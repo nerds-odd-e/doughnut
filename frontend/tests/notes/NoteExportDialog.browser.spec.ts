@@ -2,8 +2,8 @@ import { describe, it, vi, expect, beforeEach } from "vitest"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import NoteExportDialog from "@/components/notes/core/NoteExportDialog.vue"
-import { fireEvent, waitFor } from "@testing-library/vue"
 import { saveAs } from "file-saver"
+import { page } from "vitest/browser"
 
 vi.mock("file-saver", () => ({ saveAs: vi.fn() }))
 
@@ -19,21 +19,24 @@ describe("NoteExportDialog", () => {
       relatedNotes: [],
     } as never
     const getDescendantsSpy = mockSdkService("getDescendants", descendantsData)
-    const { getByText, getByTestId, queryByTestId } = helper
+    helper
       .component(NoteExportDialog)
       .withProps({ note })
       .render()
+
     // Initially, textarea is not visible
-    expect(queryByTestId("descendants-json-textarea")).toBeNull()
+    await expect.element(page.getByTestId("descendants-json-textarea")).not.toBeInTheDocument()
+
     // Expand the details
-    await fireEvent.click(getByText("Export Descendants (JSON)"))
-    await waitFor(() => {
-      const textarea = getByTestId(
-        "descendants-json-textarea"
-      ) as HTMLTextAreaElement
-      expect(textarea).toBeTruthy()
-      expect(textarea.value).toContain('"focusNote"')
-    })
+    await page.getByText("Export Descendants (JSON)").click()
+
+    const textarea = page.getByTestId("descendants-json-textarea")
+    await expect.element(textarea).toBeInTheDocument()
+    // Value assertion logic: element text content vs value property
+    // For textarea, it's usually value.
+    // Vitest browser expect.element(locator).toHaveValue(...)
+    await expect.element(textarea).toHaveValue(expect.stringContaining('"focusNote"'))
+
     // Should call API once
     expect(getDescendantsSpy).toHaveBeenCalledWith({
       path: { note: note.id },
@@ -47,13 +50,15 @@ describe("NoteExportDialog", () => {
       relatedNotes: [],
     } as never
     mockSdkService("getDescendants", descendantsData)
-    const { getByText, getByTestId } = helper
+    helper
       .component(NoteExportDialog)
       .withProps({ note })
       .render()
-    await fireEvent.click(getByText("Export Descendants (JSON)"))
-    await waitFor(() => getByTestId("download-json-btn-descendants"))
-    await fireEvent.click(getByTestId("download-json-btn-descendants"))
+
+    await page.getByText("Export Descendants (JSON)").click()
+    const downloadBtn = page.getByTestId("download-json-btn-descendants")
+    await expect.element(downloadBtn).toBeVisible()
+    await downloadBtn.click()
     expect(saveAs).toHaveBeenCalled()
   })
 
@@ -64,19 +69,24 @@ describe("NoteExportDialog", () => {
       relatedNotes: [],
     } as never
     const getDescendantsMock = mockSdkService("getDescendants", descendantsData)
-    const { getByText, getByTestId } = helper
+    helper
       .component(NoteExportDialog)
       .withProps({ note })
       .render()
+
     // Clear any calls from initial render
     getDescendantsMock.mockClear()
-    await fireEvent.click(getByText("Export Descendants (JSON)"))
-    await waitFor(() => getByTestId("descendants-json-textarea"))
+    const toggleBtn = page.getByText("Export Descendants (JSON)")
+    await toggleBtn.click()
+
+    await expect.element(page.getByTestId("descendants-json-textarea")).toBeVisible()
     expect(getDescendantsMock).toHaveBeenCalledTimes(1)
+
     // Close and reopen
-    await fireEvent.click(getByText("Export Descendants (JSON)"))
-    await fireEvent.click(getByText("Export Descendants (JSON)"))
-    await waitFor(() => getByTestId("descendants-json-textarea"))
+    await toggleBtn.click()
+    await toggleBtn.click()
+
+    await expect.element(page.getByTestId("descendants-json-textarea")).toBeVisible()
     expect(getDescendantsMock).toHaveBeenCalledTimes(1)
   })
 
@@ -87,19 +97,21 @@ describe("NoteExportDialog", () => {
       relatedNotes: [],
     } as never
     const getGraphSpy = mockSdkService("getGraph", graphData)
-    const { getByText, getByTestId, queryByTestId } = helper
+    helper
       .component(NoteExportDialog)
       .withProps({ note })
       .render()
+
     // Initially, textarea is not visible
-    expect(queryByTestId("graph-json-textarea")).toBeNull()
+    await expect.element(page.getByTestId("graph-json-textarea")).not.toBeInTheDocument()
+
     // Expand the details
-    await fireEvent.click(getByText("Export Note Graph (JSON)"))
-    await waitFor(() => {
-      const textarea = getByTestId("graph-json-textarea") as HTMLTextAreaElement
-      expect(textarea).toBeTruthy()
-      expect(textarea.value).toContain('"focusNote"')
-    })
+    await page.getByText("Export Note Graph (JSON)").click()
+
+    const textarea = page.getByTestId("graph-json-textarea")
+    await expect.element(textarea).toBeInTheDocument()
+    await expect.element(textarea).toHaveValue(expect.stringContaining('"focusNote"'))
+
     // Should call API once
     expect(getGraphSpy).toHaveBeenCalledWith({
       path: { note: note.id },
@@ -114,13 +126,15 @@ describe("NoteExportDialog", () => {
       relatedNotes: [],
     } as never
     mockSdkService("getGraph", graphData)
-    const { getByText, getByTestId } = helper
+    helper
       .component(NoteExportDialog)
       .withProps({ note })
       .render()
-    await fireEvent.click(getByText("Export Note Graph (JSON)"))
-    await waitFor(() => getByTestId("download-json-btn-graph"))
-    await fireEvent.click(getByTestId("download-json-btn-graph"))
+
+    await page.getByText("Export Note Graph (JSON)").click()
+    const downloadBtn = page.getByTestId("download-json-btn-graph")
+    await expect.element(downloadBtn).toBeVisible()
+    await downloadBtn.click()
     expect(saveAs).toHaveBeenCalled()
   })
 
@@ -131,18 +145,23 @@ describe("NoteExportDialog", () => {
       relatedNotes: [],
     } as never
     const getGraphMock = mockSdkService("getGraph", graphData)
-    const { getByText, getByTestId } = helper
+    helper
       .component(NoteExportDialog)
       .withProps({ note })
       .render()
-    await fireEvent.click(getByText("Export Note Graph (JSON)"))
-    await waitFor(() => getByTestId("graph-json-textarea"))
+
+    const toggleBtn = page.getByText("Export Note Graph (JSON)")
+    await toggleBtn.click()
+    await expect.element(page.getByTestId("graph-json-textarea")).toBeVisible()
+
     // Clear calls from initial render
     getGraphMock.mockClear()
+
     // Close and reopen
-    await fireEvent.click(getByText("Export Note Graph (JSON)"))
-    await fireEvent.click(getByText("Export Note Graph (JSON)"))
-    await waitFor(() => getByTestId("graph-json-textarea"))
+    await toggleBtn.click()
+    await toggleBtn.click()
+
+    await expect.element(page.getByTestId("graph-json-textarea")).toBeVisible()
     // Should not call again since data is already loaded
     expect(getGraphMock).toHaveBeenCalledTimes(0)
   })
@@ -161,24 +180,27 @@ describe("NoteExportDialog", () => {
     getGraphMock
       .mockResolvedValueOnce(wrapSdkResponse(graphData1))
       .mockResolvedValueOnce(wrapSdkResponse(graphData2))
-    const { getByText, getByTestId } = helper
+
+    helper
       .component(NoteExportDialog)
       .withProps({ note })
       .render()
-    await fireEvent.click(getByText("Export Note Graph (JSON)"))
-    await waitFor(() => getByTestId("graph-json-textarea"))
+
+    await page.getByText("Export Note Graph (JSON)").click()
+    await expect.element(page.getByTestId("graph-json-textarea")).toBeVisible()
+
     // Change token limit
-    const input = getByTestId("token-limit-input") as HTMLInputElement
-    input.value = "1234"
-    await fireEvent.input(input)
-    await fireEvent.click(getByTestId("refresh-graph-btn"))
-    await waitFor(() => {
-      expect(getGraphMock).toHaveBeenLastCalledWith({
-        path: { note: note.id },
-        query: { tokenLimit: 1234 },
-      })
-      const textarea = getByTestId("graph-json-textarea") as HTMLTextAreaElement
-      expect(textarea.value).toContain('"token": 1234')
+    const input = page.getByTestId("token-limit-input")
+    await input.fill("1234")
+
+    await page.getByTestId("refresh-graph-btn").click()
+
+    const textarea = page.getByTestId("graph-json-textarea")
+    await expect.element(textarea).toHaveValue(expect.stringContaining('"token": 1234'))
+
+    expect(getGraphMock).toHaveBeenLastCalledWith({
+      path: { note: note.id },
+      query: { tokenLimit: 1234 },
     })
   })
 })

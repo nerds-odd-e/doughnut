@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
-import { screen } from "@testing-library/vue"
 import ManageMCPTokensPage from "@/pages/ManageMCPTokensPage.vue"
 import helper, { mockSdkService } from "@tests/helpers"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
+import { page } from "vitest/browser"
 
 describe("ManageMCPTokensPage", () => {
   let router: ReturnType<typeof createRouter>
@@ -24,19 +24,14 @@ describe("ManageMCPTokensPage", () => {
     })
     mockSdkService("getTokens", [])
 
-    const { findByText } = helper
+    helper
       .component(ManageMCPTokensPage)
       .withRouter(router)
       .render()
 
-    const addButtons = await screen.findAllByText("Generate Token")
-    const addButton = addButtons.find((el) => el.tagName === "BUTTON")
-    expect(addButton).toBeDefined()
-    addButton!.click()
+    await page.getByRole("button", { name: "Generate Token" }).click()
+    await page.getByRole("button", { name: "Submit" }).click()
 
-    const submitButton = await screen.findByText("Submit")
-    submitButton.click()
-
-    expect(await findByText("No Label")).toBeInTheDocument()
+    await expect.element(page.getByText("No Label")).toBeVisible()
   })
 })

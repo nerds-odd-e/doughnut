@@ -3,11 +3,11 @@ import type {
   AssessmentQuestionInstance,
   RecallPrompt,
 } from "@generated/backend"
-import { screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"
+import { page } from "vitest/browser"
 
 // Helper to wait for a spy to be called (handles async timing issues)
 const waitForSpy = async (
@@ -71,9 +71,9 @@ describe("assessment page", () => {
         .withProps({ notebookId: notebook.id })
         .render()
 
-      await screen.findByText(
+      await expect.element(page.getByText(
         assessmentQuestionInstance.multipleChoicesQuestion?.f0__stem!
-      )
+      )).toBeVisible()
     })
 
     it("does not display score immediately after rendering", () => {
@@ -134,27 +134,19 @@ describe("assessment page", () => {
     })
 
     it("should submit assessment result when answer all questions", async () => {
-      const wrapper = helper
+      helper
         .component(AssessmentPage)
         .withProps({ notebookId: notebook.id })
         .render()
-      await flushPromises()
 
       // Answer first question
-      ;(await wrapper.findByText("answer1")).click()
-      await flushPromises()
-      // Small delay to ensure Vue reactivity updates
-      await new Promise((resolve) => setTimeout(resolve, 50))
+      await page.getByText("answer1").click()
 
       // Wait for first answer to be processed and advance to next question
-      await wrapper.findByText("answer3")
-      await flushPromises()
-      await new Promise((resolve) => setTimeout(resolve, 50))
+      await expect.element(page.getByText("answer3")).toBeVisible()
 
       // Answer second question
-      ;(await wrapper.findByText("answer3")).click()
-      await flushPromises()
-      await new Promise((resolve) => setTimeout(resolve, 50))
+      await page.getByText("answer3").click()
 
       // Wait for the submission API call to complete
       // This handles the async timing issue where checkIfQuizComplete() is called asynchronously

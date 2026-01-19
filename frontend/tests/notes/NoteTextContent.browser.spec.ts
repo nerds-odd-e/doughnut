@@ -1,10 +1,10 @@
 import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
 import type { Note } from "@generated/backend"
-import { VueWrapper, flushPromises } from "@vue/test-utils"
-import type { ComponentPublicInstance } from "vue"
-import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
+import { VueWrapper, flushPromises } from "@vue/test-utils"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import type { ComponentPublicInstance } from "vue"
 
 const mockedUpdateTitleCall = vi.fn()
 

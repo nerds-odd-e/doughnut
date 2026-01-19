@@ -1,10 +1,10 @@
 import HorizontalMenu from "@/components/toolbars/HorizontalMenu.vue"
 import type { User } from "@generated/backend"
-import { screen, fireEvent } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { beforeEach, vi, describe, it, expect } from "vitest"
-import { markRaw, reactive } from "vue"
+import { markRaw, reactive, nextTick } from "vue"
+import { page } from "vitest/browser"
 import SvgNote from "@/components/svgs/SvgNote.vue"
 import SvgAssimilate from "@/components/svgs/SvgAssimilate.vue"
 import SvgCalendarCheck from "@/components/svgs/SvgCalendarCheck.vue"
@@ -119,7 +119,7 @@ describe("HorizontalMenu", () => {
       expect(menuWrapper).not.toHaveClass("is-expanded")
     })
 
-    it("shows expand button when collapsed", () => {
+    it("shows expand button when collapsed", async () => {
       const navItems = createMockNavItems("assimilate")
       helper
         .component(HorizontalMenu)
@@ -132,8 +132,8 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      const expandButton = screen.getByLabelText("Toggle menu")
-      expect(expandButton).toBeInTheDocument()
+      const expandButton = page.getByLabelText("Toggle menu")
+      await expect.element(expandButton).toBeInTheDocument()
     })
 
     it("shows expand button when expanded", async () => {
@@ -150,19 +150,19 @@ describe("HorizontalMenu", () => {
         .render()
 
       // Expand button should be visible initially
-      const expandButton = screen.getByLabelText("Toggle menu")
-      expect(expandButton).toBeInTheDocument()
+      const expandButton = page.getByLabelText("Toggle menu")
+      await expect.element(expandButton).toBeInTheDocument()
 
       // Expand the menu
-      await fireEvent.click(expandButton)
+      await expandButton.click()
 
       // Expand button should still be visible after expansion
-      expect(expandButton).toBeInTheDocument()
+      await expect.element(expandButton).toBeInTheDocument()
     })
   })
 
   describe("active item display", () => {
-    it("shows active item when collapsed", () => {
+    it("shows active item when collapsed", async () => {
       const navItems = createMockNavItems("assimilate")
       helper
         .component(HorizontalMenu)
@@ -175,11 +175,11 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      const activeItem = screen.getByLabelText("Assimilate")
-      expect(activeItem).toBeInTheDocument()
+      const activeItem = page.getByLabelText("Assimilate")
+      await expect.element(activeItem).toBeInTheDocument()
     })
 
-    it("shows menu icon when collapsed and no active item exists", () => {
+    it("shows menu icon when collapsed and no active item exists", async () => {
       const navItems = createMockNavItems()
       helper
         .component(HorizontalMenu)
@@ -192,8 +192,8 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      const menuIcon = screen.getByLabelText("Menu")
-      expect(menuIcon).toBeInTheDocument()
+      const menuIcon = page.getByLabelText("Menu", { exact: true })
+      await expect.element(menuIcon).toBeInTheDocument()
     })
 
     it("hides menu icon when expanded", async () => {
@@ -210,17 +210,17 @@ describe("HorizontalMenu", () => {
         .render()
 
       // Menu icon should be visible when collapsed
-      expect(screen.getByLabelText("Menu")).toBeInTheDocument()
+      await expect.element(page.getByLabelText("Menu", { exact: true })).toBeInTheDocument()
 
       // Expand the menu
-      const expandButton = screen.getByLabelText("Toggle menu")
-      await fireEvent.click(expandButton)
+      const expandButton = page.getByLabelText("Toggle menu")
+      await expandButton.click()
 
       // Menu icon should not be visible when expanded
-      expect(screen.queryByLabelText("Menu")).not.toBeInTheDocument()
+      await expect.element(page.getByLabelText("Menu", { exact: true })).not.toBeInTheDocument()
     })
 
-    it("hides menu icon when there is an active item", () => {
+    it("hides menu icon when there is an active item", async () => {
       const navItems = createMockNavItems("assimilate")
       helper
         .component(HorizontalMenu)
@@ -234,12 +234,12 @@ describe("HorizontalMenu", () => {
         .render()
 
       // Active item should be visible
-      expect(screen.getByLabelText("Assimilate")).toBeInTheDocument()
+      await expect.element(page.getByLabelText("Assimilate")).toBeInTheDocument()
       // Menu icon should not be visible
-      expect(screen.queryByLabelText("Menu")).not.toBeInTheDocument()
+      await expect.element(page.getByLabelText("Menu", { exact: true })).not.toBeInTheDocument()
     })
 
-    it("hides menu icon on home page", () => {
+    it("hides menu icon on home page", async () => {
       const navItems = createMockNavItems()
       helper
         .component(HorizontalMenu)
@@ -253,7 +253,7 @@ describe("HorizontalMenu", () => {
         .render()
 
       // Menu icon should not be visible on home page
-      expect(screen.queryByLabelText("Menu")).not.toBeInTheDocument()
+      await expect.element(page.getByLabelText("Menu", { exact: true })).not.toBeInTheDocument()
     })
 
     it("expands menu when clicking menu icon", async () => {
@@ -274,15 +274,15 @@ describe("HorizontalMenu", () => {
       expect(menuWrapper).toHaveClass("is-collapsed")
 
       // Click on the menu icon
-      const menuIcon = screen.getByLabelText("Menu")
-      await fireEvent.click(menuIcon)
+      const menuIcon = page.getByLabelText("Menu", { exact: true })
+      await menuIcon.click()
 
       // Menu should now be expanded
       menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-expanded")
     })
 
-    it("shows active item icon and label correctly when collapsed", () => {
+    it("shows active item icon and label correctly when collapsed", async () => {
       const navItems = createMockNavItems("notebooks")
       helper
         .component(HorizontalMenu)
@@ -295,8 +295,8 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      const noteLink = screen.getByLabelText("Note")
-      expect(noteLink).toBeInTheDocument()
+      const noteLink = page.getByLabelText("Note")
+      await expect.element(noteLink).toBeInTheDocument()
     })
   })
 
@@ -314,8 +314,8 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      const expandButton = screen.getByLabelText("Toggle menu")
-      await fireEvent.click(expandButton)
+      const expandButton = page.getByLabelText("Toggle menu")
+      await expandButton.click()
 
       const menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-expanded")
@@ -340,8 +340,8 @@ describe("HorizontalMenu", () => {
       expect(menuWrapper).toHaveClass("is-collapsed")
 
       // Click on the active item (which is visible when collapsed)
-      const activeItem = screen.getByLabelText("Assimilate")
-      await fireEvent.click(activeItem)
+      const activeItem = page.getByLabelText("Assimilate")
+      await activeItem.click({ force: true })
 
       // Menu should now be expanded
       menuWrapper = document.querySelector(".menu-wrapper")
@@ -368,7 +368,7 @@ describe("HorizontalMenu", () => {
       // Click on the menu content area
       const menuContent = document.querySelector(".menu-content")
       if (menuContent) {
-        await fireEvent.click(menuContent)
+        ;(menuContent as HTMLElement).click(); await nextTick()
       }
 
       // Menu should now be expanded
@@ -389,15 +389,15 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      const expandButton = screen.getByLabelText("Toggle menu")
+      const expandButton = page.getByLabelText("Toggle menu")
 
       // Expand
-      await fireEvent.click(expandButton)
+      await expandButton.click()
       let menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-expanded")
 
       // Collapse
-      await fireEvent.click(expandButton)
+      await expandButton.click()
       menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-collapsed")
     })
@@ -415,16 +415,16 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      const expandButton = screen.getByLabelText("Toggle menu")
-      await fireEvent.click(expandButton)
+      const expandButton = page.getByLabelText("Toggle menu")
+      await expandButton.click()
 
       // All items should be visible
-      expect(screen.getByLabelText("Note")).toBeInTheDocument()
-      expect(screen.getByLabelText("Assimilate")).toBeInTheDocument()
-      expect(screen.getByLabelText("Recall")).toBeInTheDocument()
-      expect(screen.getByLabelText("Circles")).toBeInTheDocument()
-      expect(screen.getByLabelText("Bazaar")).toBeInTheDocument()
-      expect(screen.getByLabelText("Messages")).toBeInTheDocument()
+      await expect.element(page.getByLabelText("Note")).toBeInTheDocument()
+      await expect.element(page.getByLabelText("Assimilate")).toBeInTheDocument()
+      await expect.element(page.getByLabelText("Recall")).toBeInTheDocument()
+      await expect.element(page.getByLabelText("Circles")).toBeInTheDocument()
+      await expect.element(page.getByLabelText("Bazaar")).toBeInTheDocument()
+      await expect.element(page.getByLabelText("Messages")).toBeInTheDocument()
     })
   })
 
@@ -442,14 +442,14 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      const expandButton = screen.getByLabelText("Toggle menu")
-      await fireEvent.click(expandButton)
+      const expandButton = page.getByLabelText("Toggle menu")
+      await expandButton.click()
 
       let menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-expanded")
 
       // Click outside
-      await fireEvent.click(document.body)
+      document.body.click(); await nextTick()
 
       menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-collapsed")
@@ -470,8 +470,8 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      const expandButton = screen.getByLabelText("Toggle menu")
-      await fireEvent.click(expandButton)
+      const expandButton = page.getByLabelText("Toggle menu")
+      await expandButton.click()
 
       let menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-expanded")
@@ -479,7 +479,8 @@ describe("HorizontalMenu", () => {
       // Trigger blur event
       const menuContent = document.querySelector(".menu-wrapper")
       if (menuContent) {
-        await fireEvent.blur(menuContent)
+        ;(menuContent as HTMLElement).focus()
+        ;(menuContent as HTMLElement).blur(); await nextTick()
       }
 
       // Wait for setTimeout in handleFocusLoss
@@ -491,7 +492,7 @@ describe("HorizontalMenu", () => {
   })
 
   describe("login button", () => {
-    it("shows login button when no user", () => {
+    it("shows login button when no user", async () => {
       const navItems = createMockNavItems()
       helper
         .component(HorizontalMenu)
@@ -505,11 +506,11 @@ describe("HorizontalMenu", () => {
         .render()
 
       // LoginButton should be visible
-      const loginButton = screen.getByLabelText("Login via Github")
-      expect(loginButton).toBeInTheDocument()
+      const loginButton = page.getByLabelText("Login via Github")
+      await expect.element(loginButton).toBeInTheDocument()
     })
 
-    it("login button is always visible when no user and menu is expanded", () => {
+    it("login button is always visible when no user and menu is expanded", async () => {
       const navItems = createMockNavItems()
       helper
         .component(HorizontalMenu)
@@ -527,17 +528,17 @@ describe("HorizontalMenu", () => {
       expect(menuWrapper).toHaveClass("is-expanded")
       expect(menuWrapper).not.toHaveClass("is-collapsed")
 
-      const loginButton = screen.getByLabelText("Login via Github")
-      expect(loginButton).toBeInTheDocument()
+      const loginButton = page.getByLabelText("Login via Github")
+      await expect.element(loginButton).toBeInTheDocument()
 
       // Chevron should not be visible when no user
-      const expandButton = screen.queryByLabelText("Toggle menu")
-      expect(expandButton).not.toBeInTheDocument()
+      const expandButton = page.getByLabelText("Toggle menu")
+      await expect.element(expandButton).not.toBeInTheDocument()
     })
   })
 
   describe("home page behavior", () => {
-    it("does not show navigation items on home page", () => {
+    it("does not show navigation items on home page", async () => {
       const navItems = createMockNavItems("assimilate")
       helper
         .component(HorizontalMenu)
@@ -551,8 +552,8 @@ describe("HorizontalMenu", () => {
         .render()
 
       // Navigation items should not be visible
-      expect(screen.queryByLabelText("Note")).not.toBeInTheDocument()
-      expect(screen.queryByLabelText("Assimilate")).not.toBeInTheDocument()
+      await expect.element(page.getByLabelText("Note")).not.toBeInTheDocument()
+      await expect.element(page.getByLabelText("Assimilate")).not.toBeInTheDocument()
     })
   })
 
@@ -571,8 +572,8 @@ describe("HorizontalMenu", () => {
         .render()
 
       // Expand the menu first
-      const expandButton = screen.getByLabelText("Toggle menu")
-      await fireEvent.click(expandButton)
+      const expandButton = page.getByLabelText("Toggle menu")
+      await expandButton.click()
 
       let menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-expanded")

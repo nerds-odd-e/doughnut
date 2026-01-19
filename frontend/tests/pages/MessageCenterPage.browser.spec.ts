@@ -2,9 +2,9 @@ import MessageCenterPage from "@/pages/MessageCenterPage.vue"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
-import { fireEvent } from "@testing-library/vue"
 import { useRouter } from "vue-router"
 import { flushPromises } from "@vue/test-utils"
+import { page } from "vitest/browser"
 
 const mockedPush = vi.fn()
 vi.mock("vue-router", async (importOriginal) => {
@@ -34,12 +34,12 @@ describe("MessageCenterPage", () => {
   it("should render no conversation selected by default", async () => {
     const conversation = makeMe.aConversation.please()
     mockSdkService("getConversationsOfCurrentUser", [conversation])
-    const { findByText } = helper
+    helper
       .component(MessageCenterPage)
       .withCleanStorage()
       .withProps({})
       .render()
-    await findByText("No conversation selected")
+    await expect.element(page.getByText("No conversation selected")).toBeInTheDocument()
   })
 
   describe("highlighting the selected conversation", () => {
@@ -47,41 +47,39 @@ describe("MessageCenterPage", () => {
       makeMe.aConversation.please(),
       makeMe.aConversation.please(),
     ]
-    beforeEach(() => {
+    beforeEach(async () => {
       mockSdkService("getConversationsOfCurrentUser", conversations)
+      await page.viewport(1200, 800)
     })
 
     it("should highlight the selected conversation", async () => {
-      const { container } = helper
+      helper
         .component(MessageCenterPage)
         .withCleanStorage()
         .withProps({ conversationId: conversations[1]?.id })
         .render()
-      await flushPromises()
-      const listItems = container.querySelectorAll("li.daisy-menu-item")
-      expect(listItems).toHaveLength(2)
+      const listItems = page.getByRole("listitem")
+      await expect.element(listItems).toHaveLength(2)
 
-      expect(listItems[1]).toHaveClass("daisy-active")
-      expect(listItems[0]).not.toHaveClass("daisy-active")
+      await expect.element(listItems.nth(1)).toHaveClass("daisy-active")
+      await expect.element(listItems.nth(0)).not.toHaveClass("daisy-active")
     })
 
-    it("should highlight the selected conversation", async () => {
-      const { container } = helper
+    it("should navigate when conversation clicked", async () => {
+      helper
         .component(MessageCenterPage)
         .withCleanStorage()
         .withProps({})
         .render()
-      await flushPromises()
-      const listItems = container.querySelectorAll("li.daisy-menu-item")
-      expect(listItems).toHaveLength(2)
+      const listItems = page.getByRole("listitem")
+      await expect.element(listItems).toHaveLength(2)
 
       // Initially, no conversation should be highlighted
-      expect(listItems[0]).not.toHaveClass("active")
-      expect(listItems[1]).not.toHaveClass("active")
+      await expect.element(listItems.nth(0)).not.toHaveClass("active")
+      await expect.element(listItems.nth(1)).not.toHaveClass("active")
 
       // Click on the first conversation
-      await fireEvent.click(listItems[0]!)
-      await flushPromises()
+      await listItems.nth(0).click()
 
       expect(useRouter().push).toHaveBeenCalledWith({
         name: "messageCenter",
