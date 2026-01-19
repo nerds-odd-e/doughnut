@@ -1,5 +1,5 @@
 import Quiz from "@/components/recall/Quiz.vue"
-import { flushPromises } from "@vue/test-utils"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { beforeEach, describe, it, vi, afterEach, expect } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, {
@@ -12,6 +12,7 @@ import type { MemoryTrackerLite, SpellingResult } from "@generated/backend"
 describe("repeat page", () => {
   const recallPrompt = makeMe.aRecallPrompt.please()
   let askAQuestionSpy: ReturnType<typeof mockSdkService<"askAQuestion">>
+  let wrapper: VueWrapper
 
   beforeEach(() => {
     vi.resetAllMocks()
@@ -22,6 +23,8 @@ describe("repeat page", () => {
   })
 
   afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
     vi.useRealTimers()
   })
 
@@ -41,7 +44,7 @@ describe("repeat page", () => {
     const memoryTrackers = memoryTrackerIds.map((id) =>
       createMemoryTrackerLite(id, spelling)
     )
-    const wrapper = helper
+    wrapper = helper
       .component(Quiz)
       .withRouter()
       .withCleanStorage()
@@ -50,7 +53,7 @@ describe("repeat page", () => {
         currentIndex: 0,
         eagerFetchCount,
       })
-      .mount()
+      .mount({ attachTo: document.body })
     await flushPromises()
     return wrapper
   }

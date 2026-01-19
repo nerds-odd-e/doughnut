@@ -1,9 +1,8 @@
 import Modal from "@/components/commons/Modal.vue"
 import routes from "@/routes/routes"
-import { mount } from "@vue/test-utils"
+import { mount, type VueWrapper } from "@vue/test-utils"
 import { vi, afterEach, describe, it, expect } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
-import { page } from "vitest/browser"
 
 // Browser Mode: Mock AiReplyEventSource to prevent import errors
 // (Modal doesn't use it, but Browser Mode hoists mocks globally)
@@ -34,7 +33,7 @@ describe("Modal", () => {
     emits: ["close_request"],
   }
 
-  let wrapper: any
+  let wrapper: VueWrapper
 
   afterEach(() => {
     wrapper?.unmount()
@@ -53,7 +52,9 @@ describe("Modal", () => {
 
   it("click on note when doing review - close-button", async () => {
     wrapper = mountModal()
-    await vi.waitUntil(() => document.querySelector(".close-button"), { timeout: 1000 })
+    await vi.waitUntil(() => document.querySelector(".close-button"), {
+      timeout: 1000,
+    })
     const closeButton = document.querySelector(".close-button") as HTMLElement
     expect(closeButton).toBeTruthy()
     closeButton.click()
@@ -62,10 +63,14 @@ describe("Modal", () => {
 
   it("click on note when doing review - mouse-click", async () => {
     wrapper = mountModal()
-    await vi.waitUntil(() => document.querySelector(".modal-wrapper"), { timeout: 1000 })
+    await vi.waitUntil(() => document.querySelector(".modal-wrapper"), {
+      timeout: 1000,
+    })
     const modalWrapper = document.querySelector(".modal-wrapper") as HTMLElement
     expect(modalWrapper).toBeTruthy()
-    modalWrapper.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true }))
+    modalWrapper.dispatchEvent(
+      new MouseEvent("mousedown", { bubbles: true, cancelable: true })
+    )
     expect(wrapper.emitted().close_request).toHaveLength(1)
   })
 })

@@ -1,10 +1,10 @@
 import RichMarkdownEditor from "@/components/form/RichMarkdownEditor.vue"
-import { flushPromises } from "@vue/test-utils"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { nextTick } from "vue"
 import helper from "@tests/helpers"
 
 describe("RichMarkdownEditor", () => {
-  let wrapper: any
+  let wrapper: VueWrapper
 
   afterEach(() => {
     wrapper?.unmount()

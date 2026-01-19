@@ -1,12 +1,11 @@
-import { mount } from "@vue/test-utils"
+import { mount, type VueWrapper } from "@vue/test-utils"
 import QuillEditor from "@/components/form/QuillEditor.vue"
 import { nextTick } from "vue"
 import type Quill from "quill"
 import { describe, it, expect, afterEach } from "vitest"
-import { page } from "vitest/browser"
 
 describe("QuillEditor.vue", () => {
-  let wrapper: any
+  let wrapper: VueWrapper
 
   afterEach(() => {
     wrapper?.unmount()
