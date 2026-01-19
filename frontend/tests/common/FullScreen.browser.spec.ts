@@ -1,14 +1,14 @@
+import FullScreen from "@/components/common/FullScreen.vue"
+import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { page } from "vitest/browser"
-import { mount, flushPromises } from "@vue/test-utils"
-import FullScreen from "@/components/common/FullScreen.vue"
 
 describe("FullScreen", () => {
-  let wrapper: any
+  let wrapper: VueWrapper
 
   beforeEach(() => {
     // Browser Mode: Use real Fullscreen API and Pointer Lock API!
-    
+
     // Stateful mock for fullscreenElement
     let currentFullscreenElement: Element | null = null
 
@@ -36,9 +36,11 @@ describe("FullScreen", () => {
     })
 
     // Mock requestFullscreen to update state
-    vi.spyOn(document.documentElement, "requestFullscreen").mockImplementation(async function(this: Element) {
-      currentFullscreenElement = this
-    })
+    vi.spyOn(document.documentElement, "requestFullscreen").mockImplementation(
+      async function (this: Element) {
+        currentFullscreenElement = this
+      }
+    )
 
     // Mock exitFullscreen to update state
     vi.spyOn(document, "exitFullscreen").mockImplementation(async () => {
