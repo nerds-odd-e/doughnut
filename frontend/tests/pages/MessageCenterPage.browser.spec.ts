@@ -3,7 +3,6 @@ import { describe, it, expect, beforeEach, vi } from "vitest"
 import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { useRouter } from "vue-router"
-import { flushPromises } from "@vue/test-utils"
 import { page } from "vitest/browser"
 
 const mockedPush = vi.fn()
@@ -39,7 +38,9 @@ describe("MessageCenterPage", () => {
       .withCleanStorage()
       .withProps({})
       .render()
-    await expect.element(page.getByText("No conversation selected")).toBeInTheDocument()
+    await expect
+      .element(page.getByText("No conversation selected"))
+      .toBeInTheDocument()
   })
 
   describe("highlighting the selected conversation", () => {

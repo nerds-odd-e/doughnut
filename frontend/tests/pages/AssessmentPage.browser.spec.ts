@@ -71,9 +71,13 @@ describe("assessment page", () => {
         .withProps({ notebookId: notebook.id })
         .render()
 
-      await expect.element(page.getByText(
-        assessmentQuestionInstance.multipleChoicesQuestion?.f0__stem!
-      )).toBeVisible()
+      await expect
+        .element(
+          page.getByText(
+            assessmentQuestionInstance.multipleChoicesQuestion?.f0__stem!
+          )
+        )
+        .toBeVisible()
     })
 
     it("does not display score immediately after rendering", () => {

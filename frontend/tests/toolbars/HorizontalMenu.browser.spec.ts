@@ -210,14 +210,18 @@ describe("HorizontalMenu", () => {
         .render()
 
       // Menu icon should be visible when collapsed
-      await expect.element(page.getByLabelText("Menu", { exact: true })).toBeInTheDocument()
+      await expect
+        .element(page.getByLabelText("Menu", { exact: true }))
+        .toBeInTheDocument()
 
       // Expand the menu
       const expandButton = page.getByLabelText("Toggle menu")
       await expandButton.click()
 
       // Menu icon should not be visible when expanded
-      await expect.element(page.getByLabelText("Menu", { exact: true })).not.toBeInTheDocument()
+      await expect
+        .element(page.getByLabelText("Menu", { exact: true }))
+        .not.toBeInTheDocument()
     })
 
     it("hides menu icon when there is an active item", async () => {
@@ -234,9 +238,13 @@ describe("HorizontalMenu", () => {
         .render()
 
       // Active item should be visible
-      await expect.element(page.getByLabelText("Assimilate")).toBeInTheDocument()
+      await expect
+        .element(page.getByLabelText("Assimilate"))
+        .toBeInTheDocument()
       // Menu icon should not be visible
-      await expect.element(page.getByLabelText("Menu", { exact: true })).not.toBeInTheDocument()
+      await expect
+        .element(page.getByLabelText("Menu", { exact: true }))
+        .not.toBeInTheDocument()
     })
 
     it("hides menu icon on home page", async () => {
@@ -253,7 +261,9 @@ describe("HorizontalMenu", () => {
         .render()
 
       // Menu icon should not be visible on home page
-      await expect.element(page.getByLabelText("Menu", { exact: true })).not.toBeInTheDocument()
+      await expect
+        .element(page.getByLabelText("Menu", { exact: true }))
+        .not.toBeInTheDocument()
     })
 
     it("expands menu when clicking menu icon", async () => {
@@ -368,7 +378,8 @@ describe("HorizontalMenu", () => {
       // Click on the menu content area
       const menuContent = document.querySelector(".menu-content")
       if (menuContent) {
-        ;(menuContent as HTMLElement).click(); await nextTick()
+        ;(menuContent as HTMLElement).click()
+        await nextTick()
       }
 
       // Menu should now be expanded
@@ -420,7 +431,9 @@ describe("HorizontalMenu", () => {
 
       // All items should be visible
       await expect.element(page.getByLabelText("Note")).toBeInTheDocument()
-      await expect.element(page.getByLabelText("Assimilate")).toBeInTheDocument()
+      await expect
+        .element(page.getByLabelText("Assimilate"))
+        .toBeInTheDocument()
       await expect.element(page.getByLabelText("Recall")).toBeInTheDocument()
       await expect.element(page.getByLabelText("Circles")).toBeInTheDocument()
       await expect.element(page.getByLabelText("Bazaar")).toBeInTheDocument()
@@ -449,7 +462,8 @@ describe("HorizontalMenu", () => {
       expect(menuWrapper).toHaveClass("is-expanded")
 
       // Click outside
-      document.body.click(); await nextTick()
+      document.body.click()
+      await nextTick()
 
       menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-collapsed")
@@ -480,7 +494,8 @@ describe("HorizontalMenu", () => {
       const menuContent = document.querySelector(".menu-wrapper")
       if (menuContent) {
         ;(menuContent as HTMLElement).focus()
-        ;(menuContent as HTMLElement).blur(); await nextTick()
+        ;(menuContent as HTMLElement).blur()
+        await nextTick()
       }
 
       // Wait for setTimeout in handleFocusLoss
@@ -553,7 +568,9 @@ describe("HorizontalMenu", () => {
 
       // Navigation items should not be visible
       await expect.element(page.getByLabelText("Note")).not.toBeInTheDocument()
-      await expect.element(page.getByLabelText("Assimilate")).not.toBeInTheDocument()
+      await expect
+        .element(page.getByLabelText("Assimilate"))
+        .not.toBeInTheDocument()
     })
   })
 

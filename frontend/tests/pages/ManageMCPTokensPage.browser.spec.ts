@@ -24,10 +24,7 @@ describe("ManageMCPTokensPage", () => {
     })
     mockSdkService("getTokens", [])
 
-    helper
-      .component(ManageMCPTokensPage)
-      .withRouter(router)
-      .render()
+    helper.component(ManageMCPTokensPage).withRouter(router).render()
 
     await page.getByRole("button", { name: "Generate Token" }).click()
     await page.getByRole("button", { name: "Submit" }).click()
