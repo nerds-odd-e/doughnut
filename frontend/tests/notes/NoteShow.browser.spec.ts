@@ -1,10 +1,17 @@
 import NoteShow from "@/components/notes/NoteShow.vue"
 import type { NoteRealm } from "@generated/backend"
-import { screen } from "@testing-library/vue"
-import { flushPromises } from "@vue/test-utils"
+import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockShowNoteAccessory, mockSdkService } from "@tests/helpers"
-import { describe, it, expect, vi, beforeAll, beforeEach } from "vitest"
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeAll,
+  beforeEach,
+  afterEach,
+} from "vitest"
 
 describe("new/updated pink banner", () => {
   beforeAll(() => {
@@ -32,7 +39,7 @@ describe("new/updated pink banner", () => {
         noteId: note.id,
         expandChildren: true,
       })
-      .mount()
+      .mount({ attachTo: document.body })
     await flushPromises()
     const element = wrapper.find(".note-recent-update-indicator")
       .element as HTMLElement
@@ -41,6 +48,7 @@ describe("new/updated pink banner", () => {
     const actualColor = element.style.color.replace(/\s/g, "")
     const expectedColorNormalized = expectedColor.replace(/\s/g, "")
     expect(actualColor).toBe(expectedColorNormalized)
+    wrapper.unmount()
   })
 })
 
@@ -51,9 +59,12 @@ describe("note wth children", () => {
     mockShowNoteAccessory()
   })
 
+  // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+  let wrapper: VueWrapper<any>
+
   const render = (n: NoteRealm) => {
     mockSdkService("showNote", n)
-    helper
+    wrapper = helper
       .component(NoteShow)
       .withRouter()
       .withCleanStorage()
@@ -61,8 +72,13 @@ describe("note wth children", () => {
         noteId: n.id,
         expandChildren: true,
       })
-      .render()
+      .mount({ attachTo: document.body })
   }
+
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
+  })
 
   it("should call the api", () => {
     const showNoteSpy = mockSdkService("showNote", note)
@@ -76,6 +92,6 @@ describe("note wth children", () => {
   it("should not render children control if no child", async () => {
     render(note)
     await flushPromises()
-    expect(screen.queryAllByTitle("collapse children")).toHaveLength(0)
+    expect(wrapper.findAll('[title="collapse children"]')).toHaveLength(0)
   })
 })

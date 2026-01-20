@@ -56,11 +56,11 @@ describe("adding new note", () => {
 
   it("does not search for initial default 'Untitled' title", async () => {
     searchForRelationshipTargetWithinSpy.mockResolvedValue(wrapSdkResponse([]))
-    helper
+    const wrapper = helper
       .component(NoteNewDialog)
       .withCleanStorage()
       .withProps({ referenceNote: note, insertMode: "as-child" })
-      .mount()
+      .mount({ attachTo: document.body })
 
     // Wait a bit to ensure any potential search would have been triggered
     vi.runOnlyPendingTimers()
@@ -68,6 +68,7 @@ describe("adding new note", () => {
 
     // Search should not be called for the initial "Untitled" title
     expect(searchForRelationshipTargetWithinSpy).not.toHaveBeenCalled()
+    wrapper.unmount()
   })
 
   it("searches when user edits title back to 'Untitled'", async () => {
@@ -80,7 +81,7 @@ describe("adding new note", () => {
       .component(NoteNewDialog)
       .withCleanStorage()
       .withProps({ referenceNote: note, insertMode: "as-child" })
-      .mount()
+      .mount({ attachTo: document.body })
 
     // First, change the title to something else (this marks it as edited)
     await wrapper.find("input#note-title").setValue("myth")
@@ -100,6 +101,7 @@ describe("adding new note", () => {
       path: { note: note.id },
       body: expect.objectContaining({ searchKey: "Untitled" }),
     })
+    wrapper.unmount()
   })
 
   it("search for duplicate", async () => {
@@ -112,7 +114,7 @@ describe("adding new note", () => {
       .component(NoteNewDialog)
       .withCleanStorage()
       .withProps({ referenceNote: note, insertMode: "as-child" })
-      .mount()
+      .mount({ attachTo: document.body })
     await wrapper.find("input#note-title").setValue("myth")
 
     vi.runOnlyPendingTimers()
@@ -123,6 +125,7 @@ describe("adding new note", () => {
       path: { note: note.id },
       body: expect.objectContaining({ searchKey: "myth" }),
     })
+    wrapper.unmount()
   })
 
   describe("submit form", () => {
@@ -136,6 +139,10 @@ describe("adding new note", () => {
         .mount({ attachTo: document.body })
       await wrapper.find("input#note-title").setValue("note title")
       vi.clearAllTimers()
+    })
+
+    afterEach(() => {
+      wrapper?.unmount()
     })
 
     it("call the api", async () => {
@@ -155,7 +162,8 @@ describe("adding new note", () => {
   })
 
   describe("search wikidata entry", () => {
-    let wrapper: VueWrapper<ComponentPublicInstance>
+    // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+    let wrapper: VueWrapper<any>
     let searchWikidataSpy: ReturnType<typeof mockSdkService<"searchWikidata">>
 
     beforeEach(() => {
@@ -168,6 +176,10 @@ describe("adding new note", () => {
         .withCleanStorage()
         .withProps({ referenceNote: note, insertMode: "as-child" })
         .mount({ attachTo: document.body })
+    })
+
+    afterEach(() => {
+      wrapper?.unmount()
     })
 
     const titleInput = () => {

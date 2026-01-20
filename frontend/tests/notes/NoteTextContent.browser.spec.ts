@@ -2,7 +2,7 @@ import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
 import type { Note } from "@generated/backend"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
-import { VueWrapper, flushPromises } from "@vue/test-utils"
+import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { ComponentPublicInstance } from "vue"
 
@@ -10,18 +10,22 @@ const mockedUpdateTitleCall = vi.fn()
 
 describe("in place edit on title", () => {
   const note = makeMe.aNote.title("Dummy Title").please()
+  // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+  let wrapper: VueWrapper<any>
+
   const mountComponent = (
     n: Note,
     readonly = false
   ): VueWrapper<ComponentPublicInstance> => {
-    return helper
+    wrapper = helper
       .component(NoteTextContent)
       .withCleanStorage()
       .withProps({
         readonly,
         note: n,
       })
-      .mount()
+      .mount({ attachTo: document.body })
+    return wrapper
   }
 
   beforeEach(() => {
@@ -33,27 +37,63 @@ describe("in place edit on title", () => {
   })
 
   afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
     vi.useRealTimers()
   })
 
   it("should display text field when one single click on title", async () => {
-    const wrapper = mountComponent(note)
+    mountComponent(note)
     await flushPromises()
     const titleEl = wrapper.find('[role="title"]').element as HTMLElement
     expect(titleEl.getAttribute("contenteditable")).toBe("true")
   })
 
   it("should not save change when not unmount", async () => {
-    const wrapper = mountComponent(note)
+    mountComponent(note)
     await flushPromises()
     const titleEl = wrapper.find('[role="title"]').element as HTMLElement
     titleEl.innerText = "updated"
     titleEl.dispatchEvent(new Event("input"))
+    // wrapper.unmount() is NOT called here manually, but checking if save happened
+    // Wait... the original test called unmount() at the END.
+    // "should not save change when not unmount" -> implies "before unmount"?
+    // Original code:
+    // titleEl.innerText = "updated"
+    // titleEl.dispatchEvent(new Event("input"))
+    // wrapper.unmount()
+    // BUT there is NO assertion!
+    // This test seems to check that unmount DOES NOT crash or save?
+    // Wait, the next test is "should save change when unmount".
+    // This test "should not save change when not unmount" calls `wrapper.unmount()` at the end?
+    // Let's look at the original code again.
+    // it("should not save change when not unmount", async () => {
+    //   const wrapper = mountComponent(note)
+    //   await flushPromises()
+    //   const titleEl = wrapper.find('[role="title"]').element as HTMLElement
+    //   titleEl.innerText = "updated"
+    //   titleEl.dispatchEvent(new Event("input"))
+    //   wrapper.unmount()
+    // })
+    // It seems this test is misnamed or incomplete. It calls unmount but expects... what?
+    // Maybe it expects `mockedUpdateTitleCall` NOT to be called? But the NEXT test says "should save change when unmount".
+    // Ah, `NoteTextContent` saves on unmount?
+    // If so, `wrapper.unmount()` SHOULD trigger save.
+    // If the test name is "should not save...", then `wrapper.unmount()` shouldn't be called, OR it shouldn't save.
+    // Let's assume the test intends to verify state BEFORE unmount?
+    // But it calls unmount at the end.
+    // I will preserve the logic: call unmount at the end.
+    // My global afterEach also calls unmount. Double unmount is usually safe in VTU (it warns but doesn't crash).
+    // I will just let afterEach handle it?
+    // If I let afterEach handle it, the unmount happens after test function returns.
+    // If the test relies on unmount happening *during* the test block (to check side effects? but it has no checks!), then it's weird.
+    // I'll keep explicit unmount if it was there, but use the shared wrapper.
     wrapper.unmount()
+    // No assertion...
   })
 
   it("is not editable when readonly", async () => {
-    const wrapper = mountComponent(note, true)
+    mountComponent(note, true)
     await flushPromises()
     const titleEl = wrapper.find('[role="title"]').element as HTMLElement
     expect(titleEl.getAttribute("contenteditable")).toBe("false")
@@ -65,14 +105,14 @@ describe("in place edit on title", () => {
 
   it("should prompt people to add details", async () => {
     note.details = ""
-    const wrapper = mountComponent(note)
+    mountComponent(note)
     const placeholder = getPlaceholder(wrapper)
     expect(placeholder).toBe("Enter note details here...")
   })
 
   it("should not prompt people to add details if readonly", async () => {
     note.details = ""
-    const wrapper = mountComponent(note, true)
+    mountComponent(note, true)
     try {
       getPlaceholder(wrapper)
       expect(true, "there should not be placehodler for readonly").toBe(false)
@@ -86,11 +126,11 @@ describe("in place edit on title", () => {
   })
 
   it("should save change when unmount", async () => {
-    const wrapper = mountComponent(note)
+    mountComponent(note)
     const titleEl = wrapper.find('[role="title"]').element as HTMLElement
     titleEl.innerText = "updated"
     titleEl.dispatchEvent(new Event("input"))
-    wrapper.unmount()
+    wrapper.unmount() // Trigger save
     expect(mockedUpdateTitleCall).toBeCalledWith({
       path: { note: note.id },
       body: { newTitle: "updated" },
@@ -116,7 +156,7 @@ describe("in place edit on title", () => {
   }
 
   it("should save content when blur text field title", async () => {
-    const wrapper = mountComponent(note)
+    mountComponent(note)
     await flushPromises()
     await editTitle(wrapper, "updated")
     const titleEl = wrapper.find('[role="title"]').element as HTMLElement
@@ -128,7 +168,7 @@ describe("in place edit on title", () => {
   })
 
   it("should not change content if there's unsaved changed", async () => {
-    const wrapper = mountComponent(note)
+    mountComponent(note)
     await editTitle(wrapper, "updated")
 
     await wrapper.setProps({
@@ -141,7 +181,7 @@ describe("in place edit on title", () => {
   })
 
   it("should keep unsaved changes when API returns with older value during typing", async () => {
-    const wrapper = mountComponent(note)
+    mountComponent(note)
     await flushPromises()
 
     const titleEl = wrapper.find('[role="title"]').element as HTMLElement
@@ -177,7 +217,7 @@ describe("in place edit on title", () => {
   })
 
   it("should change content if there's no unsaved changed but change from prop", async () => {
-    const wrapper = mountComponent(note)
+    mountComponent(note)
     await wrapper.setProps({
       note: {
         ...note,
@@ -192,9 +232,8 @@ describe("in place edit on title", () => {
   })
 
   describe("saved and having error", () => {
-    let wrapper: VueWrapper<ComponentPublicInstance>
     beforeEach(async () => {
-      wrapper = mountComponent(note)
+      const w = mountComponent(note)
       mockedUpdateTitleCall.mockRejectedValueOnce(
         makeMe.anApiError
           .ofBindingError({
@@ -202,7 +241,7 @@ describe("in place edit on title", () => {
           })
           .please()
       )
-      await editTitleThenBlur(wrapper)
+      await editTitleThenBlur(w)
       await flushPromises()
     })
 
@@ -222,7 +261,7 @@ describe("in place edit on title", () => {
 
   it("should not trigger changes for initial details content", async () => {
     note.details = "initial\n\ndescription"
-    const wrapper = mountComponent(note)
+    mountComponent(note)
     await flushPromises()
     wrapper.unmount()
     expect(mockedUpdateTitleCall).toBeCalledTimes(0)
@@ -235,7 +274,7 @@ describe("in place edit on title", () => {
       { case: "newlines only", value: "\n\n" },
       { case: "mixed whitespace", value: " \n \t " },
     ])("should not save when title is $case", async ({ value }) => {
-      const wrapper = mountComponent(note)
+      mountComponent(note)
       await flushPromises()
 
       const titleEl = wrapper.find('[role="title"]').element as HTMLElement
@@ -260,7 +299,7 @@ describe("in place edit on title", () => {
     })
 
     it("should display error when no authorization to save", async () => {
-      const wrapper = mountComponent(note)
+      mountComponent(note)
       mockedUpdateTitleCall.mockRejectedValueOnce(
         makeMe.anApiError.of401().please()
       )
@@ -276,14 +315,14 @@ describe("in place edit on title", () => {
     const relationNote = makeMe.aRelationship.to(target).please()
 
     it("should dispay target", async () => {
-      const wrapper = mountComponent(relationNote)
+      mountComponent(relationNote)
       expect(wrapper.text()).toContain(
         relationNote.noteTopology.targetNoteTopology?.title
       )
     })
 
     it("should dispay breadcrumbs", async () => {
-      const wrapper = mountComponent(relationNote)
+      mountComponent(relationNote)
       expect(wrapper.text()).toContain(note.noteTopology.title!)
     })
   })
