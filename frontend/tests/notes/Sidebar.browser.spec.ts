@@ -301,7 +301,14 @@ describe("Sidebar", () => {
         wrapper.find('[aria-label="Drop position indicator"]').isVisible()
       ).toBe(true)
 
-      await dropTarget!.trigger("dragleave", { relatedTarget: null })
+      const dragLeaveEvent = new DragEvent("dragleave", {
+        relatedTarget: null,
+        bubbles: true,
+        cancelable: true,
+      })
+      dropTarget!.element.dispatchEvent(dragLeaveEvent)
+
+      await flushPromises()
       expect(
         wrapper.find('[aria-label="Drop position indicator"]').exists()
       ).toBe(false)
@@ -361,8 +368,17 @@ describe("Sidebar", () => {
       expect(dropIndicator.isVisible()).toBe(true)
       expect(dropIndicator.classes()).toContain("drop-indicator")
 
-      await dropTarget!.trigger("dragleave")
-      expect(dropIndicator.isVisible()).toBe(false)
+      const dragLeaveEvent = new DragEvent("dragleave", {
+        relatedTarget: null,
+        bubbles: true,
+        cancelable: true,
+      })
+      dropTarget!.element.dispatchEvent(dragLeaveEvent)
+
+      await flushPromises()
+      expect(
+        wrapper.find('[aria-label="Drop position indicator"]').exists()
+      ).toBe(false)
     })
 
     it("should not show drop indicator when dragging over notes with different parents", async () => {
@@ -417,12 +433,27 @@ describe("Sidebar", () => {
       )
       expect(dropIndicator.isVisible()).toBe(true)
 
-      await dropTarget!.trigger("dragover")
-      await dropTarget!.trigger("dragover")
+      const dragOverEvent = new DragEvent("dragover", {
+        bubbles: true,
+        cancelable: true,
+      })
+      dropTarget!.element.dispatchEvent(dragOverEvent)
+      dropTarget!.element.dispatchEvent(dragOverEvent)
+
+      await flushPromises()
       expect(dropIndicator.isVisible()).toBe(true)
 
-      await dropTarget!.trigger("dragleave")
-      expect(dropIndicator.isVisible()).toBe(false)
+      const dragLeaveEvent = new DragEvent("dragleave", {
+        relatedTarget: null,
+        bubbles: true,
+        cancelable: true,
+      })
+      dropTarget!.element.dispatchEvent(dragLeaveEvent)
+
+      await flushPromises()
+      expect(
+        wrapper.find('[aria-label="Drop position indicator"]').exists()
+      ).toBe(false)
     })
 
     it("should show child drop indicator when dragging to right half", async () => {
