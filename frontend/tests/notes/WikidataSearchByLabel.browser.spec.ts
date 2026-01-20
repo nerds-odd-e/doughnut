@@ -1,6 +1,7 @@
 import WikidataSearchByLabel from "@/components/notes/WikidataSearchByLabel.vue"
 import helper from "@tests/helpers"
-import { describe, it, expect, vi } from "vitest"
+import { describe, it, expect, vi, afterEach } from "vitest"
+import { type VueWrapper } from "@vue/test-utils"
 
 vi.mock("vue-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("vue-router")>()
@@ -13,14 +14,23 @@ vi.mock("vue-router", async (importOriginal) => {
 })
 
 describe("WikidataSearchByLabel", () => {
+  // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+  let wrapper: VueWrapper<any>
+
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
+  })
+
   const mountComponent = (modelValue?: string) => {
-    return helper
+    wrapper = helper
       .component(WikidataSearchByLabel)
       .withProps({
         searchKey: "test",
         modelValue,
       })
-      .mount()
+      .mount({ attachTo: document.body })
+    return wrapper
   }
 
   const getButton = (wrapper: ReturnType<typeof mountComponent>) =>

@@ -1,7 +1,7 @@
 import SuggestQuestionForFineTuning from "@/components/ai/SuggestQuestionForFineTuning.vue"
 import type { PredefinedQuestion } from "@generated/backend"
-import { flushPromises } from "@vue/test-utils"
-import { beforeEach, describe, it, expect } from "vitest"
+import { type VueWrapper, flushPromises } from "@vue/test-utils"
+import { beforeEach, describe, it, expect, afterEach } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 
@@ -10,13 +10,19 @@ describe("SuggestQuestion", () => {
     const predefinedQuestion: PredefinedQuestion =
       makeMe.aPredefinedQuestion.please()
 
-    let wrapper
+    // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+    let wrapper: VueWrapper<any>
 
     beforeEach(() => {
       wrapper = helper
         .component(SuggestQuestionForFineTuning)
         .withProps({ predefinedQuestion })
-        .mount()
+        .mount({ attachTo: document.body })
+    })
+
+    afterEach(() => {
+      wrapper?.unmount()
+      document.body.innerHTML = ""
     })
 
     it("should be able to suggest a question as good example", async () => {

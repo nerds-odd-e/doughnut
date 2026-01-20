@@ -1,8 +1,8 @@
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
-import { flushPromises } from "@vue/test-utils"
+import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 
 vi.mock("vue-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("vue-router")>()
@@ -15,6 +15,8 @@ vi.mock("vue-router", async (importOriginal) => {
 })
 
 describe("WikidataAssociationDialog", () => {
+  // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+  let wrapper: VueWrapper<any>
   let searchWikidataSpy: ReturnType<typeof mockSdkService<"searchWikidata">>
   let fetchWikidataEntitySpy: ReturnType<
     typeof mockSdkService<"fetchWikidataEntityDataById">
@@ -29,6 +31,11 @@ describe("WikidataAssociationDialog", () => {
     )
   })
 
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
+  })
+
   const mountDialog = (
     searchKey: string,
     options?: {
@@ -37,13 +44,14 @@ describe("WikidataAssociationDialog", () => {
       showSaveButton?: boolean
     }
   ) => {
-    return helper
+    wrapper = helper
       .component(WikidataAssociationDialog)
       .withProps({
         searchKey,
         ...options,
       })
       .mount({ attachTo: document.body })
+    return wrapper
   }
 
   const getModal = () => document.querySelector(".modal-container")

@@ -2,11 +2,10 @@ import Sidebar from "@/components/notes/Sidebar.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import type { NoteRealm } from "@/generated/backend"
 import createNoteStorage from "@/store/createNoteStorage"
-import { fireEvent, screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
-import { flushPromises } from "@vue/test-utils"
-import { vi } from "vitest"
+import { type VueWrapper, flushPromises } from "@vue/test-utils"
+import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
 
 function isBefore(node1: Node, node2: Node) {
   return !!(
@@ -16,6 +15,8 @@ function isBefore(node1: Node, node2: Node) {
 }
 
 describe("Sidebar", () => {
+  // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+  let wrapper: VueWrapper<any>
   const storageAccessor = useStorageAccessor()
   const topNoteRealm = makeMe.aNoteRealm.title("top").please()
   const firstGeneration = makeMe.aNoteRealm
@@ -31,13 +32,14 @@ describe("Sidebar", () => {
     .under(firstGeneration)
     .please()
 
-  const render = (n: NoteRealm) => {
-    return helper
+  const mountSidebar = (n: NoteRealm) => {
+    wrapper = helper
       .component(Sidebar)
       .withProps({
         activeNoteRealm: n,
       })
-      .render()
+      .mount({ attachTo: document.body })
+    return wrapper
   }
 
   beforeEach(() => {
@@ -53,7 +55,6 @@ describe("Sidebar", () => {
 
   beforeEach(() => {
     // Browser Mode: Mock getBoundingClientRect, offsetWidth, clientWidth for deterministic tests
-    // These are still needed for layout calculations
     Element.prototype.getBoundingClientRect = vi.fn().mockReturnValue({
       top: 0,
       bottom: 100,
@@ -61,6 +62,12 @@ describe("Sidebar", () => {
       width: 200,
       left: 0,
       right: 200,
+      x: 0,
+      y: 0,
+      // toJSON is required by DOMRect interface but unused in tests
+      toJSON: () => {
+        return {}
+      },
     })
 
     Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
@@ -83,52 +90,60 @@ describe("Sidebar", () => {
   })
 
   afterEach(() => {
+    wrapper?.unmount()
     document.body.innerHTML = ""
     vi.restoreAllMocks()
   })
 
+  // Helper to find sidebar item by text content
+  const findSidebarItem = (text: string) => {
+    return wrapper
+      .findAll("a, span") // Sidebar items are usually links or spans
+      .find((el) => el.text().includes(text))
+  }
+
   it("should call the api once if top note", async () => {
-    render(topNoteRealm)
-    await screen.findByText(firstGeneration.note.noteTopology.title!)
+    mountSidebar(topNoteRealm)
+    await vi.waitUntil(() =>
+      findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
+    )
   })
 
   describe("first generation", () => {
     it("should scroll to active note", async () => {
-      render(firstGeneration)
+      mountSidebar(firstGeneration)
       await flushPromises()
 
       // Browser Mode: Real IntersectionObserver checks visibility
-      // Wait for it to initialize
       await flushPromises()
       await new Promise((resolve) =>
         requestAnimationFrame(() => resolve(undefined))
       )
 
       // Browser Mode: Verify the active item is rendered correctly
-      const activeItem = await screen.findByText(
+      await vi.waitUntil(() =>
+        findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
+      )
+
+      // Check for active class on parent li or similar
+      // Assuming Sidebar structure: li > .active-item or similar
+      // The original test checked parent.parent.parent
+      // Let's check if we can find .active-item class
+      const activeElement = wrapper.find(".active-item")
+      expect(activeElement.exists()).toBe(true)
+      expect(activeElement.text()).toContain(
         firstGeneration.note.noteTopology.title!
       )
-      expect(
-        /* eslint-disable */
-        activeItem.parentNode?.parentNode?.parentNode
-        /* eslint-enable */
-      ).toHaveClass("active-item")
 
-      // Browser Mode: scrollIntoView may or may not be called depending on visibility
-      // In browser mode, if element is already visible, scrollIntoView won't be called
-      // This is correct behavior - we verify the component rendered correctly above
-      // We just verify the component rendered correctly (scrollIntoView call is optional)
       const scrollSpy = HTMLElement.prototype.scrollIntoView as ReturnType<
         typeof vi.spyOn
       >
       const scrollCallCount = scrollSpy.mock?.calls?.length || 0
-      // Test passes if component rendered correctly (scrollIntoView call is optional)
       expect(scrollCallCount).toBeGreaterThanOrEqual(0)
     })
 
     it("should not scroll if already visible", async () => {
       // Browser Mode: Use real IntersectionObserver but control its behavior
-      // We'll spy on it and manually trigger the callback with isIntersecting: true
       const originalIntersectionObserver = window.IntersectionObserver
 
       window.IntersectionObserver = class extends originalIntersectionObserver {
@@ -144,7 +159,7 @@ describe("Sidebar", () => {
         }
       } as typeof IntersectionObserver
 
-      render(firstGeneration)
+      mountSidebar(firstGeneration)
       await flushPromises()
       // Browser Mode: Use requestAnimationFrame for proper async waiting instead of setTimeout
       await new Promise((resolve) =>
@@ -160,34 +175,54 @@ describe("Sidebar", () => {
     })
 
     it("should have siblings", async () => {
-      render(firstGeneration)
-      await screen.findByText(firstGenerationSibling.note.noteTopology.title!)
+      mountSidebar(firstGeneration)
+      await vi.waitUntil(() =>
+        findSidebarItem(
+          firstGenerationSibling.note.noteTopology.title!
+        )?.exists()
+      )
     })
 
     it("should have child note of active first gen", async () => {
-      render(firstGeneration)
-      const secondGen = await screen.findByText(
+      mountSidebar(firstGeneration)
+      await vi.waitUntil(() =>
+        findSidebarItem(secondGeneration.note.noteTopology.title!)?.exists()
+      )
+
+      const secondGen = findSidebarItem(
         secondGeneration.note.noteTopology.title!
-      )
-      const sibling = await screen.findByText(
+      )!.element
+      const sibling = findSidebarItem(
         firstGenerationSibling.note.noteTopology.title!
-      )
+      )!.element
+
       expect(isBefore(secondGen, sibling)).toBe(true)
     })
   })
 
   it("should start from notebook top", async () => {
-    render(secondGeneration)
-    await screen.findByText(firstGeneration.note.noteTopology.title!)
-    await screen.findByText(secondGeneration.note.noteTopology.title!)
+    mountSidebar(secondGeneration)
+    await vi.waitUntil(() =>
+      findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
+    )
+    expect(
+      findSidebarItem(secondGeneration.note.noteTopology.title!)?.exists()
+    ).toBe(true)
   })
 
   it("should disable the menu and keep the content when loading", async () => {
-    const { rerender } = render(topNoteRealm)
+    mountSidebar(topNoteRealm)
     await flushPromises()
-    await rerender({ noteRealm: undefined })
+
+    // Simulate loading/undefined prop as per original test (which used 'noteRealm' instead of 'activeNoteRealm')
+    // We replicate the behavior: effectively not changing activeNoteRealm, or passing an extra prop.
+    // Since wrapper is <any>, we can pass arbitrary props.
+    await wrapper.setProps({ noteRealm: undefined })
     await flushPromises()
-    await screen.findByText(firstGeneration.note.noteTopology.title!)
+
+    expect(
+      findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
+    ).toBe(true)
   })
 
   describe("drag and drop functionality", () => {
@@ -197,22 +232,23 @@ describe("Sidebar", () => {
 
     it("should call moveAfter when dragging and dropping notes", async () => {
       const moveAfterSpy = mockSdkService("moveAfter", [])
-      render(firstGeneration)
+      mountSidebar(firstGeneration)
 
       await flushPromises()
 
-      const draggedNote = await screen.findByText(
+      const draggedNote = findSidebarItem(
         firstGeneration.note.noteTopology.title!
       )
-      const dropTarget = await screen.findByText(
+      const dropTarget = findSidebarItem(
         firstGenerationSibling.note.noteTopology.title!
       )
 
-      // Browser Mode: Real drag events!
-      // Start drag
-      await fireEvent.dragStart(draggedNote)
-      // Perform drag
-      await fireEvent.drop(dropTarget)
+      expect(draggedNote).toBeDefined()
+      expect(dropTarget).toBeDefined()
+
+      // Browser Mode: Trigger drag events using Vue Wrapper
+      await draggedNote!.trigger("dragstart")
+      await dropTarget!.trigger("drop")
 
       expect(moveAfterSpy).toHaveBeenCalledWith({
         path: {
@@ -224,249 +260,221 @@ describe("Sidebar", () => {
     })
 
     it("should add dragging class while dragging", async () => {
-      render(firstGeneration)
+      mountSidebar(firstGeneration)
       await flushPromises()
 
-      const draggedNote = await screen.findByText(
+      const draggedNote = findSidebarItem(
         firstGeneration.note.noteTopology.title!
       )
+
       // Get the li element (parent of the div containing the text)
-      const listItem = draggedNote.closest("li")
-      expect(listItem).not.toHaveClass("dragging")
+      // We need to traverse up to li. Assuming structure.
+      const listItem = draggedNote!.element.closest("li")
+      expect(listItem?.classList.contains("dragging")).toBe(false)
 
-      // Browser Mode: Real drag events!
-      // Start drag
-      await fireEvent.dragStart(draggedNote)
-      expect(listItem).toHaveClass("dragging")
+      await draggedNote!.trigger("dragstart")
+      expect(listItem?.classList.contains("dragging")).toBe(true)
 
-      // End drag
-      await fireEvent.dragEnd(draggedNote)
-      expect(listItem).not.toHaveClass("dragging")
+      await draggedNote!.trigger("dragend")
+      expect(listItem?.classList.contains("dragging")).toBe(false)
     })
 
     it("should show and hide drop indicator when dragging over a target", async () => {
-      render(firstGeneration)
+      mountSidebar(firstGeneration)
       await flushPromises()
 
-      const draggedNote = await screen.findByText(
+      const draggedNote = findSidebarItem(
         firstGeneration.note.noteTopology.title!
       )
-      const dropTarget = await screen.findByText(
+      const dropTarget = findSidebarItem(
         firstGenerationSibling.note.noteTopology.title!
       )
 
-      // Browser Mode: Real drag events!
-      // Start drag
-      await fireEvent.dragStart(draggedNote)
+      await draggedNote!.trigger("dragstart")
 
-      // Before drag enter
       expect(
-        screen.queryByLabelText("Drop position indicator")
-      ).not.toBeInTheDocument()
+        wrapper.find('[aria-label="Drop position indicator"]').exists()
+      ).toBe(false)
 
-      // Browser Mode: Real drag events!
-      await fireEvent.dragEnter(dropTarget)
-      expect(screen.getByLabelText("Drop position indicator")).toBeVisible()
-
-      // After drag leave
-      await fireEvent.dragLeave(dropTarget)
+      await dropTarget!.trigger("dragenter")
       expect(
-        screen.queryByLabelText("Drop position indicator")
-      ).not.toBeInTheDocument()
+        wrapper.find('[aria-label="Drop position indicator"]').isVisible()
+      ).toBe(true)
+
+      await dropTarget!.trigger("dragleave", { relatedTarget: null })
+      expect(
+        wrapper.find('[aria-label="Drop position indicator"]').exists()
+      ).toBe(false)
     })
 
     it("should not call moveAfter when dragging to the same note", async () => {
       const moveAfterMock = mockSdkService("moveAfter", [])
-      render(firstGeneration)
+      mountSidebar(firstGeneration)
       await flushPromises()
 
-      const note = await screen.findByText(
-        firstGeneration.note.noteTopology.title!
-      )
-      // Clear any calls from setup
+      const note = findSidebarItem(firstGeneration.note.noteTopology.title!)
       moveAfterMock.mockClear()
 
-      // Drag and drop on itself
-      await fireEvent.dragStart(note)
-      await fireEvent.drop(note)
+      await note!.trigger("dragstart")
+      await note!.trigger("drop")
 
       expect(moveAfterMock).not.toHaveBeenCalled()
     })
 
     it("should not call moveAfter when dragging between different parents", async () => {
       const moveAfterMock = mockSdkService("moveAfter", [])
-      render(firstGeneration)
+      mountSidebar(firstGeneration)
       await flushPromises()
 
-      const firstGenNote = await screen.findByText(
+      const firstGenNote = findSidebarItem(
         firstGeneration.note.noteTopology.title!
       )
-      const secondGenNote = await screen.findByText(
+      const secondGenNote = findSidebarItem(
         secondGeneration.note.noteTopology.title!
       )
 
-      // Clear any calls from setup
       moveAfterMock.mockClear()
 
-      // Try to drag between different parent levels
-      await fireEvent.dragStart(secondGenNote)
-      await fireEvent.drop(firstGenNote)
+      await secondGenNote!.trigger("dragstart")
+      await firstGenNote!.trigger("drop")
 
       expect(moveAfterMock).not.toHaveBeenCalled()
     })
 
     it("should show drop indicator when dragging over a note", async () => {
-      render(firstGeneration)
+      mountSidebar(firstGeneration)
       await flushPromises()
 
-      const draggedNote = await screen.findByText(
+      const draggedNote = findSidebarItem(
         firstGeneration.note.noteTopology.title!
       )
-      const dropTarget = await screen.findByText(
+      const dropTarget = findSidebarItem(
         firstGenerationSibling.note.noteTopology.title!
       )
 
-      // Browser Mode: Real drag events!
-      // Start drag
-      await fireEvent.dragStart(draggedNote)
-      // Drag over target
-      await fireEvent.dragEnter(dropTarget)
+      await draggedNote!.trigger("dragstart")
+      await dropTarget!.trigger("dragenter")
 
-      // Check for drop indicator
-      const dropIndicator = screen.getByLabelText("Drop position indicator")
-      expect(dropIndicator).toBeVisible()
-      expect(dropIndicator).toHaveClass("drop-indicator")
+      const dropIndicator = wrapper.find(
+        '[aria-label="Drop position indicator"]'
+      )
+      expect(dropIndicator.isVisible()).toBe(true)
+      expect(dropIndicator.classes()).toContain("drop-indicator")
 
-      // Indicator should disappear after drag leave
-      await fireEvent.dragLeave(dropTarget)
-      expect(dropIndicator).not.toBeVisible()
+      await dropTarget!.trigger("dragleave")
+      expect(dropIndicator.isVisible()).toBe(false)
     })
 
     it("should not show drop indicator when dragging over notes with different parents", async () => {
-      render(firstGeneration)
+      mountSidebar(firstGeneration)
       await flushPromises()
 
-      const secondGenNote = await screen.findByText(
+      const secondGenNote = findSidebarItem(
         secondGeneration.note.noteTopology.title!
       )
-      const firstGenNote = await screen.findByText(
+      const firstGenNote = findSidebarItem(
         firstGeneration.note.noteTopology.title!
       )
 
-      // Browser Mode: Real drag events!
-      // Start drag from second generation
-      await fireEvent.dragStart(secondGenNote)
-      // Try to drag over first generation
-      await fireEvent.dragEnter(firstGenNote)
+      await secondGenNote!.trigger("dragstart")
+      await firstGenNote!.trigger("dragenter")
 
-      // Check that drop indicator is not shown
-      const dropIndicator = screen.queryByLabelText("Drop position indicator")
-      expect(dropIndicator).not.toBeInTheDocument()
+      expect(
+        wrapper.find('[aria-label="Drop position indicator"]').exists()
+      ).toBe(false)
     })
 
     it("should not show drop indicator when dragging over itself", async () => {
-      render(firstGeneration)
+      mountSidebar(firstGeneration)
       await flushPromises()
 
-      const note = await screen.findByText(
-        firstGeneration.note.noteTopology.title!
-      )
+      const note = findSidebarItem(firstGeneration.note.noteTopology.title!)
 
-      // Browser Mode: Real drag events!
-      // Start drag
-      await fireEvent.dragStart(note)
-      // Drag over itself
-      await fireEvent.dragEnter(note)
+      await note!.trigger("dragstart")
+      await note!.trigger("dragenter")
 
-      // Check that drop indicator is not shown
-      const dropIndicator = screen.queryByLabelText("Drop position indicator")
-      expect(dropIndicator).not.toBeInTheDocument()
+      expect(
+        wrapper.find('[aria-label="Drop position indicator"]').exists()
+      ).toBe(false)
     })
 
     it("should maintain drop indicator while dragging within the target", async () => {
-      render(firstGeneration)
+      mountSidebar(firstGeneration)
       await flushPromises()
 
-      const draggedNote = await screen.findByText(
+      const draggedNote = findSidebarItem(
         firstGeneration.note.noteTopology.title!
       )
-      const dropTarget = await screen.findByText(
+      const dropTarget = findSidebarItem(
         firstGenerationSibling.note.noteTopology.title!
       )
 
-      // Browser Mode: Real drag events!
-      // Start drag
-      await fireEvent.dragStart(draggedNote)
-      await fireEvent.dragEnter(dropTarget)
+      await draggedNote!.trigger("dragstart")
+      await dropTarget!.trigger("dragenter")
 
-      const dropIndicator = screen.getByLabelText("Drop position indicator")
-      expect(dropIndicator).toBeVisible()
+      const dropIndicator = wrapper.find(
+        '[aria-label="Drop position indicator"]'
+      )
+      expect(dropIndicator.isVisible()).toBe(true)
 
-      // Browser Mode: Real dragOver events!
-      // Multiple dragOver events shouldn't remove the indicator
-      await fireEvent.dragOver(dropTarget)
-      await fireEvent.dragOver(dropTarget)
-      expect(dropIndicator).toBeVisible()
+      await dropTarget!.trigger("dragover")
+      await dropTarget!.trigger("dragover")
+      expect(dropIndicator.isVisible()).toBe(true)
 
-      // Only dragleave should remove it
-      await fireEvent.dragLeave(dropTarget)
-      expect(dropIndicator).not.toBeVisible()
+      await dropTarget!.trigger("dragleave")
+      expect(dropIndicator.isVisible()).toBe(false)
     })
 
     it("should show child drop indicator when dragging to right half", async () => {
-      render(firstGeneration)
+      mountSidebar(firstGeneration)
       await flushPromises()
 
-      const draggedNote = await screen.findByText(
+      const draggedNote = findSidebarItem(
         firstGeneration.note.noteTopology.title!
       )
-      const dropTarget = await screen.findByText(
+      const dropTarget = findSidebarItem(
         firstGenerationSibling.note.noteTopology.title!
       )
 
-      // Browser Mode: Real drag events!
-      // Start drag
-      await fireEvent.dragStart(draggedNote)
-      await fireEvent.dragEnter(dropTarget)
+      await draggedNote!.trigger("dragstart")
+      await dropTarget!.trigger("dragenter")
 
-      // Browser Mode: Real MouseEvent with clientX!
-      // Drag over right half
+      // Trigger dragover with clientX
       const dragOverEvent = new MouseEvent("dragover", {
         clientX: 150,
         bubbles: true,
       })
-      await fireEvent(dropTarget, dragOverEvent)
+      dropTarget!.element.dispatchEvent(dragOverEvent)
+      await flushPromises()
 
-      const dropIndicator = screen.getByLabelText("Drop as child indicator")
-      expect(dropIndicator).toBeVisible()
-      expect(dropIndicator).toHaveClass("drop-as-child")
+      const dropIndicator = wrapper.find(
+        '[aria-label="Drop as child indicator"]'
+      )
+      expect(dropIndicator.isVisible()).toBe(true)
+      expect(dropIndicator.classes()).toContain("drop-as-child")
     })
 
     it("should call moveAfter with asFirstChild when dropping on right half", async () => {
       const moveAfterSpy = mockSdkService("moveAfter", [])
-      render(firstGeneration)
+      mountSidebar(firstGeneration)
       await flushPromises()
 
-      const draggedNote = await screen.findByText(
+      const draggedNote = findSidebarItem(
         firstGeneration.note.noteTopology.title!
       )
-      const dropTarget = await screen.findByText(
+      const dropTarget = findSidebarItem(
         firstGenerationSibling.note.noteTopology.title!
       )
 
-      // Browser Mode: Real drag events!
-      // Start drag
-      await fireEvent.dragStart(draggedNote)
+      await draggedNote!.trigger("dragstart")
+      await dropTarget!.trigger("dragenter")
 
-      // Browser Mode: Real MouseEvent with clientX!
-      // Drag over right half and drop
-      await fireEvent.dragEnter(dropTarget)
       const dragOverEvent = new MouseEvent("dragover", {
         clientX: 150,
         bubbles: true,
       })
-      await fireEvent(dropTarget, dragOverEvent)
-      await fireEvent.drop(dropTarget)
+      dropTarget!.element.dispatchEvent(dragOverEvent)
+      await dropTarget!.trigger("drop")
 
       expect(moveAfterSpy).toHaveBeenCalledWith({
         path: {
@@ -479,29 +487,25 @@ describe("Sidebar", () => {
 
     it("should allow dropping as child even with different parent", async () => {
       const moveAfterSpy = mockSdkService("moveAfter", [])
-      render(firstGeneration)
+      mountSidebar(firstGeneration)
       await flushPromises()
 
-      const secondGenNote = await screen.findByText(
+      const secondGenNote = findSidebarItem(
         secondGeneration.note.noteTopology.title!
       )
-      const firstGenNote = await screen.findByText(
+      const firstGenNote = findSidebarItem(
         firstGenerationSibling.note.noteTopology.title!
       )
 
-      // Browser Mode: Real drag events!
-      // Start drag from second generation
-      await fireEvent.dragStart(secondGenNote)
+      await secondGenNote!.trigger("dragstart")
+      await firstGenNote!.trigger("dragenter")
 
-      // Browser Mode: Real MouseEvent with clientX!
-      // Drag over right half and drop
-      await fireEvent.dragEnter(firstGenNote)
       const dragOverEvent = new MouseEvent("dragover", {
         clientX: 150,
         bubbles: true,
       })
-      await fireEvent(firstGenNote, dragOverEvent)
-      await fireEvent.drop(firstGenNote)
+      firstGenNote!.element.dispatchEvent(dragOverEvent)
+      await firstGenNote!.trigger("drop")
 
       expect(moveAfterSpy).toHaveBeenCalledWith({
         path: {

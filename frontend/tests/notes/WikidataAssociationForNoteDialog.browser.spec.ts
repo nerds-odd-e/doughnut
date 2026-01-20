@@ -1,12 +1,12 @@
 import WikidataAssociationForNoteDialog from "@/components/notes/WikidataAssociationForNoteDialog.vue"
-import { flushPromises } from "@vue/test-utils"
+import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, {
   mockSdkService,
   wrapSdkResponse,
   wrapSdkError,
 } from "@tests/helpers"
-import { describe, it, expect, beforeEach, vi } from "vitest"
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 
 vi.mock("vue-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("vue-router")>()
@@ -19,6 +19,8 @@ vi.mock("vue-router", async (importOriginal) => {
 })
 
 describe("WikidataAssociationForNoteDialog", () => {
+  // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+  let wrapper: VueWrapper<any>
   let searchWikidataSpy: ReturnType<typeof mockSdkService<"searchWikidata">>
   let fetchWikidataEntitySpy: ReturnType<
     typeof mockSdkService<"fetchWikidataEntityDataById">
@@ -44,12 +46,18 @@ describe("WikidataAssociationForNoteDialog", () => {
     )
   })
 
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
+  })
+
   const mountDialog = (note: ReturnType<typeof makeMe.aNote.please>) => {
-    return helper
+    wrapper = helper
       .component(WikidataAssociationForNoteDialog)
       .withCleanStorage()
       .withProps({ note })
       .mount({ attachTo: document.body })
+    return wrapper
   }
 
   const getModal = () => document.querySelector(".modal-container")
