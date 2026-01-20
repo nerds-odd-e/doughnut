@@ -35,6 +35,10 @@ describe("NoteEditableDetails", () => {
     })
   })
 
+  afterEach(() => {
+    document.body.innerHTML = ""
+  })
+
   it("should not save previous note's details to the new note when navigating", async () => {
     const firstNoteId = 1
     const secondNoteId = 2
@@ -48,7 +52,7 @@ describe("NoteEditableDetails", () => {
         readonly: false,
         asMarkdown: true,
       })
-      .mount()
+      .mount({ attachTo: document.body })
 
     await flushPromises()
 
@@ -90,6 +94,7 @@ describe("NoteEditableDetails", () => {
         )
       ).toBe(true)
     }
+    wrapper.unmount()
   })
 
   it("should update displayed details when navigating to a different note with no unsaved changes", async () => {
@@ -102,7 +107,7 @@ describe("NoteEditableDetails", () => {
         readonly: false,
         asMarkdown: true,
       })
-      .mount()
+      .mount({ attachTo: document.body })
 
     await flushPromises()
 
@@ -114,6 +119,7 @@ describe("NoteEditableDetails", () => {
 
     const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
     expect(detailsEl.value).toBe("Second note details")
+    wrapper.unmount()
   })
 
   it("should preserve unsaved edits if the noteDetails prop doesn't actually change", async () => {
@@ -129,7 +135,7 @@ describe("NoteEditableDetails", () => {
         readonly: false,
         asMarkdown: true,
       })
-      .mount()
+      .mount({ attachTo: document.body })
 
     await flushPromises()
 
@@ -154,6 +160,7 @@ describe("NoteEditableDetails", () => {
       path: { note: noteId },
       body: { details: "Edited details" },
     })
+    wrapper.unmount()
   })
 
   it("should save edited details to the correct note on blur before navigation", async () => {
@@ -168,7 +175,7 @@ describe("NoteEditableDetails", () => {
         readonly: false,
         asMarkdown: true,
       })
-      .mount()
+      .mount({ attachTo: document.body })
 
     await flushPromises()
 
@@ -182,6 +189,7 @@ describe("NoteEditableDetails", () => {
       path: { note: firstNoteId },
       body: { details: "Edited details" },
     })
+    wrapper.unmount()
   })
 
   it("should auto-save edited details after debounce timeout without blur", async () => {
@@ -197,7 +205,7 @@ describe("NoteEditableDetails", () => {
         readonly: false,
         asMarkdown: true,
       })
-      .mount()
+      .mount({ attachTo: document.body })
 
     await flushPromises()
 
@@ -218,6 +226,7 @@ describe("NoteEditableDetails", () => {
     expect(wrapper.find(".dirty").exists()).toBe(false)
 
     vi.useRealTimers()
+    wrapper.unmount()
   })
 
   it("should preserve second edit when first save response arrives after second edit", async () => {
@@ -253,7 +262,7 @@ describe("NoteEditableDetails", () => {
         readonly: false,
         asMarkdown: true,
       })
-      .mount()
+      .mount({ attachTo: document.body })
 
     await flushPromises()
     const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
@@ -273,6 +282,7 @@ describe("NoteEditableDetails", () => {
     await flushPromises()
 
     expect(detailsEl.value).toBe("Second edit")
+    wrapper.unmount()
   })
 
   it("should clear details when switching from a note with details to a note without details (undefined)", async () => {
@@ -288,7 +298,7 @@ describe("NoteEditableDetails", () => {
         readonly: false,
         asMarkdown: true,
       })
-      .mount()
+      .mount({ attachTo: document.body })
 
     await flushPromises()
 
@@ -306,26 +316,16 @@ describe("NoteEditableDetails", () => {
     // This test should fail because the old details are still displayed
     expect(detailsEl.value).not.toContain("This is the first note's details")
     expect(detailsEl.value).toBe("")
+    wrapper.unmount()
   })
 
   function createClipboardEvent(html: string): ClipboardEvent {
-    const event = new Event("paste", {
+    const event = new ClipboardEvent("paste", {
       bubbles: true,
       cancelable: true,
-    }) as ClipboardEvent
-    const dataTransfer = {
-      getData: (format: string) => {
-        if (format === "text/html") return html
-        return ""
-      },
-      setData: () => {
-        // Mock implementation - not used in tests
-      },
-    }
-    Object.defineProperty(event, "clipboardData", {
-      value: dataTransfer,
-      writable: false,
+      clipboardData: new DataTransfer(), // Browser Mode: Use DataTransfer
     })
+    event.clipboardData?.setData("text/html", html) // Browser Mode: Set data
     return event
   }
 
@@ -339,7 +339,7 @@ describe("NoteEditableDetails", () => {
         readonly: false,
         asMarkdown: true,
       })
-      .mount()
+      .mount({ attachTo: document.body })
 
     await flushPromises()
 
@@ -355,6 +355,7 @@ describe("NoteEditableDetails", () => {
     // The update should have been called through TextContentWrapper
     expect(textarea.value).toContain("Bold text")
     expect(textarea.value).toContain("existing")
+    wrapper.unmount()
   })
 
   describe("paste with links and images in textarea", () => {
@@ -368,7 +369,7 @@ describe("NoteEditableDetails", () => {
           readonly: false,
           asMarkdown: true,
         })
-        .mount()
+        .mount({ attachTo: document.body })
 
       await flushPromises()
 
@@ -384,6 +385,7 @@ describe("NoteEditableDetails", () => {
         "The content contains 1 links.",
         expect.arrayContaining([{ label: "Remove 1 links", value: "links" }])
       )
+      wrapper.unmount()
     })
 
     it("removes all links from entire content when user selects remove links", async () => {
@@ -398,7 +400,7 @@ describe("NoteEditableDetails", () => {
           readonly: false,
           asMarkdown: true,
         })
-        .mount()
+        .mount({ attachTo: document.body })
 
       await flushPromises()
 
@@ -415,6 +417,7 @@ describe("NoteEditableDetails", () => {
       expect(textarea.value).toContain("new link")
       expect(textarea.value).not.toContain("https://existing.com")
       expect(textarea.value).not.toContain("https://example.com")
+      wrapper.unmount()
     })
 
     it("does not show popup when entire content has no links or images", async () => {
@@ -427,7 +430,7 @@ describe("NoteEditableDetails", () => {
           readonly: false,
           asMarkdown: true,
         })
-        .mount()
+        .mount({ attachTo: document.body })
 
       await flushPromises()
 
@@ -440,6 +443,7 @@ describe("NoteEditableDetails", () => {
       await flushPromises()
 
       expect(mockPopupsOptions).not.toHaveBeenCalled()
+      wrapper.unmount()
     })
   })
 
@@ -455,7 +459,7 @@ describe("NoteEditableDetails", () => {
           readonly: false,
           asMarkdown: false,
         })
-        .mount()
+        .mount({ attachTo: document.body })
 
       await flushPromises()
 
@@ -473,6 +477,7 @@ describe("NoteEditableDetails", () => {
         "The content contains 1 links.",
         expect.arrayContaining([{ label: "Remove 1 links", value: "links" }])
       )
+      wrapper.unmount()
     })
 
     it("does not show popup when quill content has no links or images", async () => {
@@ -485,7 +490,7 @@ describe("NoteEditableDetails", () => {
           readonly: false,
           asMarkdown: false,
         })
-        .mount()
+        .mount({ attachTo: document.body })
 
       await flushPromises()
 
@@ -496,6 +501,7 @@ describe("NoteEditableDetails", () => {
       await flushPromises()
 
       expect(mockPopupsOptions).not.toHaveBeenCalled()
+      wrapper.unmount()
     })
   })
 
@@ -513,7 +519,7 @@ describe("NoteEditableDetails", () => {
           readonly: false,
           asMarkdown: true,
         })
-        .mount()
+        .mount({ attachTo: document.body })
 
       await flushPromises()
 
@@ -528,6 +534,7 @@ describe("NoteEditableDetails", () => {
       expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
 
       vi.useRealTimers()
+      wrapper.unmount()
     })
 
     it("should save when clearing content (from non-empty to <p><br></p>)", async () => {
@@ -543,7 +550,7 @@ describe("NoteEditableDetails", () => {
           readonly: false,
           asMarkdown: true,
         })
-        .mount()
+        .mount({ attachTo: document.body })
 
       await flushPromises()
 
@@ -561,6 +568,7 @@ describe("NoteEditableDetails", () => {
       })
 
       vi.useRealTimers()
+      wrapper.unmount()
     })
 
     it("should not save when only addition is empty lines and <p><br></p> at the end", async () => {
@@ -576,7 +584,7 @@ describe("NoteEditableDetails", () => {
           readonly: false,
           asMarkdown: true,
         })
-        .mount()
+        .mount({ attachTo: document.body })
 
       await flushPromises()
 
@@ -591,6 +599,7 @@ describe("NoteEditableDetails", () => {
       expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
 
       vi.useRealTimers()
+      wrapper.unmount()
     })
 
     it("should save with trailing empty lines and <p><br></p> removed when change is not only at the end", async () => {
@@ -606,7 +615,7 @@ describe("NoteEditableDetails", () => {
           readonly: false,
           asMarkdown: true,
         })
-        .mount()
+        .mount({ attachTo: document.body })
 
       await flushPromises()
 
@@ -624,6 +633,7 @@ describe("NoteEditableDetails", () => {
       })
 
       vi.useRealTimers()
+      wrapper.unmount()
     })
 
     it("should remove trailing consecutive empty lines, <br>, and <p><br></p>, and only save when there's content change", async () => {
@@ -639,7 +649,7 @@ describe("NoteEditableDetails", () => {
           readonly: false,
           asMarkdown: true,
         })
-        .mount()
+        .mount({ attachTo: document.body })
 
       await flushPromises()
 
@@ -682,6 +692,7 @@ describe("NoteEditableDetails", () => {
       })
 
       vi.useRealTimers()
+      wrapper.unmount()
     })
   })
 })

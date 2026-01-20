@@ -9,7 +9,7 @@ import helper, {
   wrapSdkError,
   wrapSdkResponse,
 } from "@tests/helpers"
-import { flushPromises } from "@vue/test-utils"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, vi } from "vitest"
 
 // Browser Mode: Mock audioRecorder module (application module, not browser API)
@@ -170,7 +170,8 @@ const findButtonByTitle = (wrapper, title: string) => {
 }
 
 describe("NoteAudioTools", () => {
-  let wrapper
+  // biome-ignore lint/suspicious/noExplicitAny: Accessing internal component properties
+  let wrapper: VueWrapper<any>
   const note = makeMe.aNote.please()
 
   beforeEach(() => {
@@ -210,11 +211,13 @@ describe("NoteAudioTools", () => {
       .withProps({
         note,
       })
-      .mount()
+      .mount({ attachTo: document.body })
   })
 
   afterEach(() => {
+    wrapper?.unmount()
     vi.useRealTimers()
+    document.body.innerHTML = ""
   })
 
   it("renders the component with correct buttons", () => {
