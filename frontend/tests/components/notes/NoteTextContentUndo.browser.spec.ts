@@ -1,12 +1,19 @@
 import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
-import { flushPromises } from "@vue/test-utils"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import { describe, it, expect } from "vitest"
+import { describe, it, expect, afterEach } from "vitest"
 
 describe("undo editing", () => {
+  let wrapper: VueWrapper
+
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
+  })
+
   it("should call addEditingToUndoHistory on submitChange", async () => {
     const storageAccessor = useStorageAccessor()
     storageAccessor.value = createNoteStorage()
@@ -15,13 +22,13 @@ describe("undo editing", () => {
     storageAccessor.value.refreshNoteRealm(noteRealm)
 
     const updatedTitle = "updated"
-    const wrapper = helper
+    wrapper = helper
       .component(NoteTextContent)
       .withProps({
         readonly: false,
         note: noteRealm.note,
       })
-      .mount()
+      .mount({ attachTo: document.body })
 
     const titleEl = wrapper.find('[role="title"]').element as HTMLElement
     titleEl.innerText = updatedTitle

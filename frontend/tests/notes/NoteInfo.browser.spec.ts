@@ -1,9 +1,9 @@
 import NoteInfoBar from "@/components/notes/NoteInfoBar.vue"
-import { flushPromises } from "@vue/test-utils"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import type { NoteInfo } from "@generated/backend"
-import { describe, it, expect } from "vitest"
+import { describe, it, expect, afterEach } from "vitest"
 
 const stubResponse: NoteInfo = {
   memoryTrackers: [makeMe.aMemoryTracker.please()],
@@ -12,15 +12,22 @@ const stubResponse: NoteInfo = {
 }
 
 describe("note info", () => {
+  let wrapper: VueWrapper
+
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
+  })
+
   it("should render values", async () => {
     const getNoteInfoSpy = mockSdkService("getNoteInfo", stubResponse)
-    const wrapper = helper
+    wrapper = helper
       .component(NoteInfoBar)
       .withProps({
         noteId: 123,
       })
       .withRouter()
-      .mount()
+      .mount({ attachTo: document.body })
     await flushPromises()
     expect(wrapper.findAll(".statistics-value")).toHaveLength(3)
     expect(getNoteInfoSpy).toBeCalledWith({

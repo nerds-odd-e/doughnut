@@ -1,15 +1,19 @@
 import NoteInfoComponent from "@/components/notes/NoteInfoComponent.vue"
-import { flushPromises } from "@vue/test-utils"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import helper, { mockSdkService, wrapSdkError } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import type { NoteInfo } from "@generated/backend"
 
-afterEach(() => {
-  vi.clearAllMocks()
-})
-
 describe("NoteInfoComponent", () => {
+  let wrapper: VueWrapper
+
+  afterEach(() => {
+    vi.clearAllMocks()
+    wrapper?.unmount()
+    document.body.innerHTML = ""
+  })
+
   it("should display all memory trackers including skipped ones", () => {
     const noteInfo: NoteInfo = {
       memoryTrackers: [
@@ -27,13 +31,13 @@ describe("NoteInfoComponent", () => {
       noteType: undefined,
     }
 
-    const wrapper = helper
+    wrapper = helper
       .component(NoteInfoComponent)
       .withProps({
         noteInfo,
       })
       .withRouter()
-      .mount()
+      .mount({ attachTo: document.body })
 
     const rows = wrapper.findAll("tbody tr")
     expect(rows).toHaveLength(2)
@@ -52,13 +56,13 @@ describe("NoteInfoComponent", () => {
       noteType: undefined,
     }
 
-    const wrapper = helper
+    wrapper = helper
       .component(NoteInfoComponent)
       .withProps({
         noteInfo,
       })
       .withRouter()
-      .mount()
+      .mount({ attachTo: document.body })
 
     await flushPromises()
 
@@ -82,13 +86,13 @@ describe("NoteInfoComponent", () => {
       noteType: undefined,
     }
 
-    const wrapper = helper
+    wrapper = helper
       .component(NoteInfoComponent)
       .withProps({
         noteInfo,
       })
       .withRouter()
-      .mount()
+      .mount({ attachTo: document.body })
 
     expect(wrapper.find("table").exists()).toBe(true)
     const h6Elements = wrapper.findAll("h6")
@@ -105,13 +109,13 @@ describe("NoteInfoComponent", () => {
       noteType: undefined,
     }
 
-    const wrapper = helper
+    wrapper = helper
       .component(NoteInfoComponent)
       .withProps({
         noteInfo,
       })
       .withRouter()
-      .mount()
+      .mount({ attachTo: document.body })
 
     expect(wrapper.find("table").exists()).toBe(false)
   })
@@ -131,13 +135,13 @@ describe("NoteInfoComponent", () => {
         noteType: "concept",
       }
 
-      const wrapper = helper
+      wrapper = helper
         .component(NoteInfoComponent)
         .withProps({
           noteInfo,
         })
         .withRouter()
-        .mount()
+        .mount({ attachTo: document.body })
 
       const selection = wrapper.find('[data-test="note-type-selection-dialog"]')
       expect(selection.exists()).toBe(true)
@@ -154,13 +158,13 @@ describe("NoteInfoComponent", () => {
         noteType: undefined,
       }
 
-      const wrapper = helper
+      wrapper = helper
         .component(NoteInfoComponent)
         .withProps({
           noteInfo,
         })
         .withRouter()
-        .mount()
+        .mount({ attachTo: document.body })
 
       await flushPromises()
 
@@ -184,13 +188,13 @@ describe("NoteInfoComponent", () => {
         noteType: undefined,
       }
 
-      const wrapper = helper
+      wrapper = helper
         .component(NoteInfoComponent)
         .withProps({
           noteInfo,
         })
         .withRouter()
-        .mount()
+        .mount({ attachTo: document.body })
 
       await flushPromises()
 
@@ -214,13 +218,13 @@ describe("NoteInfoComponent", () => {
 
       updateNoteTypeSpy.mockResolvedValue(wrapSdkError("Failed to update"))
 
-      const wrapper = helper
+      wrapper = helper
         .component(NoteInfoComponent)
         .withProps({
           noteInfo,
         })
         .withRouter()
-        .mount()
+        .mount({ attachTo: document.body })
 
       await flushPromises()
 
@@ -243,13 +247,13 @@ describe("NoteInfoComponent", () => {
         noteType: "initiative",
       }
 
-      const wrapper = helper
+      wrapper = helper
         .component(NoteInfoComponent)
         .withProps({
           noteInfo,
         })
         .withRouter()
-        .mount()
+        .mount({ attachTo: document.body })
 
       await flushPromises()
 

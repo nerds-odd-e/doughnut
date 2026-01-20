@@ -1,9 +1,17 @@
 import NoteInfoMemoryTracker from "@/components/notes/NoteInfoMemoryTracker.vue"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
-import { describe, it, expect } from "vitest"
+import { describe, it, expect, afterEach } from "vitest"
+import type { VueWrapper } from "@vue/test-utils"
 
 describe("NoteInfoMemoryTracker", () => {
+  let wrapper: VueWrapper
+
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
+  })
+
   it("should display memory tracker information", () => {
     const memoryTracker = makeMe.aMemoryTracker
       .repetitionCount(5)
@@ -12,12 +20,12 @@ describe("NoteInfoMemoryTracker", () => {
       .removedFromTracking(false)
       .please()
 
-    const wrapper = helper
+    wrapper = helper
       .component(NoteInfoMemoryTracker)
       .withProps({
         modelValue: memoryTracker,
       })
-      .mount()
+      .mount({ attachTo: document.body })
 
     expect(wrapper.text()).toContain("normal")
     expect(wrapper.text()).toContain("5")
@@ -30,12 +38,12 @@ describe("NoteInfoMemoryTracker", () => {
       .please()
     memoryTracker.spelling = true
 
-    const wrapper = helper
+    wrapper = helper
       .component(NoteInfoMemoryTracker)
       .withProps({
         modelValue: memoryTracker,
       })
-      .mount()
+      .mount({ attachTo: document.body })
 
     expect(wrapper.text()).toContain("spelling")
   })
@@ -45,12 +53,12 @@ describe("NoteInfoMemoryTracker", () => {
       .removedFromTracking(true)
       .please()
 
-    const wrapper = helper
+    wrapper = helper
       .component(NoteInfoMemoryTracker)
       .withProps({
         modelValue: memoryTracker,
       })
-      .mount()
+      .mount({ attachTo: document.body })
 
     const cells = wrapper.findAll("td")
     cells.forEach((cell) => {
@@ -63,12 +71,12 @@ describe("NoteInfoMemoryTracker", () => {
       .removedFromTracking(false)
       .please()
 
-    const wrapper = helper
+    wrapper = helper
       .component(NoteInfoMemoryTracker)
       .withProps({
         modelValue: memoryTracker,
       })
-      .mount()
+      .mount({ attachTo: document.body })
 
     const cells = wrapper.findAll("td")
     cells.forEach((cell) => {
