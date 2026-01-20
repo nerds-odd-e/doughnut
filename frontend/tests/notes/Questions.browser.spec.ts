@@ -1,9 +1,8 @@
-import { describe, it, vi, expect, beforeEach } from "vitest"
-import { flushPromises } from "@vue/test-utils"
+import { describe, it, vi, expect, beforeEach, afterEach } from "vitest"
+import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import Questions from "@/components/notes/Questions.vue"
-import { fireEvent, waitFor } from "@testing-library/vue"
 import { reactive } from "vue"
 
 const mockRoute = reactive({ name: "", path: "", params: {}, query: {} })
@@ -19,6 +18,8 @@ vi.mock("vue-router", async (importOriginal) => {
 })
 
 describe("Questions", () => {
+  // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+  let wrapper: VueWrapper<any>
   const note = makeMe.aNote.please()
   const questions = [
     makeMe.aPredefinedQuestion
@@ -33,15 +34,19 @@ describe("Questions", () => {
     mockSdkService("getAllQuestionByNote", questions)
   })
 
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
+  })
+
   it("renders questions table when questions exist", async () => {
-    const { getByText } = helper
+    wrapper = helper
       .component(Questions)
       .withProps({ note })
-      .render()
+      .mount({ attachTo: document.body })
 
-    await waitFor(() => {
-      expect(getByText("What is 2+2?")).toBeTruthy()
-    })
+    await vi.waitUntil(() => wrapper.text().includes("What is 2+2?"))
+    expect(wrapper.text()).toContain("What is 2+2?")
   })
 
   it("shows export dialog when export button is clicked", async () => {
@@ -57,19 +62,24 @@ describe("Questions", () => {
       exportData
     )
 
-    const { getByLabelText, getByTestId } = helper
+    wrapper = helper
       .component(Questions)
       .withProps({ note })
-      .render()
+      .mount({ attachTo: document.body })
 
     await flushPromises()
 
-    const exportButton = getByLabelText("Export question generation request")
-    await fireEvent.click(exportButton)
+    const exportButton = wrapper.find(
+      '[aria-label="Export question generation request"]'
+    )
+    await exportButton.trigger("click")
 
-    await waitFor(() => {
-      expect(getByTestId("export-textarea")).toBeTruthy()
-    })
+    await vi.waitUntil(() =>
+      document.body.querySelector('[data-testid="export-textarea"]')
+    )
+    expect(
+      document.body.querySelector('[data-testid="export-textarea"]')
+    ).toBeTruthy()
 
     expect(exportQuestionGenerationSpy).toHaveBeenCalledWith({
       path: { note: note.id },

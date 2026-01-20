@@ -1,23 +1,32 @@
 import NoteTitleComponent from "@/components/notes/core/NoteTitleComponent.vue"
 import type { Note } from "@generated/backend"
-import { VueWrapper } from "@vue/test-utils"
+import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
-import { describe, it, expect, beforeEach, vi } from "vitest"
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 
 describe("note title", () => {
+  // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+  let wrapper: VueWrapper<any>
+
   const mountComponent = (n: Note): VueWrapper<ComponentPublicInstance> => {
-    return helper
+    wrapper = helper
       .component(NoteTitleComponent)
       .withProps({
         noteTopology: n.noteTopology,
       })
-      .mount()
+      .mount({ attachTo: document.body })
+    return wrapper
   }
 
   beforeEach(() => {
     vi.resetAllMocks()
+  })
+
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
   })
 
   describe("relationship note", () => {
@@ -26,7 +35,8 @@ describe("note title", () => {
     const relationNote = makeMe.aRelationship.to(target).please()
 
     it("should have relationship to target", async () => {
-      const wrapper = mountComponent(relationNote)
+      mountComponent(relationNote)
+      await flushPromises()
       const links = wrapper.findAll("a.router-link")
       const link = links[0]!
       expect(link.exists()).toBe(true)
@@ -39,7 +49,8 @@ describe("note title", () => {
 
     it("if relationship note has details the relationship is an icon", async () => {
       relationNote.noteTopology.shortDetails = "exist"
-      const wrapper = mountComponent(relationNote)
+      mountComponent(relationNote)
+      await flushPromises()
       const link = wrapper.find("a.router-link")
       expect(link.exists()).toBe(true)
       expect(link.text()).toBe("🔗")

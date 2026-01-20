@@ -1,8 +1,8 @@
-import { describe, it, vi, expect, beforeEach } from "vitest"
+import { describe, it, vi, expect, beforeEach, afterEach } from "vitest"
 import helper, { mockSdkService, wrapSdkError } from "../helpers"
 import makeMe from "../fixtures/makeMe"
 import QuestionExportDialog from "@/components/notes/QuestionExportDialog.vue"
-import { waitFor } from "@testing-library/vue"
+import { type VueWrapper } from "@vue/test-utils"
 import { reactive } from "vue"
 
 const mockRoute = reactive({ name: "", path: "", params: {}, query: {} })
@@ -18,8 +18,16 @@ vi.mock("vue-router", async (importOriginal) => {
 })
 
 describe("QuestionExportDialog", () => {
+  // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+  let wrapper: VueWrapper<any>
+
   beforeEach(() => {
     vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
   })
 
   it("fetches and displays export content", async () => {
@@ -33,17 +41,23 @@ describe("QuestionExportDialog", () => {
     } as never
     const spy = mockSdkService("exportQuestionGeneration", exportData)
 
-    const { getByTestId } = helper
+    wrapper = helper
       .component(QuestionExportDialog)
       .withProps({ noteId: note.id })
-      .render()
+      .mount({ attachTo: document.body })
 
-    await waitFor(() => {
-      const textarea = getByTestId("export-textarea") as HTMLTextAreaElement
-      expect(textarea).toBeTruthy()
-      expect(textarea.value).toContain('"model"')
-      expect(textarea.value).toContain('"title"')
+    await vi.waitUntil(() => {
+      const el = document.body.querySelector(
+        '[data-testid="export-textarea"]'
+      ) as HTMLTextAreaElement
+      return el && el.value.includes('"model"')
     })
+    const textarea = document.body.querySelector(
+      '[data-testid="export-textarea"]'
+    ) as HTMLTextAreaElement
+    expect(textarea).toBeTruthy()
+    expect(textarea.value).toContain('"model"')
+    expect(textarea.value).toContain('"title"')
 
     expect(spy).toHaveBeenCalledWith({
       path: { note: note.id },
@@ -58,14 +72,20 @@ describe("QuestionExportDialog", () => {
     } as never)
     spy.mockResolvedValue(wrapSdkError("API Error"))
 
-    const { getByTestId } = helper
+    wrapper = helper
       .component(QuestionExportDialog)
       .withProps({ noteId: note.id })
-      .render()
+      .mount({ attachTo: document.body })
 
-    await waitFor(() => {
-      const textarea = getByTestId("export-textarea") as HTMLTextAreaElement
-      expect(textarea.value).toBe("Failed to load export content")
+    await vi.waitUntil(() => {
+      const el = document.body.querySelector(
+        '[data-testid="export-textarea"]'
+      ) as HTMLTextAreaElement
+      return el && el.value === "Failed to load export content"
     })
+    const textarea = document.body.querySelector(
+      '[data-testid="export-textarea"]'
+    ) as HTMLTextAreaElement
+    expect(textarea.value).toBe("Failed to load export content")
   })
 })
