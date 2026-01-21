@@ -1,28 +1,22 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
+import { render } from "vitest-browser-vue"
+import {
+  defineComponent,
+  ref,
+  KeepAlive,
+  onActivated,
+  onDeactivated,
+} from "vue"
 import { useThinkingTimeTracker } from "@/composables/useThinkingTimeTracker"
-import { mount } from "@vue/test-utils"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { defineComponent, KeepAlive, onActivated, onDeactivated } from "vue"
+import { page } from "vitest/browser"
 
 describe("useThinkingTimeTracker", () => {
   let performanceNowSpy: ReturnType<typeof vi.spyOn>
-  let rafCallbacks: Array<FrameRequestCallback> = []
 
   beforeEach(() => {
-    // Browser Mode: Can use fake timers, but performance.now() is real!
     vi.useFakeTimers()
-    // Spy on real performance.now() instead of mocking it
-    performanceNowSpy = vi.spyOn(performance, "now")
-    performanceNowSpy.mockReturnValue(0)
-
-    rafCallbacks = []
-    // Mock requestAnimationFrame for deterministic testing
-    // Browser Mode: Use globalThis instead of global
-    globalThis.requestAnimationFrame = vi.fn(
-      (callback: FrameRequestCallback) => {
-        rafCallbacks.push(callback)
-        return 1
-      }
-    ) as unknown as typeof requestAnimationFrame
+    // performance.now() is available in browser environment
+    performanceNowSpy = vi.spyOn(performance, "now").mockReturnValue(0)
   })
 
   afterEach(() => {
@@ -30,27 +24,38 @@ describe("useThinkingTimeTracker", () => {
     vi.restoreAllMocks()
   })
 
-  const flushRAF = () => {
-    const callbacks = [...rafCallbacks]
-    rafCallbacks = []
-    callbacks.forEach((cb) => cb(performance.now()))
-  }
-
-  const createTestComponent = (setupFn: () => { stop: () => number }) => {
+  const createTestComponent = (
+    setupFn: () => {
+      stop: () => number
+      pause?: () => void
+      resume?: () => void
+    }
+  ) => {
     return defineComponent({
-      setup: setupFn,
-      template: "<div>Test</div>",
+      setup() {
+        const { stop, pause, resume } = setupFn()
+        const result = ref<number | null>(null)
+
+        const handleStop = () => {
+          result.value = stop()
+        }
+
+        return { handleStop, result, pause, resume }
+      },
+      template: `
+        <div>
+          <button data-testid="stop" @click="handleStop">Stop</button>
+          <button data-testid="pause" @click="pause && pause()">Pause</button>
+          <button data-testid="resume" @click="resume && resume()">Resume</button>
+          <span data-testid="result">{{ result }}</span>
+        </div>
+      `,
     })
   }
 
-  const setupTimer = async (component: ReturnType<typeof mount>) => {
-    await component.vm.$nextTick()
-    flushRAF()
-  }
-
-  const setTime = (ms: number) => {
+  const setTime = async (ms: number) => {
     performanceNowSpy.mockReturnValue(ms)
-    vi.advanceTimersByTime(ms)
+    await vi.advanceTimersByTimeAsync(ms)
   }
 
   it("starts timer after nextTick and requestAnimationFrame", async () => {
@@ -60,11 +65,20 @@ describe("useThinkingTimeTracker", () => {
       return { stop }
     })
 
-    const wrapper = mount(TestComponent)
-    await setupTimer(wrapper)
-    setTime(1000)
+    render(TestComponent)
 
-    expect(wrapper.vm.stop()).toBeGreaterThanOrEqual(1000)
+    // Initial wait to let onMounted/nextTick happen
+    await vi.advanceTimersToNextTimerAsync()
+
+    await setTime(1000)
+
+    await page.getByTestId("stop").click()
+    const result = page.getByTestId("result")
+
+    // We expect >= 1000.
+    // Since we control performance.now returning exactly 1000, it should be 1000.
+    // However, the original test used expected >= 1000.
+    await expect.element(result).toHaveTextContent("1000")
   })
 
   it("pauses when page becomes hidden", async () => {
@@ -74,21 +88,20 @@ describe("useThinkingTimeTracker", () => {
       return { stop }
     })
 
-    const wrapper = mount(TestComponent)
-    await setupTimer(wrapper)
-    setTime(1000)
+    render(TestComponent)
+    await vi.advanceTimersToNextTimerAsync()
 
-    // Browser Mode: Real Page Visibility API!
-    // Set document.hidden and dispatch real visibilitychange event
-    Object.defineProperty(document, "hidden", {
-      value: true,
-      writable: true,
-      configurable: true,
-    })
+    await setTime(1000)
+
+    // Simulate visibility change
+    Object.defineProperty(document, "hidden", { value: true, writable: true })
     document.dispatchEvent(new Event("visibilitychange"))
-    setTime(2000)
 
-    expect(wrapper.vm.stop()).toBe(1000)
+    await setTime(2000) // Advance another 1000ms (total 2000)
+
+    await page.getByTestId("stop").click()
+    // Should have only counted the first 1000ms
+    await expect.element(page.getByTestId("result")).toHaveTextContent("1000")
   })
 
   it("resumes when page becomes visible", async () => {
@@ -98,28 +111,23 @@ describe("useThinkingTimeTracker", () => {
       return { stop }
     })
 
-    const wrapper = mount(TestComponent)
-    await setupTimer(wrapper)
-    setTime(1000)
+    render(TestComponent)
+    await vi.advanceTimersToNextTimerAsync()
 
-    // Browser Mode: Real visibilitychange events work!
-    Object.defineProperty(document, "hidden", {
-      value: true,
-      writable: true,
-      configurable: true,
-    })
+    await setTime(1000)
+
+    Object.defineProperty(document, "hidden", { value: true, writable: true })
     document.dispatchEvent(new Event("visibilitychange"))
-    setTime(2000)
 
-    Object.defineProperty(document, "hidden", {
-      value: false,
-      writable: true,
-      configurable: true,
-    })
+    await setTime(2000) // Total 2000, paused at 1000
+
+    Object.defineProperty(document, "hidden", { value: false, writable: true })
     document.dispatchEvent(new Event("visibilitychange"))
-    setTime(3000)
 
-    expect(wrapper.vm.stop()).toBe(2000)
+    await setTime(3000) // Total 3000, resumed at 2000. +1000ms more. Total tracked: 2000.
+
+    await page.getByTestId("stop").click()
+    await expect.element(page.getByTestId("result")).toHaveTextContent("2000")
   })
 
   it("pauses when window loses focus", async () => {
@@ -129,15 +137,16 @@ describe("useThinkingTimeTracker", () => {
       return { stop }
     })
 
-    const wrapper = mount(TestComponent)
-    await setupTimer(wrapper)
-    setTime(1000)
+    render(TestComponent)
+    await vi.advanceTimersToNextTimerAsync()
 
-    // Browser Mode: Real window blur event!
+    await setTime(1000)
+
     window.dispatchEvent(new Event("blur"))
-    setTime(2000)
+    await setTime(2000)
 
-    expect(wrapper.vm.stop()).toBe(1000)
+    await page.getByTestId("stop").click()
+    await expect.element(page.getByTestId("result")).toHaveTextContent("1000")
   })
 
   it("resumes when window gains focus", async () => {
@@ -147,18 +156,19 @@ describe("useThinkingTimeTracker", () => {
       return { stop }
     })
 
-    const wrapper = mount(TestComponent)
-    await setupTimer(wrapper)
-    setTime(1000)
+    render(TestComponent)
+    await vi.advanceTimersToNextTimerAsync()
 
-    // Browser Mode: Real window focus/blur events!
+    await setTime(1000)
+
     window.dispatchEvent(new Event("blur"))
-    setTime(2000)
+    await setTime(2000)
 
     window.dispatchEvent(new Event("focus"))
-    setTime(3000)
+    await setTime(3000)
 
-    expect(wrapper.vm.stop()).toBe(2000)
+    await page.getByTestId("stop").click()
+    await expect.element(page.getByTestId("result")).toHaveTextContent("2000")
   })
 
   it("only records once per stop call", async () => {
@@ -168,11 +178,20 @@ describe("useThinkingTimeTracker", () => {
       return { stop }
     })
 
-    const wrapper = mount(TestComponent)
-    await setupTimer(wrapper)
-    setTime(1000)
+    render(TestComponent)
+    await vi.advanceTimersToNextTimerAsync()
 
-    expect(wrapper.vm.stop()).toBe(wrapper.vm.stop())
+    await setTime(1000)
+
+    await page.getByTestId("stop").click()
+    await expect.element(page.getByTestId("result")).toHaveTextContent("1000")
+
+    // In the original test: expect(wrapper.vm.stop()).toBe(wrapper.vm.stop())
+    // Which means subsequent calls return the same value?
+    // Let's check logic: if I click stop again, it should update result to the same value?
+
+    await page.getByTestId("stop").click()
+    await expect.element(page.getByTestId("result")).toHaveTextContent("1000")
   })
 
   it("returns rounded milliseconds", async () => {
@@ -182,71 +201,120 @@ describe("useThinkingTimeTracker", () => {
       return { stop }
     })
 
-    const wrapper = mount(TestComponent)
-    await setupTimer(wrapper)
-    setTime(1234.567)
+    render(TestComponent)
+    await vi.advanceTimersToNextTimerAsync()
 
-    expect(wrapper.vm.stop()).toBe(1235)
+    await setTime(1234.567)
+
+    await page.getByTestId("stop").click()
+    await expect.element(page.getByTestId("result")).toHaveTextContent("1235")
   })
 
   describe("KeepAlive lifecycle", () => {
-    let TestComponent: ReturnType<typeof createTestComponent>
-
-    beforeEach(() => {
-      TestComponent = createTestComponent(() => {
+    // We need a wrapper component to test KeepAlive
+    const InnerComponent = defineComponent({
+      setup() {
         const { start, stop, pause, resume } = useThinkingTimeTracker()
+        const result = ref<number | null>(null)
+
         onActivated(() => {
           start()
           resume()
         })
         onDeactivated(() => pause())
+
+        // Original test called start() immediately in setup
         start()
-        return { stop }
-      })
+
+        const handleStop = () => {
+          result.value = stop()
+        }
+
+        return { handleStop, result }
+      },
+      template: `
+        <div>
+          <button data-testid="inner-stop" @click="handleStop">Stop</button>
+          <span data-testid="inner-result">{{ result }}</span>
+        </div>
+      `,
     })
 
-    const createKeepAliveWrapper = () => {
-      return defineComponent({
-        components: { TestComponent, KeepAlive },
-        data() {
-          return { show: true }
-        },
-        template: `<KeepAlive><TestComponent v-if="show" key="test" /></KeepAlive>`,
-      })
-    }
+    const WrapperComponent = defineComponent({
+      components: { InnerComponent, KeepAlive },
+      setup() {
+        const show = ref(true)
+        return { show }
+      },
+      template: `
+        <div>
+          <button data-testid="toggle" @click="show = !show">Toggle</button>
+          <KeepAlive>
+            <InnerComponent v-if="show" key="test" />
+          </KeepAlive>
+        </div>
+      `,
+    })
 
     it("pauses when deactivated", async () => {
-      const wrapper = mount(createKeepAliveWrapper())
-      const testComponent = wrapper.findAllComponents(TestComponent)[0]
-      expect(testComponent).toBeDefined()
-      if (!testComponent) return
-      await setupTimer(testComponent)
-      setTime(1000)
+      render(WrapperComponent)
+      await vi.advanceTimersToNextTimerAsync()
 
-      await wrapper.setData({ show: false })
-      await wrapper.vm.$nextTick()
-      setTime(2000)
+      await setTime(1000)
 
-      expect(testComponent.vm.stop()).toBe(1000)
+      // Deactivate
+      await page.getByTestId("toggle").click()
+      await setTime(2000)
+
+      // We need to access the component state. But it is hidden/deactivated.
+      // However, KeepAlive keeps the instance.
+      // We can toggle it back to see the result, or we can check if it paused.
+      // If we stop() while deactivated, what happens?
+      // The original test accessed `testComponent.vm.stop()`.
+
+      // If the component is v-if=false, it is removed from DOM (put in cache).
+      // We cannot interact with its buttons via DOM queries easily if it's not in DOM.
+
+      // Let's assume we toggle back.
+      // At T=1000, deactivated.
+      // At T=2000, reactivated. onActivated -> resume.
+      // If we check immediately at T=2000, it should be 1000?
+
+      await page.getByTestId("toggle").click() // Show again
+      // It resumes.
+
+      await page.getByTestId("inner-stop").click()
+      // Should be 1000 because we just resumed and didn't advance time further than 2000.
+      await expect
+        .element(page.getByTestId("inner-result"))
+        .toHaveTextContent("1000")
     })
 
     it("resumes when reactivated", async () => {
-      const wrapper = mount(createKeepAliveWrapper())
-      const testComponent = wrapper.findAllComponents(TestComponent)[0]
-      expect(testComponent).toBeDefined()
-      if (!testComponent) return
-      await setupTimer(testComponent)
-      setTime(1000)
+      render(WrapperComponent)
+      await vi.advanceTimersToNextTimerAsync()
 
-      await wrapper.setData({ show: false })
-      await wrapper.vm.$nextTick()
-      setTime(2000)
+      await setTime(1000)
 
-      await wrapper.setData({ show: true })
-      await setupTimer(testComponent)
-      setTime(3000)
+      // Deactivate
+      await page.getByTestId("toggle").click()
+      await setTime(2000)
 
-      expect(testComponent.vm.stop()).toBe(2000)
+      // Reactivate
+      await page.getByTestId("toggle").click()
+      // onActivated -> start() + resume().
+      // note: useThinkingTimeTracker start() resets if called again?
+      // Original:
+      // onActivated(() => { start(); resume(); })
+      // useThinkingTimeTracker logic: start() sets startTime if not set? Or resets?
+      // We assume it resumes tracking.
+
+      await setTime(3000) // +1000ms active
+
+      await page.getByTestId("inner-stop").click()
+      await expect
+        .element(page.getByTestId("inner-result"))
+        .toHaveTextContent("2000")
     })
   })
 })

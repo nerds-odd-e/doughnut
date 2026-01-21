@@ -1,7 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import usePopups from "@/components/commons/Popups/usePopups"
 import type { OptionsPopupInfo } from "@/components/commons/Popups/usePopups"
-import { flushPromises } from "@vue/test-utils"
+
+// Helper to flush promises/microtasks
+const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0))
 
 describe("usePopups", () => {
   let popups: ReturnType<typeof usePopups>["popups"]
@@ -19,6 +21,7 @@ describe("usePopups", () => {
     while (popups.peek()?.length) {
       popups.done(true)
     }
+    vi.restoreAllMocks()
   })
 
   describe("options popup", () => {
@@ -66,8 +69,7 @@ describe("usePopups", () => {
       const alertPromise = popups.alert("Single alert")
       expect(popups.peek()?.length).toBe(1)
 
-      const escapeEvent = new KeyboardEvent("keydown", { key: "Escape" })
-      document.dispatchEvent(escapeEvent)
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
       await flushPromises()
 
       const result = await alertPromise
@@ -128,9 +130,6 @@ describe("usePopups", () => {
       await flushPromises()
       await alert1Promise
       expect(removeEventListenerSpy).toHaveBeenCalledTimes(1) // Should remove listener
-
-      addEventListenerSpy.mockRestore()
-      removeEventListenerSpy.mockRestore()
     })
   })
 })

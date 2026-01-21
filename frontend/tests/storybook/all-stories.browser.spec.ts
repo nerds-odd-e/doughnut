@@ -1,12 +1,12 @@
 import { describe, it } from "vitest"
-import { render } from "@testing-library/vue"
+import { render } from "vitest-browser-vue"
 import type { Meta, StoryObj } from "@storybook/vue3"
 import { createRouter, createWebHistory } from "vue-router"
 import type { RouteRecordRaw } from "vue-router"
-import { routeMetadata } from "../../src/routes/routeMetadata"
+import { routeMetadata } from "@/routes/routeMetadata"
 import { ref } from "vue"
 import type { User } from "@generated/backend"
-import makeMe from "../fixtures/makeMe"
+import makeMe from "@tests/fixtures/makeMe"
 
 // Mock router for components that use vue-router (same as Storybook preview)
 const mockRoutes: RouteRecordRaw[] = routeMetadata.map((metadata) => ({
@@ -79,7 +79,7 @@ describe("All Storybook Stories", () => {
           return
         }
 
-        it(`renders ${storyName}`, () => {
+        it(`renders ${storyName}`, async () => {
           const Component = meta.component
           if (!Component) {
             throw new Error(
@@ -89,6 +89,7 @@ describe("All Storybook Stories", () => {
 
           const args = storyObj.args || {}
           const mockUser = makeMe.aUser.please()
+
           render(Component, {
             props: args,
             global: {
