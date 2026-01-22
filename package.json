@@ -70,7 +70,7 @@
     "@hey-api/openapi-ts": "0.90.8",
     "@mbtest/mountebank": "2.9.2",
     "@modelcontextprotocol/sdk": "^1.25.3",
-    "@redocly/cli": "^2.14.5",
+    "@redocly/cli": "^2.14.7",
     "@testing-library/cypress": "10.1.0",
     "@types/cypress-cucumber-preprocessor": "^4.0.5",
     "@types/jquery": "^3.5.33",
@@ -111,7 +111,8 @@
       "qs": ">=6.14.1",
       "hono": ">=4.11.5",
       "undici": ">=6.23.0",
-      "diff": ">=8.0.3"
+      "diff": ">=8.0.3",
+      "lodash-es": ">=4.17.23"
     },
     "onlyBuiltDependencies": [
       "@badeball/cypress-cucumber-preprocessor",
