@@ -14,13 +14,25 @@ if (typeof process === "undefined") {
 import "../src/assets/daisyui.css"
 import "../src/index.css"
 
-// Note: No fetch mocking, no FormData mocking, no IntersectionObserver mocking
-// Browser Mode provides real implementations!
-//
-// If you need to mock network requests, consider using:
-// - MSW (Mock Service Worker) - recommended for Browser Mode
-// - Playwright's page.route() for request interception
-//
-// For module mocks (vi.mock), you can still use them in Browser Mode
-// but browser APIs like IntersectionObserver, FormData, Canvas, etc.
-// are now real and don't need mocking.
+import { vi } from "vitest"
+import createFetchMock from "vitest-fetch-mock"
+
+const fetchMock = createFetchMock(vi, {
+  fallbackToNetwork: false
+})
+
+fetchMock.enableMocks();
+
+if (process.env.FRONTEND_UT_CONSOLE_OUTPUT_AS_FAILURE) {
+  const CONSOLE_FAIL_TYPES = ["error", "warn", "log"]
+
+  CONSOLE_FAIL_TYPES.forEach((type) => {
+    const originalConsole = console[type];
+    console[type] = (message) => {
+      originalConsole(message)
+      throw new Error(
+        `Failing due to console.${type} while running test!`
+      )
+    }
+  })
+}
