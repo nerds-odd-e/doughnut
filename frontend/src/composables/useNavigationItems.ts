@@ -14,8 +14,13 @@ import { messageCenterConversations } from "@/store/messageStore"
 export function useNavigationItems() {
   const route = useRoute()
   const { dueCount } = useAssimilationCount()
-  const { toRepeatCount, isRecallPaused, currentIndex, diligentMode } =
-    useRecallData()
+  const {
+    toRepeatCount,
+    toRepeat,
+    isRecallPaused,
+    currentIndex,
+    diligentMode,
+  } = useRecallData()
 
   const upperNavItems = computed(() => {
     const baseItems = [
@@ -50,11 +55,15 @@ export function useNavigationItems() {
     // Recall is paused if:
     // 1. previousAnsweredQuestionCursor is set (viewing answered question), OR
     // 2. currentIndex > 0 (not at first memory tracker) AND not on recall page
-    // Resume button should only show when there are memory trackers to recall (toRepeatCount > 0)
+    // Resume button shows when:
+    // - isPausedByCursor is true AND memory trackers are loaded (viewing previously answered question)
+    // - isPausedByIndex is true AND there are memory trackers remaining to recall
+    const hasLoadedTrackers = (toRepeat.value?.length ?? 0) > 0
     const isPausedByCursor = isRecallPaused.value
     const isPausedByIndex = currentIndex.value > 0 && route.name !== "recall"
     const shouldShowResume =
-      (isPausedByCursor || isPausedByIndex) && toRepeatCount.value > 0
+      (isPausedByCursor && hasLoadedTrackers) ||
+      (isPausedByIndex && toRepeatCount.value > 0)
 
     if (shouldShowResume) {
       return [

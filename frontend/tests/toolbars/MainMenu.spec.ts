@@ -607,7 +607,7 @@ describe("main menu", () => {
       },
       {
         description:
-          "does not show resume recall menu item when toRepeatCount is 0 even if currentIndex > 0",
+          "does not show resume recall menu item when toRepeatCount is 0 and not paused even if currentIndex > 0",
         routeName: "notebooks",
         isRecallPaused: false,
         currentIndex: 5,
@@ -616,6 +616,18 @@ describe("main menu", () => {
           spelling?: boolean
         }>,
         shouldShow: false,
+      },
+      {
+        description:
+          "shows resume recall menu item when viewing last answered question (isRecallPaused true) even if toRepeatCount is 0",
+        routeName: "notebooks",
+        isRecallPaused: true,
+        currentIndex: 5,
+        toRepeat: Array(5).fill({}) as Array<{
+          memoryTrackerId?: number
+          spelling?: boolean
+        }>,
+        shouldShow: true,
       },
     ])("$description", async ({
       routeName,
