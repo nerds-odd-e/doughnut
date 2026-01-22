@@ -17,22 +17,18 @@ import "../src/index.css"
 import { vi } from "vitest"
 import createFetchMock from "vitest-fetch-mock"
 
-const fetchMock = createFetchMock(vi, {
-  fallbackToNetwork: false
-})
-
-fetchMock.enableMocks();
+const fetchMock = createFetchMock(vi)
+fetchMock.enableMocks()
+fetchMock.doMock()
 
 if (process.env.FRONTEND_UT_CONSOLE_OUTPUT_AS_FAILURE) {
   const CONSOLE_FAIL_TYPES = ["error", "warn", "log"]
 
   CONSOLE_FAIL_TYPES.forEach((type) => {
-    const originalConsole = console[type];
+    const originalConsole = console[type]
     console[type] = (message) => {
       originalConsole(message)
-      throw new Error(
-        `Failing due to console.${type} while running test!`
-      )
+      throw new Error(`Failing due to console.${type} while running test!`)
     }
   })
 }
