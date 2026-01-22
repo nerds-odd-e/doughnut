@@ -17,8 +17,8 @@
     "format": "biome check --write src/"
   },
   "devDependencies": {
-    "@modelcontextprotocol/sdk": "^1.25.2",
-    "@types/node": "25.0.9",
+    "@modelcontextprotocol/sdk": "^1.25.3",
+    "@types/node": "25.0.10",
     "esbuild": "0.27.2",
     "typescript": "5.9.3",
     "vitest": "4.0.17",
