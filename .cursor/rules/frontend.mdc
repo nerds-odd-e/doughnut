@@ -17,16 +17,28 @@ alwaysApply: false
 
 ## Run Test in Terminal
 
-### Running All Tests
+### Running All Tests in CI mode
 
 ```bash
 CURSOR_DEV=true nix develop -c pnpm frontend:test
 ```
 
+### Running All Tests with browser rendered mode
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm frontend:test:ui
+```
+
+### Running All Tests with browser rendered in 'watch' reload/retest on file changes mode
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm frontend:test:watch
+```
+
 ### Running a Single Test File
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/path/to/TestFile.spec.ts
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/path/to/TestFile.spec.ts
 ```
 
 **Running a specific test case within a file:**
@@ -75,7 +87,7 @@ CURSOR_DEV=true nix develop -c pnpm format:all
 ### Naming Conventions
 
 - Component files should use PascalCase (e.g., `NoteShow.vue`, `GlobalBar.vue`)
-- Test files should match component names with `.spec.ts` suffix
+- Test files should match component names with `.browser.spec.ts` suffix
 - Use `.vue` extension for components
 - Use `.ts` extension for TypeScript files
 
@@ -279,7 +291,7 @@ if (error) {
    - Test through user interactions
    - Avoid testing implementation details
    - Use data-testid for test selectors
-   - Test with vitest-browser-mode as [mentioned here](https://howtotestfrontend.com/resources/vitest-browser-mode-guide-and-setup-info); i.e. prefer real browser rendering in tests over mocking (stop using jsdom).
+   - Test with vitest-browser-mode as [mentioned here](https://howtotestfrontend.com/resources/vitest-browser-mode-guide-and-setup-info) & [official guide](https://vitest.dev/guide/browser/); i.e. prefer real browser rendering in tests over mocking (stop using jsdom).
 
 2. **Avoid `xxxByRole` Queries (Performance Optimization)**
    - **DO NOT use `getByRole`, `findByRole`, `queryByRole`, `getAllByRole`, etc.** - they are slow due to expensive visibility checks
@@ -346,9 +358,23 @@ if (error) {
      .please()
    ```
 
-6. "mount" vs "render"
-   - the test helper can either mount or render the component. "render" will call the testing-library render and mount will call the vuejs test util mount.
-   - In either style testing, the test should avoid finding VueJS component in the render or mount result, so that the test can be more end to end.
+6. Component Mounting in Vitest Browser Mode
+   - Use `render()` from @testing-library/vue for most tests (recommended)
+     * Encourages testing from user perspective
+     * Returns queries (getByRole, getByText, etc.) for DOM interaction
+     * Better aligns with browser mode's end-to-end philosophy
+
+   - Use `mount()` from @vue/test-utils only when necessary
+     * When you need direct access to Vue internals (wrapper.vm, wrapper.emitted())
+     * For testing Vue-specific behavior (slots, provide/inject edge cases)
+
+   - CRITICAL: Query the DOM, not Vue components
+     * ✅ DO: page.getByRole('button', { name: /submit/i })
+     * ✅ DO: screen.getByText('Loading...')
+     * ❌ AVOID: wrapper.findComponent(MyButton)
+     * ❌ AVOID: wrapper.find('[data-testid="my-component"]') for component instances
+
+   - This ensures tests remain true end-to-end tests that verify actual user-facing behavior rather than implementation details, making them more resilient to refactoring
 
 7. **Avoid If-Conditions in Tests**
    - Tests must be deterministic - they should always execute the same way
