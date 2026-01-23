@@ -1,7 +1,6 @@
-/// <reference types="vitest" />
 /// <reference types="vite/client" />
 import { URL, fileURLToPath } from 'node:url'
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from 'vite'
 
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -25,44 +24,6 @@ const config = defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       '@tests': fileURLToPath(new URL('./tests', import.meta.url)),
     }
-  },
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    environmentOptions: {
-      jsdom: {
-        url: 'http://localhost/',
-      },
-    },
-    setupFiles: ['./tests/setupVitest.js'],
-    exclude: [
-      'packages/template/*',
-      'node_modules/**/*.spec.js',
-      'node_modules/**/*.test.js',
-      'node_modules/**/test.js',
-      // Exclude browser mode test files (they use different config)
-      '**/*.browser.spec.ts',
-      '**/*.browser.spec.tsx',
-    ],
-    fakeTimers: {
-      toFake: [
-        "Date",
-        "setTimeout",
-        "clearTimeout",
-        "setInterval",
-        "clearInterval",
-      ],
-    },
-    // Performance optimizations
-    pool: 'threads', // Use threads pool for better performance
-    // Disable coverage collection during tests (not needed for unit tests)
-    coverage: {
-      enabled: false,
-    },
-    // Optimize file parallelism
-    fileParallelism: true,
-    // Keep isolation enabled for safety (tests should be isolated)
-    isolate: true,
   },
   css: {
     // Disable sourcemaps during tests (saves ~0.3s)
