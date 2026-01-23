@@ -87,7 +87,7 @@ CURSOR_DEV=true nix develop -c pnpm format:all
 ### Naming Conventions
 
 - Component files should use PascalCase (e.g., `NoteShow.vue`, `GlobalBar.vue`)
-- Test files should match component names with `.browser.spec.ts` suffix
+- Test files should match component names with `.spec.ts` suffix
 - Use `.vue` extension for components
 - Use `.ts` extension for TypeScript files
 

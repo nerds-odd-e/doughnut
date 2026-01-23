@@ -30,13 +30,12 @@ pnpm test:browser
 ### Run browser tests in watch mode
 
 ```bash
-pnpm test:browser:watch
+pnpm test:watch
 ```
 
 ## Test File Naming Convention
 
-- **Existing tests**: `*.spec.ts` (runs with jsdom)
-- **Browser Mode tests**: `*.browser.spec.ts` (runs with real browser)
+- **Browser Mode tests**: `*.spec.ts` (runs with real browser)
 
 Both test suites can run in parallel!
 
@@ -44,12 +43,7 @@ Both test suites can run in parallel!
 
 ### Example 1: Simple Component (Modal)
 
-**Original** (`tests/commons/Modal.spec.ts`):
-
-- Mocks Vue Router
-- Uses jsdom
-
-**Browser Version** (`tests/commons/Modal.browser.spec.ts`):
+**Browser Version** (`tests/commons/Modal.spec.ts`):
 
 - Uses real Vue Router
 - Runs in real browser
@@ -57,12 +51,7 @@ Both test suites can run in parallel!
 
 ### Example 2: Component with IntersectionObserver (AiResponse)
 
-**Original** (`tests/components/conversation/AiResponse.spec.ts`):
-
-- Mocks `IntersectionObserver`
-- Mocks `window.performance`
-
-**Browser Version** (`tests/components/conversation/AiResponse.browser.spec.ts`):
+**Browser Version** (`tests/components/conversation/AiResponse.spec.ts`):
 
 - ✅ **No IntersectionObserver mock** - uses real API!
 - ✅ **No performance mock** - uses real API!
@@ -96,13 +85,13 @@ Both test suites can run in parallel!
 
 ## What's Already Set Up
 
-✅ Browser Mode configuration (`vitest.browser.config.ts`)
-✅ Browser setup file (`tests/setupVitest.browser.ts`)
+✅ Browser Mode configuration (`vitest.config.ts`)
+✅ Browser setup file (`tests/setupVitest.ts`)
 ✅ Package.json scripts
 ✅ Example migrations:
 
-- `tests/commons/Modal.browser.spec.ts`
-- `tests/components/conversation/AiResponse.browser.spec.ts`
+- `tests/commons/Modal.spec.ts`
+- `tests/components/conversation/AiResponse.spec.ts`
 
 ## Next Steps
 
@@ -110,14 +99,14 @@ Both test suites can run in parallel!
 2. **Run the example tests** to verify setup:
 
    ```bash
-   pnpm test:browser
+   pnpm test
    ```
 
 3. **Migrate more tests** following the examples
 4. **Use UI mode** for debugging:
 
    ```bash
-   pnpm test:browser:watch
+   pnpm test:watch
    ```
 
 ## Tips
@@ -130,35 +119,15 @@ Both test suites can run in parallel!
 
 ## Troubleshooting
 
-### "Cannot find module '@vitest/browser-playwright'"
-
-Run: `pnpm install`
-
 ### "Playwright browsers not found"
 
 Run: `pnpm exec playwright install chromium`
-
-### "Cannot find dependency '@vitest/ui'"
-
-Run: `pnpm install` (it's already in package.json, just needs to be installed)
 
 ### Tests are slow
 
 - Browser Mode is slower than jsdom, but still fast
 - Use `headless: true` in CI (already configured)
 - Use `--ui` only for debugging
-
-## Migration Checklist
-
-When migrating a test file:
-
-- [ ] Copy `.spec.ts` to `.browser.spec.ts`
-- [ ] Remove browser API mocks (IntersectionObserver, FormData, etc.)
-- [ ] Keep module mocks (`vi.mock()`)
-- [ ] Use real Vue Router instead of mocking
-- [ ] Add `await` to `mount()`/`render()` if needed
-- [ ] Test with `pnpm test:browser`
-- [ ] Compare results with original test
 
 ## Resources
 

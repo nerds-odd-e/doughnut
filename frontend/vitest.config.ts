@@ -49,14 +49,14 @@ const config = defineConfig({
   test: {
     globals: true,
     environment: "node", // Browser mode uses 'node' environment
-    setupFiles: ["./tests/setupVitest.browser.ts"],
-    include: ["./**/*.browser.spec.{ts,tsx}"],
+    setupFiles: ["./tests/setupVitest.ts"],
+    include: ["./**/*.spec.{ts,tsx}"],
     exclude: [
       "packages/template/*",
       "node_modules/**/*.spec.js",
       "node_modules/**/*.test.js",
       "node_modules/**/test.js",
-      "**/setupVitest.browser.ts",
+      "**/setupVitest.ts",
       "**/setup*.ts",
     ],
     browser: {

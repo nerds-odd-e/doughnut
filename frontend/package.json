@@ -16,12 +16,10 @@
     "lint": "biome check . && vue-tsc --noEmit",
     "format": "biome check --write . && vue-tsc --noEmit",
     "storybook": "storybook dev -p 6006 --no-open",
-    "test:jsom": "vitest run",
-    "test:jsdom:watch": "vitest",
-    "test:ui": "vitest run --browser --config=vitest.browser.config.ts",
-    "test:watch": "vitest --browser --config=vitest.browser.config.ts --ui",
+    "test:ui": "vitest run --browser",
+    "test:watch": "vitest --browser --ui",
     "pretest": "playwright install chromium",
-    "test": "CI=true vitest run --browser --config=vitest.browser.config.ts"
+    "test": "CI=true vitest run --browser"
   },
   "dependencies": {
     "file-saver": "^2.0.5",
