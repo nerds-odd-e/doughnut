@@ -39,14 +39,6 @@ public class ChatCompletionNoteAutomationService {
         List.of());
   }
 
-  public String removePointFromNote(String pointToRemove) throws JsonProcessingException {
-    return executeWithTool(
-        AiToolFactory.removePointFromNoteAiTool(pointToRemove),
-        NoteDetailsRephrase.class,
-        NoteDetailsRephrase::getDetails,
-        "");
-  }
-
   private <T, R> R executeWithTool(
       InstructionAndSchema tool, Class<T> resultClass, Function<T, R> extractor, R defaultValue)
       throws JsonProcessingException {

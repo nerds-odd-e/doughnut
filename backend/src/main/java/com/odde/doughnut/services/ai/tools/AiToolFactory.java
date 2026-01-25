@@ -160,18 +160,6 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
         generateUnderstandingChecklist());
   }
 
-  public static InstructionAndSchema removePointFromNoteAiTool(String pointToRemove) {
-    return new InstructionAndSchema(
-        "Please rephrase the note details to remove the following point that the user considers unrelated to the note. Preserve the overall meaning and flow of the remaining content. The point to remove is: \""
-            + pointToRemove
-            + "\"",
-        removePointFromNote());
-  }
-
-  public static Class<?> removePointFromNote() {
-    return NoteDetailsRephrase.class;
-  }
-
   public static List<Class<?>> getAllAssistantTools() {
     return List.of(
         completeNoteDetails(),
