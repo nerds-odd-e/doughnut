@@ -200,22 +200,3 @@ Given(
     })
   }
 )
-
-Given(
-  'OpenAI will rephrase the note as {string}',
-  (rephrasedContent: string) => {
-    const noteRephrase = { details: rephrasedContent }
-    const reply = JSON.stringify(noteRephrase)
-    cy.then(async () => {
-      await mock_services
-        .openAi()
-        .chatCompletion()
-        .requestMessageMatches({
-          role: 'system',
-          content:
-            '.*Please rephrase the note details to remove the following point.*',
-        })
-        .stubNoteRephrase(reply)
-    })
-  }
-)
