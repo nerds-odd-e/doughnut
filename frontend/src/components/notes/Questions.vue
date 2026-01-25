@@ -30,6 +30,7 @@
           <th>B</th>
           <th>C</th>
           <th>D</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -64,6 +65,24 @@
               {{ choice }}
             </td>
           </template>
+          <td>
+            <div class="daisy-flex daisy-gap-2">
+              <button
+                class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+                title="Edit question"
+                @click="openedQuestion = question"
+              >
+                <SvgEdit />
+              </button>
+              <button
+                class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+                title="Delete question"
+                @click="deleteQuestion(question)"
+              >
+                <SvgRemove />
+              </button>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -78,6 +97,8 @@
     <template #body>
       <QuestionManagement
         :predefinedQuestion="openedQuestion"
+        @question-updated="handleQuestionUpdated"
+        @close-dialog="openedQuestion = undefined"
       />
     </template>
   </Modal>
@@ -99,6 +120,9 @@ import QuestionManagement from "./QuestionManagement.vue"
 import QuestionExportDialog from "./QuestionExportDialog.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 import SvgExport from "../svgs/SvgExport.vue"
+import SvgEdit from "../svgs/SvgEdit.vue"
+import SvgRemove from "../svgs/SvgRemove.vue"
+import usePopups from "../commons/Popups/usePopups"
 
 const props = defineProps({
   note: {
@@ -109,6 +133,7 @@ const props = defineProps({
 const questions = ref<PredefinedQuestion[]>([])
 const openedQuestion = ref<PredefinedQuestion | undefined>()
 const showExportDialog = ref(false)
+const { popups } = usePopups()
 
 const fetchQuestions = async () => {
   const { data: allQuestions, error } =
@@ -133,6 +158,29 @@ const toggleApproval = async (questionId?: number) => {
       })
     )
   }
+}
+const deleteQuestion = async (question: PredefinedQuestion) => {
+  if (
+    await popups.confirm(
+      `Are you sure you want to delete this question: "${question.multipleChoicesQuestion.f0__stem}"?`
+    )
+  ) {
+    const { error } = await apiCallWithLoading(() =>
+      PredefinedQuestionController.deleteQuestion({
+        path: { predefinedQuestion: question.id! },
+      })
+    )
+    if (!error) {
+      questions.value = questions.value.filter((q) => q.id !== question.id)
+    }
+  }
+}
+const handleQuestionUpdated = (updatedQuestion: PredefinedQuestion) => {
+  const index = questions.value.findIndex((q) => q.id === updatedQuestion.id)
+  if (index !== -1) {
+    questions.value[index] = updatedQuestion
+  }
+  openedQuestion.value = undefined
 }
 onMounted(() => {
   fetchQuestions()
