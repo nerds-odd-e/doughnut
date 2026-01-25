@@ -202,43 +202,6 @@ Given(
 )
 
 Given(
-  "AI will generate a question when prompt doesn't include {string}:",
-  (ignoreText: string, questionTable: DataTable) => {
-    const hashes = questionTable.hashes()
-    if (hashes.length !== 1 || !hashes[0]) {
-      throw new Error(
-        `Expected exactly one row in the data table, but got ${hashes.length}`
-      )
-    }
-    // Extract the actual ignore text from the quoted string (remove quotes)
-    const actualIgnoreText = ignoreText.replace(/^"|"$/g, '')
-    start
-      .questionGenerationService()
-      .stubQuestionWhenPromptDoesNotIncludeIgnoreText(
-        actualIgnoreText,
-        hashes[0]
-      )
-  }
-)
-
-Given(
-  'AI will generate a question when prompt include {string}:',
-  (ignoreText: string, questionTable: DataTable) => {
-    const hashes = questionTable.hashes()
-    if (hashes.length !== 1 || !hashes[0]) {
-      throw new Error(
-        `Expected exactly one row in the data table, but got ${hashes.length}`
-      )
-    }
-    // Extract the actual ignore text from the quoted string (remove quotes)
-    const actualIgnoreText = ignoreText.replace(/^"|"$/g, '')
-    start
-      .questionGenerationService()
-      .stubQuestionWhenPromptIncludesIgnoreText(actualIgnoreText, hashes[0])
-  }
-)
-
-Given(
   'OpenAI will rephrase the note as {string}',
   (rephrasedContent: string) => {
     const noteRephrase = { details: rephrasedContent }

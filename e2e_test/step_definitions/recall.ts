@@ -110,16 +110,6 @@ When('I am assimilating the note {string}', (noteTitle: string) => {
   start.jumpToNotePage(noteTitle).moreOptions().openAssimilationPage()
 })
 
-When(
-  'one of the checklist topic is selected to ignore {string} and assimilate the note',
-  (topicText: string) => {
-    start
-      .assumeAssimilationPage()
-      .selectChecklistTopicToIgnore(topicText)
-      .assimilateCurrentNote()
-  }
-)
-
 Then('I assimilate the note {string}', (noteTitle: string) => {
   start.jumpToNotePage(noteTitle).moreOptions().assimilateNote()
 })
@@ -318,10 +308,6 @@ Then('I can continue with the assimilation', () => {
   cy.url().should('satisfy', (url: string) => {
     return url.includes('/assimilate') || url.includes('/recalls')
   })
-})
-
-When('I mark the point {string}', (point: string) => {
-  start.assumeAssimilationPage().selectChecklistTopicToIgnore(point)
 })
 
 Then('I should see the note rephrased as {string}', (rephrasedNote: string) => {

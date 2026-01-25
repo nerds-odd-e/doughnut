@@ -169,23 +169,6 @@ export const assumeAssimilationPage = () => ({
     cy.contains('Understanding Checklist:').should('not.exist')
     return this
   },
-  selectChecklistTopicToIgnore(topicText: string) {
-    cy.pageIsNotLoading()
-    // Find the understanding checklist container
-    cy.contains('Understanding Checklist:')
-      .closest('.daisy-bg-accent')
-      .should('be.visible')
-      .within(() => {
-        // Find the list item containing the topic text
-        cy.contains('li', topicText)
-          .should('be.visible')
-          .within(() => {
-            // Find and check the checkbox within the list item
-            cy.get('input[type="checkbox"]').check()
-          })
-      })
-    return this
-  },
   rephraseNoteWithIgnoredTopic() {
     cy.pageIsNotLoading()
     cy.contains('Understanding Checklist:')

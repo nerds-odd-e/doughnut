@@ -14,9 +14,6 @@ Feature: Remove points from note when assimilating
       | English dominates the internet and digital world                                         |
       | Proficiency in English enhances career opportunities and simplifies international travel |
 
-    When I start assimilating "English"
-    And I mark the point "English is the world's most widespread lingua franca"
-
     Given OpenAI will rephrase the note as "English plays a crucial role in global communication, enabling people from different cultures and nations to understand one another. It is the primary language used in international business, science, technology, and diplomacy, which significantly broadens professional and academic opportunities. The language is deeply embedded in the digital world, with a large majority of online content created in English. Global media—such as films, music, and entertainment—relies heavily on English, offering access to a wide range of cultures and ideas. Knowledge of English also makes international travel easier, helping people navigate foreign environments and communicate with locals more effectively. As an official language in over 60 countries and a widely taught foreign language elsewhere, English is essential for global participation and education."
     And OpenAI generates understanding checklist with points:
       | English enables effective communication between people from different cultures and countries |
