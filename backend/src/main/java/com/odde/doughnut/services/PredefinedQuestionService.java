@@ -53,6 +53,18 @@ public class PredefinedQuestionService {
     return question;
   }
 
+  public PredefinedQuestion updateQuestion(
+      PredefinedQuestion question, PredefinedQuestion updatedQuestion) {
+    question.setMultipleChoicesQuestion(updatedQuestion.getMultipleChoicesQuestion());
+    question.setCorrectAnswerIndex(updatedQuestion.getCorrectAnswerIndex());
+    entityPersister.save(question);
+    return question;
+  }
+
+  public void deleteQuestion(PredefinedQuestion question) {
+    entityPersister.remove(question);
+  }
+
   public QuestionContestResult contest(PredefinedQuestion predefinedQuestion) {
     MCQWithAnswer mcqWithAnswer = predefinedQuestion.getMcqWithAnswer();
     QuestionEvaluation questionContestResult =
