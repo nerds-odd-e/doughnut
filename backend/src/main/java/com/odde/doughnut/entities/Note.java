@@ -135,11 +135,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private List<PredefinedQuestion> predefinedQuestions = new ArrayList<>();
 
-  @Column(name = "ignored_checklist_topics")
-  @Getter
-  @Setter
-  private String ignoredChecklistTopics;
-
   @Embedded @JsonIgnore @Getter private NoteRecallSetting recallSetting = new NoteRecallSetting();
 
   @JsonIgnore
@@ -394,12 +389,5 @@ public class Note extends EntityIdentifiedByIdOnly {
     if (l.getParent().getNotebook() == l.getTargetNote().getNotebook()) return true;
     if (viewer == null) return false;
     return viewer.canReferTo(l.getParent().getNotebook());
-  }
-
-  public boolean ShouldIgnoreTopic() {
-    if (ignoredChecklistTopics != null && !ignoredChecklistTopics.isEmpty()) {
-      return true;
-    }
-    return false;
   }
 }

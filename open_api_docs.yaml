@@ -3707,8 +3707,6 @@ components:
           readOnly: true
         wikidataId:
           type: string
-        ignoredChecklistTopics:
-          type: string
       required:
       - createdAt
       - id
@@ -4303,8 +4301,6 @@ components:
           format: int32
         skipMemoryTracking:
           type: boolean
-        ignoredChecklistTopics:
-          type: string
     AssessmentAttempt:
       type: object
       properties:
