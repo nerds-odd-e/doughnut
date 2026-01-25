@@ -32,7 +32,10 @@ describe("AnsweredQuestionComponent", () => {
 
       const wrapper = helper
         .component(AnsweredQuestionComponent)
-        .withProps({ answeredQuestion: answeredQuestion1, conversationButton: false })
+        .withProps({
+          answeredQuestion: answeredQuestion1,
+          conversationButton: false,
+        })
         .mount()
 
       await flushPromises()
