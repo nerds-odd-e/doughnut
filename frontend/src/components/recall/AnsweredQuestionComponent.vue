@@ -23,12 +23,13 @@
 <script setup lang="ts">
 import type { AnsweredQuestion } from "@generated/backend"
 import type { PropType } from "vue"
+import { computed } from "vue"
 import QuestionDisplay from "./QuestionDisplay.vue"
 import ConversationButton from "./ConversationButton.vue"
 import NoteUnderQuestion from "./NoteUnderQuestion.vue"
 import ViewMemoryTrackerLink from "./ViewMemoryTrackerLink.vue"
 
-const { answeredQuestion, conversationButton } = defineProps({
+const props = defineProps({
   answeredQuestion: {
     type: Object as PropType<AnsweredQuestion>,
     required: true,
@@ -39,5 +40,5 @@ const { answeredQuestion, conversationButton } = defineProps({
   },
 })
 
-const note = answeredQuestion?.note
+const note = computed(() => props.answeredQuestion?.note)
 </script>
