@@ -107,7 +107,7 @@ Then('I am assimilating new note on day {int}', (day: number) => {
 When('I am assimilating the note {string}', (noteTitle: string) => {
   start.testability().backendTimeTravelTo(1, 8)
   cy.reload()
-  start.jumpToNotePage(noteTitle).moreOptions().assimilateNote()
+  start.jumpToNotePage(noteTitle).moreOptions().openAssimilationPage()
 })
 
 When(
@@ -119,6 +119,10 @@ When(
       .assimilateCurrentNote()
   }
 )
+
+Then('I assimilate the note {string}', (noteTitle: string) => {
+  start.jumpToNotePage(noteTitle).moreOptions().assimilateNote()
+})
 
 Then(
   'I set the level of {string} to be {int}',
