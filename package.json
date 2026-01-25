@@ -67,7 +67,7 @@
     "@hey-api/openapi-ts": "0.90.10",
     "@mbtest/mountebank": "2.9.2",
     "@modelcontextprotocol/sdk": "^1.25.3",
-    "@redocly/cli": "^2.14.8",
+    "@redocly/cli": "^2.14.9",
     "@testing-library/cypress": "10.1.0",
     "@types/cypress-cucumber-preprocessor": "^4.0.5",
     "@types/jquery": "^3.5.33",
