@@ -32,7 +32,13 @@
     "indentWidth": 2,
     "lineWidth": 80
   },
-  "assist": { "actions": { "source": { "organizeImports": "off" } } },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "off"
+      }
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {
@@ -85,7 +91,9 @@
         "noInvalidBuiltinInstantiation": "error",
         "useValidTypeof": "error"
       },
-      "security": { "noGlobalEval": "error" },
+      "security": {
+        "noGlobalEval": "error"
+      },
       "style": {
         "noDefaultExport": "off",
         "noNamespace": "error",
@@ -223,6 +231,7 @@
       "!**/vitest.config.ts",
       "!**/setupVitest.js",
       "!**/typed-router.d.ts",
+      "!**/src/assets/daisyui.css",
       "!**/public"
     ]
   },
@@ -234,7 +243,9 @@
   },
   "overrides": [
     {
-      "includes": ["**/*.vue"],
+      "includes": [
+        "**/*.vue"
+      ],
       "linter": {
         "rules": {
           "correctness": {
@@ -245,21 +256,40 @@
       }
     },
     {
-      "includes": ["**/*.ts", "**/*.tsx"],
+      "includes": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
       "linter": {
-        "rules": { "correctness": { "noUndeclaredVariables": "off" } }
+        "rules": {
+          "correctness": {
+            "noUndeclaredVariables": "off"
+          }
+        }
       }
     },
     {
-      "includes": ["**/*.config.js", "**/*.config.ts"],
-      "linter": { "rules": {} }
+      "includes": [
+        "**/*.config.js",
+        "**/*.config.ts"
+      ],
+      "linter": {
+        "rules": {}
+      }
     },
     {
       "includes": [],
-      "linter": { "rules": {} }
+      "linter": {
+        "rules": {}
+      }
     },
     {
-      "includes": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
+      "includes": [
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.mts",
+        "**/*.cts"
+      ],
       "linter": {
         "rules": {
           "correctness": {
