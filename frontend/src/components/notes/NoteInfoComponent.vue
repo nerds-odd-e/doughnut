@@ -14,6 +14,7 @@
   <NoteRecallSettingForm
     v-bind="{
       noteId: noteInfo.note.id,
+      isLinkNote: !!noteInfo.note.note.noteTopology?.targetNoteTopology,
       noteRecallSetting: recallSetting,
       noteDetails: currentNoteDetails,
     }"
