@@ -58,7 +58,7 @@ public class MemoryTrackerService {
     List<MemoryTracker> trackers = new ArrayList<>();
     trackers.add(memoryTracker);
 
-    if (note.getRecallSetting().getRememberSpelling()) {
+    if (note.getRecallSetting().getRememberSpelling() && !note.isRelation()) {
       MemoryTracker spellingTracker =
           createMemoryTracker(
               note,

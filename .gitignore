@@ -137,3 +137,7 @@ mb.pid
 doughnut_mobile/android/app/local.properties
 
 *.jsonl
+
+# AI assistants
+.claude/
+.serena/

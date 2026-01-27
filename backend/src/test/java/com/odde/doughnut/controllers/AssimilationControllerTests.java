@@ -78,5 +78,35 @@ class AssimilationControllerTests extends ControllerTestBase {
       assertThat(memoryTrackers.stream().filter(mt -> mt.getSpelling()).count(), equalTo(1L));
       assertThat(memoryTrackers.stream().filter(mt -> !mt.getSpelling()).count(), equalTo(1L));
     }
+
+    @Test
+    void shouldNotCreateSpellingMemoryTrackerForLinkNoteEvenWhenRememberSpellingIsTrue() {
+      Note parentNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note targetNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note linkNote = makeMe.aRelation().between(parentNote, targetNote).please();
+      linkNote.getRecallSetting().setRememberSpelling(true);
+      noteRepository.save(linkNote);
+
+      InitialInfo initialInfo = new InitialInfo();
+      initialInfo.noteId = linkNote.getId();
+
+      controller.assimilate(initialInfo);
+
+      List<MemoryTracker> memoryTrackers =
+          memoryTrackerRepository.findLast100ByUser(currentUser.getUser().getId());
+
+      long trackersForLinkNote =
+          memoryTrackers.stream()
+              .filter(mt -> mt.getNote().getId().equals(linkNote.getId()))
+              .count();
+
+      assertThat(trackersForLinkNote, equalTo(1L));
+      assertThat(
+          memoryTrackers.stream()
+              .filter(mt -> mt.getNote().getId().equals(linkNote.getId()))
+              .filter(MemoryTracker::getSpelling)
+              .count(),
+          equalTo(0L));
+    }
   }
 }

@@ -51,6 +51,23 @@ public class MemoryTrackerServiceTest {
       assertThat(memoryTrackers.get(0).getAssimilatedAt(), equalTo(day1));
       assertThat(memoryTrackers.get(0).getLastRecalledAt(), equalTo(day1));
     }
+
+    @Test
+    void shouldNotCreateSpellingMemoryTrackerForLinkNoteEvenWithRememberSpellingEnabled() {
+      Note parentNote = makeMe.aNote().creatorAndOwner(user).please();
+      Note targetNote = makeMe.aNote().creatorAndOwner(user).please();
+      Note linkNote =
+          makeMe.aRelation().between(parentNote, targetNote).rememberSpelling().please();
+
+      InitialInfo initialInfo = new InitialInfo();
+      initialInfo.noteId = linkNote.getId();
+      initialInfo.skipMemoryTracking = false;
+
+      var memoryTrackers = memoryTrackerService.assimilate(initialInfo, user, day1);
+
+      assertThat(memoryTrackers, hasSize(1));
+      assertThat(memoryTrackers.get(0).getSpelling(), equalTo(false));
+    }
   }
 
   @Nested
