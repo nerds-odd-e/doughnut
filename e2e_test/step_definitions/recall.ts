@@ -325,3 +325,15 @@ Then(
 Then('the {string} checkbox should be disabled', (fieldLabel: string) => {
   cy.formField(fieldLabel).should('be.disabled')
 })
+
+Then('the {string} checkbox should be enabled', (fieldLabel: string) => {
+  cy.formField(fieldLabel).should('not.be.disabled')
+})
+
+When('I update the note details to {string}', (newDetails: string) => {
+  cy.get('[role="details"]').click()
+  cy.focused().clear()
+  cy.focused().type(newDetails)
+  cy.get('body').click() // blur to trigger save
+  cy.pageIsNotLoading()
+})
