@@ -12,11 +12,7 @@
     />
   </div>
   <NoteRecallSettingForm
-    v-bind="{
-      noteId: noteInfo.note.id,
-      noteRecallSetting: recallSetting,
-      isLinkNote: !!noteInfo.note.noteTopology?.targetNoteTopology,
-    }"
+    v-bind="{ noteId: noteInfo.note.id, noteRecallSetting: recallSetting }"
     @level-changed="$emit('levelChanged', $event)"
   />
   <h6 v-if="memoryTrackers.length">Memory Trackers</h6>
