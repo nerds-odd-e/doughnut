@@ -603,6 +603,9 @@ Then(
   }
 )
 
-Then('the understanding checklist should still show the remaining points', () => {
-  cy.get('ul').find('li').should('have.length.at.least', 1)
-})
+Then(
+  'the understanding checklist should still show the remaining points',
+  () => {
+    cy.get('ul').find('li').should('have.length.at.least', 1)
+  }
+)
