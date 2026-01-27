@@ -2135,6 +2135,36 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SuggestedTitleDTO"
+  /api/ai/remove-point-from-note/{note}:
+    post:
+      tags:
+      - ai-controller
+      operationId: removePointFromNote
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RemovePointsRequestDTO"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RemovePointsResponseDTO"
   /api/ai/generate-understanding-checklist/{note}:
     post:
       tags:
@@ -4336,6 +4366,18 @@ components:
       type: object
       properties:
         title:
+          type: string
+    RemovePointsRequestDTO:
+      type: object
+      properties:
+        points:
+          type: array
+          items:
+            type: string
+    RemovePointsResponseDTO:
+      type: object
+      properties:
+        details:
           type: string
     UnderstandingChecklistDTO:
       type: object

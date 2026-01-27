@@ -413,6 +413,14 @@ export type SuggestedTitleDto = {
     title?: string;
 };
 
+export type RemovePointsRequestDto = {
+    points?: Array<string>;
+};
+
+export type RemovePointsResponseDto = {
+    details?: string;
+};
+
 export type UnderstandingChecklistDto = {
     points?: Array<string>;
 };
@@ -2913,6 +2921,33 @@ export type SuggestTitleResponses = {
 };
 
 export type SuggestTitleResponse = SuggestTitleResponses[keyof SuggestTitleResponses];
+
+export type RemovePointFromNoteData = {
+    body: RemovePointsRequestDto;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/ai/remove-point-from-note/{note}';
+};
+
+export type RemovePointFromNoteErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type RemovePointFromNoteError = RemovePointFromNoteErrors[keyof RemovePointFromNoteErrors];
+
+export type RemovePointFromNoteResponses = {
+    /**
+     * OK
+     */
+    200: RemovePointsResponseDto;
+};
+
+export type RemovePointFromNoteResponse = RemovePointFromNoteResponses[keyof RemovePointFromNoteResponses];
 
 export type GenerateUnderstandingChecklistData = {
     body?: never;
