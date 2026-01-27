@@ -7,7 +7,7 @@
   "license": "MIT",
   "engines": {
     "node": ">=24",
-    "pnpm": ">=10.28.1"
+    "pnpm": ">=10.28.2"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
@@ -62,7 +62,7 @@
     "@anev/ts-mountebank": "1.8.0",
     "@badeball/cypress-cucumber-preprocessor": "^24.0.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
-    "@biomejs/biome": "2.3.12",
+    "@biomejs/biome": "2.3.13",
     "@cucumber/cucumber": "^12.6.0",
     "@hey-api/openapi-ts": "0.90.10",
     "@mbtest/mountebank": "2.9.2",
@@ -77,7 +77,7 @@
     "cypress-file-upload": "^5.0.8",
     "github_action_sound": "^1.0.5",
     "got": "^14.6.6",
-    "hono": ">=4.11.5",
+    "hono": "4.11.6",
     "jsdom": "^27.4.0",
     "npm-run-all2": "^8.0.4",
     "process": "^0.11.10",
@@ -106,7 +106,7 @@
       "express": ">=5.2.0",
       "systeminformation": ">=5.27.14",
       "qs": ">=6.14.1",
-      "hono": ">=4.11.5",
+      "hono": "4.11.6",
       "undici": ">=6.23.0",
       "diff": ">=8.0.3",
       "lodash-es": ">=4.17.23",
@@ -123,5 +123,5 @@
       "protobufjs"
     ]
   },
-  "packageManager": "pnpm@10.28.1+sha512.7d7dbbca9e99447b7c3bf7a73286afaaf6be99251eb9498baefa7d406892f67b879adb3a1d7e687fc4ccc1a388c7175fbaae567a26ab44d1067b54fcb0d6a316"
+  "packageManager": "pnpm@10.28.2+sha512.41872f037ad22f7348e3b1debbaf7e867cfd448f2726d9cf74c08f19507c31d2c8e7a11525b983febc2df640b5438dee6023ebb1f84ed43cc2d654d2bc326264"
 }
