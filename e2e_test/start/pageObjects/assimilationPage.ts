@@ -39,6 +39,8 @@ export const assumeAssimilationPage = () => ({
           noteTitle.trim()
         )
         cy.get('[data-test="verify-spelling"]').click()
+        // Wait for popup to close after successful verification
+        cy.get('[data-test="spelling-verification-popup"]').should('not.exist')
         cy.pageIsNotLoading()
       })
     return this
