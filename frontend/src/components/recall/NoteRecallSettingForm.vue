@@ -8,6 +8,7 @@
     @update:model-value="updateLevel"
   />
   <CheckInput
+    v-if="!isLinkNote"
     scope-name="review_setting"
     field="rememberSpelling"
     :model-value="formData.rememberSpelling"
@@ -40,6 +41,10 @@ export default defineComponent({
     noteRecallSetting: {
       type: Object as PropType<NoteRecallSetting>,
       required: false,
+    },
+    isLinkNote: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ["levelChanged"],
