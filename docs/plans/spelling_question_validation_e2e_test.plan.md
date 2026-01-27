@@ -14,6 +14,7 @@ todos:
   - id: step4-add-notedetails-prop
     content: "[GREEN] Step 4: 添加 noteDetails prop 到 NoteRecallSettingForm.vue - Commit 2"
     status: pending
+    
   - id: step5-pass-notedetails
     content: "[GREEN] Step 5: 在 NoteInfoComponent.vue 中传入 noteDetails - Commit 3"
     status: pending

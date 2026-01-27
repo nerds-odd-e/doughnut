@@ -302,3 +302,22 @@ Then('I can continue with the assimilation', () => {
     return url.includes('/assimilate') || url.includes('/recalls')
   })
 })
+
+When(
+  'I navigate to the assimilation page for note {string}',
+  (noteTitle: string) => {
+    start.jumpToNotePage(noteTitle).moreOptions().openAssimilationPage()
+  }
+)
+
+When('I check the {string} option', (fieldLabel: string) => {
+  cy.formField(fieldLabel).check()
+  cy.pageIsNotLoading()
+})
+
+Then(
+  'I should see an error {string} on {string} field',
+  (message: string, fieldLabel: string) => {
+    cy.expectFieldErrorMessage(fieldLabel, message)
+  }
+)
