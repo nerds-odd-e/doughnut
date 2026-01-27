@@ -49,6 +49,12 @@
     :key="buttonKey"
     @assimilate="processForm"
   />
+  <SpellingVerificationPopup
+    :show="showSpellingPopup"
+    :expected-title="note.noteTopology.title ?? ''"
+    @cancel="handleSpellingCancel"
+    @verified="handleSpellingVerified"
+  />
 </template>
 
 <script setup lang="ts">
@@ -65,6 +71,7 @@ import AssimilationButtons from "./AssimilationButtons.vue"
 import NoteShow from "../notes/NoteShow.vue"
 import Breadcrumb from "../toolbars/Breadcrumb.vue"
 import SvgAdd from "../svgs/SvgAdd.vue"
+import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
 import { computed, ref } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
@@ -88,6 +95,8 @@ const storageAccessor = useStorageAccessor()
 
 // State
 const buttonKey = computed(() => note.id)
+const showSpellingPopup = ref(false)
+const rememberSpelling = ref(false)
 const currentDetails = ref(note.details)
 
 const onDetailsSaved = (newDetails: string) => {
@@ -140,6 +149,16 @@ const processForm = async (skipMemoryTracking: boolean) => {
     }
   }
 
+  // If rememberSpelling is checked and not skipping, show verification popup
+  if (!skipMemoryTracking && rememberSpelling.value) {
+    showSpellingPopup.value = true
+    return
+  }
+
+  await doAssimilate(skipMemoryTracking)
+}
+
+const doAssimilate = async (skipMemoryTracking: boolean) => {
   const { data: memoryTrackers, error } = await apiCallWithLoading(() =>
     AssimilationController.assimilate({
       body: {
@@ -164,6 +183,15 @@ const processForm = async (skipMemoryTracking: boolean) => {
       emit("initialReviewDone")
     }
   }
+}
+
+const handleSpellingVerified = () => {
+  showSpellingPopup.value = false
+  doAssimilate(false)
+}
+
+const handleSpellingCancel = () => {
+  showSpellingPopup.value = false
 }
 
 const promotePointToChildNote = async (point: string, index: number) => {
