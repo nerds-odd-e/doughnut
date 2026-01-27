@@ -15,7 +15,7 @@
     v-bind="{
       noteId: noteInfo.note.id,
       noteRecallSetting: recallSetting,
-      isLinkNote: !!noteInfo.note.note.noteTopology?.targetNoteTopology,
+      noteDetails: currentNoteDetails,
     }"
     @level-changed="$emit('levelChanged', $event)"
   />
@@ -60,6 +60,7 @@ import type { NoteType } from "@/models/noteTypeOptions"
 // Props
 const props = defineProps<{
   noteInfo: NoteInfo
+  currentNoteDetails?: string
 }>()
 
 // Emits
@@ -77,6 +78,9 @@ const localNoteType = ref<NoteType | undefined>(props.noteInfo.noteType)
 
 // Computed
 const recallSetting = computed(() => props.noteInfo.recallSetting)
+const currentNoteDetails = computed(
+  () => props.currentNoteDetails ?? props.noteInfo.note.note.details
+)
 const noteTypeOptionsWithEmpty = computed(
   () => ["", ...noteTypeOptions] as string[]
 )

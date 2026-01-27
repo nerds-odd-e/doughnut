@@ -9,6 +9,7 @@
       <div v-if="noteInfo?.note" class="daisy-mb-4">
         <NoteInfoComponent
           :note-info="noteInfo"
+          :current-note-details="note.details"
           @note-type-updated="onNoteTypeUpdated"
         />
       </div>

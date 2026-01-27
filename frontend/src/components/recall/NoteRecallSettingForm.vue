@@ -8,11 +8,11 @@
     @update:model-value="updateLevel"
   />
   <CheckInput
-    v-if="!isLinkNote"
     scope-name="review_setting"
     field="rememberSpelling"
-    :model-value="formData.rememberSpelling"
-    :error-message="errors.rememberSpelling"
+    :model-value="rememberSpellingValue"
+    :error-message="spellingDisabledMessage"
+    :disabled="isSpellingDisabled"
     @update:model-value="updateModelValue({ rememberSpelling: $event })"
   />
   <CheckInput
@@ -42,15 +42,29 @@ export default defineComponent({
       type: Object as PropType<NoteRecallSetting>,
       required: false,
     },
-    isLinkNote: {
-      type: Boolean,
-      default: false,
+    noteDetails: {
+      type: String,
+      required: false,
     },
   },
   emits: ["levelChanged"],
   setup(props, { emit }) {
     const formData = ref<NoteRecallSetting>(props.noteRecallSetting || {})
     const errors = ref<Partial<Record<keyof NoteRecallSetting, string>>>({})
+
+    const isSpellingDisabled = computed(
+      () => !props.noteDetails || props.noteDetails.trim() === ""
+    )
+
+    const spellingDisabledMessage = computed(() =>
+      isSpellingDisabled.value
+        ? "Remember spelling note need to have detail"
+        : errors.value.rememberSpelling
+    )
+
+    const rememberSpellingValue = computed(
+      () => !isSpellingDisabled.value && formData.value.rememberSpelling
+    )
 
     const levelAsString = computed(() =>
       formData.value.level !== undefined
@@ -93,6 +107,9 @@ export default defineComponent({
     return {
       formData,
       errors,
+      isSpellingDisabled,
+      spellingDisabledMessage,
+      rememberSpellingValue,
       levelAsString,
       levelOptions,
       updateModelValue,

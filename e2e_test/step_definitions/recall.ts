@@ -321,3 +321,7 @@ Then(
     cy.expectFieldErrorMessage(fieldLabel, message)
   }
 )
+
+Then('the {string} checkbox should be disabled', (fieldLabel: string) => {
+  cy.formField(fieldLabel).should('be.disabled')
+})
