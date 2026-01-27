@@ -79,4 +79,18 @@ public class AiController {
             .generateUnderstandingChecklist();
     return new UnderstandingChecklistDTO(points);
   }
+
+  @PostMapping("/remove-point-from-note/{note}")
+  @Transactional
+  public RemovePointsResponseDTO removePointFromNote(
+      @PathVariable(value = "note") @Schema(type = "integer") Note note,
+      @RequestBody RemovePointsRequestDTO request)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(note);
+    String currentDetails = note.getDetails();
+    if (currentDetails == null) {
+      currentDetails = "";
+    }
+    return new RemovePointsResponseDTO(currentDetails);
+  }
 }
