@@ -44,18 +44,4 @@ describe("NoteRecallSettingForm", () => {
 
     expect(rememberSpellingInput).toBeUndefined()
   })
-
-  it("should show remember spelling checkbox by default when isLinkNote is not provided", () => {
-    const wrapper = helper
-      .component(NoteRecallSettingForm)
-      .withProps(defaultProps)
-      .mount()
-
-    const checkInputs = wrapper.findAllComponents({ name: "CheckInput" })
-    const rememberSpellingInput = checkInputs.find(
-      (c) => c.props("field") === "rememberSpelling"
-    )
-
-    expect(rememberSpellingInput).toBeDefined()
-  })
 })

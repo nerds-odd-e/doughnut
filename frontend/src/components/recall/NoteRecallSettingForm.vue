@@ -49,7 +49,7 @@ export default defineComponent({
     },
     isLinkNote: {
       type: Boolean,
-      default: false,
+      required: true,
     },
   },
   emits: ["levelChanged"],
