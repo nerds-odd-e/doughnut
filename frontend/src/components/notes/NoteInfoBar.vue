@@ -41,6 +41,7 @@ const fetchData = async () => {
   if (!error) {
     noteInfo.value = noteInfoData!
     emit("noteInfoLoaded", noteInfoData?.noteType)
+    emit("rememberSpellingChanged", noteInfoData?.recallSetting?.rememberSpelling ?? false)
   }
 }
 
