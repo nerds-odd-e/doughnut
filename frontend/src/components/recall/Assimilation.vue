@@ -7,10 +7,12 @@
     </div>
     <NoteShow
       v-bind="{ noteId: note.id, expandChildren: false }"
+      @details-saved="onDetailsSaved"
     />
   </main>
   <NoteInfoBar
     :note-id="note.id"
+    :current-note-details="currentDetails"
     :key="note.id"
     @level-changed="$emit('reloadNeeded')"
     @note-type-updated="onNoteTypeUpdated"
@@ -86,12 +88,17 @@ const storageAccessor = useStorageAccessor()
 
 // State
 const buttonKey = computed(() => note.id)
+const currentDetails = ref(note.details)
+
+const onDetailsSaved = (newDetails: string) => {
+  currentDetails.value = newDetails
+}
 
 // Understanding checklist from backend
 const understandingPoints = ref<string[]>([])
 
 const generateUnderstandingChecklist = async () => {
-  if (!note.details || note.details.trim().length === 0) {
+  if (!currentDetails.value || currentDetails.value.trim().length === 0) {
     understandingPoints.value = []
     return
   }
