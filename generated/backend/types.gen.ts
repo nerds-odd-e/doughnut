@@ -120,7 +120,6 @@ export type Note = {
     createdAt: string;
     readonly deletedAt?: string;
     wikidataId?: string;
-    ignoredChecklistTopics?: string;
 };
 
 export type NoteTopology = {
@@ -396,7 +395,6 @@ export type TextFromAudioWithCallInfo = {
 export type InitialInfo = {
     noteId?: number;
     skipMemoryTracking?: boolean;
-    ignoredChecklistTopics?: string;
 };
 
 export type AssessmentAttempt = {
@@ -628,7 +626,6 @@ export type NoteWritable = {
     id: number;
     createdAt: string;
     wikidataId?: string;
-    ignoredChecklistTopics?: string;
 };
 
 export type SubscriptionWritable = {
@@ -2916,33 +2913,6 @@ export type SuggestTitleResponses = {
 };
 
 export type SuggestTitleResponse = SuggestTitleResponses[keyof SuggestTitleResponses];
-
-export type RemovePointFromNoteData = {
-    body: string;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/ai/remove-point-from-note/{note}';
-};
-
-export type RemovePointFromNoteErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type RemovePointFromNoteError = RemovePointFromNoteErrors[keyof RemovePointFromNoteErrors];
-
-export type RemovePointFromNoteResponses = {
-    /**
-     * OK
-     */
-    200: NoteRealm;
-};
-
-export type RemovePointFromNoteResponse = RemovePointFromNoteResponses[keyof RemovePointFromNoteResponses];
 
 export type GenerateUnderstandingChecklistData = {
     body?: never;

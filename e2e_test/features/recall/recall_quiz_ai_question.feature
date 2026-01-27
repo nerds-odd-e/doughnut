@@ -5,17 +5,18 @@ Feature: Repetition Quiz
     Given I am logged in as an existing user
     And I have a notebook with the head note "English" which skips review
     And there are some notes:
-      | Title    | Details                        | Skip Memory Tracking | Parent Title |
-      | sedition | Sedition means incite violence | false                | English      |
-      | sedation | Put to sleep is sedation       | false                | English      |
-      | medical  |                                | true                 | English      |
+      | Title    | Details                        | Parent Title |
+      | sedition | Sedition means incite violence | English      |
+      | sedation | Put to sleep is sedation       | English      |
+      | medical  |                                | English      |
 
   @usingMockedOpenAiService
   Scenario: AI generated question - incorrect answer
+    Given It's day 1, 8 hour
     Given OpenAI generates this question:
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
-    And I assimilated one note "sedition" on day 1
+    And I assimilate the note "sedition"
     When I am recalling my note on day 2
     Then I should be asked "What is the meaning of sedition?"
     When I choose answer "to sleep"
@@ -23,10 +24,11 @@ Feature: Repetition Quiz
 
   @usingMockedOpenAiService
   Scenario: AI generated question - correct answer
+    Given It's day 1, 8 hour
     Given OpenAI generates this question:
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
-    And I assimilated one note "sedition" on day 1
+    And I assimilate the note "sedition"
     When I am recalling my note on day 2
     Then I should be asked "What is the meaning of sedition?"
     When I choose answer "to incite violence"

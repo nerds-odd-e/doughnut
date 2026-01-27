@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
 import com.odde.doughnut.controllers.dto.UnderstandingChecklistDTO;
 import com.odde.doughnut.entities.*;
@@ -281,94 +280,6 @@ class AiControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       assertThrows(
           ResponseStatusException.class, () -> controller.generateUnderstandingChecklist(testNote));
-    }
-  }
-
-  @Nested
-  class RemovePointFromNote {
-    Note testNote;
-    OpenAIChatCompletionMock openAIChatCompletionMock;
-
-    @BeforeEach
-    void setup() {
-      testNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
-    }
-
-    @Test
-    void shouldReturnRephrasedNoteDetails()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
-      testNote.setDetails(
-          "English serves as the world's most widespread lingua franca, vital for global communication.");
-      String pointToRemove = "English is the world's most widespread lingua franca";
-      String expectedRephrasedDetails =
-          "English plays a crucial role in global communication, enabling people from different cultures to understand one another.";
-
-      // Mock AI response with rephrased content
-      com.odde.doughnut.services.ai.NoteDetailsRephrase rephrasedNote =
-          new com.odde.doughnut.services.ai.NoteDetailsRephrase();
-      rephrasedNote.setDetails(expectedRephrasedDetails);
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(rephrasedNote);
-
-      NoteRealm result = controller.removePointFromNote(testNote, pointToRemove);
-
-      assertThat(result.getNote().getDetails()).isEqualTo(expectedRephrasedDetails);
-    }
-
-    @Test
-    void shouldCallChatCompletionWithRightMessage()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
-      testNote.setDetails("Some note details about English language.");
-      String pointToRemove = "English is the world's most widespread lingua franca";
-
-      com.odde.doughnut.services.ai.NoteDetailsRephrase rephrasedNote =
-          new com.odde.doughnut.services.ai.NoteDetailsRephrase();
-      rephrasedNote.setDetails("Rephrased details without the point.");
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(rephrasedNote);
-
-      controller.removePointFromNote(testNote, pointToRemove);
-
-      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
-          ArgumentCaptor.forClass(
-              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
-      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
-      com.openai.models.chat.completions.ChatCompletionCreateParams params =
-          paramsCaptor.getValue();
-
-      boolean hasPointToRemove =
-          params.messages().stream()
-              .map(Object::toString)
-              .anyMatch(msg -> msg.contains(pointToRemove));
-      MatcherAssert.assertThat(
-          "A message should contain the point to remove", hasPointToRemove, is(true));
-
-      boolean hasNoteDetails =
-          params.messages().stream()
-              .map(Object::toString)
-              .anyMatch(msg -> msg.contains("Some note details about English language"));
-      MatcherAssert.assertThat(
-          "A message should contain the original note details", hasNoteDetails, is(true));
-
-      MatcherAssert.assertThat(
-          "Should use responseFormat instead of tools",
-          params.responseFormat().isPresent(),
-          is(true));
-    }
-
-    @Test
-    void shouldRequireUserToBeLoggedIn() {
-      currentUser.setUser(null);
-      assertThrows(
-          ResponseStatusException.class,
-          () -> controller.removePointFromNote(testNote, "some point"));
-    }
-
-    @Test
-    void shouldRequireAccessToNote() {
-      Note otherUserNote = makeMe.aNote().please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.removePointFromNote(otherUserNote, "some point"));
     }
   }
 }

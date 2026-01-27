@@ -54,8 +54,6 @@ public class QuestionGenerationRequestBuilder {
             .model(modelName)
             .addUserMessage(noteInstructions + noteDescription);
 
-    if (note.ShouldIgnoreTopic())
-      builder.addUserMessage("Ignore the topic '" + note.getIgnoredChecklistTopics() + "'");
     return builder;
   }
 }

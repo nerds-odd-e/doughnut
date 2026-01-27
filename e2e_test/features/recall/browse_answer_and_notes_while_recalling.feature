@@ -9,15 +9,15 @@ Feature: Browse answers and notes while recalling
     Given I am logged in as an existing user
     And I have a notebook with the head note "English" which skips review
     And there are some notes:
-      | Title    | Details                        | Skip Memory Tracking | Parent Title |
-      | sedition | Sedition means incite violence | false                | English      |
-      | sedation | Put to sleep is sedation       | false                | English      |
-      | medical  |                                | true                 | English      |
-    And I am assimilating new note on day 1
+      | Title    | Details                        | Parent Title |
+      | sedition | Sedition means incite violence | English      |
+      | sedation | Put to sleep is sedation       | English      |
+      | medical  |                                | English      |
+    And I am assimilating the note "sedition"
     And I assimilate with the option of remembering spelling
 
   Scenario: View last answered question when the quiz answer was correct
-    Given I assimilated one note "sedation" on day 1
+    Given I assimilate the note "sedation"
     When I am recalling my note on day 2
     And I skip one question
     And I type my answer "sedition"
@@ -42,4 +42,4 @@ Feature: Browse answers and notes while recalling
     And I skip one question
     And I type my answer "sedition"
     When choose to remove the last memory tracker from recalls
-    Then On day 100 I should have "0/1/1" note for assimilation and "1/2/2" for recall
+    Then On day 100 I should have "0/2/2" note for assimilation and "1/2/2" for recall

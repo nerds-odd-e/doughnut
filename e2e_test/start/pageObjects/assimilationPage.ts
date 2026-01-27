@@ -138,19 +138,6 @@ export const assumeAssimilationPage = () => ({
     })
     return this
   },
-  expectUnderstandingPoints(points: string[]) {
-    cy.pageIsNotLoading()
-    // Find the understanding checklist by its heading text
-    cy.contains('Understanding Checklist:')
-      .closest('.daisy-bg-accent')
-      .should('be.visible')
-    points.forEach((point) => {
-      cy.contains('Understanding Checklist:')
-        .closest('.daisy-bg-accent')
-        .should('contain', point)
-    })
-    return this
-  },
   expectUnderstandingPointsAtMost(maxPoints: number) {
     cy.pageIsNotLoading()
     // Find the understanding checklist by its heading text
@@ -167,39 +154,6 @@ export const assumeAssimilationPage = () => ({
   expectUnderstandingChecklistNotShown() {
     cy.pageIsNotLoading()
     cy.contains('Understanding Checklist:').should('not.exist')
-    return this
-  },
-  selectChecklistTopicToIgnore(topicText: string) {
-    cy.pageIsNotLoading()
-    // Find the understanding checklist container
-    cy.contains('Understanding Checklist:')
-      .closest('.daisy-bg-accent')
-      .should('be.visible')
-      .within(() => {
-        // Find the list item containing the topic text
-        cy.contains('li', topicText)
-          .should('be.visible')
-          .within(() => {
-            // Find and check the checkbox within the list item
-            cy.get('input[type="checkbox"]').check()
-          })
-      })
-    return this
-  },
-  rephraseNoteWithIgnoredTopic() {
-    cy.pageIsNotLoading()
-    cy.contains('Understanding Checklist:')
-      .closest('.daisy-bg-accent')
-      .should('be.visible')
-      .within(() => {
-        cy.get('input[type="button"]#rephrase-note').click()
-      })
-    return this
-  },
-  expectNoteRephrased(rephrasedNote: string) {
-    cy.pageIsNotLoading()
-    cy.contains('Note Rephrased').should('be.visible')
-    cy.get('.note-details').should('contain', rephrasedNote)
     return this
   },
   assimilateCurrentNote() {

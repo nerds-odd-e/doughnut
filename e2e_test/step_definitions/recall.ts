@@ -107,18 +107,12 @@ Then('I am assimilating new note on day {int}', (day: number) => {
 When('I am assimilating the note {string}', (noteTitle: string) => {
   start.testability().backendTimeTravelTo(1, 8)
   cy.reload()
-  start.jumpToNotePage(noteTitle).moreOptions().assimilateNote()
+  start.jumpToNotePage(noteTitle).moreOptions().openAssimilationPage()
 })
 
-When(
-  'one of the checklist topic is selected to ignore {string} and assimilate the note',
-  (topicText: string) => {
-    start
-      .assumeAssimilationPage()
-      .selectChecklistTopicToIgnore(topicText)
-      .assimilateCurrentNote()
-  }
-)
+Then('I assimilate the note {string}', (noteTitle: string) => {
+  start.jumpToNotePage(noteTitle).moreOptions().assimilateNote()
+})
 
 Then(
   'I set the level of {string} to be {int}',
@@ -292,13 +286,6 @@ Then('I should be able to select a note type', () => {
 })
 
 Then(
-  'I should see an understanding checklist with two points: {string} and {string}',
-  (point1: string, point2: string) => {
-    start.assumeAssimilationPage().expectUnderstandingPoints([point1, point2])
-  }
-)
-
-Then(
   'I should see an understanding checklist with a maximum of {int} points',
   (maxPoints: number) => {
     start.assumeAssimilationPage().expectUnderstandingPointsAtMost(maxPoints)
@@ -314,24 +301,4 @@ Then('I can continue with the assimilation', () => {
   cy.url().should('satisfy', (url: string) => {
     return url.includes('/assimilate') || url.includes('/recalls')
   })
-})
-
-When('I mark the point {string}', (point: string) => {
-  start.assumeAssimilationPage().selectChecklistTopicToIgnore(point)
-})
-
-Then('I should see the note rephrased as {string}', (rephrasedNote: string) => {
-  start.assumeAssimilationPage().expectNoteRephrased(rephrasedNote)
-})
-
-When('let OpenAI rewrite the note without the marked points', () => {
-  start.assumeAssimilationPage().rephraseNoteWithIgnoredTopic()
-})
-
-Then('the understanding checklist should be updated as:', (data: DataTable) => {
-  const points = data
-    .raw()
-    .map((row) => row[0])
-    .filter((p): p is string => !!p)
-  start.assumeAssimilationPage().expectUnderstandingPoints(points)
 })

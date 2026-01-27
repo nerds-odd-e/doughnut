@@ -85,16 +85,22 @@ const noteMoreOptionsDialog = () => {
       toolbarButton('Questions for the note').click()
       return questionListPage()
     },
-    assimilateNote() {
+    openAssimilationPage() {
       toolbarButton('Assimilate this note').click()
       cy.url().should('include', '/d/assimilate/')
       cy.pageIsNotLoading()
       // Wait for the assimilation page to load by checking for the "Keep for repetition" button
-      cy.findByRole(
-        'button',
-        { name: 'Keep for repetition' },
-        { timeout: 10000 }
-      ).should('be.visible')
+      cy.findByRole('button', {
+        name: 'Keep for repetition',
+        timeout: 10000,
+      })
+        .scrollIntoView()
+        .should('be.visible')
+    },
+    assimilateNote() {
+      this.openAssimilationPage()
+      cy.findByRole('button', { name: 'Keep for repetition' }).click()
+      cy.pageIsNotLoading()
     },
   }
 }

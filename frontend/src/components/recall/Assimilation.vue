@@ -16,9 +16,6 @@
     @note-type-updated="onNoteTypeUpdated"
     @note-info-loaded="onNoteInfoLoaded"
   />
-  <div v-if="isNoteRephrased" class="daisy-mb-4 daisy-p-3 daisy-rounded-lg daisy-bg-success daisy-text-success-content">
-    <span class="daisy-font-semibold">Note Rephrased</span>
-  </div>
   <div
     v-if="understandingPoints.length > 0"
     class="daisy-mb-4 daisy-rounded-lg daisy-bg-accent daisy-p-4"
@@ -33,16 +30,9 @@
           :key="index"
           class="daisy-text-accent-content"
         >
-          <input
-            type="checkbox"
-            class="daisy-checkbox daisy-checkbox-xs daisy-checkbox-accent"
-            :checked="selectedCheckListPoints.has(index)"
-            @change="togglePointSelection(index)"
-          />
           {{ point }}
         </li>
       </ul>
-      <input v-if="featureToggle" type="button" class="daisy-btn daisy-btn-xs daisy-btn-accent" id="rephrase-note" value="Rephrase Note" @click="handleRephraseNote" />
     </div>
   </div>
   <AssimilationButtons
@@ -66,8 +56,6 @@ import Breadcrumb from "../toolbars/Breadcrumb.vue"
 import { computed, ref } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import { useFeatureToggle } from "@/composables/useFeatureToggle"
 
 const { note } = defineProps<{
   note: Note
@@ -86,53 +74,9 @@ const { incrementAssimilatedCount } = useAssimilationCount()
 
 // State
 const buttonKey = computed(() => note.id)
-const isNoteRephrased = ref(false)
-const selectedCheckListPoints = ref<Set<number>>(new Set())
-
-const togglePointSelection = (index: number) => {
-  if (selectedCheckListPoints.value.has(index)) {
-    selectedCheckListPoints.value.delete(index)
-  } else {
-    selectedCheckListPoints.value.add(index)
-  }
-}
-
-const storageAccessor = useStorageAccessor()
-const { featureToggle } = useFeatureToggle()
-
-const handleRephraseNote = async () => {
-  // Get the selected points to remove
-  const pointsToRemove = Array.from(selectedCheckListPoints.value)
-    .map((index) => understandingPoints.value[index])
-    .join("; ")
-
-  if (!pointsToRemove) return
-
-  // Clear the checklist to hide it while rephrasing
-  understandingPoints.value = []
-  selectedCheckListPoints.value = new Set()
-
-  try {
-    const result = await apiCallWithLoading(() =>
-      AiController.removePointFromNote({
-        path: { note: note.id },
-        body: pointsToRemove,
-      })
-    )
-
-    if (!result.error && result.data) {
-      storageAccessor.value.refreshNoteRealm(result.data)
-      isNoteRephrased.value = true
-      await generateUnderstandingChecklist()
-    }
-  } catch (err) {
-    console.error("Failed to rephrase note:", err)
-  }
-}
 
 // Understanding checklist from backend
 const understandingPoints = ref<string[]>([])
-const isLoadingChecklist = ref(false)
 
 const generateUnderstandingChecklist = async () => {
   if (!note.details || note.details.trim().length === 0) {
@@ -140,7 +84,6 @@ const generateUnderstandingChecklist = async () => {
     return
   }
 
-  isLoadingChecklist.value = true
   try {
     const result = await apiCallWithLoading(() =>
       AiController.generateUnderstandingChecklist({
@@ -156,8 +99,6 @@ const generateUnderstandingChecklist = async () => {
   } catch (err) {
     console.error("Failed to generate understanding checklist:", err)
     understandingPoints.value = []
-  } finally {
-    isLoadingChecklist.value = false
   }
 }
 
@@ -167,18 +108,6 @@ const onNoteInfoLoaded = () => {
 
 const onNoteTypeUpdated = () => {
   generateUnderstandingChecklist()
-}
-
-const getIgnoredChecklistTopics = (): string | undefined => {
-  const points = Array.from(selectedCheckListPoints.value)
-    .map((index) => understandingPoints.value[index])
-    .filter((point): point is string => Boolean(point))
-
-  if (points.length === 0) {
-    return undefined
-  }
-
-  return points.join(", ")
 }
 
 // Methods
@@ -196,7 +125,6 @@ const processForm = async (skipMemoryTracking: boolean) => {
     AssimilationController.assimilate({
       body: {
         noteId: note.id,
-        ignoredChecklistTopics: getIgnoredChecklistTopics(),
         skipMemoryTracking,
       },
     })

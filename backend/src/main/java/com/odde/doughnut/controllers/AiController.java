@@ -4,11 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
-import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,21 +23,15 @@ public class AiController {
   private final OtherAiServices otherAiServices;
   private final NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
   private final AuthorizationService authorizationService;
-  private final EntityPersister entityPersister;
-  private final TestabilitySettings testabilitySettings;
 
   @Autowired
   public AiController(
       NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory,
       OtherAiServices otherAiServices,
-      AuthorizationService authorizationService,
-      EntityPersister entityPersister,
-      TestabilitySettings testabilitySettings) {
+      AuthorizationService authorizationService) {
     this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
     this.otherAiServices = otherAiServices;
     this.authorizationService = authorizationService;
-    this.entityPersister = entityPersister;
-    this.testabilitySettings = testabilitySettings;
   }
 
   @GetMapping("/dummy")
@@ -86,25 +78,5 @@ public class AiController {
             .createNoteAutomationService(note)
             .generateUnderstandingChecklist();
     return new UnderstandingChecklistDTO(points);
-  }
-
-  @PostMapping("/remove-point-from-note/{note}")
-  @Transactional
-  public NoteRealm removePointFromNote(
-      @PathVariable(value = "note") @Schema(type = "integer") Note note,
-      @RequestBody String pointToRemove)
-      throws UnexpectedNoAccessRightException, JsonProcessingException {
-    authorizationService.assertAuthorization(note);
-
-    String rephrasedDetails =
-        notebookAssistantForNoteServiceFactory
-            .createNoteAutomationService(note)
-            .removePointFromNote(pointToRemove);
-
-    note.setDetails(rephrasedDetails);
-    note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-    entityPersister.save(note);
-
-    return note.toNoteRealm(authorizationService.getCurrentUser());
   }
 }
