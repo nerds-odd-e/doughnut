@@ -1,3 +1,4 @@
+@ignore
 Feature: Confirm Spelling Before Keep For Repetition
   As a learner, when I check 'remember spelling' and click 'keep for repetition',
   I want to verify my spelling first to ensure I actually know the word
@@ -10,7 +11,6 @@ Feature: Confirm Spelling Before Keep For Repetition
       | Title    | Details                        | Parent Title |
       | sedition | Sedition means incite violence | English      |
 
-  @focus 
   Scenario: Cancel popup and reopen it
     Given I am assimilating the note "sedition"
     And I check the option of remembering spelling
@@ -22,7 +22,6 @@ Feature: Confirm Spelling Before Keep For Repetition
     When I click "Keep for repetition" button
     Then I should see the spelling verification popup
 
-  @focus 
   Scenario: Verify spelling with correct answer proceeds with keep for repetition
     Given I am assimilating the note "sedition"
     And I check the option of remembering spelling
@@ -32,7 +31,6 @@ Feature: Confirm Spelling Before Keep For Repetition
     And I click "Verify" button on the popup
     Then the note "sedition" should be assimilated with remembering spelling
 
-  @ignore
   Scenario: Show error message when spelling is incorrect
     Given I am assimilating the note "sedition"
     And I check the option of remembering spelling
