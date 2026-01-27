@@ -3,6 +3,7 @@
     v-if="show"
     class="popups"
     :isPopup="true"
+    :opaqueBackground="true"
     @close_request="$emit('cancel')"
   >
     <template #header>
@@ -62,3 +63,4 @@ const verify = () => {
   }
 }
 </script>
+

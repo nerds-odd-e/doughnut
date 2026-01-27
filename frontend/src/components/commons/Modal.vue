@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body">
-    <div class="modal-mask daisy-text-base-content">
+    <div class="modal-mask daisy-text-base-content" :class="{ 'opaque-background': opaqueBackground }">
       <div class="modal-wrapper" @mousedown.self="$emit('close_request')">
         <div :class="sidebarStyle" class="daisy-bg-base-200">
           <button class="close-button" @click="$emit('close_request')">
@@ -29,6 +29,7 @@ import { useRoute } from "vue-router"
 interface Props {
   sidebar?: "left" | "right"
   isPopup?: boolean
+  opaqueBackground?: boolean
 }
 const props = defineProps<Props>()
 
@@ -85,6 +86,10 @@ onUnmounted(() => {
   background-color: rgba(0, 0, 0, 0.5);
   display: table;
   transition: opacity 0.3s ease;
+
+  &.opaque-background {
+    background-color: rgba(0, 0, 0, 1);
+  }
 }
 
 .modal-wrapper {
