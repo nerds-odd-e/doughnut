@@ -341,7 +341,7 @@ Then('I should see the spelling verification popup', () => {
 })
 
 When('I click {string} button on the popup', (buttonName: string) => {
-  cy.get('.popups').within(() => {
+  cy.get('.modal-mask').within(() => {
     cy.findByRole('button', { name: buttonName }).click()
   })
 })
