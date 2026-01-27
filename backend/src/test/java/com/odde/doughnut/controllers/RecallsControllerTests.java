@@ -130,6 +130,37 @@ class RecallsControllerTests extends ControllerTestBase {
       assertEquals(1, dueMemoryTrackers.totalAssimilatedCount);
       assertThat(dueMemoryTrackers.getToRepeat(), hasSize(1));
     }
+
+    @Test
+    void shouldExcludeSpellingMemoryTrackersForLinkNotesFromRecallLists() {
+      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
+      testabilitySettings.timeTravelTo(currentTime);
+
+      Note parentNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note targetNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note linkNote = makeMe.aRelation().between(parentNote, targetNote).please();
+
+      // Create a spelling memory tracker for the link note (simulating old data)
+      makeMe
+          .aMemoryTrackerFor(linkNote)
+          .by(currentUser.getUser())
+          .spelling()
+          .nextRecallAt(currentTime)
+          .please();
+
+      // Create a regular memory tracker for a normal note
+      makeMe
+          .aMemoryTrackerFor(parentNote)
+          .by(currentUser.getUser())
+          .nextRecallAt(currentTime)
+          .please();
+
+      DueMemoryTrackers dueMemoryTrackers = controller.recalling("Asia/Shanghai", 0);
+
+      // Should only include the regular memory tracker, not the link note's spelling tracker
+      assertThat(dueMemoryTrackers.getToRepeat(), hasSize(1));
+      assertFalse(dueMemoryTrackers.getToRepeat().get(0).isSpelling());
+    }
   }
 
   @Nested

@@ -40,10 +40,12 @@ public class RecallService {
 
   private Stream<MemoryTracker> getMemoryTrackersNeedToRepeat(
       User user, Timestamp currentUTCTimestamp, ZoneId timeZone, int dueInDays) {
-    return userService.getMemoryTrackersNeedToRepeat(
-        user,
-        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24),
-        timeZone);
+    return userService
+        .getMemoryTrackersNeedToRepeat(
+            user,
+            TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24),
+            timeZone)
+        .filter(mt -> !(Boolean.TRUE.equals(mt.getSpelling()) && mt.getNote().isRelation()));
   }
 
   public DueMemoryTrackers getDueMemoryTrackers(
