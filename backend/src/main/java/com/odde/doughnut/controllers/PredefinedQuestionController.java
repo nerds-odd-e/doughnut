@@ -122,6 +122,27 @@ class PredefinedQuestionController {
     return predefinedQuestionService.toggleApproval(predefinedQuestion);
   }
 
+  @PatchMapping("/{predefinedQuestion}")
+  @Transactional
+  public PredefinedQuestion updateQuestion(
+      @PathVariable("predefinedQuestion") @Schema(type = "integer")
+          PredefinedQuestion predefinedQuestion,
+      @Valid @RequestBody PredefinedQuestion updatedQuestion)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(predefinedQuestion.getNote());
+    return predefinedQuestionService.updateQuestion(predefinedQuestion, updatedQuestion);
+  }
+
+  @PostMapping("/{predefinedQuestion}/delete")
+  @Transactional
+  public void deleteQuestion(
+      @PathVariable("predefinedQuestion") @Schema(type = "integer")
+          PredefinedQuestion predefinedQuestion)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(predefinedQuestion.getNote());
+    predefinedQuestionService.deleteQuestion(predefinedQuestion);
+  }
+
   @GetMapping(value = "/{note}/export-question-generation", produces = "application/json")
   public Map<String, Object> exportQuestionGeneration(
       @PathVariable("note") @Schema(type = "integer") Note note)

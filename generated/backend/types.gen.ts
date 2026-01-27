@@ -1609,6 +1609,31 @@ export type SuggestQuestionForFineTuningResponses = {
 
 export type SuggestQuestionForFineTuningResponse = SuggestQuestionForFineTuningResponses[keyof SuggestQuestionForFineTuningResponses];
 
+export type DeleteQuestionData = {
+    body?: never;
+    path: {
+        predefinedQuestion: number;
+    };
+    query?: never;
+    url: '/api/predefined-questions/{predefinedQuestion}/delete';
+};
+
+export type DeleteQuestionErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type DeleteQuestionError = DeleteQuestionErrors[keyof DeleteQuestionErrors];
+
+export type DeleteQuestionResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type RefineQuestionData = {
     body: PredefinedQuestion;
     path: {
@@ -3046,6 +3071,33 @@ export type UpdateNoteDetailsResponses = {
 };
 
 export type UpdateNoteDetailsResponse = UpdateNoteDetailsResponses[keyof UpdateNoteDetailsResponses];
+
+export type UpdateQuestionData = {
+    body: PredefinedQuestion;
+    path: {
+        predefinedQuestion: number;
+    };
+    query?: never;
+    url: '/api/predefined-questions/{predefinedQuestion}';
+};
+
+export type UpdateQuestionErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type UpdateQuestionError = UpdateQuestionErrors[keyof UpdateQuestionErrors];
+
+export type UpdateQuestionResponses = {
+    /**
+     * OK
+     */
+    200: PredefinedQuestion;
+};
+
+export type UpdateQuestionResponse = UpdateQuestionResponses[keyof UpdateQuestionResponses];
 
 export type ShowNoteData = {
     body?: never;
