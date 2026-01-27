@@ -18,7 +18,7 @@ overrides:
   express: '>=5.2.0'
   systeminformation: '>=5.27.14'
   qs: '>=6.14.1'
-  hono: 4.11.6
+  hono: 4.11.7
   undici: '>=6.23.0'
   diff: '>=8.0.3'
   lodash-es: '>=4.17.23'
@@ -55,7 +55,7 @@ importers:
         version: 2.9.2
       '@modelcontextprotocol/sdk':
         specifier: ^1.25.3
-        version: 1.25.3(hono@4.11.6)(zod@4.3.6)
+        version: 1.25.3(hono@4.11.7)(zod@4.3.6)
       '@redocly/cli':
         specifier: ^2.14.9
         version: 2.14.9(@opentelemetry/api@1.9.0)(core-js@3.46.0)
@@ -87,8 +87,8 @@ importers:
         specifier: ^14.6.6
         version: 14.6.6
       hono:
-        specifier: 4.11.6
-        version: 4.11.6
+        specifier: 4.11.7
+        version: 4.11.7
       jsdom:
         specifier: ^27.4.0
         version: 27.4.0
@@ -293,7 +293,7 @@ importers:
     devDependencies:
       '@modelcontextprotocol/sdk':
         specifier: ^1.25.3
-        version: 1.25.3(hono@4.11.6)(zod@4.3.6)
+        version: 1.25.3(hono@4.11.7)(zod@4.3.6)
       '@types/node':
         specifier: 25.0.10
         version: 25.0.10
@@ -1088,7 +1088,7 @@ packages:
     resolution: {integrity: sha512-vHL6w3ecZsky+8P5MD+eFfaGTyCeOHUIFYMGpQGbrBTSmNNoxv0if69rEZ5giu36weC5saFuznL411gRX7bJDw==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
-      hono: 4.11.6
+      hono: 4.11.7
 
   '@humanwhocodes/momoa@2.0.4':
     resolution: {integrity: sha512-RE815I4arJFtt+FVeU1Tgp9/Xvecacji8w/V6XtXsWWH/wz/eNkNbhb+ny/+PlVZjV0rxQpRSQKNKE3lcktHEA==}
@@ -3557,8 +3557,8 @@ packages:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
 
-  hono@4.11.6:
-    resolution: {integrity: sha512-ofIiiHyl34SV6AuhE3YT2mhO5HRWokce+eUYE82TsP6z0/H3JeJcjVWEMSIAiw2QkjDOEpES/lYsg8eEbsLtdw==}
+  hono@4.11.7:
+    resolution: {integrity: sha512-l7qMiNee7t82bH3SeyUCt9UF15EVmaBvsppY2zQtrbIhl/yzBTny+YUxsVjSjQ6gaqaeVtZmGocom8TzBlA4Yw==}
     engines: {node: '>=16.9.0'}
 
   hosted-git-info@8.1.0:
@@ -4208,6 +4208,7 @@ packages:
 
   mailsplit@5.4.5:
     resolution: {integrity: sha512-oMfhmvclR689IIaQmIcR5nODnZRRVwAKtqFT407TIvmhX2OLUBnshUTcxzQBt3+96sZVDud9NfSe1NxAkUNXEQ==}
+    deprecated: This package has been renamed to @zone-eu/mailsplit. Please update your dependencies.
 
   map-or-similar@1.5.0:
     resolution: {integrity: sha512-0aF7ZmVon1igznGI4VS30yugpduQW3y3GkcgGJOp7d8x8QrizhigUxjI/m2UojsXXto+jLAH3KSz+xOJTiORjg==}
@@ -7105,9 +7106,9 @@ snapshots:
 
   '@hey-api/types@0.1.2': {}
 
-  '@hono/node-server@1.19.9(hono@4.11.6)':
+  '@hono/node-server@1.19.9(hono@4.11.7)':
     dependencies:
-      hono: 4.11.6
+      hono: 4.11.7
 
   '@humanwhocodes/momoa@2.0.4': {}
 
@@ -7193,9 +7194,9 @@ snapshots:
 
   '@mixmark-io/domino@2.2.0': {}
 
-  '@modelcontextprotocol/sdk@1.25.3(hono@4.11.6)(zod@4.3.6)':
+  '@modelcontextprotocol/sdk@1.25.3(hono@4.11.7)(zod@4.3.6)':
     dependencies:
-      '@hono/node-server': 1.19.9(hono@4.11.6)
+      '@hono/node-server': 1.19.9(hono@4.11.7)
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
       content-type: 1.0.5
@@ -9971,7 +9972,7 @@ snapshots:
 
   he@1.2.0: {}
 
-  hono@4.11.6: {}
+  hono@4.11.7: {}
 
   hosted-git-info@8.1.0:
     dependencies:
