@@ -19,6 +19,7 @@
       noteDetails: currentNoteDetails,
     }"
     @level-changed="$emit('levelChanged', $event)"
+    @remember-spelling-changed="$emit('rememberSpellingChanged', $event)"
   />
   <h6 v-if="memoryTrackers.length">Memory Trackers</h6>
   <table v-if="memoryTrackers.length" class="daisy-table daisy-table-bordered">
@@ -68,6 +69,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "levelChanged", value: unknown): void
   (e: "noteTypeUpdated", noteType: NoteType): void
+  (e: "rememberSpellingChanged", value: boolean): void
 }>()
 
 // Router

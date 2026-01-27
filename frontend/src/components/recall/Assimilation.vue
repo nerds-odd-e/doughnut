@@ -17,6 +17,7 @@
     @level-changed="$emit('reloadNeeded')"
     @note-type-updated="onNoteTypeUpdated"
     @note-info-loaded="onNoteInfoLoaded"
+    @remember-spelling-changed="onRememberSpellingChanged"
   />
   <div
     v-if="understandingPoints.length > 0"
@@ -132,6 +133,10 @@ const generateUnderstandingChecklist = async () => {
 
 const onNoteInfoLoaded = () => {
   generateUnderstandingChecklist()
+}
+
+const onRememberSpellingChanged = (value: boolean) => {
+  rememberSpelling.value = value
 }
 
 const onNoteTypeUpdated = () => {

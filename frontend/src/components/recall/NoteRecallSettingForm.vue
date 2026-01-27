@@ -52,7 +52,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["levelChanged"],
+  emits: ["levelChanged", "rememberSpellingChanged"],
   setup(props, { emit }) {
     const formData = ref<NoteRecallSetting>(props.noteRecallSetting || {})
     const errors = ref<Partial<Record<keyof NoteRecallSetting, string>>>({})
@@ -96,6 +96,9 @@ export default defineComponent({
       if (!error) {
         if (newValue.level !== undefined) {
           emit("levelChanged", newValue.level)
+        }
+        if (newValue.rememberSpelling !== undefined) {
+          emit("rememberSpellingChanged", newValue.rememberSpelling)
         }
       } else {
         // Error is handled by global interceptor (toast notification)

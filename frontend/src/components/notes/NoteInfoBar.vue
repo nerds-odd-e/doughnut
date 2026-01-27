@@ -5,6 +5,7 @@
     :current-note-details="currentNoteDetails"
     @level-changed="$emit('levelChanged', $event)"
     @note-type-updated="$emit('noteTypeUpdated', $event)"
+    @remember-spelling-changed="$emit('rememberSpellingChanged', $event)"
   />
 </template>
 
@@ -24,6 +25,7 @@ const emit = defineEmits<{
   (e: "levelChanged", value: unknown): void
   (e: "noteTypeUpdated", noteType: NoteType): void
   (e: "noteInfoLoaded", noteType: NoteType | undefined): void
+  (e: "rememberSpellingChanged", value: boolean): void
 }>()
 
 const noteInfo = ref<NoteInfo | undefined>(undefined)
