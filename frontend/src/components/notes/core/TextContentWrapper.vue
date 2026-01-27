@@ -18,6 +18,10 @@ import { normalizeNoteDetails } from "@/utils/normalizeNoteDetails"
 
 const storageAccessor = useStorageAccessor()
 
+const emit = defineEmits<{
+  (e: "details-saved", newValue: string): void
+}>()
+
 const { field, value } = defineProps({
   field: {
     type: String as PropType<"edit title" | "edit details">,
@@ -46,6 +50,9 @@ const changerInner = async (
       .catch(errorHander)
     savedVersion.value = version
     lastSavedValue.value = newValue
+    if (field === "edit details") {
+      emit("details-saved", newValue)
+    }
   } finally {
     pendingSaveValues.delete(newValue)
   }

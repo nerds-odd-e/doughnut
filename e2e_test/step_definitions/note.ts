@@ -583,3 +583,29 @@ When(
     start.jumpToNotePage(noteName).updateNoteType(noteType)
   }
 )
+
+When('I promote the point {string} to a child note', (pointText: string) => {
+  cy.contains('li', pointText).find('button').click()
+})
+
+Then(
+  'I should remain on the assimilation page for {string}',
+  (noteTitle: string) => {
+    cy.url().should('include', '/assimilate')
+    cy.findByText(noteTitle).should('exist')
+  }
+)
+
+Then(
+  'the point {string} should be removed from the understanding checklist',
+  (pointText: string) => {
+    cy.contains('li', pointText).should('not.exist')
+  }
+)
+
+Then(
+  'the understanding checklist should still show the remaining points',
+  () => {
+    cy.get('ul').find('li').should('have.length.at.least', 1)
+  }
+)

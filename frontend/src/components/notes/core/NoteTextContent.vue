@@ -13,6 +13,7 @@
   <div role="details" class="note-details">
     <NoteEditableDetails
       v-bind="{ readonly, noteId: note.id, noteDetails: note.details, asMarkdown }"
+      @details-saved="$emit('details-saved', $event)"
     />
   </div>
 </template>
@@ -29,4 +30,8 @@ defineProps({
   readonly: { type: Boolean, default: true },
   asMarkdown: Boolean,
 })
+
+defineEmits<{
+  (e: "details-saved", newValue: string): void
+}>()
 </script>
