@@ -55,7 +55,7 @@ importers:
         version: 2.9.2
       '@modelcontextprotocol/sdk':
         specifier: ^1.25.3
-        version: 1.25.3(hono@4.11.5)(zod@4.3.6)
+        version: 1.25.3(hono@4.11.6)(zod@4.3.6)
       '@redocly/cli':
         specifier: ^2.14.9
         version: 2.14.9(@opentelemetry/api@1.9.0)(core-js@3.46.0)
@@ -88,7 +88,7 @@ importers:
         version: 14.6.6
       hono:
         specifier: '>=4.11.5'
-        version: 4.11.5
+        version: 4.11.6
       jsdom:
         specifier: ^27.4.0
         version: 27.4.0
@@ -293,7 +293,7 @@ importers:
     devDependencies:
       '@modelcontextprotocol/sdk':
         specifier: ^1.25.3
-        version: 1.25.3(hono@4.11.5)(zod@4.3.6)
+        version: 1.25.3(hono@4.11.6)(zod@4.3.6)
       '@types/node':
         specifier: 25.0.10
         version: 25.0.10
@@ -3557,8 +3557,8 @@ packages:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
 
-  hono@4.11.5:
-    resolution: {integrity: sha512-WemPi9/WfyMwZs+ZUXdiwcCh9Y+m7L+8vki9MzDw3jJ+W9Lc+12HGsd368Qc1vZi1xwW8BWMMsnK5efYKPdt4g==}
+  hono@4.11.6:
+    resolution: {integrity: sha512-ofIiiHyl34SV6AuhE3YT2mhO5HRWokce+eUYE82TsP6z0/H3JeJcjVWEMSIAiw2QkjDOEpES/lYsg8eEbsLtdw==}
     engines: {node: '>=16.9.0'}
 
   hosted-git-info@8.1.0:
@@ -7105,9 +7105,9 @@ snapshots:
 
   '@hey-api/types@0.1.2': {}
 
-  '@hono/node-server@1.19.9(hono@4.11.5)':
+  '@hono/node-server@1.19.9(hono@4.11.6)':
     dependencies:
-      hono: 4.11.5
+      hono: 4.11.6
 
   '@humanwhocodes/momoa@2.0.4': {}
 
@@ -7193,9 +7193,9 @@ snapshots:
 
   '@mixmark-io/domino@2.2.0': {}
 
-  '@modelcontextprotocol/sdk@1.25.3(hono@4.11.5)(zod@4.3.6)':
+  '@modelcontextprotocol/sdk@1.25.3(hono@4.11.6)(zod@4.3.6)':
     dependencies:
-      '@hono/node-server': 1.19.9(hono@4.11.5)
+      '@hono/node-server': 1.19.9(hono@4.11.6)
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
       content-type: 1.0.5
@@ -9971,7 +9971,7 @@ snapshots:
 
   he@1.2.0: {}
 
-  hono@4.11.5: {}
+  hono@4.11.6: {}
 
   hosted-git-info@8.1.0:
     dependencies:
