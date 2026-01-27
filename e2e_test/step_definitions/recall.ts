@@ -326,6 +326,37 @@ Then('the {string} checkbox should be disabled', (fieldLabel: string) => {
   cy.formField(fieldLabel).should('be.disabled')
 })
 
+When('I check the option of remembering spelling', () => {
+  cy.formField('Remember Spelling').check()
+  cy.pageIsNotLoading()
+})
+
+When('I click {string} button', (buttonName: string) => {
+  cy.findByRole('button', { name: buttonName }).click()
+})
+
+Then('I should see the spelling verification popup', () => {
+  cy.contains('Verify Spelling').should('be.visible')
+  cy.get('[data-test="spelling-verification-input"]').should('be.visible')
+})
+
+When('I click {string} button on the popup', (buttonName: string) => {
+  cy.get('.popups').within(() => {
+    cy.findByRole('button', { name: buttonName }).click()
+  })
+})
+
+Then('the popup should be closed', () => {
+  cy.contains('Verify Spelling').should('not.exist')
+})
+
+Then(
+  'I should still be on the assimilate page for {string}',
+  (noteTitle: string) => {
+    cy.url().should('include', '/assimilate')
+    cy.findByText(noteTitle).should('exist')
+  }
+)
 Then('the {string} checkbox should be enabled', (fieldLabel: string) => {
   cy.formField(fieldLabel).should('not.be.disabled')
 })
