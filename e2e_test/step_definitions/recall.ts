@@ -350,12 +350,9 @@ Then('the popup should be closed', () => {
   cy.contains('Verify Spelling').should('not.exist')
 })
 
-When(
-  'I type {string} in the verification input',
-  (text: string) => {
-    cy.get('[data-test="spelling-verification-input"]').type(text)
-  }
-)
+When('I type {string} in the verification input', (text: string) => {
+  cy.get('[data-test="spelling-verification-input"]').type(text)
+})
 
 Then(
   'the note {string} should be assimilated with remembering spelling',
