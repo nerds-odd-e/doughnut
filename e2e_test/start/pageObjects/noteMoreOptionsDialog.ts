@@ -90,16 +90,13 @@ const noteMoreOptionsDialog = () => {
       cy.url().should('include', '/d/assimilate/')
       cy.pageIsNotLoading()
       // Wait for the assimilation page to load by checking for the "Keep for repetition" button
-      cy.findByRole('button', {
-        name: 'Keep for repetition',
-        timeout: 10000,
-      })
+      cy.get('[data-test="keep-for-repetition"]', { timeout: 10000 })
         .scrollIntoView()
         .should('be.visible')
     },
     assimilateNote() {
       this.openAssimilationPage()
-      cy.findByRole('button', { name: 'Keep for repetition' }).click()
+      cy.get('[data-test="keep-for-repetition"]').click()
       cy.pageIsNotLoading()
     },
   }

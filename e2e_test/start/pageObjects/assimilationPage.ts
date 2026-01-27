@@ -25,9 +25,22 @@ export const assumeAssimilationPage = () => ({
     cy.get('.tooltip-popup').click()
   },
   assimilateWithSpellingOption() {
-    cy.formField('Remember Spelling').check()
-    cy.pageIsNotLoading()
-    cy.findByRole('button', { name: 'Keep for repetition' }).click()
+    // Get the note title from the page before opening the popup
+    cy.get('[data-test="note-title"]')
+      .first()
+      .invoke('text')
+      .then((noteTitle: string) => {
+        cy.formField('Remember Spelling').check()
+        cy.pageIsNotLoading()
+        cy.get('[data-test="keep-for-repetition"]').click()
+        // Handle spelling verification popup
+        cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
+        cy.get('[data-test="spelling-verification-input"]').type(
+          noteTitle.trim()
+        )
+        cy.get('[data-test="verify-spelling"]').click()
+        cy.pageIsNotLoading()
+      })
     return this
   },
   initialReviewOneNote({
@@ -93,7 +106,7 @@ export const assumeAssimilationPage = () => ({
         cy.findByText('Skip repetition').click()
         cy.findByRole('button', { name: 'OK' }).click()
       } else {
-        cy.findByText('Keep for repetition').click()
+        cy.get('[data-test="keep-for-repetition"]').click()
       }
     }
     return this
@@ -158,7 +171,7 @@ export const assumeAssimilationPage = () => ({
   },
   assimilateCurrentNote() {
     cy.pageIsNotLoading()
-    cy.findByRole('button', { name: 'Keep for repetition' }).click()
+    cy.get('[data-test="keep-for-repetition"]').click()
     return this
   },
 })

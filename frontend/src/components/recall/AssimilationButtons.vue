@@ -4,6 +4,7 @@
     name="submit"
     value="Keep for repetition"
     class="daisy-btn daisy-btn-primary"
+    data-test="keep-for-repetition"
     @click="$emit('assimilate', false)"
   />
   <input

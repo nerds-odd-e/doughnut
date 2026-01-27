@@ -9,6 +9,7 @@
           :model-value="value || ''"
           :readonly="readonly"
           role="title"
+          data-test="note-title"
           @update:model-value="update(noteTopology.id, $event)"
           @blur="blur"
         />

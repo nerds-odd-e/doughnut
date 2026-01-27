@@ -336,18 +336,27 @@ When('I click {string} button', (buttonName: string) => {
 })
 
 Then('I should see the spelling verification popup', () => {
-  cy.contains('Verify Spelling').should('be.visible')
+  cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
   cy.get('[data-test="spelling-verification-input"]').should('be.visible')
 })
 
 When('I click {string} button on the popup', (buttonName: string) => {
-  cy.get('.modal-mask').within(() => {
-    cy.findByRole('button', { name: buttonName }).click()
-  })
+  const dataTestMap: Record<string, string> = {
+    Cancel: 'cancel-spelling',
+    Verify: 'verify-spelling',
+  }
+  const dataTest = dataTestMap[buttonName]
+  if (dataTest) {
+    cy.get(`[data-test="${dataTest}"]`).click()
+  } else {
+    cy.get('.modal-mask').within(() => {
+      cy.findByRole('button', { name: buttonName }).click()
+    })
+  }
 })
 
 Then('the popup should be closed', () => {
-  cy.contains('Verify Spelling').should('not.exist')
+  cy.get('[data-test="spelling-verification-popup"]').should('not.exist')
 })
 
 When('I type {string} in the verification input', (text: string) => {
@@ -359,7 +368,7 @@ Then(
   (noteTitle: string) => {
     // After successful verification, the note should be assimilated
     // and we should no longer be on the assimilate page for this note
-    cy.contains('Verify Spelling').should('not.exist')
+    cy.get('[data-test="spelling-verification-popup"]').should('not.exist')
     // Verify we moved past this note (either to next note or to recall page)
     cy.url().should('not.include', `/assimilate/${noteTitle}`)
   }
