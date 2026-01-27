@@ -28,9 +28,17 @@
         <li
           v-for="(point, index) in understandingPoints"
           :key="index"
-          class="daisy-text-accent-content"
+          class="daisy-text-accent-content daisy-flex daisy-items-center daisy-justify-between"
         >
-          {{ point }}
+          <span>{{ point }}</span>
+          <button
+            class="daisy-btn daisy-btn-xs daisy-btn-ghost"
+            @click="promotePointToChildNote(point, index)"
+            title="Promote to child note"
+            aria-label="Promote to child note"
+          >
+            <SvgAdd />
+          </button>
         </li>
       </ul>
     </div>
@@ -46,6 +54,7 @@ import type { Note } from "@generated/backend"
 import {
   AiController,
   AssimilationController,
+  NoteCreationController,
 } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
@@ -53,9 +62,11 @@ import NoteInfoBar from "../notes/NoteInfoBar.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
 import NoteShow from "../notes/NoteShow.vue"
 import Breadcrumb from "../toolbars/Breadcrumb.vue"
+import SvgAdd from "../svgs/SvgAdd.vue"
 import { computed, ref } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const { note } = defineProps<{
   note: Note
@@ -71,6 +82,7 @@ const { popups } = usePopups()
 const { totalAssimilatedCount } = useRecallData()
 
 const { incrementAssimilatedCount } = useAssimilationCount()
+const storageAccessor = useStorageAccessor()
 
 // State
 const buttonKey = computed(() => note.id)
@@ -144,6 +156,34 @@ const processForm = async (skipMemoryTracking: boolean) => {
     } else {
       emit("initialReviewDone")
     }
+  }
+}
+
+const promotePointToChildNote = async (point: string, index: number) => {
+  try {
+    const { data: nrwp, error } = await apiCallWithLoading(() =>
+      NoteCreationController.createNoteUnderParent({
+        path: { parentNote: note.id },
+        body: { newTitle: point, wikidataId: "" },
+      })
+    )
+
+    if (error || !nrwp) {
+      await popups.alert("Failed to create child note")
+      return
+    }
+
+    // 手动更新 storage（不导航）
+    if (storageAccessor.value) {
+      storageAccessor.value.refreshNoteRealm(nrwp.created)
+      storageAccessor.value.refreshNoteRealm(nrwp.parent)
+    }
+
+    // 从列表中移除该 point
+    understandingPoints.value.splice(index, 1)
+  } catch (err) {
+    console.error("Failed to promote point to child note:", err)
+    await popups.alert("Error creating child note")
   }
 }
 </script>

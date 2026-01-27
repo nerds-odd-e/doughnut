@@ -6,6 +6,7 @@ import helper, {
   mockShowNoteAccessory,
   mockSdkService,
   wrapSdkResponse,
+  wrapSdkError,
 } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import { useRecallData } from "@/composables/useRecallData"
@@ -135,6 +136,120 @@ describe("Assimilation component", () => {
         '[data-test="note-type-selection-dialog"]'
       )
       expect(noteTypeSelection.exists()).toBe(true)
+    })
+  })
+
+  describe("promote point to child note", () => {
+    it("should display promote button for each understanding point", async () => {
+      const points = ["Point 1", "Point 2", "Point 3"]
+      mockSdkService("generateUnderstandingChecklist", { points })
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      // 验证每个 point 旁边都有按钮
+      const listItems = wrapper.findAll("li")
+      expect(listItems).toHaveLength(3)
+
+      listItems.forEach((li, index) => {
+        expect(li.text()).toContain(points[index])
+        // 验证按钮存在
+        expect(li.find("button").exists()).toBe(true)
+      })
+    })
+
+    it("should call createNoteUnderParent API when promote button is clicked", async () => {
+      const points = ["Test Point"]
+      mockSdkService("generateUnderstandingChecklist", { points })
+
+      const createNoteSpy = mockSdkService("createNoteUnderParent", {
+        created: makeMe.aNoteRealm.please(),
+        parent: makeMe.aNoteRealm.please(),
+      })
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      // 点击按钮
+      await wrapper.find("li button").trigger("click")
+      await flushPromises()
+
+      // 验证 API 被调用，且使用 point 文字作为 newTitle
+      expect(createNoteSpy).toHaveBeenCalledWith({
+        path: { parentNote: note.id },
+        body: { newTitle: "Test Point", wikidataId: "" },
+      })
+    })
+
+    it("should remove the point from checklist after successful creation", async () => {
+      const points = ["Point 1", "Point 2", "Point 3"]
+      mockSdkService("generateUnderstandingChecklist", { points })
+
+      mockSdkService("createNoteUnderParent", {
+        created: makeMe.aNoteRealm.please(),
+        parent: makeMe.aNoteRealm.please(),
+      })
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      // 验证初始有 3 个 points
+      expect(wrapper.findAll("li")).toHaveLength(3)
+
+      // 点击第二个 point 的按钮
+      const secondLi = wrapper.findAll("li")[1]
+      if (secondLi) {
+        await secondLi.find("button").trigger("click")
+        await flushPromises()
+      }
+
+      // 验证只剩 2 个 points
+      expect(wrapper.findAll("li")).toHaveLength(2)
+      // 验证 "Point 2" 不见了
+      expect(wrapper.text()).not.toContain("Point 2")
+      // 验证其他两个还在
+      expect(wrapper.text()).toContain("Point 1")
+      expect(wrapper.text()).toContain("Point 3")
+    })
+
+    it("should keep the point in checklist and show error when API fails", async () => {
+      const points = ["Test Point"]
+      mockSdkService("generateUnderstandingChecklist", { points })
+
+      // Mock API 失败
+      const createNoteSpy = mockSdkService("createNoteUnderParent", undefined)
+      createNoteSpy.mockResolvedValue(wrapSdkError("API Error"))
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      // 点击按钮
+      await wrapper.find("li button").trigger("click")
+      await flushPromises()
+
+      // 验证 point 还在列表中
+      expect(wrapper.findAll("li")).toHaveLength(1)
+      expect(wrapper.text()).toContain("Test Point")
     })
   })
 })
