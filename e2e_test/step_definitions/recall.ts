@@ -350,6 +350,24 @@ Then('the popup should be closed', () => {
   cy.contains('Verify Spelling').should('not.exist')
 })
 
+When(
+  'I type {string} in the verification input',
+  (text: string) => {
+    cy.get('[data-test="spelling-verification-input"]').type(text)
+  }
+)
+
+Then(
+  'the note {string} should be assimilated with remembering spelling',
+  (noteTitle: string) => {
+    // After successful verification, the note should be assimilated
+    // and we should no longer be on the assimilate page for this note
+    cy.contains('Verify Spelling').should('not.exist')
+    // Verify we moved past this note (either to next note or to recall page)
+    cy.url().should('not.include', `/assimilate/${noteTitle}`)
+  }
+)
+
 Then(
   'I should still be on the assimilate page for {string}',
   (noteTitle: string) => {

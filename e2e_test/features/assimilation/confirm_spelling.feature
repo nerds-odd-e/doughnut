@@ -22,7 +22,7 @@ Feature: Confirm Spelling Before Keep For Repetition
     When I click "Keep for repetition" button
     Then I should see the spelling verification popup
 
-  @ignore
+  @focus 
   Scenario: Verify spelling with correct answer proceeds with keep for repetition
     Given I am assimilating the note "sedition"
     And I check the option of remembering spelling
