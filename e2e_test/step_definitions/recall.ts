@@ -347,8 +347,7 @@ Then('the {string} checkbox should be disabled', (fieldLabel: string) => {
 })
 
 When('I check the option of remembering spelling', () => {
-  cy.formField('Remember Spelling').check()
-  cy.pageIsNotLoading()
+  start.assumeAssimilationPage().checkRememberSpellingOption()
 })
 
 When('I click {string} button', (buttonName: string) => {
@@ -356,18 +355,12 @@ When('I click {string} button', (buttonName: string) => {
 })
 
 Then('I should see the spelling verification popup', () => {
-  cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
-  cy.get('[data-test="spelling-verification-input"]').should('be.visible')
+  start.assumeAssimilationPage().waitForSpellingVerificationPopup()
 })
 
 When('I click {string} button on the popup', (buttonName: string) => {
-  const dataTestMap: Record<string, string> = {
-    Cancel: 'cancel-spelling',
-    Verify: 'verify-spelling',
-  }
-  const dataTest = dataTestMap[buttonName]
-  if (dataTest) {
-    cy.get(`[data-test="${dataTest}"]`).click()
+  if (buttonName === 'Cancel' || buttonName === 'Verify') {
+    start.assumeAssimilationPage().clickPopupButton(buttonName)
   } else {
     cy.get('.modal-mask').within(() => {
       cy.findByRole('button', { name: buttonName }).click()
@@ -376,20 +369,17 @@ When('I click {string} button on the popup', (buttonName: string) => {
 })
 
 Then('the popup should be closed', () => {
-  cy.get('[data-test="spelling-verification-popup"]').should('not.exist')
+  start.assumeAssimilationPage().expectPopupClosed()
 })
 
 When('I type {string} in the verification input', (text: string) => {
-  cy.get('[data-test="spelling-verification-input"]').type(text)
+  start.assumeAssimilationPage().typeInVerificationInput(text)
 })
 
 Then(
   'the note {string} should be assimilated with remembering spelling',
   (noteTitle: string) => {
-    // After successful verification, the note should be assimilated
-    // and we should no longer be on the assimilate page for this note
-    cy.get('[data-test="spelling-verification-popup"]').should('not.exist')
-    // Verify we moved past this note (either to next note or to recall page)
+    start.assumeAssimilationPage().expectPopupClosed()
     cy.url().should('not.include', `/assimilate/${noteTitle}`)
   }
 )
@@ -397,8 +387,9 @@ Then(
 Then(
   'I should still be on the assimilate page for {string}',
   (noteTitle: string) => {
-    cy.url().should('include', '/assimilate')
-    cy.findByText(noteTitle).should('exist')
+    start
+      .assumeAssimilationPage()
+      .expectToRemainOnAssimilationPageFor(noteTitle)
   }
 )
 Then('the {string} checkbox should be enabled', (fieldLabel: string) => {
@@ -416,13 +407,10 @@ When('I update the note details to {string}', (newDetails: string) => {
 Then(
   'I should see an error message {string} below the input field',
   (errorMessage: string) => {
-    cy.get('[data-test="spelling-error-message"]').should(
-      'contain.text',
-      errorMessage
-    )
+    start.assumeAssimilationPage().expectSpellingErrorMessage(errorMessage)
   }
 )
 
 Then('the popup should remain open', () => {
-  cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
+  start.assumeAssimilationPage().expectPopupOpen()
 })

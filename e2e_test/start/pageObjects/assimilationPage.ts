@@ -197,6 +197,33 @@ export const assumeAssimilationPage = () => ({
     cy.findByText(noteTitle).should('exist')
     return this
   },
+  checkRememberSpellingOption() {
+    cy.formField('Remember Spelling').check()
+    cy.pageIsNotLoading()
+  },
+  waitForSpellingVerificationPopup() {
+    cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
+    cy.get('[data-test="spelling-verification-input"]').should('be.visible')
+  },
+  typeInVerificationInput(text: string) {
+    cy.get('[data-test="spelling-verification-input"]').type(text)
+  },
+  clickPopupButton(buttonName: 'Cancel' | 'Verify') {
+    const dataTestMap = { Cancel: 'cancel-spelling', Verify: 'verify-spelling' }
+    cy.get(`[data-test="${dataTestMap[buttonName]}"]`).click()
+  },
+  expectPopupClosed() {
+    cy.get('[data-test="spelling-verification-popup"]').should('not.exist')
+  },
+  expectPopupOpen() {
+    cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
+  },
+  expectSpellingErrorMessage(message: string) {
+    cy.get('[data-test="spelling-error-message"]').should(
+      'contain.text',
+      message
+    )
+  },
   expectPointRemovedFromChecklist(pointText: string) {
     cy.contains('li', pointText).should('not.exist')
     return this
