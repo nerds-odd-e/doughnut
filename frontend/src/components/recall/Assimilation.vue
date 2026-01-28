@@ -213,13 +213,13 @@ const promotePointToChildNote = async (point: string, index: number) => {
       return
     }
 
-    // 手动更新 storage（不导航）
+    // Update storage manually (without navigation)
     if (storageAccessor.value) {
       storageAccessor.value.refreshNoteRealm(nrwp.created)
       storageAccessor.value.refreshNoteRealm(nrwp.parent)
     }
 
-    // 从列表中移除该 point
+    // Remove the point from the list
     understandingPoints.value.splice(index, 1)
   } catch (err) {
     console.error("Failed to promote point to child note:", err)

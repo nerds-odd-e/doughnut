@@ -152,13 +152,13 @@ describe("Assimilation component", () => {
 
       await flushPromises()
 
-      // 验证每个 point 旁边都有按钮
+      // Verify each point has a promote button
       const listItems = wrapper.findAll("li")
       expect(listItems).toHaveLength(3)
 
       listItems.forEach((li, index) => {
         expect(li.text()).toContain(points[index])
-        // 验证按钮存在
+        // Verify button exists
         expect(li.find("button").exists()).toBe(true)
       })
     })
@@ -180,11 +180,11 @@ describe("Assimilation component", () => {
 
       await flushPromises()
 
-      // 点击按钮
+      // Click the button
       await wrapper.find("li button").trigger("click")
       await flushPromises()
 
-      // 验证 API 被调用，且使用 point 文字作为 newTitle
+      // Verify API is called with point text as newTitle
       expect(createNoteSpy).toHaveBeenCalledWith({
         path: { parentNote: note.id },
         body: { newTitle: "Test Point", wikidataId: "" },
@@ -208,21 +208,21 @@ describe("Assimilation component", () => {
 
       await flushPromises()
 
-      // 验证初始有 3 个 points
+      // Verify initially 3 points
       expect(wrapper.findAll("li")).toHaveLength(3)
 
-      // 点击第二个 point 的按钮
+      // Click the second point's button
       const secondLi = wrapper.findAll("li")[1]
       if (secondLi) {
         await secondLi.find("button").trigger("click")
         await flushPromises()
       }
 
-      // 验证只剩 2 个 points
+      // Verify only 2 points remain
       expect(wrapper.findAll("li")).toHaveLength(2)
-      // 验证 "Point 2" 不见了
+      // Verify "Point 2" is gone
       expect(wrapper.text()).not.toContain("Point 2")
-      // 验证其他两个还在
+      // Verify the other two remain
       expect(wrapper.text()).toContain("Point 1")
       expect(wrapper.text()).toContain("Point 3")
     })
@@ -231,7 +231,7 @@ describe("Assimilation component", () => {
       const points = ["Test Point"]
       mockSdkService("generateUnderstandingChecklist", { points })
 
-      // Mock API 失败
+      // Mock API failure
       const createNoteSpy = mockSdkService("createNoteUnderParent", undefined)
       createNoteSpy.mockResolvedValue(wrapSdkError("API Error"))
 
@@ -243,11 +243,11 @@ describe("Assimilation component", () => {
 
       await flushPromises()
 
-      // 点击按钮
+      // Click the button
       await wrapper.find("li button").trigger("click")
       await flushPromises()
 
-      // 验证 point 还在列表中
+      // Verify point remains in the list
       expect(wrapper.findAll("li")).toHaveLength(1)
       expect(wrapper.text()).toContain("Test Point")
     })
