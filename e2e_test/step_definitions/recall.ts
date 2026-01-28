@@ -343,7 +343,7 @@ Then('the note details should be {string}', (detailsText: string) => {
 })
 
 Then('the {string} checkbox should be disabled', (fieldLabel: string) => {
-  cy.formField(fieldLabel).should('be.disabled')
+  start.assumeAssimilationPage().expectCheckboxDisabled(fieldLabel)
 })
 
 When('I check the option of remembering spelling', () => {
@@ -393,15 +393,11 @@ Then(
   }
 )
 Then('the {string} checkbox should be enabled', (fieldLabel: string) => {
-  cy.formField(fieldLabel).should('not.be.disabled')
+  start.assumeAssimilationPage().expectCheckboxEnabled(fieldLabel)
 })
 
 When('I update the note details to {string}', (newDetails: string) => {
-  cy.get('[role="details"]').click()
-  cy.focused().clear()
-  cy.focused().type(newDetails)
-  cy.get('body').click() // blur to trigger save
-  cy.pageIsNotLoading()
+  start.assumeAssimilationPage().updateNoteDetails(newDetails)
 })
 
 Then(

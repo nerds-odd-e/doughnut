@@ -232,6 +232,22 @@ export const assumeAssimilationPage = () => ({
     cy.get('ul').find('li').should('have.length.at.least', 1)
     return this
   },
+  expectCheckboxDisabled(fieldLabel: string) {
+    cy.formField(fieldLabel).should('be.disabled')
+    return this
+  },
+  expectCheckboxEnabled(fieldLabel: string) {
+    cy.formField(fieldLabel).should('not.be.disabled')
+    return this
+  },
+  updateNoteDetails(newDetails: string) {
+    cy.get('[role="details"]').click()
+    cy.focused().clear()
+    cy.focused().type(newDetails)
+    cy.get('body').click()
+    cy.pageIsNotLoading()
+    return this
+  },
 })
 
 export const assimilation = () => {
