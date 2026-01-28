@@ -11,6 +11,7 @@ import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.PointExtractionResult;
+import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
-import com.odde.doughnut.testability.TestabilitySettings;
 
 @RestController
 @SessionScope
@@ -101,26 +101,26 @@ public class AiController {
       @RequestBody RemovePointsRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
 
-      authorizationService.assertAuthorization(note);
+    authorizationService.assertAuthorization(note);
 
-      String details = note.getDetails();
-      if (details == null || details.trim().isEmpty()) {
-          return new RemovePointsResponseDTO(details);
-      }
-      if (request.getPoints() == null || request.getPoints().isEmpty()) {
-          return new RemovePointsResponseDTO(details);
-      }
+    String details = note.getDetails();
+    if (details == null || details.trim().isEmpty()) {
+      return new RemovePointsResponseDTO(details);
+    }
+    if (request.getPoints() == null || request.getPoints().isEmpty()) {
+      return new RemovePointsResponseDTO(details);
+    }
 
-      String newDetails =
-          notebookAssistantForNoteServiceFactory
-              .createNoteAutomationService(note)
-              .removePointsAndRegenerateDetails(request.getPoints());
+    String newDetails =
+        notebookAssistantForNoteServiceFactory
+            .createNoteAutomationService(note)
+            .removePointsAndRegenerateDetails(request.getPoints());
 
-      note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-      note.setDetails(newDetails);
-      entityPersister.save(note);
+    note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+    note.setDetails(newDetails);
+    entityPersister.save(note);
 
-      return new RemovePointsResponseDTO(newDetails);
+    return new RemovePointsResponseDTO(newDetails);
   }
 
   @PostMapping("/extract-point-to-child/{note}")

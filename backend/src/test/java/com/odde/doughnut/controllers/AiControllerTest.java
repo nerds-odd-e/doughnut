@@ -286,55 +286,55 @@ class AiControllerTest extends ControllerTestBase {
     }
   }
 
-    @Nested
-    class RemovePointFromNote {
-        Note testNote;
-        RemovePointsResponseDTO result;
-        OpenAIChatCompletionMock openAIChatCompletionMock;
+  @Nested
+  class RemovePointFromNote {
+    Note testNote;
+    RemovePointsResponseDTO result;
+    OpenAIChatCompletionMock openAIChatCompletionMock;
 
-        @BeforeEach
-        void setup() {
-            testNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-            openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
-        }
-
-        @Test
-        void shouldReturnDetailsAfterRemovingPoints()
-            throws UnexpectedNoAccessRightException, JsonProcessingException {
-            openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(
-                new RegeneratedNoteDetails("Remaining content."));
-            String originalDetails =
-                "English is a language that is spoken in many countries. It is also the most widely spoken language in the world.";
-            testNote.setDetails(originalDetails);
-            RemovePointsRequestDTO requestDTO = new RemovePointsRequestDTO();
-            requestDTO.points = List.of("English is a language that is spoken in many countries.");
-            RemovePointsResponseDTO response = controller.removePointFromNote(testNote, requestDTO);
-            assertThat(response.getDetails()).isNotEqualTo(originalDetails);
-            assertThat(response.getDetails()).isEqualTo("Remaining content.");
-        }
-
-        @Test
-        void shouldSaveRegeneratedDetailsToDatabase()
-            throws UnexpectedNoAccessRightException, JsonProcessingException {
-            openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(
-                new RegeneratedNoteDetails("Remaining content."));
-            testNote.setDetails("Original content with point to remove.");
-            RemovePointsRequestDTO requestDTO = new RemovePointsRequestDTO();
-            requestDTO.points = List.of("point to remove");
-            controller.removePointFromNote(testNote, requestDTO);
-            makeMe.entityPersister.flush();
-            makeMe.entityPersister.refresh(testNote);
-            assertThat(testNote.getDetails()).isEqualTo("Remaining content.");
-        }
-
-        @Test
-        void shouldReturnDetailsUnchangedWhenPointsToRemoveIsEmpty()
-            throws UnexpectedNoAccessRightException, JsonProcessingException {
-            testNote.setDetails("Some note content.");
-            RemovePointsRequestDTO requestDTO = new RemovePointsRequestDTO();
-            requestDTO.points = List.of();
-            RemovePointsResponseDTO response = controller.removePointFromNote(testNote, requestDTO);
-            assertThat(response.getDetails()).isEqualTo("Some note content.");
-        }
+    @BeforeEach
+    void setup() {
+      testNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
     }
+
+    @Test
+    void shouldReturnDetailsAfterRemovingPoints()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(
+          new RegeneratedNoteDetails("Remaining content."));
+      String originalDetails =
+          "English is a language that is spoken in many countries. It is also the most widely spoken language in the world.";
+      testNote.setDetails(originalDetails);
+      RemovePointsRequestDTO requestDTO = new RemovePointsRequestDTO();
+      requestDTO.points = List.of("English is a language that is spoken in many countries.");
+      RemovePointsResponseDTO response = controller.removePointFromNote(testNote, requestDTO);
+      assertThat(response.getDetails()).isNotEqualTo(originalDetails);
+      assertThat(response.getDetails()).isEqualTo("Remaining content.");
+    }
+
+    @Test
+    void shouldSaveRegeneratedDetailsToDatabase()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(
+          new RegeneratedNoteDetails("Remaining content."));
+      testNote.setDetails("Original content with point to remove.");
+      RemovePointsRequestDTO requestDTO = new RemovePointsRequestDTO();
+      requestDTO.points = List.of("point to remove");
+      controller.removePointFromNote(testNote, requestDTO);
+      makeMe.entityPersister.flush();
+      makeMe.entityPersister.refresh(testNote);
+      assertThat(testNote.getDetails()).isEqualTo("Remaining content.");
+    }
+
+    @Test
+    void shouldReturnDetailsUnchangedWhenPointsToRemoveIsEmpty()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      testNote.setDetails("Some note content.");
+      RemovePointsRequestDTO requestDTO = new RemovePointsRequestDTO();
+      requestDTO.points = List.of();
+      RemovePointsResponseDTO response = controller.removePointFromNote(testNote, requestDTO);
+      assertThat(response.getDetails()).isEqualTo("Some note content.");
+    }
+  }
 }

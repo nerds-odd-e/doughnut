@@ -24,13 +24,13 @@ public final class NoteAutomationService {
     return chatCompletionNoteAutomationService.extractPointToChild(point);
   }
 
-    public String regenerateDetailsFromPoints(java.util.List<String> points)
-        throws JsonProcessingException {
-        return chatCompletionNoteAutomationService.regenerateDetailsFromPoints(points);
-    }
+  public String regenerateDetailsFromPoints(java.util.List<String> points)
+      throws JsonProcessingException {
+    return chatCompletionNoteAutomationService.regenerateDetailsFromPoints(points);
+  }
 
-    public String removePointsAndRegenerateDetails(java.util.List<String> pointsToRemove)
-        throws JsonProcessingException {
-        return chatCompletionNoteAutomationService.removePointsAndRegenerateDetails(pointsToRemove);
-    }
+  public String removePointsAndRegenerateDetails(java.util.List<String> pointsToRemove)
+      throws JsonProcessingException {
+    return chatCompletionNoteAutomationService.removePointsAndRegenerateDetails(pointsToRemove);
+  }
 }
