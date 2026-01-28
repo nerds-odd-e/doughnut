@@ -75,7 +75,6 @@ public_keys/
 .gitsecret/keys/pubring.kbx~
 
 # VSCode
-**/.vscode/
 **/*.code-workspace
 
 # asdf/rtx

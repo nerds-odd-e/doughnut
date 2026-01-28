@@ -1,0 +1,23 @@
+{
+  "cucumber.features": [
+    "e2e_test/features/**/*.feature"
+  ],
+  "cucumber.glue": [
+    "e2e_test/step_definitions/**/*.ts"
+  ],
+  "cucumberautocomplete.steps": [
+    "e2e_test/step_definitions/**/*.ts"
+  ],
+  "cucumberautocomplete.syncfeatures": "e2e_test/features/**/*.feature",
+  "cucumberautocomplete.strictGherkinCompletion": true,
+  "cucumberautocomplete.smartSnippets": true,
+  "cucumberautocomplete.stepsInvariants": true,
+  "cucumberautocomplete.formatConfOverride": {
+    "And": 3,
+    "But": 3,
+    "Scenario": 3,
+    "Given": 3,
+    "When": 3,
+    "Then": 3
+  }
+}
