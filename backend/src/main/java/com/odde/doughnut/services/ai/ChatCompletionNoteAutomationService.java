@@ -39,6 +39,14 @@ public class ChatCompletionNoteAutomationService {
         List.of());
   }
 
+  public PointExtractionResult extractPointToChild(String point) throws JsonProcessingException {
+    return executeWithTool(
+        AiToolFactory.extractPointToChildAiTool(point),
+        PointExtractionResult.class,
+        result -> result,
+        null);
+  }
+
   private <T, R> R executeWithTool(
       InstructionAndSchema tool, Class<T> resultClass, Function<T, R> extractor, R defaultValue)
       throws JsonProcessingException {

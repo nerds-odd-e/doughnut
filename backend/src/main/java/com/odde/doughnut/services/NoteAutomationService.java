@@ -18,4 +18,9 @@ public final class NoteAutomationService {
   public java.util.List<String> generateUnderstandingChecklist() throws JsonProcessingException {
     return chatCompletionNoteAutomationService.generateUnderstandingChecklist();
   }
+
+  public com.odde.doughnut.services.ai.PointExtractionResult extractPointToChild(String point)
+      throws JsonProcessingException {
+    return chatCompletionNoteAutomationService.extractPointToChild(point);
+  }
 }
