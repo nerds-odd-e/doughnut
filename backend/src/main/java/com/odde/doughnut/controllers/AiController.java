@@ -3,10 +3,13 @@ package com.odde.doughnut.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
+import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
+import com.odde.doughnut.services.ai.PointExtractionResult;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +26,18 @@ public class AiController {
   private final OtherAiServices otherAiServices;
   private final NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
   private final AuthorizationService authorizationService;
+  private final NoteConstructionService noteConstructionService;
 
   @Autowired
   public AiController(
       NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory,
       OtherAiServices otherAiServices,
-      AuthorizationService authorizationService) {
+      AuthorizationService authorizationService,
+      NoteConstructionService noteConstructionService) {
     this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
     this.otherAiServices = otherAiServices;
     this.authorizationService = authorizationService;
+    this.noteConstructionService = noteConstructionService;
   }
 
   @GetMapping("/dummy")
@@ -92,5 +98,36 @@ public class AiController {
       currentDetails = "";
     }
     return new RemovePointsResponseDTO(currentDetails);
+  }
+
+  @PostMapping("/extract-point-to-child/{note}")
+  @Transactional
+  public ExtractPointToChildResponseDTO extractPointToChild(
+      @PathVariable(value = "note") @Schema(type = "integer") Note note,
+      @RequestBody ExtractPointToChildRequestDTO request)
+      throws UnexpectedNoAccessRightException, JsonProcessingException {
+
+    authorizationService.assertAuthorization(note);
+
+    // 1. Call AI to generate result
+    PointExtractionResult result =
+        notebookAssistantForNoteServiceFactory
+            .createNoteAutomationService(note)
+            .extractPointToChild(request.getPoint());
+
+    if (result == null) {
+      throw new RuntimeException("AI failed to generate extraction result");
+    }
+
+    // 2. Create new note
+    User user = authorizationService.getCurrentUser();
+    Note newNote = noteConstructionService.createNote(note, result.newNoteTitle);
+    newNote.setDetails(result.newNoteDetails);
+
+    // 3. Update original note's details
+    note.setDetails(result.updatedParentDetails);
+
+    // 4. Return result
+    return new ExtractPointToChildResponseDTO(newNote.toNoteRealm(user), note.toNoteRealm(user));
   }
 }

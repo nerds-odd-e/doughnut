@@ -429,6 +429,15 @@ export type AiGeneratedImage = {
     b64encoded?: string;
 };
 
+export type ExtractPointToChildRequestDto = {
+    point?: string;
+};
+
+export type ExtractPointToChildResponseDto = {
+    createdNote?: NoteRealm;
+    updatedParentNote?: NoteRealm;
+};
+
 export type UserDto = {
     name: string;
     dailyAssimilationCount?: number;
@@ -721,6 +730,11 @@ export type ConversationSubjectWritable = {
     assessmentQuestionInstance?: AssessmentQuestionInstance;
     note?: NoteWritable;
     answeredQuestion?: AnsweredQuestionWritable;
+};
+
+export type ExtractPointToChildResponseDtoWritable = {
+    createdNote?: NoteRealmWritable;
+    updatedParentNote?: NoteRealmWritable;
 };
 
 export type NoteInfoWritable = {
@@ -3000,6 +3014,33 @@ export type GenerateImageResponses = {
 };
 
 export type GenerateImageResponse = GenerateImageResponses[keyof GenerateImageResponses];
+
+export type ExtractPointToChildData = {
+    body: ExtractPointToChildRequestDto;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/ai/extract-point-to-child/{note}';
+};
+
+export type ExtractPointToChildErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type ExtractPointToChildError = ExtractPointToChildErrors[keyof ExtractPointToChildErrors];
+
+export type ExtractPointToChildResponses = {
+    /**
+     * OK
+     */
+    200: ExtractPointToChildResponseDto;
+};
+
+export type ExtractPointToChildResponse = ExtractPointToChildResponses[keyof ExtractPointToChildResponses];
 
 export type UpdateUserData = {
     body: UserDto;
