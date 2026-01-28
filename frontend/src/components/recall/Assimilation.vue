@@ -49,6 +49,7 @@
               @click="promotePointToChildNote(point, index)"
               title="Promote to child note"
             >
+              <SvgAddChild class="w-4 h-4" />
               Child
             </button>
             <button
@@ -56,6 +57,7 @@
               @click="() => {}"
               title="Promote to sibling note"
             >
+              <SvgAddSibling class="w-4 h-4" />
               Sibling
             </button>
           </div>
@@ -99,6 +101,8 @@ import AssimilationButtons from "./AssimilationButtons.vue"
 import NoteShow from "../notes/NoteShow.vue"
 import Breadcrumb from "../toolbars/Breadcrumb.vue"
 import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
+import SvgAddChild from "../svgs/SvgAddChild.vue"
+import SvgAddSibling from "../svgs/SvgAddSibling.vue"
 import { computed, ref } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
