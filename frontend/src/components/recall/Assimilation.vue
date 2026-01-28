@@ -43,14 +43,22 @@
             />
             <span>{{ point }}</span>
           </label>
-          <button
-            class="daisy-btn daisy-btn-xs daisy-btn-ghost"
-            @click="promotePointToChildNote(point, index)"
-            title="Promote to child note"
-            aria-label="Promote to child note"
-          >
-            <SvgAdd />
-          </button>
+          <div class="daisy-flex daisy-gap-1">
+            <button
+              class="daisy-btn daisy-btn-xs daisy-btn-ghost"
+              @click="promotePointToChildNote(point, index)"
+              title="Promote to child note"
+            >
+              Child
+            </button>
+            <button
+              class="daisy-btn daisy-btn-xs daisy-btn-ghost"
+              @click="() => {}"
+              title="Promote to sibling note"
+            >
+              Sibling
+            </button>
+          </div>
         </li>
       </ul>
       <button

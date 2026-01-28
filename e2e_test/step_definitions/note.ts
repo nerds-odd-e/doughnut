@@ -610,3 +610,24 @@ Then(
     start.assumeAssimilationPage().expectChecklistHasRemainingPoints()
   }
 )
+
+Then(
+  'I should see two buttons {string} and {string} at the end of each point',
+  (button1: string, button2: string) => {
+    start.assumeAssimilationPage().expectTwoButtonsForEachPoint()
+  }
+)
+
+When(
+  'I promote the point {string} to a sibling note',
+  (pointText: string) => {
+    start.assumeAssimilationPage().promotePointToSiblingNote(pointText)
+  }
+)
+
+Then(
+  'a new sibling note {string} should be created',
+  (noteTitle: string) => {
+    cy.pageIsNotLoading()
+  }
+)

@@ -189,7 +189,23 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   promotePointToChildNote(pointText: string) {
-    cy.contains('li', pointText).find('button').click()
+    cy.contains('li', pointText).findByRole('button', { name: 'Child' }).click()
+    return this
+  },
+  promotePointToSiblingNote(pointText: string) {
+    cy.contains('li', pointText)
+      .findByRole('button', { name: 'Sibling' })
+      .click()
+    return this
+  },
+  expectTwoButtonsForEachPoint() {
+    cy.contains('Understanding Checklist:')
+      .closest('.daisy-bg-accent')
+      .find('ul li')
+      .each(($li) => {
+        cy.wrap($li).findByRole('button', { name: 'Child' }).should('exist')
+        cy.wrap($li).findByRole('button', { name: 'Sibling' }).should('exist')
+      })
     return this
   },
   expectToRemainOnAssimilationPageFor(noteTitle: string) {
