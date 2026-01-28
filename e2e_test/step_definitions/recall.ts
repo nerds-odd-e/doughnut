@@ -412,3 +412,17 @@ When('I update the note details to {string}', (newDetails: string) => {
   cy.get('body').click() // blur to trigger save
   cy.pageIsNotLoading()
 })
+
+Then(
+  'I should see an error message {string} below the input field',
+  (errorMessage: string) => {
+    cy.get('[data-test="spelling-error-message"]').should(
+      'contain.text',
+      errorMessage
+    )
+  }
+)
+
+Then('the popup should remain open', () => {
+  cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
+})
