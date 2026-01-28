@@ -585,27 +585,26 @@ When(
 )
 
 When('I promote the point {string} to a child note', (pointText: string) => {
-  cy.contains('li', pointText).find('button').click()
+  start.assumeAssimilationPage().promotePointToChildNote(pointText)
 })
 
 Then(
   'I should remain on the assimilation page for {string}',
   (noteTitle: string) => {
-    cy.url().should('include', '/assimilate')
-    cy.findByText(noteTitle).should('exist')
+    start.assumeAssimilationPage().expectToRemainOnAssimilationPageFor(noteTitle)
   }
 )
 
 Then(
   'the point {string} should be removed from the understanding checklist',
   (pointText: string) => {
-    cy.contains('li', pointText).should('not.exist')
+    start.assumeAssimilationPage().expectPointRemovedFromChecklist(pointText)
   }
 )
 
 Then(
   'the understanding checklist should still show the remaining points',
   () => {
-    cy.get('ul').find('li').should('have.length.at.least', 1)
+    start.assumeAssimilationPage().expectChecklistHasRemainingPoints()
   }
 )

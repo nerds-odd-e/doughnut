@@ -188,6 +188,23 @@ export const assumeAssimilationPage = () => ({
     cy.findByRole('button', { name: 'Delete selected points' }).click()
     return this
   },
+  promotePointToChildNote(pointText: string) {
+    cy.contains('li', pointText).find('button').click()
+    return this
+  },
+  expectToRemainOnAssimilationPageFor(noteTitle: string) {
+    cy.url().should('include', '/assimilate')
+    cy.findByText(noteTitle).should('exist')
+    return this
+  },
+  expectPointRemovedFromChecklist(pointText: string) {
+    cy.contains('li', pointText).should('not.exist')
+    return this
+  },
+  expectChecklistHasRemainingPoints() {
+    cy.get('ul').find('li').should('have.length.at.least', 1)
+    return this
+  },
 })
 
 export const assimilation = () => {
