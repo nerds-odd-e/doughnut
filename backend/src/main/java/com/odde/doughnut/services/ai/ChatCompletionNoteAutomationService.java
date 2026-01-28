@@ -39,27 +39,12 @@ public class ChatCompletionNoteAutomationService {
         List.of());
   }
 
-  public String regenerateDetailsFromPoints(List<String> points) throws JsonProcessingException {
-    if (points == null || points.isEmpty()) {
-      return "";
-    }
+  public PointExtractionResult extractPointToChild(String point) throws JsonProcessingException {
     return executeWithTool(
-        AiToolFactory.regenerateDetailsFromPointsAiTool(points),
-        RegeneratedNoteDetails.class,
-        r -> r.details,
-        "");
-  }
-
-  public String removePointsAndRegenerateDetails(List<String> pointsToRemove)
-      throws JsonProcessingException {
-    if (pointsToRemove == null || pointsToRemove.isEmpty()) {
-      return note.getDetails();
-    }
-    return executeWithTool(
-        AiToolFactory.removePointsFromDetailsAiTool(pointsToRemove),
-        RegeneratedNoteDetails.class,
-        r -> r.details,
-        note.getDetails());
+        AiToolFactory.extractPointToChildAiTool(point),
+        PointExtractionResult.class,
+        result -> result,
+        null);
   }
 
   private <T, R> R executeWithTool(
