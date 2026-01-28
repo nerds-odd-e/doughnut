@@ -160,6 +160,32 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
         generateUnderstandingChecklist());
   }
 
+  public static InstructionAndSchema regenerateDetailsFromPointsAiTool(List<String> points) {
+    String pointsBlock = String.join("\n", points);
+    String message =
+        """
+        Based on the following points, regenerate the note details. Rewrite them into coherent, well-structured markdown. Preserve the meaning of each point. Output only the new details.
+
+        Points:
+        %s
+        """
+            .formatted(pointsBlock);
+    return new InstructionAndSchema(message, RegeneratedNoteDetails.class);
+  }
+
+  public static InstructionAndSchema removePointsFromDetailsAiTool(List<String> pointsToRemove) {
+    String pointsBlock = String.join("\n", pointsToRemove);
+    String message =
+        """
+        Remove the following points from the note details. Rewrite the remaining content into coherent, well-structured markdown. Preserve the meaning of what remains. Output only the new details.
+
+        Points to remove:
+        %s
+        """
+            .formatted(pointsBlock);
+    return new InstructionAndSchema(message, RegeneratedNoteDetails.class);
+  }
+
   public static List<Class<?>> getAllAssistantTools() {
     return List.of(
         completeNoteDetails(),
@@ -182,33 +208,6 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
 
   public static Class<?> evaluateQuestion() {
     return QuestionEvaluation.class;
-  }
-
-  public static InstructionAndSchema extractPointToChildAiTool(String point) {
-    String instruction =
-        """
-        You are helping extract a point from a note to create a new child note.
-
-        Given point: "%s"
-
-        Tasks:
-        1. Generate a concise, meaningful title for the new child note based on this point
-        2. Expand the point into detailed content (in markdown) for the new note
-        3. Identify the related content in the parent note's details
-        4. Replace that content with a brief summary (1-2 sentences) that references the key concept
-
-        Guidelines:
-        - The new note should be self-contained and comprehensive
-        - The summary in parent note should maintain reading flow
-        - Keep all unrelated parts of parent details unchanged
-        """
-            .formatted(point);
-
-    return new InstructionAndSchema(instruction, extractPointToChild());
-  }
-
-  public static Class<?> extractPointToChild() {
-    return PointExtractionResult.class;
   }
 
   public static String buildRegenerateQuestionMessage(
