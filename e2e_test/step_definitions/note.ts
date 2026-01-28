@@ -618,16 +618,10 @@ Then(
   }
 )
 
-When(
-  'I promote the point {string} to a sibling note',
-  (pointText: string) => {
-    start.assumeAssimilationPage().promotePointToSiblingNote(pointText)
-  }
-)
+When('I promote the point {string} to a sibling note', (pointText: string) => {
+  start.assumeAssimilationPage().promotePointToSiblingNote(pointText)
+})
 
-Then(
-  'a new sibling note {string} should be created',
-  (noteTitle: string) => {
-    cy.pageIsNotLoading()
-  }
-)
+Then('a new sibling note {string} should be created', (noteTitle: string) => {
+  cy.pageIsNotLoading()
+})
