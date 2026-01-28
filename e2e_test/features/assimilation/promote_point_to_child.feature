@@ -13,6 +13,7 @@ Feature: Promote Point to Child Note
       | Machine learning is a subset of artificial intelligence |
       | It enables systems to learn from experience |
       | Applications range from recommendation systems to autonomous vehicles |
+    And OpenAI will extract point "It enables systems to learn from experience" to child note with title "Learning from Experience" and details "Systems improve their performance through experience" and updated parent details "Machine learning is a subset of AI. See child notes for details."
     When I start assimilating "Machine Learning"
     Then I should see an understanding checklist with a maximum of 5 points
     When I promote the point "It enables systems to learn from experience" to a child note

@@ -218,3 +218,30 @@ Given(
     })
   }
 )
+
+Given(
+  'OpenAI will extract point {string} to child note with title {string} and details {string} and updated parent details {string}',
+  (
+    point: string,
+    newNoteTitle: string,
+    newNoteDetails: string,
+    updatedParentDetails: string
+  ) => {
+    const result = {
+      newNoteTitle,
+      newNoteDetails,
+      updatedParentDetails,
+    }
+    const reply = JSON.stringify(result)
+    cy.then(async () => {
+      await mock_services
+        .openAi()
+        .chatCompletion()
+        .requestMessageMatches({
+          role: 'system',
+          content: '.*extract.*point.*child.*',
+        })
+        .stubExtractPointToChild(reply)
+    })
+  }
+)

@@ -169,13 +169,13 @@ describe("Assimilation component", () => {
       })
     })
 
-    it("should call createNoteUnderParent API when promote button is clicked", async () => {
+    it("should call extractPointToChild AI API when promote button is clicked", async () => {
       const points = ["Test Point"]
       mockSdkService("generateUnderstandingChecklist", { points })
 
-      const createNoteSpy = mockSdkService("createNoteUnderParent", {
-        created: makeMe.aNoteRealm.please(),
-        parent: makeMe.aNoteRealm.please(),
+      const extractPointSpy = mockSdkService("extractPointToChild", {
+        createdNote: makeMe.aNoteRealm.please(),
+        updatedParentNote: makeMe.aNoteRealm.please(),
       })
 
       const wrapper = renderer
@@ -190,10 +190,10 @@ describe("Assimilation component", () => {
       await wrapper.find("li button").trigger("click")
       await flushPromises()
 
-      // Verify API is called with point text as newTitle
-      expect(createNoteSpy).toHaveBeenCalledWith({
-        path: { parentNote: note.id },
-        body: { newTitle: "Test Point", wikidataId: "" },
+      // Verify AI API is called with the point text
+      expect(extractPointSpy).toHaveBeenCalledWith({
+        path: { note: note.id },
+        body: { point: "Test Point" },
       })
     })
 
@@ -201,9 +201,9 @@ describe("Assimilation component", () => {
       const points = ["Point 1", "Point 2", "Point 3"]
       mockSdkService("generateUnderstandingChecklist", { points })
 
-      mockSdkService("createNoteUnderParent", {
-        created: makeMe.aNoteRealm.please(),
-        parent: makeMe.aNoteRealm.please(),
+      mockSdkService("extractPointToChild", {
+        createdNote: makeMe.aNoteRealm.please(),
+        updatedParentNote: makeMe.aNoteRealm.please(),
       })
 
       const wrapper = renderer
@@ -233,13 +233,13 @@ describe("Assimilation component", () => {
       expect(wrapper.text()).toContain("Point 3")
     })
 
-    it("should keep the point in checklist and show error when API fails", async () => {
+    it("should keep the point in checklist and show error when AI API fails", async () => {
       const points = ["Test Point"]
       mockSdkService("generateUnderstandingChecklist", { points })
 
       // Mock API failure
-      const createNoteSpy = mockSdkService("createNoteUnderParent", undefined)
-      createNoteSpy.mockResolvedValue(wrapSdkError("API Error"))
+      const extractPointSpy = mockSdkService("extractPointToChild", undefined)
+      extractPointSpy.mockResolvedValue(wrapSdkError("API Error"))
 
       const wrapper = renderer
         .withCleanStorage()

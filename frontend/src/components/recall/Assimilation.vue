@@ -278,29 +278,34 @@ const handleAddAnswer = async (answer: string) => {
 
 const promotePointToChildNote = async (point: string, index: number) => {
   try {
-    const { data: nrwp, error } = await apiCallWithLoading(() =>
-      NoteCreationController.createNoteUnderParent({
-        path: { parentNote: note.id },
-        body: { newTitle: point, wikidataId: "" },
+    // Call AI endpoint to extract point to child note
+    const { data: result, error } = await apiCallWithLoading(() =>
+      AiController.extractPointToChild({
+        path: { note: note.id },
+        body: { point },
       })
     )
 
-    if (error || !nrwp) {
-      await popups.alert("Failed to create child note")
+    if (error || !result || !result.createdNote || !result.updatedParentNote) {
+      await popups.alert("Failed to create child note with AI")
       return
     }
 
-    // Update storage manually (without navigation)
+    // Extract non-null values for type safety
+    const createdNote = result.createdNote
+    const updatedParentNote = result.updatedParentNote
+
+    // Update storage (including parent note which was updated by AI)
     if (storageAccessor.value) {
-      storageAccessor.value.refreshNoteRealm(nrwp.created)
-      storageAccessor.value.refreshNoteRealm(nrwp.parent)
+      storageAccessor.value.refreshNoteRealm(createdNote)
+      storageAccessor.value.refreshNoteRealm(updatedParentNote)
     }
 
     // Remove the point from the list
     understandingPoints.value.splice(index, 1)
   } catch (err) {
     console.error("Failed to promote point to child note:", err)
-    await popups.alert("Error creating child note")
+    await popups.alert(`Error: ${err}`)
   }
 }
 </script>
