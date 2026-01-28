@@ -359,7 +359,11 @@ Then('I should see the spelling verification popup', () => {
 })
 
 When('I click {string} button on the popup', (buttonName: string) => {
-  if (buttonName === 'Cancel' || buttonName === 'Verify') {
+  if (
+    buttonName === 'Cancel' ||
+    buttonName === 'Verify' ||
+    buttonName === 'Add'
+  ) {
     start.assumeAssimilationPage().clickPopupButton(buttonName)
   } else {
     cy.get('.modal-mask').within(() => {
@@ -373,7 +377,12 @@ Then('the popup should be closed', () => {
 })
 
 When('I type {string} in the verification input', (text: string) => {
-  start.assumeAssimilationPage().typeInVerificationInput(text)
+  if (text === '') {
+    // If empty string, just ensure input is empty (it already is when popup opens)
+    start.assumeAssimilationPage().expectVerificationInputEmpty()
+  } else {
+    start.assumeAssimilationPage().typeInVerificationInput(text)
+  }
 })
 
 Then(
@@ -410,3 +419,19 @@ Then(
 Then('the popup should remain open', () => {
   start.assumeAssimilationPage().expectPopupOpen()
 })
+
+Then(
+  'the {string} button should be {word}',
+  (buttonName: string, state: 'enabled' | 'disabled') => {
+    if (buttonName === 'Add') {
+      start.assumeAssimilationPage().expectAddButtonState(state)
+    }
+  }
+)
+
+Then(
+  'the note title should be updated to {string}',
+  (expectedTitle: string) => {
+    start.assumeAssimilationPage().expectNoteTitleUpdatedTo(expectedTitle)
+  }
+)

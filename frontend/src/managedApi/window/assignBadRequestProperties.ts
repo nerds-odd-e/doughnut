@@ -1,5 +1,6 @@
 const assignBadRequestProperties = (object, response) => {
-  const data = response.errors
+  const data = response?.errors
+  if (!data) return
   Object.keys(data).forEach((key) => {
     if (key.includes(".")) {
       const [namespace, subkey] = key.split(".")

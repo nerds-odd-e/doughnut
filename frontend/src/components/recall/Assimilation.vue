@@ -80,6 +80,7 @@
     :expected-title="note.noteTopology.title ?? ''"
     @cancel="handleSpellingCancel"
     @verified="handleSpellingVerified"
+    @add-answer="handleAddAnswer"
   />
 </template>
 
@@ -89,6 +90,7 @@ import {
   AiController,
   AssimilationController,
   NoteCreationController,
+  TextContentController,
 } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
@@ -251,6 +253,27 @@ const handleSpellingVerified = () => {
 
 const handleSpellingCancel = () => {
   showSpellingPopup.value = false
+}
+
+const handleAddAnswer = async (answer: string) => {
+  const currentTitle = note.noteTopology.title ?? ""
+  const newTitle = `${currentTitle} / ${answer}`
+
+  const { error, data } = await apiCallWithLoading(() =>
+    TextContentController.updateNoteTitle({
+      path: { note: note.id },
+      body: { newTitle },
+    })
+  )
+
+  if (!error && data) {
+    // Update storage cache manually
+    if (storageAccessor.value) {
+      storageAccessor.value.refreshNoteRealm(data)
+    }
+    showSpellingPopup.value = false
+    emit("reloadNeeded")
+  }
 }
 
 const promotePointToChildNote = async (point: string, index: number) => {

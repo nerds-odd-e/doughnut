@@ -21,6 +21,7 @@
       <p v-if="errorMessage" class="daisy-text-error daisy-mt-2" data-test="spelling-error-message">{{ errorMessage }}</p>
       <div class="daisy-mt-4 daisy-flex daisy-gap-2">
         <button class="daisy-btn daisy-btn-secondary" data-test="cancel-spelling" @click="$emit('cancel')">Cancel</button>
+        <button class="daisy-btn daisy-btn-accent" data-test="add-spelling" :disabled="isInputEmpty" @click="addAnswer">Add</button>
         <button class="daisy-btn daisy-btn-primary" data-test="verify-spelling" @click="verify">Verify</button>
       </div>
     </template>
@@ -28,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { ref, watch, computed } from "vue"
 import Modal from "../commons/Modal.vue"
 
 const props = defineProps<{
@@ -39,6 +40,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "cancel"): void
   (e: "verified"): void
+  (e: "addAnswer", answer: string): void
 }>()
 
 const userInput = ref("")
@@ -55,11 +57,25 @@ watch(
   }
 )
 
+const isInputEmpty = computed(() => userInput.value.trim() === "")
+
 const verify = () => {
-  if (userInput.value.toLowerCase() === props.expectedTitle.toLowerCase()) {
+  // Split the expected title by "/" to get all valid answers
+  const validAnswers = props.expectedTitle
+    .split("/")
+    .map((part) => part.trim().toLowerCase())
+  const userAnswer = userInput.value.trim().toLowerCase()
+
+  if (validAnswers.includes(userAnswer)) {
     emit("verified")
   } else {
     errorMessage.value = "wrong spelling"
+  }
+}
+
+const addAnswer = () => {
+  if (!isInputEmpty.value) {
+    emit("addAnswer", userInput.value.trim())
   }
 }
 </script>
