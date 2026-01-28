@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 @Getter
 public class RemovePointsRequestDTO {
-  private List<String> points;
+  public List<String> points;
 }

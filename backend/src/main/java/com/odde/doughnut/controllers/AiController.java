@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
+import com.odde.doughnut.testability.TestabilitySettings;
 
 @RestController
 @SessionScope
@@ -27,17 +29,23 @@ public class AiController {
   private final NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
   private final AuthorizationService authorizationService;
   private final NoteConstructionService noteConstructionService;
+  private final EntityPersister entityPersister;
+  private final TestabilitySettings testabilitySettings;
 
   @Autowired
   public AiController(
       NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory,
       OtherAiServices otherAiServices,
       AuthorizationService authorizationService,
-      NoteConstructionService noteConstructionService) {
+      NoteConstructionService noteConstructionService,
+      EntityPersister entityPersister,
+      TestabilitySettings testabilitySettings) {
     this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
     this.otherAiServices = otherAiServices;
     this.authorizationService = authorizationService;
     this.noteConstructionService = noteConstructionService;
+    this.testabilitySettings = testabilitySettings;
+    this.entityPersister = entityPersister;
   }
 
   @GetMapping("/dummy")
@@ -91,13 +99,28 @@ public class AiController {
   public RemovePointsResponseDTO removePointFromNote(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
       @RequestBody RemovePointsRequestDTO request)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(note);
-    String currentDetails = note.getDetails();
-    if (currentDetails == null) {
-      currentDetails = "";
-    }
-    return new RemovePointsResponseDTO(currentDetails);
+      throws UnexpectedNoAccessRightException, JsonProcessingException {
+
+      authorizationService.assertAuthorization(note);
+
+      String details = note.getDetails();
+      if (details == null || details.trim().isEmpty()) {
+          return new RemovePointsResponseDTO(details);
+      }
+      if (request.getPoints() == null || request.getPoints().isEmpty()) {
+          return new RemovePointsResponseDTO(details);
+      }
+
+      String newDetails =
+          notebookAssistantForNoteServiceFactory
+              .createNoteAutomationService(note)
+              .removePointsAndRegenerateDetails(request.getPoints());
+
+      note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+      note.setDetails(newDetails);
+      entityPersister.save(note);
+
+      return new RemovePointsResponseDTO(newDetails);
   }
 
   @PostMapping("/extract-point-to-child/{note}")
