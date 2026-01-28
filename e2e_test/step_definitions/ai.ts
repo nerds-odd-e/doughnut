@@ -200,3 +200,21 @@ Given(
     })
   }
 )
+
+Given(
+  'OpenAI will delete related content and return new details:',
+  (data: DataTable) => {
+    const newDetails = data.raw().flat()[0]
+    const reply = JSON.stringify({ newDetails })
+    cy.then(async () => {
+      await mock_services
+        .openAi()
+        .chatCompletion()
+        .requestMessageMatches({
+          role: 'system',
+          content: '.*delete.*understanding.*points.*',
+        })
+        .stubResponse(reply)
+    })
+  }
+)

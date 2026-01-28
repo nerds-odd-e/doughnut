@@ -322,6 +322,26 @@ Then(
   }
 )
 
+When('I check the understanding point {int}', (index: number) => {
+  start.assumeAssimilationPage().checkUnderstandingPoint(index)
+})
+
+When('I click the delete understanding points button', () => {
+  start.assumeAssimilationPage().clickDeleteUnderstandingPointsButton()
+})
+
+When('I confirm the deletion', () => {
+  cy.findByRole('button', { name: 'OK' }).click()
+})
+
+When('I cancel the deletion', () => {
+  cy.findByRole('button', { name: 'Cancel' }).click()
+})
+
+Then('the note details should be {string}', (detailsText: string) => {
+  start.assumeNotePage().findNoteDetails(detailsText)
+})
+
 Then('the {string} checkbox should be disabled', (fieldLabel: string) => {
   cy.formField(fieldLabel).should('be.disabled')
 })

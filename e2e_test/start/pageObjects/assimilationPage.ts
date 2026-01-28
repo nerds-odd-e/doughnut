@@ -176,6 +176,18 @@ export const assumeAssimilationPage = () => ({
     cy.get('[data-test="keep-for-repetition"]').click()
     return this
   },
+  checkUnderstandingPoint(index: number) {
+    cy.contains('Understanding Checklist:')
+      .closest('.daisy-bg-accent')
+      .find('input[type="checkbox"]')
+      .eq(index)
+      .check()
+    return this
+  },
+  clickDeleteUnderstandingPointsButton() {
+    cy.findByRole('button', { name: 'Delete selected points' }).click()
+    return this
+  },
 })
 
 export const assimilation = () => {
