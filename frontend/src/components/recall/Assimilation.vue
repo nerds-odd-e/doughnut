@@ -22,18 +22,27 @@
   <div
     v-if="understandingPoints.length > 0"
     class="daisy-mb-4 daisy-rounded-lg daisy-bg-accent daisy-p-4"
+    data-test-id="understanding-checklist"
   >
     <div class="daisy-text-base">
       <div class="daisy-font-semibold daisy-mb-3 daisy-text-accent-content">
         Understanding Checklist:
       </div>
-      <ul class="daisy-list-disc daisy-list-inside daisy-space-y-2">
+      <ul class="daisy-space-y-2">
         <li
           v-for="(point, index) in understandingPoints"
           :key="index"
           class="daisy-text-accent-content daisy-flex daisy-items-center daisy-justify-between"
         >
-          <span>{{ point }}</span>
+          <label class="daisy-flex daisy-items-start daisy-cursor-pointer daisy-gap-2">
+            <input
+              type="checkbox"
+              :value="index"
+              v-model="selectedPointIndices"
+              class="daisy-checkbox daisy-checkbox-sm daisy-mt-1"
+            />
+            <span>{{ point }}</span>
+          </label>
           <button
             class="daisy-btn daisy-btn-xs daisy-btn-ghost"
             @click="promotePointToChildNote(point, index)"
@@ -44,6 +53,14 @@
           </button>
         </li>
       </ul>
+      <button
+        data-test-id="delete-understanding-points"
+        :disabled="selectedPointIndices.length === 0"
+        @click="deleteSelectedPoints"
+        class="daisy-btn daisy-btn-warning daisy-btn-sm daisy-mt-4"
+      >
+        Delete selected points
+      </button>
     </div>
   </div>
   <AssimilationButtons
@@ -106,6 +123,7 @@ const onDetailsSaved = (newDetails: string) => {
 
 // Understanding checklist from backend
 const understandingPoints = ref<string[]>([])
+const selectedPointIndices = ref<number[]>([])
 
 const generateUnderstandingChecklist = async () => {
   if (!currentDetails.value || currentDetails.value.trim().length === 0) {
@@ -141,6 +159,35 @@ const onRememberSpellingChanged = (value: boolean) => {
 
 const onNoteTypeUpdated = () => {
   generateUnderstandingChecklist()
+}
+
+const deleteSelectedPoints = async () => {
+  if (selectedPointIndices.value.length === 0) {
+    return
+  }
+
+  const confirmed = await popups.confirm(
+    `Are you sure you want to delete ${selectedPointIndices.value.length} selected point(s)? The AI will remove related content from the note details.`
+  )
+
+  if (!confirmed) {
+    return
+  }
+
+  const selectedPoints = selectedPointIndices.value.map(
+    (index) => understandingPoints.value[index]!
+  )
+
+  const { error } = await apiCallWithLoading(() =>
+    AiController.removePointFromNote({
+      path: { note: note.id },
+      body: { points: selectedPoints },
+    })
+  )
+
+  if (!error) {
+    emit("reloadNeeded")
+  }
 }
 
 // Methods

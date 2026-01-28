@@ -12,6 +12,7 @@ import RenderingHelper from "@tests/helpers/RenderingHelper"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import { computed, ref } from "vue"
+import usePopups from "@/components/commons/Popups/usePopups"
 
 vi.mock("@/composables/useRecallData")
 vi.mock("@/composables/useAssimilationCount")
@@ -28,6 +29,11 @@ const toRepeat = ref<
 afterEach(() => {
   document.body.innerHTML = ""
   vi.clearAllMocks()
+  // Clear any remaining popups
+  const popups = usePopups()
+  while (popups.popups.peek().length) {
+    popups.popups.done(false)
+  }
 })
 
 beforeEach(() => {
@@ -250,6 +256,191 @@ describe("Assimilation component", () => {
       // Verify point remains in the list
       expect(wrapper.findAll("li")).toHaveLength(1)
       expect(wrapper.text()).toContain("Test Point")
+    })
+  })
+
+  describe("understanding checklist deletion", () => {
+    it("shows checkboxes for each understanding point", async () => {
+      mockSdkService("generateUnderstandingChecklist", {
+        points: ["Point 1", "Point 2", "Point 3"],
+      })
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      // Find checkboxes only within the understanding checklist
+      const checkboxes = wrapper
+        .find('[data-test-id="understanding-checklist"]')
+        .findAll('input[type="checkbox"]')
+      expect(checkboxes).toHaveLength(3)
+    })
+
+    it("disables delete button when no points are selected", async () => {
+      mockSdkService("generateUnderstandingChecklist", {
+        points: ["Point 1", "Point 2"],
+      })
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      const deleteButton = wrapper.find(
+        '[data-test-id="delete-understanding-points"]'
+      )
+
+      // Button should be disabled initially
+      expect((deleteButton.element as HTMLButtonElement).disabled).toBe(true)
+    })
+
+    it("enables delete button when a point is selected", async () => {
+      mockSdkService("generateUnderstandingChecklist", {
+        points: ["Point 1", "Point 2"],
+      })
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      const deleteButton = wrapper.find(
+        '[data-test-id="delete-understanding-points"]'
+      )
+
+      // Check the first item
+      const checkboxes = wrapper
+        .find('[data-test-id="understanding-checklist"]')
+        .findAll('input[type="checkbox"]')
+      await checkboxes[0]!.setValue(true)
+      await flushPromises()
+
+      // Button should be enabled after selection
+      expect((deleteButton.element as HTMLButtonElement).disabled).toBe(false)
+    })
+
+    it("shows confirmation dialog when delete button is clicked", async () => {
+      mockSdkService("generateUnderstandingChecklist", {
+        points: ["Point 1", "Point 2"],
+      })
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      // Check an item
+      const checkboxes = wrapper
+        .find('[data-test-id="understanding-checklist"]')
+        .findAll('input[type="checkbox"]')
+      await checkboxes[0]!.setValue(true)
+      await flushPromises()
+
+      // Click delete button
+      await wrapper
+        .find('[data-test-id="delete-understanding-points"]')
+        .trigger("click")
+      await flushPromises()
+
+      // Verify confirmation dialog appears
+      const popups = usePopups().popups.peek()
+      expect(popups.length).toBe(1)
+      expect(popups[0]!.type).toBe("confirm")
+      expect(popups[0]!.message).toContain("delete")
+    })
+
+    it("calls API and emits reloadNeeded when deletion is confirmed", async () => {
+      mockSdkService("generateUnderstandingChecklist", {
+        points: ["Point 1", "Point 2", "Point 3"],
+      })
+
+      const deletePointsSpy = mockSdkService("removePointFromNote", {})
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      // Check the first item
+      const checkboxes = wrapper
+        .find('[data-test-id="understanding-checklist"]')
+        .findAll('input[type="checkbox"]')
+      await checkboxes[0]!.setValue(true)
+      await flushPromises()
+
+      // Click delete button
+      await wrapper
+        .find('[data-test-id="delete-understanding-points"]')
+        .trigger("click")
+      await flushPromises()
+
+      // Simulate user confirming deletion
+      usePopups().popups.done(true)
+      await flushPromises()
+
+      // Verify API was called with the point text, not indices
+      expect(deletePointsSpy).toHaveBeenCalledWith({
+        path: { note: note.id },
+        body: { points: ["Point 1"] },
+      })
+
+      // Verify reloadNeeded event was emitted
+      expect(wrapper.emitted()).toHaveProperty("reloadNeeded")
+    })
+
+    it("does not call API when deletion is cancelled", async () => {
+      mockSdkService("generateUnderstandingChecklist", {
+        points: ["Point 1", "Point 2"],
+      })
+
+      const deletePointsSpy = mockSdkService("removePointFromNote", {})
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      // Check an item
+      const checkboxes = wrapper
+        .find('[data-test-id="understanding-checklist"]')
+        .findAll('input[type="checkbox"]')
+      await checkboxes[0]!.setValue(true)
+      await flushPromises()
+
+      // Click delete button
+      await wrapper
+        .find('[data-test-id="delete-understanding-points"]')
+        .trigger("click")
+      await flushPromises()
+
+      // Simulate user cancelling deletion
+      usePopups().popups.done(false)
+      await flushPromises()
+
+      // API should not be called
+      expect(deletePointsSpy).not.toHaveBeenCalled()
+
+      // Should not emit reloadNeeded
+      expect(wrapper.emitted()).not.toHaveProperty("reloadNeeded")
     })
   })
 })
