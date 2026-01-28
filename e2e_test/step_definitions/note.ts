@@ -591,7 +591,9 @@ When('I promote the point {string} to a child note', (pointText: string) => {
 Then(
   'I should remain on the assimilation page for {string}',
   (noteTitle: string) => {
-    start.assumeAssimilationPage().expectToRemainOnAssimilationPageFor(noteTitle)
+    start
+      .assumeAssimilationPage()
+      .expectToRemainOnAssimilationPageFor(noteTitle)
   }
 )
 
