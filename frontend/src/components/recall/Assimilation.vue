@@ -91,7 +91,6 @@ import type { Note } from "@generated/backend"
 import {
   AiController,
   AssimilationController,
-  NoteCreationController,
   TextContentController,
 } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
