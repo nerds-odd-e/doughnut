@@ -18,10 +18,6 @@ Feature: Delete Understanding Check Points
       | Proficiency in English enhances career opportunities and simplifies travel |
     And OpenAI will delete related content and return new details:
       | English dominates the internet and digital world, with most online content in the language. It's vital for global communication and connects people across cultures. Proficiency in English enhances career opportunities and simplifies travel. |
-    And OpenAI will regenerate understanding checklist with points:
-      | It's vital for global communication and connects people across cultures |
-      | English dominates the internet and digital world |
-      | Proficiency in English enhances career opportunities and simplifies travel |
     When I start assimilating "English"
     Then I should see an understanding checklist with a maximum of 5 points
     When I check the understanding point 0
