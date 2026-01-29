@@ -54,8 +54,9 @@
             </button>
             <button
               class="daisy-btn daisy-btn-xs daisy-btn-ghost"
-              @click="() => {}"
+              @click="promotePointToSiblingNote(point, index)"
               title="Promote to sibling note"
+              :disabled="!note.parentId"
             >
               <SvgAddSibling class="w-4 h-4" />
               Sibling
@@ -282,20 +283,23 @@ const handleAddAnswer = async (answer: string) => {
   }
 }
 
-const promotePointToChildNote = async (point: string, index: number) => {
+const promotePoint = async (
+  point: string,
+  index: number,
+  parentNoteId: number
+) => {
   isCreatingChild.value = true
-
   try {
     // Call AI endpoint to promote point to a new note
     const { data: result, error } = await apiCallWithLoading(() =>
       AiController.promotePoint({
         path: { note: note.id },
-        body: { point },
+        body: { point, parentNoteId },
       })
     )
 
     if (error || !result || !result.createdNote || !result.updatedParentNote) {
-      await popups.alert("Failed to create child note with AI")
+      await popups.alert("Failed to create note with AI")
       return
     }
 
@@ -312,11 +316,22 @@ const promotePointToChildNote = async (point: string, index: number) => {
     // Remove the point from the list
     understandingPoints.value.splice(index, 1)
   } catch (err) {
-    console.error("Failed to promote point to child note:", err)
+    console.error("Failed to promote point:", err)
     await popups.alert(`Error: ${err}`)
   } finally {
     isCreatingChild.value = false
   }
+}
+
+const promotePointToChildNote = (point: string, index: number) => {
+  // Create as child: use current note as parent (pass note.id)
+  promotePoint(point, index, note.id)
+}
+
+const promotePointToSiblingNote = (point: string, index: number) => {
+  // Create as sibling: use current note's parent as parent
+  // note.parentId is guaranteed to exist because button is disabled when !note.parentId
+  promotePoint(point, index, note.parentId!)
 }
 </script>
 

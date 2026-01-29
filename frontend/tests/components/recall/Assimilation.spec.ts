@@ -170,7 +170,7 @@ describe("Assimilation component", () => {
       })
     })
 
-    it("should call promotePoint AI API when promote button is clicked", async () => {
+    it("should call promotePoint AI API with parentNoteId when child button is clicked", async () => {
       const points = ["Test Point"]
       mockSdkService("generateUnderstandingChecklist", { points })
 
@@ -187,14 +187,14 @@ describe("Assimilation component", () => {
 
       await flushPromises()
 
-      // Click the button
+      // Click the child button (first button in each li)
       await wrapper.find("li button").trigger("click")
       await flushPromises()
 
-      // Verify AI API is called with the point text
+      // Verify AI API is called with the point text and parentNoteId
       expect(extractPointSpy).toHaveBeenCalledWith({
         path: { note: note.id },
-        body: { point: "Test Point" },
+        body: { point: "Test Point", parentNoteId: note.id },
       })
     })
 
@@ -257,6 +257,62 @@ describe("Assimilation component", () => {
       // Verify point remains in the list
       expect(wrapper.findAll("li")).toHaveLength(1)
       expect(wrapper.text()).toContain("Test Point")
+    })
+
+    it("should call promotePoint AI API with parent's parentId when sibling button is clicked", async () => {
+      const parentNoteRealm = makeMe.aNoteRealm.please()
+      const childNoteRealm = makeMe.aNoteRealm.under(parentNoteRealm).please()
+      const childMemoryTracker = makeMe.aMemoryTracker
+        .ofNote(childNoteRealm)
+        .please()
+      const childNote = childMemoryTracker.note
+
+      const points = ["Test Point"]
+      mockSdkService("generateUnderstandingChecklist", { points })
+
+      const promotePointSpy = mockSdkService("promotePoint", {
+        createdNote: makeMe.aNoteRealm.please(),
+        updatedParentNote: makeMe.aNoteRealm.please(),
+      })
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note: childNote })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      // Click the sibling button (second button in the li)
+      const buttons = wrapper.findAll("li button")
+      await buttons[1]?.trigger("click")
+      await flushPromises()
+
+      // Verify AI API is called with the parent's id as parentNoteId
+      expect(promotePointSpy).toHaveBeenCalledWith({
+        path: { note: childNote.id },
+        body: { point: "Test Point", parentNoteId: childNote.parentId },
+      })
+    })
+
+    it("should disable sibling button when note has no parent", async () => {
+      const points = ["Test Point"]
+      mockSdkService("generateUnderstandingChecklist", { points })
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      // Find the sibling button (second button)
+      const buttons = wrapper.findAll("li button")
+      const siblingButton = buttons[1]
+
+      // Verify sibling button is disabled when note has no parent
+      expect(siblingButton?.attributes("disabled")).toBeDefined()
     })
   })
 
@@ -452,7 +508,7 @@ describe("Assimilation component", () => {
       })
 
       // Mock with delayed async response to simulate real AI call
-      mockSdkServiceWithImplementation("extractPointToChild", async () => {
+      mockSdkServiceWithImplementation("promotePoint", async () => {
         await new Promise((resolve) => setTimeout(resolve, 100))
         return {
           createdNote: makeMe.aNoteRealm.please(),
@@ -498,7 +554,7 @@ describe("Assimilation component", () => {
       })
 
       // Mock API to fail
-      mockSdkService("extractPointToChild", wrapSdkError({}))
+      mockSdkService("promotePoint", wrapSdkError({}))
 
       const wrapper = renderer
         .withCleanStorage()

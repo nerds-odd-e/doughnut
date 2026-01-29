@@ -423,6 +423,7 @@ export type RemovePointsResponseDto = {
 
 export type PromotePointRequestDto = {
     point?: string;
+    parentNoteId: number;
 };
 
 export type PromotePointResponseDto = {

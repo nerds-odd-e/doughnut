@@ -4444,6 +4444,11 @@ components:
       properties:
         point:
           type: string
+        parentNoteId:
+          type: integer
+          format: int32
+      required:
+      - parentNoteId
     PromotePointResponseDTO:
       type: object
       properties:

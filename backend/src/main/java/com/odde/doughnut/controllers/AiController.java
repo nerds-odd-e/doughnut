@@ -154,9 +154,11 @@ public class AiController {
       throw new RuntimeException("AI failed to generate extraction result");
     }
 
-    // 2. Create new note
+    // 2. Create new note under the specified parent (authorization checked in service)
     User user = authorizationService.getCurrentUser();
-    Note newNote = noteConstructionService.createNote(note, result.newNoteTitle);
+    Note newNote =
+        noteConstructionService.createNoteUnderParentId(
+            request.getParentNoteId(), result.newNoteTitle);
     newNote.setDetails(result.newNoteDetails);
 
     // 3. Update original note's details

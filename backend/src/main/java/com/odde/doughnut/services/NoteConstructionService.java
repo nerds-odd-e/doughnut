@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -51,6 +52,16 @@ public class NoteConstructionService {
       entityPersister.save(note);
     }
     return note;
+  }
+
+  public Note createNoteUnderParentId(Integer parentNoteId, String title)
+      throws UnexpectedNoAccessRightException {
+    Note parentNote =
+        noteRepository
+            .findById(parentNoteId)
+            .orElseThrow(() -> new RuntimeException("Parent note not found"));
+    authorizationService.assertAuthorization(parentNote);
+    return createNote(parentNote, title);
   }
 
   private Note createNoteWithWikidataInfo(
