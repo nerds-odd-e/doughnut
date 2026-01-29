@@ -19,6 +19,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MemoryTrackerService {
+  private static final int WRONG_ANSWER_THRESHOLD = 5;
+  private static final int WRONG_ANSWER_PERIOD_DAYS = 14;
+
   private final EntityPersister entityPersister;
   private final UserService userService;
   private final MemoryTrackerRepository memoryTrackerRepository;
@@ -112,13 +115,22 @@ public class MemoryTrackerService {
                 markAsRepeated(currentUTCTimestamp, correct, memoryTracker, thinkingTimeMs));
   }
 
-  public void markAsRepeated(
+  public boolean markAsRepeated(
       Timestamp currentUTCTimestamp,
       Boolean correct,
       MemoryTracker memoryTracker,
       Integer thinkingTimeMs) {
     memoryTracker.markAsRepeated(currentUTCTimestamp, correct, thinkingTimeMs);
     entityPersister.save(memoryTracker);
+
+    if (!correct) {
+      return hasExceededWrongAnswerThreshold(
+          memoryTracker.getNote(),
+          currentUTCTimestamp,
+          WRONG_ANSWER_PERIOD_DAYS,
+          WRONG_ANSWER_THRESHOLD);
+    }
+    return false;
   }
 
   public SpellingResultDTO answerSpelling(

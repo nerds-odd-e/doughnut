@@ -176,4 +176,52 @@ public class MemoryTrackerServiceTest {
       assertThat(exceeded, equalTo(true));
     }
   }
+
+  @Nested
+  class MarkAsRepeatedWithThresholdCheck {
+    Note note;
+    MemoryTracker memoryTracker;
+
+    @BeforeEach
+    void setup() {
+      note = makeMe.aNote().creatorAndOwner(user).please();
+      memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
+    }
+
+    @Test
+    void shouldReturnFalseWhenAnswerIsCorrect() {
+      boolean thresholdExceeded =
+          memoryTrackerService.markAsRepeated(day1, true, memoryTracker, 1000);
+
+      assertThat(thresholdExceeded, equalTo(false));
+    }
+
+    @Test
+    void shouldReturnFalseWhenWrongButBelowThreshold() {
+      boolean thresholdExceeded =
+          memoryTrackerService.markAsRepeated(day1, false, memoryTracker, 1000);
+
+      assertThat(thresholdExceeded, equalTo(false));
+    }
+
+    @Test
+    void shouldReturnTrueWhenWrongAndReachesThreshold() {
+      // Create 5 previous wrong answers (at threshold)
+      for (int i = 0; i < 5; i++) {
+        makeMe
+            .aRecallPrompt()
+            .approvedQuestionOf(note)
+            .forMemoryTracker(memoryTracker)
+            .answerChoiceIndex(1)
+            .answerTimestamp(day1)
+            .please();
+      }
+
+      // This wrong answer should detect threshold is exceeded
+      boolean thresholdExceeded =
+          memoryTrackerService.markAsRepeated(day1, false, memoryTracker, 1000);
+
+      assertThat(thresholdExceeded, equalTo(true));
+    }
+  }
 }
