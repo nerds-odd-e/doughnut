@@ -97,6 +97,7 @@
     @add-answer="handleAddAnswer"
   />
   <LoadingModal :show="isPromotingPoint" message="AI is creating note..." />
+  <LoadingModal :show="isDeletingPoints" message="AI is removing content..." />
 </template>
 
 <script setup lang="ts">
@@ -143,6 +144,7 @@ const showSpellingPopup = ref(false)
 const rememberSpelling = ref(false)
 const currentDetails = ref(note.details)
 const isPromotingPoint = ref(false)
+const isDeletingPoints = ref(false)
 
 const onDetailsSaved = (newDetails: string) => {
   currentDetails.value = newDetails
@@ -205,15 +207,20 @@ const deleteSelectedPoints = async () => {
     (index) => understandingPoints.value[index]!
   )
 
-  const { error } = await apiCallWithLoading(() =>
-    AiController.removePointFromNote({
-      path: { note: note.id },
-      body: { points: selectedPoints },
-    })
-  )
+  isDeletingPoints.value = true
+  try {
+    const { error } = await apiCallWithLoading(() =>
+      AiController.removePointFromNote({
+        path: { note: note.id },
+        body: { points: selectedPoints },
+      })
+    )
 
-  if (!error) {
-    emit("reloadNeeded")
+    if (!error) {
+      emit("reloadNeeded")
+    }
+  } finally {
+    isDeletingPoints.value = false
   }
 }
 

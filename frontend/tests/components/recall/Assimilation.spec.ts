@@ -590,6 +590,107 @@ describe("Assimilation component", () => {
     })
   })
 
+  describe("LoadingModal for Delete Points", () => {
+    it("should show LoadingModal while deleting points", async () => {
+      mockSdkService("generateUnderstandingChecklist", {
+        points: ["Point 1", "Point 2"],
+      })
+
+      // Mock with delayed async response to simulate real AI call
+      mockSdkServiceWithImplementation("removePointFromNote", async () => {
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        return {}
+      })
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      // Check the first item
+      const checkboxes = wrapper
+        .find('[data-test-id="understanding-checklist"]')
+        .findAll('input[type="checkbox"]')
+      await checkboxes[0]!.setValue(true)
+      await flushPromises()
+
+      // Click delete button
+      await wrapper
+        .find('[data-test-id="delete-understanding-points"]')
+        .trigger("click")
+      await flushPromises()
+
+      // Confirm deletion
+      usePopups().popups.done(true)
+
+      // Wait for LoadingModal to appear
+      await vi.waitFor(() => {
+        expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
+        expect(document.body.textContent).toContain("AI is removing content...")
+      })
+
+      // Wait for LoadingModal to disappear after API completes
+      await vi.waitFor(
+        () => {
+          expect(document.querySelector(".loading-modal-mask")).toBeNull()
+        },
+        { timeout: 3000 }
+      )
+    })
+
+    it("should hide LoadingModal when delete API call fails", async () => {
+      mockSdkService("generateUnderstandingChecklist", {
+        points: ["Point 1", "Point 2"],
+      })
+
+      // Mock API to fail with a delay to allow LoadingModal to render
+      mockSdkServiceWithImplementation("removePointFromNote", async () => {
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        return wrapSdkError("API Error")
+      })
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      // Check the first item
+      const checkboxes = wrapper
+        .find('[data-test-id="understanding-checklist"]')
+        .findAll('input[type="checkbox"]')
+      await checkboxes[0]!.setValue(true)
+      await flushPromises()
+
+      // Click delete button
+      await wrapper
+        .find('[data-test-id="delete-understanding-points"]')
+        .trigger("click")
+      await flushPromises()
+
+      // Confirm deletion
+      usePopups().popups.done(true)
+
+      // Wait for LoadingModal to appear
+      await vi.waitFor(() => {
+        expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
+      })
+
+      // Wait for LoadingModal to disappear after error
+      await vi.waitFor(
+        () => {
+          expect(document.querySelector(".loading-modal-mask")).toBeNull()
+        },
+        { timeout: 3000 }
+      )
+    })
+  })
+
   describe("ignore questions", () => {
     it("disables ignore button when no check points are selected", async () => {
       mockSdkService("generateUnderstandingChecklist", {
