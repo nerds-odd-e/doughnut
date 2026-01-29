@@ -135,11 +135,11 @@ public class AiController {
     return new IgnorePointsResponseDTO(true);
   }
 
-  @PostMapping("/extract-point-to-child/{note}")
+  @PostMapping("/promote-point/{note}")
   @Transactional
-  public ExtractPointToChildResponseDTO extractPointToChild(
+  public PromotePointResponseDTO promotePoint(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
-      @RequestBody ExtractPointToChildRequestDTO request)
+      @RequestBody PromotePointRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
 
     authorizationService.assertAuthorization(note);
@@ -148,7 +148,7 @@ public class AiController {
     PointExtractionResult result =
         notebookAssistantForNoteServiceFactory
             .createNoteAutomationService(note)
-            .extractPointToChild(request.getPoint());
+            .promotePoint(request.getPoint());
 
     if (result == null) {
       throw new RuntimeException("AI failed to generate extraction result");
@@ -163,6 +163,6 @@ public class AiController {
     note.setDetails(result.updatedParentDetails);
 
     // 4. Return result
-    return new ExtractPointToChildResponseDTO(newNote.toNoteRealm(user), note.toNoteRealm(user));
+    return new PromotePointResponseDTO(newNote.toNoteRealm(user), note.toNoteRealm(user));
   }
 }

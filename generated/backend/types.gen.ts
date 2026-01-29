@@ -421,6 +421,15 @@ export type RemovePointsResponseDto = {
     details?: string;
 };
 
+export type PromotePointRequestDto = {
+    point?: string;
+};
+
+export type PromotePointResponseDto = {
+    createdNote?: NoteRealm;
+    updatedParentNote?: NoteRealm;
+};
+
 export type IgnorePointsRequestDto = {
     points?: Array<string>;
 };
@@ -435,15 +444,6 @@ export type UnderstandingChecklistDto = {
 
 export type AiGeneratedImage = {
     b64encoded?: string;
-};
-
-export type ExtractPointToChildRequestDto = {
-    point?: string;
-};
-
-export type ExtractPointToChildResponseDto = {
-    createdNote?: NoteRealm;
-    updatedParentNote?: NoteRealm;
 };
 
 export type UserDto = {
@@ -740,7 +740,7 @@ export type ConversationSubjectWritable = {
     answeredQuestion?: AnsweredQuestionWritable;
 };
 
-export type ExtractPointToChildResponseDtoWritable = {
+export type PromotePointResponseDtoWritable = {
     createdNote?: NoteRealmWritable;
     updatedParentNote?: NoteRealmWritable;
 };
@@ -2971,6 +2971,33 @@ export type RemovePointFromNoteResponses = {
 
 export type RemovePointFromNoteResponse = RemovePointFromNoteResponses[keyof RemovePointFromNoteResponses];
 
+export type PromotePointData = {
+    body: PromotePointRequestDto;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/ai/promote-point/{note}';
+};
+
+export type PromotePointErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type PromotePointError = PromotePointErrors[keyof PromotePointErrors];
+
+export type PromotePointResponses = {
+    /**
+     * OK
+     */
+    200: PromotePointResponseDto;
+};
+
+export type PromotePointResponse = PromotePointResponses[keyof PromotePointResponses];
+
 export type IgnorePointsData = {
     body: IgnorePointsRequestDto;
     path: {
@@ -3049,33 +3076,6 @@ export type GenerateImageResponses = {
 };
 
 export type GenerateImageResponse = GenerateImageResponses[keyof GenerateImageResponses];
-
-export type ExtractPointToChildData = {
-    body: ExtractPointToChildRequestDto;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/ai/extract-point-to-child/{note}';
-};
-
-export type ExtractPointToChildErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ExtractPointToChildError = ExtractPointToChildErrors[keyof ExtractPointToChildErrors];
-
-export type ExtractPointToChildResponses = {
-    /**
-     * OK
-     */
-    200: ExtractPointToChildResponseDto;
-};
-
-export type ExtractPointToChildResponse = ExtractPointToChildResponses[keyof ExtractPointToChildResponses];
 
 export type UpdateUserData = {
     body: UserDto;

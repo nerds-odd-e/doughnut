@@ -169,11 +169,11 @@ describe("Assimilation component", () => {
       })
     })
 
-    it("should call extractPointToChild AI API when promote button is clicked", async () => {
+    it("should call promotePoint AI API when promote button is clicked", async () => {
       const points = ["Test Point"]
       mockSdkService("generateUnderstandingChecklist", { points })
 
-      const extractPointSpy = mockSdkService("extractPointToChild", {
+      const extractPointSpy = mockSdkService("promotePoint", {
         createdNote: makeMe.aNoteRealm.please(),
         updatedParentNote: makeMe.aNoteRealm.please(),
       })
@@ -201,7 +201,7 @@ describe("Assimilation component", () => {
       const points = ["Point 1", "Point 2", "Point 3"]
       mockSdkService("generateUnderstandingChecklist", { points })
 
-      mockSdkService("extractPointToChild", {
+      mockSdkService("promotePoint", {
         createdNote: makeMe.aNoteRealm.please(),
         updatedParentNote: makeMe.aNoteRealm.please(),
       })
@@ -238,7 +238,7 @@ describe("Assimilation component", () => {
       mockSdkService("generateUnderstandingChecklist", { points })
 
       // Mock API failure
-      const extractPointSpy = mockSdkService("extractPointToChild", undefined)
+      const extractPointSpy = mockSdkService("promotePoint", undefined)
       extractPointSpy.mockResolvedValue(wrapSdkError("API Error"))
 
       const wrapper = renderer

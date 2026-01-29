@@ -281,9 +281,9 @@ const handleAddAnswer = async (answer: string) => {
 
 const promotePointToChildNote = async (point: string, index: number) => {
   try {
-    // Call AI endpoint to extract point to child note
+    // Call AI endpoint to promote point to a new note
     const { data: result, error } = await apiCallWithLoading(() =>
-      AiController.extractPointToChild({
+      AiController.promotePoint({
         path: { note: note.id },
         body: { point },
       })

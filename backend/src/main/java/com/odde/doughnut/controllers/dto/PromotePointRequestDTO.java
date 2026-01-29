@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class ExtractPointToChildRequestDTO {
+public class PromotePointRequestDTO {
   private String point;
 }

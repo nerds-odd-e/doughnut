@@ -39,9 +39,9 @@ public class ChatCompletionNoteAutomationService {
         List.of());
   }
 
-  public PointExtractionResult extractPointToChild(String point) throws JsonProcessingException {
+  public PointExtractionResult promotePoint(String point) throws JsonProcessingException {
     return executeWithTool(
-        AiToolFactory.extractPointToChildAiTool(point),
+        AiToolFactory.promotePointAiTool(point),
         PointExtractionResult.class,
         result -> result,
         null);

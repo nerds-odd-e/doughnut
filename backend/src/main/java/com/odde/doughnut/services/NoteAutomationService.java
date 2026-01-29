@@ -19,9 +19,9 @@ public final class NoteAutomationService {
     return chatCompletionNoteAutomationService.generateUnderstandingChecklist();
   }
 
-  public com.odde.doughnut.services.ai.PointExtractionResult extractPointToChild(String point)
+  public com.odde.doughnut.services.ai.PointExtractionResult promotePoint(String point)
       throws JsonProcessingException {
-    return chatCompletionNoteAutomationService.extractPointToChild(point);
+    return chatCompletionNoteAutomationService.promotePoint(point);
   }
 
   public String regenerateDetailsFromPoints(java.util.List<String> points)

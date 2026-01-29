@@ -210,7 +210,7 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
     return QuestionEvaluation.class;
   }
 
-  public static InstructionAndSchema extractPointToChildAiTool(String point) {
+  public static InstructionAndSchema promotePointAiTool(String point) {
     String instruction =
         """
         You are helping extract a point from a note to create a new child note.
@@ -230,10 +230,10 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
         """
             .formatted(point);
 
-    return new InstructionAndSchema(instruction, extractPointToChild());
+    return new InstructionAndSchema(instruction, promotePoint());
   }
 
-  public static Class<?> extractPointToChild() {
+  public static Class<?> promotePoint() {
     return PointExtractionResult.class;
   }
 

@@ -165,7 +165,7 @@ const methodToController: Record<string, any> = {
   generateImage: AiController,
   generateUnderstandingChecklist: AiController,
   removePointFromNote: AiController,
-  extractPointToChild: AiController,
+  promotePoint: AiController,
   dummyEntryToGenerateDataTypesThatAreRequiredInEventStream: AiController,
   getAvailableGptModels: AiController,
   updateNoteTitle: TextContentController,
