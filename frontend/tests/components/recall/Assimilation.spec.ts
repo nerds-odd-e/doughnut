@@ -295,7 +295,7 @@ describe("Assimilation component", () => {
       })
     })
 
-    it("should disable sibling button when note has no parent", async () => {
+    it("should hide sibling button when note has no parent", async () => {
       const points = ["Test Point"]
       mockSdkService("generateUnderstandingChecklist", { points })
 
@@ -307,12 +307,15 @@ describe("Assimilation component", () => {
 
       await flushPromises()
 
-      // Find the sibling button (second button)
-      const buttons = wrapper.findAll("li button")
-      const siblingButton = buttons[1]
+      // Verify sibling button does not exist when note has no parent
+      const siblingButton = wrapper.find(
+        'button[title="Promote to sibling note"]'
+      )
+      expect(siblingButton.exists()).toBe(false)
 
-      // Verify sibling button is disabled when note has no parent
-      expect(siblingButton?.attributes("disabled")).toBeDefined()
+      // Verify child button still exists
+      const childButton = wrapper.find('button[title="Promote to child note"]')
+      expect(childButton.exists()).toBe(true)
     })
   })
 
@@ -501,8 +504,8 @@ describe("Assimilation component", () => {
     })
   })
 
-  describe("LoadingModal for Create New Child", () => {
-    it("should show LoadingModal while creating child note from point", async () => {
+  describe("LoadingModal for Promote Point", () => {
+    it("should show LoadingModal while promoting point to note", async () => {
       mockSdkService("generateUnderstandingChecklist", {
         points: ["Test understanding point"],
       })
@@ -534,9 +537,7 @@ describe("Assimilation component", () => {
       // Wait for LoadingModal to appear
       await vi.waitFor(() => {
         expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
-        expect(document.body.textContent).toContain(
-          "AI is creating child note..."
-        )
+        expect(document.body.textContent).toContain("AI is creating note...")
       })
 
       // Wait for LoadingModal to disappear after API completes

@@ -32,18 +32,18 @@
         <li
           v-for="(point, index) in understandingPoints"
           :key="index"
-          class="daisy-text-accent-content daisy-flex daisy-items-center daisy-justify-between"
+          class="daisy-text-accent-content daisy-flex daisy-items-start daisy-gap-2"
         >
-          <label class="daisy-flex daisy-items-start daisy-cursor-pointer daisy-gap-2">
+          <label class="daisy-flex daisy-items-start daisy-cursor-pointer daisy-gap-2 daisy-flex-1 daisy-min-w-0">
             <input
               type="checkbox"
               :value="index"
               v-model="selectedPointIndices"
-              class="daisy-checkbox daisy-checkbox-accent daisy-checkbox-sm daisy-mt-1 daisy-border-2"
+              class="daisy-checkbox daisy-checkbox-accent daisy-checkbox-sm daisy-mt-1 daisy-border-2 daisy-shrink-0"
             />
-            <span>{{ point }}</span>
+            <span class="daisy-break-words">{{ point }}</span>
           </label>
-          <div class="daisy-flex daisy-gap-1">
+          <div class="daisy-flex daisy-gap-1 daisy-shrink-0">
             <button
               class="daisy-btn daisy-btn-xs daisy-btn-ghost"
               @click="promotePointToChildNote(point, index)"
@@ -53,10 +53,10 @@
               Child
             </button>
             <button
+              v-if="note.parentId"
               class="daisy-btn daisy-btn-xs daisy-btn-ghost"
               @click="promotePointToSiblingNote(point, index)"
               title="Promote to sibling note"
-              :disabled="!note.parentId"
             >
               <SvgAddSibling class="w-4 h-4" />
               Sibling
@@ -85,7 +85,7 @@
     @verified="handleSpellingVerified"
     @add-answer="handleAddAnswer"
   />
-  <LoadingModal :show="isCreatingChild" message="AI is creating child note..." />
+  <LoadingModal :show="isPromotingPoint" message="AI is creating note..." />
 </template>
 
 <script setup lang="ts">
@@ -131,7 +131,7 @@ const buttonKey = computed(() => note.id)
 const showSpellingPopup = ref(false)
 const rememberSpelling = ref(false)
 const currentDetails = ref(note.details)
-const isCreatingChild = ref(false)
+const isPromotingPoint = ref(false)
 
 const onDetailsSaved = (newDetails: string) => {
   currentDetails.value = newDetails
@@ -288,7 +288,7 @@ const promotePoint = async (
   index: number,
   parentNoteId: number
 ) => {
-  isCreatingChild.value = true
+  isPromotingPoint.value = true
   try {
     // Call AI endpoint to promote point to a new note
     const { data: result, error } = await apiCallWithLoading(() =>
@@ -319,7 +319,7 @@ const promotePoint = async (
     console.error("Failed to promote point:", err)
     await popups.alert(`Error: ${err}`)
   } finally {
-    isCreatingChild.value = false
+    isPromotingPoint.value = false
   }
 }
 
