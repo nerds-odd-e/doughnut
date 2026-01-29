@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.controllers.dto.IgnorePointsRequestDTO;
 import com.odde.doughnut.controllers.dto.IgnorePointsResponseDTO;
@@ -132,6 +133,15 @@ public class AiController {
       @RequestBody IgnorePointsRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
     authorizationService.assertAuthorization(note);
+
+    if (request.getPoints() != null && !request.getPoints().isEmpty()) {
+      String ignoredPointsJson =
+          new ObjectMapperConfig().objectMapper().writeValueAsString(request.getPoints());
+      note.setIgnoredPoints(ignoredPointsJson);
+      note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+      entityPersister.save(note);
+    }
+
     return new IgnorePointsResponseDTO(true);
   }
 
