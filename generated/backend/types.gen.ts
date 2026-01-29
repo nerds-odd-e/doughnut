@@ -421,6 +421,14 @@ export type RemovePointsResponseDto = {
     details?: string;
 };
 
+export type IgnorePointsRequestDto = {
+    points?: Array<string>;
+};
+
+export type IgnorePointsResponseDto = {
+    success?: boolean;
+};
+
 export type UnderstandingChecklistDto = {
     points?: Array<string>;
 };
@@ -2962,6 +2970,33 @@ export type RemovePointFromNoteResponses = {
 };
 
 export type RemovePointFromNoteResponse = RemovePointFromNoteResponses[keyof RemovePointFromNoteResponses];
+
+export type IgnorePointsData = {
+    body: IgnorePointsRequestDto;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/ai/ignore-points/{note}';
+};
+
+export type IgnorePointsErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type IgnorePointsError = IgnorePointsErrors[keyof IgnorePointsErrors];
+
+export type IgnorePointsResponses = {
+    /**
+     * OK
+     */
+    200: IgnorePointsResponseDto;
+};
+
+export type IgnorePointsResponse = IgnorePointsResponses[keyof IgnorePointsResponses];
 
 export type GenerateUnderstandingChecklistData = {
     body?: never;
