@@ -51,7 +51,7 @@ public class QuestionGenerationRequestBuilder {
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
     String noteDescription = graphRAGService.getGraphRAGDescription(note);
     String noteInstructions =
-        "The JSON below is available only to you (the question generator). The user who will later answer the question does NOT see this JSON. You must NEVER refer to it explicitly or implicitly. Do NOT use words like \"this note\", \"above\", \"the focus note\", or anything revealing that the question originates from hidden context.\n";
+        "The JSON below is available only to you (the question and choice generator). The user who will later answer the question does NOT see this JSON. You must NEVER refer to it explicitly or implicitly. Do NOT use words like \"this note\", \"above\", \"the focus note\", or anything revealing that the question or choices originate from hidden context.\n";
 
     var builder =
         new OpenAIChatRequestBuilder()
