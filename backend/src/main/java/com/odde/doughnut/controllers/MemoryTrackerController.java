@@ -123,4 +123,14 @@ class MemoryTrackerController {
     authorizationService.assertReadAuthorization(memoryTracker);
     memoryTrackerService.deleteUnansweredRecallPrompts(memoryTracker);
   }
+
+  @PostMapping(path = "/{memoryTracker}/re-assimilate")
+  @Transactional
+  public void reAssimilate(
+      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertLoggedIn();
+    authorizationService.assertReadAuthorization(memoryTracker);
+    memoryTrackerService.reAssimilate(memoryTracker);
+  }
 }

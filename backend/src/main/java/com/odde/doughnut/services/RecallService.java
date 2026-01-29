@@ -92,7 +92,8 @@ public class RecallService {
           recallPrompt.getMemoryTracker().getNote(),
           recallPrompt.getAnswer().getSpellingAnswer(),
           recallPrompt.getAnswer().getCorrect(),
-          recallPrompt.getMemoryTracker().getId());
+          recallPrompt.getMemoryTracker().getId(),
+          false); // thresholdExceeded is not relevant for historical data
     }
     return new RecallResult.QuestionResult(recallPrompt.getAnsweredQuestion());
   }

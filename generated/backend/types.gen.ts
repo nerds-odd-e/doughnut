@@ -226,6 +226,7 @@ export type AnsweredQuestion = {
     answerDisplay?: string;
     recallPromptId: number;
     memoryTrackerId?: number;
+    thresholdExceeded?: boolean;
 };
 
 export type QuestionResult = Omit<RecallResult, 'type'> & {
@@ -242,6 +243,7 @@ export type SpellingResult = Omit<RecallResult, 'type'> & {
     answer?: string;
     isCorrect?: boolean;
     memoryTrackerId?: number;
+    thresholdExceeded?: boolean;
     type: 'SpellingResult';
 };
 
@@ -696,6 +698,7 @@ export type AnsweredQuestionWritable = {
     answerDisplay?: string;
     recallPromptId: number;
     memoryTrackerId?: number;
+    thresholdExceeded?: boolean;
 };
 
 export type QuestionResultWritable = Omit<RecallResult, 'type'> & {
@@ -708,6 +711,7 @@ export type SpellingResultWritable = Omit<RecallResult, 'type'> & {
     answer?: string;
     isCorrect?: boolean;
     memoryTrackerId?: number;
+    thresholdExceeded?: boolean;
     type: 'SpellingResultWritable';
 };
 
@@ -2341,6 +2345,31 @@ export type ReEnableResponses = {
 };
 
 export type ReEnableResponse = ReEnableResponses[keyof ReEnableResponses];
+
+export type ReAssimilateData = {
+    body?: never;
+    path: {
+        memoryTracker: number;
+    };
+    query?: never;
+    url: '/api/memory-trackers/{memoryTracker}/re-assimilate';
+};
+
+export type ReAssimilateErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type ReAssimilateError = ReAssimilateErrors[keyof ReAssimilateErrors];
+
+export type ReAssimilateResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type CreateNoteViaMcpData = {
     body: McpNoteAddDto;

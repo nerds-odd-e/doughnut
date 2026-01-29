@@ -15,11 +15,20 @@ public sealed interface RecallResult
 
   record QuestionResult(AnsweredQuestion answeredQuestion) implements RecallResult {}
 
-  record SpellingResult(Note note, String answer, Boolean isCorrect, Integer memoryTrackerId)
+  record SpellingResult(
+      Note note,
+      String answer,
+      Boolean isCorrect,
+      Integer memoryTrackerId,
+      Boolean thresholdExceeded)
       implements RecallResult {
     public static SpellingResult from(SpellingResultDTO dto) {
       return new SpellingResult(
-          dto.getNote(), dto.getAnswer(), dto.getIsCorrect(), dto.getMemoryTrackerId());
+          dto.getNote(),
+          dto.getAnswer(),
+          dto.getIsCorrect(),
+          dto.getMemoryTrackerId(),
+          dto.getThresholdExceeded());
     }
   }
 }

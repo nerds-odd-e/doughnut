@@ -78,7 +78,11 @@ import type {
   SpellingResult,
   MemoryTrackerLite,
 } from "@generated/backend"
-import { RecallsController } from "@generated/backend/sdk.gen"
+import {
+  RecallsController,
+  MemoryTrackerController,
+} from "@generated/backend/sdk.gen"
+import usePopups from "@/components/commons/Popups/usePopups"
 import {} from "@/managedApi/clientSetup"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
@@ -94,6 +98,7 @@ import {
 import { useRecallData } from "@/composables/useRecallData"
 
 type RecallResult = QuestionResult | SpellingResult
+const { popups } = usePopups()
 const {
   currentRecallWindowEndAt,
   setCurrentRecallWindowEndAt,
@@ -275,19 +280,39 @@ const moveToNextMemoryTracker = () => {
   currentIndex.value = nextIndex
 }
 
-const onAnsweredQuestion = (answerResult: QuestionResult) => {
+const handleThresholdExceeded = async (memoryTrackerId: number | undefined) => {
+  if (!memoryTrackerId) return
+  const confirmed = await popups.confirm(
+    "You have answered this note incorrectly too many times. Would you like to re-assimilate it?"
+  )
+  if (confirmed) {
+    await MemoryTrackerController.reAssimilate({
+      path: { memoryTracker: memoryTrackerId },
+    })
+  }
+}
+
+const onAnsweredQuestion = async (answerResult: QuestionResult) => {
   moveToNextMemoryTracker()
   previousAnsweredQuestions.value.push(answerResult)
   if (!answerResult.answeredQuestion?.answer.correct) {
     viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
   }
+  if (answerResult.answeredQuestion?.thresholdExceeded) {
+    await handleThresholdExceeded(
+      answerResult.answeredQuestion?.memoryTrackerId
+    )
+  }
 }
 
-const onAnsweredSpelling = (answerResult: SpellingResult) => {
+const onAnsweredSpelling = async (answerResult: SpellingResult) => {
   moveToNextMemoryTracker()
   previousAnsweredQuestions.value.push(answerResult)
   if (!answerResult.isCorrect) {
     viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
+  }
+  if (answerResult.thresholdExceeded) {
+    await handleThresholdExceeded(answerResult.memoryTrackerId)
   }
 }
 

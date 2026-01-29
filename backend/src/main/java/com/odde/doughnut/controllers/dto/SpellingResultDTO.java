@@ -9,11 +9,18 @@ public class SpellingResultDTO {
   @Getter private final String answer;
   @Getter private final Boolean isCorrect;
   @Getter private final Integer memoryTrackerId;
+  @Getter private final Boolean thresholdExceeded;
 
-  public SpellingResultDTO(Note note, String answer, Boolean isCorrect, Integer memoryTrackerId) {
+  public SpellingResultDTO(
+      Note note,
+      String answer,
+      Boolean isCorrect,
+      Integer memoryTrackerId,
+      Boolean thresholdExceeded) {
     this.note = note;
     this.answer = answer;
     this.isCorrect = isCorrect;
     this.memoryTrackerId = memoryTrackerId;
+    this.thresholdExceeded = thresholdExceeded;
   }
 }

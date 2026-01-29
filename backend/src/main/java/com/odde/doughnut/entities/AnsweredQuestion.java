@@ -9,4 +9,5 @@ public class AnsweredQuestion {
   public String answerDisplay;
   @NotNull public Integer recallPromptId;
   public Integer memoryTrackerId;
+  public Boolean thresholdExceeded;
 }

@@ -97,22 +97,23 @@ public class MemoryTrackerService {
     entityPersister.save(memoryTracker);
   }
 
-  public void updateMemoryTrackerAfterAnsweringQuestion(
+  public boolean updateMemoryTrackerAfterAnsweringQuestion(
       User user, Timestamp currentUTCTimestamp, Boolean correct, RecallPrompt recallPrompt) {
     List<MemoryTracker> memoryTrackers =
         userService.getMemoryTrackersFor(user, recallPrompt.getPredefinedQuestion().getNote());
     Integer thinkingTimeMs =
         recallPrompt.getAnswer() != null ? recallPrompt.getAnswer().getThinkingTimeMs() : null;
-    memoryTrackers.stream()
+    return memoryTrackers.stream()
         .filter(
             tracker -> {
               Boolean trackerSpelling = tracker.getSpelling();
               return !Boolean.TRUE.equals(trackerSpelling);
             })
         .findFirst()
-        .ifPresent(
+        .map(
             memoryTracker ->
-                markAsRepeated(currentUTCTimestamp, correct, memoryTracker, thinkingTimeMs));
+                markAsRepeated(currentUTCTimestamp, correct, memoryTracker, thinkingTimeMs))
+        .orElse(false);
   }
 
   public boolean markAsRepeated(
@@ -124,22 +125,20 @@ public class MemoryTrackerService {
     entityPersister.save(memoryTracker);
 
     if (!correct) {
-      boolean thresholdExceeded =
-          hasExceededWrongAnswerThreshold(
-              memoryTracker.getNote(),
-              currentUTCTimestamp,
-              WRONG_ANSWER_PERIOD_DAYS,
-              WRONG_ANSWER_THRESHOLD);
-
-      if (thresholdExceeded) {
-        // Delete MemoryTracker to return note to assimilate state
-        // First delete related RecallPrompts to avoid JPA session conflicts
-        recallPromptRepository.deleteByMemoryTrackerId(memoryTracker.getId());
-        memoryTrackerRepository.delete(memoryTracker);
-      }
-      return thresholdExceeded;
+      return hasExceededWrongAnswerThreshold(
+          memoryTracker.getNote(),
+          currentUTCTimestamp,
+          WRONG_ANSWER_PERIOD_DAYS,
+          WRONG_ANSWER_THRESHOLD);
     }
     return false;
+  }
+
+  public void reAssimilate(MemoryTracker memoryTracker) {
+    // Delete MemoryTracker to return note to assimilate state
+    // First delete related RecallPrompts to avoid JPA session conflicts
+    recallPromptRepository.deleteByMemoryTrackerId(memoryTracker.getId());
+    memoryTrackerRepository.delete(memoryTracker);
   }
 
   public SpellingResultDTO answerSpelling(
@@ -150,9 +149,11 @@ public class MemoryTrackerService {
     String spellingAnswer = answerSpellingDTO.getSpellingAnswer();
     Note note = memoryTracker.getNote();
     Boolean correct = note.matchAnswer(spellingAnswer);
-    markAsRepeated(
-        currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
-    return new SpellingResultDTO(note, spellingAnswer, correct, memoryTracker.getId());
+    boolean thresholdExceeded =
+        markAsRepeated(
+            currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
+    return new SpellingResultDTO(
+        note, spellingAnswer, correct, memoryTracker.getId(), thresholdExceeded);
   }
 
   public List<RecallPrompt> getAllRecallPrompts(MemoryTracker memoryTracker) {
@@ -202,9 +203,11 @@ public class MemoryTrackerService {
     recallPrompt.setAnswer(answer);
     entityPersister.save(recallPrompt);
 
-    markAsRepeated(
-        currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
-    return new SpellingResultDTO(note, spellingAnswer, correct, memoryTracker.getId());
+    boolean thresholdExceeded =
+        markAsRepeated(
+            currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
+    return new SpellingResultDTO(
+        note, spellingAnswer, correct, memoryTracker.getId(), thresholdExceeded);
   }
 
   public boolean hasExceededWrongAnswerThreshold(

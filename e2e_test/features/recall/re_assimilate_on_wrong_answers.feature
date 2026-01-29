@@ -42,13 +42,15 @@ Feature: Re-assimilate note after too many wrong answers
     When I choose answer "to sleep"
     Then I should see that my MCQ answer "to sleep" is incorrect
 
-    # Day 6: Fifth wrong answer - should trigger re-assimilation
+    # Day 6: Fifth wrong answer - should trigger re-assimilation prompt
     When I am recalling my note on day 6
     Then I should be asked "What is the meaning of sedition?"
     When I choose answer "to sleep"
     Then I should see that my MCQ answer "to sleep" is incorrect
+    And I should see a re-assimilate confirmation dialog
+    When I confirm to re-assimilate the note
 
-    # After 5 wrong answers, note should be back in assimilate queue
+    # After confirming re-assimilation, note should be back in assimilate queue
     # Verify by navigating to day 7 and checking counts
     When I am recalling my note on day 7
     Then I should see that I have no notes to recall today

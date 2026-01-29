@@ -179,7 +179,6 @@ Then(
   }
 )
 
-
 Then(
   'I should see that my spelling answer {string} is incorrect',
   (answer: string) => {
@@ -468,3 +467,13 @@ Then(
     start.assumeAssimilationPage().expectNoteTitleUpdatedTo(expectedTitle)
   }
 )
+
+Then('I should see a re-assimilate confirmation dialog', () => {
+  cy.contains('You have answered this note incorrectly too many times').should(
+    'be.visible'
+  )
+})
+
+When('I confirm to re-assimilate the note', () => {
+  cy.findByRole('button', { name: 'OK' }).click()
+})

@@ -27,7 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemoryTrackerServiceTest {
   @Autowired MakeMe makeMe;
   @Autowired MemoryTrackerService memoryTrackerService;
-  @Autowired com.odde.doughnut.entities.repositories.MemoryTrackerRepository memoryTrackerRepository;
+
+  @Autowired
+  com.odde.doughnut.entities.repositories.MemoryTrackerRepository memoryTrackerRepository;
+
   User user;
   Timestamp day1;
 
@@ -224,7 +227,7 @@ public class MemoryTrackerServiceTest {
   }
 
   @Nested
-  class ReAssimilateOnThresholdExceeded {
+  class ReAssimilate {
     Note note;
     MemoryTracker memoryTracker;
 
@@ -235,7 +238,26 @@ public class MemoryTrackerServiceTest {
     }
 
     @Test
-    void shouldDeleteMemoryTrackerWhenThresholdExceeded() {
+    void shouldDeleteMemoryTrackerAndRelatedRecallPrompts() {
+      // Create some recall prompts for this memory tracker
+      makeMe
+          .aRecallPrompt()
+          .approvedQuestionOf(note)
+          .forMemoryTracker(memoryTracker)
+          .answerChoiceIndex(1)
+          .answerTimestamp(day1)
+          .please();
+
+      memoryTrackerService.reAssimilate(memoryTracker);
+
+      // MemoryTracker should be deleted - note should be back in assimilate state
+      List<MemoryTracker> trackers =
+          memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId());
+      assertThat(trackers, empty());
+    }
+
+    @Test
+    void markAsRepeatedShouldNotDeleteMemoryTracker() {
       // Create 5 previous wrong answers to exceed threshold
       for (int i = 0; i < 5; i++) {
         makeMe
@@ -247,18 +269,11 @@ public class MemoryTrackerServiceTest {
             .please();
       }
 
-      memoryTrackerService.markAsRepeated(day1, false, memoryTracker, 1000);
+      boolean thresholdExceeded =
+          memoryTrackerService.markAsRepeated(day1, false, memoryTracker, 1000);
 
-      // MemoryTracker should be deleted - note should be back in assimilate state
-      List<MemoryTracker> trackers =
-          memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId());
-      assertThat(trackers, empty());
-    }
-
-    @Test
-    void shouldNotDeleteMemoryTrackerWhenBelowThreshold() {
-      memoryTrackerService.markAsRepeated(day1, false, memoryTracker, 1000);
-
+      // markAsRepeated should return true but NOT delete the MemoryTracker
+      assertThat(thresholdExceeded, equalTo(true));
       List<MemoryTracker> trackers =
           memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId());
       assertThat(trackers, hasSize(1));
