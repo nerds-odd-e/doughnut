@@ -51,6 +51,13 @@ Then(
   }
 )
 
+Then('I should see that I have no notes to recall today', () => {
+  // When there are no notes to recall, the page shows "You have finished all repetitions"
+  cy.contains('You have finished all repetitions for this half a day!').should(
+    'be.visible'
+  )
+})
+
 Then(
   'I should see that I have {int} new notes to assimilate',
   (numberOfNotes: number) => {
@@ -171,6 +178,7 @@ Then(
     start.assumeAnsweredQuestionPage().expectMCQAnswerToBeIncorrect(answer)
   }
 )
+
 
 Then(
   'I should see that my spelling answer {string} is incorrect',
