@@ -170,9 +170,13 @@ public class AiController {
         noteConstructionService.createNoteUnderParentId(
             request.getParentNoteId(), result.newNoteTitle);
     newNote.setDetails(result.newNoteDetails);
+    newNote.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+    entityPersister.save(newNote);
 
     // 3. Update original note's details
+    note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     note.setDetails(result.updatedParentDetails);
+    entityPersister.save(note);
 
     // 4. Return result
     return new PromotePointResponseDTO(newNote.toNoteRealm(user), note.toNoteRealm(user));
