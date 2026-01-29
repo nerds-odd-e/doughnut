@@ -141,10 +141,11 @@ spring:
       com.odde.doughnut: INFO
       org.hibernate: WARN
       com.zaxxer.hikari: WARN
-  resources:
-    cache:
-      cachecontrol:
-        max-age: 365d
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          max-age: 365d
   servlet:
     multipart:
       max-file-size: 10MB
