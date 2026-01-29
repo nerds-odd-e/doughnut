@@ -39,7 +39,7 @@
               type="checkbox"
               :value="index"
               v-model="selectedPointIndices"
-              class="daisy-checkbox daisy-checkbox-sm daisy-mt-1"
+              class="daisy-checkbox daisy-checkbox-accent daisy-checkbox-sm daisy-mt-1 daisy-border-2"
             />
             <span>{{ point }}</span>
           </label>
@@ -67,7 +67,7 @@
         data-test-id="delete-understanding-points"
         :disabled="selectedPointIndices.length === 0"
         @click="deleteSelectedPoints"
-        class="daisy-btn daisy-btn-warning daisy-btn-sm daisy-mt-4"
+        class="daisy-btn daisy-btn-error daisy-btn-sm daisy-mt-4"
       >
         Delete selected points
       </button>
