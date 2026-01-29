@@ -2495,6 +2495,36 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteRealm"
+  /api/notes/{note}/ai-assistant:
+    patch:
+      tags:
+      - note-controller
+      operationId: updateNoteAiAssistant
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteAiAssistant"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NoteAiAssistant"
   /api/notebooks/{notebook}/move-to-circle/{circle}:
     patch:
       tags:
@@ -4575,6 +4605,26 @@ components:
           $ref: "#/components/schemas/ImageWithMask"
       required:
       - id
+    NoteAiAssistant:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        note:
+          $ref: "#/components/schemas/Note"
+        additionalInstructionsToAi:
+          type: string
+        applyToChildren:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - id
     UpdateAiAssistantRequest:
       type: object
       properties:
@@ -4698,6 +4748,8 @@ components:
           - experience
           - initiative
           - quest
+        noteAiAssistant:
+          $ref: "#/components/schemas/NoteAiAssistant"
       required:
       - createdAt
       - note

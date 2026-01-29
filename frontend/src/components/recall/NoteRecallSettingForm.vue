@@ -7,6 +7,27 @@
     :options="levelOptions"
     @update:model-value="updateLevel"
   />
+
+  <div class="daisy-mb-4">
+    <label class="daisy-label">
+      <span class="daisy-label-text">Custom AI Instruction for Recall Questions</span>
+    </label>
+    <textarea
+      v-model="aiInstructionValue"
+      class="daisy-textarea daisy-textarea-bordered daisy-w-full"
+      rows="3"
+      placeholder="Please enter your custom instruction for recall question"
+      @blur="updateAiInstruction"
+    />
+  </div>
+
+  <CheckInput
+    scope-name="ai_assistant"
+    field="applyToChildren"
+    :model-value="applyToChildrenValue"
+    @update:model-value="updateApplyToChildren"
+  />
+
   <CheckInput
     v-if="!isLinkNote"
     scope-name="review_setting"
@@ -26,7 +47,7 @@
 </template>
 
 <script lang="ts">
-import type { NoteRecallSetting } from "@generated/backend"
+import type { NoteRecallSetting, NoteAiAssistant } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -51,11 +72,23 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
+    noteAiAssistant: {
+      type: Object as PropType<NoteAiAssistant>,
+      required: false,
+    },
   },
   emits: ["levelChanged", "rememberSpellingChanged"],
   setup(props, { emit }) {
     const formData = ref<NoteRecallSetting>(props.noteRecallSetting || {})
     const errors = ref<Partial<Record<keyof NoteRecallSetting, string>>>({})
+
+    // AI Assistant state
+    const aiInstructionValue = ref(
+      props.noteAiAssistant?.additionalInstructionsToAi || ""
+    )
+    const applyToChildrenValue = ref(
+      props.noteAiAssistant?.applyToChildren || false
+    )
 
     const isSpellingDisabled = computed(
       () => !props.noteDetails || props.noteDetails.trim() === ""
@@ -112,6 +145,27 @@ export default defineComponent({
       updateModelValue({ level: Number.parseInt(value) })
     }
 
+    const updateAiInstruction = async () => {
+      const { error } = await apiCallWithLoading(() =>
+        NoteController.updateNoteAiAssistant({
+          path: { note: props.noteId },
+          body: {
+            id: 0,
+            additionalInstructionsToAi: aiInstructionValue.value,
+            applyToChildren: applyToChildrenValue.value,
+          },
+        })
+      )
+      if (error) {
+        console.error("Failed to update AI assistant settings:", error)
+      }
+    }
+
+    const updateApplyToChildren = async (value: boolean) => {
+      applyToChildrenValue.value = value
+      await updateAiInstruction()
+    }
+
     return {
       formData,
       errors,
@@ -122,6 +176,10 @@ export default defineComponent({
       levelOptions,
       updateModelValue,
       updateLevel,
+      aiInstructionValue,
+      applyToChildrenValue,
+      updateAiInstruction,
+      updateApplyToChildren,
     }
   },
 })

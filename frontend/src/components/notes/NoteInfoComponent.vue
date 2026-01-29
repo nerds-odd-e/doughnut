@@ -17,6 +17,7 @@
       isLinkNote: !!noteInfo.note.note.noteTopology?.targetNoteTopology,
       noteRecallSetting: recallSetting,
       noteDetails: currentNoteDetails,
+      noteAiAssistant: noteInfo.noteAiAssistant,
     }"
     @level-changed="$emit('levelChanged', $event)"
     @remember-spelling-changed="$emit('rememberSpellingChanged', $event)"

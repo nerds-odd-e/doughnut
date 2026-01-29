@@ -17,6 +17,7 @@ import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.services.graphRAG.FocusNote;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
+import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -41,6 +42,7 @@ class NoteController {
   private final AuthorizationService authorizationService;
   private final UserService userService;
   private final GraphRAGService graphRAGService;
+  private final TestabilitySettings testabilitySettings;
 
   public NoteController(
       EntityPersister entityPersister,
@@ -49,7 +51,8 @@ class NoteController {
       NoteService noteService,
       AuthorizationService authorizationService,
       UserService userService,
-      GraphRAGService graphRAGService) {
+      GraphRAGService graphRAGService,
+      TestabilitySettings testabilitySettings) {
     this.entityPersister = entityPersister;
     this.wikidataService = wikidataService;
     this.noteMotionService = noteMotionService;
@@ -57,6 +60,7 @@ class NoteController {
     this.authorizationService = authorizationService;
     this.userService = userService;
     this.graphRAGService = graphRAGService;
+    this.testabilitySettings = testabilitySettings;
   }
 
   @PostMapping(value = "/{note}/updateWikidataId")
@@ -119,6 +123,7 @@ class NoteController {
     noteInfo.setCreatedAt(note.getCreatedAt());
     noteInfo.setRecallSetting(note.getRecallSetting());
     noteInfo.setNoteType(note.getNoteType());
+    noteInfo.setNoteAiAssistant(note.getNoteAiAssistant());
     return noteInfo;
   }
 
@@ -230,5 +235,26 @@ class NoteController {
     GraphRAGResult result = new GraphRAGResult(focus);
     result.getRelatedNotes().addAll(descendants);
     return result;
+  }
+
+  @PatchMapping(value = "/{note}/ai-assistant")
+  @Transactional
+  public NoteAiAssistant updateNoteAiAssistant(
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @Valid @RequestBody NoteAiAssistant aiAssistant)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(note);
+
+    NoteAiAssistant existing = note.getOrInitializeNoteAiAssistant();
+    existing.setAdditionalInstructionsToAi(aiAssistant.getAdditionalInstructionsToAi());
+    existing.setApplyToChildren(aiAssistant.getApplyToChildren());
+    existing.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+
+    if (existing.getCreatedAt() == null) {
+      existing.setCreatedAt(testabilitySettings.getCurrentUTCTimestamp());
+    }
+
+    entityPersister.save(note);
+    return existing;
   }
 }

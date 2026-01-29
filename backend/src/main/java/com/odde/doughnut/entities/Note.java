@@ -52,6 +52,11 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Getter
   private NoteAccessory noteAccessory;
 
+  @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)
+  @JsonIgnore
+  @Getter
+  private NoteAiAssistant noteAiAssistant;
+
   @Column(name = "details")
   @Getter
   @Setter
@@ -395,5 +400,14 @@ public class Note extends EntityIdentifiedByIdOnly {
     if (l.getParent().getNotebook() == l.getTargetNote().getNotebook()) return true;
     if (viewer == null) return false;
     return viewer.canReferTo(l.getParent().getNotebook());
+  }
+
+  @JsonIgnore
+  public NoteAiAssistant getOrInitializeNoteAiAssistant() {
+    if (noteAiAssistant == null) {
+      noteAiAssistant = new NoteAiAssistant();
+      noteAiAssistant.setNote(this);
+    }
+    return noteAiAssistant;
   }
 }

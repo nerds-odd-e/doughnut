@@ -486,6 +486,15 @@ export type NoteAccessory = {
     imageWithMask?: ImageWithMask;
 };
 
+export type NoteAiAssistant = {
+    id: number;
+    note?: Note;
+    additionalInstructionsToAi?: string;
+    applyToChildren?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+};
+
 export type UpdateAiAssistantRequest = {
     additionalInstructions?: string;
 };
@@ -544,6 +553,7 @@ export type NoteInfo = {
     createdAt: string;
     recallSetting?: NoteRecallSetting;
     noteType?: 'concept' | 'source' | 'person' | 'experience' | 'initiative' | 'quest';
+    noteAiAssistant?: NoteAiAssistant;
 };
 
 export type BareNote = {
@@ -752,12 +762,22 @@ export type PromotePointResponseDtoWritable = {
     updatedParentNote?: NoteRealmWritable;
 };
 
+export type NoteAiAssistantWritable = {
+    id: number;
+    note?: NoteWritable;
+    additionalInstructionsToAi?: string;
+    applyToChildren?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+};
+
 export type NoteInfoWritable = {
     memoryTrackers?: Array<MemoryTrackerWritable>;
     note: NoteRealmWritable;
     createdAt: string;
     recallSetting?: NoteRecallSetting;
     noteType?: 'concept' | 'source' | 'person' | 'experience' | 'initiative' | 'quest';
+    noteAiAssistant?: NoteAiAssistantWritable;
 };
 
 export type NotebooksViewedByUserWritable = {
@@ -3297,6 +3317,33 @@ export type UpdateNoteTypeResponses = {
 };
 
 export type UpdateNoteTypeResponse = UpdateNoteTypeResponses[keyof UpdateNoteTypeResponses];
+
+export type UpdateNoteAiAssistantData = {
+    body: NoteAiAssistantWritable;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/notes/{note}/ai-assistant';
+};
+
+export type UpdateNoteAiAssistantErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type UpdateNoteAiAssistantError = UpdateNoteAiAssistantErrors[keyof UpdateNoteAiAssistantErrors];
+
+export type UpdateNoteAiAssistantResponses = {
+    /**
+     * OK
+     */
+    200: NoteAiAssistant;
+};
+
+export type UpdateNoteAiAssistantResponse = UpdateNoteAiAssistantResponses[keyof UpdateNoteAiAssistantResponses];
 
 export type MoveToCircleData = {
     body?: never;

@@ -303,6 +303,29 @@ export const assumeAssimilationPage = () => ({
     cy.pageIsNotLoading()
     return this
   },
+  setAiInstruction(instruction: string) {
+    cy.get('textarea[placeholder*="custom instruction for recall question"]')
+      .clear()
+      .type(instruction)
+      .blur()
+    cy.pageIsNotLoading()
+    return this
+  },
+  checkApplyToChildren() {
+    cy.findByLabelText('Apply To Children').check()
+    cy.pageIsNotLoading()
+    return this
+  },
+  expectAiInstructionToBe(expectedText: string) {
+    cy.get(
+      'textarea[placeholder*="custom instruction for recall question"]'
+    ).should('have.value', expectedText)
+    return this
+  },
+  expectApplyToChildrenChecked() {
+    cy.findByLabelText('Apply To Children').should('be.checked')
+    return this
+  },
 })
 
 export const assimilation = () => {

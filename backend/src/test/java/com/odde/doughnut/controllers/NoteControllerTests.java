@@ -504,4 +504,53 @@ class NoteControllerTests extends ControllerTestBase {
           UnexpectedNoAccessRightException.class, () -> controller.getDescendants(otherUsersNote));
     }
   }
+
+  @Nested
+  class updateNoteAiAssistantTest {
+    @Test
+    void shouldUpdateAiAssistantForOwnedNote() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+
+      NoteAiAssistant aiAssistant = new NoteAiAssistant();
+      aiAssistant.setAdditionalInstructionsToAi("Focus on practical examples");
+      aiAssistant.setApplyToChildren(true);
+
+      NoteAiAssistant result = controller.updateNoteAiAssistant(note, aiAssistant);
+
+      assertThat(result.getAdditionalInstructionsToAi(), equalTo("Focus on practical examples"));
+      assertThat(result.getApplyToChildren(), equalTo(true));
+      assertThat(result.getCreatedAt(), notNullValue());
+      assertThat(result.getUpdatedAt(), notNullValue());
+    }
+
+    @Test
+    void shouldNotUpdateAiAssistantForUnauthorizedNote() {
+      User otherUser = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
+
+      NoteAiAssistant aiAssistant = new NoteAiAssistant();
+      aiAssistant.setAdditionalInstructionsToAi("Test instruction");
+
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.updateNoteAiAssistant(note, aiAssistant));
+    }
+
+    @Test
+    void shouldIncludeAiAssistantInNoteInfo() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+
+      NoteAiAssistant aiAssistant = new NoteAiAssistant();
+      aiAssistant.setAdditionalInstructionsToAi("Test instruction");
+      aiAssistant.setApplyToChildren(false);
+      controller.updateNoteAiAssistant(note, aiAssistant);
+
+      NoteInfo noteInfo = controller.getNoteInfo(note);
+
+      assertThat(noteInfo.getNoteAiAssistant(), notNullValue());
+      assertThat(
+          noteInfo.getNoteAiAssistant().getAdditionalInstructionsToAi(),
+          equalTo("Test instruction"));
+    }
+  }
 }

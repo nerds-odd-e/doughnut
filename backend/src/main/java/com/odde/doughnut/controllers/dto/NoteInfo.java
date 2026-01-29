@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers.dto;
 
 import com.odde.doughnut.entities.MemoryTracker;
+import com.odde.doughnut.entities.NoteAiAssistant;
 import com.odde.doughnut.entities.NoteRecallSetting;
 import com.odde.doughnut.entities.NoteType;
 import jakarta.validation.constraints.NotNull;
@@ -15,4 +16,5 @@ public class NoteInfo {
   @NotNull @Getter @Setter private Timestamp createdAt;
   @Getter @Setter public NoteRecallSetting recallSetting;
   @Getter @Setter private NoteType noteType;
+  @Getter @Setter private NoteAiAssistant noteAiAssistant;
 }
