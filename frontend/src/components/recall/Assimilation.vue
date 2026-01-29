@@ -64,14 +64,25 @@
           </div>
         </li>
       </ul>
-      <button
-        data-test-id="delete-understanding-points"
-        :disabled="selectedPointIndices.length === 0"
-        @click="deleteSelectedPoints"
-        class="daisy-btn daisy-btn-error daisy-btn-sm daisy-mt-4 !daisy-text-white"
-      >
-        Delete selected points
-      </button>
+
+      <div class="daisy-flex daisy-gap-2 daisy-mt-4">
+        <button
+          data-test-id="delete-understanding-points"
+          :disabled="selectedPointIndices.length === 0"
+          @click="deleteSelectedPoints"
+          class="daisy-btn daisy-btn-error daisy-btn-sm daisy-mt-4 !daisy-text-white"
+        >
+          Delete selected points
+        </button>
+        <button
+          data-test-id="ignore-understanding-points"
+          :disabled="selectedPointIndices.length === 0"
+          @click="ignoreSelectedPoints"
+          class="daisy-btn daisy-btn-sm"
+        >
+          Ignore questions
+        </button>
+      </div>
     </div>
   </div>
   <AssimilationButtons
@@ -196,6 +207,35 @@ const deleteSelectedPoints = async () => {
 
   const { error } = await apiCallWithLoading(() =>
     AiController.removePointFromNote({
+      path: { note: note.id },
+      body: { points: selectedPoints },
+    })
+  )
+
+  if (!error) {
+    emit("reloadNeeded")
+  }
+}
+
+const ignoreSelectedPoints = async () => {
+  if (selectedPointIndices.value.length === 0) {
+    return
+  }
+
+  const confirmed = await popups.confirm(
+    `Ignore ${selectedPointIndices.value.length} selected point(s) so their questions won't appear when recalling?`
+  )
+
+  if (!confirmed) {
+    return
+  }
+
+  const selectedPoints = selectedPointIndices.value.map(
+    (index) => understandingPoints.value[index]!
+  )
+
+  const { error } = await apiCallWithLoading(() =>
+    AiController.ignorePoints({
       path: { note: note.id },
       body: { points: selectedPoints },
     })

@@ -589,4 +589,148 @@ describe("Assimilation component", () => {
       )
     })
   })
+
+  describe("ignore questions", () => {
+    it("disables ignore button when no check points are selected", async () => {
+      mockSdkService("generateUnderstandingChecklist", {
+        points: ["Point 1", "Point 2"],
+      })
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      const ignoreButton = wrapper.find(
+        '[data-test-id="ignore-understanding-points"]'
+      )
+      expect((ignoreButton.element as HTMLButtonElement).disabled).toBe(true)
+    })
+
+    it("enables ignore button when check points are selected", async () => {
+      mockSdkService("generateUnderstandingChecklist", {
+        points: ["Point 1", "Point 2"],
+      })
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      const ignoreButton = wrapper.find(
+        '[data-test-id="ignore-understanding-points"]'
+      )
+
+      const checkboxes = wrapper
+        .find('[data-test-id="understanding-checklist"]')
+        .findAll('input[type="checkbox"]')
+      await checkboxes[0]!.setValue(true)
+      await flushPromises()
+
+      expect((ignoreButton.element as HTMLButtonElement).disabled).toBe(false)
+    })
+
+    it("shows popup when ignore button is clicked", async () => {
+      mockSdkService("generateUnderstandingChecklist", {
+        points: ["Point 1", "Point 2"],
+      })
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      const checkboxes = wrapper
+        .find('[data-test-id="understanding-checklist"]')
+        .findAll('input[type="checkbox"]')
+      await checkboxes[0]!.setValue(true)
+      await flushPromises()
+
+      await wrapper
+        .find('[data-test-id="ignore-understanding-points"]')
+        .trigger("click")
+      await flushPromises()
+
+      const popups = usePopups().popups.peek()
+      expect(popups.length).toBe(1)
+      expect(popups[0]!.type).toBe("confirm")
+      expect(popups[0]!.message).toContain("Ignore")
+    })
+
+    it("calls API and emits reloadNeeded when confirm is clicked", async () => {
+      mockSdkService("generateUnderstandingChecklist", {
+        points: ["Point 1", "Point 2"],
+      })
+
+      const ignorePointsSpy = mockSdkService("ignorePoints", { success: true })
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      const checkboxes = wrapper
+        .find('[data-test-id="understanding-checklist"]')
+        .findAll('input[type="checkbox"]')
+      await checkboxes[0]!.setValue(true)
+      await flushPromises()
+
+      await wrapper
+        .find('[data-test-id="ignore-understanding-points"]')
+        .trigger("click")
+      await flushPromises()
+
+      usePopups().popups.done(true)
+      await flushPromises()
+
+      expect(ignorePointsSpy).toHaveBeenCalledWith({
+        path: { note: note.id },
+        body: { points: ["Point 1"] },
+      })
+    })
+
+    it("does not call API when cancel is clicked", async () => {
+      mockSdkService("generateUnderstandingChecklist", {
+        points: ["Point 1", "Point 2"],
+      })
+
+      const ignorePointsSpy = mockSdkService("ignorePoints", { success: true })
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      const checkboxes = wrapper
+        .find('[data-test-id="understanding-checklist"]')
+        .findAll('input[type="checkbox"]')
+      await checkboxes[0]!.setValue(true)
+      await flushPromises()
+
+      await wrapper
+        .find('[data-test-id="ignore-understanding-points"]')
+        .trigger("click")
+      await flushPromises()
+
+      usePopups().popups.done(false)
+      await flushPromises()
+
+      expect(ignorePointsSpy).not.toHaveBeenCalled()
+    })
+  })
 })
