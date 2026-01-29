@@ -2,6 +2,8 @@ package com.odde.doughnut.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.*;
+import com.odde.doughnut.controllers.dto.IgnorePointsRequestDTO;
+import com.odde.doughnut.controllers.dto.IgnorePointsResponseDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -121,6 +123,16 @@ public class AiController {
     entityPersister.save(note);
 
     return new RemovePointsResponseDTO(newDetails);
+  }
+
+  @PostMapping("/ignore-points/{note}")
+  @Transactional
+  public IgnorePointsResponseDTO ignorePoints(
+      @PathVariable(value = "note") @Schema(type = "integer") Note note,
+      @RequestBody IgnorePointsRequestDTO request)
+      throws UnexpectedNoAccessRightException, JsonProcessingException {
+    authorizationService.assertAuthorization(note);
+    return new IgnorePointsResponseDTO(true);
   }
 
   @PostMapping("/extract-point-to-child/{note}")
