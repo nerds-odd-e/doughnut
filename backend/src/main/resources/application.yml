@@ -14,6 +14,11 @@ spring:
       org.springframework.web: ERROR
       com.odde.doughnut: ERROR
       org.hibernate: ERROR
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          max-age: 365d
   servlet:
     multipart:
       max-file-size: 10MB
@@ -67,6 +72,11 @@ spring:
       org.springframework.web: INFO
       com.odde.doughnut: INFO
       org.hibernate: WARN
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          max-age: 365d
   servlet:
     multipart:
       max-file-size: 10MB
@@ -131,6 +141,10 @@ spring:
       com.odde.doughnut: INFO
       org.hibernate: WARN
       com.zaxxer.hikari: WARN
+  resources:
+    cache:
+      cachecontrol:
+        max-age: 365d
   servlet:
     multipart:
       max-file-size: 10MB
@@ -202,6 +216,11 @@ spring:
       org.springframework.web: INFO
       com.odde.doughnut: DEBUG
       org.hibernate: INFO
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          max-age: 365d
   servlet:
     multipart:
       max-file-size: 10MB
