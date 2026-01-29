@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemoryTrackerServiceTest {
   @Autowired MakeMe makeMe;
   @Autowired MemoryTrackerService memoryTrackerService;
+  @Autowired com.odde.doughnut.entities.repositories.MemoryTrackerRepository memoryTrackerRepository;
   User user;
   Timestamp day1;
 
@@ -132,8 +133,7 @@ public class MemoryTrackerServiceTest {
             .please();
       }
 
-      boolean exceeded =
-          memoryTrackerService.hasExceededWrongAnswerThreshold(note, day1, 14, 5);
+      boolean exceeded = memoryTrackerService.hasExceededWrongAnswerThreshold(note, day1, 14, 5);
 
       assertThat(exceeded, equalTo(false));
     }
@@ -151,8 +151,7 @@ public class MemoryTrackerServiceTest {
             .please();
       }
 
-      boolean exceeded =
-          memoryTrackerService.hasExceededWrongAnswerThreshold(note, day1, 14, 5);
+      boolean exceeded = memoryTrackerService.hasExceededWrongAnswerThreshold(note, day1, 14, 5);
 
       assertThat(exceeded, equalTo(true));
     }
@@ -170,8 +169,7 @@ public class MemoryTrackerServiceTest {
             .please();
       }
 
-      boolean exceeded =
-          memoryTrackerService.hasExceededWrongAnswerThreshold(note, day1, 14, 5);
+      boolean exceeded = memoryTrackerService.hasExceededWrongAnswerThreshold(note, day1, 14, 5);
 
       assertThat(exceeded, equalTo(true));
     }
@@ -222,6 +220,48 @@ public class MemoryTrackerServiceTest {
           memoryTrackerService.markAsRepeated(day1, false, memoryTracker, 1000);
 
       assertThat(thresholdExceeded, equalTo(true));
+    }
+  }
+
+  @Nested
+  class ReAssimilateOnThresholdExceeded {
+    Note note;
+    MemoryTracker memoryTracker;
+
+    @BeforeEach
+    void setup() {
+      note = makeMe.aNote().creatorAndOwner(user).please();
+      memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
+    }
+
+    @Test
+    void shouldDeleteMemoryTrackerWhenThresholdExceeded() {
+      // Create 5 previous wrong answers to exceed threshold
+      for (int i = 0; i < 5; i++) {
+        makeMe
+            .aRecallPrompt()
+            .approvedQuestionOf(note)
+            .forMemoryTracker(memoryTracker)
+            .answerChoiceIndex(1)
+            .answerTimestamp(day1)
+            .please();
+      }
+
+      memoryTrackerService.markAsRepeated(day1, false, memoryTracker, 1000);
+
+      // MemoryTracker should be deleted - note should be back in assimilate state
+      List<MemoryTracker> trackers =
+          memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId());
+      assertThat(trackers, empty());
+    }
+
+    @Test
+    void shouldNotDeleteMemoryTrackerWhenBelowThreshold() {
+      memoryTrackerService.markAsRepeated(day1, false, memoryTracker, 1000);
+
+      List<MemoryTracker> trackers =
+          memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId());
+      assertThat(trackers, hasSize(1));
     }
   }
 }

@@ -124,11 +124,20 @@ public class MemoryTrackerService {
     entityPersister.save(memoryTracker);
 
     if (!correct) {
-      return hasExceededWrongAnswerThreshold(
-          memoryTracker.getNote(),
-          currentUTCTimestamp,
-          WRONG_ANSWER_PERIOD_DAYS,
-          WRONG_ANSWER_THRESHOLD);
+      boolean thresholdExceeded =
+          hasExceededWrongAnswerThreshold(
+              memoryTracker.getNote(),
+              currentUTCTimestamp,
+              WRONG_ANSWER_PERIOD_DAYS,
+              WRONG_ANSWER_THRESHOLD);
+
+      if (thresholdExceeded) {
+        // Delete MemoryTracker to return note to assimilate state
+        // First delete related RecallPrompts to avoid JPA session conflicts
+        recallPromptRepository.deleteByMemoryTrackerId(memoryTracker.getId());
+        memoryTrackerRepository.delete(memoryTracker);
+      }
+      return thresholdExceeded;
     }
     return false;
   }

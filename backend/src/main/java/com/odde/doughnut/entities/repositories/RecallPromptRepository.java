@@ -60,4 +60,6 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
               + "AND qa.created_at >= :since",
       nativeQuery = true)
   int countWrongAnswersSince(@Param("noteId") Integer noteId, @Param("since") Timestamp since);
+
+  void deleteByMemoryTrackerId(Integer memoryTrackerId);
 }
