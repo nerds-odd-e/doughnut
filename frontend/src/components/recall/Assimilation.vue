@@ -70,7 +70,7 @@
           data-test-id="delete-understanding-points"
           :disabled="selectedPointIndices.length === 0"
           @click="deleteSelectedPoints"
-          class="daisy-btn daisy-btn-error daisy-btn-sm daisy-mt-4 !daisy-text-white"
+          class="daisy-btn daisy-btn-error daisy-btn-sm !daisy-text-white"
         >
           Delete selected points
         </button>
@@ -78,7 +78,7 @@
           data-test-id="ignore-understanding-points"
           :disabled="selectedPointIndices.length === 0"
           @click="ignoreSelectedPoints"
-          class="daisy-btn daisy-btn-sm"
+          class="daisy-btn daisy-btn-warning daisy-btn-sm !daisy-text-white"
         >
           Ignore questions
         </button>
