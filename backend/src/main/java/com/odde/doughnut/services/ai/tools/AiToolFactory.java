@@ -177,7 +177,14 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
     String pointsBlock = String.join("\n", pointsToRemove);
     String message =
         """
-            Remove the following points from the note details. Rewrite the remaining content into coherent, well-structured markdown. Preserve the meaning of what remains. Output only the new details.
+            You need to remove specific points from the note details. Carefully identify and completely remove all content related to each of the following points. After removal, rewrite the remaining content into coherent, well-structured markdown while preserving all other information that is not related to the points to be removed.
+
+            Important guidelines:
+            1. Identify content that matches or relates to each point listed below
+            2. Completely remove all sentences, paragraphs, or sections that contain or relate to these points
+            3. Ensure the remaining content flows naturally and maintains coherence
+            4. Preserve all other information that is unrelated to the points to be removed
+            5. Output only the new details in markdown format
 
             Points to remove:
             %s
