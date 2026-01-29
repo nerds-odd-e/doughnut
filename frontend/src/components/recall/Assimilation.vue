@@ -84,6 +84,7 @@
     @verified="handleSpellingVerified"
     @add-answer="handleAddAnswer"
   />
+  <LoadingModal :show="isCreatingChild" message="AI is creating child note..." />
 </template>
 
 <script setup lang="ts">
@@ -102,6 +103,7 @@ import Breadcrumb from "../toolbars/Breadcrumb.vue"
 import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
 import SvgAddChild from "../svgs/SvgAddChild.vue"
 import SvgAddSibling from "../svgs/SvgAddSibling.vue"
+import LoadingModal from "../commons/LoadingModal.vue"
 import { computed, ref } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
@@ -128,6 +130,7 @@ const buttonKey = computed(() => note.id)
 const showSpellingPopup = ref(false)
 const rememberSpelling = ref(false)
 const currentDetails = ref(note.details)
+const isCreatingChild = ref(false)
 
 const onDetailsSaved = (newDetails: string) => {
   currentDetails.value = newDetails
@@ -280,6 +283,8 @@ const handleAddAnswer = async (answer: string) => {
 }
 
 const promotePointToChildNote = async (point: string, index: number) => {
+  isCreatingChild.value = true
+
   try {
     // Call AI endpoint to promote point to a new note
     const { data: result, error } = await apiCallWithLoading(() =>
@@ -309,6 +314,8 @@ const promotePointToChildNote = async (point: string, index: number) => {
   } catch (err) {
     console.error("Failed to promote point to child note:", err)
     await popups.alert(`Error: ${err}`)
+  } finally {
+    isCreatingChild.value = false
   }
 }
 </script>

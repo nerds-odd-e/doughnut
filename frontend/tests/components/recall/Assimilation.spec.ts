@@ -5,6 +5,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper, {
   mockShowNoteAccessory,
   mockSdkService,
+  mockSdkServiceWithImplementation,
   wrapSdkResponse,
   wrapSdkError,
 } from "@tests/helpers"
@@ -441,6 +442,94 @@ describe("Assimilation component", () => {
 
       // Should not emit reloadNeeded
       expect(wrapper.emitted()).not.toHaveProperty("reloadNeeded")
+    })
+  })
+
+  describe("LoadingModal for Create New Child", () => {
+    it("should show LoadingModal while creating child note from point", async () => {
+      mockSdkService("generateUnderstandingChecklist", {
+        points: ["Test understanding point"],
+      })
+
+      // Mock with delayed async response to simulate real AI call
+      mockSdkServiceWithImplementation("extractPointToChild", async () => {
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        return {
+          createdNote: makeMe.aNoteRealm.please(),
+          updatedParentNote: makeMe.aNoteRealm.please(),
+        }
+      })
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      // Verify understanding point is displayed
+      expect(wrapper.text()).toContain("Test understanding point")
+
+      // Click "Child" button
+      const childButton = wrapper.find('button[title="Promote to child note"]')
+      await childButton.trigger("click")
+
+      // Wait for LoadingModal to appear
+      await vi.waitFor(() => {
+        expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
+        expect(document.body.textContent).toContain(
+          "AI is creating child note..."
+        )
+      })
+
+      // Wait for LoadingModal to disappear after API completes
+      await vi.waitFor(
+        () => {
+          expect(document.querySelector(".loading-modal-mask")).toBeNull()
+        },
+        { timeout: 3000 }
+      )
+    })
+
+    it("should hide LoadingModal when API call fails", async () => {
+      mockSdkService("generateUnderstandingChecklist", {
+        points: ["Test understanding point"],
+      })
+
+      // Mock API to fail
+      mockSdkService("extractPointToChild", wrapSdkError({}))
+
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      // Click "Child" button
+      const childButton = wrapper.find('button[title="Promote to child note"]')
+      await childButton.trigger("click")
+
+      // Wait for LoadingModal to appear
+      await vi.waitFor(() => {
+        expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
+      })
+
+      // Wait for error popup and dismiss it
+      await vi.waitFor(() => {
+        expect(usePopups().popups.peek().length).toBeGreaterThan(0)
+      })
+      usePopups().popups.done(true)
+
+      // Wait for LoadingModal to disappear
+      await vi.waitFor(
+        () => {
+          expect(document.querySelector(".loading-modal-mask")).toBeNull()
+        },
+        { timeout: 3000 }
+      )
     })
   })
 })
