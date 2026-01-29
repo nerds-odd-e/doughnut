@@ -107,4 +107,73 @@ public class MemoryTrackerServiceTest {
       assertThat(prompts.get(1).getId(), equalTo(unansweredPrompt.getId()));
     }
   }
+
+  @Nested
+  class CheckWrongAnswerThreshold {
+    Note note;
+    MemoryTracker memoryTracker;
+
+    @BeforeEach
+    void setup() {
+      note = makeMe.aNote().creatorAndOwner(user).please();
+      memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
+    }
+
+    @Test
+    void shouldReturnFalseWhenBelowThreshold() {
+      // Create 4 wrong answers (below default threshold of 5)
+      for (int i = 0; i < 4; i++) {
+        makeMe
+            .aRecallPrompt()
+            .approvedQuestionOf(note)
+            .forMemoryTracker(memoryTracker)
+            .answerChoiceIndex(1) // wrong
+            .answerTimestamp(day1)
+            .please();
+      }
+
+      boolean exceeded =
+          memoryTrackerService.hasExceededWrongAnswerThreshold(note, day1, 14, 5);
+
+      assertThat(exceeded, equalTo(false));
+    }
+
+    @Test
+    void shouldReturnTrueWhenAtThreshold() {
+      // Create 5 wrong answers (at default threshold of 5)
+      for (int i = 0; i < 5; i++) {
+        makeMe
+            .aRecallPrompt()
+            .approvedQuestionOf(note)
+            .forMemoryTracker(memoryTracker)
+            .answerChoiceIndex(1) // wrong
+            .answerTimestamp(day1)
+            .please();
+      }
+
+      boolean exceeded =
+          memoryTrackerService.hasExceededWrongAnswerThreshold(note, day1, 14, 5);
+
+      assertThat(exceeded, equalTo(true));
+    }
+
+    @Test
+    void shouldReturnTrueWhenAboveThreshold() {
+      // Create 6 wrong answers (above default threshold of 5)
+      for (int i = 0; i < 6; i++) {
+        makeMe
+            .aRecallPrompt()
+            .approvedQuestionOf(note)
+            .forMemoryTracker(memoryTracker)
+            .answerChoiceIndex(1) // wrong
+            .answerTimestamp(day1)
+            .please();
+      }
+
+      boolean exceeded =
+          memoryTrackerService.hasExceededWrongAnswerThreshold(note, day1, 14, 5);
+
+      assertThat(exceeded, equalTo(true));
+    }
+  }
 }

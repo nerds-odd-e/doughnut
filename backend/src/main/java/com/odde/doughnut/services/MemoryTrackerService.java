@@ -185,4 +185,12 @@ public class MemoryTrackerService {
         currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
     return new SpellingResultDTO(note, spellingAnswer, correct, memoryTracker.getId());
   }
+
+  public boolean hasExceededWrongAnswerThreshold(
+      Note note, Timestamp currentTime, int periodDays, int threshold) {
+    Timestamp since =
+        new Timestamp(currentTime.getTime() - (long) periodDays * 24 * 60 * 60 * 1000);
+    int wrongCount = recallPromptRepository.countWrongAnswersSince(note.getId(), since);
+    return wrongCount >= threshold;
+  }
 }
