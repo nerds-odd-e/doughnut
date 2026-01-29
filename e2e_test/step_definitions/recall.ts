@@ -14,6 +14,10 @@ Given("It's day {int}, {int} hour", (day: number, hour: number) => {
   start.testability().backendTimeTravelTo(day, hour)
 })
 
+Given("It's day {int}", (day: number) => {
+  start.testability().backendTimeTravelTo(day, 8)
+})
+
 Given('I ask to do more repetition', () => {
   start.recall().goToRecallPage().repeatMore()
 })
@@ -326,11 +330,32 @@ When('I check the understanding point {int}', (index: number) => {
   start.assumeAssimilationPage().checkUnderstandingPoint(index)
 })
 
+When(
+  'I ignore these understanding points and complete assimilation:',
+  (data: DataTable) => {
+    const pointTexts = data
+      .raw()
+      .map((row) => row[0])
+      .filter((s): s is string => s !== undefined)
+    start
+      .assumeAssimilationPage()
+      .ignoreUnderstandingPointsAndComplete(pointTexts)
+  }
+)
+
 When('I click the delete understanding points button', () => {
   start.assumeAssimilationPage().clickDeleteUnderstandingPointsButton()
 })
 
 When('I confirm the deletion', () => {
+  cy.findByRole('button', { name: 'OK' }).click()
+})
+
+When('I click the ignore questions button', () => {
+  start.assumeAssimilationPage().clickIgnoreQuestionsButton()
+})
+
+When('I confirm the ignore', () => {
   cy.findByRole('button', { name: 'OK' }).click()
 })
 

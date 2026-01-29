@@ -184,8 +184,25 @@ export const assumeAssimilationPage = () => ({
       .check()
     return this
   },
+  ignoreUnderstandingPointsAndComplete(pointTexts: string[]) {
+    cy.contains('Understanding Checklist:')
+      .closest('.daisy-bg-accent')
+      .within(() => {
+        pointTexts.forEach((pointText) => {
+          cy.contains('li', pointText).find('input[type="checkbox"]').check()
+        })
+      })
+    this.clickIgnoreQuestionsButton()
+    cy.findByRole('button', { name: 'OK' }).click()
+    this.assimilateCurrentNote()
+    return this
+  },
   clickDeleteUnderstandingPointsButton() {
     cy.findByRole('button', { name: 'Delete selected points' }).click()
+    return this
+  },
+  clickIgnoreQuestionsButton() {
+    cy.findByRole('button', { name: 'Ignore questions' }).click()
     return this
   },
   promotePointToChildNote(pointText: string) {
