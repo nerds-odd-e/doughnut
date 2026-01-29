@@ -1,5 +1,6 @@
 <template>
   <AssimilationPageView
+    :key="reloadKey"
     :notes="notes"
     :assimilated-count-of-the-day="assimilatedCountOfTheDay"
     :total-unassimilated-count="totalUnassimilatedCount"
@@ -23,6 +24,7 @@ const { setDueCount, assimilatedCountOfTheDay, totalUnassimilatedCount } =
   useAssimilationCount()
 
 const notes = ref<Note[] | undefined>(undefined)
+const reloadKey = ref(0)
 
 const initialReviewDone = () => {
   notes.value?.shift()
@@ -45,6 +47,7 @@ onMounted(() => {
 })
 
 const onReloadNeeded = () => {
+  reloadKey.value += 1
   loadInitialReview()
 }
 </script>
