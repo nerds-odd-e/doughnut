@@ -3788,6 +3788,8 @@ components:
         id:
           type: integer
           format: int32
+        ignoredPoints:
+          type: string
         createdAt:
           type: string
           format: date-time

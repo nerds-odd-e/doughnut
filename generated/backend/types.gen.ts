@@ -117,6 +117,7 @@ export type Note = {
     parentId?: number;
     updatedAt: string;
     id: number;
+    ignoredPoints?: string;
     createdAt: string;
     readonly deletedAt?: string;
     wikidataId?: string;
@@ -650,6 +651,7 @@ export type NoteWritable = {
     parentId?: number;
     updatedAt: string;
     id: number;
+    ignoredPoints?: string;
     createdAt: string;
     wikidataId?: string;
 };
