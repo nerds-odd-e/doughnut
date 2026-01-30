@@ -1,4 +1,3 @@
-@ignore
 Feature: Ignore Understanding Check Points When Recalling
   As a learner, when I mark selected understanding points as ignored for recall,
   I want those points' questions not to appear when I recall.
@@ -13,7 +12,7 @@ Feature: Ignore Understanding Check Points When Recalling
       | English is the world's most widespread lingua franca |
       | It's vital for global communication and connects people across cultures |
       | English is the standard language for international business, science, and diplomacy |
-    And OpenAI generates this question:
+    And OpenAI also generates this question:
       | Question Stem                          | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is key about global communication? | connects people   | business           | diplomacy          |
     And It's day 1

@@ -246,16 +246,12 @@ const ignoreSelectedPoints = async () => {
     (index) => understandingPoints.value[index]!
   )
 
-  const { error } = await apiCallWithLoading(() =>
+  await apiCallWithLoading(() =>
     AiController.ignorePoints({
       path: { note: note.id },
       body: { points: selectedPoints },
     })
   )
-
-  if (!error) {
-    emit("reloadNeeded")
-  }
 }
 
 // Methods

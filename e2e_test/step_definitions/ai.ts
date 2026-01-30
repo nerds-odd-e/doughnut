@@ -54,6 +54,18 @@ Given('OpenAI generates this question:', (questionTable: DataTable) => {
     .resetAndStubAskingMCQByChatCompletion(hashes[0])
 })
 
+Given('OpenAI also generates this question:', (questionTable: DataTable) => {
+  const hashes = questionTable.hashes()
+  if (hashes.length !== 1 || !hashes[0]) {
+    throw new Error(
+      `Expected exactly one row in the data table, but got ${hashes.length}`
+    )
+  }
+  start
+    .questionGenerationService()
+    .stubAskingMCQByChatCompletion(hashes[0])
+})
+
 Given(
   'OpenAI generates this as first question:',
   (questionTable: DataTable) => {
