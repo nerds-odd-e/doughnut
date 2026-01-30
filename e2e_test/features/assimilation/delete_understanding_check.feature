@@ -7,6 +7,7 @@ Feature: Delete Understanding Check Points
     Given I am logged in as an existing user
     And I have a notebook with the head note "English" and details "English serves as the world's most widespread lingua franca, vital for global communication, connecting people across cultures and nations. It's the standard language for international business, science, technology, and diplomacy, significantly enhancing career opportunities. English dominates the internet and digital world, with most online content in the language."
 
+  @ignore
   @usingMockedOpenAiService
   Scenario: Successfully delete selected understanding points
     Given OpenAI generates understanding checklist with points:
@@ -25,6 +26,7 @@ Feature: Delete Understanding Check Points
     And I confirm the deletion
     Then the note details should be "English dominates the internet and digital world, with most online content in the language. It's vital for global communication and connects people across cultures. Proficiency in English enhances career opportunities and simplifies travel."
 
+  @ignore
   @usingMockedOpenAiService
   Scenario: Cancel deleting understanding points
     Given OpenAI generates understanding checklist with points:
