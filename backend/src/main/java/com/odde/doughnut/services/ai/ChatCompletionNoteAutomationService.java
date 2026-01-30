@@ -42,10 +42,12 @@ public class ChatCompletionNoteAutomationService {
 
   public PointExtractionResult promotePoint(String point, PromotionType promotionType)
       throws JsonProcessingException {
+    String noteTitle = note.getTitle() != null ? note.getTitle() : "";
+    String noteDetails = note.getDetails() != null ? note.getDetails() : "";
     InstructionAndSchema tool =
         promotionType == PromotionType.SIBLING
-            ? AiToolFactory.promotePointToSiblingAiTool(point)
-            : AiToolFactory.promotePointToChildAiTool(point);
+            ? AiToolFactory.promotePointToSiblingAiTool(point, noteTitle, noteDetails)
+            : AiToolFactory.promotePointToChildAiTool(point, noteTitle, noteDetails);
     return executeWithTool(tool, PointExtractionResult.class, result -> result, null);
   }
 

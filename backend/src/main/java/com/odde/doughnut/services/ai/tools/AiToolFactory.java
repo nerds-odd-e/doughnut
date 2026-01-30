@@ -230,49 +230,63 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
     return QuestionEvaluation.class;
   }
 
-  public static InstructionAndSchema promotePointToChildAiTool(String point) {
+  public static InstructionAndSchema promotePointToChildAiTool(
+      String point, String noteTitle, String noteDetails) {
     String instruction =
         """
         You are helping extract a point from a note to create a new child note.
 
-        Given point: "%s"
+        Current note title: "%s"
+        Current note details:
+        ---
+        %s
+        ---
+
+        Point to extract: "%s"
 
         Tasks:
         1. Generate a concise, meaningful title for the new child note based on this point
         2. Expand the point into detailed content (in markdown) for the new note
-        3. Identify the related content in the parent note's details
+        3. Identify the related content in the current note's details
         4. Replace that content with a brief summary (1-2 sentences) that references the key concept
 
         Guidelines:
         - The new note should be self-contained and comprehensive
-        - The summary in parent note should maintain reading flow
-        - Keep all unrelated parts of parent details unchanged
+        - The summary in current note should maintain reading flow
+        - Keep all unrelated parts of current note details unchanged
         """
-            .formatted(point);
+            .formatted(noteTitle, noteDetails, point);
 
     return new InstructionAndSchema(instruction, promotePoint());
   }
 
-  public static InstructionAndSchema promotePointToSiblingAiTool(String point) {
+  public static InstructionAndSchema promotePointToSiblingAiTool(
+      String point, String noteTitle, String noteDetails) {
     String instruction =
         """
         You are helping extract a point from a note to create a new sibling note.
 
-        Given point: "%s"
+        Current note title: "%s"
+        Current note details:
+        ---
+        %s
+        ---
+
+        Point to extract: "%s"
 
         Tasks:
         1. Generate a concise, meaningful title for the new sibling note based on this point
-        2. Identify the related content in the parent note's details for this point
+        2. Identify the related content in the current note's details for this point
         3. Move that content to the new note's details - keep the original meaning but make it concise and avoid redundancy
-        4. Remove the extracted content from the parent note's details
+        4. Remove the extracted content from the current note's details
 
         Guidelines:
-        - The new note's details should be based on the extracted content from parent note, refined for clarity and conciseness
+        - The new note's details should be based on the extracted content from current note, refined for clarity and conciseness
         - Do not add new information that was not in the original content
-        - Keep all unrelated parts of parent details unchanged
-        - Ensure the remaining content in parent note still reads naturally
+        - Keep all unrelated parts of current note details unchanged
+        - Ensure the remaining content in current note still reads naturally
         """
-            .formatted(point);
+            .formatted(noteTitle, noteDetails, point);
 
     return new InstructionAndSchema(instruction, promotePoint());
   }
