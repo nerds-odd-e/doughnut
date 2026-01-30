@@ -15,22 +15,41 @@ public class AiToolFactory {
   }
 
   public static InstructionAndSchema mcqWithAnswerAiTool() {
-    return mcqWithAnswerAiTool(null, null);
+    return questionAiTool(getDefaultMcqPrompt(), null, null);
   }
 
   public static InstructionAndSchema mcqWithAnswerAiTool(RelationType relationType) {
-    return mcqWithAnswerAiTool(relationType, null);
+    return questionAiTool(getDefaultMcqPrompt(), relationType, null);
   }
 
   public static InstructionAndSchema mcqWithAnswerAiTool(
       RelationType relationType, NoteType noteType) {
+    return questionAiTool(getDefaultMcqPrompt(), relationType, noteType);
+  }
+
+  public static InstructionAndSchema questionAiTool(
+      String customPrompt, RelationType relationType, NoteType noteType) {
+    String baseInstruction = getBaseInstruction();
     String relationTypeInstruction = getRelationTypeInstruction(relationType);
     String noteTypeInstruction = getNoteTypeInstruction(noteType);
 
-    // 5. **Empty Stems When Necessary**: Leave the question stem empty if there's insufficient
-    // information to create a meaningful question.
-    String baseInstruction =
-        """
+    StringBuilder fullInstruction = new StringBuilder(baseInstruction);
+
+    if (customPrompt != null && !customPrompt.isBlank()) {
+      fullInstruction.append("\n").append(customPrompt);
+    }
+    if (relationTypeInstruction != null) {
+      fullInstruction.append("\n").append(relationTypeInstruction);
+    }
+    if (noteTypeInstruction != null) {
+      fullInstruction.append("\n").append(noteTypeInstruction);
+    }
+    return new InstructionAndSchema(
+        fullInstruction.toString(), askSingleAnswerMultipleChoiceQuestion());
+  }
+
+  private static String getBaseInstruction() {
+    return """
         Please act as a Question Designer, testing my memory, mastery and understanding of my focus note.
         My notes are atomic pieces of knowledge organized hierarchically and can include relations to form lateral links.
         Your task is to create a memory-stimulating question by adhering to these guidelines:
@@ -39,30 +58,24 @@ public class AiToolFactory {
         2. **Leverage the Extended Graph**:
            - Use other focus note info and related notes to enrich the question formulation.
            - Avoid accidental bias by ensuring the focus note isn't falsely assumed to be the sole specialization of a general concept.
-           - Related notes often serve as excellent distractor choices for the MCQs. But avoid more than 1 correct answers.
-        3. **Generate Multiple-Choice Questions (MCQs)**:
-           - Provide 2 to 3 options, with ONLY one correct answer.
-           - Vary the length of answer choices to avoid patterns where the correct answer is consistently the longest.
-           - Use markdown for both the question stem and the answer choices.
-        4. **Ensure Question Self-Sufficiency**:
+        3. **Ensure Question Self-Sufficiency**:
            - Ensure the question provides all necessary context within the stem and choices.
            - Avoid vague phrasing like "this X" or "the following X" unless the X is explicitly defined in the stem or choices.
            - IMPORTANT: Avoid using "this note"!!! User won't know which note you are referring to.
-        6. **Make sure correct choice index is accurate**:
-           - The correct choice is also exclusive, and plausible.
-           - Ensure distractor choices are logical but clearly incorrect (without needing to be obvious).
-      	7. **Choice order semantics (strictChoiceOrder)**:
-           - In typical MCQs without meta-choices (‘All of the above’, ‘None of the above’, ‘Only A and B’), strictChoiceOrder must ALWAYS be false.
+        """;
+  }
 
-      """;
-    String fullInstruction = baseInstruction;
-    if (relationTypeInstruction != null) {
-      fullInstruction = fullInstruction + "\n" + relationTypeInstruction;
-    }
-    if (noteTypeInstruction != null) {
-      fullInstruction = fullInstruction + "\n" + noteTypeInstruction;
-    }
-    return new InstructionAndSchema(fullInstruction, askSingleAnswerMultipleChoiceQuestion());
+  private static String getDefaultMcqPrompt() {
+    return """
+        **Multiple-Choice Question (MCQ) Guidelines**:
+        - Related notes often serve as excellent distractor choices for the MCQs. But avoid more than 1 correct answers.
+        - Provide 2 to 3 options, with ONLY one correct answer.
+        - Vary the length of answer choices to avoid patterns where the correct answer is consistently the longest.
+        - Use markdown for both the question stem and the answer choices.
+        - Make sure correct choice index is accurate. The correct choice must be exclusive and plausible.
+        - Ensure distractor choices are logical but clearly incorrect (without needing to be obvious).
+        - Choice order semantics (strictChoiceOrder): In typical MCQs without meta-choices ('All of the above', 'None of the above', 'Only A and B'), strictChoiceOrder must ALWAYS be false.
+        """;
   }
 
   private static String getRelationTypeInstruction(RelationType relationType) {
