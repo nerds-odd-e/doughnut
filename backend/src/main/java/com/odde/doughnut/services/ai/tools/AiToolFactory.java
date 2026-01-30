@@ -262,12 +262,13 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
 
         Tasks:
         1. Generate a concise, meaningful title for the new sibling note based on this point
-        2. Expand the point into detailed content (in markdown) for the new note
-        3. Identify and completely remove the related content from the parent note's details
+        2. Identify the related content in the parent note's details for this point
+        3. Move that content to the new note's details - keep the original meaning but make it concise and avoid redundancy
+        4. Remove the extracted content from the parent note's details
 
         Guidelines:
-        - The new note should be self-contained and comprehensive
-        - Simply remove the extracted point from parent note's details (do not replace with summary)
+        - The new note's details should be based on the extracted content from parent note, refined for clarity and conciseness
+        - Do not add new information that was not in the original content
         - Keep all unrelated parts of parent details unchanged
         - Ensure the remaining content in parent note still reads naturally
         """
