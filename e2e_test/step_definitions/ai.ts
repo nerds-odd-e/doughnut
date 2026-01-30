@@ -204,8 +204,8 @@ Given(
 Given(
   'OpenAI will delete related content and return new details:',
   (data: DataTable) => {
-    const newDetails = data.raw().flat()[0]
-    const reply = JSON.stringify({ newDetails })
+    const details = data.raw().flat()[0]
+    const reply = JSON.stringify({ details })
     cy.then(async () => {
       await mock_services
         .openAi()
@@ -214,7 +214,7 @@ Given(
           role: 'system',
           content: '.*delete.*understanding.*points.*',
         })
-        .stubResponse(reply)
+        .stubDeletePoints(reply)
     })
   }
 )

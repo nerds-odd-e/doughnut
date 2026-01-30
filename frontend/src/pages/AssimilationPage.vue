@@ -46,8 +46,8 @@ onMounted(() => {
   loadInitialReview()
 })
 
-const onReloadNeeded = () => {
+const onReloadNeeded = async () => {
+  await loadInitialReview()
   reloadKey.value += 1
-  loadInitialReview()
 }
 </script>

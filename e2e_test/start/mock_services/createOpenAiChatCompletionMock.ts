@@ -121,6 +121,9 @@ const openAiChatCompletionStubber = (
     stubExtractPointToSibling(argumentsString: string) {
       return stubJsonSchemaResponse(argumentsString)
     },
+    stubDeletePoints(argumentsString: string) {
+      return stubJsonSchemaResponse(argumentsString)
+    },
   }
 }
 
