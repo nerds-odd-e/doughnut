@@ -21,14 +21,23 @@ const fetchMock = createFetchMock(vi)
 fetchMock.enableMocks()
 fetchMock.doMock()
 
-if (process.env.FRONTEND_UT_CONSOLE_OUTPUT_AS_FAILURE) {
-  const CONSOLE_FAIL_TYPES = ["error", "warn", "log"]
+// Fail tests on Vue warnings and console.log usage
+// Allow console.warn and console.error from libraries to pass through
+const originalConsoleLog = console.log
+const originalConsoleWarn = console.warn
 
-  CONSOLE_FAIL_TYPES.forEach((type) => {
-    const originalConsole = console[type]
-    console[type] = (message) => {
-      originalConsole(message)
-      throw new Error(`Failing due to console.${type} while running test!`)
-    }
-  })
+// Fail on any console.log usage
+console.log = (...args: unknown[]) => {
+  originalConsoleLog(...args)
+  throw new Error(`Failing due to console.log while running test!`)
+}
+
+// Fail only on Vue warnings, allow other warnings
+console.warn = (...args: unknown[]) => {
+  originalConsoleWarn(...args)
+
+  const message = args.join(" ")
+  if (message.includes("[Vue warn]")) {
+    throw new Error(`Failing due to Vue warning while running test!`)
+  }
 }
