@@ -2,6 +2,9 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteCreationResult;
+import com.odde.doughnut.controllers.dto.PromotePointRequestDTO;
+import com.odde.doughnut.controllers.dto.PromotePointResponseDTO;
+import com.odde.doughnut.services.ai.PointExtractionResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
@@ -137,5 +140,25 @@ public class NoteConstructionService {
     note.adjustPositionAsAChildOfParentInMemory();
     entityPersister.save(note);
     return note;
+  }
+
+  public PromotePointResponseDTO createNoteFromPromotedPoint(
+      Note originalNote,
+      PromotePointRequestDTO.PromotionType promotionType,
+      PointExtractionResult aiResult)
+      throws UnexpectedNoAccessRightException {
+    User user = authorizationService.getCurrentUser();
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+
+    Note newNote = createNoteUnderParentId(promotionType.getParentNoteId(originalNote), aiResult.newNoteTitle);
+    newNote.setDetails(aiResult.newNoteDetails);
+    newNote.setUpdatedAt(currentUTCTimestamp);
+    entityPersister.save(newNote);
+
+    originalNote.setUpdatedAt(currentUTCTimestamp);
+    originalNote.setDetails(aiResult.updatedParentDetails);
+    entityPersister.save(originalNote);
+
+    return new PromotePointResponseDTO(newNote.toNoteRealm(user), originalNote.toNoteRealm(user));
   }
 }

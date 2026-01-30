@@ -140,3 +140,4 @@ doughnut_mobile/android/app/local.properties
 # AI assistants
 .claude/
 .serena/
+frontend/vitest-test-results/

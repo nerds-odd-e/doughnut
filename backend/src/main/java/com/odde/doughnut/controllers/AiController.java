@@ -6,7 +6,6 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.controllers.dto.IgnorePointsRequestDTO;
 import com.odde.doughnut.controllers.dto.IgnorePointsResponseDTO;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
@@ -156,36 +155,15 @@ public class AiController {
 
     PromotePointRequestDTO.PromotionType promotionType = request.getPromotionType();
 
-    // 1. Call AI to generate result
-    PointExtractionResult result =
+    PointExtractionResult aiResult =
         notebookAssistantForNoteServiceFactory
             .createNoteAutomationService(note)
             .promotePoint(request.getPoint(), promotionType);
 
-    if (result == null) {
+    if (aiResult == null) {
       throw new RuntimeException("AI failed to generate extraction result");
     }
 
-    // 2. Determine parent based on promotion type
-    Integer parentNoteId =
-        promotionType == PromotePointRequestDTO.PromotionType.SIBLING
-            ? note.getParent().getId()
-            : note.getId();
-
-    // 3. Create new note under the determined parent
-    User user = authorizationService.getCurrentUser();
-    Note newNote =
-        noteConstructionService.createNoteUnderParentId(parentNoteId, result.newNoteTitle);
-    newNote.setDetails(result.newNoteDetails);
-    newNote.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-    entityPersister.save(newNote);
-
-    // 4. Update original note's details
-    note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-    note.setDetails(result.updatedParentDetails);
-    entityPersister.save(note);
-
-    // 5. Return result
-    return new PromotePointResponseDTO(newNote.toNoteRealm(user), note.toNoteRealm(user));
+    return noteConstructionService.createNoteFromPromotedPoint(note, promotionType, aiResult);
   }
 }
