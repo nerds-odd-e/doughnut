@@ -13,21 +13,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RecallQuestionService {
-  // TODO: Read from DB in future
-  private static final String TRUE_FALSE_PROMPT =
-      """
-      **True/False Question Guidelines**:
-      - Create a clear statement that can be judged as True or False based on the note content.
-      - The statement should be definitively True or False, not ambiguous or opinion-based.
-      - Use markdown formatting if needed.
-      - IMPORTANT: The choices MUST be exactly ["True", "False"] in this order.
-      - Set correctChoiceIndex to 0 if the statement is True, 1 if False.
-      - Set strictChoiceOrder to true (do not shuffle True/False choices).
-      - Balance: Generate both true and false statements with roughly equal probability.
-      - For false statements, make subtle but clear errors (not obviously wrong).
-      - Test understanding of key concepts, not trivial details.
-      """;
-
   private final PredefinedQuestionService predefinedQuestionService;
   private final RecallPromptRepository recallPromptRepository;
   private final EntityPersister entityPersister;
@@ -71,14 +56,42 @@ public class RecallQuestionService {
   }
 
   private RecallPrompt generateNewRecallPrompt(MemoryTracker memoryTracker) {
-    // TODO: Read custom prompt from DB. For now, hardcode to True/False
+    Note note = memoryTracker.getNote();
+    String customPrompt = getCustomPromptForNote(note);
     PredefinedQuestion question =
-        predefinedQuestionService.generateAFeasibleQuestion(
-            memoryTracker.getNote(), TRUE_FALSE_PROMPT);
+        predefinedQuestionService.generateAFeasibleQuestion(note, customPrompt);
     if (question == null) {
       return null;
     }
     return createARecallPromptFromQuestion(question, memoryTracker);
+  }
+
+  private String getCustomPromptForNote(Note note) {
+    // Check the note itself first
+    NoteAiAssistant aiAssistant = note.getNoteAiAssistant();
+    if (aiAssistant != null && hasValidPrompt(aiAssistant)) {
+      return aiAssistant.getAdditionalInstructionsToAi();
+    }
+
+    // Check parent notes for applyToChildren
+    Note parent = note.getParent();
+    while (parent != null) {
+      NoteAiAssistant parentAiAssistant = parent.getNoteAiAssistant();
+      if (parentAiAssistant != null
+          && Boolean.TRUE.equals(parentAiAssistant.getApplyToChildren())
+          && hasValidPrompt(parentAiAssistant)) {
+        return parentAiAssistant.getAdditionalInstructionsToAi();
+      }
+      parent = parent.getParent();
+    }
+
+    // Fallback to default MCQ prompt (null means use default)
+    return null;
+  }
+
+  private boolean hasValidPrompt(NoteAiAssistant aiAssistant) {
+    String prompt = aiAssistant.getAdditionalInstructionsToAi();
+    return prompt != null && !prompt.isBlank();
   }
 
   public RecallPrompt regenerateAQuestion(

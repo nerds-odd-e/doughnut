@@ -4,7 +4,6 @@ import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteCreationResult;
 import com.odde.doughnut.controllers.dto.PromotePointRequestDTO;
 import com.odde.doughnut.controllers.dto.PromotePointResponseDTO;
-import com.odde.doughnut.services.ai.PointExtractionResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
@@ -12,6 +11,7 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
+import com.odde.doughnut.services.ai.PointExtractionResult;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
@@ -150,7 +150,8 @@ public class NoteConstructionService {
     User user = authorizationService.getCurrentUser();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
-    Note newNote = createNoteUnderParentId(promotionType.getParentNoteId(originalNote), aiResult.newNoteTitle);
+    Note newNote =
+        createNoteUnderParentId(promotionType.getParentNoteId(originalNote), aiResult.newNoteTitle);
     newNote.setDetails(aiResult.newNoteDetails);
     newNote.setUpdatedAt(currentUTCTimestamp);
     entityPersister.save(newNote);

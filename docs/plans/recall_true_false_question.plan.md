@@ -18,7 +18,7 @@ todos:
     content: "[GREEN] Step 5: Update PredefinedQuestionService to accept custom prompt - Commit 3"
     status: pending
   - id: step6-update-recall-question-service
-    content: "[GREEN] Step 6: Update RecallQuestionService - hardcode True/False prompt for now - Commit 4"
+    content: "[GREEN] Step 6: Update RecallQuestionService - read custom prompt from NoteAiAssistant (DB) - Commit 4"
     status: pending
   - id: step7-verify-frontend-renders
     content: "[GREEN] Step 7: Verify frontend renders True/False as 2-choice MCQ"
@@ -406,41 +406,60 @@ public PredefinedQuestion generateAFeasibleQuestion(Note note) {
 
 ---
 
-**Step 6**: Update RecallQuestionService (hardcode True/False prompt) → **Commit 4**
+**Step 6**: Update RecallQuestionService (read from NoteAiAssistant DB) → **Commit 4**
 
 **File**: `backend/src/main/java/com/odde/doughnut/services/RecallQuestionService.java`
 
+Uses existing `NoteAiAssistant` entity (from commit ba8874c9) to read custom prompts from DB.
+
 ```java
-// Hardcoded True/False prompt for first version
-// TODO: Read from DB in future
-private static final String TRUE_FALSE_PROMPT = """
-    **True/False Question Guidelines**:
-    - Create a clear statement that can be judged as True or False based on the note content.
-    - The statement should be definitively True or False, not ambiguous or opinion-based.
-    - Use markdown formatting if needed.
-    - IMPORTANT: The choices MUST be exactly ["True", "False"] in this order.
-    - Set correctChoiceIndex to 0 if the statement is True, 1 if False.
-    - Set strictChoiceOrder to true (do not shuffle True/False choices).
-    - Balance: Generate both true and false statements with roughly equal probability.
-    - For false statements, make subtle but clear errors (not obviously wrong).
-    - Test understanding of key concepts, not trivial details.
-    """;
-
 private RecallPrompt generateNewRecallPrompt(MemoryTracker memoryTracker) {
-  // TODO: Read custom prompt from DB. For now, hardcode to True/False
-  String customPrompt = TRUE_FALSE_PROMPT;
-
+  Note note = memoryTracker.getNote();
+  String customPrompt = getCustomPromptForNote(note);
   PredefinedQuestion question =
-      predefinedQuestionService.generateAFeasibleQuestion(memoryTracker.getNote(), customPrompt);
+      predefinedQuestionService.generateAFeasibleQuestion(note, customPrompt);
   if (question == null) {
     return null;
   }
   return createARecallPromptFromQuestion(question, memoryTracker);
 }
+
+private String getCustomPromptForNote(Note note) {
+  // Check the note itself first
+  NoteAiAssistant aiAssistant = note.getNoteAiAssistant();
+  if (aiAssistant != null && hasValidPrompt(aiAssistant)) {
+    return aiAssistant.getAdditionalInstructionsToAi();
+  }
+
+  // Check parent notes for applyToChildren
+  Note parent = note.getParent();
+  while (parent != null) {
+    NoteAiAssistant parentAiAssistant = parent.getNoteAiAssistant();
+    if (parentAiAssistant != null
+        && Boolean.TRUE.equals(parentAiAssistant.getApplyToChildren())
+        && hasValidPrompt(parentAiAssistant)) {
+      return parentAiAssistant.getAdditionalInstructionsToAi();
+    }
+    parent = parent.getParent();
+  }
+
+  // Fallback to default MCQ prompt (null means use default)
+  return null;
+}
+
+private boolean hasValidPrompt(NoteAiAssistant aiAssistant) {
+  String prompt = aiAssistant.getAdditionalInstructionsToAi();
+  return prompt != null && !prompt.isBlank();
+}
 ```
 
+**Priority for custom prompt lookup:**
+1. Note itself → `note.getNoteAiAssistant().getAdditionalInstructionsToAi()`
+2. Parent notes with `applyToChildren = true`
+3. Fallback to default MCQ prompt (null)
+
 - Verify: `CURSOR_DEV=true nix develop -c pnpm backend:verify`
-- Commit message: `feat: use True/False prompt in RecallQuestionService (hardcoded for first version)`
+- Commit message: `feat: read custom prompt from NoteAiAssistant in RecallQuestionService`
 
 ---
 
@@ -546,7 +565,7 @@ Feature: Recall with True/False Questions
 | `NoteQuestionGenerationService.java` | Modify | Add `generateQuestionWithCustomPrompt()` |
 | `AiQuestionGenerator.java` | Modify | Add custom prompt parameter |
 | `PredefinedQuestionService.java` | Modify | Add overload `generateAFeasibleQuestion(note, customPrompt)` |
-| `RecallQuestionService.java` | Modify | Use hardcoded True/False prompt via PredefinedQuestionService |
+| `RecallQuestionService.java` | Modify | Read custom prompt from `NoteAiAssistant` (DB), fallback to default MCQ |
 | Frontend | **No changes** | Existing `QuestionChoices` renders True/False automatically |
 
 ---
@@ -571,39 +590,28 @@ Feature: Recall with True/False Questions
 
 ---
 
-## Future: Read Prompt from DB
+## DONE: Read Prompt from DB (Implemented)
 
-When ready to read prompt from DB:
+Custom prompt is now read from `NoteAiAssistant` entity (commit ba8874c9).
 
-```java
-// RecallQuestionService.java
-public RecallPrompt generateAQuestion(MemoryTracker memoryTracker) {
-  // Read custom prompt from DB (Note level, Notebook level, or User level)
-  String customPrompt = getCustomPromptFromDB(memoryTracker);
-
-  return generateRecallPromptWithCustomPrompt(memoryTracker, customPrompt);
-}
-
-private String getCustomPromptFromDB(MemoryTracker memoryTracker) {
-  Note note = memoryTracker.getNote();
-
-  // Priority: Note > Notebook > User > Default
-  if (note.getCustomQuestionPrompt() != null) {
-    return note.getCustomQuestionPrompt();
-  }
-  if (note.getNotebook().getCustomQuestionPrompt() != null) {
-    return note.getNotebook().getCustomQuestionPrompt();
-  }
-  // ... fallback to default MCQ prompt
-  return getDefaultMcqPrompt();
-}
-```
-
-DB schema (future):
+**DB Schema** (already exists):
 ```sql
-ALTER TABLE note ADD COLUMN custom_question_prompt TEXT;
-ALTER TABLE notebook ADD COLUMN custom_question_prompt TEXT;
+-- V300000120__create_note_ai_assistant.sql
+CREATE TABLE note_ai_assistant (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  note_id INT,
+  additional_instructions_to_ai TEXT,
+  apply_to_children BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP,
+  FOREIGN KEY (note_id) REFERENCES note(id)
+);
 ```
+
+**Frontend** (already exists):
+- Textarea for custom AI instruction in assimilation page
+- "Apply To Children" checkbox
+- Auto-save on blur
 
 ---
 
@@ -613,3 +621,37 @@ ALTER TABLE notebook ADD COLUMN custom_question_prompt TEXT;
 2. **Backward compatible** - MCQ still works exactly as before
 3. **Flexible** - Any question type that fits MCQ schema (2-4 choices) works
 4. **Easy to extend** - Just add new prompts in DB, no code changes needed
+
+---
+
+## Limitations (Current Design)
+
+**Schema is always `MCQWithAnswer`**
+
+`AiToolFactory.questionAiTool()` always returns `MCQWithAnswer.class` as the schema:
+
+```java
+return new InstructionAndSchema(fullInstruction.toString(), MCQWithAnswer.class);
+```
+
+This means:
+- No matter what custom prompt is written, AI output is forced into MCQ format
+- True/False works because it's a special case of MCQ (2 choices)
+- Prompts for other question types (fill-in-blank, short answer) will NOT work correctly
+- AI will attempt to fit non-MCQ prompts into MCQ format, producing unexpected results
+
+**Supported question types (current):**
+- Multiple Choice Questions (2-4 choices)
+- True/False Questions (MCQ with choices = ["True", "False"])
+
+**NOT supported (requires future work):**
+- Fill-in-the-blank
+- Short answer / Free text
+- Matching
+- Ordering
+
+**Future extension (if needed):**
+1. Add new schema classes (e.g., `FillInBlankAnswer.class`, `ShortAnswer.class`)
+2. Add `questionType` field to `NoteAiAssistant` entity
+3. Modify `questionAiTool()` to accept schema class parameter based on question type
+4. Update frontend to render different question type components
