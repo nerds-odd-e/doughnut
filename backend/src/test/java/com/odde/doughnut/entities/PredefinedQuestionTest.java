@@ -56,7 +56,8 @@ class PredefinedQuestionTest {
     @Test
     void shouldAlwaysChooseAIQuestionIfConfigured() {
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
+      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any(), any()))
+          .thenReturn(mcqWithAnswer);
       PredefinedQuestion randomQuizQuestion = generateQuizQuestionEntity(note);
       assertThat(randomQuizQuestion, instanceOf(PredefinedQuestion.class));
       PredefinedQuestion qq = randomQuizQuestion;
@@ -81,7 +82,8 @@ class PredefinedQuestionTest {
 
     @Test
     void shouldReturnOriginalQuestionWhenEvaluationPassesOrFails() {
-      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
+      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any(), any()))
+          .thenReturn(mcqWithAnswer);
       contestResult.feasibleQuestion = false;
       when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
 
@@ -92,7 +94,8 @@ class PredefinedQuestionTest {
 
     @Test
     void shouldReturnOriginalQuestionWhenEvaluationApiFails() {
-      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
+      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any(), any()))
+          .thenReturn(mcqWithAnswer);
       // Simulate evaluation API failure by returning null
       when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(null);
 
@@ -105,7 +108,8 @@ class PredefinedQuestionTest {
     @Test
     void shouldRegenerateQuestionWhenEvaluationShowsNotFeasible() {
       MCQWithAnswer regeneratedQuestion = makeMe.aMCQWithAnswer().please();
-      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
+      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any(), any()))
+          .thenReturn(mcqWithAnswer);
       contestResult.feasibleQuestion = true;
       when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
       when(aiQuestionGenerator.regenerateQuestion(any(), any(), any()))
@@ -120,7 +124,8 @@ class PredefinedQuestionTest {
     void shouldSaveBothOriginalAndRegeneratedQuestions() {
       // Setup
       MCQWithAnswer regeneratedQuestion = makeMe.aMCQWithAnswer().please();
-      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
+      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any(), any()))
+          .thenReturn(mcqWithAnswer);
       contestResult.feasibleQuestion = true;
       when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
       when(aiQuestionGenerator.regenerateQuestion(any(), any(), any()))
