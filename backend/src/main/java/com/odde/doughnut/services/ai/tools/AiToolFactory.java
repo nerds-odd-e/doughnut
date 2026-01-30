@@ -65,7 +65,7 @@ public class AiToolFactory {
         """;
   }
 
-  private static String getDefaultMcqPrompt() {
+  public static String getDefaultMcqPrompt() {
     return """
         **Multiple-Choice Question (MCQ) Guidelines**:
         - Related notes often serve as excellent distractor choices for the MCQs. But avoid more than 1 correct answers.

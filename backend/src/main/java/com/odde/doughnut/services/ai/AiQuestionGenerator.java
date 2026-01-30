@@ -51,12 +51,18 @@ public class AiQuestionGenerator {
   }
 
   public MCQWithAnswer getAiGeneratedQuestion(Note note, String additionalMessage) {
+    return getAiGeneratedQuestion(note, null, additionalMessage);
+  }
+
+  public MCQWithAnswer getAiGeneratedQuestion(
+      Note note, String customPrompt, String additionalMessage) {
     if (testabilitySettings.isOpenAiDisabled()) {
       return null;
     }
     try {
       MCQWithAnswer original =
-          noteQuestionGenerationService.generateQuestion(note, additionalMessage);
+          noteQuestionGenerationService.generateQuestionWithCustomPrompt(
+              note, customPrompt, additionalMessage);
       if (original != null && !original.isF2__strictChoiceOrder()) {
         return shuffleChoices(original);
       }

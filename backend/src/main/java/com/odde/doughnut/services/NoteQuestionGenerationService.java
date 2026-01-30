@@ -38,7 +38,12 @@ public class NoteQuestionGenerationService {
 
   public MCQWithAnswer generateQuestion(Note note, String additionalMessage)
       throws JsonProcessingException {
-    return generateQuestionWithChatCompletion(note, additionalMessage);
+    return generateQuestionWithCustomPrompt(note, null, additionalMessage);
+  }
+
+  public MCQWithAnswer generateQuestionWithCustomPrompt(
+      Note note, String customPrompt, String additionalMessage) throws JsonProcessingException {
+    return generateQuestionWithChatCompletion(note, customPrompt, additionalMessage);
   }
 
   public ChatCompletionCreateParams buildQuestionGenerationRequest(
@@ -46,7 +51,8 @@ public class NoteQuestionGenerationService {
     return requestBuilder.buildQuestionGenerationRequest(note, additionalMessage);
   }
 
-  private MCQWithAnswer generateQuestionWithChatCompletion(Note note, String additionalMessage) {
+  private MCQWithAnswer generateQuestionWithChatCompletion(
+      Note note, String customPrompt, String additionalMessage) {
     OpenAIChatRequestBuilder chatRequestBuilder = requestBuilder.getChatRequestBuilder(note);
 
     String instructions = note.getNotebookAssistantInstructions();
@@ -62,7 +68,8 @@ public class NoteQuestionGenerationService {
 
     RelationType relationType = note.isRelation() ? note.getRelationType() : null;
     NoteType noteType = note.getNoteType();
-    InstructionAndSchema tool = AiToolFactory.mcqWithAnswerAiTool(relationType, noteType);
+    String prompt = (customPrompt != null) ? customPrompt : AiToolFactory.getDefaultMcqPrompt();
+    InstructionAndSchema tool = AiToolFactory.questionAiTool(prompt, relationType, noteType);
     chatRequestBuilder.responseJsonSchema(tool);
 
     return openAiApiHandler
