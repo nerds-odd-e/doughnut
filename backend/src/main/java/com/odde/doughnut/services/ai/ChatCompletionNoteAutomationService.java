@@ -2,6 +2,7 @@ package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
+import com.odde.doughnut.controllers.dto.PromotePointRequestDTO.PromotionType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
@@ -39,12 +40,13 @@ public class ChatCompletionNoteAutomationService {
         List.of());
   }
 
-  public PointExtractionResult promotePoint(String point) throws JsonProcessingException {
-    return executeWithTool(
-        AiToolFactory.promotePointAiTool(point),
-        PointExtractionResult.class,
-        result -> result,
-        null);
+  public PointExtractionResult promotePoint(String point, PromotionType promotionType)
+      throws JsonProcessingException {
+    InstructionAndSchema tool =
+        promotionType == PromotionType.SIBLING
+            ? AiToolFactory.promotePointToSiblingAiTool(point)
+            : AiToolFactory.promotePointToChildAiTool(point);
+    return executeWithTool(tool, PointExtractionResult.class, result -> result, null);
   }
 
   private <T, R> R executeWithTool(

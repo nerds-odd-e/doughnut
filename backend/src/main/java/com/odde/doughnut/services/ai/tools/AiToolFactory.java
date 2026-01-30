@@ -217,7 +217,7 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
     return QuestionEvaluation.class;
   }
 
-  public static InstructionAndSchema promotePointAiTool(String point) {
+  public static InstructionAndSchema promotePointToChildAiTool(String point) {
     String instruction =
         """
         You are helping extract a point from a note to create a new child note.
@@ -234,6 +234,29 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
         - The new note should be self-contained and comprehensive
         - The summary in parent note should maintain reading flow
         - Keep all unrelated parts of parent details unchanged
+        """
+            .formatted(point);
+
+    return new InstructionAndSchema(instruction, promotePoint());
+  }
+
+  public static InstructionAndSchema promotePointToSiblingAiTool(String point) {
+    String instruction =
+        """
+        You are helping extract a point from a note to create a new sibling note.
+
+        Given point: "%s"
+
+        Tasks:
+        1. Generate a concise, meaningful title for the new sibling note based on this point
+        2. Expand the point into detailed content (in markdown) for the new note
+        3. Identify and completely remove the related content from the parent note's details
+
+        Guidelines:
+        - The new note should be self-contained and comprehensive
+        - Simply remove the extracted point from parent note's details (do not replace with summary)
+        - Keep all unrelated parts of parent details unchanged
+        - Ensure the remaining content in parent note still reads naturally
         """
             .formatted(point);
 

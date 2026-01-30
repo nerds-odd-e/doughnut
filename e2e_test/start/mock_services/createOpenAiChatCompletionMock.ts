@@ -118,6 +118,9 @@ const openAiChatCompletionStubber = (
     stubExtractPointToChild(argumentsString: string) {
       return stubJsonSchemaResponse(argumentsString)
     },
+    stubExtractPointToSibling(argumentsString: string) {
+      return stubJsonSchemaResponse(argumentsString)
+    },
   }
 }
 

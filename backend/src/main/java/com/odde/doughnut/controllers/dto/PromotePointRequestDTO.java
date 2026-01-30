@@ -7,7 +7,12 @@ import lombok.Setter;
 @Setter
 @Getter
 public class PromotePointRequestDTO {
+  public enum PromotionType {
+    CHILD,
+    SIBLING
+  }
+
   private String point;
 
-  @NotNull private Integer parentNoteId;
+  @NotNull private PromotionType promotionType;
 }

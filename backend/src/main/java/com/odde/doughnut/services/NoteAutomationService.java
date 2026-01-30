@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.controllers.dto.PromotePointRequestDTO.PromotionType;
 import com.odde.doughnut.services.ai.ChatCompletionNoteAutomationService;
 
 public final class NoteAutomationService {
@@ -19,9 +20,9 @@ public final class NoteAutomationService {
     return chatCompletionNoteAutomationService.generateUnderstandingChecklist();
   }
 
-  public com.odde.doughnut.services.ai.PointExtractionResult promotePoint(String point)
-      throws JsonProcessingException {
-    return chatCompletionNoteAutomationService.promotePoint(point);
+  public com.odde.doughnut.services.ai.PointExtractionResult promotePoint(
+      String point, PromotionType promotionType) throws JsonProcessingException {
+    return chatCompletionNoteAutomationService.promotePoint(point, promotionType);
   }
 
   public String regenerateDetailsFromPoints(java.util.List<String> points)

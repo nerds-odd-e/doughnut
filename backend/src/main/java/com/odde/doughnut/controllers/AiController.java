@@ -154,31 +154,37 @@ public class AiController {
 
     authorizationService.assertAuthorization(note);
 
+    PromotePointRequestDTO.PromotionType promotionType = request.getPromotionType();
+
     // 1. Call AI to generate result
     PointExtractionResult result =
         notebookAssistantForNoteServiceFactory
             .createNoteAutomationService(note)
-            .promotePoint(request.getPoint());
+            .promotePoint(request.getPoint(), promotionType);
 
     if (result == null) {
       throw new RuntimeException("AI failed to generate extraction result");
     }
 
-    // 2. Create new note under the specified parent (authorization checked in service)
+    // 2. Determine parent based on promotion type
+    Integer parentNoteId =
+        promotionType == PromotePointRequestDTO.PromotionType.SIBLING
+            ? note.getParent().getId()
+            : note.getId();
+
+    // 3. Create new note under the determined parent
     User user = authorizationService.getCurrentUser();
-    Note newNote =
-        noteConstructionService.createNoteUnderParentId(
-            request.getParentNoteId(), result.newNoteTitle);
+    Note newNote = noteConstructionService.createNoteUnderParentId(parentNoteId, result.newNoteTitle);
     newNote.setDetails(result.newNoteDetails);
     newNote.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     entityPersister.save(newNote);
 
-    // 3. Update original note's details
+    // 4. Update original note's details
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     note.setDetails(result.updatedParentDetails);
     entityPersister.save(note);
 
-    // 4. Return result
+    // 5. Return result
     return new PromotePointResponseDTO(newNote.toNoteRealm(user), note.toNoteRealm(user));
   }
 }

@@ -14,6 +14,12 @@ import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import { computed, ref } from "vue"
 import usePopups from "@/components/commons/Popups/usePopups"
+import type { PromotePointRequestDto } from "@generated/backend"
+
+const PromotionType = {
+  CHILD: "CHILD",
+  SIBLING: "SIBLING",
+} as const satisfies Record<string, PromotePointRequestDto["promotionType"]>
 
 vi.mock("@/composables/useRecallData")
 vi.mock("@/composables/useAssimilationCount")
@@ -191,10 +197,10 @@ describe("Assimilation component", () => {
       await wrapper.find("li button").trigger("click")
       await flushPromises()
 
-      // Verify AI API is called with the point text and parentNoteId
+      // Verify AI API is called with the point text and promotionType
       expect(extractPointSpy).toHaveBeenCalledWith({
         path: { note: note.id },
-        body: { point: "Test Point", parentNoteId: note.id },
+        body: { point: "Test Point", promotionType: PromotionType.CHILD },
       })
     })
 
@@ -288,10 +294,10 @@ describe("Assimilation component", () => {
       await buttons[1]?.trigger("click")
       await flushPromises()
 
-      // Verify AI API is called with the parent's id as parentNoteId
+      // Verify AI API is called with promotionType SIBLING
       expect(promotePointSpy).toHaveBeenCalledWith({
         path: { note: childNote.id },
-        body: { point: "Test Point", parentNoteId: childNote.parentId },
+        body: { point: "Test Point", promotionType: PromotionType.SIBLING },
       })
     })
 

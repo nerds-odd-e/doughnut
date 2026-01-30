@@ -101,12 +101,17 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/backend"
+import type { Note, PromotePointRequestDto } from "@generated/backend"
 import {
   AiController,
   AssimilationController,
   TextContentController,
 } from "@generated/backend/sdk.gen"
+
+const PromotionType = {
+  CHILD: "CHILD",
+  SIBLING: "SIBLING",
+} as const satisfies Record<string, PromotePointRequestDto["promotionType"]>
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
 import NoteInfoBar from "../notes/NoteInfoBar.vue"
@@ -333,15 +338,14 @@ const handleAddAnswer = async (answer: string) => {
 const promotePoint = async (
   point: string,
   index: number,
-  parentNoteId: number
+  promotionType: PromotePointRequestDto["promotionType"]
 ) => {
   isPromotingPoint.value = true
   try {
-    // Call AI endpoint to promote point to a new note
     const { data: result, error } = await apiCallWithLoading(() =>
       AiController.promotePoint({
         path: { note: note.id },
-        body: { point, parentNoteId },
+        body: { point, promotionType },
       })
     )
 
@@ -350,17 +354,14 @@ const promotePoint = async (
       return
     }
 
-    // Extract non-null values for type safety
     const createdNote = result.createdNote
     const updatedParentNote = result.updatedParentNote
 
-    // Update storage (including parent note which was updated by AI)
     if (storageAccessor.value) {
       storageAccessor.value.refreshNoteRealm(createdNote)
       storageAccessor.value.refreshNoteRealm(updatedParentNote)
     }
 
-    // Remove the point from the list
     understandingPoints.value.splice(index, 1)
   } catch (err) {
     console.error("Failed to promote point:", err)
@@ -371,14 +372,11 @@ const promotePoint = async (
 }
 
 const promotePointToChildNote = (point: string, index: number) => {
-  // Create as child: use current note as parent (pass note.id)
-  promotePoint(point, index, note.id)
+  promotePoint(point, index, PromotionType.CHILD)
 }
 
 const promotePointToSiblingNote = (point: string, index: number) => {
-  // Create as sibling: use current note's parent as parent
-  // note.parentId is guaranteed to exist because button is disabled when !note.parentId
-  promotePoint(point, index, note.parentId!)
+  promotePoint(point, index, PromotionType.SIBLING)
 }
 </script>
 

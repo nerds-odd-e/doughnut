@@ -426,7 +426,7 @@ export type RemovePointsResponseDto = {
 
 export type PromotePointRequestDto = {
     point?: string;
-    parentNoteId: number;
+    promotionType: 'CHILD' | 'SIBLING';
 };
 
 export type PromotePointResponseDto = {

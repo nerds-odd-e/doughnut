@@ -4500,11 +4500,13 @@ components:
       properties:
         point:
           type: string
-        parentNoteId:
-          type: integer
-          format: int32
+        promotionType:
+          type: string
+          enum:
+          - CHILD
+          - SIBLING
       required:
-      - parentNoteId
+      - promotionType
     PromotePointResponseDTO:
       type: object
       properties:
