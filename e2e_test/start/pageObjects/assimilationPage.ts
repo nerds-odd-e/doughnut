@@ -158,6 +158,7 @@ export const assumeAssimilationPage = () => ({
     // Find the understanding checklist by its heading text
     cy.contains('Understanding Checklist:')
       .closest('.daisy-bg-accent')
+      .scrollIntoView()
       .should('be.visible')
     // Count the number of list items (understanding points) in the checklist
     cy.contains('Understanding Checklist:')
