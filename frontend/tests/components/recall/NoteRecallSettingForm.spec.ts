@@ -11,6 +11,7 @@ describe("NoteRecallSettingForm", () => {
       skipMemoryTracking: false,
     },
     noteDetails: "some details",
+    isLinkNote: false,
   }
 
   beforeEach(() => {
