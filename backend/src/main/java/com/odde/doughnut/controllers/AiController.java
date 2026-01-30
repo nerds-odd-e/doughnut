@@ -174,7 +174,8 @@ public class AiController {
 
     // 3. Create new note under the determined parent
     User user = authorizationService.getCurrentUser();
-    Note newNote = noteConstructionService.createNoteUnderParentId(parentNoteId, result.newNoteTitle);
+    Note newNote =
+        noteConstructionService.createNoteUnderParentId(parentNoteId, result.newNoteTitle);
     newNote.setDetails(result.newNoteDetails);
     newNote.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     entityPersister.save(newNote);
