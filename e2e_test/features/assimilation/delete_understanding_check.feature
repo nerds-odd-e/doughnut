@@ -23,7 +23,8 @@ Feature: Delete Understanding Check Points
     And OpenAI will delete related content and return new details:
       | English dominates the internet and digital world, with most online content in the language. It's vital for global communication and connects people across cultures. Proficiency in English enhances career opportunities and simplifies travel. |
     And I click the delete understanding points button
-    And I confirm the deletion
+    And I confirm deleting the understanding points
+    And I wait for the page to reload and the note details to be updated
     Then the note details should be "English dominates the internet and digital world, with most online content in the language. It's vital for global communication and connects people across cultures. Proficiency in English enhances career opportunities and simplifies travel."
 
   @ignore

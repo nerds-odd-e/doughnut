@@ -197,3 +197,15 @@ Then(
       .startConversationAboutAssessmentQuestion(feedback)
   }
 )
+
+When('I confirm deleting the understanding points', () => {
+  // Setup intercept before confirming to catch the reload API call
+  cy.intercept('GET', '**/api/notes/*').as(
+    'reloadAfterDeletion'
+  )
+  cy.findByRole('button', { name: 'OK' }).click()
+})
+
+When('I wait for the page to reload and the note details to be updated', () => {
+  cy.wait('@reloadAfterDeletion', { timeout: 10000 })
+})

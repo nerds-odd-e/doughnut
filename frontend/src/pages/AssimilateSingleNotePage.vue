@@ -1,5 +1,6 @@
 <template>
   <AssimilateSingleNotePageView
+    :key="reloadKey"
     :note="note"
     @initial-review-done="initialReviewDone"
     @reload-needed="onReloadNeeded"
@@ -34,8 +35,11 @@ const initialReviewDone = () => {
   router.push({ name: "noteShow", params: { noteId } })
 }
 
-const onReloadNeeded = () => {
-  loadNote()
+const reloadKey = ref(0)
+
+const onReloadNeeded = async () => {
+  await loadNote()
+  reloadKey.value += 1
 }
 
 onMounted(() => {

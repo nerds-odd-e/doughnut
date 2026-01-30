@@ -224,7 +224,7 @@ Given(
         .chatCompletion()
         .requestMessageMatches({
           role: 'system',
-          content: '.*delete.*understanding.*points.*',
+          content: '.*remove.*points.*',
         })
         .stubDeletePoints(reply)
     })
