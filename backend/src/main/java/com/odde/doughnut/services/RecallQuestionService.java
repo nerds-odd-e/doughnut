@@ -13,6 +13,21 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RecallQuestionService {
+  // TODO: Read from DB in future
+  private static final String TRUE_FALSE_PROMPT =
+      """
+      **True/False Question Guidelines**:
+      - Create a clear statement that can be judged as True or False based on the note content.
+      - The statement should be definitively True or False, not ambiguous or opinion-based.
+      - Use markdown formatting if needed.
+      - IMPORTANT: The choices MUST be exactly ["True", "False"] in this order.
+      - Set correctChoiceIndex to 0 if the statement is True, 1 if False.
+      - Set strictChoiceOrder to true (do not shuffle True/False choices).
+      - Balance: Generate both true and false statements with roughly equal probability.
+      - For false statements, make subtle but clear errors (not obviously wrong).
+      - Test understanding of key concepts, not trivial details.
+      """;
+
   private final PredefinedQuestionService predefinedQuestionService;
   private final RecallPromptRepository recallPromptRepository;
   private final EntityPersister entityPersister;
@@ -56,8 +71,10 @@ public class RecallQuestionService {
   }
 
   private RecallPrompt generateNewRecallPrompt(MemoryTracker memoryTracker) {
+    // TODO: Read custom prompt from DB. For now, hardcode to True/False
     PredefinedQuestion question =
-        predefinedQuestionService.generateAFeasibleQuestion(memoryTracker.getNote());
+        predefinedQuestionService.generateAFeasibleQuestion(
+            memoryTracker.getNote(), TRUE_FALSE_PROMPT);
     if (question == null) {
       return null;
     }
