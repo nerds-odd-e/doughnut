@@ -85,14 +85,14 @@ public class QuestionGenerationRequestBuilder {
 
       StringBuilder instruction = new StringBuilder();
       instruction.append(
-          "IMPORTANT: The following points from the note should NOT be used to generate questions. Do NOT create questions based on these points:\n\n");
+          "IMPORTANT: The following points from the note should NOT be used to generate questions and choices. Do NOT create questions and choices based on these points:\n\n");
       for (String point : ignoredPoints) {
         if (point != null && !point.trim().isEmpty()) {
           instruction.append("- ").append(point.trim()).append("\n");
         }
       }
       instruction.append(
-          "\nWhen generating questions, completely avoid referencing or testing knowledge about these excluded points.");
+          "\nWhen generating questions and choices, completely avoid referencing or testing knowledge about these excluded points.");
 
       return instruction.toString();
     } catch (JsonProcessingException e) {
