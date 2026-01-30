@@ -14,17 +14,20 @@ todos:
   - id: step4-update-ai-question-generator
     content: "[GREEN] Step 4: Update AiQuestionGenerator to pass custom prompt - Commit 2"
     status: pending
-  - id: step5-update-recall-question-service
-    content: "[GREEN] Step 5: Update RecallQuestionService - hardcode True/False prompt for now - Commit 3"
+  - id: step5-update-predefined-question-service
+    content: "[GREEN] Step 5: Update PredefinedQuestionService to accept custom prompt - Commit 3"
     status: pending
-  - id: step6-verify-frontend-renders
-    content: "[GREEN] Step 6: Verify frontend renders True/False as 2-choice MCQ"
+  - id: step6-update-recall-question-service
+    content: "[GREEN] Step 6: Update RecallQuestionService - hardcode True/False prompt for now - Commit 4"
     status: pending
-  - id: step7-create-e2e-feature
-    content: "[REFACTOR] Step 7: Create E2E feature file for True/False questions - Commit 4"
+  - id: step7-verify-frontend-renders
+    content: "[GREEN] Step 7: Verify frontend renders True/False as 2-choice MCQ"
     status: pending
-  - id: step8-run-all-tests
-    content: "[FINAL] Step 8: Run all tests and verify no regression"
+  - id: step8-create-e2e-feature
+    content: "[REFACTOR] Step 8: Create E2E feature file for True/False questions - Commit 5"
+    status: pending
+  - id: step9-run-all-tests
+    content: "[FINAL] Step 9: Run all CI tests (backend, frontend, lint, E2E)"
     status: pending
 isProject: false
 ---
@@ -353,7 +356,57 @@ public MCQWithAnswer getAiGeneratedQuestion(Note note, String additionalMessage)
 
 ---
 
-**Step 5**: Update RecallQuestionService (hardcode True/False prompt) → **Commit 3**
+**Step 5**: Update PredefinedQuestionService to accept custom prompt → **Commit 3**
+
+**File**: `backend/src/main/java/com/odde/doughnut/services/PredefinedQuestionService.java`
+
+```java
+// New method with custom prompt (keeps regeneration logic)
+public PredefinedQuestion generateAFeasibleQuestion(Note note, String customPrompt) {
+  MCQWithAnswer mcqWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note, customPrompt, null);
+  if (mcqWithAnswer == null) {
+    return null;
+  }
+
+  PredefinedQuestion result = PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
+  entityPersister.save(result);
+
+  // Auto-evaluate and regenerate up to regenerationTimes (same as existing logic)
+  for (int i = 0; i < regenerationTimes; i++) {
+    QuestionContestResult contestResult = contest(result);
+
+    if (contestResult == null || contestResult.rejected) {
+      return result;
+    }
+
+    // Try to regenerate with the contest feedback
+    MCQWithAnswer regeneratedQuestion =
+        aiQuestionGenerator.regenerateQuestion(contestResult, note, mcqWithAnswer);
+    if (regeneratedQuestion != null) {
+      PredefinedQuestion regenerated =
+          PredefinedQuestion.fromMCQWithAnswer(regeneratedQuestion, note);
+      result = entityPersister.save(regenerated);
+      mcqWithAnswer = regeneratedQuestion;
+    } else {
+      return result;
+    }
+  }
+
+  return result;
+}
+
+// Keep backward compatible method (uses null for customPrompt = default MCQ)
+public PredefinedQuestion generateAFeasibleQuestion(Note note) {
+  return generateAFeasibleQuestion(note, null);
+}
+```
+
+- Verify: `CURSOR_DEV=true nix develop -c pnpm backend:verify`
+- Commit message: `feat: add custom prompt support to PredefinedQuestionService`
+
+---
+
+**Step 6**: Update RecallQuestionService (hardcode True/False prompt) → **Commit 4**
 
 **File**: `backend/src/main/java/com/odde/doughnut/services/RecallQuestionService.java`
 
@@ -373,41 +426,16 @@ private static final String TRUE_FALSE_PROMPT = """
     - Test understanding of key concepts, not trivial details.
     """;
 
-public RecallPrompt generateAQuestion(MemoryTracker memoryTracker) {
-  RecallPrompt existingPrompt = findExistingUnansweredRecallPrompt(memoryTracker);
-  if (existingPrompt != null) {
-    return existingPrompt;
-  }
-
+private RecallPrompt generateNewRecallPrompt(MemoryTracker memoryTracker) {
   // TODO: Read custom prompt from DB. For now, hardcode to True/False
   String customPrompt = TRUE_FALSE_PROMPT;
 
-  return generateRecallPromptWithCustomPrompt(memoryTracker, customPrompt);
-}
-
-private RecallPrompt generateRecallPromptWithCustomPrompt(
-    MemoryTracker memoryTracker,
-    String customPrompt) {
-
-  Note note = memoryTracker.getNote();
-
-  MCQWithAnswer mcqWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(
-      note, customPrompt, null);
-
-  if (mcqWithAnswer == null || !mcqWithAnswer.isValid()) {
+  PredefinedQuestion question =
+      predefinedQuestionService.generateAFeasibleQuestion(memoryTracker.getNote(), customPrompt);
+  if (question == null) {
     return null;
   }
-
-  PredefinedQuestion predefinedQuestion = PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
-  entityPersister.save(predefinedQuestion);
-
-  RecallPrompt recallPrompt = new RecallPrompt();
-  recallPrompt.setMemoryTracker(memoryTracker);
-  recallPrompt.setPredefinedQuestion(predefinedQuestion);
-  recallPrompt.setQuestionType(QuestionType.MCQ); // True/False is still MCQ
-  entityPersister.save(recallPrompt);
-
-  return recallPrompt;
+  return createARecallPromptFromQuestion(question, memoryTracker);
 }
 ```
 
@@ -418,7 +446,7 @@ private RecallPrompt generateRecallPromptWithCustomPrompt(
 
 ### Phase 3: GREEN - Verify Frontend
 
-**Step 6**: Verify frontend renders True/False as 2-choice MCQ
+**Step 7**: Verify frontend renders True/False as 2-choice MCQ
 
 No code changes needed! The existing `QuestionChoices.vue` will automatically render:
 
@@ -451,7 +479,7 @@ Frontend will render two buttons: **True** and **False**.
 
 ### Phase 4: REFACTOR - E2E Tests
 
-**Step 7**: Create E2E feature file → **Commit 4**
+**Step 8**: Create E2E feature file → **Commit 5**
 
 **File**: `e2e_test/features/recall/recall_true_false_question.feature`
 
@@ -498,12 +526,15 @@ Feature: Recall with True/False Questions
 
 ### Phase 5: FINAL
 
-**Step 8**: Run all tests
+**Step 9**: Run all CI tests (including linting)
 
-- Backend: `CURSOR_DEV=true nix develop -c pnpm backend:verify`
-- Frontend: `CURSOR_DEV=true nix develop -c pnpm frontend:test`
-- E2E: `CURSOR_DEV=true nix develop -c pnpm cypress run`
-- Lint: `CURSOR_DEV=true nix develop -c pnpm lint:all`
+- Backend tests: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- Backend verify: `CURSOR_DEV=true nix develop -c pnpm backend:verify`
+- Frontend tests: `CURSOR_DEV=true nix develop -c pnpm frontend:test`
+- Linting: `CURSOR_DEV=true nix develop -c pnpm lint:all`
+- Format check: `CURSOR_DEV=true nix develop -c pnpm format:all`
+- E2E tests: `CURSOR_DEV=true nix develop -c pnpm cypress run`
+- Manual test: `pnpm sut` → do recall → verify True/False buttons appear
 
 ---
 
@@ -514,7 +545,8 @@ Feature: Recall with True/False Questions
 | `AiToolFactory.java` | **Refactor** | Extract base instruction, add `questionAiTool(customPrompt)` |
 | `NoteQuestionGenerationService.java` | Modify | Add `generateQuestionWithCustomPrompt()` |
 | `AiQuestionGenerator.java` | Modify | Add custom prompt parameter |
-| `RecallQuestionService.java` | Modify | Use hardcoded True/False prompt |
+| `PredefinedQuestionService.java` | Modify | Add overload `generateAFeasibleQuestion(note, customPrompt)` |
+| `RecallQuestionService.java` | Modify | Use hardcoded True/False prompt via PredefinedQuestionService |
 | Frontend | **No changes** | Existing `QuestionChoices` renders True/False automatically |
 
 ---
