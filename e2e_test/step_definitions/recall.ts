@@ -500,3 +500,12 @@ Then(
 Then('the {string} checkbox should be checked', (checkboxLabel: string) => {
   start.assumeAssimilationPage().expectApplyToChildrenChecked()
 })
+
+Then(
+  'I should see the assimilation counter increased by {int} in the sidebar',
+  (incrementCount: number) => {
+    // After re-assimilation, the note should appear in the assimilation queue
+    // The counter should show the expected count
+    start.assimilation().expectCount(incrementCount)
+  }
+)

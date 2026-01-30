@@ -96,9 +96,11 @@ import {
   watch,
 } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
+import { useAssimilationCount } from "@/composables/useAssimilationCount"
 
 type RecallResult = QuestionResult | SpellingResult
 const { popups } = usePopups()
+const { dueCount, setDueCount } = useAssimilationCount()
 const {
   currentRecallWindowEndAt,
   setCurrentRecallWindowEndAt,
@@ -289,6 +291,7 @@ const handleThresholdExceeded = async (memoryTrackerId: number | undefined) => {
     await MemoryTrackerController.reAssimilate({
       path: { memoryTracker: memoryTrackerId },
     })
+    setDueCount((dueCount.value ?? 0) + 1)
   }
 }
 

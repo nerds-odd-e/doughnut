@@ -55,3 +55,4 @@ Feature: Re-assimilate note after too many wrong answers
     When I am recalling my note on day 7
     Then I should see that I have no notes to recall today
     And I should see that I have 1 new notes to assimilate
+    And I should see the assimilation counter increased by 1 in the sidebar
