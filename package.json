@@ -64,7 +64,7 @@
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
     "@biomejs/biome": "2.3.13",
     "@cucumber/cucumber": "^12.6.0",
-    "@hey-api/openapi-ts": "0.91.0",
+    "@hey-api/openapi-ts": "0.91.1",
     "@mbtest/mountebank": "2.9.2",
     "@modelcontextprotocol/sdk": "^1.25.3",
     "@redocly/cli": "^2.15.0",
@@ -110,7 +110,8 @@
       "undici": ">=6.23.0",
       "diff": ">=8.0.3",
       "lodash-es": ">=4.17.23",
-      "lodash": ">=4.17.23"
+      "lodash": ">=4.17.23",
+      "fast-xml-parser": ">=5.3.4"
     },
     "onlyBuiltDependencies": [
       "@badeball/cypress-cucumber-preprocessor",

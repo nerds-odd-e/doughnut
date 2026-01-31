@@ -61,9 +61,7 @@ Given('OpenAI also generates this question:', (questionTable: DataTable) => {
       `Expected exactly one row in the data table, but got ${hashes.length}`
     )
   }
-  start
-    .questionGenerationService()
-    .stubAskingMCQByChatCompletion(hashes[0])
+  start.questionGenerationService().stubAskingMCQByChatCompletion(hashes[0])
 })
 
 Given(
