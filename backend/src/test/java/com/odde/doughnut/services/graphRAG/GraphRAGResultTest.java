@@ -214,8 +214,8 @@ class GraphRAGResultTest {
 
     @Test
     void shouldIncludeDetailsTruncatedAsTrueWhenDetailsAreTruncated() throws Exception {
-      // Arrange - create details longer than truncation limit (250 bytes)
-      String longDetails = "x".repeat(300); // 300 characters should exceed 250 bytes
+      // Arrange - create details longer than truncation limit (500 bytes)
+      String longDetails = "x".repeat(600); // 600 characters should exceed 500 bytes
       Note note = makeMe.aNote().title("Long Note").details(longDetails).please();
       BareNote bareNote = BareNote.fromNote(note, RelationshipToFocusNote.Child);
 
