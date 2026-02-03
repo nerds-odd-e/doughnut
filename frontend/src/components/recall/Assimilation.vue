@@ -87,6 +87,7 @@
   </div>
   <AssimilationButtons
     :key="buttonKey"
+    :disabled="!noteInfoLoaded"
     @assimilate="processForm"
   />
   <SpellingVerificationPopup
@@ -147,6 +148,7 @@ const storageAccessor = useStorageAccessor()
 const buttonKey = computed(() => note.id)
 const showSpellingPopup = ref(false)
 const rememberSpelling = ref(false)
+const noteInfoLoaded = ref(false) // Track if noteInfo has been loaded
 const currentDetails = ref(note.details)
 const isPromotingPoint = ref(false)
 const isDeletingPoints = ref(false)
@@ -189,6 +191,7 @@ const onNoteInfoLoaded = () => {
 
 const onRememberSpellingChanged = (value: boolean) => {
   rememberSpelling.value = value
+  noteInfoLoaded.value = true // Mark as loaded when we receive the value
 }
 
 const onNoteTypeUpdated = () => {

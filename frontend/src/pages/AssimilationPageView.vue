@@ -54,7 +54,7 @@
         v-bind="{ note }"
         @initial-review-done="initialReviewDone"
         @reload-needed="onReloadNeeded"
-        :key="note.id"
+        :key="`${note.id}-${note.updatedAt}`"
       />
     </template>
   </div>
