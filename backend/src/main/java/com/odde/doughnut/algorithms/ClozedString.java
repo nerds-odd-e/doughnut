@@ -51,7 +51,10 @@ public class ClozedString {
 
   private String cloze(String content) {
     return new HtmlOrMarkdown(content)
-        .replaceText(text -> clozeReplacement.maskPronunciationsAndTitles(text, noteTitles));
+        .replaceTextWithContext(
+            (text, followsNonWhitespace) ->
+                clozeReplacement.maskPronunciationsAndTitles(
+                    text, noteTitles, followsNonWhitespace));
   }
 
   private String htmlContent() {

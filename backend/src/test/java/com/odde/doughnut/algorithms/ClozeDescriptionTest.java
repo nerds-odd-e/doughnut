@@ -57,6 +57,7 @@ class ClozeDescriptionTest {
     "cat/dog(animal/weather), dog day is a hot weather,   [...] day is a hot <...>",
     "6,               6year,                              [...]year",
     "cat,             <p class='cat'>a cat</p>,           <p class='cat'>a [...]</p>",
+    "～かたわら,        彼女は猫を可愛がる*かたわら*、犬に対してはなぜか冷たい。,  [...]",
   })
   void clozeDescription(String title, String details, String expectedClozeDescription) {
     assertThat(
