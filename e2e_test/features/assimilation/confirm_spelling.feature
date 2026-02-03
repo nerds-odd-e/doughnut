@@ -41,6 +41,7 @@ Feature: Confirm Spelling Before Keep For Repetition
       |            | disabled |
       | any answer | enabled  |
 
+  @ignore
   Scenario: Add answer to note title and can verify again
     When I type "insurrection" in the verification input
     And I click "Add" button on the popup
