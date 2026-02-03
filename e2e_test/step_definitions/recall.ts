@@ -498,7 +498,11 @@ Then(
 )
 
 Then('the {string} checkbox should be checked', (checkboxLabel: string) => {
-  start.assumeAssimilationPage().expectApplyToChildrenChecked()
+  if (checkboxLabel === 'Apply To Children') {
+    start.assumeAssimilationPage().expectApplyToChildrenChecked()
+  } else {
+    start.assumeAssimilationPage().expectCheckboxChecked(checkboxLabel)
+  }
 })
 
 Then(

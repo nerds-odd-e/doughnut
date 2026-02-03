@@ -296,6 +296,10 @@ export const assumeAssimilationPage = () => ({
     cy.formField(fieldLabel).should('not.be.disabled')
     return this
   },
+  expectCheckboxChecked(fieldLabel: string) {
+    cy.formField(fieldLabel).should('be.checked')
+    return this
+  },
   updateNoteDetails(newDetails: string) {
     cy.get('[role="details"]').click()
     cy.focused().clear()

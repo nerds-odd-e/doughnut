@@ -15,6 +15,7 @@ import { NoteController } from "@generated/backend/sdk.gen"
 import NoteInfoComponent from "./NoteInfoComponent.vue"
 import { ref, watch, computed } from "vue"
 import type { NoteType } from "@/models/noteTypeOptions"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const props = defineProps<{
   noteId: number
@@ -35,9 +36,11 @@ const currentNoteDetails = computed(
 )
 
 const fetchData = async () => {
-  const { data: noteInfoData, error } = await NoteController.getNoteInfo({
-    path: { note: props.noteId },
-  })
+  const { data: noteInfoData, error } = await apiCallWithLoading(() =>
+    NoteController.getNoteInfo({
+      path: { note: props.noteId },
+    })
+  )
   if (!error) {
     noteInfo.value = noteInfoData!
     emit("noteInfoLoaded", noteInfoData?.noteType)

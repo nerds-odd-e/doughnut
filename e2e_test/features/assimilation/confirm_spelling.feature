@@ -46,6 +46,7 @@ Feature: Confirm Spelling Before Keep For Repetition
     And I click "Add" button on the popup
     Then the popup should be closed
     And the note title should be updated to "sedition / insurrection"
+    And the "Remember Spelling" checkbox should be checked
     When I click "Keep for repetition" button
     Then I should see the spelling verification popup
 

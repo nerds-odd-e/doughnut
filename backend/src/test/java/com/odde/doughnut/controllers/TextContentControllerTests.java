@@ -42,6 +42,20 @@ class TextContentControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void shouldPreserveRecallSettingsWhenUpdatingTitle() throws UnexpectedNoAccessRightException {
+      // Set remember spelling to true
+      note.getRecallSetting().setRememberSpelling(true);
+      makeMe.refresh(note);
+
+      // Update the title
+      NoteRealm response = controller.updateNoteTitle(note, noteUpdateTitleDTO);
+
+      // Verify recall settings are preserved
+      makeMe.refresh(note);
+      assertThat(note.getRecallSetting().getRememberSpelling(), equalTo(true));
+    }
+
+    @Test
     void shouldNotAllowOthersToChange() {
       note = makeMe.aNote("another").creatorAndOwner(makeMe.aUser().please()).please();
       assertThrows(
