@@ -52,7 +52,7 @@ import { NoteController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"
-import { defineComponent, computed, ref } from "vue"
+import { defineComponent, computed, ref, watch } from "vue"
 import CheckInput from "../form/CheckInput.vue"
 import RadioButtons from "../form/RadioButtons.vue"
 
@@ -82,6 +82,16 @@ export default defineComponent({
     const formData = ref<NoteRecallSetting>(props.noteRecallSetting || {})
     const errors = ref<Partial<Record<keyof NoteRecallSetting, string>>>({})
 
+    // Keep formData in sync with props for merge operations in updateModelValue
+    watch(
+      () => props.noteRecallSetting,
+      (newValue) => {
+        if (newValue) {
+          formData.value = newValue
+        }
+      }
+    )
+
     // AI Assistant state
     const aiInstructionValue = ref(
       props.noteAiAssistant?.additionalInstructionsToAi || ""
@@ -101,7 +111,8 @@ export default defineComponent({
     )
 
     const rememberSpellingValue = computed(
-      () => !isSpellingDisabled.value && formData.value.rememberSpelling
+      () =>
+        !isSpellingDisabled.value && props.noteRecallSetting?.rememberSpelling
     )
 
     const levelAsString = computed(() =>

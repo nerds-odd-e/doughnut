@@ -383,6 +383,7 @@ When('I check the option of remembering spelling', () => {
 })
 
 When('I click {string} button', (buttonName: string) => {
+  cy.pageIsNotLoading()
   cy.findByRole('button', { name: buttonName }).click()
 })
 

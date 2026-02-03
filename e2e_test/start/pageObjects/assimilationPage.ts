@@ -276,6 +276,9 @@ export const assumeAssimilationPage = () => ({
       'contain.text',
       expectedTitle
     )
+    // Additional check to ensure all state propagation completes
+    // This gives time for NoteInfoBar event emission to reach parent
+    cy.pageIsNotLoading()
   },
   expectVerificationInputEmpty() {
     cy.get('[data-test="spelling-verification-input"]').should('have.value', '')

@@ -13,7 +13,7 @@
 import { onMounted, ref } from "vue"
 import type { Note } from "@generated/backend"
 import { AssimilationController } from "@generated/backend/sdk.gen"
-import {} from "@/managedApi/clientSetup"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import AssimilationPageView from "./AssimilationPageView.vue"
@@ -32,10 +32,11 @@ const initialReviewDone = () => {
 }
 
 const loadInitialReview = async () => {
-  const { data: assimilatingNotes, error } =
-    await AssimilationController.assimilating({
+  const { data: assimilatingNotes, error } = await apiCallWithLoading(() =>
+    AssimilationController.assimilating({
       query: { timezone: timezoneParam() },
     })
+  )
   if (!error) {
     notes.value = assimilatingNotes!
     setDueCount(assimilatingNotes!.length)
