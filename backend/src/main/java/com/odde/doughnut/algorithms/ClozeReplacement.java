@@ -43,15 +43,23 @@ record ClozeReplacement(
     return noteTitle.stream().reduce(processed, replacer, (x, y) -> y);
   }
 
-  String maskPronunciationsAndTitles(String originalContent1, List<NoteTitle> noteTitles1) {
+  String maskPronunciationsAndTitles(
+      String originalContent1, List<NoteTitle> noteTitles1, boolean followsNonWhitespace) {
     final String internalPronunciationReplacement = "__p_r_o_n_u_n_c__";
     final Pattern pattern =
         Pattern.compile(
             "/[^\\s/][^/\\n]*/(?!\\w)", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CHARACTER_CLASS);
+    // If this segment follows a non-whitespace character in the original HTML,
+    // prepend a zero-width marker so suffix patterns can match at segment start
+    String contentToProcess = originalContent1;
+    if (followsNonWhitespace) {
+      contentToProcess = HtmlOrMarkdown.NON_WHITESPACE_CONTEXT_MARKER + originalContent1;
+    }
     String pronunciationsReplaced =
-        pattern.matcher(originalContent1).replaceAll(internalPronunciationReplacement);
+        pattern.matcher(contentToProcess).replaceAll(internalPronunciationReplacement);
     return noteTitles1.stream()
         .reduce(pronunciationsReplaced, this::replaceTitleFragments, (s, s2) -> s)
-        .replace(internalPronunciationReplacement, pronunciationReplacement);
+        .replace(internalPronunciationReplacement, pronunciationReplacement)
+        .replace(HtmlOrMarkdown.NON_WHITESPACE_CONTEXT_MARKER, "");
   }
 }
