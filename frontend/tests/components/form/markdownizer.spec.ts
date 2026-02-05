@@ -207,6 +207,23 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(html).not.toMatch(/<br[^>]*>\n/)
     })
 
+    it("renders <br> correctly in round-trip conversion without escaping", () => {
+      // Bug fix: Multiple <br> tags at end of content were being escaped
+      // after round-trip conversion (markdown -> HTML -> markdown -> HTML)
+      const originalMarkdown = "A\n\n<br>\n\n<br>"
+      const html1 = markdownizer.markdownToHtml(originalMarkdown)
+      // First HTML should have <br class="softbreak"> wrapped in <p> tags
+      expect(html1).toContain('<br class="softbreak">')
+
+      const markdown = markdownizer.htmlToMarkdown(html1)
+      expect(markdown).toContain("<br>")
+
+      const html2 = markdownizer.markdownToHtml(markdown)
+      // The <br> tags should NOT be escaped as &lt;br&gt;
+      expect(html2).not.toContain("&lt;br&gt;")
+      expect(html2).toContain("<br")
+    })
+
     it("joins single newlines in alphabetical text with space", () => {
       const markdown = "hello\nwork"
       const html = markdownizer.markdownToHtml(markdown)

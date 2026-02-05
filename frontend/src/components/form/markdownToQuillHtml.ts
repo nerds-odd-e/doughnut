@@ -206,6 +206,21 @@ export default function markdownToQuillHtml(
       /(<\/ol>|<\/ul>)<br class="softbreak">(<p>|<ol>|<ul>|<h[1-6]>|<blockquote>|<pre>|$)/g,
       '$1<p><br class="softbreak"></p>$2'
     )
+    // Match <br class="softbreak"> at the end of content after </p>
+    // Use a loop to handle multiple consecutive <br> tags
+    while (
+      /<\/p><br class="softbreak">(<br class="softbreak">|$)/.test(result)
+    ) {
+      result = result.replace(
+        /<\/p><br class="softbreak">(<br class="softbreak">|$)/g,
+        '</p><p><br class="softbreak"></p>$1'
+      )
+    }
+    // Match standalone <br class="softbreak"> at the very end (after all other processing)
+    result = result.replace(
+      /<br class="softbreak">$/,
+      '<p><br class="softbreak"></p>'
+    )
     return result
   }
 
