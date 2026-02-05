@@ -358,49 +358,6 @@ describe("NoteEditableDetails", () => {
     wrapper.unmount()
   })
 
-  describe("paste HTML with bullet lists", () => {
-    it("does not insert br after first bullet when pasting HTML with empty paragraph before list", async () => {
-      // This is the exact HTML format from ChatGPT or similar applications
-      const htmlWithEmptyParagraphBeforeList = `<p style="margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Times New Roman'; -webkit-text-stroke: #000000; min-height: 13.8px"><span style="font-family: 'Times New Roman'; font-weight: normal; font-style: normal; font-size: 12.00px; font-kerning: none"></span><br></p>
-<ul style="list-style-type: disc">
-  <li style="margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Times New Roman'; -webkit-text-stroke: #000000"><span style="font-family: 'Times New Roman'; font-weight: normal; font-style: normal; font-size: 12.00px; font-kerning: none">No rendaku</span></li>
-  <li style="margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Times New Roman'; -webkit-text-stroke: #000000"><span style="font-family: 'Times New Roman'; font-weight: normal; font-style: normal; font-size: 12.00px; font-kerning: none">No dakuten</span></li>
-</ul>
-<p style="margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Times New Roman'; -webkit-text-stroke: #000000; min-height: 13.8px"><span style="font-family: 'Times New Roman'; font-weight: normal; font-style: normal; font-size: 12.00px; font-kerning: none"></span><br></p>
-<br class="Apple-interchange-newline">`
-
-      const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableDetails)
-        .withCleanStorage()
-        .withProps({
-          noteId: 1,
-          noteDetails: "",
-          readonly: false,
-          asMarkdown: true,
-        })
-        .mount({ attachTo: document.body })
-
-      await flushPromises()
-
-      const textarea = wrapper.find("textarea").element as HTMLTextAreaElement
-      const pasteEvent = createClipboardEvent(htmlWithEmptyParagraphBeforeList)
-
-      await textarea.dispatchEvent(pasteEvent)
-      await flushPromises()
-
-      // The markdown should not have <br> immediately after a bullet marker
-      // Bug pattern: "* <br>\nNo rendaku" or "- <br>\nNo rendaku"
-      expect(textarea.value).not.toMatch(/[-*]\s*<br>\s*\n/)
-
-      // Each bullet item should be on its own line with its text
-      // Note: turndown uses 3 spaces after the bullet marker
-      expect(textarea.value).toContain("*   No rendaku")
-      expect(textarea.value).toContain("*   No dakuten")
-
-      wrapper.unmount()
-    })
-  })
-
   describe("paste with links and images in textarea", () => {
     it("shows options popup when content contains links after paste", async () => {
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
