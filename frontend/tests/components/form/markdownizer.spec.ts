@@ -2,6 +2,103 @@ import markdownizer from "@/components/form/markdownizer"
 import { describe, it, expect } from "vitest"
 
 describe("Markdown and HTML Conversion Tests", () => {
+  describe("round-trip conversion (pasted HTML -> markdown -> HTML)", () => {
+    it("does not insert br after first bullet when empty paragraph precedes list", () => {
+      // This HTML is typical of content pasted from ChatGPT or similar applications
+      // It has an empty paragraph with <br> before the list
+      const pastedHtml = `<p style="margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Times New Roman'; -webkit-text-stroke: #000000; min-height: 13.8px"><span style="font-family: 'Times New Roman'; font-weight: normal; font-style: normal; font-size: 12.00px; font-kerning: none"></span><br></p>
+<ul style="list-style-type: disc">
+  <li style="margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Times New Roman'; -webkit-text-stroke: #000000"><span style="font-family: 'Times New Roman'; font-weight: normal; font-style: normal; font-size: 12.00px; font-kerning: none">No rendaku</span></li>
+  <li style="margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Times New Roman'; -webkit-text-stroke: #000000"><span style="font-family: 'Times New Roman'; font-weight: normal; font-style: normal; font-size: 12.00px; font-kerning: none">No dakuten</span></li>
+</ul>
+<p style="margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Times New Roman'; -webkit-text-stroke: #000000; min-height: 13.8px"><span style="font-family: 'Times New Roman'; font-weight: normal; font-style: normal; font-size: 12.00px; font-kerning: none"></span><br></p>
+<br class="Apple-interchange-newline">`
+      // Convert to markdown first (simulates paste conversion step 1)
+      const markdown = markdownizer.htmlToMarkdown(pastedHtml)
+
+      // Verify the markdown output has proper blank lines between <br> and list
+      // The output should be like: "<br>\n\n* No rendaku\n* No dakuten"
+      // NOT like: "<br>\n* No rendaku" (single newline would break the list)
+      expect(markdown).toMatch(/<br>\n\n[-*]/)
+
+      // Convert markdown back to HTML (simulates paste conversion step 2 with preserve_pre: true)
+      const html = markdownizer.markdownToHtml(markdown, { preserve_pre: true })
+
+      // Parse the HTML to analyze structure
+      const div = document.createElement("div")
+      div.innerHTML = html
+
+      // The first list item should contain "No rendaku", not "<br>"
+      const firstLi = div.querySelector("li")
+      expect(firstLi?.textContent?.trim()).toBe("No rendaku")
+
+      // The first list item should NOT contain a <br> element
+      expect(firstLi?.querySelector("br")).toBeNull()
+    })
+
+    it("does not insert br after first bullet - alternative HTML format", () => {
+      // Test the exact format the user reported
+      const pastedHtml = `<p style="margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Times New Roman'; -webkit-text-stroke: #000000; min-height: 13.8px"><span style="font-family: 'Times New Roman'; font-weight: normal; font-style: normal; font-size: 12.00px; font-kerning: none"></span><br></p> <ul style="list-style-type: disc"> <li style="margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Times New Roman'; -webkit-text-stroke: #000000"><span style="font-family: 'Times New Roman'; font-weight: normal; font-style: normal; font-size: 12.00px; font-kerning: none">No rendaku</span></li> <li style="margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Times New Roman'; -webkit-text-stroke: #000000"><span style="font-family: 'Times New Roman'; font-weight: normal; font-style: normal; font-size: 12.00px; font-kerning: none">No dakuten</span></li> </ul> <p style="margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Times New Roman'; -webkit-text-stroke: #000000; min-height: 13.8px"><span style="font-family: 'Times New Roman'; font-weight: normal; font-style: normal; font-size: 12.00px; font-kerning: none"></span><br></p> <br class="Apple-interchange-newline">`
+      const markdown = markdownizer.htmlToMarkdown(pastedHtml)
+      const html = markdownizer.markdownToHtml(markdown, { preserve_pre: true })
+
+      const div = document.createElement("div")
+      div.innerHTML = html
+
+      const firstLi = div.querySelector("li")
+      expect(firstLi?.textContent?.trim()).toBe("No rendaku")
+      expect(firstLi?.querySelector("br")).toBeNull()
+    })
+
+    it("list items should not have <br> followed by text", () => {
+      // Check that the output doesn't have the problematic pattern:
+      // "• <br>\nNo rendaku" where <br> is in the list item before the text
+      const pastedHtml = `<p style="margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Times New Roman'; -webkit-text-stroke: #000000; min-height: 13.8px"><span style="font-family: 'Times New Roman'; font-weight: normal; font-style: normal; font-size: 12.00px; font-kerning: none"></span><br></p>
+<ul style="list-style-type: disc">
+  <li style="margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Times New Roman'; -webkit-text-stroke: #000000"><span style="font-family: 'Times New Roman'; font-weight: normal; font-style: normal; font-size: 12.00px; font-kerning: none">No rendaku</span></li>
+  <li style="margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Times New Roman'; -webkit-text-stroke: #000000"><span style="font-family: 'Times New Roman'; font-weight: normal; font-style: normal; font-size: 12.00px; font-kerning: none">No dakuten</span></li>
+</ul>
+<p style="margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Times New Roman'; -webkit-text-stroke: #000000; min-height: 13.8px"><span style="font-family: 'Times New Roman'; font-weight: normal; font-style: normal; font-size: 12.00px; font-kerning: none"></span><br></p>
+<br class="Apple-interchange-newline">`
+      const markdown = markdownizer.htmlToMarkdown(pastedHtml)
+      const html = markdownizer.markdownToHtml(markdown, { preserve_pre: true })
+
+      // Check that no list item starts with a <br> element followed by text
+      // This would be the pattern: <li...><br>...text...
+      expect(html).not.toMatch(/<li[^>]*>\s*<br/)
+    })
+
+    it("handles empty paragraph before list with whitespace", () => {
+      // Test case where empty paragraph has whitespace between br and list
+      const pastedHtml = `<p><br></p> <ul><li>Item 1</li><li>Item 2</li></ul>`
+      const markdown = markdownizer.htmlToMarkdown(pastedHtml)
+      const html = markdownizer.markdownToHtml(markdown, { preserve_pre: true })
+
+      const div = document.createElement("div")
+      div.innerHTML = html
+
+      // Should have 2 list items
+      const listItems = div.querySelectorAll("li")
+      expect(listItems.length).toBe(2)
+      expect(listItems[0]?.textContent?.trim()).toBe("Item 1")
+      expect(listItems[1]?.textContent?.trim()).toBe("Item 2")
+    })
+
+    it("handles multiple empty paragraphs before list", () => {
+      // Test case with multiple empty paragraphs
+      const pastedHtml = `<p><br></p><p><br></p><ul><li>Item 1</li></ul>`
+      const markdown = markdownizer.htmlToMarkdown(pastedHtml)
+      const html = markdownizer.markdownToHtml(markdown, { preserve_pre: true })
+
+      const div = document.createElement("div")
+      div.innerHTML = html
+
+      const firstLi = div.querySelector("li")
+      expect(firstLi?.textContent?.trim()).toBe("Item 1")
+      expect(firstLi?.querySelector("br")).toBeNull()
+    })
+  })
+
   describe("markdown to HTML", () => {
     const markdownToHTMLElement = (markdown: string) => {
       const html = markdownizer.markdownToHtml(markdown)
