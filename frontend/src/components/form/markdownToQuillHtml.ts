@@ -190,6 +190,22 @@ export default function markdownToQuillHtml(
       /<\/h([1-6])><br class="softbreak">(<p>)/g,
       '</h$1><p><br class="softbreak"></p>$2'
     )
+    // Match <br class="softbreak"> at the start of content (before lists or other elements)
+    // This handles cases like pasting HTML with empty paragraphs before lists
+    result = result.replace(
+      /^<br class="softbreak">(<ol>|<ul>|<p>|<h[1-6]>|<blockquote>|<pre>)/,
+      '<p><br class="softbreak"></p>$1'
+    )
+    // Match <br class="softbreak"> that appears between </p> and <ol>/<ul> (list after paragraph)
+    result = result.replace(
+      /<\/p><br class="softbreak">(<ol>|<ul>)/g,
+      '</p><p><br class="softbreak"></p>$1'
+    )
+    // Match <br class="softbreak"> that appears between </ol>/<ul> and content
+    result = result.replace(
+      /(<\/ol>|<\/ul>)<br class="softbreak">(<p>|<ol>|<ul>|<h[1-6]>|<blockquote>|<pre>|$)/g,
+      '$1<p><br class="softbreak"></p>$2'
+    )
     return result
   }
 

@@ -97,6 +97,32 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(firstLi?.textContent?.trim()).toBe("Item 1")
       expect(firstLi?.querySelector("br")).toBeNull()
     })
+
+    it("verifies br is placed in paragraph, not inside list item", () => {
+      // Test the exact structure of the output HTML
+      const pastedHtml = `<p><br></p><ul><li>Item 1</li><li>Item 2</li></ul>`
+      const markdown = markdownizer.htmlToMarkdown(pastedHtml)
+      const html = markdownizer.markdownToHtml(markdown, { preserve_pre: true })
+
+      // The br should be inside a paragraph, before the list
+      // Not inside a list item
+      expect(html).toMatch(/<p>.*<br.*>.*<\/p>/)
+
+      // The list items should not start with br
+      expect(html).not.toMatch(/<li[^>]*>\s*<br/)
+
+      // Parse and verify structure
+      const div = document.createElement("div")
+      div.innerHTML = html
+
+      // Find the br element
+      const br = div.querySelector("br")
+      expect(br).not.toBeNull()
+
+      // The br should be inside a paragraph, not a list item
+      const brParent = br?.parentElement
+      expect(brParent?.tagName).toBe("P")
+    })
   })
 
   describe("markdown to HTML", () => {
