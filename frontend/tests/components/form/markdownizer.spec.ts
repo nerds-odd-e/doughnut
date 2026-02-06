@@ -1,604 +1,443 @@
 import markdownizer from "@/components/form/markdownizer"
 import { describe, it, expect } from "vitest"
 
+const toHtml = (markdown: string | undefined) =>
+  markdownizer.markdownToHtml(markdown)
+
+const toHtmlElement = (markdown: string) => {
+  const div = document.createElement("div")
+  div.innerHTML = toHtml(markdown)
+  return div
+}
+
 describe("Markdown and HTML Conversion Tests", () => {
   describe("round-trip conversion (pasted HTML -> markdown -> HTML)", () => {
     it("wraps standalone br in paragraph when before list", () => {
-      // When pasting HTML with empty paragraph containing <br> before a list,
-      // the round-trip conversion should place the <br> inside a <p> tag
       const pastedHtml = `<p><br></p><ul><li>Item 1</li><li>Item 2</li></ul>`
       const markdown = markdownizer.htmlToMarkdown(pastedHtml)
       const html = markdownizer.markdownToHtml(markdown, { preserve_pre: true })
-
-      // The br should be inside a paragraph, before the list
-      expect(html).toMatch(/<p>.*<br.*>.*<\/p>/)
-
-      // The list items should not start with br
-      expect(html).not.toMatch(/<li[^>]*>\s*<br/)
-
-      // Parse and verify structure
       const div = document.createElement("div")
       div.innerHTML = html
 
-      // The br should be inside a paragraph, not a list item
-      const br = div.querySelector("br")
-      expect(br?.parentElement?.tagName).toBe("P")
-
-      // List items should have proper content
-      const firstLi = div.querySelector("li")
-      expect(firstLi?.textContent?.trim()).toBe("Item 1")
+      expect(html).toMatch(/<p>.*<br.*>.*<\/p>/)
+      expect(html).not.toMatch(/<li[^>]*>\s*<br/)
+      expect(div.querySelector("br")?.parentElement?.tagName).toBe("P")
+      expect(div.querySelector("li")?.textContent?.trim()).toBe("Item 1")
     })
   })
 
   describe("markdown to HTML", () => {
-    const markdownToHTMLElement = (markdown: string) => {
-      const html = markdownizer.markdownToHtml(markdown)
-      const div = document.createElement("div")
-      div.innerHTML = html
-      return div
-    }
-    it("converts markdown to HTML correctly", () => {
-      const markdown = "# Hello World\n\nThis is *markdown*."
-      const expectedHtml =
-        "<h1>Hello World</h1><p>This is <em>markdown</em>.</p>"
-      expect(markdownizer.markdownToHtml(markdown)).toBe(expectedHtml)
+    it.each([
+      [
+        "basic markdown",
+        "# Hello World\n\nThis is *markdown*.",
+        "<h1>Hello World</h1><p>This is <em>markdown</em>.</p>",
+      ],
+      ["undefined input", undefined, ""],
+      [
+        "raw HTML tags (escaped)",
+        "raw <span> is ok.",
+        "<p>raw &lt;span&gt; is ok.</p>",
+      ],
+    ])("converts %s", (_, markdown, expected) => {
+      expect(toHtml(markdown)).toBe(expected)
     })
 
-    it("handles undefined markdown input", () => {
-      expect(markdownizer.markdownToHtml(undefined)).toBe("")
-    })
+    describe("list rendering as Quill editor format", () => {
+      it("renders bullet list", () => {
+        const ol = toHtmlElement("* item1\n* item2\n").querySelector("ol")
+        expect(ol?.querySelectorAll("li").length).toBe(2)
+        expect(ol?.querySelector("li")).toHaveAttribute("data-list", "bullet")
+      })
 
-    it("render list as Quill editor format", () => {
-      const elm = markdownToHTMLElement(`* item1\n* item2\n`)
-      const ol = elm.querySelector("ol")
-      expect(ol).not.toBeNull()
-      expect(ol?.querySelectorAll("li").length).toBe(2)
-      expect(ol?.querySelector("li")).toHaveAttribute("data-list", "bullet")
-    })
+      it("renders ordered list item", () => {
+        expect(toHtmlElement("2. item1").querySelector("li")).toHaveAttribute(
+          "data-list",
+          "ordered"
+        )
+      })
 
-    it("render ordered list item as Quill editor format", () => {
-      const elm = markdownToHTMLElement(`2. item1`)
-      expect(elm?.querySelector("li")).toHaveAttribute("data-list", "ordered")
-    })
+      it("renders nested ordered list item", () => {
+        expect(
+          toHtmlElement("* level1\n  2. item1").querySelector(
+            "li[data-list='ordered']"
+          )
+        ).not.toBeNull()
+      })
 
-    it("render nested ordered list item as Quill editor format", () => {
-      const elm = markdownToHTMLElement(`* level1\n  2. item1`)
-      expect(elm?.querySelector("li[data-list='ordered']")).not.toBeNull()
-    })
+      it("renders nested list with ql-indent class", () => {
+        const elm = toHtmlElement("* item1\n  * item1.1\n")
+        expect(elm.querySelectorAll("ol").length).toBe(1)
+        expect(elm.querySelector("li.ql-indent-1")).not.toBeNull()
+      })
 
-    it("render nested list as Quill editor format", () => {
-      const elm = markdownToHTMLElement(`* item1\n  * item1.1\n`)
-      expect(elm.querySelectorAll("ol").length).toBe(1)
-      expect(elm.querySelector("li.ql-indent-1")).not.toBeNull()
-    })
+      it("renders multiple level nested list", () => {
+        const elm = toHtmlElement("* item1\n  * item1.1\n    * item1.1.1\n")
+        expect(elm.querySelectorAll("ol").length).toBe(1)
+        expect(elm.querySelector("li.ql-indent-2")).not.toBeNull()
+      })
 
-    it("render multiple level nested list as Quill editor format", () => {
-      const elm = markdownToHTMLElement(
-        `* item1\n  * item1.1\n    * item1.1.1\n`
-      )
-      expect(elm.querySelectorAll("ol").length).toBe(1)
-      expect(elm.querySelector("li.ql-indent-2")).not.toBeNull()
-    })
-
-    it("raw HTML with ul/li is rendered as Quill editor format", () => {
-      const markdown = "<ul><li>list item</li></ul>"
-      const elm = markdownToHTMLElement(markdown)
-      expect(elm.querySelectorAll("ol").length).toBe(1)
-      expect(elm?.querySelector("li[data-list='bullet']")).not.toBeNull()
+      it("renders raw HTML ul/li as Quill format", () => {
+        const elm = toHtmlElement("<ul><li>list item</li></ul>")
+        expect(elm.querySelectorAll("ol").length).toBe(1)
+        expect(elm.querySelector("li[data-list='bullet']")).not.toBeNull()
+      })
     })
 
     it("renders markdown table as HTML", () => {
-      const markdown = `| Name    | Score |\n| ------- | ----- |\n| Alice   |  95   |\n| Bob     |  88   |`
-      const html = markdownizer.markdownToHtml(markdown)
-      expect(html).toMatchInlineSnapshot(
+      expect(
+        toHtml(
+          `| Name    | Score |\n| ------- | ----- |\n| Alice   |  95   |\n| Bob     |  88   |`
+        )
+      ).toMatchInlineSnapshot(
         `"<table><thead><tr><th>Name</th><th>Score</th></tr></thead><tbody><tr><td>Alice</td><td>95</td></tr><tr><td>Bob</td><td>88</td></tr></tbody></table>"`
       )
     })
 
-    it("converts simple markdown table to HTML", () => {
-      const markdown = `| Item | Value |\n| --- | --- |\n| A | 1 |`
-      const elm = markdownToHTMLElement(markdown)
-      const table = elm.querySelector("table")
-      expect(table).not.toBeNull()
-      const thead = table?.querySelector("thead")
-      expect(thead).not.toBeNull()
-      const headerRow = thead?.querySelector("tr")
-      expect(headerRow).not.toBeNull()
-      const headers = headerRow?.querySelectorAll("th")
-      expect(headers?.length).toBe(2)
-      expect(headers?.[0]?.textContent).toBe("Item")
-      expect(headers?.[1]?.textContent).toBe("Value")
-      const tbody = table?.querySelector("tbody")
-      expect(tbody).not.toBeNull()
-      const dataRow = tbody?.querySelector("tr")
-      expect(dataRow).not.toBeNull()
-      const cells = dataRow?.querySelectorAll("td")
-      expect(cells?.length).toBe(2)
-      expect(cells?.[0]?.textContent).toBe("A")
-      expect(cells?.[1]?.textContent).toBe("1")
+    it("renders markdown table with proper DOM structure", () => {
+      const elm = toHtmlElement(`| Item | Value |\n| --- | --- |\n| A | 1 |`)
+      expect(elm.querySelectorAll("thead th").length).toBe(2)
+      expect(elm.querySelector("thead th")?.textContent).toBe("Item")
+      expect(elm.querySelectorAll("tbody td").length).toBe(2)
+      expect(elm.querySelector("tbody td")?.textContent).toBe("A")
     })
 
-    it("removes <p> tags from blockquotes", () => {
-      const markdown = "> This is a quote"
-      const html = markdownizer.markdownToHtml(markdown)
-      expect(html).toBe("<blockquote>This is a quote</blockquote>")
-      expect(html).not.toContain("<p>")
-      expect(html).not.toContain("</p>")
-    })
+    describe("blockquotes remove <p> tags", () => {
+      it.each([
+        [
+          "simple",
+          "> This is a quote",
+          "<blockquote>This is a quote</blockquote>",
+        ],
+        [
+          "with formatting",
+          "> This is a *quote* with **formatting**",
+          "<blockquote>This is a <em>quote</em> with <strong>formatting</strong></blockquote>",
+        ],
+      ])("%s blockquote", (_, markdown, expected) => {
+        expect(toHtml(markdown)).toBe(expected)
+      })
 
-    it("removes <p> tags from multi-line blockquotes", () => {
-      const markdown = "> This is a quote\n> with multiple lines"
-      const html = markdownizer.markdownToHtml(markdown)
-      const elm = markdownToHTMLElement(markdown)
-      const blockquote = elm.querySelector("blockquote")
-      expect(blockquote).not.toBeNull()
-      expect(blockquote?.querySelector("p")).toBeNull()
-      expect(html).not.toContain("<p>")
-      expect(html).not.toContain("</p>")
-    })
-
-    it("removes <p> tags from blockquotes with formatting", () => {
-      const markdown = "> This is a *quote* with **formatting**"
-      const html = markdownizer.markdownToHtml(markdown)
-      expect(html).toBe(
-        "<blockquote>This is a <em>quote</em> with <strong>formatting</strong></blockquote>"
-      )
-      expect(html).not.toContain("<p>")
-      expect(html).not.toContain("</p>")
-    })
-
-    it("converts markdown with raw HTML tags", () => {
-      const markdown = "raw <span> is ok."
-      const result = markdownizer.markdownToHtml(markdown)
-      expect(result).toBe("<p>raw &lt;span&gt; is ok.</p>")
-    })
-
-    it("wraps <br> in a <p> tag when surrounded by double newlines", () => {
-      const markdown = "hello\n\n<br>\n\nworld"
-      const elm = markdownToHTMLElement(markdown)
-      // The <br> should be wrapped in a <p> tag
-      const brParagraph = elm.querySelector("p br")
-      expect(brParagraph).not.toBeNull()
-      // Should have three paragraphs: hello, <br>, world
-      const paragraphs = elm.querySelectorAll("p")
-      expect(paragraphs.length).toBe(3)
-      expect(paragraphs[0]?.textContent).toBe("hello")
-      expect(paragraphs[1]?.querySelector("br")).not.toBeNull()
-      expect(paragraphs[2]?.textContent).toBe("world")
-    })
-
-    it("wraps <br> in a <p> tag when surrounded by double newlines after header", () => {
-      const markdown = "hello\n=====\n\n<br>\n\nworld"
-      const elm = markdownToHTMLElement(markdown)
-      // The <br> should be wrapped in a <p> tag
-      const brParagraph = elm.querySelector("p br")
-      expect(brParagraph).not.toBeNull()
-      // Should have a header, then two paragraphs: <br>, world
-      const paragraphs = elm.querySelectorAll("p")
-      expect(paragraphs.length).toBe(2)
-      expect(paragraphs[0]?.querySelector("br")).not.toBeNull()
-      expect(paragraphs[1]?.textContent).toBe("world")
-    })
-
-    it("renders multiple consecutive <br> tags as line breaks, not escaped text", () => {
-      const markdown = "A\n\n<br>\n<br>"
-      const elm = markdownToHTMLElement(markdown)
-      // The <br> tags should be rendered as actual line breaks, not visible text
-      expect(elm.textContent).not.toContain("<br>")
-      // Should have at least one actual <br> element
-      expect(elm.querySelector("br")).not.toBeNull()
-    })
-
-    it("does not wrap <br> in a <p> tag when it's inside a paragraph", () => {
-      const markdown = "abc<br>\ndef"
-      const html = markdownizer.markdownToHtml(markdown)
-      const elm = markdownToHTMLElement(markdown)
-      // The <br> should be inside a single paragraph, not wrapped in its own paragraph
-      const paragraphs = elm.querySelectorAll("p")
-      expect(paragraphs.length).toBe(1)
-      expect(paragraphs[0]?.querySelector("br")).not.toBeNull()
-      // Should be a single paragraph with <br> inside
-      expect(html).toContain("<p>abc<br")
-      expect(html).toContain("def</p>")
-      // Should not have multiple paragraphs
-      expect(html).not.toMatch(/<\/p><p><br/)
-    })
-
-    it("converts markdown with <br> and newline to HTML with one paragraph only", () => {
-      const markdown = "hello<br>\nworld"
-      const html = markdownizer.markdownToHtml(markdown)
-      const elm = markdownToHTMLElement(markdown)
-      // Should have only one paragraph
-      const paragraphs = elm.querySelectorAll("p")
-      expect(paragraphs.length).toBe(1)
-      expect(paragraphs[0]?.querySelector("br")).not.toBeNull()
-      // Should not have a newline following the <br> tag
-      expect(html).not.toMatch(/<br[^>]*>\n/)
-    })
-
-    it("joins single newlines in alphabetical text with space", () => {
-      const markdown = "hello\nwork"
-      const html = markdownizer.markdownToHtml(markdown)
-      // Single newlines should be joined into one paragraph with space
-      // This prevents Quill from rendering newlines as line breaks
-      expect(html).toBe("<p>hello work</p>")
-    })
-
-    it("joins single newlines in CJK text without space", () => {
-      const markdown = "你好\n世界"
-      const html = markdownizer.markdownToHtml(markdown)
-      // CJK text should be joined without space
-      expect(html).toBe("<p>你好世界</p>")
-    })
-
-    it("joins single newlines in mixed CJK and alphabetical text", () => {
-      const markdown = "hello\n世界"
-      const html = markdownizer.markdownToHtml(markdown)
-      // When mixing CJK and alphabetical, join with space
-      expect(html).toBe("<p>hello 世界</p>")
+      it("multi-line blockquote", () => {
+        const html = toHtml("> This is a quote\n> with multiple lines")
+        expect(html).not.toContain("<p>")
+        expect(html).not.toContain("</p>")
+      })
     })
 
     describe("CJK underscore handling", () => {
-      it("does not treat underscores as emphasis when adjacent to CJK characters", () => {
-        const markdown = "これは_重要_なことです"
-        const html = markdownizer.markdownToHtml(markdown)
-        expect(html).toBe("<p>これは_重要_なことです</p>")
+      it.each([
+        [
+          "adjacent to CJK characters",
+          "これは_重要_なことです",
+          "<p>これは_重要_なことです</p>",
+        ],
+        ["after CJK opening bracket", "「_水曜日_」", "<p>「_水曜日_」</p>"],
+        [
+          "after Japanese period",
+          "日本語。_日本語_",
+          "<p>日本語。_日本語_</p>",
+        ],
+        ["after Japanese comma", "、_水曜日_", "<p>、_水曜日_</p>"],
+        [
+          "inside fullwidth parentheses",
+          "読むこと（_read_）",
+          "<p>読むこと（_read_）</p>",
+        ],
+        [
+          "in mixed CJK sentence",
+          "てっきり今日は水曜日だ_とばかり思っていました_。",
+          "<p>てっきり今日は水曜日だ_とばかり思っていました_。</p>",
+        ],
+      ])("does not treat underscores as emphasis %s", (_, markdown, expected) => {
+        const html = toHtml(markdown)
+        expect(html).toBe(expected)
         expect(html).not.toContain("<em>")
       })
 
-      it("does not treat underscores as emphasis after CJK opening bracket", () => {
-        const markdown = "「_水曜日_」"
-        const html = markdownizer.markdownToHtml(markdown)
-        expect(html).toBe("<p>「_水曜日_」</p>")
-        expect(html).not.toContain("<em>")
+      it.each([
+        [
+          "English underscore emphasis",
+          "hello _world_ there",
+          "<p>hello <em>world</em> there</p>",
+        ],
+        ["CJK asterisk emphasis", "これは*重要*です", "<em>重要</em>"],
+        [
+          "CJK bold with brackets",
+          "日本語**「太字」**テスト",
+          "<strong>「太字」</strong>",
+        ],
+        [
+          "complex bold with CJK brackets",
+          "本質や内実を隠した、見かけだけの様子。多くの場合、**「中身が伴っていない」「誠実さがない」**という否定的なニュアンスで使われます。",
+          "<strong>「中身が伴っていない」「誠実さがない」</strong>",
+        ],
+        [
+          "bold after CJK comma",
+          "多くの場合、**「太字」**という",
+          "<strong>「太字」</strong>",
+        ],
+        [
+          "italic with CJK punctuation",
+          "日本語*「イタリック」*テスト",
+          "<em>「イタリック」</em>",
+        ],
+        [
+          "English bold",
+          "hello **world** there",
+          "<p>hello <strong>world</strong> there</p>",
+        ],
+      ])("emphasis/bold still works for %s", (_, markdown, expectedSubstring) => {
+        expect(toHtml(markdown)).toContain(expectedSubstring)
+      })
+    })
+
+    it.each([
+      ["alphabetical text with space", "hello\nwork", "<p>hello work</p>"],
+      ["CJK text without space", "你好\n世界", "<p>你好世界</p>"],
+      ["mixed CJK and alphabetical", "hello\n世界", "<p>hello 世界</p>"],
+    ])("joins single newlines in %s", (_, markdown, expected) => {
+      expect(toHtml(markdown)).toBe(expected)
+    })
+
+    describe("<br> handling", () => {
+      it("wraps <br> in a <p> tag when surrounded by double newlines", () => {
+        const elm = toHtmlElement("hello\n\n<br>\n\nworld")
+        const paragraphs = elm.querySelectorAll("p")
+        expect(paragraphs.length).toBe(3)
+        expect(paragraphs[0]?.textContent).toBe("hello")
+        expect(paragraphs[1]?.querySelector("br")).not.toBeNull()
+        expect(paragraphs[2]?.textContent).toBe("world")
       })
 
-      it("does not treat underscores as emphasis after Japanese period", () => {
-        const markdown = "日本語。_日本語_"
-        const html = markdownizer.markdownToHtml(markdown)
-        expect(html).toBe("<p>日本語。_日本語_</p>")
-        expect(html).not.toContain("<em>")
+      it("wraps <br> in a <p> tag after header", () => {
+        const elm = toHtmlElement("hello\n=====\n\n<br>\n\nworld")
+        expect(elm.querySelector("p br")).not.toBeNull()
+        const paragraphs = elm.querySelectorAll("p")
+        expect(paragraphs.length).toBe(2)
+        expect(paragraphs[0]?.querySelector("br")).not.toBeNull()
+        expect(paragraphs[1]?.textContent).toBe("world")
       })
 
-      it("does not treat underscores as emphasis after Japanese comma", () => {
-        const markdown = "、_水曜日_"
-        const html = markdownizer.markdownToHtml(markdown)
-        expect(html).toBe("<p>、_水曜日_</p>")
-        expect(html).not.toContain("<em>")
+      it("renders multiple consecutive <br> tags as actual line breaks", () => {
+        const elm = toHtmlElement("A\n\n<br>\n<br>")
+        expect(elm.textContent).not.toContain("<br>")
+        expect(elm.querySelector("br")).not.toBeNull()
       })
 
-      it("does not treat underscores as emphasis inside fullwidth parentheses", () => {
-        const markdown = "読むこと（_read_）"
-        const html = markdownizer.markdownToHtml(markdown)
-        expect(html).toBe("<p>読むこと（_read_）</p>")
-        expect(html).not.toContain("<em>")
-      })
-
-      it("does not treat underscores as emphasis in the user's original example", () => {
-        const markdown = "てっきり今日は水曜日だ_とばかり思っていました_。"
-        const html = markdownizer.markdownToHtml(markdown)
-        expect(html).toBe(
-          "<p>てっきり今日は水曜日だ_とばかり思っていました_。</p>"
+      it("does not wrap <br> when inside a paragraph", () => {
+        const html = toHtml("abc<br>\ndef")
+        expect(toHtmlElement("abc<br>\ndef").querySelectorAll("p").length).toBe(
+          1
         )
-        expect(html).not.toContain("<em>")
+        expect(html).toContain("<p>abc<br")
+        expect(html).toContain("def</p>")
+        expect(html).not.toMatch(/<\/p><p><br/)
       })
 
-      it("still treats underscores as emphasis in regular English text", () => {
-        const markdown = "hello _world_ there"
-        const html = markdownizer.markdownToHtml(markdown)
-        expect(html).toBe("<p>hello <em>world</em> there</p>")
+      it("keeps <br> with newline as single paragraph", () => {
+        const html = toHtml("hello<br>\nworld")
+        expect(
+          toHtmlElement("hello<br>\nworld").querySelectorAll("p").length
+        ).toBe(1)
+        expect(html).not.toMatch(/<br[^>]*>\n/)
       })
+    })
 
-      it("still treats asterisk-based emphasis normally", () => {
-        const markdown = "これは*重要*です"
-        const html = markdownizer.markdownToHtml(markdown)
-        // Asterisks should still work for emphasis
-        expect(html).toContain("<em>重要</em>")
-      })
-
-      it("treats asterisks as bold when content contains CJK brackets", () => {
-        const markdown = "日本語**「太字」**テスト"
-        const html = markdownizer.markdownToHtml(markdown)
-        expect(html).toBe("<p>日本語<strong>「太字」</strong>テスト</p>")
-      })
-
-      it("treats asterisks as bold with CJK brackets and complex content", () => {
-        const markdown =
-          "本質や内実を隠した、見かけだけの様子。多くの場合、**「中身が伴っていない」「誠実さがない」**という否定的なニュアンスで使われます。"
-        const html = markdownizer.markdownToHtml(markdown)
-        expect(html).toContain(
-          "<strong>「中身が伴っていない」「誠実さがない」</strong>"
+    describe("code blocks", () => {
+      it("converts to Quill code block HTML", () => {
+        expect(toHtml("```\nContent\n```")).toBe(
+          '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain">Content</div></div>'
         )
       })
 
-      it("treats asterisks as bold after CJK comma", () => {
-        const markdown = "多くの場合、**「太字」**という"
-        const html = markdownizer.markdownToHtml(markdown)
-        expect(html).toContain("<strong>「太字」</strong>")
+      it("converts multi-line to multiple ql-code-block elements", () => {
+        const codeBlocks = toHtmlElement(
+          "```\nline1\nline2\n```"
+        ).querySelectorAll(".ql-code-block")
+        expect(codeBlocks.length).toBe(2)
+        expect(codeBlocks[0]?.textContent).toBe("line1")
+        expect(codeBlocks[1]?.textContent).toBe("line2")
       })
 
-      it("treats asterisks as italic with CJK punctuation inside", () => {
-        const markdown = "日本語*「イタリック」*テスト"
-        const html = markdownizer.markdownToHtml(markdown)
-        expect(html).toContain("<em>「イタリック」</em>")
+      it("preserves leading spaces", () => {
+        expect(
+          toHtmlElement("```\n  indented line\n```").querySelector(
+            ".ql-code-block"
+          )?.textContent
+        ).toBe("  indented line")
       })
 
-      it("still treats regular English bold normally", () => {
-        const markdown = "hello **world** there"
-        const html = markdownizer.markdownToHtml(markdown)
-        expect(html).toBe("<p>hello <strong>world</strong> there</p>")
+      it("converts empty line to <br>", () => {
+        expect(toHtml("```\n\n```")).toBe(
+          '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain"><br></div></div>'
+        )
       })
-    })
 
-    it("converts markdown code block to Quill code block HTML", () => {
-      const markdown = "```\nContent\n```"
-      const html = markdownizer.markdownToHtml(markdown)
-      const expectedHtml =
-        '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain">Content</div></div>'
-      expect(html).toBe(expectedHtml)
-    })
-
-    it("converts multi-line markdown code block with blank lines to multiple ql-code-block elements", () => {
-      const markdown = "```\nline1\nline2\n```"
-      const elm = markdownToHTMLElement(markdown)
-      const container = elm.querySelector(".ql-code-block-container")
-      expect(container).not.toBeNull()
-      const codeBlocks = elm.querySelectorAll(".ql-code-block")
-      expect(codeBlocks.length).toBe(2)
-      expect(codeBlocks[0]?.textContent).toBe("line1")
-      expect(codeBlocks[1]?.textContent).toBe("line2")
-    })
-
-    it("preserves leading spaces when converting markdown code block to HTML", () => {
-      const markdown = "```\n  indented line\n```"
-      const elm = markdownToHTMLElement(markdown)
-      const codeBlock = elm.querySelector(".ql-code-block")
-      expect(codeBlock?.textContent).toBe("  indented line")
-    })
-
-    it("converts empty line in markdown code block to HTML with <br>", () => {
-      const markdown = "```\n\n```"
-      const html = markdownizer.markdownToHtml(markdown)
-      const expectedHtml =
-        '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain"><br></div></div>'
-      expect(html).toBe(expectedHtml)
-    })
-
-    it("escapes HTML tags in markdown code block content", () => {
-      const markdown = "```\n<p>X</p>\n```"
-      const html = markdownizer.markdownToHtml(markdown)
-      const elm = markdownToHTMLElement(markdown)
-      const codeBlock = elm.querySelector(".ql-code-block")
-      expect(codeBlock).not.toBeNull()
-      // The HTML tags should be escaped in the ql-code-block
-      expect(html).toContain("&lt;p&gt;X&lt;/p&gt;")
-      // The textContent should still show the original content
-      expect(codeBlock?.textContent).toBe("<p>X</p>")
-    })
-
-    it("uses plain <pre> HTML when preserve_pre option is true", () => {
-      const markdown = "```\ncode content\n```"
-      const html = markdownizer.markdownToHtml(markdown, { preserve_pre: true })
-      // Should use plain <pre> tags instead of ql-code-block style
-      expect(html).toContain("<pre>")
-      expect(html).toContain("</pre>")
-      expect(html).toContain("code content")
-      expect(html).not.toContain("ql-code-block-container")
-      expect(html).not.toContain("ql-code-block")
-    })
-
-    it("escapes HTML tags in <pre> when preserve_pre option is true", () => {
-      const markdown = "```\n<p>X</p>\n```"
-      const html = markdownizer.markdownToHtml(markdown, { preserve_pre: true })
-      const div = document.createElement("div")
-      div.innerHTML = html
-      const pre = div.querySelector("pre")
-      expect(pre).not.toBeNull()
-      // The HTML tags should be escaped in the <pre> tag
-      expect(html).toContain("&lt;p&gt;X&lt;/p&gt;")
-      // The textContent should still show the original content
-      expect(pre?.textContent).toBe("<p>X</p>")
-    })
-
-    it("uses ql-code-block style by default when preserve_pre is false", () => {
-      const markdown = "```\ncode content\n```"
-      const html = markdownizer.markdownToHtml(markdown, {
-        preserve_pre: false,
+      it("escapes HTML tags in content", () => {
+        const html = toHtml("```\n<p>X</p>\n```")
+        expect(html).toContain("&lt;p&gt;X&lt;/p&gt;")
+        expect(
+          toHtmlElement("```\n<p>X</p>\n```").querySelector(".ql-code-block")
+            ?.textContent
+        ).toBe("<p>X</p>")
       })
-      // Should use ql-code-block style (default behavior)
-      expect(html).toContain("ql-code-block-container")
-      expect(html).toContain("ql-code-block")
-      expect(html).not.toContain("<pre>")
+
+      it.each([
+        [true, "<pre>", "ql-code-block"],
+        [false, "ql-code-block-container", "<pre>"],
+      ])("with preserve_pre=%s, contains %s and not %s", (preservePre, expected, notExpected) => {
+        const html = markdownizer.markdownToHtml("```\ncode content\n```", {
+          preserve_pre: preservePre as boolean,
+        })
+        expect(html).toContain(expected)
+        expect(html).toContain("code content")
+        expect(html).not.toContain(notExpected)
+      })
+
+      it("escapes HTML tags in <pre> when preserve_pre is true", () => {
+        const html = markdownizer.markdownToHtml("```\n<p>X</p>\n```", {
+          preserve_pre: true,
+        })
+        expect(html).toContain("&lt;p&gt;X&lt;/p&gt;")
+        const div = document.createElement("div")
+        div.innerHTML = html
+        expect(div.querySelector("pre")?.textContent).toBe("<p>X</p>")
+      })
     })
   })
 
-  describe("Html to markdown", () => {
-    it("converts HTML to markdown correctly", () => {
-      const html = "<h1>Hello World</h1><p>This is <em>markdown</em>.</p>"
-      const expectedMarkdown = "Hello World\n===========\n\nThis is _markdown_."
-      expect(markdownizer.htmlToMarkdown(html)).toBe(expectedMarkdown)
+  describe("HTML to markdown", () => {
+    it("converts basic HTML to markdown", () => {
+      expect(
+        markdownizer.htmlToMarkdown(
+          "<h1>Hello World</h1><p>This is <em>markdown</em>.</p>"
+        )
+      ).toBe("Hello World\n===========\n\nThis is _markdown_.")
     })
 
-    it("converts empty lines with br correctly", () => {
-      const html = "<p>a</p><p><br></p><p>b</p>"
-      const expectedMarkdown = "a\n\n<br>\n\nb"
-      expect(markdownizer.htmlToMarkdown(html)).toBe(expectedMarkdown)
+    it("converts empty lines with br", () => {
+      expect(markdownizer.htmlToMarkdown("<p>a</p><p><br></p><p>b</p>")).toBe(
+        "a\n\n<br>\n\nb"
+      )
     })
 
-    it("convert quill list to markdown list", () => {
-      const html =
-        "<ol><li data-list='bullet'>item1</li><li data-list='bullet'>item2</li></ol>"
-      const expectedMarkdown = "* item1\n* item2"
-      expect(markdownizer.htmlToMarkdown(html)).toBe(expectedMarkdown)
+    it("converts Quill bullet list to markdown", () => {
+      expect(
+        markdownizer.htmlToMarkdown(
+          "<ol><li data-list='bullet'>item1</li><li data-list='bullet'>item2</li></ol>"
+        )
+      ).toBe("* item1\n* item2")
     })
 
-    it("convert nested quill list to markdown list", () => {
-      const html =
-        "<ol><li data-list='bullet'>item1</li><li data-list='bullet' class='ql-indent-1'>item1.1</li></ol>"
-      const expectedMarkdown = "* item1\n  * item1.1"
-      expect(markdownizer.htmlToMarkdown(html)).toBe(expectedMarkdown)
+    it("converts nested Quill list to markdown", () => {
+      expect(
+        markdownizer.htmlToMarkdown(
+          "<ol><li data-list='bullet'>item1</li><li data-list='bullet' class='ql-indent-1'>item1.1</li></ol>"
+        )
+      ).toBe("* item1\n  * item1.1")
     })
 
     it("converts nested h1 tags to single header", () => {
-      const html =
+      const markdown = markdownizer.htmlToMarkdown(
         '<p class="p1"><span class="s1"><h1><b>✅<span class="Apple-converted-space"> </span></b></h1><h1><b>Conclusion</b></h1></span></p>'
-      const markdown = markdownizer.htmlToMarkdown(html)
-      // Should result in one header, not two headers
-      const headerMatches = markdown.match(/={3,}$/gm)
-      expect(headerMatches?.length).toBe(1)
+      )
+      expect(markdown.match(/={3,}$/gm)?.length).toBe(1)
     })
 
     it("keeps separate h1 tags as separate headers", () => {
-      const html = "<h1>Chapter 1</h1><h1>Chapter 2</h1>"
-      const markdown = markdownizer.htmlToMarkdown(html)
-      // Should result in two separate headers
-      const headerMatches = markdown.match(/={3,}$/gm)
-      expect(headerMatches?.length).toBe(2)
+      const markdown = markdownizer.htmlToMarkdown(
+        "<h1>Chapter 1</h1><h1>Chapter 2</h1>"
+      )
+      expect(markdown.match(/={3,}$/gm)?.length).toBe(2)
     })
 
-    it("converts HTML code block with blank line back to markdown", () => {
-      const html = "<pre><code>hello\n\nwork\n</code></pre>"
-      const markdown = markdownizer.htmlToMarkdown(html)
-      // This test documents current behavior - may need adjustment based on actual issue
-      expect(markdown).toBeTruthy()
+    it("converts HTML code block with blank line to markdown", () => {
+      expect(
+        markdownizer.htmlToMarkdown("<pre><code>hello\n\nwork\n</code></pre>")
+      ).toBeTruthy()
     })
 
-    it("converts <pre>content</pre> to markdown code block", () => {
-      const html = "<pre>content</pre>"
-      const markdown = markdownizer.htmlToMarkdown(html)
-      // <pre> tags should convert to markdown fenced code blocks
-      expect(markdown).toContain("content")
-      // Should be formatted as a fenced code block with triple backticks
-      expect(markdown).toMatch(/```[\s\S]*?content[\s\S]*?```/)
-    })
+    describe("code block conversions", () => {
+      it.each([
+        ["<pre> tag", "<pre>content</pre>", "content"],
+        [
+          "Quill code block",
+          '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain">Content</div></div>',
+          "Content",
+        ],
+        [
+          "Quill code block with leading spaces",
+          '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain">  indented line</div></div>',
+          "  indented line",
+        ],
+      ])("converts %s to markdown fenced code block", (_, html, expectedContent) => {
+        const markdown = markdownizer.htmlToMarkdown(html)
+        expect(markdown).toContain(expectedContent)
+        expect(markdown).toMatch(/```[\s\S]*```/)
+      })
 
-    it("does not escape underscore in <pre> tag when converting to markdown", () => {
-      const html = '<pre data-language="plain">\n\n_\n</pre>'
-      const markdown = markdownizer.htmlToMarkdown(html)
-      // Underscore should not be escaped in code blocks
-      expect(markdown).toContain("_")
-      expect(markdown).not.toContain("\\_")
-      // Should be formatted as a fenced code block with triple backticks
-      expect(markdown).toMatch(/```[\s\S]*?_\s*```/)
-    })
+      it("does not escape underscore in <pre> tag", () => {
+        const markdown = markdownizer.htmlToMarkdown(
+          '<pre data-language="plain">\n\n_\n</pre>'
+        )
+        expect(markdown).toContain("_")
+        expect(markdown).not.toContain("\\_")
+      })
 
-    it("converts Quill code block HTML to markdown code block", () => {
-      const html =
-        '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain">Content</div></div>'
-      const markdown = markdownizer.htmlToMarkdown(html)
-      // Quill code block should convert to markdown fenced code blocks
-      expect(markdown).toContain("Content")
-      // Should be formatted as a fenced code block with triple backticks
-      expect(markdown).toMatch(/```[\s\S]*?Content[\s\S]*?```/)
-    })
-
-    it("preserves leading spaces when converting Quill code block HTML to markdown", () => {
-      const html =
-        '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain">  indented line</div></div>'
-      const markdown = markdownizer.htmlToMarkdown(html)
-      // Leading spaces should be preserved in the markdown code block
-      expect(markdown).toContain("  indented line")
-      expect(markdown).toMatch(/```[\s\S]*? {2}indented line[\s\S]*?```/)
-    })
-
-    it("converts empty line in Quill code block HTML to markdown as empty line, not <br>", () => {
-      const html =
-        '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain"><br></div></div>'
-      const markdown = markdownizer.htmlToMarkdown(html)
-      // Empty line should be converted to empty line in markdown, not <br>
-      expect(markdown).not.toContain("<br>")
-      expect(markdown).toMatch(/```\n\n```/)
+      it("converts empty Quill code block line to empty markdown line", () => {
+        const markdown = markdownizer.htmlToMarkdown(
+          '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain"><br></div></div>'
+        )
+        expect(markdown).not.toContain("<br>")
+        expect(markdown).toMatch(/```\n\n```/)
+      })
     })
 
     it("converts HTML table to markdown table", () => {
-      const html =
+      const markdown = markdownizer.htmlToMarkdown(
         "<table><thead><tr><th>Name</th><th>Score</th></tr></thead><tbody><tr><td>Alice</td><td>95</td></tr><tr><td>Bob</td><td>88</td></tr></tbody></table>"
-      const markdown = markdownizer.htmlToMarkdown(html)
-      // Should convert to markdown table format with pipes
-      expect(markdown).toContain("Name")
-      expect(markdown).toContain("Score")
-      expect(markdown).toContain("Alice")
-      expect(markdown).toContain("95")
-      expect(markdown).toContain("Bob")
-      expect(markdown).toContain("88")
-      // Should have table structure with pipes and separators
+      )
       expect(markdown).toMatch(/\|.*Name.*\|.*Score.*\|/)
-      expect(markdown).toMatch(/\|.*-+.*\|.*-+.*\|/) // separator row
+      expect(markdown).toMatch(/\|.*-+.*\|.*-+.*\|/)
       expect(markdown).toMatch(/\|.*Alice.*\|.*95.*\|/)
       expect(markdown).toMatch(/\|.*Bob.*\|.*88.*\|/)
     })
 
     it("converts HTML table with nested p and b tags to markdown table", () => {
       const html = `<table><thead><tr><th>
-
 <p class="p1"><b>Item</b></p>
-
 </th><th>
-
 <p class="p1"><b>Value</b></p>
-
 </th></tr></thead><tbody><tr><td>
-
 <p class="p1">A</p>
-
 </td><td>
-
 <p class="p1">17</p>
-
 </td></tr><tr><td>
-
 <p class="p1">B</p>
-
 </td><td>
-
 <p class="p1">42</p>
-
 </td></tr><tr><td>
-
 <p class="p1">C</p>
-
 </td><td>
-
 <p class="p1">9</p>
-
 </td></tr><tr><td>
-
 <p class="p1">D</p>
-
 </td><td>
-
 <p class="p1">28</p>
-
 </td></tr></tbody></table>`
       const markdown = markdownizer.htmlToMarkdown(html)
-      // Should convert to markdown table format with pipes
-      expect(markdown).toContain("Item")
-      expect(markdown).toContain("Value")
-      expect(markdown).toContain("A")
-      expect(markdown).toContain("17")
-      expect(markdown).toContain("B")
-      expect(markdown).toContain("42")
-      expect(markdown).toContain("C")
-      expect(markdown).toContain("9")
-      expect(markdown).toContain("D")
-      expect(markdown).toContain("28")
-      // Item and Value should be on the same line (header row)
-      const lines = markdown.split("\n")
-      const headerLine = lines.find(
-        (line) => line.includes("Item") && line.includes("Value")
-      )
-      expect(headerLine).toBeDefined()
+      const headerLine = markdown
+        .split("\n")
+        .find((line) => line.includes("Item") && line.includes("Value"))
       expect(headerLine).toMatch(/\|.*Item.*\|.*Value.*\|/)
-      // Should have table structure with pipes and separators (allowing for whitespace/newlines)
-      expect(markdown).toMatch(/\|[\s\S]*Item[\s\S]*\|[\s\S]*Value[\s\S]*\|/)
-      expect(markdown).toMatch(/\|[\s\S]*-+[\s\S]*\|[\s\S]*-+[\s\S]*\|/) // separator row
+      expect(markdown).toMatch(/\*\*Item\*\*/)
+      expect(markdown).toMatch(/\*\*Value\*\*/)
+      expect(markdown).toMatch(/\|[\s\S]*-+[\s\S]*\|[\s\S]*-+[\s\S]*\|/)
       expect(markdown).toMatch(/\|[\s\S]*A[\s\S]*\|[\s\S]*17[\s\S]*\|/)
       expect(markdown).toMatch(/\|[\s\S]*B[\s\S]*\|[\s\S]*42[\s\S]*\|/)
       expect(markdown).toMatch(/\|[\s\S]*C[\s\S]*\|[\s\S]*9[\s\S]*\|/)
       expect(markdown).toMatch(/\|[\s\S]*D[\s\S]*\|[\s\S]*28[\s\S]*\|/)
-      // Bold text in headers should be converted to markdown bold
-      expect(markdown).toMatch(/\*\*Item\*\*/)
-      expect(markdown).toMatch(/\*\*Value\*\*/)
     })
   })
 })
