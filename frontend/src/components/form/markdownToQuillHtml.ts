@@ -41,9 +41,9 @@ export default function markdownToQuillHtml(
       return convertHtmlList(htmlContent)
     }
     const trimmed = htmlContent.trim()
-    // Allow <br> or <br/> (self-closing tags) and convert to <br class="softbreak">
-    if (/^<br\s*\/?>$/i.test(trimmed)) {
-      return '<br class="softbreak">'
+    // Allow content that consists entirely of <br> or <br/> tags (with optional whitespace between)
+    if (/^(\s*<br\s*\/?>\s*)+$/i.test(trimmed)) {
+      return htmlContent.replace(/<br\s*\/?>/gi, '<br class="softbreak">')
     }
     // Allow complete HTML tags matching <tag xxx>...</tag> pattern
     // This matches opening tag with optional attributes, content, and closing tag

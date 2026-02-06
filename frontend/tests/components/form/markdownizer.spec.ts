@@ -180,6 +180,15 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(paragraphs[1]?.textContent).toBe("world")
     })
 
+    it("renders multiple consecutive <br> tags as line breaks, not escaped text", () => {
+      const markdown = "A\n\n<br>\n<br>"
+      const elm = markdownToHTMLElement(markdown)
+      // The <br> tags should be rendered as actual line breaks, not visible text
+      expect(elm.textContent).not.toContain("<br>")
+      // Should have at least one actual <br> element
+      expect(elm.querySelector("br")).not.toBeNull()
+    })
+
     it("does not wrap <br> in a <p> tag when it's inside a paragraph", () => {
       const markdown = "abc<br>\ndef"
       const html = markdownizer.markdownToHtml(markdown)
