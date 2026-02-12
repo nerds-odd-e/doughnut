@@ -31,7 +31,7 @@ env:
 jobs:
   Lint-N-Backend-Generated-Types-For-Frontend:
     name: Linting & Types Gen for Frontend
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - name: Check for @focus tags in e2e test feature files
