@@ -100,11 +100,34 @@ install_nixpkg_manager() {
   fi
 
   if [[ "${os_type}" == "Mac" || "${os_type}" == "Linux" ]]; then
-    log "Installing nix using Determinate Systems installer"
-    curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --determinate --no-confirm
+    local max_attempts=3
+    local attempt=1
+    local installed=false
+
+    while (( attempt <= max_attempts )); do
+      log "Installing nix using Determinate Systems installer (Attempt $attempt/$max_attempts)..."
+
+      # Adding --retry and --retry-connrefused to curl for better network resilience
+      if curl --proto '=https' --tlsv1.2 -sSf -L --retry 3 --retry-connrefused --connect-timeout 10 https://install.determinate.systems/nix | sh -s -- install --determinate --no-confirm; then
+         installed=true
+         break
+      else
+         log "Installation command failed (Attempt $attempt/$max_attempts)."
+         if (( attempt < max_attempts )); then
+            log "Retrying in 3 seconds..."
+            sleep 3
+         fi
+         ((attempt++))
+      fi
+    done
+
+    if [[ "$installed" == "false" ]]; then
+       log "Error: Nix installation failed after $max_attempts attempts."
+       return 1
+    fi
   else
     log "Error: Unsupported OS Platform for Nix development environment"
-    exit 1
+    return 1
   fi
 
   # Source nix in current shell
