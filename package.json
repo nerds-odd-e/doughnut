@@ -84,7 +84,7 @@
     "syncpack": "^13.0.4",
     "typescript": "5.9.3",
     "util": "^0.12.5",
-    "wait-on": "^9.0.3",
+    "wait-on": "^9.0.4",
     "yaml": "^2.8.2"
   },
   "dependencies": {
