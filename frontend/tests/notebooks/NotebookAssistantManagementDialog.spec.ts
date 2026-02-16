@@ -10,9 +10,10 @@ describe("NotebookAssistantManagementDialog.vue", () => {
   const mockedUpdateAiAssistant = vi.fn()
 
   beforeEach(() => {
-    mockSdkServiceWithImplementation("updateAiAssistant", async (options) => {
-      return await mockedUpdateAiAssistant(options)
-    })
+    mockSdkServiceWithImplementation(
+      "updateAiAssistant",
+      async (options) => await mockedUpdateAiAssistant(options)
+    )
     wrapper = helper
       .component(NotebookAssistantManagementDialog)
       .withProps({

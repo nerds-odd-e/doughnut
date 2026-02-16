@@ -418,7 +418,7 @@ export default class StoredApiCollection implements StoredApi {
     this.noteEditingHistory.deleteNote(noteId)
     if (res.length === 0) {
       await this.routerReplaceFocus(router)
-      return undefined
+      return
     }
     const noteRealm = this.storage.refreshNoteRealm(res[0]!)
     await this.routerReplaceFocus(router, noteRealm)

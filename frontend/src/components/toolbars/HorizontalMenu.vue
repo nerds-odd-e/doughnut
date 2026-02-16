@@ -130,18 +130,14 @@ const isExpanded = ref(false)
 const menuRef: Ref<HTMLElement | null> = ref(null)
 
 // When no user, always show expanded menu (just login button)
-const shouldShowExpanded = computed(() => {
-  return !props.user || isExpanded.value
-})
+const shouldShowExpanded = computed(() => !props.user || isExpanded.value)
 
 const activeItem = computed(() => {
   const allItems = [...props.upperNavItems, ...props.lowerNavItems]
   return allItems.find((item) => item.isActive)
 })
 
-const hasActiveItem = computed(() => {
-  return activeItem.value !== undefined
-})
+const hasActiveItem = computed(() => activeItem.value !== undefined)
 
 const toggleExpanded = () => {
   isExpanded.value = !isExpanded.value

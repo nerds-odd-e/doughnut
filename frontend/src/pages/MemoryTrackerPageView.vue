@@ -190,9 +190,9 @@ const emit = defineEmits<{
 
 const { popups } = usePopups()
 
-const isSkipped = computed(() => {
-  return props.memoryTracker.removedFromTracking === true
-})
+const isSkipped = computed(
+  () => props.memoryTracker.removedFromTracking === true
+)
 
 const formatThinkingTime = (ms: number): string => {
   if (ms < 1000) {
@@ -207,11 +207,9 @@ const formatThinkingTime = (ms: number): string => {
   return `${minutes}m ${remainingSeconds}s`
 }
 
-const hasUnansweredPrompts = computed(() => {
-  return props.recallPrompts.some(
-    (prompt) => !prompt.answer && !prompt.isContested
-  )
-})
+const hasUnansweredPrompts = computed(() =>
+  props.recallPrompts.some((prompt) => !prompt.answer && !prompt.isContested)
+)
 
 const deleteUnansweredPrompts = async () => {
   const unansweredCount = props.recallPrompts.filter(

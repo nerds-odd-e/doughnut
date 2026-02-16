@@ -107,9 +107,7 @@ const shiftEnterHandler = function (
 }
 
 // BR matcher for clipboard operations
-const brMatcher = () => {
-  return new Delta().insert({ softbreak: true })
-}
+const brMatcher = () => new Delta().insert({ softbreak: true })
 
 const options: QuillOptions = {
   modules: {

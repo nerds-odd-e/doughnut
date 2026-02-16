@@ -42,14 +42,12 @@ const meta = {
         ThrowOnError extends boolean = false,
       >(
         _options: Options<GetMenuDataData, ThrowOnError>
-      ) => {
-        return {
-          data: mockMenuData,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        }
-      }) as typeof UserController.getMenuData
+      ) => ({
+        data: mockMenuData,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })) as typeof UserController.getMenuData
 
       return {
         components: { story },
@@ -104,14 +102,12 @@ export const WithDueCount: Story = {
         ThrowOnError extends boolean = false,
       >(
         _options: Options<GetMenuDataData, ThrowOnError>
-      ) => {
-        return {
-          data: mockMenuData,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        }
-      }) as typeof UserController.getMenuData
+      ) => ({
+        data: mockMenuData,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })) as typeof UserController.getMenuData
 
       return {
         components: { story },
@@ -150,14 +146,12 @@ export const WithRecallCount: Story = {
         ThrowOnError extends boolean = false,
       >(
         _options: Options<GetMenuDataData, ThrowOnError>
-      ) => {
-        return {
-          data: mockMenuData,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        }
-      }) as typeof UserController.getMenuData
+      ) => ({
+        data: mockMenuData,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })) as typeof UserController.getMenuData
 
       return {
         components: { story },
@@ -201,14 +195,12 @@ export const WithUnreadMessages: Story = {
         ThrowOnError extends boolean = false,
       >(
         _options: Options<GetMenuDataData, ThrowOnError>
-      ) => {
-        return {
-          data: mockMenuData,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        }
-      }) as typeof UserController.getMenuData
+      ) => ({
+        data: mockMenuData,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })) as typeof UserController.getMenuData
 
       return {
         components: { story },

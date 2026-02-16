@@ -33,9 +33,7 @@ function getAllStoryFiles() {
     })
   )
 
-  return storyFiles.map(([filePath, storyFile]) => {
-    return { filePath, storyFile }
-  })
+  return storyFiles.map(([filePath, storyFile]) => ({ filePath, storyFile }))
 }
 
 describe("All Storybook Stories", () => {

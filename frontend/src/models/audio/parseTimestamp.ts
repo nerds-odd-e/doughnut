@@ -1,6 +1,6 @@
 export const timestampToSeconds = (timestamp: string): number | undefined => {
   const [hms, millisecondsString] = timestamp.split(",")
-  if (!hms || !millisecondsString) return undefined
+  if (!hms || !millisecondsString) return
 
   const [hours, minutes, seconds] = hms.split(":").map(Number)
   const milliseconds = Number(millisecondsString)
@@ -11,7 +11,7 @@ export const timestampToSeconds = (timestamp: string): number | undefined => {
     seconds === undefined ||
     milliseconds === undefined
   ) {
-    return undefined
+    return
   }
 
   const totalSeconds =

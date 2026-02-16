@@ -182,9 +182,7 @@ describe("adding new note", () => {
       wrapper?.unmount()
     })
 
-    const titleInput = () => {
-      return wrapper.find("input#note-title")
-    }
+    const titleInput = () => wrapper.find("input#note-title")
 
     const openWikidataDialog = async (key: string) => {
       await titleInput().setValue(key)

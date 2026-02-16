@@ -195,7 +195,7 @@ describe("SearchResults.vue", () => {
         try {
           return JSON.parse(to).params.noteId as number
         } catch {
-          return undefined
+          return
         }
       })
 

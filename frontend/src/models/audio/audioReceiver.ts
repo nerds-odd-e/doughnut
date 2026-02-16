@@ -18,6 +18,4 @@ export interface AudioReceiver {
 import { createRawSampleAudioReceiver } from "./rawSamples/rawSampleReceiver"
 import type { AudioChunk } from "./audioProcessingScheduler"
 
-export const createAudioReceiver = () => {
-  return createRawSampleAudioReceiver()
-}
+export const createAudioReceiver = () => createRawSampleAudioReceiver()

@@ -53,9 +53,7 @@ const loading = ref(true)
 const isActiveQuestion = computed(() => !loading.value)
 const { stop } = useQuestionThinkingTime(isActiveQuestion)
 
-const stem = computed(() => {
-  return recallPrompt.value?.spellingQuestion?.stem || ""
-})
+const stem = computed(() => recallPrompt.value?.spellingQuestion?.stem || "")
 
 const fetchSpellingQuestion = async () => {
   loading.value = true

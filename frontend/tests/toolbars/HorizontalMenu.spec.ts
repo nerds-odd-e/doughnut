@@ -41,50 +41,48 @@ const createMockNavItems = (
 ): {
   upperNavItems: NavigationItemType[]
   lowerNavItems: NavigationItemType[]
-} => {
-  return {
-    upperNavItems: [
-      {
-        name: "notebooks",
-        label: "Note",
-        icon: markRaw(SvgNote),
-        isActive: activeItemName === "notebooks",
-      },
-      {
-        name: "assimilate",
-        label: "Assimilate",
-        icon: markRaw(SvgAssimilate),
-        isActive: activeItemName === "assimilate",
-      },
-      {
-        name: "recall",
-        label: "Recall",
-        icon: markRaw(SvgCalendarCheck),
-        isActive: activeItemName === "recall",
-      },
-    ],
-    lowerNavItems: [
-      {
-        name: "circles",
-        label: "Circles",
-        icon: markRaw(SvgPeople),
-        isActive: activeItemName === "circles",
-      },
-      {
-        name: "bazaar",
-        label: "Bazaar",
-        icon: markRaw(SvgShop),
-        isActive: activeItemName === "bazaar",
-      },
-      {
-        name: "messageCenter",
-        label: "Messages",
-        icon: markRaw(SvgChat),
-        isActive: activeItemName === "messageCenter",
-      },
-    ],
-  }
-}
+} => ({
+  upperNavItems: [
+    {
+      name: "notebooks",
+      label: "Note",
+      icon: markRaw(SvgNote),
+      isActive: activeItemName === "notebooks",
+    },
+    {
+      name: "assimilate",
+      label: "Assimilate",
+      icon: markRaw(SvgAssimilate),
+      isActive: activeItemName === "assimilate",
+    },
+    {
+      name: "recall",
+      label: "Recall",
+      icon: markRaw(SvgCalendarCheck),
+      isActive: activeItemName === "recall",
+    },
+  ],
+  lowerNavItems: [
+    {
+      name: "circles",
+      label: "Circles",
+      icon: markRaw(SvgPeople),
+      isActive: activeItemName === "circles",
+    },
+    {
+      name: "bazaar",
+      label: "Bazaar",
+      icon: markRaw(SvgShop),
+      isActive: activeItemName === "bazaar",
+    },
+    {
+      name: "messageCenter",
+      label: "Messages",
+      icon: markRaw(SvgChat),
+      isActive: activeItemName === "messageCenter",
+    },
+  ],
+})
 
 const noop = () => {
   // No-op function

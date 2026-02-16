@@ -43,8 +43,8 @@ describe("ContestableQuestion.vue", () => {
     vi.advanceTimersByTime(advanceMs)
   }
 
-  const mountComponent = (recallPrompt = makeMe.aRecallPrompt.please()) => {
-    return helper
+  const mountComponent = (recallPrompt = makeMe.aRecallPrompt.please()) =>
+    helper
       .component(ContestableQuestion)
       .withRouter()
       .withCleanStorage()
@@ -52,11 +52,9 @@ describe("ContestableQuestion.vue", () => {
         recallPrompt,
       })
       .mount()
-  }
 
-  const findRecallPrompt = (wrapper: ReturnType<typeof mountComponent>) => {
-    return wrapper.findComponent({ name: "RecallPromptComponent" })
-  }
+  const findRecallPrompt = (wrapper: ReturnType<typeof mountComponent>) =>
+    wrapper.findComponent({ name: "RecallPromptComponent" })
 
   const getAnswerThinkingTime = (spy: ReturnType<typeof mockSdkService>) => {
     const answerCall = spy.mock.calls[0]

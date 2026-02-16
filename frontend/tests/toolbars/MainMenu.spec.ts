@@ -30,8 +30,8 @@ vi.mock("@/managedApi/AiReplyEventSource", () => ({
 
 // Browser Mode: Use real matchMedia API!
 // We can spy on it to control behavior for tests
-const createMatchMediaSpy = (matches: boolean) => {
-  return vi.spyOn(window, "matchMedia").mockImplementation((query: string) => {
+const createMatchMediaSpy = (matches: boolean) =>
+  vi.spyOn(window, "matchMedia").mockImplementation((query: string) => {
     const mediaQueryList = {
       matches,
       media: query,
@@ -44,7 +44,6 @@ const createMatchMediaSpy = (matches: boolean) => {
     } as MediaQueryList
     return mediaQueryList
   })
-}
 
 // Default menu data structure
 const defaultMenuData = {
@@ -62,9 +61,10 @@ const defaultMenuData = {
 }
 
 // Helper to create menu data with overrides
-const createMenuData = (overrides?: Partial<typeof defaultMenuData>) => {
-  return { ...defaultMenuData, ...overrides }
-}
+const createMenuData = (overrides?: Partial<typeof defaultMenuData>) => ({
+  ...defaultMenuData,
+  ...overrides,
+})
 
 // Helper to create useRecallData mock return value
 const createUseRecallDataMock = (overrides?: {

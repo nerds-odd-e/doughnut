@@ -60,13 +60,12 @@ const setupTestData = () => {
   return { note, conversation, user }
 }
 
-const mountComponent = (conversation, user) => {
-  return helper
+const mountComponent = (conversation, user) =>
+  helper
     .component(ConversationInner)
     .withCleanStorage()
     .withProps({ conversation, user })
     .mount()
-}
 
 const submitMessage = async (wrapper, message: string) => {
   const form = wrapper.find("form.chat-input-form")

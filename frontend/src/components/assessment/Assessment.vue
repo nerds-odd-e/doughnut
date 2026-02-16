@@ -50,9 +50,9 @@ const assessmentQuestionInstance = computed(
   () => props.assessmentAttempt.assessmentQuestionInstances!
 )
 
-const currentQuestionInstance = computed(() => {
-  return assessmentQuestionInstance.value[currentQuestion.value]!
-})
+const currentQuestionInstance = computed(
+  () => assessmentQuestionInstance.value[currentQuestion.value]!
+)
 
 const passCriteriaPercentage = 80
 

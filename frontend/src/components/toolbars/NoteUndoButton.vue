@@ -110,13 +110,14 @@ const getUndoMessage = (): string => {
   }
 }
 
-const shouldShowDiff = computed((): boolean => {
-  return !!(
-    history.value &&
-    (history.value.type === "edit title" ||
-      history.value.type === "edit details")
-  )
-})
+const shouldShowDiff = computed(
+  (): boolean =>
+    !!(
+      history.value &&
+      (history.value.type === "edit title" ||
+        history.value.type === "edit details")
+    )
+)
 
 const handleConfirm = async () => {
   await storageAccessor.value.storedApi().undo(router)

@@ -127,7 +127,7 @@ vi.mock("@/models/audio/audioRecorder", async () => {
         mockMediaDevices.getUserMedia({ audio: true })
         mockMediaStreamSource.connect(mockAudioWorkletNode)
         mockAudioWorkletNode.connect(mockAudioContext.destination)
-        return undefined
+        return
       }),
       stopRecording: vi.fn().mockImplementation(async () => {
         // Simulate cleanup that would happen in real audioRecorder
@@ -149,7 +149,7 @@ vi.mock("@/models/audio/audioRecorder", async () => {
         mockMediaDevices.getUserMedia({
           audio: { deviceId: { exact: deviceId } },
         })
-        return undefined
+        return
       }),
     })),
   }
@@ -163,11 +163,10 @@ vi.mock("@/models/wakeLocker", () => ({
   })),
 }))
 
-const findButtonByTitle = (wrapper, title: string) => {
-  return wrapper
+const findButtonByTitle = (wrapper, title: string) =>
+  wrapper
     .findAll("button")
     .find((button) => button.attributes("title") === title)
-}
 
 describe("NoteAudioTools", () => {
   // biome-ignore lint/suspicious/noExplicitAny: Accessing internal component properties
@@ -506,9 +505,10 @@ describe("NoteAudioTools", () => {
     const processPromise = new Promise<AudioResponse>((resolve) => {
       resolveProcess = resolve
     })
-    mockSdkServiceWithImplementation("audioToText", async () => {
-      return await processPromise
-    })
+    mockSdkServiceWithImplementation(
+      "audioToText",
+      async () => await processPromise
+    )
 
     // Trigger audio processing
     const processPromise2 = wrapper.vm.processAudio({

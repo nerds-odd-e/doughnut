@@ -110,14 +110,11 @@ const onBlur = () => {
   changer.flush()
 }
 
-const is401Error = (errs: unknown): boolean => {
-  return (
-    typeof errs === "object" &&
-    errs !== null &&
-    "status" in errs &&
-    errs.status === 401
-  )
-}
+const is401Error = (errs: unknown): boolean =>
+  typeof errs === "object" &&
+  errs !== null &&
+  "status" in errs &&
+  errs.status === 401
 
 const setError = (errs: unknown) => {
   if (is401Error(errs)) {

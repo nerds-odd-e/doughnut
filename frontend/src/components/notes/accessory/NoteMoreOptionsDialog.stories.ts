@@ -34,14 +34,12 @@ const meta = {
         ThrowOnError extends boolean = false,
       >(
         _options: Options<GetNoteInfoData, ThrowOnError>
-      ) => {
-        return {
-          data: mockNoteInfo,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        }
-      }) as typeof NoteController.getNoteInfo
+      ) => ({
+        data: mockNoteInfo,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })) as typeof NoteController.getNoteInfo
 
       return {
         components: { story },

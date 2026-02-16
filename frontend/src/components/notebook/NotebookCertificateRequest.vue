@@ -45,22 +45,17 @@ const approvalButtonText = computed(() => {
   return "Approval Pending"
 })
 
-const approvalButtonClasses = computed(() => {
-  return {
-    "daisy-btn": true,
-    "daisy-btn-sm": true,
-    "daisy-btn-primary":
-      approval.value === undefined || approval.value === null,
-    "daisy-btn-outline":
-      approval.value !== undefined && approval.value !== null,
-    "daisy-btn-disabled":
-      approval.value !== undefined && approval.value !== null,
-  }
-})
+const approvalButtonClasses = computed(() => ({
+  "daisy-btn": true,
+  "daisy-btn-sm": true,
+  "daisy-btn-primary": approval.value === undefined || approval.value === null,
+  "daisy-btn-outline": approval.value !== undefined && approval.value !== null,
+  "daisy-btn-disabled": approval.value !== undefined && approval.value !== null,
+}))
 
-const isApprovalButtonDisabled = computed(() => {
-  return approval.value !== undefined && approval.value !== null
-})
+const isApprovalButtonDisabled = computed(
+  () => approval.value !== undefined && approval.value !== null
+)
 const requestNotebookApproval = async () => {
   const { data: newApproval, error } = await apiCallWithLoading(() =>
     NotebookCertificateApprovalController.requestApprovalForNotebook({

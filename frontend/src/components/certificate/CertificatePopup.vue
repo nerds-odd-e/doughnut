@@ -55,9 +55,7 @@ const expiredDate = computed(() =>
   )
 )
 
-const padZero = (num: number): string => {
-  return num.toString().padStart(2, "0")
-}
+const padZero = (num: number): string => num.toString().padStart(2, "0")
 const formatDate = (date: Date): string => {
   const theYear = date.getFullYear()
   const theMonth = padZero(date.getMonth() + 1)

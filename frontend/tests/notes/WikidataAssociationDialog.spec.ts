@@ -324,12 +324,13 @@ describe("WikidataAssociationDialog", () => {
         } as any)
       )
 
-      const windowOpenSpy = vi.spyOn(window, "open").mockImplementation(() => {
-        return {
-          location: { href: "" },
-          focus: vi.fn(),
-        } as unknown as Window
-      })
+      const windowOpenSpy = vi.spyOn(window, "open").mockImplementation(
+        () =>
+          ({
+            location: { href: "" },
+            focus: vi.fn(),
+          }) as unknown as Window
+      )
 
       mountDialog("Test Title", { modelValue: "Q123", showSaveButton: true })
       await flushPromises()
@@ -356,12 +357,13 @@ describe("WikidataAssociationDialog", () => {
         } as any)
       )
 
-      const windowOpenSpy = vi.spyOn(window, "open").mockImplementation(() => {
-        return {
-          location: { href: "" },
-          focus: vi.fn(),
-        } as unknown as Window
-      })
+      const windowOpenSpy = vi.spyOn(window, "open").mockImplementation(
+        () =>
+          ({
+            location: { href: "" },
+            focus: vi.fn(),
+          }) as unknown as Window
+      )
 
       mountDialog("Test Title", { modelValue: "Q123", showSaveButton: true })
       await flushPromises()

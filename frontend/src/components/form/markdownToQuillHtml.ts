@@ -17,22 +17,20 @@ export default function markdownToQuillHtml(
   let indentLevel = -1 // Variable to track indentation level
 
   // Add this new helper function at the top
-  const convertHtmlList = (html: string): string => {
-    return html
+  const convertHtmlList = (html: string): string =>
+    html
       .replace(/<ul>/g, "<ol>")
       .replace(/<\/ul>/g, "</ol>")
       .replace(/<li>/g, '<li data-list="bullet">')
-  }
 
   // Helper function to escape HTML tags
-  const escapeHtml = (html: string): string => {
-    return html
+  const escapeHtml = (html: string): string =>
+    html
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#39;")
-  }
 
   // Override the html method to handle raw HTML
   renderer.html = function (html: string | Tokens.Generic): string {
@@ -97,9 +95,7 @@ export default function markdownToQuillHtml(
   const joinSingleNewlinesInHtml = (html: string): string => {
     // First, remove newlines that immediately follow HTML tag closing characters (>)
     // This handles cases like <br>\nworld where the newline should be removed
-    const result = html.replace(/>\n([^\n<])/g, (_match, after) => {
-      return `>${after}`
-    })
+    const result = html.replace(/>\n([^\n<])/g, (_match, after) => `>${after}`)
     // Replace newline characters in HTML text content
     // This regex matches a newline that is between non-newline characters
     // and handles both plain text and text within HTML tags

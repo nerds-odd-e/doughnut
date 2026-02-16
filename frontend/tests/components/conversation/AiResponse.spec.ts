@@ -126,12 +126,11 @@ const setupTestData = () => {
   return { note, noteRealm, conversation }
 }
 
-const mountComponent = (conversation) => {
-  return helper
+const mountComponent = (conversation) =>
+  helper
     .component(AiResponse)
     .withProps({ conversation, aiReplyTrigger: 0 })
     .mount()
-}
 
 const submitMessage = async (wrapper) => {
   await wrapper.vm.getAiReply()

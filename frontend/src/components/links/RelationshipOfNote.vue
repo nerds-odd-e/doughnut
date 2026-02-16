@@ -23,15 +23,15 @@ const props = defineProps<{
   reverse?: boolean
 }>()
 
-const noteTopology = computed(() => {
-  return props.reverse
+const noteTopology = computed(() =>
+  props.reverse
     ? props.note.noteTopology.parentOrSubjectNoteTopology!
     : props.note.noteTopology.targetNoteTopology!
-})
+)
 
-const fontColor = computed(() => {
-  return props.reverse ? colors.target : colors.source
-})
+const fontColor = computed(() =>
+  props.reverse ? colors.target : colors.source
+)
 </script>
 
 <style scoped>

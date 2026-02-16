@@ -166,6 +166,5 @@ class RawAudioBuffer implements AudioBuffer {
   }
 }
 
-export const createAudioBuffer = (sampleRate: number) => {
-  return new RawAudioBuffer(sampleRate)
-}
+export const createAudioBuffer = (sampleRate: number) =>
+  new RawAudioBuffer(sampleRate)

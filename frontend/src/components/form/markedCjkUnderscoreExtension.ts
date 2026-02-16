@@ -104,7 +104,7 @@ export const markedCjkUnderscoreExtension: MarkedExtension = {
       // Handle underscore-based emphasis - block in CJK context
       if (src.startsWith("_")) {
         if (isCjkContext(prevChar)) {
-          return undefined
+          return
         }
       }
 

@@ -163,7 +163,7 @@ export const createAiReplyStates = (
 
             // Tool calls are executed inline with Chat Completion API
             // No need to submit results or cancel runs
-          } catch (_e) {
+          } catch {
             // When user rejects a tool call, do nothing
             // Tool execution is already handled inline
             // Clear accumulated tool calls on error

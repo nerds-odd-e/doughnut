@@ -135,9 +135,9 @@ const router = useRouter()
 
 const emit = defineEmits(["note-accessory-updated", "edit-as-markdown"])
 
-const isHeadNote = computed(() => {
-  return notebook !== undefined && notebook.headNoteId === note.id
-})
+const isHeadNote = computed(
+  () => notebook !== undefined && notebook.headNoteId === note.id
+)
 
 watch(
   () => note.id,

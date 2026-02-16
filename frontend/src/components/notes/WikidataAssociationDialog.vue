@@ -151,9 +151,9 @@ const titleAction = ref<"Replace" | "Append" | "">("")
 const hasSearched = ref(false)
 const isLoadingUrl = ref(false)
 
-const hasValidWikidataId = computed(() => {
-  return localWikidataId.value && localWikidataId.value.trim() !== ""
-})
+const hasValidWikidataId = computed(
+  () => localWikidataId.value && localWikidataId.value.trim() !== ""
+)
 
 const fetchSearchResults = async () => {
   loading.value = true

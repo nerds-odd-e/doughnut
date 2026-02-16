@@ -65,9 +65,7 @@ describe("Sidebar", () => {
       x: 0,
       y: 0,
       // toJSON is required by DOMRect interface but unused in tests
-      toJSON: () => {
-        return {}
-      },
+      toJSON: () => ({}),
     })
 
     Object.defineProperty(HTMLElement.prototype, "offsetWidth", {

@@ -31,9 +31,10 @@ describe("in place edit on title", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useFakeTimers()
-    mockSdkServiceWithImplementation("updateNoteTitle", async (options) => {
-      return await mockedUpdateTitleCall(options)
-    })
+    mockSdkServiceWithImplementation(
+      "updateNoteTitle",
+      async (options) => await mockedUpdateTitleCall(options)
+    )
   })
 
   afterEach(() => {
@@ -99,9 +100,8 @@ describe("in place edit on title", () => {
     expect(titleEl.getAttribute("contenteditable")).toBe("false")
   })
 
-  const getPlaceholder = (wrapper: VueWrapper<ComponentPublicInstance>) => {
-    return wrapper.get("[data-placeholder]").attributes("data-placeholder")
-  }
+  const getPlaceholder = (wrapper: VueWrapper<ComponentPublicInstance>) =>
+    wrapper.get("[data-placeholder]").attributes("data-placeholder")
 
   it("should prompt people to add details", async () => {
     note.details = ""

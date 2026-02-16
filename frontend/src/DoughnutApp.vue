@@ -29,9 +29,7 @@ const { featureToggle, setFeatureToggle } = useFeatureToggle()
 const environment = ref("production")
 const userLoaded = ref(false)
 
-const newUser = computed(() => {
-  return !user.value && !!externalIdentifier.value
-})
+const newUser = computed(() => !user.value && !!externalIdentifier.value)
 
 onMounted(async () => {
   environment.value = getEnvironment()

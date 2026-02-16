@@ -66,7 +66,7 @@ const relationTypeOptions = [
 ] as RelationTypeOption[]
 
 const reverseLabel = (lbl: NoteTopology["relationType"] | undefined) => {
-  if (!lbl) return undefined
+  if (!lbl) return
   const relationType = relationTypeOptions.find(({ label }) => lbl === label)
   if (relationType) return relationType.reversedLabel
   return "*unknown relation type*"

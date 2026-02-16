@@ -103,13 +103,9 @@ const onAiResponseDone = () => {
 const markdowntToHtml = (content?: string) =>
   markdownizer.markdownToHtml(content)
 
-const formatMessage = (message: string) => {
-  return message.replace(/^"|"$/g, "").trim()
-}
+const formatMessage = (message: string) => message.replace(/^"|"$/g, "").trim()
 
-const isCurrentUser = (id: number): boolean => {
-  return id === user?.id
-}
+const isCurrentUser = (id: number): boolean => id === user?.id
 
 const fetchConversationMessages = async () => {
   if (!conversation.id) return
@@ -162,13 +158,12 @@ const defaultQuestions = [
   "Why are other choices incorrect?",
 ]
 
-const showDefaultMessages = computed(() => {
-  return (
+const showDefaultMessages = computed(
+  () =>
     conversation.subject?.answeredQuestion &&
     (!currentConversationMessages.value ||
       currentConversationMessages.value.length === 0)
-  )
-})
+)
 </script>
 
 <style scoped>

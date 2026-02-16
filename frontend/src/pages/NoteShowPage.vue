@@ -119,9 +119,9 @@ const props = defineProps({
   noteId: { type: Number, required: true },
 })
 
-const noteRealm = computed(() => {
-  return storageAccessor.value.refOfNoteRealm(props.noteId).value
-})
+const noteRealm = computed(
+  () => storageAccessor.value.refOfNoteRealm(props.noteId).value
+)
 
 const sidebarOpened = ref(false)
 const isContentMinimized = ref(false)

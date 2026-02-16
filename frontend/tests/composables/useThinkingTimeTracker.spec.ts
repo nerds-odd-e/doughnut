@@ -30,8 +30,8 @@ describe("useThinkingTimeTracker", () => {
       pause?: () => void
       resume?: () => void
     }
-  ) => {
-    return defineComponent({
+  ) =>
+    defineComponent({
       setup() {
         const { stop, pause, resume } = setupFn()
         const result = ref<number | null>(null)
@@ -51,7 +51,6 @@ describe("useThinkingTimeTracker", () => {
         </div>
       `,
     })
-  }
 
   const setTime = async (ms: number) => {
     performanceNowSpy.mockReturnValue(ms)

@@ -165,9 +165,8 @@ const currentRecallPrompt = computed(() => {
 })
 
 // Methods
-const memoryTrackerAt = (index: number): MemoryTrackerLite | undefined => {
-  return props.memoryTrackers?.[index]
-}
+const memoryTrackerAt = (index: number): MemoryTrackerLite | undefined =>
+  props.memoryTrackers?.[index]
 
 const onSpellingAnswer = async (
   answerData: AnswerSpellingDto & { recallPromptId?: number }

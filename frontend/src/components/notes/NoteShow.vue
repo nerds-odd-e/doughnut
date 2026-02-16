@@ -116,9 +116,8 @@ defineEmits<{
 }>()
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
-const readonly = (noteRealm: NoteRealm) => {
-  return !currentUser?.value || noteRealm?.fromBazaar === true
-}
+const readonly = (noteRealm: NoteRealm) =>
+  !currentUser?.value || noteRealm?.fromBazaar === true
 
 const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined)
 const reloadKey = ref(0)
@@ -127,9 +126,7 @@ const onNoteAccessoryUpdated = () => {
 }
 const asMarkdown = ref(false)
 
-const toLocalDateString = (date: string) => {
-  return new Date(date).toLocaleDateString()
-}
+const toLocalDateString = (date: string) => new Date(date).toLocaleDateString()
 </script>
 <style scoped>
 .note-show-container {

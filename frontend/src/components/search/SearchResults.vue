@@ -121,11 +121,11 @@ const searchResult = computed(() =>
   model.getSearchResult(trimmedSearchKey.value, isGlobalSearch.value)
 )
 
-const filteredRecentNotes = computed(() => {
-  return props.noteId
+const filteredRecentNotes = computed(() =>
+  props.noteId
     ? model.recentNotes.filter((note) => note.noteTopology.id !== props.noteId)
     : model.recentNotes
-})
+)
 
 const displayState = computed(() =>
   model.getDisplayState(

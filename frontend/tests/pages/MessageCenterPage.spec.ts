@@ -6,9 +6,7 @@ import { useRouter } from "vue-router"
 import { page } from "vitest/browser"
 import { flushPromises } from "@vue/test-utils"
 
-const { mockedPush } = vi.hoisted(() => {
-  return { mockedPush: vi.fn() }
-})
+const { mockedPush } = vi.hoisted(() => ({ mockedPush: vi.fn() }))
 
 vi.mock("vue-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("vue-router")>()

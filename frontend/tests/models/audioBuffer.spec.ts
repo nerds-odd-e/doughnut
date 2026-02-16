@@ -105,7 +105,7 @@ describe("AudioBuffer", () => {
       const newData = new Float32Array(44100).fill(0.7)
       audioBuffer.receiveAudioData([newData])
 
-      return undefined
+      return
     })
 
     // Process the first chunk

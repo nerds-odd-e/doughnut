@@ -83,14 +83,15 @@ const handleNotebookUpdated = (updatedNotebook: Notebook) => {
   }
 }
 
-const invitationUrl = computed(() => {
-  return `${window.location.origin}${
-    router.resolve({
-      name: "circleJoin",
-      params: { invitationCode: circle.value?.invitationCode },
-    }).href
-  }`
-})
+const invitationUrl = computed(
+  () =>
+    `${window.location.origin}${
+      router.resolve({
+        name: "circleJoin",
+        params: { invitationCode: circle.value?.invitationCode },
+      }).href
+    }`
+)
 
 onMounted(() => {
   fetchData()

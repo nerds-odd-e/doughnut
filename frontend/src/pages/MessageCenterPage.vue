@@ -118,12 +118,9 @@ onMounted(() => {
   fetchData()
 })
 
-const conversationTopic = (conversation: Conversation) => {
-  return (
-    conversation.subject?.assessmentQuestionInstance?.multipleChoicesQuestion
-      ?.f0__stem || conversation.subject?.note?.noteTopology?.title
-  )
-}
+const conversationTopic = (conversation: Conversation) =>
+  conversation.subject?.assessmentQuestionInstance?.multipleChoicesQuestion
+    ?.f0__stem || conversation.subject?.note?.noteTopology?.title
 
 const conversationPartner = (conversation: Conversation) => {
   if (conversation.conversationInitiator?.name !== user?.value?.name) {

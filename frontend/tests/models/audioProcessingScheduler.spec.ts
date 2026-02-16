@@ -194,7 +194,7 @@ describe("AudioProcessingScheduler", () => {
       })
       .mockImplementationOnce(async () => {
         // Second call for remaining data
-        return undefined
+        return
       })
 
     const { audioBuffer, scheduler } = createBufferAndScheduler(
@@ -240,9 +240,7 @@ describe("AudioProcessingScheduler", () => {
         await firstProcessingPromise
         return "00:00:00,500" // Process 0.5 seconds
       })
-      .mockImplementationOnce(async () => {
-        return undefined
-      })
+      .mockImplementationOnce(async () => undefined)
 
     const { audioBuffer, scheduler } = createBufferAndScheduler(
       44100,

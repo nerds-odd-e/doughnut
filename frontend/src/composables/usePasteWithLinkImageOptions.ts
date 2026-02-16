@@ -47,9 +47,8 @@ function removeLinksAndImages(
 export function usePasteWithLinkImageOptions() {
   const { popups } = usePopups()
 
-  const htmlToMarkdown = (html: string): string => {
-    return markdownizer.htmlToMarkdown(html)
-  }
+  const htmlToMarkdown = (html: string): string =>
+    markdownizer.htmlToMarkdown(html)
 
   const processContentAfterPaste = async (
     content: string

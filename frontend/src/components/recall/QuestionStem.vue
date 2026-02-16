@@ -15,7 +15,7 @@ const props = defineProps<{
   stem: string | undefined
 }>()
 
-const stemHtml = computed(() => {
-  return props.stem ? markdownizer.markdownToHtml(props.stem) : ""
-})
+const stemHtml = computed(() =>
+  props.stem ? markdownizer.markdownToHtml(props.stem) : ""
+)
 </script>

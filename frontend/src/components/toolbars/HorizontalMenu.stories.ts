@@ -24,56 +24,54 @@ const createMockNavItems = (
 ): {
   upperNavItems: NavigationItemType[]
   lowerNavItems: NavigationItemType[]
-} => {
-  return {
-    upperNavItems: [
-      {
-        name: "notebooks",
-        label: "Note",
-        icon: SvgNote,
-        isActive: false,
-      },
-      {
-        name: "assimilate",
-        label: "Assimilate",
-        icon: SvgAssimilate,
-        badge: withBadges ? 5 : undefined,
-        badgeClass: "due-count",
-        isActive: false,
-      },
-      {
-        name: "recall",
-        label: "Recall",
-        icon: SvgCalendarCheck,
-        badge: withBadges ? 789 : undefined,
-        badgeClass: "recall-count",
-        isActive: false,
-      },
-    ],
-    lowerNavItems: [
-      {
-        name: "circles",
-        label: "Circles",
-        icon: SvgPeople,
-        isActive: false,
-      },
-      {
-        name: "bazaar",
-        label: "Bazaar",
-        icon: SvgShop,
-        isActive: false,
-      },
-      {
-        name: "messageCenter",
-        label: "Messages",
-        icon: SvgChat,
-        badge: withBadges ? 3 : undefined,
-        badgeClass: "unread-count",
-        isActive: false,
-      },
-    ],
-  }
-}
+} => ({
+  upperNavItems: [
+    {
+      name: "notebooks",
+      label: "Note",
+      icon: SvgNote,
+      isActive: false,
+    },
+    {
+      name: "assimilate",
+      label: "Assimilate",
+      icon: SvgAssimilate,
+      badge: withBadges ? 5 : undefined,
+      badgeClass: "due-count",
+      isActive: false,
+    },
+    {
+      name: "recall",
+      label: "Recall",
+      icon: SvgCalendarCheck,
+      badge: withBadges ? 789 : undefined,
+      badgeClass: "recall-count",
+      isActive: false,
+    },
+  ],
+  lowerNavItems: [
+    {
+      name: "circles",
+      label: "Circles",
+      icon: SvgPeople,
+      isActive: false,
+    },
+    {
+      name: "bazaar",
+      label: "Bazaar",
+      icon: SvgShop,
+      isActive: false,
+    },
+    {
+      name: "messageCenter",
+      label: "Messages",
+      icon: SvgChat,
+      badge: withBadges ? 3 : undefined,
+      badgeClass: "unread-count",
+      isActive: false,
+    },
+  ],
+})
 
 const meta = {
   title: "Toolbars/HorizontalMenu",
@@ -111,13 +109,11 @@ const meta = {
     },
   },
   decorators: [
-    (story) => {
-      return {
-        components: { story },
-        template:
-          '<div style="width: 100%; height: 80px; background: #f5f5f5; padding: 1rem;"><story /></div>',
-      }
-    },
+    (story) => ({
+      components: { story },
+      template:
+        '<div style="width: 100%; height: 80px; background: #f5f5f5; padding: 1rem;"><story /></div>',
+    }),
   ],
 } satisfies Meta<typeof HorizontalMenu>
 

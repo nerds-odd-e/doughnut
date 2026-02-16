@@ -105,13 +105,10 @@ const errors = ref<Record<string, string | undefined>>()
 const isRecording = ref(false)
 const wakeLocker = createWakeLocker()
 
-const isPowerOfTwo = (n: number): boolean => {
-  return n > 0 && (n & (n - 1)) === 0
-}
+const isPowerOfTwo = (n: number): boolean => n > 0 && (n & (n - 1)) === 0
 
-const shouldSuggestTitle = (callCount: number): boolean => {
-  return isPowerOfTwo(callCount)
-}
+const shouldSuggestTitle = (callCount: number): boolean =>
+  isPowerOfTwo(callCount)
 
 const updateTopicIfSuggested = async (noteId: number) => {
   const { data: suggestedTopic, error } = await apiCallWithLoading(() =>

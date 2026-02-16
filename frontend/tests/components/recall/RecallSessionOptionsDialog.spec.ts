@@ -48,8 +48,8 @@ describe("RecallSessionOptionsDialog", () => {
   const mountWithTeleportStub = (
     component: typeof RecallSessionOptionsDialog,
     props: typeof defaultProps
-  ) => {
-    return helper
+  ) =>
+    helper
       .component(component)
       .withProps(props)
       .mount({
@@ -59,7 +59,6 @@ describe("RecallSessionOptionsDialog", () => {
           },
         },
       })
-  }
 
   it("displays average thinking time when there are MCQ questions with thinking time", async () => {
     const note = makeMe.aNote.please()
