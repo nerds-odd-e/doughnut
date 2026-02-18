@@ -11,7 +11,7 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "postinstall": "syncpack fix-mismatches",
+    "postinstall": "syncpack fix",
     "start:mb": "scripts/start_mb.sh",
     "mcp-server:bundle": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server bundle",
     "mcp-server:test": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server test",
@@ -81,7 +81,7 @@
     "npm-run-all2": "^8.0.4",
     "process": "^0.11.10",
     "superagent": "^10.3.0",
-    "syncpack": "^13.0.4",
+    "syncpack": "^14.0.0",
     "typescript": "5.9.3",
     "util": "^0.12.5",
     "wait-on": "^9.0.4",

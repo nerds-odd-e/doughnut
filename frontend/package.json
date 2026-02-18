@@ -9,7 +9,7 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "postinstall": "syncpack fix-mismatches",
+    "postinstall": "syncpack fix",
     "dev": "vite --host",
     "build": "vue-tsc --noEmit && vite build --emptyOutDir",
     "serve": "vite preview",
