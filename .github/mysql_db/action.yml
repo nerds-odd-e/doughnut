@@ -37,7 +37,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: mirromutth/mysql-action@v1.1
+    - uses: yeongsheng-tan/mysql-action@v1.2
       with:
         mysql version: ${{ inputs.mysql_version }}
         character set server: ${{ inputs.mysql_charset }}
