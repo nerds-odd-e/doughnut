@@ -1,0 +1,13 @@
+diff --git a/src/index.js b/src/index.js
+index f6ce50a19ead412ce12ef0320e20d12d1b64fbd8..789e3c95beeda772d5f31cff5b89e0cfbaf18dfd 100644
+--- a/src/index.js
++++ b/src/index.js
+@@ -7,7 +7,7 @@ const debugGit = require('debug')('find-cypress-specs:git')
+ const fs = require('fs')
+ const path = require('path')
+ const globby = require('tinyglobby')
+-const minimatch = require('minimatch')
++const { minimatch } = require('minimatch')
+ const shell = require('shelljs')
+ const pluralize = require('pluralize')
+ const requireEveryTime = require('require-and-forget')

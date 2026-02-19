@@ -29,6 +29,11 @@ overrides:
   minimatch: '>=10.2.1'
   ajv: '>=8.18.0'
 
+patchedDependencies:
+  find-cypress-specs@1.54.9:
+    hash: 99f50748bff3bff64e78b0618d83e22794c520b02772c3be8e529c2bdca9fdbe
+    path: patches/find-cypress-specs@1.54.9.patch
+
 importers:
 
   .:
@@ -6821,7 +6826,7 @@ snapshots:
       cypress: 15.10.0
       debug: 4.4.3(supports-color@8.1.1)
       error-stack-parser: 2.1.4
-      find-cypress-specs: 1.54.9(@babel/core@7.29.0)
+      find-cypress-specs: 1.54.9(patch_hash=99f50748bff3bff64e78b0618d83e22794c520b02772c3be8e529c2bdca9fdbe)(@babel/core@7.29.0)
       fp-ts: 2.16.11
       glob: 13.0.2
       io-ts: 2.2.22(fp-ts@2.16.11)
@@ -8323,7 +8328,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.0.3
-      vitest: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.2.3)(@vitest/browser-playwright@4.0.18)(@vitest/ui@4.0.18)(jiti@1.21.7)(jsdom@27.4.0(@noble/hashes@1.8.0))(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2)
+      vitest: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.2.3)(@vitest/browser-playwright@4.0.18)(@vitest/ui@4.0.18)(jiti@2.6.1)(jsdom@27.4.0(@noble/hashes@1.8.0))(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2)
 
   '@vitest/utils@2.0.5':
     dependencies:
@@ -9912,7 +9917,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  find-cypress-specs@1.54.9(@babel/core@7.29.0):
+  find-cypress-specs@1.54.9(patch_hash=99f50748bff3bff64e78b0618d83e22794c520b02772c3be8e529c2bdca9fdbe)(@babel/core@7.29.0):
     dependencies:
       '@actions/core': 2.0.3
       arg: 5.0.2
