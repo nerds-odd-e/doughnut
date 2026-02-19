@@ -110,7 +110,7 @@
       "diff": ">=8.0.3",
       "lodash-es": ">=4.17.23",
       "lodash": ">=4.17.23",
-      "fast-xml-parser": ">=5.3.4",
+      "fast-xml-parser": ">=5.3.6",
       "@isaacs/brace-expansion": ">=5.0.1",
       "axios": ">=1.13.5"
     },
