@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -16,6 +17,7 @@ public class BazaarNotebook extends EntityIdentifiedByIdOnly {
   @JoinColumn(name = "notebook_id", referencedColumnName = "id")
   @Getter
   @Setter
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NotNull
   private Notebook notebook;
 }

@@ -130,8 +130,7 @@ paths:
             '*/*':
               schema:
                 type: array
-                items:
-                  type: object
+                items: {}
   /api/testability/time_travel:
     post:
       tags:
@@ -156,8 +155,7 @@ paths:
             '*/*':
               schema:
                 type: array
-                items:
-                  type: object
+                items: {}
   /api/testability/testability_update_user:
     post:
       tags:
@@ -262,8 +260,7 @@ paths:
             '*/*':
               schema:
                 type: array
-                items:
-                  type: object
+                items: {}
   /api/testability/inject_suggested_questions:
     post:
       tags:
@@ -410,8 +407,7 @@ paths:
             '*/*':
               schema:
                 type: array
-                items:
-                  type: object
+                items: {}
   /api/testability/create_relationships:
     post:
       tags:
@@ -2824,8 +2820,7 @@ paths:
                 type: array
                 items:
                   type: object
-                  additionalProperties:
-                    type: object
+                  additionalProperties: {}
   /api/recalls/recalling:
     get:
       tags:
@@ -2908,8 +2903,7 @@ paths:
             application/json:
               schema:
                 type: object
-                additionalProperties:
-                  type: object
+                additionalProperties: {}
   /api/notes/{note}/note-info:
     get:
       tags:
@@ -3306,8 +3300,7 @@ paths:
             '*/*':
               schema:
                 type: array
-                items:
-                  type: object
+                items: {}
   /api/conversation/{conversationId}:
     get:
       tags:
@@ -3382,8 +3375,7 @@ paths:
             application/json:
               schema:
                 type: object
-                additionalProperties:
-                  type: object
+                additionalProperties: {}
   /api/conversation/all:
     get:
       tags:
@@ -4117,7 +4109,6 @@ components:
           answeredQuestion:
             $ref: "#/components/schemas/AnsweredQuestion"
     RecallResult:
-      type: object
       discriminator:
         propertyName: type
       properties:
@@ -4355,9 +4346,7 @@ components:
           type: string
           format: date-time
       required:
-      - createdAt
       - id
-      - updatedAt
     ConversationSubject:
       type: object
       properties:

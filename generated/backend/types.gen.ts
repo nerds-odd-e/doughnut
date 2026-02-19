@@ -349,8 +349,8 @@ export type Conversation = {
     subject?: ConversationSubject;
     subjectOwnership?: Ownership;
     conversationInitiator?: User;
-    createdAt: string;
-    updatedAt: string;
+    createdAt?: string;
+    updatedAt?: string;
 };
 
 export type ConversationSubject = {
@@ -747,8 +747,8 @@ export type ConversationWritable = {
     subject?: ConversationSubjectWritable;
     subjectOwnership?: Ownership;
     conversationInitiator?: User;
-    createdAt: string;
-    updatedAt: string;
+    createdAt?: string;
+    updatedAt?: string;
 };
 
 export type ConversationSubjectWritable = {
@@ -938,9 +938,7 @@ export type TimeTravelRelativeToNowResponses = {
     /**
      * OK
      */
-    200: Array<{
-        [key: string]: unknown;
-    }>;
+    200: Array<unknown>;
 };
 
 export type TimeTravelRelativeToNowResponse = TimeTravelRelativeToNowResponses[keyof TimeTravelRelativeToNowResponses];
@@ -965,9 +963,7 @@ export type TimeTravelResponses = {
     /**
      * OK
      */
-    200: Array<{
-        [key: string]: unknown;
-    }>;
+    200: Array<unknown>;
 };
 
 export type TimeTravelResponse = TimeTravelResponses[keyof TimeTravelResponses];
@@ -1073,9 +1069,7 @@ export type RandomizerResponses = {
     /**
      * OK
      */
-    200: Array<{
-        [key: string]: unknown;
-    }>;
+    200: Array<unknown>;
 };
 
 export type RandomizerResponse = RandomizerResponses[keyof RandomizerResponses];
@@ -1231,9 +1225,7 @@ export type EnableFeatureToggleResponses = {
     /**
      * OK
      */
-    200: Array<{
-        [key: string]: unknown;
-    }>;
+    200: Array<unknown>;
 };
 
 export type EnableFeatureToggleResponse = EnableFeatureToggleResponses[keyof EnableFeatureToggleResponses];
@@ -3662,9 +3654,7 @@ export type GithubIssuesResponses = {
      * OK
      */
     200: Array<{
-        [key: string]: {
-            [key: string]: unknown;
-        };
+        [key: string]: unknown;
     }>;
 };
 
@@ -3748,9 +3738,7 @@ export type ExportQuestionGenerationResponses = {
      * OK
      */
     200: {
-        [key: string]: {
-            [key: string]: unknown;
-        };
+        [key: string]: unknown;
     };
 };
 
@@ -4223,9 +4211,7 @@ export type DataUpgradeResponses = {
     /**
      * OK
      */
-    200: Array<{
-        [key: string]: unknown;
-    }>;
+    200: Array<unknown>;
 };
 
 export type DataUpgradeResponse = DataUpgradeResponses[keyof DataUpgradeResponses];
@@ -4307,9 +4293,7 @@ export type ExportConversationResponses = {
      * OK
      */
     200: {
-        [key: string]: {
-            [key: string]: unknown;
-        };
+        [key: string]: unknown;
     };
 };
 

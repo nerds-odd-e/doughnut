@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -21,6 +22,7 @@ public class ConversationMessage extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   Conversation conversation;
 
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NotNull
   @Column(name = "message", columnDefinition = "TEXT")
   String message;
