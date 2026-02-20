@@ -1074,6 +1074,31 @@ export type RandomizerResponses = {
 
 export type RandomizerResponse = RandomizerResponses[keyof RandomizerResponses];
 
+export type SetOpenAiTokenData = {
+    body?: {
+        [key: string]: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/testability/open_ai_token';
+};
+
+export type SetOpenAiTokenErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type SetOpenAiTokenError = SetOpenAiTokenErrors[keyof SetOpenAiTokenErrors];
+
+export type SetOpenAiTokenResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type InjectSuggestedQuestionData = {
     body: SuggestedQuestionsDataWritable;
     path?: never;

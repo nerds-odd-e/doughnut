@@ -28,5 +28,6 @@ public abstract class ControllerTestBase {
   @AfterEach
   void cleanupTestabilitySettings() {
     testabilitySettings.timeTravelTo(null);
+    testabilitySettings.setOpenAiTokenOverride(null);
   }
 }

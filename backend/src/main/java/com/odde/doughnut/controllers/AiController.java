@@ -6,6 +6,7 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.controllers.dto.IgnorePointsRequestDTO;
 import com.odde.doughnut.controllers.dto.IgnorePointsResponseDTO;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
@@ -89,11 +90,15 @@ public class AiController {
     if (details == null || details.trim().isEmpty()) {
       return new UnderstandingChecklistDTO(List.of());
     }
-    List<String> points =
-        notebookAssistantForNoteServiceFactory
-            .createNoteAutomationService(note)
-            .generateUnderstandingChecklist();
-    return new UnderstandingChecklistDTO(points);
+    try {
+      List<String> points =
+          notebookAssistantForNoteServiceFactory
+              .createNoteAutomationService(note)
+              .generateUnderstandingChecklist();
+      return new UnderstandingChecklistDTO(points);
+    } catch (OpenAiNotAvailableException e) {
+      return new UnderstandingChecklistDTO(List.of());
+    }
   }
 
   @PostMapping("/remove-point-from-note/{note}")

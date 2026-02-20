@@ -23,10 +23,11 @@ public class TestabilitySettings {
   @Autowired GithubService githubService;
   @Getter private boolean featureToggleEnabled = false;
 
-  private static final String DISABLED_SENTINEL = "__DISABLED__";
   private final Map<String, String> replacedServiceUrls = new HashMap<>();
   private final Map<String, String> defaultServiceUrls =
       Map.of("wikidata", "https://www.wikidata.org", "openAi", "https://api.openai.com/v1/");
+
+  private String openAiTokenOverride = null;
 
   public Timestamp timeTravelTo(Timestamp timestamp) {
     this.timestamp = timestamp;
@@ -77,11 +78,7 @@ public class TestabilitySettings {
 
   private String getServiceUrl(String serviceName) {
     if (this.replacedServiceUrls.containsKey(serviceName)) {
-      String url = this.replacedServiceUrls.get(serviceName);
-      if (DISABLED_SENTINEL.equals(url)) {
-        return "";
-      }
-      return url;
+      return this.replacedServiceUrls.get(serviceName);
     }
     return this.defaultServiceUrls.get(serviceName);
   }
@@ -101,13 +98,12 @@ public class TestabilitySettings {
     return getServiceUrl("openAi");
   }
 
-  public void disableOpenAi() {
-    this.replacedServiceUrls.put("openAi", DISABLED_SENTINEL);
+  public String getOpenAiTokenOverride() {
+    return openAiTokenOverride;
   }
 
-  public boolean isOpenAiDisabled() {
-    return this.replacedServiceUrls.containsKey("openAi")
-        && DISABLED_SENTINEL.equals(this.replacedServiceUrls.get("openAi"));
+  public void setOpenAiTokenOverride(String token) {
+    this.openAiTokenOverride = token;
   }
 
   void init() {
@@ -116,5 +112,6 @@ public class TestabilitySettings {
     enableFeatureToggle(false);
     setRandomization(new Randomization(Randomization.RandomStrategy.first, 0));
     replacedServiceUrls.clear();
+    openAiTokenOverride = null;
   }
 }

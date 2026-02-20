@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
+import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
@@ -106,7 +107,7 @@ public class ConversationMessageController {
 
       // Use new chat completion service
       return chatCompletionConversationService.getReplyStream(conversation, conversationService);
-    } catch (OpenAiUnauthorizedException e) {
+    } catch (OpenAiUnauthorizedException | OpenAiNotAvailableException e) {
       // Since this method is asynchronous, the exception body is not returned to the client.
       // Instead, the client will receive a 400 Bad Request status code, with no body.
       throw new BadRequestException(e.getMessage(), e);

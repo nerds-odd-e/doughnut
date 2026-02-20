@@ -325,6 +325,15 @@ const testability = () => {
         { log: false }
       )
     },
+
+    setOpenAiTokenOverride(token: string | null) {
+      return cy.wrap(
+        TestabilityRestController.setOpenAiToken({
+          body: { token: token ?? '' },
+        }),
+        { log: false }
+      )
+    },
     mockBrowserTime() {
       //
       // when using `cy.clock()` to set the time,
@@ -346,10 +355,6 @@ const testability = () => {
 
     restoreMockedService(serviceMocker: ServiceMocker) {
       this.setServiceUrl(serviceMocker.serviceName, '')
-    },
-
-    disableService(serviceMocker: ServiceMocker) {
-      this.setServiceUrl(serviceMocker.serviceName, '__DISABLED__')
     },
   }
 }

@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
@@ -110,6 +111,21 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
       assertThrows(ResponseStatusException.class, () -> controller.askAQuestion(memoryTracker));
+    }
+
+    @Test
+    void shouldThrowWhenOpenAiNotAvailableAndGeneratingQuestion() {
+      Note note =
+          makeMe
+              .aNote("moon")
+              .details("partner of earth")
+              .creatorAndOwner(currentUser.getUser())
+              .rememberSpelling()
+              .please();
+      makeMe.aNote().under(note).please();
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
+      testabilitySettings.setOpenAiTokenOverride("");
+      assertThrows(OpenAiNotAvailableException.class, () -> controller.askAQuestion(memoryTracker));
     }
   }
 

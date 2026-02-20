@@ -369,6 +369,12 @@ class TestabilityRestController {
     testabilitySettings.replaceServiceUrls(setWikidataService);
   }
 
+  @PostMapping(value = "/open_ai_token")
+  public void setOpenAiToken(@RequestBody(required = false) Map<String, String> body) {
+    String token = body != null ? body.get("token") : null;
+    testabilitySettings.setOpenAiTokenOverride(token);
+  }
+
   @PostMapping(value = "/randomizer")
   public List<Object> randomizer(@RequestBody Randomization randomization) {
     testabilitySettings.setRandomization(randomization);

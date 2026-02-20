@@ -6,9 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
+import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.services.ai.ChatMessageForFineTuning;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
+import com.odde.doughnut.testability.TestabilitySettings;
 import com.openai.client.OpenAIClient;
 import com.openai.models.chat.completions.ChatCompletion;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
@@ -28,20 +30,39 @@ import java.nio.file.StandardOpenOption;
 import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
 public class OpenAiApiHandler {
-  private final OpenAIClient officialClient; // Official SDK
+  private final OpenAIClient officialClient;
   private final ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
+  private final TestabilitySettings testabilitySettings;
+  private final String defaultOpenAiToken;
 
   @Autowired
-  public OpenAiApiHandler(@Qualifier("officialOpenAiClient") OpenAIClient officialClient) {
+  public OpenAiApiHandler(
+      @Qualifier("officialOpenAiClient") OpenAIClient officialClient,
+      TestabilitySettings testabilitySettings,
+      @Value("${spring.openai.token}") String defaultOpenAiToken) {
     this.officialClient = officialClient;
+    this.testabilitySettings = testabilitySettings;
+    this.defaultOpenAiToken = defaultOpenAiToken;
+  }
+
+  private void assertOpenAiAvailable() {
+    String effectiveToken =
+        testabilitySettings.getOpenAiTokenOverride() != null
+            ? testabilitySettings.getOpenAiTokenOverride()
+            : defaultOpenAiToken;
+    if (effectiveToken == null || effectiveToken.isEmpty()) {
+      throw new OpenAiNotAvailableException("OpenAI is not available (no API key configured).");
+    }
   }
 
   public String getOpenAiImage(String prompt) {
+    assertOpenAiAvailable();
     ImageGenerateParams params =
         ImageGenerateParams.builder()
             .prompt(prompt)
@@ -65,6 +86,7 @@ public class OpenAiApiHandler {
   }
 
   public Optional<ChatCompletion.Choice> chatCompletion(ChatCompletionCreateParams params) {
+    assertOpenAiAvailable();
     ChatCompletion response = officialClient.chat().completions().create(params);
     if (response == null || response.choices() == null || response.choices().isEmpty()) {
       return Optional.empty();
@@ -73,7 +95,7 @@ public class OpenAiApiHandler {
   }
 
   public Flowable<String> streamChatCompletion(ChatCompletionCreateParams params) {
-
+    assertOpenAiAvailable();
     return Flowable.<String>create(
         emitter -> {
           // Use the async client's subscribe() method for true async streaming
@@ -118,7 +140,7 @@ public class OpenAiApiHandler {
   }
 
   public List<com.openai.models.models.Model> getModels() {
-    // Use official SDK models API
+    assertOpenAiAvailable();
     var modelsResponse = officialClient.models().list();
     if (modelsResponse != null && modelsResponse.data() != null) {
       return modelsResponse.data();
@@ -128,6 +150,7 @@ public class OpenAiApiHandler {
 
   public String uploadTextFile(String subFileName, String content, String purpose, String suffix)
       throws IOException {
+    assertOpenAiAvailable();
     File tempFile = File.createTempFile(subFileName, suffix);
     try {
       Files.write(tempFile.toPath(), content.getBytes(), StandardOpenOption.WRITE);
@@ -147,7 +170,7 @@ public class OpenAiApiHandler {
   }
 
   public com.openai.models.finetuning.jobs.FineTuningJob triggerFineTuning(String fileId) {
-    // Use official SDK fine-tuning API
+    assertOpenAiAvailable();
     var params =
         com.openai.models.finetuning.jobs.JobCreateParams.builder()
             .trainingFile(fileId)
@@ -178,7 +201,7 @@ public class OpenAiApiHandler {
   }
 
   public String getTranscription(String filename, byte[] audioBytes) throws IOException {
-    // Use official SDK audio transcription API
+    assertOpenAiAvailable();
     var params =
         com.openai.models.audio.transcriptions.TranscriptionCreateParams.builder()
             .file(audioBytes)
@@ -193,6 +216,7 @@ public class OpenAiApiHandler {
 
   public Optional<JsonNode> requestAndGetJsonSchemaResult(
       InstructionAndSchema tool, OpenAIChatRequestBuilder openAIChatRequestBuilder) {
+    assertOpenAiAvailable();
     ChatCompletionCreateParams chatRequest =
         openAIChatRequestBuilder.responseJsonSchema(tool).build();
 

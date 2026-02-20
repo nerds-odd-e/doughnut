@@ -32,8 +32,6 @@ public class OpenAiApiConfig {
       @Value("${spring.openai.token}") String openAiToken,
       @Autowired TestabilitySettings testabilitySettings) {
     String baseUrl = testabilitySettings.getOpenAiApiUrl();
-    // Use default URL if service is disabled (empty URL) to allow bean creation
-    // Services check isOpenAiDisabled() before using the client
     if (baseUrl == null || baseUrl.isEmpty()) {
       baseUrl = "https://api.openai.com/v1/";
     }
@@ -49,8 +47,6 @@ public class OpenAiApiConfig {
       @Value("${spring.openai.token}") String openAiToken,
       @Autowired TestabilitySettings testabilitySettings) {
     String baseUrl = testabilitySettings.getOpenAiApiUrl();
-    // Use default URL if service is disabled (empty URL) to allow bean creation
-    // Services check isOpenAiDisabled() before using the client
     if (baseUrl == null || baseUrl.isEmpty()) {
       baseUrl = "https://api.openai.com/v1/";
     }

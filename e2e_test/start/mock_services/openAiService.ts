@@ -15,7 +15,7 @@ const openAiService = () => {
     },
 
     disable() {
-      testability().disableService(serviceMocker)
+      testability().setOpenAiTokenOverride(null)
     },
 
     restartImposter() {

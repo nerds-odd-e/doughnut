@@ -261,6 +261,27 @@ paths:
               schema:
                 type: array
                 items: {}
+  /api/testability/open_ai_token:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: setOpenAiToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
   /api/testability/inject_suggested_questions:
     post:
       tags:

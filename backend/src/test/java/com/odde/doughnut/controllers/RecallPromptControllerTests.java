@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -292,6 +293,16 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       assertThat("A message should contain the contest information", hasContestInfo, is(true));
     }
+
+    @Test
+    void shouldThrowWhenOpenAiNotAvailable() {
+      QuestionContestResult contestResult = new QuestionContestResult();
+      contestResult.advice = "test";
+      testabilitySettings.setOpenAiTokenOverride("");
+      assertThrows(
+          OpenAiNotAvailableException.class,
+          () -> controller.regenerate(recallPrompt, contestResult));
+    }
   }
 
   @Nested
@@ -355,6 +366,12 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       QuestionContestResult contestResult = controller.contest(recallPrompt);
       assertFalse(contestResult.rejected);
+    }
+
+    @Test
+    void shouldThrowWhenOpenAiNotAvailable() {
+      testabilitySettings.setOpenAiTokenOverride("");
+      assertThrows(OpenAiNotAvailableException.class, () -> controller.contest(recallPrompt));
     }
   }
 

@@ -9,6 +9,7 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.TestabilitySettings;
 import com.openai.client.OpenAIClient;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,12 +32,14 @@ class ChatCompletionNoteAutomationServiceTest {
   @Autowired MakeMe makeMe;
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired OpenAiApiHandler openAiApiHandler;
+  @Autowired TestabilitySettings testabilitySettings;
   OpenAIChatCompletionMock openAIChatCompletionMock;
   private Note testNote;
   private ChatCompletionNoteAutomationService service;
 
   @BeforeEach
   void setup() {
+    testabilitySettings.setOpenAiTokenOverride(null);
     openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
 
     // Create common test data

@@ -14,6 +14,7 @@ import com.odde.doughnut.controllers.dto.RemovePointsResponseDTO;
 import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
 import com.odde.doughnut.controllers.dto.UnderstandingChecklistDTO;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.ai.RegeneratedNoteDetails;
 import com.odde.doughnut.services.ai.TitleReplacement;
@@ -128,6 +129,12 @@ class AiControllerTest extends ControllerTestBase {
       when(mockListPage.data()).thenReturn(modelsList);
 
       assertThat(controller.getAvailableGptModels()).contains("gpt-4");
+    }
+
+    @Test
+    void shouldThrowWhenOpenAiNotAvailable() {
+      testabilitySettings.setOpenAiTokenOverride("");
+      assertThrows(OpenAiNotAvailableException.class, () -> controller.getAvailableGptModels());
     }
   }
 

@@ -56,9 +56,6 @@ public class AiQuestionGenerator {
 
   public MCQWithAnswer getAiGeneratedQuestion(
       Note note, String customPrompt, String additionalMessage) {
-    if (testabilitySettings.isOpenAiDisabled()) {
-      return null;
-    }
     try {
       MCQWithAnswer original =
           noteQuestionGenerationService.generateQuestionWithCustomPrompt(
@@ -87,18 +84,12 @@ public class AiQuestionGenerator {
   }
 
   public MCQWithAnswer getAiGeneratedRefineQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
-    if (testabilitySettings.isOpenAiDisabled()) {
-      return null;
-    }
     return forNote(note, globalSettingsService.globalSettingQuestionGeneration().getValue())
         .refineQuestion(mcqWithAnswer)
         .orElse(null);
   }
 
   public QuestionEvaluation getQuestionContestResult(Note note, MCQWithAnswer mcqWithAnswer) {
-    if (testabilitySettings.isOpenAiDisabled()) {
-      return null;
-    }
     try {
       return noteQuestionGenerationService.evaluateQuestion(note, mcqWithAnswer).orElse(null);
     } catch (JsonProcessingException e) {

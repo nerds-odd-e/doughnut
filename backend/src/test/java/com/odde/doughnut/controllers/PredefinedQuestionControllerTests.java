@@ -10,6 +10,7 @@ import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.QuestionSuggestionForFineTuningRepository;
+import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -216,6 +217,27 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
       assertThrows(RuntimeException.class, () -> controller.refineQuestion(note, mcqWithAnswer));
       verify(openAIChatCompletionMock.completionService(), Mockito.times(1))
           .create(ArgumentMatchers.any(ChatCompletionCreateParams.class));
+    }
+
+    @Test
+    void shouldThrowWhenOpenAiNotAvailable() {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      PredefinedQuestion predefinedQuestion = makeMe.aPredefinedQuestion().please();
+      testabilitySettings.setOpenAiTokenOverride("");
+      assertThrows(
+          OpenAiNotAvailableException.class,
+          () -> controller.refineQuestion(note, predefinedQuestion));
+    }
+  }
+
+  @Nested
+  class GenerateQuestionWithoutSave {
+    @Test
+    void shouldThrowWhenOpenAiNotAvailable() {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      testabilitySettings.setOpenAiTokenOverride("");
+      assertThrows(
+          OpenAiNotAvailableException.class, () -> controller.generateQuestionWithoutSave(note));
     }
   }
 

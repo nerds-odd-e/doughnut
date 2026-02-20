@@ -2,9 +2,11 @@ package com.odde.doughnut.services.ai;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.NoteQuestionGenerationService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -51,8 +53,8 @@ class AiQuestionGeneratorTests {
 
   @AfterEach
   void cleanup() {
-    // Reset OpenAI URL to default after each test
     testabilitySettings.replaceServiceUrls(Map.of("openAi", "https://api.openai.com/v1/"));
+    testabilitySettings.setOpenAiTokenOverride(null);
   }
 
   @Test
@@ -186,18 +188,14 @@ class AiQuestionGeneratorTests {
   }
 
   @Test
-  void shouldReturnNullWhenOpenAiIsDisabled() {
-    // Setup a note with enough content for question generation
+  void shouldThrowWhenOpenAiIsNotAvailable() {
     Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
     makeMe.aNote().under(note).please();
 
-    // Disable OpenAI using the disable method
-    testabilitySettings.disableOpenAi();
+    testabilitySettings.setOpenAiTokenOverride("");
 
-    // Act
-    MCQWithAnswer result = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
-
-    // Assert
-    assertThat(result, equalTo(null)); // Question generation should be skipped
+    assertThrows(
+        OpenAiNotAvailableException.class,
+        () -> aiQuestionGenerator.getAiGeneratedQuestion(note, null));
   }
 }

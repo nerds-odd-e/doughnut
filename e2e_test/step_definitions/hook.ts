@@ -70,6 +70,10 @@ Before({ tags: '@disableOpenAiService' }, () => {
   mock_services.openAi().disable()
 })
 
+After({ tags: '@disableOpenAiService' }, () => {
+  start.testability().setOpenAiTokenOverride(null)
+})
+
 // the Afer hook from cypress-cucumber-preprocessor is not working
 // as expected.
 // When a test fail, the After hook is not called.
