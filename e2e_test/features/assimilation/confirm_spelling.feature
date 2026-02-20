@@ -16,13 +16,11 @@ Feature: Confirm Spelling Before Keep For Repetition
     And I should see the spelling verification popup
 
   Scenario: Verify spelling with correct answer proceeds with keep for repetition
-    When I type "sedition" in the verification input
-    And I click "Verify" button on the popup
+    When I verify spelling with "sedition"
     Then the note "sedition" should be assimilated with remembering spelling
 
   Scenario: Show error message when spelling is incorrect
-    When I type "wrong answer" in the verification input
-    And I click "Verify" button on the popup
+    When I verify spelling with "wrong answer"
     Then I should see an error message "wrong spelling" below the input field
     And the popup should remain open
 
@@ -34,6 +32,5 @@ Feature: Confirm Spelling Before Keep For Repetition
     And I check the option of remembering spelling
     And I click "Keep for repetition" button
     And I should see the spelling verification popup
-    When I type "rebellion" in the verification input
-    And I click "Verify" button on the popup
+    When I verify spelling with "rebellion"
     Then the note "rebellion / insurrection" should be assimilated with remembering spelling

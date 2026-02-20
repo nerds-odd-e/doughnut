@@ -239,10 +239,8 @@ export const assumeAssimilationPage = () => ({
     cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
     cy.get('[data-test="spelling-verification-input"]').should('be.visible')
   },
-  typeInVerificationInput(text: string) {
+  verifySpellingWith(text: string) {
     cy.get('[data-test="spelling-verification-input"]').type(text)
-  },
-  clickPopupButton(buttonName: 'Verify') {
     cy.get('[data-test="verify-spelling"]').click()
   },
   expectPopupClosed() {
@@ -256,9 +254,6 @@ export const assumeAssimilationPage = () => ({
       'contain.text',
       message
     )
-  },
-  expectVerificationInputEmpty() {
-    cy.get('[data-test="spelling-verification-input"]').should('have.value', '')
   },
   expectPointRemovedFromChecklist(pointText: string) {
     cy.contains('li', pointText).should('not.exist')

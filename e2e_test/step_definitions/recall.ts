@@ -391,27 +391,12 @@ Then('I should see the spelling verification popup', () => {
   start.assumeAssimilationPage().waitForSpellingVerificationPopup()
 })
 
-When('I click {string} button on the popup', (buttonName: string) => {
-  if (buttonName === 'Verify') {
-    start.assumeAssimilationPage().clickPopupButton(buttonName)
-  } else {
-    cy.get('.modal-mask').within(() => {
-      cy.findByRole('button', { name: buttonName }).click()
-    })
-  }
+When('I verify spelling with {string}', (text: string) => {
+  start.assumeAssimilationPage().verifySpellingWith(text)
 })
 
 Then('the popup should be closed', () => {
   start.assumeAssimilationPage().expectPopupClosed()
-})
-
-When('I type {string} in the verification input', (text: string) => {
-  if (text === '') {
-    // If empty string, just ensure input is empty (it already is when popup opens)
-    start.assumeAssimilationPage().expectVerificationInputEmpty()
-  } else {
-    start.assumeAssimilationPage().typeInVerificationInput(text)
-  }
 })
 
 Then(
