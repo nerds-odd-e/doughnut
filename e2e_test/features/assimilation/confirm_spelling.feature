@@ -15,13 +15,6 @@ Feature: Confirm Spelling Before Keep For Repetition
     And I click "Keep for repetition" button
     And I should see the spelling verification popup
 
-  Scenario: Cancel popup and reopen it
-    When I click "Cancel" button on the popup
-    Then the popup should be closed
-    And I should still be on the assimilate page for "sedition"
-    When I click "Keep for repetition" button
-    Then I should see the spelling verification popup
-
   Scenario: Verify spelling with correct answer proceeds with keep for repetition
     When I type "sedition" in the verification input
     And I click "Verify" button on the popup

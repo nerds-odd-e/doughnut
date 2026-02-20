@@ -242,12 +242,8 @@ export const assumeAssimilationPage = () => ({
   typeInVerificationInput(text: string) {
     cy.get('[data-test="spelling-verification-input"]').type(text)
   },
-  clickPopupButton(buttonName: 'Cancel' | 'Verify') {
-    const dataTestMap = {
-      Cancel: 'cancel-spelling',
-      Verify: 'verify-spelling',
-    }
-    cy.get(`[data-test="${dataTestMap[buttonName]}"]`).click()
+  clickPopupButton(buttonName: 'Verify') {
+    cy.get('[data-test="verify-spelling"]').click()
   },
   expectPopupClosed() {
     cy.get('[data-test="spelling-verification-popup"]').should('not.exist')

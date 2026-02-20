@@ -20,7 +20,6 @@
       />
       <p v-if="errorMessage" class="daisy-text-error daisy-mt-2" data-test="spelling-error-message">{{ errorMessage }}</p>
       <div class="daisy-mt-4 daisy-flex daisy-gap-2">
-        <button class="daisy-btn daisy-btn-secondary" data-test="cancel-spelling" @click="$emit('cancel')">Cancel</button>
         <button class="daisy-btn daisy-btn-primary" data-test="verify-spelling" @click="verify">Verify</button>
       </div>
     </template>

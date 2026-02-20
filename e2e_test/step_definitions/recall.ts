@@ -392,7 +392,7 @@ Then('I should see the spelling verification popup', () => {
 })
 
 When('I click {string} button on the popup', (buttonName: string) => {
-  if (buttonName === 'Cancel' || buttonName === 'Verify') {
+  if (buttonName === 'Verify') {
     start.assumeAssimilationPage().clickPopupButton(buttonName)
   } else {
     cy.get('.modal-mask').within(() => {
