@@ -418,15 +418,11 @@ When('I update the note details to {string}', (newDetails: string) => {
 })
 
 Then(
-  'I should see an error message {string} below the input field',
+  'I should see an error message {string} in the spelling verification popup',
   (errorMessage: string) => {
     start.assumeAssimilationPage().expectSpellingErrorMessage(errorMessage)
   }
 )
-
-Then('the popup should remain open', () => {
-  start.assumeAssimilationPage().expectPopupOpen()
-})
 
 Then('I should see a re-assimilate confirmation dialog', () => {
   cy.contains('You have answered this note incorrectly too many times').should(

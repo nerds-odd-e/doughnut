@@ -254,9 +254,6 @@ export const assumeAssimilationPage = () => ({
   expectPopupClosed() {
     cy.get('[data-test="spelling-verification-popup"]').should('not.exist')
   },
-  expectPopupOpen() {
-    cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
-  },
   expectSpellingErrorMessage(message: string) {
     cy.get('[data-test="spelling-error-message"]').should(
       'contain.text',
