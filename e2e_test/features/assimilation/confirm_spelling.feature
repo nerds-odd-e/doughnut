@@ -19,9 +19,9 @@ Feature: Confirm Spelling Before Keep For Repetition
     Then the note "<note_title>" should be assimilated with remembering spelling
 
     Examples:
-      | note_title               | details                          | spelling_input |
-      | sedition                 | Sedition means incite violence   | sedition       |
-      | rebellion / insurrection | Rebellion means armed resistance | rebellion      |
+      | note_title     | details                         | spelling_input |
+      | sedition       | Sedition means incite violence  | sedition       |
+      | colour / color | Colour is the visual perception | colour         |
 
   Scenario: Show error message when spelling is incorrect
     And there are some notes:
