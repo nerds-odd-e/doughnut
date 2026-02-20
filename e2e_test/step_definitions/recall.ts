@@ -387,10 +387,6 @@ When('I click {string} button', (buttonName: string) => {
   cy.findByRole('button', { name: buttonName }).click()
 })
 
-Then('I should see the spelling verification popup', () => {
-  start.assumeAssimilationPage().waitForSpellingVerificationPopup()
-})
-
 When('I verify spelling with {string}', (text: string) => {
   start.assumeAssimilationPage().verifySpellingWith(text)
 })

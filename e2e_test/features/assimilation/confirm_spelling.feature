@@ -7,30 +7,29 @@ Feature: Confirm Spelling Before Keep For Repetition
   Background:
     Given I am logged in as an existing user
     And I have a notebook with the head note "English" which skips review
+
+  Scenario Outline: Verify spelling proceeds with keep for repetition
+    And there are some notes:
+      | Title        | Details   | Parent Title |
+      | <note_title> | <details> | English      |
+    And I am assimilating the note "<note_title>"
+    And I check the option of remembering spelling
+    And I click "Keep for repetition" button
+    When I verify spelling with "<spelling_input>"
+    Then the note "<note_title>" should be assimilated with remembering spelling
+
+    Examples:
+      | note_title               | details                          | spelling_input |
+      | sedition                 | Sedition means incite violence   | sedition       |
+      | rebellion / insurrection | Rebellion means armed resistance | rebellion      |
+
+  Scenario: Show error message when spelling is incorrect
     And there are some notes:
       | Title    | Details                        | Parent Title |
       | sedition | Sedition means incite violence | English      |
     And I am assimilating the note "sedition"
     And I check the option of remembering spelling
     And I click "Keep for repetition" button
-    And I should see the spelling verification popup
-
-  Scenario: Verify spelling with correct answer proceeds with keep for repetition
-    When I verify spelling with "sedition"
-    Then the note "sedition" should be assimilated with remembering spelling
-
-  Scenario: Show error message when spelling is incorrect
     When I verify spelling with "wrong answer"
     Then I should see an error message "wrong spelling" below the input field
     And the popup should remain open
-
-  Scenario: Verify spelling accepts partial answers for notes with slash format
-    Given there are some notes:
-      | Title                      | Details                        | Parent Title |
-      | rebellion / insurrection   | Rebellion means armed resistance | English      |
-    And I am assimilating the note "rebellion / insurrection"
-    And I check the option of remembering spelling
-    And I click "Keep for repetition" button
-    And I should see the spelling verification popup
-    When I verify spelling with "rebellion"
-    Then the note "rebellion / insurrection" should be assimilated with remembering spelling

@@ -235,12 +235,11 @@ export const assumeAssimilationPage = () => ({
     cy.formField('Remember Spelling').check()
     cy.pageIsNotLoading()
   },
-  waitForSpellingVerificationPopup() {
-    cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
-    cy.get('[data-test="spelling-verification-input"]').should('be.visible')
-  },
   verifySpellingWith(text: string) {
-    cy.get('[data-test="spelling-verification-input"]').type(text)
+    cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
+    cy.get('[data-test="spelling-verification-input"]')
+      .should('be.visible')
+      .type(text)
     cy.get('[data-test="verify-spelling"]').click()
   },
   expectPopupClosed() {
