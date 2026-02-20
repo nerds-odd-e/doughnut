@@ -12,7 +12,7 @@ import helper, {
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
-import { computed, ref } from "vue"
+import { computed, nextTick, ref } from "vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import type { PromotePointRequestDto } from "@generated/backend"
 
@@ -96,35 +96,54 @@ describe("Assimilation component", () => {
   const memoryTracker = makeMe.aMemoryTracker.ofNote(noteRealm).please()
   const { note } = memoryTracker
 
+  const mount = (overrides?: { note?: typeof note }) =>
+    renderer
+      .withCleanStorage()
+      .withProps({ note: overrides?.note ?? note })
+      .withRouter()
+      .mount()
+
+  const mountWithChecklist = (
+    points: string[],
+    opts?: { note?: typeof note }
+  ) => {
+    mockSdkService("generateUnderstandingChecklist", { points })
+    return mount(opts)
+  }
+
+  const checklist = (wrapper: {
+    find: (s: string) => { findAll: (s: string) => unknown[] }
+  }) => wrapper.find('[data-test-id="understanding-checklist"]')
+
+  const selectFirstCheckpoint = async (wrapper: ReturnType<typeof mount>) => {
+    const checkboxes = checklist(wrapper).findAll('input[type="checkbox"]') as {
+      setValue: (v: boolean) => Promise<void>
+    }[]
+    await checkboxes[0]?.setValue(true)
+    await flushPromises()
+  }
+
   beforeEach(() => {
     showNoteSpy.mockResolvedValue(wrapSdkResponse(noteRealm))
   })
 
   describe("normal assimilation", () => {
     it("emits initialReviewDone and increments counts correctly when assimilating normally", async () => {
-      const returnedTrackers = [
-        { id: 1, removedFromTracking: false },
-        { id: 2, removedFromTracking: true },
-        { id: 3, removedFromTracking: false },
-      ]
-      assimilateSpy.mockResolvedValue(wrapSdkResponse(returnedTrackers))
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({
-          note,
-        })
-        .withRouter()
-        .mount()
+      assimilateSpy.mockResolvedValue(
+        wrapSdkResponse([
+          { id: 1, removedFromTracking: false },
+          { id: 2, removedFromTracking: true },
+          { id: 3, removedFromTracking: false },
+        ])
+      )
+      const wrapper = mount()
 
       await flushPromises()
-      await wrapper.find('input[value="Keep for repetition"]').trigger("click")
+      await wrapper.find('[data-test="keep-for-repetition"]').trigger("click")
       await flushPromises()
 
       expect(assimilateSpy).toHaveBeenCalledWith({
-        body: {
-          noteId: note.id,
-          skipMemoryTracking: false,
-        },
+        body: { noteId: note.id, skipMemoryTracking: false },
       })
       expect(wrapper.emitted()).toHaveProperty("initialReviewDone")
       expect(mockedTotalAssimilatedCount.value).toBe(2)
@@ -134,671 +153,340 @@ describe("Assimilation component", () => {
 
   describe("note type selection via NoteInfoBar", () => {
     it("displays note type selection in NoteInfoBar", async () => {
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({
-          note,
-        })
-        .withRouter()
-        .mount()
-
+      const wrapper = mount()
       await flushPromises()
-
-      // Note type selection is now rendered by NoteInfoComponent via NoteInfoBar
-      const noteTypeSelection = wrapper.find(
-        '[data-test="note-type-selection-dialog"]'
-      )
-      expect(noteTypeSelection.exists()).toBe(true)
+      expect(
+        wrapper.find('[data-test="note-type-selection-dialog"]').exists()
+      ).toBe(true)
     })
   })
 
   describe("promote point to child note", () => {
-    it("should display promote button for each understanding point", async () => {
-      const points = ["Point 1", "Point 2", "Point 3"]
-      mockSdkService("generateUnderstandingChecklist", { points })
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+    it("displays promote button for each understanding point", async () => {
+      const wrapper = mountWithChecklist(["Point 1", "Point 2", "Point 3"])
       await flushPromises()
 
-      // Verify each point has a promote button
       const listItems = wrapper.findAll("li")
       expect(listItems).toHaveLength(3)
-
       listItems.forEach((li, index) => {
-        expect(li.text()).toContain(points[index])
-        // Verify button exists
+        expect(li.text()).toContain(["Point 1", "Point 2", "Point 3"][index])
         expect(li.find("button").exists()).toBe(true)
       })
     })
 
-    it("should call promotePoint AI API with parentNoteId when child button is clicked", async () => {
-      const points = ["Test Point"]
-      mockSdkService("generateUnderstandingChecklist", { points })
-
-      const extractPointSpy = mockSdkService("promotePoint", {
+    it("calls promotePoint API when child button is clicked", async () => {
+      const promotePointSpy = mockSdkService("promotePoint", {
         createdNote: makeMe.aNoteRealm.please(),
         updatedParentNote: makeMe.aNoteRealm.please(),
       })
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+      const wrapper = mountWithChecklist(["Test Point"])
       await flushPromises()
 
-      // Click the child button (first button in each li)
       await wrapper.find("li button").trigger("click")
       await flushPromises()
 
-      // Verify AI API is called with the point text and promotionType
-      expect(extractPointSpy).toHaveBeenCalledWith({
+      expect(promotePointSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: { point: "Test Point", promotionType: PromotionType.CHILD },
       })
     })
 
-    it("should remove the point from checklist after successful creation", async () => {
-      const points = ["Point 1", "Point 2", "Point 3"]
-      mockSdkService("generateUnderstandingChecklist", { points })
-
+    it("removes point from checklist after successful creation", async () => {
       mockSdkService("promotePoint", {
         createdNote: makeMe.aNoteRealm.please(),
         updatedParentNote: makeMe.aNoteRealm.please(),
       })
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+      const wrapper = mountWithChecklist(["Point 1", "Point 2", "Point 3"])
       await flushPromises()
 
-      // Verify initially 3 points
-      expect(wrapper.findAll("li")).toHaveLength(3)
+      await wrapper.findAll("li")[1]!.find("button").trigger("click")
+      await flushPromises()
 
-      // Click the second point's button
-      const secondLi = wrapper.findAll("li")[1]
-      if (secondLi) {
-        await secondLi.find("button").trigger("click")
-        await flushPromises()
-      }
-
-      // Verify only 2 points remain
       expect(wrapper.findAll("li")).toHaveLength(2)
-      // Verify "Point 2" is gone
-      expect(wrapper.text()).not.toContain("Point 2")
-      // Verify the other two remain
       expect(wrapper.text()).toContain("Point 1")
       expect(wrapper.text()).toContain("Point 3")
+      expect(wrapper.text()).not.toContain("Point 2")
     })
 
-    it("should keep the point in checklist and show error when AI API fails", async () => {
-      const points = ["Test Point"]
-      mockSdkService("generateUnderstandingChecklist", { points })
-
-      // Mock API failure
-      const extractPointSpy = mockSdkService("promotePoint", undefined)
-      extractPointSpy.mockResolvedValue(wrapSdkError("API Error"))
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+    it("keeps point in checklist when API fails", async () => {
+      mockSdkService("promotePoint", undefined).mockResolvedValue(
+        wrapSdkError("API Error")
+      )
+      const wrapper = mountWithChecklist(["Test Point"])
       await flushPromises()
 
-      // Click the button
       await wrapper.find("li button").trigger("click")
       await flushPromises()
 
-      // Verify point remains in the list
       expect(wrapper.findAll("li")).toHaveLength(1)
       expect(wrapper.text()).toContain("Test Point")
     })
 
-    it("should call promotePoint AI API with parent's parentId when sibling button is clicked", async () => {
-      const parentNoteRealm = makeMe.aNoteRealm.please()
-      const childNoteRealm = makeMe.aNoteRealm.under(parentNoteRealm).please()
-      const childMemoryTracker = makeMe.aMemoryTracker
-        .ofNote(childNoteRealm)
+    it("calls promotePoint with SIBLING when sibling button is clicked", async () => {
+      const childNoteRealm = makeMe.aNoteRealm
+        .under(makeMe.aNoteRealm.please())
         .please()
-      const childNote = childMemoryTracker.note
-
-      const points = ["Test Point"]
-      mockSdkService("generateUnderstandingChecklist", { points })
-
+      const childNote = makeMe.aMemoryTracker
+        .ofNote(childNoteRealm)
+        .please().note
       const promotePointSpy = mockSdkService("promotePoint", {
         createdNote: makeMe.aNoteRealm.please(),
         updatedParentNote: makeMe.aNoteRealm.please(),
       })
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note: childNote })
-        .withRouter()
-        .mount()
-
+      const wrapper = mountWithChecklist(["Test Point"], { note: childNote })
       await flushPromises()
 
-      // Click the sibling button (second button in the li)
-      const buttons = wrapper.findAll("li button")
-      await buttons[1]?.trigger("click")
+      await wrapper.findAll("li button")[1]!.trigger("click")
       await flushPromises()
 
-      // Verify AI API is called with promotionType SIBLING
       expect(promotePointSpy).toHaveBeenCalledWith({
         path: { note: childNote.id },
         body: { point: "Test Point", promotionType: PromotionType.SIBLING },
       })
     })
 
-    it("should hide sibling button when note has no parent", async () => {
-      const points = ["Test Point"]
-      mockSdkService("generateUnderstandingChecklist", { points })
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+    it("hides sibling button when note has no parent", async () => {
+      const wrapper = mountWithChecklist(["Test Point"])
       await flushPromises()
 
-      // Verify sibling button does not exist when note has no parent
-      const siblingButton = wrapper.find(
-        'button[title="Promote to sibling note"]'
-      )
-      expect(siblingButton.exists()).toBe(false)
-
-      // Verify child button still exists
-      const childButton = wrapper.find('button[title="Promote to child note"]')
-      expect(childButton.exists()).toBe(true)
+      expect(
+        wrapper.find('button[title="Promote to sibling note"]').exists()
+      ).toBe(false)
+      expect(
+        wrapper.find('button[title="Promote to child note"]').exists()
+      ).toBe(true)
     })
   })
 
   describe("understanding checklist deletion", () => {
     it("shows checkboxes for each understanding point", async () => {
-      mockSdkService("generateUnderstandingChecklist", {
-        points: ["Point 1", "Point 2", "Point 3"],
-      })
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+      const wrapper = mountWithChecklist(["Point 1", "Point 2", "Point 3"])
       await flushPromises()
-
-      // Find checkboxes only within the understanding checklist
-      const checkboxes = wrapper
-        .find('[data-test-id="understanding-checklist"]')
-        .findAll('input[type="checkbox"]')
-      expect(checkboxes).toHaveLength(3)
+      expect(checklist(wrapper).findAll('input[type="checkbox"]')).toHaveLength(
+        3
+      )
     })
 
     it("disables delete button when no points are selected", async () => {
-      mockSdkService("generateUnderstandingChecklist", {
-        points: ["Point 1", "Point 2"],
-      })
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+      const wrapper = mountWithChecklist(["Point 1", "Point 2"])
       await flushPromises()
-
-      const deleteButton = wrapper.find(
-        '[data-test-id="delete-understanding-points"]'
-      )
-
-      // Button should be disabled initially
-      expect((deleteButton.element as HTMLButtonElement).disabled).toBe(true)
+      expect(
+        (
+          wrapper.find('[data-test-id="delete-understanding-points"]')
+            .element as HTMLButtonElement
+        ).disabled
+      ).toBe(true)
     })
 
     it("enables delete button when a point is selected", async () => {
-      mockSdkService("generateUnderstandingChecklist", {
-        points: ["Point 1", "Point 2"],
-      })
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+      const wrapper = mountWithChecklist(["Point 1", "Point 2"])
       await flushPromises()
-
-      const deleteButton = wrapper.find(
-        '[data-test-id="delete-understanding-points"]'
-      )
-
-      // Check the first item
-      const checkboxes = wrapper
-        .find('[data-test-id="understanding-checklist"]')
-        .findAll('input[type="checkbox"]')
-      await checkboxes[0]!.setValue(true)
-      await flushPromises()
-
-      // Button should be enabled after selection
-      expect((deleteButton.element as HTMLButtonElement).disabled).toBe(false)
+      await selectFirstCheckpoint(wrapper)
+      expect(
+        (
+          wrapper.find('[data-test-id="delete-understanding-points"]')
+            .element as HTMLButtonElement
+        ).disabled
+      ).toBe(false)
     })
 
     it("shows confirmation dialog when delete button is clicked", async () => {
-      mockSdkService("generateUnderstandingChecklist", {
-        points: ["Point 1", "Point 2"],
-      })
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+      const wrapper = mountWithChecklist(["Point 1", "Point 2"])
       await flushPromises()
-
-      // Check an item
-      const checkboxes = wrapper
-        .find('[data-test-id="understanding-checklist"]')
-        .findAll('input[type="checkbox"]')
-      await checkboxes[0]!.setValue(true)
-      await flushPromises()
-
-      // Click delete button
+      await selectFirstCheckpoint(wrapper)
       await wrapper
         .find('[data-test-id="delete-understanding-points"]')
         .trigger("click")
       await flushPromises()
 
-      // Verify confirmation dialog appears
       const popups = usePopups().popups.peek()
-      expect(popups.length).toBe(1)
+      expect(popups).toHaveLength(1)
       expect(popups[0]!.type).toBe("confirm")
       expect(popups[0]!.message).toContain("delete")
     })
 
     it("calls API and emits reloadNeeded when deletion is confirmed", async () => {
-      mockSdkService("generateUnderstandingChecklist", {
-        points: ["Point 1", "Point 2", "Point 3"],
-      })
-
       const deletePointsSpy = mockSdkService("removePointFromNote", {})
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+      const wrapper = mountWithChecklist(["Point 1", "Point 2", "Point 3"])
       await flushPromises()
-
-      // Check the first item
-      const checkboxes = wrapper
-        .find('[data-test-id="understanding-checklist"]')
-        .findAll('input[type="checkbox"]')
-      await checkboxes[0]!.setValue(true)
-      await flushPromises()
-
-      // Click delete button
+      await selectFirstCheckpoint(wrapper)
       await wrapper
         .find('[data-test-id="delete-understanding-points"]')
         .trigger("click")
       await flushPromises()
-
-      // Simulate user confirming deletion
       usePopups().popups.done(true)
       await flushPromises()
 
-      // Verify API was called with the point text, not indices
       expect(deletePointsSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: { points: ["Point 1"] },
       })
-
-      // Verify reloadNeeded event was emitted
       expect(wrapper.emitted()).toHaveProperty("reloadNeeded")
     })
 
     it("does not call API when deletion is cancelled", async () => {
-      mockSdkService("generateUnderstandingChecklist", {
-        points: ["Point 1", "Point 2"],
-      })
-
       const deletePointsSpy = mockSdkService("removePointFromNote", {})
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+      const wrapper = mountWithChecklist(["Point 1", "Point 2"])
       await flushPromises()
-
-      // Check an item
-      const checkboxes = wrapper
-        .find('[data-test-id="understanding-checklist"]')
-        .findAll('input[type="checkbox"]')
-      await checkboxes[0]!.setValue(true)
-      await flushPromises()
-
-      // Click delete button
+      await selectFirstCheckpoint(wrapper)
       await wrapper
         .find('[data-test-id="delete-understanding-points"]')
         .trigger("click")
       await flushPromises()
-
-      // Simulate user cancelling deletion
       usePopups().popups.done(false)
       await flushPromises()
 
-      // API should not be called
       expect(deletePointsSpy).not.toHaveBeenCalled()
-
-      // Should not emit reloadNeeded
       expect(wrapper.emitted()).not.toHaveProperty("reloadNeeded")
     })
   })
 
   describe("LoadingModal for Promote Point", () => {
-    it("should show LoadingModal while promoting point to note", async () => {
-      mockSdkService("generateUnderstandingChecklist", {
-        points: ["Test understanding point"],
+    it("shows LoadingModal while promoting point", async () => {
+      let resolveApi: () => void
+      const apiPromise = new Promise<void>((r) => {
+        resolveApi = r
       })
-
-      // Mock with delayed async response to simulate real AI call
       mockSdkServiceWithImplementation("promotePoint", async () => {
-        await new Promise((resolve) => setTimeout(resolve, 100))
+        await apiPromise
         return {
           createdNote: makeMe.aNoteRealm.please(),
           updatedParentNote: makeMe.aNoteRealm.please(),
         }
       })
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+      const wrapper = mountWithChecklist(["Test understanding point"])
       await flushPromises()
 
-      // Verify understanding point is displayed
-      expect(wrapper.text()).toContain("Test understanding point")
+      await wrapper
+        .find('button[title="Promote to child note"]')
+        .trigger("click")
+      await nextTick()
 
-      // Click "Child" button
-      const childButton = wrapper.find('button[title="Promote to child note"]')
-      await childButton.trigger("click")
-
-      // Wait for LoadingModal to appear
-      await vi.waitFor(() => {
-        expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
-        expect(document.body.textContent).toContain("AI is creating note...")
-      })
-
-      // Wait for LoadingModal to disappear after API completes
-      await vi.waitFor(
-        () => {
-          expect(document.querySelector(".loading-modal-mask")).toBeNull()
-        },
-        { timeout: 3000 }
-      )
+      expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
+      expect(document.body.textContent).toContain("AI is creating note...")
+      resolveApi!()
+      await flushPromises()
+      expect(document.querySelector(".loading-modal-mask")).toBeNull()
     })
 
-    it("should hide LoadingModal when API call fails", async () => {
-      mockSdkService("generateUnderstandingChecklist", {
-        points: ["Test understanding point"],
-      })
-
-      // Mock API to fail
+    it("hides LoadingModal when API fails", async () => {
       mockSdkService("promotePoint", wrapSdkError({}))
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+      const wrapper = mountWithChecklist(["Test understanding point"])
       await flushPromises()
 
-      // Click "Child" button
-      const childButton = wrapper.find('button[title="Promote to child note"]')
-      await childButton.trigger("click")
+      await wrapper
+        .find('button[title="Promote to child note"]')
+        .trigger("click")
+      await nextTick()
 
-      // Wait for LoadingModal to appear
-      await vi.waitFor(() => {
-        expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
-      })
-
-      // Wait for error popup and dismiss it
-      await vi.waitFor(() => {
-        expect(usePopups().popups.peek().length).toBeGreaterThan(0)
-      })
+      expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
       usePopups().popups.done(true)
-
-      // Wait for LoadingModal to disappear
-      await vi.waitFor(
-        () => {
-          expect(document.querySelector(".loading-modal-mask")).toBeNull()
-        },
-        { timeout: 3000 }
-      )
+      await flushPromises()
+      expect(document.querySelector(".loading-modal-mask")).toBeNull()
     })
   })
 
   describe("LoadingModal for Delete Points", () => {
-    it("should show LoadingModal while deleting points", async () => {
-      mockSdkService("generateUnderstandingChecklist", {
-        points: ["Point 1", "Point 2"],
-      })
-
-      // Mock with delayed async response to simulate real AI call
+    it("shows LoadingModal while deleting points", async () => {
+      let resolveApi: () => void
       mockSdkServiceWithImplementation("removePointFromNote", async () => {
-        await new Promise((resolve) => setTimeout(resolve, 100))
+        await new Promise<void>((r) => {
+          resolveApi = r
+        })
         return {}
       })
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+      const wrapper = mountWithChecklist(["Point 1", "Point 2"])
       await flushPromises()
-
-      // Check the first item
-      const checkboxes = wrapper
-        .find('[data-test-id="understanding-checklist"]')
-        .findAll('input[type="checkbox"]')
-      await checkboxes[0]!.setValue(true)
-      await flushPromises()
-
-      // Click delete button
+      await selectFirstCheckpoint(wrapper)
       await wrapper
         .find('[data-test-id="delete-understanding-points"]')
         .trigger("click")
       await flushPromises()
-
-      // Confirm deletion
       usePopups().popups.done(true)
+      await flushPromises()
+      await nextTick()
 
-      // Wait for LoadingModal to appear
-      await vi.waitFor(() => {
-        expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
-        expect(document.body.textContent).toContain("AI is removing content...")
-      })
-
-      // Wait for LoadingModal to disappear after API completes
-      await vi.waitFor(
-        () => {
-          expect(document.querySelector(".loading-modal-mask")).toBeNull()
-        },
-        { timeout: 3000 }
-      )
+      expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
+      expect(document.body.textContent).toContain("AI is removing content...")
+      resolveApi!()
+      await flushPromises()
+      expect(document.querySelector(".loading-modal-mask")).toBeNull()
     })
 
-    it("should hide LoadingModal when delete API call fails", async () => {
-      mockSdkService("generateUnderstandingChecklist", {
-        points: ["Point 1", "Point 2"],
-      })
-
-      // Mock API to fail with a delay to allow LoadingModal to render
+    it("hides LoadingModal when delete API fails", async () => {
+      let resolveApi: () => void
       mockSdkServiceWithImplementation("removePointFromNote", async () => {
-        await new Promise((resolve) => setTimeout(resolve, 100))
+        await new Promise<void>((r) => {
+          resolveApi = r
+        })
         return wrapSdkError("API Error")
       })
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+      const wrapper = mountWithChecklist(["Point 1", "Point 2"])
       await flushPromises()
-
-      // Check the first item
-      const checkboxes = wrapper
-        .find('[data-test-id="understanding-checklist"]')
-        .findAll('input[type="checkbox"]')
-      await checkboxes[0]!.setValue(true)
-      await flushPromises()
-
-      // Click delete button
+      await selectFirstCheckpoint(wrapper)
       await wrapper
         .find('[data-test-id="delete-understanding-points"]')
         .trigger("click")
       await flushPromises()
-
-      // Confirm deletion
       usePopups().popups.done(true)
+      await flushPromises()
+      await nextTick()
 
-      // Wait for LoadingModal to appear
-      await vi.waitFor(() => {
-        expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
-      })
-
-      // Wait for LoadingModal to disappear after error
-      await vi.waitFor(
-        () => {
-          expect(document.querySelector(".loading-modal-mask")).toBeNull()
-        },
-        { timeout: 3000 }
-      )
+      expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
+      resolveApi!()
+      await flushPromises()
+      expect(document.querySelector(".loading-modal-mask")).toBeNull()
     })
   })
 
   describe("ignore questions", () => {
-    it("disables ignore button when no check points are selected", async () => {
-      mockSdkService("generateUnderstandingChecklist", {
-        points: ["Point 1", "Point 2"],
-      })
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+    it("disables ignore button when no points are selected", async () => {
+      const wrapper = mountWithChecklist(["Point 1", "Point 2"])
       await flushPromises()
-
-      const ignoreButton = wrapper.find(
-        '[data-test-id="ignore-understanding-points"]'
-      )
-      expect((ignoreButton.element as HTMLButtonElement).disabled).toBe(true)
+      expect(
+        (
+          wrapper.find('[data-test-id="ignore-understanding-points"]')
+            .element as HTMLButtonElement
+        ).disabled
+      ).toBe(true)
     })
 
-    it("enables ignore button when check points are selected", async () => {
-      mockSdkService("generateUnderstandingChecklist", {
-        points: ["Point 1", "Point 2"],
-      })
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+    it("enables ignore button when a point is selected", async () => {
+      const wrapper = mountWithChecklist(["Point 1", "Point 2"])
       await flushPromises()
-
-      const ignoreButton = wrapper.find(
-        '[data-test-id="ignore-understanding-points"]'
-      )
-
-      const checkboxes = wrapper
-        .find('[data-test-id="understanding-checklist"]')
-        .findAll('input[type="checkbox"]')
-      await checkboxes[0]!.setValue(true)
-      await flushPromises()
-
-      expect((ignoreButton.element as HTMLButtonElement).disabled).toBe(false)
+      await selectFirstCheckpoint(wrapper)
+      expect(
+        (
+          wrapper.find('[data-test-id="ignore-understanding-points"]')
+            .element as HTMLButtonElement
+        ).disabled
+      ).toBe(false)
     })
 
-    it("shows popup when ignore button is clicked", async () => {
-      mockSdkService("generateUnderstandingChecklist", {
-        points: ["Point 1", "Point 2"],
-      })
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+    it("shows confirmation when ignore button is clicked", async () => {
+      const wrapper = mountWithChecklist(["Point 1", "Point 2"])
       await flushPromises()
-
-      const checkboxes = wrapper
-        .find('[data-test-id="understanding-checklist"]')
-        .findAll('input[type="checkbox"]')
-      await checkboxes[0]!.setValue(true)
-      await flushPromises()
-
+      await selectFirstCheckpoint(wrapper)
       await wrapper
         .find('[data-test-id="ignore-understanding-points"]')
         .trigger("click")
       await flushPromises()
 
       const popups = usePopups().popups.peek()
-      expect(popups.length).toBe(1)
+      expect(popups).toHaveLength(1)
       expect(popups[0]!.type).toBe("confirm")
       expect(popups[0]!.message).toContain("Ignore")
     })
 
-    it("calls API and emits reloadNeeded when confirm is clicked", async () => {
-      mockSdkService("generateUnderstandingChecklist", {
-        points: ["Point 1", "Point 2"],
-      })
-
+    it("calls API when confirm is clicked", async () => {
       const ignorePointsSpy = mockSdkService("ignorePoints", { success: true })
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+      const wrapper = mountWithChecklist(["Point 1", "Point 2"])
       await flushPromises()
-
-      const checkboxes = wrapper
-        .find('[data-test-id="understanding-checklist"]')
-        .findAll('input[type="checkbox"]')
-      await checkboxes[0]!.setValue(true)
-      await flushPromises()
-
+      await selectFirstCheckpoint(wrapper)
       await wrapper
         .find('[data-test-id="ignore-understanding-points"]')
         .trigger("click")
       await flushPromises()
-
       usePopups().popups.done(true)
       await flushPromises()
 
@@ -809,35 +497,50 @@ describe("Assimilation component", () => {
     })
 
     it("does not call API when cancel is clicked", async () => {
-      mockSdkService("generateUnderstandingChecklist", {
-        points: ["Point 1", "Point 2"],
-      })
-
       const ignorePointsSpy = mockSdkService("ignorePoints", { success: true })
-
-      const wrapper = renderer
-        .withCleanStorage()
-        .withProps({ note })
-        .withRouter()
-        .mount()
-
+      const wrapper = mountWithChecklist(["Point 1", "Point 2"])
       await flushPromises()
-
-      const checkboxes = wrapper
-        .find('[data-test-id="understanding-checklist"]')
-        .findAll('input[type="checkbox"]')
-      await checkboxes[0]!.setValue(true)
-      await flushPromises()
-
+      await selectFirstCheckpoint(wrapper)
       await wrapper
         .find('[data-test-id="ignore-understanding-points"]')
         .trigger("click")
       await flushPromises()
-
       usePopups().popups.done(false)
       await flushPromises()
 
       expect(ignorePointsSpy).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("SpellingVerificationPopup", () => {
+    it("closes popup and returns to original state when user closes it", async () => {
+      mockSdkService("getNoteInfo", {
+        note: makeMe.aNoteRealm.please(),
+        createdAt: "",
+        noteType: undefined,
+        recallSetting: { rememberSpelling: true },
+      })
+      const wrapper = mount()
+      await flushPromises()
+
+      await wrapper.find('[data-test="keep-for-repetition"]').trigger("click")
+      await flushPromises()
+
+      expect(document.body.textContent).toContain("Verify Spelling")
+      expect(assimilateSpy).not.toHaveBeenCalled()
+
+      const closeButton = document
+        .querySelector('[data-test="spelling-verification-popup"]')
+        ?.closest(".modal-mask")
+        ?.querySelector(".close-button") as HTMLElement
+      closeButton.click()
+      await flushPromises()
+
+      expect(document.body.textContent).not.toContain("Verify Spelling")
+      expect(assimilateSpy).not.toHaveBeenCalled()
+      expect(wrapper.find('[data-test="keep-for-repetition"]').exists()).toBe(
+        true
+      )
     })
   })
 })

@@ -1,7 +1,6 @@
 <template>
   <Modal
     v-if="show"
-    class="popups"
     :isPopup="true"
     :opaqueBackground="true"
     @close_request="$emit('cancel')"
