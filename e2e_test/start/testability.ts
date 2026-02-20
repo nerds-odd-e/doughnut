@@ -347,6 +347,10 @@ const testability = () => {
     restoreMockedService(serviceMocker: ServiceMocker) {
       this.setServiceUrl(serviceMocker.serviceName, '')
     },
+
+    disableService(serviceMocker: ServiceMocker) {
+      this.setServiceUrl(serviceMocker.serviceName, '__DISABLED__')
+    },
   }
 }
 

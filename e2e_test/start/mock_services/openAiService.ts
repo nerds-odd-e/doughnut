@@ -14,6 +14,10 @@ const openAiService = () => {
       testability().restoreMockedService(serviceMocker)
     },
 
+    disable() {
+      testability().disableService(serviceMocker)
+    },
+
     restartImposter() {
       return serviceMocker.install()
     },
