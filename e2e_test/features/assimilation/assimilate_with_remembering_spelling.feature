@@ -1,8 +1,8 @@
 @disableOpenAiService
-Feature: Confirm Spelling Before Keep For Repetition
-  As a learner, when I keep for repetition with remembering spelling,
-  I want to verify my spelling first to ensure I actually know the word
-  by typing the note title correctly.
+Feature: Assimilate With Remembering Spelling
+  As a learner, I want to assimilate notes with the option of remembering spelling.
+  When I keep for repetition with remembering spelling,
+  I verify my spelling by typing the note title correctly to ensure I know the word.
 
   Background:
     Given I am logged in as an existing user
@@ -18,7 +18,7 @@ Feature: Confirm Spelling Before Keep For Repetition
     Then the spelling verification result for note "<note_title>" should be <expected_result>
 
     Examples:
-      | note_title     | spelling_input  | expected_result       |
-      | sedition       | sedition        | "success"             |
-      | colour / color | colour          | "success"             |
-      | sedition       | wrong answer    | "error: wrong spelling" |
+      | note_title     | spelling_input | expected_result         |
+      | sedition       | sedition       | "success"               |
+      | colour / color | colour         | "success"               |
+      | sedition       | wrong answer   | "error: wrong spelling" |
