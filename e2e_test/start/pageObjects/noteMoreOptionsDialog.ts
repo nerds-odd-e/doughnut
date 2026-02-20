@@ -1,3 +1,4 @@
+import { assumeAssimilationPage } from './assimilationPage'
 import { assumeMemoryTrackerPage } from './memoryTrackerPage'
 import { toolbarButton } from './toolbarButton'
 import { questionListPage } from './questionListPage'
@@ -89,14 +90,11 @@ const noteMoreOptionsDialog = () => {
       toolbarButton('Assimilate this note').click()
       cy.url().should('include', '/d/assimilate/')
       cy.pageIsNotLoading()
-      // Wait for the assimilation page to load by checking for the "Keep for repetition" button
-      cy.get('[data-test="keep-for-repetition"]', { timeout: 10000 })
-        .scrollIntoView()
-        .should('be.visible')
+      assumeAssimilationPage().waitForAssimilationReady()
     },
     assimilateNote() {
       this.openAssimilationPage()
-      cy.get('[data-test="keep-for-repetition"]').click()
+      assumeAssimilationPage().clickKeepForRepetition()
       cy.pageIsNotLoading()
     },
   }

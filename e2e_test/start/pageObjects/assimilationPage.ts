@@ -1,6 +1,9 @@
 import { commonSenseSplit } from 'support/string_util'
 import { form } from '../forms'
 
+const keepForRepetitionButton = (options?: { timeout?: number }) =>
+  cy.get('[data-test="keep-for-repetition"]', options ?? {})
+
 export const assumeAssimilationPage = () => ({
   expectToAssimilateAndTotal(toAssimilateAndTotal: string) {
     const [assimlatedTodayCount, toAssimilateCountForToday, totalCount] =
@@ -24,9 +27,19 @@ export const assumeAssimilationPage = () => ({
     // Close tooltip
     cy.get('.tooltip-popup').click()
   },
+  clickKeepForRepetition() {
+    keepForRepetitionButton().click()
+    return this
+  },
+  waitForAssimilationReady() {
+    keepForRepetitionButton({ timeout: 10000 })
+      .scrollIntoView()
+      .should('be.visible')
+    return this
+  },
   proceedWithRememberingSpelling() {
     this.checkRememberSpellingOption()
-    cy.get('[data-test="keep-for-repetition"]').click()
+    this.clickKeepForRepetition()
     return this
   },
   assimilateWithSpellingOption() {
@@ -104,7 +117,7 @@ export const assumeAssimilationPage = () => ({
         cy.findByText('Skip repetition').click()
         cy.findByRole('button', { name: 'OK' }).click()
       } else {
-        cy.get('[data-test="keep-for-repetition"]').click()
+        this.clickKeepForRepetition()
       }
     }
     return this
@@ -170,7 +183,7 @@ export const assumeAssimilationPage = () => ({
   },
   assimilateCurrentNote() {
     cy.pageIsNotLoading()
-    cy.get('[data-test="keep-for-repetition"]').click()
+    this.clickKeepForRepetition()
     return this
   },
   checkUnderstandingPoint(index: number) {
