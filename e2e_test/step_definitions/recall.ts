@@ -378,13 +378,8 @@ Then('the {string} checkbox should be disabled', (fieldLabel: string) => {
   start.assumeAssimilationPage().expectCheckboxDisabled(fieldLabel)
 })
 
-When('I check the option of remembering spelling', () => {
-  start.assumeAssimilationPage().checkRememberSpellingOption()
-})
-
-When('I click {string} button', (buttonName: string) => {
-  cy.pageIsNotLoading()
-  cy.findByRole('button', { name: buttonName }).click()
+When('I keep for repetition with remembering spelling', () => {
+  start.assumeAssimilationPage().proceedWithRememberingSpelling()
 })
 
 When('I verify spelling with {string}', (text: string) => {

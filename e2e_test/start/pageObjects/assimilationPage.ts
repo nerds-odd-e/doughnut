@@ -24,23 +24,19 @@ export const assumeAssimilationPage = () => ({
     // Close tooltip
     cy.get('.tooltip-popup').click()
   },
+  proceedWithRememberingSpelling() {
+    this.checkRememberSpellingOption()
+    cy.get('[data-test="keep-for-repetition"]').click()
+    return this
+  },
   assimilateWithSpellingOption() {
-    // Get the note title from the page before opening the popup
     cy.get('[data-test="note-title"]')
       .first()
       .invoke('text')
       .then((noteTitle: string) => {
-        cy.formField('Remember Spelling').check()
-        cy.pageIsNotLoading()
-        cy.get('[data-test="keep-for-repetition"]').click()
-        // Handle spelling verification popup
-        cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
-        cy.get('[data-test="spelling-verification-input"]').type(
-          noteTitle.trim()
-        )
-        cy.get('[data-test="verify-spelling"]').click()
-        // Wait for popup to close after successful verification
-        cy.get('[data-test="spelling-verification-popup"]').should('not.exist')
+        this.proceedWithRememberingSpelling()
+        this.verifySpellingWith(noteTitle.trim())
+        this.expectPopupClosed()
         cy.pageIsNotLoading()
       })
     return this
