@@ -1,3 +1,4 @@
+@disableOpenAiService
 Feature: Confirm Spelling Before Keep For Repetition
   As a learner, when I check 'remember spelling' and click 'keep for repetition',
   I want to verify my spelling first to ensure I actually know the word

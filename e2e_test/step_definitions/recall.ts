@@ -422,7 +422,10 @@ Then(
   'the note {string} should be assimilated with remembering spelling',
   (noteTitle: string) => {
     start.assumeAssimilationPage().expectPopupClosed()
-    cy.url().should('not.include', `/assimilate/${noteTitle}`)
+    start
+      .jumpToNotePage(noteTitle)
+      .moreOptions()
+      .expectMemoryTrackerInfo([{ type: 'spelling', 'Repetition Count': '0' }])
   }
 )
 
