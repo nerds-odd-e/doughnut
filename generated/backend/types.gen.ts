@@ -277,6 +277,10 @@ export type NoteCreationResult = {
     parent: NoteRealm;
 };
 
+export type SpellingVerificationResult = {
+    correct?: boolean;
+};
+
 export type WikidataAssociationCreation = {
     wikidataId: string;
 };
@@ -1844,6 +1848,33 @@ export type CreateNoteUnderParentResponses = {
 };
 
 export type CreateNoteUnderParentResponse = CreateNoteUnderParentResponses[keyof CreateNoteUnderParentResponses];
+
+export type VerifySpellingData = {
+    body: AnswerSpellingDto;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/notes/{note}/verify-spelling';
+};
+
+export type VerifySpellingErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type VerifySpellingError = VerifySpellingErrors[keyof VerifySpellingErrors];
+
+export type VerifySpellingResponses = {
+    /**
+     * OK
+     */
+    200: SpellingVerificationResult;
+};
+
+export type VerifySpellingResponse = VerifySpellingResponses[keyof VerifySpellingResponses];
 
 export type UpdateWikidataIdData = {
     body: WikidataAssociationCreation;

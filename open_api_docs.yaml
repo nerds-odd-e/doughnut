@@ -1048,6 +1048,36 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteCreationResult"
+  /api/notes/{note}/verify-spelling:
+    post:
+      tags:
+      - note-controller
+      operationId: verifySpelling
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnswerSpellingDTO"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SpellingVerificationResult"
   /api/notes/{note}/updateWikidataId:
     post:
       tags:
@@ -4212,6 +4242,11 @@ components:
       required:
       - created
       - parent
+    SpellingVerificationResult:
+      type: object
+      properties:
+        correct:
+          type: boolean
     WikidataAssociationCreation:
       type: object
       properties:

@@ -84,6 +84,7 @@ const methodToController: Record<string, any> = {
   updateWikidataId: NoteController,
   updateNoteRecallSetting: NoteController,
   updateNoteType: NoteController,
+  verifySpelling: NoteController,
   deleteNote: NoteController,
   moveAfter: NoteController,
   showNote: NoteController,

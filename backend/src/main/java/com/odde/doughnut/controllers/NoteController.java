@@ -237,6 +237,16 @@ class NoteController {
     return result;
   }
 
+  @PostMapping(value = "/{note}/verify-spelling")
+  @Transactional(readOnly = true)
+  public SpellingVerificationResult verifySpelling(
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @Valid @RequestBody AnswerSpellingDTO dto)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertReadAuthorization(note);
+    return new SpellingVerificationResult(note.matchAnswer(dto.getSpellingAnswer()));
+  }
+
   @PatchMapping(value = "/{note}/ai-assistant")
   @Transactional
   public NoteAiAssistant updateNoteAiAssistant(

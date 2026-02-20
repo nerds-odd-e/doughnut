@@ -27,11 +27,13 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue"
+import { NoteController } from "@generated/backend/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import Modal from "../commons/Modal.vue"
 
 const props = defineProps<{
   show: boolean
-  expectedTitle: string
+  noteId: number
 }>()
 
 const emit = defineEmits<{
@@ -53,17 +55,18 @@ watch(
   }
 )
 
-const verify = () => {
-  // Split the expected title by "/" to get all valid answers
-  const validAnswers = props.expectedTitle
-    .split("/")
-    .map((part) => part.trim().toLowerCase())
-  const userAnswer = userInput.value.trim().toLowerCase()
+const verify = async () => {
+  const { data, error } = await apiCallWithLoading(() =>
+    NoteController.verifySpelling({
+      path: { note: props.noteId },
+      body: { spellingAnswer: userInput.value },
+    })
+  )
 
-  if (validAnswers.includes(userAnswer)) {
-    emit("verified")
-  } else {
+  if (error || !data?.correct) {
     errorMessage.value = "wrong spelling"
+  } else {
+    emit("verified")
   }
 }
 </script>

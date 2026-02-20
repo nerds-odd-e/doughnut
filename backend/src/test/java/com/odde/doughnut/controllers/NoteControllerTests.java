@@ -127,6 +127,43 @@ class NoteControllerTests extends ControllerTestBase {
   }
 
   @Nested
+  class VerifySpelling {
+    @Test
+    void returnsCorrectWhenSpellingMatches() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().title("sedition").creatorAndOwner(currentUser.getUser()).please();
+      AnswerSpellingDTO dto = new AnswerSpellingDTO();
+      dto.setSpellingAnswer("sedition");
+
+      SpellingVerificationResult result = controller.verifySpelling(note, dto);
+
+      assertThat(result.correct(), is(true));
+    }
+
+    @Test
+    void returnsCorrectWhenAlternativeSpellingMatches() throws UnexpectedNoAccessRightException {
+      Note note =
+          makeMe.aNote().title("colour / color").creatorAndOwner(currentUser.getUser()).please();
+      AnswerSpellingDTO dto = new AnswerSpellingDTO();
+      dto.setSpellingAnswer("colour");
+
+      SpellingVerificationResult result = controller.verifySpelling(note, dto);
+
+      assertThat(result.correct(), is(true));
+    }
+
+    @Test
+    void returnsIncorrectWhenSpellingDoesNotMatch() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().title("sedition").creatorAndOwner(currentUser.getUser()).please();
+      AnswerSpellingDTO dto = new AnswerSpellingDTO();
+      dto.setSpellingAnswer("wrong answer");
+
+      SpellingVerificationResult result = controller.verifySpelling(note, dto);
+
+      assertThat(result.correct(), is(false));
+    }
+  }
+
+  @Nested
   class updateNoteTest {
     Note note;
     NoteAccessoriesDTO noteAccessoriesDTO = new NoteAccessoriesDTO();

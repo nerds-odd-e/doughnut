@@ -92,7 +92,7 @@
   />
   <SpellingVerificationPopup
     :show="showSpellingPopup"
-    :expected-title="note.noteTopology.title ?? ''"
+    :note-id="note.id"
     @cancel="handleSpellingCancel"
     @verified="handleSpellingVerified"
   />
