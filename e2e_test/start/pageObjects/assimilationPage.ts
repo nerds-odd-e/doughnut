@@ -242,11 +242,10 @@ export const assumeAssimilationPage = () => ({
   typeInVerificationInput(text: string) {
     cy.get('[data-test="spelling-verification-input"]').type(text)
   },
-  clickPopupButton(buttonName: 'Cancel' | 'Verify' | 'Add') {
+  clickPopupButton(buttonName: 'Cancel' | 'Verify') {
     const dataTestMap = {
       Cancel: 'cancel-spelling',
       Verify: 'verify-spelling',
-      Add: 'add-spelling',
     }
     cy.get(`[data-test="${dataTestMap[buttonName]}"]`).click()
   },
@@ -261,24 +260,6 @@ export const assumeAssimilationPage = () => ({
       'contain.text',
       message
     )
-  },
-  expectAddButtonState(state: 'enabled' | 'disabled') {
-    if (state === 'disabled') {
-      cy.get('[data-test="add-spelling"]').should('be.disabled')
-    } else {
-      cy.get('[data-test="add-spelling"]').should('not.be.disabled')
-    }
-  },
-  expectNoteTitleUpdatedTo(expectedTitle: string) {
-    cy.pageIsNotLoading()
-    // Wait for the title to be updated after reload
-    cy.get('[data-test="note-title"]', { timeout: 10000 }).should(
-      'contain.text',
-      expectedTitle
-    )
-    // Additional check to ensure all state propagation completes
-    // This gives time for NoteInfoBar event emission to reach parent
-    cy.pageIsNotLoading()
   },
   expectVerificationInputEmpty() {
     cy.get('[data-test="spelling-verification-input"]').should('have.value', '')

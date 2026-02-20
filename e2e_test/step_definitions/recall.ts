@@ -392,11 +392,7 @@ Then('I should see the spelling verification popup', () => {
 })
 
 When('I click {string} button on the popup', (buttonName: string) => {
-  if (
-    buttonName === 'Cancel' ||
-    buttonName === 'Verify' ||
-    buttonName === 'Add'
-  ) {
+  if (buttonName === 'Cancel' || buttonName === 'Verify') {
     start.assumeAssimilationPage().clickPopupButton(buttonName)
   } else {
     cy.get('.modal-mask').within(() => {
@@ -455,22 +451,6 @@ Then(
 Then('the popup should remain open', () => {
   start.assumeAssimilationPage().expectPopupOpen()
 })
-
-Then(
-  'the {string} button should be {word}',
-  (buttonName: string, state: 'enabled' | 'disabled') => {
-    if (buttonName === 'Add') {
-      start.assumeAssimilationPage().expectAddButtonState(state)
-    }
-  }
-)
-
-Then(
-  'the note title should be updated to {string}',
-  (expectedTitle: string) => {
-    start.assumeAssimilationPage().expectNoteTitleUpdatedTo(expectedTitle)
-  }
-)
 
 Then('I should see a re-assimilate confirmation dialog', () => {
   cy.contains('You have answered this note incorrectly too many times').should(

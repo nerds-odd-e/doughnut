@@ -33,24 +33,6 @@ Feature: Confirm Spelling Before Keep For Repetition
     Then I should see an error message "wrong spelling" below the input field
     And the popup should remain open
 
-  Scenario Outline: Add button state depends on verification input
-    When I type "<input>" in the verification input
-    Then the "Add" button should be <state>
-
-    Examples:
-      | input      | state    |
-      |            | disabled |
-      | any answer | enabled  |
-
-  @ignore
-  Scenario: Add answer to note title and can verify again
-    When I type "insurrection" in the verification input
-    And I click "Add" button on the popup
-    Then the popup should be closed
-    And the note title should be updated to "sedition / insurrection"
-    When I click "Keep for repetition" button
-    Then I should see the spelling verification popup
-
   Scenario: Verify spelling accepts partial answers for notes with slash format
     Given there are some notes:
       | Title                      | Details                        | Parent Title |
