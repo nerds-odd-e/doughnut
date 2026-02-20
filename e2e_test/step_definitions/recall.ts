@@ -386,18 +386,21 @@ When('I verify spelling with {string}', (text: string) => {
   start.assumeAssimilationPage().verifySpellingWith(text)
 })
 
-Then('the popup should be closed', () => {
-  start.assumeAssimilationPage().expectPopupClosed()
-})
-
 Then(
-  'the note {string} should be assimilated with remembering spelling',
-  (noteTitle: string) => {
-    start.assumeAssimilationPage().expectPopupClosed()
-    start
-      .jumpToNotePage(noteTitle)
-      .moreOptions()
-      .expectMemoryTrackerInfo([{ type: 'spelling', 'Repetition Count': '0' }])
+  'the spelling verification result for note {string} should be {string}',
+  (noteTitle: string, expectedResult: string) => {
+    if (expectedResult === 'success') {
+      start.assumeAssimilationPage().expectPopupClosed()
+      start
+        .jumpToNotePage(noteTitle)
+        .moreOptions()
+        .expectMemoryTrackerInfo([
+          { type: 'spelling', 'Repetition Count': '0' },
+        ])
+    } else {
+      const errorMessage = expectedResult.replace(/^error: /, '')
+      start.assumeAssimilationPage().expectSpellingErrorMessage(errorMessage)
+    }
   }
 )
 
@@ -416,13 +419,6 @@ Then('the {string} checkbox should be enabled', (fieldLabel: string) => {
 When('I update the note details to {string}', (newDetails: string) => {
   start.assumeAssimilationPage().updateNoteDetails(newDetails)
 })
-
-Then(
-  'I should see an error message {string} in the spelling verification popup',
-  (errorMessage: string) => {
-    start.assumeAssimilationPage().expectSpellingErrorMessage(errorMessage)
-  }
-)
 
 Then('I should see a re-assimilate confirmation dialog', () => {
   cy.contains('You have answered this note incorrectly too many times').should(

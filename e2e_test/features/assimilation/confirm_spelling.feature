@@ -15,18 +15,10 @@ Feature: Confirm Spelling Before Keep For Repetition
     And I am assimilating the note "<note_title>"
     And I keep for repetition with remembering spelling
     When I verify spelling with "<spelling_input>"
-    Then the note "<note_title>" should be assimilated with remembering spelling
+    Then the spelling verification result for note "<note_title>" should be <expected_result>
 
     Examples:
-      | note_title     | spelling_input |
-      | sedition       | sedition       |
-      | colour / color | colour         |
-
-  Scenario: Show error message when spelling is incorrect
-    Given there are some notes:
-      | Title    | Details                        | Parent Title |
-      | sedition | Sedition means incite violence | English      |
-    And I am assimilating the note "sedition"
-    And I keep for repetition with remembering spelling
-    When I verify spelling with "wrong answer"
-    Then I should see an error message "wrong spelling" in the spelling verification popup
+      | note_title     | spelling_input  | expected_result       |
+      | sedition       | sedition        | "success"             |
+      | colour / color | colour          | "success"             |
+      | sedition       | wrong answer    | "error: wrong spelling" |
