@@ -32,7 +32,7 @@
     "vue-toastification": "2.0.0-rc.5"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.3",
+    "@biomejs/biome": "2.4.4",
     "@storybook/addon-essentials": "8.6.15",
     "@storybook/addon-interactions": "8.6.15",
     "@storybook/addon-onboarding": "8.6.15",
