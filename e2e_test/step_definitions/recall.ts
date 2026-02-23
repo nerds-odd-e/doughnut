@@ -326,13 +326,6 @@ When('I check the {string} option', (fieldLabel: string) => {
   cy.pageIsNotLoading()
 })
 
-Then(
-  'I should see an error {string} on {string} field',
-  (message: string, fieldLabel: string) => {
-    cy.expectFieldErrorMessage(fieldLabel, message)
-  }
-)
-
 When('I check the understanding point {int}', (index: number) => {
   start.assumeAssimilationPage().checkUnderstandingPoint(index)
 })
@@ -374,8 +367,12 @@ Then('the note details should be {string}', (detailsText: string) => {
   start.assumeNotePage().findNoteDetails(detailsText)
 })
 
-Then('the {string} checkbox should be disabled', (fieldLabel: string) => {
-  start.assumeAssimilationPage().expectCheckboxDisabled(fieldLabel)
+Then('remembering spelling should be unavailable', () => {
+  start.assumeAssimilationPage().expectRememberingSpellingUnavailable()
+})
+
+Then('remembering spelling should be available', () => {
+  start.assumeAssimilationPage().expectRememberingSpellingAvailable()
 })
 
 When('I keep for repetition with remembering spelling', () => {
@@ -412,10 +409,6 @@ Then(
       .expectToRemainOnAssimilationPageFor(noteTitle)
   }
 )
-Then('the {string} checkbox should be enabled', (fieldLabel: string) => {
-  start.assumeAssimilationPage().expectCheckboxEnabled(fieldLabel)
-})
-
 When('I update the note details to {string}', (newDetails: string) => {
   start.assumeAssimilationPage().updateNoteDetails(newDetails)
 })

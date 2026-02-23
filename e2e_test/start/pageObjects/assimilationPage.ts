@@ -268,12 +268,16 @@ export const assumeAssimilationPage = () => ({
     cy.get('ul').find('li').should('have.length.at.least', 1)
     return this
   },
-  expectCheckboxDisabled(fieldLabel: string) {
-    cy.formField(fieldLabel).should('be.disabled')
+  expectRememberingSpellingUnavailable() {
+    cy.expectFieldErrorMessage(
+      'Remember Spelling',
+      'Remember spelling note need to have detail'
+    )
+    cy.formField('Remember Spelling').should('be.disabled')
     return this
   },
-  expectCheckboxEnabled(fieldLabel: string) {
-    cy.formField(fieldLabel).should('not.be.disabled')
+  expectRememberingSpellingAvailable() {
+    cy.formField('Remember Spelling').should('not.be.disabled')
     return this
   },
   updateNoteDetails(newDetails: string) {
