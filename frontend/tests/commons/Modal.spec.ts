@@ -3,6 +3,7 @@ import routes from "@/routes/routes"
 import { mount, type VueWrapper } from "@vue/test-utils"
 import { vi, afterEach, describe, it, expect } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
+import { reactive } from "vue"
 
 // Browser Mode: Mock AiReplyEventSource to prevent import errors
 // (Modal doesn't use it, but Browser Mode hoists mocks globally)
@@ -86,28 +87,31 @@ describe("Modal", () => {
   it("closes only topmost modal when ESC is pressed with stacked modals", async () => {
     const outerClosed = vi.fn()
     const innerClosed = vi.fn()
+    const state = reactive({ showOuter: true, showInner: true })
     const StackedModalsComponent = {
       template: `
         <div>
-          <Modal v-if="showOuter" @close_request="onOuterClose">
+          <Modal v-if="state.showOuter" @close_request="onOuterClose">
             <template #body>Outer modal</template>
           </Modal>
-          <Modal v-if="showInner" @close_request="onInnerClose">
+          <Modal v-if="state.showInner" @close_request="onInnerClose">
             <template #body>Inner modal</template>
           </Modal>
         </div>
       `,
       components: { Modal: Comp },
-      data: () => ({ showOuter: true, showInner: true }),
-      methods: {
-        onOuterClose() {
-          this.showOuter = false
-          outerClosed()
-        },
-        onInnerClose() {
-          this.showInner = false
-          innerClosed()
-        },
+      setup() {
+        return {
+          state,
+          onOuterClose: () => {
+            state.showOuter = false
+            outerClosed()
+          },
+          onInnerClose: () => {
+            state.showInner = false
+            innerClosed()
+          },
+        }
       },
     }
 
