@@ -61,6 +61,7 @@ export const assumeAssociateWikidataDialog = () => {
     },
     expectWikidataIdValue(value: string) {
       withinModalContainer(() => {
+        form.expectNoFieldError('Wikidata Id')
         cy.formField('Wikidata Id').fieldShouldHaveValue(value)
         cy.findByRole('button', { name: 'Close' }).click()
       })
