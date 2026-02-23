@@ -1,9 +1,12 @@
+const fieldFormControl = (field: string) =>
+  cy.formField(field).closest('.daisy-form-control')
+
 const form = {
   expectFieldError(field: string, message: string) {
-    cy.formField(field)
-      .closest('.daisy-form-control')
-      .find('.daisy-text-error')
-      .findByText(message)
+    fieldFormControl(field).find('.daisy-text-error').findByText(message)
+  },
+  expectNoFieldError(field: string) {
+    fieldFormControl(field).find('.daisy-text-error').should('not.exist')
   },
   fill(noteAttributes: Record<string, string | undefined>) {
     for (const propName in noteAttributes) {

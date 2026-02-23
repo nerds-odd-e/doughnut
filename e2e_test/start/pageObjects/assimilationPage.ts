@@ -277,6 +277,7 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   expectRememberingSpellingAvailable() {
+    form.expectNoFieldError('Remember Spelling')
     cy.formField('Remember Spelling').should('not.be.disabled')
     return this
   },
