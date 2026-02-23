@@ -15,7 +15,6 @@
     :current-note-details="currentDetails"
     :key="note.id"
     @level-changed="$emit('reloadNeeded')"
-    @note-type-updated="onNoteTypeUpdated"
     @note-info-loaded="onNoteInfoLoaded"
     @remember-spelling-changed="onRememberSpellingChanged"
   />
@@ -89,10 +88,6 @@ const onNoteInfoLoaded = () => {
 const onRememberSpellingChanged = (value: boolean) => {
   rememberSpelling.value = value
   noteInfoLoaded.value = true // Mark as loaded when we receive the value
-}
-
-const onNoteTypeUpdated = () => {
-  refinementRefreshTrigger.value++
 }
 
 // Methods
