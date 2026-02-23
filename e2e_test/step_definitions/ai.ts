@@ -212,7 +212,7 @@ Given(
 )
 
 Given(
-  'OpenAI will delete related content and return new details:',
+  'OpenAI returns the following details when requested to delete points:',
   (data: DataTable) => {
     const details = data.raw().flat()[0]
     const reply = JSON.stringify({ details })
