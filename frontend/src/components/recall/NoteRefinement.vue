@@ -85,13 +85,12 @@ import usePopups from "../commons/Popups/usePopups"
 import SvgAddChild from "../svgs/SvgAddChild.vue"
 import SvgAddSibling from "../svgs/SvgAddSibling.vue"
 import LoadingModal from "../commons/LoadingModal.vue"
-import { ref, watch } from "vue"
+import { onMounted, ref } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const props = defineProps<{
   note: Note
   currentNoteDetails: string
-  refreshTrigger: number
 }>()
 
 const emit = defineEmits<{
@@ -119,11 +118,7 @@ const generateUnderstandingChecklist = async () => {
   }
 }
 
-watch(
-  () => props.refreshTrigger,
-  () => generateUnderstandingChecklist(),
-  { immediate: true }
-)
+onMounted(() => generateUnderstandingChecklist())
 
 const { popups } = usePopups()
 const storageAccessor = useStorageAccessor()

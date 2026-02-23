@@ -45,17 +45,13 @@ describe("NoteRefinement component", () => {
   const memoryTracker = makeMe.aMemoryTracker.ofNote(noteRealm).please()
   const { note } = memoryTracker
 
-  const mount = (
-    points: string[],
-    overrides?: { note?: typeof note; refreshTrigger?: number }
-  ) => {
+  const mount = (points: string[], overrides?: { note?: typeof note }) => {
     mockSdkService("generateUnderstandingChecklist", { points })
     return renderer
       .withCleanStorage()
       .withProps({
         note: overrides?.note ?? note,
         currentNoteDetails: "Some note content",
-        refreshTrigger: overrides?.refreshTrigger ?? 0,
       })
       .mount()
   }

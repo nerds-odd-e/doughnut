@@ -15,14 +15,12 @@
     :current-note-details="currentDetails"
     :key="note.id"
     @level-changed="$emit('reloadNeeded')"
-    @note-info-loaded="onNoteInfoLoaded"
     @remember-spelling-changed="onRememberSpellingChanged"
   />
   <NoteRefinement
     v-if="(currentDetails ?? '').trim()"
     :note="note"
     :current-note-details="currentDetails ?? ''"
-    :refresh-trigger="refinementRefreshTrigger"
     @reload-needed="$emit('reloadNeeded')"
   />
   <AssimilationButtons
@@ -77,12 +75,6 @@ const currentDetails = ref(note.details)
 
 const onDetailsSaved = (newDetails: string) => {
   currentDetails.value = newDetails
-}
-
-const refinementRefreshTrigger = ref(0)
-
-const onNoteInfoLoaded = () => {
-  refinementRefreshTrigger.value++
 }
 
 const onRememberSpellingChanged = (value: boolean) => {
