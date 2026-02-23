@@ -23,5 +23,4 @@ Feature: Delete Understanding Check Points
       | Second point. Fourth point. Fifth point. |
     And I click the delete understanding points button
     And I confirm deleting the understanding points
-    And I wait for the page to reload and the note details to be updated
     Then the note details on the current page should be "Second point. Fourth point. Fifth point."
