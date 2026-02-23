@@ -13,7 +13,6 @@ import type { NoteInfo } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
 import NoteInfoComponent from "./NoteInfoComponent.vue"
 import { ref, watch, computed } from "vue"
-import type { NoteType } from "@/models/noteTypeOptions"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const props = defineProps<{
@@ -23,7 +22,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "levelChanged", value: unknown): void
-  (e: "noteInfoLoaded", noteType: NoteType | undefined): void
   (e: "rememberSpellingChanged", value: boolean): void
 }>()
 
@@ -41,7 +39,6 @@ const fetchData = async () => {
   )
   if (!error) {
     noteInfo.value = noteInfoData!
-    emit("noteInfoLoaded", noteInfoData?.noteType)
     emit(
       "rememberSpellingChanged",
       noteInfoData?.recallSetting?.rememberSpelling ?? false
