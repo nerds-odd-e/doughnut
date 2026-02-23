@@ -145,5 +145,23 @@ describe("NoteRecallSettingForm", () => {
 
       expect(rememberSpellingInput?.props("modelValue")).toBe(false)
     })
+
+    it("should enable checkbox when noteDetails changes from empty to having content", async () => {
+      const wrapper = helper
+        .component(NoteRecallSettingForm)
+        .withProps({ ...defaultProps, noteDetails: "" })
+        .mount()
+
+      const getRememberSpellingInput = () =>
+        wrapper
+          .findAllComponents({ name: "CheckInput" })
+          .find((c) => c.props("field") === "rememberSpelling")
+
+      expect(getRememberSpellingInput()?.props("disabled")).toBe(true)
+
+      await wrapper.setProps({ noteDetails: "This is the definition" })
+
+      expect(getRememberSpellingInput()?.props("disabled")).toBe(false)
+    })
   })
 })
