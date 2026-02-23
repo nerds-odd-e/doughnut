@@ -217,16 +217,6 @@ Cypress.Commands.add('noteByTitle', (noteTopology: string) => {
     })
 })
 
-Cypress.Commands.add(
-  'expectFieldErrorMessage',
-  (field: string, message: string) => {
-    cy.formField(field)
-      .closest('.daisy-form-control')
-      .find('.daisy-text-error')
-      .findByText(message)
-  }
-)
-
 Cypress.Commands.add('expectAMapTo', (latitude: string, longitude: string) => {
   cy.findByText(`Location: ${latitude}'N, ${longitude}'E`)
 })

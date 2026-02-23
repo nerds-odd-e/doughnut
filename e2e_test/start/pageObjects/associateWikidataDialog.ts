@@ -1,3 +1,5 @@
+import { form } from '../forms'
+
 export const assumeAssociateWikidataDialog = () => {
   cy.findByText('Associate Wikidata').should('be.visible')
 
@@ -52,7 +54,7 @@ export const assumeAssociateWikidataDialog = () => {
     // Assertions
     expectErrorOnWikidataId(message: string) {
       withinModalContainer(() => {
-        cy.expectFieldErrorMessage('Wikidata Id', message)
+        form.expectFieldError('Wikidata Id', message)
       })
       this.close()
       return this

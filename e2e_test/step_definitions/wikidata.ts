@@ -83,7 +83,7 @@ Then(
 Then(
   'I should see an error {string} on Wikidata Id in association',
   (message: string) => {
-    cy.expectFieldErrorMessage('Wikidata Id', message)
+    assumeAssociateWikidataDialog().expectErrorOnWikidataId(message)
   }
 )
 

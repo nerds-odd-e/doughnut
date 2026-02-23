@@ -12,7 +12,6 @@ declare namespace Cypress {
       item: string,
       addChildButton: boolean = true
     ): Chainable<any>
-    expectFieldErrorMessage(field: string, message: string): Chainable<any>
     expectNoteCards(expectedCards: any): Chainable<any>
     findCardTitle(title: string): Chainable<any>
     expectAMapTo(latitude: string, longitude: string): Chainable<any>

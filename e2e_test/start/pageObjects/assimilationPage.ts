@@ -269,7 +269,7 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   expectRememberingSpellingUnavailable() {
-    cy.expectFieldErrorMessage(
+    form.expectFieldError(
       'Remember Spelling',
       'Remember spelling note need to have detail'
     )

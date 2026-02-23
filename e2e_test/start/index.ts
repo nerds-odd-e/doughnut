@@ -36,6 +36,7 @@ import { noteSidebar } from './pageObjects/noteSidebar'
 import { assumeNoteTargetSearchDialog } from './pageObjects/noteTargetSearchDialog'
 import { assumeQuestionPage } from './pageObjects/QuizQuestionPage'
 import { recall } from './pageObjects/recallPage'
+import { form } from './forms'
 
 const start = {
   // === Page Objects ===
@@ -64,6 +65,7 @@ const start = {
   routerToNotebooksPage: routerToMyNotebooksPage,
 
   // === Services & Utilities ===
+  form,
   questionGenerationService,
   testability,
   mcpApi,

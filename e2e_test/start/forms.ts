@@ -1,4 +1,10 @@
 const form = {
+  expectFieldError(field: string, message: string) {
+    cy.formField(field)
+      .closest('.daisy-form-control')
+      .find('.daisy-text-error')
+      .findByText(message)
+  },
   fill(noteAttributes: Record<string, string | undefined>) {
     for (const propName in noteAttributes) {
       const value = noteAttributes[propName]

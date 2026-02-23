@@ -20,7 +20,7 @@ Given('the OpenAI service is unavailable due to invalid system token', () => {
 Then(
   'I should be prompted with an error message saying {string}',
   (errorMessage: string) => {
-    cy.expectFieldErrorMessage('Prompt', errorMessage)
+    start.form.expectFieldError('Prompt', errorMessage)
   }
 )
 

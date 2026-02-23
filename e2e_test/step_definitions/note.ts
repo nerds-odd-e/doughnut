@@ -290,7 +290,7 @@ When('I delete note {string}', (noteTopology: string) => {
 })
 
 When('I should see that the note creation is not successful', () => {
-  cy.expectFieldErrorMessage('Title', 'size must be between 1 and 150')
+  start.form.expectFieldError('Title', 'size must be between 1 and 150')
   cy.dismissLastErrorMessage()
 })
 
