@@ -302,9 +302,9 @@ Then('I should be able to select a note type', () => {
 })
 
 Then(
-  'I should see an understanding checklist with a maximum of {int} points',
-  (maxPoints: number) => {
-    start.assumeAssimilationPage().expectUnderstandingPointsAtMost(maxPoints)
+  'I should see an understanding checklist with {int} points',
+  (count: number) => {
+    start.assumeAssimilationPage().expectUnderstandingPointsCount(count)
   }
 )
 

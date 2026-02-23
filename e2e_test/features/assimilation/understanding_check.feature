@@ -18,7 +18,7 @@ Feature: Understanding Check
       | D |
       | E |
     When I start assimilating "Sample"
-    Then I should see an understanding checklist with a maximum of 5 points
+    Then I should see an understanding checklist with 5 points
 
   @usingMockedOpenAiService
   Scenario: Delete selected understanding points

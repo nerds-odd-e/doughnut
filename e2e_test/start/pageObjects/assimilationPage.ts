@@ -162,18 +162,16 @@ export const assumeAssimilationPage = () => ({
     })
     return this
   },
-  expectUnderstandingPointsAtMost(maxPoints: number) {
+  expectUnderstandingPointsCount(count: number) {
     cy.pageIsNotLoading()
-    // Find the understanding checklist by its heading text
     cy.contains('Understanding Checklist:')
       .closest('.daisy-bg-accent')
       .scrollIntoView()
       .should('be.visible')
-    // Count the number of list items (understanding points) in the checklist
     cy.contains('Understanding Checklist:')
       .closest('.daisy-bg-accent')
       .find('ul li')
-      .should('have.length.at.most', maxPoints)
+      .should('have.length', count)
     return this
   },
   expectUnderstandingChecklistNotShown() {
