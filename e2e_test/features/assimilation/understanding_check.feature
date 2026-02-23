@@ -8,27 +8,21 @@ Feature: Understanding Check
   Background:
     Given I am logged in as an existing user
     And I have a notebook with the head note "Sample" and details "A. B. C. D. E."
-
-  @usingMockedOpenAiService
-  Scenario: Generate understanding checklist for a note
-    Given OpenAI generates understanding checklist with points:
+    And OpenAI generates understanding checklist with points:
       | A |
       | B |
       | C |
       | D |
       | E |
+
+  @usingMockedOpenAiService
+  Scenario: Generate understanding checklist for a note
     When I start assimilating "Sample"
     Then I should see an understanding checklist with 5 points
 
   @usingMockedOpenAiService
   Scenario: Delete selected understanding points
-    Given OpenAI generates understanding checklist with points:
-      | A |
-      | B |
-      | C |
-      | D |
-      | E |
-    And OpenAI returns the following details when requested to delete points:
+    Given OpenAI returns the following details when requested to delete points:
       | B. D. E. |
     When I start assimilating "Sample"
     And I delete understanding points 0 and 2
