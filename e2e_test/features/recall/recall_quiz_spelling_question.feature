@@ -12,8 +12,7 @@ Feature: Repetition Quiz
 
   Scenario: Spelling quiz - incorrect answer
     Given It's day 1
-    And I am assimilating the note "sedition"
-    And I assimilate with the option of remembering spelling
+    And I assimilate the note "sedition" with the option of remembering spelling
     When I am recalling my note on day 2
     And I skip one question
     Then I should be asked spelling question "means incite violence" from notebook "English"
@@ -22,8 +21,7 @@ Feature: Repetition Quiz
 
   Scenario: Spelling quiz - correct answer
     Given It's day 1
-    And I am assimilating the note "sedition"
-    And I assimilate with the option of remembering spelling
+    And I assimilate the note "sedition" with the option of remembering spelling
     When I am recalling my note on day 2
     And I skip one question
     Then I should be asked spelling question "means incite violence" from notebook "English"

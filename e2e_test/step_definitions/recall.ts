@@ -124,6 +124,17 @@ Then('I assimilate the note {string}', (noteTitle: string) => {
 })
 
 Then(
+  'I assimilate the note {string} with the option of remembering spelling',
+  (noteTitle: string) => {
+    start
+      .jumpToNotePage(noteTitle)
+      .moreOptions()
+      .openAssimilationPage()
+      .assimilateWithSpellingOption()
+  }
+)
+
+Then(
   'I set the level of {string} to be {int}',
   (noteTopology: string, level: number) => {
     start.assumeNotePage(noteTopology)

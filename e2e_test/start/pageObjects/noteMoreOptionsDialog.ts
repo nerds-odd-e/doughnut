@@ -90,11 +90,10 @@ const noteMoreOptionsDialog = () => {
       toolbarButton('Assimilate this note').click()
       cy.url().should('include', '/d/assimilate/')
       cy.pageIsNotLoading()
-      assumeAssimilationPage().waitForAssimilationReady()
+      return assumeAssimilationPage().waitForAssimilationReady()
     },
     assimilateNote() {
-      this.openAssimilationPage()
-      assumeAssimilationPage().clickKeepForRepetition()
+      this.openAssimilationPage().clickKeepForRepetition()
       cy.pageIsNotLoading()
     },
   }
