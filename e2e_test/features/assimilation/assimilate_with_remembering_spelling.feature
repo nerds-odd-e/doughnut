@@ -15,9 +15,9 @@ Feature: Assimilate With Remembering Spelling
     Then remembering spelling should be <availability>
 
     Examples:
-      | details                | availability |
-      |                        | unavailable  |
-      | This is the definition | available    |
+      | case                     | details                 | availability |
+      | note has no details      |                         | unavailable  |
+      | note has definition      | Definition content      | available    |
 
   Scenario Outline: Verify spelling proceeds with keep for repetition
     Given there are some notes:
