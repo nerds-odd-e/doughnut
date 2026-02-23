@@ -14,8 +14,7 @@ Feature: Browse answers and notes while recalling
       | sedation | Put to sleep is sedation       | English      |
       | medical  |                                | English      |
     And It's day 1
-    And I am assimilating the note "sedition"
-    And I assimilate with the option of remembering spelling
+    And I assimilate the note "sedition" with the option of remembering spelling
 
   Scenario: View last answered question when the quiz answer was correct
     Given I assimilate the note "sedation"

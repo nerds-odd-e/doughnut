@@ -154,10 +154,6 @@ Then('I skip one question', () => {
   start.assumeQuestionPage().skipQuestion()
 })
 
-Then('I assimilate with the option of remembering spelling', () => {
-  start.assumeAssimilationPage().assimilateWithSpellingOption()
-})
-
 Then(
   'I should be asked spelling question {string} from notebook {string}',
   (question: string, notebook: string) => {
