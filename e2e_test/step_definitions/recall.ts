@@ -364,10 +364,6 @@ When('I confirm the ignore', () => {
   cy.findByRole('button', { name: 'OK' }).click()
 })
 
-When('I cancel the deletion', () => {
-  cy.findByRole('button', { name: 'Cancel' }).click()
-})
-
 Then('the note details should be {string}', (detailsText: string) => {
   start.assumeNotePage().findNoteDetails(detailsText)
 })

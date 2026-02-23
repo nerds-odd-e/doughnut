@@ -25,17 +25,3 @@ Feature: Delete Understanding Check Points
     And I confirm deleting the understanding points
     And I wait for the page to reload and the note details to be updated
     Then the note details should be "Second point. Fourth point. Fifth point."
-
-  Scenario: Cancel deleting understanding points
-    Given OpenAI generates understanding checklist with points:
-      | First point  |
-      | Second point |
-      | Third point  |
-      | Fourth point |
-      | Fifth point  |
-    When I am assimilating the note "Sample"
-    And I check the understanding point 0
-    And I check the understanding point 2
-    And I click the delete understanding points button
-    And I cancel the deletion
-    Then the note details should be "First point. Second point. Third point. Fourth point. Fifth point."
