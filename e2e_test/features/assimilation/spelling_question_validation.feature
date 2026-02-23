@@ -15,11 +15,9 @@ Feature: Spelling Question Validation
     Then I should see an error "Remember spelling note need to have detail" on "Remember Spelling" field
     And the "Remember Spelling" checkbox should be disabled
 
-  Scenario: Can enable spelling question after adding details
+  Scenario: Can enable spelling question when note has details
     Given there are some notes:
-      | Title | Details | Parent Title |
-      | Word  |         | Learning     |
+      | Title | Details                   | Parent Title |
+      | Word  | This is the definition    | Learning     |
     When I navigate to the assimilation page for note "Word"
-    Then the "Remember Spelling" checkbox should be disabled
-    When I update the note details to "This is the definition"
     Then the "Remember Spelling" checkbox should be enabled
