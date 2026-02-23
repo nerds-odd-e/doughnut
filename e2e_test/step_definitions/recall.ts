@@ -364,10 +364,6 @@ When('I confirm the ignore', () => {
   cy.findByRole('button', { name: 'OK' }).click()
 })
 
-Then('the note details should be {string}', (detailsText: string) => {
-  start.assumeNotePage().findNoteDetails(detailsText)
-})
-
 Then('remembering spelling should be unavailable', () => {
   start.assumeAssimilationPage().expectRememberingSpellingUnavailable()
 })
