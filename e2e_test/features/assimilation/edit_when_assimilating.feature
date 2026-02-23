@@ -14,11 +14,3 @@ Feature: Editing when assimilating
     When I set the level of "hard" to be 2
     Then I assimilated one note "easy" on day 1
     And I assimilated one note "hard" on day 2
-
-  Scenario: Set AI custom instruction for recall questions
-    Given I am assimilating new note on day 1
-    When I set the AI instruction for "hard" to "Focus on practical examples"
-    And I check "Apply To Children"
-    Then the AI instruction field should contain "Focus on practical examples"
-    And the "Apply To Children" checkbox should be checked
-

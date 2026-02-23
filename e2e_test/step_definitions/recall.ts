@@ -428,29 +428,6 @@ When('I confirm to re-assimilate the note', () => {
   cy.findByRole('button', { name: 'OK' }).click()
 })
 
-When(
-  'I set the AI instruction for {string} to {string}',
-  (noteTopology: string, instruction: string) => {
-    start.assumeNotePage(noteTopology)
-    start.assumeAssimilationPage().setAiInstruction(instruction)
-  }
-)
-
-When('I check {string}', (checkboxLabel: string) => {
-  start.assumeAssimilationPage().checkApplyToChildren()
-})
-
-Then(
-  'the AI instruction field should contain {string}',
-  (expectedText: string) => {
-    start.assumeAssimilationPage().expectAiInstructionToBe(expectedText)
-  }
-)
-
-Then('the {string} checkbox should be checked', (checkboxLabel: string) => {
-  start.assumeAssimilationPage().expectApplyToChildrenChecked()
-})
-
 Then(
   'I should see the assimilation counter increased by {int} in the sidebar',
   (incrementCount: number) => {

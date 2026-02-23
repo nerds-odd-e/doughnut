@@ -57,41 +57,11 @@ public class RecallQuestionService {
 
   private RecallPrompt generateNewRecallPrompt(MemoryTracker memoryTracker) {
     Note note = memoryTracker.getNote();
-    String customPrompt = getCustomPromptForNote(note);
-    PredefinedQuestion question =
-        predefinedQuestionService.generateAFeasibleQuestion(note, customPrompt);
+    PredefinedQuestion question = predefinedQuestionService.generateAFeasibleQuestion(note, null);
     if (question == null) {
       return null;
     }
     return createARecallPromptFromQuestion(question, memoryTracker);
-  }
-
-  private String getCustomPromptForNote(Note note) {
-    // Check the note itself first
-    NoteAiAssistant aiAssistant = note.getNoteAiAssistant();
-    if (aiAssistant != null && hasValidPrompt(aiAssistant)) {
-      return aiAssistant.getAdditionalInstructionsToAi();
-    }
-
-    // Check parent notes for applyToChildren
-    Note parent = note.getParent();
-    while (parent != null) {
-      NoteAiAssistant parentAiAssistant = parent.getNoteAiAssistant();
-      if (parentAiAssistant != null
-          && Boolean.TRUE.equals(parentAiAssistant.getApplyToChildren())
-          && hasValidPrompt(parentAiAssistant)) {
-        return parentAiAssistant.getAdditionalInstructionsToAi();
-      }
-      parent = parent.getParent();
-    }
-
-    // Fallback to default MCQ prompt (null means use default)
-    return null;
-  }
-
-  private boolean hasValidPrompt(NoteAiAssistant aiAssistant) {
-    String prompt = aiAssistant.getAdditionalInstructionsToAi();
-    return prompt != null && !prompt.isBlank();
   }
 
   public RecallPrompt regenerateAQuestion(
