@@ -90,7 +90,7 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const props = defineProps<{
   note: Note
-  currentNoteDetails?: string
+  currentNoteDetails: string
   refreshTrigger: number
 }>()
 
@@ -101,14 +101,6 @@ const emit = defineEmits<{
 const understandingPoints = ref<string[]>([])
 
 const generateUnderstandingChecklist = async () => {
-  if (
-    !props.currentNoteDetails ||
-    props.currentNoteDetails.trim().length === 0
-  ) {
-    understandingPoints.value = []
-    return
-  }
-
   try {
     const result = await apiCallWithLoading(() =>
       AiController.generateUnderstandingChecklist({

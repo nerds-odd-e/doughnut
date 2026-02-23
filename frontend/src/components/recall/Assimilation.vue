@@ -20,8 +20,9 @@
     @remember-spelling-changed="onRememberSpellingChanged"
   />
   <NoteRefinement
+    v-if="(currentDetails ?? '').trim()"
     :note="note"
-    :current-note-details="currentDetails"
+    :current-note-details="currentDetails ?? ''"
     :refresh-trigger="refinementRefreshTrigger"
     @reload-needed="$emit('reloadNeeded')"
   />
