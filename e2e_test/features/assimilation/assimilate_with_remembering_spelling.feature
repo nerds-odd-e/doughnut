@@ -1,12 +1,23 @@
 @disableOpenAiService
 Feature: Assimilate With Remembering Spelling
-  As a learner, I want to assimilate notes with the option of remembering spelling.
-  When I keep for repetition with remembering spelling,
-  I verify my spelling by typing the note title correctly to ensure I know the word.
+  As a learner, I want to keep notes for repetition with spelling verification.
+  Spelling is only available for notes with details.
 
   Background:
     Given I am logged in as an existing user
     And I have a notebook with the head note "English" which skips review
+
+  Scenario Outline: Remembering spelling availability depends on note details
+    Given there are some notes:
+      | Title | Details        | Parent Title |
+      | Word  | <details>      | English      |
+    When I am assimilating the note "Word"
+    Then remembering spelling should be <availability>
+
+    Examples:
+      | details                | availability |
+      |                        | unavailable  |
+      | This is the definition | available    |
 
   Scenario Outline: Verify spelling proceeds with keep for repetition
     Given there are some notes:
