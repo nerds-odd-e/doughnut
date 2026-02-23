@@ -30,7 +30,8 @@ afterEach(() => {
 })
 
 beforeEach(() => {
-  mockSdkService("removePointFromNote", {})
+  mockSdkService("removePointFromNote", { details: "Updated content" })
+  mockSdkService("updateNoteDetails", makeMe.aNoteRealm.please())
   mockSdkService("ignorePoints", { success: true })
   mockSdkService("promotePoint", {
     createdNote: makeMe.aNoteRealm.please(),
@@ -212,8 +213,14 @@ describe("NoteRefinement component", () => {
       expect(popups[0]!.message).toContain("delete")
     })
 
-    it("calls API and emits reloadNeeded when deletion is confirmed", async () => {
-      const deletePointsSpy = mockSdkService("removePointFromNote", {})
+    it("calls API and emits detailsUpdated when deletion is confirmed", async () => {
+      const deletePointsSpy = mockSdkService("removePointFromNote", {
+        details: "Updated content",
+      })
+      const updateDetailsSpy = mockSdkService(
+        "updateNoteDetails",
+        makeMe.aNoteRealm.please()
+      )
       const wrapper = mount(["Point 1", "Point 2", "Point 3"])
       await flushPromises()
       await selectFirstCheckpoint(wrapper)
@@ -228,11 +235,18 @@ describe("NoteRefinement component", () => {
         path: { note: note.id },
         body: { points: ["Point 1"] },
       })
-      expect(wrapper.emitted()).toHaveProperty("reloadNeeded")
+      expect(updateDetailsSpy).toHaveBeenCalledWith({
+        path: { note: note.id },
+        body: { details: "Updated content" },
+      })
+      expect(wrapper.emitted()).toHaveProperty("detailsUpdated")
+      expect(wrapper.emitted("detailsUpdated")).toEqual([["Updated content"]])
     })
 
     it("does not call API when deletion is cancelled", async () => {
-      const deletePointsSpy = mockSdkService("removePointFromNote", {})
+      const deletePointsSpy = mockSdkService("removePointFromNote", {
+        details: "Updated content",
+      })
       const wrapper = mount(["Point 1", "Point 2"])
       await flushPromises()
       await selectFirstCheckpoint(wrapper)
@@ -244,7 +258,7 @@ describe("NoteRefinement component", () => {
       await flushPromises()
 
       expect(deletePointsSpy).not.toHaveBeenCalled()
-      expect(wrapper.emitted()).not.toHaveProperty("reloadNeeded")
+      expect(wrapper.emitted()).not.toHaveProperty("detailsUpdated")
     })
   })
 
@@ -300,7 +314,7 @@ describe("NoteRefinement component", () => {
         await new Promise<void>((r) => {
           resolveApi = r
         })
-        return {}
+        return { details: "Updated content" }
       })
       const wrapper = mount(["Point 1", "Point 2"])
       await flushPromises()

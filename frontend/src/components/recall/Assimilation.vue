@@ -21,7 +21,7 @@
     v-if="(currentDetails ?? '').trim()"
     :note="note"
     :current-note-details="currentDetails ?? ''"
-    @reload-needed="$emit('reloadNeeded')"
+    @details-updated="onDetailsSaved"
   />
   <AssimilationButtons
     :key="buttonKey"
