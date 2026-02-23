@@ -57,7 +57,7 @@ public class RecallQuestionService {
 
   private RecallPrompt generateNewRecallPrompt(MemoryTracker memoryTracker) {
     Note note = memoryTracker.getNote();
-    PredefinedQuestion question = predefinedQuestionService.generateAFeasibleQuestion(note, null);
+    PredefinedQuestion question = predefinedQuestionService.generateAFeasibleQuestion(note);
     if (question == null) {
       return null;
     }
