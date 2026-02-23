@@ -24,6 +24,7 @@
 import { computed, watch, onMounted, onUnmounted } from "vue"
 import SvgClose from "../svgs/SvgClose.vue"
 import { useRoute } from "vue-router"
+import { registerModal } from "./modalStack"
 
 // Props
 interface Props {
@@ -54,24 +55,16 @@ watch(
   }
 )
 
-// ESC key handler - only for non-popup modals
-const handleEscape = (event: KeyboardEvent) => {
-  if (!props.isPopup && event.key === "Escape") {
-    emit("close_request")
-  }
-}
-
-// Add/remove event listener
+// ESC key: register with modal stack so only topmost modal closes
+let unregister: (() => void) | undefined
 onMounted(() => {
   if (!props.isPopup) {
-    document.addEventListener("keydown", handleEscape)
+    unregister = registerModal(() => emit("close_request"))
   }
 })
 
 onUnmounted(() => {
-  if (!props.isPopup) {
-    document.removeEventListener("keydown", handleEscape)
-  }
+  unregister?.()
 })
 </script>
 

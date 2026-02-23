@@ -61,6 +61,15 @@ describe("Modal", () => {
     expect(wrapper.emitted().close_request).toHaveLength(1)
   })
 
+  it("closes when ESC is pressed", async () => {
+    wrapper = mountModal()
+    await vi.waitUntil(() => document.querySelector(".modal-wrapper"), {
+      timeout: 1000,
+    })
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
+    expect(wrapper.emitted().close_request).toHaveLength(1)
+  })
+
   it("click on note when doing review - mouse-click", async () => {
     wrapper = mountModal()
     await vi.waitUntil(() => document.querySelector(".modal-wrapper"), {
@@ -72,5 +81,55 @@ describe("Modal", () => {
       new MouseEvent("mousedown", { bubbles: true, cancelable: true })
     )
     expect(wrapper.emitted().close_request).toHaveLength(1)
+  })
+
+  it("closes only topmost modal when ESC is pressed with stacked modals", async () => {
+    const outerClosed = vi.fn()
+    const innerClosed = vi.fn()
+    const StackedModalsComponent = {
+      template: `
+        <div>
+          <Modal v-if="showOuter" @close_request="onOuterClose">
+            <template #body>Outer modal</template>
+          </Modal>
+          <Modal v-if="showInner" @close_request="onInnerClose">
+            <template #body>Inner modal</template>
+          </Modal>
+        </div>
+      `,
+      components: { Modal: Comp },
+      data: () => ({ showOuter: true, showInner: true }),
+      methods: {
+        onOuterClose() {
+          this.showOuter = false
+          outerClosed()
+        },
+        onInnerClose() {
+          this.showInner = false
+          innerClosed()
+        },
+      },
+    }
+
+    wrapper = mount(StackedModalsComponent, {
+      global: { plugins: [router] },
+      attachTo: document.body,
+    })
+
+    await vi.waitUntil(
+      () => document.querySelectorAll(".modal-wrapper").length === 2,
+      { timeout: 1000 }
+    )
+
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
+    await wrapper.vm.$nextTick()
+
+    expect(innerClosed).toHaveBeenCalledTimes(1)
+    expect(outerClosed).not.toHaveBeenCalled()
+
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
+    await wrapper.vm.$nextTick()
+
+    expect(outerClosed).toHaveBeenCalledTimes(1)
   })
 })
