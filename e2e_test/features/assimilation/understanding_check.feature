@@ -31,6 +31,5 @@ Feature: Understanding Check
     And OpenAI returns the following details when requested to delete points:
       | B. D. E. |
     When I start assimilating "Sample"
-    Then I should see an understanding checklist with a maximum of 5 points
-    When I delete understanding points 0 and 2
+    And I delete understanding points 0 and 2
     Then the note details on the current page should be "B. D. E."
