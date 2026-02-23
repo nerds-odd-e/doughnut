@@ -11,7 +11,8 @@ Feature: Repetition Quiz
       | sedation         | Put to sleep is sedation       | English     |
 
   Scenario: Spelling quiz - incorrect answer
-    Given I am assimilating the note "sedition"
+    Given It's day 1
+    And I am assimilating the note "sedition"
     And I assimilate with the option of remembering spelling
     When I am recalling my note on day 2
     And I skip one question
@@ -20,7 +21,8 @@ Feature: Repetition Quiz
     Then I should see that my spelling answer "asdf" is incorrect
 
   Scenario: Spelling quiz - correct answer
-    Given I am assimilating the note "sedition"
+    Given It's day 1
+    And I am assimilating the note "sedition"
     And I assimilate with the option of remembering spelling
     When I am recalling my note on day 2
     And I skip one question

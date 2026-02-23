@@ -116,8 +116,6 @@ Then('I am assimilating new note on day {int}', (day: number) => {
 })
 
 When('I am assimilating the note {string}', (noteTitle: string) => {
-  start.testability().backendTimeTravelTo(1, 8)
-  cy.reload()
   start.jumpToNotePage(noteTitle).moreOptions().openAssimilationPage()
 })
 

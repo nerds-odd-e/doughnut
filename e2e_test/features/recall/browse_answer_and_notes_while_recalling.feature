@@ -13,6 +13,7 @@ Feature: Browse answers and notes while recalling
       | sedition | Sedition means incite violence | English      |
       | sedation | Put to sleep is sedation       | English      |
       | medical  |                                | English      |
+    And It's day 1
     And I am assimilating the note "sedition"
     And I assimilate with the option of remembering spelling
 
