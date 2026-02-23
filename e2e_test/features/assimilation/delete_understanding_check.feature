@@ -19,7 +19,5 @@ Feature: Delete Understanding Check Points
       | Second point. Fourth point. Fifth point. |
     When I am assimilating the note "Sample"
     Then I should see an understanding checklist with a maximum of 5 points
-    When I check the understanding point 0
-    And I check the understanding point 2
-    And I delete the selected understanding points
+    When I delete understanding points 0 and 2
     Then the note details on the current page should be "Second point. Fourth point. Fifth point."

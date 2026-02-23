@@ -331,9 +331,12 @@ When('I check the {string} option', (fieldLabel: string) => {
   cy.pageIsNotLoading()
 })
 
-When('I check the understanding point {int}', (index: number) => {
-  start.assumeAssimilationPage().checkUnderstandingPoint(index)
-})
+When(
+  'I delete understanding points {int} and {int}',
+  (index1: number, index2: number) => {
+    start.assumeAssimilationPage().deleteUnderstandingPointsAt([index1, index2])
+  }
+)
 
 When(
   'I ignore these understanding points and complete assimilation:',
@@ -347,10 +350,6 @@ When(
       .ignoreUnderstandingPointsAndComplete(pointTexts)
   }
 )
-
-When('I delete the selected understanding points', () => {
-  start.assumeAssimilationPage().deleteSelectedUnderstandingPoints()
-})
 
 Then('remembering spelling should be unavailable', () => {
   start.assumeAssimilationPage().expectRememberingSpellingUnavailable()
