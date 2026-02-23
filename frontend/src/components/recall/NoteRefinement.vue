@@ -94,7 +94,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: "reloadNeeded"): void
+  (e: "detailsUpdated", newDetails: string): void
 }>()
 
 const understandingPoints = ref<string[]>([])
@@ -146,15 +146,23 @@ const deleteSelectedPoints = async () => {
 
   isDeletingPoints.value = true
   try {
-    const { error } = await apiCallWithLoading(() =>
+    const { data, error } = await apiCallWithLoading(() =>
       AiController.removePointFromNote({
         path: { note: props.note.id },
         body: { points: selectedPoints },
       })
     )
 
-    if (!error) {
-      emit("reloadNeeded")
+    if (!error && data?.details !== undefined) {
+      const storedApi = storageAccessor.value?.storedApi()
+      if (storedApi) {
+        await storedApi.updateTextField(
+          props.note.id,
+          "edit details",
+          data.details
+        )
+      }
+      emit("detailsUpdated", data.details)
     }
   } finally {
     isDeletingPoints.value = false

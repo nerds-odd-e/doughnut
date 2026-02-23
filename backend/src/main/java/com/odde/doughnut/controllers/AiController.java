@@ -123,10 +123,6 @@ public class AiController {
             .createNoteAutomationService(note)
             .removePointsAndRegenerateDetails(request.getPoints());
 
-    note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-    note.setDetails(newDetails);
-    entityPersister.save(note);
-
     return new RemovePointsResponseDTO(newDetails);
   }
 

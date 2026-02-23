@@ -323,17 +323,18 @@ class AiControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldSaveRegeneratedDetailsToDatabase()
+    void shouldNotModifyNoteInDatabase()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(
           new RegeneratedNoteDetails("Remaining content."));
-      testNote.setDetails("Original content with point to remove.");
+      String originalDetails = "Original content with point to remove.";
+      testNote.setDetails(originalDetails);
       RemovePointsRequestDTO requestDTO = new RemovePointsRequestDTO();
       requestDTO.points = List.of("point to remove");
       controller.removePointFromNote(testNote, requestDTO);
       makeMe.entityPersister.flush();
       makeMe.entityPersister.refresh(testNote);
-      assertThat(testNote.getDetails()).isEqualTo("Remaining content.");
+      assertThat(testNote.getDetails()).isEqualTo(originalDetails);
     }
 
     @Test
