@@ -69,12 +69,7 @@ public class PredefinedQuestionService {
   }
 
   public PredefinedQuestion generateAFeasibleQuestion(Note note) {
-    return generateAFeasibleQuestion(note, null);
-  }
-
-  public PredefinedQuestion generateAFeasibleQuestion(Note note, String customPrompt) {
-    MCQWithAnswer mcqWithAnswer =
-        aiQuestionGenerator.getAiGeneratedQuestion(note, customPrompt, null);
+    MCQWithAnswer mcqWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
     if (mcqWithAnswer == null) {
       return null;
     }
