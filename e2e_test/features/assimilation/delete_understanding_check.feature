@@ -21,6 +21,5 @@ Feature: Delete Understanding Check Points
     And I check the understanding point 2
     And OpenAI will delete related content and return new details:
       | Second point. Fourth point. Fifth point. |
-    And I click the delete understanding points button
-    And I confirm deleting the understanding points
+    And I delete the selected understanding points
     Then the note details on the current page should be "Second point. Fourth point. Fifth point."

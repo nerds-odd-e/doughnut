@@ -348,20 +348,8 @@ When(
   }
 )
 
-When('I click the delete understanding points button', () => {
-  start.assumeAssimilationPage().clickDeleteUnderstandingPointsButton()
-})
-
-When('I confirm the deletion', () => {
-  cy.findByRole('button', { name: 'OK' }).click()
-})
-
-When('I click the ignore questions button', () => {
-  start.assumeAssimilationPage().clickIgnoreQuestionsButton()
-})
-
-When('I confirm the ignore', () => {
-  cy.findByRole('button', { name: 'OK' }).click()
+When('I delete the selected understanding points', () => {
+  start.assumeAssimilationPage().deleteSelectedUnderstandingPoints()
 })
 
 Then('remembering spelling should be unavailable', () => {

@@ -207,8 +207,9 @@ export const assumeAssimilationPage = () => ({
     this.assimilateCurrentNote()
     return this
   },
-  clickDeleteUnderstandingPointsButton() {
+  deleteSelectedUnderstandingPoints() {
     cy.findByRole('button', { name: 'Delete selected points' }).click()
+    cy.findByRole('button', { name: 'OK' }).click()
     return this
   },
   clickIgnoreQuestionsButton() {

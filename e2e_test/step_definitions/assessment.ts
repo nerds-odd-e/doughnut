@@ -197,7 +197,3 @@ Then(
       .startConversationAboutAssessmentQuestion(feedback)
   }
 )
-
-When('I confirm deleting the understanding points', () => {
-  cy.findByRole('button', { name: 'OK' }).click()
-})
