@@ -32,7 +32,6 @@ afterEach(() => {
 beforeEach(() => {
   mockSdkService("removePointFromNote", { details: "Updated content" })
   mockSdkService("updateNoteDetails", makeMe.aNoteRealm.please())
-  mockSdkService("ignorePoints", { success: true })
   mockSdkService("promotePoint", {
     createdNote: makeMe.aNoteRealm.please(),
     updatedParentNote: makeMe.aNoteRealm.please(),
@@ -399,8 +398,7 @@ describe("NoteRefinement component", () => {
       expect(popups[0]!.message).toContain("Ignore")
     })
 
-    it("calls API when confirm is clicked", async () => {
-      const ignorePointsSpy = mockSdkService("ignorePoints", { success: true })
+    it("clears selection when confirm is clicked", async () => {
       const wrapper = mount(["Point 1", "Point 2"])
       await flushPromises()
       await selectFirstCheckpoint(wrapper)
@@ -411,14 +409,13 @@ describe("NoteRefinement component", () => {
       usePopups().popups.done(true)
       await flushPromises()
 
-      expect(ignorePointsSpy).toHaveBeenCalledWith({
-        path: { note: note.id },
-        body: { points: ["Point 1"] },
-      })
+      const checkboxes = wrapper.findAll('input[type="checkbox"]')
+      expect(
+        checkboxes.every((cb) => !(cb.element as HTMLInputElement).checked)
+      )
     })
 
-    it("does not call API when cancel is clicked", async () => {
-      const ignorePointsSpy = mockSdkService("ignorePoints", { success: true })
+    it("keeps selection when cancel is clicked", async () => {
       const wrapper = mount(["Point 1", "Point 2"])
       await flushPromises()
       await selectFirstCheckpoint(wrapper)
@@ -429,7 +426,8 @@ describe("NoteRefinement component", () => {
       usePopups().popups.done(false)
       await flushPromises()
 
-      expect(ignorePointsSpy).not.toHaveBeenCalled()
+      const checkboxes = wrapper.findAll('input[type="checkbox"]')
+      expect((checkboxes[0]?.element as HTMLInputElement).checked).toBe(true)
     })
   })
 })

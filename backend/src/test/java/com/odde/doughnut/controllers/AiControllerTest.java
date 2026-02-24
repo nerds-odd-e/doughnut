@@ -7,8 +7,6 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.controllers.dto.IgnorePointsRequestDTO;
-import com.odde.doughnut.controllers.dto.IgnorePointsResponseDTO;
 import com.odde.doughnut.controllers.dto.RemovePointsRequestDTO;
 import com.odde.doughnut.controllers.dto.RemovePointsResponseDTO;
 import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
@@ -345,60 +343,6 @@ class AiControllerTest extends ControllerTestBase {
       requestDTO.points = List.of();
       RemovePointsResponseDTO response = controller.removePointFromNote(testNote, requestDTO);
       assertThat(response.getDetails()).isEqualTo("Some note content.");
-    }
-  }
-
-  @Nested
-  class IgnorePoints {
-    Note testNote;
-
-    @BeforeEach
-    void setup() {
-      testNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-    }
-
-    @Test
-    void shouldReturnSuccessAndSaveIgnoredPointsToNote()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
-      IgnorePointsRequestDTO request = new IgnorePointsRequestDTO();
-      request.setPoints(List.of("point one", "point two"));
-
-      IgnorePointsResponseDTO response = controller.ignorePoints(testNote, request);
-
-      assertThat(response.isSuccess()).isTrue();
-      makeMe.entityPersister.flush();
-      makeMe.entityPersister.refresh(testNote);
-      assertThat(testNote.getIgnoredPoints()).isEqualTo("[\"point one\",\"point two\"]");
-    }
-
-    @Test
-    void shouldNotUpdateNoteWhenPointsIsEmpty()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
-      testNote.setIgnoredPoints("existing");
-      makeMe.entityPersister.save(testNote);
-
-      IgnorePointsRequestDTO request = new IgnorePointsRequestDTO();
-      request.setPoints(List.of());
-      controller.ignorePoints(testNote, request);
-
-      makeMe.entityPersister.flush();
-      makeMe.entityPersister.refresh(testNote);
-      assertThat(testNote.getIgnoredPoints()).isEqualTo("existing");
-    }
-
-    @Test
-    void shouldNotUpdateNoteWhenPointsIsNull()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
-      testNote.setIgnoredPoints("existing");
-      makeMe.entityPersister.save(testNote);
-
-      IgnorePointsRequestDTO request = new IgnorePointsRequestDTO();
-      request.setPoints(null);
-      controller.ignorePoints(testNote, request);
-
-      makeMe.entityPersister.flush();
-      makeMe.entityPersister.refresh(testNote);
-      assertThat(testNote.getIgnoredPoints()).isEqualTo("existing");
     }
   }
 }

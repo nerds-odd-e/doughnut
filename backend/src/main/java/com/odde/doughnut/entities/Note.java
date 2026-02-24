@@ -58,12 +58,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonPropertyDescription("The details of the note is in markdown format.")
   private String details;
 
-  @Column(name = "ignored_points", columnDefinition = "TEXT")
-  @Getter
-  @Setter
-  @JsonPropertyDescription("The list of ignored points, stored as text.")
-  private String ignoredPoints;
-
   @Size(min = 1, max = Note.MAX_TITLE_LENGTH)
   @Getter
   @Setter

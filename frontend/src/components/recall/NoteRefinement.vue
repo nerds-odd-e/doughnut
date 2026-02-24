@@ -182,16 +182,7 @@ const ignoreSelectedPoints = async () => {
     return
   }
 
-  const selectedPoints = selectedPointIndices.value.map(
-    (index) => understandingPoints.value[index]!
-  )
-
-  await apiCallWithLoading(() =>
-    AiController.ignorePoints({
-      path: { note: props.note.id },
-      body: { points: selectedPoints },
-    })
-  )
+  selectedPointIndices.value = []
 }
 
 const promotePoint = async (

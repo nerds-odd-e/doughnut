@@ -1,10 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.*;
-import com.odde.doughnut.controllers.dto.IgnorePointsRequestDTO;
-import com.odde.doughnut.controllers.dto.IgnorePointsResponseDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -124,25 +121,6 @@ public class AiController {
             .removePointsAndRegenerateDetails(request.getPoints());
 
     return new RemovePointsResponseDTO(newDetails);
-  }
-
-  @PostMapping("/ignore-points/{note}")
-  @Transactional
-  public IgnorePointsResponseDTO ignorePoints(
-      @PathVariable(value = "note") @Schema(type = "integer") Note note,
-      @RequestBody IgnorePointsRequestDTO request)
-      throws UnexpectedNoAccessRightException, JsonProcessingException {
-    authorizationService.assertAuthorization(note);
-
-    if (request.getPoints() != null && !request.getPoints().isEmpty()) {
-      String ignoredPointsJson =
-          new ObjectMapperConfig().objectMapper().writeValueAsString(request.getPoints());
-      note.setIgnoredPoints(ignoredPointsJson);
-      note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-      entityPersister.save(note);
-    }
-
-    return new IgnorePointsResponseDTO(true);
   }
 
   @PostMapping("/promote-point/{note}")

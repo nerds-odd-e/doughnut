@@ -2262,36 +2262,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PromotePointResponseDTO"
-  /api/ai/ignore-points/{note}:
-    post:
-      tags:
-      - ai-controller
-      operationId: ignorePoints
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/IgnorePointsRequestDTO"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/IgnorePointsResponseDTO"
   /api/ai/generate-understanding-checklist/{note}:
     post:
       tags:
@@ -3851,8 +3821,6 @@ components:
         id:
           type: integer
           format: int32
-        ignoredPoints:
-          type: string
         createdAt:
           type: string
           format: date-time
@@ -4529,18 +4497,6 @@ components:
           $ref: "#/components/schemas/NoteRealm"
         updatedParentNote:
           $ref: "#/components/schemas/NoteRealm"
-    IgnorePointsRequestDTO:
-      type: object
-      properties:
-        points:
-          type: array
-          items:
-            type: string
-    IgnorePointsResponseDTO:
-      type: object
-      properties:
-        success:
-          type: boolean
     UnderstandingChecklistDTO:
       type: object
       properties:
