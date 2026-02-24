@@ -110,6 +110,17 @@ Then('I am recalling my note on day {int}', (day: number) => {
   start.recall().goToRecallPage()
 })
 
+When(
+  'I make a wrong answer on day {int}, answering {string} to {string}',
+  (day: number, wrongAnswer: string, questionStem: string) => {
+    start.testability().backendTimeTravelTo(day, 8)
+    cy.reload()
+    start.recall().goToRecallPage()
+    start.assumeQuestionPage(questionStem).answer(wrongAnswer)
+    start.assumeAnsweredQuestionPage().expectMCQAnswerToBeIncorrect(wrongAnswer)
+  }
+)
+
 Then('I am assimilating new note on day {int}', (day: number) => {
   start.testability().backendTimeTravelTo(day, 8)
   start.assimilation().goToAssimilationPage()
