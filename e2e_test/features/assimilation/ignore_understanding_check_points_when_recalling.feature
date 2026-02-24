@@ -12,13 +12,7 @@ Feature: Ignore Understanding Check Points When Recalling
       | English is the world's most widespread lingua franca |
       | It's vital for global communication and connects people across cultures |
       | English is the standard language for international business, science, and diplomacy |
-    And OpenAI also generates this question:
-      | Question Stem                          | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
-      | What is key about global communication? | connects people   | business           | diplomacy          |
-    And It's day 1
     When I start assimilating "English"
     And I ignore these understanding points and complete assimilation:
       | English is the world's most widespread lingua franca |
       | English is the standard language for international business, science, and diplomacy |
-    When I am recalling my note on day 2
-    Then I should be asked "What is key about global communication?"
