@@ -152,6 +152,31 @@ describe("NoteRefinement component", () => {
       })
     })
 
+    it("removes point from checklist after successful promotion to sibling", async () => {
+      const childNoteRealm = makeMe.aNoteRealm
+        .under(makeMe.aNoteRealm.please())
+        .please()
+      const childNote = makeMe.aMemoryTracker
+        .ofNote(childNoteRealm)
+        .please().note
+      mockSdkService("promotePoint", {
+        createdNote: makeMe.aNoteRealm.please(),
+        updatedParentNote: makeMe.aNoteRealm.please(),
+      })
+      const wrapper = mount(["Point 1", "Point 2", "Point 3"], {
+        note: childNote,
+      })
+      await flushPromises()
+
+      await wrapper.findAll("li")[1]!.findAll("button")[1]!.trigger("click")
+      await flushPromises()
+
+      expect(wrapper.findAll("li")).toHaveLength(2)
+      expect(wrapper.text()).toContain("Point 1")
+      expect(wrapper.text()).toContain("Point 3")
+      expect(wrapper.text()).not.toContain("Point 2")
+    })
+
     it("hides sibling button when note has no parent", async () => {
       const wrapper = mount(["Test Point"])
       await flushPromises()

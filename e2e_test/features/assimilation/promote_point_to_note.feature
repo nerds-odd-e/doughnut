@@ -20,7 +20,6 @@ Feature: Promote Point to Note
     When I am assimilating the note "Supervised Learning"
     And I promote the point "It learns from input-output pairs" to a child note
     Then I should remain on the assimilation page for "Supervised Learning"
-    And the point "It learns from input-output pairs" should be removed from the understanding checklist
     And the understanding checklist should still show the remaining points
 
   Scenario: Promote a point to sibling note
@@ -34,4 +33,3 @@ Feature: Promote Point to Note
       | note-title                      |
       | Supervised Learning             |
       | Learning from Input-Output Pairs |
-    And the point "It learns from input-output pairs" should be removed from the understanding checklist

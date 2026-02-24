@@ -250,10 +250,6 @@ export const assumeAssimilationPage = () => ({
       message
     )
   },
-  expectPointRemovedFromChecklist(pointText: string) {
-    cy.contains('li', pointText).should('not.exist')
-    return this
-  },
   expectChecklistHasRemainingPoints() {
     cy.get('ul').find('li').should('have.length.at.least', 1)
     return this

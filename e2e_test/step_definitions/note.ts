@@ -598,13 +598,6 @@ Then(
 )
 
 Then(
-  'the point {string} should be removed from the understanding checklist',
-  (pointText: string) => {
-    start.assumeAssimilationPage().expectPointRemovedFromChecklist(pointText)
-  }
-)
-
-Then(
   'the understanding checklist should still show the remaining points',
   () => {
     start.assumeAssimilationPage().expectChecklistHasRemainingPoints()
