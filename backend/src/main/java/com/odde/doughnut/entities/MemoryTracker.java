@@ -77,6 +77,12 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Setter
   private Boolean spelling = false;
 
+  @Column(name = "deleted_at")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private Timestamp deletedAt;
+
   private MemoryTracker() {}
 
   public Timestamp calculateNextRecallAt() {
@@ -115,6 +121,8 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public boolean isActive() {
-    return !Boolean.TRUE.equals(removedFromTracking) && note.getDeletedAt() == null;
+    return deletedAt == null
+        && !Boolean.TRUE.equals(removedFromTracking)
+        && note.getDeletedAt() == null;
   }
 }

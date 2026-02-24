@@ -17,6 +17,7 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
               + " WHERE rp.user_id = :userId "
               + "   AND rp.assimilated_at > :since "
               + "   AND rp.removed_from_tracking IS FALSE "
+              + "   AND rp.deleted_at IS NULL "
               + "   AND n.deleted_at IS NULL",
       nativeQuery = true)
   List<MemoryTracker> findAllByUserAndAssimilatedAtGreaterThan(
@@ -40,6 +41,7 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
               + " FROM memory_tracker rp "
               + " JOIN note n ON rp.note_id = n.id "
               + " WHERE rp.user_id = :userId "
+              + "   AND rp.deleted_at IS NULL "
               + "   AND n.deleted_at IS NULL "
               + "   AND rp.note_id = :noteId",
       nativeQuery = true)
@@ -52,6 +54,7 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
               + " JOIN note n ON rp.note_id = n.id "
               + " WHERE rp.user_id = :userId "
               + "   AND rp.removed_from_tracking IS FALSE "
+              + "   AND rp.deleted_at IS NULL "
               + "   AND n.deleted_at IS NULL "
               + " ORDER BY rp.assimilated_at DESC LIMIT 100",
       nativeQuery = true)
@@ -65,6 +68,7 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
               + " WHERE rp.user_id = :userId "
               + "   AND rp.last_recalled_at IS NOT NULL "
               + "   AND rp.removed_from_tracking IS FALSE "
+              + "   AND rp.deleted_at IS NULL "
               + "   AND n.deleted_at IS NULL "
               + " ORDER BY rp.last_recalled_at DESC LIMIT 500",
       nativeQuery = true)
@@ -75,5 +79,6 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
           + " JOIN note n ON rp.note_id = n.id "
           + " WHERE rp.user_id = :userId "
           + "   AND rp.removed_from_tracking IS FALSE "
+          + "   AND rp.deleted_at IS NULL "
           + "   AND n.deleted_at IS NULL ";
 }

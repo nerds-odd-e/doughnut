@@ -38,7 +38,8 @@ public interface NoteReviewRepository extends CrudRepository<Note, Integer> {
           + "   AND COALESCE(n.recallSetting.skipMemoryTracking, FALSE) = FALSE "
           + "   AND n.deletedAt IS NULL ";
 
-  String joinMemoryTracker = " LEFT JOIN n.memoryTrackers rp ON rp.user.id = :userId";
+  String joinMemoryTracker =
+      " LEFT JOIN n.memoryTrackers rp ON rp.user.id = :userId AND rp.deletedAt IS NULL";
 
   String orderByDate = " ORDER BY n.recallSetting.level, n.createdAt, n.id";
 

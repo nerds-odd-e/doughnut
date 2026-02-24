@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
 
 import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.MemoryTracker;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemoryTrackerServiceTest {
   @Autowired MakeMe makeMe;
   @Autowired MemoryTrackerService memoryTrackerService;
+  @Autowired UserService userService;
 
   @Autowired
   com.odde.doughnut.entities.repositories.MemoryTrackerRepository memoryTrackerRepository;
@@ -238,8 +240,7 @@ public class MemoryTrackerServiceTest {
     }
 
     @Test
-    void shouldDeleteMemoryTrackerAndRelatedRecallPrompts() {
-      // Create some recall prompts for this memory tracker
+    void shouldSoftDeleteMemoryTrackerSoNoteReturnsToAssimilateState() {
       makeMe
           .aRecallPrompt()
           .approvedQuestionOf(note)
@@ -250,10 +251,33 @@ public class MemoryTrackerServiceTest {
 
       memoryTrackerService.reAssimilate(memoryTracker);
 
-      // MemoryTracker should be deleted - note should be back in assimilate state
       List<MemoryTracker> trackers =
           memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId());
       assertThat(trackers, empty());
+
+      MemoryTracker refreshed =
+          makeMe.entityPersister.find(MemoryTracker.class, memoryTracker.getId());
+      assertThat(refreshed.getDeletedAt(), notNullValue());
+    }
+
+    @Test
+    void shouldIncludeNoteInUnassimilatedCountAfterReAssimilate() {
+      assertThat(userService.getUnassimilatedNoteCount(user), equalTo(0));
+
+      memoryTrackerService.reAssimilate(memoryTracker);
+
+      assertThat(userService.getUnassimilatedNoteCount(user), equalTo(1));
+    }
+
+    @Test
+    void shouldExcludeSoftDeletedFromRecentAndReviewedLists() {
+      assertThat(memoryTrackerService.findLast100ByUser(user.getId()), hasSize(1));
+      assertThat(memoryTrackerService.findLast100ReviewedByUser(user.getId()), hasSize(1));
+
+      memoryTrackerService.reAssimilate(memoryTracker);
+
+      assertThat(memoryTrackerService.findLast100ByUser(user.getId()), empty());
+      assertThat(memoryTrackerService.findLast100ReviewedByUser(user.getId()), empty());
     }
 
     @Test

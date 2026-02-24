@@ -135,10 +135,8 @@ public class MemoryTrackerService {
   }
 
   public void reAssimilate(MemoryTracker memoryTracker) {
-    // Delete MemoryTracker to return note to assimilate state
-    // First delete related RecallPrompts to avoid JPA session conflicts
-    recallPromptRepository.deleteByMemoryTrackerId(memoryTracker.getId());
-    memoryTrackerRepository.delete(memoryTracker);
+    memoryTracker.setDeletedAt(new Timestamp(System.currentTimeMillis()));
+    entityPersister.save(memoryTracker);
   }
 
   public SpellingResultDTO answerSpelling(
