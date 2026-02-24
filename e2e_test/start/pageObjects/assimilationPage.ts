@@ -137,11 +137,6 @@ export const assumeAssimilationPage = () => ({
       })
     )
   },
-  expectNoteTitle(noteTitle: string) {
-    cy.findByText(noteTitle, { selector: 'main *' }).should('be.visible')
-    cy.pageIsNotLoading()
-    return this
-  },
   selectNoteType(noteType: string) {
     form.fill({ 'Note Type': noteType })
     cy.pageIsNotLoading()
@@ -216,13 +211,23 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   promotePointToChildNote(pointText: string) {
-    cy.contains('li', pointText).findByRole('button', { name: 'Child' }).click()
+    cy.contains('Understanding Checklist:')
+      .closest('.daisy-bg-accent')
+      .within(() => {
+        cy.contains('li', pointText)
+          .findByRole('button', { name: 'Child' })
+          .click()
+      })
     return this
   },
   promotePointToSiblingNote(pointText: string) {
-    cy.contains('li', pointText)
-      .findByRole('button', { name: 'Sibling' })
-      .click()
+    cy.contains('Understanding Checklist:')
+      .closest('.daisy-bg-accent')
+      .within(() => {
+        cy.contains('li', pointText)
+          .findByRole('button', { name: 'Sibling' })
+          .click()
+      })
     return this
   },
   expectToRemainOnAssimilationPageFor(noteTitle: string) {

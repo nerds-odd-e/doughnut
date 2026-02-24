@@ -293,10 +293,6 @@ Then(
   }
 )
 
-When('I start assimilating {string}', (noteTitle: string) => {
-  start.assimilation().goToAssimilationPage().expectNoteTitle(noteTitle)
-})
-
 Then('I should be able to select a note type', () => {
   start.assumeAssimilationPage().expectNoteTypePrompt()
 })
