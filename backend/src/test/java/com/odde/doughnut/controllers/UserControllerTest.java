@@ -13,6 +13,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 class UserControllerTest extends ControllerTestBase {
   @Autowired UserController controller;
+  @Autowired NoteService noteService;
 
   @BeforeEach
   void setup() {
@@ -156,8 +158,7 @@ class UserControllerTest extends ControllerTestBase {
       makeMe.aMemoryTrackerFor(activeNote).by(currentUser.getUser()).please();
       makeMe.aMemoryTrackerFor(deletedNote).by(currentUser.getUser()).please();
 
-      deletedNote.setDeletedAt(currentTime);
-      makeMe.entityPersister.merge(deletedNote);
+      noteService.destroy(deletedNote);
 
       MenuDataDTO menuData = controller.getMenuData("Asia/Shanghai");
 

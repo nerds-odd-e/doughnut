@@ -1,32 +1,40 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessory;
 import com.odde.doughnut.entities.NoteType;
 import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NoteService {
   private final NoteRepository noteRepository;
+  private final MemoryTrackerRepository memoryTrackerRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
 
   public NoteService(
       NoteRepository noteRepository,
+      MemoryTrackerRepository memoryTrackerRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings) {
     this.noteRepository = noteRepository;
+    this.memoryTrackerRepository = memoryTrackerRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
   }
@@ -74,6 +82,30 @@ public class NoteService {
 
     note.setDeletedAt(currentUTCTimestamp);
     entityPersister.merge(note);
+
+    softDeleteMemoryTrackersForNotes(
+        collectNoteIdsForDeletion(note, descendants, inboundReferences));
+  }
+
+  private List<Integer> collectNoteIdsForDeletion(
+      Note note, List<Note> descendants, List<Note> inboundReferences) {
+    List<Integer> noteIds = new ArrayList<>();
+    noteIds.add(note.getId());
+    descendants.forEach(d -> noteIds.add(d.getId()));
+    inboundReferences.forEach(r -> noteIds.add(r.getId()));
+    for (Note descendant : descendants) {
+      noteRepository.findAllByTargetNote(descendant.getId()).forEach(r -> noteIds.add(r.getId()));
+    }
+    return noteIds;
+  }
+
+  private void softDeleteMemoryTrackersForNotes(List<Integer> noteIds) {
+    if (noteIds.isEmpty()) return;
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    for (MemoryTracker mt : memoryTrackerRepository.findByNote_IdIn(noteIds)) {
+      mt.setDeletedAt(currentUTCTimestamp);
+      entityPersister.merge(mt);
+    }
   }
 
   public void restore(Note note) {
@@ -86,6 +118,9 @@ public class NoteService {
 
     Timestamp deletedAt = note.getDeletedAt();
     if (deletedAt != null) {
+      List<Integer> noteIdsToRestore = collectNoteIdsToRestore(note, deletedAt);
+      restoreMemoryTrackersForNotes(noteIdsToRestore, deletedAt);
+
       // Restore all descendants that were deleted at the same time (cascaded deletion)
       restoreDescendantsRecursively(note, deletedAt);
 
@@ -104,6 +139,43 @@ public class NoteService {
 
     note.setDeletedAt(null);
     entityPersister.merge(note);
+  }
+
+  private List<Integer> collectNoteIdsToRestore(Note note, Timestamp deletedAt) {
+    Set<Integer> noteIds = new LinkedHashSet<>();
+    collectNoteIdsToRestoreInto(noteIds, note, deletedAt);
+    return new ArrayList<>(noteIds);
+  }
+
+  private void collectNoteIdsToRestoreInto(Set<Integer> noteIds, Note note, Timestamp deletedAt) {
+    if (deletedAt.equals(note.getDeletedAt())) noteIds.add(note.getId());
+    noteRepository.findAllByTargetNote(note.getId()).stream()
+        .filter(r -> deletedAt.equals(r.getDeletedAt()))
+        .forEach(r -> noteIds.add(r.getId()));
+    for (Note child : noteRepository.findAllByParentId(note.getId())) {
+      if (deletedAt.equals(child.getDeletedAt())) {
+        noteIds.add(child.getId());
+        noteRepository.findAllByTargetNote(child.getId()).stream()
+            .filter(r -> deletedAt.equals(r.getDeletedAt()))
+            .forEach(r -> noteIds.add(r.getId()));
+        collectNoteIdsToRestoreInto(noteIds, child, deletedAt);
+      }
+    }
+  }
+
+  private void restoreMemoryTrackersForNotes(List<Integer> noteIds, Timestamp deletedAt) {
+    if (noteIds.isEmpty()) return;
+    for (MemoryTracker mt : memoryTrackerRepository.findByNote_IdIn(noteIds)) {
+      if (sameTimestamp(deletedAt, mt.getDeletedAt())) {
+        mt.setDeletedAt(null);
+        entityPersister.merge(mt);
+      }
+    }
+  }
+
+  private boolean sameTimestamp(Timestamp a, Timestamp b) {
+    if (a == null || b == null) return a == b;
+    return Math.abs(a.getTime() - b.getTime()) < 1000;
   }
 
   private void restoreDescendantsRecursively(Note note, Timestamp deletedAt) {

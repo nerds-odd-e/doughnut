@@ -9,6 +9,7 @@ import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.RecallResult;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 class RecallsControllerTests extends ControllerTestBase {
   @Autowired RecallsController controller;
+  @Autowired NoteService noteService;
 
   @BeforeEach
   void setup() {
@@ -121,8 +123,7 @@ class RecallsControllerTests extends ControllerTestBase {
           .nextRecallAt(currentTime)
           .please();
 
-      deletedNote.setDeletedAt(currentTime);
-      makeMe.entityPersister.merge(deletedNote);
+      noteService.destroy(deletedNote);
 
       DueMemoryTrackers dueMemoryTrackers = controller.recalling("Asia/Shanghai", 0);
 

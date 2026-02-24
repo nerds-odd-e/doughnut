@@ -12,6 +12,7 @@ import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
 import java.util.List;
@@ -27,6 +28,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
   OpenAIClient officialClient;
 
   @Autowired MemoryTrackerController controller;
+  @Autowired NoteService noteService;
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach
@@ -238,8 +240,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       MemoryTracker deletedTracker =
           makeMe.aMemoryTrackerFor(deletedNote).by(currentUser.getUser()).please();
 
-      deletedNote.setDeletedAt(testabilitySettings.getCurrentUTCTimestamp());
-      makeMe.entityPersister.merge(deletedNote);
+      noteService.destroy(deletedNote);
 
       List<MemoryTracker> memoryTrackers = controller.getRecentMemoryTrackers();
 
@@ -292,8 +293,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       controller.markAsRepeated(activeTracker, true);
       controller.markAsRepeated(deletedTracker, true);
 
-      deletedNote.setDeletedAt(testabilitySettings.getCurrentUTCTimestamp());
-      makeMe.entityPersister.merge(deletedNote);
+      noteService.destroy(deletedNote);
 
       List<MemoryTracker> memoryTrackers = controller.getRecentlyReviewed();
 

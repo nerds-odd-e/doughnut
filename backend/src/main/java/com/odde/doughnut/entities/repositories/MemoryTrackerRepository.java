@@ -11,74 +11,63 @@ import org.springframework.data.repository.query.Param;
 public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, Integer> {
   @Query(
       value =
-          "SELECT rp.* "
-              + " FROM memory_tracker rp "
-              + " JOIN note n ON rp.note_id = n.id "
+          "SELECT rp.* FROM memory_tracker rp "
               + " WHERE rp.user_id = :userId "
               + "   AND rp.assimilated_at > :since "
               + "   AND rp.removed_from_tracking IS FALSE "
-              + "   AND rp.deleted_at IS NULL "
-              + "   AND n.deleted_at IS NULL",
+              + "   AND rp.deleted_at IS NULL",
       nativeQuery = true)
   List<MemoryTracker> findAllByUserAndAssimilatedAtGreaterThan(
       @Param("userId") Integer userId, @Param("since") Timestamp since);
 
-  @Query(value = "SELECT count(*) " + byUserId, nativeQuery = true)
-  int countByUserNotRemoved(Integer userId);
+  @Query(value = "SELECT count(*) " + byUserIdFrom, nativeQuery = true)
+  int countByUserNotRemoved(@Param("userId") Integer userId);
 
   @Query(
       value =
           "SELECT rp.* "
-              + byUserId
+              + byUserIdFrom
               + " AND rp.next_recall_at <= :nextRecallAt ORDER BY rp.next_recall_at",
       nativeQuery = true)
   Stream<MemoryTracker> findAllByUserAndNextRecallAtLessThanEqualOrderByNextRecallAt(
-      Integer userId, @Param("nextRecallAt") Timestamp nextRecallAt);
+      @Param("userId") Integer userId, @Param("nextRecallAt") Timestamp nextRecallAt);
 
   @Query(
       value =
-          "SELECT rp.* "
-              + " FROM memory_tracker rp "
-              + " JOIN note n ON rp.note_id = n.id "
+          "SELECT rp.* FROM memory_tracker rp "
               + " WHERE rp.user_id = :userId "
               + "   AND rp.deleted_at IS NULL "
-              + "   AND n.deleted_at IS NULL "
               + "   AND rp.note_id = :noteId",
       nativeQuery = true)
   List<MemoryTracker> findByUserAndNote(Integer userId, @Param("noteId") Integer noteId);
 
   @Query(
       value =
-          "SELECT rp.* "
-              + " FROM memory_tracker rp "
-              + " JOIN note n ON rp.note_id = n.id "
-              + " WHERE rp.user_id = :userId "
-              + "   AND rp.removed_from_tracking IS FALSE "
-              + "   AND rp.deleted_at IS NULL "
-              + "   AND n.deleted_at IS NULL "
+          "SELECT rp.* FROM memory_tracker rp "
+              + byUserIdWhere
               + " ORDER BY rp.assimilated_at DESC LIMIT 100",
       nativeQuery = true)
-  List<MemoryTracker> findLast100ByUser(Integer userId);
+  List<MemoryTracker> findLast100ByUser(@Param("userId") Integer userId);
 
   @Query(
       value =
-          "SELECT rp.* "
-              + " FROM memory_tracker rp "
-              + " JOIN note n ON rp.note_id = n.id "
-              + " WHERE rp.user_id = :userId "
-              + "   AND rp.last_recalled_at IS NOT NULL "
-              + "   AND rp.removed_from_tracking IS FALSE "
-              + "   AND rp.deleted_at IS NULL "
-              + "   AND n.deleted_at IS NULL "
+          "SELECT rp.* FROM memory_tracker rp "
+              + byUserIdWhere
+              + " AND rp.last_recalled_at IS NOT NULL "
               + " ORDER BY rp.last_recalled_at DESC LIMIT 500",
       nativeQuery = true)
-  List<MemoryTracker> findLast100ReviewedByUser(Integer userId);
+  List<MemoryTracker> findLast100ReviewedByUser(@Param("userId") Integer userId);
 
-  String byUserId =
+  List<MemoryTracker> findByNote_IdIn(List<Integer> noteIds);
+
+  String byUserIdFrom =
       " FROM memory_tracker rp "
-          + " JOIN note n ON rp.note_id = n.id "
           + " WHERE rp.user_id = :userId "
           + "   AND rp.removed_from_tracking IS FALSE "
-          + "   AND rp.deleted_at IS NULL "
-          + "   AND n.deleted_at IS NULL ";
+          + "   AND rp.deleted_at IS NULL ";
+
+  String byUserIdWhere =
+      " WHERE rp.user_id = :userId "
+          + "   AND rp.removed_from_tracking IS FALSE "
+          + "   AND rp.deleted_at IS NULL ";
 }
