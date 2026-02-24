@@ -121,6 +121,33 @@ When(
   }
 )
 
+When(
+  'I make {int} consecutive wrong answers for {int} days since day {int}, answering {string} to {string}',
+  (
+    _numWrongAnswers: number,
+    numDays: number,
+    startDay: number,
+    wrongAnswer: string,
+    questionStem: string
+  ) => {
+    const days = Array.from({ length: numDays }, (_, i) => startDay + i)
+
+    const runIteration = (index: number) => {
+      if (index >= days.length) return
+      const day = days[index]
+      start.testability().backendTimeTravelTo(day, 8)
+      cy.reload()
+      start.recall().goToRecallPage()
+      start.assumeQuestionPage(questionStem).answer(wrongAnswer)
+      start
+        .assumeAnsweredQuestionPage()
+        .expectMCQAnswerToBeIncorrect(wrongAnswer)
+      cy.then(() => runIteration(index + 1))
+    }
+    runIteration(0)
+  }
+)
+
 Then('I am assimilating new note on day {int}', (day: number) => {
   start.testability().backendTimeTravelTo(day, 8)
   start.assimilation().goToAssimilationPage()
