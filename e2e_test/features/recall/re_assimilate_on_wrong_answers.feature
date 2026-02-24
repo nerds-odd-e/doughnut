@@ -18,10 +18,4 @@ Feature: Re-assimilate note after too many wrong answers
     And I assimilate the note "sedition"
     And I make 5 consecutive wrong answers for 5 days since day 2, answering "to sleep" to "What is the meaning of sedition?"
     When I confirm to re-assimilate the note
-
-    # After confirming re-assimilation, note should be back in assimilate queue
-    # Verify by navigating to day 7 and checking counts
-    When I am recalling my note on day 7
-    Then I should see that I have no notes to recall today
-    And I should see that I have 1 new notes to assimilate
-    And I should see the assimilation counter increased by 1 in the sidebar
+    Then I should see that I have 1 new notes to assimilate

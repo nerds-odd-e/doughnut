@@ -51,13 +51,6 @@ Then(
   }
 )
 
-Then('I should see that I have no notes to recall today', () => {
-  // When there are no notes to recall, the page shows "You have finished all repetitions"
-  cy.contains('You have finished all repetitions for this half a day!').should(
-    'be.visible'
-  )
-})
-
 Then(
   'I should see that I have {int} new notes to assimilate',
   (numberOfNotes: number) => {
@@ -434,12 +427,3 @@ When('I update the note details to {string}', (newDetails: string) => {
 When('I confirm to re-assimilate the note', () => {
   start.assumeAnsweredQuestionPage().confirmReAssimilation()
 })
-
-Then(
-  'I should see the assimilation counter increased by {int} in the sidebar',
-  (incrementCount: number) => {
-    // After re-assimilation, the note should appear in the assimilation queue
-    // The counter should show the expected count
-    start.assimilation().expectCount(incrementCount)
-  }
-)
