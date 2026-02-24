@@ -431,14 +431,8 @@ When('I update the note details to {string}', (newDetails: string) => {
   start.assumeAssimilationPage().updateNoteDetails(newDetails)
 })
 
-Then('I should see a re-assimilate confirmation dialog', () => {
-  cy.contains('You have answered this note incorrectly too many times').should(
-    'be.visible'
-  )
-})
-
 When('I confirm to re-assimilate the note', () => {
-  cy.findByRole('button', { name: 'OK' }).click()
+  start.assumeAnsweredQuestionPage().confirmReAssimilation()
 })
 
 Then(

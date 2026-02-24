@@ -16,9 +16,7 @@ Feature: Re-assimilate note after too many wrong answers
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
     And I assimilate the note "sedition"
-
-    When I make 5 consecutive wrong answers for 5 days since day 2, answering "to sleep" to "What is the meaning of sedition?"
-    Then I should see a re-assimilate confirmation dialog
+    And I make 5 consecutive wrong answers for 5 days since day 2, answering "to sleep" to "What is the meaning of sedition?"
     When I confirm to re-assimilate the note
 
     # After confirming re-assimilation, note should be back in assimilate queue
