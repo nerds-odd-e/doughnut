@@ -225,16 +225,6 @@ export const assumeAssimilationPage = () => ({
       .click()
     return this
   },
-  expectTwoButtonsForEachPoint() {
-    cy.contains('Understanding Checklist:')
-      .closest('.daisy-bg-accent')
-      .find('ul li')
-      .each(($li) => {
-        cy.wrap($li).findByRole('button', { name: 'Child' }).should('exist')
-        cy.wrap($li).findByRole('button', { name: 'Sibling' }).should('exist')
-      })
-    return this
-  },
   expectToRemainOnAssimilationPageFor(noteTitle: string) {
     cy.url().should('include', '/assimilate')
     cy.findByText(noteTitle).should('exist')
