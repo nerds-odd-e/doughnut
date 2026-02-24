@@ -39,6 +39,16 @@ describe("Markdown and HTML Conversion Tests", () => {
         "raw <span> is ok.",
         "<p>raw &lt;span&gt; is ok.</p>",
       ],
+      [
+        "inline HTML strong tag",
+        "abc <strong>def</strong>",
+        "<p>abc <strong>def</strong></p>",
+      ],
+      [
+        "inline HTML strong with CJK",
+        "你很<strong>好吃</strong>",
+        "<p>你很<strong>好吃</strong></p>",
+      ],
     ])("converts %s", (_, markdown, expected) => {
       expect(toHtml(markdown)).toBe(expected)
     })

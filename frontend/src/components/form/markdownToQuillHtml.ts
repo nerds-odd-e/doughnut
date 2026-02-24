@@ -32,6 +32,11 @@ export default function markdownToQuillHtml(
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#39;")
 
+  // Safe inline formatting tags that marked may tokenize as separate opening/closing tags.
+  // Excludes span which is often used with attributes and should remain escaped when orphan.
+  const safeInlineTagPattern =
+    /^<\/(strong|em|b|i|u|s|code)\s*>$|^<(strong|em|b|i|u|s|code)\s*>$/i
+
   // Override the html method to handle raw HTML
   renderer.html = function (html: string | Tokens.Generic): string {
     const htmlContent = typeof html === "string" ? html : html.text
@@ -42,6 +47,10 @@ export default function markdownToQuillHtml(
     // Allow content that consists entirely of <br> or <br/> tags (with optional whitespace between)
     if (/^(\s*<br\s*\/?>\s*)+$/i.test(trimmed)) {
       return htmlContent.replace(/<br\s*\/?>/gi, '<br class="softbreak">')
+    }
+    // Allow standalone opening/closing inline tags (marked tokenizes <strong>def</strong> as separate tokens)
+    if (safeInlineTagPattern.test(trimmed)) {
+      return htmlContent
     }
     // Allow complete HTML tags matching <tag xxx>...</tag> pattern
     // This matches opening tag with optional attributes, content, and closing tag
