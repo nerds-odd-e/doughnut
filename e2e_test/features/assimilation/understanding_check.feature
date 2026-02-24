@@ -26,3 +26,9 @@ Feature: Understanding Check
     When I start assimilating "Sample"
     And I delete understanding points 0 and 2
     Then the note details on the current page should be "B. D. E."
+
+  Scenario: Ignored points' questions do not appear on recall page
+    When I start assimilating "Sample"
+    And I ignore these understanding points and complete assimilation:
+      | A |
+      | C |
