@@ -588,22 +588,6 @@ When('I promote the point {string} to a child note', (pointText: string) => {
   start.assumeAssimilationPage().promotePointToChildNote(pointText)
 })
 
-Then(
-  'I should remain on the assimilation page for {string}',
-  (noteTitle: string) => {
-    start
-      .assumeAssimilationPage()
-      .expectToRemainOnAssimilationPageFor(noteTitle)
-  }
-)
-
-Then(
-  'the understanding checklist should still show the remaining points',
-  () => {
-    start.assumeAssimilationPage().expectChecklistHasRemainingPoints()
-  }
-)
-
 When('I promote the point {string} to a sibling note', (pointText: string) => {
   start.assumeAssimilationPage().promotePointToSiblingNote(pointText)
 })

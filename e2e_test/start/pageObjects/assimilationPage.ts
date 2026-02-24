@@ -250,10 +250,6 @@ export const assumeAssimilationPage = () => ({
       message
     )
   },
-  expectChecklistHasRemainingPoints() {
-    cy.get('ul').find('li').should('have.length.at.least', 1)
-    return this
-  },
   expectRememberingSpellingUnavailable() {
     form.expectFieldError(
       'Remember Spelling',

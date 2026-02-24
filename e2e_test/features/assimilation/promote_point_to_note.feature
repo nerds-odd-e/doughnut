@@ -19,8 +19,9 @@ Feature: Promote Point to Note
     And OpenAI will extract point "It learns from input-output pairs" to child note with title "Learning from Input-Output Pairs" and details "The model learns patterns from labeled examples" and updated parent details "Supervised learning is a type of ML. See child notes for details."
     When I am assimilating the note "Supervised Learning"
     And I promote the point "It learns from input-output pairs" to a child note
-    Then I should remain on the assimilation page for "Supervised Learning"
-    And the understanding checklist should still show the remaining points
+    Then I should see "Machine Learning/Supervised Learning" with these children
+      | note-title                      |
+      | Learning from Input-Output Pairs |
 
   Scenario: Promote a point to sibling note
     Given OpenAI generates understanding checklist with points:
