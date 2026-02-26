@@ -5,13 +5,11 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.PointExtractionResult;
-import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,23 +27,17 @@ public class AiController {
   private final NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
   private final AuthorizationService authorizationService;
   private final NoteConstructionService noteConstructionService;
-  private final EntityPersister entityPersister;
-  private final TestabilitySettings testabilitySettings;
 
   @Autowired
   public AiController(
       NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory,
       OtherAiServices otherAiServices,
       AuthorizationService authorizationService,
-      NoteConstructionService noteConstructionService,
-      EntityPersister entityPersister,
-      TestabilitySettings testabilitySettings) {
+      NoteConstructionService noteConstructionService) {
     this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
     this.otherAiServices = otherAiServices;
     this.authorizationService = authorizationService;
     this.noteConstructionService = noteConstructionService;
-    this.testabilitySettings = testabilitySettings;
-    this.entityPersister = entityPersister;
   }
 
   @GetMapping("/dummy")
