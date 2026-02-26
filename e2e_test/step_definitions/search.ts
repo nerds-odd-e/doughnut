@@ -4,7 +4,7 @@ import start from '../start'
 
 Given('I reindex the notebook {string}', (notebookTitle: string) => {
   start
-    .routerToNotebooksPage()
+    .navigateToNotebooksPage()
     .notebookCard(notebookTitle)
     .editNotebookSettings()
     .reindexNotebook()

@@ -34,7 +34,7 @@ When('I select the {string} notebook', (notebookTitle: string) => {
 When(
   'I export notebook {string} to Obsidian markdown zip file',
   (notebook: string) => {
-    start.routerToNotebooksPage().notebookCard(notebook).exportForObsidian()
+    start.navigateToNotebooksPage().notebookCard(notebook).exportForObsidian()
   }
 )
 

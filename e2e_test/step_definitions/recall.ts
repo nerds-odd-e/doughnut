@@ -15,11 +15,11 @@ Given("It's day {int}", (day: number) => {
 })
 
 Given('I ask to do more repetition', () => {
-  start.recall().goToRecallPage().repeatMore()
+  start.recall().navigateToRecallPage().repeatMore()
 })
 
 Then('I recall {string}', (repeatNotes: string) => {
-  start.recall().goToRecallPage().recallNotes(repeatNotes)
+  start.recall().navigateToRecallPage().recallNotes(repeatNotes)
 })
 
 Then('I repeat more old {string}', (repeatNotes: string) => {
@@ -30,8 +30,11 @@ Then(
   'On day {int} I recall {string} and assimilate new {string}',
   (day: number, repeatNotes: string, initialNotes: string) => {
     start.testability().timeTravelTo(day, 8)
-    start.recall().goToRecallPage().recallNotes(repeatNotes)
-    start.assimilation().goToAssimilationPage().assimilateNotes(initialNotes)
+    start.recall().navigateToRecallPage().recallNotes(repeatNotes)
+    start
+      .assimilation()
+      .navigateToAssimilationPage()
+      .assimilateNotes(initialNotes)
   }
 )
 
@@ -49,16 +52,16 @@ Then(
     start.testability().backendTimeTravelTo(day, 8)
     start
       .assimilation()
-      .goToAssimilationPage()
+      .navigateToAssimilationPage()
       .expectToAssimilateAndTotal(toAssimilateAndTotal)
-    start.recall().goToRecallPage().expectToRecallCounts(numberOfRecalls)
+    start.recall().navigateToRecallPage().expectToRecallCounts(numberOfRecalls)
   }
 )
 
 Then('I am recalling my note on day {int}', (day: number) => {
   start.testability().backendTimeTravelTo(day, 8)
   cy.reload()
-  start.recall().goToRecallPage()
+  start.recall().navigateToRecallPage()
 })
 
 When(
@@ -77,7 +80,7 @@ When(
       const day = days[index]!
       start.testability().backendTimeTravelTo(day, 8)
       cy.reload()
-      start.recall().goToRecallPage()
+      start.recall().navigateToRecallPage()
       start.assumeQuestionPage(questionStem).answer(wrongAnswer)
       start
         .assumeAnsweredQuestionPage()

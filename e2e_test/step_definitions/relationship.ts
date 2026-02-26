@@ -9,7 +9,7 @@ import start from '../start'
 import { commonSenseSplit } from '../support/string_util'
 
 When('I start searching from all my notebooks page', () => {
-  start.routerToNotebooksPage()
+  start.navigateToNotebooksPage()
   start.assumeNotePage().toolbarButton('search note').click()
 })
 
@@ -136,7 +136,7 @@ Then(
   'I should see note {notepath} has relationship {string} {string}',
   (notePath: NotePath, relationType: string, targetNoteTopics: string) => {
     start
-      .routerToNotebooksPage()
+      .navigateToNotebooksPage()
       .navigateToPath(notePath)
       .expectRelationshipChildren(relationType, targetNoteTopics)
   }

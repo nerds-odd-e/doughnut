@@ -1,12 +1,12 @@
 import { form } from '../forms'
-import { routerToMyNotebooksPage } from './myNotebooksPage'
+import { navigateToNotebooksPage } from './myNotebooksPage'
 import { assumeAdminDashboardPage } from './adminPages/adminDashboardPage'
 import { assumeAssessmentAndCertificateHistoryPage } from './assessmentAndCertificateHistoryPage'
 import { messageCenterIndicator } from './messageCenterIndicator'
 import { manageMCPTokensPage } from './manageMCPTokensPage'
 
 export const mainMenu = () => {
-  routerToMyNotebooksPage()
+  navigateToNotebooksPage()
   cy.pageIsNotLoading()
 
   return {

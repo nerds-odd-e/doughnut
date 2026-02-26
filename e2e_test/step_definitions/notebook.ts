@@ -13,7 +13,7 @@ import start from '../start'
 
 Given('I choose to share my notebook {string}', (noteTopology: string) => {
   start
-    .routerToNotebooksPage()
+    .navigateToNotebooksPage()
     .notebookCard(noteTopology)
     .shareNotebookToBazaar()
 })
@@ -22,7 +22,7 @@ Then(
   'I should see readonly notebook {string} in my notes',
   (noteTopology: string) => {
     start
-      .routerToNotebooksPage()
+      .navigateToNotebooksPage()
       .subscribedNotebooks()
       .openNotebook(noteTopology)
     cy.pageIsNotLoading()
@@ -35,7 +35,7 @@ Then(
   'I should be able to edit the subscription to notebook {string}',
   (noteTopology: string) => {
     start
-      .routerToNotebooksPage()
+      .navigateToNotebooksPage()
       .notebookCard(noteTopology)
       .updateSubscription()
   }
@@ -43,7 +43,7 @@ Then(
 
 When('I change notebook {string} to skip recall', (noteTopology: string) => {
   start
-    .routerToNotebooksPage()
+    .navigateToNotebooksPage()
     .notebookCard(noteTopology)
     .editNotebookSettings()
     .skipMemoryTracking()
@@ -51,7 +51,7 @@ When('I change notebook {string} to skip recall', (noteTopology: string) => {
 
 When('I request for an approval for notebook {string}', (notebook: string) => {
   start
-    .routerToNotebooksPage()
+    .navigateToNotebooksPage()
     .notebookCard(notebook)
     .editNotebookSettings()
     .requestForNotebookApproval()
@@ -61,7 +61,7 @@ When(
   'the approval for the notebook {string} is {string}',
   (noteTopology: string, status: string) => {
     start
-      .routerToNotebooksPage()
+      .navigateToNotebooksPage()
       .notebookCard(noteTopology)
       .editNotebookSettings()
       .expectNotebookApprovalStatus(status)
@@ -72,7 +72,7 @@ Then(
   'I should see the status {string} of the approval for notebook {string}',
   (status: string, noteTopology: string) => {
     start
-      .routerToNotebooksPage()
+      .navigateToNotebooksPage()
       .notebookCard(noteTopology)
       .editNotebookSettings()
       .expectNotebookApprovalStatus(status)
@@ -80,14 +80,14 @@ Then(
 )
 
 Then('I unsubscribe from notebook {string}', (noteTopology: string) => {
-  start.routerToNotebooksPage().notebookCard(noteTopology).unsubscribe()
+  start.navigateToNotebooksPage().notebookCard(noteTopology).unsubscribe()
 })
 
 Given(
   'I set the number of questions per assessment of the notebook {string} to {int}',
   (notebook: string, numberOfQuestion: number) => {
     start
-      .routerToNotebooksPage()
+      .navigateToNotebooksPage()
       .notebookCard(notebook)
       .editNotebookSettings()
       .updateAssessmentSettings({ numberOfQuestion })
@@ -98,7 +98,7 @@ Given(
   'the number of questions in assessment for notebook {string} is {int}',
   (notebook: string, numberOfQuestion: number) => {
     start
-      .routerToNotebooksPage()
+      .navigateToNotebooksPage()
       .notebookCard(notebook)
       .editNotebookSettings()
       .updateAssessmentSettings({ numberOfQuestion })
@@ -124,7 +124,7 @@ Given('following notebooks have pending approval:', (notebooks: DataTable) => {
   notebooks.raw().forEach((notebookRaw: string[]) => {
     const notebookName = notebookRaw[0]!
     start
-      .routerToNotebooksPage()
+      .navigateToNotebooksPage()
       .notebookCard(notebookName)
       .editNotebookSettings()
       .requestForNotebookApproval()
@@ -153,7 +153,7 @@ When(
   'I Import Obsidian data {string} to note {string}',
   (filename: string, noteTitle: string) => {
     start
-      .routerToNotebooksPage()
+      .navigateToNotebooksPage()
       .notebookCard(noteTitle)
       .importObsidianData(filename)
   }

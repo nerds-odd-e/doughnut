@@ -52,7 +52,7 @@ Then(
 
 Then("I should see I've subscribed to {string}", (noteTopology: string) => {
   start
-    .routerToNotebooksPage()
+    .navigateToNotebooksPage()
     .subscribedNotebooks()
     .expectNotebook(noteTopology)
 })
@@ -63,7 +63,7 @@ Then('I should see message that says {string}', (message: string) => {
 
 Then("I should see I've not subscribed to {string}", (noteTopology: string) => {
   start
-    .routerToNotebooksPage()
+    .navigateToNotebooksPage()
     .subscribedNotebooks()
     .expectNotebookNotPresent(noteTopology)
 })

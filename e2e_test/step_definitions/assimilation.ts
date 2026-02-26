@@ -7,7 +7,7 @@ import type { DataTable } from '@cucumber/cucumber'
 import start from '../start'
 
 Then('I assimilate these in sequence:', (data: DataTable) => {
-  start.assimilation().goToAssimilationPage().assimilate(data.hashes())
+  start.assimilation().navigateToAssimilationPage().assimilate(data.hashes())
 })
 
 Then('I should see {int} due for assimilation', (numberOfNotes: number) => {
@@ -15,7 +15,10 @@ Then('I should see {int} due for assimilation', (numberOfNotes: number) => {
 })
 
 Then('I assimilate {string}', (noteTopology: string) => {
-  start.assimilation().goToAssimilationPage().assimilateNotes(noteTopology)
+  start
+    .assimilation()
+    .navigateToAssimilationPage()
+    .assimilateNotes(noteTopology)
 })
 
 Then(
@@ -25,7 +28,10 @@ Then(
       start.testability().injectNotes([{ Title: noteTopology }], username)
     })
     start.testability().backendTimeTravelTo(day, 8)
-    start.assimilation().goToAssimilationPage().assimilateNotes(noteTopology)
+    start
+      .assimilation()
+      .navigateToAssimilationPage()
+      .assimilateNotes(noteTopology)
   }
 )
 
@@ -33,13 +39,16 @@ Then(
   'I assimilated one note {string} on day {int}',
   (noteTopology: string, day: number) => {
     start.testability().backendTimeTravelTo(day, 8)
-    start.assimilation().goToAssimilationPage().assimilateNotes(noteTopology)
+    start
+      .assimilation()
+      .navigateToAssimilationPage()
+      .assimilateNotes(noteTopology)
   }
 )
 
 Then('I am assimilating new note on day {int}', (day: number) => {
   start.testability().backendTimeTravelTo(day, 8)
-  start.assimilation().goToAssimilationPage()
+  start.assimilation().navigateToAssimilationPage()
 })
 
 When('I am assimilating the note {string}', (noteTitle: string) => {

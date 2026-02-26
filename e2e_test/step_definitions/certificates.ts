@@ -4,14 +4,14 @@ import start from '../start'
 import type { DataTable } from '@cucumber/cucumber'
 
 When('I have a notebook with the name {string}', (noteTopology: string) => {
-  start.routerToNotebooksPage().creatingNotebook(noteTopology)
+  start.navigateToNotebooksPage().creatingNotebook(noteTopology)
 })
 
 Then(
   'I should see the default expiration of {string} note to be 1 year',
   (noteTopology: string) => {
     start
-      .routerToNotebooksPage()
+      .navigateToNotebooksPage()
       .notebookCard(noteTopology)
       .editNotebookSettings()
       .assertNoteHasSettingWithValue('Certificate Expiry', '1y')
@@ -22,12 +22,12 @@ Given(
   'I set the certificate expiry of the notebook {string} to {string}',
   (notebook: string, period: string) => {
     start
-      .routerToNotebooksPage()
+      .navigateToNotebooksPage()
       .notebookCard(notebook)
       .editNotebookSettings()
       .updateAssessmentSettings({ certificateExpiry: period })
     start
-      .routerToNotebooksPage()
+      .navigateToNotebooksPage()
       .notebookCard(notebook)
       .editNotebookSettings()
       .assertNoteHasSettingWithValue('Certificate Expiry', period)

@@ -1,6 +1,7 @@
 import './clientConfig'
 import mock_services from './mock_services/index'
 import { questionGenerationService } from './questionGenerationService'
+import router from './router'
 import testability from './testability'
 import mcpApi from './mcpApi'
 
@@ -29,7 +30,7 @@ import {
   navigateToMessageCenter,
 } from './pageObjects/messageCenterPage'
 import { navigateToMyCircles } from './pageObjects/myCirclesPage'
-import { routerToMyNotebooksPage } from './pageObjects/myNotebooksPage'
+import { navigateToNotebooksPage } from './pageObjects/myNotebooksPage'
 import { notebookCard } from './pageObjects/notebookCard'
 import { assumeNotePage } from './pageObjects/notePage'
 import { noteSidebar } from './pageObjects/noteSidebar'
@@ -39,6 +40,14 @@ import { recall } from './pageObjects/recallPage'
 import { form } from './forms'
 
 const start = {
+  // === Router ===
+  toRoot: () => router().toRoot(),
+  routerPush: (
+    fallback: string,
+    name: string,
+    params: Record<string, string | number>
+  ) => router().push(fallback, name, params),
+
   // === Page Objects ===
   assimilation,
   assumeAdminDashboardPage,
@@ -62,7 +71,7 @@ const start = {
   notebookCard,
   noteSidebar,
   recall,
-  routerToNotebooksPage: routerToMyNotebooksPage,
+  navigateToNotebooksPage,
 
   // === Services & Utilities ===
   form,

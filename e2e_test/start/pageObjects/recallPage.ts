@@ -1,4 +1,5 @@
 import { commonSenseSplit } from 'support/string_util'
+import router from '../router'
 
 const recallPage = () => {
   return {
@@ -81,8 +82,8 @@ export const recall = () => {
       })
       return this
     },
-    goToRecallPage() {
-      cy.routerToRoot()
+    navigateToRecallPage() {
+      router().toRoot()
       getRecallListItemInSidebar(($el) => {
         $el.click()
       })

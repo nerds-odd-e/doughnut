@@ -8,7 +8,5 @@ declare namespace Cypress {
     findCardTitle(title: string): Chainable<any>
     pageIsNotLoading(): Chainable<any>
     clearFocusedText(): Chainable<any>
-    routerPush(fallback: any, name: any, params: any): Chainable<any>
-    routerToRoot(): Chainable<any>
   }
 }

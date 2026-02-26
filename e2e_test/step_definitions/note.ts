@@ -142,11 +142,11 @@ Given(
 )
 
 When('I create a notebook with the title {string}', (notebookTitle: string) => {
-  start.routerToNotebooksPage().creatingNotebook(notebookTitle)
+  start.navigateToNotebooksPage().creatingNotebook(notebookTitle)
 })
 
 When('I create a notebook with empty title', () => {
-  start.routerToNotebooksPage().creatingNotebook('')
+  start.navigateToNotebooksPage().creatingNotebook('')
 })
 
 When(
@@ -245,7 +245,7 @@ When(
 )
 
 When('I am creating a note under {notepath}', (notePath: NotePath) => {
-  start.routerToNotebooksPage().navigateToPath(notePath).addingChildNote()
+  start.navigateToNotebooksPage().navigateToPath(notePath).addingChildNote()
 })
 
 Then('I should see {string} in breadcrumb', (noteTitles: string) => {
@@ -254,20 +254,20 @@ Then('I should see {string} in breadcrumb', (noteTitles: string) => {
 })
 
 When('I visit all my notebooks', () => {
-  start.routerToNotebooksPage()
+  start.navigateToNotebooksPage()
 })
 
 Then(
   'I should see these notes belonging to the user at the top level of all my notes',
   (data: DataTable) => {
-    start.routerToNotebooksPage().expectNotebookCards(data.hashes())
+    start.navigateToNotebooksPage().expectNotebookCards(data.hashes())
   }
 )
 
 Then(
   'I should see {notepath} with these children',
   (notePath: NotePath, data: DataTable) => {
-    const notePage = start.routerToNotebooksPage().navigateToPath(notePath)
+    const notePage = start.navigateToNotebooksPage().navigateToPath(notePath)
     cy.pageIsNotLoading()
     notePage.expectChildren(data.hashes())
   }
@@ -305,12 +305,12 @@ Then(
 Then(
   'I should not see note {string} at the top level of all my notes',
   (noteTopology: string) => {
-    start.routerToNotebooksPage().expectNotebookNotToExist(noteTopology)
+    start.navigateToNotebooksPage().expectNotebookNotToExist(noteTopology)
   }
 )
 
 When('I navigate to {notepath} note', (notePath: NotePath) => {
-  start.routerToNotebooksPage().navigateToPath(notePath)
+  start.navigateToNotebooksPage().navigateToPath(notePath)
 })
 
 When('I click the child note {string}', (noteTopology: string) => {
@@ -559,7 +559,7 @@ Then(
   'I should see note {notepath} has details {string}',
   (notePath: NotePath, expectedDetails: string) => {
     start
-      .routerToNotebooksPage()
+      .navigateToNotebooksPage()
       .navigateToPath(notePath)
       .findNoteDetails(expectedDetails)
   }

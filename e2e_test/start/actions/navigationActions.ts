@@ -1,3 +1,4 @@
+import router from '../router'
 import testability from '../testability'
 import { assumeNotePage } from '../pageObjects/notePage'
 import { mainMenu } from '../pageObjects/mainMenu'
@@ -11,7 +12,7 @@ export const navigationActions = {
       .then((noteId) => {
         const url = `/n${noteId}`
         if (forceLoadPage) cy.visit(url)
-        else cy.routerPush(url, 'noteShow', { noteId: noteId })
+        else router().push(url, 'noteShow', { noteId })
       })
 
     return assumeNotePage(noteTopology)

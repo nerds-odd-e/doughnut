@@ -25,7 +25,7 @@ Then('I move the note {string} up among its siblings', (noteToMove: string) => {
 Then(
   'I move the note {string} down among its siblings',
   (noteToMove: string) => {
-    start.routerToNotebooksPage()
+    start.navigateToNotebooksPage()
     start.jumpToNotePage(noteToMove).moveDownAmongSiblings()
   }
 )

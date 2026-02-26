@@ -1,5 +1,6 @@
 import { commonSenseSplit } from 'support/string_util'
 import { form } from '../forms'
+import router from '../router'
 
 const keepForRepetitionButton = (options?: { timeout?: number }) =>
   cy.get('[data-test="keep-for-repetition"]', options ?? {})
@@ -236,8 +237,8 @@ export const assimilation = () => {
       })
       return this
     },
-    goToAssimilationPage() {
-      cy.routerToRoot()
+    navigateToAssimilationPage() {
+      router().toRoot()
       getAssimilateListItemInSidebar(($el) => {
         $el.click()
       })

@@ -1,5 +1,5 @@
 /// <reference types="cypress" />
-/// <reference path="../../support/index.d.ts" />
+import router from '../router'
 import type NotePath from '../../support/NotePath'
 import type { assumeNotePage } from './notePage'
 import { notebookCard } from './notebookCard'
@@ -36,8 +36,8 @@ const myNotebooksPage = () => {
   }
 }
 
-export const routerToMyNotebooksPage = () => {
+export const navigateToNotebooksPage = () => {
   cy.pageIsNotLoading()
-  cy.routerPush('/d/notebooks', 'notebooks', {})
+  router().push('/d/notebooks', 'notebooks', {})
   return myNotebooksPage()
 }

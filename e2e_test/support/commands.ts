@@ -42,59 +42,6 @@ Cypress.Commands.add('clearFocusedText', () => {
     .clear()
 })
 
-interface RouterPushOptions {
-  name: string
-  params: Record<string, string | number>
-  query: Record<string, string | number>
-}
-
-interface RouteParams {
-  [key: string]: string | number
-}
-
-type CustomWindow = Omit<Cypress.AUTWindow, 'Infinity' | 'NaN'> & {
-  Infinity: number
-  NaN: number
-  router?: {
-    push: (options: RouterPushOptions) => Promise<unknown>
-  }
-}
-
-Cypress.Commands.add(
-  'routerPush',
-  (fallback: string, name: string, params: RouteParams) => {
-    cy.get('@firstVisited').then((firstVisited) => {
-      // Extract the value from the Cypress subject
-      const isFirstVisited =
-        (firstVisited as unknown as { valueOf(): string }).valueOf() === 'yes'
-      cy.window().then((win: CustomWindow) => {
-        if (win.router && isFirstVisited) {
-          cy.wrap(
-            win.router
-              .push({
-                name,
-                params,
-                query: { time: Date.now() }, // make sure the route re-render
-              })
-              .catch((error) => {
-                cy.log('router push failed')
-                cy.log(error as string)
-                throw error
-              })
-          )
-        } else {
-          cy.wrap('yes').as('firstVisited')
-          cy.visit(fallback)
-        }
-      })
-    })
-  }
-)
-
 Cypress.Commands.add('findCardTitle', (title) =>
   cy.findByText(title, { selector: '.daisy-card-title .title-text' })
 )
-
-Cypress.Commands.add('routerToRoot', () => {
-  cy.routerPush('/', 'root', {})
-})
