@@ -16,7 +16,7 @@
       noteId: noteInfo.note.id,
       isLinkNote: !!noteInfo.note.note.noteTopology?.targetNoteTopology,
       noteRecallSetting: recallSetting,
-      noteDetails: currentNoteDetails,
+      noteDetails: noteInfo.note.note.details,
     }"
     @level-changed="$emit('levelChanged', $event)"
     @remember-spelling-changed="$emit('rememberSpellingChanged', $event)"
@@ -62,7 +62,6 @@ import type { NoteType } from "@/models/noteTypeOptions"
 // Props
 const props = defineProps<{
   noteInfo: NoteInfo
-  currentNoteDetails?: string
 }>()
 
 // Emits
@@ -81,9 +80,6 @@ const localNoteType = ref<NoteType | undefined>(props.noteInfo.noteType)
 
 // Computed
 const recallSetting = computed(() => props.noteInfo.recallSetting)
-const currentNoteDetails = computed(
-  () => props.currentNoteDetails ?? props.noteInfo.note.note.details
-)
 const noteTypeOptionsWithEmpty = computed(
   () => ["", ...noteTypeOptions] as string[]
 )
