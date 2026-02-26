@@ -29,7 +29,7 @@ export const mainMenu = () => {
           this.userSettingsButton(userName).click()
           return {
             changeName(name: string) {
-              form.assignFieldValue('Name', name)
+              form.getField('Name').assignValue(name)
               cy.findByText('Submit').click()
             },
           }

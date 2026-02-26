@@ -53,7 +53,7 @@ Given('the OpenAI service is unavailable due to invalid system token', () => {
 Then(
   'I should be prompted with an error message saying {string}',
   (errorMessage: string) => {
-    start.form.expectFieldError('Prompt', errorMessage)
+    start.form.getField('Prompt').expectError(errorMessage)
   }
 )
 

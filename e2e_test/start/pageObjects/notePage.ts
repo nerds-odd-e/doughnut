@@ -89,7 +89,7 @@ export const assumeNotePage = (noteTopology?: string) => {
       cy.findByRole('title').within(() => {
         cy.get('.relation-type').click()
       })
-      form.clickRadioByLabel(relationType)
+      form.getField('Relation Type').clickOption(relationType)
       cy.pageIsNotLoading()
       this.expectRelationshipTopic(relationType, target)
     },

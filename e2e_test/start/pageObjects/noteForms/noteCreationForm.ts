@@ -20,7 +20,7 @@ const noteCreationForm = {
     return assumeAssociateWikidataDialog()
   },
   searchWikidata(phrase: string) {
-    form.assignFieldValue('Title', phrase)
+    form.getField('Title').assignValue(phrase)
     return this.wikidataSearch()
   },
 }

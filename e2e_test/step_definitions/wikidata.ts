@@ -116,7 +116,7 @@ When(
 )
 
 Then('I should see that the Title becomes {string}', (value: string) => {
-  start.form.fieldShouldHaveValue('Title', value)
+  start.form.getField('Title').shouldHaveValue(value)
 })
 
 Then('I should see that the Wikidata Id becomes {string}', (value: string) => {

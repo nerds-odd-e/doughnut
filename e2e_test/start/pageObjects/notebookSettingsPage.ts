@@ -10,7 +10,7 @@ const notebookSettingsPage = () => {
 
   return {
     assertNoteHasSettingWithValue(setting: string, value: string) {
-      form.fieldShouldHaveValue(setting, value)
+      form.getField(setting).shouldHaveValue(value)
     },
 
     skipMemoryTracking() {
@@ -39,10 +39,9 @@ const notebookSettingsPage = () => {
         )
       }
       if (settings.certificateExpiry) {
-        form.assignFieldValue(
-          'Certificate Expiry',
-          `${settings.certificateExpiry}`
-        )
+        form
+          .getField('Certificate Expiry')
+          .assignValue(`${settings.certificateExpiry}`)
       }
 
       clickButton('Update Settings')

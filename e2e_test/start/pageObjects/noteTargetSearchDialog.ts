@@ -62,7 +62,7 @@ export const assumeNoteTargetSearchDialog = () => {
           .findByText('Add Relationship')
           .click()
       })
-      form.clickRadioByLabel(relationType)
+      form.getField('Relation Type').clickOption(relationType)
     },
     createRelationshipToTopLevelNoteAs(
       toNoteTopic: string,
