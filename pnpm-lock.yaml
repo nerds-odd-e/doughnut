@@ -157,25 +157,25 @@ importers:
         version: 2.4.4
       '@storybook/addon-essentials':
         specifier: 8.6.15
-        version: 8.6.15(@types/react@19.2.7)(storybook@8.6.15)
+        version: 8.6.15(@types/react@19.2.7)(storybook@8.6.17)
       '@storybook/addon-interactions':
         specifier: 8.6.15
-        version: 8.6.15(storybook@8.6.15)
+        version: 8.6.15(storybook@8.6.17)
       '@storybook/addon-onboarding':
         specifier: 8.6.15
-        version: 8.6.15(storybook@8.6.15)
+        version: 8.6.15(storybook@8.6.17)
       '@storybook/blocks':
         specifier: 8.6.15
-        version: 8.6.15(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@8.6.15)
+        version: 8.6.15(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@8.6.17)
       '@storybook/test':
         specifier: 8.6.15
-        version: 8.6.15(storybook@8.6.15)
+        version: 8.6.15(storybook@8.6.17)
       '@storybook/vue3':
         specifier: 8.6.15
-        version: 8.6.15(storybook@8.6.15)(vue@3.5.29(typescript@5.9.3))
+        version: 8.6.15(storybook@8.6.17)(vue@3.5.29(typescript@5.9.3))
       '@storybook/vue3-vite':
         specifier: 8.6.15
-        version: 8.6.15(storybook@8.6.15)(vite@7.3.1(@types/node@25.3.0)(jiti@1.21.7)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))(vue@3.5.29(typescript@5.9.3))
+        version: 8.6.15(storybook@8.6.17)(vite@7.3.1(@types/node@25.3.0)(jiti@1.21.7)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))(vue@3.5.29(typescript@5.9.3))
       '@testing-library/user-event':
         specifier: ^14.6.1
         version: 14.6.1(@testing-library/dom@10.4.1)
@@ -237,8 +237,8 @@ importers:
         specifier: 1.97.3
         version: 1.97.3
       storybook:
-        specifier: 8.6.15
-        version: 8.6.15
+        specifier: 8.6.17
+        version: 8.6.17
       tailwindcss:
         specifier: 3.4.19
         version: 3.4.19(tsx@4.21.0)(yaml@2.8.2)
@@ -1736,8 +1736,8 @@ packages:
     peerDependencies:
       storybook: ^8.2.0 || ^8.3.0-0 || ^8.4.0-0 || ^8.5.0-0 || ^8.6.0-0
 
-  '@storybook/core@8.6.15':
-    resolution: {integrity: sha512-VFpKcphNurJpSC4fpUfKL3GTXVoL53oytghGR30QIw5jKWwaT50HVbTyb41BLOUuZjmMhUQA8weiQEew6RX0gw==}
+  '@storybook/core@8.6.17':
+    resolution: {integrity: sha512-lndZDYIvUddWk54HmgYwE4h2B0JtWt8ztIRAzHRt6ReZZ9QQbmM5b85Qpa+ng4dyQEKc2JAtYD3Du7RRFcpHlw==}
     peerDependencies:
       prettier: ^2 || ^3
     peerDependenciesMeta:
@@ -1788,6 +1788,11 @@ packages:
 
   '@storybook/theming@8.6.15':
     resolution: {integrity: sha512-dAbL0XOekyT6XsF49R6Etj3WxQ/LpdJDIswUUeHgVJ6/yd2opZOGbPxnwA3zlmAh1c0tvpPyhSDXxSG79u8e4Q==}
+    peerDependencies:
+      storybook: ^8.2.0 || ^8.3.0-0 || ^8.4.0-0 || ^8.5.0-0 || ^8.6.0-0
+
+  '@storybook/theming@8.6.17':
+    resolution: {integrity: sha512-IttFvRqozpuzN5MlQEWGOzUA2rZg86688Dyv1d+bjpYcFHtY1X4XyTCGwv1BPTaTsB959oM8R2yoNYWQkABbBA==}
     peerDependencies:
       storybook: ^8.2.0 || ^8.3.0-0 || ^8.4.0-0 || ^8.5.0-0 || ^8.6.0-0
 
@@ -4295,6 +4300,7 @@ packages:
 
   mailsplit@5.4.5:
     resolution: {integrity: sha512-oMfhmvclR689IIaQmIcR5nODnZRRVwAKtqFT407TIvmhX2OLUBnshUTcxzQBt3+96sZVDud9NfSe1NxAkUNXEQ==}
+    deprecated: This package has been renamed to @zone-eu/mailsplit. Please update your dependencies.
 
   map-or-similar@1.5.0:
     resolution: {integrity: sha512-0aF7ZmVon1igznGI4VS30yugpduQW3y3GkcgGJOp7d8x8QrizhigUxjI/m2UojsXXto+jLAH3KSz+xOJTiORjg==}
@@ -5476,8 +5482,8 @@ packages:
     resolution: {integrity: sha512-eLoXW/DHyl62zxY4SCaIgnRhuMr6ri4juEYARS8E6sCEqzKpOiE521Ucofdx+KnDZl5xmvGYaaKCk5FEOxJCoQ==}
     engines: {node: '>= 0.4'}
 
-  storybook@8.6.15:
-    resolution: {integrity: sha512-Ob7DMlwWx8s7dMvcQ3xPc02TvUeralb+xX3oaPRk9wY9Hc6M1IBC/7cEoITkSmRS2v38DHubC+mtEKNc1u2gQg==}
+  storybook@8.6.17:
+    resolution: {integrity: sha512-krR/l680A6qVnkGiK9p8jY0ucX3+kFCs2f4zw+S3w2Cdq8EiM/tFebPcX2V4S3z2UsO0v0dwAJOJNpzbFPdmVg==}
     hasBin: true
     peerDependencies:
       prettier: ^2 || ^3
@@ -7840,130 +7846,130 @@ snapshots:
 
   '@standard-schema/spec@1.1.0': {}
 
-  '@storybook/addon-actions@8.6.15(storybook@8.6.15)':
+  '@storybook/addon-actions@8.6.15(storybook@8.6.17)':
     dependencies:
       '@storybook/global': 5.0.0
       '@types/uuid': 9.0.8
       dequal: 2.0.3
       polished: 4.3.1
-      storybook: 8.6.15
+      storybook: 8.6.17
       uuid: 9.0.1
 
-  '@storybook/addon-backgrounds@8.6.15(storybook@8.6.15)':
+  '@storybook/addon-backgrounds@8.6.15(storybook@8.6.17)':
     dependencies:
       '@storybook/global': 5.0.0
       memoizerific: 1.11.3
-      storybook: 8.6.15
+      storybook: 8.6.17
       ts-dedent: 2.2.0
 
-  '@storybook/addon-controls@8.6.15(storybook@8.6.15)':
+  '@storybook/addon-controls@8.6.15(storybook@8.6.17)':
     dependencies:
       '@storybook/global': 5.0.0
       dequal: 2.0.3
-      storybook: 8.6.15
+      storybook: 8.6.17
       ts-dedent: 2.2.0
 
-  '@storybook/addon-docs@8.6.15(@types/react@19.2.7)(storybook@8.6.15)':
+  '@storybook/addon-docs@8.6.15(@types/react@19.2.7)(storybook@8.6.17)':
     dependencies:
       '@mdx-js/react': 3.1.1(@types/react@19.2.7)(react@19.2.3)
-      '@storybook/blocks': 8.6.15(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@8.6.15)
-      '@storybook/csf-plugin': 8.6.15(storybook@8.6.15)
-      '@storybook/react-dom-shim': 8.6.15(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@8.6.15)
+      '@storybook/blocks': 8.6.15(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@8.6.17)
+      '@storybook/csf-plugin': 8.6.15(storybook@8.6.17)
+      '@storybook/react-dom-shim': 8.6.15(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@8.6.17)
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
-      storybook: 8.6.15
+      storybook: 8.6.17
       ts-dedent: 2.2.0
     transitivePeerDependencies:
       - '@types/react'
 
-  '@storybook/addon-essentials@8.6.15(@types/react@19.2.7)(storybook@8.6.15)':
+  '@storybook/addon-essentials@8.6.15(@types/react@19.2.7)(storybook@8.6.17)':
     dependencies:
-      '@storybook/addon-actions': 8.6.15(storybook@8.6.15)
-      '@storybook/addon-backgrounds': 8.6.15(storybook@8.6.15)
-      '@storybook/addon-controls': 8.6.15(storybook@8.6.15)
-      '@storybook/addon-docs': 8.6.15(@types/react@19.2.7)(storybook@8.6.15)
-      '@storybook/addon-highlight': 8.6.15(storybook@8.6.15)
-      '@storybook/addon-measure': 8.6.15(storybook@8.6.15)
-      '@storybook/addon-outline': 8.6.15(storybook@8.6.15)
-      '@storybook/addon-toolbars': 8.6.15(storybook@8.6.15)
-      '@storybook/addon-viewport': 8.6.15(storybook@8.6.15)
-      storybook: 8.6.15
+      '@storybook/addon-actions': 8.6.15(storybook@8.6.17)
+      '@storybook/addon-backgrounds': 8.6.15(storybook@8.6.17)
+      '@storybook/addon-controls': 8.6.15(storybook@8.6.17)
+      '@storybook/addon-docs': 8.6.15(@types/react@19.2.7)(storybook@8.6.17)
+      '@storybook/addon-highlight': 8.6.15(storybook@8.6.17)
+      '@storybook/addon-measure': 8.6.15(storybook@8.6.17)
+      '@storybook/addon-outline': 8.6.15(storybook@8.6.17)
+      '@storybook/addon-toolbars': 8.6.15(storybook@8.6.17)
+      '@storybook/addon-viewport': 8.6.15(storybook@8.6.17)
+      storybook: 8.6.17
       ts-dedent: 2.2.0
     transitivePeerDependencies:
       - '@types/react'
 
-  '@storybook/addon-highlight@8.6.15(storybook@8.6.15)':
+  '@storybook/addon-highlight@8.6.15(storybook@8.6.17)':
     dependencies:
       '@storybook/global': 5.0.0
-      storybook: 8.6.15
+      storybook: 8.6.17
 
-  '@storybook/addon-interactions@8.6.15(storybook@8.6.15)':
+  '@storybook/addon-interactions@8.6.15(storybook@8.6.17)':
     dependencies:
       '@storybook/global': 5.0.0
-      '@storybook/instrumenter': 8.6.15(storybook@8.6.15)
-      '@storybook/test': 8.6.15(storybook@8.6.15)
+      '@storybook/instrumenter': 8.6.15(storybook@8.6.17)
+      '@storybook/test': 8.6.15(storybook@8.6.17)
       polished: 4.3.1
-      storybook: 8.6.15
+      storybook: 8.6.17
       ts-dedent: 2.2.0
 
-  '@storybook/addon-measure@8.6.15(storybook@8.6.15)':
+  '@storybook/addon-measure@8.6.15(storybook@8.6.17)':
     dependencies:
       '@storybook/global': 5.0.0
-      storybook: 8.6.15
+      storybook: 8.6.17
       tiny-invariant: 1.3.3
 
-  '@storybook/addon-onboarding@8.6.15(storybook@8.6.15)':
+  '@storybook/addon-onboarding@8.6.15(storybook@8.6.17)':
     dependencies:
-      storybook: 8.6.15
+      storybook: 8.6.17
 
-  '@storybook/addon-outline@8.6.15(storybook@8.6.15)':
+  '@storybook/addon-outline@8.6.15(storybook@8.6.17)':
     dependencies:
       '@storybook/global': 5.0.0
-      storybook: 8.6.15
+      storybook: 8.6.17
       ts-dedent: 2.2.0
 
-  '@storybook/addon-toolbars@8.6.15(storybook@8.6.15)':
+  '@storybook/addon-toolbars@8.6.15(storybook@8.6.17)':
     dependencies:
-      storybook: 8.6.15
+      storybook: 8.6.17
 
-  '@storybook/addon-viewport@8.6.15(storybook@8.6.15)':
+  '@storybook/addon-viewport@8.6.15(storybook@8.6.17)':
     dependencies:
       memoizerific: 1.11.3
-      storybook: 8.6.15
+      storybook: 8.6.17
 
-  '@storybook/blocks@8.6.15(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@8.6.15)':
+  '@storybook/blocks@8.6.15(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@8.6.17)':
     dependencies:
       '@storybook/icons': 1.6.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      storybook: 8.6.15
+      storybook: 8.6.17
       ts-dedent: 2.2.0
     optionalDependencies:
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
 
-  '@storybook/blocks@8.6.15(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@8.6.15)':
+  '@storybook/blocks@8.6.15(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@8.6.17)':
     dependencies:
       '@storybook/icons': 1.6.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      storybook: 8.6.15
+      storybook: 8.6.17
       ts-dedent: 2.2.0
     optionalDependencies:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
 
-  '@storybook/builder-vite@8.6.15(storybook@8.6.15)(vite@7.3.1(@types/node@25.3.0)(jiti@1.21.7)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))':
+  '@storybook/builder-vite@8.6.15(storybook@8.6.17)(vite@7.3.1(@types/node@25.3.0)(jiti@1.21.7)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
-      '@storybook/csf-plugin': 8.6.15(storybook@8.6.15)
+      '@storybook/csf-plugin': 8.6.15(storybook@8.6.17)
       browser-assert: 1.2.1
-      storybook: 8.6.15
+      storybook: 8.6.17
       ts-dedent: 2.2.0
       vite: 7.3.1(@types/node@25.3.0)(jiti@1.21.7)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2)
 
-  '@storybook/components@8.6.15(storybook@8.6.15)':
+  '@storybook/components@8.6.15(storybook@8.6.17)':
     dependencies:
-      storybook: 8.6.15
+      storybook: 8.6.17
 
-  '@storybook/core@8.6.15(storybook@8.6.15)':
+  '@storybook/core@8.6.17(storybook@8.6.17)':
     dependencies:
-      '@storybook/theming': 8.6.15(storybook@8.6.15)
+      '@storybook/theming': 8.6.17(storybook@8.6.17)
       better-opn: 3.0.2
       browser-assert: 1.2.1
       esbuild: 0.25.12
@@ -7971,7 +7977,7 @@ snapshots:
       jsdoc-type-pratt-parser: 4.8.0
       process: 0.11.10
       recast: 0.23.11
-      semver: 7.7.3
+      semver: 7.7.4
       util: 0.12.5
       ws: 8.19.0
     transitivePeerDependencies:
@@ -7980,9 +7986,9 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@storybook/csf-plugin@8.6.15(storybook@8.6.15)':
+  '@storybook/csf-plugin@8.6.15(storybook@8.6.17)':
     dependencies:
-      storybook: 8.6.15
+      storybook: 8.6.17
       unplugin: 1.16.1
 
   '@storybook/global@5.0.0': {}
@@ -7997,48 +8003,52 @@ snapshots:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
 
-  '@storybook/instrumenter@8.6.15(storybook@8.6.15)':
+  '@storybook/instrumenter@8.6.15(storybook@8.6.17)':
     dependencies:
       '@storybook/global': 5.0.0
       '@vitest/utils': 2.1.9
-      storybook: 8.6.15
+      storybook: 8.6.17
 
-  '@storybook/manager-api@8.6.15(storybook@8.6.15)':
+  '@storybook/manager-api@8.6.15(storybook@8.6.17)':
     dependencies:
-      storybook: 8.6.15
+      storybook: 8.6.17
 
-  '@storybook/preview-api@8.6.15(storybook@8.6.15)':
+  '@storybook/preview-api@8.6.15(storybook@8.6.17)':
     dependencies:
-      storybook: 8.6.15
+      storybook: 8.6.17
 
-  '@storybook/react-dom-shim@8.6.15(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@8.6.15)':
+  '@storybook/react-dom-shim@8.6.15(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@8.6.17)':
     dependencies:
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
-      storybook: 8.6.15
+      storybook: 8.6.17
 
-  '@storybook/test@8.6.15(storybook@8.6.15)':
+  '@storybook/test@8.6.15(storybook@8.6.17)':
     dependencies:
       '@storybook/global': 5.0.0
-      '@storybook/instrumenter': 8.6.15(storybook@8.6.15)
+      '@storybook/instrumenter': 8.6.15(storybook@8.6.17)
       '@testing-library/dom': 10.4.0
       '@testing-library/jest-dom': 6.5.0
       '@testing-library/user-event': 14.5.2(@testing-library/dom@10.4.0)
       '@vitest/expect': 2.0.5
       '@vitest/spy': 2.0.5
-      storybook: 8.6.15
+      storybook: 8.6.17
 
-  '@storybook/theming@8.6.15(storybook@8.6.15)':
+  '@storybook/theming@8.6.15(storybook@8.6.17)':
     dependencies:
-      storybook: 8.6.15
+      storybook: 8.6.17
 
-  '@storybook/vue3-vite@8.6.15(storybook@8.6.15)(vite@7.3.1(@types/node@25.3.0)(jiti@1.21.7)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))(vue@3.5.29(typescript@5.9.3))':
+  '@storybook/theming@8.6.17(storybook@8.6.17)':
     dependencies:
-      '@storybook/builder-vite': 8.6.15(storybook@8.6.15)(vite@7.3.1(@types/node@25.3.0)(jiti@1.21.7)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))
-      '@storybook/vue3': 8.6.15(storybook@8.6.15)(vue@3.5.29(typescript@5.9.3))
+      storybook: 8.6.17
+
+  '@storybook/vue3-vite@8.6.15(storybook@8.6.17)(vite@7.3.1(@types/node@25.3.0)(jiti@1.21.7)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))(vue@3.5.29(typescript@5.9.3))':
+    dependencies:
+      '@storybook/builder-vite': 8.6.15(storybook@8.6.17)(vite@7.3.1(@types/node@25.3.0)(jiti@1.21.7)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))
+      '@storybook/vue3': 8.6.15(storybook@8.6.17)(vue@3.5.29(typescript@5.9.3))
       find-package-json: 1.2.0
       magic-string: 0.30.21
-      storybook: 8.6.15
+      storybook: 8.6.17
       typescript: 5.9.3
       vite: 7.3.1(@types/node@25.3.0)(jiti@1.21.7)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2)
       vue-component-meta: 2.2.12(typescript@5.9.3)
@@ -8046,15 +8056,15 @@ snapshots:
     transitivePeerDependencies:
       - vue
 
-  '@storybook/vue3@8.6.15(storybook@8.6.15)(vue@3.5.29(typescript@5.9.3))':
+  '@storybook/vue3@8.6.15(storybook@8.6.17)(vue@3.5.29(typescript@5.9.3))':
     dependencies:
-      '@storybook/components': 8.6.15(storybook@8.6.15)
+      '@storybook/components': 8.6.15(storybook@8.6.17)
       '@storybook/global': 5.0.0
-      '@storybook/manager-api': 8.6.15(storybook@8.6.15)
-      '@storybook/preview-api': 8.6.15(storybook@8.6.15)
-      '@storybook/theming': 8.6.15(storybook@8.6.15)
+      '@storybook/manager-api': 8.6.15(storybook@8.6.17)
+      '@storybook/preview-api': 8.6.15(storybook@8.6.17)
+      '@storybook/theming': 8.6.15(storybook@8.6.17)
       '@vue/compiler-core': 3.5.26
-      storybook: 8.6.15
+      storybook: 8.6.17
       ts-dedent: 2.2.0
       type-fest: 2.19.0
       vue: 3.5.29(typescript@5.9.3)
@@ -9613,7 +9623,7 @@ snapshots:
       '@one-ini/wasm': 0.1.1
       commander: 10.0.1
       minimatch: 10.2.1
-      semver: 7.7.3
+      semver: 7.7.4
 
   ee-first@1.1.1: {}
 
@@ -12186,9 +12196,9 @@ snapshots:
       es-errors: 1.3.0
       internal-slot: 1.1.0
 
-  storybook@8.6.15:
+  storybook@8.6.17:
     dependencies:
-      '@storybook/core': 8.6.15(storybook@8.6.15)
+      '@storybook/core': 8.6.17(storybook@8.6.17)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
