@@ -106,7 +106,7 @@ Then('The {string} page is displayed', (pageName) => {
       cy.findAllByText('It seems you cannot access this page.')
       break
     default:
-      cy.failure()
+      throw new Error('Deliberate CYPRESS test Failure!!!')
   }
 })
 

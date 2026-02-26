@@ -26,18 +26,9 @@
 // @ts-check
 import '@testing-library/cypress/add-commands'
 import 'cypress-file-upload'
-import { commonSenseSplit } from './string_util'
 
 Cypress.Commands.add('pageIsNotLoading', () => {
   cy.get('.loading-bar').should('not.exist', { timeout: 10000 })
-})
-
-Cypress.Commands.add('expectBreadcrumb', (items: string) => {
-  cy.get('.daisy-breadcrumbs').within(() =>
-    commonSenseSplit(items, ', ').forEach((noteTopology: string) =>
-      cy.findByText(noteTopology)
-    )
-  )
 })
 
 Cypress.Commands.add('clearFocusedText', () => {
@@ -49,10 +40,6 @@ Cypress.Commands.add('clearFocusedText', () => {
     .should('match', 'input, textarea, [contenteditable="true"]')
     .clear()
     .clear()
-})
-
-Cypress.Commands.add('replaceFocusedTextAndEnter', (text) => {
-  cy.clearFocusedText().type(text).type('{enter}')
 })
 
 Cypress.Commands.add(
@@ -89,22 +76,6 @@ Cypress.Commands.add(
 Cypress.Commands.add('clickRadioByLabel', (labelText) => {
   cy.findByText(labelText, { selector: 'label' }).click({ force: true })
 })
-
-Cypress.Commands.add(
-  'expectNoteCards',
-  (expectedCards: Record<string, string>[]) => {
-    cy.get('.daisy-card-title').should('have.length', expectedCards.length)
-    expectedCards.forEach((elem) => {
-      for (const propName in elem) {
-        if (propName === 'note-title') {
-          cy.findCardTitle(elem[propName]!)
-        } else {
-          cy.findByText(elem[propName]!)
-        }
-      }
-    })
-  }
-)
 
 interface RouterPushOptions {
   name: string
@@ -155,41 +126,9 @@ Cypress.Commands.add(
   }
 )
 
-Cypress.Commands.add('clickButtonOnCardBody', (noteTopology, buttonTitle) => {
-  cy.findCardTitle(noteTopology).then(($card) => {
-    cy.wrap($card)
-      .parent()
-      .parent()
-      .parent()
-      .parent()
-      .parent()
-      .findByText(buttonTitle)
-      .then(($button) => {
-        cy.wrap($button).click()
-      })
-  })
-})
-
 Cypress.Commands.add('findCardTitle', (title) =>
   cy.findByText(title, { selector: '.daisy-card-title .title-text' })
 )
-
-Cypress.Commands.add('yesIRemember', () => {
-  // Handle uncaught exceptions that may occur when session times out
-  // The frontend shows a confirmation dialog for 401 errors, which can cause uncaught exceptions
-  cy.on('uncaught:exception', (err) => {
-    // If it's an ApiError with 401 status, it's expected when session times out
-    if (err.message.includes('Unauthorized') || err.message.includes('401')) {
-      return false // Prevent Cypress from failing the test
-    }
-    // Otherwise, let Cypress handle the exception
-    return true
-  })
-  cy.findByRole('button', { name: 'Yes, I remember' })
-  cy.tick(11 * 1000).then(() => {
-    cy.findByRole('button', { name: 'Yes, I remember' }).click({})
-  })
-})
 
 Cypress.Commands.add('routerToRoot', () => {
   cy.routerPush('/', 'root', {})
@@ -197,10 +136,6 @@ Cypress.Commands.add('routerToRoot', () => {
 
 Cypress.Commands.add('formField', (label) => {
   return cy.findByLabelText(label)
-})
-
-Cypress.Commands.add('failure', () => {
-  throw new Error('Deliberate CYPRESS test Failure!!!')
 })
 
 Cypress.Commands.add('noteByTitle', (noteTopology: string) => {
@@ -215,12 +150,4 @@ Cypress.Commands.add('noteByTitle', (noteTopology: string) => {
       }
       throw new Error(`Could not find note ID in href: ${$attr}`)
     })
-})
-
-Cypress.Commands.add('expectAMapTo', (latitude: string, longitude: string) => {
-  cy.findByText(`Location: ${latitude}'N, ${longitude}'E`)
-})
-
-Cypress.Commands.add('dismissLastErrorMessage', () => {
-  cy.get('.Vue-Toastification__close-button').click()
 })

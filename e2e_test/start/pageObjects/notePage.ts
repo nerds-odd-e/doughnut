@@ -35,7 +35,16 @@ export const assumeNotePage = (noteTopology?: string) => {
     },
     expectChildren: (children: Record<string, string>[]) => {
       cy.get('main').within(() => {
-        cy.expectNoteCards(children)
+        cy.get('.daisy-card-title').should('have.length', children.length)
+        children.forEach((elem) => {
+          for (const propName in elem) {
+            if (propName === 'note-title') {
+              cy.findCardTitle(elem[propName]!)
+            } else {
+              cy.findByText(elem[propName]!)
+            }
+          }
+        })
       })
     },
     addRelationshipTo: (target: string) => {
@@ -91,6 +100,13 @@ export const assumeNotePage = (noteTopology?: string) => {
         }).click()
       })
       return assumeNotePage()
+    },
+    expectBreadcrumb: (items: string) => {
+      cy.get('.daisy-breadcrumbs').within(() =>
+        commonSenseSplit(items, ', ').forEach((noteTopology: string) =>
+          cy.findByText(noteTopology)
+        )
+      )
     },
     collapsedChildrenWithCount: (count: number) => {
       cy.findByText(count, { selector: '[role=collapsed-children-count]' })

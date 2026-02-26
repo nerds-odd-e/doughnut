@@ -250,7 +250,7 @@ When('I am creating a note under {notepath}', (notePath: NotePath) => {
 
 Then('I should see {string} in breadcrumb', (noteTitles: string) => {
   cy.pageIsNotLoading()
-  cy.expectBreadcrumb(noteTitles)
+  start.assumeNotePage().expectBreadcrumb(noteTitles)
 })
 
 When('I visit all my notebooks', () => {
@@ -291,7 +291,7 @@ When('I delete note {string}', (noteTopology: string) => {
 
 When('I should see that the note creation is not successful', () => {
   start.form.expectFieldError('Title', 'size must be between 1 and 150')
-  cy.dismissLastErrorMessage()
+  cy.get('.Vue-Toastification__close-button').click()
 })
 
 Then(
@@ -495,7 +495,7 @@ When(
 )
 
 Then('I should see the children notes:', (data: DataTable) => {
-  cy.get('main').within(() => cy.expectNoteCards(data.hashes()))
+  start.assumeNotePage().expectChildren(data.hashes())
 })
 
 When('I route to the note {string}', (noteTopology: string) => {

@@ -126,7 +126,7 @@ Then('I should see that the Wikidata Id becomes {string}', (value: string) => {
 Then(
   'a map pointing to lat: {string}, lon: {string} is added to the note',
   (latitude: string, longitude: string) => {
-    cy.expectAMapTo(latitude, longitude)
+    cy.findByText(`Location: ${latitude}'N, ${longitude}'E`)
   }
 )
 

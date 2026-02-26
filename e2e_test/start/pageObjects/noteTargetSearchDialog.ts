@@ -50,7 +50,16 @@ export const assumeNoteTargetSearchDialog = () => {
       cy.pageIsNotLoading()
     },
     createRelationshipToTargetAs(toNoteTopic: string, relationType: string) {
-      cy.clickButtonOnCardBody(toNoteTopic, 'Add Relationship')
+      cy.findCardTitle(toNoteTopic).then(($card) => {
+        cy.wrap($card)
+          .parent()
+          .parent()
+          .parent()
+          .parent()
+          .parent()
+          .findByText('Add Relationship')
+          .click()
+      })
       cy.clickRadioByLabel(relationType)
     },
     createRelationshipToTopLevelNoteAs(

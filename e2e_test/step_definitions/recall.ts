@@ -89,7 +89,7 @@ When(
 )
 
 Then('I choose yes I remember', () => {
-  cy.yesIRemember()
+  start.recall().assumeRecallPage().yesIRemember()
 })
 
 Then('I skip one question', () => {
@@ -104,8 +104,7 @@ Then(
 )
 
 Then('I type my answer {string}', (answer: string) => {
-  cy.pageIsNotLoading()
-  cy.replaceFocusedTextAndEnter(answer)
+  start.recall().assumeRecallPage().typeSpellingAnswer(answer)
 })
 
 Then('I choose answer {string}', (answer: string) => {

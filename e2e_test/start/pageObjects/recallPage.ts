@@ -2,6 +2,25 @@ import { commonSenseSplit } from 'support/string_util'
 
 const recallPage = () => {
   return {
+    yesIRemember() {
+      cy.on('uncaught:exception', (err) => {
+        if (
+          err.message.includes('Unauthorized') ||
+          err.message.includes('401')
+        ) {
+          return false
+        }
+        return true
+      })
+      cy.findByRole('button', { name: 'Yes, I remember' })
+      cy.tick(11 * 1000).then(() => {
+        cy.findByRole('button', { name: 'Yes, I remember' }).click({})
+      })
+    },
+    typeSpellingAnswer(answer: string) {
+      cy.pageIsNotLoading()
+      cy.clearFocusedText().type(answer).type('{enter}')
+    },
     expectToRecallCounts(numberOfRecalls: string) {
       const [recalledTodayCount, toRecallCountForToday, totalCount] =
         numberOfRecalls.split('/')
@@ -37,7 +56,7 @@ const recallPage = () => {
           ).should('be.visible')
         } else {
           cy.findByText(title, { selector: 'h2 *' })
-          cy.yesIRemember()
+          this.yesIRemember()
         }
       })
     },
