@@ -5,7 +5,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
-import com.odde.doughnut.entities.repositories.NoteReviewRepository;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.entities.repositories.UserTokenRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
@@ -19,19 +19,19 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
-  private final NoteReviewRepository noteReviewRepository;
+  private final NoteRepository noteRepository;
   private final MemoryTrackerRepository memoryTrackerRepository;
   private final EntityPersister entityPersister;
   private final UserRepository userRepository;
   private final UserTokenRepository userTokenRepository;
 
   public UserService(
-      NoteReviewRepository noteReviewRepository,
+      NoteRepository noteRepository,
       MemoryTrackerRepository memoryTrackerRepository,
       EntityPersister entityPersister,
       UserRepository userRepository,
       UserTokenRepository userTokenRepository) {
-    this.noteReviewRepository = noteReviewRepository;
+    this.noteRepository = noteRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.entityPersister = entityPersister;
     this.userRepository = userRepository;
@@ -49,12 +49,12 @@ public class UserService {
   }
 
   public int getUnassimilatedNoteCount(User user) {
-    return noteReviewRepository.countByOwnershipWhereThereIsNoMemoryTracker(
+    return noteRepository.countByOwnershipWhereThereIsNoMemoryTracker(
         user.getId(), user.getOwnership().getId());
   }
 
   public Stream<Note> getUnassimilatedNotes(User user) {
-    return noteReviewRepository.findByOwnershipWhereThereIsNoMemoryTracker(
+    return noteRepository.findByOwnershipWhereThereIsNoMemoryTracker(
         user.getId(), user.getOwnership().getId());
   }
 

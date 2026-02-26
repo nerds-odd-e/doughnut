@@ -2,6 +2,7 @@ package com.odde.doughnut.entities.repositories;
 
 import com.odde.doughnut.entities.Note;
 import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -92,4 +93,53 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
 
   @Query(value = selectFromNote + " WHERE n.parent.id = :parentId")
   List<Note> findAllByParentId(@Param("parentId") Integer parentId);
+
+  String recallWhereClause =
+      " WHERE "
+          + "   rp IS NULL "
+          + "   AND COALESCE(n.recallSetting.skipMemoryTracking, FALSE) = FALSE "
+          + "   AND n.deletedAt IS NULL ";
+
+  String joinMemoryTracker =
+      " LEFT JOIN n.memoryTrackers rp ON rp.user.id = :userId AND rp.deletedAt IS NULL";
+
+  String recallOrderByDate = " ORDER BY n.recallSetting.level, n.createdAt, n.id";
+
+  String selectFromNoteWithOwnership =
+      " JOIN n.notebook nb " + " ON nb.ownership.id = :ownershipId ";
+
+  @Query(
+      value =
+          selectFromNote
+              + selectFromNoteWithOwnership
+              + joinMemoryTracker
+              + recallWhereClause
+              + recallOrderByDate)
+  Stream<Note> findByOwnershipWhereThereIsNoMemoryTracker(Integer userId, Integer ownershipId);
+
+  @Query(
+      value =
+          "SELECT count(1) as count from Note n "
+              + selectFromNoteWithOwnership
+              + joinMemoryTracker
+              + recallWhereClause)
+  int countByOwnershipWhereThereIsNoMemoryTracker(Integer userId, Integer ownershipId);
+
+  String fromNotebook = "   AND n.notebook.id = :notebookId ";
+
+  @Query(
+      value =
+          selectFromNote + joinMemoryTracker + recallWhereClause + fromNotebook + recallOrderByDate)
+  Stream<Note> findByAncestorWhereThereIsNoMemoryTracker(Integer userId, Integer notebookId);
+
+  @Query(
+      value =
+          "SELECT count(1) as count from Note n "
+              + joinMemoryTracker
+              + recallWhereClause
+              + fromNotebook)
+  int countByAncestorWhereThereIsNoMemoryTracker(Integer userId, Integer notebookId);
+
+  @Query(value = "SELECT count(1) as count from Note n " + " WHERE n.id in :noteIds" + fromNotebook)
+  int countByAncestorAndInTheList(Integer notebookId, @Param("noteIds") List<Integer> noteIds);
 }
