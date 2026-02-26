@@ -1,7 +1,6 @@
 <template>
-  <Teleport to="body">
-    <div class="modal-mask daisy-text-base-content" :class="{ 'opaque-background': opaqueBackground }">
-      <div class="modal-wrapper" @mousedown.self="$emit('close_request')">
+  <Overlay class="modal-mask daisy-text-base-content" :opaque="opaqueBackground">
+    <div class="modal-wrapper" @mousedown.self="$emit('close_request')">
         <div :class="sidebarStyle" class="daisy-bg-base-200">
           <button class="close-button" @click="$emit('close_request')">
             <SvgClose />
@@ -16,12 +15,12 @@
           </div>
         </div>
       </div>
-    </div>
-  </Teleport>
+  </Overlay>
 </template>
 
 <script setup lang="ts">
 import { computed, watch, onMounted, onUnmounted } from "vue"
+import Overlay from "./Overlay.vue"
 import SvgClose from "../svgs/SvgClose.vue"
 import { useRoute } from "vue-router"
 import { registerModal } from "./modalStack"
@@ -69,22 +68,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-.modal-mask {
-  position: fixed;
-  z-index: 9990;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: table;
-  transition: opacity 0.3s ease;
-
-  &.opaque-background {
-    background-color: rgba(0, 0, 0, 1);
-  }
-}
-
 .modal-wrapper {
   display: table-cell;
   vertical-align: middle;
