@@ -64,12 +64,7 @@ Then(
 Then(
   'I set the level of {string} to be {int}',
   (noteTopology: string, level: number) => {
-    start.assumeNotePage(noteTopology)
-    cy.formField('Level').then(($control) => {
-      cy.wrap($control).within(() => {
-        cy.findByRole('button', { name: `${level}` }).click()
-      })
-    })
+    start.assumeNotePage(noteTopology).setLevel(level)
   }
 )
 

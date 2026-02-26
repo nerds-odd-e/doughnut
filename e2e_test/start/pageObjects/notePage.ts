@@ -294,5 +294,11 @@ export const assumeNotePage = (noteTopology?: string) => {
       toolbarButton('associate wikidata').click()
       return assumeAssociateWikidataDialog()
     },
+    setLevel(level: number) {
+      cy.formField('Level').within(() => {
+        cy.findByRole('button', { name: `${level}` }).click()
+      })
+      return this
+    },
   }
 }
