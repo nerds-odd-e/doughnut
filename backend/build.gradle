@@ -19,6 +19,10 @@ plugins {
 
 apply plugin: 'io.spring.dependency-management'
 
+springBoot {
+  mainClass = 'com.odde.doughnut.DoughnutApplication'
+}
+
 group = 'com.odde'
 version = '0.0.1-SNAPSHOT'
 java {
