@@ -34,10 +34,9 @@ const notebookSettingsPage = () => {
       certificateExpiry?: string
     }) {
       if (settings.numberOfQuestion !== undefined) {
-        form.assignFieldValue(
-          'Number of Questions in Assessment',
-          `${settings.numberOfQuestion}`
-        )
+        form
+          .getField('Number of Questions in Assessment')
+          .assignValue(`${settings.numberOfQuestion}`)
       }
       if (settings.certificateExpiry) {
         form
