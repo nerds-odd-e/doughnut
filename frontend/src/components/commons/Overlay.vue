@@ -6,7 +6,6 @@
         {
           'overlay--centered': centered,
           'overlay--dark': dark,
-          'overlay--opaque': opaque,
         },
         $attrs.class,
       ]"
@@ -23,13 +22,11 @@ withDefaults(
   defineProps<{
     centered?: boolean
     dark?: boolean
-    opaque?: boolean
     zIndex?: number
   }>(),
   {
     centered: false,
     dark: false,
-    opaque: false,
     zIndex: 9990,
   }
 )
@@ -55,9 +52,5 @@ withDefaults(
 
 .overlay--dark {
   background-color: rgba(0, 0, 0, 0.7);
-}
-
-.overlay--opaque {
-  background-color: rgba(0, 0, 0, 1);
 }
 </style>

@@ -1,10 +1,5 @@
 <template>
-  <Modal
-    v-if="show"
-    :isPopup="true"
-    :opaqueBackground="true"
-    @close_request="$emit('cancel')"
-  >
+  <Modal v-if="show" :isPopup="true" @close_request="$emit('cancel')">
     <template #header>
       <h2 data-test="spelling-verification-popup">Verify Spelling</h2>
     </template>

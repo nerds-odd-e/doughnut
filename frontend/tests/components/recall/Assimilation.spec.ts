@@ -134,13 +134,54 @@ describe("Assimilation component", () => {
   })
 
   describe("SpellingVerificationPopup", () => {
-    it("closes popup and returns to original state when user closes it", async () => {
+    beforeEach(() => {
       mockSdkService("getNoteInfo", {
         note: makeMe.aNoteRealm.please(),
         createdAt: "",
         noteType: undefined,
         recallSetting: { rememberSpelling: true },
       })
+    })
+
+    const getOpaqueContentBlocker = () =>
+      document.body.querySelector(
+        '[data-test="opaque-content-blocker"]'
+      ) as HTMLElement | null
+
+    it("shows opaque layer to hide note content behind spelling verification", async () => {
+      const wrapper = mount()
+      await flushPromises()
+
+      expect(getOpaqueContentBlocker()).toBeNull()
+
+      await wrapper.find('[data-test="keep-for-repetition"]').trigger("click")
+      await flushPromises()
+
+      const opaqueLayer = getOpaqueContentBlocker()
+      expect(opaqueLayer).not.toBeNull()
+      expect(opaqueLayer?.style.zIndex).toBe("9989")
+      expect(opaqueLayer?.className).toContain("daisy-bg-black")
+    })
+
+    it("hides opaque layer when spelling popup closes", async () => {
+      const wrapper = mount()
+      await flushPromises()
+
+      await wrapper.find('[data-test="keep-for-repetition"]').trigger("click")
+      await flushPromises()
+      expect(getOpaqueContentBlocker()).not.toBeNull()
+
+      const closeButton = document
+        .querySelector('[data-test="spelling-verification-popup"]')
+        ?.closest(".modal-mask")
+        ?.querySelector(".close-button") as HTMLElement
+      closeButton.click()
+      await flushPromises()
+
+      expect(getOpaqueContentBlocker()).toBeNull()
+    })
+
+    it("closes popup and returns to original state when user closes it", async () => {
       const wrapper = mount()
       await flushPromises()
 

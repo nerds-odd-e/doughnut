@@ -1,5 +1,5 @@
 <template>
-  <Overlay class="modal-mask daisy-text-base-content" :opaque="opaqueBackground">
+  <Overlay class="modal-mask daisy-text-base-content">
     <div class="modal-wrapper" @mousedown.self="$emit('close_request')">
         <div :class="sidebarStyle" class="daisy-bg-base-200">
           <button class="close-button" @click="$emit('close_request')">
@@ -29,7 +29,6 @@ import { registerModal } from "./modalStack"
 interface Props {
   sidebar?: "left" | "right"
   isPopup?: boolean
-  opaqueBackground?: boolean
 }
 const props = defineProps<Props>()
 

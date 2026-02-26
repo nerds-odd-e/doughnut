@@ -28,6 +28,15 @@
     :disabled="!noteInfoLoaded"
     @assimilate="processForm"
   />
+  <Teleport to="body">
+    <div
+      v-if="showSpellingPopup"
+      data-test="opaque-content-blocker"
+      class="fixed inset-0 daisy-bg-black"
+      style="z-index: 9989"
+      aria-hidden="true"
+    />
+  </Teleport>
   <SpellingVerificationPopup
     :show="showSpellingPopup"
     :note-id="note.id"
