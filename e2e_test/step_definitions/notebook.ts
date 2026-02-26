@@ -41,7 +41,7 @@ Then(
   }
 )
 
-When('I change notebook {string} to skip review', (noteTopology: string) => {
+When('I change notebook {string} to skip recall', (noteTopology: string) => {
   start
     .routerToNotebooksPage()
     .notebookCard(noteTopology)

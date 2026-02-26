@@ -1,4 +1,4 @@
-import RecentlyReviewedNotes from "@/components/recent/RecentlyReviewedNotes.vue"
+import RecentlyRecalledNotes from "@/components/recent/RecentlyRecalledNotes.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
@@ -6,7 +6,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 
-describe("RecentlyReviewedNotes", () => {
+describe("RecentlyRecalledNotes", () => {
   const mockMemoryTrackers = [
     makeMe.aMemoryTracker
       .assimilatedAt("2024-01-01T00:00:00Z")
@@ -25,20 +25,20 @@ describe("RecentlyReviewedNotes", () => {
   ]
 
   beforeEach(() => {
-    mockSdkService("getRecentlyReviewed", mockMemoryTrackers)
+    mockSdkService("getRecentlyRecalled", mockMemoryTrackers)
   })
 
-  it("fetches and displays recently reviewed points", async () => {
-    const getRecentlyReviewedSpy = mockSdkService(
-      "getRecentlyReviewed",
+  it("fetches and displays recently recalled points", async () => {
+    const getRecentlyRecalledSpy = mockSdkService(
+      "getRecentlyRecalled",
       mockMemoryTrackers
     )
-    const wrapper = helper.component(RecentlyReviewedNotes).withRouter().mount()
+    const wrapper = helper.component(RecentlyRecalledNotes).withRouter().mount()
 
     await flushPromises()
 
     // Verify API was called
-    expect(getRecentlyReviewedSpy).toBeCalled()
+    expect(getRecentlyRecalledSpy).toBeCalled()
 
     // Verify memory trackers are displayed
     const rows = wrapper.findAll("tbody tr")
@@ -60,9 +60,9 @@ describe("RecentlyReviewedNotes", () => {
     })
     const pushSpy = vi.spyOn(router, "push")
 
-    mockSdkService("getRecentlyReviewed", mockMemoryTrackers)
+    mockSdkService("getRecentlyRecalled", mockMemoryTrackers)
     const wrapper = helper
-      .component(RecentlyReviewedNotes)
+      .component(RecentlyRecalledNotes)
       .withRouter(router)
       .mount()
 

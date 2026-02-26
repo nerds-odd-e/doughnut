@@ -1,6 +1,6 @@
 Feature: Nested Note creation
   As a learner, I want to maintain my newly acquired knowledge in
-  notes, so that I can review them in the future.
+  notes, so that I can recall them in the future.
 
   Background:
     Given I am logged in as an existing user

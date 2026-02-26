@@ -86,7 +86,7 @@ public class ForgettingCurveThinkingTimeTest {
     assertThat(indexOnTimeWith10Seconds, greaterThan(indexOnTimeWithBase));
     assertThat(indexLateWith10Seconds, greaterThan(indexLateWithBase));
 
-    // Late review should have lower index than on-time review
+    // Late recall should have lower index than on-time recall
     assertThat(indexOnTimeWithBase, greaterThan(indexLateWithBase));
     assertThat(indexOnTimeWith10Seconds, greaterThan(indexLateWith10Seconds));
   }

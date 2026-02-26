@@ -94,12 +94,12 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return new ForgettingCurve(getUser().getSpacedRepetitionAlgorithm(), getForgettingCurveIndex());
   }
 
-  public void reviewFailed(Timestamp currentUTCTimestamp) {
+  public void recallFailed(Timestamp currentUTCTimestamp) {
     setForgettingCurveIndex(forgettingCurve().failed());
     setNextRecallAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));
   }
 
-  public void reviewedSuccessfully(Timestamp currentUTCTimestamp, Integer thinkingTimeMs) {
+  public void recalledSuccessfully(Timestamp currentUTCTimestamp, Integer thinkingTimeMs) {
     long delayInHours =
         TimestampOperations.getDiffInHours(currentUTCTimestamp, calculateNextRecallAt());
 
@@ -113,9 +113,9 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
       Timestamp currentUTCTimestamp, boolean successful, Integer thinkingTimeMs) {
     setRepetitionCount(getRepetitionCount() + 1);
     if (successful) {
-      reviewedSuccessfully(currentUTCTimestamp, thinkingTimeMs);
+      recalledSuccessfully(currentUTCTimestamp, thinkingTimeMs);
     } else {
-      reviewFailed(currentUTCTimestamp);
+      recallFailed(currentUTCTimestamp);
     }
   }
 

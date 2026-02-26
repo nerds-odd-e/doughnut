@@ -185,14 +185,14 @@ describe("ConversationInner", () => {
   })
 
   describe("Default questions", () => {
-    it("shows default messages for review conversations with no messages", async () => {
-      const reviewConversation = {
+    it("shows default messages for recall conversations with no messages", async () => {
+      const recallConversation = {
         ...conversation,
         subject: {
           answeredQuestion: makeMe.anAnsweredQuestion.please(),
         },
       }
-      wrapper = mountComponent(reviewConversation, user)
+      wrapper = mountComponent(recallConversation, user)
 
       // Simulate empty conversation messages
       wrapper.vm.currentConversationMessages = []
@@ -203,14 +203,14 @@ describe("ConversationInner", () => {
       expect(defaultButtons[0].text()).toBe("Why is my answer wrong?")
     })
 
-    it("doesn't show default messages for non-review conversations", async () => {
-      const nonReviewConversation = {
+    it("doesn't show default messages for non-recall conversations", async () => {
+      const nonRecallConversation = {
         ...conversation,
         subject: {
           answeredQuestion: undefined,
         },
       }
-      wrapper = mountComponent(nonReviewConversation, user)
+      wrapper = mountComponent(nonRecallConversation, user)
 
       wrapper.vm.currentConversationMessages = []
       await wrapper.vm.$nextTick()
@@ -220,13 +220,13 @@ describe("ConversationInner", () => {
     })
 
     it("sends message when default question is clicked", async () => {
-      const reviewConversation = {
+      const recallConversation = {
         ...conversation,
         subject: {
           answeredQuestion: makeMe.anAnsweredQuestion.please(),
         },
       }
-      wrapper = mountComponent(reviewConversation, user)
+      wrapper = mountComponent(recallConversation, user)
 
       wrapper.vm.currentConversationMessages = []
       await wrapper.vm.$nextTick()
@@ -235,7 +235,7 @@ describe("ConversationInner", () => {
       await firstButton.trigger("click")
 
       expect(replyToConversationSpy).toHaveBeenCalledWith({
-        path: { conversationId: reviewConversation.id },
+        path: { conversationId: recallConversation.id },
         body: "Why is my answer wrong?",
       })
     })

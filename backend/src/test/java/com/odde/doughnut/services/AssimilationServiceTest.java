@@ -75,7 +75,7 @@ public class AssimilationServiceTest {
     }
 
     @Test
-    void shouldNotIncludeNoteThatIsSkippedForReview() {
+    void shouldNotIncludeNoteThatIsSkippedForRecall() {
       makeMe.theNote(note1).skipMemoryTracking().relateTo(note2).please();
       assertThat(getFirstNoteToAssimilate(assimilationService), equalTo(note2));
     }
@@ -147,7 +147,7 @@ public class AssimilationServiceTest {
     }
 
     @Nested
-    class WhenTheUserSetToReview1NewNoteOnlyPerDay {
+    class WhenTheUserSetToRecall1NewNoteOnlyPerDay {
 
       @BeforeEach
       void setup() {
@@ -160,7 +160,7 @@ public class AssimilationServiceTest {
       }
 
       @Test
-      void shouldNotIncludeNotesThatAreAlreadyReviewed() {
+      void shouldNotIncludeNotesThatAreAlreadyRecalled() {
         makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
         assertThat(getFirstNoteToAssimilate(assimilationService), is(nullValue()));
       }
@@ -172,7 +172,7 @@ public class AssimilationServiceTest {
       }
 
       @Test
-      void shouldIncludeNotesThatAreReviewedByOtherPeople() {
+      void shouldIncludeNotesThatAreRecalledByOtherPeople() {
         makeMe.aMemoryTrackerFor(note1).by(anotherUser).assimilatedAt(day1).please();
         assertThat(getFirstNoteToAssimilate(assimilationService), equalTo(note1));
       }
@@ -200,7 +200,7 @@ public class AssimilationServiceTest {
   }
 
   @Nested
-  class ReviewSubscribedNote {
+  class RecallSubscribedNote {
     Note note1;
     Note note2;
 
@@ -223,12 +223,12 @@ public class AssimilationServiceTest {
     void shouldReturnMemoryTrackerForLink() {
       makeMe.theNote(note2).skipMemoryTracking().please();
       makeMe.theNote(note1).skipMemoryTracking().relateTo(note2).please();
-      Note noteToReview = getFirstNoteToAssimilate(assimilationService);
-      assertThat(noteToReview.getParent(), equalTo(note1));
+      Note noteToRecall = getFirstNoteToAssimilate(assimilationService);
+      assertThat(noteToRecall.getParent(), equalTo(note1));
     }
 
     @Test
-    void reviewedMoreThanPlanned() {
+    void recalledMoreThanPlanned() {
       makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
       makeMe.aMemoryTrackerFor(note2).by(user).assimilatedAt(day1).please();
       assertThat(getFirstNoteToAssimilate(assimilationService), nullValue());
@@ -246,13 +246,13 @@ public class AssimilationServiceTest {
     }
 
     @Test
-    void shouldNotBeReviewed() {
+    void shouldNotBeRecalled() {
       assertThat(getFirstNoteToAssimilate(assimilationService), is(nullValue()));
     }
   }
 
   @Nested
-  class WhenReviewedMoreThanDailyLimitLastNight {
+  class WhenRecalledMoreThanDailyLimitLastNight {
     Note note1;
     Note note2;
     Note note3;
@@ -284,7 +284,7 @@ public class AssimilationServiceTest {
       earlyMorning = makeMe.aTimestamp().of(1, 6).fromShanghai().please();
       lateMorning = makeMe.aTimestamp().of(1, 10).fromShanghai().please();
 
-      // Review more notes than daily limit last night
+      // Recall more notes than daily limit last night
       makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(earlyMorning).please();
       makeMe.aMemoryTrackerFor(note2).by(user).assimilatedAt(earlyMorning).please();
       makeMe.aMemoryTrackerFor(note3).by(user).assimilatedAt(earlyMorning).please();

@@ -1,5 +1,5 @@
 <template>
-  <div class="recently-reviewed-notes">
+  <div class="recently-recalled-notes">
     <ContentLoader v-if="!memoryTrackers" />
     <table v-else class="table">
       <thead>
@@ -48,7 +48,7 @@ const memoryTrackers = ref<MemoryTracker[] | undefined>(undefined)
 
 const fetchData = async () => {
   const { data: trackers, error } =
-    await MemoryTrackerController.getRecentlyReviewed({})
+    await MemoryTrackerController.getRecentlyRecalled({})
   if (!error) {
     memoryTrackers.value = trackers!
   }

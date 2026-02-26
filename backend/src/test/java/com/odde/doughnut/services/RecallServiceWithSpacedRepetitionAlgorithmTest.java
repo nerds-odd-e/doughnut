@@ -47,7 +47,7 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
     }
 
     @Test
-    void whenThereIsNoReviewedNotesForUser() {
+    void whenThereIsNoRecalledNotesForUser() {
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(anotherUser).please();
       assertThat(getOneMemoryTrackerNeedToRepeat(daysAfterBase(memoryTracker, 1)), is(nullValue()));
     }
@@ -67,17 +67,17 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
       "3,   3, false",
       "3,   4, true",
     })
-    void whenThereIsOneReviewedNotesForUser(
-        Integer repetitionDone, Integer reviewDay, Boolean expectedToRepeat) {
+    void whenThereIsOneRecalledNotesForUser(
+        Integer repetitionDone, Integer recallDay, Boolean expectedToRepeat) {
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRepetition(repetitionDone).please();
       MemoryTracker mostUrgentMemoryTracker =
-          getOneMemoryTrackerNeedToRepeat(daysAfterBase(memoryTracker, reviewDay));
+          getOneMemoryTrackerNeedToRepeat(daysAfterBase(memoryTracker, recallDay));
       assertThat(mostUrgentMemoryTracker != null, is(expectedToRepeat));
     }
 
     @Nested
-    class ReviewTimeIsAlignedByHalfADay {
+    class RecallTimeIsAlignedByHalfADay {
       @ParameterizedTest
       @CsvSource({
         "9,  6,    true",
@@ -97,7 +97,7 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
     }
 
     @Nested
-    class EarlyAndLateReview {
+    class EarlyAndLateRecall {
       @ParameterizedTest
       @CsvSource({
         "0, 0,  100.0",
@@ -107,7 +107,7 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
         "2, 1, 115.0",
         "2, 100, 100.0",
       })
-      void aMemoryTrackerHasBeenReviewedStrictly(
+      void aMemoryTrackerHasBeenRecalledStrictly(
           int ntimes, Integer daysDelay, float expectedForgettingCurveIndex) {
         MemoryTracker memoryTracker =
             makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRepetition(ntimes).please();
@@ -127,8 +127,8 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
         .orElse(null);
   }
 
-  private Timestamp daysAfterBase(MemoryTracker memoryTracker, Integer reviewDay) {
+  private Timestamp daysAfterBase(MemoryTracker memoryTracker, Integer recallDay) {
     return TimestampOperations.addHoursToTimestamp(
-        memoryTracker.getLastRecalledAt(), reviewDay * 24);
+        memoryTracker.getLastRecalledAt(), recallDay * 24);
   }
 }

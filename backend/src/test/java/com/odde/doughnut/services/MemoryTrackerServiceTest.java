@@ -46,7 +46,7 @@ public class MemoryTrackerServiceTest {
   class Assimilating {
 
     @Test
-    void assimilatingShouldSetBothInitialAndLastReviewAt() {
+    void assimilatingShouldSetBothInitialAndLastRecallAt() {
       Note note = makeMe.aNote().creatorAndOwner(user).please();
       InitialInfo initialInfo = new InitialInfo();
       initialInfo.noteId = note.getId();
@@ -270,14 +270,14 @@ public class MemoryTrackerServiceTest {
     }
 
     @Test
-    void shouldExcludeSoftDeletedFromRecentAndReviewedLists() {
+    void shouldExcludeSoftDeletedFromRecentAndRecalledLists() {
       assertThat(memoryTrackerService.findLast100ByUser(user.getId()), hasSize(1));
-      assertThat(memoryTrackerService.findLast100ReviewedByUser(user.getId()), hasSize(1));
+      assertThat(memoryTrackerService.findLast100RecalledByUser(user.getId()), hasSize(1));
 
       memoryTrackerService.reAssimilate(memoryTracker);
 
       assertThat(memoryTrackerService.findLast100ByUser(user.getId()), empty());
-      assertThat(memoryTrackerService.findLast100ReviewedByUser(user.getId()), empty());
+      assertThat(memoryTrackerService.findLast100RecalledByUser(user.getId()), empty());
     }
 
     @Test

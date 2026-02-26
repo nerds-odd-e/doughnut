@@ -1,6 +1,6 @@
 Feature: add relationship
   As a learner, I want to maintain my newly acquired knowledge in
-  notes that relate to each other, so that I can review them in the
+  notes that relate to each other, so that I can recall them in the
   future.
 
   Background:

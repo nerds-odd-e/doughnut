@@ -98,10 +98,10 @@ class MemoryTrackerController {
     return memoryTrackerService.findLast100ByUser(authorizationService.getCurrentUser().getId());
   }
 
-  @GetMapping("/recently-reviewed")
-  public List<MemoryTracker> getRecentlyReviewed() {
+  @GetMapping("/recently-recalled")
+  public List<MemoryTracker> getRecentlyRecalled() {
     authorizationService.assertLoggedIn();
-    return memoryTrackerService.findLast100ReviewedByUser(
+    return memoryTrackerService.findLast100RecalledByUser(
         authorizationService.getCurrentUser().getId());
   }
 

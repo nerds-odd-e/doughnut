@@ -1,5 +1,5 @@
 Feature: note move
-  As a learner, I want to move a note to become a child of another note, so that I can review them in the
+  As a learner, I want to move a note to become a child of another note,   so that I can recall them in the
   future.
 
   Background:

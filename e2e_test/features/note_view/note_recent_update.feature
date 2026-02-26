@@ -1,6 +1,6 @@
 Feature: see recent note update
   As a learner, I want to see which of my notes are recently updated,
-  so that I can focus on only reviewing the newly updated notes.
+  so that I can focus on only recalling the newly updated notes.
 
   Background:
     Given I am logged in as an existing user

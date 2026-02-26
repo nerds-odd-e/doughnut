@@ -10,15 +10,15 @@
         @click.prevent="setActivePage('recentlyLearned')"
       >Recently Learned</a>
       <a
-        :class="`daisy-tab daisy-tab-lg ${activePage === 'recentlyReviewed' ? 'daisy-tab-active' : ''}`"
+        :class="`daisy-tab daisy-tab-lg ${activePage === 'recentlyRecalled' ? 'daisy-tab-active' : ''}`"
         role="button"
         href="#"
-        @click.prevent="setActivePage('recentlyReviewed')"
-      >Recently Reviewed</a>
+        @click.prevent="setActivePage('recentlyRecalled')"
+      >Recently Recalled</a>
     </div>
 
     <RecentlyLearnedNotes v-if="activePage === 'recentlyLearned'" />
-    <RecentlyReviewedNotes v-if="activePage === 'recentlyReviewed'" />
+    <RecentlyRecalledNotes v-if="activePage === 'recentlyRecalled'" />
   </ContainerPage>
 </template>
 
@@ -27,9 +27,9 @@ import { computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import RecentlyLearnedNotes from "@/components/recent/RecentlyLearnedNotes.vue"
-import RecentlyReviewedNotes from "@/components/recent/RecentlyReviewedNotes.vue"
+import RecentlyRecalledNotes from "@/components/recent/RecentlyRecalledNotes.vue"
 
-type TabType = "recentlyLearned" | "recentlyReviewed"
+type TabType = "recentlyLearned" | "recentlyRecalled"
 
 const route = useRoute()
 const router = useRouter()
@@ -37,7 +37,7 @@ const router = useRouter()
 const activePage = computed({
   get(): TabType {
     const tab = route.query.tab as string | undefined
-    if (tab === "recentlyLearned" || tab === "recentlyReviewed") {
+    if (tab === "recentlyLearned" || tab === "recentlyRecalled") {
       return tab
     }
     return "recentlyLearned"

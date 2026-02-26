@@ -21,7 +21,7 @@ Feature: Bazaar subscription
     Then I should see I've not subscribed to "Shape"
 
   @mockBrowserTime
-  Scenario: subscribe to a note and review
+  Scenario: subscribe to a note and recall
     Given I am logged in as an existing user
     And I have a notebook with the head note "My memo"
     And my daily new notes to assimilate is set to 2
@@ -34,6 +34,6 @@ Feature: Bazaar subscription
 
   Scenario: No "add to learning" button for notebook with skip memory tracking
     Given I am logged in as "another_old_learner"
-    When I change notebook "Shape" to skip review
+    When I change notebook "Shape" to skip recall
     Then I can not see add the notebook "Shape" to my learning in the bazaar
 

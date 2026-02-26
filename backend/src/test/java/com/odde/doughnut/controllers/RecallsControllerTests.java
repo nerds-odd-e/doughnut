@@ -50,7 +50,7 @@ class RecallsControllerTests extends ControllerTestBase {
         delimiter = '|',
         textBlock =
             """
-                next review at (in hours) | timezone     | expected count
+                next recall at (in hours) | timezone     | expected count
                 #------------------------------------------------------------
                 -1                        | Asia/Tokyo   | 1
                 0                         | Asia/Tokyo   | 1

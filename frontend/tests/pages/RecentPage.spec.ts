@@ -27,7 +27,7 @@ describe("RecentPage.vue", () => {
     vi.clearAllMocks()
     mockRoute.query = {}
     mockSdkService("getRecentMemoryTrackers", [])
-    mockSdkService("getRecentlyReviewed", [])
+    mockSdkService("getRecentlyRecalled", [])
   })
 
   describe("Tab Navigation", () => {
@@ -52,14 +52,14 @@ describe("RecentPage.vue", () => {
       ).toBe(true)
     })
 
-    it("shows Recently Reviewed tab when query parameter is recentlyReviewed", () => {
-      mockRoute.query = { tab: "recentlyReviewed" }
+    it("shows Recently Recalled tab when query parameter is recentlyRecalled", () => {
+      mockRoute.query = { tab: "recentlyRecalled" }
       const wrapper = helper.component(RecentPage).mount()
 
       const activeTab = wrapper.find(".daisy-tab-active")
-      expect(activeTab.text()).toBe("Recently Reviewed")
+      expect(activeTab.text()).toBe("Recently Recalled")
       expect(
-        wrapper.findComponent({ name: "RecentlyReviewedNotes" }).exists()
+        wrapper.findComponent({ name: "RecentlyRecalledNotes" }).exists()
       ).toBe(true)
     })
 
@@ -88,17 +88,17 @@ describe("RecentPage.vue", () => {
       })
     })
 
-    it("updates route when Recently Reviewed tab is clicked", async () => {
+    it("updates route when Recently Recalled tab is clicked", async () => {
       const wrapper = helper.component(RecentPage).mount()
 
       const tab = wrapper
         .findAll(".daisy-tab")
-        .find((el) => el.text() === "Recently Reviewed")
+        .find((el) => el.text() === "Recently Recalled")
       await tab?.trigger("click")
 
       expect(mockPush).toHaveBeenCalledWith({
         name: "recent",
-        query: { tab: "recentlyReviewed" },
+        query: { tab: "recentlyRecalled" },
       })
     })
   })

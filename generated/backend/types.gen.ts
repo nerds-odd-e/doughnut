@@ -1933,7 +1933,7 @@ export type UpdateNoteRecallSettingData = {
         note: number;
     };
     query?: never;
-    url: '/api/notes/{note}/review-setting';
+    url: '/api/notes/{note}/recall-setting';
 };
 
 export type UpdateNoteRecallSettingErrors = {
@@ -4009,30 +4009,30 @@ export type AskAQuestionResponses = {
 
 export type AskAQuestionResponse = AskAQuestionResponses[keyof AskAQuestionResponses];
 
-export type GetRecentlyReviewedData = {
+export type GetRecentlyRecalledData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/api/memory-trackers/recently-reviewed';
+    url: '/api/memory-trackers/recently-recalled';
 };
 
-export type GetRecentlyReviewedErrors = {
+export type GetRecentlyRecalledErrors = {
     /**
      * Internal Server Error
      */
     500: string;
 };
 
-export type GetRecentlyReviewedError = GetRecentlyReviewedErrors[keyof GetRecentlyReviewedErrors];
+export type GetRecentlyRecalledError = GetRecentlyRecalledErrors[keyof GetRecentlyRecalledErrors];
 
-export type GetRecentlyReviewedResponses = {
+export type GetRecentlyRecalledResponses = {
     /**
      * OK
      */
     200: Array<MemoryTracker>;
 };
 
-export type GetRecentlyReviewedResponse = GetRecentlyReviewedResponses[keyof GetRecentlyReviewedResponses];
+export type GetRecentlyRecalledResponse = GetRecentlyRecalledResponses[keyof GetRecentlyRecalledResponses];
 
 export type GetRecentMemoryTrackersData = {
     body?: never;

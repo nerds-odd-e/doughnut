@@ -151,7 +151,7 @@ class NoteController {
     return note.toNoteRealm(authorizationService.getCurrentUser());
   }
 
-  @PostMapping(value = "/{note}/review-setting")
+  @PostMapping(value = "/{note}/recall-setting")
   @Transactional
   public RedirectToNoteResponse updateNoteRecallSetting(
       @PathVariable("note") @Schema(type = "integer") Note note,

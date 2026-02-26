@@ -51,7 +51,7 @@ describe("Modal", () => {
     return wrapper
   }
 
-  it("click on note when doing review - close-button", async () => {
+  it("closes when close button is clicked", async () => {
     wrapper = mountModal()
     await vi.waitUntil(() => document.querySelector(".close-button"), {
       timeout: 1000,
@@ -71,7 +71,7 @@ describe("Modal", () => {
     expect(wrapper.emitted().close_request).toHaveLength(1)
   })
 
-  it("click on note when doing review - mouse-click", async () => {
+  it("closes when modal backdrop is clicked", async () => {
     wrapper = mountModal()
     await vi.waitUntil(() => document.querySelector(".modal-wrapper"), {
       timeout: 1000,

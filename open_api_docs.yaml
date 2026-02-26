@@ -1172,7 +1172,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NoteSearchResult"
-  /api/notes/{note}/review-setting:
+  /api/notes/{note}/recall-setting:
     post:
       tags:
       - note-controller
@@ -3153,11 +3153,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecallPrompt"
-  /api/memory-trackers/recently-reviewed:
+  /api/memory-trackers/recently-recalled:
     get:
       tags:
       - memory-tracker-controller
-      operationId: getRecentlyReviewed
+      operationId: getRecentlyRecalled
       responses:
         "500":
           description: Internal Server Error

@@ -42,8 +42,8 @@ public class MemoryTrackerService {
     return memoryTrackerRepository.findLast100ByUser(userId);
   }
 
-  public List<MemoryTracker> findLast100ReviewedByUser(Integer userId) {
-    return memoryTrackerRepository.findLast100ReviewedByUser(userId);
+  public List<MemoryTracker> findLast100RecalledByUser(Integer userId) {
+    return memoryTrackerRepository.findLast100RecalledByUser(userId);
   }
 
   public List<MemoryTracker> assimilate(

@@ -183,7 +183,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
   }
 
   @Nested
-  class MarkAsReviewed {
+  class MarkAsRecalled {
     @Test
     void itMustUpdateTheMemoryTrackerRecord() {
       Note note = makeMe.aNote().please();
@@ -251,25 +251,25 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
   }
 
   @Nested
-  class GetRecentlyReviewed {
+  class GetRecentlyRecalled {
     @Test
-    void shouldReturnEmptyListWhenNoReviewed() {
-      List<MemoryTracker> memoryTrackers = controller.getRecentlyReviewed();
+    void shouldReturnEmptyListWhenNoRecalled() {
+      List<MemoryTracker> memoryTrackers = controller.getRecentlyRecalled();
       assertThat(memoryTrackers, empty());
     }
 
     @Test
-    void shouldReturnRecentlyReviewedForCurrentUser() {
+    void shouldReturnRecentlyRecalledForCurrentUser() {
       MemoryTracker rp1 =
           makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(currentUser.getUser()).please();
       MemoryTracker rp2 =
           makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(currentUser.getUser()).please();
 
-      // Mark as reviewed
+      // Mark as recalled
       controller.markAsRepeated(rp1, true);
       controller.markAsRepeated(rp2, true);
 
-      List<MemoryTracker> memoryTrackers = controller.getRecentlyReviewed();
+      List<MemoryTracker> memoryTrackers = controller.getRecentlyRecalled();
 
       assertThat(memoryTrackers, hasSize(2));
       assertThat(memoryTrackers, containsInAnyOrder(rp1, rp2));
@@ -278,7 +278,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     @Test
     void shouldRequireUserToBeLoggedIn() {
       currentUser.setUser(null);
-      assertThrows(ResponseStatusException.class, () -> controller.getRecentlyReviewed());
+      assertThrows(ResponseStatusException.class, () -> controller.getRecentlyRecalled());
     }
 
     @Test
@@ -295,7 +295,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
 
       noteService.destroy(deletedNote);
 
-      List<MemoryTracker> memoryTrackers = controller.getRecentlyReviewed();
+      List<MemoryTracker> memoryTrackers = controller.getRecentlyRecalled();
 
       assertThat(memoryTrackers, hasSize(1));
       assertThat(memoryTrackers, contains(activeTracker));

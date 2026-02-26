@@ -1,6 +1,6 @@
 <template>
   <RadioButtons
-    scope-name="review_setting"
+    scope-name="recall_setting"
     field="level"
     :model-value="levelAsString"
     :error-message="errors.level"
@@ -10,7 +10,7 @@
 
   <CheckInput
     v-if="!isLinkNote"
-    scope-name="review_setting"
+    scope-name="recall_setting"
     field="rememberSpelling"
     :model-value="rememberSpellingValue"
     :error-message="spellingDisabledMessage"
@@ -18,7 +18,7 @@
     @update:model-value="updateModelValue({ rememberSpelling: $event })"
   />
   <CheckInput
-    scope-name="review_setting"
+    scope-name="recall_setting"
     field="skipMemoryTracking"
     :model-value="formData.skipMemoryTracking"
     :error-message="errors.skipMemoryTracking"

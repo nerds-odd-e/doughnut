@@ -329,7 +329,7 @@ class NoteControllerTests extends ControllerTestBase {
       }
 
       @Test
-      void shouldExcludeMemoryTrackersForDeletedNotesFromRecentlyReviewed()
+      void shouldExcludeMemoryTrackersForDeletedNotesFromRecentlyRecalled()
           throws UnexpectedNoAccessRightException {
         MemoryTracker deletedTracker =
             makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
@@ -340,7 +340,7 @@ class NoteControllerTests extends ControllerTestBase {
         controller.deleteNote(subject);
 
         assertThat(
-            memoryTrackerService.findLast100ReviewedByUser(currentUser.getUser().getId()),
+            memoryTrackerService.findLast100RecalledByUser(currentUser.getUser().getId()),
             not(hasItem(deletedTracker)));
       }
 

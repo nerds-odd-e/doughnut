@@ -1,6 +1,6 @@
 @disableOpenAiService
 Feature: Spaced-repetition
-    As a learner, I want to review my notes in the most optimized way
+    As a learner, I want to recall my notes in the most optimized way
 
     Background:
         Given I am logged in as an existing user
@@ -27,7 +27,7 @@ Feature: Spaced-repetition
         * On day 8 I recall "Note 1, end         " and assimilate new "end         "
 
     @mockBrowserTime
-    Scenario: Strictly follow the schedule but want to review more
+    Scenario: Strictly follow the schedule but want to recall more
         * On day 1 I recall "                    " and assimilate new "Note 1, end "
         * On day 2 I recall "Note 1, end         " and assimilate new "Note 2, end "
         * On day 3 I recall "Note 2, end         " and assimilate new "Note 3, end "

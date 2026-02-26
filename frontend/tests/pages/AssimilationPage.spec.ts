@@ -46,7 +46,7 @@ beforeEach(() => {
 })
 
 describe("repeat page", () => {
-  it("shows completion message when nothing to review", async () => {
+  it("shows completion message when nothing to recall", async () => {
     const assimilatingSpy = mockSdkService("assimilating", [])
     const wrapper = renderer.currentRoute({ name: "assimilate" }).mount()
 
