@@ -114,7 +114,8 @@
       "@isaacs/brace-expansion": ">=5.0.1",
       "axios": ">=1.13.5",
       "minimatch": ">=10.2.1",
-      "ajv": ">=8.18.0"
+      "ajv": ">=8.18.0",
+      "rollup": ">=4.59.0"
     },
     "onlyBuiltDependencies": [
       "@badeball/cypress-cucumber-preprocessor",
