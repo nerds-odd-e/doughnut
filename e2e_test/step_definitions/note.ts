@@ -359,9 +359,7 @@ When(
     cy.on('uncaught:exception', () => {
       return false
     })
-    cy.get('main').within(() => {
-      cy.findCardTitle(noteTopology).click()
-    })
+    start.assumeNotePage().clickChildNote(noteTopology)
     cy.get('#username').should('exist')
   }
 )

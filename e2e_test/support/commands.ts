@@ -37,7 +37,3 @@ Cypress.Commands.add('clearFocusedText', () => {
     .clear()
     .clear()
 })
-
-Cypress.Commands.add('findCardTitle', (title) =>
-  cy.findByText(title, { selector: '.daisy-card-title .title-text' })
-)

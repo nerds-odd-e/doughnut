@@ -10,6 +10,9 @@ import { assumeAssociateWikidataDialog } from './associateWikidataDialog'
 import { toolbarButton } from './toolbarButton'
 import { makeSureNoteMoreOptionsDialogIsOpen } from './noteMoreOptionsDialog'
 
+const findChildNoteCard = (title: string) =>
+  cy.findByText(title, { selector: '.daisy-card-title .title-text' })
+
 export const assumeNotePage = (noteTopology?: string) => {
   const findNoteTitle = (title) =>
     cy.findByText(title, { selector: '[role=title]' })
@@ -22,10 +25,11 @@ export const assumeNotePage = (noteTopology?: string) => {
       return makeSureNoteMoreOptionsDialogIsOpen()
     },
     navigateToChild: (noteTopology: string) => {
-      cy.get('main').within(() => {
-        cy.findCardTitle(noteTopology).click()
-      })
+      cy.get('main').within(() => findChildNoteCard(noteTopology).click())
       return assumeNotePage(noteTopology)
+    },
+    clickChildNote: (noteTopology: string) => {
+      cy.get('main').within(() => findChildNoteCard(noteTopology).click())
     },
     collapseChildren: () => {
       cy.get('main').within(() => {
@@ -41,7 +45,7 @@ export const assumeNotePage = (noteTopology?: string) => {
         children.forEach((elem) => {
           for (const propName in elem) {
             if (propName === 'note-title') {
-              cy.findCardTitle(elem[propName]!)
+              findChildNoteCard(elem[propName]!)
             } else {
               cy.findByText(elem[propName]!)
             }

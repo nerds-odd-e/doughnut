@@ -4,8 +4,6 @@
 // @ts-check
 declare namespace Cypress {
   interface Chainable<Subject = any> {
-    cleanDownloadFolder(): Chainable<any>
-    findCardTitle(title: string): Chainable<any>
     clearFocusedText(): Chainable<any>
   }
 }
