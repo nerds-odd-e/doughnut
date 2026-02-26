@@ -1,6 +1,6 @@
 Feature: search note
   As a learner, I want to maintain my newly acquired knowledge in
-  notes that linking to each other, so that I can recall them in the
+  notes that linking to each other, so that I can view them in the
   future.
 
   Background:
