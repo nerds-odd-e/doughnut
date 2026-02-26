@@ -55,7 +55,7 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   assimilateOneNote({
-    'Review Type': reviewType,
+    'Assimilation Type': reviewType,
     Title: title,
     'Additional Info': additionalInfo,
     Skip: skip,
@@ -111,7 +111,7 @@ export const assumeAssimilationPage = () => ({
         }
 
         default:
-          expect(reviewType).equal('a known review page type')
+          expect(reviewType).equal('a known assimilation page type')
       }
       if (skip === 'yes') {
         cy.findByText('Skip repetition').click()
@@ -131,7 +131,8 @@ export const assumeAssimilationPage = () => ({
     return this.assimilate(
       commonSenseSplit(noteTitles, ', ').map((title: string) => {
         return {
-          'Review Type': title === 'end' ? 'assimilation done' : 'single note',
+          'Assimilation Type':
+            title === 'end' ? 'assimilation done' : 'single note',
           Title: title,
         }
       })

@@ -5,36 +5,36 @@ Feature: Assimilating
 
   Background:
     Given I am logged in as an existing user
-    And my daily new notes to review is set to 2
+    And my daily new notes to assimilate is set to 2
     And there are notes from Note 1 to Note 5
 
-  Scenario: First day of review
+  Scenario: First day of assimilation
     Given It's day 1, 8 hour
     Then I assimilate these in sequence:
-      | Review Type       | Title  |
+      | Assimilation Type | Title  |
       | single note       | Note 1 |
       | single note       | Note 2 |
       | assimilation done |        |
     Given It's day 1, 9 hour
     Then I assimilate these in sequence:
-      | Review Type       | Title |
+      | Assimilation Type | Title |
       | assimilation done |       |
 
-  Scenario: First day review only part of the daily number
+  Scenario: First day assimilation - only part of the daily number
     Given It's day 1, 8 hour
     Then I assimilate these in sequence:
-      | Review Type | Title  |
+      | Assimilation Type | Title  |
       | single note | Note 1 |
     Given It's day 1, 9 hour
     Then I assimilate these in sequence:
-      | Review Type       | Title  |
+      | Assimilation Type | Title  |
       | single note       | Note 2 |
       | assimilation done |        |
 
-  Scenario: Skip review
+  Scenario: Skip assimilation
     Given It's day 1, 8 hour
     When I assimilate these in sequence:
-      | Review Type       | Title  | Skip |
+      | Assimilation Type | Title  | Skip |
       | single note       | Note 1 | yes  |
       | single note       | Note 2 | no   |
       | single note       | Note 3 | no   |

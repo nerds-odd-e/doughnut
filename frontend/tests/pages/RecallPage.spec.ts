@@ -163,7 +163,7 @@ describe("repeat page", () => {
     })
   })
 
-  it("redirect to review page if nothing to repeat", async () => {
+  it("redirect to recall page if nothing to repeat", async () => {
     const repetition = makeMe.aDueMemoryTrackersList.please()
     vi.mocked(useRecallData).mockReturnValue(
       createUseRecallDataMock({ toRepeat: repetition.toRepeat })

@@ -24,7 +24,7 @@ Feature: Bazaar subscription
   Scenario: subscribe to a note and review
     Given I am logged in as an existing user
     And I have a notebook with the head note "My memo"
-    And my daily new notes to review is set to 2
+    And my daily new notes to assimilate is set to 2
     When I subscribe to notebook "Shape" in the bazaar, with target of learning 1 notes per day
     And the OpenAI service is unavailable due to invalid system token
     Then On day 1 I should have "0/2/4" note for assimilation and "0/0/0" for recall

@@ -70,7 +70,7 @@ Then('My name {string} is in the user action menu', (name: string) => {
   start.mainMenu().userOptions().userSettingsButton(name)
 })
 
-Then('my daily new notes to review is set to {int}', (number: string) => {
+Then('my daily new notes to assimilate is set to {int}', (number: string) => {
   start
     .testability()
     .updateCurrentUserSettingsWith({ daily_assimilation_count: number })

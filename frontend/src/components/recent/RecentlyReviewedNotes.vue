@@ -5,7 +5,7 @@
       <thead>
         <tr>
           <th>Note</th>
-          <th>Initial Recall</th>
+          <th>Assimilated</th>
           <th>Next Recall</th>
           <th>Recall Count</th>
           <th>Curve Index</th>

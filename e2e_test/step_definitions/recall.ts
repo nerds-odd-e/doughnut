@@ -70,7 +70,7 @@ Then(
   }
 )
 
-Then('it should move to review page', () => {
+Then('it should move to recall page', () => {
   cy.url().should('eq', `${Cypress.config().baseUrl}/recalls`)
 })
 

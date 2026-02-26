@@ -4,12 +4,12 @@ Feature: Spaced-repetition
 
     Background:
         Given I am logged in as an existing user
-        And my daily new notes to review is set to 1
+        And my daily new notes to assimilate is set to 1
         And my space setting is "1, 2, 4, 8"
         Given there are notes from Note 1 to Note 3
 
     @mockBrowserTime
-    Scenario: The review page
+    Scenario: The assimilation and recall page
         Given On day 1 I should have "0/1/3" note for assimilation and "0/0/0" for recall
         When I assimilate "Note 1"
         Then On day 1 I should have "1/1/3" note for assimilation and "0/0/1" for recall
