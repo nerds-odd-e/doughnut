@@ -10,7 +10,6 @@ declare namespace Cypress {
     formField(label: string): Chainable<any>
     assignFieldValue(value: string): Chainable<any>
     fieldShouldHaveValue(value: string): Chainable<any>
-    noteByTitle(noteTopology: string): Chainable<any>
     pageIsNotLoading(): Chainable<any>
     clearFocusedText(): Chainable<any>
     routerPush(fallback: any, name: any, params: any): Chainable<any>

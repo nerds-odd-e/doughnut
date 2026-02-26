@@ -137,17 +137,3 @@ Cypress.Commands.add('routerToRoot', () => {
 Cypress.Commands.add('formField', (label) => {
   return cy.findByLabelText(label)
 })
-
-Cypress.Commands.add('noteByTitle', (noteTopology: string) => {
-  return cy
-    .findCardTitle(noteTopology)
-    .parent()
-    .invoke('attr', 'href')
-    .then(($attr) => {
-      const match = /n(\d+)/g.exec($attr as string)?.[1]
-      if (match) {
-        return match
-      }
-      throw new Error(`Could not find note ID in href: ${$attr}`)
-    })
-})
