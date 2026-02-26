@@ -51,12 +51,9 @@ Then(
   }
 )
 
-Then(
-  'I should see that I have {int} new notes to assimilate',
-  (numberOfNotes: number) => {
-    start.assimilation().expectCount(numberOfNotes)
-  }
-)
+Then('I should see {int} due for assimilation', (numberOfNotes: number) => {
+  start.assimilation().expectCount(numberOfNotes)
+})
 
 Then(
   'On day {int} I should have {string} note for assimilation and {string} for recall',
@@ -115,7 +112,7 @@ When(
 )
 
 When(
-  'I make {int} consecutive wrong answers for {int} days since day {int}, answering {string} to {string}',
+  'I make {int} wrong answers over {int} days since day {int}, answering {string} to {string}',
   (
     _numWrongAnswers: number,
     numDays: number,
@@ -424,6 +421,6 @@ When('I update the note details to {string}', (newDetails: string) => {
   start.assumeAssimilationPage().updateNoteDetails(newDetails)
 })
 
-When('I confirm to re-assimilate the note', () => {
+When('I confirm re-assimilation', () => {
   start.assumeAnsweredQuestionPage().confirmReAssimilation()
 })

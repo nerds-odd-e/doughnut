@@ -27,4 +27,4 @@ Feature: Assimilation and Recall Pages
       | single note       | Sedition |
     When It's day 2, 9 hour
     Then I should see that I have 1 notes to recall
-    And I should see that I have 3 new notes to assimilate
+    And I should see 3 due for assimilation

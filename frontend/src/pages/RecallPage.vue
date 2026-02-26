@@ -282,7 +282,7 @@ const moveToNextMemoryTracker = () => {
   currentIndex.value = nextIndex
 }
 
-const handleThresholdExceeded = async (memoryTrackerId: number | undefined) => {
+const offerReAssimilation = async (memoryTrackerId: number | undefined) => {
   if (!memoryTrackerId) return
   const confirmed = await popups.confirm(
     "You have answered this note incorrectly too many times. Would you like to re-assimilate it?"
@@ -302,9 +302,7 @@ const onAnsweredQuestion = async (answerResult: QuestionResult) => {
     viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
   }
   if (answerResult.answeredQuestion?.thresholdExceeded) {
-    await handleThresholdExceeded(
-      answerResult.answeredQuestion?.memoryTrackerId
-    )
+    await offerReAssimilation(answerResult.answeredQuestion?.memoryTrackerId)
   }
 }
 
@@ -315,7 +313,7 @@ const onAnsweredSpelling = async (answerResult: SpellingResult) => {
     viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
   }
   if (answerResult.thresholdExceeded) {
-    await handleThresholdExceeded(answerResult.memoryTrackerId)
+    await offerReAssimilation(answerResult.memoryTrackerId)
   }
 }
 

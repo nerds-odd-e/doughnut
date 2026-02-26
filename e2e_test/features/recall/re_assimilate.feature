@@ -13,9 +13,9 @@ Feature: Re-assimilate note after too many wrong answers
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
 
-  Scenario: Note returns to assimilate after 5 wrong answers within 14 days
+  Scenario: Note returns to assimilation after 5 wrong answers
     Given It's day 1, 8 hour
     And I assimilate the note "sedition"
-    When I make 5 consecutive wrong answers for 5 days since day 2, answering "to sleep" to "What is the meaning of sedition?"
-    And I confirm to re-assimilate the note
-    Then I should see that I have 1 new notes to assimilate
+    When I make 5 wrong answers over 5 days since day 2, answering "to sleep" to "What is the meaning of sedition?"
+    And I confirm re-assimilation
+    Then I should see 1 due for assimilation

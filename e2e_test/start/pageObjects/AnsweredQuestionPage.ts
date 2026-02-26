@@ -40,9 +40,7 @@ const assumeAnsweredQuestionPage = () => {
       return assumeAnsweredQuestionPage()
     },
     confirmReAssimilation() {
-      cy.contains(
-        'You have answered this note incorrectly too many times'
-      ).should('be.visible')
+      cy.contains('re-assimilate').should('be.visible')
       cy.findByRole('button', { name: 'OK' }).click()
     },
   }
