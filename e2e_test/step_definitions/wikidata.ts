@@ -116,7 +116,7 @@ When(
 )
 
 Then('I should see that the Title becomes {string}', (value: string) => {
-  cy.formField('Title').fieldShouldHaveValue(value)
+  start.form.fieldShouldHaveValue('Title', value)
 })
 
 Then('I should see that the Wikidata Id becomes {string}', (value: string) => {

@@ -1,3 +1,5 @@
+import { form } from '../../forms'
+
 export function adminFineTuningPage() {
   return {
     triggerFineTuning() {
@@ -16,7 +18,8 @@ export function adminFineTuningPage() {
       newQuestion: Record<string, string>
     ) {
       cy.findByText(originalQuestionStem).parent().dblclick()
-      cy.formField('Stem')
+      form
+        .getField('Stem')
         .clear()
         .type(newQuestion['Question Stem'] ?? '')
       cy.get('li input')

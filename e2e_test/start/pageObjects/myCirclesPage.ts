@@ -1,3 +1,4 @@
+import { form } from '../forms'
 import { mainMenu } from './mainMenu'
 
 export const navigateToMyCircles = () => {
@@ -14,7 +15,7 @@ export const assumeMyCirclesPage = () => {
   return {
     createNewCircle: (circleName: string) => {
       cy.findByRole('button', { name: 'Create a new circle' }).click()
-      cy.formField('Name').type(circleName)
+      form.getField('Name').type(circleName)
       cy.get('input[value="Submit"]').click()
       return assumeCirclePage(circleName)
     },

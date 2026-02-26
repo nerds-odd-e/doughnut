@@ -1,3 +1,4 @@
+import { form } from '../forms'
 import { routerToMyNotebooksPage } from './myNotebooksPage'
 import { assumeAdminDashboardPage } from './adminPages/adminDashboardPage'
 import { assumeAssessmentAndCertificateHistoryPage } from './assessmentAndCertificateHistoryPage'
@@ -28,7 +29,7 @@ export const mainMenu = () => {
           this.userSettingsButton(userName).click()
           return {
             changeName(name: string) {
-              cy.formField('Name').assignFieldValue(name)
+              form.assignFieldValue('Name', name)
               cy.findByText('Submit').click()
             },
           }

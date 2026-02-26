@@ -1,4 +1,5 @@
 import { commonSenseSplit } from '../../support/string_util'
+import { form } from '../forms'
 import audioToolsPage from './audioToolsPage'
 import { assumeConversationAboutNotePage } from './conversationAboutNotePage'
 import noteCreationForm from './noteForms/noteCreationForm'
@@ -88,7 +89,7 @@ export const assumeNotePage = (noteTopology?: string) => {
       cy.findByRole('title').within(() => {
         cy.get('.relation-type').click()
       })
-      cy.clickRadioByLabel(relationType)
+      form.clickRadioByLabel(relationType)
       cy.pageIsNotLoading()
       this.expectRelationshipTopic(relationType, target)
     },
@@ -311,7 +312,7 @@ export const assumeNotePage = (noteTopology?: string) => {
       return assumeAssociateWikidataDialog()
     },
     setLevel(level: number) {
-      cy.formField('Level').within(() => {
+      form.getField('Level').within(() => {
         cy.findByRole('button', { name: `${level}` }).click()
       })
       return this

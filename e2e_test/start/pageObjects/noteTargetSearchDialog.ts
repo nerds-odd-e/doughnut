@@ -1,5 +1,7 @@
+import { form } from '../forms'
+
 function searchNote(searchKey: string, options: string[]) {
-  options?.forEach((option: string) => cy.formField(option).check())
+  options?.forEach((option: string) => form.getField(option).check())
   cy.findByPlaceholderText('Search').clear().type(searchKey)
   cy.tick(1000)
 }
@@ -60,7 +62,7 @@ export const assumeNoteTargetSearchDialog = () => {
           .findByText('Add Relationship')
           .click()
       })
-      cy.clickRadioByLabel(relationType)
+      form.clickRadioByLabel(relationType)
     },
     createRelationshipToTopLevelNoteAs(
       toNoteTopic: string,

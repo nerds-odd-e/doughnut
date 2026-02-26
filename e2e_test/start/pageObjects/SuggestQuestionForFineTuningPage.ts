@@ -1,3 +1,5 @@
+import { form } from '../forms'
+
 export const SuggestQuestionForFineTuningPage = () => {
   cy.contains(
     'will make this note and question visible to admin. Are you sure?'
@@ -8,7 +10,7 @@ export const SuggestQuestionForFineTuningPage = () => {
       cy.pageIsNotLoading()
     },
     comment(comment: string) {
-      cy.formField('Comment').type(comment)
+      form.getField('Comment').type(comment)
       return this
     },
     suggestingPositiveFeedbackForFineTuning() {

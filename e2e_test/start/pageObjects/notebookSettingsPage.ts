@@ -1,3 +1,5 @@
+import { form } from '../forms'
+
 const notebookSettingsPage = () => {
   const clickButton = (name: string) =>
     cy.findByRole('button', { name }).click()
@@ -8,11 +10,11 @@ const notebookSettingsPage = () => {
 
   return {
     assertNoteHasSettingWithValue(setting: string, value: string) {
-      cy.formField(setting).fieldShouldHaveValue(value)
+      form.fieldShouldHaveValue(setting, value)
     },
 
     skipMemoryTracking() {
-      cy.formField('Skip Memory Tracking').check()
+      form.getField('Skip Memory Tracking').check()
       clickButton('Update Settings')
       cy.pageIsNotLoading()
     },
@@ -31,12 +33,14 @@ const notebookSettingsPage = () => {
       certificateExpiry?: string
     }) {
       if (settings.numberOfQuestion !== undefined) {
-        cy.formField('Number of Questions in Assessment').assignFieldValue(
+        form.assignFieldValue(
+          'Number of Questions in Assessment',
           `${settings.numberOfQuestion}`
         )
       }
       if (settings.certificateExpiry) {
-        cy.formField('Certificate Expiry').assignFieldValue(
+        form.assignFieldValue(
+          'Certificate Expiry',
           `${settings.certificateExpiry}`
         )
       }
@@ -45,7 +49,7 @@ const notebookSettingsPage = () => {
       cy.pageIsNotLoading()
     },
     updateAiAssistantInstructions(instruction: string) {
-      cy.formField('Additional Instructions to AI').type(instruction)
+      form.getField('Additional Instructions to AI').type(instruction)
       clickButton('Update Notebook AI Assistant Settings')
       cy.pageIsNotLoading()
     },

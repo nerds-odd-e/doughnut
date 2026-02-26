@@ -191,7 +191,7 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   checkRememberSpellingOption() {
-    cy.formField('Remember Spelling').check()
+    form.getField('Remember Spelling').check()
     cy.pageIsNotLoading()
     return this
   },
@@ -216,12 +216,12 @@ export const assumeAssimilationPage = () => ({
       'Remember Spelling',
       'Remember spelling note need to have detail'
     )
-    cy.formField('Remember Spelling').should('be.disabled')
+    form.getField('Remember Spelling').should('be.disabled')
     return this
   },
   expectRememberingSpellingAvailable() {
     form.expectNoFieldError('Remember Spelling')
-    cy.formField('Remember Spelling').should('not.be.disabled')
+    form.getField('Remember Spelling').should('not.be.disabled')
     return this
   },
 })

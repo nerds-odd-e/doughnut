@@ -49,5 +49,5 @@ Then(
 
 When('I go to the testability page to turn on the feature toggle', () => {
   cy.get('button[title="Testability"]').click()
-  cy.formField('Feature Toggle').click()
+  start.form.getField('Feature Toggle').click()
 })

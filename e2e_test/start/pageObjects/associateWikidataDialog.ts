@@ -13,13 +13,14 @@ export const assumeAssociateWikidataDialog = () => {
     // Actions - Input/Selection
     associate(wikiID: string) {
       withinModalContainer(() => {
-        cy.formField('Wikidata Id').assignFieldValue(wikiID).type('{enter}')
+        form.assignFieldValue('Wikidata Id', wikiID)
+        form.getField('Wikidata Id').type('{enter}')
       })
       return this
     },
     setWikidataId(wikidataId: string) {
       withinModalContainer(() => {
-        cy.formField('Wikidata Id').assignFieldValue(wikidataId)
+        form.assignFieldValue('Wikidata Id', wikidataId)
       })
       return this
     },
@@ -62,7 +63,7 @@ export const assumeAssociateWikidataDialog = () => {
     expectWikidataIdValue(value: string) {
       withinModalContainer(() => {
         form.expectNoFieldError('Wikidata Id')
-        cy.formField('Wikidata Id').fieldShouldHaveValue(value)
+        form.fieldShouldHaveValue('Wikidata Id', value)
         cy.findByRole('button', { name: 'Close' }).click()
       })
       return this

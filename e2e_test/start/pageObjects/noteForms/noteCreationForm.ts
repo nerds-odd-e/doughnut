@@ -1,4 +1,4 @@
-import { submittableForm } from '../../forms'
+import { form, submittableForm } from '../../forms'
 import { assumeAssociateWikidataDialog } from '../associateWikidataDialog'
 
 const noteCreationForm = {
@@ -20,7 +20,7 @@ const noteCreationForm = {
     return assumeAssociateWikidataDialog()
   },
   searchWikidata(phrase: string) {
-    cy.formField('Title').assignFieldValue(phrase)
+    form.assignFieldValue('Title', phrase)
     return this.wikidataSearch()
   },
 }

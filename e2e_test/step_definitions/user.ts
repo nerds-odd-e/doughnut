@@ -56,7 +56,7 @@ When('I should be asked to create my profile', () => {
 When('I save my profile with:', (data: DataTable) => {
   data.hashes().forEach((elem) => {
     for (const propName in elem) {
-      cy.formField(propName).assignFieldValue(elem[propName] ?? '')
+      start.form.assignFieldValue(propName, elem[propName] ?? '')
     }
   })
   cy.get('input[value="Submit"]').click()

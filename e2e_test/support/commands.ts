@@ -42,41 +42,6 @@ Cypress.Commands.add('clearFocusedText', () => {
     .clear()
 })
 
-Cypress.Commands.add(
-  'fieldShouldHaveValue',
-  { prevSubject: true },
-  ($input: JQuery<HTMLElement>, value: string) => {
-    cy.wrap($input).should('have.value', value)
-  }
-)
-
-Cypress.Commands.add(
-  'assignFieldValue',
-  { prevSubject: true },
-  ($input: JQuery<HTMLElement>, value: string) => {
-    if ($input.attr('type') === 'file') {
-      cy.fixture(value).then((img) => {
-        cy.wrap($input).attachFile({
-          fileContent: Cypress.Blob.base64StringToBlob(img),
-          fileName: value,
-          mimeType: 'image/png',
-        })
-      })
-    } else if ($input.attr('role') === 'radiogroup') {
-      cy.clickRadioByLabel(value)
-    } else if ($input.attr('role') === 'button') {
-      cy.wrap($input).click()
-      cy.clickRadioByLabel(value)
-    } else {
-      cy.wrap($input).clear().type(value)
-    }
-  }
-)
-
-Cypress.Commands.add('clickRadioByLabel', (labelText) => {
-  cy.findByText(labelText, { selector: 'label' }).click({ force: true })
-})
-
 interface RouterPushOptions {
   name: string
   params: Record<string, string | number>
@@ -132,8 +97,4 @@ Cypress.Commands.add('findCardTitle', (title) =>
 
 Cypress.Commands.add('routerToRoot', () => {
   cy.routerPush('/', 'root', {})
-})
-
-Cypress.Commands.add('formField', (label) => {
-  return cy.findByLabelText(label)
 })
