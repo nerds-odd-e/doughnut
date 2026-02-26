@@ -2,7 +2,6 @@ package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
-import com.odde.doughnut.controllers.dto.PromotePointRequestDTO.PromotionType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
@@ -40,15 +39,24 @@ public class ChatCompletionNoteAutomationService {
         List.of());
   }
 
-  public PointExtractionResult promotePoint(String point, PromotionType promotionType)
-      throws JsonProcessingException {
+  public PointExtractionResult promotePointToChild(String point) throws JsonProcessingException {
     String noteTitle = note.getTitle() != null ? note.getTitle() : "";
     String noteDetails = note.getDetails() != null ? note.getDetails() : "";
-    InstructionAndSchema tool =
-        promotionType == PromotionType.SIBLING
-            ? AiToolFactory.promotePointToSiblingAiTool(point, noteTitle, noteDetails)
-            : AiToolFactory.promotePointToChildAiTool(point, noteTitle, noteDetails);
-    return executeWithTool(tool, PointExtractionResult.class, result -> result, null);
+    return executeWithTool(
+        AiToolFactory.promotePointToChildAiTool(point, noteTitle, noteDetails),
+        PointExtractionResult.class,
+        result -> result,
+        null);
+  }
+
+  public PointExtractionResult promotePointToSibling(String point) throws JsonProcessingException {
+    String noteTitle = note.getTitle() != null ? note.getTitle() : "";
+    String noteDetails = note.getDetails() != null ? note.getDetails() : "";
+    return executeWithTool(
+        AiToolFactory.promotePointToSiblingAiTool(point, noteTitle, noteDetails),
+        PointExtractionResult.class,
+        result -> result,
+        null);
   }
 
   private <T, R> R executeWithTool(

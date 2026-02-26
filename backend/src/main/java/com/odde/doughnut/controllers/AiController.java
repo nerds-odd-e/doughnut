@@ -94,7 +94,7 @@ public class AiController {
   @Transactional
   public RemovePointsResponseDTO removePointFromNote(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
-      @RequestBody RemovePointsRequestDTO request)
+      @RequestBody PointsRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
 
     authorizationService.assertAuthorization(note);
@@ -115,26 +115,54 @@ public class AiController {
     return new RemovePointsResponseDTO(newDetails);
   }
 
-  @PostMapping("/promote-point/{note}")
+  @PostMapping("/promote-point-to-child/{note}")
   @Transactional
-  public PromotePointResponseDTO promotePoint(
+  public PromotePointResponseDTO promotePointToChild(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
-      @RequestBody PromotePointRequestDTO request)
+      @RequestBody PointsRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
 
     authorizationService.assertAuthorization(note);
 
-    PromotePointRequestDTO.PromotionType promotionType = request.getPromotionType();
-
+    String point = getSinglePoint(request);
     PointExtractionResult aiResult =
         notebookAssistantForNoteServiceFactory
             .createNoteAutomationService(note)
-            .promotePoint(request.getPoint(), promotionType);
+            .promotePointToChild(point);
 
     if (aiResult == null) {
       throw new RuntimeException("AI failed to generate extraction result");
     }
 
-    return noteConstructionService.createNoteFromPromotedPoint(note, promotionType, aiResult);
+    return noteConstructionService.createNoteFromPromotedPointToChild(note, aiResult);
+  }
+
+  @PostMapping("/promote-point-to-sibling/{note}")
+  @Transactional
+  public PromotePointResponseDTO promotePointToSibling(
+      @PathVariable(value = "note") @Schema(type = "integer") Note note,
+      @RequestBody PointsRequestDTO request)
+      throws UnexpectedNoAccessRightException, JsonProcessingException {
+
+    authorizationService.assertAuthorization(note);
+
+    String point = getSinglePoint(request);
+    PointExtractionResult aiResult =
+        notebookAssistantForNoteServiceFactory
+            .createNoteAutomationService(note)
+            .promotePointToSibling(point);
+
+    if (aiResult == null) {
+      throw new RuntimeException("AI failed to generate extraction result");
+    }
+
+    return noteConstructionService.createNoteFromPromotedPointToSibling(note, aiResult);
+  }
+
+  private static String getSinglePoint(PointsRequestDTO request) {
+    if (request.getPoints() == null || request.getPoints().isEmpty()) {
+      throw new IllegalArgumentException("points must contain exactly one point");
+    }
+    return request.getPoints().getFirst();
   }
 }

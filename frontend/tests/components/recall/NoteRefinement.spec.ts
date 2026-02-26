@@ -11,13 +11,6 @@ import helper, {
 } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import usePopups from "@/components/commons/Popups/usePopups"
-import type { PromotePointRequestDto } from "@generated/backend"
-
-const PromotionType = {
-  CHILD: "CHILD",
-  SIBLING: "SIBLING",
-} as const satisfies Record<string, PromotePointRequestDto["promotionType"]>
-
 let renderer: RenderingHelper<typeof NoteRefinement>
 
 afterEach(() => {
@@ -32,7 +25,11 @@ afterEach(() => {
 beforeEach(() => {
   mockSdkService("removePointFromNote", { details: "Updated content" })
   mockSdkService("updateNoteDetails", makeMe.aNoteRealm.please())
-  mockSdkService("promotePoint", {
+  mockSdkService("promotePointToChild", {
+    createdNote: makeMe.aNoteRealm.please(),
+    updatedParentNote: makeMe.aNoteRealm.please(),
+  })
+  mockSdkService("promotePointToSibling", {
     createdNote: makeMe.aNoteRealm.please(),
     updatedParentNote: makeMe.aNoteRealm.please(),
   })
@@ -80,8 +77,8 @@ describe("NoteRefinement component", () => {
       })
     })
 
-    it("calls promotePoint API when child button is clicked", async () => {
-      const promotePointSpy = mockSdkService("promotePoint", {
+    it("calls promotePointToChild API when child button is clicked", async () => {
+      const promotePointToChildSpy = mockSdkService("promotePointToChild", {
         createdNote: makeMe.aNoteRealm.please(),
         updatedParentNote: makeMe.aNoteRealm.please(),
       })
@@ -91,14 +88,14 @@ describe("NoteRefinement component", () => {
       await wrapper.find("li button").trigger("click")
       await flushPromises()
 
-      expect(promotePointSpy).toHaveBeenCalledWith({
+      expect(promotePointToChildSpy).toHaveBeenCalledWith({
         path: { note: note.id },
-        body: { point: "Test Point", promotionType: PromotionType.CHILD },
+        body: { points: ["Test Point"] },
       })
     })
 
     it("removes point from checklist after successful promotion", async () => {
-      mockSdkService("promotePoint", {
+      mockSdkService("promotePointToChild", {
         createdNote: makeMe.aNoteRealm.please(),
         updatedParentNote: makeMe.aNoteRealm.please(),
       })
@@ -115,7 +112,7 @@ describe("NoteRefinement component", () => {
     })
 
     it("keeps point in checklist when API fails", async () => {
-      mockSdkService("promotePoint", undefined).mockResolvedValue(
+      mockSdkService("promotePointToChild", undefined).mockResolvedValue(
         wrapSdkError("API Error")
       )
       const wrapper = mount(["Test Point"])
@@ -128,14 +125,14 @@ describe("NoteRefinement component", () => {
       expect(wrapper.text()).toContain("Test Point")
     })
 
-    it("calls promotePoint with SIBLING when sibling button is clicked", async () => {
+    it("calls promotePointToSibling when sibling button is clicked", async () => {
       const childNoteRealm = makeMe.aNoteRealm
         .under(makeMe.aNoteRealm.please())
         .please()
       const childNote = makeMe.aMemoryTracker
         .ofNote(childNoteRealm)
         .please().note
-      const promotePointSpy = mockSdkService("promotePoint", {
+      const promotePointToSiblingSpy = mockSdkService("promotePointToSibling", {
         createdNote: makeMe.aNoteRealm.please(),
         updatedParentNote: makeMe.aNoteRealm.please(),
       })
@@ -145,9 +142,9 @@ describe("NoteRefinement component", () => {
       await wrapper.findAll("li button")[1]!.trigger("click")
       await flushPromises()
 
-      expect(promotePointSpy).toHaveBeenCalledWith({
+      expect(promotePointToSiblingSpy).toHaveBeenCalledWith({
         path: { note: childNote.id },
-        body: { point: "Test Point", promotionType: PromotionType.SIBLING },
+        body: { points: ["Test Point"] },
       })
     })
 
@@ -158,7 +155,7 @@ describe("NoteRefinement component", () => {
       const childNote = makeMe.aMemoryTracker
         .ofNote(childNoteRealm)
         .please().note
-      mockSdkService("promotePoint", {
+      mockSdkService("promotePointToSibling", {
         createdNote: makeMe.aNoteRealm.please(),
         updatedParentNote: makeMe.aNoteRealm.please(),
       })
@@ -291,7 +288,7 @@ describe("NoteRefinement component", () => {
       const apiPromise = new Promise<void>((r) => {
         resolveApi = r
       })
-      mockSdkServiceWithImplementation("promotePoint", async () => {
+      mockSdkServiceWithImplementation("promotePointToChild", async () => {
         await apiPromise
         return {
           createdNote: makeMe.aNoteRealm.please(),
@@ -314,7 +311,7 @@ describe("NoteRefinement component", () => {
     })
 
     it("hides LoadingModal when API fails", async () => {
-      mockSdkService("promotePoint", wrapSdkError({}))
+      mockSdkService("promotePointToChild", wrapSdkError({}))
       const wrapper = mount(["Test understanding point"])
       await flushPromises()
 

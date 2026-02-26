@@ -419,17 +419,12 @@ export type SuggestedTitleDto = {
     title?: string;
 };
 
-export type RemovePointsRequestDto = {
+export type PointsRequestDto = {
     points?: Array<string>;
 };
 
 export type RemovePointsResponseDto = {
     details?: string;
-};
-
-export type PromotePointRequestDto = {
-    point?: string;
-    promotionType: 'CHILD' | 'SIBLING';
 };
 
 export type PromotePointResponseDto = {
@@ -3015,7 +3010,7 @@ export type SuggestTitleResponses = {
 export type SuggestTitleResponse = SuggestTitleResponses[keyof SuggestTitleResponses];
 
 export type RemovePointFromNoteData = {
-    body: RemovePointsRequestDto;
+    body: PointsRequestDto;
     path: {
         note: number;
     };
@@ -3041,32 +3036,59 @@ export type RemovePointFromNoteResponses = {
 
 export type RemovePointFromNoteResponse = RemovePointFromNoteResponses[keyof RemovePointFromNoteResponses];
 
-export type PromotePointData = {
-    body: PromotePointRequestDto;
+export type PromotePointToSiblingData = {
+    body: PointsRequestDto;
     path: {
         note: number;
     };
     query?: never;
-    url: '/api/ai/promote-point/{note}';
+    url: '/api/ai/promote-point-to-sibling/{note}';
 };
 
-export type PromotePointErrors = {
+export type PromotePointToSiblingErrors = {
     /**
      * Internal Server Error
      */
     500: string;
 };
 
-export type PromotePointError = PromotePointErrors[keyof PromotePointErrors];
+export type PromotePointToSiblingError = PromotePointToSiblingErrors[keyof PromotePointToSiblingErrors];
 
-export type PromotePointResponses = {
+export type PromotePointToSiblingResponses = {
     /**
      * OK
      */
     200: PromotePointResponseDto;
 };
 
-export type PromotePointResponse = PromotePointResponses[keyof PromotePointResponses];
+export type PromotePointToSiblingResponse = PromotePointToSiblingResponses[keyof PromotePointToSiblingResponses];
+
+export type PromotePointToChildData = {
+    body: PointsRequestDto;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/ai/promote-point-to-child/{note}';
+};
+
+export type PromotePointToChildErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type PromotePointToChildError = PromotePointToChildErrors[keyof PromotePointToChildErrors];
+
+export type PromotePointToChildResponses = {
+    /**
+     * OK
+     */
+    200: PromotePointResponseDto;
+};
+
+export type PromotePointToChildResponse = PromotePointToChildResponses[keyof PromotePointToChildResponses];
 
 export type GenerateUnderstandingChecklistData = {
     body?: never;

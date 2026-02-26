@@ -7,7 +7,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.controllers.dto.RemovePointsRequestDTO;
+import com.odde.doughnut.controllers.dto.PointsRequestDTO;
 import com.odde.doughnut.controllers.dto.RemovePointsResponseDTO;
 import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
 import com.odde.doughnut.controllers.dto.UnderstandingChecklistDTO;
@@ -313,7 +313,7 @@ class AiControllerTest extends ControllerTestBase {
       String originalDetails =
           "English is a language that is spoken in many countries. It is also the most widely spoken language in the world.";
       testNote.setDetails(originalDetails);
-      RemovePointsRequestDTO requestDTO = new RemovePointsRequestDTO();
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.points = List.of("English is a language that is spoken in many countries.");
       RemovePointsResponseDTO response = controller.removePointFromNote(testNote, requestDTO);
       assertThat(response.getDetails()).isNotEqualTo(originalDetails);
@@ -327,7 +327,7 @@ class AiControllerTest extends ControllerTestBase {
           new RegeneratedNoteDetails("Remaining content."));
       String originalDetails = "Original content with point to remove.";
       testNote.setDetails(originalDetails);
-      RemovePointsRequestDTO requestDTO = new RemovePointsRequestDTO();
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.points = List.of("point to remove");
       controller.removePointFromNote(testNote, requestDTO);
       makeMe.entityPersister.flush();
@@ -339,7 +339,7 @@ class AiControllerTest extends ControllerTestBase {
     void shouldReturnDetailsUnchangedWhenPointsToRemoveIsEmpty()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       testNote.setDetails("Some note content.");
-      RemovePointsRequestDTO requestDTO = new RemovePointsRequestDTO();
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.points = List.of();
       RemovePointsResponseDTO response = controller.removePointFromNote(testNote, requestDTO);
       assertThat(response.getDetails()).isEqualTo("Some note content.");

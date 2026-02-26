@@ -2,7 +2,6 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteCreationResult;
-import com.odde.doughnut.controllers.dto.PromotePointRequestDTO;
 import com.odde.doughnut.controllers.dto.PromotePointResponseDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RelationType;
@@ -142,16 +141,23 @@ public class NoteConstructionService {
     return note;
   }
 
-  public PromotePointResponseDTO createNoteFromPromotedPoint(
-      Note originalNote,
-      PromotePointRequestDTO.PromotionType promotionType,
-      PointExtractionResult aiResult)
+  public PromotePointResponseDTO createNoteFromPromotedPointToChild(
+      Note originalNote, PointExtractionResult aiResult) throws UnexpectedNoAccessRightException {
+    return createNoteFromPromotedPoint(originalNote, originalNote.getId(), aiResult);
+  }
+
+  public PromotePointResponseDTO createNoteFromPromotedPointToSibling(
+      Note originalNote, PointExtractionResult aiResult) throws UnexpectedNoAccessRightException {
+    return createNoteFromPromotedPoint(originalNote, originalNote.getParent().getId(), aiResult);
+  }
+
+  private PromotePointResponseDTO createNoteFromPromotedPoint(
+      Note originalNote, Integer parentNoteId, PointExtractionResult aiResult)
       throws UnexpectedNoAccessRightException {
     User user = authorizationService.getCurrentUser();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
-    Note newNote =
-        createNoteUnderParentId(promotionType.getParentNoteId(originalNote), aiResult.newNoteTitle);
+    Note newNote = createNoteUnderParentId(parentNoteId, aiResult.newNoteTitle);
     newNote.setDetails(aiResult.newNoteDetails);
     newNote.setUpdatedAt(currentUTCTimestamp);
     entityPersister.save(newNote);

@@ -6,6 +6,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class RemovePointsRequestDTO {
+public class PointsRequestDTO {
   public List<String> points;
 }

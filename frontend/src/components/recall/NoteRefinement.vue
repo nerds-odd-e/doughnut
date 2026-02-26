@@ -72,13 +72,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Note, PromotePointRequestDto } from "@generated/backend"
+import type { Note, NoteRealm } from "@generated/backend"
 import { AiController } from "@generated/backend/sdk.gen"
-
-const PromotionType = {
-  CHILD: "CHILD",
-  SIBLING: "SIBLING",
-} as const satisfies Record<string, PromotePointRequestDto["promotionType"]>
 
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
@@ -184,21 +179,21 @@ const ignoreSelectedPoints = async () => {
   selectedPointIndices.value = []
 }
 
-const promotePoint = async (
-  point: string,
-  index: number,
-  promotionType: PromotePointRequestDto["promotionType"]
-) => {
+const promotePoint = async (index: number, apiCall: () => Promise<unknown>) => {
   isPromotingPoint.value = true
   try {
-    const { data: result, error } = await apiCallWithLoading(() =>
-      AiController.promotePoint({
-        path: { note: props.note.id },
-        body: { point, promotionType },
-      })
-    )
+    const response = (await apiCallWithLoading(
+      apiCall as () => Promise<{
+        data?: { createdNote?: NoteRealm; updatedParentNote?: NoteRealm }
+        error?: unknown
+      }>
+    )) as {
+      data?: { createdNote?: NoteRealm; updatedParentNote?: NoteRealm }
+      error?: unknown
+    }
+    const result = response.data
 
-    if (error || !result || !result.createdNote || !result.updatedParentNote) {
+    if (response.error || !result?.createdNote || !result?.updatedParentNote) {
       await popups.alert("Failed to create note with AI")
       return
     }
@@ -221,10 +216,20 @@ const promotePoint = async (
 }
 
 const promotePointToChildNote = (point: string, index: number) => {
-  promotePoint(point, index, PromotionType.CHILD)
+  promotePoint(index, () =>
+    AiController.promotePointToChild({
+      path: { note: props.note.id },
+      body: { points: [point] },
+    })
+  )
 }
 
 const promotePointToSiblingNote = (point: string, index: number) => {
-  promotePoint(point, index, PromotionType.SIBLING)
+  promotePoint(index, () =>
+    AiController.promotePointToSibling({
+      path: { note: props.note.id },
+      body: { points: [point] },
+    })
+  )
 }
 </script>
