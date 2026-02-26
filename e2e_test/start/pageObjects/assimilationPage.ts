@@ -4,14 +4,17 @@ import { form } from '../forms'
 const keepForRepetitionButton = (options?: { timeout?: number }) =>
   cy.get('[data-test="keep-for-repetition"]', options ?? {})
 
+const understandingChecklist = () =>
+  cy.contains('Understanding Checklist:').closest('.daisy-bg-accent')
+
 export const assumeAssimilationPage = () => ({
   expectToAssimilateAndTotal(toAssimilateAndTotal: string) {
-    const [assimlatedTodayCount, toAssimilateCountForToday, totalCount] =
+    const [assimilatedTodayCount, toAssimilateCountForToday, totalCount] =
       toAssimilateAndTotal.split('/')
 
     cy.get('.daisy-progress-bar').should(
       'contain',
-      `Assimilating: ${assimlatedTodayCount}/${toAssimilateCountForToday}`
+      `Assimilating: ${assimilatedTodayCount}/${toAssimilateCountForToday}`
     )
     // Click progress bar to show tooltip
     cy.get('.daisy-progress-bar').first().click()
@@ -19,9 +22,9 @@ export const assumeAssimilationPage = () => ({
     // Check tooltip content
     cy.get('.tooltip-content').within(() => {
       cy.contains(
-        `Daily Progress: ${assimlatedTodayCount} / ${toAssimilateCountForToday}`
+        `Daily Progress: ${assimilatedTodayCount} / ${toAssimilateCountForToday}`
       )
-      cy.contains(`Total Progress: ${assimlatedTodayCount} / ${totalCount}`)
+      cy.contains(`Total Progress: ${assimilatedTodayCount} / ${totalCount}`)
     })
 
     // Close tooltip
@@ -67,7 +70,7 @@ export const assumeAssimilationPage = () => ({
     } else {
       switch (assimilationType) {
         case 'single note': {
-          cy.findByText(title, { selector: '[role=title]' })
+          if (title) cy.findByText(title, { selector: '[role=title]' })
           if (additionalInfo) {
             cy.get('.note-details').should('contain', additionalInfo)
           }
@@ -95,17 +98,9 @@ export const assumeAssimilationPage = () => ({
               additionalInfo,
               '; '
             )
-            if (typeof title === 'string') {
-              cy.findByText(title, { selector: '[role=title] *' })
-            }
-
-            if (typeof targetNote === 'string') {
-              cy.findByText(targetNote)
-            }
-
-            if (typeof relationType === 'string') {
-              cy.get('.relation-type').contains(relationType)
-            }
+            if (title) cy.findByText(title, { selector: '[role=title] *' })
+            if (targetNote) cy.findByText(targetNote)
+            if (relationType) cy.get('.relation-type').contains(relationType)
           }
           break
         }
@@ -150,24 +145,10 @@ export const assumeAssimilationPage = () => ({
     }).should('be.visible')
     return this
   },
-  expectNoteTypeOptions(options: string[]) {
-    options.forEach((option) => {
-      cy.get('[data-test="note-type-selection-dialog"]').within(() => {
-        cy.findByRole('button', { name: option }).should('be.visible')
-      })
-    })
-    return this
-  },
   expectUnderstandingPointsCount(count: number) {
     cy.pageIsNotLoading()
-    cy.contains('Understanding Checklist:')
-      .closest('.daisy-bg-accent')
-      .scrollIntoView()
-      .should('be.visible')
-    cy.contains('Understanding Checklist:')
-      .closest('.daisy-bg-accent')
-      .find('ul li')
-      .should('have.length', count)
+    understandingChecklist().scrollIntoView().should('be.visible')
+    understandingChecklist().find('ul li').should('have.length', count)
     return this
   },
   expectUnderstandingChecklistNotShown() {
@@ -181,21 +162,15 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   checkUnderstandingPoint(index: number) {
-    cy.contains('Understanding Checklist:')
-      .closest('.daisy-bg-accent')
-      .find('input[type="checkbox"]')
-      .eq(index)
-      .check()
+    understandingChecklist().find('input[type="checkbox"]').eq(index).check()
     return this
   },
   ignoreUnderstandingPointsAndComplete(pointTexts: string[]) {
-    cy.contains('Understanding Checklist:')
-      .closest('.daisy-bg-accent')
-      .within(() => {
-        pointTexts.forEach((pointText) => {
-          cy.contains('li', pointText).find('input[type="checkbox"]').check()
-        })
+    understandingChecklist().within(() => {
+      pointTexts.forEach((pointText) => {
+        cy.contains('li', pointText).find('input[type="checkbox"]').check()
       })
+    })
     this.clickIgnoreQuestionsButton()
     cy.findByRole('button', { name: 'OK' }).click()
     this.assimilateCurrentNote()
@@ -212,23 +187,19 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   promotePointToChildNote(pointText: string) {
-    cy.contains('Understanding Checklist:')
-      .closest('.daisy-bg-accent')
-      .within(() => {
-        cy.contains('li', pointText)
-          .findByRole('button', { name: 'Child' })
-          .click()
-      })
+    understandingChecklist().within(() => {
+      cy.contains('li', pointText)
+        .findByRole('button', { name: 'Child' })
+        .click()
+    })
     return this
   },
   promotePointToSiblingNote(pointText: string) {
-    cy.contains('Understanding Checklist:')
-      .closest('.daisy-bg-accent')
-      .within(() => {
-        cy.contains('li', pointText)
-          .findByRole('button', { name: 'Sibling' })
-          .click()
-      })
+    understandingChecklist().within(() => {
+      cy.contains('li', pointText)
+        .findByRole('button', { name: 'Sibling' })
+        .click()
+    })
     return this
   },
   expectToRemainOnAssimilationPageFor(noteTitle: string) {
@@ -239,6 +210,7 @@ export const assumeAssimilationPage = () => ({
   checkRememberSpellingOption() {
     cy.formField('Remember Spelling').check()
     cy.pageIsNotLoading()
+    return this
   },
   verifySpellingWith(text: string) {
     cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
