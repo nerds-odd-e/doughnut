@@ -28,7 +28,6 @@
                     asMarkdown,
                     readonly: readonly(noteRealm),
                   }"
-                  @details-saved="$emit('details-saved', $event)"
                 />
                 <NoteAccessoryAsync
                   v-bind="{ noteId: noteRealm.id, updatedNoteAccessory, readonly: readonly(noteRealm) }"
@@ -110,10 +109,6 @@ defineProps({
   noConversationButton: { type: Boolean, default: false },
   isMinimized: { type: Boolean, default: false },
 })
-
-defineEmits<{
-  (e: "details-saved", newValue: string): void
-}>()
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 const readonly = (noteRealm: NoteRealm) =>

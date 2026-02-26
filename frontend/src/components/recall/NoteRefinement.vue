@@ -90,7 +90,6 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const props = defineProps<{
   note: Note
-  currentNoteDetails: string
 }>()
 
 const emit = defineEmits<{

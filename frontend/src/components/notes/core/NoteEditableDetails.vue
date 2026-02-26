@@ -2,7 +2,6 @@
   <TextContentWrapper
     :value="noteDetails"
     field="edit details"
-    @details-saved="$emit('details-saved', $event)"
   >
     <template #default="{ value, update, blur }">
       <TextArea
@@ -44,10 +43,6 @@ const props = defineProps({
   readonly: { type: Boolean, default: true },
   asMarkdown: Boolean,
 })
-
-defineEmits<{
-  (e: "details-saved", newValue: string): void
-}>()
 
 const textareaRef = ref<InstanceType<typeof TextArea> | null>(null)
 const { htmlToMarkdown, processContentAfterPaste } =

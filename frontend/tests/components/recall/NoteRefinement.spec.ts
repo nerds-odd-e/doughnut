@@ -51,7 +51,6 @@ describe("NoteRefinement component", () => {
       .withCleanStorage()
       .withProps({
         note: overrides?.note ?? note,
-        currentNoteDetails: "Some note content",
       })
       .mount()
   }

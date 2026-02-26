@@ -2,7 +2,6 @@
   <NoteInfoComponent
     v-if="noteInfo?.note"
     :note-info="noteInfo"
-    :current-note-details="currentNoteDetails"
     @level-changed="$emit('levelChanged', $event)"
     @remember-spelling-changed="$emit('rememberSpellingChanged', $event)"
   />
@@ -12,12 +11,11 @@
 import type { NoteInfo } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
 import NoteInfoComponent from "./NoteInfoComponent.vue"
-import { ref, watch, computed } from "vue"
+import { ref, watch } from "vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const props = defineProps<{
   noteId: number
-  currentNoteDetails?: string
 }>()
 
 const emit = defineEmits<{
@@ -26,10 +24,6 @@ const emit = defineEmits<{
 }>()
 
 const noteInfo = ref<NoteInfo | undefined>(undefined)
-
-const currentNoteDetails = computed(
-  () => props.currentNoteDetails ?? noteInfo.value?.note.note.details
-)
 
 const fetchData = async () => {
   const { data: noteInfoData, error } = await apiCallWithLoading(() =>

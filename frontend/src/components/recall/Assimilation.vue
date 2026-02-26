@@ -7,21 +7,18 @@
     </div>
     <NoteShow
       v-bind="{ noteId: note.id, expandChildren: false }"
-      @details-saved="onDetailsSaved"
     />
   </main>
   <NoteInfoBar
     :note-id="note.id"
-    :current-note-details="currentDetails"
     :key="note.id"
     @level-changed="$emit('reloadNeeded')"
     @remember-spelling-changed="onRememberSpellingChanged"
   />
   <NoteRefinement
-    v-if="(currentDetails ?? '').trim()"
+    v-if="(note.details ?? '').trim()"
     :note="note"
-    :current-note-details="currentDetails ?? ''"
-    @details-updated="onDetailsSaved"
+    @details-updated="$emit('reloadNeeded')"
   />
   <AssimilationButtons
     :key="buttonKey"
@@ -80,11 +77,6 @@ const buttonKey = computed(() => note.id)
 const showSpellingPopup = ref(false)
 const rememberSpelling = ref(false)
 const noteInfoLoaded = ref(false) // Track if noteInfo has been loaded
-const currentDetails = ref(note.details)
-
-const onDetailsSaved = (newDetails: string) => {
-  currentDetails.value = newDetails
-}
 
 const onRememberSpellingChanged = (value: boolean) => {
   rememberSpelling.value = value
