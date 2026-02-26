@@ -27,10 +27,6 @@
 import '@testing-library/cypress/add-commands'
 import 'cypress-file-upload'
 
-Cypress.Commands.add('pageIsNotLoading', () => {
-  cy.get('.loading-bar').should('not.exist', { timeout: 10000 })
-})
-
 Cypress.Commands.add('clearFocusedText', () => {
   // cy.clear for now is an alias of cy.type('{selectall}{backspace}')
   // it doesn't clear the text sometimes.

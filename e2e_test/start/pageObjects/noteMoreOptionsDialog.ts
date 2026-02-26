@@ -1,3 +1,4 @@
+import { pageIsNotLoading } from '../pageBase'
 import { assumeAssimilationPage } from './assimilationPage'
 import { assumeMemoryTrackerPage } from './memoryTrackerPage'
 import { toolbarButton } from './toolbarButton'
@@ -49,7 +50,7 @@ const noteMoreOptionsDialog = () => {
     removeMemoryTrackerFromRecall(type: 'normal' | 'spelling') {
       cy.contains('tr', type).click()
       cy.url().should('include', '/d/memory-trackers/')
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       return assumeMemoryTrackerPage().removeFromRecall()
     },
     editNoteImage(attributes: Record<string, string>) {
@@ -72,7 +73,7 @@ const noteMoreOptionsDialog = () => {
       form.fill({
         'Note Type': noteType,
       })
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
     },
     generateImageWithDALLE() {
       toolbarButton('Generate Image with DALL-E').click()
@@ -80,7 +81,7 @@ const noteMoreOptionsDialog = () => {
     deleteNote() {
       toolbarButton('Delete note').click()
       cy.findByRole('button', { name: 'OK' }).click()
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
     },
     openQuestionList() {
       toolbarButton('Questions for the note').click()
@@ -89,12 +90,12 @@ const noteMoreOptionsDialog = () => {
     openAssimilationPage() {
       toolbarButton('Assimilate this note').click()
       cy.url().should('include', '/d/assimilate/')
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       return assumeAssimilationPage().waitForAssimilationReady()
     },
     assimilateNote() {
       this.openAssimilationPage().clickKeepForRepetition()
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
     },
   }
 }

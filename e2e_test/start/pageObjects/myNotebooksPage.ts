@@ -1,4 +1,5 @@
 /// <reference types="cypress" />
+import { pageIsNotLoading } from '../pageBase'
 import router from '../router'
 import type NotePath from '../../support/NotePath'
 import type { assumeNotePage } from './notePage'
@@ -37,7 +38,7 @@ const myNotebooksPage = () => {
 }
 
 export const navigateToNotebooksPage = () => {
-  cy.pageIsNotLoading()
+  pageIsNotLoading()
   router().push('/d/notebooks', 'notebooks', {})
   return myNotebooksPage()
 }

@@ -1,3 +1,4 @@
+import { pageIsNotLoading } from '../pageBase'
 import { form } from '../forms'
 import { navigateToNotebooksPage } from './myNotebooksPage'
 import { assumeAdminDashboardPage } from './adminPages/adminDashboardPage'
@@ -7,7 +8,7 @@ import { manageMCPTokensPage } from './manageMCPTokensPage'
 
 export const mainMenu = () => {
   navigateToNotebooksPage()
-  cy.pageIsNotLoading()
+  pageIsNotLoading()
 
   return {
     adminDashboard() {

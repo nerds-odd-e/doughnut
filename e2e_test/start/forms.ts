@@ -1,3 +1,4 @@
+import { pageIsNotLoading } from './pageBase'
 import { formField } from './formField'
 
 const inputElement = (label: string) => cy.findByLabelText(label)
@@ -45,7 +46,7 @@ const submittableForm = {
       } else {
         cy.findByRole('button', { name: 'Save' }).click()
       }
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
     })
   },
   submitWith(noteAttributes: Record<string, string | undefined>) {

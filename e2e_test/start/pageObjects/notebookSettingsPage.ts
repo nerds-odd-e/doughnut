@@ -1,3 +1,4 @@
+import { pageIsNotLoading } from '../pageBase'
 import { form } from '../forms'
 
 const notebookSettingsPage = () => {
@@ -16,7 +17,7 @@ const notebookSettingsPage = () => {
     skipMemoryTracking() {
       form.getField('Skip Memory Tracking').check()
       clickButton('Update Settings')
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
     },
     requestForNotebookApproval() {
       clickButton('Send Request')
@@ -45,35 +46,35 @@ const notebookSettingsPage = () => {
       }
 
       clickButton('Update Settings')
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
     },
     updateAiAssistantInstructions(instruction: string) {
       form.getField('Additional Instructions to AI').type(instruction)
       clickButton('Update Notebook AI Assistant Settings')
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
     },
     exportForObsidian() {
       cy.findByRole('button', { name: 'Export for Obsidian' }).click()
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       return this
     },
     importObsidianData(filename: string) {
       cy.contains('label', 'Import from Obsidian')
         .find('input[type="file"]')
         .selectFile(`e2e_test/fixtures/${filename}`, { force: true })
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       return this
     },
     reindexNotebook() {
       cy.findByRole('button', { name: 'Update index' }).click()
       // Wait for the indexing to complete - toast notification will appear
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       return this
     },
     shareNotebookToBazaar() {
       cy.findByRole('button', { name: 'Share notebook to bazaar' }).click()
       cy.findByRole('button', { name: 'OK' }).click()
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       return this
     },
     moveNotebookToCircle() {

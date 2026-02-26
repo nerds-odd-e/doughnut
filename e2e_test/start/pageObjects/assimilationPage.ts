@@ -1,4 +1,5 @@
 import { commonSenseSplit } from 'support/string_util'
+import { pageIsNotLoading } from '../pageBase'
 import { form } from '../forms'
 import router from '../router'
 
@@ -54,7 +55,7 @@ export const assumeAssimilationPage = () => ({
         this.proceedWithRememberingSpelling()
         this.verifySpellingWith(noteTitle.trim())
         this.expectPopupClosed()
-        cy.pageIsNotLoading()
+        pageIsNotLoading()
       })
     return this
   },
@@ -135,18 +136,18 @@ export const assumeAssimilationPage = () => ({
     )
   },
   expectUnderstandingPointsCount(count: number) {
-    cy.pageIsNotLoading()
+    pageIsNotLoading()
     understandingChecklist().scrollIntoView().should('be.visible')
     understandingChecklist().find('ul li').should('have.length', count)
     return this
   },
   expectUnderstandingChecklistNotShown() {
-    cy.pageIsNotLoading()
+    pageIsNotLoading()
     cy.contains('Understanding Checklist:').should('not.exist')
     return this
   },
   assimilateCurrentNote() {
-    cy.pageIsNotLoading()
+    pageIsNotLoading()
     this.clickKeepForRepetition()
     return this
   },
@@ -193,7 +194,7 @@ export const assumeAssimilationPage = () => ({
   },
   checkRememberSpellingOption() {
     form.getField('Remember Spelling').check()
-    cy.pageIsNotLoading()
+    pageIsNotLoading()
     return this
   },
   verifySpellingWith(text: string) {

@@ -1,4 +1,5 @@
 import { commonSenseSplit } from '../../support/string_util'
+import { pageIsNotLoading } from '../pageBase'
 import { form } from '../forms'
 import audioToolsPage from './audioToolsPage'
 import { assumeConversationAboutNotePage } from './conversationAboutNotePage'
@@ -90,7 +91,7 @@ export const assumeNotePage = (noteTopology?: string) => {
         cy.get('.relation-type').click()
       })
       form.getField('Relation Type').clickOption(relationType)
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       this.expectRelationshipTopic(relationType, target)
     },
 
@@ -159,7 +160,7 @@ export const assumeNotePage = (noteTopology?: string) => {
           cy.get('.dirty').should('not.exist')
         }
       }
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
     },
     audioTools() {
       this.toolbarButton('Audio tools').click()
@@ -203,7 +204,7 @@ export const assumeNotePage = (noteTopology?: string) => {
       return assumeNoteTargetSearchDialog()
     },
     addingChildNoteButton() {
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       return this.toolbarButton('Add Child Note')
     },
     addingChildNote() {
@@ -211,7 +212,7 @@ export const assumeNotePage = (noteTopology?: string) => {
       return noteCreationForm
     },
     addingNextSiblingNote() {
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       this.toolbarButton('Add Next Sibling Note').click()
       return noteCreationForm
     },
@@ -251,7 +252,7 @@ export const assumeNotePage = (noteTopology?: string) => {
     },
 
     moveUpAmongSiblings() {
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       noteSidebar()
       // Find current note in sidebar
       cy.findByRole('title')
@@ -280,7 +281,7 @@ export const assumeNotePage = (noteTopology?: string) => {
         })
     },
     moveDownAmongSiblings() {
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       noteSidebar()
       // Find current note in sidebar
       cy.findByRole('title')

@@ -1,9 +1,10 @@
+import { pageIsNotLoading } from '../pageBase'
 import { mainMenu } from '../pageObjects/mainMenu'
 import { HealthCheckController } from '@generated/backend/sdk.gen'
 
 export const loginActions = {
   logout() {
-    cy.pageIsNotLoading()
+    pageIsNotLoading()
     cy.wrap(null).as('currentLoginUser')
     return cy
       .request({

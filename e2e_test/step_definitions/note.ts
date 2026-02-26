@@ -249,8 +249,7 @@ When('I am creating a note under {notepath}', (notePath: NotePath) => {
 })
 
 Then('I should see {string} in breadcrumb', (noteTitles: string) => {
-  cy.pageIsNotLoading()
-  start.assumeNotePage().expectBreadcrumb(noteTitles)
+  start.pageIsNotLoading().assumeNotePage().expectBreadcrumb(noteTitles)
 })
 
 When('I visit all my notebooks', () => {
@@ -267,9 +266,11 @@ Then(
 Then(
   'I should see {notepath} with these children',
   (notePath: NotePath, data: DataTable) => {
-    const notePage = start.navigateToNotebooksPage().navigateToPath(notePath)
-    cy.pageIsNotLoading()
-    notePage.expectChildren(data.hashes())
+    start
+      .pageIsNotLoading()
+      .navigateToNotebooksPage()
+      .navigateToPath(notePath)
+      .expectChildren(data.hashes())
   }
 )
 
@@ -369,8 +370,7 @@ Then(
   'I should see {string} is {string} than {string}',
   (left: string, aging: string, right: string) => {
     let leftColor = ''
-    cy.pageIsNotLoading()
-    start.jumpToNotePage(left)
+    start.pageIsNotLoading().jumpToNotePage(left)
     cy.get('.note-recent-update-indicator')
       .invoke('css', 'color')
       .then((val) => {
@@ -460,7 +460,7 @@ Given(
       .replyToConversationAndInviteAiToReply(
         'Please complete the note details.'
       )
-    cy.pageIsNotLoading()
+    start.pageIsNotLoading()
   }
 )
 

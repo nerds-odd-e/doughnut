@@ -1,3 +1,4 @@
+import { pageIsNotLoading } from '../pageBase'
 import { form } from '../forms'
 
 function searchNote(searchKey: string, options: string[]) {
@@ -49,7 +50,7 @@ export const assumeNoteTargetSearchDialog = () => {
     moveUnder() {
       cy.findByRole('button', { name: 'Move Under' }).click()
       cy.findByRole('button', { name: 'OK' }).click()
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
     },
     createRelationshipToTargetAs(toNoteTopic: string, relationType: string) {
       cy.findCardTitle(toNoteTopic).then(($card) => {

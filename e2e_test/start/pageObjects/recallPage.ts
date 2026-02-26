@@ -1,4 +1,5 @@
 import { commonSenseSplit } from 'support/string_util'
+import { pageIsNotLoading } from '../pageBase'
 import router from '../router'
 
 const recallPage = () => {
@@ -19,7 +20,7 @@ const recallPage = () => {
       })
     },
     typeSpellingAnswer(answer: string) {
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       cy.clearFocusedText().type(answer).type('{enter}')
     },
     expectToRecallCounts(numberOfRecalls: string) {
@@ -49,7 +50,7 @@ const recallPage = () => {
       cy.findByRole('button', { name: 'Load more from next 3 days' }).click()
     },
     recallNotes(noteTitles: string) {
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       commonSenseSplit(noteTitles, ',').forEach((title) => {
         if (title === 'end') {
           cy.findByText(
@@ -64,7 +65,7 @@ const recallPage = () => {
     expectCurrentQuestion() {
       // Verify we're back to the quiz view (current question) by checking that
       // the question section exists, which means we're viewing a question, not an answered question
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       cy.get('[data-test="question-section"]').should('exist')
       return this
     },
@@ -87,7 +88,7 @@ export const recall = () => {
       getRecallListItemInSidebar(($el) => {
         $el.click()
       })
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       return recallPage()
     },
     assumeRecallPage() {

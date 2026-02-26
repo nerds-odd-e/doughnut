@@ -1,3 +1,4 @@
+import { pageIsNotLoading } from '../../pageBase'
 import { form } from '../../forms'
 
 export function adminFineTuningPage() {
@@ -9,7 +10,7 @@ export function adminFineTuningPage() {
     },
 
     expectFineTuningExamplesCount(count: number) {
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       cy.get('tbody').contains('tr td', 'Positive').should('have.length', count)
     },
 
@@ -27,7 +28,7 @@ export function adminFineTuningPage() {
         .clear()
         .type(newQuestion['Choice A'] ?? '')
       cy.findByRole('button', { name: 'Save' }).click()
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       cy.findByText(newQuestion['Question Stem'] ?? '')
     },
 

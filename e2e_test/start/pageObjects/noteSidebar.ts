@@ -1,3 +1,5 @@
+import { pageIsNotLoading } from '../pageBase'
+
 export const noteSidebar = () => {
   cy.findByRole('button', { name: 'toggle sidebar' }).then(($button) => {
     if (!$button.hasClass('sidebar-expanded')) {
@@ -23,7 +25,7 @@ export const noteSidebar = () => {
       })
     },
     expectOrderedNotes(expectedNotes: Record<string, string>[]) {
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       cy.get('aside ul li .title-text').then(($els) => {
         const actualNotes = Array.from($els, (el) => el.innerText)
         const expectedNoteTopics = expectedNotes.map(

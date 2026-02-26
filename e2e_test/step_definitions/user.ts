@@ -35,8 +35,7 @@ Given('I am re-logged in as an admin', (_tabName: string) => {
 })
 
 Given('my session is logged out', () => {
-  cy.pageIsNotLoading()
-  start.logout()
+  start.pageIsNotLoading().logout()
 })
 
 Given("I'm on the login page", () => {

@@ -1,3 +1,5 @@
+import { pageIsNotLoading } from '../pageBase'
+
 const assumeQuestionPage = (stem?: string) => {
   if (stem) {
     cy.findByText(stem)
@@ -17,7 +19,7 @@ const assumeQuestionPage = (stem?: string) => {
       cy.findByText(notebook, { selector: '.notebook-source *' })
     },
     skipQuestion() {
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       getQuestionSection().should('exist')
       cy.get('.daisy-progress-bar').first().click()
       cy.findByRole('button', { name: 'Move to end of list' }).click()
@@ -31,7 +33,7 @@ const assumeQuestionPage = (stem?: string) => {
         .within(() => {
           cy.findByText(answer).should('be.visible').click()
         })
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       // Wait for the answered overlay to disappear, indicating it moved to the next stage
       cy.get('[data-test="answered-overlay"]').should('not.exist')
       return this

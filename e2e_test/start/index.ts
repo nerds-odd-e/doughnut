@@ -1,5 +1,6 @@
 import './clientConfig'
 import mock_services from './mock_services/index'
+import { pageIsNotLoading as waitForPageNotLoading } from './pageBase'
 import { questionGenerationService } from './questionGenerationService'
 import router from './router'
 import testability from './testability'
@@ -40,6 +41,12 @@ import { recall } from './pageObjects/recallPage'
 import { form } from './forms'
 
 const start = {
+  // === Page Base ===
+  pageIsNotLoading() {
+    waitForPageNotLoading()
+    return this
+  },
+
   // === Router ===
   toRoot: () => router().toRoot(),
   routerPush: (

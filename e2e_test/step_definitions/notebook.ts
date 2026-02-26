@@ -25,9 +25,11 @@ Then(
       .navigateToNotebooksPage()
       .subscribedNotebooks()
       .openNotebook(noteTopology)
-    cy.pageIsNotLoading()
-    // For readonly notes, the toolbar shouldn't be rendered at all
-    start.assumeNotePage().addingChildNoteButton().shouldNotExist()
+    start
+      .pageIsNotLoading()
+      .assumeNotePage()
+      .addingChildNoteButton()
+      .shouldNotExist()
   }
 )
 

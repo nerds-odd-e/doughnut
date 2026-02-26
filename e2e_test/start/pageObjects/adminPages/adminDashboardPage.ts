@@ -1,3 +1,4 @@
+import { pageIsNotLoading } from '../../pageBase'
 import { adminFineTuningPage } from './adminFineTuningPage'
 import { submittableForm } from '../../forms'
 
@@ -56,7 +57,7 @@ export function assumeAdminDashboardPage() {
             .findByRole('button', { name: 'Remove' })
             .click()
           cy.findByRole('button', { name: 'OK' }).click()
-          cy.pageIsNotLoading()
+          pageIsNotLoading()
         },
       }
     },

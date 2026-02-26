@@ -1,8 +1,9 @@
 /// <reference types="cypress" />
 /// <reference path="../../support/index.d.ts" />
+import { pageIsNotLoading } from '../pageBase'
 
 export const subscribedNotebooks = () => {
-  cy.pageIsNotLoading()
+  pageIsNotLoading()
   cy.contains('h2', 'Subscribed Notebooks').should('exist')
 
   const getContainer = () => cy.contains('h2', 'Subscribed Notebooks').parent()

@@ -1,3 +1,4 @@
+import { pageIsNotLoading } from '../pageBase'
 import { form } from '../forms'
 
 export const SuggestQuestionForFineTuningPage = () => {
@@ -7,7 +8,7 @@ export const SuggestQuestionForFineTuningPage = () => {
   return {
     confirm() {
       cy.findByRole('button', { name: 'OK' }).click()
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
     },
     comment(comment: string) {
       form.getField('Comment').type(comment)

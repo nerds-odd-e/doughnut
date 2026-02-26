@@ -1,8 +1,9 @@
 import { commonSenseSplit } from '../../support/string_util'
+import { pageIsNotLoading } from '../pageBase'
 import { assumeNotePage } from './notePage'
 
 export const notebookList = () => {
-  cy.pageIsNotLoading()
+  pageIsNotLoading()
   return {
     expectNotebookCards: (notebooks: Record<string, string>[]) => {
       cy.get('.notebook-card h5').should('have.length', notebooks.length)
@@ -19,14 +20,14 @@ export const notebookList = () => {
       })
     },
     expectNotebooks: (notebooks: string) => {
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       cy.get('.notebook-card h5').then(($els) => {
         const cardTitles = Array.from($els, (el) => el.innerText)
         expect(cardTitles).to.deep.eq(commonSenseSplit(notebooks, ','))
       })
     },
     navigateToChild(notebook: string) {
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
       cy.get('.notebook-card').should('be.visible')
       cy.findByText(notebook, {
         selector: '.notebook-card h5',
@@ -41,7 +42,7 @@ export const notebookList = () => {
 
 export const findNotebookCardButton = (notebook: string, name: string) => {
   const finder = () => {
-    cy.pageIsNotLoading()
+    pageIsNotLoading()
     cy.get('.notebook-card').should('be.visible')
     // Find the card that contains the notebook title and store it as an alias
     cy.findByText(notebook, {

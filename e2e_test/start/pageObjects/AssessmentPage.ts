@@ -1,10 +1,12 @@
+import { pageIsNotLoading } from '../pageBase'
 import { CertificatePopup } from './CertificatePopup'
 import { assumeQuestionPage } from './QuizQuestionPage'
 
 const assumeWrongAnswerPage = () => {
   return {
     continueAssessment() {
-      cy.findByRole('button', { name: 'Continue' }).click().pageIsNotLoading()
+      cy.findByRole('button', { name: 'Continue' }).click()
+      pageIsNotLoading()
       cy.get('.is-selected').should('have.length', 0)
     },
     startConversationAboutAssessmentQuestion(feedback: string) {
@@ -87,7 +89,7 @@ export const assumeAssessmentPage = (notebook?: string) => {
       Cypress._.times(answersTable.length, () => {
         this.assumeQuestionSection().answerFromTable(answersTable)
       })
-      cy.pageIsNotLoading()
+      pageIsNotLoading()
     },
     answerYesNoQuestionsToScore(correctAnswers: number, allQuestions: number) {
       for (let i = 0; i < correctAnswers; i++) {

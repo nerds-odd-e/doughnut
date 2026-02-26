@@ -1,3 +1,4 @@
+import { pageIsNotLoading } from '../pageBase'
 import { findNotebookCardButton, notebookList } from './NotebookList'
 import notebookSettingsPage from './notebookSettingsPage'
 
@@ -12,7 +13,7 @@ export const notebookCard = (notebook: string) => ({
   unsubscribe() {
     findNotebookCardButton(notebook, 'Unsubscribe').click()
     cy.findByRole('button', { name: 'OK' }).click()
-    cy.pageIsNotLoading()
+    pageIsNotLoading()
   },
   editNotebookSettings() {
     findNotebookCardButton(notebook, 'Edit notebook settings').click()
