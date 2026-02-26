@@ -86,7 +86,7 @@ const onRememberSpellingChanged = (value: boolean) => {
 const processForm = async (skipMemoryTracking: boolean) => {
   if (skipMemoryTracking) {
     const confirmed = await popups.confirm(
-      "Confirm to hide this note from reviewing in the future?"
+      "Confirm to hide this note from recalls in the future?"
     )
     if (!confirmed) {
       return

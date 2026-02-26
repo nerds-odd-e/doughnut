@@ -437,7 +437,7 @@ describe("MemoryTrackerPageView", () => {
       await flushPromises()
 
       expect(wrapper.text()).toContain(
-        "This memory tracker is currently skipped and will not appear in review sessions."
+        "This memory tracker is currently skipped and will not appear in recall sessions."
       )
     })
 
@@ -493,7 +493,7 @@ describe("MemoryTrackerPageView", () => {
       expect(wrapper.text()).toContain("C")
     })
 
-    it("hides remove from review button when memory tracker is skipped", async () => {
+    it("hides remove from recall button when memory tracker is skipped", async () => {
       const memoryTracker = makeMe.aMemoryTracker
         .removedFromTracking(true)
         .please()
@@ -513,7 +513,7 @@ describe("MemoryTrackerPageView", () => {
       await flushPromises()
 
       const removeButton = wrapper.find(
-        'button[title="remove this note from review"]'
+        'button[title="remove this note from recall"]'
       )
       expect(removeButton.exists()).toBe(false)
     })

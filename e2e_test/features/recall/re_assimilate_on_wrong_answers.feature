@@ -5,7 +5,7 @@ Feature: Re-assimilate note after too many wrong answers
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with the head note "English" which skips review
+    And I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:
       | Title    | Details                        | Parent Title |
       | sedition | Sedition means incite violence | English      |

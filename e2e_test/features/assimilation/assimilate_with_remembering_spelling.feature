@@ -5,7 +5,7 @@ Feature: Assimilate With Remembering Spelling
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with the head note "English" which skips review
+    And I have a notebook with the head note "English" which skips memory tracking
 
   Scenario Outline: Remembering spelling availability depends on note details
     Given there are some notes:

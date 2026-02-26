@@ -1,9 +1,9 @@
-Feature: Review Pages
-  As a learner, I want to review my notes and links so that I have fresh memory.
+Feature: Assimilation and Recall Pages
+  As a learner, I want to assimilate and recall my notes and links so that I have fresh memory.
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with the head note "English" which skips review
+    And I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:
       | Title    | Details         | Image Url   | Parent Title |
       | Sedition | Incite violence |             | English      |

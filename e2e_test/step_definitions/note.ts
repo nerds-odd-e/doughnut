@@ -54,7 +54,7 @@ Given(
 )
 
 Given(
-  'I have a notebook with the head note {string} which skips review',
+  'I have a notebook with the head note {string} which skips memory tracking',
   (noteTopology: string) => {
     cy.get<string>('@currentLoginUser').then((username) => {
       start

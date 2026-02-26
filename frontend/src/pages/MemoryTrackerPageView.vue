@@ -1,7 +1,7 @@
 <template>
   <div v-if="isSkipped" class="daisy-alert daisy-alert-warning daisy-mb-4">
     <div class="daisy-flex daisy-items-center daisy-justify-between">
-      <span>This memory tracker is currently skipped and will not appear in review sessions.</span>
+      <span>This memory tracker is currently skipped and will not appear in recall sessions.</span>
       <button
         class="daisy-btn daisy-btn-sm daisy-btn-primary"
         title="Re-enable this memory tracker"
@@ -69,12 +69,12 @@
       <button
         v-if="!isSkipped"
         class="daisy-btn daisy-btn-secondary"
-        title="remove this note from review"
-        aria-label="remove this note from review"
-        @click="removeFromReview"
+        title="remove this note from recall"
+        aria-label="remove this note from recall"
+        @click="removeFromRecall"
       >
         <SvgNoReview />
-        <span>Remove from Review</span>
+        <span>Remove from Recall</span>
       </button>
     </div>
     <div v-if="memoryTracker.note" class="daisy-mb-6">
@@ -232,11 +232,9 @@ const deleteUnansweredPrompts = async () => {
   }
 }
 
-const removeFromReview = async () => {
+const removeFromRecall = async () => {
   if (
-    !(await popups.confirm(
-      `Confirm to hide this from reviewing in the future?`
-    ))
+    !(await popups.confirm(`Confirm to hide this from recalls in the future?`))
   ) {
     return
   }

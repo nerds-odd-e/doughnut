@@ -81,7 +81,7 @@
             :error-message="errors.skipMemoryTrackingEntirely"
           />
           <p class="field-hint">
-            When enabled, notes in this notebook will not be included in memory tracking and review sessions.
+            When enabled, notes in this notebook will not be included in memory tracking and recall sessions.
           </p>
         </div>
         <div class="settings-item">

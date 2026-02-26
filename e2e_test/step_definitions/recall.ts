@@ -255,7 +255,7 @@ Then('choose to remove the last memory tracker from recalls', () => {
     .assumeAnsweredQuestionPage()
     .goToLastAnsweredQuestion()
     .showMemoryTracker()
-    .removeMemoryTrackerFromReview('normal')
+    .removeMemoryTrackerFromRecall('normal')
 })
 
 Then('I should see the resume recall menu item', () => {

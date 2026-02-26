@@ -46,11 +46,11 @@ const noteMoreOptionsDialog = () => {
         })
       }
     },
-    removeMemoryTrackerFromReview(type: 'normal' | 'spelling') {
+    removeMemoryTrackerFromRecall(type: 'normal' | 'spelling') {
       cy.contains('tr', type).click()
       cy.url().should('include', '/d/memory-trackers/')
       cy.pageIsNotLoading()
-      return assumeMemoryTrackerPage().removeFromReview()
+      return assumeMemoryTrackerPage().removeFromRecall()
     },
     editNoteImage(attributes: Record<string, string>) {
       toolbarButton('Edit Note Image')
