@@ -133,18 +133,6 @@ export const assumeAssimilationPage = () => ({
       })
     )
   },
-  selectNoteType(noteType: string) {
-    form.fill({ 'Note Type': noteType })
-    cy.pageIsNotLoading()
-    return this
-  },
-  expectNoteTypePrompt() {
-    cy.pageIsNotLoading()
-    cy.get('[data-test="note-type-selection-dialog"]', {
-      timeout: 5000,
-    }).should('be.visible')
-    return this
-  },
   expectUnderstandingPointsCount(count: number) {
     cy.pageIsNotLoading()
     understandingChecklist().scrollIntoView().should('be.visible')
@@ -202,11 +190,6 @@ export const assumeAssimilationPage = () => ({
     })
     return this
   },
-  expectToRemainOnAssimilationPageFor(noteTitle: string) {
-    cy.url().should('include', '/assimilate')
-    cy.findByText(noteTitle).should('exist')
-    return this
-  },
   checkRememberSpellingOption() {
     cy.formField('Remember Spelling').check()
     cy.pageIsNotLoading()
@@ -239,14 +222,6 @@ export const assumeAssimilationPage = () => ({
   expectRememberingSpellingAvailable() {
     form.expectNoFieldError('Remember Spelling')
     cy.formField('Remember Spelling').should('not.be.disabled')
-    return this
-  },
-  updateNoteDetails(newDetails: string) {
-    cy.get('[role="details"]').click()
-    cy.focused().clear()
-    cy.focused().type(newDetails)
-    cy.get('body').click()
-    cy.pageIsNotLoading()
     return this
   },
 })

@@ -39,10 +39,6 @@ Then(
   }
 )
 
-Given('I go to the recalls page', () => {
-  start.recall().goToRecallPage()
-})
-
 Then(
   'I should see that I have {int} notes to recall',
   (numberOfNotes: number) => {
@@ -66,10 +62,6 @@ Then(
     start.recall().goToRecallPage().expectToRecallCounts(numberOfRecalls)
   }
 )
-
-Then('it should move to recall page', () => {
-  cy.url().should('eq', `${Cypress.config().baseUrl}/recalls`)
-})
 
 Then('I assimilate {string}', (noteTopology: string) => {
   start.assimilation().goToAssimilationPage().assimilateNotes(noteTopology)
@@ -101,17 +93,6 @@ Then('I am recalling my note on day {int}', (day: number) => {
 })
 
 When(
-  'I make a wrong answer on day {int}, answering {string} to {string}',
-  (day: number, wrongAnswer: string, questionStem: string) => {
-    start.testability().backendTimeTravelTo(day, 8)
-    cy.reload()
-    start.recall().goToRecallPage()
-    start.assumeQuestionPage(questionStem).answer(wrongAnswer)
-    start.assumeAnsweredQuestionPage().expectMCQAnswerToBeIncorrect(wrongAnswer)
-  }
-)
-
-When(
   'I make {int} wrong answers over {int} days since day {int}, answering {string} to {string}',
   (
     _numWrongAnswers: number,
@@ -124,7 +105,7 @@ When(
 
     const runIteration = (index: number) => {
       if (index >= days.length) return
-      const day = days[index]
+      const day = days[index]!
       start.testability().backendTimeTravelTo(day, 8)
       cy.reload()
       start.recall().goToRecallPage()
@@ -197,13 +178,6 @@ Then('I type my answer {string}', (answer: string) => {
 Then('I choose answer {string}', (answer: string) => {
   start.assumeQuestionPage().answer(answer)
 })
-
-Then(
-  'I should see the information of note {string}',
-  (noteTopology: string) => {
-    start.assumeNotePage(noteTopology)
-  }
-)
 
 Then(
   'I should see that my MCQ answer {string} is incorrect',
@@ -286,20 +260,6 @@ Then('I should be asked {string}', (expectedQuestionStem: string) => {
 })
 
 Then(
-  'I should see the question {string} is disabled',
-  (questionStem: string) => {
-    start.assumeQuestionPage(questionStem).isDisabled()
-  }
-)
-
-Then(
-  'I should see the question {string} is enabled',
-  (questionStem: string) => {
-    start.assumeQuestionPage(questionStem).isNotDisabled()
-  }
-)
-
-Then(
   'I suggest the question {string} of the note {string} as a good example',
   (questionStem: string, noteTopology: string) => {
     start
@@ -321,39 +281,12 @@ Then(
   }
 )
 
-Then('I should be able to select a note type', () => {
-  start.assumeAssimilationPage().expectNoteTypePrompt()
-})
-
 Then(
   'I should see an understanding checklist with {int} points',
   (count: number) => {
     start.assumeAssimilationPage().expectUnderstandingPointsCount(count)
   }
 )
-
-Given('the note type is {string}', (noteType: string) => {
-  start.assumeAssimilationPage().selectNoteType(noteType)
-})
-
-Then('I can continue with the assimilation', () => {
-  // Verify we're still on the assimilation page or moved to the next note
-  cy.url().should('satisfy', (url: string) => {
-    return url.includes('/assimilate') || url.includes('/recalls')
-  })
-})
-
-When(
-  'I navigate to the assimilation page for note {string}',
-  (noteTitle: string) => {
-    start.jumpToNotePage(noteTitle).moreOptions().openAssimilationPage()
-  }
-)
-
-When('I check the {string} option', (fieldLabel: string) => {
-  cy.formField(fieldLabel).check()
-  cy.pageIsNotLoading()
-})
 
 When(
   'I delete understanding points {int} and {int}',
@@ -408,18 +341,6 @@ Then(
     }
   }
 )
-
-Then(
-  'I should still be on the assimilate page for {string}',
-  (noteTitle: string) => {
-    start
-      .assumeAssimilationPage()
-      .expectToRemainOnAssimilationPageFor(noteTitle)
-  }
-)
-When('I update the note details to {string}', (newDetails: string) => {
-  start.assumeAssimilationPage().updateNoteDetails(newDetails)
-})
 
 When('I confirm re-assimilation', () => {
   start.assumeAnsweredQuestionPage().confirmReAssimilation()
