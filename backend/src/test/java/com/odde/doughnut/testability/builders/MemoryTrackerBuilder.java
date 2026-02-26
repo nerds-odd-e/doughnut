@@ -17,10 +17,10 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
     return this;
   }
 
-  public MemoryTrackerBuilder assimilatedAt(Timestamp reviewTimestamp) {
-    entity.setAssimilatedAt(reviewTimestamp);
-    entity.setLastRecalledAt(reviewTimestamp);
-    entity.setNextRecallAt(reviewTimestamp);
+  public MemoryTrackerBuilder assimilatedAt(Timestamp assimilatedTimestamp) {
+    entity.setAssimilatedAt(assimilatedTimestamp);
+    entity.setLastRecalledAt(assimilatedTimestamp);
+    entity.setNextRecallAt(assimilatedTimestamp);
     return this;
   }
 

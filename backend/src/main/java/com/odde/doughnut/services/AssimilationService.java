@@ -54,13 +54,13 @@ public class AssimilationService {
         .limit(remainingDailyCount);
   }
 
-  private Stream<Note> getDueNoteFromSubscription(List<Integer> todaysReviewedNoteIds) {
+  private Stream<Note> getDueNoteFromSubscription(List<Integer> todaysAssimilatedNoteIds) {
     return getSubscriptionStream()
         .flatMap(
             sub ->
                 getDueNoteToAssimilate(
                     subscriptionService.getUnassimilatedNotes(sub),
-                    subscriptionService.needToLearnCountToday(sub, todaysReviewedNoteIds)));
+                    subscriptionService.needToLearnCountToday(sub, todaysAssimilatedNoteIds)));
   }
 
   private int getRemainingDailyAssimilationCount() {

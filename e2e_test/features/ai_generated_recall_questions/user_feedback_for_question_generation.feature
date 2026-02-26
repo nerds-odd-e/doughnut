@@ -14,7 +14,7 @@ Feature: Improve OpenAI Question Generation using User Feedback
       | Who Let the Dogs Out | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men         |
 
 
-  Scenario: Admin can obtain training data from positively reviewed questions
+  Scenario: Admin can obtain training data from positively evaluated questions
     When I suggest the question "Who wrote 'Who Let the Dogs Out'?" of the note "Who Let the Dogs Out" as a good example
     Then an admin can retrieve the training data for question generation containing:
       | Question Stem                     | Choices                  |

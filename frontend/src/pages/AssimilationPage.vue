@@ -18,7 +18,7 @@ import timezoneParam from "@/managedApi/window/timezoneParam"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import AssimilationPageView from "./AssimilationPageView.vue"
 
-defineEmits(["update-reviewing"])
+defineEmits(["update-assimilating"])
 
 const { setDueCount, assimilatedCountOfTheDay, totalUnassimilatedCount } =
   useAssimilationCount()

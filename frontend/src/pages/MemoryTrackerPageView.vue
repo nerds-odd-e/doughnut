@@ -73,7 +73,7 @@
         aria-label="remove this note from recall"
         @click="removeFromRecall"
       >
-        <SvgNoReview />
+        <SvgNoRecall />
         <span>Remove from Recall</span>
       </button>
     </div>
@@ -166,7 +166,7 @@ import ConversationButton from "@/components/recall/ConversationButton.vue"
 import { MemoryTrackerController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "@/components/commons/Popups/usePopups"
-import SvgNoReview from "@/components/svgs/SvgNoReview.vue"
+import SvgNoRecall from "@/components/svgs/SvgNoRecall.vue"
 
 const props = defineProps({
   recallPrompts: {

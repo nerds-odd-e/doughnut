@@ -125,9 +125,9 @@ public class AiToolFactory {
 
     String messageBody =
 """
-Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
+Please assume the role of a Memory Assistant, which involves helping me recall and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
 
-      1. Review the below MCQ which is based on the note in the current contextual path, the MCQ could be incomplete or incorrect.
+      1. Examine the below MCQ which is based on the note in the current contextual path, the MCQ could be incomplete or incorrect.
       2. Only the top-level of the contextual path is visible to the user.
       3. Provide 2 to 4 choices with only 1 correct answer.
       4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.

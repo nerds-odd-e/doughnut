@@ -1,6 +1,6 @@
 Feature: semantical search
   As a learner, I want to search notes by their semantic meaning,
-  so that I can find the notes that I want to review.
+  so that I can find the notes that I want to view.
 
   This test use fake embeddings data.
   After the step "OpenAI returns embeddings successfully", the mock service will return the same fake embeddings data for all inputs,

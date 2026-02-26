@@ -12,7 +12,7 @@ Feature: Notes in circles
     Then I should see the notebook "Team agreement" in circle "Odd-e SG Team"
     When I add a note "Keep it complex" under "Team agreement"
 
-  Scenario: subscribe to a note and review
+  Scenario: subscribe to a note and view
     Given  There is a notebook "Team agreement" in circle "Odd-e SG Team" by "old_learner"
     When I subscribe to notebook "Team agreement" in the circle "Odd-e SG Team", with target of learning 1 notes per day
     Then  I should be able to edit the subscription to notebook "Team agreement"

@@ -55,17 +55,17 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   assimilateOneNote({
-    'Assimilation Type': reviewType,
+    'Assimilation Type': assimilationType,
     Title: title,
     'Additional Info': additionalInfo,
     Skip: skip,
   }: Record<string, string>) {
-    if (reviewType === 'assimilation done') {
+    if (assimilationType === 'assimilation done') {
       cy.contains("You've achieved your daily assimilation goal").should(
         'be.visible'
       )
     } else {
-      switch (reviewType) {
+      switch (assimilationType) {
         case 'single note': {
           cy.findByText(title, { selector: '[role=title]' })
           if (additionalInfo) {
@@ -111,7 +111,7 @@ export const assumeAssimilationPage = () => ({
         }
 
         default:
-          expect(reviewType).equal('a known assimilation page type')
+          expect(assimilationType).equal('a known assimilation page type')
       }
       if (skip === 'yes') {
         cy.findByText('Skip repetition').click()
