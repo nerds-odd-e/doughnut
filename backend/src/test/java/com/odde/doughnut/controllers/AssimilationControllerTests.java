@@ -51,7 +51,7 @@ class AssimilationControllerTests extends ControllerTestBase {
   }
 
   @Nested
-  class CreateInitialReviewPoint {
+  class CreateAssimilationPoint {
     @Test
     void create() {
       currentUser.setUser(null);

@@ -2,7 +2,7 @@
   <AssimilateSingleNotePageView
     :key="reloadKey"
     :note="note"
-    @initial-review-done="initialReviewDone"
+    @assimilation-done="assimilationDone"
     @reload-needed="onReloadNeeded"
   />
 </template>
@@ -30,7 +30,7 @@ const loadNote = async () => {
   }
 }
 
-const initialReviewDone = () => {
+const assimilationDone = () => {
   // Navigate back to the note after assimilation
   router.push({ name: "noteShow", params: { noteId } })
 }

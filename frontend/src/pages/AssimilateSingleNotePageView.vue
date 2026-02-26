@@ -9,7 +9,7 @@
     <Assimilation
       v-if="note"
       v-bind="{ note }"
-      @initial-review-done="initialReviewDone"
+      @assimilation-done="assimilationDone"
       @reload-needed="onReloadNeeded"
       :key="note.id"
     />
@@ -31,12 +31,12 @@ defineProps({
 })
 
 const emit = defineEmits<{
-  (e: "initial-review-done"): void
+  (e: "assimilation-done"): void
   (e: "reload-needed"): void
 }>()
 
-const initialReviewDone = () => {
-  emit("initial-review-done")
+const assimilationDone = () => {
+  emit("assimilation-done")
 }
 
 const onReloadNeeded = () => {

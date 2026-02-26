@@ -8,7 +8,7 @@ Feature: Notebook deletion
       | tech  | LeSS in Action |
 
   Scenario: Delete a notebook and undo
-    Given I initial review "LeSS in Action"
+    Given I assimilate "LeSS in Action"
     When I delete notebook "LeSS in Action"
     Then I should not see note "LeSS in Action" at the top level of all my notes
     When I undo delete note to recover note "LeSS in Action"

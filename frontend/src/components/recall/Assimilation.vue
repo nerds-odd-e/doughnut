@@ -57,7 +57,7 @@ const { note } = defineProps<{
 
 const emit = defineEmits<{
   (e: "reloadNeeded"): void
-  (e: "initialReviewDone"): void
+  (e: "assimilationDone"): void
 }>()
 
 // Composables
@@ -124,7 +124,7 @@ const doAssimilate = async (skipMemoryTracking: boolean) => {
     if (skipMemoryTracking) {
       emit("reloadNeeded")
     } else {
-      emit("initialReviewDone")
+      emit("assimilationDone")
     }
   }
 }
@@ -140,7 +140,7 @@ const handleSpellingCancel = () => {
 </script>
 
 <style>
-.initial-review-paused {
+.assimilation-paused {
   background-color: rgba(50, 50, 150, 0.8);
   padding: 5px;
   border-radius: 10px;

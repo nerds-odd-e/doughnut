@@ -100,7 +100,7 @@ describe("Assimilation component", () => {
   })
 
   describe("normal assimilation", () => {
-    it("emits initialReviewDone and increments counts correctly when assimilating normally", async () => {
+    it("emits assimilationDone and increments counts correctly when assimilating normally", async () => {
       assimilateSpy.mockResolvedValue(
         wrapSdkResponse([
           { id: 1, removedFromTracking: false },
@@ -117,7 +117,7 @@ describe("Assimilation component", () => {
       expect(assimilateSpy).toHaveBeenCalledWith({
         body: { noteId: note.id, skipMemoryTracking: false },
       })
-      expect(wrapper.emitted()).toHaveProperty("initialReviewDone")
+      expect(wrapper.emitted()).toHaveProperty("assimilationDone")
       expect(mockedTotalAssimilatedCount.value).toBe(2)
       expect(mockedIncrementAssimilatedCount).toHaveBeenCalledWith(2)
     })

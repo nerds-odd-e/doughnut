@@ -31,7 +31,7 @@ Then('I repeat more old {string}', (repeatNotes: string) => {
 })
 
 Then(
-  'On day {int} I recall {string} and initial review new {string}',
+  'On day {int} I recall {string} and assimilate new {string}',
   (day: number, repeatNotes: string, initialNotes: string) => {
     start.testability().timeTravelTo(day, 8)
     start.recall().goToRecallPage().recallNotes(repeatNotes)
@@ -74,7 +74,7 @@ Then('it should move to review page', () => {
   cy.url().should('eq', `${Cypress.config().baseUrl}/recalls`)
 })
 
-Then('I initial review {string}', (noteTopology: string) => {
+Then('I assimilate {string}', (noteTopology: string) => {
   start.assimilation().goToAssimilationPage().assimilateNotes(noteTopology)
 })
 

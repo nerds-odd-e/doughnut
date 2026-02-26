@@ -54,13 +54,13 @@ export const assumeAssimilationPage = () => ({
       })
     return this
   },
-  initialReviewOneNote({
+  assimilateOneNote({
     'Review Type': reviewType,
     Title: title,
     'Additional Info': additionalInfo,
     Skip: skip,
   }: Record<string, string>) {
-    if (reviewType === 'initial done') {
+    if (reviewType === 'assimilation done') {
       cy.contains("You've achieved your daily assimilation goal").should(
         'be.visible'
       )
@@ -124,14 +124,14 @@ export const assumeAssimilationPage = () => ({
   },
   assimilate(assimilations: Record<string, string>[]) {
     assimilations.forEach((assimilation) => {
-      this.initialReviewOneNote(assimilation)
+      this.assimilateOneNote(assimilation)
     })
   },
   assimilateNotes(noteTitles: string) {
     return this.assimilate(
       commonSenseSplit(noteTitles, ', ').map((title: string) => {
         return {
-          'Review Type': title === 'end' ? 'initial done' : 'single note',
+          'Review Type': title === 'end' ? 'assimilation done' : 'single note',
           Title: title,
         }
       })

@@ -18,7 +18,7 @@ Feature: Review Pages
       | single note  | Sedation | Put to sleep                |
       | image note   | Sedative | Sleep medicine; a_slide.jpg |
       | link         | Sedition | similar to; Sedation        |
-      | initial done |          |                             |
+      | assimilation done |          |                             |
 
   Scenario: Count of recall and assimilate notes
     Given It's day 1, 8 hour

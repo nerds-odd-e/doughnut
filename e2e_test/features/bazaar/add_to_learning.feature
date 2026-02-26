@@ -28,8 +28,8 @@ Feature: Bazaar subscription
     When I subscribe to notebook "Shape" in the bazaar, with target of learning 1 notes per day
     And the OpenAI service is unavailable due to invalid system token
     Then On day 1 I should have "0/2/4" note for assimilation and "0/0/0" for recall
-    And  On day 1 I recall "                     " and initial review new "Square, My memo, end"
-    And  On day 2 I recall "Square, My memo, end " and initial review new "Triangle, end       "
+    And  On day 1 I recall "                     " and assimilate new "Square, My memo, end"
+    And  On day 2 I recall "Square, My memo, end " and assimilate new "Triangle, end       "
     And  I should be able to edit the subscription to notebook "Shape"
 
   Scenario: No "add to learning" button for notebook with skip memory tracking

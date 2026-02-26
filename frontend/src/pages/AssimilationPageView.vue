@@ -3,7 +3,7 @@
     <div class="progress-container daisy-relative daisy-w-full">
       <div
         :class="`daisy-progress-bar daisy-w-full daisy-bg-gray-500 daisy-h-[25px] daisy-rounded-lg daisy-relative daisy-cursor-help ${false ? 'daisy-h-[5px]' : ''}`"
-        v-if="remainingInitialReviewCountForToday !== null"
+        v-if="remainingAssimilationCountForToday !== null"
         :title="`Daily Progress: ${assimilatedCountOfTheDay || 0} completed out of ${plannedForTheDay} planned for today`"
         @click="showTooltip = true"
       >
@@ -52,7 +52,7 @@
       <Assimilation
         v-if="note"
         v-bind="{ note }"
-        @initial-review-done="initialReviewDone"
+        @assimilation-done="assimilationDone"
         @reload-needed="onReloadNeeded"
         :key="`${note.id}-${note.updatedAt}`"
       />
@@ -84,19 +84,19 @@ const props = defineProps({
 })
 
 const emit = defineEmits<{
-  (e: "initial-review-done"): void
+  (e: "assimilation-done"): void
   (e: "reload-needed"): void
 }>()
 
 const note = computed(() => props.notes?.[0])
-const remainingInitialReviewCountForToday = computed(
+const remainingAssimilationCountForToday = computed(
   () => props.notes?.length || 0
 )
 
 const plannedForTheDay = computed(
   () =>
     (props.assimilatedCountOfTheDay || 0) +
-    remainingInitialReviewCountForToday.value
+    remainingAssimilationCountForToday.value
 )
 
 const totalPlannedCount = computed(
@@ -104,8 +104,8 @@ const totalPlannedCount = computed(
     (props.totalUnassimilatedCount || 0) + (props.assimilatedCountOfTheDay || 0)
 )
 
-const initialReviewDone = () => {
-  emit("initial-review-done")
+const assimilationDone = () => {
+  emit("assimilation-done")
 }
 
 const onReloadNeeded = () => {

@@ -72,7 +72,7 @@ describe("AssimilateSingleNotePage", () => {
       const pageView = wrapper.findComponent({
         name: "AssimilateSingleNotePageView",
       })
-      pageView.vm.$emit("initial-review-done")
+      pageView.vm.$emit("assimilation-done")
 
       await flushPromises()
 
