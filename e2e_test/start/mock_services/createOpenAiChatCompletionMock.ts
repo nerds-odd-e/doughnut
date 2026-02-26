@@ -81,21 +81,11 @@ const openAiChatCompletionStubber = (
         ],
       })
     },
-    stubQuestionGenerationWithBodyMatch(argumentsString: string) {
-      return stubJsonSchemaResponse(argumentsString)
-    },
+    stubJsonSchemaResponse,
     requestDoesNotMessageMatch(message: MessageToMatch) {
       return openAiChatCompletionStubber(serviceMocker, bodyToMatch, {
         messages: [message],
       })
-    },
-    stubAudioTranscriptToText(argumentsString: string) {
-      return stubJsonSchemaResponse(
-        JSON.stringify({
-          completion: argumentsString,
-          deleteFromEnd: 0,
-        })
-      )
     },
     stubQuestionEvaluation(argumentsString: string) {
       return serviceMocker.stubPoster(`/chat/completions`, {
@@ -111,18 +101,6 @@ const openAiChatCompletionStubber = (
           },
         ],
       })
-    },
-    stubUnderstandingChecklist(argumentsString: string) {
-      return stubJsonSchemaResponse(argumentsString)
-    },
-    stubExtractPointToChild(argumentsString: string) {
-      return stubJsonSchemaResponse(argumentsString)
-    },
-    stubExtractPointToSibling(argumentsString: string) {
-      return stubJsonSchemaResponse(argumentsString)
-    },
-    stubDeletePoints(argumentsString: string) {
-      return stubJsonSchemaResponse(argumentsString)
     },
   }
 }

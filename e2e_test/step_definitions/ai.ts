@@ -135,7 +135,12 @@ Given(
         role: 'user',
         content: `.*${data.hashes()[0]!['request contains']}.*`,
       })
-      .stubAudioTranscriptToText(data.hashes()[0]!.response!)
+      .stubJsonSchemaResponse(
+        JSON.stringify({
+          completion: data.hashes()[0]!.response!,
+          deleteFromEnd: 0,
+        })
+      )
   }
 )
 
@@ -196,7 +201,7 @@ Given(
           role: 'system',
           content: '.*Please generate an understanding checklist.*',
         })
-        .stubUnderstandingChecklist(reply)
+        .stubJsonSchemaResponse(reply)
     })
   }
 )
@@ -214,7 +219,7 @@ Given(
           role: 'system',
           content: '.*remove.*points.*',
         })
-        .stubDeletePoints(reply)
+        .stubJsonSchemaResponse(reply)
     })
   }
 )
@@ -241,7 +246,7 @@ Given(
           role: 'system',
           content: '.*extract.*point.*child.*',
         })
-        .stubExtractPointToChild(reply)
+        .stubJsonSchemaResponse(reply)
     })
   }
 )
@@ -268,7 +273,7 @@ Given(
           role: 'system',
           content: '.*extract.*point.*sibling.*',
         })
-        .stubExtractPointToSibling(reply)
+        .stubJsonSchemaResponse(reply)
     })
   }
 )

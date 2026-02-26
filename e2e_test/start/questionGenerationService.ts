@@ -84,7 +84,7 @@ export const questionGenerationService = () => ({
               },
             ],
           })
-          .stubQuestionGenerationWithBodyMatch(reply)
+          .stubJsonSchemaResponse(reply)
       }
     })
   },
