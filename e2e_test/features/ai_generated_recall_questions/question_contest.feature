@@ -20,15 +20,15 @@ Feature: User Contests Question generation by AI
 
     Examples:
     | Legitimate Question |  Current Question |
-    | legitamate          |  First question   |
-    | not legitamate      |  Second question  |
+    | legitimate          |  First question   |
+    | not legitimate      |  Second question  |
 
   Scenario: I should be able to contest a question
     # this is a difference when running this test local and in CI server 
     # in local, this test fails because there are two second questions displayed.
-    # Moving the "OpenAI evaluates the question as not legitamate" to right before "I contest the question" fixes the issue.
+    # Moving the "OpenAI evaluates the question as not legitimate" to right before "I contest the question" fixes the issue.
     # But it passes the test in CI server.
-    And OpenAI evaluates the question as not legitamate
+    And OpenAI evaluates the question as not legitimate
     Given I assimilated one note "Scuba Diving" on day 1
     And I am recalling my note on day 2
     When I contest the question

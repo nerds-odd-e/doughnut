@@ -11,6 +11,39 @@ import {
 import '../support/string_util'
 import start, { mock_services } from '../start'
 
+function parseSingleRowQuestion(questionTable: DataTable) {
+  const hashes = questionTable.hashes()
+  if (hashes.length !== 1 || !hashes[0]) {
+    throw new Error(
+      `Expected exactly one row in the data table, but got ${hashes.length}`
+    )
+  }
+  return hashes[0]
+}
+
+function stubExtractPointResponse(
+  contentPattern: string,
+  newNoteTitle: string,
+  newNoteDetails: string,
+  updatedParentDetails: string
+) {
+  const reply = JSON.stringify({
+    newNoteTitle,
+    newNoteDetails,
+    updatedParentDetails,
+  })
+  cy.then(async () => {
+    await mock_services
+      .openAi()
+      .chatCompletion()
+      .requestMessageMatches({
+        role: 'system',
+        content: contentPattern,
+      })
+      .stubJsonSchemaResponse(reply)
+  })
+}
+
 Given('the OpenAI service is unavailable due to invalid system token', () => {
   cy.then(async () => {
     await mock_services.openAi().alwaysResponseAsUnauthorized()
@@ -43,51 +76,35 @@ Given('An OpenAI response is unavailable', () => {
 })
 
 Given('OpenAI generates this question:', (questionTable: DataTable) => {
-  const hashes = questionTable.hashes()
-  if (hashes.length !== 1 || !hashes[0]) {
-    throw new Error(
-      `Expected exactly one row in the data table, but got ${hashes.length}`
-    )
-  }
   start
     .questionGenerationService()
-    .resetAndStubAskingMCQByChatCompletion(hashes[0])
+    .resetAndStubAskingMCQByChatCompletion(
+      parseSingleRowQuestion(questionTable)
+    )
 })
 
 Given(
   'OpenAI generates this as first question:',
   (questionTable: DataTable) => {
-    const hashes = questionTable.hashes()
-    if (hashes.length !== 1 || !hashes[0]) {
-      throw new Error(
-        `Expected exactly one row in the data table, but got ${hashes.length}`
-      )
-    }
-    // Store the first question as the default
     start
       .questionGenerationService()
-      .resetAndStubAskingMCQByChatCompletion(hashes[0])
+      .resetAndStubAskingMCQByChatCompletion(
+        parseSingleRowQuestion(questionTable)
+      )
   }
 )
 
 Given(
   'OpenAI generates this as second question:',
   (questionTable: DataTable) => {
-    const hashes = questionTable.hashes()
-    if (hashes.length !== 1 || !hashes[0]) {
-      throw new Error(
-        `Expected exactly one row in the data table, but got ${hashes.length}`
-      )
-    }
-    // Register the second question to be used after contest
+    const question = parseSingleRowQuestion(questionTable)
     cy.then(async () => {
-      // Just store the data, it will be used by the "not legitamate" step
-      Cypress.env('secondQuestion', hashes[0])
+      Cypress.env('secondQuestion', question)
     })
   }
 )
 
-Given('OpenAI evaluates the question as legitamate', () => {
+Given('OpenAI evaluates the question as legitimate', () => {
   start.questionGenerationService().stubEvaluationQuestion({
     feasibleQuestion: true,
     correctChoices: [0],
@@ -95,7 +112,7 @@ Given('OpenAI evaluates the question as legitamate', () => {
   })
 })
 
-Given('OpenAI evaluates the question as not legitamate', () => {
+Given('OpenAI evaluates the question as not legitimate', () => {
   start.questionGenerationService().stubEvaluationQuestion({
     feasibleQuestion: false,
     correctChoices: [0],
@@ -141,26 +158,6 @@ Given(
           deleteFromEnd: 0,
         })
       )
-  }
-)
-
-Given(
-  'OpenAI will reply below for user messages with notebook-specific instructions:',
-  (data: DataTable) => {
-    // Conversations use Chat Completion API
-    // Notebook-specific instructions are included in system messages
-    mock_services.openAi().stubChatCompletionStream(data.hashes())
-  }
-)
-
-Given(
-  'I set my notebook {string} to use additional AI instruction {string}',
-  (notebook: string, instruction: string) => {
-    start
-      .routerToNotebooksPage()
-      .notebookCard(notebook)
-      .editNotebookSettings()
-      .updateAiAssistantInstructions(instruction)
   }
 )
 
@@ -227,53 +224,33 @@ Given(
 Given(
   'OpenAI will extract point {string} to child note with title {string} and details {string} and updated parent details {string}',
   (
-    point: string,
+    _point: string,
     newNoteTitle: string,
     newNoteDetails: string,
     updatedParentDetails: string
   ) => {
-    const result = {
+    stubExtractPointResponse(
+      '.*extract.*point.*child.*',
       newNoteTitle,
       newNoteDetails,
-      updatedParentDetails,
-    }
-    const reply = JSON.stringify(result)
-    cy.then(async () => {
-      await mock_services
-        .openAi()
-        .chatCompletion()
-        .requestMessageMatches({
-          role: 'system',
-          content: '.*extract.*point.*child.*',
-        })
-        .stubJsonSchemaResponse(reply)
-    })
+      updatedParentDetails
+    )
   }
 )
 
 Given(
   'OpenAI will extract point {string} to sibling note with title {string} and details {string} and updated parent details {string}',
   (
-    point: string,
+    _point: string,
     newNoteTitle: string,
     newNoteDetails: string,
     updatedParentDetails: string
   ) => {
-    const result = {
+    stubExtractPointResponse(
+      '.*extract.*point.*sibling.*',
       newNoteTitle,
       newNoteDetails,
-      updatedParentDetails,
-    }
-    const reply = JSON.stringify(result)
-    cy.then(async () => {
-      await mock_services
-        .openAi()
-        .chatCompletion()
-        .requestMessageMatches({
-          role: 'system',
-          content: '.*extract.*point.*sibling.*',
-        })
-        .stubJsonSchemaResponse(reply)
-    })
+      updatedParentDetails
+    )
   }
 )
