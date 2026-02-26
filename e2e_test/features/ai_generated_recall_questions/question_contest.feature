@@ -5,7 +5,7 @@ Feature: User Contests Question generation by AI
   Background:
     Given I am logged in as an existing user
     And I have a notebook with the head note "Scuba Diving"
-    Given OpenAI generates this as first question:
+    And OpenAI generates this as first question:
       | Question Stem   | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | First question  | Rescue Diver   | Divemaster         | Open Water Diver   |
     And OpenAI generates this as second question:
@@ -16,20 +16,16 @@ Feature: User Contests Question generation by AI
     Given OpenAI evaluates the question as <Legitimate Question>
     And I assimilated one note "Scuba Diving" on day 1
     When I am recalling my note on day 2
-    And I should be asked "<Current Question>"
+    Then I should be asked "<Current Question>"
 
     Examples:
-    | Legitimate Question |  Current Question |
-    | legitimate          |  First question   |
-    | not legitimate      |  Second question  |
+    | Legitimate Question | Current Question |
+    | legitimate          | First question   |
+    | not legitimate      | Second question  |
 
   Scenario: I should be able to contest a question
-    # this is a difference when running this test local and in CI server 
-    # in local, this test fails because there are two second questions displayed.
-    # Moving the "OpenAI evaluates the question as not legitimate" to right before "I contest the question" fixes the issue.
-    # But it passes the test in CI server.
-    And OpenAI evaluates the question as not legitimate
-    Given I assimilated one note "Scuba Diving" on day 1
+    Given OpenAI evaluates the question as not legitimate
+    And I assimilated one note "Scuba Diving" on day 1
     And I am recalling my note on day 2
     When I contest the question
     Then I should be asked "Second question"
