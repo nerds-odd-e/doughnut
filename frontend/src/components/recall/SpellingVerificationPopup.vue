@@ -4,7 +4,7 @@
       <h2 data-test="spelling-verification-popup">Verify Spelling</h2>
     </template>
     <template #body>
-      <p class="daisy-mb-4">Please type the note title to verify your spelling:</p>
+      <p class="daisy-mb-4">Please type the note title from memory:</p>
       <input
         v-model="userInput"
         type="text"
