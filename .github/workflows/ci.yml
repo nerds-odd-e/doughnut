@@ -103,7 +103,7 @@ jobs:
         run: pnpm bundle:all
       - name: Build application jar artifact
         run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
           path: backend/build/libs/${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
@@ -160,7 +160,7 @@ jobs:
           node_version: ${{ vars.NODE_VERSION }}
           pnpm_version: ${{ vars.PNPM_VERSION }}
           force_install: "true"
-      - uses: cypress-io/github-action@v7.1.3
+      - uses: cypress-io/github-action@v7.1.4
         with:
           browser: chrome
           config-file: e2e_test/config/ci.ts
@@ -172,7 +172,7 @@ jobs:
           install: true
         env:
           GITHUB_FOR_ISSUES_API_TOKEN: ${{ env.GITHUB_FOR_ISSUES_API_TOKEN }}
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: cypress-screenshots
