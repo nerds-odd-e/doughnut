@@ -18,7 +18,7 @@ overrides:
   express: '>=5.2.0'
   systeminformation: '>=5.31.0'
   qs: '>=6.14.2'
-  hono: ^4.12.2
+  hono: ^4.12.3
   undici: '>=6.23.0'
   diff: '>=8.0.3'
   lodash-es: '>=4.17.23'
@@ -98,7 +98,7 @@ importers:
         specifier: ^14.6.6
         version: 14.6.6
       hono:
-        specifier: ^4.12.2
+        specifier: ^4.12.3
         version: 4.12.3
       npm-run-all2:
         specifier: ^8.0.4
@@ -1177,7 +1177,7 @@ packages:
     resolution: {integrity: sha512-vHL6w3ecZsky+8P5MD+eFfaGTyCeOHUIFYMGpQGbrBTSmNNoxv0if69rEZ5giu36weC5saFuznL411gRX7bJDw==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
-      hono: ^4.12.2
+      hono: ^4.12.3
 
   '@humanwhocodes/momoa@2.0.4':
     resolution: {integrity: sha512-RE815I4arJFtt+FVeU1Tgp9/Xvecacji8w/V6XtXsWWH/wz/eNkNbhb+ny/+PlVZjV0rxQpRSQKNKE3lcktHEA==}
