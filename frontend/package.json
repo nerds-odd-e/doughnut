@@ -51,7 +51,7 @@
     "@vue/server-renderer": "^3.5.29",
     "@vue/test-utils": "2.4.6",
     "autoprefixer": "^10.4.27",
-    "daisyui": "4.12.23",
+    "daisyui": "4.12.24",
     "es-toolkit": "^1.44.0",
     "esbuild": "0.27.3",
     "gsap": "^3.14.2",
