@@ -115,7 +115,8 @@
       "axios": ">=1.13.5",
       "minimatch": ">=10.2.3",
       "ajv": ">=8.18.0",
-      "rollup": ">=4.59.0"
+      "rollup": ">=4.59.0",
+      "serialize-javascript": ">=7.0.3"
     },
     "onlyBuiltDependencies": [
       "@badeball/cypress-cucumber-preprocessor",
