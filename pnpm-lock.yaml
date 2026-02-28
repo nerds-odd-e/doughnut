@@ -59,8 +59,8 @@ importers:
         specifier: ^12.7.0
         version: 12.7.0
       '@hey-api/openapi-ts':
-        specifier: 0.93.0
-        version: 0.93.0(typescript@5.9.3)
+        specifier: 0.93.1
+        version: 0.93.1(typescript@5.9.3)
       '@mbtest/mountebank':
         specifier: 2.9.2
         version: 2.9.2
@@ -68,8 +68,8 @@ importers:
         specifier: ^1.27.1
         version: 1.27.1(zod@4.3.6)
       '@redocly/cli':
-        specifier: ^2.19.2
-        version: 2.19.2(@opentelemetry/api@1.9.0)(core-js@3.46.0)
+        specifier: ^2.20.0
+        version: 2.20.0(@opentelemetry/api@1.9.0)(core-js@3.46.0)
       '@testing-library/cypress':
         specifier: 10.1.0
         version: 10.1.0(cypress@15.11.0)
@@ -77,7 +77,7 @@ importers:
         specifier: ^4.0.5
         version: 4.0.5
       '@types/jquery':
-        specifier: ^3.5.33
+        specifier: 3.5.33
         version: 3.5.33
       '@types/node':
         specifier: 25.3.2
@@ -1155,8 +1155,8 @@ packages:
     resolution: {integrity: sha512-7atnpUkT8TyUPHYPLk91j/GyaqMuwTEHanLOe50Dlx0EEvNuQqFD52Yjg8x4KU0UFL1mWlyhE+sUE/wAtQ1N2A==}
     engines: {node: '>=20.19.0'}
 
-  '@hey-api/openapi-ts@0.93.0':
-    resolution: {integrity: sha512-LzYpKHRSasPGJFP+UvgrvlhLBa5W0roqKJKAJCTbAMpAKutC0jcWegkYXD3m85RFpBU2aXFDJrG99hf3xw1QMA==}
+  '@hey-api/openapi-ts@0.93.1':
+    resolution: {integrity: sha512-oQJPHiVkJKesZFpoW3jfQhrSQ7xdgzai7895ENl6ZDjCaIK6bOUTly7bsu+7+0ONsGH9jbtGbkoUzC+MtY+RKg==}
     engines: {node: '>=20.19.0'}
     hasBin: true
     peerDependencies:
@@ -1469,8 +1469,8 @@ packages:
   '@redocly/ajv@8.17.4':
     resolution: {integrity: sha512-BieiCML/IgP6x99HZByJSt7fJE4ipgzO7KAFss92Bs+PEI35BhY7vGIysFXLT+YmS7nHtQjZjhOQyPPEf7xGHA==}
 
-  '@redocly/cli@2.19.2':
-    resolution: {integrity: sha512-eT0hDCFwXceOUD7UxMltCk6baE9cOlCJ0LsBWFMHlaUYhkBztts0BoLx+nQTSqDUPCMGg0BKRLuNuHe3CR4HeA==}
+  '@redocly/cli@2.20.0':
+    resolution: {integrity: sha512-8R+NzB2RnT0PacozLRfdKymqWb6YtD1IbrW74e9Q63lhRcLUHYJWtHNoxT98C0k0R/7gViKhBJIygUecybIn0A==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
     hasBin: true
 
@@ -1484,12 +1484,12 @@ packages:
     resolution: {integrity: sha512-/oy8sXi5xK4+HvcFR7xS1A74zJ5aS6rtacNEr91SczLqvtxz79opxp7yYpdYtfGQAp6igx9eU9alwSC/R/X3Cg==}
     engines: {node: '>=18.17.0', npm: '>=9.5.0'}
 
-  '@redocly/openapi-core@2.19.2':
-    resolution: {integrity: sha512-eooTSDKyN0F4YOjLPh/ajcvpzg/Rv7y5+Os/EyyCc2yu+zA+gZhSykQnOAIXcrSzrjn1bNpe4QF9eZNFLX4q0A==}
+  '@redocly/openapi-core@2.20.0':
+    resolution: {integrity: sha512-cyMqjFt0jKp0FDYX5MYGbg+jdUXVvrtSMadRaviaoq1o4JmuejIaK7+fnhJhBZD389ui6ihJp2//nI2MIgQWMw==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
-  '@redocly/respect-core@2.19.2':
-    resolution: {integrity: sha512-Ng5m9Sh+6PNW5rFrGQMucphRK/1EtMwLGeJVZBMDGe7YofiyqziDLQvJbI4aHzN2RKrYA585PKGZOQekWfoaCA==}
+  '@redocly/respect-core@2.20.0':
+    resolution: {integrity: sha512-bslonUVnd2hPr1UbZnBCghB7gaoddBcYq6pSIL025N0xQT5s93ZU6zufJtJzm2c2RNWUBHyL6pfmZrrlb2nm+A==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
   '@rolldown/pluginutils@1.0.0-rc.2':
@@ -7322,7 +7322,7 @@ snapshots:
       '@types/json-schema': 7.0.15
       js-yaml: 4.1.1
 
-  '@hey-api/openapi-ts@0.93.0(typescript@5.9.3)':
+  '@hey-api/openapi-ts@0.93.1(typescript@5.9.3)':
     dependencies:
       '@hey-api/codegen-core': 0.7.0(typescript@5.9.3)
       '@hey-api/json-schema-ref-parser': 1.3.1
@@ -7652,14 +7652,14 @@ snapshots:
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
-  '@redocly/cli@2.19.2(@opentelemetry/api@1.9.0)(core-js@3.46.0)':
+  '@redocly/cli@2.20.0(@opentelemetry/api@1.9.0)(core-js@3.46.0)':
     dependencies:
       '@opentelemetry/exporter-trace-otlp-http': 0.202.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/resources': 2.0.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-node': 2.0.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.34.0
-      '@redocly/openapi-core': 2.19.2
-      '@redocly/respect-core': 2.19.2
+      '@redocly/openapi-core': 2.20.0
+      '@redocly/respect-core': 2.20.0
       abort-controller: 3.0.0
       ajv: 8.18.0
       ajv-formats: 3.0.1(ajv@8.18.0)
@@ -7711,7 +7711,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@redocly/openapi-core@2.19.2':
+  '@redocly/openapi-core@2.20.0':
     dependencies:
       '@redocly/ajv': 8.17.4
       '@redocly/config': 0.43.0
@@ -7724,12 +7724,12 @@ snapshots:
       pluralize: 8.0.0
       yaml-ast-parser: 0.0.43
 
-  '@redocly/respect-core@2.19.2':
+  '@redocly/respect-core@2.20.0':
     dependencies:
       '@faker-js/faker': 7.6.0
       '@noble/hashes': 1.8.0
       '@redocly/ajv': 8.17.4
-      '@redocly/openapi-core': 2.19.2
+      '@redocly/openapi-core': 2.20.0
       ajv: 8.18.0
       better-ajv-errors: 1.2.0(ajv@8.18.0)
       colorette: 2.0.20
@@ -9604,7 +9604,7 @@ snapshots:
       '@one-ini/wasm': 0.1.1
       commander: 10.0.1
       minimatch: 10.2.3
-      semver: 7.7.3
+      semver: 7.7.4
 
   ee-first@1.1.1: {}
 
@@ -11152,7 +11152,7 @@ snapshots:
       oas-kit-common: 1.0.8
       reftools: 1.1.9
       yaml: 1.10.2
-      yargs: 17.0.1
+      yargs: 17.7.2
 
   oas-schema-walker@1.1.5: {}
 
@@ -12307,7 +12307,7 @@ snapshots:
       oas-validator: 5.0.8
       reftools: 1.1.9
       yaml: 1.10.2
-      yargs: 17.0.1
+      yargs: 17.7.2
     transitivePeerDependencies:
       - encoding
 
