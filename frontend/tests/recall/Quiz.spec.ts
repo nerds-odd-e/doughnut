@@ -147,7 +147,6 @@ describe("repeat page", () => {
         type: "SpellingResult",
         note: makeMe.aNote.please(),
         answer: { id: 1, correct: true, spellingAnswer: "cat" },
-        isCorrect: true,
       }
       const mockedAnswerSpelling = mockSdkService(
         "answerSpelling",

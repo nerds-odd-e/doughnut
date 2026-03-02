@@ -309,7 +309,7 @@ const onAnsweredQuestion = async (answerResult: QuestionResult) => {
 const onAnsweredSpelling = async (answerResult: SpellingResult) => {
   moveToNextMemoryTracker()
   previousAnsweredQuestions.value.push(answerResult)
-  if (!answerResult.isCorrect) {
+  if (!answerResult.answer?.correct) {
     viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
   }
   if (answerResult.thresholdExceeded) {

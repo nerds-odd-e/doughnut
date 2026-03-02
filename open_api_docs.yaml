@@ -4138,8 +4138,6 @@ components:
             $ref: "#/components/schemas/Note"
           answer:
             $ref: "#/components/schemas/Answer"
-          isCorrect:
-            type: boolean
           memoryTrackerId:
             type: integer
             format: int32

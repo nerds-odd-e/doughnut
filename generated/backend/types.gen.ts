@@ -238,7 +238,6 @@ export type RecallResult = {
 export type SpellingResult = Omit<RecallResult, 'type'> & {
     note?: Note;
     answer?: Answer;
-    isCorrect?: boolean;
     memoryTrackerId?: number;
     thresholdExceeded?: boolean;
     type: 'SpellingResult';
@@ -687,7 +686,6 @@ export type QuestionResultWritable = Omit<RecallResult, 'type'> & {
 export type SpellingResultWritable = Omit<RecallResult, 'type'> & {
     note?: NoteWritable;
     answer?: Answer;
-    isCorrect?: boolean;
     memoryTrackerId?: number;
     thresholdExceeded?: boolean;
     type: 'SpellingResultWritable';

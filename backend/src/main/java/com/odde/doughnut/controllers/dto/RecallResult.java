@@ -17,10 +17,6 @@ public sealed interface RecallResult
   record QuestionResult(AnsweredQuestion answeredQuestion) implements RecallResult {}
 
   record SpellingResult(
-      Note note,
-      Answer answer,
-      Boolean isCorrect,
-      Integer memoryTrackerId,
-      Boolean thresholdExceeded)
+      Note note, Answer answer, Integer memoryTrackerId, Boolean thresholdExceeded)
       implements RecallResult {}
 }

@@ -402,7 +402,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
       answerDTO.setSpellingAnswer("this");
       assertTrue(
           ((RecallResult.SpellingResult) controller.answerSpelling(recallPrompt, answerDTO))
-              .isCorrect());
+              .answer()
+              .getCorrect());
       // Create a new recall prompt for the second answer
       RecallPrompt secondRecallPrompt =
           makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
@@ -411,7 +412,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
       assertTrue(
           ((RecallResult.SpellingResult)
                   controller.answerSpelling(secondRecallPrompt, secondAnswerDTO))
-              .isCorrect());
+              .answer()
+              .getCorrect());
     }
 
     @Test
@@ -419,7 +421,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
       RecallResult.SpellingResult answerResult =
           (RecallResult.SpellingResult) controller.answerSpelling(recallPrompt, answerDTO);
-      assertTrue(answerResult.isCorrect());
+      assertTrue(answerResult.answer().getCorrect());
       assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
     }
 
@@ -428,7 +430,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       answerDTO.setThinkingTimeMs(5000);
       RecallResult.SpellingResult answerResult =
           (RecallResult.SpellingResult) controller.answerSpelling(recallPrompt, answerDTO);
-      assertTrue(answerResult.isCorrect());
+      assertTrue(answerResult.answer().getCorrect());
       RecallPrompt reloadedPrompt = makeMe.refresh(recallPrompt);
       Answer answer = reloadedPrompt.getAnswer();
       assertNotNull(answer);
@@ -560,7 +562,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
         Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
         RecallResult.SpellingResult answerResult =
             (RecallResult.SpellingResult) controller.answerSpelling(recallPrompt, answerDTO);
-        assertFalse(answerResult.isCorrect());
+        assertFalse(answerResult.answer().getCorrect());
         assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
       }
 

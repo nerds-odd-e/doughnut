@@ -301,7 +301,6 @@ describe("repeat page", () => {
         type: "SpellingResult",
         note,
         answer: { id: 1, correct: false, spellingAnswer: "test answer" },
-        isCorrect: false,
         memoryTrackerId: 123,
       }
 
