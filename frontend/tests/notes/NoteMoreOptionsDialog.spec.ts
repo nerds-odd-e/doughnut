@@ -8,7 +8,6 @@ import helper, {
   wrapSdkError,
 } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
-import type { NoteInfo } from "@generated/backend"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { createRouter, createWebHistory } from "vue-router"
@@ -20,16 +19,14 @@ let getNoteInfoSpy: ReturnType<typeof mockSdkService<"getNoteInfo">>
 let updateNoteTypeSpy: ReturnType<typeof mockSdkService<"updateNoteType">>
 let deleteNoteSpy: ReturnType<typeof mockSdkService<"deleteNote">>
 
-const mockNoteInfo: NoteInfo = {
-  recallSetting: {
-    level: 0,
-    rememberSpelling: false,
-    skipMemoryTracking: false,
-  },
-  memoryTrackers: [],
-  createdAt: "",
-  noteType: undefined,
+const defaultRecallSetting = {
+  level: 0,
+  rememberSpelling: false,
+  skipMemoryTracking: false,
 }
+const mockNoteInfo = makeMe.aNoteInfo
+  .recallSetting(defaultRecallSetting)
+  .please()
 
 afterEach(() => {
   document.body.innerHTML = ""
@@ -74,10 +71,10 @@ describe("NoteMoreOptionsDialog", () => {
     })
 
     it("initializes note type from fetched noteInfo", async () => {
-      const noteInfoWithType: NoteInfo = {
-        ...mockNoteInfo,
-        noteType: "concept",
-      }
+      const noteInfoWithType = makeMe.aNoteInfo
+        .recallSetting(defaultRecallSetting)
+        .noteType("concept")
+        .please()
       getNoteInfoSpy.mockResolvedValue(wrapSdkResponse(noteInfoWithType))
       const wrapper = renderer.withProps({ note }).mount()
 

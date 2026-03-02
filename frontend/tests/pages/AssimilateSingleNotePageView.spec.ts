@@ -9,16 +9,16 @@ let renderer: RenderingHelper<typeof AssimilateSingleNotePageView>
 
 beforeEach(() => {
   const noteRealm = makeMe.aNoteRealm.please()
-  mockSdkService("getNoteInfo", {
-    recallSetting: {
-      level: 0,
-      rememberSpelling: false,
-      skipMemoryTracking: false,
-    },
-    memoryTrackers: [],
-    createdAt: "",
-    noteType: undefined,
-  })
+  mockSdkService(
+    "getNoteInfo",
+    makeMe.aNoteInfo
+      .recallSetting({
+        level: 0,
+        rememberSpelling: false,
+        skipMemoryTracking: false,
+      })
+      .please()
+  )
   mockSdkService("showNoteAccessory", {})
   mockSdkService("showNote", noteRealm)
   mockSdkService("generateUnderstandingChecklist", { points: [] })

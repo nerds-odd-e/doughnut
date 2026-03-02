@@ -3,7 +3,6 @@ import NoteMoreOptionsDialog from "@/components/notes/accessory/NoteMoreOptionsD
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { mockSdkService } from "@tests/helpers"
-import type { NoteInfo } from "@generated/backend"
 import { describe, it, expect, afterEach } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 
@@ -18,16 +17,16 @@ describe("NoteToolbar", () => {
 
   it("displays menu items when dropdown is open", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    const mockNoteInfo: NoteInfo = {
-      recallSetting: {
-        level: 0,
-        rememberSpelling: false,
-        skipMemoryTracking: false,
-      },
-      memoryTrackers: [],
-      createdAt: "",
-    }
-    mockSdkService("getNoteInfo", mockNoteInfo)
+    mockSdkService(
+      "getNoteInfo",
+      makeMe.aNoteInfo
+        .recallSetting({
+          level: 0,
+          rememberSpelling: false,
+          skipMemoryTracking: false,
+        })
+        .please()
+    )
 
     wrapper = helper
       .component(NoteToolbar)
@@ -59,16 +58,16 @@ describe("NoteToolbar", () => {
 
   it("closes more options dialog when note id changes", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    const mockNoteInfo: NoteInfo = {
-      recallSetting: {
-        level: 0,
-        rememberSpelling: false,
-        skipMemoryTracking: false,
-      },
-      memoryTrackers: [],
-      createdAt: "",
-    }
-    mockSdkService("getNoteInfo", mockNoteInfo)
+    mockSdkService(
+      "getNoteInfo",
+      makeMe.aNoteInfo
+        .recallSetting({
+          level: 0,
+          rememberSpelling: false,
+          skipMemoryTracking: false,
+        })
+        .please()
+    )
 
     wrapper = helper
       .component(NoteToolbar)

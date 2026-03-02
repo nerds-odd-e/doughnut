@@ -33,9 +33,7 @@ mockBrowserTimeZone("Europe/Amsterdam", beforeEach, afterEach)
 
 beforeEach(() => {
   mockSdkService("assimilating", [])
-  mockSdkService("getNoteInfo", {
-    createdAt: "",
-  })
+  mockSdkService("getNoteInfo", {})
   showNoteSpy = mockSdkService("showNote", makeMe.aNoteRealm.please())
   mockSdkService("generateUnderstandingChecklist", {
     points: [],

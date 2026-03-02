@@ -4696,9 +4696,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/MemoryTracker"
-        createdAt:
-          type: string
-          format: date-time
         recallSetting:
           $ref: "#/components/schemas/NoteRecallSetting"
         noteType:
@@ -4710,8 +4707,6 @@ components:
           - experience
           - initiative
           - quest
-      required:
-      - createdAt
     BareNote:
       type: object
       properties:

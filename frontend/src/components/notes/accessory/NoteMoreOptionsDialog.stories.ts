@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/vue3"
 import NoteMoreOptionsDialog from "./NoteMoreOptionsDialog.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import { NoteController } from "@generated/backend/sdk.gen"
-import type { NoteInfo } from "@generated/backend"
 import type { Options } from "@generated/backend/client/types.gen"
 import type { GetNoteInfoData } from "@generated/backend"
 
@@ -20,15 +19,13 @@ const meta = {
     (story) => {
       // Mock NoteController.getNoteInfo to avoid API calls
       const originalGetNoteInfo = NoteController.getNoteInfo
-      const mockNoteInfo: NoteInfo = {
-        recallSetting: {
+      const mockNoteInfo = makeMe.aNoteInfo
+        .recallSetting({
           level: 0,
           rememberSpelling: false,
           skipMemoryTracking: false,
-        },
-        memoryTrackers: [],
-        createdAt: "",
-      }
+        })
+        .please()
       NoteController.getNoteInfo = (async <
         ThrowOnError extends boolean = false,
       >(

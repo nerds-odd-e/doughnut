@@ -2,15 +2,13 @@ import NoteInfoBar from "@/components/notes/NoteInfoBar.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
-import type { NoteInfo } from "@generated/backend"
 import { describe, it, expect, afterEach } from "vitest"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const noteRealm = makeMe.aNoteRealm.please()
-const stubResponse: NoteInfo = {
-  memoryTrackers: [makeMe.aMemoryTracker.please()],
-  createdAt: "",
-}
+const stubResponse = makeMe.aNoteInfo
+  .memoryTrackers([makeMe.aMemoryTracker.please()])
+  .please()
 
 describe("note info", () => {
   let wrapper: VueWrapper

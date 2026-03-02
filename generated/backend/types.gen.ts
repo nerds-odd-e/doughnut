@@ -525,7 +525,6 @@ export type CurrentUserInfo = {
 
 export type NoteInfo = {
     memoryTrackers?: Array<MemoryTracker>;
-    createdAt: string;
     recallSetting?: NoteRecallSetting;
     noteType?: 'concept' | 'source' | 'person' | 'experience' | 'initiative' | 'quest';
 };
@@ -732,7 +731,6 @@ export type ConversationSubjectWritable = {
 
 export type NoteInfoWritable = {
     memoryTrackers?: Array<MemoryTrackerWritable>;
-    createdAt: string;
     recallSetting?: NoteRecallSetting;
     noteType?: 'concept' | 'source' | 'person' | 'experience' | 'initiative' | 'quest';
 };

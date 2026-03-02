@@ -38,10 +38,7 @@ afterEach(() => {
 beforeEach(() => {
   assimilateSpy = mockSdkService("assimilate", [])
   showNoteSpy = mockSdkService("showNote", makeMe.aNoteRealm.please())
-  mockSdkService("getNoteInfo", {
-    createdAt: "",
-    noteType: undefined,
-  })
+  mockSdkService("getNoteInfo", { noteType: undefined })
   mockSdkService("generateUnderstandingChecklist", {
     points: [],
   })
@@ -135,7 +132,6 @@ describe("Assimilation component", () => {
   describe("SpellingVerificationPopup", () => {
     beforeEach(() => {
       mockSdkService("getNoteInfo", {
-        createdAt: "",
         noteType: undefined,
         recallSetting: { rememberSpelling: true },
       })
