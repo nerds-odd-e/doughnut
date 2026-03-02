@@ -299,7 +299,7 @@ describe("repeat page", () => {
       const answerResult: SpellingResult = {
         type: "SpellingResult",
         note,
-        answer: "test answer",
+        answer: { id: 1, correct: false, spellingAnswer: "test answer" },
         isCorrect: false,
         memoryTrackerId: 123,
       }

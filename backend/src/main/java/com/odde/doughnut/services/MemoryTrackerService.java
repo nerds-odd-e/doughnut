@@ -150,8 +150,12 @@ public class MemoryTrackerService {
     boolean thresholdExceeded =
         markAsRepeated(
             currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
+    Answer answer = new Answer();
+    answer.setSpellingAnswer(spellingAnswer);
+    answer.setCorrect(correct);
+    answer.setThinkingTimeMs(answerSpellingDTO.getThinkingTimeMs());
     return new RecallResult.SpellingResult(
-        note, spellingAnswer, correct, memoryTracker.getId(), thresholdExceeded);
+        note, answer, correct, memoryTracker.getId(), thresholdExceeded);
   }
 
   public List<RecallPrompt> getAllRecallPrompts(MemoryTracker memoryTracker) {
@@ -205,7 +209,7 @@ public class MemoryTrackerService {
         markAsRepeated(
             currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
     return new RecallResult.SpellingResult(
-        note, spellingAnswer, correct, memoryTracker.getId(), thresholdExceeded);
+        note, answer, correct, memoryTracker.getId(), thresholdExceeded);
   }
 
   public boolean hasExceededWrongAnswerThreshold(

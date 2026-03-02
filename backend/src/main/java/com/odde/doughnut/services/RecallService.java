@@ -90,7 +90,7 @@ public class RecallService {
     if (recallPrompt.getQuestionType() == QuestionType.SPELLING) {
       return new RecallResult.SpellingResult(
           recallPrompt.getMemoryTracker().getNote(),
-          recallPrompt.getAnswer().getSpellingAnswer(),
+          recallPrompt.getAnswer(),
           recallPrompt.getAnswer().getCorrect(),
           recallPrompt.getMemoryTracker().getId(),
           false); // thresholdExceeded is not relevant for historical data

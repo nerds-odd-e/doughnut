@@ -4143,7 +4143,7 @@ components:
           note:
             $ref: "#/components/schemas/Note"
           answer:
-            type: string
+            $ref: "#/components/schemas/Answer"
           isCorrect:
             type: boolean
           memoryTrackerId:

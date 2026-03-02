@@ -101,7 +101,7 @@ describe("RecallSessionOptionsDialog", () => {
     const spellingResult: SpellingResult = {
       type: "SpellingResult",
       note,
-      answer: "test",
+      answer: { id: 1, correct: true, spellingAnswer: "test" },
       isCorrect: true,
       memoryTrackerId: 1,
     }

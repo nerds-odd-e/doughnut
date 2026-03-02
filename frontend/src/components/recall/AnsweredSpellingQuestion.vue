@@ -1,7 +1,7 @@
 <template>
   <div class="daisy-alert" :class="{ 'daisy-alert-success': result.isCorrect, 'daisy-alert-error': !result.isCorrect }">
     <strong>
-      {{ result.isCorrect ? 'Correct!' : `Your answer \`${result.answer}\` is incorrect.` }}
+      {{ result.isCorrect ? 'Correct!' : `Your answer \`${result.answer?.spellingAnswer}\` is incorrect.` }}
     </strong>
   </div>
   <NoteUnderQuestion v-if="result.note" v-bind="{ noteTopology: result.note.noteTopology }" />
