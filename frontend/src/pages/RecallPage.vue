@@ -295,7 +295,7 @@ const onAnswered = async (answerResult: RecallPrompt) => {
   if (!answerResult.answer?.correct) {
     viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
   }
-  const memoryTrackerId = answerResult?.memoryTrackerId
+  const memoryTrackerId = answerResult.memoryTrackerId
   if (memoryTrackerId !== undefined) {
     const { data } = await apiCallWithLoading(() =>
       MemoryTrackerController.getThresholdExceeded({

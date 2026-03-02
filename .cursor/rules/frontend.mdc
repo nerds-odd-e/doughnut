@@ -419,7 +419,7 @@ import makeMe from '@tests/fixtures/makeMe'
 ```
 
 The `makeMe` object provides access to all test data builders:
-- `makeMe.anAnsweredQuestion` - Creates answered question data
+- `makeMe.anAnsweredQuestion` - Creates recall prompt with answer (RecallPrompt)
 - `makeMe.aPredefinedQuestion` - Creates predefined question data
 - `makeMe.aNote` - Creates note data
 - `makeMe.aNoteRealm` - Creates note realm data

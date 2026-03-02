@@ -6,17 +6,11 @@ import RecallPromptBuilder from "./RecallPromptBuilder"
 
 class AnsweredQuestionBuilder extends Builder<RecallPrompt> {
   private noteToUse?: Note
-  private recallPromptToUse?: RecallPrompt
   private isCorrect: boolean = true
   private choiceIndexToUse?: number
 
   withNote(note: Note): this {
     this.noteToUse = note
-    return this
-  }
-
-  withRecallPromptId(id: number): this {
-    this.recallPromptToUse = new RecallPromptBuilder().withId(id).do()
     return this
   }
 
@@ -33,20 +27,17 @@ class AnsweredQuestionBuilder extends Builder<RecallPrompt> {
   do(): RecallPrompt {
     const predefinedQuestion = makeMe.aPredefinedQuestion.please()
     const note = this.noteToUse ?? makeMe.aNote.please()
-    return (
-      this.recallPromptToUse ??
-      new RecallPromptBuilder()
-        .withPredefinedQuestion(predefinedQuestion)
-        .withNote(note)
-        .withAnswer({
-          id: generateId(),
-          correct: this.isCorrect,
-          ...(this.choiceIndexToUse !== undefined && {
-            choiceIndex: this.choiceIndexToUse,
-          }),
-        })
-        .do()
-    )
+    return new RecallPromptBuilder()
+      .withPredefinedQuestion(predefinedQuestion)
+      .withNote(note)
+      .withAnswer({
+        id: generateId(),
+        correct: this.isCorrect,
+        ...(this.choiceIndexToUse !== undefined && {
+          choiceIndex: this.choiceIndexToUse,
+        }),
+      })
+      .do()
   }
 }
 

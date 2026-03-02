@@ -88,10 +88,8 @@ const handleTreadmillModeToggle = (event: Event) => {
 const isQuestionResultWithThinkingTime = (
   result: RecallPrompt | undefined
 ): result is RecallPrompt => {
-  if (result === undefined || result?.questionType !== "MCQ") {
-    return false
-  }
-  return result?.answer?.thinkingTimeMs !== undefined
+  if (result === undefined || result.questionType !== "MCQ") return false
+  return result.answer?.thinkingTimeMs !== undefined
 }
 
 const averageThinkingTime = computed(() => {
@@ -104,7 +102,7 @@ const averageThinkingTime = computed(() => {
   }
 
   const totalThinkingTime = mcqQuestions.reduce(
-    (sum, result) => sum + (result?.answer?.thinkingTimeMs ?? 0),
+    (sum, result) => sum + (result.answer?.thinkingTimeMs ?? 0),
     0
   )
 

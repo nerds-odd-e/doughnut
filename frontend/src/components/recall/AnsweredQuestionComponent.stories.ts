@@ -26,32 +26,19 @@ const createAnsweredQuestionWithQuestion = (
   correctIndex: number,
   answerIndex: number,
   isCorrect: boolean
-): RecallPrompt => {
-  const predefinedQuestion = makeMe.aPredefinedQuestion
-    .withQuestionStem(stem)
-    .withChoices(choices)
-    .correctAnswerIndex(correctIndex)
-    .please()
-
-  const base = makeMe.anAnsweredQuestion
-    .answerCorrect(isCorrect)
-    .withChoiceIndex(answerIndex)
-    .please()
-
-  const note = base?.note ?? makeMe.aNote.please()
-  return makeMe.aRecallPrompt
-    .withPredefinedQuestion(predefinedQuestion)
-    .withNote(note)
-    .withAnswer(
-      base?.answer ?? {
-        id: 1,
-        correct: isCorrect,
-        choiceIndex: answerIndex,
-      }
+): RecallPrompt =>
+  makeMe.aRecallPrompt
+    .withPredefinedQuestion(
+      makeMe.aPredefinedQuestion
+        .withQuestionStem(stem)
+        .withChoices(choices)
+        .correctAnswerIndex(correctIndex)
+        .please()
     )
-    .withId(base?.id ?? 1)
+    .withNote(makeMe.aNote.please())
+    .withAnswer({ id: 1, correct: isCorrect, choiceIndex: answerIndex })
+    .withId(1)
     .please()
-}
 
 export const CorrectAnswer: Story = {
   args: {
