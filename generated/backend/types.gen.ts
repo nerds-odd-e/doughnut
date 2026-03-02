@@ -427,11 +427,6 @@ export type RemovePointsResponseDto = {
     details?: string;
 };
 
-export type PromotePointResponseDto = {
-    createdNote?: NoteRealm;
-    updatedParentNote?: NoteRealm;
-};
-
 export type UnderstandingChecklistDto = {
     points?: Array<string>;
 };
@@ -734,11 +729,6 @@ export type ConversationSubjectWritable = {
     assessmentQuestionInstance?: AssessmentQuestionInstance;
     note?: NoteWritable;
     answeredQuestion?: AnsweredQuestionWritable;
-};
-
-export type PromotePointResponseDtoWritable = {
-    createdNote?: NoteRealmWritable;
-    updatedParentNote?: NoteRealmWritable;
 };
 
 export type NoteInfoWritable = {
@@ -3058,7 +3048,7 @@ export type PromotePointToSiblingResponses = {
     /**
      * OK
      */
-    200: PromotePointResponseDto;
+    200: NoteCreationResult;
 };
 
 export type PromotePointToSiblingResponse = PromotePointToSiblingResponses[keyof PromotePointToSiblingResponses];
@@ -3085,7 +3075,7 @@ export type PromotePointToChildResponses = {
     /**
      * OK
      */
-    200: PromotePointResponseDto;
+    200: NoteCreationResult;
 };
 
 export type PromotePointToChildResponse = PromotePointToChildResponses[keyof PromotePointToChildResponses];

@@ -2,7 +2,6 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteCreationResult;
-import com.odde.doughnut.controllers.dto.PromotePointResponseDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
@@ -141,17 +140,17 @@ public class NoteConstructionService {
     return note;
   }
 
-  public PromotePointResponseDTO createNoteFromPromotedPointToChild(
+  public NoteCreationResult createNoteFromPromotedPointToChild(
       Note originalNote, PointExtractionResult aiResult) throws UnexpectedNoAccessRightException {
     return createNoteFromPromotedPoint(originalNote, originalNote.getId(), aiResult);
   }
 
-  public PromotePointResponseDTO createNoteFromPromotedPointToSibling(
+  public NoteCreationResult createNoteFromPromotedPointToSibling(
       Note originalNote, PointExtractionResult aiResult) throws UnexpectedNoAccessRightException {
     return createNoteFromPromotedPoint(originalNote, originalNote.getParent().getId(), aiResult);
   }
 
-  private PromotePointResponseDTO createNoteFromPromotedPoint(
+  private NoteCreationResult createNoteFromPromotedPoint(
       Note originalNote, Integer parentNoteId, PointExtractionResult aiResult)
       throws UnexpectedNoAccessRightException {
     User user = authorizationService.getCurrentUser();
@@ -166,6 +165,6 @@ public class NoteConstructionService {
     originalNote.setDetails(aiResult.updatedParentDetails);
     entityPersister.save(originalNote);
 
-    return new PromotePointResponseDTO(newNote.toNoteRealm(user), originalNote.toNoteRealm(user));
+    return new NoteCreationResult(newNote.toNoteRealm(user), originalNote.toNoteRealm(user));
   }
 }

@@ -7,8 +7,8 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.controllers.dto.NoteCreationResult;
 import com.odde.doughnut.controllers.dto.PointsRequestDTO;
-import com.odde.doughnut.controllers.dto.PromotePointResponseDTO;
 import com.odde.doughnut.controllers.dto.RemovePointsResponseDTO;
 import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
 import com.odde.doughnut.controllers.dto.UnderstandingChecklistDTO;
@@ -371,12 +371,12 @@ class AiControllerTest extends ControllerTestBase {
 
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.setPoints(List.of("key point to promote"));
-      PromotePointResponseDTO response = controller.promotePointToChild(testNote, requestDTO);
+      NoteCreationResult response = controller.promotePointToChild(testNote, requestDTO);
 
-      assertThat(response.getCreatedNote().getNote().getTitle()).isEqualTo("Extracted Child Note");
-      assertThat(response.getCreatedNote().getNote().getDetails())
+      assertThat(response.getCreated().getNote().getTitle()).isEqualTo("Extracted Child Note");
+      assertThat(response.getCreated().getNote().getDetails())
           .isEqualTo("Expanded details for the promoted point.");
-      assertThat(response.getUpdatedParentNote().getNote().getDetails())
+      assertThat(response.getParent().getNote().getDetails())
           .isEqualTo("Updated parent with summary.");
     }
 
@@ -443,13 +443,12 @@ class AiControllerTest extends ControllerTestBase {
 
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.setPoints(List.of("key point to promote"));
-      PromotePointResponseDTO response = controller.promotePointToSibling(testNote, requestDTO);
+      NoteCreationResult response = controller.promotePointToSibling(testNote, requestDTO);
 
-      assertThat(response.getCreatedNote().getNote().getTitle())
-          .isEqualTo("Extracted Sibling Note");
-      assertThat(response.getCreatedNote().getNote().getDetails())
+      assertThat(response.getCreated().getNote().getTitle()).isEqualTo("Extracted Sibling Note");
+      assertThat(response.getCreated().getNote().getDetails())
           .isEqualTo("Expanded details for the sibling.");
-      assertThat(response.getUpdatedParentNote().getNote().getDetails())
+      assertThat(response.getParent().getNote().getDetails())
           .isEqualTo("Updated parent with summary.");
     }
 

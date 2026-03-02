@@ -117,7 +117,7 @@ public class AiController {
 
   @PostMapping("/promote-point-to-child/{note}")
   @Transactional
-  public PromotePointResponseDTO promotePointToChild(
+  public NoteCreationResult promotePointToChild(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
       @RequestBody PointsRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
@@ -139,7 +139,7 @@ public class AiController {
 
   @PostMapping("/promote-point-to-sibling/{note}")
   @Transactional
-  public PromotePointResponseDTO promotePointToSibling(
+  public NoteCreationResult promotePointToSibling(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
       @RequestBody PointsRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {

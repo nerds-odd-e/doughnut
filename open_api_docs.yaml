@@ -2261,7 +2261,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PromotePointResponseDTO"
+                $ref: "#/components/schemas/NoteCreationResult"
   /api/ai/promote-point-to-child/{note}:
     post:
       tags:
@@ -2291,7 +2291,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PromotePointResponseDTO"
+                $ref: "#/components/schemas/NoteCreationResult"
   /api/ai/generate-understanding-checklist/{note}:
     post:
       tags:
@@ -4508,13 +4508,6 @@ components:
       properties:
         details:
           type: string
-    PromotePointResponseDTO:
-      type: object
-      properties:
-        createdNote:
-          $ref: "#/components/schemas/NoteRealm"
-        updatedParentNote:
-          $ref: "#/components/schemas/NoteRealm"
     UnderstandingChecklistDTO:
       type: object
       properties:

@@ -26,12 +26,12 @@ beforeEach(() => {
   mockSdkService("removePointFromNote", { details: "Updated content" })
   mockSdkService("updateNoteDetails", makeMe.aNoteRealm.please())
   mockSdkService("promotePointToChild", {
-    createdNote: makeMe.aNoteRealm.please(),
-    updatedParentNote: makeMe.aNoteRealm.please(),
+    created: makeMe.aNoteRealm.please(),
+    parent: makeMe.aNoteRealm.please(),
   })
   mockSdkService("promotePointToSibling", {
-    createdNote: makeMe.aNoteRealm.please(),
-    updatedParentNote: makeMe.aNoteRealm.please(),
+    created: makeMe.aNoteRealm.please(),
+    parent: makeMe.aNoteRealm.please(),
   })
   mockShowNoteAccessory()
   renderer = helper.component(NoteRefinement)
@@ -79,8 +79,8 @@ describe("NoteRefinement component", () => {
 
     it("calls promotePointToChild API when child button is clicked", async () => {
       const promotePointToChildSpy = mockSdkService("promotePointToChild", {
-        createdNote: makeMe.aNoteRealm.please(),
-        updatedParentNote: makeMe.aNoteRealm.please(),
+        created: makeMe.aNoteRealm.please(),
+        parent: makeMe.aNoteRealm.please(),
       })
       const wrapper = mount(["Test Point"])
       await flushPromises()
@@ -96,8 +96,8 @@ describe("NoteRefinement component", () => {
 
     it("removes point from checklist after successful promotion", async () => {
       mockSdkService("promotePointToChild", {
-        createdNote: makeMe.aNoteRealm.please(),
-        updatedParentNote: makeMe.aNoteRealm.please(),
+        created: makeMe.aNoteRealm.please(),
+        parent: makeMe.aNoteRealm.please(),
       })
       const wrapper = mount(["Point 1", "Point 2", "Point 3"])
       await flushPromises()
@@ -133,8 +133,8 @@ describe("NoteRefinement component", () => {
         .ofNote(childNoteRealm)
         .please().note
       const promotePointToSiblingSpy = mockSdkService("promotePointToSibling", {
-        createdNote: makeMe.aNoteRealm.please(),
-        updatedParentNote: makeMe.aNoteRealm.please(),
+        created: makeMe.aNoteRealm.please(),
+        parent: makeMe.aNoteRealm.please(),
       })
       const wrapper = mount(["Test Point"], { note: childNote })
       await flushPromises()
@@ -156,8 +156,8 @@ describe("NoteRefinement component", () => {
         .ofNote(childNoteRealm)
         .please().note
       mockSdkService("promotePointToSibling", {
-        createdNote: makeMe.aNoteRealm.please(),
-        updatedParentNote: makeMe.aNoteRealm.please(),
+        created: makeMe.aNoteRealm.please(),
+        parent: makeMe.aNoteRealm.please(),
       })
       const wrapper = mount(["Point 1", "Point 2", "Point 3"], {
         note: childNote,
@@ -291,8 +291,8 @@ describe("NoteRefinement component", () => {
       mockSdkServiceWithImplementation("promotePointToChild", async () => {
         await apiPromise
         return {
-          createdNote: makeMe.aNoteRealm.please(),
-          updatedParentNote: makeMe.aNoteRealm.please(),
+          created: makeMe.aNoteRealm.please(),
+          parent: makeMe.aNoteRealm.please(),
         }
       })
       const wrapper = mount(["Test understanding point"])
