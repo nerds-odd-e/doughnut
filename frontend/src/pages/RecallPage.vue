@@ -43,7 +43,7 @@
       />
       <AnsweredSpellingQuestion
         v-if="currentAnsweredSpelling"
-        v-bind="{ result: currentAnsweredSpelling }"
+        v-bind="{ answeredQuestion: currentAnsweredSpelling }"
       />
       <template v-else-if="toRepeatCount === 0 && previousAnsweredQuestionCursor === undefined">
         <div class="daisy-alert daisy-alert-success">
@@ -73,11 +73,7 @@ import RecallProgressBar from "@/components/recall/RecallProgressBar.vue"
 import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
 import AnsweredSpellingQuestion from "@/components/recall/AnsweredSpellingQuestion.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
-import type {
-  QuestionResult,
-  SpellingResult,
-  MemoryTrackerLite,
-} from "@generated/backend"
+import type { MemoryTrackerLite, RecallResult } from "@generated/backend"
 import {
   RecallsController,
   MemoryTrackerController,
@@ -98,7 +94,6 @@ import {
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 
-type RecallResult = QuestionResult | SpellingResult
 const { popups } = usePopups()
 const { dueCount, setDueCount } = useAssimilationCount()
 const {
@@ -168,7 +163,7 @@ const currentAnsweredQuestion = computed(() => {
   const result =
     previousAnsweredQuestions.value[previousAnsweredQuestionCursor.value]
   if (!result) return undefined
-  return result.type === "QuestionResult" ? result.answeredQuestion : undefined
+  return result.questionType === "MCQ" ? result.answeredQuestion : undefined
 })
 
 const currentAnsweredSpelling = computed(() => {
@@ -176,7 +171,9 @@ const currentAnsweredSpelling = computed(() => {
   const result =
     previousAnsweredQuestions.value[previousAnsweredQuestionCursor.value]
   if (!result) return undefined
-  return result.type === "SpellingResult" ? result : undefined
+  return result.questionType === "SPELLING"
+    ? result.answeredQuestion
+    : undefined
 })
 
 const finished = computed(() => previousAnsweredQuestions.value.length)
@@ -295,25 +292,27 @@ const offerReAssimilation = async (memoryTrackerId: number | undefined) => {
   }
 }
 
-const onAnsweredQuestion = async (answerResult: QuestionResult) => {
+const onAnsweredQuestion = async (answerResult: RecallResult) => {
   moveToNextMemoryTracker()
   previousAnsweredQuestions.value.push(answerResult)
-  if (!answerResult.answeredQuestion?.answer.correct) {
+  const aq = answerResult.answeredQuestion
+  if (!aq?.answer.correct) {
     viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
   }
-  if (answerResult.answeredQuestion?.thresholdExceeded) {
-    await offerReAssimilation(answerResult.answeredQuestion?.memoryTrackerId)
+  if (aq?.thresholdExceeded) {
+    await offerReAssimilation(aq.memoryTrackerId)
   }
 }
 
-const onAnsweredSpelling = async (answerResult: SpellingResult) => {
+const onAnsweredSpelling = async (answerResult: RecallResult) => {
   moveToNextMemoryTracker()
   previousAnsweredQuestions.value.push(answerResult)
-  if (!answerResult.answer?.correct) {
+  const aq = answerResult.answeredQuestion
+  if (!aq?.answer.correct) {
     viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
   }
-  if (answerResult.thresholdExceeded) {
-    await offerReAssimilation(answerResult.memoryTrackerId)
+  if (aq?.thresholdExceeded) {
+    await offerReAssimilation(aq.memoryTrackerId)
   }
 }
 

@@ -1,10 +1,6 @@
 import { useRecallData } from "@/composables/useRecallData"
 import RecallPage from "@/pages/RecallPage.vue"
-import type {
-  MemoryTrackerLite,
-  QuestionResult,
-  SpellingResult,
-} from "@generated/backend"
+import type { MemoryTrackerLite, RecallResult } from "@generated/backend"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, {
   mockSdkService,
@@ -142,8 +138,8 @@ describe("repeat page", () => {
 
     it("should prepend previously answered recall prompts to the list", async () => {
       const note = makeMe.aNote.please()
-      const previousQuestionResult: QuestionResult = {
-        type: "QuestionResult",
+      const previousQuestionResult: RecallResult = {
+        questionType: "MCQ",
         answeredQuestion: {
           note,
           recallPrompt: makeMe.aRecallPrompt
@@ -297,11 +293,14 @@ describe("repeat page", () => {
     it("should handle spelling questions correctly", async () => {
       const note = makeMe.aNote.please()
       note.id = 42
-      const answerResult: SpellingResult = {
-        type: "SpellingResult",
-        note,
-        answer: { id: 1, correct: false, spellingAnswer: "test answer" },
-        memoryTrackerId: 123,
+      const answerResult: RecallResult = {
+        questionType: "SPELLING",
+        answeredQuestion: {
+          note,
+          recallPrompt: makeMe.aRecallPrompt.please(),
+          answer: { id: 1, correct: false, spellingAnswer: "test answer" },
+          memoryTrackerId: 123,
+        },
       }
 
       const mockedAnswerSpellingCall = mockSdkService(

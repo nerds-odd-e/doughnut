@@ -99,8 +99,6 @@ public class RecallQuestionService {
     boolean thresholdExceeded =
         memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
             user, currentUTCTimestamp, answer.getCorrect(), recallPrompt);
-    AnsweredQuestion answeredQuestion = recallPrompt.getAnsweredQuestion();
-    answeredQuestion.thresholdExceeded = thresholdExceeded;
-    return answeredQuestion;
+    return recallPrompt.getAnsweredQuestion(thresholdExceeded);
   }
 }

@@ -45,8 +45,7 @@ import type {
   AnsweredQuestion,
   RecallPrompt,
   AnswerSpellingDto,
-  SpellingResult,
-  QuestionResult,
+  RecallResult,
   MemoryTrackerLite,
 } from "@generated/backend"
 import {
@@ -70,8 +69,8 @@ const props = defineProps<QuizProps>()
 
 // Emits definition
 const emit = defineEmits<{
-  (e: "answered-question", result: QuestionResult): void
-  (e: "answered-spelling", result: SpellingResult): void
+  (e: "answered-question", result: RecallResult): void
+  (e: "answered-spelling", result: RecallResult): void
   (e: "just-reviewed", result: AnsweredQuestion | undefined): void
 }>()
 
@@ -184,11 +183,11 @@ const onSpellingAnswer = async (
     })
   )
   if (!error) {
-    emit("answered-spelling", answerResult! as SpellingResult)
+    emit("answered-spelling", answerResult!)
   }
 }
 
-const onAnswered = (answerResult: QuestionResult) => {
+const onAnswered = (answerResult: RecallResult) => {
   emit("answered-question", answerResult)
 }
 

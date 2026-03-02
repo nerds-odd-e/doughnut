@@ -790,9 +790,7 @@ paths:
           content:
             '*/*':
               schema:
-                oneOf:
-                - $ref: "#/components/schemas/QuestionResult"
-                - $ref: "#/components/schemas/SpellingResult"
+                $ref: "#/components/schemas/RecallResult"
   /api/recall-prompts/{recallPrompt}/answer-spelling:
     post:
       tags:
@@ -822,9 +820,7 @@ paths:
           content:
             '*/*':
               schema:
-                oneOf:
-                - $ref: "#/components/schemas/QuestionResult"
-                - $ref: "#/components/schemas/SpellingResult"
+                $ref: "#/components/schemas/RecallResult"
   /api/predefined-questions/{predefinedQuestion}/toggle-approval:
     post:
       tags:
@@ -2897,9 +2893,7 @@ paths:
               schema:
                 type: array
                 items:
-                  oneOf:
-                  - $ref: "#/components/schemas/QuestionResult"
-                  - $ref: "#/components/schemas/SpellingResult"
+                  $ref: "#/components/schemas/RecallResult"
   /api/predefined-questions/{note}/export-question-generation:
     get:
       tags:
@@ -4114,35 +4108,16 @@ components:
       required:
       - answer
       - recallPrompt
-    QuestionResult:
-      allOf:
-      - $ref: "#/components/schemas/RecallResult"
-      - type: object
-        properties:
-          answeredQuestion:
-            $ref: "#/components/schemas/AnsweredQuestion"
     RecallResult:
-      discriminator:
-        propertyName: type
+      type: object
       properties:
-        type:
+        answeredQuestion:
+          $ref: "#/components/schemas/AnsweredQuestion"
+        questionType:
           type: string
-      required:
-      - type
-    SpellingResult:
-      allOf:
-      - $ref: "#/components/schemas/RecallResult"
-      - type: object
-        properties:
-          note:
-            $ref: "#/components/schemas/Note"
-          answer:
-            $ref: "#/components/schemas/Answer"
-          memoryTrackerId:
-            type: integer
-            format: int32
-          thresholdExceeded:
-            type: boolean
+          enum:
+          - MCQ
+          - SPELLING
     AnswerSpellingDTO:
       type: object
       properties:

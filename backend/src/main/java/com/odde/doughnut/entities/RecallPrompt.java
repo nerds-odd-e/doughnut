@@ -72,16 +72,20 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public AnsweredQuestion getAnsweredQuestion() {
-    if (getPredefinedQuestion() == null || getAnswer() == null) {
+    return getAnsweredQuestion(null);
+  }
+
+  @JsonIgnore
+  public AnsweredQuestion getAnsweredQuestion(Boolean thresholdExceeded) {
+    if (getAnswer() == null) {
       return null;
     }
-
-    Answer answer = getAnswer();
     AnsweredQuestion answerResult = new AnsweredQuestion();
-    answerResult.answer = answer;
-    answerResult.note = getPredefinedQuestion().getNote();
+    answerResult.answer = getAnswer();
+    answerResult.note = getNote();
     answerResult.recallPrompt = this;
     answerResult.memoryTrackerId = memoryTracker.getId();
+    answerResult.thresholdExceeded = thresholdExceeded;
     return answerResult;
   }
 
@@ -113,10 +117,13 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
 
   @JsonProperty
   public Note getNote() {
-    if (getPredefinedQuestion() == null) {
-      return null;
+    if (getPredefinedQuestion() != null) {
+      return getPredefinedQuestion().getNote();
     }
-    return getPredefinedQuestion().getNote();
+    if (getMemoryTracker() != null) {
+      return getMemoryTracker().getNote();
+    }
+    return null;
   }
 
   @JsonProperty("predefinedQuestion")

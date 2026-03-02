@@ -226,21 +226,9 @@ export type AnsweredQuestion = {
     thresholdExceeded?: boolean;
 };
 
-export type QuestionResult = Omit<RecallResult, 'type'> & {
-    answeredQuestion?: AnsweredQuestion;
-    type: 'QuestionResult';
-};
-
 export type RecallResult = {
-    type: string;
-};
-
-export type SpellingResult = Omit<RecallResult, 'type'> & {
-    note?: Note;
-    answer?: Answer;
-    memoryTrackerId?: number;
-    thresholdExceeded?: boolean;
-    type: 'SpellingResult';
+    answeredQuestion?: AnsweredQuestion;
+    questionType?: 'MCQ' | 'SPELLING';
 };
 
 export type AnswerSpellingDto = {
@@ -678,17 +666,9 @@ export type AnsweredQuestionWritable = {
     thresholdExceeded?: boolean;
 };
 
-export type QuestionResultWritable = Omit<RecallResult, 'type'> & {
+export type RecallResultWritable = {
     answeredQuestion?: AnsweredQuestionWritable;
-    type: 'QuestionResultWritable';
-};
-
-export type SpellingResultWritable = Omit<RecallResult, 'type'> & {
-    note?: NoteWritable;
-    answer?: Answer;
-    memoryTrackerId?: number;
-    thresholdExceeded?: boolean;
-    type: 'SpellingResultWritable';
+    questionType?: 'MCQ' | 'SPELLING';
 };
 
 export type NoteCreationResultWritable = {
@@ -1546,7 +1526,7 @@ export type AnswerQuizResponses = {
     /**
      * OK
      */
-    200: QuestionResult | SpellingResult;
+    200: RecallResult;
 };
 
 export type AnswerQuizResponse = AnswerQuizResponses[keyof AnswerQuizResponses];
@@ -1573,7 +1553,7 @@ export type AnswerSpellingResponses = {
     /**
      * OK
      */
-    200: QuestionResult | SpellingResult;
+    200: RecallResult;
 };
 
 export type AnswerSpellingResponse = AnswerSpellingResponses[keyof AnswerSpellingResponses];
@@ -3684,7 +3664,7 @@ export type PreviouslyAnsweredResponses = {
     /**
      * OK
      */
-    200: Array<QuestionResult | SpellingResult>;
+    200: Array<RecallResult>;
 };
 
 export type PreviouslyAnsweredResponse = PreviouslyAnsweredResponses[keyof PreviouslyAnsweredResponses];

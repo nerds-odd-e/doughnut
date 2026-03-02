@@ -5,7 +5,8 @@ import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.controllers.dto.RecallResult;
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.AnsweredQuestion;
+import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.MemoryTrackerService;
@@ -67,12 +68,13 @@ class RecallPromptController {
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @Valid @RequestBody AnswerDTO answerDTO) {
     authorizationService.assertLoggedIn();
-    return new RecallResult.QuestionResult(
+    AnsweredQuestion answeredQuestion =
         recallQuestionService.answerQuestion(
             recallPrompt,
             answerDTO,
             authorizationService.getCurrentUser(),
-            testabilitySettings.getCurrentUTCTimestamp()));
+            testabilitySettings.getCurrentUTCTimestamp());
+    return new RecallResult(answeredQuestion, recallPrompt.getQuestionType());
   }
 
   @PostMapping("/{recallPrompt}/answer-spelling")

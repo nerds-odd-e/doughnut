@@ -3,8 +3,8 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.MemoryTrackerLite;
 import com.odde.doughnut.controllers.dto.RecallResult;
+import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.MemoryTracker;
-import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
@@ -87,13 +87,7 @@ public class RecallService {
   }
 
   private RecallResult toRecallResult(RecallPrompt recallPrompt) {
-    if (recallPrompt.getQuestionType() == QuestionType.SPELLING) {
-      return new RecallResult.SpellingResult(
-          recallPrompt.getMemoryTracker().getNote(),
-          recallPrompt.getAnswer(),
-          recallPrompt.getMemoryTracker().getId(),
-          false); // thresholdExceeded is not relevant for historical data
-    }
-    return new RecallResult.QuestionResult(recallPrompt.getAnsweredQuestion());
+    AnsweredQuestion answeredQuestion = recallPrompt.getAnsweredQuestion(false);
+    return new RecallResult(answeredQuestion, recallPrompt.getQuestionType());
   }
 }

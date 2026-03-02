@@ -3,7 +3,7 @@ import { vi, describe, it, expect } from "vitest"
 import helper from "@tests/helpers"
 import RecallSessionOptionsDialog from "@/components/recall/RecallSessionOptionsDialog.vue"
 import makeMe from "@tests/fixtures/makeMe"
-import type { QuestionResult, SpellingResult } from "@generated/backend"
+import type { RecallResult } from "@generated/backend"
 
 vi.mock("vue-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("vue-router")>()
@@ -38,11 +38,7 @@ describe("RecallSessionOptionsDialog", () => {
     finished: 0,
     toRepeatCount: 0,
     totalAssimilatedCount: 0,
-    previousAnsweredQuestions: [] as (
-      | QuestionResult
-      | SpellingResult
-      | undefined
-    )[],
+    previousAnsweredQuestions: [] as (RecallResult | undefined)[],
   }
 
   const mountWithTeleportStub = (
@@ -63,8 +59,8 @@ describe("RecallSessionOptionsDialog", () => {
   it("displays average thinking time when there are MCQ questions with thinking time", async () => {
     const note = makeMe.aNote.please()
     const predefinedQuestion = makeMe.aPredefinedQuestion.please()
-    const questionResult1: QuestionResult = {
-      type: "QuestionResult",
+    const questionResult1: RecallResult = {
+      questionType: "MCQ",
       answeredQuestion: {
         note,
         recallPrompt: makeMe.aRecallPrompt
@@ -75,8 +71,8 @@ describe("RecallSessionOptionsDialog", () => {
         memoryTrackerId: 1,
       },
     }
-    const questionResult2: QuestionResult = {
-      type: "QuestionResult",
+    const questionResult2: RecallResult = {
+      questionType: "MCQ",
       answeredQuestion: {
         note,
         recallPrompt: makeMe.aRecallPrompt
@@ -101,11 +97,14 @@ describe("RecallSessionOptionsDialog", () => {
 
   it("does not display average thinking time when there are no MCQ questions", async () => {
     const note = makeMe.aNote.please()
-    const spellingResult: SpellingResult = {
-      type: "SpellingResult",
-      note,
-      answer: { id: 1, correct: true, spellingAnswer: "test" },
-      memoryTrackerId: 1,
+    const spellingResult: RecallResult = {
+      questionType: "SPELLING",
+      answeredQuestion: {
+        note,
+        recallPrompt: makeMe.aRecallPrompt.please(),
+        answer: { id: 1, correct: true, spellingAnswer: "test" },
+        memoryTrackerId: 1,
+      },
     }
 
     const wrapper = mountWithTeleportStub(RecallSessionOptionsDialog, {
@@ -121,8 +120,8 @@ describe("RecallSessionOptionsDialog", () => {
 
   it("does not display average thinking time when MCQ questions have no thinking time", async () => {
     const note = makeMe.aNote.please()
-    const questionResult: QuestionResult = {
-      type: "QuestionResult",
+    const questionResult: RecallResult = {
+      questionType: "MCQ",
       answeredQuestion: {
         note,
         recallPrompt: makeMe.aRecallPrompt
@@ -147,8 +146,8 @@ describe("RecallSessionOptionsDialog", () => {
 
   it("formats thinking time correctly for milliseconds", async () => {
     const note = makeMe.aNote.please()
-    const questionResult: QuestionResult = {
-      type: "QuestionResult",
+    const questionResult: RecallResult = {
+      questionType: "MCQ",
       answeredQuestion: {
         note,
         recallPrompt: makeMe.aRecallPrompt
@@ -173,8 +172,8 @@ describe("RecallSessionOptionsDialog", () => {
 
   it("formats thinking time correctly for minutes and seconds", async () => {
     const note = makeMe.aNote.please()
-    const questionResult: QuestionResult = {
-      type: "QuestionResult",
+    const questionResult: RecallResult = {
+      questionType: "MCQ",
       answeredQuestion: {
         note,
         recallPrompt: makeMe.aRecallPrompt
@@ -204,8 +203,8 @@ describe("RecallSessionOptionsDialog", () => {
 
   it("filters out undefined results when calculating average", async () => {
     const note = makeMe.aNote.please()
-    const questionResult: QuestionResult = {
-      type: "QuestionResult",
+    const questionResult: RecallResult = {
+      questionType: "MCQ",
       answeredQuestion: {
         note,
         recallPrompt: makeMe.aRecallPrompt

@@ -84,8 +84,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void shouldValidateTheAnswerAndUpdateMemoryTracker() {
       Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
-      RecallResult.QuestionResult answerResult =
-          (RecallResult.QuestionResult) controller.answerQuiz(recallPrompt, answerDTO);
+      RecallResult answerResult = controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(answerResult.answeredQuestion().answer.getCorrect(), is(true));
       assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
     }
@@ -93,8 +92,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void shouldSaveThinkingTimeMs() {
       answerDTO.setThinkingTimeMs(5000);
-      RecallResult.QuestionResult answerResult =
-          (RecallResult.QuestionResult) controller.answerQuiz(recallPrompt, answerDTO);
+      RecallResult answerResult = controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(answerResult.answeredQuestion().answer.getThinkingTimeMs(), equalTo(5000));
     }
 
@@ -193,8 +191,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       void shouldValidateTheWrongAnswer() {
         testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
         Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
-        RecallResult.QuestionResult answerResult =
-            (RecallResult.QuestionResult) controller.answerQuiz(recallPrompt, answerDTO);
+        RecallResult answerResult = controller.answerQuiz(recallPrompt, answerDTO);
         assertThat(answerResult.answeredQuestion().answer.getCorrect(), is(false));
         assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
       }
@@ -401,8 +398,10 @@ class RecallPromptControllerTests extends ControllerTestBase {
       makeMe.theNote(answerNote).title("this / that").please();
       answerDTO.setSpellingAnswer("this");
       assertTrue(
-          ((RecallResult.SpellingResult) controller.answerSpelling(recallPrompt, answerDTO))
-              .answer()
+          controller
+              .answerSpelling(recallPrompt, answerDTO)
+              .answeredQuestion()
+              .answer
               .getCorrect());
       // Create a new recall prompt for the second answer
       RecallPrompt secondRecallPrompt =
@@ -410,27 +409,26 @@ class RecallPromptControllerTests extends ControllerTestBase {
       AnswerSpellingDTO secondAnswerDTO = new AnswerSpellingDTO();
       secondAnswerDTO.setSpellingAnswer("that");
       assertTrue(
-          ((RecallResult.SpellingResult)
-                  controller.answerSpelling(secondRecallPrompt, secondAnswerDTO))
-              .answer()
+          controller
+              .answerSpelling(secondRecallPrompt, secondAnswerDTO)
+              .answeredQuestion()
+              .answer
               .getCorrect());
     }
 
     @Test
     void shouldValidateTheAnswerAndUpdateMemoryTracker() throws UnexpectedNoAccessRightException {
       Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
-      RecallResult.SpellingResult answerResult =
-          (RecallResult.SpellingResult) controller.answerSpelling(recallPrompt, answerDTO);
-      assertTrue(answerResult.answer().getCorrect());
+      RecallResult answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+      assertTrue(answerResult.answeredQuestion().answer.getCorrect());
       assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
     }
 
     @Test
     void shouldAcceptThinkingTimeMs() throws UnexpectedNoAccessRightException {
       answerDTO.setThinkingTimeMs(5000);
-      RecallResult.SpellingResult answerResult =
-          (RecallResult.SpellingResult) controller.answerSpelling(recallPrompt, answerDTO);
-      assertTrue(answerResult.answer().getCorrect());
+      RecallResult answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+      assertTrue(answerResult.answeredQuestion().answer.getCorrect());
       RecallPrompt reloadedPrompt = makeMe.refresh(recallPrompt);
       Answer answer = reloadedPrompt.getAnswer();
       assertNotNull(answer);
@@ -560,9 +558,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
       void shouldValidateTheWrongAnswer() throws UnexpectedNoAccessRightException {
         testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
         Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
-        RecallResult.SpellingResult answerResult =
-            (RecallResult.SpellingResult) controller.answerSpelling(recallPrompt, answerDTO);
-        assertFalse(answerResult.answer().getCorrect());
+        RecallResult answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+        assertFalse(answerResult.answeredQuestion().answer.getCorrect());
         assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
       }
 

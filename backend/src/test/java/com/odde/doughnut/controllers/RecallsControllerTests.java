@@ -2,13 +2,13 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.RecallResult;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
@@ -170,7 +170,7 @@ class RecallsControllerTests extends ControllerTestBase {
       List<RecallResult> results = controller.previouslyAnswered("Asia/Shanghai");
 
       assertThat(results, hasSize(1));
-      assertThat(results.get(0), instanceOf(RecallResult.QuestionResult.class));
+      assertEquals(QuestionType.MCQ, results.get(0).questionType());
     }
 
     @Test
@@ -221,7 +221,7 @@ class RecallsControllerTests extends ControllerTestBase {
       List<RecallResult> results = controller.previouslyAnswered("Asia/Shanghai");
 
       assertThat(results, hasSize(1));
-      assertThat(results.get(0), instanceOf(RecallResult.SpellingResult.class));
+      assertEquals(QuestionType.SPELLING, results.get(0).questionType());
     }
   }
 }

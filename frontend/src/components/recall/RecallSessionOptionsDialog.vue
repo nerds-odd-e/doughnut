@@ -47,7 +47,7 @@ import { computed } from "vue"
 import SvgSkip from "../svgs/SvgSkip.vue"
 import Modal from "../commons/Modal.vue"
 import { useRecallData } from "@/composables/useRecallData"
-import type { QuestionResult, RecallResult } from "@generated/backend"
+import type { RecallResult } from "@generated/backend"
 
 const props = defineProps({
   canMoveToEnd: { type: Boolean, required: true },
@@ -87,12 +87,11 @@ const handleTreadmillModeToggle = (event: Event) => {
 
 const isQuestionResultWithThinkingTime = (
   result: RecallResult | undefined
-): result is QuestionResult => {
-  if (result === undefined || result.type !== "QuestionResult") {
+): result is RecallResult => {
+  if (result === undefined || result.questionType !== "MCQ") {
     return false
   }
-  const questionResult = result as QuestionResult
-  return questionResult.answeredQuestion?.answer?.thinkingTimeMs !== undefined
+  return result.answeredQuestion?.answer?.thinkingTimeMs !== undefined
 }
 
 const averageThinkingTime = computed(() => {
