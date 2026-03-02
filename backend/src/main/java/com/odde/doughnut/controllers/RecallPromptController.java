@@ -83,11 +83,10 @@ class RecallPromptController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     authorizationService.assertReadAuthorization(recallPrompt.getMemoryTracker());
-    return RecallResult.SpellingResult.from(
-        memoryTrackerService.answerSpelling(
-            recallPrompt,
-            answerDTO,
-            authorizationService.getCurrentUser(),
-            testabilitySettings.getCurrentUTCTimestamp()));
+    return memoryTrackerService.answerSpelling(
+        recallPrompt,
+        answerDTO,
+        authorizationService.getCurrentUser(),
+        testabilitySettings.getCurrentUTCTimestamp());
   }
 }

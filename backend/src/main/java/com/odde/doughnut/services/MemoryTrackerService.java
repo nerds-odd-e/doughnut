@@ -2,7 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.InitialInfo;
-import com.odde.doughnut.controllers.dto.SpellingResultDTO;
+import com.odde.doughnut.controllers.dto.RecallResult;
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
@@ -139,7 +139,7 @@ public class MemoryTrackerService {
     entityPersister.save(memoryTracker);
   }
 
-  public SpellingResultDTO answerSpelling(
+  public RecallResult.SpellingResult answerSpelling(
       MemoryTracker memoryTracker,
       AnswerSpellingDTO answerSpellingDTO,
       User user,
@@ -150,7 +150,7 @@ public class MemoryTrackerService {
     boolean thresholdExceeded =
         markAsRepeated(
             currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
-    return new SpellingResultDTO(
+    return new RecallResult.SpellingResult(
         note, spellingAnswer, correct, memoryTracker.getId(), thresholdExceeded);
   }
 
@@ -178,7 +178,7 @@ public class MemoryTrackerService {
     return entityPersister.save(recallPrompt);
   }
 
-  public SpellingResultDTO answerSpelling(
+  public RecallResult.SpellingResult answerSpelling(
       RecallPrompt recallPrompt,
       AnswerSpellingDTO answerSpellingDTO,
       User user,
@@ -204,7 +204,7 @@ public class MemoryTrackerService {
     boolean thresholdExceeded =
         markAsRepeated(
             currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
-    return new SpellingResultDTO(
+    return new RecallResult.SpellingResult(
         note, spellingAnswer, correct, memoryTracker.getId(), thresholdExceeded);
   }
 

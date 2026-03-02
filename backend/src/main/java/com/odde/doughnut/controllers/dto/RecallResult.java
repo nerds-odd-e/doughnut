@@ -21,14 +21,5 @@ public sealed interface RecallResult
       Boolean isCorrect,
       Integer memoryTrackerId,
       Boolean thresholdExceeded)
-      implements RecallResult {
-    public static SpellingResult from(SpellingResultDTO dto) {
-      return new SpellingResult(
-          dto.getNote(),
-          dto.getAnswer(),
-          dto.getIsCorrect(),
-          dto.getMemoryTrackerId(),
-          dto.getThresholdExceeded());
-    }
-  }
+      implements RecallResult {}
 }
