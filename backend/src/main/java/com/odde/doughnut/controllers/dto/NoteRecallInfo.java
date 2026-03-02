@@ -7,7 +7,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-public class NoteInfo {
+public class NoteRecallInfo {
   @Getter @Setter private List<MemoryTracker> memoryTrackers;
   @Getter @Setter public NoteRecallSetting recallSetting;
   @Getter @Setter private NoteType noteType;

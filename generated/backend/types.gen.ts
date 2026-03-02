@@ -523,7 +523,7 @@ export type CurrentUserInfo = {
     externalIdentifier?: string;
 };
 
-export type NoteInfo = {
+export type NoteRecallInfo = {
     memoryTrackers?: Array<MemoryTracker>;
     recallSetting?: NoteRecallSetting;
     noteType?: 'concept' | 'source' | 'person' | 'experience' | 'initiative' | 'quest';
@@ -729,7 +729,7 @@ export type ConversationSubjectWritable = {
     answeredQuestion?: AnsweredQuestionWritable;
 };
 
-export type NoteInfoWritable = {
+export type NoteRecallInfoWritable = {
     memoryTrackers?: Array<MemoryTrackerWritable>;
     recallSetting?: NoteRecallSetting;
     noteType?: 'concept' | 'source' | 'person' | 'experience' | 'initiative' | 'quest';
@@ -3746,7 +3746,7 @@ export type GetNoteInfoResponses = {
     /**
      * OK
      */
-    200: NoteInfo;
+    200: NoteRecallInfo;
 };
 
 export type GetNoteInfoResponse = GetNoteInfoResponses[keyof GetNoteInfoResponses];

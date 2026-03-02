@@ -19,7 +19,7 @@ const meta = {
     (story) => {
       // Mock NoteController.getNoteInfo to avoid API calls
       const originalGetNoteInfo = NoteController.getNoteInfo
-      const mockNoteInfo = makeMe.aNoteInfo
+      const mockNoteInfo = makeMe.aNoteRecallInfo
         .recallSetting({
           level: 0,
           rememberSpelling: false,

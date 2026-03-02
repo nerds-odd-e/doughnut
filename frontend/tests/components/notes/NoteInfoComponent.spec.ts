@@ -14,7 +14,7 @@ describe("NoteInfoComponent", () => {
 
   it("should display all memory trackers including skipped ones", () => {
     const noteRealm = makeMe.aNoteRealm.please()
-    const noteInfo = makeMe.aNoteInfo
+    const noteRecallInfo = makeMe.aNoteRecallInfo
       .memoryTrackers([
         makeMe.aMemoryTracker
           .removedFromTracking(false)
@@ -31,7 +31,7 @@ describe("NoteInfoComponent", () => {
       .component(NoteInfoComponent)
       .withProps({
         note: noteRealm.note,
-        noteInfo,
+        noteRecallInfo,
       })
       .withRouter()
       .mount({ attachTo: document.body })
@@ -46,7 +46,7 @@ describe("NoteInfoComponent", () => {
       .please()
     skippedMemoryTracker.id = 123
     const noteRealm = makeMe.aNoteRealm.please()
-    const noteInfo = makeMe.aNoteInfo
+    const noteRecallInfo = makeMe.aNoteRecallInfo
       .memoryTrackers([skippedMemoryTracker])
       .please()
 
@@ -54,7 +54,7 @@ describe("NoteInfoComponent", () => {
       .component(NoteInfoComponent)
       .withProps({
         note: noteRealm.note,
-        noteInfo,
+        noteRecallInfo,
       })
       .withRouter()
       .mount({ attachTo: document.body })
@@ -75,7 +75,7 @@ describe("NoteInfoComponent", () => {
 
   it("should display memory trackers table when there are memory trackers", () => {
     const noteRealm = makeMe.aNoteRealm.please()
-    const noteInfo = makeMe.aNoteInfo
+    const noteRecallInfo = makeMe.aNoteRecallInfo
       .memoryTrackers([makeMe.aMemoryTracker.please()])
       .please()
 
@@ -83,7 +83,7 @@ describe("NoteInfoComponent", () => {
       .component(NoteInfoComponent)
       .withProps({
         note: noteRealm.note,
-        noteInfo,
+        noteRecallInfo,
       })
       .withRouter()
       .mount({ attachTo: document.body })
@@ -97,13 +97,13 @@ describe("NoteInfoComponent", () => {
 
   it("should not display memory trackers table when there are no memory trackers", () => {
     const noteRealm = makeMe.aNoteRealm.please()
-    const noteInfo = makeMe.aNoteInfo.please()
+    const noteRecallInfo = makeMe.aNoteRecallInfo.please()
 
     wrapper = helper
       .component(NoteInfoComponent)
       .withProps({
         note: noteRealm.note,
-        noteInfo,
+        noteRecallInfo,
       })
       .withRouter()
       .mount({ attachTo: document.body })
@@ -120,13 +120,13 @@ describe("NoteInfoComponent", () => {
 
     it("should display note type selection", () => {
       const noteRealm = makeMe.aNoteRealm.please()
-      const noteInfo = makeMe.aNoteInfo.noteType("concept").please()
+      const noteRecallInfo = makeMe.aNoteRecallInfo.noteType("concept").please()
 
       wrapper = helper
         .component(NoteInfoComponent)
         .withProps({
           note: noteRealm.note,
-          noteInfo,
+          noteRecallInfo,
         })
         .withRouter()
         .mount({ attachTo: document.body })
@@ -140,13 +140,13 @@ describe("NoteInfoComponent", () => {
 
     it("should save noteType when user selects a new type", async () => {
       const noteRealm = makeMe.aNoteRealm.please()
-      const noteInfo = makeMe.aNoteInfo.please()
+      const noteRecallInfo = makeMe.aNoteRecallInfo.please()
 
       wrapper = helper
         .component(NoteInfoComponent)
         .withProps({
           note: noteRealm.note,
-          noteInfo,
+          noteRecallInfo,
         })
         .withRouter()
         .mount({ attachTo: document.body })
@@ -167,13 +167,13 @@ describe("NoteInfoComponent", () => {
 
     it("should emit noteTypeUpdated event on successful update", async () => {
       const noteRealm = makeMe.aNoteRealm.please()
-      const noteInfo = makeMe.aNoteInfo.please()
+      const noteRecallInfo = makeMe.aNoteRecallInfo.please()
 
       wrapper = helper
         .component(NoteInfoComponent)
         .withProps({
           note: noteRealm.note,
-          noteInfo,
+          noteRecallInfo,
         })
         .withRouter()
         .mount({ attachTo: document.body })
@@ -192,7 +192,7 @@ describe("NoteInfoComponent", () => {
 
     it("should revert selection on error", async () => {
       const noteRealm = makeMe.aNoteRealm.please()
-      const noteInfo = makeMe.aNoteInfo.noteType("concept").please()
+      const noteRecallInfo = makeMe.aNoteRecallInfo.noteType("concept").please()
 
       updateNoteTypeSpy.mockResolvedValue(wrapSdkError("Failed to update"))
 
@@ -200,7 +200,7 @@ describe("NoteInfoComponent", () => {
         .component(NoteInfoComponent)
         .withProps({
           note: noteRealm.note,
-          noteInfo,
+          noteRecallInfo,
         })
         .withRouter()
         .mount({ attachTo: document.body })
@@ -220,13 +220,15 @@ describe("NoteInfoComponent", () => {
 
     it("should not save when selected type matches current noteType", async () => {
       const noteRealm = makeMe.aNoteRealm.please()
-      const noteInfo = makeMe.aNoteInfo.noteType("initiative").please()
+      const noteRecallInfo = makeMe.aNoteRecallInfo
+        .noteType("initiative")
+        .please()
 
       wrapper = helper
         .component(NoteInfoComponent)
         .withProps({
           note: noteRealm.note,
-          noteInfo,
+          noteRecallInfo,
         })
         .withRouter()
         .mount({ attachTo: document.body })

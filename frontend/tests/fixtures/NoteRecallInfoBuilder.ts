@@ -1,12 +1,12 @@
 import type {
   MemoryTracker,
-  NoteInfo,
+  NoteRecallInfo,
   NoteRecallSetting,
 } from "@generated/backend"
 import Builder from "./Builder"
 
-class NoteInfoBuilder extends Builder<NoteInfo> {
-  data: NoteInfo
+class NoteRecallInfoBuilder extends Builder<NoteRecallInfo> {
+  data: NoteRecallInfo
 
   constructor() {
     super()
@@ -16,24 +16,24 @@ class NoteInfoBuilder extends Builder<NoteInfo> {
     }
   }
 
-  memoryTrackers(value: MemoryTracker[]): NoteInfoBuilder {
+  memoryTrackers(value: MemoryTracker[]): NoteRecallInfoBuilder {
     this.data.memoryTrackers = value
     return this
   }
 
-  recallSetting(value: NoteRecallSetting): NoteInfoBuilder {
+  recallSetting(value: NoteRecallSetting): NoteRecallInfoBuilder {
     this.data.recallSetting = value
     return this
   }
 
-  noteType(value: NoteInfo["noteType"]): NoteInfoBuilder {
+  noteType(value: NoteRecallInfo["noteType"]): NoteRecallInfoBuilder {
     this.data.noteType = value
     return this
   }
 
-  do(): NoteInfo {
+  do(): NoteRecallInfo {
     return this.data
   }
 }
 
-export default NoteInfoBuilder
+export default NoteRecallInfoBuilder

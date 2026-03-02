@@ -1,15 +1,15 @@
 <template>
   <NoteInfoComponent
-    v-if="noteInfo && note"
+    v-if="noteRecallInfo && note"
     :note="note"
-    :note-info="noteInfo"
+    :note-recall-info="noteRecallInfo"
     @level-changed="$emit('levelChanged', $event)"
     @remember-spelling-changed="$emit('rememberSpellingChanged', $event)"
   />
 </template>
 
 <script setup lang="ts">
-import type { NoteInfo } from "@generated/backend"
+import type { NoteRecallInfo } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
 import NoteInfoComponent from "./NoteInfoComponent.vue"
 import { ref, watch, computed } from "vue"
@@ -25,7 +25,7 @@ const emit = defineEmits<{
   (e: "rememberSpellingChanged", value: boolean): void
 }>()
 
-const noteInfo = ref<NoteInfo | undefined>(undefined)
+const noteRecallInfo = ref<NoteRecallInfo | undefined>(undefined)
 const storageAccessor = useStorageAccessor()
 
 const note = computed(
@@ -34,16 +34,16 @@ const note = computed(
 )
 
 const fetchData = async () => {
-  const { data: noteInfoData, error } = await apiCallWithLoading(() =>
+  const { data, error } = await apiCallWithLoading(() =>
     NoteController.getNoteInfo({
       path: { note: props.noteId },
     })
   )
   if (!error) {
-    noteInfo.value = noteInfoData!
+    noteRecallInfo.value = data!
     emit(
       "rememberSpellingChanged",
-      noteInfoData?.recallSetting?.rememberSpelling ?? false
+      data?.recallSetting?.rememberSpelling ?? false
     )
   }
 }

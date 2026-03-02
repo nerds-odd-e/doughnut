@@ -6,7 +6,7 @@ import { describe, it, expect, afterEach } from "vitest"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const noteRealm = makeMe.aNoteRealm.please()
-const stubResponse = makeMe.aNoteInfo
+const stubResponse = makeMe.aNoteRecallInfo
   .memoryTrackers([makeMe.aMemoryTracker.please()])
   .please()
 

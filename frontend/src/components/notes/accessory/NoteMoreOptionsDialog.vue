@@ -6,10 +6,10 @@
       </svg>
     </button>
     <div class="daisy-flex daisy-flex-col daisy-gap-2">
-      <div v-if="noteInfo && note" class="daisy-mb-4">
+      <div v-if="noteRecallInfo && note" class="daisy-mb-4">
         <NoteInfoComponent
           :note="note"
-          :note-info="noteInfo"
+          :note-recall-info="noteRecallInfo"
           @note-type-updated="onNoteTypeUpdated"
         />
       </div>
@@ -120,7 +120,7 @@ import SvgImage from "../../svgs/SvgImage.vue"
 import { useRouter } from "vue-router"
 import usePopups from "../../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import type { NoteInfo } from "@generated/backend"
+import type { NoteRecallInfo } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
 import { ref, onMounted } from "vue"
 import NoteInfoComponent from "../NoteInfoComponent.vue"
@@ -139,14 +139,14 @@ const router = useRouter()
 const { popups } = usePopups()
 const storageAccessor = useStorageAccessor()
 
-const noteInfo = ref<NoteInfo | undefined>(undefined)
+const noteRecallInfo = ref<NoteRecallInfo | undefined>(undefined)
 
 const fetchNoteInfo = async () => {
-  const { data: noteInfoData, error } = await NoteController.getNoteInfo({
+  const { data, error } = await NoteController.getNoteInfo({
     path: { note: note.id },
   })
-  if (!error && noteInfoData) {
-    noteInfo.value = noteInfoData
+  if (!error && data) {
+    noteRecallInfo.value = data
   }
 }
 

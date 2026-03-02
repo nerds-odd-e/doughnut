@@ -11,7 +11,7 @@ beforeEach(() => {
   const noteRealm = makeMe.aNoteRealm.please()
   mockSdkService(
     "getNoteInfo",
-    makeMe.aNoteInfo
+    makeMe.aNoteRecallInfo
       .recallSetting({
         level: 0,
         rememberSpelling: false,

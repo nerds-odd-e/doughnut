@@ -16,7 +16,7 @@ beforeEach(() => {
   showNoteSpy = mockSdkService("showNote", noteRealm)
   mockSdkService(
     "getNoteInfo",
-    makeMe.aNoteInfo
+    makeMe.aNoteRecallInfo
       .recallSetting({
         level: 0,
         rememberSpelling: false,

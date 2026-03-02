@@ -19,7 +19,7 @@ describe("NoteToolbar", () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
     mockSdkService(
       "getNoteInfo",
-      makeMe.aNoteInfo
+      makeMe.aNoteRecallInfo
         .recallSetting({
           level: 0,
           rememberSpelling: false,
@@ -60,7 +60,7 @@ describe("NoteToolbar", () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
     mockSdkService(
       "getNoteInfo",
-      makeMe.aNoteInfo
+      makeMe.aNoteRecallInfo
         .recallSetting({
           level: 0,
           rememberSpelling: false,

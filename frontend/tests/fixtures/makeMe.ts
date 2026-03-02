@@ -11,7 +11,7 @@ import DueMemoryTrackersBuilder from "./DueMemoryTrackersBuilder"
 import RelationshipBuilder from "./RelationshipBuilder"
 import MemoryTrackerBuilder from "./MemoryTrackerBuilder"
 import NoteBuilder from "./NoteBuilder"
-import NoteInfoBuilder from "./NoteInfoBuilder"
+import NoteRecallInfoBuilder from "./NoteRecallInfoBuilder"
 import NoteRealmBuilder from "./NoteRealmBuilder"
 import NotebookBuilder from "./NotebookBuilder"
 import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
@@ -31,8 +31,8 @@ class MakeMe {
     return new NoteBuilder()
   }
 
-  static get aNoteInfo(): NoteInfoBuilder {
-    return new NoteInfoBuilder()
+  static get aNoteRecallInfo(): NoteRecallInfoBuilder {
+    return new NoteRecallInfoBuilder()
   }
 
   static get aNoteRealm(): NoteRealmBuilder {

@@ -24,7 +24,7 @@ const defaultRecallSetting = {
   rememberSpelling: false,
   skipMemoryTracking: false,
 }
-const mockNoteInfo = makeMe.aNoteInfo
+const mockNoteInfo = makeMe.aNoteRecallInfo
   .recallSetting(defaultRecallSetting)
   .please()
 
@@ -71,7 +71,7 @@ describe("NoteMoreOptionsDialog", () => {
     })
 
     it("initializes note type from fetched noteInfo", async () => {
-      const noteInfoWithType = makeMe.aNoteInfo
+      const noteInfoWithType = makeMe.aNoteRecallInfo
         .recallSetting(defaultRecallSetting)
         .noteType("concept")
         .please()

@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import type { MemoryTracker, Note, NoteInfo } from "@generated/backend"
+import type { MemoryTracker, Note, NoteRecallInfo } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { ref, computed, watch } from "vue"
@@ -59,10 +59,10 @@ import Select from "../form/Select.vue"
 import { noteTypeOptions } from "@/models/noteTypeOptions"
 import type { NoteType } from "@/models/noteTypeOptions"
 
-// Props - note from container (reactive), noteInfo from API
+// Props - note from container (reactive), noteRecallInfo from API
 const props = defineProps<{
   note: Note
-  noteInfo: NoteInfo
+  noteRecallInfo: NoteRecallInfo
 }>()
 
 // Emits
@@ -76,11 +76,11 @@ const emit = defineEmits<{
 const router = useRouter()
 
 // Reactive state
-const memoryTrackers = ref(props.noteInfo.memoryTrackers ?? [])
-const localNoteType = ref<NoteType | undefined>(props.noteInfo.noteType)
+const memoryTrackers = ref(props.noteRecallInfo.memoryTrackers ?? [])
+const localNoteType = ref<NoteType | undefined>(props.noteRecallInfo.noteType)
 
 // Computed
-const recallSetting = computed(() => props.noteInfo.recallSetting)
+const recallSetting = computed(() => props.noteRecallInfo.recallSetting)
 const noteTypeOptionsWithEmpty = computed(
   () => ["", ...noteTypeOptions] as string[]
 )
@@ -91,9 +91,9 @@ const localNoteTypeForSelect = computed({
   },
 })
 
-// Watch for external changes to noteInfo.noteType
+// Watch for external changes to noteRecallInfo.noteType
 watch(
-  () => props.noteInfo.noteType,
+  () => props.noteRecallInfo.noteType,
   (newNoteType) => {
     localNoteType.value = newNoteType
   }
@@ -119,7 +119,7 @@ const updateNoteType = async (newTypeString: string) => {
   const newType = newTypeString === "" ? undefined : (newTypeString as NoteType)
   localNoteType.value = newType
 
-  if (newType === props.noteInfo.noteType) {
+  if (newType === props.noteRecallInfo.noteType) {
     return
   }
 

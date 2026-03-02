@@ -2948,7 +2948,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NoteInfo"
+                $ref: "#/components/schemas/NoteRecallInfo"
   /api/notes/{note}/graph:
     get:
       tags:
@@ -4689,7 +4689,7 @@ components:
           $ref: "#/components/schemas/User"
         externalIdentifier:
           type: string
-    NoteInfo:
+    NoteRecallInfo:
       type: object
       properties:
         memoryTrackers:

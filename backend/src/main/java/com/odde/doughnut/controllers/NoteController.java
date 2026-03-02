@@ -113,15 +113,15 @@ class NoteController {
   }
 
   @GetMapping("/{note}/note-info")
-  public NoteInfo getNoteInfo(@PathVariable("note") @Schema(type = "integer") Note note)
+  public NoteRecallInfo getNoteInfo(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(note);
-    NoteInfo noteInfo = new NoteInfo();
-    noteInfo.setMemoryTrackers(
+    NoteRecallInfo noteRecallInfo = new NoteRecallInfo();
+    noteRecallInfo.setMemoryTrackers(
         userService.getMemoryTrackersFor(authorizationService.getCurrentUser(), note));
-    noteInfo.setRecallSetting(note.getRecallSetting());
-    noteInfo.setNoteType(note.getNoteType());
-    return noteInfo;
+    noteRecallInfo.setRecallSetting(note.getRecallSetting());
+    noteRecallInfo.setNoteType(note.getNoteType());
+    return noteRecallInfo;
   }
 
   @PostMapping(value = "/{note}/delete")

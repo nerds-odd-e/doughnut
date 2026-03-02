@@ -109,10 +109,10 @@ class NoteControllerTests extends ControllerTestBase {
           .removedFromTracking()
           .please();
 
-      NoteInfo noteInfo = controller.getNoteInfo(note);
-      assertThat(noteInfo.getMemoryTrackers(), hasSize(2));
+      NoteRecallInfo noteRecallInfo = controller.getNoteInfo(note);
+      assertThat(noteRecallInfo.getMemoryTrackers(), hasSize(2));
       assertThat(
-          noteInfo.getMemoryTrackers().stream()
+          noteRecallInfo.getMemoryTrackers().stream()
               .anyMatch(mt -> Boolean.TRUE.equals(mt.getRemovedFromTracking())),
           is(true));
     }
@@ -121,8 +121,8 @@ class NoteControllerTests extends ControllerTestBase {
     void shouldIncludeNoteTypeInNoteInfo() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
 
-      NoteInfo noteInfo = controller.getNoteInfo(note);
-      assertThat(noteInfo.getNoteType(), nullValue());
+      NoteRecallInfo noteRecallInfo = controller.getNoteInfo(note);
+      assertThat(noteRecallInfo.getNoteType(), nullValue());
     }
   }
 
