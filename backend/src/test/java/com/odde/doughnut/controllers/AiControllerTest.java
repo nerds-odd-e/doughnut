@@ -8,12 +8,14 @@ import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.PointsRequestDTO;
+import com.odde.doughnut.controllers.dto.PromotePointResponseDTO;
 import com.odde.doughnut.controllers.dto.RemovePointsResponseDTO;
 import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
 import com.odde.doughnut.controllers.dto.UnderstandingChecklistDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.ai.PointExtractionResult;
 import com.odde.doughnut.services.ai.RegeneratedNoteDetails;
 import com.odde.doughnut.services.ai.TitleReplacement;
 import com.odde.doughnut.services.ai.UnderstandingChecklist;
@@ -343,6 +345,141 @@ class AiControllerTest extends ControllerTestBase {
       requestDTO.points = List.of();
       RemovePointsResponseDTO response = controller.removePointFromNote(testNote, requestDTO);
       assertThat(response.getDetails()).isEqualTo("Some note content.");
+    }
+  }
+
+  @Nested
+  class PromotePointToChild {
+    Note testNote;
+    OpenAIChatCompletionMock openAIChatCompletionMock;
+
+    @BeforeEach
+    void setup() {
+      testNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      testNote.setDetails("Original content with a key point to promote.");
+      openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+    }
+
+    @Test
+    void shouldReturnCreatedChildNoteAndUpdatedParent()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      PointExtractionResult aiResult = new PointExtractionResult();
+      aiResult.setNewNoteTitle("Extracted Child Note");
+      aiResult.setNewNoteDetails("Expanded details for the promoted point.");
+      aiResult.setUpdatedParentDetails("Updated parent with summary.");
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(aiResult);
+
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
+      requestDTO.setPoints(List.of("key point to promote"));
+      PromotePointResponseDTO response = controller.promotePointToChild(testNote, requestDTO);
+
+      assertThat(response.getCreatedNote().getNote().getTitle()).isEqualTo("Extracted Child Note");
+      assertThat(response.getCreatedNote().getNote().getDetails())
+          .isEqualTo("Expanded details for the promoted point.");
+      assertThat(response.getUpdatedParentNote().getNote().getDetails())
+          .isEqualTo("Updated parent with summary.");
+    }
+
+    @Test
+    void shouldRequireUserToBeLoggedIn() {
+      currentUser.setUser(null);
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
+      requestDTO.setPoints(List.of("a point"));
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.promotePointToChild(testNote, requestDTO));
+    }
+
+    @Test
+    void shouldThrowWhenPointsIsEmpty() {
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
+      requestDTO.setPoints(List.of());
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> controller.promotePointToChild(testNote, requestDTO));
+    }
+
+    @Test
+    void shouldThrowWhenPointsIsNull() {
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
+      requestDTO.setPoints(null);
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> controller.promotePointToChild(testNote, requestDTO));
+    }
+
+    @Test
+    void shouldThrowWhenAiReturnsNull()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      openAIChatCompletionMock.mockNullChatCompletion();
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
+      requestDTO.setPoints(List.of("a point"));
+      assertThrows(
+          RuntimeException.class, () -> controller.promotePointToChild(testNote, requestDTO));
+    }
+  }
+
+  @Nested
+  class PromotePointToSibling {
+    Note testNote;
+    OpenAIChatCompletionMock openAIChatCompletionMock;
+
+    @BeforeEach
+    void setup() {
+      Note parentNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      testNote = makeMe.aNote().under(parentNote).please();
+      testNote.setDetails("Original content with a key point to promote.");
+      openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+    }
+
+    @Test
+    void shouldReturnCreatedSiblingNoteAndUpdatedParent()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      PointExtractionResult aiResult = new PointExtractionResult();
+      aiResult.setNewNoteTitle("Extracted Sibling Note");
+      aiResult.setNewNoteDetails("Expanded details for the sibling.");
+      aiResult.setUpdatedParentDetails("Updated parent with summary.");
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(aiResult);
+
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
+      requestDTO.setPoints(List.of("key point to promote"));
+      PromotePointResponseDTO response = controller.promotePointToSibling(testNote, requestDTO);
+
+      assertThat(response.getCreatedNote().getNote().getTitle())
+          .isEqualTo("Extracted Sibling Note");
+      assertThat(response.getCreatedNote().getNote().getDetails())
+          .isEqualTo("Expanded details for the sibling.");
+      assertThat(response.getUpdatedParentNote().getNote().getDetails())
+          .isEqualTo("Updated parent with summary.");
+    }
+
+    @Test
+    void shouldRequireUserToBeLoggedIn() {
+      currentUser.setUser(null);
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
+      requestDTO.setPoints(List.of("a point"));
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.promotePointToSibling(testNote, requestDTO));
+    }
+
+    @Test
+    void shouldThrowWhenPointsIsEmpty() {
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
+      requestDTO.setPoints(List.of());
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> controller.promotePointToSibling(testNote, requestDTO));
+    }
+
+    @Test
+    void shouldThrowWhenAiReturnsNull()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      openAIChatCompletionMock.mockNullChatCompletion();
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
+      requestDTO.setPoints(List.of("a point"));
+      assertThrows(
+          RuntimeException.class, () -> controller.promotePointToSibling(testNote, requestDTO));
     }
   }
 }
