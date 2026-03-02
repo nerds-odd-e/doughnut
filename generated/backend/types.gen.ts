@@ -226,11 +226,6 @@ export type AnsweredQuestion = {
     thresholdExceeded?: boolean;
 };
 
-export type RecallResult = {
-    answeredQuestion?: AnsweredQuestion;
-    questionType?: 'MCQ' | 'SPELLING';
-};
-
 export type AnswerSpellingDto = {
     spellingAnswer?: string;
     thinkingTimeMs?: number;
@@ -664,11 +659,6 @@ export type AnsweredQuestionWritable = {
     answer: Answer;
     memoryTrackerId?: number;
     thresholdExceeded?: boolean;
-};
-
-export type RecallResultWritable = {
-    answeredQuestion?: AnsweredQuestionWritable;
-    questionType?: 'MCQ' | 'SPELLING';
 };
 
 export type NoteCreationResultWritable = {
@@ -1526,7 +1516,7 @@ export type AnswerQuizResponses = {
     /**
      * OK
      */
-    200: RecallResult;
+    200: AnsweredQuestion;
 };
 
 export type AnswerQuizResponse = AnswerQuizResponses[keyof AnswerQuizResponses];
@@ -1553,7 +1543,7 @@ export type AnswerSpellingResponses = {
     /**
      * OK
      */
-    200: RecallResult;
+    200: AnsweredQuestion;
 };
 
 export type AnswerSpellingResponse = AnswerSpellingResponses[keyof AnswerSpellingResponses];
@@ -3664,7 +3654,7 @@ export type PreviouslyAnsweredResponses = {
     /**
      * OK
      */
-    200: Array<RecallResult>;
+    200: Array<AnsweredQuestion>;
 };
 
 export type PreviouslyAnsweredResponse = PreviouslyAnsweredResponses[keyof PreviouslyAnsweredResponses];

@@ -1,6 +1,6 @@
 import { useRecallData } from "@/composables/useRecallData"
 import RecallPage from "@/pages/RecallPage.vue"
-import type { MemoryTrackerLite, RecallResult } from "@generated/backend"
+import type { AnsweredQuestion, MemoryTrackerLite } from "@generated/backend"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, {
   mockSdkService,
@@ -138,17 +138,14 @@ describe("repeat page", () => {
 
     it("should prepend previously answered recall prompts to the list", async () => {
       const note = makeMe.aNote.please()
-      const previousQuestionResult: RecallResult = {
-        questionType: "MCQ",
-        answeredQuestion: {
-          note,
-          recallPrompt: makeMe.aRecallPrompt
-            .withId(1)
-            .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
-            .please(),
-          answer: { id: 1, correct: true, choiceIndex: 0 },
-          memoryTrackerId: 1,
-        },
+      const previousQuestionResult: AnsweredQuestion = {
+        note,
+        recallPrompt: makeMe.aRecallPrompt
+          .withId(1)
+          .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
+          .please(),
+        answer: { id: 1, correct: true, choiceIndex: 0 },
+        memoryTrackerId: 1,
       }
       previouslyAnsweredSpy.mockResolvedValueOnce(
         wrapSdkResponse([previousQuestionResult])
@@ -293,14 +290,13 @@ describe("repeat page", () => {
     it("should handle spelling questions correctly", async () => {
       const note = makeMe.aNote.please()
       note.id = 42
-      const answerResult: RecallResult = {
-        questionType: "SPELLING",
-        answeredQuestion: {
-          note,
-          recallPrompt: makeMe.aRecallPrompt.please(),
-          answer: { id: 1, correct: false, spellingAnswer: "test answer" },
-          memoryTrackerId: 123,
-        },
+      const answerResult: AnsweredQuestion = {
+        note,
+        recallPrompt: makeMe.aRecallPrompt
+          .withQuestionType("SPELLING")
+          .please(),
+        answer: { id: 1, correct: false, spellingAnswer: "test answer" },
+        memoryTrackerId: 123,
       }
 
       const mockedAnswerSpellingCall = mockSdkService(

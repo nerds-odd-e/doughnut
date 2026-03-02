@@ -7,7 +7,7 @@ import helper, {
   wrapSdkResponse,
   wrapSdkError,
 } from "@tests/helpers"
-import type { MemoryTrackerLite, RecallResult } from "@generated/backend"
+import type { AnsweredQuestion, MemoryTrackerLite } from "@generated/backend"
 
 describe("repeat page", () => {
   const recallPrompt = makeMe.aRecallPrompt.please()
@@ -143,13 +143,10 @@ describe("repeat page", () => {
       }
       mockSdkService("showMemoryTracker", memoryTracker)
 
-      const answerResult: RecallResult = {
-        questionType: "SPELLING",
-        answeredQuestion: {
-          note: makeMe.aNote.please(),
-          recallPrompt: makeMe.aRecallPrompt.please(),
-          answer: { id: 1, correct: true, spellingAnswer: "cat" },
-        },
+      const answerResult: AnsweredQuestion = {
+        note: makeMe.aNote.please(),
+        recallPrompt: makeMe.aRecallPrompt.please(),
+        answer: { id: 1, correct: true, spellingAnswer: "cat" },
       }
       const mockedAnswerSpelling = mockSdkService(
         "answerSpelling",

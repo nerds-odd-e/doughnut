@@ -2,7 +2,6 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.InitialInfo;
-import com.odde.doughnut.controllers.dto.RecallResult;
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.MemoryTracker;
@@ -140,7 +139,7 @@ public class MemoryTrackerService {
     entityPersister.save(memoryTracker);
   }
 
-  public RecallResult answerSpelling(
+  public AnsweredQuestion answerSpelling(
       MemoryTracker memoryTracker,
       AnswerSpellingDTO answerSpellingDTO,
       User user,
@@ -159,8 +158,7 @@ public class MemoryTrackerService {
             answer.getCorrect(),
             memoryTracker,
             answerSpellingDTO.getThinkingTimeMs());
-    AnsweredQuestion answeredQuestion = recallPrompt.getAnsweredQuestion(thresholdExceeded);
-    return new RecallResult(answeredQuestion, QuestionType.SPELLING);
+    return recallPrompt.getAnsweredQuestion(thresholdExceeded);
   }
 
   public List<RecallPrompt> getAllRecallPrompts(MemoryTracker memoryTracker) {
@@ -187,7 +185,7 @@ public class MemoryTrackerService {
     return entityPersister.save(recallPrompt);
   }
 
-  public RecallResult answerSpelling(
+  public AnsweredQuestion answerSpelling(
       RecallPrompt recallPrompt,
       AnswerSpellingDTO answerSpellingDTO,
       User user,
@@ -213,8 +211,7 @@ public class MemoryTrackerService {
     boolean thresholdExceeded =
         markAsRepeated(
             currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
-    AnsweredQuestion answeredQuestion = recallPrompt.getAnsweredQuestion(thresholdExceeded);
-    return new RecallResult(answeredQuestion, QuestionType.SPELLING);
+    return recallPrompt.getAnsweredQuestion(thresholdExceeded);
   }
 
   public boolean hasExceededWrongAnswerThreshold(
