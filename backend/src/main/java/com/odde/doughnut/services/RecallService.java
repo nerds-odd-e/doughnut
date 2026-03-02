@@ -2,7 +2,6 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.MemoryTrackerLite;
-import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
@@ -73,19 +72,12 @@ public class RecallService {
     return (int) getMemoryTrackersNeedToRepeat(user, currentUTCTimestamp, timeZone, 0).count();
   }
 
-  public List<AnsweredQuestion> getPreviouslyAnsweredRecallPrompts(
+  public List<RecallPrompt> getPreviouslyAnsweredRecallPrompts(
       User user, Timestamp currentUTCTimestamp, ZoneId timeZone) {
     Timestamp startTime = TimestampOperations.startOfHalfADay(currentUTCTimestamp, timeZone);
     Timestamp endTime = TimestampOperations.alignByHalfADay(currentUTCTimestamp, timeZone);
 
-    return recallPromptRepository
-        .findAnsweredRecallPromptsInTimeRange(user.getId(), startTime, endTime)
-        .stream()
-        .map(this::toAnsweredQuestion)
-        .toList();
-  }
-
-  private AnsweredQuestion toAnsweredQuestion(RecallPrompt recallPrompt) {
-    return recallPrompt.getAnsweredQuestion();
+    return recallPromptRepository.findAnsweredRecallPromptsInTimeRange(
+        user.getId(), startTime, endTime);
   }
 }

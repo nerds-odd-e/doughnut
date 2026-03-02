@@ -93,11 +93,11 @@ public class RecallQuestionService {
     return predefinedQuestionService.contest(recallPrompt.getPredefinedQuestion());
   }
 
-  public AnsweredQuestion answerQuestion(
+  public RecallPrompt answerQuestion(
       RecallPrompt recallPrompt, AnswerDTO answerDTO, User user, Timestamp currentUTCTimestamp) {
     Answer answer = answerService.createAnswerForQuestion(recallPrompt, answerDTO);
     memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
         user, currentUTCTimestamp, answer.getCorrect(), recallPrompt);
-    return recallPrompt.getAnsweredQuestion();
+    return recallPrompt;
   }
 }

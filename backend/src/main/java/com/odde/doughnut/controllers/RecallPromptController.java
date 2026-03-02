@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
-import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
@@ -63,7 +62,7 @@ class RecallPromptController {
 
   @PostMapping("/{recallPrompt}/answer")
   @Transactional
-  public AnsweredQuestion answerQuiz(
+  public RecallPrompt answerQuiz(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @Valid @RequestBody AnswerDTO answerDTO) {
     authorizationService.assertLoggedIn();
@@ -76,7 +75,7 @@ class RecallPromptController {
 
   @PostMapping("/{recallPrompt}/answer-spelling")
   @Transactional
-  public AnsweredQuestion answerSpelling(
+  public RecallPrompt answerSpelling(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @Valid @RequestBody AnswerSpellingDTO answerDTO)
       throws UnexpectedNoAccessRightException {

@@ -1,10 +1,10 @@
-import type { AnsweredQuestion, Note, RecallPrompt } from "@generated/backend"
+import type { Note, RecallPrompt } from "@generated/backend"
 import Builder from "./Builder"
 import generateId from "./generateId"
 import makeMe from "./makeMe"
 import RecallPromptBuilder from "./RecallPromptBuilder"
 
-class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
+class AnsweredQuestionBuilder extends Builder<RecallPrompt> {
   private noteToUse?: Note
   private recallPromptToUse?: RecallPrompt
   private isCorrect: boolean = true
@@ -30,10 +30,10 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
     return this
   }
 
-  do(): AnsweredQuestion {
+  do(): RecallPrompt {
     const predefinedQuestion = makeMe.aPredefinedQuestion.please()
     const note = this.noteToUse ?? makeMe.aNote.please()
-    const recallPrompt =
+    return (
       this.recallPromptToUse ??
       new RecallPromptBuilder()
         .withPredefinedQuestion(predefinedQuestion)
@@ -46,9 +46,7 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
           }),
         })
         .do()
-    return {
-      recallPrompt,
-    }
+    )
   }
 }
 

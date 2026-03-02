@@ -1,4 +1,4 @@
-import type { AnsweredQuestion, Conversation, Note } from "@/generated/backend"
+import type { Conversation, Note, RecallPrompt } from "@/generated/backend"
 import Builder from "./Builder"
 import generateId from "./generateId"
 import NoteBuilder from "./NoteBuilder"
@@ -20,8 +20,8 @@ class ConversationBuilder extends Builder<Conversation> {
     this.data.subject!.note = note
     return this
   }
-  forAnsweredQuestion(answeredQuestion: AnsweredQuestion) {
-    this.data.subject!.answeredQuestion = answeredQuestion
+  forAnsweredQuestion(recallPrompt: RecallPrompt) {
+    this.data.subject!.answeredQuestion = recallPrompt
     return this
   }
   withoutId() {

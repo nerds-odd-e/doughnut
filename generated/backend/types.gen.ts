@@ -219,10 +219,6 @@ export type AnswerDto = {
     thinkingTimeMs?: number;
 };
 
-export type AnsweredQuestion = {
-    recallPrompt: RecallPrompt;
-};
-
 export type AnswerSpellingDto = {
     spellingAnswer?: string;
     thinkingTimeMs?: number;
@@ -336,7 +332,7 @@ export type Conversation = {
 export type ConversationSubject = {
     assessmentQuestionInstance?: AssessmentQuestionInstance;
     note?: Note;
-    answeredQuestion?: AnsweredQuestion;
+    answeredQuestion?: RecallPrompt;
 };
 
 export type CircleJoiningByInvitation = {
@@ -655,10 +651,6 @@ export type RecallPromptWritable = {
     spellingQuestion?: SpellingQuestion;
 };
 
-export type AnsweredQuestionWritable = {
-    recallPrompt: RecallPromptWritable;
-};
-
 export type NoteCreationResultWritable = {
     created: NoteRealmWritable;
     parent: NoteRealmWritable;
@@ -688,7 +680,7 @@ export type ConversationWritable = {
 export type ConversationSubjectWritable = {
     assessmentQuestionInstance?: AssessmentQuestionInstance;
     note?: NoteWritable;
-    answeredQuestion?: AnsweredQuestionWritable;
+    answeredQuestion?: RecallPromptWritable;
 };
 
 export type NoteRecallInfoWritable = {
@@ -1514,7 +1506,7 @@ export type AnswerQuizResponses = {
     /**
      * OK
      */
-    200: AnsweredQuestion;
+    200: RecallPrompt;
 };
 
 export type AnswerQuizResponse = AnswerQuizResponses[keyof AnswerQuizResponses];
@@ -1541,7 +1533,7 @@ export type AnswerSpellingResponses = {
     /**
      * OK
      */
-    200: AnsweredQuestion;
+    200: RecallPrompt;
 };
 
 export type AnswerSpellingResponse = AnswerSpellingResponses[keyof AnswerSpellingResponses];
@@ -3652,7 +3644,7 @@ export type PreviouslyAnsweredResponses = {
     /**
      * OK
      */
-    200: Array<AnsweredQuestion>;
+    200: Array<RecallPrompt>;
 };
 
 export type PreviouslyAnsweredResponse = PreviouslyAnsweredResponses[keyof PreviouslyAnsweredResponses];

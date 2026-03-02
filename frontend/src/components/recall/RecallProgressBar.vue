@@ -64,7 +64,7 @@ import SvgBackward from "../svgs/SvgBackward.vue"
 import SvgCog from "../svgs/SvgCog.vue"
 import RecallSessionOptionsDialog from "./RecallSessionOptionsDialog.vue"
 
-import type { AnsweredQuestion } from "@generated/backend"
+import type { RecallPrompt } from "@generated/backend"
 
 const props = defineProps({
   finished: { type: Number, required: true },
@@ -75,7 +75,7 @@ const props = defineProps({
   totalAssimilatedCount: { type: Number, default: 0 },
   diligentMode: { type: Boolean, default: false },
   previousAnsweredQuestions: {
-    type: Array as () => (AnsweredQuestion | undefined)[],
+    type: Array as () => (RecallPrompt | undefined)[],
     required: true,
   },
 })

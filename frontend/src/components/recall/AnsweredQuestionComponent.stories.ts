@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/vue3"
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
 import makeMe from "@tests/fixtures/makeMe"
-import type { AnsweredQuestion } from "@generated/backend"
+import type { RecallPrompt } from "@generated/backend"
 
 const meta = {
   title: "Recall/AnsweredQuestionComponent",
@@ -20,14 +20,13 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-// Helper to create an answered question with custom predefined question
 const createAnsweredQuestionWithQuestion = (
   stem: string,
   choices: string[],
   correctIndex: number,
   answerIndex: number,
   isCorrect: boolean
-): AnsweredQuestion => {
+): RecallPrompt => {
   const predefinedQuestion = makeMe.aPredefinedQuestion
     .withQuestionStem(stem)
     .withChoices(choices)
@@ -39,25 +38,21 @@ const createAnsweredQuestionWithQuestion = (
     .withChoiceIndex(answerIndex)
     .please()
 
-  const note = base.recallPrompt?.note ?? makeMe.aNote.please()
-  return {
-    ...base,
-    recallPrompt: makeMe.aRecallPrompt
-      .withPredefinedQuestion(predefinedQuestion)
-      .withNote(note)
-      .withAnswer(
-        base.recallPrompt?.answer ?? {
-          id: 1,
-          correct: isCorrect,
-          choiceIndex: answerIndex,
-        }
-      )
-      .withId(base.recallPrompt.id)
-      .please(),
-  }
+  const note = base?.note ?? makeMe.aNote.please()
+  return makeMe.aRecallPrompt
+    .withPredefinedQuestion(predefinedQuestion)
+    .withNote(note)
+    .withAnswer(
+      base?.answer ?? {
+        id: 1,
+        correct: isCorrect,
+        choiceIndex: answerIndex,
+      }
+    )
+    .withId(base?.id ?? 1)
+    .please()
 }
 
-// Correctly answered question
 export const CorrectAnswer: Story = {
   args: {
     answeredQuestion: (() => {
@@ -68,8 +63,8 @@ export const CorrectAnswer: Story = {
         0,
         true
       )
-      question.recallPrompt = {
-        ...question.recallPrompt,
+      return {
+        ...question,
         note: makeMe.aNote
           .title("France")
           .details(
@@ -77,13 +72,11 @@ export const CorrectAnswer: Story = {
           )
           .please(),
       }
-      return question
     })(),
     conversationButton: true,
   },
 }
 
-// Incorrectly answered question
 export const IncorrectAnswer: Story = {
   args: {
     answeredQuestion: (() => {
@@ -94,8 +87,8 @@ export const IncorrectAnswer: Story = {
         1,
         false
       )
-      question.recallPrompt = {
-        ...question.recallPrompt,
+      return {
+        ...question,
         note: makeMe.aNote
           .title("France")
           .details(
@@ -103,13 +96,11 @@ export const IncorrectAnswer: Story = {
           )
           .please(),
       }
-      return question
     })(),
     conversationButton: true,
   },
 }
 
-// Question with note that has many ancestors
 export const NoteWithManyAncestors: Story = {
   args: {
     answeredQuestion: (() => {
@@ -121,7 +112,6 @@ export const NoteWithManyAncestors: Story = {
         true
       )
 
-      // Create a chain of 10 ancestor notes
       let currentNote = makeMe.aNote.title("Ancestor 1").please()
       for (let i = 2; i <= 10; i++) {
         currentNote = makeMe.aNote
@@ -130,9 +120,8 @@ export const NoteWithManyAncestors: Story = {
           .please()
       }
 
-      // Create the final note with all ancestors
-      question.recallPrompt = {
-        ...question.recallPrompt,
+      return {
+        ...question,
         note: makeMe.aNote
           .title("TypeScript")
           .underNote(currentNote)
@@ -141,13 +130,11 @@ export const NoteWithManyAncestors: Story = {
           )
           .please(),
       }
-      return question
     })(),
     conversationButton: true,
   },
 }
 
-// Question in a sequence (showing multiple questions)
 export const InSequence: Story = {
   args: {
     answeredQuestion: (() => {
@@ -158,8 +145,8 @@ export const InSequence: Story = {
         0,
         true
       )
-      question.recallPrompt = {
-        ...question.recallPrompt,
+      return {
+        ...question,
         id: 1,
         note: makeMe.aNote
           .title("React")
@@ -168,13 +155,11 @@ export const InSequence: Story = {
           )
           .please(),
       }
-      return question
     })(),
     conversationButton: true,
   },
 }
 
-// Question without conversation button
 export const WithoutConversationButton: Story = {
   args: {
     answeredQuestion: (() => {
@@ -185,8 +170,8 @@ export const WithoutConversationButton: Story = {
         1,
         true
       )
-      question.recallPrompt = {
-        ...question.recallPrompt,
+      return {
+        ...question,
         note: makeMe.aNote
           .title("Basic Arithmetic")
           .details(
@@ -194,13 +179,11 @@ export const WithoutConversationButton: Story = {
           )
           .please(),
       }
-      return question
     })(),
     conversationButton: false,
   },
 }
 
-// Question with custom question stem and choices
 export const CustomQuestion: Story = {
   args: {
     answeredQuestion: (() => {
@@ -211,8 +194,8 @@ export const CustomQuestion: Story = {
         2,
         false
       )
-      question.recallPrompt = {
-        ...question.recallPrompt,
+      return {
+        ...question,
         note: makeMe.aNote
           .title("Data Structures")
           .details(
@@ -220,7 +203,6 @@ export const CustomQuestion: Story = {
           )
           .please(),
       }
-      return question
     })(),
     conversationButton: true,
   },

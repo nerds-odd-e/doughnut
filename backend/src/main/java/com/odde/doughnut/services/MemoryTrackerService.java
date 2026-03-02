@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.Answer;
-import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionType;
@@ -139,7 +138,7 @@ public class MemoryTrackerService {
     entityPersister.save(memoryTracker);
   }
 
-  public AnsweredQuestion answerSpelling(
+  public RecallPrompt answerSpelling(
       MemoryTracker memoryTracker,
       AnswerSpellingDTO answerSpellingDTO,
       User user,
@@ -157,7 +156,7 @@ public class MemoryTrackerService {
         answer.getCorrect(),
         memoryTracker,
         answerSpellingDTO.getThinkingTimeMs());
-    return recallPrompt.getAnsweredQuestion();
+    return recallPrompt;
   }
 
   public List<RecallPrompt> getAllRecallPrompts(MemoryTracker memoryTracker) {
@@ -184,7 +183,7 @@ public class MemoryTrackerService {
     return entityPersister.save(recallPrompt);
   }
 
-  public AnsweredQuestion answerSpelling(
+  public RecallPrompt answerSpelling(
       RecallPrompt recallPrompt,
       AnswerSpellingDTO answerSpellingDTO,
       User user,
@@ -209,7 +208,7 @@ public class MemoryTrackerService {
 
     markAsRepeated(
         currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
-    return recallPrompt.getAnsweredQuestion();
+    return recallPrompt;
   }
 
   public boolean hasExceededWrongAnswerThreshold(

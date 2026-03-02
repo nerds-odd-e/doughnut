@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
-import com.odde.doughnut.entities.AnsweredQuestion;
+import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -53,8 +53,7 @@ class RecallsController {
 
   @GetMapping(value = {"/previously-answered"})
   @Transactional
-  public List<AnsweredQuestion> previouslyAnswered(
-      @RequestParam(value = "timezone") String timezone) {
+  public List<RecallPrompt> previouslyAnswered(@RequestParam(value = "timezone") String timezone) {
     authorizationService.assertLoggedIn();
     ZoneId timeZone = TimezoneUtils.parseTimezone(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();

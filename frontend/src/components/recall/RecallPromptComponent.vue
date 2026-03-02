@@ -25,11 +25,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import type { PropType } from "vue"
-import type {
-  AnswerDto,
-  AnsweredQuestion,
-  RecallPrompt,
-} from "@generated/backend"
+import type { AnswerDto, RecallPrompt } from "@generated/backend"
 import { RecallPromptController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
@@ -49,7 +45,7 @@ const props = defineProps({
 })
 
 const emits = defineEmits<{
-  (e: "answered", result: AnsweredQuestion): void
+  (e: "answered", result: RecallPrompt): void
 }>()
 
 const handleError = async () => {

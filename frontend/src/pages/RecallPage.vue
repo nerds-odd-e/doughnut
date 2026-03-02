@@ -72,7 +72,7 @@ import RecallProgressBar from "@/components/recall/RecallProgressBar.vue"
 import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
 import AnsweredSpellingQuestion from "@/components/recall/AnsweredSpellingQuestion.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
-import type { AnsweredQuestion, MemoryTrackerLite } from "@generated/backend"
+import type { MemoryTrackerLite, RecallPrompt } from "@generated/backend"
 import {
   RecallsController,
   MemoryTrackerController,
@@ -115,7 +115,7 @@ defineProps({
 })
 
 const currentIndex = ref(0)
-const previousAnsweredQuestions = ref<(AnsweredQuestion | undefined)[]>([])
+const previousAnsweredQuestions = ref<(RecallPrompt | undefined)[]>([])
 const previousAnsweredQuestionCursor = ref<number | undefined>(undefined)
 const isProgressBarVisible = ref(true)
 
@@ -162,7 +162,7 @@ const currentAnsweredQuestion = computed(() => {
   const result =
     previousAnsweredQuestions.value[previousAnsweredQuestionCursor.value]
   if (!result) return undefined
-  return result?.recallPrompt?.questionType === "MCQ" ? result : undefined
+  return result?.questionType === "MCQ" ? result : undefined
 })
 
 const currentAnsweredSpelling = computed(() => {
@@ -170,7 +170,7 @@ const currentAnsweredSpelling = computed(() => {
   const result =
     previousAnsweredQuestions.value[previousAnsweredQuestionCursor.value]
   if (!result) return undefined
-  return result?.recallPrompt?.questionType === "SPELLING" ? result : undefined
+  return result?.questionType === "SPELLING" ? result : undefined
 })
 
 const finished = computed(() => previousAnsweredQuestions.value.length)
@@ -289,13 +289,13 @@ const offerReAssimilation = async (memoryTrackerId: number | undefined) => {
   }
 }
 
-const onAnswered = async (answerResult: AnsweredQuestion) => {
+const onAnswered = async (answerResult: RecallPrompt) => {
   moveToNextMemoryTracker()
   previousAnsweredQuestions.value.push(answerResult)
-  if (!answerResult.recallPrompt.answer?.correct) {
+  if (!answerResult.answer?.correct) {
     viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
   }
-  const memoryTrackerId = answerResult.recallPrompt?.memoryTrackerId
+  const memoryTrackerId = answerResult?.memoryTrackerId
   if (memoryTrackerId !== undefined) {
     const { data } = await apiCallWithLoading(() =>
       MemoryTrackerController.getThresholdExceeded({

@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -52,19 +51,17 @@ class AIGeneratedQuizFactoryTest {
 
     @Test
     void wrong() {
-      AnsweredQuestion answerResult =
-          questionBuilder().answerChoiceIndex(0).please(false).getAnsweredQuestion();
-      assertFalse(answerResult.recallPrompt.getAnswer().getCorrect());
+      RecallPrompt recallPrompt = questionBuilder().answerChoiceIndex(0).please(false);
+      assertFalse(recallPrompt.getAnswer().getCorrect());
     }
 
     @Test
     void correct() {
-      AnsweredQuestion answerResult =
+      RecallPrompt recallPrompt =
           questionBuilder()
               .answerChoiceIndex(mcqWithAnswer.getF1__correctChoiceIndex())
-              .please(false)
-              .getAnsweredQuestion();
-      assertTrue(answerResult.recallPrompt.getAnswer().getCorrect());
+              .please(false);
+      assertTrue(recallPrompt.getAnswer().getCorrect());
     }
   }
 

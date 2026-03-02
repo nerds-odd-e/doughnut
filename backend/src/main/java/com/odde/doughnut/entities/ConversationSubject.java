@@ -27,10 +27,7 @@ public class ConversationSubject {
     return assessmentQuestionInstance == null && note == null && recallPrompt == null;
   }
 
-  public AnsweredQuestion getAnsweredQuestion() {
-    if (recallPrompt == null) {
-      return null;
-    }
-    return recallPrompt.getAnsweredQuestion();
+  public RecallPrompt getAnsweredQuestion() {
+    return recallPrompt;
   }
 }

@@ -1,6 +1,6 @@
 import { useRecallData } from "@/composables/useRecallData"
 import RecallPage from "@/pages/RecallPage.vue"
-import type { AnsweredQuestion, MemoryTrackerLite } from "@generated/backend"
+import type { MemoryTrackerLite, RecallPrompt } from "@generated/backend"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, {
   mockSdkService,
@@ -138,15 +138,13 @@ describe("repeat page", () => {
 
     it("should prepend previously answered recall prompts to the list", async () => {
       const note = makeMe.aNote.please()
-      const previousQuestionResult: AnsweredQuestion = {
-        recallPrompt: makeMe.aRecallPrompt
-          .withId(1)
-          .withNote(note)
-          .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
-          .withAnswer({ id: 1, correct: true, choiceIndex: 0 })
-          .withMemoryTrackerId(1)
-          .please(),
-      }
+      const previousQuestionResult: RecallPrompt = makeMe.aRecallPrompt
+        .withId(1)
+        .withNote(note)
+        .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
+        .withAnswer({ id: 1, correct: true, choiceIndex: 0 })
+        .withMemoryTrackerId(1)
+        .please()
       previouslyAnsweredSpy.mockResolvedValueOnce(
         wrapSdkResponse([previousQuestionResult])
       )
@@ -290,14 +288,12 @@ describe("repeat page", () => {
     it("should handle spelling questions correctly", async () => {
       const note = makeMe.aNote.please()
       note.id = 42
-      const answerResult: AnsweredQuestion = {
-        recallPrompt: makeMe.aRecallPrompt
-          .withNote(note)
-          .withQuestionType("SPELLING")
-          .withAnswer({ id: 1, correct: false, spellingAnswer: "test answer" })
-          .withMemoryTrackerId(123)
-          .please(),
-      }
+      const answerResult: RecallPrompt = makeMe.aRecallPrompt
+        .withNote(note)
+        .withQuestionType("SPELLING")
+        .withAnswer({ id: 1, correct: false, spellingAnswer: "test answer" })
+        .withMemoryTrackerId(123)
+        .please()
 
       const mockedAnswerSpellingCall = mockSdkService(
         "answerSpelling",

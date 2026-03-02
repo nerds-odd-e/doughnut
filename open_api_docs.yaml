@@ -790,7 +790,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/AnsweredQuestion"
+                $ref: "#/components/schemas/RecallPrompt"
   /api/recall-prompts/{recallPrompt}/answer-spelling:
     post:
       tags:
@@ -820,7 +820,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/AnsweredQuestion"
+                $ref: "#/components/schemas/RecallPrompt"
   /api/predefined-questions/{predefinedQuestion}/toggle-approval:
     post:
       tags:
@@ -2893,7 +2893,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/AnsweredQuestion"
+                  $ref: "#/components/schemas/RecallPrompt"
   /api/predefined-questions/{note}/export-question-generation:
     get:
       tags:
@@ -4118,13 +4118,6 @@ components:
         thinkingTimeMs:
           type: integer
           format: int32
-    AnsweredQuestion:
-      type: object
-      properties:
-        recallPrompt:
-          $ref: "#/components/schemas/RecallPrompt"
-      required:
-      - recallPrompt
     AnswerSpellingDTO:
       type: object
       properties:
@@ -4353,7 +4346,7 @@ components:
         note:
           $ref: "#/components/schemas/Note"
         answeredQuestion:
-          $ref: "#/components/schemas/AnsweredQuestion"
+          $ref: "#/components/schemas/RecallPrompt"
     CircleJoiningByInvitation:
       type: object
       properties:

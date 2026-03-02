@@ -77,16 +77,6 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public AnsweredQuestion getAnsweredQuestion() {
-    if (getAnswer() == null) {
-      return null;
-    }
-    AnsweredQuestion answerResult = new AnsweredQuestion();
-    answerResult.recallPrompt = this;
-    return answerResult;
-  }
-
-  @JsonIgnore
   public String getQuestionDetails() {
     if (getPredefinedQuestion() == null) {
       return "{}";

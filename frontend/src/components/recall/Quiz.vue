@@ -42,10 +42,9 @@
 import { ref, computed, watch, onMounted } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type {
-  AnsweredQuestion,
-  RecallPrompt,
   AnswerSpellingDto,
   MemoryTrackerLite,
+  RecallPrompt,
 } from "@generated/backend"
 import {
   MemoryTrackerController,
@@ -68,8 +67,8 @@ const props = defineProps<QuizProps>()
 
 // Emits definition
 const emit = defineEmits<{
-  (e: "answered", result: AnsweredQuestion): void
-  (e: "just-reviewed", result: AnsweredQuestion | undefined): void
+  (e: "answered", result: RecallPrompt): void
+  (e: "just-reviewed", result: RecallPrompt | undefined): void
 }>()
 
 // Composable for question fetching logic
@@ -185,7 +184,7 @@ const onSpellingAnswer = async (
   }
 }
 
-const onAnswered = (answerResult: AnsweredQuestion) => {
+const onAnswered = (answerResult: RecallPrompt) => {
   emit("answered", answerResult)
 }
 

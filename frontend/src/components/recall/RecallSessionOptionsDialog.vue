@@ -47,7 +47,7 @@ import { computed } from "vue"
 import SvgSkip from "../svgs/SvgSkip.vue"
 import Modal from "../commons/Modal.vue"
 import { useRecallData } from "@/composables/useRecallData"
-import type { AnsweredQuestion } from "@generated/backend"
+import type { RecallPrompt } from "@generated/backend"
 
 const props = defineProps({
   canMoveToEnd: { type: Boolean, required: true },
@@ -57,7 +57,7 @@ const props = defineProps({
   toRepeatCount: { type: Number, required: true },
   totalAssimilatedCount: { type: Number, default: 0 },
   previousAnsweredQuestions: {
-    type: Array as () => (AnsweredQuestion | undefined)[],
+    type: Array as () => (RecallPrompt | undefined)[],
     required: true,
   },
 })
@@ -86,12 +86,12 @@ const handleTreadmillModeToggle = (event: Event) => {
 }
 
 const isQuestionResultWithThinkingTime = (
-  result: AnsweredQuestion | undefined
-): result is AnsweredQuestion => {
-  if (result === undefined || result.recallPrompt?.questionType !== "MCQ") {
+  result: RecallPrompt | undefined
+): result is RecallPrompt => {
+  if (result === undefined || result?.questionType !== "MCQ") {
     return false
   }
-  return result.recallPrompt?.answer?.thinkingTimeMs !== undefined
+  return result?.answer?.thinkingTimeMs !== undefined
 }
 
 const averageThinkingTime = computed(() => {
@@ -104,7 +104,7 @@ const averageThinkingTime = computed(() => {
   }
 
   const totalThinkingTime = mcqQuestions.reduce(
-    (sum, result) => sum + (result.recallPrompt?.answer?.thinkingTimeMs ?? 0),
+    (sum, result) => sum + (result?.answer?.thinkingTimeMs ?? 0),
     0
   )
 

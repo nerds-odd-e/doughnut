@@ -1,31 +1,31 @@
 <template>
-  <div class="daisy-alert" :class="{ 'daisy-alert-success': answeredQuestion.recallPrompt?.answer?.correct, 'daisy-alert-error': !answeredQuestion.recallPrompt?.answer?.correct }">
+  <div class="daisy-alert" :class="{ 'daisy-alert-success': answeredQuestion?.answer?.correct, 'daisy-alert-error': !answeredQuestion?.answer?.correct }">
     <strong>
-      {{ answeredQuestion.recallPrompt?.answer?.correct ? 'Correct!' : `Your answer \`${answeredQuestion.recallPrompt?.answer?.spellingAnswer}\` is incorrect.` }}
+      {{ answeredQuestion?.answer?.correct ? 'Correct!' : `Your answer \`${answeredQuestion?.answer?.spellingAnswer}\` is incorrect.` }}
     </strong>
   </div>
-  <NoteUnderQuestion v-if="answeredQuestion.recallPrompt?.note" v-bind="{ noteTopology: answeredQuestion.recallPrompt.note.noteTopology }" />
+  <NoteUnderQuestion v-if="answeredQuestion?.note" v-bind="{ noteTopology: answeredQuestion.note.noteTopology }" />
   <ViewMemoryTrackerLink
-    v-if="answeredQuestion.recallPrompt?.memoryTrackerId"
-    :memory-tracker-id="answeredQuestion.recallPrompt.memoryTrackerId"
+    v-if="answeredQuestion?.memoryTrackerId"
+    :memory-tracker-id="answeredQuestion.memoryTrackerId"
   />
   <NoteShow
-    v-if="answeredQuestion.recallPrompt?.note"
-    :note-id="answeredQuestion.recallPrompt.note.id"
+    v-if="answeredQuestion?.note"
+    :note-id="answeredQuestion.note.id"
     :expand-children="false"
   />
 </template>
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { AnsweredQuestion } from "@generated/backend"
+import type { RecallPrompt } from "@generated/backend"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import NoteUnderQuestion from "./NoteUnderQuestion.vue"
 import ViewMemoryTrackerLink from "./ViewMemoryTrackerLink.vue"
 
 defineProps({
   answeredQuestion: {
-    type: Object as PropType<AnsweredQuestion>,
+    type: Object as PropType<RecallPrompt>,
     required: true,
   },
 })
