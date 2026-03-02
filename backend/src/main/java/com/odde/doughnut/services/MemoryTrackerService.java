@@ -133,7 +133,7 @@ public class MemoryTrackerService {
     return false;
   }
 
-  public void reAssimilate(MemoryTracker memoryTracker) {
+  public void softDelete(MemoryTracker memoryTracker) {
     memoryTracker.setDeletedAt(new Timestamp(System.currentTimeMillis()));
     entityPersister.save(memoryTracker);
   }

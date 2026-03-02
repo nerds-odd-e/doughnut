@@ -135,7 +135,7 @@ public class MemoryTrackerServiceTest {
           .answerTimestamp(day1)
           .please();
 
-      memoryTrackerService.reAssimilate(memoryTracker);
+      memoryTrackerService.softDelete(memoryTracker);
 
       List<MemoryTracker> trackers =
           memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId());
@@ -147,10 +147,10 @@ public class MemoryTrackerServiceTest {
     }
 
     @Test
-    void shouldIncludeNoteInUnassimilatedCountAfterReAssimilate() {
+    void shouldIncludeNoteInUnassimilatedCountAfterSoftDelete() {
       assertThat(userService.getUnassimilatedNoteCount(user), equalTo(0));
 
-      memoryTrackerService.reAssimilate(memoryTracker);
+      memoryTrackerService.softDelete(memoryTracker);
 
       assertThat(userService.getUnassimilatedNoteCount(user), equalTo(1));
     }
@@ -160,7 +160,7 @@ public class MemoryTrackerServiceTest {
       assertThat(memoryTrackerService.findLast100ByUser(user.getId()), hasSize(1));
       assertThat(memoryTrackerService.findLast100RecalledByUser(user.getId()), hasSize(1));
 
-      memoryTrackerService.reAssimilate(memoryTracker);
+      memoryTrackerService.softDelete(memoryTracker);
 
       assertThat(memoryTrackerService.findLast100ByUser(user.getId()), empty());
       assertThat(memoryTrackerService.findLast100RecalledByUser(user.getId()), empty());

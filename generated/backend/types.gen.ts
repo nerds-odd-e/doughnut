@@ -2265,6 +2265,31 @@ export type RequestApprovalForNotebookResponses = {
 
 export type RequestApprovalForNotebookResponse = RequestApprovalForNotebookResponses[keyof RequestApprovalForNotebookResponses];
 
+export type SoftDeleteData = {
+    body?: never;
+    path: {
+        memoryTracker: number;
+    };
+    query?: never;
+    url: '/api/memory-trackers/{memoryTracker}/soft-delete';
+};
+
+export type SoftDeleteErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type SoftDeleteError = SoftDeleteErrors[keyof SoftDeleteErrors];
+
+export type SoftDeleteResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type RemoveFromRepeatingData = {
     body?: never;
     path: {
@@ -2318,31 +2343,6 @@ export type ReEnableResponses = {
 };
 
 export type ReEnableResponse = ReEnableResponses[keyof ReEnableResponses];
-
-export type ReAssimilateData = {
-    body?: never;
-    path: {
-        memoryTracker: number;
-    };
-    query?: never;
-    url: '/api/memory-trackers/{memoryTracker}/re-assimilate';
-};
-
-export type ReAssimilateErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ReAssimilateError = ReAssimilateErrors[keyof ReAssimilateErrors];
-
-export type ReAssimilateResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
 
 export type CreateNoteViaMcpData = {
     body: McpNoteAddDto;
