@@ -60,22 +60,32 @@ describe("RecallSessionOptionsDialog", () => {
     const note = makeMe.aNote.please()
     const predefinedQuestion = makeMe.aPredefinedQuestion.please()
     const questionResult1: AnsweredQuestion = {
-      note,
       recallPrompt: makeMe.aRecallPrompt
         .withId(1)
+        .withNote(note)
         .withPredefinedQuestion(predefinedQuestion)
+        .withAnswer({
+          id: 1,
+          correct: true,
+          choiceIndex: 0,
+          thinkingTimeMs: 5000,
+        })
+        .withMemoryTrackerId(1)
         .please(),
-      answer: { id: 1, correct: true, choiceIndex: 0, thinkingTimeMs: 5000 },
-      memoryTrackerId: 1,
     }
     const questionResult2: AnsweredQuestion = {
-      note,
       recallPrompt: makeMe.aRecallPrompt
         .withId(2)
+        .withNote(note)
         .withPredefinedQuestion(predefinedQuestion)
+        .withAnswer({
+          id: 2,
+          correct: true,
+          choiceIndex: 1,
+          thinkingTimeMs: 3000,
+        })
+        .withMemoryTrackerId(2)
         .please(),
-      answer: { id: 2, correct: true, choiceIndex: 1, thinkingTimeMs: 3000 },
-      memoryTrackerId: 2,
     }
 
     const wrapper = mountWithTeleportStub(RecallSessionOptionsDialog, {
@@ -92,10 +102,12 @@ describe("RecallSessionOptionsDialog", () => {
   it("does not display average thinking time when there are no MCQ questions", async () => {
     const note = makeMe.aNote.please()
     const spellingResult: AnsweredQuestion = {
-      note,
-      recallPrompt: makeMe.aRecallPrompt.withQuestionType("SPELLING").please(),
-      answer: { id: 1, correct: true, spellingAnswer: "test" },
-      memoryTrackerId: 1,
+      recallPrompt: makeMe.aRecallPrompt
+        .withNote(note)
+        .withQuestionType("SPELLING")
+        .withAnswer({ id: 1, correct: true, spellingAnswer: "test" })
+        .withMemoryTrackerId(1)
+        .please(),
     }
 
     const wrapper = mountWithTeleportStub(RecallSessionOptionsDialog, {
@@ -112,13 +124,13 @@ describe("RecallSessionOptionsDialog", () => {
   it("does not display average thinking time when MCQ questions have no thinking time", async () => {
     const note = makeMe.aNote.please()
     const questionResult: AnsweredQuestion = {
-      note,
       recallPrompt: makeMe.aRecallPrompt
         .withId(1)
+        .withNote(note)
         .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
+        .withAnswer({ id: 1, correct: true, choiceIndex: 0 })
+        .withMemoryTrackerId(1)
         .please(),
-      answer: { id: 1, correct: true, choiceIndex: 0 },
-      memoryTrackerId: 1,
     }
 
     const wrapper = mountWithTeleportStub(RecallSessionOptionsDialog, {
@@ -135,13 +147,18 @@ describe("RecallSessionOptionsDialog", () => {
   it("formats thinking time correctly for milliseconds", async () => {
     const note = makeMe.aNote.please()
     const questionResult: AnsweredQuestion = {
-      note,
       recallPrompt: makeMe.aRecallPrompt
         .withId(1)
+        .withNote(note)
         .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
+        .withAnswer({
+          id: 1,
+          correct: true,
+          choiceIndex: 0,
+          thinkingTimeMs: 500,
+        })
+        .withMemoryTrackerId(1)
         .please(),
-      answer: { id: 1, correct: true, choiceIndex: 0, thinkingTimeMs: 500 },
-      memoryTrackerId: 1,
     }
 
     const wrapper = mountWithTeleportStub(RecallSessionOptionsDialog, {
@@ -158,18 +175,18 @@ describe("RecallSessionOptionsDialog", () => {
   it("formats thinking time correctly for minutes and seconds", async () => {
     const note = makeMe.aNote.please()
     const questionResult: AnsweredQuestion = {
-      note,
       recallPrompt: makeMe.aRecallPrompt
         .withId(1)
+        .withNote(note)
         .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
+        .withAnswer({
+          id: 1,
+          correct: true,
+          choiceIndex: 0,
+          thinkingTimeMs: 125000,
+        })
+        .withMemoryTrackerId(1)
         .please(),
-      answer: {
-        id: 1,
-        correct: true,
-        choiceIndex: 0,
-        thinkingTimeMs: 125000,
-      },
-      memoryTrackerId: 1,
     }
 
     const wrapper = mountWithTeleportStub(RecallSessionOptionsDialog, {
@@ -186,13 +203,18 @@ describe("RecallSessionOptionsDialog", () => {
   it("filters out undefined results when calculating average", async () => {
     const note = makeMe.aNote.please()
     const questionResult: AnsweredQuestion = {
-      note,
       recallPrompt: makeMe.aRecallPrompt
         .withId(1)
+        .withNote(note)
         .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
+        .withAnswer({
+          id: 1,
+          correct: true,
+          choiceIndex: 0,
+          thinkingTimeMs: 6000,
+        })
+        .withMemoryTrackerId(1)
         .please(),
-      answer: { id: 1, correct: true, choiceIndex: 0, thinkingTimeMs: 6000 },
-      memoryTrackerId: 1,
     }
 
     const wrapper = mountWithTeleportStub(RecallSessionOptionsDialog, {

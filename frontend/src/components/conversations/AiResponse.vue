@@ -126,7 +126,8 @@ const handleToolCallRejected = (error: Error) => {
 
 const currentNote = computed(
   () =>
-    conversation.subject?.note || conversation.subject?.answeredQuestion?.note
+    conversation.subject?.note ||
+    conversation.subject?.answeredQuestion?.recallPrompt?.note
 )
 
 const getAiReply = async () => {

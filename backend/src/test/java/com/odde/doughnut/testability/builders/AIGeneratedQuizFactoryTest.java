@@ -54,7 +54,7 @@ class AIGeneratedQuizFactoryTest {
     void wrong() {
       AnsweredQuestion answerResult =
           questionBuilder().answerChoiceIndex(0).please(false).getAnsweredQuestion();
-      assertFalse(answerResult.answer.getCorrect());
+      assertFalse(answerResult.recallPrompt.getAnswer().getCorrect());
     }
 
     @Test
@@ -64,7 +64,7 @@ class AIGeneratedQuizFactoryTest {
               .answerChoiceIndex(mcqWithAnswer.getF1__correctChoiceIndex())
               .please(false)
               .getAnsweredQuestion();
-      assertTrue(answerResult.answer.getCorrect());
+      assertTrue(answerResult.recallPrompt.getAnswer().getCorrect());
     }
   }
 

@@ -91,7 +91,7 @@ const isQuestionResultWithThinkingTime = (
   if (result === undefined || result.recallPrompt?.questionType !== "MCQ") {
     return false
   }
-  return result.answer?.thinkingTimeMs !== undefined
+  return result.recallPrompt?.answer?.thinkingTimeMs !== undefined
 }
 
 const averageThinkingTime = computed(() => {
@@ -104,7 +104,7 @@ const averageThinkingTime = computed(() => {
   }
 
   const totalThinkingTime = mcqQuestions.reduce(
-    (sum, result) => sum + (result.answer?.thinkingTimeMs ?? 0),
+    (sum, result) => sum + (result.recallPrompt?.answer?.thinkingTimeMs ?? 0),
     0
   )
 

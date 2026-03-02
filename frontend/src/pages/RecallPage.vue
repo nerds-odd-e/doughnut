@@ -293,11 +293,11 @@ const offerReAssimilation = async (memoryTrackerId: number | undefined) => {
 const onAnswered = async (answerResult: AnsweredQuestion) => {
   moveToNextMemoryTracker()
   previousAnsweredQuestions.value.push(answerResult)
-  if (!answerResult.answer.correct) {
+  if (!answerResult.recallPrompt.answer?.correct) {
     viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
   }
   if (answerResult.thresholdExceeded) {
-    await offerReAssimilation(answerResult.memoryTrackerId)
+    await offerReAssimilation(answerResult.recallPrompt.memoryTrackerId)
   }
 }
 

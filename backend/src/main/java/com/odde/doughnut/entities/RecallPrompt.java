@@ -23,6 +23,7 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = false)
 @JsonPropertyOrder({
   "id",
+  "memoryTrackerId",
   "questionType",
   "multipleChoicesQuestion",
   "notebook",
@@ -40,6 +41,11 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
   @NotNull
   @JsonIgnore
   private MemoryTracker memoryTracker;
+
+  @JsonProperty
+  public Integer getMemoryTrackerId() {
+    return memoryTracker != null ? memoryTracker.getId() : null;
+  }
 
   @ManyToOne
   @JoinColumn(name = "predefined_question_id", referencedColumnName = "id")
@@ -81,10 +87,7 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
       return null;
     }
     AnsweredQuestion answerResult = new AnsweredQuestion();
-    answerResult.answer = getAnswer();
-    answerResult.note = getNote();
     answerResult.recallPrompt = this;
-    answerResult.memoryTrackerId = memoryTracker.getId();
     answerResult.thresholdExceeded = thresholdExceeded;
     return answerResult;
   }

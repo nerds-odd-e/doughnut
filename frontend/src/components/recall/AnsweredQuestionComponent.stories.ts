@@ -39,10 +39,19 @@ const createAnsweredQuestionWithQuestion = (
     .withChoiceIndex(answerIndex)
     .please()
 
+  const note = base.recallPrompt?.note ?? makeMe.aNote.please()
   return {
     ...base,
     recallPrompt: makeMe.aRecallPrompt
       .withPredefinedQuestion(predefinedQuestion)
+      .withNote(note)
+      .withAnswer(
+        base.recallPrompt?.answer ?? {
+          id: 1,
+          correct: isCorrect,
+          choiceIndex: answerIndex,
+        }
+      )
       .withId(base.recallPrompt.id)
       .please(),
   }
@@ -59,12 +68,15 @@ export const CorrectAnswer: Story = {
         0,
         true
       )
-      question.note = makeMe.aNote
-        .title("France")
-        .details(
-          "France is a country in Western Europe. Paris is its capital and largest city."
-        )
-        .please()
+      question.recallPrompt = {
+        ...question.recallPrompt,
+        note: makeMe.aNote
+          .title("France")
+          .details(
+            "France is a country in Western Europe. Paris is its capital and largest city."
+          )
+          .please(),
+      }
       return question
     })(),
     conversationButton: true,
@@ -82,12 +94,15 @@ export const IncorrectAnswer: Story = {
         1,
         false
       )
-      question.note = makeMe.aNote
-        .title("France")
-        .details(
-          "France is a country in Western Europe. Paris is its capital and largest city."
-        )
-        .please()
+      question.recallPrompt = {
+        ...question.recallPrompt,
+        note: makeMe.aNote
+          .title("France")
+          .details(
+            "France is a country in Western Europe. Paris is its capital and largest city."
+          )
+          .please(),
+      }
       return question
     })(),
     conversationButton: true,
@@ -116,13 +131,16 @@ export const NoteWithManyAncestors: Story = {
       }
 
       // Create the final note with all ancestors
-      question.note = makeMe.aNote
-        .title("TypeScript")
-        .underNote(currentNote)
-        .details(
-          "TypeScript is a typed superset of JavaScript that compiles to plain JavaScript."
-        )
-        .please()
+      question.recallPrompt = {
+        ...question.recallPrompt,
+        note: makeMe.aNote
+          .title("TypeScript")
+          .underNote(currentNote)
+          .details(
+            "TypeScript is a typed superset of JavaScript that compiles to plain JavaScript."
+          )
+          .please(),
+      }
       return question
     })(),
     conversationButton: true,
@@ -140,13 +158,16 @@ export const InSequence: Story = {
         0,
         true
       )
-      question.recallPrompt = { ...question.recallPrompt, id: 1 }
-      question.note = makeMe.aNote
-        .title("React")
-        .details(
-          "React is a JavaScript library for building user interfaces, particularly web applications."
-        )
-        .please()
+      question.recallPrompt = {
+        ...question.recallPrompt,
+        id: 1,
+        note: makeMe.aNote
+          .title("React")
+          .details(
+            "React is a JavaScript library for building user interfaces, particularly web applications."
+          )
+          .please(),
+      }
       return question
     })(),
     conversationButton: true,
@@ -164,12 +185,15 @@ export const WithoutConversationButton: Story = {
         1,
         true
       )
-      question.note = makeMe.aNote
-        .title("Basic Arithmetic")
-        .details(
-          "Addition is one of the four basic operations of arithmetic. 2 + 2 equals 4."
-        )
-        .please()
+      question.recallPrompt = {
+        ...question.recallPrompt,
+        note: makeMe.aNote
+          .title("Basic Arithmetic")
+          .details(
+            "Addition is one of the four basic operations of arithmetic. 2 + 2 equals 4."
+          )
+          .please(),
+      }
       return question
     })(),
     conversationButton: false,
@@ -187,12 +211,15 @@ export const CustomQuestion: Story = {
         2,
         false
       )
-      question.note = makeMe.aNote
-        .title("Data Structures")
-        .details(
-          "A stack is a linear data structure that follows the Last In First Out (LIFO) principle."
-        )
-        .please()
+      question.recallPrompt = {
+        ...question.recallPrompt,
+        note: makeMe.aNote
+          .title("Data Structures")
+          .details(
+            "A stack is a linear data structure that follows the Last In First Out (LIFO) principle."
+          )
+          .please(),
+      }
       return question
     })(),
     conversationButton: true,

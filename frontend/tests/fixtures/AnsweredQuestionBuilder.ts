@@ -32,20 +32,22 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
 
   do(): AnsweredQuestion {
     const predefinedQuestion = makeMe.aPredefinedQuestion.please()
+    const note = this.noteToUse ?? makeMe.aNote.please()
+    const recallPrompt =
+      this.recallPromptToUse ??
+      new RecallPromptBuilder()
+        .withPredefinedQuestion(predefinedQuestion)
+        .withNote(note)
+        .withAnswer({
+          id: generateId(),
+          correct: this.isCorrect,
+          ...(this.choiceIndexToUse !== undefined && {
+            choiceIndex: this.choiceIndexToUse,
+          }),
+        })
+        .do()
     return {
-      answer: {
-        id: generateId(),
-        correct: this.isCorrect,
-        ...(this.choiceIndexToUse !== undefined && {
-          choiceIndex: this.choiceIndexToUse,
-        }),
-      },
-      note: this.noteToUse ?? makeMe.aNote.please(),
-      recallPrompt:
-        this.recallPromptToUse ??
-        new RecallPromptBuilder()
-          .withPredefinedQuestion(predefinedQuestion)
-          .do(),
+      recallPrompt,
     }
   }
 }

@@ -1,17 +1,17 @@
 <template>
-  <div class="daisy-alert" :class="{ 'daisy-alert-success': answeredQuestion.answer?.correct, 'daisy-alert-error': !answeredQuestion.answer?.correct }">
+  <div class="daisy-alert" :class="{ 'daisy-alert-success': answeredQuestion.recallPrompt?.answer?.correct, 'daisy-alert-error': !answeredQuestion.recallPrompt?.answer?.correct }">
     <strong>
-      {{ answeredQuestion.answer?.correct ? 'Correct!' : `Your answer \`${answeredQuestion.answer?.spellingAnswer}\` is incorrect.` }}
+      {{ answeredQuestion.recallPrompt?.answer?.correct ? 'Correct!' : `Your answer \`${answeredQuestion.recallPrompt?.answer?.spellingAnswer}\` is incorrect.` }}
     </strong>
   </div>
-  <NoteUnderQuestion v-if="answeredQuestion.note" v-bind="{ noteTopology: answeredQuestion.note.noteTopology }" />
+  <NoteUnderQuestion v-if="answeredQuestion.recallPrompt?.note" v-bind="{ noteTopology: answeredQuestion.recallPrompt.note.noteTopology }" />
   <ViewMemoryTrackerLink
-    v-if="answeredQuestion.memoryTrackerId"
-    :memory-tracker-id="answeredQuestion.memoryTrackerId"
+    v-if="answeredQuestion.recallPrompt?.memoryTrackerId"
+    :memory-tracker-id="answeredQuestion.recallPrompt.memoryTrackerId"
   />
   <NoteShow
-    v-if="answeredQuestion.note"
-    :note-id="answeredQuestion.note.id"
+    v-if="answeredQuestion.recallPrompt?.note"
+    :note-id="answeredQuestion.recallPrompt.note.id"
     :expand-children="false"
   />
 </template>

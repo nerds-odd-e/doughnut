@@ -196,6 +196,7 @@ export type Answer = {
 
 export type RecallPrompt = {
     id: number;
+    memoryTrackerId?: number;
     questionType: 'MCQ' | 'SPELLING';
     multipleChoicesQuestion?: MultipleChoicesQuestion;
     notebook?: Notebook;
@@ -219,10 +220,7 @@ export type AnswerDto = {
 };
 
 export type AnsweredQuestion = {
-    note?: Note;
     recallPrompt: RecallPrompt;
-    answer: Answer;
-    memoryTrackerId?: number;
     thresholdExceeded?: boolean;
 };
 
@@ -641,6 +639,7 @@ export type NoteRealmWritable = {
 
 export type RecallPromptWritable = {
     id: number;
+    memoryTrackerId?: number;
     questionType: 'MCQ' | 'SPELLING';
     multipleChoicesQuestion?: MultipleChoicesQuestion;
     notebook?: Notebook;
@@ -654,10 +653,7 @@ export type RecallPromptWritable = {
 };
 
 export type AnsweredQuestionWritable = {
-    note?: NoteWritable;
     recallPrompt: RecallPromptWritable;
-    answer: Answer;
-    memoryTrackerId?: number;
     thresholdExceeded?: boolean;
 };
 

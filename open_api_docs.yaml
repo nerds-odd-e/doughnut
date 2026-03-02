@@ -4047,6 +4047,9 @@ components:
         id:
           type: integer
           format: int32
+        memoryTrackerId:
+          type: integer
+          format: int32
         questionType:
           type: string
           enum:
@@ -4094,19 +4097,11 @@ components:
     AnsweredQuestion:
       type: object
       properties:
-        note:
-          $ref: "#/components/schemas/Note"
         recallPrompt:
           $ref: "#/components/schemas/RecallPrompt"
-        answer:
-          $ref: "#/components/schemas/Answer"
-        memoryTrackerId:
-          type: integer
-          format: int32
         thresholdExceeded:
           type: boolean
       required:
-      - answer
       - recallPrompt
     AnswerSpellingDTO:
       type: object

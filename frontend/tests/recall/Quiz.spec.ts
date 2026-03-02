@@ -144,9 +144,10 @@ describe("repeat page", () => {
       mockSdkService("showMemoryTracker", memoryTracker)
 
       const answerResult: AnsweredQuestion = {
-        note: makeMe.aNote.please(),
-        recallPrompt: makeMe.aRecallPrompt.please(),
-        answer: { id: 1, correct: true, spellingAnswer: "cat" },
+        recallPrompt: makeMe.aRecallPrompt
+          .withQuestionType("SPELLING")
+          .withAnswer({ id: 1, correct: true, spellingAnswer: "cat" })
+          .please(),
       }
       const mockedAnswerSpelling = mockSdkService(
         "answerSpelling",

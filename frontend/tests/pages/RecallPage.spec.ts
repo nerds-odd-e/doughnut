@@ -139,13 +139,13 @@ describe("repeat page", () => {
     it("should prepend previously answered recall prompts to the list", async () => {
       const note = makeMe.aNote.please()
       const previousQuestionResult: AnsweredQuestion = {
-        note,
         recallPrompt: makeMe.aRecallPrompt
           .withId(1)
+          .withNote(note)
           .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
+          .withAnswer({ id: 1, correct: true, choiceIndex: 0 })
+          .withMemoryTrackerId(1)
           .please(),
-        answer: { id: 1, correct: true, choiceIndex: 0 },
-        memoryTrackerId: 1,
       }
       previouslyAnsweredSpy.mockResolvedValueOnce(
         wrapSdkResponse([previousQuestionResult])
@@ -291,12 +291,12 @@ describe("repeat page", () => {
       const note = makeMe.aNote.please()
       note.id = 42
       const answerResult: AnsweredQuestion = {
-        note,
         recallPrompt: makeMe.aRecallPrompt
+          .withNote(note)
           .withQuestionType("SPELLING")
+          .withAnswer({ id: 1, correct: false, spellingAnswer: "test answer" })
+          .withMemoryTrackerId(123)
           .please(),
-        answer: { id: 1, correct: false, spellingAnswer: "test answer" },
-        memoryTrackerId: 123,
       }
 
       const mockedAnswerSpellingCall = mockSdkService(

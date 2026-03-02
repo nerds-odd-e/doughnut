@@ -2,8 +2,8 @@
   <div v-if="note">
     <NoteUnderQuestion v-bind="{ noteTopology: note.noteTopology }" />
     <ViewMemoryTrackerLink
-      v-if="answeredQuestion.memoryTrackerId"
-      :memory-tracker-id="answeredQuestion.memoryTrackerId"
+      v-if="answeredQuestion.recallPrompt?.memoryTrackerId"
+      :memory-tracker-id="answeredQuestion.recallPrompt.memoryTrackerId"
     />
   </div>
   <QuestionDisplay
@@ -11,7 +11,7 @@
     v-bind="{
       multipleChoicesQuestion: answeredQuestion.recallPrompt.predefinedQuestion!.multipleChoicesQuestion,
       correctChoiceIndex: answeredQuestion.recallPrompt.predefinedQuestion!.correctAnswerIndex,
-      answer: answeredQuestion.answer,
+      answer: answeredQuestion.recallPrompt.answer,
     }"
   />
   <ConversationButton
@@ -40,5 +40,5 @@ const props = defineProps({
   },
 })
 
-const note = computed(() => props.answeredQuestion?.note)
+const note = computed(() => props.answeredQuestion?.recallPrompt?.note)
 </script>

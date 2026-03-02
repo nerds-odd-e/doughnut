@@ -33,7 +33,7 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
   List<RecallPrompt> findAllUnansweredByMemoryTrackerId(
       @Param("memoryTrackerId") Integer memoryTrackerId);
 
-  List<RecallPrompt> findAllByMemoryTrackerIdOrderByIdDesc(Integer memoryTrackerId);
+  List<RecallPrompt> findAllByMemoryTracker_IdOrderByIdDesc(Integer memoryTrackerId);
 
   @Query(
       value =
@@ -61,5 +61,5 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
       nativeQuery = true)
   int countWrongAnswersSince(@Param("noteId") Integer noteId, @Param("since") Timestamp since);
 
-  void deleteByMemoryTrackerId(Integer memoryTrackerId);
+  void deleteByMemoryTracker_Id(Integer memoryTrackerId);
 }
