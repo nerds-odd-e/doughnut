@@ -7,16 +7,16 @@
     />
   </div>
   <QuestionDisplay
-    v-if="answeredQuestion.predefinedQuestion"
+    v-if="answeredQuestion.recallPrompt?.predefinedQuestion"
     v-bind="{
-      multipleChoicesQuestion: answeredQuestion.predefinedQuestion.multipleChoicesQuestion,
-      correctChoiceIndex: answeredQuestion.predefinedQuestion.correctAnswerIndex,
+      multipleChoicesQuestion: answeredQuestion.recallPrompt.predefinedQuestion!.multipleChoicesQuestion,
+      correctChoiceIndex: answeredQuestion.recallPrompt.predefinedQuestion!.correctAnswerIndex,
       answer: answeredQuestion.answer,
     }"
   />
   <ConversationButton
-    v-if="conversationButton"
-    :recall-prompt-id="answeredQuestion.recallPromptId"
+    v-if="conversationButton && answeredQuestion.recallPrompt"
+    :recall-prompt-id="answeredQuestion.recallPrompt.id"
   />
 </template>
 

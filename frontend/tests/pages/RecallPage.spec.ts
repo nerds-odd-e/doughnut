@@ -146,9 +146,11 @@ describe("repeat page", () => {
         type: "QuestionResult",
         answeredQuestion: {
           note,
-          predefinedQuestion: makeMe.aPredefinedQuestion.please(),
+          recallPrompt: makeMe.aRecallPrompt
+            .withId(1)
+            .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
+            .please(),
           answer: { id: 1, correct: true, choiceIndex: 0 },
-          recallPromptId: 1,
           memoryTrackerId: 1,
         },
       }

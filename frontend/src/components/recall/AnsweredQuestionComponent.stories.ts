@@ -34,14 +34,17 @@ const createAnsweredQuestionWithQuestion = (
     .correctAnswerIndex(correctIndex)
     .please()
 
-  const baseQuestion = makeMe.anAnsweredQuestion
+  const base = makeMe.anAnsweredQuestion
     .answerCorrect(isCorrect)
     .withChoiceIndex(answerIndex)
     .please()
 
   return {
-    ...baseQuestion,
-    predefinedQuestion,
+    ...base,
+    recallPrompt: makeMe.aRecallPrompt
+      .withPredefinedQuestion(predefinedQuestion)
+      .withId(base.recallPrompt.id)
+      .please(),
   }
 }
 
@@ -137,7 +140,7 @@ export const InSequence: Story = {
         0,
         true
       )
-      question.recallPromptId = 1
+      question.recallPrompt = { ...question.recallPrompt, id: 1 }
       question.note = makeMe.aNote
         .title("React")
         .details(

@@ -4102,13 +4102,10 @@ components:
       properties:
         note:
           $ref: "#/components/schemas/Note"
-        predefinedQuestion:
-          $ref: "#/components/schemas/PredefinedQuestion"
+        recallPrompt:
+          $ref: "#/components/schemas/RecallPrompt"
         answer:
           $ref: "#/components/schemas/Answer"
-        recallPromptId:
-          type: integer
-          format: int32
         memoryTrackerId:
           type: integer
           format: int32
@@ -4116,8 +4113,7 @@ components:
           type: boolean
       required:
       - answer
-      - predefinedQuestion
-      - recallPromptId
+      - recallPrompt
     QuestionResult:
       allOf:
       - $ref: "#/components/schemas/RecallResult"

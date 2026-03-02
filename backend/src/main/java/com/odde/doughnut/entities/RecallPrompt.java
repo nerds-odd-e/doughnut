@@ -80,8 +80,7 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
     AnsweredQuestion answerResult = new AnsweredQuestion();
     answerResult.answer = answer;
     answerResult.note = getPredefinedQuestion().getNote();
-    answerResult.predefinedQuestion = getPredefinedQuestion();
-    answerResult.recallPromptId = id;
+    answerResult.recallPrompt = this;
     answerResult.memoryTrackerId = memoryTracker.getId();
     return answerResult;
   }

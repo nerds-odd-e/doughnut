@@ -11,6 +11,7 @@ import NotebookBuilder from "./NotebookBuilder"
 
 class RecallPromptBuilder extends Builder<RecallPrompt> {
   predefinedQuestionBuilder = new PredefinedQuestionBuilder()
+  private idToUse?: number
   private noteToUse?: Note
   private predefinedQuestionToUse?: PredefinedQuestion
   private answerToUse?: Answer
@@ -18,6 +19,11 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
   private questionGeneratedTimeToUse?: string
   private isContestedToUse?: boolean
   private questionTypeToUse?: string
+
+  withId(id: number) {
+    this.idToUse = id
+    return this
+  }
 
   withQuestionStem(stem: string) {
     this.predefinedQuestionBuilder.withQuestionStem(stem)
@@ -68,7 +74,7 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
     const predefinedQuestion =
       this.predefinedQuestionToUse ?? this.predefinedQuestionBuilder.do()
     return {
-      id: generateId(),
+      id: this.idToUse ?? generateId(),
       questionType: (this.questionTypeToUse ?? "MCQ") as "MCQ" | "SPELLING",
       multipleChoicesQuestion: predefinedQuestion.multipleChoicesQuestion,
       notebook: new NotebookBuilder().do(),

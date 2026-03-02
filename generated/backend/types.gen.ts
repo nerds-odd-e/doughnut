@@ -220,9 +220,8 @@ export type AnswerDto = {
 
 export type AnsweredQuestion = {
     note?: Note;
-    predefinedQuestion: PredefinedQuestion;
+    recallPrompt: RecallPrompt;
     answer: Answer;
-    recallPromptId: number;
     memoryTrackerId?: number;
     thresholdExceeded?: boolean;
 };
@@ -674,9 +673,8 @@ export type RecallPromptWritable = {
 
 export type AnsweredQuestionWritable = {
     note?: NoteWritable;
-    predefinedQuestion: PredefinedQuestion;
+    recallPrompt: RecallPromptWritable;
     answer: Answer;
-    recallPromptId: number;
     memoryTrackerId?: number;
     thresholdExceeded?: boolean;
 };

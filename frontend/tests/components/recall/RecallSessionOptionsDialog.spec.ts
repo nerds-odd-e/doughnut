@@ -62,13 +62,16 @@ describe("RecallSessionOptionsDialog", () => {
 
   it("displays average thinking time when there are MCQ questions with thinking time", async () => {
     const note = makeMe.aNote.please()
+    const predefinedQuestion = makeMe.aPredefinedQuestion.please()
     const questionResult1: QuestionResult = {
       type: "QuestionResult",
       answeredQuestion: {
         note,
-        predefinedQuestion: makeMe.aPredefinedQuestion.please(),
+        recallPrompt: makeMe.aRecallPrompt
+          .withId(1)
+          .withPredefinedQuestion(predefinedQuestion)
+          .please(),
         answer: { id: 1, correct: true, choiceIndex: 0, thinkingTimeMs: 5000 },
-        recallPromptId: 1,
         memoryTrackerId: 1,
       },
     }
@@ -76,9 +79,11 @@ describe("RecallSessionOptionsDialog", () => {
       type: "QuestionResult",
       answeredQuestion: {
         note,
-        predefinedQuestion: makeMe.aPredefinedQuestion.please(),
+        recallPrompt: makeMe.aRecallPrompt
+          .withId(2)
+          .withPredefinedQuestion(predefinedQuestion)
+          .please(),
         answer: { id: 2, correct: true, choiceIndex: 1, thinkingTimeMs: 3000 },
-        recallPromptId: 2,
         memoryTrackerId: 2,
       },
     }
@@ -121,9 +126,11 @@ describe("RecallSessionOptionsDialog", () => {
       type: "QuestionResult",
       answeredQuestion: {
         note,
-        predefinedQuestion: makeMe.aPredefinedQuestion.please(),
+        recallPrompt: makeMe.aRecallPrompt
+          .withId(1)
+          .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
+          .please(),
         answer: { id: 1, correct: true, choiceIndex: 0 },
-        recallPromptId: 1,
         memoryTrackerId: 1,
       },
     }
@@ -145,9 +152,11 @@ describe("RecallSessionOptionsDialog", () => {
       type: "QuestionResult",
       answeredQuestion: {
         note,
-        predefinedQuestion: makeMe.aPredefinedQuestion.please(),
+        recallPrompt: makeMe.aRecallPrompt
+          .withId(1)
+          .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
+          .please(),
         answer: { id: 1, correct: true, choiceIndex: 0, thinkingTimeMs: 500 },
-        recallPromptId: 1,
         memoryTrackerId: 1,
       },
     }
@@ -169,14 +178,16 @@ describe("RecallSessionOptionsDialog", () => {
       type: "QuestionResult",
       answeredQuestion: {
         note,
-        predefinedQuestion: makeMe.aPredefinedQuestion.please(),
+        recallPrompt: makeMe.aRecallPrompt
+          .withId(1)
+          .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
+          .please(),
         answer: {
           id: 1,
           correct: true,
           choiceIndex: 0,
           thinkingTimeMs: 125000,
         },
-        recallPromptId: 1,
         memoryTrackerId: 1,
       },
     }
@@ -198,9 +209,11 @@ describe("RecallSessionOptionsDialog", () => {
       type: "QuestionResult",
       answeredQuestion: {
         note,
-        predefinedQuestion: makeMe.aPredefinedQuestion.please(),
+        recallPrompt: makeMe.aRecallPrompt
+          .withId(1)
+          .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
+          .please(),
         answer: { id: 1, correct: true, choiceIndex: 0, thinkingTimeMs: 6000 },
-        recallPromptId: 1,
         memoryTrackerId: 1,
       },
     }
