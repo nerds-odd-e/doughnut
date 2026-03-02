@@ -303,6 +303,7 @@ describe("repeat page", () => {
         "answerSpelling",
         answerResult
       )
+      mockSdkService("getThresholdExceeded", { thresholdExceeded: false })
 
       const wrapper = await mountPage()
       await flushPromises()

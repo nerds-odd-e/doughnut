@@ -3127,6 +3127,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/MemoryTracker"
+  /api/memory-trackers/{memoryTracker}/threshold-exceeded:
+    get:
+      tags:
+      - memory-tracker-controller
+      operationId: getThresholdExceeded
+      parameters:
+      - name: memoryTracker
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ThresholdExceededResult"
   /api/memory-trackers/{memoryTracker}/recall-prompts:
     get:
       tags:
@@ -4099,8 +4123,6 @@ components:
       properties:
         recallPrompt:
           $ref: "#/components/schemas/RecallPrompt"
-        thresholdExceeded:
-          type: boolean
       required:
       - recallPrompt
     AnswerSpellingDTO:
@@ -4837,6 +4859,11 @@ components:
       properties:
         approval:
           $ref: "#/components/schemas/NotebookCertificateApproval"
+    ThresholdExceededResult:
+      type: object
+      properties:
+        thresholdExceeded:
+          type: boolean
     FailureReport:
       type: object
       properties:

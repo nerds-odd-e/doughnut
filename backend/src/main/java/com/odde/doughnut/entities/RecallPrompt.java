@@ -78,17 +78,11 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public AnsweredQuestion getAnsweredQuestion() {
-    return getAnsweredQuestion(null);
-  }
-
-  @JsonIgnore
-  public AnsweredQuestion getAnsweredQuestion(Boolean thresholdExceeded) {
     if (getAnswer() == null) {
       return null;
     }
     AnsweredQuestion answerResult = new AnsweredQuestion();
     answerResult.recallPrompt = this;
-    answerResult.thresholdExceeded = thresholdExceeded;
     return answerResult;
   }
 

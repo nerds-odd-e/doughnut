@@ -86,6 +86,6 @@ public class RecallService {
   }
 
   private AnsweredQuestion toAnsweredQuestion(RecallPrompt recallPrompt) {
-    return recallPrompt.getAnsweredQuestion(false);
+    return recallPrompt.getAnsweredQuestion();
   }
 }

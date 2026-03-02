@@ -78,7 +78,7 @@ import {
   MemoryTrackerController,
 } from "@generated/backend/sdk.gen"
 import usePopups from "@/components/commons/Popups/usePopups"
-import {} from "@/managedApi/clientSetup"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { shuffle } from "es-toolkit"
@@ -295,8 +295,16 @@ const onAnswered = async (answerResult: AnsweredQuestion) => {
   if (!answerResult.recallPrompt.answer?.correct) {
     viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
   }
-  if (answerResult.thresholdExceeded) {
-    await offerReAssimilation(answerResult.recallPrompt.memoryTrackerId)
+  const memoryTrackerId = answerResult.recallPrompt?.memoryTrackerId
+  if (memoryTrackerId !== undefined) {
+    const { data } = await apiCallWithLoading(() =>
+      MemoryTrackerController.getThresholdExceeded({
+        path: { memoryTracker: memoryTrackerId },
+      })
+    )
+    if (data?.thresholdExceeded) {
+      await offerReAssimilation(memoryTrackerId)
+    }
   }
 }
 

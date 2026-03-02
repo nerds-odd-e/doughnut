@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.dto.ThresholdExceededResult;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionType;
@@ -15,6 +16,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
+import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -35,6 +37,94 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
     openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+  }
+
+  @Nested
+  class GetThresholdExceeded {
+    @Test
+    void shouldReturnFalseWhenBelowThreshold() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+      Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
+
+      for (int i = 0; i < 4; i++) {
+        makeMe
+            .aRecallPrompt()
+            .approvedQuestionOf(note)
+            .forMemoryTracker(memoryTracker)
+            .answerChoiceIndex(1)
+            .answerTimestamp(day1)
+            .please();
+      }
+
+      testabilitySettings.timeTravelTo(day1);
+      ThresholdExceededResult result = controller.getThresholdExceeded(memoryTracker);
+
+      assertThat(result.thresholdExceeded(), equalTo(false));
+    }
+
+    @Test
+    void shouldReturnTrueWhenAtThreshold() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+      Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
+
+      for (int i = 0; i < 5; i++) {
+        makeMe
+            .aRecallPrompt()
+            .approvedQuestionOf(note)
+            .forMemoryTracker(memoryTracker)
+            .answerChoiceIndex(1)
+            .answerTimestamp(day1)
+            .please();
+      }
+
+      testabilitySettings.timeTravelTo(day1);
+      ThresholdExceededResult result = controller.getThresholdExceeded(memoryTracker);
+
+      assertThat(result.thresholdExceeded(), equalTo(true));
+    }
+
+    @Test
+    void shouldReturnTrueWhenAboveThreshold() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+      Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
+
+      for (int i = 0; i < 6; i++) {
+        makeMe
+            .aRecallPrompt()
+            .approvedQuestionOf(note)
+            .forMemoryTracker(memoryTracker)
+            .answerChoiceIndex(1)
+            .answerTimestamp(day1)
+            .please();
+      }
+
+      testabilitySettings.timeTravelTo(day1);
+      ThresholdExceededResult result = controller.getThresholdExceeded(memoryTracker);
+
+      assertThat(result.thresholdExceeded(), equalTo(true));
+    }
+
+    @Test
+    void shouldNotBeAbleToGetForOthersMemoryTracker() {
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.getThresholdExceeded(memoryTracker));
+    }
+
+    @Test
+    void shouldRequireUserToBeLoggedIn() {
+      currentUser.setUser(null);
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
+      assertThrows(
+          ResponseStatusException.class, () -> controller.getThresholdExceeded(memoryTracker));
+    }
   }
 
   @Nested

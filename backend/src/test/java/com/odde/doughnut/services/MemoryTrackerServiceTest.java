@@ -115,120 +115,6 @@ public class MemoryTrackerServiceTest {
   }
 
   @Nested
-  class CheckWrongAnswerThreshold {
-    Note note;
-    MemoryTracker memoryTracker;
-
-    @BeforeEach
-    void setup() {
-      note = makeMe.aNote().creatorAndOwner(user).please();
-      memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
-    }
-
-    @Test
-    void shouldReturnFalseWhenBelowThreshold() {
-      // Create 4 wrong answers (below default threshold of 5)
-      for (int i = 0; i < 4; i++) {
-        makeMe
-            .aRecallPrompt()
-            .approvedQuestionOf(note)
-            .forMemoryTracker(memoryTracker)
-            .answerChoiceIndex(1) // wrong
-            .answerTimestamp(day1)
-            .please();
-      }
-
-      boolean exceeded = memoryTrackerService.hasExceededWrongAnswerThreshold(note, day1, 14, 5);
-
-      assertThat(exceeded, equalTo(false));
-    }
-
-    @Test
-    void shouldReturnTrueWhenAtThreshold() {
-      // Create 5 wrong answers (at default threshold of 5)
-      for (int i = 0; i < 5; i++) {
-        makeMe
-            .aRecallPrompt()
-            .approvedQuestionOf(note)
-            .forMemoryTracker(memoryTracker)
-            .answerChoiceIndex(1) // wrong
-            .answerTimestamp(day1)
-            .please();
-      }
-
-      boolean exceeded = memoryTrackerService.hasExceededWrongAnswerThreshold(note, day1, 14, 5);
-
-      assertThat(exceeded, equalTo(true));
-    }
-
-    @Test
-    void shouldReturnTrueWhenAboveThreshold() {
-      // Create 6 wrong answers (above default threshold of 5)
-      for (int i = 0; i < 6; i++) {
-        makeMe
-            .aRecallPrompt()
-            .approvedQuestionOf(note)
-            .forMemoryTracker(memoryTracker)
-            .answerChoiceIndex(1) // wrong
-            .answerTimestamp(day1)
-            .please();
-      }
-
-      boolean exceeded = memoryTrackerService.hasExceededWrongAnswerThreshold(note, day1, 14, 5);
-
-      assertThat(exceeded, equalTo(true));
-    }
-  }
-
-  @Nested
-  class MarkAsRepeatedWithThresholdCheck {
-    Note note;
-    MemoryTracker memoryTracker;
-
-    @BeforeEach
-    void setup() {
-      note = makeMe.aNote().creatorAndOwner(user).please();
-      memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
-    }
-
-    @Test
-    void shouldReturnFalseWhenAnswerIsCorrect() {
-      boolean thresholdExceeded =
-          memoryTrackerService.markAsRepeated(day1, true, memoryTracker, 1000);
-
-      assertThat(thresholdExceeded, equalTo(false));
-    }
-
-    @Test
-    void shouldReturnFalseWhenWrongButBelowThreshold() {
-      boolean thresholdExceeded =
-          memoryTrackerService.markAsRepeated(day1, false, memoryTracker, 1000);
-
-      assertThat(thresholdExceeded, equalTo(false));
-    }
-
-    @Test
-    void shouldReturnTrueWhenWrongAndReachesThreshold() {
-      // Create 5 previous wrong answers (at threshold)
-      for (int i = 0; i < 5; i++) {
-        makeMe
-            .aRecallPrompt()
-            .approvedQuestionOf(note)
-            .forMemoryTracker(memoryTracker)
-            .answerChoiceIndex(1)
-            .answerTimestamp(day1)
-            .please();
-      }
-
-      // This wrong answer should detect threshold is exceeded
-      boolean thresholdExceeded =
-          memoryTrackerService.markAsRepeated(day1, false, memoryTracker, 1000);
-
-      assertThat(thresholdExceeded, equalTo(true));
-    }
-  }
-
-  @Nested
   class ReAssimilate {
     Note note;
     MemoryTracker memoryTracker;
@@ -293,11 +179,8 @@ public class MemoryTrackerServiceTest {
             .please();
       }
 
-      boolean thresholdExceeded =
-          memoryTrackerService.markAsRepeated(day1, false, memoryTracker, 1000);
+      memoryTrackerService.markAsRepeated(day1, false, memoryTracker, 1000);
 
-      // markAsRepeated should return true but NOT delete the MemoryTracker
-      assertThat(thresholdExceeded, equalTo(true));
       List<MemoryTracker> trackers =
           memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId());
       assertThat(trackers, hasSize(1));

@@ -221,7 +221,6 @@ export type AnswerDto = {
 
 export type AnsweredQuestion = {
     recallPrompt: RecallPrompt;
-    thresholdExceeded?: boolean;
 };
 
 export type AnswerSpellingDto = {
@@ -557,6 +556,10 @@ export type NotebookCertificateApprovalDto = {
     approval?: NotebookCertificateApproval;
 };
 
+export type ThresholdExceededResult = {
+    thresholdExceeded?: boolean;
+};
+
 export type FailureReport = {
     id?: number;
     errorName: string;
@@ -654,7 +657,6 @@ export type RecallPromptWritable = {
 
 export type AnsweredQuestionWritable = {
     recallPrompt: RecallPromptWritable;
-    thresholdExceeded?: boolean;
 };
 
 export type NoteCreationResultWritable = {
@@ -3922,6 +3924,33 @@ export type ShowMemoryTrackerResponses = {
 };
 
 export type ShowMemoryTrackerResponse = ShowMemoryTrackerResponses[keyof ShowMemoryTrackerResponses];
+
+export type GetThresholdExceededData = {
+    body?: never;
+    path: {
+        memoryTracker: number;
+    };
+    query?: never;
+    url: '/api/memory-trackers/{memoryTracker}/threshold-exceeded';
+};
+
+export type GetThresholdExceededErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type GetThresholdExceededError = GetThresholdExceededErrors[keyof GetThresholdExceededErrors];
+
+export type GetThresholdExceededResponses = {
+    /**
+     * OK
+     */
+    200: ThresholdExceededResult;
+};
+
+export type GetThresholdExceededResponse = GetThresholdExceededResponses[keyof GetThresholdExceededResponses];
 
 export type GetRecallPromptsData = {
     body?: never;

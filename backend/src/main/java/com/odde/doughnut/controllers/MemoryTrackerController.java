@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.ThresholdExceededResult;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -48,6 +49,18 @@ class MemoryTrackerController {
       return memoryTrackerService.getSpellingQuestion(memoryTracker);
     }
     return recallQuestionService.generateAQuestion(memoryTracker);
+  }
+
+  @GetMapping("/{memoryTracker}/threshold-exceeded")
+  public ThresholdExceededResult getThresholdExceeded(
+      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertLoggedIn();
+    authorizationService.assertReadAuthorization(memoryTracker);
+    boolean thresholdExceeded =
+        memoryTrackerService.isThresholdExceeded(
+            memoryTracker, testabilitySettings.getCurrentUTCTimestamp());
+    return new ThresholdExceededResult(thresholdExceeded);
   }
 
   @GetMapping("/{memoryTracker}")

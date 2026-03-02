@@ -152,13 +152,12 @@ public class MemoryTrackerService {
     answer.setCorrect(memoryTracker.getNote().matchAnswer(answerSpellingDTO.getSpellingAnswer()));
     answer.setThinkingTimeMs(answerSpellingDTO.getThinkingTimeMs());
     recallPrompt.setAnswer(answer);
-    boolean thresholdExceeded =
-        markAsRepeated(
-            currentUTCTimestamp,
-            answer.getCorrect(),
-            memoryTracker,
-            answerSpellingDTO.getThinkingTimeMs());
-    return recallPrompt.getAnsweredQuestion(thresholdExceeded);
+    markAsRepeated(
+        currentUTCTimestamp,
+        answer.getCorrect(),
+        memoryTracker,
+        answerSpellingDTO.getThinkingTimeMs());
+    return recallPrompt.getAnsweredQuestion();
   }
 
   public List<RecallPrompt> getAllRecallPrompts(MemoryTracker memoryTracker) {
@@ -208,10 +207,9 @@ public class MemoryTrackerService {
     recallPrompt.setAnswer(answer);
     entityPersister.save(recallPrompt);
 
-    boolean thresholdExceeded =
-        markAsRepeated(
-            currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
-    return recallPrompt.getAnsweredQuestion(thresholdExceeded);
+    markAsRepeated(
+        currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
+    return recallPrompt.getAnsweredQuestion();
   }
 
   public boolean hasExceededWrongAnswerThreshold(
@@ -220,5 +218,10 @@ public class MemoryTrackerService {
         new Timestamp(currentTime.getTime() - (long) periodDays * 24 * 60 * 60 * 1000);
     int wrongCount = recallPromptRepository.countWrongAnswersSince(note.getId(), since);
     return wrongCount >= threshold;
+  }
+
+  public boolean isThresholdExceeded(MemoryTracker memoryTracker, Timestamp currentTime) {
+    return hasExceededWrongAnswerThreshold(
+        memoryTracker.getNote(), currentTime, WRONG_ANSWER_PERIOD_DAYS, WRONG_ANSWER_THRESHOLD);
   }
 }

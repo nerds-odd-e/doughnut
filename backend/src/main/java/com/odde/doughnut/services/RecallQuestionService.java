@@ -96,9 +96,8 @@ public class RecallQuestionService {
   public AnsweredQuestion answerQuestion(
       RecallPrompt recallPrompt, AnswerDTO answerDTO, User user, Timestamp currentUTCTimestamp) {
     Answer answer = answerService.createAnswerForQuestion(recallPrompt, answerDTO);
-    boolean thresholdExceeded =
-        memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
-            user, currentUTCTimestamp, answer.getCorrect(), recallPrompt);
-    return recallPrompt.getAnsweredQuestion(thresholdExceeded);
+    memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
+        user, currentUTCTimestamp, answer.getCorrect(), recallPrompt);
+    return recallPrompt.getAnsweredQuestion();
   }
 }
