@@ -17,9 +17,9 @@
         }"
       />
       <AnsweredQuestionComponent
-        v-else-if="conversation.subject?.answeredQuestion"
+        v-else-if="conversation.subject?.recallPrompt"
         v-bind="{
-          answeredQuestion: conversation.subject.answeredQuestion,
+          answeredQuestion: conversation.subject.recallPrompt,
           conversationButton: false,
         }"
       />

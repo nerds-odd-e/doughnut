@@ -160,7 +160,7 @@ const defaultQuestions = [
 
 const showDefaultMessages = computed(
   () =>
-    conversation.subject?.answeredQuestion &&
+    conversation.subject?.recallPrompt &&
     (!currentConversationMessages.value ||
       currentConversationMessages.value.length === 0)
 )

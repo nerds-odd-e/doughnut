@@ -332,7 +332,7 @@ export type Conversation = {
 export type ConversationSubject = {
     assessmentQuestionInstance?: AssessmentQuestionInstance;
     note?: Note;
-    answeredQuestion?: RecallPrompt;
+    recallPrompt?: RecallPrompt;
 };
 
 export type CircleJoiningByInvitation = {
@@ -680,7 +680,7 @@ export type ConversationWritable = {
 export type ConversationSubjectWritable = {
     assessmentQuestionInstance?: AssessmentQuestionInstance;
     note?: NoteWritable;
-    answeredQuestion?: RecallPromptWritable;
+    recallPrompt?: RecallPromptWritable;
 };
 
 export type NoteRecallInfoWritable = {

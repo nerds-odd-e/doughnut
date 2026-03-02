@@ -4345,7 +4345,7 @@ components:
           $ref: "#/components/schemas/AssessmentQuestionInstance"
         note:
           $ref: "#/components/schemas/Note"
-        answeredQuestion:
+        recallPrompt:
           $ref: "#/components/schemas/RecallPrompt"
     CircleJoiningByInvitation:
       type: object

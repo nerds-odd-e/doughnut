@@ -21,7 +21,7 @@ class ConversationBuilder extends Builder<Conversation> {
     return this
   }
   forAnsweredQuestion(recallPrompt: RecallPrompt) {
-    this.data.subject!.answeredQuestion = recallPrompt
+    this.data.subject!.recallPrompt = recallPrompt
     return this
   }
   withoutId() {
@@ -34,7 +34,7 @@ class ConversationBuilder extends Builder<Conversation> {
     if (
       this.data.subject?.note === undefined &&
       this.data.subject?.assessmentQuestionInstance === undefined &&
-      this.data.subject?.answeredQuestion === undefined
+      this.data.subject?.recallPrompt === undefined
     ) {
       this.data.subject!.note = new NoteBuilder().please()
     }

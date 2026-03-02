@@ -189,7 +189,7 @@ describe("ConversationInner", () => {
       const recallConversation = {
         ...conversation,
         subject: {
-          answeredQuestion: makeMe.anAnsweredQuestion.please(),
+          recallPrompt: makeMe.anAnsweredQuestion.please(),
         },
       }
       wrapper = mountComponent(recallConversation, user)
@@ -207,7 +207,7 @@ describe("ConversationInner", () => {
       const nonRecallConversation = {
         ...conversation,
         subject: {
-          answeredQuestion: undefined,
+          recallPrompt: undefined,
         },
       }
       wrapper = mountComponent(nonRecallConversation, user)
@@ -223,7 +223,7 @@ describe("ConversationInner", () => {
       const recallConversation = {
         ...conversation,
         subject: {
-          answeredQuestion: makeMe.anAnsweredQuestion.please(),
+          recallPrompt: makeMe.anAnsweredQuestion.please(),
         },
       }
       wrapper = mountComponent(recallConversation, user)
