@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -338,13 +339,23 @@ class AiControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldReturnDetailsUnchangedWhenPointsToRemoveIsEmpty()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
+    void shouldThrowWhenPointsToRemoveIsEmpty() {
       testNote.setDetails("Some note content.");
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.points = List.of();
-      RemovePointsResponseDTO response = controller.removePointFromNote(testNote, requestDTO);
-      assertThat(response.getDetails()).isEqualTo("Some note content.");
+      assertThatThrownBy(() -> controller.removePointFromNote(testNote, requestDTO))
+          .isInstanceOf(IllegalArgumentException.class)
+          .hasMessageContaining("Points to remove cannot be empty");
+    }
+
+    @Test
+    void shouldThrowWhenNoteDetailsIsEmpty() {
+      testNote.setDetails("");
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
+      requestDTO.points = List.of("some point");
+      assertThatThrownBy(() -> controller.removePointFromNote(testNote, requestDTO))
+          .isInstanceOf(IllegalArgumentException.class)
+          .hasMessageContaining("Note details cannot be empty");
     }
   }
 

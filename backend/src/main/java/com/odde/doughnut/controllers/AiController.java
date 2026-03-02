@@ -101,10 +101,10 @@ public class AiController {
 
     String details = note.getDetails();
     if (details == null || details.trim().isEmpty()) {
-      return new RemovePointsResponseDTO(details);
+      throw new IllegalArgumentException("Note details cannot be empty");
     }
     if (request.getPoints() == null || request.getPoints().isEmpty()) {
-      return new RemovePointsResponseDTO(details);
+      throw new IllegalArgumentException("Points to remove cannot be empty");
     }
 
     String newDetails =
