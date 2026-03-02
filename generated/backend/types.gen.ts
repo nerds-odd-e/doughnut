@@ -222,7 +222,6 @@ export type AnsweredQuestion = {
     note?: Note;
     predefinedQuestion: PredefinedQuestion;
     answer: Answer;
-    answerDisplay?: string;
     recallPromptId: number;
     memoryTrackerId?: number;
     thresholdExceeded?: boolean;
@@ -677,7 +676,6 @@ export type AnsweredQuestionWritable = {
     note?: NoteWritable;
     predefinedQuestion: PredefinedQuestion;
     answer: Answer;
-    answerDisplay?: string;
     recallPromptId: number;
     memoryTrackerId?: number;
     thresholdExceeded?: boolean;

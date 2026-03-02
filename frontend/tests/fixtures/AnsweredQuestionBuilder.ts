@@ -38,7 +38,6 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
           choiceIndex: this.choiceIndexToUse,
         }),
       },
-      answerDisplay: "",
       note: this.noteToUse ?? makeMe.aNote.please(),
       predefinedQuestion: makeMe.aPredefinedQuestion.please(),
       recallPromptId: this.recallPromptIdToUse ?? generateId(),

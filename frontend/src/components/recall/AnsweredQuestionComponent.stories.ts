@@ -42,7 +42,6 @@ const createAnsweredQuestionWithQuestion = (
   return {
     ...baseQuestion,
     predefinedQuestion,
-    answerDisplay: choices[answerIndex] || "",
   }
 }
 

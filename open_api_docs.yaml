@@ -4106,8 +4106,6 @@ components:
           $ref: "#/components/schemas/PredefinedQuestion"
         answer:
           $ref: "#/components/schemas/Answer"
-        answerDisplay:
-          type: string
         recallPromptId:
           type: integer
           format: int32
