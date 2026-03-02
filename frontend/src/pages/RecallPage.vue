@@ -33,8 +33,7 @@
         :memory-trackers="memoryTrackers"
         :current-index="getCurrentMemoryTrackerIndex()"
         :eager-fetch-count="eagerFetchCount ?? 5"
-        @answered-question="onAnswered"
-        @answered-spelling="onAnswered"
+        @answered="onAnswered"
         @just-reviewed="onJustReviewed"
       />
       <AnsweredQuestionComponent

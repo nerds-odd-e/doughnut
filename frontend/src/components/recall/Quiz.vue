@@ -68,8 +68,7 @@ const props = defineProps<QuizProps>()
 
 // Emits definition
 const emit = defineEmits<{
-  (e: "answered-question", result: AnsweredQuestion): void
-  (e: "answered-spelling", result: AnsweredQuestion): void
+  (e: "answered", result: AnsweredQuestion): void
   (e: "just-reviewed", result: AnsweredQuestion | undefined): void
 }>()
 
@@ -182,12 +181,12 @@ const onSpellingAnswer = async (
     })
   )
   if (!error) {
-    emit("answered-spelling", answerResult!)
+    emit("answered", answerResult!)
   }
 }
 
 const onAnswered = (answerResult: AnsweredQuestion) => {
-  emit("answered-question", answerResult)
+  emit("answered", answerResult)
 }
 
 // Watchers
