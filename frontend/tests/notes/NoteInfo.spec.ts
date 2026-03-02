@@ -4,10 +4,11 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import type { NoteInfo } from "@generated/backend"
 import { describe, it, expect, afterEach } from "vitest"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
+const noteRealm = makeMe.aNoteRealm.please()
 const stubResponse: NoteInfo = {
   memoryTrackers: [makeMe.aMemoryTracker.please()],
-  note: makeMe.aNoteRealm.please(),
   createdAt: "",
 }
 
@@ -21,17 +22,19 @@ describe("note info", () => {
 
   it("should render values", async () => {
     const getNoteInfoSpy = mockSdkService("getNoteInfo", stubResponse)
+    useStorageAccessor().value?.refreshNoteRealm(noteRealm)
+
     wrapper = helper
       .component(NoteInfoBar)
       .withProps({
-        noteId: 123,
+        noteId: noteRealm.id,
       })
       .withRouter()
       .mount({ attachTo: document.body })
     await flushPromises()
-    expect(wrapper.findAll(".statistics-value")).toHaveLength(3)
+    expect(wrapper.find("table").exists()).toBe(true)
     expect(getNoteInfoSpy).toBeCalledWith({
-      path: { note: 123 },
+      path: { note: noteRealm.id },
     })
   })
 })

@@ -15,6 +15,7 @@ describe("NoteInfoComponent", () => {
   })
 
   it("should display all memory trackers including skipped ones", () => {
+    const noteRealm = makeMe.aNoteRealm.please()
     const noteInfo: NoteInfo = {
       memoryTrackers: [
         makeMe.aMemoryTracker
@@ -26,7 +27,6 @@ describe("NoteInfoComponent", () => {
           .repetitionCount(3)
           .please(),
       ],
-      note: makeMe.aNoteRealm.please(),
       createdAt: "",
       noteType: undefined,
     }
@@ -34,6 +34,7 @@ describe("NoteInfoComponent", () => {
     wrapper = helper
       .component(NoteInfoComponent)
       .withProps({
+        note: noteRealm.note,
         noteInfo,
       })
       .withRouter()
@@ -48,10 +49,10 @@ describe("NoteInfoComponent", () => {
       .removedFromTracking(true)
       .please()
     skippedMemoryTracker.id = 123
+    const noteRealm = makeMe.aNoteRealm.please()
 
     const noteInfo: NoteInfo = {
       memoryTrackers: [skippedMemoryTracker],
-      note: makeMe.aNoteRealm.please(),
       createdAt: "",
       noteType: undefined,
     }
@@ -59,6 +60,7 @@ describe("NoteInfoComponent", () => {
     wrapper = helper
       .component(NoteInfoComponent)
       .withProps({
+        note: noteRealm.note,
         noteInfo,
       })
       .withRouter()
@@ -79,9 +81,9 @@ describe("NoteInfoComponent", () => {
   })
 
   it("should display memory trackers table when there are memory trackers", () => {
+    const noteRealm = makeMe.aNoteRealm.please()
     const noteInfo: NoteInfo = {
       memoryTrackers: [makeMe.aMemoryTracker.please()],
-      note: makeMe.aNoteRealm.please(),
       createdAt: "",
       noteType: undefined,
     }
@@ -89,6 +91,7 @@ describe("NoteInfoComponent", () => {
     wrapper = helper
       .component(NoteInfoComponent)
       .withProps({
+        note: noteRealm.note,
         noteInfo,
       })
       .withRouter()
@@ -102,9 +105,9 @@ describe("NoteInfoComponent", () => {
   })
 
   it("should not display memory trackers table when there are no memory trackers", () => {
+    const noteRealm = makeMe.aNoteRealm.please()
     const noteInfo: NoteInfo = {
       memoryTrackers: [],
-      note: makeMe.aNoteRealm.please(),
       createdAt: "",
       noteType: undefined,
     }
@@ -112,6 +115,7 @@ describe("NoteInfoComponent", () => {
     wrapper = helper
       .component(NoteInfoComponent)
       .withProps({
+        note: noteRealm.note,
         noteInfo,
       })
       .withRouter()
@@ -128,9 +132,9 @@ describe("NoteInfoComponent", () => {
     })
 
     it("should display note type selection", () => {
+      const noteRealm = makeMe.aNoteRealm.please()
       const noteInfo: NoteInfo = {
         memoryTrackers: [],
-        note: makeMe.aNoteRealm.please(),
         createdAt: "",
         noteType: "concept",
       }
@@ -138,6 +142,7 @@ describe("NoteInfoComponent", () => {
       wrapper = helper
         .component(NoteInfoComponent)
         .withProps({
+          note: noteRealm.note,
           noteInfo,
         })
         .withRouter()
@@ -151,9 +156,9 @@ describe("NoteInfoComponent", () => {
     })
 
     it("should save noteType when user selects a new type", async () => {
+      const noteRealm = makeMe.aNoteRealm.please()
       const noteInfo: NoteInfo = {
         memoryTrackers: [],
-        note: makeMe.aNoteRealm.please(),
         createdAt: "",
         noteType: undefined,
       }
@@ -161,6 +166,7 @@ describe("NoteInfoComponent", () => {
       wrapper = helper
         .component(NoteInfoComponent)
         .withProps({
+          note: noteRealm.note,
           noteInfo,
         })
         .withRouter()
@@ -175,15 +181,15 @@ describe("NoteInfoComponent", () => {
       await flushPromises()
 
       expect(updateNoteTypeSpy).toHaveBeenCalledWith({
-        path: { note: noteInfo.note.id },
+        path: { note: noteRealm.note.id },
         body: "source",
       })
     })
 
     it("should emit noteTypeUpdated event on successful update", async () => {
+      const noteRealm = makeMe.aNoteRealm.please()
       const noteInfo: NoteInfo = {
         memoryTrackers: [],
-        note: makeMe.aNoteRealm.please(),
         createdAt: "",
         noteType: undefined,
       }
@@ -191,6 +197,7 @@ describe("NoteInfoComponent", () => {
       wrapper = helper
         .component(NoteInfoComponent)
         .withProps({
+          note: noteRealm.note,
           noteInfo,
         })
         .withRouter()
@@ -209,9 +216,9 @@ describe("NoteInfoComponent", () => {
     })
 
     it("should revert selection on error", async () => {
+      const noteRealm = makeMe.aNoteRealm.please()
       const noteInfo: NoteInfo = {
         memoryTrackers: [],
-        note: makeMe.aNoteRealm.please(),
         createdAt: "",
         noteType: "concept",
       }
@@ -221,6 +228,7 @@ describe("NoteInfoComponent", () => {
       wrapper = helper
         .component(NoteInfoComponent)
         .withProps({
+          note: noteRealm.note,
           noteInfo,
         })
         .withRouter()
@@ -240,9 +248,9 @@ describe("NoteInfoComponent", () => {
     })
 
     it("should not save when selected type matches current noteType", async () => {
+      const noteRealm = makeMe.aNoteRealm.please()
       const noteInfo: NoteInfo = {
         memoryTrackers: [],
-        note: makeMe.aNoteRealm.please(),
         createdAt: "",
         noteType: "initiative",
       }
@@ -250,6 +258,7 @@ describe("NoteInfoComponent", () => {
       wrapper = helper
         .component(NoteInfoComponent)
         .withProps({
+          note: noteRealm.note,
           noteInfo,
         })
         .withRouter()

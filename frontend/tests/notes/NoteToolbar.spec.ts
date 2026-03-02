@@ -19,7 +19,6 @@ describe("NoteToolbar", () => {
   it("displays menu items when dropdown is open", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
     const mockNoteInfo: NoteInfo = {
-      note: noteRealm,
       recallSetting: {
         level: 0,
         rememberSpelling: false,
@@ -61,7 +60,6 @@ describe("NoteToolbar", () => {
   it("closes more options dialog when note id changes", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
     const mockNoteInfo: NoteInfo = {
-      note: noteRealm,
       recallSetting: {
         level: 0,
         rememberSpelling: false,

@@ -6,8 +6,9 @@
       </svg>
     </button>
     <div class="daisy-flex daisy-flex-col daisy-gap-2">
-      <div v-if="noteInfo?.note" class="daisy-mb-4">
+      <div v-if="noteInfo && note" class="daisy-mb-4">
         <NoteInfoComponent
+          :note="note"
           :note-info="noteInfo"
           @note-type-updated="onNoteTypeUpdated"
         />

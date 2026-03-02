@@ -13,10 +13,10 @@
   </div>
   <NoteRecallSettingForm
     v-bind="{
-      noteId: noteInfo.note.id,
-      isLinkNote: !!noteInfo.note.note.noteTopology?.targetNoteTopology,
+      noteId: note.id,
+      isLinkNote: !!note.noteTopology?.targetNoteTopology,
       noteRecallSetting: recallSetting,
-      noteDetails: noteInfo.note.note.details,
+      noteDetails: note.details,
     }"
     @level-changed="$emit('levelChanged', $event)"
     @remember-spelling-changed="$emit('rememberSpellingChanged', $event)"
@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import type { MemoryTracker, NoteInfo } from "@generated/backend"
+import type { MemoryTracker, Note, NoteInfo } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { ref, computed, watch } from "vue"
@@ -59,8 +59,9 @@ import Select from "../form/Select.vue"
 import { noteTypeOptions } from "@/models/noteTypeOptions"
 import type { NoteType } from "@/models/noteTypeOptions"
 
-// Props
+// Props - note from container (reactive), noteInfo from API
 const props = defineProps<{
+  note: Note
   noteInfo: NoteInfo
 }>()
 
@@ -126,7 +127,7 @@ const updateNoteType = async (newTypeString: string) => {
   if (newType !== undefined) {
     const { error } = await apiCallWithLoading(() =>
       NoteController.updateNoteType({
-        path: { note: props.noteInfo.note.id },
+        path: { note: props.note.id },
         body: newType,
       })
     )

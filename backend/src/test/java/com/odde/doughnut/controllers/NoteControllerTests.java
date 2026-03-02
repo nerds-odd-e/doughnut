@@ -87,7 +87,7 @@ class NoteControllerTests extends ControllerTestBase {
           .forNotebook(note.getNotebook())
           .please();
       makeMe.refresh(currentUser.getUser());
-      assertThat(controller.getNoteInfo(note).getNote().getId(), equalTo(note.getId()));
+      assertThat(controller.getNoteInfo(note), notNullValue());
     }
 
     @Test

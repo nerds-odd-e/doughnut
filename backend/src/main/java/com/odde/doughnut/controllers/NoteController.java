@@ -119,7 +119,6 @@ class NoteController {
     NoteInfo noteInfo = new NoteInfo();
     noteInfo.setMemoryTrackers(
         userService.getMemoryTrackersFor(authorizationService.getCurrentUser(), note));
-    noteInfo.setNote(note.toNoteRealm(authorizationService.getCurrentUser()));
     noteInfo.setCreatedAt(note.getCreatedAt());
     noteInfo.setRecallSetting(note.getRecallSetting());
     noteInfo.setNoteType(note.getNoteType());

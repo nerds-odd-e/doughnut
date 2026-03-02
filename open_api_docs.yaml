@@ -4696,8 +4696,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/MemoryTracker"
-        note:
-          $ref: "#/components/schemas/NoteRealm"
         createdAt:
           type: string
           format: date-time
@@ -4714,7 +4712,6 @@ components:
           - quest
       required:
       - createdAt
-      - note
     BareNote:
       type: object
       properties:

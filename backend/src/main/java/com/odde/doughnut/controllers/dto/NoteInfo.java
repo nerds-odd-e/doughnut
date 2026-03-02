@@ -11,7 +11,6 @@ import lombok.Setter;
 
 public class NoteInfo {
   @Getter @Setter private List<MemoryTracker> memoryTrackers;
-  @NotNull @Getter @Setter private NoteRealm note;
   @NotNull @Getter @Setter private Timestamp createdAt;
   @Getter @Setter public NoteRecallSetting recallSetting;
   @Getter @Setter private NoteType noteType;

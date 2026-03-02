@@ -21,7 +21,6 @@ const meta = {
       // Mock NoteController.getNoteInfo to avoid API calls
       const originalGetNoteInfo = NoteController.getNoteInfo
       const mockNoteInfo: NoteInfo = {
-        note: makeMe.aNoteRealm.title("Sample Note").please(),
         recallSetting: {
           level: 0,
           rememberSpelling: false,

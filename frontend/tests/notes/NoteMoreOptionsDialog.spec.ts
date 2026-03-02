@@ -21,7 +21,6 @@ let updateNoteTypeSpy: ReturnType<typeof mockSdkService<"updateNoteType">>
 let deleteNoteSpy: ReturnType<typeof mockSdkService<"deleteNote">>
 
 const mockNoteInfo: NoteInfo = {
-  note: makeMe.aNoteRealm.please(),
   recallSetting: {
     level: 0,
     rememberSpelling: false,
@@ -109,7 +108,7 @@ describe("NoteMoreOptionsDialog", () => {
       await flushPromises()
 
       expect(updateNoteTypeSpy).toHaveBeenCalledWith({
-        path: { note: mockNoteInfo.note.id },
+        path: { note: note.id },
         body: "source",
       })
     })

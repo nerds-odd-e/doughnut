@@ -1,6 +1,7 @@
 <template>
   <NoteInfoComponent
-    v-if="noteInfo?.note"
+    v-if="noteInfo && note"
+    :note="note"
     :note-info="noteInfo"
     @level-changed="$emit('levelChanged', $event)"
     @remember-spelling-changed="$emit('rememberSpellingChanged', $event)"
@@ -11,8 +12,9 @@
 import type { NoteInfo } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
 import NoteInfoComponent from "./NoteInfoComponent.vue"
-import { ref, watch } from "vue"
+import { ref, watch, computed } from "vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const props = defineProps<{
   noteId: number
@@ -24,6 +26,12 @@ const emit = defineEmits<{
 }>()
 
 const noteInfo = ref<NoteInfo | undefined>(undefined)
+const storageAccessor = useStorageAccessor()
+
+const note = computed(
+  () =>
+    storageAccessor.value?.storedApi().getNoteRealmRef(props.noteId).value?.note
+)
 
 const fetchData = async () => {
   const { data: noteInfoData, error } = await apiCallWithLoading(() =>

@@ -10,7 +10,6 @@ let renderer: RenderingHelper<typeof AssimilateSingleNotePageView>
 beforeEach(() => {
   const noteRealm = makeMe.aNoteRealm.please()
   mockSdkService("getNoteInfo", {
-    note: noteRealm,
     recallSetting: {
       level: 0,
       rememberSpelling: false,
