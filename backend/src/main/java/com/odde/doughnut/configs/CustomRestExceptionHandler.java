@@ -15,6 +15,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -57,5 +59,19 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
       apiError.add(error.getObjectName(), error.getDefaultMessage());
     }
     return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler({MultipartException.class})
+  public ResponseEntity<Object> handleMultipartException(final MultipartException ex) {
+    HttpStatus status = HttpStatus.BAD_REQUEST;
+    String message = "Failed to parse multipart request";
+
+    if (ex instanceof MaxUploadSizeExceededException) {
+      status = HttpStatus.PAYLOAD_TOO_LARGE;
+      message = "File size exceeds the maximum allowed limit";
+    }
+
+    final ApiError apiError = new ApiError(message, ApiError.ErrorType.MULTIPART_ERROR);
+    return new ResponseEntity<>(apiError, new HttpHeaders(), status);
   }
 }

@@ -14,6 +14,7 @@ public class ApiError {
   public enum ErrorType {
     OPENAI_UNAUTHORIZED,
     BINDING_ERROR,
+    MULTIPART_ERROR,
     OPENAI_TIMEOUT,
     OPENAI_SERVICE_ERROR,
     OPENAI_NOT_AVAILABLE,
