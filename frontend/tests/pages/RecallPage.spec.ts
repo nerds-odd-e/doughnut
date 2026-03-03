@@ -584,6 +584,70 @@ describe("repeat page", () => {
     })
   })
 
+  describe("re-assimilation threshold check", () => {
+    const memoryTrackerId = 123
+    let getThresholdExceededSpy: ReturnType<
+      typeof mockSdkService<"getThresholdExceeded">
+    >
+
+    beforeEach(() => {
+      vi.useFakeTimers()
+      mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
+      mockSdkService("askAQuestion", makeMe.aRecallPrompt.please())
+      getThresholdExceededSpy = mockSdkService("getThresholdExceeded", {
+        thresholdExceeded: false,
+      })
+      const trackers = [createMemoryTrackerLite(memoryTrackerId)]
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({ toRepeat: trackers })
+      )
+    })
+
+    it("should NOT call getThresholdExceeded when answer is correct", async () => {
+      const note = makeMe.aNote.please()
+      const correctAnswerResult: RecallPrompt = makeMe.aRecallPrompt
+        .withNote(note)
+        .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
+        .withAnswer({ id: 1, correct: true, choiceIndex: 0 })
+        .withMemoryTrackerId(memoryTrackerId)
+        .please()
+
+      const wrapper = await mountPage()
+      await flushPromises()
+
+      const quiz = wrapper.findComponent({ name: "Quiz" })
+      expect(quiz.exists()).toBe(true)
+      quiz.vm.$emit("answered", correctAnswerResult)
+      await flushPromises()
+
+      expect(getThresholdExceededSpy).not.toHaveBeenCalled()
+    })
+
+    it("should call getThresholdExceeded when answer is wrong", async () => {
+      const note = makeMe.aNote.please()
+      const wrongAnswerResult: RecallPrompt = makeMe.aRecallPrompt
+        .withNote(note)
+        .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
+        .withAnswer({ id: 1, correct: false, choiceIndex: 1 })
+        .withMemoryTrackerId(memoryTrackerId)
+        .please()
+
+      const wrapper = await mountPage()
+      await flushPromises()
+
+      const quiz = wrapper.findComponent({ name: "Quiz" })
+      expect(quiz.exists()).toBe(true)
+      quiz.vm.$emit("answered", wrongAnswerResult)
+      await flushPromises()
+
+      expect(getThresholdExceededSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: { memoryTracker: memoryTrackerId },
+        })
+      )
+    })
+  })
+
   describe("diligent mode", () => {
     beforeEach(() => {
       vi.useFakeTimers()
