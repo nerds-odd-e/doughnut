@@ -48,7 +48,11 @@
         <div class="daisy-alert daisy-alert-success">
           You have finished all repetitions for this half a day!
         </div>
-        <div>
+        <div v-if="isLoadingMore" class="daisy-flex daisy-items-center daisy-gap-2 daisy-py-4">
+          <span class="daisy-loading daisy-loading-spinner daisy-loading-md"></span>
+          <span>Loading more items...</span>
+        </div>
+        <div v-else>
           <button role="button" class="daisy-btn daisy-btn-secondary" @click="loadMore(3)">
             Load more from next 3 days
           </button>
@@ -118,6 +122,7 @@ const currentIndex = ref(0)
 const previousAnsweredQuestions = ref<(RecallPrompt | undefined)[]>([])
 const previousAnsweredQuestionCursor = ref<number | undefined>(undefined)
 const isProgressBarVisible = ref(true)
+const isLoadingMore = ref(false)
 
 // Sync currentIndex with useRecallData
 watch(
@@ -236,27 +241,32 @@ watch(
 )
 
 const loadMore = async (dueInDays?: number) => {
-  const { data: response, error } = await RecallsController.recalling({
-    query: {
-      timezone: timezoneParam(),
-      dueindays: dueInDays,
-    },
-  })
-  if (!error && response) {
-    let trackers = response.toRepeat
-    currentIndex.value = 0
-    setDiligentMode((dueInDays ?? 0) > 0)
-    if (trackers?.length === 0) {
+  isLoadingMore.value = true
+  try {
+    const { data: response, error } = await RecallsController.recalling({
+      query: {
+        timezone: timezoneParam(),
+        dueindays: dueInDays,
+      },
+    })
+    if (!error && response) {
+      let trackers = response.toRepeat
+      currentIndex.value = 0
+      setDiligentMode((dueInDays ?? 0) > 0)
+      if (trackers?.length === 0) {
+        setToRepeat(trackers)
+        return response
+      }
+      if (getEnvironment() !== "testing" && trackers) {
+        trackers = shuffle(trackers)
+      }
       setToRepeat(trackers)
       return response
     }
-    if (getEnvironment() !== "testing" && trackers) {
-      trackers = shuffle(trackers)
-    }
-    setToRepeat(trackers)
-    return response
+    return undefined
+  } finally {
+    isLoadingMore.value = false
   }
-  return undefined
 }
 
 const moveToNextMemoryTracker = () => {
