@@ -35,6 +35,7 @@
                 :data-placeholder="row.left.isPlaceholder || undefined"
               >
                 <span v-if="!row.left.isPlaceholder">{{ row.left.text }}</span>
+                <span v-else>&nbsp;</span>
               </td>
             </tr>
           </tbody>
@@ -76,6 +77,7 @@
                 :data-placeholder="row.right.isPlaceholder || undefined"
               >
                 <span v-if="!row.right.isPlaceholder">{{ row.right.text }}</span>
+                <span v-else>&nbsp;</span>
               </td>
             </tr>
           </tbody>
@@ -415,7 +417,16 @@ const pairedRows = computed<PairedRow[]>(() => {
 }
 
 .diff-content-cell.diff-placeholder {
-  background-color: rgba(0, 0, 0, 0.02);
+  background-color: #f3f4f6;
   min-height: 1.4em;
+  height: 1.4em;
+}
+
+.diff-row {
+  height: 1.4em;
+}
+
+.diff-placeholder td {
+  height: 1.4em;
 }
 </style>
