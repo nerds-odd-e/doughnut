@@ -83,9 +83,7 @@ import {
 } from "@generated/backend/sdk.gen"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
-import { shuffle } from "es-toolkit"
 import {
   computed,
   ref,
@@ -250,17 +248,9 @@ const loadMore = async (dueInDays?: number) => {
       },
     })
     if (!error && response) {
-      let trackers = response.toRepeat
       currentIndex.value = 0
       setDiligentMode((dueInDays ?? 0) > 0)
-      if (trackers?.length === 0) {
-        setToRepeat(trackers)
-        return response
-      }
-      if (getEnvironment() !== "testing" && trackers) {
-        trackers = shuffle(trackers)
-      }
-      setToRepeat(trackers)
+      setToRepeat(response.toRepeat)
       return response
     }
     return undefined
