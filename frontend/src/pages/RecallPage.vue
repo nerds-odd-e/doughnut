@@ -294,16 +294,16 @@ const onAnswered = async (answerResult: RecallPrompt) => {
   previousAnsweredQuestions.value.push(answerResult)
   if (!answerResult.answer?.correct) {
     viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
-  }
-  const memoryTrackerId = answerResult.memoryTrackerId
-  if (memoryTrackerId !== undefined) {
-    const { data } = await apiCallWithLoading(() =>
-      MemoryTrackerController.getThresholdExceeded({
-        path: { memoryTracker: memoryTrackerId },
-      })
-    )
-    if (data?.thresholdExceeded) {
-      await offerReAssimilation(memoryTrackerId)
+    const memoryTrackerId = answerResult.memoryTrackerId
+    if (memoryTrackerId !== undefined) {
+      const { data } = await apiCallWithLoading(() =>
+        MemoryTrackerController.getThresholdExceeded({
+          path: { memoryTracker: memoryTrackerId },
+        })
+      )
+      if (data?.thresholdExceeded) {
+        await offerReAssimilation(memoryTrackerId)
+      }
     }
   }
 }
