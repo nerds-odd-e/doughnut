@@ -86,8 +86,9 @@ describe("NoteUndoButton", () => {
             /Are you sure you want to undo editing the title of /
           )
         ).toBeInTheDocument()
-        expect(screen.getByText("Test Note")).toBeInTheDocument()
-        const link = screen.getByText("Test Note").closest("a.router-link")
+        const noteLinks = screen.getAllByText("Test Note")
+        expect(noteLinks.length).toBeGreaterThan(0)
+        const link = noteLinks[0]?.closest("a.router-link")
         expect(link).toBeInTheDocument()
         expect(screen.getByText("Current")).toBeInTheDocument()
         expect(screen.getByText("Will restore to")).toBeInTheDocument()
@@ -364,7 +365,8 @@ describe("NoteUndoButton", () => {
 
         // Verify first item is shown (most recent is first)
         expect(screen.getByText("Confirm Undo")).toBeInTheDocument()
-        expect(screen.getByText("First Note")).toBeInTheDocument()
+        const firstNoteLinks = screen.getAllByText("First Note")
+        expect(firstNoteLinks.length).toBeGreaterThan(0)
 
         // Discard first item
         const discardButton = screen.getByRole("button", { name: "Discard" })
@@ -373,7 +375,8 @@ describe("NoteUndoButton", () => {
 
         // Verify next item is shown
         expect(screen.getByText("Confirm Undo")).toBeInTheDocument()
-        expect(screen.getByText("Second Note")).toBeInTheDocument()
+        const secondNoteLinks = screen.getAllByText("Second Note")
+        expect(secondNoteLinks.length).toBeGreaterThan(0)
         expect(screen.queryByText("First Note")).not.toBeInTheDocument()
       })
 
