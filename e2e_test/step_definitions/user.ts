@@ -99,7 +99,7 @@ Then('The {string} page is displayed', (pageName) => {
       cy.contains('Please sign in')
       break
     case 'FailureReportPage':
-      cy.findAllByText('Failure report list')
+      cy.get('h2').contains('Failure Reports')
       break
     case 'ErrorPage':
       cy.findAllByText('It seems you cannot access this page.')
