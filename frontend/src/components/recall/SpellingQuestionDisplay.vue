@@ -21,6 +21,7 @@
               type="submit"
               value="Answer"
               class="daisy-btn daisy-btn-primary daisy-btn"
+              :disabled="submitted"
             />
           </template>
         </TextInput>
@@ -49,6 +50,7 @@ const emits = defineEmits(["answer"])
 const spellingAnswer = ref("")
 const recallPrompt = ref<RecallPrompt>()
 const loading = ref(true)
+const submitted = ref(false)
 
 const isActiveQuestion = computed(() => !loading.value)
 const { stop } = useQuestionThinkingTime(isActiveQuestion)
@@ -68,6 +70,8 @@ const fetchSpellingQuestion = async () => {
 }
 
 const submitAnswer = () => {
+  if (submitted.value) return
+  submitted.value = true
   const thinkingTimeMs = stop()
   emits("answer", {
     spellingAnswer: spellingAnswer.value,

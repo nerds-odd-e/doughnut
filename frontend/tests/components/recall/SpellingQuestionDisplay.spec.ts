@@ -123,4 +123,64 @@ describe("SpellingQuestionDisplay", () => {
     expect(answerData?.spellingAnswer).toBe("cat")
     expect(answerData?.recallPromptId).toBeDefined()
   })
+
+  it("prevents double submission when form is submitted multiple times", async () => {
+    let rafCallbacks: Array<FrameRequestCallback> = []
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation(
+      (callback: FrameRequestCallback) => {
+        rafCallbacks.push(callback)
+        return 1
+      }
+    )
+
+    const wrapper = helper
+      .component(SpellingQuestionDisplay)
+      .withProps({ memoryTrackerId: 1 })
+      .mount()
+
+    await flushPromises()
+    const callbacks = [...rafCallbacks]
+    rafCallbacks = []
+    callbacks.forEach((cb) => cb(performance.now()))
+
+    const input = wrapper.find("input[placeholder='put your answer here']")
+    await input.setValue("cat")
+
+    await wrapper.find("form").trigger("submit")
+    await wrapper.find("form").trigger("submit")
+    await wrapper.find("form").trigger("submit")
+
+    const emitted = wrapper.emitted("answer")
+    expect(emitted).toBeTruthy()
+    expect(emitted!.length).toBe(1)
+  })
+
+  it("disables submit button after form is submitted", async () => {
+    let rafCallbacks: Array<FrameRequestCallback> = []
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation(
+      (callback: FrameRequestCallback) => {
+        rafCallbacks.push(callback)
+        return 1
+      }
+    )
+
+    const wrapper = helper
+      .component(SpellingQuestionDisplay)
+      .withProps({ memoryTrackerId: 1 })
+      .mount()
+
+    await flushPromises()
+    const callbacks = [...rafCallbacks]
+    rafCallbacks = []
+    callbacks.forEach((cb) => cb(performance.now()))
+
+    const submitButton = wrapper.find("input[type='submit']")
+    expect(submitButton.attributes("disabled")).toBeUndefined()
+
+    const input = wrapper.find("input[placeholder='put your answer here']")
+    await input.setValue("cat")
+    await wrapper.find("form").trigger("submit")
+
+    expect(submitButton.attributes("disabled")).toBeDefined()
+  })
 })
