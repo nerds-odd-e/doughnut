@@ -4,7 +4,7 @@ const assumeQuestionPage = (stem?: string) => {
   if (stem) {
     cy.findByText(stem)
   }
-  const question = () => (stem ? cy.findByText(stem).parent().parent() : cy)
+  const _question = () => (stem ? cy.findByText(stem).parent().parent() : cy)
   const getQuestionSection = () => cy.get('[data-test="question-section"]')
 
   return {

@@ -76,7 +76,9 @@ When(
     const days = Array.from({ length: numDays }, (_, i) => startDay + i)
 
     const runIteration = (index: number) => {
-      if (index >= days.length) return
+      if (index >= days.length) {
+        return
+      }
       const day = days[index]!
       start.testability().backendTimeTravelTo(day, 8)
       cy.reload()
