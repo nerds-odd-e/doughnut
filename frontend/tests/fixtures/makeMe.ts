@@ -8,6 +8,10 @@ import CircleBuilder from "./CircleBuilder"
 import CircleNoteBuilder from "./CircleNoteBuilder"
 import ConversationBuilder from "./ConversationBuilder"
 import DueMemoryTrackersBuilder from "./DueMemoryTrackersBuilder"
+import {
+  FailureReportBuilder,
+  FailureReportForViewBuilder,
+} from "./FailureReportBuilder"
 import RelationshipBuilder from "./RelationshipBuilder"
 import MemoryTrackerBuilder from "./MemoryTrackerBuilder"
 import NoteBuilder from "./NoteBuilder"
@@ -113,6 +117,14 @@ class MakeMe {
 
   static get aNoteSearchResult(): NoteSearchResultBuilder {
     return new NoteSearchResultBuilder()
+  }
+
+  static get aFailureReport(): FailureReportBuilder {
+    return new FailureReportBuilder()
+  }
+
+  static get aFailureReportForView(): FailureReportForViewBuilder {
+    return new FailureReportForViewBuilder()
   }
 }
 

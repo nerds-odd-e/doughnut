@@ -21,19 +21,20 @@ Then(
 )
 
 Then('each item in the failure report should have a checkbox', () => {
-  cy.get('.failure-report').find('input[type="checkbox"]').should('exist')
+  cy.get('.daisy-card').find('input[type="checkbox"]').should('exist')
 })
 
 When('I check the checkbox for the failure report item', () => {
-  cy.get('.failure-report').find('input[type="checkbox"]').first().check()
+  cy.get('.daisy-card').find('input[type="checkbox"]').first().check()
 })
 
 When('I click the delete button', () => {
-  cy.findByRole('button', { name: 'Delete Selected' }).click()
+  cy.get('button').contains('Delete Selected').click()
+  cy.get('.daisy-modal-action').findByRole('button', { name: 'Delete' }).click()
 })
 
 Then('the failure report should be empty', () => {
-  cy.get('.failure-report').should('not.exist')
+  cy.findByText('All Clear!').should('exist')
 })
 
 Then(
