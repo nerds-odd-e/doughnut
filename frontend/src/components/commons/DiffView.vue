@@ -1,32 +1,104 @@
 <template>
   <div class="diff-view daisy-flex daisy-flex-col md:daisy-flex-row daisy-gap-2">
-    <div class="daisy-flex-1">
+    <div class="daisy-flex-1 daisy-flex daisy-flex-col">
       <div class="daisy-text-sm daisy-font-semibold daisy-mb-2 daisy-text-error">
         Current
       </div>
       <div
-        class="diff-content daisy-border daisy-border-base-300 daisy-rounded daisy-p-2 daisy-bg-base-200 daisy-text-sm daisy-overflow-auto"
+        ref="leftPane"
+        class="diff-pane daisy-border daisy-border-base-300 daisy-rounded daisy-bg-base-200 daisy-text-sm daisy-overflow-auto"
         :style="{ maxHeight: maxHeight }"
+        @scroll="onLeftScroll"
+        data-testid="diff-left-pane"
       >
-        <div class="daisy-whitespace-pre-wrap daisy-font-mono" v-html="highlightedCurrent"></div>
+        <table class="diff-table daisy-font-mono">
+          <tbody>
+            <tr
+              v-for="(row, index) in pairedRows"
+              :key="`left-${index}`"
+              class="diff-row"
+              :data-row-index="index"
+            >
+              <td
+                class="diff-line-number"
+                :class="{ 'diff-placeholder': row.left.isPlaceholder }"
+                data-testid="line-number-left"
+              >
+                {{ row.left.isPlaceholder ? "" : row.left.lineNumber }}
+              </td>
+              <td
+                class="diff-content-cell"
+                :class="{
+                  'diff-added': row.left.type === 'added',
+                  'diff-placeholder': row.left.isPlaceholder,
+                }"
+                :data-placeholder="row.left.isPlaceholder || undefined"
+              >
+                <span v-if="!row.left.isPlaceholder">{{ row.left.text }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-    <div class="daisy-flex-1">
+    <div class="daisy-flex-1 daisy-flex daisy-flex-col">
       <div class="daisy-text-sm daisy-font-semibold daisy-mb-2 daisy-text-success">
         Will restore to
       </div>
       <div
-        class="diff-content daisy-border daisy-border-base-300 daisy-rounded daisy-p-2 daisy-bg-base-200 daisy-text-sm daisy-overflow-auto"
+        ref="rightPane"
+        class="diff-pane daisy-border daisy-border-base-300 daisy-rounded daisy-bg-base-200 daisy-text-sm daisy-overflow-auto"
         :style="{ maxHeight: maxHeight }"
+        @scroll="onRightScroll"
+        data-testid="diff-right-pane"
       >
-        <div class="daisy-whitespace-pre-wrap daisy-font-mono" v-html="highlightedOld"></div>
+        <table class="diff-table daisy-font-mono">
+          <tbody>
+            <tr
+              v-for="(row, index) in pairedRows"
+              :key="`right-${index}`"
+              class="diff-row"
+              :data-row-index="index"
+            >
+              <td
+                class="diff-line-number"
+                :class="{ 'diff-placeholder': row.right.isPlaceholder }"
+                data-testid="line-number-right"
+              >
+                {{ row.right.isPlaceholder ? "" : row.right.lineNumber }}
+              </td>
+              <td
+                class="diff-content-cell"
+                :class="{
+                  'diff-removed': row.right.type === 'removed',
+                  'diff-placeholder': row.right.isPlaceholder,
+                }"
+                :data-placeholder="row.right.isPlaceholder || undefined"
+              >
+                <span v-if="!row.right.isPlaceholder">{{ row.right.text }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue"
+import { computed, ref, onMounted, onUnmounted } from "vue"
+
+interface DiffLine {
+  text: string
+  lineNumber: number | null
+  type: "same" | "added" | "removed"
+  isPlaceholder: boolean
+}
+
+interface PairedRow {
+  left: DiffLine
+  right: DiffLine
+}
 
 const props = defineProps({
   current: { type: String, required: true },
@@ -34,109 +106,256 @@ const props = defineProps({
   maxHeight: { type: String, default: "200px" },
 })
 
-const escapeHtml = (text: string): string => {
-  const div = document.createElement("div")
-  div.textContent = text
-  return div.innerHTML
+const leftPane = ref<HTMLElement | null>(null)
+const rightPane = ref<HTMLElement | null>(null)
+let isScrolling = false
+let scrollTimeout: ReturnType<typeof setTimeout> | null = null
+
+const onLeftScroll = () => {
+  if (isScrolling) return
+  syncScroll(leftPane.value, rightPane.value)
 }
 
-const computeDiff = (current: string, old: string) => {
-  // Simple word-based diff
-  const currentWords = current.split(/(\s+)/)
-  const oldWords = old.split(/(\s+)/)
+const onRightScroll = () => {
+  if (isScrolling) return
+  syncScroll(rightPane.value, leftPane.value)
+}
 
-  const result: Array<{ text: string; type: "same" | "removed" | "added" }> = []
-  let i = 0
-  let j = 0
+const syncScroll = (source: HTMLElement | null, target: HTMLElement | null) => {
+  if (!source || !target) return
 
-  while (i < currentWords.length || j < oldWords.length) {
-    if (i >= currentWords.length) {
-      // Only in old
-      result.push({ text: oldWords[j] || "", type: "removed" })
-      j++
-    } else if (j >= oldWords.length) {
-      // Only in current
-      result.push({ text: currentWords[i] || "", type: "added" })
-      i++
-    } else if (currentWords[i] === oldWords[j]) {
-      // Same
-      result.push({ text: currentWords[i] || "", type: "same" })
-      i++
-      j++
+  isScrolling = true
+  target.scrollTop = source.scrollTop
+  target.scrollLeft = source.scrollLeft
+
+  if (scrollTimeout) clearTimeout(scrollTimeout)
+  scrollTimeout = setTimeout(() => {
+    isScrolling = false
+  }, 50)
+}
+
+onMounted(() => {
+  if (leftPane.value) {
+    leftPane.value.addEventListener("scroll", onLeftScroll, { passive: true })
+  }
+  if (rightPane.value) {
+    rightPane.value.addEventListener("scroll", onRightScroll, { passive: true })
+  }
+})
+
+onUnmounted(() => {
+  if (scrollTimeout) clearTimeout(scrollTimeout)
+})
+
+const computeLineDiff = (
+  currentText: string,
+  oldText: string
+): { currentLines: DiffLine[]; oldLines: DiffLine[] } => {
+  const currentLines = currentText.split("\n")
+  const oldLines = oldText.split("\n")
+
+  const lcs = computeLCS(currentLines, oldLines)
+
+  const currentResult: DiffLine[] = []
+  const oldResult: DiffLine[] = []
+
+  let ci = 0
+  let oi = 0
+  let lcsIdx = 0
+
+  while (ci < currentLines.length || oi < oldLines.length) {
+    const match = lcs[lcsIdx]
+    if (match) {
+      while (ci < match.currentIdx) {
+        currentResult.push({
+          text: currentLines[ci] ?? "",
+          lineNumber: ci + 1,
+          type: "added",
+          isPlaceholder: false,
+        })
+        ci++
+      }
+
+      while (oi < match.oldIdx) {
+        oldResult.push({
+          text: oldLines[oi] ?? "",
+          lineNumber: oi + 1,
+          type: "removed",
+          isPlaceholder: false,
+        })
+        oi++
+      }
+
+      currentResult.push({
+        text: currentLines[ci] ?? "",
+        lineNumber: ci + 1,
+        type: "same",
+        isPlaceholder: false,
+      })
+      oldResult.push({
+        text: oldLines[oi] ?? "",
+        lineNumber: oi + 1,
+        type: "same",
+        isPlaceholder: false,
+      })
+      ci++
+      oi++
+      lcsIdx++
     } else {
-      // Different - try to find next match
-      let found = false
-      for (let k = j + 1; k < oldWords.length && k < j + 10; k++) {
-        if (currentWords[i] === oldWords[k]) {
-          // Found match ahead in old
-          for (let l = j; l < k; l++) {
-            result.push({ text: oldWords[l] || "", type: "removed" })
-          }
-          j = k
-          found = true
-          break
-        }
+      while (ci < currentLines.length) {
+        currentResult.push({
+          text: currentLines[ci] ?? "",
+          lineNumber: ci + 1,
+          type: "added",
+          isPlaceholder: false,
+        })
+        ci++
       }
-      if (!found) {
-        for (let k = i + 1; k < currentWords.length && k < i + 10; k++) {
-          if (currentWords[k] === oldWords[j]) {
-            // Found match ahead in current
-            for (let l = i; l < k; l++) {
-              result.push({ text: currentWords[l] || "", type: "added" })
-            }
-            i = k
-            found = true
-            break
-          }
-        }
+      while (oi < oldLines.length) {
+        oldResult.push({
+          text: oldLines[oi] ?? "",
+          lineNumber: oi + 1,
+          type: "removed",
+          isPlaceholder: false,
+        })
+        oi++
       }
-      if (!found) {
-        // No match found, mark both as different
-        result.push({ text: currentWords[i] || "", type: "added" })
-        result.push({ text: oldWords[j] || "", type: "removed" })
-        i++
-        j++
+    }
+  }
+
+  return { currentLines: currentResult, oldLines: oldResult }
+}
+
+interface LCSMatch {
+  currentIdx: number
+  oldIdx: number
+}
+
+const computeLCS = (current: string[], old: string[]): LCSMatch[] => {
+  const m = current.length
+  const n = old.length
+
+  const dp: number[][] = Array(m + 1)
+    .fill(null)
+    .map(() => Array(n + 1).fill(0))
+
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (current[i - 1] === old[j - 1]) {
+        dp[i]![j] = (dp[i - 1]?.[j - 1] ?? 0) + 1
+      } else {
+        dp[i]![j] = Math.max(dp[i - 1]?.[j] ?? 0, dp[i]?.[j - 1] ?? 0)
       }
+    }
+  }
+
+  const result: LCSMatch[] = []
+  let i = m
+  let j = n
+  while (i > 0 && j > 0) {
+    if (current[i - 1] === old[j - 1]) {
+      result.unshift({ currentIdx: i - 1, oldIdx: j - 1 })
+      i--
+      j--
+    } else if ((dp[i - 1]?.[j] ?? 0) > (dp[i]?.[j - 1] ?? 0)) {
+      i--
+    } else {
+      j--
     }
   }
 
   return result
 }
 
-const highlightedCurrent = computed(() => {
+const pairedRows = computed<PairedRow[]>(() => {
   if (props.current === props.old) {
-    return escapeHtml(props.current)
+    const lines = props.current.split("\n")
+    return lines.map((line, idx) => ({
+      left: {
+        text: line,
+        lineNumber: idx + 1,
+        type: "same" as const,
+        isPlaceholder: false,
+      },
+      right: {
+        text: line,
+        lineNumber: idx + 1,
+        type: "same" as const,
+        isPlaceholder: false,
+      },
+    }))
   }
 
-  const diff = computeDiff(props.current, props.old)
-  return diff
-    .filter((item) => item.type !== "removed")
-    .map((item) => {
-      const escaped = escapeHtml(item.text)
-      if (item.type === "added") {
-        return `<span class="diff-added">${escaped}</span>`
-      }
-      return escaped
-    })
-    .join("")
-})
+  const { currentLines, oldLines } = computeLineDiff(props.current, props.old)
+  const result: PairedRow[] = []
 
-const highlightedOld = computed(() => {
-  if (props.current === props.old) {
-    return escapeHtml(props.old)
+  let li = 0
+  let ri = 0
+
+  while (li < currentLines.length || ri < oldLines.length) {
+    const leftLine = currentLines[li]
+    const rightLine = oldLines[ri]
+
+    if (
+      leftLine &&
+      rightLine &&
+      leftLine.type === "same" &&
+      rightLine.type === "same"
+    ) {
+      result.push({ left: leftLine, right: rightLine })
+      li++
+      ri++
+    } else if (leftLine && leftLine.type === "added") {
+      result.push({
+        left: leftLine,
+        right: {
+          text: "",
+          lineNumber: null,
+          type: "same",
+          isPlaceholder: true,
+        },
+      })
+      li++
+    } else if (rightLine && rightLine.type === "removed") {
+      result.push({
+        left: {
+          text: "",
+          lineNumber: null,
+          type: "same",
+          isPlaceholder: true,
+        },
+        right: rightLine,
+      })
+      ri++
+    } else {
+      if (leftLine) {
+        result.push({
+          left: leftLine,
+          right: {
+            text: "",
+            lineNumber: null,
+            type: "same",
+            isPlaceholder: true,
+          },
+        })
+        li++
+      }
+      if (rightLine) {
+        result.push({
+          left: {
+            text: "",
+            lineNumber: null,
+            type: "same",
+            isPlaceholder: true,
+          },
+          right: rightLine,
+        })
+        ri++
+      }
+    }
   }
 
-  const diff = computeDiff(props.current, props.old)
-  return diff
-    .filter((item) => item.type !== "added")
-    .map((item) => {
-      const escaped = escapeHtml(item.text)
-      if (item.type === "removed") {
-        return `<span class="diff-removed">${escaped}</span>`
-      }
-      return escaped
-    })
-    .join("")
+  return result
 })
 </script>
 
@@ -145,19 +364,58 @@ const highlightedOld = computed(() => {
   min-height: 100px;
 }
 
-.diff-content {
+.diff-pane {
   min-height: 80px;
+  overflow: auto;
 }
 
-:deep(.diff-added) {
+.diff-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.diff-row {
+  line-height: 1.4;
+}
+
+.diff-line-number {
+  width: 3em;
+  min-width: 3em;
+  max-width: 3em;
+  padding: 0 0.5em;
+  text-align: right;
+  color: #6b7280;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-right: 1px solid #d1d5db;
+  user-select: none;
+  vertical-align: top;
+}
+
+.diff-line-number.diff-placeholder {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.diff-content-cell {
+  padding: 0 0.5em;
+  white-space: pre;
+  overflow-x: auto;
+  vertical-align: top;
+}
+
+.diff-content-cell.diff-added {
   background-color: #fee2e2;
   color: #991b1b;
   text-decoration: line-through;
 }
 
-:deep(.diff-removed) {
+.diff-content-cell.diff-removed {
   background-color: #dcfce7;
   color: #166534;
 }
-</style>
 
+.diff-content-cell.diff-placeholder {
+  background-color: rgba(0, 0, 0, 0.02);
+  min-height: 1.4em;
+}
+</style>
