@@ -142,4 +142,12 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
 
   @Query(value = "SELECT count(1) as count from Note n " + " WHERE n.id in :noteIds" + fromNotebook)
   int countByAncestorAndInTheList(Integer notebookId, @Param("noteIds") List<Integer> noteIds);
+
+  @Query(value = "SELECT COUNT(n) FROM Note n WHERE n.creator.id = :userId AND n.deletedAt IS NULL")
+  long countByCreator(@Param("userId") Integer userId);
+
+  @Query(
+      value =
+          "SELECT MAX(n.createdAt) FROM Note n WHERE n.creator.id = :userId AND n.deletedAt IS NULL")
+  java.sql.Timestamp findLastNoteTimeByCreator(@Param("userId") Integer userId);
 }

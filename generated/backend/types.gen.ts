@@ -596,6 +596,24 @@ export type TitleReplacement = {
     newTitle: string;
 };
 
+export type UserForListing = {
+    id?: number;
+    name?: string;
+    noteCount?: number;
+    memoryTrackerCount?: number;
+    lastNoteTime?: string;
+    lastAssimilationTime?: string;
+    lastRecallTime?: string;
+};
+
+export type UserListingPage = {
+    users?: Array<UserForListing>;
+    pageIndex?: number;
+    pageSize?: number;
+    totalCount?: number;
+    totalPages?: number;
+};
+
 export type SuggestedQuestionsDataWritable = {
     examples?: Array<QuestionSuggestionParams>;
     username?: string;
@@ -4438,6 +4456,34 @@ export type GetAvailableGptModelsResponses = {
 };
 
 export type GetAvailableGptModelsResponse = GetAvailableGptModelsResponses[keyof GetAvailableGptModelsResponses];
+
+export type ListUsersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        pageIndex?: number;
+        pageSize?: number;
+    };
+    url: '/api/admin/users';
+};
+
+export type ListUsersErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type ListUsersError = ListUsersErrors[keyof ListUsersErrors];
+
+export type ListUsersResponses = {
+    /**
+     * OK
+     */
+    200: UserListingPage;
+};
+
+export type ListUsersResponse = ListUsersResponses[keyof ListUsersResponses];
 
 export type DeleteTokenData = {
     body?: never;

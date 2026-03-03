@@ -70,4 +70,28 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
       " WHERE rp.user_id = :userId "
           + "   AND rp.removed_from_tracking IS FALSE "
           + "   AND rp.deleted_at IS NULL ";
+
+  @Query(
+      value =
+          "SELECT MAX(rp.assimilated_at) FROM memory_tracker rp "
+              + " WHERE rp.user_id = :userId "
+              + "   AND rp.deleted_at IS NULL",
+      nativeQuery = true)
+  Timestamp findLastAssimilationTimeByUser(@Param("userId") Integer userId);
+
+  @Query(
+      value =
+          "SELECT MAX(rp.last_recalled_at) FROM memory_tracker rp "
+              + " WHERE rp.user_id = :userId "
+              + "   AND rp.deleted_at IS NULL",
+      nativeQuery = true)
+  Timestamp findLastRecallTimeByUser(@Param("userId") Integer userId);
+
+  @Query(
+      value =
+          "SELECT COUNT(*) FROM memory_tracker rp "
+              + " WHERE rp.user_id = :userId "
+              + "   AND rp.deleted_at IS NULL",
+      nativeQuery = true)
+  long countByUser(@Param("userId") Integer userId);
 }
