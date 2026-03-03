@@ -31,6 +31,12 @@
       href="#"
       @click.prevent="setActivePage('certificateRequests')"
     >Certification Requests</a>
+    <a
+      :class="`daisy-tab daisy-tab-lg ${activePage === 'users' ? 'daisy-tab-active' : ''}`"
+      role="button"
+      href="#"
+      @click.prevent="setActivePage('users')"
+    >Users</a>
   </div>
   <div class="daisy-container daisy-mx-auto">
     <FineTuningData v-if="activePage === 'fineTuningData'" />
@@ -38,6 +44,7 @@
     <ManageModel v-if="activePage === 'manageModel'" />
     <ManageBazaar v-if="activePage === 'manageBazaar'" />
     <CertificateRequests v-if="activePage === 'certificateRequests'" />
+    <UserListing v-if="activePage === 'users'" />
   </div>
 </template>
 
@@ -50,6 +57,7 @@ import ManageModel from "../components/admin/ManageModel.vue"
 import ManageBazaar from "../components/admin/ManageBazaar.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 import CertificateRequests from "../components/admin/CertificateRequests.vue"
+import UserListing from "../components/admin/UserListing.vue"
 
 type TabType =
   | "fineTuningData"
@@ -57,6 +65,7 @@ type TabType =
   | "manageModel"
   | "manageBazaar"
   | "certificateRequests"
+  | "users"
 
 const route = useRoute()
 const router = useRouter()
@@ -69,7 +78,8 @@ const activePage = computed({
       tab === "failureReport" ||
       tab === "manageModel" ||
       tab === "manageBazaar" ||
-      tab === "certificateRequests"
+      tab === "certificateRequests" ||
+      tab === "users"
     ) {
       return tab
     }

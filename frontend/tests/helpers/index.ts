@@ -31,6 +31,7 @@ import {
   RecallsController,
   HealthCheckController,
   FailureReportController,
+  AdminUserController,
 } from "@generated/backend/sdk.gen"
 import type { NoteRealm } from "@generated/backend"
 
@@ -184,6 +185,7 @@ const methodToController: Record<string, any> = {
   failureReports: FailureReportController,
   showFailureReport: FailureReportController,
   deleteFailureReports: FailureReportController,
+  listUsers: AdminUserController,
 }
 
 type SdkServiceName = keyof typeof methodToController

@@ -19,6 +19,8 @@ import RecallPromptBuilder from "./RecallPromptBuilder"
 import SuggestedQuestionForFineTuningBuilder from "./SuggestedQuestionForFineTuningBuilder"
 import NoteSearchResultBuilder from "./NoteSearchResultBuilder"
 import UserBuilder from "./UserBuilder"
+import UserForListingBuilder from "./UserForListingBuilder"
+import UserListingPageBuilder from "./UserListingPageBuilder"
 import WikidataEntityBuilder from "./WikidataEntityBuilder"
 import WikidataSearchEntityBuilder from "./WikidataSearchEntityBuilder"
 
@@ -113,6 +115,14 @@ class MakeMe {
 
   static get aNoteSearchResult(): NoteSearchResultBuilder {
     return new NoteSearchResultBuilder()
+  }
+
+  static get aUserForListing(): UserForListingBuilder {
+    return new UserForListingBuilder()
+  }
+
+  static get aUserListingPage(): UserListingPageBuilder {
+    return new UserListingPageBuilder()
   }
 }
 

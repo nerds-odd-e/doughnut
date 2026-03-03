@@ -3563,6 +3563,39 @@ paths:
                 type: array
                 items:
                   type: string
+  /api/admin/users:
+    get:
+      tags:
+      - admin-user-controller
+      operationId: listUsers
+      parameters:
+      - name: pageIndex
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: pageSize
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserListingPage"
   /api/user/token/{tokenId}:
     delete:
       tags:
@@ -4936,3 +4969,45 @@ components:
           minLength: 1
       required:
       - newTitle
+    UserForListing:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        noteCount:
+          type: integer
+          format: int64
+        memoryTrackerCount:
+          type: integer
+          format: int64
+        lastNoteTime:
+          type: string
+          format: date-time
+        lastAssimilationTime:
+          type: string
+          format: date-time
+        lastRecallTime:
+          type: string
+          format: date-time
+    UserListingPage:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserForListing"
+        pageIndex:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        totalCount:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
