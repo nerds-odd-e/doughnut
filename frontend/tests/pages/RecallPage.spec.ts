@@ -750,4 +750,40 @@ describe("repeat page", () => {
       expect(progressBar.classes()).not.toContain("diligent-mode")
     })
   })
+
+  describe("load more buttons", () => {
+    beforeEach(() => {
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({ toRepeat: [] })
+      )
+    })
+
+    it("should show loading indicator when load more button is clicked", async () => {
+      const wrapper = await mountPage()
+
+      expect(wrapper.text()).toContain(
+        "You have finished all repetitions for this half a day!"
+      )
+      expect(wrapper.find("button.daisy-btn-secondary").exists()).toBe(true)
+
+      let resolveRecalling: (value: unknown) => void
+      const pendingPromise = new Promise((resolve) => {
+        resolveRecalling = resolve
+      })
+      // biome-ignore lint/suspicious/noExplicitAny: SDK response types are complex unions that require any for proper mocking
+      recallingSpy.mockReturnValueOnce(pendingPromise as any)
+
+      await wrapper.find("button.daisy-btn-secondary").trigger("click")
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find(".daisy-loading-spinner").exists()).toBe(true)
+      expect(wrapper.text()).toContain("Loading more items...")
+      expect(wrapper.find("button.daisy-btn-secondary").exists()).toBe(false)
+
+      resolveRecalling!(wrapSdkResponse(makeMe.aDueMemoryTrackersList.please()))
+      await flushPromises()
+
+      expect(wrapper.find(".daisy-loading-spinner").exists()).toBe(false)
+    })
+  })
 })
