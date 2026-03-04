@@ -310,6 +310,13 @@ Then(
   }
 )
 
+Then(
+  'I should see note {string} at the top level of all my notes',
+  (noteTopology: string) => {
+    start.navigateToNotebooksPage().expectNotebookToExist(noteTopology)
+  }
+)
+
 When('I navigate to {notepath} note', (notePath: NotePath) => {
   start.navigateToNotebooksPage().navigateToPath(notePath)
 })

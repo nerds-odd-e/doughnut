@@ -51,6 +51,15 @@ describe("NoteUndoButton", () => {
     expect(wrapper.find("button").attributes("title")).toBe("undo create note")
   })
 
+  it("shows undo move note title when there is a move note to undo", () => {
+    const note = makeMe.aNote.please()
+    const parentNote = makeMe.aNote.please()
+    noteEditingHistory.moveNote(note.id, parentNote.id, null)
+    const wrapper = helper.component(NoteUndoButton).mount()
+    expect(wrapper.find("button").exists()).toBe(true)
+    expect(wrapper.find("button").attributes("title")).toBe("undo move note")
+  })
+
   describe("confirmation dialog", () => {
     describe("when note is in cache", () => {
       it("shows confirmation dialog with note title for delete note", async () => {
@@ -147,6 +156,28 @@ describe("NoteUndoButton", () => {
         ).toBeInTheDocument()
         expect(screen.getByText("New Note")).toBeInTheDocument()
         const link = screen.getByText("New Note").closest("a.router-link")
+        expect(link).toBeInTheDocument()
+      })
+
+      it("shows confirmation dialog with note title for move note", async () => {
+        const noteRealm = makeMe.aNoteRealm.title("Moved Note").please()
+        const parentNoteRealm = makeMe.aNoteRealm.title("Parent").please()
+        const storageAccessor = useStorageAccessor()
+        storageAccessor.value.refreshNoteRealm(noteRealm)
+        storageAccessor.value.refreshNoteRealm(parentNoteRealm)
+        noteEditingHistory.moveNote(noteRealm.id, parentNoteRealm.id, null)
+        helper.component(NoteUndoButton).render()
+
+        const undoButton = screen.getByTitle("undo move note")
+        await undoButton.click()
+        await flushPromises()
+
+        expect(screen.getByText("Confirm Undo")).toBeInTheDocument()
+        expect(
+          screen.getByText(/Are you sure you want to undo moving /)
+        ).toBeInTheDocument()
+        expect(screen.getByText("Moved Note")).toBeInTheDocument()
+        const link = screen.getByText("Moved Note").closest("a.router-link")
         expect(link).toBeInTheDocument()
       })
 

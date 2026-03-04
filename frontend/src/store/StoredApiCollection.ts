@@ -332,6 +332,8 @@ export default class StoredApiCollection implements StoredApi {
     targetNoteId: number,
     dropMode: "after" | "asFirstChild"
   ): Promise<NoteRealm[]> {
+    const moveInfo = this.getMoveUndoInfo(noteId)
+
     const { data: updatedNotes, error } = await apiCallWithLoading(() =>
       NoteController.moveAfter({
         path: {
@@ -345,7 +347,35 @@ export default class StoredApiCollection implements StoredApi {
       throw new Error(error || "Failed to move note")
     }
     this.refreshNoteRealms(updatedNotes)
+
+    if (moveInfo) {
+      this.noteEditingHistory.moveNote(
+        noteId,
+        moveInfo.originalParentId,
+        moveInfo.previousSiblingId
+      )
+    }
+
     return updatedNotes
+  }
+
+  private getMoveUndoInfo(noteId: Doughnut.ID) {
+    const noteRealm = this.storage.refOfNoteRealm(noteId).value
+    if (!noteRealm?.note.parentId) return null
+
+    const parentRealm = this.storage.refOfNoteRealm(
+      noteRealm.note.parentId
+    ).value
+    if (!parentRealm?.children) return null
+
+    const siblings = parentRealm.children
+    const noteIndex = siblings.findIndex((n) => n.id === noteId)
+    const previousSiblingId = noteIndex > 0 ? siblings[noteIndex - 1]!.id : null
+
+    return {
+      originalParentId: noteRealm.note.parentId,
+      previousSiblingId,
+    }
   }
 
   async updateTextField(
@@ -395,6 +425,13 @@ export default class StoredApiCollection implements StoredApi {
     if (undone.type === "create note") {
       return this.undoCreateNote(undone.noteId)
     }
+    if (undone.type === "move note") {
+      return this.undoMoveNote(
+        undone.noteId,
+        undone.originalParentId!,
+        undone.previousSiblingId ?? null
+      )
+    }
     const { data: noteRealm, error } = await apiCallWithLoading(() =>
       NoteController.undoDeleteNote({
         path: { note: undone.noteId },
@@ -404,6 +441,48 @@ export default class StoredApiCollection implements StoredApi {
       throw new Error(error || "Failed to undo delete note")
     }
     return noteRealm
+  }
+
+  private async undoMoveNote(
+    noteId: Doughnut.ID,
+    originalParentId: Doughnut.ID,
+    previousSiblingId: Doughnut.ID | null
+  ) {
+    if (previousSiblingId !== null) {
+      const updatedNotes = await this.moveAfterWithoutUndo(
+        noteId,
+        previousSiblingId,
+        "after"
+      )
+      return updatedNotes[0]!
+    }
+    const updatedNotes = await this.moveAfterWithoutUndo(
+      noteId,
+      originalParentId,
+      "asFirstChild"
+    )
+    return updatedNotes[0]!
+  }
+
+  private async moveAfterWithoutUndo(
+    noteId: number,
+    targetNoteId: number,
+    dropMode: "after" | "asFirstChild"
+  ): Promise<NoteRealm[]> {
+    const { data: updatedNotes, error } = await apiCallWithLoading(() =>
+      NoteController.moveAfter({
+        path: {
+          note: noteId,
+          targetNote: targetNoteId,
+          asFirstChild: dropMode === "asFirstChild" ? "true" : "false",
+        },
+      })
+    )
+    if (error || !updatedNotes) {
+      throw new Error(error || "Failed to undo move note")
+    }
+    this.refreshNoteRealms(updatedNotes)
+    return updatedNotes
   }
 
   private async undoCreateNote(noteId: Doughnut.ID) {
@@ -457,6 +536,8 @@ export default class StoredApiCollection implements StoredApi {
     targetId: Doughnut.ID,
     data: NoteMoveDto
   ) {
+    const moveInfo = this.getMoveUndoInfo(sourceId)
+
     const { data: noteRealms, error } = await apiCallWithLoading(() =>
       RelationController.moveNote({
         path: {
@@ -470,5 +551,13 @@ export default class StoredApiCollection implements StoredApi {
       throw new Error(error || "Failed to move note")
     }
     this.refreshNoteRealms(noteRealms)
+
+    if (moveInfo) {
+      this.noteEditingHistory.moveNote(
+        sourceId,
+        moveInfo.originalParentId,
+        moveInfo.previousSiblingId
+      )
+    }
   }
 }

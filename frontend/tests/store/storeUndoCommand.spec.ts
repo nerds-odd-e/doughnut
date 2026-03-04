@@ -139,6 +139,35 @@ describe("storeUndoCommand", () => {
     })
   })
 
+  describe("moveNote", () => {
+    it("should add move note entry to undo history", () => {
+      const histories = new NoteEditingHistory()
+      const note1 = makeMe.aNote.please()
+      const parentNote = makeMe.aNote.please()
+      const previousSibling = makeMe.aNote.please()
+      histories.moveNote(note1.id, parentNote.id, previousSibling.id)
+
+      expect(histories.noteUndoHistories.length).toEqual(1)
+      expect(histories.noteUndoHistories[0]!.type).toBe("move note")
+      expect(histories.noteUndoHistories[0]!.noteId).toBe(note1.id)
+      expect(histories.noteUndoHistories[0]!.originalParentId).toBe(
+        parentNote.id
+      )
+      expect(histories.noteUndoHistories[0]!.previousSiblingId).toBe(
+        previousSibling.id
+      )
+    })
+
+    it("should store null previousSiblingId when note was first child", () => {
+      const histories = new NoteEditingHistory()
+      const note1 = makeMe.aNote.please()
+      const parentNote = makeMe.aNote.please()
+      histories.moveNote(note1.id, parentNote.id, null)
+
+      expect(histories.noteUndoHistories[0]!.previousSiblingId).toBeNull()
+    })
+  })
+
   describe("popUndoHistory", () => {
     let initialUndoCount
     const histories = new NoteEditingHistory()
