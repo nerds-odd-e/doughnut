@@ -220,7 +220,7 @@ When(
     cy.location('pathname').then((pathname) => {
       const match = pathname.match(/^\/n(\d+)$/)
       if (match) {
-        return start.testability().addNoteToMap(title, parseInt(match[1]!, 10))
+        start.testability().addNoteToMap(title, parseInt(match[1]!, 10))
       }
     })
   }
