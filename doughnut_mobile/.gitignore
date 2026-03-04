@@ -46,3 +46,12 @@ app.*.map.json
 /android/app/release
 
 report.json
+
+# FVM Version Cache
+.fvm/
+
+# Deprecate test_driver
+/test_driver/
+
+# Patrol CLI generated
+integration_test/test_bundle.dart

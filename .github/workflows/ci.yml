@@ -268,7 +268,7 @@ jobs:
   #     - uses: ./.github/mobile_actions
   #       with:
   #         flutter-version: ${{ vars.FLUTTER_VERSION }}
-  #     - run: dart test_driver/app_test.dart
+  #     - run: flutter test integration_test
   #       working-directory: ./doughnut_mobile
   # drive_android:
   #   runs-on: ${{ vars.RUNNER }}
@@ -297,4 +297,4 @@ jobs:
   #       with:
   #         api-level: ${{ matrix.api-level }}
   #         script: |
-  #           cd ./doughnut_mobile && dart test_driver/app_test.dart
+  #           cd ./doughnut_mobile && flutter test integration_test

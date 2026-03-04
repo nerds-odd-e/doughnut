@@ -2,6 +2,25 @@
 
 A new Flutter project.
 
+## Integration tests (Patrol)
+
+Integration tests use [Patrol](https://patrol.leancode.co/). Run them with the Patrol CLI (not `flutter test`).
+
+One-time setup:
+
+```bash
+fvm flutter pub global activate patrol_cli
+```
+
+Run tests (Android device/emulator must be connected):
+
+```bash
+# From doughnut_mobile/
+./scripts/patrol_test.sh
+# Or with FVM Dart + global snapshot (if script fails due to snapshot version):
+fvm dart $HOME/.pub-cache/global_packages/patrol_cli/bin/main.dart-3.11.1.snapshot test --flutter-command "fvm flutter"
+```
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
