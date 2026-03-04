@@ -38,3 +38,12 @@ Feature: Nested Note creation
       | team         |
       | coordination |
       | tech         |
+
+  Scenario: Undo creating a new note
+    When I create a note belonging to "LeSS in Action" with title "New Note"
+    And I undo "create note"
+    Then I should see the note "New Note" is marked as deleted
+    And I should see "LeSS in Action" with these children
+      | note-title |
+      | team       |
+      | tech       |

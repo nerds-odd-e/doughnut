@@ -43,6 +43,14 @@ describe("NoteUndoButton", () => {
     expect(wrapper.find("button").attributes("title")).toBe("undo delete note")
   })
 
+  it("shows undo create note title when there is a create note to undo", () => {
+    const note = makeMe.aNote.please()
+    noteEditingHistory.createNote(note.id)
+    const wrapper = helper.component(NoteUndoButton).mount()
+    expect(wrapper.find("button").exists()).toBe(true)
+    expect(wrapper.find("button").attributes("title")).toBe("undo create note")
+  })
+
   describe("confirmation dialog", () => {
     describe("when note is in cache", () => {
       it("shows confirmation dialog with note title for delete note", async () => {
@@ -120,6 +128,26 @@ describe("NoteUndoButton", () => {
         expect(link).toBeInTheDocument()
         expect(screen.getByText("Current")).toBeInTheDocument()
         expect(screen.getByText("Will restore to")).toBeInTheDocument()
+      })
+
+      it("shows confirmation dialog with note title for create note", async () => {
+        const noteRealm = makeMe.aNoteRealm.title("New Note").please()
+        const storageAccessor = useStorageAccessor()
+        storageAccessor.value.refreshNoteRealm(noteRealm)
+        noteEditingHistory.createNote(noteRealm.id)
+        helper.component(NoteUndoButton).render()
+
+        const undoButton = screen.getByTitle("undo create note")
+        await undoButton.click()
+        await flushPromises()
+
+        expect(screen.getByText("Confirm Undo")).toBeInTheDocument()
+        expect(
+          screen.getByText(/Are you sure you want to undo creating /)
+        ).toBeInTheDocument()
+        expect(screen.getByText("New Note")).toBeInTheDocument()
+        const link = screen.getByText("New Note").closest("a.router-link")
+        expect(link).toBeInTheDocument()
       })
 
       it("shows diff view for edit details with long content", async () => {
@@ -268,6 +296,28 @@ describe("NoteUndoButton", () => {
       expect(mockedPush).toHaveBeenCalledWith({
         name: "noteShow",
         params: { noteId: noteRealm.id },
+      })
+    })
+
+    it("calls undo when confirmation is accepted for create note", async () => {
+      const noteRealm = makeMe.aNoteRealm.please()
+      const parentNoteRealm = makeMe.aNoteRealm.please()
+      noteEditingHistory.createNote(noteRealm.id)
+      mockSdkService("deleteNote", [parentNoteRealm])
+      helper.component(NoteUndoButton).render()
+
+      const undoButton = screen.getByTitle("undo create note")
+      await undoButton.click()
+      await flushPromises()
+
+      // Accept confirmation
+      const okButton = screen.getByRole("button", { name: "OK" })
+      await okButton.click()
+      await flushPromises()
+
+      expect(mockedPush).toHaveBeenCalledWith({
+        name: "noteShow",
+        params: { noteId: parentNoteRealm.id },
       })
     })
 
