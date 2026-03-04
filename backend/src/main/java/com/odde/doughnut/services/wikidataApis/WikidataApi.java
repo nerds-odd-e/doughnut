@@ -2,13 +2,16 @@ package com.odde.doughnut.services.wikidataApis;
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.odde.doughnut.controllers.dto.WikidataEntityData;
+import com.odde.doughnut.exceptions.WikidataServiceErrorException;
 import com.odde.doughnut.services.httpQuery.QueryBuilder;
+import com.odde.doughnut.services.httpQuery.QueryResult;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataEntityDataHash;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataEntityHash;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataSearchResult;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.SneakyThrows;
+import org.springframework.http.HttpStatus;
 
 public record WikidataApi(QueryBuilder queryBuilder) {
 
@@ -18,15 +21,22 @@ public record WikidataApi(QueryBuilder queryBuilder) {
 
   public WikidataSearchResult getWikidataSearchEntities(String search)
       throws IOException, InterruptedException {
-    return queryWikidataApi("wbsearchentities")
-        .queryParam("search", "{search}")
-        .queryParam("format", "json")
-        .queryParam("language", "en")
-        .queryParam("uselang", "en")
-        .queryParam("type", "item")
-        .queryParam("limit", 10)
-        .queryResult(search)
-        .mapToObject(WikidataSearchResult.class);
+    QueryResult queryResult =
+        queryWikidataApi("wbsearchentities")
+            .queryParam("search", "{search}")
+            .queryParam("format", "json")
+            .queryParam("language", "en")
+            .queryParam("uselang", "en")
+            .queryParam("type", "item")
+            .queryParam("limit", 10)
+            .queryResult(search);
+    WikidataSearchResult result = queryResult.mapToObject(WikidataSearchResult.class);
+    if (result == null || result.search == null) {
+      throw new WikidataServiceErrorException(
+          "Wikidata search response missing 'search' list. Raw result: " + queryResult.response(),
+          HttpStatus.BAD_GATEWAY);
+    }
+    return result;
   }
 
   public WikidataEntityHash getEntityHashById(String wikidataId)
