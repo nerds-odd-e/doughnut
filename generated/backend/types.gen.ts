@@ -633,6 +633,7 @@ export type NoteWritable = {
     id: number;
     createdAt: string;
     wikidataId?: string;
+    notebookInRestoreAsHeadNote?: Notebook;
 };
 
 export type SubscriptionWritable = {
@@ -3288,6 +3289,33 @@ export type UpdateNoteTypeResponses = {
 };
 
 export type UpdateNoteTypeResponse = UpdateNoteTypeResponses[keyof UpdateNoteTypeResponses];
+
+export type MoveToTopLevelData = {
+    body?: never;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/notes/{note}/move-to-top-level';
+};
+
+export type MoveToTopLevelErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type MoveToTopLevelError = MoveToTopLevelErrors[keyof MoveToTopLevelErrors];
+
+export type MoveToTopLevelResponses = {
+    /**
+     * OK
+     */
+    200: NoteRealm;
+};
+
+export type MoveToTopLevelResponse = MoveToTopLevelResponses[keyof MoveToTopLevelResponses];
 
 export type MoveToCircleData = {
     body?: never;

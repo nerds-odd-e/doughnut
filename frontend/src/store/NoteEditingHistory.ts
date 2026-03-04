@@ -58,13 +58,13 @@ export default class NoteEditingHistory {
 
   moveNote(
     noteId: Doughnut.ID,
-    originalParentId: Doughnut.ID,
+    originalParentId: Doughnut.ID | null,
     previousSiblingId: Doughnut.ID | null
   ) {
     this.noteUndoHistories.push({
       type: "move note",
       noteId,
-      originalParentId,
+      originalParentId: originalParentId ?? undefined,
       previousSiblingId,
     })
   }

@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.factoryServices.EntityPersister;
@@ -70,5 +71,13 @@ public class NoteMotionService {
       }
     }
     execute(sourceNote, targetNote, true);
+  }
+
+  public void moveToTopLevel(Note note, User user) {
+    note.restoreAsHeadNote(user.getOwnership(), user);
+    entityPersister.save(note.getNotebook());
+    note.getAllDescendants().forEach(entityPersister::merge);
+    entityPersister.merge(note);
+    entityPersister.flush();
   }
 }

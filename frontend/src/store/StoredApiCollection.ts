@@ -361,11 +361,14 @@ export default class StoredApiCollection implements StoredApi {
 
   private getMoveUndoInfo(noteId: Doughnut.ID) {
     const noteRealm = this.storage.refOfNoteRealm(noteId).value
-    if (!noteRealm?.note.parentId) return null
+    if (!noteRealm?.note) return null
 
-    const parentRealm = this.storage.refOfNoteRealm(
-      noteRealm.note.parentId
-    ).value
+    const parentId = noteRealm.note.parentId
+    if (parentId === null || parentId === undefined) {
+      return { originalParentId: null, previousSiblingId: null }
+    }
+
+    const parentRealm = this.storage.refOfNoteRealm(parentId).value
     if (!parentRealm?.children) return null
 
     const siblings = parentRealm.children
@@ -373,7 +376,7 @@ export default class StoredApiCollection implements StoredApi {
     const previousSiblingId = noteIndex > 0 ? siblings[noteIndex - 1]!.id : null
 
     return {
-      originalParentId: noteRealm.note.parentId,
+      originalParentId: parentId,
       previousSiblingId,
     }
   }
@@ -428,7 +431,7 @@ export default class StoredApiCollection implements StoredApi {
     if (undone.type === "move note") {
       return this.undoMoveNote(
         undone.noteId,
-        undone.originalParentId!,
+        undone.originalParentId ?? null,
         undone.previousSiblingId ?? null
       )
     }
@@ -445,9 +448,19 @@ export default class StoredApiCollection implements StoredApi {
 
   private async undoMoveNote(
     noteId: Doughnut.ID,
-    originalParentId: Doughnut.ID,
+    originalParentId: Doughnut.ID | null,
     previousSiblingId: Doughnut.ID | null
   ) {
+    if (originalParentId === null || originalParentId === undefined) {
+      const { data: noteRealm, error } = await apiCallWithLoading(() =>
+        NoteController.moveToTopLevel({ path: { note: noteId } })
+      )
+      if (error || !noteRealm) {
+        throw new Error(error || "Failed to undo move note")
+      }
+      this.refreshNoteRealms([noteRealm])
+      return noteRealm
+    }
     if (previousSiblingId !== null) {
       const updatedNotes = await this.moveAfterWithoutUndo(
         noteId,

@@ -368,6 +368,21 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
+  public void restoreAsHeadNote(Ownership ownership, User creator) {
+    if (getParent() != null) {
+      getParent().children.remove(this);
+      this.parent = null;
+    }
+    buildNotebookForHeadNote(ownership, creator);
+    getAllDescendants()
+        .forEach(descendant -> descendant.setNotebookInRestoreAsHeadNote(getNotebook()));
+  }
+
+  private void setNotebookInRestoreAsHeadNote(Notebook notebook) {
+    setNotebook(notebook);
+  }
+
+  @JsonIgnore
   public String getNotebookAssistantInstructions() {
     NotebookAiAssistant notebookAiAssistant = getNotebook().getNotebookAiAssistant();
     if (notebookAiAssistant == null) {
