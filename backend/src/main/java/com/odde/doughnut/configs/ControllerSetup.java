@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.multipart.MultipartException;
 
 @ControllerAdvice
 public class ControllerSetup {
@@ -46,6 +47,10 @@ public class ControllerSetup {
 
     throw exception;
   }
+
+  @ExceptionHandler(MultipartException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public void handleMultipartException() {}
 
   @ExceptionHandler(OpenAiUnauthorizedException.class)
   public ResponseEntity<ApiError> handleOpenAIUnauthorizedException(
