@@ -36,6 +36,13 @@ const myNotebooksPage = () => {
           .should('not.exist')
       )
     },
+    expectNotebookToExist(notebookTitle: string) {
+      cy.get('main').within(() =>
+        cy
+          .findByText(notebookTitle, { selector: '.notebook-card h5' })
+          .should('exist')
+      )
+    },
   }
 }
 

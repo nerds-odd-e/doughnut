@@ -13,3 +13,10 @@ Feature: note move
     Given I move note "Sedition" to be under note "Sedation"
     When I visit all my notebooks
     Then I should not see note "Sedition" at the top level of all my notes
+
+  @mockBrowserTime
+  Scenario: Undo moving note
+    Given I move note "Sedition" to be under note "Sedation"
+    When I undo "move note"
+    And I visit all my notebooks
+    Then I should see note "Sedition" at the top level of all my notes

@@ -107,6 +107,10 @@ const getUndoMessage = (): string => {
       return noteTopology
         ? "Are you sure you want to undo creating "
         : `Are you sure you want to undo creating ${noteIdentifier}?`
+    case "move note":
+      return noteTopology
+        ? "Are you sure you want to undo moving "
+        : `Are you sure you want to undo moving ${noteIdentifier}?`
     default:
       return noteTopology
         ? `Are you sure you want to undo ${actionType} for `
