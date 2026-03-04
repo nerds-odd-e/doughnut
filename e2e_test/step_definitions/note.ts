@@ -217,12 +217,6 @@ When(
       .createNoteWithTitle(title)
     // Wait for the note to be created and verify the title appears
     start.assumeNotePage(title)
-    cy.location('pathname').then((pathname) => {
-      const match = pathname.match(/^\/n(\d+)$/)
-      if (match) {
-        start.testability().addNoteToMap(title, parseInt(match[1]!, 10))
-      }
-    })
   }
 )
 
