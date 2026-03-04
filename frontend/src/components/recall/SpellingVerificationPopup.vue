@@ -14,7 +14,14 @@
       />
       <p v-if="errorMessage" class="daisy-text-error daisy-mt-2" data-test="spelling-error-message">{{ errorMessage }}</p>
       <div class="daisy-mt-4 daisy-flex daisy-gap-2">
-        <button class="daisy-btn daisy-btn-primary" data-test="verify-spelling" @click="verify">Verify</button>
+        <button
+          class="daisy-btn daisy-btn-primary"
+          data-test="verify-spelling"
+          :disabled="isVerifying"
+          @click="verify"
+        >
+          Verify
+        </button>
       </div>
     </template>
   </Modal>
@@ -38,6 +45,7 @@ const emit = defineEmits<{
 
 const userInput = ref("")
 const errorMessage = ref("")
+const isVerifying = ref(false)
 
 // Reset state when popup opens
 watch(
@@ -46,11 +54,14 @@ watch(
     if (newShow) {
       userInput.value = ""
       errorMessage.value = ""
+      isVerifying.value = false
     }
   }
 )
 
 const verify = async () => {
+  if (isVerifying.value) return
+  isVerifying.value = true
   const { data, error } = await apiCallWithLoading(() =>
     NoteController.verifySpelling({
       path: { note: props.noteId },
@@ -63,6 +74,7 @@ const verify = async () => {
   } else {
     emit("verified")
   }
+  isVerifying.value = false
 }
 </script>
 
