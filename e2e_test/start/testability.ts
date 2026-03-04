@@ -214,6 +214,14 @@ const testability = () => {
       ])
     },
 
+    addNoteToMap(title: string, noteId: number) {
+      return cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
+        cy.wrap({ ...existingMap, [title]: noteId }).as(
+          injectedNoteIdMapAliasName
+        )
+      })
+    },
+
     getInjectedNoteIdByTitle(noteTopology: string) {
       return cy
         .get(`@${injectedNoteIdMapAliasName}`)

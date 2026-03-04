@@ -2,6 +2,7 @@
   <PopButton
     v-if="history"
     :title="undoTitle"
+    :aria-label="undoTitle"
     btn-class="daisy-btn daisy-btn-sm daisy-btn-ghost"
   >
     <template #button_face>
