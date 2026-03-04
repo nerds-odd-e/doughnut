@@ -38,3 +38,10 @@ Feature: add relationship
     When I search for "Sed" in all my notebooks
     Then I should see "Sedation, Sedative" as targets only when searching in all my notebooks "Sed"
     And I should not see the recently updated notes section
+
+  @mockBrowserTime
+  Scenario: Undo creating relationship
+    When I add relationship from top level note "Sedition" as "similar to" to note "Sedation"
+    Then I should see "Sedition" has relationship "similar to" "Sedation"
+    When I undo "create note"
+    Then I should see "Sedition" has no relationship to "Sedation"
