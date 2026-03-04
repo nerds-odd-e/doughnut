@@ -243,6 +243,7 @@ export default class StoredApiCollection implements StoredApi {
     }
     const focus = this.storage.refreshNoteRealm(nrwp.created)
     this.storage.refreshNoteRealm(nrwp.parent)
+    this.noteEditingHistory.createNote(focus.id)
     await this.routerReplaceFocus(router, focus)
     return focus
   }
@@ -277,6 +278,7 @@ export default class StoredApiCollection implements StoredApi {
     }
     const focus = this.storage.refreshNoteRealm(nrwp.created)
     this.storage.refreshNoteRealm(nrwp.parent)
+    this.noteEditingHistory.createNote(focus.id)
     await this.routerReplaceFocus(router, focus)
     return focus
   }
@@ -386,6 +388,9 @@ export default class StoredApiCollection implements StoredApi {
         undone.textContent!
       )
     }
+    if (undone.type === "create note") {
+      return this.undoCreateNote(undone.noteId)
+    }
     const { data: noteRealm, error } = await apiCallWithLoading(() =>
       NoteController.undoDeleteNote({
         path: { note: undone.noteId },
@@ -395,6 +400,24 @@ export default class StoredApiCollection implements StoredApi {
       throw new Error(error || "Failed to undo delete note")
     }
     return noteRealm
+  }
+
+  private async undoCreateNote(noteId: Doughnut.ID) {
+    const { data: res, error } = await apiCallWithLoading(() =>
+      NoteController.deleteNote({
+        path: { note: noteId },
+      })
+    )
+    if (error || !res) {
+      throw new Error(error || "Failed to undo create note")
+    }
+    if (res.length === 0) {
+      return {
+        id: noteId,
+        note: { deletedAt: new Date().toISOString() },
+      } as NoteRealm
+    }
+    return this.storage.refreshNoteRealm(res[0]!)
   }
 
   async undo(router: Router) {

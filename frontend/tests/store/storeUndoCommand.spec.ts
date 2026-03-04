@@ -108,6 +108,37 @@ describe("storeUndoCommand", () => {
     })
   })
 
+  describe("createNote", () => {
+    it("should add create note entry to undo history", () => {
+      const histories = new NoteEditingHistory()
+      const note1 = makeMe.aNote.please()
+      histories.createNote(note1.id)
+
+      expect(histories.noteUndoHistories.length).toEqual(1)
+      expect(histories.noteUndoHistories[0]!.type).toBe("create note")
+      expect(histories.noteUndoHistories[0]!.noteId).toBe(note1.id)
+    })
+
+    it("should allow multiple create note entries", () => {
+      const histories = new NoteEditingHistory()
+      const note1 = makeMe.aNote.please()
+      const note2 = makeMe.aNote.please()
+      histories.createNote(note1.id)
+      histories.createNote(note2.id)
+
+      expect(histories.noteUndoHistories.length).toEqual(2)
+    })
+
+    it("should create new entry for title edit after create note", () => {
+      const histories = new NoteEditingHistory()
+      const note1 = makeMe.aNote.please()
+      histories.createNote(note1.id)
+      histories.addEditingToUndoHistory(note1.id, "edit title", "New Title")
+
+      expect(histories.noteUndoHistories.length).toEqual(2)
+    })
+  })
+
   describe("popUndoHistory", () => {
     let initialUndoCount
     const histories = new NoteEditingHistory()
