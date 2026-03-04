@@ -6,11 +6,13 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.ThresholdExceededResult;
+import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.NoteService;
@@ -31,6 +33,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
 
   @Autowired MemoryTrackerController controller;
   @Autowired NoteService noteService;
+  @Autowired ConversationRepository conversationRepository;
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach
@@ -570,6 +573,30 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       List<RecallPrompt> remainingPrompts = controller.getRecallPrompts(memoryTracker);
       assertThat(remainingPrompts, hasSize(1));
       assertThat(remainingPrompts.get(0).getId(), equalTo(contestedPrompt.getId()));
+    }
+
+    @Test
+    void shouldNullOutConversationReferenceBeforeDeletingRecallPrompt()
+        throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+
+      RecallPrompt unansweredPrompt =
+          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+      Conversation conversation =
+          makeMe
+              .aConversation()
+              .forARecallPrompt(unansweredPrompt)
+              .from(currentUser.getUser())
+              .please();
+
+      controller.deleteUnansweredRecallPrompts(memoryTracker);
+
+      makeMe.refresh(conversation);
+      assertThat(
+          conversation.getSubject() == null || conversation.getSubject().getRecallPrompt() == null,
+          is(true));
     }
   }
 }

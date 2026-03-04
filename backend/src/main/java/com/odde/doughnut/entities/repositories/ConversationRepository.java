@@ -10,6 +10,10 @@ import org.springframework.data.repository.query.Param;
 
 public interface ConversationRepository extends CrudRepository<Conversation, Integer> {
 
+  @Query("SELECT c FROM Conversation c WHERE c.subject.recallPrompt IN :recallPrompts")
+  List<Conversation> findBySubjectRecallPromptIn(
+      @Param("recallPrompts") List<com.odde.doughnut.entities.RecallPrompt> recallPrompts);
+
   String USER_CONVERSATION_CONDITION =
       "c.subjectOwnership.user = :user "
           + "OR c.subjectOwnership IN (SELECT o FROM Ownership o JOIN o.circle.members mem WHERE mem = :user) "

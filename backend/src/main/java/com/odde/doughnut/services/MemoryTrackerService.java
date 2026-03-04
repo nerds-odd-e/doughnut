@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
@@ -25,16 +26,19 @@ public class MemoryTrackerService {
   private final UserService userService;
   private final MemoryTrackerRepository memoryTrackerRepository;
   private final RecallPromptRepository recallPromptRepository;
+  private final ConversationRepository conversationRepository;
 
   public MemoryTrackerService(
       EntityPersister entityPersister,
       UserService userService,
       MemoryTrackerRepository memoryTrackerRepository,
-      RecallPromptRepository recallPromptRepository) {
+      RecallPromptRepository recallPromptRepository,
+      ConversationRepository conversationRepository) {
     this.entityPersister = entityPersister;
     this.userService = userService;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.recallPromptRepository = recallPromptRepository;
+    this.conversationRepository = conversationRepository;
   }
 
   public List<MemoryTracker> findLast100ByUser(Integer userId) {
@@ -166,6 +170,15 @@ public class MemoryTrackerService {
   public void deleteUnansweredRecallPrompts(MemoryTracker memoryTracker) {
     List<RecallPrompt> unansweredPrompts =
         recallPromptRepository.findAllUnansweredByMemoryTrackerId(memoryTracker.getId());
+    if (!unansweredPrompts.isEmpty()) {
+      conversationRepository
+          .findBySubjectRecallPromptIn(unansweredPrompts)
+          .forEach(
+              conversation -> {
+                conversation.getSubject().setRecallPrompt(null);
+                conversationRepository.save(conversation);
+              });
+    }
     unansweredPrompts.forEach(entityPersister::remove);
   }
 
