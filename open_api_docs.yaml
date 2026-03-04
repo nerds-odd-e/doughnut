@@ -1846,6 +1846,26 @@ paths:
           description: Bad Request
         "200":
           description: OK
+  /api/failure-reports/trigger:
+    post:
+      tags:
+      - failure-report-controller
+      operationId: triggerFailure
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/conversation/{conversationId}/send:
     post:
       tags:

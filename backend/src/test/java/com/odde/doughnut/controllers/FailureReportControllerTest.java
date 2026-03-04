@@ -32,6 +32,21 @@ class FailureReportControllerTest extends ControllerTestBase {
   }
 
   @Nested
+  class TriggerExceptionTest {
+    @Test
+    void adminCanTriggerException() {
+      currentUser.setUser(makeMe.anAdmin().please());
+      assertThrows(RuntimeException.class, () -> controller.triggerFailure());
+    }
+
+    @Test
+    void nonAdminCannotTriggerException() {
+      currentUser.setUser(makeMe.aUser().please());
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.triggerFailure());
+    }
+  }
+
+  @Nested
   class DeleteFailureReportsTest {
     List<FailureReport> failureReports;
 

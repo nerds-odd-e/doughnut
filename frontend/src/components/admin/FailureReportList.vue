@@ -27,11 +27,18 @@
             {{ failureReports.length }}
           </span>
         </h2>
-        <button
-          v-if="selectedFailureReports.length > 0"
-          class="daisy-btn daisy-btn-error daisy-btn-sm"
-          @click="showDeleteModal = true"
-        >
+        <div class="daisy-flex daisy-gap-2">
+          <button
+            class="daisy-btn daisy-btn-warning daisy-btn-sm"
+            @click="triggerFailure"
+          >
+            Trigger Test Exception
+          </button>
+          <button
+            v-if="selectedFailureReports.length > 0"
+            class="daisy-btn daisy-btn-error daisy-btn-sm"
+            @click="showDeleteModal = true"
+          >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="daisy-h-4 daisy-w-4"
@@ -47,7 +54,8 @@
             />
           </svg>
           Delete Selected ({{ selectedFailureReports.length }})
-        </button>
+          </button>
+        </div>
       </div>
 
       <div v-if="failureReports.length > 0" class="daisy-space-y-2">
@@ -201,6 +209,11 @@ const fetchData = async () => {
     }
     errorMessage.value = errMessage
   }
+}
+
+const triggerFailure = async () => {
+  await apiCallWithLoading(() => FailureReportController.triggerFailure({}))
+  await fetchData()
 }
 
 const deleteSelected = async () => {

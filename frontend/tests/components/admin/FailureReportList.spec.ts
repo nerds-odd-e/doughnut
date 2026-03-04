@@ -184,6 +184,36 @@ describe("FailureReportList", () => {
     })
   })
 
+  describe("trigger test exception", () => {
+    it("shows trigger button", async () => {
+      mockSdkService("failureReports", [])
+
+      const wrapper = helper.component(FailureReportList).withRouter().mount()
+      await flushPromises()
+
+      const triggerButton = wrapper
+        .findAll("button")
+        .find((btn) => btn.text().includes("Trigger Test Exception"))
+      expect(triggerButton?.exists()).toBe(true)
+    })
+
+    it("calls triggerFailure API and refreshes list when clicked", async () => {
+      mockSdkService("failureReports", [])
+      const triggerSpy = mockSdkService("triggerFailure", undefined)
+
+      const wrapper = helper.component(FailureReportList).withRouter().mount()
+      await flushPromises()
+
+      const triggerButton = wrapper
+        .findAll("button")
+        .find((btn) => btn.text().includes("Trigger Test Exception"))
+      await triggerButton!.trigger("click")
+      await flushPromises()
+
+      expect(triggerSpy).toHaveBeenCalled()
+    })
+  })
+
   describe("error handling", () => {
     it("displays error alert when API returns an error", async () => {
       mockSdkService("failureReports", [])

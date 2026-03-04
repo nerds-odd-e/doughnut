@@ -10,6 +10,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -61,5 +62,12 @@ class FailureReportController {
     authorizationService.assertLoggedIn();
     authorizationService.assertAdminAuthorization();
     failureReportService.deleteFailureReports(ids);
+  }
+
+  @PostMapping("/trigger")
+  public String triggerFailure() throws UnexpectedNoAccessRightException {
+    authorizationService.assertLoggedIn();
+    authorizationService.assertAdminAuthorization();
+    throw new RuntimeException("Manually triggered exception for failure report testing");
   }
 }

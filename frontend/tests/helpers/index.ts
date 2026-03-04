@@ -185,6 +185,7 @@ const methodToController: Record<string, any> = {
   failureReports: FailureReportController,
   showFailureReport: FailureReportController,
   deleteFailureReports: FailureReportController,
+  triggerFailure: FailureReportController,
   listUsers: AdminUserController,
 }
 

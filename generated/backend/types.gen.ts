@@ -2729,6 +2729,35 @@ export type UploadAndTriggerFineTuningResponses = {
     200: unknown;
 };
 
+export type TriggerFailureData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/failure-reports/trigger';
+};
+
+export type TriggerFailureErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type TriggerFailureError = TriggerFailureErrors[keyof TriggerFailureErrors];
+
+export type TriggerFailureResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type TriggerFailureResponse = TriggerFailureResponses[keyof TriggerFailureResponses];
+
 export type ReplyToConversationData = {
     body: string;
     path: {
