@@ -1,5 +1,6 @@
 import type { Router } from "vue-router"
 import createNoteStorage from "@/store/createNoteStorage"
+import NoteEditingHistory from "@/store/NoteEditingHistory"
 import makeMe from "@tests/fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
@@ -9,17 +10,23 @@ describe("storedApiCollection", () => {
   const note = makeMe.aNoteRealm.please()
   const storageAccessor = useStorageAccessor()
   const routerReplace = vi.fn()
-  const router = { replace: routerReplace } as unknown as Router
+  const routerPush = vi.fn()
+  const router = {
+    replace: routerReplace,
+    push: routerPush,
+  } as unknown as Router
 
   beforeEach(() => {
+    vi.clearAllMocks()
     storageAccessor.value = createNoteStorage()
   })
 
   describe("delete note", () => {
+    const parentNote = makeMe.aNoteRealm.please()
     let deleteNoteSpy: ReturnType<typeof mockSdkService<"deleteNote">>
 
     beforeEach(() => {
-      deleteNoteSpy = mockSdkService("deleteNote", [note])
+      deleteNoteSpy = mockSdkService("deleteNote", [parentNote])
     })
 
     it("should call the api", async () => {
@@ -28,6 +35,43 @@ describe("storedApiCollection", () => {
       expect(deleteNoteSpy).toHaveBeenCalledTimes(1)
       expect(deleteNoteSpy).toHaveBeenCalledWith({ path: { note: note.id } })
       expect(routerReplace).toHaveBeenCalledTimes(1)
+    })
+
+    it("should remove the deleted note from cache", async () => {
+      storageAccessor.value.refreshNoteRealm(note)
+      expect(storageAccessor.value.refOfNoteRealm(note.id).value).toBeTruthy()
+
+      const sa = storageAccessor.value.storedApi()
+      await sa.deleteNote(router, note.id)
+
+      expect(
+        storageAccessor.value.refOfNoteRealm(note.id).value
+      ).toBeUndefined()
+    })
+  })
+
+  describe("undo create note", () => {
+    const parentNote = makeMe.aNoteRealm.please()
+
+    beforeEach(() => {
+      mockSdkService("deleteNote", [parentNote])
+    })
+
+    it("should remove the created note from cache after undo", async () => {
+      const noteEditingHistory = new NoteEditingHistory()
+      storageAccessor.value = createNoteStorage(noteEditingHistory)
+
+      storageAccessor.value.refreshNoteRealm(note)
+      noteEditingHistory.createNote(note.id)
+
+      expect(storageAccessor.value.refOfNoteRealm(note.id).value).toBeTruthy()
+
+      const sa = storageAccessor.value.storedApi()
+      await sa.undo(router)
+
+      expect(
+        storageAccessor.value.refOfNoteRealm(note.id).value
+      ).toBeUndefined()
     })
   })
 

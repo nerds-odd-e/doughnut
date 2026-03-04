@@ -507,6 +507,7 @@ export default class StoredApiCollection implements StoredApi {
     if (error || !res) {
       throw new Error(error || "Failed to undo create note")
     }
+    this.storage.removeNoteRealm(noteId)
     if (res.length === 0) {
       return {
         id: noteId,
@@ -535,6 +536,7 @@ export default class StoredApiCollection implements StoredApi {
       throw new Error(error || "Failed to delete note")
     }
     this.noteEditingHistory.deleteNote(noteId)
+    this.storage.removeNoteRealm(noteId)
     if (res.length === 0) {
       await this.routerReplaceFocus(router)
       return

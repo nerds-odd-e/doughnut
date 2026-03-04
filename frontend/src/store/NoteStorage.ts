@@ -4,6 +4,7 @@ import { ref } from "vue"
 
 export default interface NoteStorage {
   refreshNoteRealm(data: NoteRealm): NoteRealm
+  removeNoteRealm(noteId: Doughnut.ID): void
   refOfNoteRealm(noteId: Doughnut.ID): Ref<NoteRealm | undefined>
   refOfNoteRealmWithFallback(note: Note): Ref<NoteRealm>
 }
@@ -14,6 +15,10 @@ export class StorageImplementation implements NoteStorage {
   refreshNoteRealm(noteRealm: NoteRealm): NoteRealm {
     this.refOfNoteRealm(noteRealm?.id).value = noteRealm
     return noteRealm
+  }
+
+  removeNoteRealm(noteId: Doughnut.ID): void {
+    this.cache.delete(noteId)
   }
 
   refOfNoteRealm(noteId: Doughnut.ID): Ref<NoteRealm | undefined> {

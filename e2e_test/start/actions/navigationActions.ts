@@ -18,6 +18,12 @@ export const navigationActions = {
     return assumeNotePage(noteTopology)
   },
 
+  jumpToNotePageById(noteId: number) {
+    const url = `/n${noteId}`
+    router().push(url, 'noteShow', { noteId })
+    return assumeNotePage()
+  },
+
   navigateToAssessmentAndCertificatePage() {
     return mainMenu().userOptions().myAssessmentAndCertificateHistory()
   },

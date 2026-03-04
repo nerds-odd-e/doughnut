@@ -215,8 +215,13 @@ When(
       .jumpToNotePage(noteTopology)
       .addingChildNote()
       .createNoteWithTitle(title)
-    // Wait for the note to be created and verify the title appears
     start.assumeNotePage(title)
+    cy.url().then((url) => {
+      const match = url.match(/\/n(\d+)/)
+      if (match) {
+        Cypress.env(`createdNoteId_${title}`, parseInt(match[1]!))
+      }
+    })
   }
 )
 
@@ -298,7 +303,12 @@ When('I should see that the note creation is not successful', () => {
 Then(
   'I should see the note {string} is marked as deleted',
   (noteTopology: string) => {
-    start.jumpToNotePage(noteTopology)
+    const noteId = Cypress.env(`createdNoteId_${noteTopology}`)
+    if (noteId) {
+      start.jumpToNotePageById(noteId as number)
+    } else {
+      start.jumpToNotePage(noteTopology)
+    }
     cy.findByText('This note has been deleted')
   }
 )
@@ -400,6 +410,7 @@ Then(
 
 When('I undo {string}', (undoType: string) => {
   start.assumeNotePage().undo(undoType)
+  start.pageIsNotLoading()
 })
 
 When('I undo {string} again', (undoType: string) => {
