@@ -137,13 +137,13 @@ class MemoryTrackerController {
     memoryTrackerService.deleteUnansweredRecallPrompts(memoryTracker);
   }
 
-  @PostMapping(path = "/{memoryTracker}/re-assimilate")
+  @PostMapping(path = "/{memoryTracker}/soft-delete")
   @Transactional
-  public void reAssimilate(
+  public void softDelete(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     authorizationService.assertReadAuthorization(memoryTracker);
-    memoryTrackerService.reAssimilate(memoryTracker);
+    memoryTrackerService.softDelete(memoryTracker);
   }
 }

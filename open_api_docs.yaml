@@ -1560,6 +1560,26 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebookCertificateApproval"
+  /api/memory-trackers/{memoryTracker}/soft-delete:
+    post:
+      tags:
+      - memory-tracker-controller
+      operationId: softDelete
+      parameters:
+      - name: memoryTracker
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
   /api/memory-trackers/{memoryTracker}/remove:
     post:
       tags:
@@ -1608,26 +1628,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/MemoryTracker"
-  /api/memory-trackers/{memoryTracker}/re-assimilate:
-    post:
-      tags:
-      - memory-tracker-controller
-      operationId: reAssimilate
-      parameters:
-      - name: memoryTracker
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
   /api/mcp/notes/create:
     post:
       tags:

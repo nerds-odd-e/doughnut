@@ -6,24 +6,24 @@ export function assumeAdminDashboardPage() {
   return {
     goToFailureReportList() {
       this.goToTabInAdminDashboard('Failure Reports')
-      cy.findByText('Failure report list')
+      cy.get('h2').contains('Failure Reports')
       return {
         shouldContain(content: string) {
           cy.get('body').should('contain', content)
         },
         checkFailureReportItem(index = 0) {
-          cy.get('.failure-report')
-            .eq(index)
-            .find('input[type="checkbox"]')
-            .check()
+          cy.get('.daisy-card').eq(index).find('input[type="checkbox"]').check()
           return this
         },
         deleteSelected() {
-          cy.findByRole('button', { name: 'Delete Selected' }).click()
+          cy.get('button').contains('Delete Selected').click()
+          cy.get('.daisy-modal-action')
+            .findByRole('button', { name: 'Delete' })
+            .click()
           return this
         },
         shouldBeEmpty() {
-          cy.get('.failure-report').should('not.exist')
+          cy.findByText('All Clear!').should('exist')
           return this
         },
       }

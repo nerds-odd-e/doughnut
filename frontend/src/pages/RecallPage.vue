@@ -292,7 +292,7 @@ const offerReAssimilation = async (memoryTrackerId: number | undefined) => {
     "You have answered this note incorrectly too many times. Would you like to re-assimilate it?"
   )
   if (confirmed) {
-    await MemoryTrackerController.reAssimilate({
+    await MemoryTrackerController.softDelete({
       path: { memoryTracker: memoryTrackerId },
     })
     setDueCount((dueCount.value ?? 0) + 1)
