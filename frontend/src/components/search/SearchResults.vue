@@ -128,13 +128,13 @@ const filteredRecentNotes = computed(() =>
 )
 
 const displayState = computed(() =>
-  model.getDisplayState(
-    trimmedSearchKey.value,
-    isGlobalSearch.value,
-    props.noteId,
-    props.isDropdown,
-    filteredRecentNotes.value.length
-  )
+  model.getDisplayState({
+    trimmedSearchKey: trimmedSearchKey.value,
+    isGlobal: isGlobalSearch.value,
+    noteId: props.noteId,
+    isDropdown: props.isDropdown,
+    filteredRecentNotesCount: filteredRecentNotes.value.length,
+  })
 )
 
 const performSearch = async (noteId: number | undefined, term: SearchTerm) => {

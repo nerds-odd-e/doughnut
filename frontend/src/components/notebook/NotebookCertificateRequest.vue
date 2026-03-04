@@ -1,5 +1,5 @@
 <template>
-  <ContentLoader v-if="approval === undefined && !loaded" />
+  <ContentLoader v-if="approvalState === undefined && !loaded" />
   <div v-else>
     <button :class="approvalButtonClasses" :disabled="isApprovalButtonDisabled" @click="requestNotebookApproval">
       {{ approvalButtonText }}
@@ -24,22 +24,24 @@ const props = defineProps({
   loaded: { type: Boolean, default: false },
 })
 
-const approval = ref<NotebookCertificateApproval | undefined>(props.approval)
+const approvalState = ref<NotebookCertificateApproval | undefined>(
+  props.approval
+)
 
 // Update approval when prop changes
 watch(
   () => props.approval,
   (newApproval) => {
-    approval.value = newApproval
+    approvalState.value = newApproval
   },
   { immediate: true }
 )
 
 const approvalButtonText = computed(() => {
-  if (approval.value === undefined || approval.value === null) {
+  if (approvalState.value === undefined || approvalState.value === null) {
     return "Send Request"
   }
-  if (approval.value.lastApprovalTime) {
+  if (approvalState.value.lastApprovalTime) {
     return "Certificate Request Approved"
   }
   return "Approval Pending"
@@ -48,13 +50,16 @@ const approvalButtonText = computed(() => {
 const approvalButtonClasses = computed(() => ({
   "daisy-btn": true,
   "daisy-btn-sm": true,
-  "daisy-btn-primary": approval.value === undefined || approval.value === null,
-  "daisy-btn-outline": approval.value !== undefined && approval.value !== null,
-  "daisy-btn-disabled": approval.value !== undefined && approval.value !== null,
+  "daisy-btn-primary":
+    approvalState.value === undefined || approvalState.value === null,
+  "daisy-btn-outline":
+    approvalState.value !== undefined && approvalState.value !== null,
+  "daisy-btn-disabled":
+    approvalState.value !== undefined && approvalState.value !== null,
 }))
 
 const isApprovalButtonDisabled = computed(
-  () => approval.value !== undefined && approval.value !== null
+  () => approvalState.value !== undefined && approvalState.value !== null
 )
 const requestNotebookApproval = async () => {
   const { data: newApproval, error } = await apiCallWithLoading(() =>
@@ -63,7 +68,7 @@ const requestNotebookApproval = async () => {
     })
   )
   if (!error) {
-    approval.value = newApproval!
+    approvalState.value = newApproval!
   }
 }
 </script>

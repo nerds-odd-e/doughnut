@@ -17,6 +17,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -40,6 +42,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -64,6 +68,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -82,6 +88,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -100,6 +108,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -124,6 +134,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -149,6 +161,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -182,6 +196,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -208,6 +224,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -234,6 +252,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
   /api/testability/randomizer:
@@ -254,6 +274,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -280,6 +302,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
   /api/testability/inject_suggested_questions:
@@ -300,6 +324,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -324,6 +350,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -353,6 +381,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -377,6 +407,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -397,6 +429,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -422,6 +456,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -449,6 +485,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -467,6 +505,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -497,6 +537,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -521,6 +563,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -554,6 +598,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -572,6 +618,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -595,6 +643,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -625,6 +675,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -662,6 +714,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -699,6 +753,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -731,6 +787,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -755,6 +813,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -785,6 +845,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -815,6 +877,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -839,6 +903,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -869,6 +935,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -899,6 +967,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -923,6 +993,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -954,6 +1026,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -978,6 +1052,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1008,6 +1084,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1038,6 +1116,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1068,6 +1148,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1098,6 +1180,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1128,6 +1212,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1160,6 +1246,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1192,6 +1280,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1216,6 +1306,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1242,6 +1334,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1268,6 +1362,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1304,6 +1400,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1330,6 +1428,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1359,6 +1459,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1383,6 +1485,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
   /api/notebooks/{notebook}/share:
@@ -1403,6 +1507,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1427,6 +1533,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
   /api/notebooks/{notebook}/obsidian:
@@ -1447,6 +1555,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1486,6 +1596,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
   /api/notebooks/create:
@@ -1506,6 +1618,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1530,6 +1644,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1554,6 +1670,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1578,6 +1696,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
   /api/memory-trackers/{memoryTracker}/remove:
@@ -1598,6 +1718,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1622,6 +1744,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1646,6 +1770,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1670,6 +1796,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1694,6 +1822,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1712,6 +1842,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
   /api/conversation/{conversationId}/send:
@@ -1738,6 +1870,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1762,6 +1896,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1786,6 +1922,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1810,6 +1948,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1841,6 +1981,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1871,6 +2013,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1889,6 +2033,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1914,6 +2060,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1944,6 +2092,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1968,6 +2118,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -1992,6 +2144,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2015,6 +2169,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2039,6 +2195,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2064,6 +2222,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2088,6 +2248,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2120,6 +2282,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2144,6 +2308,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2168,6 +2334,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2192,6 +2360,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2222,6 +2392,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2252,6 +2424,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2282,6 +2456,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2306,6 +2482,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2330,6 +2508,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2360,6 +2540,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2390,6 +2572,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2420,6 +2604,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2444,6 +2630,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2472,6 +2660,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2496,6 +2686,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2532,6 +2724,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2556,6 +2750,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2585,6 +2781,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2609,6 +2807,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2638,6 +2838,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2667,6 +2869,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2697,6 +2901,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2721,6 +2927,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2747,6 +2955,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2773,6 +2983,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2797,6 +3009,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2815,6 +3029,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2835,6 +3051,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2853,6 +3071,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2886,6 +3106,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2910,6 +3132,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2936,6 +3160,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2961,6 +3187,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -2991,6 +3219,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3015,6 +3245,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3039,6 +3271,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3057,6 +3291,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3077,6 +3313,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3095,6 +3333,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3121,6 +3361,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3145,6 +3387,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3169,6 +3413,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3193,6 +3439,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3219,6 +3467,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3237,6 +3487,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3257,6 +3509,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3277,6 +3531,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3295,6 +3551,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3315,6 +3573,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3339,6 +3599,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3357,6 +3619,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3382,6 +3646,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3406,6 +3672,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3432,6 +3700,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3451,6 +3721,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3477,6 +3749,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3495,6 +3769,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3521,6 +3797,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3541,6 +3819,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3561,6 +3841,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3579,6 +3861,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3614,6 +3898,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
           content:
@@ -3638,6 +3924,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
   /api/memory-trackers/{memoryTracker}/recall-prompts/unanswered:
@@ -3658,6 +3946,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
   /api/failure-reports/delete:
@@ -3681,6 +3971,8 @@ paths:
             '*/*':
               schema:
                 type: string
+        "400":
+          description: Bad Request
         "200":
           description: OK
 components:

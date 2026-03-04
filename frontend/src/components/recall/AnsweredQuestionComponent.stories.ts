@@ -20,36 +20,40 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const createAnsweredQuestionWithQuestion = (
-  stem: string,
-  choices: string[],
-  correctIndex: number,
-  answerIndex: number,
+const createAnsweredQuestionWithQuestion = (opts: {
+  stem: string
+  choices: string[]
+  correctIndex: number
+  answerIndex: number
   isCorrect: boolean
-): RecallPrompt =>
+}): RecallPrompt =>
   makeMe.aRecallPrompt
     .withPredefinedQuestion(
       makeMe.aPredefinedQuestion
-        .withQuestionStem(stem)
-        .withChoices(choices)
-        .correctAnswerIndex(correctIndex)
+        .withQuestionStem(opts.stem)
+        .withChoices(opts.choices)
+        .correctAnswerIndex(opts.correctIndex)
         .please()
     )
     .withNote(makeMe.aNote.please())
-    .withAnswer({ id: 1, correct: isCorrect, choiceIndex: answerIndex })
+    .withAnswer({
+      id: 1,
+      correct: opts.isCorrect,
+      choiceIndex: opts.answerIndex,
+    })
     .withId(1)
     .please()
 
 export const CorrectAnswer: Story = {
   args: {
     answeredQuestion: (() => {
-      const question = createAnsweredQuestionWithQuestion(
-        "What is the capital of France?",
-        ["Paris", "London", "Berlin", "Madrid"],
-        0,
-        0,
-        true
-      )
+      const question = createAnsweredQuestionWithQuestion({
+        stem: "What is the capital of France?",
+        choices: ["Paris", "London", "Berlin", "Madrid"],
+        correctIndex: 0,
+        answerIndex: 0,
+        isCorrect: true,
+      })
       return {
         ...question,
         note: makeMe.aNote
@@ -67,13 +71,13 @@ export const CorrectAnswer: Story = {
 export const IncorrectAnswer: Story = {
   args: {
     answeredQuestion: (() => {
-      const question = createAnsweredQuestionWithQuestion(
-        "What is the capital of France?",
-        ["Paris", "London", "Berlin", "Madrid"],
-        0,
-        1,
-        false
-      )
+      const question = createAnsweredQuestionWithQuestion({
+        stem: "What is the capital of France?",
+        choices: ["Paris", "London", "Berlin", "Madrid"],
+        correctIndex: 0,
+        answerIndex: 1,
+        isCorrect: false,
+      })
       return {
         ...question,
         note: makeMe.aNote
@@ -91,13 +95,18 @@ export const IncorrectAnswer: Story = {
 export const NoteWithManyAncestors: Story = {
   args: {
     answeredQuestion: (() => {
-      const question = createAnsweredQuestionWithQuestion(
-        "What is TypeScript?",
-        ["A programming language", "A database", "A framework", "A browser"],
-        0,
-        0,
-        true
-      )
+      const question = createAnsweredQuestionWithQuestion({
+        stem: "What is TypeScript?",
+        choices: [
+          "A programming language",
+          "A database",
+          "A framework",
+          "A browser",
+        ],
+        correctIndex: 0,
+        answerIndex: 0,
+        isCorrect: true,
+      })
 
       let currentNote = makeMe.aNote.title("Ancestor 1").please()
       for (let i = 2; i <= 10; i++) {
@@ -125,13 +134,13 @@ export const NoteWithManyAncestors: Story = {
 export const InSequence: Story = {
   args: {
     answeredQuestion: (() => {
-      const question = createAnsweredQuestionWithQuestion(
-        "Which of the following is a JavaScript framework?",
-        ["React", "Python", "Java", "C++"],
-        0,
-        0,
-        true
-      )
+      const question = createAnsweredQuestionWithQuestion({
+        stem: "Which of the following is a JavaScript framework?",
+        choices: ["React", "Python", "Java", "C++"],
+        correctIndex: 0,
+        answerIndex: 0,
+        isCorrect: true,
+      })
       return {
         ...question,
         id: 1,
@@ -150,13 +159,13 @@ export const InSequence: Story = {
 export const WithoutConversationButton: Story = {
   args: {
     answeredQuestion: (() => {
-      const question = createAnsweredQuestionWithQuestion(
-        "What is 2 + 2?",
-        ["3", "4", "5", "6"],
-        1,
-        1,
-        true
-      )
+      const question = createAnsweredQuestionWithQuestion({
+        stem: "What is 2 + 2?",
+        choices: ["3", "4", "5", "6"],
+        correctIndex: 1,
+        answerIndex: 1,
+        isCorrect: true,
+      })
       return {
         ...question,
         note: makeMe.aNote
@@ -174,13 +183,13 @@ export const WithoutConversationButton: Story = {
 export const CustomQuestion: Story = {
   args: {
     answeredQuestion: (() => {
-      const question = createAnsweredQuestionWithQuestion(
-        "Which data structure follows LIFO principle?",
-        ["Queue", "Stack", "Array", "Linked List"],
-        1,
-        2,
-        false
-      )
+      const question = createAnsweredQuestionWithQuestion({
+        stem: "Which data structure follows LIFO principle?",
+        choices: ["Queue", "Stack", "Array", "Linked List"],
+        correctIndex: 1,
+        answerIndex: 2,
+        isCorrect: false,
+      })
       return {
         ...question,
         note: makeMe.aNote

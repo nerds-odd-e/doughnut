@@ -15,6 +15,11 @@ import {
   toOpenApiError,
   setErrorObjectForFieldErrors,
 } from "@/managedApi/openApiError"
+
+function toErrorMessage(error: unknown, fallback: string): string {
+  if (typeof error === "string") return error
+  return error ? (toOpenApiError(error).message ?? fallback) : fallback
+}
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { Ref } from "vue"
 import type { Router } from "vue-router"
@@ -136,7 +141,7 @@ export default class StoredApiCollection implements StoredApi {
         })
       )
       if (error || !data) {
-        throw new Error(error || "Failed to update note title")
+        throw new Error(toErrorMessage(error, "Failed to update note title"))
       }
       return data
     }
@@ -149,7 +154,7 @@ export default class StoredApiCollection implements StoredApi {
       })
     )
     if (error || !data) {
-      throw new Error(error || "Failed to update note details")
+      throw new Error(toErrorMessage(error, "Failed to update note details"))
     }
     return data
   }
@@ -191,7 +196,7 @@ export default class StoredApiCollection implements StoredApi {
       })
     )
     if (error || !noteRealm) {
-      throw new Error(error || "Failed to load note")
+      throw new Error(toErrorMessage(error, "Failed to load note"))
     }
     return this.storage.refreshNoteRealm(noteRealm)
   }
@@ -298,7 +303,7 @@ export default class StoredApiCollection implements StoredApi {
       })
     )
     if (error || !noteRealms) {
-      throw new Error(error || "Failed to create relationship")
+      throw new Error(toErrorMessage(error, "Failed to create relationship"))
     }
     this.refreshNoteRealms(noteRealms)
     const relationNote = noteRealms[0]
@@ -318,7 +323,7 @@ export default class StoredApiCollection implements StoredApi {
       })
     )
     if (error || !noteRealms) {
-      throw new Error(error || "Failed to update relationship")
+      throw new Error(toErrorMessage(error, "Failed to update relationship"))
     }
     this.refreshNoteRealms(noteRealms)
   }
@@ -344,7 +349,7 @@ export default class StoredApiCollection implements StoredApi {
       })
     )
     if (error || !updatedNotes) {
-      throw new Error(error || "Failed to move note")
+      throw new Error(toErrorMessage(error, "Failed to move note"))
     }
     this.refreshNoteRealms(updatedNotes)
 
@@ -441,7 +446,7 @@ export default class StoredApiCollection implements StoredApi {
       })
     )
     if (error || !noteRealm) {
-      throw new Error(error || "Failed to undo delete note")
+      throw new Error(toErrorMessage(error, "Failed to undo delete note"))
     }
     return noteRealm
   }
@@ -456,7 +461,7 @@ export default class StoredApiCollection implements StoredApi {
         NoteController.moveToTopLevel({ path: { note: noteId } })
       )
       if (error || !noteRealm) {
-        throw new Error(error || "Failed to undo move note")
+        throw new Error(toErrorMessage(error, "Failed to undo move note"))
       }
       this.refreshNoteRealms([noteRealm])
       return noteRealm
@@ -492,7 +497,7 @@ export default class StoredApiCollection implements StoredApi {
       })
     )
     if (error || !updatedNotes) {
-      throw new Error(error || "Failed to undo move note")
+      throw new Error(toErrorMessage(error, "Failed to undo move note"))
     }
     this.refreshNoteRealms(updatedNotes)
     return updatedNotes
@@ -505,7 +510,7 @@ export default class StoredApiCollection implements StoredApi {
       })
     )
     if (error || !res) {
-      throw new Error(error || "Failed to undo create note")
+      throw new Error(toErrorMessage(error, "Failed to undo create note"))
     }
     this.storage.removeNoteRealm(noteId)
     if (res.length === 0) {
@@ -533,7 +538,7 @@ export default class StoredApiCollection implements StoredApi {
       })
     )
     if (error || !res) {
-      throw new Error(error || "Failed to delete note")
+      throw new Error(toErrorMessage(error, "Failed to delete note"))
     }
     this.noteEditingHistory.deleteNote(noteId)
     this.storage.removeNoteRealm(noteId)
@@ -563,7 +568,7 @@ export default class StoredApiCollection implements StoredApi {
       })
     )
     if (error || !noteRealms) {
-      throw new Error(error || "Failed to move note")
+      throw new Error(toErrorMessage(error, "Failed to move note"))
     }
     this.refreshNoteRealms(noteRealms)
 

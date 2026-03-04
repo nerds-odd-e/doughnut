@@ -17,13 +17,13 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 // Helper to create a recall prompt with answer
-const createRecallPromptWithAnswer = (
-  stem: string,
-  choices: string[],
-  correctIndex: number,
-  answerIndex: number,
+const createRecallPromptWithAnswer = (opts: {
+  stem: string
+  choices: string[]
+  correctIndex: number
+  answerIndex: number
   isCorrect: boolean
-) => {
+}) => {
   const note = makeMe.aNote
     .title("France")
     .details(
@@ -32,9 +32,9 @@ const createRecallPromptWithAnswer = (
     .please()
 
   const predefinedQuestion = makeMe.aPredefinedQuestion
-    .withQuestionStem(stem)
-    .withChoices(choices)
-    .correctAnswerIndex(correctIndex)
+    .withQuestionStem(opts.stem)
+    .withChoices(opts.choices)
+    .correctAnswerIndex(opts.correctIndex)
     .please()
 
   return makeMe.aRecallPrompt
@@ -42,8 +42,8 @@ const createRecallPromptWithAnswer = (
     .withPredefinedQuestion(predefinedQuestion)
     .withAnswer({
       id: 1,
-      correct: isCorrect,
-      choiceIndex: answerIndex,
+      correct: opts.isCorrect,
+      choiceIndex: opts.answerIndex,
     })
     .withAnswerTime(new Date().toISOString())
     .please()
@@ -53,13 +53,13 @@ const createRecallPromptWithAnswer = (
 export const WithAnsweredQuestion: Story = {
   args: {
     recallPrompts: [
-      createRecallPromptWithAnswer(
-        "What is the capital of France?",
-        ["Paris", "London", "Berlin", "Madrid"],
-        0,
-        0,
-        true
-      ),
+      createRecallPromptWithAnswer({
+        stem: "What is the capital of France?",
+        choices: ["Paris", "London", "Berlin", "Madrid"],
+        correctIndex: 0,
+        answerIndex: 0,
+        isCorrect: true,
+      }),
     ],
     memoryTracker: makeMe.aMemoryTracker.please(),
     memoryTrackerId: 1,
@@ -70,13 +70,13 @@ export const WithAnsweredQuestion: Story = {
 export const WithIncorrectAnswer: Story = {
   args: {
     recallPrompts: [
-      createRecallPromptWithAnswer(
-        "What is the capital of France?",
-        ["Paris", "London", "Berlin", "Madrid"],
-        0,
-        1,
-        false
-      ),
+      createRecallPromptWithAnswer({
+        stem: "What is the capital of France?",
+        choices: ["Paris", "London", "Berlin", "Madrid"],
+        correctIndex: 0,
+        answerIndex: 1,
+        isCorrect: false,
+      }),
     ],
     memoryTracker: makeMe.aMemoryTracker.please(),
     memoryTrackerId: 1,

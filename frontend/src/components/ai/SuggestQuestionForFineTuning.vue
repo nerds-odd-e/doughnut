@@ -57,12 +57,10 @@ const props = defineProps<{
 
 const emit = defineEmits(["closeDialog"])
 
-const { predefinedQuestion } = props
-
 async function suggestQuestionForFineTuning() {
   const { error } = await apiCallWithLoading(() =>
     PredefinedQuestionController.suggestQuestionForFineTuning({
-      path: { predefinedQuestion: predefinedQuestion.id },
+      path: { predefinedQuestion: props.predefinedQuestion.id },
       body: params.value,
     })
   )

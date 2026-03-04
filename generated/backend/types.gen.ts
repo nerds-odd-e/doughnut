@@ -730,6 +730,10 @@ export type GetUserProfileData = {
 
 export type GetUserProfileErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -754,6 +758,10 @@ export type CreateUserData = {
 };
 
 export type CreateUserErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -780,6 +788,10 @@ export type GenerateTokenData = {
 
 export type GenerateTokenErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -804,6 +816,10 @@ export type CloseAllGithubIssuesData = {
 };
 
 export type CloseAllGithubIssuesErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -830,6 +846,10 @@ export type TriggerExceptionData = {
 
 export type TriggerExceptionErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -855,6 +875,10 @@ export type TimeTravelRelativeToNowData = {
 
 export type TimeTravelRelativeToNowErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -879,6 +903,10 @@ export type TimeTravelData = {
 };
 
 export type TimeTravelErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -909,6 +937,10 @@ export type TestabilityUpdateUserData = {
 
 export type TestabilityUpdateUserErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -935,6 +967,10 @@ export type ShareToBazaarData = {
 };
 
 export type ShareToBazaarErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -963,6 +999,10 @@ export type ReplaceServiceUrlData = {
 
 export type ReplaceServiceUrlErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -985,6 +1025,10 @@ export type RandomizerData = {
 };
 
 export type RandomizerErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -1013,6 +1057,10 @@ export type SetOpenAiTokenData = {
 
 export type SetOpenAiTokenErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1035,6 +1083,10 @@ export type InjectSuggestedQuestionData = {
 };
 
 export type InjectSuggestedQuestionErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -1060,6 +1112,10 @@ export type InjectNotesData = {
 };
 
 export type InjectNotesErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -1090,6 +1146,10 @@ export type InjectCircleData = {
 
 export type InjectCircleErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1115,6 +1175,10 @@ export type InjectPredefinedQuestionData = {
 
 export type InjectPredefinedQuestionErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1139,6 +1203,10 @@ export type GetFeatureToggleData = {
 };
 
 export type GetFeatureToggleErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -1167,6 +1235,10 @@ export type EnableFeatureToggleData = {
 
 export type EnableFeatureToggleErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1194,6 +1266,10 @@ export type CreateRelationshipsData = {
 
 export type CreateRelationshipsErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1218,6 +1294,10 @@ export type ResetDbAndTestabilitySettingsData = {
 };
 
 export type ResetDbAndTestabilitySettingsErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -1246,6 +1326,10 @@ export type UpdateSubscriptionData = {
 
 export type UpdateSubscriptionErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1272,6 +1356,10 @@ export type DestroySubscriptionData = {
 };
 
 export type DestroySubscriptionErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -1300,6 +1388,10 @@ export type CreateSubscriptionData = {
 
 export type CreateSubscriptionErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1325,6 +1417,10 @@ export type GetCurrentModelVersionsData = {
 
 export type GetCurrentModelVersionsErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1349,6 +1445,10 @@ export type SetCurrentModelVersionsData = {
 };
 
 export type SetCurrentModelVersionsErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -1376,6 +1476,10 @@ export type UpdateRelationshipData = {
 };
 
 export type UpdateRelationshipErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -1405,6 +1509,10 @@ export type MoveNoteData = {
 
 export type MoveNoteErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1433,6 +1541,10 @@ export type AddRelationshipFinalizeData = {
 
 export type AddRelationshipFinalizeErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1459,6 +1571,10 @@ export type RegenerateData = {
 };
 
 export type RegenerateErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -1487,6 +1603,10 @@ export type ContestData = {
 
 export type ContestErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1513,6 +1633,10 @@ export type AnswerQuizData = {
 };
 
 export type AnswerQuizErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -1541,6 +1665,10 @@ export type AnswerSpellingData = {
 
 export type AnswerSpellingErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1567,6 +1695,10 @@ export type ToggleApprovalData = {
 };
 
 export type ToggleApprovalErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -1595,6 +1727,10 @@ export type SuggestQuestionForFineTuningData = {
 
 export type SuggestQuestionForFineTuningErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1621,6 +1757,10 @@ export type RefineQuestionData = {
 };
 
 export type RefineQuestionErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -1649,6 +1789,10 @@ export type GetAllQuestionByNoteData = {
 
 export type GetAllQuestionByNoteErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1675,6 +1819,10 @@ export type AddQuestionManuallyData = {
 };
 
 export type AddQuestionManuallyErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -1703,6 +1851,10 @@ export type GenerateQuestionWithoutSaveData = {
 
 export type GenerateQuestionWithoutSaveErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1729,6 +1881,10 @@ export type CreateNoteAfterData = {
 };
 
 export type CreateNoteAfterErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -1757,6 +1913,10 @@ export type CreateNoteUnderParentData = {
 
 export type CreateNoteUnderParentErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1783,6 +1943,10 @@ export type VerifySpellingData = {
 };
 
 export type VerifySpellingErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -1811,6 +1975,10 @@ export type UpdateWikidataIdData = {
 
 export type UpdateWikidataIdErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1837,6 +2005,10 @@ export type SemanticSearchWithinData = {
 };
 
 export type SemanticSearchWithinErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -1865,6 +2037,10 @@ export type SearchForRelationshipTargetWithinData = {
 
 export type SearchForRelationshipTargetWithinErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1891,6 +2067,10 @@ export type UpdateNoteRecallSettingData = {
 };
 
 export type UpdateNoteRecallSettingErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -1919,6 +2099,10 @@ export type DeleteNoteData = {
 
 export type DeleteNoteErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1944,6 +2128,10 @@ export type SemanticSearchData = {
 
 export type SemanticSearchErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -1968,6 +2156,10 @@ export type SearchForRelationshipTargetData = {
 };
 
 export type SearchForRelationshipTargetErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -1998,6 +2190,10 @@ export type MoveAfterData = {
 
 export type MoveAfterErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2024,6 +2220,10 @@ export type GetData = {
 };
 
 export type GetErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -2052,6 +2252,10 @@ export type UpdateNotebookData = {
 
 export type UpdateNotebookErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2079,6 +2283,10 @@ export type UpdateNotebookIndexData = {
 
 export type UpdateNotebookIndexErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2103,6 +2311,10 @@ export type ShareNotebookData = {
 };
 
 export type ShareNotebookErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -2131,6 +2343,10 @@ export type ResetNotebookIndexData = {
 
 export type ResetNotebookIndexErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2155,6 +2371,10 @@ export type DownloadNotebookForObsidianData = {
 };
 
 export type DownloadNotebookForObsidianErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -2191,6 +2411,10 @@ export type ImportObsidianData = {
 
 export type ImportObsidianErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2213,6 +2437,10 @@ export type CreateNotebookData = {
 };
 
 export type CreateNotebookErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -2241,6 +2469,10 @@ export type ApproveData = {
 
 export type ApproveErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2267,6 +2499,10 @@ export type RequestApprovalForNotebookData = {
 };
 
 export type RequestApprovalForNotebookErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -2295,6 +2531,10 @@ export type SoftDeleteData = {
 
 export type SoftDeleteErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2319,6 +2559,10 @@ export type RemoveFromRepeatingData = {
 };
 
 export type RemoveFromRepeatingErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -2347,6 +2591,10 @@ export type ReEnableData = {
 
 export type ReEnableErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2371,6 +2619,10 @@ export type CreateNoteViaMcpData = {
 };
 
 export type CreateNoteViaMcpErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -2399,6 +2651,10 @@ export type DuplicateData = {
 
 export type DuplicateErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2426,6 +2682,10 @@ export type DeleteData = {
 
 export type DeleteErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2451,6 +2711,10 @@ export type UploadAndTriggerFineTuningData = {
 
 export type UploadAndTriggerFineTuningErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2475,6 +2739,10 @@ export type ReplyToConversationData = {
 };
 
 export type ReplyToConversationErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -2503,6 +2771,10 @@ export type GetAiReplyData = {
 
 export type GetAiReplyErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2529,6 +2801,10 @@ export type StartConversationAboutRecallPromptData = {
 };
 
 export type StartConversationAboutRecallPromptErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -2557,6 +2833,10 @@ export type GetConversationsAboutNoteData = {
 
 export type GetConversationsAboutNoteErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2583,6 +2863,10 @@ export type StartConversationAboutNoteData = {
 };
 
 export type StartConversationAboutNoteErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -2611,6 +2895,10 @@ export type StartConversationAboutAssessmentQuestionData = {
 
 export type StartConversationAboutAssessmentQuestionErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2636,6 +2924,10 @@ export type IndexData = {
 
 export type IndexErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2660,6 +2952,10 @@ export type CreateCircleData = {
 };
 
 export type CreateCircleErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -2688,6 +2984,10 @@ export type CreateNotebookInCircleData = {
 
 export type CreateNotebookInCircleErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2712,6 +3012,10 @@ export type JoinCircleData = {
 };
 
 export type JoinCircleErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -2740,6 +3044,10 @@ export type GetCertificateData = {
 
 export type GetCertificateErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2766,6 +3074,10 @@ export type ClaimCertificateData = {
 };
 
 export type ClaimCertificateErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -2794,6 +3106,10 @@ export type RemoveFromBazaarData = {
 
 export type RemoveFromBazaarErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2819,6 +3135,10 @@ export type AudioToTextData = {
 
 export type AudioToTextErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2843,6 +3163,10 @@ export type AssimilateData = {
 };
 
 export type AssimilateErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -2871,6 +3195,10 @@ export type AnswerQuestionData = {
 
 export type AnswerQuestionErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2897,6 +3225,10 @@ export type SubmitAssessmentResultData = {
 };
 
 export type SubmitAssessmentResultErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -2925,6 +3257,10 @@ export type GenerateAssessmentQuestionsData = {
 
 export type GenerateAssessmentQuestionsErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -2951,6 +3287,10 @@ export type SuggestTitleData = {
 };
 
 export type SuggestTitleErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -2979,6 +3319,10 @@ export type RemovePointFromNoteData = {
 
 export type RemovePointFromNoteErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3005,6 +3349,10 @@ export type PromotePointToSiblingData = {
 };
 
 export type PromotePointToSiblingErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -3033,6 +3381,10 @@ export type PromotePointToChildData = {
 
 export type PromotePointToChildErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3060,6 +3412,10 @@ export type GenerateUnderstandingChecklistData = {
 
 export type GenerateUnderstandingChecklistErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3084,6 +3440,10 @@ export type GenerateImageData = {
 };
 
 export type GenerateImageErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -3112,6 +3472,10 @@ export type UpdateUserData = {
 
 export type UpdateUserErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3138,6 +3502,10 @@ export type UpdateNoteTitleData = {
 };
 
 export type UpdateNoteTitleErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -3166,6 +3534,10 @@ export type UpdateNoteDetailsData = {
 
 export type UpdateNoteDetailsErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3192,6 +3564,10 @@ export type ShowNoteData = {
 };
 
 export type ShowNoteErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -3220,6 +3596,10 @@ export type UpdateNoteAccessoriesData = {
 
 export type UpdateNoteAccessoriesErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3246,6 +3626,10 @@ export type UndoDeleteNoteData = {
 };
 
 export type UndoDeleteNoteErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -3274,6 +3658,10 @@ export type UpdateNoteTypeData = {
 
 export type UpdateNoteTypeErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3300,6 +3688,10 @@ export type MoveToTopLevelData = {
 };
 
 export type MoveToTopLevelErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -3329,6 +3721,10 @@ export type MoveToCircleData = {
 
 export type MoveToCircleErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3356,6 +3752,10 @@ export type GetAiAssistantData = {
 
 export type GetAiAssistantErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3382,6 +3782,10 @@ export type UpdateAiAssistantData = {
 };
 
 export type UpdateAiAssistantErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -3412,6 +3816,10 @@ export type MarkAsRepeatedData = {
 
 export type MarkAsRepeatedErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3438,6 +3846,10 @@ export type UpdateSuggestedQuestionForFineTuningData = {
 };
 
 export type UpdateSuggestedQuestionForFineTuningErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -3466,6 +3878,10 @@ export type MarkConversationAsReadData = {
 
 export type MarkConversationAsReadErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3492,6 +3908,10 @@ export type SearchWikidataData = {
 };
 
 export type SearchWikidataErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -3520,6 +3940,10 @@ export type FetchWikidataEntityDataByIdData = {
 
 export type FetchWikidataEntityDataByIdErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3547,6 +3971,10 @@ export type GetMenuDataData = {
 
 export type GetMenuDataErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3571,6 +3999,10 @@ export type GetTokensData = {
 };
 
 export type GetTokensErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -3597,6 +4029,10 @@ export type CurrentUserInfoData = {
 
 export type CurrentUserInfoErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3621,6 +4057,10 @@ export type GithubIssuesData = {
 };
 
 export type GithubIssuesErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -3652,6 +4092,10 @@ export type RecallingData = {
 
 export type RecallingErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3679,6 +4123,10 @@ export type PreviouslyAnsweredData = {
 
 export type PreviouslyAnsweredErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3705,6 +4153,10 @@ export type ExportQuestionGenerationData = {
 };
 
 export type ExportQuestionGenerationErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -3735,6 +4187,10 @@ export type GetNoteInfoData = {
 
 export type GetNoteInfoErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3764,6 +4220,10 @@ export type GetGraphData = {
 
 export type GetGraphErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3790,6 +4250,10 @@ export type GetDescendantsData = {
 };
 
 export type GetDescendantsErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -3818,6 +4282,10 @@ export type ShowNoteAccessoryData = {
 
 export type ShowNoteAccessoryErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3842,6 +4310,10 @@ export type GetRecentNotesData = {
 };
 
 export type GetRecentNotesErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -3868,6 +4340,10 @@ export type MyNotebooksData = {
 
 export type MyNotebooksErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3892,6 +4368,10 @@ export type GetAllPendingRequestData = {
 };
 
 export type GetAllPendingRequestErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -3920,6 +4400,10 @@ export type GetApprovalForNotebookData = {
 
 export type GetApprovalForNotebookErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -3946,6 +4430,10 @@ export type ShowMemoryTrackerData = {
 };
 
 export type ShowMemoryTrackerErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -3974,6 +4462,10 @@ export type GetThresholdExceededData = {
 
 export type GetThresholdExceededErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -4000,6 +4492,10 @@ export type GetRecallPromptsData = {
 };
 
 export type GetRecallPromptsErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -4028,6 +4524,10 @@ export type AskAQuestionData = {
 
 export type AskAQuestionErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -4052,6 +4552,10 @@ export type GetRecentlyRecalledData = {
 };
 
 export type GetRecentlyRecalledErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -4078,6 +4582,10 @@ export type GetRecentMemoryTrackersData = {
 
 export type GetRecentMemoryTrackersErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -4102,6 +4610,10 @@ export type PingData = {
 };
 
 export type PingErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -4128,6 +4640,10 @@ export type GetAllSuggestedQuestionsData = {
 
 export type GetAllSuggestedQuestionsErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -4152,6 +4668,10 @@ export type FailureReportsData = {
 };
 
 export type FailureReportsErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -4182,6 +4702,10 @@ export type ShowFailureReportData = {
 
 export type ShowFailureReportErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -4206,6 +4730,10 @@ export type DataUpgradeData = {
 };
 
 export type DataUpgradeErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -4234,6 +4762,10 @@ export type GetConversationData = {
 
 export type GetConversationErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -4260,6 +4792,10 @@ export type GetConversationMessagesData = {
 };
 
 export type GetConversationMessagesErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -4288,6 +4824,10 @@ export type ExportConversationData = {
 
 export type ExportConversationErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -4314,6 +4854,10 @@ export type GetConversationsOfCurrentUserData = {
 };
 
 export type GetConversationsOfCurrentUserErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -4342,6 +4886,10 @@ export type ShowCircleData = {
 
 export type ShowCircleErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -4366,6 +4914,10 @@ export type BazaarData = {
 };
 
 export type BazaarErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -4394,6 +4946,10 @@ export type AssimilatingData = {
 
 export type AssimilatingErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -4418,6 +4974,10 @@ export type GetMyAssessmentsData = {
 };
 
 export type GetMyAssessmentsErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -4444,6 +5004,10 @@ export type DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamData = {
 
 export type DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -4468,6 +5032,10 @@ export type GetAvailableGptModelsData = {
 };
 
 export type GetAvailableGptModelsErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */
@@ -4497,6 +5065,10 @@ export type ListUsersData = {
 
 export type ListUsersErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -4524,6 +5096,10 @@ export type DeleteTokenData = {
 
 export type DeleteTokenErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -4549,6 +5125,10 @@ export type DeleteUnansweredRecallPromptsData = {
 
 export type DeleteUnansweredRecallPromptsErrors = {
     /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
      * Internal Server Error
      */
     500: string;
@@ -4571,6 +5151,10 @@ export type DeleteFailureReportsData = {
 };
 
 export type DeleteFailureReportsErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * Internal Server Error
      */

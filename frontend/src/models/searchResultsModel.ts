@@ -125,27 +125,30 @@ export class SearchResultsModel {
     return this.state.previousSearchResult !== undefined
   }
 
-  getDisplayState(
-    trimmedSearchKey: string,
-    isGlobal: boolean,
-    noteId: number | undefined,
-    isDropdown: boolean,
+  getDisplayState(opts: {
+    trimmedSearchKey: string
+    isGlobal: boolean
+    noteId: number | undefined
+    isDropdown: boolean
     filteredRecentNotesCount: number
-  ): DisplayState {
-    const searchResult = this.getSearchResult(trimmedSearchKey, isGlobal)
-    const hasSearchKey = trimmedSearchKey !== ""
+  }): DisplayState {
+    const searchResult = this.getSearchResult(
+      opts.trimmedSearchKey,
+      opts.isGlobal
+    )
+    const hasSearchKey = opts.trimmedSearchKey !== ""
     const hasSearchResults = searchResult !== undefined
-    const hasRecentNotes = filteredRecentNotesCount > 0
+    const hasRecentNotes = opts.filteredRecentNotesCount > 0
     const isWaitingForFirstSearch =
       !hasSearchResults &&
       this.state.previousSearchResult === undefined &&
       hasSearchKey
     const shouldShowRecent =
-      (isGlobal || noteId) &&
+      (opts.isGlobal || opts.noteId) &&
       (!hasSearchKey || isWaitingForFirstSearch) &&
       !hasSearchResults
 
-    const containerClass = isDropdown ? "dropdown-list" : "result-section"
+    const containerClass = opts.isDropdown ? "dropdown-list" : "result-section"
 
     if (shouldShowRecent && hasRecentNotes) {
       return {
@@ -170,8 +173,8 @@ export class SearchResultsModel {
     if (!this.state.isSearchInProgress) {
       if (hasSearchResults && searchResult.length === 0) {
         let emptyMessage = "No matching notes found."
-        if (isDropdown && !hasSearchKey) {
-          emptyMessage = noteId
+        if (opts.isDropdown && !hasSearchKey) {
+          emptyMessage = opts.noteId
             ? "No recent notes found."
             : "Similar notes within the same notebook"
         }
@@ -185,7 +188,7 @@ export class SearchResultsModel {
         }
       }
 
-      if (!hasSearchKey && noteId && isDropdown && !hasRecentNotes) {
+      if (!hasSearchKey && opts.noteId && opts.isDropdown && !hasRecentNotes) {
         return {
           showRecentNotes: false,
           showEmptyState: true,
