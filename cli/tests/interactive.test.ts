@@ -1,29 +1,12 @@
-import { describe, test, expect, beforeAll, vi } from 'vitest'
-import { spawnSync } from 'node:child_process'
-import { existsSync } from 'node:fs'
-import { join } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { processInput } from '../src/interactive.js'
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
+import { Readable } from 'node:stream'
+import { processInput, runInteractive } from '../src/interactive.js'
 
-const cliDir = fileURLToPath(new URL('../', import.meta.url))
-const bundlePath = join(cliDir, 'dist', 'doughnut-cli.bundle.mjs')
-
-function runCli(input: string): {
-  stdout: string
-  stderr: string
-  status: number
-} {
-  const result = spawnSync('node', [bundlePath], {
-    input,
-    encoding: 'utf8',
-    timeout: 5000,
-    env: { ...process.env, CLI_VERSION: '0.1.0' },
-  })
-  return {
-    stdout: result.stdout ?? '',
-    stderr: result.stderr ?? '',
-    status: result.status ?? -1,
-  }
+function createMockStdin(input: string): NodeJS.ReadableStream {
+  const stream = new Readable({ read: () => {} })
+  stream.push(input)
+  stream.push(null)
+  return Object.assign(stream, { isTTY: false })
 }
 
 describe('processInput', () => {
@@ -49,36 +32,54 @@ describe('processInput', () => {
 })
 
 describe('interactive CLI (e2e style)', () => {
-  beforeAll(() => {
-    if (!existsSync(bundlePath)) {
-      throw new Error(
-        `CLI bundle not found at ${bundlePath}. Run 'pnpm cli:bundle' first.`
-      )
-    }
+  let logSpy: ReturnType<typeof vi.spyOn>
+  let exitSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    exitSpy = vi
+      .spyOn(process, 'exit')
+      .mockImplementation((() => {}) as typeof process.exit)
   })
 
-  test('responds "Not supported" to any input', () => {
-    const { stdout } = runCli('hello\nexit')
-    expect(stdout).toContain('Not supported')
+  afterEach(() => {
+    logSpy.mockRestore()
+    exitSpy.mockRestore()
   })
 
-  test('exit command exits the CLI', () => {
-    const { status } = runCli('exit')
-    expect(status).toBe(0)
+  test('responds "Not supported" to any input', async () => {
+    const stdin = createMockStdin('hello\nexit\n')
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    expect(logSpy).toHaveBeenCalledWith('Not supported')
+    expect(exitSpy).toHaveBeenCalledWith(0)
   })
 
-  test('shift-enter adds newline without triggering response (piped mode processes each line)', () => {
-    const { stdout } = runCli('line1\nline2\nexit')
-    expect(stdout).toContain('Not supported')
-    const notSupportedCount = (stdout.match(/Not supported/g) ?? []).length
-    expect(notSupportedCount).toBe(2)
+  test('exit command exits the CLI', async () => {
+    const stdin = createMockStdin('exit\n')
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    expect(exitSpy).toHaveBeenCalledWith(0)
   })
 
-  test('shows Cursor-like UI with version, box, and placeholder', () => {
-    const { stdout } = runCli('exit')
-    expect(stdout).toContain('doughnut 0.1.0')
-    expect(stdout).toContain('→')
-    expect(stdout).toContain('Plan, search, build anything')
-    expect(stdout).toContain('exit to quit')
+  test('each line triggers separate response (shift-enter adds newline in TTY)', async () => {
+    const stdin = createMockStdin('line1\nline2\nexit\n')
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    const notSupportedCalls = logSpy.mock.calls.filter(
+      (c) => c[0] === 'Not supported'
+    )
+    expect(notSupportedCalls).toHaveLength(2)
+  })
+
+  test('shows Cursor-like UI with version, box, and placeholder', async () => {
+    const stdin = createMockStdin('exit\n')
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    const output = logSpy.mock.calls.flat().join('\n')
+    expect(output).toContain('doughnut')
+    expect(output).toContain('→')
+    expect(output).toContain('Plan, search, build anything')
+    expect(output).toContain('exit to quit')
   })
 })
