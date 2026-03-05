@@ -6,36 +6,25 @@ on:
       - 'cli-*'
 
 env:
-  ARTIFACT: "doughnut"
-  VERSION: "0.0.1-SNAPSHOT"
   GCS_BUCKET: "dough-01"
   GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
 
 jobs:
-  build-and-deploy:
-    name: Build CLI and deploy
+  build-and-publish:
+    name: Build and publish CLI to GCS
     runs-on: ${{ vars.RUNNER }}
     steps:
       - uses: actions/checkout@v6
-      - uses: ./.github/setup_jdk_with_cache
-        with:
-          java_version: ${{ vars.JAVA_VERSION }}
       - uses: ./.github/setup_nodejs_with_cache
         with:
           node_version: ${{ vars.NODE_VERSION }}
           pnpm_version: ${{ vars.PNPM_VERSION }}
       - name: Set CLI version from tag
         run: echo "CLI_VERSION=${GITHUB_REF#refs/tags/cli-v}" >> $GITHUB_ENV
-      - name: Build CLI and copy to static, then bundle all
-        run: pnpm bundle:all
-      - name: Build application jar artifact
-        run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
+      - name: Build CLI
+        run: pnpm cli:bundle
       - uses: ./.github/gcloud_auth_n_sdk
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
-      - uses: google-github-actions/upload-cloud-storage@v3
-        with:
-          path: backend/build/libs/${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
-          destination: ${{ env.GCS_BUCKET }}/backend_app_jar
-      - name: Perform rolling replace to GCP MIG doughnut-app-group
-        run: infra/gcp/scripts/perform-rolling-replace-app-mig.sh
+      - name: Upload CLI binary to GCS
+        run: gsutil cp cli/dist/doughnut-cli.bundle.mjs gs://${{ env.GCS_BUCKET }}/doughnut-cli-latest/doughnut

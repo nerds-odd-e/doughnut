@@ -25,7 +25,8 @@ cli/
 ## Build output
 
 - Bundle: `cli/dist/doughnut-cli.bundle.mjs` (with shebang)
-- Deployed to: `backend/src/main/resources/static/doughnut-cli-latest/doughnut`
+- Production: uploaded to GCS at `gs://dough-01/doughnut-cli-latest/doughnut` via `cli-release.yml`
+- E2e tests: copied to `backend/build/resources/main/static/doughnut-cli-latest/doughnut`
 
 ## Install scripts
 

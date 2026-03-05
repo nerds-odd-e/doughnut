@@ -1,5 +1,5 @@
 $ErrorActionPreference = 'Stop'
-$BaseUrl = if ($env:BASE_URL) { $env:BASE_URL } else { 'https://doughnut.odd-e.com' }
+$BaseUrl = if ($env:BASE_URL) { $env:BASE_URL } else { 'https://storage.googleapis.com/dough-01' }
 $InstallPrefix = if ($env:INSTALL_PREFIX) { $env:INSTALL_PREFIX } else { "$env:USERPROFILE\.local\bin" }
 $DownloadUrl = "$BaseUrl/doughnut-cli-latest/doughnut"
 

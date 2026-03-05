@@ -9,7 +9,8 @@ import {
   compareVersions,
 } from './version.js'
 
-const BASE_URL = process.env.BASE_URL ?? 'https://doughnut.odd-e.com'
+const BASE_URL =
+  process.env.BASE_URL ?? 'https://storage.googleapis.com/dough-01'
 const DOWNLOAD_PATH = `${BASE_URL}/doughnut-cli-latest/doughnut`
 
 export async function runUpdate(): Promise<void> {
