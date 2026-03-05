@@ -10,9 +10,11 @@ onlyBuiltDependencies:
   - '@badeball/cypress-cucumber-preprocessor'
   - '@biomejs/biome'
   - '@parcel/watcher'
+  - core-js
   - core-js-pure
   - cypress
   - esbuild
+  - protobufjs
 
 ignoredBuiltDependencies:
   - package-with-unnecessary-build-scripts

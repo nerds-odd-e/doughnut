@@ -133,11 +133,13 @@
       "@badeball/cypress-cucumber-preprocessor",
       "@biomejs/biome",
       "@parcel/watcher",
+      "core-js",
       "core-js-pure",
       "cypress",
       "esbuild",
       "github_action_sound",
-      "package-with-necessary-build-scripts"
+      "package-with-necessary-build-scripts",
+      "protobufjs"
     ],
     "patchedDependencies": {
       "find-cypress-specs@1.54.9": "patches/find-cypress-specs@1.54.9.patch"
