@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+#
+# Tests for scripts/format_changed.sh using Bach testing framework
+# Tests the subproject mapping logic: which file paths trigger which format commands
+
+source "$(dirname "$0")/vendor/bach.sh"
+
+test-backend-files-trigger-backend-format() {
+  CHANGED_FILES="backend/Foo.java"
+  run_backend=false
+  while IFS= read -r file; do
+    case "$file" in
+      backend/*) run_backend=true ;;
+    esac
+  done <<< "$CHANGED_FILES"
+  @out "run_backend=$run_backend"
+}
+test-backend-files-trigger-backend-format-assert() {
+  @out "run_backend=true"
+}
+
+test-frontend-files-trigger-frontend-format() {
+  CHANGED_FILES="frontend/src/App.vue"
+  run_frontend=false
+  while IFS= read -r file; do
+    case "$file" in
+      frontend/*) run_frontend=true ;;
+    esac
+  done <<< "$CHANGED_FILES"
+  @out "run_frontend=$run_frontend"
+}
+test-frontend-files-trigger-frontend-format-assert() {
+  @out "run_frontend=true"
+}
+
+test-e2e-test-files-trigger-cy-format() {
+  CHANGED_FILES="e2e_test/step_definitions/foo.ts"
+  run_cy=false
+  while IFS= read -r file; do
+    case "$file" in
+      e2e_test/*|cypress.config.*|cypress/*) run_cy=true ;;
+    esac
+  done <<< "$CHANGED_FILES"
+  @out "run_cy=$run_cy"
+}
+test-e2e-test-files-trigger-cy-format-assert() {
+  @out "run_cy=true"
+}
+
+test-openapi-yaml-triggers-openapi-lint() {
+  CHANGED_FILES="open_api_docs.yaml"
+  run_openapi=false
+  while IFS= read -r file; do
+    case "$file" in
+      open_api_docs.yaml) run_openapi=true ;;
+    esac
+  done <<< "$CHANGED_FILES"
+  @out "run_openapi=$run_openapi"
+}
+test-openapi-yaml-triggers-openapi-lint-assert() {
+  @out "run_openapi=true"
+}

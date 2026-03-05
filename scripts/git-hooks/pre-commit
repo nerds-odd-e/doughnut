@@ -14,8 +14,8 @@ REPO_ROOT="$(cd "$HOOK_DIR/../.." && pwd)"
 
 cd "$REPO_ROOT"
 
-# Run formatter
-./scripts/run.sh pnpm format:all
+# Run formatter for changed subprojects only
+./scripts/run.sh pnpm format:changed
 
 # Stage any files that were modified by the formatter
 # This ensures formatted changes are included in the commit
