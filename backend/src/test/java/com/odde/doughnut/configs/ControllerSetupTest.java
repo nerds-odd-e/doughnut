@@ -93,6 +93,18 @@ public class ControllerSetupTest {
   }
 
   @Test
+  void shouldRecordGithubErrorInFailureReportWhenGithubFails()
+      throws IOException, InterruptedException {
+    when(githubService.createGithubIssue(any()))
+        .thenThrow(
+            new IOException("GitHub API returned HTTP 401: {\"message\":\"Bad credentials\"}"));
+    FailureReport failureReport = catchExceptionAndGetFailureReport();
+    assertThat(failureReport.getIssueNumber(), is(nullValue()));
+    assertThat(failureReport.getErrorDetail(), containsString("GitHub issue creation failed"));
+    assertThat(failureReport.getErrorDetail(), containsString("HTTP 401"));
+  }
+
+  @Test
   void shouldRecordUserInfo() {
     User user = makeMe.aUser().please();
     request.setUserPrincipal(() -> user.getExternalIdentifier());

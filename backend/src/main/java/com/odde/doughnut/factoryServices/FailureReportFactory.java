@@ -6,7 +6,6 @@ import com.odde.doughnut.entities.repositories.FailureReportRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.GithubService;
 import jakarta.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,13 +17,18 @@ public record FailureReportFactory(
     GithubService githubService,
     FailureReportRepository failureReportRepository) {
 
-  public void createUnlessAllowed() throws IOException, InterruptedException {
+  public void createUnlessAllowed() {
     if (exception instanceof ResponseStatusException) return;
     if (exception instanceof UnexpectedNoAccessRightException) return;
 
     FailureReport failureReport = createFailureReport();
-    Integer issueNumber = githubService.createGithubIssue(failureReport);
-    failureReport.setIssueNumber(issueNumber);
+    try {
+      Integer issueNumber = githubService.createGithubIssue(failureReport);
+      failureReport.setIssueNumber(issueNumber);
+    } catch (Exception e) {
+      failureReport.setErrorDetail(
+          failureReport.getErrorDetail() + "\n# GitHub issue creation failed\n" + e.getMessage());
+    }
     saveFailureReport(failureReport);
   }
 

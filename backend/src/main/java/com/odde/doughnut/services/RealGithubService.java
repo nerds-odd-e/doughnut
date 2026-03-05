@@ -93,7 +93,12 @@ public class RealGithubService implements GithubService {
             .build();
     HttpResponse.BodyHandler<String> bodyHandler =
         HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8);
-    return HttpClient.newBuilder().build().send(request, bodyHandler);
+    HttpResponse<String> response = HttpClient.newBuilder().build().send(request, bodyHandler);
+    int statusCode = response.statusCode();
+    if (statusCode < 200 || statusCode >= 300) {
+      throw new IOException("GitHub API returned HTTP " + statusCode + ": " + response.body());
+    }
+    return response;
   }
 
   private void assertToken() {
