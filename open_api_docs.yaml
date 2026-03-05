@@ -2957,6 +2957,33 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ConversationMessage"
+  /install:
+    get:
+      tags:
+      - install-controller
+      operationId: install
+      parameters:
+      - name: win32
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/wikidata/search:
     get:
       tags:

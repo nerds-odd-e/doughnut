@@ -3927,6 +3927,37 @@ export type MarkConversationAsReadResponses = {
 
 export type MarkConversationAsReadResponse = MarkConversationAsReadResponses[keyof MarkConversationAsReadResponses];
 
+export type InstallData = {
+    body?: never;
+    path?: never;
+    query?: {
+        win32?: boolean;
+    };
+    url: '/install';
+};
+
+export type InstallErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type InstallError = InstallErrors[keyof InstallErrors];
+
+export type InstallResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type InstallResponse = InstallResponses[keyof InstallResponses];
+
 export type SearchWikidataData = {
     body?: never;
     path?: never;
