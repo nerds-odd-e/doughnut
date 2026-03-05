@@ -138,16 +138,17 @@ describe('renderPastInput', () => {
   test('has empty-line vertical padding inside the box', () => {
     const result = renderPastInput('hello', 30)
     const lines = result.split('\n')
-    expect(visibleLength(lines[1])).toBe(28)
-    expect(lines[1].replace(/\x1b\[[0-9;]*m/g, '').trim()).toBe('')
+    expect(visibleLength(lines[0])).toBe(28)
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI escapes
+    expect(lines[0].replace(/\x1b\[[0-9;]*m/g, '').trim()).toBe('')
     const lastBgLine = lines[lines.length - 2]
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI escapes
     expect(lastBgLine.replace(/\x1b\[[0-9;]*m/g, '').trim()).toBe('')
   })
 
-  test('has empty-line vertical margin outside the box', () => {
+  test('has trailing blank line margin', () => {
     const result = renderPastInput('hello', 30)
     const lines = result.split('\n')
-    expect(lines[0]).toBe('')
     expect(lines[lines.length - 1]).toBe('')
   })
 

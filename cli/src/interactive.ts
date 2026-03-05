@@ -45,7 +45,7 @@ export function renderPastInput(input: string, width: number): string {
   const contentRows = lines.map(
     (line) => `${GREY_BG} ${padEndVisible(line, innerWidth - 1)}${RESET}`
   )
-  return ['', emptyRow, ...contentRows, emptyRow, ''].join('\n')
+  return [emptyRow, ...contentRows, emptyRow, ''].join('\n')
 }
 
 export function buildBoxLines(buffer: string, width: number): string[] {
@@ -138,6 +138,9 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           process.stdout.write('\r')
           for (let i = 0; i < prevTotalLines; i++) {
             process.stdout.write('\x1b[2K\n')
+          }
+          if (prevTotalLines > 1) {
+            process.stdout.write(`\x1b[${prevTotalLines - 1}A`)
           }
 
           if (input.trim()) {
