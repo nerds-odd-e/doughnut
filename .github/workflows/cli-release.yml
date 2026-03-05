@@ -26,5 +26,5 @@ jobs:
       - uses: ./.github/gcloud_auth_n_sdk
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
-      - name: Upload CLI binary to GCS
-        run: gsutil cp cli/dist/doughnut-cli.bundle.mjs gs://${{ env.GCS_BUCKET }}/doughnut-cli-latest/doughnut
+      - name: Upload CLI binary to GCS (public read)
+        run: gsutil cp -a public-read cli/dist/doughnut-cli.bundle.mjs gs://${{ env.GCS_BUCKET }}/doughnut-cli-latest/doughnut
