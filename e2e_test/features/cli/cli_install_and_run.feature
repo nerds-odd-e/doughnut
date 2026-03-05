@@ -2,10 +2,23 @@
 Feature: CLI install and run
   As a user, I want to install the Doughnut CLI and run it.
 
-  Scenario: Install from localhost and run
+  Scenario: Install from localhost and run interactive CLI
     Given the backend is serving the CLI and install script
     When I install the CLI from localhost without affecting my system
     And I run the installed doughnut command
+    Then I should see "doughnut 0.1.0"
+    And I should see "exit to quit"
+
+  Scenario: Interactive CLI responds "Not supported" to input
+    Given the backend is serving the CLI and install script
+    When I install the CLI from localhost without affecting my system
+    When I run the installed doughnut command with input "hello"
+    Then I should see "Not supported"
+
+  Scenario: Interactive CLI exits on exit command
+    Given the backend is serving the CLI and install script
+    When I install the CLI from localhost without affecting my system
+    When I run the installed doughnut command with input "exit"
     Then I should see "doughnut 0.1.0"
 
   Scenario: Show version

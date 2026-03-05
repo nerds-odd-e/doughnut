@@ -16,9 +16,22 @@ When('I install the CLI from localhost without affecting my system', () => {
 
 When('I run the installed doughnut command', () => {
   cy.get<string>('@doughnutPath').then((doughnutPath) => {
-    cy.exec(doughnutPath, { timeout: 5000 }).its('stdout').as('doughnutOutput')
+    cy.exec(`echo "exit" | ${doughnutPath}`, { timeout: 5000 })
+      .its('stdout')
+      .as('doughnutOutput')
   })
 })
+
+When(
+  'I run the installed doughnut command with input {string}',
+  (input: string) => {
+    cy.get<string>('@doughnutPath').then((doughnutPath) => {
+      cy.exec(`printf '%s\\n' "${input}" | ${doughnutPath}`, { timeout: 5000 })
+        .its('stdout')
+        .as('doughnutOutput')
+    })
+  }
+)
 
 When('I run the installed doughnut version command', () => {
   cy.get<string>('@doughnutPath').then((doughnutPath) => {

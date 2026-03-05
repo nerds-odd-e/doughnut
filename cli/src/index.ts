@@ -1,4 +1,5 @@
 import { formatVersionOutput } from './version.js'
+import { runInteractive } from './interactive.js'
 import { runUpdate } from './update.js'
 
 async function main(): Promise<void> {
@@ -16,7 +17,7 @@ async function main(): Promise<void> {
     return
   }
 
-  console.log(formatVersionOutput())
+  await runInteractive()
 }
 
 main()
