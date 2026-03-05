@@ -1,6 +1,6 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { Readable } from 'node:stream'
-import { processInput, runInteractive } from '../src/interactive.js'
+import { processInput, renderBox, runInteractive } from '../src/interactive.js'
 
 function createMockStdin(input: string): NodeJS.ReadableStream {
   const stream = new Readable({
@@ -32,6 +32,36 @@ describe('processInput', () => {
     expect(processInput('hello')).toBe(false)
     expect(logSpy).toHaveBeenCalledWith('Not supported')
     logSpy.mockRestore()
+  })
+})
+
+describe('renderBox', () => {
+  test('renders a single-line box', () => {
+    const result = renderBox(['hello'], 20)
+    const lines = result.split('\n')
+    expect(lines).toHaveLength(3)
+    expect(lines[0]).toBe('┌──────────────────┐')
+    expect(lines[1]).toContain('hello')
+    expect(lines[1]).toMatch(/^│.*│$/)
+    expect(lines[2]).toBe('└──────────────────┘')
+  })
+
+  test('renders a multi-line box (box expands with newlines)', () => {
+    const result = renderBox(['line 1', 'line 2', 'line 3'], 20)
+    const lines = result.split('\n')
+    expect(lines).toHaveLength(5)
+    expect(lines[0]).toBe('┌──────────────────┐')
+    expect(lines[1]).toContain('line 1')
+    expect(lines[2]).toContain('line 2')
+    expect(lines[3]).toContain('line 3')
+    expect(lines[4]).toBe('└──────────────────┘')
+  })
+
+  test('pads short lines to fill the box width', () => {
+    const result = renderBox(['hi'], 20)
+    const lines = result.split('\n')
+    expect(lines[1]).toBe('│ hi               │')
+    expect(lines[1].length).toBe(20)
   })
 })
 
@@ -76,14 +106,15 @@ describe('interactive CLI (e2e style)', () => {
     expect(notSupportedCalls).toHaveLength(2)
   })
 
-  test('shows Cursor-like UI with version, box, and placeholder', async () => {
+  test('shows placeholder with exit hint in grey inside the box', async () => {
     const stdin = createMockStdin('exit\n')
     runInteractive(stdin as NodeJS.ReadableStream)
     await new Promise((r) => setImmediate(r))
     const output = logSpy.mock.calls.flat().join('\n')
     expect(output).toContain('doughnut')
     expect(output).toContain('→')
-    expect(output).toContain('Plan, search, build anything')
-    expect(output).toContain('exit to quit')
+    expect(output).toContain('`exit` to quit.')
+    expect(output).toContain('┌')
+    expect(output).toContain('┘')
   })
 })

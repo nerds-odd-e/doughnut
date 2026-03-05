@@ -1,7 +1,9 @@
 import * as readline from 'node:readline'
 import { formatVersionOutput } from './version.js'
 
-const PLACEHOLDER = 'Plan, search, build anything'
+const GREY = '\x1b[90m'
+const RESET = '\x1b[0m'
+const PLACEHOLDER = '`exit` to quit.'
 const PROMPT = '→ '
 
 export function processInput(input: string): boolean {
@@ -15,14 +17,19 @@ export function processInput(input: string): boolean {
   return false
 }
 
+export function renderBox(lines: string[], width: number): string {
+  const innerWidth = width - 4
+  const top = `┌${'─'.repeat(width - 2)}┐`
+  const bottom = `└${'─'.repeat(width - 2)}┘`
+  const rows = lines.map((line) => `│ ${line.padEnd(innerWidth)} │`)
+  return [top, ...rows, bottom].join('\n')
+}
+
 function showBanner(width: number): void {
-  const versionLine = formatVersionOutput()
-  console.log(versionLine)
+  console.log(formatVersionOutput())
   console.log()
-  console.log(`┌${'─'.repeat(width - 2)}┐`)
-  console.log(`│ ${(PROMPT + PLACEHOLDER).padEnd(width - 4)} │`)
-  console.log(`└${'─'.repeat(width - 2)}┘`)
-  console.log('exit to quit')
+  const placeholderLine = `${PROMPT}${GREY}${PLACEHOLDER}${RESET}`
+  console.log(renderBox([placeholderLine], width))
   console.log()
 }
 

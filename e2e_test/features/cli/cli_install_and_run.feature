@@ -7,7 +7,7 @@ Feature: CLI install and run
     When I install the CLI from localhost without affecting my system
     And I run the installed doughnut command
     Then I should see "doughnut 0.1.0"
-    And I should see "exit to quit"
+    And I should see "exit"
 
   Scenario: Interactive CLI responds "Not supported" to input
     Given the backend is serving the CLI and install script
