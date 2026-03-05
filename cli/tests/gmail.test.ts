@@ -57,12 +57,10 @@ describe('loadConfig and saveConfig', () => {
 
 describe('getLastEmailSubject', () => {
   let configPath: string
-  let originalFetch: typeof fetch
 
   beforeEach(() => {
     const dir = createTempDir()
     configPath = path.join(dir, 'gmail.json')
-    originalFetch = globalThis.fetch
   })
 
   afterEach(() => {
@@ -95,20 +93,18 @@ describe('getLastEmailSubject', () => {
 
     vi.stubGlobal(
       'fetch',
-      vi.fn()
+      vi
+        .fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: () =>
-            Promise.resolve({ messages: [{ id: 'msg-1' }] }),
+          json: () => Promise.resolve({ messages: [{ id: 'msg-1' }] }),
         })
         .mockResolvedValueOnce({
           ok: true,
           json: () =>
             Promise.resolve({
               payload: {
-                headers: [
-                  { name: 'Subject', value: 'Test Email Subject' },
-                ],
+                headers: [{ name: 'Subject', value: 'Test Email Subject' }],
               },
             }),
         })
@@ -135,10 +131,13 @@ describe('getLastEmailSubject', () => {
       configPath
     )
 
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ messages: [] }),
-    }))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ messages: [] }),
+      })
+    )
 
     const subject = await getLastEmailSubject(configPath)
     expect(subject).toBe('(no messages)')
@@ -163,16 +162,15 @@ describe('getLastEmailSubject', () => {
 
     vi.stubGlobal(
       'fetch',
-      vi.fn()
+      vi
+        .fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: () =>
-            Promise.resolve({ messages: [{ id: 'msg-1' }] }),
+          json: () => Promise.resolve({ messages: [{ id: 'msg-1' }] }),
         })
         .mockResolvedValueOnce({
           ok: true,
-          json: () =>
-            Promise.resolve({ payload: { headers: [] } }),
+          json: () => Promise.resolve({ payload: { headers: [] } }),
         })
     )
 
@@ -210,8 +208,7 @@ describe('getLastEmailSubject', () => {
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: () =>
-          Promise.resolve({ messages: [{ id: 'msg-1' }] }),
+        json: () => Promise.resolve({ messages: [{ id: 'msg-1' }] }),
       })
       .mockResolvedValueOnce({
         ok: true,
@@ -227,8 +224,8 @@ describe('getLastEmailSubject', () => {
     const subject = await getLastEmailSubject(configPath)
     expect(subject).toBe('Refreshed')
     expect(fetchMock).toHaveBeenCalledTimes(3)
-    const tokenCalls = fetchMock.mock.calls.filter(
-      (c) => (c[0] as string).includes('/token')
+    const tokenCalls = fetchMock.mock.calls.filter((c) =>
+      (c[0] as string).includes('/token')
     )
     expect(tokenCalls).toHaveLength(1)
   })
@@ -250,14 +247,16 @@ describe('getLastEmailSubject', () => {
       configPath
     )
 
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-      ok: false,
-      json: () => Promise.resolve({ error: 'invalid_grant' }),
-    }))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        json: () => Promise.resolve({ error: 'invalid_grant' }),
+      })
+    )
 
     await expect(getLastEmailSubject(configPath)).rejects.toThrow(
       'Session expired'
     )
   })
 })
-

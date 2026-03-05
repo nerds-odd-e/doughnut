@@ -43,7 +43,7 @@ describe('processInput', () => {
 
   test('returns false and logs error for /last email when no account configured', async () => {
     const configDir = (await import('node:fs')).mkdtempSync(
-      (await import('node:os')).tmpdir() + '/doughnut-test-'
+      `${(await import('node:os')).tmpdir()}/doughnut-test-`
     )
     const originalEnv = process.env.DOUGHNUT_CONFIG_DIR
     process.env.DOUGHNUT_CONFIG_DIR = configDir

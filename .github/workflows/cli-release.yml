@@ -22,6 +22,9 @@ jobs:
       - name: Set CLI version from tag
         run: echo "CLI_VERSION=${GITHUB_REF#refs/tags/cli-v}" >> $GITHUB_ENV
       - name: Build CLI
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
         run: pnpm cli:bundle
       - uses: ./.github/gcloud_auth_n_sdk
         with:

@@ -4,6 +4,10 @@ import * as http from 'node:http'
 import * as os from 'node:os'
 import * as path from 'node:path'
 import { spawn } from 'node:child_process'
+import {
+  GOOGLE_CLIENT_ID as BUILTIN_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET as BUILTIN_CLIENT_SECRET,
+} from './credentials.js'
 
 const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly'
 const DEFAULT_OAUTH_TOKEN_URL = 'https://oauth2.googleapis.com/token'
@@ -159,8 +163,8 @@ async function getProfileEmail(accessToken: string): Promise<string> {
 export async function addGmailAccount(configPath?: string): Promise<void> {
   const config = loadConfig(configPath)
 
-  let clientId = config.clientId
-  let clientSecret = config.clientSecret
+  let clientId = config.clientId || BUILTIN_CLIENT_ID || undefined
+  let clientSecret = config.clientSecret || BUILTIN_CLIENT_SECRET || undefined
 
   if (!(clientId && clientSecret)) {
     const readline = await import('node:readline')
@@ -235,8 +239,8 @@ async function refreshAccessToken(
   account: GmailAccount,
   config: GmailConfig
 ): Promise<string> {
-  const clientId = config.clientId
-  const clientSecret = config.clientSecret
+  const clientId = config.clientId || BUILTIN_CLIENT_ID || undefined
+  const clientSecret = config.clientSecret || BUILTIN_CLIENT_SECRET || undefined
   if (!(clientId && clientSecret)) {
     throw new Error('Missing client credentials. Run /add gmail again.')
   }

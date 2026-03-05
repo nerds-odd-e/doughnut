@@ -113,6 +113,9 @@ frontend/app.*.symbols
 
 # Obfuscation related
 **/index.html.br
+
+# CLI OAuth credentials (local dev only)
+cli/.env.local
 frontend/app.*.map.json
 
 # local nix env related e.g. MySQL DB instance folder/files

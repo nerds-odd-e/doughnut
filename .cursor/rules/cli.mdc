@@ -33,3 +33,7 @@ cli/
 - Bash: `backend/src/main/resources/install.sh`
 - PowerShell: `backend/src/main/resources/install.ps1`
 - Served by `InstallController` at `/install` (add `?win32=true` for PowerShell)
+
+## OAuth credentials (Gmail)
+
+Credentials are injected at build time. For local builds: copy `cli/.env.local.example` to `cli/.env.local` and add your Google OAuth client ID and secret. For CI/release: add `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` as GitHub Actions secrets (Settings > Secrets and variables > Actions).
