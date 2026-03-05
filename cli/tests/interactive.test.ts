@@ -50,6 +50,20 @@ describe('visibleLength', () => {
   })
 })
 
+describe('renderBox uses full width', () => {
+  test('box top border matches the given width', () => {
+    const result = renderBox(['hi'], 100)
+    const top = result.split('\n')[0]
+    expect(top.length).toBe(100)
+  })
+
+  test('box content row matches the given width', () => {
+    const result = renderBox(['hi'], 120)
+    const row = result.split('\n')[1]
+    expect(visibleLength(row)).toBe(120)
+  })
+})
+
 describe('renderBox', () => {
   test('renders a single-line box', () => {
     const result = renderBox(['hello'], 20)
@@ -203,6 +217,23 @@ describe('interactive CLI (e2e style)', () => {
       (c) => c[0] === 'Not supported'
     )
     expect(notSupportedCalls).toHaveLength(2)
+  })
+
+  test('box uses full terminal width in piped mode', async () => {
+    Object.defineProperty(process.stdout, 'columns', {
+      value: 100,
+      writable: true,
+      configurable: true,
+    })
+    const stdin = createMockStdin('exit\n')
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    const boxCall = logSpy.mock.calls.find(
+      (c) => typeof c[0] === 'string' && c[0].includes('┌')
+    )
+    expect(boxCall).toBeDefined()
+    const topBorder = boxCall![0].split('\n')[0]
+    expect(topBorder.length).toBe(100)
   })
 
   test('shows version, box with placeholder and prompt', async () => {

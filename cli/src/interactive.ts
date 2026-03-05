@@ -59,8 +59,11 @@ export function buildBoxLines(buffer: string, width: number): string[] {
   })
 }
 
+function getTerminalWidth(): number {
+  return process.stdout.columns || 80
+}
+
 async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
-  const width = Math.min(60, Math.max(40, process.stdout.columns ?? 60))
   console.log(formatVersionOutput())
   console.log()
 
@@ -74,6 +77,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
   let prevTotalLines = 0
 
   function drawBox() {
+    const width = getTerminalWidth()
     const contentLines = buildBoxLines(buffer, width)
     const boxLines = renderBox(contentLines, width).split('\n')
     const newTotalLines = boxLines.length
@@ -107,6 +111,8 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
 
   drawBox()
 
+  process.stdout.on('resize', drawBox)
+
   stdin.on(
     'keypress',
     (
@@ -122,6 +128,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           buffer += '\n'
           drawBox()
         } else {
+          const width = getTerminalWidth()
           const input = buffer
           buffer = ''
 
@@ -161,10 +168,10 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
 async function runInteractivePiped(
   stdin: NodeJS.ReadableStream
 ): Promise<void> {
+  const width = getTerminalWidth()
   console.log(formatVersionOutput())
   console.log()
-  const contentLines = buildBoxLines('', 58)
-  console.log(renderBox(contentLines, 58))
+  console.log(renderBox(buildBoxLines('', width), width))
   console.log()
 
   const rl = readline.createInterface({
@@ -175,7 +182,7 @@ async function runInteractivePiped(
 
   rl.on('line', (line) => {
     if (line.trim()) {
-      console.log(renderPastInput(line, 58))
+      console.log(renderPastInput(line, getTerminalWidth()))
     }
     if (processInput(line)) {
       rl.close()
