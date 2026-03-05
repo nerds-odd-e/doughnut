@@ -49,7 +49,7 @@ export GITHUB_DOUGHNUT_REPO_ACCESS_TOKEN=$(curl "https://secretmanager.googleapi
   --header "x-goog-user-project: ${PROJECTID}" |
   jq -r ".payload.data" | base64 --decode)
 
-export GITHUB_FOR_ISSUES_API_TOKEN=$(curl "https://secretmanager.googleapis.com/v1/projects/${PROJECTID}/secrets/github_for_issues_api_token/versions/2:access" \
+export GITHUB_FOR_ISSUES_API_TOKEN=$(curl "https://secretmanager.googleapis.com/v1/projects/${PROJECTID}/secrets/github_for_issues_api_token/versions/latest:access" \
   --request "GET" \
   --header "authorization: Bearer ${ACCESS_TOKEN}" \
   --header "content-type: application/json" \
