@@ -3,7 +3,11 @@ import { Readable } from 'node:stream'
 import { processInput, runInteractive } from '../src/interactive.js'
 
 function createMockStdin(input: string): NodeJS.ReadableStream {
-  const stream = new Readable({ read: () => {} })
+  const stream = new Readable({
+    read() {
+      // no-op: data is pushed manually
+    },
+  })
   stream.push(input)
   stream.push(null)
   return Object.assign(stream, { isTTY: false })
@@ -39,7 +43,7 @@ describe('interactive CLI (e2e style)', () => {
     logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
     exitSpy = vi
       .spyOn(process, 'exit')
-      .mockImplementation((() => {}) as typeof process.exit)
+      .mockImplementation((() => undefined) as unknown as typeof process.exit)
   })
 
   afterEach(() => {

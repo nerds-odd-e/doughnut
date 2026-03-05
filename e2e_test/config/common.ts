@@ -1,4 +1,11 @@
-import { existsSync, mkdtempSync, rmdir, writeFileSync } from 'node:fs'
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  rmdir,
+  writeFileSync,
+} from 'node:fs'
 import { execSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -12,6 +19,20 @@ import fs from 'fs'
 import path from 'path'
 import AdmZip from 'adm-zip'
 import type { ExpectedFile } from '../start/downloadChecker'
+
+function bundleAndCopyCliToBuildOutput(
+  repoRoot: string,
+  env?: NodeJS.ProcessEnv
+) {
+  execSync('pnpm cli:bundle', { cwd: repoRoot, stdio: 'inherit', env })
+  const src = join(repoRoot, 'cli/dist/doughnut-cli.bundle.mjs')
+  const destDir = join(
+    repoRoot,
+    'backend/build/resources/main/static/doughnut-cli-latest'
+  )
+  mkdirSync(destDir, { recursive: true })
+  copyFileSync(src, join(destDir, 'doughnut'))
+}
 
 const commonConfig = {
   chromeWebSecurity: false,
@@ -204,14 +225,7 @@ const commonConfig = {
         async bundleAndCopyCli() {
           const repoRoot = path.resolve(__dirname, '..', '..')
           try {
-            execSync('pnpm cli:bundle-and-copy', {
-              cwd: repoRoot,
-              stdio: 'inherit',
-            })
-            execSync('./backend/gradlew -p backend processResources', {
-              cwd: repoRoot,
-              stdio: 'inherit',
-            })
+            bundleAndCopyCliToBuildOutput(repoRoot)
             return true
           } catch (error) {
             console.error('Failed to bundle and copy CLI:', error)
@@ -221,14 +235,9 @@ const commonConfig = {
         async bundleAndCopyCliWithVersion(version: string) {
           const repoRoot = path.resolve(__dirname, '..', '..')
           try {
-            execSync('pnpm cli:bundle-and-copy', {
-              cwd: repoRoot,
-              stdio: 'inherit',
-              env: { ...process.env, CLI_VERSION: version },
-            })
-            execSync('./backend/gradlew -p backend processResources', {
-              cwd: repoRoot,
-              stdio: 'inherit',
+            bundleAndCopyCliToBuildOutput(repoRoot, {
+              ...process.env,
+              CLI_VERSION: version,
             })
             return true
           } catch (error) {
