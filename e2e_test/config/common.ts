@@ -208,6 +208,28 @@ const commonConfig = {
               cwd: repoRoot,
               stdio: 'inherit',
             })
+            execSync('./backend/gradlew -p backend processResources', {
+              cwd: repoRoot,
+              stdio: 'inherit',
+            })
+            return true
+          } catch (error) {
+            console.error('Failed to bundle and copy CLI:', error)
+            throw error
+          }
+        },
+        async bundleAndCopyCliWithVersion(version: string) {
+          const repoRoot = path.resolve(__dirname, '..', '..')
+          try {
+            execSync('pnpm cli:bundle-and-copy', {
+              cwd: repoRoot,
+              stdio: 'inherit',
+              env: { ...process.env, CLI_VERSION: version },
+            })
+            execSync('./backend/gradlew -p backend processResources', {
+              cwd: repoRoot,
+              stdio: 'inherit',
+            })
             return true
           } catch (error) {
             console.error('Failed to bundle and copy CLI:', error)

@@ -1,4 +1,22 @@
-import { getGreeting } from './greet.js'
+import { formatVersionOutput } from './version.js'
+import { runUpdate } from './update.js'
 
-console.log(getGreeting())
-process.exit(0)
+async function main(): Promise<void> {
+  const args = process.argv.slice(2)
+  const hasVersionFlag = args.includes('--version') || args.includes('-v')
+  const subcommand = args.find((a) => !a.startsWith('-'))
+
+  if (hasVersionFlag || subcommand === 'version') {
+    console.log(formatVersionOutput())
+    return
+  }
+
+  if (subcommand === 'update') {
+    await runUpdate()
+    return
+  }
+
+  console.log(formatVersionOutput())
+}
+
+main()

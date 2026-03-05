@@ -1,0 +1,68 @@
+import { describe, test, expect, vi, beforeEach } from 'vitest'
+import * as childProcess from 'node:child_process'
+
+vi.mock('node:child_process', () => ({
+  spawnSync: vi.fn(),
+}))
+
+beforeEach(() => {
+  process.argv[1] = '/path/to/doughnut'
+})
+
+describe('runUpdate', () => {
+  test('reports already latest when incoming version equals current', async () => {
+    const consoleSpy = vi
+      .spyOn(console, 'log')
+      .mockImplementation(() => undefined)
+
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+      })
+    )
+
+    vi.mocked(childProcess.spawnSync).mockReturnValue({
+      stdout: 'doughnut 0.1.0',
+      stderr: '',
+      status: 0,
+      error: undefined,
+    } as ReturnType<typeof childProcess.spawnSync>)
+
+    process.env.BASE_URL = 'http://localhost:9081'
+
+    const { runUpdate } = await import('../src/update.js')
+    await runUpdate()
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringMatching(/is already the latest version/)
+    )
+  })
+
+  test('reports error when download returns non-ok status', async () => {
+    const consoleSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined)
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation(((
+      code?: number
+    ) => {
+      throw new Error(`exit ${code}`)
+    }) as typeof process.exit)
+
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: false, status: 404 })
+    )
+
+    process.env.BASE_URL = 'http://localhost:9081'
+
+    const { runUpdate } = await import('../src/update.js')
+    await expect(runUpdate()).rejects.toThrow('exit')
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Download failed')
+    )
+    expect(exitSpy).toHaveBeenCalledWith(1)
+  })
+})

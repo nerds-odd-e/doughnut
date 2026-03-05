@@ -24,6 +24,8 @@ jobs:
         with:
           node_version: ${{ vars.NODE_VERSION }}
           pnpm_version: ${{ vars.PNPM_VERSION }}
+      - name: Set CLI version from tag
+        run: echo "CLI_VERSION=${GITHUB_REF#refs/tags/cli-v}" >> $GITHUB_ENV
       - name: Build CLI and copy to static, then bundle all
         run: pnpm bundle:all
       - name: Build application jar artifact

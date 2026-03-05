@@ -11,7 +11,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "postinstall": "syncpack fix",
-    "bundle": "pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=./dist/doughnut-cli.bundle.mjs --format=esm --packages=external --banner:js='#!/usr/bin/env node'",
+    "bundle": "pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=./dist/doughnut-cli.bundle.mjs --format=esm --packages=external --banner:js='#!/usr/bin/env node' --define:CLI_VERSION=\\\"${CLI_VERSION:-0.1.0}\\\"",
     "test": "vitest run",
     "test:watch": "vitest --watch",
     "format": "biome check --write src/",
