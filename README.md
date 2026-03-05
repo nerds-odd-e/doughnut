@@ -19,6 +19,17 @@ For more background info you can read::
 
 [Story Map](https://miro.com/app/board/o9J_lTB77Mc=/)
 
+## Doughnut CLI
+
+```bash
+# Install (macOS, Linux, WSL)
+curl https://doughnut.odd-e.com/install -fsS | bash
+# Install (Windows PowerShell)
+irm 'https://doughnut.odd-e.com/install?win32=true' | iex
+# Run interactive session
+doughnut
+```
+
 ## [Doughnut Technology Stack](./docs/tech_stack.md)
 
 ## [Current Architecture Videos](./docs/current_architecture_workshops.md)

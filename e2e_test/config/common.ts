@@ -1,5 +1,7 @@
-import { existsSync, rmdir } from 'node:fs'
+import { existsSync, mkdtempSync, rmdir, writeFileSync } from 'node:fs'
 import { execSync } from 'node:child_process'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import mcpClient from '../support/mcp_client'
 const {
   addCucumberPreprocessorPlugin,
@@ -198,6 +200,41 @@ const commonConfig = {
             console.error('Failed to bundle MCP server:', error)
             throw error
           }
+        },
+        async bundleAndCopyCli() {
+          const repoRoot = path.resolve(__dirname, '..', '..')
+          try {
+            execSync('pnpm cli:bundle-and-copy', {
+              cwd: repoRoot,
+              stdio: 'inherit',
+            })
+            return true
+          } catch (error) {
+            console.error('Failed to bundle and copy CLI:', error)
+            throw error
+          }
+        },
+        async installCli(baseUrl: string) {
+          const installDir = mkdtempSync(
+            join(tmpdir(), 'cypress-doughnut-cli-')
+          )
+          const installScriptPath = join(installDir, 'install.sh')
+          const response = await fetch(`${baseUrl}/install`)
+          if (!response.ok) {
+            throw new Error(
+              `Failed to fetch install script: ${response.status}`
+            )
+          }
+          const script = await response.text()
+          writeFileSync(installScriptPath, script, { mode: 0o755 })
+          execSync(`bash ${installScriptPath}`, {
+            env: {
+              ...process.env,
+              INSTALL_PREFIX: installDir,
+              BASE_URL: baseUrl,
+            },
+          })
+          return join(installDir, 'bin', 'doughnut')
         },
       })
 

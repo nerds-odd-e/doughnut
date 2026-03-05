@@ -97,6 +97,7 @@ frontend/dist/
 frontend/tsconfig.tsbuildinfo
 frontend/public/mcp-server.bundle.mjs
 mcp-server/dist/
+doughnut-cli-latest/
 backend/src/main/resources/static/favicon.ico
 backend/src/main/resources/static/odd-e.ico
 backend/src/main/resources/static/index.html

@@ -1,0 +1,26 @@
+{
+  "name": "doughnut-cli",
+  "version": "0.1.0",
+  "description": "Doughnut CLI",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.13",
+    "pnpm": ">=10.30.3"
+  },
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "postinstall": "syncpack fix",
+    "bundle": "pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=./dist/doughnut-cli.bundle.mjs --format=esm --packages=external --banner:js='#!/usr/bin/env node'",
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
+    "format": "biome check --write src/",
+    "lint": "biome check src/"
+  },
+  "devDependencies": {
+    "@types/node": "25.3.3",
+    "esbuild": "0.27.3",
+    "typescript": "5.9.3",
+    "vitest": "4.0.18"
+  }
+}

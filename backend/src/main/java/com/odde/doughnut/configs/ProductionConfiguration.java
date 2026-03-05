@@ -23,7 +23,7 @@ public class ProductionConfiguration {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable);
     http.authorizeHttpRequests(
-        auth -> auth.requestMatchers("/api/healthcheck", "/api/games").permitAll());
+        auth -> auth.requestMatchers("/api/healthcheck", "/api/games", "/install").permitAll());
 
     commonConfiguration.commonConfig(http.oauth2Login(Customizer.withDefaults()));
     return http.build();

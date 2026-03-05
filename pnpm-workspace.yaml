@@ -1,6 +1,7 @@
 packages:
   - frontend
   - mcp-server
+  - cli
 
 strictDepBuilds: true
 

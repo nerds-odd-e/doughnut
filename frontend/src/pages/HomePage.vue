@@ -55,6 +55,15 @@
       </div>
     </div>
   </div>
+  <div class="cli-section">
+    <h3>Doughnut CLI</h3>
+    <pre class="cli-install-code"><code># Install (macOS, Linux, WSL)
+curl https://doughnut.odd-e.com/install -fsS | bash
+# Install (Windows PowerShell)
+irm 'https://doughnut.odd-e.com/install?win32=true' | iex
+# Run interactive session
+doughnut</code></pre>
+  </div>
   <div class="ending">
     <p>Our goal of note taking is not to remember, but to forget.</p>
     <p>Doughnut will eventually become our digital twin, our shadow.</p>
@@ -465,6 +474,20 @@ onUnmounted(() => {
   .flow-background {
     display: none;
   }
+}
+
+.cli-section {
+  padding: 2rem;
+  text-align: center;
+}
+
+.cli-install-code {
+  text-align: left;
+  display: inline-block;
+  background: #f5f5f5;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  overflow-x: auto;
 }
 
 .ending {

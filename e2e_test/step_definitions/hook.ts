@@ -86,3 +86,7 @@ Before({ tags: '@BundleFirstAndTerminateMCPServerWhenTeardown' }, () => {
 After({ tags: '@BundleFirstAndTerminateMCPServerWhenTeardown' }, () => {
   cy.task('disconnectMcpServer')
 })
+
+Before({ tags: '@cli' }, () => {
+  cy.task('bundleAndCopyCli')
+})

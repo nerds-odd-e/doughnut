@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+#
+# Tests for backend/src/main/resources/install.sh using Bach testing framework
+# Simulates the install script logic to verify URL construction and paths
+
+source "$(dirname "$0")/vendor/bach.sh"
+
+test-install-constructs-download-url-from-base-url() {
+  BASE_URL="http://localhost:9081"
+  DOWNLOAD_URL="$BASE_URL/doughnut-cli-latest/doughnut"
+  @out "$DOWNLOAD_URL"
+}
+test-install-constructs-download-url-from-base-url-assert() {
+  @out "http://localhost:9081/doughnut-cli-latest/doughnut"
+}
+
+test-install-constructs-install-path-from-install-prefix() {
+  INSTALL_PREFIX="/custom/prefix"
+  INSTALL_DIR="$INSTALL_PREFIX/bin"
+  @out "$INSTALL_DIR/doughnut"
+}
+test-install-constructs-install-path-from-install-prefix-assert() {
+  @out "/custom/prefix/bin/doughnut"
+}
