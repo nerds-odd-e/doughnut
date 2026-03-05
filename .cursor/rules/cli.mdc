@@ -1,0 +1,34 @@
+# doughnut-cli
+
+TypeScript CLI for Doughnut. Lives in `cli/`.
+
+## Structure
+
+```
+cli/
+  src/           # Production code
+  tests/         # Vitest unit tests (*.test.ts)
+  vitest.config.ts
+  tsconfig.json
+  package.json
+```
+
+## Commands
+
+| Task | Command |
+|------|---------|
+| Build & copy to static | `pnpm cli:bundle-and-copy` |
+| Run tests | `pnpm cli:test` |
+| Format | `pnpm cli:format` |
+| Lint | `pnpm cli:lint` |
+
+## Build output
+
+- Bundle: `cli/dist/doughnut-cli.bundle.mjs` (with shebang)
+- Deployed to: `backend/src/main/resources/static/doughnut-cli-latest/doughnut`
+
+## Install scripts
+
+- Bash: `backend/src/main/resources/install.sh`
+- PowerShell: `backend/src/main/resources/install.ps1`
+- Served by `InstallController` at `/install` (add `?win32=true` for PowerShell)
