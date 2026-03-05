@@ -21,24 +21,39 @@ function createMockStdin(input: string): NodeJS.ReadableStream {
 }
 
 describe('processInput', () => {
-  test('returns true for exit', () => {
-    expect(processInput('exit')).toBe(true)
-    expect(processInput('  exit  ')).toBe(true)
+  test('returns true for exit', async () => {
+    expect(await processInput('exit')).toBe(true)
+    expect(await processInput('  exit  ')).toBe(true)
   })
 
-  test('returns false and does not log for empty input', () => {
+  test('returns false and does not log for empty input', async () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    expect(processInput('')).toBe(false)
-    expect(processInput('   ')).toBe(false)
+    expect(await processInput('')).toBe(false)
+    expect(await processInput('   ')).toBe(false)
     expect(logSpy).not.toHaveBeenCalled()
     logSpy.mockRestore()
   })
 
-  test('returns false and logs "Not supported" for any other input', () => {
+  test('returns false and logs "Not supported" for any other input', async () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    expect(processInput('hello')).toBe(false)
+    expect(await processInput('hello')).toBe(false)
     expect(logSpy).toHaveBeenCalledWith('Not supported')
     logSpy.mockRestore()
+  })
+
+  test('returns false and logs error for /last email when no account configured', async () => {
+    const configDir = (await import('node:fs')).mkdtempSync(
+      (await import('node:os')).tmpdir() + '/doughnut-test-'
+    )
+    const originalEnv = process.env.DOUGHNUT_CONFIG_DIR
+    process.env.DOUGHNUT_CONFIG_DIR = configDir
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    expect(await processInput('/last email')).toBe(false)
+    expect(logSpy).toHaveBeenCalledWith(
+      'No Gmail account configured. Run /add gmail first.'
+    )
+    logSpy.mockRestore()
+    process.env.DOUGHNUT_CONFIG_DIR = originalEnv
   })
 })
 

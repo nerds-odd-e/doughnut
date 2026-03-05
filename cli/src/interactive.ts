@@ -1,4 +1,5 @@
 import * as readline from 'node:readline'
+import { addGmailAccount, getLastEmailSubject } from './gmail.js'
 import { formatVersionOutput } from './version.js'
 
 const GREY = '\x1b[90m'
@@ -7,10 +8,27 @@ const RESET = '\x1b[0m'
 const PLACEHOLDER = '`exit` to quit.'
 const PROMPT = '→ '
 
-export function processInput(input: string): boolean {
+export async function processInput(input: string): Promise<boolean> {
   const trimmed = input.trim()
   if (trimmed === 'exit') {
     return true
+  }
+  if (trimmed === '/add gmail') {
+    try {
+      await addGmailAccount()
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : String(err))
+    }
+    return false
+  }
+  if (trimmed === '/last email') {
+    try {
+      const subject = await getLastEmailSubject()
+      console.log(subject)
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : String(err))
+    }
+    return false
   }
   if (trimmed) {
     console.log('Not supported')
@@ -115,7 +133,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
 
   stdin.on(
     'keypress',
-    (
+    async (
       str: string,
       key: { name: string; shift?: boolean; ctrl?: boolean; meta?: boolean }
     ) => {
@@ -148,7 +166,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
             process.stdout.write('\n')
           }
 
-          if (processInput(input)) {
+          if (await processInput(input)) {
             process.exit(0)
           }
           linesAboveCursor = 0
@@ -183,11 +201,11 @@ async function runInteractivePiped(
     terminal: false,
   })
 
-  rl.on('line', (line) => {
+  rl.on('line', async (line) => {
     if (line.trim()) {
       console.log(renderPastInput(line, getTerminalWidth()))
     }
-    if (processInput(line)) {
+    if (await processInput(line)) {
       rl.close()
       process.exit(0)
     }
