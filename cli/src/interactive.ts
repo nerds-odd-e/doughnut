@@ -17,25 +17,41 @@ export function processInput(input: string): boolean {
   return false
 }
 
+// biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI escapes
+const ANSI_PATTERN = /\x1b\[[0-9;]*m/g
+
+export function visibleLength(str: string): number {
+  return str.replace(ANSI_PATTERN, '').length
+}
+
+function padEndVisible(str: string, targetLen: number): string {
+  const pad = targetLen - visibleLength(str)
+  return pad > 0 ? str + ' '.repeat(pad) : str
+}
+
 export function renderBox(lines: string[], width: number): string {
   const innerWidth = width - 4
   const top = `┌${'─'.repeat(width - 2)}┐`
   const bottom = `└${'─'.repeat(width - 2)}┘`
-  const rows = lines.map((line) => `│ ${line.padEnd(innerWidth)} │`)
+  const rows = lines.map((line) => `│ ${padEndVisible(line, innerWidth)} │`)
   return [top, ...rows, bottom].join('\n')
 }
 
-function showBanner(width: number): void {
-  console.log(formatVersionOutput())
-  console.log()
-  const placeholderLine = `${PROMPT}${GREY}${PLACEHOLDER}${RESET}`
-  console.log(renderBox([placeholderLine], width))
-  console.log()
+export function buildBoxLines(buffer: string, width: number): string[] {
+  const bufferLines = buffer.split('\n')
+  return bufferLines.map((line, i) => {
+    const prefix = i === 0 ? PROMPT : '  '
+    if (i === 0 && buffer === '') {
+      return `${prefix}${GREY}${PLACEHOLDER}${RESET}`
+    }
+    return prefix + line
+  })
 }
 
 async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
   const width = Math.min(60, Math.max(40, process.stdout.columns ?? 60))
-  showBanner(width)
+  console.log(formatVersionOutput())
+  console.log()
 
   stdin.setRawMode?.(true)
   stdin.resume?.()
@@ -43,7 +59,42 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
   readline.emitKeypressEvents(stdin)
 
   let buffer = ''
-  process.stdout.write(PROMPT)
+  let linesAboveCursor = 0
+  let prevTotalLines = 0
+
+  function drawBox() {
+    const contentLines = buildBoxLines(buffer, width)
+    const boxLines = renderBox(contentLines, width).split('\n')
+    const newTotalLines = boxLines.length
+
+    if (linesAboveCursor > 0) {
+      process.stdout.write(`\x1b[${linesAboveCursor}A`)
+    }
+    process.stdout.write('\r')
+
+    for (const line of boxLines) {
+      process.stdout.write(`\x1b[2K${line}\n`)
+    }
+    const extra = prevTotalLines - newTotalLines
+    for (let i = 0; i < extra; i++) {
+      process.stdout.write('\x1b[2K\n')
+    }
+
+    const totalWritten = Math.max(newTotalLines, prevTotalLines)
+    const cursorRow = contentLines.length
+    process.stdout.write(`\x1b[${totalWritten - cursorRow}A`)
+
+    const bufferLines = buffer.split('\n')
+    const lastLine = bufferLines[bufferLines.length - 1]
+    const lastPrefix = bufferLines.length === 1 ? PROMPT : '  '
+    const col = 3 + lastPrefix.length + lastLine.length
+    process.stdout.write(`\x1b[${col}G`)
+
+    linesAboveCursor = contentLines.length
+    prevTotalLines = newTotalLines
+  }
+
+  drawBox()
 
   stdin.on(
     'keypress',
@@ -52,30 +103,32 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
       key: { name: string; shift?: boolean; ctrl?: boolean; meta?: boolean }
     ) => {
       if (key.ctrl && key.name === 'c') {
+        process.stdout.write(`\x1b[${1}B\r\n`)
         process.exit(0)
       }
       if (key.name === 'return') {
         if (key.shift) {
           buffer += '\n'
-          process.stdout.write(`\n${PROMPT}`)
+          drawBox()
         } else {
-          process.stdout.write('\n')
-          if (processInput(buffer)) {
+          process.stdout.write(`\x1b[${1}B\r\n`)
+          const input = buffer
+          buffer = ''
+          if (processInput(input)) {
             process.exit(0)
           }
-          buffer = ''
-          process.stdout.write(PROMPT)
+          linesAboveCursor = 0
+          prevTotalLines = 0
+          drawBox()
         }
       } else if (key.name === 'backspace') {
         if (buffer.length > 0) {
           buffer = buffer.slice(0, -1)
-          readline.moveCursor(process.stdout, -1, 0)
-          process.stdout.write(' ')
-          readline.moveCursor(process.stdout, -1, 0)
+          drawBox()
         }
       } else if (str && !key.ctrl && !key.meta) {
         buffer += str
-        process.stdout.write(str)
+        drawBox()
       }
     }
   )
@@ -84,7 +137,11 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
 async function runInteractivePiped(
   stdin: NodeJS.ReadableStream
 ): Promise<void> {
-  showBanner(58)
+  console.log(formatVersionOutput())
+  console.log()
+  const contentLines = buildBoxLines('', 58)
+  console.log(renderBox(contentLines, 58))
+  console.log()
 
   const rl = readline.createInterface({
     input: stdin,

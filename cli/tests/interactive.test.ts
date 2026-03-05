@@ -1,6 +1,12 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { Readable } from 'node:stream'
-import { processInput, renderBox, runInteractive } from '../src/interactive.js'
+import {
+  buildBoxLines,
+  processInput,
+  renderBox,
+  runInteractive,
+  visibleLength,
+} from '../src/interactive.js'
 
 function createMockStdin(input: string): NodeJS.ReadableStream {
   const stream = new Readable({
@@ -35,6 +41,14 @@ describe('processInput', () => {
   })
 })
 
+describe('visibleLength', () => {
+  test('returns length without ANSI codes', () => {
+    expect(visibleLength('hello')).toBe(5)
+    expect(visibleLength('\x1b[90mhello\x1b[0m')).toBe(5)
+    expect(visibleLength('→ \x1b[90m`exit` to quit.\x1b[0m')).toBe(17)
+  })
+})
+
 describe('renderBox', () => {
   test('renders a single-line box', () => {
     const result = renderBox(['hello'], 20)
@@ -62,6 +76,38 @@ describe('renderBox', () => {
     const lines = result.split('\n')
     expect(lines[1]).toBe('│ hi               │')
     expect(lines[1].length).toBe(20)
+  })
+
+  test('pads correctly when line contains ANSI codes', () => {
+    const grey = '\x1b[90m'
+    const reset = '\x1b[0m'
+    const result = renderBox([`${grey}hi${reset}`], 20)
+    const lines = result.split('\n')
+    expect(visibleLength(lines[1])).toBe(20)
+    expect(lines[1]).toContain('hi')
+  })
+})
+
+describe('buildBoxLines', () => {
+  test('empty buffer shows placeholder with prompt', () => {
+    const lines = buildBoxLines('', 40)
+    expect(lines).toHaveLength(1)
+    expect(lines[0]).toContain('→')
+    expect(lines[0]).toContain('`exit` to quit.')
+  })
+
+  test('single-line buffer shows prompt + text', () => {
+    const lines = buildBoxLines('hello', 40)
+    expect(lines).toHaveLength(1)
+    expect(lines[0]).toBe('→ hello')
+  })
+
+  test('multi-line buffer produces one line per newline', () => {
+    const lines = buildBoxLines('line1\nline2\nline3', 40)
+    expect(lines).toHaveLength(3)
+    expect(lines[0]).toBe('→ line1')
+    expect(lines[1]).toBe('  line2')
+    expect(lines[2]).toBe('  line3')
   })
 })
 
@@ -96,7 +142,7 @@ describe('interactive CLI (e2e style)', () => {
     expect(exitSpy).toHaveBeenCalledWith(0)
   })
 
-  test('each line triggers separate response (shift-enter adds newline in TTY)', async () => {
+  test('each line triggers separate response', async () => {
     const stdin = createMockStdin('line1\nline2\nexit\n')
     runInteractive(stdin as NodeJS.ReadableStream)
     await new Promise((r) => setImmediate(r))
@@ -106,7 +152,7 @@ describe('interactive CLI (e2e style)', () => {
     expect(notSupportedCalls).toHaveLength(2)
   })
 
-  test('shows placeholder with exit hint in grey inside the box', async () => {
+  test('shows version, box with placeholder and prompt', async () => {
     const stdin = createMockStdin('exit\n')
     runInteractive(stdin as NodeJS.ReadableStream)
     await new Promise((r) => setImmediate(r))
