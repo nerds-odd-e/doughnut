@@ -118,7 +118,8 @@
       "ajv": ">=8.18.0",
       "rollup": ">=4.59.0",
       "serialize-javascript": ">=7.0.3",
-      "immutable": ">=5.1.5"
+      "immutable": ">=5.1.5",
+      "mailparser": ">=3.9.3"
     },
     "onlyBuiltDependencies": [
       "@badeball/cypress-cucumber-preprocessor",
