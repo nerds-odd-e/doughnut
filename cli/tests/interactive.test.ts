@@ -4,6 +4,7 @@ import {
   buildBoxLines,
   processInput,
   renderBox,
+  renderPastInput,
   runInteractive,
   visibleLength,
 } from '../src/interactive.js'
@@ -111,6 +112,46 @@ describe('buildBoxLines', () => {
   })
 })
 
+describe('renderPastInput', () => {
+  test('renders text in grey background with no border', () => {
+    const result = renderPastInput('hello', 30)
+    expect(result).not.toContain('┌')
+    expect(result).not.toContain('│')
+    expect(result).toContain('hello')
+    expect(result).toContain('\x1b[48;5;236m')
+  })
+
+  test('has empty-line vertical padding inside the box', () => {
+    const result = renderPastInput('hello', 30)
+    const lines = result.split('\n')
+    expect(visibleLength(lines[1])).toBe(28)
+    expect(lines[1].replace(/\x1b\[[0-9;]*m/g, '').trim()).toBe('')
+    const lastBgLine = lines[lines.length - 2]
+    expect(lastBgLine.replace(/\x1b\[[0-9;]*m/g, '').trim()).toBe('')
+  })
+
+  test('has empty-line vertical margin outside the box', () => {
+    const result = renderPastInput('hello', 30)
+    const lines = result.split('\n')
+    expect(lines[0]).toBe('')
+    expect(lines[lines.length - 1]).toBe('')
+  })
+
+  test('does not include prompt arrow', () => {
+    const result = renderPastInput('hello', 30)
+    expect(result).not.toContain('→')
+  })
+
+  test('handles multi-line input', () => {
+    const result = renderPastInput('line1\nline2', 30)
+    expect(result).toContain('line1')
+    expect(result).toContain('line2')
+    const lines = result.split('\n')
+    const bgLines = lines.filter((l) => l.includes('\x1b[48;5;236m'))
+    expect(bgLines).toHaveLength(4)
+  })
+})
+
 describe('interactive CLI (e2e style)', () => {
   let logSpy: ReturnType<typeof vi.spyOn>
   let exitSpy: ReturnType<typeof vi.spyOn>
@@ -133,6 +174,18 @@ describe('interactive CLI (e2e style)', () => {
     await new Promise((r) => setImmediate(r))
     expect(logSpy).toHaveBeenCalledWith('Not supported')
     expect(exitSpy).toHaveBeenCalledWith(0)
+  })
+
+  test('shows past input in grey background box', async () => {
+    const stdin = createMockStdin('hello\nexit\n')
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    const pastInputCall = logSpy.mock.calls.find(
+      (c) => typeof c[0] === 'string' && c[0].includes('\x1b[48;5;236m')
+    )
+    expect(pastInputCall).toBeDefined()
+    expect(pastInputCall![0]).toContain('hello')
+    expect(pastInputCall![0]).not.toContain('→')
   })
 
   test('exit command exits the CLI', async () => {

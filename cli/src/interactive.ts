@@ -2,6 +2,7 @@ import * as readline from 'node:readline'
 import { formatVersionOutput } from './version.js'
 
 const GREY = '\x1b[90m'
+const GREY_BG = '\x1b[48;5;236m'
 const RESET = '\x1b[0m'
 const PLACEHOLDER = '`exit` to quit.'
 const PROMPT = '→ '
@@ -35,6 +36,16 @@ export function renderBox(lines: string[], width: number): string {
   const bottom = `└${'─'.repeat(width - 2)}┘`
   const rows = lines.map((line) => `│ ${padEndVisible(line, innerWidth)} │`)
   return [top, ...rows, bottom].join('\n')
+}
+
+export function renderPastInput(input: string, width: number): string {
+  const innerWidth = width - 2
+  const lines = input.split('\n')
+  const emptyRow = `${GREY_BG}${' '.repeat(innerWidth)}${RESET}`
+  const contentRows = lines.map(
+    (line) => `${GREY_BG} ${padEndVisible(line, innerWidth - 1)}${RESET}`
+  )
+  return ['', emptyRow, ...contentRows, emptyRow, ''].join('\n')
 }
 
 export function buildBoxLines(buffer: string, width: number): string[] {
@@ -111,9 +122,22 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           buffer += '\n'
           drawBox()
         } else {
-          process.stdout.write(`\x1b[${1}B\r\n`)
           const input = buffer
           buffer = ''
+
+          if (linesAboveCursor > 0) {
+            process.stdout.write(`\x1b[${linesAboveCursor}A`)
+          }
+          process.stdout.write('\r')
+          for (let i = 0; i < prevTotalLines; i++) {
+            process.stdout.write('\x1b[2K\n')
+          }
+
+          if (input.trim()) {
+            process.stdout.write(renderPastInput(input, width))
+            process.stdout.write('\n')
+          }
+
           if (processInput(input)) {
             process.exit(0)
           }
@@ -150,6 +174,9 @@ async function runInteractivePiped(
   })
 
   rl.on('line', (line) => {
+    if (line.trim()) {
+      console.log(renderPastInput(line, 58))
+    }
     if (processInput(line)) {
       rl.close()
       process.exit(0)
