@@ -24,29 +24,6 @@ When('I run the installed doughnut command', () => {
   })
 })
 
-When(
-  'I run the installed doughnut command with input {string}',
-  (input: string) => {
-    cy.get<string>('@doughnutPath').then((doughnutPath) => {
-      cy.exec(`printf '%s\\n' "${input}" | ${doughnutPath}`, { timeout: 5000 })
-        .its('stdout')
-        .as('doughnutOutput')
-    })
-  }
-)
-
-When(
-  'I run the installed doughnut command with -c {string}',
-  (input: string) => {
-    cy.get<string>('@doughnutPath').then((doughnutPath) => {
-      cy.task('runCliWithArgs', {
-        doughnutPath,
-        args: ['-c', input],
-      }).as('doughnutOutput')
-    })
-  }
-)
-
 When('I run the installed doughnut version command', () => {
   cy.get<string>('@doughnutPath').then((doughnutPath) => {
     cy.exec(`${doughnutPath} version`, { timeout: 5000 })
