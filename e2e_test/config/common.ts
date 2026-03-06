@@ -20,18 +20,28 @@ import path from 'path'
 import AdmZip from 'adm-zip'
 import type { ExpectedFile } from '../start/downloadChecker'
 
+const CLI_BUNDLE_PATH = 'cli/dist/doughnut-cli.bundle.mjs'
+
 function bundleAndCopyCliToBuildOutput(
   repoRoot: string,
   env?: NodeJS.ProcessEnv
 ) {
   execSync('pnpm cli:bundle', { cwd: repoRoot, stdio: 'inherit', env })
-  const src = join(repoRoot, 'cli/dist/doughnut-cli.bundle.mjs')
+  const src = join(repoRoot, CLI_BUNDLE_PATH)
   const destDir = join(
     repoRoot,
     'backend/build/resources/main/static/doughnut-cli-latest'
   )
   mkdirSync(destDir, { recursive: true })
   copyFileSync(src, join(destDir, 'doughnut'))
+}
+
+function ensureCliBundleExists(repoRoot: string): string {
+  const bundlePath = join(repoRoot, CLI_BUNDLE_PATH)
+  if (!existsSync(bundlePath)) {
+    execSync('pnpm cli:bundle', { cwd: repoRoot, stdio: 'inherit' })
+  }
+  return bundlePath
 }
 
 const commonConfig = {
@@ -276,8 +286,9 @@ const commonConfig = {
         }) {
           const { spawn } = await import('node:child_process')
           const repoRoot = path.resolve(__dirname, '..', '..')
+          const bundlePath = ensureCliBundleExists(repoRoot)
           return new Promise<string>((resolve, reject) => {
-            const proc = spawn('pnpm', ['cli'], {
+            const proc = spawn(process.execPath, [bundlePath], {
               cwd: repoRoot,
               env: { ...process.env, ...env },
               stdio: ['pipe', 'pipe', 'pipe'],
@@ -304,8 +315,9 @@ const commonConfig = {
         }) {
           const { spawn } = await import('node:child_process')
           const repoRoot = path.resolve(__dirname, '..', '..')
+          const bundlePath = ensureCliBundleExists(repoRoot)
           return new Promise<string>((resolve, reject) => {
-            const proc = spawn('pnpm', ['cli', ...args], {
+            const proc = spawn(process.execPath, [bundlePath, ...args], {
               cwd: repoRoot,
               env: { ...process.env, ...env },
               stdio: ['pipe', 'pipe', 'pipe'],
@@ -339,9 +351,10 @@ const commonConfig = {
           mkdirSync(configDir, { recursive: true })
           writeFileSync(configPath, JSON.stringify(config, null, 2))
 
+          const bundlePath = ensureCliBundleExists(repoRoot)
           return new Promise<{ stdout: string; exitCode: number }>(
             (resolve, reject) => {
-              const proc = spawn('pnpm', ['cli'], {
+              const proc = spawn(process.execPath, [bundlePath], {
                 cwd: repoRoot,
                 env: {
                   ...process.env,
@@ -410,8 +423,9 @@ const commonConfig = {
             ],
           }
           writeFileSync(configPath, JSON.stringify(config, null, 2))
+          const bundlePath = ensureCliBundleExists(repoRoot)
           return new Promise<string>((resolve, reject) => {
-            const proc = spawn('pnpm', ['cli'], {
+            const proc = spawn(process.execPath, [bundlePath], {
               cwd: repoRoot,
               env: {
                 ...process.env,
