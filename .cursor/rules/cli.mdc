@@ -1,3 +1,7 @@
+---
+description: related to doughnut CLI
+alwaysApply: false
+---
 # doughnut-cli
 
 TypeScript CLI for Doughnut. Lives in `cli/`.
