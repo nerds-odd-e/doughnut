@@ -32,6 +32,17 @@ export const interactiveDocs = [
   ...gmailCommandDocs,
 ]
 
+const GREY = '\x1b[90m'
+const REVERSE = '\x1b[7m'
+const RESET = '\x1b[0m'
+
+export function filterCommandsByPrefix(
+  commands: readonly CommandDoc[],
+  prefix: string
+): CommandDoc[] {
+  return commands.filter((d) => d.usage.startsWith(prefix))
+}
+
 export function formatCommandSuggestions(
   commands: readonly CommandDoc[],
   maxVisible = 8
@@ -39,6 +50,21 @@ export function formatCommandSuggestions(
   const lines = commands.map((d) => `  ${d.usage.padEnd(20)} ${d.description}`)
   if (lines.length <= maxVisible) return lines
   return [...lines.slice(0, maxVisible), '  ↓ more below']
+}
+
+export function formatCommandSuggestionsWithHighlight(
+  commands: readonly CommandDoc[],
+  maxVisible = 8
+): string[] {
+  if (commands.length === 0) return []
+  const lines = commands.map((d) => `  ${d.usage.padEnd(20)} ${d.description}`)
+  const visible =
+    lines.length <= maxVisible
+      ? lines
+      : [...lines.slice(0, maxVisible), '  ↓ more below']
+  return visible.map((line, i) =>
+    i === 0 ? `${REVERSE}${line}${RESET}` : `${GREY}${line}${RESET}`
+  )
 }
 
 export const helpDoc = helpDocEntry

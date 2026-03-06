@@ -331,348 +331,133 @@ describe('TTY mode slash command suggestions', () => {
 
     stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
-})
 
-describe('TTY mode slash command suggestions (alternate setup)', () => {
-  let writeSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    vi.spyOn(process, 'exit').mockImplementation(
-      (() => undefined) as unknown as typeof process.exit
-    )
-  })
-
-  afterEach(() => {
-    writeSpy.mockRestore()
-    vi.restoreAllMocks()
-  })
-
-  test('typing "/" shows command suggestions below input box', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('/help')
-    expect(output).toContain('Show this help')
-    expect(output).toContain('/add gmail')
-    expect(output).toContain('Add Gmail account via OAuth')
-    expect(output).toContain('/last email')
-    expect(output).toContain('Show subject of last email')
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true })
-  })
-})
-
-describe('TTY mode slash command suggestions', () => {
-  let writeSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    vi.spyOn(process, 'exit').mockImplementation(
-      (() => undefined) as unknown as typeof process.exit
-    )
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  test('typing "/" shows command suggestions below input box', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('/help')
-    expect(output).toContain('/add gmail')
-    expect(output).toContain('/last email')
-    expect(output).toContain('Show this help')
-    expect(output).toContain('Add Gmail account')
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
-  })
-})
-
-describe('TTY mode slash command suggestions', () => {
-  let writeSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    vi.spyOn(process, 'exit').mockImplementation(
-      (() => undefined) as unknown as typeof process.exit
-    )
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  test('typing "/" shows command suggestions below input box', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
-
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('/help')
-    expect(output).toContain('/add gmail')
-    expect(output).toContain('/last email')
-    expect(output).toContain('Show this help')
-    expect(output).toContain('Add Gmail account')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
-  })
-})
-
-describe('TTY mode slash command suggestions', () => {
-  let writeSpy: ReturnType<typeof vi.spyOn>
-  let exitSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    exitSpy = vi
-      .spyOn(process, 'exit')
-      .mockImplementation((() => undefined) as unknown as typeof process.exit)
-  })
-
-  afterEach(() => {
-    writeSpy.mockRestore()
-    exitSpy.mockRestore()
-    vi.restoreAllMocks()
-  })
-
-  test('typing "/" shows command suggestions below input box', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
-
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('/help')
-    expect(output).toContain('/add gmail')
-    expect(output).toContain('/last email')
-    expect(output).toContain('Show this help')
-    expect(output).toContain('Add Gmail account')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
-    expect(exitSpy).toHaveBeenCalledWith(0)
-  })
-})
-
-describe('TTY mode slash command suggestions', () => {
-  let writeSpy: ReturnType<typeof vi.spyOn>
-  let exitSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    exitSpy = vi
-      .spyOn(process, 'exit')
-      .mockImplementation((() => undefined) as unknown as typeof process.exit)
-  })
-
-  afterEach(() => {
-    writeSpy.mockRestore()
-    exitSpy.mockRestore()
-  })
-
-  test('typing "/" shows command suggestions below input box', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '/', {
-      name: undefined,
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('/help')
-    expect(output).toContain('/add gmail')
-    expect(output).toContain('/last email')
-    expect(output).toContain('Show this help')
-    expect(output).toContain('Add Gmail account')
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true })
-  })
-})
-
-describe('TTY mode slash command suggestions', () => {
-  let writeSpy: ReturnType<typeof vi.spyOn>
-  let exitSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    exitSpy = vi
-      .spyOn(process, 'exit')
-      .mockImplementation((() => undefined) as unknown as typeof process.exit)
-  })
-
-  afterEach(() => {
-    writeSpy.mockRestore()
-    exitSpy.mockRestore()
-  })
-
-  test('typing "/" shows command suggestions below input box', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('/help')
-    expect(output).toContain('/add gmail')
-    expect(output).toContain('/last email')
-    expect(output).toContain('Show this help')
-    expect(output).toContain('Add Gmail account')
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
-  })
-})
-
-describe('TTY mode slash command suggestions', () => {
-  let writeSpy: ReturnType<typeof vi.spyOn>
-  let exitSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    exitSpy = vi
-      .spyOn(process, 'exit')
-      .mockImplementation((() => undefined) as unknown as typeof process.exit)
-  })
-
-  afterEach(() => {
-    writeSpy.mockRestore()
-    exitSpy.mockRestore()
-  })
-
-  test('typing "/" shows command suggestions below input box', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('/help')
-    expect(output).toContain('/add gmail')
-    expect(output).toContain('/last email')
-    expect(output).toContain('Show this help')
-    expect(output).toContain('Add Gmail account')
-    expect(output).toContain('Show subject of last email')
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
-  })
-})
-
-describe('TTY mode slash command suggestions', () => {
-  let writeSpy: ReturnType<typeof vi.spyOn>
-  let _exitSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    _exitSpy = vi
-      .spyOn(process, 'exit')
-      .mockImplementation((() => undefined) as unknown as typeof process.exit)
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  test('typing "/" shows command suggestions below input box', async () => {
+  test('first candidate is highlighted with reverse video', async () => {
     const stdin = createMockTTYStdin()
     runInteractive(stdin as NodeJS.ReadableStream)
     await new Promise((r) => setImmediate(r))
     writeSpy.mockClear()
+    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
 
-    stdin.emit('keypress', '/', {
-      name: undefined,
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const lines = output.split('\n')
+    const suggestionStart = lines.findIndex((l) => l.includes('/help'))
+    expect(suggestionStart).toBeGreaterThanOrEqual(0)
+    expect(lines[suggestionStart]).toContain('\x1b[7m')
+    const laterSuggestion = lines.findIndex(
+      (l) => l.includes('/add gmail') && !l.includes('\x1b[7m')
+    )
+    expect(laterSuggestion).toBeGreaterThan(suggestionStart)
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('Enter inserts highlighted command with space', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '\r', {
+      name: 'return',
+      shift: false,
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', 'x', { name: 'x', ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '\r', {
+      name: 'return',
+      shift: false,
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setTimeout(r, 50))
+
+    expect(logSpy).toHaveBeenCalledWith('Not supported')
+    logSpy.mockRestore()
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('prefix filtering shows only matching commands', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    writeSpy.mockClear()
+    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
+    stdin.emit('keypress', 'a', { name: 'a', ctrl: false, meta: false })
+    stdin.emit('keypress', 'd', { name: 'd', ctrl: false, meta: false })
+    stdin.emit('keypress', 'd', { name: 'd', ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(output).toContain('/add gmail')
+    const lastDrawStart = output.lastIndexOf('→ /add')
+    expect(lastDrawStart).toBeGreaterThanOrEqual(0)
+    expect(output.slice(lastDrawStart)).not.toContain('/help')
+    expect(output.slice(lastDrawStart)).not.toContain('/last email')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('Enter with prefix inserts first matching command', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
+    stdin.emit('keypress', 'a', { name: 'a', ctrl: false, meta: false })
+    stdin.emit('keypress', 'd', { name: 'd', ctrl: false, meta: false })
+    stdin.emit('keypress', 'd', { name: 'd', ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '\r', {
+      name: 'return',
+      shift: false,
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '\r', {
+      name: 'return',
+      shift: false,
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setTimeout(r, 50))
+
+    expect(writeSpy.mock.calls.map((c) => c[0]).join('')).toContain(
+      '/add gmail '
+    )
+    logSpy.mockRestore()
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('no suggestions after space when command inserted', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '\r', {
+      name: 'return',
+      shift: false,
       ctrl: false,
       meta: false,
     })
     await new Promise((r) => setImmediate(r))
 
     const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('/help')
-    expect(output).toContain('Show this help')
-    expect(output).toContain('/add gmail')
-    expect(output).toContain('Add Gmail account via OAuth')
-    expect(output).toContain('/last email')
-    expect(output).toContain('Show subject of last email')
-  })
-})
-
-describe('TTY mode slash command suggestions', () => {
-  let writeSpy: ReturnType<typeof vi.spyOn>
-  let exitSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    exitSpy = vi
-      .spyOn(process, 'exit')
-      .mockImplementation((() => undefined) as unknown as typeof process.exit)
-  })
-
-  afterEach(() => {
-    writeSpy.mockRestore()
-    exitSpy.mockRestore()
-  })
-
-  test('typing "/" shows command suggestions below input box', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
-
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('/help')
-    expect(output).toContain('Show this help')
-    expect(output).toContain('/add gmail')
-    expect(output).toContain('Add Gmail account')
-    expect(output).toContain('/last email')
-    expect(output).toContain('last email')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true })
-  })
-})
-
-describe('interactive CLI TTY mode slash command suggestions', () => {
-  let writeSpy: ReturnType<typeof vi.spyOn>
-  let exitSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    exitSpy = vi
-      .spyOn(process, 'exit')
-      .mockImplementation((() => undefined) as unknown as typeof process.exit)
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  test('typing "/" shows command suggestions below input box', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
-
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('/help')
-    expect(output).toContain('Show this help')
-    expect(output).toContain('/add gmail')
-    expect(output).toContain('Add Gmail account')
-    expect(output).toContain('/last email')
-    expect(output).toContain('last email')
+    expect(output).toContain('→ /help ')
+    const lastInsertDraw = output.lastIndexOf('→ /help ')
+    const afterInsert = output.slice(lastInsertDraw)
+    const suggestionLinesAfterInsert = afterInsert
+      .split('\n')
+      .filter((l) => l.includes('/help') && l.includes('Show this help'))
+    expect(suggestionLinesAfterInsert).toHaveLength(0)
 
     stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
-    expect(exitSpy).toHaveBeenCalledWith(0)
   })
 })

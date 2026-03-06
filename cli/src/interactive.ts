@@ -1,7 +1,8 @@
 import * as readline from 'node:readline'
 import { addGmailAccount, getLastEmailSubject } from './gmail.js'
 import {
-  formatCommandSuggestions,
+  filterCommandsByPrefix,
+  formatCommandSuggestionsWithHighlight,
   formatHelp,
   interactiveDocs,
 } from './help.js'
@@ -93,8 +94,9 @@ function getTerminalWidth(): number {
 function buildSuggestionLines(buffer: string): string[] {
   const bufferLines = buffer.split('\n')
   const lastLine = bufferLines[bufferLines.length - 1]
-  if (!lastLine.startsWith('/')) return []
-  return formatCommandSuggestions(interactiveDocs)
+  if (!lastLine.startsWith('/') || lastLine.endsWith(' ')) return []
+  const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
+  return formatCommandSuggestionsWithHighlight(filtered)
 }
 
 async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
@@ -126,7 +128,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
       process.stdout.write(`\x1b[2K${line}\n`)
     }
     for (const line of suggestionLines) {
-      process.stdout.write(`\x1b[2K${GREY}${line}${RESET}\n`)
+      process.stdout.write(`\x1b[2K${line}\n`)
     }
     const extra = prevTotalLines - newTotalLines
     for (let i = 0; i < extra; i++) {
@@ -166,6 +168,22 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           buffer += '\n'
           drawBox()
         } else {
+          const bufferLines = buffer.split('\n')
+          const lastLine = bufferLines[bufferLines.length - 1]
+          const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
+          const suggestionsVisible =
+            lastLine.startsWith('/') &&
+            !lastLine.endsWith(' ') &&
+            filtered.length > 0
+
+          if (suggestionsVisible) {
+            const firstCommand = `${filtered[0].usage} `
+            buffer =
+              bufferLines.slice(0, -1).concat(firstCommand).join('\n') || ''
+            drawBox()
+            return
+          }
+
           const width = getTerminalWidth()
           const input = buffer
           buffer = ''
