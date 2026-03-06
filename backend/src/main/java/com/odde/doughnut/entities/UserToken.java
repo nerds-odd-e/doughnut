@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -18,6 +19,7 @@ public class UserToken extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   @NotNull
+  @JsonIgnore
   private String token;
 
   @Column(name = "label")

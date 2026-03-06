@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.dto.GeneratedTokenDTO;
 import com.odde.doughnut.controllers.dto.MenuDataDTO;
 import com.odde.doughnut.controllers.dto.TokenConfigDTO;
 import com.odde.doughnut.controllers.dto.UserDTO;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.server.ResponseStatusException;
 
 class UserControllerTest extends ControllerTestBase {
@@ -64,11 +66,40 @@ class UserControllerTest extends ControllerTestBase {
   void generateTokenShouldReturnValidUserToken() {
     TokenConfigDTO tokenConfig = new TokenConfigDTO();
     tokenConfig.setLabel("TEST_LABEL");
-    UserToken userToken = controller.generateToken(tokenConfig);
+    GeneratedTokenDTO generated = controller.generateToken(tokenConfig);
 
-    assertThat(userToken.getUserId(), equalTo(currentUser.getUser().getId()));
-    assertThat(userToken.getLabel(), equalTo("TEST_LABEL"));
-    assertThat(userToken.getToken().length(), equalTo(36));
+    assertThat(generated.label(), equalTo("TEST_LABEL"));
+    assertThat(generated.token().length(), equalTo(36));
+  }
+
+  @Test
+  void getTokenInfoShouldReturnTokenLabel() {
+    TokenConfigDTO tokenConfig = new TokenConfigDTO();
+    tokenConfig.setLabel("My Token");
+    GeneratedTokenDTO generated = controller.generateToken(tokenConfig);
+
+    MockHttpServletRequest request = new MockHttpServletRequest();
+    request.addHeader("Authorization", "Bearer " + generated.token());
+    UserToken tokenInfo = controller.getTokenInfo(request);
+
+    assertThat(tokenInfo.getLabel(), equalTo("My Token"));
+  }
+
+  @Test
+  void getTokenInfoShouldReturn401ForInvalidToken() {
+    MockHttpServletRequest request = new MockHttpServletRequest();
+    request.addHeader("Authorization", "Bearer invalid-token");
+    ResponseStatusException exception =
+        assertThrows(ResponseStatusException.class, () -> controller.getTokenInfo(request));
+    assertEquals(HttpStatusCode.valueOf(401), exception.getStatusCode());
+  }
+
+  @Test
+  void getTokenInfoShouldReturn401WhenNoAuthHeader() {
+    MockHttpServletRequest request = new MockHttpServletRequest();
+    ResponseStatusException exception =
+        assertThrows(ResponseStatusException.class, () -> controller.getTokenInfo(request));
+    assertEquals(HttpStatusCode.valueOf(401), exception.getStatusCode());
   }
 
   @Test

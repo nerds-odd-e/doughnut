@@ -84,6 +84,10 @@ public class UserService {
     return userRepository.findById(usertoken.getUserId());
   }
 
+  public Optional<UserToken> findTokenByToken(String token) {
+    return Optional.ofNullable(userTokenRepository.findByToken(token));
+  }
+
   public Optional<List<UserToken>> findTokensByUser(Integer id) {
     List<UserToken> usertokens = userTokenRepository.findByUserId(id);
     return Optional.ofNullable(usertokens);

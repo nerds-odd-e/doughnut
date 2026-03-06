@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.GeneratedTokenDTO;
 import com.odde.doughnut.controllers.dto.MenuDataDTO;
 import com.odde.doughnut.controllers.dto.TokenConfigDTO;
 import com.odde.doughnut.controllers.dto.UserDTO;
@@ -16,6 +17,7 @@ import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimezoneUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import java.sql.Timestamp;
@@ -26,6 +28,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/user")
@@ -85,12 +88,28 @@ class UserController {
 
   @PostMapping("/generate-token")
   @Transactional
-  public UserToken generateToken(@Valid @RequestBody TokenConfigDTO tokenConfig) {
+  public GeneratedTokenDTO generateToken(@Valid @RequestBody TokenConfigDTO tokenConfig) {
     authorizationService.assertLoggedIn();
     User user = authorizationService.getCurrentUser();
     String uuid = UUID.randomUUID().toString();
     UserToken userToken = new UserToken(user.getId(), uuid, tokenConfig.getLabel());
-    return entityPersister.save(userToken);
+    entityPersister.save(userToken);
+    return new GeneratedTokenDTO(userToken.getId(), uuid, tokenConfig.getLabel());
+  }
+
+  @GetMapping("/token-info")
+  public UserToken getTokenInfo(HttpServletRequest request) {
+    String authHeader = request.getHeader("Authorization");
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      throw new ResponseStatusException(
+          org.springframework.http.HttpStatus.UNAUTHORIZED, "Missing or invalid Authorization");
+    }
+    return userService
+        .findTokenByToken(authHeader.substring(7))
+        .orElseThrow(
+            () ->
+                new ResponseStatusException(
+                    org.springframework.http.HttpStatus.UNAUTHORIZED, "Invalid token"));
   }
 
   @GetMapping("/get-tokens")

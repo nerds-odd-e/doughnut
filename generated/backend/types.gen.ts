@@ -29,9 +29,8 @@ export type TokenConfigDto = {
     label: string;
 };
 
-export type UserToken = {
+export type GeneratedTokenDto = {
     id: number;
-    userId?: number;
     token: string;
     label: string;
 };
@@ -467,6 +466,12 @@ export type WikidataEntityData = {
     WikipediaEnglishUrl: string;
 };
 
+export type UserToken = {
+    id: number;
+    userId?: number;
+    label: string;
+};
+
 export type AssimilationCountDto = {
     dueCount?: number;
     assimilatedCountOfTheDay?: number;
@@ -803,7 +808,7 @@ export type GenerateTokenResponses = {
     /**
      * OK
      */
-    200: UserToken;
+    200: GeneratedTokenDto;
 };
 
 export type GenerateTokenResponse = GenerateTokenResponses[keyof GenerateTokenResponses];
@@ -4019,6 +4024,35 @@ export type FetchWikidataEntityDataByIdResponses = {
 };
 
 export type FetchWikidataEntityDataByIdResponse = FetchWikidataEntityDataByIdResponses[keyof FetchWikidataEntityDataByIdResponses];
+
+export type GetTokenInfoData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/user/token-info';
+};
+
+export type GetTokenInfoErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type GetTokenInfoError = GetTokenInfoErrors[keyof GetTokenInfoErrors];
+
+export type GetTokenInfoResponses = {
+    /**
+     * OK
+     */
+    200: UserToken;
+};
+
+export type GetTokenInfoResponse = GetTokenInfoResponses[keyof GetTokenInfoResponses];
 
 export type GetMenuDataData = {
     body?: never;
