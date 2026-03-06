@@ -1,6 +1,10 @@
 import * as readline from 'node:readline'
 import { addGmailAccount, getLastEmailSubject } from './gmail.js'
-import { formatHelp } from './help.js'
+import {
+  formatCommandSuggestions,
+  formatHelp,
+  interactiveDocs,
+} from './help.js'
 import { formatVersionOutput } from './version.js'
 
 const GREY = '\x1b[90m'
@@ -86,6 +90,13 @@ function getTerminalWidth(): number {
   return process.stdout.columns || 80
 }
 
+function buildSuggestionLines(buffer: string): string[] {
+  const bufferLines = buffer.split('\n')
+  const lastLine = bufferLines[bufferLines.length - 1]
+  if (!lastLine.startsWith('/')) return []
+  return formatCommandSuggestions(interactiveDocs)
+}
+
 async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
   console.log(formatVersionOutput())
   console.log()
@@ -103,7 +114,8 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
     const width = getTerminalWidth()
     const contentLines = buildBoxLines(buffer, width)
     const boxLines = renderBox(contentLines, width).split('\n')
-    const newTotalLines = boxLines.length
+    const suggestionLines = buildSuggestionLines(buffer)
+    const newTotalLines = boxLines.length + suggestionLines.length
 
     if (linesAboveCursor > 0) {
       process.stdout.write(`\x1b[${linesAboveCursor}A`)
@@ -111,6 +123,9 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
     process.stdout.write('\r')
 
     for (const line of boxLines) {
+      process.stdout.write(`\x1b[2K${line}\n`)
+    }
+    for (const line of suggestionLines) {
       process.stdout.write(`\x1b[2K${line}\n`)
     }
     const extra = prevTotalLines - newTotalLines

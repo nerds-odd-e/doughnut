@@ -22,7 +22,7 @@ const helpDocEntry = {
   description: 'Show this help',
   category: 'subcommand' as const,
 }
-const interactiveDocs = [
+export const interactiveDocs = [
   {
     name: '/help',
     usage: '/help',
@@ -31,6 +31,15 @@ const interactiveDocs = [
   },
   ...gmailCommandDocs,
 ]
+
+export function formatCommandSuggestions(
+  commands: readonly CommandDoc[],
+  maxVisible = 8
+): string[] {
+  const lines = commands.map((d) => `  ${d.usage.padEnd(20)} ${d.description}`)
+  if (lines.length <= maxVisible) return lines
+  return [...lines.slice(0, maxVisible), '  ↓ more below']
+}
 
 export const helpDoc = helpDocEntry
 
