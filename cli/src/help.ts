@@ -1,5 +1,6 @@
 import { accessTokenCommandDocs } from './accessToken.js'
 import { gmailCommandDocs } from './gmail.js'
+import { formatHighlightedList } from './listDisplay.js'
 import { updateDoc } from './update.js'
 import { versionDoc } from './version.js'
 
@@ -40,10 +41,6 @@ export const interactiveDocs = [
   ...gmailCommandDocs,
 ]
 
-const GREY = '\x1b[90m'
-const REVERSE = '\x1b[7m'
-const RESET = '\x1b[0m'
-
 export function filterCommandsByPrefix(
   commands: readonly CommandDoc[],
   prefix: string
@@ -65,36 +62,8 @@ export function formatCommandSuggestionsWithHighlight(
   maxVisible = 8,
   highlightIndex = 0
 ): string[] {
-  if (commands.length === 0) return []
-  const total = commands.length
-  const scrollOffset =
-    total <= maxVisible
-      ? 0
-      : Math.max(
-          0,
-          Math.min(highlightIndex - maxVisible + 1, total - maxVisible)
-        )
-  const visibleCommands = commands.slice(
-    scrollOffset,
-    scrollOffset + maxVisible
-  )
-  const lines = visibleCommands.map(
-    (d) => `  ${d.usage.padEnd(20)} ${d.description}`
-  )
-  const result: string[] = []
-  if (scrollOffset > 0) result.push(`${GREY}  ↑ more above${RESET}`)
-  const highlightPos = highlightIndex - scrollOffset
-  for (let i = 0; i < lines.length; i++) {
-    result.push(
-      i === highlightPos
-        ? `${REVERSE}${lines[i]}${RESET}`
-        : `${GREY}${lines[i]}${RESET}`
-    )
-  }
-  if (scrollOffset + visibleCommands.length < total) {
-    result.push(`${GREY}  ↓ more below${RESET}`)
-  }
-  return result
+  const lines = commands.map((d) => `  ${d.usage.padEnd(20)} ${d.description}`)
+  return formatHighlightedList(lines, maxVisible, highlightIndex)
 }
 
 export const helpDoc = helpDocEntry
