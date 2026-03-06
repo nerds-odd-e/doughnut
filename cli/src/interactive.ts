@@ -91,12 +91,15 @@ function getTerminalWidth(): number {
   return process.stdout.columns || 80
 }
 
-function buildSuggestionLines(buffer: string): string[] {
+function buildSuggestionLines(
+  buffer: string,
+  highlightIndex: number
+): string[] {
   const bufferLines = buffer.split('\n')
   const lastLine = bufferLines[bufferLines.length - 1]
   if (!lastLine.startsWith('/') || lastLine.endsWith(' ')) return []
   const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
-  return formatCommandSuggestionsWithHighlight(filtered)
+  return formatCommandSuggestionsWithHighlight(filtered, 8, highlightIndex)
 }
 
 async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
@@ -109,6 +112,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
   readline.emitKeypressEvents(stdin)
 
   let buffer = ''
+  let highlightIndex = 0
   let linesAboveCursor = 0
   let prevTotalLines = 0
 
@@ -116,7 +120,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
     const width = getTerminalWidth()
     const contentLines = buildBoxLines(buffer, width)
     const boxLines = renderBox(contentLines, width).split('\n')
-    const suggestionLines = buildSuggestionLines(buffer)
+    const suggestionLines = buildSuggestionLines(buffer, highlightIndex)
     const newTotalLines = boxLines.length + suggestionLines.length
 
     if (linesAboveCursor > 0) {
@@ -177,9 +181,10 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
             filtered.length > 0
 
           if (suggestionsVisible) {
-            const firstCommand = `${filtered[0].usage} `
+            const selectedCommand = `${filtered[highlightIndex].usage} `
             buffer =
-              bufferLines.slice(0, -1).concat(firstCommand).join('\n') || ''
+              bufferLines.slice(0, -1).concat(selectedCommand).join('\n') || ''
+            highlightIndex = 0
             drawBox()
             return
           }
@@ -214,10 +219,28 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
       } else if (key.name === 'backspace') {
         if (buffer.length > 0) {
           buffer = buffer.slice(0, -1)
+          highlightIndex = 0
+          drawBox()
+        }
+      } else if (key.name === 'up' || key.name === 'down') {
+        const bufferLines = buffer.split('\n')
+        const lastLine = bufferLines[bufferLines.length - 1]
+        const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
+        const suggestionsVisible =
+          lastLine.startsWith('/') &&
+          !lastLine.endsWith(' ') &&
+          filtered.length > 0
+        if (suggestionsVisible) {
+          const n = filtered.length
+          highlightIndex =
+            key.name === 'up'
+              ? (highlightIndex - 1 + n) % n
+              : (highlightIndex + 1) % n
           drawBox()
         }
       } else if (str && !key.ctrl && !key.meta) {
         buffer += str
+        highlightIndex = 0
         drawBox()
       }
     }

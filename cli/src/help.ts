@@ -54,17 +54,39 @@ export function formatCommandSuggestions(
 
 export function formatCommandSuggestionsWithHighlight(
   commands: readonly CommandDoc[],
-  maxVisible = 8
+  maxVisible = 8,
+  highlightIndex = 0
 ): string[] {
   if (commands.length === 0) return []
-  const lines = commands.map((d) => `  ${d.usage.padEnd(20)} ${d.description}`)
-  const visible =
-    lines.length <= maxVisible
-      ? lines
-      : [...lines.slice(0, maxVisible), '  ↓ more below']
-  return visible.map((line, i) =>
-    i === 0 ? `${REVERSE}${line}${RESET}` : `${GREY}${line}${RESET}`
+  const total = commands.length
+  const scrollOffset =
+    total <= maxVisible
+      ? 0
+      : Math.max(
+          0,
+          Math.min(highlightIndex - maxVisible + 1, total - maxVisible)
+        )
+  const visibleCommands = commands.slice(
+    scrollOffset,
+    scrollOffset + maxVisible
   )
+  const lines = visibleCommands.map(
+    (d) => `  ${d.usage.padEnd(20)} ${d.description}`
+  )
+  const result: string[] = []
+  if (scrollOffset > 0) result.push(`${GREY}  ↑ more above${RESET}`)
+  const highlightPos = highlightIndex - scrollOffset
+  for (let i = 0; i < lines.length; i++) {
+    result.push(
+      i === highlightPos
+        ? `${REVERSE}${lines[i]}${RESET}`
+        : `${GREY}${lines[i]}${RESET}`
+    )
+  }
+  if (scrollOffset + visibleCommands.length < total) {
+    result.push(`${GREY}  ↓ more below${RESET}`)
+  }
+  return result
 }
 
 export const helpDoc = helpDocEntry

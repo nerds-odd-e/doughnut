@@ -9,6 +9,25 @@ import {
   visibleLength,
 } from '../src/interactive.js'
 
+let useManyCommandsForScrollTests = false
+vi.mock('../src/help.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../src/help.js')>()
+  const manyCommands = Array.from({ length: 12 }, (_, i) => ({
+    name: `cmd${i}`,
+    usage: `/cmd${i}`,
+    description: `Command ${i}`,
+    category: 'interactive' as const,
+  }))
+  return {
+    ...actual,
+    filterCommandsByPrefix: (_: unknown, prefix: string) => {
+      if (useManyCommandsForScrollTests && prefix.startsWith('/'))
+        return manyCommands
+      return actual.filterCommandsByPrefix(actual.interactiveDocs, prefix)
+    },
+  }
+})
+
 function createMockStdin(input: string): NodeJS.ReadableStream {
   const stream = new Readable({
     read() {
@@ -457,6 +476,148 @@ describe('TTY mode slash command suggestions', () => {
       .split('\n')
       .filter((l) => l.includes('/help') && l.includes('Show this help'))
     expect(suggestionLinesAfterInsert).toHaveLength(0)
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('up at first wraps to last', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    writeSpy.mockClear()
+    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '\x1b[A', { name: 'up', ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const lines = output.split('\n')
+    const lastEmailLines = lines.filter((l) => l.includes('/last email'))
+    const lastEmailLine = lastEmailLines[lastEmailLines.length - 1]
+    expect(lastEmailLine).toBeDefined()
+    expect(lastEmailLine).toContain('\x1b[7m')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('down at last wraps to first', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    writeSpy.mockClear()
+    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+    for (let i = 0; i < 3; i++) {
+      stdin.emit('keypress', undefined, {
+        name: 'down',
+        ctrl: false,
+        meta: false,
+      })
+      await new Promise((r) => setImmediate(r))
+    }
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const lines = output.split('\n')
+    const helpLine = lines.find((l) => l.includes('/help'))
+    expect(helpLine).toBeDefined()
+    expect(helpLine).toContain('\x1b[7m')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('Enter inserts highlighted command', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    writeSpy.mockClear()
+    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', undefined, {
+      name: 'down',
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', undefined, {
+      name: 'down',
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '\r', {
+      name: 'return',
+      shift: false,
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(output).toContain('→ /last email ')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+})
+
+describe('TTY mode slash command suggestions with scroll', () => {
+  let writeSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    useManyCommandsForScrollTests = true
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
+    vi.spyOn(process, 'exit').mockImplementation(
+      (() => undefined) as unknown as typeof process.exit
+    )
+  })
+
+  afterEach(() => {
+    useManyCommandsForScrollTests = false
+    vi.restoreAllMocks()
+  })
+
+  test('shows "↑ more above" when scrolled down', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    writeSpy.mockClear()
+    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+    for (let i = 0; i < 8; i++) {
+      stdin.emit('keypress', undefined, {
+        name: 'down',
+        ctrl: false,
+        meta: false,
+      })
+      await new Promise((r) => setImmediate(r))
+    }
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(output).toContain('↑ more above')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('hides "↓ more below" when at bottom', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    writeSpy.mockClear()
+    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+    for (let i = 0; i < 11; i++) {
+      stdin.emit('keypress', undefined, {
+        name: 'down',
+        ctrl: false,
+        meta: false,
+      })
+      await new Promise((r) => setImmediate(r))
+    }
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const lastMoreBelow = output.lastIndexOf('↓ more below')
+    const lastCmd11 = output.lastIndexOf('/cmd11')
+    expect(lastCmd11).toBeGreaterThan(lastMoreBelow)
 
     stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
