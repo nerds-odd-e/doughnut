@@ -201,7 +201,12 @@ async function runInteractivePiped(
     terminal: false,
   })
 
-  rl.on('line', async (line) => {
+  let processing = false
+  const lineQueue: string[] = []
+  async function processNextLine() {
+    if (processing || lineQueue.length === 0) return
+    processing = true
+    const line = lineQueue.shift()!
     if (line.trim()) {
       console.log(renderPastInput(line, getTerminalWidth()))
     }
@@ -209,6 +214,13 @@ async function runInteractivePiped(
       rl.close()
       process.exit(0)
     }
+    processing = false
+    if (lineQueue.length > 0) processNextLine()
+  }
+
+  rl.on('line', (line) => {
+    lineQueue.push(line)
+    processNextLine()
   })
 }
 

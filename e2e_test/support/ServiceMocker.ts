@@ -39,6 +39,13 @@ class ServiceMocker {
     return this.stubGetter(url, {}, data)
   }
 
+  public stubGetterPathOnly(path: string, response: unknown) {
+    return this.mockWithPredicates(
+      [new FlexiPredicate().withPath(path).withMethod(HttpMethod.GET)],
+      [response]
+    )
+  }
+
   public stubGetter(path: string, queryData: unknown, response: unknown) {
     return this.mockWithPredicates(
       [

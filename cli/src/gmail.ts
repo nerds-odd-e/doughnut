@@ -163,29 +163,13 @@ async function getProfileEmail(accessToken: string): Promise<string> {
 export async function addGmailAccount(configPath?: string): Promise<void> {
   const config = loadConfig(configPath)
 
-  let clientId = config.clientId || BUILTIN_CLIENT_ID || undefined
-  let clientSecret = config.clientSecret || BUILTIN_CLIENT_SECRET || undefined
+  const clientId = config.clientId || BUILTIN_CLIENT_ID || undefined
+  const clientSecret = config.clientSecret || BUILTIN_CLIENT_SECRET || undefined
 
   if (!(clientId && clientSecret)) {
-    const readline = await import('node:readline')
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    })
-    clientId =
-      clientId ||
-      (await new Promise<string>((resolve) => {
-        rl.question('Google OAuth Client ID: ', resolve)
-      }))
-    clientSecret =
-      clientSecret ||
-      (await new Promise<string>((resolve) => {
-        rl.question('Google OAuth Client Secret: ', resolve)
-      }))
-    rl.close()
-    config.clientId = clientId
-    config.clientSecret = clientSecret
-    saveConfig(config, configPath)
+    throw new Error(
+      'Missing OAuth credentials. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables, or run with the bundled CLI.'
+    )
   }
 
   const state = crypto.randomBytes(16).toString('hex')

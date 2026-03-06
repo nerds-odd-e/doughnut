@@ -90,3 +90,7 @@ After({ tags: '@BundleFirstAndTerminateMCPServerWhenTeardown' }, () => {
 Before({ tags: '@cli' }, () => {
   cy.task('bundleAndCopyCli')
 })
+
+Before({ tags: '@usingMockedGoogleService' }, () => {
+  cy.wrap(null).then(() => mock_services.google().mock())
+})
