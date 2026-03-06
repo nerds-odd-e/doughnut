@@ -45,6 +45,13 @@ deactivate_nvm
 # Setup core environment
 setup_env_vars
 
+# Load CLI OAuth credentials for dev (pnpm cli /add gmail)
+if [ -f ./cli/.env.local ]; then
+  set -a
+  source ./cli/.env.local
+  set +a
+fi
+
 # Setup MySQL environment
 setup_mysql_env "${MYSQL_PKG_PATH}"
 
