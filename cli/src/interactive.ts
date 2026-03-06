@@ -1,5 +1,6 @@
 import * as readline from 'node:readline'
 import { addGmailAccount, getLastEmailSubject } from './gmail.js'
+import { formatHelp } from './help.js'
 import { formatVersionOutput } from './version.js'
 
 const GREY = '\x1b[90m'
@@ -12,6 +13,10 @@ export async function processInput(input: string): Promise<boolean> {
   const trimmed = input.trim()
   if (trimmed === 'exit') {
     return true
+  }
+  if (trimmed === '/help') {
+    console.log(formatHelp())
+    return false
   }
   if (trimmed === '/add gmail') {
     try {

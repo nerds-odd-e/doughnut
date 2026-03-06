@@ -21,3 +21,10 @@ export function compareVersions(a: string, b: string): number {
   if (aMinor !== bMinor) return aMinor - bMinor
   return aPatch - bPatch
 }
+
+export const versionDoc = {
+  name: 'version',
+  usage: 'version | --version | -v',
+  description: 'Show CLI version',
+  category: 'subcommand' as const,
+}

@@ -37,3 +37,20 @@ cli/
 ## OAuth credentials (Gmail)
 
 Credentials are injected at build time. For local builds: copy `cli/.env.local.example` to `cli/.env.local` and add your Google OAuth client ID and secret. For CI/release: add `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` as GitHub Actions secrets (Settings > Secrets and variables > Actions).
+
+## Adding new commands
+
+When adding a new command, ensure `/help` lists it:
+
+1. **Export a CommandDoc** from the module that implements the command (same file as the handler). Use `{ name, usage, description, category: 'subcommand' | 'interactive' }`.
+2. **Register in help.ts**:
+   - For a **subcommand** (e.g. `version`, `update`): Import the doc and add it to the `subcommandDocs` array.
+   - For an **interactive** command in an existing module (e.g. gmail): Add to that module's docs array (e.g. `gmailCommandDocs` in gmail.ts)—help.ts already imports it.
+   - For an **interactive** command in a new module: Export the doc, then in help.ts import it and add to `interactiveDocs`.
+3. **Wire up the handler** in `processInput()` (interactive) or `index.ts` (subcommand).
+4. **Verify**: Run `doughnut -c "/help"` or `doughnut help` and confirm the new command appears.
+4. **Verify**: Run `doughnut -c "/help"` or `doughnut help` and confirm the new command appears.
+4. **Verify**: Run `doughnut help` or `doughnut -c "/help"` to confirm the new command appears.
+4. **Verify**: Run `doughnut help` or `doughnut -c "/help"` to confirm the new command appears in the output.
+4. **Verify**: Run `pnpm cli` then type `/help`, or run `pnpm cli -c "/help"`, and confirm the new command appears.
+4. **Verify**: Run `doughnut help` or `doughnut -c "/help"` to confirm the new command appears in the output.

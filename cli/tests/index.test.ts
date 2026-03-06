@@ -7,6 +7,19 @@ describe('CLI', () => {
     const output = formatVersionOutput()
     expect(output).toMatch(/^doughnut \d+\.\d+\.\d+$/)
   })
+
+  test('help subcommand prints help and does not start interactive mode', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    await run(['help'])
+    expect(logSpy).toHaveBeenCalled()
+    const output = logSpy.mock.calls.flat().join('\n')
+    expect(output).toContain('Subcommands')
+    expect(output).toContain('version')
+    expect(output).toContain('update')
+    expect(output).toContain('/add gmail')
+    expect(output).toContain('/last email')
+    logSpy.mockRestore()
+  })
 })
 
 describe('run with -c option', () => {

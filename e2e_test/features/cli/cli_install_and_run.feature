@@ -26,6 +26,14 @@ Feature: CLI install and run
     When I run the doughnut version command
     Then I should see "doughnut 0.1.0"
 
+  Scenario: Interactive /help command lists all commands
+    When I run the doughnut command with -c "/help"
+    Then I should see "/add gmail"
+    And I should see "/last email"
+    And I should see "exit"
+    And I should see "update"
+    And I should see "version"
+
   @bundleAndCopyCliToBackendResources
   Scenario: Update when already latest (0.1.0)
     Given the backend is serving the CLI and install script

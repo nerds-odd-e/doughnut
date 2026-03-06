@@ -72,3 +72,10 @@ export async function runUpdate(): Promise<void> {
 
   console.log(`Updated doughnut from ${currentVersion} to ${incomingVersion}`)
 }
+
+export const updateDoc = {
+  name: 'update',
+  usage: 'update',
+  description: 'Update CLI to latest version',
+  category: 'subcommand' as const,
+}

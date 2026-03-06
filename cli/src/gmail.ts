@@ -314,3 +314,18 @@ export async function getLastEmailSubject(
   }
   return getSubjectFromMessage(msgData)
 }
+
+export const gmailCommandDocs = [
+  {
+    name: '/add gmail',
+    usage: '/add gmail',
+    description: 'Add Gmail account via OAuth',
+    category: 'interactive' as const,
+  },
+  {
+    name: '/last email',
+    usage: '/last email',
+    description: 'Show subject of last email',
+    category: 'interactive' as const,
+  },
+]

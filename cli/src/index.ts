@@ -2,6 +2,7 @@ import { processInput } from './interactive.js'
 import { runInteractive } from './interactive.js'
 import { runUpdate } from './update.js'
 import { formatVersionOutput } from './version.js'
+import { formatHelp } from './help.js'
 
 export async function run(args: string[]): Promise<void> {
   const cIdx = args.findIndex((a) => a === '-c' || a.startsWith('-c='))
@@ -30,6 +31,11 @@ export async function run(args: string[]): Promise<void> {
 
   if (subcommand === 'update') {
     await runUpdate()
+    return
+  }
+
+  if (subcommand === 'help') {
+    console.log(formatHelp())
     return
   }
 

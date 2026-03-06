@@ -41,6 +41,18 @@ describe('processInput', () => {
     logSpy.mockRestore()
   })
 
+  test('returns false and logs help for /help', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    expect(await processInput('/help')).toBe(false)
+    expect(logSpy).toHaveBeenCalled()
+    const output = logSpy.mock.calls.flat().join('\n')
+    expect(output).toContain('/add gmail')
+    expect(output).toContain('/last email')
+    expect(output).toContain('exit')
+    expect(output).not.toContain('Not supported')
+    logSpy.mockRestore()
+  })
+
   test('returns false and logs error for /last email when no account configured', async () => {
     const configDir = (await import('node:fs')).mkdtempSync(
       `${(await import('node:os')).tmpdir()}/doughnut-test-`
