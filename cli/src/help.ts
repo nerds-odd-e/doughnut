@@ -19,14 +19,14 @@ const subcommandDocs = [versionDoc, updateDoc, exitDoc]
 const helpDocEntry = {
   name: 'help',
   usage: 'help',
-  description: 'Show this help',
+  description: 'List available commands',
   category: 'subcommand' as const,
 }
 export const interactiveDocs = [
   {
     name: '/help',
     usage: '/help',
-    description: 'Show this help',
+    description: 'List available commands',
     category: 'interactive' as const,
   },
   {
