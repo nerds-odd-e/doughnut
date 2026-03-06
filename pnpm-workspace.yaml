@@ -2,6 +2,7 @@ packages:
   - frontend
   - mcp-server
   - cli
+  - packages/doughnut-api
 
 strictDepBuilds: true
 

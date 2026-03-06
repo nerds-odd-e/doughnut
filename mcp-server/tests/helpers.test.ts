@@ -1,5 +1,6 @@
 import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest'
-import { createErrorResponse, getEnvironmentConfig } from '../src/helpers.js'
+import { createErrorResponse } from '../src/helpers.js'
+import { getApiConfig } from 'doughnut-api'
 
 describe('createErrorResponse', () => {
   test('should handle Error objects', () => {
@@ -59,7 +60,7 @@ describe('createErrorResponse', () => {
   })
 })
 
-describe('getEnvironmentConfig', () => {
+describe('getApiConfig', () => {
   const originalEnv = process.env
 
   beforeEach(() => {
@@ -75,7 +76,7 @@ describe('getEnvironmentConfig', () => {
     process.env.DOUGHNUT_API_BASE_URL = 'http://localhost:8080'
     process.env.DOUGHNUT_API_AUTH_TOKEN = 'test-token'
 
-    const config = getEnvironmentConfig()
+    const config = getApiConfig()
 
     expect(config.apiBaseUrl).toBe('http://localhost:8080')
     expect(config.authToken).toBe('test-token')
@@ -85,9 +86,9 @@ describe('getEnvironmentConfig', () => {
     delete process.env.DOUGHNUT_API_BASE_URL
     delete process.env.DOUGHNUT_API_AUTH_TOKEN
 
-    const config = getEnvironmentConfig()
+    const config = getApiConfig()
 
-    expect(config.apiBaseUrl).toBe('http://localhost:9081') // Default value
+    expect(config.apiBaseUrl).toBe('http://localhost:9081')
     expect(config.authToken).toBeUndefined()
   })
 
@@ -95,9 +96,9 @@ describe('getEnvironmentConfig', () => {
     process.env.DOUGHNUT_API_BASE_URL = ''
     process.env.DOUGHNUT_API_AUTH_TOKEN = ''
 
-    const config = getEnvironmentConfig()
+    const config = getApiConfig()
 
-    expect(config.apiBaseUrl).toBe('http://localhost:9081') // Empty string is falsy, so default is used
+    expect(config.apiBaseUrl).toBe('http://localhost:9081')
     expect(config.authToken).toBe('')
   })
 })

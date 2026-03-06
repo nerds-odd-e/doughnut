@@ -16,6 +16,9 @@
     "test:watch": "vitest --watch",
     "format": "biome check --write src/"
   },
+  "dependencies": {
+    "doughnut-api": "workspace:*"
+  },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",
     "@types/node": "25.3.5",

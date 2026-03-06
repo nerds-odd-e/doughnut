@@ -1,11 +1,6 @@
 import type { z } from 'zod'
 import type { ToolResponse, ServerContext } from './types.js'
 
-/**
- * Helper functions for the MCP server
- */
-
-// Response formatting
 export function createErrorResponse(
   err: unknown,
   prefix = 'ERROR:'
@@ -31,14 +26,6 @@ export function textResponse(message: string): ToolResponse {
 
 export function jsonResponse(data: unknown): ToolResponse {
   return textResponse(JSON.stringify(data))
-}
-
-// Environment configuration
-export function getEnvironmentConfig() {
-  return {
-    apiBaseUrl: process.env.DOUGHNUT_API_BASE_URL || 'http://localhost:9081',
-    authToken: process.env.DOUGHNUT_API_AUTH_TOKEN,
-  }
 }
 
 // Parameter validation

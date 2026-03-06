@@ -313,6 +313,10 @@ importers:
         version: 3.2.5(typescript@5.9.3)
 
   mcp-server:
+    dependencies:
+      doughnut-api:
+        specifier: workspace:*
+        version: link:../packages/doughnut-api
     devDependencies:
       '@modelcontextprotocol/sdk':
         specifier: ^1.27.1
@@ -332,6 +336,8 @@ importers:
       zod:
         specifier: ^4.3.6
         version: 4.3.6
+
+  packages/doughnut-api: {}
 
 packages:
 
