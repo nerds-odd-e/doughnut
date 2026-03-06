@@ -1,3 +1,4 @@
+import { accessTokenCommandDocs } from './accessToken.js'
 import { gmailCommandDocs } from './gmail.js'
 import { updateDoc } from './update.js'
 import { versionDoc } from './version.js'
@@ -35,6 +36,7 @@ export const interactiveDocs = [
     description: 'Quit the CLI',
     category: 'interactive' as const,
   },
+  ...accessTokenCommandDocs,
   ...gmailCommandDocs,
 ]
 

@@ -62,6 +62,22 @@ When(
   }
 )
 
+Given('I have a CLI config directory', () => {
+  cy.task('createCliConfigDir').as('cliConfigDir')
+})
+
+When(
+  'I run the doughnut command with -c {string} using CLI config',
+  (input: string) => {
+    cy.get<string>('@cliConfigDir').then((configDir) => {
+      cy.task('runCliDirectWithArgs', {
+        args: ['-c', input],
+        env: { DOUGHNUT_CONFIG_DIR: configDir },
+      }).as('doughnutOutput')
+    })
+  }
+)
+
 Then('I should see {string}', (expected: string) => {
   cy.get('@doughnutOutput').should('include', expected)
 })

@@ -1,4 +1,5 @@
 import * as readline from 'node:readline'
+import { addAccessToken, listAccessTokens } from './accessToken.js'
 import { addGmailAccount, getLastEmailSubject } from './gmail.js'
 import {
   filterCommandsByPrefix,
@@ -21,6 +22,30 @@ export async function processInput(input: string): Promise<boolean> {
   }
   if (trimmed === '/help') {
     console.log(formatHelp())
+    return false
+  }
+  if (trimmed.startsWith('/add-access-token ')) {
+    const token = trimmed.slice('/add-access-token '.length).trim()
+    if (!token) {
+      console.log('Usage: /add-access-token <token>')
+      return false
+    }
+    try {
+      await addAccessToken(token)
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : String(err))
+    }
+    return false
+  }
+  if (trimmed === '/list-access-token') {
+    const tokens = listAccessTokens()
+    if (tokens.length === 0) {
+      console.log('No access tokens stored.')
+    } else {
+      for (const t of tokens) {
+        console.log(t.label)
+      }
+    }
     return false
   }
   if (trimmed === '/add gmail') {

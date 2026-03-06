@@ -235,6 +235,9 @@ const commonConfig = {
             throw error
           }
         },
+        createCliConfigDir() {
+          return mkdtempSync(join(tmpdir(), 'cypress-cli-config-'))
+        },
         async bundleAndCopyCli() {
           const repoRoot = path.resolve(__dirname, '..', '..')
           try {

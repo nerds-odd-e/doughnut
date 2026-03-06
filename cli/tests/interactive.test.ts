@@ -580,7 +580,7 @@ describe('TTY mode slash command suggestions', () => {
     writeSpy.mockClear()
     stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
     await new Promise((r) => setImmediate(r))
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 5; i++) {
       stdin.emit('keypress', undefined, {
         name: 'down',
         ctrl: false,
