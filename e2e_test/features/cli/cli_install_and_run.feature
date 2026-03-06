@@ -21,6 +21,13 @@ Feature: CLI install and run
     When I run the installed doughnut command with input "exit"
     Then I should see "doughnut 0.1.0"
 
+  Scenario: -c option processes one input and exits
+    Given the backend is serving the CLI and install script
+    When I install the CLI from localhost without affecting my system
+    And I run the installed doughnut command with -c "hello"
+    Then I should see "doughnut 0.1.0"
+    And I should see "Not supported"
+
   Scenario: Show version
     Given the backend is serving the CLI and install script
     When I install the CLI from localhost without affecting my system

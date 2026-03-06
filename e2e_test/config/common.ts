@@ -334,6 +334,33 @@ const commonConfig = {
             }
           )
         },
+        async runCliWithArgs({
+          doughnutPath,
+          args,
+          env,
+        }: {
+          doughnutPath: string
+          args: string[]
+          env?: NodeJS.ProcessEnv
+        }) {
+          const { spawn } = await import('node:child_process')
+          return new Promise<string>((resolve, reject) => {
+            const proc = spawn(doughnutPath, args, {
+              env: { ...process.env, ...env },
+              stdio: ['pipe', 'pipe', 'pipe'],
+            })
+            let stdout = ''
+            proc.stdout?.on('data', (chunk: Buffer) => {
+              stdout += chunk.toString()
+            })
+            proc.stdin?.end()
+            proc.on('close', (code) => {
+              if (code === 0) resolve(stdout)
+              else reject(new Error(`CLI exited with code ${code}`))
+            })
+            proc.on('error', reject)
+          })
+        },
         async runCliWithInput({
           doughnutPath,
           input,
