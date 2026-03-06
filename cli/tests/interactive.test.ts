@@ -328,6 +328,15 @@ describe('interactive CLI (e2e style)', () => {
     expect(output).toContain('┌')
     expect(output).toContain('┘')
   })
+
+  test('shows grey hint "  / commands" below input box when user has not typed /', async () => {
+    const stdin = createMockStdin('exit\n')
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    const output = logSpy.mock.calls.flat().join('\n')
+    expect(output).toContain('  / commands')
+    expect(output).toContain('\x1b[90m')
+  })
 })
 
 describe('TTY mode slash command suggestions', () => {
@@ -345,6 +354,33 @@ describe('TTY mode slash command suggestions', () => {
     vi.restoreAllMocks()
   })
 
+  test('initial display shows grey hint "  / commands" below input box', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(output).toContain('  / commands')
+    expect(output).toContain('\x1b[90m')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('typing non-slash keeps hint instead of command list', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    writeSpy.mockClear()
+    stdin.emit('keypress', 'h', { name: 'h', ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(output).toContain('  / commands')
+    expect(output).not.toContain('/help                List available commands')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
   test('typing "/" shows command suggestions below input box', async () => {
     const stdin = createMockTTYStdin()
     runInteractive(stdin as NodeJS.ReadableStream)
@@ -354,7 +390,7 @@ describe('TTY mode slash command suggestions', () => {
 
     const output = writeSpy.mock.calls.map((c) => c[0]).join('')
     expect(output).toContain('/help')
-    expect(output).toContain('Show this help')
+    expect(output).toContain('List available commands')
     expect(output).toContain('/add gmail')
     expect(output).toContain('Add Gmail account')
     expect(output).toContain('/last email')

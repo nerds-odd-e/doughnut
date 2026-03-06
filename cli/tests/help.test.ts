@@ -22,7 +22,7 @@ describe('formatHelp', () => {
     const output = formatHelp()
     expect(output).toContain('Show CLI version')
     expect(output).toContain('Update CLI to latest version')
-    expect(output).toContain('Show this help')
+    expect(output).toContain('List available commands')
     expect(output).toContain('Add Gmail account via OAuth')
     expect(output).toContain('Show subject of last email')
     expect(output).toContain('Quit the CLI')

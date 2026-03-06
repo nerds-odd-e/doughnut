@@ -91,15 +91,19 @@ function getTerminalWidth(): number {
   return process.stdout.columns || 80
 }
 
+const COMMANDS_HINT = `${GREY}  / commands${RESET}`
+
 function buildSuggestionLines(
   buffer: string,
   highlightIndex: number
 ): string[] {
   const bufferLines = buffer.split('\n')
   const lastLine = bufferLines[bufferLines.length - 1]
-  if (!lastLine.startsWith('/') || lastLine.endsWith(' ')) return []
-  const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
-  return formatCommandSuggestionsWithHighlight(filtered, 8, highlightIndex)
+  if (lastLine.startsWith('/') && !lastLine.endsWith(' ')) {
+    const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
+    return formatCommandSuggestionsWithHighlight(filtered, 8, highlightIndex)
+  }
+  return [COMMANDS_HINT]
 }
 
 async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
@@ -253,7 +257,11 @@ async function runInteractivePiped(
   const width = getTerminalWidth()
   console.log(formatVersionOutput())
   console.log()
+  const hintLines = buildSuggestionLines('', 0)
   console.log(renderBox(buildBoxLines('', width), width))
+  for (const line of hintLines) {
+    console.log(line)
+  }
   console.log()
 
   const rl = readline.createInterface({
