@@ -72,7 +72,7 @@
     "@biomejs/biome": "2.4.5",
     "@cucumber/cucumber": "^12.7.0",
     "@hey-api/openapi-ts": "0.94.0",
-    "@mbtest/mountebank": "2.9.2",
+    "@mbtest/mountebank": "2.9.3",
     "@modelcontextprotocol/sdk": "^1.27.1",
     "@redocly/cli": "^2.20.3",
     "@testing-library/cypress": "10.1.0",
