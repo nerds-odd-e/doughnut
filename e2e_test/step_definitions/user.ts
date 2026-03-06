@@ -133,44 +133,53 @@ Then('I should be on the welcome page and asked to login', () => {
   cy.findByRole('button', { name: 'Login via Github' }).click()
 })
 
-When('I generate a new MCP token with label {string}', (label: string) => {
-  start
-    .mainMenu()
-    .userOptions()
-    .manageMCPTokens()
-    .generateToken(label)
-    .as('generatedMcpToken')
-})
+When(
+  'I generate a new Doughnut Access Token with label {string}',
+  (label: string) => {
+    start
+      .mainMenu()
+      .userOptions()
+      .manageAccessTokens()
+      .generateToken(label)
+      .as('generatedAccessToken')
+  }
+)
 
-Then('the new MCP Token should be a valid UUID', () => {
-  cy.get('@generatedMcpToken').should(
+Then('the new Doughnut Access Token should be a valid UUID', () => {
+  cy.get('@generatedAccessToken').should(
     'match',
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
   )
 })
 
-Given('I have a valid MCP token with label {string}', (label: string) => {
-  start
-    .mainMenu()
-    .userOptions()
-    .manageMCPTokens()
-    .generateToken(label)
-    .then((token) => {
-      cy.wrap(token).as('savedMcpToken')
-    })
-})
+Given(
+  'I have a valid Doughnut Access Token with label {string}',
+  (label: string) => {
+    start
+      .mainMenu()
+      .userOptions()
+      .manageAccessTokens()
+      .generateToken(label)
+      .then((token) => {
+        cy.wrap(token).as('savedAccessToken')
+      })
+  }
+)
 
-When('I delete the MCP token with label {string}', (label: string) => {
-  start
-    .mainMenu()
-    .userOptions()
-    .manageMCPTokens()
-    .deleteToken(label)
-    .checkTokenWithLabelNotExists(label)
-})
+When(
+  'I delete the Doughnut Access Token with label {string}',
+  (label: string) => {
+    start
+      .mainMenu()
+      .userOptions()
+      .manageAccessTokens()
+      .deleteToken(label)
+      .checkTokenWithLabelNotExists(label)
+  }
+)
 
 Then(
-  'I cannot create a note as a child of {string} using the MCP token',
+  'I cannot create a note as a child of {string} using the Doughnut Access Token',
   (parentNote: string) => {
     start
       .mcpApi()
@@ -180,7 +189,7 @@ Then(
 )
 
 When(
-  'I can create a note as a child of {string} using the MCP token',
+  'I can create a note as a child of {string} using the Doughnut Access Token',
   (parentNote: string) => {
     start
       .mcpApi()
@@ -195,7 +204,7 @@ Then(
     start
       .mainMenu()
       .userOptions()
-      .manageMCPTokens()
+      .manageAccessTokens()
       .checkTokenWithLabelExists(label)
   }
 )

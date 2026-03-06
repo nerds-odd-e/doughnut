@@ -16,7 +16,7 @@ import NonproductionOnlyLoginPage from "@/pages/NonproductionOnlyLoginPage.vue"
 import MessageCenterPage from "../pages/MessageCenterPage.vue"
 import RecentPage from "@/pages/RecentPage.vue"
 import CirclesPage from "@/pages/CirclesPage.vue"
-import ManageMCPTokensPage from "@/pages/ManageMCPTokensPage.vue"
+import ManageAccessTokensPage from "@/pages/ManageAccessTokensPage.vue"
 import MemoryTrackerPage from "@/pages/MemoryTrackerPage.vue"
 import NotebookPage from "@/pages/NotebookPage.vue"
 import { routeMetadata } from "./routeMetadata"
@@ -44,7 +44,7 @@ const componentMap: Record<string, unknown> = {
   nonproductionOnlyLogin: NonproductionOnlyLoginPage,
   recent: RecentPage,
   circles: CirclesPage,
-  manageMCPTokens: ManageMCPTokensPage,
+  manageAccessTokens: ManageAccessTokensPage,
   memoryTrackerShow: MemoryTrackerPage,
   notebookEdit: NotebookPage,
 }

@@ -16,7 +16,7 @@ const mcpApi = () => {
           noteCreationDTO: noteCreationDto,
         }
 
-        return cy.get('@savedMcpToken').then((token) => {
+        return cy.get('@savedAccessToken').then((token) => {
           // Call the service with token in headers for this request
           // The CancelablePromise wraps cy.then() internally, so we need to wrap it
           const authToken = typeof token === 'string' ? token : String(token)

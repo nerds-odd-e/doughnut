@@ -104,7 +104,7 @@ export const routeMetadata: RouteMetadata[] = [
   },
   {
     path: "/d/generate-token",
-    name: "manageMCPTokens",
+    name: "manageAccessTokens",
   },
   {
     path: "/d/memory-trackers/:memoryTrackerId",

@@ -16,10 +16,10 @@ class McpClient {
 
   async spawnAndConnectMcpServer({
     baseUrl,
-    mcpToken,
+    accessToken,
   }: {
     baseUrl: string
-    mcpToken: string
+    accessToken: string
   }) {
     if (this.client !== null) {
       throw new Error(
@@ -66,7 +66,7 @@ class McpClient {
         ...process.env,
         NODE_PATH: nodePath,
         DOUGHNUT_API_BASE_URL: baseUrl,
-        DOUGHNUT_API_AUTH_TOKEN: mcpToken,
+        DOUGHNUT_API_AUTH_TOKEN: accessToken,
       },
     })
     await this.client.connect(this.transport)

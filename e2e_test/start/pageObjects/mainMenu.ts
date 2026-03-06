@@ -4,7 +4,7 @@ import { navigateToNotebooksPage } from './myNotebooksPage'
 import { assumeAdminDashboardPage } from './adminPages/adminDashboardPage'
 import { assumeAssessmentAndCertificateHistoryPage } from './assessmentAndCertificateHistoryPage'
 import { messageCenterIndicator } from './messageCenterIndicator'
-import { manageMCPTokensPage } from './manageMCPTokensPage'
+import { manageAccessTokensPage } from './manageAccessTokensPage'
 
 export const mainMenu = () => {
   navigateToNotebooksPage()
@@ -45,11 +45,11 @@ export const mainMenu = () => {
           }).click({ force: true })
           return assumeAssessmentAndCertificateHistoryPage()
         },
-        manageMCPTokens() {
-          cy.findByRole('link', { name: 'Manage MCP Tokens' }).click({
+        manageAccessTokens() {
+          cy.findByRole('link', { name: 'Manage Access Tokens' }).click({
             force: true,
           })
-          return manageMCPTokensPage()
+          return manageAccessTokensPage()
         },
       }
     },

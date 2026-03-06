@@ -17,8 +17,8 @@ export const mcpAgentActions = () => {
   return {
     connect() {
       const baseUrl = Cypress.config('baseUrl')
-      cy.get('@savedMcpToken').then((mcpToken) => {
-        cy.task('spawnAndConnectMcpServer', { baseUrl, mcpToken })
+      cy.get('@savedAccessToken').then((accessToken) => {
+        cy.task('spawnAndConnectMcpServer', { baseUrl, accessToken })
       })
       return this
     },

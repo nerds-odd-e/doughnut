@@ -6,7 +6,7 @@ Feature: MCP (Model Context Protocol) Services
 
   Background:
     Given I am logged in as "old_learner"
-    And I have a valid MCP token with label "For MCP services"
+    And I have a valid Doughnut Access Token with label "For MCP services"
     And I connect to an MCP client that connects to Doughnut MCP service
     And I have a notebook with head note "Programming Concepts" and notes:
       | Title           | Parent Title         |

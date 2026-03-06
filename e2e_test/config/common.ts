@@ -199,12 +199,15 @@ const commonConfig = {
         },
         async spawnAndConnectMcpServer({
           baseUrl,
-          mcpToken,
+          accessToken,
         }: {
           baseUrl: string
-          mcpToken: string
+          accessToken: string
         }) {
-          return await mcpClient.spawnAndConnectMcpServer({ baseUrl, mcpToken })
+          return await mcpClient.spawnAndConnectMcpServer({
+            baseUrl,
+            accessToken,
+          })
         },
         async callMcpToolWithParams({
           apiName,

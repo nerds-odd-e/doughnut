@@ -1,6 +1,6 @@
 import { submittableForm } from 'start/forms'
 
-export const manageMCPTokensPage = () => {
+export const manageAccessTokensPage = () => {
   return {
     generateToken(label: string) {
       cy.findByRole('button', { name: 'Generate Token' }).click()

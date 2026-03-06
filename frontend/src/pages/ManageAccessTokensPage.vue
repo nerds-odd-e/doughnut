@@ -8,7 +8,7 @@
       </template>
       <form @submit.prevent.once="generateToken">
         <TextInput
-          scope-name="mcp-token"
+          scope-name="access-token"
           field="label"
           v-focus
           v-model="tokenFormData.label"
@@ -77,7 +77,6 @@ const loading = ref(false)
 const loadTokens = async () => {
   const { data: tokensList, error } = await UserController.getTokens({})
   if (!error) {
-    // tokensList is guaranteed to be UserToken[] when error is undefined
     tokens.value = tokensList!.map((t) => ({
       id: t.id,
       label: t.label,
@@ -97,7 +96,6 @@ const generateToken = async () => {
     })
   )
   if (!error) {
-    // newToken is guaranteed to be UserToken when error is undefined
     token.value = newToken!.token
     tokens.value.push({
       id: newToken!.id,

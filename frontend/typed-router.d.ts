@@ -124,9 +124,9 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/ManageMCPTokensPage': RouteRecordInfo<
-      '/ManageMCPTokensPage',
-      '/ManageMCPTokensPage',
+    '/ManageAccessTokensPage': RouteRecordInfo<
+      '/ManageAccessTokensPage',
+      '/ManageAccessTokensPage',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -312,9 +312,9 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
-    'src/pages/ManageMCPTokensPage.vue': {
+    'src/pages/ManageAccessTokensPage.vue': {
       routes:
-        | '/ManageMCPTokensPage'
+        | '/ManageAccessTokensPage'
       views:
         | never
     }

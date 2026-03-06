@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
-import ManageMCPTokensPage from "@/pages/ManageMCPTokensPage.vue"
+import ManageAccessTokensPage from "@/pages/ManageAccessTokensPage.vue"
 import helper, { mockSdkService } from "@tests/helpers"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
 import { page } from "vitest/browser"
 
-describe("ManageMCPTokensPage", () => {
+describe("ManageAccessTokensPage", () => {
   let router: ReturnType<typeof createRouter>
 
   beforeEach(() => {
@@ -24,7 +24,7 @@ describe("ManageMCPTokensPage", () => {
     })
     mockSdkService("getTokens", [])
 
-    helper.component(ManageMCPTokensPage).withRouter(router).render()
+    helper.component(ManageAccessTokensPage).withRouter(router).render()
 
     await page.getByRole("button", { name: "Generate Token" }).click()
     await page.getByRole("button", { name: "Submit" }).click()
