@@ -126,7 +126,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
       process.stdout.write(`\x1b[2K${line}\n`)
     }
     for (const line of suggestionLines) {
-      process.stdout.write(`\x1b[2K${line}\n`)
+      process.stdout.write(`\x1b[2K${GREY}${line}${RESET}\n`)
     }
     const extra = prevTotalLines - newTotalLines
     for (let i = 0; i < extra; i++) {
