@@ -291,6 +291,7 @@ const commonConfig = {
                 env: {
                   ...process.env,
                   DOUGHNUT_CONFIG_DIR: configDir,
+                  DOUGHNUT_NO_BROWSER: '1',
                   GOOGLE_BASE_URL: googleBaseUrl,
                 },
                 stdio: ['pipe', 'pipe', 'pipe'],

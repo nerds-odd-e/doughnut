@@ -195,7 +195,9 @@ export async function addGmailAccount(configPath?: string): Promise<void> {
   console.log(
     `Opening browser for authentication. If it does not open, visit:\n${authUrl.toString()}`
   )
-  openBrowser(authUrl.toString())
+  if (!process.env.DOUGHNUT_NO_BROWSER) {
+    openBrowser(authUrl.toString())
+  }
 
   const code = await waitForCallback(server)
   const tokens = await exchangeCodeForTokens(
