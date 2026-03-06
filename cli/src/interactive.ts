@@ -16,7 +16,7 @@ const PROMPT = '→ '
 
 export async function processInput(input: string): Promise<boolean> {
   const trimmed = input.trim()
-  if (trimmed === 'exit') {
+  if (trimmed === 'exit' || trimmed === '/exit') {
     return true
   }
   if (trimmed === '/help') {

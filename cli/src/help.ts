@@ -29,6 +29,12 @@ export const interactiveDocs = [
     description: 'Show this help',
     category: 'interactive' as const,
   },
+  {
+    name: '/exit',
+    usage: '/exit',
+    description: 'Quit the CLI',
+    category: 'interactive' as const,
+  },
   ...gmailCommandDocs,
 ]
 

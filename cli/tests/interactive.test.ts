@@ -67,6 +67,11 @@ describe('processInput', () => {
     expect(await processInput('  exit  ')).toBe(true)
   })
 
+  test('returns true for /exit', async () => {
+    expect(await processInput('/exit')).toBe(true)
+    expect(await processInput('  /exit  ')).toBe(true)
+  })
+
   test('returns false and does not log for empty input', async () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
     expect(await processInput('')).toBe(false)
@@ -273,6 +278,13 @@ describe('interactive CLI (e2e style)', () => {
 
   test('exit command exits the CLI', async () => {
     const stdin = createMockStdin('exit\n')
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    expect(exitSpy).toHaveBeenCalledWith(0)
+  })
+
+  test('/exit command exits the CLI', async () => {
+    const stdin = createMockStdin('/exit\n')
     runInteractive(stdin as NodeJS.ReadableStream)
     await new Promise((r) => setImmediate(r))
     expect(exitSpy).toHaveBeenCalledWith(0)
@@ -532,18 +544,14 @@ describe('TTY mode slash command suggestions', () => {
     writeSpy.mockClear()
     stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
     await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', undefined, {
-      name: 'down',
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', undefined, {
-      name: 'down',
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    for (let i = 0; i < 3; i++) {
+      stdin.emit('keypress', undefined, {
+        name: 'down',
+        ctrl: false,
+        meta: false,
+      })
+      await new Promise((r) => setImmediate(r))
+    }
     stdin.emit('keypress', '\r', {
       name: 'return',
       shift: false,

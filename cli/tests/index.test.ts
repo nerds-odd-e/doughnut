@@ -58,6 +58,14 @@ describe('run with -c option', () => {
     expect(exitSpy).toHaveBeenCalledWith(0)
   })
 
+  test('-c "/exit" prints version and exits 0', async () => {
+    run(['-c', '/exit'])
+    await new Promise((r) => setImmediate(r))
+    const output = logSpy.mock.calls.flat().join('\n')
+    expect(output).toMatch(/doughnut \d+\.\d+\.\d+/)
+    expect(exitSpy).toHaveBeenCalledWith(0)
+  })
+
   test('-c with no value prints error and exits 1', async () => {
     run(['-c'])
     await new Promise((r) => setImmediate(r))
