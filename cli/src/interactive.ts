@@ -1,5 +1,11 @@
 import * as readline from 'node:readline'
-import { addAccessToken, listAccessTokens } from './accessToken.js'
+import {
+  addAccessToken,
+  formatTokenLines,
+  getDefaultTokenLabel,
+  listAccessTokens,
+  setDefaultTokenLabel,
+} from './accessToken.js'
 import { addGmailAccount, getLastEmailSubject } from './gmail.js'
 import {
   filterCommandsByPrefix,
@@ -7,6 +13,7 @@ import {
   formatHelp,
   interactiveDocs,
 } from './help.js'
+import { formatHighlightedList } from './listDisplay.js'
 import { formatVersionOutput } from './version.js'
 
 const GREY = '\x1b[90m'
@@ -42,8 +49,8 @@ export async function processInput(input: string): Promise<boolean> {
     if (tokens.length === 0) {
       console.log('No access tokens stored.')
     } else {
-      for (const t of tokens) {
-        console.log(t.label)
+      for (const line of formatTokenLines(tokens, getDefaultTokenLabel())) {
+        console.log(line)
       }
     }
     return false
@@ -144,12 +151,20 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
   let highlightIndex = 0
   let linesAboveCursor = 0
   let prevTotalLines = 0
+  let tokenListItems: { label: string; token: string }[] | null = null
+  let tokenHighlightIndex = 0
 
   function drawBox() {
     const width = getTerminalWidth()
     const contentLines = buildBoxLines(buffer, width)
     const boxLines = renderBox(contentLines, width).split('\n')
-    const suggestionLines = buildSuggestionLines(buffer, highlightIndex)
+    const suggestionLines = tokenListItems
+      ? formatHighlightedList(
+          formatTokenLines(tokenListItems, getDefaultTokenLabel()),
+          8,
+          tokenHighlightIndex
+        )
+      : buildSuggestionLines(buffer, highlightIndex)
     const newTotalLines = boxLines.length + suggestionLines.length
 
     if (linesAboveCursor > 0) {
@@ -196,6 +211,40 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
         process.stdout.write(`\x1b[${1}B\r\n`)
         process.exit(0)
       }
+      if (tokenListItems) {
+        if (key.name === 'up' || key.name === 'down') {
+          const n = tokenListItems.length
+          tokenHighlightIndex =
+            key.name === 'up'
+              ? (tokenHighlightIndex - 1 + n) % n
+              : (tokenHighlightIndex + 1) % n
+          drawBox()
+        } else if (key.name === 'return' && !key.shift) {
+          const selectedLabel = tokenListItems[tokenHighlightIndex]!.label
+          setDefaultTokenLabel(selectedLabel)
+          if (linesAboveCursor > 0) {
+            process.stdout.write(`\x1b[${linesAboveCursor}A`)
+          }
+          process.stdout.write('\r')
+          for (let i = 0; i < prevTotalLines; i++) {
+            process.stdout.write('\x1b[2K\n')
+          }
+          if (prevTotalLines > 1) {
+            process.stdout.write(`\x1b[${prevTotalLines - 1}A`)
+          }
+          process.stdout.write(`Default token set to: ${selectedLabel}\n`)
+          tokenListItems = null
+          tokenHighlightIndex = 0
+          linesAboveCursor = 0
+          prevTotalLines = 0
+          drawBox()
+        } else {
+          tokenListItems = null
+          tokenHighlightIndex = 0
+          drawBox()
+        }
+        return
+      }
       if (key.name === 'return') {
         if (key.shift) {
           buffer += '\n'
@@ -236,6 +285,24 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           if (input.trim()) {
             process.stdout.write(renderPastInput(input, width))
             process.stdout.write('\n')
+          }
+
+          if (input.trim() === '/list-access-token') {
+            const tokens = listAccessTokens()
+            if (tokens.length === 0) {
+              process.stdout.write('No access tokens stored.\n')
+            } else {
+              tokenListItems = tokens
+              const dl = getDefaultTokenLabel()
+              tokenHighlightIndex = Math.max(
+                0,
+                tokens.findIndex((t) => t.label === dl)
+              )
+            }
+            linesAboveCursor = 0
+            prevTotalLines = 0
+            drawBox()
+            return
           }
 
           if (await processInput(input)) {

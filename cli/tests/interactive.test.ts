@@ -99,6 +99,31 @@ describe('processInput', () => {
     logSpy.mockRestore()
   })
 
+  test('returns false and shows tokens with default marker for /list-access-token', async () => {
+    const fs = await import('node:fs')
+    const os = await import('node:os')
+    const path = await import('node:path')
+    const configDir = fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-test-'))
+    const originalEnv = process.env.DOUGHNUT_CONFIG_DIR
+    process.env.DOUGHNUT_CONFIG_DIR = configDir
+    fs.writeFileSync(
+      path.join(configDir, 'access-tokens.json'),
+      JSON.stringify({
+        tokens: [
+          { label: 'Token A', token: 'a' },
+          { label: 'Token B', token: 'b' },
+        ],
+      })
+    )
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    expect(await processInput('/list-access-token')).toBe(false)
+    const output = logSpy.mock.calls.flat().join('\n')
+    expect(output).toContain('★ Token A')
+    expect(output).toContain('  Token B')
+    logSpy.mockRestore()
+    process.env.DOUGHNUT_CONFIG_DIR = originalEnv
+  })
+
   test('returns false and logs error for /last email when no account configured', async () => {
     const configDir = (await import('node:fs')).mkdtempSync(
       `${(await import('node:os')).tmpdir()}/doughnut-test-`
@@ -662,6 +687,132 @@ describe('TTY mode slash command suggestions with scroll', () => {
     const lastMoreBelow = output.lastIndexOf('↓ more below')
     const lastCmd11 = output.lastIndexOf('/cmd11')
     expect(lastCmd11).toBeGreaterThan(lastMoreBelow)
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+})
+
+describe('TTY token list interactive mode', () => {
+  let writeSpy: ReturnType<typeof vi.spyOn>
+  let originalConfigDir: string | undefined
+
+  beforeEach(async () => {
+    const fs = await import('node:fs')
+    const os = await import('node:os')
+    const path = await import('node:path')
+    originalConfigDir = process.env.DOUGHNUT_CONFIG_DIR
+    const configDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'doughnut-tty-test-')
+    )
+    process.env.DOUGHNUT_CONFIG_DIR = configDir
+    fs.writeFileSync(
+      path.join(configDir, 'access-tokens.json'),
+      JSON.stringify({
+        tokens: [
+          { label: 'Alpha', token: 'a' },
+          { label: 'Beta', token: 'b' },
+          { label: 'Gamma', token: 'c' },
+        ],
+      })
+    )
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
+    vi.spyOn(process, 'exit').mockImplementation(
+      (() => undefined) as unknown as typeof process.exit
+    )
+  })
+
+  afterEach(() => {
+    if (originalConfigDir === undefined) {
+      delete process.env.DOUGHNUT_CONFIG_DIR
+    } else {
+      process.env.DOUGHNUT_CONFIG_DIR = originalConfigDir
+    }
+    vi.restoreAllMocks()
+  })
+
+  async function submitListCommand(
+    stdin: ReturnType<typeof createMockTTYStdin>
+  ) {
+    for (const ch of '/list-access-token ') {
+      stdin.emit('keypress', ch, {
+        name: ch === ' ' ? 'space' : undefined,
+        ctrl: false,
+        meta: false,
+      })
+    }
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '\r', {
+      name: 'return',
+      shift: false,
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+  }
+
+  test('shows token list with default highlighted after /list-access-token', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    writeSpy.mockClear()
+
+    await submitListCommand(stdin)
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(output).toContain('Alpha')
+    expect(output).toContain('Beta')
+    expect(output).toContain('Gamma')
+    expect(output).toContain('★')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('Enter sets highlighted token as default and confirms', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+
+    await submitListCommand(stdin)
+
+    stdin.emit('keypress', undefined, {
+      name: 'down',
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+    writeSpy.mockClear()
+    stdin.emit('keypress', '\r', {
+      name: 'return',
+      shift: false,
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(output).toContain('Default token set to: Beta')
+
+    const { getDefaultTokenLabel } = await import('../src/accessToken.js')
+    expect(getDefaultTokenLabel()).toBe('Beta')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('any other key exits token list mode', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+
+    await submitListCommand(stdin)
+    writeSpy.mockClear()
+
+    stdin.emit('keypress', 'q', { name: 'q', ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(output).toContain('/ commands')
+    expect(output).not.toContain('Alpha')
 
     stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })

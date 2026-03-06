@@ -15,7 +15,13 @@ vi.mock('doughnut-api', () => ({
   configureClient: vi.fn(),
 }))
 
-import { addAccessToken, listAccessTokens } from '../src/accessToken.js'
+import {
+  addAccessToken,
+  formatTokenLines,
+  getDefaultTokenLabel,
+  listAccessTokens,
+  setDefaultTokenLabel,
+} from '../src/accessToken.js'
 
 function createTempDir(): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-access-token-test-'))
@@ -131,5 +137,81 @@ describe('listAccessTokens', () => {
     expect(tokens).toHaveLength(1)
     expect(tokens[0]!.label).toBe('My Token')
     expect(tokens[0]!.token).toBe('abc-123')
+  })
+})
+
+describe('getDefaultTokenLabel', () => {
+  let originalConfigDir: string | undefined
+
+  beforeEach(() => {
+    originalConfigDir = process.env.DOUGHNUT_CONFIG_DIR
+    process.env.DOUGHNUT_CONFIG_DIR = createTempDir()
+  })
+
+  afterEach(() => {
+    if (originalConfigDir === undefined) {
+      delete process.env.DOUGHNUT_CONFIG_DIR
+    } else {
+      process.env.DOUGHNUT_CONFIG_DIR = originalConfigDir
+    }
+  })
+
+  test('returns undefined when no tokens exist', () => {
+    expect(getDefaultTokenLabel()).toBeUndefined()
+  })
+
+  test('returns first token label by default', async () => {
+    vi.mocked(UserController.getTokenInfo)
+      .mockResolvedValueOnce({ data: { id: 1, label: 'First' } } as never)
+      .mockResolvedValueOnce({ data: { id: 2, label: 'Second' } } as never)
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await addAccessToken('token-1')
+    await addAccessToken('token-2')
+
+    expect(getDefaultTokenLabel()).toBe('First')
+  })
+
+  test('returns explicitly set default', async () => {
+    vi.mocked(UserController.getTokenInfo)
+      .mockResolvedValueOnce({ data: { id: 1, label: 'First' } } as never)
+      .mockResolvedValueOnce({ data: { id: 2, label: 'Second' } } as never)
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await addAccessToken('token-1')
+    await addAccessToken('token-2')
+    setDefaultTokenLabel('Second')
+
+    expect(getDefaultTokenLabel()).toBe('Second')
+  })
+
+  test('falls back to first token if saved default no longer exists', async () => {
+    vi.mocked(UserController.getTokenInfo).mockResolvedValueOnce({
+      data: { id: 1, label: 'Only' },
+    } as never)
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await addAccessToken('token-1')
+    setDefaultTokenLabel('Deleted')
+
+    expect(getDefaultTokenLabel()).toBe('Only')
+  })
+})
+
+describe('formatTokenLines', () => {
+  test('marks default token with ★', () => {
+    const tokens = [
+      { label: 'Token A', token: 'a' },
+      { label: 'Token B', token: 'b' },
+    ]
+    const lines = formatTokenLines(tokens, 'Token A')
+    expect(lines[0]).toBe('★ Token A')
+    expect(lines[1]).toBe('  Token B')
+  })
+
+  test('marks no token when default is undefined', () => {
+    const tokens = [{ label: 'Token A', token: 'a' }]
+    const lines = formatTokenLines(tokens, undefined)
+    expect(lines[0]).toBe('  Token A')
   })
 })

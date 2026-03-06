@@ -11,6 +11,7 @@ export interface AccessTokenEntry {
 
 interface AccessTokenConfig {
   tokens: AccessTokenEntry[]
+  defaultLabel?: string
 }
 
 function getConfigDir(): string {
@@ -62,6 +63,34 @@ export async function addAccessToken(token: string): Promise<void> {
 
 export function listAccessTokens(): AccessTokenEntry[] {
   return loadConfig().tokens
+}
+
+export function getDefaultTokenLabel(): string | undefined {
+  const config = loadConfig()
+  if (config.tokens.length === 0) return undefined
+  if (
+    config.defaultLabel &&
+    config.tokens.some((t) => t.label === config.defaultLabel)
+  ) {
+    return config.defaultLabel
+  }
+  return config.tokens[0]!.label
+}
+
+export function setDefaultTokenLabel(label: string): void {
+  const config = loadConfig()
+  config.defaultLabel = label
+  saveConfig(config)
+}
+
+export function formatTokenLines(
+  tokens: AccessTokenEntry[],
+  defaultLabel: string | undefined
+): string[] {
+  return tokens.map((t) => {
+    const prefix = t.label === defaultLabel ? '★ ' : '  '
+    return `${prefix}${t.label}`
+  })
 }
 
 export const accessTokenCommandDocs = [
