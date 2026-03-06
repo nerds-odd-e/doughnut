@@ -73,8 +73,8 @@ importers:
         specifier: ^1.27.1
         version: 1.27.1(zod@4.3.6)
       '@redocly/cli':
-        specifier: ^2.20.3
-        version: 2.20.3(@opentelemetry/api@1.9.0)(core-js@3.46.0)
+        specifier: ^2.20.4
+        version: 2.20.4(@opentelemetry/api@1.9.0)(core-js@3.46.0)
       '@testing-library/cypress':
         specifier: 10.1.0
         version: 10.1.0(cypress@15.11.0)
@@ -1520,8 +1520,8 @@ packages:
   '@redocly/ajv@8.18.0':
     resolution: {integrity: sha512-F+LMD2IDIXuHxgpLJh3nkLj9+tSaEzoUWd+7fONGq5pe2169FUDjpEkOfEpoGLz1sbZni/69p07OsecNfAOpqA==}
 
-  '@redocly/cli@2.20.3':
-    resolution: {integrity: sha512-Jp2FtUMsfdg536XlxLQJdsGFapfMNtK8+Jve4hVCmMfC3brlb+xZUhC9Wt0CHIRw1RYf1aI4E5V0EO0i3x3/nQ==}
+  '@redocly/cli@2.20.4':
+    resolution: {integrity: sha512-ahZmcTfEvw2ghWBm418A3anN3XS88Izbqn+HyH6fm/iJ/x04vFwW2KSv/V2K2JZON5ImpTCQBHPQd9bSmmZw9A==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
     hasBin: true
 
@@ -1535,12 +1535,12 @@ packages:
     resolution: {integrity: sha512-/oy8sXi5xK4+HvcFR7xS1A74zJ5aS6rtacNEr91SczLqvtxz79opxp7yYpdYtfGQAp6igx9eU9alwSC/R/X3Cg==}
     engines: {node: '>=18.17.0', npm: '>=9.5.0'}
 
-  '@redocly/openapi-core@2.20.3':
-    resolution: {integrity: sha512-i+yVsGvieqfL5ySq9N0+qQ1nxNTW0e1uTH9B+EIgkWNogV6Fuj1tcMZKlhUX7CGRIOZ+lR1AXDcAFuWVYlp9YA==}
+  '@redocly/openapi-core@2.20.4':
+    resolution: {integrity: sha512-3WZh8dPF6MrxLDbTG4GXtV81EOqHrpMWlOhELWBIICRieMMt/LKcGFuOBRdLEp/KMU2ypwQLKYHrKYCeUNwO3Q==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
-  '@redocly/respect-core@2.20.3':
-    resolution: {integrity: sha512-6HVHhDNW4B73V9p4F45Ykbq7d+6QZB+IYLElyMnQ5arBHrPfLAGRVlqE2NCd6gDciE/Y57XuZ+neY5qk1VmYNQ==}
+  '@redocly/respect-core@2.20.4':
+    resolution: {integrity: sha512-kOM1cCDQtTwZkD58Lx3IIUPcFuRD8bnlkCFUvi0iigy6JJKfpRwgXuzkzFf6FHVO9Z5LwJuYgIP58q3TftWrqg==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
   '@rolldown/pluginutils@1.0.0-rc.2':
@@ -4657,9 +4657,6 @@ packages:
     resolution: {integrity: sha512-7x81NCL719oNbsq/3mh+hVrAWmFuEYUqrq/Iw3kUzH8ReypT9QQ0BLoJS7/G9k6N81XjW4qHWtjWwe/9eLy1EQ==}
     engines: {node: '>=12'}
 
-  openapi-sampler@1.7.0:
-    resolution: {integrity: sha512-fWq32F5vqGpgRJYIarC/9Y1wC9tKnRDcCOjsDJ7MIcSv2HsE7kNifcXIZ8FVtNStBUWxYrEk/MKqVF0SwZ5gog==}
-
   openapi-sampler@1.7.1:
     resolution: {integrity: sha512-pKFRROcYyxRt9GIn0NmS+GkWPS19l0CLQRYAnHk4m1Qp+G43ssVNcfRMs1sLkGrVMuFWO4P4F6YMXeXnfyFGuQ==}
 
@@ -7674,14 +7671,14 @@ snapshots:
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
-  '@redocly/cli@2.20.3(@opentelemetry/api@1.9.0)(core-js@3.46.0)':
+  '@redocly/cli@2.20.4(@opentelemetry/api@1.9.0)(core-js@3.46.0)':
     dependencies:
       '@opentelemetry/exporter-trace-otlp-http': 0.202.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/resources': 2.0.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-node': 2.0.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.34.0
-      '@redocly/openapi-core': 2.20.3
-      '@redocly/respect-core': 2.20.3
+      '@redocly/openapi-core': 2.20.4
+      '@redocly/respect-core': 2.20.4
       abort-controller: 3.0.0
       ajv: 8.18.0
       ajv-formats: 3.0.1(ajv@8.18.0)
@@ -7733,7 +7730,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@redocly/openapi-core@2.20.3':
+  '@redocly/openapi-core@2.20.4':
     dependencies:
       '@redocly/ajv': 8.18.0
       '@redocly/config': 0.44.0
@@ -7746,12 +7743,12 @@ snapshots:
       pluralize: 8.0.0
       yaml-ast-parser: 0.0.43
 
-  '@redocly/respect-core@2.20.3':
+  '@redocly/respect-core@2.20.4':
     dependencies:
       '@faker-js/faker': 7.6.0
       '@noble/hashes': 1.8.0
       '@redocly/ajv': 8.18.0
-      '@redocly/openapi-core': 2.20.3
+      '@redocly/openapi-core': 2.20.4
       ajv: 8.18.0
       better-ajv-errors: 1.2.0(ajv@8.18.0)
       colorette: 2.0.20
@@ -11195,12 +11192,6 @@ snapshots:
       is-docker: 2.2.1
       is-wsl: 2.2.0
 
-  openapi-sampler@1.7.0:
-    dependencies:
-      '@types/json-schema': 7.0.15
-      fast-xml-parser: 5.3.8
-      json-pointer: 0.6.2
-
   openapi-sampler@1.7.1:
     dependencies:
       '@types/json-schema': 7.0.15
@@ -11720,7 +11711,7 @@ snapshots:
       marked: 4.3.0
       mobx: 6.15.0
       mobx-react: 9.2.0(mobx@6.15.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      openapi-sampler: 1.7.0
+      openapi-sampler: 1.7.1
       path-browserify: 1.0.1
       perfect-scrollbar: 1.5.6
       polished: 4.3.1
