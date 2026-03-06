@@ -8,6 +8,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@generated/*": ["../generated/*"]
+    },
     "types": ["vitest/globals"]
   },
   "include": ["src/**/*", "tests/**/*"],

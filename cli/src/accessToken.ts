@@ -1,6 +1,8 @@
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
+import { client } from '@generated/backend/client.gen'
+import { UserController } from '@generated/backend/sdk.gen'
 
 export interface AccessTokenEntry {
   label: string
@@ -38,8 +40,25 @@ function saveConfig(config: AccessTokenConfig): void {
 }
 
 export async function addAccessToken(token: string): Promise<void> {
+  const baseUrl = process.env.DOUGHNUT_API_BASE_URL || 'http://localhost:9081'
+  client.setConfig({
+    baseUrl,
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  let data: { label: string } | undefined
+  try {
+    const result = await UserController.getTokenInfo()
+    data = result.data
+  } catch {
+    throw new Error(
+      'Doughnut service is not available. Check DOUGHNUT_API_BASE_URL and ensure the service is running.'
+    )
+  }
+  if (!data) {
+    throw new Error('Token is invalid or expired.')
+  }
   const config = loadConfig()
-  config.tokens.push({ label: 'test', token })
+  config.tokens.push({ label: data.label, token })
   saveConfig(config)
   console.log('Token added')
 }

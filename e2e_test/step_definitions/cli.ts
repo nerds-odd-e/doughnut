@@ -72,7 +72,39 @@ When(
     cy.get<string>('@cliConfigDir').then((configDir) => {
       cy.task('runCliDirectWithArgs', {
         args: ['-c', input],
-        env: { DOUGHNUT_CONFIG_DIR: configDir },
+        env: {
+          DOUGHNUT_CONFIG_DIR: configDir,
+          DOUGHNUT_API_BASE_URL: BASE_URL,
+        },
+      }).as('doughnutOutput')
+    })
+  }
+)
+
+When('I run the doughnut CLI add-access-token with the saved token', () => {
+  cy.get<string>('@cliConfigDir').then((configDir) => {
+    cy.get<string>('@savedAccessToken').then((token) => {
+      cy.task('runCliDirectWithArgs', {
+        args: ['-c', `/add-access-token ${token}`],
+        env: {
+          DOUGHNUT_CONFIG_DIR: configDir,
+          DOUGHNUT_API_BASE_URL: BASE_URL,
+        },
+      }).as('doughnutOutput')
+    })
+  })
+})
+
+When(
+  'I run the doughnut CLI add-access-token with token {string}',
+  (token: string) => {
+    cy.get<string>('@cliConfigDir').then((configDir) => {
+      cy.task('runCliDirectWithArgs', {
+        args: ['-c', `/add-access-token ${token}`],
+        env: {
+          DOUGHNUT_CONFIG_DIR: configDir,
+          DOUGHNUT_API_BASE_URL: BASE_URL,
+        },
       }).as('doughnutOutput')
     })
   }
