@@ -55,6 +55,18 @@ When('I run the installed doughnut version command', () => {
   })
 })
 
+When('I run the doughnut command with input {string}', (input: string) => {
+  cy.task('runCliDirectWithInput', { input }).as('doughnutOutput')
+})
+
+When('I run the doughnut command with -c {string}', (input: string) => {
+  cy.task('runCliDirectWithArgs', { args: ['-c', input] }).as('doughnutOutput')
+})
+
+When('I run the doughnut version command', () => {
+  cy.task('runCliDirectWithArgs', { args: ['version'] }).as('doughnutOutput')
+})
+
 When('the backend serves the CLI with version {string}', (version: string) => {
   cy.task('bundleAndCopyCliWithVersion', version)
 })
@@ -89,17 +101,6 @@ Given(
   }
 )
 
-When('I run the CLI add gmail command with simulated OAuth callback', () => {
-  cy.get<string>('@doughnutPath').then((doughnutPath) => {
-    cy.task('runCliWithGmailAdd', {
-      doughnutPath,
-      googleBaseUrl: GOOGLE_MOCK_URL,
-    })
-      .its('stdout')
-      .as('doughnutOutput')
-  })
-})
-
 Given(
   'the Google API mock returns messages and message {string} with subject {string}',
   (messageId: string, subject: string) => {
@@ -112,11 +113,16 @@ Given(
   }
 )
 
-When('I run the CLI last email command with pre-configured account', () => {
-  cy.get<string>('@doughnutPath').then((doughnutPath) => {
-    cy.task('runCliWithLastEmail', {
-      doughnutPath,
-      googleBaseUrl: GOOGLE_MOCK_URL,
-    }).as('doughnutOutput')
+When('I run the CLI add gmail command with simulated OAuth callback', () => {
+  cy.task('runCliDirectWithGmailAdd', {
+    googleBaseUrl: GOOGLE_MOCK_URL,
   })
+    .its('stdout')
+    .as('doughnutOutput')
+})
+
+When('I run the CLI last email command with pre-configured account', () => {
+  cy.task('runCliDirectWithLastEmail', {
+    googleBaseUrl: GOOGLE_MOCK_URL,
+  }).as('doughnutOutput')
 })
