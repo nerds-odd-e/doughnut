@@ -1,7 +1,7 @@
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import { client } from '@generated/backend/client.gen'
+import { configureClient, getApiConfig } from 'doughnut-api'
 import { UserController } from '@generated/backend/sdk.gen'
 
 export interface AccessTokenEntry {
@@ -40,11 +40,8 @@ function saveConfig(config: AccessTokenConfig): void {
 }
 
 export async function addAccessToken(token: string): Promise<void> {
-  const baseUrl = process.env.DOUGHNUT_API_BASE_URL || 'http://localhost:9081'
-  client.setConfig({
-    baseUrl,
-    headers: { Authorization: `Bearer ${token}` },
-  })
+  const { apiBaseUrl } = getApiConfig()
+  configureClient(apiBaseUrl, token)
   let data: { label: string } | undefined
   try {
     const result = await UserController.getTokenInfo()

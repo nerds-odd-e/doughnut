@@ -132,6 +132,10 @@ importers:
         version: 2.8.2
 
   cli:
+    dependencies:
+      doughnut-api:
+        specifier: workspace:*
+        version: link:../packages/doughnut-api
     devDependencies:
       '@types/node':
         specifier: 25.3.5

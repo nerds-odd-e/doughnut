@@ -10,8 +10,9 @@ vi.mock('@generated/backend/sdk.gen', () => ({
   },
 }))
 
-vi.mock('@generated/backend/client.gen', () => ({
-  client: { setConfig: vi.fn() },
+vi.mock('doughnut-api', () => ({
+  getApiConfig: () => ({ apiBaseUrl: 'http://localhost:9081' }),
+  configureClient: vi.fn(),
 }))
 
 import { addAccessToken, listAccessTokens } from '../src/accessToken.js'
