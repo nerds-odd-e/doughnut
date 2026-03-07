@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 #
 # Setup script for Cursor Cloud Agent environment
-# This script installs Java 24 and MySQL for running backend unit tests
-# without relying on Nix
+# This script installs Java 25, MySQL, and Redis for running backend and e2e tests
+# without relying on Nix. Matches nix dev env: MySQL port 3309, Redis port 6380.
 
 set -e
 
+cd /workspace
 echo "==> Setting up Cursor Cloud Agent environment..."
 
 # Install Java 25 if not already installed
@@ -21,9 +22,11 @@ else
     echo "==> Java 25 already installed"
 fi
 
-# Set up Java environment
+# Set up Java environment (headless for Cloud VM - no display)
 export JAVA_HOME=/tmp/java25/zulu25.30.17-ca-jdk25.0.1-linux_x64
 export PATH=$JAVA_HOME/bin:$PATH
+export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:-} -Djava.awt.headless=true"
+export GRADLE_OPTS="${GRADLE_OPTS:-} -Djava.awt.headless=true"
 
 # Verify Java installation
 java -version
@@ -38,10 +41,10 @@ if [ ! -d "/tmp/mysql-8.4.3-linux-glibc2.28-x86_64" ]; then
     echo "==> MySQL downloaded and extracted"
 fi
 
-# Install required MySQL dependencies
+# Install required MySQL dependencies (libncurses6 needed by mysql client)
 echo "==> Installing MySQL dependencies..."
 sudo apt-get update -qq
-sudo apt-get install -y -qq libaio-dev libaio1t64 libnuma1 2>&1 | grep -v "^Get:" | grep -v "^Reading" | tail -5 || true
+sudo apt-get install -y -qq libaio-dev libaio1t64 libnuma1 libncurses6 libtinfo6 2>&1 | grep -v "^Get:" | grep -v "^Reading" | tail -5 || true
 
 # Create libaio symlink if needed (Ubuntu 24.04 compatibility)
 if [ ! -e "/usr/lib/x86_64-linux-gnu/libaio.so.1" ]; then
@@ -62,31 +65,36 @@ if [ ! -d "/tmp/mysql_data/mysql" ]; then
     echo "==> MySQL data directory initialized"
 fi
 
-# Check if MySQL is already running
+# MySQL port 3309 matches nix env and db-test.properties
+MYSQL_PORT=3309
+MYSQL_SOCKET=/tmp/mysql.sock
+
+# Check if MySQL is already running on correct port
 MYSQL_RUNNING=false
-if mysqladmin -S /tmp/mysql.sock ping > /dev/null 2>&1; then
-    echo "==> MySQL server already running"
-    MYSQL_RUNNING=true
-elif mysql -u root -S /tmp/mysql.sock -e "SELECT 1" > /dev/null 2>&1; then
-    echo "==> MySQL server already running (verified with connection test)"
-    MYSQL_RUNNING=true
+if [ -S "$MYSQL_SOCKET" ] && "${MYSQL_HOME}/bin/mysqladmin" -u root -S "$MYSQL_SOCKET" ping > /dev/null 2>&1; then
+    MYSQL_PORT_CHECK=$("${MYSQL_HOME}/bin/mysql" -u root -S "$MYSQL_SOCKET" -N -e "SELECT @@port" 2>/dev/null || echo "0")
+    if [ "$MYSQL_PORT_CHECK" = "$MYSQL_PORT" ]; then
+        echo "==> MySQL server already running on port $MYSQL_PORT"
+        MYSQL_RUNNING=true
+    fi
 fi
 
 if [ "$MYSQL_RUNNING" = false ]; then
-    echo "==> Starting MySQL server..."
-    # Clean up any stale socket files
+    echo "==> Starting MySQL server on port $MYSQL_PORT..."
+    pkill mysqld 2>/dev/null || true
+    sleep 2
     rm -f /tmp/mysql.sock /tmp/mysqlx.sock
 
-    mysqld --datadir=/tmp/mysql_data --port=3306 --socket=/tmp/mysql.sock > /tmp/mysql.log 2>&1 &
+    "${MYSQL_HOME}/bin/mysqld" --datadir=/tmp/mysql_data --port=$MYSQL_PORT --socket=$MYSQL_SOCKET > /tmp/mysql.log 2>&1 &
     MYSQL_PID=$!
+    sleep 10
 
-    # Wait for MySQL to start
-    for i in {1..30}; do
-        if mysql -u root -S /tmp/mysql.sock -e "SELECT 1" > /dev/null 2>&1; then
+    for i in {1..60}; do
+        if "${MYSQL_HOME}/bin/mysql" -u root -h 127.0.0.1 -P $MYSQL_PORT -e "SELECT 1" > /dev/null 2>&1; then
             echo "==> MySQL server started successfully (PID: $MYSQL_PID)"
             break
         fi
-        if [ $i -eq 30 ]; then
+        if [ $i -eq 60 ]; then
             echo "ERROR: MySQL failed to start. Check /tmp/mysql.log"
             tail -20 /tmp/mysql.log
             exit 1
@@ -96,28 +104,46 @@ if [ "$MYSQL_RUNNING" = false ]; then
 fi
 
 # Initialize doughnut databases (idempotent - safe to run multiple times)
-if mysql -u root -S /tmp/mysql.sock -e "SHOW DATABASES LIKE 'doughnut_test'" 2>/dev/null | grep -q doughnut_test; then
+if "${MYSQL_HOME}/bin/mysql" -u root -S "$MYSQL_SOCKET" -e "SHOW DATABASES LIKE 'doughnut_test'" 2>/dev/null | grep -q doughnut_test; then
     echo "==> Doughnut databases already exist"
 else
     echo "==> Setting up doughnut databases..."
-    mysql -u root -S /tmp/mysql.sock < /workspace/scripts/sql/init_doughnut_db.sql
+    "${MYSQL_HOME}/bin/mysql" -u root -S "$MYSQL_SOCKET" < /workspace/scripts/sql/init_doughnut_db.sql
     echo "==> Doughnut databases initialized"
 fi
 
-# Export environment variables for tests
-export SPRING_DATASOURCE_URL="jdbc:mysql://localhost:3306/doughnut_test?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true"
+# Export environment variables for tests (port 3309 matches db-test.properties)
+export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:${MYSQL_PORT}/doughnut_test?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true"
 export SPRING_DATASOURCE_USERNAME="doughnut"
 export SPRING_DATASOURCE_PASSWORD="doughnut"
 
 # Export environment variable for e2e tests (backend uses INPUT_DB_URL when running with e2e profile)
-export INPUT_DB_URL="jdbc:mysql://localhost:3306/doughnut_e2e_test?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true"
+export INPUT_DB_URL="jdbc:mysql://127.0.0.1:${MYSQL_PORT}/doughnut_e2e_test?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true"
 
-# Verify e2e database connection (migration will happen automatically when backend starts with e2e profile)
+# Verify e2e database connection
 echo "==> Verifying e2e database connection..."
-if mysql -u doughnut -pdoughnut -S /tmp/mysql.sock -e "USE doughnut_e2e_test; SELECT 1" > /dev/null 2>&1; then
+if "${MYSQL_HOME}/bin/mysql" -u doughnut -pdoughnut -S "$MYSQL_SOCKET" -e "USE doughnut_e2e_test; SELECT 1" > /dev/null 2>&1; then
     echo "==> E2E database connection verified"
 else
     echo "ERROR: E2E database connection failed"
+    exit 1
+fi
+
+# Install xvfb for Cypress e2e tests (headless display)
+echo "==> Installing xvfb for Cypress..."
+sudo apt-get install -y -qq xvfb 2>&1 | tail -3 || true
+
+# Setup Redis on port 6380 (matches nix env)
+echo "==> Setting up Redis on port 6380..."
+sudo apt-get install -y -qq redis-server 2>&1 | tail -3 || true
+if ! redis-cli -p 6380 ping > /dev/null 2>&1; then
+    redis-server --port 6380 --daemonize yes --bind 127.0.0.1
+    sleep 2
+fi
+if redis-cli -p 6380 ping > /dev/null 2>&1; then
+    echo "==> Redis ready on port 6380"
+else
+    echo "ERROR: Redis failed to start on port 6380"
     exit 1
 fi
 
@@ -139,6 +165,7 @@ echo "  JAVA_HOME=$JAVA_HOME"
 echo "  MYSQL_HOME=$MYSQL_HOME"
 echo "  SPRING_DATASOURCE_URL=$SPRING_DATASOURCE_URL"
 echo ""
-echo "You can now run backend tests with:"
-echo "  ./backend/gradlew -p backend test -Dspring.profiles.active=test"
+echo "You can now run:"
+echo "  Backend tests: ./backend/gradlew -p backend test -Dspring.profiles.active=test"
+echo "  E2E tests:     xvfb-run pnpm cypress run --spec e2e_test/features/<feature>.feature"
 echo ""
