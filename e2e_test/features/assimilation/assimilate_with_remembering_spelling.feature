@@ -33,3 +33,12 @@ Feature: Assimilate With Remembering Spelling
       | sedition       | sedition       | "success"               |
       | colour / color | colour         | "success"               |
       | sedition       | wrong answer   | "error: wrong spelling" |
+
+  Scenario: Already assimilated note reappears in to-be-assimilated list when remember spelling is added later
+    Given there are some notes:
+      | Title   | Details           | Parent Title |
+      | Relearn | Non-empty details | English      |
+    And I assimilate the note "Relearn"
+    And I add remember spelling to the note "Relearn"
+    When I navigate to the assimilation page
+    Then I should see 1 due for assimilation

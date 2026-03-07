@@ -116,6 +116,14 @@ When('I keep for repetition with remembering spelling', () => {
   start.assumeAssimilationPage().proceedWithRememberingSpelling()
 })
 
+When('I add remember spelling to the note {string}', (noteTitle: string) => {
+  start.jumpToNotePage(noteTitle).setRememberSpelling()
+})
+
+When('I navigate to the assimilation page', () => {
+  start.assimilation().navigateToAssimilationPage()
+})
+
 When('I verify spelling with {string}', (text: string) => {
   start.assumeAssimilationPage().verifySpellingWith(text)
 })
