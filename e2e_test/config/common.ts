@@ -63,7 +63,8 @@ const commonConfig = {
     ): Promise<Cypress.PluginConfigOptions> {
       await addCucumberPreprocessorPlugin(on, config)
 
-      const projectRoot = path.dirname(config.configFile ?? process.cwd())
+      const configDir = path.dirname(config.configFile ?? process.cwd())
+      const projectRoot = path.resolve(configDir, '..', '..')
       const generatedBackendPath = path.join(
         projectRoot,
         'packages',
