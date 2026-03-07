@@ -78,5 +78,41 @@ class AssimilationControllerTests extends ControllerTestBase {
       assertThat(memoryTrackers.stream().filter(mt -> mt.getSpelling()).count(), equalTo(1L));
       assertThat(memoryTrackers.stream().filter(mt -> !mt.getSpelling()).count(), equalTo(1L));
     }
+
+    @Test
+    void shouldReturnEmptyWhenNoteAlreadyHasMemoryTrackers() {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+
+      InitialInfo initialInfo = new InitialInfo();
+      initialInfo.noteId = note.getId();
+
+      List<MemoryTracker> result = controller.assimilate(initialInfo);
+
+      assertThat(result, empty());
+      assertThat(
+          memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
+          hasSize(1));
+    }
+
+    @Test
+    void shouldAddOnlySpellingTrackerWhenAddSpellingOnlyAndNoteHasTrackersButNoSpelling() {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      note.getRecallSetting().setRememberSpelling(true);
+      noteRepository.save(note);
+      makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+
+      InitialInfo initialInfo = new InitialInfo();
+      initialInfo.noteId = note.getId();
+      initialInfo.addSpellingOnly = true;
+
+      List<MemoryTracker> result = controller.assimilate(initialInfo);
+
+      assertThat(result, hasSize(1));
+      assertThat(result.get(0).getSpelling(), equalTo(true));
+      assertThat(
+          memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
+          hasSize(2));
+    }
   }
 }

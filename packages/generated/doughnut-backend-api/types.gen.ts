@@ -373,6 +373,7 @@ export type TextFromAudioWithCallInfo = {
 export type InitialInfo = {
     noteId?: number;
     skipMemoryTracking?: boolean;
+    addSpellingOnly?: boolean;
 };
 
 export type AssessmentAttempt = {

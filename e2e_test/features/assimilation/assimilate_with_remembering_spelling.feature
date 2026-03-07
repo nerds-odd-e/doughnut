@@ -33,3 +33,21 @@ Feature: Assimilate With Remembering Spelling
       | sedition       | sedition       | "success"               |
       | colour / color | colour         | "success"               |
       | sedition       | wrong answer   | "error: wrong spelling" |
+
+  Scenario: Add only spelling memory tracker when note already has trackers
+    Given there are some notes:
+      | Title | Details           | Parent Title |
+      | Word  | Non-empty details | English      |
+    And I assimilated one note "Word" on day 1
+    When I am assimilating the note "Word"
+    And I keep for repetition with remembering spelling
+    When I verify spelling with "Word"
+    Then the spelling verification result for note "Word" should be "success"
+
+  Scenario: Keep for repetition disabled when note already has memory trackers
+    Given there are some notes:
+      | Title | Details           | Parent Title |
+      | Word  | Non-empty details | English      |
+    And I assimilated one note "Word" on day 1
+    When I am assimilating the note "Word"
+    Then the keep for repetition button should be disabled

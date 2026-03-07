@@ -23,6 +23,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "levelChanged", value: unknown): void
   (e: "rememberSpellingChanged", value: boolean): void
+  (e: "noteRecallInfoLoaded", value: NoteRecallInfo): void
 }>()
 
 const noteRecallInfo = ref<NoteRecallInfo | undefined>(undefined)
@@ -45,6 +46,7 @@ const fetchData = async () => {
       "rememberSpellingChanged",
       data?.recallSetting?.rememberSpelling ?? false
     )
+    emit("noteRecallInfoLoaded", data!)
   }
 }
 

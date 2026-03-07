@@ -5,7 +5,7 @@
     value="Keep for repetition"
     class="daisy-btn daisy-btn-primary"
     data-test="keep-for-repetition"
-    :disabled="disabled"
+    :disabled="disabled || keepForRepetitionDisabled"
     @click="$emit('assimilate', false)"
   />
   <input
@@ -24,6 +24,10 @@ import { defineComponent } from "vue"
 export default defineComponent({
   props: {
     disabled: {
+      type: Boolean,
+      default: false,
+    },
+    keepForRepetitionDisabled: {
       type: Boolean,
       default: false,
     },

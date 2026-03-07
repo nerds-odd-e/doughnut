@@ -57,6 +57,38 @@ public class MemoryTrackerServiceTest {
       assertThat(memoryTrackers.get(0).getAssimilatedAt(), equalTo(day1));
       assertThat(memoryTrackers.get(0).getLastRecalledAt(), equalTo(day1));
     }
+
+    @Test
+    void shouldReturnEmptyWhenNoteAlreadyHasMemoryTrackers() {
+      Note note = makeMe.aNote().creatorAndOwner(user).please();
+      makeMe.aMemoryTrackerFor(note).by(user).please();
+
+      InitialInfo initialInfo = new InitialInfo();
+      initialInfo.noteId = note.getId();
+
+      List<MemoryTracker> result = memoryTrackerService.assimilate(initialInfo, user, day1);
+
+      assertThat(result, empty());
+      assertThat(memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId()), hasSize(1));
+    }
+
+    @Test
+    void shouldAddOnlySpellingTrackerWhenAddSpellingOnlyAndNoteHasTrackersButNoSpelling() {
+      Note note = makeMe.aNote().creatorAndOwner(user).please();
+      note.getRecallSetting().setRememberSpelling(true);
+      makeMe.entityPersister.merge(note);
+      makeMe.aMemoryTrackerFor(note).by(user).please();
+
+      InitialInfo initialInfo = new InitialInfo();
+      initialInfo.noteId = note.getId();
+      initialInfo.addSpellingOnly = true;
+
+      List<MemoryTracker> result = memoryTrackerService.assimilate(initialInfo, user, day1);
+
+      assertThat(result, hasSize(1));
+      assertThat(result.get(0).getSpelling(), equalTo(true));
+      assertThat(memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId()), hasSize(2));
+    }
   }
 
   @Nested

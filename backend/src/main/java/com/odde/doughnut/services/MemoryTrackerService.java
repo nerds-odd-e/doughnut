@@ -52,26 +52,35 @@ public class MemoryTrackerService {
   public List<MemoryTracker> assimilate(
       InitialInfo initialInfo, User currentUser, Timestamp currentTime) {
     Note note = entityPersister.find(Note.class, initialInfo.noteId);
+    List<MemoryTracker> existingTrackers = userService.getMemoryTrackersFor(currentUser, note);
+    boolean addSpellingOnly = Boolean.TRUE.equals(initialInfo.addSpellingOnly);
+    boolean skipMemoryTracking =
+        initialInfo.skipMemoryTracking != null ? initialInfo.skipMemoryTracking : false;
+
+    if (addSpellingOnly) {
+      boolean hasSpellingTracker =
+          existingTrackers.stream().anyMatch(mt -> Boolean.TRUE.equals(mt.getSpelling()));
+      if (hasSpellingTracker
+          || !Boolean.TRUE.equals(note.getRecallSetting().getRememberSpelling())) {
+        return List.of();
+      }
+      MemoryTracker spellingTracker =
+          createMemoryTracker(note, currentUser, currentTime, skipMemoryTracking, true);
+      return List.of(spellingTracker);
+    }
+
+    if (!existingTrackers.isEmpty()) {
+      return List.of();
+    }
 
     MemoryTracker memoryTracker =
-        createMemoryTracker(
-            note,
-            currentUser,
-            currentTime,
-            initialInfo.skipMemoryTracking != null ? initialInfo.skipMemoryTracking : false,
-            false);
-
+        createMemoryTracker(note, currentUser, currentTime, skipMemoryTracking, false);
     List<MemoryTracker> trackers = new ArrayList<>();
     trackers.add(memoryTracker);
 
-    if (note.getRecallSetting().getRememberSpelling()) {
+    if (Boolean.TRUE.equals(note.getRecallSetting().getRememberSpelling())) {
       MemoryTracker spellingTracker =
-          createMemoryTracker(
-              note,
-              currentUser,
-              currentTime,
-              initialInfo.skipMemoryTracking != null ? initialInfo.skipMemoryTracking : false,
-              true);
+          createMemoryTracker(note, currentUser, currentTime, skipMemoryTracking, true);
       trackers.add(spellingTracker);
     }
 
