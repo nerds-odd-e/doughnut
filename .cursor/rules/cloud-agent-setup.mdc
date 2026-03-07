@@ -35,7 +35,9 @@ source /workspace/scripts/cloud_agent_setup.sh
 
 This script:
 - Downloads and installs Azul Zulu Java 25 (required by the project)
-- Downloads and sets up MySQL 8.4 server
+- Downloads and sets up MySQL 8.4 server (port 3309, matches nix env)
+- Sets up Redis on port 6380 (matches nix env)
+- Installs xvfb for Cypress E2E (headless display)
 - Initializes doughnut test databases (doughnut_test, doughnut_development, doughnut_e2e_test)
 - Exports necessary environment variables (JAVA_HOME, MYSQL_HOME, SPRING_DATASOURCE_*, INPUT_DB_URL)
 
@@ -44,8 +46,9 @@ This script:
 - MySQL installed to: `/tmp/mysql-8.4.3-linux-glibc2.28-x86_64`
 - MySQL data directory: `/tmp/mysql_data`
 - MySQL socket: `/tmp/mysql.sock`
-- MySQL port: 3306
-- **INPUT_DB_URL**: Set to `jdbc:mysql://localhost:3306/doughnut_e2e_test?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true` for e2e tests
+- MySQL port: **3309** (matches db-test.properties)
+- Redis port: **6380**
+- **INPUT_DB_URL**: Set to `jdbc:mysql://127.0.0.1:3309/doughnut_e2e_test?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true` for e2e tests
 
 **Note**: The setup script is idempotent and can be run multiple times safely. It will skip steps that are already completed.
 
@@ -83,11 +86,11 @@ pnpm sut &
 # Wait for services to be ready (waits for both backend on 9081 and frontend on 5173)
 pnpm wait-on tcp:9081 tcp:5173
 
-# Run tests
-pnpm cypress run --spec e2e_test/features/<feature-file>.feature
+# Run tests (xvfb-run required - Cloud VM has no display)
+xvfb-run pnpm cypress run --spec e2e_test/features/<feature-file>.feature
 ```
 
-**Note**: The backend runs on port **9081** and frontend on port **5173**. Cypress connects to the frontend at `http://localhost:5173` (as configured in `cypress.config.ts`). The setup script exports `INPUT_DB_URL` which tells the backend (when using e2e profile) to use the `doughnut_e2e_test` database on port 3306.
+**Note**: The backend runs on port **9081** and frontend on port **5173**. Cypress requires `xvfb-run` on Cloud VM (no display). The setup script exports `INPUT_DB_URL` which tells the backend (when using e2e profile) to use the `doughnut_e2e_test` database on port 3309.
 
 ## Key Rules
 
@@ -104,6 +107,6 @@ pnpm cypress run --spec e2e_test/features/<feature-file>.feature
 |---------|----------|
 | Frontend tests | `pnpm frontend:test` |
 | Backend tests | `pnpm backend:verify` |
-| E2E tests | `pnpm sut &` then `pnpm wait-on tcp:9081 tcp:5173` then `pnpm cypress run --spec <path>` |
+| E2E tests | `pnpm sut &` then `pnpm wait-on tcp:9081 tcp:5173` then `xvfb-run pnpm cypress run --spec <path>` |
 | Linting | `pnpm lint:all` |
 | Formatting | `pnpm format:all` |

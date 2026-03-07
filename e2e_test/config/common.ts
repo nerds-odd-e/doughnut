@@ -64,7 +64,9 @@ const commonConfig = {
       await addCucumberPreprocessorPlugin(on, config)
 
       const configDir = path.dirname(config.configFile ?? process.cwd())
-      const projectRoot = path.resolve(configDir, '..', '..')
+      const projectRoot = config.configFile?.includes('e2e_test/config')
+        ? path.resolve(configDir, '..', '..')
+        : configDir
       const generatedBackendPath = path.join(
         projectRoot,
         'packages',
