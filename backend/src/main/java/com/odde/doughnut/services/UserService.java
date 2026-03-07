@@ -74,6 +74,16 @@ public class UserService {
     return memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId());
   }
 
+  public void removeMemoryTrackersForReassimilation(User user, Note note) {
+    List<MemoryTracker> trackers =
+        memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId());
+    Timestamp now = new Timestamp(System.currentTimeMillis());
+    for (MemoryTracker tracker : trackers) {
+      tracker.setDeletedAt(now);
+      memoryTrackerRepository.save(tracker);
+    }
+  }
+
   public Optional<User> findUserByToken(String token) {
     UserToken usertoken = userTokenRepository.findByToken(token);
 
