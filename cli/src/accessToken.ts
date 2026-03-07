@@ -34,23 +34,30 @@ function saveConfig(config: AccessTokenConfig): void {
   fs.writeFileSync(p, JSON.stringify(config, null, 2), 'utf-8')
 }
 
-export async function addAccessToken(token: string): Promise<void> {
+async function withBackendClient<T>(
+  token: string,
+  fn: () => Promise<T>
+): Promise<T> {
   const { apiBaseUrl } = getApiConfig()
   configureClient(apiBaseUrl, token)
-  let data: { label: string } | undefined
   try {
-    const result = await UserController.getTokenInfo()
-    data = result.data
+    return await fn()
   } catch {
     throw new Error(
       'Doughnut service is not available. Check DOUGHNUT_API_BASE_URL and ensure the service is running.'
     )
   }
-  if (!data) {
+}
+
+export async function addAccessToken(token: string): Promise<void> {
+  const result = await withBackendClient(token, () =>
+    UserController.getTokenInfo()
+  )
+  if (!result.data) {
     throw new Error('Token is invalid or expired.')
   }
   const config = loadConfig()
-  config.tokens.push({ label: data.label, token })
+  config.tokens.push({ label: result.data.label, token })
   saveConfig(config)
 }
 
@@ -78,15 +85,7 @@ export async function removeAccessTokenCompletely(
   if (!entry) {
     throw new Error(`Token "${label}" not found.`)
   }
-  const { apiBaseUrl } = getApiConfig()
-  configureClient(apiBaseUrl, entry.token)
-  try {
-    await UserController.revokeToken()
-  } catch {
-    throw new Error(
-      'Doughnut service is not available. Check DOUGHNUT_API_BASE_URL and ensure the service is running.'
-    )
-  }
+  await withBackendClient(entry.token, () => UserController.revokeToken())
   removeAccessToken(label)
 }
 
@@ -117,23 +116,13 @@ export async function createAccessToken(label: string): Promise<void> {
       'No default access token. Add one first with /add-access-token.'
     )
   }
-  const { apiBaseUrl } = getApiConfig()
-  configureClient(apiBaseUrl, defaultEntry.token)
-  let data: { token: string; label: string } | undefined
-  try {
-    const result = await UserController.generateToken({
-      body: { label },
-    })
-    data = result.data
-  } catch {
-    throw new Error(
-      'Doughnut service is not available. Check DOUGHNUT_API_BASE_URL and ensure the service is running.'
-    )
-  }
-  if (!data) {
+  const result = await withBackendClient(defaultEntry.token, () =>
+    UserController.generateToken({ body: { label } })
+  )
+  if (!result.data) {
     throw new Error('Failed to create token.')
   }
-  config.tokens.push({ label: data.label, token: data.token })
+  config.tokens.push({ label: result.data.label, token: result.data.token })
   saveConfig(config)
 }
 
