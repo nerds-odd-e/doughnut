@@ -35,8 +35,8 @@
 </template>
 
 <script setup lang="ts">
-import type { RecallPrompt } from "@generated/backend"
-import { RecallPromptController } from "@generated/backend/sdk.gen"
+import type { RecallPrompt } from "@generated/doughnut-backend-api"
+import { RecallPromptController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"
 import { ref } from "vue"

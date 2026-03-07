@@ -111,8 +111,8 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, nextTick, computed } from "vue"
-import type { WikidataSearchEntity } from "@generated/backend"
-import { WikidataController } from "@generated/backend/sdk.gen"
+import type { WikidataSearchEntity } from "@generated/doughnut-backend-api"
+import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import Modal from "../commons/Modal.vue"
 import RadioButtons from "../form/RadioButtons.vue"

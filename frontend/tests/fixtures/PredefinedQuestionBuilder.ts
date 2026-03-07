@@ -1,4 +1,4 @@
-import type { PredefinedQuestion } from "@generated/backend"
+import type { PredefinedQuestion } from "@generated/doughnut-backend-api"
 import Builder from "./Builder"
 import generateId from "./generateId"
 

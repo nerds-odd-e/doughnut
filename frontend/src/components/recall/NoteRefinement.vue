@@ -72,8 +72,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Note, NoteRealm } from "@generated/backend"
-import { AiController } from "@generated/backend/sdk.gen"
+import type { Note, NoteRealm } from "@generated/doughnut-backend-api"
+import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"

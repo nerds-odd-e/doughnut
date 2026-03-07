@@ -34,7 +34,7 @@
 
 
 <script lang="ts">
-import type { AnswerDto } from "@generated/backend"
+import type { AnswerDto } from "@generated/doughnut-backend-api"
 import { defineComponent } from "vue"
 import markdownizer from "../form/markdownizer"
 

@@ -51,8 +51,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue"
-import type { AssessmentAttempt } from "@generated/backend"
-import { AssessmentController } from "@generated/backend/sdk.gen"
+import type { AssessmentAttempt } from "@generated/doughnut-backend-api"
+import { AssessmentController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import ContainerPage from "./commons/ContainerPage.vue"
 

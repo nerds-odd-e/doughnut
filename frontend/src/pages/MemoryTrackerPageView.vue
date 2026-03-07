@@ -158,12 +158,15 @@
 
 <script setup lang="ts">
 import { computed } from "vue"
-import type { RecallPrompt, MemoryTracker } from "@generated/backend"
+import type {
+  RecallPrompt,
+  MemoryTracker,
+} from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import NoteUnderQuestion from "@/components/recall/NoteUnderQuestion.vue"
 import QuestionDisplay from "@/components/recall/QuestionDisplay.vue"
 import ConversationButton from "@/components/recall/ConversationButton.vue"
-import { MemoryTrackerController } from "@generated/backend/sdk.gen"
+import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "@/components/commons/Popups/usePopups"
 import SvgNoRecall from "@/components/svgs/SvgNoRecall.vue"

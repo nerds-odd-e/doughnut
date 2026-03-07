@@ -1,4 +1,7 @@
-import type { UserListingPage, UserForListing } from "@generated/backend"
+import type {
+  UserListingPage,
+  UserForListing,
+} from "@generated/doughnut-backend-api"
 import Builder from "./Builder"
 
 export default class UserListingPageBuilder extends Builder<UserListingPage> {

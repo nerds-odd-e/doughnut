@@ -1,4 +1,4 @@
-import type { NoteTopology } from "@generated/backend"
+import type { NoteTopology } from "@generated/doughnut-backend-api"
 // Using string literals for relationType values
 
 interface RelationTypeOption {

@@ -1,6 +1,6 @@
 import AiResponse from "@/components/conversations/AiResponse.vue"
 import createNoteStorage from "@/store/createNoteStorage"
-import type { TitleReplacement } from "@generated/backend"
+import type { TitleReplacement } from "@generated/doughnut-backend-api"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService, mockShowNote } from "@tests/helpers"
 import {

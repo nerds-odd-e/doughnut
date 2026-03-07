@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import type { NoteTopology } from "@generated/backend"
+import type { NoteTopology } from "@generated/doughnut-backend-api"
 // Using string literals for relationType values
 import { camelCase, startCase } from "es-toolkit"
 import type { PropType } from "vue"

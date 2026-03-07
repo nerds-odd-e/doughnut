@@ -33,9 +33,9 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
-import { NotebookCertificateApprovalController } from "@generated/backend/sdk.gen"
+import { NotebookCertificateApprovalController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import type { NotebookCertificateApproval } from "@generated/backend"
+import type { NotebookCertificateApproval } from "@generated/doughnut-backend-api"
 import NotebookLink from "@/components/notes/NotebookLink.vue"
 import usePopups from "../commons/Popups/usePopups"
 

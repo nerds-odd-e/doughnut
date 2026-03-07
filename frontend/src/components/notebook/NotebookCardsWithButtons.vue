@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Notebook } from "@generated/backend"
+import type { Notebook } from "@generated/doughnut-backend-api"
 import NotebookCard from "../notebooks/NotebookCard.vue"
 
 defineProps<{

@@ -28,8 +28,8 @@
 
 <script lang="ts">
 import usePopups from "@/components/commons/Popups/usePopups"
-import type { SuggestedQuestionForFineTuning } from "@generated/backend"
-import { FineTuningDataController } from "@generated/backend/sdk.gen"
+import type { SuggestedQuestionForFineTuning } from "@generated/doughnut-backend-api"
+import { FineTuningDataController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"
 

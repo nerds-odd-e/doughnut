@@ -2,7 +2,7 @@ import SearchResultCard from "@/components/search/SearchResultCard.vue"
 import { screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
-import type { NoteSearchResult } from "@generated/backend"
+import type { NoteSearchResult } from "@generated/doughnut-backend-api"
 import { describe, it, expect } from "vitest"
 
 describe("SearchResultCard", () => {

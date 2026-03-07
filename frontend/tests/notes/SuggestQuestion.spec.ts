@@ -1,5 +1,5 @@
 import SuggestQuestionForFineTuning from "@/components/ai/SuggestQuestionForFineTuning.vue"
-import type { PredefinedQuestion } from "@generated/backend"
+import type { PredefinedQuestion } from "@generated/doughnut-backend-api"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, expect, afterEach } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"

@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed } from "vue"
-import type { NoteRealm } from "@generated/backend"
+import type { NoteRealm } from "@generated/doughnut-backend-api"
 import SidebarInner from "./SidebarInner.vue"
 
 const props = defineProps({

@@ -101,8 +101,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from "vue"
-import type { Note, Notebook } from "@generated/backend"
-import type { NoteAccessory } from "@generated/backend"
+import type { Note, Notebook } from "@generated/doughnut-backend-api"
+import type { NoteAccessory } from "@generated/doughnut-backend-api"
 import NoteNewButton from "./NoteNewButton.vue"
 import SvgAddChild from "../../svgs/SvgAddChild.vue"
 import SvgAddSibling from "../../svgs/SvgAddSibling.vue"

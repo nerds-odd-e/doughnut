@@ -160,7 +160,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue"
-import type { Conversation } from "@generated/backend"
+import type { Conversation } from "@generated/doughnut-backend-api"
 import ConversationExportDialog from "./ConversationExportDialog.vue"
 import SvgExport from "@/components/svgs/SvgExport.vue"
 

@@ -40,9 +40,9 @@
 import ConversationTemplate from "@/components/conversations/ConversationTemplate.vue"
 import ConversationInner from "./ConversationInner.vue"
 import { inject, ref, type Ref, onMounted } from "vue"
-import type { Conversation, User } from "@generated/backend"
+import type { Conversation, User } from "@generated/doughnut-backend-api"
 import ContentLoader from "../commons/ContentLoader.vue"
-import { ConversationMessageController } from "@generated/backend/sdk.gen"
+import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const conversation = ref<Conversation | undefined>()

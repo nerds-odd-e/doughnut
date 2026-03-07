@@ -1,4 +1,4 @@
-import type { McqWithAnswer } from '@generated/backend/types.gen'
+import type { McqWithAnswer } from '@generated/doughnut-backend-api/types.gen'
 import mock_services from './mock_services'
 
 const createMcqWithAnswer = (

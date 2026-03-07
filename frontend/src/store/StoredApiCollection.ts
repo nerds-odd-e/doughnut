@@ -3,14 +3,17 @@ import type {
   NoteMoveDto,
   NoteRealm,
   WikidataAssociationCreation,
-} from "@generated/backend"
-import type { RelationshipCreation, NoteCreationDto } from "@generated/backend"
+} from "@generated/doughnut-backend-api"
+import type {
+  RelationshipCreation,
+  NoteCreationDto,
+} from "@generated/doughnut-backend-api"
 import {
   RelationController,
   NoteController,
   NoteCreationController,
   TextContentController,
-} from "@generated/backend/sdk.gen"
+} from "@generated/doughnut-backend-api/sdk.gen"
 import {
   toOpenApiError,
   setErrorObjectForFieldErrors,

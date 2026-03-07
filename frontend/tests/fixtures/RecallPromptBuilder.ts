@@ -3,7 +3,7 @@ import type {
   Note,
   PredefinedQuestion,
   Answer,
-} from "@generated/backend"
+} from "@generated/doughnut-backend-api"
 import Builder from "./Builder"
 import generateId from "./generateId"
 import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"

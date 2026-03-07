@@ -94,7 +94,11 @@
 import { inject, ref, type Ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
-import type { NoteAccessory, NoteRealm, User } from "@generated/backend"
+import type {
+  NoteAccessory,
+  NoteRealm,
+  User,
+} from "@generated/doughnut-backend-api"
 import NoteTextContent from "./core/NoteTextContent.vue"
 import ChildrenNotes from "./ChildrenNotes.vue"
 import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue"

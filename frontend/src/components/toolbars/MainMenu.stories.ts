@@ -1,10 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/vue3"
 import MainMenu from "./MainMenu.vue"
 import makeMe from "@tests/fixtures/makeMe"
-import { UserController } from "@generated/backend/sdk.gen"
-import type { MenuDataDto, ConversationMessage } from "@generated/backend"
-import type { Options } from "@generated/backend/client/types.gen"
-import type { GetMenuDataData } from "@generated/backend"
+import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
+import type {
+  MenuDataDto,
+  ConversationMessage,
+} from "@generated/doughnut-backend-api"
+import type { Options } from "@generated/doughnut-backend-api/client/types.gen"
+import type { GetMenuDataData } from "@generated/doughnut-backend-api"
 
 const meta = {
   title: "Toolbars/MainMenu",

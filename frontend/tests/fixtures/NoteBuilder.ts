@@ -2,7 +2,7 @@ import type {
   Note,
   NoteRealm,
   NoteTopology as NoteTopologyType,
-} from "@generated/backend"
+} from "@generated/doughnut-backend-api"
 import Builder from "./Builder"
 import generateId from "./generateId"
 

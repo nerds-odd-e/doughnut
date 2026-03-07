@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { NoteTopology } from "@generated/backend"
+import type { NoteTopology } from "@generated/doughnut-backend-api"
 import NoteTitleWithLink from "./NoteTitleWithLink.vue"
 
 defineProps({

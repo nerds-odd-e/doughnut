@@ -19,7 +19,7 @@
       "!**/components.d.ts",
       "!**/typed-router.d.ts",
       "!**/src/@types/doughnut/index.d.ts",
-      "!**/packages/generated-backend/**",
+      "!**/packages/generated/doughnut-backend-api/**",
       "!**/tests/**/*.js",
       "!**/tests/shims-vue.d.ts",
       "!**/public"

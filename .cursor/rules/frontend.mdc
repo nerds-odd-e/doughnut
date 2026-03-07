@@ -108,7 +108,7 @@ const emit = defineEmits<{
 
 // composables/setup
 // Import services directly from generated SDK
-import { getUserProfile } from "@generated/backend/sdk.gen"
+import { getUserProfile } from "@generated/doughnut-backend-api/sdk.gen"
 
 // refs/reactive state
 const loading = ref(false)
@@ -139,7 +139,7 @@ onMounted(() => {
 ```
 ### API Integration
 
-- Import services directly from `@generated/backend/sdk.gen`
+- Import services directly from `@generated/doughnut-backend-api/sdk.gen`
 - Use the wrapped response pattern: `{ data, error, request, response }`
 - Follow the API types from generated code
 
@@ -149,7 +149,7 @@ onMounted(() => {
 - Non-wrapped calls are silent (no loading, no error toasts)
 
 ```typescript
-import { UserController } from "@generated/backend/sdk.gen"
+import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 // For user actions (shows loading + error toasts)
@@ -171,7 +171,7 @@ The global client is configured with `responseStyle: "fields"` and `throwOnError
 
 ```typescript
 // Import services directly from generated SDK
-import { getTokens, generateToken } from "@generated/backend/sdk.gen"
+import { getTokens, generateToken } from "@generated/doughnut-backend-api/sdk.gen"
 
 // Destructure the response with meaningful variable names
 const { data: tokens, error } = await getTokens()

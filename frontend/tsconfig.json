@@ -19,10 +19,10 @@
     "paths": {
       "@/*": ["src/*"],
       "@tests/*": ["tests/*"],
-      "@generated/backend": ["../packages/generated-backend"],
-      "@generated/backend/*": ["../packages/generated-backend/*"],
-      "@generated/*": ["../packages/generated-backend/*"],
-      "@/generated/*": ["../packages/generated-backend/*"]
+      "@generated/doughnut-backend-api": ["../packages/generated/doughnut-backend-api"],
+      "@generated/doughnut-backend-api/*": ["../packages/generated/doughnut-backend-api/*"],
+      "@generated/*": ["../packages/generated/doughnut-backend-api/*"],
+      "@/generated/*": ["../packages/generated/doughnut-backend-api/*"]
     },
     "allowImportingTsExtensions": true,
     "noEmit": true,

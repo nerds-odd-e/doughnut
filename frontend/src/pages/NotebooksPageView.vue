@@ -41,7 +41,11 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { Notebook, Subscription, User } from "@generated/backend"
+import type {
+  Notebook,
+  Subscription,
+  User,
+} from "@generated/doughnut-backend-api"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithButtons.vue"
 import NotebookButtons from "@/components/notebook/NotebookButtons.vue"

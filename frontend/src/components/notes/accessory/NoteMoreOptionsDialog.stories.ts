@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/vue3"
 import NoteMoreOptionsDialog from "./NoteMoreOptionsDialog.vue"
 import makeMe from "@tests/fixtures/makeMe"
-import { NoteController } from "@generated/backend/sdk.gen"
-import type { Options } from "@generated/backend/client/types.gen"
-import type { GetNoteInfoData } from "@generated/backend"
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { Options } from "@generated/doughnut-backend-api/client/types.gen"
+import type { GetNoteInfoData } from "@generated/doughnut-backend-api"
 
 const meta = {
   title: "Notes/Accessory/NoteMoreOptionsDialog",

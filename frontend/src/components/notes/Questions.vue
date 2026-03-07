@@ -91,8 +91,8 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { onMounted, ref } from "vue"
-import type { Note, PredefinedQuestion } from "@generated/backend"
-import { PredefinedQuestionController } from "@generated/backend/sdk.gen"
+import type { Note, PredefinedQuestion } from "@generated/doughnut-backend-api"
+import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionManagement from "./QuestionManagement.vue"

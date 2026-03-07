@@ -19,11 +19,11 @@ import type {
   User,
   NotebookCertificateApproval,
   NotebookAiAssistant,
-} from "@generated/backend"
+} from "@generated/doughnut-backend-api"
 import {
   NotebookController,
   NotebookCertificateApprovalController,
-} from "@generated/backend/sdk.gen"
+} from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import NotebookPageView from "./NotebookPageView.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"

@@ -58,13 +58,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from "vue"
-import { ConversationMessageController } from "@generated/backend/sdk.gen"
+import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type {
   User,
   ConversationMessage,
   Conversation,
-} from "@generated/backend"
+} from "@generated/doughnut-backend-api"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"

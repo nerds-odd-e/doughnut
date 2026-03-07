@@ -200,8 +200,8 @@
 import type { PropType } from "vue"
 import { ref } from "vue"
 import { useRouter } from "vue-router"
-import type { Notebook, User } from "@generated/backend"
-import { NotebookController } from "@generated/backend/sdk.gen"
+import type { Notebook, User } from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useToast } from "@/composables/useToast"
@@ -221,7 +221,8 @@ const props = defineProps({
   user: { type: Object as PropType<User>, required: false },
   approval: {
     type: Object as PropType<
-      import("@generated/backend").NotebookCertificateApproval | undefined
+      | import("@generated/doughnut-backend-api").NotebookCertificateApproval
+      | undefined
     >,
     required: false,
   },

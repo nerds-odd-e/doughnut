@@ -48,8 +48,12 @@
 </template>
 
 <script setup lang="ts">
-import type { MemoryTracker, Note, NoteRecallInfo } from "@generated/backend"
-import { NoteController } from "@generated/backend/sdk.gen"
+import type {
+  MemoryTracker,
+  Note,
+  NoteRecallInfo,
+} from "@generated/doughnut-backend-api"
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { ref, computed, watch } from "vue"
 import { useRouter } from "vue-router"

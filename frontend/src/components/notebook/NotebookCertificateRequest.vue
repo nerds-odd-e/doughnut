@@ -10,8 +10,11 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed, ref, watch } from "vue"
-import type { Notebook, NotebookCertificateApproval } from "@generated/backend"
-import { NotebookCertificateApprovalController } from "@generated/backend/sdk.gen"
+import type {
+  Notebook,
+  NotebookCertificateApproval,
+} from "@generated/doughnut-backend-api"
+import { NotebookCertificateApprovalController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 

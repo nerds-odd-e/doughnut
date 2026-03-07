@@ -3,7 +3,7 @@ import { vi, describe, it, expect } from "vitest"
 import helper from "@tests/helpers"
 import RecallSessionOptionsDialog from "@/components/recall/RecallSessionOptionsDialog.vue"
 import makeMe from "@tests/fixtures/makeMe"
-import type { RecallPrompt } from "@generated/backend"
+import type { RecallPrompt } from "@generated/doughnut-backend-api"
 
 vi.mock("vue-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("vue-router")>()

@@ -76,11 +76,14 @@ import RecallProgressBar from "@/components/recall/RecallProgressBar.vue"
 import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
 import AnsweredSpellingQuestion from "@/components/recall/AnsweredSpellingQuestion.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
-import type { MemoryTrackerLite, RecallPrompt } from "@generated/backend"
+import type {
+  MemoryTrackerLite,
+  RecallPrompt,
+} from "@generated/doughnut-backend-api"
 import {
   RecallsController,
   MemoryTrackerController,
-} from "@generated/backend/sdk.gen"
+} from "@generated/doughnut-backend-api/sdk.gen"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import getEnvironment from "@/managedApi/window/getEnvironment"

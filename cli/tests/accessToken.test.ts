@@ -2,9 +2,9 @@ import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import { UserController } from '@generated/backend/sdk.gen'
+import { UserController } from '@generated/doughnut-backend-api/sdk.gen'
 
-vi.mock('@generated/backend/sdk.gen', () => ({
+vi.mock('@generated/doughnut-backend-api/sdk.gen', () => ({
   UserController: {
     getTokenInfo: vi.fn(),
     revokeToken: vi.fn(),

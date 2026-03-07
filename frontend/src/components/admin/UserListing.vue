@@ -51,9 +51,9 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
-import { AdminUserController } from "@generated/backend/sdk.gen"
+import { AdminUserController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import type { UserListingPage } from "@generated/backend"
+import type { UserListingPage } from "@generated/doughnut-backend-api"
 
 const userPage = ref<UserListingPage | undefined>(undefined)
 const pageIndex = ref(0)

@@ -1,4 +1,4 @@
-import type { BazaarNotebook, Notebook } from "@generated/backend"
+import type { BazaarNotebook, Notebook } from "@generated/doughnut-backend-api"
 import Builder from "./Builder"
 import generateId from "./generateId"
 

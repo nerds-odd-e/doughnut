@@ -1,6 +1,6 @@
 import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 import { apiCallWithLoading, setupGlobalClient } from "@/managedApi/clientSetup"
-import { UserController } from "@generated/backend/sdk.gen"
+import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import createFetchMock from "vitest-fetch-mock"
 

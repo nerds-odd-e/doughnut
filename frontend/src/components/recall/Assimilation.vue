@@ -43,8 +43,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/backend"
-import { AssimilationController } from "@generated/backend/sdk.gen"
+import type { Note } from "@generated/doughnut-backend-api"
+import { AssimilationController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
 import NoteInfoBar from "../notes/NoteInfoBar.vue"

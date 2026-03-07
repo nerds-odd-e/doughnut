@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/vue3"
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
 import makeMe from "@tests/fixtures/makeMe"
-import type { RecallPrompt } from "@generated/backend"
+import type { RecallPrompt } from "@generated/doughnut-backend-api"
 
 const meta = {
   title: "Recall/AnsweredQuestionComponent",
