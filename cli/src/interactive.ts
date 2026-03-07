@@ -25,6 +25,15 @@ const RESET = '\x1b[0m'
 const PLACEHOLDER = '`exit` to quit.'
 const PROMPT = '→ '
 
+function parseCommandWithRequiredParam(
+  trimmed: string,
+  command: string
+): string | 'usage' | null {
+  if (trimmed !== command && !trimmed.startsWith(`${command} `)) return null
+  const param = trimmed.slice(command.length).trim()
+  return param ? param : 'usage'
+}
+
 export async function processInput(input: string): Promise<boolean> {
   const trimmed = input.trim()
   if (trimmed === 'exit' || trimmed === '/exit') {
@@ -34,14 +43,17 @@ export async function processInput(input: string): Promise<boolean> {
     console.log(formatHelp())
     return false
   }
-  if (trimmed.startsWith('/add-access-token ')) {
-    const token = trimmed.slice('/add-access-token '.length).trim()
-    if (!token) {
+  const addTokenParam = parseCommandWithRequiredParam(
+    trimmed,
+    '/add-access-token'
+  )
+  if (addTokenParam !== null) {
+    if (addTokenParam === 'usage') {
       console.log('Usage: /add-access-token <token>')
       return false
     }
     try {
-      await addAccessToken(token)
+      await addAccessToken(addTokenParam)
       console.log('Token added')
     } catch (err) {
       console.log(err instanceof Error ? err.message : String(err))
@@ -59,55 +71,55 @@ export async function processInput(input: string): Promise<boolean> {
     }
     return false
   }
-  if (
-    trimmed.startsWith('/create-access-token ') ||
-    trimmed === '/create-access-token'
-  ) {
-    const label = trimmed.slice('/create-access-token '.length).trim()
-    if (!label) {
+  const createTokenParam = parseCommandWithRequiredParam(
+    trimmed,
+    '/create-access-token'
+  )
+  if (createTokenParam !== null) {
+    if (createTokenParam === 'usage') {
       console.log('Usage: /create-access-token <label>')
       return false
     }
     try {
-      await createAccessToken(label)
+      await createAccessToken(createTokenParam)
       console.log('Token created')
     } catch (err) {
       console.log(err instanceof Error ? err.message : String(err))
     }
     return false
   }
-  if (
-    trimmed.startsWith('/remove-access-token ') ||
-    trimmed === '/remove-access-token'
-  ) {
-    const label = trimmed.slice('/remove-access-token '.length).trim()
-    if (!label) {
-      console.log('Usage: /remove-access-token <label>')
-      return false
-    }
-    if (removeAccessToken(label)) {
-      console.log(`Token "${label}" removed.`)
-    } else {
-      console.log(`Token "${label}" not found.`)
-    }
-    return false
-  }
-  if (
-    trimmed.startsWith('/remove-access-token-completely ') ||
-    trimmed === '/remove-access-token-completely'
-  ) {
-    const label = trimmed
-      .slice('/remove-access-token-completely '.length)
-      .trim()
-    if (!label) {
+  const removeCompletelyParam = parseCommandWithRequiredParam(
+    trimmed,
+    '/remove-access-token-completely'
+  )
+  if (removeCompletelyParam !== null) {
+    if (removeCompletelyParam === 'usage') {
       console.log('Usage: /remove-access-token-completely <label>')
       return false
     }
     try {
-      await removeAccessTokenCompletely(label)
-      console.log(`Token "${label}" removed locally and from server.`)
+      await removeAccessTokenCompletely(removeCompletelyParam)
+      console.log(
+        `Token "${removeCompletelyParam}" removed locally and from server.`
+      )
     } catch (err) {
       console.log(err instanceof Error ? err.message : String(err))
+    }
+    return false
+  }
+  const removeTokenParam = parseCommandWithRequiredParam(
+    trimmed,
+    '/remove-access-token'
+  )
+  if (removeTokenParam !== null) {
+    if (removeTokenParam === 'usage') {
+      console.log('Usage: /remove-access-token <label>')
+      return false
+    }
+    if (removeAccessToken(removeTokenParam)) {
+      console.log(`Token "${removeTokenParam}" removed.`)
+    } else {
+      console.log(`Token "${removeTokenParam}" not found.`)
     }
     return false
   }

@@ -99,6 +99,20 @@ describe('processInput', () => {
     logSpy.mockRestore()
   })
 
+  test('returns false and shows usage for /add-access-token without token', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    expect(await processInput('/add-access-token')).toBe(false)
+    expect(logSpy).toHaveBeenCalledWith('Usage: /add-access-token <token>')
+    logSpy.mockRestore()
+  })
+
+  test('returns false and shows usage for /add-access-token with trailing space only', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    expect(await processInput('/add-access-token ')).toBe(false)
+    expect(logSpy).toHaveBeenCalledWith('Usage: /add-access-token <token>')
+    logSpy.mockRestore()
+  })
+
   test('returns false and shows tokens with default marker for /list-access-token', async () => {
     const fs = await import('node:fs')
     const os = await import('node:os')
