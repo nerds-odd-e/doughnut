@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.dto.InitialInfo;
+import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.AssimilationService;
 import com.odde.doughnut.services.AuthorizationService;
@@ -59,10 +59,10 @@ class AssimilationController {
 
   @PostMapping(path = "")
   @Transactional
-  public List<MemoryTracker> assimilate(@RequestBody InitialInfo initialInfo) {
+  public List<MemoryTracker> assimilate(@RequestBody AssimilationRequestDTO request) {
     authorizationService.assertLoggedIn();
     return memoryTrackerService.assimilate(
-        initialInfo,
+        request,
         authorizationService.getCurrentUser(),
         testabilitySettings.getCurrentUTCTimestamp());
   }

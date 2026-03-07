@@ -249,11 +249,7 @@ describe("Assimilation component", () => {
       await flushPromises()
 
       expect(assimilateSpy).toHaveBeenCalledWith({
-        body: {
-          noteId: note.id,
-          skipMemoryTracking: false,
-          addSpellingOnly: true,
-        },
+        body: { noteId: note.id, skipMemoryTracking: false },
       })
       expect(wrapper.emitted()).toHaveProperty("assimilationDone")
     })

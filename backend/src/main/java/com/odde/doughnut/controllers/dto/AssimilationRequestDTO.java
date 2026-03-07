@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers.dto;
 
-public class InitialInfo {
+public class AssimilationRequestDTO {
   public Integer noteId;
   public Boolean skipMemoryTracking;
-  public Boolean addSpellingOnly;
 }

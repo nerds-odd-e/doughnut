@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.dto.InitialInfo;
+import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -55,7 +55,7 @@ class AssimilationControllerTests extends ControllerTestBase {
     @Test
     void create() {
       currentUser.setUser(null);
-      InitialInfo info = new InitialInfo();
+      AssimilationRequestDTO info = new AssimilationRequestDTO();
       assertThrows(ResponseStatusException.class, () -> controller.assimilate(info));
     }
 
@@ -65,10 +65,10 @@ class AssimilationControllerTests extends ControllerTestBase {
       note.getRecallSetting().setRememberSpelling(true);
       noteRepository.save(note);
 
-      InitialInfo initialInfo = new InitialInfo();
-      initialInfo.noteId = note.getId();
+      AssimilationRequestDTO request = new AssimilationRequestDTO();
+      request.noteId = note.getId();
 
-      controller.assimilate(initialInfo);
+      controller.assimilate(request);
 
       List<MemoryTracker> memoryTrackers =
           memoryTrackerRepository.findLast100ByUser(currentUser.getUser().getId());
@@ -84,10 +84,10 @@ class AssimilationControllerTests extends ControllerTestBase {
       Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
-      InitialInfo initialInfo = new InitialInfo();
-      initialInfo.noteId = note.getId();
+      AssimilationRequestDTO request = new AssimilationRequestDTO();
+      request.noteId = note.getId();
 
-      List<MemoryTracker> result = controller.assimilate(initialInfo);
+      List<MemoryTracker> result = controller.assimilate(request);
 
       assertThat(result, empty());
       assertThat(
@@ -102,11 +102,10 @@ class AssimilationControllerTests extends ControllerTestBase {
       noteRepository.save(note);
       makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
-      InitialInfo initialInfo = new InitialInfo();
-      initialInfo.noteId = note.getId();
-      initialInfo.addSpellingOnly = true;
+      AssimilationRequestDTO request = new AssimilationRequestDTO();
+      request.noteId = note.getId();
 
-      List<MemoryTracker> result = controller.assimilate(initialInfo);
+      List<MemoryTracker> result = controller.assimilate(request);
 
       assertThat(result, hasSize(1));
       assertThat(result.get(0).getSpelling(), equalTo(true));

@@ -1,7 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
-import com.odde.doughnut.controllers.dto.InitialInfo;
+import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
@@ -50,20 +50,18 @@ public class MemoryTrackerService {
   }
 
   public List<MemoryTracker> assimilate(
-      InitialInfo initialInfo, User currentUser, Timestamp currentTime) {
-    Note note = entityPersister.find(Note.class, initialInfo.noteId);
+      AssimilationRequestDTO request, User currentUser, Timestamp currentTime) {
+    Note note = entityPersister.find(Note.class, request.noteId);
     List<MemoryTracker> existingTrackers = userService.getMemoryTrackersFor(currentUser, note);
-    boolean addSpellingOnly = Boolean.TRUE.equals(initialInfo.addSpellingOnly);
     boolean skipMemoryTracking =
-        initialInfo.skipMemoryTracking != null ? initialInfo.skipMemoryTracking : false;
+        request.skipMemoryTracking != null ? request.skipMemoryTracking : false;
+
+    boolean addSpellingOnly =
+        !existingTrackers.isEmpty()
+            && Boolean.TRUE.equals(note.getRecallSetting().getRememberSpelling())
+            && existingTrackers.stream().noneMatch(mt -> Boolean.TRUE.equals(mt.getSpelling()));
 
     if (addSpellingOnly) {
-      boolean hasSpellingTracker =
-          existingTrackers.stream().anyMatch(mt -> Boolean.TRUE.equals(mt.getSpelling()));
-      if (hasSpellingTracker
-          || !Boolean.TRUE.equals(note.getRecallSetting().getRememberSpelling())) {
-        return List.of();
-      }
       MemoryTracker spellingTracker =
           createMemoryTracker(note, currentUser, currentTime, skipMemoryTracking, true);
       return List.of(spellingTracker);
