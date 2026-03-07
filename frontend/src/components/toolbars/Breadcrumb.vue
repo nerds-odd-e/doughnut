@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import type { NoteTopology } from "@generated/backend"
+import type { NoteTopology } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import { computed } from "vue"
 import BasicBreadcrumb from "@/components/commons/BasicBreadcrumb.vue"

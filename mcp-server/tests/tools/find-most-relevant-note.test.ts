@@ -1,11 +1,11 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import { createMockContext, findTool } from '../helpers/index.js'
-import { SearchController } from '@generated/backend/sdk.gen'
-import { client } from '@generated/backend/client.gen'
-import type { SearchForRelationshipTargetResponse } from '@generated/backend'
+import { SearchController } from '@generated/doughnut-backend-api/sdk.gen'
+import { client } from '@generated/doughnut-backend-api/client.gen'
+import type { SearchForRelationshipTargetResponse } from '@generated/doughnut-backend-api'
 
 // Mock the generated services
-vi.mock('@generated/backend/sdk.gen', () => ({
+vi.mock('@generated/doughnut-backend-api/sdk.gen', () => ({
   SearchController: {
     searchForRelationshipTarget: vi.fn(),
   },

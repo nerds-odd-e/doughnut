@@ -1,5 +1,8 @@
-import { client as globalClient } from "@generated/backend/client.gen"
-import { createClient, type Config } from "@generated/backend/client"
+import { client as globalClient } from "@generated/doughnut-backend-api/client.gen"
+import {
+  createClient,
+  type Config,
+} from "@generated/doughnut-backend-api/client"
 import type { ApiStatus } from "./ApiStatusHandler"
 import ApiStatusHandler from "./ApiStatusHandler"
 import assignBadRequestProperties from "./window/assignBadRequestProperties"

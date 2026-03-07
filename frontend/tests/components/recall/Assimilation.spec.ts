@@ -197,4 +197,59 @@ describe("Assimilation component", () => {
       expect(wrapper.find('[data-test="keep-for-recall"]').exists()).toBe(true)
     })
   })
+
+  describe("keep for repetition when note has memory trackers", () => {
+    it("disables keep for repetition when note has memory trackers and no add-spelling-only mode", async () => {
+      mockSdkService("getNoteInfo", {
+        noteType: undefined,
+        memoryTrackers: [{ id: 1, spelling: false }],
+      })
+      const wrapper = mount()
+      await flushPromises()
+
+      const keepButton = wrapper.find('[data-test="keep-for-repetition"]')
+      expect(keepButton.attributes("disabled")).toBeDefined()
+    })
+
+    it("enables keep for repetition when remember spelling on and no spelling tracker", async () => {
+      mockSdkService("getNoteInfo", {
+        noteType: undefined,
+        recallSetting: { rememberSpelling: true },
+        memoryTrackers: [{ id: 1, spelling: false }],
+      })
+      const wrapper = mount()
+      await flushPromises()
+
+      const keepButton = wrapper.find('[data-test="keep-for-repetition"]')
+      expect(keepButton.attributes("disabled")).toBeUndefined()
+    })
+
+    it("adds only spelling memory tracker when in add-spelling-only mode", async () => {
+      mockSdkService("getNoteInfo", {
+        noteType: undefined,
+        recallSetting: { rememberSpelling: true },
+        memoryTrackers: [{ id: 1, spelling: false }],
+      })
+      mockSdkService("verifySpelling", { correct: true })
+      assimilateSpy.mockResolvedValue(
+        wrapSdkResponse([{ id: 2, spelling: true, removedFromTracking: false }])
+      )
+      const wrapper = mount()
+      await flushPromises()
+
+      await wrapper.find('[data-test="keep-for-repetition"]').trigger("click")
+      await flushPromises()
+
+      const verifyButton = document.querySelector(
+        '[data-test="verify-spelling"]'
+      ) as HTMLElement
+      verifyButton.click()
+      await flushPromises()
+
+      expect(assimilateSpy).toHaveBeenCalledWith({
+        body: { noteId: note.id, skipMemoryTracking: false },
+      })
+      expect(wrapper.emitted()).toHaveProperty("assimilationDone")
+    })
+  })
 })

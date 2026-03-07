@@ -8,8 +8,8 @@
 </template>
 
 <script setup lang="ts">
-import type { NoteAccessory } from "@generated/backend"
-import { NoteController } from "@generated/backend/sdk.gen"
+import type { NoteAccessory } from "@generated/doughnut-backend-api"
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { nonReloadingClient } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"
 import { onMounted, ref, watch } from "vue"

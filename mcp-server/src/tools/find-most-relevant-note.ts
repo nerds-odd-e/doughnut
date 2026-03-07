@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import { createTool } from './tool-builder.js'
 import { textResponse, jsonResponse } from '../helpers.js'
-import type { NoteSearchResult } from '@generated/backend'
-import { SearchController } from '@generated/backend/sdk.gen'
+import type { NoteSearchResult } from '@generated/doughnut-backend-api'
+import { SearchController } from '@generated/doughnut-backend-api/sdk.gen'
 
 // Schema definitions co-located with the tool
 const SearchNoteParamsSchema = z.object({

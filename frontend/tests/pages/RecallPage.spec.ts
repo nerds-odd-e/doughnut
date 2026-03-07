@@ -1,6 +1,9 @@
 import { useRecallData } from "@/composables/useRecallData"
 import RecallPage from "@/pages/RecallPage.vue"
-import type { MemoryTrackerLite, RecallPrompt } from "@generated/backend"
+import type {
+  MemoryTrackerLite,
+  RecallPrompt,
+} from "@generated/doughnut-backend-api"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, {
   mockSdkService,

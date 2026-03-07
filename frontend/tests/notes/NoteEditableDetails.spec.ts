@@ -4,7 +4,7 @@ import type { ComponentPublicInstance } from "vue"
 import { vi, describe, it, expect, beforeEach } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
-import type { UpdateNoteDetailsData } from "@generated/backend"
+import type { UpdateNoteDetailsData } from "@generated/doughnut-backend-api"
 import usePopups from "@/components/commons/Popups/usePopups"
 
 vi.mock("@/components/commons/Popups/usePopups")

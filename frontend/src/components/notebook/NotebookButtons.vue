@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router"
 import SvgNotebook from "@/components/svgs/SvgNotebook.vue"
-import type { Notebook, User } from "@generated/backend"
+import type { Notebook, User } from "@generated/doughnut-backend-api"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
 
 const router = useRouter()

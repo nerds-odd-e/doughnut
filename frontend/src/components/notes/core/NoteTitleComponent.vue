@@ -37,7 +37,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed, ref } from "vue"
-import type { NoteTopology } from "@generated/backend"
+import type { NoteTopology } from "@generated/doughnut-backend-api"
 import SvgRelationTypeIcon from "@/components/svgs/SvgRelationTypeIcon.vue"
 import NoteTitleWithLink from "../NoteTitleWithLink.vue"
 

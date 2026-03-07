@@ -1,5 +1,5 @@
 import { reactive } from "vue"
-import type { NoteSearchResult } from "@generated/backend"
+import type { NoteSearchResult } from "@generated/doughnut-backend-api"
 
 export interface DisplayState {
   showRecentNotes: boolean

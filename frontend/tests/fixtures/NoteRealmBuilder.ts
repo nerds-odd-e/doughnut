@@ -1,4 +1,4 @@
-import type { NoteRealm } from "@generated/backend"
+import type { NoteRealm } from "@generated/doughnut-backend-api"
 import Builder from "./Builder"
 import NoteBuilder from "./NoteBuilder"
 import generateId from "./generateId"

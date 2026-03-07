@@ -10,8 +10,11 @@
 </template>
 
 <script lang="ts">
-import type { NoteAccessoriesDto, NoteAccessory } from "@generated/backend"
-import { NoteController } from "@generated/backend/sdk.gen"
+import type {
+  NoteAccessoriesDto,
+  NoteAccessory,
+} from "@generated/doughnut-backend-api"
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { defineComponent } from "vue"

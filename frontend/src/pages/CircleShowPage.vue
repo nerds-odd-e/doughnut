@@ -46,8 +46,12 @@ import NotebookButtons from "@/components/notebook/NotebookButtons.vue"
 import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithButtons.vue"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
-import type { CircleForUserView, Notebook, User } from "@generated/backend"
-import { CircleController } from "@generated/backend/sdk.gen"
+import type {
+  CircleForUserView,
+  Notebook,
+  User,
+} from "@generated/doughnut-backend-api"
+import { CircleController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import type { Ref } from "vue"
 import { computed, inject, onMounted, ref } from "vue"

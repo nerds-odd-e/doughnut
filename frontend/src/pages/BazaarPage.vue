@@ -17,8 +17,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, inject, type Ref } from "vue"
-import type { BazaarNotebook, User } from "@generated/backend"
-import { BazaarController } from "@generated/backend/sdk.gen"
+import type { BazaarNotebook, User } from "@generated/doughnut-backend-api"
+import { BazaarController } from "@generated/doughnut-backend-api/sdk.gen"
 import { nonReloadingClient } from "@/managedApi/clientSetup"
 import NotebookBazaarViewCards from "@/components/bazaar/NotebookBazaarViewCards.vue"
 import ContainerPage from "./commons/ContainerPage.vue"

@@ -25,9 +25,9 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref } from "vue"
-import type { Note } from "@generated/backend"
-import type { RelationshipCreation } from "@generated/backend"
-import type { NoteTopology } from "@generated/backend"
+import type { Note } from "@generated/doughnut-backend-api"
+import type { RelationshipCreation } from "@generated/doughnut-backend-api"
+import type { NoteTopology } from "@generated/doughnut-backend-api"
 import RelationTypeSelect from "./RelationTypeSelect.vue"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 import SvgGoBack from "../svgs/SvgGoBack.vue"

@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/backend"
+import type { Note } from "@generated/doughnut-backend-api"
 
 defineProps<{
   note: Note

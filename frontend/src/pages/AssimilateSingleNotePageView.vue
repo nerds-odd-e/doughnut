@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/backend"
+import type { Note } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import Assimilation from "@/components/recall/Assimilation.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"

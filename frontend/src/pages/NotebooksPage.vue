@@ -12,8 +12,12 @@
 
 <script setup lang="ts">
 import { inject, onMounted, ref, type Ref } from "vue"
-import type { Notebook, Subscription, User } from "@generated/backend"
-import { NotebookController } from "@generated/backend/sdk.gen"
+import type {
+  Notebook,
+  Subscription,
+  User,
+} from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import NotebooksPageView from "./NotebooksPageView.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"

@@ -70,7 +70,10 @@ doughnut/
 │       ├── components/         # Reusable components
 │       ├── composables/        # Vue 3 composables
 │       ├── store/              # Pinia state management
-│       └── generated/backend/  # Auto-generated API client
+│       └── (imports from packages/generated/doughnut-backend-api/)
+├── packages/
+│   └── generated/
+│       └── doughnut-backend-api/  # Auto-generated API client
 ├── e2e_test/                   # Cucumber E2E tests
 │   ├── features/               # Gherkin feature files
 │   ├── step_definitions/       # Step implementations
@@ -95,7 +98,7 @@ doughnut/
 
 ### Frontend (Vue/TypeScript)
 - Use `<script setup lang="ts">` for components
-- Import API services from `@generated/backend/sdk.gen`
+- Import API services from `@generated/doughnut-backend-api/sdk.gen`
 - Use `apiCallWithLoading()` for user-initiated actions with loading/error handling
 - DaisyUI classes use `daisy-` prefix
 - Avoid `getByRole` queries in tests (performance) - use `getByText`, `getByLabelText`, etc.

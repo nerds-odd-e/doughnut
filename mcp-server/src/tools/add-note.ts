@@ -3,8 +3,8 @@ import type {
   NoteCreationDTO,
   McpNoteAddDTO,
   CreateNoteViaMcpResponse,
-} from '@generated/backend'
-import { McpNoteCreationController } from '@generated/backend/sdk.gen'
+} from '@generated/doughnut-backend-api'
+import { McpNoteCreationController } from '@generated/doughnut-backend-api/sdk.gen'
 import { createTool } from './tool-builder.js'
 import { jsonResponse } from '../helpers.js'
 

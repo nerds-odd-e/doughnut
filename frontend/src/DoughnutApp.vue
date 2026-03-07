@@ -7,11 +7,11 @@ import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue"
 import type { ApiStatus } from "./managedApi/ApiStatusHandler"
 import { setupGlobalClient, nonReloadingClient } from "./managedApi/clientSetup"
 import LoadingThinBar from "./components/commons/LoadingThinBar.vue"
-import type { User } from "@generated/backend"
+import type { User } from "@generated/doughnut-backend-api"
 import {
   CurrentUserInfoController,
   TestabilityRestController,
-} from "@generated/backend/sdk.gen"
+} from "@generated/doughnut-backend-api/sdk.gen"
 import getEnvironment from "./managedApi/window/getEnvironment"
 import MainMenu from "./components/toolbars/MainMenu.vue"
 import { useFeatureToggle } from "./composables/useFeatureToggle"

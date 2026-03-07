@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Circle, NoteTopology } from "@generated/backend"
+import type { Circle, NoteTopology } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 
 defineProps({

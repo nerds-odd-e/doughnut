@@ -12,8 +12,8 @@
 </template>
 
 <script lang="ts">
-import type { Circle } from "@generated/backend"
-import { CircleController } from "@generated/backend/sdk.gen"
+import type { Circle } from "@generated/doughnut-backend-api"
+import { CircleController } from "@generated/doughnut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { defineComponent } from "vue"

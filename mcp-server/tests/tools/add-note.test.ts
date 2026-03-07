@@ -1,11 +1,11 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import { createMockContext, findTool } from '../helpers/index.js'
-import { McpNoteCreationController } from '@generated/backend/sdk.gen'
-import { client } from '@generated/backend/client.gen'
-import type { CreateNoteViaMcpResponse } from '@generated/backend'
+import { McpNoteCreationController } from '@generated/doughnut-backend-api/sdk.gen'
+import { client } from '@generated/doughnut-backend-api/client.gen'
+import type { CreateNoteViaMcpResponse } from '@generated/doughnut-backend-api'
 
 // Mock the generated services
-vi.mock('@generated/backend/sdk.gen', () => ({
+vi.mock('@generated/doughnut-backend-api/sdk.gen', () => ({
   McpNoteCreationController: {
     createNoteViaMcp: vi.fn(),
   },

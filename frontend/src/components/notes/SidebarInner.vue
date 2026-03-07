@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Note, NoteRealm } from "@generated/backend"
+import type { Note, NoteRealm } from "@generated/doughnut-backend-api"
 import SidebarNoteItem from "./SidebarNoteItem.vue"
 import { ref, watch } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"

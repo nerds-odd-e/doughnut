@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 import SvgAssociation from "@/components/svgs/SvgAssociation.vue"
-import { WikidataController } from "@generated/backend/sdk.gen"
+import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup"
 

@@ -75,7 +75,7 @@ doughnut</code></pre>
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import { useNavigationItems } from "@/composables/useNavigationItems"
-import type { User } from "@generated/backend"
+import type { User } from "@generated/doughnut-backend-api"
 import { inject, onMounted, onUnmounted, ref, type Ref } from "vue"
 
 const user = inject<Ref<User | undefined>>("currentUser")

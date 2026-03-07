@@ -11,7 +11,7 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "paths": {
-      "@generated/*": ["../packages/generated-backend/*"]
+      "@generated/*": ["../packages/generated/doughnut-backend-api/*"]
     }
   },
   "include": [

@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { RecallPrompt } from "@generated/backend"
+import type { RecallPrompt } from "@generated/doughnut-backend-api"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import NoteUnderQuestion from "./NoteUnderQuestion.vue"
 import ViewMemoryTrackerLink from "./ViewMemoryTrackerLink.vue"

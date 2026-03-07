@@ -1,6 +1,6 @@
-import type { McpNoteAddDto } from '@generated/backend'
-import type { NoteCreationDto } from '@generated/backend'
-import { McpNoteCreationController } from '@generated/backend/sdk.gen'
+import type { McpNoteAddDto } from '@generated/doughnut-backend-api'
+import type { NoteCreationDto } from '@generated/doughnut-backend-api'
+import { McpNoteCreationController } from '@generated/doughnut-backend-api/sdk.gen'
 
 type ApiResponse = {
   status: number

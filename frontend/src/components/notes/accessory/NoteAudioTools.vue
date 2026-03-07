@@ -81,8 +81,11 @@
 import { ref, type PropType } from "vue"
 import { createAudioRecorder } from "../../../models/audio/audioRecorder"
 import { createWakeLocker } from "../../../models/wakeLocker"
-import type { Note } from "@generated/backend"
-import { AiAudioController, AiController } from "@generated/backend/sdk.gen"
+import type { Note } from "@generated/doughnut-backend-api"
+import {
+  AiAudioController,
+  AiController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import Waveform from "./Waveform.vue"
 import SvgAudioInput from "@/components/svgs/SvgAudioInput.vue"

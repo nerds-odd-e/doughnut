@@ -5,7 +5,7 @@
     value="Keep for recall"
     class="daisy-btn daisy-btn-primary"
     data-test="keep-for-recall"
-    :disabled="disabled"
+    :disabled="disabled || keepForRecallDisabled"
     @click="$emit('assimilate', false)"
   />
   <input
@@ -24,6 +24,10 @@ import { defineComponent } from "vue"
 export default defineComponent({
   props: {
     disabled: {
+      type: Boolean,
+      default: false,
+    },
+    keepForRecallDisabled: {
       type: Boolean,
       default: false,
     },

@@ -164,8 +164,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
-import type { FailureReport } from "@generated/backend"
-import { FailureReportController } from "@generated/backend/sdk.gen"
+import type { FailureReport } from "@generated/doughnut-backend-api"
+import { FailureReportController } from "@generated/doughnut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"

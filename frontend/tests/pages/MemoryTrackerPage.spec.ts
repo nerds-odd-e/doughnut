@@ -3,7 +3,7 @@ import { flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect } from "vitest"
 import helper, { mockSdkService, wrapSdkError } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
-import { MemoryTrackerController } from "@generated/backend/sdk.gen"
+import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 
 vi.mock("vue-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("vue-router")>()

@@ -1,4 +1,7 @@
-import type { CircleForUserView, Notebook } from "@generated/backend"
+import type {
+  CircleForUserView,
+  Notebook,
+} from "@generated/doughnut-backend-api"
 import NotebooksBuilder from "./BazaarNotebooksBuilder"
 import Builder from "./Builder"
 import generateId from "./generateId"

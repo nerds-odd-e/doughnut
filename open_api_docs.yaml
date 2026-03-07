@@ -2259,7 +2259,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/InitialInfo"
+              $ref: "#/components/schemas/AssimilationRequestDTO"
         required: true
       responses:
         "500":
@@ -4850,7 +4850,7 @@ components:
           type: string
         endTimestamp:
           type: string
-    InitialInfo:
+    AssimilationRequestDTO:
       type: object
       properties:
         noteId:

@@ -33,10 +33,10 @@
 </template>
 
 <script setup lang="ts">
-import type { User } from "@generated/backend"
+import type { User } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import UserProfileDialog from "./UserProfileDialog.vue"
-import { UserController } from "@generated/backend/sdk.gen"
+import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
 import { watch, computed, ref } from "vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import timezoneParam from "@/managedApi/window/timezoneParam"

@@ -9,7 +9,7 @@
 <script setup lang="ts">
 import { type PropType } from "vue"
 import Sidebar from "./Sidebar.vue"
-import type { NoteRealm } from "@generated/backend"
+import type { NoteRealm } from "@generated/doughnut-backend-api"
 
 defineProps({
   noteRealm: { type: Object as PropType<NoteRealm>, required: true },

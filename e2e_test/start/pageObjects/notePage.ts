@@ -322,5 +322,10 @@ export const assumeNotePage = (noteTopology?: string) => {
       })
       return this
     },
+    setRememberSpelling() {
+      form.getField('Remember Spelling').check()
+      pageIsNotLoading()
+      return this
+    },
   }
 }

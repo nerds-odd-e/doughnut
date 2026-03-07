@@ -9,9 +9,9 @@
 import { onMounted, ref } from "vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 import Assessment from "@/components/assessment/Assessment.vue"
-import { AssessmentController } from "@generated/backend/sdk.gen"
+import { AssessmentController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import type { AssessmentAttempt } from "@generated/backend"
+import type { AssessmentAttempt } from "@generated/doughnut-backend-api"
 import { toOpenApiError } from "@/managedApi/openApiError"
 
 const props = defineProps({

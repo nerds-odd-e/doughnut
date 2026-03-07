@@ -13,8 +13,8 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import type { MemoryTracker } from "@generated/backend"
-import { MemoryTrackerController } from "@generated/backend/sdk.gen"
+import type { MemoryTracker } from "@generated/doughnut-backend-api"
+import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import NoteShow from "../notes/NoteShow.vue"
 

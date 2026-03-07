@@ -33,3 +33,30 @@ Feature: Assimilate With Remembering Spelling
       | sedition       | sedition       | "success"               |
       | colour / color | colour         | "success"               |
       | sedition       | wrong answer   | "error: wrong spelling" |
+
+  Scenario: Already assimilated note reappears in to-be-assimilated list when remember spelling is added later
+    Given there are some notes:
+      | Title   | Details           | Parent Title |
+      | Relearn | Non-empty details | English      |
+    And I assimilate the note "Relearn"
+    And I add remember spelling to the note "Relearn"
+    When I navigate to the assimilation page
+    Then I should see 1 due for assimilation
+    
+  Scenario: Add only spelling memory tracker when note already has trackers
+    Given there are some notes:
+      | Title | Details           | Parent Title |
+      | Word  | Non-empty details | English      |
+    And I assimilated one note "Word" on day 1
+    When I am assimilating the note "Word"
+    And I keep for recall with remembering spelling
+    When I verify spelling with "Word"
+    Then the spelling verification result for note "Word" should be "success"
+
+  Scenario: Keep for recall disabled when note already has memory trackers
+    Given there are some notes:
+      | Title | Details           | Parent Title |
+      | Word  | Non-empty details | English      |
+    And I assimilated one note "Word" on day 1
+    When I am assimilating the note "Word"
+    Then the keep for recall button should be disabled

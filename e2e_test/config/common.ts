@@ -63,18 +63,21 @@ const commonConfig = {
     ): Promise<Cypress.PluginConfigOptions> {
       await addCucumberPreprocessorPlugin(on, config)
 
-      const projectRoot = path.dirname(config.configFile ?? process.cwd())
+      // Cypress 10+ changes process.cwd() to the config file's directory when using --config-file,
+      // so resolve from __dirname to get the repo root regardless of cwd.
+      const repoRoot = path.resolve(__dirname, '..', '..')
       const generatedBackendPath = path.join(
-        projectRoot,
+        repoRoot,
         'packages',
-        'generated-backend'
+        'generated',
+        'doughnut-backend-api'
       )
       on(
         'file:preprocessor',
         createBundler({
           plugins: [createEsbuildPlugin(config)],
           alias: {
-            '@generated/backend': generatedBackendPath,
+            '@generated/doughnut-backend-api': generatedBackendPath,
           },
         })
       )

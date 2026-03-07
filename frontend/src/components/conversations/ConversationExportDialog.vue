@@ -30,7 +30,7 @@
 import { ref, onMounted } from "vue"
 import Modal from "@/components/commons/Modal.vue"
 import CopyButton from "@/components/commons/CopyButton.vue"
-import { ConversationMessageController } from "@generated/backend/sdk.gen"
+import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 
 const props = defineProps<{

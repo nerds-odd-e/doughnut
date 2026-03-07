@@ -1,6 +1,6 @@
 import { pageIsNotLoading } from '../pageBase'
 import { mainMenu } from '../pageObjects/mainMenu'
-import { HealthCheckController } from '@generated/backend/sdk.gen'
+import { HealthCheckController } from '@generated/doughnut-backend-api/sdk.gen'
 
 export const loginActions = {
   logout() {

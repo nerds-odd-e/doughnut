@@ -17,8 +17,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue"
-import type { Note } from "@generated/backend"
-import type { NoteTopology } from "@generated/backend"
+import type { Note } from "@generated/doughnut-backend-api"
+import type { NoteTopology } from "@generated/doughnut-backend-api"
 import AddRelationshipFinalize from "./AddRelationshipFinalize.vue"
 import SearchNote from "../search/SearchNote.vue"
 import usePopups from "../commons/Popups/usePopups"

@@ -2,7 +2,7 @@ import type {
   MemoryTracker,
   NoteRecallInfo,
   NoteRecallSetting,
-} from "@generated/backend"
+} from "@generated/doughnut-backend-api"
 import Builder from "./Builder"
 
 class NoteRecallInfoBuilder extends Builder<NoteRecallInfo> {
