@@ -13,7 +13,7 @@ export default defineConfig({
     },
   ],
   output: {
-    path: path.resolve('./generated/backend'),
+    path: path.resolve('./packages/generated-backend'),
     name: 'DoughnutApi',
     clean: true,
   },

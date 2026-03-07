@@ -15,7 +15,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@generated': resolve(__dirname, '../generated'),
+      '@generated/backend': resolve(__dirname, '../packages/generated-backend'),
     },
   },
 })

@@ -34,7 +34,8 @@
       "!**/cypress/downloads/**",
       "!**/*.feature",
       "!**/cucumber-json-formatter",
-      "!**/cucumber-messages.ndjson"
+      "!**/cucumber-messages.ndjson",
+      "!**/packages/generated-backend/**"
     ],
     "ignoreUnknown": true
   },

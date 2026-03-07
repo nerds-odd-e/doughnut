@@ -19,8 +19,10 @@
     "paths": {
       "@/*": ["src/*"],
       "@tests/*": ["tests/*"],
-      "@generated/*": ["../generated/*"],
-      "@/generated/*": ["../generated/*"]
+      "@generated/backend": ["../packages/generated-backend"],
+      "@generated/backend/*": ["../packages/generated-backend/*"],
+      "@generated/*": ["../packages/generated-backend/*"],
+      "@/generated/*": ["../packages/generated-backend/*"]
     },
     "allowImportingTsExtensions": true,
     "noEmit": true,

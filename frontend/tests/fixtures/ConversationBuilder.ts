@@ -1,4 +1,4 @@
-import type { Conversation, Note, RecallPrompt } from "@/generated/backend"
+import type { Conversation, Note, RecallPrompt } from "@generated/backend"
 import Builder from "./Builder"
 import generateId from "./generateId"
 import NoteBuilder from "./NoteBuilder"

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@generated/backend": "workspace:*"
+    "@generated/backend": "file:../generated-backend"
   },
   "exports": {
     ".": "./src/index.ts"
