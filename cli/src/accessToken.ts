@@ -1,8 +1,8 @@
 import * as fs from 'node:fs'
-import * as os from 'node:os'
 import * as path from 'node:path'
 import { configureClient, getApiConfig } from 'doughnut-api'
 import { UserController } from '@generated/backend/sdk.gen'
+import { getConfigDir } from './configDir.js'
 
 export interface AccessTokenEntry {
   label: string
@@ -12,12 +12,6 @@ export interface AccessTokenEntry {
 interface AccessTokenConfig {
   tokens: AccessTokenEntry[]
   defaultLabel?: string
-}
-
-function getConfigDir(): string {
-  const dir = process.env.DOUGHNUT_CONFIG_DIR
-  if (dir) return dir
-  return path.join(os.homedir(), '.config', 'doughnut')
 }
 
 function getConfigPath(): string {
@@ -58,7 +52,6 @@ export async function addAccessToken(token: string): Promise<void> {
   const config = loadConfig()
   config.tokens.push({ label: data.label, token })
   saveConfig(config)
-  console.log('Token added')
 }
 
 export function listAccessTokens(): AccessTokenEntry[] {

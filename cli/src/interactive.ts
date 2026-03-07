@@ -41,6 +41,7 @@ export async function processInput(input: string): Promise<boolean> {
     }
     try {
       await addAccessToken(token)
+      console.log('Token added')
     } catch (err) {
       console.log(err instanceof Error ? err.message : String(err))
     }
@@ -57,8 +58,29 @@ export async function processInput(input: string): Promise<boolean> {
     }
     return false
   }
-  if (trimmed.startsWith('/remove-access-token-completely')) {
-    const label = trimmed.slice('/remove-access-token-completely'.length).trim()
+  if (
+    trimmed.startsWith('/remove-access-token ') ||
+    trimmed === '/remove-access-token'
+  ) {
+    const label = trimmed.slice('/remove-access-token '.length).trim()
+    if (!label) {
+      console.log('Usage: /remove-access-token <label>')
+      return false
+    }
+    if (removeAccessToken(label)) {
+      console.log(`Token "${label}" removed.`)
+    } else {
+      console.log(`Token "${label}" not found.`)
+    }
+    return false
+  }
+  if (
+    trimmed.startsWith('/remove-access-token-completely ') ||
+    trimmed === '/remove-access-token-completely'
+  ) {
+    const label = trimmed
+      .slice('/remove-access-token-completely '.length)
+      .trim()
     if (!label) {
       console.log('Usage: /remove-access-token-completely <label>')
       return false
@@ -68,19 +90,6 @@ export async function processInput(input: string): Promise<boolean> {
       console.log(`Token "${label}" removed locally and from server.`)
     } catch (err) {
       console.log(err instanceof Error ? err.message : String(err))
-    }
-    return false
-  }
-  if (trimmed.startsWith('/remove-access-token')) {
-    const label = trimmed.slice('/remove-access-token'.length).trim()
-    if (!label) {
-      console.log('Usage: /remove-access-token <label>')
-      return false
-    }
-    if (removeAccessToken(label)) {
-      console.log(`Token "${label}" removed.`)
-    } else {
-      console.log(`Token "${label}" not found.`)
     }
     return false
   }

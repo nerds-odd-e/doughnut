@@ -1,13 +1,13 @@
 import * as crypto from 'node:crypto'
 import * as fs from 'node:fs'
 import * as http from 'node:http'
-import * as os from 'node:os'
 import * as path from 'node:path'
 import { spawn } from 'node:child_process'
 import {
   GOOGLE_CLIENT_ID as BUILTIN_CLIENT_ID,
   GOOGLE_CLIENT_SECRET as BUILTIN_CLIENT_SECRET,
 } from './credentials.js'
+import { getConfigDir } from './configDir.js'
 
 const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly'
 const DEFAULT_OAUTH_TOKEN_URL = 'https://oauth2.googleapis.com/token'
@@ -24,12 +24,6 @@ export interface GmailConfig {
   clientId?: string
   clientSecret?: string
   accounts: GmailAccount[]
-}
-
-function getConfigDir(): string {
-  const dir = process.env.DOUGHNUT_CONFIG_DIR
-  if (dir) return dir
-  return path.join(os.homedir(), '.config', 'doughnut')
 }
 
 function getConfigPath(customPath?: string): string {
