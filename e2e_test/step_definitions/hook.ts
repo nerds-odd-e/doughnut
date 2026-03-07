@@ -91,6 +91,10 @@ Before({ tags: '@bundleAndCopyCliToBackendResources' }, () => {
   cy.task('bundleAndCopyCli')
 })
 
+Before({ tags: '@withCliConfig' }, () => {
+  cy.task('createCliConfigDir').as('cliConfigDir')
+})
+
 Before({ tags: '@usingMockedGoogleService' }, () => {
   cy.wrap(null).then(() => mock_services.google().mock())
 })

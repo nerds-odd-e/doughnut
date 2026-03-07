@@ -17,6 +17,7 @@ Feature: CLI install and run
     When I run the doughnut command with input "exit"
     Then I should see "doughnut 0.1.0"
 
+  @withCliConfig
   Scenario: -c option processes one input and exits
     When I run the doughnut command with -c "hello"
     Then I should see "doughnut 0.1.0"
@@ -26,6 +27,7 @@ Feature: CLI install and run
     When I run the doughnut version command
     Then I should see "doughnut 0.1.0"
 
+  @withCliConfig
   Scenario: Interactive /help command lists all commands
     When I run the doughnut command with -c "/help"
     Then I should see "/add gmail"

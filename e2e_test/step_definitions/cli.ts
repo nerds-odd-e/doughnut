@@ -4,6 +4,20 @@ import { mock_services } from '../start'
 const BASE_URL = 'http://localhost:9081'
 const GOOGLE_MOCK_URL = 'http://localhost:5003'
 
+function runCliWithConfig(args: string[]) {
+  return cy.get<string>('@cliConfigDir').then((configDir) =>
+    cy
+      .task('runCliDirectWithArgs', {
+        args,
+        env: {
+          DOUGHNUT_CONFIG_DIR: configDir,
+          DOUGHNUT_API_BASE_URL: BASE_URL,
+        },
+      })
+      .as('doughnutOutput')
+  )
+}
+
 Given('the backend is serving the CLI and install script', () => {
   cy.request('GET', `${BASE_URL}/install`).its('status').should('eq', 200)
 })
@@ -37,7 +51,7 @@ When('I run the doughnut command with input {string}', (input: string) => {
 })
 
 When('I run the doughnut command with -c {string}', (input: string) => {
-  cy.task('runCliDirectWithArgs', { args: ['-c', input] }).as('doughnutOutput')
+  runCliWithConfig(['-c', input])
 })
 
 When('I run the doughnut version command', () => {
@@ -62,96 +76,37 @@ When(
   }
 )
 
-Given('I have a CLI config directory', () => {
-  cy.task('createCliConfigDir').as('cliConfigDir')
-})
-
-When(
-  'I run the doughnut command with -c {string} using CLI config',
-  (input: string) => {
-    cy.get<string>('@cliConfigDir').then((configDir) => {
-      cy.task('runCliDirectWithArgs', {
-        args: ['-c', input],
-        env: {
-          DOUGHNUT_CONFIG_DIR: configDir,
-          DOUGHNUT_API_BASE_URL: BASE_URL,
-        },
-      }).as('doughnutOutput')
-    })
-  }
-)
-
 When('I run the doughnut CLI add-access-token with the saved token', () => {
-  cy.get<string>('@cliConfigDir').then((configDir) => {
-    cy.get<string>('@savedAccessToken').then((token) => {
-      cy.task('runCliDirectWithArgs', {
-        args: ['-c', `/add-access-token ${token}`],
-        env: {
-          DOUGHNUT_CONFIG_DIR: configDir,
-          DOUGHNUT_API_BASE_URL: BASE_URL,
-        },
-      }).as('doughnutOutput')
-    })
+  cy.get<string>('@savedAccessToken').then((token) => {
+    runCliWithConfig(['-c', `/add-access-token ${token}`])
   })
 })
 
 When(
   'I run the doughnut CLI add-access-token with token {string}',
   (token: string) => {
-    cy.get<string>('@cliConfigDir').then((configDir) => {
-      cy.task('runCliDirectWithArgs', {
-        args: ['-c', `/add-access-token ${token}`],
-        env: {
-          DOUGHNUT_CONFIG_DIR: configDir,
-          DOUGHNUT_API_BASE_URL: BASE_URL,
-        },
-      }).as('doughnutOutput')
-    })
+    runCliWithConfig(['-c', `/add-access-token ${token}`])
   }
 )
 
 When(
   'I run the doughnut CLI remove-access-token with label {string}',
   (label: string) => {
-    cy.get<string>('@cliConfigDir').then((configDir) => {
-      cy.task('runCliDirectWithArgs', {
-        args: ['-c', `/remove-access-token ${label}`],
-        env: {
-          DOUGHNUT_CONFIG_DIR: configDir,
-          DOUGHNUT_API_BASE_URL: BASE_URL,
-        },
-      }).as('doughnutOutput')
-    })
+    runCliWithConfig(['-c', `/remove-access-token ${label}`])
   }
 )
 
 When(
   'I run the doughnut CLI create-access-token with label {string}',
   (label: string) => {
-    cy.get<string>('@cliConfigDir').then((configDir) => {
-      cy.task('runCliDirectWithArgs', {
-        args: ['-c', `/create-access-token ${label}`],
-        env: {
-          DOUGHNUT_CONFIG_DIR: configDir,
-          DOUGHNUT_API_BASE_URL: BASE_URL,
-        },
-      }).as('doughnutOutput')
-    })
+    runCliWithConfig(['-c', `/create-access-token ${label}`])
   }
 )
 
 When(
   'I run the doughnut CLI remove-access-token-completely with label {string}',
   (label: string) => {
-    cy.get<string>('@cliConfigDir').then((configDir) => {
-      cy.task('runCliDirectWithArgs', {
-        args: ['-c', `/remove-access-token-completely ${label}`],
-        env: {
-          DOUGHNUT_CONFIG_DIR: configDir,
-          DOUGHNUT_API_BASE_URL: BASE_URL,
-        },
-      }).as('doughnutOutput')
-    })
+    runCliWithConfig(['-c', `/remove-access-token-completely ${label}`])
   }
 )
 
