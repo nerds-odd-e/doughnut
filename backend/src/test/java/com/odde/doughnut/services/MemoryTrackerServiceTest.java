@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 
-import com.odde.doughnut.controllers.dto.InitialInfo;
+import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
@@ -48,11 +48,11 @@ public class MemoryTrackerServiceTest {
     @Test
     void assimilatingShouldSetBothInitialAndLastRecallAt() {
       Note note = makeMe.aNote().creatorAndOwner(user).please();
-      InitialInfo initialInfo = new InitialInfo();
-      initialInfo.noteId = note.getId();
-      initialInfo.skipMemoryTracking = false;
+      AssimilationRequestDTO request = new AssimilationRequestDTO();
+      request.noteId = note.getId();
+      request.skipMemoryTracking = false;
 
-      var memoryTrackers = memoryTrackerService.assimilate(initialInfo, user, day1);
+      var memoryTrackers = memoryTrackerService.assimilate(request, user, day1);
 
       assertThat(memoryTrackers.get(0).getAssimilatedAt(), equalTo(day1));
       assertThat(memoryTrackers.get(0).getLastRecalledAt(), equalTo(day1));
@@ -63,27 +63,26 @@ public class MemoryTrackerServiceTest {
       Note note = makeMe.aNote().creatorAndOwner(user).please();
       makeMe.aMemoryTrackerFor(note).by(user).please();
 
-      InitialInfo initialInfo = new InitialInfo();
-      initialInfo.noteId = note.getId();
+      AssimilationRequestDTO request = new AssimilationRequestDTO();
+      request.noteId = note.getId();
 
-      List<MemoryTracker> result = memoryTrackerService.assimilate(initialInfo, user, day1);
+      List<MemoryTracker> result = memoryTrackerService.assimilate(request, user, day1);
 
       assertThat(result, empty());
       assertThat(memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId()), hasSize(1));
     }
 
     @Test
-    void shouldAddOnlySpellingTrackerWhenAddSpellingOnlyAndNoteHasTrackersButNoSpelling() {
+    void shouldAddOnlySpellingTrackerWhenNoteHasTrackersButNoSpellingAndRememberSpelling() {
       Note note = makeMe.aNote().creatorAndOwner(user).please();
       note.getRecallSetting().setRememberSpelling(true);
       makeMe.entityPersister.merge(note);
       makeMe.aMemoryTrackerFor(note).by(user).please();
 
-      InitialInfo initialInfo = new InitialInfo();
-      initialInfo.noteId = note.getId();
-      initialInfo.addSpellingOnly = true;
+      AssimilationRequestDTO request = new AssimilationRequestDTO();
+      request.noteId = note.getId();
 
-      List<MemoryTracker> result = memoryTrackerService.assimilate(initialInfo, user, day1);
+      List<MemoryTracker> result = memoryTrackerService.assimilate(request, user, day1);
 
       assertThat(result, hasSize(1));
       assertThat(result.get(0).getSpelling(), equalTo(true));

@@ -370,10 +370,9 @@ export type TextFromAudioWithCallInfo = {
     endTimestamp?: string;
 };
 
-export type InitialInfo = {
+export type AssimilationRequestDto = {
     noteId?: number;
     skipMemoryTracking?: boolean;
-    addSpellingOnly?: boolean;
 };
 
 export type AssessmentAttempt = {
@@ -3191,7 +3190,7 @@ export type AudioToTextResponses = {
 export type AudioToTextResponse = AudioToTextResponses[keyof AudioToTextResponses];
 
 export type AssimilateData = {
-    body: InitialInfo;
+    body: AssimilationRequestDto;
     path?: never;
     query?: never;
     url: '/api/assimilation';
