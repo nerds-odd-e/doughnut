@@ -8,8 +8,9 @@ export default defineConfig({
     '@hey-api/client-fetch',
     {
       name: '@hey-api/sdk',
-      asClass: true,
-      classNameBuilder: '{{name}}',
+      operations: {
+        strategy: 'byTags',
+      },
     },
   ],
   output: {
