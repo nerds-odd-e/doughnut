@@ -19,9 +19,9 @@
 </template>
 
 <script setup lang="ts">
-import type { AssessmentQuestionInstance } from "@generated/backend"
+import type { AssessmentQuestionInstance } from "@generated/doughnut-backend-api"
 import { ref } from "vue"
-import { ConversationMessageController } from "@generated/backend/sdk.gen"
+import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const props = defineProps<{

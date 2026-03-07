@@ -1,11 +1,11 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import { findTool, createMockContext } from '../helpers/index.js'
-import { NoteController } from '@generated/backend/sdk.gen'
-import { client } from '@generated/backend/client.gen'
-import type { GetGraphResponse } from '@generated/backend'
+import { NoteController } from '@generated/doughnut-backend-api/sdk.gen'
+import { client } from '@generated/doughnut-backend-api/client.gen'
+import type { GetGraphResponse } from '@generated/doughnut-backend-api'
 
 // Mock the generated services
-vi.mock('@generated/backend/sdk.gen', () => ({
+vi.mock('@generated/doughnut-backend-api/sdk.gen', () => ({
   NoteController: {
     getGraph: vi.fn(),
   },

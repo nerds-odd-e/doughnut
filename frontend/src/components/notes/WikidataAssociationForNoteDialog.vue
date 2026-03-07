@@ -18,9 +18,9 @@ import type {
   Note,
   WikidataSearchEntity,
   WikidataAssociationCreation,
-} from "@generated/backend"
+} from "@generated/doughnut-backend-api"
 import WikidataAssociationDialog from "./WikidataAssociationDialog.vue"
-import { WikidataController } from "@generated/backend/sdk.gen"
+import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { calculateNewTitle } from "@/utils/wikidataTitleActions"

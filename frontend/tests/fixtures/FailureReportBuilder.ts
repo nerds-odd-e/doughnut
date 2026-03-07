@@ -1,4 +1,7 @@
-import type { FailureReport, FailureReportForView } from "@generated/backend"
+import type {
+  FailureReport,
+  FailureReportForView,
+} from "@generated/doughnut-backend-api"
 import Builder from "./Builder"
 
 class FailureReportBuilder extends Builder<FailureReport> {

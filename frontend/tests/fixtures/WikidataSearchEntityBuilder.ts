@@ -1,4 +1,4 @@
-import type { WikidataSearchEntity } from "@generated/backend"
+import type { WikidataSearchEntity } from "@generated/doughnut-backend-api"
 import Builder from "./Builder"
 
 class WikidataSearchEntityBuilder extends Builder<WikidataSearchEntity> {

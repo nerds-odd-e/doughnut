@@ -45,11 +45,11 @@ import type {
   AnswerSpellingDto,
   MemoryTrackerLite,
   RecallPrompt,
-} from "@generated/backend"
+} from "@generated/doughnut-backend-api"
 import {
   MemoryTrackerController,
   RecallPromptController,
-} from "@generated/backend/sdk.gen"
+} from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import ContestableQuestion from "./ContestableQuestion.vue"
 import JustReview from "./JustReview.vue"

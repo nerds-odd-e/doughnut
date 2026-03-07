@@ -26,8 +26,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
-import type { MemoryTracker } from "@generated/backend"
-import { MemoryTrackerController } from "@generated/backend/sdk.gen"
+import type { MemoryTracker } from "@generated/doughnut-backend-api"
+import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import NoteTitleWithLink from "@/components/notes/NoteTitleWithLink.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"

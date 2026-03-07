@@ -1,4 +1,4 @@
-import type { WikidataSearchEntity } from "@generated/backend"
+import type { WikidataSearchEntity } from "@generated/doughnut-backend-api"
 
 /**
  * Calculates the new title based on the title action (replace or append).

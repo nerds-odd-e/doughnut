@@ -21,8 +21,8 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
-import type { Subscription } from "@generated/backend"
-import { SubscriptionController } from "@generated/backend/sdk.gen"
+import type { Subscription } from "@generated/doughnut-backend-api"
+import { SubscriptionController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import PopButton from "../commons/Popups/PopButton.vue"
 import usePopups from "../commons/Popups/usePopups"

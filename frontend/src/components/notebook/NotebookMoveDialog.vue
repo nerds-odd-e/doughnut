@@ -17,11 +17,11 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref, onMounted } from "vue"
-import type { Circle, Notebook } from "@generated/backend"
+import type { Circle, Notebook } from "@generated/doughnut-backend-api"
 import {
   CircleController,
   NotebookController,
-} from "@generated/backend/sdk.gen"
+} from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "@/components/commons/Popups/usePopups"
 

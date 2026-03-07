@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import type { User } from "@generated/backend"
+import type { User } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"

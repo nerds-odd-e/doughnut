@@ -22,7 +22,10 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import type { RelationshipCreation, NoteTopology } from "@generated/backend"
+import type {
+  RelationshipCreation,
+  NoteTopology,
+} from "@generated/doughnut-backend-api"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 import RelationTypeSelect from "./RelationTypeSelect.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"

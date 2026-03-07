@@ -1,4 +1,4 @@
-import type { UpdateNoteTypeData } from "@generated/backend"
+import type { UpdateNoteTypeData } from "@generated/doughnut-backend-api"
 
 export type NoteType = UpdateNoteTypeData["body"]
 

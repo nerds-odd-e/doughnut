@@ -1,4 +1,4 @@
-import type { Note, RecallPrompt } from "@generated/backend"
+import type { Note, RecallPrompt } from "@generated/doughnut-backend-api"
 import Builder from "./Builder"
 import generateId from "./generateId"
 import makeMe from "./makeMe"

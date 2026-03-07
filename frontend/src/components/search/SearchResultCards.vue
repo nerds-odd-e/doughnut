@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { NoteSearchResult } from "@generated/backend"
+import type { NoteSearchResult } from "@generated/doughnut-backend-api"
 import SearchResultCard from "./SearchResultCard.vue"
 
 defineProps({

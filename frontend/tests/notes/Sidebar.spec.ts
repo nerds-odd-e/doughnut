@@ -1,6 +1,6 @@
 import Sidebar from "@/components/notes/Sidebar.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import type { NoteRealm } from "@generated/backend"
+import type { NoteRealm } from "@generated/doughnut-backend-api"
 import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"

@@ -47,7 +47,7 @@ import { computed } from "vue"
 import SvgSkip from "../svgs/SvgSkip.vue"
 import Modal from "../commons/Modal.vue"
 import { useRecallData } from "@/composables/useRecallData"
-import type { RecallPrompt } from "@generated/backend"
+import type { RecallPrompt } from "@generated/doughnut-backend-api"
 
 const props = defineProps({
   canMoveToEnd: { type: Boolean, required: true },

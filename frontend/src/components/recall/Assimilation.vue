@@ -14,6 +14,7 @@
     :key="note.id"
     @level-changed="$emit('reloadNeeded')"
     @remember-spelling-changed="onRememberSpellingChanged"
+    @note-recall-info-loaded="onNoteRecallInfoLoaded"
   />
   <NoteRefinement
     v-if="(note.details ?? '').trim()"
@@ -23,6 +24,7 @@
   <AssimilationButtons
     :key="buttonKey"
     :disabled="!noteInfoLoaded"
+    :keep-for-repetition-disabled="keepForRepetitionDisabled"
     @assimilate="processForm"
   />
   <Teleport to="body">
@@ -43,8 +45,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/backend"
-import { AssimilationController } from "@generated/backend/sdk.gen"
+import type { Note } from "@generated/doughnut-backend-api"
+import { AssimilationController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
 import NoteInfoBar from "../notes/NoteInfoBar.vue"
@@ -76,12 +78,36 @@ const { incrementAssimilatedCount } = useAssimilationCount()
 const buttonKey = computed(() => note.id)
 const showSpellingPopup = ref(false)
 const rememberSpelling = ref(false)
-const noteInfoLoaded = ref(false) // Track if noteInfo has been loaded
+const noteInfoLoaded = ref(false)
+const noteRecallInfo = ref<{
+  memoryTrackers?: Array<{ spelling?: boolean }>
+} | null>(null)
 
 const onRememberSpellingChanged = (value: boolean) => {
   rememberSpelling.value = value
-  noteInfoLoaded.value = true // Mark as loaded when we receive the value
+  noteInfoLoaded.value = true
 }
+
+const onNoteRecallInfoLoaded = (info: {
+  memoryTrackers?: Array<{ spelling?: boolean }>
+}) => {
+  noteRecallInfo.value = info
+  noteInfoLoaded.value = true
+}
+
+const hasMemoryTrackers = computed(
+  () => (noteRecallInfo.value?.memoryTrackers?.length ?? 0) > 0
+)
+const hasSpellingMemoryTracker = computed(
+  () =>
+    noteRecallInfo.value?.memoryTrackers?.some((mt) => mt.spelling === true) ??
+    false
+)
+const keepForRepetitionDisabled = computed(
+  () =>
+    hasMemoryTrackers.value &&
+    !(rememberSpelling.value && !hasSpellingMemoryTracker.value)
+)
 
 // Methods
 const processForm = async (skipMemoryTracking: boolean) => {

@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import type { RecallPrompt } from "@generated/backend"
+import type { RecallPrompt } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import { computed } from "vue"
 import QuestionDisplay from "./QuestionDisplay.vue"

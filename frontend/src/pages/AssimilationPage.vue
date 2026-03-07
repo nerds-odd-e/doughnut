@@ -11,8 +11,8 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue"
-import type { Note } from "@generated/backend"
-import { AssimilationController } from "@generated/backend/sdk.gen"
+import type { Note } from "@generated/doughnut-backend-api"
+import { AssimilationController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"

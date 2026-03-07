@@ -42,3 +42,21 @@ Feature: Assimilate With Remembering Spelling
     And I add remember spelling to the note "Relearn"
     When I navigate to the assimilation page
     Then I should see 1 due for assimilation
+    
+  Scenario: Add only spelling memory tracker when note already has trackers
+    Given there are some notes:
+      | Title | Details           | Parent Title |
+      | Word  | Non-empty details | English      |
+    And I assimilated one note "Word" on day 1
+    When I am assimilating the note "Word"
+    And I keep for repetition with remembering spelling
+    When I verify spelling with "Word"
+    Then the spelling verification result for note "Word" should be "success"
+
+  Scenario: Keep for repetition disabled when note already has memory trackers
+    Given there are some notes:
+      | Title | Details           | Parent Title |
+      | Word  | Non-empty details | English      |
+    And I assimilated one note "Word" on day 1
+    When I am assimilating the note "Word"
+    Then the keep for repetition button should be disabled

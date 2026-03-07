@@ -3,7 +3,7 @@ import AssessmentAndCertificateHistoryPage from "@/pages/AssessmentAndCertificat
 import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { nextTick } from "vue"
-import type { AssessmentAttempt } from "@generated/backend"
+import type { AssessmentAttempt } from "@generated/doughnut-backend-api"
 
 vi.mock("vue-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("vue-router")>()

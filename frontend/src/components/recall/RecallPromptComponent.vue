@@ -25,8 +25,8 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import type { PropType } from "vue"
-import type { AnswerDto, RecallPrompt } from "@generated/backend"
-import { RecallPromptController } from "@generated/backend/sdk.gen"
+import type { AnswerDto, RecallPrompt } from "@generated/doughnut-backend-api"
+import { RecallPromptController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
 import QuestionDisplay from "./QuestionDisplay.vue"

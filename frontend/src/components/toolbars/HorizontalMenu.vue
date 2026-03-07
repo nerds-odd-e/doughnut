@@ -87,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import type { User } from "@generated/backend"
+import type { User } from "@generated/doughnut-backend-api"
 import type { PropType, Component, Ref } from "vue"
 import { ref, computed, onMounted, onUnmounted, watch } from "vue"
 import { useRoute } from "vue-router"

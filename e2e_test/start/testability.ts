@@ -1,15 +1,15 @@
 /// <reference types="Cypress" />
 // @ts-check
-import type { Randomization } from '@generated/backend'
-import type { QuestionSuggestionParams } from '@generated/backend'
+import type { Randomization } from '@generated/doughnut-backend-api'
+import type { QuestionSuggestionParams } from '@generated/doughnut-backend-api'
 import type ServiceMocker from '../support/ServiceMocker'
-import type { NoteTestData } from '@generated/backend'
-import type { PredefinedQuestionsTestData } from '@generated/backend'
-import type { TimeTravel } from '@generated/backend'
-import type { TimeTravelRelativeToNow } from '@generated/backend'
-import type { SuggestedQuestionsData } from '@generated/backend'
-import type { NotesTestData } from '@generated/backend'
-import { TestabilityRestController } from '@generated/backend/sdk.gen'
+import type { NoteTestData } from '@generated/doughnut-backend-api'
+import type { PredefinedQuestionsTestData } from '@generated/doughnut-backend-api'
+import type { TimeTravel } from '@generated/doughnut-backend-api'
+import type { TimeTravelRelativeToNow } from '@generated/doughnut-backend-api'
+import type { SuggestedQuestionsData } from '@generated/doughnut-backend-api'
+import type { NotesTestData } from '@generated/doughnut-backend-api'
+import { TestabilityRestController } from '@generated/doughnut-backend-api/sdk.gen'
 
 const hourOfDay = (days: number, hours: number) => {
   return new Date(1976, 5, 1 + days, hours)

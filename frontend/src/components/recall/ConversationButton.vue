@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { useRouter } from "vue-router"
-import { ConversationMessageController } from "@generated/backend/sdk.gen"
+import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const props = defineProps<{

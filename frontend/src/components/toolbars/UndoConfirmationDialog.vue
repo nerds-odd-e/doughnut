@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { NoteTopology } from "@generated/backend"
+import type { NoteTopology } from "@generated/doughnut-backend-api"
 import DiffView from "../commons/DiffView.vue"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 

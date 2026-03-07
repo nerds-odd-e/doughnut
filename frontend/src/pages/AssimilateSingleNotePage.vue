@@ -9,8 +9,8 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue"
-import type { Note } from "@generated/backend"
-import { NoteController } from "@generated/backend/sdk.gen"
+import type { Note } from "@generated/doughnut-backend-api"
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import AssimilateSingleNotePageView from "./AssimilateSingleNotePageView.vue"
 import { useRouter } from "vue-router"
 

@@ -44,7 +44,7 @@ import type {
   WikidataSearchEntity,
   Note,
   NoteCreationDto,
-} from "@generated/backend"
+} from "@generated/doughnut-backend-api"
 import type { InsertMode } from "@/models/InsertMode"
 import { ref, computed } from "vue"
 import SearchResults from "../search/SearchResults.vue"

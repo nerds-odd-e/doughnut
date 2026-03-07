@@ -41,8 +41,8 @@
 import type {
   PredefinedQuestion,
   QuestionSuggestionCreationParams,
-} from "@generated/backend"
-import { PredefinedQuestionController } from "@generated/backend/sdk.gen"
+} from "@generated/doughnut-backend-api"
+import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { ref } from "vue"
 

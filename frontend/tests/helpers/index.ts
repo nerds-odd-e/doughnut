@@ -32,8 +32,8 @@ import {
   HealthCheckController,
   FailureReportController,
   AdminUserController,
-} from "@generated/backend/sdk.gen"
-import type { NoteRealm } from "@generated/backend"
+} from "@generated/doughnut-backend-api/sdk.gen"
+import type { NoteRealm } from "@generated/doughnut-backend-api"
 
 // Mapping of method names to their controller classes
 // biome-ignore lint/suspicious/noExplicitAny: Controller classes have different types and need any for dynamic access

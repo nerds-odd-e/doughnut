@@ -1,4 +1,4 @@
-import type { Notebook } from "@generated/backend"
+import type { Notebook } from "@generated/doughnut-backend-api"
 import NotebookPageView from "@/pages/NotebookPageView.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"

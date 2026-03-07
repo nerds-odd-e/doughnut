@@ -224,6 +224,10 @@ export const assumeAssimilationPage = () => ({
     form.getField('Remember Spelling').expectNoError().shouldNotBeDisabled()
     return this
   },
+  expectKeepForRepetitionDisabled() {
+    keepForRepetitionButton().should('be.disabled')
+    return this
+  },
 })
 
 export const assimilation = () => {

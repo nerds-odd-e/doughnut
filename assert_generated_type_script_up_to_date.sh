@@ -3,7 +3,7 @@
 set -eo pipefail
 
 export savedFolder=/tmp/openapi-backend
-export targetFolder=packages/generated-backend
+export targetFolder=packages/generated/doughnut-backend-api
 
 rm -rf "$savedFolder"
 mkdir -p "$savedFolder"
@@ -11,7 +11,7 @@ cp -r "$targetFolder" "$savedFolder"
 
 pnpm generateTypeScript
 
-if diff -r "$targetFolder" "$savedFolder/generated-backend"; then
+if diff -r "$targetFolder" "$savedFolder/doughnut-backend-api"; then
   echo "The generated typescript interfaces are up-to-date"
 else
   echo "The generated typescript interfaces are out of date"

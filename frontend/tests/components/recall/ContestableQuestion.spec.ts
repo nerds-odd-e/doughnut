@@ -3,7 +3,7 @@ import { flushPromises } from "@vue/test-utils"
 import ContestableQuestion from "@/components/recall/ContestableQuestion.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
-import type { AnswerDto } from "@generated/backend"
+import type { AnswerDto } from "@generated/doughnut-backend-api"
 
 describe("ContestableQuestion.vue", () => {
   let performanceNowSpy: ReturnType<typeof vi.spyOn>

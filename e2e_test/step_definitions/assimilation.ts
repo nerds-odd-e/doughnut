@@ -128,6 +128,10 @@ When('I verify spelling with {string}', (text: string) => {
   start.assumeAssimilationPage().verifySpellingWith(text)
 })
 
+Then('the keep for repetition button should be disabled', () => {
+  start.assumeAssimilationPage().expectKeepForRepetitionDisabled()
+})
+
 Then(
   'the spelling verification result for note {string} should be {string}',
   (noteTitle: string, expectedResult: string) => {

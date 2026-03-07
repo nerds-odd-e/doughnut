@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from "vue"
-import type { Conversation } from "@generated/backend"
+import type { Conversation } from "@generated/doughnut-backend-api"
 import type { ToolCallResult } from "@/models/aiReplyState"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import markdownizer from "../form/markdownizer"

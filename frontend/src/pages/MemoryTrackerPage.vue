@@ -18,8 +18,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
-import type { RecallPrompt, MemoryTracker } from "@generated/backend"
-import { MemoryTrackerController } from "@generated/backend/sdk.gen"
+import type {
+  RecallPrompt,
+  MemoryTracker,
+} from "@generated/doughnut-backend-api"
+import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"

@@ -22,8 +22,8 @@
 
 <script lang="ts">
 import TextInput from "@/components/form/TextInput.vue"
-import type { Notebook, SubscriptionDto } from "@generated/backend"
-import { SubscriptionController } from "@generated/backend/sdk.gen"
+import type { Notebook, SubscriptionDto } from "@generated/doughnut-backend-api"
+import { SubscriptionController } from "@generated/doughnut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"

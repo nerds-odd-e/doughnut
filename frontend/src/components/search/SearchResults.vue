@@ -76,8 +76,11 @@
 </template>
 
 <script setup lang="ts">
-import type { SearchTerm, NoteTopology } from "@generated/backend"
-import { NoteController, SearchController } from "@generated/backend/sdk.gen"
+import type { SearchTerm, NoteTopology } from "@generated/doughnut-backend-api"
+import {
+  NoteController,
+  SearchController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import { debounce } from "mini-debounce"
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue"

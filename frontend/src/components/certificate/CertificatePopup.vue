@@ -31,9 +31,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue"
-import { CertificateController } from "@generated/backend/sdk.gen"
+import { CertificateController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
-import type { Certificate } from "@generated/backend"
+import type { Certificate } from "@generated/doughnut-backend-api"
 const props = defineProps({
   notebookId: { type: Number, required: true },
 })

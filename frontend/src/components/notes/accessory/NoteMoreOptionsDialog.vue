@@ -102,8 +102,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/backend"
-import type { NoteAccessory } from "@generated/backend"
+import type { Note } from "@generated/doughnut-backend-api"
+import type { NoteAccessory } from "@generated/doughnut-backend-api"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import AIGenerateImageDialog from "../AIGenerateImageDialog.vue"
 import Questions from "../Questions.vue"
@@ -120,8 +120,8 @@ import SvgImage from "../../svgs/SvgImage.vue"
 import { useRouter } from "vue-router"
 import usePopups from "../../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import type { NoteRecallInfo } from "@generated/backend"
-import { NoteController } from "@generated/backend/sdk.gen"
+import type { NoteRecallInfo } from "@generated/doughnut-backend-api"
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { ref, onMounted } from "vue"
 import NoteInfoComponent from "../NoteInfoComponent.vue"
 import type { NoteType } from "@/models/noteTypeOptions"
