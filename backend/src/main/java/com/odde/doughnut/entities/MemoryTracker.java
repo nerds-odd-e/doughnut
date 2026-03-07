@@ -57,10 +57,10 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Setter
   private Timestamp assimilatedAt;
 
-  @Column(name = "repetition_count")
+  @Column(name = "recall_count")
   @Getter
   @Setter
-  private Integer repetitionCount = 0;
+  private Integer recallCount = 0;
 
   @Column(name = "forgetting_curve_index")
   @Getter
@@ -109,9 +109,9 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     setNextRecallAt(calculateNextRecallAt());
   }
 
-  public void markAsRepeated(
+  public void markAsRecalled(
       Timestamp currentUTCTimestamp, boolean successful, Integer thinkingTimeMs) {
-    setRepetitionCount(getRepetitionCount() + 1);
+    setRecallCount(getRecallCount() + 1);
     if (successful) {
       recalledSuccessfully(currentUTCTimestamp, thinkingTimeMs);
     } else {

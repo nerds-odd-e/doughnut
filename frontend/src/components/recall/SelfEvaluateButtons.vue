@@ -11,7 +11,7 @@
       class="daisy-btn daisy-btn-secondary"
       @click.once="$emit('self-evaluated-memory-state', false)"
     >
-      No, I need more repetition
+      No, I need more recall
     </button>
   </div>
 </template>

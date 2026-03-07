@@ -2,16 +2,16 @@
   <input
     type="submit"
     name="submit"
-    value="Keep for repetition"
+    value="Keep for recall"
     class="daisy-btn daisy-btn-primary"
-    data-test="keep-for-repetition"
+    data-test="keep-for-recall"
     :disabled="disabled"
     @click="$emit('assimilate', false)"
   />
   <input
     type="submit"
     name="skip"
-    value="Skip repetition"
+    value="Skip recall"
     class="daisy-btn daisy-btn-secondary"
     :disabled="disabled"
     @click="$emit('assimilate', true)"

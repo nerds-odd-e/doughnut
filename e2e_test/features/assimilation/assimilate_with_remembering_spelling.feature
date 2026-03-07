@@ -1,6 +1,6 @@
 @disableOpenAiService
 Feature: Assimilate With Remembering Spelling
-  As a learner, I want to keep notes for repetition with spelling verification.
+  As a learner, I want to keep notes for recall with spelling verification.
   Spelling is only available for notes with details.
 
   Background:
@@ -19,12 +19,12 @@ Feature: Assimilate With Remembering Spelling
       | note has no details      |                         | unavailable  |
       | note has definition      | Definition content      | available    |
 
-  Scenario Outline: Verify spelling proceeds with keep for repetition
+  Scenario Outline: Verify spelling proceeds with keep for recall
     Given there are some notes:
       | Title        | Details           | Parent Title |
       | <note_title> | Non-empty details | English      |
     And I am assimilating the note "<note_title>"
-    And I keep for repetition with remembering spelling
+    And I keep for recall with remembering spelling
     When I verify spelling with "<spelling_input>"
     Then the spelling verification result for note "<note_title>" should be <expected_result>
 

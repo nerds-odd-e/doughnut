@@ -46,7 +46,7 @@
       />
       <template v-else-if="toRepeatCount === 0 && previousAnsweredQuestionCursor === undefined">
         <div class="daisy-alert daisy-alert-success">
-          You have finished all repetitions for this half a day!
+          You have finished all recalls for this half a day!
         </div>
         <div v-if="isLoadingMore" class="daisy-flex daisy-items-center daisy-gap-2 daisy-py-4">
           <span class="daisy-loading daisy-loading-spinner daisy-loading-md"></span>

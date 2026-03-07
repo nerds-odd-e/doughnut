@@ -281,9 +281,9 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     void itMustUpdateTheMemoryTrackerRecord() {
       Note note = makeMe.aNote().please();
       MemoryTracker rp = makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
-      Integer oldRepetitionCount = rp.getRepetitionCount();
-      controller.markAsRepeated(rp, true);
-      assertThat(rp.getRepetitionCount(), equalTo(oldRepetitionCount + 1));
+      Integer oldRecallCount = rp.getRecallCount();
+      controller.markAsRecalled(rp, true);
+      assertThat(rp.getRecallCount(), equalTo(oldRecallCount + 1));
     }
   }
 
@@ -359,8 +359,8 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
           makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(currentUser.getUser()).please();
 
       // Mark as recalled
-      controller.markAsRepeated(rp1, true);
-      controller.markAsRepeated(rp2, true);
+      controller.markAsRecalled(rp1, true);
+      controller.markAsRecalled(rp2, true);
 
       List<MemoryTracker> memoryTrackers = controller.getRecentlyRecalled();
 
@@ -383,8 +383,8 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       MemoryTracker deletedTracker =
           makeMe.aMemoryTrackerFor(deletedNote).by(currentUser.getUser()).please();
 
-      controller.markAsRepeated(activeTracker, true);
-      controller.markAsRepeated(deletedTracker, true);
+      controller.markAsRecalled(activeTracker, true);
+      controller.markAsRecalled(deletedTracker, true);
 
       noteService.destroy(deletedNote);
 

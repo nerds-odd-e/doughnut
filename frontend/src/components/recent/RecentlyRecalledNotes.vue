@@ -23,7 +23,7 @@
           </td>
           <td>{{ new Date(point.assimilatedAt!).toLocaleString() }}</td>
           <td>{{ new Date(point.nextRecallAt!).toLocaleString() }}</td>
-          <td>{{ point.repetitionCount }}</td>
+          <td>{{ point.recallCount }}</td>
           <td>{{ point.forgettingCurveIndex }}</td>
           <td>{{ point.spelling ? 'Yes' : 'No' }}</td>
           <td>{{ point.removedFromTracking ? 'Removed' : 'Active' }}</td>

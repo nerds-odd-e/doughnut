@@ -202,7 +202,7 @@ describe("repeat page", () => {
     it("should show progress", async () => {
       const wrapper = await mountPage()
       const mockedMarkAsRepeatedCall = mockSdkService(
-        "markAsRepeated",
+        "markAsRecalled",
         makeMe.aMemoryTracker.please()
       )
       const recallPrompt = makeMe.aRecallPrompt.please()
@@ -762,7 +762,7 @@ describe("repeat page", () => {
       const wrapper = await mountPage()
 
       expect(wrapper.text()).toContain(
-        "You have finished all repetitions for this half a day!"
+        "You have finished all recalls for this half a day!"
       )
       expect(wrapper.find("button.daisy-btn-secondary").exists()).toBe(true)
 

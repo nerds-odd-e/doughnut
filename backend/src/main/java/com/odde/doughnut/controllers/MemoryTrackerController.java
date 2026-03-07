@@ -94,13 +94,13 @@ class MemoryTrackerController {
     return memoryTracker;
   }
 
-  @PatchMapping(path = "/{memoryTracker}/mark-as-repeated")
+  @PatchMapping(path = "/{memoryTracker}/mark-as-recalled")
   @Transactional
-  public MemoryTracker markAsRepeated(
+  public MemoryTracker markAsRecalled(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker,
       @RequestParam("successful") boolean successful) {
     authorizationService.assertLoggedIn();
-    memoryTrackerService.markAsRepeated(
+    memoryTrackerService.markAsRecalled(
         testabilitySettings.getCurrentUTCTimestamp(), successful, memoryTracker, null);
     return memoryTracker;
   }

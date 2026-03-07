@@ -13,7 +13,7 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
       lastRecalledAt: "",
       nextRecallAt: "",
       assimilatedAt: "",
-      repetitionCount: 0,
+      recallCount: 0,
       forgettingCurveIndex: 0,
       removedFromTracking: false,
       note: new NoteBuilder().do(),
@@ -30,8 +30,8 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
     return this
   }
 
-  repetitionCount(repetitionCount: number): MemoryTrackerBuilder {
-    this.data.repetitionCount = repetitionCount
+  recallCount(recallCount: number): MemoryTrackerBuilder {
+    this.data.recallCount = recallCount
     return this
   }
 
