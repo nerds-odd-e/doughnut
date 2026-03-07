@@ -204,8 +204,12 @@ const commonConfig = {
           baseUrl: string
           accessToken: string
         }) {
+          const apiBaseUrl =
+            baseUrl && baseUrl !== 'undefined'
+              ? baseUrl
+              : commonConfig.backendBaseUrl
           return await mcpClient.spawnAndConnectMcpServer({
-            baseUrl,
+            baseUrl: apiBaseUrl,
             accessToken,
           })
         },
