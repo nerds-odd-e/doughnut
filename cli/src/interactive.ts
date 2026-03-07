@@ -270,6 +270,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
   drawBox()
 
   process.stdout.on('resize', drawBox)
+  const removeResizeListener = () => process.stdout.off('resize', drawBox)
 
   stdin.on(
     'keypress',
@@ -279,6 +280,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
     ) => {
       if (key.ctrl && key.name === 'c') {
         process.stdout.write(`\x1b[${1}B\r\n`)
+        removeResizeListener()
         process.exit(0)
       }
       if (tokenListItems) {
@@ -403,6 +405,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           }
 
           if (await processInput(input)) {
+            removeResizeListener()
             process.exit(0)
           }
           linesAboveCursor = 0
