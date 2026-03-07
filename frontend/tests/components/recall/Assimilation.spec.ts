@@ -207,7 +207,7 @@ describe("Assimilation component", () => {
       const wrapper = mount()
       await flushPromises()
 
-      const keepButton = wrapper.find('[data-test="keep-for-repetition"]')
+      const keepButton = wrapper.find('[data-test="keep-for-recall"]')
       expect(keepButton.attributes("disabled")).toBeDefined()
     })
 
@@ -220,7 +220,7 @@ describe("Assimilation component", () => {
       const wrapper = mount()
       await flushPromises()
 
-      const keepButton = wrapper.find('[data-test="keep-for-repetition"]')
+      const keepButton = wrapper.find('[data-test="keep-for-recall"]')
       expect(keepButton.attributes("disabled")).toBeUndefined()
     })
 
@@ -237,7 +237,7 @@ describe("Assimilation component", () => {
       const wrapper = mount()
       await flushPromises()
 
-      await wrapper.find('[data-test="keep-for-repetition"]').trigger("click")
+      await wrapper.find('[data-test="keep-for-recall"]').trigger("click")
       await flushPromises()
 
       const verifyButton = document.querySelector(
