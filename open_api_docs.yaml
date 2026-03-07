@@ -4858,8 +4858,6 @@ components:
           format: int32
         skipMemoryTracking:
           type: boolean
-        addSpellingOnly:
-          type: boolean
     AssessmentAttempt:
       type: object
       properties:

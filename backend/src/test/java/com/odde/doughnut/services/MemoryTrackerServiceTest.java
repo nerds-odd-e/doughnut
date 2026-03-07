@@ -63,45 +63,26 @@ public class MemoryTrackerServiceTest {
       Note note = makeMe.aNote().creatorAndOwner(user).please();
       makeMe.aMemoryTrackerFor(note).by(user).please();
 
-<<<<<<< HEAD
       AssimilationRequestDTO request = new AssimilationRequestDTO();
       request.noteId = note.getId();
 
       List<MemoryTracker> result = memoryTrackerService.assimilate(request, user, day1);
-=======
-      InitialInfo initialInfo = new InitialInfo();
-      initialInfo.noteId = note.getId();
-
-      List<MemoryTracker> result = memoryTrackerService.assimilate(initialInfo, user, day1);
->>>>>>> 8873fd737 (Disable keep for repetition when note has memory trackers; add spelling-only flow)
 
       assertThat(result, empty());
       assertThat(memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId()), hasSize(1));
     }
 
     @Test
-<<<<<<< HEAD
     void shouldAddOnlySpellingTrackerWhenNoteHasTrackersButNoSpellingAndRememberSpelling() {
-=======
-    void shouldAddOnlySpellingTrackerWhenAddSpellingOnlyAndNoteHasTrackersButNoSpelling() {
->>>>>>> 8873fd737 (Disable keep for repetition when note has memory trackers; add spelling-only flow)
       Note note = makeMe.aNote().creatorAndOwner(user).please();
       note.getRecallSetting().setRememberSpelling(true);
       makeMe.entityPersister.merge(note);
       makeMe.aMemoryTrackerFor(note).by(user).please();
 
-<<<<<<< HEAD
       AssimilationRequestDTO request = new AssimilationRequestDTO();
       request.noteId = note.getId();
 
       List<MemoryTracker> result = memoryTrackerService.assimilate(request, user, day1);
-=======
-      InitialInfo initialInfo = new InitialInfo();
-      initialInfo.noteId = note.getId();
-      initialInfo.addSpellingOnly = true;
-
-      List<MemoryTracker> result = memoryTrackerService.assimilate(initialInfo, user, day1);
->>>>>>> 8873fd737 (Disable keep for repetition when note has memory trackers; add spelling-only flow)
 
       assertThat(result, hasSize(1));
       assertThat(result.get(0).getSpelling(), equalTo(true));
