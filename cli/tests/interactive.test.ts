@@ -124,6 +124,52 @@ describe('processInput', () => {
     process.env.DOUGHNUT_CONFIG_DIR = originalEnv
   })
 
+  test('returns false and removes token for /remove-access-token with label', async () => {
+    const fs = await import('node:fs')
+    const os = await import('node:os')
+    const path = await import('node:path')
+    const configDir = fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-test-'))
+    const originalEnv = process.env.DOUGHNUT_CONFIG_DIR
+    process.env.DOUGHNUT_CONFIG_DIR = configDir
+    fs.writeFileSync(
+      path.join(configDir, 'access-tokens.json'),
+      JSON.stringify({
+        tokens: [
+          { label: 'Token A', token: 'a' },
+          { label: 'Token B', token: 'b' },
+        ],
+      })
+    )
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    expect(await processInput('/remove-access-token Token A')).toBe(false)
+    expect(logSpy).toHaveBeenCalledWith('Token "Token A" removed.')
+    logSpy.mockRestore()
+    process.env.DOUGHNUT_CONFIG_DIR = originalEnv
+  })
+
+  test('returns false and shows not found for /remove-access-token with unknown label', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    expect(await processInput('/remove-access-token Unknown')).toBe(false)
+    expect(logSpy).toHaveBeenCalledWith('Token "Unknown" not found.')
+    logSpy.mockRestore()
+  })
+
+  test('returns false and shows usage for /remove-access-token without label', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    expect(await processInput('/remove-access-token ')).toBe(false)
+    expect(logSpy).toHaveBeenCalledWith('Usage: /remove-access-token <label>')
+    logSpy.mockRestore()
+  })
+
+  test('returns false and shows usage for /remove-access-token-completely without label', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    expect(await processInput('/remove-access-token-completely ')).toBe(false)
+    expect(logSpy).toHaveBeenCalledWith(
+      'Usage: /remove-access-token-completely <label>'
+    )
+    logSpy.mockRestore()
+  })
+
   test('returns false and logs error for /last email when no account configured', async () => {
     const configDir = (await import('node:fs')).mkdtempSync(
       `${(await import('node:os')).tmpdir()}/doughnut-test-`
@@ -580,7 +626,7 @@ describe('TTY mode slash command suggestions', () => {
     writeSpy.mockClear()
     stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
     await new Promise((r) => setImmediate(r))
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 8; i++) {
       stdin.emit('keypress', undefined, {
         name: 'down',
         ctrl: false,
@@ -605,7 +651,7 @@ describe('TTY mode slash command suggestions', () => {
     writeSpy.mockClear()
     stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
     await new Promise((r) => setImmediate(r))
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 7; i++) {
       stdin.emit('keypress', undefined, {
         name: 'down',
         ctrl: false,
@@ -813,6 +859,58 @@ describe('TTY token list interactive mode', () => {
     const output = writeSpy.mock.calls.map((c) => c[0]).join('')
     expect(output).toContain('/ commands')
     expect(output).not.toContain('Alpha')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  async function submitRemoveCommand(
+    stdin: ReturnType<typeof createMockTTYStdin>,
+    command: string
+  ) {
+    for (const ch of `${command} `) {
+      stdin.emit('keypress', ch, {
+        name: ch === ' ' ? 'space' : undefined,
+        ctrl: false,
+        meta: false,
+      })
+    }
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '\r', {
+      name: 'return',
+      shift: false,
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+  }
+
+  test('/remove-access-token shows token list and Enter removes selected', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+
+    await submitRemoveCommand(stdin, '/remove-access-token')
+
+    const midOutput = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(midOutput).toContain('Alpha')
+    expect(midOutput).toContain('Beta')
+
+    writeSpy.mockClear()
+    stdin.emit('keypress', '\r', {
+      name: 'return',
+      shift: false,
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(output).toContain('Token "Alpha" removed.')
+
+    const { listAccessTokens } = await import('../src/accessToken.js')
+    const remaining = listAccessTokens()
+    expect(remaining).toHaveLength(2)
+    expect(remaining.map((t) => t.label)).not.toContain('Alpha')
 
     stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })

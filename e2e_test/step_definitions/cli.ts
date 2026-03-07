@@ -110,6 +110,21 @@ When(
   }
 )
 
+When(
+  'I run the doughnut CLI remove-access-token-completely with label {string}',
+  (label: string) => {
+    cy.get<string>('@cliConfigDir').then((configDir) => {
+      cy.task('runCliDirectWithArgs', {
+        args: ['-c', `/remove-access-token-completely ${label}`],
+        env: {
+          DOUGHNUT_CONFIG_DIR: configDir,
+          DOUGHNUT_API_BASE_URL: BASE_URL,
+        },
+      }).as('doughnutOutput')
+    })
+  }
+)
+
 Then('I should see {string}', (expected: string) => {
   cy.get('@doughnutOutput').should('include', expected)
 })

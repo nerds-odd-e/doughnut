@@ -4,6 +4,8 @@ import {
   formatTokenLines,
   getDefaultTokenLabel,
   listAccessTokens,
+  removeAccessToken,
+  removeAccessTokenCompletely,
   setDefaultTokenLabel,
 } from './accessToken.js'
 import { addGmailAccount, getLastEmailSubject } from './gmail.js'
@@ -52,6 +54,33 @@ export async function processInput(input: string): Promise<boolean> {
       for (const line of formatTokenLines(tokens, getDefaultTokenLabel())) {
         console.log(line)
       }
+    }
+    return false
+  }
+  if (trimmed.startsWith('/remove-access-token-completely')) {
+    const label = trimmed.slice('/remove-access-token-completely'.length).trim()
+    if (!label) {
+      console.log('Usage: /remove-access-token-completely <label>')
+      return false
+    }
+    try {
+      await removeAccessTokenCompletely(label)
+      console.log(`Token "${label}" removed locally and from server.`)
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : String(err))
+    }
+    return false
+  }
+  if (trimmed.startsWith('/remove-access-token')) {
+    const label = trimmed.slice('/remove-access-token'.length).trim()
+    if (!label) {
+      console.log('Usage: /remove-access-token <label>')
+      return false
+    }
+    if (removeAccessToken(label)) {
+      console.log(`Token "${label}" removed.`)
+    } else {
+      console.log(`Token "${label}" not found.`)
     }
     return false
   }
@@ -153,6 +182,8 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
   let prevTotalLines = 0
   let tokenListItems: { label: string; token: string }[] | null = null
   let tokenHighlightIndex = 0
+  let tokenListAction: 'set-default' | 'remove' | 'remove-completely' =
+    'set-default'
 
   function drawBox() {
     const width = getTerminalWidth()
@@ -221,7 +252,6 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           drawBox()
         } else if (key.name === 'return' && !key.shift) {
           const selectedLabel = tokenListItems[tokenHighlightIndex]!.label
-          setDefaultTokenLabel(selectedLabel)
           if (linesAboveCursor > 0) {
             process.stdout.write(`\x1b[${linesAboveCursor}A`)
           }
@@ -232,11 +262,30 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           if (prevTotalLines > 1) {
             process.stdout.write(`\x1b[${prevTotalLines - 1}A`)
           }
-          process.stdout.write(`Default token set to: ${selectedLabel}\n`)
+          const action = tokenListAction
           tokenListItems = null
           tokenHighlightIndex = 0
+          tokenListAction = 'set-default'
           linesAboveCursor = 0
           prevTotalLines = 0
+          if (action === 'set-default') {
+            setDefaultTokenLabel(selectedLabel)
+            process.stdout.write(`Default token set to: ${selectedLabel}\n`)
+          } else if (action === 'remove') {
+            removeAccessToken(selectedLabel)
+            process.stdout.write(`Token "${selectedLabel}" removed.\n`)
+          } else {
+            try {
+              await removeAccessTokenCompletely(selectedLabel)
+              process.stdout.write(
+                `Token "${selectedLabel}" removed locally and from server.\n`
+              )
+            } catch (err) {
+              process.stdout.write(
+                `${err instanceof Error ? err.message : String(err)}\n`
+              )
+            }
+          }
           drawBox()
         } else {
           tokenListItems = null
@@ -287,12 +336,21 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
             process.stdout.write('\n')
           }
 
-          if (input.trim() === '/list-access-token') {
+          const trimmedInput = input.trim()
+          const tokenSelectAction = (() => {
+            if (trimmedInput === '/list-access-token') return 'set-default'
+            if (trimmedInput === '/remove-access-token') return 'remove'
+            if (trimmedInput === '/remove-access-token-completely')
+              return 'remove-completely'
+            return null
+          })() as 'set-default' | 'remove' | 'remove-completely' | null
+          if (tokenSelectAction) {
             const tokens = listAccessTokens()
             if (tokens.length === 0) {
               process.stdout.write('No access tokens stored.\n')
             } else {
               tokenListItems = tokens
+              tokenListAction = tokenSelectAction
               const dl = getDefaultTokenLabel()
               tokenHighlightIndex = Math.max(
                 0,

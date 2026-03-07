@@ -65,6 +65,38 @@ export function listAccessTokens(): AccessTokenEntry[] {
   return loadConfig().tokens
 }
 
+export function removeAccessToken(label: string): boolean {
+  const config = loadConfig()
+  const index = config.tokens.findIndex((t) => t.label === label)
+  if (index === -1) return false
+  config.tokens.splice(index, 1)
+  if (config.defaultLabel === label) {
+    delete config.defaultLabel
+  }
+  saveConfig(config)
+  return true
+}
+
+export async function removeAccessTokenCompletely(
+  label: string
+): Promise<void> {
+  const config = loadConfig()
+  const entry = config.tokens.find((t) => t.label === label)
+  if (!entry) {
+    throw new Error(`Token "${label}" not found.`)
+  }
+  const { apiBaseUrl } = getApiConfig()
+  configureClient(apiBaseUrl, entry.token)
+  try {
+    await UserController.revokeToken()
+  } catch {
+    throw new Error(
+      'Doughnut service is not available. Check DOUGHNUT_API_BASE_URL and ensure the service is running.'
+    )
+  }
+  removeAccessToken(label)
+}
+
 export function getDefaultTokenLabel(): string | undefined {
   const config = loadConfig()
   if (config.tokens.length === 0) return undefined
@@ -104,6 +136,18 @@ export const accessTokenCommandDocs = [
     name: '/list-access-token',
     usage: '/list-access-token',
     description: 'List stored access tokens',
+    category: 'interactive' as const,
+  },
+  {
+    name: '/remove-access-token',
+    usage: '/remove-access-token',
+    description: 'Remove a local access token',
+    category: 'interactive' as const,
+  },
+  {
+    name: '/remove-access-token-completely',
+    usage: '/remove-access-token-completely',
+    description: 'Remove token locally and from server',
     category: 'interactive' as const,
   },
 ]

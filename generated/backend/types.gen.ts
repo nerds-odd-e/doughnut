@@ -4025,6 +4025,33 @@ export type FetchWikidataEntityDataByIdResponses = {
 
 export type FetchWikidataEntityDataByIdResponse = FetchWikidataEntityDataByIdResponses[keyof FetchWikidataEntityDataByIdResponses];
 
+export type RevokeTokenData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/user/token-info';
+};
+
+export type RevokeTokenErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type RevokeTokenError = RevokeTokenErrors[keyof RevokeTokenErrors];
+
+export type RevokeTokenResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type GetTokenInfoData = {
     body?: never;
     path?: never;

@@ -7,6 +7,7 @@ import { UserController } from '@generated/backend/sdk.gen'
 vi.mock('@generated/backend/sdk.gen', () => ({
   UserController: {
     getTokenInfo: vi.fn(),
+    revokeToken: vi.fn(),
   },
 }))
 
@@ -20,6 +21,8 @@ import {
   formatTokenLines,
   getDefaultTokenLabel,
   listAccessTokens,
+  removeAccessToken,
+  removeAccessTokenCompletely,
   setDefaultTokenLabel,
 } from '../src/accessToken.js'
 
@@ -195,6 +198,114 @@ describe('getDefaultTokenLabel', () => {
     setDefaultTokenLabel('Deleted')
 
     expect(getDefaultTokenLabel()).toBe('Only')
+  })
+})
+
+describe('removeAccessToken', () => {
+  let originalConfigDir: string | undefined
+
+  beforeEach(() => {
+    originalConfigDir = process.env.DOUGHNUT_CONFIG_DIR
+    process.env.DOUGHNUT_CONFIG_DIR = createTempDir()
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    if (originalConfigDir === undefined) {
+      delete process.env.DOUGHNUT_CONFIG_DIR
+    } else {
+      process.env.DOUGHNUT_CONFIG_DIR = originalConfigDir
+    }
+  })
+
+  test('removes token by label and returns true', async () => {
+    vi.mocked(UserController.getTokenInfo)
+      .mockResolvedValueOnce({ data: { id: 1, label: 'First' } } as never)
+      .mockResolvedValueOnce({ data: { id: 2, label: 'Second' } } as never)
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await addAccessToken('token-1')
+    await addAccessToken('token-2')
+
+    expect(removeAccessToken('First')).toBe(true)
+    const tokens = listAccessTokens()
+    expect(tokens).toHaveLength(1)
+    expect(tokens[0]!.label).toBe('Second')
+  })
+
+  test('returns false when label not found', () => {
+    expect(removeAccessToken('Nonexistent')).toBe(false)
+  })
+
+  test('clears defaultLabel when removing the default token', async () => {
+    vi.mocked(UserController.getTokenInfo)
+      .mockResolvedValueOnce({ data: { id: 1, label: 'First' } } as never)
+      .mockResolvedValueOnce({ data: { id: 2, label: 'Second' } } as never)
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await addAccessToken('token-1')
+    await addAccessToken('token-2')
+    setDefaultTokenLabel('First')
+    expect(getDefaultTokenLabel()).toBe('First')
+
+    removeAccessToken('First')
+    expect(getDefaultTokenLabel()).toBe('Second')
+  })
+})
+
+describe('removeAccessTokenCompletely', () => {
+  let originalConfigDir: string | undefined
+
+  beforeEach(() => {
+    originalConfigDir = process.env.DOUGHNUT_CONFIG_DIR
+    process.env.DOUGHNUT_CONFIG_DIR = createTempDir()
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    if (originalConfigDir === undefined) {
+      delete process.env.DOUGHNUT_CONFIG_DIR
+    } else {
+      process.env.DOUGHNUT_CONFIG_DIR = originalConfigDir
+    }
+  })
+
+  test('revokes token on server and removes locally', async () => {
+    vi.mocked(UserController.getTokenInfo).mockResolvedValueOnce({
+      data: { id: 1, label: 'MyToken' },
+    } as never)
+    vi.mocked(UserController.revokeToken).mockResolvedValueOnce({
+      data: undefined,
+    } as never)
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await addAccessToken('secret-token')
+    await removeAccessTokenCompletely('MyToken')
+
+    expect(UserController.revokeToken).toHaveBeenCalled()
+    expect(listAccessTokens()).toEqual([])
+  })
+
+  test('throws when label not found locally', async () => {
+    await expect(removeAccessTokenCompletely('Missing')).rejects.toThrow(
+      'Token "Missing" not found.'
+    )
+  })
+
+  test('throws when server is not available', async () => {
+    vi.mocked(UserController.getTokenInfo).mockResolvedValueOnce({
+      data: { id: 1, label: 'MyToken' },
+    } as never)
+    vi.mocked(UserController.revokeToken).mockRejectedValueOnce(
+      new TypeError('fetch failed')
+    )
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await addAccessToken('secret-token')
+    await expect(removeAccessTokenCompletely('MyToken')).rejects.toThrow(
+      'Doughnut service is not available'
+    )
+    expect(listAccessTokens()).toHaveLength(1)
   })
 })
 

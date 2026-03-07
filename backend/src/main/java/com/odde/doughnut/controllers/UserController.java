@@ -99,6 +99,17 @@ class UserController {
 
   @GetMapping("/token-info")
   public UserToken getTokenInfo(HttpServletRequest request) {
+    return findTokenFromBearerHeader(request);
+  }
+
+  @DeleteMapping("/token-info")
+  @Transactional
+  public void revokeToken(HttpServletRequest request) {
+    UserToken userToken = findTokenFromBearerHeader(request);
+    userService.deleteToken(userToken.getId());
+  }
+
+  private UserToken findTokenFromBearerHeader(HttpServletRequest request) {
     String authHeader = request.getHeader("Authorization");
     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
       throw new ResponseStatusException(
