@@ -120,7 +120,7 @@ const methodToController: Record<string, any> = {
   selfEvaluate: MemoryTrackerController,
   removeFromRepeating: MemoryTrackerController,
   reEnable: MemoryTrackerController,
-  markAsRepeated: MemoryTrackerController,
+  markAsRecalled: MemoryTrackerController,
   showMemoryTracker: MemoryTrackerController,
   getRecentlyRecalled: MemoryTrackerController,
   getRecentMemoryTrackers: MemoryTrackerController,

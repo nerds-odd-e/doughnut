@@ -94,7 +94,7 @@ const noteMoreOptionsDialog = () => {
       return assumeAssimilationPage().waitForAssimilationReady()
     },
     assimilateNote() {
-      this.openAssimilationPage().clickKeepForRepetition()
+      this.openAssimilationPage().clickKeepForRecall()
       pageIsNotLoading()
     },
   }

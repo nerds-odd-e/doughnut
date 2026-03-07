@@ -54,7 +54,7 @@ const recallPage = () => {
       commonSenseSplit(noteTitles, ',').forEach((title) => {
         if (title === 'end') {
           cy.findByText(
-            'You have finished all repetitions for this half a day!'
+            'You have finished all recalls for this half a day!'
           ).should('be.visible')
         } else {
           cy.findByText(title, { selector: 'h2 *' })

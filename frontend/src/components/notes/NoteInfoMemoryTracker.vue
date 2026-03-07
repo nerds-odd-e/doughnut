@@ -3,7 +3,7 @@
     {{ localMemoryTracker.spelling ? 'spelling' : 'normal' }}
   </td>
   <td :class="{ 'strikethrough': isSkipped }">
-    <span class="statistics-value">{{ localMemoryTracker.repetitionCount }}</span>
+    <span class="statistics-value">{{ localMemoryTracker.recallCount }}</span>
   </td>
   <td :class="{ 'strikethrough': isSkipped }">
     <span class="statistics-value">{{ localMemoryTracker.forgettingCurveIndex }}</span>

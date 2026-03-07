@@ -18,12 +18,9 @@ describe("NoteInfoComponent", () => {
       .memoryTrackers([
         makeMe.aMemoryTracker
           .removedFromTracking(false)
-          .repetitionCount(5)
+          .recallCount(5)
           .please(),
-        makeMe.aMemoryTracker
-          .removedFromTracking(true)
-          .repetitionCount(3)
-          .please(),
+        makeMe.aMemoryTracker.removedFromTracking(true).recallCount(3).please(),
       ])
       .please()
 

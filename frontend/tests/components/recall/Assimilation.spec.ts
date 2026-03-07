@@ -107,7 +107,7 @@ describe("Assimilation component", () => {
       const wrapper = mount()
 
       await flushPromises()
-      await wrapper.find('[data-test="keep-for-repetition"]').trigger("click")
+      await wrapper.find('[data-test="keep-for-recall"]').trigger("click")
       await flushPromises()
 
       expect(assimilateSpy).toHaveBeenCalledWith({
@@ -148,7 +148,7 @@ describe("Assimilation component", () => {
 
       expect(getOpaqueContentBlocker()).toBeNull()
 
-      await wrapper.find('[data-test="keep-for-repetition"]').trigger("click")
+      await wrapper.find('[data-test="keep-for-recall"]').trigger("click")
       await flushPromises()
 
       const opaqueLayer = getOpaqueContentBlocker()
@@ -161,7 +161,7 @@ describe("Assimilation component", () => {
       const wrapper = mount()
       await flushPromises()
 
-      await wrapper.find('[data-test="keep-for-repetition"]').trigger("click")
+      await wrapper.find('[data-test="keep-for-recall"]').trigger("click")
       await flushPromises()
       expect(getOpaqueContentBlocker()).not.toBeNull()
 
@@ -179,7 +179,7 @@ describe("Assimilation component", () => {
       const wrapper = mount()
       await flushPromises()
 
-      await wrapper.find('[data-test="keep-for-repetition"]').trigger("click")
+      await wrapper.find('[data-test="keep-for-recall"]').trigger("click")
       await flushPromises()
 
       expect(document.body.textContent).toContain("Verify Spelling")
@@ -194,9 +194,7 @@ describe("Assimilation component", () => {
 
       expect(document.body.textContent).not.toContain("Verify Spelling")
       expect(assimilateSpy).not.toHaveBeenCalled()
-      expect(wrapper.find('[data-test="keep-for-repetition"]').exists()).toBe(
-        true
-      )
+      expect(wrapper.find('[data-test="keep-for-recall"]').exists()).toBe(true)
     })
   })
 

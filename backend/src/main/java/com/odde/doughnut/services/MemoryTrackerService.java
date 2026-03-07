@@ -122,16 +122,16 @@ public class MemoryTrackerService {
         .findFirst()
         .map(
             memoryTracker ->
-                markAsRepeated(currentUTCTimestamp, correct, memoryTracker, thinkingTimeMs))
+                markAsRecalled(currentUTCTimestamp, correct, memoryTracker, thinkingTimeMs))
         .orElse(false);
   }
 
-  public boolean markAsRepeated(
+  public boolean markAsRecalled(
       Timestamp currentUTCTimestamp,
       Boolean correct,
       MemoryTracker memoryTracker,
       Integer thinkingTimeMs) {
-    memoryTracker.markAsRepeated(currentUTCTimestamp, correct, thinkingTimeMs);
+    memoryTracker.markAsRecalled(currentUTCTimestamp, correct, thinkingTimeMs);
     entityPersister.save(memoryTracker);
 
     if (!correct) {
@@ -162,7 +162,7 @@ public class MemoryTrackerService {
     answer.setCorrect(memoryTracker.getNote().matchAnswer(answerSpellingDTO.getSpellingAnswer()));
     answer.setThinkingTimeMs(answerSpellingDTO.getThinkingTimeMs());
     recallPrompt.setAnswer(answer);
-    markAsRepeated(
+    markAsRecalled(
         currentUTCTimestamp,
         answer.getCorrect(),
         memoryTracker,
@@ -226,7 +226,7 @@ public class MemoryTrackerService {
     recallPrompt.setAnswer(answer);
     entityPersister.save(recallPrompt);
 
-    markAsRepeated(
+    markAsRecalled(
         currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
     return recallPrompt;
   }

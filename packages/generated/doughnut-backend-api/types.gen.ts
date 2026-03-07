@@ -290,7 +290,7 @@ export type MemoryTracker = {
     lastRecalledAt?: string;
     nextRecallAt: string;
     assimilatedAt?: string;
-    repetitionCount?: number;
+    recallCount?: number;
     forgettingCurveIndex?: number;
     removedFromTracking?: boolean;
     spelling?: boolean;
@@ -686,7 +686,7 @@ export type MemoryTrackerWritable = {
     lastRecalledAt?: string;
     nextRecallAt: string;
     assimilatedAt?: string;
-    repetitionCount?: number;
+    recallCount?: number;
     forgettingCurveIndex?: number;
     removedFromTracking?: boolean;
     spelling?: boolean;
@@ -3837,7 +3837,7 @@ export type UpdateAiAssistantResponses = {
 
 export type UpdateAiAssistantResponse = UpdateAiAssistantResponses[keyof UpdateAiAssistantResponses];
 
-export type MarkAsRepeatedData = {
+export type MarkAsRecalledData = {
     body?: never;
     path: {
         memoryTracker: number;
@@ -3845,10 +3845,10 @@ export type MarkAsRepeatedData = {
     query: {
         successful: boolean;
     };
-    url: '/api/memory-trackers/{memoryTracker}/mark-as-repeated';
+    url: '/api/memory-trackers/{memoryTracker}/mark-as-recalled';
 };
 
-export type MarkAsRepeatedErrors = {
+export type MarkAsRecalledErrors = {
     /**
      * Bad Request
      */
@@ -3859,16 +3859,16 @@ export type MarkAsRepeatedErrors = {
     500: string;
 };
 
-export type MarkAsRepeatedError = MarkAsRepeatedErrors[keyof MarkAsRepeatedErrors];
+export type MarkAsRecalledError = MarkAsRecalledErrors[keyof MarkAsRecalledErrors];
 
-export type MarkAsRepeatedResponses = {
+export type MarkAsRecalledResponses = {
     /**
      * OK
      */
     200: MemoryTracker;
 };
 
-export type MarkAsRepeatedResponse = MarkAsRepeatedResponses[keyof MarkAsRepeatedResponses];
+export type MarkAsRecalledResponse = MarkAsRecalledResponses[keyof MarkAsRecalledResponses];
 
 export type UpdateSuggestedQuestionForFineTuningData = {
     body: QuestionSuggestionParams;

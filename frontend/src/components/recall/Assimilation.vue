@@ -24,7 +24,7 @@
   <AssimilationButtons
     :key="buttonKey"
     :disabled="!noteInfoLoaded"
-    :keep-for-repetition-disabled="keepForRepetitionDisabled"
+    :keep-for-recall-disabled="keepForRecallDisabled"
     @assimilate="processForm"
   />
   <Teleport to="body">
@@ -103,7 +103,7 @@ const hasSpellingMemoryTracker = computed(
     noteRecallInfo.value?.memoryTrackers?.some((mt) => mt.spelling === true) ??
     false
 )
-const keepForRepetitionDisabled = computed(
+const keepForRecallDisabled = computed(
   () =>
     hasMemoryTrackers.value &&
     !(rememberSpelling.value && !hasSpellingMemoryTracker.value)

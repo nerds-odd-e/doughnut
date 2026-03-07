@@ -1,5 +1,5 @@
-Feature: Repetition Quiz
-  As a learner, I want to use quizzes in my repetition to help and gamify my learning.
+Feature: Recall Quiz
+  As a learner, I want to use quizzes in my recall to help and gamify my learning.
 
   Background:
     Given I am logged in as an existing user

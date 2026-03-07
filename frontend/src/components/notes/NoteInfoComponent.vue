@@ -26,7 +26,7 @@
     <thead>
       <tr>
         <th>Type</th>
-        <th>Repetition Count</th>
+        <th>Recall Count</th>
         <th>Forgetting Curve Index</th>
         <th>Next Recall</th>
       </tr>

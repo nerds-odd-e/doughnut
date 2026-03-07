@@ -42,9 +42,9 @@
             </span>
           </div>
           <div>
-            <span class="daisy-font-semibold">Repetition Count:</span>
+            <span class="daisy-font-semibold">Recall Count:</span>
             <span class="daisy-ml-2">
-              {{ memoryTracker.repetitionCount ?? 'N/A' }}
+              {{ memoryTracker.recallCount ?? 'N/A' }}
             </span>
           </div>
           <div>

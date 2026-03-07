@@ -3,8 +3,8 @@ import { pageIsNotLoading } from '../pageBase'
 import { form } from '../forms'
 import router from '../router'
 
-const keepForRepetitionButton = (options?: { timeout?: number }) =>
-  cy.get('[data-test="keep-for-repetition"]', options ?? {})
+const keepForRecallButton = (options?: { timeout?: number }) =>
+  cy.get('[data-test="keep-for-recall"]', options ?? {})
 
 const understandingChecklist = () =>
   cy.contains('Understanding Checklist:').closest('.daisy-bg-accent')
@@ -32,19 +32,19 @@ export const assumeAssimilationPage = () => ({
     // Close tooltip
     cy.get('.tooltip-popup').click()
   },
-  clickKeepForRepetition() {
-    keepForRepetitionButton().click()
+  clickKeepForRecall() {
+    keepForRecallButton().click()
     return this
   },
   waitForAssimilationReady() {
-    keepForRepetitionButton({ timeout: 10000 })
+    keepForRecallButton({ timeout: 10000 })
       .scrollIntoView()
       .should('be.visible')
     return this
   },
   proceedWithRememberingSpelling() {
     this.checkRememberSpellingOption()
-    this.clickKeepForRepetition()
+    this.clickKeepForRecall()
     return this
   },
   assimilateWithSpellingOption() {
@@ -111,10 +111,10 @@ export const assumeAssimilationPage = () => ({
           expect(assimilationType).equal('a known assimilation page type')
       }
       if (skip === 'yes') {
-        cy.findByText('Skip repetition').click()
+        cy.findByText('Skip recall').click()
         cy.findByRole('button', { name: 'OK' }).click()
       } else {
-        this.clickKeepForRepetition()
+        this.clickKeepForRecall()
       }
     }
     return this
@@ -148,7 +148,7 @@ export const assumeAssimilationPage = () => ({
   },
   assimilateCurrentNote() {
     pageIsNotLoading()
-    this.clickKeepForRepetition()
+    this.clickKeepForRecall()
     return this
   },
   checkUnderstandingPoint(index: number) {
@@ -224,8 +224,8 @@ export const assumeAssimilationPage = () => ({
     form.getField('Remember Spelling').expectNoError().shouldNotBeDisabled()
     return this
   },
-  expectKeepForRepetitionDisabled() {
-    keepForRepetitionButton().should('be.disabled')
+  expectKeepForRecallDisabled() {
+    keepForRecallButton().should('be.disabled')
     return this
   },
 })

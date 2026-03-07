@@ -14,7 +14,7 @@ Given("It's day {int}", (day: number) => {
   start.testability().backendTimeTravelTo(day, 8)
 })
 
-Given('I ask to do more repetition', () => {
+Given('I ask to do more recall', () => {
   start.recall().navigateToRecallPage().repeatMore()
 })
 

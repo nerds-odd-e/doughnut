@@ -198,7 +198,7 @@ public class MemoryTrackerServiceTest {
     }
 
     @Test
-    void markAsRepeatedShouldNotDeleteMemoryTracker() {
+    void markAsRecalledShouldNotDeleteMemoryTracker() {
       // Create 5 previous wrong answers to exceed threshold
       for (int i = 0; i < 5; i++) {
         makeMe
@@ -210,7 +210,7 @@ public class MemoryTrackerServiceTest {
             .please();
       }
 
-      memoryTrackerService.markAsRepeated(day1, false, memoryTracker, 1000);
+      memoryTrackerService.markAsRecalled(day1, false, memoryTracker, 1000);
 
       List<MemoryTracker> trackers =
           memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId());

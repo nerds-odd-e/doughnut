@@ -23,7 +23,7 @@ Feature: Browse answers and notes while recalling
     And I type my answer "sedition"
     Then I should see that my last answer to spelling question is correct
     And I should see the memory tracker info of note "sedition"
-      | type     | Repetition Count |
+      | type     | Recall Count |
       | normal   |                0 |
       | spelling |                1 |
 
