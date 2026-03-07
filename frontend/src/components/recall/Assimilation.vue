@@ -103,6 +103,15 @@ const hasSpellingMemoryTracker = computed(
     noteRecallInfo.value?.memoryTrackers?.some((mt) => mt.spelling === true) ??
     false
 )
+<<<<<<< HEAD
+=======
+const addSpellingOnlyMode = computed(
+  () =>
+    hasMemoryTrackers.value &&
+    rememberSpelling.value &&
+    !hasSpellingMemoryTracker.value
+)
+>>>>>>> 8873fd737 (Disable keep for repetition when note has memory trackers; add spelling-only flow)
 const keepForRepetitionDisabled = computed(
   () =>
     hasMemoryTrackers.value &&
@@ -129,12 +138,16 @@ const processForm = async (skipMemoryTracking: boolean) => {
   await doAssimilate(skipMemoryTracking)
 }
 
-const doAssimilate = async (skipMemoryTracking: boolean) => {
+const doAssimilate = async (
+  skipMemoryTracking: boolean,
+  addSpellingOnly = false
+) => {
   const { data: memoryTrackers, error } = await apiCallWithLoading(() =>
     AssimilationController.assimilate({
       body: {
         noteId: note.id,
         skipMemoryTracking,
+        addSpellingOnly: addSpellingOnly || undefined,
       },
     })
   )
@@ -158,7 +171,7 @@ const doAssimilate = async (skipMemoryTracking: boolean) => {
 
 const handleSpellingVerified = () => {
   showSpellingPopup.value = false
-  doAssimilate(false)
+  doAssimilate(false, addSpellingOnlyMode.value)
 }
 
 const handleSpellingCancel = () => {

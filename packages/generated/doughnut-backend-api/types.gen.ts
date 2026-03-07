@@ -373,6 +373,7 @@ export type TextFromAudioWithCallInfo = {
 export type AssimilationRequestDto = {
     noteId?: number;
     skipMemoryTracking?: boolean;
+    addSpellingOnly?: boolean;
 };
 
 export type AssessmentAttempt = {

@@ -84,10 +84,17 @@ class AssimilationControllerTests extends ControllerTestBase {
       Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
+<<<<<<< HEAD
       AssimilationRequestDTO request = new AssimilationRequestDTO();
       request.noteId = note.getId();
 
       List<MemoryTracker> result = controller.assimilate(request);
+=======
+      InitialInfo initialInfo = new InitialInfo();
+      initialInfo.noteId = note.getId();
+
+      List<MemoryTracker> result = controller.assimilate(initialInfo);
+>>>>>>> 8873fd737 (Disable keep for repetition when note has memory trackers; add spelling-only flow)
 
       assertThat(result, empty());
       assertThat(
@@ -102,10 +109,18 @@ class AssimilationControllerTests extends ControllerTestBase {
       noteRepository.save(note);
       makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
+<<<<<<< HEAD
       AssimilationRequestDTO request = new AssimilationRequestDTO();
       request.noteId = note.getId();
 
       List<MemoryTracker> result = controller.assimilate(request);
+=======
+      InitialInfo initialInfo = new InitialInfo();
+      initialInfo.noteId = note.getId();
+      initialInfo.addSpellingOnly = true;
+
+      List<MemoryTracker> result = controller.assimilate(initialInfo);
+>>>>>>> 8873fd737 (Disable keep for repetition when note has memory trackers; add spelling-only flow)
 
       assertThat(result, hasSize(1));
       assertThat(result.get(0).getSpelling(), equalTo(true));

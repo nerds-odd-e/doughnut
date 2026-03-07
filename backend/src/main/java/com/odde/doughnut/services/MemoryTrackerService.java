@@ -50,6 +50,7 @@ public class MemoryTrackerService {
   }
 
   public List<MemoryTracker> assimilate(
+<<<<<<< HEAD
       AssimilationRequestDTO request, User currentUser, Timestamp currentTime) {
     Note note = entityPersister.find(Note.class, request.noteId);
     List<MemoryTracker> existingTrackers = userService.getMemoryTrackersFor(currentUser, note);
@@ -62,6 +63,22 @@ public class MemoryTrackerService {
             && existingTrackers.stream().noneMatch(mt -> Boolean.TRUE.equals(mt.getSpelling()));
 
     if (addSpellingOnly) {
+=======
+      InitialInfo initialInfo, User currentUser, Timestamp currentTime) {
+    Note note = entityPersister.find(Note.class, initialInfo.noteId);
+    List<MemoryTracker> existingTrackers = userService.getMemoryTrackersFor(currentUser, note);
+    boolean addSpellingOnly = Boolean.TRUE.equals(initialInfo.addSpellingOnly);
+    boolean skipMemoryTracking =
+        initialInfo.skipMemoryTracking != null ? initialInfo.skipMemoryTracking : false;
+
+    if (addSpellingOnly) {
+      boolean hasSpellingTracker =
+          existingTrackers.stream().anyMatch(mt -> Boolean.TRUE.equals(mt.getSpelling()));
+      if (hasSpellingTracker
+          || !Boolean.TRUE.equals(note.getRecallSetting().getRememberSpelling())) {
+        return List.of();
+      }
+>>>>>>> 8873fd737 (Disable keep for repetition when note has memory trackers; add spelling-only flow)
       MemoryTracker spellingTracker =
           createMemoryTracker(note, currentUser, currentTime, skipMemoryTracking, true);
       return List.of(spellingTracker);
