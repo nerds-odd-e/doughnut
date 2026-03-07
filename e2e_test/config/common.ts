@@ -63,10 +63,19 @@ const commonConfig = {
     ): Promise<Cypress.PluginConfigOptions> {
       await addCucumberPreprocessorPlugin(on, config)
 
+      const projectRoot = path.dirname(config.configFile ?? process.cwd())
+      const generatedBackendPath = path.join(
+        projectRoot,
+        'packages',
+        'generated-backend'
+      )
       on(
         'file:preprocessor',
         createBundler({
           plugins: [createEsbuildPlugin(config)],
+          alias: {
+            '@generated/backend': generatedBackendPath,
+          },
         })
       )
 
