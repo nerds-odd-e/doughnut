@@ -117,7 +117,8 @@ When('I keep for recall with remembering spelling', () => {
 })
 
 When('I add remember spelling to the note {string}', (noteTitle: string) => {
-  start.jumpToNotePage(noteTitle).setRememberSpelling()
+  start.jumpToNotePage(noteTitle).moreOptions()
+  start.assumeNotePage(noteTitle).setRememberSpelling()
 })
 
 When('I navigate to the assimilation page', () => {
