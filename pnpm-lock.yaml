@@ -133,6 +133,9 @@ importers:
 
   cli:
     dependencies:
+      '@generated/backend':
+        specifier: workspace:*
+        version: link:../generated/backend
       doughnut-api:
         specifier: workspace:*
         version: link:../packages/doughnut-api
@@ -316,6 +319,8 @@ importers:
         specifier: 3.2.5
         version: 3.2.5(typescript@5.9.3)
 
+  generated/backend: {}
+
   mcp-server:
     dependencies:
       doughnut-api:
@@ -341,7 +346,11 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
 
-  packages/doughnut-api: {}
+  packages/doughnut-api:
+    dependencies:
+      '@generated/backend':
+        specifier: workspace:*
+        version: link:../../generated/backend
 
 packages:
 
@@ -8417,7 +8426,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.0.3
-      vitest: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.3.5)(@vitest/browser-playwright@4.0.18)(@vitest/ui@4.0.18)(jiti@2.6.1)(jsdom@27.4.0(@noble/hashes@1.8.0))(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2)
+      vitest: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.3.5)(@vitest/browser-playwright@4.0.18)(@vitest/ui@4.0.18)(jiti@1.21.7)(jsdom@27.4.0(@noble/hashes@1.8.0))(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2)
 
   '@vitest/utils@2.0.5':
     dependencies:

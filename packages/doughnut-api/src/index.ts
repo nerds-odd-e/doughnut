@@ -1,4 +1,7 @@
-import { client } from '@generated/backend/client.gen'
+import { createClient, createConfig } from '@generated/backend/client'
+import type { ClientOptions } from '@generated/backend/client/types.gen'
+
+const client = createClient(createConfig<ClientOptions>())
 
 export function getApiConfig() {
   return {

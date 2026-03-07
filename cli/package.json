@@ -18,6 +18,7 @@
     "lint": "biome check src/ tests/"
   },
   "dependencies": {
+    "@generated/backend": "workspace:*",
     "doughnut-api": "workspace:*"
   },
   "devDependencies": {
