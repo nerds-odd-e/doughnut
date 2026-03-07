@@ -8,6 +8,7 @@ vi.mock('@generated/backend/sdk.gen', () => ({
   UserController: {
     getTokenInfo: vi.fn(),
     revokeToken: vi.fn(),
+    generateToken: vi.fn(),
   },
 }))
 
@@ -18,6 +19,7 @@ vi.mock('doughnut-api', () => ({
 
 import {
   addAccessToken,
+  createAccessToken,
   formatTokenLines,
   getDefaultTokenLabel,
   listAccessTokens,
@@ -224,6 +226,57 @@ describe('access token management', () => {
         'Doughnut service is not available'
       )
       expect(listAccessTokens()).toHaveLength(1)
+    })
+  })
+
+  describe('createAccessToken', () => {
+    test('creates token on server using default token and saves locally', async () => {
+      mockGetTokenInfo('Default Token')
+      await addAccessToken('default-secret')
+
+      vi.mocked(UserController.generateToken).mockResolvedValueOnce({
+        data: { id: 2, token: 'new-secret', label: 'New Token' },
+      } as never)
+
+      await createAccessToken('New Token')
+
+      const tokens = listAccessTokens()
+      expect(tokens).toHaveLength(2)
+      expect(tokens[1]!.label).toBe('New Token')
+      expect(tokens[1]!.token).toBe('new-secret')
+    })
+
+    test('throws when no default token exists', async () => {
+      await expect(createAccessToken('Some Token')).rejects.toThrow(
+        'No default access token. Add one first with /add-access-token.'
+      )
+    })
+
+    test('throws when service is not available', async () => {
+      mockGetTokenInfo('Default Token')
+      await addAccessToken('default-secret')
+
+      vi.mocked(UserController.generateToken).mockRejectedValueOnce(
+        new TypeError('fetch failed')
+      )
+
+      await expect(createAccessToken('New Token')).rejects.toThrow(
+        'Doughnut service is not available'
+      )
+    })
+
+    test('throws when default token is invalid or expired', async () => {
+      mockGetTokenInfo('Default Token')
+      await addAccessToken('default-secret')
+
+      vi.mocked(UserController.generateToken).mockResolvedValueOnce({
+        data: undefined,
+        error: { status: 401 },
+      } as never)
+
+      await expect(createAccessToken('New Token')).rejects.toThrow(
+        'Failed to create token.'
+      )
     })
   })
 })

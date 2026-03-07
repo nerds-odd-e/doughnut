@@ -108,6 +108,35 @@ export function setDefaultTokenLabel(label: string): void {
   saveConfig(config)
 }
 
+export async function createAccessToken(label: string): Promise<void> {
+  const config = loadConfig()
+  const defaultLabel = getDefaultTokenLabel()
+  const defaultEntry = config.tokens.find((t) => t.label === defaultLabel)
+  if (!defaultEntry) {
+    throw new Error(
+      'No default access token. Add one first with /add-access-token.'
+    )
+  }
+  const { apiBaseUrl } = getApiConfig()
+  configureClient(apiBaseUrl, defaultEntry.token)
+  let data: { token: string; label: string } | undefined
+  try {
+    const result = await UserController.generateToken({
+      body: { label },
+    })
+    data = result.data
+  } catch {
+    throw new Error(
+      'Doughnut service is not available. Check DOUGHNUT_API_BASE_URL and ensure the service is running.'
+    )
+  }
+  if (!data) {
+    throw new Error('Failed to create token.')
+  }
+  config.tokens.push({ label: data.label, token: data.token })
+  saveConfig(config)
+}
+
 export function formatTokenLines(
   tokens: AccessTokenEntry[],
   defaultLabel: string | undefined
@@ -141,6 +170,12 @@ export const accessTokenCommandDocs = [
     name: '/remove-access-token-completely',
     usage: '/remove-access-token-completely',
     description: 'Remove token locally and from server',
+    category: 'interactive' as const,
+  },
+  {
+    name: '/create-access-token',
+    usage: '/create-access-token',
+    description: 'Create a new access token on the server',
     category: 'interactive' as const,
   },
 ]

@@ -170,6 +170,29 @@ describe('processInput', () => {
     logSpy.mockRestore()
   })
 
+  test('returns false and shows usage for /create-access-token without label', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    expect(await processInput('/create-access-token ')).toBe(false)
+    expect(logSpy).toHaveBeenCalledWith('Usage: /create-access-token <label>')
+    logSpy.mockRestore()
+  })
+
+  test('returns false and shows error for /create-access-token with no default token', async () => {
+    const fs = await import('node:fs')
+    const os = await import('node:os')
+    const path = await import('node:path')
+    const configDir = fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-test-'))
+    const originalEnv = process.env.DOUGHNUT_CONFIG_DIR
+    process.env.DOUGHNUT_CONFIG_DIR = configDir
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    expect(await processInput('/create-access-token My New Token')).toBe(false)
+    expect(logSpy).toHaveBeenCalledWith(
+      'No default access token. Add one first with /add-access-token.'
+    )
+    logSpy.mockRestore()
+    process.env.DOUGHNUT_CONFIG_DIR = originalEnv
+  })
+
   test('returns false and logs error for /last email when no account configured', async () => {
     const configDir = (await import('node:fs')).mkdtempSync(
       `${(await import('node:os')).tmpdir()}/doughnut-test-`
@@ -464,8 +487,8 @@ describe('TTY mode slash command suggestions', () => {
     expect(output).toContain('List available commands')
     expect(output).toContain('/add gmail')
     expect(output).toContain('Add Gmail account')
-    expect(output).toContain('/last email')
-    expect(output).toContain('last email')
+    expect(output).toContain('/create-access-token')
+    expect(output).toContain('↓ more below')
 
     stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
@@ -626,7 +649,7 @@ describe('TTY mode slash command suggestions', () => {
     writeSpy.mockClear()
     stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
     await new Promise((r) => setImmediate(r))
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 9; i++) {
       stdin.emit('keypress', undefined, {
         name: 'down',
         ctrl: false,
@@ -651,7 +674,7 @@ describe('TTY mode slash command suggestions', () => {
     writeSpy.mockClear()
     stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
     await new Promise((r) => setImmediate(r))
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 8; i++) {
       stdin.emit('keypress', undefined, {
         name: 'down',
         ctrl: false,

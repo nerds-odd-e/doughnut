@@ -1,6 +1,7 @@
 import * as readline from 'node:readline'
 import {
   addAccessToken,
+  createAccessToken,
   formatTokenLines,
   getDefaultTokenLabel,
   listAccessTokens,
@@ -55,6 +56,23 @@ export async function processInput(input: string): Promise<boolean> {
       for (const line of formatTokenLines(tokens, getDefaultTokenLabel())) {
         console.log(line)
       }
+    }
+    return false
+  }
+  if (
+    trimmed.startsWith('/create-access-token ') ||
+    trimmed === '/create-access-token'
+  ) {
+    const label = trimmed.slice('/create-access-token '.length).trim()
+    if (!label) {
+      console.log('Usage: /create-access-token <label>')
+      return false
+    }
+    try {
+      await createAccessToken(label)
+      console.log('Token created')
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : String(err))
     }
     return false
   }
