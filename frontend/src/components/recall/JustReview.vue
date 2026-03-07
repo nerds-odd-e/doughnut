@@ -32,7 +32,7 @@ const justReivew = async (successful: boolean) => {
     return
   }
   const { error } = await apiCallWithLoading(() =>
-    MemoryTrackerController.markAsRepeated({
+    MemoryTrackerController.markAsRecalled({
       path: { memoryTracker: props.memoryTrackerId! },
       query: { successful },
     })

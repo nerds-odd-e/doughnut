@@ -480,6 +480,23 @@ class NoteControllerTests extends ControllerTestBase {
       assertThat(getLevel(relation), is(4));
     }
 
+    @Test
+    void shouldPutNoteBackToAssimilationListWhenRememberSpellingIsAddedLater()
+        throws UnexpectedNoAccessRightException {
+      makeMe.aMemoryTrackerFor(source).by(currentUser.getUser()).please();
+      assertThat(
+          userService.getUnassimilatedNotes(currentUser.getUser()).toList(),
+          not(hasItem(hasProperty("id", equalTo(source.getId())))));
+
+      NoteRecallSetting noteRecallSetting = new NoteRecallSetting();
+      noteRecallSetting.setRememberSpelling(true);
+      controller.updateNoteRecallSetting(source, noteRecallSetting);
+
+      assertThat(
+          userService.getUnassimilatedNotes(currentUser.getUser()).toList(),
+          hasItem(hasProperty("id", equalTo(source.getId()))));
+    }
+
     private static Integer getLevel(Note relation) {
       return relation.getRecallSetting().getLevel();
     }

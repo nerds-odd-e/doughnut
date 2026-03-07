@@ -68,9 +68,9 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
       "3,   4, true",
     })
     void whenThereIsOneRecalledNotesForUser(
-        Integer repetitionDone, Integer recallDay, Boolean expectedToRepeat) {
+        Integer recallDone, Integer recallDay, Boolean expectedToRepeat) {
       MemoryTracker memoryTracker =
-          makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRepetition(repetitionDone).please();
+          makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRecall(recallDone).please();
       MemoryTracker mostUrgentMemoryTracker =
           getOneMemoryTrackerNeedToRepeat(daysAfterBase(memoryTracker, recallDay));
       assertThat(mostUrgentMemoryTracker != null, is(expectedToRepeat));
@@ -110,11 +110,11 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
       void aMemoryTrackerHasBeenRecalledStrictly(
           int ntimes, Integer daysDelay, float expectedForgettingCurveIndex) {
         MemoryTracker memoryTracker =
-            makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRepetition(ntimes).please();
+            makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRecall(ntimes).please();
         Timestamp currentUTCTimestamp =
             TimestampOperations.addHoursToTimestamp(
                 memoryTracker.getNextRecallAt(), daysDelay * 24);
-        memoryTracker.markAsRepeated(currentUTCTimestamp, true, null);
+        memoryTracker.markAsRecalled(currentUTCTimestamp, true, null);
         assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(expectedForgettingCurveIndex));
       }
     }

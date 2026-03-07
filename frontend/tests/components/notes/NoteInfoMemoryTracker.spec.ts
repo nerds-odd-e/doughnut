@@ -14,7 +14,7 @@ describe("NoteInfoMemoryTracker", () => {
 
   it("should display memory tracker information", () => {
     const memoryTracker = makeMe.aMemoryTracker
-      .repetitionCount(5)
+      .recallCount(5)
       .forgettingCurveIndex(3)
       .nextRecallAt("2024-01-01T12:00:00Z")
       .removedFromTracking(false)

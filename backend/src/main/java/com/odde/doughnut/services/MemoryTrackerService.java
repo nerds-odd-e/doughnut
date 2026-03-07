@@ -1,7 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
-import com.odde.doughnut.controllers.dto.InitialInfo;
+import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
@@ -50,28 +50,35 @@ public class MemoryTrackerService {
   }
 
   public List<MemoryTracker> assimilate(
-      InitialInfo initialInfo, User currentUser, Timestamp currentTime) {
-    Note note = entityPersister.find(Note.class, initialInfo.noteId);
+      AssimilationRequestDTO request, User currentUser, Timestamp currentTime) {
+    Note note = entityPersister.find(Note.class, request.noteId);
+    List<MemoryTracker> existingTrackers = userService.getMemoryTrackersFor(currentUser, note);
+    boolean skipMemoryTracking =
+        request.skipMemoryTracking != null ? request.skipMemoryTracking : false;
+
+    boolean addSpellingOnly =
+        !existingTrackers.isEmpty()
+            && Boolean.TRUE.equals(note.getRecallSetting().getRememberSpelling())
+            && existingTrackers.stream().noneMatch(mt -> Boolean.TRUE.equals(mt.getSpelling()));
+
+    if (addSpellingOnly) {
+      MemoryTracker spellingTracker =
+          createMemoryTracker(note, currentUser, currentTime, skipMemoryTracking, true);
+      return List.of(spellingTracker);
+    }
+
+    if (!existingTrackers.isEmpty()) {
+      return List.of();
+    }
 
     MemoryTracker memoryTracker =
-        createMemoryTracker(
-            note,
-            currentUser,
-            currentTime,
-            initialInfo.skipMemoryTracking != null ? initialInfo.skipMemoryTracking : false,
-            false);
-
+        createMemoryTracker(note, currentUser, currentTime, skipMemoryTracking, false);
     List<MemoryTracker> trackers = new ArrayList<>();
     trackers.add(memoryTracker);
 
-    if (note.getRecallSetting().getRememberSpelling()) {
+    if (Boolean.TRUE.equals(note.getRecallSetting().getRememberSpelling())) {
       MemoryTracker spellingTracker =
-          createMemoryTracker(
-              note,
-              currentUser,
-              currentTime,
-              initialInfo.skipMemoryTracking != null ? initialInfo.skipMemoryTracking : false,
-              true);
+          createMemoryTracker(note, currentUser, currentTime, skipMemoryTracking, true);
       trackers.add(spellingTracker);
     }
 
@@ -115,16 +122,16 @@ public class MemoryTrackerService {
         .findFirst()
         .map(
             memoryTracker ->
-                markAsRepeated(currentUTCTimestamp, correct, memoryTracker, thinkingTimeMs))
+                markAsRecalled(currentUTCTimestamp, correct, memoryTracker, thinkingTimeMs))
         .orElse(false);
   }
 
-  public boolean markAsRepeated(
+  public boolean markAsRecalled(
       Timestamp currentUTCTimestamp,
       Boolean correct,
       MemoryTracker memoryTracker,
       Integer thinkingTimeMs) {
-    memoryTracker.markAsRepeated(currentUTCTimestamp, correct, thinkingTimeMs);
+    memoryTracker.markAsRecalled(currentUTCTimestamp, correct, thinkingTimeMs);
     entityPersister.save(memoryTracker);
 
     if (!correct) {
@@ -155,7 +162,7 @@ public class MemoryTrackerService {
     answer.setCorrect(memoryTracker.getNote().matchAnswer(answerSpellingDTO.getSpellingAnswer()));
     answer.setThinkingTimeMs(answerSpellingDTO.getThinkingTimeMs());
     recallPrompt.setAnswer(answer);
-    markAsRepeated(
+    markAsRecalled(
         currentUTCTimestamp,
         answer.getCorrect(),
         memoryTracker,
@@ -219,7 +226,7 @@ public class MemoryTrackerService {
     recallPrompt.setAnswer(answer);
     entityPersister.save(recallPrompt);
 
-    markAsRepeated(
+    markAsRecalled(
         currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
     return recallPrompt;
   }

@@ -156,6 +156,13 @@ class NoteController {
       @Valid @RequestBody NoteRecallSetting noteRecallSetting)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
+    boolean rememberSpellingChangedToTrue =
+        Boolean.TRUE.equals(noteRecallSetting.getRememberSpelling())
+            && !Boolean.TRUE.equals(note.getRecallSetting().getRememberSpelling());
+    if (rememberSpellingChangedToTrue) {
+      userService.removeMemoryTrackersForReassimilation(
+          authorizationService.getCurrentUser(), note);
+    }
     BeanUtils.copyProperties(noteRecallSetting, note.getRecallSetting());
     entityPersister.save(note);
     note.getRelationshipsAndRefers()

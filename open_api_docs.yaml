@@ -2259,7 +2259,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/InitialInfo"
+              $ref: "#/components/schemas/AssimilationRequestDTO"
         required: true
       responses:
         "500":
@@ -2866,11 +2866,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebookAiAssistant"
-  /api/memory-trackers/{memoryTracker}/mark-as-repeated:
+  /api/memory-trackers/{memoryTracker}/mark-as-recalled:
     patch:
       tags:
       - memory-tracker-controller
-      operationId: markAsRepeated
+      operationId: markAsRecalled
       parameters:
       - name: memoryTracker
         in: path
@@ -4692,7 +4692,7 @@ components:
         assimilatedAt:
           type: string
           format: date-time
-        repetitionCount:
+        recallCount:
           type: integer
           format: int32
         forgettingCurveIndex:
@@ -4850,7 +4850,7 @@ components:
           type: string
         endTimestamp:
           type: string
-    InitialInfo:
+    AssimilationRequestDTO:
       type: object
       properties:
         noteId:

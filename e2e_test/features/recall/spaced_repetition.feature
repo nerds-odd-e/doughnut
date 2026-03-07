@@ -31,6 +31,6 @@ Feature: Spaced-repetition
         * On day 1 I recall "                    " and assimilate new "Note 1, end "
         * On day 2 I recall "Note 1, end         " and assimilate new "Note 2, end "
         * On day 3 I recall "Note 2, end         " and assimilate new "Note 3, end "
-        Given I ask to do more repetition
+        Given I ask to do more recall
         When I repeat more old "Note 1         "
         Then On day 4 I should have "3/3/3" note for assimilation and "3/5/3" for recall

@@ -80,7 +80,7 @@ public class SpacedRepetitionEarlyRewardsAndLatePenaltyTest {
     User user = makeMe.aUser().withSpaceIntervals("3, 6, 9, 12, 15").inMemoryPlease();
     Note note = makeMe.aNote().inMemoryPlease();
     MemoryTracker memoryTracker =
-        makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRepetition(3).inMemoryPlease();
+        makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRecall(3).inMemoryPlease();
     memoryTracker.recalledSuccessfully(
         TimestampOperations.addHoursToTimestamp(memoryTracker.getNextRecallAt(), delayInHours),
         null);

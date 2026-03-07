@@ -83,10 +83,10 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
     @Test
     void shouldValidateTheAnswerAndUpdateMemoryTracker() {
-      Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
+      Integer oldRecallCount = memoryTracker.getRecallCount();
       RecallPrompt answerResult = controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(answerResult.getAnswer().getCorrect(), is(true));
-      assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
+      assertThat(memoryTracker.getRecallCount(), greaterThan(oldRecallCount));
     }
 
     @Test
@@ -190,10 +190,10 @@ class RecallPromptControllerTests extends ControllerTestBase {
       @Test
       void shouldValidateTheWrongAnswer() {
         testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-        Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
+        Integer oldRecallCount = memoryTracker.getRecallCount();
         RecallPrompt answerResult = controller.answerQuiz(recallPrompt, answerDTO);
         assertThat(answerResult.getAnswer().getCorrect(), is(false));
-        assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
+        assertThat(memoryTracker.getRecallCount(), greaterThan(oldRecallCount));
       }
 
       @Test
@@ -409,10 +409,10 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
     @Test
     void shouldValidateTheAnswerAndUpdateMemoryTracker() throws UnexpectedNoAccessRightException {
-      Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
+      Integer oldRecallCount = memoryTracker.getRecallCount();
       RecallPrompt answerResult = controller.answerSpelling(recallPrompt, answerDTO);
       assertTrue(answerResult.getAnswer().getCorrect());
-      assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
+      assertThat(memoryTracker.getRecallCount(), greaterThan(oldRecallCount));
     }
 
     @Test
@@ -548,10 +548,10 @@ class RecallPromptControllerTests extends ControllerTestBase {
       @Test
       void shouldValidateTheWrongAnswer() throws UnexpectedNoAccessRightException {
         testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-        Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
+        Integer oldRecallCount = memoryTracker.getRecallCount();
         RecallPrompt answerResult = controller.answerSpelling(recallPrompt, answerDTO);
         assertFalse(answerResult.getAnswer().getCorrect());
-        assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
+        assertThat(memoryTracker.getRecallCount(), greaterThan(oldRecallCount));
       }
 
       @Test

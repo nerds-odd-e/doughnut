@@ -112,12 +112,24 @@ Then('remembering spelling should be available', () => {
   start.assumeAssimilationPage().expectRememberingSpellingAvailable()
 })
 
-When('I keep for repetition with remembering spelling', () => {
+When('I keep for recall with remembering spelling', () => {
   start.assumeAssimilationPage().proceedWithRememberingSpelling()
+})
+
+When('I add remember spelling to the note {string}', (noteTitle: string) => {
+  start.jumpToNotePage(noteTitle).setRememberSpelling()
+})
+
+When('I navigate to the assimilation page', () => {
+  start.assimilation().navigateToAssimilationPage()
 })
 
 When('I verify spelling with {string}', (text: string) => {
   start.assumeAssimilationPage().verifySpellingWith(text)
+})
+
+Then('the keep for recall button should be disabled', () => {
+  start.assumeAssimilationPage().expectKeepForRecallDisabled()
 })
 
 Then(
@@ -128,9 +140,7 @@ Then(
       start
         .jumpToNotePage(noteTitle)
         .moreOptions()
-        .expectMemoryTrackerInfo([
-          { type: 'spelling', 'Repetition Count': '0' },
-        ])
+        .expectMemoryTrackerInfo([{ type: 'spelling', 'Recall Count': '0' }])
     } else {
       const errorMessage = expectedResult.replace(/^error: /, '')
       start.assumeAssimilationPage().expectSpellingErrorMessage(errorMessage)
