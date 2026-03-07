@@ -16,8 +16,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Notebook } from "@generated/backend"
-import { NotebookController } from "@generated/backend/sdk.gen"
+import type { Notebook } from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useToast } from "@/composables/useToast"
 import type { PropType } from "vue"

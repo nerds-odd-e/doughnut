@@ -35,7 +35,7 @@
       "!**/*.feature",
       "!**/cucumber-json-formatter",
       "!**/cucumber-messages.ndjson",
-      "!**/packages/generated-backend/**"
+      "!**/packages/generated/doughnut-backend-api/**"
     ],
     "ignoreUnknown": true
   },

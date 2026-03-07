@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { MemoryTrackerController } from "@generated/backend/sdk.gen"
+import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import MemoryTrackerAsync from "./MemoryTrackerAsync.vue"
 import SelfEvaluateButtons from "./SelfEvaluateButtons.vue"

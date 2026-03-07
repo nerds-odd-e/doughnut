@@ -10,11 +10,11 @@
 
 <script lang="ts">
 import NoteFormTitleOnly from "@/components/notes/NoteFormTitleOnly.vue"
-import type { Circle, NoteCreationDto } from "@generated/backend"
+import type { Circle, NoteCreationDto } from "@generated/doughnut-backend-api"
 import {
   CircleController,
   NotebookController,
-} from "@generated/backend/sdk.gen"
+} from "@generated/doughnut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"

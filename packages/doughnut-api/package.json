@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@generated/backend": "file:../generated-backend"
+    "@generated/doughnut-backend-api": "file:../generated/doughnut-backend-api"
   },
   "exports": {
     ".": "./src/index.ts"

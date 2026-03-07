@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { PredefinedQuestion } from "@generated/backend"
+import type { PredefinedQuestion } from "@generated/doughnut-backend-api"
 import SuggestQuestionForFineTuning from "../ai/SuggestQuestionForFineTuning.vue"
 
 defineProps({

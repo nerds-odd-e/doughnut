@@ -17,7 +17,10 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue"
-import type { NoteDetailsCompletion, Note } from "@generated/backend"
+import type {
+  NoteDetailsCompletion,
+  Note,
+} from "@generated/doughnut-backend-api"
 import type { ToolCallResult } from "@/models/aiReplyState"
 import AcceptRejectButtons from "@/components/commons/AcceptRejectButtons.vue"
 import markdownizer from "../form/markdownizer"

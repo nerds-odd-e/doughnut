@@ -7,7 +7,7 @@ You are a full stack developer who prefer to change backend code and frontend co
 ## Backend API access
 
 * The backend API code for the frontend is generated automatically from the OpenAPI specification of the backend
-* The generated code is at `frontend/src/generated/backend`
+* The generated code is at `packages/generated/doughnut-backend-api`
 
 
 ## Command to re-generate the backend API call code for frontend

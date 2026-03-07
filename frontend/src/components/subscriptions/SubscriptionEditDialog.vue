@@ -13,8 +13,11 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
-import type { Subscription, SubscriptionDto } from "@generated/backend"
-import { SubscriptionController } from "@generated/backend/sdk.gen"
+import type {
+  Subscription,
+  SubscriptionDto,
+} from "@generated/doughnut-backend-api"
+import { SubscriptionController } from "@generated/doughnut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import TextInput from "../form/TextInput.vue"

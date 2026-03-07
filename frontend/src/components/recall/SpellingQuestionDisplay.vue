@@ -32,8 +32,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue"
-import type { RecallPrompt } from "@generated/backend"
-import { MemoryTrackerController } from "@generated/backend/sdk.gen"
+import type { RecallPrompt } from "@generated/doughnut-backend-api"
+import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import TextInput from "../form/TextInput.vue"
 import QuestionStem from "./QuestionStem.vue"
 import ContentLoader from "../commons/ContentLoader.vue"

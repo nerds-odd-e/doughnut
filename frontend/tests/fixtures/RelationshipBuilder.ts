@@ -1,4 +1,7 @@
-import type { Note, NoteTopology as NoteTopologyType } from "@generated/backend"
+import type {
+  Note,
+  NoteTopology as NoteTopologyType,
+} from "@generated/doughnut-backend-api"
 // Using string literals for relationType values
 import Builder from "./Builder"
 import NoteBuilder from "./NoteBuilder"

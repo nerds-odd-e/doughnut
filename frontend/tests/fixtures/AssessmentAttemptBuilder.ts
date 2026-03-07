@@ -2,7 +2,7 @@ import type {
   AssessmentAttempt,
   Notebook,
   RecallPrompt,
-} from "@generated/backend"
+} from "@generated/doughnut-backend-api"
 import Builder from "./Builder"
 import generateId from "./generateId"
 

@@ -22,9 +22,9 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
-import { BazaarController } from "@generated/backend/sdk.gen"
+import { BazaarController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import type { BazaarNotebook } from "@generated/backend"
+import type { BazaarNotebook } from "@generated/doughnut-backend-api"
 import NotebookLink from "../notes/NotebookLink.vue"
 import usePopups from "../commons/Popups/usePopups"
 

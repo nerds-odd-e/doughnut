@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/vue3"
 import NotebookPageView from "./NotebookPageView.vue"
 import makeMe from "@tests/fixtures/makeMe"
-import type { User } from "@generated/backend"
+import type { User } from "@generated/doughnut-backend-api"
 
 const meta = {
   title: "Page Views/NotebookPageView",

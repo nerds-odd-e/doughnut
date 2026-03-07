@@ -68,14 +68,15 @@ const commonConfig = {
       const generatedBackendPath = path.join(
         projectRoot,
         'packages',
-        'generated-backend'
+        'generated',
+        'doughnut-backend-api'
       )
       on(
         'file:preprocessor',
         createBundler({
           plugins: [createEsbuildPlugin(config)],
           alias: {
-            '@generated/backend': generatedBackendPath,
+            '@generated/doughnut-backend-api': generatedBackendPath,
           },
         })
       )

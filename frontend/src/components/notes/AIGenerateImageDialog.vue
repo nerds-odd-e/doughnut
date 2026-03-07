@@ -10,8 +10,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/backend"
-import { AiController } from "@generated/backend/sdk.gen"
+import type { Note } from "@generated/doughnut-backend-api"
+import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"
 import { ref, computed, onMounted } from "vue"

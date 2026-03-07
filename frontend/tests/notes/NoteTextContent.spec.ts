@@ -1,5 +1,5 @@
 import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
-import type { Note } from "@generated/backend"
+import type { Note } from "@generated/doughnut-backend-api"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"

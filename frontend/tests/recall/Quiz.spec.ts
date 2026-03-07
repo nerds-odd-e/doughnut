@@ -7,7 +7,10 @@ import helper, {
   wrapSdkResponse,
   wrapSdkError,
 } from "@tests/helpers"
-import type { MemoryTrackerLite, RecallPrompt } from "@generated/backend"
+import type {
+  MemoryTrackerLite,
+  RecallPrompt,
+} from "@generated/doughnut-backend-api"
 
 describe("repeat page", () => {
   const recallPrompt = makeMe.aRecallPrompt.please()

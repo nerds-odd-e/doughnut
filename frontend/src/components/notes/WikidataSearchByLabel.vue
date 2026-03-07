@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import type { WikidataSearchEntity } from "@generated/backend"
+import type { WikidataSearchEntity } from "@generated/doughnut-backend-api"
 import { defineComponent } from "vue"
 import SvgWikidata from "../svgs/SvgWikidata.vue"
 import WikidataAssociationDialog from "./WikidataAssociationDialog.vue"

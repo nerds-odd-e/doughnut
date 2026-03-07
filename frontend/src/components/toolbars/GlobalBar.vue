@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import type { Ref } from "vue"
-import type { User } from "@generated/backend"
+import type { User } from "@generated/doughnut-backend-api"
 import { inject } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 

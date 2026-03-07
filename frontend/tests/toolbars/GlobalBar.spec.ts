@@ -1,5 +1,5 @@
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
-import type { User } from "@generated/backend"
+import type { User } from "@generated/doughnut-backend-api"
 import NoteEditingHistory from "@/store/NoteEditingHistory"
 import createNoteStorage from "@/store/createNoteStorage"
 import { screen } from "@testing-library/vue"

@@ -1,4 +1,7 @@
-import type { NoteSearchResult, NoteTopology } from "@generated/backend"
+import type {
+  NoteSearchResult,
+  NoteTopology,
+} from "@generated/doughnut-backend-api"
 import Builder from "./Builder"
 import generateId from "./generateId"
 

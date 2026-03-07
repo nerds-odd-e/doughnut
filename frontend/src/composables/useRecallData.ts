@@ -1,6 +1,6 @@
 import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
-import type { MemoryTrackerLite } from "@generated/backend/types.gen"
+import type { MemoryTrackerLite } from "@generated/doughnut-backend-api/types.gen"
 
 const toRepeat = ref<MemoryTrackerLite[] | undefined>(undefined)
 const currentRecallWindowEndAt = ref<string | undefined>(undefined)

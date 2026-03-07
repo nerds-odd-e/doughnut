@@ -13,8 +13,8 @@
 
 <script lang="ts">
 import { ContentLoader } from "vue-content-loader"
-import type { SuggestedQuestionForFineTuning } from "@generated/backend"
-import { FineTuningDataController } from "@generated/backend/sdk.gen"
+import type { SuggestedQuestionForFineTuning } from "@generated/doughnut-backend-api"
+import { FineTuningDataController } from "@generated/doughnut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import SuggestedQuestionList from "./SuggestedQuestionList.vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"

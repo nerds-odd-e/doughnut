@@ -34,8 +34,8 @@
 
 <script setup lang="ts">
 import TextInput from "@/components/form/TextInput.vue"
-import type { User } from "@generated/backend"
-import { UserController } from "@generated/backend/sdk.gen"
+import type { User } from "@generated/doughnut-backend-api"
+import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import { onMounted, ref } from "vue"

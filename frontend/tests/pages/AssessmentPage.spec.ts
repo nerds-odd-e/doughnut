@@ -2,7 +2,7 @@ import AssessmentPage from "@/pages/AssessmentPage.vue"
 import type {
   AssessmentQuestionInstance,
   RecallPrompt,
-} from "@generated/backend"
+} from "@generated/doughnut-backend-api"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"

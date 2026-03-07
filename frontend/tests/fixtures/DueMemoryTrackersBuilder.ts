@@ -1,4 +1,7 @@
-import type { DueMemoryTrackers, MemoryTrackerLite } from "@generated/backend"
+import type {
+  DueMemoryTrackers,
+  MemoryTrackerLite,
+} from "@generated/doughnut-backend-api"
 import Builder from "./Builder"
 
 class DueMemoryTrackersBuilder extends Builder<DueMemoryTrackers> {

@@ -60,8 +60,8 @@ import { cloneDeep } from "es-toolkit"
 import type {
   QuestionSuggestionParams,
   SuggestedQuestionForFineTuning,
-} from "@generated/backend"
-import { FineTuningDataController } from "@generated/backend/sdk.gen"
+} from "@generated/doughnut-backend-api"
+import { FineTuningDataController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import CheckInput from "../form/CheckInput.vue"
 import TextArea from "../form/TextArea.vue"

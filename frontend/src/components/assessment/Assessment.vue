@@ -30,9 +30,9 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed, ref } from "vue"
-import { AssessmentController } from "@generated/backend/sdk.gen"
+import { AssessmentController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import type { AssessmentAttempt } from "@generated/backend"
+import type { AssessmentAttempt } from "@generated/doughnut-backend-api"
 import AssessmentQuestion from "./AssessmentQuestion.vue"
 import AssessmentClaimCertificate from "./AssessmentClaimCertificate.vue"
 const props = defineProps({

@@ -51,13 +51,13 @@
 
 <script setup lang="ts">
 import { onMounted, ref, computed, watch, inject, type Ref } from "vue"
-import { ConversationMessageController } from "@generated/backend/sdk.gen"
+import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
 import SvgChat from "@/components/svgs/SvgChat.vue"
-import type { Conversation, User } from "@generated/backend"
+import type { Conversation, User } from "@generated/doughnut-backend-api"
 import { messageCenterConversations } from "@/store/messageStore"
 import { useRouter } from "vue-router"
 

@@ -343,9 +343,9 @@ importers:
 
   packages/doughnut-api:
     dependencies:
-      '@generated/backend':
-        specifier: file:../generated-backend
-        version: generated-backend@file:packages/generated-backend
+      '@generated/doughnut-backend-api':
+        specifier: file:../generated/doughnut-backend-api
+        version: doughnut-backend-api@file:packages/generated/doughnut-backend-api
 
 packages:
 
@@ -3145,6 +3145,9 @@ packages:
     resolution: {integrity: sha512-IO8C/dzEb6O3F9/twg6ZLXz164a2fhTnEWb95H23Dm4OuN+92NmEAlTrupP9VW6Jm3sO26tQlqyvyi4CsnY9GA==}
     engines: {node: '>=12'}
 
+  doughnut-backend-api@file:packages/generated/doughnut-backend-api:
+    resolution: {directory: packages/generated/doughnut-backend-api, type: directory}
+
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
@@ -3554,9 +3557,6 @@ packages:
 
   functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
-
-  generated-backend@file:packages/generated-backend:
-    resolution: {directory: packages/generated-backend, type: directory}
 
   generator-function@2.0.1:
     resolution: {integrity: sha512-SFdFmIJi+ybC0vjlHN0ZGVGHc3lgE0DxPAT0djjVg+kjOnSqclqmj0KQ7ykTOLP6YxoqOvuAODGdcHJn+43q3g==}
@@ -9605,6 +9605,8 @@ snapshots:
 
   dotenv@17.3.1: {}
 
+  doughnut-backend-api@file:packages/generated/doughnut-backend-api: {}
+
   dunder-proto@1.0.1:
     dependencies:
       call-bind-apply-helpers: 1.0.2
@@ -10098,8 +10100,6 @@ snapshots:
   function-bind@1.1.2: {}
 
   functions-have-names@1.2.3: {}
-
-  generated-backend@file:packages/generated-backend: {}
 
   generator-function@2.0.1: {}
 

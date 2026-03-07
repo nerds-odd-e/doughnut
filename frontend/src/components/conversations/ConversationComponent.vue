@@ -44,13 +44,13 @@
 </template>
 
 <script setup lang="ts">
-import type { User, Conversation } from "@generated/backend"
+import type { User, Conversation } from "@generated/doughnut-backend-api"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import AssessmentQuestion from "@/components/assessment/AssessmentQuestion.vue"
 import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
 import { useRouter } from "vue-router"
 import { ref, onMounted } from "vue"
-import { ConversationMessageController } from "@generated/backend/sdk.gen"
+import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
 

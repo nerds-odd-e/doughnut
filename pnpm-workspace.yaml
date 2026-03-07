@@ -3,7 +3,7 @@ packages:
   - mcp-server
   - cli
   - packages/doughnut-api
-  - packages/generated-backend
+  - packages/generated/doughnut-backend-api
 
 strictDepBuilds: true
 

@@ -5,7 +5,7 @@ import type { RouteRecordRaw } from "vue-router"
 import { routeMetadata } from "../src/routes/routeMetadata"
 import "../src/assets/daisyui.css"
 import { ref } from "vue"
-import type { User } from "@generated/backend"
+import type { User } from "@generated/doughnut-backend-api"
 import makeMe from "../tests/fixtures/makeMe"
 
 // Reuse route metadata from production code without importing page components

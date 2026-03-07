@@ -19,7 +19,7 @@ import type {
   Answer,
   AnswerDto,
   MultipleChoicesQuestion,
-} from "@generated/backend"
+} from "@generated/doughnut-backend-api"
 import QuestionChoices from "./QuestionChoices.vue"
 import QuestionStem from "./QuestionStem.vue"
 import { useQuestionThinkingTime } from "@/composables/useQuestionThinkingTime"

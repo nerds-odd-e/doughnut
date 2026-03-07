@@ -36,8 +36,11 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref } from "vue"
-import type { AnswerDto, AssessmentQuestionInstance } from "@generated/backend"
-import { AssessmentController } from "@generated/backend/sdk.gen"
+import type {
+  AnswerDto,
+  AssessmentQuestionInstance,
+} from "@generated/doughnut-backend-api"
+import { AssessmentController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
 import QuestionDisplay from "../recall/QuestionDisplay.vue"

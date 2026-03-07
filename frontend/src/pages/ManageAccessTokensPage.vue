@@ -55,7 +55,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import { UserController } from "@generated/backend/sdk.gen"
+import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import TextInput from "@/components/form/TextInput.vue"

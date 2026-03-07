@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/backend"
+import type { Note } from "@generated/doughnut-backend-api"
 import { computed } from "vue"
 import { colors } from "../../colors"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"

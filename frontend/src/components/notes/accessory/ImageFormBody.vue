@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import type { NoteAccessoriesDto } from "@generated/backend"
+import type { NoteAccessoriesDto } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import { defineComponent, computed } from "vue"
 import CheckInput from "../../form/CheckInput.vue"

@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue"
-import { NoteController } from "@generated/backend/sdk.gen"
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import Modal from "../commons/Modal.vue"
 

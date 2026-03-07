@@ -7,7 +7,7 @@ import {
   jsonResponse,
 } from '../helpers.js'
 import type { ToolResponse } from '../types.js'
-import { NoteController } from '@generated/backend/sdk.gen'
+import { NoteController } from '@generated/doughnut-backend-api/sdk.gen'
 
 // Schema definition co-located with the tool
 const NoteIdParamsSchema = z.object({

@@ -1,4 +1,4 @@
-import type { User } from "@generated/backend"
+import type { User } from "@generated/doughnut-backend-api"
 import Builder from "./Builder"
 import generateId from "./generateId"
 

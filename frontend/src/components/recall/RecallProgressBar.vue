@@ -64,7 +64,7 @@ import SvgBackward from "../svgs/SvgBackward.vue"
 import SvgCog from "../svgs/SvgCog.vue"
 import RecallSessionOptionsDialog from "./RecallSessionOptionsDialog.vue"
 
-import type { RecallPrompt } from "@generated/backend"
+import type { RecallPrompt } from "@generated/doughnut-backend-api"
 
 const props = defineProps({
   finished: { type: Number, required: true },
