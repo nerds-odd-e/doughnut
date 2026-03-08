@@ -3,10 +3,10 @@ import {
   existsSync,
   mkdirSync,
   mkdtempSync,
-  rmdir,
+  rm,
   writeFileSync,
 } from 'node:fs'
-import { execSync } from 'node:child_process'
+import { spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import mcpClient from '../support/mcp_client'
@@ -22,11 +22,28 @@ import type { ExpectedFile } from '../start/downloadChecker'
 
 const CLI_BUNDLE_PATH = 'cli/dist/doughnut-cli.bundle.mjs'
 
+function runSync(
+  cmd: string,
+  opts: { cwd?: string; env?: NodeJS.ProcessEnv } = {}
+) {
+  const result = spawnSync(cmd, [], {
+    ...opts,
+    shell: true,
+    stdio: 'pipe',
+    encoding: 'utf8',
+  })
+  if (result.stdout) console.log(result.stdout)
+  if (result.stderr) console.error(result.stderr)
+  if (result.status !== 0) {
+    throw new Error(`Command failed with exit code ${result.status}`)
+  }
+}
+
 function bundleAndCopyCliToBuildOutput(
   repoRoot: string,
   env?: NodeJS.ProcessEnv
 ) {
-  execSync('pnpm cli:bundle', { cwd: repoRoot, stdio: 'inherit', env })
+  runSync('pnpm cli:bundle', { cwd: repoRoot, env })
   const src = join(repoRoot, CLI_BUNDLE_PATH)
   const destDir = join(
     repoRoot,
@@ -39,7 +56,7 @@ function bundleAndCopyCliToBuildOutput(
 function ensureCliBundleExists(repoRoot: string): string {
   const bundlePath = join(repoRoot, CLI_BUNDLE_PATH)
   if (!existsSync(bundlePath)) {
-    execSync('pnpm cli:bundle', { cwd: repoRoot, stdio: 'inherit' })
+    runSync('pnpm cli:bundle', { cwd: repoRoot })
   }
   return bundlePath
 }
@@ -91,7 +108,7 @@ const commonConfig = {
               resolve(null)
               return
             }
-            rmdir(folderName, { maxRetries: 10, recursive: true }, (err) => {
+            rm(folderName, { maxRetries: 10, recursive: true }, (err) => {
               if (err) {
                 console.error(err)
                 return reject(err)
@@ -241,10 +258,7 @@ const commonConfig = {
           const repoRoot = path.resolve(__dirname, '..', '..')
           const mcpServerDir = path.join(repoRoot, 'mcp-server')
           try {
-            execSync('pnpm bundle', {
-              cwd: mcpServerDir,
-              stdio: 'inherit',
-            })
+            runSync('pnpm bundle', { cwd: mcpServerDir })
             return true
           } catch (error) {
             console.error('Failed to bundle MCP server:', error)
@@ -290,7 +304,7 @@ const commonConfig = {
           }
           const script = await response.text()
           writeFileSync(installScriptPath, script, { mode: 0o755 })
-          execSync(`bash ${installScriptPath}`, {
+          runSync(`bash ${installScriptPath}`, {
             env: {
               ...process.env,
               INSTALL_PREFIX: installDir,
@@ -348,6 +362,43 @@ const commonConfig = {
             proc.stdout?.on('data', (chunk: Buffer) => {
               stdout += chunk.toString()
             })
+            proc.stdin?.end()
+            proc.on('close', (code) => {
+              if (code === 0) resolve(stdout)
+              else reject(new Error(`CLI exited with code ${code}`))
+            })
+            proc.on('error', reject)
+          })
+        },
+        async runInstalledCli({
+          doughnutPath,
+          input,
+          args,
+          env,
+        }: {
+          doughnutPath: string
+          input?: string
+          args?: string[]
+          env?: NodeJS.ProcessEnv
+        }) {
+          const { spawn } = await import('node:child_process')
+          return new Promise<string>((resolve, reject) => {
+            const proc = spawn(
+              process.execPath,
+              [doughnutPath, ...(args ?? [])],
+              {
+                cwd: path.dirname(doughnutPath),
+                env: { ...process.env, ...env },
+                stdio: ['pipe', 'pipe', 'pipe'],
+              }
+            )
+            let stdout = ''
+            proc.stdout?.on('data', (chunk: Buffer) => {
+              stdout += chunk.toString()
+            })
+            if (input !== undefined) {
+              proc.stdin?.write(input)
+            }
             proc.stdin?.end()
             proc.on('close', (code) => {
               if (code === 0) resolve(stdout)

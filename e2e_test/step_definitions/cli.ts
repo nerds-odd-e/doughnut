@@ -32,17 +32,18 @@ When('I install the CLI from localhost without affecting my system', () => {
 
 When('I run the installed doughnut command', () => {
   cy.get<string>('@doughnutPath').then((doughnutPath) => {
-    cy.exec(`echo "exit" | ${doughnutPath}`, { timeout: 5000 })
-      .its('stdout')
-      .as('doughnutOutput')
+    cy.task<string>('runInstalledCli', { doughnutPath, input: 'exit\n' }).as(
+      'doughnutOutput'
+    )
   })
 })
 
 When('I run the installed doughnut version command', () => {
   cy.get<string>('@doughnutPath').then((doughnutPath) => {
-    cy.exec(`${doughnutPath} version`, { timeout: 5000 })
-      .its('stdout')
-      .as('doughnutOutput')
+    cy.task<string>('runInstalledCli', {
+      doughnutPath,
+      args: ['version'],
+    }).as('doughnutOutput')
   })
 })
 
@@ -66,12 +67,11 @@ When(
   'I run the installed doughnut update command with BASE_URL from localhost',
   () => {
     cy.get<string>('@doughnutPath').then((doughnutPath) => {
-      cy.exec(`${doughnutPath} update`, {
-        timeout: 15000,
+      cy.task<string>('runInstalledCli', {
+        doughnutPath,
+        args: ['update'],
         env: { BASE_URL },
-      })
-        .its('stdout')
-        .as('doughnutOutput')
+      }).as('doughnutOutput')
     })
   }
 )
