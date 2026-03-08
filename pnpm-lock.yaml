@@ -116,8 +116,8 @@ importers:
         specifier: ^10.3.0
         version: 10.3.0
       syncpack:
-        specifier: ^14.0.1
-        version: 14.0.1
+        specifier: ^14.1.0
+        version: 14.1.0
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -5609,48 +5609,48 @@ packages:
   symbol-tree@3.2.4:
     resolution: {integrity: sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==}
 
-  syncpack-darwin-arm64@14.0.1:
-    resolution: {integrity: sha512-OkHxtTqEH4pYtaH9N6+GhIrBL22JxCkOfyCsTujDO4srw3RrPxiviXaTamcDCfbJ0Z8skc7hX8fkR0RRTHvsQw==}
+  syncpack-darwin-arm64@14.1.0:
+    resolution: {integrity: sha512-w7Ggqfy5XlzkGN7HcX8wH+hyd09rq9/UT+lkTPApZ6AekEqmxP3RLnRLTe9GiFWyZRxgLVAf7YWZ2k534m07PQ==}
     cpu: [arm64]
     os: [darwin]
 
-  syncpack-darwin-x64@14.0.1:
-    resolution: {integrity: sha512-1jpmxaODUidrTAjJ9ife3bKK9Nlr3i9Osg2N8ldKcKjoH10bEX9ZMmyfLDizvOib0sC2oSyl/MWLztyFUGDQgg==}
+  syncpack-darwin-x64@14.1.0:
+    resolution: {integrity: sha512-iHjuvRtXtRHaf9h+N0eRdh55fye7XXqfXwFOslq+opDqUodTJwmqeiWYHencf+++I0LS3OZ5LHzQi79835Do+A==}
     cpu: [x64]
     os: [darwin]
 
-  syncpack-linux-arm64-musl@14.0.1:
-    resolution: {integrity: sha512-P0XS2G7pDJogH8MNyPC58fP30XjQrxCdTGVaxw7nJLvlx8LbapV1xkUw5kQl1fRABgS3dp9kIbM91O285MZtUA==}
+  syncpack-linux-arm64-musl@14.1.0:
+    resolution: {integrity: sha512-YH/BDnW9AAzW9/0w2PSALTt81usfatD1CeorIHlL7rKpXaZMTsxTNrMqJLdVUDCXdQeRw9ldUEiPzteQm6zbuA==}
     cpu: [arm64]
     os: [linux]
 
-  syncpack-linux-arm64@14.0.1:
-    resolution: {integrity: sha512-WArMxrhEKiS3beHuIyFW5uGL/syFVBHZNQBTy21H4wj5bhe8NR8RV59lOERWhMRvZwSCgh1H01sdn5Ur5zY7UA==}
+  syncpack-linux-arm64@14.1.0:
+    resolution: {integrity: sha512-f75fBuveMnLrciM7tRkJHnu7Dxv5Be9YHpu5onpdG1V2sKsUPeiZptNeRH5mMNSbZFOfx68spZB7Gu7riRTIkw==}
     cpu: [arm64]
     os: [linux]
 
-  syncpack-linux-x64-musl@14.0.1:
-    resolution: {integrity: sha512-0k+03/bHs8ybvJuHBXu/gg5HiPC9ulHF54EjoI2cLSxXc4ZDNBeCZ/Ksi3oyYkew9iYbY+0AV3wW7jSEDMlpXQ==}
+  syncpack-linux-x64-musl@14.1.0:
+    resolution: {integrity: sha512-9+D/QpL/AjYG6r2el95EkAJkm3u1CJV9dAmeAAehwJ2mDg5LMnhdMJkdaayOM9opQcjESCYOVCXU4PCgy3TCRg==}
     cpu: [x64]
     os: [linux]
 
-  syncpack-linux-x64@14.0.1:
-    resolution: {integrity: sha512-teT0FAp1n7HCxDoYSsasczyjSogxObNKWpmKKhgAKDE1siK8yMm3q2XhTz9gyfRWHGTmm+Ab1lguC0c2pZYhqQ==}
+  syncpack-linux-x64@14.1.0:
+    resolution: {integrity: sha512-Yoin2bc1VXpWoN+iQjJQ6GijEOBej7Y8VB2dmj1DKVRRMT8Sb2mapEv0B5NLKrXh20BR8A5JeGxVVoF510WETQ==}
     cpu: [x64]
     os: [linux]
 
-  syncpack-windows-arm64@14.0.1:
-    resolution: {integrity: sha512-XOofiE0j/qLqEF7jBdP5yMSZjkoVoGxqXaO8nEGFJuAXHelMf2IVmeudCwkFF4+KoNRXAkkO6wm2a1PiC46rZw==}
+  syncpack-windows-arm64@14.1.0:
+    resolution: {integrity: sha512-LwxunC5lU4Febq7fwWSc/+pN3e8GHVqQaQJSHcGSSWTwxJ1Rep13FYCKESPT6GW4/GW6Sa5rwGhG1n6Ldo4JmA==}
     cpu: [arm64]
     os: [win32]
 
-  syncpack-windows-x64@14.0.1:
-    resolution: {integrity: sha512-LnlE4bGaABCAUchlgivgLu5kV1zRS1wQqRlJmgzqWVniDW+HG7jLvRHQHZCbskavQHSZZ1p4JD+r+1+SufLNrw==}
+  syncpack-windows-x64@14.1.0:
+    resolution: {integrity: sha512-ECZFzBWph0P9CM1P6Mwmj8C8U/uuMfBdbBKrCVlqUMiFxKiWq5eiGGRqFFm+DWPD+GGLmmTNgdok0wu4CB/lMg==}
     cpu: [x64]
     os: [win32]
 
-  syncpack@14.0.1:
-    resolution: {integrity: sha512-vWb97PWQFsYJyiwPJkxP6eM9uy2FOkea8QfE+xOOsWFAafD5oAtVG6S/6g7qM4SQ8FcV7pJSnmcW8kIMNacm4g==}
+  syncpack@14.1.0:
+    resolution: {integrity: sha512-sk0u95rpgpLeW/SWqeZ3q5jsfJwAZ4FqFqy3mG6WBEbRKbaEK3LA69Q7ocnuCxHrWA54kg7Stu63fSY/pr0tmw==}
     engines: {node: '>=14.17.0'}
     hasBin: true
 
@@ -12313,40 +12313,40 @@ snapshots:
 
   symbol-tree@3.2.4: {}
 
-  syncpack-darwin-arm64@14.0.1:
+  syncpack-darwin-arm64@14.1.0:
     optional: true
 
-  syncpack-darwin-x64@14.0.1:
+  syncpack-darwin-x64@14.1.0:
     optional: true
 
-  syncpack-linux-arm64-musl@14.0.1:
+  syncpack-linux-arm64-musl@14.1.0:
     optional: true
 
-  syncpack-linux-arm64@14.0.1:
+  syncpack-linux-arm64@14.1.0:
     optional: true
 
-  syncpack-linux-x64-musl@14.0.1:
+  syncpack-linux-x64-musl@14.1.0:
     optional: true
 
-  syncpack-linux-x64@14.0.1:
+  syncpack-linux-x64@14.1.0:
     optional: true
 
-  syncpack-windows-arm64@14.0.1:
+  syncpack-windows-arm64@14.1.0:
     optional: true
 
-  syncpack-windows-x64@14.0.1:
+  syncpack-windows-x64@14.1.0:
     optional: true
 
-  syncpack@14.0.1:
+  syncpack@14.1.0:
     optionalDependencies:
-      syncpack-darwin-arm64: 14.0.1
-      syncpack-darwin-x64: 14.0.1
-      syncpack-linux-arm64: 14.0.1
-      syncpack-linux-arm64-musl: 14.0.1
-      syncpack-linux-x64: 14.0.1
-      syncpack-linux-x64-musl: 14.0.1
-      syncpack-windows-arm64: 14.0.1
-      syncpack-windows-x64: 14.0.1
+      syncpack-darwin-arm64: 14.1.0
+      syncpack-darwin-x64: 14.1.0
+      syncpack-linux-arm64: 14.1.0
+      syncpack-linux-arm64-musl: 14.1.0
+      syncpack-linux-x64: 14.1.0
+      syncpack-linux-x64-musl: 14.1.0
+      syncpack-windows-arm64: 14.1.0
+      syncpack-windows-x64: 14.1.0
 
   systeminformation@5.31.1: {}
 
