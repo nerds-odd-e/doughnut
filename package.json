@@ -128,7 +128,8 @@
       "immutable": ">=5.1.5",
       "mailparser": ">=3.9.3",
       "@tootallnate/once": ">=3.0.1",
-      "dompurify": ">=3.3.2"
+      "dompurify": ">=3.3.2",
+      "express-rate-limit": ">=8.2.2"
     },
     "onlyBuiltDependencies": [
       "@badeball/cypress-cucumber-preprocessor",
