@@ -41,14 +41,6 @@ export const questionGenerationService = () => ({
         .chatCompletion()
         .requestMessageMatches({
           role: 'system',
-          content: '.*Memory Assistant.*',
-        })
-        .stubJsonSchemaResponse(reply)
-      await mock_services
-        .openAi()
-        .chatCompletion()
-        .requestMessageMatches({
-          role: 'system',
           content: '.*Question Designer.*',
         })
         .stubQuestionGeneration(reply)
