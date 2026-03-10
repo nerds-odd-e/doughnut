@@ -342,6 +342,46 @@ const commonConfig = {
             proc.on('error', reject)
           })
         },
+        async runCliDirectWithInputAndPty({
+          input,
+          env,
+        }: {
+          input: Buffer | string
+          env?: NodeJS.ProcessEnv
+        }) {
+          const { spawn } = await import('node:child_process')
+          const repoRoot = path.resolve(__dirname, '..', '..')
+          const bundlePath = ensureCliBundleExists(repoRoot)
+          const scriptArgs =
+            process.platform === 'darwin'
+              ? ['-q', '/dev/null', process.execPath, bundlePath]
+              : [
+                  '-q',
+                  '-c',
+                  `"${process.execPath}" "${bundlePath}"`,
+                  '/dev/null',
+                ]
+          return new Promise<string>((resolve, reject) => {
+            const proc = spawn('script', scriptArgs, {
+              cwd: repoRoot,
+              env: { ...process.env, ...env },
+              stdio: ['pipe', 'pipe', 'pipe'],
+            })
+            let stdout = ''
+            proc.stdout?.on('data', (chunk: Buffer) => {
+              stdout += chunk.toString()
+            })
+            const buf =
+              typeof input === 'string' ? Buffer.from(input, 'utf8') : input
+            proc.stdin?.write(buf)
+            proc.stdin?.end()
+            proc.on('close', (code) => {
+              if (code === 0) resolve(stdout)
+              else reject(new Error(`CLI exited with code ${code}`))
+            })
+            proc.on('error', reject)
+          })
+        },
         async runCliDirectWithArgs({
           args,
           env,

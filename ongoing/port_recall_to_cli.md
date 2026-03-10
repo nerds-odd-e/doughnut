@@ -89,7 +89,7 @@
 
 ---
 
-## Phase 3.1: MCQ with up/down/Enter selection
+## Phase 3.1: MCQ with up/down/Enter selection ✅ DONE
 
 **User behavior**: When recalling an MCQ, user can use up/down arrow keys to highlight a choice and Enter to select it (in addition to typing the number). Matches the UX pattern used for access token list selection.
 

@@ -101,6 +101,24 @@ When(
   }
 )
 
+When(
+  'I run the doughnut command in interactive mode with down-arrow selection for {string}',
+  (command: string) => {
+    const downArrow = '\x1b[B'
+    cy.get<string>('@cliConfigDir').then((configDir) =>
+      cy
+        .task('runCliDirectWithInputAndPty', {
+          input: `${command}\n${downArrow}\r\nexit\n`,
+          env: {
+            DOUGHNUT_CONFIG_DIR: configDir,
+            DOUGHNUT_API_BASE_URL: BASE_URL,
+          },
+        })
+        .as('doughnutOutput')
+    )
+  }
+)
+
 When('I run the doughnut command with -c {string}', (input: string) => {
   runCliWithConfig(['-c', input])
 })

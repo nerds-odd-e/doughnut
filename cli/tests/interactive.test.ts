@@ -10,6 +10,18 @@ import {
 } from '../src/interactive.js'
 
 let useManyCommandsForScrollTests = false
+const { mockRecallNext, mockAnswerQuiz } = vi.hoisted(() => ({
+  mockRecallNext: vi.fn(),
+  mockAnswerQuiz: vi.fn(),
+}))
+vi.mock('../src/recall.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../src/recall.js')>()
+  return {
+    ...actual,
+    recallNext: mockRecallNext,
+    answerQuiz: mockAnswerQuiz,
+  }
+})
 vi.mock('../src/help.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../src/help.js')>()
   const manyCommands = Array.from({ length: 12 }, (_, i) => ({
@@ -948,6 +960,121 @@ describe('TTY token list interactive mode', () => {
     const remaining = listAccessTokens()
     expect(remaining).toHaveLength(2)
     expect(remaining.map((t) => t.label)).not.toContain('Alpha')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+})
+
+describe('TTY MCQ choice selection', () => {
+  let writeSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    mockRecallNext.mockResolvedValue({
+      type: 'mcq',
+      recallPromptId: 100,
+      stem: 'What is 2+2?',
+      choices: ['4', '3', '5'],
+    })
+    mockAnswerQuiz.mockResolvedValue({ correct: true })
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
+    vi.spyOn(process, 'exit').mockImplementation(
+      (() => undefined) as unknown as typeof process.exit
+    )
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  async function submitRecallNext(
+    stdin: ReturnType<typeof createMockTTYStdin>
+  ) {
+    for (const ch of '/recall next ') {
+      stdin.emit('keypress', ch, {
+        name: ch === ' ' ? 'space' : undefined,
+        ctrl: false,
+        meta: false,
+      })
+    }
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '\r', {
+      name: 'return',
+      shift: false,
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+  }
+
+  test('down arrow moves highlight to second choice', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    writeSpy.mockClear()
+
+    await submitRecallNext(stdin)
+
+    const afterSubmit = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(afterSubmit).toContain('  1. 4')
+    expect(afterSubmit).toContain('  2. 3')
+
+    writeSpy.mockClear()
+    stdin.emit('keypress', undefined, {
+      name: 'down',
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(output).toContain('\x1b[7m') // REVERSE on highlighted line
+    expect(output).toContain('  2. 3')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('Enter submits highlighted choice and calls answerQuiz', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+
+    await submitRecallNext(stdin)
+
+    stdin.emit('keypress', '\r', {
+      name: 'return',
+      shift: false,
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+    await new Promise((r) => setTimeout(r, 50))
+
+    expect(mockAnswerQuiz).toHaveBeenCalledWith(100, 0)
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(output).toContain('Recalled successfully')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('typed number still works', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+
+    await submitRecallNext(stdin)
+
+    stdin.emit('keypress', '2', { name: undefined, ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '\r', {
+      name: 'return',
+      shift: false,
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    expect(mockAnswerQuiz).toHaveBeenCalledWith(100, 1) // "2" = choiceIndex 1
 
     stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })

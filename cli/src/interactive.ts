@@ -286,6 +286,10 @@ function getTerminalWidth(): number {
 
 const COMMANDS_HINT = `${GREY}  / commands${RESET}`
 
+function formatMcqChoiceLines(choices: string[]): string[] {
+  return choices.map((c, i) => `  ${i + 1}. ${c}`)
+}
+
 function buildSuggestionLines(
   buffer: string,
   highlightIndex: number
@@ -316,18 +320,29 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
   let tokenHighlightIndex = 0
   let tokenListAction: 'set-default' | 'remove' | 'remove-completely' =
     'set-default'
+  let mcqChoiceHighlightIndex = 0
 
   function drawBox() {
     const width = getTerminalWidth()
     const contentLines = buildBoxLines(buffer, width)
     const boxLines = renderBox(contentLines, width).split('\n')
+    const mcqPending =
+      pendingRecallAnswer && 'recallPromptId' in pendingRecallAnswer
     const suggestionLines = tokenListItems
       ? formatHighlightedList(
           formatTokenLines(tokenListItems, getDefaultTokenLabel()),
           8,
           tokenHighlightIndex
         )
-      : buildSuggestionLines(buffer, highlightIndex)
+      : mcqPending
+        ? formatHighlightedList(
+            formatMcqChoiceLines(
+              (pendingRecallAnswer as { choices: string[] }).choices
+            ),
+            8,
+            mcqChoiceHighlightIndex
+          )
+        : buildSuggestionLines(buffer, highlightIndex)
     const newTotalLines = boxLines.length + suggestionLines.length
 
     if (linesAboveCursor > 0) {
@@ -375,6 +390,62 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
         process.stdout.write(`\x1b[${1}B\r\n`)
         removeResizeListener()
         process.exit(0)
+      }
+      const mcqPending =
+        pendingRecallAnswer && 'recallPromptId' in pendingRecallAnswer
+      if (mcqPending) {
+        const { recallPromptId, choices } = pendingRecallAnswer
+        if (key.name === 'up' || key.name === 'down') {
+          const n = choices.length
+          mcqChoiceHighlightIndex =
+            key.name === 'up'
+              ? (mcqChoiceHighlightIndex - 1 + n) % n
+              : (mcqChoiceHighlightIndex + 1) % n
+          drawBox()
+        } else if (key.name === 'return' && !key.shift) {
+          const choiceNum = Number.parseInt(buffer.trim(), 10)
+          const validTyped = choiceNum >= 1 && choiceNum <= choices.length
+          const choiceIndex = validTyped
+            ? choiceNum - 1
+            : mcqChoiceHighlightIndex
+          if (linesAboveCursor > 0) {
+            process.stdout.write(`\x1b[${linesAboveCursor}A`)
+          }
+          process.stdout.write('\r')
+          for (let i = 0; i < prevTotalLines; i++) {
+            process.stdout.write(`\x1b[2K\n`)
+          }
+          if (prevTotalLines > 1) {
+            process.stdout.write(`\x1b[${prevTotalLines - 1}A`)
+          }
+          buffer = ''
+          pendingRecallAnswer = null
+          mcqChoiceHighlightIndex = 0
+          linesAboveCursor = 0
+          prevTotalLines = 0
+          try {
+            const { correct } = await answerQuiz(recallPromptId, choiceIndex)
+            process.stdout.write(
+              `${correct ? 'Correct!' : 'Incorrect'}\nRecalled successfully\n`
+            )
+          } catch (err) {
+            process.stdout.write(
+              `${err instanceof Error ? err.message : String(err)}\n`
+            )
+          }
+          drawBox()
+        } else if (str && !key.ctrl && !key.meta) {
+          buffer += str
+          drawBox()
+        } else if (key.name === 'backspace') {
+          if (buffer.length > 0) {
+            buffer = buffer.slice(0, -1)
+            drawBox()
+          }
+        } else {
+          drawBox()
+        }
+        return
       }
       if (tokenListItems) {
         if (key.name === 'up' || key.name === 'down') {
@@ -503,6 +574,9 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           }
           linesAboveCursor = 0
           prevTotalLines = 0
+          if (pendingRecallAnswer && 'recallPromptId' in pendingRecallAnswer) {
+            mcqChoiceHighlightIndex = 0
+          }
           drawBox()
         }
       } else if (key.name === 'backspace') {
