@@ -29,7 +29,7 @@
 
 ---
 
-## Phase 2: Recall one Just Review note
+## Phase 2.1: Recall one Just Review note (title only)
 
 **User behavior**: User runs `/recall next`; if next note is Just Review (no question), CLI shows note title and prompts "Yes, I remember? (y/n)"; user answers and note is marked as recalled.
 
@@ -37,7 +37,7 @@
 
 **CLI changes**:
 
-- In `recall.ts`: `recallNext()` — fetch due list, fetch question for first tracker; if no question, prompt y/n, call `markAsRecalled`.
+- In `recall.ts`: `recallNext()` — fetch due list, fetch question for first tracker; if no question, show `note.noteTopology.title`, prompt y/n, call `markAsRecalled`.
 - Wire `/recall next` in `interactive.ts`.
 
 **Tests**:
@@ -46,6 +46,27 @@
 - **UT**: Mock question returns null → Just Review path; mock markAsRecalled; test invalid y/n input; test no notes due; test no default token.
 
 **Cleanup**: Remove any unused branches; only code exercised by E2E/UT.
+
+---
+
+## Phase 2.2: Just Review with markdown note content
+
+**User behavior**: User runs `/recall next`; for Just Review, CLI shows note title + note details (markdown rendered to terminal) before prompting "Yes, I remember? (y/n)". Matches web behavior where full note is visible.
+
+**APIs**: Same as 2.1. Note details come from `MemoryTracker.showMemoryTracker` → `note.details` (or from question/recall prompt when available).
+
+**CLI changes**:
+
+- Add `markdansi` (or equivalent) dependency to CLI.
+- Extend Just Review display: after title, render `note.details` as markdown (ANSI) when present.
+- Introduce `renderMarkdownToTerminal(md)` helper; use for note details.
+
+**Tests**:
+
+- **E2E**: Background with 1 note due (Just Review) whose details contain markdown (e.g. `**bold**`, list). Run `/recall next`, verify rendered output (title + formatted details), answer y, verify success.
+- **UT**: `renderMarkdownToTerminal` outputs ANSI for headings, bold, lists; empty/null details renders nothing; wrapping respects terminal width (or fixed width in non-TTY).
+
+**Cleanup**: No dead code; markdown helper only used where E2E/UT exercise it.
 
 ---
 
@@ -157,6 +178,7 @@
 
 ## Interim Behaviors (remove when superseded)
 
+- **Phase 2.1**: Just Review with title only is interim; Phase 2.2 replaces with full note (title + markdown details).
 - **Phase 7**: If `/recall-status 3` is redundant with Phase 6's in-session "load more", remove Phase 7 or merge.
 - Any "quick access" command (e.g. `/recall-now` as alias) that gets replaced by `/recall` should be removed.
 
@@ -169,6 +191,7 @@
 3. **SDK**: Use `RecallsController.recalling`, `MemoryTrackerController.askAQuestion`, `MemoryTrackerController.markAsRecalled`, `RecallPromptController.answerQuiz`, `RecallPromptController.answerSpelling` from `packages/generated/doughnut-backend-api/sdk.gen.ts`.
 4. **E2E setup**: Reuse `I have a valid Doughnut Access Token`, `runCliWithConfig`; add steps for "notes due for recall" (assimilation + time travel) similar to `e2e_test/features/recall/`.
 5. **CLI E2E**: Follow `e2e_test/features/cli/cli_access_token.feature` pattern; new `cli_recall.feature` with `@withCliConfig`.
+6. **Terminal markdown (Phase 2.2)**: Use `markdansi` for rendering note details to ANSI; `render(md, { width })` fits CLI ESM/Node setup.
 
 ---
 
@@ -177,10 +200,11 @@
 | Phase | Command(s)                   | User Value             | Dependencies                |
 | ----- | ---------------------------- | ---------------------- | --------------------------- |
 | 1     | `/recall-status`             | See count quickly       | runWithDefaultBackendClient  |
-| 2     | `/recall next` (Just Review) | Recall one note        | Phase 1                     |
-| 3     | `/recall next` (MCQ)         | Answer one MCQ         | Phase 2                     |
+| 2.1   | `/recall next` (Just Review) | Recall one note        | Phase 1                     |
+| 2.2   | Just Review + markdown        | Full note visible      | Phase 2.1                   |
+| 3     | `/recall next` (MCQ)         | Answer one MCQ         | Phase 2.1                   |
 | 4     | `/recall next` (spelling)     | Answer one spelling    | Phase 3                     |
-| 5     | `/recall`                    | Full session           | Phases 2–4                  |
+| 5     | `/recall`                    | Full session           | Phases 2.2, 3, 4           |
 | 6     | `/recall` load more          | Notes from future days | Phase 5                     |
 | 7     | `/recall-status N`           | Optional; count N days | Phase 1                     |
 | 8     | Contest/Regenerate           | Edge case, low priority| Phase 3                     |
