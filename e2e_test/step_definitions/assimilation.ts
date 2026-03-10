@@ -56,17 +56,37 @@ When('I am assimilating the note {string}', (noteTitle: string) => {
 })
 
 Then('I assimilate the note {string}', (noteTitle: string) => {
+  const startTime = Date.now()
   start.jumpToNotePage(noteTitle).moreOptions().assimilateNote()
+  cy.then(() => {
+    if (Cypress.env('RECORD_E2E_TIMING')) {
+      cy.task('recordTiming', {
+        label: 'assimilate-note',
+        duration: Date.now() - startTime,
+        note: noteTitle,
+      })
+    }
+  })
 })
 
 Then(
   'I assimilate the note {string} with the option of remembering spelling',
   (noteTitle: string) => {
+    const startTime = Date.now()
     start
       .jumpToNotePage(noteTitle)
       .moreOptions()
       .openAssimilationPage()
       .assimilateWithSpellingOption()
+    cy.then(() => {
+      if (Cypress.env('RECORD_E2E_TIMING')) {
+        cy.task('recordTiming', {
+          label: 'assimilate-note',
+          duration: Date.now() - startTime,
+          note: noteTitle,
+        })
+      }
+    })
   }
 )
 

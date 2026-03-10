@@ -5,6 +5,7 @@ export default defineConfig({
   ...commonConfig,
   env: {
     TAGS: 'not @ignore',
+    RECORD_E2E_TIMING: process.env.RECORD_E2E_TIMING,
   },
   viewportWidth: 1200,
   viewportHeight: 800,

@@ -1,6 +1,7 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import { mock_services } from '../start'
 import start from '../start'
+import { submittableForm } from '../start/forms'
 
 const BASE_URL = 'http://localhost:9081'
 const GOOGLE_MOCK_URL = 'http://localhost:5003'
@@ -19,23 +20,68 @@ function runCliWithConfig(args: string[]) {
   )
 }
 
+function taskWithCliTiming(
+  taskName: string,
+  taskArg: { input: string; env: Record<string, string> }
+) {
+  const startTime = Date.now()
+  return cy.task(taskName, taskArg).then((output: unknown) => {
+    if (Cypress.env('RECORD_E2E_TIMING')) {
+      return cy
+        .task('recordTiming', {
+          label: 'cli-run',
+          duration: Date.now() - startTime,
+        })
+        .then(() => cy.wrap(output))
+    }
+    return cy.wrap(output)
+  })
+}
+
 Given('the backend is serving the CLI and install script', () => {
   cy.request('GET', `${BASE_URL}/install`).its('status').should('eq', 200)
 })
 
 Given('I have the CLI configured with a valid access token', () => {
-  start
-    .mainMenu()
-    .userOptions()
-    .manageAccessTokens()
-    .generateToken('Recall CLI Token')
-    .then((token) => {
-      cy.wrap(token).as('savedAccessToken')
-    })
+  const totalStart = Date.now()
+  let t0 = Date.now()
+
+  const record = (label: string) => {
+    if (Cypress.env('RECORD_E2E_TIMING')) {
+      cy.task('recordTiming', { label, duration: Date.now() - t0 })
+    }
+    t0 = Date.now()
+  }
+
+  start.mainMenu()
+  cy.then(() => record('token-nav'))
+
+  cy.findByRole('button', { name: 'Account' }).click()
+  cy.then(() => record('token-account'))
+
+  cy.findByRole('link', { name: 'Manage Access Tokens' }).click({ force: true })
+  cy.then(() => record('token-manageTokens'))
+
+  cy.findByRole('button', { name: 'Generate Token' }).click()
+  submittableForm.submitWith({ Label: 'Recall CLI Token' })
+  cy.get('[data-testid="token-result"]')
+    .invoke('text')
+    .then((token) => cy.wrap(token).as('savedAccessToken'))
+  cy.then(() => record('token-generateToken'))
+
   cy.get<string>('@savedAccessToken').then((token) =>
     runCliWithConfig(['-c', `/add-access-token ${token}`])
   )
   cy.get('@doughnutOutput').should('include', 'Token added')
+  cy.then(() => {
+    record('token-cli-add')
+    if (Cypress.env('RECORD_E2E_TIMING')) {
+      cy.task('recordTiming', {
+        label: 'token-setup',
+        duration: Date.now() - totalStart,
+      })
+    }
+  })
 })
 
 Given('the CLI is built with version {string}', (version: string) => {
@@ -71,15 +117,13 @@ When(
   'I run the doughnut command in interactive mode with input {string}',
   (input: string) => {
     cy.get<string>('@cliConfigDir').then((configDir) =>
-      cy
-        .task('runCliDirectWithInput', {
-          input: `${input}\nexit\n`,
-          env: {
-            DOUGHNUT_CONFIG_DIR: configDir,
-            DOUGHNUT_API_BASE_URL: BASE_URL,
-          },
-        })
-        .as('doughnutOutput')
+      taskWithCliTiming('runCliDirectWithInput', {
+        input: `${input}\nexit\n`,
+        env: {
+          DOUGHNUT_CONFIG_DIR: configDir,
+          DOUGHNUT_API_BASE_URL: BASE_URL,
+        },
+      }).as('doughnutOutput')
     )
   }
 )
@@ -88,15 +132,13 @@ When(
   'I run the doughnut command in interactive mode with input {string} and {string}',
   (command: string, answer: string) => {
     cy.get<string>('@cliConfigDir').then((configDir) =>
-      cy
-        .task('runCliDirectWithInput', {
-          input: `${command}\n${answer}\nexit\n`,
-          env: {
-            DOUGHNUT_CONFIG_DIR: configDir,
-            DOUGHNUT_API_BASE_URL: BASE_URL,
-          },
-        })
-        .as('doughnutOutput')
+      taskWithCliTiming('runCliDirectWithInput', {
+        input: `${command}\n${answer}\nexit\n`,
+        env: {
+          DOUGHNUT_CONFIG_DIR: configDir,
+          DOUGHNUT_API_BASE_URL: BASE_URL,
+        },
+      }).as('doughnutOutput')
     )
   }
 )
@@ -105,15 +147,13 @@ When(
   'I run the doughnut command in interactive mode with input {string} and {string} and {string}',
   (command: string, answer1: string, answer2: string) => {
     cy.get<string>('@cliConfigDir').then((configDir) =>
-      cy
-        .task('runCliDirectWithInput', {
-          input: `${command}\n${answer1}\n${answer2}\nexit\n`,
-          env: {
-            DOUGHNUT_CONFIG_DIR: configDir,
-            DOUGHNUT_API_BASE_URL: BASE_URL,
-          },
-        })
-        .as('doughnutOutput')
+      taskWithCliTiming('runCliDirectWithInput', {
+        input: `${command}\n${answer1}\n${answer2}\nexit\n`,
+        env: {
+          DOUGHNUT_CONFIG_DIR: configDir,
+          DOUGHNUT_API_BASE_URL: BASE_URL,
+        },
+      }).as('doughnutOutput')
     )
   }
 )
@@ -122,15 +162,13 @@ When(
   'I run the doughnut command in interactive mode with input {string} and {string} and {string} and {string}',
   (command: string, answer1: string, answer2: string, answer3: string) => {
     cy.get<string>('@cliConfigDir').then((configDir) =>
-      cy
-        .task('runCliDirectWithInput', {
-          input: `${command}\n${answer1}\n${answer2}\n${answer3}\nexit\n`,
-          env: {
-            DOUGHNUT_CONFIG_DIR: configDir,
-            DOUGHNUT_API_BASE_URL: BASE_URL,
-          },
-        })
-        .as('doughnutOutput')
+      taskWithCliTiming('runCliDirectWithInput', {
+        input: `${command}\n${answer1}\n${answer2}\n${answer3}\nexit\n`,
+        env: {
+          DOUGHNUT_CONFIG_DIR: configDir,
+          DOUGHNUT_API_BASE_URL: BASE_URL,
+        },
+      }).as('doughnutOutput')
     )
   }
 )
@@ -145,15 +183,13 @@ When(
     answer4: string
   ) => {
     cy.get<string>('@cliConfigDir').then((configDir) =>
-      cy
-        .task('runCliDirectWithInput', {
-          input: `${command}\n${answer1}\n${answer2}\n${answer3}\n${answer4}\nexit\n`,
-          env: {
-            DOUGHNUT_CONFIG_DIR: configDir,
-            DOUGHNUT_API_BASE_URL: BASE_URL,
-          },
-        })
-        .as('doughnutOutput')
+      taskWithCliTiming('runCliDirectWithInput', {
+        input: `${command}\n${answer1}\n${answer2}\n${answer3}\n${answer4}\nexit\n`,
+        env: {
+          DOUGHNUT_CONFIG_DIR: configDir,
+          DOUGHNUT_API_BASE_URL: BASE_URL,
+        },
+      }).as('doughnutOutput')
     )
   }
 )
@@ -162,30 +198,26 @@ When(
   'I run a recall session and recall all due notes, declining load more',
   () => {
     cy.get<string>('@cliConfigDir').then((configDir) =>
-      cy
-        .task('runCliDirectWithInput', {
-          input: '/recall\ny\ny\nn\nexit\n',
-          env: {
-            DOUGHNUT_CONFIG_DIR: configDir,
-            DOUGHNUT_API_BASE_URL: BASE_URL,
-          },
-        })
-        .as('doughnutOutput')
+      taskWithCliTiming('runCliDirectWithInput', {
+        input: '/recall\ny\ny\nn\nexit\n',
+        env: {
+          DOUGHNUT_CONFIG_DIR: configDir,
+          DOUGHNUT_API_BASE_URL: BASE_URL,
+        },
+      }).as('doughnutOutput')
     )
   }
 )
 
 When('I run a recall session with load more from future days', () => {
   cy.get<string>('@cliConfigDir').then((configDir) =>
-    cy
-      .task('runCliDirectWithInput', {
-        input: '/recall\ny\ny\ny\ny\nexit\n',
-        env: {
-          DOUGHNUT_CONFIG_DIR: configDir,
-          DOUGHNUT_API_BASE_URL: BASE_URL,
-        },
-      })
-      .as('doughnutOutput')
+    taskWithCliTiming('runCliDirectWithInput', {
+      input: '/recall\ny\ny\ny\ny\nexit\n',
+      env: {
+        DOUGHNUT_CONFIG_DIR: configDir,
+        DOUGHNUT_API_BASE_URL: BASE_URL,
+      },
+    }).as('doughnutOutput')
   )
 })
 
@@ -193,6 +225,7 @@ When(
   'I run the doughnut command in interactive mode with down-arrow selection for {string}',
   (command: string) => {
     const downArrow = '\x1b[B'
+    const startTime = Date.now()
     cy.get<string>('@cliConfigDir').then((configDir) =>
       cy
         .task('runCliDirectWithInputAndPty', {
@@ -202,6 +235,17 @@ When(
             DOUGHNUT_CONFIG_DIR: configDir,
             DOUGHNUT_API_BASE_URL: BASE_URL,
           },
+        })
+        .then((output: unknown) => {
+          if (Cypress.env('RECORD_E2E_TIMING')) {
+            return cy
+              .task('recordTiming', {
+                label: 'cli-run',
+                duration: Date.now() - startTime,
+              })
+              .then(() => cy.wrap(output))
+          }
+          return cy.wrap(output)
         })
         .as('doughnutOutput')
     )

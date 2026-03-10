@@ -7,7 +7,19 @@ import { After, Before } from '@badeball/cypress-cucumber-preprocessor'
 import start, { mock_services } from '../start'
 
 Before(() => {
+  const startTime = Date.now()
   start.testability().cleanDBAndResetTestabilitySettings()
+  cy.then(() => {
+    if (
+      Cypress.env('RECORD_E2E_TIMING') &&
+      Cypress.spec.relative?.includes('cli_recall')
+    ) {
+      cy.task('recordTiming', {
+        label: 'db-reset',
+        duration: Date.now() - startTime,
+      })
+    }
+  })
   cy.wrap('no').as('firstVisited')
 })
 
