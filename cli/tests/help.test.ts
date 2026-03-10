@@ -15,6 +15,7 @@ describe('formatHelp', () => {
     expect(output).toContain('help')
     expect(output).toContain('/add gmail')
     expect(output).toContain('/last email')
+    expect(output).toContain('/recall-status')
     expect(output).toContain('exit')
   })
 
@@ -25,6 +26,7 @@ describe('formatHelp', () => {
     expect(output).toContain('List available commands')
     expect(output).toContain('Add Gmail account via OAuth')
     expect(output).toContain('Show subject of last email')
+    expect(output).toContain('Show how many notes to recall today')
     expect(output).toContain('Quit the CLI')
   })
 

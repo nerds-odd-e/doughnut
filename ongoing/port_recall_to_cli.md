@@ -8,7 +8,7 @@
 
 ---
 
-## Phase 1: Recall status (count)
+## Phase 1: Recall status (count) ✅ DONE
 
 **User behavior**: User runs `/recall-status` and sees how many notes to recall today (e.g. "3 notes to recall today" or "0 notes to recall today").
 

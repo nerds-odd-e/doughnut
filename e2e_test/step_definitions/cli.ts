@@ -51,6 +51,23 @@ When('I run the doughnut command with input {string}', (input: string) => {
   cy.task('runCliDirectWithInput', { input }).as('doughnutOutput')
 })
 
+When(
+  'I run the doughnut command in interactive mode with input {string}',
+  (input: string) => {
+    cy.get<string>('@cliConfigDir').then((configDir) =>
+      cy
+        .task('runCliDirectWithInput', {
+          input: `${input}\nexit\n`,
+          env: {
+            DOUGHNUT_CONFIG_DIR: configDir,
+            DOUGHNUT_API_BASE_URL: BASE_URL,
+          },
+        })
+        .as('doughnutOutput')
+    )
+  }
+)
+
 When('I run the doughnut command with -c {string}', (input: string) => {
   runCliWithConfig(['-c', input])
 })

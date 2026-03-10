@@ -1,5 +1,6 @@
 import { accessTokenCommandDocs } from './accessToken.js'
 import { gmailCommandDocs } from './gmail.js'
+import { recallCommandDocs } from './recall.js'
 import { formatHighlightedList } from './listDisplay.js'
 import { updateDoc } from './update.js'
 import { versionDoc } from './version.js'
@@ -39,6 +40,7 @@ export const interactiveDocs = [
   },
   ...accessTokenCommandDocs,
   ...gmailCommandDocs,
+  ...recallCommandDocs,
 ]
 
 export function filterCommandsByPrefix(

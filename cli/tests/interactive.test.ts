@@ -648,10 +648,10 @@ describe('TTY mode slash command suggestions', () => {
 
     const output = writeSpy.mock.calls.map((c) => c[0]).join('')
     const lines = output.split('\n')
-    const lastEmailLines = lines.filter((l) => l.includes('/last email'))
-    const lastEmailLine = lastEmailLines[lastEmailLines.length - 1]
-    expect(lastEmailLine).toBeDefined()
-    expect(lastEmailLine).toContain('\x1b[7m')
+    const recallStatusLines = lines.filter((l) => l.includes('/recall-status'))
+    const recallStatusLine = recallStatusLines[recallStatusLines.length - 1]
+    expect(recallStatusLine).toBeDefined()
+    expect(recallStatusLine).toContain('\x1b[7m')
 
     stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })

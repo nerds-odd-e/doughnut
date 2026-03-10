@@ -49,6 +49,20 @@ async function withBackendClient<T>(
   }
 }
 
+export async function runWithDefaultBackendClient<T>(
+  fn: () => Promise<T>
+): Promise<T> {
+  const config = loadConfig()
+  const label = getDefaultTokenLabel()
+  const entry = config.tokens.find((t) => t.label === label)
+  if (!entry) {
+    throw new Error(
+      'No default access token. Add one first with /add-access-token.'
+    )
+  }
+  return withBackendClient(entry.token, fn)
+}
+
 export async function addAccessToken(token: string): Promise<void> {
   const result = await withBackendClient(token, () =>
     UserController.getTokenInfo()

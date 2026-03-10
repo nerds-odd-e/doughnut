@@ -10,6 +10,7 @@ import {
   setDefaultTokenLabel,
 } from './accessToken.js'
 import { addGmailAccount, getLastEmailSubject } from './gmail.js'
+import { recallStatus } from './recall.js'
 import {
   filterCommandsByPrefix,
   formatCommandSuggestionsWithHighlight,
@@ -135,6 +136,15 @@ export async function processInput(input: string): Promise<boolean> {
     try {
       const subject = await getLastEmailSubject()
       console.log(subject)
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : String(err))
+    }
+    return false
+  }
+  if (trimmed === '/recall-status') {
+    try {
+      const message = await recallStatus()
+      console.log(message)
     } catch (err) {
       console.log(err instanceof Error ? err.message : String(err))
     }
