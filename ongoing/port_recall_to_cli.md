@@ -70,7 +70,7 @@
 
 ---
 
-## Phase 3: Recall one MCQ note
+## Phase 3: Recall one MCQ note ✅ DONE
 
 **User behavior**: User runs `/recall next`; if next note has an MCQ, CLI shows question and choices (1, 2, 3...), user enters choice number; answer submitted.
 

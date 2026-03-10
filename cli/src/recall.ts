@@ -1,6 +1,7 @@
 import {
   MemoryTrackerController,
   RecallsController,
+  RecallPromptController,
 } from '@generated/doughnut-backend-api/sdk.gen'
 import type { MemoryTrackerLite } from '@generated/doughnut-backend-api'
 import { runWithDefaultBackendClient } from './accessToken.js'
@@ -30,6 +31,12 @@ export type RecallNextResult =
       title: string
       details?: string
     }
+  | {
+      type: 'mcq'
+      recallPromptId: number
+      stem: string
+      choices: string[]
+    }
   | { type: 'has-question'; message: string }
 
 export async function recallNext(): Promise<RecallNextResult> {
@@ -49,11 +56,22 @@ export async function recallNext(): Promise<RecallNextResult> {
       path: { memoryTracker: first.memoryTrackerId },
     })
   )
-  if (questionResult.data) {
+  const prompt = questionResult.data
+  if (prompt?.questionType === 'MCQ' && prompt.multipleChoicesQuestion) {
+    const mcq = prompt.multipleChoicesQuestion
+    const stem = mcq.f0__stem ?? ''
+    const choices = mcq.f1__choices ?? []
+    return {
+      type: 'mcq',
+      recallPromptId: prompt.id,
+      stem,
+      choices,
+    }
+  }
+  if (prompt?.questionType === 'SPELLING') {
     return {
       type: 'has-question',
-      message:
-        'MCQ and spelling recall not yet supported in CLI. Use the web app.',
+      message: 'Spelling recall not yet supported in CLI. Use the web app.',
     }
   }
 
@@ -84,6 +102,20 @@ export async function markAsRecalled(
   )
 }
 
+export async function answerQuiz(
+  recallPromptId: number,
+  choiceIndex: number
+): Promise<{ correct: boolean }> {
+  const result = await runWithDefaultBackendClient(() =>
+    RecallPromptController.answerQuiz({
+      path: { recallPrompt: recallPromptId },
+      body: { choiceIndex },
+    })
+  )
+  const correct = result.data?.answer?.correct ?? false
+  return { correct }
+}
+
 export const recallCommandDocs = [
   {
     name: '/recall-status',
@@ -94,7 +126,7 @@ export const recallCommandDocs = [
   {
     name: '/recall next',
     usage: '/recall next',
-    description: 'Recall next note (Just Review only)',
+    description: 'Recall next note (Just Review or MCQ)',
     category: 'interactive' as const,
   },
 ]

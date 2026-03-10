@@ -5,10 +5,16 @@ import * as path from 'node:path'
 import {
   MemoryTrackerController,
   RecallsController,
+  RecallPromptController,
   UserController,
 } from '@generated/doughnut-backend-api/sdk.gen'
 import { addAccessToken } from '../src/accessToken.js'
-import { markAsRecalled, recallNext, recallStatus } from '../src/recall.js'
+import {
+  answerQuiz,
+  markAsRecalled,
+  recallNext,
+  recallStatus,
+} from '../src/recall.js'
 
 vi.mock('@generated/doughnut-backend-api/sdk.gen', () => ({
   MemoryTrackerController: {
@@ -18,6 +24,9 @@ vi.mock('@generated/doughnut-backend-api/sdk.gen', () => ({
   },
   RecallsController: {
     recalling: vi.fn(),
+  },
+  RecallPromptController: {
+    answerQuiz: vi.fn(),
   },
   UserController: {
     getTokenInfo: vi.fn(),
@@ -205,12 +214,19 @@ describe('recallNext', () => {
     )
   })
 
-  test('returns has-question when askAQuestion returns MCQ', async () => {
+  test('returns mcq when askAQuestion returns MCQ', async () => {
     vi.mocked(RecallsController.recalling).mockResolvedValue({
       data: { toRepeat: [{ memoryTrackerId: 42 }] },
     } as never)
     vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
-      data: { questionType: 'MCQ', multipleChoicesQuestion: {} },
+      data: {
+        id: 100,
+        questionType: 'MCQ',
+        multipleChoicesQuestion: {
+          f0__stem: 'What is 2+2?',
+          f1__choices: ['4', '3', '5'],
+        },
+      },
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
@@ -219,8 +235,33 @@ describe('recallNext', () => {
 
     const result = await recallNext()
 
-    expect(result.type).toBe('has-question')
+    expect(result).toEqual({
+      type: 'mcq',
+      recallPromptId: 100,
+      stem: 'What is 2+2?',
+      choices: ['4', '3', '5'],
+    })
     expect(MemoryTrackerController.showMemoryTracker).not.toHaveBeenCalled()
+  })
+
+  test('returns has-question when askAQuestion returns SPELLING', async () => {
+    vi.mocked(RecallsController.recalling).mockResolvedValue({
+      data: { toRepeat: [{ memoryTrackerId: 42 }] },
+    } as never)
+    vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
+      data: { id: 100, questionType: 'SPELLING' },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const result = await recallNext()
+
+    expect(result).toEqual({
+      type: 'has-question',
+      message: 'Spelling recall not yet supported in CLI. Use the web app.',
+    })
   })
 
   test('throws when no default token', async () => {
@@ -285,6 +326,78 @@ describe('recallNext', () => {
       memoryTrackerId: 42,
       title: 'Untitled note',
     })
+  })
+})
+
+describe('answerQuiz', () => {
+  let originalConfigDir: string | undefined
+
+  beforeEach(() => {
+    originalConfigDir = process.env.DOUGHNUT_CONFIG_DIR
+    process.env.DOUGHNUT_CONFIG_DIR = createTempDir()
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    if (originalConfigDir === undefined) {
+      delete process.env.DOUGHNUT_CONFIG_DIR
+    } else {
+      process.env.DOUGHNUT_CONFIG_DIR = originalConfigDir
+    }
+  })
+
+  test('calls answerQuiz with choiceIndex and returns correct true', async () => {
+    vi.mocked(RecallPromptController.answerQuiz).mockResolvedValue({
+      data: { answer: { correct: true } },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const result = await answerQuiz(100, 0)
+
+    expect(result).toEqual({ correct: true })
+    expect(RecallPromptController.answerQuiz).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: { recallPrompt: 100 },
+        body: { choiceIndex: 0 },
+      })
+    )
+  })
+
+  test('returns correct false when answer is wrong', async () => {
+    vi.mocked(RecallPromptController.answerQuiz).mockResolvedValue({
+      data: { answer: { correct: false } },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const result = await answerQuiz(100, 1)
+
+    expect(result).toEqual({ correct: false })
+    expect(RecallPromptController.answerQuiz).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: { recallPrompt: 100 },
+        body: { choiceIndex: 1 },
+      })
+    )
+  })
+
+  test('returns correct false when answer is undefined', async () => {
+    vi.mocked(RecallPromptController.answerQuiz).mockResolvedValue({
+      data: {},
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const result = await answerQuiz(100, 2)
+
+    expect(result).toEqual({ correct: false })
   })
 })
 

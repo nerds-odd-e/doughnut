@@ -11,7 +11,12 @@ import {
 } from './accessToken.js'
 import { addGmailAccount, getLastEmailSubject } from './gmail.js'
 import { renderMarkdownToTerminal } from './markdown.js'
-import { markAsRecalled, recallNext, recallStatus } from './recall.js'
+import {
+  answerQuiz,
+  markAsRecalled,
+  recallNext,
+  recallStatus,
+} from './recall.js'
 import {
   filterCommandsByPrefix,
   formatCommandSuggestionsWithHighlight,
@@ -27,7 +32,10 @@ const RESET = '\x1b[0m'
 const PLACEHOLDER = '`exit` to quit.'
 const PROMPT = '→ '
 
-let pendingRecallAnswer: { memoryTrackerId: number } | null = null
+let pendingRecallAnswer:
+  | { memoryTrackerId: number }
+  | { recallPromptId: number; choices: string[] }
+  | null = null
 
 function parseCommandWithRequiredParam(
   trimmed: string,
@@ -145,26 +153,45 @@ export async function processInput(input: string): Promise<boolean> {
     return false
   }
   if (pendingRecallAnswer) {
-    const answer = trimmed.toLowerCase()
-    if (answer === 'y' || answer === 'yes') {
-      try {
-        await markAsRecalled(pendingRecallAnswer.memoryTrackerId, true)
-        console.log('Recalled successfully')
-      } catch (err) {
-        console.log(err instanceof Error ? err.message : String(err))
-      }
-    } else if (answer === 'n' || answer === 'no') {
-      try {
-        await markAsRecalled(pendingRecallAnswer.memoryTrackerId, false)
-        console.log('Marked as not recalled')
-      } catch (err) {
-        console.log(err instanceof Error ? err.message : String(err))
+    if ('recallPromptId' in pendingRecallAnswer) {
+      const choiceNum = Number.parseInt(trimmed, 10)
+      const { recallPromptId, choices } = pendingRecallAnswer
+      const validRange = choiceNum >= 1 && choiceNum <= choices.length
+      if (validRange) {
+        try {
+          const { correct } = await answerQuiz(recallPromptId, choiceNum - 1)
+          console.log(correct ? 'Correct!' : 'Incorrect')
+          console.log('Recalled successfully')
+        } catch (err) {
+          console.log(err instanceof Error ? err.message : String(err))
+        }
+        pendingRecallAnswer = null
+      } else {
+        console.log(`Enter a number from 1 to ${choices.length}`)
+        return false
       }
     } else {
-      console.log('Please answer y or n')
-      return false
+      const answer = trimmed.toLowerCase()
+      if (answer === 'y' || answer === 'yes') {
+        try {
+          await markAsRecalled(pendingRecallAnswer.memoryTrackerId, true)
+          console.log('Recalled successfully')
+        } catch (err) {
+          console.log(err instanceof Error ? err.message : String(err))
+        }
+      } else if (answer === 'n' || answer === 'no') {
+        try {
+          await markAsRecalled(pendingRecallAnswer.memoryTrackerId, false)
+          console.log('Marked as not recalled')
+        } catch (err) {
+          console.log(err instanceof Error ? err.message : String(err))
+        }
+      } else {
+        console.log('Please answer y or n')
+        return false
+      }
+      pendingRecallAnswer = null
     }
-    pendingRecallAnswer = null
     return false
   }
   if (trimmed === '/recall-status') {
@@ -183,6 +210,16 @@ export async function processInput(input: string): Promise<boolean> {
         console.log(result.message)
       } else if (result.type === 'has-question') {
         console.log(result.message)
+      } else if (result.type === 'mcq') {
+        console.log(result.stem)
+        for (let i = 0; i < result.choices.length; i++) {
+          console.log(`  ${i + 1}. ${result.choices[i]}`)
+        }
+        console.log(`Enter your choice (1-${result.choices.length}):`)
+        pendingRecallAnswer = {
+          recallPromptId: result.recallPromptId,
+          choices: result.choices,
+        }
       } else {
         console.log(result.title)
         if (result.details) {
