@@ -159,6 +159,37 @@ When(
 )
 
 When(
+  'I run a recall session and recall all due notes, declining load more',
+  () => {
+    cy.get<string>('@cliConfigDir').then((configDir) =>
+      cy
+        .task('runCliDirectWithInput', {
+          input: '/recall\ny\ny\nn\nexit\n',
+          env: {
+            DOUGHNUT_CONFIG_DIR: configDir,
+            DOUGHNUT_API_BASE_URL: BASE_URL,
+          },
+        })
+        .as('doughnutOutput')
+    )
+  }
+)
+
+When('I run a recall session with load more from future days', () => {
+  cy.get<string>('@cliConfigDir').then((configDir) =>
+    cy
+      .task('runCliDirectWithInput', {
+        input: '/recall\ny\ny\ny\ny\nexit\n',
+        env: {
+          DOUGHNUT_CONFIG_DIR: configDir,
+          DOUGHNUT_API_BASE_URL: BASE_URL,
+        },
+      })
+      .as('doughnutOutput')
+  )
+})
+
+When(
   'I run the doughnut command in interactive mode with down-arrow selection for {string}',
   (command: string) => {
     const downArrow = '\x1b[B'

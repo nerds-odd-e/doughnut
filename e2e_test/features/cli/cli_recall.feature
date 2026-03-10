@@ -114,7 +114,7 @@ Feature: CLI recall status and recall next
     And I assimilate the note "sedition"
     And I assimilate the note "sedation"
     And It's day 2
-    When I run the doughnut command in interactive mode with input "/recall" and "y" and "y" and "n"
+    When I run a recall session and recall all due notes, declining load more
     Then I should see "Recalled 2 notes"
 
   @disableOpenAiService
@@ -128,9 +128,9 @@ Feature: CLI recall status and recall next
     And I assimilate the note "sedition"
     And I assimilate the note "sedation"
     And It's day 2
-    When I run the doughnut command in interactive mode with input "/recall" and "y" and "y" and "n"
+    When I run a recall session and recall all due notes, declining load more
     Then I should see "Recalled 2 notes"
-    When I run the doughnut command in interactive mode with input "/recall" and "y" and "y" and "y" and "y"
+    When I run a recall session with load more from future days
     Then I should see "Load more from next 3 days?"
     And I should see "sedition"
     And I should see "Recalled successfully"
