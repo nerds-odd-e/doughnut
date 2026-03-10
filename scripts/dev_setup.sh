@@ -8,8 +8,8 @@ deactivate_nvm() {
 # Setup PNPM and Biome
 setup_pnpm_and_biome() {
   log "Setting up PNPM..."
-  corepack prepare pnpm@10.31.0 --activate
-  corepack use pnpm@10.31.0
+  corepack prepare pnpm@10.32.0 --activate
+  corepack use pnpm@10.32.0
   pnpm --frozen-lockfile recursive install
 
   if [ -e /etc/NIXOS ] || [ -e /etc/nixos ]; then
