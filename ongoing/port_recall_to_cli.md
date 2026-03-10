@@ -89,6 +89,24 @@
 
 ---
 
+## Phase 3.1: MCQ with up/down/Enter selection
+
+**User behavior**: When recalling an MCQ, user can use up/down arrow keys to highlight a choice and Enter to select it (in addition to typing the number). Matches the UX pattern used for access token list selection.
+
+**CLI changes**:
+
+- Extend interactive mode: when `pendingRecallAnswer` is MCQ, enter a "choice selection" state similar to `tokenListItems`; show highlighted choice list; up/down move highlight; Enter submits the highlighted choice.
+- Keep typing a number as alternative input (1–N) for piped/non-TTY mode and user preference.
+
+**Tests**:
+
+- **E2E**: Run `/recall next` with MCQ, use down arrow and Enter to select; verify success.
+- **UT**: Up/down navigation; Enter submits correct choiceIndex; typed number still works.
+
+**Cleanup**: No dead code.
+
+---
+
 ## Phase 4: Recall one spelling note
 
 **User behavior**: User runs `/recall next`; if next note has spelling, CLI shows prompt (e.g. "Spell: ..."), user types answer; submitted via `answer-spelling`.
@@ -203,6 +221,7 @@
 | 2.1   | `/recall next` (Just Review) | Recall one note        | Phase 1                     |
 | 2.2   | Just Review + markdown        | Full note visible      | Phase 2.1                   |
 | 3     | `/recall next` (MCQ)         | Answer one MCQ         | Phase 2.1                   |
+| 3.1   | MCQ up/down/Enter selection  | Better MCQ UX          | Phase 3                     |
 | 4     | `/recall next` (spelling)     | Answer one spelling    | Phase 3                     |
 | 5     | `/recall`                    | Full session           | Phases 2.2, 3, 4           |
 | 6     | `/recall` load more          | Notes from future days | Phase 5                     |
