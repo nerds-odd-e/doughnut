@@ -187,6 +187,40 @@ describe('recallNext', () => {
     expect(MemoryTrackerController.askAQuestion).not.toHaveBeenCalled()
   })
 
+  test('passes dueindays to recalling API', async () => {
+    vi.mocked(RecallsController.recalling).mockResolvedValue({
+      data: { toRepeat: [] },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    await recallNext(3)
+
+    expect(RecallsController.recalling).toHaveBeenCalledWith(
+      expect.objectContaining({
+        query: expect.objectContaining({
+          dueindays: 3,
+        }),
+      })
+    )
+  })
+
+  test('returns none when dueindays 3 has no notes', async () => {
+    vi.mocked(RecallsController.recalling).mockResolvedValue({
+      data: { toRepeat: [] },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const result = await recallNext(3)
+
+    expect(result).toEqual({ type: 'none', message: '0 notes to recall today' })
+  })
+
   test('returns just-review when askAQuestion returns null', async () => {
     vi.mocked(RecallsController.recalling).mockResolvedValue({
       data: { toRepeat: [{ memoryTrackerId: 42 }] },

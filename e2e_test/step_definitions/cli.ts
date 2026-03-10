@@ -119,6 +119,46 @@ When(
 )
 
 When(
+  'I run the doughnut command in interactive mode with input {string} and {string} and {string} and {string}',
+  (command: string, answer1: string, answer2: string, answer3: string) => {
+    cy.get<string>('@cliConfigDir').then((configDir) =>
+      cy
+        .task('runCliDirectWithInput', {
+          input: `${command}\n${answer1}\n${answer2}\n${answer3}\nexit\n`,
+          env: {
+            DOUGHNUT_CONFIG_DIR: configDir,
+            DOUGHNUT_API_BASE_URL: BASE_URL,
+          },
+        })
+        .as('doughnutOutput')
+    )
+  }
+)
+
+When(
+  'I run the doughnut command in interactive mode with input {string} and {string} and {string} and {string} and {string}',
+  (
+    command: string,
+    answer1: string,
+    answer2: string,
+    answer3: string,
+    answer4: string
+  ) => {
+    cy.get<string>('@cliConfigDir').then((configDir) =>
+      cy
+        .task('runCliDirectWithInput', {
+          input: `${command}\n${answer1}\n${answer2}\n${answer3}\n${answer4}\nexit\n`,
+          env: {
+            DOUGHNUT_CONFIG_DIR: configDir,
+            DOUGHNUT_API_BASE_URL: BASE_URL,
+          },
+        })
+        .as('doughnutOutput')
+    )
+  }
+)
+
+When(
   'I run the doughnut command in interactive mode with down-arrow selection for {string}',
   (command: string) => {
     const downArrow = '\x1b[B'

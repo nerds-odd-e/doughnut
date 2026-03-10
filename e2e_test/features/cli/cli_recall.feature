@@ -114,8 +114,27 @@ Feature: CLI recall status and recall next
     And I assimilate the note "sedition"
     And I assimilate the note "sedation"
     And It's day 2
-    When I run the doughnut command in interactive mode with input "/recall" and "y" and "y"
+    When I run the doughnut command in interactive mode with input "/recall" and "y" and "y" and "n"
     Then I should see "Recalled 2 notes"
+
+  @disableOpenAiService
+  Scenario: Recall load more from next 3 days when none due today
+    Given I have a notebook with the head note "English" which skips memory tracking
+    And there are some notes:
+      | Title    | Details                        | Parent Title |
+      | sedition | Sedition means incite violence | English      |
+      | sedation | Put to sleep is sedation       | English      |
+    And It's day 1
+    And I assimilate the note "sedition"
+    And I assimilate the note "sedation"
+    And It's day 2
+    When I run the doughnut command in interactive mode with input "/recall" and "y" and "y" and "n"
+    Then I should see "Recalled 2 notes"
+    When I run the doughnut command in interactive mode with input "/recall" and "y" and "y" and "y" and "y"
+    Then I should see "Load more from next 3 days?"
+    And I should see "sedition"
+    And I should see "Recalled successfully"
+    And I should see "Recalled"
 
   @disableOpenAiService
   Scenario: Recall next spelling - type correct spelling and see success

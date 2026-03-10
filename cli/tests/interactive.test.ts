@@ -5,6 +5,7 @@ import {
   processInput,
   renderBox,
   renderPastInput,
+  resetRecallStateForTesting,
   runInteractive,
   visibleLength,
 } from '../src/interactive.js'
@@ -83,6 +84,14 @@ function createMockTTYStdin(): NodeJS.ReadableStream & {
 }
 
 describe('processInput', () => {
+  beforeEach(() => {
+    resetRecallStateForTesting()
+    mockRecallNext.mockClear()
+    mockMarkAsRecalled.mockClear()
+    mockAnswerQuiz.mockClear()
+    mockAnswerSpelling.mockClear()
+  })
+
   test('returns true for exit', async () => {
     expect(await processInput('exit')).toBe(true)
     expect(await processInput('  exit  ')).toBe(true)
@@ -281,7 +290,7 @@ describe('processInput', () => {
     logSpy.mockRestore()
   })
 
-  test('/recall with no notes shows 0 and does not enter session', async () => {
+  test('/recall with no notes prompts load more from next 3 days', async () => {
     mockRecallNext.mockResolvedValue({
       type: 'none',
       message: '0 notes to recall today',
@@ -289,8 +298,61 @@ describe('processInput', () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
+    expect(logSpy).toHaveBeenCalledWith('Load more from next 3 days? (y/n)')
+    expect(mockRecallNext).toHaveBeenCalledWith(0)
+
+    logSpy.mockRestore()
+  })
+
+  test('/recall load more: user says n, shows 0 notes to recall today', async () => {
+    mockRecallNext.mockResolvedValue({
+      type: 'none',
+      message: '0 notes to recall today',
+    })
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await processInput('/recall')
+    logSpy.mockClear()
+    await processInput('n')
     expect(logSpy).toHaveBeenCalledWith('0 notes to recall today')
-    expect(logSpy).toHaveBeenCalledTimes(1)
+    expect(mockRecallNext).toHaveBeenCalledTimes(1)
+
+    logSpy.mockRestore()
+  })
+
+  test('/recall load more: user says y, fetches with dueindays 3 and continues', async () => {
+    mockRecallNext
+      .mockResolvedValueOnce({
+        type: 'none',
+        message: '0 notes to recall today',
+      })
+      .mockResolvedValueOnce({
+        type: 'just-review',
+        memoryTrackerId: 1,
+        title: 'Future note',
+      })
+      .mockResolvedValueOnce({
+        type: 'none',
+        message: '0 notes to recall today',
+      })
+    mockMarkAsRecalled.mockResolvedValue(undefined)
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await processInput('/recall')
+    expect(logSpy).toHaveBeenCalledWith('Load more from next 3 days? (y/n)')
+    logSpy.mockClear()
+
+    await processInput('y')
+    expect(mockRecallNext).toHaveBeenNthCalledWith(1, 0)
+    expect(mockRecallNext).toHaveBeenNthCalledWith(2, 3)
+    expect(logSpy).toHaveBeenCalledWith('Future note')
+    expect(logSpy).toHaveBeenCalledWith('Yes, I remember? (y/n)')
+    logSpy.mockClear()
+
+    await processInput('y')
+    expect(mockMarkAsRecalled).toHaveBeenCalledWith(1, true)
+    expect(logSpy).toHaveBeenCalledWith('Recalled successfully')
+    expect(logSpy).toHaveBeenCalledWith('Recalled 1 note')
 
     logSpy.mockRestore()
   })
@@ -317,6 +379,10 @@ describe('processInput', () => {
     await processInput('y')
     expect(mockMarkAsRecalled).toHaveBeenCalledWith(1, true)
     expect(logSpy).toHaveBeenCalledWith('Recalled successfully')
+    expect(logSpy).toHaveBeenCalledWith('Load more from next 3 days? (y/n)')
+    logSpy.mockClear()
+
+    await processInput('n')
     expect(logSpy).toHaveBeenCalledWith('Recalled 1 note')
 
     logSpy.mockRestore()

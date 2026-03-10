@@ -144,7 +144,7 @@
 
 ---
 
-## Phase 6: Load more from future days
+## Phase 6: Load more from future days ✅ DONE
 
 **User behavior**: User runs `/recall`; when no notes due today, CLI offers "Load more from next 3 days? (y/n)"; if yes, fetches with `dueindays: 3` and continues.
 
@@ -160,23 +160,6 @@
 - **UT**: Prompt display; dueindays param; empty response after load more.
 
 **Cleanup**: Remove interim behavior if later replaced (e.g. `/recall --days 7` flag).
-
----
-
-## Phase 7: Recall status with due-in-days (optional interim)
-
-**User behavior**: `/recall-status 3` shows count for next 3 days.
-
-**CLI changes**:
-
-- Add optional param to `/recall-status` for dueindays; pass to `recalling()`.
-
-**Tests**:
-
-- **E2E**: Notes due in 2 days; `/recall-status 3` shows count > 0.
-- **UT**: Param parsing; default 0 vs 3.
-
-**Note**: Interim if Phase 6 already covers "load more". Remove if redundant with `/recall` load-more flow.
 
 ---
 
@@ -198,7 +181,6 @@
 ## Interim Behaviors (remove when superseded)
 
 - **Phase 2.1**: Just Review with title only is interim; Phase 2.2 replaces with full note (title + markdown details).
-- **Phase 7**: If `/recall-status 3` is redundant with Phase 6's in-session "load more", remove Phase 7 or merge.
 - Any "quick access" command (e.g. `/recall-now` as alias) that gets replaced by `/recall` should be removed.
 
 ---
@@ -226,7 +208,6 @@
 | 4     | `/recall next` (spelling)     | Answer one spelling    | Phase 3                     |
 | 5     | `/recall`                    | Full session           | Phases 2.2, 3, 4           |
 | 6     | `/recall` load more          | Notes from future days | Phase 5                     |
-| 7     | `/recall-status N`           | Optional; count N days | Phase 1                     |
 | 8     | Contest/Regenerate           | Edge case, low priority| Phase 3                     |
 
 Each phase: implement → E2E + UT → remove dead code → commit → push → CD deploy → next phase.

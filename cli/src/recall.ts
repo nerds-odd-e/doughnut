@@ -43,10 +43,10 @@ export type RecallNextResult =
       stem: string
     }
 
-export async function recallNext(): Promise<RecallNextResult> {
+export async function recallNext(dueindays = 0): Promise<RecallNextResult> {
   const result = await runWithDefaultBackendClient(() =>
     RecallsController.recalling({
-      query: { timezone: getTimezone(), dueindays: 0 },
+      query: { timezone: getTimezone(), dueindays },
     })
   )
   const toRepeat = result.data?.toRepeat ?? []

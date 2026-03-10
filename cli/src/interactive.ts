@@ -41,19 +41,37 @@ let pendingRecallAnswer:
 
 let recallSessionMode = false
 let sessionRecallCount = 0
+let recallSessionDueDays = 0
+let pendingRecallLoadMore = false
 
-async function continueRecallSession(): Promise<void> {
-  sessionRecallCount++
+export function resetRecallStateForTesting(): void {
+  pendingRecallAnswer = null
+  recallSessionMode = false
+  sessionRecallCount = 0
+  recallSessionDueDays = 0
+  pendingRecallLoadMore = false
+}
+
+async function continueRecallSession(fromLoadMore = false): Promise<void> {
+  if (!fromLoadMore) sessionRecallCount++
   try {
-    const result = await recallNext()
+    const result = await recallNext(recallSessionDueDays)
     if (result.type === 'none') {
+      if (recallSessionDueDays === 0) {
+        pendingRecallLoadMore = true
+        console.log('Load more from next 3 days? (y/n)')
+        return
+      }
       const msg =
-        sessionRecallCount === 1
-          ? 'Recalled 1 note'
-          : `Recalled ${sessionRecallCount} notes`
+        sessionRecallCount === 0
+          ? '0 notes to recall today'
+          : sessionRecallCount === 1
+            ? 'Recalled 1 note'
+            : `Recalled ${sessionRecallCount} notes`
       console.log(msg)
       recallSessionMode = false
       sessionRecallCount = 0
+      recallSessionDueDays = 0
       return
     }
     if (result.type === 'spelling') {
@@ -204,6 +222,30 @@ export async function processInput(input: string): Promise<boolean> {
     }
     return false
   }
+  if (pendingRecallLoadMore) {
+    const answer = trimmed.toLowerCase()
+    if (answer === 'y' || answer === 'yes') {
+      pendingRecallLoadMore = false
+      recallSessionDueDays = 3
+      await continueRecallSession(true)
+    } else if (answer === 'n' || answer === 'no') {
+      pendingRecallLoadMore = false
+      const msg =
+        sessionRecallCount === 0
+          ? '0 notes to recall today'
+          : sessionRecallCount === 1
+            ? 'Recalled 1 note'
+            : `Recalled ${sessionRecallCount} notes`
+      console.log(msg)
+      recallSessionMode = false
+      sessionRecallCount = 0
+      recallSessionDueDays = 0
+    } else {
+      console.log('Please answer y or n')
+      return false
+    }
+    return false
+  }
   if (pendingRecallAnswer) {
     if ('choices' in pendingRecallAnswer) {
       const choiceNum = Number.parseInt(trimmed, 10)
@@ -279,10 +321,11 @@ export async function processInput(input: string): Promise<boolean> {
     try {
       recallSessionMode = true
       sessionRecallCount = 0
-      const result = await recallNext()
+      recallSessionDueDays = 0
+      const result = await recallNext(0)
       if (result.type === 'none') {
-        console.log(result.message)
-        recallSessionMode = false
+        pendingRecallLoadMore = true
+        console.log('Load more from next 3 days? (y/n)')
       } else if (result.type === 'spelling') {
         console.log(`Spell: ${result.stem || '...'}`)
         pendingRecallAnswer = {
