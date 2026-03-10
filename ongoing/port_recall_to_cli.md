@@ -1,0 +1,188 @@
+# Port Recall Feature to CLI - Phased Plan
+
+## Context
+
+- **Recall (web)**: Spaced-repetition feature. User sees notes due for recall, answers MCQ/spelling questions or "Just Review" (yes/no). APIs: `GET /api/recalls/recalling`, `GET /api/memory-trackers/{id}/question`, `POST /api/recall-prompts/{id}/answer`, `POST /api/recall-prompts/{id}/answer-spelling`, `PATCH /api/memory-trackers/{id}/mark-as-recalled`.
+- **CLI**: Uses `doughnut-api` + `@generated/doughnut-backend-api`; auth via `access-tokens.json` and `withBackendClient(token, fn)`. Needs default token for recall.
+- **E2E**: `@withCliConfig` creates temp config dir; `runCliDirectWithArgs` runs bundle; steps use `I have a valid Doughnut Access Token` and `runCliWithConfig`.
+
+---
+
+## Phase 1: Recall status (count)
+
+**User behavior**: User runs `/recall-status` and sees how many notes to recall today (e.g. "3 notes to recall today" or "0 notes to recall today").
+
+**APIs**: `RecallsController.recalling({ query: { timezone, dueindays: 0 } })` → `DueMemoryTrackers.toRepeat.length`.
+
+**CLI changes**:
+
+- Add `cli/src/recall.ts` with `recallStatus()` calling `RecallsController.recalling()` via default token.
+- Add `runWithDefaultBackendClient(fn)` (or equivalent) in `accessToken.ts` for commands needing default token.
+- Wire `/recall-status` in `interactive.ts`, register in `help.ts`.
+
+**Tests**:
+
+- **E2E**: User with token + notes due for recall runs `-c "/recall-status"`, sees "N notes to recall today"; user with 0 due sees "0 notes to recall today".
+- **UT**: Mock `RecallsController.recalling`; test timezone handling (use `Intl.DateTimeFormat().resolvedOptions().timeZone` or env); test "no default token" error; test empty vs non-empty toRepeat.
+
+**Cleanup**: No dead code; only what E2E and UT use.
+
+---
+
+## Phase 2: Recall one Just Review note
+
+**User behavior**: User runs `/recall next`; if next note is Just Review (no question), CLI shows note title and prompts "Yes, I remember? (y/n)"; user answers and note is marked as recalled.
+
+**APIs**: `recalling()` → pick first `toRepeat`; `askAQuestion(memoryTrackerId)` → if null/empty, it's Just Review; `markAsRecalled(memoryTrackerId, successful)`.
+
+**CLI changes**:
+
+- In `recall.ts`: `recallNext()` — fetch due list, fetch question for first tracker; if no question, prompt y/n, call `markAsRecalled`.
+- Wire `/recall next` in `interactive.ts`.
+
+**Tests**:
+
+- **E2E**: Background with 1 note due (Just Review). Run `/recall next`, answer y, verify success; run again to see "0 notes to recall" or appropriate message.
+- **UT**: Mock question returns null → Just Review path; mock markAsRecalled; test invalid y/n input; test no notes due; test no default token.
+
+**Cleanup**: Remove any unused branches; only code exercised by E2E/UT.
+
+---
+
+## Phase 3: Recall one MCQ note
+
+**User behavior**: User runs `/recall next`; if next note has an MCQ, CLI shows question and choices (1, 2, 3...), user enters choice number; answer submitted.
+
+**APIs**: `askAQuestion()` → `RecallPrompt` with MCQ; `RecallPromptController.answerQuiz(recallPromptId, { body: { choiceIndex } })`.
+
+**CLI changes**:
+
+- Extend `recallNext()`: when `askAQuestion` returns MCQ, display stem + choices, read choice index, call `answerQuiz`.
+
+**Tests**:
+
+- **E2E**: 1 note due with AI-generated MCQ. Run `/recall next`, choose correct answer, see success.
+- **UT**: MCQ display formatting; valid/invalid choice index; answerQuiz success/error; mixed scenario (first Just Review, second MCQ) if needed.
+
+**Cleanup**: No dead code.
+
+---
+
+## Phase 4: Recall one spelling note
+
+**User behavior**: User runs `/recall next`; if next note has spelling, CLI shows prompt (e.g. "Spell: ..."), user types answer; submitted via `answer-spelling`.
+
+**APIs**: `askAQuestion()` → `RecallPrompt` with spelling; `RecallPromptController.answerSpelling(recallPromptId, { body: { spellingAnswer, thinkingTimeMs } })`.
+
+**CLI changes**:
+
+- Extend `recallNext()` for spelling: detect spelling type, prompt for input, call `answerSpelling`.
+
+**Tests**:
+
+- **E2E**: 1 note due with spelling question. Run `/recall next`, type correct spelling, see success.
+- **UT**: Spelling prompt format; answerSpelling call; thinkingTimeMs handling (optional).
+
+**Cleanup**: No dead code.
+
+---
+
+## Phase 5: Full recall session (all due)
+
+**User behavior**: User runs `/recall` (no args); CLI processes all due notes one by one (Just Review, MCQ, spelling) until none left, then shows summary.
+
+**CLI changes**:
+
+- Add `recallSession()`: loop over `toRepeat`, for each call existing recall-next logic, until list exhausted; show "Recalled N notes" at end.
+
+**Tests**:
+
+- **E2E**: 2–3 notes due (mix of Just Review, MCQ). Run `/recall`, complete all; verify final count.
+- **UT**: Loop termination; handling of empty list mid-session (e.g. another client); error mid-session behavior.
+
+**Cleanup**: Possibly fold `recallNext` into `recallSession` if it becomes the only entry point; keep `/recall next` if it has standalone value (single-note recall) per project preference.
+
+---
+
+## Phase 6: Load more from future days
+
+**User behavior**: User runs `/recall`; when no notes due today, CLI offers "Load more from next 3 days? (y/n)"; if yes, fetches with `dueindays: 3` and continues.
+
+**APIs**: `recalling({ query: { timezone, dueindays: 3 } })` (or 7, 14).
+
+**CLI changes**:
+
+- When `toRepeat` is empty, prompt to load more with `dueindays: 3`; if yes, refetch and continue session.
+
+**Tests**:
+
+- **E2E**: 0 due today, 1 due in 3 days. Run `/recall`, answer y to load more, complete that note.
+- **UT**: Prompt display; dueindays param; empty response after load more.
+
+**Cleanup**: Remove interim behavior if later replaced (e.g. `/recall --days 7` flag).
+
+---
+
+## Phase 7: Recall status with due-in-days (optional interim)
+
+**User behavior**: `/recall-status 3` shows count for next 3 days.
+
+**CLI changes**:
+
+- Add optional param to `/recall-status` for dueindays; pass to `recalling()`.
+
+**Tests**:
+
+- **E2E**: Notes due in 2 days; `/recall-status 3` shows count > 0.
+- **UT**: Param parsing; default 0 vs 3.
+
+**Note**: Interim if Phase 6 already covers "load more". Remove if redundant with `/recall` load-more flow.
+
+---
+
+## Phase 8: Contest / Regenerate (lower priority)
+
+**User behavior**: After answering MCQ, CLI asks "Contest this question? (y/n)"; if yes, call contest + regenerate; show new question (or skip).
+
+**APIs**: `RecallPromptController.contest`, `RecallPromptController.regenerate`.
+
+**Tests**:
+
+- **E2E**: Answer MCQ, contest, get new question.
+- **UT**: Contest/regenerate error handling; reject invalid input.
+
+**Cleanup**: Only add if user value justifies it; else defer.
+
+---
+
+## Interim Behaviors (remove when superseded)
+
+- **Phase 7**: If `/recall-status 3` is redundant with Phase 6's in-session "load more", remove Phase 7 or merge.
+- Any "quick access" command (e.g. `/recall-now` as alias) that gets replaced by `/recall` should be removed.
+
+---
+
+## Technical Notes
+
+1. **Default token**: Add `runWithDefaultBackendClient(fn)` or `getDefaultToken()` in `cli/src/accessToken.ts` and use for all recall commands.
+2. **Timezone**: Use `Intl.DateTimeFormat().resolvedOptions().timeZone` for `recalling` (matches web).
+3. **SDK**: Use `RecallsController.recalling`, `MemoryTrackerController.askAQuestion`, `MemoryTrackerController.markAsRecalled`, `RecallPromptController.answerQuiz`, `RecallPromptController.answerSpelling` from `packages/generated/doughnut-backend-api/sdk.gen.ts`.
+4. **E2E setup**: Reuse `I have a valid Doughnut Access Token`, `runCliWithConfig`; add steps for "notes due for recall" (assimilation + time travel) similar to `e2e_test/features/recall/`.
+5. **CLI E2E**: Follow `e2e_test/features/cli/cli_access_token.feature` pattern; new `cli_recall.feature` with `@withCliConfig`.
+
+---
+
+## Phase Order Summary
+
+| Phase | Command(s)                   | User Value             | Dependencies                |
+| ----- | ---------------------------- | ---------------------- | --------------------------- |
+| 1     | `/recall-status`             | See count quickly       | runWithDefaultBackendClient  |
+| 2     | `/recall next` (Just Review) | Recall one note        | Phase 1                     |
+| 3     | `/recall next` (MCQ)         | Answer one MCQ         | Phase 2                     |
+| 4     | `/recall next` (spelling)     | Answer one spelling    | Phase 3                     |
+| 5     | `/recall`                    | Full session           | Phases 2–4                  |
+| 6     | `/recall` load more          | Notes from future days | Phase 5                     |
+| 7     | `/recall-status N`           | Optional; count N days | Phase 1                     |
+| 8     | Contest/Regenerate           | Edge case, low priority| Phase 3                     |
+
+Each phase: implement → E2E + UT → remove dead code → commit → push → CD deploy → next phase.

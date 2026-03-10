@@ -1,0 +1,31 @@
+---
+description: Phased feature planning, test-driven development, incremental delivery, no dead code
+alwaysApply: false
+---
+
+# Phased Planning for Feature Development
+
+When creating plans for porting features or building new functionality, follow this approach:
+
+## Phase Structure
+
+- **Break work into phases** – Each phase adds one small, user-centric behavior.
+- **Maximize phases** – Use as many phases as possible, as long as each phase delivers user value.
+- **Prioritize by user value** – Order phases by user value and usability.
+
+## Testing Strategy
+
+- **E2E at high level** – Each phase has E2E tests that cover the main user behavior.
+- **UT for details and edge cases** – Unit tests cover formatting, error handling, invalid input, and exceptional paths.
+- **Test-driven** – Prefer writing tests first or alongside implementation.
+- **No dead code** – Code must be needed by current E2E tests or UT covering edge cases. For normal cases, UT alone is not enough to justify keeping code.
+
+## Phase Discipline
+
+- **Clean up before moving on** – Remove any dead or unreachable code before the next phase.
+- **Deploy before next phase** – Commit, push, and let CD deploy before starting the next phase.
+
+## Interim Behaviors
+
+- Interim user behavior is allowed if it helps users access the feature faster.
+- Remove interim behavior when a later phase replaces it with a better alternative.
