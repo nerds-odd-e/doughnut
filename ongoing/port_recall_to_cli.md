@@ -107,7 +107,7 @@
 
 ---
 
-## Phase 4: Recall one spelling note
+## Phase 4: Recall one spelling note ✅ DONE
 
 **User behavior**: User runs `/recall next`; if next note has spelling, CLI shows prompt (e.g. "Spell: ..."), user types answer; submitted via `answer-spelling`.
 

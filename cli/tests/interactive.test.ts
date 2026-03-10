@@ -10,16 +10,20 @@ import {
 } from '../src/interactive.js'
 
 let useManyCommandsForScrollTests = false
-const { mockRecallNext, mockAnswerQuiz } = vi.hoisted(() => ({
-  mockRecallNext: vi.fn(),
-  mockAnswerQuiz: vi.fn(),
-}))
+const { mockRecallNext, mockAnswerQuiz, mockAnswerSpelling } = vi.hoisted(
+  () => ({
+    mockRecallNext: vi.fn(),
+    mockAnswerQuiz: vi.fn(),
+    mockAnswerSpelling: vi.fn(),
+  })
+)
 vi.mock('../src/recall.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../src/recall.js')>()
   return {
     ...actual,
     recallNext: mockRecallNext,
     answerQuiz: mockAnswerQuiz,
+    answerSpelling: mockAnswerSpelling,
   }
 })
 vi.mock('../src/help.js', async (importOriginal) => {
@@ -232,6 +236,44 @@ describe('processInput', () => {
     )
     logSpy.mockRestore()
     process.env.DOUGHNUT_CONFIG_DIR = originalEnv
+  })
+
+  test('spelling: /recall next shows Spell prompt, then spelling answer calls answerSpelling', async () => {
+    mockRecallNext.mockResolvedValue({
+      type: 'spelling',
+      recallPromptId: 100,
+      stem: 'means incite violence',
+    })
+    mockAnswerSpelling.mockResolvedValue({ correct: true })
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await processInput('/recall next')
+    expect(logSpy).toHaveBeenCalledWith('Spell: means incite violence')
+    logSpy.mockClear()
+
+    await processInput('sedition')
+    expect(mockAnswerSpelling).toHaveBeenCalledWith(100, 'sedition')
+    expect(logSpy).toHaveBeenCalledWith('Correct!')
+    expect(logSpy).toHaveBeenCalledWith('Recalled successfully')
+
+    logSpy.mockRestore()
+  })
+
+  test('spelling: empty input prompts to type', async () => {
+    mockRecallNext.mockResolvedValue({
+      type: 'spelling',
+      recallPromptId: 100,
+      stem: '...',
+    })
+    mockAnswerSpelling.mockResolvedValue({ correct: false })
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await processInput('/recall next')
+    logSpy.mockClear()
+    expect(await processInput('')).toBe(false)
+    expect(logSpy).toHaveBeenCalledWith('Please type your spelling')
+    await processInput('clear') // clear pending state for subsequent tests
+    logSpy.mockRestore()
   })
 })
 

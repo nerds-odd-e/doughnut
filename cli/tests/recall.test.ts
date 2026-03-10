@@ -11,6 +11,7 @@ import {
 import { addAccessToken } from '../src/accessToken.js'
 import {
   answerQuiz,
+  answerSpelling,
   markAsRecalled,
   recallNext,
   recallStatus,
@@ -27,6 +28,7 @@ vi.mock('@generated/doughnut-backend-api/sdk.gen', () => ({
   },
   RecallPromptController: {
     answerQuiz: vi.fn(),
+    answerSpelling: vi.fn(),
   },
   UserController: {
     getTokenInfo: vi.fn(),
@@ -244,7 +246,32 @@ describe('recallNext', () => {
     expect(MemoryTrackerController.showMemoryTracker).not.toHaveBeenCalled()
   })
 
-  test('returns has-question when askAQuestion returns SPELLING', async () => {
+  test('returns spelling when askAQuestion returns SPELLING', async () => {
+    vi.mocked(RecallsController.recalling).mockResolvedValue({
+      data: { toRepeat: [{ memoryTrackerId: 42 }] },
+    } as never)
+    vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
+      data: {
+        id: 100,
+        questionType: 'SPELLING',
+        spellingQuestion: { stem: 'means incite violence' },
+      },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const result = await recallNext()
+
+    expect(result).toEqual({
+      type: 'spelling',
+      recallPromptId: 100,
+      stem: 'means incite violence',
+    })
+  })
+
+  test('returns spelling with empty stem when spellingQuestion missing', async () => {
     vi.mocked(RecallsController.recalling).mockResolvedValue({
       data: { toRepeat: [{ memoryTrackerId: 42 }] },
     } as never)
@@ -259,8 +286,9 @@ describe('recallNext', () => {
     const result = await recallNext()
 
     expect(result).toEqual({
-      type: 'has-question',
-      message: 'Spelling recall not yet supported in CLI. Use the web app.',
+      type: 'spelling',
+      recallPromptId: 100,
+      stem: '',
     })
   })
 
@@ -396,6 +424,58 @@ describe('answerQuiz', () => {
     await addAccessToken('test-token')
 
     const result = await answerQuiz(100, 2)
+
+    expect(result).toEqual({ correct: false })
+  })
+})
+
+describe('answerSpelling', () => {
+  let originalConfigDir: string | undefined
+
+  beforeEach(() => {
+    originalConfigDir = process.env.DOUGHNUT_CONFIG_DIR
+    process.env.DOUGHNUT_CONFIG_DIR = createTempDir()
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    if (originalConfigDir === undefined) {
+      delete process.env.DOUGHNUT_CONFIG_DIR
+    } else {
+      process.env.DOUGHNUT_CONFIG_DIR = originalConfigDir
+    }
+  })
+
+  test('calls answerSpelling with spellingAnswer and returns correct true', async () => {
+    vi.mocked(RecallPromptController.answerSpelling).mockResolvedValue({
+      data: { answer: { correct: true } },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const result = await answerSpelling(100, 'sedition')
+
+    expect(result).toEqual({ correct: true })
+    expect(RecallPromptController.answerSpelling).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: { recallPrompt: 100 },
+        body: { spellingAnswer: 'sedition' },
+      })
+    )
+  })
+
+  test('returns correct false when spelling is wrong', async () => {
+    vi.mocked(RecallPromptController.answerSpelling).mockResolvedValue({
+      data: { answer: { correct: false } },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const result = await answerSpelling(100, 'sedicion')
 
     expect(result).toEqual({ correct: false })
   })

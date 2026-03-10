@@ -13,6 +13,7 @@ import { addGmailAccount, getLastEmailSubject } from './gmail.js'
 import { renderMarkdownToTerminal } from './markdown.js'
 import {
   answerQuiz,
+  answerSpelling,
   markAsRecalled,
   recallNext,
   recallStatus,
@@ -35,6 +36,7 @@ const PROMPT = '→ '
 let pendingRecallAnswer:
   | { memoryTrackerId: number }
   | { recallPromptId: number; choices: string[] }
+  | { recallPromptId: number; type: 'spelling' }
   | null = null
 
 function parseCommandWithRequiredParam(
@@ -153,7 +155,7 @@ export async function processInput(input: string): Promise<boolean> {
     return false
   }
   if (pendingRecallAnswer) {
-    if ('recallPromptId' in pendingRecallAnswer) {
+    if ('choices' in pendingRecallAnswer) {
       const choiceNum = Number.parseInt(trimmed, 10)
       const { recallPromptId, choices } = pendingRecallAnswer
       const validRange = choiceNum >= 1 && choiceNum <= choices.length
@@ -170,6 +172,23 @@ export async function processInput(input: string): Promise<boolean> {
         console.log(`Enter a number from 1 to ${choices.length}`)
         return false
       }
+    } else if (
+      'type' in pendingRecallAnswer &&
+      pendingRecallAnswer.type === 'spelling'
+    ) {
+      const { recallPromptId } = pendingRecallAnswer
+      if (!trimmed) {
+        console.log('Please type your spelling')
+        return false
+      }
+      try {
+        const { correct } = await answerSpelling(recallPromptId, trimmed)
+        console.log(correct ? 'Correct!' : 'Incorrect')
+        console.log('Recalled successfully')
+      } catch (err) {
+        console.log(err instanceof Error ? err.message : String(err))
+      }
+      pendingRecallAnswer = null
     } else {
       const answer = trimmed.toLowerCase()
       if (answer === 'y' || answer === 'yes') {
@@ -208,8 +227,12 @@ export async function processInput(input: string): Promise<boolean> {
       const result = await recallNext()
       if (result.type === 'none') {
         console.log(result.message)
-      } else if (result.type === 'has-question') {
-        console.log(result.message)
+      } else if (result.type === 'spelling') {
+        console.log(`Spell: ${result.stem || '...'}`)
+        pendingRecallAnswer = {
+          recallPromptId: result.recallPromptId,
+          type: 'spelling',
+        }
       } else if (result.type === 'mcq') {
         console.log(result.stem)
         for (let i = 0; i < result.choices.length; i++) {
@@ -326,8 +349,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
     const width = getTerminalWidth()
     const contentLines = buildBoxLines(buffer, width)
     const boxLines = renderBox(contentLines, width).split('\n')
-    const mcqPending =
-      pendingRecallAnswer && 'recallPromptId' in pendingRecallAnswer
+    const mcqPending = pendingRecallAnswer && 'choices' in pendingRecallAnswer
     const suggestionLines = tokenListItems
       ? formatHighlightedList(
           formatTokenLines(tokenListItems, getDefaultTokenLabel()),
@@ -391,10 +413,12 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
         removeResizeListener()
         process.exit(0)
       }
-      const mcqPending =
-        pendingRecallAnswer && 'recallPromptId' in pendingRecallAnswer
+      const mcqPending = pendingRecallAnswer && 'choices' in pendingRecallAnswer
       if (mcqPending) {
-        const { recallPromptId, choices } = pendingRecallAnswer
+        const { recallPromptId, choices } = pendingRecallAnswer as {
+          recallPromptId: number
+          choices: string[]
+        }
         if (key.name === 'up' || key.name === 'down') {
           const n = choices.length
           mcqChoiceHighlightIndex =
@@ -574,7 +598,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           }
           linesAboveCursor = 0
           prevTotalLines = 0
-          if (pendingRecallAnswer && 'recallPromptId' in pendingRecallAnswer) {
+          if (pendingRecallAnswer && 'choices' in pendingRecallAnswer) {
             mcqChoiceHighlightIndex = 0
           }
           drawBox()

@@ -37,7 +37,11 @@ export type RecallNextResult =
       stem: string
       choices: string[]
     }
-  | { type: 'has-question'; message: string }
+  | {
+      type: 'spelling'
+      recallPromptId: number
+      stem: string
+    }
 
 export async function recallNext(): Promise<RecallNextResult> {
   const result = await runWithDefaultBackendClient(() =>
@@ -69,9 +73,11 @@ export async function recallNext(): Promise<RecallNextResult> {
     }
   }
   if (prompt?.questionType === 'SPELLING') {
+    const stem = prompt.spellingQuestion?.stem ?? ''
     return {
-      type: 'has-question',
-      message: 'Spelling recall not yet supported in CLI. Use the web app.',
+      type: 'spelling',
+      recallPromptId: prompt.id,
+      stem,
     }
   }
 
@@ -116,6 +122,20 @@ export async function answerQuiz(
   return { correct }
 }
 
+export async function answerSpelling(
+  recallPromptId: number,
+  spellingAnswer: string
+): Promise<{ correct: boolean }> {
+  const result = await runWithDefaultBackendClient(() =>
+    RecallPromptController.answerSpelling({
+      path: { recallPrompt: recallPromptId },
+      body: { spellingAnswer },
+    })
+  )
+  const correct = result.data?.answer?.correct ?? false
+  return { correct }
+}
+
 export const recallCommandDocs = [
   {
     name: '/recall-status',
@@ -126,7 +146,7 @@ export const recallCommandDocs = [
   {
     name: '/recall next',
     usage: '/recall next',
-    description: 'Recall next note (Just Review or MCQ)',
+    description: 'Recall next note (Just Review, MCQ, or spelling)',
     category: 'interactive' as const,
   },
 ]
