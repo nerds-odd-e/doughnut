@@ -1,5 +1,6 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import { mock_services } from '../start'
+import start from '../start'
 
 const BASE_URL = 'http://localhost:9081'
 const GOOGLE_MOCK_URL = 'http://localhost:5003'
@@ -20,6 +21,21 @@ function runCliWithConfig(args: string[]) {
 
 Given('the backend is serving the CLI and install script', () => {
   cy.request('GET', `${BASE_URL}/install`).its('status').should('eq', 200)
+})
+
+Given('I have the CLI configured with a valid access token', () => {
+  start
+    .mainMenu()
+    .userOptions()
+    .manageAccessTokens()
+    .generateToken('Recall CLI Token')
+    .then((token) => {
+      cy.wrap(token).as('savedAccessToken')
+    })
+  cy.get<string>('@savedAccessToken').then((token) =>
+    runCliWithConfig(['-c', `/add-access-token ${token}`])
+  )
+  cy.get('@doughnutOutput').should('include', 'Token added')
 })
 
 Given('the CLI is built with version {string}', (version: string) => {

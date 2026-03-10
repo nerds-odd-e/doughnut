@@ -4,9 +4,7 @@ Feature: CLI recall status
 
   Background:
     Given I am logged in as an existing user
-    And I have a valid Doughnut Access Token with label "Recall CLI Token"
-    When I run the doughnut CLI add-access-token with the saved token
-    Then I should see "Token added"
+    And I have the CLI configured with a valid access token
 
   Scenario: Recall status shows count when notes are due
     Given I have a notebook with the head note "English" which skips memory tracking
