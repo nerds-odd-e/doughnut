@@ -87,7 +87,7 @@ Feature: CLI recall status and recall next
     And I should see "Recalled successfully"
 
   @usingMockedOpenAiService
-  Scenario: Recall next MCQ - select incorrect choice by typing number
+  Scenario: Recall next MCQ - down arrow and Enter to select
     Given I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:
       | Title    | Details                        | Parent Title |
@@ -99,7 +99,7 @@ Feature: CLI recall status and recall next
     And It's day 1
     And I assimilate the note "sedition"
     And It's day 2
-    When I run the doughnut command in interactive mode with input "/recall next" and "2"
+    When I run the doughnut command in interactive mode with down-arrow selection for "/recall next"
     Then I should see "Incorrect"
     And I should see "Recalled successfully"
 

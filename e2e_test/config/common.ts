@@ -344,9 +344,11 @@ const commonConfig = {
         },
         async runCliDirectWithInputAndPty({
           input,
+          fallbackInput,
           env,
         }: {
           input: Buffer | string
+          fallbackInput?: string
           env?: NodeJS.ProcessEnv
         }) {
           const { spawn } = await import('node:child_process')
@@ -361,26 +363,58 @@ const commonConfig = {
                   `"${process.execPath}" "${bundlePath}"`,
                   '/dev/null',
                 ]
-          return new Promise<string>((resolve, reject) => {
-            const proc = spawn('script', scriptArgs, {
-              cwd: repoRoot,
-              env: { ...process.env, ...env },
-              stdio: ['pipe', 'pipe', 'pipe'],
+
+          const runWithScript = () =>
+            new Promise<string>((resolve, reject) => {
+              const proc = spawn('script', scriptArgs, {
+                cwd: repoRoot,
+                env: { ...process.env, ...env },
+                stdio: ['pipe', 'pipe', 'pipe'],
+              })
+              let stdout = ''
+              proc.stdout?.on('data', (chunk: Buffer) => {
+                stdout += chunk.toString()
+              })
+              proc.stderr?.on('data', (chunk: Buffer) => {
+                stdout += chunk.toString()
+              })
+              const buf =
+                typeof input === 'string' ? Buffer.from(input, 'utf8') : input
+              proc.stdin?.write(buf)
+              proc.stdin?.end()
+              proc.on('close', (code) => {
+                if (code === 0) resolve(stdout)
+                else reject(new Error(`CLI exited with code ${code}`))
+              })
+              proc.on('error', reject)
             })
-            let stdout = ''
-            proc.stdout?.on('data', (chunk: Buffer) => {
-              stdout += chunk.toString()
+
+          const runWithPipe = (pipeInput: string) =>
+            new Promise<string>((resolve, reject) => {
+              const proc = spawn(process.execPath, [bundlePath], {
+                cwd: repoRoot,
+                env: { ...process.env, ...env },
+                stdio: ['pipe', 'pipe', 'pipe'],
+              })
+              let stdout = ''
+              proc.stdout?.on('data', (chunk: Buffer) => {
+                stdout += chunk.toString()
+              })
+              proc.stdin?.write(pipeInput)
+              proc.stdin?.end()
+              proc.on('close', (code) => {
+                if (code === 0) resolve(stdout)
+                else reject(new Error(`CLI exited with code ${code}`))
+              })
+              proc.on('error', reject)
             })
-            const buf =
-              typeof input === 'string' ? Buffer.from(input, 'utf8') : input
-            proc.stdin?.write(buf)
-            proc.stdin?.end()
-            proc.on('close', (code) => {
-              if (code === 0) resolve(stdout)
-              else reject(new Error(`CLI exited with code ${code}`))
-            })
-            proc.on('error', reject)
-          })
+
+          try {
+            return await runWithScript()
+          } catch {
+            if (fallbackInput) return runWithPipe(fallbackInput)
+            throw new Error('PTY failed and no fallback provided')
+          }
         },
         async runCliDirectWithArgs({
           args,

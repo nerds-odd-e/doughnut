@@ -126,6 +126,7 @@ When(
       cy
         .task('runCliDirectWithInputAndPty', {
           input: `${command}\n${downArrow}\r\nexit\n`,
+          fallbackInput: `${command}\n2\nexit\n`,
           env: {
             DOUGHNUT_CONFIG_DIR: configDir,
             DOUGHNUT_API_BASE_URL: BASE_URL,
