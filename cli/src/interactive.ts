@@ -10,7 +10,7 @@ import {
   setDefaultTokenLabel,
 } from './accessToken.js'
 import { addGmailAccount, getLastEmailSubject } from './gmail.js'
-import { recallStatus } from './recall.js'
+import { markAsRecalled, recallNext, recallStatus } from './recall.js'
 import {
   filterCommandsByPrefix,
   formatCommandSuggestionsWithHighlight,
@@ -25,6 +25,8 @@ const GREY_BG = '\x1b[48;5;236m'
 const RESET = '\x1b[0m'
 const PLACEHOLDER = '`exit` to quit.'
 const PROMPT = '→ '
+
+let pendingRecallAnswer: { memoryTrackerId: number } | null = null
 
 function parseCommandWithRequiredParam(
   trimmed: string,
@@ -141,10 +143,50 @@ export async function processInput(input: string): Promise<boolean> {
     }
     return false
   }
+  if (pendingRecallAnswer) {
+    const answer = trimmed.toLowerCase()
+    if (answer === 'y' || answer === 'yes') {
+      try {
+        await markAsRecalled(pendingRecallAnswer.memoryTrackerId, true)
+        console.log('Recalled successfully')
+      } catch (err) {
+        console.log(err instanceof Error ? err.message : String(err))
+      }
+    } else if (answer === 'n' || answer === 'no') {
+      try {
+        await markAsRecalled(pendingRecallAnswer.memoryTrackerId, false)
+        console.log('Marked as not recalled')
+      } catch (err) {
+        console.log(err instanceof Error ? err.message : String(err))
+      }
+    } else {
+      console.log('Please answer y or n')
+      return false
+    }
+    pendingRecallAnswer = null
+    return false
+  }
   if (trimmed === '/recall-status') {
     try {
       const message = await recallStatus()
       console.log(message)
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : String(err))
+    }
+    return false
+  }
+  if (trimmed === '/recall next') {
+    try {
+      const result = await recallNext()
+      if (result.type === 'none') {
+        console.log(result.message)
+      } else if (result.type === 'has-question') {
+        console.log(result.message)
+      } else {
+        console.log(result.title)
+        console.log('Yes, I remember? (y/n)')
+        pendingRecallAnswer = { memoryTrackerId: result.memoryTrackerId }
+      }
     } catch (err) {
       console.log(err instanceof Error ? err.message : String(err))
     }

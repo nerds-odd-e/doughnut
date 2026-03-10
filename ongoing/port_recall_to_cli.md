@@ -29,7 +29,7 @@
 
 ---
 
-## Phase 2.1: Recall one Just Review note (title only)
+## Phase 2.1: Recall one Just Review note (title only) ✅ DONE
 
 **User behavior**: User runs `/recall next`; if next note is Just Review (no question), CLI shows note title and prompts "Yes, I remember? (y/n)"; user answers and note is marked as recalled.
 

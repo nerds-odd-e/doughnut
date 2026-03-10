@@ -3,13 +3,19 @@ import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
 import {
+  MemoryTrackerController,
   RecallsController,
   UserController,
 } from '@generated/doughnut-backend-api/sdk.gen'
 import { addAccessToken } from '../src/accessToken.js'
-import { recallStatus } from '../src/recall.js'
+import { markAsRecalled, recallNext, recallStatus } from '../src/recall.js'
 
 vi.mock('@generated/doughnut-backend-api/sdk.gen', () => ({
+  MemoryTrackerController: {
+    askAQuestion: vi.fn(),
+    markAsRecalled: vi.fn(),
+    showMemoryTracker: vi.fn(),
+  },
   RecallsController: {
     recalling: vi.fn(),
   },
@@ -135,5 +141,175 @@ describe('recallStatus', () => {
     const result = await recallStatus()
 
     expect(result).toBe('0 notes to recall today')
+  })
+})
+
+describe('recallNext', () => {
+  let originalConfigDir: string | undefined
+
+  beforeEach(() => {
+    originalConfigDir = process.env.DOUGHNUT_CONFIG_DIR
+    process.env.DOUGHNUT_CONFIG_DIR = createTempDir()
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    if (originalConfigDir === undefined) {
+      delete process.env.DOUGHNUT_CONFIG_DIR
+    } else {
+      process.env.DOUGHNUT_CONFIG_DIR = originalConfigDir
+    }
+  })
+
+  test('returns none when no notes due', async () => {
+    vi.mocked(RecallsController.recalling).mockResolvedValue({
+      data: { toRepeat: [] },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const result = await recallNext()
+
+    expect(result).toEqual({ type: 'none', message: '0 notes to recall today' })
+    expect(MemoryTrackerController.askAQuestion).not.toHaveBeenCalled()
+  })
+
+  test('returns just-review when askAQuestion returns null', async () => {
+    vi.mocked(RecallsController.recalling).mockResolvedValue({
+      data: { toRepeat: [{ memoryTrackerId: 42 }] },
+    } as never)
+    vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
+      data: null,
+    } as never)
+    vi.mocked(MemoryTrackerController.showMemoryTracker).mockResolvedValue({
+      data: {
+        note: { noteTopology: { title: 'My Note Title' } },
+      },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const result = await recallNext()
+
+    expect(result).toEqual({
+      type: 'just-review',
+      memoryTrackerId: 42,
+      title: 'My Note Title',
+    })
+    expect(MemoryTrackerController.askAQuestion).toHaveBeenCalledWith(
+      expect.objectContaining({ path: { memoryTracker: 42 } })
+    )
+  })
+
+  test('returns has-question when askAQuestion returns MCQ', async () => {
+    vi.mocked(RecallsController.recalling).mockResolvedValue({
+      data: { toRepeat: [{ memoryTrackerId: 42 }] },
+    } as never)
+    vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
+      data: { questionType: 'MCQ', multipleChoicesQuestion: {} },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const result = await recallNext()
+
+    expect(result.type).toBe('has-question')
+    expect(MemoryTrackerController.showMemoryTracker).not.toHaveBeenCalled()
+  })
+
+  test('throws when no default token', async () => {
+    vi.mocked(RecallsController.recalling).mockResolvedValue({
+      data: { toRepeat: [{ memoryTrackerId: 42 }] },
+    } as never)
+
+    await expect(recallNext()).rejects.toThrow(
+      'No default access token. Add one first with /add-access-token.'
+    )
+  })
+
+  test('uses Untitled note when showMemoryTracker has no title', async () => {
+    vi.mocked(RecallsController.recalling).mockResolvedValue({
+      data: { toRepeat: [{ memoryTrackerId: 42 }] },
+    } as never)
+    vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
+      data: null,
+    } as never)
+    vi.mocked(MemoryTrackerController.showMemoryTracker).mockResolvedValue({
+      data: { note: {} },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const result = await recallNext()
+
+    expect(result).toEqual({
+      type: 'just-review',
+      memoryTrackerId: 42,
+      title: 'Untitled note',
+    })
+  })
+})
+
+describe('markAsRecalled', () => {
+  let originalConfigDir: string | undefined
+
+  beforeEach(() => {
+    originalConfigDir = process.env.DOUGHNUT_CONFIG_DIR
+    process.env.DOUGHNUT_CONFIG_DIR = createTempDir()
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    if (originalConfigDir === undefined) {
+      delete process.env.DOUGHNUT_CONFIG_DIR
+    } else {
+      process.env.DOUGHNUT_CONFIG_DIR = originalConfigDir
+    }
+  })
+
+  test('calls markAsRecalled with successful true', async () => {
+    vi.mocked(MemoryTrackerController.markAsRecalled).mockResolvedValue(
+      {} as never
+    )
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    await markAsRecalled(42, true)
+
+    expect(MemoryTrackerController.markAsRecalled).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: { memoryTracker: 42 },
+        query: { successful: true },
+      })
+    )
+  })
+
+  test('calls markAsRecalled with successful false', async () => {
+    vi.mocked(MemoryTrackerController.markAsRecalled).mockResolvedValue(
+      {} as never
+    )
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    await markAsRecalled(99, false)
+
+    expect(MemoryTrackerController.markAsRecalled).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: { memoryTracker: 99 },
+        query: { successful: false },
+      })
+    )
   })
 })

@@ -1,4 +1,8 @@
-import { RecallsController } from '@generated/doughnut-backend-api/sdk.gen'
+import {
+  MemoryTrackerController,
+  RecallsController,
+} from '@generated/doughnut-backend-api/sdk.gen'
+import type { MemoryTrackerLite } from '@generated/doughnut-backend-api'
 import { runWithDefaultBackendClient } from './accessToken.js'
 
 function getTimezone(): string {
@@ -18,11 +22,72 @@ export async function recallStatus(): Promise<string> {
   return `${count} notes to recall today`
 }
 
+export type RecallNextResult =
+  | { type: 'none'; message: string }
+  | { type: 'just-review'; memoryTrackerId: number; title: string }
+  | { type: 'has-question'; message: string }
+
+export async function recallNext(): Promise<RecallNextResult> {
+  const result = await runWithDefaultBackendClient(() =>
+    RecallsController.recalling({
+      query: { timezone: getTimezone(), dueindays: 0 },
+    })
+  )
+  const toRepeat = result.data?.toRepeat ?? []
+  const first = toRepeat[0] as MemoryTrackerLite | undefined
+  if (!first?.memoryTrackerId) {
+    return { type: 'none', message: '0 notes to recall today' }
+  }
+
+  const questionResult = await runWithDefaultBackendClient(() =>
+    MemoryTrackerController.askAQuestion({
+      path: { memoryTracker: first.memoryTrackerId },
+    })
+  )
+  if (questionResult.data) {
+    return {
+      type: 'has-question',
+      message:
+        'MCQ and spelling recall not yet supported in CLI. Use the web app.',
+    }
+  }
+
+  const trackerResult = await runWithDefaultBackendClient(() =>
+    MemoryTrackerController.showMemoryTracker({
+      path: { memoryTracker: first.memoryTrackerId },
+    })
+  )
+  const title = trackerResult.data?.note?.noteTopology?.title ?? 'Untitled note'
+  return {
+    type: 'just-review',
+    memoryTrackerId: first.memoryTrackerId,
+    title,
+  }
+}
+
+export async function markAsRecalled(
+  memoryTrackerId: number,
+  successful: boolean
+): Promise<void> {
+  await runWithDefaultBackendClient(() =>
+    MemoryTrackerController.markAsRecalled({
+      path: { memoryTracker: memoryTrackerId },
+      query: { successful },
+    })
+  )
+}
+
 export const recallCommandDocs = [
   {
     name: '/recall-status',
     usage: '/recall-status',
     description: 'Show how many notes to recall today',
+    category: 'interactive' as const,
+  },
+  {
+    name: '/recall next',
+    usage: '/recall next',
+    description: 'Recall next note (Just Review only)',
     category: 'interactive' as const,
   },
 ]
