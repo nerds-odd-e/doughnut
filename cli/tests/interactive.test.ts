@@ -10,13 +10,17 @@ import {
 } from '../src/interactive.js'
 
 let useManyCommandsForScrollTests = false
-const { mockRecallNext, mockAnswerQuiz, mockAnswerSpelling } = vi.hoisted(
-  () => ({
-    mockRecallNext: vi.fn(),
-    mockAnswerQuiz: vi.fn(),
-    mockAnswerSpelling: vi.fn(),
-  })
-)
+const {
+  mockRecallNext,
+  mockAnswerQuiz,
+  mockAnswerSpelling,
+  mockMarkAsRecalled,
+} = vi.hoisted(() => ({
+  mockRecallNext: vi.fn(),
+  mockAnswerQuiz: vi.fn(),
+  mockAnswerSpelling: vi.fn(),
+  mockMarkAsRecalled: vi.fn(),
+}))
 vi.mock('../src/recall.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../src/recall.js')>()
   return {
@@ -24,6 +28,7 @@ vi.mock('../src/recall.js', async (importOriginal) => {
     recallNext: mockRecallNext,
     answerQuiz: mockAnswerQuiz,
     answerSpelling: mockAnswerSpelling,
+    markAsRecalled: mockMarkAsRecalled,
   }
 })
 vi.mock('../src/help.js', async (importOriginal) => {
@@ -273,6 +278,65 @@ describe('processInput', () => {
     expect(await processInput('')).toBe(false)
     expect(logSpy).toHaveBeenCalledWith('Please type your spelling')
     await processInput('clear') // clear pending state for subsequent tests
+    logSpy.mockRestore()
+  })
+
+  test('/recall with no notes shows 0 and does not enter session', async () => {
+    mockRecallNext.mockResolvedValue({
+      type: 'none',
+      message: '0 notes to recall today',
+    })
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await processInput('/recall')
+    expect(logSpy).toHaveBeenCalledWith('0 notes to recall today')
+    expect(logSpy).toHaveBeenCalledTimes(1)
+
+    logSpy.mockRestore()
+  })
+
+  test('/recall session: one note, answer y, shows Recalled 1 note', async () => {
+    mockRecallNext
+      .mockResolvedValueOnce({
+        type: 'just-review',
+        memoryTrackerId: 1,
+        title: 'Note 1',
+      })
+      .mockResolvedValueOnce({
+        type: 'none',
+        message: '0 notes to recall today',
+      })
+    mockMarkAsRecalled.mockResolvedValue(undefined)
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await processInput('/recall')
+    expect(logSpy).toHaveBeenCalledWith('Note 1')
+    expect(logSpy).toHaveBeenCalledWith('Yes, I remember? (y/n)')
+    logSpy.mockClear()
+
+    await processInput('y')
+    expect(mockMarkAsRecalled).toHaveBeenCalledWith(1, true)
+    expect(logSpy).toHaveBeenCalledWith('Recalled successfully')
+    expect(logSpy).toHaveBeenCalledWith('Recalled 1 note')
+
+    logSpy.mockRestore()
+  })
+
+  test('/recall session: error in continueRecallSession clears mode and logs', async () => {
+    mockRecallNext
+      .mockResolvedValueOnce({
+        type: 'just-review',
+        memoryTrackerId: 1,
+        title: 'Note 1',
+      })
+      .mockRejectedValueOnce(new Error('Network error'))
+    mockMarkAsRecalled.mockResolvedValue(undefined)
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await processInput('/recall')
+    await processInput('y')
+    expect(logSpy).toHaveBeenCalledWith('Network error')
+
     logSpy.mockRestore()
   })
 })

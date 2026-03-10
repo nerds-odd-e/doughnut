@@ -16,6 +16,7 @@ describe('formatHelp', () => {
     expect(output).toContain('/add gmail')
     expect(output).toContain('/last email')
     expect(output).toContain('/recall-status')
+    expect(output).toContain('/recall')
     expect(output).toContain('exit')
   })
 
@@ -27,6 +28,7 @@ describe('formatHelp', () => {
     expect(output).toContain('Add Gmail account via OAuth')
     expect(output).toContain('Show subject of last email')
     expect(output).toContain('Show how many notes to recall today')
+    expect(output).toContain('Recall all due notes in a session')
     expect(output).toContain('Quit the CLI')
   })
 

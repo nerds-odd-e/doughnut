@@ -39,6 +39,56 @@ let pendingRecallAnswer:
   | { recallPromptId: number; type: 'spelling' }
   | null = null
 
+let recallSessionMode = false
+let sessionRecallCount = 0
+
+async function continueRecallSession(): Promise<void> {
+  sessionRecallCount++
+  try {
+    const result = await recallNext()
+    if (result.type === 'none') {
+      const msg =
+        sessionRecallCount === 1
+          ? 'Recalled 1 note'
+          : `Recalled ${sessionRecallCount} notes`
+      console.log(msg)
+      recallSessionMode = false
+      sessionRecallCount = 0
+      return
+    }
+    if (result.type === 'spelling') {
+      console.log(`Spell: ${result.stem || '...'}`)
+      pendingRecallAnswer = {
+        recallPromptId: result.recallPromptId,
+        type: 'spelling',
+      }
+      return
+    }
+    if (result.type === 'mcq') {
+      console.log(result.stem)
+      for (let i = 0; i < result.choices.length; i++) {
+        console.log(`  ${i + 1}. ${result.choices[i]}`)
+      }
+      console.log(`Enter your choice (1-${result.choices.length}):`)
+      pendingRecallAnswer = {
+        recallPromptId: result.recallPromptId,
+        choices: result.choices,
+      }
+      return
+    }
+    console.log(result.title)
+    if (result.details) {
+      console.log(renderMarkdownToTerminal(result.details))
+    }
+    console.log('Yes, I remember? (y/n)')
+    pendingRecallAnswer = { memoryTrackerId: result.memoryTrackerId }
+  } catch (err) {
+    recallSessionMode = false
+    sessionRecallCount = 0
+    console.log(err instanceof Error ? err.message : String(err))
+  }
+}
+
 function parseCommandWithRequiredParam(
   trimmed: string,
   command: string
@@ -168,6 +218,7 @@ export async function processInput(input: string): Promise<boolean> {
           console.log(err instanceof Error ? err.message : String(err))
         }
         pendingRecallAnswer = null
+        if (recallSessionMode) await continueRecallSession()
       } else {
         console.log(`Enter a number from 1 to ${choices.length}`)
         return false
@@ -189,6 +240,7 @@ export async function processInput(input: string): Promise<boolean> {
         console.log(err instanceof Error ? err.message : String(err))
       }
       pendingRecallAnswer = null
+      if (recallSessionMode) await continueRecallSession()
     } else {
       const answer = trimmed.toLowerCase()
       if (answer === 'y' || answer === 'yes') {
@@ -210,6 +262,7 @@ export async function processInput(input: string): Promise<boolean> {
         return false
       }
       pendingRecallAnswer = null
+      if (recallSessionMode) await continueRecallSession()
     }
     return false
   }
@@ -218,6 +271,45 @@ export async function processInput(input: string): Promise<boolean> {
       const message = await recallStatus()
       console.log(message)
     } catch (err) {
+      console.log(err instanceof Error ? err.message : String(err))
+    }
+    return false
+  }
+  if (trimmed === '/recall') {
+    try {
+      recallSessionMode = true
+      sessionRecallCount = 0
+      const result = await recallNext()
+      if (result.type === 'none') {
+        console.log(result.message)
+        recallSessionMode = false
+      } else if (result.type === 'spelling') {
+        console.log(`Spell: ${result.stem || '...'}`)
+        pendingRecallAnswer = {
+          recallPromptId: result.recallPromptId,
+          type: 'spelling',
+        }
+      } else if (result.type === 'mcq') {
+        console.log(result.stem)
+        for (let i = 0; i < result.choices.length; i++) {
+          console.log(`  ${i + 1}. ${result.choices[i]}`)
+        }
+        console.log(`Enter your choice (1-${result.choices.length}):`)
+        pendingRecallAnswer = {
+          recallPromptId: result.recallPromptId,
+          choices: result.choices,
+        }
+      } else {
+        console.log(result.title)
+        if (result.details) {
+          console.log(renderMarkdownToTerminal(result.details))
+        }
+        console.log('Yes, I remember? (y/n)')
+        pendingRecallAnswer = { memoryTrackerId: result.memoryTrackerId }
+      }
+    } catch (err) {
+      recallSessionMode = false
+      sessionRecallCount = 0
       console.log(err instanceof Error ? err.message : String(err))
     }
     return false
@@ -457,6 +549,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
               `${err instanceof Error ? err.message : String(err)}\n`
             )
           }
+          if (recallSessionMode) await continueRecallSession()
           drawBox()
         } else if (str && !key.ctrl && !key.meta) {
           buffer += str

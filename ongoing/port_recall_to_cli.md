@@ -126,20 +126,21 @@
 
 ---
 
-## Phase 5: Full recall session (all due)
+## Phase 5: Full recall session (all due) ✅ DONE
 
 **User behavior**: User runs `/recall` (no args); CLI processes all due notes one by one (Just Review, MCQ, spelling) until none left, then shows summary.
 
 **CLI changes**:
 
-- Add `recallSession()`: loop over `toRepeat`, for each call existing recall-next logic, until list exhausted; show "Recalled N notes" at end.
+- Add `recallSessionMode` in interactive: loop by calling `recallNext` after each answer until none left; show "Recalled N notes" at end.
+- Add `/recall` command to `recallCommandDocs`.
 
 **Tests**:
 
-- **E2E**: 2–3 notes due (mix of Just Review, MCQ). Run `/recall`, complete all; verify final count.
-- **UT**: Loop termination; handling of empty list mid-session (e.g. another client); error mid-session behavior.
+- **E2E**: 2 notes due (both Just Review). Run `/recall`, complete all; verify "Recalled 2 notes".
+- **UT**: Loop termination; empty list on start; error mid-session clears mode and logs.
 
-**Cleanup**: Possibly fold `recallNext` into `recallSession` if it becomes the only entry point; keep `/recall next` if it has standalone value (single-note recall) per project preference.
+**Cleanup**: Kept `/recall next` for single-note recall.
 
 ---
 
