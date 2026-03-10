@@ -67,7 +67,7 @@ const openAiChatCompletionStubber = (
 
   return {
     stubQuestionGeneration(argumentsString: string) {
-      const response = {
+      return serviceMocker.stubPoster(`/chat/completions`, {
         object: 'chat.completion',
         choices: [
           {
@@ -79,13 +79,7 @@ const openAiChatCompletionStubber = (
             finish_reason: 'stop',
           },
         ],
-      }
-      return serviceMocker.mockPostMatchsAndNotMatches(
-        `/chat/completions`,
-        bodyToMatch,
-        bodyNotToMatch,
-        [response]
-      )
+      })
     },
     stubJsonSchemaResponse,
     requestDoesNotMessageMatch(message: MessageToMatch) {
@@ -94,7 +88,7 @@ const openAiChatCompletionStubber = (
       })
     },
     stubQuestionEvaluation(argumentsString: string) {
-      const response = {
+      return serviceMocker.stubPoster(`/chat/completions`, {
         object: 'chat.completion',
         choices: [
           {
@@ -106,13 +100,7 @@ const openAiChatCompletionStubber = (
             finish_reason: 'stop',
           },
         ],
-      }
-      return serviceMocker.mockPostMatchsAndNotMatches(
-        `/chat/completions`,
-        bodyToMatch,
-        bodyNotToMatch,
-        [response]
-      )
+      })
     },
   }
 }
