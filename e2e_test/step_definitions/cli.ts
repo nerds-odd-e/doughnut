@@ -53,14 +53,9 @@ Given('I have the CLI configured with a valid access token', () => {
     t0 = Date.now()
   }
 
-  start.mainMenu()
+  start.routerPush('/d/generate-token', 'manageAccessTokens', {})
+  start.pageIsNotLoading()
   cy.then(() => record('token-nav'))
-
-  cy.findByRole('button', { name: 'Account' }).click()
-  cy.then(() => record('token-account'))
-
-  cy.findByRole('link', { name: 'Manage Access Tokens' }).click({ force: true })
-  cy.then(() => record('token-manageTokens'))
 
   cy.findByRole('button', { name: 'Generate Token' }).click()
   submittableForm.submitWith({ Label: 'Recall CLI Token' })

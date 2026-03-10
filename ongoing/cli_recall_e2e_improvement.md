@@ -6,20 +6,21 @@ Measured with `RECORD_E2E_TIMING=1 pnpm cypress run --spec e2e_test/features/cli
 
 | Part | Total | Count | Avg |
 |------|-------|-------|-----|
-| db-reset | 1.1s | 10 | 111ms |
-| token-setup | 12.2s | 10 | 1.2s |
-| assimilate-note | 3.5s | 11 | 317ms |
-| cli-run | 2.6s | 12 | 219ms |
-| **Total (measured)** | **19.5s** | | |
+| db-reset | 1.3s | 10 | 129ms |
+| token-nav | 4.0s | 10 | 396ms |
+| token-generateToken | 4.9s | 10 | 493ms |
+| token-cli-add | 1.6s | 10 | 165ms |
+| token-setup | 10.5s | 10 | 1.05s |
+| assimilate-note | 3.7s | 11 | 338ms |
+| cli-run | 2.9s | 13 | 225ms |
 
-**Note:** Total excludes login, notebook/notes setup, time travel, and Cypress overhead. Full spec run ~21–30s in measured conditions.
+**Full spec:** 10 passing in ~20s.
 
-### By share of measured time
+### By share of token-setup time
 
-- **token-setup** — 62% (runs 10×, ~1.2s each)
-- **assimilate-note** — 18% (11 assimilations, ~317ms each)
-- **cli-run** — 13% (12 runs, ~219ms each)
-- **db-reset** — 6% (10×, ~111ms each)
+- **token-generateToken** — 47% (493ms avg)
+- **token-nav** — 38% (396ms avg)
+- **token-cli-add** — 16% (165ms avg)
 
 ---
 
@@ -29,20 +30,40 @@ Token setup is split into sub-steps (run with `RECORD_E2E_TIMING=1` and aggregat
 
 | Sub-step | What it does | Likely bottlenecks |
 |----------|--------------|---------------------|
-| **token-nav** | `mainMenu()` → `navigateToNotebooksPage()` + `pageIsNotLoading()` | `router().push('/d/notebooks')` does `cy.visit()` on first scenario (full page load); `pageIsNotLoading()` waits for `.loading-bar` (10s timeout) |
-| **token-account** | Click "Account" button | Fast (single click) |
-| **token-manageTokens** | Click "Manage Access Tokens" link | Client-side navigation to tokens page |
+| **token-nav** | `router.push('/d/generate-token', 'manageAccessTokens')` + `pageIsNotLoading()` | Direct nav to tokens page; first scenario may `cy.visit()` |
 | **token-generateToken** | Click "Generate Token", fill Label, submit, wait for `[data-testid="token-result"]` | API call to create token, form submit, wait for token DOM |
 | **token-cli-add** | `runCliWithConfig(['-c', '/add-access-token ${token}'])` | Spawn Node process, run CLI bundle, API call to validate token |
 
 ### What makes token setup slow
 
-1. **Navigation + page load** — `token-nav` goes to `/d/notebooks`. First scenario does full `cy.visit()`; others use Vue Router. `pageIsNotLoading()` waits for loading bar (10s timeout).
+1. **Navigation + page load** — `token-nav` went to `/d/notebooks` then Account → Manage Access Tokens. **Optimized**: now uses direct `router.push('/d/generate-token', 'manageAccessTokens')` to skip notebooks + Account + link clicks.
 2. **Token generation API** — `token-generateToken` triggers backend to create a token; we wait for it to appear in the DOM.
 3. **Redundant work** — Same flow runs 10× (once per scenario). Token could be generated once and reused.
 4. **CLI spawn** — `token-cli-add` spawns a new Node process each time (~200ms typical for cli-run).
 
-Run `RECORD_E2E_TIMING=1 pnpm cypress run --spec e2e_test/features/cli/cli_recall.feature` then `node e2e_test/aggregate_timing.mjs` to get actual sub-step timings.
+### Direct router optimization
+
+Replaced `mainMenu() → userOptions() → manageAccessTokens()` (nav to notebooks, click Account, click link) with:
+```
+start.routerPush('/d/generate-token', 'manageAccessTokens', {})
+start.pageIsNotLoading()
+```
+Skips ~2 page transitions and 2 clicks per scenario.
+
+**Measured impact (after optimization):**
+
+| Label | Total | Count | Avg |
+|-------|-------|-------|-----|
+| token-nav | 4.0s | 10 | 396ms |
+| token-generateToken | 4.9s | 10 | 493ms |
+| token-cli-add | 1.6s | 10 | 165ms |
+| **token-setup** | **10.5s** | 10 | **1.05s** |
+
+**Before** (mainMenu flow): token-setup ~12.2s total, ~1.22s avg  
+**After** (direct router): token-setup 10.5s total, ~1.05s avg  
+**Acceleration: ~1.7s total (~14% faster) for token-setup across 10 scenarios**
+
+Full spec: 10 passing in 20s.
 
 ---
 
