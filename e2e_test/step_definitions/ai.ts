@@ -113,14 +113,6 @@ Given('OpenAI evaluates the question as legitimate', () => {
 })
 
 Given('OpenAI evaluates the question as not legitimate', () => {
-  start.questionGenerationService().stubEvaluationQuestion({
-    feasibleQuestion: false,
-    correctChoices: [0],
-    improvementAdvices:
-      'This question is not feasible and needs to be regenerated completely.',
-  })
-
-  // Use the stored second question data if available
   const secondQuestion = Cypress.env('secondQuestion') || {
     'Question Stem': 'Second question',
     'Correct Choice': 'Rescue Diver',
@@ -131,6 +123,13 @@ Given('OpenAI evaluates the question as not legitimate', () => {
   start
     .questionGenerationService()
     .resetAndStubAskingMCQByChatCompletion(secondQuestion)
+
+  start.questionGenerationService().stubEvaluationQuestion({
+    feasibleQuestion: false,
+    correctChoices: [0],
+    improvementAdvices:
+      'This question is not feasible and needs to be regenerated completely.',
+  })
 })
 
 Then('I contest the question', () => {

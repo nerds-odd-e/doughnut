@@ -15,6 +15,8 @@ const createMcqWithAnswer = (
   },
 })
 
+const understandingChecklistStub = { points: [] as string[] }
+
 export const questionGenerationService = () => ({
   resetAndStubAskingMCQByChatCompletion: (record: Record<string, string>) => {
     const mcqWithAnswer = createMcqWithAnswer(
@@ -29,7 +31,18 @@ export const questionGenerationService = () => ({
       await mock_services
         .openAi()
         .chatCompletion()
-        .requestMessageMatches({ role: 'user', content: 'Memory Assistant' })
+        .requestMessageMatches({
+          role: 'system',
+          content: '.*Please generate an understanding checklist.*',
+        })
+        .stubJsonSchemaResponse(JSON.stringify(understandingChecklistStub))
+      await mock_services
+        .openAi()
+        .chatCompletion()
+        .requestMessageMatches({
+          role: 'system',
+          content: '.*Question Designer.*',
+        })
         .stubQuestionGeneration(reply)
     })
   },
@@ -41,7 +54,10 @@ export const questionGenerationService = () => ({
       await mock_services
         .openAi()
         .chatCompletion()
-        .requestMessageMatches({ role: 'user', content: 'Memory Assistant' })
+        .requestMessageMatches({
+          role: 'system',
+          content: '.*evaluating a memory recall question.*',
+        })
         .stubQuestionEvaluation(JSON.stringify(record))
     })
   },
