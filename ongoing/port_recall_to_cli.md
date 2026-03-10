@@ -49,7 +49,7 @@
 
 ---
 
-## Phase 2.2: Just Review with markdown note content
+## Phase 2.2: Just Review with markdown note content ✅ DONE
 
 **User behavior**: User runs `/recall next`; for Just Review, CLI shows note title + note details (markdown rendered to terminal) before prompting "Yes, I remember? (y/n)". Matches web behavior where full note is visible.
 

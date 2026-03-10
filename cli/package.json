@@ -18,7 +18,8 @@
     "lint": "biome check src/ tests/"
   },
   "dependencies": {
-    "doughnut-api": "workspace:*"
+    "doughnut-api": "workspace:*",
+    "markdansi": "0.2.1"
   },
   "devDependencies": {
     "@types/node": "25.3.5",

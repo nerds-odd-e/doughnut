@@ -195,7 +195,7 @@ describe('recallNext', () => {
 
     const result = await recallNext()
 
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       type: 'just-review',
       memoryTrackerId: 42,
       title: 'My Note Title',
@@ -233,6 +233,36 @@ describe('recallNext', () => {
     )
   })
 
+  test('returns details when showMemoryTracker has note details', async () => {
+    vi.mocked(RecallsController.recalling).mockResolvedValue({
+      data: { toRepeat: [{ memoryTrackerId: 42 }] },
+    } as never)
+    vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
+      data: null,
+    } as never)
+    vi.mocked(MemoryTrackerController.showMemoryTracker).mockResolvedValue({
+      data: {
+        note: {
+          noteTopology: { title: 'Bold Word' },
+          details: '**Bold** and _italic_',
+        },
+      },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const result = await recallNext()
+
+    expect(result).toMatchObject({
+      type: 'just-review',
+      memoryTrackerId: 42,
+      title: 'Bold Word',
+      details: '**Bold** and _italic_',
+    })
+  })
+
   test('uses Untitled note when showMemoryTracker has no title', async () => {
     vi.mocked(RecallsController.recalling).mockResolvedValue({
       data: { toRepeat: [{ memoryTrackerId: 42 }] },
@@ -250,7 +280,7 @@ describe('recallNext', () => {
 
     const result = await recallNext()
 
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       type: 'just-review',
       memoryTrackerId: 42,
       title: 'Untitled note',

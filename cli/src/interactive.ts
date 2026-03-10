@@ -10,6 +10,7 @@ import {
   setDefaultTokenLabel,
 } from './accessToken.js'
 import { addGmailAccount, getLastEmailSubject } from './gmail.js'
+import { renderMarkdownToTerminal } from './markdown.js'
 import { markAsRecalled, recallNext, recallStatus } from './recall.js'
 import {
   filterCommandsByPrefix,
@@ -184,6 +185,9 @@ export async function processInput(input: string): Promise<boolean> {
         console.log(result.message)
       } else {
         console.log(result.title)
+        if (result.details) {
+          console.log(renderMarkdownToTerminal(result.details))
+        }
         console.log('Yes, I remember? (y/n)')
         pendingRecallAnswer = { memoryTrackerId: result.memoryTrackerId }
       }

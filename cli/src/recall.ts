@@ -24,7 +24,12 @@ export async function recallStatus(): Promise<string> {
 
 export type RecallNextResult =
   | { type: 'none'; message: string }
-  | { type: 'just-review'; memoryTrackerId: number; title: string }
+  | {
+      type: 'just-review'
+      memoryTrackerId: number
+      title: string
+      details?: string
+    }
   | { type: 'has-question'; message: string }
 
 export async function recallNext(): Promise<RecallNextResult> {
@@ -58,10 +63,12 @@ export async function recallNext(): Promise<RecallNextResult> {
     })
   )
   const title = trackerResult.data?.note?.noteTopology?.title ?? 'Untitled note'
+  const details = trackerResult.data?.note?.details
   return {
     type: 'just-review',
     memoryTrackerId: first.memoryTrackerId,
     title,
+    details,
   }
 }
 
