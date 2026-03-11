@@ -19,5 +19,5 @@ const pkg = {
 }
 writeFileSync(
   join(outputPath, 'package.json'),
-  JSON.stringify(pkg, null, 2) + '\n',
+  `${JSON.stringify(pkg,·null,·2)}\n`
 )
