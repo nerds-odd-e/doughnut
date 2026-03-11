@@ -392,6 +392,8 @@ const commonConfig = {
                   '/dev/null',
                 ]
 
+          const PTY_TIMEOUT_MS = 55_000
+
           const runWithScript = () =>
             new Promise<string>((resolve, reject) => {
               const proc = spawn('script', scriptArgs, {
@@ -400,6 +402,10 @@ const commonConfig = {
                 stdio: ['pipe', 'pipe', 'pipe'],
               })
               let stdout = ''
+              const timeout = setTimeout(() => {
+                proc.kill('SIGKILL')
+                reject(new Error('PTY script timed out'))
+              }, PTY_TIMEOUT_MS)
               proc.stdout?.on('data', (chunk: Buffer) => {
                 stdout += chunk.toString()
               })
@@ -410,11 +416,15 @@ const commonConfig = {
                 typeof input === 'string' ? Buffer.from(input, 'utf8') : input
               proc.stdin?.write(buf)
               proc.stdin?.end()
-              proc.on('close', (code) => {
+              proc.on('close', (code, signal) => {
+                clearTimeout(timeout)
                 if (code === 0) resolve(stdout)
                 else reject(new Error(`CLI exited with code ${code}`))
               })
-              proc.on('error', reject)
+              proc.on('error', (err) => {
+                clearTimeout(timeout)
+                reject(err)
+              })
             })
 
           const runWithPipe = (pipeInput: string) =>

@@ -15,6 +15,8 @@ const createMcqWithAnswer = (
   },
 })
 
+const understandingChecklistReply = JSON.stringify({ points: [] })
+
 export const questionGenerationService = () => ({
   resetAndStubAskingMCQByChatCompletion: (record: Record<string, string>) => {
     const mcqWithAnswer = createMcqWithAnswer(
@@ -26,6 +28,14 @@ export const questionGenerationService = () => ({
     const reply = JSON.stringify(mcqWithAnswer)
     cy.then(async () => {
       await mock_services.openAi().restartImposter()
+      await mock_services
+        .openAi()
+        .chatCompletion()
+        .requestMessageMatches({
+          role: 'system',
+          content: '.*Please generate an understanding checklist.*',
+        })
+        .stubJsonSchemaResponse(understandingChecklistReply)
       await mock_services
         .openAi()
         .chatCompletion()
