@@ -17,11 +17,13 @@ const {
   mockAnswerQuiz,
   mockAnswerSpelling,
   mockMarkAsRecalled,
+  mockContestAndRegenerate,
 } = vi.hoisted(() => ({
   mockRecallNext: vi.fn(),
   mockAnswerQuiz: vi.fn(),
   mockAnswerSpelling: vi.fn(),
   mockMarkAsRecalled: vi.fn(),
+  mockContestAndRegenerate: vi.fn(),
 }))
 vi.mock('../src/recall.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../src/recall.js')>()
@@ -31,6 +33,7 @@ vi.mock('../src/recall.js', async (importOriginal) => {
     answerQuiz: mockAnswerQuiz,
     answerSpelling: mockAnswerSpelling,
     markAsRecalled: mockMarkAsRecalled,
+    contestAndRegenerate: mockContestAndRegenerate,
   }
 })
 vi.mock('../src/help.js', async (importOriginal) => {
@@ -91,6 +94,7 @@ describe('processInput', () => {
     mockMarkAsRecalled.mockClear()
     mockAnswerQuiz.mockClear()
     mockAnswerSpelling.mockClear()
+    mockContestAndRegenerate.mockClear()
   })
 
   test('returns true for exit', async () => {
@@ -475,6 +479,89 @@ describe('processInput', () => {
     expect(logSpy).not.toHaveBeenCalledWith(
       expect.stringMatching(/notes to recall today/)
     )
+
+    logSpy.mockRestore()
+  })
+
+  test('/contest when in recall with MCQ contests and shows new question', async () => {
+    mockRecallNext
+      .mockResolvedValueOnce({
+        type: 'mcq',
+        recallPromptId: 100,
+        stem: 'First question?',
+        choices: ['A', 'B', 'C'],
+      })
+      .mockResolvedValueOnce({
+        type: 'none',
+        message: '0 notes to recall today',
+      })
+    mockContestAndRegenerate.mockResolvedValue({
+      ok: true,
+      result: {
+        type: 'mcq',
+        recallPromptId: 200,
+        stem: 'Regenerated question?',
+        choices: ['X', 'Y', 'Z'],
+      },
+    })
+    mockAnswerQuiz.mockResolvedValue({ correct: true })
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await processInput('/recall')
+    expect(logSpy).toHaveBeenCalledWith('First question?')
+    logSpy.mockClear()
+
+    await processInput('/contest')
+    expect(mockContestAndRegenerate).toHaveBeenCalledWith(100)
+    expect(logSpy).toHaveBeenCalledWith('Regenerated question?')
+    expect(logSpy).toHaveBeenCalledWith('  1. X')
+    expect(logSpy).toHaveBeenCalledWith('  2. Y')
+    expect(logSpy).toHaveBeenCalledWith('  3. Z')
+    expect(logSpy).toHaveBeenCalledWith('Enter your choice (1-3):')
+    logSpy.mockClear()
+
+    await processInput('1')
+    expect(mockAnswerQuiz).toHaveBeenCalledWith(200, 0)
+    expect(logSpy).toHaveBeenCalledWith('Correct!')
+    expect(logSpy).toHaveBeenCalledWith('Recalled successfully')
+
+    logSpy.mockRestore()
+  })
+
+  test('/contest when no question pending shows /stop hint', async () => {
+    mockRecallNext.mockResolvedValue({
+      type: 'just-review',
+      memoryTrackerId: 1,
+      title: 'Note 1',
+    })
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await processInput('/recall')
+    await processInput('/contest')
+    expect(mockContestAndRegenerate).not.toHaveBeenCalled()
+    expect(logSpy).toHaveBeenCalledWith('Type /stop to exit recall')
+
+    logSpy.mockRestore()
+  })
+
+  test('/contest when contest fails shows error message', async () => {
+    mockRecallNext.mockResolvedValue({
+      type: 'mcq',
+      recallPromptId: 100,
+      stem: 'Q?',
+      choices: ['A', 'B'],
+    })
+    mockContestAndRegenerate.mockResolvedValue({
+      ok: false,
+      message: 'Question could not be regenerated',
+    })
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await processInput('/recall')
+    expect(isInRecallSubstate()).toBe(true)
+    await processInput('/contest')
+    expect(logSpy).toHaveBeenCalledWith('Question could not be regenerated')
+    expect(isInRecallSubstate()).toBe(true)
 
     logSpy.mockRestore()
   })

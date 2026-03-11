@@ -12,6 +12,7 @@ import { addAccessToken } from '../src/accessToken.js'
 import {
   answerQuiz,
   answerSpelling,
+  contestAndRegenerate,
   markAsRecalled,
   recallNext,
   recallStatus,
@@ -29,6 +30,8 @@ vi.mock('@generated/doughnut-backend-api/sdk.gen', () => ({
   RecallPromptController: {
     answerQuiz: vi.fn(),
     answerSpelling: vi.fn(),
+    contest: vi.fn(),
+    regenerate: vi.fn(),
   },
   UserController: {
     getTokenInfo: vi.fn(),
@@ -512,6 +515,91 @@ describe('answerSpelling', () => {
     const result = await answerSpelling(100, 'sedicion')
 
     expect(result).toEqual({ correct: false })
+  })
+})
+
+describe('contestAndRegenerate', () => {
+  let originalConfigDir: string | undefined
+
+  beforeEach(() => {
+    originalConfigDir = process.env.DOUGHNUT_CONFIG_DIR
+    process.env.DOUGHNUT_CONFIG_DIR = createTempDir()
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    if (originalConfigDir === undefined) {
+      delete process.env.DOUGHNUT_CONFIG_DIR
+    } else {
+      process.env.DOUGHNUT_CONFIG_DIR = originalConfigDir
+    }
+  })
+
+  test('returns new MCQ when contest and regenerate succeed', async () => {
+    vi.mocked(RecallPromptController.contest).mockResolvedValue({
+      data: { advice: 'improve', rejected: false },
+    } as never)
+    vi.mocked(RecallPromptController.regenerate).mockResolvedValue({
+      data: {
+        id: 200,
+        questionType: 'MCQ',
+        multipleChoicesQuestion: {
+          f0__stem: 'New question?',
+          f1__choices: ['A', 'B', 'C'],
+        },
+      },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const result = await contestAndRegenerate(100)
+
+    expect(result).toEqual({
+      ok: true,
+      result: {
+        type: 'mcq',
+        recallPromptId: 200,
+        stem: 'New question?',
+        choices: ['A', 'B', 'C'],
+      },
+    })
+  })
+
+  test('returns error when contest is rejected', async () => {
+    vi.mocked(RecallPromptController.contest).mockResolvedValue({
+      data: { advice: 'Question is fine', rejected: true },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const result = await contestAndRegenerate(100)
+
+    expect(result).toEqual({
+      ok: false,
+      message: 'Question is fine',
+    })
+    expect(RecallPromptController.regenerate).not.toHaveBeenCalled()
+  })
+
+  test('returns error when regenerate fails', async () => {
+    vi.mocked(RecallPromptController.contest).mockResolvedValue({
+      data: { advice: 'try again', rejected: false },
+    } as never)
+    vi.mocked(RecallPromptController.regenerate).mockResolvedValue({
+      error: new Error('API error'),
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const result = await contestAndRegenerate(100)
+
+    expect(result).toEqual({ ok: false, message: 'API error' })
   })
 })
 

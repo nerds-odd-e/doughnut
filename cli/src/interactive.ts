@@ -14,6 +14,7 @@ import { renderMarkdownToTerminal } from './markdown.js'
 import {
   answerQuiz,
   answerSpelling,
+  contestAndRegenerate,
   markAsRecalled,
   recallNext,
   recallStatus,
@@ -140,8 +141,50 @@ export async function processInput(input: string): Promise<boolean> {
     console.log('Stopped recall')
     return false
   }
+  const contestableRecallPromptId =
+    pendingRecallAnswer && 'recallPromptId' in pendingRecallAnswer
+      ? pendingRecallAnswer.recallPromptId
+      : null
+  if (isInRecallSubstate() && trimmed === '/contest') {
+    if (contestableRecallPromptId == null) {
+      console.log('Type /stop to exit recall')
+      return false
+    }
+    try {
+      const outcome = await contestAndRegenerate(contestableRecallPromptId)
+      if (!outcome.ok) {
+        console.log(outcome.message)
+        return false
+      }
+      const { result } = outcome
+      if (result.type === 'mcq') {
+        console.log(result.stem)
+        for (let i = 0; i < result.choices.length; i++) {
+          console.log(`  ${i + 1}. ${result.choices[i]}`)
+        }
+        console.log(`Enter your choice (1-${result.choices.length}):`)
+        pendingRecallAnswer = {
+          recallPromptId: result.recallPromptId,
+          choices: result.choices,
+        }
+      } else if (result.type === 'spelling') {
+        console.log(`Spell: ${result.stem || '...'}`)
+        pendingRecallAnswer = {
+          recallPromptId: result.recallPromptId,
+          type: 'spelling',
+        }
+      }
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : String(err))
+    }
+    return false
+  }
   if (isInRecallSubstate() && trimmed.startsWith('/')) {
-    console.log('Type /stop to exit recall')
+    console.log(
+      contestableRecallPromptId
+        ? 'Type /stop to exit, /contest to regenerate'
+        : 'Type /stop to exit recall'
+    )
     return false
   }
   if (trimmed === '/help') {
@@ -598,6 +641,55 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
             linesAboveCursor = 0
             prevTotalLines = 0
             process.stdout.write('Stopped recall\n')
+            drawBox()
+            return
+          }
+          if (buffer.trim() === '/contest') {
+            buffer = ''
+            if (linesAboveCursor > 0) {
+              process.stdout.write(`\x1b[${linesAboveCursor}A`)
+            }
+            process.stdout.write('\r')
+            for (let i = 0; i < prevTotalLines; i++) {
+              process.stdout.write('\x1b[2K\n')
+            }
+            if (prevTotalLines > 1) {
+              process.stdout.write(`\x1b[${prevTotalLines - 1}A`)
+            }
+            try {
+              const outcome = await contestAndRegenerate(recallPromptId)
+              if (!outcome.ok) {
+                process.stdout.write(`${outcome.message}\n`)
+              } else {
+                const { result } = outcome
+                if (result.type === 'mcq') {
+                  process.stdout.write(`${result.stem}\n`)
+                  for (let i = 0; i < result.choices.length; i++) {
+                    process.stdout.write(`  ${i + 1}. ${result.choices[i]}\n`)
+                  }
+                  process.stdout.write(
+                    `Enter your choice (1-${result.choices.length}):\n`
+                  )
+                  pendingRecallAnswer = {
+                    recallPromptId: result.recallPromptId,
+                    choices: result.choices,
+                  }
+                } else if (result.type === 'spelling') {
+                  process.stdout.write(`Spell: ${result.stem || '...'}\n`)
+                  pendingRecallAnswer = {
+                    recallPromptId: result.recallPromptId,
+                    type: 'spelling',
+                  }
+                }
+              }
+            } catch (err) {
+              process.stdout.write(
+                `${err instanceof Error ? err.message : String(err)}\n`
+              )
+            }
+            mcqChoiceHighlightIndex = 0
+            linesAboveCursor = 0
+            prevTotalLines = 0
             drawBox()
             return
           }

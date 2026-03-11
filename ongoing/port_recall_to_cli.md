@@ -182,16 +182,20 @@
 
 ---
 
-## Phase 8: Contest / Regenerate (lower priority)
+## Phase 8: Contest / Regenerate ✅ DONE
 
-**User behavior**: After answering MCQ, CLI asks "Contest this question? (y/n)"; if yes, call contest + regenerate; show new question (or skip).
+**User behavior**: While in recall state, before answering an MCQ (or spelling) question, user can type `/contest` to contest and regenerate a new question. The new question is shown and user then answers.
 
 **APIs**: `RecallPromptController.contest`, `RecallPromptController.regenerate`.
 
+**CLI changes**:
+
+- Add `/contest` as a recall-substate subcommand (alongside `/stop`). When invoked while a question is pending, call contest + regenerate; fetch and display new question; user answers the new one.
+
 **Tests**:
 
-- **E2E**: Answer MCQ, contest, get new question.
-- **UT**: Contest/regenerate error handling; reject invalid input.
+- **E2E**: Run `/recall`, get MCQ, type `/contest` before answering; verify new question appears, answer it.
+- **UT**: Contest/regenerate error handling; `/contest` only valid in recall state with pending question.
 
 **Cleanup**: Only add if user value justifies it; else defer.
 
@@ -228,6 +232,6 @@
 | 5     | `/recall`                    | Full session           | Phases 2.2, 3, 4           |
 | 6     | `/recall` load more          | Notes from future days | Phase 5                     |
 | 7     | Recall substate, `/stop`     | Exit recall mid-session| Phase 5                     |
-| 8     | Contest/Regenerate           | Edge case, low priority| Phase 3                     |
+| 8     | Recall substate `/contest`   | Contest before answering| Phases 3, 7                |
 
 Each phase: implement → E2E + UT → remove dead code → commit → push → CD deploy → next phase.

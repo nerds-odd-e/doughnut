@@ -3,6 +3,7 @@ import {
   RecallsController,
   RecallPromptController,
 } from '@generated/doughnut-backend-api/sdk.gen'
+import type { RecallPrompt } from '@generated/doughnut-backend-api'
 import type { MemoryTrackerLite } from '@generated/doughnut-backend-api'
 import { runWithDefaultBackendClient } from './accessToken.js'
 
@@ -134,6 +135,72 @@ export async function answerSpelling(
   )
   const correct = result.data?.answer?.correct ?? false
   return { correct }
+}
+
+function recallPromptToResult(prompt: RecallPrompt): RecallNextResult | null {
+  if (prompt.questionType === 'MCQ' && prompt.multipleChoicesQuestion) {
+    const mcq = prompt.multipleChoicesQuestion
+    return {
+      type: 'mcq',
+      recallPromptId: prompt.id,
+      stem: mcq.f0__stem ?? '',
+      choices: mcq.f1__choices ?? [],
+    }
+  }
+  if (prompt.questionType === 'SPELLING') {
+    const stem = prompt.spellingQuestion?.stem ?? ''
+    return { type: 'spelling', recallPromptId: prompt.id, stem }
+  }
+  return null
+}
+
+export async function contestAndRegenerate(
+  recallPromptId: number
+): Promise<
+  { ok: true; result: RecallNextResult } | { ok: false; message: string }
+> {
+  const contestResult = await runWithDefaultBackendClient(() =>
+    RecallPromptController.contest({
+      path: { recallPrompt: recallPromptId },
+    })
+  )
+  const data = contestResult.data
+  if (contestResult.error) {
+    return {
+      ok: false,
+      message: contestResult.error.message ?? String(contestResult.error),
+    }
+  }
+  if (!data) {
+    return { ok: false, message: 'Contest failed' }
+  }
+  if (data.rejected) {
+    return {
+      ok: false,
+      message: data.advice ?? 'Question could not be regenerated',
+    }
+  }
+  const regenerateResult = await runWithDefaultBackendClient(() =>
+    RecallPromptController.regenerate({
+      path: { recallPrompt: recallPromptId },
+      body: data,
+    })
+  )
+  const regenerated = regenerateResult.data
+  if (regenerateResult.error) {
+    return {
+      ok: false,
+      message: regenerateResult.error.message ?? String(regenerateResult.error),
+    }
+  }
+  if (!regenerated) {
+    return { ok: false, message: 'Regenerate failed' }
+  }
+  const result = recallPromptToResult(regenerated)
+  if (!result) {
+    return { ok: false, message: 'Unexpected question type' }
+  }
+  return { ok: true, result }
 }
 
 export const recallCommandDocs = [
