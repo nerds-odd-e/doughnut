@@ -201,13 +201,6 @@
 
 ---
 
-## Interim Behaviors (remove when superseded)
-
-- **Phase 2.1**: Just Review with title only is interim; Phase 2.2 replaces with full note (title + markdown details).
-- Any "quick access" command (e.g. `/recall-now` as alias) that gets replaced by `/recall` should be removed.
-
----
-
 ## Technical Notes
 
 1. **Default token**: Add `runWithDefaultBackendClient(fn)` or `getDefaultToken()` in `cli/src/accessToken.ts` and use for all recall commands.
