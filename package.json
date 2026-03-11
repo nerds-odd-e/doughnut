@@ -16,7 +16,7 @@
     "mcp-server:bundle": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server bundle",
     "mcp-server:test": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server test",
     "mcp-server:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server format",
-    "cli": "pnpm --frozen-lockfile --silent recursive install && DOUGHNUT_API_BASE_URL=http://localhost:9081 pnpm -C cli exec tsx src/index.ts",
+    "cli": "pnpm --frozen-lockfile --silent recursive install && DOUGHNUT_API_BASE_URL=http://localhost:9081 DOUGHNUT_CONFIG_DIR=$HOME/.config/doughnut-dev pnpm -C cli exec tsx src/index.ts",
     "cli:bundle": "pnpm --frozen-lockfile --silent recursive install && pnpm -C cli bundle",
     "cli:bundle-and-copy": "pnpm cli:bundle && mkdir -p backend/src/main/resources/static/doughnut-cli-latest && cp cli/dist/doughnut-cli.bundle.mjs backend/src/main/resources/static/doughnut-cli-latest/doughnut",
     "cli:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C cli format",

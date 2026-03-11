@@ -40,7 +40,7 @@ cli/
 
 ## API base URL
 
-The bundled CLI defaults to `https://doughnut.odd-e.com`. The `pnpm cli` script sets `DOUGHNUT_API_BASE_URL=http://localhost:9081` so it talks to the local backend. Self-hosted deployments should set this to their instance URL.
+The bundled CLI defaults to `https://doughnut.odd-e.com`. The `pnpm cli` script sets `DOUGHNUT_API_BASE_URL=http://localhost:9081` and `DOUGHNUT_CONFIG_DIR=~/.config/doughnut-dev` so it talks to the local backend and uses a separate dev config. Use `pnpm cli -P` or `pnpm cli --production` to connect to production and use the global config (`~/.config/doughnut`). Self-hosted deployments should set `DOUGHNUT_API_BASE_URL` to their instance URL.
 
 ## OAuth credentials (Gmail)
 
