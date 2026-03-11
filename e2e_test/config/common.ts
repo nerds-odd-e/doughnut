@@ -447,6 +447,9 @@ const commonConfig = {
               proc.on('error', reject)
             })
 
+          if (process.env.CI && fallbackInput) {
+            return runWithPipe(fallbackInput)
+          }
           try {
             return await runWithScript()
           } catch {
