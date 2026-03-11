@@ -10,7 +10,7 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "@generated/*": ["../packages/generated-backend/*"]
+      "@generated/*": ["../packages/generated/*"]
     },
     "types": ["vitest/globals"]
   },

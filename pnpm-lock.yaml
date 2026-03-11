@@ -348,8 +348,10 @@ importers:
   packages/doughnut-api:
     dependencies:
       '@generated/doughnut-backend-api':
-        specifier: file:../generated/doughnut-backend-api
-        version: doughnut-backend-api@file:packages/generated/doughnut-backend-api
+        specifier: workspace:*
+        version: link:../generated/doughnut-backend-api
+
+  packages/generated/doughnut-backend-api: {}
 
 packages:
 
@@ -3187,9 +3189,6 @@ packages:
   dotenv@17.3.1:
     resolution: {integrity: sha512-IO8C/dzEb6O3F9/twg6ZLXz164a2fhTnEWb95H23Dm4OuN+92NmEAlTrupP9VW6Jm3sO26tQlqyvyi4CsnY9GA==}
     engines: {node: '>=12'}
-
-  doughnut-backend-api@file:packages/generated/doughnut-backend-api:
-    resolution: {directory: packages/generated/doughnut-backend-api, type: directory}
 
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
@@ -9870,8 +9869,6 @@ snapshots:
   dotenv@16.4.7: {}
 
   dotenv@17.3.1: {}
-
-  doughnut-backend-api@file:packages/generated/doughnut-backend-api: {}
 
   dunder-proto@1.0.1:
     dependencies:
