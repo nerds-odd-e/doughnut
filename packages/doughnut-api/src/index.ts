@@ -2,7 +2,8 @@ import { client } from '@generated/doughnut-backend-api/client.gen'
 
 export function getApiConfig() {
   return {
-    apiBaseUrl: process.env.DOUGHNUT_API_BASE_URL || 'http://localhost:9081',
+    apiBaseUrl:
+      process.env.DOUGHNUT_API_BASE_URL || 'https://doughnut.odd-e.com',
     authToken: process.env.DOUGHNUT_API_AUTH_TOKEN,
   }
 }

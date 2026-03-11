@@ -88,7 +88,7 @@ describe('getApiConfig', () => {
 
     const config = getApiConfig()
 
-    expect(config.apiBaseUrl).toBe('http://localhost:9081')
+    expect(config.apiBaseUrl).toBe('https://doughnut.odd-e.com')
     expect(config.authToken).toBeUndefined()
   })
 
@@ -98,7 +98,7 @@ describe('getApiConfig', () => {
 
     const config = getApiConfig()
 
-    expect(config.apiBaseUrl).toBe('http://localhost:9081')
+    expect(config.apiBaseUrl).toBe('https://doughnut.odd-e.com')
     expect(config.authToken).toBe('')
   })
 })

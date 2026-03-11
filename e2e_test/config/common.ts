@@ -22,6 +22,14 @@ import AdmZip from 'adm-zip'
 import type { ExpectedFile } from '../start/downloadChecker'
 
 const CLI_BUNDLE_PATH = 'cli/dist/doughnut-cli.bundle.mjs'
+const CLI_E2E_BACKEND_URL = 'http://localhost:9081'
+
+function cliEnv(overrides?: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+  return {
+    DOUGHNUT_API_BASE_URL: CLI_E2E_BACKEND_URL,
+    ...overrides,
+  }
+}
 
 function runSync(
   cmd: string,
@@ -354,7 +362,7 @@ const commonConfig = {
           return new Promise<string>((resolve, reject) => {
             const proc = spawn(process.execPath, [bundlePath], {
               cwd: repoRoot,
-              env: { ...process.env, ...env },
+              env: { ...process.env, ...cliEnv(env) },
               stdio: ['pipe', 'pipe', 'pipe'],
             })
             let stdout = ''
@@ -398,7 +406,7 @@ const commonConfig = {
             new Promise<string>((resolve, reject) => {
               const proc = spawn('script', scriptArgs, {
                 cwd: repoRoot,
-                env: { ...process.env, ...env },
+                env: { ...process.env, ...cliEnv(env) },
                 stdio: ['pipe', 'pipe', 'pipe'],
               })
               let stdout = ''
@@ -431,7 +439,7 @@ const commonConfig = {
             new Promise<string>((resolve, reject) => {
               const proc = spawn(process.execPath, [bundlePath], {
                 cwd: repoRoot,
-                env: { ...process.env, ...env },
+                env: { ...process.env, ...cliEnv(env) },
                 stdio: ['pipe', 'pipe', 'pipe'],
               })
               let stdout = ''
@@ -470,7 +478,7 @@ const commonConfig = {
           return new Promise<string>((resolve, reject) => {
             const proc = spawn(process.execPath, [bundlePath, ...args], {
               cwd: repoRoot,
-              env: { ...process.env, ...env },
+              env: { ...process.env, ...cliEnv(env) },
               stdio: ['pipe', 'pipe', 'pipe'],
             })
             let stdout = ''
@@ -503,7 +511,7 @@ const commonConfig = {
               [doughnutPath, ...(args ?? [])],
               {
                 cwd: path.dirname(doughnutPath),
-                env: { ...process.env, ...env },
+                env: { ...process.env, ...cliEnv(env) },
                 stdio: ['pipe', 'pipe', 'pipe'],
               }
             )
@@ -546,9 +554,11 @@ const commonConfig = {
                 cwd: repoRoot,
                 env: {
                   ...process.env,
-                  DOUGHNUT_CONFIG_DIR: configDir,
-                  DOUGHNUT_NO_BROWSER: '1',
-                  GOOGLE_BASE_URL: googleBaseUrl,
+                  ...cliEnv({
+                    DOUGHNUT_CONFIG_DIR: configDir,
+                    DOUGHNUT_NO_BROWSER: '1',
+                    GOOGLE_BASE_URL: googleBaseUrl,
+                  }),
                 },
                 stdio: ['pipe', 'pipe', 'pipe'],
               })
@@ -617,8 +627,10 @@ const commonConfig = {
               cwd: repoRoot,
               env: {
                 ...process.env,
-                DOUGHNUT_CONFIG_DIR: configDir,
-                GOOGLE_BASE_URL: googleBaseUrl,
+                ...cliEnv({
+                  DOUGHNUT_CONFIG_DIR: configDir,
+                  GOOGLE_BASE_URL: googleBaseUrl,
+                }),
               },
               stdio: ['pipe', 'pipe', 'pipe'],
             })

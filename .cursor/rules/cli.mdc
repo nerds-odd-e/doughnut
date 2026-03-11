@@ -38,6 +38,10 @@ cli/
 - PowerShell: `backend/src/main/resources/install.ps1`
 - Served by `InstallController` at `/install` (add `?win32=true` for PowerShell)
 
+## API base URL
+
+The bundled CLI defaults to `https://doughnut.odd-e.com`. The `pnpm cli` script sets `DOUGHNUT_API_BASE_URL=http://localhost:9081` so it talks to the local backend. Self-hosted deployments should set this to their instance URL.
+
 ## OAuth credentials (Gmail)
 
 Credentials are injected at build time. For local builds: copy `cli/.env.local.example` to `cli/.env.local` and add your Google OAuth client ID and secret. For CI/release: add `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` as GitHub Actions secrets (Settings > Secrets and variables > Actions).
