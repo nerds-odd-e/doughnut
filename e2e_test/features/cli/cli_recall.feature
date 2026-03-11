@@ -104,6 +104,22 @@ Feature: CLI recall status and recall next
     And I should see "Recalled successfully"
 
   @disableOpenAiService
+  Scenario: Recall substate - /stop exits recall mode
+    Given I have a notebook with the head note "English" which skips memory tracking
+    And there are some notes:
+      | Title    | Details                        | Parent Title |
+      | sedition | Sedition means incite violence | English      |
+      | sedation | Put to sleep is sedation       | English      |
+    And It's day 1
+    And I assimilate the note "sedition"
+    And I assimilate the note "sedation"
+    And It's day 2
+    When I run the doughnut command in interactive mode with input "/recall" and "/stop"
+    Then I should see "sedition"
+    And I should see "Yes, I remember?"
+    And I should see "Stopped recall"
+
+  @disableOpenAiService
   Scenario: Recall session - complete all due notes and see summary
     Given I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:

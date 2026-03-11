@@ -52,6 +52,20 @@ export function resetRecallStateForTesting(): void {
   pendingRecallLoadMore = false
 }
 
+export function isInRecallSubstate(): boolean {
+  return (
+    recallSessionMode || pendingRecallAnswer !== null || pendingRecallLoadMore
+  )
+}
+
+function exitRecallMode(): void {
+  recallSessionMode = false
+  pendingRecallAnswer = null
+  sessionRecallCount = 0
+  recallSessionDueDays = 0
+  pendingRecallLoadMore = false
+}
+
 async function continueRecallSession(fromLoadMore = false): Promise<void> {
   if (!fromLoadMore) sessionRecallCount++
   try {
@@ -123,6 +137,11 @@ export async function processInput(input: string): Promise<boolean> {
   }
   if (trimmed === '/help') {
     console.log(formatHelp())
+    return false
+  }
+  if (isInRecallSubstate() && trimmed === '/stop') {
+    exitRecallMode()
+    console.log('Stopped recall')
     return false
   }
   const addTokenParam = parseCommandWithRequiredParam(
@@ -443,6 +462,7 @@ function getTerminalWidth(): number {
 }
 
 const COMMANDS_HINT = `${GREY}  / commands${RESET}`
+const RECALLING_INDICATOR = `${GREY}Recalling${RESET}`
 
 function formatMcqChoiceLines(choices: string[]): string[] {
   return choices.map((c, i) => `  ${i + 1}. ${c}`)
@@ -500,7 +520,9 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
             mcqChoiceHighlightIndex
           )
         : buildSuggestionLines(buffer, highlightIndex)
-    const newTotalLines = boxLines.length + suggestionLines.length
+    const recallingIndicator = isInRecallSubstate() ? [RECALLING_INDICATOR] : []
+    const newTotalLines =
+      boxLines.length + recallingIndicator.length + suggestionLines.length
 
     if (linesAboveCursor > 0) {
       process.stdout.write(`\x1b[${linesAboveCursor}A`)
@@ -508,6 +530,9 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
     process.stdout.write('\r')
 
     for (const line of boxLines) {
+      process.stdout.write(`\x1b[2K${line}\n`)
+    }
+    for (const line of recallingIndicator) {
       process.stdout.write(`\x1b[2K${line}\n`)
     }
     for (const line of suggestionLines) {
@@ -562,6 +587,16 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
               : (mcqChoiceHighlightIndex + 1) % n
           drawBox()
         } else if (key.name === 'return' && !key.shift) {
+          if (buffer.trim() === '/stop') {
+            exitRecallMode()
+            buffer = ''
+            mcqChoiceHighlightIndex = 0
+            linesAboveCursor = 0
+            prevTotalLines = 0
+            process.stdout.write('Stopped recall\n')
+            drawBox()
+            return
+          }
           const choiceNum = Number.parseInt(buffer.trim(), 10)
           const validTyped = choiceNum >= 1 && choiceNum <= choices.length
           const choiceIndex = validTyped

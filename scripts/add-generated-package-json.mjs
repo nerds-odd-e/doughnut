@@ -1,7 +1,9 @@
 import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const outputPath = process.argv[2] || join(process.cwd(), 'packages/generated/doughnut-backend-api')
+const outputPath =
+  process.argv[2] ||
+  join(process.cwd(), 'packages/generated/doughnut-backend-api')
 const pkg = {
   name: '@generated/doughnut-backend-api',
   version: '0.1.0',

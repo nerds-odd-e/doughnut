@@ -163,6 +163,25 @@
 
 ---
 
+## Phase 7: Recall substate and `/stop` ✅ DONE
+
+**User behavior**: When recalling (Phases 5/6 session), CLI enters a substate with a different command set. User can type `/stop` to leave recall mode and return to normal input. While in recall state, a "Recalling" indicator is shown below the input box.
+
+**CLI changes**:
+
+- Introduce recall substate: when in `recallSessionMode` (or equivalent), interpret input as recall-specific commands.
+- Commands in recall state: `/stop` — exit recall mode, return to normal prompt.
+- When in recall state: render a "Recalling" indicator below the input box (status bar / footer area).
+
+**Tests**:
+
+- **E2E**: Run `/recall`, start session; verify "Recalling" indicator visible below input; type `/stop`, verify recall ends and indicator disappears.
+- **UT**: Substate routing; `/stop` clears recall mode; indicator visibility tied to recall state.
+
+**Cleanup**: No dead code.
+
+---
+
 ## Phase 8: Contest / Regenerate (lower priority)
 
 **User behavior**: After answering MCQ, CLI asks "Contest this question? (y/n)"; if yes, call contest + regenerate; show new question (or skip).
@@ -208,6 +227,7 @@
 | 4     | `/recall next` (spelling)     | Answer one spelling    | Phase 3                     |
 | 5     | `/recall`                    | Full session           | Phases 2.2, 3, 4           |
 | 6     | `/recall` load more          | Notes from future days | Phase 5                     |
+| 7     | Recall substate, `/stop`     | Exit recall mid-session| Phase 5                     |
 | 8     | Contest/Regenerate           | Edge case, low priority| Phase 3                     |
 
 Each phase: implement → E2E + UT → remove dead code → commit → push → CD deploy → next phase.

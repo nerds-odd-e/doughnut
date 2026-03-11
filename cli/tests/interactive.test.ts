@@ -2,6 +2,7 @@ import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { Readable } from 'node:stream'
 import {
   buildBoxLines,
+  isInRecallSubstate,
   processInput,
   renderBox,
   renderPastInput,
@@ -402,6 +403,51 @@ describe('processInput', () => {
     await processInput('/recall')
     await processInput('y')
     expect(logSpy).toHaveBeenCalledWith('Network error')
+
+    logSpy.mockRestore()
+  })
+
+  test('/stop when in recall substate exits recall mode', async () => {
+    mockRecallNext.mockResolvedValue({
+      type: 'just-review',
+      memoryTrackerId: 1,
+      title: 'Note 1',
+    })
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await processInput('/recall')
+    expect(isInRecallSubstate()).toBe(true)
+
+    await processInput('/stop')
+    expect(logSpy).toHaveBeenCalledWith('Stopped recall')
+    expect(isInRecallSubstate()).toBe(false)
+
+    logSpy.mockRestore()
+  })
+
+  test('/stop when in recall with pending load more exits recall mode', async () => {
+    mockRecallNext.mockResolvedValue({
+      type: 'none',
+      message: '0 notes to recall today',
+    })
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await processInput('/recall')
+    expect(isInRecallSubstate()).toBe(true)
+
+    await processInput('/stop')
+    expect(logSpy).toHaveBeenCalledWith('Stopped recall')
+    expect(isInRecallSubstate()).toBe(false)
+
+    logSpy.mockRestore()
+  })
+
+  test('/stop when not in recall substate shows Not supported', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await processInput('/stop')
+    expect(logSpy).toHaveBeenCalledWith('Not supported')
+    expect(isInRecallSubstate()).toBe(false)
 
     logSpy.mockRestore()
   })
