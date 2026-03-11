@@ -55,6 +55,20 @@ CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_gene
 
 The backend service log is located at `backend/logs/doughnut-e2e.log`. Please make sure only get tail from it.
 
+## Profiling E2E Tests
+
+To collect timing for performance analysis:
+
+```bash
+# With services running (pnpm sut)
+CURSOR_DEV=true nix develop -c "RECORD_E2E_TIMING=1 pnpm cypress run --spec e2e_test/features/cli/cli_recall.feature"
+
+# Aggregate results
+node e2e_test/aggregate_timing.mjs
+```
+
+Output is written to `e2e_test/timing_log.jsonl` (gitignored).
+
 ## Key Practices
 
 ### 1. BDD with Cucumber
