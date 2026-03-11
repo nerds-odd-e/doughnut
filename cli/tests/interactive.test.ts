@@ -451,6 +451,33 @@ describe('processInput', () => {
 
     logSpy.mockRestore()
   })
+
+  test('in recall state top-level commands are not available', async () => {
+    mockRecallNext.mockResolvedValue({
+      type: 'just-review',
+      memoryTrackerId: 1,
+      title: 'Note 1',
+    })
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+
+    await processInput('/recall')
+    expect(isInRecallSubstate()).toBe(true)
+
+    await processInput('/help')
+    expect(logSpy).toHaveBeenCalledWith('Type /stop to exit recall')
+    expect(logSpy).not.toHaveBeenCalledWith(
+      expect.stringContaining('Subcommands')
+    )
+
+    logSpy.mockClear()
+    await processInput('/recall-status')
+    expect(logSpy).toHaveBeenCalledWith('Type /stop to exit recall')
+    expect(logSpy).not.toHaveBeenCalledWith(
+      expect.stringMatching(/notes to recall today/)
+    )
+
+    logSpy.mockRestore()
+  })
 })
 
 describe('visibleLength', () => {
@@ -583,6 +610,7 @@ describe('interactive CLI (e2e style)', () => {
   let exitSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
+    resetRecallStateForTesting()
     logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
     exitSpy = vi
       .spyOn(process, 'exit')
@@ -681,6 +709,7 @@ describe('TTY mode slash command suggestions', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
+    resetRecallStateForTesting()
     vi.spyOn(console, 'log').mockImplementation(() => undefined)
     writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
     vi.spyOn(process, 'exit').mockImplementation(
@@ -945,6 +974,7 @@ describe('TTY mode slash command suggestions with scroll', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
+    resetRecallStateForTesting()
     useManyCommandsForScrollTests = true
     vi.spyOn(console, 'log').mockImplementation(() => undefined)
     writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
@@ -1010,6 +1040,7 @@ describe('TTY token list interactive mode', () => {
   let originalConfigDir: string | undefined
 
   beforeEach(async () => {
+    resetRecallStateForTesting()
     const fs = await import('node:fs')
     const os = await import('node:os')
     const path = await import('node:path')
@@ -1187,6 +1218,7 @@ describe('TTY MCQ choice selection', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
+    resetRecallStateForTesting()
     mockRecallNext.mockResolvedValue({
       type: 'mcq',
       recallPromptId: 100,

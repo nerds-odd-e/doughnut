@@ -135,13 +135,17 @@ export async function processInput(input: string): Promise<boolean> {
   if (trimmed === 'exit' || trimmed === '/exit') {
     return true
   }
-  if (trimmed === '/help') {
-    console.log(formatHelp())
-    return false
-  }
   if (isInRecallSubstate() && trimmed === '/stop') {
     exitRecallMode()
     console.log('Stopped recall')
+    return false
+  }
+  if (isInRecallSubstate() && trimmed.startsWith('/')) {
+    console.log('Type /stop to exit recall')
+    return false
+  }
+  if (trimmed === '/help') {
+    console.log(formatHelp())
     return false
   }
   const addTokenParam = parseCommandWithRequiredParam(
