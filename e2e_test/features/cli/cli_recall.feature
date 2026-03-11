@@ -120,21 +120,7 @@ Feature: CLI recall status and recall session
     And I should see "Stopped recall"
 
   @disableOpenAiService
-  Scenario: Recall session - complete all due notes and see summary
-    Given I have a notebook with the head note "English" which skips memory tracking
-    And there are some notes:
-      | Title    | Details                        | Parent Title |
-      | sedition | Sedition means incite violence | English      |
-      | sedation | Put to sleep is sedation       | English      |
-    And It's day 1
-    And I assimilate the note "sedition"
-    And I assimilate the note "sedation"
-    And It's day 2
-    When I run a recall session and recall all due notes, declining load more
-    Then I should see "Recalled 2 notes"
-
-  @disableOpenAiService
-  Scenario: Recall load more from next 3 days when none due today
+  Scenario: Recall session - complete all due notes, see summary, then load more from future days
     Given I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:
       | Title    | Details                        | Parent Title |
@@ -185,9 +171,6 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedition" with the option of remembering spelling
     And It's day 2
     When I run the doughnut command in interactive mode with input "/recall" and "y" and "sedition"
-    Then I should see "Spell:"
-    And I should see "Correct!"
-    And I should see "Recalled successfully"
     Then I should see "Spell:"
     And I should see "Correct!"
     And I should see "Recalled successfully"
