@@ -423,40 +423,6 @@ export async function processInput(input: string): Promise<boolean> {
     }
     return false
   }
-  if (trimmed === '/recall next') {
-    try {
-      const result = await recallNext()
-      if (result.type === 'none') {
-        console.log(result.message)
-      } else if (result.type === 'spelling') {
-        console.log(`Spell: ${result.stem || '...'}`)
-        pendingRecallAnswer = {
-          recallPromptId: result.recallPromptId,
-          type: 'spelling',
-        }
-      } else if (result.type === 'mcq') {
-        console.log(result.stem)
-        for (let i = 0; i < result.choices.length; i++) {
-          console.log(`  ${i + 1}. ${result.choices[i]}`)
-        }
-        console.log(`Enter your choice (1-${result.choices.length}):`)
-        pendingRecallAnswer = {
-          recallPromptId: result.recallPromptId,
-          choices: result.choices,
-        }
-      } else {
-        console.log(result.title)
-        if (result.details) {
-          console.log(renderMarkdownToTerminal(result.details))
-        }
-        console.log('Yes, I remember? (y/n)')
-        pendingRecallAnswer = { memoryTrackerId: result.memoryTrackerId }
-      }
-    } catch (err) {
-      console.log(err instanceof Error ? err.message : String(err))
-    }
-    return false
-  }
   if (trimmed) {
     console.log('Not supported')
   }

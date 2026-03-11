@@ -257,7 +257,7 @@ describe('processInput', () => {
     process.env.DOUGHNUT_CONFIG_DIR = originalEnv
   })
 
-  test('spelling: /recall next shows Spell prompt, then spelling answer calls answerSpelling', async () => {
+  test('spelling: /recall shows Spell prompt, then spelling answer calls answerSpelling', async () => {
     mockRecallNext.mockResolvedValue({
       type: 'spelling',
       recallPromptId: 100,
@@ -266,7 +266,7 @@ describe('processInput', () => {
     mockAnswerSpelling.mockResolvedValue({ correct: true })
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
-    await processInput('/recall next')
+    await processInput('/recall')
     expect(logSpy).toHaveBeenCalledWith('Spell: means incite violence')
     logSpy.mockClear()
 
@@ -287,7 +287,7 @@ describe('processInput', () => {
     mockAnswerSpelling.mockResolvedValue({ correct: false })
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
-    await processInput('/recall next')
+    await processInput('/recall')
     logSpy.mockClear()
     expect(await processInput('')).toBe(false)
     expect(logSpy).toHaveBeenCalledWith('Please type your spelling')
@@ -994,10 +994,10 @@ describe('TTY mode slash command suggestions', () => {
 
     const output = writeSpy.mock.calls.map((c) => c[0]).join('')
     const lines = output.split('\n')
-    const recallNextLines = lines.filter((l) => l.includes('/recall next'))
-    const recallNextLine = recallNextLines[recallNextLines.length - 1]
-    expect(recallNextLine).toBeDefined()
-    expect(recallNextLine).toContain('\x1b[7m')
+    const recallLines = lines.filter((l) => l.includes('/recall'))
+    const recallLine = recallLines[recallLines.length - 1]
+    expect(recallLine).toBeDefined()
+    expect(recallLine).toContain('\x1b[7m')
 
     stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
@@ -1324,10 +1324,8 @@ describe('TTY MCQ choice selection', () => {
     vi.restoreAllMocks()
   })
 
-  async function submitRecallNext(
-    stdin: ReturnType<typeof createMockTTYStdin>
-  ) {
-    for (const ch of '/recall next ') {
+  async function submitRecall(stdin: ReturnType<typeof createMockTTYStdin>) {
+    for (const ch of '/recall ') {
       stdin.emit('keypress', ch, {
         name: ch === ' ' ? 'space' : undefined,
         ctrl: false,
@@ -1350,7 +1348,7 @@ describe('TTY MCQ choice selection', () => {
     await new Promise((r) => setImmediate(r))
     writeSpy.mockClear()
 
-    await submitRecallNext(stdin)
+    await submitRecall(stdin)
 
     const afterSubmit = writeSpy.mock.calls.map((c) => c[0]).join('')
     expect(afterSubmit).toContain('  1. 4')
@@ -1376,7 +1374,7 @@ describe('TTY MCQ choice selection', () => {
     runInteractive(stdin as NodeJS.ReadableStream)
     await new Promise((r) => setImmediate(r))
 
-    await submitRecallNext(stdin)
+    await submitRecall(stdin)
 
     stdin.emit('keypress', '\r', {
       name: 'return',
@@ -1399,7 +1397,7 @@ describe('TTY MCQ choice selection', () => {
     runInteractive(stdin as NodeJS.ReadableStream)
     await new Promise((r) => setImmediate(r))
 
-    await submitRecallNext(stdin)
+    await submitRecall(stdin)
 
     stdin.emit('keypress', '2', { name: undefined, ctrl: false, meta: false })
     await new Promise((r) => setImmediate(r))

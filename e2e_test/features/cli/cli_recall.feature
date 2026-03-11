@@ -1,5 +1,5 @@
 @withCliConfig
-Feature: CLI recall status and recall next
+Feature: CLI recall status and recall session
 
   Background:
     Given I am logged in as an existing user
@@ -24,7 +24,7 @@ Feature: CLI recall status and recall next
     Then I should see "0 notes to recall today"
 
   @disableOpenAiService
-  Scenario: Recall next Just Review - answer yes and verify success
+  Scenario: Recall Just Review - answer yes and verify success
     Given I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:
       | Title    | Details                        | Parent Title |
@@ -33,13 +33,13 @@ Feature: CLI recall status and recall next
     And It's day 1
     And I assimilate the note "sedition"
     And It's day 2
-    When I run the doughnut command in interactive mode with input "/recall next" and "y"
+    When I run the doughnut command in interactive mode with input "/recall" and "y"
     Then I should see "sedition"
     And I should see "Yes, I remember?"
     And I should see "Recalled successfully"
 
   @disableOpenAiService
-  Scenario: Recall next shows zero after recalling the only note
+  Scenario: Recall status shows zero after recalling the only note in session
     Given I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:
       | Title    | Details                        | Parent Title |
@@ -47,13 +47,13 @@ Feature: CLI recall status and recall next
     And It's day 1
     And I assimilate the note "sedition"
     And It's day 2
-    When I run the doughnut command in interactive mode with input "/recall next" and "y"
+    When I run the doughnut command in interactive mode with input "/recall" and "y"
     Then I should see "Recalled successfully"
-    When I run the doughnut command in interactive mode with input "/recall next"
+    When I run the doughnut command in interactive mode with input "/recall-status"
     Then I should see "0 notes to recall today"
 
   @disableOpenAiService
-  Scenario: Recall next Just Review shows markdown note content
+  Scenario: Recall Just Review shows markdown note content
     Given I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:
       | Title    | Details                         | Parent Title |
@@ -61,14 +61,14 @@ Feature: CLI recall status and recall next
     And It's day 1
     And I assimilate the note "sedation"
     And It's day 2
-    When I run the doughnut command in interactive mode with input "/recall next" and "y"
+    When I run the doughnut command in interactive mode with input "/recall" and "y"
     Then I should see "sedation"
     And I should see "Put"
     And I should see "Yes, I remember?"
     And I should see "Recalled successfully"
 
   @usingMockedOpenAiService
-  Scenario: Recall next MCQ - choose correct answer and see success
+  Scenario: Recall MCQ - choose correct answer and see success
     Given I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:
       | Title    | Details                        | Parent Title |
@@ -80,14 +80,14 @@ Feature: CLI recall status and recall next
     And It's day 1
     And I assimilate the note "sedition"
     And It's day 2
-    When I run the doughnut command in interactive mode with input "/recall next" and "1"
+    When I run the doughnut command in interactive mode with input "/recall" and "1"
     Then I should see "What is the meaning of sedition?"
     And I should see "to incite violence"
     And I should see "Correct!"
     And I should see "Recalled successfully"
 
   @usingMockedOpenAiService
-  Scenario: Recall next MCQ - down arrow and Enter to select
+  Scenario: Recall MCQ - down arrow and Enter to select
     Given I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:
       | Title    | Details                        | Parent Title |
@@ -99,7 +99,7 @@ Feature: CLI recall status and recall next
     And It's day 1
     And I assimilate the note "sedition"
     And It's day 2
-    When I run the doughnut command in interactive mode with down-arrow selection for "/recall next"
+    When I run the doughnut command in interactive mode with down-arrow selection for "/recall"
     Then I should see "Incorrect"
     And I should see "Recalled successfully"
 
@@ -175,7 +175,7 @@ Feature: CLI recall status and recall next
     And I should see "Recalled successfully"
 
   @disableOpenAiService
-  Scenario: Recall next spelling - type correct spelling and see success
+  Scenario: Recall spelling - type correct spelling and see success
     Given I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:
       | Title    | Details                        | Parent Title |
@@ -184,9 +184,10 @@ Feature: CLI recall status and recall next
     And It's day 1
     And I assimilate the note "sedition" with the option of remembering spelling
     And It's day 2
-    When I run the doughnut command in interactive mode with input "/recall next" and "y"
-    Then I should see "Recalled successfully"
-    When I run the doughnut command in interactive mode with input "/recall next" and "sedition"
+    When I run the doughnut command in interactive mode with input "/recall" and "y" and "sedition"
+    Then I should see "Spell:"
+    And I should see "Correct!"
+    And I should see "Recalled successfully"
     Then I should see "Spell:"
     And I should see "Correct!"
     And I should see "Recalled successfully"

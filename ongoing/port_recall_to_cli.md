@@ -140,7 +140,7 @@
 - **E2E**: 2 notes due (both Just Review). Run `/recall`, complete all; verify "Recalled 2 notes".
 - **UT**: Loop termination; empty list on start; error mid-session clears mode and logs.
 
-**Cleanup**: Kept `/recall next` for single-note recall.
+**Cleanup**: `/recall next` removed; use `/recall` session only.
 
 ---
 

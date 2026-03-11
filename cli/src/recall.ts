@@ -216,10 +216,4 @@ export const recallCommandDocs = [
     description: 'Recall all due notes in a session',
     category: 'interactive' as const,
   },
-  {
-    name: '/recall next',
-    usage: '/recall next',
-    description: 'Recall next note (Just Review, MCQ, or spelling)',
-    category: 'interactive' as const,
-  },
 ]
