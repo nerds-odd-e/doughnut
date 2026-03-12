@@ -1,8 +1,10 @@
 @withCliConfig
 Feature: CLI access token management
 
-  Scenario: Add access token and list it
+  Background:
     Given I am logged in as "old_learner"
+
+  Scenario: Add access token and list it
     And I have a valid Doughnut Access Token with label "E2E CLI Token"
     When I run the doughnut CLI add-access-token with the saved token
     Then I should see "Token added"
@@ -13,18 +15,21 @@ Feature: CLI access token management
     When I run the doughnut CLI add-access-token with token "invalid-token-xxx"
     Then I should see "Token is invalid or expired."
 
-  Scenario: Remove access token locally
-    Given I am logged in as "old_learner"
-    And I have a valid Doughnut Access Token with label "Remove Me Token"
+  Scenario Outline: Remove access token
+    And I have a valid Doughnut Access Token with label "<label>"
     When I run the doughnut CLI add-access-token with the saved token
     Then I should see "Token added"
-    When I run the doughnut CLI remove-access-token with label "Remove Me Token"
-    Then I should see "Token \"Remove Me Token\" removed."
+    When I run the doughnut CLI <action> with label "<label>"
+    Then I should see the <removal_type> remove success message for "<label>"
     When I run the doughnut command with -c "/list-access-token"
     Then I should see "No access tokens stored."
 
+    Examples:
+      | label           | action                         | removal_type |
+      | Remove Me Token | remove-access-token            | local        |
+      | Revoke Me Token | remove-access-token-completely | complete     |
+
   Scenario: Create access token via CLI
-    Given I am logged in as "old_learner"
     And I have a valid Doughnut Access Token with label "Default Token"
     When I run the doughnut CLI add-access-token with the saved token
     Then I should see "Token added"
@@ -32,13 +37,3 @@ Feature: CLI access token management
     Then I should see "Token created"
     When I run the doughnut command with -c "/list-access-token"
     Then I should see "New CLI Token"
-
-  Scenario: Remove access token completely (local and server)
-    Given I am logged in as "old_learner"
-    And I have a valid Doughnut Access Token with label "Revoke Me Token"
-    When I run the doughnut CLI add-access-token with the saved token
-    Then I should see "Token added"
-    When I run the doughnut CLI remove-access-token-completely with label "Revoke Me Token"
-    Then I should see "removed locally and from server"
-    When I run the doughnut command with -c "/list-access-token"
-    Then I should see "No access tokens stored."

@@ -130,27 +130,6 @@ When(
 )
 
 When(
-  'I run the doughnut command in interactive mode with input {string} and {string} and {string} and {string} and {string}',
-  (
-    command: string,
-    answer1: string,
-    answer2: string,
-    answer3: string,
-    answer4: string
-  ) => {
-    cy.get<string>('@cliConfigDir').then((configDir) =>
-      taskWithCliTiming('runCliDirectWithInput', {
-        input: `${command}\n${answer1}\n${answer2}\n${answer3}\n${answer4}\nexit\n`,
-        env: {
-          DOUGHNUT_CONFIG_DIR: configDir,
-          DOUGHNUT_API_BASE_URL: BASE_URL,
-        },
-      }).as('doughnutOutput')
-    )
-  }
-)
-
-When(
   'I run a recall session and recall all due notes, declining load more',
   () => {
     cy.get<string>('@cliConfigDir').then((configDir) =>
@@ -270,6 +249,17 @@ When(
 Then('I should see {string}', (expected: string) => {
   cy.get('@doughnutOutput').should('include', expected)
 })
+
+Then(
+  'I should see the {word} remove success message for {string}',
+  (removalType: string, label: string) => {
+    const expected =
+      removalType === 'local'
+        ? `Token "${label}" removed.`
+        : 'removed locally and from server'
+    cy.get('@doughnutOutput').should('include', expected)
+  }
+)
 
 Given(
   'the Google API mock returns tokens and profile for {string}',
