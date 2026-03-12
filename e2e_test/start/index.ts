@@ -1,4 +1,5 @@
 import './clientConfig'
+import { UserController } from '@generated/doughnut-backend-api/sdk.gen'
 import mock_services from './mock_services/index'
 import { pageIsNotLoading as waitForPageNotLoading } from './pageBase'
 import { questionGenerationService } from './questionGenerationService'
@@ -85,6 +86,7 @@ const start = {
   questionGenerationService,
   testability,
   mcpApi,
+  userController: () => UserController,
 
   // === Actions ===
   ...loginActions,

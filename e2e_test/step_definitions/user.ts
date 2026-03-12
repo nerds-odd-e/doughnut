@@ -155,14 +155,16 @@ Then('the new Doughnut Access Token should be a valid UUID', () => {
 Given(
   'I have a valid Doughnut Access Token with label {string}',
   (label: string) => {
-    start
-      .mainMenu()
-      .userOptions()
-      .manageAccessTokens()
-      .generateToken(label)
-      .then((token) => {
-        cy.wrap(token).as('savedAccessToken')
-      })
+    cy.wrap(
+      start
+        .userController()
+        .generateToken({ body: { label } })
+        .then((result) =>
+          typeof result === 'object' && result && 'token' in result
+            ? (result as { token: string }).token
+            : result
+        )
+    ).as('savedAccessToken')
   }
 )
 
