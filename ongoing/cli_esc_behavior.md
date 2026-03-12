@@ -33,12 +33,12 @@ All interactive states that need ESC handling, identified from `cli/src/interact
 
 ## Phased Plan
 
-### Phase 1: ESC to dismiss command suggestions
+### Phase 1: ESC to dismiss command suggestions ✅
 **User value**: User typed `/add` by mistake; ESC dismisses the dropdown and lets them edit.
 
-- Add `key.name === 'escape'` check at start of keypress handler (before any state-specific logic that consumes it).
-- When `suggestionsVisible` and ESC: set `highlightIndex = 0`, redraw. Suggestions hidden; buffer unchanged.
-- **Tests**: UT only in `interactive.test.ts` – emit ESC when suggestions visible, verify suggestions gone and buffer intact.
+- Add `key.name === 'escape'` check (before mcq/tokenList handling in keypress).
+- When suggestions visible and ESC: if buffer is only `/`, clear buffer and redraw; if partial command (e.g. `/ex`), set `suggestionsDismissed = true` and redraw (suggestions hidden, buffer intact).
+- **Tests**: UT in `interactive.test.ts` – ESC when buffer `/` → suggestions gone, buffer cleared; ESC when buffer `/ex` → suggestions gone, buffer intact.
 
 ### Phase 2: ESC to cancel access token list selection
 **User value**: User ran `/remove-access-token` then changed mind; ESC cancels without removing.

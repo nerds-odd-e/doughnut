@@ -1027,6 +1027,55 @@ describe('TTY mode slash command suggestions', () => {
     stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
+  test('ESC when buffer is only "/" dismisses suggestions and clears buffer', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+    writeSpy.mockClear()
+
+    stdin.emit('keypress', undefined, {
+      name: 'escape',
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(output).toContain('  / commands')
+    expect(output).not.toContain('/help')
+    expect(output).toContain('`exit` to quit.')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('ESC when partial command "/ex" hides suggestions but keeps buffer', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
+    stdin.emit('keypress', 'e', { name: 'e', ctrl: false, meta: false })
+    stdin.emit('keypress', 'x', { name: 'x', ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+    writeSpy.mockClear()
+
+    stdin.emit('keypress', undefined, {
+      name: 'escape',
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(output).toContain('→ /ex')
+    expect(output).toContain('  / commands')
+    expect(output).not.toContain('/exit')
+    expect(output).not.toContain('/help')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
   test('Enter inserts highlighted command', async () => {
     const stdin = createMockTTYStdin()
     runInteractive(stdin as NodeJS.ReadableStream)

@@ -505,6 +505,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
 
   let buffer = ''
   let highlightIndex = 0
+  let suggestionsDismissed = false
   let linesAboveCursor = 0
   let prevTotalLines = 0
   let tokenListItems: { label: string; token: string }[] | null = null
@@ -532,7 +533,15 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
             8,
             mcqChoiceHighlightIndex
           )
-        : buildSuggestionLines(buffer, highlightIndex)
+        : (() => {
+            const bufferLines = buffer.split('\n')
+            const lastLine = bufferLines[bufferLines.length - 1]
+            const wouldShowSuggestions =
+              lastLine.startsWith('/') && !lastLine.endsWith(' ')
+            if (suggestionsDismissed && wouldShowSuggestions)
+              return [COMMANDS_HINT]
+            return buildSuggestionLines(buffer, highlightIndex)
+          })()
     const recallingIndicator = isInRecallSubstate() ? [RECALLING_INDICATOR] : []
     const newTotalLines =
       boxLines.length + recallingIndicator.length + suggestionLines.length
@@ -756,6 +765,28 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
         }
         return
       }
+      if (key.name === 'escape') {
+        const bufferLines = buffer.split('\n')
+        const lastLine = bufferLines[bufferLines.length - 1]
+        const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
+        const suggestionsVisible =
+          lastLine.startsWith('/') &&
+          !lastLine.endsWith(' ') &&
+          filtered.length > 0
+        if (suggestionsVisible) {
+          highlightIndex = 0
+          if (lastLine === '/') {
+            buffer =
+              bufferLines.length === 1
+                ? ''
+                : bufferLines.slice(0, -1).join('\n')
+          } else {
+            suggestionsDismissed = true
+          }
+          drawBox()
+        }
+        return
+      }
       if (key.name === 'return') {
         if (key.shift) {
           buffer += '\n'
@@ -840,6 +871,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
         if (buffer.length > 0) {
           buffer = buffer.slice(0, -1)
           highlightIndex = 0
+          suggestionsDismissed = false
           drawBox()
         }
       } else if (key.name === 'up' || key.name === 'down') {
@@ -861,6 +893,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
       } else if (str && !key.ctrl && !key.meta) {
         buffer += str
         highlightIndex = 0
+        suggestionsDismissed = false
         drawBox()
       }
     }
