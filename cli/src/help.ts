@@ -47,7 +47,15 @@ export function filterCommandsByPrefix(
   commands: readonly CommandDoc[],
   prefix: string
 ): CommandDoc[] {
-  return commands.filter((d) => d.usage.startsWith(prefix))
+  return [...commands]
+    .filter((d) => d.usage.includes(prefix))
+    .sort((a, b) => {
+      const aStarts = a.usage.startsWith(prefix)
+      const bStarts = b.usage.startsWith(prefix)
+      if (aStarts && !bStarts) return -1
+      if (!aStarts && bStarts) return 1
+      return 0
+    })
 }
 
 export function formatCommandSuggestions(

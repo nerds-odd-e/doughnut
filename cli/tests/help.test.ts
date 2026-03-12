@@ -1,5 +1,6 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
+  filterCommandsByPrefix,
   formatCommandSuggestions,
   formatHelp,
   type CommandDoc,
@@ -36,6 +37,74 @@ describe('formatHelp', () => {
     const output = formatHelp()
     expect(output).toContain('Subcommands:')
     expect(output).toContain('Interactive commands (in prompt):')
+  })
+})
+
+describe('filterCommandsByPrefix', () => {
+  const commands: CommandDoc[] = [
+    {
+      name: 'help',
+      usage: '/help',
+      description: 'Help',
+      category: 'interactive',
+    },
+    {
+      name: 'exit',
+      usage: '/exit',
+      description: 'Exit',
+      category: 'interactive',
+    },
+    {
+      name: 'recall-status',
+      usage: '/recall-status',
+      description: 'Recall status',
+      category: 'interactive',
+    },
+    {
+      name: 'recall',
+      usage: '/recall',
+      description: 'Recall',
+      category: 'interactive',
+    },
+  ]
+
+  test('matches from beginning', () => {
+    const result = filterCommandsByPrefix(commands, '/recall')
+    expect(result.map((c) => c.usage)).toEqual(['/recall-status', '/recall'])
+  })
+
+  test('matches anywhere with beginning prioritized', () => {
+    const result = filterCommandsByPrefix(commands, 'recall')
+    expect(result.map((c) => c.usage)).toEqual(['/recall-status', '/recall'])
+  })
+
+  test('prioritizes beginning match over substring match', () => {
+    const cmds: CommandDoc[] = [
+      {
+        name: 'x',
+        usage: 'get-help',
+        description: 'X',
+        category: 'subcommand',
+      },
+      { name: 'y', usage: 'help', description: 'Y', category: 'subcommand' },
+    ]
+    const result = filterCommandsByPrefix(cmds, 'help')
+    expect(result.map((c) => c.usage)).toEqual(['help', 'get-help'])
+  })
+
+  test('empty prefix returns all commands', () => {
+    const result = filterCommandsByPrefix(commands, '')
+    expect(result).toHaveLength(4)
+  })
+
+  test('no match returns empty array', () => {
+    const result = filterCommandsByPrefix(commands, 'xyz')
+    expect(result).toHaveLength(0)
+  })
+
+  test('substring match returns matching commands', () => {
+    const result = filterCommandsByPrefix(commands, 'help')
+    expect(result.map((c) => c.usage)).toEqual(['/help'])
   })
 })
 
