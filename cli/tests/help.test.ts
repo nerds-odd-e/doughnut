@@ -106,6 +106,13 @@ describe('filterCommandsByPrefix', () => {
     const result = filterCommandsByPrefix(commands, 'help')
     expect(result.map((c) => c.usage)).toEqual(['/help'])
   })
+
+  test('/e matches /help and /exit with /exit first', () => {
+    const result = filterCommandsByPrefix(commands, '/e')
+    expect(result.map((c) => c.usage)).toContain('/help')
+    expect(result.map((c) => c.usage)).toContain('/exit')
+    expect(result[0].usage).toBe('/exit')
+  })
 })
 
 describe('formatCommandSuggestions', () => {

@@ -47,13 +47,21 @@ export function filterCommandsByPrefix(
   commands: readonly CommandDoc[],
   prefix: string
 ): CommandDoc[] {
+  const searchTerm =
+    prefix.startsWith('/') && prefix.length > 1 ? prefix.slice(1) : prefix
+  if (!searchTerm) return [...commands]
+
   return [...commands]
-    .filter((d) => d.usage.includes(prefix))
+    .filter((d) => d.usage.includes(searchTerm))
     .sort((a, b) => {
-      const aStarts = a.usage.startsWith(prefix)
-      const bStarts = b.usage.startsWith(prefix)
-      if (aStarts && !bStarts) return -1
-      if (!aStarts && bStarts) return 1
+      const aBegins =
+        a.usage.startsWith(prefix) ||
+        (prefix.startsWith('/') && a.usage.startsWith(`/${searchTerm}`))
+      const bBegins =
+        b.usage.startsWith(prefix) ||
+        (prefix.startsWith('/') && b.usage.startsWith(`/${searchTerm}`))
+      if (aBegins && !bBegins) return -1
+      if (!aBegins && bBegins) return 1
       return 0
     })
 }
