@@ -3,7 +3,8 @@ Feature: CLI recall status and recall session
 
   Background:
     Given I am logged in as an existing user
-    And I have the CLI configured with a valid access token
+    And I have a valid Doughnut Access Token with label "for cli"
+    And I run the doughnut CLI add-access-token with the saved token
 
   @disableOpenAiService
   Scenario: Recall status shows count when notes are due

@@ -1,7 +1,5 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import { mock_services } from '../start'
-import start from '../start'
-import { submittableForm } from '../start/forms'
 
 const BASE_URL = 'http://localhost:9081'
 const GOOGLE_MOCK_URL = 'http://localhost:5003'
@@ -40,43 +38,6 @@ function taskWithCliTiming(
 
 Given('the backend is serving the CLI and install script', () => {
   cy.request('GET', `${BASE_URL}/install`).its('status').should('eq', 200)
-})
-
-Given('I have the CLI configured with a valid access token', () => {
-  const totalStart = Date.now()
-  let t0 = Date.now()
-
-  const record = (label: string) => {
-    if (Cypress.env('RECORD_E2E_TIMING')) {
-      cy.task('recordTiming', { label, duration: Date.now() - t0 })
-    }
-    t0 = Date.now()
-  }
-
-  start.routerPush('/d/generate-token', 'manageAccessTokens', {})
-  start.pageIsNotLoading()
-  cy.then(() => record('token-nav'))
-
-  cy.findByRole('button', { name: 'Generate Token' }).click()
-  submittableForm.submitWith({ Label: 'Recall CLI Token' })
-  cy.get('[data-testid="token-result"]')
-    .invoke('text')
-    .then((token) => cy.wrap(token).as('savedAccessToken'))
-  cy.then(() => record('token-generateToken'))
-
-  cy.get<string>('@savedAccessToken').then((token) =>
-    runCliWithConfig(['-c', `/add-access-token ${token}`])
-  )
-  cy.get('@doughnutOutput').should('include', 'Token added')
-  cy.then(() => {
-    record('token-cli-add')
-    if (Cypress.env('RECORD_E2E_TIMING')) {
-      cy.task('recordTiming', {
-        label: 'token-setup',
-        duration: Date.now() - totalStart,
-      })
-    }
-  })
 })
 
 Given('the CLI is built with version {string}', (version: string) => {
