@@ -501,7 +501,12 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
   stdin.setRawMode?.(true)
   stdin.resume?.()
   stdin.setEncoding?.('utf8')
-  readline.emitKeypressEvents(stdin)
+  const rl = readline.createInterface({
+    input: stdin,
+    output: process.stdout,
+    escapeCodeTimeout: 50,
+  })
+  readline.emitKeypressEvents(stdin, rl)
 
   let buffer = ''
   let highlightIndex = 0
@@ -583,6 +588,11 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
 
   process.stdout.on('resize', drawBox)
   const removeResizeListener = () => process.stdout.off('resize', drawBox)
+  const doExit = () => {
+    removeResizeListener()
+    rl.close()
+    process.exit(0)
+  }
 
   stdin.on(
     'keypress',
@@ -592,8 +602,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
     ) => {
       if (key.ctrl && key.name === 'c') {
         process.stdout.write(`\x1b[${1}B\r\n`)
-        removeResizeListener()
-        process.exit(0)
+        doExit()
       }
       const mcqPending = pendingRecallAnswer && 'choices' in pendingRecallAnswer
       if (mcqPending) {
@@ -857,8 +866,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           }
 
           if (await processInput(input)) {
-            removeResizeListener()
-            process.exit(0)
+            doExit()
           }
           linesAboveCursor = 0
           prevTotalLines = 0
