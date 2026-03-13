@@ -848,12 +848,12 @@ describe('interactive CLI (e2e style)', () => {
 
 describe('TTY mode slash command suggestions', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
-  let logSpy: ReturnType<typeof vi.spyOn>
+  let _logSpy: ReturnType<typeof vi.spyOn>
   let stdin: TTYStdin
 
   beforeEach(async () => {
     resetRecallStateForTesting()
-    logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    _logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
     writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
     vi.spyOn(process, 'exit').mockImplementation(
       (() => undefined) as unknown as typeof process.exit
@@ -923,7 +923,7 @@ describe('TTY mode slash command suggestions', () => {
     pressEnter(stdin)
     await new Promise((r) => setTimeout(r, 50))
 
-    expect(logSpy).toHaveBeenCalledWith('Not supported')
+    expect(ttyOutput(writeSpy)).toContain('Not supported')
   })
 
   test('prefix filtering shows only matching commands', async () => {
