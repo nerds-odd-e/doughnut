@@ -18,6 +18,7 @@ import {
   markAsRecalled,
   recallNext,
   recallStatus,
+  type RecallNextResult,
 } from './recall.js'
 import {
   filterCommandsByPrefix,
@@ -41,6 +42,62 @@ function logStatus(msg: string): void {
 function writeStatus(msg: string): void {
   process.stdout.write(`${GREY}${msg}${RESET}\n`)
 }
+
+function logError(err: unknown): void {
+  console.log(err instanceof Error ? err.message : String(err))
+}
+
+function writeError(err: unknown): void {
+  process.stdout.write(`${err instanceof Error ? err.message : String(err)}\n`)
+}
+
+type RecallPromptResult = Exclude<RecallNextResult, { type: 'none' }>
+type StatusWriter = (msg: string) => void
+
+function formatRecallSessionSummary(count: number): string {
+  if (count === 0) return '0 notes to recall today'
+  if (count === 1) return 'Recalled 1 note'
+  return `Recalled ${count} notes`
+}
+
+function showRecallPrompt(
+  result: RecallPromptResult,
+  status: StatusWriter = logStatus
+): void {
+  if (result.type === 'spelling') {
+    status(`Spell: ${result.stem || '...'}`)
+    pendingRecallAnswer = {
+      recallPromptId: result.recallPromptId,
+      type: 'spelling',
+    }
+    return
+  }
+  if (result.type === 'mcq') {
+    status(result.stem)
+    for (let i = 0; i < result.choices.length; i++) {
+      status(`  ${i + 1}. ${result.choices[i]}`)
+    }
+    status(`Enter your choice (1-${result.choices.length}):`)
+    pendingRecallAnswer = {
+      recallPromptId: result.recallPromptId,
+      choices: result.choices,
+    }
+    return
+  }
+  status(result.title)
+  if (result.details) {
+    status(renderMarkdownToTerminal(result.details))
+  }
+  status('Yes, I remember? (y/n)')
+  pendingRecallAnswer = { memoryTrackerId: result.memoryTrackerId }
+}
+
+function isMcqPrompt(
+  p: typeof pendingRecallAnswer
+): p is { recallPromptId: number; choices: string[] } {
+  return p !== null && 'choices' in p
+}
+
 const PLACEHOLDER = '`exit` to quit.'
 const PROMPT = '→ '
 
@@ -80,6 +137,12 @@ function exitRecallMode(): void {
   pendingRecallStopConfirmation = false
 }
 
+function endRecallSession(): void {
+  recallSessionMode = false
+  sessionRecallCount = 0
+  recallSessionDueDays = 0
+}
+
 async function continueRecallSession(fromLoadMore = false): Promise<void> {
   if (!fromLoadMore) sessionRecallCount++
   try {
@@ -90,48 +153,14 @@ async function continueRecallSession(fromLoadMore = false): Promise<void> {
         logStatus('Load more from next 3 days? (y/n)')
         return
       }
-      const msg =
-        sessionRecallCount === 0
-          ? '0 notes to recall today'
-          : sessionRecallCount === 1
-            ? 'Recalled 1 note'
-            : `Recalled ${sessionRecallCount} notes`
-      console.log(msg)
-      recallSessionMode = false
-      sessionRecallCount = 0
-      recallSessionDueDays = 0
+      console.log(formatRecallSessionSummary(sessionRecallCount))
+      endRecallSession()
       return
     }
-    if (result.type === 'spelling') {
-      logStatus(`Spell: ${result.stem || '...'}`)
-      pendingRecallAnswer = {
-        recallPromptId: result.recallPromptId,
-        type: 'spelling',
-      }
-      return
-    }
-    if (result.type === 'mcq') {
-      logStatus(result.stem)
-      for (let i = 0; i < result.choices.length; i++) {
-        logStatus(`  ${i + 1}. ${result.choices[i]}`)
-      }
-      logStatus(`Enter your choice (1-${result.choices.length}):`)
-      pendingRecallAnswer = {
-        recallPromptId: result.recallPromptId,
-        choices: result.choices,
-      }
-      return
-    }
-    logStatus(result.title)
-    if (result.details) {
-      logStatus(renderMarkdownToTerminal(result.details))
-    }
-    logStatus('Yes, I remember? (y/n)')
-    pendingRecallAnswer = { memoryTrackerId: result.memoryTrackerId }
+    showRecallPrompt(result)
   } catch (err) {
-    recallSessionMode = false
-    sessionRecallCount = 0
-    console.log(err instanceof Error ? err.message : String(err))
+    endRecallSession()
+    logError(err)
   }
 }
 
@@ -142,6 +171,26 @@ function parseCommandWithRequiredParam(
   if (trimmed !== command && !trimmed.startsWith(`${command} `)) return null
   const param = trimmed.slice(command.length).trim()
   return param ? param : 'usage'
+}
+
+async function handleCommandWithParam(
+  trimmed: string,
+  command: string,
+  usage: string,
+  run: (param: string) => Promise<void>
+): Promise<boolean> {
+  const param = parseCommandWithRequiredParam(trimmed, command)
+  if (param === null) return false
+  if (param === 'usage') {
+    console.log(usage)
+    return true
+  }
+  try {
+    await run(param)
+  } catch (err) {
+    logError(err)
+  }
+  return true
 }
 
 export async function processInput(input: string): Promise<boolean> {
@@ -169,26 +218,9 @@ export async function processInput(input: string): Promise<boolean> {
         console.log(outcome.message)
         return false
       }
-      const { result } = outcome
-      if (result.type === 'mcq') {
-        logStatus(result.stem)
-        for (let i = 0; i < result.choices.length; i++) {
-          logStatus(`  ${i + 1}. ${result.choices[i]}`)
-        }
-        logStatus(`Enter your choice (1-${result.choices.length}):`)
-        pendingRecallAnswer = {
-          recallPromptId: result.recallPromptId,
-          choices: result.choices,
-        }
-      } else if (result.type === 'spelling') {
-        logStatus(`Spell: ${result.stem || '...'}`)
-        pendingRecallAnswer = {
-          recallPromptId: result.recallPromptId,
-          type: 'spelling',
-        }
-      }
+      showRecallPrompt(outcome.result as RecallPromptResult)
     } catch (err) {
-      console.log(err instanceof Error ? err.message : String(err))
+      logError(err)
     }
     return false
   }
@@ -204,21 +236,17 @@ export async function processInput(input: string): Promise<boolean> {
     console.log(formatHelp())
     return false
   }
-  const addTokenParam = parseCommandWithRequiredParam(
-    trimmed,
-    '/add-access-token'
-  )
-  if (addTokenParam !== null) {
-    if (addTokenParam === 'usage') {
-      console.log('Usage: /add-access-token <token>')
-      return false
-    }
-    try {
-      await addAccessToken(addTokenParam)
-      console.log('Token added')
-    } catch (err) {
-      console.log(err instanceof Error ? err.message : String(err))
-    }
+  if (
+    await handleCommandWithParam(
+      trimmed,
+      '/add-access-token',
+      'Usage: /add-access-token <token>',
+      async (param) => {
+        await addAccessToken(param)
+        console.log('Token added')
+      }
+    )
+  ) {
     return false
   }
   if (trimmed === '/list-access-token') {
@@ -232,63 +260,53 @@ export async function processInput(input: string): Promise<boolean> {
     }
     return false
   }
-  const createTokenParam = parseCommandWithRequiredParam(
-    trimmed,
-    '/create-access-token'
-  )
-  if (createTokenParam !== null) {
-    if (createTokenParam === 'usage') {
-      console.log('Usage: /create-access-token <label>')
-      return false
-    }
-    try {
-      await createAccessToken(createTokenParam)
-      console.log('Token created')
-    } catch (err) {
-      console.log(err instanceof Error ? err.message : String(err))
-    }
+  if (
+    await handleCommandWithParam(
+      trimmed,
+      '/create-access-token',
+      'Usage: /create-access-token <label>',
+      async (param) => {
+        await createAccessToken(param)
+        console.log('Token created')
+      }
+    )
+  ) {
     return false
   }
-  const removeCompletelyParam = parseCommandWithRequiredParam(
-    trimmed,
-    '/remove-access-token-completely'
-  )
-  if (removeCompletelyParam !== null) {
-    if (removeCompletelyParam === 'usage') {
-      console.log('Usage: /remove-access-token-completely <label>')
-      return false
-    }
-    try {
-      await removeAccessTokenCompletely(removeCompletelyParam)
-      console.log(
-        `Token "${removeCompletelyParam}" removed locally and from server.`
-      )
-    } catch (err) {
-      console.log(err instanceof Error ? err.message : String(err))
-    }
+  if (
+    await handleCommandWithParam(
+      trimmed,
+      '/remove-access-token-completely',
+      'Usage: /remove-access-token-completely <label>',
+      async (param) => {
+        await removeAccessTokenCompletely(param)
+        console.log(`Token "${param}" removed locally and from server.`)
+      }
+    )
+  ) {
     return false
   }
-  const removeTokenParam = parseCommandWithRequiredParam(
-    trimmed,
-    '/remove-access-token'
-  )
-  if (removeTokenParam !== null) {
-    if (removeTokenParam === 'usage') {
-      console.log('Usage: /remove-access-token <label>')
-      return false
-    }
-    if (removeAccessToken(removeTokenParam)) {
-      console.log(`Token "${removeTokenParam}" removed.`)
-    } else {
-      console.log(`Token "${removeTokenParam}" not found.`)
-    }
+  if (
+    await handleCommandWithParam(
+      trimmed,
+      '/remove-access-token',
+      'Usage: /remove-access-token <label>',
+      async (param) => {
+        if (removeAccessToken(param)) {
+          console.log(`Token "${param}" removed.`)
+        } else {
+          console.log(`Token "${param}" not found.`)
+        }
+      }
+    )
+  ) {
     return false
   }
   if (trimmed === '/add gmail') {
     try {
       await addGmailAccount()
     } catch (err) {
-      console.log(err instanceof Error ? err.message : String(err))
+      logError(err)
     }
     return false
   }
@@ -297,7 +315,7 @@ export async function processInput(input: string): Promise<boolean> {
       const subject = await getLastEmailSubject()
       console.log(subject)
     } catch (err) {
-      console.log(err instanceof Error ? err.message : String(err))
+      logError(err)
     }
     return false
   }
@@ -309,16 +327,8 @@ export async function processInput(input: string): Promise<boolean> {
       await continueRecallSession(true)
     } else if (answer === 'n' || answer === 'no') {
       pendingRecallLoadMore = false
-      const msg =
-        sessionRecallCount === 0
-          ? '0 notes to recall today'
-          : sessionRecallCount === 1
-            ? 'Recalled 1 note'
-            : `Recalled ${sessionRecallCount} notes`
-      console.log(msg)
-      recallSessionMode = false
-      sessionRecallCount = 0
-      recallSessionDueDays = 0
+      console.log(formatRecallSessionSummary(sessionRecallCount))
+      endRecallSession()
     } else {
       logStatus('Please answer y or n')
       return false
@@ -326,7 +336,7 @@ export async function processInput(input: string): Promise<boolean> {
     return false
   }
   if (pendingRecallAnswer) {
-    if ('choices' in pendingRecallAnswer) {
+    if (isMcqPrompt(pendingRecallAnswer)) {
       const choiceNum = Number.parseInt(trimmed, 10)
       const { recallPromptId, choices } = pendingRecallAnswer
       const validRange = choiceNum >= 1 && choiceNum <= choices.length
@@ -336,7 +346,7 @@ export async function processInput(input: string): Promise<boolean> {
           console.log(correct ? 'Correct!' : 'Incorrect')
           console.log('Recalled successfully')
         } catch (err) {
-          console.log(err instanceof Error ? err.message : String(err))
+          logError(err)
         }
         pendingRecallAnswer = null
         if (recallSessionMode) await continueRecallSession()
@@ -358,25 +368,28 @@ export async function processInput(input: string): Promise<boolean> {
         console.log(correct ? 'Correct!' : 'Incorrect')
         console.log('Recalled successfully')
       } catch (err) {
-        console.log(err instanceof Error ? err.message : String(err))
+        logError(err)
       }
       pendingRecallAnswer = null
       if (recallSessionMode) await continueRecallSession()
     } else {
+      const memoryTrackerId = (
+        pendingRecallAnswer as { memoryTrackerId: number }
+      ).memoryTrackerId
       const answer = trimmed.toLowerCase()
       if (answer === 'y' || answer === 'yes') {
         try {
-          await markAsRecalled(pendingRecallAnswer.memoryTrackerId, true)
+          await markAsRecalled(memoryTrackerId, true)
           console.log('Recalled successfully')
         } catch (err) {
-          console.log(err instanceof Error ? err.message : String(err))
+          logError(err)
         }
       } else if (answer === 'n' || answer === 'no') {
         try {
-          await markAsRecalled(pendingRecallAnswer.memoryTrackerId, false)
+          await markAsRecalled(memoryTrackerId, false)
           console.log('Marked as not recalled')
         } catch (err) {
-          console.log(err instanceof Error ? err.message : String(err))
+          logError(err)
         }
       } else {
         logStatus('Please answer y or n')
@@ -392,7 +405,7 @@ export async function processInput(input: string): Promise<boolean> {
       const message = await recallStatus()
       console.log(message)
     } catch (err) {
-      console.log(err instanceof Error ? err.message : String(err))
+      logError(err)
     }
     return false
   }
@@ -405,34 +418,12 @@ export async function processInput(input: string): Promise<boolean> {
       if (result.type === 'none') {
         pendingRecallLoadMore = true
         logStatus('Load more from next 3 days? (y/n)')
-      } else if (result.type === 'spelling') {
-        logStatus(`Spell: ${result.stem || '...'}`)
-        pendingRecallAnswer = {
-          recallPromptId: result.recallPromptId,
-          type: 'spelling',
-        }
-      } else if (result.type === 'mcq') {
-        logStatus(result.stem)
-        for (let i = 0; i < result.choices.length; i++) {
-          logStatus(`  ${i + 1}. ${result.choices[i]}`)
-        }
-        logStatus(`Enter your choice (1-${result.choices.length}):`)
-        pendingRecallAnswer = {
-          recallPromptId: result.recallPromptId,
-          choices: result.choices,
-        }
       } else {
-        logStatus(result.title)
-        if (result.details) {
-          logStatus(renderMarkdownToTerminal(result.details))
-        }
-        logStatus('Yes, I remember? (y/n)')
-        pendingRecallAnswer = { memoryTrackerId: result.memoryTrackerId }
+        showRecallPrompt(result as RecallPromptResult)
       }
     } catch (err) {
-      recallSessionMode = false
-      sessionRecallCount = 0
-      console.log(err instanceof Error ? err.message : String(err))
+      endRecallSession()
+      logError(err)
     }
     return false
   }
@@ -527,6 +518,34 @@ function buildSuggestionLines(
   return [COMMANDS_HINT]
 }
 
+function clearTTYDisplay(
+  linesAboveCursor: number,
+  prevTotalLines: number
+): void {
+  if (linesAboveCursor > 0) {
+    process.stdout.write(`\x1b[${linesAboveCursor}A`)
+  }
+  process.stdout.write('\r')
+  for (let i = 0; i < prevTotalLines; i++) {
+    process.stdout.write('\x1b[2K\n')
+  }
+  if (prevTotalLines > 1) {
+    process.stdout.write(`\x1b[${prevTotalLines - 1}A`)
+  }
+}
+
+function getLastLine(buffer: string): string {
+  const lines = buffer.split('\n')
+  return lines[lines.length - 1] ?? ''
+}
+
+function isCommandPrefixWithSuggestions(buffer: string): boolean {
+  const lastLine = getLastLine(buffer)
+  if (!lastLine.startsWith('/') || lastLine.endsWith(' ')) return false
+  const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
+  return filtered.length > 0
+}
+
 async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
   console.log(formatVersionOutput())
   console.log()
@@ -556,7 +575,6 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
     const width = getTerminalWidth()
     const contentLines = buildBoxLines(buffer, width)
     const boxLines = renderBox(contentLines, width).split('\n')
-    const mcqPending = pendingRecallAnswer && 'choices' in pendingRecallAnswer
     const suggestionLines = tokenListItems
       ? formatHighlightedList(
           formatTokenLines(tokenListItems, getDefaultTokenLabel()),
@@ -565,20 +583,17 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
         )
       : pendingRecallStopConfirmation
         ? ['Stop recall? (y/n)']
-        : mcqPending
+        : isMcqPrompt(pendingRecallAnswer)
           ? formatHighlightedList(
-              formatMcqChoiceLines(
-                (pendingRecallAnswer as { choices: string[] }).choices
-              ),
+              formatMcqChoiceLines(pendingRecallAnswer.choices),
               8,
               mcqChoiceHighlightIndex
             )
           : (() => {
-              const bufferLines = buffer.split('\n')
-              const lastLine = bufferLines[bufferLines.length - 1]
-              const wouldShowSuggestions =
-                lastLine.startsWith('/') && !lastLine.endsWith(' ')
-              if (suggestionsDismissed && wouldShowSuggestions)
+              if (
+                suggestionsDismissed &&
+                isCommandPrefixWithSuggestions(buffer)
+              )
                 return [COMMANDS_HINT]
               return buildSuggestionLines(buffer, highlightIndex)
             })()
@@ -673,12 +688,8 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
         }
         return
       }
-      const mcqPending = pendingRecallAnswer && 'choices' in pendingRecallAnswer
-      if (mcqPending) {
-        const { recallPromptId, choices } = pendingRecallAnswer as {
-          recallPromptId: number
-          choices: string[]
-        }
+      if (isMcqPrompt(pendingRecallAnswer)) {
+        const { recallPromptId, choices } = pendingRecallAnswer
         if (key.name === 'escape') {
           pendingRecallStopConfirmation = true
           buffer = ''
@@ -704,44 +715,19 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           }
           if (buffer.trim() === '/contest') {
             buffer = ''
-            if (linesAboveCursor > 0) {
-              process.stdout.write(`\x1b[${linesAboveCursor}A`)
-            }
-            process.stdout.write('\r')
-            for (let i = 0; i < prevTotalLines; i++) {
-              process.stdout.write('\x1b[2K\n')
-            }
-            if (prevTotalLines > 1) {
-              process.stdout.write(`\x1b[${prevTotalLines - 1}A`)
-            }
+            clearTTYDisplay(linesAboveCursor, prevTotalLines)
             try {
               const outcome = await contestAndRegenerate(recallPromptId)
               if (!outcome.ok) {
                 process.stdout.write(`${outcome.message}\n`)
               } else {
-                const { result } = outcome
-                if (result.type === 'mcq') {
-                  writeStatus(result.stem)
-                  for (let i = 0; i < result.choices.length; i++) {
-                    writeStatus(`  ${i + 1}. ${result.choices[i]}`)
-                  }
-                  writeStatus(`Enter your choice (1-${result.choices.length}):`)
-                  pendingRecallAnswer = {
-                    recallPromptId: result.recallPromptId,
-                    choices: result.choices,
-                  }
-                } else if (result.type === 'spelling') {
-                  writeStatus(`Spell: ${result.stem || '...'}`)
-                  pendingRecallAnswer = {
-                    recallPromptId: result.recallPromptId,
-                    type: 'spelling',
-                  }
-                }
+                showRecallPrompt(
+                  outcome.result as RecallPromptResult,
+                  writeStatus
+                )
               }
             } catch (err) {
-              process.stdout.write(
-                `${err instanceof Error ? err.message : String(err)}\n`
-              )
+              writeError(err)
             }
             mcqChoiceHighlightIndex = 0
             linesAboveCursor = 0
@@ -754,16 +740,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           const choiceIndex = validTyped
             ? choiceNum - 1
             : mcqChoiceHighlightIndex
-          if (linesAboveCursor > 0) {
-            process.stdout.write(`\x1b[${linesAboveCursor}A`)
-          }
-          process.stdout.write('\r')
-          for (let i = 0; i < prevTotalLines; i++) {
-            process.stdout.write(`\x1b[2K\n`)
-          }
-          if (prevTotalLines > 1) {
-            process.stdout.write(`\x1b[${prevTotalLines - 1}A`)
-          }
+          clearTTYDisplay(linesAboveCursor, prevTotalLines)
           buffer = ''
           pendingRecallAnswer = null
           mcqChoiceHighlightIndex = 0
@@ -775,9 +752,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
               `${correct ? 'Correct!' : 'Incorrect'}\nRecalled successfully\n`
             )
           } catch (err) {
-            process.stdout.write(
-              `${err instanceof Error ? err.message : String(err)}\n`
-            )
+            writeError(err)
           }
           if (recallSessionMode) await continueRecallSession()
           drawBox()
@@ -809,16 +784,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           drawBox()
         } else if (key.name === 'return' && !key.shift) {
           const selectedLabel = tokenListItems[tokenHighlightIndex]!.label
-          if (linesAboveCursor > 0) {
-            process.stdout.write(`\x1b[${linesAboveCursor}A`)
-          }
-          process.stdout.write('\r')
-          for (let i = 0; i < prevTotalLines; i++) {
-            process.stdout.write('\x1b[2K\n')
-          }
-          if (prevTotalLines > 1) {
-            process.stdout.write(`\x1b[${prevTotalLines - 1}A`)
-          }
+          clearTTYDisplay(linesAboveCursor, prevTotalLines)
           const action = tokenListAction
           tokenListItems = null
           tokenHighlightIndex = 0
@@ -838,9 +804,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
                 `Token "${selectedLabel}" removed locally and from server.\n`
               )
             } catch (err) {
-              process.stdout.write(
-                `${err instanceof Error ? err.message : String(err)}\n`
-              )
+              writeError(err)
             }
           }
           drawBox()
@@ -861,16 +825,11 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           drawBox()
           return
         }
-        const bufferLines = buffer.split('\n')
-        const lastLine = bufferLines[bufferLines.length - 1]
-        const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
-        const suggestionsVisible =
-          lastLine.startsWith('/') &&
-          !lastLine.endsWith(' ') &&
-          filtered.length > 0
-        if (suggestionsVisible) {
+        if (isCommandPrefixWithSuggestions(buffer)) {
           highlightIndex = 0
+          const lastLine = getLastLine(buffer)
           if (lastLine === '/') {
+            const bufferLines = buffer.split('\n')
             buffer =
               bufferLines.length === 1
                 ? ''
@@ -887,8 +846,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           buffer += '\n'
           drawBox()
         } else {
-          const bufferLines = buffer.split('\n')
-          const lastLine = bufferLines[bufferLines.length - 1]
+          const lastLine = getLastLine(buffer)
           const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
           const suggestionsVisible =
             lastLine.startsWith('/') &&
@@ -897,6 +855,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
 
           if (suggestionsVisible) {
             const selectedCommand = `${filtered[highlightIndex].usage} `
+            const bufferLines = buffer.split('\n')
             buffer =
               bufferLines.slice(0, -1).concat(selectedCommand).join('\n') || ''
             highlightIndex = 0
@@ -908,16 +867,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           const input = buffer
           buffer = ''
 
-          if (linesAboveCursor > 0) {
-            process.stdout.write(`\x1b[${linesAboveCursor}A`)
-          }
-          process.stdout.write('\r')
-          for (let i = 0; i < prevTotalLines; i++) {
-            process.stdout.write('\x1b[2K\n')
-          }
-          if (prevTotalLines > 1) {
-            process.stdout.write(`\x1b[${prevTotalLines - 1}A`)
-          }
+          clearTTYDisplay(linesAboveCursor, prevTotalLines)
 
           if (input.trim()) {
             process.stdout.write(renderPastInput(input, width))
@@ -956,7 +906,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           }
           linesAboveCursor = 0
           prevTotalLines = 0
-          if (pendingRecallAnswer && 'choices' in pendingRecallAnswer) {
+          if (isMcqPrompt(pendingRecallAnswer)) {
             mcqChoiceHighlightIndex = 0
           }
           drawBox()
@@ -969,14 +919,11 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           drawBox()
         }
       } else if (key.name === 'up' || key.name === 'down') {
-        const bufferLines = buffer.split('\n')
-        const lastLine = bufferLines[bufferLines.length - 1]
-        const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
-        const suggestionsVisible =
-          lastLine.startsWith('/') &&
-          !lastLine.endsWith(' ') &&
-          filtered.length > 0
-        if (suggestionsVisible) {
+        if (isCommandPrefixWithSuggestions(buffer)) {
+          const filtered = filterCommandsByPrefix(
+            interactiveDocs,
+            getLastLine(buffer)
+          )
           const n = filtered.length
           highlightIndex =
             key.name === 'up'
@@ -985,14 +932,14 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           drawBox()
         }
       } else if (key.name === 'tab') {
-        const bufferLines = buffer.split('\n')
-        const lastLine = bufferLines[bufferLines.length - 1]
+        const lastLine = getLastLine(buffer)
         if (lastLine.startsWith('/') && !lastLine.endsWith(' ')) {
           const { completed, count } = getTabCompletion(
             lastLine,
             interactiveDocs
           )
           if (count > 0 && completed !== lastLine) {
+            const bufferLines = buffer.split('\n')
             buffer =
               bufferLines.slice(0, -1).concat(completed).join('\n') || completed
             highlightIndex = 0
