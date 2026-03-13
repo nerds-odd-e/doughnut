@@ -1,5 +1,6 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import { mock_services } from '../start'
+import { getSectionContent, getLastCommandOutput } from './cliSectionParser'
 
 const BASE_URL = 'http://localhost:9081'
 const GOOGLE_MOCK_URL = 'http://localhost:5003'
@@ -286,6 +287,56 @@ When(
 
 Then('I should see {string}', (expected: string) => {
   cy.get('@doughnutOutput').should('include', expected)
+})
+
+Then('I should see {string} in the history output', (expected: string) => {
+  cy.get<string>('@doughnutOutput').then((output) => {
+    const content = getSectionContent(output, 'history-output')
+    expect(
+      content,
+      `Expected "${expected}" in history-output. history-output contains:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
+    ).to.include(expected)
+  })
+})
+
+Then('I should see {string} in the history input', (expected: string) => {
+  cy.get<string>('@doughnutOutput').then((output) => {
+    const content = getSectionContent(output, 'history-input')
+    expect(
+      content,
+      `Expected "${expected}" in history-input. history-input contains:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
+    ).to.include(expected)
+  })
+})
+
+Then('I should see {string} in the status', (expected: string) => {
+  cy.get<string>('@doughnutOutput').then((output) => {
+    const content = getSectionContent(output, 'status')
+    expect(
+      content,
+      `Expected "${expected}" in status. status contains:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
+    ).to.include(expected)
+  })
+})
+
+Then('I should see {string} in the last command output', (expected: string) => {
+  cy.get<string>('@doughnutOutput').then((output) => {
+    const content = getLastCommandOutput(output)
+    expect(
+      content,
+      `Expected "${expected}" in last command output. last command output contains:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
+    ).to.include(expected)
+  })
+})
+
+Then('I should not see {string} in the history output', (expected: string) => {
+  cy.get<string>('@doughnutOutput').then((output) => {
+    const content = getSectionContent(output, 'history-output')
+    expect(
+      content,
+      `Did not expect "${expected}" in history-output`
+    ).not.to.include(expected)
+  })
 })
 
 Then('the recall session was stopped', () => {

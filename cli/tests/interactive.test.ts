@@ -267,7 +267,9 @@ describe('processInput', () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
-    expect(logSpy).toHaveBeenCalledWith('Spell: means incite violence')
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Spell: means incite violence')
+    )
     logSpy.mockClear()
 
     await processInput('sedition')
@@ -290,7 +292,9 @@ describe('processInput', () => {
     await processInput('/recall')
     logSpy.mockClear()
     expect(await processInput('')).toBe(false)
-    expect(logSpy).toHaveBeenCalledWith('Please type your spelling')
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Please type your spelling')
+    )
     await processInput('clear') // clear pending state for subsequent tests
     logSpy.mockRestore()
   })
@@ -303,7 +307,9 @@ describe('processInput', () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
-    expect(logSpy).toHaveBeenCalledWith('Load more from next 3 days? (y/n)')
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Load more from next 3 days? (y/n)')
+    )
     expect(mockRecallNext).toHaveBeenCalledWith(0)
 
     logSpy.mockRestore()
@@ -344,14 +350,18 @@ describe('processInput', () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
-    expect(logSpy).toHaveBeenCalledWith('Load more from next 3 days? (y/n)')
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Load more from next 3 days? (y/n)')
+    )
     logSpy.mockClear()
 
     await processInput('y')
     expect(mockRecallNext).toHaveBeenNthCalledWith(1, 0)
     expect(mockRecallNext).toHaveBeenNthCalledWith(2, 3)
-    expect(logSpy).toHaveBeenCalledWith('Future note')
-    expect(logSpy).toHaveBeenCalledWith('Yes, I remember? (y/n)')
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Future note'))
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Yes, I remember? (y/n)')
+    )
     logSpy.mockClear()
 
     await processInput('y')
@@ -377,14 +387,18 @@ describe('processInput', () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
-    expect(logSpy).toHaveBeenCalledWith('Note 1')
-    expect(logSpy).toHaveBeenCalledWith('Yes, I remember? (y/n)')
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Note 1'))
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Yes, I remember? (y/n)')
+    )
     logSpy.mockClear()
 
     await processInput('y')
     expect(mockMarkAsRecalled).toHaveBeenCalledWith(1, true)
     expect(logSpy).toHaveBeenCalledWith('Recalled successfully')
-    expect(logSpy).toHaveBeenCalledWith('Load more from next 3 days? (y/n)')
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Load more from next 3 days? (y/n)')
+    )
     logSpy.mockClear()
 
     await processInput('n')
@@ -406,7 +420,9 @@ describe('processInput', () => {
 
     await processInput('/recall')
     await processInput('y')
-    expect(logSpy).toHaveBeenCalledWith('Network error')
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Network error')
+    )
 
     logSpy.mockRestore()
   })
@@ -468,14 +484,18 @@ describe('processInput', () => {
     expect(isInRecallSubstate()).toBe(true)
 
     await processInput('/help')
-    expect(logSpy).toHaveBeenCalledWith('Type /stop to exit recall')
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Type /stop to exit recall')
+    )
     expect(logSpy).not.toHaveBeenCalledWith(
       expect.stringContaining('Subcommands')
     )
 
     logSpy.mockClear()
     await processInput('/recall-status')
-    expect(logSpy).toHaveBeenCalledWith('Type /stop to exit recall')
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Type /stop to exit recall')
+    )
     expect(logSpy).not.toHaveBeenCalledWith(
       expect.stringMatching(/notes to recall today/)
     )
@@ -508,16 +528,22 @@ describe('processInput', () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
-    expect(logSpy).toHaveBeenCalledWith('First question?')
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('First question?')
+    )
     logSpy.mockClear()
 
     await processInput('/contest')
     expect(mockContestAndRegenerate).toHaveBeenCalledWith(100)
-    expect(logSpy).toHaveBeenCalledWith('Regenerated question?')
-    expect(logSpy).toHaveBeenCalledWith('  1. X')
-    expect(logSpy).toHaveBeenCalledWith('  2. Y')
-    expect(logSpy).toHaveBeenCalledWith('  3. Z')
-    expect(logSpy).toHaveBeenCalledWith('Enter your choice (1-3):')
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Regenerated question?')
+    )
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('  1. X'))
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('  2. Y'))
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('  3. Z'))
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Enter your choice (1-3):')
+    )
     logSpy.mockClear()
 
     await processInput('1')
@@ -539,7 +565,9 @@ describe('processInput', () => {
     await processInput('/recall')
     await processInput('/contest')
     expect(mockContestAndRegenerate).not.toHaveBeenCalled()
-    expect(logSpy).toHaveBeenCalledWith('Type /stop to exit recall')
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Type /stop to exit recall')
+    )
 
     logSpy.mockRestore()
   })

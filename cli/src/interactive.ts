@@ -31,6 +31,14 @@ import { formatVersionOutput } from './version.js'
 const GREY = '\x1b[90m'
 const GREY_BG = '\x1b[48;5;236m'
 const RESET = '\x1b[0m'
+
+function logStatus(msg: string): void {
+  console.log(`${GREY}${msg}${RESET}`)
+}
+
+function writeStatus(msg: string): void {
+  process.stdout.write(`${GREY}${msg}${RESET}\n`)
+}
 const PLACEHOLDER = '`exit` to quit.'
 const PROMPT = '→ '
 
@@ -77,7 +85,7 @@ async function continueRecallSession(fromLoadMore = false): Promise<void> {
     if (result.type === 'none') {
       if (recallSessionDueDays === 0) {
         pendingRecallLoadMore = true
-        console.log('Load more from next 3 days? (y/n)')
+        logStatus('Load more from next 3 days? (y/n)')
         return
       }
       const msg =
@@ -93,7 +101,7 @@ async function continueRecallSession(fromLoadMore = false): Promise<void> {
       return
     }
     if (result.type === 'spelling') {
-      console.log(`Spell: ${result.stem || '...'}`)
+      logStatus(`Spell: ${result.stem || '...'}`)
       pendingRecallAnswer = {
         recallPromptId: result.recallPromptId,
         type: 'spelling',
@@ -101,22 +109,22 @@ async function continueRecallSession(fromLoadMore = false): Promise<void> {
       return
     }
     if (result.type === 'mcq') {
-      console.log(result.stem)
+      logStatus(result.stem)
       for (let i = 0; i < result.choices.length; i++) {
-        console.log(`  ${i + 1}. ${result.choices[i]}`)
+        logStatus(`  ${i + 1}. ${result.choices[i]}`)
       }
-      console.log(`Enter your choice (1-${result.choices.length}):`)
+      logStatus(`Enter your choice (1-${result.choices.length}):`)
       pendingRecallAnswer = {
         recallPromptId: result.recallPromptId,
         choices: result.choices,
       }
       return
     }
-    console.log(result.title)
+    logStatus(result.title)
     if (result.details) {
-      console.log(renderMarkdownToTerminal(result.details))
+      logStatus(renderMarkdownToTerminal(result.details))
     }
-    console.log('Yes, I remember? (y/n)')
+    logStatus('Yes, I remember? (y/n)')
     pendingRecallAnswer = { memoryTrackerId: result.memoryTrackerId }
   } catch (err) {
     recallSessionMode = false
@@ -150,7 +158,7 @@ export async function processInput(input: string): Promise<boolean> {
       : null
   if (isInRecallSubstate() && trimmed === '/contest') {
     if (contestableRecallPromptId == null) {
-      console.log('Type /stop to exit recall')
+      logStatus('Type /stop to exit recall')
       return false
     }
     try {
@@ -161,17 +169,17 @@ export async function processInput(input: string): Promise<boolean> {
       }
       const { result } = outcome
       if (result.type === 'mcq') {
-        console.log(result.stem)
+        logStatus(result.stem)
         for (let i = 0; i < result.choices.length; i++) {
-          console.log(`  ${i + 1}. ${result.choices[i]}`)
+          logStatus(`  ${i + 1}. ${result.choices[i]}`)
         }
-        console.log(`Enter your choice (1-${result.choices.length}):`)
+        logStatus(`Enter your choice (1-${result.choices.length}):`)
         pendingRecallAnswer = {
           recallPromptId: result.recallPromptId,
           choices: result.choices,
         }
       } else if (result.type === 'spelling') {
-        console.log(`Spell: ${result.stem || '...'}`)
+        logStatus(`Spell: ${result.stem || '...'}`)
         pendingRecallAnswer = {
           recallPromptId: result.recallPromptId,
           type: 'spelling',
@@ -183,7 +191,7 @@ export async function processInput(input: string): Promise<boolean> {
     return false
   }
   if (isInRecallSubstate() && trimmed.startsWith('/')) {
-    console.log(
+    logStatus(
       contestableRecallPromptId
         ? 'Type /stop to exit, /contest to regenerate'
         : 'Type /stop to exit recall'
@@ -310,7 +318,7 @@ export async function processInput(input: string): Promise<boolean> {
       sessionRecallCount = 0
       recallSessionDueDays = 0
     } else {
-      console.log('Please answer y or n')
+      logStatus('Please answer y or n')
       return false
     }
     return false
@@ -331,7 +339,7 @@ export async function processInput(input: string): Promise<boolean> {
         pendingRecallAnswer = null
         if (recallSessionMode) await continueRecallSession()
       } else {
-        console.log(`Enter a number from 1 to ${choices.length}`)
+        logStatus(`Enter a number from 1 to ${choices.length}`)
         return false
       }
     } else if (
@@ -340,7 +348,7 @@ export async function processInput(input: string): Promise<boolean> {
     ) {
       const { recallPromptId } = pendingRecallAnswer
       if (!trimmed) {
-        console.log('Please type your spelling')
+        logStatus('Please type your spelling')
         return false
       }
       try {
@@ -369,7 +377,7 @@ export async function processInput(input: string): Promise<boolean> {
           console.log(err instanceof Error ? err.message : String(err))
         }
       } else {
-        console.log('Please answer y or n')
+        logStatus('Please answer y or n')
         return false
       }
       pendingRecallAnswer = null
@@ -394,29 +402,29 @@ export async function processInput(input: string): Promise<boolean> {
       const result = await recallNext(0)
       if (result.type === 'none') {
         pendingRecallLoadMore = true
-        console.log('Load more from next 3 days? (y/n)')
+        logStatus('Load more from next 3 days? (y/n)')
       } else if (result.type === 'spelling') {
-        console.log(`Spell: ${result.stem || '...'}`)
+        logStatus(`Spell: ${result.stem || '...'}`)
         pendingRecallAnswer = {
           recallPromptId: result.recallPromptId,
           type: 'spelling',
         }
       } else if (result.type === 'mcq') {
-        console.log(result.stem)
+        logStatus(result.stem)
         for (let i = 0; i < result.choices.length; i++) {
-          console.log(`  ${i + 1}. ${result.choices[i]}`)
+          logStatus(`  ${i + 1}. ${result.choices[i]}`)
         }
-        console.log(`Enter your choice (1-${result.choices.length}):`)
+        logStatus(`Enter your choice (1-${result.choices.length}):`)
         pendingRecallAnswer = {
           recallPromptId: result.recallPromptId,
           choices: result.choices,
         }
       } else {
-        console.log(result.title)
+        logStatus(result.title)
         if (result.details) {
-          console.log(renderMarkdownToTerminal(result.details))
+          logStatus(renderMarkdownToTerminal(result.details))
         }
-        console.log('Yes, I remember? (y/n)')
+        logStatus('Yes, I remember? (y/n)')
         pendingRecallAnswer = { memoryTrackerId: result.memoryTrackerId }
       }
     } catch (err) {
@@ -627,7 +635,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           } else if (answer === 'n' || answer === 'no') {
             // Stay in MCQ; drawBox will show choices again
           } else if (answer) {
-            process.stdout.write('Please answer y or n\n')
+            writeStatus('Please answer y or n')
           }
           drawBox()
         } else if (str && !key.ctrl && !key.meta) {
@@ -652,7 +660,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
         if (key.name === 'escape') {
           pendingRecallStopConfirmation = true
           buffer = ''
-          process.stdout.write('Stop recall? (y/n)\n')
+          writeStatus('Stop recall? (y/n)')
           drawBox()
         } else if (key.name === 'up' || key.name === 'down') {
           const n = choices.length
@@ -691,19 +699,17 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
               } else {
                 const { result } = outcome
                 if (result.type === 'mcq') {
-                  process.stdout.write(`${result.stem}\n`)
+                  writeStatus(result.stem)
                   for (let i = 0; i < result.choices.length; i++) {
-                    process.stdout.write(`  ${i + 1}. ${result.choices[i]}\n`)
+                    writeStatus(`  ${i + 1}. ${result.choices[i]}`)
                   }
-                  process.stdout.write(
-                    `Enter your choice (1-${result.choices.length}):\n`
-                  )
+                  writeStatus(`Enter your choice (1-${result.choices.length}):`)
                   pendingRecallAnswer = {
                     recallPromptId: result.recallPromptId,
                     choices: result.choices,
                   }
                 } else if (result.type === 'spelling') {
-                  process.stdout.write(`Spell: ${result.stem || '...'}\n`)
+                  writeStatus(`Spell: ${result.stem || '...'}`)
                   pendingRecallAnswer = {
                     recallPromptId: result.recallPromptId,
                     type: 'spelling',

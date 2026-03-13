@@ -7,9 +7,9 @@ Feature: CLI access token management
   Scenario: Add access token and list it
     And I have a valid Doughnut Access Token with label "E2E CLI Token"
     When I run the doughnut CLI add-access-token with the saved token
-    Then I should see "Token added"
+    Then I should see "Token added" in the history output
     When I run the doughnut command with -c "/list-access-token"
-    Then I should see "E2E CLI Token"
+    Then I should see "E2E CLI Token" in the history output
 
   Scenario: Add invalid access token
     When I run the doughnut CLI add-access-token with token "invalid-token-xxx"

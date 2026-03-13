@@ -100,27 +100,29 @@ Use section markers only when ANSI-based parsing is insufficient (e.g. if stylin
 
 ## Phased Implementation
 
-### Phase 1: Define and document section model
+### Phase 1: Define and document section model ✓
 - Use section names: input, status, history-input, history-output.
 
-### Phase 2: Ensure consistent styling
+### Phase 2: Ensure consistent styling ✓
 - history-input: grey background (existing `renderPastInput`)
 - history-output: default styling, no background
-- status: dim foreground, consistent indentation
+- status: dim foreground via `logStatus` / `writeStatus` for prompts, choices, hints
 
-### Phase 3: E2E parsing helper
-- Parse raw stdout by ANSI sequences into section maps.
-- Implement `getSectionContent(output, section)` for assertions.
+### Phase 3: E2E parsing helper ✓
+- `e2e_test/step_definitions/cliSectionParser.ts`: `getSectionContent(output, section)`, `getLastCommandOutput(output)`
+- Parses by ANSI: GREY_BG → history-input, DIM → status, default → history-output
 
-### Phase 4: New E2E step definitions
+### Phase 4: New E2E step definitions ✓
 - `I should see "X" in the history output`
 - `I should see "X" in the history input`
 - `I should see "X" in the status`
+- `I should see "X" in the last command output`
+- `I should not see "Y" in the history output`
 - On failure: report section content.
 
-### Phase 5: Migrate existing E2E assertions
-- Replace `I should see "X"` with section-specific steps where intent is clear.
-- Leave generic `I should see` for cases where section is irrelevant.
+### Phase 5: Migrate existing E2E assertions ✓
+- Migrated examples in cli_recall.feature and cli_access_token.feature
+- Leave generic `I should see` for cases where section is irrelevant
 
 ## Files to Touch
 

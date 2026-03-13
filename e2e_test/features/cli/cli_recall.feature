@@ -35,9 +35,9 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedition"
     And It's day 2
     When I run the doughnut command in interactive mode with input "/recall" and "y"
-    Then I should see "sedition"
-    And I should see "Yes, I remember?"
-    And I should see "Recalled successfully"
+    Then I should see "sedition" in the status
+    And I should see "Yes, I remember?" in the status
+    And I should see "Recalled successfully" in the history output
 
   @disableOpenAiService
   Scenario: Recall status shows zero after recalling the only note in session
@@ -63,10 +63,10 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedation"
     And It's day 2
     When I run the doughnut command in interactive mode with input "/recall" and "y"
-    Then I should see "sedation"
-    And I should see "Put"
-    And I should see "Yes, I remember?"
-    And I should see "Recalled successfully"
+    Then I should see "sedation" in the status
+    And I should see "Put" in the status
+    And I should see "Yes, I remember?" in the status
+    And I should see "Recalled successfully" in the last command output
 
   @usingMockedOpenAiService
   Scenario: Recall MCQ - choose correct answer and see success
