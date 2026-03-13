@@ -212,11 +212,7 @@ public class NoteSearchService {
   }
 
   private NoteSearchResult noteToSearchResult(Note note, Float distance) {
-    return new NoteSearchResult(
-        note.getNoteTopology(),
-        note.getNotebook().getId(),
-        note.getNotebook().getTitle(),
-        distance);
+    return new NoteSearchResult(note.getNoteTopology(), distance);
   }
 
   private List<NoteSearchResult> sortByDistanceThenNotebook(

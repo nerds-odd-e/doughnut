@@ -298,6 +298,10 @@ public class Note extends EntityIdentifiedByIdOnly {
     noteTopology.setTitle(getTitle() != null ? getTitle() : "");
     noteTopology.setShortDetails(getShortDetails());
     noteTopology.setRelationType(getRelationType());
+    if (getNotebook() != null) {
+      noteTopology.setNotebookId(getNotebook().getId());
+      noteTopology.setNotebookTitle(getNotebook().getTitle());
+    }
     if (getParent() != null) {
       noteTopology.setParentOrSubjectNoteTopology(getParent().getNoteTopology());
     }

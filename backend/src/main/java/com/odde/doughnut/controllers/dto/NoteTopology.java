@@ -14,6 +14,8 @@ public class NoteTopology {
   private RelationType relationType;
   private NoteTopology targetNoteTopology;
   private NoteTopology parentOrSubjectNoteTopology;
+  private Integer notebookId;
+  private String notebookTitle;
 
   public int getId() {
     return this.id;

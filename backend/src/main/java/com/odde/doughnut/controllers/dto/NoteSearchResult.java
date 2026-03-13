@@ -23,10 +23,10 @@ public class NoteSearchResult {
 
   private Float distance;
 
-  public NoteSearchResult(NoteTopology noteTopology, Integer notebookId, Float distance) {
+  public NoteSearchResult(NoteTopology noteTopology, Float distance) {
     this.noteTopology = noteTopology;
-    this.notebookId = notebookId;
-    this.notebookTitle = null;
+    this.notebookId = noteTopology != null ? noteTopology.getNotebookId() : null;
+    this.notebookTitle = noteTopology != null ? noteTopology.getNotebookTitle() : null;
     this.distance = distance;
   }
 
