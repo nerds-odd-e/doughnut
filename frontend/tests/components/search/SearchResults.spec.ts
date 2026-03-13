@@ -60,6 +60,7 @@ function mountSearchResults(props: {
   inputSearchKey: string
   isDropdown?: boolean
   noteId?: number
+  notebookId?: number
 }) {
   return helper.component(SearchResults).withProps(props).mount()
 }
@@ -200,6 +201,58 @@ describe("SearchResults.vue", () => {
       })
 
       expect(ids.filter((x) => x !== undefined)).toEqual([1, 2, 3])
+      vi.useRealTimers()
+    })
+
+    it("prioritizes same-notebook results when distances are equal", async () => {
+      vi.useFakeTimers()
+
+      const currentNotebookId = 10
+      const sameNotebookResult = makeMe.aNoteSearchResult
+        .id(2)
+        .title("Same Notebook Note")
+        .notebookId(currentNotebookId)
+        .distance(0.5)
+        .please()
+      const otherNotebookResult = makeMe.aNoteSearchResult
+        .id(1)
+        .title("Other Notebook Note")
+        .notebookId(20)
+        .distance(0.5)
+        .please()
+
+      mockSdkServiceWithImplementation(
+        "searchForRelationshipTargetWithin",
+        vi.fn().mockResolvedValue([otherNotebookResult, sameNotebookResult])
+      )
+      mockSdkServiceWithImplementation(
+        "semanticSearchWithin",
+        vi.fn().mockResolvedValue([])
+      )
+      mockSdkService("searchForRelationshipTarget", [])
+      mockSdkService("semanticSearch", [])
+      mockSdkService("getRecentNotes", [])
+
+      const wrapper = mountSearchResults({
+        inputSearchKey: "test",
+        noteId: 1,
+        notebookId: currentNotebookId,
+        isDropdown: true,
+      })
+      await waitForDebounce()
+
+      const links = wrapper.findAll(".router-link")
+      const ids = links.map((a) => {
+        const to = a.attributes("to") ?? "{}"
+        try {
+          return JSON.parse(to).params.noteId as number
+        } catch {
+          return
+        }
+      })
+
+      expect(ids[0]).toBe(2)
+      expect(ids[1]).toBe(1)
       vi.useRealTimers()
     })
   })

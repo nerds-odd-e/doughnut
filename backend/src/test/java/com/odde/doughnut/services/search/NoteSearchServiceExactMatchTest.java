@@ -125,5 +125,33 @@ class NoteSearchServiceExactMatchTest {
 
       assertThat(results, empty());
     }
+
+    @Test
+    void shouldPrioritizeSameNotebookWhenDistancesAreEqual() {
+      Note sameNotebookNote = makeMe.aNote("MatchInSame").under(parentNote).please();
+      Note otherNotebookHead = makeMe.aNote("Other Head").creatorAndOwner(user).please();
+      Note otherNotebookNote = makeMe.aNote("MatchInOther").under(otherNotebookHead).please();
+
+      searchTerm.setSearchKey("Match");
+      searchTerm.setAllMyNotebooksAndSubscriptions(true);
+
+      List<NoteSearchResult> results =
+          noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
+
+      assertThat(results, hasSize(greaterThanOrEqualTo(2)));
+      int sameNotebookIndex =
+          results.stream()
+              .map(r -> r.getNoteTopology().getId())
+              .toList()
+              .indexOf(sameNotebookNote.getId());
+      int otherNotebookIndex =
+          results.stream()
+              .map(r -> r.getNoteTopology().getId())
+              .toList()
+              .indexOf(otherNotebookNote.getId());
+      assertThat(sameNotebookIndex, greaterThanOrEqualTo(0));
+      assertThat(otherNotebookIndex, greaterThanOrEqualTo(0));
+      assertThat(sameNotebookIndex, lessThan(otherNotebookIndex));
+    }
   }
 }

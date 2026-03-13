@@ -56,6 +56,10 @@ class SearchControllerTests extends ControllerTestBase {
           containsInAnyOrder("Java Programming", "JavaScript Basics"));
       // partial matches should have distance 0.9 for now
       assertThat(result.stream().allMatch(r -> r.getDistance().equals(0.9f)), is(true));
+      assertThat(
+          result.stream()
+              .allMatch(r -> r.getNotebookTitle() != null && !r.getNotebookTitle().isEmpty()),
+          is(true));
     }
 
     @Test

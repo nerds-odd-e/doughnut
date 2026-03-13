@@ -88,5 +88,15 @@ export const assumeNoteTargetSearchDialog = () => {
       }).should('not.exist')
       return this
     },
+
+    expectNotebookTitleInSearchResults(notebookTitle: string) {
+      cy.findByText('Search result', { selector: '.result-title' }).should(
+        'be.visible'
+      )
+      cy.get('.search-result').within(() => {
+        cy.contains('.notebook-title-label', notebookTitle).should('be.visible')
+      })
+      return this
+    },
   }
 }
