@@ -22,7 +22,7 @@
     "markdansi": "0.2.1"
   },
   "devDependencies": {
-    "@types/node": "25.4.0",
+    "@types/node": "25.5.0",
     "esbuild": "0.27.4",
     "tsx": "4.21.0",
     "typescript": "5.9.3",
