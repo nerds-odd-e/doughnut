@@ -88,6 +88,26 @@ Feature: CLI recall status and recall session
     And I should see "Recalled successfully"
 
   @usingMockedOpenAiService
+  Scenario: Recall MCQ - ESC cancels with y/n confirmation
+    Given I have a notebook with the head note "English" which skips memory tracking
+    And there are some notes:
+      | Title    | Details                        | Parent Title |
+      | sedition | Sedition means incite violence | English      |
+      | sedation | Put to sleep is sedation       | English      |
+    And OpenAI generates this question:
+      | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
+      | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
+    And It's day 1
+    And I assimilate the note "sedition"
+    And It's day 2
+    When I run the doughnut command in interactive mode with recall MCQ and cancel with ESC
+    Then I should see "What is the meaning of sedition?"
+    And I should see "Stop recall? (y/n)"
+    And I should see "Stopped recall"
+    When I run the doughnut command in interactive mode with input "/recall-status"
+    Then I should see "1 note to recall today"
+
+  @usingMockedOpenAiService
   Scenario: Recall MCQ - down arrow and Enter to select
     Given I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:

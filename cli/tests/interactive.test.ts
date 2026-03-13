@@ -1490,4 +1490,77 @@ describe('TTY MCQ choice selection', () => {
 
     stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
+
+  test('ESC shows stop confirmation, y exits recall mode', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+
+    await submitRecall(stdin)
+    mockAnswerQuiz.mockClear()
+    writeSpy.mockClear()
+
+    stdin.emit('keypress', undefined, {
+      name: 'escape',
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    let output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(output).toContain('Stop recall? (y/n)')
+
+    stdin.emit('keypress', 'y', { name: 'y', ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '\r', {
+      name: 'return',
+      shift: false,
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(output).toContain('Stopped recall')
+    expect(mockAnswerQuiz).not.toHaveBeenCalled()
+    expect(isInRecallSubstate()).toBe(false)
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('ESC then n cancels confirmation and stays in MCQ', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+
+    await submitRecall(stdin)
+    mockAnswerQuiz.mockClear()
+    writeSpy.mockClear()
+
+    stdin.emit('keypress', undefined, {
+      name: 'escape',
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    stdin.emit('keypress', 'n', { name: 'n', ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '\r', {
+      name: 'return',
+      shift: false,
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    expect(isInRecallSubstate()).toBe(true)
+    expect(mockAnswerQuiz).not.toHaveBeenCalled()
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(output).toContain('  1. 4')
+    expect(output).toContain('  2. 3')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
 })

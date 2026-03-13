@@ -47,12 +47,12 @@ All interactive states that need ESC handling, identified from `cli/src/interact
 - **Tests**: UT – trigger token list, emit ESC, verify list dismissed and no token modified.
 - **E2E**: In `cli_access_token.feature` – add token, run `/remove-access-token`, send ESC (`\x1b`) via PTY before Enter; verify token still listed.
 
-### Phase 3: ESC to cancel MCQ choice and exit recall
+### Phase 3: ESC to cancel MCQ choice and exit recall ✅
 **User value**: User doesn't want to answer; ESC exits recall instead of answering or typing /stop.
 
-- In `mcqPending` block: add `key.name === 'escape'` branch. Call `exitRecallMode()`, clear `buffer`, `mcqChoiceHighlightIndex = 0`, reset cursor/lines, `drawBox()`, optionally print "Stopped recall".
-- **Tests**: UT – MCQ visible, emit ESC, verify recall mode exited.
-- **E2E**: In `cli_recall.feature` – recall with MCQ, send ESC (`\x1b`) via PTY instead of answering; verify "Stopped recall" (or equivalent), and /recall-status shows note still due.
+- In `mcqPending` block: add `key.name === 'escape'` branch. Show "Stop recall? (y/n)" confirmation; on y call `exitRecallMode()` and "Stopped recall"; on n stay in MCQ.
+- **Tests**: UT – MCQ visible, emit ESC, verify "Stop recall? (y/n)", y exits recall; n cancels and stays in MCQ.
+- **E2E**: In `cli_recall.feature` – recall with MCQ, send ESC via PTY, confirm with y; verify "Stopped recall" and /recall-status shows note still due.
 
 ### Phase 4: ESC to cancel spelling / y/n prompts (recall substates)
 **User value**: User backs out of spelling or "Yes, I remember?" or "Load more?" without typing /stop.

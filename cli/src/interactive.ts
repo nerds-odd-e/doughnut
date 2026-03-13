@@ -44,6 +44,7 @@ let recallSessionMode = false
 let sessionRecallCount = 0
 let recallSessionDueDays = 0
 let pendingRecallLoadMore = false
+let pendingRecallStopConfirmation = false
 
 export function resetRecallStateForTesting(): void {
   pendingRecallAnswer = null
@@ -51,6 +52,7 @@ export function resetRecallStateForTesting(): void {
   sessionRecallCount = 0
   recallSessionDueDays = 0
   pendingRecallLoadMore = false
+  pendingRecallStopConfirmation = false
 }
 
 export function isInRecallSubstate(): boolean {
@@ -65,6 +67,7 @@ function exitRecallMode(): void {
   sessionRecallCount = 0
   recallSessionDueDays = 0
   pendingRecallLoadMore = false
+  pendingRecallStopConfirmation = false
 }
 
 async function continueRecallSession(fromLoadMore = false): Promise<void> {
@@ -530,23 +533,25 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           8,
           tokenHighlightIndex
         )
-      : mcqPending
-        ? formatHighlightedList(
-            formatMcqChoiceLines(
-              (pendingRecallAnswer as { choices: string[] }).choices
-            ),
-            8,
-            mcqChoiceHighlightIndex
-          )
-        : (() => {
-            const bufferLines = buffer.split('\n')
-            const lastLine = bufferLines[bufferLines.length - 1]
-            const wouldShowSuggestions =
-              lastLine.startsWith('/') && !lastLine.endsWith(' ')
-            if (suggestionsDismissed && wouldShowSuggestions)
-              return [COMMANDS_HINT]
-            return buildSuggestionLines(buffer, highlightIndex)
-          })()
+      : pendingRecallStopConfirmation
+        ? ['Stop recall? (y/n)']
+        : mcqPending
+          ? formatHighlightedList(
+              formatMcqChoiceLines(
+                (pendingRecallAnswer as { choices: string[] }).choices
+              ),
+              8,
+              mcqChoiceHighlightIndex
+            )
+          : (() => {
+              const bufferLines = buffer.split('\n')
+              const lastLine = bufferLines[bufferLines.length - 1]
+              const wouldShowSuggestions =
+                lastLine.startsWith('/') && !lastLine.endsWith(' ')
+              if (suggestionsDismissed && wouldShowSuggestions)
+                return [COMMANDS_HINT]
+              return buildSuggestionLines(buffer, highlightIndex)
+            })()
     const recallingIndicator = isInRecallSubstate() ? [RECALLING_INDICATOR] : []
     const newTotalLines =
       boxLines.length + recallingIndicator.length + suggestionLines.length
@@ -604,13 +609,52 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
         process.stdout.write(`\x1b[${1}B\r\n`)
         doExit()
       }
+      if (pendingRecallStopConfirmation) {
+        if (key.name === 'escape') {
+          pendingRecallStopConfirmation = false
+          buffer = ''
+          drawBox()
+        } else if (key.name === 'return' && !key.shift) {
+          const answer = buffer.trim().toLowerCase()
+          buffer = ''
+          pendingRecallStopConfirmation = false
+          if (answer === 'y' || answer === 'yes') {
+            exitRecallMode()
+            mcqChoiceHighlightIndex = 0
+            linesAboveCursor = 0
+            prevTotalLines = 0
+            process.stdout.write('Stopped recall\n')
+          } else if (answer === 'n' || answer === 'no') {
+            // Stay in MCQ; drawBox will show choices again
+          } else if (answer) {
+            process.stdout.write('Please answer y or n\n')
+          }
+          drawBox()
+        } else if (str && !key.ctrl && !key.meta) {
+          buffer += str
+          drawBox()
+        } else if (key.name === 'backspace') {
+          if (buffer.length > 0) {
+            buffer = buffer.slice(0, -1)
+            drawBox()
+          }
+        } else {
+          drawBox()
+        }
+        return
+      }
       const mcqPending = pendingRecallAnswer && 'choices' in pendingRecallAnswer
       if (mcqPending) {
         const { recallPromptId, choices } = pendingRecallAnswer as {
           recallPromptId: number
           choices: string[]
         }
-        if (key.name === 'up' || key.name === 'down') {
+        if (key.name === 'escape') {
+          pendingRecallStopConfirmation = true
+          buffer = ''
+          process.stdout.write('Stop recall? (y/n)\n')
+          drawBox()
+        } else if (key.name === 'up' || key.name === 'down') {
           const n = choices.length
           mcqChoiceHighlightIndex =
             key.name === 'up'

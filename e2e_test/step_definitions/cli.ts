@@ -176,6 +176,25 @@ When(
 )
 
 When(
+  'I run the doughnut command in interactive mode with recall MCQ and cancel with ESC',
+  () => {
+    const esc = '\x1b'
+    cy.get<string>('@cliConfigDir').then((configDir) =>
+      cy
+        .task('runCliDirectWithInputAndPty', {
+          input: `/recall\n${esc}\ny\nexit\n`,
+          fallbackInput: '/recall\n/stop\nexit\n',
+          env: {
+            DOUGHNUT_CONFIG_DIR: configDir,
+            DOUGHNUT_API_BASE_URL: BASE_URL,
+          },
+        })
+        .as('doughnutOutput')
+    )
+  }
+)
+
+When(
   'I run the doughnut command in interactive mode with down-arrow selection for {string}',
   (command: string) => {
     const downArrow = '\x1b[B'
