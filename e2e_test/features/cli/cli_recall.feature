@@ -101,9 +101,7 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedition"
     And It's day 2
     When I run the doughnut command in interactive mode with recall MCQ and cancel with ESC
-    Then I should see "What is the meaning of sedition?"
-    And I should see "Stop recall? (y/n)"
-    And I should see "Stopped recall"
+    Then the recall session was stopped
     When I run the doughnut command in interactive mode with input "/recall-status"
     Then I should see "1 note to recall today"
 
@@ -136,9 +134,7 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedation"
     And It's day 2
     When I run the doughnut command in interactive mode with input "/recall" and "/stop"
-    Then I should see "sedition"
-    And I should see "Yes, I remember?"
-    And I should see "Stopped recall"
+    Then I stopped the recall during review
 
   @disableOpenAiService
   Scenario: Recall session - complete all due notes, see summary, then load more from future days

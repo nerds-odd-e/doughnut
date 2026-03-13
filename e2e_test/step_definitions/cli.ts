@@ -288,6 +288,21 @@ Then('I should see {string}', (expected: string) => {
   cy.get('@doughnutOutput').should('include', expected)
 })
 
+Then('the recall session was stopped', () => {
+  cy.get('@doughnutOutput').should(
+    'include',
+    'What is the meaning of sedition?'
+  )
+  cy.get('@doughnutOutput').should('include', 'Stop recall? (y/n)')
+  cy.get('@doughnutOutput').should('include', 'Stopped recall')
+})
+
+Then('I stopped the recall during review', () => {
+  cy.get('@doughnutOutput').should('include', 'sedition')
+  cy.get('@doughnutOutput').should('include', 'Yes, I remember?')
+  cy.get('@doughnutOutput').should('include', 'Stopped recall')
+})
+
 Then(
   'I should see the {word} remove success message for {string}',
   (removalType: string, label: string) => {
