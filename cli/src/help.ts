@@ -43,6 +43,27 @@ export const interactiveDocs = [
   ...recallCommandDocs,
 ]
 
+export function getTabCompletion(
+  buffer: string,
+  commands: readonly CommandDoc[]
+): { completed: string; count: number } {
+  if (!buffer.startsWith('/')) return { completed: buffer, count: 0 }
+  const matches = commands.filter((c) => c.usage.startsWith(buffer))
+  if (matches.length === 0) return { completed: buffer, count: 0 }
+  if (matches.length === 1)
+    return { completed: `${matches[0].usage} `, count: 1 }
+  const usages = matches.map((m) => m.usage)
+  let prefix = usages[0]
+  for (let i = 1; i < usages.length; i++) {
+    while (!usages[i].startsWith(prefix) && prefix.length > 0) {
+      prefix = prefix.slice(0, -1)
+    }
+  }
+  if (prefix.length > buffer.length)
+    return { completed: prefix, count: matches.length }
+  return { completed: buffer, count: matches.length }
+}
+
 export function filterCommandsByPrefix(
   commands: readonly CommandDoc[],
   prefix: string

@@ -3,6 +3,8 @@ import {
   filterCommandsByPrefix,
   formatCommandSuggestions,
   formatHelp,
+  getTabCompletion,
+  interactiveDocs,
   type CommandDoc,
 } from '../src/help.js'
 import { processInput } from '../src/interactive.js'
@@ -112,6 +114,70 @@ describe('filterCommandsByPrefix', () => {
     expect(result.map((c) => c.usage)).toContain('/help')
     expect(result.map((c) => c.usage)).toContain('/exit')
     expect(result[0].usage).toBe('/exit')
+  })
+})
+
+describe('getTabCompletion', () => {
+  test('/he completes to /help with trailing space', () => {
+    expect(getTabCompletion('/he', interactiveDocs)).toEqual({
+      completed: '/help ',
+      count: 1,
+    })
+  })
+
+  test('/help completes to /help with trailing space', () => {
+    expect(getTabCompletion('/help', interactiveDocs)).toEqual({
+      completed: '/help ',
+      count: 1,
+    })
+  })
+
+  test('/add-access-token completes to full command with space', () => {
+    expect(getTabCompletion('/add-access-token', interactiveDocs)).toEqual({
+      completed: '/add-access-token ',
+      count: 1,
+    })
+  })
+
+  test('/rec completes to common prefix /recall for recall and recall-status', () => {
+    expect(getTabCompletion('/rec', interactiveDocs)).toEqual({
+      completed: '/recall',
+      count: 2,
+    })
+  })
+
+  test('/recall with multiple matches returns buffer unchanged', () => {
+    expect(getTabCompletion('/recall', interactiveDocs)).toEqual({
+      completed: '/recall',
+      count: 2,
+    })
+  })
+
+  test('/add completes to common prefix /add for add gmail and add-access-token', () => {
+    expect(getTabCompletion('/add', interactiveDocs)).toEqual({
+      completed: '/add',
+      count: 2,
+    })
+  })
+
+  test('/unknown returns buffer unchanged with count 0', () => {
+    expect(getTabCompletion('/unknown', interactiveDocs)).toEqual({
+      completed: '/unknown',
+      count: 0,
+    })
+  })
+
+  test('no leading slash returns buffer unchanged', () => {
+    expect(getTabCompletion('hello', interactiveDocs)).toEqual({
+      completed: 'hello',
+      count: 0,
+    })
+  })
+
+  test('/ only returns buffer unchanged (common prefix equals buffer)', () => {
+    const result = getTabCompletion('/', interactiveDocs)
+    expect(result.completed).toBe('/')
+    expect(result.count).toBeGreaterThan(0)
   })
 })
 

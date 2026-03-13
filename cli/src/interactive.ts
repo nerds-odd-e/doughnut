@@ -23,6 +23,7 @@ import {
   filterCommandsByPrefix,
   formatCommandSuggestionsWithHighlight,
   formatHelp,
+  getTabCompletion,
   interactiveDocs,
 } from './help.js'
 import { formatHighlightedList } from './listDisplay.js'
@@ -973,6 +974,22 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
               ? (highlightIndex - 1 + n) % n
               : (highlightIndex + 1) % n
           drawBox()
+        }
+      } else if (key.name === 'tab') {
+        const bufferLines = buffer.split('\n')
+        const lastLine = bufferLines[bufferLines.length - 1]
+        if (lastLine.startsWith('/') && !lastLine.endsWith(' ')) {
+          const { completed, count } = getTabCompletion(
+            lastLine,
+            interactiveDocs
+          )
+          if (count > 0 && completed !== lastLine) {
+            buffer =
+              bufferLines.slice(0, -1).concat(completed).join('\n') || completed
+            highlightIndex = 0
+            suggestionsDismissed = false
+            drawBox()
+          }
         }
       } else if (str && !key.ctrl && !key.meta) {
         buffer += str

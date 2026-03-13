@@ -1195,6 +1195,127 @@ describe('TTY mode slash command suggestions', () => {
 
     stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
+
+  test('Tab with /he completes to /help with space', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
+    stdin.emit('keypress', 'h', { name: 'h', ctrl: false, meta: false })
+    stdin.emit('keypress', 'e', { name: 'e', ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+    writeSpy.mockClear()
+
+    stdin.emit('keypress', undefined, {
+      name: 'tab',
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(stripAnsi(output)).toContain('→ /help ')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('Tab with /rec completes to common prefix /recall', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
+    stdin.emit('keypress', 'r', { name: 'r', ctrl: false, meta: false })
+    stdin.emit('keypress', 'e', { name: 'e', ctrl: false, meta: false })
+    stdin.emit('keypress', 'c', { name: 'c', ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+    writeSpy.mockClear()
+
+    stdin.emit('keypress', undefined, {
+      name: 'tab',
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(stripAnsi(output)).toContain('→ /recall')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('Tab with /unknown does nothing', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    for (const ch of '/unknown') {
+      stdin.emit('keypress', ch, {
+        name: ch === '/' ? undefined : ch,
+        ctrl: false,
+        meta: false,
+      })
+    }
+    await new Promise((r) => setImmediate(r))
+
+    stdin.emit('keypress', undefined, {
+      name: 'tab',
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(stripAnsi(output)).toContain('→ /unknown')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('Tab when buffer has no leading slash does nothing', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    for (const ch of 'hello') {
+      stdin.emit('keypress', ch, { name: ch, ctrl: false, meta: false })
+    }
+    await new Promise((r) => setImmediate(r))
+
+    stdin.emit('keypress', undefined, {
+      name: 'tab',
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(stripAnsi(output)).toContain('→ hello')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('Tab with single match shows completed command', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
+    stdin.emit('keypress', 'a', { name: 'a', ctrl: false, meta: false })
+    stdin.emit('keypress', 'd', { name: 'd', ctrl: false, meta: false })
+    stdin.emit('keypress', 'd', { name: 'd', ctrl: false, meta: false })
+    stdin.emit('keypress', '-', { name: '-', ctrl: false, meta: false })
+    stdin.emit('keypress', 'a', { name: 'a', ctrl: false, meta: false })
+    await new Promise((r) => setImmediate(r))
+    writeSpy.mockClear()
+
+    stdin.emit('keypress', undefined, {
+      name: 'tab',
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(stripAnsi(output)).toContain('→ /add-access-token ')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
 })
 
 describe('TTY mode slash command suggestions with scroll', () => {
