@@ -852,6 +852,15 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
         return
       }
       if (key.name === 'escape') {
+        if (isInRecallSubstate()) {
+          exitRecallMode()
+          buffer = ''
+          mcqChoiceHighlightIndex = 0
+          linesAboveCursor = 0
+          prevTotalLines = 0
+          drawBox()
+          return
+        }
         const bufferLines = buffer.split('\n')
         const lastLine = bufferLines[bufferLines.length - 1]
         const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)

@@ -1776,3 +1776,111 @@ describe('TTY MCQ choice selection', () => {
     stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 })
+
+describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
+  let writeSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    resetRecallStateForTesting()
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
+    vi.spyOn(process, 'exit').mockImplementation(
+      (() => undefined) as unknown as typeof process.exit
+    )
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  async function submitRecall(stdin: ReturnType<typeof createMockTTYStdin>) {
+    for (const ch of '/recall ') {
+      stdin.emit('keypress', ch, {
+        name: ch === ' ' ? 'space' : undefined,
+        ctrl: false,
+        meta: false,
+      })
+    }
+    await new Promise((r) => setImmediate(r))
+    stdin.emit('keypress', '\r', {
+      name: 'return',
+      shift: false,
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+  }
+
+  test('ESC in spelling prompt exits recall mode', async () => {
+    mockRecallNext.mockResolvedValue({
+      type: 'spelling',
+      recallPromptId: 100,
+      stem: 'test',
+    })
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+
+    await submitRecall(stdin)
+    writeSpy.mockClear()
+
+    stdin.emit('keypress', undefined, {
+      name: 'escape',
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    expect(isInRecallSubstate()).toBe(false)
+    expect(mockAnswerSpelling).not.toHaveBeenCalled()
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('ESC in Yes I remember y/n prompt exits recall mode', async () => {
+    mockRecallNext.mockResolvedValue({
+      type: 'just-review',
+      memoryTrackerId: 42,
+      title: 'Test note',
+    })
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+
+    await submitRecall(stdin)
+    writeSpy.mockClear()
+
+    stdin.emit('keypress', undefined, {
+      name: 'escape',
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    expect(isInRecallSubstate()).toBe(false)
+    expect(mockMarkAsRecalled).not.toHaveBeenCalled()
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
+  test('ESC in Load more y/n prompt exits recall mode', async () => {
+    mockRecallNext.mockResolvedValue({ type: 'none', message: '0 notes' })
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+
+    await submitRecall(stdin)
+    writeSpy.mockClear()
+
+    stdin.emit('keypress', undefined, {
+      name: 'escape',
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    expect(isInRecallSubstate()).toBe(false)
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+})

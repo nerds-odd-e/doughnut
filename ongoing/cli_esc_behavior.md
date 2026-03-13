@@ -54,7 +54,7 @@ All interactive states that need ESC handling, identified from `cli/src/interact
 - **Tests**: UT – MCQ visible, emit ESC, verify "Stop recall? (y/n)", y exits recall; n cancels and stays in MCQ.
 - **E2E**: In `cli_recall.feature` – recall with MCQ, send ESC via PTY, confirm with y; verify "Stopped recall" and /recall-status shows note still due.
 
-### Phase 4: ESC to cancel spelling / y/n prompts (recall substates)
+### Phase 4: ESC to cancel spelling / y/n prompts (recall substates) ✅
 **User value**: User backs out of spelling or "Yes, I remember?" or "Load more?" without typing /stop.
 
 - When `pendingRecallAnswer` (spelling or memoryTrackerId) or `pendingRecallLoadMore`: on ESC, call `exitRecallMode()`, clear `buffer`, reset UI.
