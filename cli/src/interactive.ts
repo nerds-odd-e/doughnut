@@ -31,6 +31,7 @@ import { formatVersionOutput } from './version.js'
 const GREY = '\x1b[90m'
 const GREY_BG = '\x1b[48;5;236m'
 const RESET = '\x1b[0m'
+const COMMAND_HIGHLIGHT = '\x1b[1;36m' // bold + cyan
 
 function logStatus(msg: string): void {
   console.log(`${GREY}${msg}${RESET}`)
@@ -470,6 +471,25 @@ export function renderPastInput(input: string, width: number): string {
   return [emptyRow, ...contentRows, emptyRow, ''].join('\n')
 }
 
+export function highlightRecognizedCommand(line: string): string {
+  if (!line.startsWith('/')) return line
+
+  const usages = interactiveDocs.map((d) => d.usage)
+  let highlightLen = 0
+
+  for (const cmd of usages) {
+    if (line.startsWith(cmd)) {
+      highlightLen = Math.max(highlightLen, cmd.length)
+    }
+  }
+
+  if (highlightLen === 0) return line
+
+  const prefix = line.slice(0, highlightLen)
+  const rest = line.slice(highlightLen)
+  return `${COMMAND_HIGHLIGHT}${prefix}${RESET}${rest}`
+}
+
 export function buildBoxLines(buffer: string, width: number): string[] {
   const bufferLines = buffer.split('\n')
   return bufferLines.map((line, i) => {
@@ -477,7 +497,8 @@ export function buildBoxLines(buffer: string, width: number): string[] {
     if (i === 0 && buffer === '') {
       return `${prefix}${GREY}${PLACEHOLDER}${RESET}`
     }
-    return prefix + line
+    const highlighted = highlightRecognizedCommand(line)
+    return prefix + highlighted
   })
 }
 

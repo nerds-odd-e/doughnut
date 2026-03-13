@@ -2,6 +2,7 @@ import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { Readable } from 'node:stream'
 import {
   buildBoxLines,
+  highlightRecognizedCommand,
   isInRecallSubstate,
   processInput,
   renderBox,
@@ -10,6 +11,9 @@ import {
   runInteractive,
   visibleLength,
 } from '../src/interactive.js'
+
+// biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI for assertions
+const stripAnsi = (s: string) => s.replace(/\x1b\[[0-9;]*m/g, '')
 
 let useManyCommandsForScrollTests = false
 const {
@@ -656,7 +660,41 @@ describe('renderBox', () => {
   })
 })
 
+describe('highlightRecognizedCommand', () => {
+  const boldCyan = '\x1b[1;36m'
+  const reset = '\x1b[0m'
+
+  test('returns plain text when line does not start with /', () => {
+    expect(highlightRecognizedCommand('hello')).toBe('hello')
+  })
+
+  test('does not highlight incomplete prefix', () => {
+    expect(highlightRecognizedCommand('/he')).toBe('/he')
+  })
+
+  test('highlights exact command match', () => {
+    const result = highlightRecognizedCommand('/help')
+    expect(result).toStrictEqual(`${boldCyan}/help${reset}`)
+  })
+
+  test('highlights only command part when param follows', () => {
+    const result = highlightRecognizedCommand('/add-access-token x')
+    expect(result).toStrictEqual(`${boldCyan}/add-access-token${reset} x`)
+  })
+
+  test('returns plain when no match', () => {
+    expect(highlightRecognizedCommand('/unknown')).toBe('/unknown')
+  })
+
+  test('does not highlight lone slash', () => {
+    expect(highlightRecognizedCommand('/')).toBe('/')
+  })
+})
+
 describe('buildBoxLines', () => {
+  const boldCyan = '\x1b[1;36m'
+  const reset = '\x1b[0m'
+
   test('empty buffer shows placeholder with prompt', () => {
     const lines = buildBoxLines('', 40)
     expect(lines).toHaveLength(1)
@@ -676,6 +714,23 @@ describe('buildBoxLines', () => {
     expect(lines[0]).toBe('→ line1')
     expect(lines[1]).toBe('  line2')
     expect(lines[2]).toBe('  line3')
+  })
+
+  test('recognized command gets bold+colored in first line', () => {
+    const lines = buildBoxLines('/help', 40)
+    expect(lines[0]).toContain('→')
+    expect(lines[0]).toContain(`${boldCyan}/help${reset}`)
+  })
+
+  test('non-command line has no ANSI highlight', () => {
+    const lines = buildBoxLines('hello', 40)
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: checking ANSI codes
+    expect(lines[0]).not.toMatch(/\x1b\[1;36m/)
+  })
+
+  test('command with param highlights only command part', () => {
+    const lines = buildBoxLines('/add-access-token mylabel', 40)
+    expect(lines[0]).toContain(`${boldCyan}/add-access-token${reset} mylabel`)
   })
 })
 
@@ -944,10 +999,11 @@ describe('TTY mode slash command suggestions', () => {
 
     const output = writeSpy.mock.calls.map((c) => c[0]).join('')
     expect(output).toContain('/add gmail')
-    const lastDrawStart = output.lastIndexOf('→ /add')
+    const plain = stripAnsi(output)
+    const lastDrawStart = plain.lastIndexOf('→ /add')
     expect(lastDrawStart).toBeGreaterThanOrEqual(0)
-    expect(output.slice(lastDrawStart)).not.toContain('/help')
-    expect(output.slice(lastDrawStart)).not.toContain('/last email')
+    expect(plain.slice(lastDrawStart)).not.toContain('/help')
+    expect(plain.slice(lastDrawStart)).not.toContain('/last email')
 
     stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
@@ -999,12 +1055,18 @@ describe('TTY mode slash command suggestions', () => {
     await new Promise((r) => setImmediate(r))
 
     const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('→ /help ')
-    const lastInsertDraw = output.lastIndexOf('→ /help ')
-    const afterInsert = output.slice(lastInsertDraw)
+    const plain = stripAnsi(output)
+    expect(plain).toContain('→ /help ')
+    const lines = output.split('\n')
+    const lastBoxLineIdx = lines.findLastIndex((l) =>
+      stripAnsi(l).includes('→ /help ')
+    )
+    const afterInsert = lines.slice(lastBoxLineIdx + 1).join('\n')
     const suggestionLinesAfterInsert = afterInsert
       .split('\n')
-      .filter((l) => l.includes('/help') && l.includes('Show this help'))
+      .filter(
+        (l) => l.includes('/help') && l.includes('List available commands')
+      )
     expect(suggestionLinesAfterInsert).toHaveLength(0)
 
     stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
@@ -1096,7 +1158,8 @@ describe('TTY mode slash command suggestions', () => {
     await new Promise((r) => setImmediate(r))
 
     const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('→ /ex')
+    const plain = stripAnsi(output)
+    expect(plain).toContain('→ /ex')
     expect(output).toContain('  / commands')
     expect(output).not.toContain('/exit')
     expect(output).not.toContain('/help')
@@ -1128,7 +1191,7 @@ describe('TTY mode slash command suggestions', () => {
     await new Promise((r) => setImmediate(r))
 
     const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('→ /last email ')
+    expect(stripAnsi(output)).toContain('→ /last email ')
 
     stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
