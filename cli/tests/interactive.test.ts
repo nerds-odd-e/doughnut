@@ -1,5 +1,8 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { Readable } from 'node:stream'
+import { mkdtempSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import {
   buildBoxLines,
   highlightRecognizedCommand,
@@ -14,6 +17,7 @@ import {
 
 // biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI for assertions
 const stripAnsi = (s: string) => s.replace(/\x1b\[[0-9;]*m/g, '')
+const tick = () => new Promise<void>((r) => setImmediate(r))
 
 let useManyCommandsForScrollTests = false
 const {
@@ -61,7 +65,7 @@ vi.mock('../src/help.js', async (importOriginal) => {
 function createMockStdin(input: string): NodeJS.ReadableStream {
   const stream = new Readable({
     read() {
-      // no-op: data is pushed manually
+      /* no-op */
     },
   })
   stream.push(input)
@@ -69,14 +73,14 @@ function createMockStdin(input: string): NodeJS.ReadableStream {
   return Object.assign(stream, { isTTY: false })
 }
 
-function createMockTTYStdin(): NodeJS.ReadableStream & {
-  push: (chunk: string) => void
-} {
+function createMockTTYStdin() {
   const stream = new Readable({
     read() {
-      // no-op: data is pushed manually
+      /* no-op */
     },
-  }) as Readable & { push: (chunk: string) => void }
+  }) as Readable & {
+    push: (chunk: string) => void
+  }
   return Object.assign(stream, {
     isTTY: true,
     setRawMode: () => {
@@ -91,7 +95,72 @@ function createMockTTYStdin(): NodeJS.ReadableStream & {
   })
 }
 
+type TTYStdin = ReturnType<typeof createMockTTYStdin>
+
+function typeString(stdin: TTYStdin, str: string) {
+  for (const ch of str) {
+    stdin.emit('keypress', ch, {
+      name: ch === ' ' ? 'space' : ch === '/' ? undefined : ch,
+      ctrl: false,
+      meta: false,
+    })
+  }
+}
+
+function pressEnter(stdin: TTYStdin) {
+  stdin.emit('keypress', '\r', {
+    name: 'return',
+    shift: false,
+    ctrl: false,
+    meta: false,
+  })
+}
+
+function pressKey(
+  stdin: TTYStdin,
+  name: string,
+  extra: Record<string, unknown> = {}
+) {
+  stdin.emit('keypress', undefined, {
+    name,
+    ctrl: false,
+    meta: false,
+    ...extra,
+  })
+}
+
+async function submitTTYCommand(stdin: TTYStdin, command: string) {
+  typeString(stdin, `${command} `)
+  await tick()
+  pressEnter(stdin)
+  await tick()
+}
+
+function ttyOutput(writeSpy: ReturnType<typeof vi.spyOn>) {
+  return writeSpy.mock.calls.map((c) => c[0]).join('')
+}
+
+function makeTempConfigDir(tokens: Array<{ label: string; token: string }>) {
+  const configDir = mkdtempSync(join(tmpdir(), 'doughnut-test-'))
+  writeFileSync(
+    join(configDir, 'access-tokens.json'),
+    JSON.stringify({ tokens })
+  )
+  return configDir
+}
+
+function withConfigDir(configDir: string): () => void {
+  const original = process.env.DOUGHNUT_CONFIG_DIR
+  process.env.DOUGHNUT_CONFIG_DIR = configDir
+  return () => {
+    if (original === undefined) delete process.env.DOUGHNUT_CONFIG_DIR
+    else process.env.DOUGHNUT_CONFIG_DIR = original
+  }
+}
+
 describe('processInput', () => {
+  let logSpy: ReturnType<typeof vi.spyOn>
+
   beforeEach(() => {
     resetRecallStateForTesting()
     mockRecallNext.mockClear()
@@ -99,166 +168,112 @@ describe('processInput', () => {
     mockAnswerQuiz.mockClear()
     mockAnswerSpelling.mockClear()
     mockContestAndRegenerate.mockClear()
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
   })
 
-  test('returns true for exit', async () => {
+  afterEach(() => {
+    logSpy.mockRestore()
+  })
+
+  test('returns true for exit commands', async () => {
     expect(await processInput('exit')).toBe(true)
     expect(await processInput('  exit  ')).toBe(true)
-  })
-
-  test('returns true for /exit', async () => {
     expect(await processInput('/exit')).toBe(true)
     expect(await processInput('  /exit  ')).toBe(true)
   })
 
   test('returns false and does not log for empty input', async () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
     expect(await processInput('')).toBe(false)
     expect(await processInput('   ')).toBe(false)
     expect(logSpy).not.toHaveBeenCalled()
-    logSpy.mockRestore()
   })
 
   test('returns false and logs "Not supported" for any other input', async () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
     expect(await processInput('hello')).toBe(false)
     expect(logSpy).toHaveBeenCalledWith('Not supported')
-    logSpy.mockRestore()
   })
 
   test('returns false and logs help for /help', async () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
     expect(await processInput('/help')).toBe(false)
-    expect(logSpy).toHaveBeenCalled()
     const output = logSpy.mock.calls.flat().join('\n')
     expect(output).toContain('/add gmail')
     expect(output).toContain('/last email')
     expect(output).toContain('exit')
     expect(output).not.toContain('Not supported')
-    logSpy.mockRestore()
   })
 
   test('returns false and shows usage for /add-access-token without token', async () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
     expect(await processInput('/add-access-token')).toBe(false)
     expect(logSpy).toHaveBeenCalledWith('Usage: /add-access-token <token>')
-    logSpy.mockRestore()
-  })
-
-  test('returns false and shows usage for /add-access-token with trailing space only', async () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    logSpy.mockClear()
     expect(await processInput('/add-access-token ')).toBe(false)
     expect(logSpy).toHaveBeenCalledWith('Usage: /add-access-token <token>')
-    logSpy.mockRestore()
   })
 
   test('returns false and shows tokens with default marker for /list-access-token', async () => {
-    const fs = await import('node:fs')
-    const os = await import('node:os')
-    const path = await import('node:path')
-    const configDir = fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-test-'))
-    const originalEnv = process.env.DOUGHNUT_CONFIG_DIR
-    process.env.DOUGHNUT_CONFIG_DIR = configDir
-    fs.writeFileSync(
-      path.join(configDir, 'access-tokens.json'),
-      JSON.stringify({
-        tokens: [
-          { label: 'Token A', token: 'a' },
-          { label: 'Token B', token: 'b' },
-        ],
-      })
-    )
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    const configDir = makeTempConfigDir([
+      { label: 'Token A', token: 'a' },
+      { label: 'Token B', token: 'b' },
+    ])
+    const restore = withConfigDir(configDir)
     expect(await processInput('/list-access-token')).toBe(false)
     const output = logSpy.mock.calls.flat().join('\n')
     expect(output).toContain('★ Token A')
     expect(output).toContain('  Token B')
-    logSpy.mockRestore()
-    process.env.DOUGHNUT_CONFIG_DIR = originalEnv
+    restore()
   })
 
   test('returns false and removes token for /remove-access-token with label', async () => {
-    const fs = await import('node:fs')
-    const os = await import('node:os')
-    const path = await import('node:path')
-    const configDir = fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-test-'))
-    const originalEnv = process.env.DOUGHNUT_CONFIG_DIR
-    process.env.DOUGHNUT_CONFIG_DIR = configDir
-    fs.writeFileSync(
-      path.join(configDir, 'access-tokens.json'),
-      JSON.stringify({
-        tokens: [
-          { label: 'Token A', token: 'a' },
-          { label: 'Token B', token: 'b' },
-        ],
-      })
-    )
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    const configDir = makeTempConfigDir([
+      { label: 'Token A', token: 'a' },
+      { label: 'Token B', token: 'b' },
+    ])
+    const restore = withConfigDir(configDir)
     expect(await processInput('/remove-access-token Token A')).toBe(false)
     expect(logSpy).toHaveBeenCalledWith('Token "Token A" removed.')
-    logSpy.mockRestore()
-    process.env.DOUGHNUT_CONFIG_DIR = originalEnv
+    restore()
   })
 
   test('returns false and shows not found for /remove-access-token with unknown label', async () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
     expect(await processInput('/remove-access-token Unknown')).toBe(false)
     expect(logSpy).toHaveBeenCalledWith('Token "Unknown" not found.')
-    logSpy.mockRestore()
   })
 
   test('returns false and shows usage for /remove-access-token without label', async () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
     expect(await processInput('/remove-access-token ')).toBe(false)
     expect(logSpy).toHaveBeenCalledWith('Usage: /remove-access-token <label>')
-    logSpy.mockRestore()
   })
 
   test('returns false and shows usage for /remove-access-token-completely without label', async () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
     expect(await processInput('/remove-access-token-completely ')).toBe(false)
     expect(logSpy).toHaveBeenCalledWith(
       'Usage: /remove-access-token-completely <label>'
     )
-    logSpy.mockRestore()
   })
 
   test('returns false and shows usage for /create-access-token without label', async () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
     expect(await processInput('/create-access-token ')).toBe(false)
     expect(logSpy).toHaveBeenCalledWith('Usage: /create-access-token <label>')
-    logSpy.mockRestore()
   })
 
   test('returns false and shows error for /create-access-token with no default token', async () => {
-    const fs = await import('node:fs')
-    const os = await import('node:os')
-    const path = await import('node:path')
-    const configDir = fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-test-'))
-    const originalEnv = process.env.DOUGHNUT_CONFIG_DIR
-    process.env.DOUGHNUT_CONFIG_DIR = configDir
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    const configDir = makeTempConfigDir([])
+    const restore = withConfigDir(configDir)
     expect(await processInput('/create-access-token My New Token')).toBe(false)
     expect(logSpy).toHaveBeenCalledWith(
       'No default access token. Add one first with /add-access-token.'
     )
-    logSpy.mockRestore()
-    process.env.DOUGHNUT_CONFIG_DIR = originalEnv
+    restore()
   })
 
   test('returns false and logs error for /last email when no account configured', async () => {
-    const configDir = (await import('node:fs')).mkdtempSync(
-      `${(await import('node:os')).tmpdir()}/doughnut-test-`
-    )
-    const originalEnv = process.env.DOUGHNUT_CONFIG_DIR
-    process.env.DOUGHNUT_CONFIG_DIR = configDir
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    const configDir = mkdtempSync(`${tmpdir()}/doughnut-test-`)
+    const restore = withConfigDir(configDir)
     expect(await processInput('/last email')).toBe(false)
     expect(logSpy).toHaveBeenCalledWith(
       'No Gmail account configured. Run /add gmail first.'
     )
-    logSpy.mockRestore()
-    process.env.DOUGHNUT_CONFIG_DIR = originalEnv
+    restore()
   })
 
   test('spelling: /recall shows Spell prompt, then spelling answer calls answerSpelling', async () => {
@@ -268,7 +283,6 @@ describe('processInput', () => {
       stem: 'means incite violence',
     })
     mockAnswerSpelling.mockResolvedValue({ correct: true })
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
     expect(logSpy).toHaveBeenCalledWith(
@@ -280,8 +294,6 @@ describe('processInput', () => {
     expect(mockAnswerSpelling).toHaveBeenCalledWith(100, 'sedition')
     expect(logSpy).toHaveBeenCalledWith('Correct!')
     expect(logSpy).toHaveBeenCalledWith('Recalled successfully')
-
-    logSpy.mockRestore()
   })
 
   test('spelling: empty input prompts to type', async () => {
@@ -291,7 +303,6 @@ describe('processInput', () => {
       stem: '...',
     })
     mockAnswerSpelling.mockResolvedValue({ correct: false })
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
     logSpy.mockClear()
@@ -300,7 +311,6 @@ describe('processInput', () => {
       expect.stringContaining('Please type your spelling')
     )
     await processInput('clear') // clear pending state for subsequent tests
-    logSpy.mockRestore()
   })
 
   test('/recall with no notes prompts load more from next 3 days', async () => {
@@ -308,15 +318,12 @@ describe('processInput', () => {
       type: 'none',
       message: '0 notes to recall today',
     })
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
     expect(logSpy).toHaveBeenCalledWith(
       expect.stringContaining('Load more from next 3 days? (y/n)')
     )
     expect(mockRecallNext).toHaveBeenCalledWith(0)
-
-    logSpy.mockRestore()
   })
 
   test('/recall load more: user says n, shows 0 notes to recall today', async () => {
@@ -324,15 +331,12 @@ describe('processInput', () => {
       type: 'none',
       message: '0 notes to recall today',
     })
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
     logSpy.mockClear()
     await processInput('n')
     expect(logSpy).toHaveBeenCalledWith('0 notes to recall today')
     expect(mockRecallNext).toHaveBeenCalledTimes(1)
-
-    logSpy.mockRestore()
   })
 
   test('/recall load more: user says y, fetches with dueindays 3 and continues', async () => {
@@ -351,7 +355,6 @@ describe('processInput', () => {
         message: '0 notes to recall today',
       })
     mockMarkAsRecalled.mockResolvedValue(undefined)
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
     expect(logSpy).toHaveBeenCalledWith(
@@ -372,8 +375,6 @@ describe('processInput', () => {
     expect(mockMarkAsRecalled).toHaveBeenCalledWith(1, true)
     expect(logSpy).toHaveBeenCalledWith('Recalled successfully')
     expect(logSpy).toHaveBeenCalledWith('Recalled 1 note')
-
-    logSpy.mockRestore()
   })
 
   test('/recall session: one note, answer y, shows Recalled 1 note', async () => {
@@ -388,7 +389,6 @@ describe('processInput', () => {
         message: '0 notes to recall today',
       })
     mockMarkAsRecalled.mockResolvedValue(undefined)
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Note 1'))
@@ -407,8 +407,6 @@ describe('processInput', () => {
 
     await processInput('n')
     expect(logSpy).toHaveBeenCalledWith('Recalled 1 note')
-
-    logSpy.mockRestore()
   })
 
   test('/recall session: error in continueRecallSession clears mode and logs', async () => {
@@ -420,15 +418,12 @@ describe('processInput', () => {
       })
       .mockRejectedValueOnce(new Error('Network error'))
     mockMarkAsRecalled.mockResolvedValue(undefined)
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
     await processInput('y')
     expect(logSpy).toHaveBeenCalledWith(
       expect.stringContaining('Network error')
     )
-
-    logSpy.mockRestore()
   })
 
   test('/stop when in recall substate exits recall mode', async () => {
@@ -437,7 +432,6 @@ describe('processInput', () => {
       memoryTrackerId: 1,
       title: 'Note 1',
     })
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
     expect(isInRecallSubstate()).toBe(true)
@@ -445,8 +439,6 @@ describe('processInput', () => {
     await processInput('/stop')
     expect(logSpy).toHaveBeenCalledWith('Stopped recall')
     expect(isInRecallSubstate()).toBe(false)
-
-    logSpy.mockRestore()
   })
 
   test('/stop when in recall with pending load more exits recall mode', async () => {
@@ -454,7 +446,6 @@ describe('processInput', () => {
       type: 'none',
       message: '0 notes to recall today',
     })
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
     expect(isInRecallSubstate()).toBe(true)
@@ -462,18 +453,12 @@ describe('processInput', () => {
     await processInput('/stop')
     expect(logSpy).toHaveBeenCalledWith('Stopped recall')
     expect(isInRecallSubstate()).toBe(false)
-
-    logSpy.mockRestore()
   })
 
   test('/stop when not in recall substate shows Not supported', async () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
-
     await processInput('/stop')
     expect(logSpy).toHaveBeenCalledWith('Not supported')
     expect(isInRecallSubstate()).toBe(false)
-
-    logSpy.mockRestore()
   })
 
   test('in recall state top-level commands are not available', async () => {
@@ -482,7 +467,6 @@ describe('processInput', () => {
       memoryTrackerId: 1,
       title: 'Note 1',
     })
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
     expect(isInRecallSubstate()).toBe(true)
@@ -503,8 +487,6 @@ describe('processInput', () => {
     expect(logSpy).not.toHaveBeenCalledWith(
       expect.stringMatching(/notes to recall today/)
     )
-
-    logSpy.mockRestore()
   })
 
   test('/contest when in recall with MCQ contests and shows new question', async () => {
@@ -529,7 +511,6 @@ describe('processInput', () => {
       },
     })
     mockAnswerQuiz.mockResolvedValue({ correct: true })
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
     expect(logSpy).toHaveBeenCalledWith(
@@ -554,8 +535,6 @@ describe('processInput', () => {
     expect(mockAnswerQuiz).toHaveBeenCalledWith(200, 0)
     expect(logSpy).toHaveBeenCalledWith('Correct!')
     expect(logSpy).toHaveBeenCalledWith('Recalled successfully')
-
-    logSpy.mockRestore()
   })
 
   test('/contest when no question pending shows /stop hint', async () => {
@@ -564,7 +543,6 @@ describe('processInput', () => {
       memoryTrackerId: 1,
       title: 'Note 1',
     })
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
     await processInput('/contest')
@@ -572,8 +550,6 @@ describe('processInput', () => {
     expect(logSpy).toHaveBeenCalledWith(
       expect.stringContaining('Type /stop to exit recall')
     )
-
-    logSpy.mockRestore()
   })
 
   test('/contest when contest fails shows error message', async () => {
@@ -587,15 +563,12 @@ describe('processInput', () => {
       ok: false,
       message: 'Question could not be regenerated',
     })
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
     await processInput('/recall')
     expect(isInRecallSubstate()).toBe(true)
     await processInput('/contest')
     expect(logSpy).toHaveBeenCalledWith('Question could not be regenerated')
     expect(isInRecallSubstate()).toBe(true)
-
-    logSpy.mockRestore()
   })
 })
 
@@ -607,7 +580,7 @@ describe('visibleLength', () => {
   })
 })
 
-describe('renderBox uses full width', () => {
+describe('renderBox', () => {
   test('box top border matches the given width', () => {
     const result = renderBox(['hi'], 100)
     const top = result.split('\n')[0]
@@ -619,9 +592,7 @@ describe('renderBox uses full width', () => {
     const row = result.split('\n')[1]
     expect(visibleLength(row)).toBe(120)
   })
-})
 
-describe('renderBox', () => {
   test('renders a single-line box', () => {
     const result = renderBox(['hello'], 20)
     const lines = result.split('\n')
@@ -795,7 +766,7 @@ describe('interactive CLI (e2e style)', () => {
   test('responds "Not supported" to any input', async () => {
     const stdin = createMockStdin('hello\nexit\n')
     runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
+    await tick()
     expect(logSpy).toHaveBeenCalledWith('Not supported')
     expect(exitSpy).toHaveBeenCalledWith(0)
   })
@@ -803,7 +774,7 @@ describe('interactive CLI (e2e style)', () => {
   test('shows past input in grey background box', async () => {
     const stdin = createMockStdin('hello\nexit\n')
     runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
+    await tick()
     const pastInputCall = logSpy.mock.calls.find(
       (c) => typeof c[0] === 'string' && c[0].includes('\x1b[48;5;236m')
     )
@@ -815,21 +786,21 @@ describe('interactive CLI (e2e style)', () => {
   test('exit command exits the CLI', async () => {
     const stdin = createMockStdin('exit\n')
     runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
+    await tick()
     expect(exitSpy).toHaveBeenCalledWith(0)
   })
 
   test('/exit command exits the CLI', async () => {
     const stdin = createMockStdin('/exit\n')
     runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
+    await tick()
     expect(exitSpy).toHaveBeenCalledWith(0)
   })
 
   test('each line triggers separate response', async () => {
     const stdin = createMockStdin('line1\nline2\nexit\n')
     runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
+    await tick()
     const notSupportedCalls = logSpy.mock.calls.filter(
       (c) => c[0] === 'Not supported'
     )
@@ -844,7 +815,7 @@ describe('interactive CLI (e2e style)', () => {
     })
     const stdin = createMockStdin('exit\n')
     runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
+    await tick()
     const boxCall = logSpy.mock.calls.find(
       (c) => typeof c[0] === 'string' && c[0].includes('┌')
     )
@@ -856,7 +827,7 @@ describe('interactive CLI (e2e style)', () => {
   test('shows version, box with placeholder and prompt', async () => {
     const stdin = createMockStdin('exit\n')
     runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
+    await tick()
     const output = logSpy.mock.calls.flat().join('\n')
     expect(output).toContain('doughnut')
     expect(output).toContain('→')
@@ -868,7 +839,7 @@ describe('interactive CLI (e2e style)', () => {
   test('shows grey hint "  / commands" below input box when user has not typed /', async () => {
     const stdin = createMockStdin('exit\n')
     runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
+    await tick()
     const output = logSpy.mock.calls.flat().join('\n')
     expect(output).toContain('  / commands')
     expect(output).toContain('\x1b[90m')
@@ -877,74 +848,61 @@ describe('interactive CLI (e2e style)', () => {
 
 describe('TTY mode slash command suggestions', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
+  let logSpy: ReturnType<typeof vi.spyOn>
+  let stdin: TTYStdin
 
-  beforeEach(() => {
+  beforeEach(async () => {
     resetRecallStateForTesting()
-    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
     writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
     vi.spyOn(process, 'exit').mockImplementation(
       (() => undefined) as unknown as typeof process.exit
     )
+    stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await tick()
   })
 
   afterEach(() => {
+    pressKey(stdin, 'c', { ctrl: true })
     vi.restoreAllMocks()
   })
 
-  test('initial display shows grey hint "  / commands" below input box', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+  test('initial display shows grey hint "  / commands" below input box', () => {
+    const output = ttyOutput(writeSpy)
     expect(output).toContain('  / commands')
     expect(output).toContain('\x1b[90m')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('typing non-slash keeps hint instead of command list', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
     writeSpy.mockClear()
-    stdin.emit('keypress', 'h', { name: 'h', ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, 'h')
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const output = ttyOutput(writeSpy)
     expect(output).toContain('  / commands')
     expect(output).not.toContain('/help                List available commands')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('typing "/" shows command suggestions below input box', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, '/')
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const output = ttyOutput(writeSpy)
     expect(output).toContain('/help')
     expect(output).toContain('List available commands')
     expect(output).toContain('/add gmail')
     expect(output).toContain('Add Gmail account')
     expect(output).toContain('/create-access-token')
     expect(output).toContain('↓ more below')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('first candidate is highlighted with reverse video', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
     writeSpy.mockClear()
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, '/')
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const output = ttyOutput(writeSpy)
     const lines = output.split('\n')
     const suggestionStart = lines.findIndex((l) => l.includes('/help'))
     expect(suggestionStart).toBeGreaterThanOrEqual(0)
@@ -953,108 +911,53 @@ describe('TTY mode slash command suggestions', () => {
       (l) => l.includes('/add gmail') && !l.includes('\x1b[7m')
     )
     expect(laterSuggestion).toBeGreaterThan(suggestionStart)
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('Enter inserts highlighted command with space', async () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '\r', {
-      name: 'return',
-      shift: false,
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', 'x', { name: 'x', ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '\r', {
-      name: 'return',
-      shift: false,
-      ctrl: false,
-      meta: false,
-    })
+    typeString(stdin, '/')
+    await tick()
+    pressEnter(stdin)
+    await tick()
+    typeString(stdin, 'x')
+    await tick()
+    pressEnter(stdin)
     await new Promise((r) => setTimeout(r, 50))
 
     expect(logSpy).toHaveBeenCalledWith('Not supported')
-    logSpy.mockRestore()
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('prefix filtering shows only matching commands', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
     writeSpy.mockClear()
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    stdin.emit('keypress', 'a', { name: 'a', ctrl: false, meta: false })
-    stdin.emit('keypress', 'd', { name: 'd', ctrl: false, meta: false })
-    stdin.emit('keypress', 'd', { name: 'd', ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, '/add')
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const output = ttyOutput(writeSpy)
     expect(output).toContain('/add gmail')
     const plain = stripAnsi(output)
     const lastDrawStart = plain.lastIndexOf('→ /add')
     expect(lastDrawStart).toBeGreaterThanOrEqual(0)
     expect(plain.slice(lastDrawStart)).not.toContain('/help')
     expect(plain.slice(lastDrawStart)).not.toContain('/last email')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('Enter with prefix inserts first matching command', async () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    stdin.emit('keypress', 'a', { name: 'a', ctrl: false, meta: false })
-    stdin.emit('keypress', 'd', { name: 'd', ctrl: false, meta: false })
-    stdin.emit('keypress', 'd', { name: 'd', ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '\r', {
-      name: 'return',
-      shift: false,
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '\r', {
-      name: 'return',
-      shift: false,
-      ctrl: false,
-      meta: false,
-    })
+    typeString(stdin, '/add')
+    await tick()
+    pressEnter(stdin)
+    await tick()
+    pressEnter(stdin)
     await new Promise((r) => setTimeout(r, 50))
 
-    expect(writeSpy.mock.calls.map((c) => c[0]).join('')).toContain(
-      '/add gmail '
-    )
-    logSpy.mockRestore()
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+    expect(ttyOutput(writeSpy)).toContain('/add gmail ')
   })
 
   test('no suggestions after space when command inserted', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '\r', {
-      name: 'return',
-      shift: false,
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, '/')
+    await tick()
+    pressEnter(stdin)
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const output = ttyOutput(writeSpy)
     const plain = stripAnsi(output)
     expect(plain).toContain('→ /help ')
     const lines = output.split('\n')
@@ -1068,260 +971,142 @@ describe('TTY mode slash command suggestions', () => {
         (l) => l.includes('/help') && l.includes('List available commands')
       )
     expect(suggestionLinesAfterInsert).toHaveLength(0)
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('up at first wraps to last', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
     writeSpy.mockClear()
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '\x1b[A', { name: 'up', ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, '/')
+    await tick()
+    pressKey(stdin, 'up')
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const output = ttyOutput(writeSpy)
     const lines = output.split('\n')
     const recallLines = lines.filter((l) => l.includes('/recall'))
     const recallLine = recallLines[recallLines.length - 1]
     expect(recallLine).toBeDefined()
     expect(recallLine).toContain('\x1b[7m')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('down at last wraps to first', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
     writeSpy.mockClear()
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, '/')
+    await tick()
     for (let i = 0; i < 9; i++) {
-      stdin.emit('keypress', undefined, {
-        name: 'down',
-        ctrl: false,
-        meta: false,
-      })
-      await new Promise((r) => setImmediate(r))
+      pressKey(stdin, 'down')
+      await tick()
     }
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const output = ttyOutput(writeSpy)
     const lines = output.split('\n')
     const helpLine = lines.find((l) => l.includes('/help'))
     expect(helpLine).toBeDefined()
     expect(helpLine).toContain('\x1b[7m')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('ESC when buffer is only "/" dismisses suggestions and clears buffer', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, '/')
+    await tick()
     writeSpy.mockClear()
 
-    stdin.emit('keypress', undefined, {
-      name: 'escape',
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressKey(stdin, 'escape')
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const output = ttyOutput(writeSpy)
     expect(output).toContain('  / commands')
     expect(output).not.toContain('/help')
     expect(output).toContain('`exit` to quit.')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('ESC when partial command "/ex" hides suggestions but keeps buffer', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    stdin.emit('keypress', 'e', { name: 'e', ctrl: false, meta: false })
-    stdin.emit('keypress', 'x', { name: 'x', ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, '/ex')
+    await tick()
     writeSpy.mockClear()
 
-    stdin.emit('keypress', undefined, {
-      name: 'escape',
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressKey(stdin, 'escape')
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const output = ttyOutput(writeSpy)
     const plain = stripAnsi(output)
     expect(plain).toContain('→ /ex')
     expect(output).toContain('  / commands')
     expect(output).not.toContain('/exit')
     expect(output).not.toContain('/help')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('Enter inserts highlighted command', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
     writeSpy.mockClear()
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, '/')
+    await tick()
     for (let i = 0; i < 8; i++) {
-      stdin.emit('keypress', undefined, {
-        name: 'down',
-        ctrl: false,
-        meta: false,
-      })
-      await new Promise((r) => setImmediate(r))
+      pressKey(stdin, 'down')
+      await tick()
     }
-    stdin.emit('keypress', '\r', {
-      name: 'return',
-      shift: false,
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressEnter(stdin)
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(stripAnsi(output)).toContain('→ /last email ')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+    expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /last email ')
   })
 
   test('Tab with /he completes to /help with space', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    stdin.emit('keypress', 'h', { name: 'h', ctrl: false, meta: false })
-    stdin.emit('keypress', 'e', { name: 'e', ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, '/he')
+    await tick()
     writeSpy.mockClear()
 
-    stdin.emit('keypress', undefined, {
-      name: 'tab',
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressKey(stdin, 'tab')
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(stripAnsi(output)).toContain('→ /help ')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+    expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /help ')
   })
 
   test('Tab with /rec completes to common prefix /recall', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    stdin.emit('keypress', 'r', { name: 'r', ctrl: false, meta: false })
-    stdin.emit('keypress', 'e', { name: 'e', ctrl: false, meta: false })
-    stdin.emit('keypress', 'c', { name: 'c', ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, '/rec')
+    await tick()
     writeSpy.mockClear()
 
-    stdin.emit('keypress', undefined, {
-      name: 'tab',
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressKey(stdin, 'tab')
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(stripAnsi(output)).toContain('→ /recall')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+    expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /recall')
   })
 
   test('Tab with /unknown does nothing', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    for (const ch of '/unknown') {
-      stdin.emit('keypress', ch, {
-        name: ch === '/' ? undefined : ch,
-        ctrl: false,
-        meta: false,
-      })
-    }
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, '/unknown')
+    await tick()
 
-    stdin.emit('keypress', undefined, {
-      name: 'tab',
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressKey(stdin, 'tab')
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(stripAnsi(output)).toContain('→ /unknown')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+    expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /unknown')
   })
 
   test('Tab when buffer has no leading slash does nothing', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    for (const ch of 'hello') {
-      stdin.emit('keypress', ch, { name: ch, ctrl: false, meta: false })
-    }
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, 'hello')
+    await tick()
 
-    stdin.emit('keypress', undefined, {
-      name: 'tab',
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressKey(stdin, 'tab')
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(stripAnsi(output)).toContain('→ hello')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+    expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ hello')
   })
 
   test('Tab with single match shows completed command', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    stdin.emit('keypress', 'a', { name: 'a', ctrl: false, meta: false })
-    stdin.emit('keypress', 'd', { name: 'd', ctrl: false, meta: false })
-    stdin.emit('keypress', 'd', { name: 'd', ctrl: false, meta: false })
-    stdin.emit('keypress', '-', { name: '-', ctrl: false, meta: false })
-    stdin.emit('keypress', 'a', { name: 'a', ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, '/add-a')
+    await tick()
     writeSpy.mockClear()
 
-    stdin.emit('keypress', undefined, {
-      name: 'tab',
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressKey(stdin, 'tab')
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(stripAnsi(output)).toContain('→ /add-access-token ')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+    expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /add-access-token ')
   })
 })
 
 describe('TTY mode slash command suggestions with scroll', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
+  let stdin: TTYStdin
 
-  beforeEach(() => {
+  beforeEach(async () => {
     resetRecallStateForTesting()
     useManyCommandsForScrollTests = true
     vi.spyOn(console, 'log').mockImplementation(() => undefined)
@@ -1329,202 +1114,120 @@ describe('TTY mode slash command suggestions with scroll', () => {
     vi.spyOn(process, 'exit').mockImplementation(
       (() => undefined) as unknown as typeof process.exit
     )
+    stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await tick()
   })
 
   afterEach(() => {
     useManyCommandsForScrollTests = false
+    pressKey(stdin, 'c', { ctrl: true })
     vi.restoreAllMocks()
   })
 
   test('shows "↑ more above" when scrolled down', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
     writeSpy.mockClear()
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, '/')
+    await tick()
     for (let i = 0; i < 8; i++) {
-      stdin.emit('keypress', undefined, {
-        name: 'down',
-        ctrl: false,
-        meta: false,
-      })
-      await new Promise((r) => setImmediate(r))
+      pressKey(stdin, 'down')
+      await tick()
     }
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('↑ more above')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+    expect(ttyOutput(writeSpy)).toContain('↑ more above')
   })
 
   test('hides "↓ more below" when at bottom', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
     writeSpy.mockClear()
-    stdin.emit('keypress', '/', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, '/')
+    await tick()
     for (let i = 0; i < 11; i++) {
-      stdin.emit('keypress', undefined, {
-        name: 'down',
-        ctrl: false,
-        meta: false,
-      })
-      await new Promise((r) => setImmediate(r))
+      pressKey(stdin, 'down')
+      await tick()
     }
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const output = ttyOutput(writeSpy)
     const lastMoreBelow = output.lastIndexOf('↓ more below')
     const lastCmd11 = output.lastIndexOf('/cmd11')
     expect(lastCmd11).toBeGreaterThan(lastMoreBelow)
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 })
 
 describe('TTY token list interactive mode', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
-  let originalConfigDir: string | undefined
+  let stdin: TTYStdin
+  let restoreConfigDir: () => void
 
   beforeEach(async () => {
     resetRecallStateForTesting()
-    const fs = await import('node:fs')
-    const os = await import('node:os')
-    const path = await import('node:path')
-    originalConfigDir = process.env.DOUGHNUT_CONFIG_DIR
-    const configDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'doughnut-tty-test-')
-    )
-    process.env.DOUGHNUT_CONFIG_DIR = configDir
-    fs.writeFileSync(
-      path.join(configDir, 'access-tokens.json'),
-      JSON.stringify({
-        tokens: [
-          { label: 'Alpha', token: 'a' },
-          { label: 'Beta', token: 'b' },
-          { label: 'Gamma', token: 'c' },
-        ],
-      })
-    )
+    const configDir = makeTempConfigDir([
+      { label: 'Alpha', token: 'a' },
+      { label: 'Beta', token: 'b' },
+      { label: 'Gamma', token: 'c' },
+    ])
+    restoreConfigDir = withConfigDir(configDir)
     vi.spyOn(console, 'log').mockImplementation(() => undefined)
     writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
     vi.spyOn(process, 'exit').mockImplementation(
       (() => undefined) as unknown as typeof process.exit
     )
+    stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await tick()
   })
 
   afterEach(() => {
-    if (originalConfigDir === undefined) {
-      delete process.env.DOUGHNUT_CONFIG_DIR
-    } else {
-      process.env.DOUGHNUT_CONFIG_DIR = originalConfigDir
-    }
+    restoreConfigDir()
+    pressKey(stdin, 'c', { ctrl: true })
     vi.restoreAllMocks()
   })
 
-  async function submitListCommand(
-    stdin: ReturnType<typeof createMockTTYStdin>
-  ) {
-    for (const ch of '/list-access-token ') {
-      stdin.emit('keypress', ch, {
-        name: ch === ' ' ? 'space' : undefined,
-        ctrl: false,
-        meta: false,
-      })
-    }
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '\r', {
-      name: 'return',
-      shift: false,
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
-  }
-
   test('shows token list with default highlighted after /list-access-token', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
     writeSpy.mockClear()
+    await submitTTYCommand(stdin, '/list-access-token')
 
-    await submitListCommand(stdin)
-
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const output = ttyOutput(writeSpy)
     expect(output).toContain('Alpha')
     expect(output).toContain('Beta')
     expect(output).toContain('Gamma')
     expect(output).toContain('★')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('Enter sets highlighted token as default and confirms', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
+    await submitTTYCommand(stdin, '/list-access-token')
 
-    await submitListCommand(stdin)
-
-    stdin.emit('keypress', undefined, {
-      name: 'down',
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressKey(stdin, 'down')
+    await tick()
     writeSpy.mockClear()
-    stdin.emit('keypress', '\r', {
-      name: 'return',
-      shift: false,
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressEnter(stdin)
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('Default token set to: Beta')
+    expect(ttyOutput(writeSpy)).toContain('Default token set to: Beta')
 
     const { getDefaultTokenLabel } = await import('../src/accessToken.js')
     expect(getDefaultTokenLabel()).toBe('Beta')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('any other key exits token list mode', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-
-    await submitListCommand(stdin)
+    await submitTTYCommand(stdin, '/list-access-token')
     writeSpy.mockClear()
 
-    stdin.emit('keypress', 'q', { name: 'q', ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, 'q')
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const output = ttyOutput(writeSpy)
     expect(output).toContain('/ commands')
     expect(output).not.toContain('Alpha')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('ESC cancels token list selection without modifying tokens', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-
-    await submitRemoveCommand(stdin, '/remove-access-token')
+    await submitTTYCommand(stdin, '/remove-access-token')
     writeSpy.mockClear()
 
-    stdin.emit('keypress', undefined, {
-      name: 'escape',
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressKey(stdin, 'escape')
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const output = ttyOutput(writeSpy)
     expect(output).toContain('/ commands')
     expect(output).not.toContain('Alpha')
     expect(output).not.toContain('Token "Alpha" removed')
@@ -1533,67 +1236,33 @@ describe('TTY token list interactive mode', () => {
     const remaining = listAccessTokens()
     expect(remaining).toHaveLength(3)
     expect(remaining.map((t) => t.label)).toContain('Alpha')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
-  async function submitRemoveCommand(
-    stdin: ReturnType<typeof createMockTTYStdin>,
-    command: string
-  ) {
-    for (const ch of `${command} `) {
-      stdin.emit('keypress', ch, {
-        name: ch === ' ' ? 'space' : undefined,
-        ctrl: false,
-        meta: false,
-      })
-    }
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '\r', {
-      name: 'return',
-      shift: false,
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
-  }
-
   test('/remove-access-token shows token list and Enter removes selected', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
+    await submitTTYCommand(stdin, '/remove-access-token')
 
-    await submitRemoveCommand(stdin, '/remove-access-token')
-
-    const midOutput = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const midOutput = ttyOutput(writeSpy)
     expect(midOutput).toContain('Alpha')
     expect(midOutput).toContain('Beta')
 
     writeSpy.mockClear()
-    stdin.emit('keypress', '\r', {
-      name: 'return',
-      shift: false,
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressEnter(stdin)
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('Token "Alpha" removed.')
+    expect(ttyOutput(writeSpy)).toContain('Token "Alpha" removed.')
 
     const { listAccessTokens } = await import('../src/accessToken.js')
     const remaining = listAccessTokens()
     expect(remaining).toHaveLength(2)
     expect(remaining.map((t) => t.label)).not.toContain('Alpha')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 })
 
 describe('TTY MCQ choice selection', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
+  let stdin: TTYStdin
 
-  beforeEach(() => {
+  beforeEach(async () => {
     resetRecallStateForTesting()
     mockRecallNext.mockResolvedValue({
       type: 'mcq',
@@ -1607,209 +1276,116 @@ describe('TTY MCQ choice selection', () => {
     vi.spyOn(process, 'exit').mockImplementation(
       (() => undefined) as unknown as typeof process.exit
     )
+    stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await tick()
   })
 
   afterEach(() => {
+    pressKey(stdin, 'c', { ctrl: true })
     vi.restoreAllMocks()
   })
 
-  async function submitRecall(stdin: ReturnType<typeof createMockTTYStdin>) {
-    for (const ch of '/recall ') {
-      stdin.emit('keypress', ch, {
-        name: ch === ' ' ? 'space' : undefined,
-        ctrl: false,
-        meta: false,
-      })
-    }
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '\r', {
-      name: 'return',
-      shift: false,
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
-  }
-
   test('down arrow moves highlight to second choice', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
     writeSpy.mockClear()
+    await submitTTYCommand(stdin, '/recall')
 
-    await submitRecall(stdin)
-
-    const afterSubmit = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const afterSubmit = ttyOutput(writeSpy)
     expect(afterSubmit).toContain('  1. 4')
     expect(afterSubmit).toContain('  2. 3')
 
     writeSpy.mockClear()
-    stdin.emit('keypress', undefined, {
-      name: 'down',
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressKey(stdin, 'down')
+    await tick()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const output = ttyOutput(writeSpy)
     expect(output).toContain('\x1b[7m') // REVERSE on highlighted line
     expect(output).toContain('  2. 3')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('Enter submits highlighted choice and calls answerQuiz', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
+    await submitTTYCommand(stdin, '/recall')
 
-    await submitRecall(stdin)
-
-    stdin.emit('keypress', '\r', {
-      name: 'return',
-      shift: false,
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressEnter(stdin)
+    await tick()
     await new Promise((r) => setTimeout(r, 50))
 
     expect(mockAnswerQuiz).toHaveBeenCalledWith(100, 0)
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('Recalled successfully')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+    expect(ttyOutput(writeSpy)).toContain('Recalled successfully')
   })
 
   test('typed number still works', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
+    await submitTTYCommand(stdin, '/recall')
 
-    await submitRecall(stdin)
-
-    stdin.emit('keypress', '2', { name: undefined, ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '\r', {
-      name: 'return',
-      shift: false,
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, '2')
+    await tick()
+    pressEnter(stdin)
+    await tick()
 
     expect(mockAnswerQuiz).toHaveBeenCalledWith(100, 1) // "2" = choiceIndex 1
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('ESC shows stop confirmation, y exits recall mode', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-
-    await submitRecall(stdin)
+    await submitTTYCommand(stdin, '/recall')
     mockAnswerQuiz.mockClear()
     writeSpy.mockClear()
 
-    stdin.emit('keypress', undefined, {
-      name: 'escape',
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressKey(stdin, 'escape')
+    await tick()
 
-    let output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('Stop recall? (y/n)')
+    expect(ttyOutput(writeSpy)).toContain('Stop recall? (y/n)')
 
-    stdin.emit('keypress', 'y', { name: 'y', ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '\r', {
-      name: 'return',
-      shift: false,
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, 'y')
+    await tick()
+    pressEnter(stdin)
+    await tick()
 
-    output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('Stopped recall')
+    expect(ttyOutput(writeSpy)).toContain('Stopped recall')
     expect(mockAnswerQuiz).not.toHaveBeenCalled()
     expect(isInRecallSubstate()).toBe(false)
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('ESC then n cancels confirmation and stays in MCQ', async () => {
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
-
-    await submitRecall(stdin)
+    await submitTTYCommand(stdin, '/recall')
     mockAnswerQuiz.mockClear()
     writeSpy.mockClear()
 
-    stdin.emit('keypress', undefined, {
-      name: 'escape',
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressKey(stdin, 'escape')
+    await tick()
 
-    stdin.emit('keypress', 'n', { name: 'n', ctrl: false, meta: false })
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '\r', {
-      name: 'return',
-      shift: false,
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    typeString(stdin, 'n')
+    await tick()
+    pressEnter(stdin)
+    await tick()
 
     expect(isInRecallSubstate()).toBe(true)
     expect(mockAnswerQuiz).not.toHaveBeenCalled()
 
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    const output = ttyOutput(writeSpy)
     expect(output).toContain('  1. 4')
     expect(output).toContain('  2. 3')
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 })
 
 describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
-  let writeSpy: ReturnType<typeof vi.spyOn>
+  let stdin: TTYStdin
 
-  beforeEach(() => {
+  beforeEach(async () => {
     resetRecallStateForTesting()
     vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
+    vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
     vi.spyOn(process, 'exit').mockImplementation(
       (() => undefined) as unknown as typeof process.exit
     )
+    stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await tick()
   })
 
   afterEach(() => {
+    pressKey(stdin, 'c', { ctrl: true })
     vi.restoreAllMocks()
   })
-
-  async function submitRecall(stdin: ReturnType<typeof createMockTTYStdin>) {
-    for (const ch of '/recall ') {
-      stdin.emit('keypress', ch, {
-        name: ch === ' ' ? 'space' : undefined,
-        ctrl: false,
-        meta: false,
-      })
-    }
-    await new Promise((r) => setImmediate(r))
-    stdin.emit('keypress', '\r', {
-      name: 'return',
-      shift: false,
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
-  }
 
   test('ESC in spelling prompt exits recall mode', async () => {
     mockRecallNext.mockResolvedValue({
@@ -1817,24 +1393,13 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
       recallPromptId: 100,
       stem: 'test',
     })
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
+    await submitTTYCommand(stdin, '/recall')
 
-    await submitRecall(stdin)
-    writeSpy.mockClear()
-
-    stdin.emit('keypress', undefined, {
-      name: 'escape',
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressKey(stdin, 'escape')
+    await tick()
 
     expect(isInRecallSubstate()).toBe(false)
     expect(mockAnswerSpelling).not.toHaveBeenCalled()
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('ESC in Yes I remember y/n prompt exits recall mode', async () => {
@@ -1843,44 +1408,22 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
       memoryTrackerId: 42,
       title: 'Test note',
     })
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
+    await submitTTYCommand(stdin, '/recall')
 
-    await submitRecall(stdin)
-    writeSpy.mockClear()
-
-    stdin.emit('keypress', undefined, {
-      name: 'escape',
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressKey(stdin, 'escape')
+    await tick()
 
     expect(isInRecallSubstate()).toBe(false)
     expect(mockMarkAsRecalled).not.toHaveBeenCalled()
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
   test('ESC in Load more y/n prompt exits recall mode', async () => {
     mockRecallNext.mockResolvedValue({ type: 'none', message: '0 notes' })
-    const stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await new Promise((r) => setImmediate(r))
+    await submitTTYCommand(stdin, '/recall')
 
-    await submitRecall(stdin)
-    writeSpy.mockClear()
-
-    stdin.emit('keypress', undefined, {
-      name: 'escape',
-      ctrl: false,
-      meta: false,
-    })
-    await new Promise((r) => setImmediate(r))
+    pressKey(stdin, 'escape')
+    await tick()
 
     expect(isInRecallSubstate()).toBe(false)
-
-    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 })
