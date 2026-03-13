@@ -25,19 +25,24 @@ Feature: CLI recall status and recall session
     Then I should see "0 notes to recall today" in the history output
 
   @disableOpenAiService
-  Scenario: Recall Just Review - answer yes and verify success
+  Scenario Outline: Recall Just Review
     Given I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:
       | Title    | Details                        | Parent Title |
-      | sedition | Sedition means incite violence | English      |
-      | sedation | Put to sleep is sedation       | English      |
+      | <title>  | <details>                      | English      |
     And It's day 1
-    And I assimilate the note "sedition"
+    And I assimilate the note "<title>"
     And It's day 2
     When I run the doughnut command in interactive mode with input "/recall" and "y"
-    Then I should see "sedition" in the status
+    Then I should see "<title>" in the status
+    And I should see "<content_check>" in the status
     And I should see "Yes, I remember?" in the status
     And I should see "Recalled successfully" in the history output
+
+    Examples:
+      | title    | details                              | content_check |
+      | sedition | Sedition means incite violence       | sedition      |
+      | sedation | **Put** to sleep is _sedation_       | Put           |
 
   @disableOpenAiService
   Scenario: Recall status shows zero after recalling the only note in session
@@ -52,21 +57,6 @@ Feature: CLI recall status and recall session
     Then I should see "Recalled successfully" in the history output
     When I run the doughnut command in interactive mode with input "/recall-status"
     Then I should see "0 notes to recall today" in the history output
-
-  @disableOpenAiService
-  Scenario: Recall Just Review shows markdown note content
-    Given I have a notebook with the head note "English" which skips memory tracking
-    And there are some notes:
-      | Title    | Details                         | Parent Title |
-      | sedation | **Put** to sleep is _sedation_ | English      |
-    And It's day 1
-    And I assimilate the note "sedation"
-    And It's day 2
-    When I run the doughnut command in interactive mode with input "/recall" and "y"
-    Then I should see "sedation" in the status
-    And I should see "Put" in the status
-    And I should see "Yes, I remember?" in the status
-    And I should see "Recalled successfully" in the last command output
 
   @usingMockedOpenAiService
   Scenario: Recall MCQ - choose correct answer and see success
