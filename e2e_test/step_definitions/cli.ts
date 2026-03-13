@@ -285,10 +285,6 @@ When(
   }
 )
 
-Then('I should see {string}', (expected: string) => {
-  cy.get('@doughnutOutput').should('include', expected)
-})
-
 Then('I should see {string} in the history output', (expected: string) => {
   cy.get<string>('@doughnutOutput').then((output) => {
     const content = getSectionContent(output, 'history-output')
@@ -340,18 +336,25 @@ Then('I should not see {string} in the history output', (expected: string) => {
 })
 
 Then('the recall session was stopped', () => {
-  cy.get('@doughnutOutput').should(
-    'include',
-    'What is the meaning of sedition?'
-  )
-  cy.get('@doughnutOutput').should('include', 'Stop recall? (y/n)')
-  cy.get('@doughnutOutput').should('include', 'Stopped recall')
+  cy.get<string>('@doughnutOutput').then((output) => {
+    expect(getSectionContent(output, 'status')).to.include(
+      'What is the meaning of sedition?'
+    )
+    expect(getSectionContent(output, 'status')).to.include('Stop recall? (y/n)')
+    expect(getSectionContent(output, 'history-output')).to.include(
+      'Stopped recall'
+    )
+  })
 })
 
 Then('I stopped the recall during review', () => {
-  cy.get('@doughnutOutput').should('include', 'sedition')
-  cy.get('@doughnutOutput').should('include', 'Yes, I remember?')
-  cy.get('@doughnutOutput').should('include', 'Stopped recall')
+  cy.get<string>('@doughnutOutput').then((output) => {
+    expect(getSectionContent(output, 'status')).to.include('sedition')
+    expect(getSectionContent(output, 'status')).to.include('Yes, I remember?')
+    expect(getSectionContent(output, 'history-output')).to.include(
+      'Stopped recall'
+    )
+  })
 })
 
 Then(
@@ -361,7 +364,9 @@ Then(
       removalType === 'local'
         ? `Token "${label}" removed.`
         : 'removed locally and from server'
-    cy.get('@doughnutOutput').should('include', expected)
+    cy.get<string>('@doughnutOutput').then((output) => {
+      expect(getSectionContent(output, 'history-output')).to.include(expected)
+    })
   }
 )
 

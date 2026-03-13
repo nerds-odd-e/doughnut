@@ -17,12 +17,12 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedition"
     And It's day 2
     When I run the doughnut command in interactive mode with input "/recall-status"
-    Then I should see "1 note to recall today"
+    Then I should see "1 note to recall today" in the history output
 
   @disableOpenAiService
   Scenario: Recall status shows zero when no notes are due
     When I run the doughnut command in interactive mode with input "/recall-status"
-    Then I should see "0 notes to recall today"
+    Then I should see "0 notes to recall today" in the history output
 
   @disableOpenAiService
   Scenario: Recall Just Review - answer yes and verify success
@@ -49,9 +49,9 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedition"
     And It's day 2
     When I run the doughnut command in interactive mode with input "/recall" and "y"
-    Then I should see "Recalled successfully"
+    Then I should see "Recalled successfully" in the history output
     When I run the doughnut command in interactive mode with input "/recall-status"
-    Then I should see "0 notes to recall today"
+    Then I should see "0 notes to recall today" in the history output
 
   @disableOpenAiService
   Scenario: Recall Just Review shows markdown note content
@@ -82,10 +82,10 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedition"
     And It's day 2
     When I run the doughnut command in interactive mode with input "/recall" and "1"
-    Then I should see "What is the meaning of sedition?"
-    And I should see "to incite violence"
-    And I should see "Correct!"
-    And I should see "Recalled successfully"
+    Then I should see "What is the meaning of sedition?" in the status
+    And I should see "to incite violence" in the status
+    And I should see "Correct!" in the history output
+    And I should see "Recalled successfully" in the history output
 
   @usingMockedOpenAiService
   Scenario: Recall MCQ - ESC cancels with y/n confirmation
@@ -103,7 +103,7 @@ Feature: CLI recall status and recall session
     When I run the doughnut command in interactive mode with recall MCQ and cancel with ESC
     Then the recall session was stopped
     When I run the doughnut command in interactive mode with input "/recall-status"
-    Then I should see "1 note to recall today"
+    Then I should see "1 note to recall today" in the history output
 
   @usingMockedOpenAiService
   Scenario: Recall MCQ - down arrow and Enter to select
@@ -119,8 +119,8 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedition"
     And It's day 2
     When I run the doughnut command in interactive mode with down-arrow selection for "/recall"
-    Then I should see "Incorrect"
-    And I should see "Recalled successfully"
+    Then I should see "Incorrect" in the history output
+    And I should see "Recalled successfully" in the history output
 
   @disableOpenAiService
   Scenario: Recall substate - /stop exits recall mode
@@ -148,12 +148,12 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedation"
     And It's day 2
     When I run a recall session and recall all due notes, declining load more
-    Then I should see "Recalled 2 notes"
+    Then I should see "Recalled 2 notes" in the history output
     When I run a recall session with load more from future days
-    Then I should see "Load more from next 3 days?"
-    And I should see "sedition"
-    And I should see "Recalled successfully"
-    And I should see "Recalled"
+    Then I should see "Load more from next 3 days?" in the status
+    And I should see "sedition" in the status
+    And I should see "Recalled successfully" in the history output
+    And I should see "Recalled" in the history output
 
   @usingMockedOpenAiService
   Scenario: Recall MCQ - contest and regenerate before answering
@@ -173,9 +173,9 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedition"
     And It's day 2
     When I run the doughnut command in interactive mode with input "/recall" and "/contest" and "1" and "exit"
-    Then I should see "What is the meaning of sedition?"
-    And I should see "Correct!"
-    And I should see "Recalled successfully"
+    Then I should see "What is the meaning of sedition?" in the status
+    And I should see "Correct!" in the history output
+    And I should see "Recalled successfully" in the history output
 
   @disableOpenAiService
   Scenario: Recall spelling - type correct spelling and see success
@@ -188,6 +188,6 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedition" with the option of remembering spelling
     And It's day 2
     When I run the doughnut command in interactive mode with input "/recall" and "y" and "sedition"
-    Then I should see "Spell:"
-    And I should see "Correct!"
-    And I should see "Recalled successfully"
+    Then I should see "Spell:" in the status
+    And I should see "Correct!" in the history output
+    And I should see "Recalled successfully" in the history output
