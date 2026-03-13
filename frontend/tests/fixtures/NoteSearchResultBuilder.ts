@@ -28,6 +28,11 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
     return this
   }
 
+  notebookTitle(value: string): NoteSearchResultBuilder {
+    this.data.notebookTitle = value
+    return this
+  }
+
   title(value: string): NoteSearchResultBuilder {
     if (!this.data.noteTopology) {
       this.data.noteTopology = { id: generateId(), title: value }
@@ -55,6 +60,7 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
         title: "Untitled",
       },
       notebookId: this.data.notebookId ?? generateId(),
+      notebookTitle: this.data.notebookTitle,
       distance: this.data.distance,
     }
   }
