@@ -52,7 +52,7 @@
     "autoprefixer": "^10.4.27",
     "daisyui": "4.12.24",
     "es-toolkit": "^1.45.1",
-    "esbuild": "0.27.3",
+    "esbuild": "0.27.4",
     "gsap": "^3.14.2",
     "marked": "^17.0.4",
     "optionator": "^0.9.4",
