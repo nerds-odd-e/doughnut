@@ -226,7 +226,13 @@ class NoteController {
   public List<NoteSearchResult> getRecentNotes() throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     return noteService.findRecentNotesByUser(authorizationService.getCurrentUser().getId()).stream()
-        .map(note -> new NoteSearchResult(note.getNoteTopology(), note.getNotebook().getId(), null))
+        .map(
+            note ->
+                new NoteSearchResult(
+                    note.getNoteTopology(),
+                    note.getNotebook().getId(),
+                    note.getNotebook().getTitle(),
+                    null))
         .toList();
   }
 

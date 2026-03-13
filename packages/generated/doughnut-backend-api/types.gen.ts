@@ -265,6 +265,10 @@ export type SearchTerm = {
 export type NoteSearchResult = {
     noteTopology: NoteTopology;
     notebookId: number;
+    /**
+     * Title of the notebook this result belongs to
+     */
+    notebookTitle?: string;
     distance?: number;
 };
 

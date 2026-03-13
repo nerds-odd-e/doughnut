@@ -4639,6 +4639,9 @@ components:
         notebookId:
           type: integer
           format: int32
+        notebookTitle:
+          type: string
+          description: Title of the notebook this result belongs to
         distance:
           type: number
           format: float

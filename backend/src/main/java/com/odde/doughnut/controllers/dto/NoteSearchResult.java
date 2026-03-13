@@ -18,7 +18,17 @@ public class NoteSearchResult {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private Integer notebookId;
 
+  @Schema(description = "Title of the notebook this result belongs to")
+  private String notebookTitle;
+
   private Float distance;
+
+  public NoteSearchResult(NoteTopology noteTopology, Integer notebookId, Float distance) {
+    this.noteTopology = noteTopology;
+    this.notebookId = notebookId;
+    this.notebookTitle = null;
+    this.distance = distance;
+  }
 
   public NoteTopology getNoteTopology() {
     return this.noteTopology;
@@ -26,6 +36,10 @@ public class NoteSearchResult {
 
   public Integer getNotebookId() {
     return this.notebookId;
+  }
+
+  public String getNotebookTitle() {
+    return this.notebookTitle;
   }
 
   public Float getDistance() {
