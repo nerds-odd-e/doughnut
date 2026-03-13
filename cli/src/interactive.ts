@@ -730,6 +730,11 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
               ? (tokenHighlightIndex - 1 + n) % n
               : (tokenHighlightIndex + 1) % n
           drawBox()
+        } else if (key.name === 'escape') {
+          tokenListItems = null
+          tokenHighlightIndex = 0
+          tokenListAction = 'set-default'
+          drawBox()
         } else if (key.name === 'return' && !key.shift) {
           const selectedLabel = tokenListItems[tokenHighlightIndex]!.label
           if (linesAboveCursor > 0) {

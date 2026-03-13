@@ -40,7 +40,7 @@ All interactive states that need ESC handling, identified from `cli/src/interact
 - When suggestions visible and ESC: if buffer is only `/`, clear buffer and redraw; if partial command (e.g. `/ex`), set `suggestionsDismissed = true` and redraw (suggestions hidden, buffer intact).
 - **Tests**: UT in `interactive.test.ts` – ESC when buffer `/` → suggestions gone, buffer cleared; ESC when buffer `/ex` → suggestions gone, buffer intact.
 
-### Phase 2: ESC to cancel access token list selection
+### Phase 2: ESC to cancel access token list selection ✅
 **User value**: User ran `/remove-access-token` then changed mind; ESC cancels without removing.
 
 - In `tokenListItems` block: add explicit `key.name === 'escape'` branch before the existing `else`. Set `tokenListItems = null`, `tokenHighlightIndex = 0`, `tokenListAction = 'set-default'`, `drawBox()`.

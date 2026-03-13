@@ -1297,6 +1297,34 @@ describe('TTY token list interactive mode', () => {
     stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
   })
 
+  test('ESC cancels token list selection without modifying tokens', async () => {
+    const stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await new Promise((r) => setImmediate(r))
+
+    await submitRemoveCommand(stdin, '/remove-access-token')
+    writeSpy.mockClear()
+
+    stdin.emit('keypress', undefined, {
+      name: 'escape',
+      ctrl: false,
+      meta: false,
+    })
+    await new Promise((r) => setImmediate(r))
+
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(output).toContain('/ commands')
+    expect(output).not.toContain('Alpha')
+    expect(output).not.toContain('Token "Alpha" removed')
+
+    const { listAccessTokens } = await import('../src/accessToken.js')
+    const remaining = listAccessTokens()
+    expect(remaining).toHaveLength(3)
+    expect(remaining.map((t) => t.label)).toContain('Alpha')
+
+    stdin.emit('keypress', '\x03', { name: 'c', ctrl: true, meta: false })
+  })
+
   async function submitRemoveCommand(
     stdin: ReturnType<typeof createMockTTYStdin>,
     command: string

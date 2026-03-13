@@ -157,6 +157,25 @@ When('I run a recall session with load more from future days', () => {
 })
 
 When(
+  'I run the remove-access-token command and cancel with ESC, then list tokens',
+  () => {
+    const esc = '\x1b'
+    cy.get<string>('@cliConfigDir').then((configDir) =>
+      cy
+        .task('runCliDirectWithInputAndPty', {
+          input: `/remove-access-token\n${esc}\n/list-access-token\nexit\n`,
+          fallbackInput: `/remove-access-token\n/list-access-token\nexit\n`,
+          env: {
+            DOUGHNUT_CONFIG_DIR: configDir,
+            DOUGHNUT_API_BASE_URL: BASE_URL,
+          },
+        })
+        .as('doughnutOutput')
+    )
+  }
+)
+
+When(
   'I run the doughnut command in interactive mode with down-arrow selection for {string}',
   (command: string) => {
     const downArrow = '\x1b[B'

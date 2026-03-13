@@ -29,6 +29,13 @@ Feature: CLI access token management
       | Remove Me Token | remove-access-token            | local        |
       | Revoke Me Token | remove-access-token-completely | complete     |
 
+  Scenario: ESC cancels remove-access-token selection
+    And I have a valid Doughnut Access Token with label "E2E CLI Token"
+    When I run the doughnut CLI add-access-token with the saved token
+    Then I should see "Token added"
+    When I run the remove-access-token command and cancel with ESC, then list tokens
+    Then I should see "E2E CLI Token"
+
   Scenario: Create access token via CLI
     And I have a valid Doughnut Access Token with label "Default Token"
     When I run the doughnut CLI add-access-token with the saved token
