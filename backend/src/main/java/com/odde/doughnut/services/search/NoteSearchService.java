@@ -39,7 +39,7 @@ public class NoteSearchService {
 
     List<Note> exactMatches = searchExactMatches(user, searchTerm, null);
     List<Note> partialMatches = searchPartialMatches(user, searchTerm, null);
-    return combineExactAndPartialMatches(exactMatches, partialMatches, null);
+    return combineExactAndPartialMatches(exactMatches, partialMatches, null, null);
   }
 
   public List<NoteSearchResult> searchForNotesInRelationTo(
@@ -52,7 +52,7 @@ public class NoteSearchService {
 
     List<Note> exactMatches = searchExactMatches(user, searchTerm, notebookId);
     List<Note> partialMatches = searchPartialMatches(user, searchTerm, notebookId);
-    return combineExactAndPartialMatches(exactMatches, partialMatches, avoidNoteId);
+    return combineExactAndPartialMatches(exactMatches, partialMatches, avoidNoteId, notebookId);
   }
 
   public List<NoteSearchResult> semanticSearchForNotes(User user, SearchTerm searchTerm) {
@@ -106,14 +106,14 @@ public class NoteSearchService {
     List<Note> notes = (List<Note>) noteRepository.findAllById(orderedIds);
     java.util.Map<Integer, Note> idToNote =
         notes.stream().collect(java.util.stream.Collectors.toMap(Note::getId, n -> n));
-    return orderedIds.stream()
-        .map(id -> idToNote.get(id))
-        .filter(java.util.Objects::nonNull)
-        .map(
-            n ->
-                new NoteSearchResult(
-                    n.getNoteTopology(), n.getNotebook().getId(), noteIdToDistance.get(n.getId())))
-        .toList();
+    List<NoteSearchResult> results =
+        orderedIds.stream()
+            .map(id -> idToNote.get(id))
+            .filter(java.util.Objects::nonNull)
+            .map(n -> noteToSearchResult(n, noteIdToDistance.get(n.getId())))
+            .toList();
+
+    return sortByDistanceThenNotebook(results, notebookId);
   }
 
   private List<Note> searchExactMatches(User user, SearchTerm searchTerm, Integer notebookId) {
@@ -183,7 +183,7 @@ public class NoteSearchService {
   }
 
   private List<NoteSearchResult> combineExactAndPartialMatches(
-      List<Note> exactMatches, List<Note> partialMatches, Integer avoidNoteId) {
+      List<Note> exactMatches, List<Note> partialMatches, Integer avoidNoteId, Integer notebookId) {
     List<Note> filteredPartialMatches =
         partialMatches.stream()
             .filter(
@@ -194,10 +194,7 @@ public class NoteSearchService {
     List<NoteSearchResult> results =
         exactMatches.stream()
             .filter(note -> !note.getId().equals(avoidNoteId))
-            .map(
-                note ->
-                    new NoteSearchResult(
-                        note.getNoteTopology(), note.getNotebook().getId(), /* distance= */ 0.0f))
+            .map(note -> noteToSearchResult(note, 0.0f))
             .collect(Collectors.toList());
 
     int remainingSlots = exactMatches.isEmpty() ? 20 : 20 + exactMatches.size();
@@ -207,14 +204,37 @@ public class NoteSearchService {
           filteredPartialMatches.stream()
               .limit(remainingSlots)
               .filter(note -> !note.getId().equals(avoidNoteId))
-              .map(
-                  note ->
-                      new NoteSearchResult(
-                          note.getNoteTopology(), note.getNotebook().getId(), /* distance= */ 0.9f))
+              .map(note -> noteToSearchResult(note, 0.9f))
               .collect(Collectors.toList()));
     }
 
-    return results;
+    return sortByDistanceThenNotebook(results, notebookId);
+  }
+
+  private NoteSearchResult noteToSearchResult(Note note, Float distance) {
+    return new NoteSearchResult(
+        note.getNoteTopology(),
+        note.getNotebook().getId(),
+        note.getNotebook().getTitle(),
+        distance);
+  }
+
+  private List<NoteSearchResult> sortByDistanceThenNotebook(
+      List<NoteSearchResult> results, Integer notebookId) {
+    if (notebookId == null) return results;
+    return results.stream()
+        .sorted(
+            (a, b) -> {
+              int distCompare =
+                  Float.compare(
+                      a.getDistance() != null ? a.getDistance() : Float.MAX_VALUE,
+                      b.getDistance() != null ? b.getDistance() : Float.MAX_VALUE);
+              if (distCompare != 0) return distCompare;
+              boolean aSame = notebookId.equals(a.getNotebookId());
+              boolean bSame = notebookId.equals(b.getNotebookId());
+              return Boolean.compare(bSame, aSame);
+            })
+        .toList();
   }
 
   private Pageable getLimitPageable() {

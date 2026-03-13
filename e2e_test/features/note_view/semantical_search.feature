@@ -23,3 +23,11 @@ Feature: semantical search
       | matching       | Physics            |
       | chemistry      | Chemistry, Physics |
       | something else |                    |
+
+  @mockBrowserTime @usingMockedOpenAiService
+  Scenario: Search results indicate which notebook each result is from
+    Given OpenAI returns embeddings successfully
+    And I reindex the notebook "Physics"
+    When I start searching from all my notebooks page
+    Then I should see "Physics" as targets only when searching "matching"
+    And I should see notebook "Physics" in search results

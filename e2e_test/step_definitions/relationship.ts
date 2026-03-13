@@ -98,6 +98,15 @@ When(
   }
 )
 
+Then(
+  'I should see notebook {string} in search results',
+  (notebookTitle: string) => {
+    start
+      .assumeNoteTargetSearchDialog()
+      .expectNotebookTitleInSearchResults(notebookTitle)
+  }
+)
+
 When(
   'I should see note cannot be found when searching in all my notebooks {string}',
   (searchKey: string) => {

@@ -199,12 +199,13 @@ const search = () => {
       props.noteId,
       searchTerm.value
     )
-    model.mergeAndCacheResults(
-      trimmedSearchKey.value,
-      isGlobalSearch.value,
-      literal,
-      semantic
-    )
+    model.mergeAndCacheResults({
+      trimmedSearchKey: trimmedSearchKey.value,
+      isGlobal: isGlobalSearch.value,
+      literalResults: literal,
+      semanticResults: semantic,
+      currentNotebookId: props.notebookId,
+    })
     model.completeSearch()
   })
 }

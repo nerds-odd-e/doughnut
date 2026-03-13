@@ -209,22 +209,29 @@ export class SearchResultsModel {
     }
   }
 
-  mergeAndCacheResults(
-    trimmedSearchKey: string,
-    isGlobal: boolean,
-    literalResults: NoteSearchResult[],
+  mergeAndCacheResults(opts: {
+    trimmedSearchKey: string
+    isGlobal: boolean
+    literalResults: NoteSearchResult[]
     semanticResults: NoteSearchResult[]
-  ): void {
-    const combined = [...literalResults, ...semanticResults]
-    const existing = this.getCachedResult(trimmedSearchKey, isGlobal) ?? []
-    const merged = this.mergeUniqueAndSortByDistance(existing, combined)
-    this.setCachedResult(trimmedSearchKey, isGlobal, merged)
+    currentNotebookId?: number
+  }): void {
+    const combined = [...opts.literalResults, ...opts.semanticResults]
+    const existing =
+      this.getCachedResult(opts.trimmedSearchKey, opts.isGlobal) ?? []
+    const merged = this.mergeUniqueAndSortByDistance(
+      existing,
+      combined,
+      opts.currentNotebookId
+    )
+    this.setCachedResult(opts.trimmedSearchKey, opts.isGlobal, merged)
     this.clearPreviousResult()
   }
 
   private mergeUniqueAndSortByDistance(
     existing: NoteSearchResult[],
-    incoming: NoteSearchResult[]
+    incoming: NoteSearchResult[],
+    currentNotebookId?: number
   ): NoteSearchResult[] {
     const byId = new Map<number, NoteSearchResult>()
     const getId = (r: NoteSearchResult) => r.noteTopology.id as number
@@ -242,8 +249,13 @@ export class SearchResultsModel {
       byId.set(id, prev ? chooseBetter(prev, r) : r)
     })
 
-    return Array.from(byId.values()).sort(
-      (a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity)
-    )
+    return Array.from(byId.values()).sort((a, b) => {
+      const distDiff = (a.distance ?? Infinity) - (b.distance ?? Infinity)
+      if (distDiff !== 0) return distDiff
+      if (currentNotebookId === undefined) return 0
+      const aSame = a.notebookId === currentNotebookId
+      const bSame = b.notebookId === currentNotebookId
+      return Number(bSame) - Number(aSame)
+    })
   }
 }
