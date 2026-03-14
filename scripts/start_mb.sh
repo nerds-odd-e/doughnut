@@ -7,8 +7,8 @@
 
 MB_PORT=2525
 
-# Check if mountebank is already running
-if nc -z localhost $MB_PORT 2>/dev/null; then
+# Check if mountebank is already running (bash /dev/tcp fallback when nc unavailable)
+if nc -z localhost $MB_PORT 2>/dev/null || (echo >/dev/tcp/localhost/$MB_PORT) 2>/dev/null; then
     echo "Mountebank is already running on port $MB_PORT, skipping start"
     # Keep the script running to prevent run-p from completing
     while true; do sleep 3600; done

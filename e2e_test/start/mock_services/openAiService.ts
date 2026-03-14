@@ -6,12 +6,15 @@ import { buildChatCompletionStreamEvent } from './openAiMessageComposer'
 
 const openAiService = () => {
   const serviceMocker = new ServiceMocker('openAi', 5001)
+  const MOCK_TOKEN = 'mock-token-for-e2e-testing'
   return {
     mock() {
+      testability().setOpenAiTokenOverride(MOCK_TOKEN)
       testability().mockService(serviceMocker)
     },
     restore() {
       testability().restoreMockedService(serviceMocker)
+      testability().setOpenAiTokenOverride(null)
     },
 
     disable() {

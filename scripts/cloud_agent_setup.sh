@@ -120,6 +120,9 @@ export SPRING_DATASOURCE_PASSWORD="doughnut"
 # Export environment variable for e2e tests (backend uses INPUT_DB_URL when running with e2e profile)
 export INPUT_DB_URL="jdbc:mysql://127.0.0.1:${MYSQL_PORT}/doughnut_e2e_test?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true"
 
+# Use pipe fallback for CLI PTY tests (ESC, arrow keys) - PTY via script is unreliable without real terminal
+export CI=1
+
 # Verify e2e database connection
 echo "==> Verifying e2e database connection..."
 if "${MYSQL_HOME}/bin/mysql" -u doughnut -pdoughnut -S "$MYSQL_SOCKET" -e "USE doughnut_e2e_test; SELECT 1" > /dev/null 2>&1; then
