@@ -34,4 +34,5 @@ The backend instructs AI to use markdown for MCQ stem and choices (`AiToolFactor
 
 ### Phase 4: Verify TTY mode
 
-- `showRecallPrompt` and `formatMcqChoiceLines` are shared by piped and TTY. After Phases 1–3, both modes use the same rendering. Manually verify TTY recall session shows markdown correctly in the box.
+- `showRecallPrompt` and `formatMcqChoiceLines` are shared by piped and TTY. After Phases 1–3, both modes use the same rendering.
+- **Manual verification**: Run `pnpm cli` in a real terminal, type `/recall`, and confirm spelling stem, MCQ stem, and MCQ choices render markdown (bold, italic, etc.) correctly in the box. Phases 1–3 implementation applies to both piped and TTY.
