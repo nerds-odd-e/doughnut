@@ -111,12 +111,13 @@ export async function markAsRecalled(
 
 export async function answerQuiz(
   recallPromptId: number,
-  choiceIndex: number
+  choiceIndex: number,
+  thinkingTimeMs?: number
 ): Promise<{ correct: boolean }> {
   const result = await runWithDefaultBackendClient(() =>
     RecallPromptController.answerQuiz({
       path: { recallPrompt: recallPromptId },
-      body: { choiceIndex },
+      body: { choiceIndex, ...(thinkingTimeMs != null && { thinkingTimeMs }) },
     })
   )
   const correct = result.data?.answer?.correct ?? false
@@ -125,12 +126,16 @@ export async function answerQuiz(
 
 export async function answerSpelling(
   recallPromptId: number,
-  spellingAnswer: string
+  spellingAnswer: string,
+  thinkingTimeMs?: number
 ): Promise<{ correct: boolean }> {
   const result = await runWithDefaultBackendClient(() =>
     RecallPromptController.answerSpelling({
       path: { recallPrompt: recallPromptId },
-      body: { spellingAnswer },
+      body: {
+        spellingAnswer,
+        ...(thinkingTimeMs != null && { thinkingTimeMs }),
+      },
     })
   )
   const correct = result.data?.answer?.correct ?? false

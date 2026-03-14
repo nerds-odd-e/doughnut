@@ -311,9 +311,31 @@ describe('processInput', () => {
     logSpy.mockClear()
 
     await processInput('sedition')
-    expect(mockAnswerSpelling).toHaveBeenCalledWith(100, 'sedition')
+    expect(mockAnswerSpelling).toHaveBeenCalledWith(
+      100,
+      'sedition',
+      expect.any(Number)
+    )
+    expect(mockAnswerSpelling.mock.calls[0]![2]).toBeGreaterThanOrEqual(0)
     expect(logSpy).toHaveBeenCalledWith('Correct!')
     expect(logSpy).toHaveBeenCalledWith('Recalled successfully')
+  })
+
+  test('spelling: passes thinkingTimeMs from prompt display to answer', async () => {
+    vi.useFakeTimers()
+    mockRecallNext.mockResolvedValue({
+      type: 'spelling',
+      recallPromptId: 100,
+      stem: 'means incite violence',
+    })
+    mockAnswerSpelling.mockResolvedValue({ correct: true })
+
+    await processInput('/recall')
+    vi.advanceTimersByTime(5000)
+    await processInput('sedition')
+
+    expect(mockAnswerSpelling).toHaveBeenCalledWith(100, 'sedition', 5000)
+    vi.useRealTimers()
   })
 
   test('spelling: empty input prompts to type', async () => {
@@ -558,6 +580,24 @@ describe('processInput', () => {
     expect(stripAnsi(allChoices)).toContain('C')
   })
 
+  test('MCQ: passes thinkingTimeMs from prompt display to answer', async () => {
+    vi.useFakeTimers()
+    mockRecallNext.mockResolvedValue({
+      type: 'mcq',
+      recallPromptId: 100,
+      stem: 'What is 2+2?',
+      choices: ['4', '3', '5'],
+    })
+    mockAnswerQuiz.mockResolvedValue({ correct: true })
+
+    await processInput('/recall')
+    vi.advanceTimersByTime(3000)
+    await processInput('1')
+
+    expect(mockAnswerQuiz).toHaveBeenCalledWith(100, 0, 3000)
+    vi.useRealTimers()
+  })
+
   test('/contest when in recall with MCQ contests and shows new question', async () => {
     mockRecallNext
       .mockResolvedValueOnce({
@@ -601,7 +641,8 @@ describe('processInput', () => {
     logSpy.mockClear()
 
     await processInput('1')
-    expect(mockAnswerQuiz).toHaveBeenCalledWith(200, 0)
+    expect(mockAnswerQuiz).toHaveBeenCalledWith(200, 0, expect.any(Number))
+    expect(mockAnswerQuiz.mock.calls[0]![2]).toBeGreaterThanOrEqual(0)
     expect(logSpy).toHaveBeenCalledWith('Correct!')
     expect(logSpy).toHaveBeenCalledWith('Recalled successfully')
   })
@@ -1379,7 +1420,7 @@ describe('TTY MCQ choice selection', () => {
     await tick()
     await new Promise((r) => setTimeout(r, 50))
 
-    expect(mockAnswerQuiz).toHaveBeenCalledWith(100, 0)
+    expect(mockAnswerQuiz).toHaveBeenCalledWith(100, 0, expect.any(Number))
     expect(ttyOutput(writeSpy)).toContain('Recalled successfully')
   })
 
@@ -1391,7 +1432,7 @@ describe('TTY MCQ choice selection', () => {
     pressEnter(stdin)
     await tick()
 
-    expect(mockAnswerQuiz).toHaveBeenCalledWith(100, 1) // "2" = choiceIndex 1
+    expect(mockAnswerQuiz).toHaveBeenCalledWith(100, 1, expect.any(Number)) // "2" = choiceIndex 1
   })
 
   test('ESC shows stop confirmation, y exits recall mode', async () => {

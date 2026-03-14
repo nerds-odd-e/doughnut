@@ -62,8 +62,12 @@ function cycleIndex(current: number, delta: number, length: number): number {
 
 type RecallPromptResult = Exclude<RecallNextResult, { type: 'none' }>
 
-type McqPrompt = { recallPromptId: number; choices: string[] }
-type SpellingPrompt = { recallPromptId: number; type: 'spelling' }
+type McqPrompt = { recallPromptId: number; choices: string[]; shownAt: number }
+type SpellingPrompt = {
+  recallPromptId: number
+  type: 'spelling'
+  shownAt: number
+}
 type JustReviewPrompt = { memoryTrackerId: number }
 
 function formatRecallSessionSummary(count: number): string {
@@ -81,6 +85,7 @@ function showRecallPrompt(
     pendingRecallAnswer = {
       recallPromptId: result.recallPromptId,
       type: 'spelling',
+      shownAt: Date.now(),
     }
     return
   }
@@ -93,6 +98,7 @@ function showRecallPrompt(
     pendingRecallAnswer = {
       recallPromptId: result.recallPromptId,
       choices: result.choices,
+      shownAt: Date.now(),
     }
     return
   }
@@ -133,8 +139,8 @@ const PROMPT = '→ '
 
 let pendingRecallAnswer:
   | { memoryTrackerId: number }
-  | { recallPromptId: number; choices: string[] }
-  | { recallPromptId: number; type: 'spelling' }
+  | { recallPromptId: number; choices: string[]; shownAt: number }
+  | { recallPromptId: number; type: 'spelling'; shownAt: number }
   | null = null
 
 let recallSessionMode = false
@@ -373,7 +379,12 @@ export async function processInput(
       const validRange = choiceNum >= 1 && choiceNum <= choices.length
       if (validRange) {
         try {
-          const { correct } = await answerQuiz(recallPromptId, choiceNum - 1)
+          const thinkingTimeMs = Date.now() - pendingRecallAnswer.shownAt
+          const { correct } = await answerQuiz(
+            recallPromptId,
+            choiceNum - 1,
+            thinkingTimeMs
+          )
           output.log(correct ? 'Correct!' : 'Incorrect')
           output.log('Recalled successfully')
         } catch (err) {
@@ -392,7 +403,12 @@ export async function processInput(
         return false
       }
       try {
-        const { correct } = await answerSpelling(recallPromptId, trimmed)
+        const thinkingTimeMs = Date.now() - pendingRecallAnswer.shownAt
+        const { correct } = await answerSpelling(
+          recallPromptId,
+          trimmed,
+          thinkingTimeMs
+        )
         output.log(correct ? 'Correct!' : 'Incorrect')
         output.log('Recalled successfully')
       } catch (err) {

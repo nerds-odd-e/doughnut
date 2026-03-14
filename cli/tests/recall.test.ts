@@ -464,6 +464,25 @@ describe('answerQuiz', () => {
 
     expect(result).toEqual({ correct: false })
   })
+
+  test('passes thinkingTimeMs to API when provided', async () => {
+    vi.mocked(RecallPromptController.answerQuiz).mockResolvedValue({
+      data: { answer: { correct: true } },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    await answerQuiz(100, 0, 3000)
+
+    expect(RecallPromptController.answerQuiz).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: { recallPrompt: 100 },
+        body: { choiceIndex: 0, thinkingTimeMs: 3000 },
+      })
+    )
+  })
 })
 
 describe('answerSpelling', () => {
@@ -515,6 +534,25 @@ describe('answerSpelling', () => {
     const result = await answerSpelling(100, 'sedicion')
 
     expect(result).toEqual({ correct: false })
+  })
+
+  test('passes thinkingTimeMs to API when provided', async () => {
+    vi.mocked(RecallPromptController.answerSpelling).mockResolvedValue({
+      data: { answer: { correct: true } },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    await answerSpelling(100, 'sedition', 5000)
+
+    expect(RecallPromptController.answerSpelling).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: { recallPrompt: 100 },
+        body: { spellingAnswer: 'sedition', thinkingTimeMs: 5000 },
+      })
+    )
   })
 })
 
