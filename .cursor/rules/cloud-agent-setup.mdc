@@ -76,21 +76,21 @@ source /workspace/scripts/cloud_agent_setup.sh
 ### E2E Tests
 
 ```bash
-# One-time setup (if not already done) - sets up MySQL and exports INPUT_DB_URL
+# One-time setup (if not already done) - sets up MySQL, INPUT_DB_URL, CI for pipe fallback
 source /workspace/scripts/cloud_agent_setup.sh
 
-# Start services in the background (only needed for e2e tests)
-# The setup script exports INPUT_DB_URL which the backend uses when running with e2e profile
-pnpm sut &
+# Build and start (matches CI: bundled frontend served by backend, no separate frontend dev server)
+pnpm bundle:all
+pnpm exec run-p -clnr backend:sut:ci start:mb &
 
-# Wait for services to be ready (waits for both backend on 9081 and frontend on 5173)
-pnpm wait-on tcp:9081 tcp:5173
+# Wait for backend and Mountebank
+pnpm exec wait-on http://127.0.0.1:9081/api/healthcheck --timeout 120000
 
 # Run tests (xvfb-run required - Cloud VM has no display)
-xvfb-run pnpm cypress run --spec e2e_test/features/<feature-file>.feature
+xvfb-run pnpm cypress run --spec e2e_test/features/<feature-file>.feature --config-file e2e_test/config/ci.ts
 ```
 
-**Note**: The backend runs on port **9081** and frontend on port **5173**. Cypress requires `xvfb-run` on Cloud VM (no display). The setup script exports `INPUT_DB_URL` which tells the backend (when using e2e profile) to use the `doughnut_e2e_test` database on port 3309.
+**Note**: The setup exports `CI=1` so CLI PTY tests use the pipe fallback (consistent with GitHub Actions). Mountebank must run for tests that mock OpenAI (MCQ scenarios).
 
 ## Key Rules
 
