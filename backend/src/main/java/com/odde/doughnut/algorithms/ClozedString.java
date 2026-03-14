@@ -1,12 +1,13 @@
 package com.odde.doughnut.algorithms;
 
-import com.vladsch.flexmark.html.HtmlRenderer;
-import com.vladsch.flexmark.parser.Parser;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.logging.log4j.util.Strings;
 
 public class ClozedString {
+  private static final Pattern MARKDOWN_LINK_URL = Pattern.compile("\\]\\((https?://[^)]+)\\)");
   private ClozeReplacement clozeReplacement;
   private String originalContent;
   private List<NoteTitle> noteTitles = new ArrayList<>();
@@ -33,7 +34,28 @@ public class ClozedString {
   }
 
   public String clozeDetails() {
-    return cloze(htmlContent());
+    List<String> urls = new ArrayList<>();
+    String protectedContent = protectMarkdownLinkUrls(originalContent, urls);
+    return unprotectMarkdownLinkUrls(cloze(protectedContent), urls);
+  }
+
+  private String protectMarkdownLinkUrls(String content, List<String> urls) {
+    Matcher matcher = MARKDOWN_LINK_URL.matcher(content);
+    StringBuffer sb = new StringBuffer();
+    while (matcher.find()) {
+      urls.add(matcher.group(1));
+      matcher.appendReplacement(
+          sb, Matcher.quoteReplacement("](__URL_" + (urls.size() - 1) + "__)"));
+    }
+    matcher.appendTail(sb);
+    return sb.toString();
+  }
+
+  private String unprotectMarkdownLinkUrls(String content, List<String> urls) {
+    for (int i = urls.size() - 1; i >= 0; i--) {
+      content = content.replace("__URL_" + i + "__", urls.get(i));
+    }
+    return content;
   }
 
   public String clozeTitle() {
@@ -55,11 +77,5 @@ public class ClozedString {
             (text, followsNonWhitespace) ->
                 clozeReplacement.maskPronunciationsAndTitles(
                     text, noteTitles, followsNonWhitespace));
-  }
-
-  private String htmlContent() {
-    Parser parser = Parser.builder().build();
-    HtmlRenderer renderer = HtmlRenderer.builder().build();
-    return renderer.render(parser.parse(originalContent));
   }
 }
