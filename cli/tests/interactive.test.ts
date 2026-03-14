@@ -276,6 +276,26 @@ describe('processInput', () => {
     restore()
   })
 
+  test('spelling: prompt with markdown stem shows ANSI codes, not raw markdown', async () => {
+    mockRecallNext.mockResolvedValue({
+      type: 'spelling',
+      recallPromptId: 100,
+      stem: '**bold** and *italic*',
+    })
+
+    await processInput('/recall')
+    const spellCall = logSpy.mock.calls.find(
+      (c) => typeof c[0] === 'string' && c[0].includes('Spell:')
+    )
+    expect(spellCall).toBeDefined()
+    const output = spellCall![0] as string
+    expect(output).toContain('\x1b[')
+    expect(output).not.toContain('**')
+    expect(output).not.toContain('*italic*')
+    expect(stripAnsi(output)).toContain('bold')
+    expect(stripAnsi(output)).toContain('italic')
+  })
+
   test('spelling: /recall shows Spell prompt, then spelling answer calls answerSpelling', async () => {
     mockRecallNext.mockResolvedValue({
       type: 'spelling',
@@ -487,6 +507,55 @@ describe('processInput', () => {
     expect(logSpy).not.toHaveBeenCalledWith(
       expect.stringMatching(/notes to recall today/)
     )
+  })
+
+  test('MCQ: prompt with markdown stem shows ANSI codes', async () => {
+    mockRecallNext.mockResolvedValue({
+      type: 'mcq',
+      recallPromptId: 100,
+      stem: 'What is **2+2**?',
+      choices: ['4', '3', '5'],
+    })
+
+    await processInput('/recall')
+    const stemCall = logSpy.mock.calls.find(
+      (c) =>
+        typeof c[0] === 'string' &&
+        (c[0] as string).includes('2+2') &&
+        !(c[0] as string).includes('  1.')
+    )
+    expect(stemCall).toBeDefined()
+    const output = stemCall![0] as string
+    expect(output).toContain('\x1b[')
+    expect(output).not.toContain('**')
+    expect(stripAnsi(output)).toContain('2+2')
+  })
+
+  test('MCQ: prompt with markdown choices shows ANSI codes', async () => {
+    mockRecallNext.mockResolvedValue({
+      type: 'mcq',
+      recallPromptId: 100,
+      stem: 'Pick one',
+      choices: ['*A*', '**B**', '`C`'],
+    })
+
+    await processInput('/recall')
+    const choiceCalls = logSpy.mock.calls.filter(
+      (c) =>
+        typeof c[0] === 'string' &&
+        ((c[0] as string).includes('  1.') ||
+          (c[0] as string).includes('  2.') ||
+          (c[0] as string).includes('  3.'))
+    )
+    expect(choiceCalls.length).toBeGreaterThanOrEqual(3)
+    const allChoices = choiceCalls.map((c) => c[0]).join(' ')
+    expect(allChoices).toContain('\x1b[')
+    expect(allChoices).not.toContain('*A*')
+    expect(allChoices).not.toContain('**B**')
+    expect(allChoices).not.toContain('`C`')
+    expect(stripAnsi(allChoices)).toContain('A')
+    expect(stripAnsi(allChoices)).toContain('B')
+    expect(stripAnsi(allChoices)).toContain('C')
   })
 
   test('/contest when in recall with MCQ contests and shows new question', async () => {

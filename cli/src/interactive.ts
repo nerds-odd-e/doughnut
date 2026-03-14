@@ -77,7 +77,7 @@ function showRecallPrompt(
   status: StatusWriter = logStatus
 ): void {
   if (result.type === 'spelling') {
-    status(`Spell: ${result.stem || '...'}`)
+    status(`Spell: ${renderMarkdownToTerminal(result.stem || '...')}`)
     pendingRecallAnswer = {
       recallPromptId: result.recallPromptId,
       type: 'spelling',
@@ -85,9 +85,9 @@ function showRecallPrompt(
     return
   }
   if (result.type === 'mcq') {
-    status(result.stem)
-    for (let i = 0; i < result.choices.length; i++) {
-      status(`  ${i + 1}. ${result.choices[i]}`)
+    status(renderMarkdownToTerminal(result.stem))
+    for (const line of formatMcqChoiceLines(result.choices)) {
+      status(line)
     }
     status(`Enter your choice (1-${result.choices.length}):`)
     pendingRecallAnswer = {
@@ -528,7 +528,7 @@ const COMMANDS_HINT = `${GREY}  / commands${RESET}`
 const RECALLING_INDICATOR = `${GREY}Recalling${RESET}`
 
 function formatMcqChoiceLines(choices: string[]): string[] {
-  return choices.map((c, i) => `  ${i + 1}. ${c}`)
+  return choices.map((c, i) => `  ${i + 1}. ${renderMarkdownToTerminal(c)}`)
 }
 
 function buildSuggestionLines(
