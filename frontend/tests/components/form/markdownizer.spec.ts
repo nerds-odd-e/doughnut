@@ -49,6 +49,11 @@ describe("Markdown and HTML Conversion Tests", () => {
         "你很<strong>好吃</strong>",
         "<p>你很<strong>好吃</strong></p>",
       ],
+      [
+        "inline HTML mark tag",
+        "abc <mark>highlighted</mark>",
+        "<p>abc <mark>highlighted</mark></p>",
+      ],
     ])("converts %s", (_, markdown, expected) => {
       expect(toHtml(markdown)).toBe(expected)
     })

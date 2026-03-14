@@ -35,7 +35,7 @@ export default function markdownToQuillHtml(
   // Safe inline formatting tags that marked may tokenize as separate opening/closing tags.
   // Excludes span which is often used with attributes and should remain escaped when orphan.
   const safeInlineTagPattern =
-    /^<\/(strong|em|b|i|u|s|code)\s*>$|^<(strong|em|b|i|u|s|code)\s*>$/i
+    /^<\/(strong|em|b|i|u|s|code|mark)\s*>$|^<(strong|em|b|i|u|s|code|mark)\s*>$/i
 
   // Override the html method to handle raw HTML
   renderer.html = function (html: string | Tokens.Generic): string {
