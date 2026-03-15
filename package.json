@@ -131,7 +131,8 @@
       "@tootallnate/once": ">=3.0.1",
       "dompurify": ">=3.3.2",
       "express-rate-limit": ">=8.2.2",
-      "flatted": ">=3.4.0"
+      "flatted": ">=3.4.0",
+      "yauzl": ">=3.2.1"
     },
     "onlyBuiltDependencies": [
       "@badeball/cypress-cucumber-preprocessor",
