@@ -20,7 +20,7 @@ overrides:
   qs: '>=6.14.2'
   hono: ^4.12.7
   '@hono/node-server': '>=1.19.10'
-  undici: '>=6.23.0'
+  undici: '>=7.24.0'
   diff: '>=8.0.3'
   lodash-es: '>=4.17.23'
   lodash: '>=4.17.23'
@@ -6104,8 +6104,8 @@ packages:
   undici-types@7.18.2:
     resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
 
-  undici@7.22.0:
-    resolution: {integrity: sha512-RqslV2Us5BrllB+JeiZnK4peryVTndy9Dnqq62S3yYRRTj0tFQCwEniUy2167skdGOy3vqRzEvl1Dm4sV2ReDg==}
+  undici@7.24.3:
+    resolution: {integrity: sha512-eJdUmK/Wrx2d+mnWWmwwLRyA7OQCkLap60sk3dOK4ViZR7DKwwptwuIvFBg2HaiP9ESaEdhtpSymQPvytpmkCA==}
     engines: {node: '>=20.18.1'}
 
   unicorn-magic@0.3.0:
@@ -6687,7 +6687,7 @@ snapshots:
   '@actions/http-client@3.0.2':
     dependencies:
       tunnel: 0.0.6
-      undici: 7.22.0
+      undici: 7.24.3
 
   '@actions/io@2.0.0': {}
 
@@ -7928,7 +7928,7 @@ snapshots:
       simple-websocket: 9.1.0
       styled-components: 6.3.9(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       ulid: 3.0.2
-      undici: 7.22.0
+      undici: 7.24.3
       yargs: 17.0.1
     transitivePeerDependencies:
       - '@opentelemetry/api'
@@ -13155,7 +13155,7 @@ snapshots:
 
   undici-types@7.18.2: {}
 
-  undici@7.22.0: {}
+  undici@7.24.3: {}
 
   unicorn-magic@0.3.0: {}
 
