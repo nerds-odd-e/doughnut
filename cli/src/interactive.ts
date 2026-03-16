@@ -62,6 +62,14 @@ function cycleIndex(current: number, delta: number, length: number): number {
 
 type RecallPromptResult = Exclude<RecallNextResult, { type: 'none' }>
 
+/** User-submitted input in the prompt (what they typed). */
+type ChatHistoryInputEntry = { type: 'input'; content: string }
+/** Command output lines (what was displayed in response). */
+type ChatHistoryOutputEntry = { type: 'output'; lines: readonly string[] }
+type ChatHistoryEntry = ChatHistoryInputEntry | ChatHistoryOutputEntry
+/** Ordered log of user inputs and command outputs for re-render on resize. */
+type ChatHistory = ChatHistoryEntry[]
+
 type McqPrompt = { recallPromptId: number; choices: string[]; shownAt: number }
 type SpellingPrompt = {
   recallPromptId: number
@@ -618,7 +626,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
   })
   readline.emitKeypressEvents(stdin, rl)
 
-  let _chatHistory: unknown[] = []
+  let _chatHistory: ChatHistory = []
   let buffer = ''
   let highlightIndex = 0
   let suggestionsDismissed = false
