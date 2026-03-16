@@ -27,12 +27,17 @@ const config = defineConfig({
       "@tests": fileURLToPath(new URL("./tests", import.meta.url)),
       // Browser Mode needs the bundler build of Vue for template compilation
       vue: "vue/dist/vue.esm-bundler.js",
+      // Resolve from frontend so Vitest browser client can find it (transitive of vitest-browser-vue)
+      "@vue/compiler-core": fileURLToPath(
+        new URL("./node_modules/@vue/compiler-core", import.meta.url)
+      ),
     },
   },
   optimizeDeps: {
     include: [
       "vue",
       "vue-router",
+      "@vue/compiler-core",
       "@testing-library/vue",
       "es-toolkit",
       "vue-content-loader",
