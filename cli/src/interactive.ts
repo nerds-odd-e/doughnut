@@ -1,4 +1,5 @@
-import * as readline from 'node:readline'
+import { runPiped } from './adapters/pipedAdapter.js'
+import { runTTY } from './adapters/ttyAdapter.js'
 import {
   addAccessToken,
   createAccessToken,
@@ -10,6 +11,13 @@ import {
   setDefaultTokenLabel,
 } from './accessToken.js'
 import { addGmailAccount, getLastEmailSubject } from './gmail.js'
+import {
+  filterCommandsByPrefix,
+  formatHelp,
+  getTabCompletion,
+  interactiveDocs,
+} from './help.js'
+import { formatHighlightedList } from './listDisplay.js'
 import { renderMarkdownToTerminal } from './markdown.js'
 import {
   answerQuiz,
@@ -20,56 +28,26 @@ import {
   recallStatus,
   type RecallNextResult,
 } from './recall.js'
-import {
-  filterCommandsByPrefix,
-  formatCommandSuggestionsWithHighlight,
-  formatHelp,
-  getTabCompletion,
-  interactiveDocs,
-} from './help.js'
-import { formatHighlightedList } from './listDisplay.js'
 import { formatVersionOutput } from './version.js'
-
-const GREY = '\x1b[90m'
-const GREY_BG = '\x1b[48;5;236m'
-const RESET = '\x1b[0m'
-const COMMAND_HIGHLIGHT = '\x1b[1;36m' // bold + cyan
-
-type StatusWriter = (msg: string) => void
-
-const logStatus: StatusWriter = (msg) => console.log(`${GREY}${msg}${RESET}`)
-const writeStatus: StatusWriter = (msg) =>
-  process.stdout.write(`${GREY}${msg}${RESET}\n`)
-
-function logError(err: unknown): void {
-  console.log(err instanceof Error ? err.message : String(err))
-}
-
-function writeError(err: unknown): void {
-  process.stdout.write(`${err instanceof Error ? err.message : String(err)}\n`)
-}
-
-function parseYesNo(input: string): boolean | null {
-  const a = input.trim().toLowerCase()
-  if (a === 'y' || a === 'yes') return true
-  if (a === 'n' || a === 'no') return false
-  return null
-}
-
-function cycleIndex(current: number, delta: number, length: number): number {
-  return (current + delta + length) % length
-}
+import {
+  buildBoxLines,
+  buildSuggestionLines,
+  formatMcqChoiceLines,
+  getTerminalWidth,
+  renderBox,
+  renderFullDisplay,
+  renderPastInput,
+  writeFullRedraw,
+  GREY,
+  CLEAR_SCREEN,
+  COMMANDS_HINT,
+  RECALLING_INDICATOR,
+  PLACEHOLDER,
+  PROMPT,
+} from './renderer.js'
+import type { OutputAdapter } from './types.js'
 
 type RecallPromptResult = Exclude<RecallNextResult, { type: 'none' }>
-
-/** User-submitted input in the prompt (what they typed). */
-type ChatHistoryInputEntry = { type: 'input'; content: string }
-/** Command output lines (what was displayed in response). */
-type ChatHistoryOutputEntry = { type: 'output'; lines: readonly string[] }
-type ChatHistoryEntry = ChatHistoryInputEntry | ChatHistoryOutputEntry
-/** Ordered log of user inputs and command outputs for re-render on resize. */
-type ChatHistory = ChatHistoryEntry[]
-
 type McqPrompt = { recallPromptId: number; choices: string[]; shownAt: number }
 type SpellingPrompt = {
   recallPromptId: number
@@ -78,15 +56,79 @@ type SpellingPrompt = {
 }
 type JustReviewPrompt = { memoryTrackerId: number }
 
+type PendingRecallAnswer =
+  | { memoryTrackerId: number }
+  | { recallPromptId: number; choices: string[]; shownAt: number }
+  | { recallPromptId: number; type: 'spelling'; shownAt: number }
+  | null
+
+let pendingRecallAnswer: PendingRecallAnswer = null
+let recallSessionMode = false
+let sessionRecallCount = 0
+let recallSessionDueDays = 0
+let pendingRecallLoadMore = false
+let pendingRecallStopConfirmation = false
+
+export function resetRecallStateForTesting(): void {
+  pendingRecallAnswer = null
+  recallSessionMode = false
+  sessionRecallCount = 0
+  recallSessionDueDays = 0
+  pendingRecallLoadMore = false
+  pendingRecallStopConfirmation = false
+}
+
+function getPendingRecallAnswer(): PendingRecallAnswer {
+  return pendingRecallAnswer
+}
+
+function isPendingRecallStopConfirmation(): boolean {
+  return pendingRecallStopConfirmation
+}
+
+function setPendingRecallStopConfirmation(value: boolean): void {
+  pendingRecallStopConfirmation = value
+}
+
+export function isInRecallSubstate(): boolean {
+  return (
+    recallSessionMode || pendingRecallAnswer !== null || pendingRecallLoadMore
+  )
+}
+
+function exitRecallMode(): void {
+  recallSessionMode = false
+  pendingRecallAnswer = null
+  sessionRecallCount = 0
+  recallSessionDueDays = 0
+  pendingRecallLoadMore = false
+  pendingRecallStopConfirmation = false
+}
+
 function formatRecallSessionSummary(count: number): string {
   if (count === 0) return '0 notes to recall today'
   if (count === 1) return 'Recalled 1 note'
   return `Recalled ${count} notes`
 }
 
+function isMcqPrompt(p: unknown): p is McqPrompt {
+  return p !== null && typeof p === 'object' && 'choices' in p
+}
+
+function isSpellingPrompt(p: PendingRecallAnswer): p is SpellingPrompt {
+  return p !== null && 'type' in p && p.type === 'spelling'
+}
+
+function getContestablePromptId(): number | null {
+  return isMcqPrompt(pendingRecallAnswer) ||
+    isSpellingPrompt(pendingRecallAnswer)
+    ? pendingRecallAnswer.recallPromptId
+    : null
+}
+
 function showRecallPrompt(
   result: RecallPromptResult,
-  status: StatusWriter = logStatus
+  status: (msg: string) => void
 ): void {
   if (result.type === 'spelling') {
     status(`Spell: ${renderMarkdownToTerminal(result.stem || '...')}`)
@@ -118,94 +160,17 @@ function showRecallPrompt(
   pendingRecallAnswer = { memoryTrackerId: result.memoryTrackerId }
 }
 
-function isMcqPrompt(p: typeof pendingRecallAnswer): p is McqPrompt {
-  return p !== null && 'choices' in p
-}
-
-function isSpellingPrompt(p: typeof pendingRecallAnswer): p is SpellingPrompt {
-  return p !== null && 'type' in p && p.type === 'spelling'
-}
-
-function getContestablePromptId(): number | null {
-  return isMcqPrompt(pendingRecallAnswer) ||
-    isSpellingPrompt(pendingRecallAnswer)
-    ? pendingRecallAnswer.recallPromptId
-    : null
-}
-
-const TOKEN_LIST_COMMANDS: Record<
-  string,
-  'set-default' | 'remove' | 'remove-completely'
-> = {
-  '/list-access-token': 'set-default',
-  '/remove-access-token': 'remove',
-  '/remove-access-token-completely': 'remove-completely',
-}
-
-const PLACEHOLDER = '`exit` to quit.'
-const PROMPT = '→ '
-
-let pendingRecallAnswer:
-  | { memoryTrackerId: number }
-  | { recallPromptId: number; choices: string[]; shownAt: number }
-  | { recallPromptId: number; type: 'spelling'; shownAt: number }
-  | null = null
-
-let recallSessionMode = false
-let sessionRecallCount = 0
-let recallSessionDueDays = 0
-let pendingRecallLoadMore = false
-let pendingRecallStopConfirmation = false
-
-export function resetRecallStateForTesting(): void {
-  pendingRecallAnswer = null
-  recallSessionMode = false
-  sessionRecallCount = 0
-  recallSessionDueDays = 0
-  pendingRecallLoadMore = false
-  pendingRecallStopConfirmation = false
-}
-
-export function isInRecallSubstate(): boolean {
-  return (
-    recallSessionMode || pendingRecallAnswer !== null || pendingRecallLoadMore
-  )
-}
-
-function exitRecallMode(): void {
-  recallSessionMode = false
-  pendingRecallAnswer = null
-  sessionRecallCount = 0
-  recallSessionDueDays = 0
-  pendingRecallLoadMore = false
-  pendingRecallStopConfirmation = false
-}
-
 function endRecallSession(): void {
   recallSessionMode = false
   sessionRecallCount = 0
   recallSessionDueDays = 0
 }
 
-async function continueRecallSession(fromLoadMore = false): Promise<void> {
-  if (!fromLoadMore) sessionRecallCount++
-  try {
-    const result = await recallNext(recallSessionDueDays)
-    if (result.type === 'none') {
-      if (recallSessionDueDays === 0) {
-        pendingRecallLoadMore = true
-        logStatus('Load more from next 3 days? (y/n)')
-        return
-      }
-      console.log(formatRecallSessionSummary(sessionRecallCount))
-      endRecallSession()
-      return
-    }
-    showRecallPrompt(result)
-  } catch (err) {
-    endRecallSession()
-    logError(err)
-  }
+function parseYesNo(input: string): boolean | null {
+  const a = input.trim().toLowerCase()
+  if (a === 'y' || a === 'yes') return true
+  if (a === 'n' || a === 'no') return false
+  return null
 }
 
 function parseCommandWithRequiredParam(
@@ -273,27 +238,66 @@ async function handleParamCommand(
       const msg = await run(param)
       if (msg) output.log(msg)
     } catch (err) {
-      logError(err)
+      output.logError(err)
     }
     return true
   }
   return false
 }
 
-type OutputAdapter = {
-  log: (msg: string) => void
-  logError: (err: unknown) => void
+function getStatusWriter(output: OutputAdapter): (msg: string) => void {
+  return typeof output.status === 'function' ? output.status : output.log
+}
+
+async function continueRecallSession(
+  fromLoadMore: boolean,
+  output: OutputAdapter,
+  status: (msg: string) => void
+): Promise<void> {
+  if (!fromLoadMore) sessionRecallCount++
+  try {
+    const result = await recallNext(recallSessionDueDays)
+    if (result.type === 'none') {
+      if (recallSessionDueDays === 0) {
+        pendingRecallLoadMore = true
+        status('Load more from next 3 days? (y/n)')
+        return
+      }
+      output.log(formatRecallSessionSummary(sessionRecallCount))
+      endRecallSession()
+      return
+    }
+    showRecallPrompt(result, status)
+  } catch (err) {
+    endRecallSession()
+    output.logError(err)
+  }
+}
+
+const TOKEN_LIST_COMMANDS: Record<
+  string,
+  'set-default' | 'remove' | 'remove-completely'
+> = {
+  '/list-access-token': 'set-default',
+  '/remove-access-token': 'remove',
+  '/remove-access-token-completely': 'remove-completely',
 }
 
 const defaultOutput: OutputAdapter = {
   log: (msg) => console.log(msg),
-  logError,
+  logError: (err) =>
+    console.log(err instanceof Error ? err.message : String(err)),
+  status: (msg) => console.log(msg),
+  clearAndRedraw: () => {
+    writeFullRedraw([], '', getTerminalWidth(), buildSuggestionLines('', 0), [])
+  },
 }
 
 export async function processInput(
   input: string,
   output: OutputAdapter = defaultOutput
 ): Promise<boolean> {
+  const status = getStatusWriter(output)
   const trimmed = input.trim()
   if (trimmed === 'exit' || trimmed === '/exit') {
     return true
@@ -306,7 +310,7 @@ export async function processInput(
   const contestablePromptId = getContestablePromptId()
   if (isInRecallSubstate() && trimmed === '/contest') {
     if (contestablePromptId == null) {
-      logStatus('Type /stop to exit recall')
+      status('Type /stop to exit recall')
       return false
     }
     try {
@@ -315,14 +319,14 @@ export async function processInput(
         output.log(outcome.message)
         return false
       }
-      showRecallPrompt(outcome.result as RecallPromptResult)
+      showRecallPrompt(outcome.result as RecallPromptResult, status)
     } catch (err) {
       output.logError(err)
     }
     return false
   }
   if (isInRecallSubstate() && trimmed.startsWith('/')) {
-    logStatus(
+    status(
       contestablePromptId
         ? 'Type /stop to exit, /contest to regenerate'
         : 'Type /stop to exit recall'
@@ -334,7 +338,7 @@ export async function processInput(
     return false
   }
   if (trimmed === '/clear') {
-    writeFullRedraw([], '', getTerminalWidth(), buildSuggestionLines('', 0), [])
+    output.clearAndRedraw?.()
     return false
   }
   if (await handleParamCommand(trimmed, output)) {
@@ -373,13 +377,13 @@ export async function processInput(
     if (answer === true) {
       pendingRecallLoadMore = false
       recallSessionDueDays = 3
-      await continueRecallSession(true)
+      await continueRecallSession(true, output, status)
     } else if (answer === false) {
       pendingRecallLoadMore = false
       output.log(formatRecallSessionSummary(sessionRecallCount))
       endRecallSession()
     } else {
-      logStatus('Please answer y or n')
+      status('Please answer y or n')
       return false
     }
     return false
@@ -403,15 +407,16 @@ export async function processInput(
           output.logError(err)
         }
         pendingRecallAnswer = null
-        if (recallSessionMode) await continueRecallSession()
+        if (recallSessionMode)
+          await continueRecallSession(false, output, status)
       } else {
-        logStatus(`Enter a number from 1 to ${choices.length}`)
+        status(`Enter a number from 1 to ${choices.length}`)
         return false
       }
     } else if (isSpellingPrompt(pendingRecallAnswer)) {
       const { recallPromptId } = pendingRecallAnswer
       if (!trimmed) {
-        logStatus('Please type your spelling')
+        status('Please type your spelling')
         return false
       }
       try {
@@ -427,7 +432,7 @@ export async function processInput(
         output.logError(err)
       }
       pendingRecallAnswer = null
-      if (recallSessionMode) await continueRecallSession()
+      if (recallSessionMode) await continueRecallSession(false, output, status)
     } else {
       const { memoryTrackerId } = pendingRecallAnswer as JustReviewPrompt
       const answer = parseYesNo(trimmed)
@@ -446,11 +451,11 @@ export async function processInput(
           output.logError(err)
         }
       } else {
-        logStatus('Please answer y or n')
+        status('Please answer y or n')
         return false
       }
       pendingRecallAnswer = null
-      if (recallSessionMode) await continueRecallSession()
+      if (recallSessionMode) await continueRecallSession(false, output, status)
     }
     return false
   }
@@ -471,9 +476,9 @@ export async function processInput(
       const result = await recallNext(0)
       if (result.type === 'none') {
         pendingRecallLoadMore = true
-        logStatus('Load more from next 3 days? (y/n)')
+        status('Load more from next 3 days? (y/n)')
       } else {
-        showRecallPrompt(result as RecallPromptResult)
+        showRecallPrompt(result as RecallPromptResult, status)
       }
     } catch (err) {
       endRecallSession()
@@ -487,674 +492,69 @@ export async function processInput(
   return false
 }
 
-// biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI escapes
-const ANSI_PATTERN = /\x1b\[[0-9;]*m/g
+export {
+  visibleLength,
+  renderBox,
+  renderPastInput,
+  buildBoxLines,
+  highlightRecognizedCommand,
+} from './renderer.js'
 
-export function visibleLength(str: string): number {
-  return str.replace(ANSI_PATTERN, '').length
-}
-
-function padEndVisible(str: string, targetLen: number): string {
-  const pad = targetLen - visibleLength(str)
-  return pad > 0 ? str + ' '.repeat(pad) : str
-}
-
-export function renderBox(lines: string[], width: number): string {
-  const innerWidth = width - 4
-  const top = `┌${'─'.repeat(width - 2)}┐`
-  const bottom = `└${'─'.repeat(width - 2)}┘`
-  const rows = lines.map((line) => `│ ${padEndVisible(line, innerWidth)} │`)
-  return [top, ...rows, bottom].join('\n')
-}
-
-export function renderPastInput(input: string, width: number): string {
-  const innerWidth = width - 2
-  const lines = input.split('\n')
-  const emptyRow = `${GREY_BG}${' '.repeat(innerWidth)}${RESET}`
-  const contentRows = lines.map(
-    (line) => `${GREY_BG} ${padEndVisible(line, innerWidth - 1)}${RESET}`
-  )
-  return [emptyRow, ...contentRows, emptyRow, ''].join('\n')
-}
-
-export function highlightRecognizedCommand(line: string): string {
-  if (!line.startsWith('/')) return line
-
-  const usages = interactiveDocs.map((d) => d.usage)
-  let highlightLen = 0
-
-  for (const cmd of usages) {
-    if (line.startsWith(cmd)) {
-      highlightLen = Math.max(highlightLen, cmd.length)
-    }
-  }
-
-  if (highlightLen === 0) return line
-
-  const prefix = line.slice(0, highlightLen)
-  const rest = line.slice(highlightLen)
-  return `${COMMAND_HIGHLIGHT}${prefix}${RESET}${rest}`
-}
-
-export function buildBoxLines(buffer: string, width: number): string[] {
-  const bufferLines = buffer.split('\n')
-  return bufferLines.map((line, i) => {
-    const prefix = i === 0 ? PROMPT : '  '
-    if (i === 0 && buffer === '') {
-      return `${prefix}${GREY}${PLACEHOLDER}${RESET}`
-    }
-    const highlighted = highlightRecognizedCommand(line)
-    return prefix + highlighted
-  })
-}
-
-function getTerminalWidth(): number {
-  return process.stdout.columns || 80
-}
-
-const CLEAR_SCREEN = '\x1b[H\x1b[2J'
-const COMMANDS_HINT = `${GREY}  / commands${RESET}`
-const RECALLING_INDICATOR = `${GREY}Recalling${RESET}`
-
-function renderFullDisplay(
-  history: ChatHistory,
-  buffer: string,
-  width: number,
-  suggestionLines: string[],
-  recallingIndicator: string[]
-): string[] {
-  const lines: string[] = [formatVersionOutput(), '']
-  for (const entry of history) {
-    if (entry.type === 'input') {
-      lines.push(...renderPastInput(entry.content, width).split('\n'))
-    } else {
-      lines.push(...entry.lines)
-    }
-  }
-  const boxLines = renderBox(buildBoxLines(buffer, width), width).split('\n')
-  lines.push(...boxLines)
-  lines.push(...recallingIndicator)
-  lines.push(...suggestionLines)
-  return lines
-}
-
-function writeFullRedraw(
-  history: ChatHistory,
-  buffer: string,
-  width: number,
-  suggestionLines: string[],
-  recallingIndicator: string[]
-): void {
-  process.stdout.write(CLEAR_SCREEN)
-  const lines = renderFullDisplay(
-    history,
-    buffer,
-    width,
-    suggestionLines,
-    recallingIndicator
-  )
-  for (const line of lines) {
-    process.stdout.write(`${line}\n`)
+function buildTTYDeps() {
+  return {
+    processInput,
+    getPendingRecallAnswer,
+    isPendingRecallStopConfirmation,
+    setPendingRecallStopConfirmation,
+    isInRecallSubstate,
+    exitRecallMode,
+    isMcqPrompt,
+    formatTokenLines,
+    getDefaultTokenLabel,
+    listAccessTokens,
+    removeAccessToken,
+    removeAccessTokenCompletely,
+    setDefaultTokenLabel,
+    formatVersionOutput,
+    buildBoxLines,
+    buildSuggestionLines,
+    formatMcqChoiceLines,
+    getTerminalWidth,
+    renderBox,
+    renderFullDisplay,
+    renderPastInput,
+    GREY,
+    CLEAR_SCREEN,
+    COMMANDS_HINT,
+    RECALLING_INDICATOR,
+    PLACEHOLDER,
+    PROMPT,
+    filterCommandsByPrefix,
+    getTabCompletion,
+    interactiveDocs,
+    formatHighlightedList,
+    TOKEN_LIST_COMMANDS,
   }
 }
 
-function formatMcqChoiceLines(choices: string[]): string[] {
-  return choices.map((c, i) => `  ${i + 1}. ${renderMarkdownToTerminal(c)}`)
-}
-
-function buildSuggestionLines(
-  buffer: string,
-  highlightIndex: number
-): string[] {
-  const lastLine = getLastLine(buffer)
-  if (lastLine.startsWith('/') && !lastLine.endsWith(' ')) {
-    const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
-    return formatCommandSuggestionsWithHighlight(filtered, 8, highlightIndex)
+function buildPipedDeps() {
+  return {
+    processInput,
+    getTerminalWidth,
+    buildBoxLines,
+    buildSuggestionLines,
+    renderBox,
+    renderPastInput,
+    formatVersionOutput,
   }
-  return [COMMANDS_HINT]
-}
-
-function clearTTYDisplay(
-  linesAboveCursor: number,
-  prevTotalLines: number
-): void {
-  if (linesAboveCursor > 0) {
-    process.stdout.write(`\x1b[${linesAboveCursor}A`)
-  }
-  process.stdout.write('\r')
-  for (let i = 0; i < prevTotalLines; i++) {
-    process.stdout.write('\x1b[2K\n')
-  }
-  if (prevTotalLines > 1) {
-    process.stdout.write(`\x1b[${prevTotalLines - 1}A`)
-  }
-}
-
-function getLastLine(buffer: string): string {
-  const lines = buffer.split('\n')
-  return lines[lines.length - 1] ?? ''
-}
-
-function isCommandPrefixWithSuggestions(buffer: string): boolean {
-  const lastLine = getLastLine(buffer)
-  if (!lastLine.startsWith('/') || lastLine.endsWith(' ')) return false
-  const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
-  return filtered.length > 0
-}
-
-async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
-  console.log(formatVersionOutput())
-  console.log()
-
-  stdin.setRawMode?.(true)
-  stdin.resume?.()
-  stdin.setEncoding?.('utf8')
-  const rl = readline.createInterface({
-    input: stdin,
-    output: process.stdout,
-    terminal: false,
-    escapeCodeTimeout: 50,
-  })
-  readline.emitKeypressEvents(stdin, rl)
-
-  let chatHistory: ChatHistory = []
-  let buffer = ''
-  let highlightIndex = 0
-  let suggestionsDismissed = false
-  let linesAboveCursor = 0
-  let prevTotalLines = 0
-  let tokenListItems: { label: string; token: string }[] | null = null
-  let tokenListCommand = ''
-  let tokenHighlightIndex = 0
-  let tokenListAction: 'set-default' | 'remove' | 'remove-completely' =
-    'set-default'
-  let mcqChoiceHighlightIndex = 0
-
-  const collectedOutputLines: string[] = []
-  const ttyOutput: OutputAdapter = {
-    log: (msg) => {
-      process.stdout.write(`${msg}\n`)
-      collectedOutputLines.push(...msg.split('\n'))
-    },
-    logError: (err) => {
-      const msg = err instanceof Error ? err.message : String(err)
-      writeError(err)
-      collectedOutputLines.push(msg)
-    },
-  }
-
-  function getDisplayContent() {
-    const width = getTerminalWidth()
-    const contentLines = buildBoxLines(buffer, width)
-    const boxLines = renderBox(contentLines, width).split('\n')
-    const suggestionLines = tokenListItems
-      ? formatHighlightedList(
-          formatTokenLines(tokenListItems, getDefaultTokenLabel()),
-          8,
-          tokenHighlightIndex
-        )
-      : pendingRecallStopConfirmation
-        ? ['Stop recall? (y/n)']
-        : isMcqPrompt(pendingRecallAnswer)
-          ? formatHighlightedList(
-              formatMcqChoiceLines(pendingRecallAnswer.choices),
-              8,
-              mcqChoiceHighlightIndex
-            )
-          : (() => {
-              if (
-                suggestionsDismissed &&
-                isCommandPrefixWithSuggestions(buffer)
-              )
-                return [COMMANDS_HINT]
-              return buildSuggestionLines(buffer, highlightIndex)
-            })()
-    const recallingIndicator = isInRecallSubstate() ? [RECALLING_INDICATOR] : []
-    return { contentLines, boxLines, suggestionLines, recallingIndicator }
-  }
-
-  function doFullRedraw() {
-    const { contentLines, boxLines, suggestionLines, recallingIndicator } =
-      getDisplayContent()
-    const newTotalLines =
-      boxLines.length + recallingIndicator.length + suggestionLines.length
-
-    process.stdout.write(CLEAR_SCREEN)
-    const fullLines = renderFullDisplay(
-      chatHistory,
-      buffer,
-      getTerminalWidth(),
-      suggestionLines,
-      recallingIndicator
-    )
-    for (const line of fullLines) {
-      process.stdout.write(`${line}\n`)
-    }
-
-    linesAboveCursor = contentLines.length
-    prevTotalLines = newTotalLines
-
-    const cursorRow = contentLines.length
-    process.stdout.write(`\x1b[${newTotalLines - cursorRow}A`)
-
-    const bufferLines = buffer.split('\n')
-    const lastLine = bufferLines[bufferLines.length - 1]
-    const lastPrefix = bufferLines.length === 1 ? PROMPT : '  '
-    const col = 3 + lastPrefix.length + lastLine.length
-    process.stdout.write(`\x1b[${col}G`)
-  }
-
-  function drawBox() {
-    const { contentLines, boxLines, suggestionLines, recallingIndicator } =
-      getDisplayContent()
-    const newTotalLines =
-      boxLines.length + recallingIndicator.length + suggestionLines.length
-
-    if (linesAboveCursor > 0) {
-      process.stdout.write(`\x1b[${linesAboveCursor}A`)
-    }
-    process.stdout.write('\r')
-
-    for (const line of boxLines) {
-      process.stdout.write(`\x1b[2K${line}\n`)
-    }
-    for (const line of recallingIndicator) {
-      process.stdout.write(`\x1b[2K${line}\n`)
-    }
-    for (const line of suggestionLines) {
-      process.stdout.write(`\x1b[2K${line}\n`)
-    }
-    const extra = prevTotalLines - newTotalLines
-    for (let i = 0; i < extra; i++) {
-      process.stdout.write('\x1b[2K\n')
-    }
-
-    const totalWritten = Math.max(newTotalLines, prevTotalLines)
-    const cursorRow = contentLines.length
-    process.stdout.write(`\x1b[${totalWritten - cursorRow}A`)
-
-    const bufferLines = buffer.split('\n')
-    const lastLine = bufferLines[bufferLines.length - 1]
-    const lastPrefix = bufferLines.length === 1 ? PROMPT : '  '
-    const col = 3 + lastPrefix.length + lastLine.length
-    process.stdout.write(`\x1b[${col}G`)
-
-    linesAboveCursor = contentLines.length
-    prevTotalLines = newTotalLines
-  }
-
-  drawBox()
-
-  process.stdout.on('resize', doFullRedraw)
-  const removeResizeListener = () => process.stdout.off('resize', doFullRedraw)
-  const doExit = () => {
-    removeResizeListener()
-    rl.close()
-    process.exit(0)
-  }
-
-  stdin.on(
-    'keypress',
-    async (
-      str: string,
-      key: { name: string; shift?: boolean; ctrl?: boolean; meta?: boolean }
-    ) => {
-      if (key.ctrl && key.name === 'c') {
-        process.stdout.write(`\x1b[${1}B\r\n`)
-        doExit()
-      }
-      if (pendingRecallStopConfirmation) {
-        if (key.name === 'escape') {
-          pendingRecallStopConfirmation = false
-          buffer = ''
-          drawBox()
-        } else if (key.name === 'return' && !key.shift) {
-          const trimmed = buffer.trim()
-          const answer = parseYesNo(trimmed)
-          buffer = ''
-          pendingRecallStopConfirmation = false
-          if (answer === true) {
-            exitRecallMode()
-            mcqChoiceHighlightIndex = 0
-            linesAboveCursor = 0
-            prevTotalLines = 0
-            process.stdout.write('Stopped recall\n')
-            chatHistory.push({ type: 'input', content: trimmed })
-            chatHistory.push({ type: 'output', lines: ['Stopped recall'] })
-          } else if (answer === false) {
-            // Stay in MCQ; drawBox will show choices again
-          } else if (trimmed) {
-            writeStatus('Please answer y or n')
-          }
-          drawBox()
-        } else if (str && !key.ctrl && !key.meta) {
-          buffer += str
-          drawBox()
-        } else if (key.name === 'backspace') {
-          if (buffer.length > 0) {
-            buffer = buffer.slice(0, -1)
-            drawBox()
-          }
-        } else {
-          drawBox()
-        }
-        return
-      }
-      if (isMcqPrompt(pendingRecallAnswer)) {
-        const { choices } = pendingRecallAnswer
-        if (key.name === 'escape') {
-          pendingRecallStopConfirmation = true
-          buffer = ''
-          writeStatus('Stop recall? (y/n)')
-          drawBox()
-        } else if (key.name === 'up' || key.name === 'down') {
-          const delta = key.name === 'up' ? -1 : 1
-          mcqChoiceHighlightIndex = cycleIndex(
-            mcqChoiceHighlightIndex,
-            delta,
-            choices.length
-          )
-          drawBox()
-        } else if (key.name === 'return' && !key.shift) {
-          const trimmedBuffer = buffer.trim()
-          const effectiveInput =
-            trimmedBuffer === '/stop'
-              ? '/stop'
-              : trimmedBuffer === '/contest'
-                ? '/contest'
-                : (() => {
-                    const choiceNum = Number.parseInt(trimmedBuffer, 10)
-                    const validTyped =
-                      choiceNum >= 1 && choiceNum <= choices.length
-                    return validTyped
-                      ? String(choiceNum)
-                      : String(mcqChoiceHighlightIndex + 1)
-                  })()
-          clearTTYDisplay(linesAboveCursor, prevTotalLines)
-          const inputForHistory = buffer || effectiveInput
-          buffer = ''
-          mcqChoiceHighlightIndex = 0
-          linesAboveCursor = 0
-          prevTotalLines = 0
-          collectedOutputLines.length = 0
-          chatHistory.push({ type: 'input', content: inputForHistory })
-          if (await processInput(effectiveInput, ttyOutput)) {
-            doExit()
-            return
-          }
-          chatHistory.push({ type: 'output', lines: [...collectedOutputLines] })
-          drawBox()
-        } else if (str && !key.ctrl && !key.meta) {
-          buffer += str
-          drawBox()
-        } else if (key.name === 'backspace') {
-          if (buffer.length > 0) {
-            buffer = buffer.slice(0, -1)
-            drawBox()
-          }
-        } else {
-          drawBox()
-        }
-        return
-      }
-      if (tokenListItems) {
-        if (key.name === 'up' || key.name === 'down') {
-          const delta = key.name === 'up' ? -1 : 1
-          tokenHighlightIndex = cycleIndex(
-            tokenHighlightIndex,
-            delta,
-            tokenListItems.length
-          )
-          drawBox()
-        } else if (key.name === 'escape') {
-          tokenListItems = null
-          tokenListCommand = ''
-          tokenHighlightIndex = 0
-          tokenListAction = 'set-default'
-          drawBox()
-        } else if (key.name === 'return' && !key.shift) {
-          const selectedLabel = tokenListItems[tokenHighlightIndex]!.label
-          clearTTYDisplay(linesAboveCursor, prevTotalLines)
-          const action = tokenListAction
-          tokenListItems = null
-          tokenHighlightIndex = 0
-          tokenListAction = 'set-default'
-          linesAboveCursor = 0
-          prevTotalLines = 0
-          let outputMsg = ''
-          if (action === 'set-default') {
-            setDefaultTokenLabel(selectedLabel)
-            outputMsg = `Default token set to: ${selectedLabel}`
-            process.stdout.write(`${outputMsg}\n`)
-          } else if (action === 'remove') {
-            removeAccessToken(selectedLabel)
-            outputMsg = `Token "${selectedLabel}" removed.`
-            process.stdout.write(`${outputMsg}\n`)
-          } else {
-            try {
-              await removeAccessTokenCompletely(selectedLabel)
-              outputMsg = `Token "${selectedLabel}" removed locally and from server.`
-              process.stdout.write(`${outputMsg}\n`)
-            } catch (err) {
-              writeError(err)
-              outputMsg = err instanceof Error ? err.message : String(err)
-            }
-          }
-          chatHistory.push({ type: 'input', content: tokenListCommand })
-          chatHistory.push({ type: 'output', lines: [outputMsg] })
-          drawBox()
-        } else {
-          tokenListItems = null
-          tokenHighlightIndex = 0
-          drawBox()
-        }
-        return
-      }
-      if (key.name === 'escape') {
-        if (isInRecallSubstate()) {
-          exitRecallMode()
-          buffer = ''
-          mcqChoiceHighlightIndex = 0
-          linesAboveCursor = 0
-          prevTotalLines = 0
-          drawBox()
-          return
-        }
-        if (isCommandPrefixWithSuggestions(buffer)) {
-          highlightIndex = 0
-          const lastLine = getLastLine(buffer)
-          if (lastLine === '/') {
-            const bufferLines = buffer.split('\n')
-            buffer =
-              bufferLines.length === 1
-                ? ''
-                : bufferLines.slice(0, -1).join('\n')
-          } else {
-            suggestionsDismissed = true
-          }
-          drawBox()
-        }
-        return
-      }
-      if (key.name === 'return') {
-        if (key.shift) {
-          buffer += '\n'
-          drawBox()
-        } else {
-          const lastLine = getLastLine(buffer)
-          const trimmedInput = buffer.trim()
-
-          if (trimmedInput === '/clear') {
-            chatHistory = []
-            buffer = ''
-            tokenListItems = null
-            tokenHighlightIndex = 0
-            if (isInRecallSubstate()) exitRecallMode()
-            pendingRecallStopConfirmation = false
-            mcqChoiceHighlightIndex = 0
-            highlightIndex = 0
-            suggestionsDismissed = false
-            doFullRedraw()
-            return
-          }
-
-          const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
-          const suggestionsVisible =
-            lastLine.startsWith('/') &&
-            !lastLine.endsWith(' ') &&
-            filtered.length > 0
-
-          if (suggestionsVisible) {
-            const selectedCommand = `${filtered[highlightIndex].usage} `
-            const bufferLines = buffer.split('\n')
-            buffer =
-              bufferLines.slice(0, -1).concat(selectedCommand).join('\n') || ''
-            highlightIndex = 0
-            drawBox()
-            return
-          }
-
-          const width = getTerminalWidth()
-          const input = buffer
-          buffer = ''
-
-          clearTTYDisplay(linesAboveCursor, prevTotalLines)
-
-          if (input.trim()) {
-            process.stdout.write(renderPastInput(input, width))
-            process.stdout.write('\n')
-          }
-
-          const tokenSelectAction = TOKEN_LIST_COMMANDS[trimmedInput] ?? null
-          if (tokenSelectAction) {
-            const tokens = listAccessTokens()
-            if (tokens.length === 0) {
-              process.stdout.write('No access tokens stored.\n')
-              chatHistory.push({ type: 'input', content: trimmedInput })
-              chatHistory.push({
-                type: 'output',
-                lines: ['No access tokens stored.'],
-              })
-            } else {
-              tokenListItems = tokens
-              tokenListCommand = trimmedInput
-              tokenListAction = tokenSelectAction
-              const dl = getDefaultTokenLabel()
-              tokenHighlightIndex = Math.max(
-                0,
-                tokens.findIndex((t) => t.label === dl)
-              )
-            }
-            linesAboveCursor = 0
-            prevTotalLines = 0
-            drawBox()
-            return
-          }
-
-          collectedOutputLines.length = 0
-          chatHistory.push({ type: 'input', content: input })
-          if (await processInput(input, ttyOutput)) {
-            doExit()
-          }
-          chatHistory.push({ type: 'output', lines: [...collectedOutputLines] })
-          linesAboveCursor = 0
-          prevTotalLines = 0
-          if (isMcqPrompt(pendingRecallAnswer)) {
-            mcqChoiceHighlightIndex = 0
-          }
-          drawBox()
-        }
-      } else if (key.name === 'backspace') {
-        if (buffer.length > 0) {
-          buffer = buffer.slice(0, -1)
-          highlightIndex = 0
-          suggestionsDismissed = false
-          drawBox()
-        }
-      } else if (key.name === 'up' || key.name === 'down') {
-        if (isCommandPrefixWithSuggestions(buffer)) {
-          const filtered = filterCommandsByPrefix(
-            interactiveDocs,
-            getLastLine(buffer)
-          )
-          const delta = key.name === 'up' ? -1 : 1
-          highlightIndex = cycleIndex(highlightIndex, delta, filtered.length)
-          drawBox()
-        }
-      } else if (key.name === 'tab') {
-        const lastLine = getLastLine(buffer)
-        if (lastLine.startsWith('/') && !lastLine.endsWith(' ')) {
-          const { completed, count } = getTabCompletion(
-            lastLine,
-            interactiveDocs
-          )
-          if (count > 0 && completed !== lastLine) {
-            const bufferLines = buffer.split('\n')
-            buffer =
-              bufferLines.slice(0, -1).concat(completed).join('\n') || completed
-            highlightIndex = 0
-            suggestionsDismissed = false
-            drawBox()
-          }
-        }
-      } else if (str && !key.ctrl && !key.meta) {
-        buffer += str
-        highlightIndex = 0
-        suggestionsDismissed = false
-        drawBox()
-      }
-    }
-  )
-}
-
-async function runInteractivePiped(
-  stdin: NodeJS.ReadableStream
-): Promise<void> {
-  const width = getTerminalWidth()
-  console.log(formatVersionOutput())
-  console.log()
-  const hintLines = buildSuggestionLines('', 0)
-  console.log(renderBox(buildBoxLines('', width), width))
-  for (const line of hintLines) {
-    console.log(line)
-  }
-  console.log()
-
-  const rl = readline.createInterface({
-    input: stdin,
-    output: process.stdout,
-    terminal: false,
-  })
-
-  let processing = false
-  const lineQueue: string[] = []
-  async function processNextLine() {
-    if (processing || lineQueue.length === 0) return
-    processing = true
-    const line = lineQueue.shift()!
-    if (line.trim()) {
-      console.log(renderPastInput(line, getTerminalWidth()))
-    }
-    if (await processInput(line)) {
-      rl.close()
-      process.exit(0)
-    }
-    processing = false
-    if (lineQueue.length > 0) processNextLine()
-  }
-
-  rl.on('line', (line) => {
-    lineQueue.push(line)
-    processNextLine()
-  })
 }
 
 export async function runInteractive(
   stdin: NodeJS.ReadableStream = process.stdin
 ): Promise<void> {
   if (stdin.isTTY) {
-    await runInteractiveTTY(stdin)
+    await runTTY(stdin, buildTTYDeps())
   } else {
-    await runInteractivePiped(stdin)
+    await runPiped(stdin, buildPipedDeps())
   }
 }
