@@ -3,9 +3,9 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.Date;
-import javax.validation.constraints.NotNull;
 import lombok.*;
 
 @Setter

@@ -51,7 +51,6 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-websocket'
   implementation 'org.springframework.boot:spring-boot-starter-data-redis'
   implementation 'org.flywaydb:flyway-mysql'
-  implementation 'com.kjetland:mbknor-jackson-jsonschema_2.13:1.0.39'
   compileOnly 'org.flywaydb:flyway-core'
   implementation 'org.springframework.session:spring-session-core'
   implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -61,7 +60,6 @@ dependencies {
   implementation 'com.openai:openai-java:4.26.0'
   // RxJava2 for Flowable streaming support
   implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
-  implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
   compileOnly 'org.projectlombok:lombok:1.18.44'
   annotationProcessor 'org.projectlombok:lombok:1.18.44'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'

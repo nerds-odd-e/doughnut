@@ -4776,7 +4776,9 @@ components:
           type: string
           format: date-time
       required:
+      - createdAt
       - id
+      - updatedAt
     ConversationSubject:
       type: object
       properties:

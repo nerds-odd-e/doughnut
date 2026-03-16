@@ -330,8 +330,8 @@ export type Conversation = {
     subject?: ConversationSubject;
     subjectOwnership?: Ownership;
     conversationInitiator?: User;
-    createdAt?: string;
-    updatedAt?: string;
+    createdAt: string;
+    updatedAt: string;
 };
 
 export type ConversationSubject = {
@@ -703,8 +703,8 @@ export type ConversationWritable = {
     subject?: ConversationSubjectWritable;
     subjectOwnership?: Ownership;
     conversationInitiator?: User;
-    createdAt?: string;
-    updatedAt?: string;
+    createdAt: string;
+    updatedAt: string;
 };
 
 export type ConversationSubjectWritable = {
