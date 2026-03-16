@@ -20,26 +20,24 @@ Support terminal resize properly by keeping chat history and using full clear + 
 
 ---
 
-## Phase 2: Chat history and cohesive rendering
+## Phase 2: Chat history and cohesive rendering ✅
 
 **User value:** Past commands and outputs persist and can be re-rendered (e.g. after resize).
 
-**Changes:**
+**Implemented:**
 1. **History storage**  
-   - Add `ChatHistory` (or similar) with entries like `{ type: 'input', content }` and `{ type: 'output', lines: string[] }`.
-   - TTY `OutputAdapter` appends to history on each `log()` call.
-   - On Enter, append user input (as rendered by `renderPastInput`) and command output to history.
+   - `ChatHistory` with entries `{ type: 'input', content }` and `{ type: 'output', lines: string[] }`.
+   - TTY `OutputAdapter` collects output via `collectedOutputLines`; appended to history after each command.
+   - On Enter, append user input and command output to history (main path, MCQ, token list, stop confirmation).
 
 2. **Cohesive rendering**  
-   - Single function that renders the whole TTY display: `renderFullDisplay(history, boxState, suggestions)` → lines to write.
-   - Replace duplicate logic: initial render, `drawBox`, and `/clear` redraw all go through this function.
-   - `renderPastInput` and `renderBox` stay as building blocks; the cohesive renderer composes them with history.
+   - `renderFullDisplay(history, buffer, width, suggestionLines, recallingIndicator)` → lines to write.
+   - `doFullRedraw()` and `writeFullRedraw()` use this function; no duplicate full-render logic.
+   - `renderPastInput` and `renderBox` stay as building blocks.
 
 3. **No duplicate rendering paths**  
-   - `drawBox()`’s incremental logic stays for fast updates (typing, suggestions).
-   - Full redraw (clear, resize) uses the cohesive path only; incremental path only updates the box region when we know layout.
-
-**Tests (external):** After `/help` then `/clear`, run `/help` again; assert help output appears. Or: send commands, simulate resize, assert history is still visible (requires Phase 3).
+   - `drawBox()`’s incremental logic unchanged for typing, suggestions.
+   - Full redraw (/clear, future resize) uses cohesive path only.
 
 ---
 

@@ -334,7 +334,7 @@ export async function processInput(
     return false
   }
   if (trimmed === '/clear') {
-    writeFullRedraw('', getTerminalWidth())
+    writeFullRedraw([], '', getTerminalWidth(), buildSuggestionLines('', 0), [])
     return false
   }
   if (await handleParamCommand(trimmed, output)) {
@@ -556,14 +556,44 @@ const CLEAR_SCREEN = '\x1b[H\x1b[2J'
 const COMMANDS_HINT = `${GREY}  / commands${RESET}`
 const RECALLING_INDICATOR = `${GREY}Recalling${RESET}`
 
-function writeFullRedraw(buffer: string, width: number): void {
-  process.stdout.write(CLEAR_SCREEN)
-  process.stdout.write(`${formatVersionOutput()}\n\n`)
-  const boxLines = renderBox(buildBoxLines(buffer, width), width).split('\n')
-  for (const line of boxLines) {
-    process.stdout.write(`${line}\n`)
+function renderFullDisplay(
+  history: ChatHistory,
+  buffer: string,
+  width: number,
+  suggestionLines: string[],
+  recallingIndicator: string[]
+): string[] {
+  const lines: string[] = [formatVersionOutput(), '']
+  for (const entry of history) {
+    if (entry.type === 'input') {
+      lines.push(...renderPastInput(entry.content, width).split('\n'))
+    } else {
+      lines.push(...entry.lines)
+    }
   }
-  for (const line of buildSuggestionLines(buffer, 0)) {
+  const boxLines = renderBox(buildBoxLines(buffer, width), width).split('\n')
+  lines.push(...boxLines)
+  lines.push(...recallingIndicator)
+  lines.push(...suggestionLines)
+  return lines
+}
+
+function writeFullRedraw(
+  history: ChatHistory,
+  buffer: string,
+  width: number,
+  suggestionLines: string[],
+  recallingIndicator: string[]
+): void {
+  process.stdout.write(CLEAR_SCREEN)
+  const lines = renderFullDisplay(
+    history,
+    buffer,
+    width,
+    suggestionLines,
+    recallingIndicator
+  )
+  for (const line of lines) {
     process.stdout.write(`${line}\n`)
   }
 }
@@ -626,21 +656,30 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
   })
   readline.emitKeypressEvents(stdin, rl)
 
-  let _chatHistory: ChatHistory = []
+  let chatHistory: ChatHistory = []
   let buffer = ''
   let highlightIndex = 0
   let suggestionsDismissed = false
   let linesAboveCursor = 0
   let prevTotalLines = 0
   let tokenListItems: { label: string; token: string }[] | null = null
+  let tokenListCommand = ''
   let tokenHighlightIndex = 0
   let tokenListAction: 'set-default' | 'remove' | 'remove-completely' =
     'set-default'
   let mcqChoiceHighlightIndex = 0
 
+  const collectedOutputLines: string[] = []
   const ttyOutput: OutputAdapter = {
-    log: (msg) => process.stdout.write(`${msg}\n`),
-    logError: (err) => writeError(err),
+    log: (msg) => {
+      process.stdout.write(`${msg}\n`)
+      collectedOutputLines.push(...msg.split('\n'))
+    },
+    logError: (err) => {
+      const msg = err instanceof Error ? err.message : String(err)
+      writeError(err)
+      collectedOutputLines.push(msg)
+    },
   }
 
   function getDisplayContent() {
@@ -680,14 +719,14 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
       boxLines.length + recallingIndicator.length + suggestionLines.length
 
     process.stdout.write(CLEAR_SCREEN)
-    process.stdout.write(`${formatVersionOutput()}\n\n`)
-    for (const line of boxLines) {
-      process.stdout.write(`${line}\n`)
-    }
-    for (const line of recallingIndicator) {
-      process.stdout.write(`${line}\n`)
-    }
-    for (const line of suggestionLines) {
+    const fullLines = renderFullDisplay(
+      chatHistory,
+      buffer,
+      getTerminalWidth(),
+      suggestionLines,
+      recallingIndicator
+    )
+    for (const line of fullLines) {
       process.stdout.write(`${line}\n`)
     }
 
@@ -779,6 +818,8 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
             linesAboveCursor = 0
             prevTotalLines = 0
             process.stdout.write('Stopped recall\n')
+            chatHistory.push({ type: 'input', content: trimmed })
+            chatHistory.push({ type: 'output', lines: ['Stopped recall'] })
           } else if (answer === false) {
             // Stay in MCQ; drawBox will show choices again
           } else if (trimmed) {
@@ -829,14 +870,18 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
                       : String(mcqChoiceHighlightIndex + 1)
                   })()
           clearTTYDisplay(linesAboveCursor, prevTotalLines)
+          const inputForHistory = buffer || effectiveInput
           buffer = ''
           mcqChoiceHighlightIndex = 0
           linesAboveCursor = 0
           prevTotalLines = 0
+          collectedOutputLines.length = 0
+          chatHistory.push({ type: 'input', content: inputForHistory })
           if (await processInput(effectiveInput, ttyOutput)) {
             doExit()
             return
           }
+          chatHistory.push({ type: 'output', lines: [...collectedOutputLines] })
           drawBox()
         } else if (str && !key.ctrl && !key.meta) {
           buffer += str
@@ -862,6 +907,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           drawBox()
         } else if (key.name === 'escape') {
           tokenListItems = null
+          tokenListCommand = ''
           tokenHighlightIndex = 0
           tokenListAction = 'set-default'
           drawBox()
@@ -874,22 +920,27 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           tokenListAction = 'set-default'
           linesAboveCursor = 0
           prevTotalLines = 0
+          let outputMsg = ''
           if (action === 'set-default') {
             setDefaultTokenLabel(selectedLabel)
-            process.stdout.write(`Default token set to: ${selectedLabel}\n`)
+            outputMsg = `Default token set to: ${selectedLabel}`
+            process.stdout.write(`${outputMsg}\n`)
           } else if (action === 'remove') {
             removeAccessToken(selectedLabel)
-            process.stdout.write(`Token "${selectedLabel}" removed.\n`)
+            outputMsg = `Token "${selectedLabel}" removed.`
+            process.stdout.write(`${outputMsg}\n`)
           } else {
             try {
               await removeAccessTokenCompletely(selectedLabel)
-              process.stdout.write(
-                `Token "${selectedLabel}" removed locally and from server.\n`
-              )
+              outputMsg = `Token "${selectedLabel}" removed locally and from server.`
+              process.stdout.write(`${outputMsg}\n`)
             } catch (err) {
               writeError(err)
+              outputMsg = err instanceof Error ? err.message : String(err)
             }
           }
+          chatHistory.push({ type: 'input', content: tokenListCommand })
+          chatHistory.push({ type: 'output', lines: [outputMsg] })
           drawBox()
         } else {
           tokenListItems = null
@@ -933,7 +984,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           const trimmedInput = buffer.trim()
 
           if (trimmedInput === '/clear') {
-            _chatHistory = []
+            chatHistory = []
             buffer = ''
             tokenListItems = null
             tokenHighlightIndex = 0
@@ -978,8 +1029,14 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
             const tokens = listAccessTokens()
             if (tokens.length === 0) {
               process.stdout.write('No access tokens stored.\n')
+              chatHistory.push({ type: 'input', content: trimmedInput })
+              chatHistory.push({
+                type: 'output',
+                lines: ['No access tokens stored.'],
+              })
             } else {
               tokenListItems = tokens
+              tokenListCommand = trimmedInput
               tokenListAction = tokenSelectAction
               const dl = getDefaultTokenLabel()
               tokenHighlightIndex = Math.max(
@@ -993,9 +1050,12 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
             return
           }
 
+          collectedOutputLines.length = 0
+          chatHistory.push({ type: 'input', content: input })
           if (await processInput(input, ttyOutput)) {
             doExit()
           }
+          chatHistory.push({ type: 'output', lines: [...collectedOutputLines] })
           linesAboveCursor = 0
           prevTotalLines = 0
           if (isMcqPrompt(pendingRecallAnswer)) {

@@ -1244,6 +1244,27 @@ describe('TTY mode slash command suggestions', () => {
     expect(output).toContain('┘')
     expect(output).toContain('→')
   })
+
+  test('after /help then /clear, run /help again shows help output', async () => {
+    typeString(stdin, '/help ')
+    await tick()
+    pressEnter(stdin)
+    await tick()
+    typeString(stdin, '/clear')
+    await tick()
+    pressEnter(stdin)
+    await tick()
+    writeSpy.mockClear()
+
+    typeString(stdin, '/help ')
+    await tick()
+    pressEnter(stdin)
+    await tick()
+
+    const output = ttyOutput(writeSpy)
+    expect(stripAnsi(output)).toContain('/help')
+    expect(stripAnsi(output)).toContain('List available commands')
+  })
 })
 
 describe('TTY mode slash command suggestions with scroll', () => {
