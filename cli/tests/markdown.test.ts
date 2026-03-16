@@ -37,4 +37,25 @@ describe('renderMarkdownToTerminal', () => {
     )
     expect(narrow).toContain('\n')
   })
+
+  test('HTML <b>bold</b> renders as ANSI, not raw tags', () => {
+    const result = renderMarkdownToTerminal('<b>bold</b>')
+    expect(result).toContain('\x1b[')
+    expect(result).not.toContain('<b>')
+    expect(result).not.toContain('</b>')
+  })
+
+  test('HTML <mark> placeholder renders as ANSI, not raw tags', () => {
+    const result = renderMarkdownToTerminal('<mark>[..~]</mark>')
+    expect(result).toContain('\x1b[')
+    expect(result).not.toContain('<mark>')
+    expect(result).not.toContain('</mark>')
+  })
+
+  test('HTML <p>text</p> strips tags, no raw output', () => {
+    const result = renderMarkdownToTerminal('<p>text</p>')
+    expect(result).not.toContain('<p>')
+    expect(result).not.toContain('</p>')
+    expect(result).toContain('text')
+  })
 })
