@@ -16,6 +16,7 @@ describe('formatHelp', () => {
     expect(output).toContain('version')
     expect(output).toContain('update')
     expect(output).toContain('help')
+    expect(output).toContain('/clear')
     expect(output).toContain('/add gmail')
     expect(output).toContain('/last email')
     expect(output).toContain('/recall-status')

@@ -325,6 +325,10 @@ export async function processInput(
     output.log(formatHelp())
     return false
   }
+  if (trimmed === '/clear') {
+    writeFullRedraw('', getTerminalWidth())
+    return false
+  }
   if (await handleParamCommand(trimmed, output)) {
     return false
   }
@@ -540,8 +544,21 @@ function getTerminalWidth(): number {
   return process.stdout.columns || 80
 }
 
+const CLEAR_SCREEN = '\x1b[H\x1b[2J'
 const COMMANDS_HINT = `${GREY}  / commands${RESET}`
 const RECALLING_INDICATOR = `${GREY}Recalling${RESET}`
+
+function writeFullRedraw(buffer: string, width: number): void {
+  process.stdout.write(CLEAR_SCREEN)
+  process.stdout.write(`${formatVersionOutput()}\n\n`)
+  const boxLines = renderBox(buildBoxLines(buffer, width), width).split('\n')
+  for (const line of boxLines) {
+    process.stdout.write(`${line}\n`)
+  }
+  for (const line of buildSuggestionLines(buffer, 0)) {
+    process.stdout.write(`${line}\n`)
+  }
+}
 
 function formatMcqChoiceLines(choices: string[]): string[] {
   return choices.map((c, i) => `  ${i + 1}. ${renderMarkdownToTerminal(c)}`)
@@ -601,6 +618,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
   })
   readline.emitKeypressEvents(stdin, rl)
 
+  let _chatHistory: unknown[] = []
   let buffer = ''
   let highlightIndex = 0
   let suggestionsDismissed = false
@@ -617,7 +635,7 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
     logError: (err) => writeError(err),
   }
 
-  function drawBox() {
+  function getDisplayContent() {
     const width = getTerminalWidth()
     const contentLines = buildBoxLines(buffer, width)
     const boxLines = renderBox(contentLines, width).split('\n')
@@ -644,6 +662,43 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
               return buildSuggestionLines(buffer, highlightIndex)
             })()
     const recallingIndicator = isInRecallSubstate() ? [RECALLING_INDICATOR] : []
+    return { contentLines, boxLines, suggestionLines, recallingIndicator }
+  }
+
+  function doFullRedraw() {
+    const { contentLines, boxLines, suggestionLines, recallingIndicator } =
+      getDisplayContent()
+    const newTotalLines =
+      boxLines.length + recallingIndicator.length + suggestionLines.length
+
+    process.stdout.write(CLEAR_SCREEN)
+    process.stdout.write(`${formatVersionOutput()}\n\n`)
+    for (const line of boxLines) {
+      process.stdout.write(`${line}\n`)
+    }
+    for (const line of recallingIndicator) {
+      process.stdout.write(`${line}\n`)
+    }
+    for (const line of suggestionLines) {
+      process.stdout.write(`${line}\n`)
+    }
+
+    linesAboveCursor = contentLines.length
+    prevTotalLines = newTotalLines
+
+    const cursorRow = contentLines.length
+    process.stdout.write(`\x1b[${newTotalLines - cursorRow}A`)
+
+    const bufferLines = buffer.split('\n')
+    const lastLine = bufferLines[bufferLines.length - 1]
+    const lastPrefix = bufferLines.length === 1 ? PROMPT : '  '
+    const col = 3 + lastPrefix.length + lastLine.length
+    process.stdout.write(`\x1b[${col}G`)
+  }
+
+  function drawBox() {
+    const { contentLines, boxLines, suggestionLines, recallingIndicator } =
+      getDisplayContent()
     const newTotalLines =
       boxLines.length + recallingIndicator.length + suggestionLines.length
 
@@ -867,6 +922,22 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
           drawBox()
         } else {
           const lastLine = getLastLine(buffer)
+          const trimmedInput = buffer.trim()
+
+          if (trimmedInput === '/clear') {
+            _chatHistory = []
+            buffer = ''
+            tokenListItems = null
+            tokenHighlightIndex = 0
+            if (isInRecallSubstate()) exitRecallMode()
+            pendingRecallStopConfirmation = false
+            mcqChoiceHighlightIndex = 0
+            highlightIndex = 0
+            suggestionsDismissed = false
+            doFullRedraw()
+            return
+          }
+
           const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
           const suggestionsVisible =
             lastLine.startsWith('/') &&
@@ -894,7 +965,6 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
             process.stdout.write('\n')
           }
 
-          const trimmedInput = input.trim()
           const tokenSelectAction = TOKEN_LIST_COMMANDS[trimmedInput] ?? null
           if (tokenSelectAction) {
             const tokens = listAccessTokens()

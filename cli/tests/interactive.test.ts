@@ -202,6 +202,20 @@ describe('processInput', () => {
     expect(output).not.toContain('Not supported')
   })
 
+  test('returns false and writes clear-screen sequence and prompt box for /clear', async () => {
+    const writeSpy = vi
+      .spyOn(process.stdout, 'write')
+      .mockImplementation(() => true)
+    expect(await processInput('/clear')).toBe(false)
+    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
+    expect(output).toContain('\x1b[H\x1b[2J')
+    expect(output).toContain('doughnut')
+    expect(output).toContain('┌')
+    expect(output).toContain('┘')
+    expect(output).toContain('→')
+    writeSpy.mockRestore()
+  })
+
   test('returns false and shows usage for /add-access-token without token', async () => {
     expect(await processInput('/add-access-token')).toBe(false)
     expect(logSpy).toHaveBeenCalledWith('Usage: /add-access-token <token>')
@@ -1001,8 +1015,8 @@ describe('TTY mode slash command suggestions', () => {
     const output = ttyOutput(writeSpy)
     expect(output).toContain('/help')
     expect(output).toContain('List available commands')
-    expect(output).toContain('/add gmail')
-    expect(output).toContain('Add Gmail account')
+    expect(output).toContain('/clear')
+    expect(output).toContain('Clear screen and chat history')
     expect(output).toContain('/create-access-token')
     expect(output).toContain('↓ more below')
   })
@@ -1018,7 +1032,7 @@ describe('TTY mode slash command suggestions', () => {
     expect(suggestionStart).toBeGreaterThanOrEqual(0)
     expect(lines[suggestionStart]).toContain('\x1b[7m')
     const laterSuggestion = lines.findIndex(
-      (l) => l.includes('/add gmail') && !l.includes('\x1b[7m')
+      (l) => l.includes('/clear') && !l.includes('\x1b[7m')
     )
     expect(laterSuggestion).toBeGreaterThan(suggestionStart)
   })
@@ -1148,7 +1162,7 @@ describe('TTY mode slash command suggestions', () => {
     writeSpy.mockClear()
     typeString(stdin, '/')
     await tick()
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 9; i++) {
       pressKey(stdin, 'down')
       await tick()
     }
@@ -1209,6 +1223,26 @@ describe('TTY mode slash command suggestions', () => {
     await tick()
 
     expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /add-access-token ')
+  })
+
+  test('/clear clears screen and redraws prompt box', async () => {
+    typeString(stdin, '/help ')
+    await tick()
+    pressEnter(stdin)
+    await tick()
+    typeString(stdin, '/clear')
+    await tick()
+    writeSpy.mockClear()
+
+    pressEnter(stdin)
+    await tick()
+
+    const output = ttyOutput(writeSpy)
+    expect(output).toContain('\x1b[H\x1b[2J')
+    expect(output).toContain('doughnut')
+    expect(output).toContain('┌')
+    expect(output).toContain('┘')
+    expect(output).toContain('→')
   })
 })
 
