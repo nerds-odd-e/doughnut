@@ -739,19 +739,6 @@ export type GetUserProfileData = {
     url: '/api/user';
 };
 
-export type GetUserProfileErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetUserProfileError = GetUserProfileErrors[keyof GetUserProfileErrors];
-
 export type GetUserProfileResponses = {
     /**
      * OK
@@ -767,19 +754,6 @@ export type CreateUserData = {
     query?: never;
     url: '/api/user';
 };
-
-export type CreateUserErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type CreateUserError = CreateUserErrors[keyof CreateUserErrors];
 
 export type CreateUserResponses = {
     /**
@@ -797,19 +771,6 @@ export type GenerateTokenData = {
     url: '/api/user/generate-token';
 };
 
-export type GenerateTokenErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GenerateTokenError = GenerateTokenErrors[keyof GenerateTokenErrors];
-
 export type GenerateTokenResponses = {
     /**
      * OK
@@ -825,19 +786,6 @@ export type CloseAllGithubIssuesData = {
     query?: never;
     url: '/api/testability/use_real_sandbox_github_and_close_all_github_issues';
 };
-
-export type CloseAllGithubIssuesErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type CloseAllGithubIssuesError = CloseAllGithubIssuesErrors[keyof CloseAllGithubIssuesErrors];
 
 export type CloseAllGithubIssuesResponses = {
     /**
@@ -855,19 +803,6 @@ export type TriggerExceptionData = {
     url: '/api/testability/trigger_exception';
 };
 
-export type TriggerExceptionErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type TriggerExceptionError = TriggerExceptionErrors[keyof TriggerExceptionErrors];
-
 export type TriggerExceptionResponses = {
     /**
      * OK
@@ -884,19 +819,6 @@ export type TimeTravelRelativeToNowData = {
     url: '/api/testability/time_travel_relative_to_now';
 };
 
-export type TimeTravelRelativeToNowErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type TimeTravelRelativeToNowError = TimeTravelRelativeToNowErrors[keyof TimeTravelRelativeToNowErrors];
-
 export type TimeTravelRelativeToNowResponses = {
     /**
      * OK
@@ -912,19 +834,6 @@ export type TimeTravelData = {
     query?: never;
     url: '/api/testability/time_travel';
 };
-
-export type TimeTravelErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type TimeTravelError = TimeTravelErrors[keyof TimeTravelErrors];
 
 export type TimeTravelResponses = {
     /**
@@ -946,19 +855,6 @@ export type TestabilityUpdateUserData = {
     url: '/api/testability/testability_update_user';
 };
 
-export type TestabilityUpdateUserErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type TestabilityUpdateUserError = TestabilityUpdateUserErrors[keyof TestabilityUpdateUserErrors];
-
 export type TestabilityUpdateUserResponses = {
     /**
      * OK
@@ -976,19 +872,6 @@ export type ShareToBazaarData = {
     query?: never;
     url: '/api/testability/share_to_bazaar';
 };
-
-export type ShareToBazaarErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ShareToBazaarError = ShareToBazaarErrors[keyof ShareToBazaarErrors];
 
 export type ShareToBazaarResponses = {
     /**
@@ -1008,19 +891,6 @@ export type ReplaceServiceUrlData = {
     url: '/api/testability/replace_service_url';
 };
 
-export type ReplaceServiceUrlErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ReplaceServiceUrlError = ReplaceServiceUrlErrors[keyof ReplaceServiceUrlErrors];
-
 export type ReplaceServiceUrlResponses = {
     /**
      * OK
@@ -1034,19 +904,6 @@ export type RandomizerData = {
     query?: never;
     url: '/api/testability/randomizer';
 };
-
-export type RandomizerErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type RandomizerError = RandomizerErrors[keyof RandomizerErrors];
 
 export type RandomizerResponses = {
     /**
@@ -1066,19 +923,6 @@ export type SetOpenAiTokenData = {
     url: '/api/testability/open_ai_token';
 };
 
-export type SetOpenAiTokenErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type SetOpenAiTokenError = SetOpenAiTokenErrors[keyof SetOpenAiTokenErrors];
-
 export type SetOpenAiTokenResponses = {
     /**
      * OK
@@ -1092,19 +936,6 @@ export type InjectSuggestedQuestionData = {
     query?: never;
     url: '/api/testability/inject_suggested_questions';
 };
-
-export type InjectSuggestedQuestionErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type InjectSuggestedQuestionError = InjectSuggestedQuestionErrors[keyof InjectSuggestedQuestionErrors];
 
 export type InjectSuggestedQuestionResponses = {
     /**
@@ -1121,19 +952,6 @@ export type InjectNotesData = {
     query?: never;
     url: '/api/testability/inject_notes';
 };
-
-export type InjectNotesErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type InjectNotesError = InjectNotesErrors[keyof InjectNotesErrors];
 
 export type InjectNotesResponses = {
     /**
@@ -1155,19 +973,6 @@ export type InjectCircleData = {
     url: '/api/testability/inject_circle';
 };
 
-export type InjectCircleErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type InjectCircleError = InjectCircleErrors[keyof InjectCircleErrors];
-
 export type InjectCircleResponses = {
     /**
      * OK
@@ -1184,19 +989,6 @@ export type InjectPredefinedQuestionData = {
     url: '/api/testability/inject-predefined-questions';
 };
 
-export type InjectPredefinedQuestionErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type InjectPredefinedQuestionError = InjectPredefinedQuestionErrors[keyof InjectPredefinedQuestionErrors];
-
 export type InjectPredefinedQuestionResponses = {
     /**
      * OK
@@ -1212,19 +1004,6 @@ export type GetFeatureToggleData = {
     query?: never;
     url: '/api/testability/feature_toggle';
 };
-
-export type GetFeatureToggleErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetFeatureToggleError = GetFeatureToggleErrors[keyof GetFeatureToggleErrors];
 
 export type GetFeatureToggleResponses = {
     /**
@@ -1244,19 +1023,6 @@ export type EnableFeatureToggleData = {
     url: '/api/testability/feature_toggle';
 };
 
-export type EnableFeatureToggleErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type EnableFeatureToggleError = EnableFeatureToggleErrors[keyof EnableFeatureToggleErrors];
-
 export type EnableFeatureToggleResponses = {
     /**
      * OK
@@ -1275,19 +1041,6 @@ export type CreateRelationshipsData = {
     url: '/api/testability/create_relationships';
 };
 
-export type CreateRelationshipsErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type CreateRelationshipsError = CreateRelationshipsErrors[keyof CreateRelationshipsErrors];
-
 export type CreateRelationshipsResponses = {
     /**
      * OK
@@ -1303,19 +1056,6 @@ export type ResetDbAndTestabilitySettingsData = {
     query?: never;
     url: '/api/testability/clean_db_and_reset_testability_settings';
 };
-
-export type ResetDbAndTestabilitySettingsErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ResetDbAndTestabilitySettingsError = ResetDbAndTestabilitySettingsErrors[keyof ResetDbAndTestabilitySettingsErrors];
 
 export type ResetDbAndTestabilitySettingsResponses = {
     /**
@@ -1335,19 +1075,6 @@ export type UpdateSubscriptionData = {
     url: '/api/subscriptions/{subscription}';
 };
 
-export type UpdateSubscriptionErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type UpdateSubscriptionError = UpdateSubscriptionErrors[keyof UpdateSubscriptionErrors];
-
 export type UpdateSubscriptionResponses = {
     /**
      * OK
@@ -1365,19 +1092,6 @@ export type DestroySubscriptionData = {
     query?: never;
     url: '/api/subscriptions/{subscription}/delete';
 };
-
-export type DestroySubscriptionErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type DestroySubscriptionError = DestroySubscriptionErrors[keyof DestroySubscriptionErrors];
 
 export type DestroySubscriptionResponses = {
     /**
@@ -1397,19 +1111,6 @@ export type CreateSubscriptionData = {
     url: '/api/subscriptions/notebooks/{notebook}/subscribe';
 };
 
-export type CreateSubscriptionErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type CreateSubscriptionError = CreateSubscriptionErrors[keyof CreateSubscriptionErrors];
-
 export type CreateSubscriptionResponses = {
     /**
      * OK
@@ -1426,19 +1127,6 @@ export type GetCurrentModelVersionsData = {
     url: '/api/settings/current-model-version';
 };
 
-export type GetCurrentModelVersionsErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetCurrentModelVersionsError = GetCurrentModelVersionsErrors[keyof GetCurrentModelVersionsErrors];
-
 export type GetCurrentModelVersionsResponses = {
     /**
      * OK
@@ -1454,19 +1142,6 @@ export type SetCurrentModelVersionsData = {
     query?: never;
     url: '/api/settings/current-model-version';
 };
-
-export type SetCurrentModelVersionsErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type SetCurrentModelVersionsError = SetCurrentModelVersionsErrors[keyof SetCurrentModelVersionsErrors];
 
 export type SetCurrentModelVersionsResponses = {
     /**
@@ -1485,19 +1160,6 @@ export type UpdateRelationshipData = {
     query?: never;
     url: '/api/relations/{relation}';
 };
-
-export type UpdateRelationshipErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type UpdateRelationshipError = UpdateRelationshipErrors[keyof UpdateRelationshipErrors];
 
 export type UpdateRelationshipResponses = {
     /**
@@ -1518,19 +1180,6 @@ export type MoveNoteData = {
     url: '/api/relations/move/{sourceNote}/{targetNote}';
 };
 
-export type MoveNoteErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type MoveNoteError = MoveNoteErrors[keyof MoveNoteErrors];
-
 export type MoveNoteResponses = {
     /**
      * OK
@@ -1550,19 +1199,6 @@ export type AddRelationshipFinalizeData = {
     url: '/api/relations/create/{sourceNote}/{targetNote}';
 };
 
-export type AddRelationshipFinalizeErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type AddRelationshipFinalizeError = AddRelationshipFinalizeErrors[keyof AddRelationshipFinalizeErrors];
-
 export type AddRelationshipFinalizeResponses = {
     /**
      * OK
@@ -1580,19 +1216,6 @@ export type RegenerateData = {
     query?: never;
     url: '/api/recall-prompts/{recallPrompt}/regenerate';
 };
-
-export type RegenerateErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type RegenerateError = RegenerateErrors[keyof RegenerateErrors];
 
 export type RegenerateResponses = {
     /**
@@ -1612,19 +1235,6 @@ export type ContestData = {
     url: '/api/recall-prompts/{recallPrompt}/contest';
 };
 
-export type ContestErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ContestError = ContestErrors[keyof ContestErrors];
-
 export type ContestResponses = {
     /**
      * OK
@@ -1642,19 +1252,6 @@ export type AnswerQuizData = {
     query?: never;
     url: '/api/recall-prompts/{recallPrompt}/answer';
 };
-
-export type AnswerQuizErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type AnswerQuizError = AnswerQuizErrors[keyof AnswerQuizErrors];
 
 export type AnswerQuizResponses = {
     /**
@@ -1674,19 +1271,6 @@ export type AnswerSpellingData = {
     url: '/api/recall-prompts/{recallPrompt}/answer-spelling';
 };
 
-export type AnswerSpellingErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type AnswerSpellingError = AnswerSpellingErrors[keyof AnswerSpellingErrors];
-
 export type AnswerSpellingResponses = {
     /**
      * OK
@@ -1704,19 +1288,6 @@ export type ToggleApprovalData = {
     query?: never;
     url: '/api/predefined-questions/{predefinedQuestion}/toggle-approval';
 };
-
-export type ToggleApprovalErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ToggleApprovalError = ToggleApprovalErrors[keyof ToggleApprovalErrors];
 
 export type ToggleApprovalResponses = {
     /**
@@ -1736,19 +1307,6 @@ export type SuggestQuestionForFineTuningData = {
     url: '/api/predefined-questions/{predefinedQuestion}/suggest-fine-tuning';
 };
 
-export type SuggestQuestionForFineTuningErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type SuggestQuestionForFineTuningError = SuggestQuestionForFineTuningErrors[keyof SuggestQuestionForFineTuningErrors];
-
 export type SuggestQuestionForFineTuningResponses = {
     /**
      * OK
@@ -1766,19 +1324,6 @@ export type RefineQuestionData = {
     query?: never;
     url: '/api/predefined-questions/{note}/refine-question';
 };
-
-export type RefineQuestionErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type RefineQuestionError = RefineQuestionErrors[keyof RefineQuestionErrors];
 
 export type RefineQuestionResponses = {
     /**
@@ -1798,19 +1343,6 @@ export type GetAllQuestionByNoteData = {
     url: '/api/predefined-questions/{note}/note-questions';
 };
 
-export type GetAllQuestionByNoteErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetAllQuestionByNoteError = GetAllQuestionByNoteErrors[keyof GetAllQuestionByNoteErrors];
-
 export type GetAllQuestionByNoteResponses = {
     /**
      * OK
@@ -1828,19 +1360,6 @@ export type AddQuestionManuallyData = {
     query?: never;
     url: '/api/predefined-questions/{note}/note-questions';
 };
-
-export type AddQuestionManuallyErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type AddQuestionManuallyError = AddQuestionManuallyErrors[keyof AddQuestionManuallyErrors];
 
 export type AddQuestionManuallyResponses = {
     /**
@@ -1860,19 +1379,6 @@ export type GenerateQuestionWithoutSaveData = {
     url: '/api/predefined-questions/generate-question-without-save';
 };
 
-export type GenerateQuestionWithoutSaveErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GenerateQuestionWithoutSaveError = GenerateQuestionWithoutSaveErrors[keyof GenerateQuestionWithoutSaveErrors];
-
 export type GenerateQuestionWithoutSaveResponses = {
     /**
      * OK
@@ -1890,19 +1396,6 @@ export type CreateNoteAfterData = {
     query?: never;
     url: '/api/notes/{referenceNote}/create-after';
 };
-
-export type CreateNoteAfterErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type CreateNoteAfterError = CreateNoteAfterErrors[keyof CreateNoteAfterErrors];
 
 export type CreateNoteAfterResponses = {
     /**
@@ -1922,19 +1415,6 @@ export type CreateNoteUnderParentData = {
     url: '/api/notes/{parentNote}/create';
 };
 
-export type CreateNoteUnderParentErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type CreateNoteUnderParentError = CreateNoteUnderParentErrors[keyof CreateNoteUnderParentErrors];
-
 export type CreateNoteUnderParentResponses = {
     /**
      * OK
@@ -1952,19 +1432,6 @@ export type VerifySpellingData = {
     query?: never;
     url: '/api/notes/{note}/verify-spelling';
 };
-
-export type VerifySpellingErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type VerifySpellingError = VerifySpellingErrors[keyof VerifySpellingErrors];
 
 export type VerifySpellingResponses = {
     /**
@@ -1984,19 +1451,6 @@ export type UpdateWikidataIdData = {
     url: '/api/notes/{note}/updateWikidataId';
 };
 
-export type UpdateWikidataIdErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type UpdateWikidataIdError = UpdateWikidataIdErrors[keyof UpdateWikidataIdErrors];
-
 export type UpdateWikidataIdResponses = {
     /**
      * OK
@@ -2014,19 +1468,6 @@ export type SemanticSearchWithinData = {
     query?: never;
     url: '/api/notes/{note}/semantic-search';
 };
-
-export type SemanticSearchWithinErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type SemanticSearchWithinError = SemanticSearchWithinErrors[keyof SemanticSearchWithinErrors];
 
 export type SemanticSearchWithinResponses = {
     /**
@@ -2046,19 +1487,6 @@ export type SearchForRelationshipTargetWithinData = {
     url: '/api/notes/{note}/search';
 };
 
-export type SearchForRelationshipTargetWithinErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type SearchForRelationshipTargetWithinError = SearchForRelationshipTargetWithinErrors[keyof SearchForRelationshipTargetWithinErrors];
-
 export type SearchForRelationshipTargetWithinResponses = {
     /**
      * OK
@@ -2076,19 +1504,6 @@ export type UpdateNoteRecallSettingData = {
     query?: never;
     url: '/api/notes/{note}/recall-setting';
 };
-
-export type UpdateNoteRecallSettingErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type UpdateNoteRecallSettingError = UpdateNoteRecallSettingErrors[keyof UpdateNoteRecallSettingErrors];
 
 export type UpdateNoteRecallSettingResponses = {
     /**
@@ -2108,19 +1523,6 @@ export type DeleteNoteData = {
     url: '/api/notes/{note}/delete';
 };
 
-export type DeleteNoteErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type DeleteNoteError = DeleteNoteErrors[keyof DeleteNoteErrors];
-
 export type DeleteNoteResponses = {
     /**
      * OK
@@ -2137,19 +1539,6 @@ export type SemanticSearchData = {
     url: '/api/notes/semantic-search';
 };
 
-export type SemanticSearchErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type SemanticSearchError = SemanticSearchErrors[keyof SemanticSearchErrors];
-
 export type SemanticSearchResponses = {
     /**
      * OK
@@ -2165,19 +1554,6 @@ export type SearchForRelationshipTargetData = {
     query?: never;
     url: '/api/notes/search';
 };
-
-export type SearchForRelationshipTargetErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type SearchForRelationshipTargetError = SearchForRelationshipTargetErrors[keyof SearchForRelationshipTargetErrors];
 
 export type SearchForRelationshipTargetResponses = {
     /**
@@ -2199,19 +1575,6 @@ export type MoveAfterData = {
     url: '/api/notes/move_after/{note}/{targetNote}/{asFirstChild}';
 };
 
-export type MoveAfterErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type MoveAfterError = MoveAfterErrors[keyof MoveAfterErrors];
-
 export type MoveAfterResponses = {
     /**
      * OK
@@ -2229,19 +1592,6 @@ export type GetData = {
     query?: never;
     url: '/api/notebooks/{notebook}';
 };
-
-export type GetErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetError = GetErrors[keyof GetErrors];
 
 export type GetResponses = {
     /**
@@ -2261,19 +1611,6 @@ export type UpdateNotebookData = {
     url: '/api/notebooks/{notebook}';
 };
 
-export type UpdateNotebookErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type UpdateNotebookError = UpdateNotebookErrors[keyof UpdateNotebookErrors];
-
 export type UpdateNotebookResponses = {
     /**
      * OK
@@ -2292,19 +1629,6 @@ export type UpdateNotebookIndexData = {
     url: '/api/notebooks/{notebook}/update-index';
 };
 
-export type UpdateNotebookIndexErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type UpdateNotebookIndexError = UpdateNotebookIndexErrors[keyof UpdateNotebookIndexErrors];
-
 export type UpdateNotebookIndexResponses = {
     /**
      * OK
@@ -2320,19 +1644,6 @@ export type ShareNotebookData = {
     query?: never;
     url: '/api/notebooks/{notebook}/share';
 };
-
-export type ShareNotebookErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ShareNotebookError = ShareNotebookErrors[keyof ShareNotebookErrors];
 
 export type ShareNotebookResponses = {
     /**
@@ -2352,19 +1663,6 @@ export type ResetNotebookIndexData = {
     url: '/api/notebooks/{notebook}/reset-index';
 };
 
-export type ResetNotebookIndexErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ResetNotebookIndexError = ResetNotebookIndexErrors[keyof ResetNotebookIndexErrors];
-
 export type ResetNotebookIndexResponses = {
     /**
      * OK
@@ -2380,19 +1678,6 @@ export type DownloadNotebookForObsidianData = {
     query?: never;
     url: '/api/notebooks/{notebook}/obsidian';
 };
-
-export type DownloadNotebookForObsidianErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type DownloadNotebookForObsidianError = DownloadNotebookForObsidianErrors[keyof DownloadNotebookForObsidianErrors];
 
 export type DownloadNotebookForObsidianResponses = {
     /**
@@ -2420,19 +1705,6 @@ export type ImportObsidianData = {
     url: '/api/notebooks/{notebook}/obsidian';
 };
 
-export type ImportObsidianErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ImportObsidianError = ImportObsidianErrors[keyof ImportObsidianErrors];
-
 export type ImportObsidianResponses = {
     /**
      * OK
@@ -2446,19 +1718,6 @@ export type CreateNotebookData = {
     query?: never;
     url: '/api/notebooks/create';
 };
-
-export type CreateNotebookErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type CreateNotebookError = CreateNotebookErrors[keyof CreateNotebookErrors];
 
 export type CreateNotebookResponses = {
     /**
@@ -2478,19 +1737,6 @@ export type ApproveData = {
     url: '/api/notebook_certificate_approvals/{notebookCertificateApproval}/approve';
 };
 
-export type ApproveErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ApproveError = ApproveErrors[keyof ApproveErrors];
-
 export type ApproveResponses = {
     /**
      * OK
@@ -2508,19 +1754,6 @@ export type RequestApprovalForNotebookData = {
     query?: never;
     url: '/api/notebook_certificate_approvals/request-approval/{notebook}';
 };
-
-export type RequestApprovalForNotebookErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type RequestApprovalForNotebookError = RequestApprovalForNotebookErrors[keyof RequestApprovalForNotebookErrors];
 
 export type RequestApprovalForNotebookResponses = {
     /**
@@ -2540,19 +1773,6 @@ export type SoftDeleteData = {
     url: '/api/memory-trackers/{memoryTracker}/soft-delete';
 };
 
-export type SoftDeleteErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type SoftDeleteError = SoftDeleteErrors[keyof SoftDeleteErrors];
-
 export type SoftDeleteResponses = {
     /**
      * OK
@@ -2568,19 +1788,6 @@ export type RemoveFromRepeatingData = {
     query?: never;
     url: '/api/memory-trackers/{memoryTracker}/remove';
 };
-
-export type RemoveFromRepeatingErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type RemoveFromRepeatingError = RemoveFromRepeatingErrors[keyof RemoveFromRepeatingErrors];
 
 export type RemoveFromRepeatingResponses = {
     /**
@@ -2600,19 +1807,6 @@ export type ReEnableData = {
     url: '/api/memory-trackers/{memoryTracker}/re-enable';
 };
 
-export type ReEnableErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ReEnableError = ReEnableErrors[keyof ReEnableErrors];
-
 export type ReEnableResponses = {
     /**
      * OK
@@ -2628,19 +1822,6 @@ export type CreateNoteViaMcpData = {
     query?: never;
     url: '/api/mcp/notes/create';
 };
-
-export type CreateNoteViaMcpErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type CreateNoteViaMcpError = CreateNoteViaMcpErrors[keyof CreateNoteViaMcpErrors];
 
 export type CreateNoteViaMcpResponses = {
     /**
@@ -2660,19 +1841,6 @@ export type DuplicateData = {
     url: '/api/fine-tuning/{suggestedQuestion}/duplicate';
 };
 
-export type DuplicateErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type DuplicateError = DuplicateErrors[keyof DuplicateErrors];
-
 export type DuplicateResponses = {
     /**
      * OK
@@ -2691,19 +1859,6 @@ export type DeleteData = {
     url: '/api/fine-tuning/{suggestedQuestion}/delete';
 };
 
-export type DeleteErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type DeleteError = DeleteErrors[keyof DeleteErrors];
-
 export type DeleteResponses = {
     /**
      * OK
@@ -2720,19 +1875,6 @@ export type UploadAndTriggerFineTuningData = {
     url: '/api/fine-tuning/upload-and-trigger-fine-tuning';
 };
 
-export type UploadAndTriggerFineTuningErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type UploadAndTriggerFineTuningError = UploadAndTriggerFineTuningErrors[keyof UploadAndTriggerFineTuningErrors];
-
 export type UploadAndTriggerFineTuningResponses = {
     /**
      * OK
@@ -2746,19 +1888,6 @@ export type TriggerFailureData = {
     query?: never;
     url: '/api/failure-reports/trigger';
 };
-
-export type TriggerFailureErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type TriggerFailureError = TriggerFailureErrors[keyof TriggerFailureErrors];
 
 export type TriggerFailureResponses = {
     /**
@@ -2778,19 +1907,6 @@ export type ReplyToConversationData = {
     url: '/api/conversation/{conversationId}/send';
 };
 
-export type ReplyToConversationErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ReplyToConversationError = ReplyToConversationErrors[keyof ReplyToConversationErrors];
-
 export type ReplyToConversationResponses = {
     /**
      * OK
@@ -2808,19 +1924,6 @@ export type GetAiReplyData = {
     query?: never;
     url: '/api/conversation/{conversationId}/ai-reply';
 };
-
-export type GetAiReplyErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetAiReplyError = GetAiReplyErrors[keyof GetAiReplyErrors];
 
 export type GetAiReplyResponses = {
     /**
@@ -2840,19 +1943,6 @@ export type StartConversationAboutRecallPromptData = {
     url: '/api/conversation/recall-prompt/{recallPrompt}';
 };
 
-export type StartConversationAboutRecallPromptErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type StartConversationAboutRecallPromptError = StartConversationAboutRecallPromptErrors[keyof StartConversationAboutRecallPromptErrors];
-
 export type StartConversationAboutRecallPromptResponses = {
     /**
      * OK
@@ -2870,19 +1960,6 @@ export type GetConversationsAboutNoteData = {
     query?: never;
     url: '/api/conversation/note/{note}';
 };
-
-export type GetConversationsAboutNoteErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetConversationsAboutNoteError = GetConversationsAboutNoteErrors[keyof GetConversationsAboutNoteErrors];
 
 export type GetConversationsAboutNoteResponses = {
     /**
@@ -2902,19 +1979,6 @@ export type StartConversationAboutNoteData = {
     url: '/api/conversation/note/{note}';
 };
 
-export type StartConversationAboutNoteErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type StartConversationAboutNoteError = StartConversationAboutNoteErrors[keyof StartConversationAboutNoteErrors];
-
 export type StartConversationAboutNoteResponses = {
     /**
      * OK
@@ -2933,19 +1997,6 @@ export type StartConversationAboutAssessmentQuestionData = {
     url: '/api/conversation/assessment-question/{assessmentQuestion}';
 };
 
-export type StartConversationAboutAssessmentQuestionErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type StartConversationAboutAssessmentQuestionError = StartConversationAboutAssessmentQuestionErrors[keyof StartConversationAboutAssessmentQuestionErrors];
-
 export type StartConversationAboutAssessmentQuestionResponses = {
     /**
      * OK
@@ -2962,19 +2013,6 @@ export type IndexData = {
     url: '/api/circles';
 };
 
-export type IndexErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type IndexError = IndexErrors[keyof IndexErrors];
-
 export type IndexResponses = {
     /**
      * OK
@@ -2990,19 +2028,6 @@ export type CreateCircleData = {
     query?: never;
     url: '/api/circles';
 };
-
-export type CreateCircleErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type CreateCircleError = CreateCircleErrors[keyof CreateCircleErrors];
 
 export type CreateCircleResponses = {
     /**
@@ -3022,19 +2047,6 @@ export type CreateNotebookInCircleData = {
     url: '/api/circles/{circle}/notebooks';
 };
 
-export type CreateNotebookInCircleErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type CreateNotebookInCircleError = CreateNotebookInCircleErrors[keyof CreateNotebookInCircleErrors];
-
 export type CreateNotebookInCircleResponses = {
     /**
      * OK
@@ -3050,19 +2062,6 @@ export type JoinCircleData = {
     query?: never;
     url: '/api/circles/join';
 };
-
-export type JoinCircleErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type JoinCircleError = JoinCircleErrors[keyof JoinCircleErrors];
 
 export type JoinCircleResponses = {
     /**
@@ -3082,19 +2081,6 @@ export type GetCertificateData = {
     url: '/api/certificate/{notebook}';
 };
 
-export type GetCertificateErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetCertificateError = GetCertificateErrors[keyof GetCertificateErrors];
-
 export type GetCertificateResponses = {
     /**
      * OK
@@ -3112,19 +2098,6 @@ export type ClaimCertificateData = {
     query?: never;
     url: '/api/certificate/{notebook}';
 };
-
-export type ClaimCertificateErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ClaimCertificateError = ClaimCertificateErrors[keyof ClaimCertificateErrors];
 
 export type ClaimCertificateResponses = {
     /**
@@ -3144,19 +2117,6 @@ export type RemoveFromBazaarData = {
     url: '/api/bazaar/{bazaarNotebook}/remove';
 };
 
-export type RemoveFromBazaarErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type RemoveFromBazaarError = RemoveFromBazaarErrors[keyof RemoveFromBazaarErrors];
-
 export type RemoveFromBazaarResponses = {
     /**
      * OK
@@ -3173,19 +2133,6 @@ export type AudioToTextData = {
     url: '/api/audio/audio-to-text';
 };
 
-export type AudioToTextErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type AudioToTextError = AudioToTextErrors[keyof AudioToTextErrors];
-
 export type AudioToTextResponses = {
     /**
      * OK
@@ -3201,19 +2148,6 @@ export type AssimilateData = {
     query?: never;
     url: '/api/assimilation';
 };
-
-export type AssimilateErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type AssimilateError = AssimilateErrors[keyof AssimilateErrors];
 
 export type AssimilateResponses = {
     /**
@@ -3233,19 +2167,6 @@ export type AnswerQuestionData = {
     url: '/api/assessment/{assessmentQuestionInstance}/answer';
 };
 
-export type AnswerQuestionErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type AnswerQuestionError = AnswerQuestionErrors[keyof AnswerQuestionErrors];
-
 export type AnswerQuestionResponses = {
     /**
      * OK
@@ -3263,19 +2184,6 @@ export type SubmitAssessmentResultData = {
     query?: never;
     url: '/api/assessment/{assessmentAttempt}';
 };
-
-export type SubmitAssessmentResultErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type SubmitAssessmentResultError = SubmitAssessmentResultErrors[keyof SubmitAssessmentResultErrors];
 
 export type SubmitAssessmentResultResponses = {
     /**
@@ -3295,19 +2203,6 @@ export type GenerateAssessmentQuestionsData = {
     url: '/api/assessment/questions/{notebook}';
 };
 
-export type GenerateAssessmentQuestionsErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GenerateAssessmentQuestionsError = GenerateAssessmentQuestionsErrors[keyof GenerateAssessmentQuestionsErrors];
-
 export type GenerateAssessmentQuestionsResponses = {
     /**
      * OK
@@ -3325,19 +2220,6 @@ export type SuggestTitleData = {
     query?: never;
     url: '/api/ai/suggest-title/{note}';
 };
-
-export type SuggestTitleErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type SuggestTitleError = SuggestTitleErrors[keyof SuggestTitleErrors];
 
 export type SuggestTitleResponses = {
     /**
@@ -3357,19 +2239,6 @@ export type RemovePointFromNoteData = {
     url: '/api/ai/remove-point-from-note/{note}';
 };
 
-export type RemovePointFromNoteErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type RemovePointFromNoteError = RemovePointFromNoteErrors[keyof RemovePointFromNoteErrors];
-
 export type RemovePointFromNoteResponses = {
     /**
      * OK
@@ -3387,19 +2256,6 @@ export type PromotePointToSiblingData = {
     query?: never;
     url: '/api/ai/promote-point-to-sibling/{note}';
 };
-
-export type PromotePointToSiblingErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type PromotePointToSiblingError = PromotePointToSiblingErrors[keyof PromotePointToSiblingErrors];
 
 export type PromotePointToSiblingResponses = {
     /**
@@ -3419,19 +2275,6 @@ export type PromotePointToChildData = {
     url: '/api/ai/promote-point-to-child/{note}';
 };
 
-export type PromotePointToChildErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type PromotePointToChildError = PromotePointToChildErrors[keyof PromotePointToChildErrors];
-
 export type PromotePointToChildResponses = {
     /**
      * OK
@@ -3450,19 +2293,6 @@ export type GenerateUnderstandingChecklistData = {
     url: '/api/ai/generate-understanding-checklist/{note}';
 };
 
-export type GenerateUnderstandingChecklistErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GenerateUnderstandingChecklistError = GenerateUnderstandingChecklistErrors[keyof GenerateUnderstandingChecklistErrors];
-
 export type GenerateUnderstandingChecklistResponses = {
     /**
      * OK
@@ -3478,19 +2308,6 @@ export type GenerateImageData = {
     query?: never;
     url: '/api/ai/generate-image';
 };
-
-export type GenerateImageErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GenerateImageError = GenerateImageErrors[keyof GenerateImageErrors];
 
 export type GenerateImageResponses = {
     /**
@@ -3510,19 +2327,6 @@ export type UpdateUserData = {
     url: '/api/user/{user}';
 };
 
-export type UpdateUserErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type UpdateUserError = UpdateUserErrors[keyof UpdateUserErrors];
-
 export type UpdateUserResponses = {
     /**
      * OK
@@ -3540,19 +2344,6 @@ export type UpdateNoteTitleData = {
     query?: never;
     url: '/api/text_content/{note}/title';
 };
-
-export type UpdateNoteTitleErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type UpdateNoteTitleError = UpdateNoteTitleErrors[keyof UpdateNoteTitleErrors];
 
 export type UpdateNoteTitleResponses = {
     /**
@@ -3572,19 +2363,6 @@ export type UpdateNoteDetailsData = {
     url: '/api/text_content/{note}/details';
 };
 
-export type UpdateNoteDetailsErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type UpdateNoteDetailsError = UpdateNoteDetailsErrors[keyof UpdateNoteDetailsErrors];
-
 export type UpdateNoteDetailsResponses = {
     /**
      * OK
@@ -3602,19 +2380,6 @@ export type ShowNoteData = {
     query?: never;
     url: '/api/notes/{note}';
 };
-
-export type ShowNoteErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ShowNoteError = ShowNoteErrors[keyof ShowNoteErrors];
 
 export type ShowNoteResponses = {
     /**
@@ -3634,19 +2399,6 @@ export type UpdateNoteAccessoriesData = {
     url: '/api/notes/{note}';
 };
 
-export type UpdateNoteAccessoriesErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type UpdateNoteAccessoriesError = UpdateNoteAccessoriesErrors[keyof UpdateNoteAccessoriesErrors];
-
 export type UpdateNoteAccessoriesResponses = {
     /**
      * OK
@@ -3664,19 +2416,6 @@ export type UndoDeleteNoteData = {
     query?: never;
     url: '/api/notes/{note}/undo-delete';
 };
-
-export type UndoDeleteNoteErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type UndoDeleteNoteError = UndoDeleteNoteErrors[keyof UndoDeleteNoteErrors];
 
 export type UndoDeleteNoteResponses = {
     /**
@@ -3696,19 +2435,6 @@ export type UpdateNoteTypeData = {
     url: '/api/notes/{note}/note-type';
 };
 
-export type UpdateNoteTypeErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type UpdateNoteTypeError = UpdateNoteTypeErrors[keyof UpdateNoteTypeErrors];
-
 export type UpdateNoteTypeResponses = {
     /**
      * OK
@@ -3726,19 +2452,6 @@ export type MoveToTopLevelData = {
     query?: never;
     url: '/api/notes/{note}/move-to-top-level';
 };
-
-export type MoveToTopLevelErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type MoveToTopLevelError = MoveToTopLevelErrors[keyof MoveToTopLevelErrors];
 
 export type MoveToTopLevelResponses = {
     /**
@@ -3759,19 +2472,6 @@ export type MoveToCircleData = {
     url: '/api/notebooks/{notebook}/move-to-circle/{circle}';
 };
 
-export type MoveToCircleErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type MoveToCircleError = MoveToCircleErrors[keyof MoveToCircleErrors];
-
 export type MoveToCircleResponses = {
     /**
      * OK
@@ -3790,19 +2490,6 @@ export type GetAiAssistantData = {
     url: '/api/notebooks/{notebook}/ai-assistant';
 };
 
-export type GetAiAssistantErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetAiAssistantError = GetAiAssistantErrors[keyof GetAiAssistantErrors];
-
 export type GetAiAssistantResponses = {
     /**
      * OK
@@ -3820,19 +2507,6 @@ export type UpdateAiAssistantData = {
     query?: never;
     url: '/api/notebooks/{notebook}/ai-assistant';
 };
-
-export type UpdateAiAssistantErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type UpdateAiAssistantError = UpdateAiAssistantErrors[keyof UpdateAiAssistantErrors];
 
 export type UpdateAiAssistantResponses = {
     /**
@@ -3854,19 +2528,6 @@ export type MarkAsRecalledData = {
     url: '/api/memory-trackers/{memoryTracker}/mark-as-recalled';
 };
 
-export type MarkAsRecalledErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type MarkAsRecalledError = MarkAsRecalledErrors[keyof MarkAsRecalledErrors];
-
 export type MarkAsRecalledResponses = {
     /**
      * OK
@@ -3884,19 +2545,6 @@ export type UpdateSuggestedQuestionForFineTuningData = {
     query?: never;
     url: '/api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning';
 };
-
-export type UpdateSuggestedQuestionForFineTuningErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type UpdateSuggestedQuestionForFineTuningError = UpdateSuggestedQuestionForFineTuningErrors[keyof UpdateSuggestedQuestionForFineTuningErrors];
 
 export type UpdateSuggestedQuestionForFineTuningResponses = {
     /**
@@ -3916,19 +2564,6 @@ export type MarkConversationAsReadData = {
     url: '/api/conversation/{conversationId}/read';
 };
 
-export type MarkConversationAsReadErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type MarkConversationAsReadError = MarkConversationAsReadErrors[keyof MarkConversationAsReadErrors];
-
 export type MarkConversationAsReadResponses = {
     /**
      * OK
@@ -3946,19 +2581,6 @@ export type InstallData = {
     };
     url: '/install';
 };
-
-export type InstallErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type InstallError = InstallErrors[keyof InstallErrors];
 
 export type InstallResponses = {
     /**
@@ -3978,19 +2600,6 @@ export type SearchWikidataData = {
     url: '/api/wikidata/search';
 };
 
-export type SearchWikidataErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type SearchWikidataError = SearchWikidataErrors[keyof SearchWikidataErrors];
-
 export type SearchWikidataResponses = {
     /**
      * OK
@@ -4009,19 +2618,6 @@ export type FetchWikidataEntityDataByIdData = {
     url: '/api/wikidata/entity-data/{wikidataId}';
 };
 
-export type FetchWikidataEntityDataByIdErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type FetchWikidataEntityDataByIdError = FetchWikidataEntityDataByIdErrors[keyof FetchWikidataEntityDataByIdErrors];
-
 export type FetchWikidataEntityDataByIdResponses = {
     /**
      * OK
@@ -4038,19 +2634,6 @@ export type RevokeTokenData = {
     url: '/api/user/token-info';
 };
 
-export type RevokeTokenErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type RevokeTokenError = RevokeTokenErrors[keyof RevokeTokenErrors];
-
 export type RevokeTokenResponses = {
     /**
      * OK
@@ -4064,19 +2647,6 @@ export type GetTokenInfoData = {
     query?: never;
     url: '/api/user/token-info';
 };
-
-export type GetTokenInfoErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetTokenInfoError = GetTokenInfoErrors[keyof GetTokenInfoErrors];
 
 export type GetTokenInfoResponses = {
     /**
@@ -4096,19 +2666,6 @@ export type GetMenuDataData = {
     url: '/api/user/menu-data';
 };
 
-export type GetMenuDataErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetMenuDataError = GetMenuDataErrors[keyof GetMenuDataErrors];
-
 export type GetMenuDataResponses = {
     /**
      * OK
@@ -4124,19 +2681,6 @@ export type GetTokensData = {
     query?: never;
     url: '/api/user/get-tokens';
 };
-
-export type GetTokensErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetTokensError = GetTokensErrors[keyof GetTokensErrors];
 
 export type GetTokensResponses = {
     /**
@@ -4154,19 +2698,6 @@ export type CurrentUserInfoData = {
     url: '/api/user/current-user-info';
 };
 
-export type CurrentUserInfoErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type CurrentUserInfoError = CurrentUserInfoErrors[keyof CurrentUserInfoErrors];
-
 export type CurrentUserInfoResponses = {
     /**
      * OK
@@ -4182,19 +2713,6 @@ export type GithubIssuesData = {
     query?: never;
     url: '/api/testability/github_issues';
 };
-
-export type GithubIssuesErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GithubIssuesError = GithubIssuesErrors[keyof GithubIssuesErrors];
 
 export type GithubIssuesResponses = {
     /**
@@ -4217,19 +2735,6 @@ export type RecallingData = {
     url: '/api/recalls/recalling';
 };
 
-export type RecallingErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type RecallingError = RecallingErrors[keyof RecallingErrors];
-
 export type RecallingResponses = {
     /**
      * OK
@@ -4248,19 +2753,6 @@ export type PreviouslyAnsweredData = {
     url: '/api/recalls/previously-answered';
 };
 
-export type PreviouslyAnsweredErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type PreviouslyAnsweredError = PreviouslyAnsweredErrors[keyof PreviouslyAnsweredErrors];
-
 export type PreviouslyAnsweredResponses = {
     /**
      * OK
@@ -4278,19 +2770,6 @@ export type ExportQuestionGenerationData = {
     query?: never;
     url: '/api/predefined-questions/{note}/export-question-generation';
 };
-
-export type ExportQuestionGenerationErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ExportQuestionGenerationError = ExportQuestionGenerationErrors[keyof ExportQuestionGenerationErrors];
 
 export type ExportQuestionGenerationResponses = {
     /**
@@ -4312,19 +2791,6 @@ export type GetNoteInfoData = {
     url: '/api/notes/{note}/note-info';
 };
 
-export type GetNoteInfoErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetNoteInfoError = GetNoteInfoErrors[keyof GetNoteInfoErrors];
-
 export type GetNoteInfoResponses = {
     /**
      * OK
@@ -4345,19 +2811,6 @@ export type GetGraphData = {
     url: '/api/notes/{note}/graph';
 };
 
-export type GetGraphErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetGraphError = GetGraphErrors[keyof GetGraphErrors];
-
 export type GetGraphResponses = {
     /**
      * OK
@@ -4375,19 +2828,6 @@ export type GetDescendantsData = {
     query?: never;
     url: '/api/notes/{note}/descendants';
 };
-
-export type GetDescendantsErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetDescendantsError = GetDescendantsErrors[keyof GetDescendantsErrors];
 
 export type GetDescendantsResponses = {
     /**
@@ -4407,19 +2847,6 @@ export type ShowNoteAccessoryData = {
     url: '/api/notes/{note}/accessory';
 };
 
-export type ShowNoteAccessoryErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ShowNoteAccessoryError = ShowNoteAccessoryErrors[keyof ShowNoteAccessoryErrors];
-
 export type ShowNoteAccessoryResponses = {
     /**
      * OK
@@ -4435,19 +2862,6 @@ export type GetRecentNotesData = {
     query?: never;
     url: '/api/notes/recent';
 };
-
-export type GetRecentNotesErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetRecentNotesError = GetRecentNotesErrors[keyof GetRecentNotesErrors];
 
 export type GetRecentNotesResponses = {
     /**
@@ -4465,19 +2879,6 @@ export type MyNotebooksData = {
     url: '/api/notebooks';
 };
 
-export type MyNotebooksErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type MyNotebooksError = MyNotebooksErrors[keyof MyNotebooksErrors];
-
 export type MyNotebooksResponses = {
     /**
      * OK
@@ -4493,19 +2894,6 @@ export type GetAllPendingRequestData = {
     query?: never;
     url: '/api/notebook_certificate_approvals/get-all-pending-request';
 };
-
-export type GetAllPendingRequestErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetAllPendingRequestError = GetAllPendingRequestErrors[keyof GetAllPendingRequestErrors];
 
 export type GetAllPendingRequestResponses = {
     /**
@@ -4525,19 +2913,6 @@ export type GetApprovalForNotebookData = {
     url: '/api/notebook_certificate_approvals/for-notebook/{notebook}';
 };
 
-export type GetApprovalForNotebookErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetApprovalForNotebookError = GetApprovalForNotebookErrors[keyof GetApprovalForNotebookErrors];
-
 export type GetApprovalForNotebookResponses = {
     /**
      * OK
@@ -4555,19 +2930,6 @@ export type ShowMemoryTrackerData = {
     query?: never;
     url: '/api/memory-trackers/{memoryTracker}';
 };
-
-export type ShowMemoryTrackerErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ShowMemoryTrackerError = ShowMemoryTrackerErrors[keyof ShowMemoryTrackerErrors];
 
 export type ShowMemoryTrackerResponses = {
     /**
@@ -4587,19 +2949,6 @@ export type GetThresholdExceededData = {
     url: '/api/memory-trackers/{memoryTracker}/threshold-exceeded';
 };
 
-export type GetThresholdExceededErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetThresholdExceededError = GetThresholdExceededErrors[keyof GetThresholdExceededErrors];
-
 export type GetThresholdExceededResponses = {
     /**
      * OK
@@ -4617,19 +2966,6 @@ export type GetRecallPromptsData = {
     query?: never;
     url: '/api/memory-trackers/{memoryTracker}/recall-prompts';
 };
-
-export type GetRecallPromptsErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetRecallPromptsError = GetRecallPromptsErrors[keyof GetRecallPromptsErrors];
 
 export type GetRecallPromptsResponses = {
     /**
@@ -4649,19 +2985,6 @@ export type AskAQuestionData = {
     url: '/api/memory-trackers/{memoryTracker}/question';
 };
 
-export type AskAQuestionErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type AskAQuestionError = AskAQuestionErrors[keyof AskAQuestionErrors];
-
 export type AskAQuestionResponses = {
     /**
      * OK
@@ -4677,19 +3000,6 @@ export type GetRecentlyRecalledData = {
     query?: never;
     url: '/api/memory-trackers/recently-recalled';
 };
-
-export type GetRecentlyRecalledErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetRecentlyRecalledError = GetRecentlyRecalledErrors[keyof GetRecentlyRecalledErrors];
 
 export type GetRecentlyRecalledResponses = {
     /**
@@ -4707,19 +3017,6 @@ export type GetRecentMemoryTrackersData = {
     url: '/api/memory-trackers/recent';
 };
 
-export type GetRecentMemoryTrackersErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetRecentMemoryTrackersError = GetRecentMemoryTrackersErrors[keyof GetRecentMemoryTrackersErrors];
-
 export type GetRecentMemoryTrackersResponses = {
     /**
      * OK
@@ -4735,19 +3032,6 @@ export type PingData = {
     query?: never;
     url: '/api/healthcheck';
 };
-
-export type PingErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type PingError = PingErrors[keyof PingErrors];
 
 export type PingResponses = {
     /**
@@ -4765,19 +3049,6 @@ export type GetAllSuggestedQuestionsData = {
     url: '/api/fine-tuning/all-suggested-questions-for-fine-tuning';
 };
 
-export type GetAllSuggestedQuestionsErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetAllSuggestedQuestionsError = GetAllSuggestedQuestionsErrors[keyof GetAllSuggestedQuestionsErrors];
-
 export type GetAllSuggestedQuestionsResponses = {
     /**
      * OK
@@ -4793,19 +3064,6 @@ export type FailureReportsData = {
     query?: never;
     url: '/api/failure-reports';
 };
-
-export type FailureReportsErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type FailureReportsError = FailureReportsErrors[keyof FailureReportsErrors];
 
 export type FailureReportsResponses = {
     /**
@@ -4827,19 +3085,6 @@ export type ShowFailureReportData = {
     url: '/api/failure-reports/{failureReport}';
 };
 
-export type ShowFailureReportErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ShowFailureReportError = ShowFailureReportErrors[keyof ShowFailureReportErrors];
-
 export type ShowFailureReportResponses = {
     /**
      * OK
@@ -4855,19 +3100,6 @@ export type DataUpgradeData = {
     query?: never;
     url: '/api/data_upgrade';
 };
-
-export type DataUpgradeErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type DataUpgradeError = DataUpgradeErrors[keyof DataUpgradeErrors];
 
 export type DataUpgradeResponses = {
     /**
@@ -4887,19 +3119,6 @@ export type GetConversationData = {
     url: '/api/conversation/{conversationId}';
 };
 
-export type GetConversationErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetConversationError = GetConversationErrors[keyof GetConversationErrors];
-
 export type GetConversationResponses = {
     /**
      * OK
@@ -4917,19 +3136,6 @@ export type GetConversationMessagesData = {
     query?: never;
     url: '/api/conversation/{conversationId}/messages';
 };
-
-export type GetConversationMessagesErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetConversationMessagesError = GetConversationMessagesErrors[keyof GetConversationMessagesErrors];
 
 export type GetConversationMessagesResponses = {
     /**
@@ -4949,19 +3155,6 @@ export type ExportConversationData = {
     url: '/api/conversation/{conversationId}/export';
 };
 
-export type ExportConversationErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ExportConversationError = ExportConversationErrors[keyof ExportConversationErrors];
-
 export type ExportConversationResponses = {
     /**
      * OK
@@ -4979,19 +3172,6 @@ export type GetConversationsOfCurrentUserData = {
     query?: never;
     url: '/api/conversation/all';
 };
-
-export type GetConversationsOfCurrentUserErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetConversationsOfCurrentUserError = GetConversationsOfCurrentUserErrors[keyof GetConversationsOfCurrentUserErrors];
 
 export type GetConversationsOfCurrentUserResponses = {
     /**
@@ -5011,19 +3191,6 @@ export type ShowCircleData = {
     url: '/api/circles/{circle}';
 };
 
-export type ShowCircleErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ShowCircleError = ShowCircleErrors[keyof ShowCircleErrors];
-
 export type ShowCircleResponses = {
     /**
      * OK
@@ -5039,19 +3206,6 @@ export type BazaarData = {
     query?: never;
     url: '/api/bazaar';
 };
-
-export type BazaarErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type BazaarError = BazaarErrors[keyof BazaarErrors];
 
 export type BazaarResponses = {
     /**
@@ -5071,19 +3225,6 @@ export type AssimilatingData = {
     url: '/api/assimilation/assimilating';
 };
 
-export type AssimilatingErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type AssimilatingError = AssimilatingErrors[keyof AssimilatingErrors];
-
 export type AssimilatingResponses = {
     /**
      * OK
@@ -5099,19 +3240,6 @@ export type GetMyAssessmentsData = {
     query?: never;
     url: '/api/assessment';
 };
-
-export type GetMyAssessmentsErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetMyAssessmentsError = GetMyAssessmentsErrors[keyof GetMyAssessmentsErrors];
 
 export type GetMyAssessmentsResponses = {
     /**
@@ -5129,19 +3257,6 @@ export type DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamData = {
     url: '/api/ai/dummy';
 };
 
-export type DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamError = DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamErrors[keyof DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamErrors];
-
 export type DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamResponses = {
     /**
      * OK
@@ -5157,19 +3272,6 @@ export type GetAvailableGptModelsData = {
     query?: never;
     url: '/api/ai/available-gpt-models';
 };
-
-export type GetAvailableGptModelsErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetAvailableGptModelsError = GetAvailableGptModelsErrors[keyof GetAvailableGptModelsErrors];
 
 export type GetAvailableGptModelsResponses = {
     /**
@@ -5190,19 +3292,6 @@ export type ListUsersData = {
     url: '/api/admin/users';
 };
 
-export type ListUsersErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ListUsersError = ListUsersErrors[keyof ListUsersErrors];
-
 export type ListUsersResponses = {
     /**
      * OK
@@ -5221,19 +3310,6 @@ export type DeleteTokenData = {
     url: '/api/user/token/{tokenId}';
 };
 
-export type DeleteTokenErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type DeleteTokenError = DeleteTokenErrors[keyof DeleteTokenErrors];
-
 export type DeleteTokenResponses = {
     /**
      * OK
@@ -5250,19 +3326,6 @@ export type DeleteUnansweredRecallPromptsData = {
     url: '/api/memory-trackers/{memoryTracker}/recall-prompts/unanswered';
 };
 
-export type DeleteUnansweredRecallPromptsErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type DeleteUnansweredRecallPromptsError = DeleteUnansweredRecallPromptsErrors[keyof DeleteUnansweredRecallPromptsErrors];
-
 export type DeleteUnansweredRecallPromptsResponses = {
     /**
      * OK
@@ -5276,19 +3339,6 @@ export type DeleteFailureReportsData = {
     query?: never;
     url: '/api/failure-reports/delete';
 };
-
-export type DeleteFailureReportsErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type DeleteFailureReportsError = DeleteFailureReportsErrors[keyof DeleteFailureReportsErrors];
 
 export type DeleteFailureReportsResponses = {
     /**

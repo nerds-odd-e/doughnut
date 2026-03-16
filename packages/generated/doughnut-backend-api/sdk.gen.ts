@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AddQuestionManuallyData, AddQuestionManuallyErrors, AddQuestionManuallyResponses, AddRelationshipFinalizeData, AddRelationshipFinalizeErrors, AddRelationshipFinalizeResponses, AnswerQuestionData, AnswerQuestionErrors, AnswerQuestionResponses, AnswerQuizData, AnswerQuizErrors, AnswerQuizResponses, AnswerSpellingData, AnswerSpellingErrors, AnswerSpellingResponses, ApproveData, ApproveErrors, ApproveResponses, AskAQuestionData, AskAQuestionErrors, AskAQuestionResponses, AssimilateData, AssimilateErrors, AssimilateResponses, AssimilatingData, AssimilatingErrors, AssimilatingResponses, AudioToTextData, AudioToTextErrors, AudioToTextResponses, BazaarData, BazaarErrors, BazaarResponses, ClaimCertificateData, ClaimCertificateErrors, ClaimCertificateResponses, CloseAllGithubIssuesData, CloseAllGithubIssuesErrors, CloseAllGithubIssuesResponses, ContestData, ContestErrors, ContestResponses, CreateCircleData, CreateCircleErrors, CreateCircleResponses, CreateNoteAfterData, CreateNoteAfterErrors, CreateNoteAfterResponses, CreateNotebookData, CreateNotebookErrors, CreateNotebookInCircleData, CreateNotebookInCircleErrors, CreateNotebookInCircleResponses, CreateNotebookResponses, CreateNoteUnderParentData, CreateNoteUnderParentErrors, CreateNoteUnderParentResponses, CreateNoteViaMcpData, CreateNoteViaMcpErrors, CreateNoteViaMcpResponses, CreateRelationshipsData, CreateRelationshipsErrors, CreateRelationshipsResponses, CreateSubscriptionData, CreateSubscriptionErrors, CreateSubscriptionResponses, CreateUserData, CreateUserErrors, CreateUserResponses, CurrentUserInfoData, CurrentUserInfoErrors, CurrentUserInfoResponses, DataUpgradeData, DataUpgradeErrors, DataUpgradeResponses, DeleteData, DeleteErrors, DeleteFailureReportsData, DeleteFailureReportsErrors, DeleteFailureReportsResponses, DeleteNoteData, DeleteNoteErrors, DeleteNoteResponses, DeleteResponses, DeleteTokenData, DeleteTokenErrors, DeleteTokenResponses, DeleteUnansweredRecallPromptsData, DeleteUnansweredRecallPromptsErrors, DeleteUnansweredRecallPromptsResponses, DestroySubscriptionData, DestroySubscriptionErrors, DestroySubscriptionResponses, DownloadNotebookForObsidianData, DownloadNotebookForObsidianErrors, DownloadNotebookForObsidianResponses, DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamData, DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamErrors, DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamResponses, DuplicateData, DuplicateErrors, DuplicateResponses, EnableFeatureToggleData, EnableFeatureToggleErrors, EnableFeatureToggleResponses, ExportConversationData, ExportConversationErrors, ExportConversationResponses, ExportQuestionGenerationData, ExportQuestionGenerationErrors, ExportQuestionGenerationResponses, FailureReportsData, FailureReportsErrors, FailureReportsResponses, FetchWikidataEntityDataByIdData, FetchWikidataEntityDataByIdErrors, FetchWikidataEntityDataByIdResponses, GenerateAssessmentQuestionsData, GenerateAssessmentQuestionsErrors, GenerateAssessmentQuestionsResponses, GenerateImageData, GenerateImageErrors, GenerateImageResponses, GenerateQuestionWithoutSaveData, GenerateQuestionWithoutSaveErrors, GenerateQuestionWithoutSaveResponses, GenerateTokenData, GenerateTokenErrors, GenerateTokenResponses, GenerateUnderstandingChecklistData, GenerateUnderstandingChecklistErrors, GenerateUnderstandingChecklistResponses, GetAiAssistantData, GetAiAssistantErrors, GetAiAssistantResponses, GetAiReplyData, GetAiReplyErrors, GetAiReplyResponses, GetAllPendingRequestData, GetAllPendingRequestErrors, GetAllPendingRequestResponses, GetAllQuestionByNoteData, GetAllQuestionByNoteErrors, GetAllQuestionByNoteResponses, GetAllSuggestedQuestionsData, GetAllSuggestedQuestionsErrors, GetAllSuggestedQuestionsResponses, GetApprovalForNotebookData, GetApprovalForNotebookErrors, GetApprovalForNotebookResponses, GetAvailableGptModelsData, GetAvailableGptModelsErrors, GetAvailableGptModelsResponses, GetCertificateData, GetCertificateErrors, GetCertificateResponses, GetConversationData, GetConversationErrors, GetConversationMessagesData, GetConversationMessagesErrors, GetConversationMessagesResponses, GetConversationResponses, GetConversationsAboutNoteData, GetConversationsAboutNoteErrors, GetConversationsAboutNoteResponses, GetConversationsOfCurrentUserData, GetConversationsOfCurrentUserErrors, GetConversationsOfCurrentUserResponses, GetCurrentModelVersionsData, GetCurrentModelVersionsErrors, GetCurrentModelVersionsResponses, GetData, GetDescendantsData, GetDescendantsErrors, GetDescendantsResponses, GetErrors, GetFeatureToggleData, GetFeatureToggleErrors, GetFeatureToggleResponses, GetGraphData, GetGraphErrors, GetGraphResponses, GetMenuDataData, GetMenuDataErrors, GetMenuDataResponses, GetMyAssessmentsData, GetMyAssessmentsErrors, GetMyAssessmentsResponses, GetNoteInfoData, GetNoteInfoErrors, GetNoteInfoResponses, GetRecallPromptsData, GetRecallPromptsErrors, GetRecallPromptsResponses, GetRecentlyRecalledData, GetRecentlyRecalledErrors, GetRecentlyRecalledResponses, GetRecentMemoryTrackersData, GetRecentMemoryTrackersErrors, GetRecentMemoryTrackersResponses, GetRecentNotesData, GetRecentNotesErrors, GetRecentNotesResponses, GetResponses, GetThresholdExceededData, GetThresholdExceededErrors, GetThresholdExceededResponses, GetTokenInfoData, GetTokenInfoErrors, GetTokenInfoResponses, GetTokensData, GetTokensErrors, GetTokensResponses, GetUserProfileData, GetUserProfileErrors, GetUserProfileResponses, GithubIssuesData, GithubIssuesErrors, GithubIssuesResponses, ImportObsidianData, ImportObsidianErrors, ImportObsidianResponses, IndexData, IndexErrors, IndexResponses, InjectCircleData, InjectCircleErrors, InjectCircleResponses, InjectNotesData, InjectNotesErrors, InjectNotesResponses, InjectPredefinedQuestionData, InjectPredefinedQuestionErrors, InjectPredefinedQuestionResponses, InjectSuggestedQuestionData, InjectSuggestedQuestionErrors, InjectSuggestedQuestionResponses, InstallData, InstallErrors, InstallResponses, JoinCircleData, JoinCircleErrors, JoinCircleResponses, ListUsersData, ListUsersErrors, ListUsersResponses, MarkAsRecalledData, MarkAsRecalledErrors, MarkAsRecalledResponses, MarkConversationAsReadData, MarkConversationAsReadErrors, MarkConversationAsReadResponses, MoveAfterData, MoveAfterErrors, MoveAfterResponses, MoveNoteData, MoveNoteErrors, MoveNoteResponses, MoveToCircleData, MoveToCircleErrors, MoveToCircleResponses, MoveToTopLevelData, MoveToTopLevelErrors, MoveToTopLevelResponses, MyNotebooksData, MyNotebooksErrors, MyNotebooksResponses, PingData, PingErrors, PingResponses, PreviouslyAnsweredData, PreviouslyAnsweredErrors, PreviouslyAnsweredResponses, PromotePointToChildData, PromotePointToChildErrors, PromotePointToChildResponses, PromotePointToSiblingData, PromotePointToSiblingErrors, PromotePointToSiblingResponses, RandomizerData, RandomizerErrors, RandomizerResponses, RecallingData, RecallingErrors, RecallingResponses, ReEnableData, ReEnableErrors, ReEnableResponses, RefineQuestionData, RefineQuestionErrors, RefineQuestionResponses, RegenerateData, RegenerateErrors, RegenerateResponses, RemoveFromBazaarData, RemoveFromBazaarErrors, RemoveFromBazaarResponses, RemoveFromRepeatingData, RemoveFromRepeatingErrors, RemoveFromRepeatingResponses, RemovePointFromNoteData, RemovePointFromNoteErrors, RemovePointFromNoteResponses, ReplaceServiceUrlData, ReplaceServiceUrlErrors, ReplaceServiceUrlResponses, ReplyToConversationData, ReplyToConversationErrors, ReplyToConversationResponses, RequestApprovalForNotebookData, RequestApprovalForNotebookErrors, RequestApprovalForNotebookResponses, ResetDbAndTestabilitySettingsData, ResetDbAndTestabilitySettingsErrors, ResetDbAndTestabilitySettingsResponses, ResetNotebookIndexData, ResetNotebookIndexErrors, ResetNotebookIndexResponses, RevokeTokenData, RevokeTokenErrors, RevokeTokenResponses, SearchForRelationshipTargetData, SearchForRelationshipTargetErrors, SearchForRelationshipTargetResponses, SearchForRelationshipTargetWithinData, SearchForRelationshipTargetWithinErrors, SearchForRelationshipTargetWithinResponses, SearchWikidataData, SearchWikidataErrors, SearchWikidataResponses, SemanticSearchData, SemanticSearchErrors, SemanticSearchResponses, SemanticSearchWithinData, SemanticSearchWithinErrors, SemanticSearchWithinResponses, SetCurrentModelVersionsData, SetCurrentModelVersionsErrors, SetCurrentModelVersionsResponses, SetOpenAiTokenData, SetOpenAiTokenErrors, SetOpenAiTokenResponses, ShareNotebookData, ShareNotebookErrors, ShareNotebookResponses, ShareToBazaarData, ShareToBazaarErrors, ShareToBazaarResponses, ShowCircleData, ShowCircleErrors, ShowCircleResponses, ShowFailureReportData, ShowFailureReportErrors, ShowFailureReportResponses, ShowMemoryTrackerData, ShowMemoryTrackerErrors, ShowMemoryTrackerResponses, ShowNoteAccessoryData, ShowNoteAccessoryErrors, ShowNoteAccessoryResponses, ShowNoteData, ShowNoteErrors, ShowNoteResponses, SoftDeleteData, SoftDeleteErrors, SoftDeleteResponses, StartConversationAboutAssessmentQuestionData, StartConversationAboutAssessmentQuestionErrors, StartConversationAboutAssessmentQuestionResponses, StartConversationAboutNoteData, StartConversationAboutNoteErrors, StartConversationAboutNoteResponses, StartConversationAboutRecallPromptData, StartConversationAboutRecallPromptErrors, StartConversationAboutRecallPromptResponses, SubmitAssessmentResultData, SubmitAssessmentResultErrors, SubmitAssessmentResultResponses, SuggestQuestionForFineTuningData, SuggestQuestionForFineTuningErrors, SuggestQuestionForFineTuningResponses, SuggestTitleData, SuggestTitleErrors, SuggestTitleResponses, TestabilityUpdateUserData, TestabilityUpdateUserErrors, TestabilityUpdateUserResponses, TimeTravelData, TimeTravelErrors, TimeTravelRelativeToNowData, TimeTravelRelativeToNowErrors, TimeTravelRelativeToNowResponses, TimeTravelResponses, ToggleApprovalData, ToggleApprovalErrors, ToggleApprovalResponses, TriggerExceptionData, TriggerExceptionErrors, TriggerExceptionResponses, TriggerFailureData, TriggerFailureErrors, TriggerFailureResponses, UndoDeleteNoteData, UndoDeleteNoteErrors, UndoDeleteNoteResponses, UpdateAiAssistantData, UpdateAiAssistantErrors, UpdateAiAssistantResponses, UpdateNoteAccessoriesData, UpdateNoteAccessoriesErrors, UpdateNoteAccessoriesResponses, UpdateNotebookData, UpdateNotebookErrors, UpdateNotebookIndexData, UpdateNotebookIndexErrors, UpdateNotebookIndexResponses, UpdateNotebookResponses, UpdateNoteDetailsData, UpdateNoteDetailsErrors, UpdateNoteDetailsResponses, UpdateNoteRecallSettingData, UpdateNoteRecallSettingErrors, UpdateNoteRecallSettingResponses, UpdateNoteTitleData, UpdateNoteTitleErrors, UpdateNoteTitleResponses, UpdateNoteTypeData, UpdateNoteTypeErrors, UpdateNoteTypeResponses, UpdateRelationshipData, UpdateRelationshipErrors, UpdateRelationshipResponses, UpdateSubscriptionData, UpdateSubscriptionErrors, UpdateSubscriptionResponses, UpdateSuggestedQuestionForFineTuningData, UpdateSuggestedQuestionForFineTuningErrors, UpdateSuggestedQuestionForFineTuningResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses, UpdateWikidataIdData, UpdateWikidataIdErrors, UpdateWikidataIdResponses, UploadAndTriggerFineTuningData, UploadAndTriggerFineTuningErrors, UploadAndTriggerFineTuningResponses, VerifySpellingData, VerifySpellingErrors, VerifySpellingResponses } from './types.gen';
+import type { AddQuestionManuallyData, AddQuestionManuallyResponses, AddRelationshipFinalizeData, AddRelationshipFinalizeResponses, AnswerQuestionData, AnswerQuestionResponses, AnswerQuizData, AnswerQuizResponses, AnswerSpellingData, AnswerSpellingResponses, ApproveData, ApproveResponses, AskAQuestionData, AskAQuestionResponses, AssimilateData, AssimilateResponses, AssimilatingData, AssimilatingResponses, AudioToTextData, AudioToTextResponses, BazaarData, BazaarResponses, ClaimCertificateData, ClaimCertificateResponses, CloseAllGithubIssuesData, CloseAllGithubIssuesResponses, ContestData, ContestResponses, CreateCircleData, CreateCircleResponses, CreateNoteAfterData, CreateNoteAfterResponses, CreateNotebookData, CreateNotebookInCircleData, CreateNotebookInCircleResponses, CreateNotebookResponses, CreateNoteUnderParentData, CreateNoteUnderParentResponses, CreateNoteViaMcpData, CreateNoteViaMcpResponses, CreateRelationshipsData, CreateRelationshipsResponses, CreateSubscriptionData, CreateSubscriptionResponses, CreateUserData, CreateUserResponses, CurrentUserInfoData, CurrentUserInfoResponses, DataUpgradeData, DataUpgradeResponses, DeleteData, DeleteFailureReportsData, DeleteFailureReportsResponses, DeleteNoteData, DeleteNoteResponses, DeleteResponses, DeleteTokenData, DeleteTokenResponses, DeleteUnansweredRecallPromptsData, DeleteUnansweredRecallPromptsResponses, DestroySubscriptionData, DestroySubscriptionResponses, DownloadNotebookForObsidianData, DownloadNotebookForObsidianResponses, DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamData, DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamResponses, DuplicateData, DuplicateResponses, EnableFeatureToggleData, EnableFeatureToggleResponses, ExportConversationData, ExportConversationResponses, ExportQuestionGenerationData, ExportQuestionGenerationResponses, FailureReportsData, FailureReportsResponses, FetchWikidataEntityDataByIdData, FetchWikidataEntityDataByIdResponses, GenerateAssessmentQuestionsData, GenerateAssessmentQuestionsResponses, GenerateImageData, GenerateImageResponses, GenerateQuestionWithoutSaveData, GenerateQuestionWithoutSaveResponses, GenerateTokenData, GenerateTokenResponses, GenerateUnderstandingChecklistData, GenerateUnderstandingChecklistResponses, GetAiAssistantData, GetAiAssistantResponses, GetAiReplyData, GetAiReplyResponses, GetAllPendingRequestData, GetAllPendingRequestResponses, GetAllQuestionByNoteData, GetAllQuestionByNoteResponses, GetAllSuggestedQuestionsData, GetAllSuggestedQuestionsResponses, GetApprovalForNotebookData, GetApprovalForNotebookResponses, GetAvailableGptModelsData, GetAvailableGptModelsResponses, GetCertificateData, GetCertificateResponses, GetConversationData, GetConversationMessagesData, GetConversationMessagesResponses, GetConversationResponses, GetConversationsAboutNoteData, GetConversationsAboutNoteResponses, GetConversationsOfCurrentUserData, GetConversationsOfCurrentUserResponses, GetCurrentModelVersionsData, GetCurrentModelVersionsResponses, GetData, GetDescendantsData, GetDescendantsResponses, GetFeatureToggleData, GetFeatureToggleResponses, GetGraphData, GetGraphResponses, GetMenuDataData, GetMenuDataResponses, GetMyAssessmentsData, GetMyAssessmentsResponses, GetNoteInfoData, GetNoteInfoResponses, GetRecallPromptsData, GetRecallPromptsResponses, GetRecentlyRecalledData, GetRecentlyRecalledResponses, GetRecentMemoryTrackersData, GetRecentMemoryTrackersResponses, GetRecentNotesData, GetRecentNotesResponses, GetResponses, GetThresholdExceededData, GetThresholdExceededResponses, GetTokenInfoData, GetTokenInfoResponses, GetTokensData, GetTokensResponses, GetUserProfileData, GetUserProfileResponses, GithubIssuesData, GithubIssuesResponses, ImportObsidianData, ImportObsidianResponses, IndexData, IndexResponses, InjectCircleData, InjectCircleResponses, InjectNotesData, InjectNotesResponses, InjectPredefinedQuestionData, InjectPredefinedQuestionResponses, InjectSuggestedQuestionData, InjectSuggestedQuestionResponses, InstallData, InstallResponses, JoinCircleData, JoinCircleResponses, ListUsersData, ListUsersResponses, MarkAsRecalledData, MarkAsRecalledResponses, MarkConversationAsReadData, MarkConversationAsReadResponses, MoveAfterData, MoveAfterResponses, MoveNoteData, MoveNoteResponses, MoveToCircleData, MoveToCircleResponses, MoveToTopLevelData, MoveToTopLevelResponses, MyNotebooksData, MyNotebooksResponses, PingData, PingResponses, PreviouslyAnsweredData, PreviouslyAnsweredResponses, PromotePointToChildData, PromotePointToChildResponses, PromotePointToSiblingData, PromotePointToSiblingResponses, RandomizerData, RandomizerResponses, RecallingData, RecallingResponses, ReEnableData, ReEnableResponses, RefineQuestionData, RefineQuestionResponses, RegenerateData, RegenerateResponses, RemoveFromBazaarData, RemoveFromBazaarResponses, RemoveFromRepeatingData, RemoveFromRepeatingResponses, RemovePointFromNoteData, RemovePointFromNoteResponses, ReplaceServiceUrlData, ReplaceServiceUrlResponses, ReplyToConversationData, ReplyToConversationResponses, RequestApprovalForNotebookData, RequestApprovalForNotebookResponses, ResetDbAndTestabilitySettingsData, ResetDbAndTestabilitySettingsResponses, ResetNotebookIndexData, ResetNotebookIndexResponses, RevokeTokenData, RevokeTokenResponses, SearchForRelationshipTargetData, SearchForRelationshipTargetResponses, SearchForRelationshipTargetWithinData, SearchForRelationshipTargetWithinResponses, SearchWikidataData, SearchWikidataResponses, SemanticSearchData, SemanticSearchResponses, SemanticSearchWithinData, SemanticSearchWithinResponses, SetCurrentModelVersionsData, SetCurrentModelVersionsResponses, SetOpenAiTokenData, SetOpenAiTokenResponses, ShareNotebookData, ShareNotebookResponses, ShareToBazaarData, ShareToBazaarResponses, ShowCircleData, ShowCircleResponses, ShowFailureReportData, ShowFailureReportResponses, ShowMemoryTrackerData, ShowMemoryTrackerResponses, ShowNoteAccessoryData, ShowNoteAccessoryResponses, ShowNoteData, ShowNoteResponses, SoftDeleteData, SoftDeleteResponses, StartConversationAboutAssessmentQuestionData, StartConversationAboutAssessmentQuestionResponses, StartConversationAboutNoteData, StartConversationAboutNoteResponses, StartConversationAboutRecallPromptData, StartConversationAboutRecallPromptResponses, SubmitAssessmentResultData, SubmitAssessmentResultResponses, SuggestQuestionForFineTuningData, SuggestQuestionForFineTuningResponses, SuggestTitleData, SuggestTitleResponses, TestabilityUpdateUserData, TestabilityUpdateUserResponses, TimeTravelData, TimeTravelRelativeToNowData, TimeTravelRelativeToNowResponses, TimeTravelResponses, ToggleApprovalData, ToggleApprovalResponses, TriggerExceptionData, TriggerExceptionResponses, TriggerFailureData, TriggerFailureResponses, UndoDeleteNoteData, UndoDeleteNoteResponses, UpdateAiAssistantData, UpdateAiAssistantResponses, UpdateNoteAccessoriesData, UpdateNoteAccessoriesResponses, UpdateNotebookData, UpdateNotebookIndexData, UpdateNotebookIndexResponses, UpdateNotebookResponses, UpdateNoteDetailsData, UpdateNoteDetailsResponses, UpdateNoteRecallSettingData, UpdateNoteRecallSettingResponses, UpdateNoteTitleData, UpdateNoteTitleResponses, UpdateNoteTypeData, UpdateNoteTypeResponses, UpdateRelationshipData, UpdateRelationshipResponses, UpdateSubscriptionData, UpdateSubscriptionResponses, UpdateSuggestedQuestionForFineTuningData, UpdateSuggestedQuestionForFineTuningResponses, UpdateUserData, UpdateUserResponses, UpdateWikidataIdData, UpdateWikidataIdResponses, UploadAndTriggerFineTuningData, UploadAndTriggerFineTuningResponses, VerifySpellingData, VerifySpellingResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -20,11 +20,11 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 
 export class UserController {
     public static getUserProfile<ThrowOnError extends boolean = false>(options?: Options<GetUserProfileData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetUserProfileResponses, GetUserProfileErrors, ThrowOnError>({ url: '/api/user', ...options });
+        return (options?.client ?? client).get<GetUserProfileResponses, unknown, ThrowOnError>({ url: '/api/user', ...options });
     }
     
     public static createUser<ThrowOnError extends boolean = false>(options: Options<CreateUserData, ThrowOnError>) {
-        return (options.client ?? client).post<CreateUserResponses, CreateUserErrors, ThrowOnError>({
+        return (options.client ?? client).post<CreateUserResponses, unknown, ThrowOnError>({
             url: '/api/user',
             ...options,
             headers: {
@@ -35,7 +35,7 @@ export class UserController {
     }
     
     public static generateToken<ThrowOnError extends boolean = false>(options: Options<GenerateTokenData, ThrowOnError>) {
-        return (options.client ?? client).post<GenerateTokenResponses, GenerateTokenErrors, ThrowOnError>({
+        return (options.client ?? client).post<GenerateTokenResponses, unknown, ThrowOnError>({
             url: '/api/user/generate-token',
             ...options,
             headers: {
@@ -46,7 +46,7 @@ export class UserController {
     }
     
     public static updateUser<ThrowOnError extends boolean = false>(options: Options<UpdateUserData, ThrowOnError>) {
-        return (options.client ?? client).patch<UpdateUserResponses, UpdateUserErrors, ThrowOnError>({
+        return (options.client ?? client).patch<UpdateUserResponses, unknown, ThrowOnError>({
             url: '/api/user/{user}',
             ...options,
             headers: {
@@ -57,37 +57,37 @@ export class UserController {
     }
     
     public static revokeToken<ThrowOnError extends boolean = false>(options?: Options<RevokeTokenData, ThrowOnError>) {
-        return (options?.client ?? client).delete<RevokeTokenResponses, RevokeTokenErrors, ThrowOnError>({ url: '/api/user/token-info', ...options });
+        return (options?.client ?? client).delete<RevokeTokenResponses, unknown, ThrowOnError>({ url: '/api/user/token-info', ...options });
     }
     
     public static getTokenInfo<ThrowOnError extends boolean = false>(options?: Options<GetTokenInfoData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetTokenInfoResponses, GetTokenInfoErrors, ThrowOnError>({ url: '/api/user/token-info', ...options });
+        return (options?.client ?? client).get<GetTokenInfoResponses, unknown, ThrowOnError>({ url: '/api/user/token-info', ...options });
     }
     
     public static getMenuData<ThrowOnError extends boolean = false>(options: Options<GetMenuDataData, ThrowOnError>) {
-        return (options.client ?? client).get<GetMenuDataResponses, GetMenuDataErrors, ThrowOnError>({ url: '/api/user/menu-data', ...options });
+        return (options.client ?? client).get<GetMenuDataResponses, unknown, ThrowOnError>({ url: '/api/user/menu-data', ...options });
     }
     
     public static getTokens<ThrowOnError extends boolean = false>(options?: Options<GetTokensData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetTokensResponses, GetTokensErrors, ThrowOnError>({ url: '/api/user/get-tokens', ...options });
+        return (options?.client ?? client).get<GetTokensResponses, unknown, ThrowOnError>({ url: '/api/user/get-tokens', ...options });
     }
     
     public static deleteToken<ThrowOnError extends boolean = false>(options: Options<DeleteTokenData, ThrowOnError>) {
-        return (options.client ?? client).delete<DeleteTokenResponses, DeleteTokenErrors, ThrowOnError>({ url: '/api/user/token/{tokenId}', ...options });
+        return (options.client ?? client).delete<DeleteTokenResponses, unknown, ThrowOnError>({ url: '/api/user/token/{tokenId}', ...options });
     }
 }
 
 export class TestabilityRestController {
     public static closeAllGithubIssues<ThrowOnError extends boolean = false>(options?: Options<CloseAllGithubIssuesData, ThrowOnError>) {
-        return (options?.client ?? client).post<CloseAllGithubIssuesResponses, CloseAllGithubIssuesErrors, ThrowOnError>({ url: '/api/testability/use_real_sandbox_github_and_close_all_github_issues', ...options });
+        return (options?.client ?? client).post<CloseAllGithubIssuesResponses, unknown, ThrowOnError>({ url: '/api/testability/use_real_sandbox_github_and_close_all_github_issues', ...options });
     }
     
     public static triggerException<ThrowOnError extends boolean = false>(options?: Options<TriggerExceptionData, ThrowOnError>) {
-        return (options?.client ?? client).post<TriggerExceptionResponses, TriggerExceptionErrors, ThrowOnError>({ url: '/api/testability/trigger_exception', ...options });
+        return (options?.client ?? client).post<TriggerExceptionResponses, unknown, ThrowOnError>({ url: '/api/testability/trigger_exception', ...options });
     }
     
     public static timeTravelRelativeToNow<ThrowOnError extends boolean = false>(options: Options<TimeTravelRelativeToNowData, ThrowOnError>) {
-        return (options.client ?? client).post<TimeTravelRelativeToNowResponses, TimeTravelRelativeToNowErrors, ThrowOnError>({
+        return (options.client ?? client).post<TimeTravelRelativeToNowResponses, unknown, ThrowOnError>({
             url: '/api/testability/time_travel_relative_to_now',
             ...options,
             headers: {
@@ -98,7 +98,7 @@ export class TestabilityRestController {
     }
     
     public static timeTravel<ThrowOnError extends boolean = false>(options: Options<TimeTravelData, ThrowOnError>) {
-        return (options.client ?? client).post<TimeTravelResponses, TimeTravelErrors, ThrowOnError>({
+        return (options.client ?? client).post<TimeTravelResponses, unknown, ThrowOnError>({
             url: '/api/testability/time_travel',
             ...options,
             headers: {
@@ -109,7 +109,7 @@ export class TestabilityRestController {
     }
     
     public static testabilityUpdateUser<ThrowOnError extends boolean = false>(options: Options<TestabilityUpdateUserData, ThrowOnError>) {
-        return (options.client ?? client).post<TestabilityUpdateUserResponses, TestabilityUpdateUserErrors, ThrowOnError>({
+        return (options.client ?? client).post<TestabilityUpdateUserResponses, unknown, ThrowOnError>({
             url: '/api/testability/testability_update_user',
             ...options,
             headers: {
@@ -120,7 +120,7 @@ export class TestabilityRestController {
     }
     
     public static shareToBazaar<ThrowOnError extends boolean = false>(options: Options<ShareToBazaarData, ThrowOnError>) {
-        return (options.client ?? client).post<ShareToBazaarResponses, ShareToBazaarErrors, ThrowOnError>({
+        return (options.client ?? client).post<ShareToBazaarResponses, unknown, ThrowOnError>({
             url: '/api/testability/share_to_bazaar',
             ...options,
             headers: {
@@ -131,7 +131,7 @@ export class TestabilityRestController {
     }
     
     public static replaceServiceUrl<ThrowOnError extends boolean = false>(options: Options<ReplaceServiceUrlData, ThrowOnError>) {
-        return (options.client ?? client).post<ReplaceServiceUrlResponses, ReplaceServiceUrlErrors, ThrowOnError>({
+        return (options.client ?? client).post<ReplaceServiceUrlResponses, unknown, ThrowOnError>({
             url: '/api/testability/replace_service_url',
             ...options,
             headers: {
@@ -142,7 +142,7 @@ export class TestabilityRestController {
     }
     
     public static randomizer<ThrowOnError extends boolean = false>(options: Options<RandomizerData, ThrowOnError>) {
-        return (options.client ?? client).post<RandomizerResponses, RandomizerErrors, ThrowOnError>({
+        return (options.client ?? client).post<RandomizerResponses, unknown, ThrowOnError>({
             url: '/api/testability/randomizer',
             ...options,
             headers: {
@@ -153,7 +153,7 @@ export class TestabilityRestController {
     }
     
     public static setOpenAiToken<ThrowOnError extends boolean = false>(options?: Options<SetOpenAiTokenData, ThrowOnError>) {
-        return (options?.client ?? client).post<SetOpenAiTokenResponses, SetOpenAiTokenErrors, ThrowOnError>({
+        return (options?.client ?? client).post<SetOpenAiTokenResponses, unknown, ThrowOnError>({
             url: '/api/testability/open_ai_token',
             ...options,
             headers: {
@@ -164,7 +164,7 @@ export class TestabilityRestController {
     }
     
     public static injectSuggestedQuestion<ThrowOnError extends boolean = false>(options: Options<InjectSuggestedQuestionData, ThrowOnError>) {
-        return (options.client ?? client).post<InjectSuggestedQuestionResponses, InjectSuggestedQuestionErrors, ThrowOnError>({
+        return (options.client ?? client).post<InjectSuggestedQuestionResponses, unknown, ThrowOnError>({
             url: '/api/testability/inject_suggested_questions',
             ...options,
             headers: {
@@ -175,7 +175,7 @@ export class TestabilityRestController {
     }
     
     public static injectNotes<ThrowOnError extends boolean = false>(options: Options<InjectNotesData, ThrowOnError>) {
-        return (options.client ?? client).post<InjectNotesResponses, InjectNotesErrors, ThrowOnError>({
+        return (options.client ?? client).post<InjectNotesResponses, unknown, ThrowOnError>({
             url: '/api/testability/inject_notes',
             ...options,
             headers: {
@@ -186,7 +186,7 @@ export class TestabilityRestController {
     }
     
     public static injectCircle<ThrowOnError extends boolean = false>(options: Options<InjectCircleData, ThrowOnError>) {
-        return (options.client ?? client).post<InjectCircleResponses, InjectCircleErrors, ThrowOnError>({
+        return (options.client ?? client).post<InjectCircleResponses, unknown, ThrowOnError>({
             url: '/api/testability/inject_circle',
             ...options,
             headers: {
@@ -197,7 +197,7 @@ export class TestabilityRestController {
     }
     
     public static injectPredefinedQuestion<ThrowOnError extends boolean = false>(options: Options<InjectPredefinedQuestionData, ThrowOnError>) {
-        return (options.client ?? client).post<InjectPredefinedQuestionResponses, InjectPredefinedQuestionErrors, ThrowOnError>({
+        return (options.client ?? client).post<InjectPredefinedQuestionResponses, unknown, ThrowOnError>({
             url: '/api/testability/inject-predefined-questions',
             ...options,
             headers: {
@@ -208,11 +208,11 @@ export class TestabilityRestController {
     }
     
     public static getFeatureToggle<ThrowOnError extends boolean = false>(options?: Options<GetFeatureToggleData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetFeatureToggleResponses, GetFeatureToggleErrors, ThrowOnError>({ url: '/api/testability/feature_toggle', ...options });
+        return (options?.client ?? client).get<GetFeatureToggleResponses, unknown, ThrowOnError>({ url: '/api/testability/feature_toggle', ...options });
     }
     
     public static enableFeatureToggle<ThrowOnError extends boolean = false>(options: Options<EnableFeatureToggleData, ThrowOnError>) {
-        return (options.client ?? client).post<EnableFeatureToggleResponses, EnableFeatureToggleErrors, ThrowOnError>({
+        return (options.client ?? client).post<EnableFeatureToggleResponses, unknown, ThrowOnError>({
             url: '/api/testability/feature_toggle',
             ...options,
             headers: {
@@ -223,7 +223,7 @@ export class TestabilityRestController {
     }
     
     public static createRelationships<ThrowOnError extends boolean = false>(options: Options<CreateRelationshipsData, ThrowOnError>) {
-        return (options.client ?? client).post<CreateRelationshipsResponses, CreateRelationshipsErrors, ThrowOnError>({
+        return (options.client ?? client).post<CreateRelationshipsResponses, unknown, ThrowOnError>({
             url: '/api/testability/create_relationships',
             ...options,
             headers: {
@@ -234,17 +234,17 @@ export class TestabilityRestController {
     }
     
     public static resetDbAndTestabilitySettings<ThrowOnError extends boolean = false>(options?: Options<ResetDbAndTestabilitySettingsData, ThrowOnError>) {
-        return (options?.client ?? client).post<ResetDbAndTestabilitySettingsResponses, ResetDbAndTestabilitySettingsErrors, ThrowOnError>({ url: '/api/testability/clean_db_and_reset_testability_settings', ...options });
+        return (options?.client ?? client).post<ResetDbAndTestabilitySettingsResponses, unknown, ThrowOnError>({ url: '/api/testability/clean_db_and_reset_testability_settings', ...options });
     }
     
     public static githubIssues<ThrowOnError extends boolean = false>(options?: Options<GithubIssuesData, ThrowOnError>) {
-        return (options?.client ?? client).get<GithubIssuesResponses, GithubIssuesErrors, ThrowOnError>({ url: '/api/testability/github_issues', ...options });
+        return (options?.client ?? client).get<GithubIssuesResponses, unknown, ThrowOnError>({ url: '/api/testability/github_issues', ...options });
     }
 }
 
 export class SubscriptionController {
     public static updateSubscription<ThrowOnError extends boolean = false>(options: Options<UpdateSubscriptionData, ThrowOnError>) {
-        return (options.client ?? client).post<UpdateSubscriptionResponses, UpdateSubscriptionErrors, ThrowOnError>({
+        return (options.client ?? client).post<UpdateSubscriptionResponses, unknown, ThrowOnError>({
             url: '/api/subscriptions/{subscription}',
             ...options,
             headers: {
@@ -255,11 +255,11 @@ export class SubscriptionController {
     }
     
     public static destroySubscription<ThrowOnError extends boolean = false>(options: Options<DestroySubscriptionData, ThrowOnError>) {
-        return (options.client ?? client).post<DestroySubscriptionResponses, DestroySubscriptionErrors, ThrowOnError>({ url: '/api/subscriptions/{subscription}/delete', ...options });
+        return (options.client ?? client).post<DestroySubscriptionResponses, unknown, ThrowOnError>({ url: '/api/subscriptions/{subscription}/delete', ...options });
     }
     
     public static createSubscription<ThrowOnError extends boolean = false>(options: Options<CreateSubscriptionData, ThrowOnError>) {
-        return (options.client ?? client).post<CreateSubscriptionResponses, CreateSubscriptionErrors, ThrowOnError>({
+        return (options.client ?? client).post<CreateSubscriptionResponses, unknown, ThrowOnError>({
             url: '/api/subscriptions/notebooks/{notebook}/subscribe',
             ...options,
             headers: {
@@ -272,11 +272,11 @@ export class SubscriptionController {
 
 export class GlobalSettingsController {
     public static getCurrentModelVersions<ThrowOnError extends boolean = false>(options?: Options<GetCurrentModelVersionsData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetCurrentModelVersionsResponses, GetCurrentModelVersionsErrors, ThrowOnError>({ url: '/api/settings/current-model-version', ...options });
+        return (options?.client ?? client).get<GetCurrentModelVersionsResponses, unknown, ThrowOnError>({ url: '/api/settings/current-model-version', ...options });
     }
     
     public static setCurrentModelVersions<ThrowOnError extends boolean = false>(options: Options<SetCurrentModelVersionsData, ThrowOnError>) {
-        return (options.client ?? client).post<SetCurrentModelVersionsResponses, SetCurrentModelVersionsErrors, ThrowOnError>({
+        return (options.client ?? client).post<SetCurrentModelVersionsResponses, unknown, ThrowOnError>({
             url: '/api/settings/current-model-version',
             ...options,
             headers: {
@@ -289,7 +289,7 @@ export class GlobalSettingsController {
 
 export class RelationController {
     public static updateRelationship<ThrowOnError extends boolean = false>(options: Options<UpdateRelationshipData, ThrowOnError>) {
-        return (options.client ?? client).post<UpdateRelationshipResponses, UpdateRelationshipErrors, ThrowOnError>({
+        return (options.client ?? client).post<UpdateRelationshipResponses, unknown, ThrowOnError>({
             url: '/api/relations/{relation}',
             ...options,
             headers: {
@@ -300,7 +300,7 @@ export class RelationController {
     }
     
     public static moveNote<ThrowOnError extends boolean = false>(options: Options<MoveNoteData, ThrowOnError>) {
-        return (options.client ?? client).post<MoveNoteResponses, MoveNoteErrors, ThrowOnError>({
+        return (options.client ?? client).post<MoveNoteResponses, unknown, ThrowOnError>({
             url: '/api/relations/move/{sourceNote}/{targetNote}',
             ...options,
             headers: {
@@ -311,7 +311,7 @@ export class RelationController {
     }
     
     public static addRelationshipFinalize<ThrowOnError extends boolean = false>(options: Options<AddRelationshipFinalizeData, ThrowOnError>) {
-        return (options.client ?? client).post<AddRelationshipFinalizeResponses, AddRelationshipFinalizeErrors, ThrowOnError>({
+        return (options.client ?? client).post<AddRelationshipFinalizeResponses, unknown, ThrowOnError>({
             url: '/api/relations/create/{sourceNote}/{targetNote}',
             ...options,
             headers: {
@@ -324,7 +324,7 @@ export class RelationController {
 
 export class RecallPromptController {
     public static regenerate<ThrowOnError extends boolean = false>(options: Options<RegenerateData, ThrowOnError>) {
-        return (options.client ?? client).post<RegenerateResponses, RegenerateErrors, ThrowOnError>({
+        return (options.client ?? client).post<RegenerateResponses, unknown, ThrowOnError>({
             url: '/api/recall-prompts/{recallPrompt}/regenerate',
             ...options,
             headers: {
@@ -335,11 +335,11 @@ export class RecallPromptController {
     }
     
     public static contest<ThrowOnError extends boolean = false>(options: Options<ContestData, ThrowOnError>) {
-        return (options.client ?? client).post<ContestResponses, ContestErrors, ThrowOnError>({ url: '/api/recall-prompts/{recallPrompt}/contest', ...options });
+        return (options.client ?? client).post<ContestResponses, unknown, ThrowOnError>({ url: '/api/recall-prompts/{recallPrompt}/contest', ...options });
     }
     
     public static answerQuiz<ThrowOnError extends boolean = false>(options: Options<AnswerQuizData, ThrowOnError>) {
-        return (options.client ?? client).post<AnswerQuizResponses, AnswerQuizErrors, ThrowOnError>({
+        return (options.client ?? client).post<AnswerQuizResponses, unknown, ThrowOnError>({
             url: '/api/recall-prompts/{recallPrompt}/answer',
             ...options,
             headers: {
@@ -350,7 +350,7 @@ export class RecallPromptController {
     }
     
     public static answerSpelling<ThrowOnError extends boolean = false>(options: Options<AnswerSpellingData, ThrowOnError>) {
-        return (options.client ?? client).post<AnswerSpellingResponses, AnswerSpellingErrors, ThrowOnError>({
+        return (options.client ?? client).post<AnswerSpellingResponses, unknown, ThrowOnError>({
             url: '/api/recall-prompts/{recallPrompt}/answer-spelling',
             ...options,
             headers: {
@@ -363,11 +363,11 @@ export class RecallPromptController {
 
 export class PredefinedQuestionController {
     public static toggleApproval<ThrowOnError extends boolean = false>(options: Options<ToggleApprovalData, ThrowOnError>) {
-        return (options.client ?? client).post<ToggleApprovalResponses, ToggleApprovalErrors, ThrowOnError>({ url: '/api/predefined-questions/{predefinedQuestion}/toggle-approval', ...options });
+        return (options.client ?? client).post<ToggleApprovalResponses, unknown, ThrowOnError>({ url: '/api/predefined-questions/{predefinedQuestion}/toggle-approval', ...options });
     }
     
     public static suggestQuestionForFineTuning<ThrowOnError extends boolean = false>(options: Options<SuggestQuestionForFineTuningData, ThrowOnError>) {
-        return (options.client ?? client).post<SuggestQuestionForFineTuningResponses, SuggestQuestionForFineTuningErrors, ThrowOnError>({
+        return (options.client ?? client).post<SuggestQuestionForFineTuningResponses, unknown, ThrowOnError>({
             url: '/api/predefined-questions/{predefinedQuestion}/suggest-fine-tuning',
             ...options,
             headers: {
@@ -378,7 +378,7 @@ export class PredefinedQuestionController {
     }
     
     public static refineQuestion<ThrowOnError extends boolean = false>(options: Options<RefineQuestionData, ThrowOnError>) {
-        return (options.client ?? client).post<RefineQuestionResponses, RefineQuestionErrors, ThrowOnError>({
+        return (options.client ?? client).post<RefineQuestionResponses, unknown, ThrowOnError>({
             url: '/api/predefined-questions/{note}/refine-question',
             ...options,
             headers: {
@@ -389,11 +389,11 @@ export class PredefinedQuestionController {
     }
     
     public static getAllQuestionByNote<ThrowOnError extends boolean = false>(options: Options<GetAllQuestionByNoteData, ThrowOnError>) {
-        return (options.client ?? client).get<GetAllQuestionByNoteResponses, GetAllQuestionByNoteErrors, ThrowOnError>({ url: '/api/predefined-questions/{note}/note-questions', ...options });
+        return (options.client ?? client).get<GetAllQuestionByNoteResponses, unknown, ThrowOnError>({ url: '/api/predefined-questions/{note}/note-questions', ...options });
     }
     
     public static addQuestionManually<ThrowOnError extends boolean = false>(options: Options<AddQuestionManuallyData, ThrowOnError>) {
-        return (options.client ?? client).post<AddQuestionManuallyResponses, AddQuestionManuallyErrors, ThrowOnError>({
+        return (options.client ?? client).post<AddQuestionManuallyResponses, unknown, ThrowOnError>({
             url: '/api/predefined-questions/{note}/note-questions',
             ...options,
             headers: {
@@ -404,17 +404,17 @@ export class PredefinedQuestionController {
     }
     
     public static generateQuestionWithoutSave<ThrowOnError extends boolean = false>(options: Options<GenerateQuestionWithoutSaveData, ThrowOnError>) {
-        return (options.client ?? client).post<GenerateQuestionWithoutSaveResponses, GenerateQuestionWithoutSaveErrors, ThrowOnError>({ url: '/api/predefined-questions/generate-question-without-save', ...options });
+        return (options.client ?? client).post<GenerateQuestionWithoutSaveResponses, unknown, ThrowOnError>({ url: '/api/predefined-questions/generate-question-without-save', ...options });
     }
     
     public static exportQuestionGeneration<ThrowOnError extends boolean = false>(options: Options<ExportQuestionGenerationData, ThrowOnError>) {
-        return (options.client ?? client).get<ExportQuestionGenerationResponses, ExportQuestionGenerationErrors, ThrowOnError>({ url: '/api/predefined-questions/{note}/export-question-generation', ...options });
+        return (options.client ?? client).get<ExportQuestionGenerationResponses, unknown, ThrowOnError>({ url: '/api/predefined-questions/{note}/export-question-generation', ...options });
     }
 }
 
 export class NoteCreationController {
     public static createNoteAfter<ThrowOnError extends boolean = false>(options: Options<CreateNoteAfterData, ThrowOnError>) {
-        return (options.client ?? client).post<CreateNoteAfterResponses, CreateNoteAfterErrors, ThrowOnError>({
+        return (options.client ?? client).post<CreateNoteAfterResponses, unknown, ThrowOnError>({
             url: '/api/notes/{referenceNote}/create-after',
             ...options,
             headers: {
@@ -425,7 +425,7 @@ export class NoteCreationController {
     }
     
     public static createNoteUnderParent<ThrowOnError extends boolean = false>(options: Options<CreateNoteUnderParentData, ThrowOnError>) {
-        return (options.client ?? client).post<CreateNoteUnderParentResponses, CreateNoteUnderParentErrors, ThrowOnError>({
+        return (options.client ?? client).post<CreateNoteUnderParentResponses, unknown, ThrowOnError>({
             url: '/api/notes/{parentNote}/create',
             ...options,
             headers: {
@@ -438,7 +438,7 @@ export class NoteCreationController {
 
 export class NoteController {
     public static verifySpelling<ThrowOnError extends boolean = false>(options: Options<VerifySpellingData, ThrowOnError>) {
-        return (options.client ?? client).post<VerifySpellingResponses, VerifySpellingErrors, ThrowOnError>({
+        return (options.client ?? client).post<VerifySpellingResponses, unknown, ThrowOnError>({
             url: '/api/notes/{note}/verify-spelling',
             ...options,
             headers: {
@@ -449,7 +449,7 @@ export class NoteController {
     }
     
     public static updateWikidataId<ThrowOnError extends boolean = false>(options: Options<UpdateWikidataIdData, ThrowOnError>) {
-        return (options.client ?? client).post<UpdateWikidataIdResponses, UpdateWikidataIdErrors, ThrowOnError>({
+        return (options.client ?? client).post<UpdateWikidataIdResponses, unknown, ThrowOnError>({
             url: '/api/notes/{note}/updateWikidataId',
             ...options,
             headers: {
@@ -460,7 +460,7 @@ export class NoteController {
     }
     
     public static updateNoteRecallSetting<ThrowOnError extends boolean = false>(options: Options<UpdateNoteRecallSettingData, ThrowOnError>) {
-        return (options.client ?? client).post<UpdateNoteRecallSettingResponses, UpdateNoteRecallSettingErrors, ThrowOnError>({
+        return (options.client ?? client).post<UpdateNoteRecallSettingResponses, unknown, ThrowOnError>({
             url: '/api/notes/{note}/recall-setting',
             ...options,
             headers: {
@@ -471,19 +471,19 @@ export class NoteController {
     }
     
     public static deleteNote<ThrowOnError extends boolean = false>(options: Options<DeleteNoteData, ThrowOnError>) {
-        return (options.client ?? client).post<DeleteNoteResponses, DeleteNoteErrors, ThrowOnError>({ url: '/api/notes/{note}/delete', ...options });
+        return (options.client ?? client).post<DeleteNoteResponses, unknown, ThrowOnError>({ url: '/api/notes/{note}/delete', ...options });
     }
     
     public static moveAfter<ThrowOnError extends boolean = false>(options: Options<MoveAfterData, ThrowOnError>) {
-        return (options.client ?? client).post<MoveAfterResponses, MoveAfterErrors, ThrowOnError>({ url: '/api/notes/move_after/{note}/{targetNote}/{asFirstChild}', ...options });
+        return (options.client ?? client).post<MoveAfterResponses, unknown, ThrowOnError>({ url: '/api/notes/move_after/{note}/{targetNote}/{asFirstChild}', ...options });
     }
     
     public static showNote<ThrowOnError extends boolean = false>(options: Options<ShowNoteData, ThrowOnError>) {
-        return (options.client ?? client).get<ShowNoteResponses, ShowNoteErrors, ThrowOnError>({ url: '/api/notes/{note}', ...options });
+        return (options.client ?? client).get<ShowNoteResponses, unknown, ThrowOnError>({ url: '/api/notes/{note}', ...options });
     }
     
     public static updateNoteAccessories<ThrowOnError extends boolean = false>(options: Options<UpdateNoteAccessoriesData, ThrowOnError>) {
-        return (options.client ?? client).patch<UpdateNoteAccessoriesResponses, UpdateNoteAccessoriesErrors, ThrowOnError>({
+        return (options.client ?? client).patch<UpdateNoteAccessoriesResponses, unknown, ThrowOnError>({
             ...formDataBodySerializer,
             url: '/api/notes/{note}',
             ...options,
@@ -495,11 +495,11 @@ export class NoteController {
     }
     
     public static undoDeleteNote<ThrowOnError extends boolean = false>(options: Options<UndoDeleteNoteData, ThrowOnError>) {
-        return (options.client ?? client).patch<UndoDeleteNoteResponses, UndoDeleteNoteErrors, ThrowOnError>({ url: '/api/notes/{note}/undo-delete', ...options });
+        return (options.client ?? client).patch<UndoDeleteNoteResponses, unknown, ThrowOnError>({ url: '/api/notes/{note}/undo-delete', ...options });
     }
     
     public static updateNoteType<ThrowOnError extends boolean = false>(options: Options<UpdateNoteTypeData, ThrowOnError>) {
-        return (options.client ?? client).patch<UpdateNoteTypeResponses, UpdateNoteTypeErrors, ThrowOnError>({
+        return (options.client ?? client).patch<UpdateNoteTypeResponses, unknown, ThrowOnError>({
             url: '/api/notes/{note}/note-type',
             ...options,
             headers: {
@@ -510,33 +510,33 @@ export class NoteController {
     }
     
     public static moveToTopLevel<ThrowOnError extends boolean = false>(options: Options<MoveToTopLevelData, ThrowOnError>) {
-        return (options.client ?? client).patch<MoveToTopLevelResponses, MoveToTopLevelErrors, ThrowOnError>({ url: '/api/notes/{note}/move-to-top-level', ...options });
+        return (options.client ?? client).patch<MoveToTopLevelResponses, unknown, ThrowOnError>({ url: '/api/notes/{note}/move-to-top-level', ...options });
     }
     
     public static getNoteInfo<ThrowOnError extends boolean = false>(options: Options<GetNoteInfoData, ThrowOnError>) {
-        return (options.client ?? client).get<GetNoteInfoResponses, GetNoteInfoErrors, ThrowOnError>({ url: '/api/notes/{note}/note-info', ...options });
+        return (options.client ?? client).get<GetNoteInfoResponses, unknown, ThrowOnError>({ url: '/api/notes/{note}/note-info', ...options });
     }
     
     public static getGraph<ThrowOnError extends boolean = false>(options: Options<GetGraphData, ThrowOnError>) {
-        return (options.client ?? client).get<GetGraphResponses, GetGraphErrors, ThrowOnError>({ url: '/api/notes/{note}/graph', ...options });
+        return (options.client ?? client).get<GetGraphResponses, unknown, ThrowOnError>({ url: '/api/notes/{note}/graph', ...options });
     }
     
     public static getDescendants<ThrowOnError extends boolean = false>(options: Options<GetDescendantsData, ThrowOnError>) {
-        return (options.client ?? client).get<GetDescendantsResponses, GetDescendantsErrors, ThrowOnError>({ url: '/api/notes/{note}/descendants', ...options });
+        return (options.client ?? client).get<GetDescendantsResponses, unknown, ThrowOnError>({ url: '/api/notes/{note}/descendants', ...options });
     }
     
     public static showNoteAccessory<ThrowOnError extends boolean = false>(options: Options<ShowNoteAccessoryData, ThrowOnError>) {
-        return (options.client ?? client).get<ShowNoteAccessoryResponses, ShowNoteAccessoryErrors, ThrowOnError>({ url: '/api/notes/{note}/accessory', ...options });
+        return (options.client ?? client).get<ShowNoteAccessoryResponses, unknown, ThrowOnError>({ url: '/api/notes/{note}/accessory', ...options });
     }
     
     public static getRecentNotes<ThrowOnError extends boolean = false>(options?: Options<GetRecentNotesData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetRecentNotesResponses, GetRecentNotesErrors, ThrowOnError>({ url: '/api/notes/recent', ...options });
+        return (options?.client ?? client).get<GetRecentNotesResponses, unknown, ThrowOnError>({ url: '/api/notes/recent', ...options });
     }
 }
 
 export class SearchController {
     public static semanticSearchWithin<ThrowOnError extends boolean = false>(options: Options<SemanticSearchWithinData, ThrowOnError>) {
-        return (options.client ?? client).post<SemanticSearchWithinResponses, SemanticSearchWithinErrors, ThrowOnError>({
+        return (options.client ?? client).post<SemanticSearchWithinResponses, unknown, ThrowOnError>({
             url: '/api/notes/{note}/semantic-search',
             ...options,
             headers: {
@@ -547,7 +547,7 @@ export class SearchController {
     }
     
     public static searchForRelationshipTargetWithin<ThrowOnError extends boolean = false>(options: Options<SearchForRelationshipTargetWithinData, ThrowOnError>) {
-        return (options.client ?? client).post<SearchForRelationshipTargetWithinResponses, SearchForRelationshipTargetWithinErrors, ThrowOnError>({
+        return (options.client ?? client).post<SearchForRelationshipTargetWithinResponses, unknown, ThrowOnError>({
             url: '/api/notes/{note}/search',
             ...options,
             headers: {
@@ -558,7 +558,7 @@ export class SearchController {
     }
     
     public static semanticSearch<ThrowOnError extends boolean = false>(options: Options<SemanticSearchData, ThrowOnError>) {
-        return (options.client ?? client).post<SemanticSearchResponses, SemanticSearchErrors, ThrowOnError>({
+        return (options.client ?? client).post<SemanticSearchResponses, unknown, ThrowOnError>({
             url: '/api/notes/semantic-search',
             ...options,
             headers: {
@@ -569,7 +569,7 @@ export class SearchController {
     }
     
     public static searchForRelationshipTarget<ThrowOnError extends boolean = false>(options: Options<SearchForRelationshipTargetData, ThrowOnError>) {
-        return (options.client ?? client).post<SearchForRelationshipTargetResponses, SearchForRelationshipTargetErrors, ThrowOnError>({
+        return (options.client ?? client).post<SearchForRelationshipTargetResponses, unknown, ThrowOnError>({
             url: '/api/notes/search',
             ...options,
             headers: {
@@ -582,11 +582,11 @@ export class SearchController {
 
 export class NotebookController {
     public static get<ThrowOnError extends boolean = false>(options: Options<GetData, ThrowOnError>) {
-        return (options.client ?? client).get<GetResponses, GetErrors, ThrowOnError>({ url: '/api/notebooks/{notebook}', ...options });
+        return (options.client ?? client).get<GetResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}', ...options });
     }
     
     public static updateNotebook<ThrowOnError extends boolean = false>(options: Options<UpdateNotebookData, ThrowOnError>) {
-        return (options.client ?? client).post<UpdateNotebookResponses, UpdateNotebookErrors, ThrowOnError>({
+        return (options.client ?? client).post<UpdateNotebookResponses, unknown, ThrowOnError>({
             url: '/api/notebooks/{notebook}',
             ...options,
             headers: {
@@ -597,26 +597,26 @@ export class NotebookController {
     }
     
     public static updateNotebookIndex<ThrowOnError extends boolean = false>(options: Options<UpdateNotebookIndexData, ThrowOnError>) {
-        return (options.client ?? client).post<UpdateNotebookIndexResponses, UpdateNotebookIndexErrors, ThrowOnError>({ url: '/api/notebooks/{notebook}/update-index', ...options });
+        return (options.client ?? client).post<UpdateNotebookIndexResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/update-index', ...options });
     }
     
     public static shareNotebook<ThrowOnError extends boolean = false>(options: Options<ShareNotebookData, ThrowOnError>) {
-        return (options.client ?? client).post<ShareNotebookResponses, ShareNotebookErrors, ThrowOnError>({ url: '/api/notebooks/{notebook}/share', ...options });
+        return (options.client ?? client).post<ShareNotebookResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/share', ...options });
     }
     
     public static resetNotebookIndex<ThrowOnError extends boolean = false>(options: Options<ResetNotebookIndexData, ThrowOnError>) {
-        return (options.client ?? client).post<ResetNotebookIndexResponses, ResetNotebookIndexErrors, ThrowOnError>({ url: '/api/notebooks/{notebook}/reset-index', ...options });
+        return (options.client ?? client).post<ResetNotebookIndexResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/reset-index', ...options });
     }
     
     public static downloadNotebookForObsidian<ThrowOnError extends boolean = false>(options: Options<DownloadNotebookForObsidianData, ThrowOnError>) {
-        return (options.client ?? client).get<DownloadNotebookForObsidianResponses, DownloadNotebookForObsidianErrors, ThrowOnError>({ url: '/api/notebooks/{notebook}/obsidian', ...options });
+        return (options.client ?? client).get<DownloadNotebookForObsidianResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/obsidian', ...options });
     }
     
     /**
      * Import Obsidian file
      */
     public static importObsidian<ThrowOnError extends boolean = false>(options: Options<ImportObsidianData, ThrowOnError>) {
-        return (options.client ?? client).post<ImportObsidianResponses, ImportObsidianErrors, ThrowOnError>({
+        return (options.client ?? client).post<ImportObsidianResponses, unknown, ThrowOnError>({
             ...formDataBodySerializer,
             url: '/api/notebooks/{notebook}/obsidian',
             ...options,
@@ -628,7 +628,7 @@ export class NotebookController {
     }
     
     public static createNotebook<ThrowOnError extends boolean = false>(options: Options<CreateNotebookData, ThrowOnError>) {
-        return (options.client ?? client).post<CreateNotebookResponses, CreateNotebookErrors, ThrowOnError>({
+        return (options.client ?? client).post<CreateNotebookResponses, unknown, ThrowOnError>({
             url: '/api/notebooks/create',
             ...options,
             headers: {
@@ -639,15 +639,15 @@ export class NotebookController {
     }
     
     public static moveToCircle<ThrowOnError extends boolean = false>(options: Options<MoveToCircleData, ThrowOnError>) {
-        return (options.client ?? client).patch<MoveToCircleResponses, MoveToCircleErrors, ThrowOnError>({ url: '/api/notebooks/{notebook}/move-to-circle/{circle}', ...options });
+        return (options.client ?? client).patch<MoveToCircleResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/move-to-circle/{circle}', ...options });
     }
     
     public static getAiAssistant<ThrowOnError extends boolean = false>(options: Options<GetAiAssistantData, ThrowOnError>) {
-        return (options.client ?? client).get<GetAiAssistantResponses, GetAiAssistantErrors, ThrowOnError>({ url: '/api/notebooks/{notebook}/ai-assistant', ...options });
+        return (options.client ?? client).get<GetAiAssistantResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/ai-assistant', ...options });
     }
     
     public static updateAiAssistant<ThrowOnError extends boolean = false>(options: Options<UpdateAiAssistantData, ThrowOnError>) {
-        return (options.client ?? client).patch<UpdateAiAssistantResponses, UpdateAiAssistantErrors, ThrowOnError>({
+        return (options.client ?? client).patch<UpdateAiAssistantResponses, unknown, ThrowOnError>({
             url: '/api/notebooks/{notebook}/ai-assistant',
             ...options,
             headers: {
@@ -658,77 +658,77 @@ export class NotebookController {
     }
     
     public static myNotebooks<ThrowOnError extends boolean = false>(options?: Options<MyNotebooksData, ThrowOnError>) {
-        return (options?.client ?? client).get<MyNotebooksResponses, MyNotebooksErrors, ThrowOnError>({ url: '/api/notebooks', ...options });
+        return (options?.client ?? client).get<MyNotebooksResponses, unknown, ThrowOnError>({ url: '/api/notebooks', ...options });
     }
 }
 
 export class NotebookCertificateApprovalController {
     public static approve<ThrowOnError extends boolean = false>(options: Options<ApproveData, ThrowOnError>) {
-        return (options.client ?? client).post<ApproveResponses, ApproveErrors, ThrowOnError>({ url: '/api/notebook_certificate_approvals/{notebookCertificateApproval}/approve', ...options });
+        return (options.client ?? client).post<ApproveResponses, unknown, ThrowOnError>({ url: '/api/notebook_certificate_approvals/{notebookCertificateApproval}/approve', ...options });
     }
     
     public static requestApprovalForNotebook<ThrowOnError extends boolean = false>(options: Options<RequestApprovalForNotebookData, ThrowOnError>) {
-        return (options.client ?? client).post<RequestApprovalForNotebookResponses, RequestApprovalForNotebookErrors, ThrowOnError>({ url: '/api/notebook_certificate_approvals/request-approval/{notebook}', ...options });
+        return (options.client ?? client).post<RequestApprovalForNotebookResponses, unknown, ThrowOnError>({ url: '/api/notebook_certificate_approvals/request-approval/{notebook}', ...options });
     }
     
     public static getAllPendingRequest<ThrowOnError extends boolean = false>(options?: Options<GetAllPendingRequestData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetAllPendingRequestResponses, GetAllPendingRequestErrors, ThrowOnError>({ url: '/api/notebook_certificate_approvals/get-all-pending-request', ...options });
+        return (options?.client ?? client).get<GetAllPendingRequestResponses, unknown, ThrowOnError>({ url: '/api/notebook_certificate_approvals/get-all-pending-request', ...options });
     }
     
     public static getApprovalForNotebook<ThrowOnError extends boolean = false>(options: Options<GetApprovalForNotebookData, ThrowOnError>) {
-        return (options.client ?? client).get<GetApprovalForNotebookResponses, GetApprovalForNotebookErrors, ThrowOnError>({ url: '/api/notebook_certificate_approvals/for-notebook/{notebook}', ...options });
+        return (options.client ?? client).get<GetApprovalForNotebookResponses, unknown, ThrowOnError>({ url: '/api/notebook_certificate_approvals/for-notebook/{notebook}', ...options });
     }
 }
 
 export class MemoryTrackerController {
     public static softDelete<ThrowOnError extends boolean = false>(options: Options<SoftDeleteData, ThrowOnError>) {
-        return (options.client ?? client).post<SoftDeleteResponses, SoftDeleteErrors, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/soft-delete', ...options });
+        return (options.client ?? client).post<SoftDeleteResponses, unknown, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/soft-delete', ...options });
     }
     
     public static removeFromRepeating<ThrowOnError extends boolean = false>(options: Options<RemoveFromRepeatingData, ThrowOnError>) {
-        return (options.client ?? client).post<RemoveFromRepeatingResponses, RemoveFromRepeatingErrors, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/remove', ...options });
+        return (options.client ?? client).post<RemoveFromRepeatingResponses, unknown, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/remove', ...options });
     }
     
     public static reEnable<ThrowOnError extends boolean = false>(options: Options<ReEnableData, ThrowOnError>) {
-        return (options.client ?? client).post<ReEnableResponses, ReEnableErrors, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/re-enable', ...options });
+        return (options.client ?? client).post<ReEnableResponses, unknown, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/re-enable', ...options });
     }
     
     public static markAsRecalled<ThrowOnError extends boolean = false>(options: Options<MarkAsRecalledData, ThrowOnError>) {
-        return (options.client ?? client).patch<MarkAsRecalledResponses, MarkAsRecalledErrors, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/mark-as-recalled', ...options });
+        return (options.client ?? client).patch<MarkAsRecalledResponses, unknown, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/mark-as-recalled', ...options });
     }
     
     public static showMemoryTracker<ThrowOnError extends boolean = false>(options: Options<ShowMemoryTrackerData, ThrowOnError>) {
-        return (options.client ?? client).get<ShowMemoryTrackerResponses, ShowMemoryTrackerErrors, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}', ...options });
+        return (options.client ?? client).get<ShowMemoryTrackerResponses, unknown, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}', ...options });
     }
     
     public static getThresholdExceeded<ThrowOnError extends boolean = false>(options: Options<GetThresholdExceededData, ThrowOnError>) {
-        return (options.client ?? client).get<GetThresholdExceededResponses, GetThresholdExceededErrors, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/threshold-exceeded', ...options });
+        return (options.client ?? client).get<GetThresholdExceededResponses, unknown, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/threshold-exceeded', ...options });
     }
     
     public static getRecallPrompts<ThrowOnError extends boolean = false>(options: Options<GetRecallPromptsData, ThrowOnError>) {
-        return (options.client ?? client).get<GetRecallPromptsResponses, GetRecallPromptsErrors, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/recall-prompts', ...options });
+        return (options.client ?? client).get<GetRecallPromptsResponses, unknown, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/recall-prompts', ...options });
     }
     
     public static askAQuestion<ThrowOnError extends boolean = false>(options: Options<AskAQuestionData, ThrowOnError>) {
-        return (options.client ?? client).get<AskAQuestionResponses, AskAQuestionErrors, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/question', ...options });
+        return (options.client ?? client).get<AskAQuestionResponses, unknown, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/question', ...options });
     }
     
     public static getRecentlyRecalled<ThrowOnError extends boolean = false>(options?: Options<GetRecentlyRecalledData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetRecentlyRecalledResponses, GetRecentlyRecalledErrors, ThrowOnError>({ url: '/api/memory-trackers/recently-recalled', ...options });
+        return (options?.client ?? client).get<GetRecentlyRecalledResponses, unknown, ThrowOnError>({ url: '/api/memory-trackers/recently-recalled', ...options });
     }
     
     public static getRecentMemoryTrackers<ThrowOnError extends boolean = false>(options?: Options<GetRecentMemoryTrackersData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetRecentMemoryTrackersResponses, GetRecentMemoryTrackersErrors, ThrowOnError>({ url: '/api/memory-trackers/recent', ...options });
+        return (options?.client ?? client).get<GetRecentMemoryTrackersResponses, unknown, ThrowOnError>({ url: '/api/memory-trackers/recent', ...options });
     }
     
     public static deleteUnansweredRecallPrompts<ThrowOnError extends boolean = false>(options: Options<DeleteUnansweredRecallPromptsData, ThrowOnError>) {
-        return (options.client ?? client).delete<DeleteUnansweredRecallPromptsResponses, DeleteUnansweredRecallPromptsErrors, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/recall-prompts/unanswered', ...options });
+        return (options.client ?? client).delete<DeleteUnansweredRecallPromptsResponses, unknown, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/recall-prompts/unanswered', ...options });
     }
 }
 
 export class McpNoteCreationController {
     public static createNoteViaMcp<ThrowOnError extends boolean = false>(options: Options<CreateNoteViaMcpData, ThrowOnError>) {
-        return (options.client ?? client).post<CreateNoteViaMcpResponses, CreateNoteViaMcpErrors, ThrowOnError>({
+        return (options.client ?? client).post<CreateNoteViaMcpResponses, unknown, ThrowOnError>({
             url: '/api/mcp/notes/create',
             ...options,
             headers: {
@@ -741,19 +741,19 @@ export class McpNoteCreationController {
 
 export class FineTuningDataController {
     public static duplicate<ThrowOnError extends boolean = false>(options: Options<DuplicateData, ThrowOnError>) {
-        return (options.client ?? client).post<DuplicateResponses, DuplicateErrors, ThrowOnError>({ url: '/api/fine-tuning/{suggestedQuestion}/duplicate', ...options });
+        return (options.client ?? client).post<DuplicateResponses, unknown, ThrowOnError>({ url: '/api/fine-tuning/{suggestedQuestion}/duplicate', ...options });
     }
     
     public static delete<ThrowOnError extends boolean = false>(options: Options<DeleteData, ThrowOnError>) {
-        return (options.client ?? client).post<DeleteResponses, DeleteErrors, ThrowOnError>({ url: '/api/fine-tuning/{suggestedQuestion}/delete', ...options });
+        return (options.client ?? client).post<DeleteResponses, unknown, ThrowOnError>({ url: '/api/fine-tuning/{suggestedQuestion}/delete', ...options });
     }
     
     public static uploadAndTriggerFineTuning<ThrowOnError extends boolean = false>(options?: Options<UploadAndTriggerFineTuningData, ThrowOnError>) {
-        return (options?.client ?? client).post<UploadAndTriggerFineTuningResponses, UploadAndTriggerFineTuningErrors, ThrowOnError>({ url: '/api/fine-tuning/upload-and-trigger-fine-tuning', ...options });
+        return (options?.client ?? client).post<UploadAndTriggerFineTuningResponses, unknown, ThrowOnError>({ url: '/api/fine-tuning/upload-and-trigger-fine-tuning', ...options });
     }
     
     public static updateSuggestedQuestionForFineTuning<ThrowOnError extends boolean = false>(options: Options<UpdateSuggestedQuestionForFineTuningData, ThrowOnError>) {
-        return (options.client ?? client).patch<UpdateSuggestedQuestionForFineTuningResponses, UpdateSuggestedQuestionForFineTuningErrors, ThrowOnError>({
+        return (options.client ?? client).patch<UpdateSuggestedQuestionForFineTuningResponses, unknown, ThrowOnError>({
             url: '/api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning',
             ...options,
             headers: {
@@ -764,25 +764,25 @@ export class FineTuningDataController {
     }
     
     public static getAllSuggestedQuestions<ThrowOnError extends boolean = false>(options?: Options<GetAllSuggestedQuestionsData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetAllSuggestedQuestionsResponses, GetAllSuggestedQuestionsErrors, ThrowOnError>({ url: '/api/fine-tuning/all-suggested-questions-for-fine-tuning', ...options });
+        return (options?.client ?? client).get<GetAllSuggestedQuestionsResponses, unknown, ThrowOnError>({ url: '/api/fine-tuning/all-suggested-questions-for-fine-tuning', ...options });
     }
 }
 
 export class FailureReportController {
     public static triggerFailure<ThrowOnError extends boolean = false>(options?: Options<TriggerFailureData, ThrowOnError>) {
-        return (options?.client ?? client).post<TriggerFailureResponses, TriggerFailureErrors, ThrowOnError>({ url: '/api/failure-reports/trigger', ...options });
+        return (options?.client ?? client).post<TriggerFailureResponses, unknown, ThrowOnError>({ url: '/api/failure-reports/trigger', ...options });
     }
     
     public static failureReports<ThrowOnError extends boolean = false>(options?: Options<FailureReportsData, ThrowOnError>) {
-        return (options?.client ?? client).get<FailureReportsResponses, FailureReportsErrors, ThrowOnError>({ url: '/api/failure-reports', ...options });
+        return (options?.client ?? client).get<FailureReportsResponses, unknown, ThrowOnError>({ url: '/api/failure-reports', ...options });
     }
     
     public static showFailureReport<ThrowOnError extends boolean = false>(options: Options<ShowFailureReportData, ThrowOnError>) {
-        return (options.client ?? client).get<ShowFailureReportResponses, ShowFailureReportErrors, ThrowOnError>({ url: '/api/failure-reports/{failureReport}', ...options });
+        return (options.client ?? client).get<ShowFailureReportResponses, unknown, ThrowOnError>({ url: '/api/failure-reports/{failureReport}', ...options });
     }
     
     public static deleteFailureReports<ThrowOnError extends boolean = false>(options: Options<DeleteFailureReportsData, ThrowOnError>) {
-        return (options.client ?? client).delete<DeleteFailureReportsResponses, DeleteFailureReportsErrors, ThrowOnError>({
+        return (options.client ?? client).delete<DeleteFailureReportsResponses, unknown, ThrowOnError>({
             url: '/api/failure-reports/delete',
             ...options,
             headers: {
@@ -795,7 +795,7 @@ export class FailureReportController {
 
 export class ConversationMessageController {
     public static replyToConversation<ThrowOnError extends boolean = false>(options: Options<ReplyToConversationData, ThrowOnError>) {
-        return (options.client ?? client).post<ReplyToConversationResponses, ReplyToConversationErrors, ThrowOnError>({
+        return (options.client ?? client).post<ReplyToConversationResponses, unknown, ThrowOnError>({
             url: '/api/conversation/{conversationId}/send',
             ...options,
             headers: {
@@ -806,19 +806,19 @@ export class ConversationMessageController {
     }
     
     public static getAiReply<ThrowOnError extends boolean = false>(options: Options<GetAiReplyData, ThrowOnError>) {
-        return (options.client ?? client).post<GetAiReplyResponses, GetAiReplyErrors, ThrowOnError>({ url: '/api/conversation/{conversationId}/ai-reply', ...options });
+        return (options.client ?? client).post<GetAiReplyResponses, unknown, ThrowOnError>({ url: '/api/conversation/{conversationId}/ai-reply', ...options });
     }
     
     public static startConversationAboutRecallPrompt<ThrowOnError extends boolean = false>(options: Options<StartConversationAboutRecallPromptData, ThrowOnError>) {
-        return (options.client ?? client).post<StartConversationAboutRecallPromptResponses, StartConversationAboutRecallPromptErrors, ThrowOnError>({ url: '/api/conversation/recall-prompt/{recallPrompt}', ...options });
+        return (options.client ?? client).post<StartConversationAboutRecallPromptResponses, unknown, ThrowOnError>({ url: '/api/conversation/recall-prompt/{recallPrompt}', ...options });
     }
     
     public static getConversationsAboutNote<ThrowOnError extends boolean = false>(options: Options<GetConversationsAboutNoteData, ThrowOnError>) {
-        return (options.client ?? client).get<GetConversationsAboutNoteResponses, GetConversationsAboutNoteErrors, ThrowOnError>({ url: '/api/conversation/note/{note}', ...options });
+        return (options.client ?? client).get<GetConversationsAboutNoteResponses, unknown, ThrowOnError>({ url: '/api/conversation/note/{note}', ...options });
     }
     
     public static startConversationAboutNote<ThrowOnError extends boolean = false>(options: Options<StartConversationAboutNoteData, ThrowOnError>) {
-        return (options.client ?? client).post<StartConversationAboutNoteResponses, StartConversationAboutNoteErrors, ThrowOnError>({
+        return (options.client ?? client).post<StartConversationAboutNoteResponses, unknown, ThrowOnError>({
             url: '/api/conversation/note/{note}',
             ...options,
             headers: {
@@ -829,7 +829,7 @@ export class ConversationMessageController {
     }
     
     public static startConversationAboutAssessmentQuestion<ThrowOnError extends boolean = false>(options: Options<StartConversationAboutAssessmentQuestionData, ThrowOnError>) {
-        return (options.client ?? client).post<StartConversationAboutAssessmentQuestionResponses, StartConversationAboutAssessmentQuestionErrors, ThrowOnError>({
+        return (options.client ?? client).post<StartConversationAboutAssessmentQuestionResponses, unknown, ThrowOnError>({
             url: '/api/conversation/assessment-question/{assessmentQuestion}',
             ...options,
             headers: {
@@ -840,33 +840,33 @@ export class ConversationMessageController {
     }
     
     public static markConversationAsRead<ThrowOnError extends boolean = false>(options: Options<MarkConversationAsReadData, ThrowOnError>) {
-        return (options.client ?? client).patch<MarkConversationAsReadResponses, MarkConversationAsReadErrors, ThrowOnError>({ url: '/api/conversation/{conversationId}/read', ...options });
+        return (options.client ?? client).patch<MarkConversationAsReadResponses, unknown, ThrowOnError>({ url: '/api/conversation/{conversationId}/read', ...options });
     }
     
     public static getConversation<ThrowOnError extends boolean = false>(options: Options<GetConversationData, ThrowOnError>) {
-        return (options.client ?? client).get<GetConversationResponses, GetConversationErrors, ThrowOnError>({ url: '/api/conversation/{conversationId}', ...options });
+        return (options.client ?? client).get<GetConversationResponses, unknown, ThrowOnError>({ url: '/api/conversation/{conversationId}', ...options });
     }
     
     public static getConversationMessages<ThrowOnError extends boolean = false>(options: Options<GetConversationMessagesData, ThrowOnError>) {
-        return (options.client ?? client).get<GetConversationMessagesResponses, GetConversationMessagesErrors, ThrowOnError>({ url: '/api/conversation/{conversationId}/messages', ...options });
+        return (options.client ?? client).get<GetConversationMessagesResponses, unknown, ThrowOnError>({ url: '/api/conversation/{conversationId}/messages', ...options });
     }
     
     public static exportConversation<ThrowOnError extends boolean = false>(options: Options<ExportConversationData, ThrowOnError>) {
-        return (options.client ?? client).get<ExportConversationResponses, ExportConversationErrors, ThrowOnError>({ url: '/api/conversation/{conversationId}/export', ...options });
+        return (options.client ?? client).get<ExportConversationResponses, unknown, ThrowOnError>({ url: '/api/conversation/{conversationId}/export', ...options });
     }
     
     public static getConversationsOfCurrentUser<ThrowOnError extends boolean = false>(options?: Options<GetConversationsOfCurrentUserData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetConversationsOfCurrentUserResponses, GetConversationsOfCurrentUserErrors, ThrowOnError>({ url: '/api/conversation/all', ...options });
+        return (options?.client ?? client).get<GetConversationsOfCurrentUserResponses, unknown, ThrowOnError>({ url: '/api/conversation/all', ...options });
     }
 }
 
 export class CircleController {
     public static index<ThrowOnError extends boolean = false>(options?: Options<IndexData, ThrowOnError>) {
-        return (options?.client ?? client).get<IndexResponses, IndexErrors, ThrowOnError>({ url: '/api/circles', ...options });
+        return (options?.client ?? client).get<IndexResponses, unknown, ThrowOnError>({ url: '/api/circles', ...options });
     }
     
     public static createCircle<ThrowOnError extends boolean = false>(options: Options<CreateCircleData, ThrowOnError>) {
-        return (options.client ?? client).post<CreateCircleResponses, CreateCircleErrors, ThrowOnError>({
+        return (options.client ?? client).post<CreateCircleResponses, unknown, ThrowOnError>({
             url: '/api/circles',
             ...options,
             headers: {
@@ -877,7 +877,7 @@ export class CircleController {
     }
     
     public static createNotebookInCircle<ThrowOnError extends boolean = false>(options: Options<CreateNotebookInCircleData, ThrowOnError>) {
-        return (options.client ?? client).post<CreateNotebookInCircleResponses, CreateNotebookInCircleErrors, ThrowOnError>({
+        return (options.client ?? client).post<CreateNotebookInCircleResponses, unknown, ThrowOnError>({
             url: '/api/circles/{circle}/notebooks',
             ...options,
             headers: {
@@ -888,7 +888,7 @@ export class CircleController {
     }
     
     public static joinCircle<ThrowOnError extends boolean = false>(options: Options<JoinCircleData, ThrowOnError>) {
-        return (options.client ?? client).post<JoinCircleResponses, JoinCircleErrors, ThrowOnError>({
+        return (options.client ?? client).post<JoinCircleResponses, unknown, ThrowOnError>({
             url: '/api/circles/join',
             ...options,
             headers: {
@@ -899,33 +899,33 @@ export class CircleController {
     }
     
     public static showCircle<ThrowOnError extends boolean = false>(options: Options<ShowCircleData, ThrowOnError>) {
-        return (options.client ?? client).get<ShowCircleResponses, ShowCircleErrors, ThrowOnError>({ url: '/api/circles/{circle}', ...options });
+        return (options.client ?? client).get<ShowCircleResponses, unknown, ThrowOnError>({ url: '/api/circles/{circle}', ...options });
     }
 }
 
 export class CertificateController {
     public static getCertificate<ThrowOnError extends boolean = false>(options: Options<GetCertificateData, ThrowOnError>) {
-        return (options.client ?? client).get<GetCertificateResponses, GetCertificateErrors, ThrowOnError>({ url: '/api/certificate/{notebook}', ...options });
+        return (options.client ?? client).get<GetCertificateResponses, unknown, ThrowOnError>({ url: '/api/certificate/{notebook}', ...options });
     }
     
     public static claimCertificate<ThrowOnError extends boolean = false>(options: Options<ClaimCertificateData, ThrowOnError>) {
-        return (options.client ?? client).post<ClaimCertificateResponses, ClaimCertificateErrors, ThrowOnError>({ url: '/api/certificate/{notebook}', ...options });
+        return (options.client ?? client).post<ClaimCertificateResponses, unknown, ThrowOnError>({ url: '/api/certificate/{notebook}', ...options });
     }
 }
 
 export class BazaarController {
     public static removeFromBazaar<ThrowOnError extends boolean = false>(options: Options<RemoveFromBazaarData, ThrowOnError>) {
-        return (options.client ?? client).post<RemoveFromBazaarResponses, RemoveFromBazaarErrors, ThrowOnError>({ url: '/api/bazaar/{bazaarNotebook}/remove', ...options });
+        return (options.client ?? client).post<RemoveFromBazaarResponses, unknown, ThrowOnError>({ url: '/api/bazaar/{bazaarNotebook}/remove', ...options });
     }
     
     public static bazaar<ThrowOnError extends boolean = false>(options?: Options<BazaarData, ThrowOnError>) {
-        return (options?.client ?? client).get<BazaarResponses, BazaarErrors, ThrowOnError>({ url: '/api/bazaar', ...options });
+        return (options?.client ?? client).get<BazaarResponses, unknown, ThrowOnError>({ url: '/api/bazaar', ...options });
     }
 }
 
 export class AiAudioController {
     public static audioToText<ThrowOnError extends boolean = false>(options?: Options<AudioToTextData, ThrowOnError>) {
-        return (options?.client ?? client).post<AudioToTextResponses, AudioToTextErrors, ThrowOnError>({
+        return (options?.client ?? client).post<AudioToTextResponses, unknown, ThrowOnError>({
             ...formDataBodySerializer,
             url: '/api/audio/audio-to-text',
             ...options,
@@ -939,7 +939,7 @@ export class AiAudioController {
 
 export class AssimilationController {
     public static assimilate<ThrowOnError extends boolean = false>(options: Options<AssimilateData, ThrowOnError>) {
-        return (options.client ?? client).post<AssimilateResponses, AssimilateErrors, ThrowOnError>({
+        return (options.client ?? client).post<AssimilateResponses, unknown, ThrowOnError>({
             url: '/api/assimilation',
             ...options,
             headers: {
@@ -950,13 +950,13 @@ export class AssimilationController {
     }
     
     public static assimilating<ThrowOnError extends boolean = false>(options: Options<AssimilatingData, ThrowOnError>) {
-        return (options.client ?? client).get<AssimilatingResponses, AssimilatingErrors, ThrowOnError>({ url: '/api/assimilation/assimilating', ...options });
+        return (options.client ?? client).get<AssimilatingResponses, unknown, ThrowOnError>({ url: '/api/assimilation/assimilating', ...options });
     }
 }
 
 export class AssessmentController {
     public static answerQuestion<ThrowOnError extends boolean = false>(options: Options<AnswerQuestionData, ThrowOnError>) {
-        return (options.client ?? client).post<AnswerQuestionResponses, AnswerQuestionErrors, ThrowOnError>({
+        return (options.client ?? client).post<AnswerQuestionResponses, unknown, ThrowOnError>({
             url: '/api/assessment/{assessmentQuestionInstance}/answer',
             ...options,
             headers: {
@@ -967,25 +967,25 @@ export class AssessmentController {
     }
     
     public static submitAssessmentResult<ThrowOnError extends boolean = false>(options: Options<SubmitAssessmentResultData, ThrowOnError>) {
-        return (options.client ?? client).post<SubmitAssessmentResultResponses, SubmitAssessmentResultErrors, ThrowOnError>({ url: '/api/assessment/{assessmentAttempt}', ...options });
+        return (options.client ?? client).post<SubmitAssessmentResultResponses, unknown, ThrowOnError>({ url: '/api/assessment/{assessmentAttempt}', ...options });
     }
     
     public static generateAssessmentQuestions<ThrowOnError extends boolean = false>(options: Options<GenerateAssessmentQuestionsData, ThrowOnError>) {
-        return (options.client ?? client).post<GenerateAssessmentQuestionsResponses, GenerateAssessmentQuestionsErrors, ThrowOnError>({ url: '/api/assessment/questions/{notebook}', ...options });
+        return (options.client ?? client).post<GenerateAssessmentQuestionsResponses, unknown, ThrowOnError>({ url: '/api/assessment/questions/{notebook}', ...options });
     }
     
     public static getMyAssessments<ThrowOnError extends boolean = false>(options?: Options<GetMyAssessmentsData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetMyAssessmentsResponses, GetMyAssessmentsErrors, ThrowOnError>({ url: '/api/assessment', ...options });
+        return (options?.client ?? client).get<GetMyAssessmentsResponses, unknown, ThrowOnError>({ url: '/api/assessment', ...options });
     }
 }
 
 export class AiController {
     public static suggestTitle<ThrowOnError extends boolean = false>(options: Options<SuggestTitleData, ThrowOnError>) {
-        return (options.client ?? client).post<SuggestTitleResponses, SuggestTitleErrors, ThrowOnError>({ url: '/api/ai/suggest-title/{note}', ...options });
+        return (options.client ?? client).post<SuggestTitleResponses, unknown, ThrowOnError>({ url: '/api/ai/suggest-title/{note}', ...options });
     }
     
     public static removePointFromNote<ThrowOnError extends boolean = false>(options: Options<RemovePointFromNoteData, ThrowOnError>) {
-        return (options.client ?? client).post<RemovePointFromNoteResponses, RemovePointFromNoteErrors, ThrowOnError>({
+        return (options.client ?? client).post<RemovePointFromNoteResponses, unknown, ThrowOnError>({
             url: '/api/ai/remove-point-from-note/{note}',
             ...options,
             headers: {
@@ -996,7 +996,7 @@ export class AiController {
     }
     
     public static promotePointToSibling<ThrowOnError extends boolean = false>(options: Options<PromotePointToSiblingData, ThrowOnError>) {
-        return (options.client ?? client).post<PromotePointToSiblingResponses, PromotePointToSiblingErrors, ThrowOnError>({
+        return (options.client ?? client).post<PromotePointToSiblingResponses, unknown, ThrowOnError>({
             url: '/api/ai/promote-point-to-sibling/{note}',
             ...options,
             headers: {
@@ -1007,7 +1007,7 @@ export class AiController {
     }
     
     public static promotePointToChild<ThrowOnError extends boolean = false>(options: Options<PromotePointToChildData, ThrowOnError>) {
-        return (options.client ?? client).post<PromotePointToChildResponses, PromotePointToChildErrors, ThrowOnError>({
+        return (options.client ?? client).post<PromotePointToChildResponses, unknown, ThrowOnError>({
             url: '/api/ai/promote-point-to-child/{note}',
             ...options,
             headers: {
@@ -1018,11 +1018,11 @@ export class AiController {
     }
     
     public static generateUnderstandingChecklist<ThrowOnError extends boolean = false>(options: Options<GenerateUnderstandingChecklistData, ThrowOnError>) {
-        return (options.client ?? client).post<GenerateUnderstandingChecklistResponses, GenerateUnderstandingChecklistErrors, ThrowOnError>({ url: '/api/ai/generate-understanding-checklist/{note}', ...options });
+        return (options.client ?? client).post<GenerateUnderstandingChecklistResponses, unknown, ThrowOnError>({ url: '/api/ai/generate-understanding-checklist/{note}', ...options });
     }
     
     public static generateImage<ThrowOnError extends boolean = false>(options: Options<GenerateImageData, ThrowOnError>) {
-        return (options.client ?? client).post<GenerateImageResponses, GenerateImageErrors, ThrowOnError>({
+        return (options.client ?? client).post<GenerateImageResponses, unknown, ThrowOnError>({
             url: '/api/ai/generate-image',
             ...options,
             headers: {
@@ -1033,17 +1033,17 @@ export class AiController {
     }
     
     public static dummyEntryToGenerateDataTypesThatAreRequiredInEventStream<ThrowOnError extends boolean = false>(options?: Options<DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamData, ThrowOnError>) {
-        return (options?.client ?? client).get<DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamResponses, DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamErrors, ThrowOnError>({ url: '/api/ai/dummy', ...options });
+        return (options?.client ?? client).get<DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamResponses, unknown, ThrowOnError>({ url: '/api/ai/dummy', ...options });
     }
     
     public static getAvailableGptModels<ThrowOnError extends boolean = false>(options?: Options<GetAvailableGptModelsData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetAvailableGptModelsResponses, GetAvailableGptModelsErrors, ThrowOnError>({ url: '/api/ai/available-gpt-models', ...options });
+        return (options?.client ?? client).get<GetAvailableGptModelsResponses, unknown, ThrowOnError>({ url: '/api/ai/available-gpt-models', ...options });
     }
 }
 
 export class TextContentController {
     public static updateNoteTitle<ThrowOnError extends boolean = false>(options: Options<UpdateNoteTitleData, ThrowOnError>) {
-        return (options.client ?? client).patch<UpdateNoteTitleResponses, UpdateNoteTitleErrors, ThrowOnError>({
+        return (options.client ?? client).patch<UpdateNoteTitleResponses, unknown, ThrowOnError>({
             url: '/api/text_content/{note}/title',
             ...options,
             headers: {
@@ -1054,7 +1054,7 @@ export class TextContentController {
     }
     
     public static updateNoteDetails<ThrowOnError extends boolean = false>(options: Options<UpdateNoteDetailsData, ThrowOnError>) {
-        return (options.client ?? client).patch<UpdateNoteDetailsResponses, UpdateNoteDetailsErrors, ThrowOnError>({
+        return (options.client ?? client).patch<UpdateNoteDetailsResponses, unknown, ThrowOnError>({
             url: '/api/text_content/{note}/details',
             ...options,
             headers: {
@@ -1067,48 +1067,48 @@ export class TextContentController {
 
 export class InstallController {
     public static install<ThrowOnError extends boolean = false>(options?: Options<InstallData, ThrowOnError>) {
-        return (options?.client ?? client).get<InstallResponses, InstallErrors, ThrowOnError>({ url: '/install', ...options });
+        return (options?.client ?? client).get<InstallResponses, unknown, ThrowOnError>({ url: '/install', ...options });
     }
 }
 
 export class WikidataController {
     public static searchWikidata<ThrowOnError extends boolean = false>(options: Options<SearchWikidataData, ThrowOnError>) {
-        return (options.client ?? client).get<SearchWikidataResponses, SearchWikidataErrors, ThrowOnError>({ url: '/api/wikidata/search', ...options });
+        return (options.client ?? client).get<SearchWikidataResponses, unknown, ThrowOnError>({ url: '/api/wikidata/search', ...options });
     }
     
     public static fetchWikidataEntityDataById<ThrowOnError extends boolean = false>(options: Options<FetchWikidataEntityDataByIdData, ThrowOnError>) {
-        return (options.client ?? client).get<FetchWikidataEntityDataByIdResponses, FetchWikidataEntityDataByIdErrors, ThrowOnError>({ url: '/api/wikidata/entity-data/{wikidataId}', ...options });
+        return (options.client ?? client).get<FetchWikidataEntityDataByIdResponses, unknown, ThrowOnError>({ url: '/api/wikidata/entity-data/{wikidataId}', ...options });
     }
 }
 
 export class CurrentUserInfoController {
     public static currentUserInfo<ThrowOnError extends boolean = false>(options?: Options<CurrentUserInfoData, ThrowOnError>) {
-        return (options?.client ?? client).get<CurrentUserInfoResponses, CurrentUserInfoErrors, ThrowOnError>({ url: '/api/user/current-user-info', ...options });
+        return (options?.client ?? client).get<CurrentUserInfoResponses, unknown, ThrowOnError>({ url: '/api/user/current-user-info', ...options });
     }
 }
 
 export class RecallsController {
     public static recalling<ThrowOnError extends boolean = false>(options: Options<RecallingData, ThrowOnError>) {
-        return (options.client ?? client).get<RecallingResponses, RecallingErrors, ThrowOnError>({ url: '/api/recalls/recalling', ...options });
+        return (options.client ?? client).get<RecallingResponses, unknown, ThrowOnError>({ url: '/api/recalls/recalling', ...options });
     }
     
     public static previouslyAnswered<ThrowOnError extends boolean = false>(options: Options<PreviouslyAnsweredData, ThrowOnError>) {
-        return (options.client ?? client).get<PreviouslyAnsweredResponses, PreviouslyAnsweredErrors, ThrowOnError>({ url: '/api/recalls/previously-answered', ...options });
+        return (options.client ?? client).get<PreviouslyAnsweredResponses, unknown, ThrowOnError>({ url: '/api/recalls/previously-answered', ...options });
     }
 }
 
 export class HealthCheckController {
     public static ping<ThrowOnError extends boolean = false>(options?: Options<PingData, ThrowOnError>) {
-        return (options?.client ?? client).get<PingResponses, PingErrors, ThrowOnError>({ url: '/api/healthcheck', ...options });
+        return (options?.client ?? client).get<PingResponses, unknown, ThrowOnError>({ url: '/api/healthcheck', ...options });
     }
     
     public static dataUpgrade<ThrowOnError extends boolean = false>(options?: Options<DataUpgradeData, ThrowOnError>) {
-        return (options?.client ?? client).get<DataUpgradeResponses, DataUpgradeErrors, ThrowOnError>({ url: '/api/data_upgrade', ...options });
+        return (options?.client ?? client).get<DataUpgradeResponses, unknown, ThrowOnError>({ url: '/api/data_upgrade', ...options });
     }
 }
 
 export class AdminUserController {
     public static listUsers<ThrowOnError extends boolean = false>(options?: Options<ListUsersData, ThrowOnError>) {
-        return (options?.client ?? client).get<ListUsersResponses, ListUsersErrors, ThrowOnError>({ url: '/api/admin/users', ...options });
+        return (options?.client ?? client).get<ListUsersResponses, unknown, ThrowOnError>({ url: '/api/admin/users', ...options });
     }
 }

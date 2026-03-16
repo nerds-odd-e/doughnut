@@ -11,14 +11,6 @@ paths:
       - user-controller
       operationId: getUserProfile
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -36,14 +28,6 @@ paths:
               $ref: "#/components/schemas/User"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -62,14 +46,6 @@ paths:
               $ref: "#/components/schemas/TokenConfigDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -82,14 +58,6 @@ paths:
       - testability-rest-controller
       operationId: closeAllGithubIssues
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -102,14 +70,6 @@ paths:
       - testability-rest-controller
       operationId: triggerException
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -128,14 +88,6 @@ paths:
               $ref: "#/components/schemas/TimeTravelRelativeToNow"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -155,14 +107,6 @@ paths:
               $ref: "#/components/schemas/TimeTravel"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -190,14 +134,6 @@ paths:
                 type: string
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -218,14 +154,6 @@ paths:
                 type: string
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -246,14 +174,6 @@ paths:
                 type: string
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
   /api/testability/randomizer:
@@ -268,14 +188,6 @@ paths:
               $ref: "#/components/schemas/Randomization"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -296,14 +208,6 @@ paths:
               additionalProperties:
                 type: string
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
   /api/testability/inject_suggested_questions:
@@ -318,14 +222,6 @@ paths:
               $ref: "#/components/schemas/SuggestedQuestionsData"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -344,14 +240,6 @@ paths:
               $ref: "#/components/schemas/NotesTestData"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -375,14 +263,6 @@ paths:
                 type: string
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -401,14 +281,6 @@ paths:
               $ref: "#/components/schemas/PredefinedQuestionsTestData"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -423,14 +295,6 @@ paths:
       - testability-rest-controller
       operationId: getFeatureToggle
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -450,14 +314,6 @@ paths:
                 type: string
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -479,14 +335,6 @@ paths:
                 type: string
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -499,14 +347,6 @@ paths:
       - testability-rest-controller
       operationId: resetDBAndTestabilitySettings
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -531,14 +371,6 @@ paths:
               $ref: "#/components/schemas/SubscriptionDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -557,14 +389,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -592,14 +416,6 @@ paths:
               $ref: "#/components/schemas/SubscriptionDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -612,14 +428,6 @@ paths:
       - global-settings-controller
       operationId: getCurrentModelVersions
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -637,14 +445,6 @@ paths:
               $ref: "#/components/schemas/GlobalAiModelSettings"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -669,14 +469,6 @@ paths:
               $ref: "#/components/schemas/RelationshipCreation"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -708,14 +500,6 @@ paths:
               $ref: "#/components/schemas/NoteMoveDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -747,14 +531,6 @@ paths:
               $ref: "#/components/schemas/RelationshipCreation"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -781,14 +557,6 @@ paths:
               $ref: "#/components/schemas/QuestionContestResult"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -807,14 +575,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -839,14 +599,6 @@ paths:
               $ref: "#/components/schemas/AnswerDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -871,14 +623,6 @@ paths:
               $ref: "#/components/schemas/AnswerSpellingDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -897,14 +641,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -929,14 +665,6 @@ paths:
               $ref: "#/components/schemas/QuestionSuggestionCreationParams"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -961,14 +689,6 @@ paths:
               $ref: "#/components/schemas/PredefinedQuestion"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -987,14 +707,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1020,14 +732,6 @@ paths:
               $ref: "#/components/schemas/PredefinedQuestion"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1046,14 +750,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1078,14 +774,6 @@ paths:
               $ref: "#/components/schemas/NoteCreationDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1110,14 +798,6 @@ paths:
               $ref: "#/components/schemas/NoteCreationDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1142,14 +822,6 @@ paths:
               $ref: "#/components/schemas/AnswerSpellingDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1174,14 +846,6 @@ paths:
               $ref: "#/components/schemas/WikidataAssociationCreation"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1206,14 +870,6 @@ paths:
               $ref: "#/components/schemas/SearchTerm"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1240,14 +896,6 @@ paths:
               $ref: "#/components/schemas/SearchTerm"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1274,14 +922,6 @@ paths:
               $ref: "#/components/schemas/NoteRecallSetting"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1300,14 +940,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1328,14 +960,6 @@ paths:
               $ref: "#/components/schemas/SearchTerm"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1356,14 +980,6 @@ paths:
               $ref: "#/components/schemas/SearchTerm"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1394,14 +1010,6 @@ paths:
         schema:
           type: string
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1422,14 +1030,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1453,14 +1053,6 @@ paths:
               $ref: "#/components/schemas/NotebookSettings"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1479,14 +1071,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
   /api/notebooks/{notebook}/share:
@@ -1501,14 +1085,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1527,14 +1103,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
   /api/notebooks/{notebook}/obsidian:
@@ -1549,14 +1117,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1590,14 +1150,6 @@ paths:
               required:
               - file
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
   /api/notebooks/create:
@@ -1612,14 +1164,6 @@ paths:
               $ref: "#/components/schemas/NoteCreationDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1638,14 +1182,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1664,14 +1200,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1690,14 +1218,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
   /api/memory-trackers/{memoryTracker}/remove:
@@ -1712,14 +1232,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1738,14 +1250,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1764,14 +1268,6 @@ paths:
               $ref: "#/components/schemas/McpNoteAddDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1790,14 +1286,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1816,14 +1304,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1836,14 +1316,6 @@ paths:
       - fine-tuning-data-controller
       operationId: uploadAndTriggerFineTuning
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
   /api/failure-reports/trigger:
@@ -1852,14 +1324,6 @@ paths:
       - failure-report-controller
       operationId: triggerFailure
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1884,14 +1348,6 @@ paths:
               type: string
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1910,14 +1366,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1936,14 +1384,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1962,14 +1402,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -1995,14 +1427,6 @@ paths:
               type: string
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2027,14 +1451,6 @@ paths:
               type: string
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2047,14 +1463,6 @@ paths:
       - circle-controller
       operationId: index
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2074,14 +1482,6 @@ paths:
               $ref: "#/components/schemas/Circle"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2106,14 +1506,6 @@ paths:
               $ref: "#/components/schemas/NoteCreationDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2132,14 +1524,6 @@ paths:
               $ref: "#/components/schemas/CircleJoiningByInvitation"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2158,14 +1542,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2183,14 +1559,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2209,14 +1577,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2236,14 +1596,6 @@ paths:
             schema:
               $ref: "#/components/schemas/AudioUploadDTO"
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2262,14 +1614,6 @@ paths:
               $ref: "#/components/schemas/AssimilationRequestDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2296,14 +1640,6 @@ paths:
               $ref: "#/components/schemas/AnswerDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2322,14 +1658,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2348,14 +1676,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2374,14 +1694,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2406,14 +1718,6 @@ paths:
               $ref: "#/components/schemas/PointsRequestDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2438,14 +1742,6 @@ paths:
               $ref: "#/components/schemas/PointsRequestDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2470,14 +1766,6 @@ paths:
               $ref: "#/components/schemas/PointsRequestDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2496,14 +1784,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2522,14 +1802,6 @@ paths:
               type: string
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2554,14 +1826,6 @@ paths:
               $ref: "#/components/schemas/UserDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2586,14 +1850,6 @@ paths:
               $ref: "#/components/schemas/NoteUpdateTitleDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2618,14 +1874,6 @@ paths:
               $ref: "#/components/schemas/NoteUpdateDetailsDTO"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2644,14 +1892,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2674,14 +1914,6 @@ paths:
             schema:
               $ref: "#/components/schemas/NoteAccessoriesDTO"
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2700,14 +1932,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2738,14 +1962,6 @@ paths:
               - initiative
               - quest
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2764,14 +1980,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2795,14 +2003,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2821,14 +2021,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2852,14 +2044,6 @@ paths:
               $ref: "#/components/schemas/UpdateAiAssistantRequest"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2883,14 +2067,6 @@ paths:
         schema:
           type: boolean
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2915,14 +2091,6 @@ paths:
               $ref: "#/components/schemas/QuestionSuggestionParams"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2941,14 +2109,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2970,14 +2130,6 @@ paths:
           type: boolean
           default: false
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -2996,14 +2148,6 @@ paths:
         schema:
           type: string
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3024,14 +2168,6 @@ paths:
         schema:
           type: string
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3044,14 +2180,6 @@ paths:
       - user-controller
       operationId: getTokenInfo
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3063,14 +2191,6 @@ paths:
       - user-controller
       operationId: revokeToken
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
   /api/user/menu-data:
@@ -3085,14 +2205,6 @@ paths:
         schema:
           type: string
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3105,14 +2217,6 @@ paths:
       - user-controller
       operationId: getTokens
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3127,14 +2231,6 @@ paths:
       - current-user-info-controller
       operationId: currentUserInfo
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3147,14 +2243,6 @@ paths:
       - testability-rest-controller
       operationId: githubIssues
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3182,14 +2270,6 @@ paths:
           type: integer
           format: int32
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3208,14 +2288,6 @@ paths:
         schema:
           type: string
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3236,14 +2308,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3263,14 +2327,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3295,14 +2351,6 @@ paths:
           type: integer
           format: int32
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3321,14 +2369,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3347,14 +2387,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3367,14 +2399,6 @@ paths:
       - note-controller
       operationId: getRecentNotes
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3389,14 +2413,6 @@ paths:
       - notebook-controller
       operationId: myNotebooks
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3409,14 +2425,6 @@ paths:
       - notebook-certificate-approval-controller
       operationId: getAllPendingRequest
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3437,14 +2445,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3463,14 +2463,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3489,14 +2481,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3515,14 +2499,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3543,14 +2519,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3563,14 +2531,6 @@ paths:
       - memory-tracker-controller
       operationId: getRecentlyRecalled
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3585,14 +2545,6 @@ paths:
       - memory-tracker-controller
       operationId: getRecentMemoryTrackers
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3607,14 +2559,6 @@ paths:
       - health-check-controller
       operationId: ping
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3627,14 +2571,6 @@ paths:
       - fine-tuning-data-controller
       operationId: getAllSuggestedQuestions
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3649,14 +2585,6 @@ paths:
       - failure-report-controller
       operationId: failureReports
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3675,14 +2603,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3695,14 +2615,6 @@ paths:
       - health-check-controller
       operationId: dataUpgrade
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3722,14 +2634,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3748,14 +2652,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3776,14 +2672,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3797,14 +2685,6 @@ paths:
       - conversation-message-controller
       operationId: getConversationsOfCurrentUser
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3825,14 +2705,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3845,14 +2717,6 @@ paths:
       - bazaar-controller
       operationId: bazaar
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3873,14 +2737,6 @@ paths:
         schema:
           type: string
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3895,14 +2751,6 @@ paths:
       - assessment-controller
       operationId: getMyAssessments
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3917,14 +2765,6 @@ paths:
       - ai-controller
       operationId: dummyEntryToGenerateDataTypesThatAreRequiredInEventStream
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3937,14 +2777,6 @@ paths:
       - ai-controller
       operationId: getAvailableGptModels
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -3974,14 +2806,6 @@ paths:
           format: int32
           default: 10
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
           content:
@@ -4000,14 +2824,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
   /api/memory-trackers/{memoryTracker}/recall-prompts/unanswered:
@@ -4022,14 +2838,6 @@ paths:
         schema:
           type: integer
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
   /api/failure-reports/delete:
@@ -4047,14 +2855,6 @@ paths:
                 format: int32
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "400":
-          description: Bad Request
         "200":
           description: OK
 components:
