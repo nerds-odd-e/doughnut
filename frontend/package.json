@@ -22,9 +22,9 @@
     "test": "CI=true vitest run --browser"
   },
   "dependencies": {
+    "quill": "npm:@dotwee/quill@2.0.7",
     "file-saver": "^2.0.5",
     "mini-debounce": "^1.0.8",
-    "quill": "2.0.3",
     "turndown": "^7.2.2",
     "turndown-plugin-gfm": "^1.0.2",
     "vue-content-loader": "2.0.1",
@@ -78,5 +78,8 @@
     "vue": "3.5.30",
     "vue-router": "5.0.3",
     "vue-tsc": "3.2.5"
+  },
+  "overrides": {
+    "quill": "npm:@dotwee/quill@2.0.7"
   }
 }
