@@ -5,7 +5,7 @@ inputs:
     description: "Redis DB Server Version"
     type: string
     required: true
-    default: "7"
+    default: "8"
   redis_port:
     description: "Redis DB port"
     type: number
