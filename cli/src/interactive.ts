@@ -784,8 +784,8 @@ async function runInteractiveTTY(stdin: NodeJS.ReadableStream): Promise<void> {
 
   drawBox()
 
-  process.stdout.on('resize', drawBox)
-  const removeResizeListener = () => process.stdout.off('resize', drawBox)
+  process.stdout.on('resize', doFullRedraw)
+  const removeResizeListener = () => process.stdout.off('resize', doFullRedraw)
   const doExit = () => {
     removeResizeListener()
     rl.close()

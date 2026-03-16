@@ -1267,6 +1267,51 @@ describe('TTY mode slash command suggestions', () => {
   })
 })
 
+describe('TTY mode resize', () => {
+  let writeSpy: ReturnType<typeof vi.spyOn>
+  let stdin: TTYStdin
+
+  beforeEach(async () => {
+    resetRecallStateForTesting()
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
+    vi.spyOn(process, 'exit').mockImplementation(
+      (() => undefined) as unknown as typeof process.exit
+    )
+    stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await tick()
+  })
+
+  afterEach(() => {
+    pressKey(stdin, 'c', { ctrl: true })
+    vi.restoreAllMocks()
+  })
+
+  test('resize triggers full clear and re-render with new width', async () => {
+    typeString(stdin, 'hello')
+    await tick()
+    pressEnter(stdin)
+    await tick()
+
+    writeSpy.mockClear()
+    Object.defineProperty(process.stdout, 'columns', {
+      value: 50,
+      writable: true,
+      configurable: true,
+    })
+    process.stdout.emit('resize')
+    await tick()
+
+    const output = ttyOutput(writeSpy)
+    expect(output).toContain('\x1b[H\x1b[2J')
+    const boxTopMatch = output.match(/┌─+┐/)
+    expect(boxTopMatch).toBeTruthy()
+    expect(stripAnsi(boxTopMatch![0]).length).toBe(50)
+    expect(output).toContain('hello')
+  })
+})
+
 describe('TTY mode slash command suggestions with scroll', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
   let stdin: TTYStdin

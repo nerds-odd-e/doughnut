@@ -41,24 +41,24 @@ Support terminal resize properly by keeping chat history and using full clear + 
 
 ---
 
-## Phase 3: Resize re-renders chat history
+## Phase 3: Resize re-renders chat history ✅
 
 **User value:** Resizing the terminal (especially narrower) no longer corrupts the display; history and current prompt stay correct.
 
-**Changes:**
+**Implemented:**
 1. **Resize handler**  
    - On `process.stdout.on('resize')`:
-     - Clear screen.
-     - Call cohesive `renderFullDisplay(history, currentBoxState, suggestions)` with `process.stdout.columns`.
+     - Clear screen (via `doFullRedraw`).
+     - Call cohesive `renderFullDisplay(history, currentBoxState, suggestions)` with `getTerminalWidth()`.
      - Position cursor in the input box.
 
 2. **Remove incremental resize**  
-   - Stop using the old `drawBox()`-only resize path. On resize, always do full clear + full re-render.
+   - Replaced `drawBox` with `doFullRedraw` as the resize handler. On resize, always do full clear + full re-render.
 
 3. **Ensure width is fresh**  
-   - Use `getTerminalWidth()` (which reads `process.stdout.columns`) at render time so layout reflects new dimensions.
+   - `getTerminalWidth()` (reads `process.stdout.columns`) is used at render time in `doFullRedraw`, so layout reflects new dimensions.
 
-**Tests (external):** Simulate resize (e.g. change `process.stdout.columns`) then trigger redraw; assert output has correct width and no broken box lines. Or drive via `runInteractive` with a mock TTY that emits resize and assert final stdout layout.
+**Tests:** `TTY mode resize` – simulate resize (change `process.stdout.columns`, emit `resize`); assert clear-screen, box has correct width, chat history re-rendered.
 
 ---
 
@@ -66,8 +66,8 @@ Support terminal resize properly by keeping chat history and using full clear + 
 
 | Phase | Delivers |
 |-------|----------|
-| 1 | `/clear` command; clears screen and history placeholder |
-| 2 | Chat history stored; single cohesive render path |
-| 3 | Resize triggers full clear + re-render of history |
+| 1 | `/clear` command; clears screen and history placeholder ✅ |
+| 2 | Chat history stored; single cohesive render path ✅ |
+| 3 | Resize triggers full clear + re-render of history ✅ |
 
 Phase 2 depends on Phase 1’s redraw path. Phase 3 depends on Phase 2’s history and cohesive renderer.
