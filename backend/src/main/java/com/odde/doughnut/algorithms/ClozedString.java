@@ -6,6 +6,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.logging.log4j.util.Strings;
 
+/**
+ * Produces markdown with masked (clozed) portions. Doughnut markdown supports inline {@code <mark>}
+ * for masking in recall question stems.
+ */
 public class ClozedString {
   private static final Pattern MARKDOWN_LINK_URL = Pattern.compile("\\]\\((https?://[^)]+)\\)");
   private ClozeReplacement clozeReplacement;
@@ -14,18 +18,18 @@ public class ClozedString {
 
   public ClozedString(ClozeReplacement clozeReplacement, String originalContent) {
     this.clozeReplacement = clozeReplacement;
-
     this.originalContent = originalContent;
   }
 
-  public static ClozedString htmlClozedString(String content) {
+  /** Creates a ClozedString that outputs markdown with {@code <mark>} tags for cloze masks. */
+  public static ClozedString forMarkdownWithMarkMasks(String markdownContent) {
     ClozeReplacement clozeReplacement =
         new ClozeReplacement(
             "<mark title='Hidden text that is partially matching the answer'>[..~]</mark>",
             "<mark title='Hidden text that is matching the answer'>[...]</mark>",
             "<mark title='Hidden pronunciation'>/.../</mark>",
             "<mark title='Hidden subtitle that is matching the answer'>(...)</mark>");
-    return new ClozedString(clozeReplacement, content);
+    return new ClozedString(clozeReplacement, markdownContent);
   }
 
   @Override
@@ -33,7 +37,8 @@ public class ClozedString {
     throw new RuntimeException("Not implemented, use `cloze` instead.");
   }
 
-  public String clozeDetails() {
+  /** Returns markdown with masked portions. Frontend converts to HTML when rendering. */
+  public String maskedDetailsAsMarkdown() {
     List<String> urls = new ArrayList<>();
     String protectedContent = protectMarkdownLinkUrls(originalContent, urls);
     return unprotectMarkdownLinkUrls(cloze(protectedContent), urls);

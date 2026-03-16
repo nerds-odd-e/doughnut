@@ -150,7 +150,7 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
       return null;
     }
     Note note = memoryTracker.getNote();
-    String stem = note.getClozeDescription().clozeDetails();
+    String stem = note.createMaskedDetailsForRecall().maskedDetailsAsMarkdown();
     Notebook notebook = note.getNotebook();
     return new SpellingQuestion(stem, notebook);
   }

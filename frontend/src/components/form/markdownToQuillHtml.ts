@@ -36,6 +36,8 @@ export default function markdownToQuillHtml(
   // Excludes span which is often used with attributes and should remain escaped when orphan.
   const safeInlineTagPattern =
     /^<\/(strong|em|b|i|u|s|code|mark)\s*>$|^<(strong|em|b|i|u|s|code|mark)\s*>$/i
+  // Cloze mask: <mark title='...'> from backend recall stems (doughnut markdown flavor)
+  const clozeMarkOpeningTagPattern = /^<mark\s+title='[^']*'\s*>$/i
 
   // Override the html method to handle raw HTML
   renderer.html = function (html: string | Tokens.Generic): string {
@@ -50,6 +52,10 @@ export default function markdownToQuillHtml(
     }
     // Allow standalone opening/closing inline tags (marked tokenizes <strong>def</strong> as separate tokens)
     if (safeInlineTagPattern.test(trimmed)) {
+      return htmlContent
+    }
+    // Allow <mark title='...'> cloze mask opening tags from recall question stems
+    if (clozeMarkOpeningTagPattern.test(trimmed)) {
       return htmlContent
     }
     // Allow complete HTML tags matching <tag xxx>...</tag> pattern

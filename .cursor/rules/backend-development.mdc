@@ -58,7 +58,7 @@ Always run all unit tests instead of just selected file or test case, unlike for
    })
    void clozeDescription(String title, String details, String expectedClozeDescription) {
      assertThat(
-         new ClozedString(clozeReplacement, details).hide(new NoteTitle(title)).clozeDetails(),
+         new ClozedString(clozeReplacement, details).hide(new NoteTitle(title)).maskedDetailsAsMarkdown(),
          containsString(expectedClozeDescription));
    }
    ```

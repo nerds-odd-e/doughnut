@@ -61,7 +61,9 @@ class ClozeDescriptionTest {
   })
   void clozeDescription(String title, String details, String expectedClozeDescription) {
     assertThat(
-        new ClozedString(clozeReplacement, details).hide(new NoteTitle(title)).clozeDetails(),
+        new ClozedString(clozeReplacement, details)
+            .hide(new NoteTitle(title))
+            .maskedDetailsAsMarkdown(),
         containsString(expectedClozeDescription));
   }
 
@@ -70,7 +72,7 @@ class ClozeDescriptionTest {
     assertThat(
         new ClozedString(clozeReplacement, "a /b\nc/ d")
             .hide(new NoteTitle("title"))
-            .clozeDetails(),
+            .maskedDetailsAsMarkdown(),
         containsString("a /b\nc/ d"));
   }
 
@@ -79,7 +81,7 @@ class ClozeDescriptionTest {
     assertThat(
         new ClozedString(clozeReplacement, "$2")
             .hide(new NoteTitle("Stable Diffusion"))
-            .clozeDetails(),
+            .maskedDetailsAsMarkdown(),
         containsString("$2"));
   }
 
@@ -87,7 +89,9 @@ class ClozeDescriptionTest {
   void theReplacementsShouldNotInterfereEachOther() {
     ClozeReplacement clozeReplacement = new ClozeReplacement("/..~/", "/.../", "(...)", "<...>");
     assertThat(
-        new ClozedString(clozeReplacement, "abc").hide(new NoteTitle("abc")).clozeDetails(),
+        new ClozedString(clozeReplacement, "abc")
+            .hide(new NoteTitle("abc"))
+            .maskedDetailsAsMarkdown(),
         containsString("/.../"));
   }
 
@@ -97,7 +101,9 @@ class ClozeDescriptionTest {
     String details =
         "In literature, an **archenemy** (sometimes spelled as **arch-enemy**) or **nemesis** is the main [enemy](https://en.wikipedia.org/wiki/Enemy) of the [protagonist](https://en.wikipedia.org/wiki/Protagonist)—or sometimes, one of the other main characters—appearing as the most prominent and most-known enemy of the [hero](https://en.wikipedia.org/wiki/Hero)";
     String result =
-        new ClozedString(clozeReplacement, details).hide(new NoteTitle(title)).clozeDetails();
+        new ClozedString(clozeReplacement, details)
+            .hide(new NoteTitle(title))
+            .maskedDetailsAsMarkdown();
 
     // The word "archenemy" and "arch-enemy" should be clozed
     assertThat(result, containsString("[...]"));
@@ -116,7 +122,9 @@ class ClozeDescriptionTest {
   })
   void clozeShouldHandleTitleWithSlash(String title, String details, String expected) {
     String result =
-        new ClozedString(clozeReplacement, details).hide(new NoteTitle(title)).clozeDetails();
+        new ClozedString(clozeReplacement, details)
+            .hide(new NoteTitle(title))
+            .maskedDetailsAsMarkdown();
     assertThat(result, containsString(expected));
   }
 }

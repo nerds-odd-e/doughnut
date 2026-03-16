@@ -12,7 +12,7 @@ When doing recall, markdown is **not** applied to:
 2. **MCQ stem** – uses `status(result.stem)` (raw stem)
 3. **MCQ choices** – uses `status(\`  ${i + 1}. ${result.choices[i]}\`)` (raw choices)
 
-The backend instructs AI to use markdown for MCQ stem and choices (`AiToolFactory.java`). The spelling stem comes from `note.getClozeDescription().clozeDetails()` which can include note details in markdown.
+The backend instructs AI to use markdown for MCQ stem and choices (`AiToolFactory.java`). The spelling stem comes from `note.createMaskedDetailsForRecall().maskedDetailsAsMarkdown()` which returns markdown with cloze masks.
 
 ## Phased Plan
 
@@ -50,7 +50,7 @@ The backend instructs AI to use markdown for MCQ stem and choices (`AiToolFactor
 
 Recall content can be **HTML** in addition to markdown:
 
-- **Spelling stem** comes from `ClozedString.clozeDetails()` which uses `ClozedString.htmlClozedString()` and outputs HTML (`<mark>...</mark>` tags for cloze placeholders).
+- **Spelling stem** comes from `ClozedString.maskedDetailsAsMarkdown()` which uses `ClozedString.forMarkdownWithMarkMasks()` and outputs markdown with `<mark>...</mark>` cloze masks. Frontend converts to HTML when rendering.
 - **Note content** (details) may be stored as HTML when edited via RichMarkdownEditor (Quill); the editor converts between markdown and HTML.
 - **AI-generated MCQ** stem/choices are instructed to use markdown, but may occasionally output HTML, and note context fed to AI can be HTML.
 

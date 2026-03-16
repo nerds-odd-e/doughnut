@@ -11,6 +11,7 @@
 import { computed } from "vue"
 import markdownizer from "../form/markdownizer"
 
+/** Markdown question stem (doughnut flavor: supports <mark> for cloze masks). Converted to HTML for display. */
 const props = defineProps<{
   stem: string | undefined
 }>()

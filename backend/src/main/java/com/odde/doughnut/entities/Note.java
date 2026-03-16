@@ -170,14 +170,14 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public ClozedString getClozeDescription() {
-    if (isDetailsBlankHtml()) return new ClozedString(null, "");
+  public ClozedString createMaskedDetailsForRecall() {
+    if (isDetailsBlank()) return new ClozedString(null, "");
 
-    return ClozedString.htmlClozedString(getDetails()).hide(getNoteTitle());
+    return ClozedString.forMarkdownWithMarkMasks(getDetails()).hide(getNoteTitle());
   }
 
   @JsonIgnore
-  public boolean isDetailsBlankHtml() {
+  public boolean isDetailsBlank() {
     return new HtmlOrMarkdown(getDetails()).isBlank();
   }
 
