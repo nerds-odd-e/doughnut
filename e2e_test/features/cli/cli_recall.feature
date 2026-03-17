@@ -39,6 +39,7 @@ Feature: CLI recall status and recall session
     Then I should see "Recalled successfully" in the history output
 
   @usingMockedOpenAiService
+  @interactiveCLI
   Scenario: Recall MCQ - choose correct answer and see success
     Given I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:
@@ -51,10 +52,11 @@ Feature: CLI recall status and recall session
     And It's day 1
     And I assimilate the note "sedition"
     And It's day 2
-    When I run the doughnut command in interactive mode with input "/recall" and "1"
+    When I input "/recall" in the interactive CLI
     Then I should see "What is the meaning of sedition?" in the status
     And I should see "to incite violence" in the status
-    And I should see "Correct!" in the history output
+    When I input "1" in the interactive CLI
+    Then I should see "Correct!" in the history output
     And I should see "Recalled successfully" in the history output
 
   @usingMockedOpenAiService

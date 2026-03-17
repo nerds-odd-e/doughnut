@@ -74,11 +74,34 @@ The goal: scenarios that need interactive mode should run a **single live CLI pr
 
 ---
 
+### Phase 1.6: Recall MCQ—choose correct answer ✅ Done
+
+**Scenario type**: One When step with command plus MCQ answer; split so `/recall` is sent first, Then verify question appears, then When `1` (choice number).
+
+**Scenarios**: "Recall MCQ - choose correct answer and see success" only.
+
+**Principle**: Same as Phase 1.5—split composite inputs into separate When steps; interleave with Then steps that verify we're at the right prompt before sending the next input.
+
+**Work**:
+
+1. Add `@interactiveCLI` to the scenario.
+2. Split the single When into two:
+   - `When I input "/recall" in the interactive CLI`
+   - `Then I should see "What is the meaning of sedition?" in the status` ... `And I should see "to incite violence" in the status`
+   - `When I input "1" in the interactive CLI`
+   - `Then I should see "Correct!" in the history output` ... `And I should see "Recalled successfully" in the history output`
+3. Reuse existing step `I input {string} in the interactive CLI` (no new step def needed).
+4. Keep old step def for now (*redundancy allowed*).
+
+**Dead code**: None—remove old step def in Phase 5.
+
+---
+
 ### Phase 2: Command + answer(s)—split into separate steps
 
 **Scenario type**: One When step with command plus one or more answers; split so each input is sent only *after* a Then step verifies the expected prompt.
 
-**Scenarios**: "Recall MCQ - choose correct answer", "Recall spelling - type correct spelling", "Recall substate - /stop exits recall mode", "Recall MCQ - contest and regenerate", "Recall MCQ - down arrow and Enter to select".
+**Scenarios**: "Recall spelling - type correct spelling", "Recall substate - /stop exits recall mode", "Recall MCQ - contest and regenerate", "Recall MCQ - down arrow and Enter to select".
 
 **Principle**: Same as Phase 1.5—split composite inputs into separate When steps; interleave with Then steps that verify we're at the right prompt before sending the next input.
 
@@ -159,7 +182,8 @@ The goal: scenarios that need interactive mode should run a **single live CLI pr
 |-------|-------|---------|
 | 1 ✅ | `common.ts`, `hook.ts`, `cli.ts`, `cli_recall.feature`, `cliPtyRunner.ts`, `constants.ts`, `backendUrl.ts`, `ci.ts`, `mcpAgentActions.ts` | Tasks, hooks, step, migrate 1 scenario; single source for backend URL; `cliEnvWithConfigDir` helper |
 | 1.5 ✅ | `cli_recall.feature`, `cliPtyRunner.ts` | Migrate "Recall Just Review"; split `/recall` and `y` into 2 When steps; use input box (│ → ) as ready signal with 10ms poll and 100ms stabilization |
-| 2 | `cli.ts`, `cli_recall.feature` | Add down-arrow step; migrate 5 remaining scenarios (Recall MCQ, spelling, /stop, contest, down-arrow); split inputs into separate When steps |
+| 1.6 ✅ | `cli_recall.feature` | Migrate "Recall MCQ - choose correct answer and see success"; split `/recall` and `1` into 2 When steps; reuse existing step |
+| 2 | `cli.ts`, `cli_recall.feature` | Add down-arrow step; migrate 4 remaining scenarios (Recall spelling, /stop, contest, down-arrow); split inputs into separate When steps |
 | 3 | `cli.ts`, `cli_recall.feature` | Migrate 3 multi-step scenarios; split composite inputs into separate When steps with Then verification in between |
 | 4 | `cli.ts`, `cli_access_token.feature`, `common.ts` | Split remove-access-token + ESC + list into separate steps; migrate 1 scenario; remove `runCliDirectWithInputAndPty` |
 | 5 | `cli.ts`, docs | **Remove dead code**: all old `I run the doughnut command...` step defs; verification and doc updates |
