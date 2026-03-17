@@ -21,6 +21,7 @@ Feature: CLI recall status and recall session
     Then I should see "1 note to recall today" in the history output
 
   @disableOpenAiService
+  @interactiveCLI
   Scenario Outline: Recall Just Review
     Given I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:
@@ -29,11 +30,12 @@ Feature: CLI recall status and recall session
     And It's day 1
     And I assimilate the note "<title>"
     And It's day 2
-    When I run the doughnut command in interactive mode with input "/recall" and "y"
+    When I input "/recall" in the interactive CLI
     Then I should see "<title>" in the status
     And I should see "<content_check>" in the status
     And I should see "Yes, I remember?" in the status
-    And I should see "Recalled successfully" in the history output
+    When I input "y" in the interactive CLI
+    Then I should see "Recalled successfully" in the history output
 
     Examples:
       | title    | details                              | content_check |

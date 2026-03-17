@@ -69,7 +69,7 @@ async function waitForCliReady(
   getStdout: () => string
 ): Promise<void> {
   const maxWaitMs = 10_000
-  const pollMs = 50
+  const pollMs = 10
   const start = Date.now()
   while (Date.now() - start < maxWaitMs) {
     if (CLI_READY_PATTERN.test(getStdout())) return
@@ -209,22 +209,38 @@ async function waitForNewPromptAfterSend(
   getStdout: () => string,
   lenBeforeSend: number
 ): Promise<void> {
+  // Input box (│ → ) is drawn by drawBox() only when the CLI is ready for input.
+  // While a command is running (e.g. recall API call), drawBox is not called.
+  const INPUT_BOX_PATTERN = /│ → /
   const maxWaitMs = 15_000
-  const pollMs = 50
+  const pollMs = 10
+  const stabilizeMs = 100
   const start = Date.now()
+  let lastStdoutLen = 0
+  let stableSince = 0
   while (Date.now() - start < maxWaitMs) {
     const stdout = getStdout()
-    if (
-      stdout.length > lenBeforeSend &&
-      CLI_READY_PATTERN.test(stdout.slice(lenBeforeSend))
-    ) {
-      return
+    const newContent = stdout.slice(lenBeforeSend)
+    if (stdout.length <= lenBeforeSend) {
+      await new Promise((r) => setTimeout(r, pollMs))
+      continue
+    }
+    if (INPUT_BOX_PATTERN.test(newContent)) {
+      if (stdout.length === lastStdoutLen) {
+        if (stableSince === 0) stableSince = Date.now()
+        if (Date.now() - stableSince >= stabilizeMs) return
+      } else {
+        stableSince = 0
+      }
+      lastStdoutLen = stdout.length
+    } else {
+      stableSince = 0
     }
     await new Promise((r) => setTimeout(r, pollMs))
   }
   const stdout = getStdout()
   throw new Error(
-    `CLI did not show new prompt after send within 15s. stdout grew by ${stdout.length - lenBeforeSend} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`
+    `CLI did not show input box after send within 15s. stdout grew by ${stdout.length - lenBeforeSend} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`
   )
 }
 
