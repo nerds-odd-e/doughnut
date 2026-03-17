@@ -56,15 +56,21 @@ export function getSectionContentRaw(output: string, section: Section): string {
 
   for (const line of lines) {
     if (section === 'history-input' && isHistoryInputLine(line)) {
-      if (line.trim()) result.push(line)
+      if (line.trim()) {
+        result.push(line)
+      }
     } else if (section === 'status' && isStatusLine(line)) {
-      if (line.trim()) result.push(line)
+      if (line.trim()) {
+        result.push(line)
+      }
     } else if (
       section === 'history-output' &&
       !isHistoryInputLine(line) &&
       !isStatusLine(line)
     ) {
-      if (line.trim()) result.push(line)
+      if (line.trim()) {
+        result.push(line)
+      }
     }
   }
 

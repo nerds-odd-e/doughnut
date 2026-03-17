@@ -209,9 +209,12 @@ async function waitForNewPromptAfterSend(
   getStdout: () => string,
   lenBeforeSend: number
 ): Promise<void> {
-  // Input box (│ → ) is drawn by drawBox() only when the CLI is ready for input.
-  // While a command is running (e.g. recall API call), drawBox is not called.
-  const INPUT_BOX_PATTERN = /│ → /
+  // Input box (│ → ) is drawn by drawBox() when the CLI is ready. Require the
+  // empty-buffer placeholder (│ → `) so we don't match while typing a command
+  // (e.g. │ → /recall) which would return before the command runs and its output appears.
+  // ANSI codes (e.g. \x1b[90m for dim) may appear between "→ " and "`".
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: matching ANSI escape codes in PTY output
+  const INPUT_BOX_READY_PATTERN = /│ → (?:\x1b\[[0-9;]*m)*`/
   const maxWaitMs = 15_000
   const pollMs = 10
   const stabilizeMs = 100
@@ -225,7 +228,7 @@ async function waitForNewPromptAfterSend(
       await new Promise((r) => setTimeout(r, pollMs))
       continue
     }
-    if (INPUT_BOX_PATTERN.test(newContent)) {
+    if (INPUT_BOX_READY_PATTERN.test(newContent)) {
       if (stdout.length === lastStdoutLen) {
         if (stableSince === 0) stableSince = Date.now()
         if (Date.now() - stableSince >= stabilizeMs) return
