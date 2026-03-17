@@ -165,7 +165,6 @@ When(
       cy
         .task('runCliDirectWithInputAndPty', {
           input: `/remove-access-token\n${esc}\n/list-access-token\nexit\n`,
-          fallbackInput: `/remove-access-token\n/list-access-token\nexit\n`,
           env: {
             DOUGHNUT_CONFIG_DIR: configDir,
             DOUGHNUT_API_BASE_URL: BASE_URL,
@@ -184,7 +183,6 @@ When(
       cy
         .task('runCliDirectWithInputAndPty', {
           input: `/recall\n${esc}\ny\nexit\n`,
-          fallbackInput: '/recall\n/stop\nexit\n',
           env: {
             DOUGHNUT_CONFIG_DIR: configDir,
             DOUGHNUT_API_BASE_URL: BASE_URL,
@@ -204,7 +202,6 @@ When(
       cy
         .task('runCliDirectWithInputAndPty', {
           input: `${command}\n${downArrow}\r\nexit\n`,
-          fallbackInput: `${command}\n2\nexit\n`,
           env: {
             DOUGHNUT_CONFIG_DIR: configDir,
             DOUGHNUT_API_BASE_URL: BASE_URL,

@@ -20,6 +20,7 @@ import fs from 'fs'
 import path from 'path'
 import AdmZip from 'adm-zip'
 import type { ExpectedFile } from '../start/downloadChecker'
+import { runCliInPty } from './cliPtyRunner'
 
 const CLI_BUNDLE_PATH = 'cli/dist/doughnut-cli.bundle.mjs'
 const CLI_E2E_BACKEND_URL = 'http://localhost:9081'
@@ -356,114 +357,39 @@ const commonConfig = {
           input: string
           env?: NodeJS.ProcessEnv
         }) {
-          const { spawn } = await import('node:child_process')
           const repoRoot = path.resolve(__dirname, '..', '..')
           const bundlePath = ensureCliBundleExists(repoRoot)
-          return new Promise<string>((resolve, reject) => {
-            const proc = spawn(process.execPath, [bundlePath], {
-              cwd: repoRoot,
-              env: { ...process.env, ...cliEnv(env) },
-              stdio: ['pipe', 'pipe', 'pipe'],
-            })
-            let stdout = ''
-            proc.stdout?.on('data', (chunk: Buffer) => {
-              stdout += chunk.toString()
-            })
-            proc.stdin?.write(input)
-            proc.stdin?.end()
-            proc.on('close', (code) => {
-              if (code === 0) resolve(stdout)
-              else reject(new Error(`CLI exited with code ${code}`))
-            })
-            proc.on('error', reject)
+          return runCliInPty({
+            executablePath: bundlePath,
+            cwd: repoRoot,
+            env,
+            input,
           })
         },
         async runCliDirectWithInputAndPty({
           input,
-          fallbackInput,
+          inputChunks,
           env,
         }: {
-          input: Buffer | string
-          fallbackInput?: string
+          input?: Buffer | string
+          inputChunks?: { text: string; delayAfterMs?: number }[]
           env?: NodeJS.ProcessEnv
         }) {
-          const { spawn } = await import('node:child_process')
           const repoRoot = path.resolve(__dirname, '..', '..')
           const bundlePath = ensureCliBundleExists(repoRoot)
-          const scriptArgs =
-            process.platform === 'darwin'
-              ? ['-q', '/dev/null', process.execPath, bundlePath]
-              : [
-                  '-q',
-                  '-c',
-                  `"${process.execPath}" "${bundlePath}"`,
-                  '/dev/null',
-                ]
-
-          const PTY_TIMEOUT_MS = 55_000
-
-          const runWithScript = () =>
-            new Promise<string>((resolve, reject) => {
-              const proc = spawn('script', scriptArgs, {
-                cwd: repoRoot,
-                env: { ...process.env, ...cliEnv(env) },
-                stdio: ['pipe', 'pipe', 'pipe'],
-              })
-              let stdout = ''
-              const timeout = setTimeout(() => {
-                proc.kill('SIGKILL')
-                reject(new Error('PTY script timed out'))
-              }, PTY_TIMEOUT_MS)
-              proc.stdout?.on('data', (chunk: Buffer) => {
-                stdout += chunk.toString()
-              })
-              proc.stderr?.on('data', (chunk: Buffer) => {
-                stdout += chunk.toString()
-              })
-              const buf =
-                typeof input === 'string' ? Buffer.from(input, 'utf8') : input
-              proc.stdin?.write(buf)
-              proc.stdin?.end()
-              proc.on('close', (code, signal) => {
-                clearTimeout(timeout)
-                if (code === 0) resolve(stdout)
-                else reject(new Error(`CLI exited with code ${code}`))
-              })
-              proc.on('error', (err) => {
-                clearTimeout(timeout)
-                reject(err)
-              })
-            })
-
-          const runWithPipe = (pipeInput: string) =>
-            new Promise<string>((resolve, reject) => {
-              const proc = spawn(process.execPath, [bundlePath], {
-                cwd: repoRoot,
-                env: { ...process.env, ...cliEnv(env) },
-                stdio: ['pipe', 'pipe', 'pipe'],
-              })
-              let stdout = ''
-              proc.stdout?.on('data', (chunk: Buffer) => {
-                stdout += chunk.toString()
-              })
-              proc.stdin?.write(pipeInput)
-              proc.stdin?.end()
-              proc.on('close', (code) => {
-                if (code === 0) resolve(stdout)
-                else reject(new Error(`CLI exited with code ${code}`))
-              })
-              proc.on('error', reject)
-            })
-
-          if (process.env.CI && fallbackInput) {
-            return runWithPipe(fallbackInput)
-          }
-          try {
-            return await runWithScript()
-          } catch {
-            if (fallbackInput) return runWithPipe(fallbackInput)
-            throw new Error('PTY failed and no fallback provided')
-          }
+          const cliInput: string | { text: string; delayAfterMs?: number }[] =
+            inputChunks ??
+            (input
+              ? typeof input === 'string'
+                ? input
+                : input.toString('utf8')
+              : '')
+          return runCliInPty({
+            executablePath: bundlePath,
+            cwd: repoRoot,
+            env,
+            input: cliInput,
+          })
         },
         async runCliDirectWithArgs({
           args,
@@ -504,13 +430,23 @@ const commonConfig = {
           args?: string[]
           env?: NodeJS.ProcessEnv
         }) {
+          const cwd = path.dirname(doughnutPath)
+          if (input !== undefined) {
+            return runCliInPty({
+              executablePath: doughnutPath,
+              args: args ?? [],
+              input,
+              cwd,
+              env,
+            })
+          }
           const { spawn } = await import('node:child_process')
           return new Promise<string>((resolve, reject) => {
             const proc = spawn(
               process.execPath,
               [doughnutPath, ...(args ?? [])],
               {
-                cwd: path.dirname(doughnutPath),
+                cwd,
                 env: { ...process.env, ...cliEnv(env) },
                 stdio: ['pipe', 'pipe', 'pipe'],
               }
@@ -519,9 +455,6 @@ const commonConfig = {
             proc.stdout?.on('data', (chunk: Buffer) => {
               stdout += chunk.toString()
             })
-            if (input !== undefined) {
-              proc.stdin?.write(input)
-            }
             proc.stdin?.end()
             proc.on('close', (code) => {
               if (code === 0) resolve(stdout)
