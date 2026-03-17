@@ -50,6 +50,27 @@ export function getSectionContent(output: string, section: Section): string {
   return result.join('\n')
 }
 
+export function getSectionContentRaw(output: string, section: Section): string {
+  const lines = output.split('\n')
+  const result: string[] = []
+
+  for (const line of lines) {
+    if (section === 'history-input' && isHistoryInputLine(line)) {
+      if (line.trim()) result.push(line)
+    } else if (section === 'status' && isStatusLine(line)) {
+      if (line.trim()) result.push(line)
+    } else if (
+      section === 'history-output' &&
+      !isHistoryInputLine(line) &&
+      !isStatusLine(line)
+    ) {
+      if (line.trim()) result.push(line)
+    }
+  }
+
+  return result.join('\n')
+}
+
 export function getLastCommandOutput(output: string): string {
   const lines = output.split('\n')
   const blocks: string[] = []

@@ -22,25 +22,21 @@ Feature: CLI recall status and recall session
 
   @disableOpenAiService
   @interactiveCLI
-  Scenario Outline: Recall Just Review
+  Scenario: Recall Just Review
     Given I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:
       | Title    | Details                        | Parent Title |
-      | <title>  | <details>                      | English      |
+      | sedation | **Put** to sleep is _sedation_ | English      |
     And It's day 1
-    And I assimilate the note "<title>"
+    And I assimilate the note "sedation"
     And It's day 2
     When I input "/recall" in the interactive CLI
-    Then I should see "<title>" in the status
-    And I should see "<content_check>" in the status
+    Then I should see "sedation" in the status
+    And I should see "Put to sleep is sedation" in the status
+    And I should see "Put" styled in the status
     And I should see "Yes, I remember?" in the status
     When I input "y" in the interactive CLI
     Then I should see "Recalled successfully" in the history output
-
-    Examples:
-      | title    | details                              | content_check |
-      | sedition | Sedition means incite violence       | sedition      |
-      | sedation | **Put** to sleep is _sedation_       | Put           |
 
   @disableOpenAiService
   Scenario: Recall status shows zero after recalling the only note in session

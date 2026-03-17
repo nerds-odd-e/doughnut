@@ -1,7 +1,11 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import { backendBaseUrl } from '../support/backendUrl'
 import { mock_services } from '../start'
-import { getSectionContent, getLastCommandOutput } from './cliSectionParser'
+import {
+  getSectionContent,
+  getSectionContentRaw,
+  getLastCommandOutput,
+} from './cliSectionParser'
 
 const GOOGLE_MOCK_URL = 'http://localhost:5003'
 
@@ -298,6 +302,24 @@ Then('I should see {string} in the status', (expected: string) => {
       content,
       `Expected "${expected}" in status. status contains:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
     ).to.include(expected)
+  })
+})
+
+Then('I should see {string} styled in the status', (expected: string) => {
+  cy.get<string>('@doughnutOutput').then((output) => {
+    const rawStatus = getSectionContentRaw(output, 'status')
+    const fallbackRaw = getSectionContentRaw(output, 'history-output')
+    const rawContent = `${rawStatus}\n${fallbackRaw}`.trim()
+    expect(rawContent, `Expected "${expected}" in raw status`).to.include(
+      expected
+    )
+    // Markdown is rendered via markdansi: bold=\x1b[1m, italic=\x1b[3m
+    const hasBold = rawContent.includes('\x1b[1m')
+    const hasItalic = rawContent.includes('\x1b[3m')
+    expect(
+      hasBold || hasItalic,
+      `Expected ANSI styling (bold or italic) in status. Raw status length: ${rawContent.length}`
+    ).to.be.true
   })
 })
 
