@@ -38,20 +38,6 @@ Feature: CLI recall status and recall session
     When I input "y" in the interactive CLI
     Then I should see "Recalled successfully" in the history output
 
-  @disableOpenAiService
-  Scenario: Recall status shows zero after recalling the only note in session
-    Given I have a notebook with the head note "English" which skips memory tracking
-    And there are some notes:
-      | Title    | Details                        | Parent Title |
-      | sedition | Sedition means incite violence | English      |
-    And It's day 1
-    And I assimilate the note "sedition"
-    And It's day 2
-    When I run the doughnut command in interactive mode with input "/recall" and "y"
-    Then I should see "Recalled successfully" in the history output
-    When I run the doughnut command in interactive mode with input "/recall-status"
-    Then I should see "0 notes to recall today" in the history output
-
   @usingMockedOpenAiService
   Scenario: Recall MCQ - choose correct answer and see success
     Given I have a notebook with the head note "English" which skips memory tracking

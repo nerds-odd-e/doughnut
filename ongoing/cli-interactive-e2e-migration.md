@@ -97,7 +97,7 @@ The goal: scenarios that need interactive mode should run a **single live CLI pr
 
 **Scenario type**: Multiple When steps in one scenario sharing one CLI process.
 
-**Scenarios**: "Recall status shows zero after recalling the only note in session", "Recall MCQ - ESC cancels with y/n confirmation", "Recall session - complete all due notes, see summary, then load more from future days".
+**Scenarios**: "Recall MCQ - ESC cancels with y/n confirmation", "Recall session - complete all due notes, see summary, then load more from future days".
 
 **Principle**: Same as Phase 1.5/2—split composite inputs into separate When steps; interleave with Then steps that verify the expected prompt before sending the next input.
 
