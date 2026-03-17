@@ -448,9 +448,9 @@ const commonConfig = {
         }) {
           const { spawn } = await import('node:child_process')
           const repoRoot = path.resolve(__dirname, '..', '..')
-          const bundlePath = ensureCliBundleExists(repoRoot)
+          const config = getCliRunConfig(repoRoot)
           return new Promise<string>((resolve, reject) => {
-            const proc = spawn(process.execPath, [bundlePath, ...args], {
+            const proc = spawn(config.command, [...config.baseArgs, ...args], {
               cwd: repoRoot,
               env: { ...process.env, ...cliEnv(env) },
               stdio: ['pipe', 'pipe', 'pipe'],

@@ -75,7 +75,7 @@ All CLI e2e tests (except `runInstalledCli`) use `ensureCliBundleExists()` → `
 
 ---
 
-### Phase 3: Update `runCliDirectWithArgs`
+### Phase 3: Update `runCliDirectWithArgs` ✅
 
 - Same pattern: `getCliRunConfig` → `spawn(config.command, [...config.baseArgs, ...args], ...)`.
 - Verify `cli_access_token` and `cli_install_and_run` (-c, version) locally and in CI.
