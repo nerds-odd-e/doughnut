@@ -6,6 +6,16 @@ Currently, "interactive mode" CLI E2E tests use `runCliDirectWithInput` or `runC
 
 The goal: scenarios that need interactive mode should run a **single live CLI process** for the whole scenario. A `@interactiveCLI` tag triggers a hook that starts the CLI in the Before and exits it in the After. Steps then send input to and read output from this live process.
 
+## Principles
+
+- **Incremental**: Each phase converts one scenario type to interactive mode; the next phase adds another type.
+- **Minimum work per phase**: Only add what's needed for that phase's scenarios to pass.
+- **Step text migration**: Gradually migrate `I run the doughnut command in interactive mode with input ...` to `I input ... in the interactive CLI` in each phase.
+- **Redundancy allowed**: Interim phases may have both old and new step definitions; feature files can use either. Remove dead step defs in Phase 5.
+- **Remove dead code immediately**: After each phase, remove any code that becomes unused (except old step defs—see Phase 5).
+- **Cohesive**: No duplication; one representation per concept (after Phase 5 cleanup).
+- **No if conditions in test code**: Step definitions call `sendToInteractiveCli` directly; scenarios using them must have `@interactiveCLI`. No branching on "is interactive or not."
+
 ## Current vs. Desired Behavior
 
 | Aspect | Current | Desired |
@@ -18,125 +28,121 @@ The goal: scenarios that need interactive mode should run a **single live CLI pr
 ## Hook Ordering
 
 - `@interactiveCLI` hook **must run after** `@withCliConfig`.
-- Scenarios with `@interactiveCLI` typically also need `@withCliConfig` for the temp config dir.
-- Use the `order` parameter (badeball/cypress-cucumber-preprocessor): add `order: 1` to the existing `@withCliConfig` Before hook, and `Before({ tags: '@interactiveCLI', order: 2 })` so config runs first.
+- Use `order: 1` for `@withCliConfig` and `order: 2` for `@interactiveCLI` (badeball/cypress-cucumber-preprocessor).
+
+---
 
 ## Phased Plan
 
-### Phase 1: Add interactive CLI infrastructure
+### Phase 1: Single-step, single input
 
-**Scope**: Cypress tasks and hook, no step changes.
+**Scenario type**: One When step with a single input (e.g. `/recall-status`).
 
-1. **Cypress tasks** (in `e2e_test/config/common.ts`):
-   - `startInteractiveCli({ env })`: Spawn CLI in PTY, wait for prompt (`/ commands/`), store process ref in module-level state. Return when ready.
-   - `sendToInteractiveCli({ input })`: Write input to the live PTY. Read stdout until prompt appears again (or timeout). Return the captured output for that round.
-   - `stopInteractiveCli()`: Send `exit\n` (or `/exit\n`), wait for process end, clear state.
+**Scenarios**: "Recall status shows count when notes are due", "Recall status shows zero when no notes are due".
 
-2. **Hook** (in `e2e_test/step_definitions/hook.ts`):
-   - Add `order: 1` to the existing `Before({ tags: '@withCliConfig' })` so it runs first.
-   - `Before({ tags: '@interactiveCLI', order: 2 })`: Call `cy.task('startInteractiveCli', { env })` with config from `@cliConfigDir`.
-   - `After({ tags: '@interactiveCLI' })`: Call `cy.task('stopInteractiveCli')`.
+**Work**:
 
-3. **Prompt detection**: Use existing `CLI_READY_PATTERN` from `cliPtyRunner.ts`. For "output complete" after sending input, wait for the same prompt to reappear (or a variant like `> ` if the CLI uses that).
+1. Add Cypress tasks: `startInteractiveCli`, `sendToInteractiveCli`, `stopInteractiveCli` (PTY-based, prompt detection).
+2. Add `@interactiveCLI` Before/After hooks (order after `@withCliConfig`).
+3. Add `@interactiveCLI` to the 2 scenarios.
+4. Add step `I input {string} in the interactive CLI` that calls `sendToInteractiveCli` with input (no `exit`).
+5. Update the 2 scenarios to use `I input "/recall-status" in the interactive CLI`.
+6. Keep old step `I run the doughnut command in interactive mode with input {string}` for now (*redundancy allowed*).
 
-**Deliverable**: Infrastructure exists; no scenarios use it yet.
-
----
-
-### Phase 2: Tag scenarios and update step semantics
-
-**Scope**: Add `@interactiveCLI` to scenarios; change steps to use live CLI when the tag is present.
-
-1. **Identify interactive scenarios**:
-   - `cli_recall.feature`: All scenarios (they use "I run the doughnut command in interactive mode ..." or "I run a recall session ..."). Add `@interactiveCLI` to each.
-   - `cli_access_token.feature`: Scenarios that use `runCliDirectWithInput` or `runCliDirectWithInputAndPty`:
-     - "ESC cancels remove-access-token selection" (uses PTY for ESC)
-     - Others use `-c` (non-interactive) and do not need `@interactiveCLI`.
-
-2. **Step definitions** (in `e2e_test/step_definitions/cli.ts`):
-   - For steps that currently call `runCliDirectWithInput` or `runCliDirectWithInputAndPty`, add a **conditional path**: if the scenario has `@interactiveCLI`, call `cy.task('sendToInteractiveCli', { input })` and alias result to `@doughnutOutput`. Otherwise keep current behavior (for scenarios without the tag).
-
-   - Cucumber does not expose "does this scenario have tag X?" easily in step defs. **Alternative**: always check for running interactive CLI. If `startInteractiveCli` was called (i.e. scenario has the tag), `sendToInteractiveCli` will use it. Steps can always try `sendToInteractiveCli` when the step is an "interactive mode" step—it will fail if no CLI is running. Simpler: make the interactive steps **only** work with `@interactiveCLI`; scenarios without it use different steps (e.g. `-c` for single commands). So:
-     - Scenarios with `@interactiveCLI`: use steps that call `sendToInteractiveCli`.
-     - Scenarios without: keep using `runCliDirectWithInput` / `-c` for non-interactive flows.
-
-   - **Recommended**: All steps that say "interactive mode" require `@interactiveCLI`. The step def calls `sendToInteractiveCli`. If the tag is missing, the Before hook never runs, so `sendToInteractiveCli` will throw "no interactive CLI running". That's acceptable—the tag is required. No conditional logic in steps.
-
-3. **Input formatting**: Current steps append `exit` in the step. With interactive CLI, steps must **not** send `exit`—the After hook does that. So each step should send only the user input (e.g. `/recall-status\n`, `/recall\ny\n`, etc.) without `exit`.
-
-**Deliverable**: Tagged scenarios use live CLI; step definitions send input without `exit`.
+**Dead code**: None—old step kept (remove in Phase 5).
 
 ---
 
-### Phase 3: Multi-step scenarios and output boundaries
+### Phase 2: Single-step, command + answer(s)
 
-**Scope**: Scenarios with multiple When steps sharing one CLI; robust prompt-based output capture.
+**Scenario type**: One When step with command plus one or more answers (e.g. `/recall` and `y`).
 
-1. **Output boundary**: After sending input, read until:
-   - The prompt pattern (`/ commands/` or equivalent) reappears, **or**
-   - A timeout (e.g. 25s like current PTY timeout).
+**Scenarios**: "Recall Just Review" outline, "Recall MCQ - choose correct answer", "Recall spelling - type correct spelling", "Recall substate - /stop exits recall mode", "Recall MCQ - contest and regenerate", "Recall MCQ - down arrow and Enter to select".
 
-2. **Multi-step examples**:
-   - Scenario "Recall status shows zero after recalling..." has:
-     - When `/recall` + `y` → Then assertions
-     - When `/recall-status` → Then assertions
-   - First When: send `/recall\n`, read until prompt (or "y/n" prompt). Then send `y\n`, read until main prompt.
-   - Actually the step is "with input `/recall` and `y`"—so one step, two logical inputs. The step sends `/recall\ny\n` in one go. The `sendToInteractiveCli` just sends that and reads until the main prompt. Same as now, but without spawning a new process.
+**Work**:
 
-   - For "When ... then When ...": First When sends its input, we capture output. Second When sends its input, we capture new output. Each capture overwrites `@doughnutOutput`. Then steps read from current `@doughnutOutput`. Works.
+1. Add new steps that call `sendToInteractiveCli` (no `exit`):
+   - `I input {string} and {string} in the interactive CLI`
+   - `I input {string} and {string} and {string} in the interactive CLI`
+   - `I input {string} and {string} and {string} and {string} in the interactive CLI`
+   - `I input down-arrow selection for {string} in the interactive CLI` (sends `/recall\n2\n`)
+2. Update these scenarios to use the new step text (e.g. `I input "/recall" and "y" in the interactive CLI`).
+3. Add `@interactiveCLI` to these scenarios.
+4. Keep old step defs for now (*redundancy allowed*).
 
-3. **Compound steps** (e.g. "I run a recall session and recall all due notes, declining load more"): Input is `/recall\ny\ny\nn\nexit` → change to `/recall\ny\ny\nn\n` (no exit). Single `sendToInteractiveCli` call. Output captured. Good.
-
-**Deliverable**: Multi-step scenarios work; output capture is deterministic.
+**Dead code**: None—remove old step defs in Phase 5.
 
 ---
 
-### Phase 4: PTY-only for interactive (ESC, arrows)
+### Phase 3: Multi-step scenarios
 
-**Scope**: Ensure all `@interactiveCLI` flows use PTY so ESC and arrow keys work.
+**Scenario type**: Multiple When steps in one scenario sharing one CLI process.
 
-1. `startInteractiveCli` already uses PTY (via `runCliInPty` or equivalent).
-2. Step "I run the remove-access-token command and cancel with ESC, then list tokens": input is `/remove-access-token\n\x1b\n/list-access-token\n`. No `exit`. The ESC (`\x1b`) requires PTY. With Phase 1–3, this already uses the interactive CLI which is PTY-based.
-3. Step "I run the doughnut command in interactive mode with down-arrow selection for /recall": currently sends `/recall\n2\n` (uses "2" as shortcut for second option). If we need real arrow keys, we'd send `\x1b[B` (down) etc. Verify whether current tests use numeric shortcuts or real arrows—if numeric, no change. If arrows, ensure PTY sends them correctly.
+**Scenarios**: "Recall status shows zero after recalling the only note in session", "Recall MCQ - ESC cancels with y/n confirmation", "Recall session - complete all due notes, see summary, then load more from future days".
 
-**Deliverable**: ESC and arrow-key scenarios pass with live interactive CLI.
+**Work**:
 
----
+1. Ensure `sendToInteractiveCli` returns output per call; each When overwrites `@doughnutOutput`. Verify prompt-based output boundaries work for sequential sends.
+2. Add new steps that call `sendToInteractiveCli`:
+   - `I input recall MCQ cancel with ESC in the interactive CLI` → `/recall\n/stop\n`
+   - `I input a recall session declining load more in the interactive CLI` → `/recall\ny\ny\nn\n`
+   - `I input a recall session with load more from future days in the interactive CLI` → `/recall\ny\ny\ny\ny\n`
+3. Update these 3 scenarios to use the new step text. For the multi-step scenario "Recall status shows zero after recalling...", first When becomes `I input "/recall" and "y" in the interactive CLI`, second When becomes `I input "/recall-status" in the interactive CLI`.
+4. Add `@interactiveCLI` to these 3 scenarios.
+5. Keep old step defs for now (*redundancy allowed*).
 
-### Phase 5: Gmail scenarios (optional / separate)
-
-**Scope**: `cli_gmail.feature` uses `runCliDirectWithGmailAdd` and `runCliDirectWithLastEmail`, which create their own temp config dir (not `@withCliConfig`).
-
-- These are one-shot: `/add gmail\nexit`, `/last email\nexit`.
-- They could use `@interactiveCLI` only if we extend the hook to support a different config source (e.g. Gmail-specific config). Lower priority.
-- **Recommendation**: Leave Gmail scenarios as-is for this migration unless we explicitly want them on the interactive CLI. Document as future work.
-
-**Deliverable**: Gmail scenarios unchanged, or a separate phase if we migrate them.
+**Dead code**: None—remove old step defs in Phase 5.
 
 ---
 
-### Phase 6: Cleanup and verification
+### Phase 4: PTY scenario (ESC key)
 
-1. Remove or simplify `runCliDirectWithInput` usage for interactive scenarios—ensure no scenario both has `@interactiveCLI` and uses the old pipe-based flow.
+**Scenario type**: Requires PTY for ESC key handling.
+
+**Scenarios**: "ESC cancels remove-access-token selection" (in `cli_access_token.feature`).
+
+**Work**:
+
+1. Add step `I input remove-access-token, ESC, then list-access-token in the interactive CLI` that calls `sendToInteractiveCli` with input `/remove-access-token\n\x1b\n/list-access-token\n` (no `exit`).
+2. Update the scenario to use the new step text.
+3. Add `@interactiveCLI` to this scenario.
+4. Remove `runCliDirectWithInputAndPty` task (no longer used).
+5. Keep old step def for now (*redundancy allowed*).
+
+**Dead code**: `runCliDirectWithInputAndPty`—remove in this phase. Old step def—remove in Phase 5.
+
+---
+
+### Phase 5: Final cleanup and docs
+
+**Work**:
+
+1. **Remove dead step definitions**: Remove all old `I run the doughnut command in interactive mode...` / `I run a recall session...` / `I run the remove-access-token...` step defs that were kept for redundancy. All scenarios now use `I input ... in the interactive CLI`.
 2. Run full CLI E2E: `pnpm cypress run --spec "e2e_test/features/cli/*.feature"`.
-3. Update `.cursor/rules/cli.mdc` if it documents the E2E approach.
-4. Remove dead code: any wrapper that was only for the old flow.
+3. Update `.cursor/rules/cli.mdc` or `CLAUDE.md` if they document the E2E approach.
+4. Remove any other dead code (e.g. helpers that only served old flow).
 
-**Deliverable**: All CLI E2E pass; docs updated; no duplicate logic.
+**Note**: `runCliDirectWithInput` stays—it is used by `I run the doughnut command with input {string}` in `cli_install_and_run.feature` (non-interactive flow).
 
 ---
 
-## Summary of Changes
+### Out of scope: Gmail scenarios
 
-| File | Changes |
-|------|---------|
-| `e2e_test/config/common.ts` | Add `startInteractiveCli`, `sendToInteractiveCli`, `stopInteractiveCli` tasks |
-| `e2e_test/step_definitions/hook.ts` | Add Before/After for `@interactiveCLI` (after `@withCliConfig`) |
-| `e2e_test/step_definitions/cli.ts` | Update "interactive mode" steps to use `sendToInteractiveCli`, remove `exit` from input |
-| `e2e_test/features/cli/cli_recall.feature` | Add `@interactiveCLI` to each scenario |
-| `e2e_test/features/cli/cli_access_token.feature` | Add `@interactiveCLI` to "ESC cancels remove-access-token selection" |
+`cli_gmail.feature` uses `runCliDirectWithGmailAdd` and `runCliDirectWithLastEmail` with their own config setup. Leave as-is; document as future work if needed.
+
+---
+
+## Summary of Changes by Phase
+
+| Phase | Files | Changes |
+|-------|-------|---------|
+| 1 | `common.ts`, `hook.ts`, `cli.ts`, `cli_recall.feature` | Tasks, hooks, add `I input {string} in the interactive CLI`, migrate 2 scenarios |
+| 2 | `cli.ts`, `cli_recall.feature` | Add 4 new `I input ...` steps, migrate 6 scenarios |
+| 3 | `cli.ts`, `cli_recall.feature` | Add 3 new `I input ...` steps, migrate 3 multi-step scenarios |
+| 4 | `cli.ts`, `cli_access_token.feature`, `common.ts` | Add 1 new step, migrate 1 scenario, remove `runCliDirectWithInputAndPty` |
+| 5 | `cli.ts`, docs | **Remove dead code**: all old `I run the doughnut command...` step defs; verification and doc updates |
 
 ## Open Questions
 
-1. **Prompt stability**: Is `/ commands/` the right pattern for "ready for next input"? Or does the CLI vary prompts (e.g. `> ` for main, different for sub-menus)? Verify in `cli/src/` output.
-2. **CI vs local**: `runCliDirectWithInput` uses stdio pipe; PTY may behave differently in CI. Validate on GitHub Actions.
+1. **Prompt stability**: Is `/ commands/` the right pattern for "ready for next input"? Verify in `cli/src/` output.
+2. **CI vs local**: PTY may behave differently in CI. Validate on GitHub Actions.
