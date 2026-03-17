@@ -46,15 +46,21 @@ Given('the CLI is built with version {string}', (version: string) => {
 })
 
 When('I install the CLI from localhost without affecting my system', () => {
-  cy.task<string>('installCli', BASE_URL).as('doughnutPath')
+  cy.task<string>('installCli', BASE_URL)
+    .should('be.a', 'string')
+    .and('not.be.empty')
+    .as('doughnutPath')
 })
 
 When('I run the installed doughnut command', () => {
-  cy.get<string>('@doughnutPath').then((doughnutPath) => {
-    cy.task<string>('runInstalledCli', { doughnutPath, input: 'exit\n' }).as(
-      'doughnutOutput'
-    )
-  })
+  cy.get<string>('@doughnutPath')
+    .should('be.a', 'string')
+    .and('not.be.empty')
+    .then((doughnutPath) => {
+      cy.task<string>('runInstalledCli', { doughnutPath, input: 'exit\n' }).as(
+        'doughnutOutput'
+      )
+    })
 })
 
 When('I run the installed doughnut version command', () => {
@@ -67,7 +73,11 @@ When('I run the installed doughnut version command', () => {
 })
 
 When('I run the doughnut command with input {string}', (input: string) => {
-  cy.task('runCliDirectWithInput', { input }).as('doughnutOutput')
+  const trimmed = input.trim()
+  const exitSuffix = trimmed === 'exit' || trimmed === '/exit' ? '' : `\nexit`
+  cy.task('runCliDirectWithInput', { input: `${input}${exitSuffix}` }).as(
+    'doughnutOutput'
+  )
 })
 
 When(

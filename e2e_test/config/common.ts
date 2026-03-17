@@ -336,7 +336,7 @@ const commonConfig = {
           const response = await fetch(`${baseUrl}/install`)
           if (!response.ok) {
             throw new Error(
-              `Failed to fetch install script: ${response.status}`
+              `installCli: failed to fetch install script from ${baseUrl}/install: ${response.status}`
             )
           }
           const script = await response.text()
@@ -348,7 +348,13 @@ const commonConfig = {
               BASE_URL: baseUrl,
             },
           })
-          return join(installDir, 'bin', 'doughnut')
+          const doughnutPath = join(installDir, 'bin', 'doughnut')
+          if (!existsSync(doughnutPath)) {
+            throw new Error(
+              `installCli: doughnut binary not found at ${doughnutPath} after install. Check that ${baseUrl}/doughnut-cli-latest/doughnut is served.`
+            )
+          }
+          return doughnutPath
         },
         async runCliDirectWithInput({
           input,
@@ -430,6 +436,16 @@ const commonConfig = {
           args?: string[]
           env?: NodeJS.ProcessEnv
         }) {
+          if (!doughnutPath || typeof doughnutPath !== 'string') {
+            throw new Error(
+              `runInstalledCli: doughnutPath required, got ${JSON.stringify(doughnutPath)}`
+            )
+          }
+          if (!existsSync(doughnutPath)) {
+            throw new Error(
+              `runInstalledCli: doughnut binary not found at ${doughnutPath}. Ensure prior step "I install the CLI" succeeded.`
+            )
+          }
           const cwd = path.dirname(doughnutPath)
           if (input !== undefined) {
             return runCliInPty({
