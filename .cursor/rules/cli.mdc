@@ -1,5 +1,6 @@
 ---
 description: related to doughnut CLI
+globs: cli/**, e2e_test/features/cli/**
 alwaysApply: false
 ---
 # doughnut-cli
@@ -25,6 +26,14 @@ cli/
 | Run tests | `pnpm cli:test` |
 | Format | `pnpm cli:format` |
 | Lint | `pnpm cli:lint` |
+
+## CLI E2E tests
+
+CLI e2e tests run TypeScript source locally, bundled in CI:
+
+- **Local**: `pnpm -C cli exec tsx src/index.ts` (no build step)
+- **CI**: `cli/dist/doughnut-cli.bundle.mjs` (pre-built by `pnpm bundle:all` before Cypress)
+- **Installation tests**: Always use the bundled/installed binary
 
 ## Build output
 
@@ -56,9 +65,4 @@ When adding a new command, ensure `/help` lists it:
    - For an **interactive** command in an existing module (e.g. gmail): Add to that module's docs array (e.g. `gmailCommandDocs` in gmail.ts)—help.ts already imports it.
    - For an **interactive** command in a new module: Export the doc, then in help.ts import it and add to `interactiveDocs`.
 3. **Wire up the handler** in `processInput()` (interactive) or `index.ts` (subcommand).
-4. **Verify**: Run `doughnut -c "/help"` or `doughnut help` and confirm the new command appears.
-4. **Verify**: Run `doughnut -c "/help"` or `doughnut help` and confirm the new command appears.
-4. **Verify**: Run `doughnut help` or `doughnut -c "/help"` to confirm the new command appears.
-4. **Verify**: Run `doughnut help` or `doughnut -c "/help"` to confirm the new command appears in the output.
 4. **Verify**: Run `pnpm cli` then type `/help`, or run `pnpm cli -c "/help"`, and confirm the new command appears.
-4. **Verify**: Run `doughnut help` or `doughnut -c "/help"` to confirm the new command appears in the output.

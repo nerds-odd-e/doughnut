@@ -63,14 +63,6 @@ function bundleAndCopyCliToBuildOutput(
   copyFileSync(src, join(destDir, 'doughnut'))
 }
 
-function ensureCliBundleExists(repoRoot: string): string {
-  const bundlePath = join(repoRoot, CLI_BUNDLE_PATH)
-  if (!existsSync(bundlePath)) {
-    runSync('pnpm cli:bundle', { cwd: repoRoot })
-  }
-  return bundlePath
-}
-
 function getCliRunConfig(repoRoot: string): {
   command: string
   baseArgs: string[]
