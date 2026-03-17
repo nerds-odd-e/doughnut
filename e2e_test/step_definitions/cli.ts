@@ -41,10 +41,6 @@ Given('the backend is serving the CLI and install script', () => {
   cy.request('GET', `${BASE_URL}/install`).its('status').should('eq', 200)
 })
 
-Given('the CLI is built with version {string}', (version: string) => {
-  cy.task('bundleAndCopyCliWithVersion', version)
-})
-
 When('I install the CLI from localhost without affecting my system', () => {
   cy.task<string>('installCli', BASE_URL)
     .should('be.a', 'string')

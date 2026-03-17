@@ -36,7 +36,7 @@ describe('runUpdate', () => {
     await runUpdate()
 
     expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringMatching(/is already the latest version/)
+      'doughnut 0.1.0 is already the latest version'
     )
   })
 

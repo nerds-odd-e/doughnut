@@ -37,16 +37,8 @@ Feature: CLI install and run
     And I should see "version" in the history output
 
   @bundleAndCopyCliToBackendResources
-  Scenario: Update when already latest (0.1.0)
-    Given the backend is serving the CLI and install script
-    When I install the CLI from localhost without affecting my system
-    When I run the installed doughnut update command with BASE_URL from localhost
-    Then I should see "doughnut 0.1.0 is already the latest version" in the history output
-
-  @bundleAndCopyCliToBackendResources
   Scenario: Update from 0.1.0 to 0.2.0
     Given the backend is serving the CLI and install script
-    And the CLI is built with version "0.1.0"
     When I install the CLI from localhost without affecting my system
     And I run the installed doughnut version command
     Then I should see "doughnut 0.1.0" in the history output
