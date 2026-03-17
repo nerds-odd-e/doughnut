@@ -4,6 +4,7 @@
  */
 
 import type { IPty } from '@lydell/node-pty'
+import { E2E_BACKEND_BASE_URL } from './constants'
 
 const PTY_TIMEOUT_MS = 25_000
 const PTY_OPTIONS = {
@@ -14,7 +15,7 @@ const PTY_OPTIONS = {
 
 function cliEnv(overrides?: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
   return {
-    DOUGHNUT_API_BASE_URL: 'http://localhost:9081',
+    DOUGHNUT_API_BASE_URL: E2E_BACKEND_BASE_URL,
     ...overrides,
   }
 }
@@ -141,5 +142,107 @@ export async function runCliInPty(opts: {
         inputSent = true
       })
       .catch(reject)
+  })
+}
+
+/** Module-level handle for long-running interactive CLI. Used by Cypress tasks. */
+let interactiveHandle: {
+  pty: IPty
+  stdoutRef: { s: string }
+  disposeData: { dispose: () => void }
+} | null = null
+
+export async function startInteractiveCli(opts: {
+  command: string
+  args: string[]
+  cwd: string
+  env?: NodeJS.ProcessEnv
+}): Promise<void> {
+  if (interactiveHandle) {
+    throw new Error(
+      'Interactive CLI already running. Call stopInteractiveCli first.'
+    )
+  }
+  const pty = require('@lydell/node-pty') as {
+    spawn: (file: string, args: string[], options: object) => IPty
+  }
+  const envMerged = { ...process.env, ...cliEnv(opts.env) }
+  const ptyProcess = pty.spawn(opts.command, opts.args, {
+    ...PTY_OPTIONS,
+    cwd: opts.cwd,
+    env: envMerged as { [key: string]: string },
+  })
+  const stdoutRef = { s: '' }
+  const disposeData = ptyProcess.onData((data) => {
+    stdoutRef.s += data
+  })
+  await waitForCliReady(ptyProcess, () => stdoutRef.s)
+  interactiveHandle = { pty: ptyProcess, stdoutRef, disposeData }
+}
+
+export async function sendToInteractiveCli(input: string): Promise<string> {
+  if (!interactiveHandle) {
+    throw new Error(
+      'No interactive CLI running. Ensure @interactiveCLI Before hook ran.'
+    )
+  }
+  const trimmed = input.trim()
+  const toSend =
+    trimmed.startsWith('/') && !trimmed.endsWith(' ')
+      ? `${trimmed} \n`
+      : trimmed.endsWith('\n')
+        ? trimmed
+        : `${trimmed}\n`
+  const normalizedInput = toSend
+  const lenBeforeSend = interactiveHandle.stdoutRef.s.length
+  interactiveHandle.pty.write(normalizedInput)
+  await waitForNewPromptAfterSend(
+    interactiveHandle.pty,
+    () => interactiveHandle!.stdoutRef.s,
+    lenBeforeSend
+  )
+  return interactiveHandle.stdoutRef.s
+}
+
+async function waitForNewPromptAfterSend(
+  _ptyProcess: IPty,
+  getStdout: () => string,
+  lenBeforeSend: number
+): Promise<void> {
+  const maxWaitMs = 15_000
+  const pollMs = 50
+  const start = Date.now()
+  while (Date.now() - start < maxWaitMs) {
+    const stdout = getStdout()
+    if (
+      stdout.length > lenBeforeSend &&
+      CLI_READY_PATTERN.test(stdout.slice(lenBeforeSend))
+    ) {
+      return
+    }
+    await new Promise((r) => setTimeout(r, pollMs))
+  }
+  const stdout = getStdout()
+  throw new Error(
+    `CLI did not show new prompt after send within 15s. stdout grew by ${stdout.length - lenBeforeSend} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`
+  )
+}
+
+export async function stopInteractiveCli(): Promise<void> {
+  if (!interactiveHandle) return
+  const { pty, disposeData } = interactiveHandle
+  interactiveHandle = null
+  return new Promise<void>((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      pty.kill('SIGKILL')
+      disposeData.dispose()
+      reject(new Error('Interactive CLI did not exit within 5s'))
+    }, 5_000)
+    pty.write('exit\n')
+    pty.onExit(() => {
+      clearTimeout(timeout)
+      disposeData.dispose()
+      resolve()
+    })
   })
 }

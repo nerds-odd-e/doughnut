@@ -1,3 +1,5 @@
+import { backendBaseUrl } from '../../support/backendUrl'
+
 interface ApiResponse {
   content: Array<{
     text: string
@@ -16,12 +18,11 @@ const getResponseText = (alias: string) => {
 export const mcpAgentActions = () => {
   return {
     connect() {
-      const baseUrl =
-        Cypress.config('backendBaseUrl') ??
-        Cypress.config('baseUrl') ??
-        'http://localhost:9081'
       cy.get('@savedAccessToken').then((accessToken) => {
-        cy.task('spawnAndConnectMcpServer', { baseUrl, accessToken })
+        cy.task('spawnAndConnectMcpServer', {
+          baseUrl: backendBaseUrl(),
+          accessToken,
+        })
       })
       return this
     },

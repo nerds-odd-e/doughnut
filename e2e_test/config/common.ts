@@ -20,14 +20,19 @@ import fs from 'fs'
 import path from 'path'
 import AdmZip from 'adm-zip'
 import type { ExpectedFile } from '../start/downloadChecker'
-import { runCliInPty } from './cliPtyRunner'
+import {
+  runCliInPty,
+  startInteractiveCli as startInteractiveCliProcess,
+  sendToInteractiveCli as sendToInteractiveCliInput,
+  stopInteractiveCli as stopInteractiveCliProcess,
+} from './cliPtyRunner'
+import { E2E_BACKEND_BASE_URL } from './constants'
 
 const CLI_BUNDLE_PATH = 'cli/dist/doughnut-cli.bundle.mjs'
-const CLI_E2E_BACKEND_URL = 'http://localhost:9081'
 
 function cliEnv(overrides?: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
   return {
-    DOUGHNUT_API_BASE_URL: CLI_E2E_BACKEND_URL,
+    DOUGHNUT_API_BASE_URL: E2E_BACKEND_BASE_URL,
     ...overrides,
   }
 }
@@ -89,7 +94,7 @@ const commonConfig = {
   defaultCommandTimeout: 6000,
   trashAssetsBeforeRuns: true,
   environment: 'ci',
-  backendBaseUrl: 'http://localhost:9081',
+  backendBaseUrl: E2E_BACKEND_BASE_URL,
 
   e2e: {
     async setupNodeEvents(
@@ -405,6 +410,24 @@ const commonConfig = {
               reject(err)
             })
           })
+        },
+        async startInteractiveCli({ env }: { env?: NodeJS.ProcessEnv }) {
+          const repoRoot = path.resolve(__dirname, '..', '..')
+          const config = getCliRunConfig(repoRoot)
+          await startInteractiveCliProcess({
+            command: config.command,
+            args: config.baseArgs,
+            cwd: repoRoot,
+            env: { ...cliEnv(env) },
+          })
+          return true
+        },
+        async sendToInteractiveCli({ input }: { input: string }) {
+          return sendToInteractiveCliInput(input)
+        },
+        async stopInteractiveCli() {
+          await stopInteractiveCliProcess()
+          return null
         },
         async runCliDirectWithInputAndPty({
           input,

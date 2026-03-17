@@ -38,15 +38,15 @@ The goal: scenarios that need interactive mode should run a **single live CLI pr
 
 **Scenario type**: One When step with a single input (e.g. `/recall-status`).
 
-**Scenarios**: "Recall status shows count when notes are due", "Recall status shows zero when no notes are due".
+**Scenarios**: "Recall status shows count when notes are due"
 
 **Work**:
 
 1. Add Cypress tasks: `startInteractiveCli`, `sendToInteractiveCli`, `stopInteractiveCli` (PTY-based, prompt detection).
 2. Add `@interactiveCLI` Before/After hooks (order after `@withCliConfig`).
-3. Add `@interactiveCLI` to the 2 scenarios.
+3. Add `@interactiveCLI` to the 1 scenarios.
 4. Add step `I input {string} in the interactive CLI` that calls `sendToInteractiveCli` with input (no `exit`).
-5. Update the 2 scenarios to use `I input "/recall-status" in the interactive CLI`.
+5. Update the 1 scenario to use `I input "/recall-status" in the interactive CLI`.
 6. Keep old step `I run the doughnut command in interactive mode with input {string}` for now (*redundancy allowed*).
 
 **Dead code**: None—old step kept (remove in Phase 5).
@@ -142,7 +142,11 @@ The goal: scenarios that need interactive mode should run a **single live CLI pr
 | 4 | `cli.ts`, `cli_access_token.feature`, `common.ts` | Add 1 new step, migrate 1 scenario, remove `runCliDirectWithInputAndPty` |
 | 5 | `cli.ts`, docs | **Remove dead code**: all old `I run the doughnut command...` step defs; verification and doc updates |
 
+## Phase 1 Implementation Notes
+
+- **Command submission**: When the CLI buffer is a command prefix with suggestions (e.g. `/recall-status` without trailing space), Enter selects the suggestion (adds space) instead of submitting. `sendToInteractiveCli` appends a trailing space before newline for command-like input so submission runs.
+- **Prompt detection**: Before hook waits for `/ commands` in stdout; `sendToInteractiveCli` waits for the pattern in *new* content (after lenBeforeSend) to avoid matching the initial display.
+
 ## Open Questions
 
-1. **Prompt stability**: Is `/ commands/` the right pattern for "ready for next input"? Verify in `cli/src/` output.
-2. **CI vs local**: PTY may behave differently in CI. Validate on GitHub Actions.
+1. **CI vs local**: PTY may behave differently in CI. Validate on GitHub Actions.

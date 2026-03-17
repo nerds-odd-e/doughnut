@@ -4,6 +4,7 @@
 // @ts-check
 
 import { After, Before } from '@badeball/cypress-cucumber-preprocessor'
+import { backendBaseUrl } from '../support/backendUrl'
 import start, { mock_services } from '../start'
 
 Before(() => {
@@ -103,8 +104,23 @@ Before({ tags: '@bundleAndCopyCliToBackendResources' }, () => {
   cy.task('bundleAndCopyCli')
 })
 
-Before({ tags: '@withCliConfig' }, () => {
+Before({ tags: '@withCliConfig', order: 1 }, () => {
   cy.task('createCliConfigDir').as('cliConfigDir')
+})
+
+Before({ tags: '@interactiveCLI', order: 2 }, () => {
+  cy.get<string>('@cliConfigDir').then((configDir) =>
+    cy.task('startInteractiveCli', {
+      env: {
+        DOUGHNUT_CONFIG_DIR: configDir,
+        DOUGHNUT_API_BASE_URL: backendBaseUrl(),
+      },
+    })
+  )
+})
+
+After({ tags: '@interactiveCLI' }, () => {
+  cy.task('stopInteractiveCli')
 })
 
 Before({ tags: '@usingMockedGoogleService' }, () => {

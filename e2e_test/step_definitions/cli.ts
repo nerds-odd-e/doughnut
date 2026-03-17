@@ -1,19 +1,23 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
+import { backendBaseUrl } from '../support/backendUrl'
 import { mock_services } from '../start'
 import { getSectionContent, getLastCommandOutput } from './cliSectionParser'
 
-const BASE_URL = 'http://localhost:9081'
 const GOOGLE_MOCK_URL = 'http://localhost:5003'
+
+function cliEnvWithConfigDir(configDir: string): Record<string, string> {
+  return {
+    DOUGHNUT_CONFIG_DIR: configDir,
+    DOUGHNUT_API_BASE_URL: backendBaseUrl(),
+  }
+}
 
 function runCliWithConfig(args: string[]) {
   return cy.get<string>('@cliConfigDir').then((configDir) =>
     cy
       .task('runCliDirectWithArgs', {
         args,
-        env: {
-          DOUGHNUT_CONFIG_DIR: configDir,
-          DOUGHNUT_API_BASE_URL: BASE_URL,
-        },
+        env: cliEnvWithConfigDir(configDir),
       })
       .as('doughnutOutput')
   )
@@ -38,11 +42,13 @@ function taskWithCliTiming(
 }
 
 Given('the backend is serving the CLI and install script', () => {
-  cy.request('GET', `${BASE_URL}/install`).its('status').should('eq', 200)
+  cy.request('GET', `${backendBaseUrl()}/install`)
+    .its('status')
+    .should('eq', 200)
 })
 
 When('I install the CLI from localhost without affecting my system', () => {
-  cy.task<string>('installCli', BASE_URL)
+  cy.task<string>('installCli', backendBaseUrl())
     .should('be.a', 'string')
     .and('not.be.empty')
     .as('doughnutPath')
@@ -82,14 +88,15 @@ When(
     cy.get<string>('@cliConfigDir').then((configDir) =>
       taskWithCliTiming('runCliDirectWithInput', {
         input: `${input}\nexit\n`,
-        env: {
-          DOUGHNUT_CONFIG_DIR: configDir,
-          DOUGHNUT_API_BASE_URL: BASE_URL,
-        },
+        env: cliEnvWithConfigDir(configDir),
       }).as('doughnutOutput')
     )
   }
 )
+
+When('I input {string} in the interactive CLI', (input: string) => {
+  cy.task<string>('sendToInteractiveCli', { input }).as('doughnutOutput')
+})
 
 When(
   'I run the doughnut command in interactive mode with input {string} and {string}',
@@ -97,10 +104,7 @@ When(
     cy.get<string>('@cliConfigDir').then((configDir) =>
       taskWithCliTiming('runCliDirectWithInput', {
         input: `${command}\n${answer}\nexit\n`,
-        env: {
-          DOUGHNUT_CONFIG_DIR: configDir,
-          DOUGHNUT_API_BASE_URL: BASE_URL,
-        },
+        env: cliEnvWithConfigDir(configDir),
       }).as('doughnutOutput')
     )
   }
@@ -112,10 +116,7 @@ When(
     cy.get<string>('@cliConfigDir').then((configDir) =>
       taskWithCliTiming('runCliDirectWithInput', {
         input: `${command}\n${answer1}\n${answer2}\nexit\n`,
-        env: {
-          DOUGHNUT_CONFIG_DIR: configDir,
-          DOUGHNUT_API_BASE_URL: BASE_URL,
-        },
+        env: cliEnvWithConfigDir(configDir),
       }).as('doughnutOutput')
     )
   }
@@ -127,10 +128,7 @@ When(
     cy.get<string>('@cliConfigDir').then((configDir) =>
       taskWithCliTiming('runCliDirectWithInput', {
         input: `${command}\n${answer1}\n${answer2}\n${answer3}\nexit\n`,
-        env: {
-          DOUGHNUT_CONFIG_DIR: configDir,
-          DOUGHNUT_API_BASE_URL: BASE_URL,
-        },
+        env: cliEnvWithConfigDir(configDir),
       }).as('doughnutOutput')
     )
   }
@@ -142,10 +140,7 @@ When(
     cy.get<string>('@cliConfigDir').then((configDir) =>
       taskWithCliTiming('runCliDirectWithInput', {
         input: '/recall\ny\ny\nn\nexit\n',
-        env: {
-          DOUGHNUT_CONFIG_DIR: configDir,
-          DOUGHNUT_API_BASE_URL: BASE_URL,
-        },
+        env: cliEnvWithConfigDir(configDir),
       }).as('doughnutOutput')
     )
   }
@@ -155,10 +150,7 @@ When('I run a recall session with load more from future days', () => {
   cy.get<string>('@cliConfigDir').then((configDir) =>
     taskWithCliTiming('runCliDirectWithInput', {
       input: '/recall\ny\ny\ny\ny\nexit\n',
-      env: {
-        DOUGHNUT_CONFIG_DIR: configDir,
-        DOUGHNUT_API_BASE_URL: BASE_URL,
-      },
+      env: cliEnvWithConfigDir(configDir),
     }).as('doughnutOutput')
   )
 })
@@ -171,10 +163,7 @@ When(
       cy
         .task('runCliDirectWithInputAndPty', {
           input: `/remove-access-token\n${esc}\n/list-access-token\nexit\n`,
-          env: {
-            DOUGHNUT_CONFIG_DIR: configDir,
-            DOUGHNUT_API_BASE_URL: BASE_URL,
-          },
+          env: cliEnvWithConfigDir(configDir),
         })
         .as('doughnutOutput')
     )
@@ -188,10 +177,7 @@ When(
       cy
         .task('runCliDirectWithInput', {
           input: '/recall\n/stop\nexit\n',
-          env: {
-            DOUGHNUT_CONFIG_DIR: configDir,
-            DOUGHNUT_API_BASE_URL: BASE_URL,
-          },
+          env: cliEnvWithConfigDir(configDir),
         })
         .as('doughnutOutput')
     )
@@ -206,10 +192,7 @@ When(
       cy
         .task('runCliDirectWithInput', {
           input: '/recall\n2\nexit\n',
-          env: {
-            DOUGHNUT_CONFIG_DIR: configDir,
-            DOUGHNUT_API_BASE_URL: BASE_URL,
-          },
+          env: cliEnvWithConfigDir(configDir),
         })
         .then((output: unknown) => {
           if (Cypress.env('RECORD_E2E_TIMING')) {
@@ -246,7 +229,7 @@ When(
       cy.task<string>('runInstalledCli', {
         doughnutPath,
         args: ['update'],
-        env: { BASE_URL },
+        env: { BASE_URL: backendBaseUrl() },
       }).as('doughnutOutput')
     })
   }
