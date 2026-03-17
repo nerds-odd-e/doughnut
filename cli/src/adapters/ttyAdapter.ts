@@ -147,7 +147,6 @@ export async function runTTY(
   const rl = readline.createInterface({
     input: stdin,
     output: process.stdout,
-    terminal: false,
     escapeCodeTimeout: 50,
   })
   readline.emitKeypressEvents(stdin, rl)
