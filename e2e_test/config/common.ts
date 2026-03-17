@@ -539,10 +539,10 @@ const commonConfig = {
           mkdirSync(configDir, { recursive: true })
           writeFileSync(configPath, JSON.stringify(config, null, 2))
 
-          const bundlePath = ensureCliBundleExists(repoRoot)
+          const cliConfig = getCliRunConfig(repoRoot)
           return new Promise<{ stdout: string; exitCode: number }>(
             (resolve, reject) => {
-              const proc = spawn(process.execPath, [bundlePath], {
+              const proc = spawn(cliConfig.command, [...cliConfig.baseArgs], {
                 cwd: repoRoot,
                 env: {
                   ...process.env,
@@ -613,9 +613,9 @@ const commonConfig = {
             ],
           }
           writeFileSync(configPath, JSON.stringify(config, null, 2))
-          const bundlePath = ensureCliBundleExists(repoRoot)
+          const cliConfig = getCliRunConfig(repoRoot)
           return new Promise<string>((resolve, reject) => {
-            const proc = spawn(process.execPath, [bundlePath], {
+            const proc = spawn(cliConfig.command, [...cliConfig.baseArgs], {
               cwd: repoRoot,
               env: {
                 ...process.env,

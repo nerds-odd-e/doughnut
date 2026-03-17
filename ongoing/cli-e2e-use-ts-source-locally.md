@@ -98,7 +98,7 @@ All CLI e2e tests (except `runInstalledCli`) use `ensureCliBundleExists()` → `
 
 ---
 
-### Phase 5: Update `runCliDirectWithGmailAdd` and `runCliDirectWithLastEmail`
+### Phase 5: Update `runCliDirectWithGmailAdd` and `runCliDirectWithLastEmail` ✅
 
 - Apply the same `getCliRunConfig` pattern to both tasks.
 - Verify `cli_gmail` locally and in CI.
