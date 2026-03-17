@@ -38,6 +38,22 @@ async function writeInput(ptyProcess: IPty, input: CliPtyInput): Promise<void> {
   }
 }
 
+const CLI_READY_PATTERN = /doughnut\s+[\d.]+/
+
+async function waitForCliReady(
+  ptyProcess: IPty,
+  getStdout: () => string
+): Promise<void> {
+  const maxWaitMs = 5_000
+  const pollMs = 50
+  const start = Date.now()
+  while (Date.now() - start < maxWaitMs) {
+    if (CLI_READY_PATTERN.test(getStdout())) return
+    await new Promise((r) => setTimeout(r, pollMs))
+  }
+  throw new Error('CLI did not show readiness within 5s')
+}
+
 export async function runCliInPty(opts: {
   executablePath: string
   args?: string[]
@@ -74,6 +90,8 @@ export async function runCliInPty(opts: {
       if (exitCode === 0) resolve(stdout)
       else reject(new Error(`CLI exited with code ${exitCode}`))
     })
-    writeInput(ptyProcess, opts.input).catch(reject)
+    waitForCliReady(ptyProcess, () => stdout)
+      .then(() => writeInput(ptyProcess, opts.input))
+      .catch(reject)
   })
 }
