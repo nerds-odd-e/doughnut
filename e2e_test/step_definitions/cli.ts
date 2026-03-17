@@ -103,6 +103,14 @@ When('I input {string} in the interactive CLI', (input: string) => {
 })
 
 When(
+  'I input down-arrow selection for {string} in the interactive CLI',
+  (command: string) => {
+    cy.task<string>('sendToInteractiveCli', { input: command })
+    cy.task<string>('sendToInteractiveCli', { input: '2' }).as('doughnutOutput')
+  }
+)
+
+When(
   'I run the doughnut command in interactive mode with input {string} and {string}',
   (command: string, answer: string) => {
     cy.get<string>('@cliConfigDir').then((configDir) =>

@@ -78,6 +78,7 @@ Feature: CLI recall status and recall session
     Then I should see "1 note to recall today" in the history output
 
   @usingMockedOpenAiService
+  @interactiveCLI
   Scenario: Recall MCQ - down arrow and Enter to select
     Given I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:
@@ -90,11 +91,12 @@ Feature: CLI recall status and recall session
     And It's day 1
     And I assimilate the note "sedition"
     And It's day 2
-    When I run the doughnut command in interactive mode with down-arrow selection for "/recall"
+    When I input down-arrow selection for "/recall" in the interactive CLI
     Then I should see "Incorrect" in the history output
     And I should see "Recalled successfully" in the history output
 
   @disableOpenAiService
+  @interactiveCLI
   Scenario: Recall substate - /stop exits recall mode
     Given I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:
@@ -105,7 +107,10 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedition"
     And I assimilate the note "sedation"
     And It's day 2
-    When I run the doughnut command in interactive mode with input "/recall" and "/stop"
+    When I input "/recall" in the interactive CLI
+    Then I should see "sedition" in the status
+    And I should see "Yes, I remember?" in the status
+    When I input "/stop" in the interactive CLI
     Then I stopped the recall during review
 
   @disableOpenAiService
@@ -128,6 +133,7 @@ Feature: CLI recall status and recall session
     And I should see "Recalled" in the history output
 
   @usingMockedOpenAiService
+  @interactiveCLI
   Scenario: Recall MCQ - contest and regenerate before answering
     Given I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:
@@ -144,12 +150,16 @@ Feature: CLI recall status and recall session
     And It's day 1
     And I assimilate the note "sedition"
     And It's day 2
-    When I run the doughnut command in interactive mode with input "/recall" and "/contest" and "1" and "exit"
+    When I input "/recall" in the interactive CLI
     Then I should see "What is the meaning of sedition?" in the status
-    And I should see "Correct!" in the history output
+    When I input "/contest" in the interactive CLI
+    Then I should see "What is the meaning of sedition?" in the status
+    When I input "1" in the interactive CLI
+    Then I should see "Correct!" in the history output
     And I should see "Recalled successfully" in the history output
 
   @disableOpenAiService
+  @interactiveCLI
   Scenario: Recall spelling - type correct spelling and see success
     Given I have a notebook with the head note "English" which skips memory tracking
     And there are some notes:
@@ -159,7 +169,10 @@ Feature: CLI recall status and recall session
     And It's day 1
     And I assimilate the note "sedition" with the option of remembering spelling
     And It's day 2
-    When I run the doughnut command in interactive mode with input "/recall" and "y" and "sedition"
+    When I input "/recall" in the interactive CLI
+    Then I should see "Yes, I remember?" in the status
+    When I input "y" in the interactive CLI
     Then I should see "Spell:" in the status
-    And I should see "Correct!" in the history output
+    When I input "sedition" in the interactive CLI
+    Then I should see "Correct!" in the history output
     And I should see "Recalled successfully" in the history output

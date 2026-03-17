@@ -97,7 +97,7 @@ The goal: scenarios that need interactive mode should run a **single live CLI pr
 
 ---
 
-### Phase 2: Command + answer(s)—split into separate steps
+### Phase 2: Command + answer(s)—split into separate steps ✅ Done
 
 **Scenario type**: One When step with command plus one or more answers; split so each input is sent only *after* a Then step verifies the expected prompt.
 
@@ -183,7 +183,7 @@ The goal: scenarios that need interactive mode should run a **single live CLI pr
 | 1 ✅ | `common.ts`, `hook.ts`, `cli.ts`, `cli_recall.feature`, `cliPtyRunner.ts`, `constants.ts`, `backendUrl.ts`, `ci.ts`, `mcpAgentActions.ts` | Tasks, hooks, step, migrate 1 scenario; single source for backend URL; `cliEnvWithConfigDir` helper |
 | 1.5 ✅ | `cli_recall.feature`, `cliPtyRunner.ts` | Migrate "Recall Just Review"; split `/recall` and `y` into 2 When steps; use input box (│ → ) as ready signal with 10ms poll and 100ms stabilization |
 | 1.6 ✅ | `cli_recall.feature` | Migrate "Recall MCQ - choose correct answer and see success"; split `/recall` and `1` into 2 When steps; reuse existing step |
-| 2 | `cli.ts`, `cli_recall.feature` | Add down-arrow step; migrate 4 remaining scenarios (Recall spelling, /stop, contest, down-arrow); split inputs into separate When steps |
+| 2 ✅ | `cli.ts`, `cli_recall.feature` | Add down-arrow step; migrate 4 remaining scenarios (Recall spelling, /stop, contest, down-arrow); split inputs into separate When steps |
 | 3 | `cli.ts`, `cli_recall.feature` | Migrate 3 multi-step scenarios; split composite inputs into separate When steps with Then verification in between |
 | 4 | `cli.ts`, `cli_access_token.feature`, `common.ts` | Split remove-access-token + ESC + list into separate steps; migrate 1 scenario; remove `runCliDirectWithInputAndPty` |
 | 5 | `cli.ts`, docs | **Remove dead code**: all old `I run the doughnut command...` step defs; verification and doc updates |

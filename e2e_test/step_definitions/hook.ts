@@ -109,6 +109,7 @@ Before({ tags: '@withCliConfig', order: 1 }, () => {
 })
 
 Before({ tags: '@interactiveCLI', order: 2 }, () => {
+  cy.task('stopInteractiveCli')
   cy.get<string>('@cliConfigDir').then((configDir) =>
     cy.task('startInteractiveCli', {
       env: {
