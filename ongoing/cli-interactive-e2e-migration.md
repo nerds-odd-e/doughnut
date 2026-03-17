@@ -116,7 +116,7 @@ The goal: scenarios that need interactive mode should run a **single live CLI pr
 
 ---
 
-### Phase 3: Multi-step scenarios
+### Phase 3: Multi-step scenarios ✅ Done
 
 **Scenario type**: Multiple When steps in one scenario sharing one CLI process.
 
@@ -126,12 +126,11 @@ The goal: scenarios that need interactive mode should run a **single live CLI pr
 
 **Work**:
 
-1. Ensure `sendToInteractiveCli` returns output per call; each When overwrites `@doughnutOutput`. Verify prompt-based output boundaries work for sequential sends.
-2. Update "Recall status shows zero": When `/recall` → Then "Yes, I remember?" → When `y` → Then "Recalled successfully" → When `/recall-status` → Then "0 notes". (Split `/recall` and `y` like Phase 1.5.)
-3. Update "Recall MCQ - ESC cancels": When `/recall` → Then question → When `/stop` (or ESC) → Then stopped → When `/recall-status` → Then "1 note". Split into separate steps.
-4. Update "Recall session - complete all due...": Split `/recall`, `y`, `y`, `n` and `/recall`, `y`, `y`, `y`, `y` into separate When steps with Then verification in between.
-5. Add `@interactiveCLI` to these 3 scenarios.
-6. Keep old step defs for now (*redundancy allowed*).
+1. Ensure `sendToInteractiveCli` returns output per call; each When overwrites `@doughnutOutput`. (Already works—sequential sends accumulate stdout.)
+2. Update "Recall MCQ - ESC cancels": When `/recall` → Then question → When `/stop` → Then stopped → When `/recall-status` → Then "1 note". Split into separate steps.
+3. Update "Recall session - complete all due...": Split `/recall`, `y`, `y`, `n` and `/recall`, `y`, `y`, `y`, `y` into separate When steps with Then verification in between.
+4. Add `@interactiveCLI` to these 2 scenarios.
+5. Keep old step defs for now (*redundancy allowed*).
 
 **Dead code**: None—remove old step defs in Phase 5.
 
@@ -184,7 +183,7 @@ The goal: scenarios that need interactive mode should run a **single live CLI pr
 | 1.5 ✅ | `cli_recall.feature`, `cliPtyRunner.ts` | Migrate "Recall Just Review"; split `/recall` and `y` into 2 When steps; use input box (│ → ) as ready signal with 10ms poll and 100ms stabilization |
 | 1.6 ✅ | `cli_recall.feature` | Migrate "Recall MCQ - choose correct answer and see success"; split `/recall` and `1` into 2 When steps; reuse existing step |
 | 2 ✅ | `cli.ts`, `cli_recall.feature` | Add down-arrow step; migrate 4 remaining scenarios (Recall spelling, /stop, contest, down-arrow); split inputs into separate When steps |
-| 3 | `cli.ts`, `cli_recall.feature` | Migrate 3 multi-step scenarios; split composite inputs into separate When steps with Then verification in between |
+| 3 ✅ | `cli_recall.feature` | Migrate 2 multi-step scenarios (ESC cancels, complete all due); split composite inputs into separate When steps with Then verification in between |
 | 4 | `cli.ts`, `cli_access_token.feature`, `common.ts` | Split remove-access-token + ESC + list into separate steps; migrate 1 scenario; remove `runCliDirectWithInputAndPty` |
 | 5 | `cli.ts`, docs | **Remove dead code**: all old `I run the doughnut command...` step defs; verification and doc updates |
 
