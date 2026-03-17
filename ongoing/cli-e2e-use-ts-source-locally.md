@@ -53,7 +53,7 @@ All CLI e2e tests (except `runInstalledCli`) use `ensureCliBundleExists()` → `
 
 ## Phases
 
-### Phase 1: Add `getCliRunConfig()` helper
+### Phase 1: Add `getCliRunConfig()` helper ✅
 
 - Add `getCliRunConfig(repoRoot: string): { command: string; baseArgs: string[] }`.
 - Logic:
@@ -65,7 +65,7 @@ All CLI e2e tests (except `runInstalledCli`) use `ensureCliBundleExists()` → `
 
 ---
 
-### Phase 2: Update `runCliDirectWithInput`
+### Phase 2: Update `runCliDirectWithInput` ✅
 
 - Replace `bundlePath` usage with `getCliRunConfig(repoRoot)`.
 - Change spawn to `spawn(config.command, [...config.baseArgs], ...)` for pipe mode.

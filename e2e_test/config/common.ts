@@ -71,6 +71,22 @@ function ensureCliBundleExists(repoRoot: string): string {
   return bundlePath
 }
 
+function getCliRunConfig(repoRoot: string): {
+  command: string
+  baseArgs: string[]
+} {
+  if (process.env.CI === '1') {
+    return {
+      command: process.execPath,
+      baseArgs: [join(repoRoot, CLI_BUNDLE_PATH)],
+    }
+  }
+  return {
+    command: 'pnpm',
+    baseArgs: ['-C', join(repoRoot, 'cli'), 'exec', 'tsx', 'src/index.ts'],
+  }
+}
+
 const commonConfig = {
   chromeWebSecurity: false,
   screenshotOnRunFailure: true,
@@ -365,10 +381,10 @@ const commonConfig = {
         }) {
           const { spawn } = await import('node:child_process')
           const repoRoot = path.resolve(__dirname, '..', '..')
-          const bundlePath = ensureCliBundleExists(repoRoot)
+          const config = getCliRunConfig(repoRoot)
           const normalizedInput = input.endsWith('\n') ? input : `${input}\n`
           return new Promise<string>((resolve, reject) => {
-            const proc = spawn(process.execPath, [bundlePath], {
+            const proc = spawn(config.command, [...config.baseArgs], {
               cwd: repoRoot,
               env: { ...process.env, ...cliEnv(env) },
               stdio: ['pipe', 'pipe', 'pipe'],
