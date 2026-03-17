@@ -424,7 +424,7 @@ const commonConfig = {
           env?: NodeJS.ProcessEnv
         }) {
           const repoRoot = path.resolve(__dirname, '..', '..')
-          const bundlePath = ensureCliBundleExists(repoRoot)
+          const config = getCliRunConfig(repoRoot)
           const cliInput: string | { text: string; delayAfterMs?: number }[] =
             inputChunks ??
             (input
@@ -433,7 +433,8 @@ const commonConfig = {
                 : input.toString('utf8')
               : '')
           return runCliInPty({
-            executablePath: bundlePath,
+            command: config.command,
+            args: config.baseArgs,
             cwd: repoRoot,
             env,
             input: cliInput,

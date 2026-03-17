@@ -43,7 +43,7 @@ async function writeInput(ptyProcess: IPty, input: CliPtyInput): Promise<void> {
 const CLI_READY_PATTERN = /\/ commands/
 
 function formatPtyTimeoutDiagnostics(opts: {
-  executablePath: string
+  spawnLabel: string
   cwd: string
   stdout: string
   inputSent: boolean
@@ -51,7 +51,7 @@ function formatPtyTimeoutDiagnostics(opts: {
 }): string {
   const lines = [
     `PTY timed out after ${PTY_TIMEOUT_MS / 1000}s`,
-    `executable: ${opts.executablePath}`,
+    `spawn: ${opts.spawnLabel}`,
     `cwd: ${opts.cwd}`,
     `CLI ready (prompt shown): ${opts.readyReached}`,
     `input sent: ${opts.inputSent}`,
@@ -81,8 +81,11 @@ async function waitForCliReady(
 }
 
 export async function runCliInPty(opts: {
-  executablePath: string
+  /** Program to run (e.g. 'pnpm' or process.execPath) and full args. Use for TS source locally. */
+  command?: string
   args?: string[]
+  /** Legacy: spawn node with [executablePath, ...args]. Use for bundle or installed binary. */
+  executablePath?: string
   cwd: string
   env?: NodeJS.ProcessEnv
   input: CliPtyInput
@@ -91,15 +94,16 @@ export async function runCliInPty(opts: {
     spawn: (file: string, args: string[], options: object) => IPty
   }
   const envMerged = { ...process.env, ...cliEnv(opts.env) }
-  const ptyProcess = pty.spawn(
-    process.execPath,
-    [opts.executablePath, ...(opts.args ?? [])],
-    {
-      ...PTY_OPTIONS,
-      cwd: opts.cwd,
-      env: envMerged as { [key: string]: string },
-    }
-  )
+  const [file, fileArgs] =
+    opts.command !== undefined
+      ? [opts.command, opts.args ?? []]
+      : [process.execPath, [opts.executablePath!, ...(opts.args ?? [])]]
+  const spawnLabel = [file, ...fileArgs].join(' ')
+  const ptyProcess = pty.spawn(file, fileArgs, {
+    ...PTY_OPTIONS,
+    cwd: opts.cwd,
+    env: envMerged as { [key: string]: string },
+  })
   let stdout = ''
   let readyReached = false
   let inputSent = false
@@ -113,7 +117,7 @@ export async function runCliInPty(opts: {
       reject(
         new Error(
           formatPtyTimeoutDiagnostics({
-            executablePath: opts.executablePath,
+            spawnLabel,
             cwd: opts.cwd,
             stdout,
             inputSent,

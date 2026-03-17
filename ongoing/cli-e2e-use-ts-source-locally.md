@@ -84,15 +84,15 @@ All CLI e2e tests (except `runInstalledCli`) use `ensureCliBundleExists()` → `
 
 ---
 
-### Phase 4: Update `cliPtyRunner` and `runCliDirectWithInputAndPty`
+### Phase 4: Update `cliPtyRunner` and `runCliDirectWithInputAndPty` ✅
 
-- `cliPtyRunner` currently does `pty.spawn(process.execPath, [opts.executablePath, ...(opts.args ?? [])])`.
+- `cliPtyRunner` previously did `pty.spawn(process.execPath, [opts.executablePath, ...(opts.args ?? [])])`.
 - Extend options to accept either:
   - `{ executablePath, args? }` (current, for bundle), or
   - `{ command, args }` (for pnpm + tsx).
 - Simpler alternative: keep `executablePath` as the program and `args` as full argument list. For local, pass `executablePath: 'pnpm'` and `args: ['-C', 'cli', 'exec', 'tsx', 'src/index.ts']`.
 - Update `runCliDirectWithInputAndPty` to use `getCliRunConfig` and pass `command` + `baseArgs` + input-related args to the runner.
-- Verify recall ESC/arrow scenarios and access_token ESC cancel locally.
+- Verify recall ESC/arrow scenarios and access_token ESC cancel locally (with `pnpm sut` running).
 
 **Deliverable**: PTY flows use TS locally.
 
