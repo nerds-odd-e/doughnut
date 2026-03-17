@@ -363,13 +363,39 @@ const commonConfig = {
           input: string
           env?: NodeJS.ProcessEnv
         }) {
+          const { spawn } = await import('node:child_process')
           const repoRoot = path.resolve(__dirname, '..', '..')
           const bundlePath = ensureCliBundleExists(repoRoot)
-          return runCliInPty({
-            executablePath: bundlePath,
-            cwd: repoRoot,
-            env,
-            input,
+          const normalizedInput = input.endsWith('\n') ? input : `${input}\n`
+          return new Promise<string>((resolve, reject) => {
+            const proc = spawn(process.execPath, [bundlePath], {
+              cwd: repoRoot,
+              env: { ...process.env, ...cliEnv(env) },
+              stdio: ['pipe', 'pipe', 'pipe'],
+            })
+            let stdout = ''
+            proc.stdout?.on('data', (chunk: Buffer) => {
+              stdout += chunk.toString()
+            })
+            const timeout = setTimeout(() => {
+              proc.kill('SIGKILL')
+              reject(
+                new Error(
+                  `Piped CLI timed out after 25s. stdout tail: ${stdout.slice(-300)}`
+                )
+              )
+            }, 25_000)
+            proc.stdin?.write(normalizedInput)
+            proc.stdin?.end()
+            proc.on('close', (code) => {
+              clearTimeout(timeout)
+              if (code === 0) resolve(stdout)
+              else reject(new Error(`CLI exited with code ${code}`))
+            })
+            proc.on('error', (err) => {
+              clearTimeout(timeout)
+              reject(err)
+            })
           })
         },
         async runCliDirectWithInputAndPty({

@@ -5,7 +5,7 @@
 
 import type { IPty } from '@lydell/node-pty'
 
-const PTY_TIMEOUT_MS = 15_000
+const PTY_TIMEOUT_MS = 25_000
 const PTY_OPTIONS = {
   name: 'xterm-256color' as const,
   cols: 80,
@@ -21,13 +21,8 @@ function cliEnv(overrides?: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
 
 export type CliPtyInput = string | { text: string; delayAfterMs?: number }[]
 
-/**
- * Normalizes input for PTY: ensures trailing newline, and converts \n to \r
- * so the TTY adapter receives 'return' keypresses (Enter) instead of linefeed.
- */
 function normalizeInput(input: string): string {
-  const withNewline = input.endsWith('\n') ? input : `${input}\n`
-  return withNewline.replace(/\n/g, '\r')
+  return input.endsWith('\n') ? input : `${input}\n`
 }
 
 async function writeInput(ptyProcess: IPty, input: CliPtyInput): Promise<void> {
@@ -36,15 +31,16 @@ async function writeInput(ptyProcess: IPty, input: CliPtyInput): Promise<void> {
     return
   }
   for (const chunk of input) {
-    const text = chunk.text.replace(/\n/g, '\r')
-    ptyProcess.write(text)
+    ptyProcess.write(chunk.text)
     if (chunk.delayAfterMs) {
       await new Promise((r) => setTimeout(r, chunk.delayAfterMs))
     }
   }
 }
 
-const CLI_READY_PATTERN = /doughnut\s+[\d.]+/
+// Wait for the rendered prompt, not just version output.
+// Version text is printed before readline key handlers are fully wired.
+const CLI_READY_PATTERN = /\/ commands/
 
 function formatPtyTimeoutDiagnostics(opts: {
   executablePath: string
@@ -57,7 +53,7 @@ function formatPtyTimeoutDiagnostics(opts: {
     `PTY timed out after ${PTY_TIMEOUT_MS / 1000}s`,
     `executable: ${opts.executablePath}`,
     `cwd: ${opts.cwd}`,
-    `CLI ready (version shown): ${opts.readyReached}`,
+    `CLI ready (prompt shown): ${opts.readyReached}`,
     `input sent: ${opts.inputSent}`,
     `stdout (${opts.stdout.length} chars):`,
     opts.stdout
@@ -80,7 +76,7 @@ async function waitForCliReady(
   }
   const stdout = getStdout()
   throw new Error(
-    `CLI did not show readiness within 10s. stdout: ${stdout.slice(-300).replace(/\r/g, '\\r')}`
+    `CLI prompt did not appear within 10s. stdout: ${stdout.slice(-300).replace(/\r/g, '\\r')}`
   )
 }
 

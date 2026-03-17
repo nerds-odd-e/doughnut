@@ -86,6 +86,10 @@ function getLastLine(buffer: string): string {
   return lines[lines.length - 1] ?? ''
 }
 
+function isSubmitKey(keyName: string): boolean {
+  return keyName === 'return' || keyName === 'enter'
+}
+
 function writeError(err: unknown): void {
   process.stdout.write(`${err instanceof Error ? err.message : String(err)}\n`)
 }
@@ -311,6 +315,8 @@ export async function runTTY(
       str: string,
       key: { name: string; shift?: boolean; ctrl?: boolean; meta?: boolean }
     ) => {
+      const submitPressed =
+        isSubmitKey(key.name) || str === '\n' || str === '\r'
       if (key.ctrl && key.name === 'c') {
         process.stdout.write(`\x1b[${1}B\r\n`)
         doExit()
@@ -320,7 +326,7 @@ export async function runTTY(
           setPendingRecallStopConfirmation(false)
           buffer = ''
           drawBox()
-        } else if (key.name === 'return' && !key.shift) {
+        } else if (submitPressed && !key.shift) {
           const trimmed = buffer.trim()
           const answer = trimmed.toLowerCase()
           const isYes = answer === 'y' || answer === 'yes'
@@ -371,7 +377,7 @@ export async function runTTY(
             choices.length
           )
           drawBox()
-        } else if (key.name === 'return' && !key.shift) {
+        } else if (submitPressed && !key.shift) {
           const trimmedBuffer = buffer.trim()
           const effectiveInput =
             trimmedBuffer === '/stop'
@@ -428,7 +434,7 @@ export async function runTTY(
           tokenHighlightIndex = 0
           tokenListAction = 'set-default'
           drawBox()
-        } else if (key.name === 'return' && !key.shift) {
+        } else if (submitPressed && !key.shift) {
           const selectedLabel = tokenListItems[tokenHighlightIndex]!.label
           clearTTYDisplay(linesAboveCursor, prevTotalLines)
           const action = tokenListAction
@@ -492,7 +498,7 @@ export async function runTTY(
         }
         return
       }
-      if (key.name === 'return') {
+      if (submitPressed) {
         if (key.shift) {
           buffer += '\n'
           drawBox()

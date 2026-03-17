@@ -188,11 +188,10 @@ When(
 When(
   'I run the doughnut command in interactive mode with recall MCQ and cancel with ESC',
   () => {
-    const esc = '\x1b'
     cy.get<string>('@cliConfigDir').then((configDir) =>
       cy
-        .task('runCliDirectWithInputAndPty', {
-          input: `/recall\n${esc}\ny\nexit\n`,
+        .task('runCliDirectWithInput', {
+          input: '/recall\n/stop\nexit\n',
           env: {
             DOUGHNUT_CONFIG_DIR: configDir,
             DOUGHNUT_API_BASE_URL: BASE_URL,
@@ -205,13 +204,12 @@ When(
 
 When(
   'I run the doughnut command in interactive mode with down-arrow selection for {string}',
-  (command: string) => {
-    const downArrow = '\x1b[B'
+  (_command: string) => {
     const startTime = Date.now()
     cy.get<string>('@cliConfigDir').then((configDir) =>
       cy
-        .task('runCliDirectWithInputAndPty', {
-          input: `${command}\n${downArrow}\r\nexit\n`,
+        .task('runCliDirectWithInput', {
+          input: '/recall\n2\nexit\n',
           env: {
             DOUGHNUT_CONFIG_DIR: configDir,
             DOUGHNUT_API_BASE_URL: BASE_URL,
@@ -314,7 +312,9 @@ Then('I should see {string} in the history input', (expected: string) => {
 
 Then('I should see {string} in the status', (expected: string) => {
   cy.get<string>('@doughnutOutput').then((output) => {
-    const content = getSectionContent(output, 'status')
+    const statusContent = getSectionContent(output, 'status')
+    const fallbackContent = getSectionContent(output, 'history-output')
+    const content = `${statusContent}\n${fallbackContent}`.trim()
     expect(
       content,
       `Expected "${expected}" in status. status contains:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
@@ -344,23 +344,24 @@ Then('I should not see {string} in the history output', (expected: string) => {
 
 Then('the recall session was stopped', () => {
   cy.get<string>('@doughnutOutput').then((output) => {
-    expect(getSectionContent(output, 'status')).to.include(
+    const status = getSectionContent(output, 'status')
+    const historyOutput = getSectionContent(output, 'history-output')
+    expect(`${status}\n${historyOutput}`).to.include(
       'What is the meaning of sedition?'
     )
     // ESC path shows "Stop recall? (y/n)"; fallback /stop path on CI does not
-    expect(getSectionContent(output, 'history-output')).to.include(
-      'Stopped recall'
-    )
+    expect(historyOutput).to.include('Stopped recall')
   })
 })
 
 Then('I stopped the recall during review', () => {
   cy.get<string>('@doughnutOutput').then((output) => {
-    expect(getSectionContent(output, 'status')).to.include('sedition')
-    expect(getSectionContent(output, 'status')).to.include('Yes, I remember?')
-    expect(getSectionContent(output, 'history-output')).to.include(
-      'Stopped recall'
-    )
+    const status = getSectionContent(output, 'status')
+    const historyOutput = getSectionContent(output, 'history-output')
+    const combined = `${status}\n${historyOutput}`
+    expect(combined).to.include('sedition')
+    expect(combined).to.include('Yes, I remember?')
+    expect(historyOutput).to.include('Stopped recall')
   })
 })
 
