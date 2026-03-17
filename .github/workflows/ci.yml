@@ -16,7 +16,7 @@ env:
   MYSQL_E2E_DB: "doughnut_e2e_test"
   MYSQL_DB_USER: ${{ secrets.DBUSER }}
   MYSQL_DB_PASSWORD: ${{ secrets.DBPASSWORD }}
-  REDIS_VERSION: "8"
+  REDIS_VERSION: "8.4"
   MYSQL_VERSION: "8.4"
   REDIS_PORT: "6380"
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
