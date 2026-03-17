@@ -130,23 +130,22 @@ Feature: CLI recall status and recall session
     And It's day 2
     When I input "/recall" in the interactive CLI
     Then I should see "sedition" in the status
-    And I should see "Yes, I remember?" in the status
-    When I input "y" in the interactive CLI
+    When I answer "y" in the interactive CLI to "Yes, I remember?"
     Then I should see "Recalled successfully" in the history output
-    When I input "y" in the interactive CLI
+    When I answer "y" in the interactive CLI to "Yes, I remember?"
     Then I should see "Recalled successfully" in the history output
-    When I input "n" in the interactive CLI
+    When I answer "n" in the interactive CLI to "Load more from next 3 days?"
     Then I should see "Recalled 2 notes" in the history output
     When I input "/recall" in the interactive CLI
     Then I should see "Yes, I remember?" in the status
-    When I input "y" in the interactive CLI
+    When I answer "y" in the interactive CLI to "Yes, I remember?"
     Then I should see "Recalled successfully" in the history output
-    When I input "y" in the interactive CLI
+    When I answer "y" in the interactive CLI to "Yes, I remember?"
     Then I should see "Recalled successfully" in the history output
-    When I input "y" in the interactive CLI
+    When I answer "y" in the interactive CLI to "Yes, I remember?"
     Then I should see "Load more from next 3 days?" in the status
     And I should see "sedition" in the status
-    When I input "y" in the interactive CLI
+    When I answer "y" in the interactive CLI to "Load more from next 3 days?"
     Then I should see "Recalled successfully" in the history output
     And I should see "Recalled" in the history output
 

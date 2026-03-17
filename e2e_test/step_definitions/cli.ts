@@ -103,6 +103,13 @@ When('I input {string} in the interactive CLI', (input: string) => {
 })
 
 When(
+  'I answer {string} in the interactive CLI to {string}',
+  (input: string, _to: string) => {
+    cy.task<string>('sendToInteractiveCli', { input }).as('doughnutOutput')
+  }
+)
+
+When(
   'I input down-arrow selection for {string} in the interactive CLI',
   (command: string) => {
     cy.task<string>('sendToInteractiveCli', { input: command })
