@@ -11,6 +11,7 @@ import {
   getRecallDisplaySections,
   getCurrentGuidanceDebug,
   getCurrentGuidanceAndHistoryRaw,
+  countTopBorderLinesBeforeFirstInputBox,
 } from '../../../step_definitions/cliSectionParser'
 
 const SECTION_LABELS = {
@@ -134,4 +135,24 @@ function currentGuidance() {
   }
 }
 
-export { nonInteractiveOutput, historyOutput, historyInput, currentGuidance }
+function inputBoxTopBorder() {
+  return {
+    expectExactlyOne() {
+      withOutput((output) => {
+        const count = countTopBorderLinesBeforeFirstInputBox(output)
+        expect(
+          count,
+          `Expected exactly one input box top border (┌─┐) before first │ row, found ${count}`
+        ).to.equal(1)
+      })
+    },
+  }
+}
+
+export {
+  nonInteractiveOutput,
+  historyOutput,
+  historyInput,
+  currentGuidance,
+  inputBoxTopBorder,
+}

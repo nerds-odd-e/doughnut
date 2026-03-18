@@ -1,4 +1,5 @@
 import * as readline from 'node:readline'
+import { Writable } from 'node:stream'
 import type { ChatHistory, OutputAdapter } from '../types.js'
 
 type CommandDoc = { usage: string }
@@ -151,9 +152,14 @@ export async function runTTY(
   stdin.setRawMode?.(true)
   stdin.resume?.()
   stdin.setEncoding?.('utf8')
+  const noopOutput = new Writable({
+    write(_chunk, _encoding, cb) {
+      cb()
+    },
+  })
   const rl = readline.createInterface({
     input: stdin,
-    output: process.stdout,
+    output: noopOutput,
     escapeCodeTimeout: 50,
   })
   readline.emitKeypressEvents(stdin, rl)

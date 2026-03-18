@@ -231,3 +231,25 @@ export function getCurrentGuidanceAndHistoryRaw(output: string): string {
   const boundaries = parseCliOutput(output)
   return getCurrentGuidanceCombined(boundaries, false)
 }
+
+const TOP_BORDER_PATTERN = /^┌─*┐$/
+
+export function countTopBorderLinesBeforeFirstInputBox(output: string): number {
+  const normalized = stripAllAnsi(output)
+  const lines = normalized.split('\n')
+  let versionLineIdx = -1
+  for (let i = 0; i < lines.length; i++) {
+    if (/doughnut \d+\.\d+\.\d+/.test(lines[i] ?? '')) {
+      versionLineIdx = i
+      break
+    }
+  }
+  if (versionLineIdx < 0) return 0
+  let count = 0
+  for (let i = versionLineIdx + 1; i < lines.length; i++) {
+    const line = (lines[i] ?? '').trim()
+    if (line.includes('│')) break
+    if (TOP_BORDER_PATTERN.test(line)) count++
+  }
+  return count
+}

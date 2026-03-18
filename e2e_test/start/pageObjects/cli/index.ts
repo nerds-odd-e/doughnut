@@ -3,6 +3,7 @@ import {
   historyOutput,
   historyInput,
   currentGuidance,
+  inputBoxTopBorder,
 } from './outputAssertions'
 import { recallSession } from './recallSession'
 import { removeToken } from './removeToken'
@@ -30,6 +31,7 @@ export const cli = {
   historyOutput,
   historyInput,
   currentGuidance,
+  inputBoxTopBorder,
   recallSession,
   removeToken,
   installation,

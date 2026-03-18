@@ -37,6 +37,9 @@ When('I input {string} in the interactive CLI', (input: string) =>
   cli.interactive().input(input)
 )
 When('I press ESC in the interactive CLI', () => cli.interactive().pressEsc())
+When('I press Enter in the interactive CLI', () =>
+  cli.interactive().input('\n')
+)
 When(
   'I answer {string} in the interactive CLI to prompt {string}',
   (answer: string, expectedPromptText: string) =>
@@ -90,6 +93,9 @@ Then('I should see {string} in the Current guidance', (expected: string) =>
 Then(
   'I should see {string} styled in the Current guidance',
   (expected: string) => cli.currentGuidance().expectStyled(expected)
+)
+Then('I should see exactly one input box top border', () =>
+  cli.inputBoxTopBorder().expectExactlyOne()
 )
 
 Then('the recall session was stopped', () =>
