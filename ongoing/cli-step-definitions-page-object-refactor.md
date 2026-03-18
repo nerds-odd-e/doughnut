@@ -106,12 +106,12 @@ Then('I should see {string} in the non-interactive output', (expected: string) =
 3. ~~Refactor~~ Then steps delegate to `cli.nonInteractiveOutput()`, `cli.historyOutput()`, etc.
 4. ~~Remove~~ `assertOutputIncludes`, `assertOutputNotIncludes`, `buildCurrentGuidanceFailureMessage` from cli.ts.
 
-### Phase 2: Execution (When steps)
+### Phase 2: Execution (When steps) ✅
 
-1. Create `cli/installation.ts`, `nonInteractiveExecution.ts`, `interactiveExecution.ts`, `accessTokenExecution.ts`, `gmailExecution.ts` (or combined `execution.ts`).
-2. Move `runDoughnutWithConfig`, `runDoughnutWithConfigCommand`, env helpers into page objects.
-3. Refactor When steps to use `cli.installation().installFromLocalhost()`, `cli.nonInteractive().runWithInput(...)`, etc.
-4. Interactive steps: `cli.interactive().input(...)`, `cli.interactive().pressEsc()`, etc.
+1. ~~Create~~ `cli/execution.ts` (combined) – `installation`, `nonInteractive`, `interactive`, `accessToken`, `gmail`, `backend`.
+2. ~~Move~~ `runDoughnutWithConfig`, `runDoughnutWithConfigCommand`, `cliEnvWithConfigDir` into page objects.
+3. ~~Refactor~~ When steps to use `cli.installation().installFromLocalhost()`, `cli.nonInteractive().runWithInput(...)`, etc.
+4. ~~Interactive steps~~ `cli.interactive().input(...)`, `cli.interactive().pressEsc()`, etc.
 
 ### Phase 3: Recall and removal assertions
 

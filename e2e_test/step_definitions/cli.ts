@@ -4,26 +4,6 @@ import { mock_services } from '../start'
 import { getRecallDisplaySections } from './cliSectionParser'
 import { cli } from '../start/pageObjects/cli'
 
-const GOOGLE_MOCK_BASE_URL = 'http://localhost:5003'
-
-function cliEnvWithConfigDir(configDir: string): Record<string, string> {
-  return {
-    DOUGHNUT_CONFIG_DIR: configDir,
-    DOUGHNUT_API_BASE_URL: backendBaseUrl(),
-  }
-}
-
-function runDoughnutWithConfig(args: string[]) {
-  return cy.get<string>('@cliConfigDir').then((configDir) =>
-    cy
-      .task('runCliDirectWithArgs', {
-        args,
-        env: cliEnvWithConfigDir(configDir),
-      })
-      .as('doughnutOutput')
-  )
-}
-
 // --- Setup ---
 
 Given('the backend is serving the CLI and install script', () => {
@@ -35,120 +15,83 @@ Given('the backend is serving the CLI and install script', () => {
 // --- Installation (non-interactive: installed binary) ---
 
 When('I install the CLI from localhost without affecting my system', () => {
-  cy.task<string>('installCli', backendBaseUrl())
-    .should('be.a', 'string')
-    .and('not.be.empty')
-    .as('doughnutPath')
+  cli.installation().installFromLocalhost()
 })
 
 When('I run the installed doughnut command', () => {
-  cy.get<string>('@doughnutPath')
-    .should('be.a', 'string')
-    .and('not.be.empty')
-    .then((doughnutPath) => {
-      cy.task<string>('runInstalledCli', { doughnutPath, input: 'exit\n' }).as(
-        'doughnutOutput'
-      )
-    })
+  cli.installation().runInstalled()
 })
 
 When('I run the installed doughnut version command', () => {
-  cy.get<string>('@doughnutPath').then((doughnutPath) => {
-    cy.task<string>('runInstalledCli', {
-      doughnutPath,
-      args: ['version'],
-    }).as('doughnutOutput')
-  })
+  cli.installation().runVersion()
 })
+
+When(
+  'I run the installed doughnut update command with BASE_URL from localhost',
+  () => {
+    cli.installation().runUpdate(backendBaseUrl())
+  }
+)
 
 // --- Non-interactive execution: piped input ---
 
 When('I run the doughnut command with input {string}', (input: string) => {
-  const trimmed = input.trim()
-  const exitSuffix = trimmed === 'exit' || trimmed === '/exit' ? '' : `\nexit`
-  cy.task('runCliDirectWithInput', { input: `${input}${exitSuffix}` }).as(
-    'doughnutOutput'
-  )
+  cli.nonInteractive().runWithInput(input)
+})
+
+When('I run the doughnut command with -c {string}', (input: string) => {
+  cli.nonInteractive().runWithCommand(input)
+})
+
+When('I run the doughnut version command', () => {
+  cli.nonInteractive().runVersion()
+})
+
+When('the backend serves the CLI with version {string}', (version: string) => {
+  cli.backend().serveVersion(version)
 })
 
 // --- Interactive execution: input and keypress ---
 
 When('I input {string} in the interactive CLI', (input: string) => {
-  cy.task<string>('sendToInteractiveCli', { input }).as('doughnutOutput')
+  cli.interactive().input(input)
 })
 
 When('I press ESC in the interactive CLI', () => {
-  cy.task<string>('sendToInteractiveCli', { input: '\x1b' }).as(
-    'doughnutOutput'
-  )
+  cli.interactive().pressEsc()
 })
 
 When(
   'I answer {string} in the interactive CLI to prompt {string}',
   (answer: string, expectedPromptText: string) => {
-    cli.currentGuidance().expectContains(expectedPromptText)
-    cy.task<string>('sendToInteractiveCli', { input: answer }).as(
-      'doughnutOutput'
-    )
+    cli.interactive().answerToPrompt(answer, expectedPromptText)
   }
 )
 
 When(
   'I input down-arrow selection for {string} in the interactive CLI',
   (command: string) => {
-    cy.task<string>('sendToInteractiveCli', { input: command })
-    cy.task<string>('sendToInteractiveCli', { input: '2' }).as('doughnutOutput')
-  }
-)
-
-When('I run the doughnut command with -c {string}', (input: string) => {
-  runDoughnutWithConfig(['-c', input])
-})
-
-When('I run the doughnut version command', () => {
-  cy.task('runCliDirectWithArgs', { args: ['version'] }).as('doughnutOutput')
-})
-
-When('the backend serves the CLI with version {string}', (version: string) => {
-  cy.task('bundleAndCopyCliWithVersion', version)
-})
-
-When(
-  'I run the installed doughnut update command with BASE_URL from localhost',
-  () => {
-    cy.get<string>('@doughnutPath').then((doughnutPath) => {
-      cy.task<string>('runInstalledCli', {
-        doughnutPath,
-        args: ['update'],
-        env: { BASE_URL: backendBaseUrl() },
-      }).as('doughnutOutput')
-    })
+    cli.interactive().inputDownArrowSelection(command)
   }
 )
 
 // --- Non-interactive execution: doughnut -c (access token) ---
 
-function runDoughnutWithConfigCommand(command: string, arg: string) {
-  return runDoughnutWithConfig(['-c', `${command} ${arg}`])
-}
-
 When('I run doughnut -c {string} with the saved token', (command: string) => {
-  cy.get<string>('@savedAccessToken').then((token) =>
-    runDoughnutWithConfigCommand(command, token)
-  )
+  cli.accessToken().runWithSavedToken(command)
 })
 
 When(
   'I run doughnut -c {string} with token {string}',
   (command: string, token: string) => {
-    runDoughnutWithConfigCommand(command, token)
+    cli.accessToken().runWithToken(command, token)
   }
 )
 
 When(
   'I run doughnut -c {string} with label {string}',
   (command: string, label: string) => {
-    runDoughnutWithConfigCommand(command, label)
+    cli.accessToken().runWithLabel(command, label)
   }
 )
 
@@ -243,15 +186,9 @@ Given(
 // --- Gmail commands ---
 
 When('I run the CLI add gmail command with simulated OAuth callback', () => {
-  cy.task('runCliDirectWithGmailAdd', {
-    googleBaseUrl: GOOGLE_MOCK_BASE_URL,
-  })
-    .its('stdout')
-    .as('doughnutOutput')
+  cli.gmail().addWithSimulatedOAuth()
 })
 
 When('I run the CLI last email command with pre-configured account', () => {
-  cy.task('runCliDirectWithLastEmail', {
-    googleBaseUrl: GOOGLE_MOCK_BASE_URL,
-  }).as('doughnutOutput')
+  cli.gmail().lastEmailWithPreconfiguredAccount()
 })
