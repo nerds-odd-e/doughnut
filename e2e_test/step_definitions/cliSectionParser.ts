@@ -1,11 +1,13 @@
 /**
  * Parses CLI stdout into sections for E2E assertions.
- * Sections: history-input (grey bg), history-output, current-prompt (separator-delimited).
+ * Sections: history-input (past user input), history-output (command output),
+ * current-prompt (prompt hints between separator and input box).
  */
 
-const GREY_BG = '\x1b[48;5;236m'
-const GREEN = '\x1b[32m'
-const DIM = '\x1b[90m'
+const HISTORY_INPUT_BG = '\x1b[48;5;236m'
+const CURRENT_PROMPT_SEPARATOR_GREEN = '\x1b[32m'
+const CURRENT_PROMPT_HINT = '\x1b[90m'
+const INPUT_BOX_TOP = '┌'
 // biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI escapes
 const ANSI_PATTERN = /\x1b\[[0-9;]*m/g
 
@@ -14,34 +16,38 @@ function stripAnsi(str: string): string {
 }
 
 function isHistoryInputLine(line: string): boolean {
-  return line.includes(GREY_BG)
+  return line.includes(HISTORY_INPUT_BG)
 }
 
-function isCurrentPromptSeparator(line: string): boolean {
-  return line.includes(GREEN) && line.includes('─')
+function isCurrentPromptSeparatorLine(line: string): boolean {
+  return line.includes(CURRENT_PROMPT_SEPARATOR_GREEN) && line.includes('─')
 }
 
-function isCurrentPromptContentLine(line: string): boolean {
-  return line.includes(DIM) && !line.includes(GREY_BG)
+function isCurrentPromptHintLine(line: string): boolean {
+  return line.includes(CURRENT_PROMPT_HINT) && !line.includes(HISTORY_INPUT_BG)
 }
 
 function findLastSeparatorIndex(lines: string[]): number {
   for (let i = lines.length - 1; i >= 0; i--) {
-    if (isCurrentPromptSeparator(lines[i]!)) return i
+    if (isCurrentPromptSeparatorLine(lines[i]!)) return i
   }
   return -1
 }
 
 function findLastInputBoxStart(lines: string[]): number {
   for (let i = lines.length - 1; i >= 0; i--) {
-    if (lines[i]?.trimStart().startsWith('┌')) return i
+    if (lines[i]?.trimStart().startsWith(INPUT_BOX_TOP)) return i
   }
   return lines.length
 }
 
-export type Section = 'history-input' | 'history-output' | 'current-prompt'
+type Boundaries = {
+  historyLines: string[]
+  currentPromptLines: string[]
+  outputLinesIncludingPromptBlock: string[]
+}
 
-export function getSectionContent(output: string, section: Section): string {
+function parseCliOutput(output: string): Boundaries {
   const lines = output.split('\n')
   const separatorIdx = findLastSeparatorIndex(lines)
   const boxStart = findLastInputBoxStart(lines)
@@ -49,84 +55,70 @@ export function getSectionContent(output: string, section: Section): string {
   const historyLines = lines.slice(0, historyEnd)
   const currentPromptLines =
     separatorIdx >= 0 ? lines.slice(separatorIdx + 1, boxStart) : []
+  const outputLinesIncludingPromptBlock = [
+    ...historyLines,
+    ...currentPromptLines.filter((l) => !isCurrentPromptHintLine(l)),
+  ]
+  return { historyLines, currentPromptLines, outputLinesIncludingPromptBlock }
+}
 
+export type Section = 'history-input' | 'history-output' | 'current-prompt'
+
+function collectSectionLines(
+  boundaries: Boundaries,
+  section: Section,
+  strip: boolean
+): string[] {
+  const { historyLines, currentPromptLines } = boundaries
   const result: string[] = []
+
   if (section === 'history-input') {
     for (const line of historyLines) {
       if (isHistoryInputLine(line)) {
-        const stripped = stripAnsi(line)
-        if (stripped.trim()) result.push(stripped)
+        const content = strip ? stripAnsi(line) : line
+        if (content.trim()) result.push(content)
       }
     }
   } else if (section === 'history-output') {
     for (const line of historyLines) {
       if (!isHistoryInputLine(line)) {
-        const stripped = stripAnsi(line)
-        if (stripped.trim()) result.push(stripped)
+        const content = strip ? stripAnsi(line) : line
+        if (content.trim()) result.push(content)
       }
     }
     for (const line of currentPromptLines) {
-      if (!isCurrentPromptContentLine(line)) {
-        const stripped = stripAnsi(line)
-        if (stripped.trim()) result.push(stripped)
+      if (!isCurrentPromptHintLine(line)) {
+        const content = strip ? stripAnsi(line) : line
+        if (content.trim()) result.push(content)
       }
     }
   } else if (section === 'current-prompt') {
     for (const line of currentPromptLines) {
-      if (isCurrentPromptContentLine(line)) {
-        const stripped = stripAnsi(line)
-        if (stripped.trim()) result.push(stripped)
+      if (isCurrentPromptHintLine(line)) {
+        const content = strip ? stripAnsi(line) : line
+        if (content.trim()) result.push(content)
       }
     }
   }
-  return result.join('\n')
+  return result
+}
+
+export function getSectionContent(output: string, section: Section): string {
+  const boundaries = parseCliOutput(output)
+  return collectSectionLines(boundaries, section, true).join('\n')
 }
 
 export function getSectionContentRaw(output: string, section: Section): string {
-  const lines = output.split('\n')
-  const separatorIdx = findLastSeparatorIndex(lines)
-  const boxStart = findLastInputBoxStart(lines)
-  const historyEnd = separatorIdx >= 0 ? separatorIdx : lines.length
-  const historyLines = lines.slice(0, historyEnd)
-  const currentPromptLines =
-    separatorIdx >= 0 ? lines.slice(separatorIdx + 1, boxStart) : []
-
-  const result: string[] = []
-  if (section === 'history-input') {
-    for (const line of historyLines) {
-      if (isHistoryInputLine(line) && line.trim()) result.push(line)
-    }
-  } else if (section === 'history-output') {
-    for (const line of historyLines) {
-      if (!isHistoryInputLine(line) && line.trim()) result.push(line)
-    }
-    for (const line of currentPromptLines) {
-      if (!isCurrentPromptContentLine(line) && line.trim()) result.push(line)
-    }
-  } else if (section === 'current-prompt') {
-    for (const line of currentPromptLines) {
-      if (isCurrentPromptContentLine(line) && line.trim()) result.push(line)
-    }
-  }
-  return result.join('\n')
+  const boundaries = parseCliOutput(output)
+  return collectSectionLines(boundaries, section, false).join('\n')
 }
 
 export function getLastCommandOutput(output: string): string {
-  const lines = output.split('\n')
-  const separatorIdx = findLastSeparatorIndex(lines)
-  const boxStart = findLastInputBoxStart(lines)
-  const historyEnd = separatorIdx >= 0 ? separatorIdx : lines.length
-  const historyLines = lines.slice(0, historyEnd)
-  const betweenSeparatorAndBox =
-    separatorIdx >= 0 ? lines.slice(separatorIdx + 1, boxStart) : []
-  const allOutputLines = [
-    ...historyLines,
-    ...betweenSeparatorAndBox.filter((l) => !isCurrentPromptContentLine(l)),
-  ]
-
+  const { outputLinesIncludingPromptBlock } = parseCliOutput(output)
   const blocks: string[] = []
   let current: string[] = []
-  for (const line of allOutputLines) {
+
+  for (const line of outputLinesIncludingPromptBlock) {
     const stripped = stripAnsi(line)
     if (isHistoryInputLine(line)) {
       if (current.length > 0) {

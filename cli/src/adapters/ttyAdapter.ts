@@ -134,7 +134,7 @@ export async function runTTY(
     TOKEN_LIST_COMMANDS,
   } = deps
 
-  const writeStatus = (msg: string) =>
+  const writeCurrentPromptLine = (msg: string) =>
     process.stdout.write(`${GREY}${msg}\x1b[0m\n`)
 
   const doBeginCurrentPrompt = () => {
@@ -291,7 +291,7 @@ export async function runTTY(
       writeError(err)
       collectedOutputLines.push(msg)
     },
-    writeCurrentPrompt: writeStatus,
+    writeCurrentPrompt: writeCurrentPromptLine,
     beginCurrentPrompt: doBeginCurrentPrompt,
     clearAndRedraw: () => {
       chatHistory = []
@@ -352,7 +352,7 @@ export async function runTTY(
           } else if (isNo) {
             // Stay in MCQ; drawBox will show choices again
           } else if (trimmed) {
-            writeStatus('Please answer y or n')
+            writeCurrentPromptLine('Please answer y or n')
             setPendingRecallStopConfirmation(true)
           }
           drawBox()
@@ -376,7 +376,7 @@ export async function runTTY(
           setPendingRecallStopConfirmation(true)
           buffer = ''
           doBeginCurrentPrompt()
-          writeStatus('Stop recall? (y/n)')
+          writeCurrentPromptLine('Stop recall? (y/n)')
           drawBox()
         } else if (key.name === 'up' || key.name === 'down') {
           const delta = key.name === 'up' ? -1 : 1

@@ -104,11 +104,13 @@ When('I input {string} in the interactive CLI', (input: string) => {
 
 When(
   'I answer {string} in the interactive CLI to prompt {string}',
-  (input: string, to: string) => {
+  (answer: string, expectedPromptText: string) => {
     cy.get<string>('@doughnutOutput').then((output) =>
-      assertExpectedInCurrentPrompt(output, to, true)
+      assertExpectedInCurrentPrompt(output, expectedPromptText, true)
     )
-    cy.task<string>('sendToInteractiveCli', { input }).as('doughnutOutput')
+    cy.task<string>('sendToInteractiveCli', { input: answer }).as(
+      'doughnutOutput'
+    )
   }
 )
 
@@ -291,24 +293,39 @@ When(
   }
 )
 
+function assertSectionIncludes(
+  output: string,
+  section: 'history-input' | 'history-output',
+  expected: string
+): void {
+  const content = getSectionContent(output, section)
+  expect(
+    content,
+    `Expected "${expected}" in ${section}. Content:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
+  ).to.include(expected)
+}
+
+function assertSectionNotIncludes(
+  output: string,
+  section: 'history-output',
+  expected: string
+): void {
+  const content = getSectionContent(output, section)
+  expect(content, `Did not expect "${expected}" in ${section}`).not.to.include(
+    expected
+  )
+}
+
 Then('I should see {string} in the history output', (expected: string) => {
-  cy.get<string>('@doughnutOutput').then((output) => {
-    const content = getSectionContent(output, 'history-output')
-    expect(
-      content,
-      `Expected "${expected}" in history-output. history-output contains:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
-    ).to.include(expected)
-  })
+  cy.get<string>('@doughnutOutput').then((output) =>
+    assertSectionIncludes(output, 'history-output', expected)
+  )
 })
 
 Then('I should see {string} in the history input', (expected: string) => {
-  cy.get<string>('@doughnutOutput').then((output) => {
-    const content = getSectionContent(output, 'history-input')
-    expect(
-      content,
-      `Expected "${expected}" in history-input. history-input contains:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
-    ).to.include(expected)
-  })
+  cy.get<string>('@doughnutOutput').then((output) =>
+    assertSectionIncludes(output, 'history-input', expected)
+  )
 })
 
 function assertExpectedInCurrentPrompt(
@@ -359,40 +376,46 @@ Then('I should see {string} in the last command output', (expected: string) => {
     const content = getLastCommandOutput(output)
     expect(
       content,
-      `Expected "${expected}" in last command output. last command output contains:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
+      `Expected "${expected}" in last command output. Content:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
     ).to.include(expected)
   })
 })
 
 Then('I should not see {string} in the history output', (expected: string) => {
-  cy.get<string>('@doughnutOutput').then((output) => {
-    const content = getSectionContent(output, 'history-output')
-    expect(
-      content,
-      `Did not expect "${expected}" in history-output`
-    ).not.to.include(expected)
-  })
+  cy.get<string>('@doughnutOutput').then((output) =>
+    assertSectionNotIncludes(output, 'history-output', expected)
+  )
 })
+
+function getRecallDisplayContent(output: string): {
+  currentPromptAndHistory: string
+  historyOutput: string
+} {
+  const currentPrompt = getSectionContent(output, 'current-prompt')
+  const historyOutput = getSectionContent(output, 'history-output')
+  return {
+    currentPromptAndHistory: `${currentPrompt}\n${historyOutput}`,
+    historyOutput,
+  }
+}
 
 Then('the recall session was stopped', () => {
   cy.get<string>('@doughnutOutput').then((output) => {
-    const currentPrompt = getSectionContent(output, 'current-prompt')
-    const historyOutput = getSectionContent(output, 'history-output')
-    expect(`${currentPrompt}\n${historyOutput}`).to.include(
+    const { currentPromptAndHistory, historyOutput } =
+      getRecallDisplayContent(output)
+    expect(currentPromptAndHistory).to.include(
       'What is the meaning of sedition?'
     )
-    // ESC path shows "Stop recall? (y/n)"; fallback /stop path on CI does not
     expect(historyOutput).to.include('Stopped recall')
   })
 })
 
 Then('I stopped the recall during review', () => {
   cy.get<string>('@doughnutOutput').then((output) => {
-    const currentPrompt = getSectionContent(output, 'current-prompt')
-    const historyOutput = getSectionContent(output, 'history-output')
-    const combined = `${currentPrompt}\n${historyOutput}`
-    expect(combined).to.include('sedition')
-    expect(combined).to.include('Yes, I remember?')
+    const { currentPromptAndHistory, historyOutput } =
+      getRecallDisplayContent(output)
+    expect(currentPromptAndHistory).to.include('sedition')
+    expect(currentPromptAndHistory).to.include('Yes, I remember?')
     expect(historyOutput).to.include('Stopped recall')
   })
 })
@@ -404,9 +427,9 @@ Then(
       removalType === 'local'
         ? `Token "${label}" removed.`
         : 'removed locally and from server'
-    cy.get<string>('@doughnutOutput').then((output) => {
-      expect(getSectionContent(output, 'history-output')).to.include(expected)
-    })
+    cy.get<string>('@doughnutOutput').then((output) =>
+      assertSectionIncludes(output, 'history-output', expected)
+    )
   }
 )
 
