@@ -1,19 +1,10 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import { backendBaseUrl } from '../support/backendUrl'
 import { mock_services } from '../start'
-import {
-  getHistoryOutputContent,
-  getHistoryInputContent,
-  getRecallDisplaySections,
-  getCurrentGuidanceDebug,
-  getCurrentGuidanceAndHistoryRaw,
-} from './cliSectionParser'
+import { getRecallDisplaySections } from './cliSectionParser'
+import { cli } from '../start/pageObjects/cli'
 
 const GOOGLE_MOCK_URL = 'http://localhost:5003'
-
-// Domain: output section names for assertion messages
-const NON_INTERACTIVE_OUTPUT = 'non-interactive output'
-const CURRENT_GUIDANCE = 'Current guidance'
 
 function cliEnvWithConfigDir(configDir: string): Record<string, string> {
   return {
@@ -31,41 +22,6 @@ function runDoughnutWithConfig(args: string[]) {
       })
       .as('doughnutOutput')
   )
-}
-
-function assertOutputIncludes(
-  content: string,
-  expected: string,
-  label: string
-): void {
-  expect(
-    content,
-    `Expected "${expected}" in ${label}. Content:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
-  ).to.include(expected)
-}
-
-function assertOutputNotIncludes(content: string, expected: string): void {
-  expect(content, `Did not expect "${expected}"`).not.to.include(expected)
-}
-
-function buildCurrentGuidanceFailureMessage(
-  output: string,
-  expected: string
-): string {
-  const { currentGuidanceContent, inputBoxLineRange, lineCount, rawTail } =
-    getCurrentGuidanceDebug(output)
-  const linesAfterBox =
-    inputBoxLineRange.end >= 0 ? lineCount - inputBoxLineRange.end - 1 : 0
-  return [
-    `Expected "${expected}" in ${CURRENT_GUIDANCE} (prompts, hints, options for the current input).`,
-    ``,
-    `Parser: input box ┌ at line ${inputBoxLineRange.start}, └ at line ${inputBoxLineRange.end} of ${lineCount} lines. Lines after └: ${linesAfterBox}.`,
-    ``,
-    `${CURRENT_GUIDANCE}: ${currentGuidanceContent ? `"${currentGuidanceContent}"` : '(empty)'}`,
-    ``,
-    `Raw output tail (\\r→\\r \\n→\\n ):`,
-    rawTail,
-  ].join('\n')
 }
 
 // --- Setup ---
@@ -130,14 +86,7 @@ When('I press ESC in the interactive CLI', () => {
 When(
   'I answer {string} in the interactive CLI to prompt {string}',
   (answer: string, expectedPromptText: string) => {
-    cy.get<string>('@doughnutOutput').then((output) => {
-      const { currentGuidanceAndHistory } = getRecallDisplaySections(output)
-      assertOutputIncludes(
-        currentGuidanceAndHistory,
-        expectedPromptText,
-        CURRENT_GUIDANCE
-      )
-    })
+    cli.currentGuidance().expectContains(expectedPromptText)
     cy.task<string>('sendToInteractiveCli', { input: answer }).as(
       'doughnutOutput'
     )
@@ -191,14 +140,16 @@ When('I run doughnut -c {string} with the saved token', (command: string) => {
 
 When(
   'I run doughnut -c {string} with token {string}',
-  (command: string, token: string) =>
+  (command: string, token: string) => {
     runDoughnutWithConfigCommand(command, token)
+  }
 )
 
 When(
   'I run doughnut -c {string} with label {string}',
-  (command: string, label: string) =>
+  (command: string, label: string) => {
     runDoughnutWithConfigCommand(command, label)
+  }
 )
 
 Then(
@@ -208,9 +159,7 @@ Then(
       removalType === 'local'
         ? `Token "${label}" removed.`
         : 'removed locally and from server'
-    cy.get<string>('@doughnutOutput').then((output) =>
-      assertOutputIncludes(output, expected, NON_INTERACTIVE_OUTPUT)
-    )
+    cli.nonInteractiveOutput().expectContains(expected)
   }
 )
 
@@ -221,75 +170,38 @@ Then(
 Then(
   'I should see {string} in the non-interactive output',
   (expected: string) => {
-    cy.get<string>('@doughnutOutput').then((output) =>
-      assertOutputIncludes(output, expected, NON_INTERACTIVE_OUTPUT)
-    )
+    cli.nonInteractiveOutput().expectContains(expected)
   }
 )
 
 Then(
   'I should not see {string} in the non-interactive output',
   (expected: string) => {
-    cy.get<string>('@doughnutOutput').then((output) =>
-      assertOutputNotIncludes(output, expected)
-    )
+    cli.nonInteractiveOutput().expectNotContains(expected)
   }
 )
 
 Then('I should see {string} in the history output', (expected: string) => {
-  cy.get<string>('@doughnutOutput').then((output) =>
-    assertOutputIncludes(
-      getHistoryOutputContent(output),
-      expected,
-      'history output'
-    )
-  )
+  cli.historyOutput().expectContains(expected)
 })
 
 Then('I should see {string} in the Current guidance', (expected: string) => {
-  cy.get<string>('@doughnutOutput').then((output) => {
-    const { currentGuidanceAndHistory } = getRecallDisplaySections(output)
-    const msg = currentGuidanceAndHistory.includes(expected)
-      ? undefined
-      : buildCurrentGuidanceFailureMessage(output, expected)
-    expect(currentGuidanceAndHistory, msg).to.include(expected)
-  })
+  cli.currentGuidance().expectContains(expected)
 })
 
 Then('I should see {string} in the history input', (expected: string) => {
-  cy.get<string>('@doughnutOutput').then((output) =>
-    assertOutputIncludes(
-      getHistoryInputContent(output),
-      expected,
-      'history input'
-    )
-  )
+  cli.historyInput().expectContains(expected)
 })
 
 Then(
   'I should see {string} styled in the Current guidance',
   (expected: string) => {
-    cy.get<string>('@doughnutOutput').then((output) => {
-      const rawContent = getCurrentGuidanceAndHistoryRaw(output)
-      expect(
-        rawContent,
-        `Expected "${expected}" in raw ${CURRENT_GUIDANCE}`
-      ).to.include(expected)
-      // Markdown is rendered via markdansi: bold=\x1b[1m, italic=\x1b[3m
-      const hasBold = rawContent.includes('\x1b[1m')
-      const hasItalic = rawContent.includes('\x1b[3m')
-      expect(
-        hasBold || hasItalic,
-        `Expected ANSI styling (bold or italic) in ${CURRENT_GUIDANCE}. Raw length: ${rawContent.length}`
-      ).to.be.true
-    })
+    cli.currentGuidance().expectStyled(expected)
   }
 )
 
 Then('I should not see {string} in the history output', (expected: string) => {
-  cy.get<string>('@doughnutOutput').then((output) =>
-    assertOutputNotIncludes(getHistoryOutputContent(output), expected)
-  )
+  cli.historyOutput().expectNotContains(expected)
 })
 
 // --- Recall session assertions ---
