@@ -51,7 +51,7 @@ function installation() {
         }).as('doughnutOutput')
       })
     },
-    runUpdate(baseUrl: string) {
+    runUpdate(baseUrl = backendBaseUrl()) {
       cy.get<string>('@doughnutPath').then((doughnutPath) => {
         cy.task<string>('runInstalledCli', {
           doughnutPath,
@@ -111,18 +111,22 @@ function interactive() {
   }
 }
 
+function runWithCommandAndSuffix(command: string, suffix: string) {
+  runWithConfigDir(['-c', `${command} ${suffix}`])
+}
+
 function accessToken() {
   return {
     runWithSavedToken(command: string) {
       cy.get<string>('@savedAccessToken').then((token) =>
-        runWithConfigDir(['-c', `${command} ${token}`])
+        runWithCommandAndSuffix(command, token)
       )
     },
     runWithToken(command: string, token: string) {
-      runWithConfigDir(['-c', `${command} ${token}`])
+      runWithCommandAndSuffix(command, token)
     },
     runWithLabel(command: string, label: string) {
-      runWithConfigDir(['-c', `${command} ${label}`])
+      runWithCommandAndSuffix(command, label)
     },
   }
 }

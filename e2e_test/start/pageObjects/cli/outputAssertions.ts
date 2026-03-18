@@ -27,7 +27,7 @@ export function withOutput(cb: (output: string) => void): void {
   cy.get<string>(OUTPUT_ALIAS).then(cb)
 }
 
-function assertOutputSection(
+function assertInSection(
   content: string,
   expected: string,
   sectionLabel: string,
@@ -45,6 +45,42 @@ function assertOutputSection(
   } else {
     expect(content, message).not.to.include(expected)
   }
+}
+
+function outputSection(
+  getContent: (output: string) => string,
+  sectionLabel: string,
+  options: { expectNotContains?: boolean } = { expectNotContains: true }
+) {
+  const { expectNotContains } = options
+  return {
+    expectContains(expected: string) {
+      withOutput((output) =>
+        assertInSection(getContent(output), expected, sectionLabel, true)
+      )
+    },
+    ...(expectNotContains && {
+      expectNotContains(expected: string) {
+        withOutput((output) =>
+          assertInSection(getContent(output), expected, sectionLabel, false)
+        )
+      },
+    }),
+  }
+}
+
+function nonInteractiveOutput() {
+  return outputSection((o) => o, SECTION_LABELS.nonInteractiveOutput)
+}
+
+function historyOutput() {
+  return outputSection(getHistoryOutputContent, SECTION_LABELS.historyOutput)
+}
+
+function historyInput() {
+  return outputSection(getHistoryInputContent, SECTION_LABELS.historyInput, {
+    expectNotContains: false,
+  })
 }
 
 function buildCurrentGuidanceFailureMessage(
@@ -67,74 +103,6 @@ function buildCurrentGuidanceFailureMessage(
   ].join('\n')
 }
 
-function nonInteractiveOutput() {
-  return {
-    expectContains(expected: string) {
-      withOutput((output) =>
-        assertOutputSection(
-          output,
-          expected,
-          SECTION_LABELS.nonInteractiveOutput,
-          true
-        )
-      )
-    },
-    expectNotContains(expected: string) {
-      withOutput((output) =>
-        assertOutputSection(
-          output,
-          expected,
-          SECTION_LABELS.nonInteractiveOutput,
-          false
-        )
-      )
-    },
-  }
-}
-
-function historyOutput() {
-  return {
-    expectContains(expected: string) {
-      withOutput((output) => {
-        const content = getHistoryOutputContent(output)
-        assertOutputSection(
-          content,
-          expected,
-          SECTION_LABELS.historyOutput,
-          true
-        )
-      })
-    },
-    expectNotContains(expected: string) {
-      withOutput((output) => {
-        const content = getHistoryOutputContent(output)
-        assertOutputSection(
-          content,
-          expected,
-          SECTION_LABELS.historyOutput,
-          false
-        )
-      })
-    },
-  }
-}
-
-function historyInput() {
-  return {
-    expectContains(expected: string) {
-      withOutput((output) => {
-        const content = getHistoryInputContent(output)
-        assertOutputSection(
-          content,
-          expected,
-          SECTION_LABELS.historyInput,
-          true
-        )
-      })
-    },
-  }
-}
-
 function currentGuidance() {
   return {
     expectContains(expected: string) {
@@ -149,7 +117,7 @@ function currentGuidance() {
     expectStyled(expected: string) {
       withOutput((output) => {
         const rawContent = getCurrentGuidanceAndHistoryRaw(output)
-        assertOutputSection(
+        assertInSection(
           rawContent,
           expected,
           `raw ${SECTION_LABELS.currentGuidance}`,

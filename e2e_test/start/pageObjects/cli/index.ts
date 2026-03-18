@@ -15,17 +15,14 @@ import {
 } from './execution'
 import { backend } from './backend'
 
+/** CLI page objects. Grouped by domain: output sections → recall → access-token removal → execution → backend. */
 export const cli = {
-  // Output sections (non-interactive, history output/input, current guidance)
   nonInteractiveOutput,
   historyOutput,
   historyInput,
   currentGuidance,
-  // Recall session state
   recallSession,
-  // Access token removal
   removeToken,
-  // Execution (install, run, interactive, access-token, gmail)
   installation,
   nonInteractive,
   interactive,

@@ -1,5 +1,4 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
-import { backendBaseUrl } from '../support/backendUrl'
 import { mock_services } from '../start'
 import { cli } from '../start/pageObjects/cli'
 
@@ -7,18 +6,18 @@ Given('the backend is serving the CLI and install script', () =>
   cli.backend().expectInstallScriptServed()
 )
 
-When('I install the CLI from localhost without affecting my system', () => {
+When('I install the CLI from localhost without affecting my system', () =>
   cli.installation().installFromLocalhost()
-})
-When('I run the installed doughnut command', () => {
+)
+When('I run the installed doughnut command', () =>
   cli.installation().runInstalled()
-})
-When('I run the installed doughnut version command', () => {
+)
+When('I run the installed doughnut version command', () =>
   cli.installation().runVersion()
-})
+)
 When(
   'I run the installed doughnut update command with BASE_URL from localhost',
-  () => cli.installation().runUpdate(backendBaseUrl())
+  () => cli.installation().runUpdate()
 )
 
 When('I run the doughnut command with input {string}', (input: string) =>
@@ -124,10 +123,9 @@ Given(
   }
 )
 
-When('I run the CLI add gmail command with simulated OAuth callback', () => {
+When('I run the CLI add gmail command with simulated OAuth callback', () =>
   cli.gmail().addWithSimulatedOAuth()
-})
-
-When('I run the CLI last email command with pre-configured account', () => {
+)
+When('I run the CLI last email command with pre-configured account', () =>
   cli.gmail().lastEmailWithPreconfiguredAccount()
-})
+)
