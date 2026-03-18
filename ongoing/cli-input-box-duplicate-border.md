@@ -31,7 +31,7 @@ const rl = readline.createInterface({
 
 ### Phase 1: E2E test (reproduce, then @ignore) — DONE
 
-1. ✅ Added scenario to `e2e_test/features/cli/cli_input_box.feature`:
+1. ✅ Added scenario to `e2e_test/features/cli/cli_ui.feature`:
    - Tags: `@withCliConfig`, `@interactiveCLI`, `@ignore`
    - Background: Given I am logged in, valid access token, add-access-token
    - When I press Enter in the interactive CLI (uses new step; Enter on empty triggers the bug)
@@ -55,7 +55,7 @@ Note: Test passed locally (bug may not reproduce in PTY or may have been fixed).
 
 ### Phase 3: Sanity check
 
-1. Run relevant CLI E2E tests: `pnpm cypress run --spec e2e_test/features/cli/cli_input_box.feature`, `cli_recall.feature`, `cli_access_token.feature`.
+1. Run relevant CLI E2E tests: `pnpm cypress run --spec e2e_test/features/cli/cli_ui.feature`, `cli_recall.feature`, `cli_access_token.feature`.
 2. Manually run `pnpm cli` and verify: Enter on empty, command selection, typing+Enter—no duplicate border.
 
 ## Notes

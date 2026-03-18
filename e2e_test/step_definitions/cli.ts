@@ -94,7 +94,7 @@ Then(
   'I should see {string} styled in the Current guidance',
   (expected: string) => cli.currentGuidance().expectStyled(expected)
 )
-Then('I should see exactly one input box top border', () =>
+Then('the input box UI should be normal', () =>
   cli.inputBoxTopBorder().expectExactlyOne()
 )
 
