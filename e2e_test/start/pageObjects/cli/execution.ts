@@ -13,6 +13,17 @@ function cliEnvWithConfigDir(configDir: string): Record<string, string> {
   }
 }
 
+function runWithConfigDir(args: string[]) {
+  cy.get<string>('@cliConfigDir').then((configDir) =>
+    cy
+      .task('runCliDirectWithArgs', {
+        args,
+        env: cliEnvWithConfigDir(configDir),
+      })
+      .as('doughnutOutput')
+  )
+}
+
 function installation() {
   return {
     installFromLocalhost() {
@@ -63,14 +74,7 @@ function nonInteractive() {
       }).as('doughnutOutput')
     },
     runWithCommand(cmd: string) {
-      cy.get<string>('@cliConfigDir').then((configDir) =>
-        cy
-          .task('runCliDirectWithArgs', {
-            args: ['-c', cmd],
-            env: cliEnvWithConfigDir(configDir),
-          })
-          .as('doughnutOutput')
-      )
+      runWithConfigDir(['-c', cmd])
     },
     runVersion() {
       cy.task('runCliDirectWithArgs', { args: ['version'] }).as(
@@ -108,28 +112,17 @@ function interactive() {
 }
 
 function accessToken() {
-  function runWithConfigCommand(command: string, arg: string) {
-    return cy.get<string>('@cliConfigDir').then((configDir) =>
-      cy
-        .task('runCliDirectWithArgs', {
-          args: ['-c', `${command} ${arg}`],
-          env: cliEnvWithConfigDir(configDir),
-        })
-        .as('doughnutOutput')
-    )
-  }
-
   return {
     runWithSavedToken(command: string) {
       cy.get<string>('@savedAccessToken').then((token) =>
-        runWithConfigCommand(command, token)
+        runWithConfigDir(['-c', `${command} ${token}`])
       )
     },
     runWithToken(command: string, token: string) {
-      runWithConfigCommand(command, token)
+      runWithConfigDir(['-c', `${command} ${token}`])
     },
     runWithLabel(command: string, label: string) {
-      runWithConfigCommand(command, label)
+      runWithConfigDir(['-c', `${command} ${label}`])
     },
   }
 }

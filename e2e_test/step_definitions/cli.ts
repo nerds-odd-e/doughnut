@@ -4,99 +4,66 @@ import { mock_services } from '../start'
 import { getRecallDisplaySections } from './cliSectionParser'
 import { cli } from '../start/pageObjects/cli'
 
-// --- Setup ---
-
 Given('the backend is serving the CLI and install script', () => {
   cy.request('GET', `${backendBaseUrl()}/install`)
     .its('status')
     .should('eq', 200)
 })
 
-// --- Installation (non-interactive: installed binary) ---
-
 When('I install the CLI from localhost without affecting my system', () => {
   cli.installation().installFromLocalhost()
 })
-
 When('I run the installed doughnut command', () => {
   cli.installation().runInstalled()
 })
-
 When('I run the installed doughnut version command', () => {
   cli.installation().runVersion()
 })
-
 When(
   'I run the installed doughnut update command with BASE_URL from localhost',
-  () => {
-    cli.installation().runUpdate(backendBaseUrl())
-  }
+  () => cli.installation().runUpdate(backendBaseUrl())
 )
 
-// --- Non-interactive execution: piped input ---
-
-When('I run the doughnut command with input {string}', (input: string) => {
+When('I run the doughnut command with input {string}', (input: string) =>
   cli.nonInteractive().runWithInput(input)
-})
-
-When('I run the doughnut command with -c {string}', (input: string) => {
+)
+When('I run the doughnut command with -c {string}', (input: string) =>
   cli.nonInteractive().runWithCommand(input)
-})
-
-When('I run the doughnut version command', () => {
+)
+When('I run the doughnut version command', () =>
   cli.nonInteractive().runVersion()
-})
-
-When('the backend serves the CLI with version {string}', (version: string) => {
+)
+When('the backend serves the CLI with version {string}', (version: string) =>
   cli.backend().serveVersion(version)
-})
+)
 
-// --- Interactive execution: input and keypress ---
-
-When('I input {string} in the interactive CLI', (input: string) => {
+When('I input {string} in the interactive CLI', (input: string) =>
   cli.interactive().input(input)
-})
-
-When('I press ESC in the interactive CLI', () => {
-  cli.interactive().pressEsc()
-})
-
+)
+When('I press ESC in the interactive CLI', () => cli.interactive().pressEsc())
 When(
   'I answer {string} in the interactive CLI to prompt {string}',
-  (answer: string, expectedPromptText: string) => {
+  (answer: string, expectedPromptText: string) =>
     cli.interactive().answerToPrompt(answer, expectedPromptText)
-  }
 )
-
 When(
   'I input down-arrow selection for {string} in the interactive CLI',
-  (command: string) => {
-    cli.interactive().inputDownArrowSelection(command)
-  }
+  (command: string) => cli.interactive().inputDownArrowSelection(command)
 )
 
-// --- Non-interactive execution: doughnut -c (access token) ---
-
-When('I run doughnut -c {string} with the saved token', (command: string) => {
+When('I run doughnut -c {string} with the saved token', (command: string) =>
   cli.accessToken().runWithSavedToken(command)
-})
-
+)
 When(
   'I run doughnut -c {string} with token {string}',
-  (command: string, token: string) => {
+  (command: string, token: string) =>
     cli.accessToken().runWithToken(command, token)
-  }
 )
-
 When(
   'I run doughnut -c {string} with label {string}',
-  (command: string, label: string) => {
+  (command: string, label: string) =>
     cli.accessToken().runWithLabel(command, label)
-  }
 )
-
-// --- Output assertions ---
-// Domain: non-interactive output, history output, history input, current guidance (cli.mdc)
 
 Then(
   'I should see the {word} remove success message for {string}',
@@ -134,8 +101,6 @@ Then(
   (expected: string) => cli.currentGuidance().expectStyled(expected)
 )
 
-// --- Recall session assertions ---
-
 Then('the recall session was stopped', () => {
   cy.get<string>('@doughnutOutput').then((output) => {
     const { currentGuidanceAndHistory, historyOutput } =
@@ -156,8 +121,6 @@ Then('I stopped the recall during review', () => {
     expect(historyOutput).to.include('Stopped recall')
   })
 })
-
-// --- Gmail / Google API setup ---
 
 Given(
   'the Google API mock returns tokens and profile for {string}',
@@ -182,8 +145,6 @@ Given(
     )
   }
 )
-
-// --- Gmail commands ---
 
 When('I run the CLI add gmail command with simulated OAuth callback', () => {
   cli.gmail().addWithSimulatedOAuth()
