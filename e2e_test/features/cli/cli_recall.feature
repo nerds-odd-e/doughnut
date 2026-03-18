@@ -14,8 +14,7 @@ Feature: CLI recall status and recall session
       | Title    | Details                        | Parent Title |
       | sedition | Sedition means incite violence | English      |
       | sedation | Put to sleep is sedation       | English      |
-    And It's day 1
-    And I assimilate the note "sedition"
+    And I assimilate the note "sedition" on day 1
     And It's day 2
     When I input "/recall-status" in the interactive CLI
     Then I should see "1 note to recall today" in the history output
@@ -27,8 +26,7 @@ Feature: CLI recall status and recall session
     And there are some notes:
       | Title    | Details                        | Parent Title |
       | sedation | **Put** to sleep is _sedation_ | English      |
-    And It's day 1
-    And I assimilate the note "sedation"
+    And I assimilate the note "sedation" on day 1
     And It's day 2
     When I input "/recall" in the interactive CLI
     Then I should see "sedation" in the Current guidance
@@ -46,8 +44,7 @@ Feature: CLI recall status and recall session
       | Title    | Details                        | Parent Title |
       | sedition | Sedition means incite violence | English      |
       | sedation | Put to sleep is sedation       | English      |
-    And It's day 1
-    And I assimilate the note "sedition"
+    And I assimilate the note "sedition" on day 1
     And I assimilate the note "sedation"
     And It's day 2
     When I input "/recall" in the interactive CLI
@@ -72,8 +69,7 @@ Feature: CLI recall status and recall session
     And OpenAI generates this question:
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
-    And It's day 1
-    And I assimilate the note "sedition"
+    And I assimilate the note "sedition" on day 1
     And It's day 2
     When I input "/recall" in the interactive CLI
     Then I should see "What is the meaning of sedition?" in the Current guidance
@@ -93,8 +89,7 @@ Feature: CLI recall status and recall session
     And OpenAI generates this question:
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
-    And It's day 1
-    And I assimilate the note "sedition"
+    And I assimilate the note "sedition" on day 1
     And It's day 2
     When I input "/recall" in the interactive CLI
     Then I should see "What is the meaning of sedition?" in the Current guidance
@@ -114,8 +109,7 @@ Feature: CLI recall status and recall session
     And OpenAI generates this question:
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
-    And It's day 1
-    And I assimilate the note "sedition"
+    And I assimilate the note "sedition" on day 1
     And It's day 2
     When I input down-arrow selection for "/recall" in the interactive CLI
     Then I should see "Incorrect" in the history output
@@ -129,8 +123,7 @@ Feature: CLI recall status and recall session
       | Title    | Details                        | Parent Title |
       | sedition | Sedition means incite violence | English      |
       | sedation | Put to sleep is sedation       | English      |
-    And It's day 1
-    And I assimilate the note "sedition"
+    And I assimilate the note "sedition" on day 1
     And I assimilate the note "sedation"
     And It's day 2
     When I input "/recall" in the interactive CLI
@@ -154,8 +147,7 @@ Feature: CLI recall status and recall session
     And OpenAI generates this as first question:
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
-    And It's day 1
-    And I assimilate the note "sedition"
+    And I assimilate the note "sedition" on day 1
     And It's day 2
     When I input "/recall" in the interactive CLI
     Then I should see "What is the meaning of sedition?" in the Current guidance

@@ -39,6 +39,14 @@ Then(
   }
 )
 
+Then(
+  'I assimilate the note {string} on day {int}',
+  (noteTitle: string, day: number) => {
+    start.testability().backendTimeTravelTo(day, 8)
+    start.jumpToNotePage(noteTitle).moreOptions().assimilateNote()
+  }
+)
+
 Then('I am assimilating new note on day {int}', (day: number) => {
   start.testability().backendTimeTravelTo(day, 8)
   start.assimilation().navigateToAssimilationPage()
@@ -49,37 +57,17 @@ When('I am assimilating the note {string}', (noteTitle: string) => {
 })
 
 Then('I assimilate the note {string}', (noteTitle: string) => {
-  const startTime = Date.now()
   start.jumpToNotePage(noteTitle).moreOptions().assimilateNote()
-  cy.then(() => {
-    if (Cypress.expose('RECORD_E2E_TIMING')) {
-      cy.task('recordTiming', {
-        label: 'assimilate-note',
-        duration: Date.now() - startTime,
-        note: noteTitle,
-      })
-    }
-  })
 })
 
 Then(
   'I assimilate the note {string} with the option of remembering spelling',
   (noteTitle: string) => {
-    const startTime = Date.now()
     start
       .jumpToNotePage(noteTitle)
       .moreOptions()
       .openAssimilationPage()
       .assimilateWithSpellingOption()
-    cy.then(() => {
-      if (Cypress.expose('RECORD_E2E_TIMING')) {
-        cy.task('recordTiming', {
-          label: 'assimilate-note',
-          duration: Date.now() - startTime,
-          note: noteTitle,
-        })
-      }
-    })
   }
 )
 

@@ -9,19 +9,7 @@ import { cli } from '../start/pageObjects/cli'
 
 Before(() => {
   cy.task('clearTestState')
-  const startTime = Date.now()
   start.testability().cleanDBAndResetTestabilitySettings()
-  cy.then(() => {
-    if (
-      Cypress.expose('RECORD_E2E_TIMING') &&
-      Cypress.spec.relative?.includes('cli_recall')
-    ) {
-      cy.task('recordTiming', {
-        label: 'db-reset',
-        duration: Date.now() - startTime,
-      })
-    }
-  })
   cy.wrap('no').as('firstVisited')
 })
 

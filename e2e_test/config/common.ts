@@ -1,5 +1,4 @@
 import {
-  appendFileSync,
   copyFileSync,
   existsSync,
   mkdirSync,
@@ -188,14 +187,7 @@ const commonConfig = {
         })
       )
 
-      const timingLogPath = join(repoRoot, 'e2e_test', 'timing_log.jsonl')
       const testState: Record<string, unknown> = {}
-
-      on('before:run', () => {
-        if (process.env.RECORD_E2E_TIMING && existsSync(timingLogPath)) {
-          writeFileSync(timingLogPath, '')
-        }
-      })
 
       on('task', {
         setTestState({ key, value }: { key: string; value: unknown }) {
@@ -207,25 +199,6 @@ const commonConfig = {
         },
         clearTestState() {
           Object.keys(testState).forEach((k) => delete testState[k])
-          return null
-        },
-        recordTiming({
-          label,
-          duration,
-          note,
-        }: {
-          label: string
-          duration: number
-          note?: string
-        }) {
-          if (!process.env.RECORD_E2E_TIMING) return null
-          const line = `${JSON.stringify({
-            label,
-            duration,
-            note: note ?? null,
-            ts: Date.now(),
-          })}\n`
-          appendFileSync(timingLogPath, line)
           return null
         },
         deleteFolder(folderName) {
