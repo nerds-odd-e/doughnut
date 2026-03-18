@@ -113,14 +113,14 @@ Then('I should see {string} in the non-interactive output', (expected: string) =
 2. Gmail Given steps (Google API mock) stay in cli.ts; they use `mock_services` which is a shared dependency.
 3. ~~Gmail When steps~~: `cli.gmail().addWithSimulatedOAuth()`, `cli.gmail().lastEmailWithPreconfiguredAccount()` (already in place).
 
-### Phase 5: Slim common.ts and replace overkill tasks
+### Phase 5: Slim common.ts and replace overkill tasks ✅
 
-Tasks in `e2e_test/config/common.ts` like `runCliDirectWithLastEmail` and `runCliDirectWithGmailAdd` are overkill—they embed domain logic (config dir creation, gmail.json structure, OAuth URL parsing, command sequence). Leave only necessary low-level code in common.ts and move domain logic to step defs and page objects. Prefer replacing these with normal non-interactive steps that use generic tasks (`runCliDirectWithArgs`, `runCliDirectWithInput`).
+1. ~~Audit CLI-related tasks in common.ts; identify domain logic vs. plumbing.~~
+2. ~~Move config setup (gmail.json, temp dirs) to page objects or step setup.~~
+3. ~~Replace `runCliDirectWithGmailAdd`, `runCliDirectWithLastEmail` with `runCliDirectWithInput` or `runCliDirectWithArgs` + setup orchestrated by `cli.gmail()` page object.~~
+4. ~~Keep in common.ts only: generic spawn helpers, `getCliRunConfig`, env wiring. Delete bespoke task implementations once replaced.~~
 
-1. Audit CLI-related tasks in common.ts; identify domain logic vs. plumbing.
-2. Move config setup (gmail.json, temp dirs) to page objects or step setup.
-3. Replace `runCliDirectWithGmailAdd`, `runCliDirectWithLastEmail` with `runCliDirectWithInput` or `runCliDirectWithArgs` + setup orchestrated by `cli.gmail()` page object.
-4. Keep in common.ts only: generic spawn helpers, `getCliRunConfig`, env wiring. Delete bespoke task implementations once replaced.
+Done: Added `createCliConfigDirWithGmail(gmailConfig)` task. Extended `runCliDirectWithInput` with optional `simulateOAuthCallback`. `cli.gmail()` now orchestrates config creation + `runCliDirectWithInput`. Removed `runCliDirectWithGmailAdd` and `runCliDirectWithLastEmail`.
 
 ### Phase 6: Full encapsulation—cy.get and cy.task in page objects
 

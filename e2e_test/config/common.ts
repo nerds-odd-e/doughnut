@@ -330,6 +330,13 @@ const commonConfig = {
         createCliConfigDir() {
           return mkdtempSync(join(tmpdir(), 'cypress-cli-config-'))
         },
+        createCliConfigDirWithGmail(gmailConfig: Record<string, unknown>) {
+          const configDir = mkdtempSync(join(tmpdir(), 'cypress-cli-gmail-'))
+          const configPath = join(configDir, 'gmail.json')
+          mkdirSync(configDir, { recursive: true })
+          writeFileSync(configPath, JSON.stringify(gmailConfig, null, 2))
+          return configDir
+        },
         async bundleAndCopyCli() {
           const repoRoot = path.resolve(__dirname, '..', '..')
           try {
@@ -384,9 +391,11 @@ const commonConfig = {
         async runCliDirectWithInput({
           input,
           env,
+          simulateOAuthCallback,
         }: {
           input: string
           env?: NodeJS.ProcessEnv
+          simulateOAuthCallback?: boolean
         }) {
           const { spawn } = await import('node:child_process')
           const repoRoot = path.resolve(__dirname, '..', '..')
@@ -399,9 +408,35 @@ const commonConfig = {
               stdio: ['pipe', 'pipe', 'pipe'],
             })
             let stdout = ''
+            const append = (chunk: string) => {
+              stdout += chunk
+              return stdout
+            }
             proc.stdout?.on('data', (chunk: Buffer) => {
-              stdout += chunk.toString()
+              const out = append(chunk.toString())
+              if (simulateOAuthCallback) {
+                const authMatch = out.match(
+                  /https:\/\/accounts\.google\.com\/[^\s]+/
+                )
+                if (authMatch) {
+                  const redirectUri = new URL(authMatch[0]).searchParams.get(
+                    'redirect_uri'
+                  )
+                  if (redirectUri) {
+                    fetch(`${redirectUri}?code=e2e_mock_auth_code`).catch(
+                      () => {
+                        /* ignore callback errors */
+                      }
+                    )
+                  }
+                }
+              }
             })
+            if (simulateOAuthCallback) {
+              proc.stderr?.on('data', (chunk: Buffer) =>
+                append(chunk.toString())
+              )
+            }
             const timeout = setTimeout(() => {
               proc.kill('SIGKILL')
               reject(
@@ -515,123 +550,6 @@ const commonConfig = {
             proc.stdout?.on('data', (chunk: Buffer) => {
               stdout += chunk.toString()
             })
-            proc.stdin?.end()
-            proc.on('close', (code) => {
-              if (code === 0) resolve(stdout)
-              else reject(new Error(`CLI exited with code ${code}`))
-            })
-            proc.on('error', reject)
-          })
-        },
-        async runCliDirectWithGmailAdd({
-          googleBaseUrl,
-        }: {
-          googleBaseUrl: string
-        }) {
-          const { spawn } = await import('node:child_process')
-          const repoRoot = path.resolve(__dirname, '..', '..')
-          const configDir = mkdtempSync(join(tmpdir(), 'cypress-gmail-add-'))
-          const configPath = join(configDir, 'gmail.json')
-          const config = {
-            clientId: 'e2e-test-client',
-            clientSecret: 'e2e-test-secret',
-            accounts: [],
-          }
-          mkdirSync(configDir, { recursive: true })
-          writeFileSync(configPath, JSON.stringify(config, null, 2))
-
-          const cliConfig = getCliRunConfig(repoRoot)
-          return new Promise<{ stdout: string; exitCode: number }>(
-            (resolve, reject) => {
-              const proc = spawn(cliConfig.command, [...cliConfig.baseArgs], {
-                cwd: repoRoot,
-                env: {
-                  ...process.env,
-                  ...cliEnv({
-                    DOUGHNUT_CONFIG_DIR: configDir,
-                    DOUGHNUT_NO_BROWSER: '1',
-                    GOOGLE_BASE_URL: googleBaseUrl,
-                  }),
-                },
-                stdio: ['pipe', 'pipe', 'pipe'],
-              })
-
-              let stdout = ''
-              const append = (chunk: string) => {
-                stdout += chunk
-                return stdout
-              }
-              proc.stdout?.on('data', (chunk: Buffer) => {
-                const out = append(chunk.toString())
-                const authMatch = out.match(
-                  /https:\/\/accounts\.google\.com\/[^\s]+/
-                )
-                if (authMatch) {
-                  const redirectUri = new URL(authMatch[0]).searchParams.get(
-                    'redirect_uri'
-                  )
-                  if (redirectUri) {
-                    fetch(`${redirectUri}?code=e2e_mock_auth_code`).catch(
-                      () => {
-                        /* ignore callback errors */
-                      }
-                    )
-                  }
-                }
-              })
-              proc.stderr?.on('data', (chunk: Buffer) =>
-                append(chunk.toString())
-              )
-
-              proc.stdin?.write('/add gmail\nexit\n')
-              proc.stdin?.end()
-
-              proc.on('close', (code) => {
-                resolve({ stdout, exitCode: code ?? -1 })
-              })
-              proc.on('error', reject)
-            }
-          )
-        },
-        async runCliDirectWithLastEmail({
-          googleBaseUrl,
-        }: {
-          googleBaseUrl: string
-        }) {
-          const { spawn } = await import('node:child_process')
-          const repoRoot = path.resolve(__dirname, '..', '..')
-          const configDir = mkdtempSync(join(tmpdir(), 'cypress-gmail-last-'))
-          const configPath = join(configDir, 'gmail.json')
-          mkdirSync(configDir, { recursive: true })
-          const config = {
-            accounts: [
-              {
-                email: 'e2e@gmail.com',
-                accessToken: 'mock_access_token',
-                refreshToken: 'mock_refresh_token',
-                expiresAt: Date.now() + 3600_000,
-              },
-            ],
-          }
-          writeFileSync(configPath, JSON.stringify(config, null, 2))
-          const cliConfig = getCliRunConfig(repoRoot)
-          return new Promise<string>((resolve, reject) => {
-            const proc = spawn(cliConfig.command, [...cliConfig.baseArgs], {
-              cwd: repoRoot,
-              env: {
-                ...process.env,
-                ...cliEnv({
-                  DOUGHNUT_CONFIG_DIR: configDir,
-                  GOOGLE_BASE_URL: googleBaseUrl,
-                }),
-              },
-              stdio: ['pipe', 'pipe', 'pipe'],
-            })
-            let stdout = ''
-            proc.stdout?.on('data', (chunk: Buffer) => {
-              stdout += chunk.toString()
-            })
-            proc.stdin?.write('/last email\nexit\n')
             proc.stdin?.end()
             proc.on('close', (code) => {
               if (code === 0) resolve(stdout)

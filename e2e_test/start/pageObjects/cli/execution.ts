@@ -132,18 +132,53 @@ function accessToken() {
 }
 
 function gmail() {
+  const emptyGmailConfig = {
+    clientId: 'e2e-test-client',
+    clientSecret: 'e2e-test-secret',
+    accounts: [],
+  }
+  const preconfiguredGmailConfig = {
+    accounts: [
+      {
+        email: 'e2e@gmail.com',
+        accessToken: 'mock_access_token',
+        refreshToken: 'mock_refresh_token',
+        expiresAt: Date.now() + 3600_000,
+      },
+    ],
+  }
   return {
     addWithSimulatedOAuth() {
-      cy.task('runCliDirectWithGmailAdd', {
-        googleBaseUrl: GOOGLE_MOCK_BASE_URL,
-      })
-        .its('stdout')
-        .as('doughnutOutput')
+      cy.task<string>('createCliConfigDirWithGmail', emptyGmailConfig).then(
+        (configDir) =>
+          cy
+            .task('runCliDirectWithInput', {
+              input: '/add gmail\nexit',
+              env: {
+                DOUGHNUT_CONFIG_DIR: configDir,
+                DOUGHNUT_NO_BROWSER: '1',
+                GOOGLE_BASE_URL: GOOGLE_MOCK_BASE_URL,
+              },
+              simulateOAuthCallback: true,
+            })
+            .as('doughnutOutput')
+      )
     },
     lastEmailWithPreconfiguredAccount() {
-      cy.task('runCliDirectWithLastEmail', {
-        googleBaseUrl: GOOGLE_MOCK_BASE_URL,
-      }).as('doughnutOutput')
+      cy.task<string>(
+        'createCliConfigDirWithGmail',
+        preconfiguredGmailConfig
+      ).then((configDir) =>
+        cy
+          .task('runCliDirectWithInput', {
+            input: '/last email\nexit',
+            env: {
+              DOUGHNUT_CONFIG_DIR: configDir,
+              GOOGLE_BASE_URL: GOOGLE_MOCK_BASE_URL,
+            },
+          })
+          .as('doughnutOutput')
+      )
     },
   }
 }
