@@ -4,7 +4,6 @@ import { mock_services } from '../start'
 import {
   getHistoryOutputContent,
   getHistoryInputContent,
-  getLastCommandOutput,
   getRecallDisplaySections,
   getCurrentGuidanceDebug,
   getCurrentGuidanceAndHistoryRaw,
@@ -212,7 +211,22 @@ When(
   }
 )
 
-// --- Section assertions: History output, History input, Current guidance, Command output ---
+Then(
+  'I should see the {word} remove success message for {string}',
+  (removalType: string, label: string) => {
+    const expected =
+      removalType === 'local'
+        ? `Token "${label}" removed.`
+        : 'removed locally and from server'
+    cy.get<string>('@doughnutOutput').then((output) =>
+      assertOutputIncludes(output, expected, 'command output')
+    )
+  }
+)
+
+// --- Output assertions ---
+// Command output: non-interactive (-c, piped, installed). Entire stdout, no section parsing.
+// History output, History input, Current guidance: interactive only. Parsed ANSI sections.
 
 Then('I should see {string} in the command output', (expected: string) => {
   cy.get<string>('@doughnutOutput').then((output) =>
@@ -276,16 +290,6 @@ Then(
   }
 )
 
-Then('I should see {string} in the last command output', (expected: string) => {
-  cy.get<string>('@doughnutOutput').then((output) =>
-    assertOutputIncludes(
-      getLastCommandOutput(output),
-      expected,
-      'last command output'
-    )
-  )
-})
-
 Then('I should not see {string} in the history output', (expected: string) => {
   cy.get<string>('@doughnutOutput').then((output) =>
     assertOutputNotIncludes(getHistoryOutputContent(output), expected)
@@ -314,21 +318,6 @@ Then('I stopped the recall during review', () => {
     expect(historyOutput).to.include('Stopped recall')
   })
 })
-
-// --- Access token assertions ---
-
-Then(
-  'I should see the {word} remove success message for {string}',
-  (removalType: string, label: string) => {
-    const expected =
-      removalType === 'local'
-        ? `Token "${label}" removed.`
-        : 'removed locally and from server'
-    cy.get<string>('@doughnutOutput').then((output) =>
-      assertOutputIncludes(output, expected, 'command output')
-    )
-  }
-)
 
 // --- Gmail / Google API setup ---
 

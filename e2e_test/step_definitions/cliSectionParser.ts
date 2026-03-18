@@ -81,7 +81,6 @@ type Boundaries = {
   historyLines: string[]
   currentPromptLines: string[]
   currentGuidanceLines: string[]
-  outputLinesIncludingPromptBlock: string[]
 }
 
 function parseCliOutput(output: string): Boundaries {
@@ -94,15 +93,10 @@ function parseCliOutput(output: string): Boundaries {
   const currentPromptLines =
     separatorIdx >= 0 ? lines.slice(separatorIdx + 1, boxStart) : []
   const currentGuidanceLines = boxEnd >= 0 ? lines.slice(boxEnd + 1) : []
-  const outputLinesIncludingPromptBlock = [
-    ...historyLines,
-    ...currentPromptLines.filter((l) => !isCurrentPromptHintLine(l)),
-  ]
   return {
     historyLines,
     currentPromptLines,
     currentGuidanceLines,
-    outputLinesIncludingPromptBlock,
   }
 }
 
@@ -200,28 +194,6 @@ export function getCurrentGuidanceDebug(output: string): {
     lineCount: lines.length,
     rawTail: output.slice(-1200).replace(/\r/g, '\\r').replace(/\n/g, '\\n '),
   }
-}
-
-export function getLastCommandOutput(output: string): string {
-  const { outputLinesIncludingPromptBlock } = parseCliOutput(output)
-  const blocks: string[] = []
-  let current: string[] = []
-
-  for (const line of outputLinesIncludingPromptBlock) {
-    const stripped = stripAnsi(line)
-    if (isHistoryInputLine(line)) {
-      if (current.length > 0) {
-        blocks.push(current.join('\n'))
-        current = []
-      }
-    } else if (stripped.trim()) {
-      current.push(stripped)
-    }
-  }
-  if (current.length > 0) {
-    blocks.push(current.join('\n'))
-  }
-  return blocks.length > 0 ? blocks[blocks.length - 1]! : ''
 }
 
 function getCurrentGuidanceCombined(
