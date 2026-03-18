@@ -429,32 +429,6 @@ const commonConfig = {
           await stopInteractiveCliProcess()
           return null
         },
-        async runCliDirectWithInputAndPty({
-          input,
-          inputChunks,
-          env,
-        }: {
-          input?: Buffer | string
-          inputChunks?: { text: string; delayAfterMs?: number }[]
-          env?: NodeJS.ProcessEnv
-        }) {
-          const repoRoot = path.resolve(__dirname, '..', '..')
-          const config = getCliRunConfig(repoRoot)
-          const cliInput: string | { text: string; delayAfterMs?: number }[] =
-            inputChunks ??
-            (input
-              ? typeof input === 'string'
-                ? input
-                : input.toString('utf8')
-              : '')
-          return runCliInPty({
-            command: config.command,
-            args: config.baseArgs,
-            cwd: repoRoot,
-            env,
-            input: cliInput,
-          })
-        },
         async runCliDirectWithArgs({
           args,
           env,

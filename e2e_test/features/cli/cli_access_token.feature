@@ -30,12 +30,17 @@ Feature: CLI access token management
       | Revoke Me Token | remove-access-token-completely | complete     |
 
   
+  @interactiveCLI
   Scenario: ESC cancels remove-access-token selection
     And I have a valid Doughnut Access Token with label "E2E CLI Token"
     When I run the doughnut CLI add-access-token with the saved token
     Then I should see "Token added" in the history output
-    When I run the remove-access-token command and cancel with ESC, then list tokens
-    Then I should see "E2E CLI Token" in the history output
+    When I input "/remove-access-token" in the interactive CLI
+    Then I should see "E2E CLI Token" in the CLI output
+    When I press ESC in the interactive CLI
+    Then I should see "/ commands" in the CLI output
+    When I input "/list-access-token" in the interactive CLI
+    Then I should see "E2E CLI Token" in the CLI output
 
   Scenario: Create access token via CLI
     And I have a valid Doughnut Access Token with label "Default Token"

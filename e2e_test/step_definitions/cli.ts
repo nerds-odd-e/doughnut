@@ -5,6 +5,7 @@ import {
   getSectionContent,
   getSectionContentRaw,
   getLastCommandOutput,
+  getRecallDisplaySections,
 } from './cliSectionParser'
 
 const GOOGLE_MOCK_URL = 'http://localhost:5003'
@@ -27,29 +28,30 @@ function runCliWithConfig(args: string[]) {
   )
 }
 
-function taskWithCliTiming(
-  taskName: string,
-  taskArg: { input: string; env: Record<string, string> }
-) {
-  const startTime = Date.now()
-  return cy.task(taskName, taskArg).then((output: unknown) => {
-    if (Cypress.env('RECORD_E2E_TIMING')) {
-      return cy
-        .task('recordTiming', {
-          label: 'cli-run',
-          duration: Date.now() - startTime,
-        })
-        .then(() => cy.wrap(output))
-    }
-    return cy.wrap(output)
-  })
+function assertOutputIncludes(
+  content: string,
+  expected: string,
+  label: string
+): void {
+  expect(
+    content,
+    `Expected "${expected}" in ${label}. Content:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
+  ).to.include(expected)
 }
+
+function assertOutputNotIncludes(content: string, expected: string): void {
+  expect(content, `Did not expect "${expected}"`).not.to.include(expected)
+}
+
+// --- Setup ---
 
 Given('the backend is serving the CLI and install script', () => {
   cy.request('GET', `${backendBaseUrl()}/install`)
     .its('status')
     .should('eq', 200)
 })
+
+// --- CLI installation and run ---
 
 When('I install the CLI from localhost without affecting my system', () => {
   cy.task<string>('installCli', backendBaseUrl())
@@ -78,6 +80,8 @@ When('I run the installed doughnut version command', () => {
   })
 })
 
+// --- CLI execution: piped input (non-interactive) ---
+
 When('I run the doughnut command with input {string}', (input: string) => {
   const trimmed = input.trim()
   const exitSuffix = trimmed === 'exit' || trimmed === '/exit' ? '' : `\nexit`
@@ -86,27 +90,27 @@ When('I run the doughnut command with input {string}', (input: string) => {
   )
 })
 
-When(
-  'I run the doughnut command in interactive mode with input {string}',
-  (input: string) => {
-    cy.get<string>('@cliConfigDir').then((configDir) =>
-      taskWithCliTiming('runCliDirectWithInput', {
-        input: `${input}\nexit\n`,
-        env: cliEnvWithConfigDir(configDir),
-      }).as('doughnutOutput')
-    )
-  }
-)
+// --- Interactive CLI: input and keypress ---
 
 When('I input {string} in the interactive CLI', (input: string) => {
   cy.task<string>('sendToInteractiveCli', { input }).as('doughnutOutput')
+})
+
+When('I press ESC in the interactive CLI', () => {
+  cy.task<string>('sendToInteractiveCli', { input: '\x1b\n' }).as(
+    'doughnutOutput'
+  )
 })
 
 When(
   'I answer {string} in the interactive CLI to prompt {string}',
   (answer: string, expectedPromptText: string) => {
     cy.get<string>('@doughnutOutput').then((output) =>
-      assertExpectedInCurrentPrompt(output, expectedPromptText, true)
+      assertOutputIncludes(
+        getSectionContent(output, 'current-prompt'),
+        expectedPromptText,
+        'current prompt'
+      )
     )
     cy.task<string>('sendToInteractiveCli', { input: answer }).as(
       'doughnutOutput'
@@ -122,117 +126,7 @@ When(
   }
 )
 
-When(
-  'I run the doughnut command in interactive mode with input {string} and {string}',
-  (command: string, answer: string) => {
-    cy.get<string>('@cliConfigDir').then((configDir) =>
-      taskWithCliTiming('runCliDirectWithInput', {
-        input: `${command}\n${answer}\nexit\n`,
-        env: cliEnvWithConfigDir(configDir),
-      }).as('doughnutOutput')
-    )
-  }
-)
-
-When(
-  'I run the doughnut command in interactive mode with input {string} and {string} and {string}',
-  (command: string, answer1: string, answer2: string) => {
-    cy.get<string>('@cliConfigDir').then((configDir) =>
-      taskWithCliTiming('runCliDirectWithInput', {
-        input: `${command}\n${answer1}\n${answer2}\nexit\n`,
-        env: cliEnvWithConfigDir(configDir),
-      }).as('doughnutOutput')
-    )
-  }
-)
-
-When(
-  'I run the doughnut command in interactive mode with input {string} and {string} and {string} and {string}',
-  (command: string, answer1: string, answer2: string, answer3: string) => {
-    cy.get<string>('@cliConfigDir').then((configDir) =>
-      taskWithCliTiming('runCliDirectWithInput', {
-        input: `${command}\n${answer1}\n${answer2}\n${answer3}\nexit\n`,
-        env: cliEnvWithConfigDir(configDir),
-      }).as('doughnutOutput')
-    )
-  }
-)
-
-When(
-  'I run a recall session and recall all due notes, declining load more',
-  () => {
-    cy.get<string>('@cliConfigDir').then((configDir) =>
-      taskWithCliTiming('runCliDirectWithInput', {
-        input: '/recall\ny\ny\nn\nexit\n',
-        env: cliEnvWithConfigDir(configDir),
-      }).as('doughnutOutput')
-    )
-  }
-)
-
-When('I run a recall session with load more from future days', () => {
-  cy.get<string>('@cliConfigDir').then((configDir) =>
-    taskWithCliTiming('runCliDirectWithInput', {
-      input: '/recall\ny\ny\ny\ny\nexit\n',
-      env: cliEnvWithConfigDir(configDir),
-    }).as('doughnutOutput')
-  )
-})
-
-When(
-  'I run the remove-access-token command and cancel with ESC, then list tokens',
-  () => {
-    const esc = '\x1b'
-    cy.get<string>('@cliConfigDir').then((configDir) =>
-      cy
-        .task('runCliDirectWithInputAndPty', {
-          input: `/remove-access-token\n${esc}\n/list-access-token\nexit\n`,
-          env: cliEnvWithConfigDir(configDir),
-        })
-        .as('doughnutOutput')
-    )
-  }
-)
-
-When(
-  'I run the doughnut command in interactive mode with recall MCQ and cancel with ESC',
-  () => {
-    cy.get<string>('@cliConfigDir').then((configDir) =>
-      cy
-        .task('runCliDirectWithInput', {
-          input: '/recall\n/stop\nexit\n',
-          env: cliEnvWithConfigDir(configDir),
-        })
-        .as('doughnutOutput')
-    )
-  }
-)
-
-When(
-  'I run the doughnut command in interactive mode with down-arrow selection for {string}',
-  (_command: string) => {
-    const startTime = Date.now()
-    cy.get<string>('@cliConfigDir').then((configDir) =>
-      cy
-        .task('runCliDirectWithInput', {
-          input: '/recall\n2\nexit\n',
-          env: cliEnvWithConfigDir(configDir),
-        })
-        .then((output: unknown) => {
-          if (Cypress.env('RECORD_E2E_TIMING')) {
-            return cy
-              .task('recordTiming', {
-                label: 'cli-run',
-                duration: Date.now() - startTime,
-              })
-              .then(() => cy.wrap(output))
-          }
-          return cy.wrap(output)
-        })
-        .as('doughnutOutput')
-    )
-  }
-)
+// --- CLI execution: -c, version, update ---
 
 When('I run the doughnut command with -c {string}', (input: string) => {
   runCliWithConfig(['-c', input])
@@ -258,6 +152,8 @@ When(
     })
   }
 )
+
+// --- Access token commands ---
 
 When('I run the doughnut CLI add-access-token with the saved token', () => {
   cy.get<string>('@savedAccessToken').then((token) => {
@@ -293,60 +189,43 @@ When(
   }
 )
 
-function assertSectionIncludes(
-  output: string,
-  section: 'history-input' | 'history-output',
-  expected: string
-): void {
-  const content = getSectionContent(output, section)
-  expect(
-    content,
-    `Expected "${expected}" in ${section}. Content:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
-  ).to.include(expected)
-}
-
-function assertSectionNotIncludes(
-  output: string,
-  section: 'history-output',
-  expected: string
-): void {
-  const content = getSectionContent(output, section)
-  expect(content, `Did not expect "${expected}" in ${section}`).not.to.include(
-    expected
-  )
-}
+// --- CLI output assertions ---
 
 Then('I should see {string} in the history output', (expected: string) => {
   cy.get<string>('@doughnutOutput').then((output) =>
-    assertSectionIncludes(output, 'history-output', expected)
+    assertOutputIncludes(
+      getSectionContent(output, 'history-output'),
+      expected,
+      'history output'
+    )
+  )
+})
+
+Then('I should see {string} in the CLI output', (expected: string) => {
+  cy.get<string>('@doughnutOutput').then((output) =>
+    assertOutputIncludes(output, expected, 'CLI output')
   )
 })
 
 Then('I should see {string} in the history input', (expected: string) => {
   cy.get<string>('@doughnutOutput').then((output) =>
-    assertSectionIncludes(output, 'history-input', expected)
+    assertOutputIncludes(
+      getSectionContent(output, 'history-input'),
+      expected,
+      'history input'
+    )
   )
 })
 
-function assertExpectedInCurrentPrompt(
-  output: string,
-  expected: string,
-  currentPromptOnly = false
-): void {
-  const currentPromptContent = getSectionContent(output, 'current-prompt')
-  const content = currentPromptOnly
-    ? currentPromptContent
-    : `${currentPromptContent}\n${getSectionContent(output, 'history-output')}`.trim()
-  expect(
-    content,
-    `Expected "${expected}" in ${currentPromptOnly ? 'current prompt' : 'current prompt or history'}. content:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
-  ).to.include(expected)
-}
-
 Then('I should see {string} in the current prompt', (expected: string) => {
-  cy.get<string>('@doughnutOutput').then((output) =>
-    assertExpectedInCurrentPrompt(output, expected)
-  )
+  cy.get<string>('@doughnutOutput').then((output) => {
+    const { currentPromptAndHistory } = getRecallDisplaySections(output)
+    assertOutputIncludes(
+      currentPromptAndHistory,
+      expected,
+      'current prompt or history'
+    )
+  })
 })
 
 Then(
@@ -372,37 +251,30 @@ Then(
 )
 
 Then('I should see {string} in the last command output', (expected: string) => {
-  cy.get<string>('@doughnutOutput').then((output) => {
-    const content = getLastCommandOutput(output)
-    expect(
-      content,
-      `Expected "${expected}" in last command output. Content:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
-    ).to.include(expected)
-  })
+  cy.get<string>('@doughnutOutput').then((output) =>
+    assertOutputIncludes(
+      getLastCommandOutput(output),
+      expected,
+      'last command output'
+    )
+  )
 })
 
 Then('I should not see {string} in the history output', (expected: string) => {
   cy.get<string>('@doughnutOutput').then((output) =>
-    assertSectionNotIncludes(output, 'history-output', expected)
+    assertOutputNotIncludes(
+      getSectionContent(output, 'history-output'),
+      expected
+    )
   )
 })
 
-function getRecallDisplayContent(output: string): {
-  currentPromptAndHistory: string
-  historyOutput: string
-} {
-  const currentPrompt = getSectionContent(output, 'current-prompt')
-  const historyOutput = getSectionContent(output, 'history-output')
-  return {
-    currentPromptAndHistory: `${currentPrompt}\n${historyOutput}`,
-    historyOutput,
-  }
-}
+// --- Recall session assertions ---
 
 Then('the recall session was stopped', () => {
   cy.get<string>('@doughnutOutput').then((output) => {
     const { currentPromptAndHistory, historyOutput } =
-      getRecallDisplayContent(output)
+      getRecallDisplaySections(output)
     expect(currentPromptAndHistory).to.include(
       'What is the meaning of sedition?'
     )
@@ -413,12 +285,14 @@ Then('the recall session was stopped', () => {
 Then('I stopped the recall during review', () => {
   cy.get<string>('@doughnutOutput').then((output) => {
     const { currentPromptAndHistory, historyOutput } =
-      getRecallDisplayContent(output)
+      getRecallDisplaySections(output)
     expect(currentPromptAndHistory).to.include('sedition')
     expect(currentPromptAndHistory).to.include('Yes, I remember?')
     expect(historyOutput).to.include('Stopped recall')
   })
 })
+
+// --- Access token assertions ---
 
 Then(
   'I should see the {word} remove success message for {string}',
@@ -428,10 +302,16 @@ Then(
         ? `Token "${label}" removed.`
         : 'removed locally and from server'
     cy.get<string>('@doughnutOutput').then((output) =>
-      assertSectionIncludes(output, 'history-output', expected)
+      assertOutputIncludes(
+        getSectionContent(output, 'history-output'),
+        expected,
+        'history output'
+      )
     )
   }
 )
+
+// --- Gmail / Google API setup ---
 
 Given(
   'the Google API mock returns tokens and profile for {string}',
@@ -456,6 +336,8 @@ Given(
     )
   }
 )
+
+// --- Gmail commands ---
 
 When('I run the CLI add gmail command with simulated OAuth callback', () => {
   cy.task('runCliDirectWithGmailAdd', {

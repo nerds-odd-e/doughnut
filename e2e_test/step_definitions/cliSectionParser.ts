@@ -132,3 +132,15 @@ export function getLastCommandOutput(output: string): string {
   if (current.length > 0) blocks.push(current.join('\n'))
   return blocks.length > 0 ? blocks[blocks.length - 1]! : ''
 }
+
+export function getRecallDisplaySections(output: string): {
+  currentPromptAndHistory: string
+  historyOutput: string
+} {
+  const currentPrompt = getSectionContent(output, 'current-prompt')
+  const historyOutput = getSectionContent(output, 'history-output')
+  return {
+    currentPromptAndHistory: `${currentPrompt}\n${historyOutput}`,
+    historyOutput,
+  }
+}
