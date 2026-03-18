@@ -103,7 +103,7 @@ When('I input {string} in the interactive CLI', (input: string) => {
 })
 
 When(
-  'I answer {string} in the interactive CLI to {string}',
+  'I answer {string} in the interactive CLI to prompt {string}',
   (input: string, to: string) => {
     cy.get<string>('@doughnutOutput').then((output) =>
       assertExpectedInCurrentPrompt(output, to, true)
@@ -326,30 +326,33 @@ function assertExpectedInCurrentPrompt(
   ).to.include(expected)
 }
 
-Then('I should see {string} in the status', (expected: string) => {
+Then('I should see {string} in the current prompt', (expected: string) => {
   cy.get<string>('@doughnutOutput').then((output) =>
     assertExpectedInCurrentPrompt(output, expected)
   )
 })
 
-Then('I should see {string} styled in the status', (expected: string) => {
-  cy.get<string>('@doughnutOutput').then((output) => {
-    const rawCurrentPrompt = getSectionContentRaw(output, 'current-prompt')
-    const fallbackRaw = getSectionContentRaw(output, 'history-output')
-    const rawContent = `${rawCurrentPrompt}\n${fallbackRaw}`.trim()
-    expect(
-      rawContent,
-      `Expected "${expected}" in raw current prompt`
-    ).to.include(expected)
-    // Markdown is rendered via markdansi: bold=\x1b[1m, italic=\x1b[3m
-    const hasBold = rawContent.includes('\x1b[1m')
-    const hasItalic = rawContent.includes('\x1b[3m')
-    expect(
-      hasBold || hasItalic,
-      `Expected ANSI styling (bold or italic) in current prompt. Raw length: ${rawContent.length}`
-    ).to.be.true
-  })
-})
+Then(
+  'I should see {string} styled in the current prompt',
+  (expected: string) => {
+    cy.get<string>('@doughnutOutput').then((output) => {
+      const rawCurrentPrompt = getSectionContentRaw(output, 'current-prompt')
+      const fallbackRaw = getSectionContentRaw(output, 'history-output')
+      const rawContent = `${rawCurrentPrompt}\n${fallbackRaw}`.trim()
+      expect(
+        rawContent,
+        `Expected "${expected}" in raw current prompt`
+      ).to.include(expected)
+      // Markdown is rendered via markdansi: bold=\x1b[1m, italic=\x1b[3m
+      const hasBold = rawContent.includes('\x1b[1m')
+      const hasItalic = rawContent.includes('\x1b[3m')
+      expect(
+        hasBold || hasItalic,
+        `Expected ANSI styling (bold or italic) in current prompt. Raw length: ${rawContent.length}`
+      ).to.be.true
+    })
+  }
+)
 
 Then('I should see {string} in the last command output', (expected: string) => {
   cy.get<string>('@doughnutOutput').then((output) => {

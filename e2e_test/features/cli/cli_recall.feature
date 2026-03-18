@@ -31,10 +31,10 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedation"
     And It's day 2
     When I input "/recall" in the interactive CLI
-    Then I should see "sedation" in the status
-    And I should see "Put to sleep is sedation" in the status
-    And I should see "Put" styled in the status
-    And I should see "Yes, I remember?" in the status
+    Then I should see "sedation" in the current prompt
+    And I should see "Put to sleep is sedation" in the current prompt
+    And I should see "Put" styled in the current prompt
+    And I should see "Yes, I remember?" in the current prompt
     When I input "y" in the interactive CLI
     Then I should see "Recalled successfully" in the history output
 
@@ -51,14 +51,14 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedation"
     And It's day 2
     When I input "/recall" in the interactive CLI
-    Then I should see "sedition" in the status
-    When I answer "y" in the interactive CLI to "Yes, I remember?"
-    And I answer "y" in the interactive CLI to "Yes, I remember?"
-    And I answer "n" in the interactive CLI to "Load more from next 3 days?"
+    Then I should see "sedition" in the current prompt
+    When I answer "y" in the interactive CLI to prompt "Yes, I remember?"
+    And I answer "y" in the interactive CLI to prompt "Yes, I remember?"
+    And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
     Then I should see "Recalled 2 notes" in the history output
     When I input "/recall" in the interactive CLI
-    And I answer "y" in the interactive CLI to "Load more from next 3 days?"
-    When I answer "y" in the interactive CLI to "Yes, I remember?"
+    And I answer "y" in the interactive CLI to prompt "Load more from next 3 days?"
+    When I answer "y" in the interactive CLI to prompt "Yes, I remember?"
     Then I should see "Recalled successfully" in the history output
 
   @usingMockedOpenAiService
@@ -76,8 +76,8 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedition"
     And It's day 2
     When I input "/recall" in the interactive CLI
-    Then I should see "What is the meaning of sedition?" in the status
-    And I should see "to incite violence" in the status
+    Then I should see "What is the meaning of sedition?" in the current prompt
+    And I should see "to incite violence" in the current prompt
     When I input "1" in the interactive CLI
     Then I should see "Correct!" in the history output
     And I should see "Recalled successfully" in the history output
@@ -97,7 +97,7 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedition"
     And It's day 2
     When I input "/recall" in the interactive CLI
-    Then I should see "What is the meaning of sedition?" in the status
+    Then I should see "What is the meaning of sedition?" in the current prompt
     When I input "/stop" in the interactive CLI
     Then the recall session was stopped
     When I input "/recall-status" in the interactive CLI
@@ -134,8 +134,8 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedation"
     And It's day 2
     When I input "/recall" in the interactive CLI
-    Then I should see "sedition" in the status
-    And I should see "Yes, I remember?" in the status
+    Then I should see "sedition" in the current prompt
+    And I should see "Yes, I remember?" in the current prompt
     When I input "/stop" in the interactive CLI
     Then I stopped the recall during review
 
@@ -158,9 +158,9 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedition"
     And It's day 2
     When I input "/recall" in the interactive CLI
-    Then I should see "What is the meaning of sedition?" in the status
+    Then I should see "What is the meaning of sedition?" in the current prompt
     When I input "/contest" in the interactive CLI
-    Then I should see "What is the meaning of sedition?" in the status
+    Then I should see "What is the meaning of sedition?" in the current prompt
     When I input "1" in the interactive CLI
     Then I should see "Correct!" in the history output
     And I should see "Recalled successfully" in the history output
@@ -177,9 +177,9 @@ Feature: CLI recall status and recall session
     And I assimilate the note "sedition" with the option of remembering spelling
     And It's day 2
     When I input "/recall" in the interactive CLI
-    Then I should see "Yes, I remember?" in the status
+    Then I should see "Yes, I remember?" in the current prompt
     When I input "y" in the interactive CLI
-    Then I should see "Spell:" in the status
+    Then I should see "Spell:" in the current prompt
     When I input "sedition" in the interactive CLI
     Then I should see "Correct!" in the history output
     And I should see "Recalled successfully" in the history output

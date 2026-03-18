@@ -40,12 +40,10 @@ Rename "status" / "status line" to **Current Prompt**. Change identification fro
 2. Section type: `'status'` → `'current-prompt'`
 3. **cli.ts**: `assertExpectedInStatus` → `assertExpectedInCurrentPrompt`; use `'current-prompt'`
 
-## Phase 3: Rename E2E steps and feature language
+## Phase 3: Rename E2E steps and feature language ✅
 
-1. **cli.ts**: `assertExpectedInStatus` → `assertExpectedInCurrentPrompt`; `getSectionContent(output, 'status')` → `getSectionContent(output, 'current-prompt')`
-2. Steps: "in the status" → "in the current prompt", "styled in the status" → "styled in the current prompt"
-3. **cli_recall.feature**: "in the status" → "in the current prompt"
-4. `getLastCommandOutput` and steps that rely on boundaries
+1. **cli.ts**: Step patterns "in the status" → "in the current prompt", "styled in the status" → "styled in the current prompt"
+2. **cli_recall.feature**: "in the status" → "in the current prompt", "styled in the status" → "styled in the current prompt"
 
 ## Phase 4: Verify and fix failures
 
