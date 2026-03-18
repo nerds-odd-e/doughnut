@@ -10,6 +10,7 @@ export interface CommandDoc {
   usage: string
   description: string
   category: 'subcommand' | 'interactive'
+  interactiveOnly?: boolean
 }
 
 const exitDoc = {
@@ -25,7 +26,7 @@ const helpDocEntry = {
   description: 'List available commands',
   category: 'subcommand' as const,
 }
-export const interactiveDocs = [
+export const interactiveDocs: CommandDoc[] = [
   {
     name: '/help',
     usage: '/help',
@@ -121,6 +122,14 @@ function formatSection(title: string, docs: readonly CommandDoc[]): string {
     return `  ${padded}${d.description}`
   })
   return `${title}:\n${lines.join('\n')}`
+}
+
+const interactiveOnlyUsages = new Set(
+  interactiveDocs.filter((c) => c.interactiveOnly).map((c) => c.usage)
+)
+
+export function isInteractiveOnlyCommand(cmd: string): boolean {
+  return interactiveOnlyUsages.has(cmd.trim())
 }
 
 export function formatHelp(): string {

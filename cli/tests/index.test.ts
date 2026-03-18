@@ -66,6 +66,15 @@ describe('run with -c option', () => {
     expect(exitSpy).toHaveBeenCalledWith(0)
   })
 
+  test('-c "/recall" rejects with message and exits 1 (interactive-only command)', async () => {
+    run(['-c', '/recall'])
+    await new Promise((r) => setImmediate(r))
+    expect(errorSpy).toHaveBeenCalledWith(
+      'This command requires interactive mode. Run `doughnut` without -c.'
+    )
+    expect(exitSpy).toHaveBeenCalledWith(1)
+  })
+
   test('-c with no value prints error and exits 1', async () => {
     run(['-c'])
     await new Promise((r) => setImmediate(r))

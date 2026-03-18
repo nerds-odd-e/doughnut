@@ -2,7 +2,7 @@ import { processInput } from './interactive.js'
 import { runInteractive } from './interactive.js'
 import { runUpdate } from './update.js'
 import { formatVersionOutput } from './version.js'
-import { formatHelp } from './help.js'
+import { formatHelp, isInteractiveOnlyCommand } from './help.js'
 
 export async function run(args: string[]): Promise<void> {
   const cIdx = args.findIndex((a) => a === '-c' || a.startsWith('-c='))
@@ -11,6 +11,14 @@ export async function run(args: string[]): Promise<void> {
     const value = arg.startsWith('-c=') ? arg.slice(3) : args[cIdx + 1]
     if (value === undefined) {
       console.error('doughnut: -c requires an argument')
+      process.exit(1)
+      return
+    }
+    const trimmed = value.trim()
+    if (isInteractiveOnlyCommand(trimmed)) {
+      console.error(
+        'This command requires interactive mode. Run `doughnut` without -c.'
+      )
       process.exit(1)
       return
     }

@@ -220,5 +220,6 @@ export const recallCommandDocs = [
     usage: '/recall',
     description: 'Recall all due notes in a session',
     category: 'interactive' as const,
+    interactiveOnly: true,
   },
 ]
