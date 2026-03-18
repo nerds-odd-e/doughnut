@@ -101,7 +101,7 @@ When('I run the installed doughnut version command', () => {
   })
 })
 
-// --- CLI execution: piped input (non-interactive) ---
+// --- Non-interactive CLI execution ---
 
 When('I run the doughnut command with input {string}', (input: string) => {
   const trimmed = input.trim()
@@ -148,8 +148,6 @@ When(
   }
 )
 
-// --- CLI execution: -c, version, update ---
-
 When('I run the doughnut command with -c {string}', (input: string) => {
   runCliWithConfig(['-c', input])
 })
@@ -177,37 +175,23 @@ When(
 
 // --- Access token commands ---
 
-When('I run the doughnut CLI add-access-token with the saved token', () => {
+When('I run doughnut -c {string} with the saved token', (command: string) => {
   cy.get<string>('@savedAccessToken').then((token) => {
-    runCliWithConfig(['-c', `/add-access-token ${token}`])
+    runCliWithConfig(['-c', `${command} ${token}`])
   })
 })
 
 When(
-  'I run the doughnut CLI add-access-token with token {string}',
-  (token: string) => {
-    runCliWithConfig(['-c', `/add-access-token ${token}`])
+  'I run doughnut -c {string} with token {string}',
+  (command: string, token: string) => {
+    runCliWithConfig(['-c', `${command} ${token}`])
   }
 )
 
 When(
-  'I run the doughnut CLI remove-access-token with label {string}',
-  (label: string) => {
-    runCliWithConfig(['-c', `/remove-access-token ${label}`])
-  }
-)
-
-When(
-  'I run the doughnut CLI create-access-token with label {string}',
-  (label: string) => {
-    runCliWithConfig(['-c', `/create-access-token ${label}`])
-  }
-)
-
-When(
-  'I run the doughnut CLI remove-access-token-completely with label {string}',
-  (label: string) => {
-    runCliWithConfig(['-c', `/remove-access-token-completely ${label}`])
+  'I run doughnut -c {string} with label {string}',
+  (command: string, label: string) => {
+    runCliWithConfig(['-c', `${command} ${label}`])
   }
 )
 
@@ -219,26 +203,32 @@ Then(
         ? `Token "${label}" removed.`
         : 'removed locally and from server'
     cy.get<string>('@doughnutOutput').then((output) =>
-      assertOutputIncludes(output, expected, 'command output')
+      assertOutputIncludes(output, expected, 'non-interactive output')
     )
   }
 )
 
 // --- Output assertions ---
-// Command output: non-interactive (-c, piped, installed). Entire stdout, no section parsing.
+// Non-interactive output: entire stdout when running non-interactively (-c, piped, installed).
 // History output, History input, Current guidance: interactive only. Parsed ANSI sections.
 
-Then('I should see {string} in the command output', (expected: string) => {
-  cy.get<string>('@doughnutOutput').then((output) =>
-    assertOutputIncludes(output, expected, 'command output')
-  )
-})
+Then(
+  'I should see {string} in the non-interactive output',
+  (expected: string) => {
+    cy.get<string>('@doughnutOutput').then((output) =>
+      assertOutputIncludes(output, expected, 'non-interactive output')
+    )
+  }
+)
 
-Then('I should not see {string} in the command output', (expected: string) => {
-  cy.get<string>('@doughnutOutput').then((output) =>
-    assertOutputNotIncludes(output, expected)
-  )
-})
+Then(
+  'I should not see {string} in the non-interactive output',
+  (expected: string) => {
+    cy.get<string>('@doughnutOutput').then((output) =>
+      assertOutputNotIncludes(output, expected)
+    )
+  }
+)
 
 Then('I should see {string} in the history output', (expected: string) => {
   cy.get<string>('@doughnutOutput').then((output) =>

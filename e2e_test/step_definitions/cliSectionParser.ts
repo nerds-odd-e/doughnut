@@ -1,11 +1,13 @@
 /**
  * Parses CLI stdout into domain sections for E2E assertions.
  *
- * Domain sections:
+ * Non-interactive output: entire stdout when running non-interactively, no parsing.
+ *
+ * Interactive-only sections:
  * - History input: Past user input lines
  * - History output: Past command results
- * - Current guidance: Prompts, hints, options for the current input (spans two regions:
- *   above the input box [recall, MCQ, y/n] and below it [/ commands, token list])
+ * - Current guidance: Prompts, hints, options for the current input (above input box:
+ *   recall, MCQ, y/n; below: / commands, token list)
  */
 
 // --- ANSI stripping ---
