@@ -1,5 +1,5 @@
-import type { Preview } from "@storybook/vue3"
-import { setup } from "@storybook/vue3"
+import type { Preview } from "@storybook/vue3-vite"
+import { setup } from "@storybook/vue3-vite"
 import { createRouter, createWebHistory } from "vue-router"
 import type { RouteRecordRaw } from "vue-router"
 import { routeMetadata } from "../src/routes/routeMetadata"

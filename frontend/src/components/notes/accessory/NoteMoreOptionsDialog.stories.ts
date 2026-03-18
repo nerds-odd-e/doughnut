@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/vue3"
+import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import NoteMoreOptionsDialog from "./NoteMoreOptionsDialog.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"

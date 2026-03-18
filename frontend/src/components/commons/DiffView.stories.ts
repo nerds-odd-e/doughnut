@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/vue3"
+import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import DiffView from "./DiffView.vue"
 
 const meta = {

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/vue3"
+import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import type { RecallPrompt } from "@generated/doughnut-backend-api"

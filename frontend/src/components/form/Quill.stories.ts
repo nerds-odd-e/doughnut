@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/vue3"
+import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import QuillStoryWrapper from "./QuillStoryWrapper.vue"
 import type { QuillOptions } from "quill"
 

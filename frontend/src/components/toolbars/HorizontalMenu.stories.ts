@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/vue3"
+import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import HorizontalMenu from "./HorizontalMenu.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import SvgNote from "@/components/svgs/SvgNote.vue"

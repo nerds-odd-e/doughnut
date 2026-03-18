@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/vue3"
+import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import NotebooksPageView from "./NotebooksPageView.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import type { Subscription, User } from "@generated/doughnut-backend-api"

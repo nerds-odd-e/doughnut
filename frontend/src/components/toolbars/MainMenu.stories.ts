@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/vue3"
+import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import MainMenu from "./MainMenu.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import { UserController } from "@generated/doughnut-backend-api/sdk.gen"

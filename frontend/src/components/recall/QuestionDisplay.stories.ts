@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/vue3"
+import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import QuestionDisplay from "./QuestionDisplay.vue"
 import makeMe from "@tests/fixtures/makeMe"
 
