@@ -160,7 +160,7 @@ The goal: scenarios that need interactive mode should run a **single live CLI pr
 
 **Work**:
 
-1. **Remove dead step definitions**: Remove all old `I run the doughnut command in interactive mode...` / `I run a recall session...` / `I run the remove-access-token...` step defs that were kept for redundancy. All scenarios now use `I input ... in the interactive CLI`.
+1. **Remove dead step definitions**: ✅ Done (Phase 4 follow-up). Removed 8 old step defs; all scenarios use `I input ... in the interactive CLI`.
 2. Run full CLI E2E: `pnpm cypress run --spec "e2e_test/features/cli/*.feature"`.
 3. Update `.cursor/rules/cli.mdc` or `CLAUDE.md` if they document the E2E approach.
 4. Remove any other dead code (e.g. helpers that only served old flow).
@@ -185,7 +185,8 @@ The goal: scenarios that need interactive mode should run a **single live CLI pr
 | 2 ✅ | `cli.ts`, `cli_recall.feature` | Add down-arrow step; migrate 4 remaining scenarios (Recall spelling, /stop, contest, down-arrow); split inputs into separate When steps |
 | 3 ✅ | `cli_recall.feature` | Migrate 2 multi-step scenarios (ESC cancels, complete all due); split composite inputs into separate When steps with Then verification in between |
 | 4 ✅ | `cli.ts`, `cli_access_token.feature`, `common.ts`, `cliPtyRunner.ts` | Split remove-access-token + ESC + list into separate steps; migrate 1 scenario; remove `runCliDirectWithInputAndPty` |
-| 5 | `cli.ts`, docs | **Remove dead code**: all old `I run the doughnut command...` step defs; verification and doc updates |
+| 4 follow-up ✅ | `cli.ts`, `cliSectionParser.ts` | Remove 8 dead step defs; consolidate assertions (`assertOutputIncludes`); move `getRecallDisplaySections` to parser; group steps by domain |
+| 5 | `cli.ts`, docs | Verification and doc updates |
 
 ## Phase 1 Implementation Notes
 
