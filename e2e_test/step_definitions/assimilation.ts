@@ -56,7 +56,7 @@ When('I am assimilating the note {string}', (noteTitle: string) => {
   start.jumpToNotePage(noteTitle).moreOptions().openAssimilationPage()
 })
 
-Then('I assimilate the note {string}', (noteTitle: string) => {
+Then('I assimilate the note {string} via more options', (noteTitle: string) => {
   start.jumpToNotePage(noteTitle).moreOptions().assimilateNote()
 })
 

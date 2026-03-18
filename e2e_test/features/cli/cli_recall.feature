@@ -45,7 +45,7 @@ Feature: CLI recall status and recall session
       | sedition | Sedition means incite violence | English      |
       | sedation | Put to sleep is sedation       | English      |
     And I assimilate the note "sedition" on day 1
-    And I assimilate the note "sedation"
+    And I assimilate the note "sedation" on day 1
     And It's day 2
     When I input "/recall" in the interactive CLI
     Then I should see "sedition" in the Current guidance
@@ -124,7 +124,7 @@ Feature: CLI recall status and recall session
       | sedition | Sedition means incite violence | English      |
       | sedation | Put to sleep is sedation       | English      |
     And I assimilate the note "sedition" on day 1
-    And I assimilate the note "sedation"
+    And I assimilate the note "sedation" on day 1
     And It's day 2
     When I input "/recall" in the interactive CLI
     Then I should see "sedition" in the Current guidance
