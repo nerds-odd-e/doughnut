@@ -12,10 +12,10 @@ Feature: Recall Quiz
 
   @usingMockedOpenAiService
   Scenario: AI generated question - incorrect answer
-    Given It's day 1, 8 hour
     Given OpenAI generates this question:
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
+    And It's day 1
     And I assimilate the note "sedition"
     When I am recalling my note on day 2
     Then I should be asked "What is the meaning of sedition?"
@@ -24,10 +24,10 @@ Feature: Recall Quiz
 
   @usingMockedOpenAiService
   Scenario: AI generated question - correct answer
-    Given It's day 1, 8 hour
     Given OpenAI generates this question:
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
+    And It's day 1
     And I assimilate the note "sedition"
     When I am recalling my note on day 2
     Then I should be asked "What is the meaning of sedition?"

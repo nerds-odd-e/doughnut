@@ -6,7 +6,7 @@ Feature: Spaced-repetition
         Given I am logged in as an existing user
         And my daily new notes to assimilate is set to 1
         And my space setting is "1, 2, 4, 8"
-        Given there are notes from Note 1 to Note 3
+        And there are notes from Note 1 to Note 3
 
     @mockBrowserTime
     Scenario: The assimilation and recall page

@@ -17,7 +17,8 @@ Feature: Browse answers and notes while recalling
     And I assimilate the note "sedition" with the option of remembering spelling
 
   Scenario: View last answered question when the quiz answer was correct
-    Given I assimilate the note "sedation"
+    Given It's day 1
+    And I assimilate the note "sedation"
     When I am recalling my note on day 2
     And I skip one question
     And I type my answer "sedition"

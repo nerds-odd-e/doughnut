@@ -38,7 +38,7 @@ Feature: Assimilate With Remembering Spelling
     Given there are some notes:
       | Title   | Details           | Parent Title |
       | Relearn | Non-empty details | English      |
-    And I assimilate the note "Relearn"
+    And I assimilated one note "Relearn" on day 1
     And I add remember spelling to the note "Relearn"
     When I navigate to the assimilation page
     Then I should see 1 due for assimilation
