@@ -33,6 +33,7 @@ import {
   buildBoxLines,
   buildCurrentPromptSeparator,
   buildSuggestionLines,
+  getLastLine,
   formatMcqChoiceLines,
   getTerminalWidth,
   renderBox,
@@ -43,7 +44,6 @@ import {
   CLEAR_SCREEN,
   COMMANDS_HINT,
   RECALLING_INDICATOR,
-  PLACEHOLDER,
   PROMPT,
 } from './renderer.js'
 import type { OutputAdapter } from './types.js'
@@ -538,6 +538,7 @@ function buildTTYDeps() {
     buildBoxLines,
     buildCurrentPromptSeparator,
     buildSuggestionLines,
+    getLastLine,
     formatMcqChoiceLines,
     getTerminalWidth,
     renderBox,
@@ -547,7 +548,6 @@ function buildTTYDeps() {
     CLEAR_SCREEN,
     COMMANDS_HINT,
     RECALLING_INDICATOR,
-    PLACEHOLDER,
     PROMPT,
     filterCommandsByPrefix,
     getTabCompletion,

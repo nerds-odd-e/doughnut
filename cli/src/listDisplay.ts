@@ -1,6 +1,4 @@
-const GREY = '\x1b[90m'
-const REVERSE = '\x1b[7m'
-const RESET = '\x1b[0m'
+import { GREY, RESET, REVERSE } from './ansi.js'
 
 export function formatHighlightedList(
   lines: string[],

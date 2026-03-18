@@ -1,16 +1,16 @@
-import { renderMarkdownToTerminal } from './markdown.js'
+import { GREY, RESET } from './ansi.js'
 import {
   filterCommandsByPrefix,
   formatCommandSuggestionsWithHighlight,
   interactiveDocs,
 } from './help.js'
-import { formatVersionOutput } from './version.js'
+import { renderMarkdownToTerminal } from './markdown.js'
 import type { ChatHistory } from './types.js'
+import { formatVersionOutput } from './version.js'
 
-export const GREY = '\x1b[90m'
+export { GREY, RESET }
 export const GREEN = '\x1b[32m'
 export const GREY_BG = '\x1b[48;5;236m'
-export const RESET = '\x1b[0m'
 
 export function buildCurrentPromptSeparator(width: number): string {
   return `${GREEN}${'─'.repeat(width)}${RESET}`
@@ -94,7 +94,8 @@ export function formatMcqChoiceLines(choices: string[]): string[] {
   return choices.map((c, i) => `  ${i + 1}. ${renderMarkdownToTerminal(c)}`)
 }
 
-function getLastLine(buffer: string): string {
+/** Last line of buffer (for slash-command prefix detection). */
+export function getLastLine(buffer: string): string {
   const lines = buffer.split('\n')
   return lines[lines.length - 1] ?? ''
 }

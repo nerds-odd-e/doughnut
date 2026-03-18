@@ -22,6 +22,7 @@ export interface TTYDeps {
   removeAccessTokenCompletely: (label: string) => Promise<void>
   setDefaultTokenLabel: (label: string) => void
   formatVersionOutput: () => string
+  getLastLine: (buffer: string) => string
   buildBoxLines: (buffer: string, width: number) => string[]
   buildSuggestionLines: (buffer: string, highlightIndex: number) => string[]
   formatMcqChoiceLines: (choices: string[]) => string[]
@@ -40,7 +41,6 @@ export interface TTYDeps {
   CLEAR_SCREEN: string
   COMMANDS_HINT: string
   RECALLING_INDICATOR: string
-  PLACEHOLDER: string
   PROMPT: string
   filterCommandsByPrefix: (
     commands: readonly CommandDoc[],
@@ -82,11 +82,6 @@ function clearTTYDisplay(
   }
 }
 
-function getLastLine(buffer: string): string {
-  const lines = buffer.split('\n')
-  return lines[lines.length - 1] ?? ''
-}
-
 function isSubmitKey(keyName: string): boolean {
   return keyName === 'return' || keyName === 'enter'
 }
@@ -114,6 +109,7 @@ export async function runTTY(
     removeAccessTokenCompletely,
     setDefaultTokenLabel,
     formatVersionOutput,
+    getLastLine,
     buildBoxLines,
     buildSuggestionLines,
     formatMcqChoiceLines,
@@ -514,7 +510,6 @@ export async function runTTY(
           buffer += '\n'
           drawBox()
         } else {
-          const lastLine = getLastLine(buffer)
           const trimmedInput = buffer.trim()
 
           if (trimmedInput === '/clear') {
@@ -533,13 +528,11 @@ export async function runTTY(
             return
           }
 
-          const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
-          const suggestionsVisible =
-            lastLine.startsWith('/') &&
-            !lastLine.endsWith(' ') &&
-            filtered.length > 0
-
-          if (suggestionsVisible) {
+          if (isCommandPrefixWithSuggestions(buffer)) {
+            const filtered = filterCommandsByPrefix(
+              interactiveDocs,
+              getLastLine(buffer)
+            )
             const selectedCommand = `${filtered[highlightIndex].usage} `
             const bufferLines = buffer.split('\n')
             buffer =
