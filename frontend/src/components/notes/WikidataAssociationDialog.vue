@@ -93,7 +93,7 @@
           type="submit"
           form="wikidata-association-form"
           class="daisy-btn daisy-btn-primary"
-          :disabled="!hasValidWikidataId || props.disabled"
+          :disabled="!canSave || props.disabled"
         >
           Save
         </button>
@@ -126,6 +126,7 @@ const props = defineProps<{
   errorMessage?: string
   showSaveButton?: boolean
   disabled?: boolean
+  canSaveEmptyToClear?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -153,6 +154,12 @@ const isLoadingUrl = ref(false)
 
 const hasValidWikidataId = computed(
   () => localWikidataId.value && localWikidataId.value.trim() !== ""
+)
+
+const canSave = computed(
+  () =>
+    hasValidWikidataId.value ||
+    (!!props.canSaveEmptyToClear && localWikidataId.value.trim() === "")
 )
 
 const fetchSearchResults = async () => {
@@ -300,7 +307,7 @@ const handleClose = () => {
 }
 
 const handleSave = async () => {
-  if (!hasValidWikidataId.value) return
+  if (!canSave.value) return
 
   if (hasSaveButton.value) {
     // If title options are shown and action is selected, emit selected
@@ -308,8 +315,8 @@ const handleSave = async () => {
       const action = getTitleAction()
       emit("selected", selectedItem.value, action)
     } else {
-      // Otherwise, just save the wikidata ID (no title update)
-      emit("save", localWikidataId.value)
+      // Otherwise, just save the wikidata ID (or empty to clear)
+      emit("save", localWikidataId.value.trim())
     }
   }
   // If hasSaveButton is false, form submission does nothing (just prevents default)

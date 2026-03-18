@@ -5,6 +5,7 @@
     :model-value="localWikidataId"
     :error-message="wikidataIdError"
     :show-save-button="true"
+    :can-save-empty-to-clear="!!note.wikidataId"
     :disabled="isProcessing"
     @close="handleClose"
     @save="handleSave"
@@ -153,6 +154,10 @@ const handleSelectedForEdit = async (
 }
 
 const handleSave = async (wikidataId: string) => {
+  if (wikidataId.trim() === "") {
+    await saveWikidataId("")
+    return
+  }
   // Check if title options are currently shown (user already saw the conflict)
   // If so, save directly without re-validation
   if (dialogRef.value && showTitleOptionsInDialog.value) {

@@ -449,6 +449,18 @@ class NoteControllerTests extends ControllerTestBase {
       assertThat(
           bindException.getMessage(), stringContainsInOrder("Duplicate Wikidata ID Detected."));
     }
+
+    @Test
+    void shouldClearWikidataIdWhenEmptyStringProvided()
+        throws BindException, UnexpectedNoAccessRightException, IOException, InterruptedException {
+      note = makeMe.aNote().under(parent).wikidataId("Q123").please();
+
+      WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
+      wikidataAssociationCreation.wikidataId = "";
+      controller.updateWikidataId(note, wikidataAssociationCreation);
+      Note sameNote = noteRepository.findById(note.getId()).get();
+      assertThat(sameNote.getWikidataId(), equalTo(null));
+    }
   }
 
   @Nested

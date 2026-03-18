@@ -449,5 +449,33 @@ describe("WikidataAssociationForNoteDialog", () => {
       // Verify dialog is closed
       expect(wrapper.emitted("closeDialog")).toBeTruthy()
     })
+
+    it("saves empty wikidata ID to clear when note had wikidata ID", async () => {
+      const note = makeMe.aNote.title("dog").wikidataId("Q123").please()
+      updateWikidataIdSpy.mockResolvedValue(
+        wrapSdkResponse(makeMe.aNoteRealm.please())
+      )
+
+      const wrapper = mountDialog(note)
+      await flushPromises()
+
+      const input = getInput()
+      expect(input?.value).toBe("Q123")
+      input.value = ""
+      input.dispatchEvent(new Event("input", { bubbles: true }))
+      await flushPromises()
+
+      const saveButton = getSaveButton()
+      expect(saveButton).toBeTruthy()
+      expect(saveButton.disabled).toBe(false)
+      saveButton.click()
+      await flushPromises()
+
+      expect(updateWikidataIdSpy).toHaveBeenCalledWith({
+        path: { note: note.id },
+        body: { wikidataId: "" },
+      })
+      expect(wrapper.emitted("closeDialog")).toBeTruthy()
+    })
   })
 })
