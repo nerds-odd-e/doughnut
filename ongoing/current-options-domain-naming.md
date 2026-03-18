@@ -1,5 +1,7 @@
 # Plan: Current Guidance Domain Naming
 
+**Status**: Phases 1–4 ✅ complete. Phases 5–6 pending.
+
 ## Context
 
 The CLI interactive UI has an area below the input box that displays hints, help, or selection options for the current input (e.g. `/ commands`, command suggestions, access token list, recall questions, MCQ choices, y/n confirmation). This area currently lacks a consistent domain name across product code, E2E tests, and documentation.
@@ -27,85 +29,65 @@ The CLI interactive UI has an area below the input box that displays hints, help
 
 ## Phased Plan
 
-### Phase 1: E2E section parser – add Current guidance
+### Phase 1: E2E section parser – add Current guidance ✅
 
 **Goal**: Define and extract "Current guidance" in the E2E parser.
 
-**Work**:
+**Done**:
 
 1. In `cliSectionParser.ts`:
-   - Add section type `'current-guidance'`.
-   - Define Current guidance as all content after the last line of the input box (the line containing `└`).
-   - Add `findLastInputBoxEnd(lines)` – scan from last `┌` to find the matching `└` line.
-   - Add `getSectionContent(output, 'current-guidance')` that returns lines after the input box.
-   - Update module comment: document `current-guidance` alongside existing sections.
+   - Added section type `'current-guidance'`.
+   - Current guidance = all content after the last line of the input box (the line containing `└`).
+   - Added `findLastInputBoxEnd(lines)` – scan from last `┌` to find the matching `└` line.
+   - `getSectionContent(output, 'current-guidance')` returns lines after the input box.
+   - Module comment documents domain sections.
 
-2. Handle edge case: when no input box exists (e.g. piped non-interactive), Current guidance is empty.
+2. Edge case: when no input box exists (piped non-interactive), Current guidance is empty.
 
-**Verification**: Existing E2E tests continue to pass (no behavior change yet).
+3. Added `getCurrentGuidanceDebug(output)` for educational failure messages (parser state, raw tail).
 
 ---
 
-### Phase 2: Step definition – "Current guidance"
+### Phase 2: Step definition – "Current guidance" ✅
 
 **Goal**: Add a step that asserts on Current guidance and deprecate the generic "CLI output" step for interactive scenarios.
 
-**Work**:
+**Done**:
 
 1. In `cli.ts`:
-   - Add `Then('I should see {string} in the Current guidance', ...)` that uses `getSectionContent(output, 'current-guidance')`.
-   - Keep `Then('I should see {string} in the CLI output', ...)` for now (used by some scenarios) – Phase 3 will migrate.
-
-**Verification**: Add a temporary scenario or adjust an existing one to use the new step; ensure it passes.
+   - Added `Then('I should see {string} in the Current guidance', ...)` using `getSectionContent(output, 'current-guidance')`.
+   - Educational failure message via `buildCurrentGuidanceFailureMessage()` – parser state, Current guidance content, raw tail.
 
 ---
 
-### Phase 3: Migrate feature files – replace "CLI output" with "Current guidance"
+### Phase 3: Migrate feature files – replace "CLI output" with "Current guidance" ✅
 
 **Goal**: Use domain language in all interactive scenarios.
 
-**Work**:
+**Done**:
 
-1. Replace in feature files:
-   - `I should see "X" in the CLI output` → `I should see "X" in the Current guidance` (only when X is in the area below the input box).
+1. Migrated `cli_access_token.feature` – ESC cancels remove-access-token selection uses Current guidance for token list and `/ commands` hint.
 
-2. Affected scenarios (from `cli_access_token.feature`):
-   - Line 39: `E2E CLI Token` (token list in Current guidance)
-   - Line 41: `/ commands` (hint in Current guidance)
-   - Line 43: `E2E CLI Token` (token list in Current guidance)
+2. Removed `Then('I should see {string} in the CLI output', ...)` – no scenarios needed "anywhere in full stdout"; all use domain sections.
 
-3. Remove `Then('I should see {string} in the CLI output', ...)` if no longer used, or retain only for edge cases that truly mean "anywhere in full output" (and document).
-
-**Verification**: `pnpm cypress run --spec "e2e_test/features/cli/*.feature"` passes.
+3. Fix for token list: "I press ESC" now sends only `\x1b` (no `\n`) to avoid accidental remove on Enter; ESC from token list clears buffer (`cliPtyRunner.ts`, `ttyAdapter.ts`).
 
 ---
 
-### Phase 4: Align "current prompt" with Current guidance
+### Phase 4: Align "current prompt" with Current guidance ✅
 
 **Goal**: Use "Current guidance" where the existing "current prompt" refers to the same area.
 
-**Analysis**: The recall scenarios use "I should see X in the current prompt" for:
-- Recall question text, MCQ choices, "Yes, I remember?", "Spell:", etc.
-- These are displayed in the area below the input box (Current guidance).
+**Done**:
 
-**Work**:
-
-1. Decide naming:
-   - Option A: Rename step to `I should see {string} in the Current guidance` and migrate all "current prompt" assertions.
-   - Option B: Keep "current prompt" as a semantic subtype when the content is explicitly a prompt (e.g. "Yes, I remember?") but ensure it still targets the same section (`current-guidance`).
-   - Recommended: **Option A** – one term, less ambiguity.
+1. Naming: Option A – one term "Current guidance" for step and feature assertions.
 
 2. In `cliSectionParser.ts`:
-   - Deprecate or alias `'current-prompt'` to use the same physical region as `'current-guidance'` if they overlap. If the parser’s `current-prompt` (between separator and box) differs from content below the box, clarify and possibly merge logic.
-   - Ensure recall content (MCQ, y/n, spelling) is included in Current guidance extraction.
+   - `getRecallDisplaySections` returns `currentGuidanceAndHistory` (current-prompt + current-guidance + history-output). Recall content is between separator and box; hints below the box.
 
-3. In feature files and step defs:
-   - Replace `I should see X in the current prompt` with `I should see X in the Current guidance` where applicable.
-   - Replace `I should see X styled in the current prompt` with `I should see X styled in the Current guidance`.
+3. In feature files and step defs: Replaced all "current prompt" with "Current guidance". `I answer X to prompt Y` asserts against Current guidance.
 
-4. Update `getRecallDisplaySections` if it depends on `current-prompt` – use `current-guidance` or equivalent.
-
-**Verification**: All CLI E2E tests pass.
+4. Single step `I should see {string} in the Current guidance` uses `getRecallDisplaySections` for the combined region.
 
 ---
 
@@ -152,19 +134,17 @@ The CLI interactive UI has an area below the input box that displays hints, help
 
 ## Summary of Changes by Phase
 
-| Phase | Files | Changes |
-|-------|-------|---------|
-| 1 | `cliSectionParser.ts` | Add `current-guidance` section, `findLastInputBoxEnd`, extract content below box |
-| 2 | `cli.ts` | Add step `I should see {string} in the Current guidance` |
-| 3 | `cli_access_token.feature`, `cli.ts` | Replace "CLI output" with "Current guidance"; remove or narrow "CLI output" step |
-| 4 | `cliSectionParser.ts`, `cli.ts`, `cli_recall.feature` | Align "current prompt" with Current guidance; migrate recall assertions |
-| 5 | `cli/src/`, `cli/tests/interactive.test.ts` | Use "Current guidance" in comments and test descriptions |
-| 6 | `.cursor/rules/cli.mdc` | Add domain terminology section and E2E guidance |
+| Phase | Status | Files | Changes |
+|-------|--------|-------|---------|
+| 1 | ✅ | `cliSectionParser.ts` | Add `current-guidance`, `findLastInputBoxEnd`, `getCurrentGuidanceDebug` |
+| 2 | ✅ | `cli.ts` | Add step `I should see {string} in the Current guidance` with educational failure message |
+| 3 | ✅ | `cli_access_token.feature`, `cli.ts`, `cliPtyRunner.ts`, `ttyAdapter.ts` | Migrate to Current guidance; remove "CLI output" step; fix ESC/Enter ordering |
+| 4 | ✅ | `cliSectionParser.ts`, `cli.ts`, `cli_recall.feature` | Align "current prompt" with Current guidance; migrate recall assertions |
+| 5 | pending | `cli/src/`, `cli/tests/interactive.test.ts` | Use "Current guidance" in comments and test descriptions |
+| 6 | pending | `.cursor/rules/cli.mdc` | Add domain terminology section and E2E guidance |
 
 ---
 
 ## Open Questions
 
-1. **Parser layout**: The current `current-prompt` extracts grey hint lines "between separator and box". The renderer places hints (suggestionLines) *below* the box. Confirm the actual stdout order in interactive mode and ensure `current-guidance` correctly captures hints, MCQ, token list, recall prompts, etc.
-
-2. **"CLI output" step**: After migration, is there any scenario that genuinely needs "anywhere in full stdout"? If not, remove the step. If yes, keep it and document when to use "CLI output" vs "Current guidance".
+1. **Parser layout**: The current `current-prompt` extracts grey hint lines "between separator and box". The renderer places hints (suggestionLines) *below* the box. `current-guidance` captures content after the input box (`└`) – verified for token list, `/ commands` hint.

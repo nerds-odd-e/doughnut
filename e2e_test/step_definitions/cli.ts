@@ -126,13 +126,14 @@ When('I press ESC in the interactive CLI', () => {
 When(
   'I answer {string} in the interactive CLI to prompt {string}',
   (answer: string, expectedPromptText: string) => {
-    cy.get<string>('@doughnutOutput').then((output) =>
+    cy.get<string>('@doughnutOutput').then((output) => {
+      const { currentGuidanceAndHistory } = getRecallDisplaySections(output)
       assertOutputIncludes(
-        getSectionContent(output, 'current-prompt'),
+        currentGuidanceAndHistory,
         expectedPromptText,
-        'current prompt'
+        'Current guidance'
       )
-    )
+    })
     cy.task<string>('sendToInteractiveCli', { input: answer }).as(
       'doughnutOutput'
     )
@@ -224,11 +225,11 @@ Then('I should see {string} in the history output', (expected: string) => {
 
 Then('I should see {string} in the Current guidance', (expected: string) => {
   cy.get<string>('@doughnutOutput').then((output) => {
-    const content = getSectionContent(output, 'current-guidance')
-    const msg = content.includes(expected)
+    const { currentGuidanceAndHistory } = getRecallDisplaySections(output)
+    const msg = currentGuidanceAndHistory.includes(expected)
       ? undefined
       : buildCurrentGuidanceFailureMessage(output, expected)
-    expect(content, msg).to.include(expected)
+    expect(currentGuidanceAndHistory, msg).to.include(expected)
   })
 })
 
@@ -242,34 +243,28 @@ Then('I should see {string} in the history input', (expected: string) => {
   )
 })
 
-Then('I should see {string} in the current prompt', (expected: string) => {
-  cy.get<string>('@doughnutOutput').then((output) => {
-    const { currentPromptAndHistory } = getRecallDisplaySections(output)
-    assertOutputIncludes(
-      currentPromptAndHistory,
-      expected,
-      'current prompt or history'
-    )
-  })
-})
-
 Then(
-  'I should see {string} styled in the current prompt',
+  'I should see {string} styled in the Current guidance',
   (expected: string) => {
     cy.get<string>('@doughnutOutput').then((output) => {
       const rawCurrentPrompt = getSectionContentRaw(output, 'current-prompt')
+      const rawCurrentGuidance = getSectionContentRaw(
+        output,
+        'current-guidance'
+      )
       const fallbackRaw = getSectionContentRaw(output, 'history-output')
-      const rawContent = `${rawCurrentPrompt}\n${fallbackRaw}`.trim()
+      const rawContent =
+        `${rawCurrentPrompt}\n${rawCurrentGuidance}\n${fallbackRaw}`.trim()
       expect(
         rawContent,
-        `Expected "${expected}" in raw current prompt`
+        `Expected "${expected}" in raw Current guidance`
       ).to.include(expected)
       // Markdown is rendered via markdansi: bold=\x1b[1m, italic=\x1b[3m
       const hasBold = rawContent.includes('\x1b[1m')
       const hasItalic = rawContent.includes('\x1b[3m')
       expect(
         hasBold || hasItalic,
-        `Expected ANSI styling (bold or italic) in current prompt. Raw length: ${rawContent.length}`
+        `Expected ANSI styling (bold or italic) in Current guidance. Raw length: ${rawContent.length}`
       ).to.be.true
     })
   }
@@ -298,9 +293,9 @@ Then('I should not see {string} in the history output', (expected: string) => {
 
 Then('the recall session was stopped', () => {
   cy.get<string>('@doughnutOutput').then((output) => {
-    const { currentPromptAndHistory, historyOutput } =
+    const { currentGuidanceAndHistory, historyOutput } =
       getRecallDisplaySections(output)
-    expect(currentPromptAndHistory).to.include(
+    expect(currentGuidanceAndHistory).to.include(
       'What is the meaning of sedition?'
     )
     expect(historyOutput).to.include('Stopped recall')
@@ -309,10 +304,10 @@ Then('the recall session was stopped', () => {
 
 Then('I stopped the recall during review', () => {
   cy.get<string>('@doughnutOutput').then((output) => {
-    const { currentPromptAndHistory, historyOutput } =
+    const { currentGuidanceAndHistory, historyOutput } =
       getRecallDisplaySections(output)
-    expect(currentPromptAndHistory).to.include('sedition')
-    expect(currentPromptAndHistory).to.include('Yes, I remember?')
+    expect(currentGuidanceAndHistory).to.include('sedition')
+    expect(currentGuidanceAndHistory).to.include('Yes, I remember?')
     expect(historyOutput).to.include('Stopped recall')
   })
 })

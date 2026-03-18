@@ -4,8 +4,8 @@
  * Domain sections:
  * - history-input: Past user input lines
  * - history-output: Past command results
- * - current-prompt: Hints between separator and input box
- * - current-guidance: Content below the input box (hints, options, MCQ, etc.)
+ * - current-prompt: Content between separator and input box (recall prompts, MCQ, y/n)
+ * - current-guidance: Content below the input box (hints like / commands)
  */
 
 // --- ANSI stripping ---
@@ -221,13 +221,16 @@ export function getLastCommandOutput(output: string): string {
 }
 
 export function getRecallDisplaySections(output: string): {
-  currentPromptAndHistory: string
+  currentGuidanceAndHistory: string
   historyOutput: string
 } {
   const currentPrompt = getSectionContent(output, 'current-prompt')
+  const currentGuidance = getSectionContent(output, 'current-guidance')
   const historyOutput = getSectionContent(output, 'history-output')
+  const currentGuidanceCombined = `${currentPrompt}\n${currentGuidance}`.trim()
   return {
-    currentPromptAndHistory: `${currentPrompt}\n${historyOutput}`,
+    currentGuidanceAndHistory:
+      `${currentGuidanceCombined}\n${historyOutput}`.trim(),
     historyOutput,
   }
 }
