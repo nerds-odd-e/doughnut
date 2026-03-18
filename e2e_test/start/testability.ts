@@ -9,7 +9,10 @@ import type { TimeTravel } from '@generated/doughnut-backend-api'
 import type { TimeTravelRelativeToNow } from '@generated/doughnut-backend-api'
 import type { SuggestedQuestionsData } from '@generated/doughnut-backend-api'
 import type { NotesTestData } from '@generated/doughnut-backend-api'
-import { TestabilityRestController } from '@generated/doughnut-backend-api/sdk.gen'
+import {
+  AssimilationController,
+  TestabilityRestController,
+} from '@generated/doughnut-backend-api/sdk.gen'
 
 const hourOfDay = (days: number, hours: number) => {
   return new Date(1976, 5, 1 + days, hours)
@@ -224,6 +227,17 @@ const testability = () => {
           ).to.have.property(noteTopology)
           return injectedNoteIdMap[noteTopology]
         })
+    },
+
+    assimilateNote(noteTitle: string) {
+      return this.getInjectedNoteIdByTitle(noteTitle).then((noteId) => {
+        return cy.wrap(
+          AssimilationController.assimilate({
+            body: { noteId, skipMemoryTracking: false },
+          }),
+          { log: false }
+        )
+      })
     },
 
     timeTravelTo(day: number, hour: number) {

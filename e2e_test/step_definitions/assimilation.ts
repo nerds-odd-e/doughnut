@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
 import start from '../start'
 
@@ -39,11 +39,11 @@ Then(
   }
 )
 
-Then(
-  'I assimilate the note {string} on day {int}',
+Given(
+  'the note {string} was assimilated on day {int}',
   (noteTitle: string, day: number) => {
     start.testability().backendTimeTravelTo(day, 8)
-    start.jumpToNotePage(noteTitle).moreOptions().assimilateNote()
+    start.testability().assimilateNote(noteTitle)
   }
 )
 
