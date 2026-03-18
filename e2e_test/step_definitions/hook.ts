@@ -4,8 +4,8 @@
 // @ts-check
 
 import { After, Before } from '@badeball/cypress-cucumber-preprocessor'
-import { backendBaseUrl } from '../support/backendUrl'
 import start, { mock_services } from '../start'
+import { cli } from '../start/pageObjects/cli'
 
 Before(() => {
   cy.task('clearTestState')
@@ -101,29 +101,19 @@ After({ tags: '@BundleFirstAndTerminateMCPServerWhenTeardown' }, () => {
   cy.task('disconnectMcpServer')
 })
 
-Before({ tags: '@bundleAndCopyCliToBackendResources' }, () => {
-  cy.task('bundleAndCopyCli')
-})
+Before({ tags: '@bundleAndCopyCliToBackendResources' }, () =>
+  cli.backend().bundleAndCopy()
+)
 
-Before({ tags: '@withCliConfig', order: 1 }, () => {
-  cy.task('createCliConfigDir').as('cliConfigDir')
-})
+Before({ tags: '@withCliConfig', order: 1 }, () =>
+  cli.setup().createConfigDir()
+)
 
-Before({ tags: '@interactiveCLI', order: 2 }, () => {
-  cy.task('stopInteractiveCli')
-  cy.get<string>('@cliConfigDir').then((configDir) =>
-    cy.task('startInteractiveCli', {
-      env: {
-        DOUGHNUT_CONFIG_DIR: configDir,
-        DOUGHNUT_API_BASE_URL: backendBaseUrl(),
-      },
-    })
-  )
-})
+Before({ tags: '@interactiveCLI', order: 2 }, () =>
+  cli.interactive().startSession()
+)
 
-After({ tags: '@interactiveCLI' }, () => {
-  cy.task('stopInteractiveCli')
-})
+After({ tags: '@interactiveCLI' }, () => cli.interactive().stopSession())
 
 Before({ tags: '@usingMockedGoogleService' }, () => {
   cy.wrap(null).then(() => mock_services.google().mock())

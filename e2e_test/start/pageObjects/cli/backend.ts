@@ -5,6 +5,9 @@ import { backendBaseUrl } from '../../../support/backendUrl'
 
 export function backend() {
   return {
+    bundleAndCopy() {
+      cy.task('bundleAndCopyCli')
+    },
     expectInstallScriptServed() {
       cy.request('GET', `${backendBaseUrl()}/install`)
         .its('status')

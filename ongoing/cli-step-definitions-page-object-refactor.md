@@ -122,13 +122,13 @@ Then('I should see {string} in the non-interactive output', (expected: string) =
 
 Done: Added `createCliConfigDirWithGmail(gmailConfig)` task. Extended `runCliDirectWithInput` with optional `simulateOAuthCallback`. `cli.gmail()` now orchestrates config creation + `runCliDirectWithInput`. Removed `runCliDirectWithGmailAdd` and `runCliDirectWithLastEmail`.
 
-### Phase 6: Full encapsulation—cy.get and cy.task in page objects
+### Phase 6: Full encapsulation—cy.get and cy.task in page objects ✅
 
-Eventually move all `cy.get` and `cy.task` calls into page objects with a fluent interface. Step definitions should only orchestrate via `cli.xxx()` and never call `cy.get` or `cy.task` directly for CLI concerns.
+1. ~~Ensure every CLI step delegates to a page object method.~~
+2. ~~Page objects own: `cy.get('@doughnutOutput')`, `cy.get('@doughnutPath')`, `cy.get('@cliConfigDir')`, and all `cy.task(...)` invocations.~~
+3. ~~Step definitions become one-liners: `When('...', () => cli.gmail().lastEmailWithPreconfiguredAccount())`.~~
 
-1. Ensure every CLI step delegates to a page object method.
-2. Page objects own: `cy.get('@doughnutOutput')`, `cy.get('@doughnutPath')`, `cy.get('@cliConfigDir')`, and all `cy.task(...)` invocations.
-3. Step definitions become one-liners: `When('...', () => cli.gmail().lastEmailWithPreconfiguredAccount())`.
+Done: Added `cli.backend().bundleAndCopy()`, `cli.setup().createConfigDir()`, `cli.interactive().startSession()`, `cli.interactive().stopSession()`. Hooks in hook.ts now delegate to cli page objects; no `cy.get` or `cy.task` remain in CLI step definitions or hooks for CLI concerns.
 
 ### Phase 7: Integration and verification
 

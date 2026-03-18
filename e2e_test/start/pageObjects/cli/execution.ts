@@ -87,6 +87,20 @@ function nonInteractive() {
 
 function interactive() {
   return {
+    startSession() {
+      cy.task('stopInteractiveCli')
+      cy.get<string>('@cliConfigDir').then((configDir) =>
+        cy.task('startInteractiveCli', {
+          env: {
+            DOUGHNUT_CONFIG_DIR: configDir,
+            DOUGHNUT_API_BASE_URL: backendBaseUrl(),
+          },
+        })
+      )
+    },
+    stopSession() {
+      cy.task('stopInteractiveCli')
+    },
     input(text: string) {
       cy.task<string>('sendToInteractiveCli', { input: text }).as(
         'doughnutOutput'
