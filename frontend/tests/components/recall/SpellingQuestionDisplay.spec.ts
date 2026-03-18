@@ -155,6 +155,72 @@ describe("SpellingQuestionDisplay", () => {
     expect(emitted!.length).toBe(1)
   })
 
+  it("shows inactive mask when document is hidden", async () => {
+    let rafCallbacks: Array<FrameRequestCallback> = []
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation(
+      (callback: FrameRequestCallback) => {
+        rafCallbacks.push(callback)
+        return 1
+      }
+    )
+
+    const wrapper = helper
+      .component(SpellingQuestionDisplay)
+      .withProps({ memoryTrackerId: 1 })
+      .mount()
+
+    await flushPromises()
+    const callbacks = [...rafCallbacks]
+    rafCallbacks = []
+    callbacks.forEach((cb) => cb(performance.now()))
+
+    expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
+      false
+    )
+
+    Object.defineProperty(document, "hidden", { value: true, writable: true })
+    document.dispatchEvent(new Event("visibilitychange"))
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
+      true
+    )
+    expect(wrapper.find("[data-test='inactive-recall-mask']").text()).toContain(
+      "Focus to activate"
+    )
+  })
+
+  it("shows inactive mask when window loses focus", async () => {
+    let rafCallbacks: Array<FrameRequestCallback> = []
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation(
+      (callback: FrameRequestCallback) => {
+        rafCallbacks.push(callback)
+        return 1
+      }
+    )
+
+    const wrapper = helper
+      .component(SpellingQuestionDisplay)
+      .withProps({ memoryTrackerId: 1 })
+      .mount()
+
+    await flushPromises()
+    const callbacks = [...rafCallbacks]
+    rafCallbacks = []
+    callbacks.forEach((cb) => cb(performance.now()))
+
+    expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
+      false
+    )
+
+    window.dispatchEvent(new Event("blur"))
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
+      true
+    )
+  })
+
   it("disables submit button after form is submitted", async () => {
     let rafCallbacks: Array<FrameRequestCallback> = []
     vi.spyOn(window, "requestAnimationFrame").mockImplementation(
