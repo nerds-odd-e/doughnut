@@ -212,7 +212,19 @@ When(
   }
 )
 
-// --- Section assertions: History output, History input, Current guidance ---
+// --- Section assertions: History output, History input, Current guidance, Command output ---
+
+Then('I should see {string} in the command output', (expected: string) => {
+  cy.get<string>('@doughnutOutput').then((output) =>
+    assertOutputIncludes(output, expected, 'command output')
+  )
+})
+
+Then('I should not see {string} in the command output', (expected: string) => {
+  cy.get<string>('@doughnutOutput').then((output) =>
+    assertOutputNotIncludes(output, expected)
+  )
+})
 
 Then('I should see {string} in the history output', (expected: string) => {
   cy.get<string>('@doughnutOutput').then((output) =>
@@ -313,11 +325,7 @@ Then(
         ? `Token "${label}" removed.`
         : 'removed locally and from server'
     cy.get<string>('@doughnutOutput').then((output) =>
-      assertOutputIncludes(
-        getHistoryOutputContent(output),
-        expected,
-        'history output'
-      )
+      assertOutputIncludes(output, expected, 'command output')
     )
   }
 )

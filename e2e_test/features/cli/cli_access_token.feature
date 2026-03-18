@@ -7,22 +7,22 @@ Feature: CLI access token management
   Scenario: Add access token and list it
     And I have a valid Doughnut Access Token with label "E2E CLI Token"
     When I run the doughnut CLI add-access-token with the saved token
-    Then I should see "Token added" in the history output
+    Then I should see "Token added" in the command output
     When I run the doughnut command with -c "/list-access-token"
-    Then I should see "E2E CLI Token" in the history output
+    Then I should see "E2E CLI Token" in the command output
 
   Scenario: Add invalid access token
     When I run the doughnut CLI add-access-token with token "invalid-token-xxx"
-    Then I should see "Token is invalid or expired." in the history output
+    Then I should see "Token is invalid or expired." in the command output
 
   Scenario Outline: Remove access token
     And I have a valid Doughnut Access Token with label "<label>"
     When I run the doughnut CLI add-access-token with the saved token
-    Then I should see "Token added" in the history output
+    Then I should see "Token added" in the command output
     When I run the doughnut CLI <action> with label "<label>"
     Then I should see the <removal_type> remove success message for "<label>"
     When I run the doughnut command with -c "/list-access-token"
-    Then I should see "No access tokens stored." in the history output
+    Then I should see "No access tokens stored." in the command output
 
     Examples:
       | label           | action                         | removal_type |
@@ -34,7 +34,7 @@ Feature: CLI access token management
   Scenario: ESC cancels remove-access-token selection
     And I have a valid Doughnut Access Token with label "E2E CLI Token"
     When I run the doughnut CLI add-access-token with the saved token
-    Then I should see "Token added" in the history output
+    Then I should see "Token added" in the command output
     When I input "/remove-access-token" in the interactive CLI
     Then I should see "E2E CLI Token" in the Current guidance
     When I press ESC in the interactive CLI
@@ -45,8 +45,8 @@ Feature: CLI access token management
   Scenario: Create access token via CLI
     And I have a valid Doughnut Access Token with label "Default Token"
     When I run the doughnut CLI add-access-token with the saved token
-    Then I should see "Token added" in the history output
+    Then I should see "Token added" in the command output
     When I run the doughnut CLI create-access-token with label "New CLI Token"
-    Then I should see "Token created" in the history output
+    Then I should see "Token created" in the command output
     When I run the doughnut command with -c "/list-access-token"
-    Then I should see "New CLI Token" in the history output
+    Then I should see "New CLI Token" in the command output

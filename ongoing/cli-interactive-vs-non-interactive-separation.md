@@ -14,29 +14,36 @@ Commands like `/recall` require multi-turn interaction (y/n, MCQ choices, spelli
 
 - **Separate assertion steps**: Interactive uses section parser (history-output, current-prompt). Non-interactive uses entire stdout as "command output".
 - **Non-interactive = simple stdio**: No PTY. User confirmation (y/n) is not supported—commands that need it are unavailable.
-- **Interactive-only commands**: `/recall`, `/recall-status` (and possibly `/list-access-token` when it shows selection UI) require interactive mode. In `-c` mode, show a proper message.
+- **Interactive-only commands**: Only `/recall` (multi-turn: y/n, MCQ, spelling, load-more). `/recall-status`, `/list-access-token`, etc. work in `-c`. In `-c` mode, interactive-only commands show a proper message.
 - **Domain vocabulary**: Use consistent terms: "command output" (both modes), "history output" (interactive only, parsed section), "current prompt" (interactive only).
 
 ## Phased Plan
 
-### Phase 1: Product—reject interactive-only commands in `-c` mode
+### Phase 1: Product—reject interactive-only commands in `-c` mode ✅
 
-**Scope**: `cli/src/index.ts`, `cli/src/interactive.ts`
+**Scope**: `cli/src/index.ts`, `cli/src/help.ts`, `cli/src/recall.ts`
 
-1. Add validation: the only interactive-only command is `/recall` (multi-turn: y/n, MCQ, spelling, load-more). `/recall-status`, `/list-access-token`, `/remove-access-token <label>` work in -c (single output or usage).
-2. In `index.ts` when handling `-c`, before calling `processInput`:
-   - If `trimmed === '/recall'`, log a message like "This command requires interactive mode. Run `doughnut` without -c." to stderr, and exit 1.
-5. Implement: in `index.ts`, if the trimmed command is exactly `/recall` (not `/recall-status`), reject with message. Use: `const trimmed = value.trim(); if (trimmed === '/recall') { ... }`.
+**Implemented**:
+- `CommandDoc` has optional `interactiveOnly?: boolean`. Commands that need multi-turn interaction set `interactiveOnly: true` (e.g. `/recall` in recall.ts).
+- `help.ts`: `isInteractiveOnlyCommand(cmd)`, `INTERACTIVE_ONLY_REJECTION_MESSAGE`, `interactiveOnlyUsages` derived from `interactiveDocs`.
+- `index.ts`: Before `processInput`, if `isInteractiveOnlyCommand(trimmed)`, log message to stderr and exit 1.
+- Unit test in `cli/tests/index.test.ts`: `-c "/recall" rejects interactive-only command with message and exits 1`.
 
-**Deliverable**: Running `doughnut -c "/recall"` prints a clear message and exits non-zero.
+**Deliverable**: Running `doughnut -c "/recall"` prints a clear message and exits non-zero. ✅
 
 ---
 
-### Phase 2: Product—ensure non-interactive uses simple stdio
+### Phase 2: Product—ensure non-interactive uses simple stdio ✅
 
 **Scope**: `index.ts` already uses `processInput` with default output (console.log). The `-c` path does not use PTY. Verify:
 - `runCliDirectWithArgs` and `runCliDirectWithInput` use `stdio: ['pipe','pipe','pipe']` — no TTY. ✓
 - No changes needed if already correct.
+
+**Verified** (e2e_test/config/common.ts):
+- `runCliDirectWithArgs`: stdio `['pipe','pipe','pipe']` (line 458)
+- `runCliDirectWithInput`: stdio `['pipe','pipe','pipe']` (line 399)
+- `runInstalledCli` (no input path): stdio `['pipe','pipe','pipe']` (line 510)
+- `runCliDirectWithGmailAdd`: stdio `['pipe','pipe','pipe']` (line 556)
 
 ---
 
@@ -90,12 +97,12 @@ Commands like `/recall` require multi-turn interaction (y/n, MCQ choices, spelli
 
 ### Phase 5: CLI unit tests for new behaviors
 
-**Scope**: `cli/tests/interactive.test.ts` or new `cli/tests/nonInteractive.test.ts`
+**Scope**: `cli/tests/index.test.ts`, `cli/tests/help.test.ts`
 
-1. **`-c` mode rejects `/recall`**:
-   - Cannot easily test `index.ts` without spawning. Alternative: export a function `validateCommandForNonInteractive(cmd: string): string | null` that returns error message or null. Test that `validateCommandForNonInteractive('/recall')` returns a non-null message, and `validateCommandForNonInteractive('/list-access-token')` returns null.
-2. **Non-interactive command output**: Unit test `processInput` for `/recall-status` returns message (already covered). For rejection, test the validation helper.
-3. Add `cli/tests/nonInteractive.test.ts` or extend `interactive.test.ts` with a `describe('non-interactive mode -c')` that tests the validation logic.
+**Done** (Phase 1): Integration test in `index.test.ts` — `-c "/recall"` rejects with message and exits 1.
+
+**Optional**:
+- Add `isInteractiveOnlyCommand` unit tests in `help.test.ts`: `/recall` → true, `/recall-status` → false.
 
 ---
 
@@ -136,15 +143,15 @@ Commands like `/recall` require multi-turn interaction (y/n, MCQ choices, spelli
 
 ## Summary
 
-| Phase | Focus | Files |
-|-------|-------|-------|
-| 1 | Reject `/recall` in `-c` mode | `cli/src/index.ts` |
-| 2 | Verify non-interactive uses stdio (no PTY) | (verification only) |
-| 3 | Separate E2E steps: command output vs history output | `cli.ts`, `cliSectionParser.ts`, feature files |
-| 4 | E2E scenario for `/recall` rejected in `-c` | `cli_recall.feature` |
-| 5 | CLI unit tests for validation and behaviors | `cli/tests/*.test.ts` |
-| 6 | Domain vocabulary consistency | All CLI and E2E |
-| 7 | Update cli.mdc | `.cursor/rules/cli.mdc` |
+| Phase | Focus | Files | Status |
+|-------|-------|-------|--------|
+| 1 | Reject interactive-only commands in `-c` mode | `cli/src/index.ts`, `help.ts`, `recall.ts` | ✅ |
+| 2 | Verify non-interactive uses stdio (no PTY) | e2e_test/config/common.ts | ✅ |
+| 3 | Separate E2E steps: command output vs history output | `cli.ts`, `cliSectionParser.ts`, feature files | ✅ |
+| 4 | E2E scenario for `/recall` rejected in `-c` | `cli_recall.feature` | |
+| 5 | CLI unit tests for validation and behaviors | `cli/tests/index.test.ts` | partial |
+| 6 | Domain vocabulary consistency | All CLI and E2E | |
+| 7 | Update cli.mdc | `.cursor/rules/cli.mdc` | |
 
 ---
 
