@@ -12,6 +12,8 @@ import {
   gmail,
   backend,
 } from './execution'
+import { recallSession } from './recallSession'
+import { removeToken } from './removeToken'
 
 export const cli = {
   nonInteractiveOutput,
@@ -24,4 +26,6 @@ export const cli = {
   accessToken,
   gmail,
   backend,
+  recallSession,
+  removeToken,
 }

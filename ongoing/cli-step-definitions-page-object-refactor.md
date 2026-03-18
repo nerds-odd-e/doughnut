@@ -113,11 +113,11 @@ Then('I should see {string} in the non-interactive output', (expected: string) =
 3. ~~Refactor~~ When steps to use `cli.installation().installFromLocalhost()`, `cli.nonInteractive().runWithInput(...)`, etc.
 4. ~~Interactive steps~~ `cli.interactive().input(...)`, `cli.interactive().pressEsc()`, etc.
 
-### Phase 3: Recall and removal assertions
+### Phase 3: Recall and removal assertions ✅
 
-1. Create `cli/recallSession.ts` for `the recall session was stopped`, `I stopped the recall during review`.
-2. Create or extend page object for `I should see the {word} remove success message for {string}` (e.g. `cli.removeToken().expectSuccess(removalType, label)`).
-3. Refactor those Then steps.
+1. ~~Create~~ `cli/recallSession.ts` for `the recall session was stopped`, `I stopped the recall during review`.
+2. ~~Create~~ `cli/removeToken.ts` for `I should see the {word} remove success message for {string}` (`cli.removeToken().expectSuccess(removalType, label)`).
+3. ~~Refactor~~ those Then steps.
 
 ### Phase 4: Setup and Gmail mocks
 

@@ -1,7 +1,6 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import { backendBaseUrl } from '../support/backendUrl'
 import { mock_services } from '../start'
-import { getRecallDisplaySections } from './cliSectionParser'
 import { cli } from '../start/pageObjects/cli'
 
 Given('the backend is serving the CLI and install script', () => {
@@ -67,13 +66,8 @@ When(
 
 Then(
   'I should see the {word} remove success message for {string}',
-  (removalType: string, label: string) => {
-    const expected =
-      removalType === 'local'
-        ? `Token "${label}" removed.`
-        : 'removed locally and from server'
-    cli.nonInteractiveOutput().expectContains(expected)
-  }
+  (removalType: string, label: string) =>
+    cli.removeToken().expectSuccess(removalType, label)
 )
 
 Then(
@@ -101,26 +95,12 @@ Then(
   (expected: string) => cli.currentGuidance().expectStyled(expected)
 )
 
-Then('the recall session was stopped', () => {
-  cy.get<string>('@doughnutOutput').then((output) => {
-    const { currentGuidanceAndHistory, historyOutput } =
-      getRecallDisplaySections(output)
-    expect(currentGuidanceAndHistory).to.include(
-      'What is the meaning of sedition?'
-    )
-    expect(historyOutput).to.include('Stopped recall')
-  })
-})
-
-Then('I stopped the recall during review', () => {
-  cy.get<string>('@doughnutOutput').then((output) => {
-    const { currentGuidanceAndHistory, historyOutput } =
-      getRecallDisplaySections(output)
-    expect(currentGuidanceAndHistory).to.include('sedition')
-    expect(currentGuidanceAndHistory).to.include('Yes, I remember?')
-    expect(historyOutput).to.include('Stopped recall')
-  })
-})
+Then('the recall session was stopped', () =>
+  cli.recallSession().expectStopped()
+)
+Then('I stopped the recall during review', () =>
+  cli.recallSession().expectStoppedDuringReview()
+)
 
 Given(
   'the Google API mock returns tokens and profile for {string}',
