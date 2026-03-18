@@ -45,6 +45,8 @@ repositories {
   }
 }
 
+ext['flyway.version'] = '11.20.3'
+
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'org.springframework.boot:spring-boot-starter-web'
