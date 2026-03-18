@@ -251,17 +251,6 @@ export async function stopInteractiveCli(): Promise<void> {
   if (!interactiveHandle) return
   const { pty, disposeData } = interactiveHandle
   interactiveHandle = null
-  return new Promise<void>((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      pty.kill('SIGKILL')
-      disposeData.dispose()
-      reject(new Error('Interactive CLI did not exit within 5s'))
-    }, 5_000)
-    pty.write('exit\n')
-    pty.onExit(() => {
-      clearTimeout(timeout)
-      disposeData.dispose()
-      resolve()
-    })
-  })
+  pty.kill('SIGKILL')
+  disposeData.dispose()
 }
