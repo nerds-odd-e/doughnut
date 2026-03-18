@@ -106,7 +106,7 @@ When(
   'I answer {string} in the interactive CLI to {string}',
   (input: string, to: string) => {
     cy.get<string>('@doughnutOutput').then((output) =>
-      assertExpectedInStatus(output, to, true)
+      assertExpectedInCurrentPrompt(output, to, true)
     )
     cy.task<string>('sendToInteractiveCli', { input }).as('doughnutOutput')
   }
@@ -311,41 +311,42 @@ Then('I should see {string} in the history input', (expected: string) => {
   })
 })
 
-function assertExpectedInStatus(
+function assertExpectedInCurrentPrompt(
   output: string,
   expected: string,
-  statusOnly = false
+  currentPromptOnly = false
 ): void {
-  const statusContent = getSectionContent(output, 'status')
-  const content = statusOnly
-    ? statusContent
-    : `${statusContent}\n${getSectionContent(output, 'history-output')}`.trim()
+  const currentPromptContent = getSectionContent(output, 'current-prompt')
+  const content = currentPromptOnly
+    ? currentPromptContent
+    : `${currentPromptContent}\n${getSectionContent(output, 'history-output')}`.trim()
   expect(
     content,
-    `Expected "${expected}" in ${statusOnly ? 'status' : 'status or history'}. content:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
+    `Expected "${expected}" in ${currentPromptOnly ? 'current prompt' : 'current prompt or history'}. content:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
   ).to.include(expected)
 }
 
 Then('I should see {string} in the status', (expected: string) => {
   cy.get<string>('@doughnutOutput').then((output) =>
-    assertExpectedInStatus(output, expected)
+    assertExpectedInCurrentPrompt(output, expected)
   )
 })
 
 Then('I should see {string} styled in the status', (expected: string) => {
   cy.get<string>('@doughnutOutput').then((output) => {
-    const rawStatus = getSectionContentRaw(output, 'status')
+    const rawCurrentPrompt = getSectionContentRaw(output, 'current-prompt')
     const fallbackRaw = getSectionContentRaw(output, 'history-output')
-    const rawContent = `${rawStatus}\n${fallbackRaw}`.trim()
-    expect(rawContent, `Expected "${expected}" in raw status`).to.include(
-      expected
-    )
+    const rawContent = `${rawCurrentPrompt}\n${fallbackRaw}`.trim()
+    expect(
+      rawContent,
+      `Expected "${expected}" in raw current prompt`
+    ).to.include(expected)
     // Markdown is rendered via markdansi: bold=\x1b[1m, italic=\x1b[3m
     const hasBold = rawContent.includes('\x1b[1m')
     const hasItalic = rawContent.includes('\x1b[3m')
     expect(
       hasBold || hasItalic,
-      `Expected ANSI styling (bold or italic) in status. Raw status length: ${rawContent.length}`
+      `Expected ANSI styling (bold or italic) in current prompt. Raw length: ${rawContent.length}`
     ).to.be.true
   })
 })
@@ -372,9 +373,9 @@ Then('I should not see {string} in the history output', (expected: string) => {
 
 Then('the recall session was stopped', () => {
   cy.get<string>('@doughnutOutput').then((output) => {
-    const status = getSectionContent(output, 'status')
+    const currentPrompt = getSectionContent(output, 'current-prompt')
     const historyOutput = getSectionContent(output, 'history-output')
-    expect(`${status}\n${historyOutput}`).to.include(
+    expect(`${currentPrompt}\n${historyOutput}`).to.include(
       'What is the meaning of sedition?'
     )
     // ESC path shows "Stop recall? (y/n)"; fallback /stop path on CI does not
@@ -384,9 +385,9 @@ Then('the recall session was stopped', () => {
 
 Then('I stopped the recall during review', () => {
   cy.get<string>('@doughnutOutput').then((output) => {
-    const status = getSectionContent(output, 'status')
+    const currentPrompt = getSectionContent(output, 'current-prompt')
     const historyOutput = getSectionContent(output, 'history-output')
-    const combined = `${status}\n${historyOutput}`
+    const combined = `${currentPrompt}\n${historyOutput}`
     expect(combined).to.include('sedition')
     expect(combined).to.include('Yes, I remember?')
     expect(historyOutput).to.include('Stopped recall')

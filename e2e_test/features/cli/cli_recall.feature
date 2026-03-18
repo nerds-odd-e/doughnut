@@ -38,6 +38,29 @@ Feature: CLI recall status and recall session
     When I input "y" in the interactive CLI
     Then I should see "Recalled successfully" in the history output
 
+  @disableOpenAiService
+  @interactiveCLI
+  Scenario: Recall session - complete all due notes, see summary, then load more from future days
+    Given I have a notebook with the head note "English" which skips memory tracking
+    And there are some notes:
+      | Title    | Details                        | Parent Title |
+      | sedition | Sedition means incite violence | English      |
+      | sedation | Put to sleep is sedation       | English      |
+    And It's day 1
+    And I assimilate the note "sedition"
+    And I assimilate the note "sedation"
+    And It's day 2
+    When I input "/recall" in the interactive CLI
+    Then I should see "sedition" in the status
+    When I answer "y" in the interactive CLI to "Yes, I remember?"
+    And I answer "y" in the interactive CLI to "Yes, I remember?"
+    And I answer "n" in the interactive CLI to "Load more from next 3 days?"
+    Then I should see "Recalled 2 notes" in the history output
+    When I input "/recall" in the interactive CLI
+    And I answer "y" in the interactive CLI to "Load more from next 3 days?"
+    When I answer "y" in the interactive CLI to "Yes, I remember?"
+    Then I should see "Recalled successfully" in the history output
+
   @usingMockedOpenAiService
   @interactiveCLI
   Scenario: Recall MCQ - choose correct answer and see success
@@ -115,38 +138,6 @@ Feature: CLI recall status and recall session
     And I should see "Yes, I remember?" in the status
     When I input "/stop" in the interactive CLI
     Then I stopped the recall during review
-
-  @disableOpenAiService
-  @interactiveCLI
-  Scenario: Recall session - complete all due notes, see summary, then load more from future days
-    Given I have a notebook with the head note "English" which skips memory tracking
-    And there are some notes:
-      | Title    | Details                        | Parent Title |
-      | sedition | Sedition means incite violence | English      |
-      | sedation | Put to sleep is sedation       | English      |
-    And It's day 1
-    And I assimilate the note "sedition"
-    And I assimilate the note "sedation"
-    And It's day 2
-    When I input "/recall" in the interactive CLI
-    Then I should see "sedition" in the status
-    When I answer "y" in the interactive CLI to "Yes, I remember?"
-    Then I should see "Recalled successfully" in the history output
-    When I answer "y" in the interactive CLI to "Yes, I remember?"
-    Then I should see "Recalled successfully" in the history output
-    When I answer "n" in the interactive CLI to "Load more from next 3 days?"
-    Then I should see "Recalled 2 notes" in the history output
-    When I input "/recall" in the interactive CLI
-    And I answer "y" in the interactive CLI to "Yes, I remember?"
-    Then I should see "Recalled successfully" in the history output
-    When I answer "y" in the interactive CLI to "Yes, I remember?"
-    Then I should see "Recalled successfully" in the history output
-    When I answer "y" in the interactive CLI to "Yes, I remember?"
-    Then I should see "Load more from next 3 days?" in the status
-    And I should see "sedition" in the status
-    When I answer "y" in the interactive CLI to "Load more from next 3 days?"
-    Then I should see "Recalled successfully" in the history output
-    And I should see "Recalled" in the history output
 
   @usingMockedOpenAiService
   @interactiveCLI

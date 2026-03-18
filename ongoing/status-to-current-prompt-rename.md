@@ -28,15 +28,17 @@ Rename "status" / "status line" to **Current Prompt**. Change identification fro
 4. **interactive.ts**: Call `output.beginCurrentPrompt?.()` at start of `showRecallPrompt`, "Load more", "Stop recall?" flows
 5. Piped adapter: no `beginCurrentPrompt` (optional, E2E uses PTY)
 
-## Phase 2: Update E2E section parser
+## Phase 2: Update E2E section parser ✅
 
-1. **cliSectionParser.ts** (use same `\x1b[32m` + `─` pattern as `renderer.ts`):
-   - Add `isCurrentPromptSeparator(line)` (green + `─`)
-   - Add `findLastSeparatorIndex(lines)`, `findLastInputBoxStart(lines)` (box = line starting with `┌`)
-   - `getSectionContent('current-prompt')`: lines from (separator + 1) to (box start - 1); empty if no separator
-   - History sections: scope to lines before separator (or before box if no separator)
-   - Remove `isStatusLine`; update `getLastCommandOutput` to use new boundaries
+1. **cliSectionParser.ts** (same `\x1b[32m` + `─` pattern as `renderer.ts`):
+   - `isCurrentPromptSeparator(line)` (green + `─`)
+   - `findLastSeparatorIndex(lines)`, `findLastInputBoxStart(lines)` (box = line with `┌`)
+   - When no separator (piped mode): history = all lines, current-prompt = empty
+   - `current-prompt`: dim lines between last separator and box (writeCurrentPrompt output)
+   - `history-output`: non-input before separator + non-dim lines between separator and box (log output)
+   - `getLastCommandOutput`: includes log lines between separator and box
 2. Section type: `'status'` → `'current-prompt'`
+3. **cli.ts**: `assertExpectedInStatus` → `assertExpectedInCurrentPrompt`; use `'current-prompt'`
 
 ## Phase 3: Rename E2E steps and feature language
 
