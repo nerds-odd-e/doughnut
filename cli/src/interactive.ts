@@ -31,6 +31,7 @@ import {
 import { formatVersionOutput } from './version.js'
 import {
   buildBoxLines,
+  buildCurrentPromptSeparator,
   buildSuggestionLines,
   formatMcqChoiceLines,
   getTerminalWidth,
@@ -128,10 +129,14 @@ function getContestablePromptId(): number | null {
 
 function showRecallPrompt(
   result: RecallPromptResult,
-  status: (msg: string) => void
+  output: OutputAdapter,
+  writeCurrentPrompt: (msg: string) => void
 ): void {
+  output.beginCurrentPrompt?.()
   if (result.type === 'spelling') {
-    status(`Spell: ${renderMarkdownToTerminal(result.stem || '...')}`)
+    writeCurrentPrompt(
+      `Spell: ${renderMarkdownToTerminal(result.stem || '...')}`
+    )
     pendingRecallAnswer = {
       recallPromptId: result.recallPromptId,
       type: 'spelling',
@@ -140,11 +145,11 @@ function showRecallPrompt(
     return
   }
   if (result.type === 'mcq') {
-    status(renderMarkdownToTerminal(result.stem))
+    writeCurrentPrompt(renderMarkdownToTerminal(result.stem))
     for (const line of formatMcqChoiceLines(result.choices)) {
-      status(line)
+      writeCurrentPrompt(line)
     }
-    status(`Enter your choice (1-${result.choices.length}):`)
+    writeCurrentPrompt(`Enter your choice (1-${result.choices.length}):`)
     pendingRecallAnswer = {
       recallPromptId: result.recallPromptId,
       choices: result.choices,
@@ -152,11 +157,11 @@ function showRecallPrompt(
     }
     return
   }
-  status(result.title)
+  writeCurrentPrompt(result.title)
   if (result.details) {
-    status(renderMarkdownToTerminal(result.details))
+    writeCurrentPrompt(renderMarkdownToTerminal(result.details))
   }
-  status('Yes, I remember? (y/n)')
+  writeCurrentPrompt('Yes, I remember? (y/n)')
   pendingRecallAnswer = { memoryTrackerId: result.memoryTrackerId }
 }
 
@@ -245,14 +250,16 @@ async function handleParamCommand(
   return false
 }
 
-function getStatusWriter(output: OutputAdapter): (msg: string) => void {
-  return typeof output.status === 'function' ? output.status : output.log
+function getCurrentPromptWriter(output: OutputAdapter): (msg: string) => void {
+  return typeof output.writeCurrentPrompt === 'function'
+    ? output.writeCurrentPrompt
+    : output.log
 }
 
 async function continueRecallSession(
   fromLoadMore: boolean,
   output: OutputAdapter,
-  status: (msg: string) => void
+  writeCurrentPrompt: (msg: string) => void
 ): Promise<void> {
   if (!fromLoadMore) sessionRecallCount++
   try {
@@ -260,14 +267,15 @@ async function continueRecallSession(
     if (result.type === 'none') {
       if (recallSessionDueDays === 0) {
         pendingRecallLoadMore = true
-        status('Load more from next 3 days? (y/n)')
+        output.beginCurrentPrompt?.()
+        writeCurrentPrompt('Load more from next 3 days? (y/n)')
         return
       }
       output.log(formatRecallSessionSummary(sessionRecallCount))
       endRecallSession()
       return
     }
-    showRecallPrompt(result, status)
+    showRecallPrompt(result, output, writeCurrentPrompt)
   } catch (err) {
     endRecallSession()
     output.logError(err)
@@ -287,7 +295,7 @@ const defaultOutput: OutputAdapter = {
   log: (msg) => console.log(msg),
   logError: (err) =>
     console.log(err instanceof Error ? err.message : String(err)),
-  status: (msg) => console.log(msg),
+  writeCurrentPrompt: (msg) => console.log(msg),
   clearAndRedraw: () => {
     writeFullRedraw([], '', getTerminalWidth(), buildSuggestionLines('', 0), [])
   },
@@ -297,7 +305,7 @@ export async function processInput(
   input: string,
   output: OutputAdapter = defaultOutput
 ): Promise<boolean> {
-  const status = getStatusWriter(output)
+  const writeCurrentPrompt = getCurrentPromptWriter(output)
   const trimmed = input.trim()
   if (trimmed === 'exit' || trimmed === '/exit') {
     return true
@@ -310,7 +318,7 @@ export async function processInput(
   const contestablePromptId = getContestablePromptId()
   if (isInRecallSubstate() && trimmed === '/contest') {
     if (contestablePromptId == null) {
-      status('Type /stop to exit recall')
+      writeCurrentPrompt('Type /stop to exit recall')
       return false
     }
     try {
@@ -319,14 +327,18 @@ export async function processInput(
         output.log(outcome.message)
         return false
       }
-      showRecallPrompt(outcome.result as RecallPromptResult, status)
+      showRecallPrompt(
+        outcome.result as RecallPromptResult,
+        output,
+        writeCurrentPrompt
+      )
     } catch (err) {
       output.logError(err)
     }
     return false
   }
   if (isInRecallSubstate() && trimmed.startsWith('/')) {
-    status(
+    writeCurrentPrompt(
       contestablePromptId
         ? 'Type /stop to exit, /contest to regenerate'
         : 'Type /stop to exit recall'
@@ -377,13 +389,13 @@ export async function processInput(
     if (answer === true) {
       pendingRecallLoadMore = false
       recallSessionDueDays = 3
-      await continueRecallSession(true, output, status)
+      await continueRecallSession(true, output, writeCurrentPrompt)
     } else if (answer === false) {
       pendingRecallLoadMore = false
       output.log(formatRecallSessionSummary(sessionRecallCount))
       endRecallSession()
     } else {
-      status('Please answer y or n')
+      writeCurrentPrompt('Please answer y or n')
       return false
     }
     return false
@@ -408,15 +420,15 @@ export async function processInput(
         }
         pendingRecallAnswer = null
         if (recallSessionMode)
-          await continueRecallSession(false, output, status)
+          await continueRecallSession(false, output, writeCurrentPrompt)
       } else {
-        status(`Enter a number from 1 to ${choices.length}`)
+        writeCurrentPrompt(`Enter a number from 1 to ${choices.length}`)
         return false
       }
     } else if (isSpellingPrompt(pendingRecallAnswer)) {
       const { recallPromptId } = pendingRecallAnswer
       if (!trimmed) {
-        status('Please type your spelling')
+        writeCurrentPrompt('Please type your spelling')
         return false
       }
       try {
@@ -432,7 +444,8 @@ export async function processInput(
         output.logError(err)
       }
       pendingRecallAnswer = null
-      if (recallSessionMode) await continueRecallSession(false, output, status)
+      if (recallSessionMode)
+        await continueRecallSession(false, output, writeCurrentPrompt)
     } else {
       const { memoryTrackerId } = pendingRecallAnswer as JustReviewPrompt
       const answer = parseYesNo(trimmed)
@@ -451,11 +464,12 @@ export async function processInput(
           output.logError(err)
         }
       } else {
-        status('Please answer y or n')
+        writeCurrentPrompt('Please answer y or n')
         return false
       }
       pendingRecallAnswer = null
-      if (recallSessionMode) await continueRecallSession(false, output, status)
+      if (recallSessionMode)
+        await continueRecallSession(false, output, writeCurrentPrompt)
     }
     return false
   }
@@ -476,9 +490,14 @@ export async function processInput(
       const result = await recallNext(0)
       if (result.type === 'none') {
         pendingRecallLoadMore = true
-        status('Load more from next 3 days? (y/n)')
+        output.beginCurrentPrompt?.()
+        writeCurrentPrompt('Load more from next 3 days? (y/n)')
       } else {
-        showRecallPrompt(result as RecallPromptResult, status)
+        showRecallPrompt(
+          result as RecallPromptResult,
+          output,
+          writeCurrentPrompt
+        )
       }
     } catch (err) {
       endRecallSession()
@@ -517,6 +536,7 @@ function buildTTYDeps() {
     setDefaultTokenLabel,
     formatVersionOutput,
     buildBoxLines,
+    buildCurrentPromptSeparator,
     buildSuggestionLines,
     formatMcqChoiceLines,
     getTerminalWidth,

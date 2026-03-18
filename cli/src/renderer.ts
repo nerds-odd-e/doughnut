@@ -8,8 +8,13 @@ import { formatVersionOutput } from './version.js'
 import type { ChatHistory } from './types.js'
 
 export const GREY = '\x1b[90m'
+export const GREEN = '\x1b[32m'
 export const GREY_BG = '\x1b[48;5;236m'
 export const RESET = '\x1b[0m'
+
+export function buildCurrentPromptSeparator(width: number): string {
+  return `${GREEN}${'─'.repeat(width)}${RESET}`
+}
 export const COMMAND_HIGHLIGHT = '\x1b[1;36m' // bold + cyan
 
 export const PLACEHOLDER = '`exit` to quit.'

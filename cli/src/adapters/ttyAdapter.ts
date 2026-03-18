@@ -26,6 +26,7 @@ export interface TTYDeps {
   buildSuggestionLines: (buffer: string, highlightIndex: number) => string[]
   formatMcqChoiceLines: (choices: string[]) => string[]
   getTerminalWidth: () => number
+  buildCurrentPromptSeparator: (width: number) => string
   renderBox: (lines: string[], width: number) => string
   renderFullDisplay: (
     history: ChatHistory,
@@ -117,6 +118,7 @@ export async function runTTY(
     buildSuggestionLines,
     formatMcqChoiceLines,
     getTerminalWidth,
+    buildCurrentPromptSeparator,
     renderBox,
     renderFullDisplay,
     renderPastInput,
@@ -134,6 +136,11 @@ export async function runTTY(
 
   const writeStatus = (msg: string) =>
     process.stdout.write(`${GREY}${msg}\x1b[0m\n`)
+
+  const doBeginCurrentPrompt = () => {
+    const sep = buildCurrentPromptSeparator(getTerminalWidth())
+    process.stdout.write(`${sep}\n`)
+  }
 
   function isCommandPrefixWithSuggestions(buffer: string): boolean {
     const lastLine = getLastLine(buffer)
@@ -284,7 +291,8 @@ export async function runTTY(
       writeError(err)
       collectedOutputLines.push(msg)
     },
-    status: writeStatus,
+    writeCurrentPrompt: writeStatus,
+    beginCurrentPrompt: doBeginCurrentPrompt,
     clearAndRedraw: () => {
       chatHistory = []
       buffer = ''
@@ -367,6 +375,7 @@ export async function runTTY(
         if (key.name === 'escape') {
           setPendingRecallStopConfirmation(true)
           buffer = ''
+          doBeginCurrentPrompt()
           writeStatus('Stop recall? (y/n)')
           drawBox()
         } else if (key.name === 'up' || key.name === 'down') {

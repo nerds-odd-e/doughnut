@@ -12,8 +12,10 @@ export type ChatHistory = ChatHistoryEntry[]
 export type OutputAdapter = {
   log: (msg: string) => void
   logError: (err: unknown) => void
-  /** Optional: for status hints (e.g. "Please answer y or n"). Defaults to log. */
-  status?: (msg: string) => void
+  /** Optional: for Current Prompt hints (e.g. "Please answer y or n"). Defaults to log. */
+  writeCurrentPrompt?: (msg: string) => void
+  /** Optional: write green separator before first status in a prompt turn. TTY only. */
+  beginCurrentPrompt?: () => void
   /** Optional: for /clear and resize. TTY provides a callback that clears and redraws. */
   clearAndRedraw?: () => void
 }
