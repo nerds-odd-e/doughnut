@@ -127,6 +127,7 @@ const props = defineProps<{
   showSaveButton?: boolean
   disabled?: boolean
   canSaveEmptyToClear?: boolean
+  savedValue?: string
 }>()
 
 const emit = defineEmits<{
@@ -156,10 +157,17 @@ const hasValidWikidataId = computed(
   () => localWikidataId.value && localWikidataId.value.trim() !== ""
 )
 
+const hasValueChanged = computed(() => {
+  const current = localWikidataId.value.trim()
+  const saved = (props.savedValue ?? "").trim()
+  return current !== saved
+})
+
 const canSave = computed(
   () =>
-    hasValidWikidataId.value ||
-    (!!props.canSaveEmptyToClear && localWikidataId.value.trim() === "")
+    hasValueChanged.value &&
+    (hasValidWikidataId.value ||
+      (!!props.canSaveEmptyToClear && localWikidataId.value.trim() === ""))
 )
 
 const fetchSearchResults = async () => {

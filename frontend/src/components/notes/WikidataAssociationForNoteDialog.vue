@@ -3,6 +3,7 @@
     ref="dialogRef"
     :search-key="note.noteTopology.title ?? ''"
     :model-value="localWikidataId"
+    :saved-value="note.wikidataId ?? ''"
     :error-message="wikidataIdError"
     :show-save-button="true"
     :can-save-empty-to-clear="!!note.wikidataId"

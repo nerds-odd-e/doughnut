@@ -450,6 +450,24 @@ describe("WikidataAssociationForNoteDialog", () => {
       expect(wrapper.emitted("closeDialog")).toBeTruthy()
     })
 
+    it("disables Save when value unchanged from saved", async () => {
+      const note = makeMe.aNote.title("dog").wikidataId("Q123").please()
+      mountDialog(note)
+      await flushPromises()
+      const saveButton = getSaveButton()
+      expect(saveButton).toBeTruthy()
+      expect(saveButton.disabled).toBe(true)
+    })
+
+    it("disables Save when note has no wikidata ID and input is empty", async () => {
+      const note = makeMe.aNote.title("dog").please()
+      mountDialog(note)
+      await flushPromises()
+      const saveButton = getSaveButton()
+      expect(saveButton).toBeTruthy()
+      expect(saveButton.disabled).toBe(true)
+    })
+
     it("saves empty wikidata ID to clear when note had wikidata ID", async () => {
       const note = makeMe.aNote.title("dog").wikidataId("Q123").please()
       updateWikidataIdSpy.mockResolvedValue(

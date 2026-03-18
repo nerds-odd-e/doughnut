@@ -43,6 +43,7 @@ describe("WikidataAssociationDialog", () => {
       errorMessage?: string
       showSaveButton?: boolean
       canSaveEmptyToClear?: boolean
+      savedValue?: string
     }
   ) => {
     wrapper = helper
@@ -520,6 +521,7 @@ describe("WikidataAssociationDialog", () => {
       const wrapper = mountDialog("dog", {
         showSaveButton: true,
         canSaveEmptyToClear: true,
+        savedValue: "Q123",
         modelValue: "Q123",
       })
       await flushPromises()
@@ -535,6 +537,31 @@ describe("WikidataAssociationDialog", () => {
       saveButton.click()
       await flushPromises()
       expect(wrapper.emitted("save")?.[0]).toEqual([""])
+    })
+
+    it("disables Save when current value equals savedValue", async () => {
+      mountDialog("dog", {
+        showSaveButton: true,
+        modelValue: "Q123",
+        savedValue: "Q123",
+      })
+      await flushPromises()
+      const saveButton = getSaveButton()
+      expect(saveButton).toBeTruthy()
+      expect(saveButton.disabled).toBe(true)
+    })
+
+    it("disables Save when both current and saved are empty", async () => {
+      mountDialog("dog", {
+        showSaveButton: true,
+        canSaveEmptyToClear: true,
+        modelValue: "",
+        savedValue: "",
+      })
+      await flushPromises()
+      const saveButton = getSaveButton()
+      expect(saveButton).toBeTruthy()
+      expect(saveButton.disabled).toBe(true)
     })
   })
 })
