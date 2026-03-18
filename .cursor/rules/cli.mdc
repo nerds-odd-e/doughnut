@@ -37,7 +37,7 @@ cli/
 | **Current guidance** | Interactive only. Prompts, hints, options for the current input (above input box: recall, MCQ, y/n; below: / commands, token list). |
 | **Input box** | The bordered area where the user types. |
 
-**E2E assertion steps**: Use `I should see X in the non-interactive output` for non-interactive (-c, piped). Use `I should see X in the history output` or `I should see X in the Current guidance` for interactive. The `cliSectionParser` exports `getRecallDisplaySections`, `getHistoryOutputContent`, etc.
+**E2E assertion steps**: Use `I should see X in the non-interactive output` for non-interactive (-c, piped). Use `I should see X in the history output` or `I should see X in the Current guidance` for interactive. Step definitions delegate to `cli.xxx` page objects; the `cliSectionParser` exports `getRecallDisplaySections`, `getHistoryOutputContent`, etc.
 
 ## Interactive vs non-interactive mode
 
@@ -57,6 +57,8 @@ CLI e2e tests run TypeScript source locally, bundled in CI:
 **Non-interactive** (install-and-run, -c commands): Use `I run the doughnut command with input {string}` or `I run the doughnut command with -c {string}`; access-token steps use `I run doughnut -c /<command> with ...`; each When spawns a new process, pipes input, and captures stdout.
 
 Use `I should see X in the non-interactive output` for non-interactive; `I should see X in the history output` or `I should see X in the Current guidance` for interactive (hints, suggestions, recall prompts).
+
+CLI page objects live in `e2e_test/start/pageObjects/cli/` and map to domain concepts: non-interactive output, history output, history input, current guidance. Use `cli.nonInteractiveOutput()`, `cli.historyOutput()`, `cli.currentGuidance()`, etc.
 
 ## Build output
 

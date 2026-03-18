@@ -48,7 +48,7 @@ CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_gene
 - `e2e_test` contains all the tests
 - `e2e_test/features` contains the BDD-style tests
 - `e2e_test/step_definitions` contains the step definitions for the tests
-- `e2e_test/start/` contains the page objects for the tests
+- `e2e_test/start/` contains the page objects for the tests (`e2e_test/start/pageObjects/cli/` for CLI page objects with prefix `cli.xxx`)
 - `e2e_test/support/` contains the support files for the tests
 
 ## Debugging
@@ -101,7 +101,7 @@ When('I start a conversation about the note {string}', (noteTopology: string) =>
 - Keep page objects focused on single responsibility
 - Use meaningful method names that reflect user actions
 
-Example:
+Example (browser):
 ```typescript
 const notePage = {
   startAConversationAboutNote() {
@@ -111,7 +111,18 @@ const notePage = {
 }
 ```
 
-### 4. Test Data Management
+Example (CLI assertions):
+```typescript
+Then('I should see {string} in the non-interactive output', (expected: string) => {
+  cli.nonInteractiveOutput().expectContains(expected)
+})
+```
+
+### 4. CLI E2E and page objects
+
+CLI steps use `cli.xxx` page objects (in `e2e_test/start/pageObjects/cli/`), not `start.xxx`. Use `cli.nonInteractiveOutput()`, `cli.historyOutput()`, `cli.currentGuidance()`, etc., for output assertions; use `cli.interactive()`, `cli.nonInteractive()`, `cli.gmail()`, etc., for actions.
+
+### 5. Test Data Management
 
 - Use Given steps to set up test data
 - Mock external services when appropriate (e.g., OpenAI)
@@ -126,7 +137,7 @@ Given there are some notes:
   | Square   | Shape        |             |
 ```
 
-### 5. Service Mocking
+### 6. Service Mocking
 
 - Mock external services (e.g., OpenAI) for reliable tests
 - Use tags to indicate when mocks are required
@@ -142,7 +153,7 @@ Given('OpenAI assistant will reply below for user messages in a stream run:', (d
 })
 ```
 
-### 6. Best Practices
+### 7. Best Practices
 
 1. **Test Organization**
    - Group related features in domain folders
@@ -160,7 +171,7 @@ Given('OpenAI assistant will reply below for user messages in a stream run:', (d
    - Use meaningful descriptions in feature files
    - Document complex test scenarios
 
-### 7. Assertions and Error Messages
+### 8. Assertions and Error Messages
 
 **CRITICAL**: When tests fail, error messages must be immediately actionable for debugging. Follow these principles:
 
