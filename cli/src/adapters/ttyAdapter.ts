@@ -178,6 +178,7 @@ export async function runTTY(
   const collectedOutputLines: string[] = []
   let ttyOutput: OutputAdapter
 
+  /** Builds lines for input box, recalling indicator, and Current guidance (hints, suggestions, options). */
   function getDisplayContent() {
     const width = getTerminalWidth()
     const contentLines = buildBoxLines(buffer, width)

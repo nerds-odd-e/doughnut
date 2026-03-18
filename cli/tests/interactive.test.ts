@@ -960,7 +960,7 @@ describe('interactive CLI (e2e style)', () => {
     expect(output).toContain('┘')
   })
 
-  test('shows grey hint "  / commands" below input box when user has not typed /', async () => {
+  test('shows "  / commands" in the Current guidance when user has not typed /', async () => {
     const stdin = createMockStdin('exit\n')
     runInteractive(stdin as NodeJS.ReadableStream)
     await tick()
@@ -992,13 +992,13 @@ describe('TTY mode slash command suggestions', () => {
     vi.restoreAllMocks()
   })
 
-  test('initial display shows grey hint "  / commands" below input box', () => {
+  test('initial display shows "  / commands" in the Current guidance', () => {
     const output = ttyOutput(writeSpy)
     expect(output).toContain('  / commands')
     expect(output).toContain('\x1b[90m')
   })
 
-  test('typing non-slash keeps hint instead of command list', async () => {
+  test('typing non-slash keeps Current guidance hint instead of command list', async () => {
     writeSpy.mockClear()
     typeString(stdin, 'h')
     await tick()
@@ -1008,7 +1008,7 @@ describe('TTY mode slash command suggestions', () => {
     expect(output).not.toContain('/help                List available commands')
   })
 
-  test('typing "/" shows command suggestions below input box', async () => {
+  test('typing "/" shows command suggestions in the Current guidance', async () => {
     typeString(stdin, '/')
     await tick()
 

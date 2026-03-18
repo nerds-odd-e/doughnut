@@ -21,6 +21,7 @@ export const PLACEHOLDER = '`exit` to quit.'
 export const PROMPT = '→ '
 
 export const CLEAR_SCREEN = '\x1b[H\x1b[2J'
+/** Shown in Current guidance when user has not typed a slash command prefix. */
 export const COMMANDS_HINT = `${GREY}  / commands${RESET}`
 export const RECALLING_INDICATOR = `${GREY}Recalling${RESET}`
 
@@ -98,6 +99,7 @@ function getLastLine(buffer: string): string {
   return lines[lines.length - 1] ?? ''
 }
 
+/** Returns lines for the Current guidance area (command suggestions or / commands hint). */
 export function buildSuggestionLines(
   buffer: string,
   highlightIndex: number
@@ -110,6 +112,7 @@ export function buildSuggestionLines(
   return [COMMANDS_HINT]
 }
 
+/** Renders the full display. suggestionLines and recallingIndicator are Current guidance (below input box). */
 export function renderFullDisplay(
   history: ChatHistory,
   buffer: string,

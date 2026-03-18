@@ -27,9 +27,9 @@ export async function runPiped(
   const width = getTerminalWidth()
   console.log(formatVersionOutput())
   console.log()
-  const hintLines = buildSuggestionLines('', 0)
+  const currentGuidanceLines = buildSuggestionLines('', 0)
   console.log(renderBox(buildBoxLines('', width), width))
-  for (const line of hintLines) {
+  for (const line of currentGuidanceLines) {
     console.log(line)
   }
   console.log()

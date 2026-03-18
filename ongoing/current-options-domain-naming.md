@@ -1,6 +1,6 @@
 # Plan: Current Guidance Domain Naming
 
-**Status**: Phases 1–4 ✅ complete. Phases 5–6 pending.
+**Status**: Phases 1–5 ✅ complete. Phase 6 pending.
 
 ## Context
 
@@ -91,22 +91,20 @@ The CLI interactive UI has an area below the input box that displays hints, help
 
 ---
 
-### Phase 5: Product code – use "Current guidance" terminology
+### Phase 5: Product code – use "Current guidance" terminology ✅
 
 **Goal**: Use the domain name in CLI product code (comments, variable names, docs).
 
-**Work**:
+**Done**:
 
 1. In `cli/`:
-   - Identify references to "hint", "suggestions", "prompt" that map to the area below the input box.
-   - Update comments and non-public symbols to use "Current guidance" where it improves clarity (e.g. in `renderer.ts`, `ttyAdapter.ts`, `cliSectionParser.ts`).
-   - Avoid invasive renames of stable APIs unless necessary.
+   - Updated `types.ts`: writeCurrentPrompt/beginCurrentPrompt comments → "Current guidance".
+   - Updated `renderer.ts`: JSDoc for COMMANDS_HINT, buildSuggestionLines, renderFullDisplay.
+   - Updated `ttyAdapter.ts`: getDisplayContent comment for Current guidance.
+   - Updated `pipedAdapter.ts`: hintLines → currentGuidanceLines.
 
 2. In `cli/tests/interactive.test.ts`:
-   - Update test descriptions: "below input box" → "in the Current guidance" where appropriate.
-   - Example: `shows grey hint "  / commands" below input box` → `shows "  / commands" in the Current guidance`.
-
-**Verification**: `pnpm cli:test` passes.
+   - Migrated test descriptions: "below input box" → "in the Current guidance".
 
 ---
 
@@ -140,7 +138,7 @@ The CLI interactive UI has an area below the input box that displays hints, help
 | 2 | ✅ | `cli.ts` | Add step `I should see {string} in the Current guidance` with educational failure message |
 | 3 | ✅ | `cli_access_token.feature`, `cli.ts`, `cliPtyRunner.ts`, `ttyAdapter.ts` | Migrate to Current guidance; remove "CLI output" step; fix ESC/Enter ordering |
 | 4 | ✅ | `cliSectionParser.ts`, `cli.ts`, `cli_recall.feature` | Align "current prompt" with Current guidance; migrate recall assertions |
-| 5 | pending | `cli/src/`, `cli/tests/interactive.test.ts` | Use "Current guidance" in comments and test descriptions |
+| 5 | ✅ | `cli/src/`, `cli/tests/interactive.test.ts` | Use "Current guidance" in comments and test descriptions |
 | 6 | pending | `.cursor/rules/cli.mdc` | Add domain terminology section and E2E guidance |
 
 ---
