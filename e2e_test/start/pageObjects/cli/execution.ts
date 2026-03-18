@@ -7,10 +7,23 @@ import { currentGuidance } from './outputAssertions'
 
 const GOOGLE_MOCK_BASE_URL = 'http://localhost:5003'
 
-function envForCliConfigDir(configDir: string): Record<string, string> {
+export function envForCliWithConfigDir(
+  configDir: string
+): Record<string, string> {
   return {
     DOUGHNUT_CONFIG_DIR: configDir,
     DOUGHNUT_API_BASE_URL: backendBaseUrl(),
+  }
+}
+
+function envForGmail(
+  configDir: string,
+  noBrowser = false
+): Record<string, string> {
+  return {
+    DOUGHNUT_CONFIG_DIR: configDir,
+    GOOGLE_BASE_URL: GOOGLE_MOCK_BASE_URL,
+    ...(noBrowser && { DOUGHNUT_NO_BROWSER: '1' }),
   }
 }
 
@@ -19,7 +32,7 @@ function runCliWithScenarioConfigDir(args: string[]) {
     cy
       .task('runCliDirectWithArgs', {
         args,
-        env: envForCliConfigDir(configDir),
+        env: envForCliWithConfigDir(configDir),
       })
       .as('doughnutOutput')
   )
@@ -87,20 +100,6 @@ function nonInteractive() {
 
 function interactive() {
   return {
-    startSession() {
-      cy.task('stopInteractiveCli')
-      cy.get<string>('@cliConfigDir').then((configDir) =>
-        cy.task('startInteractiveCli', {
-          env: {
-            DOUGHNUT_CONFIG_DIR: configDir,
-            DOUGHNUT_API_BASE_URL: backendBaseUrl(),
-          },
-        })
-      )
-    },
-    stopSession() {
-      cy.task('stopInteractiveCli')
-    },
     input(text: string) {
       cy.task<string>('sendToInteractiveCli', { input: text }).as(
         'doughnutOutput'
@@ -168,11 +167,7 @@ function gmail() {
           cy
             .task('runCliDirectWithInput', {
               input: '/add gmail\nexit',
-              env: {
-                DOUGHNUT_CONFIG_DIR: configDir,
-                DOUGHNUT_NO_BROWSER: '1',
-                GOOGLE_BASE_URL: GOOGLE_MOCK_BASE_URL,
-              },
+              env: envForGmail(configDir, true),
               simulateOAuthCallback: true,
             })
             .as('doughnutOutput')
@@ -186,10 +181,7 @@ function gmail() {
         cy
           .task('runCliDirectWithInput', {
             input: '/last email\nexit',
-            env: {
-              DOUGHNUT_CONFIG_DIR: configDir,
-              GOOGLE_BASE_URL: GOOGLE_MOCK_BASE_URL,
-            },
+            env: envForGmail(configDir),
           })
           .as('doughnutOutput')
       )

@@ -20,10 +20,10 @@ const SECTION_LABELS = {
   currentGuidance: 'Current guidance',
 } as const
 
-const OUTPUT_ALIAS = '@doughnutOutput'
+export const OUTPUT_ALIAS = '@doughnutOutput'
 const CONTENT_PREVIEW_LEN = 500
 
-export function withOutput(cb: (output: string) => void): void {
+function withOutput(cb: (output: string) => void): void {
   cy.get<string>(OUTPUT_ALIAS).then(cb)
 }
 

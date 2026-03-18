@@ -59,7 +59,7 @@ All output-based page objects read from `cy.get<string>('@doughnutOutput')` inte
 ## File Structure
 
 **Current (grouped)**:
-- `outputAssertions.ts` – nonInteractiveOutput, historyOutput, historyInput, currentGuidance; exports `withOutput` for other output readers
+- `outputAssertions.ts` – nonInteractiveOutput, historyOutput, historyInput, currentGuidance; exports OUTPUT_ALIAS for recallSession
 - `execution.ts` – installation, nonInteractive, interactive, accessToken, gmail
 - `backend.ts` – backend serving CLI (expectInstallScriptServed, serveVersion)
 - `recallSession.ts` – recall session state (expectStopped, expectStoppedDuringReview)

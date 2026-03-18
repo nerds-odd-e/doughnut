@@ -110,10 +110,10 @@ Before({ tags: '@withCliConfig', order: 1 }, () =>
 )
 
 Before({ tags: '@interactiveCLI', order: 2 }, () =>
-  cli.interactive().startSession()
+  cli.setup().startInteractiveSession()
 )
 
-After({ tags: '@interactiveCLI' }, () => cli.interactive().stopSession())
+After({ tags: '@interactiveCLI' }, () => cli.setup().stopInteractiveSession())
 
 Before({ tags: '@usingMockedGoogleService' }, () => {
   cy.wrap(null).then(() => mock_services.google().mock())

@@ -4,12 +4,12 @@
  * - Stopped during review: y/n prompt, user typed /stop
  */
 import { getRecallDisplaySections } from '../../../step_definitions/cliSectionParser'
-import { withOutput } from './outputAssertions'
+import { OUTPUT_ALIAS } from './outputAssertions'
 
 function recallSession() {
   return {
     expectStopped() {
-      withOutput((output) => {
+      cy.get<string>(OUTPUT_ALIAS).then((output) => {
         const { currentGuidanceAndHistory, historyOutput } =
           getRecallDisplaySections(output)
         expect(currentGuidanceAndHistory).to.include(
@@ -19,7 +19,7 @@ function recallSession() {
       })
     },
     expectStoppedDuringReview() {
-      withOutput((output) => {
+      cy.get<string>(OUTPUT_ALIAS).then((output) => {
         const { currentGuidanceAndHistory, historyOutput } =
           getRecallDisplaySections(output)
         expect(currentGuidanceAndHistory).to.include('sedition')
