@@ -4,7 +4,7 @@ import { mock_services } from '../start'
 import { getRecallDisplaySections } from './cliSectionParser'
 import { cli } from '../start/pageObjects/cli'
 
-const GOOGLE_MOCK_URL = 'http://localhost:5003'
+const GOOGLE_MOCK_BASE_URL = 'http://localhost:5003'
 
 function cliEnvWithConfigDir(configDir: string): Record<string, string> {
   return {
@@ -152,6 +152,9 @@ When(
   }
 )
 
+// --- Output assertions ---
+// Domain: non-interactive output, history output, history input, current guidance (cli.mdc)
+
 Then(
   'I should see the {word} remove success message for {string}',
   (removalType: string, label: string) => {
@@ -163,46 +166,30 @@ Then(
   }
 )
 
-// --- Output assertions ---
-// Non-interactive output: entire stdout when running with -c or piped input.
-// History output, History input, Current guidance: interactive only (parsed ANSI sections).
-
 Then(
   'I should see {string} in the non-interactive output',
-  (expected: string) => {
-    cli.nonInteractiveOutput().expectContains(expected)
-  }
+  (expected: string) => cli.nonInteractiveOutput().expectContains(expected)
 )
-
 Then(
   'I should not see {string} in the non-interactive output',
-  (expected: string) => {
-    cli.nonInteractiveOutput().expectNotContains(expected)
-  }
+  (expected: string) => cli.nonInteractiveOutput().expectNotContains(expected)
 )
-
-Then('I should see {string} in the history output', (expected: string) => {
+Then('I should see {string} in the history output', (expected: string) =>
   cli.historyOutput().expectContains(expected)
-})
-
-Then('I should see {string} in the Current guidance', (expected: string) => {
-  cli.currentGuidance().expectContains(expected)
-})
-
-Then('I should see {string} in the history input', (expected: string) => {
+)
+Then('I should not see {string} in the history output', (expected: string) =>
+  cli.historyOutput().expectNotContains(expected)
+)
+Then('I should see {string} in the history input', (expected: string) =>
   cli.historyInput().expectContains(expected)
-})
-
+)
+Then('I should see {string} in the Current guidance', (expected: string) =>
+  cli.currentGuidance().expectContains(expected)
+)
 Then(
   'I should see {string} styled in the Current guidance',
-  (expected: string) => {
-    cli.currentGuidance().expectStyled(expected)
-  }
+  (expected: string) => cli.currentGuidance().expectStyled(expected)
 )
-
-Then('I should not see {string} in the history output', (expected: string) => {
-  cli.historyOutput().expectNotContains(expected)
-})
 
 // --- Recall session assertions ---
 
@@ -257,7 +244,7 @@ Given(
 
 When('I run the CLI add gmail command with simulated OAuth callback', () => {
   cy.task('runCliDirectWithGmailAdd', {
-    googleBaseUrl: GOOGLE_MOCK_URL,
+    googleBaseUrl: GOOGLE_MOCK_BASE_URL,
   })
     .its('stdout')
     .as('doughnutOutput')
@@ -265,6 +252,6 @@ When('I run the CLI add gmail command with simulated OAuth callback', () => {
 
 When('I run the CLI last email command with pre-configured account', () => {
   cy.task('runCliDirectWithLastEmail', {
-    googleBaseUrl: GOOGLE_MOCK_URL,
+    googleBaseUrl: GOOGLE_MOCK_BASE_URL,
   }).as('doughnutOutput')
 })
