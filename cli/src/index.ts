@@ -2,7 +2,11 @@ import { processInput } from './interactive.js'
 import { runInteractive } from './interactive.js'
 import { runUpdate } from './update.js'
 import { formatVersionOutput } from './version.js'
-import { formatHelp, isInteractiveOnlyCommand } from './help.js'
+import {
+  formatHelp,
+  INTERACTIVE_ONLY_REJECTION_MESSAGE,
+  isInteractiveOnlyCommand,
+} from './help.js'
 
 export async function run(args: string[]): Promise<void> {
   const cIdx = args.findIndex((a) => a === '-c' || a.startsWith('-c='))
@@ -16,9 +20,7 @@ export async function run(args: string[]): Promise<void> {
     }
     const trimmed = value.trim()
     if (isInteractiveOnlyCommand(trimmed)) {
-      console.error(
-        'This command requires interactive mode. Run `doughnut` without -c.'
-      )
+      console.error(INTERACTIVE_ONLY_REJECTION_MESSAGE)
       process.exit(1)
       return
     }

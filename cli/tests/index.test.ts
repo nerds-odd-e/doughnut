@@ -1,6 +1,7 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
-import { formatVersionOutput } from '../src/version.js'
+import { INTERACTIVE_ONLY_REJECTION_MESSAGE } from '../src/help.js'
 import { run } from '../src/index.js'
+import { formatVersionOutput } from '../src/version.js'
 
 describe('CLI', () => {
   test('version command outputs doughnut prefix with version', () => {
@@ -66,12 +67,10 @@ describe('run with -c option', () => {
     expect(exitSpy).toHaveBeenCalledWith(0)
   })
 
-  test('-c "/recall" rejects with message and exits 1 (interactive-only command)', async () => {
+  test('-c "/recall" rejects interactive-only command with message and exits 1', async () => {
     run(['-c', '/recall'])
     await new Promise((r) => setImmediate(r))
-    expect(errorSpy).toHaveBeenCalledWith(
-      'This command requires interactive mode. Run `doughnut` without -c.'
-    )
+    expect(errorSpy).toHaveBeenCalledWith(INTERACTIVE_ONLY_REJECTION_MESSAGE)
     expect(exitSpy).toHaveBeenCalledWith(1)
   })
 

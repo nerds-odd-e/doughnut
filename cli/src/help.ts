@@ -94,11 +94,17 @@ export function filterCommandsByPrefix(
     })
 }
 
+function formatCommandSuggestionLines(
+  commands: readonly CommandDoc[]
+): string[] {
+  return commands.map((d) => `  ${d.usage.padEnd(20)} ${d.description}`)
+}
+
 export function formatCommandSuggestions(
   commands: readonly CommandDoc[],
   maxVisible = 8
 ): string[] {
-  const lines = commands.map((d) => `  ${d.usage.padEnd(20)} ${d.description}`)
+  const lines = formatCommandSuggestionLines(commands)
   if (lines.length <= maxVisible) return lines
   return [...lines.slice(0, maxVisible), '  ↓ more below']
 }
@@ -108,11 +114,12 @@ export function formatCommandSuggestionsWithHighlight(
   maxVisible = 8,
   highlightIndex = 0
 ): string[] {
-  const lines = commands.map((d) => `  ${d.usage.padEnd(20)} ${d.description}`)
-  return formatHighlightedList(lines, maxVisible, highlightIndex)
+  return formatHighlightedList(
+    formatCommandSuggestionLines(commands),
+    maxVisible,
+    highlightIndex
+  )
 }
-
-export const helpDoc = helpDocEntry
 
 const allSubcommandDocs = [...subcommandDocs, helpDocEntry]
 
@@ -127,10 +134,11 @@ function formatSection(title: string, docs: readonly CommandDoc[]): string {
 const interactiveOnlyUsages = new Set(
   interactiveDocs.filter((c) => c.interactiveOnly).map((c) => c.usage)
 )
-
 export function isInteractiveOnlyCommand(cmd: string): boolean {
   return interactiveOnlyUsages.has(cmd.trim())
 }
+export const INTERACTIVE_ONLY_REJECTION_MESSAGE =
+  'This command requires interactive mode. Run `doughnut` without -c.'
 
 export function formatHelp(): string {
   return [
