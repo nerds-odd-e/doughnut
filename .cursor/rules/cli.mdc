@@ -27,6 +27,17 @@ cli/
 | Format | `pnpm cli:format` |
 | Lint | `pnpm cli:lint` |
 
+## Domain terminology
+
+| Term | Definition |
+|------|-------------|
+| **Current guidance** | The UI area below the input box. Used for hints, help, or selection options for the current input. In E2E tests, Current guidance = all content below the input box. |
+| **History output** | Past command results. |
+| **History input** | Past user input lines. |
+| **Input box** | The bordered area where the user types. |
+
+When asserting on content below the input box, use domain terms: `I should see X in the Current guidance` (not "in the CLI output"). The `cliSectionParser` exports `getSectionContent(output, 'current-guidance')` for Current guidance.
+
 ## CLI E2E tests
 
 CLI e2e tests run TypeScript source locally, bundled in CI:
@@ -34,6 +45,8 @@ CLI e2e tests run TypeScript source locally, bundled in CI:
 - **Local**: `pnpm -C cli exec tsx src/index.ts` (no build step)
 - **CI**: `cli/dist/doughnut-cli.bundle.mjs` (pre-built by `pnpm bundle:all` before Cypress)
 - **Installation tests**: Always use the bundled/installed binary
+
+Use Current guidance for assertions on hints, command suggestions, selection lists, or recall prompts below the input box.
 
 ## Build output
 
