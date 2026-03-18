@@ -64,7 +64,7 @@ The goal: scenarios that need interactive mode should run a **single live CLI pr
 1. Add `@interactiveCLI` to the scenario.
 2. Split the single When into two:
    - `When I input "/recall" in the interactive CLI`
-   - `Then I should see "<title>" in the status` ... `And I should see "Yes, I remember?" in the status`
+   - `Then I should see "<title>" in the current prompt` ... `And I should see "Yes, I remember?" in the current prompt`
    - `When I input "y" in the interactive CLI`
    - `Then I should see "Recalled successfully" in the history output`
 3. Reuse existing step `I input {string} in the interactive CLI` (no new step def needed).
@@ -87,7 +87,7 @@ The goal: scenarios that need interactive mode should run a **single live CLI pr
 1. Add `@interactiveCLI` to the scenario.
 2. Split the single When into two:
    - `When I input "/recall" in the interactive CLI`
-   - `Then I should see "What is the meaning of sedition?" in the status` ... `And I should see "to incite violence" in the status`
+   - `Then I should see "What is the meaning of sedition?" in the current prompt` ... `And I should see "to incite violence" in the current prompt`
    - `When I input "1" in the interactive CLI`
    - `Then I should see "Correct!" in the history output` ... `And I should see "Recalled successfully" in the history output`
 3. Reuse existing step `I input {string} in the interactive CLI` (no new step def needed).
