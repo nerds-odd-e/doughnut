@@ -11,6 +11,10 @@ import {
 
 const GOOGLE_MOCK_URL = 'http://localhost:5003'
 
+// Domain: output section names for assertion messages
+const NON_INTERACTIVE_OUTPUT = 'non-interactive output'
+const CURRENT_GUIDANCE = 'Current guidance'
+
 function cliEnvWithConfigDir(configDir: string): Record<string, string> {
   return {
     DOUGHNUT_CONFIG_DIR: configDir,
@@ -18,7 +22,7 @@ function cliEnvWithConfigDir(configDir: string): Record<string, string> {
   }
 }
 
-function runCliWithConfig(args: string[]) {
+function runDoughnutWithConfig(args: string[]) {
   return cy.get<string>('@cliConfigDir').then((configDir) =>
     cy
       .task('runCliDirectWithArgs', {
@@ -53,11 +57,11 @@ function buildCurrentGuidanceFailureMessage(
   const linesAfterBox =
     inputBoxLineRange.end >= 0 ? lineCount - inputBoxLineRange.end - 1 : 0
   return [
-    `Expected "${expected}" in Current guidance (prompts, hints, options for the current input).`,
+    `Expected "${expected}" in ${CURRENT_GUIDANCE} (prompts, hints, options for the current input).`,
     ``,
     `Parser: input box ┌ at line ${inputBoxLineRange.start}, └ at line ${inputBoxLineRange.end} of ${lineCount} lines. Lines after └: ${linesAfterBox}.`,
     ``,
-    `Current guidance: ${currentGuidanceContent ? `"${currentGuidanceContent}"` : '(empty)'}`,
+    `${CURRENT_GUIDANCE}: ${currentGuidanceContent ? `"${currentGuidanceContent}"` : '(empty)'}`,
     ``,
     `Raw output tail (\\r→\\r \\n→\\n ):`,
     rawTail,
@@ -72,7 +76,7 @@ Given('the backend is serving the CLI and install script', () => {
     .should('eq', 200)
 })
 
-// --- CLI installation and run ---
+// --- Installation (non-interactive: installed binary) ---
 
 When('I install the CLI from localhost without affecting my system', () => {
   cy.task<string>('installCli', backendBaseUrl())
@@ -101,7 +105,7 @@ When('I run the installed doughnut version command', () => {
   })
 })
 
-// --- Non-interactive CLI execution ---
+// --- Non-interactive execution: piped input ---
 
 When('I run the doughnut command with input {string}', (input: string) => {
   const trimmed = input.trim()
@@ -111,7 +115,7 @@ When('I run the doughnut command with input {string}', (input: string) => {
   )
 })
 
-// --- Interactive CLI: input and keypress ---
+// --- Interactive execution: input and keypress ---
 
 When('I input {string} in the interactive CLI', (input: string) => {
   cy.task<string>('sendToInteractiveCli', { input }).as('doughnutOutput')
@@ -131,7 +135,7 @@ When(
       assertOutputIncludes(
         currentGuidanceAndHistory,
         expectedPromptText,
-        'Current guidance'
+        CURRENT_GUIDANCE
       )
     })
     cy.task<string>('sendToInteractiveCli', { input: answer }).as(
@@ -149,7 +153,7 @@ When(
 )
 
 When('I run the doughnut command with -c {string}', (input: string) => {
-  runCliWithConfig(['-c', input])
+  runDoughnutWithConfig(['-c', input])
 })
 
 When('I run the doughnut version command', () => {
@@ -173,26 +177,28 @@ When(
   }
 )
 
-// --- Access token commands ---
+// --- Non-interactive execution: doughnut -c (access token) ---
+
+function runDoughnutWithConfigCommand(command: string, arg: string) {
+  return runDoughnutWithConfig(['-c', `${command} ${arg}`])
+}
 
 When('I run doughnut -c {string} with the saved token', (command: string) => {
-  cy.get<string>('@savedAccessToken').then((token) => {
-    runCliWithConfig(['-c', `${command} ${token}`])
-  })
+  cy.get<string>('@savedAccessToken').then((token) =>
+    runDoughnutWithConfigCommand(command, token)
+  )
 })
 
 When(
   'I run doughnut -c {string} with token {string}',
-  (command: string, token: string) => {
-    runCliWithConfig(['-c', `${command} ${token}`])
-  }
+  (command: string, token: string) =>
+    runDoughnutWithConfigCommand(command, token)
 )
 
 When(
   'I run doughnut -c {string} with label {string}',
-  (command: string, label: string) => {
-    runCliWithConfig(['-c', `${command} ${label}`])
-  }
+  (command: string, label: string) =>
+    runDoughnutWithConfigCommand(command, label)
 )
 
 Then(
@@ -203,20 +209,20 @@ Then(
         ? `Token "${label}" removed.`
         : 'removed locally and from server'
     cy.get<string>('@doughnutOutput').then((output) =>
-      assertOutputIncludes(output, expected, 'non-interactive output')
+      assertOutputIncludes(output, expected, NON_INTERACTIVE_OUTPUT)
     )
   }
 )
 
 // --- Output assertions ---
-// Non-interactive output: entire stdout when running non-interactively (-c, piped, installed).
-// History output, History input, Current guidance: interactive only. Parsed ANSI sections.
+// Non-interactive output: entire stdout when running with -c or piped input.
+// History output, History input, Current guidance: interactive only (parsed ANSI sections).
 
 Then(
   'I should see {string} in the non-interactive output',
   (expected: string) => {
     cy.get<string>('@doughnutOutput').then((output) =>
-      assertOutputIncludes(output, expected, 'non-interactive output')
+      assertOutputIncludes(output, expected, NON_INTERACTIVE_OUTPUT)
     )
   }
 )
@@ -267,14 +273,14 @@ Then(
       const rawContent = getCurrentGuidanceAndHistoryRaw(output)
       expect(
         rawContent,
-        `Expected "${expected}" in raw Current guidance`
+        `Expected "${expected}" in raw ${CURRENT_GUIDANCE}`
       ).to.include(expected)
       // Markdown is rendered via markdansi: bold=\x1b[1m, italic=\x1b[3m
       const hasBold = rawContent.includes('\x1b[1m')
       const hasItalic = rawContent.includes('\x1b[3m')
       expect(
         hasBold || hasItalic,
-        `Expected ANSI styling (bold or italic) in Current guidance. Raw length: ${rawContent.length}`
+        `Expected ANSI styling (bold or italic) in ${CURRENT_GUIDANCE}. Raw length: ${rawContent.length}`
       ).to.be.true
     })
   }
