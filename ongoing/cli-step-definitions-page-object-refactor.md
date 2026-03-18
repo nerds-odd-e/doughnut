@@ -6,8 +6,8 @@ Refactor `e2e_test/step_definitions/cli.ts` to use the Page Object pattern with 
 
 ## Current State
 
-- **cli.ts** (~255 lines): Step definitions delegate output assertions to `cli.*` page objects. Still contains execution helpers (`runDoughnutWithConfig`), recall assertions, Gmail setup.
-- **cli/page objects** (`e2e_test/start/pageObjects/cli/`): `outputAssertions.ts` and `index.ts` – Phase 1 done.
+- **cli.ts** (~136 lines): Step definitions delegate to `cli.*` page objects. Output assertions, execution, recall, and remove-token steps all use page objects. Still contains: Given for backend install check, Gmail mocks (Given), Gmail When steps via `cli.gmail()`.
+- **cli/page objects** (`e2e_test/start/pageObjects/cli/`): `outputAssertions.ts`, `execution.ts`, `recallSession.ts`, `removeToken.ts`, `backend.ts`, `index.ts` – Phases 1–4 done.
 - **cliSectionParser.ts**: Domain-aware parser for output sections (history-output, history-input, current-guidance); used by page objects
 - **Domain concepts** (from cli.mdc):
   - **Non-interactive output**: Entire stdout when running with `-c`, piped, or installed binary
@@ -53,33 +53,20 @@ All output-based page objects read from `cy.get<string>('@doughnutOutput')` inte
 
 | Page Object | Responsibility |
 |-------------|----------------|
-| `cli.backend()` | Backend serving CLI | `expectInstallScriptServed()` |
-| `cli.removeToken()` | Token removal expectations | `expectLocalRemoveSuccess(label)`, `expectCompleteRemoveSuccess(label)` |
+| `cli.backend()` | Backend serving CLI | `expectInstallScriptServed()` (Phase 4) |
+| `cli.removeToken()` | Access-token removal success | `expectSuccess(removalType, label)` – local vs complete |
 
 ## File Structure
 
-```
-e2e_test/start/pageObjects/cli/
-  index.ts           # Exports `cli` object aggregating all sub-page objects
-  nonInteractiveOutput.ts
-  historyOutput.ts
-  historyInput.ts
-  currentGuidance.ts
-  installation.ts
-  nonInteractiveExecution.ts
-  interactiveExecution.ts
-  accessTokenExecution.ts
-  recallSession.ts
-  gmailExecution.ts
-```
-
-**Alternative**: Fewer files with grouped concerns:
-- `outputAssertions.ts` – nonInteractiveOutput, historyOutput, historyInput, currentGuidance (all read from @doughnutOutput)
+**Current (grouped)**:
+- `outputAssertions.ts` – nonInteractiveOutput, historyOutput, historyInput, currentGuidance; exports `withOutput` for other output readers
 - `execution.ts` – installation, nonInteractive, interactive, accessToken, gmail
-- `recallSession.ts` – recall-specific assertions
-- `index.ts` – exports `cli`
+- `backend.ts` – backend serving CLI (expectInstallScriptServed, serveVersion)
+- `recallSession.ts` – recall session state (expectStopped, expectStoppedDuringReview)
+- `removeToken.ts` – access-token removal success
+- `index.ts` – exports `cli`, grouped by domain: output sections → recall → removeToken → execution
 
-Prefer the grouped approach for cohesion; split only if a file exceeds ~150 lines.
+Prefer grouped files; split only if a file exceeds ~150 lines.
 
 ## Step definition refactor
 
@@ -115,15 +102,16 @@ Then('I should see {string} in the non-interactive output', (expected: string) =
 
 ### Phase 3: Recall and removal assertions ✅
 
-1. ~~Create~~ `cli/recallSession.ts` for `the recall session was stopped`, `I stopped the recall during review`.
+1. ~~Create~~ `cli/recallSession.ts` for `the recall session was stopped`, `I stopped the recall during review` – `expectStopped()` (MCQ), `expectStoppedDuringReview()` (y/n review).
 2. ~~Create~~ `cli/removeToken.ts` for `I should see the {word} remove success message for {string}` (`cli.removeToken().expectSuccess(removalType, label)`).
 3. ~~Refactor~~ those Then steps.
+4. ~~Cleanup~~: Deduplicate `withOutput` (export from outputAssertions, import in recallSession). Group `cli` index by domain. Add domain JSDoc (MCQ vs review, local vs complete removal).
 
-### Phase 4: Setup and Gmail mocks
+### Phase 4: Setup and Gmail mocks ✅
 
-1. Create `cli/backend.ts` for `the backend is serving the CLI and install script`.
-2. Gmail Given steps (Google API mock) stay in cli.ts or move to a `cli/gmailMocks.ts` if desired; they use `mock_services` which is a shared dependency.
-3. Gmail When steps: `cli.gmail().addWithSimulatedOAuth()`, `cli.gmail().lastEmailWithPreconfiguredAccount()`.
+1. ~~Create~~ `cli/backend.ts` for `the backend is serving the CLI and install script` – `expectInstallScriptServed()`, `serveVersion()`.
+2. Gmail Given steps (Google API mock) stay in cli.ts; they use `mock_services` which is a shared dependency.
+3. ~~Gmail When steps~~: `cli.gmail().addWithSimulatedOAuth()`, `cli.gmail().lastEmailWithPreconfiguredAccount()` (already in place).
 
 ### Phase 5: Slim common.ts and replace overkill tasks
 
@@ -144,8 +132,8 @@ Eventually move all `cy.get` and `cy.task` calls into page objects with a fluent
 
 ### Phase 7: Integration and verification
 
-1. `cli/index.ts` exists and exports `cli` (done with Phase 1).
-2. `cli` imported in `cli.ts` step definitions; CLI remains its own namespace, not added to `start`.
+1. ~~`cli/index.ts` exists and exports `cli`~~ (done).
+2. ~~`cli` imported in `cli.ts` step definitions; CLI remains its own namespace~~.
 3. Run all CLI feature files to verify: `cli_access_token.feature`, `cli_recall.feature`, `cli_install_and_run.feature`, `cli_gmail.feature`.
 4. Delete unused helpers from cli.ts after each phase.
 

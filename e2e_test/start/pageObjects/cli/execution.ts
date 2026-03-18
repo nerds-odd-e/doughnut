@@ -144,19 +144,4 @@ function gmail() {
   }
 }
 
-function backend() {
-  return {
-    serveVersion(version: string) {
-      cy.task('bundleAndCopyCliWithVersion', version)
-    },
-  }
-}
-
-export {
-  installation,
-  nonInteractive,
-  interactive,
-  accessToken,
-  gmail,
-  backend,
-}
+export { installation, nonInteractive, interactive, accessToken, gmail }

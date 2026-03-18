@@ -3,11 +3,9 @@ import { backendBaseUrl } from '../support/backendUrl'
 import { mock_services } from '../start'
 import { cli } from '../start/pageObjects/cli'
 
-Given('the backend is serving the CLI and install script', () => {
-  cy.request('GET', `${backendBaseUrl()}/install`)
-    .its('status')
-    .should('eq', 200)
-})
+Given('the backend is serving the CLI and install script', () =>
+  cli.backend().expectInstallScriptServed()
+)
 
 When('I install the CLI from localhost without affecting my system', () => {
   cli.installation().installFromLocalhost()

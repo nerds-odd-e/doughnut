@@ -12,8 +12,8 @@ import {
   interactive,
   accessToken,
   gmail,
-  backend,
 } from './execution'
+import { backend } from './backend'
 
 export const cli = {
   // Output sections (non-interactive, history output/input, current guidance)
