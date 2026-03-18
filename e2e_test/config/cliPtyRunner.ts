@@ -15,23 +15,12 @@ const PTY_OPTIONS = {
   rows: 24,
 }
 
-export type CliPtyInput = string | { text: string; delayAfterMs?: number }[]
-
 function normalizeInput(input: string): string {
   return input.endsWith('\n') ? input : `${input}\n`
 }
 
-async function writeInput(ptyProcess: IPty, input: CliPtyInput): Promise<void> {
-  if (typeof input === 'string') {
-    ptyProcess.write(normalizeInput(input))
-    return
-  }
-  for (const chunk of input) {
-    ptyProcess.write(chunk.text)
-    if (chunk.delayAfterMs) {
-      await new Promise((r) => setTimeout(r, chunk.delayAfterMs))
-    }
-  }
+function writeInput(ptyProcess: IPty, input: string): void {
+  ptyProcess.write(normalizeInput(input))
 }
 
 // Wait for the rendered prompt, not just version output.
@@ -83,7 +72,7 @@ export async function runCliInPty(opts: {
   executablePath?: string
   cwd: string
   env?: NodeJS.ProcessEnv
-  input: CliPtyInput
+  input: string
 }): Promise<string> {
   const pty = require('@lydell/node-pty') as {
     spawn: (file: string, args: string[], options: object) => IPty
