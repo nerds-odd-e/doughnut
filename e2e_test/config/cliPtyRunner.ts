@@ -4,20 +4,13 @@
  */
 
 import type { IPty } from '@lydell/node-pty'
-import { E2E_BACKEND_BASE_URL } from './constants'
+import { cliEnv } from './cliEnv'
 
 const PTY_TIMEOUT_MS = 25_000
 const PTY_OPTIONS = {
   name: 'xterm-256color' as const,
   cols: 80,
   rows: 24,
-}
-
-function cliEnv(overrides?: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
-  return {
-    DOUGHNUT_API_BASE_URL: E2E_BACKEND_BASE_URL,
-    ...overrides,
-  }
 }
 
 export type CliPtyInput = string | { text: string; delayAfterMs?: number }[]

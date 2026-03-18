@@ -4,20 +4,19 @@ import {
   existsSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   rm,
   writeFileSync,
 } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, extname, join, resolve } from 'node:path'
 import mcpClient from '../support/mcp_client'
 const {
   addCucumberPreprocessorPlugin,
 } = require('@badeball/cypress-cucumber-preprocessor')
 import { createEsbuildPlugin } from '@badeball/cypress-cucumber-preprocessor/esbuild'
 import createBundler from '@bahmutov/cypress-esbuild-preprocessor'
-import fs from 'fs'
-import path from 'path'
 import AdmZip from 'adm-zip'
 import type { ExpectedFile } from '../start/downloadChecker'
 import {
@@ -26,16 +25,10 @@ import {
   sendToInteractiveCli as sendToInteractiveCliInput,
   stopInteractiveCli as stopInteractiveCliProcess,
 } from './cliPtyRunner'
+import { cliEnv } from './cliEnv'
 import { E2E_BACKEND_BASE_URL } from './constants'
 
 const CLI_BUNDLE_PATH = 'cli/dist/doughnut-cli.bundle.mjs'
-
-function cliEnv(overrides?: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
-  return {
-    DOUGHNUT_API_BASE_URL: E2E_BACKEND_BASE_URL,
-    ...overrides,
-  }
-}
 
 function runSync(
   cmd: string,
@@ -84,6 +77,79 @@ function getCliRunConfig(repoRoot: string): {
   }
 }
 
+const CLI_SPAWN_TIMEOUT_MS = 25_000
+
+async function spawnCliFromRepo(opts: {
+  repoRoot: string
+  args?: string[]
+  stdin?: string
+  env?: NodeJS.ProcessEnv
+  simulateOAuthCallback?: boolean
+  timeoutMs?: number
+}): Promise<string> {
+  const { spawn } = await import('node:child_process')
+  const config = getCliRunConfig(opts.repoRoot)
+  const args = [...config.baseArgs, ...(opts.args ?? [])]
+  return new Promise<string>((resolve, reject) => {
+    const proc = spawn(config.command, args, {
+      cwd: opts.repoRoot,
+      env: { ...process.env, ...cliEnv(opts.env) },
+      stdio: ['pipe', 'pipe', 'pipe'],
+    })
+    let stdout = ''
+    const append = (chunk: string) => {
+      stdout += chunk
+      return stdout
+    }
+    proc.stdout?.on('data', (chunk: Buffer) => {
+      const out = append(chunk.toString())
+      if (opts.simulateOAuthCallback) {
+        const authMatch = out.match(/https:\/\/accounts\.google\.com\/[^\s]+/)
+        if (authMatch) {
+          const redirectUri = new URL(authMatch[0]).searchParams.get(
+            'redirect_uri'
+          )
+          if (redirectUri) {
+            fetch(`${redirectUri}?code=e2e_mock_auth_code`).catch(() => {
+              /* ignore OAuth callback errors */
+            })
+          }
+        }
+      }
+    })
+    if (opts.simulateOAuthCallback) {
+      proc.stderr?.on('data', (chunk: Buffer) => append(chunk.toString()))
+    }
+    const timeout =
+      opts.timeoutMs &&
+      setTimeout(() => {
+        proc.kill('SIGKILL')
+        reject(
+          new Error(
+            `CLI timed out after ${opts.timeoutMs}ms. stdout tail: ${stdout.slice(-300)}`
+          )
+        )
+      }, opts.timeoutMs)
+    if (opts.stdin !== undefined) {
+      proc.stdin?.write(
+        opts.stdin.endsWith('\n') ? opts.stdin : `${opts.stdin}\n`
+      )
+      proc.stdin?.end()
+    } else {
+      proc.stdin?.end()
+    }
+    proc.on('close', (code) => {
+      if (timeout) clearTimeout(timeout)
+      if (code === 0) resolve(stdout)
+      else reject(new Error(`CLI exited with code ${code}`))
+    })
+    proc.on('error', (err) => {
+      if (timeout) clearTimeout(timeout)
+      reject(err)
+    })
+  })
+}
+
 const commonConfig = {
   chromeWebSecurity: false,
   screenshotOnRunFailure: true,
@@ -105,8 +171,8 @@ const commonConfig = {
 
       // Cypress 10+ changes process.cwd() to the config file's directory when using --config-file,
       // so resolve from __dirname to get the repo root regardless of cwd.
-      const repoRoot = path.resolve(__dirname, '..', '..')
-      const generatedBackendPath = path.join(
+      const repoRoot = resolve(__dirname, '..', '..')
+      const generatedBackendPath = join(
         repoRoot,
         'packages',
         'generated',
@@ -200,19 +266,19 @@ const commonConfig = {
         },
         checkDownloadedZipContent(expectedFiles: ExpectedFile[]) {
           const downloadsFolder = config.downloadsFolder
-          const files = fs.readdirSync(downloadsFolder)
+          const files = readdirSync(downloadsFolder)
           const zipFile = files.find((file) => file.endsWith('.zip'))
 
           if (!zipFile) {
             throw new Error('No zip file found in downloads folder')
           }
 
-          const zip = new AdmZip(path.join(downloadsFolder, zipFile))
+          const zip = new AdmZip(join(downloadsFolder, zipFile))
           const zipEntries = zip.getEntries()
 
           const actualFiles = zipEntries.map((entry) => ({
             Filename: entry.entryName,
-            Format: path.extname(entry.entryName).slice(1),
+            Format: extname(entry.entryName).slice(1),
             Content: entry.getData().toString('utf8'),
           }))
 
@@ -317,8 +383,8 @@ const commonConfig = {
           return await mcpClient.disconnectMcpServer()
         },
         async bundleMcpServer() {
-          const repoRoot = path.resolve(__dirname, '..', '..')
-          const mcpServerDir = path.join(repoRoot, 'mcp-server')
+          const repoRoot = resolve(__dirname, '..', '..')
+          const mcpServerDir = join(repoRoot, 'mcp-server')
           try {
             runSync('pnpm bundle', { cwd: mcpServerDir })
             return true
@@ -332,13 +398,14 @@ const commonConfig = {
         },
         createCliConfigDirWithGmail(gmailConfig: Record<string, unknown>) {
           const configDir = mkdtempSync(join(tmpdir(), 'cypress-cli-gmail-'))
-          const configPath = join(configDir, 'gmail.json')
-          mkdirSync(configDir, { recursive: true })
-          writeFileSync(configPath, JSON.stringify(gmailConfig, null, 2))
+          writeFileSync(
+            join(configDir, 'gmail.json'),
+            JSON.stringify(gmailConfig, null, 2)
+          )
           return configDir
         },
         async bundleAndCopyCli() {
-          const repoRoot = path.resolve(__dirname, '..', '..')
+          const repoRoot = resolve(__dirname, '..', '..')
           try {
             bundleAndCopyCliToBuildOutput(repoRoot)
             return true
@@ -348,7 +415,7 @@ const commonConfig = {
           }
         },
         async bundleAndCopyCliWithVersion(version: string) {
-          const repoRoot = path.resolve(__dirname, '..', '..')
+          const repoRoot = resolve(__dirname, '..', '..')
           try {
             bundleAndCopyCliToBuildOutput(repoRoot, {
               ...process.env,
@@ -397,69 +464,17 @@ const commonConfig = {
           env?: NodeJS.ProcessEnv
           simulateOAuthCallback?: boolean
         }) {
-          const { spawn } = await import('node:child_process')
-          const repoRoot = path.resolve(__dirname, '..', '..')
-          const config = getCliRunConfig(repoRoot)
-          const normalizedInput = input.endsWith('\n') ? input : `${input}\n`
-          return new Promise<string>((resolve, reject) => {
-            const proc = spawn(config.command, [...config.baseArgs], {
-              cwd: repoRoot,
-              env: { ...process.env, ...cliEnv(env) },
-              stdio: ['pipe', 'pipe', 'pipe'],
-            })
-            let stdout = ''
-            const append = (chunk: string) => {
-              stdout += chunk
-              return stdout
-            }
-            proc.stdout?.on('data', (chunk: Buffer) => {
-              const out = append(chunk.toString())
-              if (simulateOAuthCallback) {
-                const authMatch = out.match(
-                  /https:\/\/accounts\.google\.com\/[^\s]+/
-                )
-                if (authMatch) {
-                  const redirectUri = new URL(authMatch[0]).searchParams.get(
-                    'redirect_uri'
-                  )
-                  if (redirectUri) {
-                    fetch(`${redirectUri}?code=e2e_mock_auth_code`).catch(
-                      () => {
-                        /* ignore callback errors */
-                      }
-                    )
-                  }
-                }
-              }
-            })
-            if (simulateOAuthCallback) {
-              proc.stderr?.on('data', (chunk: Buffer) =>
-                append(chunk.toString())
-              )
-            }
-            const timeout = setTimeout(() => {
-              proc.kill('SIGKILL')
-              reject(
-                new Error(
-                  `Piped CLI timed out after 25s. stdout tail: ${stdout.slice(-300)}`
-                )
-              )
-            }, 25_000)
-            proc.stdin?.write(normalizedInput)
-            proc.stdin?.end()
-            proc.on('close', (code) => {
-              clearTimeout(timeout)
-              if (code === 0) resolve(stdout)
-              else reject(new Error(`CLI exited with code ${code}`))
-            })
-            proc.on('error', (err) => {
-              clearTimeout(timeout)
-              reject(err)
-            })
+          const repoRoot = resolve(__dirname, '..', '..')
+          return spawnCliFromRepo({
+            repoRoot,
+            stdin: input,
+            env,
+            simulateOAuthCallback,
+            timeoutMs: CLI_SPAWN_TIMEOUT_MS,
           })
         },
         async startInteractiveCli({ env }: { env?: NodeJS.ProcessEnv }) {
-          const repoRoot = path.resolve(__dirname, '..', '..')
+          const repoRoot = resolve(__dirname, '..', '..')
           const config = getCliRunConfig(repoRoot)
           await startInteractiveCliProcess({
             command: config.command,
@@ -483,26 +498,8 @@ const commonConfig = {
           args: string[]
           env?: NodeJS.ProcessEnv
         }) {
-          const { spawn } = await import('node:child_process')
-          const repoRoot = path.resolve(__dirname, '..', '..')
-          const config = getCliRunConfig(repoRoot)
-          return new Promise<string>((resolve, reject) => {
-            const proc = spawn(config.command, [...config.baseArgs, ...args], {
-              cwd: repoRoot,
-              env: { ...process.env, ...cliEnv(env) },
-              stdio: ['pipe', 'pipe', 'pipe'],
-            })
-            let stdout = ''
-            proc.stdout?.on('data', (chunk: Buffer) => {
-              stdout += chunk.toString()
-            })
-            proc.stdin?.end()
-            proc.on('close', (code) => {
-              if (code === 0) resolve(stdout)
-              else reject(new Error(`CLI exited with code ${code}`))
-            })
-            proc.on('error', reject)
-          })
+          const repoRoot = resolve(__dirname, '..', '..')
+          return spawnCliFromRepo({ repoRoot, args, env })
         },
         async runInstalledCli({
           doughnutPath,
@@ -525,7 +522,7 @@ const commonConfig = {
               `runInstalledCli: doughnut binary not found at ${doughnutPath}. Ensure prior step "I install the CLI" succeeded.`
             )
           }
-          const cwd = path.dirname(doughnutPath)
+          const cwd = dirname(doughnutPath)
           if (input !== undefined) {
             return runCliInPty({
               executablePath: doughnutPath,

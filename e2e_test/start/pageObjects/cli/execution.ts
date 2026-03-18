@@ -1,24 +1,25 @@
 /**
- * CLI execution page objects. Domain: installation, non-interactive, interactive, access token, Gmail.
+ * CLI execution page objects.
+ * Domain: installation, non-interactive, interactive, access token, Gmail.
  */
 import { backendBaseUrl } from '../../../support/backendUrl'
 import { currentGuidance } from './outputAssertions'
 
 const GOOGLE_MOCK_BASE_URL = 'http://localhost:5003'
 
-function cliEnvWithConfigDir(configDir: string): Record<string, string> {
+function envForCliConfigDir(configDir: string): Record<string, string> {
   return {
     DOUGHNUT_CONFIG_DIR: configDir,
     DOUGHNUT_API_BASE_URL: backendBaseUrl(),
   }
 }
 
-function runWithConfigDir(args: string[]) {
+function runCliWithScenarioConfigDir(args: string[]) {
   cy.get<string>('@cliConfigDir').then((configDir) =>
     cy
       .task('runCliDirectWithArgs', {
         args,
-        env: cliEnvWithConfigDir(configDir),
+        env: envForCliConfigDir(configDir),
       })
       .as('doughnutOutput')
   )
@@ -74,7 +75,7 @@ function nonInteractive() {
       }).as('doughnutOutput')
     },
     runWithCommand(cmd: string) {
-      runWithConfigDir(['-c', cmd])
+      runCliWithScenarioConfigDir(['-c', cmd])
     },
     runVersion() {
       cy.task('runCliDirectWithArgs', { args: ['version'] }).as(
@@ -111,45 +112,44 @@ function interactive() {
   }
 }
 
-function runWithCommandAndSuffix(command: string, suffix: string) {
-  runWithConfigDir(['-c', `${command} ${suffix}`])
-}
-
 function accessToken() {
+  const runAccessTokenCommand = (command: string, value: string) =>
+    runCliWithScenarioConfigDir(['-c', `${command} ${value}`])
   return {
     runWithSavedToken(command: string) {
       cy.get<string>('@savedAccessToken').then((token) =>
-        runWithCommandAndSuffix(command, token)
+        runAccessTokenCommand(command, token)
       )
     },
     runWithToken(command: string, token: string) {
-      runWithCommandAndSuffix(command, token)
+      runAccessTokenCommand(command, token)
     },
     runWithLabel(command: string, label: string) {
-      runWithCommandAndSuffix(command, label)
+      runAccessTokenCommand(command, label)
     },
   }
 }
 
+const gmailConfigForAdd = {
+  clientId: 'e2e-test-client',
+  clientSecret: 'e2e-test-secret',
+  accounts: [],
+}
+const gmailConfigWithMockAccount = {
+  accounts: [
+    {
+      email: 'e2e@gmail.com',
+      accessToken: 'mock_access_token',
+      refreshToken: 'mock_refresh_token',
+      expiresAt: Date.now() + 3600_000,
+    },
+  ],
+}
+
 function gmail() {
-  const emptyGmailConfig = {
-    clientId: 'e2e-test-client',
-    clientSecret: 'e2e-test-secret',
-    accounts: [],
-  }
-  const preconfiguredGmailConfig = {
-    accounts: [
-      {
-        email: 'e2e@gmail.com',
-        accessToken: 'mock_access_token',
-        refreshToken: 'mock_refresh_token',
-        expiresAt: Date.now() + 3600_000,
-      },
-    ],
-  }
   return {
     addWithSimulatedOAuth() {
-      cy.task<string>('createCliConfigDirWithGmail', emptyGmailConfig).then(
+      cy.task<string>('createCliConfigDirWithGmail', gmailConfigForAdd).then(
         (configDir) =>
           cy
             .task('runCliDirectWithInput', {
@@ -167,7 +167,7 @@ function gmail() {
     lastEmailWithPreconfiguredAccount() {
       cy.task<string>(
         'createCliConfigDirWithGmail',
-        preconfiguredGmailConfig
+        gmailConfigWithMockAccount
       ).then((configDir) =>
         cy
           .task('runCliDirectWithInput', {
