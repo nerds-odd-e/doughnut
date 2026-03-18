@@ -2,19 +2,16 @@ import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import { UserController } from '@generated/doughnut-backend-api/sdk.gen'
+import { UserController } from 'doughnut-api'
 
-vi.mock('@generated/doughnut-backend-api/sdk.gen', () => ({
+vi.mock('doughnut-api', () => ({
+  getApiConfig: () => ({ apiBaseUrl: 'http://localhost:9081' }),
+  configureClient: vi.fn(),
   UserController: {
     getTokenInfo: vi.fn(),
     revokeToken: vi.fn(),
     generateToken: vi.fn(),
   },
-}))
-
-vi.mock('doughnut-api', () => ({
-  getApiConfig: () => ({ apiBaseUrl: 'http://localhost:9081' }),
-  configureClient: vi.fn(),
 }))
 
 import {

@@ -11,14 +11,13 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "postinstall": "syncpack fix",
-    "bundle": "([ -f .env.local ] && set -a && . ./.env.local && set +a) || true; pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=./dist/doughnut-cli.bundle.mjs --format=esm --alias:@generated/doughnut-backend-api=../packages/generated/doughnut-backend-api --alias:doughnut-api=../packages/doughnut-api/src/index.ts --banner:js='#!/usr/bin/env node' --define:CLI_VERSION=\\\"${CLI_VERSION:-0.1.0}\\\" --define:process.env.GOOGLE_CLIENT_ID=\\\"${GOOGLE_CLIENT_ID:-}\\\" --define:process.env.GOOGLE_CLIENT_SECRET=\\\"${GOOGLE_CLIENT_SECRET:-}\\\"",
+    "bundle": "([ -f .env.local ] && set -a && . ./.env.local && set +a) || true; pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=./dist/doughnut-cli.bundle.mjs --format=esm --alias:doughnut-api=../packages/doughnut-api/src/index.ts --banner:js='#!/usr/bin/env node' --define:CLI_VERSION=\\\"${CLI_VERSION:-0.1.0}\\\" --define:process.env.GOOGLE_CLIENT_ID=\\\"${GOOGLE_CLIENT_ID:-}\\\" --define:process.env.GOOGLE_CLIENT_SECRET=\\\"${GOOGLE_CLIENT_SECRET:-}\\\"",
     "test": "vitest run",
     "test:watch": "vitest --watch",
     "format": "biome check --write src/ tests/",
     "lint": "biome check src/ tests/"
   },
   "dependencies": {
-    "@generated/doughnut-backend-api": "workspace:*",
     "doughnut-api": "workspace:*",
     "markdansi": "0.2.1",
     "turndown": "^7.2.2"

@@ -2,9 +2,9 @@ import {
   MemoryTrackerController,
   RecallsController,
   RecallPromptController,
-} from '@generated/doughnut-backend-api/sdk.gen'
-import type { RecallPrompt } from '@generated/doughnut-backend-api'
-import type { MemoryTrackerLite } from '@generated/doughnut-backend-api'
+  type MemoryTrackerLite,
+  type RecallPrompt,
+} from 'doughnut-api'
 import { runWithDefaultBackendClient } from './accessToken.js'
 
 function getTimezone(): string {

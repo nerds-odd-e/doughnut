@@ -7,7 +7,7 @@ import {
   RecallsController,
   RecallPromptController,
   UserController,
-} from '@generated/doughnut-backend-api/sdk.gen'
+} from 'doughnut-api'
 import { addAccessToken } from '../src/accessToken.js'
 import {
   answerQuiz,
@@ -18,7 +18,9 @@ import {
   recallStatus,
 } from '../src/recall.js'
 
-vi.mock('@generated/doughnut-backend-api/sdk.gen', () => ({
+vi.mock('doughnut-api', () => ({
+  getApiConfig: () => ({ apiBaseUrl: 'http://localhost:9081' }),
+  configureClient: vi.fn(),
   MemoryTrackerController: {
     askAQuestion: vi.fn(),
     markAsRecalled: vi.fn(),
@@ -36,11 +38,6 @@ vi.mock('@generated/doughnut-backend-api/sdk.gen', () => ({
   UserController: {
     getTokenInfo: vi.fn(),
   },
-}))
-
-vi.mock('doughnut-api', () => ({
-  getApiConfig: () => ({ apiBaseUrl: 'http://localhost:9081' }),
-  configureClient: vi.fn(),
 }))
 
 function createTempDir(): string {

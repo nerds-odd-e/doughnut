@@ -1,7 +1,6 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { configureClient, getApiConfig } from 'doughnut-api'
-import { UserController } from '@generated/doughnut-backend-api/sdk.gen'
+import { configureClient, getApiConfig, UserController } from 'doughnut-api'
 import { getConfigDir } from './configDir.js'
 
 export interface AccessTokenEntry {
