@@ -12,7 +12,6 @@ import Inspector from 'unplugin-vue-inspector/vite'
 import { VueRouterAutoImports } from 'vue-router/unplugin'
 import VueRouter from 'vue-router/vite'
 import checker from 'vite-plugin-checker'
-import tsconfigPaths from 'vite-tsconfig-paths'
 
 // Check if we're running tests - Vitest sets process.env.VITEST
 // This is the official and most reliable way to detect test mode
@@ -20,6 +19,7 @@ const isTest = process.env.VITEST !== undefined
 
 const config = defineConfig({
   resolve: {
+    tsconfigPaths: true,
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       '@tests': fileURLToPath(new URL('./tests', import.meta.url)),
@@ -38,7 +38,6 @@ const config = defineConfig({
     },
   },
   plugins: [
-    tsconfigPaths(),
     vue({
       template: {
         compilerOptions: {
@@ -102,9 +101,16 @@ const config = defineConfig({
         main: fileURLToPath(new URL('index.html', import.meta.url)),
       },
       output: {
-        manualChunks: {
-          'vue-vendor': ['vue', 'vue-router'],
-          'ui-vendor': ['quill', 'gsap', 'marked', 'turndown']
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('vue') || id.includes('vue-router')) {
+              return 'vue-vendor';
+            }
+            if (id.includes('quill') || id.includes('gsap') || id.includes('marked') || id.includes('turndown')) {
+              return 'ui-vendor';
+            }
+          }
+          return undefined;
         },
         assetFileNames: ({ name }) => {
           if (name === 'main.css') return 'assets/main.css';

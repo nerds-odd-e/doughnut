@@ -7,6 +7,7 @@ import { routeMetadata } from "@/routes/routeMetadata"
 import { ref } from "vue"
 import type { User } from "@generated/doughnut-backend-api"
 import makeMe from "@tests/fixtures/makeMe"
+import { storyFiles } from "../../storyFiles.generated"
 
 // Mock router for components that use vue-router (same as Storybook preview)
 const mockRoutes: RouteRecordRaw[] = routeMetadata.map((metadata) => ({
@@ -21,32 +22,17 @@ const router = createRouter({
   routes: mockRoutes,
 })
 
-type StoryFile = {
-  default: Meta
-  [name: string]: StoryObj | Meta
-}
-
-function getAllStoryFiles() {
-  const storyFiles = Object.entries(
-    import.meta.glob<StoryFile>("../../src/**/*.stories.@(js|jsx|mjs|ts|tsx)", {
-      eager: true,
-    })
-  )
-
-  return storyFiles.map(([filePath, storyFile]) => ({ filePath, storyFile }))
-}
-
 describe("All Storybook Stories", () => {
-  const storyFiles = getAllStoryFiles()
+  const storyFilesList = storyFiles
 
-  if (storyFiles.length === 0) {
+  if (storyFilesList.length === 0) {
     it("should find story files", () => {
       throw new Error("No story files found. Check the glob pattern.")
     })
   }
 
-  storyFiles.forEach(({ filePath, storyFile }) => {
-    const meta = storyFile.default
+  storyFilesList.forEach(({ filePath, storyFile }) => {
+    const meta = storyFile.default as Meta | undefined
     if (!meta) {
       return
     }
