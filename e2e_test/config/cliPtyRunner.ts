@@ -211,10 +211,10 @@ async function waitForNewPromptAfterSend(
   const INPUT_BOX_READY_PATTERN = /│ → (?:\x1b\[[0-9;]*m)*`/
   const maxWaitMs = 15_000
   const pollMs = 10
-  const stabilizeMs = 100
+  const stablePollsRequired = 3
   const start = Date.now()
   let lastStdoutLen = 0
-  let stableSince = 0
+  let stablePolls = 0
   while (Date.now() - start < maxWaitMs) {
     const stdout = getStdout()
     const newContent = stdout.slice(lenBeforeSend)
@@ -224,14 +224,14 @@ async function waitForNewPromptAfterSend(
     }
     if (INPUT_BOX_READY_PATTERN.test(newContent)) {
       if (stdout.length === lastStdoutLen) {
-        if (stableSince === 0) stableSince = Date.now()
-        if (Date.now() - stableSince >= stabilizeMs) return
+        stablePolls++
+        if (stablePolls >= stablePollsRequired) return
       } else {
-        stableSince = 0
+        stablePolls = 0
       }
       lastStdoutLen = stdout.length
     } else {
-      stableSince = 0
+      stablePolls = 0
     }
     await new Promise((r) => setTimeout(r, pollMs))
   }
