@@ -7,6 +7,8 @@ import type { IPty } from '@lydell/node-pty'
 import { cliEnv } from './cliEnv'
 
 const PTY_TIMEOUT_MS = 25_000
+/** Polling interval for state-based waits; not a fixed delay. */
+const CLI_POLL_MS = 10
 const PTY_OPTIONS = {
   name: 'xterm-256color' as const,
   cols: 80,
@@ -62,11 +64,10 @@ async function waitForCliReady(
   getStdout: () => string
 ): Promise<void> {
   const maxWaitMs = 10_000
-  const pollMs = 10
   const start = Date.now()
   while (Date.now() - start < maxWaitMs) {
     if (CLI_READY_PATTERN.test(getStdout())) return
-    await new Promise((r) => setTimeout(r, pollMs))
+    await new Promise((r) => setTimeout(r, CLI_POLL_MS))
   }
   const stdout = getStdout()
   throw new Error(
@@ -210,7 +211,6 @@ async function waitForNewPromptAfterSend(
   // biome-ignore lint/suspicious/noControlCharactersInRegex: matching ANSI escape codes in PTY output
   const INPUT_BOX_READY_PATTERN = /│ → (?:\x1b\[[0-9;]*m)*`/
   const maxWaitMs = 15_000
-  const pollMs = 10
   const stablePollsRequired = 3
   const start = Date.now()
   let lastStdoutLen = 0
@@ -219,7 +219,7 @@ async function waitForNewPromptAfterSend(
     const stdout = getStdout()
     const newContent = stdout.slice(lenBeforeSend)
     if (stdout.length <= lenBeforeSend) {
-      await new Promise((r) => setTimeout(r, pollMs))
+      await new Promise((r) => setTimeout(r, CLI_POLL_MS))
       continue
     }
     if (INPUT_BOX_READY_PATTERN.test(newContent)) {
@@ -233,7 +233,7 @@ async function waitForNewPromptAfterSend(
     } else {
       stablePolls = 0
     }
-    await new Promise((r) => setTimeout(r, pollMs))
+    await new Promise((r) => setTimeout(r, CLI_POLL_MS))
   }
   const stdout = getStdout()
   throw new Error(
