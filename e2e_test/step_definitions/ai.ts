@@ -98,9 +98,7 @@ Given(
   'OpenAI generates this as second question:',
   (questionTable: DataTable) => {
     const question = parseSingleRowQuestion(questionTable)
-    cy.then(async () => {
-      Cypress.env('secondQuestion', question)
-    })
+    cy.task('setTestState', { key: 'secondQuestion', value: question })
   }
 )
 
@@ -120,17 +118,19 @@ Given('OpenAI evaluates the question as not legitimate', () => {
       'This question is not feasible and needs to be regenerated completely.',
   })
 
-  // Use the stored second question data if available
-  const secondQuestion = Cypress.env('secondQuestion') || {
+  const defaultSecondQuestion = {
     'Question Stem': 'Second question',
     'Correct Choice': 'Rescue Diver',
     'Incorrect Choice 1': 'Divemaster',
     'Incorrect Choice 2': 'Open Water Diver',
   }
-
-  start
-    .questionGenerationService()
-    .resetAndStubAskingMCQByChatCompletion(secondQuestion)
+  cy.task('getTestState', 'secondQuestion').then((stored) => {
+    const secondQuestion =
+      (stored as Record<string, string> | undefined) ?? defaultSecondQuestion
+    start
+      .questionGenerationService()
+      .resetAndStubAskingMCQByChatCompletion(secondQuestion)
+  })
 })
 
 Then('I contest the question', () => {

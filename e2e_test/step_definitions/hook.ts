@@ -8,11 +8,12 @@ import { backendBaseUrl } from '../support/backendUrl'
 import start, { mock_services } from '../start'
 
 Before(() => {
+  cy.task('clearTestState')
   const startTime = Date.now()
   start.testability().cleanDBAndResetTestabilitySettings()
   cy.then(() => {
     if (
-      Cypress.env('RECORD_E2E_TIMING') &&
+      Cypress.expose('RECORD_E2E_TIMING') &&
       Cypress.spec.relative?.includes('cli_recall')
     ) {
       cy.task('recordTiming', {

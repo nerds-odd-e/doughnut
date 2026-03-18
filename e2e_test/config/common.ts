@@ -123,6 +123,7 @@ const commonConfig = {
       )
 
       const timingLogPath = join(repoRoot, 'e2e_test', 'timing_log.jsonl')
+      const testState: Record<string, unknown> = {}
 
       on('before:run', () => {
         if (process.env.RECORD_E2E_TIMING && existsSync(timingLogPath)) {
@@ -131,6 +132,17 @@ const commonConfig = {
       })
 
       on('task', {
+        setTestState({ key, value }: { key: string; value: unknown }) {
+          testState[key] = value
+          return null
+        },
+        getTestState(key: string) {
+          return testState[key] ?? null
+        },
+        clearTestState() {
+          Object.keys(testState).forEach((k) => delete testState[k])
+          return null
+        },
         recordTiming({
           label,
           duration,
