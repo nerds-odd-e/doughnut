@@ -11,7 +11,7 @@ Feature: Spaced-repetition
     @mockBrowserTime
     Scenario: The assimilation and recall page
         Given On day 1 I should have "0/1/3" note for assimilation and "0/0/0" for recall
-        When I assimilate "Note 1"
+        When I assimilate the note "Note 1"
         Then On day 1 I should have "1/1/3" note for assimilation and "0/0/1" for recall
         And On day 3 I should have "1/2/3" note for assimilation and "0/0/1" for recall
 

@@ -14,13 +14,6 @@ Then('I should see {int} due for assimilation', (numberOfNotes: number) => {
   start.assimilation().expectCount(numberOfNotes)
 })
 
-Then('I assimilate {string}', (noteTopology: string) => {
-  start
-    .assimilation()
-    .navigateToAssimilationPage()
-    .assimilateNotes(noteTopology)
-})
-
 Then(
   'I added and learned one note {string} on day {int}',
   (noteTopology: string, day: number) => {
