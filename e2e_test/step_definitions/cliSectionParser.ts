@@ -1,11 +1,11 @@
 /**
- * Parses CLI stdout into sections for E2E assertions.
+ * Parses CLI stdout into domain sections for E2E assertions.
  *
  * Domain sections:
- * - history-input: Past user input lines
- * - history-output: Past command results
- * - current-prompt: Content between separator and input box (recall prompts, MCQ, y/n)
- * - current-guidance: Content below the input box (hints like / commands)
+ * - History input: Past user input lines
+ * - History output: Past command results
+ * - Current guidance: Prompts, hints, options for the current input (spans two regions:
+ *   above the input box [recall, MCQ, y/n] and below it [/ commands, token list])
  */
 
 // --- ANSI stripping ---
@@ -106,7 +106,7 @@ function parseCliOutput(output: string): Boundaries {
   }
 }
 
-export type Section =
+type Section =
   | 'history-input'
   | 'history-output'
   | 'current-prompt'
@@ -170,13 +170,22 @@ function collectSectionLines(
 }
 
 // --- Public API ---
-export function getSectionContent(output: string, section: Section): string {
+
+function getSectionContent(output: string, section: Section): string {
   const boundaries = parseCliOutput(output)
   return collectSectionLines(boundaries, section, true).join('\n')
 }
 
+export function getHistoryOutputContent(output: string): string {
+  return getSectionContent(output, 'history-output')
+}
+
+export function getHistoryInputContent(output: string): string {
+  return getSectionContent(output, 'history-input')
+}
+
 export function getCurrentGuidanceDebug(output: string): {
-  contentReadable: string
+  currentGuidanceContent: string
   inputBoxLineRange: { start: number; end: number }
   lineCount: number
   rawTail: string
@@ -184,18 +193,13 @@ export function getCurrentGuidanceDebug(output: string): {
   const lines = output.split('\n')
   const boxStart = findLastInputBoxStart(lines)
   const boxEnd = findLastInputBoxEnd(lines)
-  const content = getSectionContent(output, 'current-guidance')
+  const { currentGuidanceAndHistory } = getRecallDisplaySections(output)
   return {
-    contentReadable: stripAllAnsi(content).trim(),
+    currentGuidanceContent: stripAllAnsi(currentGuidanceAndHistory).trim(),
     inputBoxLineRange: { start: boxStart, end: boxEnd },
     lineCount: lines.length,
     rawTail: output.slice(-1200).replace(/\r/g, '\\r').replace(/\n/g, '\\n '),
   }
-}
-
-export function getSectionContentRaw(output: string, section: Section): string {
-  const boundaries = parseCliOutput(output)
-  return collectSectionLines(boundaries, section, false).join('\n')
 }
 
 export function getLastCommandOutput(output: string): string {
@@ -220,17 +224,36 @@ export function getLastCommandOutput(output: string): string {
   return blocks.length > 0 ? blocks[blocks.length - 1]! : ''
 }
 
+function getCurrentGuidanceCombined(
+  boundaries: Boundaries,
+  stripAnsi: boolean
+): string {
+  const parts = [
+    collectSectionLines(boundaries, 'current-prompt', stripAnsi),
+    collectSectionLines(boundaries, 'current-guidance', stripAnsi),
+    collectSectionLines(boundaries, 'history-output', stripAnsi),
+  ].map((lines) => lines.join('\n'))
+  return `${parts[0]}\n${parts[1]}\n${parts[2]}`.trim()
+}
+
 export function getRecallDisplaySections(output: string): {
   currentGuidanceAndHistory: string
   historyOutput: string
 } {
-  const currentPrompt = getSectionContent(output, 'current-prompt')
-  const currentGuidance = getSectionContent(output, 'current-guidance')
-  const historyOutput = getSectionContent(output, 'history-output')
-  const currentGuidanceCombined = `${currentPrompt}\n${currentGuidance}`.trim()
+  const boundaries = parseCliOutput(output)
+  const currentGuidanceAndHistory = getCurrentGuidanceCombined(boundaries, true)
+  const historyOutput = collectSectionLines(
+    boundaries,
+    'history-output',
+    true
+  ).join('\n')
   return {
-    currentGuidanceAndHistory:
-      `${currentGuidanceCombined}\n${historyOutput}`.trim(),
+    currentGuidanceAndHistory,
     historyOutput,
   }
+}
+
+export function getCurrentGuidanceAndHistoryRaw(output: string): string {
+  const boundaries = parseCliOutput(output)
+  return getCurrentGuidanceCombined(boundaries, false)
 }

@@ -2,11 +2,12 @@ import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import { backendBaseUrl } from '../support/backendUrl'
 import { mock_services } from '../start'
 import {
-  getSectionContent,
-  getSectionContentRaw,
+  getHistoryOutputContent,
+  getHistoryInputContent,
   getLastCommandOutput,
   getRecallDisplaySections,
   getCurrentGuidanceDebug,
+  getCurrentGuidanceAndHistoryRaw,
 } from './cliSectionParser'
 
 const GOOGLE_MOCK_URL = 'http://localhost:5003'
@@ -48,16 +49,16 @@ function buildCurrentGuidanceFailureMessage(
   output: string,
   expected: string
 ): string {
-  const { contentReadable, inputBoxLineRange, lineCount, rawTail } =
+  const { currentGuidanceContent, inputBoxLineRange, lineCount, rawTail } =
     getCurrentGuidanceDebug(output)
   const linesAfterBox =
     inputBoxLineRange.end >= 0 ? lineCount - inputBoxLineRange.end - 1 : 0
   return [
-    `Expected "${expected}" in Current guidance (content below the last input box).`,
+    `Expected "${expected}" in Current guidance (prompts, hints, options for the current input).`,
     ``,
     `Parser: input box ┌ at line ${inputBoxLineRange.start}, └ at line ${inputBoxLineRange.end} of ${lineCount} lines. Lines after └: ${linesAfterBox}.`,
     ``,
-    `Current guidance: ${contentReadable ? `"${contentReadable}"` : '(empty)'}`,
+    `Current guidance: ${currentGuidanceContent ? `"${currentGuidanceContent}"` : '(empty)'}`,
     ``,
     `Raw output tail (\\r→\\r \\n→\\n ):`,
     rawTail,
@@ -211,12 +212,12 @@ When(
   }
 )
 
-// --- Section assertions (History output, History input, Current guidance) ---
+// --- Section assertions: History output, History input, Current guidance ---
 
 Then('I should see {string} in the history output', (expected: string) => {
   cy.get<string>('@doughnutOutput').then((output) =>
     assertOutputIncludes(
-      getSectionContent(output, 'history-output'),
+      getHistoryOutputContent(output),
       expected,
       'history output'
     )
@@ -236,7 +237,7 @@ Then('I should see {string} in the Current guidance', (expected: string) => {
 Then('I should see {string} in the history input', (expected: string) => {
   cy.get<string>('@doughnutOutput').then((output) =>
     assertOutputIncludes(
-      getSectionContent(output, 'history-input'),
+      getHistoryInputContent(output),
       expected,
       'history input'
     )
@@ -247,14 +248,7 @@ Then(
   'I should see {string} styled in the Current guidance',
   (expected: string) => {
     cy.get<string>('@doughnutOutput').then((output) => {
-      const rawCurrentPrompt = getSectionContentRaw(output, 'current-prompt')
-      const rawCurrentGuidance = getSectionContentRaw(
-        output,
-        'current-guidance'
-      )
-      const fallbackRaw = getSectionContentRaw(output, 'history-output')
-      const rawContent =
-        `${rawCurrentPrompt}\n${rawCurrentGuidance}\n${fallbackRaw}`.trim()
+      const rawContent = getCurrentGuidanceAndHistoryRaw(output)
       expect(
         rawContent,
         `Expected "${expected}" in raw Current guidance`
@@ -282,10 +276,7 @@ Then('I should see {string} in the last command output', (expected: string) => {
 
 Then('I should not see {string} in the history output', (expected: string) => {
   cy.get<string>('@doughnutOutput').then((output) =>
-    assertOutputNotIncludes(
-      getSectionContent(output, 'history-output'),
-      expected
-    )
+    assertOutputNotIncludes(getHistoryOutputContent(output), expected)
   )
 })
 
@@ -323,7 +314,7 @@ Then(
         : 'removed locally and from server'
     cy.get<string>('@doughnutOutput').then((output) =>
       assertOutputIncludes(
-        getSectionContent(output, 'history-output'),
+        getHistoryOutputContent(output),
         expected,
         'history output'
       )
