@@ -188,14 +188,15 @@ export async function sendToInteractiveCli(input: string): Promise<string> {
   }
   const trimmed = input.trim()
   const toSend =
-    trimmed.startsWith('/') && !trimmed.endsWith(' ')
-      ? `${trimmed} \n`
-      : trimmed.endsWith('\n')
-        ? trimmed
-        : `${trimmed}\n`
-  const normalizedInput = toSend
+    trimmed === '\x1b'
+      ? '\x1b'
+      : trimmed.startsWith('/') && !trimmed.endsWith(' ')
+        ? `${trimmed} \n`
+        : trimmed.endsWith('\n')
+          ? trimmed
+          : `${trimmed}\n`
   const lenBeforeSend = interactiveHandle.stdoutRef.s.length
-  interactiveHandle.pty.write(normalizedInput)
+  interactiveHandle.pty.write(toSend)
   await waitForNewPromptAfterSend(
     interactiveHandle.pty,
     () => interactiveHandle!.stdoutRef.s,

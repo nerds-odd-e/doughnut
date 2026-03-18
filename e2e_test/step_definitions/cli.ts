@@ -6,6 +6,7 @@ import {
   getSectionContentRaw,
   getLastCommandOutput,
   getRecallDisplaySections,
+  getCurrentGuidanceDebug,
 } from './cliSectionParser'
 
 const GOOGLE_MOCK_URL = 'http://localhost:5003'
@@ -41,6 +42,26 @@ function assertOutputIncludes(
 
 function assertOutputNotIncludes(content: string, expected: string): void {
   expect(content, `Did not expect "${expected}"`).not.to.include(expected)
+}
+
+function buildCurrentGuidanceFailureMessage(
+  output: string,
+  expected: string
+): string {
+  const { contentReadable, inputBoxLineRange, lineCount, rawTail } =
+    getCurrentGuidanceDebug(output)
+  const linesAfterBox =
+    inputBoxLineRange.end >= 0 ? lineCount - inputBoxLineRange.end - 1 : 0
+  return [
+    `Expected "${expected}" in Current guidance (content below the last input box).`,
+    ``,
+    `Parser: input box ┌ at line ${inputBoxLineRange.start}, └ at line ${inputBoxLineRange.end} of ${lineCount} lines. Lines after └: ${linesAfterBox}.`,
+    ``,
+    `Current guidance: ${contentReadable ? `"${contentReadable}"` : '(empty)'}`,
+    ``,
+    `Raw output tail (\\r→\\r \\n→\\n ):`,
+    rawTail,
+  ].join('\n')
 }
 
 // --- Setup ---
@@ -97,7 +118,7 @@ When('I input {string} in the interactive CLI', (input: string) => {
 })
 
 When('I press ESC in the interactive CLI', () => {
-  cy.task<string>('sendToInteractiveCli', { input: '\x1b\n' }).as(
+  cy.task<string>('sendToInteractiveCli', { input: '\x1b' }).as(
     'doughnutOutput'
   )
 })
@@ -189,7 +210,7 @@ When(
   }
 )
 
-// --- CLI output assertions ---
+// --- Section assertions (History output, History input, Current guidance) ---
 
 Then('I should see {string} in the history output', (expected: string) => {
   cy.get<string>('@doughnutOutput').then((output) =>
@@ -201,10 +222,14 @@ Then('I should see {string} in the history output', (expected: string) => {
   )
 })
 
-Then('I should see {string} in the CLI output', (expected: string) => {
-  cy.get<string>('@doughnutOutput').then((output) =>
-    assertOutputIncludes(output, expected, 'CLI output')
-  )
+Then('I should see {string} in the Current guidance', (expected: string) => {
+  cy.get<string>('@doughnutOutput').then((output) => {
+    const content = getSectionContent(output, 'current-guidance')
+    const msg = content.includes(expected)
+      ? undefined
+      : buildCurrentGuidanceFailureMessage(output, expected)
+    expect(content, msg).to.include(expected)
+  })
 })
 
 Then('I should see {string} in the history input', (expected: string) => {

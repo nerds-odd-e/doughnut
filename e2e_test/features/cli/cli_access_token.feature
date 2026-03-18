@@ -36,11 +36,11 @@ Feature: CLI access token management
     When I run the doughnut CLI add-access-token with the saved token
     Then I should see "Token added" in the history output
     When I input "/remove-access-token" in the interactive CLI
-    Then I should see "E2E CLI Token" in the CLI output
+    Then I should see "E2E CLI Token" in the Current guidance
     When I press ESC in the interactive CLI
-    Then I should see "/ commands" in the CLI output
+    Then I should see "/ commands" in the Current guidance
     When I input "/list-access-token" in the interactive CLI
-    Then I should see "E2E CLI Token" in the CLI output
+    Then I should see "E2E CLI Token" in the Current guidance
 
   Scenario: Create access token via CLI
     And I have a valid Doughnut Access Token with label "Default Token"

@@ -442,6 +442,7 @@ export async function runTTY(
           tokenListCommand = ''
           tokenHighlightIndex = 0
           tokenListAction = 'set-default'
+          buffer = ''
           drawBox()
         } else if (submitPressed && !key.shift) {
           const selectedLabel = tokenListItems[tokenHighlightIndex]!.label
