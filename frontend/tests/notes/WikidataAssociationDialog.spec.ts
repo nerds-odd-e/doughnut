@@ -42,6 +42,8 @@ describe("WikidataAssociationDialog", () => {
       modelValue?: string
       errorMessage?: string
       showSaveButton?: boolean
+      canSaveEmptyToClear?: boolean
+      savedValue?: string
     }
   ) => {
     wrapper = helper
@@ -513,6 +515,53 @@ describe("WikidataAssociationDialog", () => {
       const emitted = wrapper.emitted("selected")?.[0]
       expect(emitted?.[0]).toEqual(searchResult)
       expect(emitted?.[1]).toBe("append")
+    })
+
+    it("enables Save and emits save with empty string when clearing and canSaveEmptyToClear", async () => {
+      const wrapper = mountDialog("dog", {
+        showSaveButton: true,
+        canSaveEmptyToClear: true,
+        savedValue: "Q123",
+        modelValue: "Q123",
+      })
+      await flushPromises()
+      const input = getInput()
+      expect(input?.value).toBe("Q123")
+      input.value = ""
+      input.dispatchEvent(new Event("input", { bubbles: true }))
+      await flushPromises()
+
+      const saveButton = getSaveButton()
+      expect(saveButton).toBeTruthy()
+      expect(saveButton.disabled).toBe(false)
+      saveButton.click()
+      await flushPromises()
+      expect(wrapper.emitted("save")?.[0]).toEqual([""])
+    })
+
+    it("disables Save when current value equals savedValue", async () => {
+      mountDialog("dog", {
+        showSaveButton: true,
+        modelValue: "Q123",
+        savedValue: "Q123",
+      })
+      await flushPromises()
+      const saveButton = getSaveButton()
+      expect(saveButton).toBeTruthy()
+      expect(saveButton.disabled).toBe(true)
+    })
+
+    it("disables Save when both current and saved are empty", async () => {
+      mountDialog("dog", {
+        showSaveButton: true,
+        canSaveEmptyToClear: true,
+        modelValue: "",
+        savedValue: "",
+      })
+      await flushPromises()
+      const saveButton = getSaveButton()
+      expect(saveButton).toBeTruthy()
+      expect(saveButton.disabled).toBe(true)
     })
   })
 })

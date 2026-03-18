@@ -72,13 +72,18 @@ class NoteController {
     authorizationService.assertAuthorization(note);
     WikidataIdWithApi wikidataIdWithApi =
         wikidataService.wrapWikidataIdWithApi(wikidataAssociationCreation.wikidataId);
-    try {
-      wikidataIdWithApi.associateNoteToWikidata(note, noteService);
-    } catch (DuplicateWikidataIdException e) {
-      BindingResult bindingResult =
-          new BeanPropertyBindingResult(wikidataAssociationCreation, "wikidataAssociationCreation");
-      bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");
-      throw new BindException(bindingResult);
+    if (wikidataIdWithApi == null) {
+      note.setWikidataId(null);
+    } else {
+      try {
+        wikidataIdWithApi.associateNoteToWikidata(note, noteService);
+      } catch (DuplicateWikidataIdException e) {
+        BindingResult bindingResult =
+            new BeanPropertyBindingResult(
+                wikidataAssociationCreation, "wikidataAssociationCreation");
+        bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");
+        throw new BindException(bindingResult);
+      }
     }
     entityPersister.save(note);
     return note.toNoteRealm(authorizationService.getCurrentUser());
