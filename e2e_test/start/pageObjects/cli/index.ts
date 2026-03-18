@@ -4,6 +4,8 @@ import {
   historyInput,
   currentGuidance,
 } from './outputAssertions'
+import { recallSession } from './recallSession'
+import { removeToken } from './removeToken'
 import {
   installation,
   nonInteractive,
@@ -12,20 +14,22 @@ import {
   gmail,
   backend,
 } from './execution'
-import { recallSession } from './recallSession'
-import { removeToken } from './removeToken'
 
 export const cli = {
+  // Output sections (non-interactive, history output/input, current guidance)
   nonInteractiveOutput,
   historyOutput,
   historyInput,
   currentGuidance,
+  // Recall session state
+  recallSession,
+  // Access token removal
+  removeToken,
+  // Execution (install, run, interactive, access-token, gmail)
   installation,
   nonInteractive,
   interactive,
   accessToken,
   gmail,
   backend,
-  recallSession,
-  removeToken,
 }

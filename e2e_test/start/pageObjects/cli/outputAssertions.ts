@@ -23,7 +23,7 @@ const SECTION_LABELS = {
 const OUTPUT_ALIAS = '@doughnutOutput'
 const CONTENT_PREVIEW_LEN = 500
 
-function withOutput(cb: (output: string) => void): void {
+export function withOutput(cb: (output: string) => void): void {
   cy.get<string>(OUTPUT_ALIAS).then(cb)
 }
 

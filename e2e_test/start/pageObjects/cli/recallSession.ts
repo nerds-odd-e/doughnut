@@ -1,13 +1,10 @@
 /**
  * CLI recall session assertions. Domain: recall session state after /stop.
+ * - Stopped from MCQ: question display, user typed /stop
+ * - Stopped during review: y/n prompt, user typed /stop
  */
 import { getRecallDisplaySections } from '../../../step_definitions/cliSectionParser'
-
-const OUTPUT_ALIAS = '@doughnutOutput'
-
-function withOutput(cb: (output: string) => void): void {
-  cy.get<string>(OUTPUT_ALIAS).then(cb)
-}
+import { withOutput } from './outputAssertions'
 
 function recallSession() {
   return {
