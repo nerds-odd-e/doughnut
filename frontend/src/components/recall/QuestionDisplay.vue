@@ -1,5 +1,6 @@
 <template>
   <div class="quiz-instruction daisy-relative daisy-max-w-6xl daisy-mx-auto" data-test="question-section">
+    <InactiveRecallMask :show="isActiveQuestion && isPaused" />
     <QuestionStem :stem="multipleChoicesQuestion.f0__stem" />
     <QuestionChoices
       v-if="multipleChoicesQuestion.f1__choices"
@@ -20,6 +21,7 @@ import type {
   AnswerDto,
   MultipleChoicesQuestion,
 } from "@generated/doughnut-backend-api"
+import InactiveRecallMask from "./InactiveRecallMask.vue"
 import QuestionChoices from "./QuestionChoices.vue"
 import QuestionStem from "./QuestionStem.vue"
 import { useQuestionThinkingTime } from "@/composables/useQuestionThinkingTime"
@@ -38,7 +40,7 @@ const emits = defineEmits(["answer"])
 
 const isActiveQuestion = computed(() => !props.disabled && !props.answer)
 
-const { stop } = useQuestionThinkingTime(isActiveQuestion)
+const { stop, isPaused } = useQuestionThinkingTime(isActiveQuestion)
 
 const submitAnswer = async (answerData: AnswerDto) => {
   const thinkingTimeMs = stop()

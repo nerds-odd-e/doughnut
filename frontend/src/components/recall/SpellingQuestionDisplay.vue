@@ -1,5 +1,6 @@
 <template>
   <div class="quiz-instruction daisy-relative daisy-h-full daisy-flex daisy-flex-col" data-test="question-section">
+    <InactiveRecallMask :show="isActiveQuestion && isPaused" />
     <ContentLoader v-if="loading" />
     <template v-else>
       <div class="daisy-flex-1 daisy-overflow-y-auto daisy-pb-4">
@@ -34,9 +35,10 @@
 import { ref, onMounted, computed } from "vue"
 import type { RecallPrompt } from "@generated/doughnut-backend-api"
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
-import TextInput from "../form/TextInput.vue"
-import QuestionStem from "./QuestionStem.vue"
 import ContentLoader from "../commons/ContentLoader.vue"
+import TextInput from "../form/TextInput.vue"
+import InactiveRecallMask from "./InactiveRecallMask.vue"
+import QuestionStem from "./QuestionStem.vue"
 import { useQuestionThinkingTime } from "@/composables/useQuestionThinkingTime"
 
 const props = defineProps({
@@ -53,7 +55,7 @@ const loading = ref(true)
 const submitted = ref(false)
 
 const isActiveQuestion = computed(() => !loading.value)
-const { stop } = useQuestionThinkingTime(isActiveQuestion)
+const { stop, isPaused } = useQuestionThinkingTime(isActiveQuestion)
 
 const stem = computed(() => recallPrompt.value?.spellingQuestion?.stem || "")
 

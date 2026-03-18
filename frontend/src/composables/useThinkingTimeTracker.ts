@@ -4,6 +4,7 @@ export function useThinkingTimeTracker() {
   const accumulatedMs = ref(0)
   const runningStart = ref<number | null>(null)
   const isRunning = ref(false)
+  const isPaused = ref(false)
   const hasStopped = ref(false)
 
   const pause = () => {
@@ -13,6 +14,7 @@ export function useThinkingTimeTracker() {
     accumulatedMs.value += now - runningStart.value
     runningStart.value = null
     isRunning.value = false
+    isPaused.value = true
   }
 
   const resume = () => {
@@ -20,6 +22,7 @@ export function useThinkingTimeTracker() {
 
     runningStart.value = performance.now()
     isRunning.value = true
+    isPaused.value = false
   }
 
   const start = async () => {
@@ -96,5 +99,7 @@ export function useThinkingTimeTracker() {
     stop,
     pause,
     resume,
+    isRunning,
+    isPaused,
   }
 }

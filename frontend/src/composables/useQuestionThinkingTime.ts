@@ -10,7 +10,7 @@ import { useThinkingTimeTracker } from "./useThinkingTimeTracker"
 export function useQuestionThinkingTime(
   isActiveQuestion: ComputedRef<boolean>
 ) {
-  const { start, stop, pause, resume } = useThinkingTimeTracker()
+  const { start, stop, pause, resume, isPaused } = useThinkingTimeTracker()
 
   watch(
     isActiveQuestion,
@@ -40,5 +40,6 @@ export function useQuestionThinkingTime(
 
   return {
     stop,
+    isPaused,
   }
 }

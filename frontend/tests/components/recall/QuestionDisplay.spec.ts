@@ -158,6 +158,91 @@ describe("QuestionDisplay", () => {
     expect(answerData?.thinkingTimeMs).toBe(1000)
   })
 
+  it("shows inactive mask when document is hidden", async () => {
+    const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
+      .withStem("Test question")
+      .withChoices(["A", "B", "C"])
+      .please()
+
+    const wrapper = helper
+      .component(QuestionDisplay)
+      .withProps({ multipleChoicesQuestion })
+      .mount()
+
+    await flushPromises()
+    flushRAF()
+    await flushPromises()
+
+    expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
+      false
+    )
+
+    Object.defineProperty(document, "hidden", { value: true, writable: true })
+    document.dispatchEvent(new Event("visibilitychange"))
+    await flushPromises()
+
+    expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
+      true
+    )
+    expect(wrapper.find("[data-test='inactive-recall-mask']").text()).toContain(
+      "Focus to activate"
+    )
+  })
+
+  it("shows inactive mask when window loses focus", async () => {
+    const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
+      .withStem("Test question")
+      .withChoices(["A", "B", "C"])
+      .please()
+
+    const wrapper = helper
+      .component(QuestionDisplay)
+      .withProps({ multipleChoicesQuestion })
+      .mount()
+
+    await flushPromises()
+    flushRAF()
+    await flushPromises()
+
+    expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
+      false
+    )
+
+    window.dispatchEvent(new Event("blur"))
+    await flushPromises()
+
+    expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
+      true
+    )
+  })
+
+  it("hides inactive mask when window regains focus", async () => {
+    const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
+      .withStem("Test question")
+      .withChoices(["A", "B", "C"])
+      .please()
+
+    const wrapper = helper
+      .component(QuestionDisplay)
+      .withProps({ multipleChoicesQuestion })
+      .mount()
+
+    await flushPromises()
+    flushRAF()
+    await flushPromises()
+    window.dispatchEvent(new Event("blur"))
+    await flushPromises()
+    expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
+      true
+    )
+
+    window.dispatchEvent(new Event("focus"))
+    await flushPromises()
+    expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
+      false
+    )
+  })
+
   it("pauses timer when component is deactivated (KeepAlive)", async () => {
     const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
       .withStem("Test question")
