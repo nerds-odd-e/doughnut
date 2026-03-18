@@ -137,8 +137,7 @@ Feature: CLI recall status and recall session
     When I answer "n" in the interactive CLI to "Load more from next 3 days?"
     Then I should see "Recalled 2 notes" in the history output
     When I input "/recall" in the interactive CLI
-    Then I should see "Yes, I remember?" in the status
-    When I answer "y" in the interactive CLI to "Yes, I remember?"
+    And I answer "y" in the interactive CLI to "Yes, I remember?"
     Then I should see "Recalled successfully" in the history output
     When I answer "y" in the interactive CLI to "Yes, I remember?"
     Then I should see "Recalled successfully" in the history output

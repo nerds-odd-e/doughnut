@@ -140,6 +140,9 @@ importers:
 
   cli:
     dependencies:
+      '@generated/doughnut-backend-api':
+        specifier: workspace:*
+        version: link:../packages/generated/doughnut-backend-api
       doughnut-api:
         specifier: workspace:*
         version: link:../packages/doughnut-api

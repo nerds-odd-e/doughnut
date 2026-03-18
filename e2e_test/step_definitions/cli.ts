@@ -104,7 +104,10 @@ When('I input {string} in the interactive CLI', (input: string) => {
 
 When(
   'I answer {string} in the interactive CLI to {string}',
-  (input: string, _to: string) => {
+  (input: string, to: string) => {
+    cy.get<string>('@doughnutOutput').then((output) =>
+      assertExpectedInStatus(output, to, true)
+    )
     cy.task<string>('sendToInteractiveCli', { input }).as('doughnutOutput')
   }
 )
@@ -308,16 +311,25 @@ Then('I should see {string} in the history input', (expected: string) => {
   })
 })
 
+function assertExpectedInStatus(
+  output: string,
+  expected: string,
+  statusOnly = false
+): void {
+  const statusContent = getSectionContent(output, 'status')
+  const content = statusOnly
+    ? statusContent
+    : `${statusContent}\n${getSectionContent(output, 'history-output')}`.trim()
+  expect(
+    content,
+    `Expected "${expected}" in ${statusOnly ? 'status' : 'status or history'}. content:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
+  ).to.include(expected)
+}
+
 Then('I should see {string} in the status', (expected: string) => {
-  cy.get<string>('@doughnutOutput').then((output) => {
-    const statusContent = getSectionContent(output, 'status')
-    const fallbackContent = getSectionContent(output, 'history-output')
-    const content = `${statusContent}\n${fallbackContent}`.trim()
-    expect(
-      content,
-      `Expected "${expected}" in status. status contains:\n${content.slice(0, 500)}${content.length > 500 ? '...' : ''}`
-    ).to.include(expected)
-  })
+  cy.get<string>('@doughnutOutput').then((output) =>
+    assertExpectedInStatus(output, expected)
+  )
 })
 
 Then('I should see {string} styled in the status', (expected: string) => {
