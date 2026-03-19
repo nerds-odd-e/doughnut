@@ -27,6 +27,8 @@ export function buildCurrentPromptSeparator(width: TerminalWidth): string {
 export const COMMAND_HIGHLIGHT = '\x1b[1;36m' // bold + cyan
 
 export const PLACEHOLDER = '`exit` to quit.'
+/** Shown in input box when listing access tokens (↑↓ Enter to select, other keys cancel). */
+export const TOKEN_LIST_PLACEHOLDER = '↑↓ Enter to select; other keys cancel'
 export const PROMPT = '→ '
 
 export const CLEAR_SCREEN = '\x1b[H\x1b[2J'
@@ -101,7 +103,10 @@ export function renderBox(lines: string[], width: TerminalWidth): string {
   const innerWidth = width - 4
   const top = `┌${'─'.repeat(width - 2)}┐`
   const bottom = `└${'─'.repeat(width - 2)}┘`
-  const rows = lines.map((line) => `│ ${padEndVisible(line, innerWidth)} │`)
+  const rows = lines.map(
+    (line) =>
+      `│ ${padEndVisible(truncateToWidth(line, innerWidth), innerWidth)} │`
+  )
   return [top, ...rows, bottom].join('\n')
 }
 
@@ -134,12 +139,22 @@ export function highlightRecognizedCommand(line: string): string {
   return `${COMMAND_HIGHLIGHT}${prefix}${RESET}${rest}`
 }
 
-export function buildBoxLines(buffer: string, width: TerminalWidth): string[] {
+export interface BuildBoxLinesOptions {
+  inTokenList?: boolean
+}
+
+export function buildBoxLines(
+  buffer: string,
+  width: TerminalWidth,
+  options?: BuildBoxLinesOptions
+): string[] {
   const bufferLines = buffer.split('\n')
+  const placeholder =
+    (options?.inTokenList ?? false) ? TOKEN_LIST_PLACEHOLDER : PLACEHOLDER
   return bufferLines.map((line, i) => {
     const prefix = i === 0 ? PROMPT : '  '
     if (i === 0 && buffer === '') {
-      return `${prefix}${GREY}${PLACEHOLDER}${RESET}`
+      return `${prefix}${GREY}${placeholder}${RESET}`
     }
     const highlighted = highlightRecognizedCommand(line)
     return prefix + highlighted
@@ -217,7 +232,8 @@ export function renderFullDisplay(
   width: TerminalWidth,
   suggestionLines: string[],
   recallingIndicator: string[],
-  currentPromptLines?: string[]
+  currentPromptLines?: string[],
+  options?: BuildBoxLinesOptions
 ): string[] {
   const lines: string[] = [formatVersionOutput(), '']
   for (const entry of history) {
@@ -233,7 +249,10 @@ export function renderFullDisplay(
       lines.push(`${GREY}${line}${RESET}`)
     }
   }
-  const boxLines = renderBox(buildBoxLines(buffer, width), width).split('\n')
+  const boxLines = renderBox(
+    buildBoxLines(buffer, width, options),
+    width
+  ).split('\n')
   lines.push(...boxLines)
   lines.push(...recallingIndicator)
   lines.push(...suggestionLines)

@@ -885,6 +885,30 @@ describe('buildBoxLines', () => {
     const lines = buildBoxLines('/add-access-token mylabel', 40)
     expect(lines[0]).toContain(`${boldCyan}/add-access-token${reset} mylabel`)
   })
+
+  test('empty buffer in token list state shows token list placeholder', () => {
+    const lines = buildBoxLines('', 80, { inTokenList: true })
+    expect(lines).toHaveLength(1)
+    expect(lines[0]).toContain('→')
+    expect(lines[0]).toContain('↑↓ Enter to select; other keys cancel')
+  })
+
+  test('empty buffer with inTokenList false shows default placeholder', () => {
+    const lines = buildBoxLines('', 80, { inTokenList: false })
+    expect(lines[0]).toContain('`exit` to quit.')
+  })
+
+  test('token list placeholder truncates in narrow window', () => {
+    const width = 25
+    const lines = buildBoxLines('', width, { inTokenList: true })
+    const box = renderBox(lines, width)
+    const boxLines = box.split('\n')
+    for (let i = 1; i < boxLines.length - 1; i++) {
+      expect(visibleLength(boxLines[i])).toBeLessThanOrEqual(width)
+    }
+    expect(lines[0]).toContain('↑↓')
+    expect(boxLines[1]).toContain('...')
+  })
 })
 
 describe('buildSuggestionLines', () => {
@@ -1562,6 +1586,7 @@ describe('TTY token list interactive mode', () => {
     const output = ttyOutput(writeSpy)
     if (expectPrompt) {
       expect(output).toContain('Select and enter to change the default')
+      expect(output).toContain('↑↓ Enter to select; other keys cancel')
       expect(output).toContain('Alpha')
       expect(output).toContain('Beta')
       expect(output).toContain('Gamma')

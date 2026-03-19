@@ -34,7 +34,11 @@ export interface TTYDeps {
   setDefaultTokenLabel: (label: string) => void
   formatVersionOutput: () => string
   getLastLine: (buffer: string) => string
-  buildBoxLines: (buffer: string, width: number) => string[]
+  buildBoxLines: (
+    buffer: string,
+    width: number,
+    options?: { inTokenList?: boolean }
+  ) => string[]
   buildSuggestionLines: (
     buffer: string,
     highlightIndex: number,
@@ -51,7 +55,8 @@ export interface TTYDeps {
     width: number,
     suggestionLines: string[],
     recallingIndicator: string[],
-    currentPromptLines?: string[]
+    currentPromptLines?: string[],
+    options?: { inTokenList?: boolean }
   ) => string[]
   renderPastInput: (input: string, width: number) => string
   GREY: string
@@ -193,7 +198,9 @@ export async function runTTY(
   /** Builds lines for input box, recalling indicator, Current prompt (above box), and Current guidance (below box). */
   function getDisplayContent() {
     const width = getTerminalWidth()
-    const contentLines = buildBoxLines(buffer, width)
+    const contentLines = buildBoxLines(buffer, width, {
+      inTokenList: !!tokenListItems,
+    })
     const boxLines = renderBox(contentLines, width).split('\n')
     const pendingRecallAnswer = getPendingRecallAnswer()
     const currentPromptText =
@@ -274,7 +281,8 @@ export async function runTTY(
       getTerminalWidth(),
       suggestionLines,
       recallingIndicator,
-      currentPromptWrappedLines
+      currentPromptWrappedLines,
+      { inTokenList: !!tokenListItems }
     )
     for (const line of fullLines) {
       process.stdout.write(`${line}\n`)
