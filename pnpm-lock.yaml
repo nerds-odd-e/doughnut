@@ -81,8 +81,8 @@ importers:
         specifier: ^1.27.1
         version: 1.27.1(zod@4.3.6)
       '@redocly/cli':
-        specifier: ^2.22.1
-        version: 2.22.1(@opentelemetry/api@1.9.0)(core-js@3.46.0)
+        specifier: ^2.24.0
+        version: 2.24.0(@opentelemetry/api@1.9.0)(core-js@3.46.0)
       '@testing-library/cypress':
         specifier: 10.1.0
         version: 10.1.0(cypress@15.12.0)
@@ -1369,8 +1369,8 @@ packages:
   '@redocly/ajv@8.18.0':
     resolution: {integrity: sha512-F+LMD2IDIXuHxgpLJh3nkLj9+tSaEzoUWd+7fONGq5pe2169FUDjpEkOfEpoGLz1sbZni/69p07OsecNfAOpqA==}
 
-  '@redocly/cli@2.22.1':
-    resolution: {integrity: sha512-oW3k/IN0ydS1CfyTF6Ozcn4gIHDmlJ9GG9MUPjSxH0w5ZKqIU0kzxD/s08+noPjP5AYBANDcl3cJn0nPcFNEHw==}
+  '@redocly/cli@2.24.0':
+    resolution: {integrity: sha512-g5iKfmG1rgbpQ/mBnEH78bJbAUx2XxLSJTYdYGuvsrT8CODbOyza1xFF7kwOFo93JV62lmu3IfzNIxFj9FACYw==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
     hasBin: true
 
@@ -1384,12 +1384,12 @@ packages:
     resolution: {integrity: sha512-/oy8sXi5xK4+HvcFR7xS1A74zJ5aS6rtacNEr91SczLqvtxz79opxp7yYpdYtfGQAp6igx9eU9alwSC/R/X3Cg==}
     engines: {node: '>=18.17.0', npm: '>=9.5.0'}
 
-  '@redocly/openapi-core@2.22.1':
-    resolution: {integrity: sha512-sb3QYpqJZq4U31x6LRuYXgaA4byNFoTMGVLCvq8o8Om1GGv6O0/oMu6EpPZoDAYDxIsTRDPC04Lu6MLVU6D/ag==}
+  '@redocly/openapi-core@2.24.0':
+    resolution: {integrity: sha512-4j8+OKA+bFBOj9Uhr6LJuNnFQpKAE9uK5Smw4yd2WJS2bcsJhCqbUWOG9N1cYBUFlwRQpLBT1ZOSmDFYv81NOg==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
-  '@redocly/respect-core@2.22.1':
-    resolution: {integrity: sha512-aYfiAyqmMJ6Sa8LcAewwyvya6g+oxsvVCfDJhtFeZZnO7JMnr8hmEYqQf2iCCqUGMbPdL0VcPABex15i4WYQVQ==}
+  '@redocly/respect-core@2.24.0':
+    resolution: {integrity: sha512-3Gp+4X5V6DCATmB7OYpUrGKEYaR8quq2LD+PsniEAMTfG+oyuDHJRUy3zXYfGQGT7PDi0iXUZ8PEWUFzgVdyZQ==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
   '@rolldown/binding-android-arm64@1.0.0-rc.9':
@@ -7422,14 +7422,14 @@ snapshots:
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
-  '@redocly/cli@2.22.1(@opentelemetry/api@1.9.0)(core-js@3.46.0)':
+  '@redocly/cli@2.24.0(@opentelemetry/api@1.9.0)(core-js@3.46.0)':
     dependencies:
       '@opentelemetry/exporter-trace-otlp-http': 0.202.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/resources': 2.0.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-node': 2.0.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.34.0
-      '@redocly/openapi-core': 2.22.1
-      '@redocly/respect-core': 2.22.1
+      '@redocly/openapi-core': 2.24.0
+      '@redocly/respect-core': 2.24.0
       abort-controller: 3.0.0
       ajv: 8.18.0
       ajv-formats: 3.0.1(ajv@8.18.0)
@@ -7481,7 +7481,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@redocly/openapi-core@2.22.1':
+  '@redocly/openapi-core@2.24.0':
     dependencies:
       '@redocly/ajv': 8.18.0
       '@redocly/config': 0.44.1
@@ -7494,12 +7494,12 @@ snapshots:
       pluralize: 8.0.0
       yaml-ast-parser: 0.0.43
 
-  '@redocly/respect-core@2.22.1':
+  '@redocly/respect-core@2.24.0':
     dependencies:
       '@faker-js/faker': 7.6.0
       '@noble/hashes': 1.8.0
       '@redocly/ajv': 8.18.0
-      '@redocly/openapi-core': 2.22.1
+      '@redocly/openapi-core': 2.24.0
       ajv: 8.18.0
       better-ajv-errors: 1.2.0(ajv@8.18.0)
       colorette: 2.0.20
@@ -7975,7 +7975,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.0.3
-      vitest: 4.1.0(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(@vitest/browser-playwright@4.1.0)(@vitest/ui@4.1.0)(jsdom@27.4.0(@noble/hashes@1.8.0))(vite@8.0.0(@types/node@25.5.0)(esbuild@0.27.4)(jiti@2.6.1)(sass@1.98.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
+      vitest: 4.1.0(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(@vitest/browser-playwright@4.1.0)(@vitest/ui@4.1.0)(jsdom@27.4.0(@noble/hashes@1.8.0))(vite@8.0.0(@types/node@25.5.0)(esbuild@0.27.4)(jiti@1.21.7)(sass@1.98.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
 
   '@vitest/utils@3.2.4':
     dependencies:
@@ -11197,7 +11197,7 @@ snapshots:
 
   polished@4.3.1:
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.6
 
   possible-typed-array-names@1.1.0: {}
 
