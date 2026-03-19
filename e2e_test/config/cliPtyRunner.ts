@@ -193,13 +193,12 @@ async function waitForNewPromptAfterSend(
   getStdout: () => string,
   lenBeforeSend: number
 ): Promise<void> {
-  // Input box (│ → ) is drawn by drawBox() when the CLI is ready. Require either
-  // (1) main prompt placeholder (│ → `) or (2) recall yes/no (│ → y or n) so we don't
-  // match while typing a command (e.g. │ → /recall). After recall completes, the CLI
-  // may show "Load more from next 3 days?" which uses "y or n" placeholder (no backtick).
-  // ANSI codes (e.g. \x1b[90m) may appear between "→ " and the placeholder.
+  // Input box (│ → ) is drawn by drawBox() when the CLI is ready. Match distinctive
+  // placeholder prefixes so we don't match while typing (e.g. │ → /recall). Covers all
+  // contexts: default (`), recallYesNo/recallStopConfirmation (y or n), recallMcq/tokenList
+  // (↑↓), recallSpelling (type). ANSI codes (e.g. \x1b[90m) may appear between "→ " and the placeholder.
   // biome-ignore lint/suspicious/noControlCharactersInRegex: matching ANSI escape codes in PTY output
-  const INPUT_BOX_READY_PATTERN = /│ → (?:\x1b\[[0-9;]*m)*(?:`|y or n)/
+  const INPUT_BOX_READY_PATTERN = /│ → (?:\x1b\[[0-9;]*m)*(?:`|y or n|↑↓|type)/
   const maxWaitMs = 15_000
   const stablePollsRequired = 3
   const start = Date.now()
