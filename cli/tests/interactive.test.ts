@@ -1669,6 +1669,20 @@ describe('TTY token list interactive mode', () => {
     expect(getDefaultTokenLabel()).toBe('Beta')
   })
 
+  test('in selection mode, input box borders are all gray including right', async () => {
+    await submitTTYCommand(stdin, '/list-access-token')
+    const output = ttyOutput(writeSpy)
+    const boxSection = output.slice(output.indexOf('Select and enter'))
+    const boxLines = boxSection
+      .split('\n')
+      .filter((l) => l.includes('┌') || l.includes('│') || l.includes('└'))
+    for (const line of boxLines) {
+      // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI escape codes for terminal output assertion
+      const resetBeforeRightBorder = /\x1b\[0m\s*│/.test(line)
+      expect(resetBeforeRightBorder).toBe(false)
+    }
+  })
+
   test('in selection mode, input box has no arrow prompt', async () => {
     await submitTTYCommand(stdin, '/list-access-token')
     const output = ttyOutput(writeSpy)

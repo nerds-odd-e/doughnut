@@ -60,6 +60,7 @@ export interface TTYDeps {
   ) => string[]
   renderPastInput: (input: string, width: number) => string
   GREY: string
+  RESET: string
   HIDE_CURSOR: string
   SHOW_CURSOR: string
   CLEAR_SCREEN: string
@@ -140,6 +141,7 @@ export async function runTTY(
     renderFullDisplay,
     renderPastInput,
     GREY,
+    RESET,
     HIDE_CURSOR,
     SHOW_CURSOR,
     CLEAR_SCREEN,
@@ -338,7 +340,9 @@ export async function runTTY(
       }
     }
     for (const line of boxLines) {
-      const displayLine = tokenListItems ? `${GREY}${line}\x1b[0m` : line // selection mode: gray input box
+      const displayLine = tokenListItems
+        ? `${GREY}${line.split(RESET).join(GREY)}${RESET}` // selection mode: gray entire box including right border
+        : line
       process.stdout.write(`\x1b[2K${displayLine}\n`)
     }
     for (const line of recallingIndicator) {

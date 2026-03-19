@@ -271,7 +271,7 @@ export function renderFullDisplay(
   ).split('\n')
   const boxLines =
     options?.placeholderContext === 'tokenList' // selection mode
-      ? rawBoxLines.map((l) => `${GREY}${l}${RESET}`)
+      ? rawBoxLines.map((l) => `${GREY}${l.split(RESET).join(GREY)}${RESET}`)
       : rawBoxLines
   lines.push(...boxLines)
   lines.push(...recallingIndicator)
