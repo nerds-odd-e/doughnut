@@ -257,7 +257,7 @@ export async function runTTY(
     linesAboveCursor = contentLines.length
     prevTotalLines = newTotalLines
 
-    const cursorRow = contentLines.length
+    const cursorRow = currentPromptLines + contentLines.length
     process.stdout.write(`\x1b[${newTotalLines - cursorRow}A`)
 
     const bufferLines = buffer.split('\n')
@@ -308,7 +308,7 @@ export async function runTTY(
     }
 
     const totalWritten = Math.max(newTotalLines, prevTotalLines)
-    const cursorRow = contentLines.length
+    const cursorRow = currentPromptLines + contentLines.length
     process.stdout.write(`\x1b[${totalWritten - cursorRow}A`)
 
     const bufferLines = buffer.split('\n')

@@ -1443,6 +1443,30 @@ describe('TTY token list interactive mode', () => {
     expect(output).toContain('★')
   })
 
+  test('cursor is at input box row after /list-access-token with Current prompt', async () => {
+    writeSpy.mockClear()
+    await submitTTYCommand(stdin, '/list-access-token')
+
+    const output = ttyOutput(writeSpy)
+    const cursorUpMatches = output.matchAll(
+      new RegExp(`${String.fromCharCode(0x1b)}\\[(\\d+)A`, 'g')
+    )
+    const cursorUpValues = [...cursorUpMatches].map((m) => Number(m[1]))
+    const lastCursorUp = cursorUpValues.at(-1)
+    expect(lastCursorUp).toBeDefined()
+
+    const currentPromptLines = 2
+    const contentLinesLength = 1
+    const boxLinesLength = 3
+    const suggestionLinesLength = 3
+    const newTotalLines =
+      currentPromptLines + boxLinesLength + 0 + suggestionLinesLength
+    const expectedCursorUp =
+      newTotalLines - currentPromptLines - contentLinesLength
+
+    expect(lastCursorUp).toBe(expectedCursorUp)
+  })
+
   test.each([
     {
       name: 'tokens exist',
