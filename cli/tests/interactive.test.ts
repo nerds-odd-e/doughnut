@@ -1057,7 +1057,7 @@ describe('TTY mode slash command suggestions', () => {
     expect(output).toContain('List available commands')
     expect(output).toContain('/clear')
     expect(output).toContain('Clear screen and chat history')
-    expect(output).toContain('/create-access-token')
+    expect(output).toContain('/list-access-token')
     expect(output).toContain('↓ more below')
   })
 
