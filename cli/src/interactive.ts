@@ -1,5 +1,5 @@
 import { runPiped } from './adapters/pipedAdapter.js'
-import { runTTY, type TokenListAction } from './adapters/ttyAdapter.js'
+import { runTTY, type TokenListCommandConfig } from './adapters/ttyAdapter.js'
 import {
   addAccessToken,
   createAccessToken,
@@ -282,13 +282,10 @@ async function continueRecallSession(
   }
 }
 
-const TOKEN_LIST_COMMANDS: Record<
-  string,
-  { action: TokenListAction; prompt?: string }
-> = {
+const TOKEN_LIST_COMMANDS: Record<string, TokenListCommandConfig> = {
   '/list-access-token': {
     action: 'set-default',
-    prompt: 'Select and enter to change the default access token',
+    currentPrompt: 'Select and enter to change the default access token',
   },
   '/remove-access-token': { action: 'remove' },
   '/remove-access-token-completely': { action: 'remove-completely' },

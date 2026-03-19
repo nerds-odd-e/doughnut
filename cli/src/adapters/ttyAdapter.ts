@@ -2,9 +2,16 @@ import * as readline from 'node:readline'
 import { Writable } from 'node:stream'
 import type { AccessTokenEntry } from '../accessToken.js'
 import type { CommandDoc } from '../help.js'
+import { CURRENT_PROMPT_LINES } from '../renderer.js'
 import type { ChatHistory, OutputAdapter } from '../types.js'
 
 export type TokenListAction = 'set-default' | 'remove' | 'remove-completely'
+
+export interface TokenListCommandConfig {
+  action: TokenListAction
+  /** Shown in Current prompt (above input box) when list is non-empty. */
+  currentPrompt?: string
+}
 
 export interface TTYDeps {
   processInput: (input: string, output?: OutputAdapter) => Promise<boolean>
@@ -43,7 +50,8 @@ export interface TTYDeps {
     buffer: string,
     width: number,
     suggestionLines: string[],
-    recallingIndicator: string[]
+    recallingIndicator: string[],
+    currentPrompt?: string
   ) => string[]
   renderPastInput: (input: string, width: number) => string
   GREY: string
@@ -64,10 +72,7 @@ export interface TTYDeps {
     maxVisible?: number,
     highlightIndex?: number
   ) => string[]
-  TOKEN_LIST_COMMANDS: Record<
-    string,
-    { action: TokenListAction; prompt?: string }
-  >
+  TOKEN_LIST_COMMANDS: Record<string, TokenListCommandConfig>
 }
 
 function cycleIndex(current: number, delta: number, length: number): number {
@@ -193,7 +198,7 @@ export async function runTTY(
     const pendingRecallAnswer = getPendingRecallAnswer()
     const currentPrompt =
       tokenListItems && tokenListCommand
-        ? TOKEN_LIST_COMMANDS[tokenListCommand]?.prompt
+        ? TOKEN_LIST_COMMANDS[tokenListCommand]?.currentPrompt
         : undefined
     const suggestionLines = tokenListItems
       ? buildTokenListLines(
@@ -217,13 +222,29 @@ export async function runTTY(
                 suggestionsDismissed && isCommandPrefixWithSuggestions(buffer),
             })
     const recallingIndicator = isInRecallSubstate() ? [RECALLING_INDICATOR] : []
+    const currentPromptLines = currentPrompt ? CURRENT_PROMPT_LINES : 0
     return {
       contentLines,
       boxLines,
       currentPrompt,
+      currentPromptLines,
       suggestionLines,
       recallingIndicator,
     }
+  }
+
+  /** Row index of input box content from top of drawn area. Used for cursor positioning. */
+  const inputRowFromTop = (
+    currentPromptLines: number,
+    contentLinesLength: number
+  ) => currentPromptLines + contentLinesLength
+
+  const positionCursorInInputBox = () => {
+    const bufferLines = buffer.split('\n')
+    const lastLine = bufferLines[bufferLines.length - 1] ?? ''
+    const lastPrefix = bufferLines.length === 1 ? PROMPT : '  '
+    const col = 3 + lastPrefix.length + lastLine.length
+    process.stdout.write(`\x1b[${col}G`)
   }
 
   function doFullRedraw() {
@@ -231,10 +252,10 @@ export async function runTTY(
       contentLines,
       boxLines,
       currentPrompt,
+      currentPromptLines,
       suggestionLines,
       recallingIndicator,
     } = getDisplayContent()
-    const currentPromptLines = currentPrompt ? 2 : 0
     const newTotalLines =
       currentPromptLines +
       boxLines.length +
@@ -254,17 +275,12 @@ export async function runTTY(
       process.stdout.write(`${line}\n`)
     }
 
-    linesAboveCursor = contentLines.length + currentPromptLines
+    const inputRow = inputRowFromTop(currentPromptLines, contentLines.length)
+    linesAboveCursor = inputRow
     prevTotalLines = newTotalLines
 
-    const cursorRow = currentPromptLines + contentLines.length
-    process.stdout.write(`\x1b[${newTotalLines - cursorRow}A`)
-
-    const bufferLines = buffer.split('\n')
-    const lastLine = bufferLines[bufferLines.length - 1]
-    const lastPrefix = bufferLines.length === 1 ? PROMPT : '  '
-    const col = 3 + lastPrefix.length + lastLine.length
-    process.stdout.write(`\x1b[${col}G`)
+    process.stdout.write(`\x1b[${newTotalLines - inputRow}A`)
+    positionCursorInInputBox()
   }
 
   function drawBox() {
@@ -272,10 +288,10 @@ export async function runTTY(
       contentLines,
       boxLines,
       currentPrompt,
+      currentPromptLines,
       suggestionLines,
       recallingIndicator,
     } = getDisplayContent()
-    const currentPromptLines = currentPrompt ? 2 : 0
     const newTotalLines =
       currentPromptLines +
       boxLines.length +
@@ -308,16 +324,11 @@ export async function runTTY(
     }
 
     const totalWritten = Math.max(newTotalLines, prevTotalLines)
-    const cursorRow = currentPromptLines + contentLines.length
-    process.stdout.write(`\x1b[${totalWritten - cursorRow}A`)
+    const inputRow = inputRowFromTop(currentPromptLines, contentLines.length)
+    process.stdout.write(`\x1b[${totalWritten - inputRow}A`)
+    positionCursorInInputBox()
 
-    const bufferLines = buffer.split('\n')
-    const lastLine = bufferLines[bufferLines.length - 1]
-    const lastPrefix = bufferLines.length === 1 ? PROMPT : '  '
-    const col = 3 + lastPrefix.length + lastLine.length
-    process.stdout.write(`\x1b[${col}G`)
-
-    linesAboveCursor = contentLines.length + currentPromptLines
+    linesAboveCursor = inputRow
     prevTotalLines = newTotalLines
   }
 

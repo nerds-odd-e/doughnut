@@ -26,6 +26,10 @@ export const PLACEHOLDER = '`exit` to quit.'
 export const PROMPT = '→ '
 
 export const CLEAR_SCREEN = '\x1b[H\x1b[2J'
+
+/** Lines occupied by Current prompt: separator + prompt text. */
+export const CURRENT_PROMPT_LINES = 2
+
 /** Shown in Current guidance when user has not typed a slash command prefix. */
 export const COMMANDS_HINT = `${GREY}  / commands${RESET}`
 export const RECALLING_INDICATOR = `${GREY}Recalling${RESET}`

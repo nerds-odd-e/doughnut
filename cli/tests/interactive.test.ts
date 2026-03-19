@@ -1492,17 +1492,6 @@ describe('TTY token list interactive mode', () => {
     vi.restoreAllMocks()
   })
 
-  test('shows token list with default highlighted after /list-access-token', async () => {
-    writeSpy.mockClear()
-    await submitTTYCommand(stdin, '/list-access-token')
-
-    const output = ttyOutput(writeSpy)
-    expect(output).toContain('Alpha')
-    expect(output).toContain('Beta')
-    expect(output).toContain('Gamma')
-    expect(output).toContain('★')
-  })
-
   test('cursor is at input box row after /list-access-token with Current prompt', async () => {
     writeSpy.mockClear()
     await submitTTYCommand(stdin, '/list-access-token')
@@ -1515,7 +1504,8 @@ describe('TTY token list interactive mode', () => {
     const lastCursorUp = cursorUpValues.at(-1)
     expect(lastCursorUp).toBeDefined()
 
-    const currentPromptLines = 2
+    const { CURRENT_PROMPT_LINES } = await import('../src/renderer.js')
+    const currentPromptLines = CURRENT_PROMPT_LINES
     const contentLinesLength = 1
     const boxLinesLength = 3
     const suggestionLinesLength = 3
@@ -1530,25 +1520,22 @@ describe('TTY token list interactive mode', () => {
   test.each([
     {
       name: 'tokens exist',
-      tokens: [
-        { label: 'Alpha', token: 'a' },
-        { label: 'Beta', token: 'b' },
-      ],
       expectPrompt: true,
       expectNoTokensMessage: false,
+      useEmptyConfig: false,
     },
     {
       name: 'token list empty',
-      tokens: [] as Array<{ label: string; token: string }>,
       expectPrompt: false,
       expectNoTokensMessage: true,
+      useEmptyConfig: true,
     },
   ])('/list-access-token: $name - Current prompt when tokens exist, no prompt when empty', async ({
-    tokens,
     expectPrompt,
     expectNoTokensMessage,
+    useEmptyConfig,
   }) => {
-    if (tokens.length === 0) {
+    if (useEmptyConfig) {
       restoreConfigDir()
       withConfigDir(makeTempConfigDir([]))
     }
@@ -1561,6 +1548,10 @@ describe('TTY token list interactive mode', () => {
       expect(output).toContain(
         'Select and enter to change the default access token'
       )
+      expect(output).toContain('Alpha')
+      expect(output).toContain('Beta')
+      expect(output).toContain('Gamma')
+      expect(output).toContain('★')
     }
     if (expectNoTokensMessage) {
       expect(output).toContain('No access tokens stored')
