@@ -114,6 +114,17 @@ class ClozeDescriptionTest {
     assertThat(result, containsString("https://en.wikipedia.org/wiki/Hero"));
   }
 
+  @Test
+  void clozeShouldMaskPronunciationFollowedByJapaneseParticle() {
+    String details =
+        "/あしかが よしみつ/は、室町時代前期の室町幕府第3代将軍（在職：1369年 - 1395年）である。";
+    String result =
+        new ClozedString(clozeReplacement, details)
+            .hide(new NoteTitle("足利義満"))
+            .maskedDetailsAsMarkdown();
+    assertThat(result, containsString("/.../"));
+  }
+
   @ParameterizedTest
   @CsvSource({
     "archenemy / arch-enemy, an archenemy here, an [...] here",

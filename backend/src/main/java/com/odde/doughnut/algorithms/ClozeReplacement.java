@@ -48,7 +48,8 @@ record ClozeReplacement(
     final String internalPronunciationReplacement = "__p_r_o_n_u_n_c__";
     final Pattern pattern =
         Pattern.compile(
-            "/[^\\s/][^/\\n]*/(?!\\w)", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CHARACTER_CLASS);
+            "/[^\\s/][^/\\n]*/(?![a-zA-Z0-9_])",
+            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CHARACTER_CLASS);
     // If this segment follows a non-whitespace character in the original HTML,
     // prepend a zero-width marker so suffix patterns can match at segment start
     String contentToProcess = originalContent1;
