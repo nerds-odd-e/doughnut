@@ -93,19 +93,12 @@ function clearTTYDisplay(
   linesAboveCursor: number,
   prevTotalLines: number
 ): void {
-  if (linesAboveCursor > 0) {
-    process.stdout.write(`\x1b[${linesAboveCursor}A`)
-  }
-  process.stdout.write('\r')
+  if (linesAboveCursor > 0) process.stdout.write(`\x1b[${linesAboveCursor}A`)
   for (let i = 0; i < prevTotalLines; i++) {
-    process.stdout.write('\x1b[2K')
-    if (i < prevTotalLines - 1) {
-      process.stdout.write(`\x1b[1B`)
-    }
+    process.stdout.write('\r\x1b[2K')
+    if (i < prevTotalLines - 1) process.stdout.write('\x1b[1B')
   }
-  if (prevTotalLines > 1) {
-    process.stdout.write(`\x1b[${prevTotalLines - 1}A`)
-  }
+  if (prevTotalLines > 1) process.stdout.write(`\x1b[${prevTotalLines - 1}A`)
 }
 
 function isSubmitKey(keyName: string): boolean {

@@ -171,7 +171,7 @@ function countTopBorderLinesBeforeFirstInputBox(output: string): number {
   return count
 }
 
-/** Simulates terminal overwrite: cursor-up causes subsequent writes to overwrite previous content. */
+/** Simulates terminal overwrite: cursor movement and erase sequences alter displayed content. Used to detect visual bugs (e.g. extra blank lines, double border). */
 function simulateTerminalOverwrite(output: string): string {
   const lines: string[] = []
   let row = 0
@@ -179,17 +179,25 @@ function simulateTerminalOverwrite(output: string): string {
   let i = 0
   const ESC = '\x1b'
   const cursorUpRe = new RegExp(`^${ESC}\\[(\\d+)A`)
+  const cursorDownRe = new RegExp(`^${ESC}\\[(\\d+)B`)
   const eraseLineRe = new RegExp(`^${ESC}\\[2K`)
   const cursorColRe = new RegExp(`^${ESC}\\[(\\d+)G`)
   const ansiRe = new RegExp(`^${ESC}\\[[0-9;]*[A-Za-z]`)
   while (i < output.length) {
     if (output.startsWith('\x1b[', i)) {
-      const cursorUpMatch = output.slice(i).match(cursorUpRe)
-      const eraseLineMatch = output.slice(i).match(eraseLineRe)
-      const cursorColMatch = output.slice(i).match(cursorColRe)
+      const rest = output.slice(i)
+      const cursorUpMatch = rest.match(cursorUpRe)
+      const cursorDownMatch = rest.match(cursorDownRe)
+      const eraseLineMatch = rest.match(eraseLineRe)
+      const cursorColMatch = rest.match(cursorColRe)
       if (cursorUpMatch) {
         row = Math.max(0, row - Number(cursorUpMatch[1]))
         i += cursorUpMatch[0].length
+        continue
+      }
+      if (cursorDownMatch) {
+        row += Number(cursorDownMatch[1])
+        i += cursorDownMatch[0].length
         continue
       }
       if (eraseLineMatch) {
@@ -204,7 +212,7 @@ function simulateTerminalOverwrite(output: string): string {
         i += cursorColMatch[0].length
         continue
       }
-      const ansiMatch = output.slice(i).match(ansiRe)
+      const ansiMatch = rest.match(ansiRe)
       if (ansiMatch) {
         i += ansiMatch[0].length
         continue
@@ -223,12 +231,21 @@ function simulateTerminalOverwrite(output: string): string {
     }
     while (lines.length <= row) lines.push('')
     const line = lines[row] ?? ''
-    const newLine = line.slice(0, col) + output[i] + line.slice(col + 1)
-    lines[row] = newLine
+    lines[row] = line.slice(0, col) + output[i] + line.slice(col + 1)
     col++
     i++
   }
   return lines.join('\n')
+}
+
+function maxConsecutiveBlanks(lines: string[]): number {
+  let max = 0
+  let curr = 0
+  for (const l of lines) {
+    curr = l.trim() ? 0 : curr + 1
+    max = Math.max(max, curr)
+  }
+  return max
 }
 
 function makeTempConfigDir(tokens: Array<{ label: string; token: string }>) {
@@ -1818,7 +1835,7 @@ describe('TTY token list interactive mode', () => {
       },
       expectMsg: 'Cancelled by user.',
     },
-  ])('token list $action has no two consecutive blank lines after result', async ({
+  ])('token list $action result message appears without leading blank lines', async ({
     setup,
     expectMsg,
   }) => {
@@ -1826,30 +1843,21 @@ describe('TTY token list interactive mode', () => {
     writeSpy.mockClear()
     await setup()
 
-    const rawOutput = ttyOutput(writeSpy)
-    const visualOutput = simulateTerminalOverwrite(rawOutput)
-    const lines = stripAllAnsi(visualOutput).split('\n')
-
+    const lines = stripAllAnsi(
+      simulateTerminalOverwrite(ttyOutput(writeSpy))
+    ).split('\n')
     const resultLineIdx = lines.findIndex((l) => l.includes(expectMsg))
     expect(
       resultLineIdx,
       `Result "${expectMsg}" not found`
     ).toBeGreaterThanOrEqual(0)
 
-    const afterResult = lines.slice(resultLineIdx + 1)
-    const maxConsecutiveBlanks = (() => {
-      let max = 0
-      let curr = 0
-      for (const l of afterResult) {
-        curr = l.trim() ? 0 : curr + 1
-        max = Math.max(max, curr)
-      }
-      return max
-    })()
+    const beforeResult = lines.slice(0, resultLineIdx)
+    const blanks = maxConsecutiveBlanks(beforeResult)
     expect(
-      maxConsecutiveBlanks,
-      `Expected no two consecutive blank lines after result. Max: ${maxConsecutiveBlanks}. Lines: ${JSON.stringify(afterResult.slice(0, 10))}`
-    ).toBeLessThan(2)
+      blanks,
+      `Expected no blank lines before result message (blank lines here appear as scrollback noise above the result). Got ${blanks}. Lines before result: ${JSON.stringify(beforeResult)}`
+    ).toBe(0)
   })
 
   test('/remove-access-token shows token list and Enter removes selected', async () => {

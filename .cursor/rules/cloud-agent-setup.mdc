@@ -1,8 +1,7 @@
 ---
 description: How to setup dev env on Cursor Cloud Agent with Cloud VM
-alwaysApply: true
+alwaysApply: false
 ---
-
 # Cloud VM Development Environment Setup
 
 **CRITICAL: On Cloud VM, the `CURSOR_DEV=true nix develop -c` prefix MUST NOT be added to commands. Run commands directly without any nix prefix.**
