@@ -2,7 +2,7 @@ import * as readline from 'node:readline'
 import { Writable } from 'node:stream'
 import type { AccessTokenEntry } from '../accessToken.js'
 import type { CommandDoc } from '../help.js'
-import { CURRENT_PROMPT_LINES } from '../renderer.js'
+import { wrapTextToLines } from '../renderer.js'
 import type { ChatHistory, OutputAdapter } from '../types.js'
 
 export type TokenListAction = 'set-default' | 'remove' | 'remove-completely'
@@ -51,7 +51,7 @@ export interface TTYDeps {
     width: number,
     suggestionLines: string[],
     recallingIndicator: string[],
-    currentPrompt?: string
+    currentPromptLines?: string[]
   ) => string[]
   renderPastInput: (input: string, width: number) => string
   GREY: string
@@ -196,10 +196,16 @@ export async function runTTY(
     const contentLines = buildBoxLines(buffer, width)
     const boxLines = renderBox(contentLines, width).split('\n')
     const pendingRecallAnswer = getPendingRecallAnswer()
-    const currentPrompt =
+    const currentPromptText =
       tokenListItems && tokenListCommand
         ? TOKEN_LIST_COMMANDS[tokenListCommand]?.currentPrompt
         : undefined
+    const currentPromptWrappedLines = currentPromptText
+      ? wrapTextToLines(currentPromptText, width)
+      : []
+    const currentPromptLines = currentPromptWrappedLines.length
+      ? 1 + currentPromptWrappedLines.length
+      : 0
     const suggestionLines = tokenListItems
       ? buildTokenListLines(
           tokenListItems,
@@ -222,11 +228,10 @@ export async function runTTY(
                 suggestionsDismissed && isCommandPrefixWithSuggestions(buffer),
             })
     const recallingIndicator = isInRecallSubstate() ? [RECALLING_INDICATOR] : []
-    const currentPromptLines = currentPrompt ? CURRENT_PROMPT_LINES : 0
     return {
       contentLines,
       boxLines,
-      currentPrompt,
+      currentPromptWrappedLines,
       currentPromptLines,
       suggestionLines,
       recallingIndicator,
@@ -251,7 +256,7 @@ export async function runTTY(
     const {
       contentLines,
       boxLines,
-      currentPrompt,
+      currentPromptWrappedLines,
       currentPromptLines,
       suggestionLines,
       recallingIndicator,
@@ -269,7 +274,7 @@ export async function runTTY(
       getTerminalWidth(),
       suggestionLines,
       recallingIndicator,
-      currentPrompt
+      currentPromptWrappedLines
     )
     for (const line of fullLines) {
       process.stdout.write(`${line}\n`)
@@ -287,7 +292,7 @@ export async function runTTY(
     const {
       contentLines,
       boxLines,
-      currentPrompt,
+      currentPromptWrappedLines,
       currentPromptLines,
       suggestionLines,
       recallingIndicator,
@@ -303,11 +308,13 @@ export async function runTTY(
     }
     process.stdout.write('\r')
 
-    if (currentPrompt) {
+    if (currentPromptWrappedLines.length > 0) {
       process.stdout.write(
         `\x1b[2K${buildCurrentPromptSeparator(getTerminalWidth())}\n`
       )
-      process.stdout.write(`\x1b[2K${GREY}${currentPrompt}\x1b[0m\n`)
+      for (const line of currentPromptWrappedLines) {
+        process.stdout.write(`\x1b[2K${GREY}${line}\x1b[0m\n`)
+      }
     }
     for (const line of boxLines) {
       process.stdout.write(`\x1b[2K${line}\n`)

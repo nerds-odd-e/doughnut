@@ -1504,8 +1504,11 @@ describe('TTY token list interactive mode', () => {
     const lastCursorUp = cursorUpValues.at(-1)
     expect(lastCursorUp).toBeDefined()
 
-    const { CURRENT_PROMPT_LINES } = await import('../src/renderer.js')
-    const currentPromptLines = CURRENT_PROMPT_LINES
+    const { wrapTextToLines } = await import('../src/renderer.js')
+    const promptText = 'Select and enter to change the default access token'
+    const width = process.stdout.columns ?? 80
+    const wrappedPromptLines = wrapTextToLines(promptText, width)
+    const currentPromptLines = 1 + wrappedPromptLines.length
     const contentLinesLength = 1
     const boxLinesLength = 3
     const suggestionLinesLength = 3
@@ -1545,9 +1548,7 @@ describe('TTY token list interactive mode', () => {
 
     const output = ttyOutput(writeSpy)
     if (expectPrompt) {
-      expect(output).toContain(
-        'Select and enter to change the default access token'
-      )
+      expect(output).toContain('Select and enter to change the default')
       expect(output).toContain('Alpha')
       expect(output).toContain('Beta')
       expect(output).toContain('Gamma')
@@ -1568,10 +1569,41 @@ describe('TTY token list interactive mode', () => {
     await tick()
 
     const output = ttyOutput(writeSpy)
-    const promptText = 'Select and enter to change the default access token'
     const visualOutput = simulateTerminalOverwrite(output)
-    const count = visualOutput.split(promptText).length - 1
+    const promptStart = 'Select and enter to change the default'
+    const count = visualOutput.split(promptStart).length - 1
     expect(count).toBe(1)
+  })
+
+  test('with narrow terminal and wrapped prompt, separator and input box top appear once when selection changes', async () => {
+    const originalColumns = process.stdout.columns
+    Object.defineProperty(process.stdout, 'columns', {
+      value: 40,
+      writable: true,
+      configurable: true,
+    })
+
+    await submitTTYCommand(stdin, '/list-access-token')
+    writeSpy.mockClear()
+
+    pressKey(stdin, 'down')
+    await tick()
+
+    const output = ttyOutput(writeSpy)
+    const visualOutput = simulateTerminalOverwrite(output)
+    const lines = visualOutput.split('\n')
+
+    const separatorLines = lines.filter((l) => /^─+$/.test(stripAnsi(l).trim()))
+    const boxTopLines = lines.filter((l) => stripAnsi(l).trim().startsWith('┌'))
+
+    Object.defineProperty(process.stdout, 'columns', {
+      value: originalColumns,
+      writable: true,
+      configurable: true,
+    })
+
+    expect(separatorLines).toHaveLength(1)
+    expect(boxTopLines).toHaveLength(1)
   })
 
   test('Enter sets highlighted token as default and confirms', async () => {

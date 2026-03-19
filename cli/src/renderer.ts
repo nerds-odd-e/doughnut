@@ -27,9 +27,6 @@ export const PROMPT = '→ '
 
 export const CLEAR_SCREEN = '\x1b[H\x1b[2J'
 
-/** Lines occupied by Current prompt: separator + prompt text. */
-export const CURRENT_PROMPT_LINES = 2
-
 /** Shown in Current guidance when user has not typed a slash command prefix. */
 export const COMMANDS_HINT = `${GREY}  / commands${RESET}`
 export const RECALLING_INDICATOR = `${GREY}Recalling${RESET}`
@@ -44,6 +41,27 @@ export type TerminalWidth = number
 
 export function visibleLength(str: string): number {
   return str.replace(ANSI_PATTERN, '').length
+}
+
+/** Wraps plain text to width; returns lines. Breaks at word boundaries when possible. */
+export function wrapTextToLines(text: string, width: TerminalWidth): string[] {
+  if (width <= 0) return text.length ? [text] : []
+  if (text.length <= width) return text.length ? [text] : []
+  const result: string[] = []
+  let remaining = text
+  while (remaining.length > 0) {
+    if (remaining.length <= width) {
+      result.push(remaining)
+      break
+    }
+    const chunk = remaining.slice(0, width + 1)
+    const lastSpace = chunk.lastIndexOf(' ')
+    const breakAt = lastSpace > 0 && lastSpace <= width ? lastSpace : width
+    const line = remaining.slice(0, breakAt).trimEnd()
+    if (line.length > 0) result.push(line)
+    remaining = remaining.slice(breakAt).trimStart()
+  }
+  return result
 }
 
 /** Truncate str to at most width visible chars; append "..." when truncating. ANSI-aware. */
@@ -175,14 +193,14 @@ export function buildTokenListLines(
   return lines.map((line) => truncateToWidth(line, width))
 }
 
-/** Renders the full display. currentPrompt is Current prompt (above input box). suggestionLines and recallingIndicator are Current guidance (below input box). */
+/** Renders the full display. currentPromptLines is Current prompt (above input box), pre-wrapped. suggestionLines and recallingIndicator are Current guidance (below input box). */
 export function renderFullDisplay(
   history: ChatHistory,
   buffer: string,
   width: number,
   suggestionLines: string[],
   recallingIndicator: string[],
-  currentPrompt?: string
+  currentPromptLines?: string[]
 ): string[] {
   const lines: string[] = [formatVersionOutput(), '']
   for (const entry of history) {
@@ -192,9 +210,11 @@ export function renderFullDisplay(
       lines.push(...entry.lines)
     }
   }
-  if (currentPrompt) {
+  if (currentPromptLines && currentPromptLines.length > 0) {
     lines.push(buildCurrentPromptSeparator(width))
-    lines.push(`${GREY}${currentPrompt}${RESET}`)
+    for (const line of currentPromptLines) {
+      lines.push(`${GREY}${line}${RESET}`)
+    }
   }
   const boxLines = renderBox(buildBoxLines(buffer, width), width).split('\n')
   lines.push(...boxLines)
