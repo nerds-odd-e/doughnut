@@ -17,7 +17,7 @@ In narrow terminals, the Current guidance area (below the input box) shows:
 | Access token list  | `formatTokenLines` (accessToken.ts)   | `formatHighlightedList` | `truncateToWidth` ✓ | `  ★ label` or `    label` |
 | MCQ choices        | `formatMcqChoiceLines` (renderer.ts)  | `formatHighlightedList` | none                | `  1. choice text`         |
 
-Command completion flow: `buildSuggestionLines(buffer, highlightIndex, width, options?)` → `formatHighlightedList(formatCommandCompletionLines(filtered), 8, highlightIndex)` → `.map(truncateToWidth(·, width))`. Hint path (`/ commands`) also truncated.
+Command completion flow: `buildSuggestionLines(buffer, highlightIndex, width, options?)` → `formatHighlightedList(formatCommandCompletionLines(filtered), CURRENT_GUIDANCE_MAX_VISIBLE, highlightIndex)` → `.map(truncateToWidth(·, width))`. Hint path (`/ commands`) also truncated.
 
 ## Testing Strategy
 
@@ -80,4 +80,4 @@ Top-level functions: `buildSuggestionLines(buffer, highlightIndex, width)`, `bui
 - `visibleLength()` and `truncateToWidth()` in `renderer.ts` – ANSI-aware; truncateToWidth uses fresh RegExp per call to avoid global-state bugs.
 - `getTerminalWidth()` via `process.stdout.columns || 80`.
 - Phase 3: consider `wrapToWidth(str, width)` for MCQ (markdansi's `renderMarkdownToTerminal` may suffice).
-- Truncation lives in `renderer.ts`; `formatHighlightedList` (listDisplay.ts) stays generic (scroll, highlight only).
+- Truncation lives in `renderer.ts`; `formatHighlightedList` (listDisplay.ts) stays generic (scroll, highlight only); `CURRENT_GUIDANCE_MAX_VISIBLE` in listDisplay.ts names the scroll window height.

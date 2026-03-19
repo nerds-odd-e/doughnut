@@ -1,5 +1,8 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
-import { formatHighlightedList } from '../src/listDisplay.js'
+import {
+  CURRENT_GUIDANCE_MAX_VISIBLE,
+  formatHighlightedList,
+} from '../src/listDisplay.js'
 import {
   filterCommandsByPrefix,
   formatCommandCompletionLines,
@@ -206,7 +209,7 @@ describe('formatCommandCompletionLines', () => {
     }))
     const lines = formatHighlightedList(
       formatCommandCompletionLines(commands),
-      8,
+      CURRENT_GUIDANCE_MAX_VISIBLE,
       0
     )
     expect(lines.some((l) => l.includes('↓ more below'))).toBe(true)

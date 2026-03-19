@@ -1,5 +1,5 @@
 import { runPiped } from './adapters/pipedAdapter.js'
-import { runTTY } from './adapters/ttyAdapter.js'
+import { runTTY, type TokenListAction } from './adapters/ttyAdapter.js'
 import {
   addAccessToken,
   createAccessToken,
@@ -282,10 +282,7 @@ async function continueRecallSession(
   }
 }
 
-const TOKEN_LIST_COMMANDS: Record<
-  string,
-  'set-default' | 'remove' | 'remove-completely'
-> = {
+const TOKEN_LIST_COMMANDS: Record<string, TokenListAction> = {
   '/list-access-token': 'set-default',
   '/remove-access-token': 'remove',
   '/remove-access-token-completely': 'remove-completely',

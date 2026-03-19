@@ -5,7 +5,10 @@ import {
   interactiveDocs,
 } from './help.js'
 import { formatTokenLines, type AccessTokenEntry } from './accessToken.js'
-import { formatHighlightedList } from './listDisplay.js'
+import {
+  CURRENT_GUIDANCE_MAX_VISIBLE,
+  formatHighlightedList,
+} from './listDisplay.js'
 import { renderMarkdownToTerminal } from './markdown.js'
 import type { ChatHistory } from './types.js'
 import { formatVersionOutput } from './version.js'
@@ -147,7 +150,7 @@ export function buildSuggestionLines(
   const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
   const lines = formatHighlightedList(
     formatCommandCompletionLines(filtered),
-    8,
+    CURRENT_GUIDANCE_MAX_VISIBLE,
     highlightIndex
   )
   return lines.map((line) => truncateToWidth(line, width))
@@ -162,7 +165,7 @@ export function buildTokenListLines(
 ): string[] {
   const lines = formatHighlightedList(
     formatTokenLines(tokens, defaultLabel),
-    8,
+    CURRENT_GUIDANCE_MAX_VISIBLE,
     highlightIndex
   )
   return lines.map((line) => truncateToWidth(line, width))

@@ -1,11 +1,12 @@
 import { GREY, RESET, REVERSE } from './ansi.js'
 
-const WINDOW_HEIGHT = 8
+/** Max visible lines in Current guidance scrollable lists (commands, tokens, MCQ). */
+export const CURRENT_GUIDANCE_MAX_VISIBLE = 8
 
 /** Scrollable list with fixed-height window. Indicators replace option slots, never add lines. */
 export function formatHighlightedList(
   lines: string[],
-  maxVisible = WINDOW_HEIGHT,
+  maxVisible = CURRENT_GUIDANCE_MAX_VISIBLE,
   highlightIndex = 0
 ): string[] {
   const total = lines.length

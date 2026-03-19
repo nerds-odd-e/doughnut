@@ -1,9 +1,10 @@
 import * as readline from 'node:readline'
 import { Writable } from 'node:stream'
+import type { AccessTokenEntry } from '../accessToken.js'
+import type { CommandDoc } from '../help.js'
 import type { ChatHistory, OutputAdapter } from '../types.js'
 
-type CommandDoc = { usage: string }
-type TokenEntry = { label: string; token: string }
+export type TokenListAction = 'set-default' | 'remove' | 'remove-completely'
 
 export interface TTYDeps {
   processInput: (input: string, output?: OutputAdapter) => Promise<boolean>
@@ -14,13 +15,13 @@ export interface TTYDeps {
   exitRecallMode: () => void
   isMcqPrompt: (p: unknown) => boolean
   buildTokenListLines: (
-    tokens: TokenEntry[],
+    tokens: AccessTokenEntry[],
     defaultLabel: string | undefined,
     width: number,
     highlightIndex: number
   ) => string[]
   getDefaultTokenLabel: () => string | undefined
-  listAccessTokens: () => TokenEntry[]
+  listAccessTokens: () => AccessTokenEntry[]
   removeAccessToken: (label: string) => boolean
   removeAccessTokenCompletely: (label: string) => Promise<void>
   setDefaultTokenLabel: (label: string) => void
@@ -63,10 +64,7 @@ export interface TTYDeps {
     maxVisible?: number,
     highlightIndex?: number
   ) => string[]
-  TOKEN_LIST_COMMANDS: Record<
-    string,
-    'set-default' | 'remove' | 'remove-completely'
-  >
+  TOKEN_LIST_COMMANDS: Record<string, TokenListAction>
 }
 
 function cycleIndex(current: number, delta: number, length: number): number {
@@ -175,11 +173,10 @@ export async function runTTY(
   let suggestionsDismissed = false
   let linesAboveCursor = 0
   let prevTotalLines = 0
-  let tokenListItems: TokenEntry[] | null = null
+  let tokenListItems: AccessTokenEntry[] | null = null
   let tokenListCommand = ''
   let tokenHighlightIndex = 0
-  let tokenListAction: 'set-default' | 'remove' | 'remove-completely' =
-    'set-default'
+  let tokenListAction: TokenListAction = 'set-default'
   let mcqChoiceHighlightIndex = 0
 
   const collectedOutputLines: string[] = []
@@ -205,7 +202,7 @@ export async function runTTY(
               formatMcqChoiceLines(
                 (pendingRecallAnswer as { choices: string[] }).choices
               ),
-              8,
+              undefined,
               mcqChoiceHighlightIndex
             )
           : buildSuggestionLines(buffer, highlightIndex, width, {
