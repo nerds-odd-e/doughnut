@@ -72,7 +72,7 @@
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
     "@biomejs/biome": "2.4.8",
     "@cucumber/cucumber": "^12.7.0",
-    "@hey-api/openapi-ts": "0.94.2",
+    "@hey-api/openapi-ts": "0.94.3",
     "@lydell/node-pty": "^1.2.0-beta.10",
     "@mbtest/mountebank": "2.9.3",
     "@modelcontextprotocol/sdk": "^1.27.1",
