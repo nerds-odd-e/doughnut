@@ -3,9 +3,7 @@ import {
   CURRENT_GUIDANCE_MAX_VISIBLE,
   formatHighlightedList,
 } from '../src/listDisplay.js'
-
-// biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI for assertions
-const stripAnsi = (s: string) => s.replace(/\x1b\[[0-9;]*m/g, '')
+import { stripAnsi } from '../src/renderer.js'
 
 describe('formatHighlightedList', () => {
   test('returns maxVisible lines when "more below" appears (replaces last option)', () => {

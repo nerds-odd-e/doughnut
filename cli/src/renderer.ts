@@ -14,10 +14,14 @@ import type { ChatHistory } from './types.js'
 import { formatVersionOutput } from './version.js'
 
 export { GREY, RESET }
+
+/** Terminal column count; used for truncation and line width. */
+export type TerminalWidth = number
+
 export const GREEN = '\x1b[32m'
 export const GREY_BG = '\x1b[48;5;236m'
 
-export function buildCurrentPromptSeparator(width: number): string {
+export function buildCurrentPromptSeparator(width: TerminalWidth): string {
   return `${GREEN}${'─'.repeat(width)}${RESET}`
 }
 export const COMMAND_HIGHLIGHT = '\x1b[1;36m' // bold + cyan
@@ -36,11 +40,13 @@ const ANSI_PATTERN = /\x1b\[[0-9;]*m/g
 // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI escape or single char (for truncation)
 const ANSI_OR_CHAR_PATTERN = /\x1b\[[0-9;]*m|./gs
 
-/** Terminal column count; used for truncation and line width. */
-export type TerminalWidth = number
+/** Strip ANSI escape sequences; returns plain text. */
+export function stripAnsi(str: string): string {
+  return str.replace(ANSI_PATTERN, '')
+}
 
 export function visibleLength(str: string): number {
-  return str.replace(ANSI_PATTERN, '').length
+  return stripAnsi(str).length
 }
 
 /** Wraps plain text to width; returns lines. Breaks at word boundaries when possible. */
@@ -91,7 +97,7 @@ function padEndVisible(str: string, targetLen: number): string {
   return pad > 0 ? str + ' '.repeat(pad) : str
 }
 
-export function renderBox(lines: string[], width: number): string {
+export function renderBox(lines: string[], width: TerminalWidth): string {
   const innerWidth = width - 4
   const top = `┌${'─'.repeat(width - 2)}┐`
   const bottom = `└${'─'.repeat(width - 2)}┘`
@@ -99,7 +105,7 @@ export function renderBox(lines: string[], width: number): string {
   return [top, ...rows, bottom].join('\n')
 }
 
-export function renderPastInput(input: string, width: number): string {
+export function renderPastInput(input: string, width: TerminalWidth): string {
   const innerWidth = width - 2
   const lines = input.split('\n')
   const emptyRow = `${GREY_BG}${' '.repeat(innerWidth)}${RESET}`
@@ -128,7 +134,7 @@ export function highlightRecognizedCommand(line: string): string {
   return `${COMMAND_HIGHLIGHT}${prefix}${RESET}${rest}`
 }
 
-export function buildBoxLines(buffer: string, width: number): string[] {
+export function buildBoxLines(buffer: string, width: TerminalWidth): string[] {
   const bufferLines = buffer.split('\n')
   return bufferLines.map((line, i) => {
     const prefix = i === 0 ? PROMPT : '  '
@@ -154,11 +160,24 @@ export function getLastLine(buffer: string): string {
   return lines[lines.length - 1] ?? ''
 }
 
-/** Returns lines for the Current guidance area (command completion or / commands hint). */
+/** Format plain option lines to Current guidance: highlight selected, truncate to terminal width. */
+function formatCurrentGuidanceLines(
+  plainLines: string[],
+  highlightIndex: number,
+  width: TerminalWidth
+): string[] {
+  return formatHighlightedList(
+    plainLines,
+    CURRENT_GUIDANCE_MAX_VISIBLE,
+    highlightIndex
+  ).map((line) => truncateToWidth(line, width))
+}
+
+/** Returns lines for Current guidance (command completion or / commands hint). */
 export function buildSuggestionLines(
   buffer: string,
   highlightIndex: number,
-  width: number,
+  width: TerminalWidth,
   options?: { forceCommandsHint?: boolean }
 ): string[] {
   const lastLine = getLastLine(buffer)
@@ -170,34 +189,32 @@ export function buildSuggestionLines(
     return [truncateToWidth(COMMANDS_HINT, width)]
   }
   const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
-  const lines = formatHighlightedList(
+  return formatCurrentGuidanceLines(
     formatCommandCompletionLines(filtered),
-    CURRENT_GUIDANCE_MAX_VISIBLE,
-    highlightIndex
+    highlightIndex,
+    width
   )
-  return lines.map((line) => truncateToWidth(line, width))
 }
 
-/** Returns lines for the Current guidance area (access token list). Truncates long labels to width. */
+/** Returns lines for Current guidance (access token list). */
 export function buildTokenListLines(
   tokens: AccessTokenEntry[],
   defaultLabel: string | undefined,
-  width: number,
+  width: TerminalWidth,
   highlightIndex: number
 ): string[] {
-  const lines = formatHighlightedList(
+  return formatCurrentGuidanceLines(
     formatTokenLines(tokens, defaultLabel),
-    CURRENT_GUIDANCE_MAX_VISIBLE,
-    highlightIndex
+    highlightIndex,
+    width
   )
-  return lines.map((line) => truncateToWidth(line, width))
 }
 
 /** Renders the full display. currentPromptLines is Current prompt (above input box), pre-wrapped. suggestionLines and recallingIndicator are Current guidance (below input box). */
 export function renderFullDisplay(
   history: ChatHistory,
   buffer: string,
-  width: number,
+  width: TerminalWidth,
   suggestionLines: string[],
   recallingIndicator: string[],
   currentPromptLines?: string[]
@@ -226,7 +243,7 @@ export function renderFullDisplay(
 export function writeFullRedraw(
   history: ChatHistory,
   buffer: string,
-  width: number,
+  width: TerminalWidth,
   suggestionLines: string[],
   recallingIndicator: string[]
 ): void {

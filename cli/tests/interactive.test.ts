@@ -14,10 +14,7 @@ import {
   runInteractive,
   visibleLength,
 } from '../src/interactive.js'
-import { buildSuggestionLines } from '../src/renderer.js'
-
-// biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI for assertions
-const stripAnsi = (s: string) => s.replace(/\x1b\[[0-9;]*m/g, '')
+import { buildSuggestionLines, stripAnsi } from '../src/renderer.js'
 const tick = () => new Promise<void>((r) => setImmediate(r))
 
 let useManyCommandsForScrollTests = false
@@ -928,7 +925,7 @@ describe('buildSuggestionLines', () => {
     expect(lines).toHaveLength(0)
   })
 
-  test('with narrow width, every line containing ANSI codes must end with RESET', () => {
+  test('Current guidance lines with ANSI end with RESET (no state bleed)', () => {
     const widths = [25, 30] as const
     const buffers = ['/list', '/']
     for (const buffer of buffers) {
