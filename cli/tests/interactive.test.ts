@@ -1669,6 +1669,25 @@ describe('TTY token list interactive mode', () => {
     expect(getDefaultTokenLabel()).toBe('Beta')
   })
 
+  test('in token list mode, cursor is hidden', async () => {
+    await submitTTYCommand(stdin, '/list-access-token')
+    expect(ttyOutput(writeSpy)).toContain('\x1b[?25l')
+  })
+
+  test('in token list mode, input box is grayed out', async () => {
+    await submitTTYCommand(stdin, '/list-access-token')
+    expect(ttyOutput(writeSpy)).toContain('\x1b[90m┌')
+  })
+
+  test('after exiting token list with any key, cursor is shown', async () => {
+    await submitTTYCommand(stdin, '/list-access-token')
+    writeSpy.mockClear()
+    pressKey(stdin, 'x')
+    await tick()
+
+    expect(ttyOutput(writeSpy)).toContain('\x1b[?25h')
+  })
+
   test('any other key exits token list mode', async () => {
     await submitTTYCommand(stdin, '/list-access-token')
     writeSpy.mockClear()

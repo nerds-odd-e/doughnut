@@ -1,4 +1,4 @@
-import { GREY, RESET } from './ansi.js'
+import { GREY, RESET, HIDE_CURSOR, SHOW_CURSOR } from './ansi.js'
 import {
   filterCommandsByPrefix,
   formatCommandCompletionLines,
@@ -13,7 +13,7 @@ import { renderMarkdownToTerminal } from './markdown.js'
 import type { ChatHistory } from './types.js'
 import { formatVersionOutput } from './version.js'
 
-export { GREY, RESET }
+export { GREY, RESET, HIDE_CURSOR, SHOW_CURSOR }
 
 /** Terminal column count; used for truncation and line width. */
 export type TerminalWidth = number
@@ -264,10 +264,14 @@ export function renderFullDisplay(
       lines.push(`${GREY}${line}${RESET}`)
     }
   }
-  const boxLines = renderBox(
+  const rawBoxLines = renderBox(
     buildBoxLines(buffer, width, options),
     width
   ).split('\n')
+  const boxLines =
+    options?.placeholderContext === 'tokenList'
+      ? rawBoxLines.map((l) => `${GREY}${l}${RESET}`)
+      : rawBoxLines
   lines.push(...boxLines)
   lines.push(...recallingIndicator)
   lines.push(...suggestionLines)

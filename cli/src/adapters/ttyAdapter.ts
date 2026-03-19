@@ -60,6 +60,8 @@ export interface TTYDeps {
   ) => string[]
   renderPastInput: (input: string, width: number) => string
   GREY: string
+  HIDE_CURSOR: string
+  SHOW_CURSOR: string
   CLEAR_SCREEN: string
   RECALLING_INDICATOR: string
   PROMPT: string
@@ -138,6 +140,8 @@ export async function runTTY(
     renderFullDisplay,
     renderPastInput,
     GREY,
+    HIDE_CURSOR,
+    SHOW_CURSOR,
     CLEAR_SCREEN,
     RECALLING_INDICATOR,
     PROMPT,
@@ -278,6 +282,7 @@ export async function runTTY(
       suggestionLines.length
 
     process.stdout.write(CLEAR_SCREEN)
+    const placeholderContext = getPlaceholderContext(!!tokenListItems)
     const fullLines = renderFullDisplay(
       chatHistory,
       buffer,
@@ -285,7 +290,7 @@ export async function runTTY(
       suggestionLines,
       recallingIndicator,
       currentPromptWrappedLines,
-      { placeholderContext: getPlaceholderContext(!!tokenListItems) }
+      { placeholderContext }
     )
     for (const line of fullLines) {
       process.stdout.write(`${line}\n`)
@@ -296,7 +301,12 @@ export async function runTTY(
     prevTotalLines = newTotalLines
 
     process.stdout.write(`\x1b[${newTotalLines - inputRow}A`)
-    positionCursorInInputBox()
+    if (tokenListItems) {
+      process.stdout.write(HIDE_CURSOR)
+    } else {
+      process.stdout.write(SHOW_CURSOR)
+      positionCursorInInputBox()
+    }
   }
 
   function drawBox() {
@@ -328,7 +338,8 @@ export async function runTTY(
       }
     }
     for (const line of boxLines) {
-      process.stdout.write(`\x1b[2K${line}\n`)
+      const displayLine = tokenListItems ? `${GREY}${line}\x1b[0m` : line
+      process.stdout.write(`\x1b[2K${displayLine}\n`)
     }
     for (const line of recallingIndicator) {
       process.stdout.write(`\x1b[2K${line}\n`)
@@ -344,7 +355,12 @@ export async function runTTY(
     const totalWritten = Math.max(newTotalLines, prevTotalLines)
     const inputRow = inputRowFromTop(currentPromptLines, contentLines.length)
     process.stdout.write(`\x1b[${totalWritten - inputRow}A`)
-    positionCursorInInputBox()
+    if (tokenListItems) {
+      process.stdout.write(HIDE_CURSOR)
+    } else {
+      process.stdout.write(SHOW_CURSOR)
+      positionCursorInInputBox()
+    }
 
     linesAboveCursor = inputRow
     prevTotalLines = newTotalLines
@@ -382,6 +398,7 @@ export async function runTTY(
   const removeResizeListener = () => process.stdout.off('resize', doFullRedraw)
   const doExit = () => {
     removeResizeListener()
+    process.stdout.write(SHOW_CURSOR)
     rl.close()
     process.exit(0)
   }
