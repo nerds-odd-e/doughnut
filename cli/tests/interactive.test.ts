@@ -1799,6 +1799,59 @@ describe('TTY token list interactive mode', () => {
     expect(remaining.map((t) => t.label)).toContain('Alpha')
   })
 
+  test.each([
+    {
+      action: 'select',
+      setup: async () => {
+        pressKey(stdin, 'down')
+        await tick()
+        pressEnter(stdin)
+        await tick()
+      },
+      expectMsg: 'Default token set to:',
+    },
+    {
+      action: 'cancel',
+      setup: async () => {
+        typeString(stdin, 'q')
+        await tick()
+      },
+      expectMsg: 'Cancelled by user.',
+    },
+  ])('token list $action has no two consecutive blank lines after result', async ({
+    setup,
+    expectMsg,
+  }) => {
+    await submitTTYCommand(stdin, '/list-access-token')
+    writeSpy.mockClear()
+    await setup()
+
+    const rawOutput = ttyOutput(writeSpy)
+    const visualOutput = simulateTerminalOverwrite(rawOutput)
+    const lines = stripAllAnsi(visualOutput).split('\n')
+
+    const resultLineIdx = lines.findIndex((l) => l.includes(expectMsg))
+    expect(
+      resultLineIdx,
+      `Result "${expectMsg}" not found`
+    ).toBeGreaterThanOrEqual(0)
+
+    const afterResult = lines.slice(resultLineIdx + 1)
+    const maxConsecutiveBlanks = (() => {
+      let max = 0
+      let curr = 0
+      for (const l of afterResult) {
+        curr = l.trim() ? 0 : curr + 1
+        max = Math.max(max, curr)
+      }
+      return max
+    })()
+    expect(
+      maxConsecutiveBlanks,
+      `Expected no two consecutive blank lines after result. Max: ${maxConsecutiveBlanks}. Lines: ${JSON.stringify(afterResult.slice(0, 10))}`
+    ).toBeLessThan(2)
+  })
+
   test('/remove-access-token shows token list and Enter removes selected', async () => {
     await submitTTYCommand(stdin, '/remove-access-token')
 

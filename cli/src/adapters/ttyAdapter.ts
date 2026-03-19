@@ -98,7 +98,10 @@ function clearTTYDisplay(
   }
   process.stdout.write('\r')
   for (let i = 0; i < prevTotalLines; i++) {
-    process.stdout.write('\x1b[2K\n')
+    process.stdout.write('\x1b[2K')
+    if (i < prevTotalLines - 1) {
+      process.stdout.write(`\x1b[1B`)
+    }
   }
   if (prevTotalLines > 1) {
     process.stdout.write(`\x1b[${prevTotalLines - 1}A`)
