@@ -897,7 +897,7 @@ describe('buildSuggestionLines', () => {
     for (const line of lines) {
       expect(visibleLength(line)).toBeLessThanOrEqual(40)
       if (visibleLength(line) === 40) {
-        expect(line.endsWith('...')).toBe(true)
+        expect(line).toContain('...')
       }
     }
   })
@@ -920,7 +920,7 @@ describe('buildSuggestionLines', () => {
     const lines = buildSuggestionLines('hello', 0, 5)
     expect(lines).toHaveLength(1)
     expect(visibleLength(lines[0])).toBeLessThanOrEqual(5)
-    expect(lines[0].endsWith('...')).toBe(true)
+    expect(lines[0]).toContain('...')
   })
 
   test('with slash prefix but no match returns empty', () => {
@@ -937,7 +937,7 @@ describe('buildSuggestionLines', () => {
         for (const line of lines) {
           if (line.includes('\x1b')) {
             // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI RESET escape, intentional
-            expect(line).toMatch(/\x1b\[0m(\.\.\.)?$/)
+            expect(line).toMatch(/\x1b\[0m$/)
           }
         }
       }

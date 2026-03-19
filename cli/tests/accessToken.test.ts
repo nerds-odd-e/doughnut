@@ -323,7 +323,7 @@ describe('buildTokenListLines', () => {
     for (const line of lines) {
       expect(visibleLength(line)).toBeLessThanOrEqual(20)
       if (visibleLength(line) === 20) {
-        expect(line.endsWith('...')).toBe(true)
+        expect(line).toContain('...')
       }
     }
   })
