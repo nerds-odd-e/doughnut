@@ -347,6 +347,8 @@ export async function runTTY(
 
     if (linesAboveCursor > 0) {
       process.stdout.write(`\x1b[${linesAboveCursor}A`)
+    } else if (prevTotalLines === 0 && chatHistory.length > 0) {
+      process.stdout.write('\n')
     }
     process.stdout.write('\r')
 

@@ -1493,6 +1493,17 @@ describe('TTY mode slash command suggestions', () => {
     const output = ttyOutput(writeSpy)
     expect(countTopBorderLinesBeforeFirstInputBox(output)).toBe(1)
   })
+
+  test('after /help, there is one empty line between history output and input box', async () => {
+    writeSpy.mockClear()
+    await submitTTYCommand(stdin, '/help')
+
+    const visualOutput = simulateTerminalOverwrite(ttyOutput(writeSpy))
+    const lines = visualOutput.split('\n').map((l) => stripAllAnsi(l))
+    const boxTopIndex = lines.findIndex((l) => /^┌─+┐$/.test(l.trim()))
+    expect(boxTopIndex).toBeGreaterThan(0)
+    expect(lines[boxTopIndex - 1]).toBe('')
+  })
 })
 
 describe('TTY mode resize', () => {
