@@ -141,6 +141,66 @@ function ttyOutput(writeSpy: ReturnType<typeof vi.spyOn>) {
   return writeSpy.mock.calls.map((c) => c[0]).join('')
 }
 
+/** Simulates terminal overwrite: cursor-up causes subsequent writes to overwrite previous content. */
+function simulateTerminalOverwrite(output: string): string {
+  const lines: string[] = []
+  let row = 0
+  let col = 0
+  let i = 0
+  const ESC = '\x1b'
+  const cursorUpRe = new RegExp(`^${ESC}\\[(\\d+)A`)
+  const eraseLineRe = new RegExp(`^${ESC}\\[2K`)
+  const cursorColRe = new RegExp(`^${ESC}\\[(\\d+)G`)
+  const ansiRe = new RegExp(`^${ESC}\\[[0-9;]*[A-Za-z]`)
+  while (i < output.length) {
+    if (output.startsWith('\x1b[', i)) {
+      const cursorUpMatch = output.slice(i).match(cursorUpRe)
+      const eraseLineMatch = output.slice(i).match(eraseLineRe)
+      const cursorColMatch = output.slice(i).match(cursorColRe)
+      if (cursorUpMatch) {
+        row = Math.max(0, row - Number(cursorUpMatch[1]))
+        i += cursorUpMatch[0].length
+        continue
+      }
+      if (eraseLineMatch) {
+        while (lines.length <= row) lines.push('')
+        lines[row] = ''
+        col = 0
+        i += eraseLineMatch[0].length
+        continue
+      }
+      if (cursorColMatch) {
+        col = Number(cursorColMatch[1]) - 1
+        i += cursorColMatch[0].length
+        continue
+      }
+      const ansiMatch = output.slice(i).match(ansiRe)
+      if (ansiMatch) {
+        i += ansiMatch[0].length
+        continue
+      }
+    }
+    if (output[i] === '\r') {
+      col = 0
+      i++
+      continue
+    }
+    if (output[i] === '\n') {
+      row++
+      col = 0
+      i++
+      continue
+    }
+    while (lines.length <= row) lines.push('')
+    const line = lines[row] ?? ''
+    const newLine = line.slice(0, col) + output[i] + line.slice(col + 1)
+    lines[row] = newLine
+    col++
+    i++
+  }
+  return lines.join('\n')
+}
+
 function makeTempConfigDir(tokens: Array<{ label: string; token: string }>) {
   const configDir = mkdtempSync(join(tmpdir(), 'doughnut-test-'))
   writeFileSync(
@@ -1505,6 +1565,22 @@ describe('TTY token list interactive mode', () => {
     if (expectNoTokensMessage) {
       expect(output).toContain('No access tokens stored')
     }
+  })
+
+  test('Current prompt appears once when selection changes in token list, not duplicated', async () => {
+    await submitTTYCommand(stdin, '/list-access-token')
+    writeSpy.mockClear()
+
+    pressKey(stdin, 'down')
+    await tick()
+    pressKey(stdin, 'down')
+    await tick()
+
+    const output = ttyOutput(writeSpy)
+    const promptText = 'Select and enter to change the default access token'
+    const visualOutput = simulateTerminalOverwrite(output)
+    const count = visualOutput.split(promptText).length - 1
+    expect(count).toBe(1)
   })
 
   test('Enter sets highlighted token as default and confirms', async () => {

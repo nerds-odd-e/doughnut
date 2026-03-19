@@ -254,7 +254,7 @@ export async function runTTY(
       process.stdout.write(`${line}\n`)
     }
 
-    linesAboveCursor = contentLines.length
+    linesAboveCursor = contentLines.length + currentPromptLines
     prevTotalLines = newTotalLines
 
     const cursorRow = currentPromptLines + contentLines.length
@@ -317,7 +317,7 @@ export async function runTTY(
     const col = 3 + lastPrefix.length + lastLine.length
     process.stdout.write(`\x1b[${col}G`)
 
-    linesAboveCursor = contentLines.length
+    linesAboveCursor = contentLines.length + currentPromptLines
     prevTotalLines = newTotalLines
   }
 
