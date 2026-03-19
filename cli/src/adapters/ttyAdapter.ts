@@ -2,7 +2,7 @@ import * as readline from 'node:readline'
 import { Writable } from 'node:stream'
 import type { AccessTokenEntry } from '../accessToken.js'
 import type { CommandDoc } from '../help.js'
-import { wrapTextToLines } from '../renderer.js'
+import { wrapTextToLines, type PlaceholderContext } from '../renderer.js'
 import type { ChatHistory, OutputAdapter } from '../types.js'
 
 export type TokenListAction = 'set-default' | 'remove' | 'remove-completely'
@@ -37,7 +37,7 @@ export interface TTYDeps {
   buildBoxLines: (
     buffer: string,
     width: number,
-    options?: { placeholderContext?: string }
+    options?: { placeholderContext?: PlaceholderContext }
   ) => string[]
   buildSuggestionLines: (
     buffer: string,
@@ -56,11 +56,10 @@ export interface TTYDeps {
     suggestionLines: string[],
     recallingIndicator: string[],
     currentPromptLines?: string[],
-    options?: { placeholderContext?: string }
+    options?: { placeholderContext?: PlaceholderContext }
   ) => string[]
   renderPastInput: (input: string, width: number) => string
   GREY: string
-  RESET: string
   HIDE_CURSOR: string
   SHOW_CURSOR: string
   CLEAR_SCREEN: string
@@ -81,7 +80,9 @@ export interface TTYDeps {
     highlightIndex?: number
   ) => string[]
   TOKEN_LIST_COMMANDS: Record<string, TokenListCommandConfig>
-  getPlaceholderContext: (inTokenList: boolean) => string
+  getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
+  grayBoxLinesForSelectionMode: (lines: string[]) => string[]
+  isSelectionMode: (ctx: PlaceholderContext) => boolean
 }
 
 function cycleIndex(current: number, delta: number, length: number): number {
@@ -141,7 +142,6 @@ export async function runTTY(
     renderFullDisplay,
     renderPastInput,
     GREY,
-    RESET,
     HIDE_CURSOR,
     SHOW_CURSOR,
     CLEAR_SCREEN,
@@ -153,6 +153,8 @@ export async function runTTY(
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
+    grayBoxLinesForSelectionMode,
+    isSelectionMode,
   } = deps
 
   const writeCurrentPromptLine = (msg: string) =>
@@ -210,7 +212,10 @@ export async function runTTY(
     const contentLines = buildBoxLines(buffer, width, {
       placeholderContext,
     })
-    const boxLines = renderBox(contentLines, width).split('\n')
+    let boxLines = renderBox(contentLines, width).split('\n')
+    if (isSelectionMode(placeholderContext)) {
+      boxLines = grayBoxLinesForSelectionMode(boxLines)
+    }
     const pendingRecallAnswer = getPendingRecallAnswer()
     const currentPromptText =
       tokenListItems && tokenListCommand
@@ -251,6 +256,7 @@ export async function runTTY(
       currentPromptLines,
       suggestionLines,
       recallingIndicator,
+      placeholderContext,
     }
   }
 
@@ -276,6 +282,7 @@ export async function runTTY(
       currentPromptLines,
       suggestionLines,
       recallingIndicator,
+      placeholderContext,
     } = getDisplayContent()
     const newTotalLines =
       currentPromptLines +
@@ -284,7 +291,6 @@ export async function runTTY(
       suggestionLines.length
 
     process.stdout.write(CLEAR_SCREEN)
-    const placeholderContext = getPlaceholderContext(!!tokenListItems)
     const fullLines = renderFullDisplay(
       chatHistory,
       buffer,
@@ -303,7 +309,7 @@ export async function runTTY(
     prevTotalLines = newTotalLines
 
     process.stdout.write(`\x1b[${newTotalLines - inputRow}A`)
-    if (tokenListItems) {
+    if (isSelectionMode(placeholderContext)) {
       process.stdout.write(HIDE_CURSOR)
     } else {
       process.stdout.write(SHOW_CURSOR)
@@ -319,6 +325,7 @@ export async function runTTY(
       currentPromptLines,
       suggestionLines,
       recallingIndicator,
+      placeholderContext,
     } = getDisplayContent()
     const newTotalLines =
       currentPromptLines +
@@ -340,10 +347,7 @@ export async function runTTY(
       }
     }
     for (const line of boxLines) {
-      const displayLine = tokenListItems
-        ? `${GREY}${line.split(RESET).join(GREY)}${RESET}` // selection mode: gray entire box including right border
-        : line
-      process.stdout.write(`\x1b[2K${displayLine}\n`)
+      process.stdout.write(`\x1b[2K${line}\n`)
     }
     for (const line of recallingIndicator) {
       process.stdout.write(`\x1b[2K${line}\n`)
@@ -359,8 +363,8 @@ export async function runTTY(
     const totalWritten = Math.max(newTotalLines, prevTotalLines)
     const inputRow = inputRowFromTop(currentPromptLines, contentLines.length)
     process.stdout.write(`\x1b[${totalWritten - inputRow}A`)
-    if (tokenListItems) {
-      process.stdout.write(HIDE_CURSOR) // selection mode: hide cursor
+    if (isSelectionMode(placeholderContext)) {
+      process.stdout.write(HIDE_CURSOR)
     } else {
       process.stdout.write(SHOW_CURSOR)
       positionCursorInInputBox()

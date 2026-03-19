@@ -41,8 +41,9 @@ import {
   renderFullDisplay,
   renderPastInput,
   writeFullRedraw,
+  grayBoxLinesForSelectionMode,
+  isSelectionMode,
   GREY,
-  RESET,
   HIDE_CURSOR,
   SHOW_CURSOR,
   CLEAR_SCREEN,
@@ -266,12 +267,6 @@ async function handleParamCommand(
   return false
 }
 
-function getCurrentPromptWriter(output: OutputAdapter): (msg: string) => void {
-  return typeof output.writeCurrentPrompt === 'function'
-    ? output.writeCurrentPrompt
-    : output.log
-}
-
 async function continueRecallSession(
   fromLoadMore: boolean,
   output: OutputAdapter,
@@ -327,7 +322,7 @@ export async function processInput(
   input: string,
   output: OutputAdapter = defaultOutput
 ): Promise<boolean> {
-  const writeCurrentPrompt = getCurrentPromptWriter(output)
+  const writeCurrentPrompt = output.writeCurrentPrompt ?? output.log
   const trimmed = input.trim()
   if (trimmed === 'exit' || trimmed === '/exit') {
     return true
@@ -567,7 +562,6 @@ function buildTTYDeps() {
     renderFullDisplay,
     renderPastInput,
     GREY,
-    RESET,
     HIDE_CURSOR,
     SHOW_CURSOR,
     CLEAR_SCREEN,
@@ -579,6 +573,8 @@ function buildTTYDeps() {
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
+    grayBoxLinesForSelectionMode,
+    isSelectionMode,
   }
 }
 

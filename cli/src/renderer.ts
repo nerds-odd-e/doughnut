@@ -39,11 +39,21 @@ export type PlaceholderContext =
 
 export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
   default: '`exit` to quit.',
-  tokenList: '↑↓ Enter to select; other keys cancel', // selection mode
+  tokenList: '↑↓ Enter to select; other keys cancel',
   recallMcq: '↑↓ Enter or number to select; Esc to cancel',
   recallStopConfirmation: 'y or n; Esc to go back',
   recallYesNo: 'y or n; /stop to exit recall',
   recallSpelling: 'type your answer; /stop to exit recall',
+}
+
+/** Selection mode: user selects from Current guidance via ↑↓ Enter; input box grayed, cursor hidden, no arrow. */
+export function isSelectionMode(ctx: PlaceholderContext): boolean {
+  return ctx === 'tokenList'
+}
+
+/** Gray box lines for selection mode; ensures right border stays gray (replaces internal RESET with GREY). */
+export function grayBoxLinesForSelectionMode(lines: string[]): string[] {
+  return lines.map((l) => `${GREY}${l.split(RESET).join(GREY)}${RESET}`)
 }
 
 export const CLEAR_SCREEN = '\x1b[H\x1b[2J'
@@ -166,9 +176,8 @@ export function buildBoxLines(
   const bufferLines = buffer.split('\n')
   const context = options?.placeholderContext ?? 'default'
   const placeholder = PLACEHOLDER_BY_CONTEXT[context]
-  const isSelectionMode = context === 'tokenList'
   return bufferLines.map((line, i) => {
-    const prefix = isSelectionMode ? '' : i === 0 ? PROMPT : '  '
+    const prefix = isSelectionMode(context) ? '' : i === 0 ? PROMPT : '  '
     if (i === 0 && buffer === '') {
       return `${prefix}${GREY}${placeholder}${RESET}`
     }
@@ -270,8 +279,8 @@ export function renderFullDisplay(
     width
   ).split('\n')
   const boxLines =
-    options?.placeholderContext === 'tokenList' // selection mode
-      ? rawBoxLines.map((l) => `${GREY}${l.split(RESET).join(GREY)}${RESET}`)
+    options?.placeholderContext === 'tokenList'
+      ? grayBoxLinesForSelectionMode(rawBoxLines)
       : rawBoxLines
   lines.push(...boxLines)
   lines.push(...recallingIndicator)
