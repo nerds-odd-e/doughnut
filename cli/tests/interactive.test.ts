@@ -1711,7 +1711,7 @@ describe('TTY token list interactive mode', () => {
     expect(ttyOutput(writeSpy)).toContain('\x1b[?25h')
   })
 
-  test('any other key exits token list mode', async () => {
+  test('any other key cancels token list and shows Cancelled by user. in history', async () => {
     await submitTTYCommand(stdin, '/list-access-token')
     writeSpy.mockClear()
 
@@ -1719,11 +1719,12 @@ describe('TTY token list interactive mode', () => {
     await tick()
 
     const output = ttyOutput(writeSpy)
+    expect(output).toContain('Cancelled by user.')
     expect(output).toContain('/ commands')
     expect(output).not.toContain('Alpha')
   })
 
-  test('ESC cancels token list selection without modifying tokens', async () => {
+  test('ESC cancels token list and shows Cancelled by user. in history', async () => {
     await submitTTYCommand(stdin, '/remove-access-token')
     writeSpy.mockClear()
 
@@ -1731,6 +1732,7 @@ describe('TTY token list interactive mode', () => {
     await tick()
 
     const output = ttyOutput(writeSpy)
+    expect(output).toContain('Cancelled by user.')
     expect(output).toContain('/ commands')
     expect(output).not.toContain('Alpha')
     expect(output).not.toContain('Token "Alpha" removed')

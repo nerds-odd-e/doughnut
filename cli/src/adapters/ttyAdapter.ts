@@ -531,13 +531,6 @@ export async function runTTY(
             tokenListItems.length
           )
           drawBox()
-        } else if (key.name === 'escape') {
-          tokenListItems = null
-          tokenListCommand = ''
-          tokenHighlightIndex = 0
-          tokenListAction = 'set-default'
-          buffer = ''
-          drawBox()
         } else if (submitPressed && !key.shift) {
           const selectedLabel = tokenListItems[tokenHighlightIndex]!.label
           clearTTYDisplay(linesAboveCursor, prevTotalLines)
@@ -570,8 +563,18 @@ export async function runTTY(
           chatHistory.push({ type: 'output', lines: [outputMsg] })
           drawBox()
         } else {
+          const command = tokenListCommand
+          clearTTYDisplay(linesAboveCursor, prevTotalLines)
+          process.stdout.write('Cancelled by user.\n')
+          chatHistory.push({ type: 'input', content: command })
+          chatHistory.push({ type: 'output', lines: ['Cancelled by user.'] })
           tokenListItems = null
+          tokenListCommand = ''
           tokenHighlightIndex = 0
+          tokenListAction = 'set-default'
+          buffer = ''
+          linesAboveCursor = 0
+          prevTotalLines = 0
           drawBox()
         }
         return
