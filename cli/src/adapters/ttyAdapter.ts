@@ -338,7 +338,7 @@ export async function runTTY(
       }
     }
     for (const line of boxLines) {
-      const displayLine = tokenListItems ? `${GREY}${line}\x1b[0m` : line
+      const displayLine = tokenListItems ? `${GREY}${line}\x1b[0m` : line // selection mode: gray input box
       process.stdout.write(`\x1b[2K${displayLine}\n`)
     }
     for (const line of recallingIndicator) {
@@ -356,7 +356,7 @@ export async function runTTY(
     const inputRow = inputRowFromTop(currentPromptLines, contentLines.length)
     process.stdout.write(`\x1b[${totalWritten - inputRow}A`)
     if (tokenListItems) {
-      process.stdout.write(HIDE_CURSOR)
+      process.stdout.write(HIDE_CURSOR) // selection mode: hide cursor
     } else {
       process.stdout.write(SHOW_CURSOR)
       positionCursorInInputBox()

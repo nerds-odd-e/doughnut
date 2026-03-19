@@ -39,7 +39,7 @@ export type PlaceholderContext =
 
 export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
   default: '`exit` to quit.',
-  tokenList: '↑↓ Enter to select; other keys cancel',
+  tokenList: '↑↓ Enter to select; other keys cancel', // selection mode
   recallMcq: '↑↓ Enter or number to select; Esc to cancel',
   recallStopConfirmation: 'y or n; Esc to go back',
   recallYesNo: 'y or n; /stop to exit recall',
@@ -166,8 +166,9 @@ export function buildBoxLines(
   const bufferLines = buffer.split('\n')
   const context = options?.placeholderContext ?? 'default'
   const placeholder = PLACEHOLDER_BY_CONTEXT[context]
+  const isSelectionMode = context === 'tokenList'
   return bufferLines.map((line, i) => {
-    const prefix = i === 0 ? PROMPT : '  '
+    const prefix = isSelectionMode ? '' : i === 0 ? PROMPT : '  '
     if (i === 0 && buffer === '') {
       return `${prefix}${GREY}${placeholder}${RESET}`
     }
@@ -269,7 +270,7 @@ export function renderFullDisplay(
     width
   ).split('\n')
   const boxLines =
-    options?.placeholderContext === 'tokenList'
+    options?.placeholderContext === 'tokenList' // selection mode
       ? rawBoxLines.map((l) => `${GREY}${l}${RESET}`)
       : rawBoxLines
   lines.push(...boxLines)

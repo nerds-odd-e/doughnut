@@ -886,10 +886,10 @@ describe('buildBoxLines', () => {
     expect(lines[0]).toContain(`${boldCyan}/add-access-token${reset} mylabel`)
   })
 
-  test('empty buffer in token list state shows token list placeholder', () => {
+  test('empty buffer in selection mode shows placeholder without arrow', () => {
     const lines = buildBoxLines('', 80, { placeholderContext: 'tokenList' })
     expect(lines).toHaveLength(1)
-    expect(lines[0]).toContain('→')
+    expect(lines[0]).not.toContain('→')
     expect(lines[0]).toContain('↑↓ Enter to select; other keys cancel')
   })
 
@@ -1667,6 +1667,15 @@ describe('TTY token list interactive mode', () => {
 
     const { getDefaultTokenLabel } = await import('../src/accessToken.js')
     expect(getDefaultTokenLabel()).toBe('Beta')
+  })
+
+  test('in selection mode, input box has no arrow prompt', async () => {
+    await submitTTYCommand(stdin, '/list-access-token')
+    const output = ttyOutput(writeSpy)
+    const tokenListBoxSection = output.slice(
+      output.lastIndexOf('Select and enter')
+    )
+    expect(tokenListBoxSection).not.toContain('→')
   })
 
   test('in token list mode, cursor is hidden', async () => {
