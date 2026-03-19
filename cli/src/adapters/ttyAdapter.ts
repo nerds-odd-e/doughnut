@@ -185,23 +185,23 @@ export async function runTTY(
   const collectedOutputLines: string[] = []
   let ttyOutput: OutputAdapter
 
-  /** Builds lines for input box, recalling indicator, and Current guidance (hints, suggestions, options). */
+  /** Builds lines for input box, recalling indicator, Current prompt (above box), and Current guidance (below box). */
   function getDisplayContent() {
     const width = getTerminalWidth()
     const contentLines = buildBoxLines(buffer, width)
     const boxLines = renderBox(contentLines, width).split('\n')
     const pendingRecallAnswer = getPendingRecallAnswer()
+    const currentPrompt =
+      tokenListItems && tokenListCommand
+        ? TOKEN_LIST_COMMANDS[tokenListCommand]?.prompt
+        : undefined
     const suggestionLines = tokenListItems
-      ? (() => {
-          const listLines = buildTokenListLines(
-            tokenListItems,
-            getDefaultTokenLabel(),
-            width,
-            tokenHighlightIndex
-          )
-          const prompt = TOKEN_LIST_COMMANDS[tokenListCommand]?.prompt
-          return prompt ? [prompt, ...listLines] : listLines
-        })()
+      ? buildTokenListLines(
+          tokenListItems,
+          getDefaultTokenLabel(),
+          width,
+          tokenHighlightIndex
+        )
       : isPendingRecallStopConfirmation()
         ? ['Stop recall? (y/n)']
         : isMcqPrompt(pendingRecallAnswer)
@@ -217,14 +217,29 @@ export async function runTTY(
                 suggestionsDismissed && isCommandPrefixWithSuggestions(buffer),
             })
     const recallingIndicator = isInRecallSubstate() ? [RECALLING_INDICATOR] : []
-    return { contentLines, boxLines, suggestionLines, recallingIndicator }
+    return {
+      contentLines,
+      boxLines,
+      currentPrompt,
+      suggestionLines,
+      recallingIndicator,
+    }
   }
 
   function doFullRedraw() {
-    const { contentLines, boxLines, suggestionLines, recallingIndicator } =
-      getDisplayContent()
+    const {
+      contentLines,
+      boxLines,
+      currentPrompt,
+      suggestionLines,
+      recallingIndicator,
+    } = getDisplayContent()
+    const currentPromptLines = currentPrompt ? 2 : 0
     const newTotalLines =
-      boxLines.length + recallingIndicator.length + suggestionLines.length
+      currentPromptLines +
+      boxLines.length +
+      recallingIndicator.length +
+      suggestionLines.length
 
     process.stdout.write(CLEAR_SCREEN)
     const fullLines = renderFullDisplay(
@@ -232,7 +247,8 @@ export async function runTTY(
       buffer,
       getTerminalWidth(),
       suggestionLines,
-      recallingIndicator
+      recallingIndicator,
+      currentPrompt
     )
     for (const line of fullLines) {
       process.stdout.write(`${line}\n`)
@@ -252,16 +268,31 @@ export async function runTTY(
   }
 
   function drawBox() {
-    const { contentLines, boxLines, suggestionLines, recallingIndicator } =
-      getDisplayContent()
+    const {
+      contentLines,
+      boxLines,
+      currentPrompt,
+      suggestionLines,
+      recallingIndicator,
+    } = getDisplayContent()
+    const currentPromptLines = currentPrompt ? 2 : 0
     const newTotalLines =
-      boxLines.length + recallingIndicator.length + suggestionLines.length
+      currentPromptLines +
+      boxLines.length +
+      recallingIndicator.length +
+      suggestionLines.length
 
     if (linesAboveCursor > 0) {
       process.stdout.write(`\x1b[${linesAboveCursor}A`)
     }
     process.stdout.write('\r')
 
+    if (currentPrompt) {
+      process.stdout.write(
+        `\x1b[2K${buildCurrentPromptSeparator(getTerminalWidth())}\n`
+      )
+      process.stdout.write(`\x1b[2K${GREY}${currentPrompt}\x1b[0m\n`)
+    }
     for (const line of boxLines) {
       process.stdout.write(`\x1b[2K${line}\n`)
     }

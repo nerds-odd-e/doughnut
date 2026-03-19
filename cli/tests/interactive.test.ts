@@ -1443,29 +1443,44 @@ describe('TTY token list interactive mode', () => {
     expect(output).toContain('★')
   })
 
-  test('shows "Select and enter to change the default access token" in Current guidance after /list-access-token when tokens exist', async () => {
+  test.each([
+    {
+      name: 'tokens exist',
+      tokens: [
+        { label: 'Alpha', token: 'a' },
+        { label: 'Beta', token: 'b' },
+      ],
+      expectPrompt: true,
+      expectNoTokensMessage: false,
+    },
+    {
+      name: 'token list empty',
+      tokens: [] as Array<{ label: string; token: string }>,
+      expectPrompt: false,
+      expectNoTokensMessage: true,
+    },
+  ])('/list-access-token: $name - Current prompt when tokens exist, no prompt when empty', async ({
+    tokens,
+    expectPrompt,
+    expectNoTokensMessage,
+  }) => {
+    if (tokens.length === 0) {
+      restoreConfigDir()
+      withConfigDir(makeTempConfigDir([]))
+    }
+
     writeSpy.mockClear()
     await submitTTYCommand(stdin, '/list-access-token')
 
     const output = ttyOutput(writeSpy)
-    expect(output).toContain(
-      'Select and enter to change the default access token'
-    )
-  })
-
-  test('does not show prompt when token list is empty', async () => {
-    restoreConfigDir()
-    const emptyDir = makeTempConfigDir([])
-    withConfigDir(emptyDir)
-
-    writeSpy.mockClear()
-    await submitTTYCommand(stdin, '/list-access-token')
-
-    const output = ttyOutput(writeSpy)
-    expect(output).toContain('No access tokens stored')
-    expect(output).not.toContain(
-      'Select and enter to change the default access token'
-    )
+    if (expectPrompt) {
+      expect(output).toContain(
+        'Select and enter to change the default access token'
+      )
+    }
+    if (expectNoTokensMessage) {
+      expect(output).toContain('No access tokens stored')
+    }
   })
 
   test('Enter sets highlighted token as default and confirms', async () => {

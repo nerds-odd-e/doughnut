@@ -171,13 +171,14 @@ export function buildTokenListLines(
   return lines.map((line) => truncateToWidth(line, width))
 }
 
-/** Renders the full display. suggestionLines and recallingIndicator are Current guidance (below input box). */
+/** Renders the full display. currentPrompt is Current prompt (above input box). suggestionLines and recallingIndicator are Current guidance (below input box). */
 export function renderFullDisplay(
   history: ChatHistory,
   buffer: string,
   width: number,
   suggestionLines: string[],
-  recallingIndicator: string[]
+  recallingIndicator: string[],
+  currentPrompt?: string
 ): string[] {
   const lines: string[] = [formatVersionOutput(), '']
   for (const entry of history) {
@@ -186,6 +187,10 @@ export function renderFullDisplay(
     } else {
       lines.push(...entry.lines)
     }
+  }
+  if (currentPrompt) {
+    lines.push(buildCurrentPromptSeparator(width))
+    lines.push(`${GREY}${currentPrompt}${RESET}`)
   }
   const boxLines = renderBox(buildBoxLines(buffer, width), width).split('\n')
   lines.push(...boxLines)

@@ -34,7 +34,8 @@ cli/
 | **Non-interactive output** | Entire stdout when running non-interactively (-c, piped, installed). |
 | **History output** | Interactive only. Past command results (parsed ANSI section). |
 | **History input** | Interactive only. Past user input lines. |
-| **Current guidance** | Interactive only. Prompts, hints, options for the current input (above input box: recall, MCQ, y/n; below: / commands, token list). |
+| **Current prompt** | Interactive only. Instructional line above the input box (between separator and box), e.g. "Select and enter to change the default access token", "Stop recall? (y/n)". |
+| **Current guidance** | Interactive only. Options below the input box: / commands, token list, MCQ choices. |
 | **Input box** | The bordered area where the user types. |
 
 **E2E assertion steps**: Use `I should see X in the non-interactive output` for non-interactive (-c, piped). Use `I should see X in the history output` or `I should see X in the Current guidance` for interactive. Step definitions delegate to `cli.xxx` page objects; the `cliSectionParser` exports `getRecallDisplaySections`, `getHistoryOutputContent`, etc.
