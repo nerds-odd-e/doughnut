@@ -58,27 +58,27 @@ describe('filterCommandsByPrefix', () => {
       category: 'interactive',
     },
     {
-      name: 'recall-status',
-      usage: '/recall-status',
-      description: 'Recall status',
-      category: 'interactive',
-    },
-    {
       name: 'recall',
       usage: '/recall',
       description: 'Recall',
+      category: 'interactive',
+    },
+    {
+      name: 'recall-status',
+      usage: '/recall-status',
+      description: 'Recall status',
       category: 'interactive',
     },
   ]
 
   test('matches from beginning', () => {
     const result = filterCommandsByPrefix(commands, '/recall')
-    expect(result.map((c) => c.usage)).toEqual(['/recall-status', '/recall'])
+    expect(result.map((c) => c.usage)).toEqual(['/recall', '/recall-status'])
   })
 
   test('matches anywhere with beginning prioritized', () => {
     const result = filterCommandsByPrefix(commands, 'recall')
-    expect(result.map((c) => c.usage)).toEqual(['/recall-status', '/recall'])
+    expect(result.map((c) => c.usage)).toEqual(['/recall', '/recall-status'])
   })
 
   test('prioritizes beginning match over substring match', () => {
