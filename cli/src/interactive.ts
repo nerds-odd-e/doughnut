@@ -32,6 +32,8 @@ import { formatVersionOutput } from './version.js'
 import {
   buildBoxLines,
   buildCurrentPromptSeparator,
+  buildLiveRegionLines,
+  needsGapBeforeBox,
   buildSuggestionLines,
   buildTokenListLines,
   getLastLine,
@@ -554,6 +556,8 @@ function buildTTYDeps() {
     formatVersionOutput,
     buildBoxLines,
     buildCurrentPromptSeparator,
+    buildLiveRegionLines,
+    needsGapBeforeBox,
     buildSuggestionLines,
     getLastLine,
     formatMcqChoiceLines,

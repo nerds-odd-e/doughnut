@@ -200,6 +200,42 @@ export function getLastLine(buffer: string): string {
   return lines[lines.length - 1] ?? ''
 }
 
+export function needsGapBeforeBox(
+  history: ChatHistory,
+  currentPromptWrappedLines: string[]
+): boolean {
+  return history.length > 0 && currentPromptWrappedLines.length === 0
+}
+
+export function buildLiveRegionLines(
+  buffer: string,
+  width: TerminalWidth,
+  currentPromptWrappedLines: string[],
+  suggestionLines: string[],
+  recallingIndicator: string[],
+  options?: BuildBoxLinesOptions
+): string[] {
+  const lines: string[] = []
+  if (currentPromptWrappedLines.length > 0) {
+    lines.push(buildCurrentPromptSeparator(width))
+    for (const line of currentPromptWrappedLines) {
+      lines.push(`${GREY}${line}${RESET}`)
+    }
+  }
+  const rawBoxLines = renderBox(
+    buildBoxLines(buffer, width, options),
+    width
+  ).split('\n')
+  const boxLines =
+    options?.placeholderContext === 'tokenList'
+      ? grayBoxLinesForSelectionMode(rawBoxLines)
+      : rawBoxLines
+  lines.push(...boxLines)
+  lines.push(...recallingIndicator)
+  lines.push(...suggestionLines)
+  return lines
+}
+
 /** Format plain option lines to Current guidance: highlight selected, truncate to terminal width. */
 function formatCurrentGuidanceLines(
   plainLines: string[],
@@ -268,25 +304,22 @@ export function renderFullDisplay(
       lines.push(...entry.lines)
     }
   }
-  if (currentPromptLines && currentPromptLines.length > 0) {
-    lines.push(buildCurrentPromptSeparator(width))
-    for (const line of currentPromptLines) {
-      lines.push(`${GREY}${line}${RESET}`)
-    }
-  } else if (history.length > 0 && lines[lines.length - 1] !== '') {
+  if (
+    needsGapBeforeBox(history, currentPromptLines ?? []) &&
+    lines[lines.length - 1] !== ''
+  ) {
     lines.push('')
   }
-  const rawBoxLines = renderBox(
-    buildBoxLines(buffer, width, options),
-    width
-  ).split('\n')
-  const boxLines =
-    options?.placeholderContext === 'tokenList'
-      ? grayBoxLinesForSelectionMode(rawBoxLines)
-      : rawBoxLines
-  lines.push(...boxLines)
-  lines.push(...recallingIndicator)
-  lines.push(...suggestionLines)
+  lines.push(
+    ...buildLiveRegionLines(
+      buffer,
+      width,
+      currentPromptLines ?? [],
+      suggestionLines,
+      recallingIndicator,
+      options
+    )
+  )
   return lines
 }
 

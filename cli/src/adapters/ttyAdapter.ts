@@ -48,6 +48,18 @@ export interface TTYDeps {
   formatMcqChoiceLines: (choices: string[]) => string[]
   getTerminalWidth: () => number
   buildCurrentPromptSeparator: (width: number) => string
+  buildLiveRegionLines: (
+    buffer: string,
+    width: number,
+    currentPromptWrappedLines: string[],
+    suggestionLines: string[],
+    recallingIndicator: string[],
+    options?: { placeholderContext?: PlaceholderContext }
+  ) => string[]
+  needsGapBeforeBox: (
+    history: ChatHistory,
+    currentPromptWrappedLines: string[]
+  ) => boolean
   renderBox: (lines: string[], width: number) => string
   renderFullDisplay: (
     history: ChatHistory,
@@ -134,7 +146,8 @@ export async function runTTY(
     formatMcqChoiceLines,
     getTerminalWidth,
     buildCurrentPromptSeparator,
-    renderBox,
+    buildLiveRegionLines,
+    needsGapBeforeBox,
     renderFullDisplay,
     renderPastInput,
     GREY,
@@ -149,7 +162,6 @@ export async function runTTY(
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
-    grayBoxLinesForSelectionMode,
     isSelectionMode,
   } = deps
 
@@ -224,10 +236,6 @@ export async function runTTY(
     const contentLines = buildBoxLines(buffer, width, {
       placeholderContext,
     })
-    let boxLines = renderBox(contentLines, width).split('\n')
-    if (isSelectionMode(placeholderContext)) {
-      boxLines = grayBoxLinesForSelectionMode(boxLines)
-    }
     const pendingRecallAnswer = getPendingRecallAnswer()
     const currentPromptText =
       tokenListItems && tokenListCommand
@@ -263,7 +271,6 @@ export async function runTTY(
     const recallingIndicator = isInRecallSubstate() ? [RECALLING_INDICATOR] : []
     return {
       contentLines,
-      boxLines,
       currentPromptWrappedLines,
       currentPromptLines,
       suggestionLines,
@@ -289,18 +296,21 @@ export async function runTTY(
   function doFullRedraw() {
     const {
       contentLines,
-      boxLines,
       currentPromptWrappedLines,
       currentPromptLines,
       suggestionLines,
       recallingIndicator,
       placeholderContext,
     } = getDisplayContent()
-    const newTotalLines =
-      currentPromptLines +
-      boxLines.length +
-      recallingIndicator.length +
-      suggestionLines.length
+    const liveLines = buildLiveRegionLines(
+      buffer,
+      getTerminalWidth(),
+      currentPromptWrappedLines,
+      suggestionLines,
+      recallingIndicator,
+      { placeholderContext }
+    )
+    const newTotalLines = liveLines.length
 
     process.stdout.write(CLEAR_SCREEN)
     const fullLines = renderFullDisplay(
@@ -332,41 +342,33 @@ export async function runTTY(
   function drawBox() {
     const {
       contentLines,
-      boxLines,
       currentPromptWrappedLines,
       currentPromptLines,
       suggestionLines,
       recallingIndicator,
       placeholderContext,
     } = getDisplayContent()
-    const newTotalLines =
-      currentPromptLines +
-      boxLines.length +
-      recallingIndicator.length +
-      suggestionLines.length
+    const liveLines = buildLiveRegionLines(
+      buffer,
+      getTerminalWidth(),
+      currentPromptWrappedLines,
+      suggestionLines,
+      recallingIndicator,
+      { placeholderContext }
+    )
+    const newTotalLines = liveLines.length
 
     if (linesAboveCursor > 0) {
       process.stdout.write(`\x1b[${linesAboveCursor}A`)
-    } else if (prevTotalLines === 0 && chatHistory.length > 0) {
+    } else if (
+      prevTotalLines === 0 &&
+      needsGapBeforeBox(chatHistory, currentPromptWrappedLines)
+    ) {
       process.stdout.write('\n')
     }
     process.stdout.write('\r')
 
-    if (currentPromptWrappedLines.length > 0) {
-      process.stdout.write(
-        `\x1b[2K${buildCurrentPromptSeparator(getTerminalWidth())}\n`
-      )
-      for (const line of currentPromptWrappedLines) {
-        process.stdout.write(`\x1b[2K${GREY}${line}\x1b[0m\n`)
-      }
-    }
-    for (const line of boxLines) {
-      process.stdout.write(`\x1b[2K${line}\n`)
-    }
-    for (const line of recallingIndicator) {
-      process.stdout.write(`\x1b[2K${line}\n`)
-    }
-    for (const line of suggestionLines) {
+    for (const line of liveLines) {
       process.stdout.write(`\x1b[2K${line}\n`)
     }
     const extra = prevTotalLines - newTotalLines

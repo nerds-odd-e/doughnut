@@ -5,6 +5,8 @@ import {
   grayBoxLinesForSelectionMode,
   renderFullDisplay,
   stripAnsi,
+  needsGapBeforeBox,
+  buildLiveRegionLines,
 } from '../src/renderer.js'
 import type { ChatHistory } from '../src/types.js'
 
@@ -23,6 +25,40 @@ describe('grayBoxLinesForSelectionMode', () => {
     expect(result[0]).toContain('\x1b[90m')
     // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI RESET, intentional
     expect(/\x1b\[0m\s*│/.test(result[0])).toBe(false)
+  })
+})
+
+describe('needsGapBeforeBox', () => {
+  test('returns true only when history is non-empty and no current prompt', () => {
+    expect(needsGapBeforeBox([], [])).toBe(false)
+    expect(needsGapBeforeBox([], ['line'])).toBe(false)
+    expect(needsGapBeforeBox([{ type: 'input', content: 'x' }], [])).toBe(true)
+    expect(needsGapBeforeBox([{ type: 'input', content: 'x' }], ['line'])).toBe(
+      false
+    )
+  })
+})
+
+describe('buildLiveRegionLines', () => {
+  test('prompt-present: includes separator and grey prompt lines before box', () => {
+    const lines = buildLiveRegionLines(
+      '',
+      80,
+      ['Select token', 'wrapped'],
+      [],
+      []
+    )
+    const boxTopIndex = lines.findIndex((l) => stripAnsi(l).startsWith('┌'))
+    expect(boxTopIndex).toBeGreaterThan(0)
+    expect(stripAnsi(lines[0])).toMatch(/^─+$/)
+    expect(stripAnsi(lines[1])).toBe('Select token')
+    expect(stripAnsi(lines[2])).toBe('wrapped')
+    expect(boxTopIndex).toBe(3)
+  })
+
+  test('prompt-absent: box first, no separator', () => {
+    const lines = buildLiveRegionLines('', 80, [], [], [])
+    expect(stripAnsi(lines[0])).toMatch(/^┌.*┐$/)
   })
 })
 
