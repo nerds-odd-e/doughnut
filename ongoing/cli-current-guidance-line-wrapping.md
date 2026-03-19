@@ -3,21 +3,21 @@
 ## Summary
 
 In narrow terminals, the Current guidance area (below the input box) shows:
-- **Command completion choices** – currently line-wraps (ugly)
-- **Access token list** – currently line-wraps (ugly)  
+- **Command completion choices** – truncates with "..." ✓ (Phase 1 done)
+- **Access token list** – currently line-wraps (ugly)
 - **MCQ choices** – should use line wrapping; other MCQ bugs are out of scope
 
 **Goal**: Command completion and access token list should truncate with "..." when lines exceed terminal width. MCQ choices should NOT be truncated and should use line wrapping only.
 
 ## Current Architecture
 
-| Content Type            | Source Function                         | Wrapper                    | Output |
-|-------------------------|------------------------------------------|----------------------------|--------|
-| Command completion      | `formatCommandSuggestionLines` (help.ts) | `formatHighlightedList`    | `  /usage        description` |
-| Access token list       | `formatTokenLines` (accessToken.ts)      | `formatHighlightedList`    | `  ★ label` or `    label` |
-| MCQ choices             | `formatMcqChoiceLines` (renderer.ts)     | `formatHighlightedList`    | `  1. choice text` |
+| Content Type       | Source Function                        | Wrapper                 | Truncation           | Output                      |
+|--------------------|----------------------------------------|------------------------|---------------------|-----------------------------|
+| Command completion | `formatCommandCompletionLines` (help.ts) | `formatHighlightedList` | `truncateToWidth` ✓ | `  /usage        description` |
+| Access token list  | `formatTokenLines` (accessToken.ts)   | `formatHighlightedList` | none                | `  ★ label` or `    label` |
+| MCQ choices        | `formatMcqChoiceLines` (renderer.ts)  | `formatHighlightedList` | none                | `  1. choice text`         |
 
-All are rendered via `ttyAdapter`'s `drawBox()` / `doFullRedraw()`, which write each `suggestionLines` element with `process.stdout.write(`\x1b[2K${line}\n`)`. Lines longer than `process.stdout.columns` wrap at the terminal (no explicit truncation or wrapping).
+Command completion flow: `buildSuggestionLines(buffer, highlightIndex, width, options?)` → `formatHighlightedList(formatCommandCompletionLines(filtered), 8, highlightIndex)` → `.map(truncateToWidth(·, width))`. Hint path (`/ commands`) also truncated.
 
 ## Testing Strategy
 
@@ -27,12 +27,7 @@ All are rendered via `ttyAdapter`'s `drawBox()` / `doFullRedraw()`, which write 
 
 **Unit tests only**, starting at the **top level**: exercise the public functions that produce Current guidance lines. Assert on observable output (line content, length, presence of "...")—never on internal state or helper functions. Avoid revealing implementation details.
 
-To enable this, expose top-level functions that take `(state, width)` and return the lines to display:
-- Command suggestions: `buildSuggestionLines(buffer, highlightIndex, width)` (already exists; add `width`).
-- Token list: extract `buildTokenListLines(tokens, defaultLabel, width)`.
-- MCQ: `formatMcqChoiceLines(choices, width)` (add `width`).
-
-Tests call these with narrow/wide widths and assert on the returned strings. Coverage is achieved by exercising all branches through these public entry points.
+Top-level functions: `buildSuggestionLines(buffer, highlightIndex, width)`, `buildTokenListLines(...)` (Phase 2), `formatMcqChoiceLines(choices, width)` (Phase 3). Tests call with narrow/wide widths and assert on line length and presence of "...". Phase 1: tests in `interactive.test.ts` (buildSuggestionLines) and `help.test.ts` (formatCommandCompletionLines, formatHighlightedList scroll).
 
 ## Phases
 
@@ -40,13 +35,12 @@ Tests call these with narrow/wide widths and assert on the returned strings. Cov
 
 **User value**: Command suggestions stay on one line in narrow terminals; no messy wrapping.
 
-**Changes**:
-1. Add width parameter to `buildSuggestionLines(buffer, highlightIndex, width)`. Apply truncation internally.
-2. Use `visibleLength()` for ANSI-aware truncation; append "..." when truncating.
-
-**Tests** (top-level only):
-- Call `buildSuggestionLines` with buffer like `/rec`, narrow width (e.g. 40). Assert each returned line has visible length ≤ width or ends with "...". Wide width: no truncation.
-- Various prefix + width combinations to cover edge cases.
+**Done**:
+- `buildSuggestionLines(buffer, highlightIndex, width, options?)` – width param, optional `forceCommandsHint` for dismissed case
+- `truncateToWidth(str, width)` – ANSI-aware truncation, appends "..."
+- `formatCommandCompletionLines` (help.ts) – renamed from formatCommandSuggestionLines
+- Removed dead `formatCommandSuggestions`, inlined `formatCommandSuggestionsWithHighlight`
+- `TerminalWidth` type alias
 
 ---
 
@@ -55,7 +49,7 @@ Tests call these with narrow/wide widths and assert on the returned strings. Cov
 **User value**: Token labels stay on one line in narrow terminals.
 
 **Changes**:
-1. Extract `buildTokenListLines(tokens, defaultLabel, width)` (e.g. in `accessToken.ts` or `renderer.ts`). Returns raw lines; truncate when exceeding width.
+1. Extract `buildTokenListLines(tokens, defaultLabel, width)` (e.g. in `accessToken.ts` or `renderer.ts`). Use `truncateToWidth()` for each line.
 2. Use from `ttyAdapter` in `getDisplayContent()`.
 
 **Tests** (top-level only):
@@ -83,7 +77,7 @@ Tests call these with narrow/wide widths and assert on the returned strings. Cov
 
 ## Implementation Notes
 
-- `visibleLength()` in `renderer.ts` already strips ANSI for length; reuse for truncation.
-- `getTerminalWidth()` is available via `process.stdout.columns || 80`; inject or use where width is needed.
-- Consider a shared `wrapToWidth(str, width)` for MCQ if no existing helper (markdansi's `renderMarkdownToTerminal` wraps; may suffice for choice text).
-- Keep high cohesion: truncation vs wrapping logic should live in one place (e.g. `renderer.ts` or `listDisplay.ts`).
+- `visibleLength()` and `truncateToWidth()` in `renderer.ts` – ANSI-aware; truncateToWidth uses fresh RegExp per call to avoid global-state bugs.
+- `getTerminalWidth()` via `process.stdout.columns || 80`.
+- Phase 3: consider `wrapToWidth(str, width)` for MCQ (markdansi's `renderMarkdownToTerminal` may suffice).
+- Truncation lives in `renderer.ts`; `formatHighlightedList` (listDisplay.ts) stays generic (scroll, highlight only).
