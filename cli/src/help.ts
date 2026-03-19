@@ -1,7 +1,6 @@
 import { accessTokenCommandDocs } from './accessToken.js'
 import { gmailCommandDocs } from './gmail.js'
 import { recallCommandDocs } from './recall.js'
-import { formatHighlightedList } from './listDisplay.js'
 import { updateDoc } from './update.js'
 import { versionDoc } from './version.js'
 
@@ -94,31 +93,11 @@ export function filterCommandsByPrefix(
     })
 }
 
-function formatCommandSuggestionLines(
+/** Raw lines for command completion choices: "  /usage        description". */
+export function formatCommandCompletionLines(
   commands: readonly CommandDoc[]
 ): string[] {
   return commands.map((d) => `  ${d.usage.padEnd(20)} ${d.description}`)
-}
-
-export function formatCommandSuggestions(
-  commands: readonly CommandDoc[],
-  maxVisible = 8
-): string[] {
-  const lines = formatCommandSuggestionLines(commands)
-  if (lines.length <= maxVisible) return lines
-  return [...lines.slice(0, maxVisible), '  ↓ more below']
-}
-
-export function formatCommandSuggestionsWithHighlight(
-  commands: readonly CommandDoc[],
-  maxVisible = 8,
-  highlightIndex = 0
-): string[] {
-  return formatHighlightedList(
-    formatCommandSuggestionLines(commands),
-    maxVisible,
-    highlightIndex
-  )
 }
 
 const allSubcommandDocs = [...subcommandDocs, helpDocEntry]

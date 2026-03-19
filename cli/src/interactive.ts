@@ -42,7 +42,6 @@ import {
   writeFullRedraw,
   GREY,
   CLEAR_SCREEN,
-  COMMANDS_HINT,
   RECALLING_INDICATOR,
   PROMPT,
 } from './renderer.js'
@@ -552,7 +551,6 @@ function buildTTYDeps() {
     renderPastInput,
     GREY,
     CLEAR_SCREEN,
-    COMMANDS_HINT,
     RECALLING_INDICATOR,
     PROMPT,
     filterCommandsByPrefix,

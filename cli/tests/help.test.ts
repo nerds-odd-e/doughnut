@@ -1,7 +1,8 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
+import { formatHighlightedList } from '../src/listDisplay.js'
 import {
   filterCommandsByPrefix,
-  formatCommandSuggestions,
+  formatCommandCompletionLines,
   formatHelp,
   getTabCompletion,
   interactiveDocs,
@@ -182,32 +183,33 @@ describe('getTabCompletion', () => {
   })
 })
 
-describe('formatCommandSuggestions', () => {
-  test('returns all lines when ≤8 commands, no "↓ more below"', () => {
+describe('formatCommandCompletionLines', () => {
+  test('returns padded usage and description per command', () => {
     const commands: CommandDoc[] = [
       { name: 'a', usage: '/a', description: 'A', category: 'interactive' },
       { name: 'b', usage: '/b', description: 'B', category: 'interactive' },
     ]
-    const lines = formatCommandSuggestions(commands)
+    const lines = formatCommandCompletionLines(commands)
     expect(lines).toHaveLength(2)
     expect(lines[0]).toContain('/a')
     expect(lines[0]).toContain('A')
     expect(lines[1]).toContain('/b')
     expect(lines[1]).toContain('B')
-    expect(lines.some((l) => l.includes('↓ more below'))).toBe(false)
   })
 
-  test('returns 8 command lines plus "↓ more below" when 9 commands', () => {
+  test('with formatHighlightedList shows "↓ more below" when many commands', () => {
     const commands: CommandDoc[] = Array.from({ length: 9 }, (_, i) => ({
       name: `cmd${i}`,
       usage: `/cmd${i}`,
       description: `Desc ${i}`,
       category: 'interactive' as const,
     }))
-    const lines = formatCommandSuggestions(commands)
-    expect(lines).toHaveLength(9)
-    expect(lines.slice(0, 8).every((l, i) => l.includes(`/cmd${i}`))).toBe(true)
-    expect(lines[8]).toBe('  ↓ more below')
+    const lines = formatHighlightedList(
+      formatCommandCompletionLines(commands),
+      8,
+      0
+    )
+    expect(lines.some((l) => l.includes('↓ more below'))).toBe(true)
   })
 })
 

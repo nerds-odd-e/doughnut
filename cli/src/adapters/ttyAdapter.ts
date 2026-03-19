@@ -28,7 +28,8 @@ export interface TTYDeps {
   buildSuggestionLines: (
     buffer: string,
     highlightIndex: number,
-    width: number
+    width: number,
+    options?: { forceCommandsHint?: boolean }
   ) => string[]
   formatMcqChoiceLines: (choices: string[]) => string[]
   getTerminalWidth: () => number
@@ -44,7 +45,6 @@ export interface TTYDeps {
   renderPastInput: (input: string, width: number) => string
   GREY: string
   CLEAR_SCREEN: string
-  COMMANDS_HINT: string
   RECALLING_INDICATOR: string
   PROMPT: string
   filterCommandsByPrefix: (
@@ -125,7 +125,6 @@ export async function runTTY(
     renderPastInput,
     GREY,
     CLEAR_SCREEN,
-    COMMANDS_HINT,
     RECALLING_INDICATOR,
     PROMPT,
     filterCommandsByPrefix,
@@ -206,14 +205,10 @@ export async function runTTY(
               8,
               mcqChoiceHighlightIndex
             )
-          : (() => {
-              if (
-                suggestionsDismissed &&
-                isCommandPrefixWithSuggestions(buffer)
-              )
-                return [COMMANDS_HINT]
-              return buildSuggestionLines(buffer, highlightIndex, width)
-            })()
+          : buildSuggestionLines(buffer, highlightIndex, width, {
+              forceCommandsHint:
+                suggestionsDismissed && isCommandPrefixWithSuggestions(buffer),
+            })
     const recallingIndicator = isInRecallSubstate() ? [RECALLING_INDICATOR] : []
     return { contentLines, boxLines, suggestionLines, recallingIndicator }
   }

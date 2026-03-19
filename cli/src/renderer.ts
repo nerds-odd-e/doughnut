@@ -1,9 +1,10 @@
 import { GREY, RESET } from './ansi.js'
 import {
   filterCommandsByPrefix,
-  formatCommandSuggestionsWithHighlight,
+  formatCommandCompletionLines,
   interactiveDocs,
 } from './help.js'
+import { formatHighlightedList } from './listDisplay.js'
 import { renderMarkdownToTerminal } from './markdown.js'
 import type { ChatHistory } from './types.js'
 import { formatVersionOutput } from './version.js'
@@ -30,34 +31,33 @@ const ANSI_PATTERN = /\x1b\[[0-9;]*m/g
 // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI escape or single char (for truncation)
 const ANSI_OR_CHAR_PATTERN = /\x1b\[[0-9;]*m|./gs
 
+/** Terminal column count; used for truncation and line width. */
+export type TerminalWidth = number
+
 export function visibleLength(str: string): number {
   return str.replace(ANSI_PATTERN, '').length
 }
 
 /** Truncate str to at most width visible chars; append "..." when truncating. ANSI-aware. */
-export function truncateToWidth(str: string, width: number): string {
+export function truncateToWidth(str: string, width: TerminalWidth): string {
   if (visibleLength(str) <= width) return str
   const maxVisible = width - 3
   let visibleCount = 0
   let result = ''
-  for (
-    let m = ANSI_OR_CHAR_PATTERN.exec(str);
-    m !== null;
-    m = ANSI_OR_CHAR_PATTERN.exec(str)
-  ) {
+  const re = new RegExp(ANSI_OR_CHAR_PATTERN.source, 'gs')
+  for (let m = re.exec(str); m !== null; m = re.exec(str)) {
     const token = m[0]
     if (token.startsWith('\x1b')) {
       result += token
     } else {
       if (visibleCount + 1 > maxVisible) {
-        result += '...'
-        return result
+        return `${result}...`
       }
       result += token
       visibleCount++
     }
   }
-  return `${result}...`
+  return result
 }
 
 function padEndVisible(str: string, targetLen: number): string {
@@ -128,23 +128,28 @@ export function getLastLine(buffer: string): string {
   return lines[lines.length - 1] ?? ''
 }
 
-/** Returns lines for the Current guidance area (command suggestions or / commands hint). */
+/** Returns lines for the Current guidance area (command completion or / commands hint). */
 export function buildSuggestionLines(
   buffer: string,
   highlightIndex: number,
-  width: number
+  width: number,
+  options?: { forceCommandsHint?: boolean }
 ): string[] {
   const lastLine = getLastLine(buffer)
-  if (lastLine.startsWith('/') && !lastLine.endsWith(' ')) {
-    const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
-    const lines = formatCommandSuggestionsWithHighlight(
-      filtered,
-      8,
-      highlightIndex
-    )
-    return lines.map((line) => truncateToWidth(line, width))
+  const showHint =
+    options?.forceCommandsHint ||
+    !lastLine.startsWith('/') ||
+    lastLine.endsWith(' ')
+  if (showHint) {
+    return [truncateToWidth(COMMANDS_HINT, width)]
   }
-  return [truncateToWidth(COMMANDS_HINT, width)]
+  const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
+  const lines = formatHighlightedList(
+    formatCommandCompletionLines(filtered),
+    8,
+    highlightIndex
+  )
+  return lines.map((line) => truncateToWidth(line, width))
 }
 
 /** Renders the full display. suggestionLines and recallingIndicator are Current guidance (below input box). */
