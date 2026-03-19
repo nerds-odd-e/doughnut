@@ -77,7 +77,7 @@ export function truncateToWidth(str: string, width: TerminalWidth): string {
       result += token
     } else {
       if (visibleCount + 1 > maxVisible) {
-        return `${result}...`
+        return `${result}${RESET}...`
       }
       result += token
       visibleCount++

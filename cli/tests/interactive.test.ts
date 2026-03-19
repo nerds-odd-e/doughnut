@@ -928,7 +928,7 @@ describe('buildSuggestionLines', () => {
     expect(lines).toHaveLength(0)
   })
 
-  test.skip('with narrow width, every line containing ANSI codes must end with RESET', () => {
+  test('with narrow width, every line containing ANSI codes must end with RESET', () => {
     const widths = [25, 30] as const
     const buffers = ['/list', '/']
     for (const buffer of buffers) {
