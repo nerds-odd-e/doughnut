@@ -3,7 +3,10 @@ import {
   truncateToWidth,
   isSelectionMode,
   grayBoxLinesForSelectionMode,
+  renderFullDisplay,
+  stripAnsi,
 } from '../src/renderer.js'
+import type { ChatHistory } from '../src/types.js'
 
 describe('isSelectionMode', () => {
   test('true for tokenList only', () => {
@@ -20,6 +23,19 @@ describe('grayBoxLinesForSelectionMode', () => {
     expect(result[0]).toContain('\x1b[90m')
     // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI RESET, intentional
     expect(/\x1b\[0m\s*│/.test(result[0])).toBe(false)
+  })
+})
+
+describe('renderFullDisplay', () => {
+  test('has one empty line between history output and input box', () => {
+    const history: ChatHistory = [
+      { type: 'input', content: '/help' },
+      { type: 'output', lines: ['Available commands...'] },
+    ]
+    const lines = renderFullDisplay(history, '', 80, [], [])
+    const boxTopIndex = lines.findIndex((l) => stripAnsi(l).startsWith('┌'))
+    expect(boxTopIndex).toBeGreaterThan(0)
+    expect(stripAnsi(lines[boxTopIndex - 1])).toBe('')
   })
 })
 

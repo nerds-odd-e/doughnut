@@ -273,6 +273,8 @@ export function renderFullDisplay(
     for (const line of currentPromptLines) {
       lines.push(`${GREY}${line}${RESET}`)
     }
+  } else if (history.length > 0 && lines[lines.length - 1] !== '') {
+    lines.push('')
   }
   const rawBoxLines = renderBox(
     buildBoxLines(buffer, width, options),
