@@ -26,10 +26,25 @@ export function buildCurrentPromptSeparator(width: TerminalWidth): string {
 }
 export const COMMAND_HIGHLIGHT = '\x1b[1;36m' // bold + cyan
 
-export const PLACEHOLDER = '`exit` to quit.'
-/** Shown in input box when listing access tokens (↑↓ Enter to select, other keys cancel). */
-export const TOKEN_LIST_PLACEHOLDER = '↑↓ Enter to select; other keys cancel'
 export const PROMPT = '→ '
+
+/** Input box placeholder by interaction context. Single source of truth. */
+export type PlaceholderContext =
+  | 'default'
+  | 'tokenList'
+  | 'recallMcq'
+  | 'recallStopConfirmation'
+  | 'recallYesNo'
+  | 'recallSpelling'
+
+export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
+  default: '`exit` to quit.',
+  tokenList: '↑↓ Enter to select; other keys cancel',
+  recallMcq: '↑↓ Enter or number to select; Esc to cancel',
+  recallStopConfirmation: 'y or n; Esc to go back',
+  recallYesNo: 'y or n; /stop to exit recall',
+  recallSpelling: 'type your answer; /stop to exit recall',
+}
 
 export const CLEAR_SCREEN = '\x1b[H\x1b[2J'
 
@@ -140,7 +155,7 @@ export function highlightRecognizedCommand(line: string): string {
 }
 
 export interface BuildBoxLinesOptions {
-  inTokenList?: boolean
+  placeholderContext?: PlaceholderContext
 }
 
 export function buildBoxLines(
@@ -149,8 +164,8 @@ export function buildBoxLines(
   options?: BuildBoxLinesOptions
 ): string[] {
   const bufferLines = buffer.split('\n')
-  const placeholder =
-    (options?.inTokenList ?? false) ? TOKEN_LIST_PLACEHOLDER : PLACEHOLDER
+  const context = options?.placeholderContext ?? 'default'
+  const placeholder = PLACEHOLDER_BY_CONTEXT[context]
   return bufferLines.map((line, i) => {
     const prefix = i === 0 ? PROMPT : '  '
     if (i === 0 && buffer === '') {

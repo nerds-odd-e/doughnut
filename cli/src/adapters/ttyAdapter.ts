@@ -37,7 +37,7 @@ export interface TTYDeps {
   buildBoxLines: (
     buffer: string,
     width: number,
-    options?: { inTokenList?: boolean }
+    options?: { placeholderContext?: string }
   ) => string[]
   buildSuggestionLines: (
     buffer: string,
@@ -56,7 +56,7 @@ export interface TTYDeps {
     suggestionLines: string[],
     recallingIndicator: string[],
     currentPromptLines?: string[],
-    options?: { inTokenList?: boolean }
+    options?: { placeholderContext?: string }
   ) => string[]
   renderPastInput: (input: string, width: number) => string
   GREY: string
@@ -78,6 +78,7 @@ export interface TTYDeps {
     highlightIndex?: number
   ) => string[]
   TOKEN_LIST_COMMANDS: Record<string, TokenListCommandConfig>
+  getPlaceholderContext: (inTokenList: boolean) => string
 }
 
 function cycleIndex(current: number, delta: number, length: number): number {
@@ -145,6 +146,7 @@ export async function runTTY(
     interactiveDocs,
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
+    getPlaceholderContext,
   } = deps
 
   const writeCurrentPromptLine = (msg: string) =>
@@ -198,8 +200,9 @@ export async function runTTY(
   /** Builds lines for input box, recalling indicator, Current prompt (above box), and Current guidance (below box). */
   function getDisplayContent() {
     const width = getTerminalWidth()
+    const placeholderContext = getPlaceholderContext(!!tokenListItems)
     const contentLines = buildBoxLines(buffer, width, {
-      inTokenList: !!tokenListItems,
+      placeholderContext,
     })
     const boxLines = renderBox(contentLines, width).split('\n')
     const pendingRecallAnswer = getPendingRecallAnswer()
@@ -282,7 +285,7 @@ export async function runTTY(
       suggestionLines,
       recallingIndicator,
       currentPromptWrappedLines,
-      { inTokenList: !!tokenListItems }
+      { placeholderContext: getPlaceholderContext(!!tokenListItems) }
     )
     for (const line of fullLines) {
       process.stdout.write(`${line}\n`)

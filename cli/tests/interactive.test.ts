@@ -887,20 +887,30 @@ describe('buildBoxLines', () => {
   })
 
   test('empty buffer in token list state shows token list placeholder', () => {
-    const lines = buildBoxLines('', 80, { inTokenList: true })
+    const lines = buildBoxLines('', 80, { placeholderContext: 'tokenList' })
     expect(lines).toHaveLength(1)
     expect(lines[0]).toContain('→')
     expect(lines[0]).toContain('↑↓ Enter to select; other keys cancel')
   })
 
-  test('empty buffer with inTokenList false shows default placeholder', () => {
-    const lines = buildBoxLines('', 80, { inTokenList: false })
+  test('empty buffer with default context shows default placeholder', () => {
+    const lines = buildBoxLines('', 80, { placeholderContext: 'default' })
     expect(lines[0]).toContain('`exit` to quit.')
   })
 
-  test('token list placeholder truncates in narrow window', () => {
+  test.each([
+    ['recallMcq', '↑↓ Enter or number to select; Esc to cancel'],
+    ['recallStopConfirmation', 'y or n; Esc to go back'],
+    ['recallYesNo', 'y or n; /stop to exit recall'],
+    ['recallSpelling', 'type your answer; /stop to exit recall'],
+  ] as const)('placeholderContext %s shows correct placeholder', (ctx, phrase) => {
+    const lines = buildBoxLines('', 80, { placeholderContext: ctx })
+    expect(lines[0]).toContain(phrase)
+  })
+
+  test('placeholder truncates in narrow window for any long context', () => {
     const width = 25
-    const lines = buildBoxLines('', width, { inTokenList: true })
+    const lines = buildBoxLines('', width, { placeholderContext: 'tokenList' })
     const box = renderBox(lines, width)
     const boxLines = box.split('\n')
     for (let i = 1; i < boxLines.length - 1; i++) {
@@ -1742,6 +1752,7 @@ describe('TTY MCQ choice selection', () => {
     await submitTTYCommand(stdin, '/recall')
 
     const afterSubmit = ttyOutput(writeSpy)
+    expect(afterSubmit).toContain('↑↓ Enter or number to select; Esc to cancel')
     expect(afterSubmit).toContain('  1. 4')
     expect(afterSubmit).toContain('  2. 3')
 
@@ -1785,6 +1796,7 @@ describe('TTY MCQ choice selection', () => {
     await tick()
 
     expect(ttyOutput(writeSpy)).toContain('Stop recall? (y/n)')
+    expect(ttyOutput(writeSpy)).toContain('y or n; Esc to go back')
 
     typeString(stdin, 'y')
     await tick()
@@ -1820,11 +1832,12 @@ describe('TTY MCQ choice selection', () => {
 
 describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
   let stdin: TTYStdin
+  let writeSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(async () => {
     resetRecallStateForTesting()
     vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
+    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
     vi.spyOn(process, 'exit').mockImplementation(
       (() => undefined) as unknown as typeof process.exit
     )
@@ -1844,7 +1857,12 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
       recallPromptId: 100,
       stem: 'test',
     })
+    mockAnswerSpelling.mockResolvedValue({ correct: true })
     await submitTTYCommand(stdin, '/recall')
+
+    expect(ttyOutput(writeSpy)).toContain(
+      'type your answer; /stop to exit recall'
+    )
 
     pressKey(stdin, 'escape')
     await tick()
@@ -1861,6 +1879,8 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     })
     await submitTTYCommand(stdin, '/recall')
 
+    expect(ttyOutput(writeSpy)).toContain('y or n; /stop to exit recall')
+
     pressKey(stdin, 'escape')
     await tick()
 
@@ -1871,6 +1891,8 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
   test('ESC in Load more y/n prompt exits recall mode', async () => {
     mockRecallNext.mockResolvedValue({ type: 'none', message: '0 notes' })
     await submitTTYCommand(stdin, '/recall')
+
+    expect(ttyOutput(writeSpy)).toContain('y or n; /stop to exit recall')
 
     pressKey(stdin, 'escape')
     await tick()

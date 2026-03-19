@@ -45,6 +45,7 @@ import {
   CLEAR_SCREEN,
   RECALLING_INDICATOR,
   PROMPT,
+  type PlaceholderContext,
 } from './renderer.js'
 import type { OutputAdapter } from './types.js'
 
@@ -125,6 +126,18 @@ function getContestablePromptId(): number | null {
     isSpellingPrompt(pendingRecallAnswer)
     ? pendingRecallAnswer.recallPromptId
     : null
+}
+
+export function getPlaceholderContext(
+  inTokenList: boolean
+): PlaceholderContext {
+  if (inTokenList) return 'tokenList'
+  if (pendingRecallStopConfirmation) return 'recallStopConfirmation'
+  if (pendingRecallLoadMore) return 'recallYesNo'
+  if (isMcqPrompt(pendingRecallAnswer)) return 'recallMcq'
+  if (isSpellingPrompt(pendingRecallAnswer)) return 'recallSpelling'
+  if (pendingRecallAnswer !== null) return 'recallYesNo'
+  return 'default'
 }
 
 function showRecallPrompt(
@@ -559,6 +572,7 @@ function buildTTYDeps() {
     interactiveDocs,
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
+    getPlaceholderContext,
   }
 }
 
