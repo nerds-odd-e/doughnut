@@ -15,7 +15,7 @@
 - [Vue3](https://v3.vuejs.org/guide/introduction.html)
 - [Vite](https://vitejs.dev)
 - [vite-plugin-vue-inspector](https://github.com/webfansplz/vite-plugin-vue-inspector#readme)
-- [vue-router 4](https://router.vuejs.org/)
+- [vue-router](https://router.vuejs.org/)
 - [Vitest](https://vitest.dev/)
 - [vitest-browser-mode](https://vitest.dev/guide/browser/)
 - [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro/)
