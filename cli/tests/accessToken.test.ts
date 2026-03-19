@@ -100,6 +100,18 @@ describe('access token management', () => {
       )
       expect(listAccessTokens()).toEqual([])
     })
+
+    test('throws when adding duplicate token', async () => {
+      mockGetTokenInfo('My Token')
+      mockGetTokenInfo('My Token') // second call still validates via API
+
+      await addAccessToken('my-secret-token')
+
+      await expect(addAccessToken('my-secret-token')).rejects.toThrow(
+        'Token already added.'
+      )
+      expect(listAccessTokens()).toHaveLength(1)
+    })
   })
 
   describe('listAccessTokens', () => {

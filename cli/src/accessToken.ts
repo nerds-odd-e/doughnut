@@ -70,6 +70,9 @@ export async function addAccessToken(token: string): Promise<void> {
     throw new Error('Token is invalid or expired.')
   }
   const config = loadConfig()
+  if (config.tokens.some((t) => t.token === token)) {
+    throw new Error('Token already added.')
+  }
   config.tokens.push({ label: result.data.label, token })
   saveConfig(config)
 }
