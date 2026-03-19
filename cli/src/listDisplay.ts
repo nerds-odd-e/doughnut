@@ -1,86 +1,106 @@
 import { GREY, RESET, REVERSE } from './ansi.js'
 
+const WINDOW_HEIGHT = 8
+
+/** Scrollable list with fixed-height window. Indicators replace option slots, never add lines. */
 export function formatHighlightedList(
   lines: string[],
-  maxVisible = 8,
+  maxVisible = WINDOW_HEIGHT,
   highlightIndex = 0
 ): string[] {
-  if (lines.length === 0) return []
   const total = lines.length
-  const hasMoreAbove = total > maxVisible
-  const hasMoreBelow = total > maxVisible
+  if (total === 0) return []
 
-  const hasMoreContentBelow = (offset: number) => offset + maxVisible < total
-  const optionSlotsWhenMoreBelow = maxVisible - 1
-
-  let scrollOffset: number
-  if (total <= maxVisible) {
-    scrollOffset = 0
-  } else if (highlightIndex < maxVisible - 1 && hasMoreContentBelow(0)) {
-    scrollOffset = 0
-  } else if (highlightIndex === maxVisible - 1 && hasMoreContentBelow(0)) {
-    scrollOffset = 1
-  } else {
-    scrollOffset = Math.max(
-      0,
-      Math.min(highlightIndex - maxVisible + 1, total - maxVisible)
+  const isOverflowing = total > maxVisible
+  if (!isOverflowing) {
+    return lines.map((line, i) =>
+      i === highlightIndex
+        ? `${REVERSE}${line}${RESET}`
+        : `${GREY}${line}${RESET}`
     )
   }
 
-  if (scrollOffset > 0 && hasMoreContentBelow(scrollOffset)) {
-    const optionSlots = maxVisible - 2
-    if (highlightIndex < scrollOffset + 1) {
-      scrollOffset = Math.max(0, highlightIndex - 1)
-    } else if (highlightIndex > scrollOffset + optionSlots) {
-      scrollOffset = Math.min(
-        total - maxVisible,
-        Math.max(scrollOffset, highlightIndex - optionSlots)
-      )
-    }
-  }
+  const scrollOffset = computeScrollOffset(total, maxVisible, highlightIndex)
+  const window = lines.slice(scrollOffset, scrollOffset + maxVisible)
+  const showMoreAbove = shouldShowMoreAbove(
+    scrollOffset,
+    highlightIndex,
+    maxVisible,
+    total
+  )
+  const showMoreBelow = shouldShowMoreBelow(
+    scrollOffset,
+    highlightIndex,
+    maxVisible,
+    total
+  )
 
-  const finalVisibleLines = lines.slice(scrollOffset, scrollOffset + maxVisible)
-  const finalShowMoreAbove =
-    scrollOffset > 0 ||
-    (scrollOffset === 0 &&
-      highlightIndex === maxVisible - 2 &&
-      hasMoreContentBelow(0))
-  const finalShowMoreBelow =
-    hasMoreContentBelow(scrollOffset) &&
-    highlightIndex < scrollOffset + optionSlotsWhenMoreBelow
-
-  const moreAboveLine = `${GREY}  ↑ more above${RESET}`
-  const moreBelowLine = `${GREY}  ↓ more below${RESET}`
-
-  if (!(hasMoreAbove || hasMoreBelow)) {
-    const result: string[] = []
-    for (let i = 0; i < finalVisibleLines.length; i++) {
-      result.push(
-        i === highlightIndex
-          ? `${REVERSE}${finalVisibleLines[i]}${RESET}`
-          : `${GREY}${finalVisibleLines[i]}${RESET}`
-      )
-    }
-    return result
-  }
+  const firstOptionIndex = showMoreAbove ? 1 : 0
+  const lastOptionIndex = showMoreBelow ? window.length - 2 : window.length - 1
+  const highlightPosInWindow = highlightIndex - scrollOffset
 
   const result: string[] = []
-  let start = 0
-  let end = finalVisibleLines.length
-  if (finalShowMoreAbove) {
-    result.push(moreAboveLine)
-    start = 1
-  }
-  if (finalShowMoreBelow) end -= 1
-
-  const highlightPos = highlightIndex - scrollOffset
-  for (let i = start; i < end; i++) {
+  if (showMoreAbove) result.push(`${GREY}  ↑ more above${RESET}`)
+  for (let i = firstOptionIndex; i <= lastOptionIndex; i++) {
+    const line = window[i]
+    const isHighlighted = i === highlightPosInWindow
     result.push(
-      i === highlightPos
-        ? `${REVERSE}${finalVisibleLines[i]}${RESET}`
-        : `${GREY}${finalVisibleLines[i]}${RESET}`
+      isHighlighted ? `${REVERSE}${line}${RESET}` : `${GREY}${line}${RESET}`
     )
   }
-  if (finalShowMoreBelow) result.push(moreBelowLine)
+  if (showMoreBelow) result.push(`${GREY}  ↓ more below${RESET}`)
   return result
+}
+
+function computeScrollOffset(
+  total: number,
+  maxVisible: number,
+  highlightIndex: number
+): number {
+  const maxScroll = total - maxVisible
+  const hasMoreBelow = (offset: number) => offset + maxVisible < total
+
+  if (!hasMoreBelow(0)) return 0
+
+  const optionSlotsWithMoreBelow = maxVisible - 1
+  const lastVisibleWithMoreBelow = optionSlotsWithMoreBelow - 1
+
+  if (highlightIndex <= lastVisibleWithMoreBelow) return 0
+
+  if (highlightIndex === optionSlotsWithMoreBelow) return 1
+
+  let offset = Math.max(0, Math.min(highlightIndex - maxVisible + 1, maxScroll))
+
+  if (offset > 0 && hasMoreBelow(offset)) {
+    const optionSlotsWithBoth = maxVisible - 2
+    if (highlightIndex < offset + 1) {
+      offset = Math.max(0, highlightIndex - 1)
+    } else if (highlightIndex > offset + optionSlotsWithBoth) {
+      offset = Math.min(maxScroll, highlightIndex - optionSlotsWithBoth)
+    }
+  }
+  return offset
+}
+
+function shouldShowMoreAbove(
+  scrollOffset: number,
+  highlightIndex: number,
+  maxVisible: number,
+  total: number
+): boolean {
+  if (scrollOffset > 0) return true
+  const hasMoreBelow = scrollOffset + maxVisible < total
+  const lastVisibleBeforeScroll = maxVisible - 2
+  return hasMoreBelow && highlightIndex === lastVisibleBeforeScroll
+}
+
+function shouldShowMoreBelow(
+  scrollOffset: number,
+  highlightIndex: number,
+  maxVisible: number,
+  total: number
+): boolean {
+  const hasMoreBelow = scrollOffset + maxVisible < total
+  const firstHiddenByMoreBelow = scrollOffset + maxVisible - 1
+  return hasMoreBelow && highlightIndex < firstHiddenByMoreBelow
 }
