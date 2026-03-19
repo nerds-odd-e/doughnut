@@ -142,7 +142,7 @@ function inputBoxTopBorder() {
         const count = countTopBorderLinesBeforeFirstInputBox(output)
         expect(
           count,
-          `Expected exactly one input box top border (┌─┐) before first │ row, found ${count}`
+          `Expected exactly one input box top border (┌─┐) in visual output, found ${count}`
         ).to.equal(1)
       })
     },

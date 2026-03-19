@@ -138,6 +138,39 @@ function ttyOutput(writeSpy: ReturnType<typeof vi.spyOn>) {
   return writeSpy.mock.calls.map((c) => c[0]).join('')
 }
 
+function stripAllAnsi(str: string): string {
+  const esc = String.fromCharCode(0x1b)
+  return str
+    .replace(new RegExp(`${esc}\\[[0-9;]*m`, 'g'), '')
+    .replace(new RegExp(`${esc}\\[[0-9;]*[A-Za-z]`, 'g'), '')
+    .replace(/\r/g, '')
+}
+
+const TOP_BORDER_PATTERN = /^┌─*┐$/
+
+function countTopBorderLinesBeforeFirstInputBox(output: string): number {
+  const normalized = stripAllAnsi(output)
+  const lines = normalized.split('\n')
+  let searchStart = 0
+  for (let i = 0; i < lines.length; i++) {
+    if (/doughnut \d+\.\d+\.\d+/.test(lines[i] ?? '')) {
+      searchStart = i + 1
+      break
+    }
+  }
+  let count = 0
+  for (let i = searchStart; i < lines.length; i++) {
+    const line = (lines[i] ?? '').trim()
+    if (line.includes('│')) {
+      break
+    }
+    if (TOP_BORDER_PATTERN.test(line)) {
+      count++
+    }
+  }
+  return count
+}
+
 /** Simulates terminal overwrite: cursor-up causes subsequent writes to overwrite previous content. */
 function simulateTerminalOverwrite(output: string): string {
   const lines: string[] = []
@@ -1392,6 +1425,24 @@ describe('TTY mode slash command suggestions', () => {
     expect(output).toContain('→')
   })
 
+  test('after /clear, Enter on empty input does not show duplicate input box top border', async () => {
+    typeString(stdin, '/clear')
+    await tick()
+    pressEnter(stdin)
+    await tick()
+    writeSpy.mockClear()
+
+    pressEnter(stdin)
+    await tick()
+
+    const output = ttyOutput(writeSpy)
+    const visualOutput = simulateTerminalOverwrite(output)
+    const boxTopLines = visualOutput
+      .split('\n')
+      .filter((l) => TOP_BORDER_PATTERN.test(stripAllAnsi(l).trim()))
+    expect(boxTopLines).toHaveLength(1)
+  })
+
   test('after /help then /clear, run /help again shows help output', async () => {
     typeString(stdin, '/help ')
     await tick()
@@ -1411,6 +1462,19 @@ describe('TTY mode slash command suggestions', () => {
     const output = ttyOutput(writeSpy)
     expect(stripAnsi(output)).toContain('/help')
     expect(stripAnsi(output)).toContain('List available commands')
+  })
+
+  test('after /clear then Enter, input box has exactly one top border (no double border)', async () => {
+    typeString(stdin, '/clear')
+    await tick()
+    pressEnter(stdin)
+    await tick()
+    writeSpy.mockClear()
+    pressEnter(stdin)
+    await tick()
+
+    const output = ttyOutput(writeSpy)
+    expect(countTopBorderLinesBeforeFirstInputBox(output)).toBe(1)
   })
 })
 

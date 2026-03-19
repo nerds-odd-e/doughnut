@@ -616,8 +616,6 @@ export async function runTTY(
             highlightIndex = 0
             suggestionsDismissed = false
             ttyOutput.clearAndRedraw?.()
-            linesAboveCursor = 0
-            prevTotalLines = 0
             return
           }
 
@@ -678,8 +676,10 @@ export async function runTTY(
             doExit()
           }
           chatHistory.push({ type: 'output', lines: [...collectedOutputLines] })
-          linesAboveCursor = 0
-          prevTotalLines = 0
+          if (input.trim()) {
+            linesAboveCursor = 0
+            prevTotalLines = 0
+          }
           if (isMcqPrompt(getPendingRecallAnswer())) {
             mcqChoiceHighlightIndex = 0
           }

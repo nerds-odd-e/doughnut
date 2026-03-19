@@ -234,28 +234,89 @@ export function getCurrentGuidanceAndHistoryRaw(output: string): string {
 
 const TOP_BORDER_PATTERN = /^┌─*┐$/
 
+/** Simulates terminal overwrite: cursor/erase sequences alter displayed content. Used to detect visual bugs (e.g. double border). */
+function simulateTerminalOverwrite(output: string): string {
+  const lines: string[] = []
+  let row = 0
+  let col = 0
+  let i = 0
+  const ESC = '\x1b'
+  const cursorUpRe = new RegExp(`^${ESC}\\[(\\d+)A`)
+  const eraseLineRe = new RegExp(`^${ESC}\\[2K`)
+  const cursorColRe = new RegExp(`^${ESC}\\[(\\d+)G`)
+  const clearScreenRe = new RegExp(`^${ESC}\\[[02]?J`) // \x1b[J, \x1b[2J clear screen
+  const cursorHomeRe = new RegExp(`^${ESC}\\[H`) // \x1b[H cursor home
+  const ansiRe = new RegExp(`^${ESC}\\[[0-9;]*[A-Za-z]`)
+  while (i < output.length) {
+    if (output.startsWith('\x1b[', i)) {
+      const cursorUpMatch = output.slice(i).match(cursorUpRe)
+      const eraseLineMatch = output.slice(i).match(eraseLineRe)
+      const cursorColMatch = output.slice(i).match(cursorColRe)
+      const clearScreenMatch = output.slice(i).match(clearScreenRe)
+      const cursorHomeMatch = output.slice(i).match(cursorHomeRe)
+      if (cursorUpMatch) {
+        row = Math.max(0, row - Number(cursorUpMatch[1]))
+        i += cursorUpMatch[0].length
+        continue
+      }
+      if (eraseLineMatch) {
+        while (lines.length <= row) lines.push('')
+        lines[row] = ''
+        col = 0
+        i += eraseLineMatch[0].length
+        continue
+      }
+      if (cursorColMatch) {
+        col = Number(cursorColMatch[1]) - 1
+        i += cursorColMatch[0].length
+        continue
+      }
+      if (clearScreenMatch) {
+        lines.length = 0
+        row = 0
+        col = 0
+        i += clearScreenMatch[0].length
+        continue
+      }
+      if (cursorHomeMatch) {
+        row = 0
+        col = 0
+        i += cursorHomeMatch[0].length
+        continue
+      }
+      const ansiMatch = output.slice(i).match(ansiRe)
+      if (ansiMatch) {
+        i += ansiMatch[0].length
+        continue
+      }
+    }
+    if (output[i] === '\r') {
+      col = 0
+      i++
+      continue
+    }
+    if (output[i] === '\n') {
+      row++
+      col = 0
+      i++
+      continue
+    }
+    while (lines.length <= row) lines.push('')
+    const line = lines[row] ?? ''
+    const newLine = line.slice(0, col) + output[i] + line.slice(col + 1)
+    lines[row] = newLine
+    col++
+    i++
+  }
+  return lines.join('\n')
+}
+
 export function countTopBorderLinesBeforeFirstInputBox(output: string): number {
-  const normalized = stripAllAnsi(output)
+  const visualOutput = simulateTerminalOverwrite(output)
+  const normalized = stripAllAnsi(visualOutput)
   const lines = normalized.split('\n')
-  let versionLineIdx = -1
-  for (let i = 0; i < lines.length; i++) {
-    if (/doughnut \d+\.\d+\.\d+/.test(lines[i] ?? '')) {
-      versionLineIdx = i
-      break
-    }
-  }
-  if (versionLineIdx < 0) {
-    return 0
-  }
-  let count = 0
-  for (let i = versionLineIdx + 1; i < lines.length; i++) {
-    const line = (lines[i] ?? '').trim()
-    if (line.includes('│')) {
-      break
-    }
-    if (TOP_BORDER_PATTERN.test(line)) {
-      count++
-    }
-  }
-  return count
+  const boxTopLines = lines.filter((l) =>
+    TOP_BORDER_PATTERN.test((l ?? '').trim())
+  )
+  return boxTopLines.length
 }
