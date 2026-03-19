@@ -1443,6 +1443,31 @@ describe('TTY token list interactive mode', () => {
     expect(output).toContain('★')
   })
 
+  test('shows "Select and enter to change the default access token" in Current guidance after /list-access-token when tokens exist', async () => {
+    writeSpy.mockClear()
+    await submitTTYCommand(stdin, '/list-access-token')
+
+    const output = ttyOutput(writeSpy)
+    expect(output).toContain(
+      'Select and enter to change the default access token'
+    )
+  })
+
+  test('does not show prompt when token list is empty', async () => {
+    restoreConfigDir()
+    const emptyDir = makeTempConfigDir([])
+    withConfigDir(emptyDir)
+
+    writeSpy.mockClear()
+    await submitTTYCommand(stdin, '/list-access-token')
+
+    const output = ttyOutput(writeSpy)
+    expect(output).toContain('No access tokens stored')
+    expect(output).not.toContain(
+      'Select and enter to change the default access token'
+    )
+  })
+
   test('Enter sets highlighted token as default and confirms', async () => {
     await submitTTYCommand(stdin, '/list-access-token')
 

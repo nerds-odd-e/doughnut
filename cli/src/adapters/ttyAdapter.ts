@@ -64,7 +64,10 @@ export interface TTYDeps {
     maxVisible?: number,
     highlightIndex?: number
   ) => string[]
-  TOKEN_LIST_COMMANDS: Record<string, TokenListAction>
+  TOKEN_LIST_COMMANDS: Record<
+    string,
+    { action: TokenListAction; prompt?: string }
+  >
 }
 
 function cycleIndex(current: number, delta: number, length: number): number {
@@ -189,12 +192,16 @@ export async function runTTY(
     const boxLines = renderBox(contentLines, width).split('\n')
     const pendingRecallAnswer = getPendingRecallAnswer()
     const suggestionLines = tokenListItems
-      ? buildTokenListLines(
-          tokenListItems,
-          getDefaultTokenLabel(),
-          width,
-          tokenHighlightIndex
-        )
+      ? (() => {
+          const listLines = buildTokenListLines(
+            tokenListItems,
+            getDefaultTokenLabel(),
+            width,
+            tokenHighlightIndex
+          )
+          const prompt = TOKEN_LIST_COMMANDS[tokenListCommand]?.prompt
+          return prompt ? [prompt, ...listLines] : listLines
+        })()
       : isPendingRecallStopConfirmation()
         ? ['Stop recall? (y/n)']
         : isMcqPrompt(pendingRecallAnswer)
@@ -558,8 +565,8 @@ export async function runTTY(
             process.stdout.write('\n')
           }
 
-          const tokenSelectAction = TOKEN_LIST_COMMANDS[trimmedInput] ?? null
-          if (tokenSelectAction) {
+          const tokenSelect = TOKEN_LIST_COMMANDS[trimmedInput] ?? null
+          if (tokenSelect) {
             const tokens = listAccessTokens()
             if (tokens.length === 0) {
               process.stdout.write('No access tokens stored.\n')
@@ -571,7 +578,7 @@ export async function runTTY(
             } else {
               tokenListItems = tokens
               tokenListCommand = trimmedInput
-              tokenListAction = tokenSelectAction
+              tokenListAction = tokenSelect.action
               const dl = getDefaultTokenLabel()
               tokenHighlightIndex = Math.max(
                 0,

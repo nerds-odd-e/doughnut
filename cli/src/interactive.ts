@@ -282,10 +282,16 @@ async function continueRecallSession(
   }
 }
 
-const TOKEN_LIST_COMMANDS: Record<string, TokenListAction> = {
-  '/list-access-token': 'set-default',
-  '/remove-access-token': 'remove',
-  '/remove-access-token-completely': 'remove-completely',
+const TOKEN_LIST_COMMANDS: Record<
+  string,
+  { action: TokenListAction; prompt?: string }
+> = {
+  '/list-access-token': {
+    action: 'set-default',
+    prompt: 'Select and enter to change the default access token',
+  },
+  '/remove-access-token': { action: 'remove' },
+  '/remove-access-token-completely': { action: 'remove-completely' },
 }
 
 const defaultOutput: OutputAdapter = {
