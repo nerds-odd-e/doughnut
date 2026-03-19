@@ -4,6 +4,7 @@ import {
   formatCommandCompletionLines,
   interactiveDocs,
 } from './help.js'
+import { formatTokenLines, type AccessTokenEntry } from './accessToken.js'
 import { formatHighlightedList } from './listDisplay.js'
 import { renderMarkdownToTerminal } from './markdown.js'
 import type { ChatHistory } from './types.js'
@@ -146,6 +147,21 @@ export function buildSuggestionLines(
   const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
   const lines = formatHighlightedList(
     formatCommandCompletionLines(filtered),
+    8,
+    highlightIndex
+  )
+  return lines.map((line) => truncateToWidth(line, width))
+}
+
+/** Returns lines for the Current guidance area (access token list). Truncates long labels to width. */
+export function buildTokenListLines(
+  tokens: AccessTokenEntry[],
+  defaultLabel: string | undefined,
+  width: number,
+  highlightIndex: number
+): string[] {
+  const lines = formatHighlightedList(
+    formatTokenLines(tokens, defaultLabel),
     8,
     highlightIndex
   )

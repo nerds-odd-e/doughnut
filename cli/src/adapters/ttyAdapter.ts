@@ -13,9 +13,11 @@ export interface TTYDeps {
   isInRecallSubstate: () => boolean
   exitRecallMode: () => void
   isMcqPrompt: (p: unknown) => boolean
-  formatTokenLines: (
+  buildTokenListLines: (
     tokens: TokenEntry[],
-    defaultLabel: string | undefined
+    defaultLabel: string | undefined,
+    width: number,
+    highlightIndex: number
   ) => string[]
   getDefaultTokenLabel: () => string | undefined
   listAccessTokens: () => TokenEntry[]
@@ -107,7 +109,7 @@ export async function runTTY(
     isInRecallSubstate,
     exitRecallMode,
     isMcqPrompt,
-    formatTokenLines,
+    buildTokenListLines,
     getDefaultTokenLabel,
     listAccessTokens,
     removeAccessToken,
@@ -190,9 +192,10 @@ export async function runTTY(
     const boxLines = renderBox(contentLines, width).split('\n')
     const pendingRecallAnswer = getPendingRecallAnswer()
     const suggestionLines = tokenListItems
-      ? formatHighlightedList(
-          formatTokenLines(tokenListItems, getDefaultTokenLabel()),
-          8,
+      ? buildTokenListLines(
+          tokenListItems,
+          getDefaultTokenLabel(),
+          width,
           tokenHighlightIndex
         )
       : isPendingRecallStopConfirmation()

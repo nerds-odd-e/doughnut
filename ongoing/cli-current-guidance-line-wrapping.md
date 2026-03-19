@@ -14,7 +14,7 @@ In narrow terminals, the Current guidance area (below the input box) shows:
 | Content Type       | Source Function                        | Wrapper                 | Truncation           | Output                      |
 |--------------------|----------------------------------------|------------------------|---------------------|-----------------------------|
 | Command completion | `formatCommandCompletionLines` (help.ts) | `formatHighlightedList` | `truncateToWidth` ✓ | `  /usage        description` |
-| Access token list  | `formatTokenLines` (accessToken.ts)   | `formatHighlightedList` | none                | `  ★ label` or `    label` |
+| Access token list  | `formatTokenLines` (accessToken.ts)   | `formatHighlightedList` | `truncateToWidth` ✓ | `  ★ label` or `    label` |
 | MCQ choices        | `formatMcqChoiceLines` (renderer.ts)  | `formatHighlightedList` | none                | `  1. choice text`         |
 
 Command completion flow: `buildSuggestionLines(buffer, highlightIndex, width, options?)` → `formatHighlightedList(formatCommandCompletionLines(filtered), 8, highlightIndex)` → `.map(truncateToWidth(·, width))`. Hint path (`/ commands`) also truncated.
@@ -44,17 +44,17 @@ Top-level functions: `buildSuggestionLines(buffer, highlightIndex, width)`, `bui
 
 ---
 
-### Phase 2: Truncate access token list
+### Phase 2: Truncate access token list ✓
 
 **User value**: Token labels stay on one line in narrow terminals.
 
-**Changes**:
-1. Extract `buildTokenListLines(tokens, defaultLabel, width)` (e.g. in `accessToken.ts` or `renderer.ts`). Use `truncateToWidth()` for each line.
-2. Use from `ttyAdapter` in `getDisplayContent()`.
+**Done**:
+- `buildTokenListLines(tokens, defaultLabel, width, highlightIndex)` in renderer.ts – formats via `formatTokenLines`, `formatHighlightedList`, then `truncateToWidth()` per line
+- Used from `ttyAdapter` in `getDisplayContent()` instead of raw `formatTokenLines` + `formatHighlightedList`
 
-**Tests** (top-level only):
-- Call `buildTokenListLines` with tokens, narrow width. Assert each line ≤ width or ends with "...". Long label: truncated with "...".
-- Wide width: no truncation.
+**Tests** (accessToken.test.ts):
+- Narrow width: each line ≤ width or ends with "..."; long label truncated with "..."
+- Wide width: no truncation
 
 ---
 

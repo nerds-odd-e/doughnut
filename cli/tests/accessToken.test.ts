@@ -24,6 +24,7 @@ import {
   removeAccessTokenCompletely,
   setDefaultTokenLabel,
 } from '../src/accessToken.js'
+import { buildTokenListLines, visibleLength } from '../src/renderer.js'
 
 function createTempDir(): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-access-token-test-'))
@@ -293,5 +294,45 @@ describe('formatTokenLines', () => {
     const tokens = [{ label: 'Token A', token: 'a' }]
     const lines = formatTokenLines(tokens, undefined)
     expect(lines[0]).toBe('  Token A')
+  })
+})
+
+describe('buildTokenListLines', () => {
+  test('with narrow width, each line ≤ width or ends with "..."', () => {
+    const tokens = [
+      { label: 'Short', token: 'a' },
+      {
+        label: 'A very long token label that exceeds terminal width',
+        token: 'b',
+      },
+    ]
+    const lines = buildTokenListLines(tokens, 'Short', 20, 0)
+    expect(lines.length).toBeGreaterThan(0)
+    for (const line of lines) {
+      expect(visibleLength(line)).toBeLessThanOrEqual(20)
+      if (visibleLength(line) === 20) {
+        expect(line.endsWith('...')).toBe(true)
+      }
+    }
+  })
+
+  test('long label truncated with "..." at narrow width', () => {
+    const tokens = [
+      { label: 'ExtremelyLongTokenLabelThatWillBeTruncated', token: 'x' },
+    ]
+    const lines = buildTokenListLines(tokens, undefined, 25, 0)
+    expect(lines).toHaveLength(1)
+    expect(lines[0]).toContain('...')
+    expect(visibleLength(lines[0])).toBeLessThanOrEqual(25)
+  })
+
+  test('with wide width, no truncation', () => {
+    const tokens = [
+      { label: 'Token A', token: 'a' },
+      { label: 'Token B', token: 'b' },
+    ]
+    const lines = buildTokenListLines(tokens, 'Token A', 120, 0)
+    expect(lines.length).toBeGreaterThan(0)
+    expect(lines.some((l) => l.endsWith('...'))).toBe(false)
   })
 })
