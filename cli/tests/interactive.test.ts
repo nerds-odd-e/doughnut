@@ -1702,15 +1702,6 @@ describe('TTY token list interactive mode', () => {
     expect(ttyOutput(writeSpy)).toContain('\x1b[90m┌')
   })
 
-  test('after exiting token list with any key, cursor is shown', async () => {
-    await submitTTYCommand(stdin, '/list-access-token')
-    writeSpy.mockClear()
-    pressKey(stdin, 'x')
-    await tick()
-
-    expect(ttyOutput(writeSpy)).toContain('\x1b[?25h')
-  })
-
   test('any other key cancels token list and shows Cancelled by user. in history', async () => {
     await submitTTYCommand(stdin, '/list-access-token')
     writeSpy.mockClear()
@@ -1722,6 +1713,7 @@ describe('TTY token list interactive mode', () => {
     expect(output).toContain('Cancelled by user.')
     expect(output).toContain('/ commands')
     expect(output).not.toContain('Alpha')
+    expect(output).toContain('\x1b[?25h')
   })
 
   test('ESC cancels token list and shows Cancelled by user. in history', async () => {

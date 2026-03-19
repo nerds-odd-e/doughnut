@@ -202,6 +202,22 @@ export async function runTTY(
   let tokenListAction: TokenListAction = 'set-default'
   let mcqChoiceHighlightIndex = 0
 
+  function endTokenListSelection(outputMsg: string) {
+    const command = tokenListCommand
+    clearTTYDisplay(linesAboveCursor, prevTotalLines)
+    process.stdout.write(`${outputMsg}\n`)
+    chatHistory.push({ type: 'input', content: command })
+    chatHistory.push({ type: 'output', lines: [outputMsg] })
+    tokenListItems = null
+    tokenListCommand = ''
+    tokenHighlightIndex = 0
+    tokenListAction = 'set-default'
+    buffer = ''
+    linesAboveCursor = 0
+    prevTotalLines = 0
+    drawBox()
+  }
+
   const collectedOutputLines: string[] = []
   let ttyOutput: OutputAdapter
 
@@ -533,49 +549,26 @@ export async function runTTY(
           drawBox()
         } else if (submitPressed && !key.shift) {
           const selectedLabel = tokenListItems[tokenHighlightIndex]!.label
-          clearTTYDisplay(linesAboveCursor, prevTotalLines)
           const action = tokenListAction
-          tokenListItems = null
-          tokenHighlightIndex = 0
-          tokenListAction = 'set-default'
-          linesAboveCursor = 0
-          prevTotalLines = 0
           let outputMsg = ''
           if (action === 'set-default') {
             setDefaultTokenLabel(selectedLabel)
             outputMsg = `Default token set to: ${selectedLabel}`
-            process.stdout.write(`${outputMsg}\n`)
           } else if (action === 'remove') {
             removeAccessToken(selectedLabel)
             outputMsg = `Token "${selectedLabel}" removed.`
-            process.stdout.write(`${outputMsg}\n`)
           } else {
             try {
               await removeAccessTokenCompletely(selectedLabel)
               outputMsg = `Token "${selectedLabel}" removed locally and from server.`
-              process.stdout.write(`${outputMsg}\n`)
             } catch (err) {
               writeError(err)
               outputMsg = err instanceof Error ? err.message : String(err)
             }
           }
-          chatHistory.push({ type: 'input', content: tokenListCommand })
-          chatHistory.push({ type: 'output', lines: [outputMsg] })
-          drawBox()
+          endTokenListSelection(outputMsg)
         } else {
-          const command = tokenListCommand
-          clearTTYDisplay(linesAboveCursor, prevTotalLines)
-          process.stdout.write('Cancelled by user.\n')
-          chatHistory.push({ type: 'input', content: command })
-          chatHistory.push({ type: 'output', lines: ['Cancelled by user.'] })
-          tokenListItems = null
-          tokenListCommand = ''
-          tokenHighlightIndex = 0
-          tokenListAction = 'set-default'
-          buffer = ''
-          linesAboveCursor = 0
-          prevTotalLines = 0
-          drawBox()
+          endTokenListSelection('Cancelled by user.')
         }
         return
       }
