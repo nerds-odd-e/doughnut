@@ -244,12 +244,18 @@ export function countTopBorderLinesBeforeFirstInputBox(output: string): number {
       break
     }
   }
-  if (versionLineIdx < 0) return 0
+  if (versionLineIdx < 0) {
+    return 0
+  }
   let count = 0
   for (let i = versionLineIdx + 1; i < lines.length; i++) {
     const line = (lines[i] ?? '').trim()
-    if (line.includes('│')) break
-    if (TOP_BORDER_PATTERN.test(line)) count++
+    if (line.includes('│')) {
+      break
+    }
+    if (TOP_BORDER_PATTERN.test(line)) {
+      count++
+    }
   }
   return count
 }
