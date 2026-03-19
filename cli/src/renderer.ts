@@ -27,9 +27,37 @@ export const RECALLING_INDICATOR = `${GREY}Recalling${RESET}`
 
 // biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI escapes
 const ANSI_PATTERN = /\x1b\[[0-9;]*m/g
+// biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI escape or single char (for truncation)
+const ANSI_OR_CHAR_PATTERN = /\x1b\[[0-9;]*m|./gs
 
 export function visibleLength(str: string): number {
   return str.replace(ANSI_PATTERN, '').length
+}
+
+/** Truncate str to at most width visible chars; append "..." when truncating. ANSI-aware. */
+export function truncateToWidth(str: string, width: number): string {
+  if (visibleLength(str) <= width) return str
+  const maxVisible = width - 3
+  let visibleCount = 0
+  let result = ''
+  for (
+    let m = ANSI_OR_CHAR_PATTERN.exec(str);
+    m !== null;
+    m = ANSI_OR_CHAR_PATTERN.exec(str)
+  ) {
+    const token = m[0]
+    if (token.startsWith('\x1b')) {
+      result += token
+    } else {
+      if (visibleCount + 1 > maxVisible) {
+        result += '...'
+        return result
+      }
+      result += token
+      visibleCount++
+    }
+  }
+  return `${result}...`
 }
 
 function padEndVisible(str: string, targetLen: number): string {
@@ -103,14 +131,20 @@ export function getLastLine(buffer: string): string {
 /** Returns lines for the Current guidance area (command suggestions or / commands hint). */
 export function buildSuggestionLines(
   buffer: string,
-  highlightIndex: number
+  highlightIndex: number,
+  width: number
 ): string[] {
   const lastLine = getLastLine(buffer)
   if (lastLine.startsWith('/') && !lastLine.endsWith(' ')) {
     const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
-    return formatCommandSuggestionsWithHighlight(filtered, 8, highlightIndex)
+    const lines = formatCommandSuggestionsWithHighlight(
+      filtered,
+      8,
+      highlightIndex
+    )
+    return lines.map((line) => truncateToWidth(line, width))
   }
-  return [COMMANDS_HINT]
+  return [truncateToWidth(COMMANDS_HINT, width)]
 }
 
 /** Renders the full display. suggestionLines and recallingIndicator are Current guidance (below input box). */

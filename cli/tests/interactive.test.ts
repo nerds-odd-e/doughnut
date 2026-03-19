@@ -14,6 +14,7 @@ import {
   runInteractive,
   visibleLength,
 } from '../src/interactive.js'
+import { buildSuggestionLines } from '../src/renderer.js'
 
 // biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI for assertions
 const stripAnsi = (s: string) => s.replace(/\x1b\[[0-9;]*m/g, '')
@@ -826,6 +827,45 @@ describe('buildBoxLines', () => {
   test('command with param highlights only command part', () => {
     const lines = buildBoxLines('/add-access-token mylabel', 40)
     expect(lines[0]).toContain(`${boldCyan}/add-access-token${reset} mylabel`)
+  })
+})
+
+describe('buildSuggestionLines', () => {
+  test('with /rec and narrow width (40), each line has visible length ≤ width or ends with "..."', () => {
+    const lines = buildSuggestionLines('/rec', 0, 40)
+    expect(lines.length).toBeGreaterThan(0)
+    for (const line of lines) {
+      expect(visibleLength(line)).toBeLessThanOrEqual(40)
+      if (visibleLength(line) === 40) {
+        expect(line.endsWith('...')).toBe(true)
+      }
+    }
+  })
+
+  test('with /rec and wide width (120), no truncation', () => {
+    const lines = buildSuggestionLines('/rec', 0, 120)
+    expect(lines.length).toBeGreaterThan(0)
+    expect(lines.some((l) => l.endsWith('...'))).toBe(false)
+  })
+
+  test('with /recall-status prefix, narrow width truncates long descriptions', () => {
+    const lines = buildSuggestionLines('/recall-status', 0, 30)
+    expect(lines.length).toBeGreaterThan(0)
+    for (const line of lines) {
+      expect(visibleLength(line)).toBeLessThanOrEqual(30)
+    }
+  })
+
+  test('without slash prefix returns / commands hint, truncated when narrow', () => {
+    const lines = buildSuggestionLines('hello', 0, 5)
+    expect(lines).toHaveLength(1)
+    expect(visibleLength(lines[0])).toBeLessThanOrEqual(5)
+    expect(lines[0].endsWith('...')).toBe(true)
+  })
+
+  test('with slash prefix but no match returns empty', () => {
+    const lines = buildSuggestionLines('/unknown', 0, 80)
+    expect(lines).toHaveLength(0)
   })
 })
 

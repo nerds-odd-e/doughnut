@@ -297,7 +297,13 @@ const defaultOutput: OutputAdapter = {
     console.log(err instanceof Error ? err.message : String(err)),
   writeCurrentPrompt: (msg) => console.log(msg),
   clearAndRedraw: () => {
-    writeFullRedraw([], '', getTerminalWidth(), buildSuggestionLines('', 0), [])
+    writeFullRedraw(
+      [],
+      '',
+      getTerminalWidth(),
+      buildSuggestionLines('', 0, getTerminalWidth()),
+      []
+    )
   },
 }
 

@@ -4,7 +4,11 @@ export interface PipedDeps {
   processInput: (input: string) => Promise<boolean>
   getTerminalWidth: () => number
   buildBoxLines: (buffer: string, width: number) => string[]
-  buildSuggestionLines: (buffer: string, highlightIndex: number) => string[]
+  buildSuggestionLines: (
+    buffer: string,
+    highlightIndex: number,
+    width: number
+  ) => string[]
   renderBox: (lines: string[], width: number) => string
   renderPastInput: (input: string, width: number) => string
   formatVersionOutput: () => string
@@ -27,7 +31,7 @@ export async function runPiped(
   const width = getTerminalWidth()
   console.log(formatVersionOutput())
   console.log()
-  const currentGuidanceLines = buildSuggestionLines('', 0)
+  const currentGuidanceLines = buildSuggestionLines('', 0, width)
   console.log(renderBox(buildBoxLines('', width), width))
   for (const line of currentGuidanceLines) {
     console.log(line)

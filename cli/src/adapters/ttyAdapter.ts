@@ -25,7 +25,11 @@ export interface TTYDeps {
   formatVersionOutput: () => string
   getLastLine: (buffer: string) => string
   buildBoxLines: (buffer: string, width: number) => string[]
-  buildSuggestionLines: (buffer: string, highlightIndex: number) => string[]
+  buildSuggestionLines: (
+    buffer: string,
+    highlightIndex: number,
+    width: number
+  ) => string[]
   formatMcqChoiceLines: (choices: string[]) => string[]
   getTerminalWidth: () => number
   buildCurrentPromptSeparator: (width: number) => string
@@ -208,7 +212,7 @@ export async function runTTY(
                 isCommandPrefixWithSuggestions(buffer)
               )
                 return [COMMANDS_HINT]
-              return buildSuggestionLines(buffer, highlightIndex)
+              return buildSuggestionLines(buffer, highlightIndex, width)
             })()
     const recallingIndicator = isInRecallSubstate() ? [RECALLING_INDICATOR] : []
     return { contentLines, boxLines, suggestionLines, recallingIndicator }

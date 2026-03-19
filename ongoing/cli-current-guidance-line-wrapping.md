@@ -19,20 +19,34 @@ In narrow terminals, the Current guidance area (below the input box) shows:
 
 All are rendered via `ttyAdapter`'s `drawBox()` / `doFullRedraw()`, which write each `suggestionLines` element with `process.stdout.write(`\x1b[2K${line}\n`)`. Lines longer than `process.stdout.columns` wrap at the terminal (no explicit truncation or wrapping).
 
+## Testing Strategy
+
+**E2E tests are not needed** for this task.
+
+**CLI-related E2E tests must pass** at each and every phase. Do not introduce regressions in existing CLI E2E scenarios.
+
+**Unit tests only**, starting at the **top level**: exercise the public functions that produce Current guidance lines. Assert on observable output (line content, length, presence of "...")—never on internal state or helper functions. Avoid revealing implementation details.
+
+To enable this, expose top-level functions that take `(state, width)` and return the lines to display:
+- Command suggestions: `buildSuggestionLines(buffer, highlightIndex, width)` (already exists; add `width`).
+- Token list: extract `buildTokenListLines(tokens, defaultLabel, width)`.
+- MCQ: `formatMcqChoiceLines(choices, width)` (add `width`).
+
+Tests call these with narrow/wide widths and assert on the returned strings. Coverage is achieved by exercising all branches through these public entry points.
+
 ## Phases
 
-### Phase 1: Truncate command completion choices
+### Phase 1: Truncate command completion choices ✓
 
 **User value**: Command suggestions stay on one line in narrow terminals; no messy wrapping.
 
 **Changes**:
-1. Add `truncateToWidth(line: string, width: number): string` in `renderer.ts` (or a shared util). Use `visibleLength()` for ANSI-aware truncation; append "..." when truncating.
-2. Pass terminal width into `buildSuggestionLines` (or the command-suggestion path). Apply truncation to each line from `formatCommandSuggestionLines` before passing to `formatHighlightedList`.
+1. Add width parameter to `buildSuggestionLines(buffer, highlightIndex, width)`. Apply truncation internally.
+2. Use `visibleLength()` for ANSI-aware truncation; append "..." when truncating.
 
-**Tests**:
-- Unit: `truncateToWidth` – truncates at width, adds "..."; handles ANSI; no change if within width.
-- Unit: Command suggestions truncated when width is small (mock `getTerminalWidth`).
-- E2E: Narrow terminal; type `/` prefix; Current guidance shows truncated lines without wrap.
+**Tests** (top-level only):
+- Call `buildSuggestionLines` with buffer like `/rec`, narrow width (e.g. 40). Assert each returned line has visible length ≤ width or ends with "...". Wide width: no truncation.
+- Various prefix + width combinations to cover edge cases.
 
 ---
 
@@ -41,11 +55,12 @@ All are rendered via `ttyAdapter`'s `drawBox()` / `doFullRedraw()`, which write 
 **User value**: Token labels stay on one line in narrow terminals.
 
 **Changes**:
-1. In `ttyAdapter.getDisplayContent()`, when `tokenListItems` is set, apply truncation to each line from `formatTokenLines` before `formatHighlightedList`. Use `getTerminalWidth()`.
+1. Extract `buildTokenListLines(tokens, defaultLabel, width)` (e.g. in `accessToken.ts` or `renderer.ts`). Returns raw lines; truncate when exceeding width.
+2. Use from `ttyAdapter` in `getDisplayContent()`.
 
-**Tests**:
-- Unit: Token list lines truncated when width is small.
-- E2E: Narrow terminal; `/remove-access-token` or similar; Current guidance shows truncated token list.
+**Tests** (top-level only):
+- Call `buildTokenListLines` with tokens, narrow width. Assert each line ≤ width or ends with "...". Long label: truncated with "...".
+- Wide width: no truncation.
 
 ---
 
@@ -54,15 +69,15 @@ All are rendered via `ttyAdapter`'s `drawBox()` / `doFullRedraw()`, which write 
 **User value**: Long MCQ choice text wraps to multiple lines; never truncated.
 
 **Changes**:
-1. Ensure MCQ path does NOT use truncation (already the case once Phase 1–2 are done; verify).
-2. Add explicit word-wrap for MCQ choices so each choice wraps at terminal width. `formatMcqChoiceLines(choices, width)` should return multiple lines per choice when needed (e.g. using a wrap utility or `renderMarkdownToTerminal` which already supports width).
-3. Adjust `formatHighlightedList` usage for MCQ: either (a) accept multi-line items and map highlight correctly, or (b) introduce `formatMcqChoiceLinesWithWrap` that returns flat lines with metadata for which lines belong to which choice, and handle highlight/scroll per “choice” not per “line”.
+1. Ensure MCQ path does NOT use truncation.
+2. Add width to `formatMcqChoiceLines(choices, width)`. Word-wrap each choice at width; return multiple lines per choice when needed.
+3. Adjust `formatHighlightedList` usage for MCQ if multi-line items require it.
 
 **Note**: MCQ behavior is still buggy (e.g. highlight/scroll across wrapped choices). This phase only guarantees: no truncation and proper line wrapping.
 
-**Tests**:
-- Unit: Long MCQ choice produces multiple wrapped lines; no truncation.
-- E2E: Narrow terminal; recall with long choice; Current guidance shows wrapped choices, no "...".
+**Tests** (top-level only):
+- Call `formatMcqChoiceLines` with long choice, narrow width. Assert output has multiple lines, no "...", each line ≤ width.
+- Short choices: single line per choice. Wide width: no wrapping.
 
 ---
 
