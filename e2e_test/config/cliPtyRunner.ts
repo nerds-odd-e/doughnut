@@ -15,17 +15,92 @@ const PTY_OPTIONS = {
   rows: 24,
 }
 
-function normalizeInput(input: string): string {
-  return input.endsWith('\n') ? input : `${input}\n`
-}
-
-function writeInput(ptyProcess: IPty, input: string): void {
-  ptyProcess.write(normalizeInput(input))
-}
-
-// Wait for the rendered prompt, not just version output.
-// Version text is printed before readline key handlers are fully wired.
 const CLI_READY_PATTERN = /\/ commands/
+
+// The CLI renders placeholder text with ANSI grey (\x1b[90m) when the input
+// buffer is empty (ready for input). In normal mode: `│ → \x1b[90m<placeholder>`.
+// In selection mode (token list): the entire box is grey-wrapped with no arrow,
+// so the content line is `\x1b[90m│ \x1b[90m<placeholder>`.
+// Matching grey after the box border character detects both modes without
+// enumerating placeholder strings (those live in renderer.ts PLACEHOLDER_BY_CONTEXT).
+// biome-ignore lint/suspicious/noControlCharactersInRegex: matching ANSI escape codes in PTY output
+const INPUT_BOX_READY_PATTERN = /(?:│ → |\x1b\[90m│ )\x1b\[90m/
+
+interface PtyHandle {
+  pty: IPty
+  stdout: { value: string }
+  dispose: () => void
+}
+
+function spawnPty(opts: {
+  command: string
+  args: string[]
+  cwd: string
+  env?: NodeJS.ProcessEnv
+}): PtyHandle {
+  const pty = require('@lydell/node-pty') as {
+    spawn: (file: string, args: string[], options: object) => IPty
+  }
+  const envMerged = { ...process.env, ...cliEnv(opts.env) }
+  const ptyProcess = pty.spawn(opts.command, opts.args, {
+    ...PTY_OPTIONS,
+    cwd: opts.cwd,
+    env: envMerged as { [key: string]: string },
+  })
+  const stdout = { value: '' }
+  const disposeData = ptyProcess.onData((data) => {
+    stdout.value += data
+  })
+  return { pty: ptyProcess, stdout, dispose: () => disposeData.dispose() }
+}
+
+async function waitForCliReady(getStdout: () => string): Promise<void> {
+  const maxWaitMs = 10_000
+  const start = Date.now()
+  while (Date.now() - start < maxWaitMs) {
+    if (CLI_READY_PATTERN.test(getStdout())) return
+    await new Promise((r) => setTimeout(r, CLI_POLL_MS))
+  }
+  const stdout = getStdout()
+  throw new Error(
+    `CLI prompt did not appear within 10s. stdout: ${stdout.slice(-300).replace(/\r/g, '\\r')}`
+  )
+}
+
+async function waitForInputBoxReady(
+  getStdout: () => string,
+  lenBeforeSend: number
+): Promise<void> {
+  const maxWaitMs = 15_000
+  const stablePollsRequired = 3
+  const start = Date.now()
+  let lastStdoutLen = 0
+  let stablePolls = 0
+  while (Date.now() - start < maxWaitMs) {
+    const stdout = getStdout()
+    if (stdout.length <= lenBeforeSend) {
+      await new Promise((r) => setTimeout(r, CLI_POLL_MS))
+      continue
+    }
+    const newContent = stdout.slice(lenBeforeSend)
+    if (INPUT_BOX_READY_PATTERN.test(newContent)) {
+      if (stdout.length === lastStdoutLen) {
+        stablePolls++
+        if (stablePolls >= stablePollsRequired) return
+      } else {
+        stablePolls = 0
+      }
+      lastStdoutLen = stdout.length
+    } else {
+      stablePolls = 0
+    }
+    await new Promise((r) => setTimeout(r, CLI_POLL_MS))
+  }
+  const stdout = getStdout()
+  throw new Error(
+    `CLI did not show input box after send within 15s. stdout grew by ${stdout.length - lenBeforeSend} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`
+  )
+}
 
 function formatPtyTimeoutDiagnostics(opts: {
   spawnLabel: string
@@ -48,78 +123,50 @@ function formatPtyTimeoutDiagnostics(opts: {
   return lines.join('\n')
 }
 
-async function waitForCliReady(
-  ptyProcess: IPty,
-  getStdout: () => string
-): Promise<void> {
-  const maxWaitMs = 10_000
-  const start = Date.now()
-  while (Date.now() - start < maxWaitMs) {
-    if (CLI_READY_PATTERN.test(getStdout())) return
-    await new Promise((r) => setTimeout(r, CLI_POLL_MS))
-  }
-  const stdout = getStdout()
-  throw new Error(
-    `CLI prompt did not appear within 10s. stdout: ${stdout.slice(-300).replace(/\r/g, '\\r')}`
-  )
-}
-
 export async function runCliInPty(opts: {
-  /** Program to run (e.g. 'pnpm' or process.execPath) and full args. Use for TS source locally. */
-  command?: string
+  executablePath: string
   args?: string[]
-  /** Legacy: spawn node with [executablePath, ...args]. Use for bundle or installed binary. */
-  executablePath?: string
   cwd: string
   env?: NodeJS.ProcessEnv
   input: string
 }): Promise<string> {
-  const pty = require('@lydell/node-pty') as {
-    spawn: (file: string, args: string[], options: object) => IPty
-  }
-  const envMerged = { ...process.env, ...cliEnv(opts.env) }
-  const [file, fileArgs] =
-    opts.command !== undefined
-      ? [opts.command, opts.args ?? []]
-      : [process.execPath, [opts.executablePath!, ...(opts.args ?? [])]]
-  const spawnLabel = [file, ...fileArgs].join(' ')
-  const ptyProcess = pty.spawn(file, fileArgs, {
-    ...PTY_OPTIONS,
+  const args = [opts.executablePath, ...(opts.args ?? [])]
+  const spawnLabel = [process.execPath, ...args].join(' ')
+  const handle = spawnPty({
+    command: process.execPath,
+    args,
     cwd: opts.cwd,
-    env: envMerged as { [key: string]: string },
+    env: opts.env,
   })
-  let stdout = ''
   let readyReached = false
   let inputSent = false
-  const disposeData = ptyProcess.onData((data) => {
-    stdout += data
-  })
   return new Promise<string>((resolve, reject) => {
     const timeout = setTimeout(() => {
-      ptyProcess.kill('SIGKILL')
-      disposeData.dispose()
+      handle.pty.kill('SIGKILL')
+      handle.dispose()
       reject(
         new Error(
           formatPtyTimeoutDiagnostics({
             spawnLabel,
             cwd: opts.cwd,
-            stdout,
+            stdout: handle.stdout.value,
             inputSent,
             readyReached,
           })
         )
       )
     }, PTY_TIMEOUT_MS)
-    ptyProcess.onExit(({ exitCode }) => {
+    handle.pty.onExit(({ exitCode }) => {
       clearTimeout(timeout)
-      disposeData.dispose()
-      if (exitCode === 0) resolve(stdout)
+      handle.dispose()
+      if (exitCode === 0) resolve(handle.stdout.value)
       else reject(new Error(`CLI exited with code ${exitCode}`))
     })
-    waitForCliReady(ptyProcess, () => stdout)
+    waitForCliReady(() => handle.stdout.value)
       .then(() => {
         readyReached = true
-        return writeInput(ptyProcess, opts.input)
+        const input = opts.input.endsWith('\n') ? opts.input : `${opts.input}\n`
+        handle.pty.write(input)
       })
       .then(() => {
         inputSent = true
@@ -129,11 +176,7 @@ export async function runCliInPty(opts: {
 }
 
 /** Module-level handle for long-running interactive CLI. Used by Cypress tasks. */
-let interactiveHandle: {
-  pty: IPty
-  stdoutRef: { s: string }
-  disposeData: { dispose: () => void }
-} | null = null
+let interactiveHandle: PtyHandle | null = null
 
 export async function startInteractiveCli(opts: {
   command: string
@@ -146,21 +189,9 @@ export async function startInteractiveCli(opts: {
       'Interactive CLI already running. Call stopInteractiveCli first.'
     )
   }
-  const pty = require('@lydell/node-pty') as {
-    spawn: (file: string, args: string[], options: object) => IPty
-  }
-  const envMerged = { ...process.env, ...cliEnv(opts.env) }
-  const ptyProcess = pty.spawn(opts.command, opts.args, {
-    ...PTY_OPTIONS,
-    cwd: opts.cwd,
-    env: envMerged as { [key: string]: string },
-  })
-  const stdoutRef = { s: '' }
-  const disposeData = ptyProcess.onData((data) => {
-    stdoutRef.s += data
-  })
-  await waitForCliReady(ptyProcess, () => stdoutRef.s)
-  interactiveHandle = { pty: ptyProcess, stdoutRef, disposeData }
+  const handle = spawnPty(opts)
+  await waitForCliReady(() => handle.stdout.value)
+  interactiveHandle = handle
 }
 
 export async function sendToInteractiveCli(input: string): Promise<string> {
@@ -178,62 +209,19 @@ export async function sendToInteractiveCli(input: string): Promise<string> {
         : trimmed.endsWith('\n')
           ? trimmed
           : `${trimmed}\n`
-  const lenBeforeSend = interactiveHandle.stdoutRef.s.length
+  const lenBeforeSend = interactiveHandle.stdout.value.length
   interactiveHandle.pty.write(toSend)
-  await waitForNewPromptAfterSend(
-    interactiveHandle.pty,
-    () => interactiveHandle!.stdoutRef.s,
+  await waitForInputBoxReady(
+    () => interactiveHandle!.stdout.value,
     lenBeforeSend
   )
-  return interactiveHandle.stdoutRef.s
-}
-
-async function waitForNewPromptAfterSend(
-  _ptyProcess: IPty,
-  getStdout: () => string,
-  lenBeforeSend: number
-): Promise<void> {
-  // Input box (│ → ) is drawn by drawBox() when the CLI is ready. Match distinctive
-  // placeholder prefixes so we don't match while typing (e.g. │ → /recall). Covers all
-  // contexts: default (`), recallYesNo/recallStopConfirmation (y or n), recallMcq/tokenList
-  // (↑↓), recallSpelling (type). ANSI codes (e.g. \x1b[90m) may appear between "→ " and the placeholder.
-  // biome-ignore lint/suspicious/noControlCharactersInRegex: matching ANSI escape codes in PTY output
-  const INPUT_BOX_READY_PATTERN = /│ → (?:\x1b\[[0-9;]*m)*(?:`|y or n|↑↓|type)/
-  const maxWaitMs = 15_000
-  const stablePollsRequired = 3
-  const start = Date.now()
-  let lastStdoutLen = 0
-  let stablePolls = 0
-  while (Date.now() - start < maxWaitMs) {
-    const stdout = getStdout()
-    const newContent = stdout.slice(lenBeforeSend)
-    if (stdout.length <= lenBeforeSend) {
-      await new Promise((r) => setTimeout(r, CLI_POLL_MS))
-      continue
-    }
-    if (INPUT_BOX_READY_PATTERN.test(newContent)) {
-      if (stdout.length === lastStdoutLen) {
-        stablePolls++
-        if (stablePolls >= stablePollsRequired) return
-      } else {
-        stablePolls = 0
-      }
-      lastStdoutLen = stdout.length
-    } else {
-      stablePolls = 0
-    }
-    await new Promise((r) => setTimeout(r, CLI_POLL_MS))
-  }
-  const stdout = getStdout()
-  throw new Error(
-    `CLI did not show input box after send within 15s. stdout grew by ${stdout.length - lenBeforeSend} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`
-  )
+  return interactiveHandle.stdout.value
 }
 
 export async function stopInteractiveCli(): Promise<void> {
   if (!interactiveHandle) return
-  const { pty, disposeData } = interactiveHandle
+  const { pty, dispose } = interactiveHandle
   interactiveHandle = null
   pty.kill('SIGKILL')
-  disposeData.dispose()
+  dispose()
 }
