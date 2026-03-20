@@ -34,7 +34,7 @@ import {
   INTERACTIVE_FETCH_WAIT_LINES,
   resetInteractiveFetchWaitForTesting,
   runInteractiveFetchWait,
-  runRecallNextFetchWithWaitUi,
+  runInteractiveRecallLoad,
   type InteractiveFetchWaitLine,
 } from './interactiveFetchWait.js'
 import { formatVersionOutput } from './version.js'
@@ -265,8 +265,11 @@ const PARAM_COMMANDS: ParamCommand[] = [
   },
 ]
 
-/** After `runRecallNextFetchWithWaitUi` throws: end recall mode and show cancel vs backend error. */
-function handleRecallNextFetchError(err: unknown, output: OutputAdapter): void {
+/** After `runInteractiveRecallLoad` throws: end recall session and show cancel vs backend error. */
+function handleInteractiveRecallLoadError(
+  err: unknown,
+  output: OutputAdapter
+): void {
   endRecallSession()
   if (isFetchAbortedByCaller(err)) {
     output.log('Cancelled by user.')
@@ -308,8 +311,8 @@ async function continueRecallSession(
 ): Promise<void> {
   if (!fromLoadMore) sessionRecallCount++
   try {
-    const result = await runRecallNextFetchWithWaitUi(output, (signal) =>
-      recallNext(recallSessionDueDays, signal)
+    const result = await runInteractiveRecallLoad(output, (recallLoadSignal) =>
+      recallNext(recallSessionDueDays, recallLoadSignal)
     )
     if (result.type === 'none') {
       if (recallSessionDueDays === 0) {
@@ -324,7 +327,7 @@ async function continueRecallSession(
     }
     showRecallPrompt(result, output, writeCurrentPrompt)
   } catch (err) {
-    handleRecallNextFetchError(err, output)
+    handleInteractiveRecallLoadError(err, output)
   }
 }
 
@@ -555,8 +558,9 @@ export async function processInput(
       recallSessionMode = true
       sessionRecallCount = 0
       recallSessionDueDays = 0
-      const result = await runRecallNextFetchWithWaitUi(output, (signal) =>
-        recallNext(0, signal)
+      const result = await runInteractiveRecallLoad(
+        output,
+        (recallLoadSignal) => recallNext(0, recallLoadSignal)
       )
       if (result.type === 'none') {
         pendingRecallLoadMore = true
@@ -570,7 +574,7 @@ export async function processInput(
         )
       }
     } catch (err) {
-      handleRecallNextFetchError(err, output)
+      handleInteractiveRecallLoadError(err, output)
     }
     return false
   }

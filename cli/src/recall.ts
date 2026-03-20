@@ -6,7 +6,48 @@ import {
   type RecallPrompt,
 } from 'doughnut-api'
 import { runWithDefaultBackendClient } from './accessToken.js'
-import { awaitSlowRecallLoadBeforeFirstFetch } from './slowRecallLoad.js'
+import { userAbortError } from './fetchAbort.js'
+
+/**
+ * Env var: milliseconds to wait before the first `recalling` HTTP call when `recallLoadSignal` is set
+ * (Vitest fake timers / manual Esc-during-load practice). Capped inside `recallNext`.
+ */
+export const RECALL_LOAD_CLI_TEST_DELAY_MS_ENV =
+  'DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS' as const
+
+const RECALL_LOAD_CLI_TEST_DELAY_MAX_MS = 60_000
+
+function parseCliTestRecallLoadDelayMs(): number {
+  const raw = process.env[RECALL_LOAD_CLI_TEST_DELAY_MS_ENV]
+  if (raw == null || raw === '') return 0
+  const n = Number.parseInt(raw, 10)
+  if (!Number.isFinite(n) || n <= 0) return 0
+  return Math.min(n, RECALL_LOAD_CLI_TEST_DELAY_MAX_MS)
+}
+
+/** Only when `recallLoadSignal` is set (interactive load); honours abort during the wait. */
+async function awaitCliTestRecallLoadDelayIfConfigured(
+  recallLoadSignal: AbortSignal | undefined
+): Promise<void> {
+  const ms = parseCliTestRecallLoadDelayMs()
+  if (ms === 0 || recallLoadSignal == null) return
+  await new Promise<void>((resolve, reject) => {
+    if (recallLoadSignal.aborted) {
+      reject(userAbortError())
+      return
+    }
+    const t = setTimeout(() => {
+      recallLoadSignal.removeEventListener('abort', onAbort)
+      resolve()
+    }, ms)
+    const onAbort = () => {
+      clearTimeout(t)
+      recallLoadSignal.removeEventListener('abort', onAbort)
+      reject(userAbortError())
+    }
+    recallLoadSignal.addEventListener('abort', onAbort, { once: true })
+  })
+}
 
 function getTimezone(): string {
   return Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -46,19 +87,20 @@ export type RecallNextResult =
     }
 
 /**
- * Fetches the next recall prompt for the session. When `signal` is provided (CLI recall load with
- * wait UI), the in-flight HTTP calls honour it so the user can cancel with Esc.
+ * Fetches the next recall prompt for the session.
+ * When `recallLoadSignal` is set (TTY `runInteractiveRecallLoad` + wait chrome), HTTP calls and
+ * optional {@link RECALL_LOAD_CLI_TEST_DELAY_MS_ENV} honour the same signal so Esc can cancel before or during fetch.
  */
 export async function recallNext(
   dueindays = 0,
-  signal?: AbortSignal
+  recallLoadSignal?: AbortSignal
 ): Promise<RecallNextResult> {
-  await awaitSlowRecallLoadBeforeFirstFetch(signal)
-  const opt = signal ? { signal } : {}
+  await awaitCliTestRecallLoadDelayIfConfigured(recallLoadSignal)
+  const sdkOpts = recallLoadSignal ? { signal: recallLoadSignal } : {}
   const result = await runWithDefaultBackendClient(() =>
     RecallsController.recalling({
       query: { timezone: getTimezone(), dueindays },
-      ...opt,
+      ...sdkOpts,
     })
   )
   const toRepeat = result.data?.toRepeat ?? []
@@ -70,7 +112,7 @@ export async function recallNext(
   const questionResult = await runWithDefaultBackendClient(() =>
     MemoryTrackerController.askAQuestion({
       path: { memoryTracker: first.memoryTrackerId },
-      ...opt,
+      ...sdkOpts,
     })
   )
   const prompt = questionResult.data
@@ -97,7 +139,7 @@ export async function recallNext(
   const trackerResult = await runWithDefaultBackendClient(() =>
     MemoryTrackerController.showMemoryTracker({
       path: { memoryTracker: first.memoryTrackerId },
-      ...opt,
+      ...sdkOpts,
     })
   )
   const title = trackerResult.data?.note?.noteTopology?.title ?? 'Untitled note'

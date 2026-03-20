@@ -9,6 +9,9 @@ import {
   UserController,
 } from 'doughnut-api'
 import { addAccessToken } from '../src/accessToken.js'
+import { userAbortError } from '../src/fetchAbort.js'
+import { processInput, resetRecallStateForTesting } from '../src/interactive.js'
+import { cancelInteractiveRecallLoadFor } from '../src/interactiveFetchWait.js'
 import {
   answerQuiz,
   answerSpelling,
@@ -16,6 +19,7 @@ import {
   markAsRecalled,
   recallNext,
   recallStatus,
+  RECALL_LOAD_CLI_TEST_DELAY_MS_ENV,
 } from '../src/recall.js'
 
 vi.mock('doughnut-api', () => ({
@@ -48,6 +52,16 @@ function mockRecalling(toRepeat: unknown[] = []) {
   return vi.mocked(RecallsController.recalling).mockResolvedValue({
     data: { toRepeat },
   } as never)
+}
+
+function mockInteractiveOutputAdapter() {
+  return {
+    log: vi.fn(),
+    logError: vi.fn(),
+    writeCurrentPrompt: vi.fn(),
+    beginCurrentPrompt: vi.fn(),
+    onInteractiveFetchWaitChanged: vi.fn(),
+  }
 }
 
 describe('recallStatus', () => {
@@ -211,8 +225,7 @@ describe('recallNext', () => {
     vi.mocked(RecallsController.recalling).mockImplementation(
       ({ signal }: { signal?: AbortSignal }) =>
         new Promise((_resolve, reject) => {
-          const fail = () =>
-            reject(new DOMException('The operation was aborted', 'AbortError'))
+          const fail = () => reject(userAbortError())
           if (signal?.aborted) fail()
           else signal?.addEventListener('abort', fail, { once: true })
         })
@@ -228,24 +241,24 @@ describe('recallNext', () => {
     await expect(p).rejects.toMatchObject({ name: 'AbortError' })
   })
 
-  describe('DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS', () => {
+  describe(RECALL_LOAD_CLI_TEST_DELAY_MS_ENV, () => {
     let originalSlow: string | undefined
 
     beforeEach(() => {
-      originalSlow = process.env.DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS
+      originalSlow = process.env[RECALL_LOAD_CLI_TEST_DELAY_MS_ENV]
     })
 
     afterEach(() => {
       vi.useRealTimers()
       if (originalSlow === undefined) {
-        delete process.env.DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS
+        delete process.env[RECALL_LOAD_CLI_TEST_DELAY_MS_ENV]
       } else {
-        process.env.DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS = originalSlow
+        process.env[RECALL_LOAD_CLI_TEST_DELAY_MS_ENV] = originalSlow
       }
     })
 
     test('with AbortSignal: abort during delay does not call recalling', async () => {
-      process.env.DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS = '100'
+      process.env[RECALL_LOAD_CLI_TEST_DELAY_MS_ENV] = '100'
       vi.mocked(RecallsController.recalling).mockResolvedValue({
         data: { toRepeat: [] },
       } as never)
@@ -265,7 +278,7 @@ describe('recallNext', () => {
     })
 
     test('with AbortSignal: after delay, recalling runs', async () => {
-      process.env.DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS = '50'
+      process.env[RECALL_LOAD_CLI_TEST_DELAY_MS_ENV] = '50'
       vi.mocked(RecallsController.recalling).mockResolvedValue({
         data: { toRepeat: [] },
       } as never)
@@ -282,7 +295,7 @@ describe('recallNext', () => {
     })
 
     test('without AbortSignal: env has no effect', async () => {
-      process.env.DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS = '99999'
+      process.env[RECALL_LOAD_CLI_TEST_DELAY_MS_ENV] = '99999'
       vi.mocked(RecallsController.recalling).mockResolvedValue({
         data: { toRepeat: [] },
       } as never)
@@ -477,6 +490,56 @@ describe('recallNext', () => {
       memoryTrackerId: 42,
       title: 'Untitled note',
     })
+  })
+})
+
+describe('processInput /recall — interactive recall load', () => {
+  let originalConfigDir: string | undefined
+  let originalSlow: string | undefined
+
+  beforeEach(() => {
+    originalConfigDir = process.env.DOUGHNUT_CONFIG_DIR
+    process.env.DOUGHNUT_CONFIG_DIR = createTempDir()
+    originalSlow = process.env[RECALL_LOAD_CLI_TEST_DELAY_MS_ENV]
+    process.env[RECALL_LOAD_CLI_TEST_DELAY_MS_ENV] = '60000'
+    vi.clearAllMocks()
+    resetRecallStateForTesting()
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+    if (originalConfigDir === undefined) {
+      delete process.env.DOUGHNUT_CONFIG_DIR
+    } else {
+      process.env.DOUGHNUT_CONFIG_DIR = originalConfigDir
+    }
+    if (originalSlow === undefined) {
+      delete process.env[RECALL_LOAD_CLI_TEST_DELAY_MS_ENV]
+    } else {
+      process.env[RECALL_LOAD_CLI_TEST_DELAY_MS_ENV] = originalSlow
+    }
+  })
+
+  test('cancel during CLI test delay logs Cancelled by user. (real recallNext)', async () => {
+    vi.mocked(RecallsController.recalling).mockResolvedValue({
+      data: { toRepeat: [] },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const out = mockInteractiveOutputAdapter()
+    const done = processInput('/recall', out)
+    await vi.waitFor(() =>
+      expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalled()
+    )
+    expect(cancelInteractiveRecallLoadFor(out)).toBe(true)
+    await done
+    expect(out.log).toHaveBeenCalledWith('Cancelled by user.')
+    expect(RecallsController.recalling).not.toHaveBeenCalled()
+    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
   })
 })
 

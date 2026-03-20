@@ -3,6 +3,7 @@ import { Readable } from 'node:stream'
 import { mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { userAbortError } from '../src/fetchAbort.js'
 import {
   buildBoxLines,
   highlightRecognizedCommand,
@@ -2058,11 +2059,9 @@ describe('TTY recall load wait — Esc cancels', () => {
     mockRecallNext.mockReset()
     mockRecallNext.mockImplementation((_due, signal) => {
       return new Promise((_resolve, reject) => {
-        signal?.addEventListener(
-          'abort',
-          () => reject(new DOMException('Aborted', 'AbortError')),
-          { once: true }
-        )
+        signal?.addEventListener('abort', () => reject(userAbortError()), {
+          once: true,
+        })
       })
     })
     vi.spyOn(console, 'log').mockImplementation(() => undefined)

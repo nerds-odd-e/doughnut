@@ -5,7 +5,8 @@ import {
   resetRecallStateForTesting,
   runInteractiveFetchWait,
 } from '../src/interactive.js'
-import { cancelInFlightRecallNextFetchFor } from '../src/interactiveFetchWait.js'
+import { userAbortError } from '../src/fetchAbort.js'
+import { cancelInteractiveRecallLoadFor } from '../src/interactiveFetchWait.js'
 import {
   buildBoxLines,
   buildLiveRegionLines,
@@ -180,7 +181,7 @@ describe('interactive fetch wait UI', () => {
   test('/recall: abort during recall load logs cancellation and clears wait', async () => {
     mockRecallNext.mockImplementation((_due, signal) => {
       return new Promise<RecallNextResult>((_resolve, reject) => {
-        const onAbort = () => reject(new DOMException('Aborted', 'AbortError'))
+        const onAbort = () => reject(userAbortError())
         if (signal?.aborted) {
           onAbort()
           return
@@ -193,7 +194,7 @@ describe('interactive fetch wait UI', () => {
     await vi.waitFor(() =>
       expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalled()
     )
-    expect(cancelInFlightRecallNextFetchFor(out)).toBe(true)
+    expect(cancelInteractiveRecallLoadFor(out)).toBe(true)
     await done
     expect(out.log).toHaveBeenCalledWith('Cancelled by user.')
     expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)

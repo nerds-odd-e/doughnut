@@ -4,7 +4,7 @@ import type { AccessTokenEntry } from '../accessToken.js'
 import type { CommandDoc } from '../help.js'
 import {
   INTERACTIVE_FETCH_WAIT_LINES,
-  cancelInFlightRecallNextFetchFor,
+  cancelInteractiveRecallLoadFor,
   type InteractiveFetchWaitLine,
 } from '../interactiveFetchWait.js'
 import {
@@ -512,7 +512,7 @@ export async function runTTY(
       process.stdout.write(`\x1b[${1}B\r\n`)
       doExit()
     }
-    if (key.name === 'escape' && cancelInFlightRecallNextFetchFor(ttyOutput)) {
+    if (key.name === 'escape' && cancelInteractiveRecallLoadFor(ttyOutput)) {
       drawBox()
       return
     }

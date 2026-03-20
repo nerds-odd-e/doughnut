@@ -20,12 +20,11 @@ export type InteractiveFetchWaitLine =
 
 let activeWaitLine: InteractiveFetchWaitLine | null = null
 
-/** Only set while {@link runRecallNextFetchWithWaitUi} is in flight (phase 3.1 — Esc can cancel). */
-type InFlightRecallNextFetch = {
+type ActiveInteractiveRecallLoad = {
   output: OutputAdapter
   controller: AbortController
 }
-let inFlightRecallNextFetch: InFlightRecallNextFetch | null = null
+let activeInteractiveRecallLoad: ActiveInteractiveRecallLoad | null = null
 
 export function getInteractiveFetchWaitLine(): InteractiveFetchWaitLine | null {
   return activeWaitLine
@@ -40,39 +39,42 @@ function setActiveWaitLine(
 }
 
 /**
- * Loads the next recall item from the backend while the TTY shows the loading chrome.
- * The given `signal` is aborted when the user presses Esc (see {@link cancelInFlightRecallNextFetchFor}).
+ * Work for one interactive recall load: first `recalling` (and follow-ups) in `recallNext`, tied to
+ * {@link runInteractiveRecallLoad} so Esc can abort the same `AbortSignal`.
  */
-export type RecallNextBackendFetch<T> = (signal: AbortSignal) => Promise<T>
+export type InteractiveRecallLoadFn<T> = (
+  recallLoadSignal: AbortSignal
+) => Promise<T>
 
-export async function runRecallNextFetchWithWaitUi<T>(
+export async function runInteractiveRecallLoad<T>(
   output: OutputAdapter,
-  fetchNextRecallItem: RecallNextBackendFetch<T>
+  load: InteractiveRecallLoadFn<T>
 ): Promise<T> {
   const controller = new AbortController()
-  inFlightRecallNextFetch = { output, controller }
+  activeInteractiveRecallLoad = { output, controller }
   setActiveWaitLine(output, INTERACTIVE_FETCH_WAIT_LINES.recallNext)
   try {
-    return await fetchNextRecallItem(controller.signal)
+    return await load(controller.signal)
   } finally {
     if (
-      inFlightRecallNextFetch?.output === output &&
-      inFlightRecallNextFetch.controller === controller
+      activeInteractiveRecallLoad?.output === output &&
+      activeInteractiveRecallLoad.controller === controller
     ) {
-      inFlightRecallNextFetch = null
+      activeInteractiveRecallLoad = null
     }
     setActiveWaitLine(output, null)
   }
 }
 
-/** Returns whether a fetch was in flight for this TTY session and was cancelled. */
-export function cancelInFlightRecallNextFetchFor(
-  output: OutputAdapter
-): boolean {
-  if (!inFlightRecallNextFetch || inFlightRecallNextFetch.output !== output) {
+/** Esc during recall load: abort in-flight work if this TTY output owns it. */
+export function cancelInteractiveRecallLoadFor(output: OutputAdapter): boolean {
+  if (
+    !activeInteractiveRecallLoad ||
+    activeInteractiveRecallLoad.output !== output
+  ) {
     return false
   }
-  inFlightRecallNextFetch.controller.abort()
+  activeInteractiveRecallLoad.controller.abort()
   return true
 }
 
@@ -92,5 +94,5 @@ export async function runInteractiveFetchWait<T>(
 
 export function resetInteractiveFetchWaitForTesting(): void {
   activeWaitLine = null
-  inFlightRecallNextFetch = null
+  activeInteractiveRecallLoad = null
 }

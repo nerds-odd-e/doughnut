@@ -29,26 +29,25 @@ Informal requirement; delete or shrink once implemented.
 
 | Piece | Location |
 |------|-----------|
-| Recall load + `AbortSignal` | `interactiveFetchWait.ts`: `runRecallNextFetchWithWaitUi`, `inFlightRecallNextFetch` keyed by `OutputAdapter`; `RecallNextBackendFetch<T>` |
+| Recall load + `AbortSignal` | `interactiveFetchWait.ts`: `runInteractiveRecallLoad`, `InteractiveRecallLoadFn<T>`; `activeInteractiveRecallLoad` keyed by `OutputAdapter` |
 | Other waits (no cancel yet) | `runInteractiveFetchWait` — `fn: () => Promise` only |
-| TTY Esc | `ttyAdapter.ts`: `cancelInFlightRecallNextFetchFor(ttyOutput)` returns whether Esc cancelled an in-flight recall-next fetch |
-| Recall API | `recall.ts`: `recallNext(due, signal?)` passes `signal` into recalling / askAQuestion / showMemoryTracker |
-| Abort vs generic error | `fetchAbort.ts`: `isFetchAbortedByCaller`; `withBackendClient` rethrows that case |
-| User copy | `interactive.ts`: `handleRecallNextFetchError` → `Cancelled by user.` when fetch was aborted |
+| TTY Esc | `ttyAdapter.ts`: `cancelInteractiveRecallLoadFor(ttyOutput)` |
+| Recall API | `recall.ts`: `recallNext(due, recallLoadSignal?)` passes signal into recalling / askAQuestion / showMemoryTracker |
+| Abort vs generic error | `fetchAbort.ts`: `userAbortError`, `isFetchAbortedByCaller`; `withBackendClient` rethrows abort |
+| User copy | `interactive.ts`: `handleInteractiveRecallLoadError` → `Cancelled by user.` when load was aborted |
 
 ## Phase 3.2 (done) — slow recall load knob
 
 | Piece | Location |
 |------|-----------|
-| Env + abortable delay | `slowRecallLoad.ts`: `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS`, `awaitSlowRecallLoadBeforeFirstFetch` |
-| Wired into recall load | `recall.ts`: `recallNext` calls delay only when `signal` is defined |
-| Tests | `recall.test.ts` (`DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` describe); `slowRecallLoadProcessInput.test.ts` (real `recallNext` + `processInput`) |
+| Env + abortable delay | `recall.ts`: `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS`, `awaitCliTestRecallLoadDelayIfConfigured` (only with `recallLoadSignal`) |
+| Tests | `recall.test.ts`: `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` describe + `processInput /recall` (real `recallNext`, mocked API) |
 
 ## Future phases
 
 | Phase | Scope |
 |-------|--------|
-| 3.x | **3.1** done (recall cancel). **3.2** done: `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` + `slowRecallLoad.ts`, Vitest in `recall.test.ts` / `slowRecallLoadProcessInput.test.ts`. **3.3–3.4**: widen cancel + copy (`planning.mdc`). |
+| 3.x | **3.1–3.2** done. **3.3–3.4**: widen cancel + copy (`planning.mdc`). |
 
 ### Phase 3 (planned) — cancellable interactive fetch wait
 
@@ -86,11 +85,11 @@ Informal requirement; delete or shrink once implemented.
 
 ---
 
-#### Research: CLI wiring (post–3.1 snapshot)
+#### Research: CLI wiring (current)
 
-- **`runInteractiveFetchWait`** — wait chrome only, no abort. **`runRecallNextFetchWithWaitUi`** — recall-next load only, owns `AbortController` + `inFlightRecallNextFetch` per `OutputAdapter`.
+- **`runInteractiveFetchWait`** — wait chrome only, no abort. **`runInteractiveRecallLoad`** — recall load only, owns `AbortController` + `activeInteractiveRecallLoad` per `OutputAdapter`.
 - **`withBackendClient`** — maps failures to “service unavailable” except **`isFetchAbortedByCaller`** (`fetchAbort.ts`).
-- **TTY** — Esc calls **`cancelInFlightRecallNextFetchFor`**; overlapping async keypress handlers during `await processInput` remain a product choice for later.
+- **TTY** — Esc calls **`cancelInteractiveRecallLoadFor`**; overlapping async keypress handlers during `await processInput` remain a product choice for later.
 
 ---
 
@@ -100,12 +99,12 @@ Split by **who can cancel what**, not by “plumbing layer then TTY layer.” Th
 
 1. **Phase 3.1 — Cancel one high-value read wait (end-to-end)** ✅  
    - **User scenario:** During **recall load** (`INTERACTIVE_FETCH_WAIT_LINES.recallNext`), user presses **Esc** → wait chrome clears, recall session ends, **“Cancelled by user.”** is logged (same line as token-list cancel).  
-   - **Implementation:** **`runRecallNextFetchWithWaitUi`** + **`cancelInFlightRecallNextFetchFor(output)`**; generic waits stay on **`runInteractiveFetchWait`**. **`recallNext(due, signal?)`**, **`isFetchAbortedByCaller`** / **`handleRecallNextFetchError`**.  
-   - **Tests:** `interactiveFetchWait.test.ts` (`cancelInFlightRecallNextFetchFor(out)`); `interactive.test.ts` **“TTY recall load wait — Esc cancels”**; `recall.test.ts` / `accessToken.test.ts` edges.
+   - **Implementation:** **`runInteractiveRecallLoad`** + **`cancelInteractiveRecallLoadFor(output)`**; generic waits stay on **`runInteractiveFetchWait`**. **`recallNext(due, recallLoadSignal?)`**, **`isFetchAbortedByCaller`** / **`handleInteractiveRecallLoadError`**.  
+   - **Tests:** `interactiveFetchWait.test.ts`; `interactive.test.ts` **“TTY recall load wait — Esc cancels”**; `recall.test.ts` / `accessToken.test.ts` edges.
 
 2. **Phase 3.2 — CLI testability: simulated slow recall load** ✅  
-   - **Implemented:** `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` (cap 60000), `cli/src/slowRecallLoad.ts`, wired at start of `recallNext` when `signal` is set (covers `/recall` and `continueRecallSession` recall loads).  
-   - **Tests:** `recall.test.ts` (delay + abort / delay completion / no signal ignores env); `slowRecallLoadProcessInput.test.ts` — real `recallNext`, mocked `doughnut-api`, cancel during long fake-timer delay → **“Cancelled by user.”**  
+   - **Implemented:** `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` (cap 60000) in `recall.ts` when `recallLoadSignal` is set.  
+   - **Tests:** `recall.test.ts` (delay + abort / delay completion / no signal; `processInput /recall` with real `recallNext`).  
    - **Docs:** `CLAUDE.md`, `.cursor/rules/cli.mdc`.
 
 3. **Phase 3.3 — Cancel applies to remaining interactive waits**  
