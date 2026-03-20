@@ -44,7 +44,7 @@ import {
   renderPastInput,
   writeFullRedraw,
   grayBoxLinesForSelectionMode,
-  isSelectionMode,
+  isInputBoxDisabledPlaceholderContext,
   GREY,
   HIDE_CURSOR,
   SHOW_CURSOR,
@@ -53,6 +53,12 @@ import {
   PROMPT,
   type PlaceholderContext,
 } from './renderer.js'
+import {
+  applyInteractiveLoading,
+  getInteractiveLoadingDisplayMessage,
+  LOADING_MESSAGES,
+  resetInteractiveLoadingForTesting,
+} from './interactiveLoading.js'
 import type { McqRecallPending, OutputAdapter } from './types.js'
 
 type RecallPromptResult = Exclude<RecallNextResult, { type: 'none' }>
@@ -84,6 +90,7 @@ export function resetRecallStateForTesting(): void {
   recallSessionDueDays = 0
   pendingRecallLoadMore = false
   pendingRecallStopConfirmation = false
+  resetInteractiveLoadingForTesting()
 }
 
 function getPendingRecallAnswer(): PendingRecallAnswer {
@@ -137,6 +144,7 @@ function getContestablePromptId(): number | null {
 export function getPlaceholderContext(
   inTokenList: boolean
 ): PlaceholderContext {
+  if (getInteractiveLoadingDisplayMessage()) return 'loading'
   if (inTokenList) return 'tokenList'
   if (pendingRecallStopConfirmation) return 'recallStopConfirmation'
   if (pendingRecallLoadMore) return 'recallYesNo'
@@ -269,6 +277,18 @@ async function handleParamCommand(
   return false
 }
 
+async function recallNextWithLoading(
+  dueindays: number,
+  output: OutputAdapter
+): Promise<RecallNextResult> {
+  applyInteractiveLoading(output, { message: LOADING_MESSAGES.recallNext })
+  try {
+    return await recallNext(dueindays)
+  } finally {
+    applyInteractiveLoading(output, null)
+  }
+}
+
 async function continueRecallSession(
   fromLoadMore: boolean,
   output: OutputAdapter,
@@ -276,7 +296,7 @@ async function continueRecallSession(
 ): Promise<void> {
   if (!fromLoadMore) sessionRecallCount++
   try {
-    const result = await recallNext(recallSessionDueDays)
+    const result = await recallNextWithLoading(recallSessionDueDays, output)
     if (result.type === 'none') {
       if (recallSessionDueDays === 0) {
         pendingRecallLoadMore = true
@@ -506,7 +526,7 @@ export async function processInput(
       recallSessionMode = true
       sessionRecallCount = 0
       recallSessionDueDays = 0
-      const result = await recallNext(0)
+      const result = await recallNextWithLoading(0, output)
       if (result.type === 'none') {
         pendingRecallLoadMore = true
         output.beginCurrentPrompt?.()
@@ -538,6 +558,8 @@ export {
   buildBoxLines,
   highlightRecognizedCommand,
 } from './renderer.js'
+
+export { LOADING_MESSAGES } from './interactiveLoading.js'
 
 function buildTTYDeps() {
   return {
@@ -578,8 +600,9 @@ function buildTTYDeps() {
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
+    getLoadingPromptBase: getInteractiveLoadingDisplayMessage,
     grayBoxLinesForSelectionMode,
-    isSelectionMode,
+    isInputBoxDisabledPlaceholderContext,
   }
 }
 

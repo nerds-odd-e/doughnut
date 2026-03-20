@@ -25,4 +25,6 @@ export type OutputAdapter = {
   beginCurrentPrompt?: () => void
   /** Optional: for /clear and resize. TTY provides a callback that clears and redraws. */
   clearAndRedraw?: () => void
+  /** TTY only: called when interactive loading state changes so the live region can repaint. */
+  notifyLoadingChanged?: () => void
 }

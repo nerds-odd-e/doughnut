@@ -14,7 +14,7 @@ When creating plans for building new functionality or change functionarlity, fol
 ## Testing Strategy
 
 - **E2E at high level** – Each phase has E2E tests that cover the main user behavior.
-- **UT for details and edge cases** – Unit tests cover formatting, error handling, invalid input, and exceptional paths.
+- **UT for details and edge cases** – Unit tests cover formatting, error handling, invalid input, and exceptional paths. Prefer unit test that is at top level, without looking at the internal state, and minimum test that ensures the full coverage.
 - **Test-driven** – Prefer writing tests first or alongside implementation.
 - **No final integration or test** – All changes within a phase is justify and tested within its own phase completely. No following up integration or test should be needed.
 - **No dead code** – Code must be needed by current E2E tests or UT covering edge cases. For normal cases, UT alone is not enough to justify keeping code.
@@ -23,6 +23,12 @@ When creating plans for building new functionality or change functionarlity, fol
 
 - **Clean up before moving on** – Remove any dead or unreachable code before the next phase.
 - **Deploy before next phase** – Commit, push, and let CD deploy before starting the next phase. This is typically done by the developer manually, unless instructed differently.
+- **Prefer Test-Driven Development** – Apply when adding or changing behavior. 
+  * Make sure the new or changed e2e test or unit test fail first by actually running it
+  * Make sure the test is failing for expected reason
+  * Make sure the failing message is clear with educational information. Improve the assertion or other aspects of the test if not.
+  * Use simplest, least intrusive solution to pass the test
+  * refactoring before continue 
 
 ## Interim Behaviors
 

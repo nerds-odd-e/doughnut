@@ -3,8 +3,11 @@ import { Writable } from 'node:stream'
 import type { AccessTokenEntry } from '../accessToken.js'
 import type { CommandDoc } from '../help.js'
 import {
+  formatLoadingPromptWithEllipsis,
   isCommittedInteractiveInput,
+  LOADING_FOREGROUND,
   wrapTextToLines,
+  type LiveRegionPaintOptions,
   type PlaceholderContext,
 } from '../renderer.js'
 import type { ChatHistory, McqRecallPending, OutputAdapter } from '../types.js'
@@ -58,7 +61,7 @@ export interface TTYDeps {
     currentPromptWrappedLines: string[],
     suggestionLines: string[],
     recallingIndicator: string[],
-    options?: { placeholderContext?: PlaceholderContext }
+    options?: LiveRegionPaintOptions
   ) => string[]
   needsGapBeforeBox: (
     history: ChatHistory,
@@ -72,7 +75,7 @@ export interface TTYDeps {
     suggestionLines: string[],
     recallingIndicator: string[],
     currentPromptLines?: string[],
-    options?: { placeholderContext?: PlaceholderContext }
+    options?: LiveRegionPaintOptions
   ) => string[]
   renderPastInput: (input: string, width: number) => string
   GREY: string
@@ -97,8 +100,9 @@ export interface TTYDeps {
   ) => string[]
   TOKEN_LIST_COMMANDS: Record<string, TokenListCommandConfig>
   getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
+  getLoadingPromptBase: () => string | null
   grayBoxLinesForSelectionMode: (lines: string[]) => string[]
-  isSelectionMode: (ctx: PlaceholderContext) => boolean
+  isInputBoxDisabledPlaceholderContext: (ctx: PlaceholderContext) => boolean
 }
 
 function cycleIndex(current: number, delta: number, length: number): number {
@@ -183,7 +187,8 @@ export async function runTTY(
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
-    isSelectionMode,
+    getLoadingPromptBase,
+    isInputBoxDisabledPlaceholderContext,
   } = deps
 
   const writeCurrentPromptLine = (msg: string) =>
@@ -232,6 +237,8 @@ export async function runTTY(
   let tokenHighlightIndex = 0
   let tokenListAction: TokenListAction = 'set-default'
   let mcqChoiceHighlightIndex = 0
+  let loadingEllipsisTick = 0
+  let loadingRepaintInterval: ReturnType<typeof setInterval> | null = null
 
   function endTokenListSelection(outputMsg: string) {
     const command = tokenListCommand
@@ -259,13 +266,24 @@ export async function runTTY(
       placeholderContext,
     })
     const pendingRecallAnswer = getPendingRecallAnswer()
-    const currentPromptText =
-      tokenListItems && tokenListCommand
-        ? TOKEN_LIST_COMMANDS[tokenListCommand]?.currentPrompt
-        : undefined
-    const currentPromptWrappedLines = currentPromptText
-      ? wrapTextToLines(currentPromptText, width)
-      : []
+    const loadingBase = getLoadingPromptBase()
+    let currentPromptWrappedLines: string[]
+    let currentPromptSgr: string | undefined
+    if (loadingBase) {
+      currentPromptWrappedLines = [
+        formatLoadingPromptWithEllipsis(loadingBase, loadingEllipsisTick),
+      ]
+      currentPromptSgr = LOADING_FOREGROUND
+    } else {
+      const currentPromptText =
+        tokenListItems && tokenListCommand
+          ? TOKEN_LIST_COMMANDS[tokenListCommand]?.currentPrompt
+          : undefined
+      currentPromptWrappedLines = currentPromptText
+        ? wrapTextToLines(currentPromptText, width)
+        : []
+      currentPromptSgr = undefined
+    }
     const currentPromptLines = currentPromptWrappedLines.length
       ? 1 + currentPromptWrappedLines.length
       : 0
@@ -296,6 +314,7 @@ export async function runTTY(
       suggestionLines,
       recallingIndicator,
       placeholderContext,
+      currentPromptSgr,
     }
   }
 
@@ -321,6 +340,7 @@ export async function runTTY(
       suggestionLines,
       recallingIndicator,
       placeholderContext,
+      currentPromptSgr,
     } = getDisplayContent()
     const liveLines = buildLiveRegionLines(
       buffer,
@@ -328,7 +348,7 @@ export async function runTTY(
       currentPromptWrappedLines,
       suggestionLines,
       recallingIndicator,
-      { placeholderContext }
+      { placeholderContext, currentPromptSgr }
     )
     const newTotalLines = liveLines.length
 
@@ -340,7 +360,7 @@ export async function runTTY(
       suggestionLines,
       recallingIndicator,
       currentPromptWrappedLines,
-      { placeholderContext }
+      { placeholderContext, currentPromptSgr }
     )
     for (const line of fullLines) {
       process.stdout.write(`${line}\n`)
@@ -351,7 +371,7 @@ export async function runTTY(
     livePaint.lastPaintedLineCount = newTotalLines
 
     process.stdout.write(`\x1b[${newTotalLines - inputRow}A`)
-    if (isSelectionMode(placeholderContext)) {
+    if (isInputBoxDisabledPlaceholderContext(placeholderContext)) {
       process.stdout.write(HIDE_CURSOR)
     } else {
       process.stdout.write(SHOW_CURSOR)
@@ -367,6 +387,7 @@ export async function runTTY(
       suggestionLines,
       recallingIndicator,
       placeholderContext,
+      currentPromptSgr,
     } = getDisplayContent()
     const liveLines = buildLiveRegionLines(
       buffer,
@@ -374,7 +395,7 @@ export async function runTTY(
       currentPromptWrappedLines,
       suggestionLines,
       recallingIndicator,
-      { placeholderContext }
+      { placeholderContext, currentPromptSgr }
     )
     const newTotalLines = liveLines.length
 
@@ -399,7 +420,7 @@ export async function runTTY(
     const totalWritten = Math.max(newTotalLines, livePaint.lastPaintedLineCount)
     const inputRow = inputRowFromTop(currentPromptLines, contentLines.length)
     process.stdout.write(`\x1b[${totalWritten - inputRow}A`)
-    if (isSelectionMode(placeholderContext)) {
+    if (isInputBoxDisabledPlaceholderContext(placeholderContext)) {
       process.stdout.write(HIDE_CURSOR)
     } else {
       process.stdout.write(SHOW_CURSOR)
@@ -434,6 +455,25 @@ export async function runTTY(
       suggestionsDismissed = false
       doFullRedraw()
     },
+    notifyLoadingChanged: () => {
+      const base = getLoadingPromptBase()
+      if (base) {
+        if (loadingRepaintInterval) clearInterval(loadingRepaintInterval)
+        loadingEllipsisTick = 0
+        drawBox()
+        loadingRepaintInterval = setInterval(() => {
+          loadingEllipsisTick = (loadingEllipsisTick + 1) % 3
+          drawBox()
+        }, 400)
+      } else {
+        if (loadingRepaintInterval) {
+          clearInterval(loadingRepaintInterval)
+          loadingRepaintInterval = null
+        }
+        loadingEllipsisTick = 0
+        drawBox()
+      }
+    },
   }
 
   drawBox()
@@ -441,6 +481,10 @@ export async function runTTY(
   process.stdout.on('resize', doFullRedraw)
   const removeResizeListener = () => process.stdout.off('resize', doFullRedraw)
   const doExit = () => {
+    if (loadingRepaintInterval) {
+      clearInterval(loadingRepaintInterval)
+      loadingRepaintInterval = null
+    }
     removeResizeListener()
     process.stdout.write(SHOW_CURSOR)
     rl.close()

@@ -1,4 +1,10 @@
-import { GREY, RESET, HIDE_CURSOR, SHOW_CURSOR } from './ansi.js'
+import {
+  GREY,
+  LOADING_FOREGROUND,
+  RESET,
+  HIDE_CURSOR,
+  SHOW_CURSOR,
+} from './ansi.js'
 import {
   filterCommandsByPrefix,
   formatCommandCompletionLines,
@@ -13,7 +19,7 @@ import { renderMarkdownToTerminal } from './markdown.js'
 import type { ChatHistory } from './types.js'
 import { formatVersionOutput } from './version.js'
 
-export { GREY, RESET, HIDE_CURSOR, SHOW_CURSOR }
+export { GREY, LOADING_FOREGROUND, RESET, HIDE_CURSOR, SHOW_CURSOR }
 
 /** Terminal column count; used for truncation and line width. */
 export type TerminalWidth = number
@@ -32,6 +38,7 @@ export const PROMPT = '→ '
 export type PlaceholderContext =
   | 'default'
   | 'tokenList'
+  | 'loading'
   | 'recallMcq'
   | 'recallStopConfirmation'
   | 'recallYesNo'
@@ -40,6 +47,7 @@ export type PlaceholderContext =
 export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
   default: '`exit` to quit.',
   tokenList: '↑↓ Enter to select; other keys cancel',
+  loading: 'loading ...',
   recallMcq: '↑↓ Enter or number to select; Esc to cancel',
   recallStopConfirmation: 'y or n; Esc to go back',
   recallYesNo: 'y or n; /stop to exit recall',
@@ -49,6 +57,22 @@ export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
 /** Selection mode: user selects from Current guidance via ↑↓ Enter; input box grayed, cursor hidden, no arrow. */
 export function isSelectionMode(ctx: PlaceholderContext): boolean {
   return ctx === 'tokenList'
+}
+
+/** Grey bordered input box, no →, hidden cursor — token list selection or async loading wait. */
+export function isInputBoxDisabledPlaceholderContext(
+  ctx: PlaceholderContext
+): boolean {
+  return ctx === 'tokenList' || ctx === 'loading'
+}
+
+/** Animated ellipsis phases for loading current prompt (`.`, `..`, `...`). */
+export function formatLoadingPromptWithEllipsis(
+  baseMessage: string,
+  tick: number
+): string {
+  const dots = ['.', '..', '...'][tick % 3]!
+  return `${baseMessage}${dots}`
 }
 
 /** Gray box lines for selection mode; ensures right border stays gray (replaces internal RESET with GREY). */
@@ -182,6 +206,11 @@ export interface BuildBoxLinesOptions {
   placeholderContext?: PlaceholderContext
 }
 
+export type LiveRegionPaintOptions = BuildBoxLinesOptions & {
+  /** SGR for current prompt lines above the input box; default grey. */
+  currentPromptSgr?: string
+}
+
 export function buildBoxLines(
   buffer: string,
   width: TerminalWidth,
@@ -191,7 +220,11 @@ export function buildBoxLines(
   const context = options?.placeholderContext ?? 'default'
   const placeholder = PLACEHOLDER_BY_CONTEXT[context]
   return bufferLines.map((line, i) => {
-    const prefix = isSelectionMode(context) ? '' : i === 0 ? PROMPT : '  '
+    const prefix = isInputBoxDisabledPlaceholderContext(context)
+      ? ''
+      : i === 0
+        ? PROMPT
+        : '  '
     if (i === 0 && buffer === '') {
       return `${prefix}${GREY}${placeholder}${RESET}`
     }
@@ -227,13 +260,14 @@ export function buildLiveRegionLines(
   currentPromptWrappedLines: string[],
   suggestionLines: string[],
   recallingIndicator: string[],
-  options?: BuildBoxLinesOptions
+  options?: LiveRegionPaintOptions
 ): string[] {
   const lines: string[] = []
+  const promptSgr = options?.currentPromptSgr ?? GREY
   if (currentPromptWrappedLines.length > 0) {
     lines.push(buildCurrentPromptSeparator(width))
     for (const line of currentPromptWrappedLines) {
-      lines.push(`${GREY}${line}${RESET}`)
+      lines.push(`${promptSgr}${line}${RESET}`)
     }
   }
   const rawBoxLines = renderBox(
@@ -241,7 +275,8 @@ export function buildLiveRegionLines(
     width
   ).split('\n')
   const boxLines =
-    options?.placeholderContext === 'tokenList'
+    options?.placeholderContext &&
+    isInputBoxDisabledPlaceholderContext(options.placeholderContext)
       ? grayBoxLinesForSelectionMode(rawBoxLines)
       : rawBoxLines
   lines.push(...boxLines)
@@ -308,7 +343,7 @@ export function renderFullDisplay(
   suggestionLines: string[],
   recallingIndicator: string[],
   currentPromptLines?: string[],
-  options?: BuildBoxLinesOptions
+  options?: LiveRegionPaintOptions
 ): string[] {
   const lines: string[] = [formatVersionOutput(), '']
   for (const entry of history) {
@@ -342,7 +377,8 @@ export function writeFullRedraw(
   buffer: string,
   width: TerminalWidth,
   suggestionLines: string[],
-  recallingIndicator: string[]
+  recallingIndicator: string[],
+  liveRegionOptions?: LiveRegionPaintOptions
 ): void {
   process.stdout.write(CLEAR_SCREEN)
   const lines = renderFullDisplay(
@@ -350,7 +386,9 @@ export function writeFullRedraw(
     buffer,
     width,
     suggestionLines,
-    recallingIndicator
+    recallingIndicator,
+    undefined,
+    liveRegionOptions
   )
   for (const line of lines) {
     process.stdout.write(`${line}\n`)

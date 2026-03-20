@@ -38,6 +38,7 @@ cli/
 | **Current guidance** | Interactive only. Options below the input box: / commands, token list, MCQ choices. |
 | **Input box** | The bordered area where the user types. |
 | **Selection mode** | Interactive only. User selects from Current guidance (e.g. token list) via ↑↓ Enter; input box is grayed, cursor hidden, no "→" prompt. Any other key cancels. |
+| **Loading (recall fetch)** | Interactive only. While `recallNext` is in flight (phase 1: `/recall` and recall continuation). **Current prompt** shows the loading line in **bright blue** foreground (`\x1b[94m` in `ansi.ts` as `LOADING_FOREGROUND`). **Input box** uses the same grey disabled treatment as selection mode (`isInputBoxDisabledPlaceholderContext`), placeholder `loading ...`. Animated `.` / `..` / `...` suffix on the current prompt only. |
 
 **E2E assertion steps**: Use `I should see X in the non-interactive output` for non-interactive (-c, piped). Use `I should see X in the history output` or `I should see X in the Current guidance` for interactive. Step definitions delegate to `cli.xxx` page objects; the `cliSectionParser` exports `getRecallDisplaySections`, `getHistoryOutputContent`, etc.
 
@@ -59,6 +60,8 @@ CLI e2e tests run TypeScript source locally, bundled in CI:
 **Non-interactive** (install-and-run, -c commands): Use `I run the doughnut command with input {string}` or `I run the doughnut command with -c {string}`; access-token steps use `I run doughnut -c /<command> with ...`; each When spawns a new process, pipes input, and captures stdout.
 
 Use `I should see X in the non-interactive output` for non-interactive; `I should see X in the history output` or `I should see X in the Current guidance` for interactive (hints, suggestions, recall prompts).
+
+**Loading UI (TTY):** Do not add Cypress E2E for transient loading lines — timing vs. PTY capture is flaky. Cover with `cli/tests/recallLoadingUi.test.ts` (`pnpm cli:test`).
 
 CLI page objects live in `e2e_test/start/pageObjects/cli/` and map to domain concepts: non-interactive output, history output, history input, current guidance. Use `cli.nonInteractiveOutput()`, `cli.historyOutput()`, `cli.currentGuidance()`, etc.
 
