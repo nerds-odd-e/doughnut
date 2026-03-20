@@ -41,6 +41,8 @@ cli/
 | **Selection mode** | Interactive only. User selects from Current guidance (e.g. token list) via ↑↓ Enter; input box is grayed, cursor hidden, no "→" prompt. Any other key cancels. |
 | **Interactive fetch wait** | Interactive only. While a slow command is awaited (recall fetch, `/contest`, `/recall-status`, async token params, Gmail/email, token list remove-completely). **Current prompt** uses **bright blue** `\x1b[94m` (`INTERACTIVE_FETCH_WAIT_PROMPT_FG`). **Input box** uses the same grey outline as token list pickers (`isGreyDisabledInputChrome`), placeholder context `interactiveFetchWait` / text `loading ...`. Animated `.` / `..` / `...` on the wait line. Copy: `INTERACTIVE_FETCH_WAIT_LINES` in `interactiveFetchWait.ts`. |
 
+**TTY command output:** In interactive TTY mode, `OutputAdapter.log` / `logError` do not write plain message lines to stdout directly. Text is buffered for `chatHistory`, then a **full redraw** (`doFullRedraw` → `renderFullDisplay`) runs after each completed command so scrollback and the live region stay in one paint. Incremental `drawBox` repaints only the live region (input box + Current prompt + guidance) between keystrokes or while the fetch-wait line animates.
+
 **E2E assertion steps**: Use `I should see X in the non-interactive output` for non-interactive (-c, piped). Use `I should see X in the history output` or `I should see X in the Current guidance` for interactive. Step definitions delegate to `cli.xxx` page objects; the `cliSectionParser` exports `getRecallDisplaySections`, `getHistoryOutputContent`, etc.
 
 ## Interactive vs non-interactive mode

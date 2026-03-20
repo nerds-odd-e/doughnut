@@ -155,8 +155,11 @@ function isSubmitKey(keyName: string): boolean {
 
 type ReadlineKey = Pick<readline.Key, 'name' | 'shift' | 'ctrl' | 'meta'>
 
-function writeError(err: unknown): void {
-  process.stdout.write(`${err instanceof Error ? err.message : String(err)}\n`)
+type TokenSelectionState = {
+  items: AccessTokenEntry[]
+  command: string
+  action: TokenListAction
+  highlightIndex: number
 }
 
 export async function runTTY(
@@ -244,29 +247,48 @@ export async function runTTY(
     cursorUpStepsToLiveRegionTop: 0,
     lastPaintedLineCount: 0,
   }
-  let tokenListItems: AccessTokenEntry[] | null = null
-  let tokenListCommand = ''
-  let tokenHighlightIndex = 0
-  let tokenListAction: TokenListAction = 'set-default'
+  let tokenSelection: TokenSelectionState | null = null
   let mcqChoiceHighlightIndex = 0
   const INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS = 400
   let interactiveFetchWaitEllipsisTick = 0
   let interactiveFetchWaitRepaintTimer: ReturnType<typeof setInterval> | null =
     null
 
-  function endTokenListSelection(outputMsg: string) {
-    const command = tokenListCommand
-    clearLiveRegionForRepaint(livePaint)
-    process.stdout.write(`${outputMsg}\n`)
-    chatHistory.push({ type: 'input', content: command })
-    chatHistory.push({ type: 'output', lines: [outputMsg] })
-    tokenListItems = null
-    tokenListCommand = ''
-    tokenHighlightIndex = 0
-    tokenListAction = 'set-default'
-    buffer = ''
+  function resetLivePaintCursor(): void {
+    livePaint.cursorUpStepsToLiveRegionTop = 0
     livePaint.lastPaintedLineCount = 0
-    drawBox()
+  }
+
+  function commitHistoryOutput(lines: readonly string[]): void {
+    chatHistory.push({ type: 'output', lines: [...lines] })
+    resetLivePaintCursor()
+    doFullRedraw()
+  }
+
+  function endTokenSelection(outputMsg: string) {
+    const command = tokenSelection?.command ?? ''
+    clearLiveRegionForRepaint(livePaint)
+    chatHistory.push({ type: 'input', content: command })
+    tokenSelection = null
+    buffer = ''
+    commitHistoryOutput([outputMsg])
+  }
+
+  function beginTokenSelection(
+    command: string,
+    action: TokenListAction,
+    items: AccessTokenEntry[]
+  ): void {
+    const defaultLabel = getDefaultTokenLabel()
+    tokenSelection = {
+      items,
+      command,
+      action,
+      highlightIndex: Math.max(
+        0,
+        items.findIndex((token) => token.label === defaultLabel)
+      ),
+    }
   }
 
   const collectedOutputLines: string[] = []
@@ -275,7 +297,7 @@ export async function runTTY(
   /** Builds lines for input box, recalling indicator, Current prompt (above box), and Current guidance (below box). */
   function getDisplayContent() {
     const width = getTerminalWidth()
-    const placeholderContext = getPlaceholderContext(!!tokenListItems)
+    const placeholderContext = getPlaceholderContext(!!tokenSelection)
     const contentLines = buildBoxLines(buffer, width, {
       placeholderContext,
     })
@@ -292,10 +314,9 @@ export async function runTTY(
       ]
       currentPromptSgr = INTERACTIVE_FETCH_WAIT_PROMPT_FG
     } else {
-      const currentPromptText =
-        tokenListItems && tokenListCommand
-          ? TOKEN_LIST_COMMANDS[tokenListCommand]?.currentPrompt
-          : undefined
+      const currentPromptText = tokenSelection
+        ? TOKEN_LIST_COMMANDS[tokenSelection.command]?.currentPrompt
+        : undefined
       currentPromptWrappedLines = currentPromptText
         ? wrapTextToLines(currentPromptText, width)
         : []
@@ -304,12 +325,12 @@ export async function runTTY(
     const currentPromptLines = currentPromptWrappedLines.length
       ? 1 + currentPromptWrappedLines.length
       : 0
-    const suggestionLines = tokenListItems
+    const suggestionLines = tokenSelection
       ? buildTokenListLines(
-          tokenListItems,
+          tokenSelection.items,
           getDefaultTokenLabel(),
           width,
-          tokenHighlightIndex
+          tokenSelection.highlightIndex
         )
       : isPendingRecallStopConfirmation()
         ? ['Stop recall? (y/n)']
@@ -476,21 +497,18 @@ export async function runTTY(
 
   ttyOutput = {
     log: (msg) => {
-      process.stdout.write(`${msg}\n`)
       collectedOutputLines.push(...msg.split('\n'))
     },
     logError: (err) => {
       const msg = err instanceof Error ? err.message : String(err)
-      writeError(err)
-      collectedOutputLines.push(msg)
+      collectedOutputLines.push(...msg.split('\n'))
     },
     writeCurrentPrompt: writeCurrentPromptLine,
     beginCurrentPrompt: doBeginCurrentPrompt,
     clearAndRedraw: () => {
       chatHistory = []
       buffer = ''
-      tokenListItems = null
-      tokenHighlightIndex = 0
+      tokenSelection = null
       if (isInRecallSubstate()) exitRecallMode()
       setPendingRecallStopConfirmation(false)
       mcqChoiceHighlightIndex = 0
@@ -551,11 +569,9 @@ export async function runTTY(
         if (isYes) {
           exitRecallMode()
           mcqChoiceHighlightIndex = 0
-          livePaint.cursorUpStepsToLiveRegionTop = 0
-          livePaint.lastPaintedLineCount = 0
-          process.stdout.write('Stopped recall\n')
           chatHistory.push({ type: 'input', content: trimmed })
-          chatHistory.push({ type: 'output', lines: ['Stopped recall'] })
+          commitHistoryOutput(['Stopped recall'])
+          return
         } else if (isNo) {
           // redraw below
         } else if (trimmed) {
@@ -619,8 +635,7 @@ export async function runTTY(
           doExit()
           return
         }
-        chatHistory.push({ type: 'output', lines: [...collectedOutputLines] })
-        drawBox()
+        commitHistoryOutput(collectedOutputLines)
       } else if (str && !key.ctrl && !key.meta) {
         buffer += str
         drawBox()
@@ -634,18 +649,19 @@ export async function runTTY(
       }
       return
     }
-    if (tokenListItems) {
+    if (tokenSelection) {
       if (key.name === 'up' || key.name === 'down') {
         const delta = key.name === 'up' ? -1 : 1
-        tokenHighlightIndex = cycleIndex(
-          tokenHighlightIndex,
+        tokenSelection.highlightIndex = cycleIndex(
+          tokenSelection.highlightIndex,
           delta,
-          tokenListItems.length
+          tokenSelection.items.length
         )
         drawBox()
       } else if (submitPressed && !key.shift) {
-        const selectedLabel = tokenListItems[tokenHighlightIndex]!.label
-        const action = tokenListAction
+        const selectedLabel =
+          tokenSelection.items[tokenSelection.highlightIndex]!.label
+        const action = tokenSelection.action
         let outputMsg = ''
         if (action === 'set-default') {
           setDefaultTokenLabel(selectedLabel)
@@ -665,14 +681,13 @@ export async function runTTY(
             if (isFetchAbortedByCaller(err)) {
               outputMsg = CLI_USER_ABORTED_WAIT_MESSAGE
             } else {
-              writeError(err)
               outputMsg = err instanceof Error ? err.message : String(err)
             }
           }
         }
-        endTokenListSelection(outputMsg)
+        endTokenSelection(outputMsg)
       } else {
-        endTokenListSelection(CLI_USER_ABORTED_WAIT_MESSAGE)
+        endTokenSelection(CLI_USER_ABORTED_WAIT_MESSAGE)
       }
       return
     }
@@ -681,8 +696,7 @@ export async function runTTY(
         exitRecallMode()
         buffer = ''
         mcqChoiceHighlightIndex = 0
-        livePaint.cursorUpStepsToLiveRegionTop = 0
-        livePaint.lastPaintedLineCount = 0
+        resetLivePaintCursor()
         drawBox()
         return
       }
@@ -710,8 +724,7 @@ export async function runTTY(
         if (trimmedInput === '/clear') {
           chatHistory = []
           buffer = ''
-          tokenListItems = null
-          tokenHighlightIndex = 0
+          tokenSelection = null
           if (isInRecallSubstate()) exitRecallMode()
           setPendingRecallStopConfirmation(false)
           mcqChoiceHighlightIndex = 0
@@ -741,30 +754,19 @@ export async function runTTY(
 
         clearLiveRegionForRepaint(livePaint)
 
-        if (isCommittedInteractiveInput(input)) {
-          process.stdout.write(renderPastInput(input, width))
-          process.stdout.write('\n')
-        }
-
         const tokenSelect = TOKEN_LIST_COMMANDS[trimmedInput] ?? null
         if (tokenSelect) {
           const tokens = listAccessTokens()
           if (tokens.length === 0) {
-            process.stdout.write('No access tokens stored.\n')
             chatHistory.push({ type: 'input', content: trimmedInput })
-            chatHistory.push({
-              type: 'output',
-              lines: ['No access tokens stored.'],
-            })
+            commitHistoryOutput(['No access tokens stored.'])
+            return
           } else {
-            tokenListItems = tokens
-            tokenListCommand = trimmedInput
-            tokenListAction = tokenSelect.action
-            const dl = getDefaultTokenLabel()
-            tokenHighlightIndex = Math.max(
-              0,
-              tokens.findIndex((t) => t.label === dl)
-            )
+            if (isCommittedInteractiveInput(input)) {
+              process.stdout.write(renderPastInput(input, width))
+              process.stdout.write('\n')
+            }
+            beginTokenSelection(trimmedInput, tokenSelect.action, tokens)
           }
           livePaint.lastPaintedLineCount = 0
           drawBox()
@@ -777,9 +779,8 @@ export async function runTTY(
           if (await processInput(input, ttyOutput)) {
             doExit()
           }
-          chatHistory.push({ type: 'output', lines: [...collectedOutputLines] })
-          livePaint.cursorUpStepsToLiveRegionTop = 0
-          livePaint.lastPaintedLineCount = 0
+          commitHistoryOutput(collectedOutputLines)
+          return
         }
         if (isMcqPrompt(getPendingRecallAnswer())) {
           mcqChoiceHighlightIndex = 0

@@ -1,6 +1,6 @@
 # CLI interactive: history placement, API errors, and user cancel
 
-Informal plan — **Phase 1 done** (Phases 2–5 pending).
+Informal plan — **Phases 1–2 done** (Phases 3–5 pending).
 
 ## Problems (from product + code)
 
@@ -72,7 +72,7 @@ Gmail / raw `http` in `cli/src/gmail.ts` is out of scope for `throwOnError`; onl
 - **`interactive.test.ts`**: unchanged (mocks recall at module level, not SDK `{ error }` returns).
 - **Regression**: Esc during **`/recall-status`** remains covered by **`interactiveFetchWait.test.ts`** (mock **`recallStatus`** rejects with **`userAbortError()`**); real path now uses SDK **`throwOnError`** + abort so **`recallStatus`** rejects instead of reporting **0 notes**.
 
-### Phase 2 — TTY: history-only emission for command output
+### Phase 2 — TTY: history-only emission for command output ✅
 
 - Change **`ttyOutput.log` / `logError`** (and any **`writeError`** paths that duplicate content) so **message lines are not written** in the adapter; **`drawBox`** after **`processInput`** is the source of truth for visible history.
 - Re-run **`pnpm cli:test`**; run **one** relevant Cypress spec (e.g. `cli_recall.feature`) to confirm **`history output`** assertions still pass.

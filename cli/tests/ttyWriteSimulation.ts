@@ -114,12 +114,17 @@ export function simulatedScreenFromTtyWrites(output: string): string {
   return lines.join('\n')
 }
 
+/** Counts runs of truly empty simulated lines (`""`), not space-only padding (e.g. grey past-input rows). */
 export function maxConsecutiveBlankLines(lines: string[]): number {
   let max = 0
   let curr = 0
   for (const l of lines) {
-    curr = l.trim() ? 0 : curr + 1
-    max = Math.max(max, curr)
+    if (l === '') {
+      curr += 1
+      max = Math.max(max, curr)
+    } else {
+      curr = 0
+    }
   }
   return max
 }

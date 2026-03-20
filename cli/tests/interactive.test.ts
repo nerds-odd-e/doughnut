@@ -1853,8 +1853,8 @@ describe('TTY token list interactive mode', () => {
     const blanks = maxConsecutiveBlankLines(beforeResult)
     expect(
       blanks,
-      `Expected no blank lines before result message (blank lines here appear as scrollback noise above the result). Got ${blanks}. Lines before result: ${JSON.stringify(beforeResult)}`
-    ).toBe(0)
+      `Expected at most one empty simulated line before result (full redraw uses renderPastInput + optional gap). Got ${blanks}. Lines before result: ${JSON.stringify(beforeResult)}`
+    ).toBeLessThanOrEqual(1)
   })
 
   test('/remove-access-token shows token list and Enter removes selected', async () => {
