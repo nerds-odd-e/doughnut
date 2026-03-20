@@ -1,8 +1,28 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { configureClient, getApiConfig, UserController } from 'doughnut-api'
+import {
+  configureClient,
+  getApiConfig,
+  UserController,
+  type GeneratedTokenDto,
+  type UserToken,
+} from 'doughnut-api'
 import { getConfigDir } from './configDir.js'
 import { isFetchAbortedByCaller } from './fetchAbort.js'
+
+/**
+ * For every call to the generated Doughnut HTTP client that runs inside
+ * {@link withBackendClient} / {@link runWithDefaultBackendClient}: non-OK responses and
+ * fetch failures throw instead of returning `{ error }`.
+ */
+export function doughnutSdkOptions(signal?: AbortSignal): {
+  throwOnError: true
+  signal?: AbortSignal
+} {
+  return signal === undefined
+    ? { throwOnError: true }
+    : { throwOnError: true, signal }
+}
 
 export interface AccessTokenEntry {
   label: string
@@ -21,8 +41,8 @@ function getConfigPath(): string {
 function loadConfig(): AccessTokenConfig {
   try {
     const data = fs.readFileSync(getConfigPath(), 'utf-8')
-    const parsed = JSON.parse(data) as AccessTokenConfig
-    return { tokens: [], ...parsed }
+    const parsed = JSON.parse(data) as Partial<AccessTokenConfig>
+    return { tokens: parsed.tokens ?? [], defaultLabel: parsed.defaultLabel }
   } catch {
     return { tokens: [] }
   }
@@ -64,21 +84,38 @@ export async function runWithDefaultBackendClient<T>(
   return withBackendClient(entry.token, fn)
 }
 
+/**
+ * Parses the JSON `data` field from a successful SDK response. Use only with calls that pass
+ * {@link doughnutSdkOptions} (so failures throw instead of returning an error envelope).
+ */
+export async function runDefaultBackendJson<T>(
+  fn: () => Promise<unknown>
+): Promise<T> {
+  const envelope = await runWithDefaultBackendClient(fn)
+  return (envelope as { data: T }).data
+}
+
+/** Like {@link runDefaultBackendJson}, but authenticates with the given bearer token string. */
+export async function withBackendJson<T>(
+  bearerToken: string,
+  fn: () => Promise<unknown>
+): Promise<T> {
+  const envelope = await withBackendClient(bearerToken, fn)
+  return (envelope as { data: T }).data
+}
+
 export async function addAccessToken(
   token: string,
   signal?: AbortSignal
 ): Promise<void> {
-  const result = await withBackendClient(token, () =>
-    UserController.getTokenInfo({ signal, throwOnError: true })
+  const identity = await withBackendJson<UserToken>(token, () =>
+    UserController.getTokenInfo(doughnutSdkOptions(signal))
   )
-  if (!result.data) {
-    throw new Error('Token is invalid or expired.')
-  }
   const config = loadConfig()
   if (config.tokens.some((t) => t.token === token)) {
     throw new Error('Token already added.')
   }
-  config.tokens.push({ label: result.data.label, token })
+  config.tokens.push({ label: identity.label, token })
   saveConfig(config)
 }
 
@@ -108,7 +145,7 @@ export async function removeAccessTokenCompletely(
     throw new Error(`Token "${label}" not found.`)
   }
   await withBackendClient(entry.token, () =>
-    UserController.revokeToken({ signal, throwOnError: true })
+    UserController.revokeToken(doughnutSdkOptions(signal))
   )
   removeAccessToken(label)
 }
@@ -143,17 +180,13 @@ export async function createAccessToken(
       'No default access token. Add one first with /add-access-token.'
     )
   }
-  const result = await withBackendClient(defaultEntry.token, () =>
+  const row = await withBackendJson<GeneratedTokenDto>(defaultEntry.token, () =>
     UserController.generateToken({
       body: { label },
-      signal,
-      throwOnError: true,
+      ...doughnutSdkOptions(signal),
     })
   )
-  if (!result.data) {
-    throw new Error('Failed to create token.')
-  }
-  config.tokens.push({ label: result.data.label, token: result.data.token })
+  config.tokens.push({ label: row.label, token: row.token })
   saveConfig(config)
 }
 

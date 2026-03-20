@@ -1,6 +1,6 @@
 # CLI interactive: history placement, API errors, and user cancel
 
-Informal plan — **Phase 1 done** (Phases 2–4 pending).
+Informal plan — **Phase 1 done** (Phases 2–5 pending).
 
 ## Problems (from product + code)
 
@@ -8,6 +8,7 @@ Informal plan — **Phase 1 done** (Phases 2–4 pending).
 2. **API / network failures** (and similar) can show **“0 notes to recall today”** instead of an error — same symptom as “server down”.
 3. **Esc during interactive fetch-wait** can show **“0 notes to recall today”** instead of a clear “cancelled by user” message — behaviour matches (2) because the root cause is the same.
 4. **Desired UX**: real errors → **history** with **dedicated style** (e.g. red). User-initiated cancel → **system message** in **history** (e.g. grey + italic), **same treatment for all** such cancellations.
+5. **Opaque failures**: after errors surface (Phase 1), the user still sees **one generic backend message** for distinct situations — **service unreachable**, **no token configured**, **token invalid / expired**, **403**, etc. — and cannot tell what to do next without reading logs.
 
 Note: the real command is **`/recall-status`** (hyphen), not `/recall_status`.
 
@@ -95,12 +96,32 @@ Inventory and align:
 | **`/contest`** / other **`runInteractiveFetchWait`** callers | **`logCancelledOrError`** | unchanged logic, **system** vs **error** styling |
 | Esc in recall substate / MCQ stop flow | mostly **no** history line | **optional**: one system line (“Recall cancelled” / “Cancelled”) for consistency — **confirm with product**; if out of scope, document as follow-up |
 
+### Phase 5 — Distinct user-facing messages (connectivity vs auth)
+
+**Goal:** When a command fails for a **known class** of reason, the **message in history** (or stderr for non-TTY if we extend there) should **name the situation** so the user knows whether to fix network, run `doughnut login`, refresh token, or contact support — not a single undifferentiated “backend error”.
+
+**Classify at least:**
+
+| Situation | Example signals | User-facing intent |
+|-----------|-----------------|-------------------|
+| **Service not available** | `ECONNREFUSED`, `ENOTFOUND`, timeouts, fetch failures without HTTP response | Backend unreachable or DNS wrong; check URL / VPN / server. |
+| **No access token** | Missing stored token when one is required for the operation | Configure or run login / token flow. |
+| **Access token invalid** | HTTP **401**, refresh failure, token rejected by API | Re-authenticate or regenerate token. |
+| **No permission** (optional same phase if small) | HTTP **403** | Distinct from “bad token” where the API distinguishes it. |
+
+**Implementation sketch:** Centralize mapping in one place (e.g. extend **`withBackendClient`** / a small **`cli/src/backendErrors.ts`** helper) that inspects **`cause`**, **`response.status`**, and existing token helpers in **`accessToken.ts`**. Reuse **`throwOnError`** thrown shapes from the generated client where they expose status.
+
+**Tests:** Unit tests in **`accessToken.test.ts`** / **`recall.test.ts`** (or a focused **`backendErrors.test.ts`**) with **mocked** network errors, 401, 403, and “no token” preconditions — assert **exact or stable substring** messages per class. E2E only if an existing CLI feature already asserts error text; avoid flaky network E2E.
+
+**Dependency:** Best after Phase 1 (failures are thrown, not silent). Can ship **after** Phase 2–3 so messages land in **styled** history, or **with** Phase 3 if error **kind** and **copy** are done together — prefer **one** phase that owns **copy + classification**; styling stays Phase 3 unless merged deliberately.
+
 ---
 
 ## Files likely touched (when implementing)
 
 - `cli/src/recall.ts` — `throwOnError`, no silent `data` fallback on failure  
-- `cli/src/accessToken.ts` — `throwOnError` on `UserController.*`  
+- `cli/src/accessToken.ts` — `throwOnError` on `UserController.*`; token presence / **`withBackendClient`** error mapping (Phase 5)  
+- `cli/src/backendErrors.ts` (or equivalent) — Phase 5: classify fetch vs HTTP status vs missing token → message  
 - `cli/src/adapters/ttyAdapter.ts` — log routing, possibly token-list **`writeError`** alignment  
 - `cli/src/types.ts` — `OutputAdapter`, `ChatHistoryOutputEntry`  
 - `cli/src/renderer.ts` — `renderFullDisplay` output line styling  
@@ -123,6 +144,7 @@ Inventory and align:
 
 1. **Exact copy** for system cancel: keep **`Cancelled by user.`** or standardize to **“Command cancelled by user.”** everywhere (token list + fetch-wait)?  
 2. **Esc exiting recall** (without fetch-wait): add a system line or leave silent?  
-3. **Server error body**: keep **`withBackendClient`** generic message only, or surface **`error`** payload when JSON (narrow follow-up)?
+3. **Server error body**: Phase 5 covers **classification + short user copy**; optional follow-up: append **safe** snippet from JSON **`error`** body when present (still no secrets).  
+4. **Exact strings** for Phase 5: agree copy for “service not available” vs “cannot reach server” etc. once and reuse in tests.
 
 When these are decided, update this doc and implement phase-by-phase per **`planning.mdc`** (tests first where practical).

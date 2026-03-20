@@ -2,10 +2,17 @@ import {
   MemoryTrackerController,
   RecallsController,
   RecallPromptController,
+  type DueMemoryTrackers,
+  type MemoryTracker,
   type MemoryTrackerLite,
+  type QuestionContestResult,
   type RecallPrompt,
 } from 'doughnut-api'
-import { runWithDefaultBackendClient } from './accessToken.js'
+import {
+  doughnutSdkOptions,
+  runDefaultBackendJson,
+  runWithDefaultBackendClient,
+} from './accessToken.js'
 import { userAbortError } from './fetchAbort.js'
 
 /**
@@ -49,26 +56,11 @@ async function awaitCliTestRecallLoadDelayIfConfigured(
   })
 }
 
-function getTimezone(): string {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone
-}
-
-function backendSdkOpts(signal?: AbortSignal) {
-  return { throwOnError: true as const, ...(signal ? { signal } : {}) }
-}
-
-export async function recallStatus(signal?: AbortSignal): Promise<string> {
-  const result = await runWithDefaultBackendClient(() =>
-    RecallsController.recalling({
-      query: { timezone: getTimezone(), dueindays: 0 },
-      ...backendSdkOpts(signal),
-    })
-  )
-  const count = result.data?.toRepeat?.length ?? 0
-  if (count === 1) {
-    return '1 note to recall today'
+function dueRecallQuery(dueindays: number) {
+  return {
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    dueindays,
   }
-  return `${count} notes to recall today`
 }
 
 export type RecallNextResult =
@@ -91,6 +83,49 @@ export type RecallNextResult =
       stem: string
     }
 
+/** MCQ or spelling turn in the terminal; `null` means use the “just review this note” path. */
+type RecallQuestionInTerminal = Extract<
+  RecallNextResult,
+  { type: 'mcq' | 'spelling' }
+>
+
+function recallQuestionForTerminal(
+  prompt: RecallPrompt | null | undefined
+): RecallQuestionInTerminal | null {
+  if (prompt == null) return null
+  if (prompt.questionType === 'MCQ' && prompt.multipleChoicesQuestion) {
+    const mcq = prompt.multipleChoicesQuestion
+    return {
+      type: 'mcq',
+      recallPromptId: prompt.id,
+      stem: mcq.f0__stem ?? '',
+      choices: mcq.f1__choices ?? [],
+    }
+  }
+  if (prompt.questionType === 'SPELLING') {
+    return {
+      type: 'spelling',
+      recallPromptId: prompt.id,
+      stem: prompt.spellingQuestion?.stem ?? '',
+    }
+  }
+  return null
+}
+
+export async function recallStatus(signal?: AbortSignal): Promise<string> {
+  const trackers = await runDefaultBackendJson<DueMemoryTrackers>(() =>
+    RecallsController.recalling({
+      query: dueRecallQuery(0),
+      ...doughnutSdkOptions(signal),
+    })
+  )
+  const count = trackers.toRepeat?.length ?? 0
+  if (count === 1) {
+    return '1 note to recall today'
+  }
+  return `${count} notes to recall today`
+}
+
 /**
  * Fetches the next recall prompt for the session.
  * When `abortSignal` is set (interactive fetch-wait for `/recall`), HTTP calls and optional
@@ -101,53 +136,36 @@ export async function recallNext(
   abortSignal?: AbortSignal
 ): Promise<RecallNextResult> {
   await awaitCliTestRecallLoadDelayIfConfigured(abortSignal)
-  const result = await runWithDefaultBackendClient(() =>
+  const opts = doughnutSdkOptions(abortSignal)
+  const trackers = await runDefaultBackendJson<DueMemoryTrackers>(() =>
     RecallsController.recalling({
-      query: { timezone: getTimezone(), dueindays },
-      ...backendSdkOpts(abortSignal),
+      query: dueRecallQuery(dueindays),
+      ...opts,
     })
   )
-  const toRepeat = result.data?.toRepeat ?? []
-  const first = toRepeat[0] as MemoryTrackerLite | undefined
+  const toRepeat = trackers.toRepeat ?? []
+  const first: MemoryTrackerLite | undefined = toRepeat[0]
   if (!first?.memoryTrackerId) {
     return { type: 'none', message: '0 notes to recall today' }
   }
 
-  const questionResult = await runWithDefaultBackendClient(() =>
+  const prompt = await runDefaultBackendJson<RecallPrompt | null>(() =>
     MemoryTrackerController.askAQuestion({
       path: { memoryTracker: first.memoryTrackerId },
-      ...backendSdkOpts(abortSignal),
+      ...opts,
     })
   )
-  const prompt = questionResult.data
-  if (prompt?.questionType === 'MCQ' && prompt.multipleChoicesQuestion) {
-    const mcq = prompt.multipleChoicesQuestion
-    const stem = mcq.f0__stem ?? ''
-    const choices = mcq.f1__choices ?? []
-    return {
-      type: 'mcq',
-      recallPromptId: prompt.id,
-      stem,
-      choices,
-    }
-  }
-  if (prompt?.questionType === 'SPELLING') {
-    const stem = prompt.spellingQuestion?.stem ?? ''
-    return {
-      type: 'spelling',
-      recallPromptId: prompt.id,
-      stem,
-    }
-  }
+  const question = recallQuestionForTerminal(prompt)
+  if (question) return question
 
-  const trackerResult = await runWithDefaultBackendClient(() =>
+  const trackerPayload = await runDefaultBackendJson<MemoryTracker>(() =>
     MemoryTrackerController.showMemoryTracker({
       path: { memoryTracker: first.memoryTrackerId },
-      ...backendSdkOpts(abortSignal),
+      ...opts,
     })
   )
-  const title = trackerResult.data?.note?.noteTopology?.title ?? 'Untitled note'
-  const details = trackerResult.data?.note?.details
+  const title = trackerPayload.note?.noteTopology?.title ?? 'Untitled note'
+  const details = trackerPayload.note?.details
   return {
     type: 'just-review',
     memoryTrackerId: first.memoryTrackerId,
@@ -164,7 +182,7 @@ export async function markAsRecalled(
     MemoryTrackerController.markAsRecalled({
       path: { memoryTracker: memoryTrackerId },
       query: { successful },
-      ...backendSdkOpts(),
+      ...doughnutSdkOptions(),
     })
   )
 }
@@ -174,15 +192,14 @@ export async function answerQuiz(
   choiceIndex: number,
   thinkingTimeMs?: number
 ): Promise<{ correct: boolean }> {
-  const result = await runWithDefaultBackendClient(() =>
+  const answered = await runDefaultBackendJson<RecallPrompt>(() =>
     RecallPromptController.answerQuiz({
       path: { recallPrompt: recallPromptId },
       body: { choiceIndex, ...(thinkingTimeMs != null && { thinkingTimeMs }) },
-      ...backendSdkOpts(),
+      ...doughnutSdkOptions(),
     })
   )
-  const correct = result.data?.answer?.correct ?? false
-  return { correct }
+  return { correct: answered.answer?.correct ?? false }
 }
 
 export async function answerSpelling(
@@ -190,75 +207,52 @@ export async function answerSpelling(
   spellingAnswer: string,
   thinkingTimeMs?: number
 ): Promise<{ correct: boolean }> {
-  const result = await runWithDefaultBackendClient(() =>
+  const answered = await runDefaultBackendJson<RecallPrompt>(() =>
     RecallPromptController.answerSpelling({
       path: { recallPrompt: recallPromptId },
       body: {
         spellingAnswer,
         ...(thinkingTimeMs != null && { thinkingTimeMs }),
       },
-      ...backendSdkOpts(),
+      ...doughnutSdkOptions(),
     })
   )
-  const correct = result.data?.answer?.correct ?? false
-  return { correct }
+  return { correct: answered.answer?.correct ?? false }
 }
 
-function recallPromptToResult(prompt: RecallPrompt): RecallNextResult | null {
-  if (prompt.questionType === 'MCQ' && prompt.multipleChoicesQuestion) {
-    const mcq = prompt.multipleChoicesQuestion
-    return {
-      type: 'mcq',
-      recallPromptId: prompt.id,
-      stem: mcq.f0__stem ?? '',
-      choices: mcq.f1__choices ?? [],
-    }
-  }
-  if (prompt.questionType === 'SPELLING') {
-    const stem = prompt.spellingQuestion?.stem ?? ''
-    return { type: 'spelling', recallPromptId: prompt.id, stem }
-  }
-  return null
-}
+type ContestRegenerateOutcome =
+  | { ok: true; result: RecallNextResult }
+  | { ok: false; message: string }
 
 export async function contestAndRegenerate(
   recallPromptId: number,
   signal?: AbortSignal
-): Promise<
-  { ok: true; result: RecallNextResult } | { ok: false; message: string }
-> {
-  const contestResult = await runWithDefaultBackendClient(() =>
+): Promise<ContestRegenerateOutcome> {
+  const opts = doughnutSdkOptions(signal)
+  const contest = await runDefaultBackendJson<QuestionContestResult>(() =>
     RecallPromptController.contest({
       path: { recallPrompt: recallPromptId },
-      ...backendSdkOpts(signal),
+      ...opts,
     })
   )
-  const data = contestResult.data
-  if (!data) {
-    return { ok: false, message: 'Contest failed' }
-  }
-  if (data.rejected) {
+  if (contest.rejected) {
     return {
       ok: false,
-      message: data.advice ?? 'Question could not be regenerated',
+      message: contest.advice ?? 'Question could not be regenerated',
     }
   }
-  const regenerateResult = await runWithDefaultBackendClient(() =>
+  const regenerated = await runDefaultBackendJson<RecallPrompt>(() =>
     RecallPromptController.regenerate({
       path: { recallPrompt: recallPromptId },
-      body: data,
-      ...backendSdkOpts(signal),
+      body: contest,
+      ...opts,
     })
   )
-  const regenerated = regenerateResult.data
-  if (!regenerated) {
-    return { ok: false, message: 'Regenerate failed' }
-  }
-  const result = recallPromptToResult(regenerated)
-  if (!result) {
+  const next = recallQuestionForTerminal(regenerated)
+  if (next == null) {
     return { ok: false, message: 'Unexpected question type' }
   }
-  return { ok: true, result }
+  return { ok: true, result: next }
 }
 
 export const recallCommandDocs = [

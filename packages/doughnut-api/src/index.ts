@@ -6,8 +6,13 @@ import {
   UserController,
 } from '@generated/doughnut-backend-api/sdk.gen'
 import type {
+  DueMemoryTrackers,
+  GeneratedTokenDto,
+  MemoryTracker,
   MemoryTrackerLite,
+  QuestionContestResult,
   RecallPrompt,
+  UserToken,
 } from '@generated/doughnut-backend-api'
 
 export function getApiConfig() {
@@ -31,4 +36,12 @@ export {
   RecallPromptController,
   UserController,
 }
-export type { MemoryTrackerLite, RecallPrompt }
+export type {
+  DueMemoryTrackers,
+  GeneratedTokenDto,
+  MemoryTracker,
+  MemoryTrackerLite,
+  QuestionContestResult,
+  RecallPrompt,
+  UserToken,
+}
