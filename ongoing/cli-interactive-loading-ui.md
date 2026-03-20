@@ -29,17 +29,18 @@ Informal requirement; delete or shrink once implemented.
 
 | Piece | Location |
 |------|-----------|
-| Wait + `AbortSignal` | `interactiveFetchWait.ts`: `runInteractiveFetchWait(..., fn(signal))`, `abortInteractiveFetchWait(output)` scoped to `OutputAdapter` |
-| TTY Esc | `ttyAdapter.ts`: Esc when wait line is `recallNext` → `abortInteractiveFetchWait(ttyOutput)` |
+| Recall load + `AbortSignal` | `interactiveFetchWait.ts`: `runRecallNextFetchWithWaitUi`, `inFlightRecallNextFetch` keyed by `OutputAdapter`; `RecallNextBackendFetch<T>` |
+| Other waits (no cancel yet) | `runInteractiveFetchWait` — `fn: () => Promise` only |
+| TTY Esc | `ttyAdapter.ts`: `cancelInFlightRecallNextFetchFor(ttyOutput)` returns whether Esc cancelled an in-flight recall-next fetch |
 | Recall API | `recall.ts`: `recallNext(due, signal?)` passes `signal` into recalling / askAQuestion / showMemoryTracker |
-| Abort vs generic error | `accessToken.ts`: `isAbortError`, `withBackendClient` rethrows abort |
-| User copy | `interactive.ts`: `Cancelled by user.` on abort in `/recall` and `continueRecallSession` |
+| Abort vs generic error | `fetchAbort.ts`: `isFetchAbortedByCaller`; `withBackendClient` rethrows that case |
+| User copy | `interactive.ts`: `handleRecallNextFetchError` → `Cancelled by user.` when fetch was aborted |
 
 ## Future phases
 
 | Phase | Scope |
 |-------|--------|
-| 3.x | Cancellable long waits — **3.1 done**; **3.2–3.3** below (`planning.mdc`). |
+| 3.x | **3.1** done (recall cancel). **3.2** next: CLI slow / testability for exploratory + stable tests. **3.3–3.4**: widen cancel + copy (`planning.mdc`). |
 
 ### Phase 3 (planned) — cancellable interactive fetch wait
 
@@ -77,11 +78,11 @@ Informal requirement; delete or shrink once implemented.
 
 ---
 
-#### Research: CLI wiring gaps today
+#### Research: CLI wiring (post–3.1 snapshot)
 
-- **`runInteractiveFetchWait`** (`interactiveFetchWait.ts`) only toggles visibility; the work is an opaque `() => Promise<T>` with **no `signal`**.
-- **`withBackendClient`** (`accessToken.ts`) uses `try/catch` that **rethrows a generic “service not available” for any failure**, which would **mask `AbortError`** and break cancel UX until abort is detected and rethrown (or a dedicated error type is used).
-- **TTY** (`ttyAdapter.ts`): `keypress` handler is `async` and **awaits** `processInput` / nested `runInteractiveFetchWait`. While waiting, **further keypresses can still be delivered** (overlapping async handlers are possible). Phase 3 should **define** behaviour: e.g. **Esc** during `getInteractiveFetchWaitLine() != null` → `abort()`, and optionally **ignore or queue** other keys during wait to avoid double-submit (existing risk worth noting).
+- **`runInteractiveFetchWait`** — wait chrome only, no abort. **`runRecallNextFetchWithWaitUi`** — recall-next load only, owns `AbortController` + `inFlightRecallNextFetch` per `OutputAdapter`.
+- **`withBackendClient`** — maps failures to “service unavailable” except **`isFetchAbortedByCaller`** (`fetchAbort.ts`).
+- **TTY** — Esc calls **`cancelInFlightRecallNextFetchFor`**; overlapping async keypress handlers during `await processInput` remain a product choice for later.
 
 ---
 
@@ -91,15 +92,24 @@ Split by **who can cancel what**, not by “plumbing layer then TTY layer.” Th
 
 1. **Phase 3.1 — Cancel one high-value read wait (end-to-end)** ✅  
    - **User scenario:** During **recall load** (`INTERACTIVE_FETCH_WAIT_LINES.recallNext`), user presses **Esc** → wait chrome clears, recall session ends, **“Cancelled by user.”** is logged (same line as token-list cancel).  
-   - **Implementation:** `runInteractiveFetchWait` creates an `AbortController` per wait, stored with the **active `OutputAdapter`** so parallel tests/sessions do not cross-abort. **`abortInteractiveFetchWait(ttyOutput)`** from TTY when Esc fires and wait line is `recallNext`. **`recallNext(due, signal?)`** passes `signal` into `RecallsController.recalling`, `MemoryTrackerController.askAQuestion`, and `showMemoryTracker`. **`withBackendClient`** rethrows **`AbortError`** / `DOMException` `AbortError` via **`isAbortError`**.  
-   - **Tests:** `interactiveFetchWait.test.ts` (`processInput` + `abortInteractiveFetchWait(out)`); `interactive.test.ts` TTY full-path **“TTY recall load wait — Esc cancels”**; `recall.test.ts` / `accessToken.test.ts` edges.
+   - **Implementation:** **`runRecallNextFetchWithWaitUi`** + **`cancelInFlightRecallNextFetchFor(output)`**; generic waits stay on **`runInteractiveFetchWait`**. **`recallNext(due, signal?)`**, **`isFetchAbortedByCaller`** / **`handleRecallNextFetchError`**.  
+   - **Tests:** `interactiveFetchWait.test.ts` (`cancelInFlightRecallNextFetchFor(out)`); `interactive.test.ts` **“TTY recall load wait — Esc cancels”**; `recall.test.ts` / `accessToken.test.ts` edges.
 
-2. **Phase 3.2 — Cancel applies to remaining interactive waits**  
+2. **Phase 3.2 — CLI testability: simulated slow recall load**  
+   - **Ordering:** Comes **before** 3.3 so exploratory runs and automation for **later** cancel phases do not depend on network luck.  
+   - **Why CLI-side (not backend):** Keeps production API and deploy surface unchanged; avoids Mountebank/backend test-only endpoints; any environment (local, CI, pointed at staging) can enable a **predictable pause** so the TTY shows **“Loading recall questions”** long enough to manually press Esc or to drive **stable post-conditions** (e.g. **“Cancelled by user.”**) without asserting animated ellipsis.  
+   - **Why it’s reasonable:** Phase 3.1 cancel is already proven with mocks; this phase closes the gap for **real transport + real TTY** exploratory runs and optional Cypress/Vitest “full path” checks.  
+   - **Safety / cohesion:** Single knob (prefer **`DOUGHNUT_CLI_*` env** and/or a **dev-only flag** documented in `CLAUDE.md` / `cli.mdc`), **off by default**, **no effect in bundled release** unless explicitly set (team choice: strip in release build or document “never set in prod”). Implement in **one place** (e.g. delay helper used only from **`recallNext`** or **`runWithDefaultBackendClient`** when the knob is set) so behaviour stays obvious.  
+   - **User scenario (when enabled):** Starting **`/recall`** (and optionally **`continueRecallSession`** recall load) waits an extra **configured duration** before the first recalling call returns (or before the SDK call runs — product choice), so cancel-during-load can be exercised reliably.  
+   - **Tests:** TDD: with knob on in test env, **Vitest** asserts Esc → **“Cancelled by user.”** without mocking `recallNext` internals (or a thin wrapper); optionally **one** Cypress `@interactiveCLI` scenario **only** if it asserts **stable** text after cancel, not loading dots. **Do not** add Cypress that races on transient wait lines (`cli.mdc`).  
+   - **Out of scope for 3.2:** Slowing arbitrary commands (that is **3.3+** if needed); changing backend timeouts; non-interactive `-c`.
+
+3. **Phase 3.3 — Cancel applies to remaining interactive waits**  
    - **User scenario:** Same Esc cancel works for other `runInteractiveFetchWait` entry points (contest, recall-status, token flows, Gmail, etc.).  
-   - **Implementation:** Generalize threading `signal` for each path; reuse one pattern (extend existing helpers; **generalize only after** 3.1 shows repetition per planning).  
+   - **Implementation:** Generalize threading `signal` for each path; reuse one pattern (extend existing helpers; **generalize only after** 3.1 shows repetition per planning). Use **3.2** slow mode for exploratory / stable checks where helpful.  
    - **Tests:** Extend the same E2E-shaped approach for **one additional** representative slow path if coverage would otherwise duplicate; remaining paths covered by unit tests **only where** they exercise non–happy-path or distinct branching.
 
-3. **Phase 3.3 (optional) — Copy / classification**  
+4. **Phase 3.4 (optional) — Copy / classification**  
    - **User scenario:** Where writes or multi-step flows make “cancel” misleading, history or prompt copy reflects **stopped waiting** vs implied rollback (see GET vs write table above).  
    - **Tests:** Unit or a small E2E assertion on the **final message string** if product adds distinct copy.
 
@@ -120,8 +130,8 @@ Split by **who can cancel what**, not by “plumbing layer then TTY layer.” Th
 - Non-interactive `-c` wait UX  
 - Cypress E2E for transient wait lines  
 - Progress percentage  
-- Broader cancellation (phase 3.2+) beyond recall load wait  
+- Broader cancellation (phase **3.3+**) beyond recall load wait  
 
 ---
 
-**Status:** Phases 1–2 done. **Phase 3.1 implemented** (recall load cancel). 3.2–3.3 pending.
+**Status:** Phases 1–2 done. **Phase 3.1 implemented** (recall load cancel). **3.2** (CLI slow / testability) next, not implemented. **3.3–3.4** pending after that.

@@ -2,6 +2,7 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { configureClient, getApiConfig, UserController } from 'doughnut-api'
 import { getConfigDir } from './configDir.js'
+import { isFetchAbortedByCaller } from './fetchAbort.js'
 
 export interface AccessTokenEntry {
   label: string
@@ -33,15 +34,6 @@ function saveConfig(config: AccessTokenConfig): void {
   fs.writeFileSync(p, JSON.stringify(config, null, 2), 'utf-8')
 }
 
-export function isAbortError(e: unknown): boolean {
-  return (
-    (typeof DOMException !== 'undefined' &&
-      e instanceof DOMException &&
-      e.name === 'AbortError') ||
-    (e instanceof Error && e.name === 'AbortError')
-  )
-}
-
 async function withBackendClient<T>(
   token: string,
   fn: () => Promise<T>
@@ -51,7 +43,7 @@ async function withBackendClient<T>(
   try {
     return await fn()
   } catch (e) {
-    if (isAbortError(e)) throw e
+    if (isFetchAbortedByCaller(e)) throw e
     throw new Error(
       'Doughnut service is not available. Check DOUGHNUT_API_BASE_URL and ensure the service is running.'
     )

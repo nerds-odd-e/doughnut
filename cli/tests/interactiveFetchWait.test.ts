@@ -5,7 +5,7 @@ import {
   resetRecallStateForTesting,
   runInteractiveFetchWait,
 } from '../src/interactive.js'
-import { abortInteractiveFetchWait } from '../src/interactiveFetchWait.js'
+import { cancelInFlightRecallNextFetchFor } from '../src/interactiveFetchWait.js'
 import {
   buildBoxLines,
   buildLiveRegionLines,
@@ -169,7 +169,7 @@ describe('interactive fetch wait UI', () => {
       runInteractiveFetchWait(
         out,
         INTERACTIVE_FETCH_WAIT_LINES.recallNext,
-        async (_signal) => {
+        async () => {
           throw new Error('fail')
         }
       )
@@ -193,7 +193,7 @@ describe('interactive fetch wait UI', () => {
     await vi.waitFor(() =>
       expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalled()
     )
-    abortInteractiveFetchWait(out)
+    expect(cancelInFlightRecallNextFetchFor(out)).toBe(true)
     await done
     expect(out.log).toHaveBeenCalledWith('Cancelled by user.')
     expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)

@@ -44,6 +44,10 @@ export type RecallNextResult =
       stem: string
     }
 
+/**
+ * Fetches the next recall prompt for the session. When `signal` is provided (CLI recall load with
+ * wait UI), the in-flight HTTP calls honour it so the user can cancel with Esc.
+ */
 export async function recallNext(
   dueindays = 0,
   signal?: AbortSignal

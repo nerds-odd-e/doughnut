@@ -5,12 +5,12 @@ import {
   createAccessToken,
   formatTokenLines,
   getDefaultTokenLabel,
-  isAbortError,
   listAccessTokens,
   removeAccessToken,
   removeAccessTokenCompletely,
   setDefaultTokenLabel,
 } from './accessToken.js'
+import { isFetchAbortedByCaller } from './fetchAbort.js'
 import { addGmailAccount, getLastEmailSubject } from './gmail.js'
 import {
   filterCommandsByPrefix,
@@ -34,6 +34,7 @@ import {
   INTERACTIVE_FETCH_WAIT_LINES,
   resetInteractiveFetchWaitForTesting,
   runInteractiveFetchWait,
+  runRecallNextFetchWithWaitUi,
   type InteractiveFetchWaitLine,
 } from './interactiveFetchWait.js'
 import { formatVersionOutput } from './version.js'
@@ -264,6 +265,16 @@ const PARAM_COMMANDS: ParamCommand[] = [
   },
 ]
 
+/** After `runRecallNextFetchWithWaitUi` throws: end recall mode and show cancel vs backend error. */
+function handleRecallNextFetchError(err: unknown, output: OutputAdapter): void {
+  endRecallSession()
+  if (isFetchAbortedByCaller(err)) {
+    output.log('Cancelled by user.')
+  } else {
+    output.logError(err)
+  }
+}
+
 async function handleParamCommand(
   trimmed: string,
   output: OutputAdapter
@@ -277,10 +288,8 @@ async function handleParamCommand(
     }
     try {
       const msg = entry.fetchWaitLine
-        ? await runInteractiveFetchWait(
-            output,
-            entry.fetchWaitLine,
-            (_signal) => Promise.resolve(entry.run(param))
+        ? await runInteractiveFetchWait(output, entry.fetchWaitLine, () =>
+            Promise.resolve(entry.run(param))
           )
         : await Promise.resolve(entry.run(param))
       if (msg) output.log(msg)
@@ -299,10 +308,8 @@ async function continueRecallSession(
 ): Promise<void> {
   if (!fromLoadMore) sessionRecallCount++
   try {
-    const result = await runInteractiveFetchWait(
-      output,
-      INTERACTIVE_FETCH_WAIT_LINES.recallNext,
-      (signal) => recallNext(recallSessionDueDays, signal)
+    const result = await runRecallNextFetchWithWaitUi(output, (signal) =>
+      recallNext(recallSessionDueDays, signal)
     )
     if (result.type === 'none') {
       if (recallSessionDueDays === 0) {
@@ -317,12 +324,7 @@ async function continueRecallSession(
     }
     showRecallPrompt(result, output, writeCurrentPrompt)
   } catch (err) {
-    endRecallSession()
-    if (isAbortError(err)) {
-      output.log('Cancelled by user.')
-    } else {
-      output.logError(err)
-    }
+    handleRecallNextFetchError(err, output)
   }
 }
 
@@ -375,7 +377,7 @@ export async function processInput(
       const outcome = await runInteractiveFetchWait(
         output,
         INTERACTIVE_FETCH_WAIT_LINES.contest,
-        (_signal) => contestAndRegenerate(contestablePromptId)
+        () => contestAndRegenerate(contestablePromptId)
       )
       if (!outcome.ok) {
         output.log(outcome.message)
@@ -426,7 +428,7 @@ export async function processInput(
       await runInteractiveFetchWait(
         output,
         INTERACTIVE_FETCH_WAIT_LINES.addGmail,
-        (_signal) => addGmailAccount()
+        () => addGmailAccount()
       )
     } catch (err) {
       output.logError(err)
@@ -438,7 +440,7 @@ export async function processInput(
       const subject = await runInteractiveFetchWait(
         output,
         INTERACTIVE_FETCH_WAIT_LINES.lastEmail,
-        (_signal) => getLastEmailSubject()
+        () => getLastEmailSubject()
       )
       output.log(subject)
     } catch (err) {
@@ -540,7 +542,7 @@ export async function processInput(
       const message = await runInteractiveFetchWait(
         output,
         INTERACTIVE_FETCH_WAIT_LINES.recallStatus,
-        (_signal) => recallStatus()
+        () => recallStatus()
       )
       output.log(message)
     } catch (err) {
@@ -553,10 +555,8 @@ export async function processInput(
       recallSessionMode = true
       sessionRecallCount = 0
       recallSessionDueDays = 0
-      const result = await runInteractiveFetchWait(
-        output,
-        INTERACTIVE_FETCH_WAIT_LINES.recallNext,
-        (signal) => recallNext(0, signal)
+      const result = await runRecallNextFetchWithWaitUi(output, (signal) =>
+        recallNext(0, signal)
       )
       if (result.type === 'none') {
         pendingRecallLoadMore = true
@@ -570,12 +570,7 @@ export async function processInput(
         )
       }
     } catch (err) {
-      endRecallSession()
-      if (isAbortError(err)) {
-        output.log('Cancelled by user.')
-      } else {
-        output.logError(err)
-      }
+      handleRecallNextFetchError(err, output)
     }
     return false
   }
