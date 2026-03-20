@@ -225,6 +225,17 @@ describe('access token management', () => {
       )
     })
 
+    test('rethrows AbortError from revokeToken', async () => {
+      mockGetTokenInfo('MyToken')
+      await addAccessToken('secret-token')
+      vi.mocked(UserController.revokeToken).mockRejectedValueOnce(
+        new DOMException('Aborted', 'AbortError')
+      )
+      await expect(
+        removeAccessTokenCompletely('MyToken')
+      ).rejects.toMatchObject({ name: 'AbortError' })
+    })
+
     test('throws when server is not available', async () => {
       mockGetTokenInfo('MyToken')
       vi.mocked(UserController.revokeToken).mockRejectedValueOnce(

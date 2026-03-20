@@ -207,6 +207,27 @@ describe('recallNext', () => {
     )
   })
 
+  test('recallNext rejects when AbortSignal aborts during recalling', async () => {
+    vi.mocked(RecallsController.recalling).mockImplementation(
+      ({ signal }: { signal?: AbortSignal }) =>
+        new Promise((_resolve, reject) => {
+          const fail = () =>
+            reject(new DOMException('The operation was aborted', 'AbortError'))
+          if (signal?.aborted) fail()
+          else signal?.addEventListener('abort', fail, { once: true })
+        })
+    )
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const ac = new AbortController()
+    const p = recallNext(0, ac.signal)
+    ac.abort()
+    await expect(p).rejects.toMatchObject({ name: 'AbortError' })
+  })
+
   test('returns none when dueindays 3 has no notes', async () => {
     vi.mocked(RecallsController.recalling).mockResolvedValue({
       data: { toRepeat: [] },

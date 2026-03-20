@@ -5,6 +5,7 @@ import {
   resetRecallStateForTesting,
   runInteractiveFetchWait,
 } from '../src/interactive.js'
+import { abortInteractiveFetchWait } from '../src/interactiveFetchWait.js'
 import {
   buildBoxLines,
   buildLiveRegionLines,
@@ -99,7 +100,7 @@ describe('interactive fetch wait UI', () => {
   test('processInput /recall signals TTY once when recall fetch starts and once when it ends', async () => {
     let resolveRecall!: (value: RecallNextResult) => void
     mockRecallNext.mockImplementation(
-      () =>
+      (_due, _signal) =>
         new Promise<RecallNextResult>((resolve) => {
           resolveRecall = resolve
         })
@@ -168,11 +169,33 @@ describe('interactive fetch wait UI', () => {
       runInteractiveFetchWait(
         out,
         INTERACTIVE_FETCH_WAIT_LINES.recallNext,
-        async () => {
+        async (_signal) => {
           throw new Error('fail')
         }
       )
     ).rejects.toThrow('fail')
+    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
+  })
+
+  test('/recall: abort during recall load logs cancellation and clears wait', async () => {
+    mockRecallNext.mockImplementation((_due, signal) => {
+      return new Promise<RecallNextResult>((_resolve, reject) => {
+        const onAbort = () => reject(new DOMException('Aborted', 'AbortError'))
+        if (signal?.aborted) {
+          onAbort()
+          return
+        }
+        signal?.addEventListener('abort', onAbort, { once: true })
+      })
+    })
+    const out = outputAdapter()
+    const done = processInput('/recall', out)
+    await vi.waitFor(() =>
+      expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalled()
+    )
+    abortInteractiveFetchWait(out)
+    await done
+    expect(out.log).toHaveBeenCalledWith('Cancelled by user.')
     expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
   })
 })

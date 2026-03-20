@@ -44,10 +44,15 @@ export type RecallNextResult =
       stem: string
     }
 
-export async function recallNext(dueindays = 0): Promise<RecallNextResult> {
+export async function recallNext(
+  dueindays = 0,
+  signal?: AbortSignal
+): Promise<RecallNextResult> {
+  const opt = signal ? { signal } : {}
   const result = await runWithDefaultBackendClient(() =>
     RecallsController.recalling({
       query: { timezone: getTimezone(), dueindays },
+      ...opt,
     })
   )
   const toRepeat = result.data?.toRepeat ?? []
@@ -59,6 +64,7 @@ export async function recallNext(dueindays = 0): Promise<RecallNextResult> {
   const questionResult = await runWithDefaultBackendClient(() =>
     MemoryTrackerController.askAQuestion({
       path: { memoryTracker: first.memoryTrackerId },
+      ...opt,
     })
   )
   const prompt = questionResult.data
@@ -85,6 +91,7 @@ export async function recallNext(dueindays = 0): Promise<RecallNextResult> {
   const trackerResult = await runWithDefaultBackendClient(() =>
     MemoryTrackerController.showMemoryTracker({
       path: { memoryTracker: first.memoryTrackerId },
+      ...opt,
     })
   )
   const title = trackerResult.data?.note?.noteTopology?.title ?? 'Untitled note'

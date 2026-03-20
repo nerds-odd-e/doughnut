@@ -33,6 +33,15 @@ function saveConfig(config: AccessTokenConfig): void {
   fs.writeFileSync(p, JSON.stringify(config, null, 2), 'utf-8')
 }
 
+export function isAbortError(e: unknown): boolean {
+  return (
+    (typeof DOMException !== 'undefined' &&
+      e instanceof DOMException &&
+      e.name === 'AbortError') ||
+    (e instanceof Error && e.name === 'AbortError')
+  )
+}
+
 async function withBackendClient<T>(
   token: string,
   fn: () => Promise<T>
@@ -41,7 +50,8 @@ async function withBackendClient<T>(
   configureClient(apiBaseUrl, token)
   try {
     return await fn()
-  } catch {
+  } catch (e) {
+    if (isAbortError(e)) throw e
     throw new Error(
       'Doughnut service is not available. Check DOUGHNUT_API_BASE_URL and ensure the service is running.'
     )

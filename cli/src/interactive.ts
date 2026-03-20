@@ -5,6 +5,7 @@ import {
   createAccessToken,
   formatTokenLines,
   getDefaultTokenLabel,
+  isAbortError,
   listAccessTokens,
   removeAccessToken,
   removeAccessTokenCompletely,
@@ -276,8 +277,10 @@ async function handleParamCommand(
     }
     try {
       const msg = entry.fetchWaitLine
-        ? await runInteractiveFetchWait(output, entry.fetchWaitLine, () =>
-            Promise.resolve(entry.run(param))
+        ? await runInteractiveFetchWait(
+            output,
+            entry.fetchWaitLine,
+            (_signal) => Promise.resolve(entry.run(param))
           )
         : await Promise.resolve(entry.run(param))
       if (msg) output.log(msg)
@@ -299,7 +302,7 @@ async function continueRecallSession(
     const result = await runInteractiveFetchWait(
       output,
       INTERACTIVE_FETCH_WAIT_LINES.recallNext,
-      () => recallNext(recallSessionDueDays)
+      (signal) => recallNext(recallSessionDueDays, signal)
     )
     if (result.type === 'none') {
       if (recallSessionDueDays === 0) {
@@ -315,7 +318,11 @@ async function continueRecallSession(
     showRecallPrompt(result, output, writeCurrentPrompt)
   } catch (err) {
     endRecallSession()
-    output.logError(err)
+    if (isAbortError(err)) {
+      output.log('Cancelled by user.')
+    } else {
+      output.logError(err)
+    }
   }
 }
 
@@ -368,7 +375,7 @@ export async function processInput(
       const outcome = await runInteractiveFetchWait(
         output,
         INTERACTIVE_FETCH_WAIT_LINES.contest,
-        () => contestAndRegenerate(contestablePromptId)
+        (_signal) => contestAndRegenerate(contestablePromptId)
       )
       if (!outcome.ok) {
         output.log(outcome.message)
@@ -419,7 +426,7 @@ export async function processInput(
       await runInteractiveFetchWait(
         output,
         INTERACTIVE_FETCH_WAIT_LINES.addGmail,
-        () => addGmailAccount()
+        (_signal) => addGmailAccount()
       )
     } catch (err) {
       output.logError(err)
@@ -431,7 +438,7 @@ export async function processInput(
       const subject = await runInteractiveFetchWait(
         output,
         INTERACTIVE_FETCH_WAIT_LINES.lastEmail,
-        () => getLastEmailSubject()
+        (_signal) => getLastEmailSubject()
       )
       output.log(subject)
     } catch (err) {
@@ -533,7 +540,7 @@ export async function processInput(
       const message = await runInteractiveFetchWait(
         output,
         INTERACTIVE_FETCH_WAIT_LINES.recallStatus,
-        () => recallStatus()
+        (_signal) => recallStatus()
       )
       output.log(message)
     } catch (err) {
@@ -549,7 +556,7 @@ export async function processInput(
       const result = await runInteractiveFetchWait(
         output,
         INTERACTIVE_FETCH_WAIT_LINES.recallNext,
-        () => recallNext(0)
+        (signal) => recallNext(0, signal)
       )
       if (result.type === 'none') {
         pendingRecallLoadMore = true
@@ -564,7 +571,11 @@ export async function processInput(
       }
     } catch (err) {
       endRecallSession()
-      output.logError(err)
+      if (isAbortError(err)) {
+        output.log('Cancelled by user.')
+      } else {
+        output.logError(err)
+      }
     }
     return false
   }

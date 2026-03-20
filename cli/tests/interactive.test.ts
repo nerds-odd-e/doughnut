@@ -388,7 +388,7 @@ describe('processInput', () => {
     expect(logSpy).toHaveBeenCalledWith(
       expect.stringContaining('Load more from next 3 days? (y/n)')
     )
-    expect(mockRecallNext).toHaveBeenCalledWith(0)
+    expect(mockRecallNext).toHaveBeenCalledWith(0, expect.any(AbortSignal))
   })
 
   test('/recall load more: user says n, shows 0 notes to recall today', async () => {
@@ -428,8 +428,16 @@ describe('processInput', () => {
     logSpy.mockClear()
 
     await processInput('y')
-    expect(mockRecallNext).toHaveBeenNthCalledWith(1, 0)
-    expect(mockRecallNext).toHaveBeenNthCalledWith(2, 3)
+    expect(mockRecallNext).toHaveBeenNthCalledWith(
+      1,
+      0,
+      expect.any(AbortSignal)
+    )
+    expect(mockRecallNext).toHaveBeenNthCalledWith(
+      2,
+      3,
+      expect.any(AbortSignal)
+    )
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Future note'))
     expect(logSpy).toHaveBeenCalledWith(
       expect.stringContaining('Yes, I remember? (y/n)')
@@ -2037,6 +2045,49 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     pressKey(stdin, 'escape')
     await tick()
 
+    expect(isInRecallSubstate()).toBe(false)
+  })
+})
+
+describe('TTY recall load wait — Esc cancels', () => {
+  let writeSpy: ReturnType<typeof vi.spyOn>
+  let stdin: TTYStdin
+
+  beforeEach(async () => {
+    resetRecallStateForTesting()
+    mockRecallNext.mockReset()
+    mockRecallNext.mockImplementation((_due, signal) => {
+      return new Promise((_resolve, reject) => {
+        signal?.addEventListener(
+          'abort',
+          () => reject(new DOMException('Aborted', 'AbortError')),
+          { once: true }
+        )
+      })
+    })
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
+    vi.spyOn(process, 'exit').mockImplementation(
+      (() => undefined) as unknown as typeof process.exit
+    )
+    stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await tick()
+  })
+
+  afterEach(() => {
+    pressKey(stdin, 'c', { ctrl: true })
+    vi.restoreAllMocks()
+  })
+
+  test('Esc aborts recall fetch and shows Cancelled by user.', async () => {
+    await submitTTYCommand(stdin, '/recall')
+    await tick()
+    pressKey(stdin, 'escape')
+    await tick()
+    await vi.waitFor(() =>
+      expect(ttyOutput(writeSpy)).toContain('Cancelled by user.')
+    )
     expect(isInRecallSubstate()).toBe(false)
   })
 })

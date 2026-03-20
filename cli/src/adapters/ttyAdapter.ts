@@ -4,6 +4,7 @@ import type { AccessTokenEntry } from '../accessToken.js'
 import type { CommandDoc } from '../help.js'
 import {
   INTERACTIVE_FETCH_WAIT_LINES,
+  abortInteractiveFetchWait,
   type InteractiveFetchWaitLine,
 } from '../interactiveFetchWait.js'
 import {
@@ -108,7 +109,7 @@ export interface TTYDeps {
   runInteractiveFetchWait: <T>(
     output: OutputAdapter,
     line: InteractiveFetchWaitLine,
-    fn: () => Promise<T>
+    fn: (signal: AbortSignal) => Promise<T>
   ) => Promise<T>
   isGreyDisabledInputChrome: (ctx: PlaceholderContext) => boolean
 }
@@ -511,6 +512,14 @@ export async function runTTY(
       process.stdout.write(`\x1b[${1}B\r\n`)
       doExit()
     }
+    if (
+      key.name === 'escape' &&
+      getInteractiveFetchWaitLine() === INTERACTIVE_FETCH_WAIT_LINES.recallNext
+    ) {
+      abortInteractiveFetchWait(ttyOutput)
+      drawBox()
+      return
+    }
     if (isPendingRecallStopConfirmation()) {
       if (key.name === 'escape') {
         setPendingRecallStopConfirmation(false)
@@ -633,7 +642,7 @@ export async function runTTY(
             await runInteractiveFetchWait(
               ttyOutput,
               INTERACTIVE_FETCH_WAIT_LINES.removeAccessTokenCompletely,
-              () => removeAccessTokenCompletely(selectedLabel)
+              (_signal) => removeAccessTokenCompletely(selectedLabel)
             )
             outputMsg = `Token "${selectedLabel}" removed locally and from server.`
           } catch (err) {
