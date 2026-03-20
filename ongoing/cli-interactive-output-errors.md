@@ -1,6 +1,6 @@
 # CLI interactive: history placement, API errors, and user cancel
 
-Informal plan — **Phases 1–3 done** (Phases 4–5 pending).
+Informal plan — **Phases 1–4 done** (Phase 5 pending).
 
 ## Problems (from product + code)
 
@@ -85,7 +85,7 @@ Gmail / raw `http` in `cli/src/gmail.ts` is out of scope for `throwOnError`; onl
 - Token list Esc / cancel: same **`userNotice`** tone and copy as fetch-wait cancel (`commitTokenListResult`).
 - **E2E / Vitest**: prefer **Vitest** on renderer or adapter for ANSI presence; extend **`cliSectionParser`** or add a small **raw history** assertion only if E2E must see grey italic / red (avoid flaky loading lines per existing rule).
 
-### Phase 4 — Cancel audit (same semantics + style)
+### Phase 4 — Cancel audit (same semantics + style) ✅
 
 Inventory and align:
 
@@ -94,7 +94,11 @@ Inventory and align:
 | Esc during **`runInteractiveFetchWait`** | abort controller | system message (after Phases 1–3) |
 | Token list: non-Enter exit | **`endTokenListSelection(CLI_USER_ABORTED_WAIT_MESSAGE)`** | same copy, **system** kind |
 | **`/contest`** / other **`runInteractiveFetchWait`** callers | **`logCancelledOrError`** | unchanged logic, **system** vs **error** styling |
-| Esc in recall substate / MCQ stop flow | mostly **no** history line | **optional**: one system line (“Recall cancelled” / “Cancelled”) for consistency — **confirm with product**; if out of scope, document as follow-up |
+| Esc in recall substate / MCQ stop flow | mostly **no** history line | kept as-is for now (silent exit / stop confirmation path); optional follow-up to add one system line only after product copy decision |
+
+Phase 4 implementation note:
+
+- Added cancellation regression tests for `/contest` (unit + TTY): Esc/abort now verified to use the same `Cancelled by user.` user-notice path as other interactive fetch waits.
 
 ### Phase 5 — Distinct user-facing messages (connectivity vs auth)
 

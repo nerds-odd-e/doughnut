@@ -721,6 +721,27 @@ describe('processInput', () => {
     expect(logSpy).toHaveBeenCalledWith('Question could not be regenerated')
     expect(isInRecallSubstate()).toBe(true)
   })
+
+  test('/contest abort logs Cancelled by user. as user notice', async () => {
+    mockRecallNext.mockResolvedValue({
+      type: 'mcq',
+      recallPromptId: 100,
+      stem: 'Q?',
+      choices: ['A', 'B'],
+    })
+    mockContestAndRegenerate.mockRejectedValue(userAbortError())
+    const output = {
+      log: vi.fn(),
+      logError: vi.fn(),
+      logUserNotice: vi.fn(),
+    }
+
+    await processInput('/recall', output)
+    await processInput('/contest', output)
+
+    expect(output.logUserNotice).toHaveBeenCalledWith('Cancelled by user.')
+    expect(output.logError).not.toHaveBeenCalled()
+  })
 })
 
 describe('visibleLength', () => {
@@ -2144,5 +2165,54 @@ describe('TTY recall-status wait — Esc cancels', () => {
     await vi.waitFor(() =>
       expect(ttyOutput(writeSpy)).toContain('Cancelled by user.')
     )
+  })
+})
+
+describe('TTY contest wait — Esc cancels', () => {
+  let writeSpy: ReturnType<typeof vi.spyOn>
+  let stdin: TTYStdin
+
+  beforeEach(async () => {
+    resetRecallStateForTesting()
+    mockRecallNext.mockReset()
+    mockContestAndRegenerate.mockReset()
+    mockRecallNext.mockResolvedValue({
+      type: 'mcq',
+      recallPromptId: 100,
+      stem: 'Q?',
+      choices: ['A', 'B'],
+    })
+    mockContestAndRegenerate.mockImplementation((_id, signal?: AbortSignal) => {
+      return new Promise((_resolve, reject) => {
+        signal?.addEventListener('abort', () => reject(userAbortError()), {
+          once: true,
+        })
+      })
+    })
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
+    vi.spyOn(process, 'exit').mockImplementation(
+      (() => undefined) as unknown as typeof process.exit
+    )
+    stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await tick()
+  })
+
+  afterEach(() => {
+    pressKey(stdin, 'c', { ctrl: true })
+    vi.restoreAllMocks()
+  })
+
+  test('Esc aborts contest fetch and shows Cancelled by user.', async () => {
+    await submitTTYCommand(stdin, '/recall')
+    await submitTTYCommand(stdin, '/contest')
+    await tick()
+    pressKey(stdin, 'escape')
+    await tick()
+    await vi.waitFor(() =>
+      expect(ttyOutput(writeSpy)).toContain('Cancelled by user.')
+    )
+    expect(isInRecallSubstate()).toBe(true)
   })
 })
