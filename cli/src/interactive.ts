@@ -29,9 +29,12 @@ import {
   type RecallNextResult,
 } from './recall.js'
 import {
-  FETCH_WAIT_LINES,
-  RECALL_FETCH_WAIT_BASE_LINE,
-} from './fetchWaitLines.js'
+  getInteractiveFetchWaitLine,
+  INTERACTIVE_FETCH_WAIT_LINES,
+  resetInteractiveFetchWaitForTesting,
+  runInteractiveFetchWait,
+  type InteractiveFetchWaitLine,
+} from './interactiveFetchWait.js'
 import { formatVersionOutput } from './version.js'
 import {
   buildBoxLines,
@@ -80,41 +83,7 @@ let recallSessionDueDays = 0
 let pendingRecallLoadMore = false
 let pendingRecallStopConfirmation = false
 
-export {
-  RECALL_FETCH_WAIT_BASE_LINE,
-  FETCH_WAIT_LINES,
-} from './fetchWaitLines.js'
-
-let interactiveFetchWaitBaseLine: string | null = null
-
-function setInteractiveFetchWait(
-  output: OutputAdapter,
-  baseLine: string | null
-): void {
-  interactiveFetchWaitBaseLine = baseLine
-  output.onRecallFetchWaitChanged?.()
-}
-
-function getFetchWaitBaseLine(): string | null {
-  return interactiveFetchWaitBaseLine
-}
-
-export async function withInteractiveFetchWaitUi<T>(
-  output: OutputAdapter,
-  baseLine: string,
-  fn: () => Promise<T>
-): Promise<T> {
-  setInteractiveFetchWait(output, baseLine)
-  try {
-    return await fn()
-  } finally {
-    setInteractiveFetchWait(output, null)
-  }
-}
-
-function resetInteractiveFetchWaitForTesting(): void {
-  interactiveFetchWaitBaseLine = null
-}
+export * from './interactiveFetchWait.js'
 
 export function resetRecallStateForTesting(): void {
   pendingRecallAnswer = null
@@ -177,7 +146,7 @@ function getContestablePromptId(): number | null {
 export function getPlaceholderContext(
   inTokenList: boolean
 ): PlaceholderContext {
-  if (interactiveFetchWaitBaseLine !== null) return 'recallFetchWait'
+  if (getInteractiveFetchWaitLine() !== null) return 'interactiveFetchWait'
   if (inTokenList) return 'tokenList'
   if (pendingRecallStopConfirmation) return 'recallStopConfirmation'
   if (pendingRecallLoadMore) return 'recallYesNo'
@@ -249,14 +218,18 @@ function parseCommandWithRequiredParam(
 
 type ParamCommandResult = string | undefined
 
-const PARAM_COMMANDS: Array<{
+type ParamCommand = {
   command: string
   usage: string
+  fetchWaitLine?: InteractiveFetchWaitLine
   run: (param: string) => Promise<ParamCommandResult> | ParamCommandResult
-}> = [
+}
+
+const PARAM_COMMANDS: ParamCommand[] = [
   {
     command: '/add-access-token',
     usage: 'Usage: /add-access-token <token>',
+    fetchWaitLine: INTERACTIVE_FETCH_WAIT_LINES.addAccessToken,
     run: async (param) => {
       await addAccessToken(param)
       return 'Token added'
@@ -265,6 +238,7 @@ const PARAM_COMMANDS: Array<{
   {
     command: '/create-access-token',
     usage: 'Usage: /create-access-token <label>',
+    fetchWaitLine: INTERACTIVE_FETCH_WAIT_LINES.createAccessToken,
     run: async (param) => {
       await createAccessToken(param)
       return 'Token created'
@@ -273,6 +247,7 @@ const PARAM_COMMANDS: Array<{
   {
     command: '/remove-access-token-completely',
     usage: 'Usage: /remove-access-token-completely <label>',
+    fetchWaitLine: INTERACTIVE_FETCH_WAIT_LINES.removeAccessTokenCompletely,
     run: async (param) => {
       await removeAccessTokenCompletely(param)
       return `Token "${param}" removed locally and from server.`
@@ -288,31 +263,23 @@ const PARAM_COMMANDS: Array<{
   },
 ]
 
-const PARAM_FETCH_WAIT_LINE: Record<string, string> = {
-  '/add-access-token': FETCH_WAIT_LINES.addAccessToken,
-  '/create-access-token': FETCH_WAIT_LINES.createAccessToken,
-  '/remove-access-token-completely':
-    FETCH_WAIT_LINES.removeAccessTokenCompletely,
-}
-
 async function handleParamCommand(
   trimmed: string,
   output: OutputAdapter
 ): Promise<boolean> {
-  for (const { command, usage, run } of PARAM_COMMANDS) {
-    const param = parseCommandWithRequiredParam(trimmed, command)
+  for (const entry of PARAM_COMMANDS) {
+    const param = parseCommandWithRequiredParam(trimmed, entry.command)
     if (param === null) continue
     if (param === 'usage') {
-      output.log(usage)
+      output.log(entry.usage)
       return true
     }
     try {
-      const waitLine = PARAM_FETCH_WAIT_LINE[command]
-      const msg = waitLine
-        ? await withInteractiveFetchWaitUi(output, waitLine, () =>
-            Promise.resolve(run(param))
+      const msg = entry.fetchWaitLine
+        ? await runInteractiveFetchWait(output, entry.fetchWaitLine, () =>
+            Promise.resolve(entry.run(param))
           )
-        : await Promise.resolve(run(param))
+        : await Promise.resolve(entry.run(param))
       if (msg) output.log(msg)
     } catch (err) {
       output.logError(err)
@@ -322,15 +289,6 @@ async function handleParamCommand(
   return false
 }
 
-async function recallNextWithFetchWaitUi(
-  dueindays: number,
-  output: OutputAdapter
-): Promise<RecallNextResult> {
-  return withInteractiveFetchWaitUi(output, RECALL_FETCH_WAIT_BASE_LINE, () =>
-    recallNext(dueindays)
-  )
-}
-
 async function continueRecallSession(
   fromLoadMore: boolean,
   output: OutputAdapter,
@@ -338,7 +296,11 @@ async function continueRecallSession(
 ): Promise<void> {
   if (!fromLoadMore) sessionRecallCount++
   try {
-    const result = await recallNextWithFetchWaitUi(recallSessionDueDays, output)
+    const result = await runInteractiveFetchWait(
+      output,
+      INTERACTIVE_FETCH_WAIT_LINES.recallNext,
+      () => recallNext(recallSessionDueDays)
+    )
     if (result.type === 'none') {
       if (recallSessionDueDays === 0) {
         pendingRecallLoadMore = true
@@ -403,9 +365,9 @@ export async function processInput(
       return false
     }
     try {
-      const outcome = await withInteractiveFetchWaitUi(
+      const outcome = await runInteractiveFetchWait(
         output,
-        FETCH_WAIT_LINES.contest,
+        INTERACTIVE_FETCH_WAIT_LINES.contest,
         () => contestAndRegenerate(contestablePromptId)
       )
       if (!outcome.ok) {
@@ -454,8 +416,10 @@ export async function processInput(
   }
   if (trimmed === '/add gmail') {
     try {
-      await withInteractiveFetchWaitUi(output, FETCH_WAIT_LINES.addGmail, () =>
-        addGmailAccount()
+      await runInteractiveFetchWait(
+        output,
+        INTERACTIVE_FETCH_WAIT_LINES.addGmail,
+        () => addGmailAccount()
       )
     } catch (err) {
       output.logError(err)
@@ -464,9 +428,9 @@ export async function processInput(
   }
   if (trimmed === '/last email') {
     try {
-      const subject = await withInteractiveFetchWaitUi(
+      const subject = await runInteractiveFetchWait(
         output,
-        FETCH_WAIT_LINES.lastEmail,
+        INTERACTIVE_FETCH_WAIT_LINES.lastEmail,
         () => getLastEmailSubject()
       )
       output.log(subject)
@@ -566,9 +530,9 @@ export async function processInput(
   }
   if (trimmed === '/recall-status') {
     try {
-      const message = await withInteractiveFetchWaitUi(
+      const message = await runInteractiveFetchWait(
         output,
-        FETCH_WAIT_LINES.recallStatus,
+        INTERACTIVE_FETCH_WAIT_LINES.recallStatus,
         () => recallStatus()
       )
       output.log(message)
@@ -582,7 +546,11 @@ export async function processInput(
       recallSessionMode = true
       sessionRecallCount = 0
       recallSessionDueDays = 0
-      const result = await recallNextWithFetchWaitUi(0, output)
+      const result = await runInteractiveFetchWait(
+        output,
+        INTERACTIVE_FETCH_WAIT_LINES.recallNext,
+        () => recallNext(0)
+      )
       if (result.type === 'none') {
         pendingRecallLoadMore = true
         output.beginCurrentPrompt?.()
@@ -654,8 +622,8 @@ function buildTTYDeps() {
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
-    getFetchWaitBaseLine,
-    withInteractiveFetchWaitUi,
+    getInteractiveFetchWaitLine,
+    runInteractiveFetchWait,
     isGreyDisabledInputChrome,
   }
 }

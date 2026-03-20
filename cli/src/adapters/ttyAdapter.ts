@@ -3,14 +3,17 @@ import { Writable } from 'node:stream'
 import type { AccessTokenEntry } from '../accessToken.js'
 import type { CommandDoc } from '../help.js'
 import {
-  formatRecallFetchWaitPromptLine,
+  INTERACTIVE_FETCH_WAIT_LINES,
+  type InteractiveFetchWaitLine,
+} from '../interactiveFetchWait.js'
+import {
+  formatInteractiveFetchWaitPromptLine,
   isCommittedInteractiveInput,
-  RECALL_FETCH_WAIT_PROMPT_FG,
+  INTERACTIVE_FETCH_WAIT_PROMPT_FG,
   wrapTextToLines,
   type LiveRegionPaintOptions,
   type PlaceholderContext,
 } from '../renderer.js'
-import { FETCH_WAIT_LINES } from '../fetchWaitLines.js'
 import type { ChatHistory, McqRecallPending, OutputAdapter } from '../types.js'
 
 export type TokenListAction = 'set-default' | 'remove' | 'remove-completely'
@@ -101,10 +104,10 @@ export interface TTYDeps {
   ) => string[]
   TOKEN_LIST_COMMANDS: Record<string, TokenListCommandConfig>
   getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
-  getFetchWaitBaseLine: () => string | null
-  withInteractiveFetchWaitUi: <T>(
+  getInteractiveFetchWaitLine: () => InteractiveFetchWaitLine | null
+  runInteractiveFetchWait: <T>(
     output: OutputAdapter,
-    baseLine: string,
+    line: InteractiveFetchWaitLine,
     fn: () => Promise<T>
   ) => Promise<T>
   isGreyDisabledInputChrome: (ctx: PlaceholderContext) => boolean
@@ -192,8 +195,8 @@ export async function runTTY(
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
-    getFetchWaitBaseLine,
-    withInteractiveFetchWaitUi,
+    getInteractiveFetchWaitLine,
+    runInteractiveFetchWait,
     isGreyDisabledInputChrome,
   } = deps
 
@@ -243,9 +246,10 @@ export async function runTTY(
   let tokenHighlightIndex = 0
   let tokenListAction: TokenListAction = 'set-default'
   let mcqChoiceHighlightIndex = 0
-  const RECALL_FETCH_WAIT_ELLIPSIS_MS = 400
-  let recallFetchWaitEllipsisTick = 0
-  let recallFetchWaitRepaintTimer: ReturnType<typeof setInterval> | null = null
+  const INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS = 400
+  let interactiveFetchWaitEllipsisTick = 0
+  let interactiveFetchWaitRepaintTimer: ReturnType<typeof setInterval> | null =
+    null
 
   function endTokenListSelection(outputMsg: string) {
     const command = tokenListCommand
@@ -273,17 +277,17 @@ export async function runTTY(
       placeholderContext,
     })
     const pendingRecallAnswer = getPendingRecallAnswer()
-    const waitBaseLine = getFetchWaitBaseLine()
+    const waitLine = getInteractiveFetchWaitLine()
     let currentPromptWrappedLines: string[]
     let currentPromptSgr: string | undefined
-    if (waitBaseLine) {
+    if (waitLine) {
       currentPromptWrappedLines = [
-        formatRecallFetchWaitPromptLine(
-          waitBaseLine,
-          recallFetchWaitEllipsisTick
+        formatInteractiveFetchWaitPromptLine(
+          waitLine,
+          interactiveFetchWaitEllipsisTick
         ),
       ]
-      currentPromptSgr = RECALL_FETCH_WAIT_PROMPT_FG
+      currentPromptSgr = INTERACTIVE_FETCH_WAIT_PROMPT_FG
     } else {
       const currentPromptText =
         tokenListItems && tokenListCommand
@@ -441,12 +445,12 @@ export async function runTTY(
     livePaint.lastPaintedLineCount = newTotalLines
   }
 
-  function stopRecallFetchWaitRepaintTimer(): void {
-    if (recallFetchWaitRepaintTimer) {
-      clearInterval(recallFetchWaitRepaintTimer)
-      recallFetchWaitRepaintTimer = null
+  function stopInteractiveFetchWaitRepaintTimer(): void {
+    if (interactiveFetchWaitRepaintTimer) {
+      clearInterval(interactiveFetchWaitRepaintTimer)
+      interactiveFetchWaitRepaintTimer = null
     }
-    recallFetchWaitEllipsisTick = 0
+    interactiveFetchWaitEllipsisTick = 0
   }
 
   ttyOutput = {
@@ -473,16 +477,17 @@ export async function runTTY(
       suggestionsDismissed = false
       doFullRedraw()
     },
-    onRecallFetchWaitChanged: () => {
-      if (getFetchWaitBaseLine()) {
-        stopRecallFetchWaitRepaintTimer()
+    onInteractiveFetchWaitChanged: () => {
+      if (getInteractiveFetchWaitLine()) {
+        stopInteractiveFetchWaitRepaintTimer()
         drawBox()
-        recallFetchWaitRepaintTimer = setInterval(() => {
-          recallFetchWaitEllipsisTick = (recallFetchWaitEllipsisTick + 1) % 3
+        interactiveFetchWaitRepaintTimer = setInterval(() => {
+          interactiveFetchWaitEllipsisTick =
+            (interactiveFetchWaitEllipsisTick + 1) % 3
           drawBox()
-        }, RECALL_FETCH_WAIT_ELLIPSIS_MS)
+        }, INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS)
       } else {
-        stopRecallFetchWaitRepaintTimer()
+        stopInteractiveFetchWaitRepaintTimer()
         drawBox()
       }
     },
@@ -493,7 +498,7 @@ export async function runTTY(
   process.stdout.on('resize', doFullRedraw)
   const removeResizeListener = () => process.stdout.off('resize', doFullRedraw)
   const doExit = () => {
-    stopRecallFetchWaitRepaintTimer()
+    stopInteractiveFetchWaitRepaintTimer()
     removeResizeListener()
     process.stdout.write(SHOW_CURSOR)
     rl.close()
@@ -625,9 +630,9 @@ export async function runTTY(
           outputMsg = `Token "${selectedLabel}" removed.`
         } else {
           try {
-            await withInteractiveFetchWaitUi(
+            await runInteractiveFetchWait(
               ttyOutput,
-              FETCH_WAIT_LINES.removeAccessTokenCompletely,
+              INTERACTIVE_FETCH_WAIT_LINES.removeAccessTokenCompletely,
               () => removeAccessTokenCompletely(selectedLabel)
             )
             outputMsg = `Token "${selectedLabel}" removed locally and from server.`

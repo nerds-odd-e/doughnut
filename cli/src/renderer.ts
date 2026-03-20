@@ -1,6 +1,6 @@
 import {
   GREY,
-  RECALL_FETCH_WAIT_PROMPT_FG,
+  INTERACTIVE_FETCH_WAIT_PROMPT_FG,
   RESET,
   HIDE_CURSOR,
   SHOW_CURSOR,
@@ -17,9 +17,16 @@ import {
 } from './listDisplay.js'
 import { renderMarkdownToTerminal } from './markdown.js'
 import type { ChatHistory } from './types.js'
+import type { InteractiveFetchWaitLine } from './interactiveFetchWait.js'
 import { formatVersionOutput } from './version.js'
 
-export { GREY, RECALL_FETCH_WAIT_PROMPT_FG, RESET, HIDE_CURSOR, SHOW_CURSOR }
+export {
+  GREY,
+  INTERACTIVE_FETCH_WAIT_PROMPT_FG,
+  RESET,
+  HIDE_CURSOR,
+  SHOW_CURSOR,
+}
 
 /** Terminal column count; used for truncation and line width. */
 export type TerminalWidth = number
@@ -36,12 +43,12 @@ export const PROMPT = '→ '
 
 /**
  * Which placeholder and input chrome apply in the live region.
- * `recallFetchWait`: slow interactive command in flight (recall, contest, params, gmail, etc.) — same grey, no-→ box as token list pickers.
+ * `interactiveFetchWait`: slow backend/network call in flight — same grey, no-→ box as token list pickers.
  */
 export type PlaceholderContext =
   | 'default'
   | 'tokenList'
-  | 'recallFetchWait'
+  | 'interactiveFetchWait'
   | 'recallMcq'
   | 'recallStopConfirmation'
   | 'recallYesNo'
@@ -50,23 +57,23 @@ export type PlaceholderContext =
 export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
   default: '`exit` to quit.',
   tokenList: '↑↓ Enter to select; other keys cancel',
-  recallFetchWait: 'loading ...',
+  interactiveFetchWait: 'loading ...',
   recallMcq: '↑↓ Enter or number to select; Esc to cancel',
   recallStopConfirmation: 'y or n; Esc to go back',
   recallYesNo: 'y or n; /stop to exit recall',
   recallSpelling: 'type your answer; /stop to exit recall',
 }
 
-/** Token list pick or recall fetch wait: grey bordered box, no →, cursor hidden. */
+/** Token list pick or interactive fetch wait: grey bordered box, no →, cursor hidden. */
 export function isGreyDisabledInputChrome(ctx: PlaceholderContext): boolean {
-  return ctx === 'tokenList' || ctx === 'recallFetchWait'
+  return ctx === 'tokenList' || ctx === 'interactiveFetchWait'
 }
 
 const ELLIPSIS_PHASE = ['.', '..', '...'] as const
 
-/** Appends `.` / `..` / `...` to the recall-fetch wait base line (TTY cycles `tick`). */
-export function formatRecallFetchWaitPromptLine(
-  baseLine: string,
+/** Appends `.` / `..` / `...` to the wait prompt base (TTY cycles `ellipsisTick`). */
+export function formatInteractiveFetchWaitPromptLine(
+  baseLine: InteractiveFetchWaitLine,
   ellipsisTick: number
 ): string {
   return `${baseLine}${ELLIPSIS_PHASE[ellipsisTick % 3]!}`
@@ -204,7 +211,7 @@ export interface BuildBoxLinesOptions {
 }
 
 export type LiveRegionPaintOptions = BuildBoxLinesOptions & {
-  /** Default grey. Recall fetch wait uses `RECALL_FETCH_WAIT_PROMPT_FG`. */
+  /** Default grey. Interactive fetch wait uses `INTERACTIVE_FETCH_WAIT_PROMPT_FG`. */
   currentPromptSgr?: string
 }
 

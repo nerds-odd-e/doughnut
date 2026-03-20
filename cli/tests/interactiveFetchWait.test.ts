@@ -1,17 +1,16 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import {
-  FETCH_WAIT_LINES,
-  RECALL_FETCH_WAIT_BASE_LINE,
+  INTERACTIVE_FETCH_WAIT_LINES,
   processInput,
   resetRecallStateForTesting,
-  withInteractiveFetchWaitUi,
+  runInteractiveFetchWait,
 } from '../src/interactive.js'
 import {
   buildBoxLines,
   buildLiveRegionLines,
-  formatRecallFetchWaitPromptLine,
+  formatInteractiveFetchWaitPromptLine,
   isGreyDisabledInputChrome,
-  RECALL_FETCH_WAIT_PROMPT_FG,
+  INTERACTIVE_FETCH_WAIT_PROMPT_FG,
   stripAnsi,
   GREY,
 } from '../src/renderer.js'
@@ -43,7 +42,7 @@ function outputAdapter() {
     logError: vi.fn(),
     writeCurrentPrompt: vi.fn(),
     beginCurrentPrompt: vi.fn(),
-    onRecallFetchWaitChanged: vi.fn(),
+    onInteractiveFetchWaitChanged: vi.fn(),
   }
 }
 
@@ -54,42 +53,47 @@ beforeEach(() => {
   mockAddAccessToken.mockReset()
 })
 
-describe('recall fetch wait UI', () => {
+describe('interactive fetch wait UI', () => {
   test('renderer: ellipsis, grey chrome contexts, live region colors', () => {
-    expect(formatRecallFetchWaitPromptLine('Wait', 0)).toBe('Wait.')
-    expect(formatRecallFetchWaitPromptLine('Wait', 3)).toBe('Wait.')
+    const recallLine = INTERACTIVE_FETCH_WAIT_LINES.recallNext
+    expect(formatInteractiveFetchWaitPromptLine(recallLine, 0)).toBe(
+      `${recallLine}.`
+    )
+    expect(formatInteractiveFetchWaitPromptLine(recallLine, 3)).toBe(
+      `${recallLine}.`
+    )
 
-    expect(isGreyDisabledInputChrome('recallFetchWait')).toBe(true)
+    expect(isGreyDisabledInputChrome('interactiveFetchWait')).toBe(true)
     expect(isGreyDisabledInputChrome('tokenList')).toBe(true)
     expect(isGreyDisabledInputChrome('default')).toBe(false)
     expect(isGreyDisabledInputChrome('recallMcq')).toBe(false)
 
     const boxLine = buildBoxLines('', 80, {
-      placeholderContext: 'recallFetchWait',
+      placeholderContext: 'interactiveFetchWait',
     })[0]!
     expect(boxLine).not.toContain('→')
     expect(boxLine).toContain('loading ...')
 
-    const prompt = formatRecallFetchWaitPromptLine(
-      RECALL_FETCH_WAIT_BASE_LINE,
-      1
-    )
+    const prompt = formatInteractiveFetchWaitPromptLine(recallLine, 1)
     const live = buildLiveRegionLines('', 80, [prompt], [], [], {
-      placeholderContext: 'recallFetchWait',
-      currentPromptSgr: RECALL_FETCH_WAIT_PROMPT_FG,
+      placeholderContext: 'interactiveFetchWait',
+      currentPromptSgr: INTERACTIVE_FETCH_WAIT_PROMPT_FG,
     })
     expect(live[0]).toContain('\x1b[32m')
-    expect(live[1]).toContain(RECALL_FETCH_WAIT_PROMPT_FG)
-    expect(stripAnsi(live[1])).toContain(RECALL_FETCH_WAIT_BASE_LINE)
+    expect(live[1]).toContain(INTERACTIVE_FETCH_WAIT_PROMPT_FG)
+    expect(stripAnsi(live[1])).toContain(recallLine)
     const boxTopIdx = live.findIndex((l) => stripAnsi(l).startsWith('┌'))
     expect(boxTopIdx).toBeGreaterThan(0)
     expect(live[boxTopIdx]).toContain(GREY)
 
     expect(
       stripAnsi(
-        formatRecallFetchWaitPromptLine(FETCH_WAIT_LINES.recallStatus, 0)
+        formatInteractiveFetchWaitPromptLine(
+          INTERACTIVE_FETCH_WAIT_LINES.recallStatus,
+          0
+        )
       )
-    ).toContain(FETCH_WAIT_LINES.recallStatus)
+    ).toContain(INTERACTIVE_FETCH_WAIT_LINES.recallStatus)
   })
 
   test('processInput /recall signals TTY once when recall fetch starts and once when it ends', async () => {
@@ -103,18 +107,18 @@ describe('recall fetch wait UI', () => {
     const out = outputAdapter()
     const finished = processInput('/recall', out)
     await vi.waitFor(() =>
-      expect(out.onRecallFetchWaitChanged).toHaveBeenCalled()
+      expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalled()
     )
-    expect(out.onRecallFetchWaitChanged).toHaveBeenCalledTimes(1)
+    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(1)
     resolveRecall({ type: 'none', message: '0' })
     await finished
-    expect(out.onRecallFetchWaitChanged).toHaveBeenCalledTimes(2)
+    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
 
     resetRecallStateForTesting()
     mockRecallNext.mockRejectedValueOnce(new Error('network'))
     const outErr = outputAdapter()
     await processInput('/recall', outErr)
-    expect(outErr.onRecallFetchWaitChanged).toHaveBeenCalledTimes(2)
+    expect(outErr.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
     expect(outErr.logError).toHaveBeenCalled()
   })
 
@@ -129,12 +133,12 @@ describe('recall fetch wait UI', () => {
     const out = outputAdapter()
     const done = processInput('/recall-status', out)
     await vi.waitFor(() =>
-      expect(out.onRecallFetchWaitChanged).toHaveBeenCalled()
+      expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalled()
     )
-    expect(out.onRecallFetchWaitChanged).toHaveBeenCalledTimes(1)
+    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(1)
     resolveStatus('2 notes to recall today')
     await done
-    expect(out.onRecallFetchWaitChanged).toHaveBeenCalledTimes(2)
+    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
     expect(out.log).toHaveBeenCalledWith('2 notes to recall today')
   })
 
@@ -149,22 +153,26 @@ describe('recall fetch wait UI', () => {
     const out = outputAdapter()
     const done = processInput('/add-access-token secret', out)
     await vi.waitFor(() =>
-      expect(out.onRecallFetchWaitChanged).toHaveBeenCalled()
+      expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalled()
     )
-    expect(out.onRecallFetchWaitChanged).toHaveBeenCalledTimes(1)
+    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(1)
     resolveAdd()
     await done
-    expect(out.onRecallFetchWaitChanged).toHaveBeenCalledTimes(2)
+    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
     expect(mockAddAccessToken).toHaveBeenCalledWith('secret')
   })
 
-  test('withInteractiveFetchWaitUi notifies end wait after rejection', async () => {
+  test('runInteractiveFetchWait notifies end wait after rejection', async () => {
     const out = outputAdapter()
     await expect(
-      withInteractiveFetchWaitUi(out, 'Busy', async () => {
-        throw new Error('fail')
-      })
+      runInteractiveFetchWait(
+        out,
+        INTERACTIVE_FETCH_WAIT_LINES.recallNext,
+        async () => {
+          throw new Error('fail')
+        }
+      )
     ).rejects.toThrow('fail')
-    expect(out.onRecallFetchWaitChanged).toHaveBeenCalledTimes(2)
+    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
   })
 })

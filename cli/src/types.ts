@@ -26,7 +26,7 @@ export type OutputAdapter = {
   /** Optional: for /clear and resize. TTY provides a callback that clears and redraws. */
   clearAndRedraw?: () => void
   /**
-   * TTY only: `recallNext` started or finished — repaint live region (wait prompt, disabled box, ellipsis timer).
+   * TTY only: interactive fetch-wait UI started or ended — repaint live region (wait prompt, grey box, ellipsis).
    */
-  onRecallFetchWaitChanged?: () => void
+  onInteractiveFetchWaitChanged?: () => void
 }
