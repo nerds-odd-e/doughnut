@@ -9,7 +9,10 @@ import {
   UserController,
 } from 'doughnut-api'
 import { addAccessToken } from '../src/accessToken.js'
-import { userAbortError } from '../src/fetchAbort.js'
+import {
+  CLI_USER_ABORTED_WAIT_MESSAGE,
+  userAbortError,
+} from '../src/fetchAbort.js'
 import { processInput, resetRecallStateForTesting } from '../src/interactive.js'
 import { cancelInteractiveFetchWaitFor } from '../src/interactiveFetchWait.js'
 import {
@@ -537,7 +540,7 @@ describe('processInput /recall — interactive recall load', () => {
     )
     expect(cancelInteractiveFetchWaitFor(out)).toBe(true)
     await done
-    expect(out.log).toHaveBeenCalledWith('Cancelled by user.')
+    expect(out.log).toHaveBeenCalledWith(CLI_USER_ABORTED_WAIT_MESSAGE)
     expect(RecallsController.recalling).not.toHaveBeenCalled()
     expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
   })

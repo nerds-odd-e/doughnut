@@ -1,3 +1,6 @@
+/** Shown in history / `OutputAdapter.log` when the user aborts an interactive network wait (e.g. Esc). */
+export const CLI_USER_ABORTED_WAIT_MESSAGE = 'Cancelled by user.' as const
+
 /**
  * Same shape as `fetch` / SDK when `AbortSignal` fires; use for synthetic aborts (CLI delay, tests).
  */

@@ -10,7 +10,10 @@ import {
   removeAccessTokenCompletely,
   setDefaultTokenLabel,
 } from './accessToken.js'
-import { isFetchAbortedByCaller } from './fetchAbort.js'
+import {
+  CLI_USER_ABORTED_WAIT_MESSAGE,
+  isFetchAbortedByCaller,
+} from './fetchAbort.js'
 import { addGmailAccount, getLastEmailSubject } from './gmail.js'
 import {
   filterCommandsByPrefix,
@@ -34,7 +37,6 @@ import {
   INTERACTIVE_FETCH_WAIT_LINES,
   resetInteractiveFetchWaitForTesting,
   runInteractiveFetchWait,
-  runInteractiveRecallLoad,
   type InteractiveFetchWaitLine,
 } from './interactiveFetchWait.js'
 import { formatVersionOutput } from './version.js'
@@ -220,21 +222,31 @@ function parseCommandWithRequiredParam(
 
 type ParamCommandResult = string | undefined
 
-type ParamCommand = {
+/** Slash-commands that may hit the network while the TTY shows the interactive fetch-wait chrome. */
+type ParamCommandWithFetchWait = {
   command: string
   usage: string
-  fetchWaitLine?: InteractiveFetchWaitLine
-  run: (
-    param: string,
-    signal?: AbortSignal
-  ) => Promise<ParamCommandResult> | ParamCommandResult
+  usesInteractiveFetchWait: true
+  waitLine: InteractiveFetchWaitLine
+  run: (param: string, signal: AbortSignal) => Promise<ParamCommandResult>
 }
+
+/** Slash-commands that only touch local config (no fetch-wait chrome). */
+type ParamCommandLocalOnly = {
+  command: string
+  usage: string
+  usesInteractiveFetchWait?: false
+  run: (param: string) => ParamCommandResult
+}
+
+type ParamCommand = ParamCommandWithFetchWait | ParamCommandLocalOnly
 
 const PARAM_COMMANDS: ParamCommand[] = [
   {
     command: '/add-access-token',
     usage: 'Usage: /add-access-token <token>',
-    fetchWaitLine: INTERACTIVE_FETCH_WAIT_LINES.addAccessToken,
+    usesInteractiveFetchWait: true,
+    waitLine: INTERACTIVE_FETCH_WAIT_LINES.addAccessToken,
     run: async (param, signal) => {
       await addAccessToken(param, signal)
       return 'Token added'
@@ -243,7 +255,8 @@ const PARAM_COMMANDS: ParamCommand[] = [
   {
     command: '/create-access-token',
     usage: 'Usage: /create-access-token <label>',
-    fetchWaitLine: INTERACTIVE_FETCH_WAIT_LINES.createAccessToken,
+    usesInteractiveFetchWait: true,
+    waitLine: INTERACTIVE_FETCH_WAIT_LINES.createAccessToken,
     run: async (param, signal) => {
       await createAccessToken(param, signal)
       return 'Token created'
@@ -252,7 +265,8 @@ const PARAM_COMMANDS: ParamCommand[] = [
   {
     command: '/remove-access-token-completely',
     usage: 'Usage: /remove-access-token-completely <label>',
-    fetchWaitLine: INTERACTIVE_FETCH_WAIT_LINES.removeAccessTokenCompletely,
+    usesInteractiveFetchWait: true,
+    waitLine: INTERACTIVE_FETCH_WAIT_LINES.removeAccessTokenCompletely,
     run: async (param, signal) => {
       await removeAccessTokenCompletely(param, signal)
       return `Token "${param}" removed locally and from server.`
@@ -269,12 +283,12 @@ const PARAM_COMMANDS: ParamCommand[] = [
 ]
 
 function logCancelledOrError(err: unknown, output: OutputAdapter): void {
-  if (isFetchAbortedByCaller(err)) output.log('Cancelled by user.')
+  if (isFetchAbortedByCaller(err)) output.log(CLI_USER_ABORTED_WAIT_MESSAGE)
   else output.logError(err)
 }
 
-/** After `runInteractiveRecallLoad` throws: end recall session and show cancel vs backend error. */
-function handleInteractiveRecallLoadError(
+/** Recall session cannot continue after a failed or user-aborted recall load. */
+function endRecallSessionAfterFailedRecallLoad(
   err: unknown,
   output: OutputAdapter
 ): void {
@@ -294,11 +308,11 @@ async function handleParamCommand(
       return true
     }
     try {
-      const msg = entry.fetchWaitLine
-        ? await runInteractiveFetchWait(output, entry.fetchWaitLine, (signal) =>
-            Promise.resolve(entry.run(param, signal))
+      const msg = entry.usesInteractiveFetchWait
+        ? await runInteractiveFetchWait(output, entry.waitLine, (signal) =>
+            entry.run(param, signal)
           )
-        : await Promise.resolve(entry.run(param))
+        : entry.run(param)
       if (msg) output.log(msg)
     } catch (err) {
       logCancelledOrError(err, output)
@@ -315,8 +329,10 @@ async function continueRecallSession(
 ): Promise<void> {
   if (!fromLoadMore) sessionRecallCount++
   try {
-    const result = await runInteractiveRecallLoad(output, (recallLoadSignal) =>
-      recallNext(recallSessionDueDays, recallLoadSignal)
+    const result = await runInteractiveFetchWait(
+      output,
+      INTERACTIVE_FETCH_WAIT_LINES.recallNext,
+      (signal) => recallNext(recallSessionDueDays, signal)
     )
     if (result.type === 'none') {
       if (recallSessionDueDays === 0) {
@@ -331,7 +347,7 @@ async function continueRecallSession(
     }
     showRecallPrompt(result, output, writeCurrentPrompt)
   } catch (err) {
-    handleInteractiveRecallLoadError(err, output)
+    endRecallSessionAfterFailedRecallLoad(err, output)
   }
 }
 
@@ -562,9 +578,10 @@ export async function processInput(
       recallSessionMode = true
       sessionRecallCount = 0
       recallSessionDueDays = 0
-      const result = await runInteractiveRecallLoad(
+      const result = await runInteractiveFetchWait(
         output,
-        (recallLoadSignal) => recallNext(0, recallLoadSignal)
+        INTERACTIVE_FETCH_WAIT_LINES.recallNext,
+        (signal) => recallNext(0, signal)
       )
       if (result.type === 'none') {
         pendingRecallLoadMore = true
@@ -578,7 +595,7 @@ export async function processInput(
         )
       }
     } catch (err) {
-      handleInteractiveRecallLoadError(err, output)
+      endRecallSessionAfterFailedRecallLoad(err, output)
     }
     return false
   }
@@ -636,8 +653,6 @@ function buildTTYDeps() {
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
-    getInteractiveFetchWaitLine,
-    runInteractiveFetchWait,
     isGreyDisabledInputChrome,
   }
 }

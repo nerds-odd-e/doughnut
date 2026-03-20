@@ -20,11 +20,11 @@ export type InteractiveFetchWaitLine =
 
 let activeWaitLine: InteractiveFetchWaitLine | null = null
 
-type ActiveCancellableWait = {
+type EscBoundAbort = {
   output: OutputAdapter
   controller: AbortController
 }
-let activeCancellableInteractiveWait: ActiveCancellableWait | null = null
+let escBoundAbort: EscBoundAbort | null = null
 
 export function getInteractiveFetchWaitLine(): InteractiveFetchWaitLine | null {
   return activeWaitLine
@@ -38,63 +38,45 @@ function setActiveWaitLine(
   output.onInteractiveFetchWaitChanged?.()
 }
 
-export type InteractiveFetchWaitFn<T> = (signal: AbortSignal) => Promise<T>
-
 /**
- * Work for one interactive recall load: first `recalling` (and follow-ups) in `recallNext`, tied to
- * {@link runInteractiveRecallLoad} so Esc can abort the same `AbortSignal`.
+ * Backend/network work executed while the interactive fetch-wait chrome is shown.
+ * The same `abortSignal` is aborted if the user presses Esc on this `output`.
  */
-export type InteractiveRecallLoadFn<T> = InteractiveFetchWaitFn<T>
+export type InteractiveFetchWaitTask<T> = (
+  abortSignal: AbortSignal
+) => Promise<T>
 
-/**
- * Runs slow interactive work with wait chrome; Esc calls {@link cancelInteractiveFetchWaitFor}
- * to abort the same `AbortSignal` passed to `fn`.
- */
 export async function runInteractiveFetchWait<T>(
   output: OutputAdapter,
   line: InteractiveFetchWaitLine,
-  fn: InteractiveFetchWaitFn<T>
+  task: InteractiveFetchWaitTask<T>
 ): Promise<T> {
   const controller = new AbortController()
-  activeCancellableInteractiveWait = { output, controller }
+  escBoundAbort = { output, controller }
   setActiveWaitLine(output, line)
   try {
-    return await fn(controller.signal)
+    return await task(controller.signal)
   } finally {
     if (
-      activeCancellableInteractiveWait?.output === output &&
-      activeCancellableInteractiveWait.controller === controller
+      escBoundAbort?.output === output &&
+      escBoundAbort.controller === controller
     ) {
-      activeCancellableInteractiveWait = null
+      escBoundAbort = null
     }
     setActiveWaitLine(output, null)
   }
 }
 
-export async function runInteractiveRecallLoad<T>(
-  output: OutputAdapter,
-  load: InteractiveRecallLoadFn<T>
-): Promise<T> {
-  return runInteractiveFetchWait(
-    output,
-    INTERACTIVE_FETCH_WAIT_LINES.recallNext,
-    load
-  )
-}
-
-/** Esc during interactive fetch wait: abort in-flight work if this TTY output owns it. */
+/** Esc during an interactive fetch wait: abort in-flight work if this TTY owns it. */
 export function cancelInteractiveFetchWaitFor(output: OutputAdapter): boolean {
-  if (
-    !activeCancellableInteractiveWait ||
-    activeCancellableInteractiveWait.output !== output
-  ) {
+  if (!escBoundAbort || escBoundAbort.output !== output) {
     return false
   }
-  activeCancellableInteractiveWait.controller.abort()
+  escBoundAbort.controller.abort()
   return true
 }
 
 export function resetInteractiveFetchWaitForTesting(): void {
   activeWaitLine = null
-  activeCancellableInteractiveWait = null
+  escBoundAbort = null
 }

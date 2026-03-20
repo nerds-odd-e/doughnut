@@ -5,7 +5,10 @@ import {
   resetRecallStateForTesting,
   runInteractiveFetchWait,
 } from '../src/interactive.js'
-import { userAbortError } from '../src/fetchAbort.js'
+import {
+  CLI_USER_ABORTED_WAIT_MESSAGE,
+  userAbortError,
+} from '../src/fetchAbort.js'
 import { cancelInteractiveFetchWaitFor } from '../src/interactiveFetchWait.js'
 import {
   buildBoxLines,
@@ -199,11 +202,11 @@ describe('interactive fetch wait UI', () => {
     )
     expect(cancelInteractiveFetchWaitFor(out)).toBe(true)
     await done
-    expect(out.log).toHaveBeenCalledWith('Cancelled by user.')
+    expect(out.log).toHaveBeenCalledWith(CLI_USER_ABORTED_WAIT_MESSAGE)
     expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
   })
 
-  test('processInput /recall-status: Esc abort logs Cancelled by user.', async () => {
+  test('processInput /recall-status: Esc abort logs user-cancelled wait message.', async () => {
     mockRecallStatus.mockImplementation((_signal?: AbortSignal) => {
       return new Promise<string>((_resolve, reject) => {
         if (_signal?.aborted) {
@@ -222,7 +225,7 @@ describe('interactive fetch wait UI', () => {
     )
     expect(cancelInteractiveFetchWaitFor(out)).toBe(true)
     await done
-    expect(out.log).toHaveBeenCalledWith('Cancelled by user.')
+    expect(out.log).toHaveBeenCalledWith(CLI_USER_ABORTED_WAIT_MESSAGE)
     expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
   })
 })

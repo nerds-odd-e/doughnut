@@ -23,34 +23,35 @@ Informal requirement; delete or shrink once implemented.
 | Piece | Location |
 |------|-----------|
 | Wait lines + state + runner | `interactiveFetchWait.ts`: `INTERACTIVE_FETCH_WAIT_LINES`, `InteractiveFetchWaitLine`, `runInteractiveFetchWait`, `getInteractiveFetchWaitLine` |
-| Command wiring | `interactive.ts` (`fetchWaitLine` on param commands, recall paths, gmail/email); token list remove-completely in `ttyAdapter.ts` |
+| Command wiring | `interactive.ts` (param commands with `usesInteractiveFetchWait` + `waitLine`, recall paths, gmail/email); token list remove-completely in `ttyAdapter.ts` |
 
 ## Phase 3.1 (done) — recall load cancel
 
 | Piece | Location |
 |------|-----------|
-| Recall load + `AbortSignal` | `interactiveFetchWait.ts`: `runInteractiveRecallLoad`, `InteractiveRecallLoadFn<T>` (phase **3.3** merged abort with all `runInteractiveFetchWait` waits — see below) |
-| TTY Esc (phase 3.1 name) | Was `cancelInteractiveRecallLoadFor`; **3.3** renamed to `cancelInteractiveFetchWaitFor` (`ttyAdapter.ts`) |
-| Recall API | `recall.ts`: `recallNext(due, recallLoadSignal?)` passes signal into recalling / askAQuestion / showMemoryTracker |
-| Abort vs generic error | `fetchAbort.ts`: `userAbortError`, `isFetchAbortedByCaller`; `withBackendClient` rethrows abort |
-| User copy | `interactive.ts`: `handleInteractiveRecallLoadError` → `Cancelled by user.` when load was aborted |
+| Recall load + `AbortSignal` | Same as other waits: `runInteractiveFetchWait` + `INTERACTIVE_FETCH_WAIT_LINES.recallNext` (`interactive.ts`) |
+| TTY Esc (historical) | `cancelInteractiveRecallLoadFor` → **`cancelInteractiveFetchWaitFor`** (`ttyAdapter.ts`) |
+| Recall API | `recall.ts`: `recallNext(due, abortSignal?)` on recalling / askAQuestion / showMemoryTracker |
+| Abort vs generic error | `fetchAbort.ts`: `userAbortError`, `isFetchAbortedByCaller`, `CLI_USER_ABORTED_WAIT_MESSAGE`; `withBackendClient` rethrows abort |
+| User copy | `interactive.ts`: `logCancelledOrError`; failed recall **load** also calls `endRecallSessionAfterFailedRecallLoad` |
 
 ## Phase 3.2 (done) — slow recall load knob
 
 | Piece | Location |
 |------|-----------|
-| Env + abortable delay | `recall.ts`: `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS`, `awaitCliTestRecallLoadDelayIfConfigured` (only with `recallLoadSignal`) |
+| Env + abortable delay | `recall.ts`: `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS`, `awaitCliTestRecallLoadDelayIfConfigured` (only when `recallNext` gets an `AbortSignal`) |
 | Tests | `recall.test.ts`: `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` describe + `processInput /recall` (real `recallNext`, mocked API) |
 
 ## Phase 3.3 (done) — Esc cancels all interactive fetch waits
 
 | Piece | Location |
 |------|-----------|
-| Shared abort + wait chrome | `interactiveFetchWait.ts`: `runInteractiveFetchWait(output, line, fn(signal))` owns `AbortController` + `activeCancellableInteractiveWait`; `runInteractiveRecallLoad` delegates to it |
-| TTY Esc | `cancelInteractiveFetchWaitFor(ttyOutput)` in `ttyAdapter.ts` |
-| User copy | `interactive.ts`: `logCancelledOrError` for param commands, `/contest`, `/recall-status`, Gmail, last email; `handleInteractiveRecallLoadError` still ends recall session on load abort |
-| Backend / network | `accessToken.ts`: optional `signal` on `addAccessToken`, `createAccessToken`, `removeAccessTokenCompletely`; `recall.ts`: `recallStatus(signal?)`, `contestAndRegenerate(id, signal?)`; `gmail.ts`: `addGmailAccount`, `getLastEmailSubject`, OAuth wait, fetches |
-| Token list remove-completely | `ttyAdapter.ts`: passes `signal` into `removeAccessTokenCompletely`; abort → history `Cancelled by user.` |
+| Shared abort + wait chrome | `interactiveFetchWait.ts`: `runInteractiveFetchWait` + `InteractiveFetchWaitTask<T>`; `escBoundAbort` ties Esc to the active `OutputAdapter` |
+| TTY wiring | `ttyAdapter.ts` imports `runInteractiveFetchWait` / `getInteractiveFetchWaitLine` directly (not via `TTYDeps`) |
+| TTY Esc | `cancelInteractiveFetchWaitFor(ttyOutput)` |
+| User copy | `CLI_USER_ABORTED_WAIT_MESSAGE` (`fetchAbort.ts`); `logCancelledOrError` + `endRecallSessionAfterFailedRecallLoad` for recall **load** failures |
+| Backend / network | `accessToken.ts`, `recall.ts` (`recallStatus`, `contestAndRegenerate`), `gmail.ts` — optional `AbortSignal` on I/O |
+| Token list remove-completely | `ttyAdapter.ts`: `signal` into `removeAccessTokenCompletely`; abort → `CLI_USER_ABORTED_WAIT_MESSAGE` in history |
 
 **Tests:** `interactiveFetchWait.test.ts` — `/recall-status` cancel via `cancelInteractiveFetchWaitFor`; `interactive.test.ts` — **“TTY recall-status wait — Esc cancels”**; existing recall-load / contest assertions updated for `AbortSignal`.
 
@@ -60,15 +61,7 @@ Informal requirement; delete or shrink once implemented.
 |-------|--------|
 | 3.x | **3.1–3.3** done. **3.4** optional: copy / classification (`planning.mdc`). |
 
-### Phase 3 (planned) — cancellable interactive fetch wait
-
-**Goal:** While the TTY shows the interactive fetch wait chrome (grey box, blue wait line), the user can **cancel the in-flight work** (e.g. Esc) so the CLI stops waiting, clears wait state, and shows a clear **“Cancelled by user.”** (or similar) outcome without killing the whole session.
-
-**Alignment with `planning.mdc`:** Phases are **scenario-first** (user outcome per phase), not layer-first plumbing-then-UI. Each phase ships a **visible** slice; avoid a phase that is **only** refactor with no user-facing behavior. **Test-driven workflow** and **at most one intentionally failing test** while driving a change apply when implementing.
-
-**Testing (planning vs CLI):** Planning expects **E2E-shaped** tests for the **main user behavior** per phase, and unit tests for edges; **normal paths should not be justified by unit tests alone**. For this feature, the **cli** rule still applies: **do not assert transient loading lines** in Cypress (flaky). Satisfy planning by making E2E **post-cancel / post-wait** assertions stable (e.g. history contains **“Cancelled by user.”**, live region restored), or use an **equivalent** full-path test (e.g. Vitest driving `runTTY` / stdin simulation) if the team treats that as the phase’s end-to-end proof. **Extend** `interactiveFetchWait.test.ts` / related tests where behavior already has coverage; avoid duplicate harness code.
-
-**Phase discipline:** Before the next phase: cleanup, **deploy gate** (commit/push/CD per team), update this doc.
+**Planning note:** Sub-phases 3.1–3.3 below are **done**. Optional **3.4** only adjusts copy when “cancel” could imply rollback (see GET vs write table). E2E-shaped proof for waits uses Vitest + `runTTY` / stdin simulation (not Cypress for transient lines); see `.cursor/rules/cli.mdc`.
 
 ---
 
@@ -98,7 +91,7 @@ Informal requirement; delete or shrink once implemented.
 
 #### Research: CLI wiring (current)
 
-- **`runInteractiveFetchWait`** — wait chrome + `AbortController`; **`runInteractiveRecallLoad`** delegates to it with the recall wait line.
+- **`runInteractiveFetchWait`** — wait chrome + `AbortController` registered as `escBoundAbort`. Recall load uses the same helper with `INTERACTIVE_FETCH_WAIT_LINES.recallNext`.
 - **`withBackendClient`** — maps failures to “service unavailable” except **`isFetchAbortedByCaller`** (`fetchAbort.ts`).
 - **TTY** — Esc calls **`cancelInteractiveFetchWaitFor`**; overlapping async keypress handlers during `await processInput` remain a product choice for later.
 
@@ -110,11 +103,11 @@ Split by **who can cancel what**, not by “plumbing layer then TTY layer.” Th
 
 1. **Phase 3.1 — Cancel one high-value read wait (end-to-end)** ✅  
    - **User scenario:** During **recall load** (`INTERACTIVE_FETCH_WAIT_LINES.recallNext`), user presses **Esc** → wait chrome clears, recall session ends, **“Cancelled by user.”** is logged (same line as token-list cancel).  
-   - **Implementation (first slice):** `runInteractiveRecallLoad` + dedicated cancel registration; **`recallNext(due, recallLoadSignal?)`**, **`isFetchAbortedByCaller`** / **`handleInteractiveRecallLoadError`**. Unified with all waits in **3.3**.  
+   - **Implementation (first slice):** dedicated recall-load registration, then unified in **3.3** with `runInteractiveFetchWait` + `recallNext(due, abortSignal?)` + **`isFetchAbortedByCaller`**.  
    - **Tests:** `interactiveFetchWait.test.ts`; `interactive.test.ts` **“TTY recall load wait — Esc cancels”**; `recall.test.ts` / `accessToken.test.ts` edges.
 
 2. **Phase 3.2 — CLI testability: simulated slow recall load** ✅  
-   - **Implemented:** `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` (cap 60000) in `recall.ts` when `recallLoadSignal` is set.  
+   - **Implemented:** `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` (cap 60000) in `recall.ts` when `recallNext` receives an `AbortSignal`.  
    - **Tests:** `recall.test.ts` (delay + abort / delay completion / no signal; `processInput /recall` with real `recallNext`).  
    - **Docs:** `CLAUDE.md`, `.cursor/rules/cli.mdc`.
 

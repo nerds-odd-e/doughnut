@@ -9,8 +9,8 @@ import { runWithDefaultBackendClient } from './accessToken.js'
 import { userAbortError } from './fetchAbort.js'
 
 /**
- * Env var: milliseconds to wait before the first `recalling` HTTP call when `recallLoadSignal` is set
- * (Vitest fake timers / manual Esc-during-load practice). Capped inside `recallNext`.
+ * Env var: milliseconds to wait before the first `recalling` HTTP call when `recallNext` receives an
+ * `AbortSignal` (interactive TTY fetch-wait). Vitest fake timers / manual Esc practice. Capped in `recallNext`.
  */
 export const RECALL_LOAD_CLI_TEST_DELAY_MS_ENV =
   'DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS' as const
@@ -25,27 +25,27 @@ function parseCliTestRecallLoadDelayMs(): number {
   return Math.min(n, RECALL_LOAD_CLI_TEST_DELAY_MAX_MS)
 }
 
-/** Only when `recallLoadSignal` is set (interactive load); honours abort during the wait. */
+/** Only when `abortSignal` is set (interactive fetch-wait); honours abort during the delay. */
 async function awaitCliTestRecallLoadDelayIfConfigured(
-  recallLoadSignal: AbortSignal | undefined
+  abortSignal: AbortSignal | undefined
 ): Promise<void> {
   const ms = parseCliTestRecallLoadDelayMs()
-  if (ms === 0 || recallLoadSignal == null) return
+  if (ms === 0 || abortSignal == null) return
   await new Promise<void>((resolve, reject) => {
-    if (recallLoadSignal.aborted) {
+    if (abortSignal.aborted) {
       reject(userAbortError())
       return
     }
     const t = setTimeout(() => {
-      recallLoadSignal.removeEventListener('abort', onAbort)
+      abortSignal.removeEventListener('abort', onAbort)
       resolve()
     }, ms)
     const onAbort = () => {
       clearTimeout(t)
-      recallLoadSignal.removeEventListener('abort', onAbort)
+      abortSignal.removeEventListener('abort', onAbort)
       reject(userAbortError())
     }
-    recallLoadSignal.addEventListener('abort', onAbort, { once: true })
+    abortSignal.addEventListener('abort', onAbort, { once: true })
   })
 }
 
@@ -90,15 +90,15 @@ export type RecallNextResult =
 
 /**
  * Fetches the next recall prompt for the session.
- * When `recallLoadSignal` is set (TTY `runInteractiveRecallLoad` + wait chrome), HTTP calls and
- * optional {@link RECALL_LOAD_CLI_TEST_DELAY_MS_ENV} honour the same signal so Esc can cancel before or during fetch.
+ * When `abortSignal` is set (interactive fetch-wait for `/recall`), HTTP calls and optional
+ * {@link RECALL_LOAD_CLI_TEST_DELAY_MS_ENV} honour it so Esc can cancel before or during fetch.
  */
 export async function recallNext(
   dueindays = 0,
-  recallLoadSignal?: AbortSignal
+  abortSignal?: AbortSignal
 ): Promise<RecallNextResult> {
-  await awaitCliTestRecallLoadDelayIfConfigured(recallLoadSignal)
-  const sdkOpts = recallLoadSignal ? { signal: recallLoadSignal } : {}
+  await awaitCliTestRecallLoadDelayIfConfigured(abortSignal)
+  const sdkOpts = abortSignal ? { signal: abortSignal } : {}
   const result = await runWithDefaultBackendClient(() =>
     RecallsController.recalling({
       query: { timezone: getTimezone(), dueindays },

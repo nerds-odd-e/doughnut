@@ -2,10 +2,15 @@ import * as readline from 'node:readline'
 import { Writable } from 'node:stream'
 import type { AccessTokenEntry } from '../accessToken.js'
 import type { CommandDoc } from '../help.js'
-import { isFetchAbortedByCaller } from '../fetchAbort.js'
+import {
+  CLI_USER_ABORTED_WAIT_MESSAGE,
+  isFetchAbortedByCaller,
+} from '../fetchAbort.js'
 import {
   INTERACTIVE_FETCH_WAIT_LINES,
   cancelInteractiveFetchWaitFor,
+  getInteractiveFetchWaitLine,
+  runInteractiveFetchWait,
   type InteractiveFetchWaitLine,
 } from '../interactiveFetchWait.js'
 import {
@@ -44,7 +49,10 @@ export interface TTYDeps {
   getDefaultTokenLabel: () => string | undefined
   listAccessTokens: () => AccessTokenEntry[]
   removeAccessToken: (label: string) => boolean
-  removeAccessTokenCompletely: (label: string) => Promise<void>
+  removeAccessTokenCompletely: (
+    label: string,
+    signal?: AbortSignal
+  ) => Promise<void>
   setDefaultTokenLabel: (label: string) => void
   formatVersionOutput: () => string
   getLastLine: (buffer: string) => string
@@ -107,12 +115,6 @@ export interface TTYDeps {
   ) => string[]
   TOKEN_LIST_COMMANDS: Record<string, TokenListCommandConfig>
   getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
-  getInteractiveFetchWaitLine: () => InteractiveFetchWaitLine | null
-  runInteractiveFetchWait: <T>(
-    output: OutputAdapter,
-    line: InteractiveFetchWaitLine,
-    fn: () => Promise<T>
-  ) => Promise<T>
   isGreyDisabledInputChrome: (ctx: PlaceholderContext) => boolean
 }
 
@@ -198,8 +200,6 @@ export async function runTTY(
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
-    getInteractiveFetchWaitLine,
-    runInteractiveFetchWait,
     isGreyDisabledInputChrome,
   } = deps
 
@@ -663,7 +663,7 @@ export async function runTTY(
             outputMsg = `Token "${selectedLabel}" removed locally and from server.`
           } catch (err) {
             if (isFetchAbortedByCaller(err)) {
-              outputMsg = 'Cancelled by user.'
+              outputMsg = CLI_USER_ABORTED_WAIT_MESSAGE
             } else {
               writeError(err)
               outputMsg = err instanceof Error ? err.message : String(err)
@@ -672,7 +672,7 @@ export async function runTTY(
         }
         endTokenListSelection(outputMsg)
       } else {
-        endTokenListSelection('Cancelled by user.')
+        endTokenListSelection(CLI_USER_ABORTED_WAIT_MESSAGE)
       }
       return
     }
