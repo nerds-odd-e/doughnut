@@ -187,6 +187,18 @@ describe('recallStatus', () => {
     )
   })
 
+  test('rejects with invalid-token message when recalling returns 401', async () => {
+    vi.mocked(RecallsController.recalling).mockRejectedValue({ status: 401 })
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    await expect(recallStatus()).rejects.toThrow(
+      'Access token is invalid or expired'
+    )
+  })
+
   test('rejects when AbortSignal aborts during recalling', async () => {
     vi.mocked(RecallsController.recalling).mockImplementation(
       ({ signal }: { signal?: AbortSignal }) =>

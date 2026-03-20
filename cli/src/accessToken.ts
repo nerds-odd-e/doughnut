@@ -8,6 +8,7 @@ import {
   type UserToken,
 } from 'doughnut-api'
 import { getConfigDir } from './configDir.js'
+import { userMessageFromBackendError } from './backendErrors.js'
 import { isFetchAbortedByCaller } from './fetchAbort.js'
 
 /**
@@ -64,9 +65,7 @@ async function withBackendClient<T>(
     return await fn()
   } catch (e) {
     if (isFetchAbortedByCaller(e)) throw e
-    throw new Error(
-      'Doughnut service is not available. Check DOUGHNUT_API_BASE_URL and ensure the service is running.'
-    )
+    throw new Error(userMessageFromBackendError(e))
   }
 }
 

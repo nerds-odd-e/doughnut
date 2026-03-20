@@ -1,6 +1,6 @@
 # CLI interactive: history placement, API errors, and user cancel
 
-Informal plan — **Phases 1–4 done** (Phase 5 pending).
+Informal plan — **Phases 1–5 done**.
 
 ## Problems (from product + code)
 
@@ -100,7 +100,7 @@ Phase 4 implementation note:
 
 - Added cancellation regression tests for `/contest` (unit + TTY): Esc/abort now verified to use the same `Cancelled by user.` user-notice path as other interactive fetch waits.
 
-### Phase 5 — Distinct user-facing messages (connectivity vs auth)
+### Phase 5 — Distinct user-facing messages (connectivity vs auth) ✅
 
 **Goal:** When a command fails for a **known class** of reason, the **message in history** (or stderr for non-TTY if we extend there) should **name the situation** so the user knows whether to fix network, run `doughnut login`, refresh token, or contact support — not a single undifferentiated “backend error”.
 
@@ -117,7 +117,11 @@ Phase 4 implementation note:
 
 **Tests:** Unit tests in **`accessToken.test.ts`** / **`recall.test.ts`** (or a focused **`backendErrors.test.ts`**) with **mocked** network errors, 401, 403, and “no token” preconditions — assert **exact or stable substring** messages per class. E2E only if an existing CLI feature already asserts error text; avoid flaky network E2E.
 
-**Dependency:** Best after Phase 1 (failures are thrown, not silent). Can ship **after** Phase 2–3 so messages land in **styled** history, or **with** Phase 3 if error **kind** and **copy** are done together — prefer **one** phase that owns **copy + classification**; styling stays Phase 3 unless merged deliberately.
+Phase 5 implementation note:
+
+- Added centralized error copy mapping in `cli/src/backendErrors.ts`, used by `withBackendClient` in `cli/src/accessToken.ts`.
+- Classified at least these classes: network/service unavailable, HTTP 401 invalid-or-expired token, HTTP 403 no-permission.
+- Added unit coverage in `cli/tests/backendErrors.test.ts` plus command-path assertions in `cli/tests/accessToken.test.ts` and `cli/tests/recall.test.ts`.
 
 ---
 
