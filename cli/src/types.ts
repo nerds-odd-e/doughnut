@@ -11,6 +11,7 @@ export type ChatHistoryInputEntry = { type: 'input'; content: string }
 export type ChatHistoryOutputEntry = {
   type: 'output'
   lines: readonly string[]
+  kind?: 'normal' | 'error' | 'system'
 }
 export type ChatHistoryEntry = ChatHistoryInputEntry | ChatHistoryOutputEntry
 /** Ordered log of user inputs and command outputs for re-render on resize. */
@@ -19,6 +20,7 @@ export type ChatHistory = ChatHistoryEntry[]
 export type OutputAdapter = {
   log: (msg: string) => void
   logError: (err: unknown) => void
+  logSystem?: (msg: string) => void
   /** Optional: for Current guidance (e.g. "Please answer y or n"). Defaults to log. */
   writeCurrentPrompt?: (msg: string) => void
   /** Optional: write green separator before first Current guidance content in a turn. TTY only. */

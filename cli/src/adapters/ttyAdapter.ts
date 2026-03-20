@@ -67,7 +67,7 @@ export interface TTYDeps {
     width: number,
     options?: { forceCommandsHint?: boolean }
   ) => string[]
-  formatMcqChoiceLines: (choices: string[]) => string[]
+  formatMcqChoiceLines: (choices: readonly string[]) => string[]
   getTerminalWidth: () => number
   buildCurrentPromptSeparator: (width: number) => string
   buildLiveRegionLines: (
@@ -259,19 +259,25 @@ export async function runTTY(
     livePaint.lastPaintedLineCount = 0
   }
 
-  function commitHistoryOutput(lines: readonly string[]): void {
-    chatHistory.push({ type: 'output', lines: [...lines] })
+  function commitHistoryOutput(
+    lines: readonly string[],
+    kind: 'normal' | 'error' | 'system' = 'normal'
+  ): void {
+    chatHistory.push({ type: 'output', lines: [...lines], kind })
     resetLivePaintCursor()
     doFullRedraw()
   }
 
-  function endTokenSelection(outputMsg: string) {
+  function endTokenSelection(
+    outputMsg: string,
+    kind: 'normal' | 'error' | 'system' = 'normal'
+  ) {
     const command = tokenSelection?.command ?? ''
     clearLiveRegionForRepaint(livePaint)
     chatHistory.push({ type: 'input', content: command })
     tokenSelection = null
     buffer = ''
-    commitHistoryOutput([outputMsg])
+    commitHistoryOutput([outputMsg], kind)
   }
 
   function beginTokenSelection(
@@ -292,6 +298,7 @@ export async function runTTY(
   }
 
   const collectedOutputLines: string[] = []
+  let collectedOutputKind: 'normal' | 'error' | 'system' = 'normal'
   let ttyOutput: OutputAdapter
 
   /** Builds lines for input box, recalling indicator, Current prompt (above box), and Current guidance (below box). */
@@ -497,10 +504,16 @@ export async function runTTY(
 
   ttyOutput = {
     log: (msg) => {
+      collectedOutputKind = 'normal'
       collectedOutputLines.push(...msg.split('\n'))
     },
     logError: (err) => {
       const msg = err instanceof Error ? err.message : String(err)
+      collectedOutputKind = 'error'
+      collectedOutputLines.push(...msg.split('\n'))
+    },
+    logSystem: (msg) => {
+      collectedOutputKind = 'system'
       collectedOutputLines.push(...msg.split('\n'))
     },
     writeCurrentPrompt: writeCurrentPromptLine,
@@ -630,12 +643,13 @@ export async function runTTY(
         mcqChoiceHighlightIndex = 0
         livePaint.lastPaintedLineCount = 0
         collectedOutputLines.length = 0
+        collectedOutputKind = 'normal'
         chatHistory.push({ type: 'input', content: inputForHistory })
         if (await processInput(effectiveInput, ttyOutput)) {
           doExit()
           return
         }
-        commitHistoryOutput(collectedOutputLines)
+        commitHistoryOutput(collectedOutputLines, collectedOutputKind)
       } else if (str && !key.ctrl && !key.meta) {
         buffer += str
         drawBox()
@@ -663,6 +677,7 @@ export async function runTTY(
           tokenSelection.items[tokenSelection.highlightIndex]!.label
         const action = tokenSelection.action
         let outputMsg = ''
+        let outputKind: 'normal' | 'error' | 'system' = 'normal'
         if (action === 'set-default') {
           setDefaultTokenLabel(selectedLabel)
           outputMsg = `Default token set to: ${selectedLabel}`
@@ -680,14 +695,16 @@ export async function runTTY(
           } catch (err) {
             if (isFetchAbortedByCaller(err)) {
               outputMsg = CLI_USER_ABORTED_WAIT_MESSAGE
+              outputKind = 'system'
             } else {
               outputMsg = err instanceof Error ? err.message : String(err)
+              outputKind = 'error'
             }
           }
         }
-        endTokenSelection(outputMsg)
+        endTokenSelection(outputMsg, outputKind)
       } else {
-        endTokenSelection(CLI_USER_ABORTED_WAIT_MESSAGE)
+        endTokenSelection(CLI_USER_ABORTED_WAIT_MESSAGE, 'system')
       }
       return
     }
@@ -774,12 +791,13 @@ export async function runTTY(
         }
 
         collectedOutputLines.length = 0
+        collectedOutputKind = 'normal'
         if (isCommittedInteractiveInput(input)) {
           chatHistory.push({ type: 'input', content: input })
           if (await processInput(input, ttyOutput)) {
             doExit()
           }
-          commitHistoryOutput(collectedOutputLines)
+          commitHistoryOutput(collectedOutputLines, collectedOutputKind)
           return
         }
         if (isMcqPrompt(getPendingRecallAnswer())) {

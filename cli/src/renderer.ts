@@ -42,6 +42,8 @@ export type InteractiveInputReadyOsc = typeof INTERACTIVE_INPUT_READY_OSC
 export type TerminalWidth = number
 
 export const GREEN = '\x1b[32m'
+export const RED = '\x1b[31m'
+export const ITALIC = '\x1b[3m'
 export const GREY_BG = '\x1b[48;5;236m'
 
 export function buildCurrentPromptSeparator(width: TerminalWidth): string {
@@ -381,11 +383,20 @@ export function renderFullDisplay(
   options?: LiveRegionPaintOptions
 ): string[] {
   const lines: string[] = [formatVersionOutput(), '']
+  const styleHistoryLine = (
+    line: string,
+    kind: 'normal' | 'error' | 'system'
+  ): string => {
+    if (kind === 'error') return `${RED}${line}${RESET}`
+    if (kind === 'system') return `${GREY}${ITALIC}${line}${RESET}`
+    return line
+  }
   for (const entry of history) {
     if (entry.type === 'input') {
       lines.push(...renderPastInput(entry.content, width).split('\n'))
     } else {
-      lines.push(...entry.lines)
+      const kind = entry.kind ?? 'normal'
+      lines.push(...entry.lines.map((line) => styleHistoryLine(line, kind)))
     }
   }
   if (

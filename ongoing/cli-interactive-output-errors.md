@@ -1,6 +1,6 @@
 # CLI interactive: history placement, API errors, and user cancel
 
-Informal plan — **Phases 1–2 done** (Phases 3–5 pending).
+Informal plan — **Phases 1–3 done** (Phases 4–5 pending).
 
 ## Problems (from product + code)
 
@@ -78,7 +78,7 @@ Gmail / raw `http` in `cli/src/gmail.ts` is out of scope for `throwOnError`; onl
 - Re-run **`pnpm cli:test`**; run **one** relevant Cypress spec (e.g. `cli_recall.feature`) to confirm **`history output`** assertions still pass.
 - Update **`.cursor/rules/cli.mdc`** briefly: command results are painted only via history + live region redraw.
 
-### Phase 3 — Error vs system styling in history
+### Phase 3 — Error vs system styling in history ✅
 
 - Implement **`kind`** on output history entries + renderer styles.
 - Wire **`logCancelledOrError`**: abort → **`logSystem`**, else **`logError`** (error kind).

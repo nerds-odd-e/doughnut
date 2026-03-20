@@ -45,6 +45,7 @@ function outputAdapter() {
   return {
     log: vi.fn(),
     logError: vi.fn(),
+    logSystem: vi.fn(),
     writeCurrentPrompt: vi.fn(),
     beginCurrentPrompt: vi.fn(),
     onInteractiveFetchWaitChanged: vi.fn(),
@@ -202,7 +203,7 @@ describe('interactive fetch wait UI', () => {
     )
     expect(cancelInteractiveFetchWaitFor(out)).toBe(true)
     await done
-    expect(out.log).toHaveBeenCalledWith(CLI_USER_ABORTED_WAIT_MESSAGE)
+    expect(out.logSystem).toHaveBeenCalledWith(CLI_USER_ABORTED_WAIT_MESSAGE)
     expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
   })
 
@@ -225,7 +226,7 @@ describe('interactive fetch wait UI', () => {
     )
     expect(cancelInteractiveFetchWaitFor(out)).toBe(true)
     await done
-    expect(out.log).toHaveBeenCalledWith(CLI_USER_ABORTED_WAIT_MESSAGE)
+    expect(out.logSystem).toHaveBeenCalledWith(CLI_USER_ABORTED_WAIT_MESSAGE)
     expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
   })
 })

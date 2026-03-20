@@ -283,8 +283,10 @@ const PARAM_COMMANDS: ParamCommand[] = [
 ]
 
 function logCancelledOrError(err: unknown, output: OutputAdapter): void {
-  if (isFetchAbortedByCaller(err)) output.log(CLI_USER_ABORTED_WAIT_MESSAGE)
-  else output.logError(err)
+  if (isFetchAbortedByCaller(err)) {
+    if (output.logSystem) output.logSystem(CLI_USER_ABORTED_WAIT_MESSAGE)
+    else output.log(CLI_USER_ABORTED_WAIT_MESSAGE)
+  } else output.logError(err)
 }
 
 /** Recall session cannot continue after a failed or user-aborted recall load. */
@@ -364,6 +366,7 @@ const defaultOutput: OutputAdapter = {
   log: (msg) => console.log(msg),
   logError: (err) =>
     console.log(err instanceof Error ? err.message : String(err)),
+  logSystem: (msg) => console.log(msg),
   writeCurrentPrompt: (msg) => console.log(msg),
   clearAndRedraw: () => {
     writeFullRedraw(
