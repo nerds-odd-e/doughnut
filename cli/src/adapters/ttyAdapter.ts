@@ -658,7 +658,6 @@ export async function runTTY(
         resetCommandTurnBuffer()
         chatHistory.push({ type: 'input', content: inputForHistory })
         if (await processInput(effectiveInput, ttyOutput)) {
-          doFullRedraw()
           doExit()
           return
         }
@@ -803,8 +802,8 @@ export async function runTTY(
         if (isCommittedInteractiveInput(input)) {
           chatHistory.push({ type: 'input', content: input })
           if (await processInput(input, ttyOutput)) {
-            doFullRedraw()
             doExit()
+            return
           }
           commitHistoryOutput(commandTurn.lines, commandTurn.tone)
           return

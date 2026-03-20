@@ -17,6 +17,7 @@ import {
 } from '../src/interactive.js'
 import {
   buildSuggestionLines,
+  CLEAR_SCREEN,
   stripAnsi,
   stripAnsiCsiAndCr,
 } from '../src/renderer.js'
@@ -2214,5 +2215,43 @@ describe('TTY contest wait — Esc cancels', () => {
       expect(ttyOutput(writeSpy)).toContain('Cancelled by user.')
     )
     expect(isInRecallSubstate()).toBe(true)
+  })
+})
+
+describe('TTY exit: no full-screen redraw', () => {
+  let writeSpy: ReturnType<typeof vi.spyOn>
+  let exitSpy: ReturnType<typeof vi.spyOn>
+  let stdin: TTYStdin
+
+  beforeEach(async () => {
+    resetRecallStateForTesting()
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
+    exitSpy = vi
+      .spyOn(process, 'exit')
+      .mockImplementation((() => undefined) as unknown as typeof process.exit)
+    stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await tick()
+  })
+
+  afterEach(() => {
+    pressKey(stdin, 'c', { ctrl: true })
+    vi.restoreAllMocks()
+  })
+
+  test('after Enter on exit, stdout must not clear and repaint the full UI (cursor must not land in input box)', async () => {
+    typeString(stdin, 'exit')
+    await tick()
+    writeSpy.mockClear()
+    pressEnter(stdin)
+    await tick()
+    await vi.waitFor(() => expect(exitSpy).toHaveBeenCalledWith(0))
+
+    const outAfterSubmit = ttyOutput(writeSpy)
+    expect(
+      outAfterSubmit,
+      'Exit should not run doFullRedraw (clear screen + live region); that leaves the cursor in the input row after exit'
+    ).not.toContain(CLEAR_SCREEN)
   })
 })
