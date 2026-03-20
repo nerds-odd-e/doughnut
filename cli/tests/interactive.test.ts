@@ -148,6 +148,20 @@ function stripAllAnsi(str: string): string {
 
 const TOP_BORDER_PATTERN = /^┌─*┐$/
 
+/**
+ * After clearing the live region, drawBox must not apply a stale cursor-up before redrawing the
+ * input box top (┌). Two consecutive \\x1b[nA at the end of that prefix means an extra move-up
+ * and matches the "input box jumps one line up" bug.
+ */
+function hasStaleCursorUpBeforeInputBoxRedraw(output: string): boolean {
+  const marker = '\r\x1b[2K┌'
+  const idx = output.indexOf(marker)
+  if (idx < 0) return false
+  const prefix = output.slice(0, idx)
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI CUU sequences
+  return /\x1b\[\d+A\x1b\[\d+A$/.test(prefix)
+}
+
 function countTopBorderLinesBeforeFirstInputBox(output: string): number {
   const normalized = stripAllAnsi(output)
   const lines = normalized.split('\n')
@@ -1503,6 +1517,41 @@ describe('TTY mode slash command suggestions', () => {
     const boxTopIndex = lines.findIndex((l) => /^┌─+┐$/.test(l.trim()))
     expect(boxTopIndex).toBeGreaterThan(0)
     expect(lines[boxTopIndex - 1]).toBe('')
+  })
+})
+
+describe('TTY empty Enter redraw (regression)', () => {
+  let writeSpy: ReturnType<typeof vi.spyOn>
+  let stdin: TTYStdin
+
+  beforeEach(async () => {
+    resetRecallStateForTesting()
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
+    vi.spyOn(process, 'exit').mockImplementation(
+      (() => undefined) as unknown as typeof process.exit
+    )
+    stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await tick()
+  })
+
+  afterEach(() => {
+    pressKey(stdin, 'c', { ctrl: true })
+    vi.restoreAllMocks()
+  })
+
+  test('empty Enter redraw must not emit a stale cursor-up before the input box top', async () => {
+    writeSpy.mockClear()
+    pressEnter(stdin)
+    await tick()
+    await tick()
+
+    const output = ttyOutput(writeSpy)
+    expect(
+      hasStaleCursorUpBeforeInputBoxRedraw(output),
+      `Stale double cursor-up before \\r\\x1b[2K┌ — input box shifts up (prefix tail): ${JSON.stringify(output.slice(Math.max(0, output.indexOf('\r\x1b[2K┌') - 40), output.indexOf('\r\x1b[2K┌') + 5))}`
+    ).toBe(false)
   })
 })
 

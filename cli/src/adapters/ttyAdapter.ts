@@ -638,6 +638,7 @@ export async function runTTY(
           buffer = ''
 
           clearTTYDisplay(linesAboveCursor, prevTotalLines)
+          linesAboveCursor = 0
 
           if (input.trim()) {
             process.stdout.write(renderPastInput(input, width))
