@@ -1,6 +1,8 @@
 import {
   GREY,
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
+  ITALIC,
+  RED,
   RESET,
   HIDE_CURSOR,
   SHOW_CURSOR,
@@ -16,7 +18,7 @@ import {
   formatHighlightedList,
 } from './listDisplay.js'
 import { renderMarkdownToTerminal } from './markdown.js'
-import type { ChatHistory } from './types.js'
+import type { ChatHistory, ChatHistoryOutputTone } from './types.js'
 import type { InteractiveFetchWaitLine } from './interactiveFetchWait.js'
 import { formatVersionOutput } from './version.js'
 
@@ -42,8 +44,6 @@ export type InteractiveInputReadyOsc = typeof INTERACTIVE_INPUT_READY_OSC
 export type TerminalWidth = number
 
 export const GREEN = '\x1b[32m'
-export const RED = '\x1b[31m'
-export const ITALIC = '\x1b[3m'
 export const GREY_BG = '\x1b[48;5;236m'
 
 export function buildCurrentPromptSeparator(width: TerminalWidth): string {
@@ -358,6 +358,16 @@ export function buildSuggestionLines(
   )
 }
 
+/** SGR wrapper for one line of scrollback from {@link ChatHistoryOutputEntry}. */
+export function applyChatHistoryOutputTone(
+  line: string,
+  tone: ChatHistoryOutputTone
+): string {
+  if (tone === 'error') return `${RED}${line}${RESET}`
+  if (tone === 'userNotice') return `${GREY}${ITALIC}${line}${RESET}`
+  return line
+}
+
 /** Returns lines for Current guidance (access token list). */
 export function buildTokenListLines(
   tokens: AccessTokenEntry[],
@@ -383,20 +393,14 @@ export function renderFullDisplay(
   options?: LiveRegionPaintOptions
 ): string[] {
   const lines: string[] = [formatVersionOutput(), '']
-  const styleHistoryLine = (
-    line: string,
-    kind: 'normal' | 'error' | 'system'
-  ): string => {
-    if (kind === 'error') return `${RED}${line}${RESET}`
-    if (kind === 'system') return `${GREY}${ITALIC}${line}${RESET}`
-    return line
-  }
   for (const entry of history) {
     if (entry.type === 'input') {
       lines.push(...renderPastInput(entry.content, width).split('\n'))
     } else {
-      const kind = entry.kind ?? 'normal'
-      lines.push(...entry.lines.map((line) => styleHistoryLine(line, kind)))
+      const tone = entry.tone ?? 'plain'
+      lines.push(
+        ...entry.lines.map((line) => applyChatHistoryOutputTone(line, tone))
+      )
     }
   }
   if (

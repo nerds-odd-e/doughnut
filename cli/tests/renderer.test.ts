@@ -6,6 +6,7 @@ import {
   truncateToWidth,
   isCommittedInteractiveInput,
   grayDisabledInputBoxLines,
+  applyChatHistoryOutputTone,
   renderFullDisplay,
   stripAnsi,
   stripAnsiCsiAndCr,
@@ -131,17 +132,23 @@ describe('renderFullDisplay', () => {
     expect(stripAnsi(lines[boxTopIndex - 1])).toBe('')
   })
 
-  test('styles error and system history output lines', () => {
+  test('styles error and userNotice history output lines', () => {
     const history: ChatHistory = [
-      { type: 'output', lines: ['Network down'], kind: 'error' },
-      { type: 'output', lines: ['Cancelled by user.'], kind: 'system' },
+      { type: 'output', lines: ['Network down'], tone: 'error' },
+      { type: 'output', lines: ['Cancelled by user.'], tone: 'userNotice' },
     ]
     const lines = renderFullDisplay(history, '', 80, [], [])
     const errorLine = lines.find((l) => l.includes('Network down'))
-    const systemLine = lines.find((l) => l.includes('Cancelled by user.'))
+    const noticeLine = lines.find((l) => l.includes('Cancelled by user.'))
     expect(errorLine).toContain('\x1b[31m')
-    expect(systemLine).toContain('\x1b[90m')
-    expect(systemLine).toContain('\x1b[3m')
+    expect(noticeLine).toContain('\x1b[90m')
+    expect(noticeLine).toContain('\x1b[3m')
+  })
+})
+
+describe('applyChatHistoryOutputTone', () => {
+  test('plain leaves text unchanged', () => {
+    expect(applyChatHistoryOutputTone('ok', 'plain')).toBe('ok')
   })
 })
 

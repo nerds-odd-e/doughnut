@@ -56,7 +56,7 @@ Treat three layers together:
 |--------|------|
 | **Data plane** | Every CLI call to `doughnut-api` controllers must **surface failure as throw** (or assert unwrap), so `recallStatus`, `recallNext`, token flows, etc. never interpret `error` as empty data. Prefer **`throwOnError: true`** on each controller options object (spread with `signal` where used) in **`cli/src/recall.ts`** and **`cli/src/accessToken.ts`** — only places that import `*Controller` from `doughnut-api`. |
 | **TTY paint plane** | **`log` / `logError` must not print message body to stdout** in `ttyAdapter`; only update **`collectedOutputLines`** / **`chatHistory`** and let **`drawBox` → `renderFullDisplay`** paint scrollback. Eliminates duplicate/misplaced lines in the PTY stream (fixes (1) and stabilizes E2E sections). |
-| **Semantics plane** | Extend **`ChatHistory`** / **`ChatHistoryOutputEntry`** (`cli/src/types.ts`) with a **line kind**: at least **`normal` | `error` | `system`**. **`renderer.renderFullDisplay`** applies SGR (reuse **`GREY`** / **`ansi.ts`** conventions; error e.g. red, system e.g. grey+italic). **`OutputAdapter`**: add **`logSystem`** (or equivalent) so **`logCancelledOrError`** and token-list cancel use **system** styling; **`logError`** maps to **error** styling in TTY. **`interactive.ts` `defaultOutput`** (non-TTY) can stay plain or use minimal prefixes — keep simple. |
+| **Semantics plane** | Extend **`ChatHistory`** / **`ChatHistoryOutputEntry`** (`cli/src/types.ts`) with **`ChatHistoryOutputTone`**: **`plain` | `error` | `userNotice`**. **`renderer.applyChatHistoryOutputTone`** / **`renderFullDisplay`** apply SGR (error red; userNotice grey+italic). **`OutputAdapter.logUserNotice`** for user-cancelled waits / picker exit; **`logError`** → error tone in TTY. Shared mapping: **`userVisibleOutcomeFromCommandError`** in **`fetchAbort.ts`**. |
 
 Gmail / raw `http` in `cli/src/gmail.ts` is out of scope for `throwOnError`; only ensure **interactive fetch-wait** paths that already use **`logCancelledOrError`** still classify abort vs error correctly once throws work.
 
@@ -80,9 +80,9 @@ Gmail / raw `http` in `cli/src/gmail.ts` is out of scope for `throwOnError`; onl
 
 ### Phase 3 — Error vs system styling in history ✅
 
-- Implement **`kind`** on output history entries + renderer styles.
-- Wire **`logCancelledOrError`**: abort → **`logSystem`**, else **`logError`** (error kind).
-- **`endTokenListSelection`** (token list Esc / cancel): use the same **system** helper text as fetch-wait cancel.
+- Implement **`tone`** on output history entries + renderer (`applyChatHistoryOutputTone`).
+- Wire **`logCancelledOrError`**: abort → **`logUserNotice`**, else **`logError`**.
+- Token list Esc / cancel: same **`userNotice`** tone and copy as fetch-wait cancel (`commitTokenListResult`).
 - **E2E / Vitest**: prefer **Vitest** on renderer or adapter for ANSI presence; extend **`cliSectionParser`** or add a small **raw history** assertion only if E2E must see grey italic / red (avoid flaky loading lines per existing rule).
 
 ### Phase 4 — Cancel audit (same semantics + style)

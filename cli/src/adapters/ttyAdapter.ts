@@ -4,7 +4,7 @@ import type { AccessTokenEntry } from '../accessToken.js'
 import type { CommandDoc } from '../help.js'
 import {
   CLI_USER_ABORTED_WAIT_MESSAGE,
-  isFetchAbortedByCaller,
+  userVisibleOutcomeFromCommandError,
 } from '../fetchAbort.js'
 import {
   INTERACTIVE_FETCH_WAIT_LINES,
@@ -22,7 +22,12 @@ import {
   type LiveRegionPaintOptions,
   type PlaceholderContext,
 } from '../renderer.js'
-import type { ChatHistory, McqRecallPending, OutputAdapter } from '../types.js'
+import type {
+  ChatHistory,
+  ChatHistoryOutputTone,
+  McqRecallPending,
+  OutputAdapter,
+} from '../types.js'
 
 export type TokenListAction = 'set-default' | 'remove' | 'remove-completely'
 
@@ -162,6 +167,9 @@ type TokenSelectionState = {
   highlightIndex: number
 }
 
+/** One submitted command’s buffered scrollback: lines + dominant tone for `commitHistoryOutput`. */
+type BufferedCommandTurn = { lines: string[]; tone: ChatHistoryOutputTone }
+
 export async function runTTY(
   stdin: NodeJS.ReadableStream,
   deps: TTYDeps
@@ -261,23 +269,24 @@ export async function runTTY(
 
   function commitHistoryOutput(
     lines: readonly string[],
-    kind: 'normal' | 'error' | 'system' = 'normal'
+    tone: ChatHistoryOutputTone = 'plain'
   ): void {
-    chatHistory.push({ type: 'output', lines: [...lines], kind })
+    chatHistory.push({ type: 'output', lines: [...lines], tone })
     resetLivePaintCursor()
     doFullRedraw()
   }
 
-  function endTokenSelection(
-    outputMsg: string,
-    kind: 'normal' | 'error' | 'system' = 'normal'
+  /** Ends token-list mode: records the slash command as input, then the outcome line in scrollback. */
+  function commitTokenListResult(
+    message: string,
+    tone: ChatHistoryOutputTone = 'plain'
   ) {
     const command = tokenSelection?.command ?? ''
     clearLiveRegionForRepaint(livePaint)
     chatHistory.push({ type: 'input', content: command })
     tokenSelection = null
     buffer = ''
-    commitHistoryOutput([outputMsg], kind)
+    commitHistoryOutput([message], tone)
   }
 
   function beginTokenSelection(
@@ -297,9 +306,13 @@ export async function runTTY(
     }
   }
 
-  const collectedOutputLines: string[] = []
-  let collectedOutputKind: 'normal' | 'error' | 'system' = 'normal'
+  /** Buffered `processInput` stdout for one submitted command (MCQ path or normal Enter). */
+  let commandTurn: BufferedCommandTurn = { lines: [], tone: 'plain' }
   let ttyOutput: OutputAdapter
+
+  function resetCommandTurnBuffer(): void {
+    commandTurn = { lines: [], tone: 'plain' }
+  }
 
   /** Builds lines for input box, recalling indicator, Current prompt (above box), and Current guidance (below box). */
   function getDisplayContent() {
@@ -504,17 +517,17 @@ export async function runTTY(
 
   ttyOutput = {
     log: (msg) => {
-      collectedOutputKind = 'normal'
-      collectedOutputLines.push(...msg.split('\n'))
+      commandTurn.tone = 'plain'
+      commandTurn.lines.push(...msg.split('\n'))
     },
     logError: (err) => {
       const msg = err instanceof Error ? err.message : String(err)
-      collectedOutputKind = 'error'
-      collectedOutputLines.push(...msg.split('\n'))
+      commandTurn.tone = 'error'
+      commandTurn.lines.push(...msg.split('\n'))
     },
-    logSystem: (msg) => {
-      collectedOutputKind = 'system'
-      collectedOutputLines.push(...msg.split('\n'))
+    logUserNotice: (msg) => {
+      commandTurn.tone = 'userNotice'
+      commandTurn.lines.push(...msg.split('\n'))
     },
     writeCurrentPrompt: writeCurrentPromptLine,
     beginCurrentPrompt: doBeginCurrentPrompt,
@@ -642,14 +655,13 @@ export async function runTTY(
         buffer = ''
         mcqChoiceHighlightIndex = 0
         livePaint.lastPaintedLineCount = 0
-        collectedOutputLines.length = 0
-        collectedOutputKind = 'normal'
+        resetCommandTurnBuffer()
         chatHistory.push({ type: 'input', content: inputForHistory })
         if (await processInput(effectiveInput, ttyOutput)) {
           doExit()
           return
         }
-        commitHistoryOutput(collectedOutputLines, collectedOutputKind)
+        commitHistoryOutput(commandTurn.lines, commandTurn.tone)
       } else if (str && !key.ctrl && !key.meta) {
         buffer += str
         drawBox()
@@ -676,14 +688,14 @@ export async function runTTY(
         const selectedLabel =
           tokenSelection.items[tokenSelection.highlightIndex]!.label
         const action = tokenSelection.action
-        let outputMsg = ''
-        let outputKind: 'normal' | 'error' | 'system' = 'normal'
+        let message = ''
+        let tone: ChatHistoryOutputTone = 'plain'
         if (action === 'set-default') {
           setDefaultTokenLabel(selectedLabel)
-          outputMsg = `Default token set to: ${selectedLabel}`
+          message = `Default token set to: ${selectedLabel}`
         } else if (action === 'remove') {
           removeAccessToken(selectedLabel)
-          outputMsg = `Token "${selectedLabel}" removed.`
+          message = `Token "${selectedLabel}" removed.`
         } else {
           try {
             await runInteractiveFetchWait(
@@ -691,20 +703,16 @@ export async function runTTY(
               INTERACTIVE_FETCH_WAIT_LINES.removeAccessTokenCompletely,
               (signal) => removeAccessTokenCompletely(selectedLabel, signal)
             )
-            outputMsg = `Token "${selectedLabel}" removed locally and from server.`
+            message = `Token "${selectedLabel}" removed locally and from server.`
           } catch (err) {
-            if (isFetchAbortedByCaller(err)) {
-              outputMsg = CLI_USER_ABORTED_WAIT_MESSAGE
-              outputKind = 'system'
-            } else {
-              outputMsg = err instanceof Error ? err.message : String(err)
-              outputKind = 'error'
-            }
+            const o = userVisibleOutcomeFromCommandError(err)
+            message = o.text
+            tone = o.tone
           }
         }
-        endTokenSelection(outputMsg, outputKind)
+        commitTokenListResult(message, tone)
       } else {
-        endTokenSelection(CLI_USER_ABORTED_WAIT_MESSAGE, 'system')
+        commitTokenListResult(CLI_USER_ABORTED_WAIT_MESSAGE, 'userNotice')
       }
       return
     }
@@ -790,14 +798,13 @@ export async function runTTY(
           return
         }
 
-        collectedOutputLines.length = 0
-        collectedOutputKind = 'normal'
+        resetCommandTurnBuffer()
         if (isCommittedInteractiveInput(input)) {
           chatHistory.push({ type: 'input', content: input })
           if (await processInput(input, ttyOutput)) {
             doExit()
           }
-          commitHistoryOutput(collectedOutputLines, collectedOutputKind)
+          commitHistoryOutput(commandTurn.lines, commandTurn.tone)
           return
         }
         if (isMcqPrompt(getPendingRecallAnswer())) {

@@ -10,10 +10,7 @@ import {
   removeAccessTokenCompletely,
   setDefaultTokenLabel,
 } from './accessToken.js'
-import {
-  CLI_USER_ABORTED_WAIT_MESSAGE,
-  isFetchAbortedByCaller,
-} from './fetchAbort.js'
+import { userVisibleOutcomeFromCommandError } from './fetchAbort.js'
 import { addGmailAccount, getLastEmailSubject } from './gmail.js'
 import {
   filterCommandsByPrefix,
@@ -283,10 +280,13 @@ const PARAM_COMMANDS: ParamCommand[] = [
 ]
 
 function logCancelledOrError(err: unknown, output: OutputAdapter): void {
-  if (isFetchAbortedByCaller(err)) {
-    if (output.logSystem) output.logSystem(CLI_USER_ABORTED_WAIT_MESSAGE)
-    else output.log(CLI_USER_ABORTED_WAIT_MESSAGE)
-  } else output.logError(err)
+  const { text, tone } = userVisibleOutcomeFromCommandError(err)
+  if (tone === 'userNotice') {
+    if (output.logUserNotice) output.logUserNotice(text)
+    else output.log(text)
+  } else {
+    output.logError(err)
+  }
 }
 
 /** Recall session cannot continue after a failed or user-aborted recall load. */
@@ -366,7 +366,7 @@ const defaultOutput: OutputAdapter = {
   log: (msg) => console.log(msg),
   logError: (err) =>
     console.log(err instanceof Error ? err.message : String(err)),
-  logSystem: (msg) => console.log(msg),
+  logUserNotice: (msg) => console.log(msg),
   writeCurrentPrompt: (msg) => console.log(msg),
   clearAndRedraw: () => {
     writeFullRedraw(

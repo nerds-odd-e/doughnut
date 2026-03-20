@@ -8,6 +8,7 @@ import {
 import {
   CLI_USER_ABORTED_WAIT_MESSAGE,
   userAbortError,
+  userVisibleOutcomeFromCommandError,
 } from '../src/fetchAbort.js'
 import { cancelInteractiveFetchWaitFor } from '../src/interactiveFetchWait.js'
 import {
@@ -45,7 +46,7 @@ function outputAdapter() {
   return {
     log: vi.fn(),
     logError: vi.fn(),
-    logSystem: vi.fn(),
+    logUserNotice: vi.fn(),
     writeCurrentPrompt: vi.fn(),
     beginCurrentPrompt: vi.fn(),
     onInteractiveFetchWaitChanged: vi.fn(),
@@ -57,6 +58,22 @@ beforeEach(() => {
   mockRecallNext.mockReset()
   mockRecallStatus.mockReset()
   mockAddAccessToken.mockReset()
+})
+
+describe('userVisibleOutcomeFromCommandError', () => {
+  test('AbortError maps to user notice text and tone', () => {
+    expect(userVisibleOutcomeFromCommandError(userAbortError())).toEqual({
+      text: CLI_USER_ABORTED_WAIT_MESSAGE,
+      tone: 'userNotice',
+    })
+  })
+
+  test('other errors map to message and error tone', () => {
+    expect(userVisibleOutcomeFromCommandError(new Error('boom'))).toEqual({
+      text: 'boom',
+      tone: 'error',
+    })
+  })
 })
 
 describe('interactive fetch wait UI', () => {
@@ -203,7 +220,9 @@ describe('interactive fetch wait UI', () => {
     )
     expect(cancelInteractiveFetchWaitFor(out)).toBe(true)
     await done
-    expect(out.logSystem).toHaveBeenCalledWith(CLI_USER_ABORTED_WAIT_MESSAGE)
+    expect(out.logUserNotice).toHaveBeenCalledWith(
+      CLI_USER_ABORTED_WAIT_MESSAGE
+    )
     expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
   })
 
@@ -226,7 +245,9 @@ describe('interactive fetch wait UI', () => {
     )
     expect(cancelInteractiveFetchWaitFor(out)).toBe(true)
     await done
-    expect(out.logSystem).toHaveBeenCalledWith(CLI_USER_ABORTED_WAIT_MESSAGE)
+    expect(out.logUserNotice).toHaveBeenCalledWith(
+      CLI_USER_ABORTED_WAIT_MESSAGE
+    )
     expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
   })
 })

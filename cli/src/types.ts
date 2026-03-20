@@ -7,11 +7,18 @@ export type McqRecallPending = {
 
 /** User-submitted input in the prompt (what they typed). */
 export type ChatHistoryInputEntry = { type: 'input'; content: string }
+
+/**
+ * TTY scrollback styling for one command’s output block.
+ * `userNotice` = user cancelled a wait or left a picker — not an application failure.
+ */
+export type ChatHistoryOutputTone = 'plain' | 'error' | 'userNotice'
+
 /** Command output lines (what was displayed in response). */
 export type ChatHistoryOutputEntry = {
   type: 'output'
   lines: readonly string[]
-  kind?: 'normal' | 'error' | 'system'
+  tone?: ChatHistoryOutputTone
 }
 export type ChatHistoryEntry = ChatHistoryInputEntry | ChatHistoryOutputEntry
 /** Ordered log of user inputs and command outputs for re-render on resize. */
@@ -20,7 +27,8 @@ export type ChatHistory = ChatHistoryEntry[]
 export type OutputAdapter = {
   log: (msg: string) => void
   logError: (err: unknown) => void
-  logSystem?: (msg: string) => void
+  /** Optional: user-facing notice (e.g. cancelled wait); TTY paints as distinct scrollback tone. */
+  logUserNotice?: (msg: string) => void
   /** Optional: for Current guidance (e.g. "Please answer y or n"). Defaults to log. */
   writeCurrentPrompt?: (msg: string) => void
   /** Optional: write green separator before first Current guidance content in a turn. TTY only. */
