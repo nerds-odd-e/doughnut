@@ -2,9 +2,10 @@ import * as readline from 'node:readline'
 import { Writable } from 'node:stream'
 import type { AccessTokenEntry } from '../accessToken.js'
 import type { CommandDoc } from '../help.js'
+import { isFetchAbortedByCaller } from '../fetchAbort.js'
 import {
   INTERACTIVE_FETCH_WAIT_LINES,
-  cancelInteractiveRecallLoadFor,
+  cancelInteractiveFetchWaitFor,
   type InteractiveFetchWaitLine,
 } from '../interactiveFetchWait.js'
 import {
@@ -531,7 +532,7 @@ export async function runTTY(
       process.stdout.write(`\x1b[${1}B\r\n`)
       doExit()
     }
-    if (key.name === 'escape' && cancelInteractiveRecallLoadFor(ttyOutput)) {
+    if (key.name === 'escape' && cancelInteractiveFetchWaitFor(ttyOutput)) {
       drawBox()
       return
     }
@@ -657,12 +658,16 @@ export async function runTTY(
             await runInteractiveFetchWait(
               ttyOutput,
               INTERACTIVE_FETCH_WAIT_LINES.removeAccessTokenCompletely,
-              () => removeAccessTokenCompletely(selectedLabel)
+              (signal) => removeAccessTokenCompletely(selectedLabel, signal)
             )
             outputMsg = `Token "${selectedLabel}" removed locally and from server.`
           } catch (err) {
-            writeError(err)
-            outputMsg = err instanceof Error ? err.message : String(err)
+            if (isFetchAbortedByCaller(err)) {
+              outputMsg = 'Cancelled by user.'
+            } else {
+              writeError(err)
+              outputMsg = err instanceof Error ? err.message : String(err)
+            }
           }
         }
         endTokenListSelection(outputMsg)

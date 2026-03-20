@@ -11,7 +11,7 @@ import {
 import { addAccessToken } from '../src/accessToken.js'
 import { userAbortError } from '../src/fetchAbort.js'
 import { processInput, resetRecallStateForTesting } from '../src/interactive.js'
-import { cancelInteractiveRecallLoadFor } from '../src/interactiveFetchWait.js'
+import { cancelInteractiveFetchWaitFor } from '../src/interactiveFetchWait.js'
 import {
   answerQuiz,
   answerSpelling,
@@ -535,7 +535,7 @@ describe('processInput /recall — interactive recall load', () => {
     await vi.waitFor(() =>
       expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalled()
     )
-    expect(cancelInteractiveRecallLoadFor(out)).toBe(true)
+    expect(cancelInteractiveFetchWaitFor(out)).toBe(true)
     await done
     expect(out.log).toHaveBeenCalledWith('Cancelled by user.')
     expect(RecallsController.recalling).not.toHaveBeenCalled()

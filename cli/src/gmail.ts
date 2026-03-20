@@ -8,6 +8,7 @@ import {
   GOOGLE_CLIENT_SECRET as BUILTIN_CLIENT_SECRET,
 } from './credentials.js'
 import { getConfigDir } from './configDir.js'
+import { userAbortError } from './fetchAbort.js'
 
 const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly'
 const DEFAULT_OAUTH_TOKEN_URL = 'https://oauth2.googleapis.com/token'
@@ -74,9 +75,29 @@ function openBrowser(url: string): void {
   }
 }
 
-async function waitForCallback(server: http.Server): Promise<string> {
+async function waitForCallback(
+  server: http.Server,
+  signal?: AbortSignal
+): Promise<string> {
   return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
+    if (signal?.aborted) {
+      server.close()
+      reject(userAbortError())
+      return
+    }
+    let timeout: NodeJS.Timeout
+    const cleanup = () => {
+      clearTimeout(timeout)
+      signal?.removeEventListener('abort', onAbort)
+    }
+    const onAbort = () => {
+      cleanup()
+      server.close()
+      reject(userAbortError())
+    }
+    signal?.addEventListener('abort', onAbort, { once: true })
+    timeout = setTimeout(() => {
+      cleanup()
       server.close()
       reject(new Error('Authentication timed out. Please try again.'))
     }, 300_000)
@@ -91,7 +112,7 @@ async function waitForCallback(server: http.Server): Promise<string> {
         res.end(
           '<html><body><h1>Authentication complete. You can close this window.</h1></body></html>'
         )
-        clearTimeout(timeout)
+        cleanup()
         server.close()
         if (error) reject(new Error(`OAuth error: ${error}`))
         else if (code) resolve(code)
@@ -105,7 +126,8 @@ async function exchangeCodeForTokens(
   code: string,
   clientId: string,
   clientSecret: string,
-  redirectUri: string
+  redirectUri: string,
+  signal?: AbortSignal
 ): Promise<{ accessToken: string; refreshToken: string; expiresIn: number }> {
   const body = new URLSearchParams({
     code,
@@ -118,6 +140,7 @@ async function exchangeCodeForTokens(
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body.toString(),
+    signal,
   })
   if (!res.ok) {
     const err = (await res.json().catch(() => ({}))) as {
@@ -142,9 +165,13 @@ async function exchangeCodeForTokens(
   }
 }
 
-async function getProfileEmail(accessToken: string): Promise<string> {
+async function getProfileEmail(
+  accessToken: string,
+  signal?: AbortSignal
+): Promise<string> {
   const res = await fetch(getGmailApiUrl('/users/me/profile'), {
     headers: { Authorization: `Bearer ${accessToken}` },
+    signal,
   })
   if (!res.ok) {
     const text = await res.text()
@@ -154,7 +181,12 @@ async function getProfileEmail(accessToken: string): Promise<string> {
   return data.emailAddress || 'unknown@gmail.com'
 }
 
-export async function addGmailAccount(configPath?: string): Promise<void> {
+export async function addGmailAccount(
+  configPath?: string,
+  signal?: AbortSignal
+): Promise<void> {
+  if (signal?.aborted) throw userAbortError()
+
   const config = loadConfig(configPath)
 
   const clientId = config.clientId || BUILTIN_CLIENT_ID || undefined
@@ -173,6 +205,10 @@ export async function addGmailAccount(configPath?: string): Promise<void> {
   if (!address || typeof address === 'string') {
     server.close()
     throw new Error('Failed to bind callback server')
+  }
+  if (signal?.aborted) {
+    server.close()
+    throw userAbortError()
   }
   const port = address.port
   const redirectUri = `http://localhost:${port}`
@@ -193,14 +229,15 @@ export async function addGmailAccount(configPath?: string): Promise<void> {
     openBrowser(authUrl.toString())
   }
 
-  const code = await waitForCallback(server)
+  const code = await waitForCallback(server, signal)
   const tokens = await exchangeCodeForTokens(
     code,
     clientId!,
     clientSecret!,
-    redirectUri
+    redirectUri,
+    signal
   )
-  const email = await getProfileEmail(tokens.accessToken)
+  const email = await getProfileEmail(tokens.accessToken, signal)
 
   const expiresAt = Date.now() + tokens.expiresIn * 1000
   const account: GmailAccount = {
@@ -217,7 +254,8 @@ export async function addGmailAccount(configPath?: string): Promise<void> {
 
 async function refreshAccessToken(
   account: GmailAccount,
-  config: GmailConfig
+  config: GmailConfig,
+  signal?: AbortSignal
 ): Promise<string> {
   const clientId = config.clientId || BUILTIN_CLIENT_ID || undefined
   const clientSecret = config.clientSecret || BUILTIN_CLIENT_SECRET || undefined
@@ -235,6 +273,7 @@ async function refreshAccessToken(
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body.toString(),
+    signal,
   })
   if (!res.ok) {
     const err = (await res.json().catch(() => ({}))) as { error?: string }
@@ -261,7 +300,8 @@ function getSubjectFromMessage(message: {
 }
 
 export async function getLastEmailSubject(
-  configPath?: string
+  configPath?: string,
+  signal?: AbortSignal
 ): Promise<string> {
   const config = loadConfig(configPath)
   const account = config.accounts[0]
@@ -272,7 +312,7 @@ export async function getLastEmailSubject(
   let accessToken = account.accessToken
   const bufferMs = 60_000
   if (Date.now() >= account.expiresAt - bufferMs) {
-    accessToken = await refreshAccessToken(account, config)
+    accessToken = await refreshAccessToken(account, config, signal)
     saveConfig(config, configPath)
   }
 
@@ -280,6 +320,7 @@ export async function getLastEmailSubject(
     getGmailApiUrl('/users/me/messages?maxResults=1'),
     {
       headers: { Authorization: `Bearer ${accessToken}` },
+      signal,
     }
   )
   if (!listRes.ok) {
@@ -297,7 +338,7 @@ export async function getLastEmailSubject(
     getGmailApiUrl(
       `/users/me/messages/${msgId}?format=metadata&metadataHeaders=Subject`
     ),
-    { headers: { Authorization: `Bearer ${accessToken}` } }
+    { headers: { Authorization: `Bearer ${accessToken}` }, signal }
   )
   if (!msgRes.ok) {
     const text = await msgRes.text()

@@ -53,10 +53,12 @@ function getTimezone(): string {
   return Intl.DateTimeFormat().resolvedOptions().timeZone
 }
 
-export async function recallStatus(): Promise<string> {
+export async function recallStatus(signal?: AbortSignal): Promise<string> {
+  const sdkOpts = signal ? { signal } : {}
   const result = await runWithDefaultBackendClient(() =>
     RecallsController.recalling({
       query: { timezone: getTimezone(), dueindays: 0 },
+      ...sdkOpts,
     })
   )
   const count = result.data?.toRepeat?.length ?? 0
@@ -215,13 +217,16 @@ function recallPromptToResult(prompt: RecallPrompt): RecallNextResult | null {
 }
 
 export async function contestAndRegenerate(
-  recallPromptId: number
+  recallPromptId: number,
+  signal?: AbortSignal
 ): Promise<
   { ok: true; result: RecallNextResult } | { ok: false; message: string }
 > {
+  const sdkOpts = signal ? { signal } : {}
   const contestResult = await runWithDefaultBackendClient(() =>
     RecallPromptController.contest({
       path: { recallPrompt: recallPromptId },
+      ...sdkOpts,
     })
   )
   const data = contestResult.data
@@ -244,6 +249,7 @@ export async function contestAndRegenerate(
     RecallPromptController.regenerate({
       path: { recallPrompt: recallPromptId },
       body: data,
+      ...sdkOpts,
     })
   )
   const regenerated = regenerateResult.data

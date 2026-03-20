@@ -64,9 +64,12 @@ export async function runWithDefaultBackendClient<T>(
   return withBackendClient(entry.token, fn)
 }
 
-export async function addAccessToken(token: string): Promise<void> {
+export async function addAccessToken(
+  token: string,
+  signal?: AbortSignal
+): Promise<void> {
   const result = await withBackendClient(token, () =>
-    UserController.getTokenInfo()
+    UserController.getTokenInfo({ signal })
   )
   if (!result.data) {
     throw new Error('Token is invalid or expired.')
@@ -96,14 +99,17 @@ export function removeAccessToken(label: string): boolean {
 }
 
 export async function removeAccessTokenCompletely(
-  label: string
+  label: string,
+  signal?: AbortSignal
 ): Promise<void> {
   const config = loadConfig()
   const entry = config.tokens.find((t) => t.label === label)
   if (!entry) {
     throw new Error(`Token "${label}" not found.`)
   }
-  await withBackendClient(entry.token, () => UserController.revokeToken())
+  await withBackendClient(entry.token, () =>
+    UserController.revokeToken({ signal })
+  )
   removeAccessToken(label)
 }
 
@@ -125,7 +131,10 @@ export function setDefaultTokenLabel(label: string): void {
   saveConfig(config)
 }
 
-export async function createAccessToken(label: string): Promise<void> {
+export async function createAccessToken(
+  label: string,
+  signal?: AbortSignal
+): Promise<void> {
   const config = loadConfig()
   const defaultLabel = getDefaultTokenLabel()
   const defaultEntry = config.tokens.find((t) => t.label === defaultLabel)
@@ -135,7 +144,7 @@ export async function createAccessToken(label: string): Promise<void> {
     )
   }
   const result = await withBackendClient(defaultEntry.token, () =>
-    UserController.generateToken({ body: { label } })
+    UserController.generateToken({ body: { label }, signal })
   )
   if (!result.data) {
     throw new Error('Failed to create token.')

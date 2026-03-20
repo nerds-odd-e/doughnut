@@ -6,7 +6,7 @@ import {
   runInteractiveFetchWait,
 } from '../src/interactive.js'
 import { userAbortError } from '../src/fetchAbort.js'
-import { cancelInteractiveRecallLoadFor } from '../src/interactiveFetchWait.js'
+import { cancelInteractiveFetchWaitFor } from '../src/interactiveFetchWait.js'
 import {
   buildBoxLines,
   buildLiveRegionLines,
@@ -127,7 +127,7 @@ describe('interactive fetch wait UI', () => {
   test('processInput /recall-status signals fetch wait start and end', async () => {
     let resolveStatus!: (value: string) => void
     mockRecallStatus.mockImplementation(
-      () =>
+      (_signal?: AbortSignal) =>
         new Promise<string>((resolve) => {
           resolveStatus = resolve
         })
@@ -161,7 +161,10 @@ describe('interactive fetch wait UI', () => {
     resolveAdd()
     await done
     expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
-    expect(mockAddAccessToken).toHaveBeenCalledWith('secret')
+    expect(mockAddAccessToken).toHaveBeenCalledWith(
+      'secret',
+      expect.any(AbortSignal)
+    )
   })
 
   test('runInteractiveFetchWait notifies end wait after rejection', async () => {
@@ -170,7 +173,7 @@ describe('interactive fetch wait UI', () => {
       runInteractiveFetchWait(
         out,
         INTERACTIVE_FETCH_WAIT_LINES.recallNext,
-        async () => {
+        async (_signal) => {
           throw new Error('fail')
         }
       )
@@ -194,7 +197,30 @@ describe('interactive fetch wait UI', () => {
     await vi.waitFor(() =>
       expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalled()
     )
-    expect(cancelInteractiveRecallLoadFor(out)).toBe(true)
+    expect(cancelInteractiveFetchWaitFor(out)).toBe(true)
+    await done
+    expect(out.log).toHaveBeenCalledWith('Cancelled by user.')
+    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
+  })
+
+  test('processInput /recall-status: Esc abort logs Cancelled by user.', async () => {
+    mockRecallStatus.mockImplementation((_signal?: AbortSignal) => {
+      return new Promise<string>((_resolve, reject) => {
+        if (_signal?.aborted) {
+          reject(userAbortError())
+          return
+        }
+        _signal?.addEventListener('abort', () => reject(userAbortError()), {
+          once: true,
+        })
+      })
+    })
+    const out = outputAdapter()
+    const done = processInput('/recall-status', out)
+    await vi.waitFor(() =>
+      expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalled()
+    )
+    expect(cancelInteractiveFetchWaitFor(out)).toBe(true)
     await done
     expect(out.log).toHaveBeenCalledWith('Cancelled by user.')
     expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)

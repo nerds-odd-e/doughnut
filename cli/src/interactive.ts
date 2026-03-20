@@ -224,7 +224,10 @@ type ParamCommand = {
   command: string
   usage: string
   fetchWaitLine?: InteractiveFetchWaitLine
-  run: (param: string) => Promise<ParamCommandResult> | ParamCommandResult
+  run: (
+    param: string,
+    signal?: AbortSignal
+  ) => Promise<ParamCommandResult> | ParamCommandResult
 }
 
 const PARAM_COMMANDS: ParamCommand[] = [
@@ -232,8 +235,8 @@ const PARAM_COMMANDS: ParamCommand[] = [
     command: '/add-access-token',
     usage: 'Usage: /add-access-token <token>',
     fetchWaitLine: INTERACTIVE_FETCH_WAIT_LINES.addAccessToken,
-    run: async (param) => {
-      await addAccessToken(param)
+    run: async (param, signal) => {
+      await addAccessToken(param, signal)
       return 'Token added'
     },
   },
@@ -241,8 +244,8 @@ const PARAM_COMMANDS: ParamCommand[] = [
     command: '/create-access-token',
     usage: 'Usage: /create-access-token <label>',
     fetchWaitLine: INTERACTIVE_FETCH_WAIT_LINES.createAccessToken,
-    run: async (param) => {
-      await createAccessToken(param)
+    run: async (param, signal) => {
+      await createAccessToken(param, signal)
       return 'Token created'
     },
   },
@@ -250,8 +253,8 @@ const PARAM_COMMANDS: ParamCommand[] = [
     command: '/remove-access-token-completely',
     usage: 'Usage: /remove-access-token-completely <label>',
     fetchWaitLine: INTERACTIVE_FETCH_WAIT_LINES.removeAccessTokenCompletely,
-    run: async (param) => {
-      await removeAccessTokenCompletely(param)
+    run: async (param, signal) => {
+      await removeAccessTokenCompletely(param, signal)
       return `Token "${param}" removed locally and from server.`
     },
   },
@@ -265,17 +268,18 @@ const PARAM_COMMANDS: ParamCommand[] = [
   },
 ]
 
+function logCancelledOrError(err: unknown, output: OutputAdapter): void {
+  if (isFetchAbortedByCaller(err)) output.log('Cancelled by user.')
+  else output.logError(err)
+}
+
 /** After `runInteractiveRecallLoad` throws: end recall session and show cancel vs backend error. */
 function handleInteractiveRecallLoadError(
   err: unknown,
   output: OutputAdapter
 ): void {
   endRecallSession()
-  if (isFetchAbortedByCaller(err)) {
-    output.log('Cancelled by user.')
-  } else {
-    output.logError(err)
-  }
+  logCancelledOrError(err, output)
 }
 
 async function handleParamCommand(
@@ -291,13 +295,13 @@ async function handleParamCommand(
     }
     try {
       const msg = entry.fetchWaitLine
-        ? await runInteractiveFetchWait(output, entry.fetchWaitLine, () =>
-            Promise.resolve(entry.run(param))
+        ? await runInteractiveFetchWait(output, entry.fetchWaitLine, (signal) =>
+            Promise.resolve(entry.run(param, signal))
           )
         : await Promise.resolve(entry.run(param))
       if (msg) output.log(msg)
     } catch (err) {
-      output.logError(err)
+      logCancelledOrError(err, output)
     }
     return true
   }
@@ -380,7 +384,7 @@ export async function processInput(
       const outcome = await runInteractiveFetchWait(
         output,
         INTERACTIVE_FETCH_WAIT_LINES.contest,
-        () => contestAndRegenerate(contestablePromptId)
+        (signal) => contestAndRegenerate(contestablePromptId, signal)
       )
       if (!outcome.ok) {
         output.log(outcome.message)
@@ -392,7 +396,7 @@ export async function processInput(
         writeCurrentPrompt
       )
     } catch (err) {
-      output.logError(err)
+      logCancelledOrError(err, output)
     }
     return false
   }
@@ -431,10 +435,10 @@ export async function processInput(
       await runInteractiveFetchWait(
         output,
         INTERACTIVE_FETCH_WAIT_LINES.addGmail,
-        () => addGmailAccount()
+        (signal) => addGmailAccount(undefined, signal)
       )
     } catch (err) {
-      output.logError(err)
+      logCancelledOrError(err, output)
     }
     return false
   }
@@ -443,11 +447,11 @@ export async function processInput(
       const subject = await runInteractiveFetchWait(
         output,
         INTERACTIVE_FETCH_WAIT_LINES.lastEmail,
-        () => getLastEmailSubject()
+        (signal) => getLastEmailSubject(undefined, signal)
       )
       output.log(subject)
     } catch (err) {
-      output.logError(err)
+      logCancelledOrError(err, output)
     }
     return false
   }
@@ -545,11 +549,11 @@ export async function processInput(
       const message = await runInteractiveFetchWait(
         output,
         INTERACTIVE_FETCH_WAIT_LINES.recallStatus,
-        () => recallStatus()
+        (signal) => recallStatus(signal)
       )
       output.log(message)
     } catch (err) {
-      output.logError(err)
+      logCancelledOrError(err, output)
     }
     return false
   }

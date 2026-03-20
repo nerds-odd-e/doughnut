@@ -32,12 +32,14 @@ const tick = () => new Promise<void>((r) => setImmediate(r))
 let useManyCommandsForScrollTests = false
 const {
   mockRecallNext,
+  mockRecallStatus,
   mockAnswerQuiz,
   mockAnswerSpelling,
   mockMarkAsRecalled,
   mockContestAndRegenerate,
 } = vi.hoisted(() => ({
   mockRecallNext: vi.fn(),
+  mockRecallStatus: vi.fn(),
   mockAnswerQuiz: vi.fn(),
   mockAnswerSpelling: vi.fn(),
   mockMarkAsRecalled: vi.fn(),
@@ -45,9 +47,13 @@ const {
 }))
 vi.mock('../src/recall.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../src/recall.js')>()
+  mockRecallStatus.mockImplementation((signal?: AbortSignal) =>
+    actual.recallStatus(signal)
+  )
   return {
     ...actual,
     recallNext: mockRecallNext,
+    recallStatus: mockRecallStatus,
     answerQuiz: mockAnswerQuiz,
     answerSpelling: mockAnswerSpelling,
     markAsRecalled: mockMarkAsRecalled,
@@ -660,7 +666,10 @@ describe('processInput', () => {
     logSpy.mockClear()
 
     await processInput('/contest')
-    expect(mockContestAndRegenerate).toHaveBeenCalledWith(100)
+    expect(mockContestAndRegenerate).toHaveBeenCalledWith(
+      100,
+      expect.any(AbortSignal)
+    )
     expect(logSpy).toHaveBeenCalledWith(
       expect.stringContaining('Regenerated question?')
     )
@@ -2088,5 +2097,52 @@ describe('TTY recall load wait — Esc cancels', () => {
       expect(ttyOutput(writeSpy)).toContain('Cancelled by user.')
     )
     expect(isInRecallSubstate()).toBe(false)
+  })
+})
+
+describe('TTY recall-status wait — Esc cancels', () => {
+  let writeSpy: ReturnType<typeof vi.spyOn>
+  let stdin: TTYStdin
+
+  beforeEach(async () => {
+    resetRecallStateForTesting()
+    mockRecallStatus.mockReset()
+    mockRecallStatus.mockImplementation((signal?: AbortSignal) => {
+      return new Promise((_resolve, reject) => {
+        signal?.addEventListener('abort', () => reject(userAbortError()), {
+          once: true,
+        })
+      })
+    })
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
+    vi.spyOn(process, 'exit').mockImplementation(
+      (() => undefined) as unknown as typeof process.exit
+    )
+    stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await tick()
+  })
+
+  afterEach(async () => {
+    pressKey(stdin, 'c', { ctrl: true })
+    vi.restoreAllMocks()
+    const actual =
+      await vi.importActual<typeof import('../src/recall.js')>(
+        '../src/recall.js'
+      )
+    mockRecallStatus.mockImplementation((signal?: AbortSignal) =>
+      actual.recallStatus(signal)
+    )
+  })
+
+  test('Esc aborts recall-status fetch and shows Cancelled by user.', async () => {
+    await submitTTYCommand(stdin, '/recall-status')
+    await tick()
+    pressKey(stdin, 'escape')
+    await tick()
+    await vi.waitFor(() =>
+      expect(ttyOutput(writeSpy)).toContain('Cancelled by user.')
+    )
   })
 })
