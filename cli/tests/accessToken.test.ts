@@ -100,6 +100,30 @@ describe('access token management', () => {
       expect(listAccessTokens()).toEqual([])
     })
 
+    test('throws ApiError message when server returns OPENAI_NOT_AVAILABLE body', async () => {
+      vi.mocked(UserController.getTokenInfo).mockRejectedValue({
+        errorType: 'OPENAI_NOT_AVAILABLE',
+        message: 'OpenAI is not available (no API key configured).',
+        errors: {},
+      } as never)
+
+      await expect(addAccessToken('any-token')).rejects.toThrow(
+        'OpenAI is not available (no API key configured).'
+      )
+      expect(listAccessTokens()).toEqual([])
+    })
+
+    test('throws HTTP 502 wording when status present without ApiError body', async () => {
+      vi.mocked(UserController.getTokenInfo).mockRejectedValue({
+        status: 502,
+      } as never)
+
+      await expect(addAccessToken('any-token')).rejects.toThrow(
+        'A dependency service failed (HTTP 502)'
+      )
+      expect(listAccessTokens()).toEqual([])
+    })
+
     test('throws a no-permission message when token validation gets 403', async () => {
       vi.mocked(UserController.getTokenInfo).mockRejectedValue({
         status: 403,
