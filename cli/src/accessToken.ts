@@ -69,7 +69,7 @@ export async function addAccessToken(
   signal?: AbortSignal
 ): Promise<void> {
   const result = await withBackendClient(token, () =>
-    UserController.getTokenInfo({ signal })
+    UserController.getTokenInfo({ signal, throwOnError: true })
   )
   if (!result.data) {
     throw new Error('Token is invalid or expired.')
@@ -108,7 +108,7 @@ export async function removeAccessTokenCompletely(
     throw new Error(`Token "${label}" not found.`)
   }
   await withBackendClient(entry.token, () =>
-    UserController.revokeToken({ signal })
+    UserController.revokeToken({ signal, throwOnError: true })
   )
   removeAccessToken(label)
 }
@@ -144,7 +144,11 @@ export async function createAccessToken(
     )
   }
   const result = await withBackendClient(defaultEntry.token, () =>
-    UserController.generateToken({ body: { label }, signal })
+    UserController.generateToken({
+      body: { label },
+      signal,
+      throwOnError: true,
+    })
   )
   if (!result.data) {
     throw new Error('Failed to create token.')

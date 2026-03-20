@@ -96,6 +96,7 @@ describe('recallStatus', () => {
     expect(result).toBe('0 notes to recall today')
     expect(RecallsController.recalling).toHaveBeenCalledWith(
       expect.objectContaining({
+        throwOnError: true,
         query: expect.objectContaining({
           timezone: expect.any(String),
           dueindays: 0,
@@ -140,6 +141,7 @@ describe('recallStatus', () => {
 
     expect(RecallsController.recalling).toHaveBeenCalledWith(
       expect.objectContaining({
+        throwOnError: true,
         query: expect.objectContaining({
           timezone: expectedTimezone,
           dueindays: 0,
@@ -169,6 +171,40 @@ describe('recallStatus', () => {
     const result = await recallStatus()
 
     expect(result).toBe('0 notes to recall today')
+  })
+
+  test('rejects when recalling fails (never returns 0 notes)', async () => {
+    vi.mocked(RecallsController.recalling).mockRejectedValue(
+      new Error('network')
+    )
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    await expect(recallStatus()).rejects.toThrow(
+      'Doughnut service is not available'
+    )
+  })
+
+  test('rejects when AbortSignal aborts during recalling', async () => {
+    vi.mocked(RecallsController.recalling).mockImplementation(
+      ({ signal }: { signal?: AbortSignal }) =>
+        new Promise((_resolve, reject) => {
+          const fail = () => reject(userAbortError())
+          if (signal?.aborted) fail()
+          else signal?.addEventListener('abort', fail, { once: true })
+        })
+    )
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const ac = new AbortController()
+    const p = recallStatus(ac.signal)
+    ac.abort()
+    await expect(p).rejects.toMatchObject({ name: 'AbortError' })
   })
 })
 
@@ -217,6 +253,7 @@ describe('recallNext', () => {
 
     expect(RecallsController.recalling).toHaveBeenCalledWith(
       expect.objectContaining({
+        throwOnError: true,
         query: expect.objectContaining({
           dueindays: 3,
         }),
@@ -351,7 +388,10 @@ describe('recallNext', () => {
       title: 'My Note Title',
     })
     expect(MemoryTrackerController.askAQuestion).toHaveBeenCalledWith(
-      expect.objectContaining({ path: { memoryTracker: 42 } })
+      expect.objectContaining({
+        throwOnError: true,
+        path: { memoryTracker: 42 },
+      })
     )
   })
 
@@ -577,6 +617,7 @@ describe('answerQuiz', () => {
     expect(result).toEqual({ correct: true })
     expect(RecallPromptController.answerQuiz).toHaveBeenCalledWith(
       expect.objectContaining({
+        throwOnError: true,
         path: { recallPrompt: 100 },
         body: { choiceIndex: 0 },
       })
@@ -597,6 +638,7 @@ describe('answerQuiz', () => {
     expect(result).toEqual({ correct: false })
     expect(RecallPromptController.answerQuiz).toHaveBeenCalledWith(
       expect.objectContaining({
+        throwOnError: true,
         path: { recallPrompt: 100 },
         body: { choiceIndex: 1 },
       })
@@ -630,6 +672,7 @@ describe('answerQuiz', () => {
 
     expect(RecallPromptController.answerQuiz).toHaveBeenCalledWith(
       expect.objectContaining({
+        throwOnError: true,
         path: { recallPrompt: 100 },
         body: { choiceIndex: 0, thinkingTimeMs: 3000 },
       })
@@ -668,6 +711,7 @@ describe('answerSpelling', () => {
     expect(result).toEqual({ correct: true })
     expect(RecallPromptController.answerSpelling).toHaveBeenCalledWith(
       expect.objectContaining({
+        throwOnError: true,
         path: { recallPrompt: 100 },
         body: { spellingAnswer: 'sedition' },
       })
@@ -701,6 +745,7 @@ describe('answerSpelling', () => {
 
     expect(RecallPromptController.answerSpelling).toHaveBeenCalledWith(
       expect.objectContaining({
+        throwOnError: true,
         path: { recallPrompt: 100 },
         body: { spellingAnswer: 'sedition', thinkingTimeMs: 5000 },
       })
@@ -775,21 +820,21 @@ describe('contestAndRegenerate', () => {
     expect(RecallPromptController.regenerate).not.toHaveBeenCalled()
   })
 
-  test('returns error when regenerate fails', async () => {
+  test('throws when regenerate fails (throwOnError)', async () => {
     vi.mocked(RecallPromptController.contest).mockResolvedValue({
       data: { advice: 'try again', rejected: false },
     } as never)
-    vi.mocked(RecallPromptController.regenerate).mockResolvedValue({
-      error: new Error('API error'),
-    } as never)
+    vi.mocked(RecallPromptController.regenerate).mockRejectedValue(
+      new Error('API error')
+    )
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
     } as never)
     await addAccessToken('test-token')
 
-    const result = await contestAndRegenerate(100)
-
-    expect(result).toEqual({ ok: false, message: 'API error' })
+    await expect(contestAndRegenerate(100)).rejects.toThrow(
+      'Doughnut service is not available'
+    )
   })
 })
 
@@ -823,6 +868,7 @@ describe('markAsRecalled', () => {
 
     expect(MemoryTrackerController.markAsRecalled).toHaveBeenCalledWith(
       expect.objectContaining({
+        throwOnError: true,
         path: { memoryTracker: 42 },
         query: { successful: true },
       })
@@ -842,6 +888,7 @@ describe('markAsRecalled', () => {
 
     expect(MemoryTrackerController.markAsRecalled).toHaveBeenCalledWith(
       expect.objectContaining({
+        throwOnError: true,
         path: { memoryTracker: 99 },
         query: { successful: false },
       })

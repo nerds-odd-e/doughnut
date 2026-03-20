@@ -53,12 +53,15 @@ function getTimezone(): string {
   return Intl.DateTimeFormat().resolvedOptions().timeZone
 }
 
+function backendSdkOpts(signal?: AbortSignal) {
+  return { throwOnError: true as const, ...(signal ? { signal } : {}) }
+}
+
 export async function recallStatus(signal?: AbortSignal): Promise<string> {
-  const sdkOpts = signal ? { signal } : {}
   const result = await runWithDefaultBackendClient(() =>
     RecallsController.recalling({
       query: { timezone: getTimezone(), dueindays: 0 },
-      ...sdkOpts,
+      ...backendSdkOpts(signal),
     })
   )
   const count = result.data?.toRepeat?.length ?? 0
@@ -98,11 +101,10 @@ export async function recallNext(
   abortSignal?: AbortSignal
 ): Promise<RecallNextResult> {
   await awaitCliTestRecallLoadDelayIfConfigured(abortSignal)
-  const sdkOpts = abortSignal ? { signal: abortSignal } : {}
   const result = await runWithDefaultBackendClient(() =>
     RecallsController.recalling({
       query: { timezone: getTimezone(), dueindays },
-      ...sdkOpts,
+      ...backendSdkOpts(abortSignal),
     })
   )
   const toRepeat = result.data?.toRepeat ?? []
@@ -114,7 +116,7 @@ export async function recallNext(
   const questionResult = await runWithDefaultBackendClient(() =>
     MemoryTrackerController.askAQuestion({
       path: { memoryTracker: first.memoryTrackerId },
-      ...sdkOpts,
+      ...backendSdkOpts(abortSignal),
     })
   )
   const prompt = questionResult.data
@@ -141,7 +143,7 @@ export async function recallNext(
   const trackerResult = await runWithDefaultBackendClient(() =>
     MemoryTrackerController.showMemoryTracker({
       path: { memoryTracker: first.memoryTrackerId },
-      ...sdkOpts,
+      ...backendSdkOpts(abortSignal),
     })
   )
   const title = trackerResult.data?.note?.noteTopology?.title ?? 'Untitled note'
@@ -162,6 +164,7 @@ export async function markAsRecalled(
     MemoryTrackerController.markAsRecalled({
       path: { memoryTracker: memoryTrackerId },
       query: { successful },
+      ...backendSdkOpts(),
     })
   )
 }
@@ -175,6 +178,7 @@ export async function answerQuiz(
     RecallPromptController.answerQuiz({
       path: { recallPrompt: recallPromptId },
       body: { choiceIndex, ...(thinkingTimeMs != null && { thinkingTimeMs }) },
+      ...backendSdkOpts(),
     })
   )
   const correct = result.data?.answer?.correct ?? false
@@ -193,6 +197,7 @@ export async function answerSpelling(
         spellingAnswer,
         ...(thinkingTimeMs != null && { thinkingTimeMs }),
       },
+      ...backendSdkOpts(),
     })
   )
   const correct = result.data?.answer?.correct ?? false
@@ -222,20 +227,13 @@ export async function contestAndRegenerate(
 ): Promise<
   { ok: true; result: RecallNextResult } | { ok: false; message: string }
 > {
-  const sdkOpts = signal ? { signal } : {}
   const contestResult = await runWithDefaultBackendClient(() =>
     RecallPromptController.contest({
       path: { recallPrompt: recallPromptId },
-      ...sdkOpts,
+      ...backendSdkOpts(signal),
     })
   )
   const data = contestResult.data
-  if (contestResult.error) {
-    return {
-      ok: false,
-      message: contestResult.error.message ?? String(contestResult.error),
-    }
-  }
   if (!data) {
     return { ok: false, message: 'Contest failed' }
   }
@@ -249,16 +247,10 @@ export async function contestAndRegenerate(
     RecallPromptController.regenerate({
       path: { recallPrompt: recallPromptId },
       body: data,
-      ...sdkOpts,
+      ...backendSdkOpts(signal),
     })
   )
   const regenerated = regenerateResult.data
-  if (regenerateResult.error) {
-    return {
-      ok: false,
-      message: regenerateResult.error.message ?? String(regenerateResult.error),
-    }
-  }
   if (!regenerated) {
     return { ok: false, message: 'Regenerate failed' }
   }

@@ -89,14 +89,13 @@ describe('access token management', () => {
       expect(listAccessTokens()).toEqual([])
     })
 
-    test('throws when token is invalid', async () => {
-      vi.mocked(UserController.getTokenInfo).mockResolvedValue({
-        data: undefined,
-        error: { status: 401 },
-      } as never)
+    test('throws when token validation fails (API error)', async () => {
+      vi.mocked(UserController.getTokenInfo).mockRejectedValue(
+        new Error('Unauthorized')
+      )
 
       await expect(addAccessToken('bad-token')).rejects.toThrow(
-        'Token is invalid or expired.'
+        'Doughnut service is not available'
       )
       expect(listAccessTokens()).toEqual([])
     })
@@ -286,17 +285,16 @@ describe('access token management', () => {
       )
     })
 
-    test('throws when default token is invalid or expired', async () => {
+    test('throws when generateToken fails', async () => {
       mockGetTokenInfo('Default Token')
       await addAccessToken('default-secret')
 
-      vi.mocked(UserController.generateToken).mockResolvedValueOnce({
-        data: undefined,
-        error: { status: 401 },
-      } as never)
+      vi.mocked(UserController.generateToken).mockRejectedValueOnce(
+        new Error('Unauthorized')
+      )
 
       await expect(createAccessToken('New Token')).rejects.toThrow(
-        'Failed to create token.'
+        'Doughnut service is not available'
       )
     })
   })
