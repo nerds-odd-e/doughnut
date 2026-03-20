@@ -1,0 +1,163 @@
+import { Readable } from 'node:stream'
+import { mkdtempSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { vi } from 'vitest'
+import {
+  resetRecallStateForTesting,
+  runInteractive,
+} from '../../src/interactive.js'
+
+export const tick = () => new Promise<void>((r) => setImmediate(r))
+
+export const BOLD_CYAN = '\x1b[1;36m'
+export const ANSI_RESET = '\x1b[0m'
+export const GREY_BG_PAST_INPUT = '\x1b[48;5;236m'
+
+export function createMockStdin(input: string): NodeJS.ReadableStream {
+  const stream = new Readable({
+    read() {
+      /* no-op */
+    },
+  })
+  stream.push(input)
+  stream.push(null)
+  return Object.assign(stream, { isTTY: false })
+}
+
+export function createMockTTYStdin() {
+  const stream = new Readable({
+    read() {
+      /* no-op */
+    },
+  }) as Readable & {
+    push: (chunk: string) => void
+  }
+  return Object.assign(stream, {
+    isTTY: true,
+    setRawMode: () => {
+      /* no-op */
+    },
+    resume: () => {
+      /* no-op */
+    },
+    setEncoding: () => {
+      /* no-op */
+    },
+  })
+}
+
+export type TTYStdin = ReturnType<typeof createMockTTYStdin>
+
+export function typeString(stdin: TTYStdin, str: string) {
+  for (const ch of str) {
+    stdin.emit('keypress', ch, {
+      name: ch === ' ' ? 'space' : ch === '/' ? undefined : ch,
+      ctrl: false,
+      meta: false,
+    })
+  }
+}
+
+export function pressEnter(stdin: TTYStdin) {
+  stdin.emit('keypress', '\r', {
+    name: 'return',
+    shift: false,
+    ctrl: false,
+    meta: false,
+  })
+}
+
+export function pressKey(
+  stdin: TTYStdin,
+  name: string,
+  extra: Record<string, unknown> = {}
+) {
+  stdin.emit('keypress', undefined, {
+    name,
+    ctrl: false,
+    meta: false,
+    ...extra,
+  })
+}
+
+export async function submitTTYCommand(stdin: TTYStdin, command: string) {
+  typeString(stdin, `${command} `)
+  await tick()
+  pressEnter(stdin)
+  await tick()
+}
+
+export function ttyOutput(writeSpy: ReturnType<typeof vi.spyOn>) {
+  return writeSpy.mock.calls.map((c) => c[0]).join('')
+}
+
+export function makeTempConfigDir(
+  tokens: Array<{ label: string; token: string }>
+) {
+  const configDir = mkdtempSync(join(tmpdir(), 'doughnut-test-'))
+  writeFileSync(
+    join(configDir, 'access-tokens.json'),
+    JSON.stringify({ tokens })
+  )
+  return configDir
+}
+
+export function withConfigDir(configDir: string): () => void {
+  const original = process.env.DOUGHNUT_CONFIG_DIR
+  process.env.DOUGHNUT_CONFIG_DIR = configDir
+  return () => {
+    if (original === undefined) delete process.env.DOUGHNUT_CONFIG_DIR
+    else process.env.DOUGHNUT_CONFIG_DIR = original
+  }
+}
+
+export function spyConsoleLogNoop() {
+  return vi.spyOn(console, 'log').mockImplementation(() => undefined)
+}
+
+export function spyStdoutWriteTrue() {
+  return vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
+}
+
+export function spyExitNoop(): ReturnType<typeof vi.spyOn> {
+  return vi
+    .spyOn(process, 'exit')
+    .mockImplementation((() => undefined) as unknown as typeof process.exit)
+}
+
+export async function startInteractiveOnStdin(stdin: TTYStdin) {
+  runInteractive(stdin as NodeJS.ReadableStream)
+  await tick()
+}
+
+export async function ttySessionWithSpies(): Promise<{
+  stdin: TTYStdin
+  writeSpy: ReturnType<typeof vi.spyOn>
+}> {
+  resetRecallStateForTesting()
+  return startTTYSessionWithoutRecallReset()
+}
+
+export async function startTTYSessionWithoutRecallReset(): Promise<{
+  stdin: TTYStdin
+  writeSpy: ReturnType<typeof vi.spyOn>
+}> {
+  spyConsoleLogNoop()
+  const writeSpy = spyStdoutWriteTrue()
+  spyExitNoop()
+  const stdin = createMockTTYStdin()
+  await startInteractiveOnStdin(stdin)
+  return { stdin, writeSpy }
+}
+
+export function endTTYSession(stdin: TTYStdin) {
+  pressKey(stdin, 'c', { ctrl: true })
+  vi.restoreAllMocks()
+}
+
+export async function runPipedInteractive(input: string) {
+  const stdin = createMockStdin(input)
+  runInteractive(stdin as NodeJS.ReadableStream)
+  await tick()
+}
