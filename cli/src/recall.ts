@@ -6,6 +6,7 @@ import {
   type RecallPrompt,
 } from 'doughnut-api'
 import { runWithDefaultBackendClient } from './accessToken.js'
+import { awaitSlowRecallLoadBeforeFirstFetch } from './slowRecallLoad.js'
 
 function getTimezone(): string {
   return Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -52,6 +53,7 @@ export async function recallNext(
   dueindays = 0,
   signal?: AbortSignal
 ): Promise<RecallNextResult> {
+  await awaitSlowRecallLoadBeforeFirstFetch(signal)
   const opt = signal ? { signal } : {}
   const result = await runWithDefaultBackendClient(() =>
     RecallsController.recalling({

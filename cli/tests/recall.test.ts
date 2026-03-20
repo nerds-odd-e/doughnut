@@ -228,6 +228,74 @@ describe('recallNext', () => {
     await expect(p).rejects.toMatchObject({ name: 'AbortError' })
   })
 
+  describe('DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS', () => {
+    let originalSlow: string | undefined
+
+    beforeEach(() => {
+      originalSlow = process.env.DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+      if (originalSlow === undefined) {
+        delete process.env.DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS
+      } else {
+        process.env.DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS = originalSlow
+      }
+    })
+
+    test('with AbortSignal: abort during delay does not call recalling', async () => {
+      process.env.DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS = '100'
+      vi.mocked(RecallsController.recalling).mockResolvedValue({
+        data: { toRepeat: [] },
+      } as never)
+      vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+        data: { id: 1, label: 'Test Token' },
+      } as never)
+      await addAccessToken('test-token')
+
+      vi.useFakeTimers()
+      const ac = new AbortController()
+      const p = recallNext(0, ac.signal)
+      await vi.advanceTimersByTimeAsync(50)
+      expect(RecallsController.recalling).not.toHaveBeenCalled()
+      ac.abort()
+      await expect(p).rejects.toMatchObject({ name: 'AbortError' })
+      expect(RecallsController.recalling).not.toHaveBeenCalled()
+    })
+
+    test('with AbortSignal: after delay, recalling runs', async () => {
+      process.env.DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS = '50'
+      vi.mocked(RecallsController.recalling).mockResolvedValue({
+        data: { toRepeat: [] },
+      } as never)
+      vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+        data: { id: 1, label: 'Test Token' },
+      } as never)
+      await addAccessToken('test-token')
+
+      vi.useFakeTimers()
+      const p = recallNext(0, new AbortController().signal)
+      await vi.advanceTimersByTimeAsync(50)
+      await p
+      expect(RecallsController.recalling).toHaveBeenCalledTimes(1)
+    })
+
+    test('without AbortSignal: env has no effect', async () => {
+      process.env.DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS = '99999'
+      vi.mocked(RecallsController.recalling).mockResolvedValue({
+        data: { toRepeat: [] },
+      } as never)
+      vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+        data: { id: 1, label: 'Test Token' },
+      } as never)
+      await addAccessToken('test-token')
+
+      await recallNext()
+      expect(RecallsController.recalling).toHaveBeenCalledTimes(1)
+    })
+  })
+
   test('returns none when dueindays 3 has no notes', async () => {
     vi.mocked(RecallsController.recalling).mockResolvedValue({
       data: { toRepeat: [] },

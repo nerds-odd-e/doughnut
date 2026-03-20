@@ -61,7 +61,7 @@ CLI e2e tests run TypeScript source locally, bundled in CI:
 
 Use `I should see X in the non-interactive output` for non-interactive; `I should see X in the history output` or `I should see X in the Current guidance` for interactive (hints, suggestions, recall prompts).
 
-**Loading UI (TTY):** Do not add Cypress E2E for transient loading lines — timing vs. PTY capture is flaky. Cover with `cli/tests/interactiveFetchWait.test.ts` (`pnpm cli:test`).
+**Loading UI (TTY):** Do not add Cypress E2E for transient loading lines — timing vs. PTY capture is flaky. Cover with `cli/tests/interactiveFetchWait.test.ts` and `cli/tests/slowRecallLoadProcessInput.test.ts` (`pnpm cli:test`).
 
 CLI page objects live in `e2e_test/start/pageObjects/cli/` and map to domain concepts: non-interactive output, history output, history input, current guidance. Use `cli.nonInteractiveOutput()`, `cli.historyOutput()`, `cli.currentGuidance()`, etc.
 
@@ -80,6 +80,8 @@ CLI page objects live in `e2e_test/start/pageObjects/cli/` and map to domain con
 ## API base URL
 
 The bundled CLI defaults to `https://doughnut.odd-e.com`. The `pnpm cli` script sets `DOUGHNUT_API_BASE_URL=http://localhost:9081` and `DOUGHNUT_CONFIG_DIR=~/.config/doughnut-dev` so it talks to the local backend and uses a separate dev config. Use `pnpm cli -P` or `pnpm cli --production` to connect to production and use the global config (`~/.config/doughnut`). Self-hosted deployments should set `DOUGHNUT_API_BASE_URL` to their instance URL.
+
+**Recall load testability:** `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` — optional pause (positive integer ms, max 60000) before the first `recalling` request during interactive recall load only (when `recallNext` receives an `AbortSignal`). Off by default; use for manual Esc-during-load checks or tests without relying on network speed. Implemented in `cli/src/slowRecallLoad.ts`.
 
 ## OAuth credentials (Gmail)
 

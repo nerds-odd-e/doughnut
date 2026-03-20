@@ -36,11 +36,19 @@ Informal requirement; delete or shrink once implemented.
 | Abort vs generic error | `fetchAbort.ts`: `isFetchAbortedByCaller`; `withBackendClient` rethrows that case |
 | User copy | `interactive.ts`: `handleRecallNextFetchError` → `Cancelled by user.` when fetch was aborted |
 
+## Phase 3.2 (done) — slow recall load knob
+
+| Piece | Location |
+|------|-----------|
+| Env + abortable delay | `slowRecallLoad.ts`: `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS`, `awaitSlowRecallLoadBeforeFirstFetch` |
+| Wired into recall load | `recall.ts`: `recallNext` calls delay only when `signal` is defined |
+| Tests | `recall.test.ts` (`DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` describe); `slowRecallLoadProcessInput.test.ts` (real `recallNext` + `processInput`) |
+
 ## Future phases
 
 | Phase | Scope |
 |-------|--------|
-| 3.x | **3.1** done (recall cancel). **3.2** next: CLI slow / testability for exploratory + stable tests. **3.3–3.4**: widen cancel + copy (`planning.mdc`). |
+| 3.x | **3.1** done (recall cancel). **3.2** done: `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` + `slowRecallLoad.ts`, Vitest in `recall.test.ts` / `slowRecallLoadProcessInput.test.ts`. **3.3–3.4**: widen cancel + copy (`planning.mdc`). |
 
 ### Phase 3 (planned) — cancellable interactive fetch wait
 
@@ -95,14 +103,10 @@ Split by **who can cancel what**, not by “plumbing layer then TTY layer.” Th
    - **Implementation:** **`runRecallNextFetchWithWaitUi`** + **`cancelInFlightRecallNextFetchFor(output)`**; generic waits stay on **`runInteractiveFetchWait`**. **`recallNext(due, signal?)`**, **`isFetchAbortedByCaller`** / **`handleRecallNextFetchError`**.  
    - **Tests:** `interactiveFetchWait.test.ts` (`cancelInFlightRecallNextFetchFor(out)`); `interactive.test.ts` **“TTY recall load wait — Esc cancels”**; `recall.test.ts` / `accessToken.test.ts` edges.
 
-2. **Phase 3.2 — CLI testability: simulated slow recall load**  
-   - **Ordering:** Comes **before** 3.3 so exploratory runs and automation for **later** cancel phases do not depend on network luck.  
-   - **Why CLI-side (not backend):** Keeps production API and deploy surface unchanged; avoids Mountebank/backend test-only endpoints; any environment (local, CI, pointed at staging) can enable a **predictable pause** so the TTY shows **“Loading recall questions”** long enough to manually press Esc or to drive **stable post-conditions** (e.g. **“Cancelled by user.”**) without asserting animated ellipsis.  
-   - **Why it’s reasonable:** Phase 3.1 cancel is already proven with mocks; this phase closes the gap for **real transport + real TTY** exploratory runs and optional Cypress/Vitest “full path” checks.  
-   - **Safety / cohesion:** Single knob (prefer **`DOUGHNUT_CLI_*` env** and/or a **dev-only flag** documented in `CLAUDE.md` / `cli.mdc`), **off by default**, **no effect in bundled release** unless explicitly set (team choice: strip in release build or document “never set in prod”). Implement in **one place** (e.g. delay helper used only from **`recallNext`** or **`runWithDefaultBackendClient`** when the knob is set) so behaviour stays obvious.  
-   - **User scenario (when enabled):** Starting **`/recall`** (and optionally **`continueRecallSession`** recall load) waits an extra **configured duration** before the first recalling call returns (or before the SDK call runs — product choice), so cancel-during-load can be exercised reliably.  
-   - **Tests:** TDD: with knob on in test env, **Vitest** asserts Esc → **“Cancelled by user.”** without mocking `recallNext` internals (or a thin wrapper); optionally **one** Cypress `@interactiveCLI` scenario **only** if it asserts **stable** text after cancel, not loading dots. **Do not** add Cypress that races on transient wait lines (`cli.mdc`).  
-   - **Out of scope for 3.2:** Slowing arbitrary commands (that is **3.3+** if needed); changing backend timeouts; non-interactive `-c`.
+2. **Phase 3.2 — CLI testability: simulated slow recall load** ✅  
+   - **Implemented:** `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` (cap 60000), `cli/src/slowRecallLoad.ts`, wired at start of `recallNext` when `signal` is set (covers `/recall` and `continueRecallSession` recall loads).  
+   - **Tests:** `recall.test.ts` (delay + abort / delay completion / no signal ignores env); `slowRecallLoadProcessInput.test.ts` — real `recallNext`, mocked `doughnut-api`, cancel during long fake-timer delay → **“Cancelled by user.”**  
+   - **Docs:** `CLAUDE.md`, `.cursor/rules/cli.mdc`.
 
 3. **Phase 3.3 — Cancel applies to remaining interactive waits**  
    - **User scenario:** Same Esc cancel works for other `runInteractiveFetchWait` entry points (contest, recall-status, token flows, Gmail, etc.).  
@@ -134,4 +138,4 @@ Split by **who can cancel what**, not by “plumbing layer then TTY layer.” Th
 
 ---
 
-**Status:** Phases 1–2 done. **Phase 3.1 implemented** (recall load cancel). **3.2** (CLI slow / testability) next, not implemented. **3.3–3.4** pending after that.
+**Status:** Phases 1–2 done. **Phase 3.1** (recall load cancel) and **3.2** (CLI slow recall load knob + tests) implemented. **3.3–3.4** pending.

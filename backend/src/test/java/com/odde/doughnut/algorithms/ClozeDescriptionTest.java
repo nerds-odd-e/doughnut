@@ -116,8 +116,7 @@ class ClozeDescriptionTest {
 
   @Test
   void clozeShouldMaskPronunciationFollowedByJapaneseParticle() {
-    String details =
-        "/あしかが よしみつ/は、室町時代前期の室町幕府第3代将軍（在職：1369年 - 1395年）である。";
+    String details = "/あしかが よしみつ/は、室町時代前期の室町幕府第3代将軍（在職：1369年 - 1395年）である。";
     String result =
         new ClozedString(clozeReplacement, details)
             .hide(new NoteTitle("足利義満"))
