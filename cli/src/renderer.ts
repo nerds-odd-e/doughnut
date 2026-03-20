@@ -19,6 +19,7 @@ import { renderMarkdownToTerminal } from './markdown.js'
 import type { ChatHistory } from './types.js'
 import type { InteractiveFetchWaitLine } from './interactiveFetchWait.js'
 import { formatVersionOutput } from './version.js'
+import { OSC_133_INPUT_BOX_SETTLED } from './readyMarker.js'
 
 export {
   GREY,
@@ -26,6 +27,7 @@ export {
   RESET,
   HIDE_CURSOR,
   SHOW_CURSOR,
+  OSC_133_INPUT_BOX_SETTLED,
 }
 
 /** Terminal column count; used for truncation and line width. */
@@ -63,12 +65,6 @@ export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
   recallYesNo: 'y or n; /stop to exit recall',
   recallSpelling: 'type your answer; /stop to exit recall',
 }
-
-/**
- * OSC 133 ; A ST — FinalTerm / shell-integration "prompt start".
- * Invisible on screen; automation may treat it as "input box paint finished, safe to send keystrokes."
- */
-export const OSC_133_INPUT_BOX_SETTLED = '\x1b]133;A\x07' as const
 
 /** What the TTY must know to decide if this paint represents a settled input box (vs draft text or loading). */
 export type InputBoxSettledForAutomation = {

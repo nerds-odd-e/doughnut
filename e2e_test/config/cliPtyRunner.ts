@@ -6,25 +6,19 @@
 import type { IPty } from '@lydell/node-pty'
 import { cliEnv } from './cliEnv'
 
+/** Byte-identical to `cli/src/readyMarker.ts` (inlined: Cypress plugin load does not resolve that import reliably). */
+const OSC_133_INPUT_BOX_SETTLED = '\x1b]133;A\x07' as const
+
 const PTY_TIMEOUT_MS = 25_000
 /** Polling interval for state-based waits; not a fixed delay. */
 const CLI_POLL_MS = 10
+/** After OSC 133 "input settled" appears, brief pause so trailing PTY chunks can flush. */
+const READY_MARKER_FLUSH_MS = 50
 const PTY_OPTIONS = {
   name: 'xterm-256color' as const,
   cols: 80,
   rows: 24,
 }
-
-const CLI_READY_PATTERN = /\/ commands/
-
-// The CLI renders placeholder text with ANSI grey (\x1b[90m) when the input
-// buffer is empty (ready for input). In normal mode: `│ → \x1b[90m<placeholder>`.
-// In selection mode (token list): the entire box is grey-wrapped with no arrow,
-// so the content line is `\x1b[90m│ \x1b[90m<placeholder>`.
-// Matching grey after the box border character detects both modes without
-// enumerating placeholder strings (those live in renderer.ts PLACEHOLDER_BY_CONTEXT).
-// biome-ignore lint/suspicious/noControlCharactersInRegex: matching ANSI escape codes in PTY output
-const INPUT_BOX_READY_PATTERN = /(?:│ → |\x1b\[90m│ )\x1b\[90m/
 
 interface PtyHandle {
   pty: IPty
@@ -58,7 +52,10 @@ async function waitForCliReady(getStdout: () => string): Promise<void> {
   const maxWaitMs = 10_000
   const start = Date.now()
   while (Date.now() - start < maxWaitMs) {
-    if (CLI_READY_PATTERN.test(getStdout())) return
+    if (getStdout().includes(OSC_133_INPUT_BOX_SETTLED)) {
+      await new Promise((r) => setTimeout(r, READY_MARKER_FLUSH_MS))
+      return
+    }
     await new Promise((r) => setTimeout(r, CLI_POLL_MS))
   }
   const stdout = getStdout()
@@ -72,14 +69,7 @@ async function waitForInputBoxReady(
   lenBeforeSend: number
 ): Promise<void> {
   const maxWaitMs = 15_000
-  // Interactive fetch wait repaints every 400ms (ellipsis on the current prompt). The grey
-  // disabled input box matches INPUT_BOX_READY_PATTERN too, so a short stability window (e.g. 30ms)
-  // can return before the HTTP call finishes. Require stability longer than that interval.
-  const INPUT_BOX_STABLE_MS = 550
-  const stablePollsRequired = Math.ceil(INPUT_BOX_STABLE_MS / CLI_POLL_MS)
   const start = Date.now()
-  let lastStdoutLen = 0
-  let stablePolls = 0
   while (Date.now() - start < maxWaitMs) {
     const stdout = getStdout()
     if (stdout.length <= lenBeforeSend) {
@@ -87,16 +77,9 @@ async function waitForInputBoxReady(
       continue
     }
     const newContent = stdout.slice(lenBeforeSend)
-    if (INPUT_BOX_READY_PATTERN.test(newContent)) {
-      if (stdout.length === lastStdoutLen) {
-        stablePolls++
-        if (stablePolls >= stablePollsRequired) return
-      } else {
-        stablePolls = 0
-      }
-      lastStdoutLen = stdout.length
-    } else {
-      stablePolls = 0
+    if (newContent.includes(OSC_133_INPUT_BOX_SETTLED)) {
+      await new Promise((r) => setTimeout(r, READY_MARKER_FLUSH_MS))
+      return
     }
     await new Promise((r) => setTimeout(r, CLI_POLL_MS))
   }

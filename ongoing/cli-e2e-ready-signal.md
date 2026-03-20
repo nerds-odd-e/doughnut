@@ -67,15 +67,15 @@ This is a single call site — high cohesion. The CLI owns the definition of "re
 
 **E2E:** Unchanged — old detection still works.
 
-### Phase 2: Detect the marker in the test infrastructure
+### Phase 2: Detect the marker in the test infrastructure — done
 
 In `cliPtyRunner.ts`:
-- Replace `INPUT_BOX_READY_PATTERN` with a check for `OSC_133_INPUT_BOX_SETTLED` in new stdout content.
-- Replace `CLI_READY_PATTERN` (initial startup) with the same OSC check.
-- Remove `INPUT_BOX_STABLE_MS` / stability polling. Keep a small flush debounce if needed.
-- Import `OSC_133_INPUT_BOX_SETTLED` from `cli/src/renderer.ts` (or a tiny shared module if import boundaries block it).
+- Replaced `INPUT_BOX_READY_PATTERN` with `OSC_133_INPUT_BOX_SETTLED` in new stdout (`includes`).
+- Replaced `CLI_READY_PATTERN` (initial startup) with the same OSC check.
+- Removed `INPUT_BOX_STABLE_MS` / stability polling; `READY_MARKER_FLUSH_MS = 50` after seeing the marker.
+- Marker bytes live in `cli/src/readyMarker.ts` (CLI). The PTY harness inlines the same literal: Cypress plugin load does not resolve a cross-tree import to `readyMarker.ts` reliably.
 
-**Test:** Run all CLI E2E features locally. They should pass with the new detection. The loading-animation race and placeholder-mismatch failure modes are structurally impossible now.
+**Test:** All 25 scenarios across `e2e_test/features/cli/*.feature` pass (run with `env -u CI` for tsx CLI, or ensure `pnpm cli:bundle` has been run when `CI=1` so the bundle includes phase 1 emission).
 
 ### Phase 3: Verify on CI
 
@@ -83,10 +83,4 @@ Push and confirm GitHub Actions passes. If the small flush debounce is insuffici
 
 ## Cross-package import
 
-`cliPtyRunner.ts` (e2e_test, runs in Cypress Node process) needs the marker constant from `cli/src/renderer.ts`. Options:
-
-1. **Direct relative import** — `cliPtyRunner.ts` already imports from `./cliEnv`; if tsconfig allows reaching `../../cli/src/renderer`, this is simplest.
-2. **Shared constants file** — Extract `OSC_133_INPUT_BOX_SETTLED` to a small file (e.g. `cli/src/readyMarker.ts`) with no transitive dependencies, import from both.
-3. **Duplicate the constant** — Last resort. A single string constant duplicated in two places is low risk, but violates the "one representation" principle. If we must, add a unit test that imports both and asserts equality.
-
-Prefer option 1 or 2. Investigate at implementation time.
+Canonical definition: `cli/src/readyMarker.ts` (also re-exported from `renderer.ts`). The Cypress plugin process does not resolve `../../cli/src/readyMarker.js` from `cliPtyRunner.ts` reliably, so the PTY harness **inlines** the same escape sequence with a comment to keep it aligned with `readyMarker.ts`.
