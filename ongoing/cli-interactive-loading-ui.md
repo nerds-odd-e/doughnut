@@ -7,11 +7,10 @@ Informal requirement; delete or shrink once implemented.
 - On TTY submit, `ttyAdapter` clears the live region then `await processInput(...)`. Until `recallNext` resolves, nothing repainted the live region, so the **input box disappeared** during the network wait.
 - **Desired:** Current prompt shows a clear wait line; input box stays visible, greyed, placeholder `loading ...`.
 
-## Implemented (phase 1)
+## Implemented (phase 1 — TTY chrome)
 
 | Piece | Location |
 |------|-----------|
-| Wait flag + base line text | `interactive.ts`: `recallFetchWaitActive`, `RECALL_FETCH_WAIT_BASE_LINE`, `setRecallFetchWait`, `recallNextWithFetchWaitUi` |
 | TTY repaint + ellipsis | `ttyAdapter.ts`: `onRecallFetchWaitChanged`, `formatRecallFetchWaitPromptLine`, `RECALL_FETCH_WAIT_PROMPT_FG` |
 | Placeholder context | `renderer.ts`: `recallFetchWait` in `PlaceholderContext`, `PLACEHOLDER_BY_CONTEXT` |
 | Grey box + no cursor | `isGreyDisabledInputChrome`, `grayDisabledInputBoxLines` in `renderer.ts`; `drawBox` / `doFullRedraw` in `ttyAdapter.ts` |
@@ -19,11 +18,18 @@ Informal requirement; delete or shrink once implemented.
 
 **Tests:** `cli/tests/recallLoadingUi.test.ts` — public `processInput`, `RECALL_FETCH_WAIT_BASE_LINE`, renderer helpers; **no Cypress** for this (flaky).
 
-## Future phases (not implemented here)
+## Phase 2 (done)
+
+| Piece | Location |
+|------|-----------|
+| Shared wait line strings | `fetchWaitLines.ts`: `FETCH_WAIT_LINES`, `RECALL_FETCH_WAIT_BASE_LINE` |
+| Generalized wait state | `interactive.ts`: `interactiveFetchWaitBaseLine`, `withInteractiveFetchWaitUi`, `getFetchWaitBaseLine` |
+| Wrapped commands | `contest`, `/recall-status`, async param commands (`/add-access-token`, `/create-access-token`, `/remove-access-token-completely`), `/add gmail`, `/last email`; token list **remove completely** in `ttyAdapter.ts` |
+
+## Future phases
 
 | Phase | Scope |
 |-------|--------|
-| 2 | Other slow commands (contest, recall-status, params, gmail, email, token remove-completely). Reuse or generalize the wait pattern when adding each. |
 | 3 | Cancellable long waits — needs research first. |
 
 ## Out of scope (unless product asks)
@@ -34,4 +40,4 @@ Informal requirement; delete or shrink once implemented.
 
 ---
 
-**Status:** Phase 1 done (`recallNext` paths only).
+**Status:** Phases 1–2 done.

@@ -36,7 +36,7 @@ export const PROMPT = '→ '
 
 /**
  * Which placeholder and input chrome apply in the live region.
- * `recallFetchWait`: `recallNext` in flight — same grey, no-→ box treatment as token list pickers.
+ * `recallFetchWait`: slow interactive command in flight (recall, contest, params, gmail, etc.) — same grey, no-→ box as token list pickers.
  */
 export type PlaceholderContext =
   | 'default'

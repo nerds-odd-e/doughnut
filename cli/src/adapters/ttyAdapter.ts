@@ -10,6 +10,7 @@ import {
   type LiveRegionPaintOptions,
   type PlaceholderContext,
 } from '../renderer.js'
+import { FETCH_WAIT_LINES } from '../fetchWaitLines.js'
 import type { ChatHistory, McqRecallPending, OutputAdapter } from '../types.js'
 
 export type TokenListAction = 'set-default' | 'remove' | 'remove-completely'
@@ -100,7 +101,12 @@ export interface TTYDeps {
   ) => string[]
   TOKEN_LIST_COMMANDS: Record<string, TokenListCommandConfig>
   getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
-  getRecallFetchWaitBaseLine: () => string | null
+  getFetchWaitBaseLine: () => string | null
+  withInteractiveFetchWaitUi: <T>(
+    output: OutputAdapter,
+    baseLine: string,
+    fn: () => Promise<T>
+  ) => Promise<T>
   isGreyDisabledInputChrome: (ctx: PlaceholderContext) => boolean
 }
 
@@ -186,7 +192,8 @@ export async function runTTY(
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
-    getRecallFetchWaitBaseLine,
+    getFetchWaitBaseLine,
+    withInteractiveFetchWaitUi,
     isGreyDisabledInputChrome,
   } = deps
 
@@ -266,7 +273,7 @@ export async function runTTY(
       placeholderContext,
     })
     const pendingRecallAnswer = getPendingRecallAnswer()
-    const waitBaseLine = getRecallFetchWaitBaseLine()
+    const waitBaseLine = getFetchWaitBaseLine()
     let currentPromptWrappedLines: string[]
     let currentPromptSgr: string | undefined
     if (waitBaseLine) {
@@ -467,7 +474,7 @@ export async function runTTY(
       doFullRedraw()
     },
     onRecallFetchWaitChanged: () => {
-      if (getRecallFetchWaitBaseLine()) {
+      if (getFetchWaitBaseLine()) {
         stopRecallFetchWaitRepaintTimer()
         drawBox()
         recallFetchWaitRepaintTimer = setInterval(() => {
@@ -618,7 +625,11 @@ export async function runTTY(
           outputMsg = `Token "${selectedLabel}" removed.`
         } else {
           try {
-            await removeAccessTokenCompletely(selectedLabel)
+            await withInteractiveFetchWaitUi(
+              ttyOutput,
+              FETCH_WAIT_LINES.removeAccessTokenCompletely,
+              () => removeAccessTokenCompletely(selectedLabel)
+            )
             outputMsg = `Token "${selectedLabel}" removed locally and from server.`
           } catch (err) {
             writeError(err)

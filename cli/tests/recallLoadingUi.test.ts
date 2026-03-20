@@ -1,8 +1,10 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import {
+  FETCH_WAIT_LINES,
   RECALL_FETCH_WAIT_BASE_LINE,
   processInput,
   resetRecallStateForTesting,
+  withInteractiveFetchWaitUi,
 } from '../src/interactive.js'
 import {
   buildBoxLines,
@@ -15,12 +17,24 @@ import {
 } from '../src/renderer.js'
 import type { RecallNextResult } from '../src/recall.js'
 
-const { mockRecallNext } = vi.hoisted(() => ({
+const { mockRecallNext, mockRecallStatus } = vi.hoisted(() => ({
   mockRecallNext: vi.fn(),
+  mockRecallStatus: vi.fn(),
+}))
+const { mockAddAccessToken } = vi.hoisted(() => ({
+  mockAddAccessToken: vi.fn(),
 }))
 vi.mock('../src/recall.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../src/recall.js')>()
-  return { ...actual, recallNext: mockRecallNext }
+  return {
+    ...actual,
+    recallNext: mockRecallNext,
+    recallStatus: mockRecallStatus,
+  }
+})
+vi.mock('../src/accessToken.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../src/accessToken.js')>()
+  return { ...actual, addAccessToken: mockAddAccessToken }
 })
 
 function outputAdapter() {
@@ -36,6 +50,8 @@ function outputAdapter() {
 beforeEach(() => {
   resetRecallStateForTesting()
   mockRecallNext.mockReset()
+  mockRecallStatus.mockReset()
+  mockAddAccessToken.mockReset()
 })
 
 describe('recall fetch wait UI', () => {
@@ -68,6 +84,12 @@ describe('recall fetch wait UI', () => {
     const boxTopIdx = live.findIndex((l) => stripAnsi(l).startsWith('┌'))
     expect(boxTopIdx).toBeGreaterThan(0)
     expect(live[boxTopIdx]).toContain(GREY)
+
+    expect(
+      stripAnsi(
+        formatRecallFetchWaitPromptLine(FETCH_WAIT_LINES.recallStatus, 0)
+      )
+    ).toContain(FETCH_WAIT_LINES.recallStatus)
   })
 
   test('processInput /recall signals TTY once when recall fetch starts and once when it ends', async () => {
@@ -94,5 +116,55 @@ describe('recall fetch wait UI', () => {
     await processInput('/recall', outErr)
     expect(outErr.onRecallFetchWaitChanged).toHaveBeenCalledTimes(2)
     expect(outErr.logError).toHaveBeenCalled()
+  })
+
+  test('processInput /recall-status signals fetch wait start and end', async () => {
+    let resolveStatus!: (value: string) => void
+    mockRecallStatus.mockImplementation(
+      () =>
+        new Promise<string>((resolve) => {
+          resolveStatus = resolve
+        })
+    )
+    const out = outputAdapter()
+    const done = processInput('/recall-status', out)
+    await vi.waitFor(() =>
+      expect(out.onRecallFetchWaitChanged).toHaveBeenCalled()
+    )
+    expect(out.onRecallFetchWaitChanged).toHaveBeenCalledTimes(1)
+    resolveStatus('2 notes to recall today')
+    await done
+    expect(out.onRecallFetchWaitChanged).toHaveBeenCalledTimes(2)
+    expect(out.log).toHaveBeenCalledWith('2 notes to recall today')
+  })
+
+  test('processInput /add-access-token signals fetch wait start and end', async () => {
+    let resolveAdd!: () => void
+    mockAddAccessToken.mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveAdd = resolve
+        })
+    )
+    const out = outputAdapter()
+    const done = processInput('/add-access-token secret', out)
+    await vi.waitFor(() =>
+      expect(out.onRecallFetchWaitChanged).toHaveBeenCalled()
+    )
+    expect(out.onRecallFetchWaitChanged).toHaveBeenCalledTimes(1)
+    resolveAdd()
+    await done
+    expect(out.onRecallFetchWaitChanged).toHaveBeenCalledTimes(2)
+    expect(mockAddAccessToken).toHaveBeenCalledWith('secret')
+  })
+
+  test('withInteractiveFetchWaitUi notifies end wait after rejection', async () => {
+    const out = outputAdapter()
+    await expect(
+      withInteractiveFetchWaitUi(out, 'Busy', async () => {
+        throw new Error('fail')
+      })
+    ).rejects.toThrow('fail')
+    expect(out.onRecallFetchWaitChanged).toHaveBeenCalledTimes(2)
   })
 })
