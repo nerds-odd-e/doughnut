@@ -8,10 +8,10 @@ import {
   type InteractiveFetchWaitLine,
 } from '../interactiveFetchWait.js'
 import {
-  cliReadyMarkerSuffix,
   formatInteractiveFetchWaitPromptLine,
   isCommittedInteractiveInput,
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
+  osc133WhenInputBoxSettled,
   wrapTextToLines,
   type LiveRegionPaintOptions,
   type PlaceholderContext,
@@ -331,6 +331,7 @@ export async function runTTY(
       recallingIndicator,
       placeholderContext,
       currentPromptSgr,
+      interactiveFetchWaitLine: waitLine,
     }
   }
 
@@ -348,6 +349,25 @@ export async function runTTY(
     process.stdout.write(`\x1b[${col}G`)
   }
 
+  /** After live-region lines are written and the cursor row is chosen: show/hide chrome, then OSC if settled. */
+  function positionInputChromeCursorAndMaybeEmitSettledOsc(
+    placeholderContext: PlaceholderContext,
+    interactiveFetchWaitLine: InteractiveFetchWaitLine | null
+  ): void {
+    if (isGreyDisabledInputChrome(placeholderContext)) {
+      process.stdout.write(HIDE_CURSOR)
+    } else {
+      process.stdout.write(SHOW_CURSOR)
+      positionCursorInInputBox()
+    }
+    process.stdout.write(
+      osc133WhenInputBoxSettled({
+        lineDraft: buffer,
+        interactiveFetchWaitLine,
+      })
+    )
+  }
+
   function doFullRedraw() {
     const {
       contentLines,
@@ -357,6 +377,7 @@ export async function runTTY(
       recallingIndicator,
       placeholderContext,
       currentPromptSgr,
+      interactiveFetchWaitLine,
     } = getDisplayContent()
     const liveLines = buildLiveRegionLines(
       buffer,
@@ -387,14 +408,9 @@ export async function runTTY(
     livePaint.lastPaintedLineCount = newTotalLines
 
     process.stdout.write(`\x1b[${newTotalLines - inputRow}A`)
-    if (isGreyDisabledInputChrome(placeholderContext)) {
-      process.stdout.write(HIDE_CURSOR)
-    } else {
-      process.stdout.write(SHOW_CURSOR)
-      positionCursorInInputBox()
-    }
-    process.stdout.write(
-      cliReadyMarkerSuffix(buffer, getInteractiveFetchWaitLine() !== null)
+    positionInputChromeCursorAndMaybeEmitSettledOsc(
+      placeholderContext,
+      interactiveFetchWaitLine
     )
   }
 
@@ -407,6 +423,7 @@ export async function runTTY(
       recallingIndicator,
       placeholderContext,
       currentPromptSgr,
+      interactiveFetchWaitLine,
     } = getDisplayContent()
     const liveLines = buildLiveRegionLines(
       buffer,
@@ -439,14 +456,9 @@ export async function runTTY(
     const totalWritten = Math.max(newTotalLines, livePaint.lastPaintedLineCount)
     const inputRow = inputRowFromTop(currentPromptLines, contentLines.length)
     process.stdout.write(`\x1b[${totalWritten - inputRow}A`)
-    if (isGreyDisabledInputChrome(placeholderContext)) {
-      process.stdout.write(HIDE_CURSOR)
-    } else {
-      process.stdout.write(SHOW_CURSOR)
-      positionCursorInInputBox()
-    }
-    process.stdout.write(
-      cliReadyMarkerSuffix(buffer, getInteractiveFetchWaitLine() !== null)
+    positionInputChromeCursorAndMaybeEmitSettledOsc(
+      placeholderContext,
+      interactiveFetchWaitLine
     )
 
     livePaint.cursorUpStepsToLiveRegionTop = inputRow

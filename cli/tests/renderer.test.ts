@@ -1,7 +1,8 @@
 import { describe, test, expect } from 'vitest'
+import { INTERACTIVE_FETCH_WAIT_LINES } from '../src/interactiveFetchWait.js'
 import {
-  CLI_READY_MARKER,
-  cliReadyMarkerSuffix,
+  OSC_133_INPUT_BOX_SETTLED,
+  osc133WhenInputBoxSettled,
   truncateToWidth,
   isCommittedInteractiveInput,
   grayDisabledInputBoxLines,
@@ -13,19 +14,39 @@ import {
 } from '../src/renderer.js'
 import type { ChatHistory } from '../src/types.js'
 
-describe('cliReadyMarkerSuffix', () => {
-  test('emits OSC 133;A when buffer is empty and no interactive fetch wait', () => {
-    expect(cliReadyMarkerSuffix('', false)).toBe(CLI_READY_MARKER)
-    expect(CLI_READY_MARKER).toBe('\x1b]133;A\x07')
+describe('osc133WhenInputBoxSettled', () => {
+  const settled = {
+    lineDraft: '',
+    interactiveFetchWaitLine: null,
+  } as const
+
+  test('emits OSC 133;A when draft is empty and no interactive fetch wait', () => {
+    expect(osc133WhenInputBoxSettled(settled)).toBe(OSC_133_INPUT_BOX_SETTLED)
+    expect(OSC_133_INPUT_BOX_SETTLED).toBe('\x1b]133;A\x07')
   })
 
-  test('omits marker when buffer has text', () => {
-    expect(cliReadyMarkerSuffix('x', false)).toBe('')
-    expect(cliReadyMarkerSuffix(' \n', false)).toBe('')
+  test('omits OSC when the user has typed in the input box', () => {
+    expect(
+      osc133WhenInputBoxSettled({
+        lineDraft: 'x',
+        interactiveFetchWaitLine: null,
+      })
+    ).toBe('')
+    expect(
+      osc133WhenInputBoxSettled({
+        lineDraft: ' \n',
+        interactiveFetchWaitLine: null,
+      })
+    ).toBe('')
   })
 
-  test('omits marker during interactive fetch wait', () => {
-    expect(cliReadyMarkerSuffix('', true)).toBe('')
+  test('omits OSC while interactive fetch wait is shown', () => {
+    expect(
+      osc133WhenInputBoxSettled({
+        lineDraft: '',
+        interactiveFetchWaitLine: INTERACTIVE_FETCH_WAIT_LINES.recallNext,
+      })
+    ).toBe('')
   })
 })
 

@@ -61,7 +61,7 @@ This is a single call site — high cohesion. The CLI owns the definition of "re
 
 ### Phase 1: Emit the ready marker from the CLI — done
 
-`CLI_READY_MARKER` and `cliReadyMarkerSuffix` live in `renderer.ts`. `ttyAdapter` `drawBox` / `doFullRedraw` append the suffix after cursor placement when the buffer is empty and `getInteractiveFetchWaitLine()` is null.
+`OSC_133_INPUT_BOX_SETTLED` and `osc133WhenInputBoxSettled` live in `renderer.ts` (`InputBoxSettledForAutomation` describes the predicate). `ttyAdapter` finishes each live-region paint with `positionInputChromeCursorAndMaybeEmitSettledOsc`, using the same-frame `interactiveFetchWaitLine` from `getDisplayContent()` (no second `getInteractiveFetchWaitLine()` call).
 
 **Test:** `cli/tests/renderer.test.ts` covers the suffix helper.
 
@@ -70,10 +70,10 @@ This is a single call site — high cohesion. The CLI owns the definition of "re
 ### Phase 2: Detect the marker in the test infrastructure
 
 In `cliPtyRunner.ts`:
-- Replace `INPUT_BOX_READY_PATTERN` with a check for `CLI_READY_MARKER` in new stdout content.
-- Replace `CLI_READY_PATTERN` (initial startup) with the same marker check.
+- Replace `INPUT_BOX_READY_PATTERN` with a check for `OSC_133_INPUT_BOX_SETTLED` in new stdout content.
+- Replace `CLI_READY_PATTERN` (initial startup) with the same OSC check.
 - Remove `INPUT_BOX_STABLE_MS` / stability polling. Keep a small flush debounce if needed.
-- Import `CLI_READY_MARKER` from the CLI package (or define it as a shared constant if cross-package import is blocked by module boundaries).
+- Import `OSC_133_INPUT_BOX_SETTLED` from `cli/src/renderer.ts` (or a tiny shared module if import boundaries block it).
 
 **Test:** Run all CLI E2E features locally. They should pass with the new detection. The loading-animation race and placeholder-mismatch failure modes are structurally impossible now.
 
@@ -86,7 +86,7 @@ Push and confirm GitHub Actions passes. If the small flush debounce is insuffici
 `cliPtyRunner.ts` (e2e_test, runs in Cypress Node process) needs the marker constant from `cli/src/renderer.ts`. Options:
 
 1. **Direct relative import** — `cliPtyRunner.ts` already imports from `./cliEnv`; if tsconfig allows reaching `../../cli/src/renderer`, this is simplest.
-2. **Shared constants file** — Extract `CLI_READY_MARKER` to a small file (e.g. `cli/src/readyMarker.ts`) with no transitive dependencies, import from both.
+2. **Shared constants file** — Extract `OSC_133_INPUT_BOX_SETTLED` to a small file (e.g. `cli/src/readyMarker.ts`) with no transitive dependencies, import from both.
 3. **Duplicate the constant** — Last resort. A single string constant duplicated in two places is low risk, but violates the "one representation" principle. If we must, add a unit test that imports both and asserts equality.
 
 Prefer option 1 or 2. Investigate at implementation time.

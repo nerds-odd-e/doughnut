@@ -64,15 +64,27 @@ export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
   recallSpelling: 'type your answer; /stop to exit recall',
 }
 
-/** OSC 133;A ST (FinalTerm prompt mark). Invisible; declares the input box is ready for the next keystroke. */
-export const CLI_READY_MARKER = '\x1b]133;A\x07'
+/**
+ * OSC 133 ; A ST — FinalTerm / shell-integration "prompt start".
+ * Invisible on screen; automation may treat it as "input box paint finished, safe to send keystrokes."
+ */
+export const OSC_133_INPUT_BOX_SETTLED = '\x1b]133;A\x07' as const
 
-export function cliReadyMarkerSuffix(
-  buffer: string,
-  interactiveFetchWaitActive: boolean
-): string {
-  if (buffer !== '' || interactiveFetchWaitActive) return ''
-  return CLI_READY_MARKER
+/** What the TTY must know to decide if this paint represents a settled input box (vs draft text or loading). */
+export type InputBoxSettledForAutomation = {
+  /** Multiline draft; empty means the user has not started typing in the box. */
+  lineDraft: string
+  /** When non-null, a slow command is in flight and the box is repainting (ellipsis); not settled. */
+  interactiveFetchWaitLine: InteractiveFetchWaitLine | null
+}
+
+export function osc133WhenInputBoxSettled(
+  snapshot: InputBoxSettledForAutomation
+): typeof OSC_133_INPUT_BOX_SETTLED | '' {
+  if (snapshot.lineDraft !== '' || snapshot.interactiveFetchWaitLine !== null) {
+    return ''
+  }
+  return OSC_133_INPUT_BOX_SETTLED
 }
 
 /** Token list pick or interactive fetch wait: grey bordered box, no →, cursor hidden. */
