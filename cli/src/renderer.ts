@@ -19,7 +19,6 @@ import { renderMarkdownToTerminal } from './markdown.js'
 import type { ChatHistory } from './types.js'
 import type { InteractiveFetchWaitLine } from './interactiveFetchWait.js'
 import { formatVersionOutput } from './version.js'
-import { OSC_133_INPUT_BOX_SETTLED } from './readyMarker.js'
 
 export {
   GREY,
@@ -27,8 +26,16 @@ export {
   RESET,
   HIDE_CURSOR,
   SHOW_CURSOR,
-  OSC_133_INPUT_BOX_SETTLED,
 }
+
+/**
+ * OSC 133 ; A ST — FinalTerm / shell-integration [“prompt start”](https://gitlab.freedesktop.org/Per_Bothner/specifications/blob/master/proposals/semantic-prompts.md).
+ * Invisible on screen. The interactive TTY appends this when the bordered input box is ready for the next keystroke.
+ */
+export const INTERACTIVE_INPUT_READY_OSC = '\x1b]133;A\x07' as const
+
+/** Byte sequence written to stdout when the interactive CLI announces input readiness. */
+export type InteractiveInputReadyOsc = typeof INTERACTIVE_INPUT_READY_OSC
 
 /** Terminal column count; used for truncation and line width. */
 export type TerminalWidth = number
@@ -66,21 +73,25 @@ export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
   recallSpelling: 'type your answer; /stop to exit recall',
 }
 
-/** What the TTY must know to decide if this paint represents a settled input box (vs draft text or loading). */
-export type InputBoxSettledForAutomation = {
-  /** Multiline draft; empty means the user has not started typing in the box. */
+/** Same-frame paint facts the TTY already has when finishing the live region (cursor + readiness signal). */
+export type InteractiveInputReadyPaint = {
+  /** Input box draft; empty means the user has not started typing. */
   lineDraft: string
-  /** When non-null, a slow command is in flight and the box is repainting (ellipsis); not settled. */
+  /** When set, a slow command is in flight and the live region is still animating — not ready for input. */
   interactiveFetchWaitLine: InteractiveFetchWaitLine | null
 }
 
-export function osc133WhenInputBoxSettled(
-  snapshot: InputBoxSettledForAutomation
-): typeof OSC_133_INPUT_BOX_SETTLED | '' {
-  if (snapshot.lineDraft !== '' || snapshot.interactiveFetchWaitLine !== null) {
+/**
+ * Suffix to append after cursor placement when the interactive input box accepts input;
+ * empty during interactive fetch wait or while the user has typed a draft.
+ */
+export function interactiveInputReadyOscSuffix(
+  paint: InteractiveInputReadyPaint
+): InteractiveInputReadyOsc | '' {
+  if (paint.lineDraft !== '' || paint.interactiveFetchWaitLine !== null) {
     return ''
   }
-  return OSC_133_INPUT_BOX_SETTLED
+  return INTERACTIVE_INPUT_READY_OSC
 }
 
 /** Token list pick or interactive fetch wait: grey bordered box, no →, cursor hidden. */

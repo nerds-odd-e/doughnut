@@ -1,8 +1,8 @@
 import { describe, test, expect } from 'vitest'
 import { INTERACTIVE_FETCH_WAIT_LINES } from '../src/interactiveFetchWait.js'
 import {
-  OSC_133_INPUT_BOX_SETTLED,
-  osc133WhenInputBoxSettled,
+  INTERACTIVE_INPUT_READY_OSC,
+  interactiveInputReadyOscSuffix,
   truncateToWidth,
   isCommittedInteractiveInput,
   grayDisabledInputBoxLines,
@@ -14,35 +14,37 @@ import {
 } from '../src/renderer.js'
 import type { ChatHistory } from '../src/types.js'
 
-describe('osc133WhenInputBoxSettled', () => {
-  const settled = {
+describe('interactiveInputReadyOscSuffix', () => {
+  const readyPaint = {
     lineDraft: '',
     interactiveFetchWaitLine: null,
   } as const
 
-  test('emits OSC 133;A when draft is empty and no interactive fetch wait', () => {
-    expect(osc133WhenInputBoxSettled(settled)).toBe(OSC_133_INPUT_BOX_SETTLED)
-    expect(OSC_133_INPUT_BOX_SETTLED).toBe('\x1b]133;A\x07')
+  test('emits FinalTerm prompt-start OSC when draft is empty and no interactive fetch wait', () => {
+    expect(interactiveInputReadyOscSuffix(readyPaint)).toBe(
+      INTERACTIVE_INPUT_READY_OSC
+    )
+    expect(INTERACTIVE_INPUT_READY_OSC).toBe('\x1b]133;A\x07')
   })
 
-  test('omits OSC when the user has typed in the input box', () => {
+  test('emits nothing when the user has typed in the input box', () => {
     expect(
-      osc133WhenInputBoxSettled({
+      interactiveInputReadyOscSuffix({
         lineDraft: 'x',
         interactiveFetchWaitLine: null,
       })
     ).toBe('')
     expect(
-      osc133WhenInputBoxSettled({
+      interactiveInputReadyOscSuffix({
         lineDraft: ' \n',
         interactiveFetchWaitLine: null,
       })
     ).toBe('')
   })
 
-  test('omits OSC while interactive fetch wait is shown', () => {
+  test('emits nothing while interactive fetch wait is shown', () => {
     expect(
-      osc133WhenInputBoxSettled({
+      interactiveInputReadyOscSuffix({
         lineDraft: '',
         interactiveFetchWaitLine: INTERACTIVE_FETCH_WAIT_LINES.recallNext,
       })

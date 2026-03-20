@@ -6,24 +6,68 @@
 import type { IPty } from '@lydell/node-pty'
 import { cliEnv } from './cliEnv'
 
-/** Byte-identical to `cli/src/readyMarker.ts` (inlined: Cypress plugin load does not resolve that import reliably). */
-const OSC_133_INPUT_BOX_SETTLED = '\x1b]133;A\x07' as const
+/**
+ * Inlined: must stay byte-identical to `INTERACTIVE_INPUT_READY_OSC` in `cli/src/renderer.ts`.
+ * The Cypress plugin process does not resolve imports into `cli/` from this file reliably.
+ */
+const INTERACTIVE_INPUT_READY_OSC = '\x1b]133;A\x07' as const
 
 const PTY_TIMEOUT_MS = 25_000
-/** Polling interval for state-based waits; not a fixed delay. */
 const CLI_POLL_MS = 10
-/** After OSC 133 "input settled" appears, brief pause so trailing PTY chunks can flush. */
-const READY_MARKER_FLUSH_MS = 50
+/** After the readiness OSC appears, wait briefly so any trailing PTY chunks flush. */
+const INTERACTIVE_INPUT_READY_FLUSH_MS = 50
+
 const PTY_OPTIONS = {
   name: 'xterm-256color' as const,
   cols: 80,
   rows: 24,
 }
 
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
+
 interface PtyHandle {
   pty: IPty
   stdout: { value: string }
   dispose: () => void
+}
+
+/** Wait until stdout contains the interactive CLI’s invisible “ready for keystrokes” marker. */
+type WaitForInteractiveInputReadyOptions = {
+  getStdout: () => string
+  maxWaitMs: number
+  /**
+   * When set, only search output appended after this byte offset (e.g. length before a `pty.write`).
+   * Omit for startup: the marker may already exist earlier in the capture.
+   */
+  onlyInStdoutAfterByteLength?: number
+  formatTimeoutError: (stdout: string) => string
+}
+
+async function waitForInteractiveInputReadyOsc(
+  options: WaitForInteractiveInputReadyOptions
+): Promise<void> {
+  const {
+    getStdout,
+    maxWaitMs,
+    onlyInStdoutAfterByteLength: afterLen,
+    formatTimeoutError,
+  } = options
+  const start = Date.now()
+  while (Date.now() - start < maxWaitMs) {
+    const stdout = getStdout()
+    const haystack =
+      afterLen === undefined
+        ? stdout
+        : stdout.length > afterLen
+          ? stdout.slice(afterLen)
+          : ''
+    if (haystack.includes(INTERACTIVE_INPUT_READY_OSC)) {
+      await sleep(INTERACTIVE_INPUT_READY_FLUSH_MS)
+      return
+    }
+    await sleep(CLI_POLL_MS)
+  }
+  throw new Error(formatTimeoutError(getStdout()))
 }
 
 function spawnPty(opts: {
@@ -48,59 +92,18 @@ function spawnPty(opts: {
   return { pty: ptyProcess, stdout, dispose: () => disposeData.dispose() }
 }
 
-async function waitForCliReady(getStdout: () => string): Promise<void> {
-  const maxWaitMs = 10_000
-  const start = Date.now()
-  while (Date.now() - start < maxWaitMs) {
-    if (getStdout().includes(OSC_133_INPUT_BOX_SETTLED)) {
-      await new Promise((r) => setTimeout(r, READY_MARKER_FLUSH_MS))
-      return
-    }
-    await new Promise((r) => setTimeout(r, CLI_POLL_MS))
-  }
-  const stdout = getStdout()
-  throw new Error(
-    `CLI prompt did not appear within 10s. stdout: ${stdout.slice(-300).replace(/\r/g, '\\r')}`
-  )
-}
-
-async function waitForInputBoxReady(
-  getStdout: () => string,
-  lenBeforeSend: number
-): Promise<void> {
-  const maxWaitMs = 15_000
-  const start = Date.now()
-  while (Date.now() - start < maxWaitMs) {
-    const stdout = getStdout()
-    if (stdout.length <= lenBeforeSend) {
-      await new Promise((r) => setTimeout(r, CLI_POLL_MS))
-      continue
-    }
-    const newContent = stdout.slice(lenBeforeSend)
-    if (newContent.includes(OSC_133_INPUT_BOX_SETTLED)) {
-      await new Promise((r) => setTimeout(r, READY_MARKER_FLUSH_MS))
-      return
-    }
-    await new Promise((r) => setTimeout(r, CLI_POLL_MS))
-  }
-  const stdout = getStdout()
-  throw new Error(
-    `CLI did not show input box after send within 15s. stdout grew by ${stdout.length - lenBeforeSend} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`
-  )
-}
-
 function formatPtyTimeoutDiagnostics(opts: {
   spawnLabel: string
   cwd: string
   stdout: string
   inputSent: boolean
-  readyReached: boolean
+  sawInteractiveInputReadyOsc: boolean
 }): string {
   const lines = [
     `PTY timed out after ${PTY_TIMEOUT_MS / 1000}s`,
     `spawn: ${opts.spawnLabel}`,
     `cwd: ${opts.cwd}`,
-    `CLI ready (prompt shown): ${opts.readyReached}`,
+    `interactive input ready OSC seen: ${opts.sawInteractiveInputReadyOsc}`,
     `input sent: ${opts.inputSent}`,
     `stdout (${opts.stdout.length} chars):`,
     opts.stdout
@@ -125,7 +128,7 @@ export async function runCliInPty(opts: {
     cwd: opts.cwd,
     env: opts.env,
   })
-  let readyReached = false
+  let sawInteractiveInputReadyOsc = false
   let inputSent = false
   return new Promise<string>((resolve, reject) => {
     const timeout = setTimeout(() => {
@@ -138,7 +141,7 @@ export async function runCliInPty(opts: {
             cwd: opts.cwd,
             stdout: handle.stdout.value,
             inputSent,
-            readyReached,
+            sawInteractiveInputReadyOsc,
           })
         )
       )
@@ -149,9 +152,14 @@ export async function runCliInPty(opts: {
       if (exitCode === 0) resolve(handle.stdout.value)
       else reject(new Error(`CLI exited with code ${exitCode}`))
     })
-    waitForCliReady(() => handle.stdout.value)
+    waitForInteractiveInputReadyOsc({
+      getStdout: () => handle.stdout.value,
+      maxWaitMs: 10_000,
+      formatTimeoutError: (stdout) =>
+        `CLI prompt did not appear within 10s. stdout: ${stdout.slice(-300).replace(/\r/g, '\\r')}`,
+    })
       .then(() => {
-        readyReached = true
+        sawInteractiveInputReadyOsc = true
         const input = opts.input.endsWith('\n') ? opts.input : `${opts.input}\n`
         handle.pty.write(input)
       })
@@ -162,7 +170,6 @@ export async function runCliInPty(opts: {
   })
 }
 
-/** Module-level handle for long-running interactive CLI. Used by Cypress tasks. */
 let interactiveHandle: PtyHandle | null = null
 
 export async function startInteractiveCli(opts: {
@@ -177,7 +184,12 @@ export async function startInteractiveCli(opts: {
     )
   }
   const handle = spawnPty(opts)
-  await waitForCliReady(() => handle.stdout.value)
+  await waitForInteractiveInputReadyOsc({
+    getStdout: () => handle.stdout.value,
+    maxWaitMs: 10_000,
+    formatTimeoutError: (stdout) =>
+      `CLI prompt did not appear within 10s. stdout: ${stdout.slice(-300).replace(/\r/g, '\\r')}`,
+  })
   interactiveHandle = handle
 }
 
@@ -198,10 +210,13 @@ export async function sendToInteractiveCli(input: string): Promise<string> {
           : `${trimmed}\n`
   const lenBeforeSend = interactiveHandle.stdout.value.length
   interactiveHandle.pty.write(toSend)
-  await waitForInputBoxReady(
-    () => interactiveHandle!.stdout.value,
-    lenBeforeSend
-  )
+  await waitForInteractiveInputReadyOsc({
+    getStdout: () => interactiveHandle!.stdout.value,
+    maxWaitMs: 15_000,
+    onlyInStdoutAfterByteLength: lenBeforeSend,
+    formatTimeoutError: (stdout) =>
+      `CLI did not show input box after send within 15s. stdout grew by ${stdout.length - lenBeforeSend} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`,
+  })
   return interactiveHandle.stdout.value
 }
 

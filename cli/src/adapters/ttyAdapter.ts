@@ -9,9 +9,9 @@ import {
 } from '../interactiveFetchWait.js'
 import {
   formatInteractiveFetchWaitPromptLine,
+  interactiveInputReadyOscSuffix,
   isCommittedInteractiveInput,
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
-  osc133WhenInputBoxSettled,
   wrapTextToLines,
   type LiveRegionPaintOptions,
   type PlaceholderContext,
@@ -349,8 +349,8 @@ export async function runTTY(
     process.stdout.write(`\x1b[${col}G`)
   }
 
-  /** After live-region lines are written and the cursor row is chosen: show/hide chrome, then OSC if settled. */
-  function positionInputChromeCursorAndMaybeEmitSettledOsc(
+  /** Cursor visibility and column, then `INTERACTIVE_INPUT_READY_OSC` from `renderer.ts` when the box accepts input. */
+  function finalizeInteractiveLiveRegionPaint(
     placeholderContext: PlaceholderContext,
     interactiveFetchWaitLine: InteractiveFetchWaitLine | null
   ): void {
@@ -361,7 +361,7 @@ export async function runTTY(
       positionCursorInInputBox()
     }
     process.stdout.write(
-      osc133WhenInputBoxSettled({
+      interactiveInputReadyOscSuffix({
         lineDraft: buffer,
         interactiveFetchWaitLine,
       })
@@ -408,7 +408,7 @@ export async function runTTY(
     livePaint.lastPaintedLineCount = newTotalLines
 
     process.stdout.write(`\x1b[${newTotalLines - inputRow}A`)
-    positionInputChromeCursorAndMaybeEmitSettledOsc(
+    finalizeInteractiveLiveRegionPaint(
       placeholderContext,
       interactiveFetchWaitLine
     )
@@ -456,7 +456,7 @@ export async function runTTY(
     const totalWritten = Math.max(newTotalLines, livePaint.lastPaintedLineCount)
     const inputRow = inputRowFromTop(currentPromptLines, contentLines.length)
     process.stdout.write(`\x1b[${totalWritten - inputRow}A`)
-    positionInputChromeCursorAndMaybeEmitSettledOsc(
+    finalizeInteractiveLiveRegionPaint(
       placeholderContext,
       interactiveFetchWaitLine
     )
