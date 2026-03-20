@@ -87,7 +87,6 @@ export interface TTYDeps {
     history: ChatHistory,
     currentPromptWrappedLines: string[]
   ) => boolean
-  renderBox: (lines: string[], width: number) => string
   renderFullDisplay: (
     history: ChatHistory,
     buffer: string,
@@ -169,6 +168,26 @@ type TokenSelectionState = {
 
 /** One submitted command’s buffered scrollback: lines + dominant tone for `commitHistoryOutput`. */
 type BufferedCommandTurn = { lines: string[]; tone: ChatHistoryOutputTone }
+
+/**
+ * Measured live region for one paint: Current prompt, input box, and Current guidance
+ * (same inputs as {@link buildLiveRegionLines} / full-display tail).
+ */
+type LiveRegionLayout = {
+  currentPromptWrappedLines: string[]
+  currentPromptLines: number
+  suggestionLines: string[]
+  recallingIndicator: string[]
+  placeholderContext: PlaceholderContext
+  currentPromptSgr: string | undefined
+  interactiveFetchWaitLine: InteractiveFetchWaitLine | null
+  liveLines: string[]
+  /** Line count of the live block (used for CUU cursor positioning). */
+  liveLineCount: number
+  /** Rows from live block top to the input line (prompt + box content lines). */
+  inputLineRowInLiveBlock: number
+  terminalWidth: number
+}
 
 export async function runTTY(
   stdin: NodeJS.ReadableStream,
@@ -383,6 +402,44 @@ export async function runTTY(
     contentLinesLength: number
   ) => currentPromptLines + contentLinesLength
 
+  function measureLiveRegionLayout(): LiveRegionLayout {
+    const {
+      contentLines,
+      currentPromptWrappedLines,
+      currentPromptLines,
+      suggestionLines,
+      recallingIndicator,
+      placeholderContext,
+      currentPromptSgr,
+      interactiveFetchWaitLine,
+    } = getDisplayContent()
+    const terminalWidth = getTerminalWidth()
+    const liveLines = buildLiveRegionLines(
+      buffer,
+      terminalWidth,
+      currentPromptWrappedLines,
+      suggestionLines,
+      recallingIndicator,
+      { placeholderContext, currentPromptSgr }
+    )
+    return {
+      currentPromptWrappedLines,
+      currentPromptLines,
+      suggestionLines,
+      recallingIndicator,
+      placeholderContext,
+      currentPromptSgr,
+      interactiveFetchWaitLine,
+      liveLines,
+      liveLineCount: liveLines.length,
+      inputLineRowInLiveBlock: inputRowFromTop(
+        currentPromptLines,
+        contentLines.length
+      ),
+      terminalWidth,
+    }
+  }
+
   const positionCursorInInputBox = () => {
     const bufferLines = buffer.split('\n')
     const lastLine = bufferLines[bufferLines.length - 1] ?? ''
@@ -411,77 +468,46 @@ export async function runTTY(
   }
 
   function doFullRedraw() {
-    const {
-      contentLines,
-      currentPromptWrappedLines,
-      currentPromptLines,
-      suggestionLines,
-      recallingIndicator,
-      placeholderContext,
-      currentPromptSgr,
-      interactiveFetchWaitLine,
-    } = getDisplayContent()
-    const liveLines = buildLiveRegionLines(
-      buffer,
-      getTerminalWidth(),
-      currentPromptWrappedLines,
-      suggestionLines,
-      recallingIndicator,
-      { placeholderContext, currentPromptSgr }
-    )
-    const newTotalLines = liveLines.length
+    const layout = measureLiveRegionLayout()
 
     process.stdout.write(CLEAR_SCREEN)
     const fullLines = renderFullDisplay(
       chatHistory,
       buffer,
-      getTerminalWidth(),
-      suggestionLines,
-      recallingIndicator,
-      currentPromptWrappedLines,
-      { placeholderContext, currentPromptSgr }
+      layout.terminalWidth,
+      layout.suggestionLines,
+      layout.recallingIndicator,
+      layout.currentPromptWrappedLines,
+      {
+        placeholderContext: layout.placeholderContext,
+        currentPromptSgr: layout.currentPromptSgr,
+      }
     )
     for (const line of fullLines) {
       process.stdout.write(`${line}\n`)
     }
 
-    const inputRow = inputRowFromTop(currentPromptLines, contentLines.length)
-    livePaint.cursorUpStepsToLiveRegionTop = inputRow
-    livePaint.lastPaintedLineCount = newTotalLines
+    livePaint.cursorUpStepsToLiveRegionTop = layout.inputLineRowInLiveBlock
+    livePaint.lastPaintedLineCount = layout.liveLineCount
 
-    process.stdout.write(`\x1b[${newTotalLines - inputRow}A`)
+    process.stdout.write(
+      `\x1b[${layout.liveLineCount - layout.inputLineRowInLiveBlock}A`
+    )
     finalizeInteractiveLiveRegionPaint(
-      placeholderContext,
-      interactiveFetchWaitLine
+      layout.placeholderContext,
+      layout.interactiveFetchWaitLine
     )
   }
 
   function drawBox() {
-    const {
-      contentLines,
-      currentPromptWrappedLines,
-      currentPromptLines,
-      suggestionLines,
-      recallingIndicator,
-      placeholderContext,
-      currentPromptSgr,
-      interactiveFetchWaitLine,
-    } = getDisplayContent()
-    const liveLines = buildLiveRegionLines(
-      buffer,
-      getTerminalWidth(),
-      currentPromptWrappedLines,
-      suggestionLines,
-      recallingIndicator,
-      { placeholderContext, currentPromptSgr }
-    )
-    const newTotalLines = liveLines.length
+    const layout = measureLiveRegionLayout()
+    const { liveLines, liveLineCount, inputLineRowInLiveBlock } = layout
 
     if (livePaint.cursorUpStepsToLiveRegionTop > 0) {
       process.stdout.write(`\x1b[${livePaint.cursorUpStepsToLiveRegionTop}A`)
     } else if (
       livePaint.lastPaintedLineCount === 0 &&
-      needsGapBeforeBox(chatHistory, currentPromptWrappedLines)
+      needsGapBeforeBox(chatHistory, layout.currentPromptWrappedLines)
     ) {
       process.stdout.write('\n')
     }
@@ -490,21 +516,20 @@ export async function runTTY(
     for (const line of liveLines) {
       process.stdout.write(`\x1b[2K${line}\n`)
     }
-    const extra = livePaint.lastPaintedLineCount - newTotalLines
+    const extra = livePaint.lastPaintedLineCount - liveLineCount
     for (let i = 0; i < extra; i++) {
       process.stdout.write('\x1b[2K\n')
     }
 
-    const totalWritten = Math.max(newTotalLines, livePaint.lastPaintedLineCount)
-    const inputRow = inputRowFromTop(currentPromptLines, contentLines.length)
-    process.stdout.write(`\x1b[${totalWritten - inputRow}A`)
+    const totalWritten = Math.max(liveLineCount, livePaint.lastPaintedLineCount)
+    process.stdout.write(`\x1b[${totalWritten - inputLineRowInLiveBlock}A`)
     finalizeInteractiveLiveRegionPaint(
-      placeholderContext,
-      interactiveFetchWaitLine
+      layout.placeholderContext,
+      layout.interactiveFetchWaitLine
     )
 
-    livePaint.cursorUpStepsToLiveRegionTop = inputRow
-    livePaint.lastPaintedLineCount = newTotalLines
+    livePaint.cursorUpStepsToLiveRegionTop = inputLineRowInLiveBlock
+    livePaint.lastPaintedLineCount = liveLineCount
   }
 
   function stopInteractiveFetchWaitRepaintTimer(): void {
@@ -513,6 +538,19 @@ export async function runTTY(
       interactiveFetchWaitRepaintTimer = null
     }
     interactiveFetchWaitEllipsisTick = 0
+  }
+
+  /** MCQ recall turn: line passed to `processInput` (slash escapes, number, or highlighted choice). */
+  function recallMcqSubmittedLine(
+    trimmedBuffer: string,
+    choices: readonly string[],
+    highlightedChoiceIndex: number
+  ): string {
+    if (trimmedBuffer === '/stop') return '/stop'
+    if (trimmedBuffer === '/contest') return '/contest'
+    const n = Number.parseInt(trimmedBuffer, 10)
+    if (n >= 1 && n <= choices.length) return String(n)
+    return String(highlightedChoiceIndex + 1)
   }
 
   ttyOutput = {
@@ -598,9 +636,8 @@ export async function runTTY(
           chatHistory.push({ type: 'input', content: trimmed })
           commitHistoryOutput(['Stopped recall'])
           return
-        } else if (isNo) {
-          // redraw below
-        } else if (trimmed) {
+        }
+        if (!isNo && trimmed) {
           writeCurrentPromptLine('Please answer y or n')
           setPendingRecallStopConfirmation(true)
         }
@@ -637,19 +674,11 @@ export async function runTTY(
         drawBox()
       } else if (submitPressed && !key.shift) {
         const trimmedBuffer = buffer.trim()
-        const effectiveInput =
-          trimmedBuffer === '/stop'
-            ? '/stop'
-            : trimmedBuffer === '/contest'
-              ? '/contest'
-              : (() => {
-                  const choiceNum = Number.parseInt(trimmedBuffer, 10)
-                  const validTyped =
-                    choiceNum >= 1 && choiceNum <= choices.length
-                  return validTyped
-                    ? String(choiceNum)
-                    : String(mcqChoiceHighlightIndex + 1)
-                })()
+        const effectiveInput = recallMcqSubmittedLine(
+          trimmedBuffer,
+          choices,
+          mcqChoiceHighlightIndex
+        )
         clearLiveRegionForRepaint(livePaint)
         const inputForHistory = buffer || effectiveInput
         buffer = ''
@@ -747,14 +776,6 @@ export async function runTTY(
         const trimmedInput = buffer.trim()
 
         if (trimmedInput === '/clear') {
-          chatHistory = []
-          buffer = ''
-          tokenSelection = null
-          if (isInRecallSubstate()) exitRecallMode()
-          setPendingRecallStopConfirmation(false)
-          mcqChoiceHighlightIndex = 0
-          highlightIndex = 0
-          suggestionsDismissed = false
           ttyOutput.clearAndRedraw?.()
           return
         }

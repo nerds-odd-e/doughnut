@@ -641,7 +641,6 @@ function buildTTYDeps() {
     getLastLine,
     formatMcqChoiceLines,
     getTerminalWidth,
-    renderBox,
     renderFullDisplay,
     renderPastInput,
     GREY,
