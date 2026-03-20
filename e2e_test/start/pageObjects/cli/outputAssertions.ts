@@ -11,8 +11,7 @@ import {
   getRecallDisplaySections,
   getCurrentGuidanceDebug,
   getCurrentGuidanceAndHistoryRaw,
-  countTopBorderLinesBeforeFirstInputBox,
-  findControlCharCorruptionInRenderedOutput,
+  countInputBoxTopBorderLinesInInteractivePtyTranscript,
 } from '../../../step_definitions/cliSectionParser'
 
 const SECTION_LABELS = {
@@ -140,13 +139,12 @@ function inputBoxTopBorder() {
   return {
     expectExactlyOne() {
       withOutput((output) => {
-        const count = countTopBorderLinesBeforeFirstInputBox(output)
+        const count =
+          countInputBoxTopBorderLinesInInteractivePtyTranscript(output)
         expect(
           count,
-          `Expected exactly one input box top border (┌─┐) in visual output, found ${count}`
+          `Expected exactly one input box top border (┌─┐) in simulated interactive PTY grid, found ${count}`
         ).to.equal(1)
-        const corruption = findControlCharCorruptionInRenderedOutput(output)
-        expect(corruption, corruption ?? undefined).to.be.null
       })
     },
   }

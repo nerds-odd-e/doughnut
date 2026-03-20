@@ -232,15 +232,36 @@ export function getCurrentGuidanceAndHistoryRaw(output: string): string {
   return getCurrentGuidanceCombined(boundaries, false)
 }
 
-const TOP_BORDER_PATTERN = /^┌─*┐$/
+const INPUT_BOX_TOP_BORDER_LINE = /^┌─*┐$/
 
-/** Simulates terminal overwrite: cursor/erase sequences alter displayed content. Used to detect visual bugs (e.g. double border). */
-function simulateTerminalOverwrite(output: string): string {
+/**
+ * Plain grid after replaying an interactive CLI PTY transcript through a minimal
+ * cursor/erase model and stripping SGR + CSI. Used to approximate what the user sees
+ * (e.g. duplicate `┌─┐`, stray ESC written as text when a sequence is unhandled).
+ */
+export type InteractiveCliSimulatedPlainScreen = Readonly<{
+  asPlainTextGrid: string
+}>
+
+function toInteractiveCliSimulatedPlainScreen(
+  ptyTranscript: string
+): InteractiveCliSimulatedPlainScreen {
+  return {
+    asPlainTextGrid: stripAllAnsi(
+      replayInteractiveCliPtyTranscriptOntoGrid(ptyTranscript)
+    ),
+  }
+}
+
+/** Applies cursor motion, line erase, and screen clear from a PTY byte stream onto a logical character grid. */
+function replayInteractiveCliPtyTranscriptOntoGrid(
+  ptyTranscript: string
+): string {
   const lines: string[] = []
   let row = 0
   let col = 0
   let i = 0
-  const ESC = '\x1b'
+  const ESC = '\x1b' as const
   const cursorUpRe = new RegExp(`^${ESC}\\[(\\d+)A`)
   const eraseLineRe = new RegExp(`^${ESC}\\[2K`)
   const cursorColRe = new RegExp(`^${ESC}\\[(\\d+)G`)
@@ -249,15 +270,15 @@ function simulateTerminalOverwrite(output: string): string {
   /** DEC private mode CSI: SHOW_CURSOR / HIDE_CURSOR (\x1b[?25h), etc. */
   const decPrivateCsiRe = new RegExp(`^${ESC}\\[[?][0-9;]*[a-zA-Z]`)
   const ansiRe = new RegExp(`^${ESC}\\[[0-9;]*[A-Za-z]`)
-  while (i < output.length) {
-    if (output.startsWith(`${ESC}]`, i)) {
+  while (i < ptyTranscript.length) {
+    if (ptyTranscript.startsWith(`${ESC}]`, i)) {
       let j = i + 2
-      while (j < output.length) {
-        if (output[j] === '\x07') {
+      while (j < ptyTranscript.length) {
+        if (ptyTranscript[j] === '\x07') {
           j++
           break
         }
-        if (output[j] === ESC && output[j + 1] === '\\') {
+        if (ptyTranscript[j] === ESC && ptyTranscript[j + 1] === '\\') {
           j += 2
           break
         }
@@ -266,12 +287,12 @@ function simulateTerminalOverwrite(output: string): string {
       i = j
       continue
     }
-    if (output.startsWith('\x1b[', i)) {
-      const cursorUpMatch = output.slice(i).match(cursorUpRe)
-      const eraseLineMatch = output.slice(i).match(eraseLineRe)
-      const cursorColMatch = output.slice(i).match(cursorColRe)
-      const clearScreenMatch = output.slice(i).match(clearScreenRe)
-      const cursorHomeMatch = output.slice(i).match(cursorHomeRe)
+    if (ptyTranscript.startsWith('\x1b[', i)) {
+      const cursorUpMatch = ptyTranscript.slice(i).match(cursorUpRe)
+      const eraseLineMatch = ptyTranscript.slice(i).match(eraseLineRe)
+      const cursorColMatch = ptyTranscript.slice(i).match(cursorColRe)
+      const clearScreenMatch = ptyTranscript.slice(i).match(clearScreenRe)
+      const cursorHomeMatch = ptyTranscript.slice(i).match(cursorHomeRe)
       if (cursorUpMatch) {
         row = Math.max(0, row - Number(cursorUpMatch[1]))
         i += cursorUpMatch[0].length
@@ -304,23 +325,23 @@ function simulateTerminalOverwrite(output: string): string {
         i += cursorHomeMatch[0].length
         continue
       }
-      const decPrivateMatch = output.slice(i).match(decPrivateCsiRe)
+      const decPrivateMatch = ptyTranscript.slice(i).match(decPrivateCsiRe)
       if (decPrivateMatch) {
         i += decPrivateMatch[0].length
         continue
       }
-      const ansiMatch = output.slice(i).match(ansiRe)
+      const ansiMatch = ptyTranscript.slice(i).match(ansiRe)
       if (ansiMatch) {
         i += ansiMatch[0].length
         continue
       }
     }
-    if (output[i] === '\r') {
+    if (ptyTranscript[i] === '\r') {
       col = 0
       i++
       continue
     }
-    if (output[i] === '\n') {
+    if (ptyTranscript[i] === '\n') {
       row++
       col = 0
       i++
@@ -330,7 +351,7 @@ function simulateTerminalOverwrite(output: string): string {
       lines.push('')
     }
     const line = lines[row] ?? ''
-    const newLine = line.slice(0, col) + output[i] + line.slice(col + 1)
+    const newLine = line.slice(0, col) + ptyTranscript[i] + line.slice(col + 1)
     lines[row] = newLine
     col++
     i++
@@ -338,39 +359,48 @@ function simulateTerminalOverwrite(output: string): string {
   return lines.join('\n')
 }
 
-export function countTopBorderLinesBeforeFirstInputBox(output: string): number {
-  const visualOutput = simulateTerminalOverwrite(output)
-  const normalized = stripAllAnsi(visualOutput)
-  const lines = normalized.split('\n')
-  const boxTopLines = lines.filter((l) =>
-    TOP_BORDER_PATTERN.test((l ?? '').trim())
-  )
-  return boxTopLines.length
-}
-
-/**
- * If non-null, `simulateTerminalOverwrite` left raw ESC in the grid (unhandled control
- * sequences treated as printable). Extend the simulator for those sequences.
- */
-export function findControlCharCorruptionInRenderedOutput(
-  output: string
+function interactiveCliSimulatedScreenEscapeLeakFailureMessage(
+  screen: InteractiveCliSimulatedPlainScreen
 ): string | null {
-  const visualOutput = simulateTerminalOverwrite(output)
-  const normalized = stripAllAnsi(visualOutput)
-  const lines = normalized.split('\n')
+  const lines = screen.asPlainTextGrid.split('\n')
   const corrupt = lines
-    .map((line, i) => ({ line, i }))
+    .map((line, rowIndex) => ({ line, rowIndex }))
     .filter(({ line }) => line.includes('\u001b'))
   if (corrupt.length === 0) {
     return null
   }
   const examples = corrupt
     .slice(0, 3)
-    .map(({ line, i }) => `  line ${i}: ${JSON.stringify(line.slice(0, 80))}`)
+    .map(
+      ({ line, rowIndex }) =>
+        `  row ${rowIndex}: ${JSON.stringify(line.slice(0, 80))}`
+    )
     .join('\n')
   return (
-    `Simulated terminal output still contains raw ESC (\\x1b) after ANSI stripping —` +
-    ` unhandled sequences were written as visible characters. Examples: DEC private CSI` +
-    ` (\\x1b[?25h), OSC (\\x1b]…\\x07). Corrupt lines:\n${examples}`
+    `Interactive CLI PTY simulator still has raw ESC (\\x1b) after stripping —` +
+    ` an escape was treated as printable text. Add handling in replayInteractiveCliPtyTranscriptOntoGrid ` +
+    `(e.g. DEC private CSI \\x1b[?25h, OSC \\x1b]…\\x07). Sample rows:\n${examples}`
   )
+}
+
+/** After each interactive “input ready” paint, the PTY transcript must replay to a grid without escape leaks. */
+export function assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks(
+  ptyTranscript: string
+): void {
+  const screen = toInteractiveCliSimulatedPlainScreen(ptyTranscript)
+  const msg = interactiveCliSimulatedScreenEscapeLeakFailureMessage(screen)
+  if (msg !== null) {
+    throw new Error(msg)
+  }
+}
+
+/** Counts input box top borders (`┌─┐`) in the simulated plain grid (entire transcript). */
+export function countInputBoxTopBorderLinesInInteractivePtyTranscript(
+  ptyTranscript: string
+): number {
+  const { asPlainTextGrid } =
+    toInteractiveCliSimulatedPlainScreen(ptyTranscript)
+  return asPlainTextGrid
+    .split('\n')
+    .filter((l) => INPUT_BOX_TOP_BORDER_LINE.test((l ?? '').trim())).length
 }

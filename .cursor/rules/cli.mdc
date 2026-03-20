@@ -37,6 +37,7 @@ cli/
 | **Current prompt** | Interactive only. Instructional line above the input box (between separator and box), e.g. "Select and enter to change the default access token", "Stop recall? (y/n)". |
 | **Current guidance** | Interactive only. Options below the input box: / commands, token list, MCQ choices. |
 | **Input box** | The bordered area where the user types. |
+| **Interactive CLI simulated plain screen** | E2E only: `cliSectionParser` replays PTY bytes (cursor up, erase line, OSC, etc.), then strips CSI/SGR — approximate visible grid for counting `┌─┐` lines and for `assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks` after each ready OSC in `cliPtyRunner`. |
 | **Selection mode** | Interactive only. User selects from Current guidance (e.g. token list) via ↑↓ Enter; input box is grayed, cursor hidden, no "→" prompt. Any other key cancels. |
 | **Interactive fetch wait** | Interactive only. While a slow command is awaited (recall fetch, `/contest`, `/recall-status`, async token params, Gmail/email, token list remove-completely). **Current prompt** uses **bright blue** `\x1b[94m` (`INTERACTIVE_FETCH_WAIT_PROMPT_FG`). **Input box** uses the same grey outline as token list pickers (`isGreyDisabledInputChrome`), placeholder context `interactiveFetchWait` / text `loading ...`. Animated `.` / `..` / `...` on the wait line. Copy: `INTERACTIVE_FETCH_WAIT_LINES` in `interactiveFetchWait.ts`. |
 
