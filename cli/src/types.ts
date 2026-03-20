@@ -1,3 +1,10 @@
+/** Pending MCQ in recall: user must choose 1–n in the TTY live region. */
+export type McqRecallPending = {
+  recallPromptId: number
+  choices: readonly string[]
+  shownAt: number
+}
+
 /** User-submitted input in the prompt (what they typed). */
 export type ChatHistoryInputEntry = { type: 'input'; content: string }
 /** Command output lines (what was displayed in response). */

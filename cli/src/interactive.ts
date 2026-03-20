@@ -53,20 +53,20 @@ import {
   PROMPT,
   type PlaceholderContext,
 } from './renderer.js'
-import type { OutputAdapter } from './types.js'
+import type { McqRecallPending, OutputAdapter } from './types.js'
 
 type RecallPromptResult = Exclude<RecallNextResult, { type: 'none' }>
-type McqPrompt = { recallPromptId: number; choices: string[]; shownAt: number }
 type SpellingPrompt = {
   recallPromptId: number
   type: 'spelling'
   shownAt: number
 }
+/** Just-review recall step: user answers y/n on a note title. */
 type JustReviewPrompt = { memoryTrackerId: number }
 
 type PendingRecallAnswer =
   | { memoryTrackerId: number }
-  | { recallPromptId: number; choices: string[]; shownAt: number }
+  | McqRecallPending
   | { recallPromptId: number; type: 'spelling'; shownAt: number }
   | null
 
@@ -119,7 +119,7 @@ function formatRecallSessionSummary(count: number): string {
   return `Recalled ${count} notes`
 }
 
-function isMcqPrompt(p: unknown): p is McqPrompt {
+function isMcqPrompt(p: unknown): p is McqRecallPending {
   return p !== null && typeof p === 'object' && 'choices' in p
 }
 

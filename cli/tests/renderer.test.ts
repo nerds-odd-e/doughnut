@@ -5,6 +5,7 @@ import {
   grayBoxLinesForSelectionMode,
   renderFullDisplay,
   stripAnsi,
+  stripAnsiCsiAndCr,
   needsGapBeforeBox,
   buildLiveRegionLines,
 } from '../src/renderer.js'
@@ -25,6 +26,13 @@ describe('grayBoxLinesForSelectionMode', () => {
     expect(result[0]).toContain('\x1b[90m')
     // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI RESET, intentional
     expect(/\x1b\[0m\s*│/.test(result[0])).toBe(false)
+  })
+})
+
+describe('stripAnsiCsiAndCr', () => {
+  test('removes SGR, CSI cursor codes, and carriage returns', () => {
+    const raw = '\x1b[31mhi\x1b[0m\r\x1b[2A\x1b[1B'
+    expect(stripAnsiCsiAndCr(raw)).toBe('hi')
   })
 })
 

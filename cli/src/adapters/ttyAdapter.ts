@@ -3,7 +3,7 @@ import { Writable } from 'node:stream'
 import type { AccessTokenEntry } from '../accessToken.js'
 import type { CommandDoc } from '../help.js'
 import { wrapTextToLines, type PlaceholderContext } from '../renderer.js'
-import type { ChatHistory, OutputAdapter } from '../types.js'
+import type { ChatHistory, McqRecallPending, OutputAdapter } from '../types.js'
 
 export type TokenListAction = 'set-default' | 'remove' | 'remove-completely'
 
@@ -20,7 +20,7 @@ export interface TTYDeps {
   setPendingRecallStopConfirmation: (value: boolean) => void
   isInRecallSubstate: () => boolean
   exitRecallMode: () => void
-  isMcqPrompt: (p: unknown) => boolean
+  isMcqPrompt: (p: unknown) => p is McqRecallPending
   buildTokenListLines: (
     tokens: AccessTokenEntry[],
     defaultLabel: string | undefined,
@@ -101,21 +101,38 @@ function cycleIndex(current: number, delta: number, length: number): number {
   return (current + delta + length) % length
 }
 
-function clearTTYDisplay(
-  linesAboveCursor: number,
-  prevTotalLines: number
-): void {
-  if (linesAboveCursor > 0) process.stdout.write(`\x1b[${linesAboveCursor}A`)
-  for (let i = 0; i < prevTotalLines; i++) {
+/**
+ * Tracks incremental repaint of the TTY live region (Current prompt + input box + Current guidance).
+ * After {@link clearLiveRegionForRepaint}, the cursor sits on the top line of that region and
+ * {@link LiveRegionPaintCursor.cursorUpStepsToLiveRegionTop} must be 0 before the next paint.
+ */
+type LiveRegionPaintCursor = {
+  /**
+   * CUU count from the input-line cursor row to the top line of the live region — same value
+   * written at the end of the previous paint as `inputRowFromTop(...)`.
+   */
+  cursorUpStepsToLiveRegionTop: number
+  /** Line count of the last painted live block; used to erase lines when the block shrinks. */
+  lastPaintedLineCount: number
+}
+
+function clearLiveRegionForRepaint(cursor: LiveRegionPaintCursor): void {
+  const up = cursor.cursorUpStepsToLiveRegionTop
+  const n = cursor.lastPaintedLineCount
+  if (up > 0) process.stdout.write(`\x1b[${up}A`)
+  for (let i = 0; i < n; i++) {
     process.stdout.write('\r\x1b[2K')
-    if (i < prevTotalLines - 1) process.stdout.write('\x1b[1B')
+    if (i < n - 1) process.stdout.write('\x1b[1B')
   }
-  if (prevTotalLines > 1) process.stdout.write(`\x1b[${prevTotalLines - 1}A`)
+  if (n > 1) process.stdout.write(`\x1b[${n - 1}A`)
+  cursor.cursorUpStepsToLiveRegionTop = 0
 }
 
 function isSubmitKey(keyName: string): boolean {
   return keyName === 'return' || keyName === 'enter'
 }
+
+type ReadlineKey = Pick<readline.Key, 'name' | 'shift' | 'ctrl' | 'meta'>
 
 function writeError(err: unknown): void {
   process.stdout.write(`${err instanceof Error ? err.message : String(err)}\n`)
@@ -202,8 +219,10 @@ export async function runTTY(
   let buffer = ''
   let highlightIndex = 0
   let suggestionsDismissed = false
-  let linesAboveCursor = 0
-  let prevTotalLines = 0
+  const livePaint: LiveRegionPaintCursor = {
+    cursorUpStepsToLiveRegionTop: 0,
+    lastPaintedLineCount: 0,
+  }
   let tokenListItems: AccessTokenEntry[] | null = null
   let tokenListCommand = ''
   let tokenHighlightIndex = 0
@@ -212,7 +231,7 @@ export async function runTTY(
 
   function endTokenListSelection(outputMsg: string) {
     const command = tokenListCommand
-    clearTTYDisplay(linesAboveCursor, prevTotalLines)
+    clearLiveRegionForRepaint(livePaint)
     process.stdout.write(`${outputMsg}\n`)
     chatHistory.push({ type: 'input', content: command })
     chatHistory.push({ type: 'output', lines: [outputMsg] })
@@ -221,8 +240,7 @@ export async function runTTY(
     tokenHighlightIndex = 0
     tokenListAction = 'set-default'
     buffer = ''
-    linesAboveCursor = 0
-    prevTotalLines = 0
+    livePaint.lastPaintedLineCount = 0
     drawBox()
   }
 
@@ -258,9 +276,7 @@ export async function runTTY(
         ? ['Stop recall? (y/n)']
         : isMcqPrompt(pendingRecallAnswer)
           ? formatHighlightedList(
-              formatMcqChoiceLines(
-                (pendingRecallAnswer as { choices: string[] }).choices
-              ),
+              formatMcqChoiceLines(pendingRecallAnswer.choices),
               undefined,
               mcqChoiceHighlightIndex
             )
@@ -327,8 +343,8 @@ export async function runTTY(
     }
 
     const inputRow = inputRowFromTop(currentPromptLines, contentLines.length)
-    linesAboveCursor = inputRow
-    prevTotalLines = newTotalLines
+    livePaint.cursorUpStepsToLiveRegionTop = inputRow
+    livePaint.lastPaintedLineCount = newTotalLines
 
     process.stdout.write(`\x1b[${newTotalLines - inputRow}A`)
     if (isSelectionMode(placeholderContext)) {
@@ -358,10 +374,10 @@ export async function runTTY(
     )
     const newTotalLines = liveLines.length
 
-    if (linesAboveCursor > 0) {
-      process.stdout.write(`\x1b[${linesAboveCursor}A`)
+    if (livePaint.cursorUpStepsToLiveRegionTop > 0) {
+      process.stdout.write(`\x1b[${livePaint.cursorUpStepsToLiveRegionTop}A`)
     } else if (
-      prevTotalLines === 0 &&
+      livePaint.lastPaintedLineCount === 0 &&
       needsGapBeforeBox(chatHistory, currentPromptWrappedLines)
     ) {
       process.stdout.write('\n')
@@ -371,12 +387,12 @@ export async function runTTY(
     for (const line of liveLines) {
       process.stdout.write(`\x1b[2K${line}\n`)
     }
-    const extra = prevTotalLines - newTotalLines
+    const extra = livePaint.lastPaintedLineCount - newTotalLines
     for (let i = 0; i < extra; i++) {
       process.stdout.write('\x1b[2K\n')
     }
 
-    const totalWritten = Math.max(newTotalLines, prevTotalLines)
+    const totalWritten = Math.max(newTotalLines, livePaint.lastPaintedLineCount)
     const inputRow = inputRowFromTop(currentPromptLines, contentLines.length)
     process.stdout.write(`\x1b[${totalWritten - inputRow}A`)
     if (isSelectionMode(placeholderContext)) {
@@ -386,8 +402,8 @@ export async function runTTY(
       positionCursorInInputBox()
     }
 
-    linesAboveCursor = inputRow
-    prevTotalLines = newTotalLines
+    livePaint.cursorUpStepsToLiveRegionTop = inputRow
+    livePaint.lastPaintedLineCount = newTotalLines
   }
 
   ttyOutput = {
@@ -427,304 +443,289 @@ export async function runTTY(
     process.exit(0)
   }
 
-  stdin.on(
-    'keypress',
-    async (
-      str: string,
-      key: { name: string; shift?: boolean; ctrl?: boolean; meta?: boolean }
-    ) => {
-      const submitPressed =
-        isSubmitKey(key.name) || str === '\n' || str === '\r'
-      if (key.ctrl && key.name === 'c') {
-        process.stdout.write(`\x1b[${1}B\r\n`)
-        doExit()
-      }
-      if (isPendingRecallStopConfirmation()) {
-        if (key.name === 'escape') {
-          setPendingRecallStopConfirmation(false)
-          buffer = ''
-          drawBox()
-        } else if (submitPressed && !key.shift) {
-          const trimmed = buffer.trim()
-          const answer = trimmed.toLowerCase()
-          const isYes = answer === 'y' || answer === 'yes'
-          const isNo = answer === 'n' || answer === 'no'
-          buffer = ''
-          setPendingRecallStopConfirmation(false)
-          if (isYes) {
-            exitRecallMode()
-            mcqChoiceHighlightIndex = 0
-            linesAboveCursor = 0
-            prevTotalLines = 0
-            process.stdout.write('Stopped recall\n')
-            chatHistory.push({ type: 'input', content: trimmed })
-            chatHistory.push({ type: 'output', lines: ['Stopped recall'] })
-          } else if (isNo) {
-            // Stay in MCQ; drawBox will show choices again
-          } else if (trimmed) {
-            writeCurrentPromptLine('Please answer y or n')
-            setPendingRecallStopConfirmation(true)
-          }
-          drawBox()
-        } else if (str && !key.ctrl && !key.meta) {
-          buffer += str
-          drawBox()
-        } else if (key.name === 'backspace') {
-          if (buffer.length > 0) {
-            buffer = buffer.slice(0, -1)
-            drawBox()
-          }
-        } else {
-          drawBox()
-        }
-        return
-      }
-      const pendingRecallAnswer = getPendingRecallAnswer()
-      if (isMcqPrompt(pendingRecallAnswer)) {
-        const choices = (pendingRecallAnswer as { choices: string[] }).choices
-        if (key.name === 'escape') {
-          setPendingRecallStopConfirmation(true)
-          buffer = ''
-          doBeginCurrentPrompt()
-          writeCurrentPromptLine('Stop recall? (y/n)')
-          drawBox()
-        } else if (key.name === 'up' || key.name === 'down') {
-          const delta = key.name === 'up' ? -1 : 1
-          mcqChoiceHighlightIndex = cycleIndex(
-            mcqChoiceHighlightIndex,
-            delta,
-            choices.length
-          )
-          drawBox()
-        } else if (submitPressed && !key.shift) {
-          const trimmedBuffer = buffer.trim()
-          const effectiveInput =
-            trimmedBuffer === '/stop'
-              ? '/stop'
-              : trimmedBuffer === '/contest'
-                ? '/contest'
-                : (() => {
-                    const choiceNum = Number.parseInt(trimmedBuffer, 10)
-                    const validTyped =
-                      choiceNum >= 1 && choiceNum <= choices.length
-                    return validTyped
-                      ? String(choiceNum)
-                      : String(mcqChoiceHighlightIndex + 1)
-                  })()
-          clearTTYDisplay(linesAboveCursor, prevTotalLines)
-          const inputForHistory = buffer || effectiveInput
-          buffer = ''
-          mcqChoiceHighlightIndex = 0
-          linesAboveCursor = 0
-          prevTotalLines = 0
-          collectedOutputLines.length = 0
-          chatHistory.push({ type: 'input', content: inputForHistory })
-          if (await processInput(effectiveInput, ttyOutput)) {
-            doExit()
-            return
-          }
-          chatHistory.push({ type: 'output', lines: [...collectedOutputLines] })
-          drawBox()
-        } else if (str && !key.ctrl && !key.meta) {
-          buffer += str
-          drawBox()
-        } else if (key.name === 'backspace') {
-          if (buffer.length > 0) {
-            buffer = buffer.slice(0, -1)
-            drawBox()
-          }
-        } else {
-          drawBox()
-        }
-        return
-      }
-      if (tokenListItems) {
-        if (key.name === 'up' || key.name === 'down') {
-          const delta = key.name === 'up' ? -1 : 1
-          tokenHighlightIndex = cycleIndex(
-            tokenHighlightIndex,
-            delta,
-            tokenListItems.length
-          )
-          drawBox()
-        } else if (submitPressed && !key.shift) {
-          const selectedLabel = tokenListItems[tokenHighlightIndex]!.label
-          const action = tokenListAction
-          let outputMsg = ''
-          if (action === 'set-default') {
-            setDefaultTokenLabel(selectedLabel)
-            outputMsg = `Default token set to: ${selectedLabel}`
-          } else if (action === 'remove') {
-            removeAccessToken(selectedLabel)
-            outputMsg = `Token "${selectedLabel}" removed.`
-          } else {
-            try {
-              await removeAccessTokenCompletely(selectedLabel)
-              outputMsg = `Token "${selectedLabel}" removed locally and from server.`
-            } catch (err) {
-              writeError(err)
-              outputMsg = err instanceof Error ? err.message : String(err)
-            }
-          }
-          endTokenListSelection(outputMsg)
-        } else {
-          endTokenListSelection('Cancelled by user.')
-        }
-        return
-      }
+  stdin.on('keypress', async (str: string | undefined, key: ReadlineKey) => {
+    const submitPressed = isSubmitKey(key.name) || str === '\n' || str === '\r'
+    if (key.ctrl && key.name === 'c') {
+      process.stdout.write(`\x1b[${1}B\r\n`)
+      doExit()
+    }
+    if (isPendingRecallStopConfirmation()) {
       if (key.name === 'escape') {
-        if (isInRecallSubstate()) {
+        setPendingRecallStopConfirmation(false)
+        buffer = ''
+        drawBox()
+      } else if (submitPressed && !key.shift) {
+        const trimmed = buffer.trim()
+        const answer = trimmed.toLowerCase()
+        const isYes = answer === 'y' || answer === 'yes'
+        const isNo = answer === 'n' || answer === 'no'
+        buffer = ''
+        setPendingRecallStopConfirmation(false)
+        if (isYes) {
           exitRecallMode()
-          buffer = ''
           mcqChoiceHighlightIndex = 0
-          linesAboveCursor = 0
-          prevTotalLines = 0
-          drawBox()
-          return
+          livePaint.cursorUpStepsToLiveRegionTop = 0
+          livePaint.lastPaintedLineCount = 0
+          process.stdout.write('Stopped recall\n')
+          chatHistory.push({ type: 'input', content: trimmed })
+          chatHistory.push({ type: 'output', lines: ['Stopped recall'] })
+        } else if (isNo) {
+          // redraw below
+        } else if (trimmed) {
+          writeCurrentPromptLine('Please answer y or n')
+          setPendingRecallStopConfirmation(true)
         }
-        if (isCommandPrefixWithSuggestions(buffer)) {
-          highlightIndex = 0
-          const lastLine = getLastLine(buffer)
-          if (lastLine === '/') {
-            const bufferLines = buffer.split('\n')
-            buffer =
-              bufferLines.length === 1
-                ? ''
-                : bufferLines.slice(0, -1).join('\n')
-          } else {
-            suggestionsDismissed = true
-          }
-          drawBox()
-        }
-        return
-      }
-      if (submitPressed) {
-        if (key.shift) {
-          buffer += '\n'
-          drawBox()
-        } else {
-          const trimmedInput = buffer.trim()
-
-          if (trimmedInput === '/clear') {
-            chatHistory = []
-            buffer = ''
-            tokenListItems = null
-            tokenHighlightIndex = 0
-            if (isInRecallSubstate()) exitRecallMode()
-            setPendingRecallStopConfirmation(false)
-            mcqChoiceHighlightIndex = 0
-            highlightIndex = 0
-            suggestionsDismissed = false
-            ttyOutput.clearAndRedraw?.()
-            return
-          }
-
-          if (isCommandPrefixWithSuggestions(buffer)) {
-            const filtered = filterCommandsByPrefix(
-              interactiveDocs,
-              getLastLine(buffer)
-            )
-            const selectedCommand = `${filtered[highlightIndex].usage} `
-            const bufferLines = buffer.split('\n')
-            buffer =
-              bufferLines.slice(0, -1).concat(selectedCommand).join('\n') || ''
-            highlightIndex = 0
-            drawBox()
-            return
-          }
-
-          const width = getTerminalWidth()
-          const input = buffer
-          buffer = ''
-
-          clearTTYDisplay(linesAboveCursor, prevTotalLines)
-          linesAboveCursor = 0
-
-          if (input.trim()) {
-            process.stdout.write(renderPastInput(input, width))
-            process.stdout.write('\n')
-          }
-
-          const tokenSelect = TOKEN_LIST_COMMANDS[trimmedInput] ?? null
-          if (tokenSelect) {
-            const tokens = listAccessTokens()
-            if (tokens.length === 0) {
-              process.stdout.write('No access tokens stored.\n')
-              chatHistory.push({ type: 'input', content: trimmedInput })
-              chatHistory.push({
-                type: 'output',
-                lines: ['No access tokens stored.'],
-              })
-            } else {
-              tokenListItems = tokens
-              tokenListCommand = trimmedInput
-              tokenListAction = tokenSelect.action
-              const dl = getDefaultTokenLabel()
-              tokenHighlightIndex = Math.max(
-                0,
-                tokens.findIndex((t) => t.label === dl)
-              )
-            }
-            linesAboveCursor = 0
-            prevTotalLines = 0
-            drawBox()
-            return
-          }
-
-          collectedOutputLines.length = 0
-          chatHistory.push({ type: 'input', content: input })
-          if (await processInput(input, ttyOutput)) {
-            doExit()
-          }
-          chatHistory.push({ type: 'output', lines: [...collectedOutputLines] })
-          if (input.trim()) {
-            linesAboveCursor = 0
-            prevTotalLines = 0
-          }
-          if (isMcqPrompt(getPendingRecallAnswer())) {
-            mcqChoiceHighlightIndex = 0
-          }
-          drawBox()
-        }
+        drawBox()
+      } else if (str && !key.ctrl && !key.meta) {
+        buffer += str
+        drawBox()
       } else if (key.name === 'backspace') {
         if (buffer.length > 0) {
           buffer = buffer.slice(0, -1)
-          highlightIndex = 0
-          suggestionsDismissed = false
           drawBox()
         }
+      } else {
+        drawBox()
+      }
+      return
+    }
+    const pendingRecallAnswer = getPendingRecallAnswer()
+    if (isMcqPrompt(pendingRecallAnswer)) {
+      const choices = pendingRecallAnswer.choices
+      if (key.name === 'escape') {
+        setPendingRecallStopConfirmation(true)
+        buffer = ''
+        doBeginCurrentPrompt()
+        writeCurrentPromptLine('Stop recall? (y/n)')
+        drawBox()
       } else if (key.name === 'up' || key.name === 'down') {
+        const delta = key.name === 'up' ? -1 : 1
+        mcqChoiceHighlightIndex = cycleIndex(
+          mcqChoiceHighlightIndex,
+          delta,
+          choices.length
+        )
+        drawBox()
+      } else if (submitPressed && !key.shift) {
+        const trimmedBuffer = buffer.trim()
+        const effectiveInput =
+          trimmedBuffer === '/stop'
+            ? '/stop'
+            : trimmedBuffer === '/contest'
+              ? '/contest'
+              : (() => {
+                  const choiceNum = Number.parseInt(trimmedBuffer, 10)
+                  const validTyped =
+                    choiceNum >= 1 && choiceNum <= choices.length
+                  return validTyped
+                    ? String(choiceNum)
+                    : String(mcqChoiceHighlightIndex + 1)
+                })()
+        clearLiveRegionForRepaint(livePaint)
+        const inputForHistory = buffer || effectiveInput
+        buffer = ''
+        mcqChoiceHighlightIndex = 0
+        livePaint.lastPaintedLineCount = 0
+        collectedOutputLines.length = 0
+        chatHistory.push({ type: 'input', content: inputForHistory })
+        if (await processInput(effectiveInput, ttyOutput)) {
+          doExit()
+          return
+        }
+        chatHistory.push({ type: 'output', lines: [...collectedOutputLines] })
+        drawBox()
+      } else if (str && !key.ctrl && !key.meta) {
+        buffer += str
+        drawBox()
+      } else if (key.name === 'backspace') {
+        if (buffer.length > 0) {
+          buffer = buffer.slice(0, -1)
+          drawBox()
+        }
+      } else {
+        drawBox()
+      }
+      return
+    }
+    if (tokenListItems) {
+      if (key.name === 'up' || key.name === 'down') {
+        const delta = key.name === 'up' ? -1 : 1
+        tokenHighlightIndex = cycleIndex(
+          tokenHighlightIndex,
+          delta,
+          tokenListItems.length
+        )
+        drawBox()
+      } else if (submitPressed && !key.shift) {
+        const selectedLabel = tokenListItems[tokenHighlightIndex]!.label
+        const action = tokenListAction
+        let outputMsg = ''
+        if (action === 'set-default') {
+          setDefaultTokenLabel(selectedLabel)
+          outputMsg = `Default token set to: ${selectedLabel}`
+        } else if (action === 'remove') {
+          removeAccessToken(selectedLabel)
+          outputMsg = `Token "${selectedLabel}" removed.`
+        } else {
+          try {
+            await removeAccessTokenCompletely(selectedLabel)
+            outputMsg = `Token "${selectedLabel}" removed locally and from server.`
+          } catch (err) {
+            writeError(err)
+            outputMsg = err instanceof Error ? err.message : String(err)
+          }
+        }
+        endTokenListSelection(outputMsg)
+      } else {
+        endTokenListSelection('Cancelled by user.')
+      }
+      return
+    }
+    if (key.name === 'escape') {
+      if (isInRecallSubstate()) {
+        exitRecallMode()
+        buffer = ''
+        mcqChoiceHighlightIndex = 0
+        livePaint.cursorUpStepsToLiveRegionTop = 0
+        livePaint.lastPaintedLineCount = 0
+        drawBox()
+        return
+      }
+      if (isCommandPrefixWithSuggestions(buffer)) {
+        highlightIndex = 0
+        const lastLine = getLastLine(buffer)
+        if (lastLine === '/') {
+          const bufferLines = buffer.split('\n')
+          buffer =
+            bufferLines.length === 1 ? '' : bufferLines.slice(0, -1).join('\n')
+        } else {
+          suggestionsDismissed = true
+        }
+        drawBox()
+      }
+      return
+    }
+    if (submitPressed) {
+      if (key.shift) {
+        buffer += '\n'
+        drawBox()
+      } else {
+        const trimmedInput = buffer.trim()
+
+        if (trimmedInput === '/clear') {
+          chatHistory = []
+          buffer = ''
+          tokenListItems = null
+          tokenHighlightIndex = 0
+          if (isInRecallSubstate()) exitRecallMode()
+          setPendingRecallStopConfirmation(false)
+          mcqChoiceHighlightIndex = 0
+          highlightIndex = 0
+          suggestionsDismissed = false
+          ttyOutput.clearAndRedraw?.()
+          return
+        }
+
         if (isCommandPrefixWithSuggestions(buffer)) {
           const filtered = filterCommandsByPrefix(
             interactiveDocs,
             getLastLine(buffer)
           )
-          const delta = key.name === 'up' ? -1 : 1
-          highlightIndex = cycleIndex(highlightIndex, delta, filtered.length)
+          const selectedCommand = `${filtered[highlightIndex].usage} `
+          const bufferLines = buffer.split('\n')
+          buffer =
+            bufferLines.slice(0, -1).concat(selectedCommand).join('\n') || ''
+          highlightIndex = 0
           drawBox()
+          return
         }
-      } else if (key.name === 'tab') {
-        const lastLine = getLastLine(buffer)
-        if (lastLine.startsWith('/') && !lastLine.endsWith(' ')) {
-          const { completed, count } = getTabCompletion(
-            lastLine,
-            interactiveDocs
-          )
-          if (count > 0 && completed !== lastLine) {
-            const bufferLines = buffer.split('\n')
-            buffer =
-              bufferLines.slice(0, -1).concat(completed).join('\n') || completed
-            highlightIndex = 0
-            suggestionsDismissed = false
-            drawBox()
+
+        const width = getTerminalWidth()
+        const input = buffer
+        buffer = ''
+
+        clearLiveRegionForRepaint(livePaint)
+
+        if (input.trim()) {
+          process.stdout.write(renderPastInput(input, width))
+          process.stdout.write('\n')
+        }
+
+        const tokenSelect = TOKEN_LIST_COMMANDS[trimmedInput] ?? null
+        if (tokenSelect) {
+          const tokens = listAccessTokens()
+          if (tokens.length === 0) {
+            process.stdout.write('No access tokens stored.\n')
+            chatHistory.push({ type: 'input', content: trimmedInput })
+            chatHistory.push({
+              type: 'output',
+              lines: ['No access tokens stored.'],
+            })
+          } else {
+            tokenListItems = tokens
+            tokenListCommand = trimmedInput
+            tokenListAction = tokenSelect.action
+            const dl = getDefaultTokenLabel()
+            tokenHighlightIndex = Math.max(
+              0,
+              tokens.findIndex((t) => t.label === dl)
+            )
           }
+          livePaint.lastPaintedLineCount = 0
+          drawBox()
+          return
         }
-      } else if (str && !key.ctrl && !key.meta) {
-        buffer += str
+
+        collectedOutputLines.length = 0
+        chatHistory.push({ type: 'input', content: input })
+        if (await processInput(input, ttyOutput)) {
+          doExit()
+        }
+        chatHistory.push({ type: 'output', lines: [...collectedOutputLines] })
+        if (input.trim()) {
+          livePaint.cursorUpStepsToLiveRegionTop = 0
+          livePaint.lastPaintedLineCount = 0
+        }
+        if (isMcqPrompt(getPendingRecallAnswer())) {
+          mcqChoiceHighlightIndex = 0
+        }
+        drawBox()
+      }
+    } else if (key.name === 'backspace') {
+      if (buffer.length > 0) {
+        buffer = buffer.slice(0, -1)
         highlightIndex = 0
         suggestionsDismissed = false
         drawBox()
       }
+    } else if (key.name === 'up' || key.name === 'down') {
+      if (isCommandPrefixWithSuggestions(buffer)) {
+        const filtered = filterCommandsByPrefix(
+          interactiveDocs,
+          getLastLine(buffer)
+        )
+        const delta = key.name === 'up' ? -1 : 1
+        highlightIndex = cycleIndex(highlightIndex, delta, filtered.length)
+        drawBox()
+      }
+    } else if (key.name === 'tab') {
+      const lastLine = getLastLine(buffer)
+      if (lastLine.startsWith('/') && !lastLine.endsWith(' ')) {
+        const { completed, count } = getTabCompletion(lastLine, interactiveDocs)
+        if (count > 0 && completed !== lastLine) {
+          const bufferLines = buffer.split('\n')
+          buffer =
+            bufferLines.slice(0, -1).concat(completed).join('\n') || completed
+          highlightIndex = 0
+          suggestionsDismissed = false
+          drawBox()
+        }
+      }
+    } else if (str && !key.ctrl && !key.meta) {
+      buffer += str
+      highlightIndex = 0
+      suggestionsDismissed = false
+      drawBox()
     }
-  )
+  })
 }

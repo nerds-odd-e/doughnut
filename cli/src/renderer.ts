@@ -72,6 +72,15 @@ export function stripAnsi(str: string): string {
   return str.replace(ANSI_PATTERN, '')
 }
 
+/** Strip SGR, other CSI sequences, and CR — for inspecting raw TTY captures in tests. */
+export function stripAnsiCsiAndCr(str: string): string {
+  const esc = '\x1b'
+  return str
+    .replace(new RegExp(`${esc}\\[[0-9;]*m`, 'g'), '')
+    .replace(new RegExp(`${esc}\\[[0-9;]*[A-Za-z]`, 'g'), '')
+    .replace(/\r/g, '')
+}
+
 export function visibleLength(str: string): number {
   return stripAnsi(str).length
 }
@@ -190,7 +199,7 @@ export function getTerminalWidth(): number {
   return process.stdout.columns || 80
 }
 
-export function formatMcqChoiceLines(choices: string[]): string[] {
+export function formatMcqChoiceLines(choices: readonly string[]): string[] {
   return choices.map((c, i) => `  ${i + 1}. ${renderMarkdownToTerminal(c)}`)
 }
 

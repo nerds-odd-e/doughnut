@@ -14,7 +14,18 @@ import {
   runInteractive,
   visibleLength,
 } from '../src/interactive.js'
-import { buildSuggestionLines, stripAnsi } from '../src/renderer.js'
+import {
+  buildSuggestionLines,
+  stripAnsi,
+  stripAnsiCsiAndCr,
+} from '../src/renderer.js'
+import {
+  countInputBoxTopOutlinesBeforeFirstBoxContent,
+  INPUT_BOX_TOP_OUTLINE_PATTERN,
+  liveRegionRepaintHasStaleCursorUpBeforeBoxTop,
+  maxConsecutiveBlankLines,
+  simulatedScreenFromTtyWrites,
+} from './ttyWriteSimulation.js'
 const tick = () => new Promise<void>((r) => setImmediate(r))
 
 let useManyCommandsForScrollTests = false
@@ -136,130 +147,6 @@ async function submitTTYCommand(stdin: TTYStdin, command: string) {
 
 function ttyOutput(writeSpy: ReturnType<typeof vi.spyOn>) {
   return writeSpy.mock.calls.map((c) => c[0]).join('')
-}
-
-function stripAllAnsi(str: string): string {
-  const esc = String.fromCharCode(0x1b)
-  return str
-    .replace(new RegExp(`${esc}\\[[0-9;]*m`, 'g'), '')
-    .replace(new RegExp(`${esc}\\[[0-9;]*[A-Za-z]`, 'g'), '')
-    .replace(/\r/g, '')
-}
-
-const TOP_BORDER_PATTERN = /^┌─*┐$/
-
-/**
- * After clearing the live region, drawBox must not apply a stale cursor-up before redrawing the
- * input box top (┌). Two consecutive \\x1b[nA at the end of that prefix means an extra move-up
- * and matches the "input box jumps one line up" bug.
- */
-function hasStaleCursorUpBeforeInputBoxRedraw(output: string): boolean {
-  const marker = '\r\x1b[2K┌'
-  const idx = output.indexOf(marker)
-  if (idx < 0) return false
-  const prefix = output.slice(0, idx)
-  // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI CUU sequences
-  return /\x1b\[\d+A\x1b\[\d+A$/.test(prefix)
-}
-
-function countTopBorderLinesBeforeFirstInputBox(output: string): number {
-  const normalized = stripAllAnsi(output)
-  const lines = normalized.split('\n')
-  let searchStart = 0
-  for (let i = 0; i < lines.length; i++) {
-    if (/doughnut \d+\.\d+\.\d+/.test(lines[i] ?? '')) {
-      searchStart = i + 1
-      break
-    }
-  }
-  let count = 0
-  for (let i = searchStart; i < lines.length; i++) {
-    const line = (lines[i] ?? '').trim()
-    if (line.includes('│')) {
-      break
-    }
-    if (TOP_BORDER_PATTERN.test(line)) {
-      count++
-    }
-  }
-  return count
-}
-
-/** Simulates terminal overwrite: cursor movement and erase sequences alter displayed content. Used to detect visual bugs (e.g. extra blank lines, double border). */
-function simulateTerminalOverwrite(output: string): string {
-  const lines: string[] = []
-  let row = 0
-  let col = 0
-  let i = 0
-  const ESC = '\x1b'
-  const cursorUpRe = new RegExp(`^${ESC}\\[(\\d+)A`)
-  const cursorDownRe = new RegExp(`^${ESC}\\[(\\d+)B`)
-  const eraseLineRe = new RegExp(`^${ESC}\\[2K`)
-  const cursorColRe = new RegExp(`^${ESC}\\[(\\d+)G`)
-  const ansiRe = new RegExp(`^${ESC}\\[[0-9;]*[A-Za-z]`)
-  while (i < output.length) {
-    if (output.startsWith('\x1b[', i)) {
-      const rest = output.slice(i)
-      const cursorUpMatch = rest.match(cursorUpRe)
-      const cursorDownMatch = rest.match(cursorDownRe)
-      const eraseLineMatch = rest.match(eraseLineRe)
-      const cursorColMatch = rest.match(cursorColRe)
-      if (cursorUpMatch) {
-        row = Math.max(0, row - Number(cursorUpMatch[1]))
-        i += cursorUpMatch[0].length
-        continue
-      }
-      if (cursorDownMatch) {
-        row += Number(cursorDownMatch[1])
-        i += cursorDownMatch[0].length
-        continue
-      }
-      if (eraseLineMatch) {
-        while (lines.length <= row) lines.push('')
-        lines[row] = ''
-        col = 0
-        i += eraseLineMatch[0].length
-        continue
-      }
-      if (cursorColMatch) {
-        col = Number(cursorColMatch[1]) - 1
-        i += cursorColMatch[0].length
-        continue
-      }
-      const ansiMatch = rest.match(ansiRe)
-      if (ansiMatch) {
-        i += ansiMatch[0].length
-        continue
-      }
-    }
-    if (output[i] === '\r') {
-      col = 0
-      i++
-      continue
-    }
-    if (output[i] === '\n') {
-      row++
-      col = 0
-      i++
-      continue
-    }
-    while (lines.length <= row) lines.push('')
-    const line = lines[row] ?? ''
-    lines[row] = line.slice(0, col) + output[i] + line.slice(col + 1)
-    col++
-    i++
-  }
-  return lines.join('\n')
-}
-
-function maxConsecutiveBlanks(lines: string[]): number {
-  let max = 0
-  let curr = 0
-  for (const l of lines) {
-    curr = l.trim() ? 0 : curr + 1
-    max = Math.max(max, curr)
-  }
-  return max
 }
 
 function makeTempConfigDir(tokens: Array<{ label: string; token: string }>) {
@@ -1467,10 +1354,12 @@ describe('TTY mode slash command suggestions', () => {
     await tick()
 
     const output = ttyOutput(writeSpy)
-    const visualOutput = simulateTerminalOverwrite(output)
+    const visualOutput = simulatedScreenFromTtyWrites(output)
     const boxTopLines = visualOutput
       .split('\n')
-      .filter((l) => TOP_BORDER_PATTERN.test(stripAllAnsi(l).trim()))
+      .filter((l) =>
+        INPUT_BOX_TOP_OUTLINE_PATTERN.test(stripAnsiCsiAndCr(l).trim())
+      )
     expect(boxTopLines).toHaveLength(1)
   })
 
@@ -1505,15 +1394,15 @@ describe('TTY mode slash command suggestions', () => {
     await tick()
 
     const output = ttyOutput(writeSpy)
-    expect(countTopBorderLinesBeforeFirstInputBox(output)).toBe(1)
+    expect(countInputBoxTopOutlinesBeforeFirstBoxContent(output)).toBe(1)
   })
 
   test('after /help, there is one empty line between history output and input box', async () => {
     writeSpy.mockClear()
     await submitTTYCommand(stdin, '/help')
 
-    const visualOutput = simulateTerminalOverwrite(ttyOutput(writeSpy))
-    const lines = visualOutput.split('\n').map((l) => stripAllAnsi(l))
+    const visualOutput = simulatedScreenFromTtyWrites(ttyOutput(writeSpy))
+    const lines = visualOutput.split('\n').map((l) => stripAnsiCsiAndCr(l))
     const boxTopIndex = lines.findIndex((l) => /^┌─+┐$/.test(l.trim()))
     expect(boxTopIndex).toBeGreaterThan(0)
     expect(lines[boxTopIndex - 1]).toBe('')
@@ -1549,7 +1438,7 @@ describe('TTY empty Enter redraw (regression)', () => {
 
     const output = ttyOutput(writeSpy)
     expect(
-      hasStaleCursorUpBeforeInputBoxRedraw(output),
+      liveRegionRepaintHasStaleCursorUpBeforeBoxTop(output),
       `Stale double cursor-up before \\r\\x1b[2K┌ — input box shifts up (prefix tail): ${JSON.stringify(output.slice(Math.max(0, output.indexOf('\r\x1b[2K┌') - 40), output.indexOf('\r\x1b[2K┌') + 5))}`
     ).toBe(false)
   })
@@ -1758,7 +1647,7 @@ describe('TTY token list interactive mode', () => {
     await tick()
 
     const output = ttyOutput(writeSpy)
-    const visualOutput = simulateTerminalOverwrite(output)
+    const visualOutput = simulatedScreenFromTtyWrites(output)
     const promptStart = 'Select and enter to change the default'
     const count = visualOutput.split(promptStart).length - 1
     expect(count).toBe(1)
@@ -1779,7 +1668,7 @@ describe('TTY token list interactive mode', () => {
     await tick()
 
     const output = ttyOutput(writeSpy)
-    const visualOutput = simulateTerminalOverwrite(output)
+    const visualOutput = simulatedScreenFromTtyWrites(output)
     const lines = visualOutput.split('\n')
 
     const separatorLines = lines.filter((l) => /^─+$/.test(stripAnsi(l).trim()))
@@ -1903,8 +1792,8 @@ describe('TTY token list interactive mode', () => {
     writeSpy.mockClear()
     await setup()
 
-    const lines = stripAllAnsi(
-      simulateTerminalOverwrite(ttyOutput(writeSpy))
+    const lines = stripAnsiCsiAndCr(
+      simulatedScreenFromTtyWrites(ttyOutput(writeSpy))
     ).split('\n')
     const resultLineIdx = lines.findIndex((l) => l.includes(expectMsg))
     expect(
@@ -1913,7 +1802,7 @@ describe('TTY token list interactive mode', () => {
     ).toBeGreaterThanOrEqual(0)
 
     const beforeResult = lines.slice(0, resultLineIdx)
-    const blanks = maxConsecutiveBlanks(beforeResult)
+    const blanks = maxConsecutiveBlankLines(beforeResult)
     expect(
       blanks,
       `Expected no blank lines before result message (blank lines here appear as scrollback noise above the result). Got ${blanks}. Lines before result: ${JSON.stringify(beforeResult)}`
