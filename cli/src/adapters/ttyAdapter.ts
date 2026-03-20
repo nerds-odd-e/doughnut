@@ -677,12 +677,12 @@ export async function runTTY(
         }
 
         collectedOutputLines.length = 0
-        chatHistory.push({ type: 'input', content: input })
-        if (await processInput(input, ttyOutput)) {
-          doExit()
-        }
-        chatHistory.push({ type: 'output', lines: [...collectedOutputLines] })
         if (input.trim()) {
+          chatHistory.push({ type: 'input', content: input })
+          if (await processInput(input, ttyOutput)) {
+            doExit()
+          }
+          chatHistory.push({ type: 'output', lines: [...collectedOutputLines] })
           livePaint.cursorUpStepsToLiveRegionTop = 0
           livePaint.lastPaintedLineCount = 0
         }

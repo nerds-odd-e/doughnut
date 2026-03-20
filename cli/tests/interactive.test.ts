@@ -1442,6 +1442,36 @@ describe('TTY empty Enter redraw (regression)', () => {
       `Stale double cursor-up before \\r\\x1b[2K┌ — input box shifts up (prefix tail): ${JSON.stringify(output.slice(Math.max(0, output.indexOf('\r\x1b[2K┌') - 40), output.indexOf('\r\x1b[2K┌') + 5))}`
     ).toBe(false)
   })
+
+  test('after blank submits, full redraw must not paint past-input grey blocks (history parity)', async () => {
+    const greyBgPastInput = '\x1b[48;5;236m'
+
+    writeSpy.mockClear()
+    process.stdout.emit('resize')
+    await tick()
+    const redrawBaseline = ttyOutput(writeSpy)
+    const baselineMatches = redrawBaseline.split(greyBgPastInput).length - 1
+    expect(
+      baselineMatches,
+      'baseline resize should not use GREY_BG (only renderPastInput uses this code)'
+    ).toBe(0)
+
+    writeSpy.mockClear()
+    pressEnter(stdin)
+    await tick()
+    pressEnter(stdin)
+    await tick()
+
+    writeSpy.mockClear()
+    process.stdout.emit('resize')
+    await tick()
+
+    const redrawAfterEmptySubmits = ttyOutput(writeSpy)
+    expect(
+      redrawAfterEmptySubmits.split(greyBgPastInput).length - 1,
+      'blank Enter must not add history rows that only appear on full redraw'
+    ).toBe(baselineMatches)
+  })
 })
 
 describe('TTY mode resize', () => {
