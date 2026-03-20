@@ -1,5 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import {
+  CLI_READY_MARKER,
+  cliReadyMarkerSuffix,
   truncateToWidth,
   isCommittedInteractiveInput,
   grayDisabledInputBoxLines,
@@ -10,6 +12,22 @@ import {
   buildLiveRegionLines,
 } from '../src/renderer.js'
 import type { ChatHistory } from '../src/types.js'
+
+describe('cliReadyMarkerSuffix', () => {
+  test('emits OSC 133;A when buffer is empty and no interactive fetch wait', () => {
+    expect(cliReadyMarkerSuffix('', false)).toBe(CLI_READY_MARKER)
+    expect(CLI_READY_MARKER).toBe('\x1b]133;A\x07')
+  })
+
+  test('omits marker when buffer has text', () => {
+    expect(cliReadyMarkerSuffix('x', false)).toBe('')
+    expect(cliReadyMarkerSuffix(' \n', false)).toBe('')
+  })
+
+  test('omits marker during interactive fetch wait', () => {
+    expect(cliReadyMarkerSuffix('', true)).toBe('')
+  })
+})
 
 describe('isCommittedInteractiveInput', () => {
   test('false for empty and whitespace-only', () => {

@@ -8,6 +8,7 @@ import {
   type InteractiveFetchWaitLine,
 } from '../interactiveFetchWait.js'
 import {
+  cliReadyMarkerSuffix,
   formatInteractiveFetchWaitPromptLine,
   isCommittedInteractiveInput,
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
@@ -392,6 +393,9 @@ export async function runTTY(
       process.stdout.write(SHOW_CURSOR)
       positionCursorInInputBox()
     }
+    process.stdout.write(
+      cliReadyMarkerSuffix(buffer, getInteractiveFetchWaitLine() !== null)
+    )
   }
 
   function drawBox() {
@@ -441,6 +445,9 @@ export async function runTTY(
       process.stdout.write(SHOW_CURSOR)
       positionCursorInInputBox()
     }
+    process.stdout.write(
+      cliReadyMarkerSuffix(buffer, getInteractiveFetchWaitLine() !== null)
+    )
 
     livePaint.cursorUpStepsToLiveRegionTop = inputRow
     livePaint.lastPaintedLineCount = newTotalLines

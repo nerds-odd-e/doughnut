@@ -64,6 +64,17 @@ export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
   recallSpelling: 'type your answer; /stop to exit recall',
 }
 
+/** OSC 133;A ST (FinalTerm prompt mark). Invisible; declares the input box is ready for the next keystroke. */
+export const CLI_READY_MARKER = '\x1b]133;A\x07'
+
+export function cliReadyMarkerSuffix(
+  buffer: string,
+  interactiveFetchWaitActive: boolean
+): string {
+  if (buffer !== '' || interactiveFetchWaitActive) return ''
+  return CLI_READY_MARKER
+}
+
 /** Token list pick or interactive fetch wait: grey bordered box, no →, cursor hidden. */
 export function isGreyDisabledInputChrome(ctx: PlaceholderContext): boolean {
   return ctx === 'tokenList' || ctx === 'interactiveFetchWait'
