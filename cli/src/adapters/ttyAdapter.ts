@@ -14,6 +14,7 @@ import {
   type InteractiveFetchWaitLine,
 } from '../interactiveFetchWait.js'
 import {
+  applyChatHistoryOutputTone,
   formatInteractiveFetchWaitPromptLine,
   interactiveInputReadyOscSuffix,
   isCommittedInteractiveInput,
@@ -288,11 +289,15 @@ export async function runTTY(
 
   function commitHistoryOutput(
     lines: readonly string[],
-    tone: ChatHistoryOutputTone = 'plain'
+    tone: ChatHistoryOutputTone = 'plain',
+    options?: { inputAlreadyPaintedAboveLiveRegion?: boolean }
   ): void {
     chatHistory.push({ type: 'output', lines: [...lines], tone })
+    clearLiveRegionForRepaint(livePaint)
     resetLivePaintCursor()
-    doFullRedraw()
+    paintCommittedTurnAppend(
+      options?.inputAlreadyPaintedAboveLiveRegion ?? false
+    )
   }
 
   /** Ends token-list mode: records the slash command as input, then the outcome line in scrollback. */
@@ -305,7 +310,9 @@ export async function runTTY(
     chatHistory.push({ type: 'input', content: command })
     tokenSelection = null
     buffer = ''
-    commitHistoryOutput([message], tone)
+    commitHistoryOutput([message], tone, {
+      inputAlreadyPaintedAboveLiveRegion: true,
+    })
   }
 
   function beginTokenSelection(
@@ -530,6 +537,31 @@ export async function runTTY(
 
     livePaint.cursorUpStepsToLiveRegionTop = inputLineRowInLiveBlock
     livePaint.lastPaintedLineCount = liveLineCount
+  }
+
+  /**
+   * Paints the last history turn (input grey block + output lines) without {@link CLEAR_SCREEN}, then
+   * {@link drawBox}. Token-list completion already wrote `renderPastInput` when entering selection mode.
+   */
+  function paintCommittedTurnAppend(inputAlreadyPainted: boolean): void {
+    const h = chatHistory
+    const last = h[h.length - 1]
+    const prev = h[h.length - 2]
+    if (!(last && prev) || last.type !== 'output' || prev.type !== 'input') {
+      doFullRedraw()
+      return
+    }
+
+    const width = getTerminalWidth()
+    if (!inputAlreadyPainted) {
+      process.stdout.write(renderPastInput(prev.content, width))
+      process.stdout.write('\n')
+    }
+    const outTone = last.tone ?? 'plain'
+    for (const line of last.lines) {
+      process.stdout.write(`${applyChatHistoryOutputTone(line, outTone)}\n`)
+    }
+    drawBox()
   }
 
   function stopInteractiveFetchWaitRepaintTimer(): void {

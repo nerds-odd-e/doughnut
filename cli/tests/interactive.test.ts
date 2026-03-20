@@ -2218,6 +2218,68 @@ describe('TTY contest wait — Esc cancels', () => {
   })
 })
 
+/**
+ * Full-screen clear (\x1b[H\x1b[2J) scrolls the viewport and wipes prior scrollback from view.
+ * Normal commands should only append to rendered history (incremental live-region repaint), like a
+ * typical REPL — reserved for /clear and terminal resize.
+ */
+describe('TTY: normal command output must not full-screen clear', () => {
+  let writeSpy: ReturnType<typeof vi.spyOn>
+  let stdin: TTYStdin
+
+  beforeEach(async () => {
+    resetRecallStateForTesting()
+    mockRecallStatus.mockReset()
+    mockRecallStatus.mockResolvedValue('0 notes to recall today')
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
+    vi.spyOn(process, 'exit').mockImplementation(
+      (() => undefined) as unknown as typeof process.exit
+    )
+    stdin = createMockTTYStdin()
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await tick()
+  })
+
+  afterEach(async () => {
+    pressKey(stdin, 'c', { ctrl: true })
+    vi.restoreAllMocks()
+    const actual =
+      await vi.importActual<typeof import('../src/recall.js')>(
+        '../src/recall.js'
+      )
+    mockRecallStatus.mockImplementation((signal?: AbortSignal) =>
+      actual.recallStatus(signal)
+    )
+  })
+
+  test('after /help, stdout writes must not include CLEAR_SCREEN', async () => {
+    writeSpy.mockClear()
+    await submitTTYCommand(stdin, '/help')
+    await vi.waitFor(() =>
+      expect(ttyOutput(writeSpy)).toContain('List available commands')
+    )
+
+    expect(
+      ttyOutput(writeSpy),
+      'Command output should append to history without full-screen clear; only /clear and resize should emit CLEAR_SCREEN'
+    ).not.toContain(CLEAR_SCREEN)
+  })
+
+  test('after /recall-status, stdout writes must not include CLEAR_SCREEN', async () => {
+    writeSpy.mockClear()
+    await submitTTYCommand(stdin, '/recall-status')
+    await vi.waitFor(() =>
+      expect(ttyOutput(writeSpy)).toContain('0 notes to recall today')
+    )
+
+    expect(
+      ttyOutput(writeSpy),
+      'Command output should append to history without full-screen clear; only /clear and resize should emit CLEAR_SCREEN'
+    ).not.toContain(CLEAR_SCREEN)
+  })
+})
+
 describe('TTY exit: no full-screen redraw', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
   let exitSpy: ReturnType<typeof vi.spyOn>
