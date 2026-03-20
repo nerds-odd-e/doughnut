@@ -13,7 +13,7 @@ import {
   runDefaultBackendJson,
   runWithDefaultBackendClient,
 } from './accessToken.js'
-import { userAbortError } from './fetchAbort.js'
+import { isFetchAbortedByCaller, userAbortError } from './fetchAbort.js'
 
 /**
  * Env var: milliseconds to wait before the first `recalling` HTTP call when `recallNext` receives an
@@ -149,12 +149,17 @@ export async function recallNext(
     return { type: 'none', message: '0 notes to recall today' }
   }
 
-  const prompt = await runDefaultBackendJson<RecallPrompt | null>(() =>
-    MemoryTrackerController.askAQuestion({
-      path: { memoryTracker: first.memoryTrackerId },
-      ...opts,
-    })
-  )
+  let prompt: RecallPrompt | null = null
+  try {
+    prompt = await runDefaultBackendJson<RecallPrompt | null>(() =>
+      MemoryTrackerController.askAQuestion({
+        path: { memoryTracker: first.memoryTrackerId },
+        ...opts,
+      })
+    )
+  } catch (e) {
+    if (isFetchAbortedByCaller(e)) throw e
+  }
   const question = recallQuestionForTerminal(prompt)
   if (question) return question
 

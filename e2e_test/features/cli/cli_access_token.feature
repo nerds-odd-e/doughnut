@@ -13,7 +13,7 @@ Feature: CLI access token management
 
   Scenario: Add invalid access token
     When I run doughnut -c "/add-access-token" with token "invalid-token-xxx"
-    Then I should see "Token is invalid or expired." in the non-interactive output
+    Then I should see "Access token is invalid or expired" in the non-interactive output
 
   Scenario Outline: Remove access token
     And I have a valid Doughnut Access Token with label "<label>"
