@@ -1,4 +1,5 @@
 import * as readline from 'node:readline'
+import { isCommittedInteractiveInput } from '../renderer.js'
 
 export interface PipedDeps {
   processInput: (input: string) => Promise<boolean>
@@ -50,7 +51,7 @@ export async function runPiped(
     if (processing || lineQueue.length === 0) return
     processing = true
     const line = lineQueue.shift()!
-    if (line.trim()) {
+    if (isCommittedInteractiveInput(line)) {
       console.log(renderPastInput(line, getTerminalWidth()))
     }
     if (await processInput(line)) {

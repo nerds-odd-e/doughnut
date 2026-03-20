@@ -144,6 +144,11 @@ export function renderBox(lines: string[], width: TerminalWidth): string {
   return [top, ...rows, bottom].join('\n')
 }
 
+/** Submitted buffer counts as history input (and past-input paint) only when non-blank after trim. */
+export function isCommittedInteractiveInput(submitted: string): boolean {
+  return submitted.trim().length > 0
+}
+
 export function renderPastInput(input: string, width: TerminalWidth): string {
   const innerWidth = width - 2
   const lines = input.split('\n')

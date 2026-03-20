@@ -534,6 +534,7 @@ export {
   visibleLength,
   renderBox,
   renderPastInput,
+  isCommittedInteractiveInput,
   buildBoxLines,
   highlightRecognizedCommand,
 } from './renderer.js'

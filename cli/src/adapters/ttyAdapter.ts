@@ -2,7 +2,11 @@ import * as readline from 'node:readline'
 import { Writable } from 'node:stream'
 import type { AccessTokenEntry } from '../accessToken.js'
 import type { CommandDoc } from '../help.js'
-import { wrapTextToLines, type PlaceholderContext } from '../renderer.js'
+import {
+  isCommittedInteractiveInput,
+  wrapTextToLines,
+  type PlaceholderContext,
+} from '../renderer.js'
 import type { ChatHistory, McqRecallPending, OutputAdapter } from '../types.js'
 
 export type TokenListAction = 'set-default' | 'remove' | 'remove-completely'
@@ -646,7 +650,7 @@ export async function runTTY(
 
         clearLiveRegionForRepaint(livePaint)
 
-        if (input.trim()) {
+        if (isCommittedInteractiveInput(input)) {
           process.stdout.write(renderPastInput(input, width))
           process.stdout.write('\n')
         }
@@ -677,7 +681,7 @@ export async function runTTY(
         }
 
         collectedOutputLines.length = 0
-        if (input.trim()) {
+        if (isCommittedInteractiveInput(input)) {
           chatHistory.push({ type: 'input', content: input })
           if (await processInput(input, ttyOutput)) {
             doExit()

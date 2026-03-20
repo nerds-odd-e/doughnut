@@ -2,6 +2,7 @@ import { describe, test, expect } from 'vitest'
 import {
   truncateToWidth,
   isSelectionMode,
+  isCommittedInteractiveInput,
   grayBoxLinesForSelectionMode,
   renderFullDisplay,
   stripAnsi,
@@ -10,6 +11,20 @@ import {
   buildLiveRegionLines,
 } from '../src/renderer.js'
 import type { ChatHistory } from '../src/types.js'
+
+describe('isCommittedInteractiveInput', () => {
+  test('false for empty and whitespace-only', () => {
+    expect(isCommittedInteractiveInput('')).toBe(false)
+    expect(isCommittedInteractiveInput('   ')).toBe(false)
+    expect(isCommittedInteractiveInput('\n\t ')).toBe(false)
+  })
+
+  test('true when any non-whitespace remains after trim', () => {
+    expect(isCommittedInteractiveInput('a')).toBe(true)
+    expect(isCommittedInteractiveInput('  x  ')).toBe(true)
+    expect(isCommittedInteractiveInput('\nhi')).toBe(true)
+  })
+})
 
 describe('isSelectionMode', () => {
   test('true for tokenList only', () => {
