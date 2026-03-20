@@ -1,6 +1,6 @@
 import {
   GREY,
-  LOADING_FOREGROUND,
+  RECALL_FETCH_WAIT_PROMPT_FG,
   RESET,
   HIDE_CURSOR,
   SHOW_CURSOR,
@@ -19,7 +19,7 @@ import { renderMarkdownToTerminal } from './markdown.js'
 import type { ChatHistory } from './types.js'
 import { formatVersionOutput } from './version.js'
 
-export { GREY, LOADING_FOREGROUND, RESET, HIDE_CURSOR, SHOW_CURSOR }
+export { GREY, RECALL_FETCH_WAIT_PROMPT_FG, RESET, HIDE_CURSOR, SHOW_CURSOR }
 
 /** Terminal column count; used for truncation and line width. */
 export type TerminalWidth = number
@@ -34,11 +34,14 @@ export const COMMAND_HIGHLIGHT = '\x1b[1;36m' // bold + cyan
 
 export const PROMPT = '→ '
 
-/** Input box placeholder by interaction context. Single source of truth. */
+/**
+ * Which placeholder and input chrome apply in the live region.
+ * `recallFetchWait`: `recallNext` in flight — same grey, no-→ box treatment as token list pickers.
+ */
 export type PlaceholderContext =
   | 'default'
   | 'tokenList'
-  | 'loading'
+  | 'recallFetchWait'
   | 'recallMcq'
   | 'recallStopConfirmation'
   | 'recallYesNo'
@@ -47,36 +50,30 @@ export type PlaceholderContext =
 export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
   default: '`exit` to quit.',
   tokenList: '↑↓ Enter to select; other keys cancel',
-  loading: 'loading ...',
+  recallFetchWait: 'loading ...',
   recallMcq: '↑↓ Enter or number to select; Esc to cancel',
   recallStopConfirmation: 'y or n; Esc to go back',
   recallYesNo: 'y or n; /stop to exit recall',
   recallSpelling: 'type your answer; /stop to exit recall',
 }
 
-/** Selection mode: user selects from Current guidance via ↑↓ Enter; input box grayed, cursor hidden, no arrow. */
-export function isSelectionMode(ctx: PlaceholderContext): boolean {
-  return ctx === 'tokenList'
+/** Token list pick or recall fetch wait: grey bordered box, no →, cursor hidden. */
+export function isGreyDisabledInputChrome(ctx: PlaceholderContext): boolean {
+  return ctx === 'tokenList' || ctx === 'recallFetchWait'
 }
 
-/** Grey bordered input box, no →, hidden cursor — token list selection or async loading wait. */
-export function isInputBoxDisabledPlaceholderContext(
-  ctx: PlaceholderContext
-): boolean {
-  return ctx === 'tokenList' || ctx === 'loading'
-}
+const ELLIPSIS_PHASE = ['.', '..', '...'] as const
 
-/** Animated ellipsis phases for loading current prompt (`.`, `..`, `...`). */
-export function formatLoadingPromptWithEllipsis(
-  baseMessage: string,
-  tick: number
+/** Appends `.` / `..` / `...` to the recall-fetch wait base line (TTY cycles `tick`). */
+export function formatRecallFetchWaitPromptLine(
+  baseLine: string,
+  ellipsisTick: number
 ): string {
-  const dots = ['.', '..', '...'][tick % 3]!
-  return `${baseMessage}${dots}`
+  return `${baseLine}${ELLIPSIS_PHASE[ellipsisTick % 3]!}`
 }
 
-/** Gray box lines for selection mode; ensures right border stays gray (replaces internal RESET with GREY). */
-export function grayBoxLinesForSelectionMode(lines: string[]): string[] {
+/** Full grey outline for the input box when the user is not free-typing a command. */
+export function grayDisabledInputBoxLines(lines: string[]): string[] {
   return lines.map((l) => `${GREY}${l.split(RESET).join(GREY)}${RESET}`)
 }
 
@@ -207,7 +204,7 @@ export interface BuildBoxLinesOptions {
 }
 
 export type LiveRegionPaintOptions = BuildBoxLinesOptions & {
-  /** SGR for current prompt lines above the input box; default grey. */
+  /** Default grey. Recall fetch wait uses `RECALL_FETCH_WAIT_PROMPT_FG`. */
   currentPromptSgr?: string
 }
 
@@ -220,7 +217,7 @@ export function buildBoxLines(
   const context = options?.placeholderContext ?? 'default'
   const placeholder = PLACEHOLDER_BY_CONTEXT[context]
   return bufferLines.map((line, i) => {
-    const prefix = isInputBoxDisabledPlaceholderContext(context)
+    const prefix = isGreyDisabledInputChrome(context)
       ? ''
       : i === 0
         ? PROMPT
@@ -276,8 +273,8 @@ export function buildLiveRegionLines(
   ).split('\n')
   const boxLines =
     options?.placeholderContext &&
-    isInputBoxDisabledPlaceholderContext(options.placeholderContext)
-      ? grayBoxLinesForSelectionMode(rawBoxLines)
+    isGreyDisabledInputChrome(options.placeholderContext)
+      ? grayDisabledInputBoxLines(rawBoxLines)
       : rawBoxLines
   lines.push(...boxLines)
   lines.push(...recallingIndicator)

@@ -3,9 +3,9 @@ import { Writable } from 'node:stream'
 import type { AccessTokenEntry } from '../accessToken.js'
 import type { CommandDoc } from '../help.js'
 import {
-  formatLoadingPromptWithEllipsis,
+  formatRecallFetchWaitPromptLine,
   isCommittedInteractiveInput,
-  LOADING_FOREGROUND,
+  RECALL_FETCH_WAIT_PROMPT_FG,
   wrapTextToLines,
   type LiveRegionPaintOptions,
   type PlaceholderContext,
@@ -100,9 +100,8 @@ export interface TTYDeps {
   ) => string[]
   TOKEN_LIST_COMMANDS: Record<string, TokenListCommandConfig>
   getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
-  getLoadingPromptBase: () => string | null
-  grayBoxLinesForSelectionMode: (lines: string[]) => string[]
-  isInputBoxDisabledPlaceholderContext: (ctx: PlaceholderContext) => boolean
+  getRecallFetchWaitBaseLine: () => string | null
+  isGreyDisabledInputChrome: (ctx: PlaceholderContext) => boolean
 }
 
 function cycleIndex(current: number, delta: number, length: number): number {
@@ -187,8 +186,8 @@ export async function runTTY(
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
-    getLoadingPromptBase,
-    isInputBoxDisabledPlaceholderContext,
+    getRecallFetchWaitBaseLine,
+    isGreyDisabledInputChrome,
   } = deps
 
   const writeCurrentPromptLine = (msg: string) =>
@@ -237,8 +236,9 @@ export async function runTTY(
   let tokenHighlightIndex = 0
   let tokenListAction: TokenListAction = 'set-default'
   let mcqChoiceHighlightIndex = 0
-  let loadingEllipsisTick = 0
-  let loadingRepaintInterval: ReturnType<typeof setInterval> | null = null
+  const RECALL_FETCH_WAIT_ELLIPSIS_MS = 400
+  let recallFetchWaitEllipsisTick = 0
+  let recallFetchWaitRepaintTimer: ReturnType<typeof setInterval> | null = null
 
   function endTokenListSelection(outputMsg: string) {
     const command = tokenListCommand
@@ -266,14 +266,17 @@ export async function runTTY(
       placeholderContext,
     })
     const pendingRecallAnswer = getPendingRecallAnswer()
-    const loadingBase = getLoadingPromptBase()
+    const waitBaseLine = getRecallFetchWaitBaseLine()
     let currentPromptWrappedLines: string[]
     let currentPromptSgr: string | undefined
-    if (loadingBase) {
+    if (waitBaseLine) {
       currentPromptWrappedLines = [
-        formatLoadingPromptWithEllipsis(loadingBase, loadingEllipsisTick),
+        formatRecallFetchWaitPromptLine(
+          waitBaseLine,
+          recallFetchWaitEllipsisTick
+        ),
       ]
-      currentPromptSgr = LOADING_FOREGROUND
+      currentPromptSgr = RECALL_FETCH_WAIT_PROMPT_FG
     } else {
       const currentPromptText =
         tokenListItems && tokenListCommand
@@ -371,7 +374,7 @@ export async function runTTY(
     livePaint.lastPaintedLineCount = newTotalLines
 
     process.stdout.write(`\x1b[${newTotalLines - inputRow}A`)
-    if (isInputBoxDisabledPlaceholderContext(placeholderContext)) {
+    if (isGreyDisabledInputChrome(placeholderContext)) {
       process.stdout.write(HIDE_CURSOR)
     } else {
       process.stdout.write(SHOW_CURSOR)
@@ -420,7 +423,7 @@ export async function runTTY(
     const totalWritten = Math.max(newTotalLines, livePaint.lastPaintedLineCount)
     const inputRow = inputRowFromTop(currentPromptLines, contentLines.length)
     process.stdout.write(`\x1b[${totalWritten - inputRow}A`)
-    if (isInputBoxDisabledPlaceholderContext(placeholderContext)) {
+    if (isGreyDisabledInputChrome(placeholderContext)) {
       process.stdout.write(HIDE_CURSOR)
     } else {
       process.stdout.write(SHOW_CURSOR)
@@ -429,6 +432,14 @@ export async function runTTY(
 
     livePaint.cursorUpStepsToLiveRegionTop = inputRow
     livePaint.lastPaintedLineCount = newTotalLines
+  }
+
+  function stopRecallFetchWaitRepaintTimer(): void {
+    if (recallFetchWaitRepaintTimer) {
+      clearInterval(recallFetchWaitRepaintTimer)
+      recallFetchWaitRepaintTimer = null
+    }
+    recallFetchWaitEllipsisTick = 0
   }
 
   ttyOutput = {
@@ -455,22 +466,16 @@ export async function runTTY(
       suggestionsDismissed = false
       doFullRedraw()
     },
-    notifyLoadingChanged: () => {
-      const base = getLoadingPromptBase()
-      if (base) {
-        if (loadingRepaintInterval) clearInterval(loadingRepaintInterval)
-        loadingEllipsisTick = 0
+    onRecallFetchWaitChanged: () => {
+      if (getRecallFetchWaitBaseLine()) {
+        stopRecallFetchWaitRepaintTimer()
         drawBox()
-        loadingRepaintInterval = setInterval(() => {
-          loadingEllipsisTick = (loadingEllipsisTick + 1) % 3
+        recallFetchWaitRepaintTimer = setInterval(() => {
+          recallFetchWaitEllipsisTick = (recallFetchWaitEllipsisTick + 1) % 3
           drawBox()
-        }, 400)
+        }, RECALL_FETCH_WAIT_ELLIPSIS_MS)
       } else {
-        if (loadingRepaintInterval) {
-          clearInterval(loadingRepaintInterval)
-          loadingRepaintInterval = null
-        }
-        loadingEllipsisTick = 0
+        stopRecallFetchWaitRepaintTimer()
         drawBox()
       }
     },
@@ -481,10 +486,7 @@ export async function runTTY(
   process.stdout.on('resize', doFullRedraw)
   const removeResizeListener = () => process.stdout.off('resize', doFullRedraw)
   const doExit = () => {
-    if (loadingRepaintInterval) {
-      clearInterval(loadingRepaintInterval)
-      loadingRepaintInterval = null
-    }
+    stopRecallFetchWaitRepaintTimer()
     removeResizeListener()
     process.stdout.write(SHOW_CURSOR)
     rl.close()

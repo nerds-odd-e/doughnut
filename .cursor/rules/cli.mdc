@@ -38,7 +38,7 @@ cli/
 | **Current guidance** | Interactive only. Options below the input box: / commands, token list, MCQ choices. |
 | **Input box** | The bordered area where the user types. |
 | **Selection mode** | Interactive only. User selects from Current guidance (e.g. token list) via ↑↓ Enter; input box is grayed, cursor hidden, no "→" prompt. Any other key cancels. |
-| **Loading (recall fetch)** | Interactive only. While `recallNext` is in flight (phase 1: `/recall` and recall continuation). **Current prompt** shows the loading line in **bright blue** foreground (`\x1b[94m` in `ansi.ts` as `LOADING_FOREGROUND`). **Input box** uses the same grey disabled treatment as selection mode (`isInputBoxDisabledPlaceholderContext`), placeholder `loading ...`. Animated `.` / `..` / `...` suffix on the current prompt only. |
+| **Recall fetch wait** | Interactive only. While `recallNext` is in flight (`/recall` and recall continuation). **Current prompt** uses **bright blue** `\x1b[94m` (`RECALL_FETCH_WAIT_PROMPT_FG` in `ansi.ts`). **Input box** uses the same grey outline as token list pickers (`isGreyDisabledInputChrome`), placeholder context `recallFetchWait` / text `loading ...`. Animated `.` / `..` / `...` on the wait line only. |
 
 **E2E assertion steps**: Use `I should see X in the non-interactive output` for non-interactive (-c, piped). Use `I should see X in the history output` or `I should see X in the Current guidance` for interactive. Step definitions delegate to `cli.xxx` page objects; the `cliSectionParser` exports `getRecallDisplaySections`, `getHistoryOutputContent`, etc.
 

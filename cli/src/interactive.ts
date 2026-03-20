@@ -43,8 +43,7 @@ import {
   renderFullDisplay,
   renderPastInput,
   writeFullRedraw,
-  grayBoxLinesForSelectionMode,
-  isInputBoxDisabledPlaceholderContext,
+  isGreyDisabledInputChrome,
   GREY,
   HIDE_CURSOR,
   SHOW_CURSOR,
@@ -53,12 +52,6 @@ import {
   PROMPT,
   type PlaceholderContext,
 } from './renderer.js'
-import {
-  applyInteractiveLoading,
-  getInteractiveLoadingDisplayMessage,
-  LOADING_MESSAGES,
-  resetInteractiveLoadingForTesting,
-} from './interactiveLoading.js'
 import type { McqRecallPending, OutputAdapter } from './types.js'
 
 type RecallPromptResult = Exclude<RecallNextResult, { type: 'none' }>
@@ -83,6 +76,26 @@ let recallSessionDueDays = 0
 let pendingRecallLoadMore = false
 let pendingRecallStopConfirmation = false
 
+/** Plain Current prompt text before animated dots; only while `recallNext` is awaited. */
+export const RECALL_FETCH_WAIT_BASE_LINE = 'Loading recall questions' as const
+
+let recallFetchWaitActive = false
+
+function setRecallFetchWait(output: OutputAdapter, active: boolean): void {
+  recallFetchWaitActive = active
+  output.onRecallFetchWaitChanged?.()
+}
+
+function getRecallFetchWaitBaseLine():
+  | typeof RECALL_FETCH_WAIT_BASE_LINE
+  | null {
+  return recallFetchWaitActive ? RECALL_FETCH_WAIT_BASE_LINE : null
+}
+
+function resetRecallFetchWaitForTesting(): void {
+  recallFetchWaitActive = false
+}
+
 export function resetRecallStateForTesting(): void {
   pendingRecallAnswer = null
   recallSessionMode = false
@@ -90,7 +103,7 @@ export function resetRecallStateForTesting(): void {
   recallSessionDueDays = 0
   pendingRecallLoadMore = false
   pendingRecallStopConfirmation = false
-  resetInteractiveLoadingForTesting()
+  resetRecallFetchWaitForTesting()
 }
 
 function getPendingRecallAnswer(): PendingRecallAnswer {
@@ -144,7 +157,7 @@ function getContestablePromptId(): number | null {
 export function getPlaceholderContext(
   inTokenList: boolean
 ): PlaceholderContext {
-  if (getInteractiveLoadingDisplayMessage()) return 'loading'
+  if (recallFetchWaitActive) return 'recallFetchWait'
   if (inTokenList) return 'tokenList'
   if (pendingRecallStopConfirmation) return 'recallStopConfirmation'
   if (pendingRecallLoadMore) return 'recallYesNo'
@@ -277,15 +290,15 @@ async function handleParamCommand(
   return false
 }
 
-async function recallNextWithLoading(
+async function recallNextWithFetchWaitUi(
   dueindays: number,
   output: OutputAdapter
 ): Promise<RecallNextResult> {
-  applyInteractiveLoading(output, { message: LOADING_MESSAGES.recallNext })
+  setRecallFetchWait(output, true)
   try {
     return await recallNext(dueindays)
   } finally {
-    applyInteractiveLoading(output, null)
+    setRecallFetchWait(output, false)
   }
 }
 
@@ -296,7 +309,7 @@ async function continueRecallSession(
 ): Promise<void> {
   if (!fromLoadMore) sessionRecallCount++
   try {
-    const result = await recallNextWithLoading(recallSessionDueDays, output)
+    const result = await recallNextWithFetchWaitUi(recallSessionDueDays, output)
     if (result.type === 'none') {
       if (recallSessionDueDays === 0) {
         pendingRecallLoadMore = true
@@ -526,7 +539,7 @@ export async function processInput(
       recallSessionMode = true
       sessionRecallCount = 0
       recallSessionDueDays = 0
-      const result = await recallNextWithLoading(0, output)
+      const result = await recallNextWithFetchWaitUi(0, output)
       if (result.type === 'none') {
         pendingRecallLoadMore = true
         output.beginCurrentPrompt?.()
@@ -558,8 +571,6 @@ export {
   buildBoxLines,
   highlightRecognizedCommand,
 } from './renderer.js'
-
-export { LOADING_MESSAGES } from './interactiveLoading.js'
 
 function buildTTYDeps() {
   return {
@@ -600,9 +611,8 @@ function buildTTYDeps() {
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
-    getLoadingPromptBase: getInteractiveLoadingDisplayMessage,
-    grayBoxLinesForSelectionMode,
-    isInputBoxDisabledPlaceholderContext,
+    getRecallFetchWaitBaseLine,
+    isGreyDisabledInputChrome,
   }
 }
 

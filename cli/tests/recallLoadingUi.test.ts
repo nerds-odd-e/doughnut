@@ -1,15 +1,15 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import {
-  LOADING_MESSAGES,
+  RECALL_FETCH_WAIT_BASE_LINE,
   processInput,
   resetRecallStateForTesting,
 } from '../src/interactive.js'
 import {
   buildBoxLines,
   buildLiveRegionLines,
-  formatLoadingPromptWithEllipsis,
-  isInputBoxDisabledPlaceholderContext,
-  LOADING_FOREGROUND,
+  formatRecallFetchWaitPromptLine,
+  isGreyDisabledInputChrome,
+  RECALL_FETCH_WAIT_PROMPT_FG,
   stripAnsi,
   GREY,
 } from '../src/renderer.js'
@@ -29,7 +29,7 @@ function outputAdapter() {
     logError: vi.fn(),
     writeCurrentPrompt: vi.fn(),
     beginCurrentPrompt: vi.fn(),
-    notifyLoadingChanged: vi.fn(),
+    onRecallFetchWaitChanged: vi.fn(),
   }
 }
 
@@ -38,39 +38,39 @@ beforeEach(() => {
   mockRecallNext.mockReset()
 })
 
-describe('recall loading UI', () => {
-  test('renderer: ellipsis cycle, disabled contexts, grey live region for loading', () => {
-    expect(formatLoadingPromptWithEllipsis('Wait', 0)).toBe('Wait.')
-    expect(formatLoadingPromptWithEllipsis('Wait', 1)).toBe('Wait..')
-    expect(formatLoadingPromptWithEllipsis('Wait', 2)).toBe('Wait...')
-    expect(formatLoadingPromptWithEllipsis('Wait', 3)).toBe('Wait.')
+describe('recall fetch wait UI', () => {
+  test('renderer: ellipsis, grey chrome contexts, live region colors', () => {
+    expect(formatRecallFetchWaitPromptLine('Wait', 0)).toBe('Wait.')
+    expect(formatRecallFetchWaitPromptLine('Wait', 3)).toBe('Wait.')
 
-    expect(isInputBoxDisabledPlaceholderContext('loading')).toBe(true)
-    expect(isInputBoxDisabledPlaceholderContext('tokenList')).toBe(true)
-    expect(isInputBoxDisabledPlaceholderContext('default')).toBe(false)
-    expect(isInputBoxDisabledPlaceholderContext('recallMcq')).toBe(false)
+    expect(isGreyDisabledInputChrome('recallFetchWait')).toBe(true)
+    expect(isGreyDisabledInputChrome('tokenList')).toBe(true)
+    expect(isGreyDisabledInputChrome('default')).toBe(false)
+    expect(isGreyDisabledInputChrome('recallMcq')).toBe(false)
 
-    const boxLine = buildBoxLines('', 80, { placeholderContext: 'loading' })[0]!
+    const boxLine = buildBoxLines('', 80, {
+      placeholderContext: 'recallFetchWait',
+    })[0]!
     expect(boxLine).not.toContain('→')
     expect(boxLine).toContain('loading ...')
 
-    const prompt = formatLoadingPromptWithEllipsis(
-      LOADING_MESSAGES.recallNext,
+    const prompt = formatRecallFetchWaitPromptLine(
+      RECALL_FETCH_WAIT_BASE_LINE,
       1
     )
     const live = buildLiveRegionLines('', 80, [prompt], [], [], {
-      placeholderContext: 'loading',
-      currentPromptSgr: LOADING_FOREGROUND,
+      placeholderContext: 'recallFetchWait',
+      currentPromptSgr: RECALL_FETCH_WAIT_PROMPT_FG,
     })
     expect(live[0]).toContain('\x1b[32m')
-    expect(live[1]).toContain(LOADING_FOREGROUND)
-    expect(stripAnsi(live[1])).toContain(LOADING_MESSAGES.recallNext)
+    expect(live[1]).toContain(RECALL_FETCH_WAIT_PROMPT_FG)
+    expect(stripAnsi(live[1])).toContain(RECALL_FETCH_WAIT_BASE_LINE)
     const boxTopIdx = live.findIndex((l) => stripAnsi(l).startsWith('┌'))
     expect(boxTopIdx).toBeGreaterThan(0)
     expect(live[boxTopIdx]).toContain(GREY)
   })
 
-  test('processInput /recall calls notifyLoadingChanged once when loading starts and once when recallNext settles', async () => {
+  test('processInput /recall signals TTY once when recall fetch starts and once when it ends', async () => {
     let resolveRecall!: (value: RecallNextResult) => void
     mockRecallNext.mockImplementation(
       () =>
@@ -80,17 +80,19 @@ describe('recall loading UI', () => {
     )
     const out = outputAdapter()
     const finished = processInput('/recall', out)
-    await vi.waitFor(() => expect(out.notifyLoadingChanged).toHaveBeenCalled())
-    expect(out.notifyLoadingChanged).toHaveBeenCalledTimes(1)
+    await vi.waitFor(() =>
+      expect(out.onRecallFetchWaitChanged).toHaveBeenCalled()
+    )
+    expect(out.onRecallFetchWaitChanged).toHaveBeenCalledTimes(1)
     resolveRecall({ type: 'none', message: '0' })
     await finished
-    expect(out.notifyLoadingChanged).toHaveBeenCalledTimes(2)
+    expect(out.onRecallFetchWaitChanged).toHaveBeenCalledTimes(2)
 
     resetRecallStateForTesting()
     mockRecallNext.mockRejectedValueOnce(new Error('network'))
     const outErr = outputAdapter()
     await processInput('/recall', outErr)
-    expect(outErr.notifyLoadingChanged).toHaveBeenCalledTimes(2)
+    expect(outErr.onRecallFetchWaitChanged).toHaveBeenCalledTimes(2)
     expect(outErr.logError).toHaveBeenCalled()
   })
 })
