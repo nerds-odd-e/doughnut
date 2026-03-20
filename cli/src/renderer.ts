@@ -29,10 +29,11 @@ export {
 }
 
 /**
- * OSC 133 ; A ST — FinalTerm / shell-integration [“prompt start”](https://gitlab.freedesktop.org/Per_Bothner/specifications/blob/master/proposals/semantic-prompts.md).
- * Invisible on screen. The interactive TTY appends this when the bordered input box is ready for the next keystroke.
+ * Private OSC (not FinalTerm 133) so terminals with shell integration do not treat it
+ * as a shell prompt boundary. Invisible on screen. Appended when the input box is ready.
  */
-export const INTERACTIVE_INPUT_READY_OSC = '\x1b]133;A\x07' as const
+export const INTERACTIVE_INPUT_READY_OSC =
+  '\x1b]900;doughnut-interactive-input-ready\x07' as const
 
 /** Byte sequence written to stdout when the interactive CLI announces input readiness. */
 export type InteractiveInputReadyOsc = typeof INTERACTIVE_INPUT_READY_OSC

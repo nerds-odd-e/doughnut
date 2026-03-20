@@ -246,8 +246,26 @@ function simulateTerminalOverwrite(output: string): string {
   const cursorColRe = new RegExp(`^${ESC}\\[(\\d+)G`)
   const clearScreenRe = new RegExp(`^${ESC}\\[[02]?J`) // \x1b[J, \x1b[2J clear screen
   const cursorHomeRe = new RegExp(`^${ESC}\\[H`) // \x1b[H cursor home
+  /** DEC private mode CSI: SHOW_CURSOR / HIDE_CURSOR (\x1b[?25h), etc. */
+  const decPrivateCsiRe = new RegExp(`^${ESC}\\[[?][0-9;]*[a-zA-Z]`)
   const ansiRe = new RegExp(`^${ESC}\\[[0-9;]*[A-Za-z]`)
   while (i < output.length) {
+    if (output.startsWith(`${ESC}]`, i)) {
+      let j = i + 2
+      while (j < output.length) {
+        if (output[j] === '\x07') {
+          j++
+          break
+        }
+        if (output[j] === ESC && output[j + 1] === '\\') {
+          j += 2
+          break
+        }
+        j++
+      }
+      i = j
+      continue
+    }
     if (output.startsWith('\x1b[', i)) {
       const cursorUpMatch = output.slice(i).match(cursorUpRe)
       const eraseLineMatch = output.slice(i).match(eraseLineRe)
@@ -284,6 +302,11 @@ function simulateTerminalOverwrite(output: string): string {
         row = 0
         col = 0
         i += cursorHomeMatch[0].length
+        continue
+      }
+      const decPrivateMatch = output.slice(i).match(decPrivateCsiRe)
+      if (decPrivateMatch) {
+        i += decPrivateMatch[0].length
         continue
       }
       const ansiMatch = output.slice(i).match(ansiRe)
@@ -326,17 +349,8 @@ export function countTopBorderLinesBeforeFirstInputBox(output: string): number {
 }
 
 /**
- * Returns a diagnostic message if the simulated terminal output contains raw ESC bytes
- * after ANSI stripping — which means simulateTerminalOverwrite wrote unhandled control
- * sequences as visible characters.
- *
- * Known culprits introduced by fc92059be:
- *   \x1b[?25h / \x1b[?25l  (SHOW/HIDE_CURSOR) — the '?' breaks [0-9;]* in ansiRe
- *   \x1b]133;A\x07          (OSC INTERACTIVE_INPUT_READY_OSC) — starts with \x1b] not \x1b[
- *
- * Both get stamped as literal chars into the input-content row, corrupting the
- * simulation. In real terminals that interpret OSC 133;A (VS Code, iTerm2 shell
- * integration) this also produces wrong cursor placement and a visual duplicate box.
+ * If non-null, `simulateTerminalOverwrite` left raw ESC in the grid (unhandled control
+ * sequences treated as printable). Extend the simulator for those sequences.
  */
 export function findControlCharCorruptionInRenderedOutput(
   output: string
@@ -355,14 +369,8 @@ export function findControlCharCorruptionInRenderedOutput(
     .map(({ line, i }) => `  line ${i}: ${JSON.stringify(line.slice(0, 80))}`)
     .join('\n')
   return (
-    `Simulated terminal output still contains raw ESC (\\x1b) characters after ANSI` +
-    ` stripping. This means simulateTerminalOverwrite wrote unhandled control` +
-    ` sequences as visible characters.\n` +
-    `Known sequences NOT handled by the simulator:\n` +
-    `  \\x1b[?25h / \\x1b[?25l  (SHOW/HIDE_CURSOR — '?' breaks the [0-9;]* match)\n` +
-    `  \\x1b]133;A\\x07          (OSC INTERACTIVE_INPUT_READY_OSC — starts with \\x1b])\n` +
-    `These overwrite the '│ → ' prefix of the input row, making cursor position appear\n` +
-    `wrong and causing a visual duplicate box in terminals with shell integration.\n` +
-    `Corrupt lines:\n${examples}`
+    `Simulated terminal output still contains raw ESC (\\x1b) after ANSI stripping —` +
+    ` unhandled sequences were written as visible characters. Examples: DEC private CSI` +
+    ` (\\x1b[?25h), OSC (\\x1b]…\\x07). Corrupt lines:\n${examples}`
   )
 }

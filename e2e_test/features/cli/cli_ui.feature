@@ -1,4 +1,3 @@
-@ignore
 @withCliConfig
 Feature: CLI input box display
 

@@ -20,11 +20,13 @@ describe('interactiveInputReadyOscSuffix', () => {
     interactiveFetchWaitLine: null,
   } as const
 
-  test('emits FinalTerm prompt-start OSC when draft is empty and no interactive fetch wait', () => {
+  test('emits private ready OSC when draft is empty and no interactive fetch wait', () => {
     expect(interactiveInputReadyOscSuffix(readyPaint)).toBe(
       INTERACTIVE_INPUT_READY_OSC
     )
-    expect(INTERACTIVE_INPUT_READY_OSC).toBe('\x1b]133;A\x07')
+    expect(INTERACTIVE_INPUT_READY_OSC).toBe(
+      '\x1b]900;doughnut-interactive-input-ready\x07'
+    )
   })
 
   test('emits nothing when the user has typed in the input box', () => {

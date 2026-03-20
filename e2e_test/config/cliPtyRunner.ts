@@ -10,7 +10,8 @@ import { cliEnv } from './cliEnv'
  * Inlined: must stay byte-identical to `INTERACTIVE_INPUT_READY_OSC` in `cli/src/renderer.ts`.
  * The Cypress plugin process does not resolve imports into `cli/` from this file reliably.
  */
-const INTERACTIVE_INPUT_READY_OSC = '\x1b]133;A\x07' as const
+const INTERACTIVE_INPUT_READY_OSC =
+  '\x1b]900;doughnut-interactive-input-ready\x07' as const
 
 const PTY_TIMEOUT_MS = 25_000
 const CLI_POLL_MS = 10
