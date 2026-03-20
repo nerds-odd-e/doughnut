@@ -175,6 +175,60 @@ function withConfigDir(configDir: string): () => void {
   }
 }
 
+const BOLD_CYAN = '\x1b[1;36m'
+const ANSI_RESET = '\x1b[0m'
+const GREY_BG_PAST_INPUT = '\x1b[48;5;236m'
+
+function spyConsoleLogNoop() {
+  return vi.spyOn(console, 'log').mockImplementation(() => undefined)
+}
+
+function spyStdoutWriteTrue() {
+  return vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
+}
+
+function spyExitNoop(): ReturnType<typeof vi.spyOn> {
+  return vi
+    .spyOn(process, 'exit')
+    .mockImplementation((() => undefined) as unknown as typeof process.exit)
+}
+
+async function startInteractiveOnStdin(stdin: TTYStdin) {
+  runInteractive(stdin as NodeJS.ReadableStream)
+  await tick()
+}
+
+async function ttySessionWithSpies(): Promise<{
+  stdin: TTYStdin
+  writeSpy: ReturnType<typeof vi.spyOn>
+}> {
+  resetRecallStateForTesting()
+  return startTTYSessionWithoutRecallReset()
+}
+
+async function startTTYSessionWithoutRecallReset(): Promise<{
+  stdin: TTYStdin
+  writeSpy: ReturnType<typeof vi.spyOn>
+}> {
+  spyConsoleLogNoop()
+  const writeSpy = spyStdoutWriteTrue()
+  spyExitNoop()
+  const stdin = createMockTTYStdin()
+  await startInteractiveOnStdin(stdin)
+  return { stdin, writeSpy }
+}
+
+function endTTYSession(stdin: TTYStdin) {
+  pressKey(stdin, 'c', { ctrl: true })
+  vi.restoreAllMocks()
+}
+
+async function runPipedInteractive(input: string) {
+  const stdin = createMockStdin(input)
+  runInteractive(stdin as NodeJS.ReadableStream)
+  await tick()
+}
+
 describe('processInput', () => {
   let logSpy: ReturnType<typeof vi.spyOn>
 
@@ -270,21 +324,16 @@ describe('processInput', () => {
     expect(logSpy).toHaveBeenCalledWith('Token "Unknown" not found.')
   })
 
-  test('returns false and shows usage for /remove-access-token without label', async () => {
-    expect(await processInput('/remove-access-token ')).toBe(false)
-    expect(logSpy).toHaveBeenCalledWith('Usage: /remove-access-token <label>')
-  })
-
-  test('returns false and shows usage for /remove-access-token-completely without label', async () => {
-    expect(await processInput('/remove-access-token-completely ')).toBe(false)
-    expect(logSpy).toHaveBeenCalledWith(
-      'Usage: /remove-access-token-completely <label>'
-    )
-  })
-
-  test('returns false and shows usage for /create-access-token without label', async () => {
-    expect(await processInput('/create-access-token ')).toBe(false)
-    expect(logSpy).toHaveBeenCalledWith('Usage: /create-access-token <label>')
+  test.each([
+    ['/remove-access-token ', 'Usage: /remove-access-token <label>'],
+    [
+      '/remove-access-token-completely ',
+      'Usage: /remove-access-token-completely <label>',
+    ],
+    ['/create-access-token ', 'Usage: /create-access-token <label>'],
+  ] as const)('returns false and shows usage for %s', async (input, expected) => {
+    expect(await processInput(input)).toBe(false)
+    expect(logSpy).toHaveBeenCalledWith(expected)
   })
 
   test('returns false and shows error for /create-access-token with no default token', async () => {
@@ -507,30 +556,26 @@ describe('processInput', () => {
     )
   })
 
-  test('/stop when in recall substate exits recall mode', async () => {
-    mockRecallNext.mockResolvedValue({
-      type: 'just-review',
-      memoryTrackerId: 1,
-      title: 'Note 1',
-    })
-
+  test.each([
+    {
+      label: 'just-review',
+      recall: {
+        type: 'just-review' as const,
+        memoryTrackerId: 1,
+        title: 'Note 1',
+      },
+    },
+    {
+      label: 'pending load more',
+      recall: {
+        type: 'none' as const,
+        message: '0 notes to recall today',
+      },
+    },
+  ])('/stop when in recall ($label) exits recall mode', async ({ recall }) => {
+    mockRecallNext.mockResolvedValue(recall)
     await processInput('/recall')
     expect(isInRecallSubstate()).toBe(true)
-
-    await processInput('/stop')
-    expect(logSpy).toHaveBeenCalledWith('Stopped recall')
-    expect(isInRecallSubstate()).toBe(false)
-  })
-
-  test('/stop when in recall with pending load more exits recall mode', async () => {
-    mockRecallNext.mockResolvedValue({
-      type: 'none',
-      message: '0 notes to recall today',
-    })
-
-    await processInput('/recall')
-    expect(isInRecallSubstate()).toBe(true)
-
     await processInput('/stop')
     expect(logSpy).toHaveBeenCalledWith('Stopped recall')
     expect(isInRecallSubstate()).toBe(false)
@@ -754,16 +799,14 @@ describe('visibleLength', () => {
 })
 
 describe('renderBox', () => {
-  test('box top border matches the given width', () => {
-    const result = renderBox(['hi'], 100)
-    const top = result.split('\n')[0]
-    expect(top.length).toBe(100)
-  })
-
-  test('box content row matches the given width', () => {
-    const result = renderBox(['hi'], 120)
-    const row = result.split('\n')[1]
-    expect(visibleLength(row)).toBe(120)
+  test.each([
+    { width: 100, check: 'top' as const },
+    { width: 120, check: 'content' as const },
+  ])('box respects width $width ($check row)', ({ width, check }) => {
+    const result = renderBox(['hi'], width)
+    const line = result.split('\n')[check === 'top' ? 0 : 1]
+    if (check === 'top') expect(line.length).toBe(width)
+    else expect(visibleLength(line)).toBe(width)
   })
 
   test('renders a single-line box', () => {
@@ -805,9 +848,6 @@ describe('renderBox', () => {
 })
 
 describe('highlightRecognizedCommand', () => {
-  const boldCyan = '\x1b[1;36m'
-  const reset = '\x1b[0m'
-
   test('returns plain text when line does not start with /', () => {
     expect(highlightRecognizedCommand('hello')).toBe('hello')
   })
@@ -818,12 +858,12 @@ describe('highlightRecognizedCommand', () => {
 
   test('highlights exact command match', () => {
     const result = highlightRecognizedCommand('/help')
-    expect(result).toStrictEqual(`${boldCyan}/help${reset}`)
+    expect(result).toStrictEqual(`${BOLD_CYAN}/help${ANSI_RESET}`)
   })
 
   test('highlights only command part when param follows', () => {
     const result = highlightRecognizedCommand('/add-access-token x')
-    expect(result).toStrictEqual(`${boldCyan}/add-access-token${reset} x`)
+    expect(result).toStrictEqual(`${BOLD_CYAN}/add-access-token${ANSI_RESET} x`)
   })
 
   test('returns plain when no match', () => {
@@ -836,9 +876,6 @@ describe('highlightRecognizedCommand', () => {
 })
 
 describe('buildBoxLines', () => {
-  const boldCyan = '\x1b[1;36m'
-  const reset = '\x1b[0m'
-
   test('empty buffer shows placeholder with prompt', () => {
     const lines = buildBoxLines('', 40)
     expect(lines).toHaveLength(1)
@@ -863,7 +900,7 @@ describe('buildBoxLines', () => {
   test('recognized command gets bold+colored in first line', () => {
     const lines = buildBoxLines('/help', 40)
     expect(lines[0]).toContain('→')
-    expect(lines[0]).toContain(`${boldCyan}/help${reset}`)
+    expect(lines[0]).toContain(`${BOLD_CYAN}/help${ANSI_RESET}`)
   })
 
   test('non-command line has no ANSI highlight', () => {
@@ -874,7 +911,9 @@ describe('buildBoxLines', () => {
 
   test('command with param highlights only command part', () => {
     const lines = buildBoxLines('/add-access-token mylabel', 40)
-    expect(lines[0]).toContain(`${boldCyan}/add-access-token${reset} mylabel`)
+    expect(lines[0]).toContain(
+      `${BOLD_CYAN}/add-access-token${ANSI_RESET} mylabel`
+    )
   })
 
   test('empty buffer in selection mode shows placeholder without arrow', () => {
@@ -950,34 +989,29 @@ describe('buildSuggestionLines', () => {
     expect(lines).toHaveLength(0)
   })
 
-  test('Current guidance lines with ANSI end with RESET (no state bleed)', () => {
-    const widths = [25, 30] as const
-    const buffers = ['/list', '/']
-    for (const buffer of buffers) {
-      for (const width of widths) {
-        const lines = buildSuggestionLines(buffer, 0, width)
-        for (const line of lines) {
-          if (line.includes('\x1b')) {
-            // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI RESET escape, intentional
-            expect(line).toMatch(/\x1b\[0m$/)
-          }
-        }
+  test.each([
+    ['/list', 25],
+    ['/list', 30],
+    ['/', 25],
+    ['/', 30],
+  ] as const)('Current guidance lines with ANSI end with RESET for buffer %s width %s', (buffer, width) => {
+    for (const line of buildSuggestionLines(buffer, 0, width)) {
+      if (line.includes('\x1b')) {
+        // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI RESET escape, intentional
+        expect(line).toMatch(/\x1b\[0m$/)
       }
     }
   })
 })
 
 describe('renderPastInput', () => {
-  test('renders text in grey background with no border', () => {
+  test('single-line hello: grey block, no border, padding, trailing blank, no arrow', () => {
     const result = renderPastInput('hello', 30)
     expect(result).not.toContain('┌')
     expect(result).not.toContain('│')
     expect(result).toContain('hello')
-    expect(result).toContain('\x1b[48;5;236m')
-  })
-
-  test('has empty-line vertical padding inside the box', () => {
-    const result = renderPastInput('hello', 30)
+    expect(result).toContain(GREY_BG_PAST_INPUT)
+    expect(result).not.toContain('→')
     const lines = result.split('\n')
     expect(visibleLength(lines[0])).toBe(28)
     // biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI escapes
@@ -985,17 +1019,7 @@ describe('renderPastInput', () => {
     const lastBgLine = lines[lines.length - 2]
     // biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI escapes
     expect(lastBgLine.replace(/\x1b\[[0-9;]*m/g, '').trim()).toBe('')
-  })
-
-  test('has trailing blank line margin', () => {
-    const result = renderPastInput('hello', 30)
-    const lines = result.split('\n')
     expect(lines[lines.length - 1]).toBe('')
-  })
-
-  test('does not include prompt arrow', () => {
-    const result = renderPastInput('hello', 30)
-    expect(result).not.toContain('→')
   })
 
   test('handles multi-line input', () => {
@@ -1003,7 +1027,7 @@ describe('renderPastInput', () => {
     expect(result).toContain('line1')
     expect(result).toContain('line2')
     const lines = result.split('\n')
-    const bgLines = lines.filter((l) => l.includes('\x1b[48;5;236m'))
+    const bgLines = lines.filter((l) => l.includes(GREY_BG_PAST_INPUT))
     expect(bgLines).toHaveLength(4)
   })
 })
@@ -1026,43 +1050,31 @@ describe('interactive CLI (e2e style)', () => {
   })
 
   test('responds "Not supported" to any input', async () => {
-    const stdin = createMockStdin('hello\nexit\n')
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
+    await runPipedInteractive('hello\nexit\n')
     expect(logSpy).toHaveBeenCalledWith('Not supported')
     expect(exitSpy).toHaveBeenCalledWith(0)
   })
 
   test('shows past input in grey background box', async () => {
-    const stdin = createMockStdin('hello\nexit\n')
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
+    await runPipedInteractive('hello\nexit\n')
     const pastInputCall = logSpy.mock.calls.find(
-      (c) => typeof c[0] === 'string' && c[0].includes('\x1b[48;5;236m')
+      (c) => typeof c[0] === 'string' && c[0].includes(GREY_BG_PAST_INPUT)
     )
     expect(pastInputCall).toBeDefined()
     expect(pastInputCall![0]).toContain('hello')
     expect(pastInputCall![0]).not.toContain('→')
   })
 
-  test('exit command exits the CLI', async () => {
-    const stdin = createMockStdin('exit\n')
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
-    expect(exitSpy).toHaveBeenCalledWith(0)
-  })
-
-  test('/exit command exits the CLI', async () => {
-    const stdin = createMockStdin('/exit\n')
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
+  test.each([
+    ['exit\n', 'exit'],
+    ['/exit\n', '/exit'],
+  ])('%s line exits the CLI', async (input) => {
+    await runPipedInteractive(input)
     expect(exitSpy).toHaveBeenCalledWith(0)
   })
 
   test('each line triggers separate response', async () => {
-    const stdin = createMockStdin('line1\nline2\nexit\n')
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
+    await runPipedInteractive('line1\nline2\nexit\n')
     const notSupportedCalls = logSpy.mock.calls.filter(
       (c) => c[0] === 'Not supported'
     )
@@ -1075,9 +1087,7 @@ describe('interactive CLI (e2e style)', () => {
       writable: true,
       configurable: true,
     })
-    const stdin = createMockStdin('exit\n')
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
+    await runPipedInteractive('exit\n')
     const boxCall = logSpy.mock.calls.find(
       (c) => typeof c[0] === 'string' && c[0].includes('┌')
     )
@@ -1087,9 +1097,7 @@ describe('interactive CLI (e2e style)', () => {
   })
 
   test('shows version, box with placeholder and prompt', async () => {
-    const stdin = createMockStdin('exit\n')
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
+    await runPipedInteractive('exit\n')
     const output = logSpy.mock.calls.flat().join('\n')
     expect(output).toContain('doughnut')
     expect(output).toContain('→')
@@ -1099,463 +1107,414 @@ describe('interactive CLI (e2e style)', () => {
   })
 
   test('shows "  / commands" in the Current guidance when user has not typed /', async () => {
-    const stdin = createMockStdin('exit\n')
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
+    await runPipedInteractive('exit\n')
     const output = logSpy.mock.calls.flat().join('\n')
     expect(output).toContain('  / commands')
     expect(output).toContain('\x1b[90m')
   })
 })
 
-describe('TTY mode slash command suggestions', () => {
-  let writeSpy: ReturnType<typeof vi.spyOn>
-  let _logSpy: ReturnType<typeof vi.spyOn>
-  let stdin: TTYStdin
-
-  beforeEach(async () => {
-    resetRecallStateForTesting()
-    _logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    vi.spyOn(process, 'exit').mockImplementation(
-      (() => undefined) as unknown as typeof process.exit
-    )
-    stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
-  })
-
-  afterEach(() => {
-    pressKey(stdin, 'c', { ctrl: true })
-    vi.restoreAllMocks()
-  })
-
-  test('initial display shows "  / commands" in the Current guidance', () => {
-    const output = ttyOutput(writeSpy)
-    expect(output).toContain('  / commands')
-    expect(output).toContain('\x1b[90m')
-  })
-
-  test('typing non-slash keeps Current guidance hint instead of command list', async () => {
-    writeSpy.mockClear()
-    typeString(stdin, 'h')
-    await tick()
-
-    const output = ttyOutput(writeSpy)
-    expect(output).toContain('  / commands')
-    expect(output).not.toContain('/help                List available commands')
-  })
-
-  test('typing "/" shows command suggestions in the Current guidance', async () => {
-    typeString(stdin, '/')
-    await tick()
-
-    const output = ttyOutput(writeSpy)
-    expect(output).toContain('/help')
-    expect(output).toContain('List available commands')
-    expect(output).toContain('/clear')
-    expect(output).toContain('Clear screen and chat history')
-    expect(output).toContain('/list-access-token')
-    expect(output).toContain('↓ more below')
-  })
-
-  test('first candidate is highlighted with reverse video', async () => {
-    writeSpy.mockClear()
-    typeString(stdin, '/')
-    await tick()
-
-    const output = ttyOutput(writeSpy)
-    const lines = output.split('\n')
-    const suggestionStart = lines.findIndex((l) => l.includes('/help'))
-    expect(suggestionStart).toBeGreaterThanOrEqual(0)
-    expect(lines[suggestionStart]).toContain('\x1b[7m')
-    const laterSuggestion = lines.findIndex(
-      (l) => l.includes('/clear') && !l.includes('\x1b[7m')
-    )
-    expect(laterSuggestion).toBeGreaterThan(suggestionStart)
-  })
-
-  test('Enter inserts highlighted command with space', async () => {
-    typeString(stdin, '/')
-    await tick()
-    pressEnter(stdin)
-    await tick()
-    typeString(stdin, 'x')
-    await tick()
-    pressEnter(stdin)
-    await new Promise((r) => setTimeout(r, 50))
-
-    expect(ttyOutput(writeSpy)).toContain('Not supported')
-  })
-
-  test('prefix filtering shows only matching commands', async () => {
-    writeSpy.mockClear()
-    typeString(stdin, '/add')
-    await tick()
-
-    const output = ttyOutput(writeSpy)
-    expect(output).toContain('/add gmail')
-    const plain = stripAnsi(output)
-    const lastDrawStart = plain.lastIndexOf('→ /add')
-    expect(lastDrawStart).toBeGreaterThanOrEqual(0)
-    expect(plain.slice(lastDrawStart)).not.toContain('/help')
-    expect(plain.slice(lastDrawStart)).not.toContain('/last email')
-  })
-
-  test('Enter with prefix inserts first matching command', async () => {
-    typeString(stdin, '/add')
-    await tick()
-    pressEnter(stdin)
-    await tick()
-    pressEnter(stdin)
-    await new Promise((r) => setTimeout(r, 50))
-
-    expect(ttyOutput(writeSpy)).toContain('/add gmail ')
-  })
-
-  test('no suggestions after space when command inserted', async () => {
-    typeString(stdin, '/')
-    await tick()
-    pressEnter(stdin)
-    await tick()
-
-    const output = ttyOutput(writeSpy)
-    const plain = stripAnsi(output)
-    expect(plain).toContain('→ /help ')
-    const lines = output.split('\n')
-    const lastBoxLineIdx = lines.findLastIndex((l) =>
-      stripAnsi(l).includes('→ /help ')
-    )
-    const afterInsert = lines.slice(lastBoxLineIdx + 1).join('\n')
-    const suggestionLinesAfterInsert = afterInsert
-      .split('\n')
-      .filter(
-        (l) => l.includes('/help') && l.includes('List available commands')
-      )
-    expect(suggestionLinesAfterInsert).toHaveLength(0)
-  })
-
-  test('up at first wraps to last', async () => {
-    writeSpy.mockClear()
-    typeString(stdin, '/')
-    await tick()
-    pressKey(stdin, 'up')
-    await tick()
-
-    const output = ttyOutput(writeSpy)
-    const lines = output.split('\n')
-    const recallLines = lines.filter((l) => l.includes('/recall'))
-    const recallLine = recallLines[recallLines.length - 1]
-    expect(recallLine).toBeDefined()
-    expect(recallLine).toContain('\x1b[7m')
-  })
-
-  test('down at last wraps to first', async () => {
-    writeSpy.mockClear()
-    typeString(stdin, '/')
-    await tick()
-    for (let i = 0; i < 9; i++) {
-      pressKey(stdin, 'down')
-      await tick()
-    }
-
-    const output = ttyOutput(writeSpy)
-    const lines = output.split('\n')
-    const helpLine = lines.find((l) => l.includes('/help'))
-    expect(helpLine).toBeDefined()
-    expect(helpLine).toContain('\x1b[7m')
-  })
-
-  test('ESC when buffer is only "/" dismisses suggestions and clears buffer', async () => {
-    typeString(stdin, '/')
-    await tick()
-    writeSpy.mockClear()
-
-    pressKey(stdin, 'escape')
-    await tick()
-
-    const output = ttyOutput(writeSpy)
-    expect(output).toContain('  / commands')
-    expect(output).not.toContain('/help')
-    expect(output).toContain('`exit` to quit.')
-  })
-
-  test('ESC when partial command "/ex" hides suggestions but keeps buffer', async () => {
-    typeString(stdin, '/ex')
-    await tick()
-    writeSpy.mockClear()
-
-    pressKey(stdin, 'escape')
-    await tick()
-
-    const output = ttyOutput(writeSpy)
-    const plain = stripAnsi(output)
-    expect(plain).toContain('→ /ex')
-    expect(output).toContain('  / commands')
-    expect(output).not.toContain('/exit')
-    expect(output).not.toContain('/help')
-  })
-
-  test('Enter inserts highlighted command', async () => {
-    writeSpy.mockClear()
-    typeString(stdin, '/')
-    await tick()
-    for (let i = 0; i < 9; i++) {
-      pressKey(stdin, 'down')
-      await tick()
-    }
-    pressEnter(stdin)
-    await tick()
-
-    expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /last email ')
-  })
-
-  test('Tab with /he completes to /help with space', async () => {
-    typeString(stdin, '/he')
-    await tick()
-    writeSpy.mockClear()
-
-    pressKey(stdin, 'tab')
-    await tick()
-
-    expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /help ')
-  })
-
-  test('Tab with /rec completes to common prefix /recall', async () => {
-    typeString(stdin, '/rec')
-    await tick()
-    writeSpy.mockClear()
-
-    pressKey(stdin, 'tab')
-    await tick()
-
-    expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /recall')
-  })
-
-  test('Tab with /unknown does nothing', async () => {
-    typeString(stdin, '/unknown')
-    await tick()
-
-    pressKey(stdin, 'tab')
-    await tick()
-
-    expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /unknown')
-  })
-
-  test('Tab when buffer has no leading slash does nothing', async () => {
-    typeString(stdin, 'hello')
-    await tick()
-
-    pressKey(stdin, 'tab')
-    await tick()
-
-    expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ hello')
-  })
-
-  test('Tab with single match shows completed command', async () => {
-    typeString(stdin, '/add-a')
-    await tick()
-    writeSpy.mockClear()
-
-    pressKey(stdin, 'tab')
-    await tick()
-
-    expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /add-access-token ')
-  })
-
-  test('/clear clears screen and redraws prompt box', async () => {
-    typeString(stdin, '/help ')
-    await tick()
-    pressEnter(stdin)
-    await tick()
-    typeString(stdin, '/clear')
-    await tick()
-    writeSpy.mockClear()
-
-    pressEnter(stdin)
-    await tick()
-
-    const output = ttyOutput(writeSpy)
-    expect(output).toContain('\x1b[H\x1b[2J')
-    expect(output).toContain('doughnut')
-    expect(output).toContain('┌')
-    expect(output).toContain('┘')
-    expect(output).toContain('→')
-  })
-
-  test('after /clear, Enter on empty input does not show duplicate input box top border', async () => {
-    typeString(stdin, '/clear')
-    await tick()
-    pressEnter(stdin)
-    await tick()
-    writeSpy.mockClear()
-
-    pressEnter(stdin)
-    await tick()
-
-    const output = ttyOutput(writeSpy)
-    const visualOutput = simulatedScreenFromTtyWrites(output)
-    const boxTopLines = visualOutput
-      .split('\n')
-      .filter((l) =>
-        INPUT_BOX_TOP_OUTLINE_PATTERN.test(stripAnsiCsiAndCr(l).trim())
-      )
-    expect(boxTopLines).toHaveLength(1)
-  })
-
-  test('after /help then /clear, run /help again shows help output', async () => {
-    typeString(stdin, '/help ')
-    await tick()
-    pressEnter(stdin)
-    await tick()
-    typeString(stdin, '/clear')
-    await tick()
-    pressEnter(stdin)
-    await tick()
-    writeSpy.mockClear()
-
-    typeString(stdin, '/help ')
-    await tick()
-    pressEnter(stdin)
-    await tick()
-
-    const output = ttyOutput(writeSpy)
-    expect(stripAnsi(output)).toContain('/help')
-    expect(stripAnsi(output)).toContain('List available commands')
-  })
-
-  test('after /clear then Enter, input box has exactly one top border (no double border)', async () => {
-    typeString(stdin, '/clear')
-    await tick()
-    pressEnter(stdin)
-    await tick()
-    writeSpy.mockClear()
-    pressEnter(stdin)
-    await tick()
-
-    const output = ttyOutput(writeSpy)
-    expect(countInputBoxTopOutlinesBeforeFirstBoxContent(output)).toBe(1)
-  })
-
-  test('after /help, there is one empty line between history output and input box', async () => {
-    writeSpy.mockClear()
-    await submitTTYCommand(stdin, '/help')
-
-    const visualOutput = simulatedScreenFromTtyWrites(ttyOutput(writeSpy))
-    const lines = visualOutput.split('\n').map((l) => stripAnsiCsiAndCr(l))
-    const boxTopIndex = lines.findIndex((l) => /^┌─+┐$/.test(l.trim()))
-    expect(boxTopIndex).toBeGreaterThan(0)
-    expect(lines[boxTopIndex - 1]).toBe('')
-  })
-})
-
-describe('TTY empty Enter redraw (regression)', () => {
+describe('TTY: shared interactive session', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
   let stdin: TTYStdin
 
   beforeEach(async () => {
-    resetRecallStateForTesting()
-    vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    vi.spyOn(process, 'exit').mockImplementation(
-      (() => undefined) as unknown as typeof process.exit
-    )
-    stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
+    ;({ stdin, writeSpy } = await ttySessionWithSpies())
   })
 
   afterEach(() => {
-    pressKey(stdin, 'c', { ctrl: true })
-    vi.restoreAllMocks()
+    endTTYSession(stdin)
   })
 
-  test('empty Enter redraw must not emit a stale cursor-up before the input box top', async () => {
-    writeSpy.mockClear()
-    pressEnter(stdin)
-    await tick()
-    await tick()
-
-    const output = ttyOutput(writeSpy)
-    expect(
-      liveRegionRepaintHasStaleCursorUpBeforeBoxTop(output),
-      `Stale double cursor-up before \\r\\x1b[2K┌ — input box shifts up (prefix tail): ${JSON.stringify(output.slice(Math.max(0, output.indexOf('\r\x1b[2K┌') - 40), output.indexOf('\r\x1b[2K┌') + 5))}`
-    ).toBe(false)
-  })
-
-  test('after blank submits, full redraw must not paint past-input grey blocks (history parity)', async () => {
-    const greyBgPastInput = '\x1b[48;5;236m'
-
-    writeSpy.mockClear()
-    process.stdout.emit('resize')
-    await tick()
-    const redrawBaseline = ttyOutput(writeSpy)
-    const baselineMatches = redrawBaseline.split(greyBgPastInput).length - 1
-    expect(
-      baselineMatches,
-      'baseline resize should not use GREY_BG (only renderPastInput uses this code)'
-    ).toBe(0)
-
-    writeSpy.mockClear()
-    pressEnter(stdin)
-    await tick()
-    pressEnter(stdin)
-    await tick()
-
-    writeSpy.mockClear()
-    process.stdout.emit('resize')
-    await tick()
-
-    const redrawAfterEmptySubmits = ttyOutput(writeSpy)
-    expect(
-      redrawAfterEmptySubmits.split(greyBgPastInput).length - 1,
-      'blank Enter must not add history rows that only appear on full redraw'
-    ).toBe(baselineMatches)
-  })
-})
-
-describe('TTY mode resize', () => {
-  let writeSpy: ReturnType<typeof vi.spyOn>
-  let stdin: TTYStdin
-
-  beforeEach(async () => {
-    resetRecallStateForTesting()
-    vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    vi.spyOn(process, 'exit').mockImplementation(
-      (() => undefined) as unknown as typeof process.exit
-    )
-    stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
-  })
-
-  afterEach(() => {
-    pressKey(stdin, 'c', { ctrl: true })
-    vi.restoreAllMocks()
-  })
-
-  test('resize triggers full clear and re-render with new width', async () => {
-    typeString(stdin, 'hello')
-    await tick()
-    pressEnter(stdin)
-    await tick()
-
-    writeSpy.mockClear()
-    Object.defineProperty(process.stdout, 'columns', {
-      value: 50,
-      writable: true,
-      configurable: true,
+  describe('slash command suggestions', () => {
+    test('initial display shows "  / commands" in the Current guidance', () => {
+      const output = ttyOutput(writeSpy)
+      expect(output).toContain('  / commands')
+      expect(output).toContain('\x1b[90m')
     })
-    process.stdout.emit('resize')
-    await tick()
 
-    const output = ttyOutput(writeSpy)
-    expect(output).toContain('\x1b[H\x1b[2J')
-    const boxTopMatch = output.match(/┌─+┐/)
-    expect(boxTopMatch).toBeTruthy()
-    expect(stripAnsi(boxTopMatch![0]).length).toBe(50)
-    expect(output).toContain('hello')
+    test('typing non-slash keeps Current guidance hint instead of command list', async () => {
+      writeSpy.mockClear()
+      typeString(stdin, 'h')
+      await tick()
+
+      const output = ttyOutput(writeSpy)
+      expect(output).toContain('  / commands')
+      expect(output).not.toContain(
+        '/help                List available commands'
+      )
+    })
+
+    test('typing "/" shows command suggestions in the Current guidance', async () => {
+      typeString(stdin, '/')
+      await tick()
+
+      const output = ttyOutput(writeSpy)
+      expect(output).toContain('/help')
+      expect(output).toContain('List available commands')
+      expect(output).toContain('/clear')
+      expect(output).toContain('Clear screen and chat history')
+      expect(output).toContain('/list-access-token')
+      expect(output).toContain('↓ more below')
+    })
+
+    test('first candidate is highlighted with reverse video', async () => {
+      writeSpy.mockClear()
+      typeString(stdin, '/')
+      await tick()
+
+      const output = ttyOutput(writeSpy)
+      const lines = output.split('\n')
+      const suggestionStart = lines.findIndex((l) => l.includes('/help'))
+      expect(suggestionStart).toBeGreaterThanOrEqual(0)
+      expect(lines[suggestionStart]).toContain('\x1b[7m')
+      const laterSuggestion = lines.findIndex(
+        (l) => l.includes('/clear') && !l.includes('\x1b[7m')
+      )
+      expect(laterSuggestion).toBeGreaterThan(suggestionStart)
+    })
+
+    test('Enter inserts highlighted command with space', async () => {
+      typeString(stdin, '/')
+      await tick()
+      pressEnter(stdin)
+      await tick()
+      typeString(stdin, 'x')
+      await tick()
+      pressEnter(stdin)
+      await new Promise((r) => setTimeout(r, 50))
+
+      expect(ttyOutput(writeSpy)).toContain('Not supported')
+    })
+
+    test('prefix filtering shows only matching commands', async () => {
+      writeSpy.mockClear()
+      typeString(stdin, '/add')
+      await tick()
+
+      const output = ttyOutput(writeSpy)
+      expect(output).toContain('/add gmail')
+      const plain = stripAnsi(output)
+      const lastDrawStart = plain.lastIndexOf('→ /add')
+      expect(lastDrawStart).toBeGreaterThanOrEqual(0)
+      expect(plain.slice(lastDrawStart)).not.toContain('/help')
+      expect(plain.slice(lastDrawStart)).not.toContain('/last email')
+    })
+
+    test('Enter with prefix inserts first matching command', async () => {
+      typeString(stdin, '/add')
+      await tick()
+      pressEnter(stdin)
+      await tick()
+      pressEnter(stdin)
+      await new Promise((r) => setTimeout(r, 50))
+
+      expect(ttyOutput(writeSpy)).toContain('/add gmail ')
+    })
+
+    test('no suggestions after space when command inserted', async () => {
+      typeString(stdin, '/')
+      await tick()
+      pressEnter(stdin)
+      await tick()
+
+      const output = ttyOutput(writeSpy)
+      const plain = stripAnsi(output)
+      expect(plain).toContain('→ /help ')
+      const lines = output.split('\n')
+      const lastBoxLineIdx = lines.findLastIndex((l) =>
+        stripAnsi(l).includes('→ /help ')
+      )
+      const afterInsert = lines.slice(lastBoxLineIdx + 1).join('\n')
+      const suggestionLinesAfterInsert = afterInsert
+        .split('\n')
+        .filter(
+          (l) => l.includes('/help') && l.includes('List available commands')
+        )
+      expect(suggestionLinesAfterInsert).toHaveLength(0)
+    })
+
+    test('up at first wraps to last', async () => {
+      writeSpy.mockClear()
+      typeString(stdin, '/')
+      await tick()
+      pressKey(stdin, 'up')
+      await tick()
+
+      const output = ttyOutput(writeSpy)
+      const lines = output.split('\n')
+      const recallLines = lines.filter((l) => l.includes('/recall'))
+      const recallLine = recallLines[recallLines.length - 1]
+      expect(recallLine).toBeDefined()
+      expect(recallLine).toContain('\x1b[7m')
+    })
+
+    test('down at last wraps to first', async () => {
+      writeSpy.mockClear()
+      typeString(stdin, '/')
+      await tick()
+      for (let i = 0; i < 9; i++) {
+        pressKey(stdin, 'down')
+        await tick()
+      }
+
+      const output = ttyOutput(writeSpy)
+      const lines = output.split('\n')
+      const helpLine = lines.find((l) => l.includes('/help'))
+      expect(helpLine).toBeDefined()
+      expect(helpLine).toContain('\x1b[7m')
+    })
+
+    test('ESC when buffer is only "/" dismisses suggestions and clears buffer', async () => {
+      typeString(stdin, '/')
+      await tick()
+      writeSpy.mockClear()
+
+      pressKey(stdin, 'escape')
+      await tick()
+
+      const output = ttyOutput(writeSpy)
+      expect(output).toContain('  / commands')
+      expect(output).not.toContain('/help')
+      expect(output).toContain('`exit` to quit.')
+    })
+
+    test('ESC when partial command "/ex" hides suggestions but keeps buffer', async () => {
+      typeString(stdin, '/ex')
+      await tick()
+      writeSpy.mockClear()
+
+      pressKey(stdin, 'escape')
+      await tick()
+
+      const output = ttyOutput(writeSpy)
+      const plain = stripAnsi(output)
+      expect(plain).toContain('→ /ex')
+      expect(output).toContain('  / commands')
+      expect(output).not.toContain('/exit')
+      expect(output).not.toContain('/help')
+    })
+
+    test('Enter inserts highlighted command', async () => {
+      writeSpy.mockClear()
+      typeString(stdin, '/')
+      await tick()
+      for (let i = 0; i < 9; i++) {
+        pressKey(stdin, 'down')
+        await tick()
+      }
+      pressEnter(stdin)
+      await tick()
+
+      expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /last email ')
+    })
+
+    test('Tab with /he completes to /help with space', async () => {
+      typeString(stdin, '/he')
+      await tick()
+      writeSpy.mockClear()
+
+      pressKey(stdin, 'tab')
+      await tick()
+
+      expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /help ')
+    })
+
+    test('Tab with /rec completes to common prefix /recall', async () => {
+      typeString(stdin, '/rec')
+      await tick()
+      writeSpy.mockClear()
+
+      pressKey(stdin, 'tab')
+      await tick()
+
+      expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /recall')
+    })
+
+    test('Tab with /unknown does nothing', async () => {
+      typeString(stdin, '/unknown')
+      await tick()
+
+      pressKey(stdin, 'tab')
+      await tick()
+
+      expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /unknown')
+    })
+
+    test('Tab when buffer has no leading slash does nothing', async () => {
+      typeString(stdin, 'hello')
+      await tick()
+
+      pressKey(stdin, 'tab')
+      await tick()
+
+      expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ hello')
+    })
+
+    test('Tab with single match shows completed command', async () => {
+      typeString(stdin, '/add-a')
+      await tick()
+      writeSpy.mockClear()
+
+      pressKey(stdin, 'tab')
+      await tick()
+
+      expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /add-access-token ')
+    })
+
+    test('/clear clears screen and redraws prompt box', async () => {
+      typeString(stdin, '/help ')
+      await tick()
+      pressEnter(stdin)
+      await tick()
+      typeString(stdin, '/clear')
+      await tick()
+      writeSpy.mockClear()
+
+      pressEnter(stdin)
+      await tick()
+
+      const output = ttyOutput(writeSpy)
+      expect(output).toContain('\x1b[H\x1b[2J')
+      expect(output).toContain('doughnut')
+      expect(output).toContain('┌')
+      expect(output).toContain('┘')
+      expect(output).toContain('→')
+    })
+
+    test('after /clear, Enter on empty input does not show duplicate input box top border', async () => {
+      typeString(stdin, '/clear')
+      await tick()
+      pressEnter(stdin)
+      await tick()
+      writeSpy.mockClear()
+
+      pressEnter(stdin)
+      await tick()
+
+      const output = ttyOutput(writeSpy)
+      const visualOutput = simulatedScreenFromTtyWrites(output)
+      const boxTopLines = visualOutput
+        .split('\n')
+        .filter((l) =>
+          INPUT_BOX_TOP_OUTLINE_PATTERN.test(stripAnsiCsiAndCr(l).trim())
+        )
+      expect(boxTopLines).toHaveLength(1)
+    })
+
+    test('after /help then /clear, run /help again shows help output', async () => {
+      typeString(stdin, '/help ')
+      await tick()
+      pressEnter(stdin)
+      await tick()
+      typeString(stdin, '/clear')
+      await tick()
+      pressEnter(stdin)
+      await tick()
+      writeSpy.mockClear()
+
+      typeString(stdin, '/help ')
+      await tick()
+      pressEnter(stdin)
+      await tick()
+
+      const output = ttyOutput(writeSpy)
+      expect(stripAnsi(output)).toContain('/help')
+      expect(stripAnsi(output)).toContain('List available commands')
+    })
+
+    test('after /clear then Enter, input box has exactly one top border (no double border)', async () => {
+      typeString(stdin, '/clear')
+      await tick()
+      pressEnter(stdin)
+      await tick()
+      writeSpy.mockClear()
+      pressEnter(stdin)
+      await tick()
+
+      const output = ttyOutput(writeSpy)
+      expect(countInputBoxTopOutlinesBeforeFirstBoxContent(output)).toBe(1)
+    })
+
+    test('after /help, there is one empty line between history output and input box', async () => {
+      writeSpy.mockClear()
+      await submitTTYCommand(stdin, '/help')
+
+      const visualOutput = simulatedScreenFromTtyWrites(ttyOutput(writeSpy))
+      const lines = visualOutput.split('\n').map((l) => stripAnsiCsiAndCr(l))
+      const boxTopIndex = lines.findIndex((l) => /^┌─+┐$/.test(l.trim()))
+      expect(boxTopIndex).toBeGreaterThan(0)
+      expect(lines[boxTopIndex - 1]).toBe('')
+    })
+  })
+
+  describe('empty Enter redraw (regression)', () => {
+    test('empty Enter redraw must not emit a stale cursor-up before the input box top', async () => {
+      writeSpy.mockClear()
+      pressEnter(stdin)
+      await tick()
+      await tick()
+
+      const output = ttyOutput(writeSpy)
+      expect(
+        liveRegionRepaintHasStaleCursorUpBeforeBoxTop(output),
+        `Stale double cursor-up before \\r\\x1b[2K┌ — input box shifts up (prefix tail): ${JSON.stringify(output.slice(Math.max(0, output.indexOf('\r\x1b[2K┌') - 40), output.indexOf('\r\x1b[2K┌') + 5))}`
+      ).toBe(false)
+    })
+
+    test('after blank submits, full redraw must not paint past-input grey blocks (history parity)', async () => {
+      writeSpy.mockClear()
+      process.stdout.emit('resize')
+      await tick()
+      const redrawBaseline = ttyOutput(writeSpy)
+      const baselineMatches =
+        redrawBaseline.split(GREY_BG_PAST_INPUT).length - 1
+      expect(
+        baselineMatches,
+        'baseline resize should not use GREY_BG (only renderPastInput uses this code)'
+      ).toBe(0)
+
+      writeSpy.mockClear()
+      pressEnter(stdin)
+      await tick()
+      pressEnter(stdin)
+      await tick()
+
+      writeSpy.mockClear()
+      process.stdout.emit('resize')
+      await tick()
+
+      const redrawAfterEmptySubmits = ttyOutput(writeSpy)
+      expect(
+        redrawAfterEmptySubmits.split(GREY_BG_PAST_INPUT).length - 1,
+        'blank Enter must not add history rows that only appear on full redraw'
+      ).toBe(baselineMatches)
+    })
+  })
+
+  describe('resize', () => {
+    test('resize triggers full clear and re-render with new width', async () => {
+      typeString(stdin, 'hello')
+      await tick()
+      pressEnter(stdin)
+      await tick()
+
+      writeSpy.mockClear()
+      Object.defineProperty(process.stdout, 'columns', {
+        value: 50,
+        writable: true,
+        configurable: true,
+      })
+      process.stdout.emit('resize')
+      await tick()
+
+      const output = ttyOutput(writeSpy)
+      expect(output).toContain('\x1b[H\x1b[2J')
+      const boxTopMatch = output.match(/┌─+┐/)
+      expect(boxTopMatch).toBeTruthy()
+      expect(stripAnsi(boxTopMatch![0]).length).toBe(50)
+      expect(output).toContain('hello')
+    })
   })
 })
 
@@ -1566,20 +1525,12 @@ describe('TTY mode slash command suggestions with scroll', () => {
   beforeEach(async () => {
     resetRecallStateForTesting()
     useManyCommandsForScrollTests = true
-    vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    vi.spyOn(process, 'exit').mockImplementation(
-      (() => undefined) as unknown as typeof process.exit
-    )
-    stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
+    ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
   })
 
   afterEach(() => {
     useManyCommandsForScrollTests = false
-    pressKey(stdin, 'c', { ctrl: true })
-    vi.restoreAllMocks()
+    endTTYSession(stdin)
   })
 
   test('shows "↑ more above" when scrolled down', async () => {
@@ -1617,26 +1568,19 @@ describe('TTY token list interactive mode', () => {
 
   beforeEach(async () => {
     resetRecallStateForTesting()
-    const configDir = makeTempConfigDir([
-      { label: 'Alpha', token: 'a' },
-      { label: 'Beta', token: 'b' },
-      { label: 'Gamma', token: 'c' },
-    ])
-    restoreConfigDir = withConfigDir(configDir)
-    vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    vi.spyOn(process, 'exit').mockImplementation(
-      (() => undefined) as unknown as typeof process.exit
+    restoreConfigDir = withConfigDir(
+      makeTempConfigDir([
+        { label: 'Alpha', token: 'a' },
+        { label: 'Beta', token: 'b' },
+        { label: 'Gamma', token: 'c' },
+      ])
     )
-    stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
+    ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
   })
 
   afterEach(() => {
     restoreConfigDir()
-    pressKey(stdin, 'c', { ctrl: true })
-    vi.restoreAllMocks()
+    endTTYSession(stdin)
   })
 
   test('cursor is at input box row after /list-access-token with Current prompt', async () => {
@@ -1769,37 +1713,23 @@ describe('TTY token list interactive mode', () => {
     expect(getDefaultTokenLabel()).toBe('Beta')
   })
 
-  test('in selection mode, input box borders are all gray including right', async () => {
+  test('selection mode: gray borders (no reset before right │), no arrow, hidden cursor, grayed chrome', async () => {
     await submitTTYCommand(stdin, '/list-access-token')
     const output = ttyOutput(writeSpy)
+    expect(output).toContain('\x1b[?25l')
+    expect(output).toContain('\x1b[90m┌')
+    const tokenListBoxSection = output.slice(
+      output.lastIndexOf('Select and enter')
+    )
+    expect(tokenListBoxSection).not.toContain('→')
     const boxSection = output.slice(output.indexOf('Select and enter'))
     const boxLines = boxSection
       .split('\n')
       .filter((l) => l.includes('┌') || l.includes('│') || l.includes('└'))
     for (const line of boxLines) {
       // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI escape codes for terminal output assertion
-      const resetBeforeRightBorder = /\x1b\[0m\s*│/.test(line)
-      expect(resetBeforeRightBorder).toBe(false)
+      expect(/\x1b\[0m\s*│/.test(line)).toBe(false)
     }
-  })
-
-  test('in selection mode, input box has no arrow prompt', async () => {
-    await submitTTYCommand(stdin, '/list-access-token')
-    const output = ttyOutput(writeSpy)
-    const tokenListBoxSection = output.slice(
-      output.lastIndexOf('Select and enter')
-    )
-    expect(tokenListBoxSection).not.toContain('→')
-  })
-
-  test('in token list mode, cursor is hidden', async () => {
-    await submitTTYCommand(stdin, '/list-access-token')
-    expect(ttyOutput(writeSpy)).toContain('\x1b[?25l')
-  })
-
-  test('in token list mode, input box is grayed out', async () => {
-    await submitTTYCommand(stdin, '/list-access-token')
-    expect(ttyOutput(writeSpy)).toContain('\x1b[90m┌')
   })
 
   test('any other key cancels token list and shows Cancelled by user. in history', async () => {
@@ -1912,19 +1842,11 @@ describe('TTY MCQ choice selection', () => {
       choices: ['4', '3', '5'],
     })
     mockAnswerQuiz.mockResolvedValue({ correct: true })
-    vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    vi.spyOn(process, 'exit').mockImplementation(
-      (() => undefined) as unknown as typeof process.exit
-    )
-    stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
+    ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
   })
 
   afterEach(() => {
-    pressKey(stdin, 'c', { ctrl: true })
-    vi.restoreAllMocks()
+    endTTYSession(stdin)
   })
 
   test('down arrow moves highlight to second choice', async () => {
@@ -2015,20 +1937,11 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(async () => {
-    resetRecallStateForTesting()
-    vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    vi.spyOn(process, 'exit').mockImplementation(
-      (() => undefined) as unknown as typeof process.exit
-    )
-    stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
+    ;({ stdin, writeSpy } = await ttySessionWithSpies())
   })
 
   afterEach(() => {
-    pressKey(stdin, 'c', { ctrl: true })
-    vi.restoreAllMocks()
+    endTTYSession(stdin)
   })
 
   test('ESC in spelling prompt exits recall mode', async () => {
@@ -2095,19 +2008,11 @@ describe('TTY recall load wait — Esc cancels', () => {
         })
       })
     })
-    vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    vi.spyOn(process, 'exit').mockImplementation(
-      (() => undefined) as unknown as typeof process.exit
-    )
-    stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
+    ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
   })
 
   afterEach(() => {
-    pressKey(stdin, 'c', { ctrl: true })
-    vi.restoreAllMocks()
+    endTTYSession(stdin)
   })
 
   test('Esc aborts recall fetch and shows Cancelled by user.', async () => {
@@ -2136,19 +2041,11 @@ describe('TTY recall-status wait — Esc cancels', () => {
         })
       })
     })
-    vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    vi.spyOn(process, 'exit').mockImplementation(
-      (() => undefined) as unknown as typeof process.exit
-    )
-    stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
+    ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
   })
 
   afterEach(async () => {
-    pressKey(stdin, 'c', { ctrl: true })
-    vi.restoreAllMocks()
+    endTTYSession(stdin)
     const actual =
       await vi.importActual<typeof import('../src/recall.js')>(
         '../src/recall.js'
@@ -2190,19 +2087,11 @@ describe('TTY contest wait — Esc cancels', () => {
         })
       })
     })
-    vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    vi.spyOn(process, 'exit').mockImplementation(
-      (() => undefined) as unknown as typeof process.exit
-    )
-    stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
+    ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
   })
 
   afterEach(() => {
-    pressKey(stdin, 'c', { ctrl: true })
-    vi.restoreAllMocks()
+    endTTYSession(stdin)
   })
 
   test('Esc aborts contest fetch and shows Cancelled by user.', async () => {
@@ -2231,19 +2120,11 @@ describe('TTY: normal command output must not full-screen clear', () => {
     resetRecallStateForTesting()
     mockRecallStatus.mockReset()
     mockRecallStatus.mockResolvedValue('0 notes to recall today')
-    vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    vi.spyOn(process, 'exit').mockImplementation(
-      (() => undefined) as unknown as typeof process.exit
-    )
-    stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
+    ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
   })
 
   afterEach(async () => {
-    pressKey(stdin, 'c', { ctrl: true })
-    vi.restoreAllMocks()
+    endTTYSession(stdin)
     const actual =
       await vi.importActual<typeof import('../src/recall.js')>(
         '../src/recall.js'
@@ -2253,25 +2134,13 @@ describe('TTY: normal command output must not full-screen clear', () => {
     )
   })
 
-  test('after /help, stdout writes must not include CLEAR_SCREEN', async () => {
+  test.each([
+    ['/help', 'List available commands'],
+    ['/recall-status', '0 notes to recall today'],
+  ] as const)('after %s, stdout writes must not include CLEAR_SCREEN', async (cmd, waitForText) => {
     writeSpy.mockClear()
-    await submitTTYCommand(stdin, '/help')
-    await vi.waitFor(() =>
-      expect(ttyOutput(writeSpy)).toContain('List available commands')
-    )
-
-    expect(
-      ttyOutput(writeSpy),
-      'Command output should append to history without full-screen clear; only /clear and resize should emit CLEAR_SCREEN'
-    ).not.toContain(CLEAR_SCREEN)
-  })
-
-  test('after /recall-status, stdout writes must not include CLEAR_SCREEN', async () => {
-    writeSpy.mockClear()
-    await submitTTYCommand(stdin, '/recall-status')
-    await vi.waitFor(() =>
-      expect(ttyOutput(writeSpy)).toContain('0 notes to recall today')
-    )
+    await submitTTYCommand(stdin, cmd)
+    await vi.waitFor(() => expect(ttyOutput(writeSpy)).toContain(waitForText))
 
     expect(
       ttyOutput(writeSpy),
@@ -2287,19 +2156,15 @@ describe('TTY exit: no full-screen redraw', () => {
 
   beforeEach(async () => {
     resetRecallStateForTesting()
-    vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    exitSpy = vi
-      .spyOn(process, 'exit')
-      .mockImplementation((() => undefined) as unknown as typeof process.exit)
+    spyConsoleLogNoop()
+    writeSpy = spyStdoutWriteTrue()
+    exitSpy = spyExitNoop()
     stdin = createMockTTYStdin()
-    runInteractive(stdin as NodeJS.ReadableStream)
-    await tick()
+    await startInteractiveOnStdin(stdin)
   })
 
   afterEach(() => {
-    pressKey(stdin, 'c', { ctrl: true })
-    vi.restoreAllMocks()
+    endTTYSession(stdin)
   })
 
   test('after Enter on exit, stdout must not clear and repaint the full UI (cursor must not land in input box)', async () => {
