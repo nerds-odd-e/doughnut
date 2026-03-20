@@ -113,23 +113,22 @@ Phase 4 implementation note:
 | **Access token invalid** | HTTP **401**, refresh failure, token rejected by API | Re-authenticate or regenerate token. |
 | **No permission** (optional same phase if small) | HTTP **403** | Distinct from “bad token” where the API distinguishes it. |
 
-**Implementation sketch:** Centralize mapping in one place (e.g. extend **`withBackendClient`** / a small **`cli/src/backendErrors.ts`** helper) that inspects **`cause`**, **`response.status`**, and existing token helpers in **`accessToken.ts`**. Reuse **`throwOnError`** thrown shapes from the generated client where they expose status.
+**Implementation sketch:** Map throwables to user copy inside **`withBackendClient`** in **`cli/src/accessToken.ts`** (inspect **`cause`**, optional **`response.status`**). Reuse **`throwOnError`** thrown shapes from the generated client where they expose status.
 
-**Tests:** Unit tests in **`accessToken.test.ts`** / **`recall.test.ts`** (or a focused **`backendErrors.test.ts`**) with **mocked** network errors, 401, 403, and “no token” preconditions — assert **exact or stable substring** messages per class. E2E only if an existing CLI feature already asserts error text; avoid flaky network E2E.
+**Tests:** Unit tests in **`accessToken.test.ts`** / **`recall.test.ts`** with **mocked** network errors, 401, 403, and “no token” preconditions — assert **exact or stable substring** messages per class. E2E only if an existing CLI feature already asserts error text; avoid flaky network E2E.
 
 Phase 5 implementation note:
 
-- Added centralized error copy mapping in `cli/src/backendErrors.ts`, used by `withBackendClient` in `cli/src/accessToken.ts`.
+- User-visible messages for SDK failures live next to `withBackendClient` in `cli/src/accessToken.ts` (same module as the only caller).
 - Classified at least these classes: network/service unavailable, HTTP 401 invalid-or-expired token, HTTP 403 no-permission.
-- Added unit coverage in `cli/tests/backendErrors.test.ts` plus command-path assertions in `cli/tests/accessToken.test.ts` and `cli/tests/recall.test.ts`.
+- Covered by `cli/tests/accessToken.test.ts` and `cli/tests/recall.test.ts`.
 
 ---
 
 ## Files likely touched (when implementing)
 
 - `cli/src/recall.ts` — `throwOnError`, no silent `data` fallback on failure  
-- `cli/src/accessToken.ts` — `throwOnError` on `UserController.*`; token presence / **`withBackendClient`** error mapping (Phase 5)  
-- `cli/src/backendErrors.ts` (or equivalent) — Phase 5: classify fetch vs HTTP status vs missing token → message  
+- `cli/src/accessToken.ts` — `throwOnError` on `UserController.*`; token presence; **`withBackendClient`** error mapping (Phase 5)  
 - `cli/src/adapters/ttyAdapter.ts` — log routing, possibly token-list **`writeError`** alignment  
 - `cli/src/types.ts` — `OutputAdapter`, `ChatHistoryOutputEntry`  
 - `cli/src/renderer.ts` — `renderFullDisplay` output line styling  

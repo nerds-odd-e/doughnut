@@ -8,7 +8,6 @@ import {
   type UserToken,
 } from 'doughnut-api'
 import { getConfigDir } from './configDir.js'
-import { userMessageFromBackendError } from './backendErrors.js'
 import { isFetchAbortedByCaller } from './fetchAbort.js'
 
 /**
@@ -16,13 +15,82 @@ import { isFetchAbortedByCaller } from './fetchAbort.js'
  * {@link withBackendClient} / {@link runWithDefaultBackendClient}: non-OK responses and
  * fetch failures throw instead of returning `{ error }`.
  */
-export function doughnutSdkOptions(signal?: AbortSignal): {
+export type DoughnutSdkCallOptions = {
   throwOnError: true
   signal?: AbortSignal
-} {
+}
+
+export function doughnutSdkOptions(
+  signal?: AbortSignal
+): DoughnutSdkCallOptions {
   return signal === undefined
     ? { throwOnError: true }
     : { throwOnError: true, signal }
+}
+
+/**
+ * What we tell the user after {@link withBackendClient} catches a throwable from the SDK
+ * (`throwOnError: true`). Distinct from “no token in local config” (see
+ * {@link authenticatedBackendCallFailureAdvice.noDefaultTokenInConfig}).
+ */
+const authenticatedBackendCallFailureAdvice = {
+  noDefaultTokenInConfig:
+    'No default access token. Add one first with /add-access-token.',
+  serviceUnreachableOrUnclassifiedFailure:
+    'Doughnut service is not available. Check DOUGHNUT_API_BASE_URL and ensure the service is running.',
+  http401StoredTokenRejected:
+    'Access token is invalid or expired. Run doughnut login or add a new token with /add-access-token.',
+  http403StoredTokenForbidden:
+    'Access token does not have permission for this operation. Contact support if you believe this is an error.',
+} as const
+
+/** Values `throwOnError` may throw: parsed JSON body, string body, `TypeError: fetch failed`, etc. */
+type SdkThrowable = unknown
+
+function httpStatusFromSdkThrowable(cause: SdkThrowable): number | undefined {
+  if (typeof cause !== 'object' || cause === null) return undefined
+  const o = cause as Record<string, unknown>
+  if (typeof o.status === 'number' && Number.isFinite(o.status)) {
+    return o.status
+  }
+  const res = o.response
+  if (typeof res === 'object' && res !== null) {
+    const s = (res as Record<string, unknown>).status
+    if (typeof s === 'number' && Number.isFinite(s)) return s
+  }
+  return undefined
+}
+
+function isLikelyTransportLayerFailure(cause: SdkThrowable): boolean {
+  if (typeof cause !== 'object' || cause === null) return false
+  const code = (cause as NodeJS.ErrnoException).code
+  if (
+    code === 'ECONNREFUSED' ||
+    code === 'ENOTFOUND' ||
+    code === 'ETIMEDOUT' ||
+    code === 'ECONNRESET'
+  ) {
+    return true
+  }
+  if (cause instanceof TypeError && /fetch failed/i.test(cause.message)) {
+    return true
+  }
+  const message = cause instanceof Error ? cause.message : ''
+  return /network|timeout|ECONNREFUSED|ENOTFOUND|ETIMEDOUT/i.test(message)
+}
+
+function userVisibleMessageForSdkThrowable(cause: SdkThrowable): string {
+  if (isLikelyTransportLayerFailure(cause)) {
+    return authenticatedBackendCallFailureAdvice.serviceUnreachableOrUnclassifiedFailure
+  }
+  const status = httpStatusFromSdkThrowable(cause)
+  if (status === 401) {
+    return authenticatedBackendCallFailureAdvice.http401StoredTokenRejected
+  }
+  if (status === 403) {
+    return authenticatedBackendCallFailureAdvice.http403StoredTokenForbidden
+  }
+  return authenticatedBackendCallFailureAdvice.serviceUnreachableOrUnclassifiedFailure
 }
 
 export interface AccessTokenEntry {
@@ -65,7 +133,7 @@ async function withBackendClient<T>(
     return await fn()
   } catch (e) {
     if (isFetchAbortedByCaller(e)) throw e
-    throw new Error(userMessageFromBackendError(e))
+    throw new Error(userVisibleMessageForSdkThrowable(e))
   }
 }
 
@@ -77,7 +145,7 @@ export async function runWithDefaultBackendClient<T>(
   const entry = config.tokens.find((t) => t.label === label)
   if (!entry) {
     throw new Error(
-      'No default access token. Add one first with /add-access-token.'
+      authenticatedBackendCallFailureAdvice.noDefaultTokenInConfig
     )
   }
   return withBackendClient(entry.token, fn)
@@ -176,7 +244,7 @@ export async function createAccessToken(
   const defaultEntry = config.tokens.find((t) => t.label === defaultLabel)
   if (!defaultEntry) {
     throw new Error(
-      'No default access token. Add one first with /add-access-token.'
+      authenticatedBackendCallFailureAdvice.noDefaultTokenInConfig
     )
   }
   const row = await withBackendJson<GeneratedTokenDto>(defaultEntry.token, () =>
