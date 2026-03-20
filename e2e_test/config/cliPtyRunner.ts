@@ -4,6 +4,7 @@
  */
 
 import type { IPty } from '@lydell/node-pty'
+import { findControlCharCorruptionInRenderedOutput } from '../step_definitions/cliSectionParser'
 import { cliEnv } from './cliEnv'
 
 /**
@@ -69,6 +70,13 @@ async function waitForInteractiveInputReadyOsc(
     await sleep(CLI_POLL_MS)
   }
   throw new Error(formatTimeoutError(getStdout()))
+}
+
+function assertNoSimulatorCorruption(stdout: string): void {
+  const msg = findControlCharCorruptionInRenderedOutput(stdout)
+  if (msg !== null) {
+    throw new Error(msg)
+  }
 }
 
 function spawnPty(opts: {
@@ -160,6 +168,7 @@ export async function runCliInPty(opts: {
         `CLI prompt did not appear within 10s. stdout: ${stdout.slice(-300).replace(/\r/g, '\\r')}`,
     })
       .then(() => {
+        assertNoSimulatorCorruption(handle.stdout.value)
         sawInteractiveInputReadyOsc = true
         const input = opts.input.endsWith('\n') ? opts.input : `${opts.input}\n`
         handle.pty.write(input)
@@ -191,6 +200,7 @@ export async function startInteractiveCli(opts: {
     formatTimeoutError: (stdout) =>
       `CLI prompt did not appear within 10s. stdout: ${stdout.slice(-300).replace(/\r/g, '\\r')}`,
   })
+  assertNoSimulatorCorruption(handle.stdout.value)
   interactiveHandle = handle
 }
 
@@ -218,6 +228,7 @@ export async function sendToInteractiveCli(input: string): Promise<string> {
     formatTimeoutError: (stdout) =>
       `CLI did not show input box after send within 15s. stdout grew by ${stdout.length - lenBeforeSend} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`,
   })
+  assertNoSimulatorCorruption(interactiveHandle.stdout.value)
   return interactiveHandle.stdout.value
 }
 
