@@ -12,6 +12,7 @@ import {
   getCurrentGuidanceDebug,
   getCurrentGuidanceAndHistoryRaw,
   countTopBorderLinesBeforeFirstInputBox,
+  findControlCharCorruptionInRenderedOutput,
 } from '../../../step_definitions/cliSectionParser'
 
 const SECTION_LABELS = {
@@ -144,6 +145,8 @@ function inputBoxTopBorder() {
           count,
           `Expected exactly one input box top border (┌─┐) in visual output, found ${count}`
         ).to.equal(1)
+        const corruption = findControlCharCorruptionInRenderedOutput(output)
+        expect(corruption, corruption ?? undefined).to.be.null
       })
     },
   }

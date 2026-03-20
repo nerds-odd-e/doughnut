@@ -260,7 +260,9 @@ function simulateTerminalOverwrite(output: string): string {
         continue
       }
       if (eraseLineMatch) {
-        while (lines.length <= row) lines.push('')
+        while (lines.length <= row) {
+          lines.push('')
+        }
         lines[row] = ''
         col = 0
         i += eraseLineMatch[0].length
@@ -301,7 +303,9 @@ function simulateTerminalOverwrite(output: string): string {
       i++
       continue
     }
-    while (lines.length <= row) lines.push('')
+    while (lines.length <= row) {
+      lines.push('')
+    }
     const line = lines[row] ?? ''
     const newLine = line.slice(0, col) + output[i] + line.slice(col + 1)
     lines[row] = newLine
@@ -319,4 +323,46 @@ export function countTopBorderLinesBeforeFirstInputBox(output: string): number {
     TOP_BORDER_PATTERN.test((l ?? '').trim())
   )
   return boxTopLines.length
+}
+
+/**
+ * Returns a diagnostic message if the simulated terminal output contains raw ESC bytes
+ * after ANSI stripping — which means simulateTerminalOverwrite wrote unhandled control
+ * sequences as visible characters.
+ *
+ * Known culprits introduced by fc92059be:
+ *   \x1b[?25h / \x1b[?25l  (SHOW/HIDE_CURSOR) — the '?' breaks [0-9;]* in ansiRe
+ *   \x1b]133;A\x07          (OSC INTERACTIVE_INPUT_READY_OSC) — starts with \x1b] not \x1b[
+ *
+ * Both get stamped as literal chars into the input-content row, corrupting the
+ * simulation. In real terminals that interpret OSC 133;A (VS Code, iTerm2 shell
+ * integration) this also produces wrong cursor placement and a visual duplicate box.
+ */
+export function findControlCharCorruptionInRenderedOutput(
+  output: string
+): string | null {
+  const visualOutput = simulateTerminalOverwrite(output)
+  const normalized = stripAllAnsi(visualOutput)
+  const lines = normalized.split('\n')
+  const corrupt = lines
+    .map((line, i) => ({ line, i }))
+    .filter(({ line }) => line.includes('\u001b'))
+  if (corrupt.length === 0) {
+    return null
+  }
+  const examples = corrupt
+    .slice(0, 3)
+    .map(({ line, i }) => `  line ${i}: ${JSON.stringify(line.slice(0, 80))}`)
+    .join('\n')
+  return (
+    `Simulated terminal output still contains raw ESC (\\x1b) characters after ANSI` +
+    ` stripping. This means simulateTerminalOverwrite wrote unhandled control` +
+    ` sequences as visible characters.\n` +
+    `Known sequences NOT handled by the simulator:\n` +
+    `  \\x1b[?25h / \\x1b[?25l  (SHOW/HIDE_CURSOR — '?' breaks the [0-9;]* match)\n` +
+    `  \\x1b]133;A\\x07          (OSC INTERACTIVE_INPUT_READY_OSC — starts with \\x1b])\n` +
+    `These overwrite the '│ → ' prefix of the input row, making cursor position appear\n` +
+    `wrong and causing a visual duplicate box in terminals with shell integration.\n` +
+    `Corrupt lines:\n${examples}`
+  )
 }
