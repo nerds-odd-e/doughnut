@@ -72,7 +72,11 @@ async function waitForInputBoxReady(
   lenBeforeSend: number
 ): Promise<void> {
   const maxWaitMs = 15_000
-  const stablePollsRequired = 3
+  // Interactive fetch wait repaints every 400ms (ellipsis on the current prompt). The grey
+  // disabled input box matches INPUT_BOX_READY_PATTERN too, so a short stability window (e.g. 30ms)
+  // can return before the HTTP call finishes. Require stability longer than that interval.
+  const INPUT_BOX_STABLE_MS = 550
+  const stablePollsRequired = Math.ceil(INPUT_BOX_STABLE_MS / CLI_POLL_MS)
   const start = Date.now()
   let lastStdoutLen = 0
   let stablePolls = 0
