@@ -1,3 +1,8 @@
+---
+description: Doughnut MCP server — structure, build, tests, Cursor/IDE configuration
+alwaysApply: false
+---
+
 # doughnut-mcp-server MCP Server
 
 A Model Context Protocol server for Doughnut.

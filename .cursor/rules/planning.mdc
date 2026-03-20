@@ -3,34 +3,80 @@ alwaysApply: true
 ---
 # Phased Planning for Feature Development
 
-When creating plans for building new functionality or change functionarlity, follow this approach:
+**Where to put plans:** `ongoing/<short-name>.md` — informal, temporary; update as work proceeds; remove or archive when done.
 
-## Phase Structure
+Use this when planning **new** or **changed** functionality.
 
-- **Break work into phases** – Each phase adds one small, user-centric behavior.
-- **Maximize phases** – Use as many phases as possible, as long as each phase delivers user value.
-- **Prioritize by user value** – Order phases by user value and usability.
+---
 
-## Testing Strategy
+## Phase principles
 
-- **E2E at high level** – Each phase has E2E tests that cover the main user behavior.
-- **UT for details and edge cases** – Unit tests cover formatting, error handling, invalid input, and exceptional paths. Prefer unit test that is at top level, without looking at the internal state, and minimum test that ensures the full coverage.
-- **Test-driven** – Prefer writing tests first or alongside implementation.
-- **No final integration or test** – All changes within a phase is justify and tested within its own phase completely. No following up integration or test should be needed.
-- **No dead code** – Code must be needed by current E2E tests or UT covering edge cases. For normal cases, UT alone is not enough to justify keeping code.
+1. **One behavior per phase** — Each phase ships a small, **user-visible** slice of value.
+2. **Many phases are good** — Split as finely as you can while **each phase still delivers user value** (not phases that only refactor or only “prepare”).
+3. **Order by value** — Earlier phases = higher user value and usability first.
 
-## Phase Discipline
+---
 
-- **Clean up before moving on** – Remove any dead or unreachable code before the next phase.
-- **Deploy before next phase** – Commit, push, and let CD deploy before starting the next phase. This is typically done by the developer manually, unless instructed differently.
-- **Prefer Test-Driven Development** – Apply when adding or changing behavior. 
-  * Make sure the new or changed e2e test or unit test fail first by actually running it
-  * Make sure the test is failing for expected reason
-  * Make sure the failing message is clear with educational information. Improve the assertion or other aspects of the test if not.
-  * Use simplest, least intrusive solution to pass the test
-  * refactoring before continue 
+## How to split phases (scenario-first)
 
-## Interim Behaviors
+**Default:** Split by **user scenarios and outcomes**, not by layers (DB → API → UI) or by “build the abstraction first.”
 
-- Interim user behavior is allowed if it helps users access the feature faster. A secondary reason for interium behavior is it helps the developer to receive end to end feedback of the system earlier.
-- Remove interim behavior when a later phase replaces it with a better alternative.
+**Order scenarios** from **common / general** toward **more specific** preconditions.
+
+**Solutions:** First phases implement a **narrow, concrete** slice. Later phases **generalize or reuse** only after you see real repetition — not a big generic framework up front.
+
+**Regression:** If behavior **already exists** but has **no automated test**, prefer a **dedicated phase**: add a regression test and make it pass.
+
+**Extending tests:** If similar behavior **already has** tests, extend them for the new behavior; avoid duplicate test code. Either fold “test fails → pass” into the same phase as the feature, **or** use a short phase where the **new** test fails first. **While driving that change, keep at most one intentionally failing test** (the one you are implementing toward).
+
+**Big refactor:** If making the test pass needs a **large structural** change, plan **that structure as its own phase** before (or as the first slice of) the feature.
+
+**E2E-shaped phases:** Prefer phases that each map to an **end-to-end** scenario; different phases may use **different preconditions** (setup, role, data).
+
+**Still too big:** If one precondition + one E2E story is still large, split by **one small part of the outcome** per phase (one aspect of the postcondition).
+
+---
+
+## Plan document (design and architecture)
+
+Document **important structure and intent** in the same markdown plan. **Update the plan** when you learn something that changes how remaining phases should run. Remove text that no longer helps the **current** snapshot of the work.
+
+---
+
+## Testing strategy
+
+| Layer | Role |
+|--------|------|
+| **E2E** | Each phase: tests that cover the **main user behavior** for that phase. |
+| **Unit tests** | Formatting, errors, invalid input, edge paths. Prefer **black-box** tests (inputs/outputs), minimal tests, full coverage of those concerns. |
+
+- **Test-driven:** Prefer tests **first** or **alongside** implementation. **Concrete steps:** see **Test-driven workflow** below.
+- **Phase-complete:** Everything in a phase is **justified and tested inside that phase**. No separate “final integration phase” or deferred test pass for that slice.
+- **No dead code:** Production code must be **used** by current E2E tests **or** by unit tests that cover **non–happy-path** behavior. For **normal user paths**, unit tests alone are **not** enough to justify keeping the code — pair with E2E for that phase.
+
+**Scope of E2E:** “E2E for this phase” means Cypress (or equivalent) coverage for the **behavior and feature files touched in that phase** — run the relevant `--spec`(s), not the **entire** suite every time. See `e2e_test.mdc` for running a single feature.
+
+---
+
+## Phase discipline (checklist)
+
+Before closing a phase and starting the next:
+
+1. **Clean up** — Remove dead or unreachable code.
+2. **Deploy gate** — Commit, push, and let **CD deploy** before the next phase (unless the team explicitly agrees otherwise). Usually **manual** on the developer side.
+3. **Update the plan** — Reflect what is done and what remains; drop obsolete notes.
+
+### Test-driven workflow (when adding or changing behavior)
+
+1. Add or change the **E2E or unit** test; **run it** and confirm it **fails**.
+2. Confirm it fails for the **right reason** (not a typo or env issue).
+3. If the failure is unclear, **improve the assertion or message** so the next reader learns what was wrong.
+4. Implement the **smallest** change that makes the test pass.
+5. **Refactor** with tests green, then continue.
+
+---
+
+## Interim behavior
+
+- **Allowed** when it gets the feature to users faster **or** gives the team **earlier end-to-end feedback**.
+- **Remove** interim behavior when a **later phase** replaces it with the intended design.

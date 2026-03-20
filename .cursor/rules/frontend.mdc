@@ -361,7 +361,7 @@ if (error) {
 6. Component Mounting in Vitest Browser Mode
    - Use `render()` from @testing-library/vue for most tests (recommended)
      * Encourages testing from user perspective
-     * Returns queries (getByRole, getByText, etc.) for DOM interaction
+     * Returns queries (`getByText`, `getByLabelText`, `data-testid`, etc.) for DOM interaction — avoid `getByRole` here too (see §2)
      * Better aligns with browser mode's end-to-end philosophy
 
    - Use `mount()` from @vue/test-utils only when necessary
@@ -369,7 +369,7 @@ if (error) {
      * For testing Vue-specific behavior (slots, provide/inject edge cases)
 
    - CRITICAL: Query the DOM, not Vue components
-     * ✅ DO: page.getByRole('button', { name: /submit/i })
+     * ✅ DO: page.getByText(/submit/i) or `getByLabelText` / `[data-testid="..."]` as appropriate
      * ✅ DO: screen.getByText('Loading...')
      * ❌ AVOID: wrapper.findComponent(MyButton)
      * ❌ AVOID: wrapper.find('[data-testid="my-component"]') for component instances

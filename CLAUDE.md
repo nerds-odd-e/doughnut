@@ -30,6 +30,8 @@ Prefix commands with the nix wrapper:
 CURSOR_DEV=true nix develop -c <command>
 ```
 
+**Cursor Cloud VM** has no Nix — run commands without that prefix. See `.cursor/rules/cloud-agent-setup.mdc`.
+
 ## Common Commands
 
 | Task | Command |
@@ -39,12 +41,14 @@ CURSOR_DEV=true nix develop -c <command>
 | Run backend tests (no migration) | `pnpm backend:test_only` |
 | Run frontend tests | `pnpm frontend:test` |
 | Run single frontend test | `pnpm -C frontend test tests/path/to/TestFile.spec.ts` |
-| Run E2E test (single feature) | `pnpm cypress run --spec e2e_test/features/path/to.feature` |
+| Run E2E test (single feature) | `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/path/to.feature` |
 | Open Cypress IDE | `pnpm cy:open` |
 | Format all code | `pnpm format:all` |
 | Lint all code | `pnpm lint:all` |
 | Regenerate TypeScript from OpenAPI | `pnpm generateTypeScript` |
 | Connect to local DB | `mysql -S $MYSQL_HOME/mysql.sock -u doughnut -p` (password: doughnut) |
+
+Unless you are already inside `nix develop`, wrap `pnpm` / Gradle invocations like the E2E row: `CURSOR_DEV=true nix develop -c <command>`. (Cloud VM: no wrapper — see above.)
 
 ## Architecture
 
@@ -114,9 +118,14 @@ doughnut/
 - Naming: `V{version}__{description}.sql` (e.g., `V300000176__description.sql`)
 - Never modify committed migrations; create new ones
 
-## Development Principles
+## Planning and phased delivery
 
-1. **High Cohesion** - Minimize duplication, keep related code together
-2. **Keep it Simple** - Avoid defensive programming, use minimum code
-3. **No Historical Documentation** - Code readers only care about current state
-4. **Test Behavior, Not Implementation** - Tests verify pre/post state transitions
+- Informal plans for active work: `ongoing/<short-name>.md`
+- **How to phase work, E2E vs unit tests, TDD workflow, deploy gate, and interim behavior:** `.cursor/rules/planning.mdc`
+
+## Development principles
+
+1. **High cohesion** — Minimize duplication; keep related code together (see also `.cursor/rules/general.mdc`).
+2. **Keep it simple** — Avoid defensive programming; use the minimum code that fits the task.
+3. **No historical documentation** — Code and comments reflect the current state only; temporary notes may live in `ongoing/`.
+4. **Test behavior, not implementation** — Tests verify pre/post state transitions; stack-specific practices are in `.cursor/rules/backend-development.mdc`, `.cursor/rules/frontend.mdc`, and `.cursor/rules/e2e_test.mdc`.
