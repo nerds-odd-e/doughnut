@@ -700,9 +700,7 @@ function buildPipedDeps() {
   }
 }
 
-export async function runInteractive(
-  stdin: NodeJS.ReadableStream = process.stdin
-): Promise<void> {
+export async function runInteractive(stdin = process.stdin): Promise<void> {
   if (stdin.isTTY) {
     await runTTY(stdin, buildTTYDeps())
   } else {
