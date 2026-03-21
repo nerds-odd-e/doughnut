@@ -7,7 +7,9 @@ import {
   RecallsController,
   RecallPromptController,
   UserController,
+  type MemoryTrackerLite,
 } from 'doughnut-api'
+import makeMe from 'doughnut-test-fixtures/makeMe'
 import { addAccessToken } from '../src/accessToken.js'
 import { userAbortError } from '../src/fetchAbort.js'
 import {
@@ -46,10 +48,16 @@ function createTempDir(): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-recall-test-'))
 }
 
-function mockRecalling(toRepeat: unknown[] = []) {
-  return vi.mocked(RecallsController.recalling).mockResolvedValue({
-    data: { toRepeat },
-  } as never)
+function dueTrackersData(toRepeat: MemoryTrackerLite[]) {
+  return {
+    data: makeMe.aDueMemoryTrackersList.toRepeat(toRepeat).please(),
+  } as never
+}
+
+function mockRecalling(toRepeat: MemoryTrackerLite[] = []) {
+  return vi
+    .mocked(RecallsController.recalling)
+    .mockResolvedValue(dueTrackersData(toRepeat))
 }
 
 // recall.ts API and HTTP wiring. Multi-turn /recall via processInput (console or OutputAdapter): interactive/processInput.test.ts.
@@ -92,7 +100,7 @@ describe('recallStatus', () => {
   })
 
   test('returns "1 note to recall today" when one note is due', async () => {
-    mockRecalling([{ id: 1 }])
+    mockRecalling([{ memoryTrackerId: 1 }])
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
     } as never)
@@ -104,7 +112,11 @@ describe('recallStatus', () => {
   })
 
   test('returns "3 notes to recall today" when three notes are due', async () => {
-    mockRecalling([{ id: 1 }, { id: 2 }, { id: 3 }])
+    mockRecalling([
+      { memoryTrackerId: 1 },
+      { memoryTrackerId: 2 },
+      { memoryTrackerId: 3 },
+    ])
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
     } as never)
@@ -224,9 +236,9 @@ describe('recallNext', () => {
   })
 
   test('returns none when no notes due', async () => {
-    vi.mocked(RecallsController.recalling).mockResolvedValue({
-      data: { toRepeat: [] },
-    } as never)
+    vi.mocked(RecallsController.recalling).mockResolvedValue(
+      dueTrackersData([])
+    )
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
     } as never)
@@ -239,9 +251,9 @@ describe('recallNext', () => {
   })
 
   test('passes dueindays to recalling API', async () => {
-    vi.mocked(RecallsController.recalling).mockResolvedValue({
-      data: { toRepeat: [] },
-    } as never)
+    vi.mocked(RecallsController.recalling).mockResolvedValue(
+      dueTrackersData([])
+    )
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
     } as never)
@@ -297,9 +309,9 @@ describe('recallNext', () => {
 
     test('with AbortSignal: abort during delay does not call recalling', async () => {
       process.env[RECALL_LOAD_CLI_TEST_DELAY_MS_ENV] = '100'
-      vi.mocked(RecallsController.recalling).mockResolvedValue({
-        data: { toRepeat: [] },
-      } as never)
+      vi.mocked(RecallsController.recalling).mockResolvedValue(
+        dueTrackersData([])
+      )
       vi.mocked(UserController.getTokenInfo).mockResolvedValue({
         data: { id: 1, label: 'Test Token' },
       } as never)
@@ -317,9 +329,9 @@ describe('recallNext', () => {
 
     test('with AbortSignal: after delay, recalling runs', async () => {
       process.env[RECALL_LOAD_CLI_TEST_DELAY_MS_ENV] = '50'
-      vi.mocked(RecallsController.recalling).mockResolvedValue({
-        data: { toRepeat: [] },
-      } as never)
+      vi.mocked(RecallsController.recalling).mockResolvedValue(
+        dueTrackersData([])
+      )
       vi.mocked(UserController.getTokenInfo).mockResolvedValue({
         data: { id: 1, label: 'Test Token' },
       } as never)
@@ -334,9 +346,9 @@ describe('recallNext', () => {
 
     test('without AbortSignal: env has no effect', async () => {
       process.env[RECALL_LOAD_CLI_TEST_DELAY_MS_ENV] = '99999'
-      vi.mocked(RecallsController.recalling).mockResolvedValue({
-        data: { toRepeat: [] },
-      } as never)
+      vi.mocked(RecallsController.recalling).mockResolvedValue(
+        dueTrackersData([])
+      )
       vi.mocked(UserController.getTokenInfo).mockResolvedValue({
         data: { id: 1, label: 'Test Token' },
       } as never)
@@ -348,9 +360,9 @@ describe('recallNext', () => {
   })
 
   test('returns none when dueindays 3 has no notes', async () => {
-    vi.mocked(RecallsController.recalling).mockResolvedValue({
-      data: { toRepeat: [] },
-    } as never)
+    vi.mocked(RecallsController.recalling).mockResolvedValue(
+      dueTrackersData([])
+    )
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
     } as never)
@@ -362,16 +374,16 @@ describe('recallNext', () => {
   })
 
   test('returns just-review when askAQuestion returns null', async () => {
-    vi.mocked(RecallsController.recalling).mockResolvedValue({
-      data: { toRepeat: [{ memoryTrackerId: 42 }] },
-    } as never)
+    vi.mocked(RecallsController.recalling).mockResolvedValue(
+      dueTrackersData([{ memoryTrackerId: 42 }])
+    )
     vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
       data: null,
     } as never)
     vi.mocked(MemoryTrackerController.showMemoryTracker).mockResolvedValue({
-      data: {
-        note: { noteTopology: { title: 'My Note Title' } },
-      },
+      data: makeMe.aMemoryTracker
+        .ofNote(makeMe.aNoteRealm.title('My Note Title').please())
+        .please(),
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
@@ -395,17 +407,17 @@ describe('recallNext', () => {
   })
 
   test('returns mcq when askAQuestion returns MCQ', async () => {
-    vi.mocked(RecallsController.recalling).mockResolvedValue({
-      data: { toRepeat: [{ memoryTrackerId: 42 }] },
-    } as never)
+    vi.mocked(RecallsController.recalling).mockResolvedValue(
+      dueTrackersData([{ memoryTrackerId: 42 }])
+    )
     vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
       data: {
-        id: 100,
-        questionType: 'MCQ',
-        multipleChoicesQuestion: {
-          f0__stem: 'What is 2+2?',
-          f1__choices: ['4', '3', '5'],
-        },
+        ...makeMe.aRecallPrompt
+          .withId(100)
+          .withQuestionStem('What is 2+2?')
+          .withChoices(['4', '3', '5'])
+          .please(),
+        notebook: undefined,
       },
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
@@ -426,9 +438,9 @@ describe('recallNext', () => {
   })
 
   test('returns spelling when askAQuestion returns SPELLING', async () => {
-    vi.mocked(RecallsController.recalling).mockResolvedValue({
-      data: { toRepeat: [{ memoryTrackerId: 42 }] },
-    } as never)
+    vi.mocked(RecallsController.recalling).mockResolvedValue(
+      dueTrackersData([{ memoryTrackerId: 42 }])
+    )
     vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
       data: {
         id: 100,
@@ -452,9 +464,9 @@ describe('recallNext', () => {
   })
 
   test('returns spelling with empty stem when spellingQuestion missing', async () => {
-    vi.mocked(RecallsController.recalling).mockResolvedValue({
-      data: { toRepeat: [{ memoryTrackerId: 42 }] },
-    } as never)
+    vi.mocked(RecallsController.recalling).mockResolvedValue(
+      dueTrackersData([{ memoryTrackerId: 42 }])
+    )
     vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
       data: { id: 100, questionType: 'SPELLING' },
     } as never)
@@ -474,9 +486,9 @@ describe('recallNext', () => {
   })
 
   test('throws when no default token', async () => {
-    vi.mocked(RecallsController.recalling).mockResolvedValue({
-      data: { toRepeat: [{ memoryTrackerId: 42 }] },
-    } as never)
+    vi.mocked(RecallsController.recalling).mockResolvedValue(
+      dueTrackersData([{ memoryTrackerId: 42 }])
+    )
 
     await expect(recallNext()).rejects.toThrow(
       'No default access token. Add one first with /add-access-token.'
@@ -484,19 +496,21 @@ describe('recallNext', () => {
   })
 
   test('returns details when showMemoryTracker has note details', async () => {
-    vi.mocked(RecallsController.recalling).mockResolvedValue({
-      data: { toRepeat: [{ memoryTrackerId: 42 }] },
-    } as never)
+    vi.mocked(RecallsController.recalling).mockResolvedValue(
+      dueTrackersData([{ memoryTrackerId: 42 }])
+    )
     vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
       data: null,
     } as never)
     vi.mocked(MemoryTrackerController.showMemoryTracker).mockResolvedValue({
-      data: {
-        note: {
-          noteTopology: { title: 'Bold Word' },
-          details: '**Bold** and _italic_',
-        },
-      },
+      data: makeMe.aMemoryTracker
+        .ofNote(
+          makeMe.aNoteRealm
+            .title('Bold Word')
+            .details('**Bold** and _italic_')
+            .please()
+        )
+        .please(),
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
@@ -515,9 +529,9 @@ describe('recallNext', () => {
   })
 
   test('uses Untitled note when showMemoryTracker has no title', async () => {
-    vi.mocked(RecallsController.recalling).mockResolvedValue({
-      data: { toRepeat: [{ memoryTrackerId: 42 }] },
-    } as never)
+    vi.mocked(RecallsController.recalling).mockResolvedValue(
+      dueTrackersData([{ memoryTrackerId: 42 }])
+    )
     vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
       data: null,
     } as never)
@@ -540,25 +554,22 @@ describe('recallNext', () => {
   })
 
   test('returns mcq with notebookTitle from RecallPrompt.notebook', async () => {
-    vi.mocked(RecallsController.recalling).mockResolvedValue({
-      data: { toRepeat: [{ memoryTrackerId: 42 }] },
-    } as never)
+    vi.mocked(RecallsController.recalling).mockResolvedValue(
+      dueTrackersData([{ memoryTrackerId: 42 }])
+    )
     vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
-      data: {
-        id: 100,
-        questionType: 'MCQ',
-        notebook: {
-          id: 1,
-          title: 'Physics',
-          notebookSettings: {},
-          headNoteId: 1,
-          updated_at: '',
-        },
-        multipleChoicesQuestion: {
-          f0__stem: 'Q?',
-          f1__choices: ['a'],
-        },
-      },
+      data: (() => {
+        const physicsNotebook = makeMe.aNotebook
+        physicsNotebook.notebuilder.title('Physics')
+        return {
+          ...makeMe.aRecallPrompt
+            .withId(100)
+            .withQuestionStem('Q?')
+            .withChoices(['a'])
+            .please(),
+          notebook: physicsNotebook.please(),
+        }
+      })(),
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
@@ -577,21 +588,18 @@ describe('recallNext', () => {
   })
 
   test('returns just-review with notebookTitle from note topology', async () => {
-    vi.mocked(RecallsController.recalling).mockResolvedValue({
-      data: { toRepeat: [{ memoryTrackerId: 42 }] },
-    } as never)
+    vi.mocked(RecallsController.recalling).mockResolvedValue(
+      dueTrackersData([{ memoryTrackerId: 42 }])
+    )
     vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
       data: null,
     } as never)
     vi.mocked(MemoryTrackerController.showMemoryTracker).mockResolvedValue({
-      data: {
-        note: {
-          noteTopology: {
-            title: 'T',
-            notebookTitle: 'History',
-          },
-        },
-      },
+      data: (() => {
+        const note = makeMe.aNote.title('T').please()
+        note.noteTopology.notebookTitle = 'History'
+        return makeMe.aMemoryTracker.ofLink(note).please()
+      })(),
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
@@ -627,7 +635,7 @@ describe('answerQuiz', () => {
 
   test('calls answerQuiz with choiceIndex and returns correct true', async () => {
     vi.mocked(RecallPromptController.answerQuiz).mockResolvedValue({
-      data: { answer: { correct: true } },
+      data: makeMe.aRecallPrompt.withAnswer({ id: 1, correct: true }).please(),
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
@@ -648,7 +656,7 @@ describe('answerQuiz', () => {
 
   test('returns correct false when answer is wrong', async () => {
     vi.mocked(RecallPromptController.answerQuiz).mockResolvedValue({
-      data: { answer: { correct: false } },
+      data: makeMe.aRecallPrompt.withAnswer({ id: 1, correct: false }).please(),
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
@@ -669,7 +677,7 @@ describe('answerQuiz', () => {
 
   test('returns correct false when answer is undefined', async () => {
     vi.mocked(RecallPromptController.answerQuiz).mockResolvedValue({
-      data: {},
+      data: makeMe.aRecallPrompt.please(),
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
@@ -683,7 +691,7 @@ describe('answerQuiz', () => {
 
   test('passes thinkingTimeMs to API when provided', async () => {
     vi.mocked(RecallPromptController.answerQuiz).mockResolvedValue({
-      data: { answer: { correct: true } },
+      data: makeMe.aRecallPrompt.withAnswer({ id: 1, correct: true }).please(),
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
@@ -721,7 +729,7 @@ describe('answerSpelling', () => {
 
   test('calls answerSpelling with spellingAnswer and returns correct true', async () => {
     vi.mocked(RecallPromptController.answerSpelling).mockResolvedValue({
-      data: { answer: { correct: true } },
+      data: makeMe.aRecallPrompt.withAnswer({ id: 1, correct: true }).please(),
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
@@ -742,7 +750,7 @@ describe('answerSpelling', () => {
 
   test('returns correct false when spelling is wrong', async () => {
     vi.mocked(RecallPromptController.answerSpelling).mockResolvedValue({
-      data: { answer: { correct: false } },
+      data: makeMe.aRecallPrompt.withAnswer({ id: 1, correct: false }).please(),
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
@@ -756,7 +764,7 @@ describe('answerSpelling', () => {
 
   test('passes thinkingTimeMs to API when provided', async () => {
     vi.mocked(RecallPromptController.answerSpelling).mockResolvedValue({
-      data: { answer: { correct: true } },
+      data: makeMe.aRecallPrompt.withAnswer({ id: 1, correct: true }).please(),
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
@@ -798,12 +806,12 @@ describe('contestAndRegenerate', () => {
     } as never)
     vi.mocked(RecallPromptController.regenerate).mockResolvedValue({
       data: {
-        id: 200,
-        questionType: 'MCQ',
-        multipleChoicesQuestion: {
-          f0__stem: 'New question?',
-          f1__choices: ['A', 'B', 'C'],
-        },
+        ...makeMe.aRecallPrompt
+          .withId(200)
+          .withQuestionStem('New question?')
+          .withChoices(['A', 'B', 'C'])
+          .please(),
+        notebook: undefined,
       },
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({

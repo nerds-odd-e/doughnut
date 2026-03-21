@@ -8,6 +8,7 @@ import {
   beforeAll,
 } from 'vitest'
 import { RecallsController, UserController } from 'doughnut-api'
+import makeMe from 'doughnut-test-fixtures/makeMe'
 import { addAccessToken } from '../../src/accessToken.js'
 import {
   CLI_USER_ABORTED_WAIT_MESSAGE,
@@ -629,7 +630,7 @@ describe('processInput', () => {
 
     test('cancel during CLI test delay logs Cancelled by user. (real recallNext)', async () => {
       vi.mocked(RecallsController.recalling).mockResolvedValue({
-        data: { toRepeat: [] },
+        data: makeMe.aDueMemoryTrackersList.toRepeat([]).please(),
       } as never)
       vi.mocked(UserController.getTokenInfo).mockResolvedValue({
         data: { id: 1, label: 'Test Token' },

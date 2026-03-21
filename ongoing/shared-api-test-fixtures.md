@@ -53,6 +53,8 @@
 
 ## Phase 3 — CLI tests consume shared fixtures
 
+**Status:** Done — `cli` devDepends on `doughnut-test-fixtures`; Vitest resolves `@generated/doughnut-backend-api` like MCP; `recall.test.ts` uses `makeMe` for due-tracker and recall-prompt mocks; `processInput.test.ts` uses `makeMe` for one `recalling` response.
+
 **User-visible outcome:** CLI tests that need API-shaped data use the same builders as frontend/MCP.
 
 1. Add `doughnut-test-fixtures` as **devDependency** of `cli`.
