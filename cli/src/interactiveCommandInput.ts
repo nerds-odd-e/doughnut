@@ -64,6 +64,31 @@ export function replaceLastLogicalLine(
   return [...lines.slice(0, -1), newLastLine].join('\n')
 }
 
+/**
+ * When recalling a committed line into the box during ↑↓ history walk, an incomplete `/…`
+ * prefix that would show slash suggestions is stored without a trailing space. Append one
+ * so TTY suggestion mode does not apply to the recalled draft (arrows stay on history).
+ */
+export function normalizeRecalledLineDraftForSlashSuggestionExit(
+  lineDraft: string,
+  hasIncompleteSlashSuggestions: boolean
+): string {
+  if (!hasIncompleteSlashSuggestions) return lineDraft
+  const lines = lineDraft.split('\n')
+  const last = lines[lines.length - 1] ?? ''
+  return replaceLastLogicalLine(lineDraft, `${last} `)
+}
+
+function lineDraftAppliedFromHistory(
+  recalled: string,
+  lineHasIncompleteSlashSuggestions: (lineDraft: string) => boolean
+): string {
+  return normalizeRecalledLineDraftForSlashSuggestionExit(
+    recalled,
+    lineHasIncompleteSlashSuggestions(recalled)
+  )
+}
+
 /** After Esc when the last line is exactly `/`: clear one-line draft, or drop the last line. */
 export function lineDraftAfterEscapingBareSlash(lineDraft: string): string {
   const lines = lineDraft.split('\n')
@@ -133,13 +158,18 @@ export function ttyArrowKeyUsesSlashSuggestionCycle(
 }
 
 export function onArrowUp(
-  state: InteractiveCommandInput
+  state: InteractiveCommandInput,
+  lineHasIncompleteSlashSuggestions: (lineDraft: string) => boolean = () =>
+    false
 ): InteractiveCommandInput {
   const { lineDraft, caretOffset, committedCommands, historyWalkIndex } = state
   if (historyWalkIndex !== null) {
     const nextIdx = historyWalkIndex + 1
     if (nextIdx >= committedCommands.length) return state
-    const line = committedCommands[nextIdx]!
+    const line = lineDraftAppliedFromHistory(
+      committedCommands[nextIdx]!,
+      lineHasIncompleteSlashSuggestions
+    )
     return {
       ...state,
       historyWalkIndex: nextIdx,
@@ -151,17 +181,23 @@ export function onArrowUp(
     return { ...state, caretOffset: 0 }
   }
   if (committedCommands.length === 0) return state
+  const line = lineDraftAppliedFromHistory(
+    committedCommands[0]!,
+    lineHasIncompleteSlashSuggestions
+  )
   return {
     ...state,
     lineDraftBeforeHistoryWalk: lineDraft,
     historyWalkIndex: 0,
-    lineDraft: committedCommands[0]!,
+    lineDraft: line,
     caretOffset: 0,
   }
 }
 
 export function onArrowDown(
-  state: InteractiveCommandInput
+  state: InteractiveCommandInput,
+  lineHasIncompleteSlashSuggestions: (lineDraft: string) => boolean = () =>
+    false
 ): InteractiveCommandInput {
   const {
     lineDraft,
@@ -173,7 +209,10 @@ export function onArrowDown(
   if (historyWalkIndex !== null) {
     if (historyWalkIndex > 0) {
       const nextIdx = historyWalkIndex - 1
-      const line = committedCommands[nextIdx]!
+      const line = lineDraftAppliedFromHistory(
+        committedCommands[nextIdx]!,
+        lineHasIncompleteSlashSuggestions
+      )
       return {
         ...state,
         historyWalkIndex: nextIdx,

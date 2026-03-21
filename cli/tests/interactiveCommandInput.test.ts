@@ -12,6 +12,7 @@ import {
   emptyInteractiveCommandInput,
   insertIntoDraft,
   lineDraftAfterEscapingBareSlash,
+  normalizeRecalledLineDraftForSlashSuggestionExit,
   onArrowDown,
   onArrowUp,
   replaceLastLogicalLine,
@@ -133,6 +134,66 @@ describe('TTY slash-suggestion vs ↑ precedence (phase A1)', () => {
       'first ↑ must move the caret to the start of the draft when not in history mode'
     ).toBe(0)
     expect(after.historyWalkIndex).toBe(null)
+  })
+})
+
+describe('normalizeRecalledLineDraftForSlashSuggestionExit (phase A3)', () => {
+  test('appends one trailing space on the last line when the slash-prefix predicate is true', () => {
+    expect(
+      normalizeRecalledLineDraftForSlashSuggestionExit('/help_A3', true)
+    ).toBe('/help_A3 ')
+  })
+
+  test('leaves the draft unchanged when the predicate is false', () => {
+    expect(
+      normalizeRecalledLineDraftForSlashSuggestionExit('/help_A3', false)
+    ).toBe('/help_A3')
+  })
+
+  test('only extends the last logical line in a multiline recalled draft', () => {
+    expect(
+      normalizeRecalledLineDraftForSlashSuggestionExit('a\n/help_A3', true)
+    ).toBe('a\n/help_A3 ')
+  })
+})
+
+describe('recalled incomplete slash commands and ↑↓ history (phase A3)', () => {
+  const incompleteSlash = (d: string) => d === '/help_A3'
+
+  test('first ↑ into history normalizes a recalled line that would be slash-suggestion mode', () => {
+    const out = onArrowUp(
+      commandInputWith({
+        lineDraft: 'draft',
+        caretOffset: 0,
+        committedCommands: ['/help_A3', '/clear_A3'],
+      }),
+      incompleteSlash
+    )
+    expect(out.historyWalkIndex).toBe(0)
+    expect(out.lineDraft).toBe('/help_A3 ')
+    expect(out.caretOffset).toBe(0)
+  })
+
+  test('↓ within history still navigates when the current recalled line was normalized', () => {
+    const fromOlder = onArrowUp(
+      commandInputWith({
+        lineDraft: 'draft',
+        caretOffset: 0,
+        committedCommands: ['/clear_A3', '/help_A3'],
+      }),
+      incompleteSlash
+    )
+    expect(fromOlder.historyWalkIndex).toBe(0)
+    expect(fromOlder.lineDraft).toBe('/clear_A3')
+
+    const showingHelp = onArrowUp(fromOlder, incompleteSlash)
+    expect(showingHelp.historyWalkIndex).toBe(1)
+    expect(showingHelp.lineDraft).toBe('/help_A3 ')
+
+    const backToClear = onArrowDown(showingHelp, incompleteSlash)
+    expect(backToClear.historyWalkIndex).toBe(0)
+    expect(backToClear.lineDraft).toBe('/clear_A3')
+    expect(backToClear.caretOffset).toBe('/clear_A3'.length)
   })
 })
 

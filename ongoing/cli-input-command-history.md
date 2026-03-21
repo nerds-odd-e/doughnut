@@ -35,13 +35,13 @@ Scope: **`/add-access-token`** only unless product asks to extend (e.g. other pa
 
 ## Phased delivery (scenario-first)
 
-### Phase A — Input history behavior (TTY, in-process) ✅ (follow-ups: A1–A3; A1–A2 done)
+### Phase A — Input history behavior (TTY, in-process) ✅ (follow-ups A1–A3 done)
 
 **User-visible:** In interactive TTY mode, ↑↓ walk previous submissions; first ↑ moves cursor to start if not already there; first ↓ moves cursor to end if not already there; after ↑ into history, cursor at **beginning**; after ↓ within history, cursor at **end**; stepping ↓ past the “newest” stored line restores the **pre-history draft** (what the user had typed before first ↑), or **empty** if there was none.
 
 **Done:** Domain state + transitions in `cli/src/interactiveCommandInput.ts` (Vitest: `cli/tests/interactiveCommandInput.test.ts`). TTY wiring in `cli/src/adapters/ttyAdapter.ts` (caret row/column in box, left/right/home/end, backspace before cursor, insert at cursor). TTY smoke: `cli/tests/interactive/interactiveTtyInputHistory.test.ts`.
 
-**Gap (why A1–A3):** `onArrowUp` / `onArrowDown` already implement “home / end caret on first ↑↓ while editing the live draft” when they run, but `ttyAdapter` can still handle ↑↓ as **slash-command suggestion cycling** whenever `isCommandPrefixWithSuggestions` is true—**before** delegating to the domain. That steals the first ↑/↓ that should only move the caret. Recalled history lines that look like incomplete `/` commands hit the same path.
+**Gap (resolved via A1–A3):** `ttyAdapter` used to treat ↑↓ as slash-command suggestion cycling without respecting caret position (A1/A2) and needed recalled incomplete `/` lines normalized so suggestion UI does not apply to history recall (A3).
 
 ---
 
@@ -65,20 +65,13 @@ Scope: **`/add-access-token`** only unless product asks to extend (e.g. other pa
 
 ---
 
-### Phase A3 — Recalled `/` command lines: ↑↓ continue history, not suggestion picker
+### Phase A3 — Recalled `/` command lines: ↑↓ continue history, not suggestion picker ✅
 
 **User-visible:** After ↑ recalls a line that is an **incomplete** slash command with matches (e.g. `/help` with no trailing space), **↑↓ still walk input history** (and the caret rules already defined for history mode), instead of moving the **suggestion highlight**.
 
 **Preferred fix (product):** When applying a committed line into the box from **history navigation**, if the line is an incomplete `/` command with suggestions, **append a single trailing space** to the recalled `lineDraft` so `lastLine.endsWith(' ')` is true and `isCommandPrefixWithSuggestions` is **false**—arrows go to domain history/caret logic. (Alternative: dismiss suggestions whenever entering history recall; pick **one** representation—trailing space keeps behavior aligned with “complete the command with a space” and matches existing `isCommandPrefixWithSuggestions` guard.)
 
-**TDD**
-
-1. **Failing test first** — Unit-level, **observable state only**: start from a state that simulates “user recalled history entry `'/help'`” (or another stable prefix with known matches), with `historyWalkIndex !== null`, then apply **one** ↓ or ↑ that should change **history index** or **lineDraft** to another stored entry—not merely `highlightIndex`. If the bug is TTY-only, test the **pure** “normalize recalled line for display” function: e.g. `'/help'` → `'/help '` when the rule fires, with an educational message: *recalled incomplete slash commands must be normalized so ↑↓ are not interpreted as suggestion cycling.*  
-   **Stronger behavioral test (still unit):** after normalization, a **synthetic** “would `isCommandPrefixWithSuggestions` be true?” check on the recalled last line is **false** (export a tiny predicate shared with the adapter, or test via the normalizer’s output only—avoid duplicating prefix logic in the test in a brittle way).
-2. Confirm red, then implement normalization at the single place history applies a committed string to `lineDraft` (likely `interactiveCommandInput.ts` and/or the TTY caller).
-3. Green; ensure **masked** recall lines (Phase B) still behave—no double spaces unless intended.
-
-**False-positive guards:** Do not only assert `highlightIndex` in isolation if it is not exported—prefer **draft string + history index** outcomes. Use a **unique** committed history pair (e.g. `'/help'` then `'/clear'`) so the wrong behavior is unmistakable.
+**Done:** `normalizeRecalledLineDraftForSlashSuggestionExit` and `lineDraftAppliedFromHistory` in `cli/src/interactiveCommandInput.ts`; `onArrowUp` / `onArrowDown` take optional `lineHasIncompleteSlashSuggestions` (TTY passes `isCommandPrefixWithSuggestions`). **Tests:** `cli/tests/interactiveCommandInput.test.ts` (normalizer + history walk with synthetic predicate).
 
 ---
 

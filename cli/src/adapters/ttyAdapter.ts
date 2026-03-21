@@ -971,8 +971,8 @@ export async function runTTY(
         const prevDraft = commandInput.lineDraft
         commandInput =
           key.name === 'up'
-            ? onArrowUp(commandInput)
-            : onArrowDown(commandInput)
+            ? onArrowUp(commandInput, isCommandPrefixWithSuggestions)
+            : onArrowDown(commandInput, isCommandPrefixWithSuggestions)
         if (commandInput.lineDraft !== prevDraft) {
           highlightIndex = 0
           suggestionsDismissed = false
