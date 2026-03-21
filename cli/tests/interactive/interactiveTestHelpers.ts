@@ -92,6 +92,18 @@ export function ttyOutput(writeSpy: ReturnType<typeof vi.spyOn>) {
   return writeSpy.mock.calls.map((c) => c[0]).join('')
 }
 
+/** Latest line in captured TTY stdout containing `needle` (successive repaints overwrite the same logical rows). */
+export function lastStdoutLineContaining(
+  output: string,
+  needle: string
+): string | undefined {
+  let found: string | undefined
+  for (const line of output.split('\n')) {
+    if (line.includes(needle)) found = line
+  }
+  return found
+}
+
 export function makeTempConfigDir(
   tokens: Array<{ label: string; token: string }>
 ) {

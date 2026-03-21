@@ -11,6 +11,7 @@ import { filterCommandsByPrefix, interactiveDocs } from '../../src/help.js'
 import {
   endTTYSession,
   GREY_BG_PAST_INPUT,
+  lastStdoutLineContaining,
   pressEnter,
   pressKey,
   submitTTYCommand,
@@ -20,17 +21,6 @@ import {
   typeString,
   type TTYStdin,
 } from './interactiveTestHelpers.js'
-
-function lastStdoutLineContaining(
-  output: string,
-  needle: string
-): string | undefined {
-  let found: string | undefined
-  for (const line of output.split('\n')) {
-    if (line.includes(needle)) found = line
-  }
-  return found
-}
 
 describe('TTY: shared interactive session', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
@@ -169,10 +159,13 @@ describe('TTY: shared interactive session', () => {
       expect(lastLine).toContain('\x1b[7m')
     })
 
-    test('Down moves highlight from the first slash command to the next', async () => {
+    test('slash picker: ArrowDown moves highlight to next row; ArrowUp moves it back (not caret/history only)', async () => {
       const filtered = filterCommandsByPrefix(interactiveDocs, '/')
       expect(filtered.length).toBeGreaterThanOrEqual(2)
+      const firstUsage = filtered[0]!.usage
       const secondUsage = filtered[1]!.usage
+      const needleFirst = `  ${firstUsage}`
+      const needleSecond = `  ${secondUsage}`
 
       writeSpy.mockClear()
       typeString(stdin, '/')
@@ -180,13 +173,35 @@ describe('TTY: shared interactive session', () => {
       pressKey(stdin, 'down')
       await tick()
 
-      const output = ttyOutput(writeSpy)
-      const helpLine = lastStdoutLineContaining(output, '  /help')
-      expect(helpLine).toBeDefined()
-      expect(helpLine).not.toContain('\x1b[7m')
-      expect(lastStdoutLineContaining(output, `  ${secondUsage}`)).toContain(
-        '\x1b[7m'
+      const afterDown = ttyOutput(writeSpy)
+      expect(
+        lastStdoutLineContaining(afterDown, needleSecond),
+        'With "/" list open, Down must highlight the next command (reverse video), not only move the caret.'
+      ).toContain('\x1b[7m')
+      const firstLineAfterDown = lastStdoutLineContaining(
+        afterDown,
+        needleFirst
       )
+      expect(firstLineAfterDown).toBeDefined()
+      expect(
+        firstLineAfterDown,
+        'After Down, the first command row must no longer be highlighted.'
+      ).not.toContain('\x1b[7m')
+
+      pressKey(stdin, 'up')
+      await tick()
+
+      const afterUp = ttyOutput(writeSpy)
+      expect(
+        lastStdoutLineContaining(afterUp, needleFirst),
+        'Up from the second row must highlight the first command again.'
+      ).toContain('\x1b[7m')
+      const secondLineAfterUp = lastStdoutLineContaining(afterUp, needleSecond)
+      expect(secondLineAfterUp).toBeDefined()
+      expect(
+        secondLineAfterUp,
+        'After Up, the second command row must no longer be highlighted.'
+      ).not.toContain('\x1b[7m')
     })
 
     test('ESC when buffer is only "/" dismisses suggestions and clears buffer', async () => {
