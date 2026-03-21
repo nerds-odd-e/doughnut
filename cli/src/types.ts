@@ -1,7 +1,10 @@
+/** Choice strings from a recall multiple-choice prompt (API payload; may embed line breaks). */
+export type RecallMcqChoiceTexts = readonly string[]
+
 /** User is answering a multiple-choice recall question (choices in Current guidance; TTY stem in Current prompt). */
 export type McqRecallPending = {
   recallPromptId: number
-  choices: readonly string[]
+  choices: RecallMcqChoiceTexts
   /** Stem with markdown applied for the terminal (may include ANSI SGR). */
   stemRenderedForTerminal: string
   shownAt: number

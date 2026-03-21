@@ -17,7 +17,6 @@ import {
   CURRENT_GUIDANCE_MAX_VISIBLE,
   formatHighlightedList,
 } from './listDisplay.js'
-import { renderMarkdownToTerminal } from './markdown.js'
 import type { ChatHistory, ChatHistoryOutputTone } from './types.js'
 import type { InteractiveFetchWaitLine } from './interactiveFetchWait.js'
 import { formatVersionOutput } from './version.js'
@@ -345,43 +344,6 @@ export function getTerminalWidth(): number {
   return process.stdout.columns || 80
 }
 
-/** One logical MCQ choice → one terminal line: collapse embedded newlines and trim runs of whitespace. */
-export function normalizeMcqChoiceRawText(raw: string): string {
-  return raw
-    .split(/\r?\n/)
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0)
-    .join(' ')
-}
-
-function renderMcqChoiceMarkdownOneLine(normalizedMarkdown: string): string {
-  return renderMarkdownToTerminal(normalizedMarkdown)
-    .split(/\r?\n/)
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0)
-    .join(' ')
-}
-
-export function formatMcqChoiceLines(choices: readonly string[]): string[] {
-  return choices.map((c, i) => {
-    const body = renderMcqChoiceMarkdownOneLine(normalizeMcqChoiceRawText(c))
-    return `  ${i + 1}. ${body}`
-  })
-}
-
-/** Current guidance for recall MCQ: one highlighted row per choice (same path as scrollback numbering). */
-export function buildMcqCurrentGuidanceLines(
-  choices: readonly string[],
-  highlightIndex: number,
-  width: TerminalWidth
-): string[] {
-  return formatCurrentGuidanceLines(
-    formatMcqChoiceLines(choices),
-    highlightIndex,
-    width
-  )
-}
-
 /** Last line of buffer (for slash-command prefix detection). */
 export function getLastLine(buffer: string): string {
   const lines = buffer.split('\n')
@@ -426,16 +388,19 @@ export function buildLiveRegionLines(
   return lines
 }
 
-/** Format plain option lines to Current guidance: highlight selected, truncate to terminal width. */
-function formatCurrentGuidanceLines(
-  plainLines: string[],
-  highlightIndex: number,
+/**
+ * Plain selectable rows (commands, tokens, recall MCQ choices, …) → Current guidance:
+ * highlight one row, truncate to width, scroll window when needed.
+ */
+export function renderCurrentGuidanceForSelectableLines(
+  plainLines: readonly string[],
+  selectedIndex: number,
   width: TerminalWidth
 ): string[] {
   return formatHighlightedList(
     plainLines,
     CURRENT_GUIDANCE_MAX_VISIBLE,
-    highlightIndex
+    selectedIndex
   ).map((line) => truncateToWidth(line, width))
 }
 
@@ -455,7 +420,7 @@ export function buildSuggestionLines(
     return [truncateToWidth(COMMANDS_HINT, width)]
   }
   const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
-  return formatCurrentGuidanceLines(
+  return renderCurrentGuidanceForSelectableLines(
     formatCommandCompletionLines(filtered),
     highlightIndex,
     width
@@ -479,7 +444,7 @@ export function buildTokenListLines(
   width: TerminalWidth,
   highlightIndex: number
 ): string[] {
-  return formatCurrentGuidanceLines(
+  return renderCurrentGuidanceForSelectableLines(
     formatTokenLines(tokens, defaultLabel),
     highlightIndex,
     width

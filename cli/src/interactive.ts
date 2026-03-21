@@ -29,6 +29,11 @@ import {
   type RecallNextResult,
 } from './recall.js'
 import {
+  recallMcqCurrentGuidanceLines,
+  recallMcqNumberedChoiceLines,
+  recallMcqStemWrappedLinesForCurrentPrompt,
+} from './recallMcqDisplay.js'
+import {
   getInteractiveFetchWaitLine,
   INTERACTIVE_FETCH_WAIT_LINES,
   resetInteractiveFetchWaitForTesting,
@@ -43,9 +48,7 @@ import {
   needsGapBeforeBox,
   buildSuggestionLines,
   buildTokenListLines,
-  buildMcqCurrentGuidanceLines,
   getLastLine,
-  formatMcqChoiceLines,
   getTerminalWidth,
   renderBox,
   renderFullDisplay,
@@ -164,7 +167,7 @@ function writeMcqRecallQuestionToScrollback(
   choices: readonly string[]
 ): void {
   writeLine(stemRenderedForTerminal)
-  for (const line of formatMcqChoiceLines(choices)) {
+  for (const line of recallMcqNumberedChoiceLines(choices)) {
     writeLine(line)
   }
   writeLine(`Enter your choice (1-${choices.length}):`)
@@ -660,7 +663,8 @@ function buildTTYDeps() {
     needsGapBeforeBox,
     buildSuggestionLines,
     getLastLine,
-    buildMcqCurrentGuidanceLines,
+    recallMcqStemWrappedLinesForCurrentPrompt,
+    recallMcqCurrentGuidanceLines,
     getTerminalWidth,
     renderFullDisplay,
     renderPastInput,

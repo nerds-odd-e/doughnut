@@ -46,7 +46,7 @@ Informal plan. Delete or trim when shipped.
 
 ### Phase 3 — Single choice-list builder + fix blank-line / index cohesion
 
-**Done:** `normalizeMcqChoiceRawText` + `renderMcqChoiceMarkdownOneLine` → `formatMcqChoiceLines`; `buildMcqCurrentGuidanceLines` (highlight + truncate) used from TTY; piped scrollback still uses `formatMcqChoiceLines` only.
+**Done:** `cli/src/recallMcqDisplay.ts` — `recallMcqNumberedChoiceLines` (scrollback + plain rows), `recallMcqCurrentGuidanceLines` (TTY Current guidance), `recallMcqStemWrappedLinesForCurrentPrompt` (Current prompt). Shared list chrome: `renderer.renderCurrentGuidanceForSelectableLines` (commands, tokens, MCQ).
 
 **Goal:** **One** function (or pair: “logical choices → display lines” + “highlight”) used for Current guidance so initial paint and ↑↓ selection always agree. Ensure `formatMcqChoiceLines` / markdown does not introduce **spurious extra rows** (e.g. trim or normalize embedded newlines in a **defined** way — single policy for all paths). `formatHighlightedList` continues to receive **one entry per choice** at the logical level **before** wrapping (or a flattened structure with explicit choice boundaries — see Phase 4).
 
@@ -80,7 +80,8 @@ Informal plan. Delete or trim when shipped.
 
 - `cli/src/interactive.ts` — `showRecallPrompt`, getters for TTY, exports for tests if needed
 - `cli/src/adapters/ttyAdapter.ts` — `getDisplayContent`, MCQ branch for `currentPromptWrappedLines`
-- `cli/src/renderer.ts` — `formatMcqChoiceLines`, wrapping helpers, `buildLiveRegionLines` consumers
+- `cli/src/recallMcqDisplay.ts` — recall MCQ stem + choice rows for terminal
+- `cli/src/renderer.ts` — `renderCurrentGuidanceForSelectableLines`, `buildLiveRegionLines`, wrapping helpers
 - `cli/src/listDisplay.ts` — `formatHighlightedList` or successor for “logical items”
 - `cli/tests/interactive/interactiveTtyMcq.test.ts`, `processInput.test.ts`, possibly `interactiveRendering.test.ts`
 

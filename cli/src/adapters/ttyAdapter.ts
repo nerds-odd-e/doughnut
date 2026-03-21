@@ -42,7 +42,6 @@ import {
   isGreyDisabledInputChrome,
   RECALL_SESSION_YES_NO_PLACEHOLDER,
   wrapTextToLines,
-  wrapTextToVisibleWidthLines,
   type LiveRegionPaintOptions,
   type PlaceholderContext,
 } from '../renderer.js'
@@ -52,6 +51,7 @@ import type {
   McqRecallPending,
   OutputAdapter,
   PendingRecallAnswer,
+  RecallMcqChoiceTexts,
 } from '../types.js'
 
 export type TokenListAction = 'set-default' | 'remove' | 'remove-completely'
@@ -101,9 +101,13 @@ export interface TTYDeps {
     width: number,
     options?: { forceCommandsHint?: boolean }
   ) => string[]
-  buildMcqCurrentGuidanceLines: (
-    choices: readonly string[],
-    highlightIndex: number,
+  recallMcqStemWrappedLinesForCurrentPrompt: (
+    stemRenderedForTerminal: string,
+    width: number
+  ) => string[]
+  recallMcqCurrentGuidanceLines: (
+    choices: RecallMcqChoiceTexts,
+    selectedChoiceIndex: number,
     width: number
   ) => string[]
   getTerminalWidth: () => number
@@ -151,20 +155,6 @@ export interface TTYDeps {
 
 function cycleIndex(current: number, delta: number, length: number): number {
   return (current + delta + length) % length
-}
-
-/** MCQ recall stem for the TTY Current prompt: one wrapped row per markdown line, ANSI preserved. */
-function wrapRecallMcqStemForCurrentPrompt(
-  stemRenderedForTerminal: string,
-  width: number
-): string[] {
-  return stemRenderedForTerminal
-    .split('\n')
-    .flatMap((paragraph) =>
-      paragraph.length === 0
-        ? ['']
-        : wrapTextToVisibleWidthLines(paragraph, width)
-    )
 }
 
 /**
@@ -251,7 +241,8 @@ export async function runTTY(
     getLastLine,
     buildBoxLines,
     buildSuggestionLines,
-    buildMcqCurrentGuidanceLines,
+    recallMcqStemWrappedLinesForCurrentPrompt,
+    recallMcqCurrentGuidanceLines,
     getTerminalWidth,
     buildCurrentPromptSeparator,
     buildLiveRegionLines,
@@ -316,7 +307,7 @@ export async function runTTY(
     lastPaintedLineCount: 0,
   }
   let tokenSelection: TokenSelectionState | null = null
-  let mcqChoiceHighlightIndex = 0
+  let recallMcqSelectedChoiceIndex = 0
   let interactiveFetchWaitEllipsisTick = 0
   let interactiveFetchWaitRepaintTimer: ReturnType<typeof setInterval> | null =
     null
@@ -421,7 +412,7 @@ export async function runTTY(
         isMcqRecallPending(pendingRecallAnswer) &&
         !isPendingRecallStopConfirmation()
       ) {
-        currentPromptWrappedLines = wrapRecallMcqStemForCurrentPrompt(
+        currentPromptWrappedLines = recallMcqStemWrappedLinesForCurrentPrompt(
           pendingRecallAnswer.stemRenderedForTerminal,
           width
         )
@@ -445,9 +436,9 @@ export async function runTTY(
       : isPendingRecallStopConfirmation()
         ? ['Stop recall? (y/n)']
         : isMcqRecallPending(pendingRecallAnswer)
-          ? buildMcqCurrentGuidanceLines(
+          ? recallMcqCurrentGuidanceLines(
               pendingRecallAnswer.choices,
-              mcqChoiceHighlightIndex,
+              recallMcqSelectedChoiceIndex,
               width
             )
           : buildSuggestionLines(
@@ -678,14 +669,14 @@ export async function runTTY(
   /** MCQ recall turn: line passed to `processInput` (slash escapes, number, or highlighted choice). */
   function recallMcqSubmittedLine(
     trimmedBuffer: string,
-    choices: readonly string[],
-    highlightedChoiceIndex: number
+    choices: RecallMcqChoiceTexts,
+    selectedChoiceIndex: number
   ): string {
     if (trimmedBuffer === '/stop') return '/stop'
     if (trimmedBuffer === '/contest') return '/contest'
     const n = Number.parseInt(trimmedBuffer, 10)
     if (n >= 1 && n <= choices.length) return String(n)
-    return String(highlightedChoiceIndex + 1)
+    return String(selectedChoiceIndex + 1)
   }
 
   ttyOutput = {
@@ -710,7 +701,7 @@ export async function runTTY(
       tokenSelection = null
       if (isInRecallSubstate()) exitRecallMode()
       setPendingRecallStopConfirmation(false)
-      mcqChoiceHighlightIndex = 0
+      recallMcqSelectedChoiceIndex = 0
       doFullRedraw()
     },
     onInteractiveFetchWaitChanged: () => {
@@ -766,7 +757,7 @@ export async function runTTY(
         setPendingRecallStopConfirmation(false)
         if (isYes) {
           exitRecallMode()
-          mcqChoiceHighlightIndex = 0
+          recallMcqSelectedChoiceIndex = 0
           commitHistoryOutput(['Stopped recall'])
           return
         }
@@ -797,8 +788,8 @@ export async function runTTY(
         drawBox()
       } else if (key.name === 'up' || key.name === 'down') {
         const delta = key.name === 'up' ? -1 : 1
-        mcqChoiceHighlightIndex = cycleIndex(
-          mcqChoiceHighlightIndex,
+        recallMcqSelectedChoiceIndex = cycleIndex(
+          recallMcqSelectedChoiceIndex,
           delta,
           choices.length
         )
@@ -808,12 +799,12 @@ export async function runTTY(
         const effectiveInput = recallMcqSubmittedLine(
           trimmedBuffer,
           choices,
-          mcqChoiceHighlightIndex
+          recallMcqSelectedChoiceIndex
         )
         clearLiveRegionForRepaint(livePaint)
         const inputForHistory = commandInput.lineDraft || effectiveInput
         commandInput = clearLiveCommandLine(commandInput)
-        mcqChoiceHighlightIndex = 0
+        recallMcqSelectedChoiceIndex = 0
         livePaint.lastPaintedLineCount = 0
         resetCommandTurnBuffer()
         chatHistory.push({
@@ -885,7 +876,7 @@ export async function runTTY(
       if (isInRecallSubstate()) {
         exitRecallMode()
         commandInput = clearLiveCommandLine(commandInput)
-        mcqChoiceHighlightIndex = 0
+        recallMcqSelectedChoiceIndex = 0
         resetLivePaintCursor()
         drawBox()
         return
@@ -979,7 +970,7 @@ export async function runTTY(
           return
         }
         if (isMcqRecallPending(getPendingRecallAnswer())) {
-          mcqChoiceHighlightIndex = 0
+          recallMcqSelectedChoiceIndex = 0
         }
         drawBox()
       }
