@@ -1,5 +1,5 @@
 ---
-description: E2E testing, end-to-end tests, Cypress, Cucumber, BDD, feature files, step definitions, page objects, test execution
+description: E2E testing, end-to-end tests, Cypress, Cucumber, BDD, feature files, step definitions, page objects, fluent interface, test execution
 alwaysApply: false
 ---
 # E2E Testing Practices for Doughnut
@@ -67,7 +67,7 @@ The backend service log is located at `backend/logs/doughnut-e2e.log`. Please ma
 ### 2. Step Definitions
 
 - Keep step definitions lightweight
-- Delegate implementation details to Page Objects
+- Delegate implementation details to Page Objects, preferably as **fluent** chains (see §3)
 - Use TypeScript for better type safety
 - Reuse steps across features when possible
 - Use parameter types for complex objects
@@ -81,8 +81,10 @@ When('I start a conversation about the note {string}', (noteTopology: string) =>
 
 ### 3. Page Object Pattern
 
+**Preferred pattern:** page objects with a **fluent interface** — methods that perform an action return the next page object (or `this` when staying on the same screen) so step definitions read as a short chain and navigation stays explicit in the types.
+
 - Centralize all UI interactions in page objects
-- Chain methods for better readability
+- Prefer fluent chaining over one-off helpers that do not return a navigable object
 - Use TypeScript interfaces for better type checking
 - Keep page objects focused on single responsibility
 - Use meaningful method names that reflect user actions
