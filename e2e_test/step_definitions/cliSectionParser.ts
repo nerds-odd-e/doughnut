@@ -166,15 +166,15 @@ function collectSectionLines(
 }
 
 /**
- * True for PTY-driven interactive captures only.
- * Piped `runPiped` also draws ┌─┐ and grey past-input lines but does not emit this OSC — use non-interactive assertion steps for that.
- * Inlined: byte-identical to `INTERACTIVE_INPUT_READY_OSC` in `cli/src/renderer.ts`.
+ * TTY writes this when the input box is ready; PTY E2E waits on it.
+ * Byte-identical to `cli/src/renderer.ts` (Cypress plugin must not import `cli/`).
  */
-const INTERACTIVE_INPUT_READY_OSC =
+export const INTERACTIVE_INPUT_READY_OSC =
   '\x1b]900;doughnut-interactive-input-ready\x07' as const
 
-export function cliOutputHasInteractiveLayout(output: string): boolean {
-  return output.includes(INTERACTIVE_INPUT_READY_OSC)
+/** True only for real PTY captures; piped `runPiped` draws a box but never emits the OSC. */
+export function ptyStdoutHasInputReadyMarker(stdout: string): boolean {
+  return stdout.includes(INTERACTIVE_INPUT_READY_OSC)
 }
 
 // --- Public API ---
@@ -210,38 +210,38 @@ export function getCurrentGuidanceDebug(output: string): {
   }
 }
 
-function getCurrentGuidanceCombined(
-  boundaries: Boundaries,
-  stripAnsi: boolean
-): string {
-  const parts = [
-    collectSectionLines(boundaries, 'current-prompt', stripAnsi),
-    collectSectionLines(boundaries, 'current-guidance', stripAnsi),
-    collectSectionLines(boundaries, 'history-output', stripAnsi),
-  ].map((lines) => lines.join('\n'))
-  return `${parts[0]}\n${parts[1]}\n${parts[2]}`.trim()
+function parseLiveRegion(
+  output: string,
+  stripAnsiForAssertions: boolean
+): { currentGuidanceAndHistory: string; historyOutput: string } {
+  const boundaries = parseCliOutput(output)
+  const strip = stripAnsiForAssertions
+  const historyOutput = collectSectionLines(
+    boundaries,
+    'history-output',
+    strip
+  ).join('\n')
+  const currentGuidanceAndHistory = [
+    collectSectionLines(boundaries, 'current-prompt', strip).join('\n'),
+    collectSectionLines(boundaries, 'current-guidance', strip).join('\n'),
+    historyOutput,
+  ]
+    .join('\n')
+    .trim()
+  return { currentGuidanceAndHistory, historyOutput }
 }
 
+/** Strip-ansi “live” region: current prompt, guidance, plus parsed history-output (recall-style assertions). */
 export function getRecallDisplaySections(output: string): {
   currentGuidanceAndHistory: string
   historyOutput: string
 } {
-  const boundaries = parseCliOutput(output)
-  const currentGuidanceAndHistory = getCurrentGuidanceCombined(boundaries, true)
-  const historyOutput = collectSectionLines(
-    boundaries,
-    'history-output',
-    true
-  ).join('\n')
-  return {
-    currentGuidanceAndHistory,
-    historyOutput,
-  }
+  return parseLiveRegion(output, true)
 }
 
+/** Raw ANSI for styling checks on the same logical region as `getRecallDisplaySections`. */
 export function getCurrentGuidanceAndHistoryRaw(output: string): string {
-  const boundaries = parseCliOutput(output)
-  return getCurrentGuidanceCombined(boundaries, false)
+  return parseLiveRegion(output, false).currentGuidanceAndHistory
 }
 
 const INPUT_BOX_TOP_BORDER_LINE = /^┌─*┐$/

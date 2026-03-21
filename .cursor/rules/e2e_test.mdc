@@ -211,6 +211,14 @@ injectNotes(noteTestData: NoteTestData[]) {
 }
 ```
 
+### 9. Explicit conditions: avoid “smart” branches in steps and page objects
+
+- A scenario describes **one fixed path**. Step definitions and page objects should **not** encode alternate behaviors with conditional logic (large `if` / `switch` trees, parameter sniffing, mode flags) **except** when the branch exists **only** to **assert** or **fail fast** with a clear error.
+- **Distinguish differences at the caller:** prefer separate steps and/or separate page-object methods over one generic helper that decides what to do at runtime.
+- **Name the condition in Gherkin** when behavior differs (e.g. different kinds of input or navigation). Readable scenarios plus explicit steps keep automation shallow; branching in test code should be rare.
+
+(Related example: interactive CLI input—use distinct steps for slash-command entry vs plain line vs Enter, instead of one function that inspects the string.)
+
 ## Linting Errors and E2E Tests
 
 **IMPORTANT**: The frontend Vite configuration has `overlay: false` set in the checker plugin to prevent linting/type errors from blocking e2e tests with overlay warnings.
@@ -231,7 +239,7 @@ CURSOR_DEV=true nix develop -c pnpm format:all
 
 ## Common Pitfalls to Avoid
 
-1. Don't put complex logic in step definitions
+1. Don't put complex logic in step definitions (see **§9. Explicit conditions**—avoid hiding variants behind one parameterized step or page-object method)
 2. Don't create long scenarios with many steps
 3. Don't rely on test order
 4. Don't use hardcoded waits
