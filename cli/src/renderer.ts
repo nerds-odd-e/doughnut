@@ -152,8 +152,39 @@ export function stripAnsiCsiAndCr(str: string): string {
     .replace(/\r/g, '')
 }
 
+/**
+ * Terminal column width of a single character: 2 for CJK/wide characters
+ * (East Asian Width W or F), 1 for everything else.
+ */
+function charTerminalWidth(ch: string): 1 | 2 {
+  const cp = ch.codePointAt(0) ?? 0
+  if (
+    (cp >= 0x2e80 && cp <= 0x303e) || // CJK Radicals Supplement – CJK Symbols and Punctuation
+    (cp >= 0x3040 && cp <= 0x33ff) || // Hiragana, Katakana, Bopomofo, CJK Compatibility
+    (cp >= 0x3400 && cp <= 0x4dbf) || // CJK Unified Ideographs Extension A
+    (cp >= 0x4e00 && cp <= 0xa4cf) || // CJK Unified Ideographs + Yi
+    (cp >= 0xa960 && cp <= 0xa97f) || // Hangul Jamo Extended-A
+    (cp >= 0xac00 && cp <= 0xd7ff) || // Hangul Syllables + Hangul Jamo Extended-B
+    (cp >= 0xf900 && cp <= 0xfaff) || // CJK Compatibility Ideographs
+    (cp >= 0xfe10 && cp <= 0xfe6f) || // CJK Compatibility Forms, Small Form Variants
+    (cp >= 0xff00 && cp <= 0xff60) || // Fullwidth Latin, etc.
+    (cp >= 0xffe0 && cp <= 0xffe6) || // Fullwidth Signs
+    (cp >= 0x1b000 && cp <= 0x1b12f) || // Kana Supplement / Kana Extended-A
+    (cp >= 0x20000 && cp <= 0x2fffd) || // CJK Unified Ideographs Extension B–F
+    (cp >= 0x30000 && cp <= 0x3fffd) // CJK Unified Ideographs Extension G+
+  ) {
+    return 2
+  }
+  return 1
+}
+
+/** Terminal column count of a string (ANSI-stripped; CJK wide chars count as 2). */
 export function visibleLength(str: string): number {
-  return stripAnsi(str).length
+  let total = 0
+  for (const ch of stripAnsi(str)) {
+    total += charTerminalWidth(ch)
+  }
+  return total
 }
 
 /** Wraps plain text to width; returns lines. Breaks at word boundaries when possible. */
@@ -205,13 +236,14 @@ export function wrapTextToVisibleWidthLines(
         j++
         continue
       }
-      if (vis + 1 > width) break
+      const tw = charTerminalWidth(t)
+      if (vis + tw > width) break
       if (t === ' ' || t === '\t') {
         breakAfter = j
         breakLine = line + t
       }
       line += t
-      vis += 1
+      vis += tw
       j++
     }
     if (j === i) {
@@ -254,11 +286,12 @@ export function truncateToWidth(str: string, width: TerminalWidth): string {
     if (token.startsWith('\x1b')) {
       result += token
     } else {
-      if (visibleCount + 1 > maxVisible) {
+      const tw = charTerminalWidth(token)
+      if (visibleCount + tw > maxVisible) {
         return `${result}...${RESET}`
       }
       result += token
-      visibleCount++
+      visibleCount += tw
     }
   }
   return result

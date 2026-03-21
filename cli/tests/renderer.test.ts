@@ -12,6 +12,7 @@ import {
   stripAnsiCsiAndCr,
   needsGapBeforeBox,
   buildLiveRegionLines,
+  visibleLength,
   wrapTextToVisibleWidthLines,
 } from '../src/renderer.js'
 import type { ChatHistory } from '../src/types.js'
@@ -72,6 +73,28 @@ describe('wrapTextToVisibleWidthLines (recall MCQ stem / ANSI terminal strings)'
     expect(joined).toContain('hi')
     expect(joined).toContain('there')
     expect(lines.every((l) => stripAnsi(l).length <= 3)).toBe(true)
+  })
+
+  test('CJK wide characters count as 2 terminal columns each', () => {
+    // 'あ' through 'た' = 16 hiragana characters × 2 terminal columns = 32 cols > 30
+    // Real terminals render each as 2 columns; the stem auto-wraps on screen.
+    // If wide chars are counted as 1, currentPromptWrappedLines is 1 line short,
+    // cursorUpStepsToLiveRegionTop is too small, and ↓ leaves the old separator
+    // on screen above the repainted live region — appearing duplicated.
+    const japanese16 = 'あいうえおかきくけこさしすせそた'
+    expect(
+      visibleLength(japanese16),
+      'Each CJK/hiragana character occupies 2 terminal columns, so 16 chars = 32 columns.'
+    ).toBe(32)
+    const lines = wrapTextToVisibleWidthLines(japanese16, 30)
+    expect(
+      lines.length,
+      '32 terminal-column text must wrap to ≥2 lines at width 30.'
+    ).toBeGreaterThanOrEqual(2)
+    expect(
+      lines.every((l) => visibleLength(l) <= 30),
+      'Every wrapped line must fit within the terminal width.'
+    ).toBe(true)
   })
 })
 
