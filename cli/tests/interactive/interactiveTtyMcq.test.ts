@@ -28,7 +28,6 @@ import {
 } from './interactiveTestHelpers.js'
 import {
   countInputBoxTopOutlinesBeforeFirstBoxContent,
-  cursorPositionAfterTtyWrites,
   liveRegionRepaintHasStaleCursorUpBeforeBoxTop,
 } from '../ttyWriteSimulation.js'
 
@@ -181,17 +180,12 @@ describe('TTY recall MCQ', () => {
       )
     })
 
-    test('no stale extra cursor-up before input box top', async () => {
+    test('initial MCQ live-region paint: no stale CUU and a single input box top', async () => {
       await submitTTYCommand(stdin, '/recall')
+      const raw = ttyOutput(writeSpy)
+      expect(liveRegionRepaintHasStaleCursorUpBeforeBoxTop(raw)).toBe(false)
       expect(
-        liveRegionRepaintHasStaleCursorUpBeforeBoxTop(ttyOutput(writeSpy))
-      ).toBe(false)
-    })
-
-    test('at most one input box top outline before first box content row', async () => {
-      await submitTTYCommand(stdin, '/recall')
-      expect(
-        countInputBoxTopOutlinesBeforeFirstBoxContent(ttyOutput(writeSpy))
+        countInputBoxTopOutlinesBeforeFirstBoxContent(raw)
       ).toBeLessThanOrEqual(1)
     })
 
@@ -246,62 +240,5 @@ describe('TTY recall MCQ wrapped choices (narrow terminal)', () => {
       .filter((l: string) => l.includes('\x1b[7m'))
     expect(highlighted.length).toBe(1)
     expect(stripAnsi(highlighted[0]!)).toMatch(/ {2}2\. /)
-  })
-})
-
-describe('TTY recall MCQ wrapped stem (narrow terminal)', () => {
-  let writeSpy: ReturnType<typeof vi.spyOn>
-  let stdin: TTYStdin
-  let savedColumns: number | undefined
-
-  // Stem that wraps to 2 lines at width 30; choices short enough to fit on 1 line each.
-  const LONG_STEM = 'A question long enough to wrap at thirty columns wide'
-  const NARROW_WIDTH = 30
-
-  beforeEach(async () => {
-    savedColumns = process.stdout.columns
-    Object.defineProperty(process.stdout, 'columns', {
-      value: NARROW_WIDTH,
-      writable: true,
-      configurable: true,
-    })
-    resetRecallStateForTesting()
-    mockRecallNext.mockResolvedValue({
-      type: 'mcq',
-      recallPromptId: 300,
-      stem: LONG_STEM,
-      choices: ['A', 'B'],
-    })
-    mockAnswerQuiz.mockResolvedValue({ correct: true })
-    ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
-  })
-
-  afterEach(() => {
-    endTTYSession(stdin)
-    Object.defineProperty(process.stdout, 'columns', {
-      value: savedColumns,
-      writable: true,
-      configurable: true,
-    })
-  })
-
-  test('after ↓ selection change, separator appears exactly once in the simulated screen', async () => {
-    await submitTTYCommand(stdin, '/recall')
-    pressKey(stdin, 'down')
-    await tick()
-
-    const { lines } = cursorPositionAfterTtyWrites(ttyOutput(writeSpy))
-    const separatorCount = lines.filter((l) => /^─{10,}$/.test(l)).length
-    expect(
-      separatorCount,
-      'After pressing ↓ with a wrapped MCQ stem, the separator must appear exactly once ' +
-        'in the simulated screen.\n' +
-        'A count > 1 means the second drawBox() started painting one row below the live-region ' +
-        'top, leaving the old separator intact above the new one.\n' +
-        'Root cause: cursorUpStepsToLiveRegionTop was set to inputLineRowInLiveBlock from the ' +
-        'PREVIOUS (pre-MCQ) live region, not from the current MCQ live region whose height ' +
-        'includes the wrapped stem lines.\n' +
-        `Simulated final screen rows:\n${lines.map((l, i) => `  [${i}] ${l}`).join('\n')}`
-    ).toBe(1)
   })
 })

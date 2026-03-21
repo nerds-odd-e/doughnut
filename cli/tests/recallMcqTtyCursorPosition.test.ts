@@ -1,8 +1,8 @@
 /**
- * Observable contract: after the TTY paints recall MCQ with wrapped choice lines, the final
- * cursor must sit on the live input row (the bordered line with the → prompt). Cursor-up math
- * must use the full live-region height from buildLiveRegionLines, not a height that ignores
- * extra guidance rows from wrapping.
+ * Observable contract: after the TTY paints recall MCQ, the final cursor must sit on the live
+ * input row (the bordered line with the → prompt). Wrong `liveLineCount` / `inputLineRowInLiveBlock`
+ * (e.g. wrapped stem or choices counted with JS `.length` instead of terminal columns) breaks
+ * CUU after `drawBox` — duplicate separators, drift, or a cursor off the → row.
  */
 import process from 'node:process'
 import { afterEach, describe, expect, test, type vi } from 'vitest'
@@ -80,22 +80,14 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
     assertCursorOnInputPromptRow(ttyOutput(writeSpy))
   })
 
-  test('narrow terminal (wrapped choices), after ↓ repaint: cursor on the → input row', async () => {
-    const choices = [
-      'First option with enough text to wrap across multiple rows at narrow width',
-      'B',
-    ] as const
+  test('wrapped MCQ stem (narrow terminal), after ↓: cursor on the → input row', async () => {
     mockRecallNext.mockResolvedValue({
       type: 'mcq',
-      recallPromptId: 2,
-      stem: 'Pick:',
-      choices: [...choices],
+      recallPromptId: 300,
+      stem: 'A question long enough to wrap at thirty columns wide',
+      choices: ['A', 'B'],
     })
-    await sessionWithColumns(36)
-    expect(
-      formatMcqChoiceLines([...choices], 36).length,
-      'Sanity: this fixture must wrap to more than two physical choice lines at width 36 or the regression does not apply.'
-    ).toBeGreaterThanOrEqual(3)
+    await sessionWithColumns(30)
     await submitTTYCommand(stdin, '/recall')
     await tick()
     pressKey(stdin, 'down')
