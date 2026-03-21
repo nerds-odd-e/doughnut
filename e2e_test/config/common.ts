@@ -19,10 +19,15 @@ import createBundler from '@bahmutov/cypress-esbuild-preprocessor'
 import AdmZip from 'adm-zip'
 import type { ExpectedFile } from '../start/downloadChecker'
 import {
+  interactivePayloadEnterOnly,
+  interactivePayloadEsc,
+  interactivePayloadLineAndEnter,
+  interactivePayloadSlashCommandAndEnter,
   runCliInPty,
-  startInteractiveCli as startInteractiveCliProcess,
   sendToInteractiveCli as sendToInteractiveCliInput,
+  startInteractiveCli as startInteractiveCliProcess,
   stopInteractiveCli as stopInteractiveCliProcess,
+  writeInteractiveCliAndWaitForReady,
 } from './cliPtyRunner'
 import { cliEnv } from './cliEnv'
 import { E2E_BACKEND_BASE_URL } from './constants'
@@ -459,6 +464,24 @@ const commonConfig = {
         },
         async sendToInteractiveCli({ input }: { input: string }) {
           return sendToInteractiveCliInput(input)
+        },
+        async sendInteractiveCliSlashCommand({ command }: { command: string }) {
+          return writeInteractiveCliAndWaitForReady(
+            interactivePayloadSlashCommandAndEnter(command)
+          )
+        },
+        async sendInteractiveCliLine({ line }: { line: string }) {
+          return writeInteractiveCliAndWaitForReady(
+            interactivePayloadLineAndEnter(line)
+          )
+        },
+        async sendInteractiveCliEnter() {
+          return writeInteractiveCliAndWaitForReady(
+            interactivePayloadEnterOnly()
+          )
+        },
+        async sendInteractiveCliEsc() {
+          return writeInteractiveCliAndWaitForReady(interactivePayloadEsc())
         },
         async stopInteractiveCli() {
           await stopInteractiveCliProcess()

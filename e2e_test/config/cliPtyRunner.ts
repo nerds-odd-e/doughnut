@@ -197,23 +197,36 @@ export async function startInteractiveCli(opts: {
   interactiveHandle = handle
 }
 
-export async function sendToInteractiveCli(input: string): Promise<string> {
+/** Bytes for a slash command: space before Enter, as the live CLI expects. `command` is typically trimmed and starts with `/`. */
+export function interactivePayloadSlashCommandAndEnter(
+  command: string
+): string {
+  return `${command} \n`
+}
+
+/** One line of input followed by Enter (recall answers, plain text, numeric choice, etc.). */
+export function interactivePayloadLineAndEnter(line: string): string {
+  return `${line}\n`
+}
+
+export function interactivePayloadEnterOnly(): string {
+  return '\n'
+}
+
+export function interactivePayloadEsc(): string {
+  return '\x1b'
+}
+
+export async function writeInteractiveCliAndWaitForReady(
+  payload: string
+): Promise<string> {
   if (!interactiveHandle) {
     throw new Error(
       'No interactive CLI running. Ensure @interactiveCLI Before hook ran.'
     )
   }
-  const trimmed = input.trim()
-  const toSend =
-    trimmed === '\x1b'
-      ? '\x1b'
-      : trimmed.startsWith('/') && !trimmed.endsWith(' ')
-        ? `${trimmed} \n`
-        : trimmed.endsWith('\n')
-          ? trimmed
-          : `${trimmed}\n`
   const lenBeforeSend = interactiveHandle.stdout.value.length
-  interactiveHandle.pty.write(toSend)
+  interactiveHandle.pty.write(payload)
   await waitForInteractiveInputReadyOsc({
     getStdout: () => interactiveHandle!.stdout.value,
     maxWaitMs: 15_000,
@@ -225,6 +238,21 @@ export async function sendToInteractiveCli(input: string): Promise<string> {
     interactiveHandle.stdout.value
   )
   return interactiveHandle.stdout.value
+}
+
+export async function sendToInteractiveCli(input: string): Promise<string> {
+  const trimmed = input.trim()
+  let payload: string
+  if (trimmed === '\x1b') {
+    payload = interactivePayloadEsc()
+  } else if (trimmed.startsWith('/') && !trimmed.endsWith(' ')) {
+    payload = interactivePayloadSlashCommandAndEnter(trimmed)
+  } else if (trimmed.endsWith('\n')) {
+    payload = trimmed
+  } else {
+    payload = interactivePayloadLineAndEnter(trimmed)
+  }
+  return writeInteractiveCliAndWaitForReady(payload)
 }
 
 export async function stopInteractiveCli(): Promise<void> {

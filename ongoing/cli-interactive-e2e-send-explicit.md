@@ -65,10 +65,7 @@ Order by **risk reduction** and **mechanical migration**; each phase should end 
 
 ### Phase 1 — Dumb write helper + parallel API
 
-- Extract `writeInteractiveCliAndWaitForReady` from current `sendToInteractiveCli` (wait + assert unchanged).
-- Add new named functions that only build `payload` (slash+space+newline, line+newline, esc, enter).
-- Keep the legacy `sendToInteractiveCli` behavior **unchanged** temporarily (delegate internally to the new builders so logic lives in one place per intent, or duplicate minimally for one phase—team choice; goal is no nested ternary in the hot path long-term).
-- Add Cypress tasks + page-object methods **alongside** existing `input()`; no feature file changes yet (or one trivial scenario converted to prove wiring—optional).
+- **Done:** `writeInteractiveCliAndWaitForReady` + payload builders (`interactivePayloadSlashCommandAndEnter`, `interactivePayloadLineAndEnter`, `interactivePayloadEnterOnly`, `interactivePayloadEsc`) in `cliPtyRunner.ts`. Legacy `sendToInteractiveCli` keeps the same trim/slash/newline rules and delegates to those builders + `writeInteractiveCliAndWaitForReady`. Parallel Cypress tasks: `sendInteractiveCliSlashCommand`, `sendInteractiveCliLine`, `sendInteractiveCliEnter`, `sendInteractiveCliEsc`. Page object: `interactive().enterSlashCommand`, `enterLine`, `pressEnter`; `pressEsc` uses `sendInteractiveCliEsc`. No feature file changes.
 
 ### Phase 2 — Migrate `@interactiveCLI` scenarios to explicit steps
 
