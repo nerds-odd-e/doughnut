@@ -1,4 +1,5 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
+import makeMe from 'doughnut-test-fixtures/makeMe'
 import { createMockContext, findTool } from '../helpers/index.js'
 import { SearchController } from '@generated/doughnut-backend-api/sdk.gen'
 import { client } from '@generated/doughnut-backend-api/client.gen'
@@ -31,8 +32,8 @@ describe('find_most_relevant_note tool', () => {
   ) => {
     const findMostRelevantNoteTool = findTool('find_most_relevant_note')
 
-    const searchResult = shouldFindNote
-      ? [{ noteTopology: { id: 123, title: 'Test Note' } }]
+    const searchResult: SearchForRelationshipTargetResponse = shouldFindNote
+      ? [makeMe.aNoteSearchResult.id(123).title('Test Note').please()]
       : []
 
     // Mock the service response
@@ -41,7 +42,7 @@ describe('find_most_relevant_note tool', () => {
     )
     // OpenAPI client returns { data, error, request, response } structure
     mockSearchForRelationshipTarget.mockResolvedValue({
-      data: searchResult as SearchForRelationshipTargetResponse,
+      data: searchResult,
       error: undefined,
     } as Awaited<
       ReturnType<typeof SearchController.searchForRelationshipTarget>
