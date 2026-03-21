@@ -1,30 +1,56 @@
 /**
- * Cypress `task` handlers for CLI E2E. Depends on repo root only; no Cypress types required for the implementations.
+ * Cypress `task` handlers for CLI E2E. Depends only on `repoRoot` (repo checkout path).
  */
 
 import { existsSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import {
-  bundleAndCopyCliToBuildOutput,
-  CLI_SPAWN_TIMEOUT_MS,
-  getCliRunConfig,
-  runSync,
+  bundleCliIntoBackendStatic,
+  CLI_NON_INTERACTIVE_SPAWN_TIMEOUT_MS,
+  cliRepoSpawnFromRoot,
+  runShellCommandSync,
   spawnCliFromRepo,
-} from './cliNode'
+} from './cliE2eRepo'
 import { cliEnv } from './cliEnv'
 import {
-  interactiveSendEnter,
-  interactiveSendEsc,
-  interactiveSendLine,
-  interactiveSendSlashCommand,
   runCliInPty,
-  sendToInteractiveCli as sendToInteractiveCliLegacy,
-  startInteractiveCli as startInteractiveCliProcess,
-  stopInteractiveCli as stopInteractiveCliProcess,
+  sendToInteractiveCli as sendInteractiveCliToPty,
+  startInteractiveCli as startInteractiveCliPtySession,
+  stopInteractiveCli as stopInteractiveCliPtySession,
 } from './cliPtyRunner'
 
-export function createCliPluginTasks(repoRoot: string) {
+type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
+
+type RunCliDirectWithInputTask = WithOptionalCliEnv & {
+  input: string
+  simulateOAuthCallback?: boolean
+}
+
+type RunCliDirectWithArgsTask = WithOptionalCliEnv & {
+  args: string[]
+}
+
+type RunInstalledCliTask = WithOptionalCliEnv & {
+  doughnutPath: string
+  input?: string
+  args?: string[]
+}
+
+async function bundleCliIntoBackendStaticOrThrow(
+  repoRoot: string,
+  env?: NodeJS.ProcessEnv
+): Promise<true> {
+  try {
+    bundleCliIntoBackendStatic(repoRoot, env)
+    return true
+  } catch (error) {
+    console.error('Failed to bundle and copy CLI:', error)
+    throw error
+  }
+}
+
+export function createCliE2ePluginTasks(repoRoot: string) {
   return {
     createCliConfigDir() {
       return mkdtempSync(join(tmpdir(), 'cypress-cli-config-'))
@@ -38,25 +64,13 @@ export function createCliPluginTasks(repoRoot: string) {
       return configDir
     },
     async bundleAndCopyCli() {
-      try {
-        bundleAndCopyCliToBuildOutput(repoRoot)
-        return true
-      } catch (error) {
-        console.error('Failed to bundle and copy CLI:', error)
-        throw error
-      }
+      return bundleCliIntoBackendStaticOrThrow(repoRoot)
     },
     async bundleAndCopyCliWithVersion(version: string) {
-      try {
-        bundleAndCopyCliToBuildOutput(repoRoot, {
-          ...process.env,
-          CLI_VERSION: version,
-        })
-        return true
-      } catch (error) {
-        console.error('Failed to bundle and copy CLI:', error)
-        throw error
-      }
+      return bundleCliIntoBackendStaticOrThrow(repoRoot, {
+        ...process.env,
+        CLI_VERSION: version,
+      })
     },
     async installCli(baseUrl: string) {
       const installDir = mkdtempSync(join(tmpdir(), 'cypress-doughnut-cli-'))
@@ -69,7 +83,7 @@ export function createCliPluginTasks(repoRoot: string) {
       }
       const script = await response.text()
       writeFileSync(installScriptPath, script, { mode: 0o755 })
-      runSync(`bash ${installScriptPath}`, {
+      runShellCommandSync(`bash ${installScriptPath}`, {
         env: {
           ...process.env,
           INSTALL_PREFIX: installDir,
@@ -88,55 +102,33 @@ export function createCliPluginTasks(repoRoot: string) {
       input,
       env,
       simulateOAuthCallback,
-    }: {
-      input: string
-      env?: NodeJS.ProcessEnv
-      simulateOAuthCallback?: boolean
-    }) {
+    }: RunCliDirectWithInputTask) {
       return spawnCliFromRepo({
         repoRoot,
         stdin: input,
         env,
         simulateOAuthCallback,
-        timeoutMs: CLI_SPAWN_TIMEOUT_MS,
+        timeoutMs: CLI_NON_INTERACTIVE_SPAWN_TIMEOUT_MS,
       })
     },
-    async startInteractiveCli({ env }: { env?: NodeJS.ProcessEnv }) {
-      const config = getCliRunConfig(repoRoot)
-      await startInteractiveCliProcess({
-        command: config.command,
-        args: config.baseArgs,
+    async startInteractiveCli({ env }: WithOptionalCliEnv) {
+      const { command, baseArgs } = cliRepoSpawnFromRoot(repoRoot)
+      await startInteractiveCliPtySession({
+        command,
+        args: baseArgs,
         cwd: repoRoot,
         env: { ...cliEnv(env) },
       })
       return true
     },
     async sendToInteractiveCli({ input }: { input: string }) {
-      return sendToInteractiveCliLegacy(input)
-    },
-    async sendInteractiveCliSlashCommand({ command }: { command: string }) {
-      return interactiveSendSlashCommand(command)
-    },
-    async sendInteractiveCliLine({ line }: { line: string }) {
-      return interactiveSendLine(line)
-    },
-    async sendInteractiveCliEnter() {
-      return interactiveSendEnter()
-    },
-    async sendInteractiveCliEsc() {
-      return interactiveSendEsc()
+      return sendInteractiveCliToPty(input)
     },
     async stopInteractiveCli() {
-      await stopInteractiveCliProcess()
+      await stopInteractiveCliPtySession()
       return null
     },
-    async runCliDirectWithArgs({
-      args,
-      env,
-    }: {
-      args: string[]
-      env?: NodeJS.ProcessEnv
-    }) {
+    async runCliDirectWithArgs({ args, env }: RunCliDirectWithArgsTask) {
       return spawnCliFromRepo({ repoRoot, args, env })
     },
     async runInstalledCli({
@@ -144,13 +136,8 @@ export function createCliPluginTasks(repoRoot: string) {
       input,
       args,
       env,
-    }: {
-      doughnutPath: string
-      input?: string
-      args?: string[]
-      env?: NodeJS.ProcessEnv
-    }) {
-      if (!doughnutPath || typeof doughnutPath !== 'string') {
+    }: RunInstalledCliTask) {
+      if (!doughnutPath) {
         throw new Error(
           `runInstalledCli: doughnutPath required, got ${JSON.stringify(doughnutPath)}`
         )

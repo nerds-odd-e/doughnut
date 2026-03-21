@@ -105,19 +105,10 @@ function interactive() {
         'doughnutOutput'
       )
     },
-    enterSlashCommand(command: string) {
-      cy.task<string>('sendInteractiveCliSlashCommand', { command }).as(
+    pressEsc() {
+      cy.task<string>('sendToInteractiveCli', { input: '\x1b' }).as(
         'doughnutOutput'
       )
-    },
-    enterLine(line: string) {
-      cy.task<string>('sendInteractiveCliLine', { line }).as('doughnutOutput')
-    },
-    pressEnter() {
-      cy.task<string>('sendInteractiveCliEnter').as('doughnutOutput')
-    },
-    pressEsc() {
-      cy.task<string>('sendInteractiveCliEsc').as('doughnutOutput')
     },
     answerToPrompt(answer: string, expectedPromptText: string) {
       currentGuidance().expectContains(expectedPromptText)

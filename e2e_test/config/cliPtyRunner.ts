@@ -197,25 +197,20 @@ export async function startInteractiveCli(opts: {
   interactiveHandle = handle
 }
 
-/** Bytes for a slash command: space before Enter, as the live CLI expects. `command` is typically trimmed and starts with `/`. */
-export function interactivePayloadSlashCommandAndEnter(
-  command: string
-): string {
-  return `${command} \n`
-}
-
-/** One line of input followed by Enter (recall answers, plain text, numeric choice, etc.). */
-export function interactivePayloadLineAndEnter(line: string): string {
-  return `${line}\n`
-}
-
-export function interactivePayloadEnterOnly(): string {
-  return '\n'
-}
-
-export function interactivePayloadEsc(): string {
-  return '\x1b'
-}
+/**
+ * Raw PTY writes after an interactive CLI session is running.
+ * Matches CLI domain terms: slash command (+ space before Enter), line + Enter, bare Enter, ESC.
+ */
+export const interactiveCliTtyPayload = {
+  slashCommandSpaceThenEnter(command: string) {
+    return `${command} \n`
+  },
+  lineThenEnter(line: string) {
+    return `${line}\n`
+  },
+  enterOnly: '\n',
+  esc: '\x1b',
+} as const
 
 export async function writeInteractiveCliAndWaitForReady(
   payload: string
@@ -240,39 +235,18 @@ export async function writeInteractiveCliAndWaitForReady(
   return interactiveHandle.stdout.value
 }
 
-export async function interactiveSendSlashCommand(
-  command: string
-): Promise<string> {
-  return writeInteractiveCliAndWaitForReady(
-    interactivePayloadSlashCommandAndEnter(command)
-  )
-}
-
-export async function interactiveSendLine(line: string): Promise<string> {
-  return writeInteractiveCliAndWaitForReady(
-    interactivePayloadLineAndEnter(line)
-  )
-}
-
-export async function interactiveSendEnter(): Promise<string> {
-  return writeInteractiveCliAndWaitForReady(interactivePayloadEnterOnly())
-}
-
-export async function interactiveSendEsc(): Promise<string> {
-  return writeInteractiveCliAndWaitForReady(interactivePayloadEsc())
-}
-
+/** Cypress task helper: maps trimmed string + heuristics to PTY bytes (slash commands, lines, ESC). */
 export async function sendToInteractiveCli(input: string): Promise<string> {
   const trimmed = input.trim()
   let payload: string
-  if (trimmed === '\x1b') {
-    payload = interactivePayloadEsc()
+  if (trimmed === interactiveCliTtyPayload.esc) {
+    payload = interactiveCliTtyPayload.esc
   } else if (trimmed.startsWith('/') && !trimmed.endsWith(' ')) {
-    payload = interactivePayloadSlashCommandAndEnter(trimmed)
+    payload = interactiveCliTtyPayload.slashCommandSpaceThenEnter(trimmed)
   } else if (trimmed.endsWith('\n')) {
     payload = trimmed
   } else {
-    payload = interactivePayloadLineAndEnter(trimmed)
+    payload = interactiveCliTtyPayload.lineThenEnter(trimmed)
   }
   return writeInteractiveCliAndWaitForReady(payload)
 }

@@ -8,8 +8,8 @@ import { createEsbuildPlugin } from '@badeball/cypress-cucumber-preprocessor/esb
 import createBundler from '@bahmutov/cypress-esbuild-preprocessor'
 import AdmZip from 'adm-zip'
 import type { ExpectedFile } from '../start/downloadChecker'
-import { createCliPluginTasks } from './cliCypressTasks'
-import { runSync } from './cliNode'
+import { createCliE2ePluginTasks } from './cliE2ePluginTasks'
+import { runShellCommandSync } from './cliE2eRepo'
 import { E2E_BACKEND_BASE_URL } from './constants'
 
 const commonConfig = {
@@ -53,7 +53,7 @@ const commonConfig = {
       const testState: Record<string, unknown> = {}
 
       on('task', {
-        ...createCliPluginTasks(repoRoot),
+        ...createCliE2ePluginTasks(repoRoot),
         setTestState({ key, value }: { key: string; value: unknown }) {
           testState[key] = value
           return null
@@ -222,7 +222,7 @@ const commonConfig = {
         async bundleMcpServer() {
           const mcpServerDir = join(repoRoot, 'mcp-server')
           try {
-            runSync('pnpm bundle', { cwd: mcpServerDir })
+            runShellCommandSync('pnpm bundle', { cwd: mcpServerDir })
             return true
           } catch (error) {
             console.error('Failed to bundle MCP server:', error)

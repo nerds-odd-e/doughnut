@@ -65,7 +65,7 @@ Order by **risk reduction** and **mechanical migration**; each phase should end 
 
 ### Phase 1 — Dumb write helper + parallel API
 
-- **Done:** `writeInteractiveCliAndWaitForReady` + payload builders (`interactivePayloadSlashCommandAndEnter`, `interactivePayloadLineAndEnter`, `interactivePayloadEnterOnly`, `interactivePayloadEsc`) in `cliPtyRunner.ts`. Legacy `sendToInteractiveCli` keeps the same trim/slash/newline rules and delegates to those builders + `writeInteractiveCliAndWaitForReady`. Parallel Cypress tasks: `sendInteractiveCliSlashCommand`, `sendInteractiveCliLine`, `sendInteractiveCliEnter`, `sendInteractiveCliEsc`. Page object: `interactive().enterSlashCommand`, `enterLine`, `pressEnter`; `pressEsc` uses `sendInteractiveCliEsc`. No feature file changes.
+- **Done:** `writeInteractiveCliAndWaitForReady` + `interactiveCliTtyPayload` in `cliPtyRunner.ts`. Legacy task `sendToInteractiveCli` unchanged for steps/page objects. Repo/spawn/bundle lives in `cliE2eRepo.ts`; CLI Cypress tasks in `cliE2ePluginTasks.ts` (`createCliE2ePluginTasks`). Unused parallel tasks / page-object shortcuts removed until Phase 2 migrates Gherkin.
 
 ### Phase 2 — Migrate `@interactiveCLI` scenarios to explicit steps
 
