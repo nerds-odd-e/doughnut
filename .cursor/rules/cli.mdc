@@ -29,89 +29,70 @@ cli/
 
 ## Vitest: observable behavior
 
-For **interactive** behavior, prefer driving the real stack (**`runInteractive`** with a mock TTY or piped stdin) and asserting on **stdout / `console.log`** (or other user-visible output). Avoid splitting the same visible outcome across many tests that only call **`processInput`** with bespoke adapters unless the contract under test is truly that function in isolation (e.g. `-c` / non-interactive paths). See **Testing strategy → Observable behavior first** in `.cursor/rules/planning.mdc`.
+For **interactive** behavior, prefer **`runInteractive`** with a mock TTY or piped stdin and assert **stdout** / visible output. Use **`processInput`** + mock **`OutputAdapter`** only for **non-interactive** (`-c`), helpers, or when there is no stable hook. See **Testing strategy → Observable behavior first** in `.cursor/rules/planning.mdc`.
 
-### Guardrails (new tests)
-
-- **New interactive behavior:** Default to **`runInteractive`** and assert user-visible output (TTY bytes or piped stdout as appropriate). Add **`processInput`** plus a mock **`OutputAdapter`** only when the contract under test is **non-interactive** (`-c` / default console adapter), **helper-only**, or there is no stable observable hook without it (see **Loading UI** below).
-- **`cli/tests/interactive/processInput.test.ts`:** Treat as **contract tests** for **`processInput`** with the **default adapter** (typically `console.log`), i.e. the same observable surface as **`-c` / piped** logging — **not** a second full interactive engine. TTY-specific outcomes belong in **`interactiveTty*.test.ts`** (or equivalent **`runInteractive`** harness).
-- When adding or reshaping CLI tests, re-read this section and **planning.mdc** → observable behavior first.
+- **TTY-specific behavior:** `cli/tests/interactive/interactiveTty*.test.ts` (or equivalent `runInteractive` harness).
+- **`cli/tests/interactive/processInput.test.ts`:** Contract for **`processInput`** with the **default adapter** (same surface as `-c` / piped), not a second interactive engine.
 
 ## Domain terminology
 
+Vocabulary for Cucumber steps and page objects (`e2e_test/start/pageObjects/cli/`). **Exact TTY behavior** (history, cursor, rendering) lives in code + Vitest; **scenario-shaped coverage** in `e2e_test/features/cli/*.feature`.
+
 | Term | Definition |
 |------|-------------|
-| **Non-interactive output** | Entire stdout when running non-interactively (-c, piped, installed). |
-| **History output** | Interactive only. Past command results (parsed ANSI section). |
-| **History input** | Interactive only. Past user input lines. |
-| **Current prompt** | Interactive only. Instructional line above the input box (between separator and box), e.g. "Select and enter to change the default access token", "Stop recall? (y/n)". |
-| **Current guidance** | Interactive only. Options below the input box: / commands, token list, MCQ choices. |
-| **Input box** | The bordered area where the user types. |
-| **Interactive CLI simulated plain screen** | E2E only: `cliSectionParser` replays PTY bytes (cursor up, erase line, OSC, etc.), then strips CSI/SGR — approximate visible grid for counting `┌─┐` lines and for `assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks` after each ready OSC in `cliPtyRunner`. |
-| **Selection mode** | Interactive only. User selects from Current guidance (e.g. token list) via ↑↓ Enter; input box is grayed, cursor hidden, no "→" prompt. Any other key cancels. |
-| **Interactive fetch wait** | Interactive only. While a slow command is awaited (recall fetch, `/contest`, `/recall-status`, async token params, Gmail/email, token list remove-completely). **Current prompt** uses **bright blue** `\x1b[94m` (`INTERACTIVE_FETCH_WAIT_PROMPT_FG`). **Input box** uses the same grey outline as token list pickers (`isGreyDisabledInputChrome`), placeholder context `interactiveFetchWait` / text `loading ...`. Animated `.` / `..` / `...` on the wait line. Copy: `INTERACTIVE_FETCH_WAIT_LINES` in `interactiveFetchWait.ts`. |
+| **Non-interactive output** | Full stdout for `-c`, piped, or installed one-shot runs. |
+| **History output** | Interactive: past command results (parsed section). |
+| **History input** | Interactive: past user lines in scrollback (grey blocks). Step: “history input”. |
+| **Input command history** | TTY: committed lines for ↑↓ recall + persistence (`interactiveCommandInput.ts`, `cliCommandHistoryFile.ts`). Masked before storage/display. |
+| **Current prompt** | Line above the input box (instructions, y/n, etc.). |
+| **Current guidance** | Below the box: `/` hints, lists, MCQ options. |
+| **Input box** | Bordered live typing area. |
+| **Selection mode** | Pick from Current guidance with ↑↓ Enter; greyed box. |
+| **Interactive fetch wait** | Blue prompt + grey box + animated loading while a slow interactive call runs — see `interactiveFetchWait.ts` and Vitest (`interactiveFetchWait`, `interactiveTtyFetchWaitEsc`, etc.). |
 
-**TTY command output:** In interactive TTY mode, `OutputAdapter.log` / `logError` / `logUserNotice` do not write plain message lines to stdout directly. Text is buffered for `chatHistory` with a **`ChatHistoryOutputTone`** (`plain` / `error` / `userNotice`). When a command finishes, the adapter clears the live region, appends the committed input (`renderPastInput`) and output lines to stdout (no full-screen clear), then `drawBox` repaints the live region. **`/clear` and terminal resize** still use a full redraw (`doFullRedraw` → `CLEAR_SCREEN` + `renderFullDisplay`). Token-list completion skips a second `renderPastInput` because entering selection mode already printed it. Incremental `drawBox` repaints only the live region between keystrokes or while the fetch-wait line animates.
+**`/add-access-token`:** Never persist or show raw tokens in history; `inputHistoryMask.ts`.
 
-**E2E assertion steps**: Use `I should see X in the non-interactive output` for non-interactive (-c, piped). Use `I should see X in the history output` or `I should see X in the Current guidance` for interactive. Step definitions delegate to `cli.xxx` page objects; the `cliSectionParser` exports `getRecallDisplaySections`, `getHistoryOutputContent`, etc. Assertions fail fast if the capture does not match the step: `ptyStdoutHasInputReadyMarker` (same OSC as `INTERACTIVE_INPUT_READY_OSC` in `cli/src/renderer.ts`, re-exported from `cliSectionParser` for the PTY runner). Piped runs draw a box but omit the OSC, so they stay on non-interactive assertion steps.
+## Interactive vs non-interactive
 
-## Interactive vs non-interactive mode
+- **Interactive:** TTY or piped `runInteractive`; multi-turn commands (e.g. `/recall`).
+- **Non-interactive:** `-c` or single piped command; multi-turn commands fail with a clear message.
 
-- **Interactive**: TTY or piped with `runInteractive`. PTY features. Output has sections (history-output, Current guidance). Commands like `/recall` need multi-turn input.
-- **Non-interactive**: `-c "<cmd>"` or piped single command. No PTY. Entire stdout is command output. Commands requiring multi-turn interaction (e.g. `/recall`) are rejected with a clear message and exit 1.
+## CLI E2E
 
-## CLI E2E tests
+Features: **`e2e_test/features/cli/`**. Steps and page objects: **`e2e_test/step_definitions/cli.ts`**, **`e2e_test/start/pageObjects/cli/`**.
 
-CLI Cucumber features live in `e2e_test/features/cli/`.
-
-CLI e2e tests run TypeScript source locally, bundled in CI:
-
-- **Local**: `pnpm -C cli exec tsx src/index.ts` (no build step)
-- **CI**: `cli/dist/doughnut-cli.bundle.mjs` (pre-built by `pnpm bundle:all` before Cypress)
-- **Installation tests**: Always use the bundled/installed binary
-
-**Interactive mode** (recall, access-token selection, etc.): Scenarios tagged `@interactiveCLI` use one live CLI process per scenario. The Before hook starts the CLI (PTY-based); steps send input via **`I enter the slash command {string} in the interactive CLI`** (space before Enter, for `/` commands), **`I enter {string} in the interactive CLI`** (one line + Enter, e.g. recall answers), **`I press Enter in the interactive CLI`**, **`I press ESC in the interactive CLI`**, or **`I input down-arrow selection for {string} in the interactive CLI`** when the scenario needs that sequence; the After hook sends `exit` and stops the process. Split composite inputs into separate When steps with Then verification between them.
-
-**PTY keystroke contract:** Node registers one Cypress task, `applyInteractiveCliPtyKeystroke`, with a JSON payload typed as **`InteractiveCliPtyKeystroke`** in `e2e_test/config/interactiveCliPtyTypes.ts`. Page objects map Gherkin steps to that union; byte encoding and “wait for input-ready OSC” live in `e2e_test/config/cliPtyRunner.ts`. Extend the union + encoder together — do not add parallel `cy.task` names for new send shapes unless you truly need raw bytes outside this model.
-
-**Non-interactive** (install-and-run, -c commands): Use `I run the doughnut command with input {string}` or `I run the doughnut command with -c {string}`; access-token steps use `I run doughnut -c /<command> with ...`; each When spawns a new process, pipes input, and captures stdout.
-
-Use `I should see X in the non-interactive output` for non-interactive; `I should see X in the history output` or `I should see X in the Current guidance` for interactive (hints, suggestions, recall prompts).
-
-**Loading UI (TTY):** Do not add Cypress E2E for transient loading lines — timing vs. PTY capture is flaky. Cover with `cli/tests/interactiveFetchWait.test.ts` (renderer + non-TTY outcomes), `cli/tests/interactive/interactiveTtyFetchWaitEsc.test.ts` (visible loading copy while fetch is in flight), and `cli/tests/interactive/processInput.test.ts` (`contract: /recall load` + default-console `/recall` cases; `pnpm cli:test`).
-
-CLI page objects live in `e2e_test/start/pageObjects/cli/` and map to domain concepts: non-interactive output, history output, history input, current guidance. Use `cli.nonInteractiveOutput()`, `cli.historyOutput()`, `cli.currentGuidance()`, etc.
+- **Run:** Local uses `pnpm -C cli exec tsx src/index.ts`; CI uses the pre-built bundle (`pnpm bundle:all`). Installation scenarios use the bundled binary.
+- **`@interactiveCLI`:** One PTY-backed process per scenario (hooks in `e2e_test/step_definitions/hook.ts`). Copy existing scenarios for **when/how** to send input and assert (history output, history input, Current guidance). Draft-line ↑↓ history is **Vitest-only** (not in `InteractiveCliPtyKeystroke`); E2E down-arrow is for **selection mode** (see recall features).
+- **New PTY input shapes:** Extend **`InteractiveCliPtyKeystroke`** (`e2e_test/config/interactiveCliPtyTypes.ts`) and the encoder in **`e2e_test/config/cliPtyRunner.ts`** together — not a second `cy.task`.
+- **Flaky:** Avoid Cypress for **transient loading lines**; use Vitest (see fetch-wait tests above).
 
 ## Build output
 
-- Bundle: `cli/dist/doughnut-cli.bundle.mjs` (with shebang)
-- Production: uploaded to GCS at `gs://dough-01/doughnut-cli-latest/doughnut` via `cli-release.yml`
-- E2e tests: copied to `backend/build/resources/main/static/doughnut-cli-latest/doughnut`
+- Bundle: `cli/dist/doughnut-cli.bundle.mjs` (shebang)
+- Release: `gs://dough-01/doughnut-cli-latest/doughnut` (`cli-release.yml`)
+- E2E artifact: `backend/build/resources/main/static/doughnut-cli-latest/doughnut`
 
 ## Install scripts
 
 - Bash: `backend/src/main/resources/install.sh`
 - PowerShell: `backend/src/main/resources/install.ps1`
-- Served by `InstallController` at `/install` (add `?win32=true` for PowerShell)
+- Served at `/install` (`InstallController`; `?win32=true` for PowerShell)
 
 ## API base URL
 
-The bundled CLI defaults to `https://doughnut.odd-e.com`. The `pnpm cli` script sets `DOUGHNUT_API_BASE_URL=http://localhost:9081` and `DOUGHNUT_CONFIG_DIR=~/.config/doughnut-dev` so it talks to the local backend and uses a separate dev config. Use `pnpm cli -P` or `pnpm cli --production` to connect to production and use the global config (`~/.config/doughnut`). Self-hosted deployments should set `DOUGHNUT_API_BASE_URL` to their instance URL.
+Default production API: `https://doughnut.odd-e.com`. **`pnpm cli`** sets `DOUGHNUT_API_BASE_URL=http://localhost:9081` and `DOUGHNUT_CONFIG_DIR=~/.config/doughnut-dev`. Production-style: `pnpm cli -P` / `--production`. Self-hosted: set `DOUGHNUT_API_BASE_URL`.
 
-**Recall load testability:** `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` — optional pause (positive integer ms, max 60000) before the first `recalling` request during interactive recall load only (when `recallNext` receives an `AbortSignal`). Off by default; use for manual Esc-during-load checks or tests without relying on network speed. Implemented in `cli/src/recall.ts` next to `recallNext`.
+**Recall load delay (tests/manual):** `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` — see `cli/src/recall.ts`.
 
 ## OAuth credentials (Gmail)
 
-Credentials are injected at build time. For local builds: copy `cli/.env.local.example` to `cli/.env.local` and add your Google OAuth client ID and secret. For CI/release: add `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` as GitHub Actions secrets (Settings > Secrets and variables > Actions).
+Build-time injection. Local: `cli/.env.local` from `cli/.env.local.example`. CI: `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` secrets.
 
 ## Adding new commands
 
-When adding a new command, ensure `/help` lists it:
+Ensure `/help` lists the command:
 
-1. **Export a CommandDoc** from the module that implements the command (same file as the handler). Use `{ name, usage, description, category: 'subcommand' | 'interactive' }`.
-2. **Register in help.ts**:
-   - For a **subcommand** (e.g. `version`, `update`): Import the doc and add it to the `subcommandDocs` array.
-   - For an **interactive** command in an existing module (e.g. gmail): Add to that module's docs array (e.g. `gmailCommandDocs` in gmail.ts)—help.ts already imports it.
-   - For an **interactive** command in a new module: Export the doc, then in help.ts import it and add to `interactiveDocs`.
-3. **Wire up the handler** in `processInput()` (interactive) or `index.ts` (subcommand).
-4. **Verify**: Run `pnpm cli` then type `/help`, or run `pnpm cli -c "/help"`, and confirm the new command appears.
+1. Export **CommandDoc** from the handler module (`category`: `subcommand` | `interactive`).
+2. Register in **`help.ts`** (`subcommandDocs`, module doc arrays, or `interactiveDocs`).
+3. Wire **`processInput()`** (interactive) or **`index.ts`** (subcommand).
+4. Verify with `pnpm cli` → `/help` or `pnpm cli -c "/help"`.

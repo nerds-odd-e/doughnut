@@ -6,6 +6,7 @@ Feature: CLI interactive mode
   Scenario: TTY interactive responds "Not supported" to a plain line
     When I enter "hello" in the interactive CLI
     Then I should see "Not supported" in the history output
+    And I should see "hello" in the history input
 
   @withCliConfig
   @interactiveCLI
