@@ -5,7 +5,7 @@ Informal plan; delete or archive when done.
 ## Goals
 
 1. **Skip GCP deploy** when the deployable backend jar is **byte-identical** to the last **successful** production deploy, using a **recorded hash** (not only “GCS object exists”).
-2. **Reproducible builds** so the comparison is trustworthy (same sources → same jar hash on CI).
+2. **Reproducible builds** so the comparison is trustworthy (same sources → same jar hash for a given build environment).
 3. **Guardrail:** If a file **`force_deployment`** exists at the **repository root**, always run the full deploy path (upload + MIG rolling replace) when the workflow would otherwise deploy—subject to existing job success/`needs` (same as today).
 4. **Later:** Ship the **frontend static assets from GCS** (or CDN in front of it) so **frontend-only** changes do not require a **backend MIG** rollout in prod.
 5. **E2E:** After (4), tests should **mimic CDN-only static hosting** (browser loads UI from a static origin separate from the API), without depending on Google infrastructure in CI.
@@ -14,13 +14,19 @@ Informal plan; delete or archive when done.
 
 ## Phase 1 — Reproducible fat jar
 
-**Outcome:** Building the same commit twice in CI (or locally in the nix env) yields the **same SHA-256** for `doughnut-0.0.1-SNAPSHOT.jar` (or the agreed deploy artifact name).
+**Outcome:** Building the same commit twice (e.g. locally in the nix env) yields the **same SHA-256** for `doughnut-0.0.1-SNAPSHOT.jar` (or the agreed deploy artifact name).
 
 **Scope:** Gradle/Spring Boot packaging only (the jar that includes embedded static assets today). Document any intentional non-reproducible inputs (timestamps, property files) and eliminate or normalize them.
 
-**Check:** Add a minimal **observable** check in CI for this phase—e.g. a job step that builds twice and asserts equal `sha256sum` of the jar, or a dedicated script invoked from the workflow. Prefer one stable entry point (Gradle task or script) so the rule does not rot.
-
 **User/system value:** Trustworthy artifact hashing for all later phases.
+
+### Phase 1 implementation (done)
+
+- **Gradle:** `JavaCompile` uses UTF-8; all `AbstractArchiveTask` tasks (including `bootJar`) use `preserveFileTimestamps = false` so ZIP entry times do not depend on filesystem metadata. (`reproducibleFileOrdering` is not available on Spring Boot’s `BootJar` task type, so it is not set globally.)
+
+**Inputs that can change the jar without a source change (documented):**
+
+- **CLI bundle** (`pnpm cli:bundle`): `--define` inlines `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `CLI_VERSION` from the environment at build time. Same commit on CI with the same env yields the same bytes; a local `.env.local` or different `CLI_VERSION` can differ from CI.
 
 ---
 
@@ -95,7 +101,7 @@ Informal plan; delete or archive when done.
 
 | Phase | Tests |
 |-------|--------|
-| 1 | CI (or script): reproducibility assertion on the jar. |
+| 1 | Gradle reproducibility settings; ad-hoc local confirmation (e.g. two `bundle:all` + `clean bootJar` cycles, compare `sha256sum`) if needed. |
 | 2 | Workflow-level: can use dry-run or a test bucket in a fork—prefer **observable** checks (record read/write, skip path) without mocking GCP in unit tests; keep one place that owns the behavior. |
 | 3 | Minimal: document + one manual run with file present/absent, or a workflow test in a branch. |
 | 4–5 | Smoke after deploy; optional scripted check that `index.html` and assets load from the new origin. |
