@@ -6,6 +6,8 @@ import {
   type DueMemoryTrackers,
   type MemoryTracker,
   type MemoryTrackerLite,
+  type Note,
+  type Notebook,
   type QuestionContestResult,
   type RecallPrompt,
 } from 'doughnut-api'
@@ -82,8 +84,8 @@ export function formatRecallNotebookCurrentPromptLine(
 }
 
 export function resolveRecallNotebookTitle(
-  notebook?: { title?: string },
-  note?: { noteTopology?: { notebookTitle?: string } }
+  notebook?: Notebook,
+  note?: Note
 ): string {
   return notebook?.title ?? note?.noteTopology?.notebookTitle ?? 'Notebook'
 }
