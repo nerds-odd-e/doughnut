@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
 import SpellingQuestionDisplay from "@/components/recall/SpellingQuestionDisplay.vue"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 
 describe("SpellingQuestionDisplay", () => {
   let performanceNowSpy: ReturnType<typeof vi.spyOn>

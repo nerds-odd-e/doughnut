@@ -2,7 +2,7 @@ import NoteTitleComponent from "@/components/notes/core/NoteTitleComponent.vue"
 import type { Note } from "@generated/doughnut-backend-api"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 

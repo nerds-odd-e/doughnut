@@ -1,7 +1,7 @@
 import { describe, it, beforeEach, vi, expect } from "vitest"
 import AssessmentAndCertificateHistoryPage from "@/pages/AssessmentAndCertificateHistoryPage.vue"
 import helper, { mockSdkService } from "@tests/helpers"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import { nextTick } from "vue"
 import type { AssessmentAttempt } from "@generated/doughnut-backend-api"
 

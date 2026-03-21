@@ -1,7 +1,7 @@
 import AssimilateSingleNotePage from "@/pages/AssimilateSingleNotePage.vue"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it } from "vitest"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import { createRouter, createWebHistory } from "vue-router"

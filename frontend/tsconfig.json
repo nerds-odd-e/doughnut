@@ -18,7 +18,6 @@
     ],
     "paths": {
       "@/*": ["src/*"],
-      "@tests/fixtures/*": ["../packages/doughnut-test-fixtures/src/*"],
       "@tests/*": ["tests/*"],
       "@generated/doughnut-backend-api": ["../packages/generated/doughnut-backend-api"],
       "@generated/doughnut-backend-api/*": ["../packages/generated/doughnut-backend-api/*"],

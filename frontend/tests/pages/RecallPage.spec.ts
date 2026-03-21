@@ -4,7 +4,7 @@ import type {
   MemoryTrackerLite,
   RecallPrompt,
 } from "@generated/doughnut-backend-api"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, {
   mockSdkService,
   wrapSdkError,

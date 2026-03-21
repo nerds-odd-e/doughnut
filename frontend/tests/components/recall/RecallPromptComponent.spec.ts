@@ -5,7 +5,7 @@ import helper, {
   wrapSdkResponse,
   wrapSdkError,
 } from "@tests/helpers"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 
 describe("RecallPromptComponent", () => {

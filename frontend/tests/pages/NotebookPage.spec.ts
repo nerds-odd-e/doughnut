@@ -1,4 +1,4 @@
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import NotebookPage from "@/pages/NotebookPage.vue"
 import { screen } from "@testing-library/vue"

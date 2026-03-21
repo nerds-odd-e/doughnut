@@ -1,7 +1,7 @@
 import MessageCenterPage from "@/pages/MessageCenterPage.vue"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import helper, { mockSdkService } from "@tests/helpers"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import { useRouter } from "vue-router"
 import { page } from "vitest/browser"
 import { flushPromises } from "@vue/test-utils"

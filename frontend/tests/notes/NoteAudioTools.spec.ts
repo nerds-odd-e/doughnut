@@ -1,7 +1,7 @@
 import FullScreen from "@/components/common/FullScreen.vue"
 import NoteAudioTools from "@/components/notes/accessory/NoteAudioTools.vue"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, {
   mockSdkService,
   mockSdkServiceWithImplementation,

@@ -1,6 +1,6 @@
 import NotebookMoveDialog from "@/components/notebook/NotebookMoveDialog.vue"
 import { describe, it, beforeEach, expect } from "vitest"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"

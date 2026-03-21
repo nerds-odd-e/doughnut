@@ -1,7 +1,7 @@
 import RecentlyLearnedNotes from "@/components/recent/RecentlyLearnedNotes.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import { describe, it, expect, beforeEach } from "vitest"
 
 describe("RecentlyLearnedNotes", () => {

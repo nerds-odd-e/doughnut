@@ -1,7 +1,7 @@
 import { describe, it, vi, expect, beforeEach, afterEach } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import Questions from "@/components/notes/Questions.vue"
 import { reactive } from "vue"
 

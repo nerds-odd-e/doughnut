@@ -2,7 +2,7 @@ import NoteAddQuestion from "@/components/notes/NoteAddQuestion.vue"
 import { userEvent } from "@testing-library/user-event"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { describe, it, expect } from "vitest"
 

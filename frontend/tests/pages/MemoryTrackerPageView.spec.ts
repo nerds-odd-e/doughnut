@@ -1,7 +1,7 @@
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
 import MemoryTrackerPageView from "@/pages/MemoryTrackerPageView.vue"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { vi, describe, it, expect, beforeEach } from "vitest"
 

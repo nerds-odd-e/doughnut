@@ -2,7 +2,7 @@ import NoteEditableDetails from "@/components/notes/core/NoteEditableDetails.vue
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import { vi, describe, it, expect, beforeEach } from "vitest"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import type { UpdateNoteDetailsData } from "@generated/doughnut-backend-api"
 import usePopups from "@/components/commons/Popups/usePopups"

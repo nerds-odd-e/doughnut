@@ -349,7 +349,7 @@ if (error) {
    ```
 
 5. **Data Builder Pattern**
-   - Use `makeMe` for API-shaped test data; implementation lives in `packages/doughnut-test-fixtures` (workspace package). The package exposes **`doughnut-test-fixtures/makeMe` only** — do not import the bare package name or deep paths into `src/`. In the frontend, import via `@tests/fixtures/makeMe` (alias to that entry). MCP and CLI use `doughnut-test-fixtures/makeMe` directly.
+   - Use `makeMe` for API-shaped test data; implementation lives in `packages/doughnut-test-fixtures` (workspace package). Import **`doughnut-test-fixtures/makeMe` only** — do not import the bare package name or deep paths into `src/`. (Same specifier as MCP and CLI.)
    - Builders handle complex object creation
    - Example:
    ```typescript
@@ -413,10 +413,10 @@ This will start Storybook on `http://localhost:6006` by default.
 
 ### Shared Test Data Builders
 
-Storybook stories reuse the same `makeMe` builders as unit tests. Source code lives in `packages/doughnut-test-fixtures`. The frontend resolves `@tests/fixtures/*` to that package (not under `frontend/tests/`).
+Storybook stories reuse the same `makeMe` builders as unit tests. Source code lives in `packages/doughnut-test-fixtures`.
 
 ```typescript
-import makeMe from '@tests/fixtures/makeMe'
+import makeMe from 'doughnut-test-fixtures/makeMe'
 ```
 
 The `makeMe` object provides access to all test data builders:
@@ -429,7 +429,7 @@ The `makeMe` object provides access to all test data builders:
 **Example Usage:**
 
 ```typescript
-import makeMe from '@tests/fixtures/makeMe'
+import makeMe from 'doughnut-test-fixtures/makeMe'
 
 // Create an answered question with correct answer
 const correctQuestion = makeMe.anAnsweredQuestion
@@ -457,7 +457,7 @@ To create a new Storybook story for a component:
 ```typescript
 import type { Meta, StoryObj } from '@storybook/vue3'
 import MyComponent from './MyComponent.vue'
-import makeMe from '@tests/fixtures/makeMe'
+import makeMe from 'doughnut-test-fixtures/makeMe'
 
 const meta = {
   title: 'Category/MyComponent',
@@ -498,8 +498,9 @@ export const Variant2: Story = {
 Storybook is configured to support the same module aliases as the main application:
 - `@/` - Points to `src/`
 - `@tests/*` - Points to `tests/` (e.g. `@tests/helpers`)
-- `@tests/fixtures/*` - Resolves to `packages/doughnut-test-fixtures/src/*` (shared `makeMe`; the package’s only declared export is `doughnut-test-fixtures/makeMe`)
 - `@generated/` - Points to `generated/`
+
+For API-shaped fixtures, import `makeMe` from `doughnut-test-fixtures/makeMe` (workspace package; no `@tests/fixtures` alias).
 
 ### Global Styles
 
@@ -510,7 +511,7 @@ Storybook automatically loads the global styles from `src/assets/daisyui.css`, w
 
 ### Storybook Best Practices
 
-1. **Reuse Builders**: Always use `makeMe` from `@tests/fixtures/makeMe` (backed by `packages/doughnut-test-fixtures`) instead of ad-hoc mock objects that duplicate API shapes
+1. **Reuse Builders**: Always use `makeMe` from `doughnut-test-fixtures/makeMe` instead of ad-hoc mock objects that duplicate API shapes
 2. **No Duplication**: Never duplicate mock data - use builders for consistency
 3. **Multiple Variants**: Create multiple story variants to showcase different component states
 4. **Documentation**: Use the `autodocs` tag to automatically generate documentation

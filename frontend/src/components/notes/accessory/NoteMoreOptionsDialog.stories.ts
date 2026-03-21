@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import NoteMoreOptionsDialog from "./NoteMoreOptionsDialog.vue"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import type { Options } from "@generated/doughnut-backend-api/client/types.gen"
 import type { GetNoteInfoData } from "@generated/doughnut-backend-api"

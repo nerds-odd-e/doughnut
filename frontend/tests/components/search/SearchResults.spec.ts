@@ -7,7 +7,7 @@ import helper, {
 import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
 import type { NoteSearchResult } from "@generated/doughnut-backend-api"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import { describe, it, expect, vi } from "vitest"
 
 // Test fixtures

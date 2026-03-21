@@ -1,6 +1,6 @@
 import Card from "@/components/notes/Card.vue"
 import { screen } from "@testing-library/vue"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { describe, it } from "vitest"
 

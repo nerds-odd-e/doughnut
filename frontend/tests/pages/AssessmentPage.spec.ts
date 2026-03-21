@@ -3,7 +3,7 @@ import type {
   AssessmentQuestionInstance,
   RecallPrompt,
 } from "@generated/doughnut-backend-api"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"

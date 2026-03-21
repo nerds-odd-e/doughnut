@@ -2,7 +2,7 @@ import { flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect } from "vitest"
 import helper from "@tests/helpers"
 import RecallSessionOptionsDialog from "@/components/recall/RecallSessionOptionsDialog.vue"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import type { RecallPrompt } from "@generated/doughnut-backend-api"
 
 vi.mock("vue-router", async (importOriginal) => {

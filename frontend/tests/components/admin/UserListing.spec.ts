@@ -1,7 +1,7 @@
 import UserListing from "@/components/admin/UserListing.vue"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 
 describe("UserListing", () => {

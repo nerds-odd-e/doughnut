@@ -1,7 +1,7 @@
 import FailureReportList from "@/components/admin/FailureReportList.vue"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 
 describe("FailureReportList", () => {

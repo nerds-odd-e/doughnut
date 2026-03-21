@@ -1,7 +1,7 @@
 import Assimilation from "@/components/recall/Assimilation.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, {
   mockShowNoteAccessory,
   mockSdkService,

@@ -1,7 +1,7 @@
 import { describe, expect, it, beforeEach, afterEach, vi } from "vitest"
 import { flushPromises } from "@vue/test-utils"
 import ContestableQuestion from "@/components/recall/ContestableQuestion.vue"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import type { AnswerDto } from "@generated/doughnut-backend-api"
 

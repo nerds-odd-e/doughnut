@@ -1,7 +1,7 @@
 import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import createNoteStorage from "@/store/createNoteStorage"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { describe, it, expect, afterEach } from "vitest"

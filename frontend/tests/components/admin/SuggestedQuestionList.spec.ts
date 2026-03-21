@@ -2,7 +2,7 @@ import SuggestedQuestionList from "@/components/admin/SuggestedQuestionList.vue"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
 import usePopups from "@/components/commons/Popups/usePopups"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { matchByText, mockSdkService } from "@tests/helpers"
 
 describe("Edit Suggested Question", () => {

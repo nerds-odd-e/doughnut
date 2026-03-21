@@ -1,6 +1,6 @@
 import NoteInfoBar from "@/components/notes/NoteInfoBar.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { describe, it, expect, afterEach } from "vitest"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"

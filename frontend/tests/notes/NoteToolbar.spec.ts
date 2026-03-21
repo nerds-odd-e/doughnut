@@ -1,6 +1,6 @@
 import NoteToolbar from "@/components/notes/core/NoteToolbar.vue"
 import NoteMoreOptionsDialog from "@/components/notes/accessory/NoteMoreOptionsDialog.vue"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { mockSdkService } from "@tests/helpers"
 import { describe, it, expect, afterEach } from "vitest"

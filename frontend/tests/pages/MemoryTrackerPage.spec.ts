@@ -2,7 +2,7 @@ import MemoryTrackerPage from "@/pages/MemoryTrackerPage.vue"
 import { flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect } from "vitest"
 import helper, { mockSdkService, wrapSdkError } from "@tests/helpers"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 
 vi.mock("vue-router", async (importOriginal) => {

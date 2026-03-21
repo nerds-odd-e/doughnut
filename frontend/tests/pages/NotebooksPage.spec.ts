@@ -1,6 +1,6 @@
 import NotebooksPage from "@/pages/NotebooksPage.vue"
 import { describe, it, expect } from "vitest"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 

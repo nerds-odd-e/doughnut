@@ -80,7 +80,7 @@ doughnut/
 ├── packages/
 │   ├── generated/
 │   │   └── doughnut-backend-api/  # Auto-generated API client
-│   └── doughnut-test-fixtures/    # Shared `makeMe` API-shaped builders; **public import:** `doughnut-test-fixtures/makeMe` only (frontend may use `@tests/fixtures/makeMe` alias)
+│   └── doughnut-test-fixtures/    # Shared `makeMe` API-shaped builders; **public import:** `doughnut-test-fixtures/makeMe` only
 ├── e2e_test/                   # Cucumber E2E tests
 │   ├── features/               # Gherkin feature files
 │   ├── step_definitions/       # Step implementations
@@ -110,7 +110,7 @@ doughnut/
 - DaisyUI classes use `daisy-` prefix
 - Avoid `getByRole` queries in tests (performance) - use `getByText`, `getByLabelText`, etc.
 - Use `mockSdkService()` helper for mocking API calls in tests
-- API-shaped test and Storybook data: `makeMe` — package **`doughnut-test-fixtures/makeMe`** is the only supported export (builders under `src/` are internal). Frontend uses `@tests/fixtures/makeMe` (alias to the same file); MCP/CLI import `doughnut-test-fixtures/makeMe` directly.
+- API-shaped test and Storybook data: `makeMe` — import **`doughnut-test-fixtures/makeMe`** (the package’s only supported export; builders under `src/` are internal). `@tests/*` still maps to `frontend/tests/` for helpers.
 
 ### E2E Tests
 - Keep step definitions lightweight, delegate to page objects

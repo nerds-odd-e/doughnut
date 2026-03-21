@@ -1,6 +1,6 @@
 import { flushPromises } from "@vue/test-utils"
 import NotebookAssistantManagementDialog from "@/components/notebook/NotebookAssistantManagementDialog.vue"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 

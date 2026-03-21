@@ -1,7 +1,7 @@
 import type { Router } from "vue-router"
 import createNoteStorage from "@/store/createNoteStorage"
 import NoteEditingHistory from "@/store/NoteEditingHistory"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { describe, it, expect, vi, beforeEach } from "vitest"

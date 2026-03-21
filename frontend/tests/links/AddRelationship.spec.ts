@@ -1,5 +1,5 @@
 import AddRelationshipFinalize from "@/components/links/AddRelationshipFinalize.vue"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { describe, it, expect } from "vitest"
 

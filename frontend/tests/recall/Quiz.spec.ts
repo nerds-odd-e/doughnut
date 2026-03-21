@@ -1,7 +1,7 @@
 import Quiz from "@/components/recall/Quiz.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { beforeEach, describe, it, vi, afterEach, expect } from "vitest"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, {
   mockSdkService,
   wrapSdkResponse,

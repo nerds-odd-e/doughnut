@@ -1,7 +1,7 @@
 import AddRelationshipDialog from "@/components/links/AddRelationshipDialog.vue"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import MakeMe from "@tests/fixtures/makeMe"
+import MakeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { beforeEach, vi, describe, it, expect } from "vitest"
 

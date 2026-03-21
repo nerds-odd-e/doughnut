@@ -1,7 +1,7 @@
 import RecentlyRecalledNotes from "@/components/recent/RecentlyRecalledNotes.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
 import { describe, it, expect, beforeEach, vi } from "vitest"

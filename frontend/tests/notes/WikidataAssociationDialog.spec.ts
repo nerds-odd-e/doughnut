@@ -1,6 +1,6 @@
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 

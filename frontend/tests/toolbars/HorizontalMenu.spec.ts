@@ -1,6 +1,6 @@
 import HorizontalMenu from "@/components/toolbars/HorizontalMenu.vue"
 import type { User } from "@generated/doughnut-backend-api"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { beforeEach, vi, describe, it, expect } from "vitest"
 import { markRaw, reactive, nextTick } from "vue"

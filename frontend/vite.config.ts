@@ -22,12 +22,6 @@ const config = defineConfig({
     tsconfigPaths: true,
     alias: [
       {
-        find: '@tests/fixtures',
-        replacement: fileURLToPath(
-          new URL('../packages/doughnut-test-fixtures/src', import.meta.url)
-        ),
-      },
-      {
         find: '@tests',
         replacement: fileURLToPath(new URL('./tests', import.meta.url)),
       },

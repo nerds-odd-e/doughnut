@@ -1,7 +1,7 @@
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
 import ConversationTemplate from "@/components/conversations/ConversationTemplate.vue"
 import NoteConversation from "@/components/conversations/NoteConversation.vue"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { expect, vi, describe, beforeEach, afterEach } from "vitest"

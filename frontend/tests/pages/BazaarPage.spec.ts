@@ -1,6 +1,6 @@
 import BazaarPage from "@/pages/BazaarPage.vue"
 import { describe, it, expect } from "vitest"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 
 describe("bazaar page", () => {

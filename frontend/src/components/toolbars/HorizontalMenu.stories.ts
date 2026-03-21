@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import HorizontalMenu from "./HorizontalMenu.vue"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import SvgNote from "@/components/svgs/SvgNote.vue"
 import SvgAssimilate from "@/components/svgs/SvgAssimilate.vue"
 import SvgCalendarCheck from "@/components/svgs/SvgCalendarCheck.vue"

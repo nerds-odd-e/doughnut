@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import AssimilationPageView from "./AssimilationPageView.vue"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 
 const meta = {
   title: "Page Views/AssimilationPageView",

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import MemoryTrackerPageView from "./MemoryTrackerPageView.vue"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 
 const meta = {
   title: "Page Views/MemoryTrackerPageView",

@@ -1,7 +1,7 @@
 import AIGenerateImageDialog from "@/components/notes/AIGenerateImageDialog.vue"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { expect, describe, it, afterEach } from "vitest"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 
 describe("AIGeneratedImageDialog", () => {

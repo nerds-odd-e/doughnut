@@ -3,7 +3,7 @@ import { vi, beforeEach, afterEach, describe, it, expect } from "vitest"
 import { defineComponent, KeepAlive } from "vue"
 import helper from "@tests/helpers"
 import QuestionDisplay from "@/components/recall/QuestionDisplay.vue"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import markdownizer from "@/components/form/markdownizer"
 
 describe("QuestionDisplay", () => {

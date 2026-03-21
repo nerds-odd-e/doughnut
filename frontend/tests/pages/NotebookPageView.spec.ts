@@ -1,6 +1,6 @@
 import type { Notebook } from "@generated/doughnut-backend-api"
 import NotebookPageView from "@/pages/NotebookPageView.vue"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { beforeEach, describe, it, expect } from "vitest"
 

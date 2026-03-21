@@ -6,7 +6,7 @@ import type { RouteRecordRaw } from "vue-router"
 import { routeMetadata } from "@/routes/routeMetadata"
 import { ref } from "vue"
 import type { User } from "@generated/doughnut-backend-api"
-import makeMe from "@tests/fixtures/makeMe"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import { storyFiles } from "../../storyFiles.generated"
 
 // Mock router for components that use vue-router (same as Storybook preview)

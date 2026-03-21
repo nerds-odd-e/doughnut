@@ -5,7 +5,7 @@
 **Current state**
 
 - Implementation: `packages/doughnut-test-fixtures` (`exports`: **`./makeMe` only** → `src/makeMe.ts`).
-- Frontend tests and Storybook: `import makeMe from "@tests/fixtures/makeMe"` (alias to the package via `frontend/tsconfig.json`, Vite, Vitest).
+- Frontend tests and Storybook: `import makeMe from "doughnut-test-fixtures/makeMe"` (same as MCP/CLI).
 - MCP and CLI tests: `import makeMe from 'doughnut-test-fixtures/makeMe'`.
 
 **Constraints**
@@ -18,7 +18,7 @@
 
 ## Phase 1 — Workspace package + move code + frontend unchanged at import sites
 
-**Status:** Done — fixtures in `packages/doughnut-test-fixtures`; `@tests/fixtures/*` and Vite/Vitest aliases point there.
+**Status:** Done — fixtures in `packages/doughnut-test-fixtures`; frontend used `@tests/fixtures/*` aliases until Phase 7 (now `doughnut-test-fixtures/makeMe` only).
 
 **User-visible outcome:** Frontend tests and Storybook still pass; fixtures live in one workspace package.
 
@@ -27,7 +27,7 @@
 3. `package.json`: dependency on `@generated/doughnut-backend-api` (`workspace:*`); `private: true`; `exports` for `makeMe`.
 4. `tsconfig.json`: map `@generated/doughnut-backend-api` to `../generated/doughnut-backend-api`.
 5. Move former `frontend/tests/fixtures/**` into the package; keep relative imports between builders working.
-6. Frontend: `tsconfig` paths + Vite/Vitest/Storybook so `@tests/fixtures/*` resolves to the package.
+6. Frontend: `tsconfig` paths + Vite/Vitest/Storybook so `@tests/fixtures/*` resolved to the package (removed in Phase 7 in favor of `doughnut-test-fixtures/makeMe`).
 7. `frontend` devDepends on `doughnut-test-fixtures` (`workspace:*`).
 8. Remove duplicate fixtures under `frontend/tests/fixtures/`.
 9. **Gate:** `pnpm frontend:test` (and Storybook if in CI) green; format/lint as usual.
@@ -62,14 +62,14 @@
 
 ## Phase 4 — Documentation and hygiene
 
-**Status:** Done — `.cursor/rules/frontend.mdc` and `CLAUDE.md` describe `packages/doughnut-test-fixtures`, the `@tests/fixtures` alias, and MCP/CLI imports; CI `Other-unit-tests` uses recursive `pnpm install`, so the workspace package is always present for `frontend:test` / `mcp-server:test` / `cli:test`.
+**Status:** Done — `.cursor/rules/frontend.mdc` and `CLAUDE.md` describe `packages/doughnut-test-fixtures` and `doughnut-test-fixtures/makeMe`; CI `Other-unit-tests` uses recursive `pnpm install`, so the workspace package is always present for `frontend:test` / `mcp-server:test` / `cli:test`.
 
 **User-visible outcome:** Contributors know where fixtures live; no duplicate builders.
 
 1. Update cursor rules (frontend / Storybook): implementation vs alias vs package import paths.
 2. Root discoverability in `CLAUDE.md` (directory tree + frontend conventions).
 3. Confirm CI installs the full workspace before those test scripts.
-4. **Keep this plan** until phases 5–7 are done (or explicitly deprioritized); then remove or archive.
+4. **This plan** — phases 1–7 done; remove or archive when no longer needed for reference.
 
 ---
 
@@ -104,7 +104,7 @@
 
 ## Phase 7 — Uniform imports (frontend uses the package name)
 
-**Status:** Not started.
+**Status:** Done — frontend imports `doughnut-test-fixtures/makeMe`; `@tests/fixtures` path/alias removed from `frontend/tsconfig.json`, `vite.config.ts`, and `vitest.config.ts`; docs updated.
 
 **User-visible outcome:** Every consumer imports the same specifier: `doughnut-test-fixtures/makeMe` (no special-case `@tests/fixtures` alias for `makeMe`).
 
