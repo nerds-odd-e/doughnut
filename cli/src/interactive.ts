@@ -381,11 +381,15 @@ const defaultOutput: OutputAdapter = {
 
 export async function processInput(
   input: string,
-  output: OutputAdapter = defaultOutput
+  output: OutputAdapter = defaultOutput,
+  interactiveUi = false
 ): Promise<boolean> {
   const writeCurrentPrompt = output.writeCurrentPrompt ?? output.log
   const trimmed = input.trim()
   if (trimmed === 'exit' || trimmed === '/exit') {
+    if (interactiveUi) {
+      output.log('Bye.')
+    }
     return true
   }
   if (isInRecallSubstate() && trimmed === '/stop') {

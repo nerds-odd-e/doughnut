@@ -39,7 +39,11 @@ export interface TokenListCommandConfig {
 }
 
 export interface TTYDeps {
-  processInput: (input: string, output?: OutputAdapter) => Promise<boolean>
+  processInput: (
+    input: string,
+    output?: OutputAdapter,
+    interactiveUi?: boolean
+  ) => Promise<boolean>
   getPendingRecallAnswer: () => unknown
   isPendingRecallStopConfirmation: () => boolean
   setPendingRecallStopConfirmation: (value: boolean) => void
@@ -734,7 +738,7 @@ export async function runTTY(
         livePaint.lastPaintedLineCount = 0
         resetCommandTurnBuffer()
         chatHistory.push({ type: 'input', content: inputForHistory })
-        if (await processInput(effectiveInput, ttyOutput)) {
+        if (await processInput(effectiveInput, ttyOutput, true)) {
           commitExitTurnToScrollback()
           doExit()
           return
@@ -871,7 +875,7 @@ export async function runTTY(
         resetCommandTurnBuffer()
         if (isCommittedInteractiveInput(input)) {
           chatHistory.push({ type: 'input', content: input })
-          if (await processInput(input, ttyOutput)) {
+          if (await processInput(input, ttyOutput, true)) {
             commitExitTurnToScrollback()
             doExit()
             return

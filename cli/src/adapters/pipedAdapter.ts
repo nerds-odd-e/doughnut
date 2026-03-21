@@ -1,8 +1,13 @@
 import * as readline from 'node:readline'
 import { isCommittedInteractiveInput } from '../renderer.js'
+import type { OutputAdapter } from '../types.js'
 
 export interface PipedDeps {
-  processInput: (input: string) => Promise<boolean>
+  processInput: (
+    input: string,
+    output?: OutputAdapter,
+    interactiveUi?: boolean
+  ) => Promise<boolean>
   getTerminalWidth: () => number
   buildBoxLines: (buffer: string, width: number) => string[]
   buildSuggestionLines: (
@@ -54,7 +59,7 @@ export async function runPiped(
     if (isCommittedInteractiveInput(line)) {
       console.log(renderPastInput(line, getTerminalWidth()))
     }
-    if (await processInput(line)) {
+    if (await processInput(line, undefined, true)) {
       rl.close()
       process.exit(0)
     }
