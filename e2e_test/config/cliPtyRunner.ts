@@ -240,6 +240,28 @@ export async function writeInteractiveCliAndWaitForReady(
   return interactiveHandle.stdout.value
 }
 
+export async function interactiveSendSlashCommand(
+  command: string
+): Promise<string> {
+  return writeInteractiveCliAndWaitForReady(
+    interactivePayloadSlashCommandAndEnter(command)
+  )
+}
+
+export async function interactiveSendLine(line: string): Promise<string> {
+  return writeInteractiveCliAndWaitForReady(
+    interactivePayloadLineAndEnter(line)
+  )
+}
+
+export async function interactiveSendEnter(): Promise<string> {
+  return writeInteractiveCliAndWaitForReady(interactivePayloadEnterOnly())
+}
+
+export async function interactiveSendEsc(): Promise<string> {
+  return writeInteractiveCliAndWaitForReady(interactivePayloadEsc())
+}
+
 export async function sendToInteractiveCli(input: string): Promise<string> {
   const trimmed = input.trim()
   let payload: string

@@ -1,15 +1,5 @@
-import {
-  copyFileSync,
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  readdirSync,
-  rm,
-  writeFileSync,
-} from 'node:fs'
-import { spawnSync } from 'node:child_process'
-import { tmpdir } from 'node:os'
-import { dirname, extname, join, resolve } from 'node:path'
+import { existsSync, readdirSync, rm } from 'node:fs'
+import { extname, join, resolve } from 'node:path'
 import mcpClient from '../support/mcp_client'
 const {
   addCucumberPreprocessorPlugin,
@@ -18,141 +8,9 @@ import { createEsbuildPlugin } from '@badeball/cypress-cucumber-preprocessor/esb
 import createBundler from '@bahmutov/cypress-esbuild-preprocessor'
 import AdmZip from 'adm-zip'
 import type { ExpectedFile } from '../start/downloadChecker'
-import {
-  interactivePayloadEnterOnly,
-  interactivePayloadEsc,
-  interactivePayloadLineAndEnter,
-  interactivePayloadSlashCommandAndEnter,
-  runCliInPty,
-  sendToInteractiveCli as sendToInteractiveCliInput,
-  startInteractiveCli as startInteractiveCliProcess,
-  stopInteractiveCli as stopInteractiveCliProcess,
-  writeInteractiveCliAndWaitForReady,
-} from './cliPtyRunner'
-import { cliEnv } from './cliEnv'
+import { createCliPluginTasks } from './cliCypressTasks'
+import { runSync } from './cliNode'
 import { E2E_BACKEND_BASE_URL } from './constants'
-
-const CLI_BUNDLE_PATH = 'cli/dist/doughnut-cli.bundle.mjs'
-
-function runSync(
-  cmd: string,
-  opts: { cwd?: string; env?: NodeJS.ProcessEnv } = {}
-) {
-  const result = spawnSync(cmd, [], {
-    ...opts,
-    shell: true,
-    stdio: 'pipe',
-    encoding: 'utf8',
-  })
-  if (result.stdout) console.log(result.stdout)
-  if (result.stderr) console.error(result.stderr)
-  if (result.status !== 0) {
-    throw new Error(`Command failed with exit code ${result.status}`)
-  }
-}
-
-function bundleAndCopyCliToBuildOutput(
-  repoRoot: string,
-  env?: NodeJS.ProcessEnv
-) {
-  runSync('pnpm cli:bundle', { cwd: repoRoot, env })
-  const src = join(repoRoot, CLI_BUNDLE_PATH)
-  const destDir = join(
-    repoRoot,
-    'backend/build/resources/main/static/doughnut-cli-latest'
-  )
-  mkdirSync(destDir, { recursive: true })
-  copyFileSync(src, join(destDir, 'doughnut'))
-}
-
-function getCliRunConfig(repoRoot: string): {
-  command: string
-  baseArgs: string[]
-} {
-  if (process.env.CI === '1') {
-    return {
-      command: process.execPath,
-      baseArgs: [join(repoRoot, CLI_BUNDLE_PATH)],
-    }
-  }
-  return {
-    command: 'pnpm',
-    baseArgs: ['-C', join(repoRoot, 'cli'), 'exec', 'tsx', 'src/index.ts'],
-  }
-}
-
-const CLI_SPAWN_TIMEOUT_MS = 25_000
-
-async function spawnCliFromRepo(opts: {
-  repoRoot: string
-  args?: string[]
-  stdin?: string
-  env?: NodeJS.ProcessEnv
-  simulateOAuthCallback?: boolean
-  timeoutMs?: number
-}): Promise<string> {
-  const { spawn } = await import('node:child_process')
-  const config = getCliRunConfig(opts.repoRoot)
-  const args = [...config.baseArgs, ...(opts.args ?? [])]
-  return new Promise<string>((resolve, reject) => {
-    const proc = spawn(config.command, args, {
-      cwd: opts.repoRoot,
-      env: { ...process.env, ...cliEnv(opts.env) },
-      stdio: ['pipe', 'pipe', 'pipe'],
-    })
-    let stdout = ''
-    const append = (chunk: string) => {
-      stdout += chunk
-      return stdout
-    }
-    proc.stdout?.on('data', (chunk: Buffer) => {
-      const out = append(chunk.toString())
-      if (opts.simulateOAuthCallback) {
-        const authMatch = out.match(/https:\/\/accounts\.google\.com\/[^\s]+/)
-        if (authMatch) {
-          const redirectUri = new URL(authMatch[0]).searchParams.get(
-            'redirect_uri'
-          )
-          if (redirectUri) {
-            fetch(`${redirectUri}?code=e2e_mock_auth_code`).catch(() => {
-              /* ignore OAuth callback errors */
-            })
-          }
-        }
-      }
-    })
-    if (opts.simulateOAuthCallback) {
-      proc.stderr?.on('data', (chunk: Buffer) => append(chunk.toString()))
-    }
-    const timeout =
-      opts.timeoutMs &&
-      setTimeout(() => {
-        proc.kill('SIGKILL')
-        reject(
-          new Error(
-            `CLI timed out after ${opts.timeoutMs}ms. stdout tail: ${stdout.slice(-300)}`
-          )
-        )
-      }, opts.timeoutMs)
-    if (opts.stdin !== undefined) {
-      proc.stdin?.write(
-        opts.stdin.endsWith('\n') ? opts.stdin : `${opts.stdin}\n`
-      )
-      proc.stdin?.end()
-    } else {
-      proc.stdin?.end()
-    }
-    proc.on('close', (code) => {
-      if (timeout) clearTimeout(timeout)
-      if (code === 0) resolve(stdout)
-      else reject(new Error(`CLI exited with code ${code}`))
-    })
-    proc.on('error', (err) => {
-      if (timeout) clearTimeout(timeout)
-      reject(err)
-    })
-  })
-}
 
 const commonConfig = {
   chromeWebSecurity: false,
@@ -195,6 +53,7 @@ const commonConfig = {
       const testState: Record<string, unknown> = {}
 
       on('task', {
+        ...createCliPluginTasks(repoRoot),
         setTestState({ key, value }: { key: string; value: unknown }) {
           testState[key] = value
           return null
@@ -361,7 +220,6 @@ const commonConfig = {
           return await mcpClient.disconnectMcpServer()
         },
         async bundleMcpServer() {
-          const repoRoot = resolve(__dirname, '..', '..')
           const mcpServerDir = join(repoRoot, 'mcp-server')
           try {
             runSync('pnpm bundle', { cwd: mcpServerDir })
@@ -370,186 +228,6 @@ const commonConfig = {
             console.error('Failed to bundle MCP server:', error)
             throw error
           }
-        },
-        createCliConfigDir() {
-          return mkdtempSync(join(tmpdir(), 'cypress-cli-config-'))
-        },
-        createCliConfigDirWithGmail(gmailConfig: Record<string, unknown>) {
-          const configDir = mkdtempSync(join(tmpdir(), 'cypress-cli-gmail-'))
-          writeFileSync(
-            join(configDir, 'gmail.json'),
-            JSON.stringify(gmailConfig, null, 2)
-          )
-          return configDir
-        },
-        async bundleAndCopyCli() {
-          const repoRoot = resolve(__dirname, '..', '..')
-          try {
-            bundleAndCopyCliToBuildOutput(repoRoot)
-            return true
-          } catch (error) {
-            console.error('Failed to bundle and copy CLI:', error)
-            throw error
-          }
-        },
-        async bundleAndCopyCliWithVersion(version: string) {
-          const repoRoot = resolve(__dirname, '..', '..')
-          try {
-            bundleAndCopyCliToBuildOutput(repoRoot, {
-              ...process.env,
-              CLI_VERSION: version,
-            })
-            return true
-          } catch (error) {
-            console.error('Failed to bundle and copy CLI:', error)
-            throw error
-          }
-        },
-        async installCli(baseUrl: string) {
-          const installDir = mkdtempSync(
-            join(tmpdir(), 'cypress-doughnut-cli-')
-          )
-          const installScriptPath = join(installDir, 'install.sh')
-          const response = await fetch(`${baseUrl}/install`)
-          if (!response.ok) {
-            throw new Error(
-              `installCli: failed to fetch install script from ${baseUrl}/install: ${response.status}`
-            )
-          }
-          const script = await response.text()
-          writeFileSync(installScriptPath, script, { mode: 0o755 })
-          runSync(`bash ${installScriptPath}`, {
-            env: {
-              ...process.env,
-              INSTALL_PREFIX: installDir,
-              BASE_URL: baseUrl,
-            },
-          })
-          const doughnutPath = join(installDir, 'bin', 'doughnut')
-          if (!existsSync(doughnutPath)) {
-            throw new Error(
-              `installCli: doughnut binary not found at ${doughnutPath} after install. Check that ${baseUrl}/doughnut-cli-latest/doughnut is served.`
-            )
-          }
-          return doughnutPath
-        },
-        async runCliDirectWithInput({
-          input,
-          env,
-          simulateOAuthCallback,
-        }: {
-          input: string
-          env?: NodeJS.ProcessEnv
-          simulateOAuthCallback?: boolean
-        }) {
-          const repoRoot = resolve(__dirname, '..', '..')
-          return spawnCliFromRepo({
-            repoRoot,
-            stdin: input,
-            env,
-            simulateOAuthCallback,
-            timeoutMs: CLI_SPAWN_TIMEOUT_MS,
-          })
-        },
-        async startInteractiveCli({ env }: { env?: NodeJS.ProcessEnv }) {
-          const repoRoot = resolve(__dirname, '..', '..')
-          const config = getCliRunConfig(repoRoot)
-          await startInteractiveCliProcess({
-            command: config.command,
-            args: config.baseArgs,
-            cwd: repoRoot,
-            env: { ...cliEnv(env) },
-          })
-          return true
-        },
-        async sendToInteractiveCli({ input }: { input: string }) {
-          return sendToInteractiveCliInput(input)
-        },
-        async sendInteractiveCliSlashCommand({ command }: { command: string }) {
-          return writeInteractiveCliAndWaitForReady(
-            interactivePayloadSlashCommandAndEnter(command)
-          )
-        },
-        async sendInteractiveCliLine({ line }: { line: string }) {
-          return writeInteractiveCliAndWaitForReady(
-            interactivePayloadLineAndEnter(line)
-          )
-        },
-        async sendInteractiveCliEnter() {
-          return writeInteractiveCliAndWaitForReady(
-            interactivePayloadEnterOnly()
-          )
-        },
-        async sendInteractiveCliEsc() {
-          return writeInteractiveCliAndWaitForReady(interactivePayloadEsc())
-        },
-        async stopInteractiveCli() {
-          await stopInteractiveCliProcess()
-          return null
-        },
-        async runCliDirectWithArgs({
-          args,
-          env,
-        }: {
-          args: string[]
-          env?: NodeJS.ProcessEnv
-        }) {
-          const repoRoot = resolve(__dirname, '..', '..')
-          return spawnCliFromRepo({ repoRoot, args, env })
-        },
-        async runInstalledCli({
-          doughnutPath,
-          input,
-          args,
-          env,
-        }: {
-          doughnutPath: string
-          input?: string
-          args?: string[]
-          env?: NodeJS.ProcessEnv
-        }) {
-          if (!doughnutPath || typeof doughnutPath !== 'string') {
-            throw new Error(
-              `runInstalledCli: doughnutPath required, got ${JSON.stringify(doughnutPath)}`
-            )
-          }
-          if (!existsSync(doughnutPath)) {
-            throw new Error(
-              `runInstalledCli: doughnut binary not found at ${doughnutPath}. Ensure prior step "I install the CLI" succeeded.`
-            )
-          }
-          const cwd = dirname(doughnutPath)
-          if (input !== undefined) {
-            return runCliInPty({
-              executablePath: doughnutPath,
-              args: args ?? [],
-              input,
-              cwd,
-              env,
-            })
-          }
-          const { spawn } = await import('node:child_process')
-          return new Promise<string>((resolve, reject) => {
-            const proc = spawn(
-              process.execPath,
-              [doughnutPath, ...(args ?? [])],
-              {
-                cwd,
-                env: { ...process.env, ...cliEnv(env) },
-                stdio: ['pipe', 'pipe', 'pipe'],
-              }
-            )
-            let stdout = ''
-            proc.stdout?.on('data', (chunk: Buffer) => {
-              stdout += chunk.toString()
-            })
-            proc.stdin?.end()
-            proc.on('close', (code) => {
-              if (code === 0) resolve(stdout)
-              else reject(new Error(`CLI exited with code ${code}`))
-            })
-            proc.on('error', reject)
-          })
         },
       })
 
