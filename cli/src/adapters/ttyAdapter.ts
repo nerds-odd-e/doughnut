@@ -643,6 +643,9 @@ export async function runTTY(
         }, INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS)
       } else {
         stopInteractiveFetchWaitRepaintTimer()
+        buffer = ''
+        highlightIndex = 0
+        suggestionsDismissed = false
         drawBox()
       }
     },

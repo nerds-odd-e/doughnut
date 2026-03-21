@@ -16,7 +16,7 @@ In `ttyAdapter.ts`, the `keypress` handler handles `tokenSelection`, MCQ, recall
 
 So during **interactive fetch wait** (recall load, `/recall-status`, `/contest`, token/async flows, …), printable keys still run `buffer += str` (and similar). The UI hides the cursor and shows “loading …”, but `buffer` can grow. When the wait ends, that draft reappears in the enabled box — wrong.
 
-`cancelInteractiveFetchWaitFor` (Esc) ends the wait and repaints but does **not** clear `buffer`, so the same leak applies after abort.
+Esc-cancel ends the wait via `setActiveWaitLine(..., null)` in `runInteractiveFetchWait`’s `finally`; that invokes the same `onInteractiveFetchWaitChanged` hook as a normal completion, so clearing the draft there covers abort as well.
 
 **Token list selection mode** usually starts with `buffer === ''` (cleared on Enter before `beginTokenSelection`). Non-arrow keys go through `commitTokenListResult`, which already sets `buffer = ''`. So the **main** regression is fetch-wait + normal typing mode; still worth one test that after wait ends the draft is empty (covers the fix centrally).
 
@@ -24,22 +24,11 @@ So during **interactive fetch wait** (recall load, `/recall-status`, `/contest`,
 
 ### Phase 1 — Failing unit test (TTY)
 
-- Add a test (new file e.g. `cli/tests/interactive/interactiveTtyBufferAfterFetchWait.test.ts` or extend `interactiveFetchWait.test.ts` if it stays cohesive) that:
-  1. Starts interactive TTY (`startTTYSessionWithoutRecallReset` + `resetRecallStateForTesting`).
-  2. Mocks a command that uses `runInteractiveFetchWait` (same pattern as `interactiveTtyOutput.test.ts` + `mockRecallStatus`): e.g. `mockRecallStatus.mockImplementation(() => new Promise((r) => setTimeout(() => r('0 notes…'), …)))` so there is a window where `getInteractiveFetchWaitLine()` is set.
-  3. Submits `/recall-status` (or another fetch-wait command), then **types arbitrary characters while the wait is active**.
-  4. Waits until the command finishes (`vi.waitFor` on `ttyOutput(writeSpy)` containing expected result text).
-  5. **Assert** the post-wait state does not keep the typed draft. Practical assertion options:
-     - After `writeSpy.mockClear()`, trigger one more harmless repaint (e.g. type a single character then backspace, or rely on final `drawBox` from wait end) and check the tail of stdout for `INTERACTIVE_INPUT_READY_OSC` **or** that the visible box region does not contain the typed secret substring — prefer the OSC if stable, since it reflects `lineDraft === ''` in `interactiveInputReadyOscSuffix`.
-- **Expect failure before fix**: draft remains non-empty → no ready OSC / stray text in live region.
+- **Done:** `cli/tests/interactive/interactiveTtyBufferAfterFetchWait.test.ts` — delayed `mockRecallStatus`, `/recall-status`, types while wait active, then after output settles clears the spy and does `x` + Backspace; expects `INTERACTIVE_INPUT_READY_OSC` (empty `lineDraft` after repaint).
 
 ### Phase 2 — Implementation
 
-- In `ttyAdapter.ts`, when interactive fetch wait **ends**, clear the line draft:
-  - **Preferred single hook**: in `onInteractiveFetchWaitChanged`, when `getInteractiveFetchWaitLine()` transitions to **off** (the `else` branch that stops the timer and calls `drawBox()`), set `buffer = ''` (and reset any suggestion/highlight state that is tied to `buffer` if needed — e.g. `highlightIndex`, `suggestionsDismissed` — only if tests or behaviour show stale suggestion state; keep minimal).
-  - Ensure Esc-cancel path is covered: `cancelInteractiveFetchWaitFor` leads to `setActiveWaitLine(..., null)` → same callback → buffer cleared before redraw.
-- Do **not** change piped non-TTY path (`pipedAdapter.ts` has no live buffer).
-- Run `pnpm cli:test` (with nix prefix per project rules).
+- **Done:** `ttyAdapter` `onInteractiveFetchWaitChanged` **else** branch (wait off): after `stopInteractiveFetchWaitRepaintTimer()`, set `buffer = ''`, `highlightIndex = 0`, `suggestionsDismissed = false`, then `drawBox()`. Piped adapter unchanged.
 
 ### Phase 3 — Cleanup
 
