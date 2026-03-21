@@ -12,6 +12,7 @@ const pkg = {
   exports: {
     '.': './index.ts',
     './client.gen': './client.gen.ts',
+    './client/types.gen': './client/types.gen.ts',
     './sdk.gen': './sdk.gen.ts',
     './types.gen': './types.gen.ts',
     './*': './*',
