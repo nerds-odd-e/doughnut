@@ -76,8 +76,9 @@ doughnut/
 │       ├── store/              # Pinia state management
 │       └── (imports from packages/generated/doughnut-backend-api/)
 ├── packages/
-│   └── generated/
-│       └── doughnut-backend-api/  # Auto-generated API client
+│   ├── generated/
+│   │   └── doughnut-backend-api/  # Auto-generated API client
+│   └── doughnut-test-fixtures/    # Shared `makeMe` API-shaped builders (frontend alias `@tests/fixtures/*`, MCP/CLI: `doughnut-test-fixtures/...`)
 ├── e2e_test/                   # Cucumber E2E tests
 │   ├── features/               # Gherkin feature files
 │   ├── step_definitions/       # Step implementations
@@ -107,6 +108,7 @@ doughnut/
 - DaisyUI classes use `daisy-` prefix
 - Avoid `getByRole` queries in tests (performance) - use `getByText`, `getByLabelText`, etc.
 - Use `mockSdkService()` helper for mocking API calls in tests
+- API-shaped test and Storybook data: `makeMe` from `@tests/fixtures/makeMe` (implementation in `packages/doughnut-test-fixtures`; MCP/CLI tests use `doughnut-test-fixtures/makeMe`)
 
 ### E2E Tests
 - Keep step definitions lightweight, delegate to page objects
