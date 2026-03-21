@@ -40,6 +40,14 @@ Informal plan; delete or archive when done.
 
 **User/system value:** Fewer unnecessary rollouts and less blast radius when nothing deployable changed.
 
+### Phase 2 implementation (done)
+
+- **Workflow:** `.github/workflows/ci.yml` `Deploy` job runs `infra/gcp/scripts/deploy-backend-jar-to-gcp-mig.sh` after downloading the packaged jar artifact.
+- **Record:** `gs://<GCS_BUCKET>/deploy/last-successful-deploy.json` — JSON with `sha256`, `git_sha`, `recorded_at` (ISO8601 UTC). Written **only** after `gsutil cp` of the jar and `perform-rolling-replace-app-mig.sh` both succeed.
+- **Skip path:** If the jar’s SHA-256 equals `sha256` in the record, the script exits without uploading or rolling replace (record unchanged).
+- **First run / missing record:** No object or unreadable JSON → full deploy; record created on success.
+- **Recovery:** If prod is already on the intended jar but the record is missing or wrong, you can upload a correct JSON to `deploy/last-successful-deploy.json` (same `sha256` as the jar you intend) to re-enable skipping without a rollout—or delete the object to force the next green pipeline to deploy.
+
 ---
 
 ## Phase 3 — `force_deployment` guardrail
