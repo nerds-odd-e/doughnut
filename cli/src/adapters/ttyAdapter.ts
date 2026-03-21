@@ -13,6 +13,11 @@ import {
   getInteractiveFetchWaitLine,
   runInteractiveFetchWait,
 } from '../interactiveFetchWait.js'
+import {
+  loadCliCommandHistory,
+  saveCliCommandHistory,
+} from '../cliCommandHistoryFile.js'
+import { getConfigDir } from '../configDir.js'
 import { maskInteractiveInputForHistory } from '../inputHistoryMask.js'
 import {
   afterBareSlashEscape,
@@ -285,7 +290,10 @@ export async function runTTY(
   readline.emitKeypressEvents(stdin, rl)
 
   let chatHistory: ChatHistory = []
-  let commandInput = emptyInteractiveCommandInput()
+  let commandInput = {
+    ...emptyInteractiveCommandInput(),
+    committedCommands: loadCliCommandHistory(getConfigDir()),
+  }
   let highlightIndex = 0
   let suggestionsDismissed = false
   const livePaint: LiveRegionPaintCursor = {
@@ -306,6 +314,7 @@ export async function runTTY(
         maskInteractiveInputForHistory(raw)
       ),
     }
+    saveCliCommandHistory(getConfigDir(), commandInput.committedCommands)
   }
 
   function resetLivePaintCursor(): void {

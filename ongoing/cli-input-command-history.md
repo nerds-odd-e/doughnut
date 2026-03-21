@@ -93,18 +93,11 @@ Scope: **`/add-access-token`** only unless product asks to extend (e.g. other pa
 
 **Done:** `maskInteractiveInputForHistory` in `cli/src/inputHistoryMask.ts`. TTY: all `chatHistory` input entries, `rememberCommittedLine` / `appendCommittedCommand`, and immediate `renderPastInput` before token-list mode use the masked string; `processInput` still receives the raw line. Piped interactive: `renderPastInput` uses the masked line. **Tests:** `cli/tests/inputHistoryMask.test.ts`, `cli/tests/interactive/interactiveTtyAddAccessTokenMask.test.ts`.
 
-### Phase C — Persist last ~100 commands
+### Phase C — Persist last ~100 commands ✅
 
 **User-visible:** History survives CLI restart (same config dir as the rest of the app, `DOUGHNUT_CONFIG_DIR` / `configDir`).
 
-**Implementation sketch:**
-
-- New file under config dir, e.g. `cli-command-history.json` (name TBD), array of strings, **max length ~100** (truncate oldest when appending — exact number not critical).
-- **Load** once when starting **TTY** interactive session; **append** on each successful commit of an input line (after masking).
-- Avoid secrets on disk beyond masked lines (Phase B is a prerequisite).
-- **Debounce or flush-on-exit:** simplest is synchronous append after each submit; if noisy, batch with `setImmediate` / short debounce still acceptable for ~100 strings.
-
-**Tests:** Unit test persistence helper with temp config dir (pattern from `accessToken.test.ts` / `interactiveTestHelpers.ts`).
+**Done:** `cli/src/cliCommandHistoryFile.ts` — `cli-command-history.json`, JSON array of strings (newest first), cap `MAX_COMMITTED_COMMANDS` on load and via `appendCommittedCommand` on write. **TTY:** load in `runTTY` initial `commandInput`; `saveCliCommandHistory` after each `rememberCommittedLine` (masked lines only). **Tests:** `cli/tests/cliCommandHistoryFile.test.ts`.
 
 ### Phase D — Hygiene
 
