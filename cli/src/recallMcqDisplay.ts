@@ -1,10 +1,17 @@
 import { renderMarkdownToTerminal } from './markdown.js'
 import {
-  renderCurrentGuidanceForSelectableLines,
+  CURRENT_GUIDANCE_MAX_VISIBLE,
+  formatHighlightedListByItem,
+} from './listDisplay.js'
+import {
+  truncateToWidth,
+  visibleLength,
   wrapTextToVisibleWidthLines,
   type TerminalWidth,
 } from './renderer.js'
 import type { RecallMcqChoiceTexts } from './types.js'
+
+const DEFAULT_NUMBERED_CHOICE_WRAP_WIDTH = 4096
 
 function collapseSoftLineBreaksToSingleLine(text: string): string {
   return text
@@ -20,11 +27,40 @@ function choiceBodyOneVisibleLine(apiChoiceText: string): string {
   return collapseSoftLineBreaksToSingleLine(rendered)
 }
 
-/** Numbered rows: piped scrollback and the plain rows passed into Current guidance highlighting. */
+function recallMcqNumberedChoiceLinesAndIndices(
+  choices: RecallMcqChoiceTexts,
+  width: TerminalWidth
+): { lines: string[]; itemIndexPerLine: number[] } {
+  const lines: string[] = []
+  const itemIndexPerLine: number[] = []
+  for (let i = 0; i < choices.length; i++) {
+    const body = choiceBodyOneVisibleLine(choices[i]!)
+    const prefix = `  ${i + 1}. `
+    const indent = ' '.repeat(visibleLength(prefix))
+    const innerWidth = Math.max(1, width - visibleLength(prefix))
+    const bodyLines = wrapTextToVisibleWidthLines(body, innerWidth)
+    if (bodyLines.length === 0) {
+      lines.push(prefix)
+      itemIndexPerLine.push(i)
+      continue
+    }
+    for (let r = 0; r < bodyLines.length; r++) {
+      const rowPrefix = r === 0 ? prefix : indent
+      lines.push(rowPrefix + bodyLines[r]!)
+      itemIndexPerLine.push(i)
+    }
+  }
+  return { lines, itemIndexPerLine }
+}
+
+/**
+ * Numbered rows for scrollback (and tests): wraps each choice to `width` (default: very wide → one row per choice when text fits).
+ */
 export function recallMcqNumberedChoiceLines(
-  choices: RecallMcqChoiceTexts
+  choices: RecallMcqChoiceTexts,
+  width: TerminalWidth = DEFAULT_NUMBERED_CHOICE_WRAP_WIDTH
 ): string[] {
-  return choices.map((c, i) => `  ${i + 1}. ${choiceBodyOneVisibleLine(c)}`)
+  return recallMcqNumberedChoiceLinesAndIndices(choices, width).lines
 }
 
 /**
@@ -36,11 +72,16 @@ export function recallMcqCurrentGuidanceLines(
   selectedChoiceIndex: number,
   width: TerminalWidth
 ): string[] {
-  return renderCurrentGuidanceForSelectableLines(
-    recallMcqNumberedChoiceLines(choices),
-    selectedChoiceIndex,
+  const { lines, itemIndexPerLine } = recallMcqNumberedChoiceLinesAndIndices(
+    choices,
     width
   )
+  return formatHighlightedListByItem(
+    lines,
+    itemIndexPerLine,
+    CURRENT_GUIDANCE_MAX_VISIBLE,
+    selectedChoiceIndex
+  ).map((line) => truncateToWidth(line, width))
 }
 
 /**

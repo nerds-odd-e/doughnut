@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { describe, test, expect, type vi, beforeEach, afterEach } from 'vitest'
 import {
   mockAnswerQuiz,
@@ -197,5 +198,52 @@ describe('TTY recall MCQ', () => {
       await submitTTYCommand(stdin, '/recall')
       expect(ttyOutput(writeSpy)).toContain(INTERACTIVE_INPUT_READY_OSC)
     })
+  })
+})
+
+describe('TTY recall MCQ wrapped choices (narrow terminal)', () => {
+  let writeSpy: ReturnType<typeof vi.spyOn>
+  let stdin: TTYStdin
+  let savedColumns: number | undefined
+
+  beforeEach(async () => {
+    savedColumns = process.stdout.columns
+    Object.defineProperty(process.stdout, 'columns', {
+      value: 34,
+      writable: true,
+      configurable: true,
+    })
+    resetRecallStateForTesting()
+    mockRecallNext.mockResolvedValue({
+      type: 'mcq',
+      recallPromptId: 200,
+      stem: 'Pick:',
+      choices: ['Long first option text that must wrap in narrow cols', 'B'],
+    })
+    mockAnswerQuiz.mockResolvedValue({ correct: true })
+    ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
+  })
+
+  afterEach(() => {
+    endTTYSession(stdin)
+    Object.defineProperty(process.stdout, 'columns', {
+      value: savedColumns,
+      writable: true,
+      configurable: true,
+    })
+  })
+
+  test('first choice wraps; down arrow highlights only the second choice', async () => {
+    await submitTTYCommand(stdin, '/recall')
+    writeSpy.mockClear()
+    pressKey(stdin, 'down')
+    await tick()
+
+    const output = ttyOutput(writeSpy)
+    const highlighted = output
+      .split('\n')
+      .filter((l: string) => l.includes('\x1b[7m'))
+    expect(highlighted.length).toBe(1)
+    expect(stripAnsi(highlighted[0]!)).toMatch(/ {2}2\. /)
   })
 })

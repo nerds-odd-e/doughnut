@@ -56,6 +56,8 @@ Informal plan. Delete or trim when shipped.
 
 ### Phase 4 — Wrapping long choices without breaking selection
 
+**Done:** Flat physical lines + `itemIndexPerLine` in `recallMcqDisplay.ts` (`recallMcqNumberedChoiceLinesAndIndices`); `formatHighlightedListByItem` in `listDisplay.ts` (scroll anchor = first line of selected choice; reverse video on every line of that choice). `recallMcqNumberedChoiceLines(choices, width?)` + scrollback use `getTerminalWidth()`.
+
 **Goal:** For narrow terminals, wrap choice text to width. **Highlight** and `mcqChoiceHighlightIndex` / `recallMcqSubmittedLine` stay **per choice index**. Options: (a) render each choice as multiple physical lines but apply **one highlight style** to the whole group, and teach scroll/window logic to step by **choice**; or (b) keep a flat line array with metadata `{ choiceIndex }` per line and adjust scrolling/highlight helpers accordingly — pick the **smaller** change that preserves `CURRENT_GUIDANCE_MAX_VISIBLE` behavior for large N.
 
 **Scope:** Renderer + `listDisplay` (or dedicated `mcqDisplay.ts` if it stays clearer), `ttyAdapter` only if index math moves.

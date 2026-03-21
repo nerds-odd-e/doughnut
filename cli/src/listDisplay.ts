@@ -53,6 +53,69 @@ export function formatHighlightedList(
   return result
 }
 
+/**
+ * Like {@link formatHighlightedList}, but each physical line belongs to a logical item (e.g. MCQ choice).
+ * Scroll anchoring uses the first line of `selectedItemIndex`; all lines for that item are highlighted.
+ */
+export function formatHighlightedListByItem(
+  lines: string[],
+  itemIndexPerLine: readonly number[],
+  maxVisible = CURRENT_GUIDANCE_MAX_VISIBLE,
+  selectedItemIndex = 0
+): string[] {
+  const total = lines.length
+  if (total === 0) return []
+
+  let anchorLine = 0
+  for (let i = 0; i < total; i++) {
+    if (itemIndexPerLine[i] === selectedItemIndex) {
+      anchorLine = i
+      break
+    }
+  }
+
+  const isOverflowing = total > maxVisible
+  if (!isOverflowing) {
+    return lines.map((line, i) =>
+      itemIndexPerLine[i] === selectedItemIndex
+        ? `${REVERSE}${line}${RESET}`
+        : `${GREY}${line}${RESET}`
+    )
+  }
+
+  const scrollOffset = computeScrollOffset(total, maxVisible, anchorLine)
+  const window = lines.slice(scrollOffset, scrollOffset + maxVisible)
+  const showMoreAbove = shouldShowMoreAbove(
+    scrollOffset,
+    anchorLine,
+    maxVisible,
+    total
+  )
+  const showMoreBelow = shouldShowMoreBelow(
+    scrollOffset,
+    anchorLine,
+    maxVisible,
+    total
+  )
+
+  const firstOptionIndex = showMoreAbove ? 1 : 0
+  const lastOptionIndex = showMoreBelow ? window.length - 2 : window.length - 1
+
+  const result: string[] = []
+  if (showMoreAbove) result.push(`${GREY}  ↑ more above${RESET}`)
+  for (let i = firstOptionIndex; i <= lastOptionIndex; i++) {
+    const line = window[i]!
+    const actualLineIndex = scrollOffset + i
+    const isHighlighted =
+      itemIndexPerLine[actualLineIndex] === selectedItemIndex
+    result.push(
+      isHighlighted ? `${REVERSE}${line}${RESET}` : `${GREY}${line}${RESET}`
+    )
+  }
+  if (showMoreBelow) result.push(`${GREY}  ↓ more below${RESET}`)
+  return result
+}
+
 function computeScrollOffset(
   total: number,
   maxVisible: number,

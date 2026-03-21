@@ -167,7 +167,10 @@ function writeMcqRecallQuestionToScrollback(
   choices: readonly string[]
 ): void {
   writeLine(stemRenderedForTerminal)
-  for (const line of recallMcqNumberedChoiceLines(choices)) {
+  for (const line of recallMcqNumberedChoiceLines(
+    choices,
+    getTerminalWidth()
+  )) {
     writeLine(line)
   }
   writeLine(`Enter your choice (1-${choices.length}):`)

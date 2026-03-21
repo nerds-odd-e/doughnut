@@ -24,6 +24,26 @@ describe('recall MCQ terminal display', () => {
     expect(stripAnsi(highlighted[0]!)).toMatch(/ {2}2\. /)
   })
 
+  test('narrow width: one choice can span multiple rows; highlight covers every wrapped row', () => {
+    const long =
+      'This answer text is long enough to require wrapping at thirty columns wide.'
+    const out = recallMcqCurrentGuidanceLines([long, 'B'], 0, 30)
+    const highlighted = out.filter((l) => l.includes('\x1b[7m'))
+    expect(highlighted.length).toBeGreaterThan(1)
+    expect(stripAnsi(highlighted[0]!)).toContain('This')
+    const joined = highlighted.map((l) => stripAnsi(l)).join(' ')
+    expect(joined).toContain('wide')
+  })
+
+  test('narrow width: selected index is per choice, not per wrapped line', () => {
+    const long =
+      'First choice is long so it occupies multiple physical guidance lines here.'
+    const out = recallMcqCurrentGuidanceLines([long, 'Second'], 1, 28)
+    const highlighted = out.filter((l) => l.includes('\x1b[7m'))
+    expect(highlighted).toHaveLength(1)
+    expect(stripAnsi(highlighted[0]!)).toContain('Second')
+  })
+
   test('stem for Current prompt: empty markdown paragraph becomes a blank row between wrapped segments', () => {
     const lines = recallMcqStemWrappedLinesForCurrentPrompt('hi\n\nthere', 80)
     expect(lines[0]).toBe('hi')
