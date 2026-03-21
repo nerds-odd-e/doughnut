@@ -72,7 +72,7 @@ CLI e2e tests run TypeScript source locally, bundled in CI:
 
 Use `I should see X in the non-interactive output` for non-interactive; `I should see X in the history output` or `I should see X in the Current guidance` for interactive (hints, suggestions, recall prompts).
 
-**Loading UI (TTY):** Do not add Cypress E2E for transient loading lines — timing vs. PTY capture is flaky. Cover with `cli/tests/interactiveFetchWait.test.ts` and the `processInput /recall` section in `cli/tests/recall.test.ts` (`pnpm cli:test`).
+**Loading UI (TTY):** Do not add Cypress E2E for transient loading lines — timing vs. PTY capture is flaky. Cover with `cli/tests/interactiveFetchWait.test.ts` and `cli/tests/interactive/processInput.test.ts` (`contract: /recall load` + default-console `/recall` cases; `pnpm cli:test`).
 
 CLI page objects live in `e2e_test/start/pageObjects/cli/` and map to domain concepts: non-interactive output, history output, history input, current guidance. Use `cli.nonInteractiveOutput()`, `cli.historyOutput()`, `cli.currentGuidance()`, etc.
 

@@ -30,13 +30,15 @@ Informal plan. Aligned with `.cursor/rules/planning.mdc` → **Observable behavi
 
 ---
 
-## Phase 2 — One home for “recall + `processInput`” contract
+## Phase 2 — One home for “recall + `processInput`” contract ✅ done
 
 **Outcome:** Single obvious file for “recall command through `processInput` with mocked API,” aligned with planning **cohesion for one behavior**.
 
 - Move or merge so **either** `recall.test.ts` **or** `processInput.test.ts` owns **multi-turn recall via `processInput` + `console.log`**, not both.
 - Keep **`recall.test.ts`** focused on **`recall.ts`** pure behavior (`recallStatus`, `recallNext` wiring with mocks) where tests **do not need** `processInput`.
 - **Deliverable:** New contributors know where to add recall tests; duplicated describe blocks gone.
+
+**Done (2026-03-21):** `interactive/processInput.test.ts` owns all `processInput` `/recall` contract tests (default `console.log` flows + `describe('contract: /recall load — real recallNext + OutputAdapter cancel')`). `recall.test.ts` no longer imports `processInput`; `cli.mdc` loading-UI note updated.
 
 ---
 

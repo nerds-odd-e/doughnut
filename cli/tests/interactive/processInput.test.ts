@@ -1,4 +1,18 @@
-import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
+import {
+  describe,
+  test,
+  expect,
+  vi,
+  beforeEach,
+  afterEach,
+  beforeAll,
+} from 'vitest'
+import { RecallsController, UserController } from 'doughnut-api'
+import { addAccessToken } from '../../src/accessToken.js'
+import {
+  CLI_USER_ABORTED_WAIT_MESSAGE,
+  userAbortError,
+} from '../../src/fetchAbort.js'
 import {
   mockAnswerQuiz,
   mockAnswerSpelling,
@@ -8,7 +22,8 @@ import {
 } from './interactiveRecallMockAccess.js'
 import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { userAbortError } from '../../src/fetchAbort.js'
+import { cancelInteractiveFetchWaitFor } from '../../src/interactiveFetchWait.js'
+import { RECALL_LOAD_CLI_TEST_DELAY_MS_ENV } from '../../src/recall.js'
 import {
   isInRecallSubstate,
   processInput,
@@ -16,6 +31,28 @@ import {
 } from '../../src/interactive.js'
 import { stripAnsi } from '../../src/renderer.js'
 import { makeTempConfigDir, withConfigDir } from './interactiveTestHelpers.js'
+
+vi.mock('doughnut-api', () => ({
+  getApiConfig: () => ({ apiBaseUrl: 'http://localhost:9081' }),
+  configureClient: vi.fn(),
+  MemoryTrackerController: {
+    askAQuestion: vi.fn(),
+    markAsRecalled: vi.fn(),
+    showMemoryTracker: vi.fn(),
+  },
+  RecallsController: {
+    recalling: vi.fn(),
+  },
+  RecallPromptController: {
+    answerQuiz: vi.fn(),
+    answerSpelling: vi.fn(),
+    contest: vi.fn(),
+    regenerate: vi.fn(),
+  },
+  UserController: {
+    getTokenInfo: vi.fn(),
+  },
+}))
 
 describe('processInput', () => {
   let logSpy: ReturnType<typeof vi.spyOn>
@@ -147,7 +184,7 @@ describe('processInput', () => {
     restore()
   })
 
-  // contract: /recall session (mock recallNext + default console). recall.test.ts covers recall.ts API and /recall load cancel with real recallNext.
+  // contract: /recall via processInput — default console (below) and OutputAdapter + real recallNext (load cancel).
 
   test('spelling: prompt with markdown stem shows ANSI codes, not raw markdown', async () => {
     mockRecallNext.mockResolvedValue({
@@ -522,6 +559,73 @@ describe('processInput', () => {
     await processInput('/contest')
     expect(logSpy).toHaveBeenCalledWith('Question could not be regenerated')
     expect(isInRecallSubstate()).toBe(true)
+  })
+
+  describe('contract: /recall load — real recallNext + OutputAdapter cancel', () => {
+    let realRecallNext: typeof import('../../src/recall.js')['recallNext']
+    let originalConfigDir: string | undefined
+    let originalSlow: string | undefined
+
+    beforeAll(async () => {
+      const mod = await vi.importActual<typeof import('../../src/recall.js')>(
+        '../../src/recall.js'
+      )
+      realRecallNext = mod.recallNext
+    })
+
+    beforeEach(() => {
+      originalConfigDir = process.env.DOUGHNUT_CONFIG_DIR
+      process.env.DOUGHNUT_CONFIG_DIR = mkdtempSync(
+        `${tmpdir()}/doughnut-processInput-recall-load-`
+      )
+      originalSlow = process.env[RECALL_LOAD_CLI_TEST_DELAY_MS_ENV]
+      process.env[RECALL_LOAD_CLI_TEST_DELAY_MS_ENV] = '60000'
+      resetRecallStateForTesting()
+      vi.useFakeTimers()
+      mockRecallNext.mockImplementation(realRecallNext)
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+      mockRecallNext.mockReset()
+      if (originalConfigDir === undefined) {
+        delete process.env.DOUGHNUT_CONFIG_DIR
+      } else {
+        process.env.DOUGHNUT_CONFIG_DIR = originalConfigDir
+      }
+      if (originalSlow === undefined) {
+        delete process.env[RECALL_LOAD_CLI_TEST_DELAY_MS_ENV]
+      } else {
+        process.env[RECALL_LOAD_CLI_TEST_DELAY_MS_ENV] = originalSlow
+      }
+    })
+
+    test('cancel during CLI test delay logs Cancelled by user. (real recallNext)', async () => {
+      vi.mocked(RecallsController.recalling).mockResolvedValue({
+        data: { toRepeat: [] },
+      } as never)
+      vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+        data: { id: 1, label: 'Test Token' },
+      } as never)
+      await addAccessToken('test-token')
+
+      const out = {
+        log: vi.fn(),
+        logError: vi.fn(),
+        writeCurrentPrompt: vi.fn(),
+        beginCurrentPrompt: vi.fn(),
+        onInteractiveFetchWaitChanged: vi.fn(),
+      }
+      const done = processInput('/recall', out)
+      await vi.waitFor(() =>
+        expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalled()
+      )
+      expect(cancelInteractiveFetchWaitFor(out)).toBe(true)
+      await done
+      expect(out.log).toHaveBeenCalledWith(CLI_USER_ABORTED_WAIT_MESSAGE)
+      expect(RecallsController.recalling).not.toHaveBeenCalled()
+      expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
+    })
   })
 
   // contract: explicit OutputAdapter (userNotice path; not default console.log)
