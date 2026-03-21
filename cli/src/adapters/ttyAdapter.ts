@@ -952,12 +952,26 @@ export async function runTTY(
       }
       drawBox()
     } else if (key.name === 'up' || key.name === 'down') {
-      const prevDraft = commandInput.lineDraft
-      commandInput =
-        key.name === 'up' ? onArrowUp(commandInput) : onArrowDown(commandInput)
-      if (commandInput.lineDraft !== prevDraft) {
-        highlightIndex = 0
-        suggestionsDismissed = false
+      if (
+        !suggestionsDismissed &&
+        isCommandPrefixWithSuggestions(commandInput.lineDraft)
+      ) {
+        const filtered = filterCommandsByPrefix(
+          interactiveDocs,
+          getLastLine(commandInput.lineDraft)
+        )
+        const delta = key.name === 'up' ? -1 : 1
+        highlightIndex = cycleIndex(highlightIndex, delta, filtered.length)
+      } else {
+        const prevDraft = commandInput.lineDraft
+        commandInput =
+          key.name === 'up'
+            ? onArrowUp(commandInput)
+            : onArrowDown(commandInput)
+        if (commandInput.lineDraft !== prevDraft) {
+          highlightIndex = 0
+          suggestionsDismissed = false
+        }
       }
       drawBox()
     } else if (key.name === 'left') {

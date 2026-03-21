@@ -7,6 +7,7 @@ import {
   liveRegionRepaintHasStaleCursorUpBeforeBoxTop,
   simulatedScreenFromTtyWrites,
 } from '../ttyWriteSimulation.js'
+import { filterCommandsByPrefix, interactiveDocs } from '../../src/help.js'
 import {
   endTTYSession,
   GREY_BG_PAST_INPUT,
@@ -19,6 +20,17 @@ import {
   typeString,
   type TTYStdin,
 } from './interactiveTestHelpers.js'
+
+function lastStdoutLineContaining(
+  output: string,
+  needle: string
+): string | undefined {
+  let found: string | undefined
+  for (const line of output.split('\n')) {
+    if (line.includes(needle)) found = line
+  }
+  return found
+}
 
 describe('TTY: shared interactive session', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
@@ -140,7 +152,11 @@ describe('TTY: shared interactive session', () => {
       expect(suggestionLinesAfterInsert).toHaveLength(0)
     })
 
-    test('first up from `/` moves cursor to start; first suggestion stays highlighted', async () => {
+    test('first Up from `/` wraps highlight to the last matching command', async () => {
+      const filtered = filterCommandsByPrefix(interactiveDocs, '/')
+      expect(filtered.length).toBeGreaterThanOrEqual(2)
+      const lastUsage = filtered[filtered.length - 1]!.usage
+
       writeSpy.mockClear()
       typeString(stdin, '/')
       await tick()
@@ -148,27 +164,29 @@ describe('TTY: shared interactive session', () => {
       await tick()
 
       const output = ttyOutput(writeSpy)
-      const lines = output.split('\n')
-      const helpLines = lines.filter((l) => l.includes('/help'))
-      const helpLine = helpLines[helpLines.length - 1]
-      expect(helpLine).toBeDefined()
-      expect(helpLine).toContain('\x1b[7m')
+      const lastLine = lastStdoutLineContaining(output, `  ${lastUsage}`)
+      expect(lastLine).toBeDefined()
+      expect(lastLine).toContain('\x1b[7m')
     })
 
-    test('down with cursor at end does not cycle suggestion highlight', async () => {
+    test('Down moves highlight from the first slash command to the next', async () => {
+      const filtered = filterCommandsByPrefix(interactiveDocs, '/')
+      expect(filtered.length).toBeGreaterThanOrEqual(2)
+      const secondUsage = filtered[1]!.usage
+
       writeSpy.mockClear()
       typeString(stdin, '/')
       await tick()
-      for (let i = 0; i < 9; i++) {
-        pressKey(stdin, 'down')
-        await tick()
-      }
+      pressKey(stdin, 'down')
+      await tick()
 
       const output = ttyOutput(writeSpy)
-      const lines = output.split('\n')
-      const helpLine = lines.find((l) => l.includes('/help'))
+      const helpLine = lastStdoutLineContaining(output, '  /help')
       expect(helpLine).toBeDefined()
-      expect(helpLine).toContain('\x1b[7m')
+      expect(helpLine).not.toContain('\x1b[7m')
+      expect(lastStdoutLineContaining(output, `  ${secondUsage}`)).toContain(
+        '\x1b[7m'
+      )
     })
 
     test('ESC when buffer is only "/" dismisses suggestions and clears buffer', async () => {

@@ -26,7 +26,7 @@ describe('TTY mode slash command suggestions with scroll', () => {
     endTTYSession(stdin)
   })
 
-  test('many down arrows do not scroll the long suggestion list; first item stays highlighted', async () => {
+  test('repeated Down moves highlight through a long list; window can show ↑ more above', async () => {
     writeSpy.mockClear()
     typeString(stdin, '/')
     await tick()
@@ -37,11 +37,14 @@ describe('TTY mode slash command suggestions with scroll', () => {
 
     const output = ttyOutput(writeSpy)
     expect(output).toContain('\x1b[7m')
-    expect(output).toContain('/cmd0')
-    expect(output).not.toContain('↑ more above')
+    expect(output).toContain('↑ more above')
+    const lines = output.split('\n')
+    const cmd8Lines = lines.filter((l: string) => l.includes('  /cmd8'))
+    expect(cmd8Lines.length).toBeGreaterThan(0)
+    expect(cmd8Lines[cmd8Lines.length - 1]).toContain('\x1b[7m')
   })
 
-  test('many down presses do not reveal last command in the guidance window', async () => {
+  test('enough Down presses move highlight to the last command in a long list', async () => {
     writeSpy.mockClear()
     typeString(stdin, '/')
     await tick()
@@ -51,6 +54,9 @@ describe('TTY mode slash command suggestions with scroll', () => {
     }
 
     const output = ttyOutput(writeSpy)
-    expect(output).not.toContain('/cmd11')
+    const lines = output.split('\n')
+    const cmd11Lines = lines.filter((l: string) => l.includes('  /cmd11'))
+    expect(cmd11Lines.length).toBeGreaterThan(0)
+    expect(cmd11Lines[cmd11Lines.length - 1]).toContain('\x1b[7m')
   })
 })
