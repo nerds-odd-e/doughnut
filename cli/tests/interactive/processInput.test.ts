@@ -31,8 +31,11 @@ describe('processInput', () => {
   })
 
   afterEach(() => {
+    vi.useRealTimers()
     logSpy.mockRestore()
   })
+
+  // contract: default console (same observable surface as -c / piped log; not TTY bytes — see interactiveTty*.test.ts)
 
   test('returns true for exit commands', async () => {
     expect(await processInput('exit')).toBe(true)
@@ -144,6 +147,8 @@ describe('processInput', () => {
     restore()
   })
 
+  // contract: /recall session (mock recallNext + default console). recall.test.ts covers recall.ts API and /recall load cancel with real recallNext.
+
   test('spelling: prompt with markdown stem shows ANSI codes, not raw markdown', async () => {
     mockRecallNext.mockResolvedValue({
       type: 'spelling',
@@ -164,7 +169,8 @@ describe('processInput', () => {
     expect(stripAnsi(output)).toContain('italic')
   })
 
-  test('spelling: /recall shows Spell prompt, then spelling answer calls answerSpelling', async () => {
+  test('spelling: Spell prompt, answer calls answerSpelling with thinkingTimeMs, then success messages', async () => {
+    vi.useFakeTimers()
     mockRecallNext.mockResolvedValue({
       type: 'spelling',
       recallPromptId: 100,
@@ -178,32 +184,11 @@ describe('processInput', () => {
     )
     logSpy.mockClear()
 
-    await processInput('sedition')
-    expect(mockAnswerSpelling).toHaveBeenCalledWith(
-      100,
-      'sedition',
-      expect.any(Number)
-    )
-    expect(mockAnswerSpelling.mock.calls[0]![2]).toBeGreaterThanOrEqual(0)
-    expect(logSpy).toHaveBeenCalledWith('Correct!')
-    expect(logSpy).toHaveBeenCalledWith('Recalled successfully')
-  })
-
-  test('spelling: passes thinkingTimeMs from prompt display to answer', async () => {
-    vi.useFakeTimers()
-    mockRecallNext.mockResolvedValue({
-      type: 'spelling',
-      recallPromptId: 100,
-      stem: 'means incite violence',
-    })
-    mockAnswerSpelling.mockResolvedValue({ correct: true })
-
-    await processInput('/recall')
     vi.advanceTimersByTime(5000)
     await processInput('sedition')
-
     expect(mockAnswerSpelling).toHaveBeenCalledWith(100, 'sedition', 5000)
-    vi.useRealTimers()
+    expect(logSpy).toHaveBeenCalledWith('Correct!')
+    expect(logSpy).toHaveBeenCalledWith('Recalled successfully')
   })
 
   test('spelling: empty input prompts to type', async () => {
@@ -452,25 +437,8 @@ describe('processInput', () => {
     expect(stripAnsi(allChoices)).toContain('C')
   })
 
-  test('MCQ: passes thinkingTimeMs from prompt display to answer', async () => {
+  test('/contest when in recall with MCQ contests and shows new question; regenerated MCQ answer passes thinkingTimeMs', async () => {
     vi.useFakeTimers()
-    mockRecallNext.mockResolvedValue({
-      type: 'mcq',
-      recallPromptId: 100,
-      stem: 'What is 2+2?',
-      choices: ['4', '3', '5'],
-    })
-    mockAnswerQuiz.mockResolvedValue({ correct: true })
-
-    await processInput('/recall')
-    vi.advanceTimersByTime(3000)
-    await processInput('1')
-
-    expect(mockAnswerQuiz).toHaveBeenCalledWith(100, 0, 3000)
-    vi.useRealTimers()
-  })
-
-  test('/contest when in recall with MCQ contests and shows new question', async () => {
     mockRecallNext
       .mockResolvedValueOnce({
         type: 'mcq',
@@ -515,9 +483,9 @@ describe('processInput', () => {
     )
     logSpy.mockClear()
 
+    vi.advanceTimersByTime(3000)
     await processInput('1')
-    expect(mockAnswerQuiz).toHaveBeenCalledWith(200, 0, expect.any(Number))
-    expect(mockAnswerQuiz.mock.calls[0]![2]).toBeGreaterThanOrEqual(0)
+    expect(mockAnswerQuiz).toHaveBeenCalledWith(200, 0, 3000)
     expect(logSpy).toHaveBeenCalledWith('Correct!')
     expect(logSpy).toHaveBeenCalledWith('Recalled successfully')
   })
@@ -555,6 +523,8 @@ describe('processInput', () => {
     expect(logSpy).toHaveBeenCalledWith('Question could not be regenerated')
     expect(isInRecallSubstate()).toBe(true)
   })
+
+  // contract: explicit OutputAdapter (userNotice path; not default console.log)
 
   test('/contest abort logs Cancelled by user. as user notice', async () => {
     mockRecallNext.mockResolvedValue({

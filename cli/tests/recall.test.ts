@@ -67,6 +67,7 @@ function mockInteractiveOutputAdapter() {
   }
 }
 
+// recall.ts API (no processInput). For /recall via default console see interactive/processInput.test.ts.
 describe('recallStatus', () => {
   let originalConfigDir: string | undefined
 
@@ -548,7 +549,8 @@ describe('recallNext', () => {
   })
 })
 
-describe('processInput /recall — interactive recall load', () => {
+// contract: processInput + mock OutputAdapter + real recallNext (load delay / cancel). Default-console /recall flows: interactive/processInput.test.ts
+describe('contract: processInput /recall — interactive recall load', () => {
   let originalConfigDir: string | undefined
   let originalSlow: string | undefined
 
