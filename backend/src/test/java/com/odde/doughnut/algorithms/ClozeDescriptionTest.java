@@ -124,6 +124,24 @@ class ClozeDescriptionTest {
     assertThat(result, containsString("/.../"));
   }
 
+  @Test
+  void clozeShouldMaskBonaFideWithFidesVariantAndMarkdownEmphasis() {
+    String result =
+        new ClozedString(clozeReplacement, "_Bona fides_ is a Latin phrase meaning \"good faith\".")
+            .hide(new NoteTitle("bona fide"))
+            .maskedDetailsAsMarkdown();
+    assertThat(result, containsString("[...]"));
+  }
+
+  @Test
+  void clozeShouldNotMatchPartialWordInDogma() {
+    String result =
+        new ClozedString(clozeReplacement, "the cat dogma is a belief")
+            .hide(new NoteTitle("cat dog"))
+            .maskedDetailsAsMarkdown();
+    assertThat(result, containsString("dogma"));
+  }
+
   @ParameterizedTest
   @CsvSource({
     "archenemy / arch-enemy, an archenemy here, an [...] here",

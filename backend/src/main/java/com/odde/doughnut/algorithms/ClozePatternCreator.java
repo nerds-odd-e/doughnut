@@ -2,7 +2,6 @@ package com.odde.doughnut.algorithms;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class ClozePatternCreator {
   final boolean suffix;
@@ -24,17 +23,27 @@ public class ClozePatternCreator {
   }
 
   private String ignoreConjunctions(String toMatch) {
-    return Arrays.stream(toMatch.split("[\\s-]+"))
-        .filter(x -> !Arrays.asList("the", "a", "an").contains(x))
-        .map(Pattern::quote)
-        .collect(Collectors.joining("([\\s-]+)((and\\s+)|(the\\s+)|(a\\s+)|(an\\s+))?"));
+    String[] words =
+        Arrays.stream(toMatch.split("[\\s-]+"))
+            .filter(x -> !Arrays.asList("the", "a", "an").contains(x))
+            .toArray(String[]::new);
+    if (words.length == 0) return "";
+    String between = "([\\s-]+)((and\\s+)|(the\\s+)|(a\\s+)|(an\\s+))?";
+    StringBuilder sb = new StringBuilder("(?:[_*])?");
+    for (int i = 0; i < words.length; i++) {
+      if (i > 0) sb.append(between);
+      String word = words[i];
+      sb.append(Pattern.quote(word));
+      if (i == words.length - 1) sb.append("s?(?:[_*])?(?!\\w)");
+    }
+    return sb.toString();
   }
 
   private String suffixIfNeeded(String pattern) {
     if (suffix) {
       return "(?U)(?<=[^\\s])" + pattern;
     }
-    return "(?<=" + potentialWordBoundary + ")" + pattern;
+    return "(?<=" + potentialWordBoundary + "|[_*])" + pattern;
   }
 
   Pattern getPattern(String toMatch) {
