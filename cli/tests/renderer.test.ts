@@ -14,6 +14,7 @@ import {
   buildLiveRegionLines,
   visibleLength,
   wrapTextToVisibleWidthLines,
+  terminalColumnsOfPlainGrapheme,
 } from '../src/renderer.js'
 import type { ChatHistory } from '../src/types.js'
 
@@ -72,7 +73,7 @@ describe('wrapTextToVisibleWidthLines (recall MCQ stem / ANSI terminal strings)'
     const joined = stripAnsi(lines.join(''))
     expect(joined).toContain('hi')
     expect(joined).toContain('there')
-    expect(lines.every((l) => stripAnsi(l).length <= 3)).toBe(true)
+    expect(lines.every((l) => visibleLength(l) <= 3)).toBe(true)
   })
 
   test('CJK wide characters count as 2 terminal columns each', () => {
@@ -95,6 +96,20 @@ describe('wrapTextToVisibleWidthLines (recall MCQ stem / ANSI terminal strings)'
       lines.every((l) => visibleLength(l) <= 30),
       'Every wrapped line must fit within the terminal width.'
     ).toBe(true)
+  })
+
+  test('emoji and emoji presentation use 2 terminal columns', () => {
+    expect(terminalColumnsOfPlainGrapheme('😀')).toBe(2)
+    expect(visibleLength('a😀b')).toBe(4)
+    expect(visibleLength('❤️')).toBe(2)
+  })
+
+  test('flag regional-indicator pair is 2 columns', () => {
+    expect(terminalColumnsOfPlainGrapheme('🇯🇵')).toBe(2)
+  })
+
+  test('ZWJ emoji sequence counts as 2 columns', () => {
+    expect(terminalColumnsOfPlainGrapheme('👨‍👩‍👧')).toBe(2)
   })
 })
 

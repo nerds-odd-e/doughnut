@@ -135,8 +135,10 @@ export const RECALLING_INDICATOR = `${GREY}Recalling${RESET}`
 
 // biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI escapes
 const ANSI_PATTERN = /\x1b\[[0-9;]*m/g
-// biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI escape or single char (for truncation)
-const ANSI_OR_CHAR_PATTERN = /\x1b\[[0-9;]*m|./gs
+// biome-ignore lint/suspicious/noControlCharactersInRegex: SGR at start of slice
+const SGR_AT_START = /^\x1b\[[0-9;]*m/
+
+const graphemeSegmenter = new Intl.Segmenter('en', { granularity: 'grapheme' })
 
 /** Strip ANSI escape sequences; returns plain text. */
 export function stripAnsi(str: string): string {
@@ -152,60 +154,109 @@ export function stripAnsiCsiAndCr(str: string): string {
     .replace(/\r/g, '')
 }
 
+function isRegionalIndicator(cp: number): boolean {
+  return cp >= 0x1f1e6 && cp <= 0x1f1ff
+}
+
 /**
- * Terminal column width of a single character: 2 for CJK/wide characters
- * (East Asian Width W or F), 1 for everything else.
+ * Column width of one Unicode code point (plain text, not a full grapheme).
+ * Used only inside {@link terminalColumnsOfPlainGrapheme}.
  */
-function charTerminalWidth(ch: string): 1 | 2 {
-  const cp = ch.codePointAt(0) ?? 0
+function codePointTerminalColumnWidth(cp: number): number {
+  if (cp === 0x09) return 1
+  if (cp < 0x20 || cp === 0x7f) return 0
   if (
-    (cp >= 0x2e80 && cp <= 0x303e) || // CJK Radicals Supplement – CJK Symbols and Punctuation
-    (cp >= 0x3040 && cp <= 0x33ff) || // Hiragana, Katakana, Bopomofo, CJK Compatibility
-    (cp >= 0x3400 && cp <= 0x4dbf) || // CJK Unified Ideographs Extension A
-    (cp >= 0x4e00 && cp <= 0xa4cf) || // CJK Unified Ideographs + Yi
-    (cp >= 0xa960 && cp <= 0xa97f) || // Hangul Jamo Extended-A
-    (cp >= 0xac00 && cp <= 0xd7ff) || // Hangul Syllables + Hangul Jamo Extended-B
-    (cp >= 0xf900 && cp <= 0xfaff) || // CJK Compatibility Ideographs
-    (cp >= 0xfe10 && cp <= 0xfe6f) || // CJK Compatibility Forms, Small Form Variants
-    (cp >= 0xff00 && cp <= 0xff60) || // Fullwidth Latin, etc.
-    (cp >= 0xffe0 && cp <= 0xffe6) || // Fullwidth Signs
-    (cp >= 0x1b000 && cp <= 0x1b12f) || // Kana Supplement / Kana Extended-A
-    (cp >= 0x20000 && cp <= 0x2fffd) || // CJK Unified Ideographs Extension B–F
-    (cp >= 0x30000 && cp <= 0x3fffd) // CJK Unified Ideographs Extension G+
+    (cp >= 0x0300 && cp <= 0x036f) ||
+    (cp >= 0x1ab0 && cp <= 0x1aff) ||
+    (cp >= 0x1dc0 && cp <= 0x1dff) ||
+    (cp >= 0x20d0 && cp <= 0x20ff) ||
+    (cp >= 0xfe00 && cp <= 0xfe0e) ||
+    (cp >= 0xfe20 && cp <= 0xfe2f) ||
+    (cp >= 0x1f3fb && cp <= 0x1f3ff)
+  ) {
+    return 0
+  }
+  if (cp === 0xfe0f) return 0
+  if (
+    (cp >= 0x2e80 && cp <= 0x303e) ||
+    (cp >= 0x3040 && cp <= 0x33ff) ||
+    (cp >= 0x3400 && cp <= 0x4dbf) ||
+    (cp >= 0x4e00 && cp <= 0xa4cf) ||
+    (cp >= 0xa960 && cp <= 0xa97f) ||
+    (cp >= 0xac00 && cp <= 0xd7ff) ||
+    (cp >= 0xf900 && cp <= 0xfaff) ||
+    (cp >= 0xfe10 && cp <= 0xfe6f) ||
+    (cp >= 0xff00 && cp <= 0xff60) ||
+    (cp >= 0xffe0 && cp <= 0xffe6) ||
+    (cp >= 0x1b000 && cp <= 0x1b12f) ||
+    (cp >= 0x20000 && cp <= 0x2fffd) ||
+    (cp >= 0x30000 && cp <= 0x3fffd)
+  ) {
+    return 2
+  }
+  if (
+    (cp >= 0x2600 && cp <= 0x26ff) ||
+    (cp >= 0x2700 && cp <= 0x27bf) ||
+    (cp >= 0x1f000 && cp <= 0x1faff)
   ) {
     return 2
   }
   return 1
 }
 
-/** Terminal column count of a string (ANSI-stripped; CJK wide chars count as 2). */
+/**
+ * Terminal column width of one plain-text grapheme cluster (no ANSI).
+ * Single source of truth for “how wide is this on a typical terminal?” — CJK, emoji,
+ * flags (regional indicators), and ZWJ sequences.
+ */
+export function terminalColumnsOfPlainGrapheme(g: string): number {
+  if (g.includes('\u200d')) return 2
+  const cps: number[] = []
+  for (const ch of g) cps.push(ch.codePointAt(0)!)
+  if (cps.length === 2 && cps.every(isRegionalIndicator)) return 2
+  if (g.includes('\ufe0f')) return 2
+  let sum = 0
+  for (const cp of cps) sum += codePointTerminalColumnWidth(cp)
+  return sum
+}
+
+/** Terminal column count after stripping ANSI; uses grapheme clusters + {@link terminalColumnsOfPlainGrapheme}. */
 export function visibleLength(str: string): number {
   let total = 0
-  for (const ch of stripAnsi(str)) {
-    total += charTerminalWidth(ch)
+  for (const { segment } of graphemeSegmenter.segment(stripAnsi(str))) {
+    total += terminalColumnsOfPlainGrapheme(segment)
   }
   return total
 }
 
-/** Wraps plain text to width; returns lines. Breaks at word boundaries when possible. */
-export function wrapTextToLines(text: string, width: TerminalWidth): string[] {
-  if (width <= 0) return text.length ? [text] : []
-  if (text.length <= width) return text.length ? [text] : []
-  const result: string[] = []
-  let remaining = text
-  while (remaining.length > 0) {
-    if (remaining.length <= width) {
-      result.push(remaining)
+function* terminalVisualTokens(str: string): Generator<string> {
+  let pos = 0
+  while (pos < str.length) {
+    const slice = str.slice(pos)
+    const ansi = slice.match(SGR_AT_START)
+    if (ansi) {
+      yield ansi[0]
+      pos += ansi[0].length
+      continue
+    }
+    const rest = str.slice(pos)
+    if (rest.length === 0) break
+    for (const { segment } of graphemeSegmenter.segment(rest)) {
+      yield segment
+      pos += segment.length
       break
     }
-    const chunk = remaining.slice(0, width + 1)
-    const lastSpace = chunk.lastIndexOf(' ')
-    const breakAt = lastSpace > 0 && lastSpace <= width ? lastSpace : width
-    const line = remaining.slice(0, breakAt).trimEnd()
-    if (line.length > 0) result.push(line)
-    remaining = remaining.slice(breakAt).trimStart()
   }
-  return result
+}
+
+function terminalTokenVisibleWidth(token: string): number {
+  if (token.startsWith('\x1b')) return 0
+  return terminalColumnsOfPlainGrapheme(token)
+}
+
+/** Wraps plain text to terminal columns (same rules as {@link wrapTextToVisibleWidthLines} without ANSI). */
+export function wrapTextToLines(text: string, width: TerminalWidth): string[] {
+  return wrapTextToVisibleWidthLines(text, width)
 }
 
 /** Wrap one paragraph to `width` visible columns; preserves ANSI sequences. */
@@ -216,11 +267,7 @@ export function wrapTextToVisibleWidthLines(
   if (width <= 0) return text.length ? [text] : []
   if (!text) return []
   if (visibleLength(text) <= width) return [text]
-  const tokens: string[] = []
-  const re = new RegExp(ANSI_OR_CHAR_PATTERN.source, 'gs')
-  for (let m = re.exec(text); m !== null; m = re.exec(text)) {
-    tokens.push(m[0])
-  }
+  const tokens = [...terminalVisualTokens(text)]
   const lines: string[] = []
   let i = 0
   while (i < tokens.length) {
@@ -236,7 +283,7 @@ export function wrapTextToVisibleWidthLines(
         j++
         continue
       }
-      const tw = charTerminalWidth(t)
+      const tw = terminalTokenVisibleWidth(t)
       if (vis + tw > width) break
       if (t === ' ' || t === '\t') {
         breakAfter = j
@@ -280,13 +327,11 @@ export function truncateToWidth(str: string, width: TerminalWidth): string {
   const maxVisible = width - 3
   let visibleCount = 0
   let result = ''
-  const re = new RegExp(ANSI_OR_CHAR_PATTERN.source, 'gs')
-  for (let m = re.exec(str); m !== null; m = re.exec(str)) {
-    const token = m[0]
+  for (const token of terminalVisualTokens(str)) {
     if (token.startsWith('\x1b')) {
       result += token
     } else {
-      const tw = charTerminalWidth(token)
+      const tw = terminalTokenVisibleWidth(token)
       if (visibleCount + tw > maxVisible) {
         return `${result}...${RESET}`
       }
