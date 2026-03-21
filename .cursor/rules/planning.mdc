@@ -50,6 +50,18 @@ Document **important structure and intent** in the same markdown plan. **Update 
 | **E2E** | Each phase: tests that cover the **main user behavior** for that phase. |
 | **Unit tests** | Formatting, errors, invalid input, edge paths. Prefer **black-box** tests (inputs/outputs), minimal tests, full coverage of those concerns. |
 
+### Observable behavior first (avoid structure-mapped tests)
+
+**Preference:** Tests should stand on **what a user or integrator can observe** (HTTP response, DOM, terminal output, exit code, public error text), not on how the code is factored inside.
+
+- **Drive from stable entry points** — e.g. Spring **controllers**, page / component **mount**, CLI **`run` / `runInteractive`** (or subprocess), not from internal helpers unless the behavior *is* that helper’s isolated contract (pure formatting, algorithm I/O).
+- **Avoid tests that mirror code structure** — e.g. calling a low-level function with **internal-only parameters** (feature flags passed only from tests, bespoke `OutputAdapter` mocks) to assert behavior that really belongs to a full path. Those tests **break on harmless refactors** and **miss wiring bugs** (wrong argument at the real call site).
+- **Minimum tests for the same coverage** — When behavior spans layers, prefer **fewer integration-style tests** (one per **observable surface** if surfaces differ — e.g. CLI TTY vs piped stdin) over **many** tests scattered across files that each pin a private function.
+- **Cohesion for one behavior** — Assertions for a single user-visible behavior should live **together** (one file or one focused `describe`) when practical, instead of duplicating partial checks in three places.
+- **Where small unit tests still shine** — Pure functions, validation, error messages, edge inputs: **inputs → outputs** with no need to know caller shape.
+
+**Stack-specific commands and examples** — backend: `.cursor/rules/backend-development.mdc`; frontend: `.cursor/rules/frontend.mdc`; CLI Vitest + E2E: `.cursor/rules/cli.mdc`, `.cursor/rules/e2e_test.mdc`.
+
 - **Test-driven:** Prefer tests **first** or **alongside** implementation. **Concrete steps:** see **Test-driven workflow** below.
 - **Phase-complete:** Everything in a phase is **justified and tested inside that phase**. No separate “final integration phase” or deferred test pass for that slice.
 - **No dead code:** Production code must be **used** by current E2E tests **or** by unit tests that cover **non–happy-path** behavior. For **normal user paths**, unit tests alone are **not** enough to justify keeping the code — pair with E2E for that phase.

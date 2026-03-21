@@ -27,6 +27,10 @@ cli/
 | Format | `pnpm cli:format` |
 | Lint | `pnpm cli:lint` |
 
+## Vitest: observable behavior
+
+For **interactive** behavior, prefer driving the real stack (**`runInteractive`** with a mock TTY or piped stdin) and asserting on **stdout / `console.log`** (or other user-visible output). Avoid splitting the same visible outcome across many tests that only call **`processInput`** with bespoke adapters unless the contract under test is truly that function in isolation (e.g. `-c` / non-interactive paths). See **Testing strategy → Observable behavior first** in `.cursor/rules/planning.mdc`.
+
 ## Domain terminology
 
 | Term | Definition |

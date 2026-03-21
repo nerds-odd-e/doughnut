@@ -36,6 +36,7 @@ Always run all unit tests instead of just selected file or test case, unlike for
 1. **Focus on Behavior, Not Implementation**
    - Tests verify system behavior through pre/post state transitions
    - Tests should be resilient to internal code structure changes
+   - Prefer **controllers (or other stable boundaries)** over tests that only target internal helpers with **caller-specific parameters** no user sees — same idea as **Observable behavior first** in `.cursor/rules/planning.mdc`
    - Example from RestNoteControllerTests.java:
    ```java
    @Test
