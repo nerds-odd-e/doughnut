@@ -52,6 +52,8 @@ cli/
 
 ## CLI E2E tests
 
+CLI Cucumber features live in `e2e_test/features/cli/`.
+
 CLI e2e tests run TypeScript source locally, bundled in CI:
 
 - **Local**: `pnpm -C cli exec tsx src/index.ts` (no build step)
