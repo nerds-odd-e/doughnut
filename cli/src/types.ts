@@ -2,6 +2,8 @@
 export type McqRecallPending = {
   recallPromptId: number
   choices: readonly string[]
+  /** Markdown rendered for terminal (ANSI); TTY current prompt wraps this. */
+  stemTerminal: string
   shownAt: number
 }
 

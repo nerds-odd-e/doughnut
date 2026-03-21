@@ -8,6 +8,12 @@ import {
   resetRecallStateForTesting,
 } from '../../src/interactive.js'
 import {
+  buildCurrentPromptSeparator,
+  getTerminalWidth,
+  INTERACTIVE_INPUT_READY_OSC,
+  stripAnsi,
+} from '../../src/renderer.js'
+import {
   endTTYSession,
   expectTtyRecallYesNoReplyScrollback,
   pressEnter,
@@ -19,6 +25,30 @@ import {
   typeString,
   type TTYStdin,
 } from './interactiveTestHelpers.js'
+import {
+  countInputBoxTopOutlinesBeforeFirstBoxContent,
+  liveRegionRepaintHasStaleCursorUpBeforeBoxTop,
+} from '../ttyWriteSimulation.js'
+
+const GREY_SGR = '\x1b[90m'
+const SGR_RESET_LINE = '\x1b[0m\n'
+
+/** Whole-line grey writes from TTY `writeCurrentPrompt` (not `\x1b[2K` live-region rows). */
+function countGreyWriteCurrentPromptLinesMatching(
+  writeSpy: ReturnType<typeof vi.spyOn>,
+  predicate: (plainOneLine: string) => boolean
+): number {
+  let count = 0
+  for (const call of writeSpy.mock.calls) {
+    const chunk = String(call[0] ?? '')
+    if (chunk.includes('\x1b[2K')) continue
+    if (!(chunk.startsWith(GREY_SGR) && chunk.endsWith(SGR_RESET_LINE)))
+      continue
+    const plain = stripAnsi(chunk).trimEnd()
+    if (predicate(plain)) count++
+  }
+  return count
+}
 
 describe('TTY MCQ choice selection', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
@@ -122,5 +152,63 @@ describe('TTY MCQ choice selection', () => {
     const output = ttyOutput(writeSpy)
     expect(output).toContain('  1. 4')
     expect(output).toContain('  2. 3')
+  })
+})
+
+describe('TTY MCQ layout contract (current prompt vs guidance)', () => {
+  let writeSpy: ReturnType<typeof vi.spyOn>
+  let stdin: TTYStdin
+
+  beforeEach(async () => {
+    resetRecallStateForTesting()
+    mockRecallNext.mockResolvedValue({
+      type: 'mcq',
+      recallPromptId: 100,
+      stem: 'What is 2+2?',
+      choices: ['4', '3', '5'],
+    })
+    mockAnswerQuiz.mockResolvedValue({ correct: true })
+    ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
+  })
+
+  afterEach(() => {
+    endTTYSession(stdin)
+  })
+
+  test('numbered choices are not emitted as grey whole-line writeCurrentPrompt rows', async () => {
+    await submitTTYCommand(stdin, '/recall')
+    const n = countGreyWriteCurrentPromptLinesMatching(writeSpy, (plain) =>
+      /^ {2}\d+\. /.test(plain)
+    )
+    expect(n).toBe(0)
+  })
+
+  test('live-region repaint: 2K green separator is painted before MCQ stem', async () => {
+    await submitTTYCommand(stdin, '/recall')
+    const raw = ttyOutput(writeSpy)
+    const sep = buildCurrentPromptSeparator(getTerminalWidth())
+    const stem = 'What is 2+2?'
+    expect(raw).toContain(`\x1b[2K${sep}`)
+    expect(raw).toContain(stem)
+    expect(raw.lastIndexOf(`\x1b[2K${sep}`)).toBeLessThan(raw.lastIndexOf(stem))
+  })
+
+  test('live-region repaint does not use a stale extra cursor-up before the input box top', async () => {
+    await submitTTYCommand(stdin, '/recall')
+    expect(
+      liveRegionRepaintHasStaleCursorUpBeforeBoxTop(ttyOutput(writeSpy))
+    ).toBe(false)
+  })
+
+  test('at most one input box top outline appears before first box content row', async () => {
+    await submitTTYCommand(stdin, '/recall')
+    expect(
+      countInputBoxTopOutlinesBeforeFirstBoxContent(ttyOutput(writeSpy))
+    ).toBeLessThanOrEqual(1)
+  })
+
+  test('MCQ screen emits interactive input-ready OSC after paint', async () => {
+    await submitTTYCommand(stdin, '/recall')
+    expect(ttyOutput(writeSpy)).toContain(INTERACTIVE_INPUT_READY_OSC)
   })
 })

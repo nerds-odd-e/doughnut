@@ -173,6 +173,85 @@ export function wrapTextToLines(text: string, width: TerminalWidth): string[] {
   return result
 }
 
+/** Wrap one paragraph to `width` visible columns; preserves ANSI sequences. */
+export function wrapTextToVisibleWidthLines(
+  text: string,
+  width: TerminalWidth
+): string[] {
+  if (width <= 0) return text.length ? [text] : []
+  if (!text) return []
+  if (visibleLength(text) <= width) return [text]
+  const tokens: string[] = []
+  const re = new RegExp(ANSI_OR_CHAR_PATTERN.source, 'gs')
+  for (let m = re.exec(text); m !== null; m = re.exec(text)) {
+    tokens.push(m[0])
+  }
+  const lines: string[] = []
+  let i = 0
+  while (i < tokens.length) {
+    let line = ''
+    let vis = 0
+    let breakAfter = -1
+    let breakLine = ''
+    let j = i
+    while (j < tokens.length) {
+      const t = tokens[j]!
+      if (t.startsWith('\x1b')) {
+        line += t
+        j++
+        continue
+      }
+      if (vis + 1 > width) break
+      if (t === ' ' || t === '\t') {
+        breakAfter = j
+        breakLine = line + t
+      }
+      line += t
+      vis += 1
+      j++
+    }
+    if (j === i) {
+      const t = tokens[i]!
+      if (t.startsWith('\x1b')) {
+        line = t
+        i++
+        while (i < tokens.length && tokens[i]!.startsWith('\x1b')) {
+          line += tokens[i]!
+          i++
+        }
+        lines.push(line)
+        continue
+      }
+      lines.push(t)
+      i++
+      continue
+    }
+    if (j < tokens.length && breakAfter >= i) {
+      lines.push(breakLine.trimEnd())
+      i = breakAfter + 1
+    } else {
+      lines.push(line.trimEnd())
+      i = j
+    }
+    while (i < tokens.length && tokens[i] === ' ') i++
+  }
+  return lines
+}
+
+/** Newline-aware terminal wrap for markdown-rendered recall stems (may contain ANSI). */
+export function wrapMarkdownTerminalToLines(
+  text: string,
+  width: TerminalWidth
+): string[] {
+  const parts = text.split('\n')
+  const out: string[] = []
+  for (const p of parts) {
+    if (p.length === 0) out.push('')
+    else out.push(...wrapTextToVisibleWidthLines(p, width))
+  }
+  return out
+}
+
 /** Truncate str to at most width visible chars; append "..." when truncating. ANSI-aware. */
 export function truncateToWidth(str: string, width: TerminalWidth): string {
   if (visibleLength(str) <= width) return str

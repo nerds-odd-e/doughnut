@@ -41,6 +41,7 @@ import {
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
   isGreyDisabledInputChrome,
   RECALL_SESSION_YES_NO_PLACEHOLDER,
+  wrapMarkdownTerminalToLines,
   wrapTextToLines,
   type LiveRegionPaintOptions,
   type PlaceholderContext,
@@ -402,9 +403,20 @@ export async function runTTY(
       const currentPromptText = tokenSelection
         ? TOKEN_LIST_COMMANDS[tokenSelection.command]?.currentPrompt
         : undefined
-      currentPromptWrappedLines = currentPromptText
-        ? wrapTextToLines(currentPromptText, width)
-        : []
+      if (
+        !tokenSelection &&
+        isMcqPrompt(pendingRecallAnswer) &&
+        !isPendingRecallStopConfirmation()
+      ) {
+        currentPromptWrappedLines = wrapMarkdownTerminalToLines(
+          pendingRecallAnswer.stemTerminal,
+          width
+        )
+      } else if (currentPromptText) {
+        currentPromptWrappedLines = wrapTextToLines(currentPromptText, width)
+      } else {
+        currentPromptWrappedLines = []
+      }
       currentPromptSgr = undefined
     }
     const currentPromptLines = currentPromptWrappedLines.length

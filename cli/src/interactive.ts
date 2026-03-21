@@ -160,6 +160,23 @@ function showRecallPrompt(
   output: OutputAdapter,
   writeCurrentPrompt: (msg: string) => void
 ): void {
+  if (result.type === 'mcq') {
+    const stemTerminal = renderMarkdownToTerminal(result.stem)
+    pendingRecallAnswer = {
+      recallPromptId: result.recallPromptId,
+      choices: result.choices,
+      stemTerminal,
+      shownAt: Date.now(),
+    }
+    if (!output.beginCurrentPrompt) {
+      writeCurrentPrompt(stemTerminal)
+      for (const line of formatMcqChoiceLines(result.choices)) {
+        writeCurrentPrompt(line)
+      }
+      writeCurrentPrompt(`Enter your choice (1-${result.choices.length}):`)
+    }
+    return
+  }
   output.beginCurrentPrompt?.()
   if (result.type === 'spelling') {
     writeCurrentPrompt(
@@ -168,19 +185,6 @@ function showRecallPrompt(
     pendingRecallAnswer = {
       recallPromptId: result.recallPromptId,
       type: 'spelling',
-      shownAt: Date.now(),
-    }
-    return
-  }
-  if (result.type === 'mcq') {
-    writeCurrentPrompt(renderMarkdownToTerminal(result.stem))
-    for (const line of formatMcqChoiceLines(result.choices)) {
-      writeCurrentPrompt(line)
-    }
-    writeCurrentPrompt(`Enter your choice (1-${result.choices.length}):`)
-    pendingRecallAnswer = {
-      recallPromptId: result.recallPromptId,
-      choices: result.choices,
       shownAt: Date.now(),
     }
     return
