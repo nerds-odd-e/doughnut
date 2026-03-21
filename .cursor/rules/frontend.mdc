@@ -349,7 +349,7 @@ if (error) {
    ```
 
 5. **Data Builder Pattern**
-   - Use `makeMe` for API-shaped test data; implementation lives in `packages/doughnut-test-fixtures` (workspace package). In the frontend, import via `@tests/fixtures/makeMe` (tsconfig/Vitest/Vite alias to that package). MCP and CLI tests import `doughnut-test-fixtures/makeMe` directly.
+   - Use `makeMe` for API-shaped test data; implementation lives in `packages/doughnut-test-fixtures` (workspace package). The package exposes **`doughnut-test-fixtures/makeMe` only** — do not import the bare package name or deep paths into `src/`. In the frontend, import via `@tests/fixtures/makeMe` (alias to that entry). MCP and CLI use `doughnut-test-fixtures/makeMe` directly.
    - Builders handle complex object creation
    - Example:
    ```typescript
@@ -498,7 +498,7 @@ export const Variant2: Story = {
 Storybook is configured to support the same module aliases as the main application:
 - `@/` - Points to `src/`
 - `@tests/*` - Points to `tests/` (e.g. `@tests/helpers`)
-- `@tests/fixtures/*` - Resolves to `packages/doughnut-test-fixtures/src/*` (shared `makeMe` builders; same as Vitest/Vite)
+- `@tests/fixtures/*` - Resolves to `packages/doughnut-test-fixtures/src/*` (shared `makeMe`; the package’s only declared export is `doughnut-test-fixtures/makeMe`)
 - `@generated/` - Points to `generated/`
 
 ### Global Styles

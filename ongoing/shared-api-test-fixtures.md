@@ -4,7 +4,7 @@
 
 **Current state**
 
-- Implementation: `packages/doughnut-test-fixtures` (`exports`: `./makeMe` and `.` → `src/makeMe.ts`).
+- Implementation: `packages/doughnut-test-fixtures` (`exports`: **`./makeMe` only** → `src/makeMe.ts`).
 - Frontend tests and Storybook: `import makeMe from "@tests/fixtures/makeMe"` (alias to the package via `frontend/tsconfig.json`, Vite, Vitest).
 - MCP and CLI tests: `import makeMe from 'doughnut-test-fixtures/makeMe'`.
 
@@ -89,11 +89,11 @@
 
 ## Phase 6 — Stricter public surface on `doughnut-test-fixtures`
 
-**Status:** Not started.
+**Status:** Done — `exports` lists **`./makeMe` only**; `CLAUDE.md` and `frontend.mdc` document the public surface.
 
 **User-visible outcome:** The supported entrypoint for consumers is **`makeMe` only**; individual `*Builder` modules are internal implementation details unless you deliberately export them later.
 
-**Context:** Today `package.json` exports `"."` and `"./makeMe"` to the same file; no current consumer imports `doughnut-test-fixtures` without the `/makeMe` subpath (verified via repo search). Internal builders live under `src/` and are not listed in `exports`, which already discourages deep imports in modern Node resolution.
+**Context:** The package previously exported both `"."` and `"./makeMe"`; only `./makeMe` remains. No consumer used the bare package name (verified before the change). Internal builders live under `src/` and stay outside `exports`.
 
 1. Remove the redundant **`"."`** export if nothing needs it; keep **`"./makeMe"`** (and document that as the only supported public API).
 2. Grep the repo (and any external docs) for `from 'doughnut-test-fixtures'` / `from "doughnut-test-fixtures"` without a subpath; fix any usage to `doughnut-test-fixtures/makeMe`.
