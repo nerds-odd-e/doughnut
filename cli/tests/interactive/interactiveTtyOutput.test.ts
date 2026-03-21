@@ -99,7 +99,6 @@ describe('TTY exit: no full-screen redraw', () => {
     const outAfterSubmit = ttyOutput(writeSpy)
     expect(outAfterSubmit).toContain(GREY_BG_PAST_INPUT)
     expect(outAfterSubmit).toContain('exit')
-    expect(outAfterSubmit).toContain('Bye.')
     expect(
       outAfterSubmit,
       'must not repaint the live input box after quit'

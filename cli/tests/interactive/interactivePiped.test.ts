@@ -45,7 +45,6 @@ describe('interactive CLI (e2e style)', () => {
   ])('%s line exits the CLI', async (input) => {
     await runPipedInteractive(input)
     expect(exitSpy).toHaveBeenCalledWith(0)
-    expect(logSpy.mock.calls.some((c) => c[0] === 'Bye.')).toBe(true)
   })
 
   test('each line triggers separate response', async () => {

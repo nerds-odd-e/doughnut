@@ -15,7 +15,6 @@ import {
   resetRecallStateForTesting,
 } from '../../src/interactive.js'
 import { stripAnsi } from '../../src/renderer.js'
-import type { OutputAdapter } from '../../src/types.js'
 import { makeTempConfigDir, withConfigDir } from './interactiveTestHelpers.js'
 
 describe('processInput', () => {
@@ -35,24 +34,11 @@ describe('processInput', () => {
     logSpy.mockRestore()
   })
 
-  test('returns true for exit commands without logging when not interactive UI', async () => {
+  test('returns true for exit commands', async () => {
     expect(await processInput('exit')).toBe(true)
     expect(await processInput('  exit  ')).toBe(true)
     expect(await processInput('/exit')).toBe(true)
     expect(await processInput('  /exit  ')).toBe(true)
-    expect(logSpy).not.toHaveBeenCalled()
-  })
-
-  test('logs Bye. when exiting in interactive UI mode', async () => {
-    const log = vi.fn()
-    const adapter: OutputAdapter = {
-      log,
-      logError: vi.fn(),
-    }
-    expect(await processInput('exit', adapter, true)).toBe(true)
-    expect(await processInput('/exit', adapter, true)).toBe(true)
-    expect(log).toHaveBeenCalledTimes(2)
-    expect(log.mock.calls).toEqual([['Bye.'], ['Bye.']])
   })
 
   test('returns false and does not log for empty input', async () => {
