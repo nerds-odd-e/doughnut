@@ -1,7 +1,13 @@
 import './interactiveTestMocks.js'
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
-import { resetRecallStateForTesting } from '../../src/interactive.js'
 import {
+  resetRecallStateForTesting,
+  runInteractive,
+} from '../../src/interactive.js'
+import { getTerminalWidth, renderPastInput } from '../../src/renderer.js'
+import { mockRecallNext } from './interactiveRecallMockAccess.js'
+import {
+  createMockStdin,
   GREY_BG_PAST_INPUT,
   runPipedInteractive,
 } from './interactiveTestHelpers.js'
@@ -85,5 +91,17 @@ describe('interactive CLI (e2e style)', () => {
     const output = logSpy.mock.calls.flat().join('\n')
     expect(output).toContain('  / commands')
     expect(output).toContain('\x1b[90m')
+  })
+
+  test('recall load-more n does not log grey past input for n', async () => {
+    mockRecallNext.mockResolvedValue({ type: 'none', message: '0 notes' })
+    const stdin = createMockStdin('/recall\nn\nexit\n')
+    runInteractive(stdin as NodeJS.ReadableStream)
+    await vi.waitFor(() => expect(exitSpy).toHaveBeenCalledWith(0), {
+      timeout: 5000,
+    })
+    const output = logSpy.mock.calls.flat().join('\n')
+    expect(output).toContain('0 notes to recall today')
+    expect(output).not.toContain(renderPastInput('n', getTerminalWidth()))
   })
 })

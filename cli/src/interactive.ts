@@ -156,6 +156,14 @@ export function getPlaceholderContext(
   return 'default'
 }
 
+/** Next committed line is a recall y/n answer only — omit grey history input and command-history file. */
+function shouldOmitCommittedInputFromScrollback(): boolean {
+  if (pendingRecallLoadMore) return true
+  const p = pendingRecallAnswer
+  if (p === null) return false
+  return !(isMcqPrompt(p) || isSpellingPrompt(p))
+}
+
 function showRecallPrompt(
   result: RecallPromptResult,
   output: OutputAdapter,
@@ -658,6 +666,7 @@ function buildTTYDeps() {
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
+    shouldOmitCommittedInputFromScrollback,
   }
 }
 
@@ -670,6 +679,7 @@ function buildPipedDeps() {
     renderBox,
     renderPastInput,
     formatVersionOutput,
+    shouldOmitCommittedInputFromScrollback,
   }
 }
 

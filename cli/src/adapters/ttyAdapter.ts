@@ -145,6 +145,7 @@ export interface TTYDeps {
   ) => string[]
   TOKEN_LIST_COMMANDS: Record<string, TokenListCommandConfig>
   getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
+  shouldOmitCommittedInputFromScrollback: () => boolean
 }
 
 function cycleIndex(current: number, delta: number, length: number): number {
@@ -254,6 +255,7 @@ export async function runTTY(
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
+    shouldOmitCommittedInputFromScrollback,
   } = deps
 
   const writeCurrentPromptLine = (msg: string) =>
@@ -588,8 +590,10 @@ export async function runTTY(
   }
 
   /**
-   * Paints the last history turn (input grey block + output lines) without {@link CLEAR_SCREEN}, then
-   * {@link drawBox} unless {@link options.skipDrawBox} (e.g. quit after `exit` — keep scrollback, no live input box).
+   * Paints the last committed scrollback chunk without {@link CLEAR_SCREEN}, then {@link drawBox} unless
+   * {@link options.skipDrawBox} (e.g. quit after `exit`).
+   * - After normal input: grey `renderPastInput` for `prev` (unless already painted) + output lines.
+   * - After input-less commits (e.g. recall y/n): `prev` may be prior output — append output lines only.
    * Token-list completion already wrote `renderPastInput` when entering selection mode.
    */
   function paintCommittedTurnAppend(
@@ -599,19 +603,25 @@ export async function runTTY(
     const h = chatHistory
     const last = h[h.length - 1]
     const prev = h[h.length - 2]
-    if (!(last && prev) || last.type !== 'output' || prev.type !== 'input') {
+    if (!last || last.type !== 'output') {
       doFullRedraw()
       return
     }
 
     const width = getTerminalWidth()
-    if (!inputAlreadyPainted) {
-      process.stdout.write(renderPastInput(prev.content, width))
-      process.stdout.write('\n')
-    }
     const outTone = last.tone ?? 'plain'
-    for (const line of last.lines) {
-      process.stdout.write(`${applyChatHistoryOutputTone(line, outTone)}\n`)
+    if (prev?.type === 'input') {
+      if (!inputAlreadyPainted) {
+        process.stdout.write(renderPastInput(prev.content, width))
+        process.stdout.write('\n')
+      }
+      for (const line of last.lines) {
+        process.stdout.write(`${applyChatHistoryOutputTone(line, outTone)}\n`)
+      }
+    } else {
+      for (const line of last.lines) {
+        process.stdout.write(`${applyChatHistoryOutputTone(line, outTone)}\n`)
+      }
     }
     if (!options?.skipDrawBox) {
       drawBox()
@@ -735,11 +745,6 @@ export async function runTTY(
         if (isYes) {
           exitRecallMode()
           mcqChoiceHighlightIndex = 0
-          chatHistory.push({
-            type: 'input',
-            content: maskInteractiveInputForHistory(trimmed),
-          })
-          rememberCommittedLine(trimmed)
           commitHistoryOutput(['Stopped recall'])
           return
         }
@@ -933,11 +938,13 @@ export async function runTTY(
 
         resetCommandTurnBuffer()
         if (isCommittedInteractiveInput(input)) {
-          chatHistory.push({
-            type: 'input',
-            content: maskInteractiveInputForHistory(input),
-          })
-          rememberCommittedLine(input)
+          if (!shouldOmitCommittedInputFromScrollback()) {
+            chatHistory.push({
+              type: 'input',
+              content: maskInteractiveInputForHistory(input),
+            })
+            rememberCommittedLine(input)
+          }
           if (await processInput(input, ttyOutput, true)) {
             commitExitTurnToScrollback()
             doExit()

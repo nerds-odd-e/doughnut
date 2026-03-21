@@ -19,6 +19,7 @@ export interface PipedDeps {
   renderBox: (lines: string[], width: number) => string
   renderPastInput: (input: string, width: number) => string
   formatVersionOutput: () => string
+  shouldOmitCommittedInputFromScrollback: () => boolean
 }
 
 export async function runPiped(
@@ -33,6 +34,7 @@ export async function runPiped(
     renderBox,
     renderPastInput,
     formatVersionOutput,
+    shouldOmitCommittedInputFromScrollback,
   } = deps
 
   const width = getTerminalWidth()
@@ -57,7 +59,10 @@ export async function runPiped(
     if (processing || lineQueue.length === 0) return
     processing = true
     const line = lineQueue.shift()!
-    if (isCommittedInteractiveInput(line)) {
+    if (
+      isCommittedInteractiveInput(line) &&
+      !shouldOmitCommittedInputFromScrollback()
+    ) {
       console.log(
         renderPastInput(
           maskInteractiveInputForHistory(line),
