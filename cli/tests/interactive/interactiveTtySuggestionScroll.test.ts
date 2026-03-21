@@ -1,5 +1,5 @@
 import { interactiveHelpMockState } from './interactiveTestMocks.js'
-import { describe, test, expect, type vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, type vi } from 'vitest'
 import { resetRecallStateForTesting } from '../../src/interactive.js'
 import {
   endTTYSession,
@@ -26,7 +26,7 @@ describe('TTY mode slash command suggestions with scroll', () => {
     endTTYSession(stdin)
   })
 
-  test('↑↓ no longer scroll long suggestion lists; first item stays highlighted', async () => {
+  test('many down arrows do not scroll the long suggestion list; first item stays highlighted', async () => {
     writeSpy.mockClear()
     typeString(stdin, '/')
     await tick()

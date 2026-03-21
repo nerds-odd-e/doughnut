@@ -1,5 +1,5 @@
 import './interactiveTestMocks.js'
-import { describe, test, expect, type vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, type vi } from 'vitest'
 import { stripAnsi } from '../../src/renderer.js'
 import {
   endTTYSession,
@@ -24,20 +24,22 @@ describe('TTY: input command history (↑↓)', () => {
     endTTYSession(stdin)
   })
 
-  test('after submitting a line, ↑↑ recalls it into the input box', async () => {
-    const marker = 'history-recall-xyz'
-    typeString(stdin, marker)
-    pressEnter(stdin)
-    await tick()
-    await tick()
+  describe('recalling a prior line from in-memory history', () => {
+    test('shows the previous submitted line in the input box after ↑↑ with a new draft', async () => {
+      const marker = 'history-recall-xyz'
+      typeString(stdin, marker)
+      pressEnter(stdin)
+      await tick()
+      await tick()
 
-    typeString(stdin, 'draft')
-    await tick()
-    pressKey(stdin, 'up')
-    await tick()
-    pressKey(stdin, 'up')
-    await tick()
+      typeString(stdin, 'draft')
+      await tick()
+      pressKey(stdin, 'up')
+      await tick()
+      pressKey(stdin, 'up')
+      await tick()
 
-    expect(stripAnsi(ttyOutput(writeSpy))).toContain(`→ ${marker}`)
+      expect(stripAnsi(ttyOutput(writeSpy))).toContain(`→ ${marker}`)
+    })
   })
 })

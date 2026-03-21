@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, test, expect } from 'vitest'
 import {
   MAX_COMMITTED_COMMANDS,
   afterBareSlashEscape,
@@ -18,166 +18,254 @@ import {
   type InteractiveCommandInput,
 } from '../src/interactiveCommandInput.js'
 
-function partial(p: Partial<InteractiveCommandInput>): InteractiveCommandInput {
-  return { ...emptyInteractiveCommandInput(), ...p }
+function commandInputWith(
+  partial: Partial<InteractiveCommandInput>
+): InteractiveCommandInput {
+  return { ...emptyInteractiveCommandInput(), ...partial }
 }
 
-describe('interactiveCommandInput', () => {
-  test('appendCommittedCommand trims, newest-first, caps', () => {
-    let c = appendCommittedCommand([], '  a  ')
-    expect(c).toEqual(['a'])
-    c = appendCommittedCommand(c, 'b')
-    expect(c).toEqual(['b', 'a'])
+describe('appendCommittedCommand', () => {
+  test('ignores whitespace-only lines', () => {
+    expect(appendCommittedCommand([], '   ')).toEqual([])
+  })
+
+  test('stores trimmed text', () => {
+    expect(appendCommittedCommand([], '  a  ')).toEqual(['a'])
+  })
+
+  test('prepends so the newest commit is first', () => {
+    const once = appendCommittedCommand([], 'a')
+    expect(appendCommittedCommand(once, 'b')).toEqual(['b', 'a'])
+  })
+
+  test('drops the oldest entry when over the max length', () => {
     const full = Array.from(
       { length: MAX_COMMITTED_COMMANDS },
       (_, i) => `h${i}`
     )
-    c = appendCommittedCommand(full, 'new')
-    expect(c.length).toBe(MAX_COMMITTED_COMMANDS)
-    expect(c[0]).toBe('new')
-    expect(c[MAX_COMMITTED_COMMANDS - 1]).toBe(`h${MAX_COMMITTED_COMMANDS - 2}`)
+    const next = appendCommittedCommand(full, 'new')
+    expect(next.length).toBe(MAX_COMMITTED_COMMANDS)
+    expect(next[0]).toBe('new')
+    expect(next[MAX_COMMITTED_COMMANDS - 1]).toBe(
+      `h${MAX_COMMITTED_COMMANDS - 2}`
+    )
+  })
+})
+
+describe('replaceLastLogicalLine', () => {
+  test('replaces the whole draft when it is a single line', () => {
+    expect(replaceLastLogicalLine('a', 'b')).toBe('b')
   })
 
-  test('replaceLastLogicalLine', () => {
-    expect(replaceLastLogicalLine('a', 'b')).toBe('b')
+  test('replaces only the last line when the draft is multiline', () => {
     expect(replaceLastLogicalLine('x\ny', 'z')).toBe('x\nz')
   })
+})
 
-  test('lineDraftAfterEscapingBareSlash', () => {
+describe('lineDraftAfterEscapingBareSlash', () => {
+  test('returns empty string when the draft is only `/`', () => {
     expect(lineDraftAfterEscapingBareSlash('/')).toBe('')
-    expect(lineDraftAfterEscapingBareSlash('a\n/')).toBe('a')
-    expect(lineDraftAfterEscapingBareSlash('/ex')).toBe('/ex')
   })
 
-  test('afterBareSlashEscape ends history walk and places caret at end', () => {
-    const s = partial({
-      lineDraft: '/',
-      historyWalkIndex: 0,
-      lineDraftBeforeHistoryWalk: 'x',
-    })
-    const out = afterBareSlashEscape(s)
+  test('drops the last line when it is exactly `/`', () => {
+    expect(lineDraftAfterEscapingBareSlash('a\n/')).toBe('a')
+  })
+
+  test('returns the draft unchanged when the last line is not bare `/`', () => {
+    expect(lineDraftAfterEscapingBareSlash('/ex')).toBe('/ex')
+  })
+})
+
+describe('afterBareSlashEscape', () => {
+  test('clears a one-line `/` draft, ends history walk, and leaves caret at end', () => {
+    const out = afterBareSlashEscape(
+      commandInputWith({
+        lineDraft: '/',
+        historyWalkIndex: 0,
+        lineDraftBeforeHistoryWalk: 'x',
+      })
+    )
     expect(out.lineDraft).toBe('')
     expect(out.caretOffset).toBe(0)
     expect(out.historyWalkIndex).toBe(null)
     expect(out.lineDraftBeforeHistoryWalk).toBe(null)
   })
+})
 
-  test('applyLastLineEdit', () => {
-    const s = partial({
-      lineDraft: 'a\nb',
-      historyWalkIndex: 0,
-      lineDraftBeforeHistoryWalk: 'z',
-    })
-    const out = applyLastLineEdit(s, '/help ')
+describe('applyLastLineEdit', () => {
+  test('replaces the last line, ends history walk, and puts the caret at end', () => {
+    const out = applyLastLineEdit(
+      commandInputWith({
+        lineDraft: 'a\nb',
+        historyWalkIndex: 0,
+        lineDraftBeforeHistoryWalk: 'z',
+      }),
+      '/help '
+    )
     expect(out.lineDraft).toBe('a\n/help ')
     expect(out.caretOffset).toBe(out.lineDraft.length)
     expect(out.historyWalkIndex).toBe(null)
+    expect(out.lineDraftBeforeHistoryWalk).toBe(null)
+  })
+})
+
+describe('onArrowUp', () => {
+  test('moves the caret to the start of the draft when still editing live text', () => {
+    const out = onArrowUp(
+      commandInputWith({
+        lineDraft: 'ab',
+        caretOffset: 2,
+        committedCommands: ['x'],
+      })
+    )
+    expect(out.lineDraft).toBe('ab')
+    expect(out.caretOffset).toBe(0)
+    expect(out.historyWalkIndex).toBe(null)
   })
 
-  test('onArrowUp: caret to draft start, then into history', () => {
-    const s0 = partial({
-      lineDraft: 'ab',
-      caretOffset: 2,
-      committedCommands: ['x'],
-    })
-    const s1 = onArrowUp(s0)
-    expect(s1.lineDraft).toBe('ab')
-    expect(s1.caretOffset).toBe(0)
-    expect(s1.historyWalkIndex).toBe(null)
-
-    const s2 = onArrowUp(s1)
-    expect(s2.lineDraftBeforeHistoryWalk).toBe('ab')
-    expect(s2.historyWalkIndex).toBe(0)
-    expect(s2.lineDraft).toBe('x')
-    expect(s2.caretOffset).toBe(0)
+  test('loads the newest committed line when the caret is already at the start', () => {
+    const afterCaretHome = onArrowUp(
+      commandInputWith({
+        lineDraft: 'ab',
+        caretOffset: 2,
+        committedCommands: ['x'],
+      })
+    )
+    const out = onArrowUp(afterCaretHome)
+    expect(out.lineDraftBeforeHistoryWalk).toBe('ab')
+    expect(out.historyWalkIndex).toBe(0)
+    expect(out.lineDraft).toBe('x')
+    expect(out.caretOffset).toBe(0)
   })
 
-  test('onArrowUp at oldest committed line is a no-op', () => {
-    const s0 = partial({
+  test('does nothing when already showing the oldest committed line', () => {
+    const state = commandInputWith({
       lineDraft: 'older',
       committedCommands: ['newest', 'older'],
       historyWalkIndex: 1,
       lineDraftBeforeHistoryWalk: 'd',
     })
-    expect(onArrowUp(s0)).toEqual(s0)
+    expect(onArrowUp(state)).toEqual(state)
+  })
+})
+
+describe('onArrowDown', () => {
+  test('shows the newer committed line with the caret at its end', () => {
+    const out = onArrowDown(
+      commandInputWith({
+        lineDraft: 'older',
+        caretOffset: 0,
+        committedCommands: ['newest', 'older'],
+        historyWalkIndex: 1,
+        lineDraftBeforeHistoryWalk: 'draft',
+      })
+    )
+    expect(out.historyWalkIndex).toBe(0)
+    expect(out.lineDraft).toBe('newest')
+    expect(out.caretOffset).toBe('newest'.length)
   })
 
-  test('onArrowDown within history moves to newer with caret at end', () => {
-    const s0 = partial({
-      lineDraft: 'older',
-      caretOffset: 0,
-      committedCommands: ['newest', 'older'],
-      historyWalkIndex: 1,
-      lineDraftBeforeHistoryWalk: 'draft',
-    })
-    const s1 = onArrowDown(s0)
-    expect(s1.historyWalkIndex).toBe(0)
-    expect(s1.lineDraft).toBe('newest')
-    expect(s1.caretOffset).toBe('newest'.length)
+  test('restores the draft that was suspended when walking past the newest commit', () => {
+    const out = onArrowDown(
+      commandInputWith({
+        lineDraft: 'newest',
+        caretOffset: 6,
+        committedCommands: ['newest', 'older'],
+        historyWalkIndex: 0,
+        lineDraftBeforeHistoryWalk: 'draft',
+      })
+    )
+    expect(out.lineDraft).toBe('draft')
+    expect(out.caretOffset).toBe(5)
+    expect(out.historyWalkIndex).toBe(null)
   })
 
-  test('onArrowDown restores suspended draft past newest', () => {
-    const s0 = partial({
-      lineDraft: 'newest',
-      caretOffset: 6,
-      committedCommands: ['newest', 'older'],
-      historyWalkIndex: 0,
-      lineDraftBeforeHistoryWalk: 'draft',
-    })
-    const s1 = onArrowDown(s0)
-    expect(s1.lineDraft).toBe('draft')
-    expect(s1.caretOffset).toBe(5)
-    expect(s1.historyWalkIndex).toBe(null)
+  test('clears the draft when leaving history with no suspended draft', () => {
+    const out = onArrowDown(
+      commandInputWith({
+        lineDraft: 'only',
+        caretOffset: 4,
+        committedCommands: ['only'],
+        historyWalkIndex: 0,
+        lineDraftBeforeHistoryWalk: null,
+      })
+    )
+    expect(out.lineDraft).toBe('')
+    expect(out.caretOffset).toBe(0)
   })
+})
 
-  test('onArrowDown past newest with no suspended draft clears line', () => {
-    const s0 = partial({
-      lineDraft: 'only',
-      caretOffset: 4,
-      committedCommands: ['only'],
-      historyWalkIndex: 0,
-      lineDraftBeforeHistoryWalk: null,
-    })
-    const s1 = onArrowDown(s0)
-    expect(s1.lineDraft).toBe('')
-    expect(s1.caretOffset).toBe(0)
+describe('insertIntoDraft', () => {
+  test('ends history walk before inserting text', () => {
+    const out = insertIntoDraft(
+      commandInputWith({
+        lineDraft: 'h',
+        caretOffset: 0,
+        committedCommands: ['h'],
+        historyWalkIndex: 0,
+        lineDraftBeforeHistoryWalk: 'x',
+      }),
+      'Z'
+    )
+    expect(out.historyWalkIndex).toBe(null)
+    expect(out.lineDraftBeforeHistoryWalk).toBe(null)
+    expect(out.lineDraft).toBe('Zh')
+    expect(out.caretOffset).toBe(1)
   })
+})
 
-  test('insertIntoDraft clears history walk', () => {
-    const s0 = partial({
-      lineDraft: 'h',
-      caretOffset: 0,
-      committedCommands: ['h'],
-      historyWalkIndex: 0,
-      lineDraftBeforeHistoryWalk: 'x',
-    })
-    const s1 = insertIntoDraft(s0, 'Z')
-    expect(s1.historyWalkIndex).toBe(null)
-    expect(s1.lineDraftBeforeHistoryWalk).toBe(null)
-    expect(s1.lineDraft).toBe('Zh')
-    expect(s1.caretOffset).toBe(1)
+describe('deleteBeforeCaret', () => {
+  test('removes the code unit before the caret', () => {
+    const out = deleteBeforeCaret(
+      commandInputWith({ lineDraft: 'ab', caretOffset: 1 })
+    )
+    expect(out.lineDraft).toBe('b')
+    expect(out.caretOffset).toBe(0)
   })
+})
 
-  test('deleteBeforeCaret and caret motion', () => {
-    const s0 = partial({ lineDraft: 'ab', caretOffset: 1 })
-    expect(deleteBeforeCaret(s0).lineDraft).toBe('b')
-    expect(caretOneLeft(s0).caretOffset).toBe(0)
-    expect(caretToDraftStart(s0).caretOffset).toBe(0)
-    expect(caretToDraftEnd(s0).caretOffset).toBe(2)
+describe('caretOneLeft', () => {
+  test('moves the caret one code unit left', () => {
+    const out = caretOneLeft(
+      commandInputWith({ lineDraft: 'ab', caretOffset: 1 })
+    )
+    expect(out.caretOffset).toBe(0)
   })
+})
 
-  test('clearLiveCommandLine keeps committedCommands', () => {
-    const s0 = partial({
-      lineDraft: 'x',
-      caretOffset: 1,
-      committedCommands: ['a'],
-      historyWalkIndex: 0,
-      lineDraftBeforeHistoryWalk: 'd',
-    })
-    const s1 = clearLiveCommandLine(s0)
-    expect(s1.lineDraft).toBe('')
-    expect(s1.caretOffset).toBe(0)
-    expect(s1.committedCommands).toEqual(['a'])
-    expect(s1.historyWalkIndex).toBe(null)
+describe('caretToDraftStart', () => {
+  test('sets the caret to the start of the draft', () => {
+    const out = caretToDraftStart(
+      commandInputWith({ lineDraft: 'ab', caretOffset: 1 })
+    )
+    expect(out.caretOffset).toBe(0)
+  })
+})
+
+describe('caretToDraftEnd', () => {
+  test('sets the caret past the last code unit', () => {
+    const out = caretToDraftEnd(
+      commandInputWith({ lineDraft: 'ab', caretOffset: 0 })
+    )
+    expect(out.caretOffset).toBe(2)
+  })
+})
+
+describe('clearLiveCommandLine', () => {
+  test('empties the draft and walk state but keeps committed commands', () => {
+    const out = clearLiveCommandLine(
+      commandInputWith({
+        lineDraft: 'x',
+        caretOffset: 1,
+        committedCommands: ['a'],
+        historyWalkIndex: 0,
+        lineDraftBeforeHistoryWalk: 'd',
+      })
+    )
+    expect(out.lineDraft).toBe('')
+    expect(out.caretOffset).toBe(0)
+    expect(out.committedCommands).toEqual(['a'])
+    expect(out.historyWalkIndex).toBe(null)
+    expect(out.lineDraftBeforeHistoryWalk).toBe(null)
   })
 })
