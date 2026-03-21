@@ -14,10 +14,12 @@ import {
 } from './cliE2eRepo'
 import { cliEnv } from './cliEnv'
 import {
+  interactiveCliTtyPayload,
   runCliInPty,
   sendToInteractiveCli as sendInteractiveCliToPty,
   startInteractiveCli as startInteractiveCliPtySession,
   stopInteractiveCli as stopInteractiveCliPtySession,
+  writeInteractiveCliAndWaitForReady,
 } from './cliPtyRunner'
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
@@ -123,6 +125,24 @@ export function createCliE2ePluginTasks(repoRoot: string) {
     },
     async sendToInteractiveCli({ input }: { input: string }) {
       return sendInteractiveCliToPty(input)
+    },
+    async sendInteractiveCliSlashCommand({ command }: { command: string }) {
+      return writeInteractiveCliAndWaitForReady(
+        interactiveCliTtyPayload.slashCommandSpaceThenEnter(command)
+      )
+    },
+    async sendInteractiveCliLine({ line }: { line: string }) {
+      return writeInteractiveCliAndWaitForReady(
+        interactiveCliTtyPayload.lineThenEnter(line)
+      )
+    },
+    async sendInteractiveCliEnter() {
+      return writeInteractiveCliAndWaitForReady(
+        interactiveCliTtyPayload.enterOnly
+      )
+    },
+    async sendInteractiveCliEsc() {
+      return writeInteractiveCliAndWaitForReady(interactiveCliTtyPayload.esc)
     },
     async stopInteractiveCli() {
       await stopInteractiveCliPtySession()

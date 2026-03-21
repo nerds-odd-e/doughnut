@@ -69,8 +69,8 @@ Order by **risk reduction** and **mechanical migration**; each phase should end 
 
 ### Phase 2 — Migrate `@interactiveCLI` scenarios to explicit steps
 
-- Convert `cli_interactive_mode.feature`, `cli_recall.feature`, `cli_access_token.feature` (and any other `I input` / `press Enter` users) to the new steps and page-object methods.
-- Delete generic `I input {string} in the interactive CLI` if nothing uses it; otherwise narrow it to a single meaning and rename usages (prefer delete to avoid ambiguity).
+- **Done:** `cli_interactive_mode.feature`, `cli_recall.feature`, `cli_access_token.feature` use `I enter the slash command …`, `I enter …` (line), `I press Enter …`; page object uses `enterSlashCommand`, `enterLine`, `pressEnter`, `pressEsc`; Cypress tasks `sendInteractiveCliSlashCommand`, `sendInteractiveCliLine`, `sendInteractiveCliEnter`, `sendInteractiveCliEsc` call `writeInteractiveCliAndWaitForReady` with `interactiveCliTtyPayload` (legacy `sendToInteractiveCli` unchanged for Phase 3).
+- Generic `I input {string} in the interactive CLI` removed; down-arrow step name unchanged, implementation uses explicit sends.
 
 ### Phase 3 — Remove legacy smart send
 

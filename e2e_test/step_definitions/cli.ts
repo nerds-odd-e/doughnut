@@ -33,12 +33,16 @@ When('the backend serves the CLI with version {string}', (version: string) =>
   cli.backend().serveVersion(version)
 )
 
-When('I input {string} in the interactive CLI', (input: string) =>
-  cli.interactive().input(input)
+When(
+  'I enter the slash command {string} in the interactive CLI',
+  (command: string) => cli.interactive().enterSlashCommand(command)
+)
+When('I enter {string} in the interactive CLI', (line: string) =>
+  cli.interactive().enterLine(line)
 )
 When('I press ESC in the interactive CLI', () => cli.interactive().pressEsc())
 When('I press Enter in the interactive CLI', () =>
-  cli.interactive().input('\n')
+  cli.interactive().pressEnter()
 )
 When(
   'I answer {string} in the interactive CLI to prompt {string}',

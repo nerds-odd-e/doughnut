@@ -60,7 +60,7 @@ CLI e2e tests run TypeScript source locally, bundled in CI:
 - **CI**: `cli/dist/doughnut-cli.bundle.mjs` (pre-built by `pnpm bundle:all` before Cypress)
 - **Installation tests**: Always use the bundled/installed binary
 
-**Interactive mode** (recall, access-token selection, etc.): Scenarios tagged `@interactiveCLI` use one live CLI process per scenario. The Before hook starts the CLI (PTY-based); steps send input via `I input {string} in the interactive CLI` or `I press ESC`; the After hook sends `exit` and stops the process. Split composite inputs into separate When steps with Then verification between them.
+**Interactive mode** (recall, access-token selection, etc.): Scenarios tagged `@interactiveCLI` use one live CLI process per scenario. The Before hook starts the CLI (PTY-based); steps send input via **`I enter the slash command {string} in the interactive CLI`** (space before Enter, for `/` commands), **`I enter {string} in the interactive CLI`** (one line + Enter, e.g. recall answers), **`I press Enter in the interactive CLI`**, **`I press ESC in the interactive CLI`**, or **`I input down-arrow selection for {string} in the interactive CLI`** when the scenario needs that sequence; the After hook sends `exit` and stops the process. Split composite inputs into separate When steps with Then verification between them.
 
 **Non-interactive** (install-and-run, -c commands): Use `I run the doughnut command with input {string}` or `I run the doughnut command with -c {string}`; access-token steps use `I run doughnut -c /<command> with ...`; each When spawns a new process, pipes input, and captures stdout.
 

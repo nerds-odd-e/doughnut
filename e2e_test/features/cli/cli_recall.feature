@@ -16,7 +16,7 @@ Feature: CLI recall status and recall session
       | sedation | Put to sleep is sedation       | English      |
     And the note "sedition" was assimilated on day 1
     And It's day 2
-    When I input "/recall-status" in the interactive CLI
+    When I enter the slash command "/recall-status" in the interactive CLI
     Then I should see "1 note to recall today" in the history output
 
   @disableOpenAiService
@@ -28,12 +28,12 @@ Feature: CLI recall status and recall session
       | sedation | **Put** to sleep is _sedation_ | English      |
     And the note "sedation" was assimilated on day 1
     And It's day 2
-    When I input "/recall" in the interactive CLI
+    When I enter the slash command "/recall" in the interactive CLI
     Then I should see "sedation" in the Current guidance
     And I should see "Put to sleep is sedation" in the Current guidance
     And I should see "Put" styled in the Current guidance
     And I should see "Yes, I remember?" in the Current guidance
-    When I input "y" in the interactive CLI
+    When I enter "y" in the interactive CLI
     Then I should see "Recalled successfully" in the history output
 
   @disableOpenAiService
@@ -47,13 +47,13 @@ Feature: CLI recall status and recall session
     And the note "sedition" was assimilated on day 1
     And the note "sedation" was assimilated on day 1
     And It's day 2
-    When I input "/recall" in the interactive CLI
+    When I enter the slash command "/recall" in the interactive CLI
     Then I should see "sedition" in the Current guidance
     When I answer "y" in the interactive CLI to prompt "Yes, I remember?"
     And I answer "y" in the interactive CLI to prompt "Yes, I remember?"
     And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
     Then I should see "Recalled 2 notes" in the history output
-    When I input "/recall" in the interactive CLI
+    When I enter the slash command "/recall" in the interactive CLI
     And I answer "y" in the interactive CLI to prompt "Load more from next 3 days?"
     When I answer "y" in the interactive CLI to prompt "Yes, I remember?"
     Then I should see "Recalled successfully" in the history output
@@ -71,10 +71,10 @@ Feature: CLI recall status and recall session
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
     And the note "sedition" was assimilated on day 1
     And It's day 2
-    When I input "/recall" in the interactive CLI
+    When I enter the slash command "/recall" in the interactive CLI
     Then I should see "What is the meaning of sedition?" in the Current guidance
     And I should see "to incite violence" in the Current guidance
-    When I input "1" in the interactive CLI
+    When I enter "1" in the interactive CLI
     Then I should see "Correct!" in the history output
     And I should see "Recalled successfully" in the history output
 
@@ -91,11 +91,11 @@ Feature: CLI recall status and recall session
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
     And the note "sedition" was assimilated on day 1
     And It's day 2
-    When I input "/recall" in the interactive CLI
+    When I enter the slash command "/recall" in the interactive CLI
     Then I should see "What is the meaning of sedition?" in the Current guidance
-    When I input "/stop" in the interactive CLI
+    When I enter the slash command "/stop" in the interactive CLI
     Then the recall session was stopped
-    When I input "/recall-status" in the interactive CLI
+    When I enter the slash command "/recall-status" in the interactive CLI
     Then I should see "1 note to recall today" in the history output
 
   @usingMockedOpenAiService
@@ -126,10 +126,10 @@ Feature: CLI recall status and recall session
     And the note "sedition" was assimilated on day 1
     And the note "sedation" was assimilated on day 1
     And It's day 2
-    When I input "/recall" in the interactive CLI
+    When I enter the slash command "/recall" in the interactive CLI
     Then I should see "sedition" in the Current guidance
     And I should see "Yes, I remember?" in the Current guidance
-    When I input "/stop" in the interactive CLI
+    When I enter the slash command "/stop" in the interactive CLI
     Then I stopped the recall during review
 
   @usingMockedOpenAiService
@@ -149,11 +149,11 @@ Feature: CLI recall status and recall session
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
     And the note "sedition" was assimilated on day 1
     And It's day 2
-    When I input "/recall" in the interactive CLI
+    When I enter the slash command "/recall" in the interactive CLI
     Then I should see "What is the meaning of sedition?" in the Current guidance
-    When I input "/contest" in the interactive CLI
+    When I enter the slash command "/contest" in the interactive CLI
     Then I should see "What is the meaning of sedition?" in the Current guidance
-    When I input "1" in the interactive CLI
+    When I enter "1" in the interactive CLI
     Then I should see "Correct!" in the history output
     And I should see "Recalled successfully" in the history output
 
@@ -168,10 +168,10 @@ Feature: CLI recall status and recall session
     And It's day 1
     And I assimilate the note "sedition" with the option of remembering spelling
     And It's day 2
-    When I input "/recall" in the interactive CLI
+    When I enter the slash command "/recall" in the interactive CLI
     Then I should see "Yes, I remember?" in the Current guidance
-    When I input "y" in the interactive CLI
+    When I enter "y" in the interactive CLI
     Then I should see "Spell:" in the Current guidance
-    When I input "sedition" in the interactive CLI
+    When I enter "sedition" in the interactive CLI
     Then I should see "Correct!" in the history output
     And I should see "Recalled successfully" in the history output
