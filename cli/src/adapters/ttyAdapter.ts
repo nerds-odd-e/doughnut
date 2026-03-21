@@ -41,8 +41,8 @@ import {
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
   isGreyDisabledInputChrome,
   RECALL_SESSION_YES_NO_PLACEHOLDER,
-  wrapMarkdownTerminalToLines,
   wrapTextToLines,
+  wrapTextToVisibleWidthLines,
   type LiveRegionPaintOptions,
   type PlaceholderContext,
 } from '../renderer.js'
@@ -51,6 +51,7 @@ import type {
   ChatHistoryOutputTone,
   McqRecallPending,
   OutputAdapter,
+  PendingRecallAnswer,
 } from '../types.js'
 
 export type TokenListAction = 'set-default' | 'remove' | 'remove-completely'
@@ -67,12 +68,12 @@ export interface TTYDeps {
     output?: OutputAdapter,
     interactiveUi?: boolean
   ) => Promise<boolean>
-  getPendingRecallAnswer: () => unknown
+  getPendingRecallAnswer: () => PendingRecallAnswer
   isPendingRecallStopConfirmation: () => boolean
   setPendingRecallStopConfirmation: (value: boolean) => void
   isInRecallSubstate: () => boolean
   exitRecallMode: () => void
-  isMcqPrompt: (p: unknown) => p is McqRecallPending
+  isMcqRecallPending: (p: unknown) => p is McqRecallPending
   buildTokenListLines: (
     tokens: AccessTokenEntry[],
     defaultLabel: string | undefined,
@@ -153,6 +154,20 @@ function cycleIndex(current: number, delta: number, length: number): number {
   return (current + delta + length) % length
 }
 
+/** MCQ recall stem for the TTY Current prompt: one wrapped row per markdown line, ANSI preserved. */
+function wrapRecallMcqStemForCurrentPrompt(
+  stemRenderedForTerminal: string,
+  width: number
+): string[] {
+  return stemRenderedForTerminal
+    .split('\n')
+    .flatMap((paragraph) =>
+      paragraph.length === 0
+        ? ['']
+        : wrapTextToVisibleWidthLines(paragraph, width)
+    )
+}
+
 /**
  * Tracks incremental repaint of the TTY live region (Current prompt + input box + Current guidance).
  * After {@link clearLiveRegionForRepaint}, the cursor sits on the top line of that region and
@@ -226,7 +241,7 @@ export async function runTTY(
     setPendingRecallStopConfirmation,
     isInRecallSubstate,
     exitRecallMode,
-    isMcqPrompt,
+    isMcqRecallPending,
     buildTokenListLines,
     getDefaultTokenLabel,
     listAccessTokens,
@@ -405,11 +420,11 @@ export async function runTTY(
         : undefined
       if (
         !tokenSelection &&
-        isMcqPrompt(pendingRecallAnswer) &&
+        isMcqRecallPending(pendingRecallAnswer) &&
         !isPendingRecallStopConfirmation()
       ) {
-        currentPromptWrappedLines = wrapMarkdownTerminalToLines(
-          pendingRecallAnswer.stemTerminal,
+        currentPromptWrappedLines = wrapRecallMcqStemForCurrentPrompt(
+          pendingRecallAnswer.stemRenderedForTerminal,
           width
         )
       } else if (currentPromptText) {
@@ -431,7 +446,7 @@ export async function runTTY(
         )
       : isPendingRecallStopConfirmation()
         ? ['Stop recall? (y/n)']
-        : isMcqPrompt(pendingRecallAnswer)
+        : isMcqRecallPending(pendingRecallAnswer)
           ? formatHighlightedList(
               formatMcqChoiceLines(pendingRecallAnswer.choices),
               undefined,
@@ -774,7 +789,7 @@ export async function runTTY(
       return
     }
     const pendingRecallAnswer = getPendingRecallAnswer()
-    if (isMcqPrompt(pendingRecallAnswer)) {
+    if (isMcqRecallPending(pendingRecallAnswer)) {
       const choices = pendingRecallAnswer.choices
       if (key.name === 'escape') {
         setPendingRecallStopConfirmation(true)
@@ -965,7 +980,7 @@ export async function runTTY(
           commitHistoryOutput(commandTurn.lines, commandTurn.tone)
           return
         }
-        if (isMcqPrompt(getPendingRecallAnswer())) {
+        if (isMcqRecallPending(getPendingRecallAnswer())) {
           mcqChoiceHighlightIndex = 0
         }
         drawBox()

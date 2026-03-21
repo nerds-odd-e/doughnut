@@ -238,20 +238,6 @@ export function wrapTextToVisibleWidthLines(
   return lines
 }
 
-/** Newline-aware terminal wrap for markdown-rendered recall stems (may contain ANSI). */
-export function wrapMarkdownTerminalToLines(
-  text: string,
-  width: TerminalWidth
-): string[] {
-  const parts = text.split('\n')
-  const out: string[] = []
-  for (const p of parts) {
-    if (p.length === 0) out.push('')
-    else out.push(...wrapTextToVisibleWidthLines(p, width))
-  }
-  return out
-}
-
 /** Truncate str to at most width visible chars; append "..." when truncating. ANSI-aware. */
 export function truncateToWidth(str: string, width: TerminalWidth): string {
   if (visibleLength(str) <= width) return str

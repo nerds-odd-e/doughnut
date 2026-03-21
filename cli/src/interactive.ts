@@ -60,22 +60,14 @@ import {
   RECALL_SESSION_YES_NO_PLACEHOLDER,
   type PlaceholderContext,
 } from './renderer.js'
-import type { McqRecallPending, OutputAdapter } from './types.js'
+import type {
+  McqRecallPending,
+  OutputAdapter,
+  PendingRecallAnswer,
+  SpellingRecallPending,
+} from './types.js'
 
 type RecallPromptResult = Exclude<RecallNextResult, { type: 'none' }>
-type SpellingPrompt = {
-  recallPromptId: number
-  type: 'spelling'
-  shownAt: number
-}
-/** Just-review recall step: user answers y/n on a note title. */
-type JustReviewPrompt = { memoryTrackerId: number }
-
-type PendingRecallAnswer =
-  | { memoryTrackerId: number }
-  | McqRecallPending
-  | { recallPromptId: number; type: 'spelling'; shownAt: number }
-  | null
 
 let pendingRecallAnswer: PendingRecallAnswer = null
 let recallSessionMode = false
@@ -129,17 +121,27 @@ function formatRecallSessionSummary(count: number): string {
   return `Recalled ${count} notes`
 }
 
-function isMcqPrompt(p: unknown): p is McqRecallPending {
-  return p !== null && typeof p === 'object' && 'choices' in p
+function isMcqRecallPending(p: unknown): p is McqRecallPending {
+  if (p === null || typeof p !== 'object') return false
+  const o = p as Record<string, unknown>
+  return (
+    typeof o.recallPromptId === 'number' &&
+    Array.isArray(o.choices) &&
+    typeof o.stemRenderedForTerminal === 'string' &&
+    typeof o.shownAt === 'number' &&
+    !('type' in o)
+  )
 }
 
-function isSpellingPrompt(p: PendingRecallAnswer): p is SpellingPrompt {
+function isSpellingRecallPending(
+  p: PendingRecallAnswer
+): p is SpellingRecallPending {
   return p !== null && 'type' in p && p.type === 'spelling'
 }
 
 function getContestablePromptId(): number | null {
-  return isMcqPrompt(pendingRecallAnswer) ||
-    isSpellingPrompt(pendingRecallAnswer)
+  return isMcqRecallPending(pendingRecallAnswer) ||
+    isSpellingRecallPending(pendingRecallAnswer)
     ? pendingRecallAnswer.recallPromptId
     : null
 }
@@ -149,10 +151,23 @@ function getPlaceholderContext(inTokenList: boolean): PlaceholderContext {
   if (inTokenList) return 'tokenList'
   if (pendingRecallStopConfirmation) return 'recallStopConfirmation'
   if (pendingRecallLoadMore) return RECALL_SESSION_YES_NO_PLACEHOLDER
-  if (isMcqPrompt(pendingRecallAnswer)) return 'recallMcq'
-  if (isSpellingPrompt(pendingRecallAnswer)) return 'recallSpelling'
+  if (isMcqRecallPending(pendingRecallAnswer)) return 'recallMcq'
+  if (isSpellingRecallPending(pendingRecallAnswer)) return 'recallSpelling'
   if (pendingRecallAnswer !== null) return RECALL_SESSION_YES_NO_PLACEHOLDER
   return 'default'
+}
+
+/** Console / piped recall MCQ: same lines the user would see without a TTY live region. */
+function writeMcqRecallQuestionToScrollback(
+  writeLine: (line: string) => void,
+  stemRenderedForTerminal: string,
+  choices: readonly string[]
+): void {
+  writeLine(stemRenderedForTerminal)
+  for (const line of formatMcqChoiceLines(choices)) {
+    writeLine(line)
+  }
+  writeLine(`Enter your choice (1-${choices.length}):`)
 }
 
 function showRecallPrompt(
@@ -161,19 +176,19 @@ function showRecallPrompt(
   writeCurrentPrompt: (msg: string) => void
 ): void {
   if (result.type === 'mcq') {
-    const stemTerminal = renderMarkdownToTerminal(result.stem)
+    const stemRenderedForTerminal = renderMarkdownToTerminal(result.stem)
     pendingRecallAnswer = {
       recallPromptId: result.recallPromptId,
       choices: result.choices,
-      stemTerminal,
+      stemRenderedForTerminal,
       shownAt: Date.now(),
     }
     if (!output.beginCurrentPrompt) {
-      writeCurrentPrompt(stemTerminal)
-      for (const line of formatMcqChoiceLines(result.choices)) {
-        writeCurrentPrompt(line)
-      }
-      writeCurrentPrompt(`Enter your choice (1-${result.choices.length}):`)
+      writeMcqRecallQuestionToScrollback(
+        writeCurrentPrompt,
+        stemRenderedForTerminal,
+        result.choices
+      )
     }
     return
   }
@@ -497,7 +512,7 @@ export async function processInput(
     return false
   }
   if (pendingRecallAnswer) {
-    if (isMcqPrompt(pendingRecallAnswer)) {
+    if (isMcqRecallPending(pendingRecallAnswer)) {
       const choiceNum = Number.parseInt(trimmed, 10)
       const { recallPromptId, choices } = pendingRecallAnswer
       const validRange = choiceNum >= 1 && choiceNum <= choices.length
@@ -521,7 +536,7 @@ export async function processInput(
         writeCurrentPrompt(`Enter a number from 1 to ${choices.length}`)
         return false
       }
-    } else if (isSpellingPrompt(pendingRecallAnswer)) {
+    } else if (isSpellingRecallPending(pendingRecallAnswer)) {
       const { recallPromptId } = pendingRecallAnswer
       if (!trimmed) {
         writeCurrentPrompt('Please type your spelling')
@@ -543,7 +558,7 @@ export async function processInput(
       if (recallSessionMode)
         await continueRecallSession(false, output, writeCurrentPrompt)
     } else {
-      const { memoryTrackerId } = pendingRecallAnswer as JustReviewPrompt
+      const { memoryTrackerId } = pendingRecallAnswer
       const answer = parseYesNo(trimmed)
       if (answer === true) {
         try {
@@ -631,7 +646,7 @@ function buildTTYDeps() {
     setPendingRecallStopConfirmation,
     isInRecallSubstate,
     exitRecallMode,
-    isMcqPrompt,
+    isMcqRecallPending,
     buildTokenListLines,
     getDefaultTokenLabel,
     listAccessTokens,

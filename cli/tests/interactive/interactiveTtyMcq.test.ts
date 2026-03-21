@@ -33,8 +33,7 @@ import {
 const GREY_SGR = '\x1b[90m'
 const SGR_RESET_LINE = '\x1b[0m\n'
 
-/** Whole-line grey writes from TTY `writeCurrentPrompt` (not `\x1b[2K` live-region rows). */
-function countGreyWriteCurrentPromptLinesMatching(
+function countGreyWholeLineWriteCurrentPromptsWhere(
   writeSpy: ReturnType<typeof vi.spyOn>,
   predicate: (plainOneLine: string) => boolean
 ): number {
@@ -50,7 +49,7 @@ function countGreyWriteCurrentPromptLinesMatching(
   return count
 }
 
-describe('TTY MCQ choice selection', () => {
+describe('TTY recall MCQ', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
   let stdin: TTYStdin
 
@@ -70,145 +69,133 @@ describe('TTY MCQ choice selection', () => {
     endTTYSession(stdin)
   })
 
-  test('down arrow moves highlight to second choice', async () => {
-    writeSpy.mockClear()
-    await submitTTYCommand(stdin, '/recall')
+  describe('choice selection', () => {
+    test('down arrow moves highlight to second choice', async () => {
+      writeSpy.mockClear()
+      await submitTTYCommand(stdin, '/recall')
 
-    const afterSubmit = ttyOutput(writeSpy)
-    expect(afterSubmit).toContain('↑↓ Enter or number to select; Esc to cancel')
-    expect(afterSubmit).toContain('  1. 4')
-    expect(afterSubmit).toContain('  2. 3')
+      const afterSubmit = ttyOutput(writeSpy)
+      expect(afterSubmit).toContain(
+        '↑↓ Enter or number to select; Esc to cancel'
+      )
+      expect(afterSubmit).toContain('  1. 4')
+      expect(afterSubmit).toContain('  2. 3')
 
-    writeSpy.mockClear()
-    pressKey(stdin, 'down')
-    await tick()
+      writeSpy.mockClear()
+      pressKey(stdin, 'down')
+      await tick()
 
-    const output = ttyOutput(writeSpy)
-    expect(output).toContain('\x1b[7m') // REVERSE on highlighted line
-    expect(output).toContain('  2. 3')
-  })
-
-  test('Enter submits highlighted choice and calls answerQuiz', async () => {
-    await submitTTYCommand(stdin, '/recall')
-
-    pressEnter(stdin)
-    await tick()
-    await new Promise((r) => setTimeout(r, 50))
-
-    expect(mockAnswerQuiz).toHaveBeenCalledWith(100, 0, expect.any(Number))
-    expect(ttyOutput(writeSpy)).toContain('Recalled successfully')
-  })
-
-  test('typed number still works', async () => {
-    await submitTTYCommand(stdin, '/recall')
-
-    typeString(stdin, '2')
-    await tick()
-    pressEnter(stdin)
-    await tick()
-
-    expect(mockAnswerQuiz).toHaveBeenCalledWith(100, 1, expect.any(Number)) // "2" = choiceIndex 1
-  })
-
-  test('ESC shows stop confirmation, y exits recall mode', async () => {
-    await submitTTYCommand(stdin, '/recall')
-    mockAnswerQuiz.mockClear()
-    writeSpy.mockClear()
-
-    pressKey(stdin, 'escape')
-    await tick()
-
-    expect(ttyOutput(writeSpy)).toContain('Stop recall? (y/n)')
-    expect(ttyOutput(writeSpy)).toContain('y or n; Esc to go back')
-
-    typeString(stdin, 'y')
-    await tick()
-    pressEnter(stdin)
-    await tick()
-
-    const out = ttyOutput(writeSpy)
-    expect(out).toContain('Stopped recall')
-    expectTtyRecallYesNoReplyScrollback(writeSpy, 'y')
-    expect(mockAnswerQuiz).not.toHaveBeenCalled()
-    expect(isInRecallSubstate()).toBe(false)
-  })
-
-  test('ESC then n cancels confirmation and stays in MCQ', async () => {
-    await submitTTYCommand(stdin, '/recall')
-    mockAnswerQuiz.mockClear()
-    writeSpy.mockClear()
-
-    pressKey(stdin, 'escape')
-    await tick()
-
-    typeString(stdin, 'n')
-    await tick()
-    pressEnter(stdin)
-    await tick()
-
-    expect(isInRecallSubstate()).toBe(true)
-    expect(mockAnswerQuiz).not.toHaveBeenCalled()
-
-    const output = ttyOutput(writeSpy)
-    expect(output).toContain('  1. 4')
-    expect(output).toContain('  2. 3')
-  })
-})
-
-describe('TTY MCQ layout contract (current prompt vs guidance)', () => {
-  let writeSpy: ReturnType<typeof vi.spyOn>
-  let stdin: TTYStdin
-
-  beforeEach(async () => {
-    resetRecallStateForTesting()
-    mockRecallNext.mockResolvedValue({
-      type: 'mcq',
-      recallPromptId: 100,
-      stem: 'What is 2+2?',
-      choices: ['4', '3', '5'],
+      const output = ttyOutput(writeSpy)
+      expect(output).toContain('\x1b[7m')
+      expect(output).toContain('  2. 3')
     })
-    mockAnswerQuiz.mockResolvedValue({ correct: true })
-    ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
+
+    test('Enter submits highlighted choice and calls answerQuiz', async () => {
+      await submitTTYCommand(stdin, '/recall')
+
+      pressEnter(stdin)
+      await tick()
+      await new Promise((r) => setTimeout(r, 50))
+
+      expect(mockAnswerQuiz).toHaveBeenCalledWith(100, 0, expect.any(Number))
+      expect(ttyOutput(writeSpy)).toContain('Recalled successfully')
+    })
+
+    test('typed number still works', async () => {
+      await submitTTYCommand(stdin, '/recall')
+
+      typeString(stdin, '2')
+      await tick()
+      pressEnter(stdin)
+      await tick()
+
+      expect(mockAnswerQuiz).toHaveBeenCalledWith(100, 1, expect.any(Number))
+    })
+
+    test('ESC shows stop confirmation, y exits recall mode', async () => {
+      await submitTTYCommand(stdin, '/recall')
+      mockAnswerQuiz.mockClear()
+      writeSpy.mockClear()
+
+      pressKey(stdin, 'escape')
+      await tick()
+
+      expect(ttyOutput(writeSpy)).toContain('Stop recall? (y/n)')
+      expect(ttyOutput(writeSpy)).toContain('y or n; Esc to go back')
+
+      typeString(stdin, 'y')
+      await tick()
+      pressEnter(stdin)
+      await tick()
+
+      const out = ttyOutput(writeSpy)
+      expect(out).toContain('Stopped recall')
+      expectTtyRecallYesNoReplyScrollback(writeSpy, 'y')
+      expect(mockAnswerQuiz).not.toHaveBeenCalled()
+      expect(isInRecallSubstate()).toBe(false)
+    })
+
+    test('ESC then n cancels confirmation and stays in MCQ', async () => {
+      await submitTTYCommand(stdin, '/recall')
+      mockAnswerQuiz.mockClear()
+      writeSpy.mockClear()
+
+      pressKey(stdin, 'escape')
+      await tick()
+
+      typeString(stdin, 'n')
+      await tick()
+      pressEnter(stdin)
+      await tick()
+
+      expect(isInRecallSubstate()).toBe(true)
+      expect(mockAnswerQuiz).not.toHaveBeenCalled()
+
+      const output = ttyOutput(writeSpy)
+      expect(output).toContain('  1. 4')
+      expect(output).toContain('  2. 3')
+    })
   })
 
-  afterEach(() => {
-    endTTYSession(stdin)
-  })
+  describe('live region: current prompt vs guidance (observable bytes)', () => {
+    test('numbered choices are not grey whole-line writeCurrentPrompt rows', async () => {
+      await submitTTYCommand(stdin, '/recall')
+      expect(
+        countGreyWholeLineWriteCurrentPromptsWhere(writeSpy, (plain) =>
+          /^ {2}\d+\. /.test(plain)
+        )
+      ).toBe(0)
+    })
 
-  test('numbered choices are not emitted as grey whole-line writeCurrentPrompt rows', async () => {
-    await submitTTYCommand(stdin, '/recall')
-    const n = countGreyWriteCurrentPromptLinesMatching(writeSpy, (plain) =>
-      /^ {2}\d+\. /.test(plain)
-    )
-    expect(n).toBe(0)
-  })
+    test('2K green separator is painted before MCQ stem text', async () => {
+      await submitTTYCommand(stdin, '/recall')
+      const raw = ttyOutput(writeSpy)
+      const sep = buildCurrentPromptSeparator(getTerminalWidth())
+      const stem = 'What is 2+2?'
+      expect(raw).toContain(`\x1b[2K${sep}`)
+      expect(raw).toContain(stem)
+      expect(raw.lastIndexOf(`\x1b[2K${sep}`)).toBeLessThan(
+        raw.lastIndexOf(stem)
+      )
+    })
 
-  test('live-region repaint: 2K green separator is painted before MCQ stem', async () => {
-    await submitTTYCommand(stdin, '/recall')
-    const raw = ttyOutput(writeSpy)
-    const sep = buildCurrentPromptSeparator(getTerminalWidth())
-    const stem = 'What is 2+2?'
-    expect(raw).toContain(`\x1b[2K${sep}`)
-    expect(raw).toContain(stem)
-    expect(raw.lastIndexOf(`\x1b[2K${sep}`)).toBeLessThan(raw.lastIndexOf(stem))
-  })
+    test('no stale extra cursor-up before input box top', async () => {
+      await submitTTYCommand(stdin, '/recall')
+      expect(
+        liveRegionRepaintHasStaleCursorUpBeforeBoxTop(ttyOutput(writeSpy))
+      ).toBe(false)
+    })
 
-  test('live-region repaint does not use a stale extra cursor-up before the input box top', async () => {
-    await submitTTYCommand(stdin, '/recall')
-    expect(
-      liveRegionRepaintHasStaleCursorUpBeforeBoxTop(ttyOutput(writeSpy))
-    ).toBe(false)
-  })
+    test('at most one input box top outline before first box content row', async () => {
+      await submitTTYCommand(stdin, '/recall')
+      expect(
+        countInputBoxTopOutlinesBeforeFirstBoxContent(ttyOutput(writeSpy))
+      ).toBeLessThanOrEqual(1)
+    })
 
-  test('at most one input box top outline appears before first box content row', async () => {
-    await submitTTYCommand(stdin, '/recall')
-    expect(
-      countInputBoxTopOutlinesBeforeFirstBoxContent(ttyOutput(writeSpy))
-    ).toBeLessThanOrEqual(1)
-  })
-
-  test('MCQ screen emits interactive input-ready OSC after paint', async () => {
-    await submitTTYCommand(stdin, '/recall')
-    expect(ttyOutput(writeSpy)).toContain(INTERACTIVE_INPUT_READY_OSC)
+    test('emits interactive input-ready OSC after paint', async () => {
+      await submitTTYCommand(stdin, '/recall')
+      expect(ttyOutput(writeSpy)).toContain(INTERACTIVE_INPUT_READY_OSC)
+    })
   })
 })

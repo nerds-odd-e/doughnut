@@ -12,6 +12,7 @@ import {
   stripAnsiCsiAndCr,
   needsGapBeforeBox,
   buildLiveRegionLines,
+  wrapTextToVisibleWidthLines,
 } from '../src/renderer.js'
 import type { ChatHistory } from '../src/types.js'
 
@@ -52,6 +53,25 @@ describe('interactiveInputReadyOscSuffix', () => {
         interactiveFetchWaitLine: INTERACTIVE_FETCH_WAIT_LINES.recallNext,
       })
     ).toBe('')
+  })
+})
+
+describe('wrapTextToVisibleWidthLines (recall MCQ stem / ANSI terminal strings)', () => {
+  test('wraps plain text at visible width with word break when possible', () => {
+    expect(wrapTextToVisibleWidthLines('hello world', 5)).toEqual([
+      'hello',
+      'world',
+    ])
+  })
+
+  test('preserves ANSI sequences while wrapping at visible column count', () => {
+    const boldHi = '\x1b[1mhi\x1b[0m there'
+    const lines = wrapTextToVisibleWidthLines(boldHi, 3)
+    expect(lines[0]).toContain('\x1b[1m')
+    const joined = stripAnsi(lines.join(''))
+    expect(joined).toContain('hi')
+    expect(joined).toContain('there')
+    expect(lines.every((l) => stripAnsi(l).length <= 3)).toBe(true)
   })
 })
 

@@ -1,11 +1,28 @@
-/** Pending MCQ in recall: user must choose 1–n in the TTY live region. */
+/** User is answering a multiple-choice recall question (choices in Current guidance; TTY stem in Current prompt). */
 export type McqRecallPending = {
   recallPromptId: number
   choices: readonly string[]
-  /** Markdown rendered for terminal (ANSI); TTY current prompt wraps this. */
-  stemTerminal: string
+  /** Stem with markdown applied for the terminal (may include ANSI SGR). */
+  stemRenderedForTerminal: string
   shownAt: number
 }
+
+/** User is answering the spelling variant of a recall prompt. */
+export type SpellingRecallPending = {
+  recallPromptId: number
+  type: 'spelling'
+  shownAt: number
+}
+
+/** Just-review step: user answers y/n on whether they remember the note. */
+export type RecallJustReviewPending = { memoryTrackerId: number }
+
+/** What recall is waiting for next, if anything. */
+export type PendingRecallAnswer =
+  | RecallJustReviewPending
+  | McqRecallPending
+  | SpellingRecallPending
+  | null
 
 /** User-submitted input in the prompt (what they typed). */
 export type ChatHistoryInputEntry = { type: 'input'; content: string }
@@ -33,7 +50,10 @@ export type OutputAdapter = {
   logUserNotice?: (msg: string) => void
   /** Optional: for Current guidance (e.g. "Please answer y or n"). Defaults to log. */
   writeCurrentPrompt?: (msg: string) => void
-  /** Optional: write green separator before first Current guidance content in a turn. TTY only. */
+  /**
+   * TTY only: green separator before the first Current prompt line in a turn.
+   * When set, recall MCQ is painted entirely in the live region (stem + separator + box), not via grey `writeCurrentPrompt` lines.
+   */
   beginCurrentPrompt?: () => void
   /** Optional: for /clear and resize. TTY provides a callback that clears and redraws. */
   clearAndRedraw?: () => void

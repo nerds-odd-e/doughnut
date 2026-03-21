@@ -30,7 +30,7 @@ Informal plan. Delete or trim when shipped.
 
 **Scope:** Prefer extending `cli/tests/interactive/interactiveTtyMcq.test.ts` and/or `cli/tests/interactive/interactiveRendering.test.ts` (or a small dedicated file) — assert on stripped/normalized output patterns, not internal function names.
 
-**Done:** `cli/tests/interactive/interactiveTtyMcq.test.ts` → describe `TTY MCQ layout contract (current prompt vs guidance)`: (1) no numbered MCQ lines via grey whole-line `writeCurrentPrompt`; (2) last `2K`+green separator before last stem in capture; plus stale CUU / single box-top / input-ready OSC on full capture.
+**Done:** `cli/tests/interactive/interactiveTtyMcq.test.ts` → `describe('TTY recall MCQ')` / nested `live region: current prompt vs guidance (observable bytes)` for those assertions.
 
 **Gate:** Existing E2E for recall still run; they may still pass while Vitest is red until Phase 2 fixes implementation (or keep one test “pending” until Phase 2 — team choice).
 
@@ -40,7 +40,7 @@ Informal plan. Delete or trim when shipped.
 
 **Scope:** `interactive.ts` (`showRecallPrompt` MCQ branch), `ttyAdapter.ts` (`getDisplayContent`), and any small exported getter on `interactive` (or shared module) to avoid circular deps — keep surface minimal.
 
-**Done:** `McqRecallPending.stemTerminal` (markdown → terminal string). TTY: MCQ skips `beginCurrentPrompt` / `writeCurrentPrompt`; `getDisplayContent` fills `currentPromptWrappedLines` via `wrapMarkdownTerminalToLines` (ANSI-aware) unless stop-confirm is active. Console/piped: unchanged logging (stem + choices + “Enter your choice…”). `renderer.ts`: `wrapTextToVisibleWidthLines` + `wrapMarkdownTerminalToLines`.
+**Done:** `McqRecallPending.stemRenderedForTerminal`; pending-answer union lives in `types.ts`. TTY: MCQ skips `beginCurrentPrompt` / grey `writeCurrentPrompt`; stem wrapped in-adapter with `wrapTextToVisibleWidthLines` per paragraph. Console: `writeMcqRecallQuestionToScrollback` in `interactive.ts`. `renderer.ts`: `wrapTextToVisibleWidthLines` only.
 
 **Gate:** Phase 1 Vitest green; `cli_recall.feature` MCQ scenarios green.
 
