@@ -35,7 +35,7 @@ Scope: **`/add-access-token`** only unless product asks to extend (e.g. other pa
 
 ## Phased delivery (scenario-first)
 
-### Phase A — Input history behavior (TTY, in-process) ✅ (follow-ups: A1–A3)
+### Phase A — Input history behavior (TTY, in-process) ✅ (follow-ups: A1–A3; A1–A2 done)
 
 **User-visible:** In interactive TTY mode, ↑↓ walk previous submissions; first ↑ moves cursor to start if not already there; first ↓ moves cursor to end if not already there; after ↑ into history, cursor at **beginning**; after ↓ within history, cursor at **end**; stepping ↓ past the “newest” stored line restores the **pre-history draft** (what the user had typed before first ↑), or **empty** if there was none.
 
@@ -55,19 +55,13 @@ Scope: **`/add-access-token`** only unless product asks to extend (e.g. other pa
 
 ---
 
-### Phase A2 — ↓ while editing: caret to end before suggestions or history
+### Phase A2 — ↓ while editing: caret to end before suggestions or history ✅
 
 **User-visible:** With the caret **not** at the end of the draft (`caretOffset < lineDraft.length`), **one** ↓ moves the caret to **`lineDraft.length`** and leaves the **characters** of `lineDraft` unchanged. No suggestion cycling and no history navigation on that keypress.
 
 **Root cause:** Same TTY branch as A1 for the **down** key.
 
-**TDD**
-
-1. **Failing test first** — Mirror A1: `historyWalkIndex === null`, `caretOffset < lineDraft.length`, last line suggestion-eligible; **↓** must yield `caretOffset === lineDraft.length`, unchanged `lineDraft`, `historyWalkIndex` still `null`. Educational failure message: *first ↓ must move the caret to the end of the draft when not browsing history; it must not cycle slash suggestions or change the history index while the caret is not already at the end.*
-2. Confirm red, then implement symmetric precedence in `ttyAdapter` (delegate to `onArrowDown`’s live-edit path or equivalent).
-3. Green; add a second TTY test only if required for coverage.
-
-**False-positive guards:** Same as A1 — exact draft length and caret at end, unique content.
+**Done:** `ttyArrowKeyUsesSlashSuggestionCycle` treats ↓ like ↑ symmetrically (cycle only when caret already at draft end). Unit: `cli/tests/interactiveCommandInput.test.ts`. TTY: `cli/tests/interactive/interactiveTtySession.test.ts` (↓ after ↑ on `/` does not advance highlight).
 
 ---
 

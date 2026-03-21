@@ -177,6 +177,31 @@ describe('TTY: shared interactive session', () => {
       expect(lastLineAfterSecond).toContain('\x1b[7m')
     })
 
+    test('first Down after caret-home on `/` moves caret to end without cycling slash highlight (phase A2)', async () => {
+      const filtered = filterCommandsByPrefix(interactiveDocs, '/')
+      expect(filtered.length).toBeGreaterThanOrEqual(2)
+      const firstUsage = filtered[0]!.usage
+      const secondUsage = filtered[1]!.usage
+
+      writeSpy.mockClear()
+      typeString(stdin, '/')
+      await tick()
+      pressKey(stdin, 'up')
+      await tick()
+      pressKey(stdin, 'down')
+      await tick()
+
+      const out = ttyOutput(writeSpy)
+      expect(
+        lastStdoutLineContaining(out, `  ${firstUsage}`),
+        'Phase A2: first ↓ with caret before end of `/` must not cycle slash highlights yet'
+      ).toContain('\x1b[7m')
+      expect(
+        lastStdoutLineContaining(out, `  ${secondUsage}`),
+        'Slash highlight must stay on the first row until the caret is already at the draft end'
+      ).not.toContain('\x1b[7m')
+    })
+
     test('slash picker: ArrowDown moves highlight; first Up moves caret home, second Up moves highlight back', async () => {
       const filtered = filterCommandsByPrefix(interactiveDocs, '/')
       expect(filtered.length).toBeGreaterThanOrEqual(2)

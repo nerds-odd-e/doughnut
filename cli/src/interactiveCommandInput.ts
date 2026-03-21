@@ -114,19 +114,22 @@ export function clearLiveCommandLine(
 /**
  * Whether the TTY should move slash-command suggestion highlight on ↑/↓ instead of
  * {@link onArrowUp} / {@link onArrowDown}. Slash cycling applies only while editing the live
- * draft (`historyWalkIndex === null`). For ↑, a caret not at column 0 takes precedence — first ↑
- * goes home. (↓ while the caret is not at the end still uses cycling until phase A2.)
+ * draft (`historyWalkIndex === null`). A caret not at column 0 (for ↑) or not at
+ * `lineDraft.length` (for ↓) takes precedence — first ↑ goes home, first ↓ goes to end.
  */
 export function ttyArrowKeyUsesSlashSuggestionCycle(
   key: 'up' | 'down',
-  state: Pick<InteractiveCommandInput, 'historyWalkIndex' | 'caretOffset'>,
+  state: Pick<
+    InteractiveCommandInput,
+    'historyWalkIndex' | 'caretOffset' | 'lineDraft'
+  >,
   suggestionsDismissed: boolean,
   lineDraftHasSlashSuggestions: boolean
 ): boolean {
   if (suggestionsDismissed || !lineDraftHasSlashSuggestions) return false
   if (state.historyWalkIndex !== null) return false
-  if (key === 'down') return true
-  return state.caretOffset === 0
+  if (key === 'up') return state.caretOffset === 0
+  return state.caretOffset === state.lineDraft.length
 }
 
 export function onArrowUp(

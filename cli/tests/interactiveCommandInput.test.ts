@@ -136,6 +136,32 @@ describe('TTY slash-suggestion vs ↑ precedence (phase A1)', () => {
   })
 })
 
+describe('TTY slash-suggestion vs ↓ precedence (phase A2)', () => {
+  test('first ↓ moves caret to end when not in history and caret is not at end, even if slash suggestions apply', () => {
+    const lineDraft = '/help_PHASE_A2_UNIQUE'
+    const state = commandInputWith({
+      lineDraft,
+      caretOffset: 2,
+      historyWalkIndex: null,
+      committedCommands: ['/version'],
+    })
+    expect(
+      ttyArrowKeyUsesSlashSuggestionCycle('down', state, false, true),
+      'first ↓ must not use slash suggestion cycling while the caret is still away from the end of the draft'
+    ).toBe(false)
+    const after = onArrowDown(state)
+    expect(
+      after.lineDraft,
+      'first ↓ must leave lineDraft unchanged (no history recall, no suggestion side effects)'
+    ).toBe(lineDraft)
+    expect(
+      after.caretOffset,
+      'first ↓ must move the caret to the end of the draft when not in history mode'
+    ).toBe(lineDraft.length)
+    expect(after.historyWalkIndex).toBe(null)
+  })
+})
+
 describe('onArrowUp', () => {
   test('moves the caret to the start of the draft when still editing live text', () => {
     const out = onArrowUp(
