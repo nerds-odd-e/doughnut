@@ -40,6 +40,7 @@ import {
   isCommittedInteractiveInput,
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
   isGreyDisabledInputChrome,
+  RECALL_SESSION_YES_NO_PLACEHOLDER,
   wrapTextToLines,
   type LiveRegionPaintOptions,
   type PlaceholderContext,
@@ -145,7 +146,6 @@ export interface TTYDeps {
   ) => string[]
   TOKEN_LIST_COMMANDS: Record<string, TokenListCommandConfig>
   getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
-  shouldOmitCommittedInputFromScrollback: () => boolean
 }
 
 function cycleIndex(current: number, delta: number, length: number): number {
@@ -255,7 +255,6 @@ export async function runTTY(
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
-    shouldOmitCommittedInputFromScrollback,
   } = deps
 
   const writeCurrentPromptLine = (msg: string) =>
@@ -332,7 +331,7 @@ export async function runTTY(
     chatHistory.push({ type: 'output', lines: [...lines], tone })
     clearLiveRegionForRepaint(livePaint)
     resetLivePaintCursor()
-    paintCommittedTurnAppend(
+    paintCommittedScrollbackAppend(
       options?.inputAlreadyPaintedAboveLiveRegion ?? false
     )
   }
@@ -590,13 +589,11 @@ export async function runTTY(
   }
 
   /**
-   * Paints the last committed scrollback chunk without {@link CLEAR_SCREEN}, then {@link drawBox} unless
-   * {@link options.skipDrawBox} (e.g. quit after `exit`).
-   * - After normal input: grey `renderPastInput` for `prev` (unless already painted) + output lines.
-   * - After input-less commits (e.g. recall y/n): `prev` may be prior output — append output lines only.
-   * Token-list completion already wrote `renderPastInput` when entering selection mode.
+   * Writes the newest `chatHistory` slice to stdout (no {@link CLEAR_SCREEN}), then {@link drawBox} unless
+   * {@link options.skipDrawBox}. Normal turn is grey input + output; recall y/n adds output only (`recallYesNo`
+   * placeholder). Token-list already wrote `renderPastInput` before this.
    */
-  function paintCommittedTurnAppend(
+  function paintCommittedScrollbackAppend(
     inputAlreadyPainted: boolean,
     options?: { skipDrawBox?: boolean }
   ): void {
@@ -635,7 +632,7 @@ export async function runTTY(
       tone: commandTurn.tone,
     })
     resetLivePaintCursor()
-    paintCommittedTurnAppend(false, { skipDrawBox: true })
+    paintCommittedScrollbackAppend(false, { skipDrawBox: true })
   }
 
   function stopInteractiveFetchWaitRepaintTimer(): void {
@@ -938,7 +935,10 @@ export async function runTTY(
 
         resetCommandTurnBuffer()
         if (isCommittedInteractiveInput(input)) {
-          if (!shouldOmitCommittedInputFromScrollback()) {
+          if (
+            getPlaceholderContext(!!tokenSelection) !==
+            RECALL_SESSION_YES_NO_PLACEHOLDER
+          ) {
             chatHistory.push({
               type: 'input',
               content: maskInteractiveInputForHistory(input),

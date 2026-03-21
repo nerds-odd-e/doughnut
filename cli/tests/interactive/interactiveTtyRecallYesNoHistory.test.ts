@@ -5,12 +5,8 @@ import {
 } from './interactiveRecallMockAccess.js'
 import { resetRecallStateForTesting } from '../../src/interactive.js'
 import {
-  CLEAR_SCREEN,
-  getTerminalWidth,
-  renderPastInput,
-} from '../../src/renderer.js'
-import {
   endTTYSession,
+  expectTtyRecallYesNoReplyScrollback,
   pressEnter,
   startTTYSessionWithoutRecallReset,
   submitTTYCommand,
@@ -20,7 +16,7 @@ import {
   type TTYStdin,
 } from './interactiveTestHelpers.js'
 
-describe('TTY recall y/n replies omit grey history input', () => {
+describe('TTY: recall-session y/n answers (scrollback)', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
   let stdin: TTYStdin
 
@@ -45,8 +41,7 @@ describe('TTY recall y/n replies omit grey history input', () => {
 
     const out = ttyOutput(writeSpy)
     expect(out).toContain('0 notes to recall today')
-    expect(out).not.toContain(renderPastInput('n', getTerminalWidth()))
-    expect(out).not.toContain(CLEAR_SCREEN)
+    expectTtyRecallYesNoReplyScrollback(writeSpy, 'n')
   })
 
   test('just-review: y omits history input; outcome still logged', async () => {
@@ -67,8 +62,7 @@ describe('TTY recall y/n replies omit grey history input', () => {
     const out = ttyOutput(writeSpy)
     expect(out).toContain('Recalled successfully')
     expect(mockMarkAsRecalled).toHaveBeenCalledWith(42, true)
-    expect(out).not.toContain(renderPastInput('y', getTerminalWidth()))
-    expect(out).not.toContain(CLEAR_SCREEN)
+    expectTtyRecallYesNoReplyScrollback(writeSpy, 'y')
   })
 
   test('just-review: n omits history input', async () => {
@@ -89,7 +83,6 @@ describe('TTY recall y/n replies omit grey history input', () => {
     const out = ttyOutput(writeSpy)
     expect(out).toContain('Marked as not recalled')
     expect(mockMarkAsRecalled).toHaveBeenCalledWith(7, false)
-    expect(out).not.toContain(renderPastInput('n', getTerminalWidth()))
-    expect(out).not.toContain(CLEAR_SCREEN)
+    expectTtyRecallYesNoReplyScrollback(writeSpy, 'n')
   })
 })

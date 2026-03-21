@@ -2,11 +2,16 @@ import { Readable } from 'node:stream'
 import { mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { vi } from 'vitest'
+import { expect, vi } from 'vitest'
 import {
   resetRecallStateForTesting,
   runInteractive,
 } from '../../src/interactive.js'
+import {
+  CLEAR_SCREEN,
+  getTerminalWidth,
+  renderPastInput,
+} from '../../src/renderer.js'
 
 export const tick = () => new Promise<void>((r) => setImmediate(r))
 
@@ -90,6 +95,16 @@ export async function submitTTYCommand(stdin: TTYStdin, command: string) {
 
 export function ttyOutput(writeSpy: ReturnType<typeof vi.spyOn>) {
   return writeSpy.mock.calls.map((c) => c[0]).join('')
+}
+
+/** Recall-session y/n answers append to scrollback without a grey input row or full-screen clear. */
+export function expectTtyRecallYesNoReplyScrollback(
+  writeSpy: ReturnType<typeof vi.spyOn>,
+  answerLine: string
+) {
+  const out = ttyOutput(writeSpy)
+  expect(out).not.toContain(renderPastInput(answerLine, getTerminalWidth()))
+  expect(out).not.toContain(CLEAR_SCREEN)
 }
 
 /** Latest line in captured TTY stdout containing `needle` (successive repaints overwrite the same logical rows). */

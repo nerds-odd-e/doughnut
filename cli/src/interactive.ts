@@ -57,6 +57,7 @@ import {
   CLEAR_SCREEN,
   RECALLING_INDICATOR,
   PROMPT,
+  RECALL_SESSION_YES_NO_PLACEHOLDER,
   type PlaceholderContext,
 } from './renderer.js'
 import type { McqRecallPending, OutputAdapter } from './types.js'
@@ -143,25 +144,15 @@ function getContestablePromptId(): number | null {
     : null
 }
 
-export function getPlaceholderContext(
-  inTokenList: boolean
-): PlaceholderContext {
+function getPlaceholderContext(inTokenList: boolean): PlaceholderContext {
   if (getInteractiveFetchWaitLine() !== null) return 'interactiveFetchWait'
   if (inTokenList) return 'tokenList'
   if (pendingRecallStopConfirmation) return 'recallStopConfirmation'
-  if (pendingRecallLoadMore) return 'recallYesNo'
+  if (pendingRecallLoadMore) return RECALL_SESSION_YES_NO_PLACEHOLDER
   if (isMcqPrompt(pendingRecallAnswer)) return 'recallMcq'
   if (isSpellingPrompt(pendingRecallAnswer)) return 'recallSpelling'
-  if (pendingRecallAnswer !== null) return 'recallYesNo'
+  if (pendingRecallAnswer !== null) return RECALL_SESSION_YES_NO_PLACEHOLDER
   return 'default'
-}
-
-/** Next committed line is a recall y/n answer only — omit grey history input and command-history file. */
-function shouldOmitCommittedInputFromScrollback(): boolean {
-  if (pendingRecallLoadMore) return true
-  const p = pendingRecallAnswer
-  if (p === null) return false
-  return !(isMcqPrompt(p) || isSpellingPrompt(p))
 }
 
 function showRecallPrompt(
@@ -666,7 +657,6 @@ function buildTTYDeps() {
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
-    shouldOmitCommittedInputFromScrollback,
   }
 }
 
@@ -679,7 +669,7 @@ function buildPipedDeps() {
     renderBox,
     renderPastInput,
     formatVersionOutput,
-    shouldOmitCommittedInputFromScrollback,
+    getPlaceholderContext,
   }
 }
 

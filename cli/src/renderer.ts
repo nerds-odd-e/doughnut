@@ -56,6 +56,8 @@ export const PROMPT = '→ '
 /**
  * Which placeholder and input chrome apply in the live region.
  * `interactiveFetchWait`: slow backend/network call in flight — same grey, no-→ box as token list pickers.
+ * `recallYesNo`: next Enter submits a recall-session y/n answer (load more days or just-review); that line is
+ * not stored as a grey history-input row or in on-disk command history (outcome lines only).
  */
 export type PlaceholderContext =
   | 'default'
@@ -75,6 +77,10 @@ export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
   recallYesNo: 'y or n; /stop to exit recall',
   recallSpelling: 'type your answer; /stop to exit recall',
 }
+
+/** Load-more or just-review y/n — the `PlaceholderContext` for the next recall-session y/n Enter. */
+export const RECALL_SESSION_YES_NO_PLACEHOLDER =
+  'recallYesNo' as const satisfies PlaceholderContext
 
 /** Same-frame paint facts the TTY already has when finishing the live region (cursor + readiness signal). */
 export type InteractiveInputReadyPaint = {

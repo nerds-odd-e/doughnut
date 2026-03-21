@@ -1,6 +1,10 @@
 import * as readline from 'node:readline'
 import { maskInteractiveInputForHistory } from '../inputHistoryMask.js'
-import { isCommittedInteractiveInput } from '../renderer.js'
+import {
+  isCommittedInteractiveInput,
+  RECALL_SESSION_YES_NO_PLACEHOLDER,
+  type PlaceholderContext,
+} from '../renderer.js'
 import type { OutputAdapter } from '../types.js'
 
 export interface PipedDeps {
@@ -19,7 +23,7 @@ export interface PipedDeps {
   renderBox: (lines: string[], width: number) => string
   renderPastInput: (input: string, width: number) => string
   formatVersionOutput: () => string
-  shouldOmitCommittedInputFromScrollback: () => boolean
+  getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
 }
 
 export async function runPiped(
@@ -34,7 +38,7 @@ export async function runPiped(
     renderBox,
     renderPastInput,
     formatVersionOutput,
-    shouldOmitCommittedInputFromScrollback,
+    getPlaceholderContext,
   } = deps
 
   const width = getTerminalWidth()
@@ -61,7 +65,7 @@ export async function runPiped(
     const line = lineQueue.shift()!
     if (
       isCommittedInteractiveInput(line) &&
-      !shouldOmitCommittedInputFromScrollback()
+      getPlaceholderContext(false) !== RECALL_SESSION_YES_NO_PLACEHOLDER
     ) {
       console.log(
         renderPastInput(

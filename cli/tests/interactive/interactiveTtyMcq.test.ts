@@ -8,12 +8,8 @@ import {
   resetRecallStateForTesting,
 } from '../../src/interactive.js'
 import {
-  CLEAR_SCREEN,
-  getTerminalWidth,
-  renderPastInput,
-} from '../../src/renderer.js'
-import {
   endTTYSession,
+  expectTtyRecallYesNoReplyScrollback,
   pressEnter,
   pressKey,
   startTTYSessionWithoutRecallReset,
@@ -102,11 +98,7 @@ describe('TTY MCQ choice selection', () => {
 
     const out = ttyOutput(writeSpy)
     expect(out).toContain('Stopped recall')
-    expect(out).not.toContain(renderPastInput('y', getTerminalWidth()))
-    expect(
-      out,
-      'stop recall y/n should append without full-screen redraw'
-    ).not.toContain(CLEAR_SCREEN)
+    expectTtyRecallYesNoReplyScrollback(writeSpy, 'y')
     expect(mockAnswerQuiz).not.toHaveBeenCalled()
     expect(isInRecallSubstate()).toBe(false)
   })
