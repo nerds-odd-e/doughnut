@@ -39,7 +39,7 @@ Scope: **`/add-access-token`** only unless product asks to extend (e.g. other pa
 
 **User-visible:** In interactive TTY mode, ↑↓ walk previous submissions; first ↑ moves cursor to start if not already there; first ↓ moves cursor to end if not already there; after ↑ into history, cursor at **beginning**; after ↓ within history, cursor at **end**; stepping ↓ past the “newest” stored line restores the **pre-history draft** (what the user had typed before first ↑), or **empty** if there was none.
 
-**Done:** Pure state in `cli/src/inputHistoryNav.ts` (Vitest: `cli/tests/inputHistoryNav.test.ts`). TTY wiring in `cli/src/adapters/ttyAdapter.ts` (caret row/column in box, left/right/home/end, backspace before cursor, insert at cursor). **↑↓ no longer cycle slash-command suggestions** (use **Tab** / Enter on first match); see `cli/tests/interactive/interactiveTtySession.test.ts` and `interactiveTtySuggestionScroll.test.ts`. TTY smoke: `cli/tests/interactive/interactiveTtyInputHistory.test.ts`.
+**Done:** Domain state + transitions in `cli/src/interactiveCommandInput.ts` (Vitest: `cli/tests/interactiveCommandInput.test.ts`). TTY wiring in `cli/src/adapters/ttyAdapter.ts` (caret row/column in box, left/right/home/end, backspace before cursor, insert at cursor). **↑↓ no longer cycle slash-command suggestions** (use **Tab** / Enter on first match); see `cli/tests/interactive/interactiveTtySession.test.ts` and `interactiveTtySuggestionScroll.test.ts`. TTY smoke: `cli/tests/interactive/interactiveTtyInputHistory.test.ts`.
 
 **Implementation sketch (historical):**
 
@@ -49,7 +49,7 @@ Scope: **`/add-access-token`** only unless product asks to extend (e.g. other pa
 - **Cursor:** `cursorOffset`; update `positionCursorInInputBox` to map offset → row/column inside the bordered box (reuse `PROMPT` / continuation prefix widths from `buildBoxLines`). Insert printable characters **at** `cursorOffset`; backspace deletes **before** `cursorOffset` (readline-style).
 - **Keys:** At minimum **left/right** (or equivalent) so a visible in-box cursor is usable; **Home/End** optional but cheap if already doing offset-based cursor.
 
-**Tests:** Prefer **Vitest** on a small pure module (e.g. `inputHistoryNav.ts`) for the state machine: sequences of ↑↓ + assert resulting `buffer`, `cursorOffset`, `historyBrowseIndex`, and draft cache. Add focused **TTY tests** only where pure extraction is awkward (following existing `cli/tests/interactive/*.test.ts` patterns).
+**Tests:** Vitest on `interactiveCommandInput.ts` for transitions; focused **TTY** tests in `cli/tests/interactive/*.test.ts` where needed.
 
 **Out of scope this phase:** Disk persistence; masking (can use plain test strings).
 
@@ -87,6 +87,7 @@ Scope: **`/add-access-token`** only unless product asks to extend (e.g. other pa
 
 | Area | Files |
 |------|--------|
+| TTY command line state | `cli/src/interactiveCommandInput.ts` |
 | TTY key handling / cursor | `cli/src/adapters/ttyAdapter.ts` |
 | Box painting / cursor column | `cli/src/renderer.ts` (`buildLiveRegionLines` / `buildBoxLines` callers, possibly helpers) |
 | Masking | new small module or `renderer.ts`; call sites in `ttyAdapter` where input is committed |

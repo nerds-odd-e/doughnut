@@ -14,19 +14,20 @@ import {
   runInteractiveFetchWait,
 } from '../interactiveFetchWait.js'
 import {
-  applyArrowDown,
-  applyArrowUp,
-  clampCursorToBuffer,
-  deleteBackward,
-  insertAtCursor,
-  moveCursorEnd,
-  moveCursorHome,
-  moveCursorLeft,
-  moveCursorRight,
-  pushSubmittedLine,
-  resetLiveDraftFields,
-  type InputNavState,
-} from '../inputHistoryNav.js'
+  afterBareSlashEscape,
+  appendCommittedCommand,
+  applyLastLineEdit,
+  caretOneLeft,
+  caretOneRight,
+  caretToDraftEnd,
+  caretToDraftStart,
+  clearLiveCommandLine,
+  deleteBeforeCaret,
+  emptyInteractiveCommandInput,
+  insertIntoDraft,
+  onArrowDown,
+  onArrowUp,
+} from '../interactiveCommandInput.js'
 import {
   applyChatHistoryOutputTone,
   formatInteractiveFetchWaitPromptLine,
@@ -258,8 +259,8 @@ export async function runTTY(
     process.stdout.write(`${sep}\n`)
   }
 
-  function isCommandPrefixWithSuggestions(buffer: string): boolean {
-    const lastLine = getLastLine(buffer)
+  function isCommandPrefixWithSuggestions(lineDraft: string): boolean {
+    const lastLine = getLastLine(lineDraft)
     if (!lastLine.startsWith('/') || lastLine.endsWith(' ')) return false
     const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
     return filtered.length > 0
@@ -284,11 +285,7 @@ export async function runTTY(
   readline.emitKeypressEvents(stdin, rl)
 
   let chatHistory: ChatHistory = []
-  let buffer = ''
-  let cursorOffset = 0
-  let submittedCommandLines: string[] = []
-  let historyBrowseIndex: number | null = null
-  let historyDraftCache: string | null = null
+  let commandInput = emptyInteractiveCommandInput()
   let highlightIndex = 0
   let suggestionsDismissed = false
   const livePaint: LiveRegionPaintCursor = {
@@ -301,26 +298,14 @@ export async function runTTY(
   let interactiveFetchWaitRepaintTimer: ReturnType<typeof setInterval> | null =
     null
 
-  function nav(): InputNavState {
-    return {
-      buffer,
-      cursorOffset,
-      submittedLines: submittedCommandLines,
-      historyBrowseIndex,
-      historyDraftCache,
+  function rememberCommittedLine(raw: string): void {
+    commandInput = {
+      ...commandInput,
+      committedCommands: appendCommittedCommand(
+        commandInput.committedCommands,
+        raw
+      ),
     }
-  }
-
-  function applyNav(next: InputNavState): void {
-    buffer = next.buffer
-    cursorOffset = next.cursorOffset
-    submittedCommandLines = next.submittedLines
-    historyBrowseIndex = next.historyBrowseIndex
-    historyDraftCache = next.historyDraftCache
-  }
-
-  function recordSubmittedCommand(raw: string): void {
-    submittedCommandLines = pushSubmittedLine(submittedCommandLines, raw)
   }
 
   function resetLivePaintCursor(): void {
@@ -350,7 +335,7 @@ export async function runTTY(
     clearLiveRegionForRepaint(livePaint)
     chatHistory.push({ type: 'input', content: command })
     tokenSelection = null
-    applyNav(resetLiveDraftFields(nav()))
+    commandInput = clearLiveCommandLine(commandInput)
     commitHistoryOutput([message], tone, {
       inputAlreadyPaintedAboveLiveRegion: true,
     })
@@ -385,7 +370,7 @@ export async function runTTY(
   function getDisplayContent() {
     const width = getTerminalWidth()
     const placeholderContext = getPlaceholderContext(!!tokenSelection)
-    const contentLines = buildBoxLines(buffer, width, {
+    const contentLines = buildBoxLines(commandInput.lineDraft, width, {
       placeholderContext,
     })
     const pendingRecallAnswer = getPendingRecallAnswer()
@@ -427,10 +412,16 @@ export async function runTTY(
               undefined,
               mcqChoiceHighlightIndex
             )
-          : buildSuggestionLines(buffer, highlightIndex, width, {
-              forceCommandsHint:
-                suggestionsDismissed && isCommandPrefixWithSuggestions(buffer),
-            })
+          : buildSuggestionLines(
+              commandInput.lineDraft,
+              highlightIndex,
+              width,
+              {
+                forceCommandsHint:
+                  suggestionsDismissed &&
+                  isCommandPrefixWithSuggestions(commandInput.lineDraft),
+              }
+            )
     const recallingIndicator = isInRecallSubstate() ? [RECALLING_INDICATOR] : []
     return {
       contentLines,
@@ -461,7 +452,7 @@ export async function runTTY(
     } = getDisplayContent()
     const terminalWidth = getTerminalWidth()
     const liveLines = buildLiveRegionLines(
-      buffer,
+      commandInput.lineDraft,
       terminalWidth,
       currentPromptWrappedLines,
       suggestionLines,
@@ -486,11 +477,12 @@ export async function runTTY(
   }
 
   const positionCursorInInputBox = () => {
-    const contentLineCount = buffer.split('\n').length
+    const { lineDraft, caretOffset } = commandInput
+    const contentLineCount = lineDraft.split('\n').length
     let row = 0
     let col = 0
-    for (let i = 0; i < cursorOffset; i++) {
-      if (buffer[i] === '\n') {
+    for (let i = 0; i < caretOffset; i++) {
+      if (lineDraft[i] === '\n') {
         row++
         col = 0
       } else {
@@ -518,7 +510,7 @@ export async function runTTY(
     }
     process.stdout.write(
       interactiveInputReadyOscSuffix({
-        lineDraft: buffer,
+        lineDraft: commandInput.lineDraft,
         interactiveFetchWaitLine: getInteractiveFetchWaitLine(),
       })
     )
@@ -530,7 +522,7 @@ export async function runTTY(
     process.stdout.write(CLEAR_SCREEN)
     const fullLines = renderFullDisplay(
       chatHistory,
-      buffer,
+      commandInput.lineDraft,
       layout.terminalWidth,
       layout.suggestionLines,
       layout.recallingIndicator,
@@ -634,7 +626,7 @@ export async function runTTY(
 
   /** Clears the live input line and `/` command-picker state (used by `/clear` and when fetch-wait ends). */
   function resetLiveLineDraftAndSlashSuggestions(): void {
-    applyNav(resetLiveDraftFields(nav()))
+    commandInput = clearLiveCommandLine(commandInput)
     highlightIndex = 0
     suggestionsDismissed = false
   }
@@ -719,20 +711,20 @@ export async function runTTY(
     if (isPendingRecallStopConfirmation()) {
       if (key.name === 'escape') {
         setPendingRecallStopConfirmation(false)
-        applyNav(resetLiveDraftFields(nav()))
+        commandInput = clearLiveCommandLine(commandInput)
         drawBox()
       } else if (submitPressed && !key.shift) {
-        const trimmed = buffer.trim()
+        const trimmed = commandInput.lineDraft.trim()
         const answer = trimmed.toLowerCase()
         const isYes = answer === 'y' || answer === 'yes'
         const isNo = answer === 'n' || answer === 'no'
-        applyNav(resetLiveDraftFields(nav()))
+        commandInput = clearLiveCommandLine(commandInput)
         setPendingRecallStopConfirmation(false)
         if (isYes) {
           exitRecallMode()
           mcqChoiceHighlightIndex = 0
           chatHistory.push({ type: 'input', content: trimmed })
-          recordSubmittedCommand(trimmed)
+          rememberCommittedLine(trimmed)
           commitHistoryOutput(['Stopped recall'])
           return
         }
@@ -742,10 +734,10 @@ export async function runTTY(
         }
         drawBox()
       } else if (str && !key.ctrl && !key.meta) {
-        applyNav(insertAtCursor(nav(), str))
+        commandInput = insertIntoDraft(commandInput, str)
         drawBox()
       } else if (key.name === 'backspace') {
-        applyNav(deleteBackward(nav()))
+        commandInput = deleteBeforeCaret(commandInput)
         drawBox()
       } else {
         drawBox()
@@ -757,7 +749,7 @@ export async function runTTY(
       const choices = pendingRecallAnswer.choices
       if (key.name === 'escape') {
         setPendingRecallStopConfirmation(true)
-        applyNav(resetLiveDraftFields(nav()))
+        commandInput = clearLiveCommandLine(commandInput)
         doBeginCurrentPrompt()
         writeCurrentPromptLine('Stop recall? (y/n)')
         drawBox()
@@ -770,21 +762,21 @@ export async function runTTY(
         )
         drawBox()
       } else if (submitPressed && !key.shift) {
-        const trimmedBuffer = buffer.trim()
+        const trimmedBuffer = commandInput.lineDraft.trim()
         const effectiveInput = recallMcqSubmittedLine(
           trimmedBuffer,
           choices,
           mcqChoiceHighlightIndex
         )
         clearLiveRegionForRepaint(livePaint)
-        const inputForHistory = buffer || effectiveInput
-        applyNav(resetLiveDraftFields(nav()))
+        const inputForHistory = commandInput.lineDraft || effectiveInput
+        commandInput = clearLiveCommandLine(commandInput)
         mcqChoiceHighlightIndex = 0
         livePaint.lastPaintedLineCount = 0
         resetCommandTurnBuffer()
         chatHistory.push({ type: 'input', content: inputForHistory })
         if (isCommittedInteractiveInput(inputForHistory)) {
-          recordSubmittedCommand(inputForHistory)
+          rememberCommittedLine(inputForHistory)
         }
         if (await processInput(effectiveInput, ttyOutput, true)) {
           commitExitTurnToScrollback()
@@ -793,10 +785,10 @@ export async function runTTY(
         }
         commitHistoryOutput(commandTurn.lines, commandTurn.tone)
       } else if (str && !key.ctrl && !key.meta) {
-        applyNav(insertAtCursor(nav(), str))
+        commandInput = insertIntoDraft(commandInput, str)
         drawBox()
       } else if (key.name === 'backspace') {
-        applyNav(deleteBackward(nav()))
+        commandInput = deleteBeforeCaret(commandInput)
         drawBox()
       } else {
         drawBox()
@@ -847,26 +839,17 @@ export async function runTTY(
     if (key.name === 'escape') {
       if (isInRecallSubstate()) {
         exitRecallMode()
-        applyNav(resetLiveDraftFields(nav()))
+        commandInput = clearLiveCommandLine(commandInput)
         mcqChoiceHighlightIndex = 0
         resetLivePaintCursor()
         drawBox()
         return
       }
-      if (isCommandPrefixWithSuggestions(buffer)) {
+      if (isCommandPrefixWithSuggestions(commandInput.lineDraft)) {
         highlightIndex = 0
-        const lastLine = getLastLine(buffer)
+        const lastLine = getLastLine(commandInput.lineDraft)
         if (lastLine === '/') {
-          const bufferLines = buffer.split('\n')
-          const nextBuf =
-            bufferLines.length === 1 ? '' : bufferLines.slice(0, -1).join('\n')
-          applyNav(
-            clampCursorToBuffer({
-              ...nav(),
-              buffer: nextBuf,
-              cursorOffset: nextBuf.length,
-            })
-          )
+          commandInput = afterBareSlashEscape(commandInput)
         } else {
           suggestionsDismissed = true
         }
@@ -876,40 +859,31 @@ export async function runTTY(
     }
     if (submitPressed) {
       if (key.shift) {
-        applyNav(insertAtCursor(nav(), '\n'))
+        commandInput = insertIntoDraft(commandInput, '\n')
         drawBox()
       } else {
-        const trimmedInput = buffer.trim()
+        const trimmedInput = commandInput.lineDraft.trim()
 
         if (trimmedInput === '/clear') {
           ttyOutput.clearAndRedraw?.()
           return
         }
 
-        if (isCommandPrefixWithSuggestions(buffer)) {
+        if (isCommandPrefixWithSuggestions(commandInput.lineDraft)) {
           const filtered = filterCommandsByPrefix(
             interactiveDocs,
-            getLastLine(buffer)
+            getLastLine(commandInput.lineDraft)
           )
           const selectedCommand = `${filtered[highlightIndex].usage} `
-          const bufferLines = buffer.split('\n')
-          const nextBuf =
-            bufferLines.slice(0, -1).concat(selectedCommand).join('\n') || ''
-          applyNav(
-            clampCursorToBuffer({
-              ...nav(),
-              buffer: nextBuf,
-              cursorOffset: nextBuf.length,
-            })
-          )
+          commandInput = applyLastLineEdit(commandInput, selectedCommand)
           highlightIndex = 0
           drawBox()
           return
         }
 
         const width = getTerminalWidth()
-        const input = buffer
-        applyNav(resetLiveDraftFields(nav()))
+        const input = commandInput.lineDraft
+        commandInput = clearLiveCommandLine(commandInput)
 
         clearLiveRegionForRepaint(livePaint)
 
@@ -918,7 +892,7 @@ export async function runTTY(
           const tokens = listAccessTokens()
           if (tokens.length === 0) {
             chatHistory.push({ type: 'input', content: trimmedInput })
-            recordSubmittedCommand(trimmedInput)
+            rememberCommittedLine(trimmedInput)
             commitHistoryOutput(['No access tokens stored.'])
             return
           } else {
@@ -926,7 +900,7 @@ export async function runTTY(
               process.stdout.write(renderPastInput(input, width))
               process.stdout.write('\n')
             }
-            recordSubmittedCommand(trimmedInput)
+            rememberCommittedLine(trimmedInput)
             beginTokenSelection(trimmedInput, tokenSelect.action, tokens)
           }
           livePaint.lastPaintedLineCount = 0
@@ -937,7 +911,7 @@ export async function runTTY(
         resetCommandTurnBuffer()
         if (isCommittedInteractiveInput(input)) {
           chatHistory.push({ type: 'input', content: input })
-          recordSubmittedCommand(input)
+          rememberCommittedLine(input)
           if (await processInput(input, ttyOutput, true)) {
             commitExitTurnToScrollback()
             doExit()
@@ -952,55 +926,47 @@ export async function runTTY(
         drawBox()
       }
     } else if (key.name === 'backspace') {
-      const prevLen = buffer.length
-      applyNav(deleteBackward(nav()))
-      if (buffer.length !== prevLen) {
+      const prevLen = commandInput.lineDraft.length
+      commandInput = deleteBeforeCaret(commandInput)
+      if (commandInput.lineDraft.length !== prevLen) {
         highlightIndex = 0
         suggestionsDismissed = false
       }
       drawBox()
     } else if (key.name === 'up' || key.name === 'down') {
-      const prevBuf = buffer
-      applyNav(key.name === 'up' ? applyArrowUp(nav()) : applyArrowDown(nav()))
-      if (buffer !== prevBuf) {
+      const prevDraft = commandInput.lineDraft
+      commandInput =
+        key.name === 'up' ? onArrowUp(commandInput) : onArrowDown(commandInput)
+      if (commandInput.lineDraft !== prevDraft) {
         highlightIndex = 0
         suggestionsDismissed = false
       }
       drawBox()
     } else if (key.name === 'left') {
-      applyNav(moveCursorLeft(nav()))
+      commandInput = caretOneLeft(commandInput)
       drawBox()
     } else if (key.name === 'right') {
-      applyNav(moveCursorRight(nav()))
+      commandInput = caretOneRight(commandInput)
       drawBox()
     } else if (key.name === 'home') {
-      applyNav(moveCursorHome(nav()))
+      commandInput = caretToDraftStart(commandInput)
       drawBox()
     } else if (key.name === 'end') {
-      applyNav(moveCursorEnd(nav()))
+      commandInput = caretToDraftEnd(commandInput)
       drawBox()
     } else if (key.name === 'tab') {
-      const lastLine = getLastLine(buffer)
+      const lastLine = getLastLine(commandInput.lineDraft)
       if (lastLine.startsWith('/') && !lastLine.endsWith(' ')) {
         const { completed, count } = getTabCompletion(lastLine, interactiveDocs)
         if (count > 0 && completed !== lastLine) {
-          const bufferLines = buffer.split('\n')
-          const nextBuf =
-            bufferLines.slice(0, -1).concat(completed).join('\n') || completed
-          applyNav(
-            clampCursorToBuffer({
-              ...nav(),
-              buffer: nextBuf,
-              cursorOffset: nextBuf.length,
-            })
-          )
+          commandInput = applyLastLineEdit(commandInput, completed)
           highlightIndex = 0
           suggestionsDismissed = false
           drawBox()
         }
       }
     } else if (str && !key.ctrl && !key.meta) {
-      applyNav(insertAtCursor(nav(), str))
+      commandInput = insertIntoDraft(commandInput, str)
       highlightIndex = 0
       suggestionsDismissed = false
       drawBox()
