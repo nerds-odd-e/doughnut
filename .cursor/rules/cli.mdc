@@ -31,6 +31,12 @@ cli/
 
 For **interactive** behavior, prefer driving the real stack (**`runInteractive`** with a mock TTY or piped stdin) and asserting on **stdout / `console.log`** (or other user-visible output). Avoid splitting the same visible outcome across many tests that only call **`processInput`** with bespoke adapters unless the contract under test is truly that function in isolation (e.g. `-c` / non-interactive paths). See **Testing strategy → Observable behavior first** in `.cursor/rules/planning.mdc`.
 
+### Guardrails (new tests)
+
+- **New interactive behavior:** Default to **`runInteractive`** and assert user-visible output (TTY bytes or piped stdout as appropriate). Add **`processInput`** plus a mock **`OutputAdapter`** only when the contract under test is **non-interactive** (`-c` / default console adapter), **helper-only**, or there is no stable observable hook without it (see **Loading UI** below).
+- **`cli/tests/interactive/processInput.test.ts`:** Treat as **contract tests** for **`processInput`** with the **default adapter** (typically `console.log`), i.e. the same observable surface as **`-c` / piped** logging — **not** a second full interactive engine. TTY-specific outcomes belong in **`interactiveTty*.test.ts`** (or equivalent **`runInteractive`** harness).
+- When adding or reshaping CLI tests, re-read this section and **planning.mdc** → observable behavior first.
+
 ## Domain terminology
 
 | Term | Definition |

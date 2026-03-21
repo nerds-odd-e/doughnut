@@ -32,6 +32,8 @@ import {
 import { stripAnsi } from '../../src/renderer.js'
 import { makeTempConfigDir, withConfigDir } from './interactiveTestHelpers.js'
 
+// Contract: processInput + default console adapter (same surface as -c / piped log). Not TTY bytes — see interactiveTty*.test.ts and .cursor/rules/cli.mdc → Vitest.
+
 vi.mock('doughnut-api', () => ({
   getApiConfig: () => ({ apiBaseUrl: 'http://localhost:9081' }),
   configureClient: vi.fn(),
