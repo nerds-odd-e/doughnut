@@ -2,6 +2,7 @@ import {
   MemoryTrackerController,
   RecallsController,
   RecallPromptController,
+  type Answer,
   type DueMemoryTrackers,
   type MemoryTracker,
   type MemoryTrackerLite,
@@ -67,30 +68,12 @@ export type RecallNextResult =
   | { type: 'none'; message: string }
   | {
       type: 'just-review'
-      memoryTrackerId: number
+      memoryTrackerId: NonNullable<MemoryTrackerLite['memoryTrackerId']>
       notebookTitle: string
       title: string
       details?: string
     }
-  | {
-      type: 'mcq'
-      recallPromptId: number
-      notebookTitle: string
-      stem: string
-      choices: string[]
-    }
-  | {
-      type: 'spelling'
-      recallPromptId: number
-      notebookTitle: string
-      stem: string
-    }
-
-/** MCQ or spelling turn in the terminal; `null` means use the “just review this note” path. */
-type RecallQuestionInTerminal = Extract<
-  RecallNextResult,
-  { type: 'mcq' | 'spelling' }
->
+  | { type: 'question'; prompt: RecallPrompt }
 
 export function formatRecallNotebookCurrentPromptLine(
   notebookTitle: string
@@ -98,40 +81,20 @@ export function formatRecallNotebookCurrentPromptLine(
   return `📓 ${notebookTitle}`
 }
 
-function resolveRecallNotebookTitle(
+export function resolveRecallNotebookTitle(
   notebook?: { title?: string },
   note?: { noteTopology?: { notebookTitle?: string } }
 ): string {
   return notebook?.title ?? note?.noteTopology?.notebookTitle ?? 'Notebook'
 }
 
-function recallQuestionForTerminal(
+function isTerminalRecallQuestion(
   prompt: RecallPrompt | null | undefined
-): RecallQuestionInTerminal | null {
-  if (prompt == null) return null
-  const notebookTitle = resolveRecallNotebookTitle(prompt.notebook, prompt.note)
-  if (prompt.questionType === 'MCQ' && prompt.multipleChoicesQuestion) {
-    const mcq = prompt.multipleChoicesQuestion
-    return {
-      type: 'mcq',
-      recallPromptId: prompt.id,
-      notebookTitle,
-      stem: mcq.f0__stem ?? '',
-      choices: mcq.f1__choices ?? [],
-    }
-  }
-  if (prompt.questionType === 'SPELLING') {
-    return {
-      type: 'spelling',
-      recallPromptId: prompt.id,
-      notebookTitle: resolveRecallNotebookTitle(
-        prompt.spellingQuestion?.notebook ?? prompt.notebook,
-        prompt.note
-      ),
-      stem: prompt.spellingQuestion?.stem ?? '',
-    }
-  }
-  return null
+): prompt is RecallPrompt {
+  if (prompt == null) return false
+  if (prompt.questionType === 'MCQ' && prompt.multipleChoicesQuestion)
+    return true
+  return prompt.questionType === 'SPELLING'
 }
 
 export async function recallStatus(signal?: AbortSignal): Promise<string> {
@@ -182,8 +145,9 @@ export async function recallNext(
   } catch (e) {
     if (isFetchAbortedByCaller(e)) throw e
   }
-  const question = recallQuestionForTerminal(prompt)
-  if (question) return question
+  if (isTerminalRecallQuestion(prompt)) {
+    return { type: 'question', prompt }
+  }
 
   const trackerPayload = await runDefaultBackendJson<MemoryTracker>(() =>
     MemoryTrackerController.showMemoryTracker({
@@ -219,7 +183,7 @@ export async function answerQuiz(
   recallPromptId: number,
   choiceIndex: number,
   thinkingTimeMs?: number
-): Promise<{ correct: boolean }> {
+): Promise<Pick<Answer, 'correct'>> {
   const answered = await runDefaultBackendJson<RecallPrompt>(() =>
     RecallPromptController.answerQuiz({
       path: { recallPrompt: recallPromptId },
@@ -234,7 +198,7 @@ export async function answerSpelling(
   recallPromptId: number,
   spellingAnswer: string,
   thinkingTimeMs?: number
-): Promise<{ correct: boolean }> {
+): Promise<Pick<Answer, 'correct'>> {
   const answered = await runDefaultBackendJson<RecallPrompt>(() =>
     RecallPromptController.answerSpelling({
       path: { recallPrompt: recallPromptId },
@@ -276,11 +240,10 @@ export async function contestAndRegenerate(
       ...opts,
     })
   )
-  const next = recallQuestionForTerminal(regenerated)
-  if (next == null) {
+  if (!isTerminalRecallQuestion(regenerated)) {
     return { ok: false, message: 'Unexpected question type' }
   }
-  return { ok: true, result: next }
+  return { ok: true, result: { type: 'question', prompt: regenerated } }
 }
 
 export const recallCommandDocs = [

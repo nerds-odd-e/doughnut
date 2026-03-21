@@ -14,6 +14,7 @@ import {
   ttySessionWithSpies,
   type TTYStdin,
 } from './interactiveTestHelpers.js'
+import { recallNextQuestion } from '../recallNextTestShapes.js'
 
 describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
   let stdin: TTYStdin
@@ -28,12 +29,13 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
   })
 
   test('ESC in spelling prompt exits recall mode', async () => {
-    mockRecallNext.mockResolvedValue({
-      type: 'spelling',
-      notebookTitle: 'Notebook',
-      recallPromptId: 100,
-      stem: 'test',
-    })
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion({
+        id: 100,
+        questionType: 'SPELLING',
+        spellingQuestion: { stem: 'test' },
+      })
+    )
     mockAnswerSpelling.mockResolvedValue({ correct: true })
     await submitTTYCommand(stdin, '/recall')
 

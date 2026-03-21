@@ -19,6 +19,7 @@ import {
   ttyOutput,
   type TTYStdin,
 } from './interactiveTestHelpers.js'
+import { recallNextQuestion } from '../recallNextTestShapes.js'
 
 describe('TTY recall load wait — Esc cancels', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
@@ -111,13 +112,13 @@ describe('TTY contest wait — Esc cancels', () => {
     resetRecallStateForTesting()
     mockRecallNext.mockReset()
     mockContestAndRegenerate.mockReset()
-    mockRecallNext.mockResolvedValue({
-      type: 'mcq',
-      recallPromptId: 100,
-      notebookTitle: 'Notebook',
-      stem: 'Q?',
-      choices: ['A', 'B'],
-    })
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion({
+        id: 100,
+        questionType: 'MCQ',
+        multipleChoicesQuestion: { f0__stem: 'Q?', f1__choices: ['A', 'B'] },
+      })
+    )
     mockContestAndRegenerate.mockImplementation((_id, signal?: AbortSignal) => {
       return new Promise((_resolve, reject) => {
         signal?.addEventListener('abort', () => reject(userAbortError()), {

@@ -26,6 +26,7 @@ import {
   cursorPositionAfterTtyWrites,
   lastRowIndexContainingPlain,
 } from './ttyWriteSimulation.js'
+import { recallNextQuestion } from './recallNextTestShapes.js'
 
 const CURSOR_ROW_MESSAGE =
   'After painting the live region, the final CUU must land exactly on the → input row. ' +
@@ -68,13 +69,16 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
   }
 
   test('wide terminal (no choice wrap): cursor ends on the → input row', async () => {
-    mockRecallNext.mockResolvedValue({
-      type: 'mcq',
-      recallPromptId: 1,
-      notebookTitle: 'Notebook',
-      stem: 'Q?',
-      choices: ['A', 'B'],
-    })
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion({
+        id: 1,
+        questionType: 'MCQ',
+        multipleChoicesQuestion: {
+          f0__stem: 'Q?',
+          f1__choices: ['A', 'B'],
+        },
+      })
+    )
     await sessionWithColumns(100)
     await submitTTYCommand(stdin, '/recall')
     await tick()
@@ -82,13 +86,16 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
   })
 
   test('wrapped MCQ stem (narrow terminal), after ↓: cursor on the → input row', async () => {
-    mockRecallNext.mockResolvedValue({
-      type: 'mcq',
-      recallPromptId: 300,
-      notebookTitle: 'Notebook',
-      stem: 'A question long enough to wrap at thirty columns wide',
-      choices: ['A', 'B'],
-    })
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion({
+        id: 300,
+        questionType: 'MCQ',
+        multipleChoicesQuestion: {
+          f0__stem: 'A question long enough to wrap at thirty columns wide',
+          f1__choices: ['A', 'B'],
+        },
+      })
+    )
     await sessionWithColumns(30)
     await submitTTYCommand(stdin, '/recall')
     await tick()
@@ -102,13 +109,16 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
       'First option with enough text to wrap across multiple rows at narrow width',
       'Second option also long enough to wrap at this narrow terminal width here',
     ] as const
-    mockRecallNext.mockResolvedValue({
-      type: 'mcq',
-      recallPromptId: 4,
-      notebookTitle: 'Notebook',
-      stem: 'Pick:',
-      choices: [...choices],
-    })
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion({
+        id: 4,
+        questionType: 'MCQ',
+        multipleChoicesQuestion: {
+          f0__stem: 'Pick:',
+          f1__choices: [...choices],
+        },
+      })
+    )
     await sessionWithColumns(36)
     expect(
       formatMcqChoiceLines([...choices], 36).length,
@@ -137,13 +147,16 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
       'First option with enough text to wrap across multiple rows at narrow width',
       'B',
     ] as const
-    mockRecallNext.mockResolvedValue({
-      type: 'mcq',
-      recallPromptId: 3,
-      notebookTitle: 'Notebook',
-      stem: 'Pick:',
-      choices: [...choices],
-    })
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion({
+        id: 3,
+        questionType: 'MCQ',
+        multipleChoicesQuestion: {
+          f0__stem: 'Pick:',
+          f1__choices: [...choices],
+        },
+      })
+    )
     await sessionWithColumns(36)
     expect(
       formatMcqChoiceLines([...choices], 36).length

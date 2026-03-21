@@ -1,9 +1,17 @@
+import type {
+  MemoryTrackerLite,
+  MultipleChoicesQuestion,
+  RecallPrompt,
+} from 'doughnut-api'
+
 /** Choice strings from a recall multiple-choice prompt (API payload; may embed line breaks). */
-export type RecallMcqChoiceTexts = readonly string[]
+export type RecallMcqChoiceTexts = Readonly<
+  MultipleChoicesQuestion['f1__choices']
+>
 
 /** User is answering a multiple-choice recall question (choices in Current guidance; TTY stem in Current prompt). */
 export type McqRecallPending = {
-  recallPromptId: number
+  recallPromptId: RecallPrompt['id']
   choices: RecallMcqChoiceTexts
   /** Stem with markdown applied for the terminal (may include ANSI SGR). */
   stemRenderedForTerminal: string
@@ -14,13 +22,15 @@ export type McqRecallPending = {
 
 /** User is answering the spelling variant of a recall prompt. */
 export type SpellingRecallPending = {
-  recallPromptId: number
+  recallPromptId: RecallPrompt['id']
   type: 'spelling'
   shownAt: number
 }
 
 /** Just-review step: user answers y/n on whether they remember the note. */
-export type RecallJustReviewPending = { memoryTrackerId: number }
+export type RecallJustReviewPending = Required<
+  Pick<MemoryTrackerLite, 'memoryTrackerId'>
+>
 
 /** What recall is waiting for next, if anything. */
 export type PendingRecallAnswer =

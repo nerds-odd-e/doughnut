@@ -32,6 +32,7 @@ import {
 } from '../../src/interactive.js'
 import { stripAnsi } from '../../src/renderer.js'
 import { makeTempConfigDir, withConfigDir } from './interactiveTestHelpers.js'
+import { recallNextQuestion } from '../recallNextTestShapes.js'
 
 // Contract: processInput + default console adapter (same surface as -c / piped log). Not TTY bytes — see interactiveTty*.test.ts and .cursor/rules/cli.mdc → Vitest.
 
@@ -181,12 +182,13 @@ describe('processInput', () => {
   // contract: /recall via processInput — default console (below) and OutputAdapter + real recallNext (load cancel).
 
   test('spelling: prompt with markdown stem shows ANSI codes, not raw markdown', async () => {
-    mockRecallNext.mockResolvedValue({
-      type: 'spelling',
-      recallPromptId: 100,
-      notebookTitle: 'Notebook',
-      stem: '**bold** and *italic*',
-    })
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion({
+        id: 100,
+        questionType: 'SPELLING',
+        spellingQuestion: { stem: '**bold** and *italic*' },
+      })
+    )
 
     await processInput('/recall')
     const spellCall = logSpy.mock.calls.find(
@@ -203,12 +205,13 @@ describe('processInput', () => {
 
   test('spelling: Spell prompt, answer calls answerSpelling with thinkingTimeMs, then success messages', async () => {
     vi.useFakeTimers()
-    mockRecallNext.mockResolvedValue({
-      type: 'spelling',
-      recallPromptId: 100,
-      notebookTitle: 'Notebook',
-      stem: 'means incite violence',
-    })
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion({
+        id: 100,
+        questionType: 'SPELLING',
+        spellingQuestion: { stem: 'means incite violence' },
+      })
+    )
     mockAnswerSpelling.mockResolvedValue({ correct: true })
 
     await processInput('/recall')
@@ -225,12 +228,13 @@ describe('processInput', () => {
   })
 
   test('spelling: empty input prompts to type', async () => {
-    mockRecallNext.mockResolvedValue({
-      type: 'spelling',
-      recallPromptId: 100,
-      notebookTitle: 'Notebook',
-      stem: '...',
-    })
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion({
+        id: 100,
+        questionType: 'SPELLING',
+        spellingQuestion: { stem: '...' },
+      })
+    )
     mockAnswerSpelling.mockResolvedValue({ correct: false })
 
     await processInput('/recall')
@@ -419,13 +423,16 @@ describe('processInput', () => {
   })
 
   test('MCQ: stem goes to writeCurrentPrompt and choices to log when hooks differ', async () => {
-    mockRecallNext.mockResolvedValue({
-      type: 'mcq',
-      recallPromptId: 101,
-      notebookTitle: 'Notebook',
-      stem: 'Pick one',
-      choices: ['Alpha', 'Beta'],
-    })
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion({
+        id: 101,
+        questionType: 'MCQ',
+        multipleChoicesQuestion: {
+          f0__stem: 'Pick one',
+          f1__choices: ['Alpha', 'Beta'],
+        },
+      })
+    )
     const promptSpy = vi.fn()
     const logSpyLocal = vi.fn()
     const splitOutput = {
@@ -459,13 +466,16 @@ describe('processInput', () => {
   })
 
   test('MCQ: default console renders markdown in stem and choices as ANSI', async () => {
-    mockRecallNext.mockResolvedValue({
-      type: 'mcq',
-      recallPromptId: 100,
-      notebookTitle: 'Notebook',
-      stem: 'What is **2+2**?',
-      choices: ['*A*', '**B**', '`C`'],
-    })
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion({
+        id: 100,
+        questionType: 'MCQ',
+        multipleChoicesQuestion: {
+          f0__stem: 'What is **2+2**?',
+          f1__choices: ['*A*', '**B**', '`C`'],
+        },
+      })
+    )
 
     await processInput('/recall')
     const stemCall = logSpy.mock.calls.find(
@@ -501,26 +511,30 @@ describe('processInput', () => {
   test('/contest when in recall with MCQ contests and shows new question; regenerated MCQ answer passes thinkingTimeMs', async () => {
     vi.useFakeTimers()
     mockRecallNext
-      .mockResolvedValueOnce({
-        type: 'mcq',
-        recallPromptId: 100,
-        notebookTitle: 'Notebook',
-        stem: 'First question?',
-        choices: ['A', 'B', 'C'],
-      })
+      .mockResolvedValueOnce(
+        recallNextQuestion({
+          id: 100,
+          questionType: 'MCQ',
+          multipleChoicesQuestion: {
+            f0__stem: 'First question?',
+            f1__choices: ['A', 'B', 'C'],
+          },
+        })
+      )
       .mockResolvedValueOnce({
         type: 'none',
         message: '0 notes to recall today',
       })
     mockContestAndRegenerate.mockResolvedValue({
       ok: true,
-      result: {
-        type: 'mcq',
-        recallPromptId: 200,
-        notebookTitle: 'Notebook',
-        stem: 'Regenerated question?',
-        choices: ['X', 'Y', 'Z'],
-      },
+      result: recallNextQuestion({
+        id: 200,
+        questionType: 'MCQ',
+        multipleChoicesQuestion: {
+          f0__stem: 'Regenerated question?',
+          f1__choices: ['X', 'Y', 'Z'],
+        },
+      }),
     })
     mockAnswerQuiz.mockResolvedValue({ correct: true })
 
@@ -570,13 +584,13 @@ describe('processInput', () => {
   })
 
   test('/contest when contest fails shows error message', async () => {
-    mockRecallNext.mockResolvedValue({
-      type: 'mcq',
-      recallPromptId: 100,
-      notebookTitle: 'Notebook',
-      stem: 'Q?',
-      choices: ['A', 'B'],
-    })
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion({
+        id: 100,
+        questionType: 'MCQ',
+        multipleChoicesQuestion: { f0__stem: 'Q?', f1__choices: ['A', 'B'] },
+      })
+    )
     mockContestAndRegenerate.mockResolvedValue({
       ok: false,
       message: 'Question could not be regenerated',
@@ -659,13 +673,13 @@ describe('processInput', () => {
   // contract: explicit OutputAdapter (userNotice path; not default console.log)
 
   test('/contest abort logs Cancelled by user. as user notice', async () => {
-    mockRecallNext.mockResolvedValue({
-      type: 'mcq',
-      recallPromptId: 100,
-      notebookTitle: 'Notebook',
-      stem: 'Q?',
-      choices: ['A', 'B'],
-    })
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion({
+        id: 100,
+        questionType: 'MCQ',
+        multipleChoicesQuestion: { f0__stem: 'Q?', f1__choices: ['A', 'B'] },
+      })
+    )
     mockContestAndRegenerate.mockRejectedValue(userAbortError())
     const output = {
       log: vi.fn(),

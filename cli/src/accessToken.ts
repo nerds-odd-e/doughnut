@@ -5,6 +5,7 @@ import {
   getApiConfig,
   UserController,
   type GeneratedTokenDto,
+  type RequestOptions,
   type UserToken,
 } from 'doughnut-api'
 import { getConfigDir } from './configDir.js'
@@ -15,9 +16,8 @@ import { isFetchAbortedByCaller } from './fetchAbort.js'
  * {@link withBackendClient} / {@link runWithDefaultBackendClient}: non-OK responses and
  * fetch failures throw instead of returning `{ error }`.
  */
-export type DoughnutSdkCallOptions = {
+export type DoughnutSdkCallOptions = Partial<Pick<RequestOptions, 'signal'>> & {
   throwOnError: true
-  signal?: AbortSignal
 }
 
 export function doughnutSdkOptions(

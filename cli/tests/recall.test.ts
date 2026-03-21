@@ -21,6 +21,7 @@ import {
   recallStatus,
   RECALL_LOAD_CLI_TEST_DELAY_MS_ENV,
 } from '../src/recall.js'
+import { recallNextQuestion } from './recallNextTestShapes.js'
 
 vi.mock('doughnut-api', () => ({
   getApiConfig: () => ({ apiBaseUrl: 'http://localhost:9081' }),
@@ -410,15 +411,16 @@ describe('recallNext', () => {
     vi.mocked(RecallsController.recalling).mockResolvedValue(
       dueTrackersData([{ memoryTrackerId: 42 }])
     )
+    const prompt = {
+      ...makeMe.aRecallPrompt
+        .withId(100)
+        .withQuestionStem('What is 2+2?')
+        .withChoices(['4', '3', '5'])
+        .please(),
+      notebook: undefined,
+    }
     vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
-      data: {
-        ...makeMe.aRecallPrompt
-          .withId(100)
-          .withQuestionStem('What is 2+2?')
-          .withChoices(['4', '3', '5'])
-          .please(),
-        notebook: undefined,
-      },
+      data: prompt,
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
@@ -427,13 +429,7 @@ describe('recallNext', () => {
 
     const result = await recallNext()
 
-    expect(result).toEqual({
-      type: 'mcq',
-      recallPromptId: 100,
-      notebookTitle: 'Notebook',
-      stem: 'What is 2+2?',
-      choices: ['4', '3', '5'],
-    })
+    expect(result).toEqual(recallNextQuestion(prompt))
     expect(MemoryTrackerController.showMemoryTracker).not.toHaveBeenCalled()
   })
 
@@ -441,12 +437,13 @@ describe('recallNext', () => {
     vi.mocked(RecallsController.recalling).mockResolvedValue(
       dueTrackersData([{ memoryTrackerId: 42 }])
     )
+    const prompt = {
+      id: 100,
+      questionType: 'SPELLING' as const,
+      spellingQuestion: { stem: 'means incite violence' },
+    }
     vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
-      data: {
-        id: 100,
-        questionType: 'SPELLING',
-        spellingQuestion: { stem: 'means incite violence' },
-      },
+      data: prompt,
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
@@ -455,20 +452,16 @@ describe('recallNext', () => {
 
     const result = await recallNext()
 
-    expect(result).toEqual({
-      type: 'spelling',
-      recallPromptId: 100,
-      notebookTitle: 'Notebook',
-      stem: 'means incite violence',
-    })
+    expect(result).toEqual(recallNextQuestion(prompt))
   })
 
   test('returns spelling with empty stem when spellingQuestion missing', async () => {
     vi.mocked(RecallsController.recalling).mockResolvedValue(
       dueTrackersData([{ memoryTrackerId: 42 }])
     )
+    const prompt = { id: 100, questionType: 'SPELLING' as const }
     vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
-      data: { id: 100, questionType: 'SPELLING' },
+      data: prompt,
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
@@ -477,12 +470,7 @@ describe('recallNext', () => {
 
     const result = await recallNext()
 
-    expect(result).toEqual({
-      type: 'spelling',
-      recallPromptId: 100,
-      notebookTitle: 'Notebook',
-      stem: '',
-    })
+    expect(result).toEqual(recallNextQuestion(prompt))
   })
 
   test('throws when no default token', async () => {
@@ -557,19 +545,20 @@ describe('recallNext', () => {
     vi.mocked(RecallsController.recalling).mockResolvedValue(
       dueTrackersData([{ memoryTrackerId: 42 }])
     )
+    const prompt = (() => {
+      const physicsNotebook = makeMe.aNotebook
+      physicsNotebook.notebuilder.title('Physics')
+      return {
+        ...makeMe.aRecallPrompt
+          .withId(100)
+          .withQuestionStem('Q?')
+          .withChoices(['a'])
+          .please(),
+        notebook: physicsNotebook.please(),
+      }
+    })()
     vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
-      data: (() => {
-        const physicsNotebook = makeMe.aNotebook
-        physicsNotebook.notebuilder.title('Physics')
-        return {
-          ...makeMe.aRecallPrompt
-            .withId(100)
-            .withQuestionStem('Q?')
-            .withChoices(['a'])
-            .please(),
-          notebook: physicsNotebook.please(),
-        }
-      })(),
+      data: prompt,
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
@@ -578,13 +567,7 @@ describe('recallNext', () => {
 
     const result = await recallNext()
 
-    expect(result).toEqual({
-      type: 'mcq',
-      recallPromptId: 100,
-      notebookTitle: 'Physics',
-      stem: 'Q?',
-      choices: ['a'],
-    })
+    expect(result).toEqual(recallNextQuestion(prompt))
   })
 
   test('returns just-review with notebookTitle from note topology', async () => {
@@ -804,15 +787,16 @@ describe('contestAndRegenerate', () => {
     vi.mocked(RecallPromptController.contest).mockResolvedValue({
       data: { advice: 'improve', rejected: false },
     } as never)
+    const regenerated = {
+      ...makeMe.aRecallPrompt
+        .withId(200)
+        .withQuestionStem('New question?')
+        .withChoices(['A', 'B', 'C'])
+        .please(),
+      notebook: undefined,
+    }
     vi.mocked(RecallPromptController.regenerate).mockResolvedValue({
-      data: {
-        ...makeMe.aRecallPrompt
-          .withId(200)
-          .withQuestionStem('New question?')
-          .withChoices(['A', 'B', 'C'])
-          .please(),
-        notebook: undefined,
-      },
+      data: regenerated,
     } as never)
     vi.mocked(UserController.getTokenInfo).mockResolvedValue({
       data: { id: 1, label: 'Test Token' },
@@ -823,13 +807,7 @@ describe('contestAndRegenerate', () => {
 
     expect(result).toEqual({
       ok: true,
-      result: {
-        type: 'mcq',
-        recallPromptId: 200,
-        notebookTitle: 'Notebook',
-        stem: 'New question?',
-        choices: ['A', 'B', 'C'],
-      },
+      result: recallNextQuestion(regenerated),
     })
   })
 

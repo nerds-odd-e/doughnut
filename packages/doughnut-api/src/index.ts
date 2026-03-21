@@ -6,12 +6,15 @@ import {
   UserController,
 } from '@generated/doughnut-backend-api/sdk.gen'
 import type {
+  Answer,
   DueMemoryTrackers,
   GeneratedTokenDto,
   MemoryTracker,
   MemoryTrackerLite,
+  MultipleChoicesQuestion,
   QuestionContestResult,
   RecallPrompt,
+  SpellingQuestion,
   UserToken,
 } from '@generated/doughnut-backend-api'
 
@@ -62,11 +65,15 @@ export {
   UserController,
 }
 export type {
+  Answer,
   DueMemoryTrackers,
   GeneratedTokenDto,
   MemoryTracker,
   MemoryTrackerLite,
+  MultipleChoicesQuestion,
   QuestionContestResult,
   RecallPrompt,
+  SpellingQuestion,
   UserToken,
 }
+export type { RequestOptions } from '@generated/doughnut-backend-api/client/types.gen'

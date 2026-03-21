@@ -1,6 +1,8 @@
 /// <reference types="node" />
 import { describe, test, expect, type vi, beforeEach, afterEach } from 'vitest'
+import makeMe from 'doughnut-test-fixtures/makeMe'
 import { mockRecallNext } from './interactiveRecallMockAccess.js'
+import { recallNextQuestion } from '../recallNextTestShapes.js'
 import { resetRecallStateForTesting } from '../../src/interactive.js'
 import { formatRecallNotebookCurrentPromptLine } from '../../src/recall.js'
 import { stripAnsi } from '../../src/renderer.js'
@@ -27,13 +29,16 @@ describe('TTY recall: notebook first in Current prompt (all question kinds)', ()
   })
 
   test('MCQ: emoji notebook line precedes stem in live region', async () => {
-    mockRecallNext.mockResolvedValue({
-      type: 'mcq',
-      recallPromptId: 1,
-      notebookTitle: 'Chem',
-      stem: 'Q?',
-      choices: ['a', 'b'],
-    })
+    const chem = makeMe.aNotebook
+    chem.notebuilder.title('Chem')
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion({
+        id: 1,
+        questionType: 'MCQ',
+        notebook: chem.please(),
+        multipleChoicesQuestion: { f0__stem: 'Q?', f1__choices: ['a', 'b'] },
+      })
+    )
     await submitTTYCommand(stdin, '/recall')
     await tick()
     const plain = stripAnsi(ttyOutput(writeSpy))
@@ -43,12 +48,16 @@ describe('TTY recall: notebook first in Current prompt (all question kinds)', ()
   })
 
   test('spelling: notebook line precedes Spell prompt in scrollback', async () => {
-    mockRecallNext.mockResolvedValue({
-      type: 'spelling',
-      recallPromptId: 2,
-      notebookTitle: 'Chem',
-      stem: 'word',
-    })
+    const chem = makeMe.aNotebook
+    chem.notebuilder.title('Chem')
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion({
+        id: 2,
+        questionType: 'SPELLING',
+        notebook: chem.please(),
+        spellingQuestion: { stem: 'word' },
+      })
+    )
     await submitTTYCommand(stdin, '/recall')
     await tick()
     const plain = stripAnsi(ttyOutput(writeSpy))

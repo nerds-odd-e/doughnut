@@ -26,6 +26,7 @@ import {
   typeString,
   type TTYStdin,
 } from './interactiveTestHelpers.js'
+import { recallNextQuestion } from '../recallNextTestShapes.js'
 
 const GREY_SGR = '\x1b[90m'
 const SGR_RESET_LINE = '\x1b[0m\n'
@@ -52,13 +53,16 @@ describe('TTY recall MCQ', () => {
 
   beforeEach(async () => {
     resetRecallStateForTesting()
-    mockRecallNext.mockResolvedValue({
-      type: 'mcq',
-      recallPromptId: 100,
-      notebookTitle: 'Notebook',
-      stem: 'What is 2+2?',
-      choices: ['4', '3', '5'],
-    })
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion({
+        id: 100,
+        questionType: 'MCQ',
+        multipleChoicesQuestion: {
+          f0__stem: 'What is 2+2?',
+          f1__choices: ['4', '3', '5'],
+        },
+      })
+    )
     mockAnswerQuiz.mockResolvedValue({ correct: true })
     ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
   })
@@ -189,13 +193,19 @@ describe('TTY recall MCQ wrapped choices (narrow terminal)', () => {
       configurable: true,
     })
     resetRecallStateForTesting()
-    mockRecallNext.mockResolvedValue({
-      type: 'mcq',
-      recallPromptId: 200,
-      notebookTitle: 'Notebook',
-      stem: 'Pick:',
-      choices: ['Long first option text that must wrap in narrow cols', 'B'],
-    })
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion({
+        id: 200,
+        questionType: 'MCQ',
+        multipleChoicesQuestion: {
+          f0__stem: 'Pick:',
+          f1__choices: [
+            'Long first option text that must wrap in narrow cols',
+            'B',
+          ],
+        },
+      })
+    )
     mockAnswerQuiz.mockResolvedValue({ correct: true })
     ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
   })

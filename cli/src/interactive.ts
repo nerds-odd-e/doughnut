@@ -27,6 +27,7 @@ import {
   markAsRecalled,
   recallNext,
   recallStatus,
+  resolveRecallNotebookTitle,
   type RecallNextResult,
 } from './recall.js'
 import {
@@ -176,22 +177,46 @@ function showRecallPrompt(
   output: OutputAdapter,
   writeCurrentPrompt: (msg: string) => void
 ): void {
-  if (result.type === 'mcq') {
-    const stemRenderedForTerminal = renderMarkdownToTerminal(result.stem)
-    pendingRecallAnswer = {
-      recallPromptId: result.recallPromptId,
-      choices: result.choices,
-      stemRenderedForTerminal,
-      notebookTitle: result.notebookTitle,
-      shownAt: Date.now(),
-    }
-    if (!output.beginCurrentPrompt) {
-      emitMcqRecallQuestionForNonInteractiveOutput(
-        output,
-        result.notebookTitle,
+  if (result.type === 'question') {
+    const p = result.prompt
+    if (p.questionType === 'MCQ' && p.multipleChoicesQuestion) {
+      const mcq = p.multipleChoicesQuestion
+      const stem = mcq.f0__stem ?? ''
+      const choices = mcq.f1__choices ?? []
+      const notebookTitle = resolveRecallNotebookTitle(p.notebook, p.note)
+      const stemRenderedForTerminal = renderMarkdownToTerminal(stem)
+      pendingRecallAnswer = {
+        recallPromptId: p.id,
+        choices,
         stemRenderedForTerminal,
-        result.choices
+        notebookTitle,
+        shownAt: Date.now(),
+      }
+      if (!output.beginCurrentPrompt) {
+        emitMcqRecallQuestionForNonInteractiveOutput(
+          output,
+          notebookTitle,
+          stemRenderedForTerminal,
+          choices
+        )
+      }
+      return
+    }
+    if (p.questionType === 'SPELLING') {
+      const notebookTitle = resolveRecallNotebookTitle(
+        p.spellingQuestion?.notebook ?? p.notebook,
+        p.note
       )
+      output.beginCurrentPrompt?.()
+      writeCurrentPrompt(formatRecallNotebookCurrentPromptLine(notebookTitle))
+      const stem = p.spellingQuestion?.stem ?? ''
+      writeCurrentPrompt(`Spell: ${renderMarkdownToTerminal(stem || '...')}`)
+      pendingRecallAnswer = {
+        recallPromptId: p.id,
+        type: 'spelling',
+        shownAt: Date.now(),
+      }
+      return
     }
     return
   }
@@ -199,17 +224,6 @@ function showRecallPrompt(
   writeCurrentPrompt(
     formatRecallNotebookCurrentPromptLine(result.notebookTitle)
   )
-  if (result.type === 'spelling') {
-    writeCurrentPrompt(
-      `Spell: ${renderMarkdownToTerminal(result.stem || '...')}`
-    )
-    pendingRecallAnswer = {
-      recallPromptId: result.recallPromptId,
-      type: 'spelling',
-      shownAt: Date.now(),
-    }
-    return
-  }
   writeCurrentPrompt(result.title)
   if (result.details) {
     writeCurrentPrompt(renderMarkdownToTerminal(result.details))
@@ -436,11 +450,7 @@ export async function processInput(
         output.log(outcome.message)
         return false
       }
-      showRecallPrompt(
-        outcome.result as RecallPromptResult,
-        output,
-        writeCurrentPrompt
-      )
+      showRecallPrompt(outcome.result, output, writeCurrentPrompt)
     } catch (err) {
       logCancelledOrError(err, output)
     }
@@ -618,11 +628,7 @@ export async function processInput(
         output.beginCurrentPrompt?.()
         writeCurrentPrompt('Load more from next 3 days? (y/n)')
       } else {
-        showRecallPrompt(
-          result as RecallPromptResult,
-          output,
-          writeCurrentPrompt
-        )
+        showRecallPrompt(result, output, writeCurrentPrompt)
       }
     } catch (err) {
       endRecallSessionAfterFailedRecallLoad(err, output)
