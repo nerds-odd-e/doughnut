@@ -4,23 +4,22 @@ import {
   processInput,
   resetRecallStateForTesting,
   runInteractiveFetchWait,
+  getInteractiveFetchWaitLine,
 } from '../src/interactive.js'
 import {
   CLI_USER_ABORTED_WAIT_MESSAGE,
   userAbortError,
   userVisibleOutcomeFromCommandError,
 } from '../src/fetchAbort.js'
-import { cancelInteractiveFetchWaitFor } from '../src/interactiveFetchWait.js'
 import {
   buildBoxLines,
   buildLiveRegionLines,
   formatInteractiveFetchWaitPromptLine,
   isGreyDisabledInputChrome,
-  INTERACTIVE_FETCH_WAIT_PROMPT_FG,
   stripAnsi,
   GREY,
+  INTERACTIVE_FETCH_WAIT_PROMPT_FG,
 } from '../src/renderer.js'
-import type { RecallNextResult } from '../src/recall.js'
 
 const { mockRecallNext, mockRecallStatus } = vi.hoisted(() => ({
   mockRecallNext: vi.fn(),
@@ -42,14 +41,11 @@ vi.mock('../src/accessToken.js', async (importOriginal) => {
   return { ...actual, addAccessToken: mockAddAccessToken }
 })
 
-function outputAdapter() {
+function minimalOutputAdapter() {
   return {
     log: vi.fn(),
     logError: vi.fn(),
     logUserNotice: vi.fn(),
-    writeCurrentPrompt: vi.fn(),
-    beginCurrentPrompt: vi.fn(),
-    onInteractiveFetchWaitChanged: vi.fn(),
   }
 }
 
@@ -119,53 +115,21 @@ describe('interactive fetch wait UI', () => {
     ).toContain(INTERACTIVE_FETCH_WAIT_LINES.recallStatus)
   })
 
-  test('processInput /recall signals TTY once when recall fetch starts and once when it ends', async () => {
-    let resolveRecall!: (value: RecallNextResult) => void
-    mockRecallNext.mockImplementation(
-      (_due, _signal) =>
-        new Promise<RecallNextResult>((resolve) => {
-          resolveRecall = resolve
-        })
-    )
-    const out = outputAdapter()
-    const finished = processInput('/recall', out)
-    await vi.waitFor(() =>
-      expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalled()
-    )
-    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(1)
-    resolveRecall({ type: 'none', message: '0' })
-    await finished
-    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
-
-    resetRecallStateForTesting()
+  test('processInput /recall: rejected recallNext surfaces logError', async () => {
     mockRecallNext.mockRejectedValueOnce(new Error('network'))
-    const outErr = outputAdapter()
-    await processInput('/recall', outErr)
-    expect(outErr.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
-    expect(outErr.logError).toHaveBeenCalled()
+    const out = minimalOutputAdapter()
+    await processInput('/recall', out)
+    expect(out.logError).toHaveBeenCalled()
   })
 
-  test('processInput /recall-status signals fetch wait start and end', async () => {
-    let resolveStatus!: (value: string) => void
-    mockRecallStatus.mockImplementation(
-      (_signal?: AbortSignal) =>
-        new Promise<string>((resolve) => {
-          resolveStatus = resolve
-        })
-    )
-    const out = outputAdapter()
-    const done = processInput('/recall-status', out)
-    await vi.waitFor(() =>
-      expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalled()
-    )
-    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(1)
-    resolveStatus('2 notes to recall today')
-    await done
-    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
+  test('processInput /recall-status resolves and logs status text', async () => {
+    mockRecallStatus.mockResolvedValueOnce('2 notes to recall today')
+    const out = minimalOutputAdapter()
+    await processInput('/recall-status', out)
     expect(out.log).toHaveBeenCalledWith('2 notes to recall today')
   })
 
-  test('processInput /add-access-token signals fetch wait start and end', async () => {
+  test('processInput /add-access-token passes AbortSignal and logs Token added', async () => {
     let resolveAdd!: () => void
     mockAddAccessToken.mockImplementation(
       () =>
@@ -173,81 +137,28 @@ describe('interactive fetch wait UI', () => {
           resolveAdd = resolve
         })
     )
-    const out = outputAdapter()
+    const out = minimalOutputAdapter()
     const done = processInput('/add-access-token secret', out)
-    await vi.waitFor(() =>
-      expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalled()
-    )
-    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(1)
     resolveAdd()
     await done
-    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
     expect(mockAddAccessToken).toHaveBeenCalledWith(
       'secret',
       expect.any(AbortSignal)
     )
+    expect(out.log).toHaveBeenCalledWith('Token added')
   })
 
-  test('runInteractiveFetchWait notifies end wait after rejection', async () => {
-    const out = outputAdapter()
+  test('runInteractiveFetchWait clears active wait line after rejection', async () => {
+    const out = minimalOutputAdapter()
     await expect(
       runInteractiveFetchWait(
         out,
         INTERACTIVE_FETCH_WAIT_LINES.recallNext,
-        async (_signal) => {
+        async () => {
           throw new Error('fail')
         }
       )
     ).rejects.toThrow('fail')
-    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
-  })
-
-  test('/recall: abort during recall load logs cancellation and clears wait', async () => {
-    mockRecallNext.mockImplementation((_due, signal) => {
-      return new Promise<RecallNextResult>((_resolve, reject) => {
-        const onAbort = () => reject(userAbortError())
-        if (signal?.aborted) {
-          onAbort()
-          return
-        }
-        signal?.addEventListener('abort', onAbort, { once: true })
-      })
-    })
-    const out = outputAdapter()
-    const done = processInput('/recall', out)
-    await vi.waitFor(() =>
-      expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalled()
-    )
-    expect(cancelInteractiveFetchWaitFor(out)).toBe(true)
-    await done
-    expect(out.logUserNotice).toHaveBeenCalledWith(
-      CLI_USER_ABORTED_WAIT_MESSAGE
-    )
-    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
-  })
-
-  test('processInput /recall-status: Esc abort logs user-cancelled wait message.', async () => {
-    mockRecallStatus.mockImplementation((_signal?: AbortSignal) => {
-      return new Promise<string>((_resolve, reject) => {
-        if (_signal?.aborted) {
-          reject(userAbortError())
-          return
-        }
-        _signal?.addEventListener('abort', () => reject(userAbortError()), {
-          once: true,
-        })
-      })
-    })
-    const out = outputAdapter()
-    const done = processInput('/recall-status', out)
-    await vi.waitFor(() =>
-      expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalled()
-    )
-    expect(cancelInteractiveFetchWaitFor(out)).toBe(true)
-    await done
-    expect(out.logUserNotice).toHaveBeenCalledWith(
-      CLI_USER_ABORTED_WAIT_MESSAGE
-    )
-    expect(out.onInteractiveFetchWaitChanged).toHaveBeenCalledTimes(2)
+    expect(getInteractiveFetchWaitLine()).toBe(null)
   })
 })

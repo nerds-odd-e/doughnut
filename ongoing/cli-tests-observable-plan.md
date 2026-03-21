@@ -54,7 +54,7 @@ Informal plan. Aligned with `.cursor/rules/planning.mdc` → **Observable behavi
 
 ---
 
-## Phase 4 — `interactiveFetchWait`: shrink adapter-shaped tests
+## Phase 4 — `interactiveFetchWait`: shrink adapter-shaped tests ✅ done
 
 **Outcome:** Minimum spies on `OutputAdapter`; keep what Cypress cannot cover.
 
@@ -62,6 +62,8 @@ Informal plan. Aligned with `.cursor/rules/planning.mdc` → **Observable behavi
 - Replace **(a)** with **`runInteractive` + TTY** where stable (reuse `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` / existing patterns) when it **reduces** reliance on mock adapter shape.
 - Retain **(b)** only if **no** practical observable hook exists without flaking.
 - **Deliverable:** Smaller file or same coverage with fewer `mockInteractiveOutputAdapter`-style tests; `cli.mdc` “no E2E for transient loading” still respected.
+
+**Done (2026-03-21):** Dropped `onInteractiveFetchWaitChanged` / `cancelInteractiveFetchWaitFor` adapter tests duplicated by **`interactiveTtyFetchWaitEsc.test.ts`** (Esc → `Cancelled by user.`). Replaced “start/end signal” cases with **TTY** assertions on visible loading copy (`Loading recall questions`, `Loading recall status`) in that file. **`interactiveFetchWait.test.ts`** now keeps renderer/formatting, **`processInput` + minimal adapter** (log / logError only) for `/recall` error, `/recall-status` success, `/add-access-token` + signal, and **`getInteractiveFetchWaitLine()`** after `runInteractiveFetchWait` rejection instead of callback counts.
 
 ---
 

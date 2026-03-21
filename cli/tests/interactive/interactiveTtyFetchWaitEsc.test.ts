@@ -9,6 +9,7 @@ import {
   isInRecallSubstate,
   resetRecallStateForTesting,
 } from '../../src/interactive.js'
+import { stripAnsi } from '../../src/renderer.js'
 import {
   endTTYSession,
   pressKey,
@@ -38,6 +39,12 @@ describe('TTY recall load wait — Esc cancels', () => {
 
   afterEach(() => {
     endTTYSession(stdin)
+  })
+
+  test('while recall fetch is in flight, prompt shows loading recall copy', async () => {
+    await submitTTYCommand(stdin, '/recall')
+    await tick()
+    expect(stripAnsi(ttyOutput(writeSpy))).toContain('Loading recall questions')
   })
 
   test('Esc aborts recall fetch and shows Cancelled by user.', async () => {
@@ -77,6 +84,12 @@ describe('TTY recall-status wait — Esc cancels', () => {
     mockRecallStatus.mockImplementation((signal?: AbortSignal) =>
       actual.recallStatus(signal)
     )
+  })
+
+  test('while recall-status fetch is in flight, prompt shows loading status copy', async () => {
+    await submitTTYCommand(stdin, '/recall-status')
+    await tick()
+    expect(stripAnsi(ttyOutput(writeSpy))).toContain('Loading recall status')
   })
 
   test('Esc aborts recall-status fetch and shows Cancelled by user.', async () => {
