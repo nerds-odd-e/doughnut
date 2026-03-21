@@ -40,6 +40,8 @@
 
 ## Phase 2 — MCP server tests consume shared fixtures
 
+**Status:** Done — `mcp-server` devDepends on `doughnut-test-fixtures`; `add-note.test.ts` mocks `CreateNoteViaMcpResponse` via `makeMe.aNoteRealm`.
+
 **User-visible outcome:** At least one MCP test (or new focused test) builds inputs/responses using `makeMe` instead of ad-hoc objects.
 
 1. Add `doughnut-test-fixtures` as **devDependency** of `mcp-server`.

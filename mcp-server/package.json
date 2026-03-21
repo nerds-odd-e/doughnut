@@ -20,6 +20,7 @@
     "doughnut-api": "workspace:*"
   },
   "devDependencies": {
+    "doughnut-test-fixtures": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.27.1",
     "@types/node": "25.5.0",
     "esbuild": "0.27.4",

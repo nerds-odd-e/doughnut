@@ -1,4 +1,5 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
+import makeMe from 'doughnut-test-fixtures/makeMe'
 import { createMockContext, findTool } from '../helpers/index.js'
 import { McpNoteCreationController } from '@generated/doughnut-backend-api/sdk.gen'
 import { client } from '@generated/doughnut-backend-api/client.gen'
@@ -30,20 +31,8 @@ describe('add_note tool', () => {
     // Mock the service response
     const mockCreateNote = vi.mocked(McpNoteCreationController.createNoteViaMcp)
     const mockResponse: CreateNoteViaMcpResponse = {
-      created: {
-        note: {
-          noteTopology: {
-            title: 'Test Note',
-          },
-        },
-      },
-      parent: {
-        note: {
-          noteTopology: {
-            title: 'Parent Note',
-          },
-        },
-      },
+      created: makeMe.aNoteRealm.title('Test Note').please(),
+      parent: makeMe.aNoteRealm.title('Parent Note').please(),
     }
     // OpenAPI client returns { data, error, request, response } structure
     mockCreateNote.mockResolvedValue({
