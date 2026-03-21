@@ -69,12 +69,7 @@ Order by **risk reduction** and **mechanical migration**; each phase should end 
 
 ### Phase 4 — Interactive “Not supported” scenario
 
-- In `e2e_test/features/cli/cli_interactive_mode.feature`, add an `@interactiveCLI` scenario (with `@withCliConfig` if other interactive tests need the same backend/config hooks—match whatever `@interactiveCLI` scenarios that exercise the repo CLI require).
-- **Given** the same class of setup as other interactive tests (minimal: start interactive CLI via existing Before hook).
-- **When** use the **line** primitive step, e.g. `I enter "hello" in the interactive CLI` (not the slash-command step).
-- **Then** assert `Not supported` in **history output** (or Current guidance—match where the CLI actually renders that message in TTY mode; align with existing interactive assertion steps, not `non-interactive output`).
-
-If product behavior differs in TTY (message text or placement), adjust the Then to the correct section; the scenario intent is parity with `cli_non_interactive_mode.feature`’s “Piped stdin responds ‘Not supported’” / `-c "hello"` expectations.
+- **Done:** `cli_interactive_mode.feature` — `@withCliConfig` + `@interactiveCLI`, `I enter "hello" in the interactive CLI`, `Not supported` in **history output** (matches `processInput` → `output.log` in TTY; parity with piped / `-c "hello"` in `cli_non_interactive_mode.feature`).
 
 ### Phase 5 — Document “explicit conditions, dumb automation” in E2E rule
 
