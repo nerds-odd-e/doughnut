@@ -2,7 +2,7 @@ import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import { UserController } from 'doughnut-api'
+import { UserController, type UserToken } from 'doughnut-api'
 
 vi.mock('doughnut-api', () => ({
   getApiConfig: () => ({ apiBaseUrl: 'http://localhost:9081' }),
@@ -30,7 +30,7 @@ function createTempDir(): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-access-token-test-'))
 }
 
-function mockGetTokenInfo(label: string, id = 1) {
+function mockGetTokenInfo(label: UserToken['label'], id = 1) {
   return vi
     .mocked(UserController.getTokenInfo)
     .mockResolvedValueOnce({ data: { id, label } } as never)

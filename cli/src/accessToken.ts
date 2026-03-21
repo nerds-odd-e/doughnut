@@ -6,6 +6,7 @@ import {
   UserController,
   type GeneratedTokenDto,
   type RequestOptions,
+  type TokenConfigDto,
   type UserToken,
 } from 'doughnut-api'
 import { getConfigDir } from './configDir.js'
@@ -179,10 +180,11 @@ function inferredStatusForBackendErrorType(errorType: string): number {
 }
 
 export type AccessTokenEntry = Pick<GeneratedTokenDto, 'label' | 'token'>
+export type AccessTokenLabel = TokenConfigDto['label']
 
 interface AccessTokenConfig {
   tokens: AccessTokenEntry[]
-  defaultLabel?: string
+  defaultLabel?: AccessTokenLabel
 }
 
 function getConfigPath(): string {
@@ -272,7 +274,7 @@ export function listAccessTokens(): AccessTokenEntry[] {
   return loadConfig().tokens
 }
 
-export function removeAccessToken(label: string): boolean {
+export function removeAccessToken(label: AccessTokenLabel): boolean {
   const config = loadConfig()
   const index = config.tokens.findIndex((t) => t.label === label)
   if (index === -1) return false
@@ -285,7 +287,7 @@ export function removeAccessToken(label: string): boolean {
 }
 
 export async function removeAccessTokenCompletely(
-  label: string,
+  label: AccessTokenLabel,
   signal?: AbortSignal
 ): Promise<void> {
   const config = loadConfig()
@@ -299,7 +301,7 @@ export async function removeAccessTokenCompletely(
   removeAccessToken(label)
 }
 
-export function getDefaultTokenLabel(): string | undefined {
+export function getDefaultTokenLabel(): AccessTokenLabel | undefined {
   const config = loadConfig()
   if (config.tokens.length === 0) return undefined
   if (
@@ -311,14 +313,14 @@ export function getDefaultTokenLabel(): string | undefined {
   return config.tokens[0]!.label
 }
 
-export function setDefaultTokenLabel(label: string): void {
+export function setDefaultTokenLabel(label: AccessTokenLabel): void {
   const config = loadConfig()
   config.defaultLabel = label
   saveConfig(config)
 }
 
 export async function createAccessToken(
-  label: string,
+  label: AccessTokenLabel,
   signal?: AbortSignal
 ): Promise<void> {
   const config = loadConfig()
@@ -329,9 +331,10 @@ export async function createAccessToken(
       authenticatedBackendCallFailureAdvice.noDefaultTokenInConfig
     )
   }
+  const body: TokenConfigDto = { label }
   const row = await withBackendJson<GeneratedTokenDto>(defaultEntry.token, () =>
     UserController.generateToken({
-      body: { label },
+      body,
       ...doughnutSdkOptions(signal),
     })
   )
@@ -341,7 +344,7 @@ export async function createAccessToken(
 
 export function formatTokenLines(
   tokens: AccessTokenEntry[],
-  defaultLabel: string | undefined
+  defaultLabel: AccessTokenLabel | undefined
 ): string[] {
   return tokens.map((t) => {
     const prefix = t.label === defaultLabel ? '★ ' : '  '

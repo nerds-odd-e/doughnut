@@ -12,7 +12,11 @@ import {
   formatCommandCompletionLines,
   interactiveDocs,
 } from './help.js'
-import { formatTokenLines, type AccessTokenEntry } from './accessToken.js'
+import {
+  formatTokenLines,
+  type AccessTokenEntry,
+  type AccessTokenLabel,
+} from './accessToken.js'
 import {
   CURRENT_GUIDANCE_MAX_VISIBLE,
   formatHighlightedList,
@@ -588,7 +592,7 @@ export function applyChatHistoryOutputTone(
 /** Returns lines for Current guidance (access token list). */
 export function buildTokenListLines(
   tokens: AccessTokenEntry[],
-  defaultLabel: string | undefined,
+  defaultLabel: AccessTokenLabel | undefined,
   width: TerminalWidth,
   highlightIndex: number
 ): string[] {

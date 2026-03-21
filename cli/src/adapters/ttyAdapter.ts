@@ -1,6 +1,6 @@
 import * as readline from 'node:readline'
 import { Writable } from 'node:stream'
-import type { AccessTokenEntry } from '../accessToken.js'
+import type { AccessTokenEntry, AccessTokenLabel } from '../accessToken.js'
 import type { CommandDoc } from '../help.js'
 import {
   CLI_USER_ABORTED_WAIT_MESSAGE,
@@ -77,18 +77,18 @@ export interface TTYDeps {
   isMcqRecallPending: (p: PendingRecallAnswer) => p is McqRecallPending
   buildTokenListLines: (
     tokens: AccessTokenEntry[],
-    defaultLabel: string | undefined,
+    defaultLabel: AccessTokenLabel | undefined,
     width: number,
     highlightIndex: number
   ) => string[]
-  getDefaultTokenLabel: () => string | undefined
+  getDefaultTokenLabel: () => AccessTokenLabel | undefined
   listAccessTokens: () => AccessTokenEntry[]
-  removeAccessToken: (label: string) => boolean
+  removeAccessToken: (label: AccessTokenLabel) => boolean
   removeAccessTokenCompletely: (
-    label: string,
+    label: AccessTokenLabel,
     signal?: AbortSignal
   ) => Promise<void>
-  setDefaultTokenLabel: (label: string) => void
+  setDefaultTokenLabel: (label: AccessTokenLabel) => void
   formatVersionOutput: () => string
   getLastLine: (buffer: string) => string
   buildBoxLines: (
@@ -217,10 +217,13 @@ type LiveRegionLayout = {
   terminalWidth: number
 }
 
-export async function runTTY(
-  stdin: NodeJS.ReadableStream,
-  deps: TTYDeps
-): Promise<void> {
+type TTYInput = NodeJS.ReadableStream & {
+  setRawMode?: (mode: boolean) => void
+  resume?: () => void
+  setEncoding?: (encoding: BufferEncoding) => void
+}
+
+export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   const {
     processInput,
     getPendingRecallAnswer,
@@ -740,7 +743,10 @@ export async function runTTY(
   }
 
   stdin.on('keypress', async (str: string | undefined, key: ReadlineKey) => {
-    const submitPressed = isSubmitKey(key.name) || str === '\n' || str === '\r'
+    const submitPressed =
+      (key.name !== undefined && isSubmitKey(key.name)) ||
+      str === '\n' ||
+      str === '\r'
     if (key.ctrl && key.name === 'c') {
       process.stdout.write(`\x1b[${1}B\r\n`)
       doExit()

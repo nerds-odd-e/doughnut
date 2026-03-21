@@ -7,6 +7,8 @@ import {
 } from '@generated/doughnut-backend-api/sdk.gen'
 import type {
   Answer,
+  AnswerDto,
+  AnswerSpellingDto,
   DueMemoryTrackers,
   GeneratedTokenDto,
   MemoryTracker,
@@ -17,6 +19,7 @@ import type {
   QuestionContestResult,
   RecallPrompt,
   SpellingQuestion,
+  TokenConfigDto,
   UserToken,
 } from '@generated/doughnut-backend-api'
 
@@ -68,6 +71,8 @@ export {
 }
 export type {
   Answer,
+  AnswerDto,
+  AnswerSpellingDto,
   DueMemoryTrackers,
   GeneratedTokenDto,
   MemoryTracker,
@@ -78,6 +83,7 @@ export type {
   QuestionContestResult,
   RecallPrompt,
   SpellingQuestion,
+  TokenConfigDto,
   UserToken,
 }
 export type { RequestOptions } from '@generated/doughnut-backend-api/client/types.gen'

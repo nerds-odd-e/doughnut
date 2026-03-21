@@ -3,6 +3,7 @@ import { mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { expect, vi } from 'vitest'
+import type { AccessTokenEntry } from '../../src/accessToken.js'
 import {
   resetRecallStateForTesting,
   runInteractive,
@@ -94,7 +95,7 @@ export async function submitTTYCommand(stdin: TTYStdin, command: string) {
 }
 
 export function ttyOutput(writeSpy: ReturnType<typeof vi.spyOn>) {
-  return writeSpy.mock.calls.map((c) => c[0]).join('')
+  return writeSpy.mock.calls.map((c: [string]) => c[0]).join('')
 }
 
 /** Recall-session y/n answers append to scrollback without a grey input row or full-screen clear. */
@@ -119,9 +120,7 @@ export function lastStdoutLineContaining(
   return found
 }
 
-export function makeTempConfigDir(
-  tokens: Array<{ label: string; token: string }>
-) {
+export function makeTempConfigDir(tokens: AccessTokenEntry[]) {
   const configDir = mkdtempSync(join(tmpdir(), 'doughnut-test-'))
   writeFileSync(
     join(configDir, 'access-tokens.json'),
@@ -154,7 +153,7 @@ export function spyExitNoop(): ReturnType<typeof vi.spyOn> {
 }
 
 export async function startInteractiveOnStdin(stdin: TTYStdin) {
-  runInteractive(stdin as NodeJS.ReadableStream)
+  runInteractive(stdin as unknown as Parameters<typeof runInteractive>[0])
   await tick()
 }
 
@@ -185,6 +184,6 @@ export function endTTYSession(stdin: TTYStdin) {
 
 export async function runPipedInteractive(input: string) {
   const stdin = createMockStdin(input)
-  runInteractive(stdin as NodeJS.ReadableStream)
+  runInteractive(stdin as unknown as Parameters<typeof runInteractive>[0])
   await tick()
 }

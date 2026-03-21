@@ -3,6 +3,8 @@ import {
   RecallsController,
   RecallPromptController,
   type Answer,
+  type AnswerDto,
+  type AnswerSpellingDto,
   type DueMemoryTrackers,
   type MemoryTracker,
   type MemoryTrackerLite,
@@ -186,10 +188,14 @@ export async function answerQuiz(
   choiceIndex: number,
   thinkingTimeMs?: number
 ): Promise<Pick<Answer, 'correct'>> {
+  const body: AnswerDto = {
+    choiceIndex,
+    ...(thinkingTimeMs != null && { thinkingTimeMs }),
+  }
   const answered = await runDefaultBackendJson<RecallPrompt>(() =>
     RecallPromptController.answerQuiz({
       path: { recallPrompt: recallPromptId },
-      body: { choiceIndex, ...(thinkingTimeMs != null && { thinkingTimeMs }) },
+      body,
       ...doughnutSdkOptions(),
     })
   )
@@ -201,13 +207,14 @@ export async function answerSpelling(
   spellingAnswer: string,
   thinkingTimeMs?: number
 ): Promise<Pick<Answer, 'correct'>> {
+  const body: AnswerSpellingDto = {
+    spellingAnswer,
+    ...(thinkingTimeMs != null && { thinkingTimeMs }),
+  }
   const answered = await runDefaultBackendJson<RecallPrompt>(() =>
     RecallPromptController.answerSpelling({
       path: { recallPrompt: recallPromptId },
-      body: {
-        spellingAnswer,
-        ...(thinkingTimeMs != null && { thinkingTimeMs }),
-      },
+      body,
       ...doughnutSdkOptions(),
     })
   )
