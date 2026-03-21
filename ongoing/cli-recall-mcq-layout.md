@@ -66,6 +66,8 @@ Informal plan. Delete or trim when shipped.
 
 ### Phase 5 — Non-interactive / `processInput` parity
 
+**Done:** `emitMcqRecallQuestionForNonInteractiveOutput` in `interactive.ts` — stem → `writeCurrentPrompt` (else `log`); numbered choices + `Enter your choice…` → `log` only. `OutputAdapter` JSDOC updated.
+
 **Goal:** `processInput` + default `OutputAdapter` MCQ path (`cli/tests/interactive/processInput.test.ts`) should match the same **semantic** split: stem vs choices (stdout ordering may differ from TTY, but **no duplicate** choice listing in “prompt” vs “list” if both exist).
 
 **Scope:** `interactive.ts` export/helpers used by non-interactive logging.

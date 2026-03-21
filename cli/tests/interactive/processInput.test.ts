@@ -188,7 +188,7 @@ describe('processInput', () => {
 
     await processInput('/recall')
     const spellCall = logSpy.mock.calls.find(
-      (c) => typeof c[0] === 'string' && c[0].includes('Spell:')
+      (c: unknown[]) => typeof c[0] === 'string' && c[0].includes('Spell:')
     )
     expect(spellCall).toBeDefined()
     const output = spellCall![0] as string
@@ -409,6 +409,43 @@ describe('processInput', () => {
     )
   })
 
+  test('MCQ: stem goes to writeCurrentPrompt and choices to log when hooks differ', async () => {
+    mockRecallNext.mockResolvedValue({
+      type: 'mcq',
+      recallPromptId: 101,
+      stem: 'Pick one',
+      choices: ['Alpha', 'Beta'],
+    })
+    const promptSpy = vi.fn()
+    const logSpyLocal = vi.fn()
+    const splitOutput = {
+      log: logSpyLocal,
+      logError: vi.fn(),
+      writeCurrentPrompt: promptSpy,
+    }
+
+    await processInput('/recall', splitOutput)
+
+    expect(promptSpy).toHaveBeenCalledTimes(1)
+    expect(promptSpy.mock.calls[0]![0]).toContain('Pick one')
+    expect(
+      promptSpy.mock.calls.every(
+        (c: unknown[]) => !String(c[0]).includes('  1. ')
+      )
+    ).toBe(true)
+    expect(
+      logSpyLocal.mock.calls.some((c: unknown[]) =>
+        String(c[0]).includes('  1. ')
+      )
+    ).toBe(true)
+    expect(
+      logSpyLocal.mock.calls.some((c: unknown[]) =>
+        String(c[0]).includes('  2. ')
+      )
+    ).toBe(true)
+    expect(logSpyLocal).toHaveBeenCalledWith('Enter your choice (1-2):')
+  })
+
   test('MCQ: default console renders markdown in stem and choices as ANSI', async () => {
     mockRecallNext.mockResolvedValue({
       type: 'mcq',
@@ -419,7 +456,7 @@ describe('processInput', () => {
 
     await processInput('/recall')
     const stemCall = logSpy.mock.calls.find(
-      (c) =>
+      (c: unknown[]) =>
         typeof c[0] === 'string' &&
         (c[0] as string).includes('2+2') &&
         !(c[0] as string).includes('  1.')
@@ -431,14 +468,14 @@ describe('processInput', () => {
     expect(stripAnsi(stemOut)).toContain('2+2')
 
     const choiceCalls = logSpy.mock.calls.filter(
-      (c) =>
+      (c: unknown[]) =>
         typeof c[0] === 'string' &&
         ((c[0] as string).includes('  1.') ||
           (c[0] as string).includes('  2.') ||
           (c[0] as string).includes('  3.'))
     )
     expect(choiceCalls.length).toBeGreaterThanOrEqual(3)
-    const allChoices = choiceCalls.map((c) => c[0]).join(' ')
+    const allChoices = choiceCalls.map((c: unknown[]) => c[0]).join(' ')
     expect(allChoices).toContain('\x1b[')
     expect(allChoices).not.toContain('*A*')
     expect(allChoices).not.toContain('**B**')

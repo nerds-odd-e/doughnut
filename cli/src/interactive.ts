@@ -160,20 +160,22 @@ function getPlaceholderContext(inTokenList: boolean): PlaceholderContext {
   return 'default'
 }
 
-/** Console / piped recall MCQ: same lines the user would see without a TTY live region. */
-function writeMcqRecallQuestionToScrollback(
-  writeLine: (line: string) => void,
+/**
+ * Non-TTY MCQ: stem on `writeCurrentPrompt` (Current prompt analogue); numbered choices and
+ * “Enter your choice…” on `log` (Current guidance analogue). Avoids sending choice lines through both hooks.
+ */
+function emitMcqRecallQuestionForNonInteractiveOutput(
+  output: OutputAdapter,
   stemRenderedForTerminal: string,
   choices: readonly string[]
 ): void {
-  writeLine(stemRenderedForTerminal)
-  for (const line of recallMcqNumberedChoiceLines(
-    choices,
-    getTerminalWidth()
-  )) {
-    writeLine(line)
+  const writePrompt = output.writeCurrentPrompt ?? output.log
+  writePrompt(stemRenderedForTerminal)
+  const width = getTerminalWidth()
+  for (const line of recallMcqNumberedChoiceLines(choices, width)) {
+    output.log(line)
   }
-  writeLine(`Enter your choice (1-${choices.length}):`)
+  output.log(`Enter your choice (1-${choices.length}):`)
 }
 
 function showRecallPrompt(
@@ -190,8 +192,8 @@ function showRecallPrompt(
       shownAt: Date.now(),
     }
     if (!output.beginCurrentPrompt) {
-      writeMcqRecallQuestionToScrollback(
-        writeCurrentPrompt,
+      emitMcqRecallQuestionForNonInteractiveOutput(
+        output,
         stemRenderedForTerminal,
         result.choices
       )

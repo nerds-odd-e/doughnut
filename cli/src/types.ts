@@ -51,7 +51,10 @@ export type OutputAdapter = {
   logError: (err: unknown) => void
   /** Optional: user-facing notice (e.g. cancelled wait); TTY paints as distinct scrollback tone. */
   logUserNotice?: (msg: string) => void
-  /** Optional: for Current guidance (e.g. "Please answer y or n"). Defaults to log. */
+  /**
+   * Optional: short prompts (e.g. "Please answer y or n"). For non-TTY MCQ recall, the stem only
+   * is sent here; numbered choices and the "Enter your choice" line use `log`. Defaults to log.
+   */
   writeCurrentPrompt?: (msg: string) => void
   /**
    * TTY only: green separator before the first Current prompt line in a turn.
