@@ -142,6 +142,17 @@ class ClozeDescriptionTest {
     assertThat(result, containsString("dogma"));
   }
 
+  @Test
+  void clozeShouldMaskEvictedWhenTitleIsEvict() {
+    String result =
+        new ClozedString(
+                clozeReplacement,
+                "a single mother and her children have been **evicted from** their home")
+            .hide(new NoteTitle("evict"))
+            .maskedDetailsAsMarkdown();
+    assertThat(result, containsString("[...]"));
+  }
+
   @ParameterizedTest
   @CsvSource({
     "archenemy / arch-enemy, an archenemy here, an [...] here",

@@ -34,7 +34,7 @@ public class ClozePatternCreator {
       if (i > 0) sb.append(between);
       String word = words[i];
       sb.append(Pattern.quote(word));
-      if (i == words.length - 1) sb.append("s?(?:[_*])?(?!\\w)");
+      if (i == words.length - 1) sb.append("(?:s|ed|ing)?(?:[_*])?(?!\\w)");
     }
     return sb.toString();
   }
