@@ -140,7 +140,7 @@ describe('TTY: shared interactive session', () => {
       expect(suggestionLinesAfterInsert).toHaveLength(0)
     })
 
-    test('up at first wraps to last', async () => {
+    test('first up from `/` moves cursor to start; first suggestion stays highlighted', async () => {
       writeSpy.mockClear()
       typeString(stdin, '/')
       await tick()
@@ -149,13 +149,13 @@ describe('TTY: shared interactive session', () => {
 
       const output = ttyOutput(writeSpy)
       const lines = output.split('\n')
-      const recallLines = lines.filter((l) => l.includes('/recall'))
-      const recallLine = recallLines[recallLines.length - 1]
-      expect(recallLine).toBeDefined()
-      expect(recallLine).toContain('\x1b[7m')
+      const helpLines = lines.filter((l) => l.includes('/help'))
+      const helpLine = helpLines[helpLines.length - 1]
+      expect(helpLine).toBeDefined()
+      expect(helpLine).toContain('\x1b[7m')
     })
 
-    test('down at last wraps to first', async () => {
+    test('down with cursor at end does not cycle suggestion highlight', async () => {
       writeSpy.mockClear()
       typeString(stdin, '/')
       await tick()
@@ -201,18 +201,14 @@ describe('TTY: shared interactive session', () => {
       expect(output).not.toContain('/help')
     })
 
-    test('Enter inserts highlighted command', async () => {
+    test('Enter with only `/` inserts first highlighted command', async () => {
       writeSpy.mockClear()
       typeString(stdin, '/')
       await tick()
-      for (let i = 0; i < 9; i++) {
-        pressKey(stdin, 'down')
-        await tick()
-      }
       pressEnter(stdin)
       await tick()
 
-      expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /last email ')
+      expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /help ')
     })
 
     test('Tab with /he completes to /help with space', async () => {

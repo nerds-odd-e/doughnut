@@ -26,7 +26,7 @@ describe('TTY mode slash command suggestions with scroll', () => {
     endTTYSession(stdin)
   })
 
-  test('shows "↑ more above" when scrolled down', async () => {
+  test('↑↓ no longer scroll long suggestion lists; first item stays highlighted', async () => {
     writeSpy.mockClear()
     typeString(stdin, '/')
     await tick()
@@ -35,10 +35,13 @@ describe('TTY mode slash command suggestions with scroll', () => {
       await tick()
     }
 
-    expect(ttyOutput(writeSpy)).toContain('↑ more above')
+    const output = ttyOutput(writeSpy)
+    expect(output).toContain('\x1b[7m')
+    expect(output).toContain('/cmd0')
+    expect(output).not.toContain('↑ more above')
   })
 
-  test('hides "↓ more below" when at bottom', async () => {
+  test('many down presses do not reveal last command in the guidance window', async () => {
     writeSpy.mockClear()
     typeString(stdin, '/')
     await tick()
@@ -48,8 +51,6 @@ describe('TTY mode slash command suggestions with scroll', () => {
     }
 
     const output = ttyOutput(writeSpy)
-    const lastMoreBelow = output.lastIndexOf('↓ more below')
-    const lastCmd11 = output.lastIndexOf('/cmd11')
-    expect(lastCmd11).toBeGreaterThan(lastMoreBelow)
+    expect(output).not.toContain('/cmd11')
   })
 })

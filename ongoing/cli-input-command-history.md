@@ -35,11 +35,13 @@ Scope: **`/add-access-token`** only unless product asks to extend (e.g. other pa
 
 ## Phased delivery (scenario-first)
 
-### Phase A — Input history behavior (TTY, in-process)
+### Phase A — Input history behavior (TTY, in-process) ✅
 
 **User-visible:** In interactive TTY mode, ↑↓ walk previous submissions; first ↑ moves cursor to start if not already there; first ↓ moves cursor to end if not already there; after ↑ into history, cursor at **beginning**; after ↓ within history, cursor at **end**; stepping ↓ past the “newest” stored line restores the **pre-history draft** (what the user had typed before first ↑), or **empty** if there was none.
 
-**Implementation sketch:**
+**Done:** Pure state in `cli/src/inputHistoryNav.ts` (Vitest: `cli/tests/inputHistoryNav.test.ts`). TTY wiring in `cli/src/adapters/ttyAdapter.ts` (caret row/column in box, left/right/home/end, backspace before cursor, insert at cursor). **↑↓ no longer cycle slash-command suggestions** (use **Tab** / Enter on first match); see `cli/tests/interactive/interactiveTtySession.test.ts` and `interactiveTtySuggestionScroll.test.ts`. TTY smoke: `cli/tests/interactive/interactiveTtyInputHistory.test.ts`.
+
+**Implementation sketch (historical):**
 
 - Maintain a **deque/array** of submitted lines (trimmed non-empty, same eligibility as `isCommittedInteractiveInput`), cap ~100 in memory aligned with later persistence.
 - Maintain **`historyBrowseIndex`**: `null` = editing fresh draft, `0` = most recent submitted, increasing = older (or the inverse — pick one convention and stick to it).
