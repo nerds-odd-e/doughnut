@@ -17,7 +17,7 @@ alwaysApply: false
 ## Overview
 
 This project uses multiple linting tools to ensure code quality:
-- **Biome**: Frontend, Cypress, and root-level TypeScript/JavaScript code
+- **Biome**: Frontend, CLI, MCP server, `packages/doughnut-test-fixtures`, Cypress, and other root-level TypeScript/JavaScript code
 - **Redocly CLI**: OpenAPI specification validation
 - **Backend linting**: Java code quality checks (via Gradle)
 
@@ -36,6 +36,8 @@ CURSOR_DEV=true nix develop -c pnpm lint:all
 This runs:
 - Backend Java linting (`pnpm backend:lint`)
 - Frontend TypeScript/Vue linting (`pnpm frontend:lint`)
+- CLI TypeScript linting (`pnpm cli:lint`)
+- Shared API test fixtures (`packages/doughnut-test-fixtures`) via Biome (`pnpm test-fixtures:lint`)
 - Cypress E2E test linting (`pnpm cy:lint`)
 - OpenAPI specification linting (`pnpm openapi:lint`)
 
@@ -43,6 +45,8 @@ This runs:
 
 - `pnpm backend:lint` - Java code linting
 - `pnpm frontend:lint` - Frontend TypeScript/Vue linting
+- `pnpm cli:lint` - CLI TypeScript linting
+- `pnpm test-fixtures:lint` - Biome on `packages/doughnut-test-fixtures` only
 - `pnpm cy:lint` - Cypress E2E test linting
 - `pnpm openapi:lint` - OpenAPI spec validation
 

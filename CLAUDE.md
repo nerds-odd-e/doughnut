@@ -45,6 +45,8 @@ CURSOR_DEV=true nix develop -c <command>
 | Open Cypress IDE | `pnpm cy:open` |
 | Format all code | `pnpm format:all` |
 | Lint all code | `pnpm lint:all` |
+| Format shared API test fixtures only (Biome) | `pnpm test-fixtures:format` |
+| Lint shared API test fixtures only (Biome) | `pnpm test-fixtures:lint` |
 | Regenerate TypeScript from OpenAPI | `pnpm generateTypeScript` |
 | Connect to local DB | `mysql -S $MYSQL_HOME/mysql.sock -u doughnut -p` (password: doughnut) |
 

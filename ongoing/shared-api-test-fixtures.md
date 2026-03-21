@@ -75,7 +75,7 @@
 
 ## Phase 5 — Explicit Biome coverage for `doughnut-test-fixtures`
 
-**Status:** Not started.
+**Status:** Done — `packages/doughnut-test-fixtures` has `format` / `lint` (Biome); root `test-fixtures:format` / `test-fixtures:lint`; `format:all` and `lint:all` run them.
 
 **User-visible outcome:** Formatting and lint for the fixtures package are impossible to miss in scripts and docs; no reliance on “it happens to be inside root `**`.”
 

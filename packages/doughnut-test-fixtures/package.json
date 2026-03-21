@@ -3,8 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "scripts": {
+    "format": "biome check --write .",
+    "lint": "biome check ."
+  },
   "dependencies": {
     "@generated/doughnut-backend-api": "workspace:*"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.8"
   },
   "exports": {
     ".": "./src/makeMe.ts",
