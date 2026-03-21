@@ -6,6 +6,7 @@
  * - Current guidance: interactive only, prompts/hints/options for current input
  */
 import {
+  cliOutputHasInteractiveLayout,
   getHistoryOutputContent,
   getHistoryInputContent,
   getRecallDisplaySections,
@@ -23,6 +24,29 @@ const SECTION_LABELS = {
 
 export const OUTPUT_ALIAS = '@doughnutOutput'
 const CONTENT_PREVIEW_LEN = 500
+
+const WRONG_NON_INTERACTIVE_ASSERTION =
+  'This capture looks like interactive PTY output (contains the doughnut interactive-input-ready marker). Use: Then I should see "…" in the history output — or Current guidance / history input — not "…" in the non-interactive output. (Piped CLI runs have no marker; use non-interactive steps even when you see a box.)'
+
+const WRONG_INTERACTIVE_SECTION_ASSERTION = (section: string) =>
+  `This capture has no interactive PTY marker (piped/-c/subcommand stdout). Use: Then I should see "…" in the non-interactive output — not "…" in the ${section}.`
+
+function assertNonInteractiveOutputShape(output: string): void {
+  expect(
+    !cliOutputHasInteractiveLayout(output),
+    WRONG_NON_INTERACTIVE_ASSERTION
+  ).to.be.true
+}
+
+function assertInteractiveSectionOutputShape(
+  output: string,
+  sectionLabel: string
+): void {
+  expect(
+    cliOutputHasInteractiveLayout(output),
+    WRONG_INTERACTIVE_SECTION_ASSERTION(sectionLabel)
+  ).to.be.true
+}
 
 function withOutput(cb: (output: string) => void): void {
   cy.get<string>(OUTPUT_ALIAS).then(cb)
@@ -51,36 +75,48 @@ function assertInSection(
 function outputSection(
   getContent: (output: string) => string,
   sectionLabel: string,
-  options: { expectNotContains?: boolean } = { expectNotContains: true }
+  options: {
+    expectNotContains?: boolean
+    assertOutputShape?: (output: string, label: string) => void
+  } = { expectNotContains: true }
 ) {
-  const { expectNotContains } = options
+  const { expectNotContains, assertOutputShape } = options
   return {
     expectContains(expected: string) {
-      withOutput((output) =>
+      withOutput((output) => {
+        assertOutputShape?.(output, sectionLabel)
         assertInSection(getContent(output), expected, sectionLabel, true)
-      )
+      })
     },
     ...(expectNotContains && {
       expectNotContains(expected: string) {
-        withOutput((output) =>
+        withOutput((output) => {
+          assertOutputShape?.(output, sectionLabel)
           assertInSection(getContent(output), expected, sectionLabel, false)
-        )
+        })
       },
     }),
   }
 }
 
 function nonInteractiveOutput() {
-  return outputSection((o) => o, SECTION_LABELS.nonInteractiveOutput)
+  return outputSection((o) => o, SECTION_LABELS.nonInteractiveOutput, {
+    assertOutputShape: (output) => assertNonInteractiveOutputShape(output),
+  })
 }
 
 function historyOutput() {
-  return outputSection(getHistoryOutputContent, SECTION_LABELS.historyOutput)
+  return outputSection(getHistoryOutputContent, SECTION_LABELS.historyOutput, {
+    assertOutputShape: (output, label) =>
+      assertInteractiveSectionOutputShape(output, label),
+  })
 }
 
 function historyInput() {
   return outputSection(getHistoryInputContent, SECTION_LABELS.historyInput, {
     expectNotContains: false,
+    assertOutputShape: (output, label) =>
+      assertInteractiveSectionOutputShape(output, label),
   })
 }
 
@@ -108,6 +144,10 @@ function currentGuidance() {
   return {
     expectContains(expected: string) {
       withOutput((output) => {
+        assertInteractiveSectionOutputShape(
+          output,
+          SECTION_LABELS.currentGuidance
+        )
         const { currentGuidanceAndHistory } = getRecallDisplaySections(output)
         const msg = currentGuidanceAndHistory.includes(expected)
           ? undefined
@@ -117,6 +157,10 @@ function currentGuidance() {
     },
     expectStyled(expected: string) {
       withOutput((output) => {
+        assertInteractiveSectionOutputShape(
+          output,
+          SECTION_LABELS.currentGuidance
+        )
         const rawContent = getCurrentGuidanceAndHistoryRaw(output)
         assertInSection(
           rawContent,
@@ -139,6 +183,7 @@ function inputBoxTopBorder() {
   return {
     expectExactlyOne() {
       withOutput((output) => {
+        assertInteractiveSectionOutputShape(output, 'interactive CLI input box')
         const count =
           countInputBoxTopBorderLinesInInteractivePtyTranscript(output)
         expect(

@@ -165,6 +165,18 @@ function collectSectionLines(
   return result
 }
 
+/**
+ * True for PTY-driven interactive captures only.
+ * Piped `runPiped` also draws ┌─┐ and grey past-input lines but does not emit this OSC — use non-interactive assertion steps for that.
+ * Inlined: byte-identical to `INTERACTIVE_INPUT_READY_OSC` in `cli/src/renderer.ts`.
+ */
+const INTERACTIVE_INPUT_READY_OSC =
+  '\x1b]900;doughnut-interactive-input-ready\x07' as const
+
+export function cliOutputHasInteractiveLayout(output: string): boolean {
+  return output.includes(INTERACTIVE_INPUT_READY_OSC)
+}
+
 // --- Public API ---
 
 function getSectionContent(output: string, section: Section): string {
