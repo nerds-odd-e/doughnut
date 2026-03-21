@@ -5,6 +5,7 @@ import { CLEAR_SCREEN } from '../../src/renderer.js'
 import {
   createMockTTYStdin,
   endTTYSession,
+  GREY_BG_PAST_INPUT,
   pressEnter,
   spyConsoleLogNoop,
   spyExitNoop,
@@ -85,5 +86,22 @@ describe('TTY exit: no full-screen redraw', () => {
       outAfterSubmit,
       'Exit should not run doFullRedraw (clear screen + live region); that leaves the cursor in the input row after exit'
     ).not.toContain(CLEAR_SCREEN)
+  })
+
+  test('after Enter on exit, committed line appears as grey history input (same as other submits)', async () => {
+    typeString(stdin, 'exit')
+    await tick()
+    writeSpy.mockClear()
+    pressEnter(stdin)
+    await tick()
+    await vi.waitFor(() => expect(exitSpy).toHaveBeenCalledWith(0))
+
+    const outAfterSubmit = ttyOutput(writeSpy)
+    expect(outAfterSubmit).toContain(GREY_BG_PAST_INPUT)
+    expect(outAfterSubmit).toContain('exit')
+    expect(
+      outAfterSubmit,
+      'must not repaint the live input box after quit'
+    ).not.toContain('┌')
   })
 })

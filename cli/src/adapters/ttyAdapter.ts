@@ -541,9 +541,13 @@ export async function runTTY(
 
   /**
    * Paints the last history turn (input grey block + output lines) without {@link CLEAR_SCREEN}, then
-   * {@link drawBox}. Token-list completion already wrote `renderPastInput` when entering selection mode.
+   * {@link drawBox} unless {@link options.skipDrawBox} (e.g. quit after `exit` — keep scrollback, no live input box).
+   * Token-list completion already wrote `renderPastInput` when entering selection mode.
    */
-  function paintCommittedTurnAppend(inputAlreadyPainted: boolean): void {
+  function paintCommittedTurnAppend(
+    inputAlreadyPainted: boolean,
+    options?: { skipDrawBox?: boolean }
+  ): void {
     const h = chatHistory
     const last = h[h.length - 1]
     const prev = h[h.length - 2]
@@ -561,7 +565,19 @@ export async function runTTY(
     for (const line of last.lines) {
       process.stdout.write(`${applyChatHistoryOutputTone(line, outTone)}\n`)
     }
-    drawBox()
+    if (!options?.skipDrawBox) {
+      drawBox()
+    }
+  }
+
+  function commitExitTurnToScrollback(): void {
+    chatHistory.push({
+      type: 'output',
+      lines: [...commandTurn.lines],
+      tone: commandTurn.tone,
+    })
+    resetLivePaintCursor()
+    paintCommittedTurnAppend(false, { skipDrawBox: true })
   }
 
   function stopInteractiveFetchWaitRepaintTimer(): void {
@@ -719,6 +735,7 @@ export async function runTTY(
         resetCommandTurnBuffer()
         chatHistory.push({ type: 'input', content: inputForHistory })
         if (await processInput(effectiveInput, ttyOutput)) {
+          commitExitTurnToScrollback()
           doExit()
           return
         }
@@ -855,6 +872,7 @@ export async function runTTY(
         if (isCommittedInteractiveInput(input)) {
           chatHistory.push({ type: 'input', content: input })
           if (await processInput(input, ttyOutput)) {
+            commitExitTurnToScrollback()
             doExit()
             return
           }
