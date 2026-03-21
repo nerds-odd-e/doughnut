@@ -9,7 +9,7 @@ Given('the backend is serving the CLI and install script', () =>
 When('I install the CLI from localhost without affecting my system', () =>
   cli.installation().installFromLocalhost()
 )
-When('I run the installed doughnut command', () =>
+When('I run the installed doughnut command in interactive mode', () =>
   cli.installation().runInstalled()
 )
 When('I run the installed doughnut version command', () =>
