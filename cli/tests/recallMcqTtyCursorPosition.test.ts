@@ -95,7 +95,7 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
     assertCursorOnInputPromptRow(ttyOutput(writeSpy))
   })
 
-  test('narrow terminal (both choices wrap), after ↓ repaint: cursor on the → input row', async () => {
+  test('wrapped choices: after ↓↑↓, cursor on → row and live region does not drift into history', async () => {
     const choices = [
       'First option with enough text to wrap across multiple rows at narrow width',
       'Second option also long enough to wrap at this narrow terminal width here',
@@ -115,44 +115,18 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
     await tick()
     pressKey(stdin, 'down')
     await tick()
-    assertCursorOnInputPromptRow(ttyOutput(writeSpy))
-  })
-
-  test('after multiple ↓ navigations, live region does not drift into history', async () => {
-    const choices = [
-      'First option with enough text to wrap across multiple rows at narrow width',
-      'Second option also long enough to wrap at this narrow terminal width here',
-    ] as const
-    mockRecallNext.mockResolvedValue({
-      type: 'mcq',
-      recallPromptId: 5,
-      stem: 'Pick:',
-      choices: [...choices],
-    })
-    await sessionWithColumns(36)
-    await submitTTYCommand(stdin, '/recall')
-    await tick()
-    pressKey(stdin, 'down')
-    await tick()
     pressKey(stdin, 'up')
     await tick()
     pressKey(stdin, 'down')
     await tick()
-    const { lines } = cursorPositionAfterTtyWrites(ttyOutput(writeSpy))
+    const raw = ttyOutput(writeSpy)
+    assertCursorOnInputPromptRow(raw)
+    const { lines } = cursorPositionAfterTtyWrites(raw)
     const recallRow = lastRowIndexContainingPlain(lines, '/recall')
     const separatorRow = lastRowIndexContainingPlain(lines, '─'.repeat(10))
-    expect(
-      recallRow,
-      'Sanity: /recall past-input line should be visible in the output.'
-    ).toBeGreaterThanOrEqual(0)
-    expect(
-      separatorRow,
-      'Sanity: the ─── separator above the MCQ stem should appear.'
-    ).toBeGreaterThanOrEqual(0)
-    expect(
-      separatorRow,
-      'The separator (start of live region) must appear AFTER the /recall past-input. If it appears earlier, the live region drifted upward into history.'
-    ).toBeGreaterThan(recallRow)
+    expect(recallRow).toBeGreaterThanOrEqual(0)
+    expect(separatorRow).toBeGreaterThanOrEqual(0)
+    expect(separatorRow).toBeGreaterThan(recallRow)
   })
 
   test('narrow then resize (guidance shrinks): cursor still on the → input row', async () => {

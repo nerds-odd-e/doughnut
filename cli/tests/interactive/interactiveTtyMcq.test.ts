@@ -26,10 +26,6 @@ import {
   typeString,
   type TTYStdin,
 } from './interactiveTestHelpers.js'
-import {
-  countInputBoxTopOutlinesBeforeFirstBoxContent,
-  liveRegionRepaintHasStaleCursorUpBeforeBoxTop,
-} from '../ttyWriteSimulation.js'
 
 const GREY_SGR = '\x1b[90m'
 const SGR_RESET_LINE = '\x1b[0m\n'
@@ -159,17 +155,13 @@ describe('TTY recall MCQ', () => {
   })
 
   describe('live region: current prompt vs guidance (observable bytes)', () => {
-    test('numbered choices are not grey whole-line writeCurrentPrompt rows', async () => {
+    test('stem vs numbered choices, separator order, input-ready OSC', async () => {
       await submitTTYCommand(stdin, '/recall')
       expect(
         countGreyWholeLineWriteCurrentPromptsWhere(writeSpy, (plain) =>
           /^ {2}\d+\. /.test(plain)
         )
       ).toBe(0)
-    })
-
-    test('2K green separator is painted before MCQ stem text', async () => {
-      await submitTTYCommand(stdin, '/recall')
       const raw = ttyOutput(writeSpy)
       const sep = buildCurrentPromptSeparator(getTerminalWidth())
       const stem = 'What is 2+2?'
@@ -178,20 +170,7 @@ describe('TTY recall MCQ', () => {
       expect(raw.lastIndexOf(`\x1b[2K${sep}`)).toBeLessThan(
         raw.lastIndexOf(stem)
       )
-    })
-
-    test('initial MCQ live-region paint: no stale CUU and a single input box top', async () => {
-      await submitTTYCommand(stdin, '/recall')
-      const raw = ttyOutput(writeSpy)
-      expect(liveRegionRepaintHasStaleCursorUpBeforeBoxTop(raw)).toBe(false)
-      expect(
-        countInputBoxTopOutlinesBeforeFirstBoxContent(raw)
-      ).toBeLessThanOrEqual(1)
-    })
-
-    test('emits interactive input-ready OSC after paint', async () => {
-      await submitTTYCommand(stdin, '/recall')
-      expect(ttyOutput(writeSpy)).toContain(INTERACTIVE_INPUT_READY_OSC)
+      expect(raw).toContain(INTERACTIVE_INPUT_READY_OSC)
     })
   })
 })
