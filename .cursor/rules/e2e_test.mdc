@@ -68,6 +68,7 @@ The backend service log is located at `backend/logs/doughnut-e2e.log`. Please ma
 
 - Keep step definitions lightweight
 - Delegate implementation details to Page Objects, preferably as **fluent** chains (see §3)
+- When user-visible behavior differs (input kind, navigation, mode), use **different steps** and thin implementations—do not hide variants behind one parameterized step (see **§9**)
 - Use TypeScript for better type safety
 - Reuse steps across features when possible
 - Use parameter types for complex objects
@@ -213,13 +214,15 @@ injectNotes(noteTestData: NoteTestData[]) {
 }
 ```
 
-### 9. Explicit conditions: avoid “smart” branches in steps and page objects
+### 9. Explicit conditions, dumb automation: avoid “smart” branches
 
-- A scenario describes **one fixed path**. Step definitions and page objects should **not** encode alternate behaviors with conditional logic (large `if` / `switch` trees, parameter sniffing, mode flags) **except** when the branch exists **only** to **assert** or **fail fast** with a clear error.
-- **Distinguish differences at the caller:** prefer separate steps and/or separate page-object methods over one generic helper that decides what to do at runtime.
-- **Name the condition in Gherkin** when behavior differs (e.g. different kinds of input or navigation). Readable scenarios plus explicit steps keep automation shallow; branching in test code should be rare.
+A scenario describes **one fixed path**. Prefer **dumb** automation: the path is visible in Gherkin and in small, purpose-named page-object methods—not inferred at runtime from a string or flag.
 
-(Related example: interactive CLI input—use distinct steps for slash-command entry vs plain line vs Enter, instead of one function that inspects the string.)
+- **Conditional logic in steps and page objects:** avoid large `if` / `switch` trees, parameter sniffing, and mode flags **except** when a branch exists **only** to **assert** or **fail fast** with a clear error.
+- **Distinguish variants at the caller:** use different steps and/or different page-object methods (and scenarios when needed), not one “smart” API that infers what to do from parameters.
+- **State the condition in step wording** when behavior differs—for example **slash command** (space then Enter) vs **plain line** (line then Enter) vs **Enter** alone vs **ESC**—so readers and tools see a fixed sequence without opening implementation code.
+
+**Motivating example (CLI):** interactive CLI E2E used to send one string through heuristics; it now uses explicit Gherkin steps and a typed `InteractiveCliPtyKeystroke` union encoded in one place (`cliPtyRunner.ts`). See **`cli.mdc`** (CLI E2E / PTY keystroke contract) for the current steps and types—extend the union and encoder together, do not add parallel send paths that reintroduce inference.
 
 ## Linting Errors and E2E Tests
 
@@ -241,7 +244,7 @@ CURSOR_DEV=true nix develop -c pnpm format:all
 
 ## Common Pitfalls to Avoid
 
-1. Don't put complex logic in step definitions (see **§9. Explicit conditions**—avoid hiding variants behind one parameterized step or page-object method)
+1. Don't put complex logic in step definitions (see **§9**—avoid hiding variants behind one parameterized step or page-object method)
 2. Don't create long scenarios with many steps
 3. Don't rely on test order
 4. Don't use hardcoded waits
