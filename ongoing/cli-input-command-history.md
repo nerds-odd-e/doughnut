@@ -71,7 +71,7 @@ Scope: **`/add-access-token`** only unless product asks to extend (e.g. other pa
 
 **Preferred fix (product):** When applying a committed line into the box from **history navigation**, if the line is an incomplete `/` command with suggestions, **append a single trailing space** to the recalled `lineDraft` so `lastLine.endsWith(' ')` is true and `isCommandPrefixWithSuggestions` is **false**—arrows go to domain history/caret logic. (Alternative: dismiss suggestions whenever entering history recall; pick **one** representation—trailing space keeps behavior aligned with “complete the command with a space” and matches existing `isCommandPrefixWithSuggestions` guard.)
 
-**Done:** `normalizeRecalledLineDraftForSlashSuggestionExit` and `lineDraftAppliedFromHistory` in `cli/src/interactiveCommandInput.ts`; `onArrowUp` / `onArrowDown` take optional `lineHasIncompleteSlashSuggestions` (TTY passes `isCommandPrefixWithSuggestions`). **Tests:** `cli/tests/interactiveCommandInput.test.ts` (normalizer + history walk with synthetic predicate).
+**Done:** `normalizeRecalledLineDraftForSlashSuggestionExit` and private `recalledDraftForInputBox` in `cli/src/interactiveCommandInput.ts`; `onArrowUp` / `onArrowDown` take optional `SlashSuggestionPickerApplies` (TTY passes `isCommandPrefixWithSuggestions`). **Tests:** `cli/tests/interactiveCommandInput.test.ts` (normalizer + history walk with synthetic predicate).
 
 ---
 

@@ -5,8 +5,6 @@ import {
   appendCommittedCommand,
   applyLastLineEdit,
   caretOneLeft,
-  caretToDraftEnd,
-  caretToDraftStart,
   clearLiveCommandLine,
   deleteBeforeCaret,
   emptyInteractiveCommandInput,
@@ -18,6 +16,7 @@ import {
   replaceLastLogicalLine,
   ttyArrowKeyUsesSlashSuggestionCycle,
   type InteractiveCommandInput,
+  type SlashSuggestionPickerApplies,
 } from '../src/interactiveCommandInput.js'
 
 function commandInputWith(
@@ -111,9 +110,9 @@ describe('applyLastLineEdit', () => {
   })
 })
 
-describe('TTY slash-suggestion vs ↑ precedence (phase A1)', () => {
-  test('first ↑ moves caret to start when not in history and caret is not at 0, even if slash suggestions apply', () => {
-    const lineDraft = '/help_PHASE_A1_UNIQUE'
+describe('Input command history: slash suggestion picker vs ↑↓ while editing live draft', () => {
+  test('first ↑ moves caret home without cycling highlights when the picker would apply', () => {
+    const lineDraft = '/help_tty_arrow_up'
     const state = commandInputWith({
       lineDraft,
       caretOffset: 2,
@@ -122,84 +121,16 @@ describe('TTY slash-suggestion vs ↑ precedence (phase A1)', () => {
     })
     expect(
       ttyArrowKeyUsesSlashSuggestionCycle('up', state, false, true),
-      'first ↑ must not use slash suggestion cycling while the caret is still away from column 0'
+      'slash cycling must wait until the caret is at column 0'
     ).toBe(false)
     const after = onArrowUp(state)
-    expect(
-      after.lineDraft,
-      'first ↑ must leave lineDraft unchanged (no history recall, no suggestion side effects)'
-    ).toBe(lineDraft)
-    expect(
-      after.caretOffset,
-      'first ↑ must move the caret to the start of the draft when not in history mode'
-    ).toBe(0)
+    expect(after.lineDraft).toBe(lineDraft)
+    expect(after.caretOffset).toBe(0)
     expect(after.historyWalkIndex).toBe(null)
   })
-})
 
-describe('normalizeRecalledLineDraftForSlashSuggestionExit (phase A3)', () => {
-  test('appends one trailing space on the last line when the slash-prefix predicate is true', () => {
-    expect(
-      normalizeRecalledLineDraftForSlashSuggestionExit('/help_A3', true)
-    ).toBe('/help_A3 ')
-  })
-
-  test('leaves the draft unchanged when the predicate is false', () => {
-    expect(
-      normalizeRecalledLineDraftForSlashSuggestionExit('/help_A3', false)
-    ).toBe('/help_A3')
-  })
-
-  test('only extends the last logical line in a multiline recalled draft', () => {
-    expect(
-      normalizeRecalledLineDraftForSlashSuggestionExit('a\n/help_A3', true)
-    ).toBe('a\n/help_A3 ')
-  })
-})
-
-describe('recalled incomplete slash commands and ↑↓ history (phase A3)', () => {
-  const incompleteSlash = (d: string) => d === '/help_A3'
-
-  test('first ↑ into history normalizes a recalled line that would be slash-suggestion mode', () => {
-    const out = onArrowUp(
-      commandInputWith({
-        lineDraft: 'draft',
-        caretOffset: 0,
-        committedCommands: ['/help_A3', '/clear_A3'],
-      }),
-      incompleteSlash
-    )
-    expect(out.historyWalkIndex).toBe(0)
-    expect(out.lineDraft).toBe('/help_A3 ')
-    expect(out.caretOffset).toBe(0)
-  })
-
-  test('↓ within history still navigates when the current recalled line was normalized', () => {
-    const fromOlder = onArrowUp(
-      commandInputWith({
-        lineDraft: 'draft',
-        caretOffset: 0,
-        committedCommands: ['/clear_A3', '/help_A3'],
-      }),
-      incompleteSlash
-    )
-    expect(fromOlder.historyWalkIndex).toBe(0)
-    expect(fromOlder.lineDraft).toBe('/clear_A3')
-
-    const showingHelp = onArrowUp(fromOlder, incompleteSlash)
-    expect(showingHelp.historyWalkIndex).toBe(1)
-    expect(showingHelp.lineDraft).toBe('/help_A3 ')
-
-    const backToClear = onArrowDown(showingHelp, incompleteSlash)
-    expect(backToClear.historyWalkIndex).toBe(0)
-    expect(backToClear.lineDraft).toBe('/clear_A3')
-    expect(backToClear.caretOffset).toBe('/clear_A3'.length)
-  })
-})
-
-describe('TTY slash-suggestion vs ↓ precedence (phase A2)', () => {
-  test('first ↓ moves caret to end when not in history and caret is not at end, even if slash suggestions apply', () => {
-    const lineDraft = '/help_PHASE_A2_UNIQUE'
+  test('first ↓ moves caret to end without cycling highlights when the picker would apply', () => {
+    const lineDraft = '/help_tty_arrow_down'
     const state = commandInputWith({
       lineDraft,
       caretOffset: 2,
@@ -208,18 +139,63 @@ describe('TTY slash-suggestion vs ↓ precedence (phase A2)', () => {
     })
     expect(
       ttyArrowKeyUsesSlashSuggestionCycle('down', state, false, true),
-      'first ↓ must not use slash suggestion cycling while the caret is still away from the end of the draft'
+      'slash cycling must wait until the caret is at the end of the draft'
     ).toBe(false)
     const after = onArrowDown(state)
-    expect(
-      after.lineDraft,
-      'first ↓ must leave lineDraft unchanged (no history recall, no suggestion side effects)'
-    ).toBe(lineDraft)
-    expect(
-      after.caretOffset,
-      'first ↓ must move the caret to the end of the draft when not in history mode'
-    ).toBe(lineDraft.length)
+    expect(after.lineDraft).toBe(lineDraft)
+    expect(after.caretOffset).toBe(lineDraft.length)
     expect(after.historyWalkIndex).toBe(null)
+  })
+})
+
+describe('Input command history: recalled drafts leave slash suggestion picker', () => {
+  test('normalizeRecalledLineDraftForSlashSuggestionExit appends a trailing space only on the last line when needed', () => {
+    expect(
+      normalizeRecalledLineDraftForSlashSuggestionExit('/help_hist', true)
+    ).toBe('/help_hist ')
+    expect(
+      normalizeRecalledLineDraftForSlashSuggestionExit('/help_hist', false)
+    ).toBe('/help_hist')
+    expect(
+      normalizeRecalledLineDraftForSlashSuggestionExit('a\n/help_hist', true)
+    ).toBe('a\n/help_hist ')
+  })
+
+  test('↑↓ through history still walks entries when a recalled line would have opened the picker', () => {
+    const pickerWouldApply: SlashSuggestionPickerApplies = (d) =>
+      d === '/help_hist'
+
+    const intoNewest = onArrowUp(
+      commandInputWith({
+        lineDraft: 'draft',
+        caretOffset: 0,
+        committedCommands: ['/help_hist', '/clear_hist'],
+      }),
+      pickerWouldApply
+    )
+    expect(intoNewest.historyWalkIndex).toBe(0)
+    expect(intoNewest.lineDraft).toBe('/help_hist ')
+    expect(intoNewest.caretOffset).toBe(0)
+
+    const fromOlder = onArrowUp(
+      commandInputWith({
+        lineDraft: 'draft',
+        caretOffset: 0,
+        committedCommands: ['/clear_hist', '/help_hist'],
+      }),
+      pickerWouldApply
+    )
+    expect(fromOlder.historyWalkIndex).toBe(0)
+    expect(fromOlder.lineDraft).toBe('/clear_hist')
+
+    const showingHelp = onArrowUp(fromOlder, pickerWouldApply)
+    expect(showingHelp.historyWalkIndex).toBe(1)
+    expect(showingHelp.lineDraft).toBe('/help_hist ')
+
+    const backToClear = onArrowDown(showingHelp, pickerWouldApply)
+    expect(backToClear.historyWalkIndex).toBe(0)
+    expect(backToClear.lineDraft).toBe('/clear_hist')
+    expect(backToClear.caretOffset).toBe('/clear_hist'.length)
   })
 })
 
@@ -344,24 +320,6 @@ describe('caretOneLeft', () => {
       commandInputWith({ lineDraft: 'ab', caretOffset: 1 })
     )
     expect(out.caretOffset).toBe(0)
-  })
-})
-
-describe('caretToDraftStart', () => {
-  test('sets the caret to the start of the draft', () => {
-    const out = caretToDraftStart(
-      commandInputWith({ lineDraft: 'ab', caretOffset: 1 })
-    )
-    expect(out.caretOffset).toBe(0)
-  })
-})
-
-describe('caretToDraftEnd', () => {
-  test('sets the caret past the last code unit', () => {
-    const out = caretToDraftEnd(
-      commandInputWith({ lineDraft: 'ab', caretOffset: 0 })
-    )
-    expect(out.caretOffset).toBe(2)
   })
 })
 

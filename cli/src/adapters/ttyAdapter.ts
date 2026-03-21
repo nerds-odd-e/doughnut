@@ -20,8 +20,6 @@ import {
   applyLastLineEdit,
   caretOneLeft,
   caretOneRight,
-  caretToDraftEnd,
-  caretToDraftStart,
   clearLiveCommandLine,
   deleteBeforeCaret,
   emptyInteractiveCommandInput,
@@ -986,10 +984,13 @@ export async function runTTY(
       commandInput = caretOneRight(commandInput)
       drawBox()
     } else if (key.name === 'home') {
-      commandInput = caretToDraftStart(commandInput)
+      commandInput = { ...commandInput, caretOffset: 0 }
       drawBox()
     } else if (key.name === 'end') {
-      commandInput = caretToDraftEnd(commandInput)
+      commandInput = {
+        ...commandInput,
+        caretOffset: commandInput.lineDraft.length,
+      }
       drawBox()
     } else if (key.name === 'tab') {
       const lastLine = getLastLine(commandInput.lineDraft)
