@@ -8,8 +8,7 @@ import process from 'node:process'
 import { afterEach, describe, expect, test, type vi } from 'vitest'
 import './interactive/interactiveTestMocks.js'
 import { resetRecallStateForTesting } from '../src/interactive.js'
-import { recallMcqNumberedChoiceLines } from '../src/recallMcqDisplay.js'
-import { PROMPT } from '../src/renderer.js'
+import { formatMcqChoiceLines, PROMPT } from '../src/renderer.js'
 import {
   mockAnswerQuiz,
   mockRecallNext,
@@ -94,7 +93,7 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
     })
     await sessionWithColumns(36)
     expect(
-      recallMcqNumberedChoiceLines([...choices], 36).length,
+      formatMcqChoiceLines([...choices], 36).length,
       'Sanity: this fixture must wrap to more than two physical choice lines at width 36 or the regression does not apply.'
     ).toBeGreaterThanOrEqual(3)
     await submitTTYCommand(stdin, '/recall')
@@ -117,7 +116,7 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
     })
     await sessionWithColumns(36)
     expect(
-      recallMcqNumberedChoiceLines([...choices], 36).length,
+      formatMcqChoiceLines([...choices], 36).length,
       'Sanity: both choices must produce multiple physical lines at width 36.'
     ).toBeGreaterThanOrEqual(5)
     await submitTTYCommand(stdin, '/recall')
@@ -177,7 +176,7 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
     })
     await sessionWithColumns(36)
     expect(
-      recallMcqNumberedChoiceLines([...choices], 36).length
+      formatMcqChoiceLines([...choices], 36).length
     ).toBeGreaterThanOrEqual(3)
     await submitTTYCommand(stdin, '/recall')
     await tick()

@@ -101,10 +101,7 @@ export interface TTYDeps {
     width: number,
     options?: { forceCommandsHint?: boolean }
   ) => string[]
-  recallMcqStemWrappedLinesForCurrentPrompt: (
-    stemRenderedForTerminal: string,
-    width: number
-  ) => string[]
+  wrapMarkdownTerminalToLines: (text: string, width: number) => string[]
   recallMcqCurrentGuidanceLines: (
     choices: RecallMcqChoiceTexts,
     selectedChoiceIndex: number,
@@ -241,7 +238,7 @@ export async function runTTY(
     getLastLine,
     buildBoxLines,
     buildSuggestionLines,
-    recallMcqStemWrappedLinesForCurrentPrompt,
+    wrapMarkdownTerminalToLines,
     recallMcqCurrentGuidanceLines,
     getTerminalWidth,
     buildCurrentPromptSeparator,
@@ -412,7 +409,7 @@ export async function runTTY(
         isMcqRecallPending(pendingRecallAnswer) &&
         !isPendingRecallStopConfirmation()
       ) {
-        currentPromptWrappedLines = recallMcqStemWrappedLinesForCurrentPrompt(
+        currentPromptWrappedLines = wrapMarkdownTerminalToLines(
           pendingRecallAnswer.stemRenderedForTerminal,
           width
         )

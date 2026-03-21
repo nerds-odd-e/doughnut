@@ -2,7 +2,6 @@ import { describe, test, expect } from 'vitest'
 import {
   CURRENT_GUIDANCE_MAX_VISIBLE,
   formatHighlightedList,
-  formatHighlightedListByItem,
 } from '../src/listDisplay.js'
 import { stripAnsi } from '../src/renderer.js'
 
@@ -79,15 +78,15 @@ describe('formatHighlightedList', () => {
   })
 })
 
-describe('formatHighlightedListByItem', () => {
+describe('formatHighlightedList with itemIndexPerLine', () => {
   test('highlights all physical lines for the selected item', () => {
     const lines = ['aa', 'ab', 'ac', 'b', 'c']
     const perLine = [0, 0, 0, 1, 2]
-    const result = formatHighlightedListByItem(
+    const result = formatHighlightedList(
       lines,
-      perLine,
       CURRENT_GUIDANCE_MAX_VISIBLE,
-      0
+      0,
+      perLine
     )
     const hi = result.filter((l) => l.includes('\x1b[7m'))
     expect(hi).toHaveLength(3)
@@ -98,11 +97,11 @@ describe('formatHighlightedListByItem', () => {
   test('overflow window: scroll anchors to first line of selected item', () => {
     const lines = Array.from({ length: 12 }, (_, i) => `L${i}`)
     const perLine = [0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    const result = formatHighlightedListByItem(
+    const result = formatHighlightedList(
       lines,
-      perLine,
       CURRENT_GUIDANCE_MAX_VISIBLE,
-      10
+      10,
+      perLine
     )
     expect(result).toHaveLength(8)
     expect(stripAnsi(result[7]!)).toContain('L11')

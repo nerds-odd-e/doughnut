@@ -3,81 +3,33 @@ import { GREY, RESET, REVERSE } from './ansi.js'
 /** Max visible lines in Current guidance scrollable lists (commands, tokens, MCQ). */
 export const CURRENT_GUIDANCE_MAX_VISIBLE = 8
 
-/** Scrollable list with fixed-height window. Indicators replace option slots, never add lines. */
-export function formatHighlightedList(
-  lines: string[],
-  maxVisible = CURRENT_GUIDANCE_MAX_VISIBLE,
-  highlightIndex = 0
-): string[] {
-  const total = lines.length
-  if (total === 0) return []
-
-  const isOverflowing = total > maxVisible
-  if (!isOverflowing) {
-    return lines.map((line, i) =>
-      i === highlightIndex
-        ? `${REVERSE}${line}${RESET}`
-        : `${GREY}${line}${RESET}`
-    )
-  }
-
-  const scrollOffset = computeScrollOffset(total, maxVisible, highlightIndex)
-  const window = lines.slice(scrollOffset, scrollOffset + maxVisible)
-  const showMoreAbove = shouldShowMoreAbove(
-    scrollOffset,
-    highlightIndex,
-    maxVisible,
-    total
-  )
-  const showMoreBelow = shouldShowMoreBelow(
-    scrollOffset,
-    highlightIndex,
-    maxVisible,
-    total
-  )
-
-  const firstOptionIndex = showMoreAbove ? 1 : 0
-  const lastOptionIndex = showMoreBelow ? window.length - 2 : window.length - 1
-  const highlightPosInWindow = highlightIndex - scrollOffset
-
-  const result: string[] = []
-  if (showMoreAbove) result.push(`${GREY}  ↑ more above${RESET}`)
-  for (let i = firstOptionIndex; i <= lastOptionIndex; i++) {
-    const line = window[i]
-    const isHighlighted = i === highlightPosInWindow
-    result.push(
-      isHighlighted ? `${REVERSE}${line}${RESET}` : `${GREY}${line}${RESET}`
-    )
-  }
-  if (showMoreBelow) result.push(`${GREY}  ↓ more below${RESET}`)
-  return result
-}
-
 /**
- * Like {@link formatHighlightedList}, but each physical line belongs to a logical item (e.g. MCQ choice).
- * Scroll anchoring uses the first line of `selectedItemIndex`; all lines for that item are highlighted.
+ * Scrollable list with fixed-height window. Indicators replace option slots, never add lines.
+ *
+ * When `itemIndexPerLine` is provided, `highlightIndex` is a logical item index:
+ * all physical lines belonging to that item are highlighted, and scroll anchors on
+ * the first line of the item.
  */
-export function formatHighlightedListByItem(
-  lines: string[],
-  itemIndexPerLine: readonly number[],
+export function formatHighlightedList(
+  lines: readonly string[],
   maxVisible = CURRENT_GUIDANCE_MAX_VISIBLE,
-  selectedItemIndex = 0
+  highlightIndex = 0,
+  itemIndexPerLine?: readonly number[]
 ): string[] {
   const total = lines.length
   if (total === 0) return []
 
-  let anchorLine = 0
-  for (let i = 0; i < total; i++) {
-    if (itemIndexPerLine[i] === selectedItemIndex) {
-      anchorLine = i
-      break
-    }
-  }
+  const anchorLine = itemIndexPerLine
+    ? itemIndexPerLine.indexOf(highlightIndex)
+    : highlightIndex
+  const isHighlightedLine = itemIndexPerLine
+    ? (idx: number) => itemIndexPerLine[idx] === highlightIndex
+    : (idx: number) => idx === anchorLine
 
   const isOverflowing = total > maxVisible
   if (!isOverflowing) {
     return lines.map((line, i) =>
-      itemIndexPerLine[i] === selectedItemIndex
+      isHighlightedLine(i)
         ? `${REVERSE}${line}${RESET}`
         : `${GREY}${line}${RESET}`
     )
@@ -105,11 +57,10 @@ export function formatHighlightedListByItem(
   if (showMoreAbove) result.push(`${GREY}  ↑ more above${RESET}`)
   for (let i = firstOptionIndex; i <= lastOptionIndex; i++) {
     const line = window[i]!
-    const actualLineIndex = scrollOffset + i
-    const isHighlighted =
-      itemIndexPerLine[actualLineIndex] === selectedItemIndex
     result.push(
-      isHighlighted ? `${REVERSE}${line}${RESET}` : `${GREY}${line}${RESET}`
+      isHighlightedLine(scrollOffset + i)
+        ? `${REVERSE}${line}${RESET}`
+        : `${GREY}${line}${RESET}`
     )
   }
   if (showMoreBelow) result.push(`${GREY}  ↓ more below${RESET}`)

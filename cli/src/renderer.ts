@@ -17,7 +17,12 @@ import {
   CURRENT_GUIDANCE_MAX_VISIBLE,
   formatHighlightedList,
 } from './listDisplay.js'
-import type { ChatHistory, ChatHistoryOutputTone } from './types.js'
+import { renderMarkdownToTerminal } from './markdown.js'
+import type {
+  ChatHistory,
+  ChatHistoryOutputTone,
+  RecallMcqChoiceTexts,
+} from './types.js'
 import type { InteractiveFetchWaitLine } from './interactiveFetchWait.js'
 import { formatVersionOutput } from './version.js'
 
@@ -388,20 +393,87 @@ export function buildLiveRegionLines(
   return lines
 }
 
+/** Newline-aware terminal wrap for markdown-rendered text (may contain ANSI). */
+export function wrapMarkdownTerminalToLines(
+  text: string,
+  width: TerminalWidth
+): string[] {
+  return text
+    .split('\n')
+    .flatMap((p) =>
+      p.length === 0 ? [''] : wrapTextToVisibleWidthLines(p, width)
+    )
+}
+
+const DEFAULT_MCQ_CHOICE_WRAP_WIDTH = 4096
+
+function formatMcqChoiceLinesWithIndices(
+  choices: RecallMcqChoiceTexts,
+  width: TerminalWidth
+): { lines: string[]; itemIndexPerLine: number[] } {
+  const lines: string[] = []
+  const itemIndexPerLine: number[] = []
+  for (let i = 0; i < choices.length; i++) {
+    const rendered = renderMarkdownToTerminal(choices[i]!)
+      .replace(/\n+/g, ' ')
+      .trim()
+    const prefix = `  ${i + 1}. `
+    const indent = ' '.repeat(visibleLength(prefix))
+    const innerWidth = Math.max(1, width - visibleLength(prefix))
+    const bodyLines = wrapTextToVisibleWidthLines(rendered, innerWidth)
+    if (bodyLines.length === 0) {
+      lines.push(prefix)
+      itemIndexPerLine.push(i)
+      continue
+    }
+    for (let r = 0; r < bodyLines.length; r++) {
+      lines.push((r === 0 ? prefix : indent) + bodyLines[r]!)
+      itemIndexPerLine.push(i)
+    }
+  }
+  return { lines, itemIndexPerLine }
+}
+
+export function formatMcqChoiceLines(
+  choices: RecallMcqChoiceTexts,
+  width: TerminalWidth = DEFAULT_MCQ_CHOICE_WRAP_WIDTH
+): string[] {
+  return formatMcqChoiceLinesWithIndices(choices, width).lines
+}
+
 /**
- * Plain selectable rows (commands, tokens, recall MCQ choices, …) → Current guidance:
+ * Plain selectable rows (commands, tokens, …) → Current guidance:
  * highlight one row, truncate to width, scroll window when needed.
  */
 export function renderCurrentGuidanceForSelectableLines(
   plainLines: readonly string[],
   selectedIndex: number,
-  width: TerminalWidth
+  width: TerminalWidth,
+  itemIndexPerLine?: readonly number[]
 ): string[] {
   return formatHighlightedList(
     plainLines,
     CURRENT_GUIDANCE_MAX_VISIBLE,
-    selectedIndex
+    selectedIndex,
+    itemIndexPerLine
   ).map((line) => truncateToWidth(line, width))
+}
+
+export function recallMcqCurrentGuidanceLines(
+  choices: RecallMcqChoiceTexts,
+  selectedChoiceIndex: number,
+  width: TerminalWidth
+): string[] {
+  const { lines, itemIndexPerLine } = formatMcqChoiceLinesWithIndices(
+    choices,
+    width
+  )
+  return renderCurrentGuidanceForSelectableLines(
+    lines,
+    selectedChoiceIndex,
+    width,
+    itemIndexPerLine
+  )
 }
 
 /** Returns lines for Current guidance (command completion or / commands hint). */

@@ -29,11 +29,6 @@ import {
   type RecallNextResult,
 } from './recall.js'
 import {
-  recallMcqCurrentGuidanceLines,
-  recallMcqNumberedChoiceLines,
-  recallMcqStemWrappedLinesForCurrentPrompt,
-} from './recallMcqDisplay.js'
-import {
   getInteractiveFetchWaitLine,
   INTERACTIVE_FETCH_WAIT_LINES,
   resetInteractiveFetchWaitForTesting,
@@ -48,6 +43,9 @@ import {
   needsGapBeforeBox,
   buildSuggestionLines,
   buildTokenListLines,
+  formatMcqChoiceLines,
+  recallMcqCurrentGuidanceLines,
+  wrapMarkdownTerminalToLines,
   getLastLine,
   getTerminalWidth,
   renderBox,
@@ -172,7 +170,7 @@ function emitMcqRecallQuestionForNonInteractiveOutput(
   const writePrompt = output.writeCurrentPrompt ?? output.log
   writePrompt(stemRenderedForTerminal)
   const width = getTerminalWidth()
-  for (const line of recallMcqNumberedChoiceLines(choices, width)) {
+  for (const line of formatMcqChoiceLines(choices, width)) {
     output.log(line)
   }
   output.log(`Enter your choice (1-${choices.length}):`)
@@ -668,7 +666,7 @@ function buildTTYDeps() {
     needsGapBeforeBox,
     buildSuggestionLines,
     getLastLine,
-    recallMcqStemWrappedLinesForCurrentPrompt,
+    wrapMarkdownTerminalToLines,
     recallMcqCurrentGuidanceLines,
     getTerminalWidth,
     renderFullDisplay,
