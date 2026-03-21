@@ -1,0 +1,201 @@
+#!/usr/bin/env bash
+#
+# Unit tests for infra/gcp/scripts/deploy-backend-jar-to-gcp-mig.sh
+# Uses fake gsutil + fake bash on PATH (no real GCS or gcloud).
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+DEPLOY_SCRIPT="$REPO_ROOT/infra/gcp/scripts/deploy-backend-jar-to-gcp-mig.sh"
+REAL_BASH="$(command -v bash)"
+
+fail() {
+	echo "FAIL: $*" >&2
+	exit 1
+}
+
+assert_equals() {
+	local expected=$1 actual=$2 msg=${3:-}
+	if [[ "$expected" != "$actual" ]]; then
+		fail "${msg:+$msg — }expected <$expected> got <$actual>"
+	fi
+}
+
+assert_file_exists() {
+	[[ -f "$1" ]] || fail "expected file missing: $1"
+}
+
+assert_not_file_exists() {
+	[[ ! -f "$1" ]] || fail "expected file absent: $1"
+}
+
+write_fake_bin() {
+	local fake_bin=$1
+	mkdir -p "$fake_bin"
+	{
+		printf '#!%s\n' "$REAL_BASH"
+		cat <<'EOS'
+set -e
+LOG="${GSUTIL_LOG:?}"
+cmd="${1:-}"
+shift || true
+case "$cmd" in
+cat)
+	echo "cat $*" >>"$LOG"
+	if [[ -n "${RECORD_JSON_FILE:-}" && -f "$RECORD_JSON_FILE" ]]; then
+		cat "$RECORD_JSON_FILE"
+		exit 0
+	fi
+	exit 1
+	;;
+cp)
+	if [[ "${1:-}" == "-" ]]; then
+		echo "cp - $2" >>"$LOG"
+		cat >/dev/null
+		exit 0
+	fi
+	echo "cp $*" >>"$LOG"
+	exit 0
+	;;
+*)
+	echo "unexpected gsutil: $cmd $*" >>"$LOG"
+	exit 1
+	;;
+esac
+EOS
+	} >"$fake_bin/gsutil"
+	chmod +x "$fake_bin/gsutil"
+
+	{
+		printf '#!%s\n' "$REAL_BASH"
+		cat <<'EOS'
+case "$*" in
+*perform-rolling-replace-app-mig.sh*)
+	echo "rolling-replace $*" >>"${ROLLING_LOG:?}"
+	exit 0
+	;;
+esac
+EOS
+		printf 'exec %q "$@"\n' "$REAL_BASH"
+	} >"$fake_bin/bash"
+	chmod +x "$fake_bin/bash"
+}
+
+run_deploy() {
+	(
+		cd "$1"
+		PATH="$2:$PATH"
+		export GCS_BUCKET ARTIFACT VERSION GITHUB_SHA
+		export GSUTIL_LOG ROLLING_LOG
+		export DEPLOY_JAR_PATH="${DEPLOY_JAR_PATH:-}"
+		export RECORD_JSON_FILE="${RECORD_JSON_FILE:-}"
+		bash "$DEPLOY_SCRIPT"
+	)
+}
+
+test_fails_when_jar_missing() {
+	local work fake_bin
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	fake_bin="$work/fakebin"
+	write_fake_bin "$fake_bin"
+	export GSUTIL_LOG="$work/gsutil.log" ROLLING_LOG="$work/rolling.log"
+	: >"$GSUTIL_LOG"
+	rm -f "$ROLLING_LOG"
+	export GCS_BUCKET=b ARTIFACT=a VERSION=1 GITHUB_SHA=abc
+	unset DEPLOY_JAR_PATH RECORD_JSON_FILE
+	# no jar at ./a-1.jar or backend/build/libs/a-1.jar
+	if run_deploy "$work" "$fake_bin" 2>/dev/null; then
+		fail "expected non-zero exit when jar missing"
+	fi
+	trap - EXIT
+	rm -rf "$work"
+}
+
+test_skips_upload_and_replace_when_record_matches_jar_hash() {
+	local work fake_bin jar hash
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	fake_bin="$work/fakebin"
+	write_fake_bin "$fake_bin"
+	export GSUTIL_LOG="$work/gsutil.log" ROLLING_LOG="$work/rolling.log"
+	: >"$GSUTIL_LOG"
+	rm -f "$ROLLING_LOG"
+	jar="$work/a-1.jar"
+	printf 'fixture-jar-bytes' >"$jar"
+	hash=$(sha256sum "$jar" | awk '{print $1}')
+	printf '{"sha256":"%s","git_sha":"old","recorded_at":"2020-01-01T00:00:00Z"}\n' "$hash" >"$work/record.json"
+	export RECORD_JSON_FILE="$work/record.json"
+	export GCS_BUCKET=bucket ARTIFACT=a VERSION=1 GITHUB_SHA=newcommit
+	export DEPLOY_JAR_PATH="$jar"
+	run_deploy "$work" "$fake_bin"
+	assert_not_file_exists "$work/rolling.log"
+	local cp_count cat_count
+	cp_count=$(grep -c '^cp ' "$GSUTIL_LOG" 2>/dev/null || true)
+	[[ -n "$cp_count" ]] || cp_count=0
+	cat_count=$(grep -c '^cat ' "$GSUTIL_LOG" 2>/dev/null || true)
+	[[ -n "$cat_count" ]] || cat_count=0
+	assert_equals "0" "$cp_count" "no gsutil cp when skipped"
+	assert_equals "1" "$cat_count" "one gsutil cat when skipped"
+	trap - EXIT
+	rm -rf "$work"
+}
+
+test_deploys_when_no_record() {
+	local work fake_bin jar
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	fake_bin="$work/fakebin"
+	write_fake_bin "$fake_bin"
+	export GSUTIL_LOG="$work/gsutil.log" ROLLING_LOG="$work/rolling.log"
+	: >"$GSUTIL_LOG"
+	rm -f "$ROLLING_LOG"
+	jar="$work/doughnut-0.0.1-SNAPSHOT.jar"
+	printf 'new-jar' >"$jar"
+	unset RECORD_JSON_FILE
+	export GCS_BUCKET=mybucket ARTIFACT=doughnut VERSION=0.0.1-SNAPSHOT GITHUB_SHA=sha111
+	export DEPLOY_JAR_PATH="$jar"
+	run_deploy "$work" "$fake_bin"
+	assert_file_exists "$work/rolling.log"
+	grep -q perform-rolling-replace-app-mig.sh "$work/rolling.log" || fail "rolling replace not invoked"
+	grep -q 'cp .*backend_app_jar' "$GSUTIL_LOG" || fail "jar upload not logged"
+	grep -q 'cp - gs://' "$GSUTIL_LOG" || fail "record upload (stdin) not logged"
+	trap - EXIT
+	rm -rf "$work"
+}
+
+test_deploys_when_record_hash_differs() {
+	local work fake_bin jar
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	fake_bin="$work/fakebin"
+	write_fake_bin "$fake_bin"
+	export GSUTIL_LOG="$work/gsutil.log" ROLLING_LOG="$work/rolling.log"
+	: >"$GSUTIL_LOG"
+	rm -f "$ROLLING_LOG"
+	jar="$work/a-1.jar"
+	printf 'v2-content' >"$jar"
+	printf '{"sha256":"0000000000000000000000000000000000000000000000000000000000000000","git_sha":"x","recorded_at":"2020-01-01T00:00:00Z"}\n' >"$work/record.json"
+	export RECORD_JSON_FILE="$work/record.json"
+	export GCS_BUCKET=b ARTIFACT=a VERSION=1 GITHUB_SHA=sha222
+	export DEPLOY_JAR_PATH="$jar"
+	run_deploy "$work" "$fake_bin"
+	assert_file_exists "$work/rolling.log"
+	grep -q 'cp .*backend_app_jar' "$GSUTIL_LOG" || fail "jar upload not logged on mismatch"
+	trap - EXIT
+	rm -rf "$work"
+}
+
+main() {
+	[[ -x "$DEPLOY_SCRIPT" ]] || fail "deploy script not found or not executable: $DEPLOY_SCRIPT"
+	command -v sha256sum >/dev/null || fail "sha256sum required"
+	command -v jq >/dev/null || fail "jq required"
+
+	test_fails_when_jar_missing
+	test_skips_upload_and_replace_when_record_matches_jar_hash
+	test_deploys_when_no_record
+	test_deploys_when_record_hash_differs
+	echo "ok deploy-backend-jar-to-gcp-mig.sh tests"
+}
+
+main "$@"
