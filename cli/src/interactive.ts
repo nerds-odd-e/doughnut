@@ -23,6 +23,7 @@ import {
   answerQuiz,
   answerSpelling,
   contestAndRegenerate,
+  formatRecallNotebookCurrentPromptLine,
   markAsRecalled,
   recallNext,
   recallStatus,
@@ -151,15 +152,17 @@ function getPlaceholderContext(inTokenList: boolean): PlaceholderContext {
 }
 
 /**
- * Non-TTY MCQ: stem on `writeCurrentPrompt` (Current prompt analogue); numbered choices and
+ * Non-TTY MCQ: notebook line + stem on `writeCurrentPrompt`; numbered choices and
  * “Enter your choice…” on `log` (Current guidance analogue). Avoids sending choice lines through both hooks.
  */
 function emitMcqRecallQuestionForNonInteractiveOutput(
   output: OutputAdapter,
+  notebookTitle: string,
   stemRenderedForTerminal: string,
   choices: readonly string[]
 ): void {
   const writePrompt = output.writeCurrentPrompt ?? output.log
+  writePrompt(formatRecallNotebookCurrentPromptLine(notebookTitle))
   writePrompt(stemRenderedForTerminal)
   const width = getTerminalWidth()
   for (const line of formatMcqChoiceLines(choices, width)) {
@@ -179,11 +182,13 @@ function showRecallPrompt(
       recallPromptId: result.recallPromptId,
       choices: result.choices,
       stemRenderedForTerminal,
+      notebookTitle: result.notebookTitle,
       shownAt: Date.now(),
     }
     if (!output.beginCurrentPrompt) {
       emitMcqRecallQuestionForNonInteractiveOutput(
         output,
+        result.notebookTitle,
         stemRenderedForTerminal,
         result.choices
       )
@@ -191,6 +196,9 @@ function showRecallPrompt(
     return
   }
   output.beginCurrentPrompt?.()
+  writeCurrentPrompt(
+    formatRecallNotebookCurrentPromptLine(result.notebookTitle)
+  )
   if (result.type === 'spelling') {
     writeCurrentPrompt(
       `Spell: ${renderMarkdownToTerminal(result.stem || '...')}`

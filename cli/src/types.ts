@@ -7,6 +7,8 @@ export type McqRecallPending = {
   choices: RecallMcqChoiceTexts
   /** Stem with markdown applied for the terminal (may include ANSI SGR). */
   stemRenderedForTerminal: string
+  /** Resolved notebook name; first Current prompt line is emoji + this title. */
+  notebookTitle: string
   shownAt: number
 }
 
@@ -52,8 +54,8 @@ export type OutputAdapter = {
   /** Optional: user-facing notice (e.g. cancelled wait); TTY paints as distinct scrollback tone. */
   logUserNotice?: (msg: string) => void
   /**
-   * Optional: short prompts (e.g. "Please answer y or n"). For non-TTY MCQ recall, the stem only
-   * is sent here; numbered choices and the "Enter your choice" line use `log`. Defaults to log.
+   * Optional: short prompts (e.g. "Please answer y or n"). For non-TTY MCQ recall, notebook line then stem
+   * are sent here; numbered choices and the "Enter your choice" line use `log`. Defaults to log.
    */
   writeCurrentPrompt?: (msg: string) => void
   /**

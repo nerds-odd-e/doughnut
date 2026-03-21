@@ -55,6 +55,7 @@ describe('TTY recall MCQ', () => {
     mockRecallNext.mockResolvedValue({
       type: 'mcq',
       recallPromptId: 100,
+      notebookTitle: 'Notebook',
       stem: 'What is 2+2?',
       choices: ['4', '3', '5'],
     })
@@ -191,6 +192,7 @@ describe('TTY recall MCQ wrapped choices (narrow terminal)', () => {
     mockRecallNext.mockResolvedValue({
       type: 'mcq',
       recallPromptId: 200,
+      notebookTitle: 'Notebook',
       stem: 'Pick:',
       choices: ['Long first option text that must wrap in narrow cols', 'B'],
     })

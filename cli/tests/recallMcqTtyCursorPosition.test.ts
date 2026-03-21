@@ -71,6 +71,7 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
     mockRecallNext.mockResolvedValue({
       type: 'mcq',
       recallPromptId: 1,
+      notebookTitle: 'Notebook',
       stem: 'Q?',
       choices: ['A', 'B'],
     })
@@ -84,6 +85,7 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
     mockRecallNext.mockResolvedValue({
       type: 'mcq',
       recallPromptId: 300,
+      notebookTitle: 'Notebook',
       stem: 'A question long enough to wrap at thirty columns wide',
       choices: ['A', 'B'],
     })
@@ -103,6 +105,7 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
     mockRecallNext.mockResolvedValue({
       type: 'mcq',
       recallPromptId: 4,
+      notebookTitle: 'Notebook',
       stem: 'Pick:',
       choices: [...choices],
     })
@@ -137,6 +140,7 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
     mockRecallNext.mockResolvedValue({
       type: 'mcq',
       recallPromptId: 3,
+      notebookTitle: 'Notebook',
       stem: 'Pick:',
       choices: [...choices],
     })

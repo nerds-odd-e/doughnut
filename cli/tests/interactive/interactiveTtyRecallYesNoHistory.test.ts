@@ -48,6 +48,7 @@ describe('TTY: recall-session y/n answers (scrollback)', () => {
     mockRecallNext.mockResolvedValue({
       type: 'just-review',
       memoryTrackerId: 42,
+      notebookTitle: 'Notebook',
       title: 'Test note',
     })
     mockMarkAsRecalled.mockResolvedValue(undefined)
@@ -69,6 +70,7 @@ describe('TTY: recall-session y/n answers (scrollback)', () => {
     mockRecallNext.mockResolvedValue({
       type: 'just-review',
       memoryTrackerId: 7,
+      notebookTitle: 'Notebook',
       title: 'Other',
     })
     mockMarkAsRecalled.mockResolvedValue(undefined)

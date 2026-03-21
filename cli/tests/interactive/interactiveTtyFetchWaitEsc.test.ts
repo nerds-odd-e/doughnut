@@ -114,6 +114,7 @@ describe('TTY contest wait — Esc cancels', () => {
     mockRecallNext.mockResolvedValue({
       type: 'mcq',
       recallPromptId: 100,
+      notebookTitle: 'Notebook',
       stem: 'Q?',
       choices: ['A', 'B'],
     })

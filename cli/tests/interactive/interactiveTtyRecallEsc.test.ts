@@ -30,6 +30,7 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
   test('ESC in spelling prompt exits recall mode', async () => {
     mockRecallNext.mockResolvedValue({
       type: 'spelling',
+      notebookTitle: 'Notebook',
       recallPromptId: 100,
       stem: 'test',
     })
@@ -51,6 +52,7 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     mockRecallNext.mockResolvedValue({
       type: 'just-review',
       memoryTrackerId: 42,
+      notebookTitle: 'Notebook',
       title: 'Test note',
     })
     await submitTTYCommand(stdin, '/recall')

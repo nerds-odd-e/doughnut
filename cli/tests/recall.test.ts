@@ -383,6 +383,7 @@ describe('recallNext', () => {
     expect(result).toMatchObject({
       type: 'just-review',
       memoryTrackerId: 42,
+      notebookTitle: 'Notebook',
       title: 'My Note Title',
     })
     expect(MemoryTrackerController.askAQuestion).toHaveBeenCalledWith(
@@ -417,6 +418,7 @@ describe('recallNext', () => {
     expect(result).toEqual({
       type: 'mcq',
       recallPromptId: 100,
+      notebookTitle: 'Notebook',
       stem: 'What is 2+2?',
       choices: ['4', '3', '5'],
     })
@@ -444,6 +446,7 @@ describe('recallNext', () => {
     expect(result).toEqual({
       type: 'spelling',
       recallPromptId: 100,
+      notebookTitle: 'Notebook',
       stem: 'means incite violence',
     })
   })
@@ -465,6 +468,7 @@ describe('recallNext', () => {
     expect(result).toEqual({
       type: 'spelling',
       recallPromptId: 100,
+      notebookTitle: 'Notebook',
       stem: '',
     })
   })
@@ -504,6 +508,7 @@ describe('recallNext', () => {
     expect(result).toMatchObject({
       type: 'just-review',
       memoryTrackerId: 42,
+      notebookTitle: 'Notebook',
       title: 'Bold Word',
       details: '**Bold** and _italic_',
     })
@@ -529,7 +534,76 @@ describe('recallNext', () => {
     expect(result).toMatchObject({
       type: 'just-review',
       memoryTrackerId: 42,
+      notebookTitle: 'Notebook',
       title: 'Untitled note',
+    })
+  })
+
+  test('returns mcq with notebookTitle from RecallPrompt.notebook', async () => {
+    vi.mocked(RecallsController.recalling).mockResolvedValue({
+      data: { toRepeat: [{ memoryTrackerId: 42 }] },
+    } as never)
+    vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
+      data: {
+        id: 100,
+        questionType: 'MCQ',
+        notebook: {
+          id: 1,
+          title: 'Physics',
+          notebookSettings: {},
+          headNoteId: 1,
+          updated_at: '',
+        },
+        multipleChoicesQuestion: {
+          f0__stem: 'Q?',
+          f1__choices: ['a'],
+        },
+      },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const result = await recallNext()
+
+    expect(result).toEqual({
+      type: 'mcq',
+      recallPromptId: 100,
+      notebookTitle: 'Physics',
+      stem: 'Q?',
+      choices: ['a'],
+    })
+  })
+
+  test('returns just-review with notebookTitle from note topology', async () => {
+    vi.mocked(RecallsController.recalling).mockResolvedValue({
+      data: { toRepeat: [{ memoryTrackerId: 42 }] },
+    } as never)
+    vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
+      data: null,
+    } as never)
+    vi.mocked(MemoryTrackerController.showMemoryTracker).mockResolvedValue({
+      data: {
+        note: {
+          noteTopology: {
+            title: 'T',
+            notebookTitle: 'History',
+          },
+        },
+      },
+    } as never)
+    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
+      data: { id: 1, label: 'Test Token' },
+    } as never)
+    await addAccessToken('test-token')
+
+    const result = await recallNext()
+
+    expect(result).toMatchObject({
+      type: 'just-review',
+      notebookTitle: 'History',
+      title: 'T',
     })
   })
 })
@@ -744,6 +818,7 @@ describe('contestAndRegenerate', () => {
       result: {
         type: 'mcq',
         recallPromptId: 200,
+        notebookTitle: 'Notebook',
         stem: 'New question?',
         choices: ['A', 'B', 'C'],
       },

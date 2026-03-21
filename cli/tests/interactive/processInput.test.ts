@@ -183,6 +183,7 @@ describe('processInput', () => {
     mockRecallNext.mockResolvedValue({
       type: 'spelling',
       recallPromptId: 100,
+      notebookTitle: 'Notebook',
       stem: '**bold** and *italic*',
     })
 
@@ -204,6 +205,7 @@ describe('processInput', () => {
     mockRecallNext.mockResolvedValue({
       type: 'spelling',
       recallPromptId: 100,
+      notebookTitle: 'Notebook',
       stem: 'means incite violence',
     })
     mockAnswerSpelling.mockResolvedValue({ correct: true })
@@ -225,6 +227,7 @@ describe('processInput', () => {
     mockRecallNext.mockResolvedValue({
       type: 'spelling',
       recallPromptId: 100,
+      notebookTitle: 'Notebook',
       stem: '...',
     })
     mockAnswerSpelling.mockResolvedValue({ correct: false })
@@ -264,6 +267,7 @@ describe('processInput', () => {
       .mockResolvedValueOnce({
         type: 'just-review',
         memoryTrackerId: 1,
+        notebookTitle: 'Notebook',
         title: 'Future note',
       })
       .mockResolvedValueOnce({
@@ -306,6 +310,7 @@ describe('processInput', () => {
       .mockResolvedValueOnce({
         type: 'just-review',
         memoryTrackerId: 1,
+        notebookTitle: 'Notebook',
         title: 'Note 1',
       })
       .mockResolvedValueOnce({
@@ -338,6 +343,7 @@ describe('processInput', () => {
       .mockResolvedValueOnce({
         type: 'just-review',
         memoryTrackerId: 1,
+        notebookTitle: 'Notebook',
         title: 'Note 1',
       })
       .mockRejectedValueOnce(new Error('Network error'))
@@ -356,6 +362,7 @@ describe('processInput', () => {
       recall: {
         type: 'just-review' as const,
         memoryTrackerId: 1,
+        notebookTitle: 'Notebook',
         title: 'Note 1',
       },
     },
@@ -385,6 +392,7 @@ describe('processInput', () => {
     mockRecallNext.mockResolvedValue({
       type: 'just-review',
       memoryTrackerId: 1,
+      notebookTitle: 'Notebook',
       title: 'Note 1',
     })
 
@@ -413,6 +421,7 @@ describe('processInput', () => {
     mockRecallNext.mockResolvedValue({
       type: 'mcq',
       recallPromptId: 101,
+      notebookTitle: 'Notebook',
       stem: 'Pick one',
       choices: ['Alpha', 'Beta'],
     })
@@ -426,8 +435,10 @@ describe('processInput', () => {
 
     await processInput('/recall', splitOutput)
 
-    expect(promptSpy).toHaveBeenCalledTimes(1)
-    expect(promptSpy.mock.calls[0]![0]).toContain('Pick one')
+    expect(promptSpy).toHaveBeenCalledTimes(2)
+    expect(promptSpy.mock.calls[0]![0]).toContain('📓')
+    expect(promptSpy.mock.calls[0]![0]).toContain('Notebook')
+    expect(promptSpy.mock.calls[1]![0]).toContain('Pick one')
     expect(
       promptSpy.mock.calls.every(
         (c: unknown[]) => !String(c[0]).includes('  1. ')
@@ -450,6 +461,7 @@ describe('processInput', () => {
     mockRecallNext.mockResolvedValue({
       type: 'mcq',
       recallPromptId: 100,
+      notebookTitle: 'Notebook',
       stem: 'What is **2+2**?',
       choices: ['*A*', '**B**', '`C`'],
     })
@@ -491,6 +503,7 @@ describe('processInput', () => {
       .mockResolvedValueOnce({
         type: 'mcq',
         recallPromptId: 100,
+        notebookTitle: 'Notebook',
         stem: 'First question?',
         choices: ['A', 'B', 'C'],
       })
@@ -503,6 +516,7 @@ describe('processInput', () => {
       result: {
         type: 'mcq',
         recallPromptId: 200,
+        notebookTitle: 'Notebook',
         stem: 'Regenerated question?',
         choices: ['X', 'Y', 'Z'],
       },
@@ -542,6 +556,7 @@ describe('processInput', () => {
     mockRecallNext.mockResolvedValue({
       type: 'just-review',
       memoryTrackerId: 1,
+      notebookTitle: 'Notebook',
       title: 'Note 1',
     })
 
@@ -557,6 +572,7 @@ describe('processInput', () => {
     mockRecallNext.mockResolvedValue({
       type: 'mcq',
       recallPromptId: 100,
+      notebookTitle: 'Notebook',
       stem: 'Q?',
       choices: ['A', 'B'],
     })
@@ -645,6 +661,7 @@ describe('processInput', () => {
     mockRecallNext.mockResolvedValue({
       type: 'mcq',
       recallPromptId: 100,
+      notebookTitle: 'Notebook',
       stem: 'Q?',
       choices: ['A', 'B'],
     })

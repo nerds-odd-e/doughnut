@@ -68,18 +68,21 @@ export type RecallNextResult =
   | {
       type: 'just-review'
       memoryTrackerId: number
+      notebookTitle: string
       title: string
       details?: string
     }
   | {
       type: 'mcq'
       recallPromptId: number
+      notebookTitle: string
       stem: string
       choices: string[]
     }
   | {
       type: 'spelling'
       recallPromptId: number
+      notebookTitle: string
       stem: string
     }
 
@@ -89,15 +92,30 @@ type RecallQuestionInTerminal = Extract<
   { type: 'mcq' | 'spelling' }
 >
 
+export function formatRecallNotebookCurrentPromptLine(
+  notebookTitle: string
+): string {
+  return `📓 ${notebookTitle}`
+}
+
+function resolveRecallNotebookTitle(
+  notebook?: { title?: string },
+  note?: { noteTopology?: { notebookTitle?: string } }
+): string {
+  return notebook?.title ?? note?.noteTopology?.notebookTitle ?? 'Notebook'
+}
+
 function recallQuestionForTerminal(
   prompt: RecallPrompt | null | undefined
 ): RecallQuestionInTerminal | null {
   if (prompt == null) return null
+  const notebookTitle = resolveRecallNotebookTitle(prompt.notebook, prompt.note)
   if (prompt.questionType === 'MCQ' && prompt.multipleChoicesQuestion) {
     const mcq = prompt.multipleChoicesQuestion
     return {
       type: 'mcq',
       recallPromptId: prompt.id,
+      notebookTitle,
       stem: mcq.f0__stem ?? '',
       choices: mcq.f1__choices ?? [],
     }
@@ -106,6 +124,10 @@ function recallQuestionForTerminal(
     return {
       type: 'spelling',
       recallPromptId: prompt.id,
+      notebookTitle: resolveRecallNotebookTitle(
+        prompt.spellingQuestion?.notebook ?? prompt.notebook,
+        prompt.note
+      ),
       stem: prompt.spellingQuestion?.stem ?? '',
     }
   }
@@ -174,6 +196,7 @@ export async function recallNext(
   return {
     type: 'just-review',
     memoryTrackerId: first.memoryTrackerId,
+    notebookTitle: resolveRecallNotebookTitle(undefined, trackerPayload.note),
     title,
     details,
   }

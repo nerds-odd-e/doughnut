@@ -18,6 +18,7 @@ import {
   saveCliCommandHistory,
 } from '../cliCommandHistoryFile.js'
 import { getConfigDir } from '../configDir.js'
+import { formatRecallNotebookCurrentPromptLine } from '../recall.js'
 import { maskInteractiveInputForHistory } from '../inputHistoryMask.js'
 import {
   afterBareSlashEscape,
@@ -409,10 +410,18 @@ export async function runTTY(
         isMcqRecallPending(pendingRecallAnswer) &&
         !isPendingRecallStopConfirmation()
       ) {
-        currentPromptWrappedLines = wrapMarkdownTerminalToLines(
-          pendingRecallAnswer.stemRenderedForTerminal,
-          width
-        )
+        currentPromptWrappedLines = [
+          ...wrapTextToLines(
+            formatRecallNotebookCurrentPromptLine(
+              pendingRecallAnswer.notebookTitle
+            ),
+            width
+          ),
+          ...wrapMarkdownTerminalToLines(
+            pendingRecallAnswer.stemRenderedForTerminal,
+            width
+          ),
+        ]
       } else if (currentPromptText) {
         currentPromptWrappedLines = wrapTextToLines(currentPromptText, width)
       } else {
