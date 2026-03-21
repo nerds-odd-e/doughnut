@@ -1,5 +1,8 @@
 import type { OutputAdapter } from './types.js'
 
+/** Interval for cycling `.` / `..` / `...` on the fetch-wait Current prompt (TTY only). */
+export const INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS = 400
+
 /**
  * User-visible first line of the Current prompt while the TTY awaits a slow
  * network/backend call. Ellipsis animation is applied by the adapter.
@@ -20,11 +23,12 @@ export type InteractiveFetchWaitLine =
 
 let activeWaitLine: InteractiveFetchWaitLine | null = null
 
-type EscBoundAbort = {
+/** Esc aborts only the in-flight wait that registered this binding (one TTY `output` at a time). */
+type InteractiveFetchWaitEscBinding = {
   output: OutputAdapter
-  controller: AbortController
+  abortController: AbortController
 }
-let escBoundAbort: EscBoundAbort | null = null
+let escBinding: InteractiveFetchWaitEscBinding | null = null
 
 export function getInteractiveFetchWaitLine(): InteractiveFetchWaitLine | null {
   return activeWaitLine
@@ -51,17 +55,17 @@ export async function runInteractiveFetchWait<T>(
   line: InteractiveFetchWaitLine,
   task: InteractiveFetchWaitTask<T>
 ): Promise<T> {
-  const controller = new AbortController()
-  escBoundAbort = { output, controller }
+  const abortController = new AbortController()
+  escBinding = { output, abortController }
   setActiveWaitLine(output, line)
   try {
-    return await task(controller.signal)
+    return await task(abortController.signal)
   } finally {
     if (
-      escBoundAbort?.output === output &&
-      escBoundAbort.controller === controller
+      escBinding?.output === output &&
+      escBinding.abortController === abortController
     ) {
-      escBoundAbort = null
+      escBinding = null
     }
     setActiveWaitLine(output, null)
   }
@@ -69,14 +73,14 @@ export async function runInteractiveFetchWait<T>(
 
 /** Esc during an interactive fetch wait: abort in-flight work if this TTY owns it. */
 export function cancelInteractiveFetchWaitFor(output: OutputAdapter): boolean {
-  if (!escBoundAbort || escBoundAbort.output !== output) {
+  if (!escBinding || escBinding.output !== output) {
     return false
   }
-  escBoundAbort.controller.abort()
+  escBinding.abortController.abort()
   return true
 }
 
 export function resetInteractiveFetchWaitForTesting(): void {
   activeWaitLine = null
-  escBoundAbort = null
+  escBinding = null
 }

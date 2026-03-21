@@ -7,11 +7,11 @@ import {
   userVisibleOutcomeFromCommandError,
 } from '../fetchAbort.js'
 import {
+  INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS,
   INTERACTIVE_FETCH_WAIT_LINES,
   cancelInteractiveFetchWaitFor,
   getInteractiveFetchWaitLine,
   runInteractiveFetchWait,
-  type InteractiveFetchWaitLine,
 } from '../interactiveFetchWait.js'
 import {
   applyChatHistoryOutputTone,
@@ -19,6 +19,7 @@ import {
   interactiveInputReadyOscSuffix,
   isCommittedInteractiveInput,
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
+  isGreyDisabledInputChrome,
   wrapTextToLines,
   type LiveRegionPaintOptions,
   type PlaceholderContext,
@@ -124,7 +125,6 @@ export interface TTYDeps {
   ) => string[]
   TOKEN_LIST_COMMANDS: Record<string, TokenListCommandConfig>
   getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
-  isGreyDisabledInputChrome: (ctx: PlaceholderContext) => boolean
 }
 
 function cycleIndex(current: number, delta: number, length: number): number {
@@ -185,7 +185,6 @@ type LiveRegionLayout = {
   recallingIndicator: string[]
   placeholderContext: PlaceholderContext
   currentPromptSgr: string | undefined
-  interactiveFetchWaitLine: InteractiveFetchWaitLine | null
   liveLines: string[]
   /** Line count of the live block (used for CUU cursor positioning). */
   liveLineCount: number
@@ -235,7 +234,6 @@ export async function runTTY(
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
-    isGreyDisabledInputChrome,
   } = deps
 
   const writeCurrentPromptLine = (msg: string) =>
@@ -281,7 +279,6 @@ export async function runTTY(
   }
   let tokenSelection: TokenSelectionState | null = null
   let mcqChoiceHighlightIndex = 0
-  const INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS = 400
   let interactiveFetchWaitEllipsisTick = 0
   let interactiveFetchWaitRepaintTimer: ReturnType<typeof setInterval> | null =
     null
@@ -403,7 +400,6 @@ export async function runTTY(
       recallingIndicator,
       placeholderContext,
       currentPromptSgr,
-      interactiveFetchWaitLine: waitLine,
     }
   }
 
@@ -422,7 +418,6 @@ export async function runTTY(
       recallingIndicator,
       placeholderContext,
       currentPromptSgr,
-      interactiveFetchWaitLine,
     } = getDisplayContent()
     const terminalWidth = getTerminalWidth()
     const liveLines = buildLiveRegionLines(
@@ -440,7 +435,6 @@ export async function runTTY(
       recallingIndicator,
       placeholderContext,
       currentPromptSgr,
-      interactiveFetchWaitLine,
       liveLines,
       liveLineCount: liveLines.length,
       inputLineRowInLiveBlock: inputRowFromTop(
@@ -459,10 +453,9 @@ export async function runTTY(
     process.stdout.write(`\x1b[${col}G`)
   }
 
-  /** Cursor visibility and column, then `INTERACTIVE_INPUT_READY_OSC` from `renderer.ts` when the box accepts input. */
+  /** Cursor visibility and column, then `INTERACTIVE_INPUT_READY_OSC` when the box accepts input. */
   function finalizeInteractiveLiveRegionPaint(
-    placeholderContext: PlaceholderContext,
-    interactiveFetchWaitLine: InteractiveFetchWaitLine | null
+    placeholderContext: PlaceholderContext
   ): void {
     if (isGreyDisabledInputChrome(placeholderContext)) {
       process.stdout.write(HIDE_CURSOR)
@@ -473,7 +466,7 @@ export async function runTTY(
     process.stdout.write(
       interactiveInputReadyOscSuffix({
         lineDraft: buffer,
-        interactiveFetchWaitLine,
+        interactiveFetchWaitLine: getInteractiveFetchWaitLine(),
       })
     )
   }
@@ -504,10 +497,7 @@ export async function runTTY(
     process.stdout.write(
       `\x1b[${layout.liveLineCount - layout.inputLineRowInLiveBlock}A`
     )
-    finalizeInteractiveLiveRegionPaint(
-      layout.placeholderContext,
-      layout.interactiveFetchWaitLine
-    )
+    finalizeInteractiveLiveRegionPaint(layout.placeholderContext)
   }
 
   function drawBox() {
@@ -534,10 +524,7 @@ export async function runTTY(
 
     const totalWritten = Math.max(liveLineCount, livePaint.lastPaintedLineCount)
     process.stdout.write(`\x1b[${totalWritten - inputLineRowInLiveBlock}A`)
-    finalizeInteractiveLiveRegionPaint(
-      layout.placeholderContext,
-      layout.interactiveFetchWaitLine
-    )
+    finalizeInteractiveLiveRegionPaint(layout.placeholderContext)
 
     livePaint.cursorUpStepsToLiveRegionTop = inputLineRowInLiveBlock
     livePaint.lastPaintedLineCount = liveLineCount
@@ -592,6 +579,13 @@ export async function runTTY(
     interactiveFetchWaitEllipsisTick = 0
   }
 
+  /** Clears the live input line and `/` command-picker state (used by `/clear` and when fetch-wait ends). */
+  function resetLiveLineDraftAndSlashSuggestions(): void {
+    buffer = ''
+    highlightIndex = 0
+    suggestionsDismissed = false
+  }
+
   /** MCQ recall turn: line passed to `processInput` (slash escapes, number, or highlighted choice). */
   function recallMcqSubmittedLine(
     trimmedBuffer: string,
@@ -623,18 +617,17 @@ export async function runTTY(
     beginCurrentPrompt: doBeginCurrentPrompt,
     clearAndRedraw: () => {
       chatHistory = []
-      buffer = ''
+      resetLiveLineDraftAndSlashSuggestions()
       tokenSelection = null
       if (isInRecallSubstate()) exitRecallMode()
       setPendingRecallStopConfirmation(false)
       mcqChoiceHighlightIndex = 0
-      highlightIndex = 0
-      suggestionsDismissed = false
       doFullRedraw()
     },
     onInteractiveFetchWaitChanged: () => {
-      if (getInteractiveFetchWaitLine()) {
-        stopInteractiveFetchWaitRepaintTimer()
+      stopInteractiveFetchWaitRepaintTimer()
+      const activeWaitPrompt = getInteractiveFetchWaitLine()
+      if (activeWaitPrompt) {
         drawBox()
         interactiveFetchWaitRepaintTimer = setInterval(() => {
           interactiveFetchWaitEllipsisTick =
@@ -642,10 +635,7 @@ export async function runTTY(
           drawBox()
         }, INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS)
       } else {
-        stopInteractiveFetchWaitRepaintTimer()
-        buffer = ''
-        highlightIndex = 0
-        suggestionsDismissed = false
+        resetLiveLineDraftAndSlashSuggestions()
         drawBox()
       }
     },

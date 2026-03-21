@@ -51,7 +51,6 @@ import {
   renderFullDisplay,
   renderPastInput,
   writeFullRedraw,
-  isGreyDisabledInputChrome,
   GREY,
   HIDE_CURSOR,
   SHOW_CURSOR,
@@ -659,7 +658,6 @@ function buildTTYDeps() {
     formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
-    isGreyDisabledInputChrome,
   }
 }
 

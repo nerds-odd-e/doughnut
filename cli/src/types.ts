@@ -36,7 +36,9 @@ export type OutputAdapter = {
   /** Optional: for /clear and resize. TTY provides a callback that clears and redraws. */
   clearAndRedraw?: () => void
   /**
-   * TTY only: interactive fetch-wait UI started or ended — repaint live region (wait prompt, grey box, ellipsis).
+   * TTY only: invoked when interactive fetch-wait starts or finishes (see `runInteractiveFetchWait`).
+   * On start: repaint live region and run ellipsis animation. On end: discard line draft typed during the
+   * grey disabled input box, reset `/` command-picker highlight state, repaint.
    */
   onInteractiveFetchWaitChanged?: () => void
 }
