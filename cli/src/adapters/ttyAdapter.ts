@@ -28,6 +28,7 @@ import {
   insertIntoDraft,
   onArrowDown,
   onArrowUp,
+  ttyArrowKeyUsesSlashSuggestionCycle,
 } from '../interactiveCommandInput.js'
 import {
   applyChatHistoryOutputTone,
@@ -953,8 +954,12 @@ export async function runTTY(
       drawBox()
     } else if (key.name === 'up' || key.name === 'down') {
       if (
-        !suggestionsDismissed &&
-        isCommandPrefixWithSuggestions(commandInput.lineDraft)
+        ttyArrowKeyUsesSlashSuggestionCycle(
+          key.name === 'up' ? 'up' : 'down',
+          commandInput,
+          suggestionsDismissed,
+          isCommandPrefixWithSuggestions(commandInput.lineDraft)
+        )
       ) {
         const filtered = filterCommandsByPrefix(
           interactiveDocs,

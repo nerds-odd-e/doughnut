@@ -142,9 +142,10 @@ describe('TTY: shared interactive session', () => {
       expect(suggestionLinesAfterInsert).toHaveLength(0)
     })
 
-    test('first Up from `/` wraps highlight to the last matching command', async () => {
+    test('first Up from `/` moves caret home; second Up wraps highlight to the last matching command', async () => {
       const filtered = filterCommandsByPrefix(interactiveDocs, '/')
       expect(filtered.length).toBeGreaterThanOrEqual(2)
+      const firstUsage = filtered[0]!.usage
       const lastUsage = filtered[filtered.length - 1]!.usage
 
       writeSpy.mockClear()
@@ -153,13 +154,30 @@ describe('TTY: shared interactive session', () => {
       pressKey(stdin, 'up')
       await tick()
 
-      const output = ttyOutput(writeSpy)
-      const lastLine = lastStdoutLineContaining(output, `  ${lastUsage}`)
-      expect(lastLine).toBeDefined()
-      expect(lastLine).toContain('\x1b[7m')
+      const afterFirstUp = ttyOutput(writeSpy)
+      const firstLineAfterFirst = lastStdoutLineContaining(
+        afterFirstUp,
+        `  ${firstUsage}`
+      )
+      expect(firstLineAfterFirst).toBeDefined()
+      expect(
+        firstLineAfterFirst,
+        'Phase A1: first ↑ with caret after `/` must move to column 0, not cycle slash highlights yet'
+      ).toContain('\x1b[7m')
+
+      pressKey(stdin, 'up')
+      await tick()
+
+      const afterSecondUp = ttyOutput(writeSpy)
+      const lastLineAfterSecond = lastStdoutLineContaining(
+        afterSecondUp,
+        `  ${lastUsage}`
+      )
+      expect(lastLineAfterSecond).toBeDefined()
+      expect(lastLineAfterSecond).toContain('\x1b[7m')
     })
 
-    test('slash picker: ArrowDown moves highlight to next row; ArrowUp moves it back (not caret/history only)', async () => {
+    test('slash picker: ArrowDown moves highlight; first Up moves caret home, second Up moves highlight back', async () => {
       const filtered = filterCommandsByPrefix(interactiveDocs, '/')
       expect(filtered.length).toBeGreaterThanOrEqual(2)
       const firstUsage = filtered[0]!.usage
@@ -191,16 +209,32 @@ describe('TTY: shared interactive session', () => {
       pressKey(stdin, 'up')
       await tick()
 
-      const afterUp = ttyOutput(writeSpy)
+      const afterFirstUp = ttyOutput(writeSpy)
       expect(
-        lastStdoutLineContaining(afterUp, needleFirst),
-        'Up from the second row must highlight the first command again.'
+        lastStdoutLineContaining(afterFirstUp, needleSecond),
+        'Phase A1: first ↑ after Down must not move slash highlight yet (caret leaves end of `/` first).'
       ).toContain('\x1b[7m')
-      const secondLineAfterUp = lastStdoutLineContaining(afterUp, needleSecond)
-      expect(secondLineAfterUp).toBeDefined()
       expect(
-        secondLineAfterUp,
-        'After Up, the second command row must no longer be highlighted.'
+        lastStdoutLineContaining(afterFirstUp, needleFirst),
+        'First row stays unhighlighted after the caret-only ↑.'
+      ).not.toContain('\x1b[7m')
+
+      pressKey(stdin, 'up')
+      await tick()
+
+      const afterSecondUp = ttyOutput(writeSpy)
+      expect(
+        lastStdoutLineContaining(afterSecondUp, needleFirst),
+        'Second ↑ with caret at column 0 must highlight the first command again.'
+      ).toContain('\x1b[7m')
+      const secondLineAfterSecondUp = lastStdoutLineContaining(
+        afterSecondUp,
+        needleSecond
+      )
+      expect(secondLineAfterSecondUp).toBeDefined()
+      expect(
+        secondLineAfterSecondUp,
+        'After the second Up, the second command row must no longer be highlighted.'
       ).not.toContain('\x1b[7m')
     })
 

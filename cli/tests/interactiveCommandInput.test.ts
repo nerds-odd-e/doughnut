@@ -15,6 +15,7 @@ import {
   onArrowDown,
   onArrowUp,
   replaceLastLogicalLine,
+  ttyArrowKeyUsesSlashSuggestionCycle,
   type InteractiveCommandInput,
 } from '../src/interactiveCommandInput.js'
 
@@ -106,6 +107,32 @@ describe('applyLastLineEdit', () => {
     expect(out.caretOffset).toBe(out.lineDraft.length)
     expect(out.historyWalkIndex).toBe(null)
     expect(out.lineDraftBeforeHistoryWalk).toBe(null)
+  })
+})
+
+describe('TTY slash-suggestion vs ↑ precedence (phase A1)', () => {
+  test('first ↑ moves caret to start when not in history and caret is not at 0, even if slash suggestions apply', () => {
+    const lineDraft = '/help_PHASE_A1_UNIQUE'
+    const state = commandInputWith({
+      lineDraft,
+      caretOffset: 2,
+      historyWalkIndex: null,
+      committedCommands: ['/version'],
+    })
+    expect(
+      ttyArrowKeyUsesSlashSuggestionCycle('up', state, false, true),
+      'first ↑ must not use slash suggestion cycling while the caret is still away from column 0'
+    ).toBe(false)
+    const after = onArrowUp(state)
+    expect(
+      after.lineDraft,
+      'first ↑ must leave lineDraft unchanged (no history recall, no suggestion side effects)'
+    ).toBe(lineDraft)
+    expect(
+      after.caretOffset,
+      'first ↑ must move the caret to the start of the draft when not in history mode'
+    ).toBe(0)
+    expect(after.historyWalkIndex).toBe(null)
   })
 })
 
