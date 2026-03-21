@@ -1,0 +1,26 @@
+/**
+ * Contract between Cypress (browser) and the Node PTY runner for interactive CLI E2E.
+ * Kept free of Node-only imports so page objects can import the task name + types safely.
+ */
+
+/** Cypress `task` registered in `cliE2ePluginTasks.ts` for all interactive PTY keystrokes. */
+export const INTERACTIVE_CLI_PTY_KEYSTROKE_TASK =
+  'applyInteractiveCliPtyKeystroke' as const
+
+/**
+ * One logical TTY action once the CLI has drawn the input box (ready OSC).
+ * Maps to exact bytes in `cliPtyRunner` — no trimming or slash detection here.
+ */
+export type InteractiveCliPtyKeystroke =
+  | {
+      kind: 'slashCommand'
+      /** Full slash line as typed (e.g. `/recall`); runner appends space + Enter. */
+      commandLine: string
+    }
+  | {
+      kind: 'line'
+      /** One line of input; runner appends Enter (recall answers, `hello`, etc.). */
+      text: string
+    }
+  | { kind: 'enter' }
+  | { kind: 'escape' }

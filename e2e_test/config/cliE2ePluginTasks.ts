@@ -14,12 +14,15 @@ import {
 } from './cliE2eRepo'
 import { cliEnv } from './cliEnv'
 import {
-  interactiveCliTtyPayload,
+  applyInteractiveCliPtyKeystroke,
   runCliInPty,
   startInteractiveCli as startInteractiveCliPtySession,
   stopInteractiveCli as stopInteractiveCliPtySession,
-  writeInteractiveCliAndWaitForReady,
 } from './cliPtyRunner'
+import {
+  INTERACTIVE_CLI_PTY_KEYSTROKE_TASK,
+  type InteractiveCliPtyKeystroke,
+} from './interactiveCliPtyTypes'
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
 
@@ -122,24 +125,9 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       })
       return true
     },
-    async sendInteractiveCliSlashCommand({ command }: { command: string }) {
-      return writeInteractiveCliAndWaitForReady(
-        interactiveCliTtyPayload.slashCommandSpaceThenEnter(command)
-      )
-    },
-    async sendInteractiveCliLine({ line }: { line: string }) {
-      return writeInteractiveCliAndWaitForReady(
-        interactiveCliTtyPayload.lineThenEnter(line)
-      )
-    },
-    async sendInteractiveCliEnter() {
-      return writeInteractiveCliAndWaitForReady(
-        interactiveCliTtyPayload.enterOnly
-      )
-    },
-    async sendInteractiveCliEsc() {
-      return writeInteractiveCliAndWaitForReady(interactiveCliTtyPayload.esc)
-    },
+    [INTERACTIVE_CLI_PTY_KEYSTROKE_TASK]: (
+      keystroke: InteractiveCliPtyKeystroke
+    ) => applyInteractiveCliPtyKeystroke(keystroke),
     async stopInteractiveCli() {
       await stopInteractiveCliPtySession()
       return null

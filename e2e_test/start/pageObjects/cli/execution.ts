@@ -2,6 +2,10 @@
  * CLI execution page objects.
  * Domain: installation, non-interactive, interactive, access token, Gmail.
  */
+import {
+  INTERACTIVE_CLI_PTY_KEYSTROKE_TASK,
+  type InteractiveCliPtyKeystroke,
+} from '../../../config/interactiveCliPtyTypes'
 import { backendBaseUrl } from '../../../support/backendUrl'
 import { currentGuidance } from './outputAssertions'
 
@@ -98,34 +102,43 @@ function nonInteractive() {
   }
 }
 
+function applyInteractiveCliPtyKeystroke(
+  keystroke: InteractiveCliPtyKeystroke
+) {
+  cy.task<string>(INTERACTIVE_CLI_PTY_KEYSTROKE_TASK, keystroke).as(
+    'doughnutOutput'
+  )
+}
+
 function interactive() {
-  const io = {
-    enterSlashCommand(command: string) {
-      cy.task<string>('sendInteractiveCliSlashCommand', { command }).as(
-        'doughnutOutput'
-      )
+  return {
+    enterSlashCommand(commandLine: string) {
+      applyInteractiveCliPtyKeystroke({
+        kind: 'slashCommand',
+        commandLine,
+      })
     },
-    enterLine(line: string) {
-      cy.task<string>('sendInteractiveCliLine', { line }).as('doughnutOutput')
+    enterLine(text: string) {
+      applyInteractiveCliPtyKeystroke({ kind: 'line', text })
     },
     pressEnter() {
-      cy.task<string>('sendInteractiveCliEnter').as('doughnutOutput')
+      applyInteractiveCliPtyKeystroke({ kind: 'enter' })
     },
     pressEsc() {
-      cy.task<string>('sendInteractiveCliEsc').as('doughnutOutput')
+      applyInteractiveCliPtyKeystroke({ kind: 'escape' })
     },
     answerToPrompt(answer: string, expectedPromptText: string) {
       currentGuidance().expectContains(expectedPromptText)
-      io.enterLine(answer)
+      applyInteractiveCliPtyKeystroke({ kind: 'line', text: answer })
     },
-    inputDownArrowSelection(command: string) {
-      cy.task<string>('sendInteractiveCliSlashCommand', { command })
-      cy.task<string>('sendInteractiveCliLine', { line: '2' }).as(
-        'doughnutOutput'
-      )
+    inputDownArrowSelection(commandLine: string) {
+      cy.task<string>(INTERACTIVE_CLI_PTY_KEYSTROKE_TASK, {
+        kind: 'slashCommand',
+        commandLine,
+      })
+      applyInteractiveCliPtyKeystroke({ kind: 'line', text: '2' })
     },
   }
-  return io
 }
 
 function accessToken() {

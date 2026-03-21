@@ -4,7 +4,7 @@
 
 **Before Phases 1–3:** One Cypress task and `interactive().input` used a single string with heuristics (`trim()`, slash vs line, etc.), which hid trailing-space behavior and mixed intents.
 
-**Now:** Interactive PTY writes go only through `writeInteractiveCliAndWaitForReady(payload)` with bytes built from `interactiveCliTtyPayload` or the matching Cypress tasks (`sendInteractiveCliSlashCommand`, `sendInteractiveCliLine`, `sendInteractiveCliEnter`, `sendInteractiveCliEsc`). Gherkin uses explicit steps (Phase 2).
+**Now:** Interactive PTY writes use a single Cypress task `applyInteractiveCliPtyKeystroke` with a typed `InteractiveCliPtyKeystroke` union (`interactiveCliPtyTypes.ts`). Node-side `applyInteractiveCliPtyKeystroke` in `cliPtyRunner.ts` encodes bytes and waits for the ready OSC. Gherkin uses explicit steps (slash vs line vs Enter vs ESC).
 
 ## Correction: non-`/` input already exists in E2E
 
@@ -14,19 +14,15 @@ The gap vs `cli_non_interactive_mode.feature` is an explicit **unsupported plain
 
 ## Target shape
 
-### Low level (`cliPtyRunner.ts`)
+### Low level (`cliPtyRunner.ts` + `interactiveCliPtyTypes.ts`)
 
-- One shared helper, e.g. `writeInteractiveCliAndWaitForReady(payload: string)`, containing only: length before write, `pty.write(payload)`, wait for ready OSC, assert no escape leaks, return stdout. **No** interpretation of `payload`.
-- Several **named** exports that only assemble bytes (no content-based branching):
-  - **Slash command + space + Enter** — exact bytes: `command + ' \n'` where `command` is the slash line **without** relying on trim to invent the space (callers pass the command body they intend; document whether leading `/` is required by the CLI).
-  - **Line + Enter** — `line + '\n'` for recall answers, numeric choices, free text, and unsupported probes like `hello`.
-  - **Enter only** — `'\n'` (empty line).
-  - **ESC** — `'\x1b'`.
-  - Optional: **raw** / **exact bytes** if a future test must send `\n` inside a payload without the helper appending; only add if a real scenario needs it.
+- **`InteractiveCliPtyKeystroke`** — discriminated union (slash command line, one line + Enter, bare Enter, ESC). Encoding lives in one `switch` next to `pty.write`.
+- **`applyInteractiveCliPtyKeystroke`** — encode keystroke → bytes, write PTY, wait for ready OSC, assert no escape leaks, return stdout.
+- Optional future **raw** payload task only if a scenario needs bytes that do not fit the union.
 
 ### Cypress tasks (`cliE2ePluginTasks.ts`, merged in `common.ts` via `createCliE2ePluginTasks`)
 
-- **Done:** Separate task names for each send shape (`sendInteractiveCliSlashCommand`, etc.).
+- **Done:** One task key `INTERACTIVE_CLI_PTY_KEYSTROKE_TASK` (`applyInteractiveCliPtyKeystroke`) for all interactive PTY input.
 
 ### Page objects (`execution.ts` → `interactive()`)
 
@@ -56,11 +52,11 @@ Order by **risk reduction** and **mechanical migration**; each phase should end 
 
 ### Phase 1 — Dumb write helper + parallel API
 
-- **Done:** `writeInteractiveCliAndWaitForReady` + `interactiveCliTtyPayload` in `cliPtyRunner.ts`. Repo/spawn/bundle in `cliE2eRepo.ts`; CLI Cypress tasks in `cliE2ePluginTasks.ts` (`createCliE2ePluginTasks`).
+- **Done:** `applyInteractiveCliPtyKeystroke` + `InteractiveCliPtyKeystroke` (`interactiveCliPtyTypes.ts` + `cliPtyRunner.ts`). Repo/spawn/bundle in `cliE2eRepo.ts`; CLI Cypress tasks in `cliE2ePluginTasks.ts`.
 
 ### Phase 2 — Migrate `@interactiveCLI` scenarios to explicit steps
 
-- **Done:** `cli_interactive_mode.feature`, `cli_recall.feature`, `cli_access_token.feature` use `I enter the slash command …`, `I enter …` (line), `I press Enter …`; page object uses `enterSlashCommand`, `enterLine`, `pressEnter`, `pressEsc`; Cypress tasks `sendInteractiveCliSlashCommand`, `sendInteractiveCliLine`, `sendInteractiveCliEnter`, `sendInteractiveCliEsc` call `writeInteractiveCliAndWaitForReady` with `interactiveCliTtyPayload`.
+- **Done:** Same features + steps; page object maps each step to `InteractiveCliPtyKeystroke` and the single PTY keystroke task.
 - Generic `I input {string} in the interactive CLI` removed; down-arrow step name unchanged, implementation uses explicit sends.
 
 ### Phase 3 — Remove legacy smart send

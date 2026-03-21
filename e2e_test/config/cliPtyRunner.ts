@@ -9,6 +9,7 @@ import {
   INTERACTIVE_INPUT_READY_OSC,
 } from '../step_definitions/cliSectionParser'
 import { cliEnv } from './cliEnv'
+import type { InteractiveCliPtyKeystroke } from './interactiveCliPtyTypes'
 
 const PTY_TIMEOUT_MS = 25_000
 const CLI_POLL_MS = 10
@@ -197,22 +198,22 @@ export async function startInteractiveCli(opts: {
   interactiveHandle = handle
 }
 
-/**
- * Raw PTY writes after an interactive CLI session is running.
- * Matches CLI domain terms: slash command (+ space before Enter), line + Enter, bare Enter, ESC.
- */
-export const interactiveCliTtyPayload = {
-  slashCommandSpaceThenEnter(command: string) {
-    return `${command} \n`
-  },
-  lineThenEnter(line: string) {
-    return `${line}\n`
-  },
-  enterOnly: '\n',
-  esc: '\x1b',
-} as const
+function interactiveCliPtyKeystrokeToBytes(
+  keystroke: InteractiveCliPtyKeystroke
+): string {
+  switch (keystroke.kind) {
+    case 'slashCommand':
+      return `${keystroke.commandLine} \n`
+    case 'line':
+      return `${keystroke.text}\n`
+    case 'enter':
+      return '\n'
+    case 'escape':
+      return '\x1b'
+  }
+}
 
-export async function writeInteractiveCliAndWaitForReady(
+async function ptyWritePayloadAndWaitForInputReady(
   payload: string
 ): Promise<string> {
   if (!interactiveHandle) {
@@ -233,6 +234,15 @@ export async function writeInteractiveCliAndWaitForReady(
     interactiveHandle.stdout.value
   )
   return interactiveHandle.stdout.value
+}
+
+/** Deliver one keystroke to the shared interactive PTY and wait until the input box is ready again. */
+export async function applyInteractiveCliPtyKeystroke(
+  keystroke: InteractiveCliPtyKeystroke
+): Promise<string> {
+  return ptyWritePayloadAndWaitForInputReady(
+    interactiveCliPtyKeystrokeToBytes(keystroke)
+  )
 }
 
 export async function stopInteractiveCli(): Promise<void> {
