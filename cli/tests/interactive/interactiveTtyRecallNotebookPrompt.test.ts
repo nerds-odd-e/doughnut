@@ -3,6 +3,10 @@ import { describe, test, expect, type vi, beforeEach, afterEach } from 'vitest'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { mockRecallNext } from './interactiveRecallMockAccess.js'
 import { recallNextQuestion } from '../recallNextTestShapes.js'
+import {
+  mcqRecallPromptWithNotebook,
+  spellingRecallPromptWithNotebook,
+} from '../recallPromptFixtures.js'
 import { resetRecallStateForTesting } from '../../src/interactive.js'
 import { formatRecallNotebookCurrentPromptLine } from '../../src/recall.js'
 import { stripAnsi } from '../../src/renderer.js'
@@ -32,12 +36,9 @@ describe('TTY recall: notebook first in Current prompt (all question kinds)', ()
     const chem = makeMe.aNotebook
     chem.notebuilder.title('Chem')
     mockRecallNext.mockResolvedValue(
-      recallNextQuestion({
-        id: 1,
-        questionType: 'MCQ',
-        notebook: chem.please(),
-        multipleChoicesQuestion: { f0__stem: 'Q?', f1__choices: ['a', 'b'] },
-      })
+      recallNextQuestion(
+        mcqRecallPromptWithNotebook(1, 'Q?', ['a', 'b'], chem.please())
+      )
     )
     await submitTTYCommand(stdin, '/recall')
     await tick()
@@ -51,12 +52,9 @@ describe('TTY recall: notebook first in Current prompt (all question kinds)', ()
     const chem = makeMe.aNotebook
     chem.notebuilder.title('Chem')
     mockRecallNext.mockResolvedValue(
-      recallNextQuestion({
-        id: 2,
-        questionType: 'SPELLING',
-        notebook: chem.please(),
-        spellingQuestion: { stem: 'word' },
-      })
+      recallNextQuestion(
+        spellingRecallPromptWithNotebook(2, 'word', chem.please())
+      )
     )
     await submitTTYCommand(stdin, '/recall')
     await tick()

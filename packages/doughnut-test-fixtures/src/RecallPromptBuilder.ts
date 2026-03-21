@@ -20,6 +20,7 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
   private isContestedToUse?: boolean
   private questionTypeToUse?: string
   private memoryTrackerIdToUse?: number
+  private spellingStemToUse?: string
 
   withId(id: number) {
     this.idToUse = id
@@ -76,7 +77,27 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
     return this
   }
 
+  withSpellingStem(stem: string) {
+    this.spellingStemToUse = stem
+    this.questionTypeToUse = 'SPELLING'
+    return this
+  }
+
   do(): RecallPrompt {
+    if (this.spellingStemToUse !== undefined) {
+      return {
+        id: this.idToUse ?? generateId(),
+        memoryTrackerId: this.memoryTrackerIdToUse,
+        questionType: 'SPELLING',
+        notebook: new NotebookBuilder().do(),
+        note: this.noteToUse,
+        spellingQuestion: { stem: this.spellingStemToUse },
+        answer: this.answerToUse,
+        answerTime: this.answerTimeToUse,
+        questionGeneratedTime: this.questionGeneratedTimeToUse,
+        isContested: this.isContestedToUse,
+      }
+    }
     const predefinedQuestion =
       this.predefinedQuestionToUse ?? this.predefinedQuestionBuilder.do()
     return {

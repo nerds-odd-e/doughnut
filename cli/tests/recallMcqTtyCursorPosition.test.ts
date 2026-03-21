@@ -27,6 +27,7 @@ import {
   lastRowIndexContainingPlain,
 } from './ttyWriteSimulation.js'
 import { recallNextQuestion } from './recallNextTestShapes.js'
+import { mcqRecallPrompt } from './recallPromptFixtures.js'
 
 const CURSOR_ROW_MESSAGE =
   'After painting the live region, the final CUU must land exactly on the → input row. ' +
@@ -70,14 +71,7 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
 
   test('wide terminal (no choice wrap): cursor ends on the → input row', async () => {
     mockRecallNext.mockResolvedValue(
-      recallNextQuestion({
-        id: 1,
-        questionType: 'MCQ',
-        multipleChoicesQuestion: {
-          f0__stem: 'Q?',
-          f1__choices: ['A', 'B'],
-        },
-      })
+      recallNextQuestion(mcqRecallPrompt(1, 'Q?', ['A', 'B']))
     )
     await sessionWithColumns(100)
     await submitTTYCommand(stdin, '/recall')
@@ -87,14 +81,13 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
 
   test('wrapped MCQ stem (narrow terminal), after ↓: cursor on the → input row', async () => {
     mockRecallNext.mockResolvedValue(
-      recallNextQuestion({
-        id: 300,
-        questionType: 'MCQ',
-        multipleChoicesQuestion: {
-          f0__stem: 'A question long enough to wrap at thirty columns wide',
-          f1__choices: ['A', 'B'],
-        },
-      })
+      recallNextQuestion(
+        mcqRecallPrompt(
+          300,
+          'A question long enough to wrap at thirty columns wide',
+          ['A', 'B']
+        )
+      )
     )
     await sessionWithColumns(30)
     await submitTTYCommand(stdin, '/recall')
@@ -110,14 +103,7 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
       'Second option also long enough to wrap at this narrow terminal width here',
     ] as const
     mockRecallNext.mockResolvedValue(
-      recallNextQuestion({
-        id: 4,
-        questionType: 'MCQ',
-        multipleChoicesQuestion: {
-          f0__stem: 'Pick:',
-          f1__choices: [...choices],
-        },
-      })
+      recallNextQuestion(mcqRecallPrompt(4, 'Pick:', [...choices]))
     )
     await sessionWithColumns(36)
     expect(
@@ -148,14 +134,7 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
       'B',
     ] as const
     mockRecallNext.mockResolvedValue(
-      recallNextQuestion({
-        id: 3,
-        questionType: 'MCQ',
-        multipleChoicesQuestion: {
-          f0__stem: 'Pick:',
-          f1__choices: [...choices],
-        },
-      })
+      recallNextQuestion(mcqRecallPrompt(3, 'Pick:', [...choices]))
     )
     await sessionWithColumns(36)
     expect(

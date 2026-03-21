@@ -10,6 +10,12 @@ import {
   type MemoryTrackerLite,
 } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
+import {
+  mcqRecallPrompt,
+  mcqRecallPromptWithNotebook,
+  spellingRecallPrompt,
+} from './recallPromptFixtures.js'
+import { recallNextQuestion } from './recallNextTestShapes.js'
 import { addAccessToken } from '../src/accessToken.js'
 import { userAbortError } from '../src/fetchAbort.js'
 import {
@@ -21,7 +27,6 @@ import {
   recallStatus,
   RECALL_LOAD_CLI_TEST_DELAY_MS_ENV,
 } from '../src/recall.js'
-import { recallNextQuestion } from './recallNextTestShapes.js'
 
 vi.mock('doughnut-api', () => ({
   getApiConfig: () => ({ apiBaseUrl: 'http://localhost:9081' }),
@@ -411,14 +416,7 @@ describe('recallNext', () => {
     vi.mocked(RecallsController.recalling).mockResolvedValue(
       dueTrackersData([{ memoryTrackerId: 42 }])
     )
-    const prompt = {
-      ...makeMe.aRecallPrompt
-        .withId(100)
-        .withQuestionStem('What is 2+2?')
-        .withChoices(['4', '3', '5'])
-        .please(),
-      notebook: undefined,
-    }
+    const prompt = mcqRecallPrompt(100, 'What is 2+2?', ['4', '3', '5'])
     vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
       data: prompt,
     } as never)
@@ -437,11 +435,7 @@ describe('recallNext', () => {
     vi.mocked(RecallsController.recalling).mockResolvedValue(
       dueTrackersData([{ memoryTrackerId: 42 }])
     )
-    const prompt = {
-      id: 100,
-      questionType: 'SPELLING' as const,
-      spellingQuestion: { stem: 'means incite violence' },
-    }
+    const prompt = spellingRecallPrompt(100, 'means incite violence')
     vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
       data: prompt,
     } as never)
@@ -545,18 +539,14 @@ describe('recallNext', () => {
     vi.mocked(RecallsController.recalling).mockResolvedValue(
       dueTrackersData([{ memoryTrackerId: 42 }])
     )
-    const prompt = (() => {
-      const physicsNotebook = makeMe.aNotebook
-      physicsNotebook.notebuilder.title('Physics')
-      return {
-        ...makeMe.aRecallPrompt
-          .withId(100)
-          .withQuestionStem('Q?')
-          .withChoices(['a'])
-          .please(),
-        notebook: physicsNotebook.please(),
-      }
-    })()
+    const physicsNotebook = makeMe.aNotebook
+    physicsNotebook.notebuilder.title('Physics')
+    const prompt = mcqRecallPromptWithNotebook(
+      100,
+      'Q?',
+      ['a'],
+      physicsNotebook.please()
+    )
     vi.mocked(MemoryTrackerController.askAQuestion).mockResolvedValue({
       data: prompt,
     } as never)
@@ -787,14 +777,7 @@ describe('contestAndRegenerate', () => {
     vi.mocked(RecallPromptController.contest).mockResolvedValue({
       data: { advice: 'improve', rejected: false },
     } as never)
-    const regenerated = {
-      ...makeMe.aRecallPrompt
-        .withId(200)
-        .withQuestionStem('New question?')
-        .withChoices(['A', 'B', 'C'])
-        .please(),
-      notebook: undefined,
-    }
+    const regenerated = mcqRecallPrompt(200, 'New question?', ['A', 'B', 'C'])
     vi.mocked(RecallPromptController.regenerate).mockResolvedValue({
       data: regenerated,
     } as never)
