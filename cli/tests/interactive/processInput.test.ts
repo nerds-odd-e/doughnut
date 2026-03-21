@@ -92,15 +92,6 @@ describe('processInput', () => {
     expect(logSpy).toHaveBeenCalledWith('Not supported')
   })
 
-  test('returns false and logs help for /help', async () => {
-    expect(await processInput('/help')).toBe(false)
-    const output = logSpy.mock.calls.flat().join('\n')
-    expect(output).toContain('/add gmail')
-    expect(output).toContain('/last email')
-    expect(output).toContain('exit')
-    expect(output).not.toContain('Not supported')
-  })
-
   test('returns false and writes clear-screen sequence and prompt box for /clear', async () => {
     const writeSpy = vi
       .spyOn(process.stdout, 'write')
@@ -245,7 +236,7 @@ describe('processInput', () => {
     await processInput('clear') // clear pending state for subsequent tests
   })
 
-  test('/recall with no notes prompts load more from next 3 days', async () => {
+  test('/recall load more: user says n, shows 0 notes to recall today', async () => {
     mockRecallNext.mockResolvedValue({
       type: 'none',
       message: '0 notes to recall today',
@@ -256,15 +247,6 @@ describe('processInput', () => {
       expect.stringContaining('Load more from next 3 days? (y/n)')
     )
     expect(mockRecallNext).toHaveBeenCalledWith(0, expect.any(AbortSignal))
-  })
-
-  test('/recall load more: user says n, shows 0 notes to recall today', async () => {
-    mockRecallNext.mockResolvedValue({
-      type: 'none',
-      message: '0 notes to recall today',
-    })
-
-    await processInput('/recall')
     logSpy.mockClear()
     await processInput('n')
     expect(logSpy).toHaveBeenCalledWith('0 notes to recall today')
@@ -425,12 +407,12 @@ describe('processInput', () => {
     )
   })
 
-  test('MCQ: prompt with markdown stem shows ANSI codes', async () => {
+  test('MCQ: default console renders markdown in stem and choices as ANSI', async () => {
     mockRecallNext.mockResolvedValue({
       type: 'mcq',
       recallPromptId: 100,
       stem: 'What is **2+2**?',
-      choices: ['4', '3', '5'],
+      choices: ['*A*', '**B**', '`C`'],
     })
 
     await processInput('/recall')
@@ -441,21 +423,11 @@ describe('processInput', () => {
         !(c[0] as string).includes('  1.')
     )
     expect(stemCall).toBeDefined()
-    const output = stemCall![0] as string
-    expect(output).toContain('\x1b[')
-    expect(output).not.toContain('**')
-    expect(stripAnsi(output)).toContain('2+2')
-  })
+    const stemOut = stemCall![0] as string
+    expect(stemOut).toContain('\x1b[')
+    expect(stemOut).not.toContain('**')
+    expect(stripAnsi(stemOut)).toContain('2+2')
 
-  test('MCQ: prompt with markdown choices shows ANSI codes', async () => {
-    mockRecallNext.mockResolvedValue({
-      type: 'mcq',
-      recallPromptId: 100,
-      stem: 'Pick one',
-      choices: ['*A*', '**B**', '`C`'],
-    })
-
-    await processInput('/recall')
     const choiceCalls = logSpy.mock.calls.filter(
       (c) =>
         typeof c[0] === 'string' &&

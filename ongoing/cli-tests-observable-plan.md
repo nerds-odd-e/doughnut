@@ -42,13 +42,15 @@ Informal plan. Aligned with `.cursor/rules/planning.mdc` → **Observable behavi
 
 ---
 
-## Phase 3 — TTY vs piped: one observable surface per gap
+## Phase 3 — TTY vs piped: one observable surface per gap ✅ done
 
 **Outcome:** Fewer “log-only” tests where **real** user-visible difference is TTY bytes.
 
 - For behaviors already covered in **`interactiveTty*`** (ESC, MCQ, token list, fetch-wait repaint), **drop** redundant `processInput` tests that only repeat the same **plain string** unless they guard **non-TTY** (`-c` / default adapter) semantics.
 - Where **TTY and piped differ** (e.g. buffered `ttyOutput` vs `console.log`), keep **at most one** focused test per surface (same idea as `interactiveExitFarewell.test.ts`).
 - **Deliverable:** No loss of coverage on either surface; less processInput-only noise.
+
+**Done (2026-03-21):** Removed duplicate `/help` contract from `processInput.test.ts` (same assertions live under `help.test.ts` → `processInput with /help`). Folded “load more” prompt + first `recallNext(0, …)` check into `/recall load more: user says n`. Merged the two MCQ markdown rendering tests into one default-console case (stem + choices).
 
 ---
 
