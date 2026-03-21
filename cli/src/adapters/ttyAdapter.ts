@@ -13,6 +13,7 @@ import {
   getInteractiveFetchWaitLine,
   runInteractiveFetchWait,
 } from '../interactiveFetchWait.js'
+import { maskInteractiveInputForHistory } from '../inputHistoryMask.js'
 import {
   afterBareSlashEscape,
   appendCommittedCommand,
@@ -303,7 +304,7 @@ export async function runTTY(
       ...commandInput,
       committedCommands: appendCommittedCommand(
         commandInput.committedCommands,
-        raw
+        maskInteractiveInputForHistory(raw)
       ),
     }
   }
@@ -333,7 +334,10 @@ export async function runTTY(
   ) {
     const command = tokenSelection?.command ?? ''
     clearLiveRegionForRepaint(livePaint)
-    chatHistory.push({ type: 'input', content: command })
+    chatHistory.push({
+      type: 'input',
+      content: maskInteractiveInputForHistory(command),
+    })
     tokenSelection = null
     commandInput = clearLiveCommandLine(commandInput)
     commitHistoryOutput([message], tone, {
@@ -723,7 +727,10 @@ export async function runTTY(
         if (isYes) {
           exitRecallMode()
           mcqChoiceHighlightIndex = 0
-          chatHistory.push({ type: 'input', content: trimmed })
+          chatHistory.push({
+            type: 'input',
+            content: maskInteractiveInputForHistory(trimmed),
+          })
           rememberCommittedLine(trimmed)
           commitHistoryOutput(['Stopped recall'])
           return
@@ -774,7 +781,10 @@ export async function runTTY(
         mcqChoiceHighlightIndex = 0
         livePaint.lastPaintedLineCount = 0
         resetCommandTurnBuffer()
-        chatHistory.push({ type: 'input', content: inputForHistory })
+        chatHistory.push({
+          type: 'input',
+          content: maskInteractiveInputForHistory(inputForHistory),
+        })
         if (isCommittedInteractiveInput(inputForHistory)) {
           rememberCommittedLine(inputForHistory)
         }
@@ -891,13 +901,18 @@ export async function runTTY(
         if (tokenSelect) {
           const tokens = listAccessTokens()
           if (tokens.length === 0) {
-            chatHistory.push({ type: 'input', content: trimmedInput })
+            chatHistory.push({
+              type: 'input',
+              content: maskInteractiveInputForHistory(trimmedInput),
+            })
             rememberCommittedLine(trimmedInput)
             commitHistoryOutput(['No access tokens stored.'])
             return
           } else {
             if (isCommittedInteractiveInput(input)) {
-              process.stdout.write(renderPastInput(input, width))
+              process.stdout.write(
+                renderPastInput(maskInteractiveInputForHistory(input), width)
+              )
               process.stdout.write('\n')
             }
             rememberCommittedLine(trimmedInput)
@@ -910,7 +925,10 @@ export async function runTTY(
 
         resetCommandTurnBuffer()
         if (isCommittedInteractiveInput(input)) {
-          chatHistory.push({ type: 'input', content: input })
+          chatHistory.push({
+            type: 'input',
+            content: maskInteractiveInputForHistory(input),
+          })
           rememberCommittedLine(input)
           if (await processInput(input, ttyOutput, true)) {
             commitExitTurnToScrollback()

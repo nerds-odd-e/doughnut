@@ -53,17 +53,11 @@ Scope: **`/add-access-token`** only unless product asks to extend (e.g. other pa
 
 **Out of scope this phase:** Disk persistence; masking (can use plain test strings).
 
-### Phase B — Mask `/add-access-token` in history input
+### Phase B — Mask `/add-access-token` in history input ✅
 
 **User-visible:** After adding a token, the grey **history input** block and any **navigable** history entry show a redacted line, never the raw token.
 
-**Implementation sketch:**
-
-- Add something like `maskInteractiveInputForHistory(line: string): string` in one place (e.g. `renderer.ts` next to `renderPastInput` or a tiny `inputHistoryMask.ts`).
-- Apply when pushing `{ type: 'input', … }` to `chatHistory` **and** when appending to the command-history deque (so TTY scrollback, navigation, and future file all agree).
-- Real token still goes to `processInput` / `addAccessToken` as today; masking is **only** for stored/display strings.
-
-**Tests:** Unit tests for the mask helper (edge cases: exact command, extra spaces, wrong casing if normalized).
+**Done:** `maskInteractiveInputForHistory` in `cli/src/inputHistoryMask.ts`. TTY: all `chatHistory` input entries, `rememberCommittedLine` / `appendCommittedCommand`, and immediate `renderPastInput` before token-list mode use the masked string; `processInput` still receives the raw line. Piped interactive: `renderPastInput` uses the masked line. **Tests:** `cli/tests/inputHistoryMask.test.ts`, `cli/tests/interactive/interactiveTtyAddAccessTokenMask.test.ts`.
 
 ### Phase C — Persist last ~100 commands
 

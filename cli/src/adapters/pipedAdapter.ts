@@ -1,4 +1,5 @@
 import * as readline from 'node:readline'
+import { maskInteractiveInputForHistory } from '../inputHistoryMask.js'
 import { isCommittedInteractiveInput } from '../renderer.js'
 import type { OutputAdapter } from '../types.js'
 
@@ -57,7 +58,12 @@ export async function runPiped(
     processing = true
     const line = lineQueue.shift()!
     if (isCommittedInteractiveInput(line)) {
-      console.log(renderPastInput(line, getTerminalWidth()))
+      console.log(
+        renderPastInput(
+          maskInteractiveInputForHistory(line),
+          getTerminalWidth()
+        )
+      )
     }
     if (await processInput(line, undefined, true)) {
       rl.close()

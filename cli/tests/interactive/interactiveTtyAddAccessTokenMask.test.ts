@@ -1,0 +1,52 @@
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+
+vi.mock('../../src/accessToken.js', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('../../src/accessToken.js')>()
+  return {
+    ...actual,
+    addAccessToken: vi.fn().mockResolvedValue(undefined),
+  }
+})
+
+import './interactiveTestMocks.js'
+import { stripAnsi } from '../../src/renderer.js'
+import {
+  endTTYSession,
+  pressEnter,
+  tick,
+  ttyOutput,
+  ttySessionWithSpies,
+  typeString,
+  type TTYStdin,
+} from './interactiveTestHelpers.js'
+
+describe('TTY: /add-access-token masking in scrollback', () => {
+  let writeSpy: ReturnType<typeof vi.spyOn>
+  let stdin: TTYStdin
+
+  beforeEach(async () => {
+    ;({ stdin, writeSpy } = await ttySessionWithSpies())
+  })
+
+  afterEach(() => {
+    endTTYSession(stdin)
+  })
+
+  test('history grey block shows redacted line, not the raw token', async () => {
+    const secret = 'tty-mask-secret-never-leak'
+    typeString(stdin, `/add-access-token ${secret}`)
+    pressEnter(stdin)
+    await tick()
+    await tick()
+    await tick()
+
+    const out = stripAnsi(ttyOutput(writeSpy))
+    expect(out).toContain('/add-access-token <redacted>')
+    const fromCommittedHistory = out.slice(
+      out.indexOf('/add-access-token <redacted>')
+    )
+    expect(fromCommittedHistory).toContain('Token added')
+    expect(fromCommittedHistory).not.toContain(secret)
+  })
+})
