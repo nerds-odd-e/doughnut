@@ -46,6 +46,8 @@ Informal plan. Delete or trim when shipped.
 
 ### Phase 3 — Single choice-list builder + fix blank-line / index cohesion
 
+**Done:** `normalizeMcqChoiceRawText` + `renderMcqChoiceMarkdownOneLine` → `formatMcqChoiceLines`; `buildMcqCurrentGuidanceLines` (highlight + truncate) used from TTY; piped scrollback still uses `formatMcqChoiceLines` only.
+
 **Goal:** **One** function (or pair: “logical choices → display lines” + “highlight”) used for Current guidance so initial paint and ↑↓ selection always agree. Ensure `formatMcqChoiceLines` / markdown does not introduce **spurious extra rows** (e.g. trim or normalize embedded newlines in a **defined** way — single policy for all paths). `formatHighlightedList` continues to receive **one entry per choice** at the logical level **before** wrapping (or a flattened structure with explicit choice boundaries — see Phase 4).
 
 **Scope:** Likely `cli/src/renderer.ts`, `cli/src/listDisplay.ts`, `ttyAdapter.ts`; remove duplicate `formatMcqChoiceLines` loops from `showRecallPrompt` for MCQ.

@@ -345,8 +345,41 @@ export function getTerminalWidth(): number {
   return process.stdout.columns || 80
 }
 
+/** One logical MCQ choice → one terminal line: collapse embedded newlines and trim runs of whitespace. */
+export function normalizeMcqChoiceRawText(raw: string): string {
+  return raw
+    .split(/\r?\n/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+    .join(' ')
+}
+
+function renderMcqChoiceMarkdownOneLine(normalizedMarkdown: string): string {
+  return renderMarkdownToTerminal(normalizedMarkdown)
+    .split(/\r?\n/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+    .join(' ')
+}
+
 export function formatMcqChoiceLines(choices: readonly string[]): string[] {
-  return choices.map((c, i) => `  ${i + 1}. ${renderMarkdownToTerminal(c)}`)
+  return choices.map((c, i) => {
+    const body = renderMcqChoiceMarkdownOneLine(normalizeMcqChoiceRawText(c))
+    return `  ${i + 1}. ${body}`
+  })
+}
+
+/** Current guidance for recall MCQ: one highlighted row per choice (same path as scrollback numbering). */
+export function buildMcqCurrentGuidanceLines(
+  choices: readonly string[],
+  highlightIndex: number,
+  width: TerminalWidth
+): string[] {
+  return formatCurrentGuidanceLines(
+    formatMcqChoiceLines(choices),
+    highlightIndex,
+    width
+  )
 }
 
 /** Last line of buffer (for slash-command prefix detection). */

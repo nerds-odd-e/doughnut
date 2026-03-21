@@ -18,7 +18,6 @@ import {
   getTabCompletion,
   interactiveDocs,
 } from './help.js'
-import { formatHighlightedList } from './listDisplay.js'
 import { renderMarkdownToTerminal } from './markdown.js'
 import {
   answerQuiz,
@@ -44,6 +43,7 @@ import {
   needsGapBeforeBox,
   buildSuggestionLines,
   buildTokenListLines,
+  buildMcqCurrentGuidanceLines,
   getLastLine,
   formatMcqChoiceLines,
   getTerminalWidth,
@@ -660,7 +660,7 @@ function buildTTYDeps() {
     needsGapBeforeBox,
     buildSuggestionLines,
     getLastLine,
-    formatMcqChoiceLines,
+    buildMcqCurrentGuidanceLines,
     getTerminalWidth,
     renderFullDisplay,
     renderPastInput,
@@ -673,7 +673,6 @@ function buildTTYDeps() {
     filterCommandsByPrefix,
     getTabCompletion,
     interactiveDocs,
-    formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
   }

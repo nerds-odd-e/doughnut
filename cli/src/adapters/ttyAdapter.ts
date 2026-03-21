@@ -101,7 +101,11 @@ export interface TTYDeps {
     width: number,
     options?: { forceCommandsHint?: boolean }
   ) => string[]
-  formatMcqChoiceLines: (choices: readonly string[]) => string[]
+  buildMcqCurrentGuidanceLines: (
+    choices: readonly string[],
+    highlightIndex: number,
+    width: number
+  ) => string[]
   getTerminalWidth: () => number
   buildCurrentPromptSeparator: (width: number) => string
   buildLiveRegionLines: (
@@ -141,11 +145,6 @@ export interface TTYDeps {
     commands: readonly CommandDoc[]
   ) => { completed: string; count: number }
   interactiveDocs: readonly CommandDoc[]
-  formatHighlightedList: (
-    lines: string[],
-    maxVisible?: number,
-    highlightIndex?: number
-  ) => string[]
   TOKEN_LIST_COMMANDS: Record<string, TokenListCommandConfig>
   getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
 }
@@ -252,7 +251,7 @@ export async function runTTY(
     getLastLine,
     buildBoxLines,
     buildSuggestionLines,
-    formatMcqChoiceLines,
+    buildMcqCurrentGuidanceLines,
     getTerminalWidth,
     buildCurrentPromptSeparator,
     buildLiveRegionLines,
@@ -268,7 +267,6 @@ export async function runTTY(
     filterCommandsByPrefix,
     getTabCompletion,
     interactiveDocs,
-    formatHighlightedList,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
   } = deps
@@ -447,10 +445,10 @@ export async function runTTY(
       : isPendingRecallStopConfirmation()
         ? ['Stop recall? (y/n)']
         : isMcqRecallPending(pendingRecallAnswer)
-          ? formatHighlightedList(
-              formatMcqChoiceLines(pendingRecallAnswer.choices),
-              undefined,
-              mcqChoiceHighlightIndex
+          ? buildMcqCurrentGuidanceLines(
+              pendingRecallAnswer.choices,
+              mcqChoiceHighlightIndex,
+              width
             )
           : buildSuggestionLines(
               commandInput.lineDraft,

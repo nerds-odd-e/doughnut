@@ -13,6 +13,9 @@ import {
   needsGapBeforeBox,
   buildLiveRegionLines,
   wrapTextToVisibleWidthLines,
+  buildMcqCurrentGuidanceLines,
+  formatMcqChoiceLines,
+  normalizeMcqChoiceRawText,
 } from '../src/renderer.js'
 import type { ChatHistory } from '../src/types.js'
 
@@ -177,5 +180,29 @@ describe('truncateToWidth', () => {
     const result = truncateToWidth('\x1b[7mhello world\x1b[0m', 8)
     // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI RESET, intentional
     expect(result).toMatch(/\.\.\.\x1b\[0m$/)
+  })
+})
+
+describe('MCQ choice display (single pipeline)', () => {
+  test('normalizeMcqChoiceRawText collapses newlines and trims', () => {
+    expect(normalizeMcqChoiceRawText('a\n\n  b  \n')).toBe('a b')
+    expect(normalizeMcqChoiceRawText('  \n  ')).toBe('')
+  })
+
+  test('formatMcqChoiceLines: one row per choice, no blank rows between', () => {
+    const lines = formatMcqChoiceLines(['line1\n\nline2', 'second'])
+    expect(lines).toHaveLength(2)
+    expect(lines.every((l) => stripAnsi(l).trim().length > 0)).toBe(true)
+    expect(stripAnsi(lines[0]!)).toMatch(/^ {2}1\. /)
+    expect(stripAnsi(lines[0]!)).toContain('line1')
+    expect(stripAnsi(lines[0]!)).toContain('line2')
+    expect(stripAnsi(lines[1]!)).toBe('  2. second')
+  })
+
+  test('buildMcqCurrentGuidanceLines highlights exactly the choice at highlightIndex', () => {
+    const out = buildMcqCurrentGuidanceLines(['a', 'b', 'c'], 1, 120)
+    const highlighted = out.filter((l) => l.includes('\x1b[7m'))
+    expect(highlighted).toHaveLength(1)
+    expect(stripAnsi(highlighted[0]!)).toMatch(/ {2}2\. /)
   })
 })
