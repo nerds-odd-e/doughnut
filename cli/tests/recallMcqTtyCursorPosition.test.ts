@@ -29,9 +29,8 @@ import {
 } from './ttyWriteSimulation.js'
 
 const CURSOR_ROW_MESSAGE =
-  'Recall MCQ uses one extra final CUU in ttyAdapter so the real TTY lands on the → row. ' +
-  'Naive replay leaves simulated `row` one index below that line in the sparse buffer (row + 1 === promptRow). ' +
-  'If the real cursor still sits below the prompt, increase extraCursorUpAfterLiveRegionPaint for recallMcq.'
+  'After painting the live region, the final CUU must land exactly on the → input row. ' +
+  'If the cursor row does not equal the prompt row, the CUU count in drawBox/doFullRedraw is wrong.'
 
 describe('recall MCQ on TTY: cursor row after paint', () => {
   let stdin: TTYStdin
@@ -66,7 +65,7 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
       promptRow,
       'Sanity: live session output should contain the → prompt inside the input box.'
     ).toBeGreaterThanOrEqual(0)
-    expect(row + 1, CURSOR_ROW_MESSAGE).toBe(promptRow)
+    expect(row, CURSOR_ROW_MESSAGE).toBe(promptRow)
   }
 
   test('wide terminal (no choice wrap): cursor ends on the → input row', async () => {
@@ -103,6 +102,66 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
     pressKey(stdin, 'down')
     await tick()
     assertCursorOnInputPromptRow(ttyOutput(writeSpy))
+  })
+
+  test('narrow terminal (both choices wrap), after ↓ repaint: cursor on the → input row', async () => {
+    const choices = [
+      'First option with enough text to wrap across multiple rows at narrow width',
+      'Second option also long enough to wrap at this narrow terminal width here',
+    ] as const
+    mockRecallNext.mockResolvedValue({
+      type: 'mcq',
+      recallPromptId: 4,
+      stem: 'Pick:',
+      choices: [...choices],
+    })
+    await sessionWithColumns(36)
+    expect(
+      recallMcqNumberedChoiceLines([...choices], 36).length,
+      'Sanity: both choices must produce multiple physical lines at width 36.'
+    ).toBeGreaterThanOrEqual(5)
+    await submitTTYCommand(stdin, '/recall')
+    await tick()
+    pressKey(stdin, 'down')
+    await tick()
+    assertCursorOnInputPromptRow(ttyOutput(writeSpy))
+  })
+
+  test('after multiple ↓ navigations, live region does not drift into history', async () => {
+    const choices = [
+      'First option with enough text to wrap across multiple rows at narrow width',
+      'Second option also long enough to wrap at this narrow terminal width here',
+    ] as const
+    mockRecallNext.mockResolvedValue({
+      type: 'mcq',
+      recallPromptId: 5,
+      stem: 'Pick:',
+      choices: [...choices],
+    })
+    await sessionWithColumns(36)
+    await submitTTYCommand(stdin, '/recall')
+    await tick()
+    pressKey(stdin, 'down')
+    await tick()
+    pressKey(stdin, 'up')
+    await tick()
+    pressKey(stdin, 'down')
+    await tick()
+    const { lines } = cursorPositionAfterTtyWrites(ttyOutput(writeSpy))
+    const recallRow = lastRowIndexContainingPlain(lines, '/recall')
+    const separatorRow = lastRowIndexContainingPlain(lines, '─'.repeat(10))
+    expect(
+      recallRow,
+      'Sanity: /recall past-input line should be visible in the output.'
+    ).toBeGreaterThanOrEqual(0)
+    expect(
+      separatorRow,
+      'Sanity: the ─── separator above the MCQ stem should appear.'
+    ).toBeGreaterThanOrEqual(0)
+    expect(
+      separatorRow,
+      'The separator (start of live region) must appear AFTER the /recall past-input. If it appears earlier, the live region drifted upward into history.'
+    ).toBeGreaterThan(recallRow)
   })
 
   test('narrow then resize (guidance shrinks): cursor still on the → input row', async () => {

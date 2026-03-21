@@ -184,12 +184,6 @@ function clearLiveRegionForRepaint(cursor: LiveRegionPaintCursor): void {
   cursor.cursorUpStepsToLiveRegionTop = 0
 }
 
-function extraCursorUpAfterLiveRegionPaint(
-  placeholderContext: PlaceholderContext
-): number {
-  return placeholderContext === 'recallMcq' ? 1 : 0
-}
-
 function isSubmitKey(keyName: string): boolean {
   return keyName === 'return' || keyName === 'enter'
 }
@@ -571,27 +565,18 @@ export async function runTTY(
       process.stdout.write(`${line}\n`)
     }
 
-    livePaint.cursorUpStepsToLiveRegionTop = layout.inputLineRowInLiveBlock
     livePaint.lastPaintedLineCount = layout.liveLineCount
+    livePaint.cursorUpStepsToLiveRegionTop = layout.inputLineRowInLiveBlock
 
     process.stdout.write(
-      `\x1b[${
-        layout.liveLineCount -
-        layout.inputLineRowInLiveBlock +
-        extraCursorUpAfterLiveRegionPaint(layout.placeholderContext)
-      }A`
+      `\x1b[${layout.liveLineCount - layout.inputLineRowInLiveBlock}A`
     )
     finalizeInteractiveLiveRegionPaint(layout.placeholderContext)
   }
 
   function drawBox() {
     const layout = measureLiveRegionLayout()
-    const {
-      liveLines,
-      liveLineCount,
-      inputLineRowInLiveBlock,
-      placeholderContext,
-    } = layout
+    const { liveLines, liveLineCount, inputLineRowInLiveBlock } = layout
 
     if (livePaint.cursorUpStepsToLiveRegionTop > 0) {
       process.stdout.write(`\x1b[${livePaint.cursorUpStepsToLiveRegionTop}A`)
@@ -612,17 +597,11 @@ export async function runTTY(
     }
 
     const totalWritten = Math.max(liveLineCount, livePaint.lastPaintedLineCount)
-    process.stdout.write(
-      `\x1b[${
-        totalWritten -
-        inputLineRowInLiveBlock +
-        extraCursorUpAfterLiveRegionPaint(placeholderContext)
-      }A`
-    )
-    finalizeInteractiveLiveRegionPaint(layout.placeholderContext)
-
+    process.stdout.write(`\x1b[${totalWritten - inputLineRowInLiveBlock}A`)
     livePaint.cursorUpStepsToLiveRegionTop = inputLineRowInLiveBlock
     livePaint.lastPaintedLineCount = liveLineCount
+
+    finalizeInteractiveLiveRegionPaint(layout.placeholderContext)
   }
 
   /**
