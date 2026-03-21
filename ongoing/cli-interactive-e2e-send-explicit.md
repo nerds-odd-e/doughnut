@@ -2,16 +2,9 @@
 
 ## Context
 
-Today `sendToInteractiveCli` in `e2e_test/config/cliPtyRunner.ts` decides what bytes to write using nested ternaries:
+**Before Phases 1–3:** One Cypress task and `interactive().input` used a single string with heuristics (`trim()`, slash vs line, etc.), which hid trailing-space behavior and mixed intents.
 
-- ESC → send `\x1b` as-is.
-- Otherwise `trim()` the string, then if it looks like a slash command **and** the trimmed form does not end with a space, send `{trimmed} \n` (note the injected space before newline).
-- Else if the trimmed string already ends with `\n`, send trimmed as-is.
-- Else send `{trimmed}\n`.
-
-Cypress calls this through one task (`sendToInteractiveCli` in `e2e_test/config/common.ts`) and one page-object entry point (`interactive().input` in `e2e_test/start/pageObjects/cli/execution.ts`). Steps collapse different user intents into `I input {string} in the interactive CLI` and `I press Enter` (which passes `"\n"`—after trim, empty line, then `\n`).
-
-**Side effect of `trim()`:** Trailing spaces in the Gherkin string are invisible to the slash-command branch (they are stripped before `endsWith(' ')`), so “space then Enter” cannot be expressed honestly today.
+**Now:** Interactive PTY writes go only through `writeInteractiveCliAndWaitForReady(payload)` with bytes built from `interactiveCliTtyPayload` or the matching Cypress tasks (`sendInteractiveCliSlashCommand`, `sendInteractiveCliLine`, `sendInteractiveCliEnter`, `sendInteractiveCliEsc`). Gherkin uses explicit steps (Phase 2).
 
 ## Correction: non-`/` input already exists in E2E
 
@@ -31,11 +24,9 @@ The gap vs `cli_non_interactive_mode.feature` is an explicit **unsupported plain
   - **ESC** — `'\x1b'`.
   - Optional: **raw** / **exact bytes** if a future test must send `\n` inside a payload without the helper appending; only add if a real scenario needs it.
 
-Remove the old “smart” `sendToInteractiveCli(string)` once call sites are migrated, or keep a thin deprecated wrapper only if needed briefly during migration (prefer deleting in the same series of phases).
+### Cypress tasks (`cliE2ePluginTasks.ts`, merged in `common.ts` via `createCliE2ePluginTasks`)
 
-### Cypress tasks (`common.ts`)
-
-- Register **separate** `task` names (or one task with a **discriminated union** and a trivial `switch`—acceptable if the PTY layer stays dumb; preference from the prompt is **explicit caller functions**, which maps cleanly to separate tasks or separate exported functions invoked from one task dispatcher with a fixed `action` field).
+- **Done:** Separate task names for each send shape (`sendInteractiveCliSlashCommand`, etc.).
 
 ### Page objects (`execution.ts` → `interactive()`)
 
@@ -65,17 +56,16 @@ Order by **risk reduction** and **mechanical migration**; each phase should end 
 
 ### Phase 1 — Dumb write helper + parallel API
 
-- **Done:** `writeInteractiveCliAndWaitForReady` + `interactiveCliTtyPayload` in `cliPtyRunner.ts`. Legacy task `sendToInteractiveCli` unchanged for steps/page objects. Repo/spawn/bundle lives in `cliE2eRepo.ts`; CLI Cypress tasks in `cliE2ePluginTasks.ts` (`createCliE2ePluginTasks`). Unused parallel tasks / page-object shortcuts removed until Phase 2 migrates Gherkin.
+- **Done:** `writeInteractiveCliAndWaitForReady` + `interactiveCliTtyPayload` in `cliPtyRunner.ts`. Repo/spawn/bundle in `cliE2eRepo.ts`; CLI Cypress tasks in `cliE2ePluginTasks.ts` (`createCliE2ePluginTasks`).
 
 ### Phase 2 — Migrate `@interactiveCLI` scenarios to explicit steps
 
-- **Done:** `cli_interactive_mode.feature`, `cli_recall.feature`, `cli_access_token.feature` use `I enter the slash command …`, `I enter …` (line), `I press Enter …`; page object uses `enterSlashCommand`, `enterLine`, `pressEnter`, `pressEsc`; Cypress tasks `sendInteractiveCliSlashCommand`, `sendInteractiveCliLine`, `sendInteractiveCliEnter`, `sendInteractiveCliEsc` call `writeInteractiveCliAndWaitForReady` with `interactiveCliTtyPayload` (legacy `sendToInteractiveCli` unchanged for Phase 3).
+- **Done:** `cli_interactive_mode.feature`, `cli_recall.feature`, `cli_access_token.feature` use `I enter the slash command …`, `I enter …` (line), `I press Enter …`; page object uses `enterSlashCommand`, `enterLine`, `pressEnter`, `pressEsc`; Cypress tasks `sendInteractiveCliSlashCommand`, `sendInteractiveCliLine`, `sendInteractiveCliEnter`, `sendInteractiveCliEsc` call `writeInteractiveCliAndWaitForReady` with `interactiveCliTtyPayload`.
 - Generic `I input {string} in the interactive CLI` removed; down-arrow step name unchanged, implementation uses explicit sends.
 
 ### Phase 3 — Remove legacy smart send
 
-- Delete `sendToInteractiveCli`’s string interpretation; single entry becomes the explicit functions + tasks only.
-- Remove dead exports and update `common.ts` task table accordingly.
+- **Done:** Removed `sendToInteractiveCli` from `cliPtyRunner.ts` and the `sendToInteractiveCli` Cypress task from `cliE2ePluginTasks.ts`. `common.ts` only spreads `createCliE2ePluginTasks` — no separate task list to edit.
 
 ### Phase 4 — Interactive “Not supported” scenario
 
@@ -103,7 +93,7 @@ If product behavior differs in TTY (message text or placement), adjust the Then 
 
 ## Checklist before closing the overall effort
 
-- [ ] No nested ternary “what to send” logic in `cliPtyRunner` for interactive input.
+- [x] No nested ternary “what to send” logic in `cliPtyRunner` for interactive input.
 - [ ] Gherkin steps read as the user action (slash command with space+Enter vs plain line+Enter vs Enter vs ESC).
 - [ ] `.cursor/rules/e2e_test.mdc` includes the explicit-conditions / minimal-branching guidance (Phase 5).
 - [ ] `ongoing/cli-interactive-e2e-send-explicit.md` updated or removed when done.

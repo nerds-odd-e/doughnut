@@ -16,7 +16,6 @@ import { cliEnv } from './cliEnv'
 import {
   interactiveCliTtyPayload,
   runCliInPty,
-  sendToInteractiveCli as sendInteractiveCliToPty,
   startInteractiveCli as startInteractiveCliPtySession,
   stopInteractiveCli as stopInteractiveCliPtySession,
   writeInteractiveCliAndWaitForReady,
@@ -122,9 +121,6 @@ export function createCliE2ePluginTasks(repoRoot: string) {
         env: { ...cliEnv(env) },
       })
       return true
-    },
-    async sendToInteractiveCli({ input }: { input: string }) {
-      return sendInteractiveCliToPty(input)
     },
     async sendInteractiveCliSlashCommand({ command }: { command: string }) {
       return writeInteractiveCliAndWaitForReady(

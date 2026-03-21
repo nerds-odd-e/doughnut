@@ -235,22 +235,6 @@ export async function writeInteractiveCliAndWaitForReady(
   return interactiveHandle.stdout.value
 }
 
-/** Cypress task helper: maps trimmed string + heuristics to PTY bytes (slash commands, lines, ESC). */
-export async function sendToInteractiveCli(input: string): Promise<string> {
-  const trimmed = input.trim()
-  let payload: string
-  if (trimmed === interactiveCliTtyPayload.esc) {
-    payload = interactiveCliTtyPayload.esc
-  } else if (trimmed.startsWith('/') && !trimmed.endsWith(' ')) {
-    payload = interactiveCliTtyPayload.slashCommandSpaceThenEnter(trimmed)
-  } else if (trimmed.endsWith('\n')) {
-    payload = trimmed
-  } else {
-    payload = interactiveCliTtyPayload.lineThenEnter(trimmed)
-  }
-  return writeInteractiveCliAndWaitForReady(payload)
-}
-
 export async function stopInteractiveCli(): Promise<void> {
   if (!interactiveHandle) return
   const { pty, dispose } = interactiveHandle
