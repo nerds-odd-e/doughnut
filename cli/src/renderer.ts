@@ -483,8 +483,6 @@ export function wrapMarkdownTerminalToLines(
     )
 }
 
-const DEFAULT_MCQ_CHOICE_WRAP_WIDTH = 4096
-
 function formatMcqChoiceLinesWithIndices(
   choices: RecallMcqChoiceTexts,
   width: TerminalWidth
@@ -514,7 +512,7 @@ function formatMcqChoiceLinesWithIndices(
 
 export function formatMcqChoiceLines(
   choices: RecallMcqChoiceTexts,
-  width: TerminalWidth = DEFAULT_MCQ_CHOICE_WRAP_WIDTH
+  width: TerminalWidth
 ): string[] {
   return formatMcqChoiceLinesWithIndices(choices, width).lines
 }

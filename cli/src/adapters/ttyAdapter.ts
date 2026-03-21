@@ -73,7 +73,7 @@ export interface TTYDeps {
   setPendingRecallStopConfirmation: (value: boolean) => void
   isInRecallSubstate: () => boolean
   exitRecallMode: () => void
-  isMcqRecallPending: (p: unknown) => p is McqRecallPending
+  isMcqRecallPending: (p: PendingRecallAnswer) => p is McqRecallPending
   buildTokenListLines: (
     tokens: AccessTokenEntry[],
     defaultLabel: string | undefined,

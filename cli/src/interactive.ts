@@ -122,16 +122,8 @@ function formatRecallSessionSummary(count: number): string {
   return `Recalled ${count} notes`
 }
 
-function isMcqRecallPending(p: unknown): p is McqRecallPending {
-  if (p === null || typeof p !== 'object') return false
-  const o = p as Record<string, unknown>
-  return (
-    typeof o.recallPromptId === 'number' &&
-    Array.isArray(o.choices) &&
-    typeof o.stemRenderedForTerminal === 'string' &&
-    typeof o.shownAt === 'number' &&
-    !('type' in o)
-  )
+function isMcqRecallPending(p: PendingRecallAnswer): p is McqRecallPending {
+  return p !== null && 'choices' in p
 }
 
 function isSpellingRecallPending(
