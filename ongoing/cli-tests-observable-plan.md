@@ -67,13 +67,15 @@ Informal plan. Aligned with `.cursor/rules/planning.mdc` → **Observable behavi
 
 ---
 
-## Phase 5 — Help, access tokens, gmail: entry-point alignment
+## Phase 5 — Help, access tokens, gmail: entry-point alignment ✅ done
 
 **Outcome:** Public CLI contract tested like a user runs it where cheap.
 
 - **`help.test.ts`:** Prefer **`formatHelp`** / doc structure tests + **one** path through **`run(['-c', '/help'])`** or **`processInput`** — avoid three parallel ways to assert the same listing.
 - **`accessToken.test.ts` / `gmail.test.ts`:** Prefer outcomes (files written, messages) over **private** function names; subprocess or `index` only if it **simplifies** and stays fast.
 - **Deliverable:** Clear story: “non-interactive contract” vs “interactive TTY” vs “pure helpers.”
+
+**Done (2026-03-21):** `help.test.ts` keeps `formatHelp` / tab-completion / list helpers; dropped parallel `processInput('/help')` and `run(['help'])` listing checks; added **`non-interactive entry: -c /help`** (mock `process.exit`, assert section headers + no `Not supported`). **`index.test.ts`** help subcommand asserts **`console.log(formatHelp())`** (wiring only, no duplicate command list). **`accessToken.test.ts`** / **`gmail.test.ts`** `describe` blocks renamed to outcome-oriented names; tests still assert file contents and user-facing messages.
 
 ---
 

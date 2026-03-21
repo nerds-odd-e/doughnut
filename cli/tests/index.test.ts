@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
-import { INTERACTIVE_ONLY_REJECTION_MESSAGE } from '../src/help.js'
+import { formatHelp, INTERACTIVE_ONLY_REJECTION_MESSAGE } from '../src/help.js'
 import { run } from '../src/index.js'
 import { formatVersionOutput } from '../src/version.js'
 
@@ -9,16 +9,10 @@ describe('CLI', () => {
     expect(output).toMatch(/^doughnut \d+\.\d+\.\d+$/)
   })
 
-  test('help subcommand prints help and does not start interactive mode', async () => {
+  test('help subcommand logs formatHelp()', async () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
     await run(['help'])
-    expect(logSpy).toHaveBeenCalled()
-    const output = logSpy.mock.calls.flat().join('\n')
-    expect(output).toContain('Subcommands')
-    expect(output).toContain('version')
-    expect(output).toContain('update')
-    expect(output).toContain('/add gmail')
-    expect(output).toContain('/last email')
+    expect(logSpy).toHaveBeenCalledWith(formatHelp())
     logSpy.mockRestore()
   })
 })

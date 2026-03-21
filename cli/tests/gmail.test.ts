@@ -13,7 +13,7 @@ function createTempDir(): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-gmail-test-'))
 }
 
-describe('loadConfig and saveConfig', () => {
+describe('Gmail config file', () => {
   let configPath: string
 
   beforeEach(() => {
@@ -55,7 +55,7 @@ describe('loadConfig and saveConfig', () => {
   })
 })
 
-describe('getLastEmailSubject', () => {
+describe('last email subject (Gmail API)', () => {
   let configPath: string
 
   beforeEach(() => {

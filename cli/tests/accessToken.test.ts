@@ -36,7 +36,7 @@ function mockGetTokenInfo(label: string, id = 1) {
     .mockResolvedValueOnce({ data: { id, label } } as never)
 }
 
-describe('access token management', () => {
+describe('access tokens (persisted file + API)', () => {
   let originalConfigDir: string | undefined
 
   beforeEach(() => {
@@ -53,7 +53,7 @@ describe('access token management', () => {
     }
   })
 
-  describe('addAccessToken', () => {
+  describe('adding a token', () => {
     test('validates token via API and saves with returned label', async () => {
       mockGetTokenInfo('My Token')
 
@@ -148,7 +148,7 @@ describe('access token management', () => {
     })
   })
 
-  describe('listAccessTokens', () => {
+  describe('stored token list', () => {
     test('returns empty array when no config file exists', () => {
       expect(listAccessTokens()).toEqual([])
     })
@@ -171,7 +171,7 @@ describe('access token management', () => {
     })
   })
 
-  describe('getDefaultTokenLabel', () => {
+  describe('which token is default', () => {
     test('returns undefined when no tokens exist', () => {
       expect(getDefaultTokenLabel()).toBeUndefined()
     })
@@ -207,7 +207,7 @@ describe('access token management', () => {
     })
   })
 
-  describe('removeAccessToken', () => {
+  describe('removing a token locally', () => {
     test('removes token by label and returns true', async () => {
       mockGetTokenInfo('First', 1)
       mockGetTokenInfo('Second', 2)
@@ -239,7 +239,7 @@ describe('access token management', () => {
     })
   })
 
-  describe('removeAccessTokenCompletely', () => {
+  describe('revoke on server and remove locally', () => {
     test('revokes token on server and removes locally', async () => {
       mockGetTokenInfo('MyToken')
       vi.mocked(UserController.revokeToken).mockResolvedValueOnce({
@@ -284,7 +284,7 @@ describe('access token management', () => {
     })
   })
 
-  describe('createAccessToken', () => {
+  describe('creating a new token via API', () => {
     test('creates token on server using default token and saves locally', async () => {
       mockGetTokenInfo('Default Token')
       await addAccessToken('default-secret')
@@ -335,7 +335,7 @@ describe('access token management', () => {
   })
 })
 
-describe('formatTokenLines', () => {
+describe('token list lines for display', () => {
   test('marks default token with ★', () => {
     const tokens = [
       { label: 'Token A', token: 'a' },
@@ -353,7 +353,7 @@ describe('formatTokenLines', () => {
   })
 })
 
-describe('buildTokenListLines', () => {
+describe('token list layout at terminal width', () => {
   test('with narrow width, each line ≤ width or ends with "..."', () => {
     const tokens = [
       { label: 'Short', token: 'a' },

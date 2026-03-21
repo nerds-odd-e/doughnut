@@ -11,7 +11,6 @@ import {
   interactiveDocs,
   type CommandDoc,
 } from '../src/help.js'
-import { processInput } from '../src/interactive.js'
 import { run } from '../src/index.js'
 
 describe('formatHelp', () => {
@@ -216,55 +215,28 @@ describe('formatCommandCompletionLines', () => {
   })
 })
 
-describe('processInput with /help', () => {
+describe('non-interactive entry: -c /help', () => {
   let logSpy: ReturnType<typeof vi.spyOn>
+  let exitSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
     logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    exitSpy = vi
+      .spyOn(process, 'exit')
+      .mockImplementation((() => undefined) as unknown as typeof process.exit)
   })
 
   afterEach(() => {
     logSpy.mockRestore()
+    exitSpy.mockRestore()
   })
 
-  test('logs help output and returns false', async () => {
-    const result = await processInput('/help')
-    expect(result).toBe(false)
+  test('prints help and exits 0; does not treat /help as unknown', async () => {
+    await run(['-c', '/help'])
     const output = logSpy.mock.calls.flat().join('\n')
-    expect(output).toContain('/add gmail')
-    expect(output).toContain('/last email')
-    expect(output).toContain('exit')
-    expect(output).toContain('update')
-    expect(output).toContain('version')
-  })
-
-  test('does not log "Not supported"', async () => {
-    await processInput('/help')
-    const notSupportedCalls = logSpy.mock.calls.filter(
-      (c) => c[0] === 'Not supported'
-    )
-    expect(notSupportedCalls).toHaveLength(0)
-  })
-})
-
-describe('run with help subcommand', () => {
-  let logSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
-  })
-
-  afterEach(() => {
-    logSpy.mockRestore()
-  })
-
-  test('prints help and does not start interactive mode', async () => {
-    await run(['help'])
-    const output = logSpy.mock.calls.flat().join('\n')
-    expect(output).toContain('/add gmail')
-    expect(output).toContain('/last email')
-    expect(output).toContain('exit')
-    expect(output).toContain('update')
-    expect(output).toContain('version')
+    expect(output).toContain('Subcommands:')
+    expect(output).toContain('Interactive commands (in prompt):')
+    expect(output).not.toContain('Not supported')
+    expect(exitSpy).toHaveBeenCalledWith(0)
   })
 })
