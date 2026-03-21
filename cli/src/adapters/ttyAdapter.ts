@@ -184,6 +184,12 @@ function clearLiveRegionForRepaint(cursor: LiveRegionPaintCursor): void {
   cursor.cursorUpStepsToLiveRegionTop = 0
 }
 
+function extraCursorUpAfterLiveRegionPaint(
+  placeholderContext: PlaceholderContext
+): number {
+  return placeholderContext === 'recallMcq' ? 1 : 0
+}
+
 function isSubmitKey(keyName: string): boolean {
   return keyName === 'return' || keyName === 'enter'
 }
@@ -569,14 +575,23 @@ export async function runTTY(
     livePaint.lastPaintedLineCount = layout.liveLineCount
 
     process.stdout.write(
-      `\x1b[${layout.liveLineCount - layout.inputLineRowInLiveBlock}A`
+      `\x1b[${
+        layout.liveLineCount -
+        layout.inputLineRowInLiveBlock +
+        extraCursorUpAfterLiveRegionPaint(layout.placeholderContext)
+      }A`
     )
     finalizeInteractiveLiveRegionPaint(layout.placeholderContext)
   }
 
   function drawBox() {
     const layout = measureLiveRegionLayout()
-    const { liveLines, liveLineCount, inputLineRowInLiveBlock } = layout
+    const {
+      liveLines,
+      liveLineCount,
+      inputLineRowInLiveBlock,
+      placeholderContext,
+    } = layout
 
     if (livePaint.cursorUpStepsToLiveRegionTop > 0) {
       process.stdout.write(`\x1b[${livePaint.cursorUpStepsToLiveRegionTop}A`)
@@ -597,7 +612,13 @@ export async function runTTY(
     }
 
     const totalWritten = Math.max(liveLineCount, livePaint.lastPaintedLineCount)
-    process.stdout.write(`\x1b[${totalWritten - inputLineRowInLiveBlock}A`)
+    process.stdout.write(
+      `\x1b[${
+        totalWritten -
+        inputLineRowInLiveBlock +
+        extraCursorUpAfterLiveRegionPaint(placeholderContext)
+      }A`
+    )
     finalizeInteractiveLiveRegionPaint(layout.placeholderContext)
 
     livePaint.cursorUpStepsToLiveRegionTop = inputLineRowInLiveBlock
