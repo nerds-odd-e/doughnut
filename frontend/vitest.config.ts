@@ -22,16 +22,31 @@ const isTest = process.env.VITEST !== undefined
 const config = defineConfig({
   resolve: {
     tsconfigPaths: true,
-    alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
-      "@tests": fileURLToPath(new URL("./tests", import.meta.url)),
+    alias: [
+      {
+        find: "@tests/fixtures",
+        replacement: fileURLToPath(
+          new URL("../packages/doughnut-test-fixtures/src", import.meta.url)
+        ),
+      },
+      {
+        find: "@tests",
+        replacement: fileURLToPath(new URL("./tests", import.meta.url)),
+      },
+      {
+        find: "@",
+        replacement: fileURLToPath(new URL("./src", import.meta.url)),
+      },
       // Browser Mode needs the bundler build of Vue for template compilation
-      vue: "vue/dist/vue.esm-bundler.js",
+      { find: "vue", replacement: "vue/dist/vue.esm-bundler.js" },
       // Resolve from frontend so Vitest browser client can find it (transitive of vitest-browser-vue)
-      "@vue/compiler-core": fileURLToPath(
-        new URL("./node_modules/@vue/compiler-core", import.meta.url)
-      ),
-    },
+      {
+        find: "@vue/compiler-core",
+        replacement: fileURLToPath(
+          new URL("./node_modules/@vue/compiler-core", import.meta.url)
+        ),
+      },
+    ],
   },
   optimizeDeps: {
     include: [

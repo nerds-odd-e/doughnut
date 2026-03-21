@@ -1,12 +1,12 @@
-import type { Note, RecallPrompt } from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
-import generateId from "./generateId"
-import makeMe from "./makeMe"
-import RecallPromptBuilder from "./RecallPromptBuilder"
+import type { Note, RecallPrompt } from '@generated/doughnut-backend-api'
+import Builder from './Builder'
+import generateId from './generateId'
+import makeMe from './makeMe'
+import RecallPromptBuilder from './RecallPromptBuilder'
 
 class AnsweredQuestionBuilder extends Builder<RecallPrompt> {
   private noteToUse?: Note
-  private isCorrect: boolean = true
+  private isCorrect = true
   private choiceIndexToUse?: number
 
   withNote(note: Note): this {

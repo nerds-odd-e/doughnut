@@ -2,9 +2,9 @@ import type {
   AssessmentAttempt,
   Notebook,
   RecallPrompt,
-} from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
-import generateId from "./generateId"
+} from '@generated/doughnut-backend-api'
+import Builder from './Builder'
+import generateId from './generateId'
 
 class AssessmentAttemptBuilder extends Builder<AssessmentAttempt> {
   private data: Partial<AssessmentAttempt> = {}
@@ -22,7 +22,7 @@ class AssessmentAttemptBuilder extends Builder<AssessmentAttempt> {
       multipleChoicesQuestion: question.multipleChoicesQuestion,
       recallPrompt: {
         ...question,
-        questionType: question.questionType ?? "MCQ",
+        questionType: question.questionType ?? 'MCQ',
       },
     }))
     return this
@@ -37,7 +37,7 @@ class AssessmentAttemptBuilder extends Builder<AssessmentAttempt> {
     return {
       notebookId: generateId(),
       id,
-      submittedAt: "2021-09-01T00:00:00Z",
+      submittedAt: '2021-09-01T00:00:00Z',
       notebookTitle: `Notebook ${id}`,
       ...this.data,
     }

@@ -1,7 +1,7 @@
-import type { AssessmentQuestionInstance } from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
-import generateId from "./generateId"
-import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
+import type { AssessmentQuestionInstance } from '@generated/doughnut-backend-api'
+import Builder from './Builder'
+import generateId from './generateId'
+import PredefinedQuestionBuilder from './PredefinedQuestionBuilder'
 
 class AssessmentQuestionInstanceBuilder extends Builder<AssessmentQuestionInstance> {
   predefinedQuestionBuilder = new PredefinedQuestionBuilder()

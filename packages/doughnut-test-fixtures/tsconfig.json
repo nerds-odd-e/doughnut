@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@generated/doughnut-backend-api": ["../generated/doughnut-backend-api"],
+      "@generated/doughnut-backend-api/*": [
+        "../generated/doughnut-backend-api/*"
+      ]
+    }
+  },
+  "include": ["src/**/*"]
+}

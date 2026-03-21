@@ -1,22 +1,22 @@
 import type {
   NoteSearchResult,
   NoteTopology,
-} from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
-import generateId from "./generateId"
+} from '@generated/doughnut-backend-api'
+import Builder from './Builder'
+import generateId from './generateId'
 
 class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
   data: Partial<NoteSearchResult> = {
     noteTopology: {
       id: generateId(),
-      title: "Untitled",
+      title: 'Untitled',
     },
     notebookId: generateId(),
   }
 
   id(value: number): NoteSearchResultBuilder {
     if (!this.data.noteTopology) {
-      this.data.noteTopology = { id: value, title: "Untitled" }
+      this.data.noteTopology = { id: value, title: 'Untitled' }
     } else {
       this.data.noteTopology.id = value
     }
@@ -57,7 +57,7 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
     return {
       noteTopology: this.data.noteTopology ?? {
         id,
-        title: "Untitled",
+        title: 'Untitled',
       },
       notebookId: this.data.notebookId ?? generateId(),
       notebookTitle: this.data.notebookTitle,

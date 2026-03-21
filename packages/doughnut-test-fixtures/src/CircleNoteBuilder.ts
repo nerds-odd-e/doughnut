@@ -1,10 +1,10 @@
 import type {
   CircleForUserView,
   Notebook,
-} from "@generated/doughnut-backend-api"
-import NotebooksBuilder from "./BazaarNotebooksBuilder"
-import Builder from "./Builder"
-import generateId from "./generateId"
+} from '@generated/doughnut-backend-api'
+import NotebooksBuilder from './BazaarNotebooksBuilder'
+import Builder from './Builder'
+import generateId from './generateId'
 
 class CircleNoteBuilder extends Builder<CircleForUserView> {
   notebooksBuilder: NotebooksBuilder = new NotebooksBuilder()
@@ -17,8 +17,8 @@ class CircleNoteBuilder extends Builder<CircleForUserView> {
   do(): CircleForUserView {
     return {
       id: generateId(),
-      name: "",
-      invitationCode: "",
+      name: '',
+      invitationCode: '',
       notebooks: {
         notebooks: this.notebooksBuilder
           .do()

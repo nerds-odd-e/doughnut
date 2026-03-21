@@ -1,5 +1,5 @@
-import type { WikidataSearchEntity } from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
+import type { WikidataSearchEntity } from '@generated/doughnut-backend-api'
+import Builder from './Builder'
 
 class WikidataSearchEntityBuilder extends Builder<WikidataSearchEntity> {
   data: WikidataSearchEntity
@@ -7,9 +7,9 @@ class WikidataSearchEntityBuilder extends Builder<WikidataSearchEntity> {
   constructor() {
     super()
     this.data = {
-      id: "Q1234",
-      label: "label",
-      description: "details",
+      id: 'Q1234',
+      label: 'label',
+      description: 'details',
     }
   }
 

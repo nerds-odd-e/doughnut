@@ -1,5 +1,5 @@
-import type { WikidataEntityData } from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
+import type { WikidataEntityData } from '@generated/doughnut-backend-api'
+import Builder from './Builder'
 
 class WikidataEntityBuilder extends Builder<WikidataEntityData> {
   data: WikidataEntityData
@@ -7,8 +7,8 @@ class WikidataEntityBuilder extends Builder<WikidataEntityData> {
   constructor() {
     super()
     this.data = {
-      WikidataTitleInEnglish: "default title",
-      WikipediaEnglishUrl: "",
+      WikidataTitleInEnglish: 'default title',
+      WikipediaEnglishUrl: '',
     }
   }
 

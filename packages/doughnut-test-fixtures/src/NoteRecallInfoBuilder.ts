@@ -2,8 +2,8 @@ import type {
   MemoryTracker,
   NoteRecallInfo,
   NoteRecallSetting,
-} from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
+} from '@generated/doughnut-backend-api'
+import Builder from './Builder'
 
 class NoteRecallInfoBuilder extends Builder<NoteRecallInfo> {
   data: NoteRecallInfo
@@ -26,7 +26,7 @@ class NoteRecallInfoBuilder extends Builder<NoteRecallInfo> {
     return this
   }
 
-  noteType(value: NoteRecallInfo["noteType"]): NoteRecallInfoBuilder {
+  noteType(value: NoteRecallInfo['noteType']): NoteRecallInfoBuilder {
     this.data.noteType = value
     return this
   }

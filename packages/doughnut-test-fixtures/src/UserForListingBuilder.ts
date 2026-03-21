@@ -1,6 +1,6 @@
-import type { UserForListing } from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
-import generateId from "./generateId"
+import type { UserForListing } from '@generated/doughnut-backend-api'
+import Builder from './Builder'
+import generateId from './generateId'
 
 export default class UserForListingBuilder extends Builder<UserForListing> {
   data: UserForListing

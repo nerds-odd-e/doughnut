@@ -1,8 +1,8 @@
 import type {
   FailureReport,
   FailureReportForView,
-} from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
+} from '@generated/doughnut-backend-api'
+import Builder from './Builder'
 
 class FailureReportBuilder extends Builder<FailureReport> {
   private report: FailureReport
@@ -12,9 +12,9 @@ class FailureReportBuilder extends Builder<FailureReport> {
     const id = Math.floor(Math.random() * 10000)
     this.report = {
       id,
-      errorName: "RuntimeException",
+      errorName: 'RuntimeException',
       errorDetail:
-        "Error occurred at com.example.service.Service.process(Service.java:42)\nCaused by: NullPointerException",
+        'Error occurred at com.example.service.Service.process(Service.java:42)\nCaused by: NullPointerException',
       issueNumber: 123,
       createDatetime: new Date().toISOString(),
     }
@@ -63,7 +63,7 @@ class FailureReportForViewBuilder extends Builder<FailureReportForView> {
     const reportBuilder = new FailureReportBuilder()
     this.reportForView = {
       failureReport: reportBuilder.please(),
-      githubIssueUrl: "https://github.com/test/repo/issues/123",
+      githubIssueUrl: 'https://github.com/test/repo/issues/123',
     }
   }
 

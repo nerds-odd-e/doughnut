@@ -1,6 +1,6 @@
-import type { BazaarNotebook, Notebook } from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
-import generateId from "./generateId"
+import type { BazaarNotebook, Notebook } from '@generated/doughnut-backend-api'
+import Builder from './Builder'
+import generateId from './generateId'
 
 class NotebooksBuilder extends Builder<BazaarNotebook[]> {
   data: BazaarNotebook[] = []

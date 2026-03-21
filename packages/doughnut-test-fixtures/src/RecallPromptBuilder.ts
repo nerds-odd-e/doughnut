@@ -3,11 +3,11 @@ import type {
   Note,
   PredefinedQuestion,
   Answer,
-} from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
-import generateId from "./generateId"
-import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
-import NotebookBuilder from "./NotebookBuilder"
+} from '@generated/doughnut-backend-api'
+import Builder from './Builder'
+import generateId from './generateId'
+import PredefinedQuestionBuilder from './PredefinedQuestionBuilder'
+import NotebookBuilder from './NotebookBuilder'
 
 class RecallPromptBuilder extends Builder<RecallPrompt> {
   predefinedQuestionBuilder = new PredefinedQuestionBuilder()
@@ -82,7 +82,7 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
     return {
       id: this.idToUse ?? generateId(),
       memoryTrackerId: this.memoryTrackerIdToUse,
-      questionType: (this.questionTypeToUse ?? "MCQ") as "MCQ" | "SPELLING",
+      questionType: (this.questionTypeToUse ?? 'MCQ') as 'MCQ' | 'SPELLING',
       multipleChoicesQuestion: predefinedQuestion.multipleChoicesQuestion,
       notebook: new NotebookBuilder().do(),
       note: this.noteToUse,

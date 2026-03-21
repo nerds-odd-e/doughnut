@@ -1,17 +1,17 @@
 import type {
   Note,
   NoteTopology as NoteTopologyType,
-} from "@generated/doughnut-backend-api"
+} from '@generated/doughnut-backend-api'
 // Using string literals for relationType values
-import Builder from "./Builder"
-import NoteBuilder from "./NoteBuilder"
+import Builder from './Builder'
+import NoteBuilder from './NoteBuilder'
 
 class RelationshipBuilder extends Builder<Note> {
   sourceNoteBuilder = new NoteBuilder()
 
   targetNoteBuilder = new NoteBuilder()
 
-  internalType: NoteTopologyType["relationType"] = "related to"
+  internalType: NoteTopologyType['relationType'] = 'related to'
 
   from(note: Note): RelationshipBuilder {
     this.sourceNoteBuilder.data = note
@@ -23,7 +23,7 @@ class RelationshipBuilder extends Builder<Note> {
     return this
   }
 
-  type(t: NoteTopologyType["relationType"]): RelationshipBuilder {
+  type(t: NoteTopologyType['relationType']): RelationshipBuilder {
     this.internalType = t
     return this
   }

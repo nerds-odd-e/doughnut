@@ -17,7 +17,7 @@ class MockApiError extends Error {
     message: string
   ) {
     super(message)
-    this.name = "ApiError"
+    this.name = 'ApiError'
     this.url = response.url
     this.status = response.status
     this.statusText = response.statusText
@@ -26,12 +26,12 @@ class MockApiError extends Error {
   }
 }
 
-import Builder from "./Builder"
+import Builder from './Builder'
 
 class ApiErrorBuilder extends Builder<MockApiError> {
   request: { url: string; method: string } = {
-    url: "",
-    method: "GET",
+    url: '',
+    method: 'GET',
   }
 
   response: {
@@ -41,14 +41,14 @@ class ApiErrorBuilder extends Builder<MockApiError> {
     statusText: string
     body: unknown
   } = {
-    url: "",
+    url: '',
     ok: false,
     status: 404,
-    statusText: "not found",
-    body: "not found",
+    statusText: 'not found',
+    body: 'not found',
   }
 
-  message = "not found"
+  message = 'not found'
 
   errors: Record<string, unknown> = {}
 
@@ -66,7 +66,7 @@ class ApiErrorBuilder extends Builder<MockApiError> {
       ...this.response,
       status: 400,
     }
-    this.message = "bad request"
+    this.message = 'bad request'
     return this
   }
 

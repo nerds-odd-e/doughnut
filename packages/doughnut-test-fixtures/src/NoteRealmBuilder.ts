@@ -1,8 +1,8 @@
-import type { NoteRealm } from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
-import NoteBuilder from "./NoteBuilder"
-import generateId from "./generateId"
-import NotebookBuilder from "./NotebookBuilder"
+import type { NoteRealm } from '@generated/doughnut-backend-api'
+import Builder from './Builder'
+import NoteBuilder from './NoteBuilder'
+import generateId from './generateId'
+import NotebookBuilder from './NotebookBuilder'
 
 class NoteRealmBuilder extends Builder<NoteRealm> {
   data: NoteRealm

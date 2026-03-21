@@ -1,5 +1,5 @@
-import type { SuggestedQuestionForFineTuning } from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
+import type { SuggestedQuestionForFineTuning } from '@generated/doughnut-backend-api'
+import Builder from './Builder'
 
 class SuggestQuestionForFineTuningBuilder extends Builder<SuggestedQuestionForFineTuning> {
   data: SuggestedQuestionForFineTuning
@@ -10,16 +10,16 @@ class SuggestQuestionForFineTuningBuilder extends Builder<SuggestedQuestionForFi
       id: 1357,
       preservedQuestion: {
         f0__multipleChoicesQuestion: {
-          f0__stem: "What is the capital of France?",
-          f1__choices: ["Paris", "London", "Berlin"],
+          f0__stem: 'What is the capital of France?',
+          f1__choices: ['Paris', 'London', 'Berlin'],
         },
         f1__correctChoiceIndex: 1,
         f2__strictChoiceOrder: false,
       },
-      preservedNoteContent: "this is the note content",
-      comment: "",
+      preservedNoteContent: 'this is the note content',
+      comment: '',
       positiveFeedback: false,
-      realCorrectAnswers: "0",
+      realCorrectAnswers: '0',
     }
   }
 

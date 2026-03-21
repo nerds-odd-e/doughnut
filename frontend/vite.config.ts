@@ -20,10 +20,19 @@ const isTest = process.env.VITEST !== undefined
 const config = defineConfig({
   resolve: {
     tsconfigPaths: true,
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@tests': fileURLToPath(new URL('./tests', import.meta.url)),
-    }
+    alias: [
+      {
+        find: '@tests/fixtures',
+        replacement: fileURLToPath(
+          new URL('../packages/doughnut-test-fixtures/src', import.meta.url)
+        ),
+      },
+      {
+        find: '@tests',
+        replacement: fileURLToPath(new URL('./tests', import.meta.url)),
+      },
+      { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
+    ],
   },
   css: {
     // Disable sourcemaps during tests (saves ~0.3s)

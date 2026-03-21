@@ -1,13 +1,13 @@
-import type { PredefinedQuestion } from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
-import generateId from "./generateId"
+import type { PredefinedQuestion } from '@generated/doughnut-backend-api'
+import Builder from './Builder'
+import generateId from './generateId'
 
 class PredefinedQuestionBuilder extends Builder<PredefinedQuestion> {
   predefinedQuestion: PredefinedQuestion = {
     id: generateId(),
     correctAnswerIndex: 0,
     multipleChoicesQuestion: {
-      f0__stem: "answer",
+      f0__stem: 'answer',
       f1__choices: [],
     },
   }

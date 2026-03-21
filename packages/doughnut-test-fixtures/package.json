@@ -1,0 +1,13 @@
+{
+  "name": "doughnut-test-fixtures",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@generated/doughnut-backend-api": "workspace:*"
+  },
+  "exports": {
+    ".": "./src/makeMe.ts",
+    "./makeMe": "./src/makeMe.ts"
+  }
+}

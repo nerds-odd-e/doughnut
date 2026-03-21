@@ -1,9 +1,9 @@
-import type { MultipleChoicesQuestion } from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
+import type { MultipleChoicesQuestion } from '@generated/doughnut-backend-api'
+import Builder from './Builder'
 
 class MultipleChoicesQuestionBuilder extends Builder<MultipleChoicesQuestion> {
   private multipleChoicesQuestion: MultipleChoicesQuestion = {
-    f0__stem: "",
+    f0__stem: '',
     f1__choices: [],
   }
 

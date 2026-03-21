@@ -1,6 +1,6 @@
-import type { User } from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
-import generateId from "./generateId"
+import type { User } from '@generated/doughnut-backend-api'
+import Builder from './Builder'
+import generateId from './generateId'
 
 class UserBuilder extends Builder<User> {
   data: User
@@ -9,11 +9,11 @@ class UserBuilder extends Builder<User> {
     super()
     this.data = {
       id: generateId(),
-      name: "a name",
+      name: 'a name',
       externalIdentifier: `user ${generateId()}`,
       ownership: { id: 0 },
       dailyAssimilationCount: 5,
-      spaceIntervals: "",
+      spaceIntervals: '',
       admin: false,
     }
   }

@@ -2,10 +2,10 @@ import type {
   Note,
   NoteRealm,
   MemoryTracker,
-} from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
-import NoteBuilder from "./NoteBuilder"
-import generateId from "./generateId"
+} from '@generated/doughnut-backend-api'
+import Builder from './Builder'
+import NoteBuilder from './NoteBuilder'
+import generateId from './generateId'
 
 class MemoryTrackerBuilder extends Builder<MemoryTracker> {
   data: MemoryTracker
@@ -14,9 +14,9 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
     super()
     this.data = {
       id: generateId(),
-      lastRecalledAt: "",
-      nextRecallAt: "",
-      assimilatedAt: "",
+      lastRecalledAt: '',
+      nextRecallAt: '',
+      assimilatedAt: '',
       recallCount: 0,
       forgettingCurveIndex: 0,
       removedFromTracking: false,

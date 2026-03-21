@@ -2,16 +2,16 @@ import type {
   Conversation,
   Note,
   RecallPrompt,
-} from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
-import generateId from "./generateId"
-import NoteBuilder from "./NoteBuilder"
+} from '@generated/doughnut-backend-api'
+import Builder from './Builder'
+import generateId from './generateId'
+import NoteBuilder from './NoteBuilder'
 
 class ConversationBuilder extends Builder<Conversation> {
   data: Conversation = {
     id: generateId(),
-    createdAt: "",
-    updatedAt: "",
+    createdAt: '',
+    updatedAt: '',
     subject: {},
   }
 

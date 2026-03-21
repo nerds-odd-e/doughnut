@@ -2,9 +2,9 @@ import type {
   Note,
   NoteRealm,
   NoteTopology as NoteTopologyType,
-} from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
-import generateId from "./generateId"
+} from '@generated/doughnut-backend-api'
+import Builder from './Builder'
+import generateId from './generateId'
 
 class NoteBuilder extends Builder<Note> {
   data: Note
@@ -16,13 +16,13 @@ class NoteBuilder extends Builder<Note> {
       id,
       noteTopology: {
         id,
-        title: "Note1.1.1",
+        title: 'Note1.1.1',
       },
-      details: "<p>Desc</p>",
-      wikidataId: "",
-      deletedAt: "",
+      details: '<p>Desc</p>',
+      wikidataId: '',
+      deletedAt: '',
       createdAt: new Date().toISOString(),
-      updatedAt: "2021-08-24T08:46:44.000+00:00",
+      updatedAt: '2021-08-24T08:46:44.000+00:00',
     }
   }
 
@@ -72,13 +72,13 @@ class NoteBuilder extends Builder<Note> {
     return this
   }
 
-  relationType(value: NoteTopologyType["relationType"]): NoteBuilder {
+  relationType(value: NoteTopologyType['relationType']): NoteBuilder {
     this.title(`:${value}`)
     // default target
     this.data.noteTopology.targetNoteTopology = {
       id: generateId(),
       relationType: value,
-      title: "a target",
+      title: 'a target',
     }
     return this
   }

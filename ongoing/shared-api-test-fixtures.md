@@ -18,6 +18,8 @@
 
 ## Phase 1 — Workspace package + move code + frontend unchanged at import sites
 
+**Status:** Done (fixtures in `packages/doughnut-test-fixtures`; `@tests/fixtures/*` and Vite/Vitest aliases point there; one spec used `../fixtures/makeMe` → `@tests/fixtures/makeMe`; Storybook `preview.ts` same).
+
 **User-visible outcome:** Frontend tests and Storybook still pass; fixtures live in one workspace package.
 
 1. Add `packages/doughnut-test-fixtures` (name TBD; align with existing `doughnut-api` naming).

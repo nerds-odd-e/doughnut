@@ -1,7 +1,7 @@
-import type { Note, Notebook } from "@generated/doughnut-backend-api"
-import Builder from "./Builder"
-import NoteBuilder from "./NoteBuilder"
-import generateId from "./generateId"
+import type { Note, Notebook } from '@generated/doughnut-backend-api'
+import Builder from './Builder'
+import NoteBuilder from './NoteBuilder'
+import generateId from './generateId'
 
 class NotebookBuilder extends Builder<Notebook> {
   data: Notebook
@@ -13,7 +13,7 @@ class NotebookBuilder extends Builder<Notebook> {
     this.data = {
       id: generateId(),
       headNoteId: this.notebuilder.data.noteTopology.id,
-      title: this.notebuilder.data.noteTopology.title ?? "",
+      title: this.notebuilder.data.noteTopology.title ?? '',
       notebookSettings: {
         skipMemoryTrackingEntirely: false,
       },
@@ -38,7 +38,7 @@ class NotebookBuilder extends Builder<Notebook> {
 
   do(): Notebook {
     this.data.headNoteId = this.notebuilder.do().noteTopology.id
-    this.data.title = this.notebuilder.do().noteTopology.title ?? ""
+    this.data.title = this.notebuilder.do().noteTopology.title ?? ''
     this.data.shortDetails = this.notebuilder.do().noteTopology.shortDetails
     return this.data
   }
