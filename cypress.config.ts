@@ -1,14 +1,10 @@
 import { defineConfig } from 'cypress'
-import commonConfig from './e2e_test/config/common'
+import ciConfig from './e2e_test/config/ci'
 
+/** Default for `cypress open`; `pnpm cy:run` uses `e2e_test/config/ci.ts` explicitly (same config + `expose` below). */
 export default defineConfig({
-  ...commonConfig,
-  env: {
-    TAGS: 'not @ignore',
-  },
+  ...ciConfig,
   expose: {
     RECORD_E2E_TIMING: process.env.RECORD_E2E_TIMING,
   },
-  viewportWidth: 1200,
-  viewportHeight: 800,
 })

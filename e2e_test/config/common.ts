@@ -22,7 +22,8 @@ const commonConfig = {
   defaultCommandTimeout: 6000,
   trashAssetsBeforeRuns: true,
   environment: 'ci',
-  e2eAppBaseUrl: E2E_APP_BASE_URL,
+  viewportWidth: 1200,
+  viewportHeight: 800,
 
   e2e: {
     baseUrl: E2E_APP_BASE_URL,
@@ -200,9 +201,7 @@ const commonConfig = {
           accessToken: string
         }) {
           const apiBaseUrl =
-            baseUrl && baseUrl !== 'undefined'
-              ? baseUrl
-              : commonConfig.e2eAppBaseUrl
+            baseUrl && baseUrl !== 'undefined' ? baseUrl : E2E_APP_BASE_URL
           return await mcpClient.spawnAndConnectMcpServer({
             baseUrl: apiBaseUrl,
             accessToken,
