@@ -2,7 +2,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import path from 'path'
 import fs from 'fs'
-import { E2E_BACKEND_BASE_URL } from '../config/constants'
+import { E2E_APP_BASE_URL } from '../config/constants'
 
 interface MaybeChildProcess {
   child?: { kill: () => void }
@@ -61,7 +61,7 @@ class McpClient {
       ? `${process.env.NODE_PATH}:${mcpServerNodeModules}`
       : mcpServerNodeModules
     const apiBaseUrl =
-      baseUrl && baseUrl !== 'undefined' ? baseUrl : E2E_BACKEND_BASE_URL
+      baseUrl && baseUrl !== 'undefined' ? baseUrl : E2E_APP_BASE_URL
     this.transport = new StdioClientTransport({
       command: process.execPath,
       args: [bundlePath],

@@ -6,7 +6,7 @@ import {
   INTERACTIVE_CLI_PTY_KEYSTROKE_TASK,
   type InteractiveCliPtyKeystroke,
 } from '../../../config/interactiveCliPtyTypes'
-import { backendBaseUrl } from '../../../support/backendUrl'
+import { e2eAppBaseUrl } from '../../../support/e2eAppUrl'
 import { currentGuidance } from './outputAssertions'
 
 const GOOGLE_MOCK_BASE_URL = 'http://localhost:5003'
@@ -16,7 +16,7 @@ export function envForCliWithConfigDir(
 ): Record<string, string> {
   return {
     DOUGHNUT_CONFIG_DIR: configDir,
-    DOUGHNUT_API_BASE_URL: backendBaseUrl(),
+    DOUGHNUT_API_BASE_URL: e2eAppBaseUrl(),
   }
 }
 
@@ -45,7 +45,7 @@ function runCliWithScenarioConfigDir(args: string[]) {
 function installation() {
   return {
     installFromLocalhost() {
-      cy.task<string>('installCli', backendBaseUrl())
+      cy.task<string>('installCli', e2eAppBaseUrl())
         .should('be.a', 'string')
         .and('not.be.empty')
         .as('doughnutPath')
@@ -69,7 +69,7 @@ function installation() {
         }).as('doughnutOutput')
       })
     },
-    runUpdate(baseUrl = backendBaseUrl()) {
+    runUpdate(baseUrl = e2eAppBaseUrl()) {
       cy.get<string>('@doughnutPath').then((doughnutPath) => {
         cy.task<string>('runInstalledCli', {
           doughnutPath,

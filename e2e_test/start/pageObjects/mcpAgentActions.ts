@@ -1,4 +1,4 @@
-import { backendBaseUrl } from '../../support/backendUrl'
+import { e2eAppBaseUrl } from '../../support/e2eAppUrl'
 
 interface ApiResponse {
   content: Array<{
@@ -20,7 +20,7 @@ export const mcpAgentActions = () => {
     connect() {
       cy.get('@savedAccessToken').then((accessToken) => {
         cy.task('spawnAndConnectMcpServer', {
-          baseUrl: backendBaseUrl(),
+          baseUrl: e2eAppBaseUrl(),
           accessToken,
         })
       })

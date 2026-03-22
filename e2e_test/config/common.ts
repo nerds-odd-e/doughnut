@@ -10,7 +10,7 @@ import AdmZip from 'adm-zip'
 import type { ExpectedFile } from '../start/downloadChecker'
 import { createCliE2ePluginTasks } from './cliE2ePluginTasks'
 import { runShellCommandSync } from './cliE2eRepo'
-import { E2E_BACKEND_BASE_URL } from './constants'
+import { E2E_APP_BASE_URL } from './constants'
 
 const commonConfig = {
   chromeWebSecurity: false,
@@ -22,10 +22,10 @@ const commonConfig = {
   defaultCommandTimeout: 6000,
   trashAssetsBeforeRuns: true,
   environment: 'ci',
-  backendBaseUrl: E2E_BACKEND_BASE_URL,
+  e2eAppBaseUrl: E2E_APP_BASE_URL,
 
   e2e: {
-    baseUrl: E2E_BACKEND_BASE_URL,
+    baseUrl: E2E_APP_BASE_URL,
     async setupNodeEvents(
       on: Cypress.PluginEvents,
       config: Cypress.PluginConfigOptions
@@ -202,7 +202,7 @@ const commonConfig = {
           const apiBaseUrl =
             baseUrl && baseUrl !== 'undefined'
               ? baseUrl
-              : commonConfig.backendBaseUrl
+              : commonConfig.e2eAppBaseUrl
           return await mcpClient.spawnAndConnectMcpServer({
             baseUrl: apiBaseUrl,
             accessToken,
