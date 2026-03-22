@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { defineConfig } from 'cypress'
-import { E2E_BACKEND_BASE_URL } from './constants'
 import commonConfig from './common'
 
 export default defineConfig({
@@ -12,8 +11,4 @@ export default defineConfig({
   viewportHeight: 800,
   video: false,
   watchForFileChanges: false,
-  e2e: {
-    ...commonConfig.e2e,
-    baseUrl: E2E_BACKEND_BASE_URL,
-  },
 })

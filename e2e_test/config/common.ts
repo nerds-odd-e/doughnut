@@ -25,6 +25,7 @@ const commonConfig = {
   backendBaseUrl: E2E_BACKEND_BASE_URL,
 
   e2e: {
+    baseUrl: E2E_BACKEND_BASE_URL,
     async setupNodeEvents(
       on: Cypress.PluginEvents,
       config: Cypress.PluginConfigOptions

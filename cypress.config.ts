@@ -11,8 +11,4 @@ export default defineConfig({
   },
   viewportWidth: 1200,
   viewportHeight: 800,
-  e2e: {
-    ...commonConfig.e2e,
-    baseUrl: 'http://localhost:5173',
-  },
 })
