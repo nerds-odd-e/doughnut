@@ -25,7 +25,15 @@ Do **not** treat `https://storage.googleapis.com/...` as the primary UI origin: 
 | URL map (HTTPS) | `doughnut-app-service-map` — YAML in repo: [`infra/gcp/url-maps/doughnut-app-service-map.yaml`](../../infra/gcp/url-maps/doughnut-app-service-map.yaml) |
 | HTTPS target proxy | `doughnut-app-service-map-target-proxy-2` → above URL map |
 | MIG backend service | `doughnut-app-service` (default path matcher + API traffic) |
-| LB service account | Default Compute SA `220715781008-compute@developer.gserviceaccount.com` has `roles/storage.objectViewer` on `gs://dough-01` (required for backend buckets). |
+| GCS read for LB + CDN | `gs://dough-01` has `roles/storage.objectViewer` for `allUsers` so the backend bucket (and Cloud CDN cache fills) can read objects. The default Compute SA and `service-220715781008@compute-system.iam.gserviceaccount.com` are also granted `objectViewer`; with **Cloud CDN** enabled, Google’s docs require `service-<PROJECT_NUMBER>@cloud-cdn-fill.iam.gserviceaccount.com` (created after the first signed URL key on a backend bucket in the project) when the bucket is not publicly readable. |
+
+### Why the bucket is world-readable today (and what to do instead)
+
+Serving static through a **backend bucket** on the **same** multi-purpose bucket as jars (`backend_app_jar/`), `deploy/`, `db_backups/`, etc. means **`allUsers` objectViewer exposes every object prefix** to unauthenticated reads if someone knows or guesses object names. That is acceptable only as a **stopgap**.
+
+**Preferred:** Create a **frontend-only** GCS bucket (only trees under `frontend/<GITHUB_SHA>/`), make that bucket publicly readable (or keep it private and grant only the Compute + CDN fill principals), point `doughnut-frontend-backend-bucket` at that bucket, set CI to upload static there (separate env from the deploy jar bucket), then **remove** `allUsers` from `dough-01`.
+
+**Org constraint:** If your org forbids `allUsers` with IAM **conditions** (`PublicResourceAllowConditionCheck`), you cannot scope “public read only under `frontend/`” on a single bucket via conditional bindings; a dedicated bucket avoids that.
 
 **Promote a new frontend build:** confirm `gs://dough-01/frontend/<GITHUB_SHA>/` exists, update every `pathPrefixRewrite` in the YAML to that SHA (and add path rules for any **new root-level** static files next to `index.html`, same as `odd-e.ico` / `odd-e.png` today), then:
 
@@ -90,12 +98,11 @@ Minimum to send to the **backend bucket** (with prefix rewrite to `frontend/<ACT
 
 ## SPA deep links (`/d/…`, `/n…`)
 
-There is **no** object per client route under `frontend/<sha>/`. Options:
+There is **no** object per client route under `frontend/<sha>/`. The URL map still sends these paths to the **MIG** (path matcher default). Spring must not serve **classpath** `index.html` for them when that build can differ from the **active GCS** tree (e.g. frontend-only deploy + conditional MIG skip): the HTML would reference new chunk names while `/assets/*` still maps to GCS for the older SHA → **404 on JS**.
 
-1. **Staged:** Keep **default** backend as **MIG** so unknown paths (e.g. `/d/notebook/…`) still hit Spring; Spring continues to return `index.html` for those routes ([`ApplicationController`](../../backend/src/main/java/com/odde/doughnut/controllers/ApplicationController.java)). Static **chunks** still load from GCS via `/assets/*`. Later you can move default to GCS when CDN error handling is in place.
-2. **Full static default:** Use **Cloud CDN** (on the backend bucket backend) **custom error response** policy: map **404** from the bucket to serve `index.html` from the same prefix, so deep links receive the SPA shell. **Requires** path rules so `/api/*` and other backend paths **never** reach the bucket.
+**Current behavior:** In **prod**, [`ApplicationController`](../../backend/src/main/java/com/odde/doughnut/controllers/ApplicationController.java) handles `/d/**` and `/n**` by HTTP‑fetching the public site root (`doughnut.spa-public-base-url`, overridable with `DOUGHNUT_SPA_PUBLIC_BASE_URL`) so the shell matches what `/` gets from GCS. **Non‑prod** keeps forwarding to classpath `index.html`.
 
-Pick one approach; do not leave deep links 404ing from the bucket.
+**Alternative (infra-only):** Route deep links to the backend bucket and use **Cloud CDN custom error response** (404 → `index.html` in the active prefix), with strict path rules so `/api/*` never hits the bucket.
 
 ---
 

@@ -199,6 +199,8 @@ spring:
 question:
   regeneration:
     times: 0
+doughnut:
+  spa-public-base-url: ${DOUGHNUT_SPA_PUBLIC_BASE_URL:https://doughnut.odd-e.com}
 server:
   error:
     include-stacktrace: never
