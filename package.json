@@ -75,11 +75,11 @@
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
     "@biomejs/biome": "2.4.8",
     "@cucumber/cucumber": "^12.7.0",
-    "@hey-api/openapi-ts": "0.94.3",
+    "@hey-api/openapi-ts": "0.94.4",
     "@lydell/node-pty": "^1.2.0-beta.10",
     "@mbtest/mountebank": "2.9.3",
     "@modelcontextprotocol/sdk": "^1.27.1",
-    "@redocly/cli": "^2.24.0",
+    "@redocly/cli": "^2.24.1",
     "@testing-library/cypress": "10.1.0",
     "@types/cypress-cucumber-preprocessor": "^4.0.5",
     "@types/jquery": "^3.5",
@@ -93,11 +93,11 @@
     "npm-run-all2": "^8.0.4",
     "process": "^0.11.10",
     "superagent": "^10.3.0",
-    "syncpack": "^14.2.0",
+    "syncpack": "^14.2.1",
     "typescript": "5.9.3",
     "util": "^0.12.5",
     "wait-on": "^9.0.4",
-    "yaml": "^2.8.2"
+    "yaml": "^2.8.3"
   },
   "dependencies": {
     "vue-toastification": "2.0.0-rc.5"
