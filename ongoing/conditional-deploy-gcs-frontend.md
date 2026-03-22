@@ -85,6 +85,15 @@ Informal plan; delete or archive when done.
 
 **User/system value:** Frontend releases no longer require baking the same bundle into the jar for prod (prep for decoupling MIG from FE changes).
 
+### Phase 4 implementation (done)
+
+- **Layout:** `gs://<GCS_BUCKET>/frontend/<GITHUB_SHA>/` — full tree from `backend/src/main/resources/static/` after `pnpm bundle:all` (same files the jar embeds).
+- **Script:** `infra/gcp/scripts/upload-frontend-static-to-gcs.sh` — env: `GCS_BUCKET`, `GITHUB_SHA`; optional `FRONTEND_STATIC_DIR`.
+- **CI:** `.github/workflows/ci.yml` `Package-artifacts` runs GCP auth then the script after the prod `build` (and `bundle:all`).
+- **Tests:** `scripts/test/upload-frontend-static-to-gcs.sh.test`.
+
+**Not in this phase:** Prod LB/CDN routing (phase 5), cache headers, `latest` pointer object, conditional skip when static unchanged.
+
 ---
 
 ## Phase 5 — Prod wiring: static from GCS/CDN, API from backend
@@ -129,7 +138,8 @@ Informal plan; delete or archive when done.
 | 1 | `backend/scripts/boot-jar-reproducible.sh` (Gradle contract + real double `bootJar`). |
 | 2 | Workflow-level: can use dry-run or a test bucket in a fork—prefer **observable** checks (record read/write, skip path) without mocking GCP in unit tests; keep one place that owns the behavior. |
 | 3 | `scripts/test/deploy-backend-jar-to-gcp-mig.sh.test` (`test_force_full_deploy_when_record_matches_jar_hash`); docs `docs/gcp/conditional-backend-deploy.md`. |
-| 4–5 | Smoke after deploy; optional scripted check that `index.html` and assets load from the new origin. |
+| 4 | `scripts/test/upload-frontend-static-to-gcs.sh.test`; smoke: objects under `gs://…/frontend/<sha>/`. |
+| 5 | Smoke after deploy; optional scripted check that `index.html` and assets load from the new origin. |
 | 6 | **E2E** is the main proof: existing features still pass with static+API split; add or extend one scenario that fails if assets load from the wrong origin or API base is wrong. |
 | 7 | E2E still green; deploy skip behavior validated for FE-only vs BE-only commits. |
 

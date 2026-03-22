@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+#
+# Unit tests for infra/gcp/scripts/upload-frontend-static-to-gcs.sh
+# Uses fake gsutil on PATH (no real GCS).
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+UPLOAD_SCRIPT="$REPO_ROOT/infra/gcp/scripts/upload-frontend-static-to-gcs.sh"
+
+fail() {
+	echo "FAIL: $*" >&2
+	exit 1
+}
+
+assert_contains() {
+	local haystack=$1 needle=$2 msg=${3:-}
+	if [[ "$haystack" != *"$needle"* ]]; then
+		fail "${msg:+$msg — }expected log to contain <$needle>"
+	fi
+}
+
+write_fake_gsutil() {
+	local fake_bin=$1
+	mkdir -p "$fake_bin"
+	printf '#!%s\nset -e\nLOG="${GSUTIL_LOG:?}"\necho "gsutil $*" >>"$LOG"\nexit 0\n' "$(command -v bash)" >"$fake_bin/gsutil"
+	chmod +x "$fake_bin/gsutil"
+}
+
+run_upload() {
+	(
+		cd "$1"
+		PATH="$2:$PATH"
+		export GCS_BUCKET GITHUB_SHA GSUTIL_LOG="$3"
+		export FRONTEND_STATIC_DIR="${FRONTEND_STATIC_DIR:-}"
+		bash "$UPLOAD_SCRIPT"
+	)
+}
+
+test_fails_when_static_dir_missing() {
+	local work fake_bin
+	work=$(mktemp -d)
+	trap "rm -rf '${work}'" EXIT
+	fake_bin="$work/bin"
+	write_fake_gsutil "$fake_bin"
+	log="$work/log"
+	touch "$log"
+	(
+		cd "$work"
+		PATH="$fake_bin:$PATH"
+		export GCS_BUCKET=bucket GITHUB_SHA=abc123 GSUTIL_LOG="$log"
+		export FRONTEND_STATIC_DIR="$work/nonexistent"
+		if bash "$UPLOAD_SCRIPT" 2>/dev/null; then
+			fail "expected exit non-zero when static dir missing"
+		fi
+	)
+}
+
+test_rsync_invoked_with_dest_prefix() {
+	local work fake_bin
+	work=$(mktemp -d)
+	trap "rm -rf '${work}'" EXIT
+	fake_bin="$work/bin"
+	write_fake_gsutil "$fake_bin"
+	log="$work/log"
+	touch "$log"
+	mkdir -p "$work/backend/src/main/resources/static"
+	echo '<html/>' >"$work/backend/src/main/resources/static/index.html"
+	run_upload "$work" "$fake_bin" "$log"
+	local content
+	content=$(cat "$log")
+	assert_contains "$content" "rsync" "gsutil args"
+	assert_contains "$content" "gs://bucket/frontend/deadbeef/" "GCS dest"
+}
+
+main() {
+	test_fails_when_static_dir_missing
+	GITHUB_SHA=deadbeef GCS_BUCKET=bucket test_rsync_invoked_with_dest_prefix
+	echo "upload-frontend-static-to-gcs.sh tests: OK"
+}
+
+main "$@"

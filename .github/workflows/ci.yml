@@ -118,6 +118,13 @@ jobs:
         run: pnpm bundle:all
       - name: Build application jar artifact
         run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
+      - uses: ./.github/gcloud_auth_n_sdk
+        with:
+          credentials_json: ${{ env.GCP_CREDENTIALS }}
+      - name: Upload frontend static to GCS
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+        run: infra/gcp/scripts/upload-frontend-static-to-gcs.sh
       - uses: actions/upload-artifact@v7
         with:
           name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
