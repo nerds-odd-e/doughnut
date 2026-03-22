@@ -7,7 +7,7 @@
  *   E2E_STATIC_ROOT — default backend/src/main/resources/static (after pnpm bundle:all + frontend:build)
  *   E2E_PROXY_TARGET — default http://127.0.0.1:9081
  *   E2E_PROXY_LISTEN_PORT — default 5173 (same port as Vite for one mental model; CI uses proxy, not Vite).
- *     In CI, wait for this port with wait-on `tcp:5173`, not `http://127.0.0.1:5173/` (avoids HTTP_PROXY 400).
+ *     CI should wait on `http://127.0.0.1:5173/__e2e__/ready` — probes Spring at E2E_PROXY_TARGET using Node http (no corporate HTTP_PROXY), unlike wait-on hitting :9081 directly.
  */
 import { createReadStream, existsSync, statSync } from 'node:fs'
 import http from 'node:http'
@@ -93,6 +93,54 @@ function serveSpaIndex(method, res) {
   return sendStatic(indexPath, method, res)
 }
 
+function backendPortNumber() {
+  if (BACKEND.port) return Number(BACKEND.port)
+  return BACKEND.protocol === 'https:' ? 443 : 80
+}
+
+/** Used by CI wait-on: proxy is up and can reach Spring /api/healthcheck (server-side; bypasses HTTP_PROXY on wait-on). */
+function probeBackendHealth(done) {
+  const opts = {
+    hostname: BACKEND.hostname,
+    port: backendPortNumber(),
+    path: '/api/healthcheck',
+    method: 'GET',
+    timeout: 10_000,
+  }
+  const pReq = http.request(opts, (pRes) => {
+    const ok =
+      pRes.statusCode !== undefined &&
+      pRes.statusCode >= 200 &&
+      pRes.statusCode < 300
+    pRes.resume()
+    pRes.on('end', () => done(ok))
+  })
+  pReq.on('error', () => done(false))
+  pReq.on('timeout', () => {
+    pReq.destroy()
+    done(false)
+  })
+  pReq.end()
+}
+
+function handleE2eReady(req, res) {
+  const method = req.method ?? 'GET'
+  if (method !== 'GET' && method !== 'HEAD') {
+    res.statusCode = 405
+    res.end('Method Not Allowed')
+    return
+  }
+  probeBackendHealth((ok) => {
+    res.statusCode = ok ? 200 : 503
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+    if (method === 'HEAD') {
+      res.end()
+      return
+    }
+    res.end(ok ? 'ready' : 'not ready')
+  })
+}
+
 function proxyToBackend(clientReq, clientRes) {
   const targetPath = clientReq.url ?? '/'
   const headers = { ...clientReq.headers }
@@ -133,6 +181,10 @@ if (!existsSync(STATIC_ROOT)) {
 http
   .createServer((req, res) => {
     const urlPath = (req.url ?? '/').split('?')[0] || '/'
+    if (urlPath === '/__e2e__/ready') {
+      handleE2eReady(req, res)
+      return
+    }
     if (shouldProxyPath(urlPath)) {
       proxyToBackend(req, res)
       return

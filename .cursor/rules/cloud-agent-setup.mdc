@@ -83,7 +83,7 @@ pnpm bundle:all
 pnpm exec run-p -clnr backend:sut:ci start:mb &
 
 # Wait for backend and Mountebank
-NO_PROXY=127.0.0.1,localhost pnpm exec wait-on http://127.0.0.1:9081/api/healthcheck tcp:5173 --timeout 120000
+NO_PROXY=127.0.0.1,localhost pnpm exec wait-on http://127.0.0.1:5173/__e2e__/ready --timeout 120000
 
 # Run tests (xvfb-run required - Cloud VM has no display)
 xvfb-run pnpm cypress run --spec e2e_test/features/<feature-file>.feature --config-file e2e_test/config/ci.ts
@@ -95,7 +95,7 @@ xvfb-run pnpm cypress run --spec e2e_test/features/<feature-file>.feature --conf
 
 1. **Do NOT use `CURSOR_DEV=true nix develop -c` prefix** - run commands directly
 2. **Backend tests:** Require one-time setup script for Java and MySQL
-3. **E2E tests:** **MUST source the setup script first** (to set `INPUT_DB_URL` and `CI=1`). Then use the **E2E Tests** section above: `pnpm bundle:all`, `run-p` for `backend:sut:ci` + `start:mb` + **`e2e:prod-topology-proxy`**, `wait-on` **9081** healthcheck **and** **`tcp:5173`** (not `http://127.0.0.1:5173/`—HTTP `wait-on` can hit `HTTP_PROXY` and get **400**), with **`NO_PROXY=127.0.0.1,localhost`** for the health URL, then `xvfb-run pnpm cypress run ...` with `e2e_test/config/ci.ts`. Cypress `baseUrl` is **5173** (prod-topology proxy: built static + forward to Spring), not Vite.
+3. **E2E tests:** **MUST source the setup script first** (to set `INPUT_DB_URL` and `CI=1`). Then use the **E2E Tests** section above: `pnpm bundle:all`, `run-p` for `backend:sut:ci` + `start:mb` + **`e2e:prod-topology-proxy`**, `wait-on` **`http://127.0.0.1:5173/__e2e__/ready`** (proxy + server-side probe to Spring—avoids `wait-on` calling **9081** through `HTTP_PROXY` and seeing **400/404**). Set **`NO_PROXY=127.0.0.1,localhost`** for the `wait-on` step, then `xvfb-run pnpm cypress run ...` with `e2e_test/config/ci.ts`. Cypress `baseUrl` is **5173** (prod-topology proxy), not Vite.
 4. **Service ports:** Spring E2E on **9081**; **5173** is either the prod-topology proxy (CI / `pnpm test`) or Vite (`pnpm sut` / `cy:focus`)—never both at once.
 5. **Test execution:** Frontend tests work without nix
 6. **Linting errors:** TypeScript/vue-tsc errors may appear but don't prevent test execution
@@ -106,6 +106,6 @@ xvfb-run pnpm cypress run --spec e2e_test/features/<feature-file>.feature --conf
 |---------|----------|
 | Frontend tests | `pnpm frontend:test` |
 | Backend tests | `pnpm backend:verify` |
-| E2E tests | See **E2E Tests** section: `bundle:all` → `backend:sut:ci` + `start:mb` + `e2e:prod-topology-proxy` → `wait-on` healthcheck + `tcp:5173`, `NO_PROXY` for localhost → `xvfb-run pnpm cypress run --spec <path> --config-file e2e_test/config/ci.ts` |
+| E2E tests | See **E2E Tests** section: `bundle:all` → `backend:sut:ci` + `start:mb` + `e2e:prod-topology-proxy` → `wait-on` `http://127.0.0.1:5173/__e2e__/ready`, `NO_PROXY` for localhost → `xvfb-run pnpm cypress run --spec <path> --config-file e2e_test/config/ci.ts` |
 | Linting | `pnpm lint:all` |
 | Formatting | `pnpm format:all` |

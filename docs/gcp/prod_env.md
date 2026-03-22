@@ -93,7 +93,7 @@ Upload script: `infra/gcp/scripts/upload-frontend-static-to-gcs.sh`.
 
 **Prod routing:** HTTPS load balancer sends static paths to a **backend bucket** (and optional Cloud CDN); API, OAuth, `/attachments`, `/logout`, `/install`, etc. stay on the MIG. How the **active** `GITHUB_SHA` is chosen, path order, SPA deep links, rollback, and smoke checks: [prod-frontend-static-lb.md](prod-frontend-static-lb.md).
 
-**E2E (phase 6):** Cypress CI uses a local **single-origin** proxy on port **5173** that serves the same built static tree from disk and forwards those API paths to Spring on **9081**—see `e2e_test/e2e-prod-topology-proxy.mjs`.
+**E2E (phase 6):** Cypress CI uses a local **single-origin** proxy on port **5173** that serves the same built static tree from disk and forwards those API paths to Spring on **9081**—see `e2e_test/e2e-prod-topology-proxy.mjs`. CI `wait-on` uses **`/__e2e__/ready`**, which checks Spring from inside the proxy (avoids `HTTP_PROXY` breaking direct **9081** health requests).
 
 Operational note: creating a Cloud SQL VECTOR index may fail with
 "Vector index: not enough data to train" if the table has too few embeddings.

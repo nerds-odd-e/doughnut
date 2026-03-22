@@ -52,7 +52,7 @@
     "cy:run": "cypress run --config-file e2e_test/config/ci.ts",
     "cy:focus": "cypress run --config-file e2e_test/config/local.ts",
     "cy:run-with-sut": "wait-on tcp:9081 tcp:5173 && cypress run --config-file e2e_test/config/local.ts",
-    "cy:run-on-sut": "wait-on tcp:9081 tcp:5173 && pnpm cy:run",
+    "cy:run-on-sut": "wait-on http://127.0.0.1:5173/__e2e__/ready && pnpm cy:run",
     "e2e:prod-topology-proxy": "node e2e_test/e2e-prod-topology-proxy.mjs",
     "test": "pnpm --frozen-lockfile --silent recursive install && pnpm frontend:build && pnpm exec run-p -clnr backend:sut start:mb e2e:prod-topology-proxy cy:run-on-sut",
     "sut": "pnpm --frozen-lockfile --silent recursive install && pnpm exec run-p -clnr backend:sut start:mb frontend:sut",

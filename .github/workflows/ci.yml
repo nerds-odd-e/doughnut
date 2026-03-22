@@ -188,7 +188,7 @@ jobs:
           config-file: e2e_test/config/ci.ts
           build: pnpm bundle:all
           start: pnpm run-p -clnr backend:sut:ci start:mb e2e:prod-topology-proxy
-          wait-on: "http://127.0.0.1:9081/api/healthcheck tcp:5173"
+          wait-on: "http://127.0.0.1:5173/__e2e__/ready"
           wait-on-timeout: 150
           spec: ${{ matrix.spec }}
           install: true
