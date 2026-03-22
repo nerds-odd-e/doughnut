@@ -83,13 +83,15 @@ gcloud sql instances describe doughnut-db-instance \
 
 Green `main` builds may **skip** GCS jar upload and MIG rollout when the jar hash matches the last successful deploy record. To **force** upload + rolling replace anyway, use the commit-message token and merge caveats in [conditional-backend-deploy.md](conditional-backend-deploy.md).
 
-## 6. Frontend static in GCS (CI publish)
+## 6. Frontend static in GCS (CI publish + prod LB)
 
 Each green `Package-artifacts` run on `main` uploads the SPA tree (Vite output under `backend/src/main/resources/static/`, including CLI bundle paths produced by `pnpm bundle:all`) to:
 
 `gs://<GCS_BUCKET>/frontend/<GITHUB_SHA>/`
 
-Prod still serves the app from the jar until load balancer / CDN wiring (separate change). Upload script: `infra/gcp/scripts/upload-frontend-static-to-gcs.sh`.
+Upload script: `infra/gcp/scripts/upload-frontend-static-to-gcs.sh`.
+
+**Prod routing:** HTTPS load balancer sends static paths to a **backend bucket** (and optional Cloud CDN); API, OAuth, `/attachments`, `/logout`, `/install`, etc. stay on the MIG. How the **active** `GITHUB_SHA` is chosen, path order, SPA deep links, rollback, and smoke checks: [prod-frontend-static-lb.md](prod-frontend-static-lb.md).
 
 Operational note: creating a Cloud SQL VECTOR index may fail with
 "Vector index: not enough data to train" if the table has too few embeddings.

@@ -1,14 +1,14 @@
-# Conditional deploy, reproducible jar, GCS frontend, E2E parity
+# Conditional backend deploy, reproducible jar, GCS frontend, E2E parity
 
 Informal plan; delete or archive when done.
 
 ## Goals
 
-1. **Skip GCP deploy** when the deployable backend jar is **byte-identical** to the last **successful** production deploy, using a **recorded hash** (not only “GCS object exists”).
+1. **Skip backend GCP deploy** (jar upload + MIG replace) when the deployable backend jar is **byte-identical** to the last **successful** production deploy, using a **recorded hash** (not only “GCS object exists”). **Frontend static upload to GCS is not conditional**—each green pipeline publishes static under the commit prefix; no skip-by-hash for the frontend artifact.
 2. **Reproducible builds** so the comparison is trustworthy (same sources → same jar hash for a given build environment).
 3. **Guardrail (implemented):** If the **`main`** commit CI deploys (`GITHUB_SHA`) has a message containing **`force-deployment: true`** (subject or body; optional spaces around `:`), always run the full deploy path when the job runs, **even when** the jar hash matches the last successful deploy record—subject to existing job success/`needs`. See `docs/gcp/conditional-backend-deploy.md`.
 4. **Later:** Ship the **frontend static assets from GCS** (or CDN in front of it) so **frontend-only** changes do not require a **backend MIG** rollout in prod.
-5. **E2E:** After (4), tests should **mimic CDN-only static hosting** (browser loads UI from a static origin separate from the API), without depending on Google infrastructure in CI.
+5. **E2E:** After (4), tests should mirror **prod routing**: the UI is **not** served from the jar (local static server and/or proxy), and how the browser reaches **static vs API** matches prod—whether that is **one hostname** (path-based LB) or a deliberate **split-origin** layout—without using real GCS in CI.
 
 ---
 
@@ -92,42 +92,50 @@ Informal plan; delete or archive when done.
 - **CI:** `.github/workflows/ci.yml` `Package-artifacts` runs GCP auth then the script after the prod `build` (and `bundle:all`).
 - **Tests:** `scripts/test/upload-frontend-static-to-gcs.sh.test`.
 
-**Not in this phase:** Prod LB/CDN routing (phase 5), cache headers, `latest` pointer object, conditional skip when static unchanged.
+**Not in this phase:** Prod LB/CDN routing (phase 5), cache headers, `latest` pointer object. **No** conditional skip for frontend upload—every successful `Package-artifacts` run uploads static for that `GITHUB_SHA`.
 
 ---
 
 ## Phase 5 — Prod wiring: static from GCS/CDN, API from backend
 
-**Outcome:** Production users load the SPA from the static hosting path and call the API on the existing backend host (or separate host), with **CORS/cookies/same-site** and **OAuth redirect URIs** still correct.
+**Default (conventional):** One **browser-facing hostname** (the existing prod domain). An **HTTPS load balancer URL map** sends **SPA routes** (e.g. `/`, `/assets/*`, and fallbacks for client-side routing) to **GCS** via a **backend bucket** and optional **Cloud CDN**; **API** and other backend-only paths go to the **MIG**. The browser sees a **single origin**—no Vue router change for that reason, and cookies/sessions stay straightforward. GCS remains storage; users should not depend on raw `https://storage.googleapis.com/...` in the address bar or as the primary script origin (avoid ES-module CORS and versioning pain; use your domain in front of the bucket).
 
-**Scope:** GCP load balancer URL map, backend bucket, or Cloud CDN—whatever matches your infra; minimal Spring changes (e.g. stop serving static from the jar for prod, or redirect `/` to the static origin—pick one coherent story).
+**Alternative:** Separate hostnames for static vs API (e.g. `cdn.` + app/API)—then document **CORS, cookies (`SameSite` / `Domain`), and OAuth redirect URIs** deliberately.
 
-**User/system value:** Backend MIG **not** required for frontend-only changes.
+**Scope:** LB/backend-bucket/CDN wiring for the chosen layout; minimal Spring changes (e.g. stop serving the SPA from the jar in prod, or only non-SPA paths). Decide how the **active** tree under `frontend/<sha>/` is selected (URL map / rewrite to current SHA, `latest` pointer, etc.) and align **cache headers** with that story.
+
+**One-time GCP setup:** This phase includes **platform work** (URL map and path rules, backend bucket, optional CDN, IAM, DNS, TLS, bucket CORS if ever needed). **Document it in `docs/gcp/`**—extend `prod_env.md` and/or add a short runbook: resources, naming, how the active frontend revision is chosen, rollback, and who can change it—so setup is **not** tribal knowledge.
+
+**User/system value:** Backend MIG **not** required for frontend-only changes (once routing and the active-build pointer are in place).
+
+### Phase 5 implementation (done)
+
+- **Docs:** [docs/gcp/prod-frontend-static-lb.md](docs/gcp/prod-frontend-static-lb.md) — single-hostname LB + backend bucket/CDN, path rules (MIG vs GCS), choosing and rolling back **active** `frontend/<GITHUB_SHA>/`, IAM/CDN/cache notes, SPA deep-link options (staged default-to-MIG vs CDN 404→`index.html`), smoke checks. [docs/gcp/prod_env.md](docs/gcp/prod_env.md) §6 links to it.
+- **GCP (applied):** Backend bucket `doughnut-frontend-backend-bucket` on `dough-01` with CDN; URL map `doughnut-app-service-map` path matcher `doughnut-paths` — `/`, `/index.html`, `/assets/*`, favicon paths → GCS prefix `frontend/<sha>/` via rewrites; default → MIG `doughnut-app-service`. Repo YAML: [`infra/gcp/url-maps/doughnut-app-service-map.yaml`](infra/gcp/url-maps/doughnut-app-service-map.yaml).
+- **Code:** No Spring change in this phase; jar may still embed static until phase 7.
 
 ---
 
-## Phase 6 — E2E mimics CDN-only hosting
+## Phase 6 — E2E mimics prod static + API shape
 
-**Outcome:** Cypress SUT uses **two origins** (or two ports): **API** from the existing Spring app, **static UI** from a **local** static server that serves the **same built assets** as phase 4 (no GCS in CI). The browser behavior matches prod: **HTML/JS/CSS not served from the jar**.
+**Outcome:** Cypress SUT serves the **same built assets** as phase 4 from **outside the Spring jar** (local static server; no GCS in CI). **API** stays the existing Spring app. Topology should **match prod**: if prod uses **one hostname + path routing** (phase 5 default), prefer a **single browser origin** in E2E too (e.g. a small local reverse proxy that merges static + API); if prod uses **split origins**, use two origins (or two ports) and the same API base URL / cookie rules as prod.
 
 **Research / design (this phase):**
 
-- Vite (or your build) **`base`** and **asset paths** in `index.html` must work when the app is opened from the static origin while API calls go to the backend origin (proxy in dev is different from prod—E2E should mirror **prod** shape).
-- Prefer **root-relative asset URLs** in built HTML (`/assets/...`) and serve the static tree under `/` on a local server so no hardcoded Google URLs appear in the artifact.
-- If prod HTML must contain an absolute CDN base, consider **one build** with `base` from env at build time: CI would set **local static base** for E2E and **CDN base** for prod, or use a tiny post-build substitution—**investigate which option matches “reproducible + simple”** before coding.
-- **Cypress `baseUrl` / `start`:** likely `run-p` static server + backend + mountebank; health checks wait on both if needed.
+- Vite **`base`** and **asset paths** in `index.html` must work for the chosen E2E layout (dev proxy differs from prod—E2E should mirror **prod**).
+- Prefer **root-relative asset URLs** in built HTML (`/assets/...`) and serve the static tree under `/` on the static side so artifacts stay free of hardcoded cloud URLs unless prod truly requires them.
+- If prod needs an absolute asset base, align **one build** or a minimal post-build step with **reproducible + simple**—prefer deciding after phase 5’s URL shape is fixed.
+- **Cypress `baseUrl` / `start`:** e.g. `run-p` static server + backend + mountebank; exact wiring follows prod.
 
-**User/system value:** E2E catches CORS, wrong API base URL, cookie scope, and asset path bugs that only appear when UI is not embedded in the jar.
+**User/system value:** E2E catches wrong API base URL, cookie scope, asset paths, and (when prod is split-origin) CORS issues that only appear when the UI is not embedded in the jar.
 
 ---
 
-## Phase 7 — Jar slimming and deploy skip granularity (optional cleanup)
+## Phase 7 — Jar slimming (optional cleanup)
 
-**Outcome:** Backend jar for prod **excludes** embedded SPA (or includes only a minimal stub), **conditional deploy** compares **backend-only** artifact hash where applicable, and **frontend-only** commits **skip MIG** while still publishing static (phases 4–5).
+**Outcome:** Backend jar for prod **excludes** embedded SPA (or includes only a minimal stub). **Conditional deploy** stays **backend-only** (jar hash vs last successful deploy record). **Frontend static** keeps **always uploading** on green pipeline (phases 4–5); **frontend-only** commits still **skip MIG** when the jar hash is unchanged, without any separate conditional frontend deploy mechanism.
 
-**Note:** Hash comparison might be **one hash for backend jar** plus optional **separate record for static bundle** if you still want “no-op” static uploads—product decision.
-
-**User/system value:** Fastest feedback loop for frontend changes; smallest backend deploy surface.
+**User/system value:** Smaller backend deploy surface; frontend changes still publish to GCS every time.
 
 ---
 
@@ -139,15 +147,15 @@ Informal plan; delete or archive when done.
 | 2 | Workflow-level: can use dry-run or a test bucket in a fork—prefer **observable** checks (record read/write, skip path) without mocking GCP in unit tests; keep one place that owns the behavior. |
 | 3 | `scripts/test/deploy-backend-jar-to-gcp-mig.sh.test` (`test_force_full_deploy_when_record_matches_jar_hash`); docs `docs/gcp/conditional-backend-deploy.md`. |
 | 4 | `scripts/test/upload-frontend-static-to-gcs.sh.test`; smoke: objects under `gs://…/frontend/<sha>/`. |
-| 5 | Smoke after deploy; optional scripted check that `index.html` and assets load from the new origin. |
-| 6 | **E2E** is the main proof: existing features still pass with static+API split; add or extend one scenario that fails if assets load from the wrong origin or API base is wrong. |
-| 7 | E2E still green; deploy skip behavior validated for FE-only vs BE-only commits. |
+| 5 | Smoke after deploy; **docs** in `docs/gcp/` for one-time platform setup; optional scripted check that SPA and assets load through the prod URL shape. |
+| 6 | **E2E** is the main proof: features pass with UI not from jar; topology matches prod (single-origin proxy vs split origins); add or extend coverage that fails if static/API routing or API base is wrong. |
+| 7 | E2E still green; backend conditional MIG skip still correct when jar unchanged; frontend upload remains unconditional. |
 
 ---
 
 ## Deploy gate
 
-After phases that change prod behavior (especially 2, 5, 7), follow your usual **commit → CD → verify** before stacking risky follow-ups.
+After phases that change prod behavior (especially 2, 5, 7), follow your usual **commit → CD → verify** before stacking risky follow-ups. For **phase 5**, treat **GCP runbook updates in `docs/gcp/`** as part of “done,” not a follow-up.
 
 ---
 
@@ -155,4 +163,4 @@ After phases that change prod behavior (especially 2, 5, 7), follow your usual *
 
 - Where exactly to store **last successful deploy** metadata (GCS object, Firestore, etc.) and IAM for read vs write.
 - Whether **rolling replace** must run when only **startup script / template** changes but jar hash is unchanged (commit-message force covers intentional cases; template changes might need path filters or always-replace policy).
-- **Cookie/session** domain when static and API hosts differ (subdomain vs path-based).
+- **Cookie/session:** straightforward with **single hostname + path-based routing** (phase 5 default); if using **separate static vs API hosts**, document `Domain` / `SameSite` and OAuth redirects.
