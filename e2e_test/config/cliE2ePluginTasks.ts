@@ -12,7 +12,7 @@ import {
   runShellCommandSync,
   spawnCliFromRepo,
 } from './cliE2eRepo'
-import { cliEnv, cliInstallShellEnv } from './cliEnv'
+import { cliEnv } from './cliEnv'
 import {
   applyInteractiveCliPtyKeystroke,
   runCliInPty,
@@ -88,10 +88,11 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       const script = await response.text()
       writeFileSync(installScriptPath, script, { mode: 0o755 })
       runShellCommandSync(`bash ${installScriptPath}`, {
-        env: cliInstallShellEnv({
+        env: {
+          ...process.env,
           INSTALL_PREFIX: installDir,
           BASE_URL: baseUrl,
-        }),
+        },
       })
       const doughnutPath = join(installDir, 'bin', 'doughnut')
       if (!existsSync(doughnutPath)) {
