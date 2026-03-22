@@ -26,6 +26,12 @@ All services automatically restart when code changes are made. The developer doe
 
 **If services are not running**, suggest the user to run `pnpm sut` in a separate terminal first.
 
+## Prod-style topology in CI / `pnpm test`
+
+Cypress uses **`http://localhost:5173`** as `baseUrl` (`e2e_test/config/ci.ts`): the **prod-topology proxy** (not Vite) listens on **5173**, serves the **built** static tree from `backend/src/main/resources/static`, and forwards API/auth paths to Spring on **9081** (`e2e_test/e2e-prod-topology-proxy.mjs`). Same port as Vite for a single mental model; CI runs the proxy only.
+
+**`pnpm sut` + `cy:focus`** use Vite on **5173** (`e2e_test/config/local.ts`). Do not run Vite and `e2e:prod-topology-proxy` together (port clash). Override with `E2E_PROXY_LISTEN_PORT` if needed.
+
 ## Run E2E Test in Terminal
 
 We usually don't run all the e2e tests locally, since it will take too much time. That still fits **phased planning** (`planning.mdc`): each phase should have E2E for **its** slice — run the **relevant** feature file(s), not necessarily the whole suite. To run one feature file:

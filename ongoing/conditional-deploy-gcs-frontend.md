@@ -129,6 +129,13 @@ Informal plan; delete or archive when done.
 
 **User/system value:** E2E catches wrong API base URL, cookie scope, asset paths, and (when prod is split-origin) CORS issues that only appear when the UI is not embedded in the jar.
 
+### Phase 6 implementation (done)
+
+- **Proxy:** [`e2e_test/e2e-prod-topology-proxy.mjs`](../e2e_test/e2e-prod-topology-proxy.mjs) listens on **5173**, serves `backend/src/main/resources/static` (after `pnpm frontend:build` / `bundle:all`), proxies `/api`, `/attachments`, `/logout`, `/users/*`, `/install`, OAuth paths, `/robots.txt` to Spring **9081**; unknown GET paths fall back to `index.html` (SPA, like prod default-to-MIG for `/d/**`).
+- **Cypress CI / `pnpm test`:** `baseUrl` and `E2E_BACKEND_BASE_URL` → `http://localhost:5173`. `pnpm exec run-p` runs `e2e:prod-topology-proxy` with `backend:sut` + mountebank; `cy:run-on-sut` waits on **9081** and **5173**. GitHub Action E2E job starts the same proxy and `wait-on` includes both healthcheck and `http://127.0.0.1:5173/`.
+- **`E2E_SPRING_BACKEND_URL`** in [`e2e_test/config/constants.ts`](../e2e_test/config/constants.ts) documents the raw Spring port for tools that must bypass the browser origin.
+- **Local `cy:focus` / `pnpm sut`:** same **5173** as CI, but **Vite** (HMR) instead of the proxy—do not run both Vite and `e2e:prod-topology-proxy` on one machine at once (`e2e_test/config/local.ts` unchanged).
+
 ---
 
 ## Phase 7 — Jar slimming (optional cleanup)
@@ -148,7 +155,7 @@ Informal plan; delete or archive when done.
 | 3 | `scripts/test/deploy-backend-jar-to-gcp-mig.sh.test` (`test_force_full_deploy_when_record_matches_jar_hash`); docs `docs/gcp/conditional-backend-deploy.md`. |
 | 4 | `scripts/test/upload-frontend-static-to-gcs.sh.test`; smoke: objects under `gs://…/frontend/<sha>/`. |
 | 5 | Smoke after deploy; **docs** in `docs/gcp/` for one-time platform setup; optional scripted check that SPA and assets load through the prod URL shape. |
-| 6 | **E2E** is the main proof: features pass with UI not from jar; topology matches prod (single-origin proxy vs split origins); add or extend coverage that fails if static/API routing or API base is wrong. |
+| 6 | **E2E** is the main proof: `e2e-prod-topology-proxy` + Cypress `baseUrl` :5173; full suite in CI. |
 | 7 | E2E still green; backend conditional MIG skip still correct when jar unchanged; frontend upload remains unconditional. |
 
 ---
