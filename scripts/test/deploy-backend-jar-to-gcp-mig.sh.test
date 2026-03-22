@@ -89,6 +89,7 @@ run_deploy() {
 		export GSUTIL_LOG ROLLING_LOG
 		export DEPLOY_JAR_PATH="${DEPLOY_JAR_PATH:-}"
 		export RECORD_JSON_FILE="${RECORD_JSON_FILE:-}"
+		export FORCE_FULL_DEPLOY="${FORCE_FULL_DEPLOY:-}"
 		bash "$DEPLOY_SCRIPT"
 	)
 }
@@ -186,6 +187,33 @@ test_deploys_when_record_hash_differs() {
 	rm -rf "$work"
 }
 
+test_force_full_deploy_when_record_matches_jar_hash() {
+	local work fake_bin jar hash
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	fake_bin="$work/fakebin"
+	write_fake_bin "$fake_bin"
+	export GSUTIL_LOG="$work/gsutil.log" ROLLING_LOG="$work/rolling.log"
+	: >"$GSUTIL_LOG"
+	rm -f "$ROLLING_LOG"
+	jar="$work/a-1.jar"
+	printf 'fixture-jar-bytes' >"$jar"
+	hash=$(sha256sum "$jar" | awk '{print $1}')
+	printf '{"sha256":"%s","git_sha":"old","recorded_at":"2020-01-01T00:00:00Z"}\n' "$hash" >"$work/record.json"
+	export RECORD_JSON_FILE="$work/record.json"
+	export GCS_BUCKET=bucket ARTIFACT=a VERSION=1 GITHUB_SHA=newcommit
+	export DEPLOY_JAR_PATH="$jar"
+	export FORCE_FULL_DEPLOY=1
+	run_deploy "$work" "$fake_bin"
+	unset FORCE_FULL_DEPLOY
+	assert_file_exists "$work/rolling.log"
+	grep -q perform-rolling-replace-app-mig.sh "$work/rolling.log" || fail "rolling replace not invoked when forced"
+	grep -q 'cp .*backend_app_jar' "$GSUTIL_LOG" || fail "jar upload not logged when forced"
+	grep -q 'cp - gs://' "$GSUTIL_LOG" || fail "record upload (stdin) not logged when forced"
+	trap - EXIT
+	rm -rf "$work"
+}
+
 main() {
 	[[ -x "$DEPLOY_SCRIPT" ]] || fail "deploy script not found or not executable: $DEPLOY_SCRIPT"
 	command -v sha256sum >/dev/null || fail "sha256sum required"
@@ -193,6 +221,7 @@ main() {
 
 	test_fails_when_jar_missing
 	test_skips_upload_and_replace_when_record_matches_jar_hash
+	test_force_full_deploy_when_record_matches_jar_hash
 	test_deploys_when_no_record
 	test_deploys_when_record_hash_differs
 	echo "ok deploy-backend-jar-to-gcp-mig.sh tests"

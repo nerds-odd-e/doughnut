@@ -6,7 +6,7 @@ Informal plan; delete or archive when done.
 
 1. **Skip GCP deploy** when the deployable backend jar is **byte-identical** to the last **successful** production deploy, using a **recorded hash** (not only “GCS object exists”).
 2. **Reproducible builds** so the comparison is trustworthy (same sources → same jar hash for a given build environment).
-3. **Guardrail:** If a file **`force_deployment`** exists at the **repository root**, always run the full deploy path (upload + MIG rolling replace) when the workflow would otherwise deploy—subject to existing job success/`needs` (same as today).
+3. **Guardrail (implemented):** If the **`main`** commit CI deploys (`GITHUB_SHA`) has a message containing **`force-deployment: true`** (subject or body; optional spaces around `:`), always run the full deploy path when the job runs, **even when** the jar hash matches the last successful deploy record—subject to existing job success/`needs`. See `docs/gcp/conditional-backend-deploy.md`.
 4. **Later:** Ship the **frontend static assets from GCS** (or CDN in front of it) so **frontend-only** changes do not require a **backend MIG** rollout in prod.
 5. **E2E:** After (4), tests should **mimic CDN-only static hosting** (browser loads UI from a static origin separate from the API), without depending on Google infrastructure in CI.
 
@@ -51,13 +51,29 @@ Informal plan; delete or archive when done.
 
 ---
 
-## Phase 3 — `force_deployment` guardrail
+## Phase 3 — Commit-message force deploy
 
-**Outcome:** If **`force_deployment`** exists at the **repo root** on the commit being built, the workflow **always** performs the full deploy path (upload + rolling replace) when that job runs, **even when** the jar hash matches the last successful deploy record.
+**Outcome:** On the **`Deploy` job** (after the same `needs` as today), if the triggering **`push`** indicates a force, run the **full** path (upload + rolling replace) **even when** the jar SHA-256 equals the last successful deploy record. Otherwise keep phase 2 skip behavior.
 
-**Removal:** Deleting the file in a follow-up commit returns to normal hash-based skipping.
+**Token (concrete):** Treat the deploy as forced when the full message (subject + body) of at least one relevant commit matches a documented pattern, e.g. substring **`force-deployment: true`** (or a small regex allowing optional spaces around `:`). Document exact rules in the runbook; optional: **`workflow_dispatch`** with a “force full deploy” input later for ad-hoc reruns without a commit.
 
-**User/system value:** Escape hatch for “must roll VMs” without a code change to the jar (or to recover from drift).
+**Where CI gets the message:** Prefer `github.event.head_commit.message` for the **tip** of the push, or `git log` over `before..after` after checkout if we choose to honor **every commit in the batch** (see caveats). Pass a boolean or `FORCE_FULL_DEPLOY=1` into `deploy-backend-jar-to-gcp-mig.sh` so the script only skips on hash match when force is off.
+
+**Caveats (document for authors):**
+
+- **Tip-only (simplest):** If only the **latest** commit on the push is inspected, a multi-commit push must put the token on the **last** commit, or force won’t apply.
+- **Batch scan:** Scanning `github.event.commits` or `git log before..after` covers the whole push; note GitHub’s **`commits` array is capped at 20** — larger pushes need `git log`.
+- **Merge style:** **Squash merge:** put the token in the squash title/description. **Merge commit:** token must appear in the **merge commit message** (default text often won’t include PR body). **Rebase merge:** token on the rebased tip commit message.
+- **`head_commit`:** Rare push shapes leave it empty; treat as “no force” if missing.
+
+**User/system value:** Escape hatch for “must roll VMs” without a jar change (or drift recovery), no repo-root sentinel file to add/remove.
+
+### Phase 3 implementation (done)
+
+- **Workflow:** `.github/workflows/ci.yml` `Deploy` job runs `git log -1 --format=%B "$GITHUB_SHA"`; if the message matches `force-deployment[[:space:]]*:[[:space:]]*true` (grep extended regex), it sets `FORCE_FULL_DEPLOY=1` before `deploy-backend-jar-to-gcp-mig.sh`.
+- **Script:** `infra/gcp/scripts/deploy-backend-jar-to-gcp-mig.sh` — when the jar hash equals the record, skips unless `FORCE_FULL_DEPLOY=1`.
+- **Tests:** `scripts/test/deploy-backend-jar-to-gcp-mig.sh.test` — `test_force_full_deploy_when_record_matches_jar_hash`.
+- **Docs:** `docs/gcp/conditional-backend-deploy.md`; overview link from `docs/gcp/prod_env.md` §5.
 
 ---
 
@@ -112,7 +128,7 @@ Informal plan; delete or archive when done.
 |-------|--------|
 | 1 | `backend/scripts/boot-jar-reproducible.sh` (Gradle contract + real double `bootJar`). |
 | 2 | Workflow-level: can use dry-run or a test bucket in a fork—prefer **observable** checks (record read/write, skip path) without mocking GCP in unit tests; keep one place that owns the behavior. |
-| 3 | Minimal: document + one manual run with file present/absent, or a workflow test in a branch. |
+| 3 | `scripts/test/deploy-backend-jar-to-gcp-mig.sh.test` (`test_force_full_deploy_when_record_matches_jar_hash`); docs `docs/gcp/conditional-backend-deploy.md`. |
 | 4–5 | Smoke after deploy; optional scripted check that `index.html` and assets load from the new origin. |
 | 6 | **E2E** is the main proof: existing features still pass with static+API split; add or extend one scenario that fails if assets load from the wrong origin or API base is wrong. |
 | 7 | E2E still green; deploy skip behavior validated for FE-only vs BE-only commits. |
@@ -128,5 +144,5 @@ After phases that change prod behavior (especially 2, 5, 7), follow your usual *
 ## Open questions (resolve before or during early phases)
 
 - Where exactly to store **last successful deploy** metadata (GCS object, Firestore, etc.) and IAM for read vs write.
-- Whether **rolling replace** must run when only **startup script / template** changes but jar hash is unchanged (`force_deployment` covers manual cases; template changes might need path filters or always-replace policy).
+- Whether **rolling replace** must run when only **startup script / template** changes but jar hash is unchanged (commit-message force covers intentional cases; template changes might need path filters or always-replace policy).
 - **Cookie/session** domain when static and API hosts differ (subdomain vs path-based).

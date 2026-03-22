@@ -4,6 +4,7 @@ set -euo pipefail
 # Compares the built jar SHA-256 to gs://${GCS_BUCKET}/deploy/last-successful-deploy.json.
 # If equal, skips GCS upload and MIG rolling replace (record only advances after success).
 # Env: GCS_BUCKET, ARTIFACT, VERSION; optional DEPLOY_JAR_PATH; GITHUB_SHA (set by CI).
+# Optional FORCE_FULL_DEPLOY=1: run upload + rolling replace even when the hash matches the record.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -35,8 +36,12 @@ if recorded_json=$(gsutil cat "$RECORD_URI" 2>/dev/null); then
 fi
 
 if [[ -n "$recorded_hash" && "$recorded_hash" == "$new_hash" ]]; then
-  echo "Deploy skipped: jar SHA-256 matches last successful deploy record ($new_hash)."
-  exit 0
+  if [[ "${FORCE_FULL_DEPLOY:-}" == "1" ]]; then
+    echo "Force full deploy: jar SHA-256 matches record ($new_hash); continuing with upload and rolling replace."
+  else
+    echo "Deploy skipped: jar SHA-256 matches last successful deploy record ($new_hash)."
+    exit 0
+  fi
 fi
 
 echo "Deploying: jar SHA-256 $new_hash (record had ${recorded_hash:-<none>})."

@@ -79,6 +79,10 @@ gcloud sql instances describe doughnut-db-instance \
   --format="table(settings.databaseFlags[].name, settings.databaseFlags[].value)"
 ```
 
+## 5. CI/CD: conditional backend deploy
+
+Green `main` builds may **skip** GCS jar upload and MIG rollout when the jar hash matches the last successful deploy record. To **force** upload + rolling replace anyway, use the commit-message token and merge caveats in [conditional-backend-deploy.md](conditional-backend-deploy.md).
+
 Operational note: creating a Cloud SQL VECTOR index may fail with
 "Vector index: not enough data to train" if the table has too few embeddings.
 Run index creation after sufficient data exists.

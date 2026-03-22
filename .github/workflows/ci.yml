@@ -214,7 +214,11 @@ jobs:
         with:
           name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
       - name: Conditional GCS upload, MIG rolling replace, record last success
-        run: infra/gcp/scripts/deploy-backend-jar-to-gcp-mig.sh
+        run: |
+          if git log -1 --format=%B "$GITHUB_SHA" | grep -qE 'force-deployment[[:space:]]*:[[:space:]]*true'; then
+            export FORCE_FULL_DEPLOY=1
+          fi
+          infra/gcp/scripts/deploy-backend-jar-to-gcp-mig.sh
 
   Notify-on-failure:
     name: Single slack/discord notification on CI/CD failure
