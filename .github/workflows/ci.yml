@@ -188,12 +188,14 @@ jobs:
           config-file: e2e_test/config/ci.ts
           build: pnpm bundle:all
           start: pnpm run-p -clnr backend:sut:ci start:mb e2e:prod-topology-proxy
-          wait-on: "http://127.0.0.1:9081/api/healthcheck http://127.0.0.1:5173/"
+          wait-on: "http://127.0.0.1:9081/api/healthcheck tcp:5173"
           wait-on-timeout: 150
           spec: ${{ matrix.spec }}
           install: true
         env:
           GITHUB_FOR_ISSUES_API_TOKEN: ${{ env.GITHUB_FOR_ISSUES_API_TOKEN }}
+          # Node/wait-on: bypass HTTP(S)_PROXY for loopback so healthcheck is not answered 400 by a corporate proxy
+          NO_PROXY: 127.0.0.1,localhost
       - uses: actions/upload-artifact@v7
         if: failure()
         with:

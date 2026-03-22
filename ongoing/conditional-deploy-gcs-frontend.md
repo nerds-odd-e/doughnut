@@ -132,7 +132,7 @@ Informal plan; delete or archive when done.
 ### Phase 6 implementation (done)
 
 - **Proxy:** [`e2e_test/e2e-prod-topology-proxy.mjs`](../e2e_test/e2e-prod-topology-proxy.mjs) listens on **5173**, serves `backend/src/main/resources/static` (after `pnpm frontend:build` / `bundle:all`), proxies `/api`, `/attachments`, `/logout`, `/users/*`, `/install`, OAuth paths, `/robots.txt` to Spring **9081**; unknown GET paths fall back to `index.html` (SPA, like prod default-to-MIG for `/d/**`).
-- **Cypress CI / `pnpm test`:** `baseUrl` and `E2E_APP_BASE_URL` → `http://localhost:5173`. `pnpm exec run-p` runs `e2e:prod-topology-proxy` with `backend:sut` + mountebank; `cy:run-on-sut` waits on **9081** and **5173**. GitHub Action E2E job starts the same proxy and `wait-on` includes both healthcheck and `http://127.0.0.1:5173/`.
+- **Cypress CI / `pnpm test`:** `baseUrl` and `E2E_APP_BASE_URL` → `http://localhost:5173`. `pnpm exec run-p` runs `e2e:prod-topology-proxy` with `backend:sut` + mountebank; `cy:run-on-sut` waits on **9081** and **5173** (TCP). GitHub Action E2E uses `wait-on` **`http://127.0.0.1:9081/api/healthcheck` + `tcp:5173`** (not `http://127.0.0.1:5173/`—HTTP checks can go through `HTTP_PROXY` and get **400**), plus **`NO_PROXY=127.0.0.1,localhost`** on the Cypress step.
 - **`E2E_SPRING_BACKEND_URL`** in [`e2e_test/config/constants.ts`](../e2e_test/config/constants.ts) documents the raw Spring port for tools that must bypass the browser origin.
 - **Local `cy:focus` / `pnpm sut`:** same **5173** as CI, but **Vite** (HMR) instead of the proxy—do not run both Vite and `e2e:prod-topology-proxy` on one machine at once (`e2e_test/config/local.ts` unchanged).
 

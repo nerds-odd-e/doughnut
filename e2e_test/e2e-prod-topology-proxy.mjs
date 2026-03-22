@@ -6,7 +6,8 @@
  * Env:
  *   E2E_STATIC_ROOT — default backend/src/main/resources/static (after pnpm bundle:all + frontend:build)
  *   E2E_PROXY_TARGET — default http://127.0.0.1:9081
- *   E2E_PROXY_LISTEN_PORT — default 5173 (same port as Vite for one mental model; CI uses proxy, not Vite)
+ *   E2E_PROXY_LISTEN_PORT — default 5173 (same port as Vite for one mental model; CI uses proxy, not Vite).
+ *     In CI, wait for this port with wait-on `tcp:5173`, not `http://127.0.0.1:5173/` (avoids HTTP_PROXY 400).
  */
 import { createReadStream, existsSync, statSync } from 'node:fs'
 import http from 'node:http'
