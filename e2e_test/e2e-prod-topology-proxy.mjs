@@ -1,16 +1,8 @@
 #!/usr/bin/env node
 /**
- * Single-origin app entry (phase 7): fake LB on E2E_PROXY_LISTEN_PORT (default 5173).
- * - API/auth paths → Spring (E2E_PROXY_TARGET, default :9081).
- * - If E2E_PROXY_VITE_UPSTREAM is set (e.g. http://127.0.0.1:5174): other traffic → Vite (HMR, WebSocket upgrade).
- * - Else: serve built static from E2E_STATIC_ROOT (CI / pnpm test).
+ * Local fake LB for Cypress / dev. Behavior and ports: docs/gcp/prod_env.md (section **Local E2E / dev**).
  *
- * Env:
- *   E2E_STATIC_ROOT — default backend/src/main/resources/static (ignored when E2E_PROXY_VITE_UPSTREAM set)
- *   E2E_PROXY_TARGET — default http://127.0.0.1:9081
- *   E2E_PROXY_VITE_UPSTREAM — optional; dev (pnpm sut) forwards UI + upgrades to Vite
- *   E2E_PROXY_LISTEN_PORT — default 5173
- *   wait-on: `http://127.0.0.1:5173/__e2e__/ready` — probes Spring from this process (no HTTP_PROXY on wait-on→9081).
+ * Env: E2E_STATIC_ROOT, E2E_PROXY_TARGET, E2E_PROXY_VITE_UPSTREAM, E2E_PROXY_LISTEN_PORT (defaults in code).
  */
 import { createReadStream, existsSync, statSync } from 'node:fs'
 import http from 'node:http'
@@ -57,6 +49,17 @@ function shouldProxyPath(urlPath) {
   if (urlPath === '/login' || urlPath.startsWith('/login?')) return true
   if (urlPath === '/robots.txt') return true
   return false
+}
+
+/** Backend vs Vite for normal app traffic (not `/__e2e__/ready`). */
+function upstreamForPath(urlPath) {
+  if (shouldProxyPath(urlPath)) return BACKEND
+  if (VITE_UPSTREAM) return VITE_UPSTREAM
+  return null
+}
+
+function proxyLogLabel(target) {
+  return target === BACKEND ? 'backend' : 'vite'
 }
 
 function safeStaticPath(urlPath) {
@@ -247,12 +250,9 @@ const server = http.createServer((req, res) => {
     handleE2eReady(req, res)
     return
   }
-  if (shouldProxyPath(urlPath)) {
-    proxyHttp(req, res, BACKEND, 'backend')
-    return
-  }
-  if (VITE_UPSTREAM) {
-    proxyHttp(req, res, VITE_UPSTREAM, 'vite')
+  const up = upstreamForPath(urlPath)
+  if (up) {
+    proxyHttp(req, res, up, proxyLogLabel(up))
     return
   }
   const method = req.method ?? 'GET'
@@ -274,12 +274,9 @@ const server = http.createServer((req, res) => {
 
 server.on('upgrade', (req, socket, head) => {
   const urlPath = (req.url ?? '/').split('?')[0] || '/'
-  if (shouldProxyPath(urlPath)) {
-    proxyUpgrade(req, socket, head, BACKEND, 'backend')
-    return
-  }
-  if (VITE_UPSTREAM) {
-    proxyUpgrade(req, socket, head, VITE_UPSTREAM, 'vite')
+  const up = upstreamForPath(urlPath)
+  if (up) {
+    proxyUpgrade(req, socket, head, up, proxyLogLabel(up))
     return
   }
   socket.destroy()

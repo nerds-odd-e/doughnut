@@ -19,7 +19,7 @@ To use AI services, set `OPENAI_API_TOKEN` environment variable before running `
 
 ## Access Points
 
-- Frontend web-app: http://localhost:5173/ (fake LB → Vite on 5174 when using `pnpm sut`; HMR works through 5173)
+- Frontend web-app: http://localhost:5173/ (see `docs/gcp/prod_env.md` Local E2E / dev)
 - Backend API: http://localhost:9081
 
 ## Test Accounts
@@ -51,7 +51,7 @@ When performing manual testing, use the browser extension tools to:
 - Use `browser_snapshot` to see all available elements and their refs
 
 **Login Flow**:
-1. Navigate to http://localhost:5173/
+1. Navigate to the app URL (see **Access Points** above)
 2. Click "Login via Github" button (this redirects to the username/password form)
 3. Fill in username field (use `id="username"` or find by label "Username")
 4. Fill in password field (use `id="password"` or find by label "Password")

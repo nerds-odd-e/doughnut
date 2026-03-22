@@ -191,7 +191,7 @@ For MS Windows WSL2 users:
 
 | Purpose                               | Command (run from `doughnut` source root directory)                                                                                             |
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------  |
-| **🌟 Start full dev environment (RECOMMENDED)** | **`pnpm sut`** (backend, mountebank, fake LB on **5173** → Vite **5174**, all with auto-reload). Open **http://localhost:5173** |
+| **🌟 Start full dev environment (RECOMMENDED)** | **`pnpm sut`** — backend, mountebank, proxy + frontend; app **http://localhost:5173** ([ports / topology](docs/gcp/prod_env.md)) |
 | Install needed e2e tooling            | `pnpm --frozen-lockfile recursive install`                                                                                                      |                               |                                       |                                                                                                                                                 |
 | Start backend only                    | `pnpm backend:sut` (starts backend SUT with auto-reload)                                                                                        |
 | Start Mock for external backend       | `pnpm start:mb` (starts mocked external backend ONLY)                                                                                           |
@@ -247,7 +247,7 @@ From `doughnut` source root directory
 pnpm frontend:verify
 ```
 
-##### Run frontend dev server only (Vite on port **5174**; use **`pnpm sut`** for the usual app URL on **5173**)
+##### Run frontend dev server only (Vite; use **`pnpm sut`** for the usual browser URL — see [prod_env.md](docs/gcp/prod_env.md))
 
 ```bash
 pnpm frontend:sut
