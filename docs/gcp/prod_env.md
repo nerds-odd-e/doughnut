@@ -85,7 +85,7 @@ Green `main` builds may **skip** GCS jar upload and MIG rollout when the jar has
 
 ## 6. Frontend static in GCS (CI publish + prod LB)
 
-Each green `Package-artifacts` run on `main` uploads the SPA tree (Vite output under `backend/src/main/resources/static/`, including CLI bundle paths produced by `pnpm bundle:all`) to:
+Each green `Package-artifacts` run on `main` uploads the SPA tree (Vite output under `frontend/dist/` after `pnpm bundle:all`) to:
 
 `gs://<GCS_BUCKET>/frontend/<GITHUB_SHA>/`
 
@@ -93,7 +93,7 @@ Upload script: `infra/gcp/scripts/upload-frontend-static-to-gcs.sh`.
 
 **Prod routing:** HTTPS load balancer sends static paths to a **backend bucket** (and optional Cloud CDN); API, OAuth, `/attachments`, `/logout`, `/install`, etc. stay on the MIG. How the **active** `GITHUB_SHA` is chosen, path order, SPA deep links, rollback, and smoke checks: [prod-frontend-static-lb.md](prod-frontend-static-lb.md).
 
-**Local E2E / dev (single write-up):** Cypress **`baseUrl`** is **`http://localhost:5173`** — always **`e2e_test/e2e-prod-topology-proxy.mjs`** (fake LB). **CI** and **`pnpm test`** run that script **without** `E2E_PROXY_VITE_UPSTREAM`: built static from `backend/src/main/resources/static`, API/OAuth/etc. paths forwarded to Spring **9081**. **`pnpm sut`** runs **`e2e:prod-topology-proxy:dev`**, which sets **`E2E_PROXY_VITE_UPSTREAM=http://127.0.0.1:5174`** so UI + HMR WebSockets go to Vite (**`frontend/vite.config.ts`** `server.port`). **`wait-on`** should use **`http://127.0.0.1:5173/__e2e__/ready`** (Spring health checked from inside the proxy; avoids **`HTTP_PROXY`** breaking loopback **9081**). Set **`NO_PROXY=127.0.0.1,localhost`** for `wait-on` in CI anyway. Full env list: file header on **`e2e_test/e2e-prod-topology-proxy.mjs`**.
+**Local E2E / dev (single write-up):** Cypress **`baseUrl`** is **`http://localhost:5173`** — always **`e2e_test/e2e-prod-topology-proxy.mjs`** (fake LB). **CI** and **`pnpm test`** run that script **without** `E2E_PROXY_VITE_UPSTREAM`: built static from **`frontend/dist`** (run **`pnpm frontend:build`** or **`pnpm bundle:all`** first), API/OAuth/etc. paths forwarded to Spring **9081**. **`pnpm sut`** runs **`e2e:prod-topology-proxy:dev`**, which sets **`E2E_PROXY_VITE_UPSTREAM=http://127.0.0.1:5174`** so UI + HMR WebSockets go to Vite (**`frontend/vite.config.ts`** `server.port`). **`wait-on`** should use **`http://127.0.0.1:5173/__e2e__/ready`** (Spring health checked from inside the proxy; avoids **`HTTP_PROXY`** breaking loopback **9081**). Set **`NO_PROXY=127.0.0.1,localhost`** for `wait-on` in CI anyway. Full env list: file header on **`e2e_test/e2e-prod-topology-proxy.mjs`**.
 
 Operational note: creating a Cloud SQL VECTOR index may fail with
 "Vector index: not enough data to train" if the table has too few embeddings.

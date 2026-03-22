@@ -78,9 +78,9 @@ source /workspace/scripts/cloud_agent_setup.sh
 # One-time setup (if not already done) - sets up MySQL, INPUT_DB_URL, CI for pipe fallback
 source /workspace/scripts/cloud_agent_setup.sh
 
-# Build and start (matches CI: bundled frontend served by backend, no separate frontend dev server)
+# Build and start (matches CI: fake LB serves `frontend/dist`, API on Spring; no Vite dev server)
 pnpm bundle:all
-pnpm exec run-p -clnr backend:sut:ci start:mb &
+pnpm exec run-p -clnr backend:sut:ci start:mb e2e:prod-topology-proxy &
 
 # Wait for backend and Mountebank
 NO_PROXY=127.0.0.1,localhost pnpm exec wait-on http://127.0.0.1:5173/__e2e__/ready --timeout 120000

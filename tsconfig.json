@@ -28,7 +28,7 @@
     "dist",
     "backend/bin/main/static/**/*.js",
     "backend/build/**/*.js",
-    "backend/src/main/resources/static/**/*.js",
+    "frontend/dist/**/*.js",
     "frontend/tests/setupVitest.js",
     "frontend/vue.config.js"
   ]

@@ -260,24 +260,7 @@ pnpm frontend:build
 pnpm backend:sut
 ```
 
-Expect to find minified and uglified web bundle assets in `backend/src/main/resources/static`
-directory:
-
-```bash
-❯ pwd
-/home/lia/doughnut/backend/src/main/resources/static
-❯ tree -L 3
-.
-├── assets
-│   ├── main.32137c85.js
-│   ├── main.b097c993.css
-│   └── vendor.8f9eb49d.js
-├── index.html
-├── odd-e.ico
-└── odd-e.png
-
-1 directory, 6 files
-```
+Expect the Vue production build under `frontend/dist` (and, after `pnpm bundle:all`, the CLI bundle under `backend/src/main/resources/static/doughnut-cli-latest/` for the Spring app).
 
 ### 8. [Integrating MCP server for IDE](./\.cursor/rules/mcp-server.mdc#how-to-use-this-mcp-server)
 

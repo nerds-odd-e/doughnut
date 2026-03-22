@@ -8,7 +8,7 @@ Informal plan; delete or archive when done.
 2. **Reproducible builds** so the comparison is trustworthy (same sources → same jar hash for a given build environment).
 3. **Guardrail (implemented):** If the **`main`** commit CI deploys (`GITHUB_SHA`) has a message containing **`force-deployment: true`** (subject or body; optional spaces around `:`), always run the full deploy path when the job runs, **even when** the jar hash matches the last successful deploy record—subject to existing job success/`needs`. See `docs/gcp/conditional-backend-deploy.md`.
 4. **Later:** Ship the **frontend static assets from GCS** (or CDN in front of it) so **frontend-only** changes do not require a **backend MIG** rollout in prod.
-5. **E2E:** After (4), tests should mirror **prod routing**: the UI is **not** served from the jar (local static server and/or proxy), and how the browser reaches **static vs API** matches prod—whether that is **one hostname** (path-based LB) or a deliberate **split-origin** layout—without using real GCS in CI. **Phases 7–9** carry this further: one fake LB for **`pnpm sut`**, CI, and `pnpm test`; **one source of truth** for path rules vs prod GCP; then **no SPA output** into `backend/.../static` before **phase 10** jar slimming.
+5. **E2E:** After (4), tests should mirror **prod routing**: the UI is **not** served from the jar (local static server and/or proxy), and how the browser reaches **static vs API** matches prod—whether that is **one hostname** (path-based LB) or a deliberate **split-origin** layout—without using real GCS in CI. **Phases 7–8:** one fake LB for **`pnpm sut`**, CI, and `pnpm test`; **one source of truth** for path rules vs prod GCP. **Phase 9:** SPA build output is **`frontend/dist`** (not `backend/.../static`); **phase 10** jar slimming removes embedding whatever remains from the CLI copy path.
 
 ---
 
@@ -87,8 +87,8 @@ Informal plan; delete or archive when done.
 
 ### Phase 4 implementation (done)
 
-- **Layout:** `gs://<GCS_BUCKET>/frontend/<GITHUB_SHA>/` — full tree from `backend/src/main/resources/static/` after `pnpm bundle:all` (same files the jar embeds today).
-- **Script:** `infra/gcp/scripts/upload-frontend-static-to-gcs.sh` — env: `GCS_BUCKET`, `GITHUB_SHA`; optional `FRONTEND_STATIC_DIR`. **Phase 9** changes the default tree to the **frontend build output** (no SPA under backend resources); keep this script aligned.
+- **Layout:** `gs://<GCS_BUCKET>/frontend/<GITHUB_SHA>/` — full tree from **`frontend/dist/`** after `pnpm bundle:all` (Vue SPA only; CLI install stays on the MIG under `/doughnut-cli-latest/`).
+- **Script:** `infra/gcp/scripts/upload-frontend-static-to-gcs.sh` — env: `GCS_BUCKET`, `GITHUB_SHA`; optional `FRONTEND_STATIC_DIR` (default `frontend/dist`).
 - **CI:** `.github/workflows/ci.yml` `Package-artifacts` runs GCP auth then the script after the prod `build` (and `bundle:all`).
 - **Tests:** `scripts/test/upload-frontend-static-to-gcs.sh.test`.
 
@@ -183,6 +183,16 @@ Informal plan; delete or archive when done.
 **User/system value:** Clear separation: backend resources are not the SPA sink; less coupling before jar slimming.
 
 **Relation to phase 10:** Phase 9 stops **feeding** the SPA into backend static; phase 10 removes **embedding** that tree from the prod jar (may already be empty for SPA after 9).
+
+### Phase 9 implementation (done)
+
+- **Vite:** `frontend/vite.config.ts` — `build.outDir` is **`dist`** (i.e. `frontend/dist`).
+- **GCS:** `infra/gcp/scripts/upload-frontend-static-to-gcs.sh` — default **`FRONTEND_STATIC_DIR=frontend/dist`**.
+- **Fake LB / E2E:** `e2e_test/e2e-prod-topology-proxy.mjs` — default static root **`frontend/dist`** (`E2E_STATIC_ROOT` override unchanged).
+- **CLI:** `pnpm cli:bundle-and-copy` still copies the CLI bundle to `backend/src/main/resources/static/doughnut-cli-latest/` (unchanged until phase 10).
+- **Icons:** Canonical root assets are **`frontend/public/`** (`odd-e.ico`, `odd-e.png`); removed duplicate tracked **`backend/src/main/resources/static/odd-e.png`**.
+- **Docs / config:** `README.md`, `CLAUDE.md`, `docs/gcp/prod_env.md`, `.cursor/rules/cloud-agent-setup.mdc`, root `tsconfig.json` excludes, `.gitignore` (dropped obsolete SPA ignores under backend static).
+- **Tests:** `scripts/test/upload-frontend-static-to-gcs.sh.test` fixture path updated to `frontend/dist`.
 
 ---
 

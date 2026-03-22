@@ -64,8 +64,8 @@ test_rsync_invoked_with_dest_prefix() {
 	write_fake_gsutil "$fake_bin"
 	log="$work/log"
 	touch "$log"
-	mkdir -p "$work/backend/src/main/resources/static"
-	echo '<html/>' >"$work/backend/src/main/resources/static/index.html"
+	mkdir -p "$work/frontend/dist"
+	echo '<html/>' >"$work/frontend/dist/index.html"
 	run_upload "$work" "$fake_bin" "$log"
 	local content
 	content=$(cat "$log")

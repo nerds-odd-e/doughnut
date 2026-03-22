@@ -98,7 +98,7 @@ const config = defineConfig({
       },
     },
     reportCompressedSize: false,
-    outDir: '../backend/src/main/resources/static/',
+    outDir: 'dist',
     chunkSizeWarningLimit: 1000,
     sourcemap: true,
     rollupOptions: {

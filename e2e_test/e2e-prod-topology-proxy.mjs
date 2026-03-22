@@ -16,8 +16,7 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
 const STATIC_ROOT = path.resolve(
-  process.env.E2E_STATIC_ROOT ??
-    path.join(repoRoot, 'backend/src/main/resources/static')
+  process.env.E2E_STATIC_ROOT ?? path.join(repoRoot, 'frontend/dist')
 )
 const BACKEND = new URL(process.env.E2E_PROXY_TARGET ?? 'http://127.0.0.1:9081')
 const VITE_UPSTREAM = process.env.E2E_PROXY_VITE_UPSTREAM
