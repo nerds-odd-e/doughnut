@@ -8,7 +8,7 @@ Informal plan; delete or archive when done.
 2. **Reproducible builds** so the comparison is trustworthy (same sources → same jar hash for a given build environment).
 3. **Guardrail (implemented):** If the **`main`** commit CI deploys (`GITHUB_SHA`) has a message containing **`force-deployment: true`** (subject or body; optional spaces around `:`), always run the full deploy path when the job runs, **even when** the jar hash matches the last successful deploy record—subject to existing job success/`needs`. See `docs/gcp/conditional-backend-deploy.md`.
 4. **Later:** Ship the **frontend static assets from GCS** (or CDN in front of it) so **frontend-only** changes do not require a **backend MIG** rollout in prod.
-5. **E2E:** After (4), tests should mirror **prod routing**: the UI is **not** served from the jar (local static server and/or proxy), and how the browser reaches **static vs API** matches prod—whether that is **one hostname** (path-based LB) or a deliberate **split-origin** layout—without using real GCS in CI.
+5. **E2E:** After (4), tests should mirror **prod routing**: the UI is **not** served from the jar (local static server and/or proxy), and how the browser reaches **static vs API** matches prod—whether that is **one hostname** (path-based LB) or a deliberate **split-origin** layout—without using real GCS in CI. **Phases 7–9** carry this further: one fake LB for **`pnpm sut`**, CI, and `pnpm test`; **one source of truth** for path rules vs prod GCP; then **no SPA output** into `backend/.../static` before **phase 10** jar slimming.
 
 ---
 
@@ -87,8 +87,8 @@ Informal plan; delete or archive when done.
 
 ### Phase 4 implementation (done)
 
-- **Layout:** `gs://<GCS_BUCKET>/frontend/<GITHUB_SHA>/` — full tree from `backend/src/main/resources/static/` after `pnpm bundle:all` (same files the jar embeds).
-- **Script:** `infra/gcp/scripts/upload-frontend-static-to-gcs.sh` — env: `GCS_BUCKET`, `GITHUB_SHA`; optional `FRONTEND_STATIC_DIR`.
+- **Layout:** `gs://<GCS_BUCKET>/frontend/<GITHUB_SHA>/` — full tree from `backend/src/main/resources/static/` after `pnpm bundle:all` (same files the jar embeds today).
+- **Script:** `infra/gcp/scripts/upload-frontend-static-to-gcs.sh` — env: `GCS_BUCKET`, `GITHUB_SHA`; optional `FRONTEND_STATIC_DIR`. **Phase 9** changes the default tree to the **frontend build output** (no SPA under backend resources); keep this script aligned.
 - **CI:** `.github/workflows/ci.yml` `Package-artifacts` runs GCP auth then the script after the prod `build` (and `bundle:all`).
 - **Tests:** `scripts/test/upload-frontend-static-to-gcs.sh.test`.
 
@@ -132,13 +132,51 @@ Informal plan; delete or archive when done.
 ### Phase 6 implementation (done)
 
 - **Proxy:** [`e2e_test/e2e-prod-topology-proxy.mjs`](../e2e_test/e2e-prod-topology-proxy.mjs) listens on **5173**, serves `backend/src/main/resources/static` (after `pnpm frontend:build` / `bundle:all`), proxies `/api`, `/attachments`, `/logout`, `/users/*`, `/install`, OAuth paths, `/robots.txt` to Spring **9081**; unknown GET paths fall back to `index.html` (SPA, like prod default-to-MIG for `/d/**`).
-- **Cypress CI / `pnpm test`:** `baseUrl` and `E2E_APP_BASE_URL` → `http://localhost:5173`. `pnpm exec run-p` runs `e2e:prod-topology-proxy` with `backend:sut` + mountebank; `wait-on` is **`http://127.0.0.1:5173/__e2e__/ready`** (proxy answers **200** only after a **server-side** `GET /api/healthcheck` to Spring—so CI does not rely on `wait-on`’s HTTP client talking to **9081** through `HTTP_PROXY`). **`NO_PROXY=127.0.0.1,localhost`** on the Cypress step remains for the `wait-on` client.
+- **Cypress CI / `pnpm test`:** `baseUrl` and `E2E_APP_BASE_URL` → `http://127.0.0.1:5173` (`local.ts` / Vite: `localhost`). `pnpm exec run-p` runs `e2e:prod-topology-proxy` with `backend:sut` + mountebank; `wait-on` is **`http://127.0.0.1:5173/__e2e__/ready`** (proxy answers **200** only after a **server-side** `GET /api/healthcheck` to Spring—so CI does not rely on `wait-on`’s HTTP client talking to **9081** through `HTTP_PROXY`). **`NO_PROXY=127.0.0.1,localhost`** on the Cypress step remains for the `wait-on` client.
 - **`E2E_SPRING_BACKEND_URL`** in [`e2e_test/config/constants.ts`](../e2e_test/config/constants.ts) documents the raw Spring port for tools that must bypass the browser origin.
-- **Local `cy:focus` / `pnpm sut`:** same **5173** as CI, but **Vite** (HMR) instead of the proxy—do not run both Vite and `e2e:prod-topology-proxy` on one machine at once (`e2e_test/config/local.ts` unchanged).
+- **Local `cy:focus` / `pnpm sut`:** same **5173** as CI, but **Vite** (HMR) instead of the proxy—do not run both Vite and `e2e:prod-topology-proxy` on one machine at once (`e2e_test/config/local.ts` unchanged). **Superseded by phase 7** once the unified fake LB + Vite-on-new-port layout lands.
 
 ---
 
-## Phase 7 — Jar slimming (optional cleanup)
+## Phase 7 — Unified fake LB: `pnpm sut`, CI, and local E2E
+
+**Outcome:** One **local reverse proxy** (“fake LB”) is the **browser entry** in all of: **`pnpm sut`**, **CI E2E**, and **`pnpm test`**. Cypress **`baseUrl`** / **`E2E_APP_BASE_URL`** always point at that proxy—**no** separate “Vite is the origin” path for `cy:focus` vs “proxy is the origin” for CI.
+
+**Dev frontend port:** **Vite** moves to a **new port** (e.g. 5174). The fake LB keeps the **current** public port (e.g. **5173**): in **dev** it **proxies** UI/asset requests to **Vite** (HMR unchanged); on **CI** it serves the **production build** from disk (bundled tree, not Vite).
+
+**Start graph:** `pnpm sut` runs backend + mountebank + **fake LB** + **Vite** (new port). CI already runs backend + mountebank + proxy; align to the **same** proxy implementation and env flags (e.g. upstream = Vite URL vs static root).
+
+**User/system value:** One mental model and no port clash between “browser origin” and “Vite dev server”; local dev still follows “single origin then route” like prod.
+
+**Interim:** Until this phase ships, phase 6 behavior remains.
+
+---
+
+## Phase 8 — Single source of truth for path routing (fake LB vs prod GCP)
+
+**Outcome:** Rules for **which paths hit the API/backend** vs **static/SPA** are **not** duplicated between `e2e-prod-topology-proxy.mjs` (or its successor) and **`infra/gcp/url-maps/doughnut-app-service-map.yaml`** (and docs). One **canonical definition** (e.g. shared YAML/JSON list, or generated snippets) drives **both** local/CI proxy and **documented/generated** prod URL map updates.
+
+**Scope:** Pick a maintainable mechanism (import at proxy startup, small codegen step for Terraform/gcloud, or “proxy reads same file committed next to url-map”). Prod GCP apply may remain manual, but the **edited** artifact should not diverge from the file the proxy uses.
+
+**User/system value:** Drift between E2E and prod LB shows up as **merge/CI** failure, not silent production bugs.
+
+---
+
+## Phase 9 — Stop writing the SPA bundle into `backend/.../static`
+
+**Outcome:** The **Vue production build** no longer uses **`outDir`** under `backend/src/main/resources/static/` and **no** scripts copy the SPA there. Build output lives under **`frontend/`** (or another agreed directory). **GCS upload** (phase 4), **CI E2E** static serving, and **local fake LB** (phases 7–8) read from that output path.
+
+**CLI install path:** **`cli:bundle-and-copy`** (or equivalent) may **remain** under backend static **until phase 10** if the install script still serves the CLI from the Spring app—do **not** remove CLI serving without replacing it.
+
+**Remove:** Vite `outDir` into backend resources, any `pnpm`/`gradle` steps whose **only** purpose is syncing the **SPA** into backend static, and obsolete docs that assume the jar/static tree is the SPA source of truth for dev.
+
+**User/system value:** Clear separation: backend resources are not the SPA sink; less coupling before jar slimming.
+
+**Relation to phase 10:** Phase 9 stops **feeding** the SPA into backend static; phase 10 removes **embedding** that tree from the prod jar (may already be empty for SPA after 9).
+
+---
+
+## Phase 10 — Jar slimming (optional cleanup)
 
 **Outcome:** Backend jar for prod **excludes** embedded SPA (or includes only a minimal stub). **Conditional deploy** stays **backend-only** (jar hash vs last successful deploy record). **Frontend static** keeps **always uploading** on green pipeline (phases 4–5); **frontend-only** commits still **skip MIG** when the jar hash is unchanged, without any separate conditional frontend deploy mechanism.
 
@@ -156,13 +194,16 @@ Informal plan; delete or archive when done.
 | 4 | `scripts/test/upload-frontend-static-to-gcs.sh.test`; smoke: objects under `gs://…/frontend/<sha>/`. |
 | 5 | Smoke after deploy; **docs** in `docs/gcp/` for one-time platform setup; optional scripted check that SPA and assets load through the prod URL shape. |
 | 6 | **E2E** is the main proof: `e2e-prod-topology-proxy` + Cypress `baseUrl` :5173; full suite in CI. |
-| 7 | E2E still green; backend conditional MIG skip still correct when jar unchanged; frontend upload remains unconditional. |
+| 7 | E2E + manual dev: `pnpm sut` uses unified fake LB; Vite on new port; no port clash with Cypress. |
+| 8 | Contract test or lint that **proxy routing** stays in sync with **committed** prod route source (or one generated file). |
+| 9 | E2E + upload script: SPA not required under `backend/…/static`; adjust `upload-frontend-static-to-gcs` tests/paths; boot-jar / reproducibility scripts if they assumed SPA in resources. |
+| 10 | E2E still green; backend conditional MIG skip still correct when jar unchanged; frontend upload remains unconditional. |
 
 ---
 
 ## Deploy gate
 
-After phases that change prod behavior (especially 2, 5, 7), follow your usual **commit → CD → verify** before stacking risky follow-ups. For **phase 5**, treat **GCP runbook updates in `docs/gcp/`** as part of “done,” not a follow-up.
+After phases that change prod behavior (especially 2, 5, 8, 10), follow your usual **commit → CD → verify** before stacking risky follow-ups. For **phase 5**, treat **GCP runbook updates in `docs/gcp/`** as part of “done,” not a follow-up.
 
 ---
 
