@@ -23,6 +23,7 @@ Informal plan; delete or archive when done.
 ### Phase 1 implementation (done)
 
 - **Gradle:** `JavaCompile` uses UTF-8; all `AbstractArchiveTask` tasks (including `bootJar`) use `preserveFileTimestamps = false` so ZIP entry times do not depend on filesystem metadata. (`reproducibleFileOrdering` is not available on Spring Boot’s `BootJar` task type, so it is not set globally.)
+- **Regression test:** `backend/scripts/boot-jar-reproducible.sh` — asserts those Gradle lines stay in `backend/build.gradle`, then runs two `clean bootJar` passes with `--no-build-cache`, pinned CLI bundle env, and a short sleep between passes; compares SHA-256. CI runs it from the **Backend unit tests** job after `pnpm bundle:all` and a prod `build`, via `BOOT_JAR_REPRO_SKIP_BUNDLE=1`.
 
 **Inputs that can change the jar without a source change (documented):**
 
@@ -109,7 +110,7 @@ Informal plan; delete or archive when done.
 
 | Phase | Tests |
 |-------|--------|
-| 1 | Gradle reproducibility settings; ad-hoc local confirmation (e.g. two `bundle:all` + `clean bootJar` cycles, compare `sha256sum`) if needed. |
+| 1 | `backend/scripts/boot-jar-reproducible.sh` (Gradle contract + real double `bootJar`). |
 | 2 | Workflow-level: can use dry-run or a test bucket in a fork—prefer **observable** checks (record read/write, skip path) without mocking GCP in unit tests; keep one place that owns the behavior. |
 | 3 | Minimal: document + one manual run with file present/absent, or a workflow test in a branch. |
 | 4–5 | Smoke after deploy; optional scripted check that `index.html` and assets load from the new origin. |

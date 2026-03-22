@@ -72,6 +72,18 @@ jobs:
           java_version: ${{ vars.JAVA_VERSION }}
       - run: backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test
       - run: backend/gradlew -p backend test -Dspring.profiles.active=test --parallel
+      - uses: ./.github/setup_nodejs_with_cache
+        with:
+          node_version: ${{ vars.NODE_VERSION }}
+          pnpm_version: ${{ vars.PNPM_VERSION }}
+      - name: Boot jar reproducibility (phase 1)
+        env:
+          GOOGLE_CLIENT_ID: ${{ env.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ env.GOOGLE_CLIENT_SECRET }}
+        run: |
+          pnpm bundle:all
+          backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
+          BOOT_JAR_REPRO_SKIP_BUNDLE=1 bash backend/scripts/boot-jar-reproducible.sh
 
   Other-unit-tests:
     name: Other Unit Tests
