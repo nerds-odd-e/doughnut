@@ -18,7 +18,7 @@ pnpm sut
 
 This starts all services with auto-reload:
 - Backend (Spring Boot with Gradle continuous build)
-- Frontend (Vite with HMR)
+- Frontend (Vite with HMR on port **5174**, browser entry **http://localhost:5173** via `e2e-prod-topology-proxy`)
 - Mountebank (mock external services)
 
 **DO NOT restart services after code changes** - they auto-reload.

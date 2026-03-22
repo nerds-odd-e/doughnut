@@ -19,9 +19,12 @@ tasks:
       cd /workspace/doughnut && direnv allow
 
 ports:
-  # Vite Frontend Dev Server
+  # Fake LB (browser entry when using pnpm sut); CI E2E prod-topology proxy
   - port: 5173
     onOpen: open-browser
+    visibility: public
+  - port: 5174
+    onOpen: ignore
     visibility: public
   # Springboot Backend Server
   - port: 8081

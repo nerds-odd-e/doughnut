@@ -74,6 +74,8 @@ const config = defineConfig({
     ]),
   ],
   server: {
+    port: 5174,
+    strictPort: true,
     proxy: {
       '/api': 'http://localhost:9081',
       '/attachments': 'http://localhost:9081',

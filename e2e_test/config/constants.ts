@@ -1,6 +1,6 @@
 /**
- * Browser / Cypress entry for E2E: same origin for the UI and `/api` (Vite on `pnpm sut`, or
- * prod-topology proxy on CI — see e2e_test/e2e-prod-topology-proxy.mjs). Not the Spring port.
+ * Browser / Cypress entry: fake LB on 5173 (`e2e-prod-topology-proxy.mjs`). `pnpm sut` forwards UI
+ * to Vite on 5174; CI/`pnpm test` serves built static from disk. Not the Spring port.
  */
 export const E2E_APP_BASE_URL = 'http://localhost:5173'
 

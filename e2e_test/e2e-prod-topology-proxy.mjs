@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 /**
- * Single-origin E2E entrypoint (phase 6): serves built static from disk like prod GCS path,
- * proxies API/auth/attachments/install to Spring on E2E_PROXY_TARGET (default :9081).
+ * Single-origin app entry (phase 7): fake LB on E2E_PROXY_LISTEN_PORT (default 5173).
+ * - API/auth paths → Spring (E2E_PROXY_TARGET, default :9081).
+ * - If E2E_PROXY_VITE_UPSTREAM is set (e.g. http://127.0.0.1:5174): other traffic → Vite (HMR, WebSocket upgrade).
+ * - Else: serve built static from E2E_STATIC_ROOT (CI / pnpm test).
  *
  * Env:
- *   E2E_STATIC_ROOT — default backend/src/main/resources/static (after pnpm bundle:all + frontend:build)
+ *   E2E_STATIC_ROOT — default backend/src/main/resources/static (ignored when E2E_PROXY_VITE_UPSTREAM set)
  *   E2E_PROXY_TARGET — default http://127.0.0.1:9081
- *   E2E_PROXY_LISTEN_PORT — default 5173 (same port as Vite for one mental model; CI uses proxy, not Vite).
- *     CI should wait on `http://127.0.0.1:5173/__e2e__/ready` — probes Spring at E2E_PROXY_TARGET using Node http (no corporate HTTP_PROXY), unlike wait-on hitting :9081 directly.
+ *   E2E_PROXY_VITE_UPSTREAM — optional; dev (pnpm sut) forwards UI + upgrades to Vite
+ *   E2E_PROXY_LISTEN_PORT — default 5173
+ *   wait-on: `http://127.0.0.1:5173/__e2e__/ready` — probes Spring from this process (no HTTP_PROXY on wait-on→9081).
  */
 import { createReadStream, existsSync, statSync } from 'node:fs'
 import http from 'node:http'
@@ -21,6 +24,9 @@ const STATIC_ROOT = path.resolve(
     path.join(repoRoot, 'backend/src/main/resources/static')
 )
 const BACKEND = new URL(process.env.E2E_PROXY_TARGET ?? 'http://127.0.0.1:9081')
+const VITE_UPSTREAM = process.env.E2E_PROXY_VITE_UPSTREAM
+  ? new URL(process.env.E2E_PROXY_VITE_UPSTREAM)
+  : null
 const PORT = Number(process.env.E2E_PROXY_LISTEN_PORT ?? 5173)
 
 const MIME = {
@@ -94,9 +100,13 @@ function serveSpaIndex(method, res) {
   return sendStatic(indexPath, method, res)
 }
 
+function targetPort(target) {
+  if (target.port) return target.port
+  return target.protocol === 'https:' ? '443' : '80'
+}
+
 function backendPortNumber() {
-  if (BACKEND.port) return Number(BACKEND.port)
-  return BACKEND.protocol === 'https:' ? 443 : 80
+  return Number(targetPort(BACKEND))
 }
 
 /** Used by CI wait-on: proxy is up and can reach Spring /api/healthcheck (server-side; bypasses HTTP_PROXY on wait-on). */
@@ -142,20 +152,20 @@ function handleE2eReady(req, res) {
   })
 }
 
-function proxyToBackend(clientReq, clientRes) {
-  const targetPath = clientReq.url ?? '/'
+function proxyHttp(clientReq, clientRes, target, logLabel) {
   const headers = { ...clientReq.headers }
   const incomingHost = clientReq.headers.host ?? `127.0.0.1:${PORT}`
-  headers.host = `${BACKEND.hostname}:${BACKEND.port || (BACKEND.protocol === 'https:' ? 443 : 80)}`
+  const tp = targetPort(target)
+  headers.host = `${target.hostname}:${tp}`
   headers['x-forwarded-host'] = incomingHost
   headers['x-forwarded-proto'] = 'http'
   delete headers.connection
 
   const opts = {
-    protocol: BACKEND.protocol,
-    hostname: BACKEND.hostname,
-    port: BACKEND.port || 80,
-    path: targetPath,
+    protocol: target.protocol,
+    hostname: target.hostname,
+    port: tp,
+    path: clientReq.url,
     method: clientReq.method,
     headers,
   }
@@ -165,7 +175,7 @@ function proxyToBackend(clientReq, clientRes) {
     pRes.pipe(clientRes)
   })
   pReq.on('error', (err) => {
-    console.error('[e2e-prod-topology-proxy] backend error:', err.message)
+    console.error(`[e2e-prod-topology-proxy] ${logLabel} error:`, err.message)
     if (!clientRes.headersSent) {
       clientRes.statusCode = 502
       clientRes.end('Bad Gateway')
@@ -174,40 +184,112 @@ function proxyToBackend(clientReq, clientRes) {
   clientReq.pipe(pReq)
 }
 
-if (!existsSync(STATIC_ROOT)) {
+function rawUpgradeHead(res) {
+  const code = res.statusCode ?? 101
+  const msg = res.statusMessage || 'Switching Protocols'
+  let raw = `HTTP/1.1 ${code} ${msg}\r\n`
+  for (const [key, value] of Object.entries(res.headers)) {
+    if (value === undefined) continue
+    if (Array.isArray(value)) {
+      for (const v of value) raw += `${key}: ${v}\r\n`
+    } else {
+      raw += `${key}: ${value}\r\n`
+    }
+  }
+  raw += '\r\n'
+  return raw
+}
+
+function proxyUpgrade(clientReq, clientSocket, head, target, logLabel) {
+  const tp = targetPort(target)
+  const headers = { ...clientReq.headers }
+  headers.host = `${target.hostname}:${tp}`
+
+  const opts = {
+    hostname: target.hostname,
+    port: tp,
+    path: clientReq.url,
+    method: clientReq.method,
+    headers,
+  }
+
+  const pReq = http.request(opts)
+  pReq.on('upgrade', (pRes, pSocket, pHead) => {
+    clientSocket.write(rawUpgradeHead(pRes))
+    const endSocket = () => {
+      clientSocket.destroy()
+      pSocket.destroy()
+    }
+    pSocket.on('error', endSocket)
+    clientSocket.on('error', endSocket)
+    if (pHead?.length) pSocket.unshift(pHead)
+    pSocket.pipe(clientSocket)
+    clientSocket.pipe(pSocket)
+  })
+  pReq.on('error', (err) => {
+    console.error(
+      `[e2e-prod-topology-proxy] ${logLabel} upgrade error:`,
+      err.message
+    )
+    clientSocket.destroy()
+  })
+  pReq.end(head)
+}
+
+if (!(VITE_UPSTREAM || existsSync(STATIC_ROOT))) {
   console.error(`[e2e-prod-topology-proxy] static root missing: ${STATIC_ROOT}`)
   process.exit(1)
 }
 
-http
-  .createServer((req, res) => {
-    const urlPath = (req.url ?? '/').split('?')[0] || '/'
-    if (urlPath === '/__e2e__/ready') {
-      handleE2eReady(req, res)
-      return
-    }
-    if (shouldProxyPath(urlPath)) {
-      proxyToBackend(req, res)
-      return
-    }
-    const method = req.method ?? 'GET'
-    if (method !== 'GET' && method !== 'HEAD') {
-      res.statusCode = 405
-      res.end('Method Not Allowed')
-      return
-    }
-    const filePath = safeStaticPath(req.url ?? '/')
-    if (filePath && existsSync(filePath)) {
-      if (sendStatic(filePath, method, res)) return
-    }
-    if (method === 'GET' || method === 'HEAD') {
-      if (serveSpaIndex(method, res)) return
-    }
-    res.statusCode = 404
-    res.end('Not Found')
-  })
-  .listen(PORT, '0.0.0.0', () => {
-    console.log(
-      `[e2e-prod-topology-proxy] http://127.0.0.1:${PORT} static=${STATIC_ROOT} -> ${BACKEND.origin}`
-    )
-  })
+const server = http.createServer((req, res) => {
+  const urlPath = (req.url ?? '/').split('?')[0] || '/'
+  if (urlPath === '/__e2e__/ready') {
+    handleE2eReady(req, res)
+    return
+  }
+  if (shouldProxyPath(urlPath)) {
+    proxyHttp(req, res, BACKEND, 'backend')
+    return
+  }
+  if (VITE_UPSTREAM) {
+    proxyHttp(req, res, VITE_UPSTREAM, 'vite')
+    return
+  }
+  const method = req.method ?? 'GET'
+  if (method !== 'GET' && method !== 'HEAD') {
+    res.statusCode = 405
+    res.end('Method Not Allowed')
+    return
+  }
+  const filePath = safeStaticPath(req.url ?? '/')
+  if (filePath && existsSync(filePath)) {
+    if (sendStatic(filePath, method, res)) return
+  }
+  if (method === 'GET' || method === 'HEAD') {
+    if (serveSpaIndex(method, res)) return
+  }
+  res.statusCode = 404
+  res.end('Not Found')
+})
+
+server.on('upgrade', (req, socket, head) => {
+  const urlPath = (req.url ?? '/').split('?')[0] || '/'
+  if (shouldProxyPath(urlPath)) {
+    proxyUpgrade(req, socket, head, BACKEND, 'backend')
+    return
+  }
+  if (VITE_UPSTREAM) {
+    proxyUpgrade(req, socket, head, VITE_UPSTREAM, 'vite')
+    return
+  }
+  socket.destroy()
+})
+
+server.listen(PORT, '0.0.0.0', () => {
+  const staticOrVite = VITE_UPSTREAM
+    ? `vite=${VITE_UPSTREAM.origin}`
+    : `static=${STATIC_ROOT}`
+  console.log(
+    `[e2e-prod-topology-proxy] http://127.0.0.1:${PORT} ${staticOrVite} -> ${BACKEND.origin}`
+  )
+})

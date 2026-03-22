@@ -134,7 +134,7 @@ Informal plan; delete or archive when done.
 - **Proxy:** [`e2e_test/e2e-prod-topology-proxy.mjs`](../e2e_test/e2e-prod-topology-proxy.mjs) listens on **5173**, serves `backend/src/main/resources/static` (after `pnpm frontend:build` / `bundle:all`), proxies `/api`, `/attachments`, `/logout`, `/users/*`, `/install`, OAuth paths, `/robots.txt` to Spring **9081**; unknown GET paths fall back to `index.html` (SPA, like prod default-to-MIG for `/d/**`).
 - **Cypress CI / `pnpm test`:** `baseUrl` and `E2E_APP_BASE_URL` → `http://localhost:5173`. `pnpm exec run-p` runs `e2e:prod-topology-proxy` with `backend:sut` + mountebank; `wait-on` is **`http://127.0.0.1:5173/__e2e__/ready`** (proxy answers **200** only after a **server-side** `GET /api/healthcheck` to Spring—so CI does not rely on `wait-on`’s HTTP client talking to **9081** through `HTTP_PROXY`). **`NO_PROXY=127.0.0.1,localhost`** on the Cypress step remains for the `wait-on` client.
 - **`E2E_SPRING_BACKEND_URL`** in [`e2e_test/config/constants.ts`](../e2e_test/config/constants.ts) documents the raw Spring port for tools that must bypass the browser origin.
-- **Local `cy:focus` / `pnpm sut`:** same **5173** as CI, but **Vite** (HMR) instead of the proxy—do not run both Vite and `e2e:prod-topology-proxy` on one machine at once (`e2e_test/config/local.ts` unchanged). **Superseded by phase 7** once the unified fake LB + Vite-on-new-port layout lands.
+- **Local `cy:focus` / `pnpm sut` (phase 7):** fake LB on **5173** (same as CI); **Vite** on **5174** via **`E2E_PROXY_VITE_UPSTREAM`** (`e2e:prod-topology-proxy:dev`).
 
 ---
 
@@ -148,7 +148,12 @@ Informal plan; delete or archive when done.
 
 **User/system value:** One mental model and no port clash between “browser origin” and “Vite dev server”; local dev still follows “single origin then route” like prod.
 
-**Interim:** Until this phase ships, phase 6 behavior remains.
+### Phase 7 implementation (done)
+
+- **Vite:** `frontend/vite.config.ts` — `server.port` **5174**, `strictPort: true`.
+- **Proxy:** `e2e_test/e2e-prod-topology-proxy.mjs` — optional **`E2E_PROXY_VITE_UPSTREAM`** (HTTP + **WebSocket upgrade** to Vite). Without it, behavior unchanged (static from disk). With it, **no** requirement for `E2E_STATIC_ROOT` to exist.
+- **Scripts:** `package.json` — **`e2e:prod-topology-proxy:dev`** sets upstream to `http://127.0.0.1:5174`; **`sut`** runs it alongside **`frontend:sut`**. **`cy:run-with-sut`** waits on **`tcp:5174`** and **`http://127.0.0.1:5173/__e2e__/ready`**.
+- **Docs / ports:** README, `.gitpod.yml` (**5174**), `infra/ona/Dockerfile`, `docs/gcp/prod_env.md`, cursor rules (`e2e_test`, `cloud-agent-setup`, `manual-testing`).
 
 ---
 
@@ -194,7 +199,7 @@ Informal plan; delete or archive when done.
 | 4 | `scripts/test/upload-frontend-static-to-gcs.sh.test`; smoke: objects under `gs://…/frontend/<sha>/`. |
 | 5 | Smoke after deploy; **docs** in `docs/gcp/` for one-time platform setup; optional scripted check that SPA and assets load through the prod URL shape. |
 | 6 | **E2E** is the main proof: `e2e-prod-topology-proxy` + Cypress `baseUrl` :5173; full suite in CI. |
-| 7 | E2E + manual dev: `pnpm sut` uses unified fake LB; Vite on new port; no port clash with Cypress. |
+| 7 | E2E + manual dev: `pnpm sut` uses unified fake LB; Vite on 5174; `cy:run-with-sut` waits on Vite + `__e2e__/ready`. |
 | 8 | Contract test or lint that **proxy routing** stays in sync with **committed** prod route source (or one generated file). |
 | 9 | E2E + upload script: SPA not required under `backend/…/static`; adjust `upload-frontend-static-to-gcs` tests/paths; boot-jar / reproducibility scripts if they assumed SPA in resources. |
 | 10 | E2E still green; backend conditional MIG skip still correct when jar unchanged; frontend upload remains unconditional. |

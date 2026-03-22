@@ -19,7 +19,7 @@ To use AI services, set `OPENAI_API_TOKEN` environment variable before running `
 
 ## Access Points
 
-- Frontend web-app: http://localhost:5173/ (with hot-reload)
+- Frontend web-app: http://localhost:5173/ (fake LB → Vite on 5174 when using `pnpm sut`; HMR works through 5173)
 - Backend API: http://localhost:9081
 
 ## Test Accounts

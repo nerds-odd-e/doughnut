@@ -117,6 +117,7 @@ RUN echo "test -f ./sh_profile && source ./sh_profile" >> /home/gitpod/.bashrc \
     && echo "test -f ./sh_profile && source ./sh_profile" >> /home/gitpod/.zshrc
 
 EXPOSE 5173
+EXPOSE 5174
 EXPOSE 3309
 EXPOSE 5900
 EXPOSE 6080

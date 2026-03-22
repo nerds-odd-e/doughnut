@@ -26,11 +26,13 @@ All services automatically restart when code changes are made. The developer doe
 
 **If services are not running**, suggest the user to run `pnpm sut` in a separate terminal first.
 
-## Prod-style topology in CI / `pnpm test`
+## Prod-style topology (fake LB on 5173)
 
-Cypress uses **`http://localhost:5173`** as `baseUrl` (`e2e_test/config/ci.ts`): the **prod-topology proxy** (not Vite) listens on **5173**, serves the **built** static tree from `backend/src/main/resources/static`, and forwards API/auth paths to Spring on **9081** (`e2e_test/e2e-prod-topology-proxy.mjs`). Same port as Vite for a single mental model; CI runs the proxy only. **GitHub Actions** `wait-on` should hit **`http://127.0.0.1:5173/__e2e__/ready`**, which probes Spring **from the proxy process** (Node `http` to loopback, not via `HTTP_PROXY`). Set **`NO_PROXY=127.0.0.1,localhost`** for the `wait-on` HTTP client anyway.
+Cypress uses **`http://localhost:5173`** as `baseUrl` (`e2e_test/config/ci.ts`): **`e2e-prod-topology-proxy.mjs`** listens on **5173** and forwards API/auth paths to Spring on **9081**.
 
-**`pnpm sut` + `cy:focus`** use Vite on **5173** (`e2e_test/config/local.ts`). Do not run Vite and `e2e:prod-topology-proxy` together (port clash). Override with `E2E_PROXY_LISTEN_PORT` if needed.
+- **CI / `pnpm test`:** proxy serves the **built** static tree from `backend/src/main/resources/static` (no `E2E_PROXY_VITE_UPSTREAM`). **GitHub Actions** `wait-on` → **`http://127.0.0.1:5173/__e2e__/ready`** (Spring probed from the proxy process; avoids `HTTP_PROXY` on loopback). Set **`NO_PROXY=127.0.0.1,localhost`** for `wait-on` anyway.
+
+- **`pnpm sut` + `cy:focus` / `cy:run-with-sut`:** same **5173** entry; **`e2e:prod-topology-proxy:dev`** sets **`E2E_PROXY_VITE_UPSTREAM=http://127.0.0.1:5174`** so UI and HMR WebSockets go to **Vite** (dev server on **5174**, `frontend/vite.config.ts`). Override with `E2E_PROXY_LISTEN_PORT` / env if needed.
 
 ## Run E2E Test in Terminal
 
