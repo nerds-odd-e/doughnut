@@ -67,6 +67,8 @@ CI writes **immutable** prefixes: `frontend/<GITHUB_SHA>/`. The load balancer mu
 
 Order **specific** paths **before** the catch-all that sends traffic to GCS.
 
+The **canonical backend path list** used by the local prod-topology proxy and by CI checks against this URL map lives in [`infra/gcp/path-routing/backend-path-hints.json`](../../infra/gcp/path-routing/backend-path-hints.json) (`pnpm validate:path-routing`).
+
 Send to the **backend service (MIG)** at least:
 
 | Path prefix / pattern | Why |

@@ -1,0 +1,12 @@
+{
+  "exactPaths": ["/api", "/install", "/login", "/robots.txt"],
+  "pathPrefixes": [
+    "/api/",
+    "/attachments/",
+    "/users/",
+    "/doughnut-cli-latest/",
+    "/oauth2/",
+    "/login/oauth2/"
+  ],
+  "pathPrefixesAllowBare": ["/logout"]
+}

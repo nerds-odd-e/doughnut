@@ -8,6 +8,10 @@ import { createReadStream, existsSync, statSync } from 'node:fs'
 import http from 'node:http'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import {
+  loadBackendPathHints,
+  pathGoesToBackend,
+} from '../infra/gcp/path-routing/pathGoesToBackend.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
@@ -20,6 +24,11 @@ const VITE_UPSTREAM = process.env.E2E_PROXY_VITE_UPSTREAM
   ? new URL(process.env.E2E_PROXY_VITE_UPSTREAM)
   : null
 const PORT = Number(process.env.E2E_PROXY_LISTEN_PORT ?? 5173)
+const BACKEND_PATH_HINTS = loadBackendPathHints(
+  process.env.E2E_BACKEND_PATH_HINTS_JSON
+    ? path.resolve(process.env.E2E_BACKEND_PATH_HINTS_JSON)
+    : path.join(repoRoot, 'infra/gcp/path-routing/backend-path-hints.json')
+)
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -38,17 +47,7 @@ const MIME = {
 }
 
 function shouldProxyPath(urlPath) {
-  if (urlPath === '/api' || urlPath.startsWith('/api/')) return true
-  if (urlPath.startsWith('/attachments/')) return true
-  if (urlPath.startsWith('/logout')) return true
-  if (urlPath.startsWith('/users/')) return true
-  if (urlPath === '/install') return true
-  if (urlPath.startsWith('/doughnut-cli-latest/')) return true
-  if (urlPath.startsWith('/oauth2/')) return true
-  if (urlPath.startsWith('/login/oauth2/')) return true
-  if (urlPath === '/login' || urlPath.startsWith('/login?')) return true
-  if (urlPath === '/robots.txt') return true
-  return false
+  return pathGoesToBackend(urlPath, BACKEND_PATH_HINTS)
 }
 
 /** Backend vs Vite for normal app traffic (not `/__e2e__/ready`). */

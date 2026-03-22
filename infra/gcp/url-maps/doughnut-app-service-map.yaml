@@ -2,6 +2,10 @@
 #   gcloud compute url-maps import doughnut-app-service-map \
 #     --source=infra/gcp/url-maps/doughnut-app-service-map.yaml --global --quiet
 #
+# Backend vs static path split must stay consistent with:
+#   infra/gcp/path-routing/backend-path-hints.json
+# (validated by: pnpm validate:path-routing)
+#
 # After CI uploads a new tree under gs://dough-01/frontend/<GITHUB_SHA>/, update
 # every pathPrefixRewrite below to use that SHA, then import again.
 name: doughnut-app-service-map

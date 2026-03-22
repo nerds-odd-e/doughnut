@@ -163,6 +163,13 @@ Informal plan; delete or archive when done.
 
 **User/system value:** Drift between E2E and prod LB shows up as **merge/CI** failure, not silent production bugs.
 
+### Phase 8 implementation (done)
+
+- **Canonical backend paths:** [`infra/gcp/path-routing/backend-path-hints.json`](../infra/gcp/path-routing/backend-path-hints.json) — `exactPaths`, `pathPrefixes`, `pathPrefixesAllowBare` (e.g. `/logout` loose prefix).
+- **Matcher:** [`infra/gcp/path-routing/pathGoesToBackend.mjs`](../infra/gcp/path-routing/pathGoesToBackend.mjs) — loaded by [`e2e_test/e2e-prod-topology-proxy.mjs`](../e2e_test/e2e-prod-topology-proxy.mjs) (override JSON path with `E2E_BACKEND_PATH_HINTS_JSON` if needed).
+- **CI / lint:** `pnpm validate:path-routing` parses [`infra/gcp/url-maps/doughnut-app-service-map.yaml`](../infra/gcp/url-maps/doughnut-app-service-map.yaml) and fails if any backend-classified probe path would match a static `pathRules` entry; part of `pnpm lint:all`. URL map header comment points at the hints file.
+- **Not in scope:** GCP YAML is still hand-edited (SHA rewrites); optional later codegen from hints. **Deep links** (`/d/…`, `/n…`) remain a separate prod vs local behavioral story.
+
 ---
 
 ## Phase 9 — Stop writing the SPA bundle into `backend/.../static`
@@ -198,7 +205,7 @@ Informal plan; delete or archive when done.
 | 5 | Smoke after deploy; **docs** in `docs/gcp/` for one-time platform setup; optional scripted check that SPA and assets load through the prod URL shape. |
 | 6 | **E2E** is the main proof: `e2e-prod-topology-proxy` + Cypress `baseUrl` :5173; full suite in CI. |
 | 7 | E2E + manual dev: `pnpm sut` uses unified fake LB; Vite on 5174; `cy:run-with-sut` waits on Vite + `__e2e__/ready`. |
-| 8 | Contract test or lint that **proxy routing** stays in sync with **committed** prod route source (or one generated file). |
+| 8 | `pnpm validate:path-routing` (also in `lint:all`); hints in `infra/gcp/path-routing/backend-path-hints.json`. |
 | 9 | E2E + upload script: SPA not required under `backend/…/static`; adjust `upload-frontend-static-to-gcs` tests/paths; boot-jar / reproducibility scripts if they assumed SPA in resources. |
 | 10 | E2E still green; backend conditional MIG skip still correct when jar unchanged; frontend upload remains unconditional. |
 
