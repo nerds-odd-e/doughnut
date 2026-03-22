@@ -45,6 +45,7 @@ function shouldProxyPath(urlPath) {
   if (urlPath.startsWith('/logout')) return true
   if (urlPath.startsWith('/users/')) return true
   if (urlPath === '/install') return true
+  if (urlPath.startsWith('/doughnut-cli-latest/')) return true
   if (urlPath.startsWith('/oauth2/')) return true
   if (urlPath.startsWith('/login/oauth2/')) return true
   if (urlPath === '/login' || urlPath.startsWith('/login?')) return true
