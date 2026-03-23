@@ -4,6 +4,17 @@ Runbook for production static hosting: one browser-facing hostname, HTTPS load b
 
 **Related:** CI uploads each commit’s SPA tree to `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/` and the CLI install binary to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/doughnut` ([`upload-frontend-static-to-gcs.sh`](../../infra/gcp/scripts/upload-frontend-static-to-gcs.sh), [`upload-cli-binary-to-gcs.sh`](../../infra/gcp/scripts/upload-cli-binary-to-gcs.sh)). In [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml), `GCS_FRONTEND_BUCKET` is the public static bucket (e.g. `dough-frontend-01`); `GCS_BUCKET` is deploy-only (jars, `deploy/`, etc., e.g. `dough-01`).
 
+## Release at a glance
+
+| Step | What happens |
+|------|----------------|
+| Green `main` **Package-artifacts** | SPA → `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/`; CLI → same bucket; fat jar + `deploy/last-successful-deploy.json` → `GCS_BUCKET` only. |
+| Green `main` **Deploy** | Always runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh) so the LB serves that pipeline’s `frontend/<GITHUB_SHA>/` (including frontend-only commits). |
+| Backend MIG | Jar upload + rolling replace only when the jar hash differs from the record — [conditional-backend-deploy.md](conditional-backend-deploy.md). |
+| Routing edits | Change [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json); CI must pass `pnpm validate:path-routing`. |
+| **Frontend rollback** | Render + validate + `gcloud url-maps import` for an older SHA whose `frontend/<SHA>/` still exists (commands under [Recovery / manual import](#cutover-checklist-new-frontend-bucket) below). |
+| **Backend rollback / bad record** | Redeploy a known-good jar, use `force-deployment: true`, or fix `deploy/last-successful-deploy.json` in `GCS_BUCKET` — [conditional-backend-deploy.md](conditional-backend-deploy.md). |
+
 ---
 
 ## Goals
@@ -59,11 +70,7 @@ HTTP forwarding (`doughnut-app-web-map-http`) is unchanged and does not use this
 
 ## Choosing the **active** frontend revision
 
-CI writes **immutable** prefixes: `frontend/<GITHUB_SHA>/`. The load balancer maps browser paths into **that** prefix for the commit that just passed the full pipeline.
-
-**Automatic:** Each successful `main` deploy job renders from [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json) with the pipeline’s `GITHUB_SHA` and imports the URL map (even when the backend jar deploy is skipped).
-
-- **Rollback:** Render and import for a previous `<GITHUB_SHA>` that still exists under `frontend/` (see manual import above).
+CI writes **immutable** prefixes: `frontend/<GITHUB_SHA>/`. See [Release at a glance](#release-at-a-glance) for the automatic path; rollback uses the [manual import](#cutover-checklist-new-frontend-bucket) commands above.
 
 **Alternatives (tradeoffs):**
 
@@ -91,7 +98,7 @@ Send to the **backend service (MIG)** at least:
 
 **Optional:** `/robots.txt` can be served from GCS if you upload it in the static tree, or left on the MIG.
 
-**Default service:** Often still the MIG during migration; once static is fully on GCS + CDN, the **default** may be the backend bucket, provided SPA deep links are handled (below).
+**Default service:** In the rendered map, `defaultService` is the MIG (`doughnut-app-service`). Traffic that does not match a static path rule goes to Spring (API, OAuth, deep-link shell fetch, etc.).
 
 ---
 
@@ -170,6 +177,6 @@ Confirm: **HTML/JS** responses are from the **expected** revision (e.g. unique h
 
 ---
 
-## Spring Boot / jar (phase 10)
+## Spring Boot jar (no SPA or CLI inside)
 
-The **deployable boot jar** does **not** embed `classpath:/static/**` (no SPA, no CLI). **Conditional MIG skip** still compares only the **jar** hash. Each green **`Package-artifacts`** run uploads **frontend** and **CLI** to **`GCS_FRONTEND_BUCKET`** (the LB backend bucket’s GCS target); jars and **`deploy/last-successful-deploy.json`** stay on **`GCS_BUCKET`**.
+The **deployable boot jar** does **not** embed `classpath:/static/**` (no SPA, no CLI). **Conditional MIG skip** compares only the **jar** hash to `deploy/last-successful-deploy.json`. Each green **`Package-artifacts`** run uploads **frontend** and **CLI** to **`GCS_FRONTEND_BUCKET`**; jars and the deploy record stay on **`GCS_BUCKET`**.

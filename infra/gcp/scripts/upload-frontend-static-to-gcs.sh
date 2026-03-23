@@ -4,7 +4,7 @@ set -euo pipefail
 # Uploads the built SPA tree (Vite output after pnpm frontend:build / bundle:all)
 # to gs://<bucket>/frontend/${GITHUB_SHA}/ for the LB backend bucket.
 # Env: GITHUB_SHA; optional FRONTEND_STATIC_DIR (default: frontend/dist).
-# Destination bucket: GCS_FRONTEND_BUCKET if set, else GCS_BUCKET (legacy single-bucket).
+# Destination bucket: GCS_FRONTEND_BUCKET, or GCS_BUCKET if unset.
 
 DEST_BUCKET="${GCS_FRONTEND_BUCKET:-}"
 if [[ -z "$DEST_BUCKET" ]]; then

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# Phase 1: two clean bootJar runs from the same tree must yield the same SHA-256.
-# Real Gradle + pnpm (not Bach). See ongoing/conditional-deploy-gcs-frontend.md.
+# Two clean bootJar runs from the same tree must yield the same SHA-256 (conditional deploy compares this hash).
+# Real Gradle + pnpm (not Bach). See docs/gcp/conditional-backend-deploy.md.
 #
 # Local (full cost):  CURSOR_DEV=true nix develop -c bash backend/scripts/boot-jar-reproducible.sh
 # CI (after bundle+build): BOOT_JAR_REPRO_SKIP_BUNDLE=1 bash backend/scripts/boot-jar-reproducible.sh
@@ -21,7 +21,7 @@ export CLI_VERSION="${CLI_VERSION:-repro-test-cli-version}"
 
 fail() {
 	echo "boot-jar-reproducible.sh: $*" >&2
-	echo "  Phase 1 context: ongoing/conditional-deploy-gcs-frontend.md" >&2
+	echo "  See docs/gcp/conditional-backend-deploy.md (jar hash vs deploy record)." >&2
 	exit 1
 }
 
@@ -32,7 +32,7 @@ hash_jar() {
 
 run_boot_jar() {
 	# --no-build-cache: each run must recompile so ZIP entry times reflect real mtimes; with
-	# cache, FROM-CACHE outputs can hide non-reproducible bootJar packaging (Phase 1).
+	# cache, FROM-CACHE outputs can hide non-reproducible bootJar packaging.
 	backend/gradlew -p backend clean bootJar -x test \
 		-Dspring.profiles.active=prod \
 		--no-build-cache \
@@ -48,10 +48,8 @@ if ! command -v sha256sum >/dev/null; then
 	fail "sha256sum not in PATH (install GNU coreutils, e.g. CURSOR_DEV=true nix develop)"
 fi
 
-# Phase 1 Gradle settings (commit 4a75bd169169965fc81933cf0a28c96ecdddad67). A plain double
-# bootJar can still match byte-for-byte on some JDK/Gradle pairs without these lines, so we
-# assert the configuration stays in the tree.
-assert_phase1_gradle_reproducibility_config() {
+# Gradle settings below are required for stable jar bytes across runs; assert they stay in the tree.
+assert_boot_jar_reproducibility_gradle_config() {
 	local f="backend/build.gradle"
 	[[ -f "$f" ]] || fail "missing $f (run from repo root)"
 	grep -qF "import org.gradle.api.tasks.bundling.AbstractArchiveTask" "$f" \
@@ -62,7 +60,7 @@ assert_phase1_gradle_reproducibility_config() {
 		|| fail "$f must set tasks.withType(AbstractArchiveTask) { preserveFileTimestamps = false } — otherwise ZIP entry times leak into the jar and hashes can differ run-to-run"
 }
 
-assert_phase1_gradle_reproducibility_config
+assert_boot_jar_reproducibility_gradle_config
 
 if [[ "${BOOT_JAR_REPRO_SKIP_BUNDLE:-}" == "1" ]]; then
 	[[ -f "$JAR" ]] || fail "BOOT_JAR_REPRO_SKIP_BUNDLE=1 but no jar yet — run pnpm bundle:all then backend/gradlew -p backend build -x test -Dspring.profiles.active=prod (same as CI Backend-unit-tests)"

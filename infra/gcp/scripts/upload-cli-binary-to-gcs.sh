@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Uploads the bundled CLI to gs://<bucket>/doughnut-cli-latest/doughnut (prod LB + CDN).
-# Destination bucket: GCS_FRONTEND_BUCKET if set, else GCS_BUCKET (legacy single-bucket).
+# Destination bucket: GCS_FRONTEND_BUCKET, or GCS_BUCKET if unset.
 
 DEST_BUCKET="${GCS_FRONTEND_BUCKET:-}"
 if [[ -z "$DEST_BUCKET" ]]; then

@@ -1,5 +1,7 @@
 # Conditional backend deploy (GCS jar + MIG)
 
+**See also:** [prod-frontend-static-lb.md](prod-frontend-static-lb.md) for SPA/CLI buckets, URL map, and frontend rollback (Deploy always applies the URL map; jar rollout is what this page describes).
+
 On a green `main` pipeline, the **Deploy** job runs `infra/gcp/scripts/deploy-backend-jar-to-gcp-mig.sh`. That script compares the built fat jar’s SHA-256 to `gs://<bucket>/deploy/last-successful-deploy.json`. When they match, it **skips** uploading the jar and **skips** the MIG rolling replace, and leaves the record unchanged.
 
 ## Last successful deploy record
@@ -48,4 +50,9 @@ Use normal GCP credentials and a jar path the script can find (or set `DEPLOY_JA
 
 ## Other recovery
 
-If prod matches the intended jar but the record is wrong or missing, you can fix or remove `deploy/last-successful-deploy.json` in GCS as described in the project deploy plan (`ongoing/conditional-deploy-gcs-frontend.md`).
+If prod already runs the intended jar but `deploy/last-successful-deploy.json` in **`GCS_BUCKET`** is wrong or missing, either:
+
+- Upload a corrected JSON object with the matching `sha256` (and consistent `git_sha` / `recorded_at` if you use them), or
+- Remove the object so the next deploy treats the record as absent and performs a full upload + MIG rollout (coordinate with the team; traffic impact depends on template changes).
+
+Do not confuse this object with frontend trees under **`GCS_FRONTEND_BUCKET`**; only the deploy bucket holds the jar deploy record.
