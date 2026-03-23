@@ -21,6 +21,7 @@ import {
   expectTtyRecallYesNoReplyScrollback,
   pressEnter,
   pressKey,
+  pressRealBackspace,
   startTTYSessionWithoutRecallReset,
   submitTTYCommand,
   tick,
@@ -123,6 +124,31 @@ describe('TTY recall MCQ', () => {
       await tick()
 
       expect(mockAnswerQuiz).toHaveBeenCalledWith(100, 1, expect.any(Number))
+    })
+
+    test('real backspace (str=\\x7f) in MCQ deletes typed input, not inserts DEL char', async () => {
+      await submitTTYCommand(stdin, '/recall')
+      mockAnswerQuiz.mockClear()
+
+      // Type '2' to select choice 2, then delete it — should revert to default choice (1)
+      typeString(stdin, '2')
+      await tick()
+      // Real TTY backspace: str='\x7f'. If the handler checks `str && !ctrl && !meta`
+      // before `key.name === 'backspace'`, it inserts '\x7f', making the draft '2\x7f'.
+      // parseInt('2\x7f') = 2, so choice 2 is still submitted despite the "delete".
+      pressRealBackspace(stdin)
+      await tick()
+      pressEnter(stdin)
+      await tick()
+      await new Promise((r) => setTimeout(r, 50))
+
+      expect(
+        mockAnswerQuiz.mock.calls[0],
+        'After typing "2" and pressing real backspace, the draft should be empty so the ' +
+          'default highlighted choice (index 0) is submitted. If backspace instead inserts ' +
+          '\\x7f, parseInt("2\\x7f") still parses as 2 and submits choice index 1. ' +
+          'Fix: move the backspace check above the str-insertion check in the MCQ handler.'
+      ).toEqual([100, 0, expect.any(Number)])
     })
 
     test('ESC shows stop confirmation, y exits recall mode', async () => {

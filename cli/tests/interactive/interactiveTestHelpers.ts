@@ -87,6 +87,19 @@ export function pressKey(
   })
 }
 
+/**
+ * Simulate backspace as a real TTY emits it: str='\x7f' (DEL) alongside key.name='backspace'.
+ * Unlike pressKey('backspace'), this uses a truthy str, which exposes the ordering bug where
+ * `str && !ctrl && !meta` fires before `key.name === 'backspace'`.
+ */
+export function pressRealBackspace(stdin: TTYStdin) {
+  stdin.emit('keypress', '\x7f', {
+    name: 'backspace',
+    ctrl: false,
+    meta: false,
+  })
+}
+
 export async function submitTTYCommand(stdin: TTYStdin, command: string) {
   typeString(stdin, `${command} `)
   await tick()

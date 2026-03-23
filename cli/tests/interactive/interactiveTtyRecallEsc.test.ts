@@ -11,6 +11,7 @@ import {
   expectTtyRecallYesNoReplyScrollback,
   pressEnter,
   pressKey,
+  pressRealBackspace,
   submitTTYCommand,
   tick,
   ttyOutput,
@@ -170,6 +171,34 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     expect(ttyOutput(writeSpy)).toContain('Stopped recall')
     expectTtyRecallYesNoReplyScrollback(writeSpy, 'y')
     expect(isInRecallSubstate()).toBe(false)
+  })
+
+  test('real backspace (str=\\x7f) in stop confirmation on empty input is a no-op, not DEL insertion', async () => {
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion(spellingRecallPrompt(100, 'test'))
+    )
+    await submitTTYCommand(stdin, '/recall')
+    pressKey(stdin, 'escape')
+    await tick()
+    writeSpy.mockClear()
+
+    // Real TTY backspace: str='\x7f' (DEL char, truthy). If the handler checks
+    // `str && !ctrl && !meta` before `key.name === 'backspace'`, it inserts '\x7f'
+    // into the draft instead of deleting. On enter, '\x7f'.trim() is non-empty
+    // and not 'y'/'n', triggering "Please answer y or n".
+    pressRealBackspace(stdin)
+    await tick()
+    pressEnter(stdin)
+    await tick()
+
+    expect(
+      stripAnsi(ttyOutput(writeSpy)),
+      'Backspace on empty stop-confirmation input must be a no-op. ' +
+        'If this fails, the `str && !ctrl && !meta` branch fires before `key.name === "backspace"` ' +
+        'in the isPendingRecallStopConfirmation handler, inserting the DEL character \\x7f. ' +
+        'Fix: move the backspace check above the str-insertion check in that handler.'
+    ).not.toContain('Please answer y or n')
+    expect(isInRecallSubstate()).toBe(true)
   })
 
   test('ESC then n in Load more cancels confirmation and stays in recall', async () => {

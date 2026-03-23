@@ -799,11 +799,11 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           setPendingRecallStopConfirmation(true)
         }
         drawBox()
-      } else if (str && !key.ctrl && !key.meta) {
-        commandInput = insertIntoDraft(commandInput, str)
-        drawBox()
       } else if (key.name === 'backspace') {
         commandInput = deleteBeforeCaret(commandInput)
+        drawBox()
+      } else if (str && !key.ctrl && !key.meta) {
+        commandInput = insertIntoDraft(commandInput, str)
         drawBox()
       } else {
         drawBox()
@@ -849,11 +849,11 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           return
         }
         commitHistoryOutput(commandTurn.lines, commandTurn.tone)
-      } else if (str && !key.ctrl && !key.meta) {
-        commandInput = insertIntoDraft(commandInput, str)
-        drawBox()
       } else if (key.name === 'backspace') {
         commandInput = deleteBeforeCaret(commandInput)
+        drawBox()
+      } else if (str && !key.ctrl && !key.meta) {
+        commandInput = insertIntoDraft(commandInput, str)
         drawBox()
       } else {
         drawBox()
