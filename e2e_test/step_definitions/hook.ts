@@ -89,7 +89,13 @@ After({ tags: '@BundleFirstAndTerminateMCPServerWhenTeardown' }, () => {
   cy.task('disconnectMcpServer')
 })
 
-Before({ tags: '@bundleCli' }, () => cli.backend().bundleCli())
+Before({ tags: '@bundleCliE2eInstall' }, () =>
+  cli.backend().bundleCliForE2eInstall()
+)
+
+After({ tags: '@bundleCliE2eInstall' }, () =>
+  cli.backend().removeE2eInstallCliBundle()
+)
 
 Before({ tags: '@withCliConfig', order: 1 }, () =>
   cli.setup().createConfigDir()

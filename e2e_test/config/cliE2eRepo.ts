@@ -9,6 +9,13 @@ import { cliEnv } from './cliEnv'
 
 export const CLI_BUNDLE_RELATIVE_PATH = 'cli/dist/doughnut-cli.bundle.mjs'
 
+/** Cypress install scenarios build here so version bumps do not overwrite the default bundle. */
+export const CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH =
+  'cli/dist/e2e-install-doughnut-cli.bundle.mjs'
+
+const CLI_E2E_INSTALL_BUNDLE_OUTFILE =
+  './dist/e2e-install-doughnut-cli.bundle.mjs'
+
 /** Max wall time for one non-interactive `spawnCliFromRepo` run before SIGKILL. */
 export const CLI_NON_INTERACTIVE_SPAWN_TIMEOUT_MS = 25_000
 
@@ -35,11 +42,20 @@ export function runShellCommandSync(
   }
 }
 
-export function bundleCli(repoRoot: string, env?: NodeJS.ProcessEnv) {
-  runShellCommandSync('pnpm -C cli bundle', { cwd: repoRoot, env })
-  const bundle = join(repoRoot, CLI_BUNDLE_RELATIVE_PATH)
+export function bundleCliE2eInstall(repoRoot: string, env?: NodeJS.ProcessEnv) {
+  runShellCommandSync('pnpm -C cli bundle', {
+    cwd: repoRoot,
+    env: {
+      ...process.env,
+      ...env,
+      CLI_BUNDLE_OUTFILE: CLI_E2E_INSTALL_BUNDLE_OUTFILE,
+    },
+  })
+  const bundle = join(repoRoot, CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH)
   if (!existsSync(bundle)) {
-    throw new Error(`Missing CLI bundle at ${bundle} after pnpm -C cli bundle`)
+    throw new Error(
+      `Missing E2E install CLI bundle at ${bundle} after pnpm -C cli bundle`
+    )
   }
 }
 

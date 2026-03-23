@@ -2,11 +2,12 @@
  * Cypress `task` handlers for CLI E2E. Depends only on `repoRoot` (repo checkout path).
  */
 
-import { existsSync, mkdtempSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import {
-  bundleCli,
+  bundleCliE2eInstall,
+  CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH,
   CLI_NON_INTERACTIVE_SPAWN_TIMEOUT_MS,
   cliRepoSpawnFromRoot,
   runShellCommandSync,
@@ -41,15 +42,15 @@ type RunInstalledCliTask = WithOptionalCliEnv & {
   args?: string[]
 }
 
-async function bundleCliOrThrow(
+async function bundleCliE2eInstallOrThrow(
   repoRoot: string,
   env?: NodeJS.ProcessEnv
 ): Promise<true> {
   try {
-    bundleCli(repoRoot, env)
+    bundleCliE2eInstall(repoRoot, env)
     return true
   } catch (error) {
-    console.error('Failed to bundle CLI:', error)
+    console.error('Failed to bundle E2E install CLI:', error)
     throw error
   }
 }
@@ -67,14 +68,19 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       )
       return configDir
     },
-    async bundleCli() {
-      return bundleCliOrThrow(repoRoot)
+    async bundleCliE2eInstall() {
+      return bundleCliE2eInstallOrThrow(repoRoot)
     },
-    async bundleCliWithVersion(version: string) {
-      return bundleCliOrThrow(repoRoot, {
+    async bundleCliE2eInstallWithVersion(version: string) {
+      return bundleCliE2eInstallOrThrow(repoRoot, {
         ...process.env,
         CLI_VERSION: version,
       })
+    },
+    removeE2eInstallCliBundle() {
+      const p = join(repoRoot, CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH)
+      if (existsSync(p)) unlinkSync(p)
+      return null
     },
     async installCli(baseUrl: string) {
       const installDir = mkdtempSync(join(tmpdir(), 'cypress-doughnut-cli-'))

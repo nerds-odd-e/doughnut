@@ -31,11 +31,21 @@ const LOCAL_SPA_SHELL_PATHS = new Set(
   DOUGHNUT_ROUTING.localProxy?.spaShellInsteadOfBackendExactPaths ?? []
 )
 
-/** Same path as prod GCS object; local file from `pnpm cli:bundle`. */
-const CLI_INSTALL_BUNDLE = path.join(
+/** Default: same as prod GCS object; from `pnpm cli:bundle`. */
+const CLI_DEFAULT_INSTALL_BUNDLE = path.join(
   repoRoot,
   'cli/dist/doughnut-cli.bundle.mjs'
 )
+/** Cypress `@bundleCliE2eInstall` builds here so install scenarios do not overwrite the default bundle. */
+const CLI_E2E_INSTALL_BUNDLE = path.join(
+  repoRoot,
+  'cli/dist/e2e-install-doughnut-cli.bundle.mjs'
+)
+
+function cliInstallBundlePath() {
+  if (existsSync(CLI_E2E_INSTALL_BUNDLE)) return CLI_E2E_INSTALL_BUNDLE
+  return CLI_DEFAULT_INSTALL_BUNDLE
+}
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -115,12 +125,13 @@ function tryServeCliInstallPath(urlPath, method, res) {
   const pathname = (urlPath.split('?')[0] || '/').replace(/\/+$/, '') || '/'
   if (pathname !== '/doughnut-cli-latest/doughnut') return false
   if (method !== 'GET' && method !== 'HEAD') return false
-  if (!existsSync(CLI_INSTALL_BUNDLE)) {
+  const bundlePath = cliInstallBundlePath()
+  if (!existsSync(bundlePath)) {
     res.statusCode = 404
     res.end('Not Found')
     return true
   }
-  return sendStatic(CLI_INSTALL_BUNDLE, method, res)
+  return sendStatic(bundlePath, method, res)
 }
 
 function targetPort(target) {

@@ -71,7 +71,8 @@ Vocabulary for Cucumber steps and page objects (`e2e_test/start/pageObjects/cli/
 
 Features: **`e2e_test/features/cli/`**. Steps and page objects: **`e2e_test/step_definitions/cli.ts`**, **`e2e_test/start/pageObjects/cli/`**.
 
-- **Run:** Local uses `pnpm -C cli exec tsx src/index.ts`; CI uses the pre-built bundle (`pnpm bundle:all`). Installation scenarios use the bundled binary.
+- **Run:** Local uses `pnpm -C cli exec tsx src/index.ts`; CI uses the pre-built bundle (`pnpm bundle:all`). Installation scenarios use the E2E install bundle path (see `@bundleCliE2eInstall`).
+- **`@bundleCliE2eInstall`:** Builds `cli/dist/e2e-install-doughnut-cli.bundle.mjs` before each scenario and removes it after; the prod-topology proxy serves `/doughnut-cli-latest/doughnut` from that file when present so install tests do not overwrite `cli/dist/doughnut-cli.bundle.mjs`.
 - **`@interactiveCLI`:** One PTY-backed process per scenario (hooks in `e2e_test/step_definitions/hook.ts`). Copy existing scenarios for **when/how** to send input and assert (history output, history input, Current guidance). Draft-line ↑↓ history is **Vitest-only** (not in `InteractiveCliPtyKeystroke`); E2E down-arrow is for **selection mode** (see recall features).
 - **New PTY input shapes:** Extend **`InteractiveCliPtyKeystroke`** (`e2e_test/config/interactiveCliPtyTypes.ts`) and the encoder in **`e2e_test/config/cliPtyRunner.ts`** together — not a second `cy.task`.
 - **Flaky:** Avoid Cypress for **transient loading lines**; use Vitest (see fetch-wait tests above).
@@ -80,7 +81,7 @@ Features: **`e2e_test/features/cli/`**. Steps and page objects: **`e2e_test/step
 
 - Bundle: `cli/dist/doughnut-cli.bundle.mjs` (shebang)
 - Release: `gs://dough-01/doughnut-cli-latest/doughnut` (`cli-release.yml`)
-- Local install URL: fake LB serves `cli/dist` at `/doughnut-cli-latest/doughnut` (see `e2e_test/e2e-prod-topology-proxy.mjs`, `docs/gcp/prod_env.md`)
+- Local install URL: fake LB serves `/doughnut-cli-latest/doughnut` (see `e2e_test/e2e-prod-topology-proxy.mjs`, `docs/gcp/prod_env.md`)
 
 ## Install scripts
 
