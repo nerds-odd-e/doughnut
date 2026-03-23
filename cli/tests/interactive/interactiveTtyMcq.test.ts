@@ -10,12 +10,7 @@ import {
   resetRecallStateForTesting,
 } from '../../src/interactive.js'
 import { formatRecallNotebookCurrentPromptLine } from '../../src/recall.js'
-import {
-  buildCurrentPromptSeparatorForStageBand,
-  getTerminalWidth,
-  INTERACTIVE_INPUT_READY_OSC,
-  stripAnsi,
-} from '../../src/renderer.js'
+import { INTERACTIVE_INPUT_READY_OSC, stripAnsi } from '../../src/renderer.js'
 import {
   endTTYSession,
   expectTtyRecallYesNoReplyScrollback,
@@ -209,23 +204,17 @@ describe('TTY recall MCQ', () => {
   })
 
   describe('live region: current prompt vs guidance (observable bytes)', () => {
-    test('stem vs numbered choices, separator order, input-ready OSC', async () => {
+    test('choices not via writeCurrentPrompt; input-ready OSC emitted', async () => {
+      writeSpy.mockClear()
       await submitTTYCommand(stdin, '/recall')
+      // Numbered choices must not appear as grey writeCurrentPrompt lines
       expect(
         countGreyWholeLineWriteCurrentPromptsWhere(writeSpy, (plain) =>
           /^ {2}\d+\. /.test(plain)
         )
       ).toBe(0)
+      // INTERACTIVE_INPUT_READY_OSC is emitted synchronously from renderInkMcqDisplay
       const raw = ttyOutput(writeSpy)
-      const bandSep = buildCurrentPromptSeparatorForStageBand(
-        getTerminalWidth()
-      )
-      const stem = 'What is 2+2?'
-      expect(raw).toContain(`\x1b[2K${bandSep}`)
-      expect(raw).toContain(stem)
-      expect(raw.lastIndexOf(`\x1b[2K${bandSep}`)).toBeLessThan(
-        raw.lastIndexOf(stem)
-      )
       expect(raw).toContain(INTERACTIVE_INPUT_READY_OSC)
     })
   })

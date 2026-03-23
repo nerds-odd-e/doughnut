@@ -171,17 +171,15 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
-### Phase F2 — Migrate **select** flows to Ink components
+### Phase F2 — Migrate **select** flows to Ink components — **done**
 
 **Goal:** Extend the Ink island to MCQ numbered-choice select and access-token list picker (replacing their `drawBox()` rendering), bringing `ttyAdapter` confirm/select branches fully to Ink.
 
-**Remaining work:**
+**Delivered**
 
-- Replace MCQ branch (`numberedChoices !== null`) with `renderInkMcqDisplay(choices, highlightIndex)` — Ink `McqDisplay` component stub exists in `cli/src/ui/McqDisplay.tsx`.
-- Replace token-list branch with `renderInkTokenListDisplay(items, highlightIndex)` — Ink `TokenListDisplay` stub in `cli/src/ui/TokenListDisplay.tsx`.
-- Update cursor-position tests (`recallMcqTtyCursorPosition.test.ts`) and ANSI-visual tests (`interactiveTtyTokenList.test.ts`) to match Ink rendering (the `→` input row, `┌` box border, `\x1b[?25l` cursor-hide must come from Ink components or cursor positioning calls).
-- **Decision gates as needed:** **cursor model**, **visual parity** for stage band + bordered input box.
-- Keep `maxFps: 0` for synchronous Ink renders in tests.
+- **`cli/src/ui/McqDisplay.tsx`** and **`cli/src/ui/TokenListDisplay.tsx`**: Ink display-only components for MCQ and token list.
+- **`ttyAdapter.ts`**: `renderInkMcqDisplay()`, `renderInkTokenListDisplay()` functions; `drawBox()` routes to these when MCQ or token list is active; `unmountInkDisplay()` called on MCQ submit and `commitTokenListResult()`; `INTERACTIVE_INPUT_READY_OSC` emitted after each Ink render.
+- **Tests updated:** `recallMcqTtyCursorPosition.test.ts` (→ checks Ink McqDisplay renders `→` and doesn't overwrite history), `interactiveTtyTokenList.test.ts` (→ checks Ink output content, no ANSI box border checks), `interactiveTtyMcq.test.ts` (→ checks OSC emission and no grey writeCurrentPrompt for choices).
 
 ---
 

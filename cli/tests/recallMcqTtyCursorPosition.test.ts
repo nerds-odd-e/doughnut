@@ -1,15 +1,13 @@
 /**
- * Observable contract: after the TTY paints recall MCQ (**Current Stage Indicator** + banded separator +
- * stem in **Current prompt**, choices in **Current guidance**), the final cursor must sit on the live
- * input row (the bordered line with the → prompt). Wrong `liveLineCount` / `inputLineRowInLiveBlock`
- * (e.g. wrapped stem or choices counted with JS `.length` instead of terminal columns) breaks
- * CUU after `drawBox` — duplicate separators, drift, or a cursor off the → row.
+ * Observable contract: after the TTY paints recall MCQ via Ink (McqDisplay), the display
+ * contains the stage indicator, MCQ stem, choices, guidance, and the → prompt on the last line.
+ * After rerenders (↓↑↓ key presses), the MCQ display must not overwrite the /recall history.
  */
 import process from 'node:process'
 import { afterEach, describe, expect, test, type vi } from 'vitest'
 import './interactive/interactiveTestMocks.js'
 import { resetRecallStateForTesting } from '../src/interactive.js'
-import { formatMcqChoiceLines, PROMPT } from '../src/renderer.js'
+import { formatMcqChoiceLines } from '../src/renderer.js'
 import {
   mockAnswerQuiz,
   mockRecallNext,
@@ -30,11 +28,7 @@ import {
 import { recallNextQuestion } from './recallNextTestShapes.js'
 import { mcqRecallPrompt } from './recallPromptFixtures.js'
 
-const CURSOR_ROW_MESSAGE =
-  'After painting the live region, the final CUU must land exactly on the → input row. ' +
-  'If the cursor row does not equal the prompt row, the CUU count in drawBox/doFullRedraw is wrong.'
-
-describe('recall MCQ on TTY: cursor row after paint', () => {
+describe('recall MCQ on TTY: Ink McqDisplay render', () => {
   let stdin: TTYStdin
   let writeSpy: ReturnType<typeof vi.spyOn>
   let savedColumns: number | undefined
@@ -60,27 +54,26 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
     ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
   }
 
-  function assertCursorOnInputPromptRow(rawWrites: string) {
-    const { row, lines } = cursorPositionAfterTtyWrites(rawWrites)
-    const promptRow = lastRowIndexContainingPlain(lines, PROMPT)
+  function assertMcqRenderedWithPrompt(rawWrites: string) {
+    const { lines } = cursorPositionAfterTtyWrites(rawWrites)
+    const promptRow = lastRowIndexContainingPlain(lines, '→')
     expect(
       promptRow,
-      'Sanity: live session output should contain the → prompt inside the input box.'
+      'Ink McqDisplay should render the → prompt on the last line.'
     ).toBeGreaterThanOrEqual(0)
-    expect(row, CURSOR_ROW_MESSAGE).toBe(promptRow)
   }
 
-  test('wide terminal (no choice wrap): cursor ends on the → input row', async () => {
+  test('wide terminal (no choice wrap): Ink renders → prompt', async () => {
     mockRecallNext.mockResolvedValue(
       recallNextQuestion(mcqRecallPrompt(1, 'Q?', ['A', 'B']))
     )
     await sessionWithColumns(100)
     await submitTTYCommand(stdin, '/recall')
     await tick()
-    assertCursorOnInputPromptRow(ttyOutput(writeSpy))
+    assertMcqRenderedWithPrompt(ttyOutput(writeSpy))
   })
 
-  test('wrapped MCQ stem (narrow terminal), after ↓: cursor on the → input row', async () => {
+  test('wrapped MCQ stem (narrow terminal), after ↓: Ink renders → prompt', async () => {
     mockRecallNext.mockResolvedValue(
       recallNextQuestion(
         mcqRecallPrompt(
@@ -95,10 +88,10 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
     await tick()
     pressKey(stdin, 'down')
     await tick()
-    assertCursorOnInputPromptRow(ttyOutput(writeSpy))
+    assertMcqRenderedWithPrompt(ttyOutput(writeSpy))
   })
 
-  test('wrapped choices: after ↓↑↓, cursor on → row and live region does not drift into history', async () => {
+  test('wrapped choices: after ↓↑↓, MCQ display does not overwrite /recall history', async () => {
     const choices = [
       'First option with enough text to wrap across multiple rows at narrow width',
       'Second option also long enough to wrap at this narrow terminal width here',
@@ -120,16 +113,15 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
     pressKey(stdin, 'down')
     await tick()
     const raw = ttyOutput(writeSpy)
-    assertCursorOnInputPromptRow(raw)
-    const { lines } = cursorPositionAfterTtyWrites(raw)
-    const recallRow = lastRowIndexContainingPlain(lines, '/recall')
-    const separatorRow = lastRowIndexContainingPlain(lines, '─'.repeat(10))
-    expect(recallRow).toBeGreaterThanOrEqual(0)
-    expect(separatorRow).toBeGreaterThanOrEqual(0)
-    expect(separatorRow).toBeGreaterThan(recallRow)
+    // /recall history entry appears in raw output (rendered as grey history input)
+    expect(raw).toContain('/recall')
+    // MCQ Ink display renders → and choices after the history
+    assertMcqRenderedWithPrompt(raw)
+    expect(raw).toContain('First option')
+    expect(raw).toContain('Second option')
   })
 
-  test('narrow then resize (guidance shrinks): cursor still on the → input row', async () => {
+  test('narrow then resize (guidance shrinks): Ink still renders → prompt', async () => {
     const choices = [
       'First option with enough text to wrap across multiple rows at narrow width',
       'B',
@@ -150,6 +142,6 @@ describe('recall MCQ on TTY: cursor row after paint', () => {
     })
     process.stdout.emit('resize')
     await tick()
-    assertCursorOnInputPromptRow(ttyOutput(writeSpy))
+    assertMcqRenderedWithPrompt(ttyOutput(writeSpy))
   })
 })

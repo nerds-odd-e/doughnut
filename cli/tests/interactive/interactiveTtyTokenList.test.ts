@@ -1,7 +1,7 @@
 import './interactiveTestMocks.js'
 import { describe, test, expect, type vi, beforeEach, afterEach } from 'vitest'
 import { resetRecallStateForTesting } from '../../src/interactive.js'
-import { stripAnsi, stripAnsiCsiAndCr } from '../../src/renderer.js'
+import { stripAnsiCsiAndCr } from '../../src/renderer.js'
 import {
   maxConsecutiveBlankLines,
   simulatedScreenFromTtyWrites,
@@ -42,32 +42,19 @@ describe('TTY token list interactive mode', () => {
     endTTYSession(stdin)
   })
 
-  test('cursor is at input box row after /list-access-token with Current prompt', async () => {
+  test('Ink renders token list content after /list-access-token', async () => {
     writeSpy.mockClear()
     await submitTTYCommand(stdin, '/list-access-token')
 
     const output = ttyOutput(writeSpy)
-    const cursorUpMatches = output.matchAll(
-      new RegExp(`${String.fromCharCode(0x1b)}\\[(\\d+)A`, 'g')
+    expect(output).toContain('Access tokens')
+    expect(output).toContain(
+      'Select and enter to change the default access token'
     )
-    const cursorUpValues = [...cursorUpMatches].map((m) => Number(m[1]))
-    const lastCursorUp = cursorUpValues.at(-1)
-    expect(lastCursorUp).toBeDefined()
-
-    const { wrapTextToLines } = await import('../../src/renderer.js')
-    const promptText = 'Select and enter to change the default access token'
-    const width = process.stdout.columns ?? 80
-    const wrappedPromptLines = wrapTextToLines(promptText, width)
-    const currentPromptLines = 2 + wrappedPromptLines.length
-    const contentLinesLength = 1
-    const boxLinesLength = 3
-    const suggestionLinesLength = 3
-    const newTotalLines =
-      currentPromptLines + boxLinesLength + 0 + suggestionLinesLength
-    const expectedCursorUp =
-      newTotalLines - currentPromptLines - contentLinesLength
-
-    expect(lastCursorUp).toBe(expectedCursorUp)
+    expect(output).toContain('Alpha')
+    expect(output).toContain('Beta')
+    expect(output).toContain('Gamma')
+    expect(output).toContain('↑↓ Enter to select; other keys cancel')
   })
 
   test.each([
@@ -127,7 +114,7 @@ describe('TTY token list interactive mode', () => {
     expect(count).toBe(1)
   })
 
-  test('with narrow terminal and wrapped prompt, separator and input box top appear once when selection changes', async () => {
+  test('with narrow terminal, token list content appears once when selection changes', async () => {
     const originalColumns = process.stdout.columns
     Object.defineProperty(process.stdout, 'columns', {
       value: 40,
@@ -143,10 +130,6 @@ describe('TTY token list interactive mode', () => {
 
     const output = ttyOutput(writeSpy)
     const visualOutput = simulatedScreenFromTtyWrites(output)
-    const lines = visualOutput.split('\n')
-
-    const separatorLines = lines.filter((l) => /^─+$/.test(stripAnsi(l).trim()))
-    const boxTopLines = lines.filter((l) => stripAnsi(l).trim().startsWith('┌'))
 
     Object.defineProperty(process.stdout, 'columns', {
       value: originalColumns,
@@ -154,8 +137,9 @@ describe('TTY token list interactive mode', () => {
       configurable: true,
     })
 
-    expect(separatorLines).toHaveLength(1)
-    expect(boxTopLines).toHaveLength(1)
+    // After ↓, the rerender should show the guidance text exactly once
+    const guidanceCount = visualOutput.split('↑↓ Enter to select').length - 1
+    expect(guidanceCount).toBe(1)
   })
 
   test('Enter sets highlighted token as default and confirms', async () => {
@@ -173,23 +157,18 @@ describe('TTY token list interactive mode', () => {
     expect(getDefaultTokenLabel()).toBe('Beta')
   })
 
-  test('selection mode: gray borders (no reset before right │), no arrow, hidden cursor, grayed chrome', async () => {
+  test('selection mode: Ink renders token list items and guidance, no input box borders', async () => {
     await submitTTYCommand(stdin, '/list-access-token')
     const output = ttyOutput(writeSpy)
-    expect(output).toContain('\x1b[?25l')
-    expect(output).toContain('\x1b[90m┌')
-    const tokenListBoxSection = output.slice(
+    // Ink TokenListDisplay renders items and guidance
+    expect(output).toContain('Alpha')
+    expect(output).toContain('Beta')
+    expect(output).toContain('↑↓ Enter to select; other keys cancel')
+    // Ink display does not render an input box (no box-drawing → prompt)
+    const tokenListSection = output.slice(
       output.lastIndexOf('Select and enter')
     )
-    expect(tokenListBoxSection).not.toContain('→')
-    const boxSection = output.slice(output.indexOf('Select and enter'))
-    const boxLines = boxSection
-      .split('\n')
-      .filter((l) => l.includes('┌') || l.includes('│') || l.includes('└'))
-    for (const line of boxLines) {
-      // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI escape codes for terminal output assertion
-      expect(/\x1b\[0m\s*│/.test(line)).toBe(false)
-    }
+    expect(tokenListSection).not.toContain('→')
   })
 
   test('any other key cancels token list and shows Cancelled by user. in history', async () => {

@@ -66,6 +66,7 @@ import {
   greyCurrentStageIndicatorLabel,
   HIDE_CURSOR,
   interactiveFetchWaitStageIndicatorLine,
+  INTERACTIVE_INPUT_READY_OSC,
   interactiveInputReadyOscSuffix,
   isCommittedInteractiveInput,
   isGreyDisabledInputChrome,
@@ -86,6 +87,8 @@ import type {
   OutputAdapter,
 } from '../types.js'
 import { ConfirmDisplay } from '../ui/ConfirmDisplay.js'
+import { McqDisplay } from '../ui/McqDisplay.js'
+import { TokenListDisplay } from '../ui/TokenListDisplay.js'
 
 export interface TTYDeps {
   processInput: (
@@ -368,6 +371,44 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     )
   }
 
+  function renderInkMcqDisplay(): void {
+    const width = getTerminalWidth()
+    const choices = getNumberedChoiceListChoices() ?? []
+    const promptLines =
+      getNumberedChoiceListCurrentPromptWrappedLines(width) ?? []
+    startOrUpdateInkDisplay(
+      React.createElement(McqDisplay, {
+        stageIndicatorLine: DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
+        currentPromptLines: promptLines,
+        choices,
+        highlightIndex: numberedChoiceHighlightIndex,
+      })
+    )
+    process.stdout.write(INTERACTIVE_INPUT_READY_OSC)
+  }
+
+  function renderInkTokenListDisplay(): void {
+    if (!tokenSelection) return
+    const tokenListConfig = TOKEN_LIST_COMMANDS[tokenSelection.command]
+    const width = getTerminalWidth()
+    const promptLines = tokenListConfig?.currentPrompt
+      ? wrapTextToLines(tokenListConfig.currentPrompt, width)
+      : []
+    const stageIndicatorLine = tokenListConfig
+      ? greyCurrentStageIndicatorLabel(tokenListConfig.stageIndicator)
+      : ''
+    startOrUpdateInkDisplay(
+      React.createElement(TokenListDisplay, {
+        stageIndicatorLine,
+        currentPromptLines: promptLines,
+        items: tokenSelection.items,
+        defaultLabel: getDefaultTokenLabel(),
+        highlightIndex: tokenSelection.highlightIndex,
+      })
+    )
+    process.stdout.write(INTERACTIVE_INPUT_READY_OSC)
+  }
+
   function rememberCommittedLine(raw: string): void {
     commandInput = {
       ...commandInput,
@@ -406,6 +447,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     message: string,
     tone: ChatHistoryOutputTone = 'plain'
   ) {
+    unmountInkDisplay()
     const command = tokenSelection?.command ?? ''
     clearLiveRegionForRepaint(livePaint)
     chatHistory.push({
@@ -634,6 +676,14 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   }
 
   function drawBox() {
+    if (getNumberedChoiceListChoices() !== null) {
+      renderInkMcqDisplay()
+      return
+    }
+    if (tokenSelection) {
+      renderInkTokenListDisplay()
+      return
+    }
     const layout = measureLiveRegionLayout()
     const { liveLines, liveLineCount, inputLineRowInLiveBlock } = layout
 
@@ -999,6 +1049,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           break
         case 'submit-with-line': {
           const effectiveInput = listDispatch.lineForProcessInput
+          unmountInkDisplay()
           clearLiveRegionForRepaint(livePaint)
           const inputForHistory = commandInput.lineDraft || effectiveInput
           commandInput = clearLiveCommandLine(commandInput)
