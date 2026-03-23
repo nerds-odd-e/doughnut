@@ -18,15 +18,6 @@ function recallSession() {
         expect(historyOutput).to.include('Stopped recall')
       })
     },
-    expectStoppedDuringReview() {
-      cy.get<string>(OUTPUT_ALIAS).then((output) => {
-        const { currentGuidanceAndHistory, historyOutput } =
-          getRecallDisplaySections(output)
-        expect(currentGuidanceAndHistory).to.include('sedition')
-        expect(currentGuidanceAndHistory).to.include('Yes, I remember?')
-        expect(historyOutput).to.include('Stopped recall')
-      })
-    },
   }
 }
 

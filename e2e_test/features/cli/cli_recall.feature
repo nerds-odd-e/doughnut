@@ -115,23 +115,6 @@ Feature: CLI recall status and recall session
     Then I should see "Incorrect" in the history output
     And I should see "Recalled successfully" in the history output
 
-  @disableOpenAiService
-  @interactiveCLI
-  Scenario: Recall substate - /stop exits recall mode
-    Given I have a notebook with the head note "English" which skips memory tracking
-    And there are some notes:
-      | Title    | Details                        | Parent Title |
-      | sedition | Sedition means incite violence | English      |
-      | sedation | Put to sleep is sedation       | English      |
-    And the note "sedition" was assimilated on day 1
-    And the note "sedation" was assimilated on day 1
-    And It's day 2
-    When I enter the slash command "/recall" in the interactive CLI
-    Then I should see "sedition" in the Current guidance
-    And I should see "Yes, I remember?" in the Current guidance
-    When I enter the slash command "/stop" in the interactive CLI
-    Then I stopped the recall during review
-
   @usingMockedOpenAiService
   @interactiveCLI
   Scenario: Recall MCQ - contest and regenerate before answering

@@ -88,3 +88,9 @@ export function dispatchRecallSessionConfirmKey(
   if (e.str && !e.ctrl && !e.meta) return { result: 'edit-char', char: e.str }
   return { result: 'redraw' }
 }
+
+/** Neutral aliases for TTY deps — keeps product words out of the transport adapter. */
+export type SessionYesNoLineKeyEvent = RecallSessionConfirmKeyEvent
+export type SessionYesNoLineDispatchResult = RecallSessionConfirmDispatchResult
+export type SessionYesNoLineEmptySubmit = RecallSessionConfirmEmptySubmit
+export type StopConfirmationLiveView = RecallStopConfirmViewModel

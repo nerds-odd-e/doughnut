@@ -38,7 +38,11 @@ import {
   type InteractiveFetchWaitLine,
 } from './interactiveFetchWait.js'
 import { formatVersionOutput } from './version.js'
-import { parseRecallSessionYesNoSubmit } from './interactions/recallSessionConfirmInteraction.js'
+import {
+  dispatchRecallSessionConfirmKey,
+  recallStopConfirmViewModelForContext,
+  parseRecallSessionYesNoSubmit,
+} from './interactions/recallSessionConfirmInteraction.js'
 import {
   buildBoxLines,
   buildCurrentPromptSeparator,
@@ -54,6 +58,7 @@ import {
   renderBox,
   renderFullDisplay,
   renderPastInput,
+  wrapTextToLines,
   writeFullRedraw,
   GREY,
   HIDE_CURSOR,
@@ -91,10 +96,6 @@ export function resetRecallStateForTesting(): void {
   pendingRecallLoadMore = false
   pendingRecallStopConfirmation = false
   resetInteractiveFetchWaitForTesting()
-}
-
-function getPendingRecallAnswer(): PendingRecallAnswer {
-  return pendingRecallAnswer
 }
 
 function isPendingRecallStopConfirmation(): boolean {
@@ -652,15 +653,53 @@ export {
   highlightRecognizedCommand,
 } from './renderer.js'
 
+function getNumberedChoiceListCurrentPromptWrappedLines(
+  width: number
+): string[] | null {
+  const p = pendingRecallAnswer
+  if (!isMcqRecallPending(p)) return null
+  return [
+    ...wrapTextToLines(
+      formatRecallNotebookCurrentPromptLine(p.notebookTitle),
+      width
+    ),
+    ...wrapMarkdownTerminalToLines(p.stemRenderedForTerminal, width),
+  ]
+}
+
+function isNumberedChoiceListActive(): boolean {
+  return isMcqRecallPending(pendingRecallAnswer)
+}
+
+function getNumberedChoiceListChoices(): readonly string[] | null {
+  const p = pendingRecallAnswer
+  if (!isMcqRecallPending(p)) return null
+  return p.choices
+}
+
+function usesSessionYesNoInputChrome(inTokenList: boolean): boolean {
+  return (
+    getPlaceholderContext(inTokenList) === RECALL_SESSION_YES_NO_PLACEHOLDER
+  )
+}
+
 function buildTTYDeps() {
   return {
     processInput,
-    getPendingRecallAnswer,
-    isPendingRecallStopConfirmation,
-    setPendingRecallStopConfirmation,
-    isInRecallSubstate,
-    exitRecallMode,
-    isMcqRecallPending,
+    isPendingStopConfirmation: isPendingRecallStopConfirmation,
+    setPendingStopConfirmation: setPendingRecallStopConfirmation,
+    isInCommandSessionSubstate: isInRecallSubstate,
+    exitCommandSession: exitRecallMode,
+    getStopConfirmationYesOutcomeLines: () => ['Stopped recall'] as const,
+    getStopConfirmationLiveView: recallStopConfirmViewModelForContext,
+    dispatchSessionYesNoKey: dispatchRecallSessionConfirmKey,
+    isNumberedChoiceListActive,
+    getNumberedChoiceListChoices,
+    getNumberedChoiceListCurrentPromptWrappedLines,
+    formatNumberedChoiceGuidanceLines: recallMcqCurrentGuidanceLines,
+    usesSessionYesNoInputChrome,
+    getSessionPayloadLoadingIndicator: () =>
+      DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
     buildTokenListLines,
     getDefaultTokenLabel,
     listAccessTokens,
@@ -674,8 +713,6 @@ function buildTTYDeps() {
     needsGapBeforeBox,
     buildSuggestionLines,
     getLastLine,
-    wrapMarkdownTerminalToLines,
-    recallMcqCurrentGuidanceLines,
     getTerminalWidth,
     renderFullDisplay,
     renderPastInput,
@@ -683,7 +720,6 @@ function buildTTYDeps() {
     HIDE_CURSOR,
     SHOW_CURSOR,
     CLEAR_SCREEN,
-    DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
     PROMPT,
     filterCommandsByPrefix,
     getTabCompletion,

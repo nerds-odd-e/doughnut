@@ -105,9 +105,6 @@ Then('the input box UI should be normal', () =>
 Then('the recall session was stopped', () =>
   cli.recallSession().expectStopped()
 )
-Then('I stopped the recall during review', () =>
-  cli.recallSession().expectStoppedDuringReview()
-)
 
 Given(
   'the Google API mock returns tokens and profile for {string}',

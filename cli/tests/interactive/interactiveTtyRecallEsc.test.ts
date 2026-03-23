@@ -195,7 +195,7 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
       stripAnsi(ttyOutput(writeSpy)),
       'Backspace on empty stop-confirmation input must be a no-op. ' +
         'If this fails, the `str && !ctrl && !meta` branch fires before `key.name === "backspace"` ' +
-        'in the isPendingRecallStopConfirmation handler, inserting the DEL character \\x7f. ' +
+        'in the isPendingStopConfirmation handler, inserting the DEL character \\x7f. ' +
         'Fix: move the backspace check above the str-insertion check in that handler.'
     ).not.toContain('Please answer y or n')
     expect(isInRecallSubstate()).toBe(true)

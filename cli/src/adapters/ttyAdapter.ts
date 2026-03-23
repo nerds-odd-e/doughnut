@@ -19,7 +19,6 @@ import {
   saveCliCommandHistory,
 } from '../cliCommandHistoryFile.js'
 import { getConfigDir } from '../configDir.js'
-import { formatRecallNotebookCurrentPromptLine } from '../recall.js'
 import { maskInteractiveInputForHistory } from '../inputHistoryMask.js'
 import {
   afterBareSlashEscape,
@@ -35,10 +34,15 @@ import {
   onArrowUp,
   ttyArrowKeyUsesSlashSuggestionCycle,
 } from '../interactiveCommandInput.js'
-import {
-  dispatchRecallSessionConfirmKey,
-  recallStopConfirmViewModelForContext,
+import type {
+  SessionYesNoLineDispatchResult,
+  SessionYesNoLineEmptySubmit,
+  SessionYesNoLineKeyEvent,
 } from '../interactions/recallSessionConfirmInteraction.js'
+import {
+  cycleListSelectionIndex,
+  dispatchSelectListKey,
+} from '../interactions/selectListInteraction.js'
 import {
   applyChatHistoryOutputTone,
   countPromptBlockLinesAboveInputBoxTop,
@@ -47,7 +51,6 @@ import {
   interactiveInputReadyOscSuffix,
   isCommittedInteractiveInput,
   isGreyDisabledInputChrome,
-  RECALL_SESSION_YES_NO_PLACEHOLDER,
   wrapTextToLines,
   type LiveRegionPaintOptions,
   type PlaceholderContext,
@@ -57,10 +60,7 @@ import type {
   AccessTokenPickerCommandConfig,
   ChatHistory,
   ChatHistoryOutputTone,
-  McqRecallPending,
   OutputAdapter,
-  PendingRecallAnswer,
-  RecallMcqChoiceTexts,
 } from '../types.js'
 
 export interface TTYDeps {
@@ -69,12 +69,32 @@ export interface TTYDeps {
     output?: OutputAdapter,
     interactiveUi?: boolean
   ) => Promise<boolean>
-  getPendingRecallAnswer: () => PendingRecallAnswer
-  isPendingRecallStopConfirmation: () => boolean
-  setPendingRecallStopConfirmation: (value: boolean) => void
-  isInRecallSubstate: () => boolean
-  exitRecallMode: () => void
-  isMcqRecallPending: (p: PendingRecallAnswer) => p is McqRecallPending
+  isPendingStopConfirmation: () => boolean
+  setPendingStopConfirmation: (value: boolean) => void
+  isInCommandSessionSubstate: () => boolean
+  exitCommandSession: () => void
+  getStopConfirmationYesOutcomeLines: () => readonly string[]
+  getStopConfirmationLiveView: (ctx: PlaceholderContext) => {
+    promptLines: string[]
+    placeholder: string
+    guidance: string[]
+  }
+  dispatchSessionYesNoKey: (
+    e: SessionYesNoLineKeyEvent,
+    emptySubmit: SessionYesNoLineEmptySubmit
+  ) => SessionYesNoLineDispatchResult
+  isNumberedChoiceListActive: () => boolean
+  getNumberedChoiceListChoices: () => readonly string[] | null
+  getNumberedChoiceListCurrentPromptWrappedLines: (
+    width: number
+  ) => string[] | null
+  formatNumberedChoiceGuidanceLines: (
+    choices: readonly string[],
+    selectedIndex: number,
+    width: number
+  ) => string[]
+  usesSessionYesNoInputChrome: (inTokenList: boolean) => boolean
+  getSessionPayloadLoadingIndicator: () => string
   buildTokenListLines: (
     tokens: AccessTokenEntry[],
     defaultLabel: AccessTokenLabel | undefined,
@@ -101,12 +121,6 @@ export interface TTYDeps {
     highlightIndex: number,
     width: number,
     options?: { forceCommandsHint?: boolean }
-  ) => string[]
-  wrapMarkdownTerminalToLines: (text: string, width: number) => string[]
-  recallMcqCurrentGuidanceLines: (
-    choices: RecallMcqChoiceTexts,
-    selectedChoiceIndex: number,
-    width: number
   ) => string[]
   getTerminalWidth: () => number
   buildCurrentPromptSeparator: (width: number) => string
@@ -137,7 +151,6 @@ export interface TTYDeps {
   HIDE_CURSOR: string
   SHOW_CURSOR: string
   CLEAR_SCREEN: string
-  DEFAULT_RECALL_LOADING_STAGE_INDICATOR: string
   PROMPT: string
   filterCommandsByPrefix: (
     commands: readonly CommandDoc[],
@@ -150,10 +163,6 @@ export interface TTYDeps {
   interactiveDocs: readonly CommandDoc[]
   TOKEN_LIST_COMMANDS: Record<string, AccessTokenPickerCommandConfig>
   getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
-}
-
-function cycleIndex(current: number, delta: number, length: number): number {
-  return (current + delta + length) % length
 }
 
 /**
@@ -226,12 +235,19 @@ type TTYInput = NodeJS.ReadableStream & {
 export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   const {
     processInput,
-    getPendingRecallAnswer,
-    isPendingRecallStopConfirmation,
-    setPendingRecallStopConfirmation,
-    isInRecallSubstate,
-    exitRecallMode,
-    isMcqRecallPending,
+    isPendingStopConfirmation,
+    setPendingStopConfirmation,
+    isInCommandSessionSubstate,
+    exitCommandSession,
+    getStopConfirmationYesOutcomeLines,
+    getStopConfirmationLiveView,
+    dispatchSessionYesNoKey,
+    isNumberedChoiceListActive,
+    getNumberedChoiceListChoices,
+    getNumberedChoiceListCurrentPromptWrappedLines,
+    formatNumberedChoiceGuidanceLines,
+    usesSessionYesNoInputChrome,
+    getSessionPayloadLoadingIndicator,
     buildTokenListLines,
     getDefaultTokenLabel,
     listAccessTokens,
@@ -242,8 +258,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     getLastLine,
     buildBoxLines,
     buildSuggestionLines,
-    wrapMarkdownTerminalToLines,
-    recallMcqCurrentGuidanceLines,
     getTerminalWidth,
     buildCurrentPromptSeparator,
     buildLiveRegionLines,
@@ -254,7 +268,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     HIDE_CURSOR,
     SHOW_CURSOR,
     CLEAR_SCREEN,
-    DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
     PROMPT,
     filterCommandsByPrefix,
     getTabCompletion,
@@ -267,7 +280,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     waitLine: InteractiveFetchWaitLine | null,
     fetchWaitEllipsisTick: number,
     tokenPicker: AccessTokenPickerCommandConfig | undefined,
-    recallPayloadLoading: boolean
+    sessionPayloadLoading: boolean
   ): string[] {
     if (waitLine != null) {
       return [
@@ -277,8 +290,8 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     if (tokenPicker != null) {
       return [greyCurrentStageIndicatorLabel(tokenPicker.stageIndicator)]
     }
-    if (recallPayloadLoading) {
-      return [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
+    if (sessionPayloadLoading) {
+      return [getSessionPayloadLoadingIndicator()]
     }
     return []
   }
@@ -328,7 +341,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     lastPaintedLineCount: 0,
   }
   let tokenSelection: TokenSelectionState | null = null
-  let recallMcqSelectedChoiceIndex = 0
+  let numberedChoiceHighlightIndex = 0
   let interactiveFetchWaitEllipsisTick = 0
   let interactiveFetchWaitRepaintTimer: ReturnType<typeof setInterval> | null =
     null
@@ -397,7 +410,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     }
   }
 
-  /** Buffered `processInput` stdout for one submitted command (MCQ path or normal Enter). */
+  /** Buffered `processInput` stdout for one submitted command (numbered-choice path or normal Enter). */
   let commandTurn: BufferedCommandTurn = { lines: [], tone: 'plain' }
   let ttyOutput: OutputAdapter
 
@@ -409,13 +422,14 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   function getDisplayContent() {
     const width = getTerminalWidth()
     const placeholderContext = getPlaceholderContext(!!tokenSelection)
-    const recallStopConfirmDisplay = isPendingRecallStopConfirmation()
-      ? recallStopConfirmViewModelForContext(placeholderContext)
+    const stopConfirmDisplay = isPendingStopConfirmation()
+      ? getStopConfirmationLiveView(placeholderContext)
       : null
     const contentLines = buildBoxLines(commandInput.lineDraft, width, {
       placeholderContext,
     })
-    const pendingRecallAnswer = getPendingRecallAnswer()
+    const numberedChoicePromptLines =
+      getNumberedChoiceListCurrentPromptWrappedLines(width)
     const waitLine = getInteractiveFetchWaitLine()
     const tokenListConfig = tokenSelection
       ? TOKEN_LIST_COMMANDS[tokenSelection.command]
@@ -423,27 +437,16 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     let currentPromptWrappedLines: string[]
     if (waitLine) {
       currentPromptWrappedLines = []
-    } else if (recallStopConfirmDisplay) {
-      currentPromptWrappedLines = recallStopConfirmDisplay.promptLines
+    } else if (stopConfirmDisplay) {
+      currentPromptWrappedLines = stopConfirmDisplay.promptLines
     } else {
       const currentPromptText = tokenListConfig?.currentPrompt
       if (
         !tokenSelection &&
-        isMcqRecallPending(pendingRecallAnswer) &&
-        !isPendingRecallStopConfirmation()
+        numberedChoicePromptLines !== null &&
+        !isPendingStopConfirmation()
       ) {
-        currentPromptWrappedLines = [
-          ...wrapTextToLines(
-            formatRecallNotebookCurrentPromptLine(
-              pendingRecallAnswer.notebookTitle
-            ),
-            width
-          ),
-          ...wrapMarkdownTerminalToLines(
-            pendingRecallAnswer.stemRenderedForTerminal,
-            width
-          ),
-        ]
+        currentPromptWrappedLines = numberedChoicePromptLines
       } else if (currentPromptText) {
         currentPromptWrappedLines = wrapTextToLines(currentPromptText, width)
       } else {
@@ -454,12 +457,13 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       waitLine,
       interactiveFetchWaitEllipsisTick,
       tokenListConfig,
-      isInRecallSubstate()
+      isInCommandSessionSubstate()
     )
     const currentPromptLines = countPromptBlockLinesAboveInputBoxTop(
       currentStageIndicatorLines,
       currentPromptWrappedLines
     )
+    const numberedChoices = getNumberedChoiceListChoices()
     const suggestionLines = tokenSelection
       ? buildTokenListLines(
           tokenSelection.items,
@@ -467,12 +471,12 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           width,
           tokenSelection.highlightIndex
         )
-      : recallStopConfirmDisplay
-        ? recallStopConfirmDisplay.guidance
-        : isMcqRecallPending(pendingRecallAnswer)
-          ? recallMcqCurrentGuidanceLines(
-              pendingRecallAnswer.choices,
-              recallMcqSelectedChoiceIndex,
+      : stopConfirmDisplay
+        ? stopConfirmDisplay.guidance
+        : numberedChoices !== null
+          ? formatNumberedChoiceGuidanceLines(
+              numberedChoices,
+              numberedChoiceHighlightIndex,
               width
             )
           : buildSuggestionLines(
@@ -639,8 +643,8 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
 
   /**
    * Writes the newest `chatHistory` slice to stdout (no {@link CLEAR_SCREEN}), then {@link drawBox} unless
-   * {@link options.skipDrawBox}. Normal turn is grey input + output; recall y/n adds output only (`recallYesNo`
-   * placeholder). Token-list already wrote `renderPastInput` before this.
+   * {@link options.skipDrawBox}. Normal turn is grey input + output; session yes/no steps add output only (no
+   * grey history-input row). Token-list already wrote `renderPastInput` before this.
    */
   function paintCommittedScrollbackAppend(
     inputAlreadyPainted: boolean,
@@ -699,21 +703,8 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     suggestionsDismissed = false
   }
 
-  /** MCQ recall turn: line passed to `processInput` (slash escapes, number, or highlighted choice). */
-  function recallMcqSubmittedLine(
-    trimmedBuffer: string,
-    choices: RecallMcqChoiceTexts,
-    selectedChoiceIndex: number
-  ): string {
-    if (trimmedBuffer === '/stop') return '/stop'
-    if (trimmedBuffer === '/contest') return '/contest'
-    const n = Number.parseInt(trimmedBuffer, 10)
-    if (n >= 1 && n <= choices.length) return String(n)
-    return String(selectedChoiceIndex + 1)
-  }
-
-  const enterRecallStopConfirmationFromEsc = (): void => {
-    setPendingRecallStopConfirmation(true)
+  const enterStopConfirmationFromEsc = (): void => {
+    setPendingStopConfirmation(true)
     commandInput = clearLiveCommandLine(commandInput)
     drawBox()
   }
@@ -738,9 +729,9 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       chatHistory = []
       resetLiveLineDraftAndSlashSuggestions()
       tokenSelection = null
-      if (isInRecallSubstate()) exitRecallMode()
-      setPendingRecallStopConfirmation(false)
-      recallMcqSelectedChoiceIndex = 0
+      if (isInCommandSessionSubstate()) exitCommandSession()
+      setPendingStopConfirmation(false)
+      numberedChoiceHighlightIndex = 0
       doFullRedraw()
     },
     onInteractiveFetchWaitChanged: () => {
@@ -785,8 +776,8 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       drawBox()
       return
     }
-    if (isPendingRecallStopConfirmation()) {
-      const dispatch = dispatchRecallSessionConfirmKey(
+    if (isPendingStopConfirmation()) {
+      const dispatch = dispatchSessionYesNoKey(
         {
           keyName: key.name,
           str,
@@ -800,27 +791,27 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       )
       switch (dispatch.result) {
         case 'cancel':
-          setPendingRecallStopConfirmation(false)
+          setPendingStopConfirmation(false)
           commandInput = clearLiveCommandLine(commandInput)
           drawBox()
           break
         case 'submit-yes':
           commandInput = clearLiveCommandLine(commandInput)
-          setPendingRecallStopConfirmation(false)
-          exitRecallMode()
-          recallMcqSelectedChoiceIndex = 0
-          commitHistoryOutput(['Stopped recall'])
+          setPendingStopConfirmation(false)
+          exitCommandSession()
+          numberedChoiceHighlightIndex = 0
+          commitHistoryOutput(getStopConfirmationYesOutcomeLines())
           break
         case 'submit-no':
           commandInput = clearLiveCommandLine(commandInput)
-          setPendingRecallStopConfirmation(false)
+          setPendingStopConfirmation(false)
           drawBox()
           break
         case 'invalid-submit':
           commandInput = clearLiveCommandLine(commandInput)
-          setPendingRecallStopConfirmation(false)
+          setPendingStopConfirmation(false)
           writeCurrentPromptLine(dispatch.hint)
-          setPendingRecallStopConfirmation(true)
+          setPendingStopConfirmation(true)
           drawBox()
           break
         case 'edit-backspace':
@@ -837,18 +828,18 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       }
       return
     }
-    const recallSessionYesNoPlaceholder =
-      getPlaceholderContext(!!tokenSelection) ===
-      RECALL_SESSION_YES_NO_PLACEHOLDER
-    if (recallSessionYesNoPlaceholder) {
+    const sessionYesNoInputChrome = usesSessionYesNoInputChrome(
+      !!tokenSelection
+    )
+    if (sessionYesNoInputChrome) {
       const keysForConfirmDispatch =
         submitPressed ||
         key.name === 'backspace' ||
         (str !== undefined && str !== '' && !key.ctrl && !key.meta)
-      const bareEnterOnRecallYesNo =
+      const bareEnterOnSessionYesNo =
         submitPressed && !key.shift && commandInput.lineDraft.trim() === ''
-      if (keysForConfirmDispatch && !bareEnterOnRecallYesNo) {
-        const dispatch = dispatchRecallSessionConfirmKey(
+      if (keysForConfirmDispatch && !bareEnterOnSessionYesNo) {
+        const dispatch = dispatchSessionYesNoKey(
           {
             keyName: key.name,
             str,
@@ -871,10 +862,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
             livePaint.lastPaintedLineCount = 0
             resetCommandTurnBuffer()
             if (isCommittedInteractiveInput(input)) {
-              if (
-                getPlaceholderContext(!!tokenSelection) !==
-                RECALL_SESSION_YES_NO_PLACEHOLDER
-              ) {
+              if (!usesSessionYesNoInputChrome(!!tokenSelection)) {
                 chatHistory.push({
                   type: 'input',
                   content: maskInteractiveInputForHistory(input),
@@ -911,100 +899,141 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         return
       }
     }
-    const pendingRecallAnswer = getPendingRecallAnswer()
-    if (isMcqRecallPending(pendingRecallAnswer)) {
-      const choices = pendingRecallAnswer.choices
-      if (key.name === 'escape') {
-        enterRecallStopConfirmationFromEsc()
-      } else if (key.name === 'up' || key.name === 'down') {
-        const delta = key.name === 'up' ? -1 : 1
-        recallMcqSelectedChoiceIndex = cycleIndex(
-          recallMcqSelectedChoiceIndex,
-          delta,
-          choices.length
-        )
-        drawBox()
-      } else if (submitPressed && !key.shift) {
-        const trimmedBuffer = commandInput.lineDraft.trim()
-        const effectiveInput = recallMcqSubmittedLine(
-          trimmedBuffer,
-          choices,
-          recallMcqSelectedChoiceIndex
-        )
-        clearLiveRegionForRepaint(livePaint)
-        const inputForHistory = commandInput.lineDraft || effectiveInput
-        commandInput = clearLiveCommandLine(commandInput)
-        recallMcqSelectedChoiceIndex = 0
-        livePaint.lastPaintedLineCount = 0
-        resetCommandTurnBuffer()
-        chatHistory.push({
-          type: 'input',
-          content: maskInteractiveInputForHistory(inputForHistory),
-        })
-        if (isCommittedInteractiveInput(inputForHistory)) {
-          rememberCommittedLine(inputForHistory)
+    const numberedChoices = getNumberedChoiceListChoices()
+    if (numberedChoices !== null) {
+      const listDispatch = dispatchSelectListKey(
+        {
+          keyName: key.name,
+          str,
+          ctrl: !!key.ctrl,
+          meta: !!key.meta,
+          shift: !!key.shift,
+          lineDraft: commandInput.lineDraft,
+          submitPressed,
+        },
+        numberedChoiceHighlightIndex,
+        {
+          kind: 'slash-and-number-or-highlight',
+          choiceCount: numberedChoices.length,
+        },
+        'signal-escape'
+      )
+      switch (listDispatch.result) {
+        case 'escape-signaled':
+          enterStopConfirmationFromEsc()
+          break
+        case 'move-highlight':
+          numberedChoiceHighlightIndex = cycleListSelectionIndex(
+            numberedChoiceHighlightIndex,
+            listDispatch.delta,
+            numberedChoices.length
+          )
+          drawBox()
+          break
+        case 'submit-with-line': {
+          const effectiveInput = listDispatch.lineForProcessInput
+          clearLiveRegionForRepaint(livePaint)
+          const inputForHistory = commandInput.lineDraft || effectiveInput
+          commandInput = clearLiveCommandLine(commandInput)
+          numberedChoiceHighlightIndex = 0
+          livePaint.lastPaintedLineCount = 0
+          resetCommandTurnBuffer()
+          chatHistory.push({
+            type: 'input',
+            content: maskInteractiveInputForHistory(inputForHistory),
+          })
+          if (isCommittedInteractiveInput(inputForHistory)) {
+            rememberCommittedLine(inputForHistory)
+          }
+          if (await processInput(effectiveInput, ttyOutput, true)) {
+            commitExitTurnToScrollback()
+            doExit()
+            return
+          }
+          commitHistoryOutput(commandTurn.lines, commandTurn.tone)
+          break
         }
-        if (await processInput(effectiveInput, ttyOutput, true)) {
-          commitExitTurnToScrollback()
-          doExit()
-          return
-        }
-        commitHistoryOutput(commandTurn.lines, commandTurn.tone)
-      } else if (key.name === 'backspace') {
-        commandInput = deleteBeforeCaret(commandInput)
-        drawBox()
-      } else if (str && !key.ctrl && !key.meta) {
-        commandInput = insertIntoDraft(commandInput, str)
-        drawBox()
-      } else {
-        drawBox()
+        case 'edit-backspace':
+          commandInput = deleteBeforeCaret(commandInput)
+          drawBox()
+          break
+        case 'edit-char':
+          commandInput = insertIntoDraft(commandInput, listDispatch.char)
+          drawBox()
+          break
+        case 'redraw':
+          drawBox()
+          break
+        default:
+          drawBox()
+          break
       }
       return
     }
     if (tokenSelection) {
-      if (key.name === 'up' || key.name === 'down') {
-        const delta = key.name === 'up' ? -1 : 1
-        tokenSelection.highlightIndex = cycleIndex(
-          tokenSelection.highlightIndex,
-          delta,
-          tokenSelection.items.length
-        )
-        drawBox()
-      } else if (submitPressed && !key.shift) {
-        const selectedLabel =
-          tokenSelection.items[tokenSelection.highlightIndex]!.label
-        const action = tokenSelection.action
-        let message = ''
-        let tone: ChatHistoryOutputTone = 'plain'
-        if (action === 'set-default') {
-          setDefaultTokenLabel(selectedLabel)
-          message = `Default token set to: ${selectedLabel}`
-        } else if (action === 'remove') {
-          removeAccessToken(selectedLabel)
-          message = `Token "${selectedLabel}" removed.`
-        } else {
-          try {
-            await runInteractiveFetchWait(
-              ttyOutput,
-              INTERACTIVE_FETCH_WAIT_LINES.removeAccessTokenCompletely,
-              (signal) => removeAccessTokenCompletely(selectedLabel, signal)
-            )
-            message = `Token "${selectedLabel}" removed locally and from server.`
-          } catch (err) {
-            const o = userVisibleOutcomeFromCommandError(err)
-            message = o.text
-            tone = o.tone
+      const listDispatch = dispatchSelectListKey(
+        {
+          keyName: key.name,
+          str,
+          ctrl: !!key.ctrl,
+          meta: !!key.meta,
+          shift: !!key.shift,
+          lineDraft: commandInput.lineDraft,
+          submitPressed,
+        },
+        tokenSelection.highlightIndex,
+        { kind: 'highlight-only' },
+        'abort-list'
+      )
+      switch (listDispatch.result) {
+        case 'abort-highlight-only-list':
+          commitTokenListResult(CLI_USER_ABORTED_WAIT_MESSAGE, 'userNotice')
+          break
+        case 'move-highlight':
+          tokenSelection.highlightIndex = cycleListSelectionIndex(
+            tokenSelection.highlightIndex,
+            listDispatch.delta,
+            tokenSelection.items.length
+          )
+          drawBox()
+          break
+        case 'submit-highlight-index': {
+          const selectedLabel = tokenSelection.items[listDispatch.index]!.label
+          const action = tokenSelection.action
+          let message = ''
+          let tone: ChatHistoryOutputTone = 'plain'
+          if (action === 'set-default') {
+            setDefaultTokenLabel(selectedLabel)
+            message = `Default token set to: ${selectedLabel}`
+          } else if (action === 'remove') {
+            removeAccessToken(selectedLabel)
+            message = `Token "${selectedLabel}" removed.`
+          } else {
+            try {
+              await runInteractiveFetchWait(
+                ttyOutput,
+                INTERACTIVE_FETCH_WAIT_LINES.removeAccessTokenCompletely,
+                (signal) => removeAccessTokenCompletely(selectedLabel, signal)
+              )
+              message = `Token "${selectedLabel}" removed locally and from server.`
+            } catch (err) {
+              const o = userVisibleOutcomeFromCommandError(err)
+              message = o.text
+              tone = o.tone
+            }
           }
+          commitTokenListResult(message, tone)
+          break
         }
-        commitTokenListResult(message, tone)
-      } else {
-        commitTokenListResult(CLI_USER_ABORTED_WAIT_MESSAGE, 'userNotice')
+        default:
+          commitTokenListResult(CLI_USER_ABORTED_WAIT_MESSAGE, 'userNotice')
+          break
       }
       return
     }
     if (key.name === 'escape') {
-      if (isInRecallSubstate()) {
-        enterRecallStopConfirmationFromEsc()
+      if (isInCommandSessionSubstate()) {
+        enterStopConfirmationFromEsc()
         return
       }
       if (isCommandPrefixWithSuggestions(commandInput.lineDraft)) {
@@ -1077,10 +1106,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
 
         resetCommandTurnBuffer()
         if (isCommittedInteractiveInput(input)) {
-          if (
-            getPlaceholderContext(!!tokenSelection) !==
-            RECALL_SESSION_YES_NO_PLACEHOLDER
-          ) {
+          if (!usesSessionYesNoInputChrome(!!tokenSelection)) {
             chatHistory.push({
               type: 'input',
               content: maskInteractiveInputForHistory(input),
@@ -1095,8 +1121,8 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           commitHistoryOutput(commandTurn.lines, commandTurn.tone)
           return
         }
-        if (isMcqRecallPending(getPendingRecallAnswer())) {
-          recallMcqSelectedChoiceIndex = 0
+        if (isNumberedChoiceListActive()) {
+          numberedChoiceHighlightIndex = 0
         }
         drawBox()
       }
@@ -1122,7 +1148,11 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           getLastLine(commandInput.lineDraft)
         )
         const delta = key.name === 'up' ? -1 : 1
-        highlightIndex = cycleIndex(highlightIndex, delta, filtered.length)
+        highlightIndex = cycleListSelectionIndex(
+          highlightIndex,
+          delta,
+          filtered.length
+        )
       } else {
         const prevDraft = commandInput.lineDraft
         commandInput =
