@@ -152,7 +152,7 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 **Current tree:** Phase E **spike code, env flag, Vitest, and `ink`/`react` deps are removed** so the CLI stays lean until Phase F reintroduces them.
 
-**Next:** Phase F (migrate confirm/select to Ink — add `react`/`ink` again and reuse the bundle notes above).
+**Next:** Phase G onward (F1–F3 Ink confirm/select + OSC ordering done).
 
 ---
 
@@ -165,7 +165,7 @@ After each phase: **delete dead code** that only served the old path; **delete o
 - **`cli/src/ui/ConfirmDisplay.tsx`**: display-only Ink component for y/n confirm (stop-recall and session y/n).
 - **`ttyAdapter.ts`**: Ink island lifecycle (`startOrUpdateInkDisplay`, `unmountInkDisplay`, `renderInkStopConfirm`, `renderInkSessionYesNo`). Stop-confirm and session y/n render via Ink; MCQ and token-list remain ANSI `drawBox()`.
 - **Vitest**: `CI: '0'`, `FORCE_COLOR: '1'` in `test.env`; `is-in-ci` stub in `tests/__mocks__/`; `vi.mock('is-in-ci')` in `tests/setup.ts` so Ink renders to stdout in tests.
-- **Tests**: 398/398 pass. E2E `cli_recall.feature` unchanged (1 pre-existing failure, unrelated).
+- **Tests**: 398/398 pass. E2E `cli_recall.feature` tracked in F2/F3.
 
 **Architecture note:** Ink island approach — Ink renders to stdout as display layer; the ANSI readline keypress handler dispatches keys and calls `inkDisplayInstance.rerender(element)` to update the Ink display. This avoids readline-vs-raw-stdin conflicts (`useInput` listens to raw stdin `data` events, not readline `keypress` events).
 
@@ -182,19 +182,16 @@ After each phase: **delete dead code** that only served the old path; **delete o
 - **Tests updated:** `recallMcqTtyCursorPosition.test.ts` (→ checks Ink McqDisplay renders `→` and doesn't overwrite history), `interactiveTtyTokenList.test.ts` (→ checks Ink output content, no ANSI box border checks), `interactiveTtyMcq.test.ts` (→ checks OSC emission and no grey writeCurrentPrompt for choices).
 - **Bundle fix:** `cli/package.json` banner now uses `$'...'` syntax so `createRequire` preamble actually executes (was `\n` literal instead of newline).
 - **E2E fix:** `e2e_test/config/cliEnv.ts` sets `CI=0` so Ink renders in non-CI mode in E2E tests.
-- **E2E state:** 3/8 tests pass (recall status, recall session y/n, MCQ ESC cancel). 5 pre-existing failures exist with or without F2 changes: MCQ answer tests (Recalled successfully, Correct!, Incorrect) share a timing issue where OSC from fetch-wait inside `processInput` fires before `commitHistoryOutput` writes results; see Phase **F3** to fix OSC ordering.
 
 ---
 
-### Phase F3 — Fix OSC ordering so MCQ answer E2E tests pass
+### Phase F3 — Fix OSC ordering so MCQ answer E2E tests pass — **done**
 
-**Goal:** Fix the pre-existing E2E timing issue where `INTERACTIVE_INPUT_READY_OSC` fires from `onInteractiveFetchWaitChanged` (inside `processInput`) before `commitHistoryOutput` writes the MCQ result to stdout.
+**Goal:** Fix the E2E timing issue where `INTERACTIVE_INPUT_READY_OSC` could appear in the PTY transcript before MCQ outcome lines (`Correct!`, etc.) were written to scrollback, so `getHistoryOutputContent` missed them.
 
-**Root cause (confirmed):** After MCQ is answered, `continueRecallSession` → `runInteractiveFetchWait` finally block → `onInteractiveFetchWaitChanged` → ANSI `drawBox()` → `finalizeInteractiveLiveRegionPaint` → OSC fires. The `ptyWritePayloadAndWaitForInputReady` catches this early OSC before `commitHistoryOutput` writes "Correct!" etc. The section parser then places "Correct!" in `currentGuidanceLines` (after the last `└`) instead of `historyOutput` because the fetch-end ANSI `┌─┐` box appears **before** the separator written by `showRecallPrompt`, making the section parser see "Correct!" as current guidance rather than history.
+**Fix:** `flushCommandTurnToScrollbackBeforeFetchWait()` in `ttyAdapter.ts` — when interactive fetch-wait **starts**, commit any buffered `commandTurn` lines to history (`commitHistoryOutput` with `skipDrawBox: true`) **before** `drawBox()` paints the wait chrome and emits OSC. That way `continueRecallSession` → `runInteractiveFetchWait` no longer leaves "Correct!" / "Recalled successfully" in the buffer across fetch-wait paint + OSC. Landed with `finishProcessInputTurnAfterAwait` refactor (e.g. commit `a2c29ef68c1ccc83403dc54eaacb0c18816fe8d3`).
 
-**Attempted but rolled back:** Suppressing OSC inside `processInput` and suppressing the fetch-end `drawBox()` in `onInteractiveFetchWaitChanged` fixed MCQ answer tests locally but broke "Recall session" and "Recall spelling" tests in CI due to PTY/timing differences. Reverted to the pre-F3 state.
-
-**Approach for next attempt:** Either update `cliSectionParser.ts` to also search `currentGuidanceLines` when looking for history output, or ensure the fetch-end ANSI box is drawn AFTER the separator so the section parser's `currentPromptLines` captures "Correct!".
+**Verify:** `pnpm cypress run --spec e2e_test/features/cli/cli_recall.feature` — 8/8; `pnpm cli:test` green.
 
 ---
 
@@ -242,5 +239,5 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ## Notes
 
-- **Ordering:** Phases A–D deliver a safe **extract-and-thin-adapter** path even if Ink is deferred; E–I require the **decision gates** to be closed. **Next:** Phase F (Ink confirm/select).
+- **Ordering:** Phases A–D deliver a safe **extract-and-thin-adapter** path even if Ink is deferred; E–I require the **decision gates** to be closed. **Next:** Phase G onward (Ink shell / fetch-wait).
 - **Conflicts:** Any phase that would change PTY/E2E-visible behavior without product sign-off should stop at the nearest **decision gate** above.
