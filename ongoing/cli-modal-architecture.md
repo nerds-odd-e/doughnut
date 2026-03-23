@@ -10,6 +10,8 @@ Optional **@inkjs/ui** (**Context7:** `vadimdemedes/ink-ui`) supplies patterns c
 
 **Non-interactive** (`-c`, piped) remains the **`processInput` + `pipedAdapter`** path unless a later decision explicitly unifies surfaces.
 
+**Adapter rule:** **`ttyAdapter` (and any equivalent stdin/stdout bridge) must not leak business concepts**—no branching on product notions such as *recall*, *MCQ*, *notebook*, *memory tracker*, or quiz rules. Those belong in the **business** layer; the adapter only moves bytes, repaints, and forwards **opaque** interaction handles / callbacks from deps (or delegates to `processInput`). Phases C–I move the codebase toward that boundary; see **`ttyAdapter` vs domain naming** below.
+
 ---
 
 ## Layering (stable through migration)
@@ -18,6 +20,7 @@ Optional **@inkjs/ui** (**Context7:** `vadimdemedes/ink-ui`) supplies patterns c
 |-------|------------------|---------------|
 | **Business** | `interactive.ts`, `recall.ts`, etc. Domain orchestration and state transitions. | Unchanged domain language; exposes props/callbacks to the UI root (e.g. “submit recall answer”, “exit recall”). |
 | **Interactive UI** | Was “CliModal” / adapter-specific modals; becomes **React state + components** (confirm flows, pickers, loading row). | `useState` / reducers, small presentational components; **no business branching** beyond dispatching callbacks passed from business layer. |
+| **TTY adapter** (transitional) | Raw mode, key events, ANSI live region **until** Ink subsumes it. | **No business-concept leakage:** only I/O, layout, and calls into neutral interaction modules or `processInput`; **not** a place for `recall` / `mcq` semantics (migration debt today; target is thin shell). |
 | **Ink shell** | Owns stdin/stdout, `render()` instance (`waitUntilExit`, `unmount`, `clear`), and the top-level layout split (e.g. history vs live). | One place that configures `render(..., { stdin, stdout, stderr, patchConsole, exitOnCtrlC, ... })` per Ink’s API. |
 | **Layout / terminal width** | Correct column width for CJK, emoji, graphemes. | **Bridge:** keep **`cli/src/renderer.ts`** as the source of truth for wrapping/truncation where Ink’s `Text` wrapping is insufficient; feed Ink pre-wrapped lines or wrap in a thin helper until a deliberate choice is made (see **Decision gate: wrapping**). |
 
@@ -58,6 +61,23 @@ Each phase should keep **user-visible behavior** covered by **existing E2E** whe
 
 After each phase: **delete dead code** that only served the old path; **delete or rewrite tests** whose sole purpose was asserting **internal** adapter branches now owned by Ink or removed components (follow **observable behavior first** in `.cursor/rules/planning.mdc`—keep one strong test per surface, not scattered implementation mirrors).
 
+### `ttyAdapter` vs domain naming (adapter leakage — planned cleanup)
+
+**Steady-state rule — no business concepts in the adapter:** The TTY layer is **transport + presentation mechanics** only. It must **not** decide or name **what** the user is doing in domain terms (recall session, quiz type, token semantics, etc.). Business rules and domain vocabulary live in **`interactive.ts` / `recall.ts`** (and later in Ink **screen-level** components fed by props), **not** in `if (isMcqRecallPending(…))`-style adapter code.
+
+**Problem (today):** `cli/src/adapters/ttyAdapter.ts` still branches on product-shaped state (`recall`, MCQ, token pickers, …) because it owns raw keypresses and the ANSI live region. That is **business-concept leakage into the adapter**—**intentional migration debt**, not the target.
+
+**Target boundary:** **Business** keeps domain language and rules. **Interactive UI** (Ink tree, interaction modules: confirm, select-list, text field, fetch-wait) speaks in **UI mechanism** terms and callbacks. **Named** components may still use product words in the **React** layer (e.g. `<RecallConfirm />`) when they are the rooted screen; the **adapter** itself should only see neutral modes or delegated handlers, not “this keypath is MCQ.”
+
+**Where the plan removes it:**
+
+| What to fix | Phases |
+|-------------|--------|
+| Scattered list-selection logic and **recall-named** branches for MCQ vs token list in `ttyAdapter` | **C** (shared select-list interaction); **F** (Ink `Select` / equivalent) |
+| Residual confirm / placeholder routing and ANSI view-model paint in the adapter | **F** (Ink confirm + select); **H** (Ink shell owns live column) |
+| Business layer importing presentation constants from `renderer` | **D** |
+| Legacy full-screen repaint and duplicated “mode” wiring | **H** (large deletion), **I** (single Ink entry, dead-code pass) |
+
 ---
 
 ### Phase A — Interaction extract with Ink-shaped boundaries (no Ink dependency yet) — **done**
@@ -87,16 +107,16 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ### Phase C — MCQ and token pickers as **select** interactions (still ANSI)
 
-**Goal:** ↑↓ / number / Enter / Esc behavior lives in one **select-list interaction** module (name aligned with future `<Select>` or custom `useInput` list), not scattered `if (mcq)` in `ttyAdapter`.
+**Goal:** ↑↓ / number / Enter / Esc behavior lives in one **select-list interaction** module (name aligned with future `<Select>` or custom `useInput` list), not scattered `if (mcq)` in `ttyAdapter`. **First major cut** to **adapter–domain leakage** (see **`ttyAdapter` vs domain naming** above).
 
-- Recall MCQ and token list either share one abstraction or two thin wrappers over the same key logic—**avoid** recall-named state inside the adapter.
+- Recall MCQ and token list either share one abstraction or two thin wrappers over the same key logic—**avoid** recall-named state **inside the adapter**; the adapter should delegate to a generic select interaction + narrow glue.
 - **Verify:** MCQ E2E + Vitest; token-list Vitest.
 
 ---
 
 ### Phase D — TTYDeps / `interactive.ts` cleanup (renderer imports)
 
-**Goal:** Business layer does not import presentation constants; deps are **data + callbacks** suitable to pass as React props later.
+**Goal:** Business layer does not import presentation constants; deps are **data + callbacks** suitable to pass as React props later. Reduces **business↔presentation leakage** (complements **`ttyAdapter` vs domain naming**).
 
 - **Verify:** full CLI Vitest + recall E2E.
 
@@ -115,7 +135,7 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ### Phase F — Migrate confirm + select flows to Ink components
 
-**Goal:** Replace ANSI implementation of confirm/select with Ink (`useInput` and/or ink-ui `ConfirmInput` / `Select`).
+**Goal:** Replace ANSI implementation of confirm/select with Ink (`useInput` and/or ink-ui `ConfirmInput` / `Select`). **Primary phase for stripping recall/MCQ-specific confirm/select branches from `ttyAdapter`** (after Phase C extract).
 
 - Remove redundant key branches and view-model paint code from `ttyAdapter` **once** E2E/Vitest show parity.
 - **Remove** tests that only asserted removed adapter internals; keep **stdout-level** coverage.
@@ -135,14 +155,14 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 **Goal:** Top-level layout matches Ink idioms: **`Static`** for committed history lines (only if **decision gate: Static** approves), dynamic column for current prompt, guidance, and input (`TextInput` / custom bordered field).
 
-- **Large deletion:** legacy full-screen repaint logic in `ttyAdapter` that Ink subsumes.
+- **Large deletion:** legacy full-screen repaint logic in `ttyAdapter` that Ink subsumes—**clears most remaining mode-specific ANSI wiring** in the adapter (see **`ttyAdapter` vs domain naming**).
 - **Verify:** full interactive Vitest + CLI E2E suite; fix step parsers only if escape sequences change.
 
 ---
 
 ### Phase I — Consolidation and dead-code pass
 
-**Goal:** No parallel interactive engines; one Ink app entry for TTY interactive mode.
+**Goal:** No parallel interactive engines; one Ink app entry for TTY interactive mode—**finishes** the **`ttyAdapter` vs domain naming** cleanup alongside Phase H.
 
 - Delete unused `renderer.ts` helpers **only** when no caller remains; if `renderer.ts` stays as wrap helper, document it as **layout bridge**, not a second UI framework.
 - Final **test audit:** every removed internal test must be replaced by observable coverage or explicitly accepted gap.
@@ -153,6 +173,7 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 - Not where **recall business rules** live (what “yes” means, when to load more, quiz scoring).
 - Not a second `processInput`—business still centralizes command handling; UI emits **intent** events (confirm, pick index, cancel).
+- **Not the adapter:** `ttyAdapter` / Ink shell must **not** embed **business concepts** (see **Adapter rule** under north star and **`ttyAdapter` vs domain naming**).
 - Not required for **piped** mode unless you explicitly extend scope.
 
 ---
