@@ -36,10 +36,10 @@ export function runShellCommandSync(
 }
 
 export function bundleCli(repoRoot: string, env?: NodeJS.ProcessEnv) {
-  runShellCommandSync('pnpm cli:bundle', { cwd: repoRoot, env })
+  runShellCommandSync('pnpm -C cli bundle', { cwd: repoRoot, env })
   const bundle = join(repoRoot, CLI_BUNDLE_RELATIVE_PATH)
   if (!existsSync(bundle)) {
-    throw new Error(`Missing CLI bundle at ${bundle} after pnpm cli:bundle`)
+    throw new Error(`Missing CLI bundle at ${bundle} after pnpm -C cli bundle`)
   }
 }
 
