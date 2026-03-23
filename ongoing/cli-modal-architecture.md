@@ -180,6 +180,17 @@ After each phase: **delete dead code** that only served the old path; **delete o
 - **`cli/src/ui/McqDisplay.tsx`** and **`cli/src/ui/TokenListDisplay.tsx`**: Ink display-only components for MCQ and token list.
 - **`ttyAdapter.ts`**: `renderInkMcqDisplay()`, `renderInkTokenListDisplay()` functions; `drawBox()` routes to these when MCQ or token list is active; `unmountInkDisplay()` called on MCQ submit and `commitTokenListResult()`; `INTERACTIVE_INPUT_READY_OSC` emitted after each Ink render.
 - **Tests updated:** `recallMcqTtyCursorPosition.test.ts` (→ checks Ink McqDisplay renders `→` and doesn't overwrite history), `interactiveTtyTokenList.test.ts` (→ checks Ink output content, no ANSI box border checks), `interactiveTtyMcq.test.ts` (→ checks OSC emission and no grey writeCurrentPrompt for choices).
+- **Bundle fix:** `cli/package.json` banner now uses `$'...'` syntax so `createRequire` preamble actually executes (was `\n` literal instead of newline).
+- **E2E fix:** `e2e_test/config/cliEnv.ts` sets `CI=0` so Ink renders in non-CI mode in E2E tests.
+- **E2E state:** 3/8 tests pass (recall status, recall session y/n, MCQ ESC cancel). 5 pre-existing failures exist with or without F2 changes: MCQ answer tests (Recalled successfully, Correct!, Incorrect) share a timing issue where OSC from fetch-wait inside `processInput` fires before `commitHistoryOutput` writes results; see Phase **F3** to fix OSC ordering.
+
+---
+
+### Phase F3 — Fix OSC ordering so MCQ answer E2E tests pass
+
+**Goal:** Fix the pre-existing E2E timing issue where `INTERACTIVE_INPUT_READY_OSC` fires from `onInteractiveFetchWaitChanged` (inside `processInput`) before `commitHistoryOutput` writes the MCQ result to stdout. The E2E `ptyWritePayloadAndWaitForInputReady` catches the early OSC before history is painted; `getHistoryOutputContent` returns empty.
+
+**Approach:** Suppress OSC emission from drawBox calls made during an active `processInput` execution (e.g. don't emit OSC when `interactiveFetchWaitLine !== null` and the drawBox is from the fetch-wait start path), or gate OSC on the session having exited active processing.
 
 ---
 
