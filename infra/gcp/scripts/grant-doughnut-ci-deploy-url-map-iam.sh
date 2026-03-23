@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Grants the GitHub Actions deploy SA what gcloud compute url-maps import needs:
-# - compute.urlMaps.update on the URL map (project roles/compute.loadBalancerAdmin)
-# - compute.backendServices.use / backendBuckets.use on referenced backends
-#   (resource roles/compute.loadBalancerServiceUser)
+# Grants the GitHub Actions deploy SA roles/compute.loadBalancerAdmin on the project.
+# That role includes compute.urlMaps.update, compute.backendServices.use, and
+# compute.backendBuckets.use — everything gcloud compute url-maps import needs.
 #
-# Symptoms without this: 403 compute.backendServices.use or compute.urlMaps.update.
+# Symptom without this: 403 compute.backendServices.use or compute.urlMaps.update.
 
 PROJECT_ID="${GCP_PROJECT_ID:-carbon-syntax-298809}"
 SA="${CI_DEPLOY_GCP_SA:-doughnut-ci-gcp-deploy-svc-acc@${PROJECT_ID}.iam.gserviceaccount.com}"
@@ -17,15 +16,4 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --role="roles/compute.loadBalancerAdmin" \
   --condition=None
 
-gcloud compute backend-services add-iam-policy-binding doughnut-app-service \
-  --project="${PROJECT_ID}" \
-  --global \
-  --member="${MEMBER}" \
-  --role="roles/compute.loadBalancerServiceUser"
-
-gcloud compute backend-buckets add-iam-policy-binding doughnut-frontend-backend-bucket \
-  --project="${PROJECT_ID}" \
-  --member="${MEMBER}" \
-  --role="roles/compute.loadBalancerServiceUser"
-
-echo "Granted loadBalancerAdmin (project) and loadBalancerServiceUser (backend service + backend bucket) to ${SA}"
+echo "Granted roles/compute.loadBalancerAdmin on ${PROJECT_ID} to ${SA}"

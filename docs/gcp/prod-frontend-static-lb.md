@@ -148,14 +148,9 @@ Treat URL map / backend edits as **production infrastructure**: restrict to proj
 
 ### GitHub Actions deploy SA and `url-maps import`
 
-CI runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh), which calls `gcloud compute url-maps import`. That needs:
+CI runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh), which calls `gcloud compute url-maps import`. Grant the deploy service account (e.g. `doughnut-ci-gcp-deploy-svc-acc@…`) **`roles/compute.loadBalancerAdmin`** on the **project**: that single role includes **`compute.urlMaps.update`** plus **`compute.backendServices.use`** and **`compute.backendBuckets.use`** on the backends referenced by the map (separate per-resource bindings are not required).
 
-1. **`compute.urlMaps.update`** on `doughnut-app-service-map` — grant the deploy SA **`roles/compute.loadBalancerAdmin`** on the **project** (URL maps do not expose per-resource `add-iam-policy-binding` in `gcloud` the way backend services do).
-2. **`compute.backendServices.use`** and **`compute.backendBuckets.use`** on the resources named in the map — grant **`roles/compute.loadBalancerServiceUser`** on **`doughnut-app-service`** (global) and **`doughnut-frontend-backend-bucket`**.
-
-Typical **403** messages if something is missing: `compute.backendServices.use` or `compute.urlMaps.update`.
-
-One-shot script (project + both backends): [`grant-doughnut-ci-deploy-url-map-iam.sh`](../../infra/gcp/scripts/grant-doughnut-ci-deploy-url-map-iam.sh). Override SA with `CI_DEPLOY_GCP_SA=…@….iam.gserviceaccount.com` if needed.
+If Deploy returns **403** mentioning `compute.urlMaps.update` or `compute.backendServices.use`, run [`grant-doughnut-ci-deploy-url-map-iam.sh`](../../infra/gcp/scripts/grant-doughnut-ci-deploy-url-map-iam.sh) (or add the same project binding manually). Override SA with `CI_DEPLOY_GCP_SA=…@….iam.gserviceaccount.com` if needed.
 
 ---
 
