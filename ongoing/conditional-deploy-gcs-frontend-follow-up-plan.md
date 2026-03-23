@@ -9,7 +9,7 @@ Do not execute this plan all at once. Complete one phase, test it, deploy it, th
 Finish the incomplete "single source of truth" story so that:
 
 1. prod routing cannot silently drift from local/CI behavior,
-2. frontend promotion is reliable and understandable,
+2. every successful `main` CI run makes the matching frontend live automatically,
 3. deploy storage and public static hosting are separated cleanly,
 4. obsolete compatibility behavior is removed after safer replacements exist.
 
@@ -17,7 +17,11 @@ Finish the incomplete "single source of truth" story so that:
 
 - Keep **backend deploy skip** based on the backend jar hash.
 - Keep **frontend upload** unconditional for green packaging runs.
-- Add one explicit concept for frontend release state: the **active frontend SHA**.
+- Make the normal release path **fully automatic**:
+  - CI uploads frontend static to `gs://.../frontend/${GITHUB_SHA}/`
+  - the green deploy flow updates the prod URL map to serve that same SHA
+  - no separate human "promote frontend" step is needed for normal releases
+- Prefer a **committed routing source or template** that CI can render for `${GITHUB_SHA}` at deploy time, rather than a hand-maintained concrete prod URL map with repeated SHAs.
 - Treat `/doughnut-cli-latest/doughnut` as a **static-only** path:
   - served by GCS/LB in prod
   - served by the fake LB from `cli/dist` locally
@@ -81,39 +85,45 @@ Finish the incomplete "single source of truth" story so that:
 
 **Status:** Implemented — `infra/gcp/path-routing/validateUrlMapPathRouting.mjs` runs backend + static checks; required paths come from `requiredStaticPathsFromFrontend.mjs` (source `index.html`, `public/`, optional `dist/index.html`) plus `mandatoryStaticBucketProbes()` for `/`, `/index.html`, and `/assets/*`. `pnpm test:path-routing` (in `lint:all`) covers fixtures; `pnpm validate:path-routing` is the repo entry point.
 
+**Later change expected:** This currently validates the committed prod URL-map YAML. If Phase 3 moves prod activation to deploy-time generation in CI, add that generated URL-map path as the new validation input in a later phase rather than re-opening Phase 2.
+
 ---
 
-## Phase 3 — Frontend promotion becomes one explicit operation
+## Phase 3 — Green CI automatically activates the matching frontend build
 
-**Outcome:** Promoting a frontend build is one reviewed, explicit operation with one input: the active frontend SHA.
+**Outcome:** After a successful `main` CI run, users get the frontend built from that same commit on the prod hostname without any developer-operated promotion step.
 
-**User-visible value:** Frontend-only changes can be published reliably without a backend rollout and without hand-editing the same SHA in several places.
+**User-visible value:** Frontend-only changes go live as soon as CI is green, matching the commit that just passed tests.
 
 **Scope:**
 
-- Introduce one promotion mechanism, likely a script or generated config, that:
-  - takes the active frontend SHA,
-  - verifies the uploaded GCS prefix exists,
-  - updates the prod URL-map artifact from that one value,
-  - leaves a reviewable result in the repo or command output.
-- Do not couple this to backend jar deployment.
-- Keep rollback simple: promote an older SHA using the same path.
+- Extend the existing deploy path so that, after the frontend upload for `${GITHUB_SHA}` and after all green gates, CI updates the prod URL map to serve `frontend/${GITHUB_SHA}/`.
+- Keep this in the same production deployment flow that already handles backend rollout logic, so "green CI" means "latest frontend is live" even when the backend jar is unchanged.
+- Prefer one small render/apply path for the URL map:
+  - CI provides `${GITHUB_SHA}`,
+  - committed routing inputs define the stable path split,
+  - deploy applies the rendered URL map to GCP.
+- Do not require a committed "active frontend SHA" file or any manual repo edit as part of the normal release path.
+- Keep rollback possible, but treat it as a separate recovery path, not the everyday deployment mechanism.
 
 **Tests:**
 
-- Script tests for promotion input validation and generated output.
-- Validation that the produced URL-map artifact still passes path-routing checks.
+- Script or unit tests for the URL-map render step given a commit SHA.
+- Validation that the generated URL map for `${GITHUB_SHA}` still passes the existing path-routing checks before CI applies it.
+- One focused deploy-path test or dry-run command proving the CI entry point wires upload output and URL-map generation together correctly.
 
 **Done when:**
 
-- The active frontend SHA is set in one place, not repeated manually in several rewrites.
-- The documented promotion flow is shorter and less error-prone than today.
+- A successful `main` CI run makes the frontend for that commit live on the prod hostname without manual intervention.
+- Frontend-only changes no longer wait for a separate promotion step.
+
+**Status:** Implemented — `infra/gcp/url-maps/doughnut-app-service-map.template.yaml` + `renderDoughnutAppServiceUrlMap.mjs`; `apply-doughnut-app-service-url-map.sh` renders, runs `validate-url-map-static-vs-backend-hints.mjs --url-map`, then `gcloud compute url-maps import`. `deploy-backend-jar-to-gcp-mig.sh` invokes apply **before** the jar skip gate so frontend-only commits still activate. `pnpm validate:path-routing` validates the template (dummy SHA substitution). Tests: `renderDoughnutAppServiceUrlMap.test.mjs`, `apply-doughnut-app-service-url-map-wiring.test`, extended `deploy-backend-jar-to-gcp-mig.sh.test`.
 
 ---
 
 ## Phase 4 — Make local/prod routing share one committed source
 
-**Outcome:** Local fake LB behavior and prod URL-map behavior are derived from the same committed routing inputs, not only loosely checked against each other.
+**Outcome:** Local fake LB behavior, CI validation, and deploy-time prod URL-map generation are derived from the same committed routing inputs, not only loosely checked against each other.
 
 **User-visible value:** Dev, CI, and prod behave the same more often, so bugs are found before release.
 
@@ -122,13 +132,14 @@ Finish the incomplete "single source of truth" story so that:
 - Expand the current backend-path hints approach into a fuller routing source, or add a second committed source for static/public routing if that keeps things simpler.
 - Generate or derive:
   - proxy routing behavior,
-  - prod URL-map fragments or full YAML,
+  - deploy-time prod URL-map fragments or full YAML,
   - validation probes.
+- Move Phase 2 validation off the hand-maintained concrete prod URL-map file and onto the same generated URL-map output CI will apply in Phase 3.
 - Avoid a big generic framework. Keep the representation small and specific to the current routing needs.
 
 **Tests:**
 
-- Existing validator extended to prove generated/prod routing and proxy expectations match.
+- Existing validator extended to prove generated deploy-time routing and proxy expectations match.
 - Minimal tests around generation or derivation behavior.
 
 **Done when:**
@@ -196,7 +207,7 @@ Finish the incomplete "single source of truth" story so that:
 
 ## Phase 7 — Optional final cohesion pass
 
-**Outcome:** The release story is small enough to explain in a short runbook: package artifacts, promote frontend SHA, deploy backend when jar changes.
+**Outcome:** The release story is small enough to explain in a short runbook: package artifacts, green CI makes that frontend live, backend rolls only when the jar changes.
 
 **User-visible value:** Faster, safer operations and less tribal knowledge.
 
@@ -209,7 +220,7 @@ Finish the incomplete "single source of truth" story so that:
 **Tests / verification:**
 
 - Re-run the focused tests and validation commands touched by earlier phases.
-- Manual checklist in docs for frontend promotion and backend deploy.
+- Manual checklist in docs for automatic frontend activation, backend deploy, and rollback/recovery.
 
 **Done when:**
 
@@ -221,8 +232,8 @@ Finish the incomplete "single source of truth" story so that:
 
 1. Phase 1: protect existing deep-link behavior.
 2. Phase 2: close the prod-only static routing gap.
-3. Phase 3: make frontend promotion explicit and reliable.
-4. Phase 4: unify routing sources after the promotion flow is clearer.
+3. Phase 3: make successful CI automatically activate that commit's frontend.
+4. Phase 4: unify routing sources and move validation onto the generated deploy-time URL map.
 5. Phase 5: split the frontend bucket from deploy storage.
 6. Phase 6: remove stale compatibility behavior.
 7. Phase 7: final cleanup and doc compression.

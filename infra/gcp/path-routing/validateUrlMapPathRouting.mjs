@@ -7,6 +7,10 @@ import {
   mandatoryStaticBucketProbes,
 } from './urlMapStaticRouting.mjs'
 import { collectRequiredStaticPathsFromFrontend } from './requiredStaticPathsFromFrontend.mjs'
+import {
+  FRONTEND_GITHUB_SHA_PLACEHOLDER,
+  renderDoughnutAppServiceUrlMapTemplate,
+} from '../url-maps/renderDoughnutAppServiceUrlMap.mjs'
 
 function backendProbePaths(hints) {
   const out = new Set(hints.exactPaths)
@@ -95,6 +99,10 @@ export function validateUrlMapAgainstHintsAndStaticPaths({
   return { failures, backendChecks, staticChecks }
 }
 
+/** 40-char hex; only used to expand the committed URL map template in CI lint. */
+export const PATH_ROUTING_VALIDATION_DUMMY_SHA =
+  '0000000000000000000000000000000000000000'
+
 /**
  * @param {{
  *   repoRoot: string,
@@ -105,11 +113,21 @@ export function validateUrlMapAgainstHintsAndStaticPaths({
 export function runRepoPathRoutingValidation({ repoRoot, urlMapPath, hintsPath }) {
   const mapPath =
     urlMapPath ??
-    path.join(repoRoot, 'infra/gcp/url-maps/doughnut-app-service-map.yaml')
+    path.join(
+      repoRoot,
+      'infra/gcp/url-maps/doughnut-app-service-map.template.yaml'
+    )
   const hintsFile =
     hintsPath ??
     path.join(repoRoot, 'infra/gcp/path-routing/backend-path-hints.json')
-  const raw = readFileSync(mapPath, 'utf8')
+  let raw = readFileSync(mapPath, 'utf8')
+  if (raw.includes(FRONTEND_GITHUB_SHA_PLACEHOLDER)) {
+    raw = renderDoughnutAppServiceUrlMapTemplate(
+      raw,
+      process.env.PATH_ROUTING_VALIDATION_SHA ??
+        PATH_ROUTING_VALIDATION_DUMMY_SHA
+    )
+  }
   const hints = loadBackendPathHints(hintsFile)
   const requiredStaticPaths = collectRequiredStaticPathsFromFrontend(repoRoot)
   return validateUrlMapAgainstHintsAndStaticPaths({

@@ -1,5 +1,4 @@
 import assert from 'node:assert'
-import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
@@ -15,6 +14,7 @@ import {
 } from './urlMapStaticRouting.mjs'
 import {
   pathRulesFromUrlMapDoc,
+  runRepoPathRoutingValidation,
   validateUrlMapAgainstHintsAndStaticPaths,
 } from './validateUrlMapPathRouting.mjs'
 
@@ -142,20 +142,7 @@ test('fixture: backend path must not match static bucket rule', () => {
   )
 })
 
-test('committed doughnut-app-service-map passes validation', () => {
-  const yamlPath = path.join(
-    repoRoot,
-    'infra/gcp/url-maps/doughnut-app-service-map.yaml'
-  )
-  const raw = readFileSync(yamlPath, 'utf8')
-  const hints = loadBackendPathHints(
-    path.join(repoRoot, 'infra/gcp/path-routing/backend-path-hints.json')
-  )
-  const requiredStaticPaths = collectRequiredStaticPathsFromFrontend(repoRoot)
-  const { failures } = validateUrlMapAgainstHintsAndStaticPaths({
-    urlMapYamlText: raw,
-    hints,
-    requiredStaticPaths,
-  })
+test('committed doughnut-app-service-map template passes validation', () => {
+  const { failures } = runRepoPathRoutingValidation({ repoRoot })
   assert.equal(failures.length, 0, failures.join('\n'))
 })

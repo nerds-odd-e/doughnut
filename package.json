@@ -49,7 +49,7 @@
     "cy:format": "pnpm --frozen-lockfile --silent install && pnpm biome check --write .",
     "cy:lint": "pnpm --frozen-lockfile --silent install && pnpm biome check .",
     "validate:path-routing": "node scripts/validate-url-map-static-vs-backend-hints.mjs",
-    "test:path-routing": "node --test infra/gcp/path-routing/path-routing-validation.test.mjs",
+    "test:path-routing": "node --test infra/gcp/path-routing/path-routing-validation.test.mjs infra/gcp/url-maps/renderDoughnutAppServiceUrlMap.test.mjs",
     "cy:open": "cypress open --e2e",
     "cy:run": "cypress run --config-file e2e_test/config/ci.ts",
     "cy:focus": "cypress run --config-file e2e_test/config/local.ts",

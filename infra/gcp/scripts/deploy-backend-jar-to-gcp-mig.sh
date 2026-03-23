@@ -25,6 +25,10 @@ else
   exit 1
 fi
 
+REPO_ROOT="${REPO_ROOT:-$(cd "$SCRIPT_DIR/../../.." && pwd)}"
+export REPO_ROOT
+bash "$SCRIPT_DIR/apply-doughnut-app-service-url-map.sh"
+
 RECORD_URI="gs://${GCS_BUCKET}/deploy/last-successful-deploy.json"
 JAR_DEST="gs://${GCS_BUCKET}/backend_app_jar/${JAR_NAME}"
 

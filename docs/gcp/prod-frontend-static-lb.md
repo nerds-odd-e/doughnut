@@ -22,7 +22,7 @@ Do **not** treat `https://storage.googleapis.com/...` as the primary UI origin: 
 |----------|-------------|
 | GCS bucket (CI + LB) | `dough-01` |
 | Backend bucket (CDN on) | `doughnut-frontend-backend-bucket` → `dough-01` |
-| URL map (HTTPS) | `doughnut-app-service-map` — YAML in repo: [`infra/gcp/url-maps/doughnut-app-service-map.yaml`](../../infra/gcp/url-maps/doughnut-app-service-map.yaml) |
+| URL map (HTTPS) | `doughnut-app-service-map` — template in repo: [`infra/gcp/url-maps/doughnut-app-service-map.template.yaml`](../../infra/gcp/url-maps/doughnut-app-service-map.template.yaml); CI renders it with `GITHUB_SHA` and imports after each green `main` run |
 | HTTPS target proxy | `doughnut-app-service-map-target-proxy-2` → above URL map |
 | MIG backend service | `doughnut-app-service` (default path matcher + API traffic) |
 | GCS read for LB + CDN | `gs://dough-01` has `roles/storage.objectViewer` for `allUsers` so the backend bucket (and Cloud CDN cache fills) can read objects. The default Compute SA and `service-220715781008@compute-system.iam.gserviceaccount.com` are also granted `objectViewer`; with **Cloud CDN** enabled, Google’s docs require `service-<PROJECT_NUMBER>@cloud-cdn-fill.iam.gserviceaccount.com` (created after the first signed URL key on a backend bucket in the project) when the bucket is not publicly readable. |
@@ -35,13 +35,18 @@ Serving static through a **backend bucket** on the **same** multi-purpose bucket
 
 **Org constraint:** If your org forbids `allUsers` with IAM **conditions** (`PublicResourceAllowConditionCheck`), you cannot scope “public read only under `frontend/`” on a single bucket via conditional bindings; a dedicated bucket avoids that.
 
-**Promote a new frontend build:** confirm `gs://dough-01/frontend/<GITHUB_SHA>/` exists, update every `pathPrefixRewrite` in the YAML to that SHA (and add path rules for any **new root-level** static files next to `index.html`, same as `odd-e.ico` / `odd-e.png` today), then:
+**Normal release:** On green `main`, CI runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh) (render template + `pnpm validate:path-routing` equivalent + `gcloud compute url-maps import`) so the LB serves `frontend/<GITHUB_SHA>/` for that pipeline.
+
+**Recovery / manual import:** Render the template for a known commit (40-char SHA) whose tree exists under `gs://dough-01/frontend/<SHA>/`, validate, then import:
 
 ```bash
 gcloud config set project carbon-syntax-298809
-gcloud compute url-maps import doughnut-app-service-map \
-  --source=infra/gcp/url-maps/doughnut-app-service-map.yaml --global --quiet
+node infra/gcp/url-maps/renderDoughnutAppServiceUrlMap.mjs --sha <FULL_GITHUB_SHA> --write /tmp/url-map.yaml
+pnpm exec node scripts/validate-url-map-static-vs-backend-hints.mjs --url-map /tmp/url-map.yaml
+gcloud compute url-maps import doughnut-app-service-map --source=/tmp/url-map.yaml --global --quiet
 ```
+
+Add path rules in the **template** for any **new root-level** static files (same pattern as `odd-e.ico` / `odd-e.png`), merge to `main`, and let CI apply the updated map.
 
 HTTP forwarding (`doughnut-app-web-map-http`) is unchanged and does not use this map.
 
@@ -49,12 +54,11 @@ HTTP forwarding (`doughnut-app-web-map-http`) is unchanged and does not use this
 
 ## Choosing the **active** frontend revision
 
-CI writes **immutable** prefixes: `frontend/<GITHUB_SHA>/`. The load balancer must map browser paths into **one** of those prefixes.
+CI writes **immutable** prefixes: `frontend/<GITHUB_SHA>/`. The load balancer maps browser paths into **that** prefix for the commit that just passed the full pipeline.
 
-**Recommended:** URL map **path prefix rewrite** for routes that go to the backend bucket: rewrite incoming paths so the backend bucket sees `frontend/<ACTIVE_SHA>/…` (replace `<ACTIVE_SHA>` when you promote a build).
+**Automatic:** Each successful `main` deploy job renders [`doughnut-app-service-map.template.yaml`](../../infra/gcp/url-maps/doughnut-app-service-map.template.yaml) with the pipeline’s `GITHUB_SHA` and imports the URL map (even when the backend jar deploy is skipped).
 
-- **Promote:** Update the URL map (or the IaC that owns it) so the rewrite uses the new full commit SHA after you confirm the object prefix exists in GCS.
-- **Rollback:** Point the rewrite back to a previous `<GITHUB_SHA>` that still exists under `frontend/`.
+- **Rollback:** Render and import the template for a previous `<GITHUB_SHA>` that still exists under `frontend/` (see manual import above).
 
 **Alternatives (tradeoffs):**
 
