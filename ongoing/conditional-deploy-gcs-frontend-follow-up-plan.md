@@ -18,7 +18,7 @@ Finish the incomplete "single source of truth" story so that:
 - Keep **backend deploy skip** based on the backend jar hash.
 - Keep **frontend upload** unconditional for green packaging runs.
 - Make the normal release path **fully automatic**:
-  - CI uploads frontend static to `gs://.../frontend/${GITHUB_SHA}/`
+  - CI uploads frontend static to `gs://<GCS_FRONTEND_BUCKET>/frontend/${GITHUB_SHA}/` (deploy artifacts stay on `GCS_BUCKET`)
   - the green deploy flow updates the prod URL map to serve that same SHA
   - no separate human "promote frontend" step is needed for normal releases
 - Prefer a **committed routing source or template** that CI can render for `${GITHUB_SHA}` at deploy time, rather than a hand-maintained concrete prod URL map with repeated SHAs.
@@ -171,6 +171,8 @@ Finish the incomplete "single source of truth" story so that:
 **Done when:**
 
 - Public frontend hosting no longer depends on a mixed-purpose bucket.
+
+**Status:** Implemented — `GCS_FRONTEND_BUCKET` in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and [`.github/workflows/cli-release.yml`](.github/workflows/cli-release.yml) (e.g. `dough-frontend-01`); [`upload-frontend-static-to-gcs.sh`](infra/gcp/scripts/upload-frontend-static-to-gcs.sh) and [`upload-cli-binary-to-gcs.sh`](infra/gcp/scripts/upload-cli-binary-to-gcs.sh) use it with fallback to `GCS_BUCKET` for legacy runs. Runbook: [docs/gcp/prod-frontend-static-lb.md](docs/gcp/prod-frontend-static-lb.md) cutover checklist (create bucket, repoint `doughnut-frontend-backend-bucket`, IAM, then tighten `dough-01`). Script tests: [`upload-frontend-static-to-gcs.sh.test`](scripts/test/upload-frontend-static-to-gcs.sh.test), [`upload-cli-binary-to-gcs.sh.test`](scripts/test/upload-cli-binary-to-gcs.sh.test).
 
 ---
 

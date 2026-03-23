@@ -7,6 +7,7 @@ on:
 
 env:
   GCS_BUCKET: "dough-01"
+  GCS_FRONTEND_BUCKET: "dough-frontend-01"
   GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
 
 jobs:
@@ -30,4 +31,4 @@ jobs:
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
       - name: Upload CLI binary to GCS (public read)
-        run: gsutil cp -a public-read cli/dist/doughnut-cli.bundle.mjs gs://${{ env.GCS_BUCKET }}/doughnut-cli-latest/doughnut
+        run: gsutil cp -a public-read cli/dist/doughnut-cli.bundle.mjs gs://${{ env.GCS_FRONTEND_BUCKET }}/doughnut-cli-latest/doughnut

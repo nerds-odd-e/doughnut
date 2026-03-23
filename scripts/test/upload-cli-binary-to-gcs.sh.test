@@ -58,7 +58,7 @@ test_cp_invoked_with_dest() {
 	(
 		cd "$work"
 		PATH="$fake_bin:$PATH"
-		export GCS_BUCKET=my-bucket GSUTIL_LOG="$log"
+		export GCS_BUCKET=my-bucket GCS_FRONTEND_BUCKET= GSUTIL_LOG="$log"
 		bash "$UPLOAD_SCRIPT"
 	)
 	local content
@@ -67,9 +67,31 @@ test_cp_invoked_with_dest() {
 	assert_contains "$content" "gs://my-bucket/doughnut-cli-latest/doughnut" "GCS dest"
 }
 
+test_cp_prefers_gcs_frontend_bucket() {
+	local work fake_bin
+	work=$(mktemp -d)
+	trap "rm -rf '${work}'" EXIT
+	fake_bin="$work/bin"
+	write_fake_gsutil "$fake_bin"
+	log="$work/log"
+	touch "$log"
+	mkdir -p "$work/cli/dist"
+	echo '#!/usr/bin/env node' >"$work/cli/dist/doughnut-cli.bundle.mjs"
+	(
+		cd "$work"
+		PATH="$fake_bin:$PATH"
+		export GCS_BUCKET=legacy GCS_FRONTEND_BUCKET=fe GSUTIL_LOG="$log"
+		bash "$UPLOAD_SCRIPT"
+	)
+	local content
+	content=$(cat "$log")
+	assert_contains "$content" "gs://fe/doughnut-cli-latest/doughnut" "GCS dest"
+}
+
 main() {
 	test_fails_when_bundle_missing
 	test_cp_invoked_with_dest
+	test_cp_prefers_gcs_frontend_bucket
 	echo "upload-cli-binary-to-gcs.sh tests: OK"
 }
 

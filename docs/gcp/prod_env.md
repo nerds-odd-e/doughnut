@@ -87,9 +87,9 @@ Green `main` builds may **skip** GCS jar upload and MIG rollout when the jar has
 
 Each green `Package-artifacts` run on `main` uploads the SPA tree (Vite output under `frontend/dist/` after `pnpm bundle:all`) to:
 
-`gs://<GCS_BUCKET>/frontend/<GITHUB_SHA>/`
+`gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/`
 
-Upload script: `infra/gcp/scripts/upload-frontend-static-to-gcs.sh`.
+The CLI install binary goes to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/doughnut`. Deploy artifacts (fat jar, `deploy/last-successful-deploy.json`) use **`GCS_BUCKET`** only. Upload scripts: `infra/gcp/scripts/upload-frontend-static-to-gcs.sh`, `infra/gcp/scripts/upload-cli-binary-to-gcs.sh`.
 
 **Prod routing:** HTTPS load balancer sends static paths to a **backend bucket** (and optional Cloud CDN); API, OAuth, `/attachments`, `/logout`, `/install`, etc. stay on the MIG. How the **active** `GITHUB_SHA` is chosen, path order, SPA deep links, rollback, and smoke checks: [prod-frontend-static-lb.md](prod-frontend-static-lb.md).
 

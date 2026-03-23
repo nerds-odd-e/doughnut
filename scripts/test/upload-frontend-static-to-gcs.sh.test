@@ -31,7 +31,9 @@ run_upload() {
 	(
 		cd "$1"
 		PATH="$2:$PATH"
-		export GCS_BUCKET GITHUB_SHA GSUTIL_LOG="$3"
+		export GITHUB_SHA GSUTIL_LOG="$3"
+		export GCS_BUCKET="${GCS_BUCKET:-}"
+		export GCS_FRONTEND_BUCKET="${GCS_FRONTEND_BUCKET:-}"
 		export FRONTEND_STATIC_DIR="${FRONTEND_STATIC_DIR:-}"
 		bash "$UPLOAD_SCRIPT"
 	)
@@ -66,16 +68,33 @@ test_rsync_invoked_with_dest_prefix() {
 	touch "$log"
 	mkdir -p "$work/frontend/dist"
 	echo '<html/>' >"$work/frontend/dist/index.html"
-	run_upload "$work" "$fake_bin" "$log"
+	GITHUB_SHA=deadbeef GCS_BUCKET=bucket GCS_FRONTEND_BUCKET= run_upload "$work" "$fake_bin" "$log"
 	local content
 	content=$(cat "$log")
 	assert_contains "$content" "rsync" "gsutil args"
 	assert_contains "$content" "gs://bucket/frontend/deadbeef/" "GCS dest"
 }
 
+test_rsync_prefers_gcs_frontend_bucket() {
+	local work fake_bin
+	work=$(mktemp -d)
+	trap "rm -rf '${work}'" EXIT
+	fake_bin="$work/bin"
+	write_fake_gsutil "$fake_bin"
+	log="$work/log"
+	touch "$log"
+	mkdir -p "$work/frontend/dist"
+	echo '<html/>' >"$work/frontend/dist/index.html"
+	GITHUB_SHA=deadbeef GCS_BUCKET=legacy GCS_FRONTEND_BUCKET=frontend-only run_upload "$work" "$fake_bin" "$log"
+	local content
+	content=$(cat "$log")
+	assert_contains "$content" "gs://frontend-only/frontend/deadbeef/" "GCS dest"
+}
+
 main() {
 	test_fails_when_static_dir_missing
-	GITHUB_SHA=deadbeef GCS_BUCKET=bucket test_rsync_invoked_with_dest_prefix
+	test_rsync_invoked_with_dest_prefix
+	test_rsync_prefers_gcs_frontend_bucket
 	echo "upload-frontend-static-to-gcs.sh tests: OK"
 }
 
