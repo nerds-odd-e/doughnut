@@ -92,7 +92,7 @@ doughnut/
 
 - Frontend API client is auto-generated from OpenAPI spec
 - After changing backend controller signatures, run `pnpm generateTypeScript`
-- Frontend production build outputs to `frontend/dist/`; CLI bundle is `cli/dist/doughnut-cli.bundle.mjs` (`pnpm cli:bundle`). Prod serves `/doughnut-cli-latest/doughnut` from GCS; local E2E/dev serves that path from `e2e_test/e2e-prod-topology-proxy.mjs` reading `cli/dist` (not Spring on 9081).
+- Frontend production build outputs to `frontend/dist/`; CLI bundle is `cli/dist/doughnut-cli.bundle.mjs` (`pnpm cli:bundle`). Prod serves `/doughnut-cli-latest/doughnut` from GCS; local E2E/dev serves that path from `e2e_test/e2e-prod-topology-proxy.mjs` reading `cli/dist` (not Spring on 9081). The CLI bundle aliases optional Ink DevTools import `react-devtools-core` to a stub under `cli/src/shims/`; see **Build output** in `.cursor/rules/cli.mdc`.
 - Dev server proxies `/api/`, `/attachments/`, `/logout/`, `/testability/` to backend
 
 ## Code Conventions
