@@ -55,6 +55,14 @@ tasks.register('copyCliBundle', Copy) {
   into(layout.buildDirectory.dir('resources/main/static/doughnut-cli-latest'))
 }
 
+tasks.named('copyCliBundle') {
+  dependsOn('processResources')
+}
+
+tasks.named('resolveMainClassName') {
+  dependsOn('copyCliBundle')
+}
+
 tasks.named('bootRun') {
   dependsOn('copyCliBundle')
 }
