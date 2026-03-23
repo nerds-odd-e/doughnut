@@ -38,6 +38,7 @@ import {
   type InteractiveFetchWaitLine,
 } from './interactiveFetchWait.js'
 import { formatVersionOutput } from './version.js'
+import { parseRecallSessionYesNoSubmit } from './interactions/recallSessionConfirmInteraction.js'
 import {
   buildBoxLines,
   buildCurrentPromptSeparator,
@@ -237,13 +238,6 @@ function endRecallSession(): void {
   recallSessionMode = false
   sessionRecallCount = 0
   recallSessionDueDays = 0
-}
-
-function parseYesNo(input: string): boolean | null {
-  const a = input.trim().toLowerCase()
-  if (a === 'y' || a === 'yes') return true
-  if (a === 'n' || a === 'no') return false
-  return null
 }
 
 function parseCommandWithRequiredParam(
@@ -520,12 +514,12 @@ export async function processInput(
     return false
   }
   if (pendingRecallLoadMore) {
-    const answer = parseYesNo(trimmed)
-    if (answer === true) {
+    const parsed = parseRecallSessionYesNoSubmit(trimmed, 'empty-is-invalid')
+    if (parsed === 'yes') {
       pendingRecallLoadMore = false
       recallSessionDueDays = 3
       await continueRecallSession(true, output, writeCurrentPrompt)
-    } else if (answer === false) {
+    } else if (parsed === 'no') {
       pendingRecallLoadMore = false
       output.log(formatRecallSessionSummary(sessionRecallCount))
       endRecallSession()
@@ -583,15 +577,15 @@ export async function processInput(
         await continueRecallSession(false, output, writeCurrentPrompt)
     } else {
       const { memoryTrackerId } = pendingRecallAnswer
-      const answer = parseYesNo(trimmed)
-      if (answer === true) {
+      const parsed = parseRecallSessionYesNoSubmit(trimmed, 'empty-is-invalid')
+      if (parsed === 'yes') {
         try {
           await markAsRecalled(memoryTrackerId, true)
           output.log('Recalled successfully')
         } catch (err) {
           output.logError(err)
         }
-      } else if (answer === false) {
+      } else if (parsed === 'no') {
         try {
           await markAsRecalled(memoryTrackerId, false)
           output.log('Marked as not recalled')

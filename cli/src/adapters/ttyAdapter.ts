@@ -36,9 +36,9 @@ import {
   ttyArrowKeyUsesSlashSuggestionCycle,
 } from '../interactiveCommandInput.js'
 import {
-  dispatchRecallStopConfirmKey,
+  dispatchRecallSessionConfirmKey,
   recallStopConfirmViewModelForContext,
-} from '../interactions/recallStopConfirmInteraction.js'
+} from '../interactions/recallSessionConfirmInteraction.js'
 import {
   applyChatHistoryOutputTone,
   countPromptBlockLinesAboveInputBoxTop,
@@ -786,15 +786,18 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       return
     }
     if (isPendingRecallStopConfirmation()) {
-      const dispatch = dispatchRecallStopConfirmKey({
-        keyName: key.name,
-        str,
-        ctrl: !!key.ctrl,
-        meta: !!key.meta,
-        shift: !!key.shift,
-        lineDraft: commandInput.lineDraft,
-        submitPressed,
-      })
+      const dispatch = dispatchRecallSessionConfirmKey(
+        {
+          keyName: key.name,
+          str,
+          ctrl: !!key.ctrl,
+          meta: !!key.meta,
+          shift: !!key.shift,
+          lineDraft: commandInput.lineDraft,
+          submitPressed,
+        },
+        'treat-as-no'
+      )
       switch (dispatch.result) {
         case 'cancel':
           setPendingRecallStopConfirmation(false)
@@ -833,6 +836,80 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           break
       }
       return
+    }
+    const recallSessionYesNoPlaceholder =
+      getPlaceholderContext(!!tokenSelection) ===
+      RECALL_SESSION_YES_NO_PLACEHOLDER
+    if (recallSessionYesNoPlaceholder) {
+      const keysForConfirmDispatch =
+        submitPressed ||
+        key.name === 'backspace' ||
+        (str !== undefined && str !== '' && !key.ctrl && !key.meta)
+      const bareEnterOnRecallYesNo =
+        submitPressed && !key.shift && commandInput.lineDraft.trim() === ''
+      if (keysForConfirmDispatch && !bareEnterOnRecallYesNo) {
+        const dispatch = dispatchRecallSessionConfirmKey(
+          {
+            keyName: key.name,
+            str,
+            ctrl: !!key.ctrl,
+            meta: !!key.meta,
+            shift: !!key.shift,
+            lineDraft: commandInput.lineDraft,
+            submitPressed,
+          },
+          'treat-as-invalid'
+        )
+        switch (dispatch.result) {
+          case 'cancel':
+            break
+          case 'submit-yes':
+          case 'submit-no': {
+            const input = commandInput.lineDraft
+            clearLiveRegionForRepaint(livePaint)
+            commandInput = clearLiveCommandLine(commandInput)
+            livePaint.lastPaintedLineCount = 0
+            resetCommandTurnBuffer()
+            if (isCommittedInteractiveInput(input)) {
+              if (
+                getPlaceholderContext(!!tokenSelection) !==
+                RECALL_SESSION_YES_NO_PLACEHOLDER
+              ) {
+                chatHistory.push({
+                  type: 'input',
+                  content: maskInteractiveInputForHistory(input),
+                })
+                rememberCommittedLine(input)
+              }
+              const lineForProcess =
+                dispatch.result === 'submit-yes' ? 'y' : 'n'
+              if (await processInput(lineForProcess, ttyOutput, true)) {
+                commitExitTurnToScrollback()
+                doExit()
+                return
+              }
+              commitHistoryOutput(commandTurn.lines, commandTurn.tone)
+            }
+            break
+          }
+          case 'invalid-submit':
+            writeCurrentPromptLine(dispatch.hint)
+            drawBox()
+            break
+          case 'edit-backspace':
+            commandInput = deleteBeforeCaret(commandInput)
+            drawBox()
+            break
+          case 'edit-char':
+            commandInput = insertIntoDraft(commandInput, dispatch.char)
+            drawBox()
+            break
+          case 'redraw':
+            drawBox()
+            break
+        }
+        return
+      }
     }
     const pendingRecallAnswer = getPendingRecallAnswer()
     if (isMcqRecallPending(pendingRecallAnswer)) {

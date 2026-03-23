@@ -66,17 +66,22 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 **Delivered**
 
-- **`cli/src/interactions/recallStopConfirmInteraction.ts`** — stop-recall confirm only: **view model** `{ promptLines, placeholder, guidance }` (`recallStopConfirmViewModelForContext`), **key dispatch** `dispatchRecallStopConfirmKey` → `submit-yes` / `submit-no` / `cancel` / `invalid-submit` / draft edits / `redraw` (adapter maps these to scrollback + recall state; same intent as `onYes` / `onNo` / `onCancel` + invalid hint).
-- **`ttyAdapter`** paints from that view model and does not implement y/n parsing for this step.
-- Tests: `cli/tests/recallStopConfirmInteraction.test.ts`; verified with `pnpm cli:test` and `e2e_test/features/cli/cli_recall.feature`.
+- **`cli/src/interactions/recallSessionConfirmInteraction.ts`** (evolved from Phase A extract): **view model** for stop-recall only (`recallStopConfirmViewModelForContext`); shared **parse** + **dispatch** for all recall y/n (see Phase B).
+- **`ttyAdapter`** paints stop confirm from that view model (no ad-hoc y/n parsing there for stop confirm).
+- Tests: `cli/tests/recallSessionConfirmInteraction.test.ts`; `pnpm cli:test` + `e2e_test/features/cli/cli_recall.feature`.
 
 ---
 
-### Phase B — Unify recall y/n (load-more, just-review) through the same confirm interaction
+### Phase B — Unify recall y/n (load-more, just-review) through the same confirm interaction — **done**
 
 **Goal:** One confirm implementation, three business call sites; remove duplicate `parseYesNo` / pending flags where replaced by a **single stackable UI state** (conceptually: nested React state later). **Start from** generalizing or reusing the Phase A module (shared yes/no parse + dispatch + view model shape).
 
-- **Verify:** recall session E2E + Vitest.
+**Delivered**
+
+- **`parseRecallSessionYesNoSubmit`** with `empty-is-no` vs `empty-is-invalid`; **`dispatchRecallSessionConfirmKey`** with `treat-as-no` (stop confirm) vs `treat-as-invalid` (session y/n).
+- **`processInput`:** load-more + memory y/n use the shared parse (`parseYesNo` removed).
+- **`ttyAdapter`:** placeholder `recallYesNo` routes submit / edit keys through the same dispatch (`treat-as-invalid`); bare Enter still uses the legacy submit path (no `processInput`).
+- Business flags **`pendingRecallLoadMore`** and simple **`pendingRecallAnswer`** unchanged.
 
 ---
 
@@ -161,5 +166,5 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ## Notes
 
-- **Ordering:** Phases A–D deliver a safe **extract-and-thin-adapter** path even if Ink is deferred; E–I require the **decision gates** to be closed. **Next:** Phase B.
+- **Ordering:** Phases A–D deliver a safe **extract-and-thin-adapter** path even if Ink is deferred; E–I require the **decision gates** to be closed. **Next:** Phase C.
 - **Conflicts:** Any phase that would change PTY/E2E-visible behavior without product sign-off should stop at the nearest **decision gate** above.

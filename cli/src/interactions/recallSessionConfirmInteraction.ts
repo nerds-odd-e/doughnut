@@ -1,8 +1,9 @@
 import { PLACEHOLDER_BY_CONTEXT, type PlaceholderContext } from '../renderer.js'
 
 /**
- * Ink-shaped view model for the stop-recall y/n step: declarative strings the TTY paints via {@link ../renderer.ts}.
- * Business layer remains responsible for when this mode is active; this module only describes what to show and how keys map to intent.
+ * Ink-shaped view model for recall y/n steps: declarative strings the TTY paints via {@link ../renderer.ts}.
+ * Stop-recall confirm uses {@link recallStopConfirmViewModelForContext}; load-more / memory y/n use grey
+ * `writeCurrentPrompt` lines from the business layer instead of this guidance-only shape.
  */
 export type RecallStopConfirmViewModel = {
   promptLines: string[]
@@ -29,17 +30,23 @@ export function recallStopConfirmViewModelForContext(
   return recallStopConfirmViewModel(PLACEHOLDER_BY_CONTEXT[ctx])
 }
 
-export function parseRecallStopConfirmSubmit(
-  trimmedLine: string
+/** How an empty submitted line is interpreted for recall session y/n. */
+export type RecallSessionYesNoEmptyPolicy = 'empty-is-no' | 'empty-is-invalid'
+
+export function parseRecallSessionYesNoSubmit(
+  trimmedLine: string,
+  emptyPolicy: RecallSessionYesNoEmptyPolicy
 ): 'yes' | 'no' | 'invalid' {
-  if (trimmedLine === '') return 'no'
+  if (trimmedLine === '') {
+    return emptyPolicy === 'empty-is-no' ? 'no' : 'invalid'
+  }
   const a = trimmedLine.toLowerCase()
   if (a === 'y' || a === 'yes') return 'yes'
   if (a === 'n' || a === 'no') return 'no'
   return 'invalid'
 }
 
-export type RecallStopConfirmKeyEvent = {
+export type RecallSessionConfirmKeyEvent = {
   keyName: string | undefined
   str: string | undefined
   ctrl: boolean
@@ -49,7 +56,7 @@ export type RecallStopConfirmKeyEvent = {
   submitPressed: boolean
 }
 
-export type RecallStopConfirmDispatchResult =
+export type RecallSessionConfirmDispatchResult =
   | { result: 'cancel' }
   | { result: 'submit-yes' }
   | { result: 'submit-no' }
@@ -58,13 +65,21 @@ export type RecallStopConfirmDispatchResult =
   | { result: 'edit-char'; char: string }
   | { result: 'redraw' }
 
-/** Maps raw keypress to stop-recall confirm intent; draft edits are returned for the adapter to apply with shared command-line helpers. */
-export function dispatchRecallStopConfirmKey(
-  e: RecallStopConfirmKeyEvent
-): RecallStopConfirmDispatchResult {
+export type RecallSessionConfirmEmptySubmit = 'treat-as-no' | 'treat-as-invalid'
+
+/** Maps raw keypress to recall y/n intent; draft edits are returned for the adapter to apply with shared command-line helpers. */
+export function dispatchRecallSessionConfirmKey(
+  e: RecallSessionConfirmKeyEvent,
+  emptySubmit: RecallSessionConfirmEmptySubmit
+): RecallSessionConfirmDispatchResult {
+  const emptyPolicy: RecallSessionYesNoEmptyPolicy =
+    emptySubmit === 'treat-as-no' ? 'empty-is-no' : 'empty-is-invalid'
   if (e.keyName === 'escape') return { result: 'cancel' }
   if (e.submitPressed && !e.shift) {
-    const parsed = parseRecallStopConfirmSubmit(e.lineDraft.trim())
+    const parsed = parseRecallSessionYesNoSubmit(
+      e.lineDraft.trim(),
+      emptyPolicy
+    )
     if (parsed === 'yes') return { result: 'submit-yes' }
     if (parsed === 'no') return { result: 'submit-no' }
     return { result: 'invalid-submit', hint: 'Please answer y or n' }
