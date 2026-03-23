@@ -58,7 +58,7 @@ describe('TTY token list interactive mode', () => {
     const promptText = 'Select and enter to change the default access token'
     const width = process.stdout.columns ?? 80
     const wrappedPromptLines = wrapTextToLines(promptText, width)
-    const currentPromptLines = 1 + wrappedPromptLines.length
+    const currentPromptLines = 2 + wrappedPromptLines.length
     const contentLinesLength = 1
     const boxLinesLength = 3
     const suggestionLinesLength = 3
@@ -98,6 +98,7 @@ describe('TTY token list interactive mode', () => {
 
     const output = ttyOutput(writeSpy)
     if (expectPrompt) {
+      expect(output).toContain('Access tokens')
       expect(output).toContain('Select and enter to change the default')
       expect(output).toContain('↑↓ Enter to select; other keys cancel')
       expect(output).toContain('Alpha')
@@ -272,6 +273,7 @@ describe('TTY token list interactive mode', () => {
     await submitTTYCommand(stdin, '/remove-access-token')
 
     const midOutput = ttyOutput(writeSpy)
+    expect(midOutput).toContain('Remove access token')
     expect(midOutput).toContain('Alpha')
     expect(midOutput).toContain('Beta')
 

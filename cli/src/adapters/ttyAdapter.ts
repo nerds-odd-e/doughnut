@@ -38,6 +38,7 @@ import {
   applyChatHistoryOutputTone,
   countPromptBlockLinesAboveInputBoxTop,
   formatInteractiveFetchWaitPromptLine,
+  greyCurrentStageIndicatorLabel,
   interactiveInputReadyOscSuffix,
   isCommittedInteractiveInput,
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
@@ -61,7 +62,9 @@ export type TokenListAction = 'set-default' | 'remove' | 'remove-completely'
 
 export interface TokenListCommandConfig {
   action: TokenListAction
-  /** Shown in Current prompt (above input box) when list is non-empty. */
+  /** Plain text for the banded **Current Stage Indicator** while this list is active. */
+  stageIndicator: string
+  /** Optional wrapped lines under the band (below the banded separator). */
   currentPrompt?: string
 }
 
@@ -397,15 +400,16 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     })
     const pendingRecallAnswer = getPendingRecallAnswer()
     const waitLine = getInteractiveFetchWaitLine()
+    const tokenListConfig = tokenSelection
+      ? TOKEN_LIST_COMMANDS[tokenSelection.command]
+      : undefined
     let currentPromptWrappedLines: string[]
     let currentPromptSgr: string | undefined
     if (waitLine) {
       currentPromptWrappedLines = []
       currentPromptSgr = undefined
     } else {
-      const currentPromptText = tokenSelection
-        ? TOKEN_LIST_COMMANDS[tokenSelection.command]?.currentPrompt
-        : undefined
+      const currentPromptText = tokenListConfig?.currentPrompt
       if (
         !tokenSelection &&
         isMcqRecallPending(pendingRecallAnswer) &&
@@ -438,9 +442,11 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
               interactiveFetchWaitEllipsisTick
             )}${RESET}`,
           ]
-        : isInRecallSubstate()
-          ? [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
-          : []
+        : tokenListConfig != null
+          ? [greyCurrentStageIndicatorLabel(tokenListConfig.stageIndicator)]
+          : isInRecallSubstate()
+            ? [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
+            : []
     const currentPromptLines = countPromptBlockLinesAboveInputBoxTop(
       currentStageIndicatorLines,
       currentPromptWrappedLines

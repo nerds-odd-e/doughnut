@@ -58,6 +58,7 @@ Vocabulary for Cucumber steps and page objects (`e2e_test/start/pageObjects/cli/
 | **Input box** | Bordered live typing area. |
 | **Selection mode** | Pick from Current guidance with ↑↓ Enter; greyed box. |
 | **Interactive fetch wait** | Domain: a **Current Stage**. TTY: **Current Stage Indicator** on the **Current stage band** (bright blue label + animated ellipsis) + banded separator, grey disabled input box — see `interactiveFetchWait.ts`, `ttyAdapter.ts`, Vitest (`interactiveFetchWait`, `interactiveTtyFetchWaitEsc`, etc.). |
+| **Access token list / pick (TTY)** | **Current Stage**; banded indicator text from `TokenListCommandConfig.stageIndicator` (`interactive.ts` → `TOKEN_LIST_COMMANDS`); `greyCurrentStageIndicatorLabel` in `renderer.ts`. `/list-access-token` keeps the long instruction as wrapped **Current prompt** lines under the band. |
 
 **`/add-access-token`:** Never persist or show raw tokens in history; `inputHistoryMask.ts`.
 

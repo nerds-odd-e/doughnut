@@ -14,8 +14,10 @@ import {
   buildLiveRegionLines,
   CURRENT_STAGE_BAND_BACKGROUND_SGR,
   DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
+  greyCurrentStageIndicatorLabel,
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
   visibleLength,
+  wrapTextToLines,
   wrapTextToVisibleWidthLines,
   terminalColumnsOfPlainGrapheme,
   formatInteractiveFetchWaitPromptLine,
@@ -245,6 +247,29 @@ describe('buildLiveRegionLines', () => {
     expect(visibleLength(stripAnsi(lines[0]))).toBe(width)
     expect(lines[1]).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
     expect(stripAnsi(lines[1])).toBe('─'.repeat(width))
+  })
+
+  test('access token list: grey stage indicator, banded separator, wrapped instruction, then box', () => {
+    const width = 48
+    const instruction = 'Select and enter to change the default access token'
+    const lines = buildLiveRegionLines(
+      '',
+      width,
+      wrapTextToLines(instruction, width),
+      [],
+      [greyCurrentStageIndicatorLabel('Access tokens')],
+      { placeholderContext: 'tokenList' }
+    )
+    const boxTopIndex = lines.findIndex((l) => stripAnsi(l).startsWith('┌'))
+    expect(stripAnsi(lines[0])).toMatch(/^Access tokens +$/)
+    expect(stripAnsi(lines[1])).toBe('─'.repeat(width))
+    expect(boxTopIndex).toBeGreaterThan(2)
+    expect(
+      lines
+        .slice(0, boxTopIndex)
+        .map((l) => stripAnsi(l))
+        .join('\n')
+    ).toContain('Select and enter')
   })
 })
 

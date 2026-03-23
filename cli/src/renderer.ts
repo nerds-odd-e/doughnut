@@ -149,8 +149,18 @@ export const CLEAR_SCREEN = '\x1b[H\x1b[2J'
 
 /** Shown in Current guidance when user has not typed a slash command prefix. */
 export const COMMANDS_HINT = `${GREY}  / commands${RESET}`
+
+/**
+ * Grey foreground SGR for one **Current Stage Indicator** label; full-width band padding is applied in
+ * {@link buildLiveRegionLines}.
+ */
+export function greyCurrentStageIndicatorLabel(plainText: string): string {
+  return `${GREY}${plainText}${RESET}`
+}
+
 /** Default **Current Stage Indicator** line while recall payload is loading (label: “Recalling”). */
-export const DEFAULT_RECALL_LOADING_STAGE_INDICATOR = `${GREY}Recalling${RESET}`
+export const DEFAULT_RECALL_LOADING_STAGE_INDICATOR =
+  greyCurrentStageIndicatorLabel('Recalling')
 
 // biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI escapes
 const ANSI_PATTERN = /\x1b\[[0-9;]*m/g

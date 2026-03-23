@@ -58,8 +58,13 @@ So: no separate “plan phase.” When implementation starts, **fold the domain 
 1. **Recall loading + MCQ TTY layout** — **Done.** Current Stage Indicator above the box with full-width **Current stage band** + banded separator; `countPromptBlockLinesAboveInputBoxTop` keeps TTY cursor math aligned with `buildLiveRegionLines`; `CURRENT_STAGE_BAND_BACKGROUND_SGR` / `buildCurrentPromptSeparatorForStageBand` in `renderer.ts`; Vitest in `renderer.test.ts`, MCQ TTY test uses banded separator; `.cursor/rules/cli.mdc` glossary updated.
 2. **Vocabulary pass** — **Done.** `currentStageIndicatorLines`, `DEFAULT_RECALL_LOADING_STAGE_INDICATOR`; `OutputAdapter.writeCurrentPrompt` JSDoc in `types.ts`; TTY adapter comments. No CLI E2E strings referenced the old symbol names.
 3. **Interactive fetch wait + Current Stage Indicator** — **Done.** Fetch-wait copy and ellipsis live on the **Current Stage Indicator** (full-width **Current stage band** + banded separator); blue `INTERACTIVE_FETCH_WAIT_PROMPT_FG` on the band; `needsGapBeforeBox` accounts for indicator-only prompt blocks; Vitest in `renderer.test.ts`, `interactiveFetchWait.test.ts`.
+4. **Access token list / pick + Current Stage Indicator** — **Done.** Per-command `stageIndicator` on `TokenListCommandConfig`; band + banded separator for `/list-access-token` (short band + existing wrapped instruction), `/remove-access-token`, `/remove-access-token-completely`; `greyCurrentStageIndicatorLabel` shared with recall default indicator; Vitest `renderer.test.ts`, `interactiveTtyTokenList.test.ts`.
 
 **Deploy gate** between phases if the team requires CD before the next slice (see `.cursor/rules/planning.mdc`).
+
+## Candidates for future phases (not scheduled)
+
+_None._ **Access token list / pick** shipped: `TokenListCommandConfig.stageIndicator` + `greyCurrentStageIndicatorLabel` in `renderer.ts`; `getDisplayContent` in `ttyAdapter.ts`; labels defined only in `TOKEN_LIST_COMMANDS` (`interactive.ts`).
 
 ## Resolved decisions
 
