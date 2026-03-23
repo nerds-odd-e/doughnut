@@ -136,8 +136,7 @@ class ClozeDescriptionTest {
 
   @Test
   void clozeShouldFullyMaskJapaneseTitleFollowedByParticle() {
-    String details =
-        "如何，怎样。（どんなふう。） どのようなぐあいですか。／情况如何？ どのように致しましょうか。／应该怎样做？";
+    String details = "如何，怎样。（どんなふう。） どのようなぐあいですか。／情况如何？ どのように致しましょうか。／应该怎样做？";
     String result =
         new ClozedString(clozeReplacement, details)
             .hide(new NoteTitle("どのよう"))
