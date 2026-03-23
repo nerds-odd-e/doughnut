@@ -123,6 +123,7 @@ jobs:
       - uses: ./.github/gcloud_auth_n_sdk
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
+          skip_install: ${{ runner.os == 'Linux' && vars.GCP_FORCE_GCLOUD_INSTALL != 'true' }}
       - name: Upload frontend static to GCS
         env:
           GITHUB_SHA: ${{ github.sha }}
@@ -219,6 +220,8 @@ jobs:
       ]
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ vars.NODE_VERSION }}
@@ -230,6 +233,7 @@ jobs:
       - uses: ./.github/gcloud_auth_n_sdk
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
+          skip_install: ${{ runner.os == 'Linux' && vars.GCP_FORCE_GCLOUD_INSTALL != 'true' }}
       - name: Download production application jar artifact
         uses: actions/download-artifact@v7
         with:

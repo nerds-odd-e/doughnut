@@ -16,6 +16,7 @@ jobs:
       - uses: ./.github/gcloud_auth_n_sdk
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
+          skip_install: ${{ runner.os == 'Linux' && vars.GCP_FORCE_GCLOUD_INSTALL != 'true' }}
       - name: Check doughnut MIG Status
         run: |
           PROJECT_ID=$(gcloud config get-value project)

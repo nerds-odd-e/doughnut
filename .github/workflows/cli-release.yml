@@ -30,5 +30,6 @@ jobs:
       - uses: ./.github/gcloud_auth_n_sdk
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
+          skip_install: ${{ runner.os == 'Linux' && vars.GCP_FORCE_GCLOUD_INSTALL != 'true' }}
       - name: Upload CLI binary to GCS (public read)
         run: gsutil cp -a public-read cli/dist/doughnut-cli.bundle.mjs gs://${{ env.GCS_FRONTEND_BUCKET }}/doughnut-cli-latest/doughnut

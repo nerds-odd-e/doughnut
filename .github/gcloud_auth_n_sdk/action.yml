@@ -4,6 +4,10 @@ inputs:
   credentials_json:
     description: "GCloud Credentials JSON"
     required: true
+  skip_install:
+    description: "Use gcloud on PATH instead of downloading SDK (GitHub Linux runners ship Google Cloud CLI). macOS runners need skip_install false. Self-hosted Linux without gcloud: set repo variable GCP_FORCE_GCLOUD_INSTALL=true (see ci.yml expression)."
+    required: false
+    default: "false"
 runs:
   using: "composite"
   steps:
@@ -13,3 +17,5 @@ runs:
         credentials_json: ${{ inputs.credentials_json }}
     - name: Set up GCP SDK
       uses: google-github-actions/setup-gcloud@v3
+      with:
+        skip_install: ${{ inputs.skip_install == 'true' }}
