@@ -810,8 +810,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       if (key.name === 'escape') {
         setPendingRecallStopConfirmation(true)
         commandInput = clearLiveCommandLine(commandInput)
-        doBeginCurrentPrompt()
-        writeCurrentPromptLine('Stop recall? (y/n)')
         drawBox()
       } else if (key.name === 'up' || key.name === 'down') {
         const delta = key.name === 'up' ? -1 : 1
