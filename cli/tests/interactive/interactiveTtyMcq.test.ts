@@ -1,5 +1,6 @@
 /// <reference types="node" />
 import { describe, test, expect, type vi, beforeEach, afterEach } from 'vitest'
+import makeMe from 'doughnut-test-fixtures/makeMe'
 import {
   mockAnswerQuiz,
   mockRecallNext,
@@ -8,6 +9,7 @@ import {
   isInRecallSubstate,
   resetRecallStateForTesting,
 } from '../../src/interactive.js'
+import { formatRecallNotebookCurrentPromptLine } from '../../src/recall.js'
 import {
   buildCurrentPromptSeparatorForStageBand,
   getTerminalWidth,
@@ -27,7 +29,13 @@ import {
   type TTYStdin,
 } from './interactiveTestHelpers.js'
 import { recallNextQuestion } from '../recallNextTestShapes.js'
-import { mcqRecallPrompt } from '../recallPromptFixtures.js'
+import {
+  mcqRecallPrompt,
+  mcqRecallPromptWithNotebook,
+} from '../recallPromptFixtures.js'
+
+/** Distinct title so Esc → stop-confirm repaint cannot match unrelated output. */
+const MCQ_NOTEBOOK_TITLE = 'McqEscStopConfirmNb_k9Qz'
 
 const GREY_SGR = '\x1b[90m'
 const SGR_RESET_LINE = '\x1b[0m\n'
@@ -54,8 +62,17 @@ describe('TTY recall MCQ', () => {
 
   beforeEach(async () => {
     resetRecallStateForTesting()
+    const nb = makeMe.aNotebook
+    nb.notebuilder.title(MCQ_NOTEBOOK_TITLE)
     mockRecallNext.mockResolvedValue(
-      recallNextQuestion(mcqRecallPrompt(100, 'What is 2+2?', ['4', '3', '5']))
+      recallNextQuestion(
+        mcqRecallPromptWithNotebook(
+          100,
+          'What is 2+2?',
+          ['4', '3', '5'],
+          nb.please()
+        )
+      )
     )
     mockAnswerQuiz.mockResolvedValue({ correct: true })
     ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
@@ -116,8 +133,20 @@ describe('TTY recall MCQ', () => {
       pressKey(stdin, 'escape')
       await tick()
 
-      expect(ttyOutput(writeSpy)).toContain('Stop recall? (y/n)')
-      expect(ttyOutput(writeSpy)).toContain('y or n; Esc to go back')
+      const escRepaint = stripAnsi(ttyOutput(writeSpy))
+      expect(
+        (escRepaint.match(/Stop recall\? \(y\/n\)/g) ?? []).length,
+        'The stop-recall question must be emitted once for this Esc repaint. Two copies usually mean writeCurrentPrompt wrote the line and drawBox painted it again in Current guidance — bypassing the live-region erase and duplicating the stage band area.'
+      ).toBe(1)
+      expect(
+        escRepaint,
+        'While confirming stop recall, the MCQ notebook line must not stay on screen; it belongs to the hidden question. If this fails, Current prompt still includes the notebook under the stage band.'
+      ).not.toContain(formatRecallNotebookCurrentPromptLine(MCQ_NOTEBOOK_TITLE))
+      expect(
+        (escRepaint.match(/Recalling/g) ?? []).length,
+        'Bytes written for this repaint should contain the "Recalling" label only once. Duplicate counts usually mean beginCurrentPrompt/writeCurrentPrompt wrote outside drawBox before the live region repaint, duplicating the stage band and separator.'
+      ).toBe(1)
+      expect(escRepaint).toContain('y or n; Esc to go back')
 
       typeString(stdin, 'y')
       await tick()
