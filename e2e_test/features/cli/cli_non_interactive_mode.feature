@@ -1,4 +1,3 @@
-@bundleCli
 Feature: CLI non-interactive mode
   As a user, I want the CLI to behave predictably when run with piped input, -c, or subcommands.
 
