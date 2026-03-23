@@ -754,6 +754,15 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     }
   }
 
+  /** Before fetch-wait chrome paints and emits input-ready OSC, persist buffered `log` lines so PTY captures are not ahead of scrollback. */
+  function flushCommandTurnToScrollbackBeforeFetchWait(): void {
+    if (commandTurn.lines.length === 0) return
+    commitHistoryOutput(commandTurn.lines, commandTurn.tone, {
+      skipDrawBox: true,
+    })
+    resetCommandTurnBuffer()
+  }
+
   function commitExitTurnToScrollback(): void {
     chatHistory.push({
       type: 'output',
@@ -819,6 +828,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       stopInteractiveFetchWaitRepaintTimer()
       const activeWaitPrompt = getInteractiveFetchWaitLine()
       if (activeWaitPrompt) {
+        flushCommandTurnToScrollbackBeforeFetchWait()
         drawBox()
         interactiveFetchWaitRepaintTimer = setInterval(() => {
           interactiveFetchWaitEllipsisTick =
@@ -843,6 +853,22 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     process.stdout.write(SHOW_CURSOR)
     rl.close()
     process.exit(0)
+  }
+
+  function finishProcessInputTurnAfterAwait(): void {
+    const newSessionYesNo = usesSessionYesNoInputChrome(false)
+    if (commandTurn.lines.length > 0) {
+      commitHistoryOutput(commandTurn.lines, commandTurn.tone, {
+        skipDrawBox: newSessionYesNo,
+      })
+    } else if (!newSessionYesNo) {
+      drawBox()
+    }
+    if (newSessionYesNo) {
+      sessionYesNoDraft = ''
+      sessionYesNoHint = ''
+      renderInkSessionYesNo()
+    }
   }
 
   stdin.on('keypress', async (str: string | undefined, key: ReadlineKey) => {
@@ -978,16 +1004,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
                 doExit()
                 return
               }
-              // Commit history then check if we need Ink again (another y/n)
-              const newSessionYesNo = usesSessionYesNoInputChrome(false)
-              commitHistoryOutput(commandTurn.lines, commandTurn.tone, {
-                skipDrawBox: newSessionYesNo,
-              })
-              if (newSessionYesNo) {
-                sessionYesNoDraft = ''
-                sessionYesNoHint = ''
-                renderInkSessionYesNo()
-              }
+              finishProcessInputTurnAfterAwait()
             }
             break
           }
@@ -1068,16 +1085,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
             doExit()
             return
           }
-          // After MCQ submit, check for session y/n (Ink) or normal (ANSI drawBox)
-          const newSessionYesNo = usesSessionYesNoInputChrome(false)
-          commitHistoryOutput(commandTurn.lines, commandTurn.tone, {
-            skipDrawBox: newSessionYesNo,
-          })
-          if (newSessionYesNo) {
-            sessionYesNoDraft = ''
-            sessionYesNoHint = ''
-            renderInkSessionYesNo()
-          }
+          finishProcessInputTurnAfterAwait()
           break
         }
         case 'edit-backspace':
@@ -1245,16 +1253,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
             doExit()
             return
           }
-          // Start Ink for session y/n; MCQ and normal stay ANSI
-          const newSessionYesNo = usesSessionYesNoInputChrome(false)
-          commitHistoryOutput(commandTurn.lines, commandTurn.tone, {
-            skipDrawBox: newSessionYesNo,
-          })
-          if (newSessionYesNo) {
-            sessionYesNoDraft = ''
-            sessionYesNoHint = ''
-            renderInkSessionYesNo()
-          }
+          finishProcessInputTurnAfterAwait()
           return
         }
         if (isNumberedChoiceListActive()) {
