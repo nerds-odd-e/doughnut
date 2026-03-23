@@ -9,9 +9,6 @@ import { cliEnv } from './cliEnv'
 
 export const CLI_BUNDLE_RELATIVE_PATH = 'cli/dist/doughnut-cli.bundle.mjs'
 
-/** Default `CLI_VERSION` for E2E rebuilds (same as cli bundle script fallback); assertions assume this unless overridden. */
-const CLI_BUNDLE_DEFAULT_VERSION = '0.1.0'
-
 /** Max wall time for one non-interactive `spawnCliFromRepo` run before SIGKILL. */
 export const CLI_NON_INTERACTIVE_SPAWN_TIMEOUT_MS = 25_000
 
@@ -39,13 +36,7 @@ export function runShellCommandSync(
 }
 
 export function bundleCli(repoRoot: string, env?: NodeJS.ProcessEnv) {
-  runShellCommandSync('pnpm -C cli bundle', {
-    cwd: repoRoot,
-    env: env ?? {
-      ...process.env,
-      CLI_VERSION: CLI_BUNDLE_DEFAULT_VERSION,
-    },
-  })
+  runShellCommandSync('pnpm -C cli bundle', { cwd: repoRoot, env })
   const bundle = join(repoRoot, CLI_BUNDLE_RELATIVE_PATH)
   if (!existsSync(bundle)) {
     throw new Error(`Missing CLI bundle at ${bundle} after pnpm -C cli bundle`)
