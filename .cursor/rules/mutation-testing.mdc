@@ -1,0 +1,69 @@
+---
+description: Stryker + Vitest mutation testing; survived-mutant discipline (observable entry points, no shallow internals); setup pitfalls; extend to other packages later
+globs: cli/**,**/stryker.conf.mjs,**/vitest.stryker.config.ts
+alwaysApply: false
+---
+
+# Mutation testing (Stryker + Vitest)
+
+**Current scope:** `cli/` only. **Later:** Reuse the same layout in other JS/TS packages (e.g. `frontend/`, `mcp-server/`) — copy/adapt paths and `pnpm` script names.
+
+## When to use
+
+- Checking whether **unit tests actually exercise** a module’s logic (especially after an extract/refactor).
+- Comparing **integration-only** coverage (TTY, E2E) vs **mutation kill rate** on a **pure** or **narrow** module.
+
+## When mutants survive — how to react
+
+**Do not** “fix” a survived mutant by adding **shallow** tests that **reach into inner structure**, call **non–entry-point** helpers, or assert on **internal state** (private fields, implementation-only types, test-only hooks) just to flip Stryker green. Those tests **refactor badly** and **miss real wiring bugs** (see **Observable behavior first** in `.cursor/rules/planning.mdc`).
+
+**Do** add or extend coverage from a **higher-level, domain-stable entry point**, and assert only what an **integrator or user can observe**: HTTP response / body, **CLI stdout** from `runInteractive` or the real CLI surface, DOM from a **mounted** page, **public** module API with **black-box** inputs and outputs (no peering inside).
+
+**Pure helpers** (e.g. `dispatchX(…) → result object`, formatting with no hidden globals) may keep **direct-import** tests **only** when that API **is** the intentional stable contract — still **black-box**: arguments in, return value out, no internal spies.
+
+If a **good** observable test at a stable boundary is **hard to compose**, **stop** and **ask the developer** whether the mutated code **deserves to exist**: does it carry **clear business value**, or is it accidental complexity that should be **removed or simplified** instead of encrusted with narrow tests?
+
+## Commands
+
+Use the repo Nix wrapper (see `.cursor/rules/general.mdc`). Example for CLI:
+
+```bash
+CURSOR_DEV=true nix develop -c bash -c 'cd cli && pnpm test:mutation'
+```
+
+## Package setup (per subproject)
+
+| Piece | Role |
+|-------|------|
+| `devDependencies` | `@stryker-mutator/core`, `@stryker-mutator/vitest-runner` |
+| `stryker.conf.mjs` | Must set `plugins: ['@stryker-mutator/vitest-runner']` or the Vitest runner is not loaded in workers. |
+| `package.json` script | e.g. `"test:mutation": "stryker run"` |
+| `vitest.stryker.config.ts` | **Dedicated** Vitest config for mutation runs (see below). |
+| `.gitignore` (package dir) | Stryker temp/output (see **Ignore**). |
+
+## Lessons from CLI (`selectListInteraction`)
+
+1. **`vitest.related` (Stryker default via plugin)** — Vitest may only run tests it considers “related” to mutated files. If production code reaches the module **indirectly** (e.g. TTY → `ttyAdapter` → interaction), related resolution can **skip** the tests that actually execute it → **0 mutants killed** while behavior is still covered elsewhere. **Fix:** set `vitest: { related: false }` in `stryker.conf.mjs` **or** add **direct-import** tests that import the mutated source (NodeNext: `../src/.../module.js`).
+
+2. **`mergeConfig` + `test.include`** — Merging a “full suite” Vitest config with `{ include: ['tests/foo.test.ts'] }` can **union** includes so Stryker still runs **many** tests per mutant. **Fix:** standalone `vitest.stryker.config.ts` that **only** includes the tests that import the mutated file(s) (and duplicates `resolve` / `setupFiles` as needed).
+
+3. **`coverageAnalysis: 'perTest'`** — Can show **no effective coverage** on some ESM / boundary setups; **`coverageAnalysis: 'off'`** with a **small** dedicated test set is acceptable for targeted runs.
+
+4. **Pure interaction helpers** — Where the **stable contract** is the extracted function (inputs → dispatch / string result), black-box unit tests are appropriate — same idea as `cli/tests/recallSessionConfirmInteraction.test.ts`. **End-to-end product behavior** still belongs in **TTY / E2E** tests at the right level; see **When mutants survive** above when choosing depth.
+
+## Ignore (per package that runs Stryker)
+
+In that package’s `.gitignore`:
+
+```
+.stryker-tmp/
+reports/mutation/
+stryker-setup-*.js
+```
+
+## Extending to another subproject
+
+1. Add the same devDependencies and `stryker.conf.mjs` (adjust `mutate`, `vitest.configFile` → package-local `vitest.stryker.config.ts`).
+2. Point `vitest.stryker.config.ts` at **only** tests that import mutated sources.
+3. Add the ignore block to that package’s `.gitignore`.
+4. Wire a root or package script (e.g. `pnpm -C frontend test:mutation`) with the Nix prefix when not on Cloud VM.

@@ -24,6 +24,7 @@ cli/
 |------|---------|
 | Build bundle | `pnpm cli:bundle` |
 | Run tests | `pnpm cli:test` |
+| Mutation test (Stryker) | `CURSOR_DEV=true nix develop -c bash -c 'cd cli && pnpm test:mutation'` — see `.cursor/rules/mutation-testing.mdc` |
 | Format | `pnpm cli:format` |
 | Lint | `pnpm cli:lint` |
 
