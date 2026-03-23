@@ -2,6 +2,7 @@ package com.odde.doughnut.algorithms;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -131,6 +132,21 @@ class ClozeDescriptionTest {
             .hide(new NoteTitle("bona fide"))
             .maskedDetailsAsMarkdown();
     assertThat(result, containsString("[...]"));
+  }
+
+  @Test
+  void clozeShouldFullyMaskJapaneseTitleFollowedByParticle() {
+    String details =
+        "如何，怎样。（どんなふう。） どのようなぐあいですか。／情况如何？ どのように致しましょうか。／应该怎样做？";
+    String result =
+        new ClozedString(clozeReplacement, details)
+            .hide(new NoteTitle("どのよう"))
+            .maskedDetailsAsMarkdown();
+    assertThat(result, containsString("[...]"));
+    assertThat(result, containsString("[...]なぐあいですか"));
+    assertThat(result, containsString("[...]に致しましょうか"));
+    assertThat(result, not(containsString("うなぐあい")));
+    assertThat(result, not(containsString("うに致し")));
   }
 
   @Test

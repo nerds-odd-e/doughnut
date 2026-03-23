@@ -34,9 +34,16 @@ public class ClozePatternCreator {
       if (i > 0) sb.append(between);
       String word = words[i];
       sb.append(Pattern.quote(word));
-      if (i == words.length - 1) sb.append("(?:s|ed|ing)?(?:[_*])?(?!\\w)");
+      if (i == words.length - 1) {
+        sb.append("(?:s|ed|ing)?(?:[_*])?");
+        if (!isCjkOnly(word)) sb.append("(?!\\w)");
+      }
     }
     return sb.toString();
+  }
+
+  private static boolean isCjkOnly(String s) {
+    return !s.isEmpty() && s.matches("[\\p{IsHan}\\p{IsKatakana}\\p{IsHiragana}]+");
   }
 
   private String suffixIfNeeded(String pattern) {
