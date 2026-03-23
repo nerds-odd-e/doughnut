@@ -1,5 +1,5 @@
 ---
-description: Stryker + Vitest mutation testing; survived-mutant discipline (observable entry points, no shallow internals); setup pitfalls; extend to other packages later
+description: Stryker + Vitest mutation testing; survived mutants may be dead code — do not auto-add tests; prefer observable entry points; setup pitfalls; extend to other packages later
 globs: cli/**,**/stryker.conf.mjs,**/vitest.stryker.config.ts
 alwaysApply: false
 ---
@@ -14,6 +14,8 @@ alwaysApply: false
 - Comparing **integration-only** coverage (TTY, E2E) vs **mutation kill rate** on a **pure** or **narrow** module.
 
 ## When mutants survive — how to react
+
+A **survived** mutant often means **no test executes that branch** — it can also mean the code is **dead or unreachable** (leftover refactor, duplicate path, never-called helper). **Do not automatically add tests** for every survivor; **first** consider **deleting** the dead path, **merging** redundant logic, or **proving** it is still required from product/domain behavior.
 
 **Do not** “fix” a survived mutant by adding **shallow** tests that **reach into inner structure**, call **non–entry-point** helpers, or assert on **internal state** (private fields, implementation-only types, test-only hooks) just to flip Stryker green. Those tests **refactor badly** and **miss real wiring bugs** (see **Observable behavior first** in `.cursor/rules/planning.mdc`).
 
