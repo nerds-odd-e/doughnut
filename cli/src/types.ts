@@ -58,6 +58,22 @@ export type ChatHistoryEntry = ChatHistoryInputEntry | ChatHistoryOutputEntry
 /** Ordered log of user inputs and command outputs for re-render on resize. */
 export type ChatHistory = ChatHistoryEntry[]
 
+/** Slash-command token-picker modes for `/list-access-token` and related TTY flows. */
+export type AccessTokenPickerAction =
+  | 'set-default'
+  | 'remove'
+  | 'remove-completely'
+
+/**
+ * One access-token picker command: **Current Stage Indicator** label, optional wrapped **Current prompt**
+ * under the band (`interactive.ts` → `TOKEN_LIST_COMMANDS`).
+ */
+export interface AccessTokenPickerCommandConfig {
+  action: AccessTokenPickerAction
+  stageIndicator: string
+  currentPrompt?: string
+}
+
 export type OutputAdapter = {
   log: (msg: string) => void
   logError: (err: unknown) => void

@@ -1,5 +1,5 @@
 import { runPiped } from './adapters/pipedAdapter.js'
-import { runTTY, type TokenListCommandConfig } from './adapters/ttyAdapter.js'
+import { runTTY } from './adapters/ttyAdapter.js'
 import {
   addAccessToken,
   createAccessToken,
@@ -64,6 +64,7 @@ import {
   type PlaceholderContext,
 } from './renderer.js'
 import type {
+  AccessTokenPickerCommandConfig,
   McqRecallPending,
   OutputAdapter,
   PendingRecallAnswer,
@@ -390,7 +391,7 @@ async function continueRecallSession(
   }
 }
 
-const TOKEN_LIST_COMMANDS: Record<string, TokenListCommandConfig> = {
+const TOKEN_LIST_COMMANDS: Record<string, AccessTokenPickerCommandConfig> = {
   '/list-access-token': {
     action: 'set-default',
     stageIndicator: 'Access tokens',

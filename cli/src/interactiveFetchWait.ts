@@ -4,8 +4,8 @@ import type { OutputAdapter } from './types.js'
 export const INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS = 400
 
 /**
- * User-visible first line of the Current prompt while the TTY awaits a slow
- * network/backend call. Ellipsis animation is applied by the adapter.
+ * Plain-text base for the **Current Stage Indicator** while the TTY awaits a slow
+ * network/backend call. Ellipsis animation uses `formatInteractiveFetchWaitPromptLine` in `renderer.ts`.
  */
 export const INTERACTIVE_FETCH_WAIT_LINES = {
   recallNext: 'Loading recall questions',

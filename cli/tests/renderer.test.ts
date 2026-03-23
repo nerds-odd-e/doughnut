@@ -20,7 +20,7 @@ import {
   wrapTextToLines,
   wrapTextToVisibleWidthLines,
   terminalColumnsOfPlainGrapheme,
-  formatInteractiveFetchWaitPromptLine,
+  interactiveFetchWaitStageIndicatorLine,
   RESET,
 } from '../src/renderer.js'
 import type { ChatHistory } from '../src/types.js'
@@ -153,12 +153,14 @@ describe('stripAnsiCsiAndCr', () => {
 
 describe('needsGapBeforeBox', () => {
   test('returns true only when history is non-empty and no current prompt', () => {
-    expect(needsGapBeforeBox([], [])).toBe(false)
-    expect(needsGapBeforeBox([], ['line'])).toBe(false)
-    expect(needsGapBeforeBox([{ type: 'input', content: 'x' }], [])).toBe(true)
-    expect(needsGapBeforeBox([{ type: 'input', content: 'x' }], ['line'])).toBe(
-      false
+    expect(needsGapBeforeBox([], [], [])).toBe(false)
+    expect(needsGapBeforeBox([], ['line'], [])).toBe(false)
+    expect(needsGapBeforeBox([{ type: 'input', content: 'x' }], [], [])).toBe(
+      true
     )
+    expect(
+      needsGapBeforeBox([{ type: 'input', content: 'x' }], ['line'], [])
+    ).toBe(false)
   })
 
   test('false when Current Stage Indicator is present but wrapped prompt is empty', () => {
@@ -235,7 +237,7 @@ describe('buildLiveRegionLines', () => {
   test('interactive fetch wait: banded Current Stage Indicator + separator, then box', () => {
     const width = 44
     const base = INTERACTIVE_FETCH_WAIT_LINES.recallNext
-    const label = `${INTERACTIVE_FETCH_WAIT_PROMPT_FG}${formatInteractiveFetchWaitPromptLine(base, 0)}${RESET}`
+    const label = interactiveFetchWaitStageIndicatorLine(base, 0)
     const lines = buildLiveRegionLines('', width, [], [], [label], {
       placeholderContext: 'interactiveFetchWait',
     })

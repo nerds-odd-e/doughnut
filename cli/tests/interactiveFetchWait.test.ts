@@ -16,11 +16,11 @@ import {
   buildLiveRegionLines,
   CURRENT_STAGE_BAND_BACKGROUND_SGR,
   formatInteractiveFetchWaitPromptLine,
+  interactiveFetchWaitStageIndicatorLine,
   isGreyDisabledInputChrome,
   stripAnsi,
   GREY,
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
-  RESET,
 } from '../src/renderer.js'
 
 const { mockRecallNext, mockRecallStatus } = vi.hoisted(() => ({
@@ -95,7 +95,7 @@ describe('interactive fetch wait UI', () => {
     expect(boxLine).not.toContain('→')
     expect(boxLine).toContain('loading ...')
 
-    const label = `${INTERACTIVE_FETCH_WAIT_PROMPT_FG}${formatInteractiveFetchWaitPromptLine(recallLine, 1)}${RESET}`
+    const label = interactiveFetchWaitStageIndicatorLine(recallLine, 1)
     const live = buildLiveRegionLines('', 80, [], [], [label], {
       placeholderContext: 'interactiveFetchWait',
     })

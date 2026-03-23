@@ -140,6 +140,14 @@ export function formatInteractiveFetchWaitPromptLine(
   return `${baseLine}${ELLIPSIS_PHASE[ellipsisTick % 3]!}`
 }
 
+/** One **Current Stage Indicator** line for interactive fetch-wait (blue label + ellipsis on the band). */
+export function interactiveFetchWaitStageIndicatorLine(
+  baseLine: InteractiveFetchWaitLine,
+  ellipsisTick: number
+): string {
+  return `${INTERACTIVE_FETCH_WAIT_PROMPT_FG}${formatInteractiveFetchWaitPromptLine(baseLine, ellipsisTick)}${RESET}`
+}
+
 /** Full grey outline for the input box when the user is not free-typing a command. */
 export function grayDisabledInputBoxLines(lines: string[]): string[] {
   return lines.map((l) => `${GREY}${l.split(RESET).join(GREY)}${RESET}`)
@@ -459,10 +467,7 @@ export interface BuildBoxLinesOptions {
   placeholderContext?: PlaceholderContext
 }
 
-export type LiveRegionPaintOptions = BuildBoxLinesOptions & {
-  /** Default grey for wrapped Current prompt rows (MCQ stem, token prompt, …). */
-  currentPromptSgr?: string
-}
+export type LiveRegionPaintOptions = BuildBoxLinesOptions
 
 export function buildBoxLines(
   buffer: string,
@@ -496,10 +501,11 @@ export function getLastLine(buffer: string): string {
   return lines[lines.length - 1] ?? ''
 }
 
+/** Blank line before the live region when scrollback exists but there is no Current prompt block (no wrapped lines and no stage indicator). */
 export function needsGapBeforeBox(
   history: ChatHistory,
   currentPromptWrappedLines: string[],
-  currentStageIndicatorLines: string[] = []
+  currentStageIndicatorLines: string[]
 ): boolean {
   return (
     history.length > 0 &&
@@ -517,7 +523,6 @@ export function buildLiveRegionLines(
   options?: LiveRegionPaintOptions
 ): string[] {
   const lines: string[] = []
-  const promptSgr = options?.currentPromptSgr ?? GREY
   const hasStageIndicator = currentStageIndicatorLines.length > 0
   if (hasStageIndicator) {
     for (const ind of currentStageIndicatorLines) {
@@ -530,7 +535,7 @@ export function buildLiveRegionLines(
       lines.push(buildCurrentPromptSeparator(width))
     }
     for (const line of currentPromptWrappedLines) {
-      lines.push(`${promptSgr}${line}${RESET}`)
+      lines.push(`${GREY}${line}${RESET}`)
     }
   }
   const rawBoxLines = renderBox(

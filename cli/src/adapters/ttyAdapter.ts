@@ -12,6 +12,7 @@ import {
   cancelInteractiveFetchWaitFor,
   getInteractiveFetchWaitLine,
   runInteractiveFetchWait,
+  type InteractiveFetchWaitLine,
 } from '../interactiveFetchWait.js'
 import {
   loadCliCommandHistory,
@@ -37,12 +38,10 @@ import {
 import {
   applyChatHistoryOutputTone,
   countPromptBlockLinesAboveInputBoxTop,
-  formatInteractiveFetchWaitPromptLine,
   greyCurrentStageIndicatorLabel,
+  interactiveFetchWaitStageIndicatorLine,
   interactiveInputReadyOscSuffix,
   isCommittedInteractiveInput,
-  INTERACTIVE_FETCH_WAIT_PROMPT_FG,
-  RESET,
   isGreyDisabledInputChrome,
   RECALL_SESSION_YES_NO_PLACEHOLDER,
   wrapTextToLines,
@@ -50,6 +49,8 @@ import {
   type PlaceholderContext,
 } from '../renderer.js'
 import type {
+  AccessTokenPickerAction,
+  AccessTokenPickerCommandConfig,
   ChatHistory,
   ChatHistoryOutputTone,
   McqRecallPending,
@@ -57,16 +58,6 @@ import type {
   PendingRecallAnswer,
   RecallMcqChoiceTexts,
 } from '../types.js'
-
-export type TokenListAction = 'set-default' | 'remove' | 'remove-completely'
-
-export interface TokenListCommandConfig {
-  action: TokenListAction
-  /** Plain text for the banded **Current Stage Indicator** while this list is active. */
-  stageIndicator: string
-  /** Optional wrapped lines under the band (below the banded separator). */
-  currentPrompt?: string
-}
 
 export interface TTYDeps {
   processInput: (
@@ -126,7 +117,7 @@ export interface TTYDeps {
   needsGapBeforeBox: (
     history: ChatHistory,
     currentPromptWrappedLines: string[],
-    currentStageIndicatorLines?: string[]
+    currentStageIndicatorLines: string[]
   ) => boolean
   renderFullDisplay: (
     history: ChatHistory,
@@ -153,7 +144,7 @@ export interface TTYDeps {
     commands: readonly CommandDoc[]
   ) => { completed: string; count: number }
   interactiveDocs: readonly CommandDoc[]
-  TOKEN_LIST_COMMANDS: Record<string, TokenListCommandConfig>
+  TOKEN_LIST_COMMANDS: Record<string, AccessTokenPickerCommandConfig>
   getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
 }
 
@@ -197,7 +188,7 @@ type ReadlineKey = Pick<readline.Key, 'name' | 'shift' | 'ctrl' | 'meta'>
 type TokenSelectionState = {
   items: AccessTokenEntry[]
   command: string
-  action: TokenListAction
+  action: AccessTokenPickerAction
   highlightIndex: number
 }
 
@@ -214,7 +205,6 @@ type LiveRegionLayout = {
   suggestionLines: string[]
   currentStageIndicatorLines: string[]
   placeholderContext: PlaceholderContext
-  currentPromptSgr: string | undefined
   liveLines: string[]
   /** Line count of the live block (used for CUU cursor positioning). */
   liveLineCount: number
@@ -268,6 +258,26 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
   } = deps
+
+  function currentStageIndicatorLinesForLiveRegion(
+    waitLine: InteractiveFetchWaitLine | null,
+    fetchWaitEllipsisTick: number,
+    tokenPicker: AccessTokenPickerCommandConfig | undefined,
+    recallPayloadLoading: boolean
+  ): string[] {
+    if (waitLine != null) {
+      return [
+        interactiveFetchWaitStageIndicatorLine(waitLine, fetchWaitEllipsisTick),
+      ]
+    }
+    if (tokenPicker != null) {
+      return [greyCurrentStageIndicatorLabel(tokenPicker.stageIndicator)]
+    }
+    if (recallPayloadLoading) {
+      return [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
+    }
+    return []
+  }
 
   const writeCurrentPromptLine = (msg: string) =>
     process.stdout.write(`${GREY}${msg}\x1b[0m\n`)
@@ -368,7 +378,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
 
   function beginTokenSelection(
     command: string,
-    action: TokenListAction,
+    action: AccessTokenPickerAction,
     items: AccessTokenEntry[]
   ): void {
     const defaultLabel = getDefaultTokenLabel()
@@ -404,10 +414,8 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       ? TOKEN_LIST_COMMANDS[tokenSelection.command]
       : undefined
     let currentPromptWrappedLines: string[]
-    let currentPromptSgr: string | undefined
     if (waitLine) {
       currentPromptWrappedLines = []
-      currentPromptSgr = undefined
     } else {
       const currentPromptText = tokenListConfig?.currentPrompt
       if (
@@ -432,21 +440,13 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       } else {
         currentPromptWrappedLines = []
       }
-      currentPromptSgr = undefined
     }
-    const currentStageIndicatorLines =
-      waitLine != null
-        ? [
-            `${INTERACTIVE_FETCH_WAIT_PROMPT_FG}${formatInteractiveFetchWaitPromptLine(
-              waitLine,
-              interactiveFetchWaitEllipsisTick
-            )}${RESET}`,
-          ]
-        : tokenListConfig != null
-          ? [greyCurrentStageIndicatorLabel(tokenListConfig.stageIndicator)]
-          : isInRecallSubstate()
-            ? [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
-            : []
+    const currentStageIndicatorLines = currentStageIndicatorLinesForLiveRegion(
+      waitLine,
+      interactiveFetchWaitEllipsisTick,
+      tokenListConfig,
+      isInRecallSubstate()
+    )
     const currentPromptLines = countPromptBlockLinesAboveInputBoxTop(
       currentStageIndicatorLines,
       currentPromptWrappedLines
@@ -483,7 +483,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       suggestionLines,
       currentStageIndicatorLines,
       placeholderContext,
-      currentPromptSgr,
     }
   }
 
@@ -501,7 +500,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       suggestionLines,
       currentStageIndicatorLines,
       placeholderContext,
-      currentPromptSgr,
     } = getDisplayContent()
     const terminalWidth = getTerminalWidth()
     const liveLines = buildLiveRegionLines(
@@ -510,7 +508,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       currentPromptWrappedLines,
       suggestionLines,
       currentStageIndicatorLines,
-      { placeholderContext, currentPromptSgr }
+      { placeholderContext }
     )
     return {
       currentPromptWrappedLines,
@@ -518,7 +516,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       suggestionLines,
       currentStageIndicatorLines,
       placeholderContext,
-      currentPromptSgr,
       liveLines,
       liveLineCount: liveLines.length,
       inputLineRowInLiveBlock: inputRowFromTop(
@@ -582,7 +579,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       layout.currentPromptWrappedLines,
       {
         placeholderContext: layout.placeholderContext,
-        currentPromptSgr: layout.currentPromptSgr,
       }
     )
     for (const line of fullLines) {
