@@ -500,6 +500,10 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       return await processInput(input, ttyOutput, true)
     } finally {
       insideProcessInput = false
+      // Reset livePaint so clearLiveRegionForRepaint in commitHistoryOutput is a
+      // no-op: any ANSI boxes drawn inside processInput stay in the transcript,
+      // keeping the section-parser-visible separator above the final ┌─┐ box.
+      resetLivePaintCursor()
     }
   }
 
@@ -846,7 +850,12 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         }, INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS)
       } else {
         resetLiveLineDraftAndSlashSuggestions()
-        drawBox()
+        // Skip drawBox when inside processInput: the fetch-end ANSI box would
+        // land before the separator written by showRecallPrompt, confusing the
+        // section parser. commitHistoryOutput draws the final box after processInput.
+        if (!insideProcessInput) {
+          drawBox()
+        }
       }
     },
   }
