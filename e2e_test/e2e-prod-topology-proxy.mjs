@@ -52,6 +52,10 @@ const MIME = {
 }
 
 function shouldProxyPath(urlPath) {
+  // Prod still maps /users/identify → MIG; locally Spring forwards to classpath
+  // index.html, but the SPA is built to frontend/dist only (not on the classpath).
+  // Serve the login shell from Vite or STATIC_ROOT like other SPA routes.
+  if (urlPath === '/users/identify') return false
   return pathGoesToBackend(urlPath, BACKEND_PATH_HINTS)
 }
 
