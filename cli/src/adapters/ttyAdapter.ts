@@ -36,6 +36,7 @@ import {
 } from '../interactiveCommandInput.js'
 import {
   applyChatHistoryOutputTone,
+  countPromptBlockLinesAboveInputBoxTop,
   formatInteractiveFetchWaitPromptLine,
   interactiveInputReadyOscSuffix,
   isCommittedInteractiveInput,
@@ -432,9 +433,11 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       }
       currentPromptSgr = undefined
     }
-    const currentPromptLines = currentPromptWrappedLines.length
-      ? 1 + currentPromptWrappedLines.length
-      : 0
+    const recallingIndicator = isInRecallSubstate() ? [RECALLING_INDICATOR] : []
+    const currentPromptLines = countPromptBlockLinesAboveInputBoxTop(
+      recallingIndicator,
+      currentPromptWrappedLines
+    )
     const suggestionLines = tokenSelection
       ? buildTokenListLines(
           tokenSelection.items,
@@ -460,7 +463,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
                   isCommandPrefixWithSuggestions(commandInput.lineDraft),
               }
             )
-    const recallingIndicator = isInRecallSubstate() ? [RECALLING_INDICATOR] : []
     return {
       contentLines,
       currentPromptWrappedLines,

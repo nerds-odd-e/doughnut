@@ -12,6 +12,8 @@ import {
   stripAnsiCsiAndCr,
   needsGapBeforeBox,
   buildLiveRegionLines,
+  CURRENT_STAGE_BAND_BACKGROUND_SGR,
+  RECALLING_INDICATOR,
   visibleLength,
   wrapTextToVisibleWidthLines,
   terminalColumnsOfPlainGrapheme,
@@ -175,6 +177,38 @@ describe('buildLiveRegionLines', () => {
   test('prompt-absent: box first, no separator', () => {
     const lines = buildLiveRegionLines('', 80, [], [], [])
     expect(stripAnsi(lines[0])).toMatch(/^┌.*┐$/)
+  })
+
+  test('recall stage: Current Stage Indicator and banded separator above box, not below', () => {
+    const width = 40
+    const lines = buildLiveRegionLines('', width, [], [], [RECALLING_INDICATOR])
+    const boxTopIndex = lines.findIndex((l) => stripAnsi(l).startsWith('┌'))
+    expect(boxTopIndex).toBeGreaterThan(1)
+    expect(lines[0]).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
+    expect(stripAnsi(lines[0])).toMatch(/^Recalling +$/)
+    expect(visibleLength(stripAnsi(lines[0]))).toBe(width)
+    expect(lines[1]).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
+    expect(stripAnsi(lines[1])).toBe('─'.repeat(width))
+    expect(boxTopIndex).toBe(2)
+    const recallBelowBox = lines.slice(boxTopIndex).join('\n')
+    expect(recallBelowBox).not.toContain('Recalling')
+  })
+
+  test('recall stage + MCQ prompt: indicator, banded separator, stem lines, then box', () => {
+    const width = 50
+    const lines = buildLiveRegionLines(
+      '',
+      width,
+      ['Notebook: X', 'Stem?'],
+      [],
+      [RECALLING_INDICATOR]
+    )
+    const boxTopIndex = lines.findIndex((l) => stripAnsi(l).startsWith('┌'))
+    expect(stripAnsi(lines[0])).toMatch(/^Recalling +$/)
+    expect(stripAnsi(lines[1])).toBe('─'.repeat(width))
+    expect(stripAnsi(lines[2])).toBe('Notebook: X')
+    expect(stripAnsi(lines[3])).toBe('Stem?')
+    expect(boxTopIndex).toBe(4)
   })
 })
 

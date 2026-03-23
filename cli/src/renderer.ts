@@ -54,8 +54,22 @@ export type TerminalWidth = number
 export const GREEN = '\x1b[32m'
 export const GREY_BG = '\x1b[48;5;236m'
 
+/**
+ * Background SGR for the **Current stage band**: full-width Current Stage Indicator line and,
+ * when that indicator is shown, the matching Current prompt separator strip (same color index as
+ * {@link GREY_BG} until palette is tuned).
+ */
+export const CURRENT_STAGE_BAND_BACKGROUND_SGR = GREY_BG
+
 export function buildCurrentPromptSeparator(width: TerminalWidth): string {
   return `${GREEN}${'─'.repeat(width)}${RESET}`
+}
+
+/** Green rule on the Current stage band (after the Current Stage Indicator line). */
+export function buildCurrentPromptSeparatorForStageBand(
+  width: TerminalWidth
+): string {
+  return `${CURRENT_STAGE_BAND_BACKGROUND_SGR}${GREEN}${'─'.repeat(width)}${RESET}`
 }
 export const COMMAND_HIGHLIGHT = '\x1b[1;36m' // bold + cyan
 
@@ -351,6 +365,40 @@ function padEndVisible(str: string, targetLen: number): string {
   return pad > 0 ? str + ' '.repeat(pad) : str
 }
 
+function stripTrailingSgrReset(s: string): string {
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: strip trailing SGR reset
+  return s.replace(/\x1b\[0m$/, '')
+}
+
+/** One full-width screen line: Current stage band + padded label (visible width = `width`). */
+function formatCurrentStageIndicatorLine(
+  labelWithLeadingSgr: string,
+  width: TerminalWidth
+): string {
+  const opened = stripTrailingSgrReset(labelWithLeadingSgr)
+  return `${CURRENT_STAGE_BAND_BACKGROUND_SGR}${padEndVisible(opened, width)}${RESET}`
+}
+
+/**
+ * Line count from the top of the live region through the last Current prompt line (separator and
+ * wrapped prompt rows), immediately above the input box top border. Matches
+ * {@link buildLiveRegionLines} layout rules.
+ */
+export function countPromptBlockLinesAboveInputBoxTop(
+  recallingIndicator: string[],
+  currentPromptWrappedLines: string[]
+): number {
+  let n = 0
+  if (recallingIndicator.length > 0) {
+    n += recallingIndicator.length + 1
+  }
+  if (currentPromptWrappedLines.length > 0) {
+    if (recallingIndicator.length === 0) n += 1
+    n += currentPromptWrappedLines.length
+  }
+  return n
+}
+
 export function renderBox(lines: string[], width: TerminalWidth): string {
   const innerWidth = width - 4
   const top = `┌${'─'.repeat(width - 2)}┐`
@@ -454,8 +502,17 @@ export function buildLiveRegionLines(
 ): string[] {
   const lines: string[] = []
   const promptSgr = options?.currentPromptSgr ?? GREY
+  const hasStageIndicator = recallingIndicator.length > 0
+  if (hasStageIndicator) {
+    for (const ind of recallingIndicator) {
+      lines.push(formatCurrentStageIndicatorLine(ind, width))
+    }
+    lines.push(buildCurrentPromptSeparatorForStageBand(width))
+  }
   if (currentPromptWrappedLines.length > 0) {
-    lines.push(buildCurrentPromptSeparator(width))
+    if (!hasStageIndicator) {
+      lines.push(buildCurrentPromptSeparator(width))
+    }
     for (const line of currentPromptWrappedLines) {
       lines.push(`${promptSgr}${line}${RESET}`)
     }
@@ -470,7 +527,6 @@ export function buildLiveRegionLines(
       ? grayDisabledInputBoxLines(rawBoxLines)
       : rawBoxLines
   lines.push(...boxLines)
-  lines.push(...recallingIndicator)
   lines.push(...suggestionLines)
   return lines
 }
@@ -603,7 +659,12 @@ export function buildTokenListLines(
   )
 }
 
-/** Renders the full display. currentPromptLines is Current prompt (above input box), pre-wrapped. suggestionLines and recallingIndicator are Current guidance (below input box). */
+/**
+ * Renders the full display. `currentPromptLines` is wrapped Current prompt text (stem, etc.).
+ * `recallingIndicator` drives the **Current Stage Indicator** line(s) and banded separator when
+ * non-empty (first lines of the Current prompt block). `suggestionLines` are Current guidance
+ * (below the input box).
+ */
 export function renderFullDisplay(
   history: ChatHistory,
   buffer: string,

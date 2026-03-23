@@ -9,7 +9,7 @@ import {
   resetRecallStateForTesting,
 } from '../../src/interactive.js'
 import {
-  buildCurrentPromptSeparator,
+  buildCurrentPromptSeparatorForStageBand,
   getTerminalWidth,
   INTERACTIVE_INPUT_READY_OSC,
   stripAnsi,
@@ -162,11 +162,13 @@ describe('TTY recall MCQ', () => {
         )
       ).toBe(0)
       const raw = ttyOutput(writeSpy)
-      const sep = buildCurrentPromptSeparator(getTerminalWidth())
+      const bandSep = buildCurrentPromptSeparatorForStageBand(
+        getTerminalWidth()
+      )
       const stem = 'What is 2+2?'
-      expect(raw).toContain(`\x1b[2K${sep}`)
+      expect(raw).toContain(`\x1b[2K${bandSep}`)
       expect(raw).toContain(stem)
-      expect(raw.lastIndexOf(`\x1b[2K${sep}`)).toBeLessThan(
+      expect(raw.lastIndexOf(`\x1b[2K${bandSep}`)).toBeLessThan(
         raw.lastIndexOf(stem)
       )
       expect(raw).toContain(INTERACTIVE_INPUT_READY_OSC)
