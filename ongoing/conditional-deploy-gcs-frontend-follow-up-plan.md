@@ -52,6 +52,8 @@ Finish the incomplete "single source of truth" story so that:
 
 - Deep-link shell behavior is explicit, tested, and documented enough for later routing changes.
 
+**Status:** Implemented — `ApplicationControllerProdDeepLinkTests` (MockMvc + `MockRestServiceServer`): prod-style deep links under `/d/**` and `/n**` GET the SPA shell from `doughnut.spa-public-base-url/`; upstream error is covered as 500 after `RestTemplate` throws (test-only `@ControllerAdvice` maps `RestClientException` to 500, matching unhandled failure behavior).
+
 ---
 
 ## Phase 2 — Catch prod-only static routing drift in CI
