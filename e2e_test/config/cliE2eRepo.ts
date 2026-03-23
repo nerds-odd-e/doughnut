@@ -3,7 +3,7 @@
  */
 
 import { spawnSync } from 'node:child_process'
-import { copyFileSync, mkdirSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { cliEnv } from './cliEnv'
 
@@ -35,18 +35,12 @@ export function runShellCommandSync(
   }
 }
 
-export function bundleCliIntoBackendStatic(
-  repoRoot: string,
-  env?: NodeJS.ProcessEnv
-) {
+export function bundleCli(repoRoot: string, env?: NodeJS.ProcessEnv) {
   runShellCommandSync('pnpm cli:bundle', { cwd: repoRoot, env })
-  const src = join(repoRoot, CLI_BUNDLE_RELATIVE_PATH)
-  const destDir = join(
-    repoRoot,
-    'backend/build/resources/main/static/doughnut-cli-latest'
-  )
-  mkdirSync(destDir, { recursive: true })
-  copyFileSync(src, join(destDir, 'doughnut'))
+  const bundle = join(repoRoot, CLI_BUNDLE_RELATIVE_PATH)
+  if (!existsSync(bundle)) {
+    throw new Error(`Missing CLI bundle at ${bundle} after pnpm cli:bundle`)
+  }
 }
 
 export function cliRepoSpawnFromRoot(repoRoot: string): CliRepoSpawn {

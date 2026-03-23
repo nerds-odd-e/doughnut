@@ -31,7 +31,7 @@ const LOCAL_SPA_SHELL_PATHS = new Set(
   DOUGHNUT_ROUTING.localProxy?.spaShellInsteadOfBackendExactPaths ?? []
 )
 
-/** Same path as prod GCS object; local file from pnpm cli:bundle (phase 10). */
+/** Same path as prod GCS object; local file from `pnpm cli:bundle`. */
 const CLI_INSTALL_BUNDLE = path.join(
   repoRoot,
   'cli/dist/doughnut-cli.bundle.mjs'

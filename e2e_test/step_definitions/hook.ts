@@ -89,9 +89,7 @@ After({ tags: '@BundleFirstAndTerminateMCPServerWhenTeardown' }, () => {
   cy.task('disconnectMcpServer')
 })
 
-Before({ tags: '@bundleAndCopyCliToBackendResources' }, () =>
-  cli.backend().bundleAndCopy()
-)
+Before({ tags: '@bundleCli' }, () => cli.backend().bundleCli())
 
 Before({ tags: '@withCliConfig', order: 1 }, () =>
   cli.setup().createConfigDir()

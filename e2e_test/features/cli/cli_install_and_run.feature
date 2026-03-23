@@ -1,4 +1,4 @@
-@bundleAndCopyCliToBackendResources
+@bundleCli
 Feature: CLI install and run
   As a user, I want to install the Doughnut CLI, run it, and update it from the server.
 

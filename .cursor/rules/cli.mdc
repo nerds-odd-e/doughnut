@@ -22,7 +22,7 @@ cli/
 
 | Task | Command |
 |------|---------|
-| Build & copy to static | `pnpm cli:bundle-and-copy` |
+| Build bundle | `pnpm cli:bundle` |
 | Run tests | `pnpm cli:test` |
 | Format | `pnpm cli:format` |
 | Lint | `pnpm cli:lint` |
@@ -76,7 +76,7 @@ Features: **`e2e_test/features/cli/`**. Steps and page objects: **`e2e_test/step
 
 - Bundle: `cli/dist/doughnut-cli.bundle.mjs` (shebang)
 - Release: `gs://dough-01/doughnut-cli-latest/doughnut` (`cli-release.yml`)
-- E2E artifact: `backend/build/resources/main/static/doughnut-cli-latest/doughnut`
+- Local install URL: fake LB serves `cli/dist` at `/doughnut-cli-latest/doughnut` (see `e2e_test/e2e-prod-topology-proxy.mjs`, `docs/gcp/prod_env.md`)
 
 ## Install scripts
 

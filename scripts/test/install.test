@@ -6,12 +6,12 @@
 source "$(dirname "$0")/vendor/bach.sh"
 
 test-install-constructs-download-url-from-base-url() {
-  BASE_URL="http://localhost:9081"
+  BASE_URL="http://127.0.0.1:5173"
   DOWNLOAD_URL="$BASE_URL/doughnut-cli-latest/doughnut"
   @out "$DOWNLOAD_URL"
 }
 test-install-constructs-download-url-from-base-url-assert() {
-  @out "http://localhost:9081/doughnut-cli-latest/doughnut"
+  @out "http://127.0.0.1:5173/doughnut-cli-latest/doughnut"
 }
 
 test-install-constructs-install-path-from-install-prefix() {

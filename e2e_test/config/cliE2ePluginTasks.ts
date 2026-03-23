@@ -6,7 +6,7 @@ import { existsSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import {
-  bundleCliIntoBackendStatic,
+  bundleCli,
   CLI_NON_INTERACTIVE_SPAWN_TIMEOUT_MS,
   cliRepoSpawnFromRoot,
   runShellCommandSync,
@@ -41,15 +41,15 @@ type RunInstalledCliTask = WithOptionalCliEnv & {
   args?: string[]
 }
 
-async function bundleCliIntoBackendStaticOrThrow(
+async function bundleCliOrThrow(
   repoRoot: string,
   env?: NodeJS.ProcessEnv
 ): Promise<true> {
   try {
-    bundleCliIntoBackendStatic(repoRoot, env)
+    bundleCli(repoRoot, env)
     return true
   } catch (error) {
-    console.error('Failed to bundle and copy CLI:', error)
+    console.error('Failed to bundle CLI:', error)
     throw error
   }
 }
@@ -67,11 +67,11 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       )
       return configDir
     },
-    async bundleAndCopyCli() {
-      return bundleCliIntoBackendStaticOrThrow(repoRoot)
+    async bundleCli() {
+      return bundleCliOrThrow(repoRoot)
     },
-    async bundleAndCopyCliWithVersion(version: string) {
-      return bundleCliIntoBackendStaticOrThrow(repoRoot, {
+    async bundleCliWithVersion(version: string) {
+      return bundleCliOrThrow(repoRoot, {
         ...process.env,
         CLI_VERSION: version,
       })

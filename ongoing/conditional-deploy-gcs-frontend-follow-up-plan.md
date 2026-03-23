@@ -207,6 +207,8 @@ Finish the incomplete "single source of truth" story so that:
 - The local topology has fewer exceptions and names reflect actual behavior.
 - No build or runtime path still relies on Spring resources for the CLI binary.
 
+**Status:** Implemented — Removed `cli:bundle-and-copy` and `copyCliBundle` from Gradle (`bootRun` / `jar` no longer copy CLI into `backend/build/.../static`). `bundle:all` uses `pnpm cli:bundle`. CLI E2E: Cypress tasks `bundleCli` / `bundleCliWithVersion`, hook tag `@bundleCli`, `bundleCli()` in repo helper (writes only `cli/dist`). Docs and `scripts/test/install.test` use fake-LB `127.0.0.1:5173` for the install download URL. **`localProxy.spaShellInsteadOfBackendExactPaths` `/users/identify` kept:** prod still hits Spring for that path; without this entry the fake LB would proxy to Spring, which would serve classpath `index.html` (no committed static) or recurse if we tried to fetch the LB from Spring.
+
 ---
 
 ## Phase 7 — Optional final cohesion pass

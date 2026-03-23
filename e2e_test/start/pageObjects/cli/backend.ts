@@ -5,8 +5,8 @@ import { e2eAppBaseUrl } from '../../../support/e2eAppUrl'
 
 export function backend() {
   return {
-    bundleAndCopy() {
-      cy.task('bundleAndCopyCli')
+    bundleCli() {
+      cy.task('bundleCli')
     },
     expectInstallScriptServed() {
       cy.request('GET', `${e2eAppBaseUrl()}/install`)
@@ -14,7 +14,7 @@ export function backend() {
         .should('eq', 200)
     },
     serveVersion(version: string) {
-      cy.task('bundleAndCopyCliWithVersion', version)
+      cy.task('bundleCliWithVersion', version)
     },
   }
 }
