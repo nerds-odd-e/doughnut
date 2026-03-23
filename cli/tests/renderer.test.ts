@@ -299,6 +299,23 @@ describe('renderFullDisplay', () => {
     expect(noticeLine).toContain('\x1b[90m')
     expect(noticeLine).toContain('\x1b[3m')
   })
+
+  test('omitLiveRegion skips live region (box and guidance)', () => {
+    const history: ChatHistory = [{ type: 'input', content: '/help' }]
+    const lines = renderFullDisplay(
+      history,
+      '',
+      80,
+      ['guidance only'],
+      [],
+      [],
+      {
+        omitLiveRegion: true,
+      }
+    )
+    expect(lines.some((l) => stripAnsi(l).startsWith('┌'))).toBe(false)
+    expect(lines.join('\n')).not.toContain('guidance only')
+  })
 })
 
 describe('applyChatHistoryOutputTone', () => {

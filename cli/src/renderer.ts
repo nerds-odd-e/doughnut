@@ -467,7 +467,10 @@ export interface BuildBoxLinesOptions {
   placeholderContext?: PlaceholderContext
 }
 
-export type LiveRegionPaintOptions = BuildBoxLinesOptions
+export type LiveRegionPaintOptions = BuildBoxLinesOptions & {
+  /** When true, history (+ version header) only — no Current prompt / box / guidance tail. */
+  omitLiveRegion?: boolean
+}
 
 export function buildBoxLines(
   buffer: string,
@@ -716,16 +719,18 @@ export function renderFullDisplay(
   ) {
     lines.push('')
   }
-  lines.push(
-    ...buildLiveRegionLines(
-      buffer,
-      width,
-      currentPromptLines ?? [],
-      suggestionLines,
-      currentStageIndicatorLines,
-      options
+  if (!options?.omitLiveRegion) {
+    lines.push(
+      ...buildLiveRegionLines(
+        buffer,
+        width,
+        currentPromptLines ?? [],
+        suggestionLines,
+        currentStageIndicatorLines,
+        options
+      )
     )
-  )
+  }
   return lines
 }
 

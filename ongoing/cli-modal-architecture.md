@@ -195,11 +195,18 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
-### Phase G — Fetch-wait and stage indicator in the Ink tree
+### Phase G — Fetch-wait and stage indicator in the Ink tree — **done**
 
 **Goal:** Loading state as **`Spinner`** (or Ink-native animated `Text`) + branch that disables command input; align with existing “current stage” product concept using `Box`/`Text` styling.
 
-- **Decision gate:** **visual parity** for stage band vs simpler Ink layout.
+- **Decision gate:** **visual parity** for stage band vs simpler Ink layout — **simpler Ink layout** (blue `Text` stage label + dim `loading ...`, same ellipsis cycle as before; no full-width ANSI stage band).
+
+**Delivered**
+
+- **`cli/src/ui/FetchWaitDisplay.tsx`**: Ink display for interactive fetch-wait (`formatInteractiveFetchWaitPromptLine` + `PLACEHOLDER_BY_CONTEXT.interactiveFetchWait`).
+- **`ttyAdapter.ts`**: `drawBox()` routes fetch-wait first to `renderInkFetchWaitDisplay()`; `onInteractiveFetchWaitChanged` unmounts Ink when wait ends; `doFullRedraw` uses `renderFullDisplay(..., { omitLiveRegion: true })` + Ink fetch-wait so resize does not duplicate ANSI live region.
+- **`renderer.ts`**: `LiveRegionPaintOptions.omitLiveRegion` for history-only full redraw.
+- **Tests:** `renderer.test.ts` (`omitLiveRegion`); `pnpm cli:test` + relevant E2E as needed.
 
 ---
 

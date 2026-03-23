@@ -87,6 +87,7 @@ import type {
   OutputAdapter,
 } from '../types.js'
 import { ConfirmDisplay } from '../ui/ConfirmDisplay.js'
+import { FetchWaitDisplay } from '../ui/FetchWaitDisplay.js'
 import { McqDisplay } from '../ui/McqDisplay.js'
 import { TokenListDisplay } from '../ui/TokenListDisplay.js'
 
@@ -288,9 +289,8 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   let interactiveFetchWaitRepaintTimer: ReturnType<typeof setInterval> | null =
     null
 
-  // --- Ink island for confirm flows (Phase F1) ---
+  // --- Ink island: confirm, select, fetch-wait (Phases F–G) ---
   // The ANSI keypress handler dispatches keys; Ink is display-only (no useInput).
-  // MCQ and token list still use ANSI drawBox (Phase F2).
   let inkDisplayInstance: ReturnType<typeof render> | null = null
   let stopConfirmDraft = ''
   let stopConfirmHint = ''
@@ -407,6 +407,18 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       })
     )
     process.stdout.write(INTERACTIVE_INPUT_READY_OSC)
+  }
+
+  function renderInkFetchWaitDisplay(): void {
+    const waitLine = getInteractiveFetchWaitLine()
+    if (waitLine === null) return
+    startOrUpdateInkDisplay(
+      React.createElement(FetchWaitDisplay, {
+        waitLine,
+        ellipsisTick: interactiveFetchWaitEllipsisTick,
+      })
+    )
+    process.stdout.write(HIDE_CURSOR)
   }
 
   function rememberCommittedLine(raw: string): void {
@@ -648,6 +660,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   }
 
   function doFullRedraw() {
+    const waitLine = getInteractiveFetchWaitLine()
     const layout = measureLiveRegionLayout()
 
     process.stdout.write(CLEAR_SCREEN)
@@ -660,10 +673,18 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       layout.currentPromptWrappedLines,
       {
         placeholderContext: layout.placeholderContext,
+        omitLiveRegion: waitLine !== null,
       }
     )
     for (const line of fullLines) {
       process.stdout.write(`${line}\n`)
+    }
+
+    if (waitLine !== null) {
+      resetLivePaintCursor()
+      unmountInkDisplay()
+      renderInkFetchWaitDisplay()
+      return
     }
 
     livePaint.lastPaintedLineCount = layout.liveLineCount
@@ -676,6 +697,10 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   }
 
   function drawBox() {
+    if (getInteractiveFetchWaitLine() !== null) {
+      renderInkFetchWaitDisplay()
+      return
+    }
     if (getNumberedChoiceListChoices() !== null) {
       renderInkMcqDisplay()
       return
@@ -837,6 +862,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         }, INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS)
       } else {
         resetLiveLineDraftAndSlashSuggestions()
+        unmountInkDisplay()
         drawBox()
       }
     },
