@@ -66,6 +66,8 @@ export type OutputAdapter = {
   /**
    * Optional: short prompts (e.g. "Please answer y or n"). For non-TTY MCQ recall, notebook line then stem
    * are sent here; numbered choices and the "Enter your choice" line use `log`. Defaults to log.
+   * On TTY, MCQ stem and notebook line are part of the **Current prompt** live region (above the input box),
+   * not **Current guidance**; recall loading uses a separate **Current Stage Indicator** line there.
    */
   writeCurrentPrompt?: (msg: string) => void
   /**

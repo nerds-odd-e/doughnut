@@ -149,7 +149,8 @@ export const CLEAR_SCREEN = '\x1b[H\x1b[2J'
 
 /** Shown in Current guidance when user has not typed a slash command prefix. */
 export const COMMANDS_HINT = `${GREY}  / commands${RESET}`
-export const RECALLING_INDICATOR = `${GREY}Recalling${RESET}`
+/** Default **Current Stage Indicator** line while recall payload is loading (label: “Recalling”). */
+export const DEFAULT_RECALL_LOADING_STAGE_INDICATOR = `${GREY}Recalling${RESET}`
 
 // biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI escapes
 const ANSI_PATTERN = /\x1b\[[0-9;]*m/g
@@ -385,15 +386,15 @@ function formatCurrentStageIndicatorLine(
  * {@link buildLiveRegionLines} layout rules.
  */
 export function countPromptBlockLinesAboveInputBoxTop(
-  recallingIndicator: string[],
+  currentStageIndicatorLines: string[],
   currentPromptWrappedLines: string[]
 ): number {
   let n = 0
-  if (recallingIndicator.length > 0) {
-    n += recallingIndicator.length + 1
+  if (currentStageIndicatorLines.length > 0) {
+    n += currentStageIndicatorLines.length + 1
   }
   if (currentPromptWrappedLines.length > 0) {
-    if (recallingIndicator.length === 0) n += 1
+    if (currentStageIndicatorLines.length === 0) n += 1
     n += currentPromptWrappedLines.length
   }
   return n
@@ -497,14 +498,14 @@ export function buildLiveRegionLines(
   width: TerminalWidth,
   currentPromptWrappedLines: string[],
   suggestionLines: string[],
-  recallingIndicator: string[],
+  currentStageIndicatorLines: string[],
   options?: LiveRegionPaintOptions
 ): string[] {
   const lines: string[] = []
   const promptSgr = options?.currentPromptSgr ?? GREY
-  const hasStageIndicator = recallingIndicator.length > 0
+  const hasStageIndicator = currentStageIndicatorLines.length > 0
   if (hasStageIndicator) {
-    for (const ind of recallingIndicator) {
+    for (const ind of currentStageIndicatorLines) {
       lines.push(formatCurrentStageIndicatorLine(ind, width))
     }
     lines.push(buildCurrentPromptSeparatorForStageBand(width))
@@ -661,7 +662,7 @@ export function buildTokenListLines(
 
 /**
  * Renders the full display. `currentPromptLines` is wrapped Current prompt text (stem, etc.).
- * `recallingIndicator` drives the **Current Stage Indicator** line(s) and banded separator when
+ * `currentStageIndicatorLines` drives the **Current Stage Indicator** line(s) and banded separator when
  * non-empty (first lines of the Current prompt block). `suggestionLines` are Current guidance
  * (below the input box).
  */
@@ -670,7 +671,7 @@ export function renderFullDisplay(
   buffer: string,
   width: TerminalWidth,
   suggestionLines: string[],
-  recallingIndicator: string[],
+  currentStageIndicatorLines: string[],
   currentPromptLines?: string[],
   options?: LiveRegionPaintOptions
 ): string[] {
@@ -697,7 +698,7 @@ export function renderFullDisplay(
       width,
       currentPromptLines ?? [],
       suggestionLines,
-      recallingIndicator,
+      currentStageIndicatorLines,
       options
     )
   )
@@ -709,7 +710,7 @@ export function writeFullRedraw(
   buffer: string,
   width: TerminalWidth,
   suggestionLines: string[],
-  recallingIndicator: string[],
+  currentStageIndicatorLines: string[],
   liveRegionOptions?: LiveRegionPaintOptions
 ): void {
   process.stdout.write(CLEAR_SCREEN)
@@ -718,7 +719,7 @@ export function writeFullRedraw(
     buffer,
     width,
     suggestionLines,
-    recallingIndicator,
+    currentStageIndicatorLines,
     undefined,
     liveRegionOptions
   )

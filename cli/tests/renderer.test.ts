@@ -13,7 +13,7 @@ import {
   needsGapBeforeBox,
   buildLiveRegionLines,
   CURRENT_STAGE_BAND_BACKGROUND_SGR,
-  RECALLING_INDICATOR,
+  DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
   visibleLength,
   wrapTextToVisibleWidthLines,
   terminalColumnsOfPlainGrapheme,
@@ -181,7 +181,13 @@ describe('buildLiveRegionLines', () => {
 
   test('recall stage: Current Stage Indicator and banded separator above box, not below', () => {
     const width = 40
-    const lines = buildLiveRegionLines('', width, [], [], [RECALLING_INDICATOR])
+    const lines = buildLiveRegionLines(
+      '',
+      width,
+      [],
+      [],
+      [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
+    )
     const boxTopIndex = lines.findIndex((l) => stripAnsi(l).startsWith('┌'))
     expect(boxTopIndex).toBeGreaterThan(1)
     expect(lines[0]).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
@@ -201,7 +207,7 @@ describe('buildLiveRegionLines', () => {
       width,
       ['Notebook: X', 'Stem?'],
       [],
-      [RECALLING_INDICATOR]
+      [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
     )
     const boxTopIndex = lines.findIndex((l) => stripAnsi(l).startsWith('┌'))
     expect(stripAnsi(lines[0])).toMatch(/^Recalling +$/)

@@ -116,7 +116,7 @@ export interface TTYDeps {
     width: number,
     currentPromptWrappedLines: string[],
     suggestionLines: string[],
-    recallingIndicator: string[],
+    currentStageIndicatorLines: string[],
     options?: LiveRegionPaintOptions
   ) => string[]
   needsGapBeforeBox: (
@@ -128,7 +128,7 @@ export interface TTYDeps {
     buffer: string,
     width: number,
     suggestionLines: string[],
-    recallingIndicator: string[],
+    currentStageIndicatorLines: string[],
     currentPromptLines?: string[],
     options?: LiveRegionPaintOptions
   ) => string[]
@@ -137,7 +137,7 @@ export interface TTYDeps {
   HIDE_CURSOR: string
   SHOW_CURSOR: string
   CLEAR_SCREEN: string
-  RECALLING_INDICATOR: string
+  DEFAULT_RECALL_LOADING_STAGE_INDICATOR: string
   PROMPT: string
   filterCommandsByPrefix: (
     commands: readonly CommandDoc[],
@@ -207,7 +207,7 @@ type LiveRegionLayout = {
   currentPromptWrappedLines: string[]
   currentPromptLines: number
   suggestionLines: string[]
-  recallingIndicator: string[]
+  currentStageIndicatorLines: string[]
   placeholderContext: PlaceholderContext
   currentPromptSgr: string | undefined
   liveLines: string[]
@@ -255,7 +255,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     HIDE_CURSOR,
     SHOW_CURSOR,
     CLEAR_SCREEN,
-    RECALLING_INDICATOR,
+    DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
     PROMPT,
     filterCommandsByPrefix,
     getTabCompletion,
@@ -386,7 +386,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     commandTurn = { lines: [], tone: 'plain' }
   }
 
-  /** Builds lines for input box, recalling indicator, Current prompt (above box), and Current guidance (below box). */
+  /** Builds lines for input box, optional Current Stage Indicator + Current prompt (above box), and Current guidance (below box). */
   function getDisplayContent() {
     const width = getTerminalWidth()
     const placeholderContext = getPlaceholderContext(!!tokenSelection)
@@ -433,9 +433,11 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       }
       currentPromptSgr = undefined
     }
-    const recallingIndicator = isInRecallSubstate() ? [RECALLING_INDICATOR] : []
+    const currentStageIndicatorLines = isInRecallSubstate()
+      ? [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
+      : []
     const currentPromptLines = countPromptBlockLinesAboveInputBoxTop(
-      recallingIndicator,
+      currentStageIndicatorLines,
       currentPromptWrappedLines
     )
     const suggestionLines = tokenSelection
@@ -468,7 +470,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       currentPromptWrappedLines,
       currentPromptLines,
       suggestionLines,
-      recallingIndicator,
+      currentStageIndicatorLines,
       placeholderContext,
       currentPromptSgr,
     }
@@ -486,7 +488,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       currentPromptWrappedLines,
       currentPromptLines,
       suggestionLines,
-      recallingIndicator,
+      currentStageIndicatorLines,
       placeholderContext,
       currentPromptSgr,
     } = getDisplayContent()
@@ -496,14 +498,14 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       terminalWidth,
       currentPromptWrappedLines,
       suggestionLines,
-      recallingIndicator,
+      currentStageIndicatorLines,
       { placeholderContext, currentPromptSgr }
     )
     return {
       currentPromptWrappedLines,
       currentPromptLines,
       suggestionLines,
-      recallingIndicator,
+      currentStageIndicatorLines,
       placeholderContext,
       currentPromptSgr,
       liveLines,
@@ -565,7 +567,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       commandInput.lineDraft,
       layout.terminalWidth,
       layout.suggestionLines,
-      layout.recallingIndicator,
+      layout.currentStageIndicatorLines,
       layout.currentPromptWrappedLines,
       {
         placeholderContext: layout.placeholderContext,
