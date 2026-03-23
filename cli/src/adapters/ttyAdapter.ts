@@ -41,6 +41,7 @@ import {
   interactiveInputReadyOscSuffix,
   isCommittedInteractiveInput,
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
+  RESET,
   isGreyDisabledInputChrome,
   RECALL_SESSION_YES_NO_PLACEHOLDER,
   wrapTextToLines,
@@ -121,7 +122,8 @@ export interface TTYDeps {
   ) => string[]
   needsGapBeforeBox: (
     history: ChatHistory,
-    currentPromptWrappedLines: string[]
+    currentPromptWrappedLines: string[],
+    currentStageIndicatorLines?: string[]
   ) => boolean
   renderFullDisplay: (
     history: ChatHistory,
@@ -398,13 +400,8 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     let currentPromptWrappedLines: string[]
     let currentPromptSgr: string | undefined
     if (waitLine) {
-      currentPromptWrappedLines = [
-        formatInteractiveFetchWaitPromptLine(
-          waitLine,
-          interactiveFetchWaitEllipsisTick
-        ),
-      ]
-      currentPromptSgr = INTERACTIVE_FETCH_WAIT_PROMPT_FG
+      currentPromptWrappedLines = []
+      currentPromptSgr = undefined
     } else {
       const currentPromptText = tokenSelection
         ? TOKEN_LIST_COMMANDS[tokenSelection.command]?.currentPrompt
@@ -433,9 +430,17 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       }
       currentPromptSgr = undefined
     }
-    const currentStageIndicatorLines = isInRecallSubstate()
-      ? [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
-      : []
+    const currentStageIndicatorLines =
+      waitLine != null
+        ? [
+            `${INTERACTIVE_FETCH_WAIT_PROMPT_FG}${formatInteractiveFetchWaitPromptLine(
+              waitLine,
+              interactiveFetchWaitEllipsisTick
+            )}${RESET}`,
+          ]
+        : isInRecallSubstate()
+          ? [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
+          : []
     const currentPromptLines = countPromptBlockLinesAboveInputBoxTop(
       currentStageIndicatorLines,
       currentPromptWrappedLines
@@ -595,7 +600,11 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       process.stdout.write(`\x1b[${livePaint.cursorUpStepsToLiveRegionTop}A`)
     } else if (
       livePaint.lastPaintedLineCount === 0 &&
-      needsGapBeforeBox(chatHistory, layout.currentPromptWrappedLines)
+      needsGapBeforeBox(
+        chatHistory,
+        layout.currentPromptWrappedLines,
+        layout.currentStageIndicatorLines
+      )
     ) {
       process.stdout.write('\n')
     }

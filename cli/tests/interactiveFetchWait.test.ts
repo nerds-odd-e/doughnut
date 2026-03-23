@@ -14,11 +14,13 @@ import {
 import {
   buildBoxLines,
   buildLiveRegionLines,
+  CURRENT_STAGE_BAND_BACKGROUND_SGR,
   formatInteractiveFetchWaitPromptLine,
   isGreyDisabledInputChrome,
   stripAnsi,
   GREY,
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
+  RESET,
 } from '../src/renderer.js'
 
 const { mockRecallNext, mockRecallStatus } = vi.hoisted(() => ({
@@ -93,16 +95,17 @@ describe('interactive fetch wait UI', () => {
     expect(boxLine).not.toContain('→')
     expect(boxLine).toContain('loading ...')
 
-    const prompt = formatInteractiveFetchWaitPromptLine(recallLine, 1)
-    const live = buildLiveRegionLines('', 80, [prompt], [], [], {
+    const label = `${INTERACTIVE_FETCH_WAIT_PROMPT_FG}${formatInteractiveFetchWaitPromptLine(recallLine, 1)}${RESET}`
+    const live = buildLiveRegionLines('', 80, [], [], [label], {
       placeholderContext: 'interactiveFetchWait',
-      currentPromptSgr: INTERACTIVE_FETCH_WAIT_PROMPT_FG,
     })
-    expect(live[0]).toContain('\x1b[32m')
-    expect(live[1]).toContain(INTERACTIVE_FETCH_WAIT_PROMPT_FG)
-    expect(stripAnsi(live[1])).toContain(recallLine)
+    expect(live[0]).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
+    expect(live[0]).toContain(INTERACTIVE_FETCH_WAIT_PROMPT_FG)
+    expect(stripAnsi(live[0])).toContain(recallLine)
+    expect(live[1]).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
+    expect(live[1]).toContain('\x1b[32m')
     const boxTopIdx = live.findIndex((l) => stripAnsi(l).startsWith('┌'))
-    expect(boxTopIdx).toBeGreaterThan(0)
+    expect(boxTopIdx).toBe(2)
     expect(live[boxTopIdx]).toContain(GREY)
 
     expect(

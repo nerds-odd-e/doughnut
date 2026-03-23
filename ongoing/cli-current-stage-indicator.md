@@ -18,7 +18,7 @@ Out of scope for wording: backend/OpenAPI identifiers such as `RecallsController
 |----------|--------|
 | Grey “Recalling” below the input box (old names) | **Current Stage Indicator** as **line 1 of Current prompt** (not Current guidance). Code: `DEFAULT_RECALL_LOADING_STAGE_INDICATOR` / `currentStageIndicatorLines`. |
 | `cli.mdc`: Current guidance lists hints + MCQ choices | Remove any implication that recall-loading text lives in Current guidance; guidance stays **below** the input box. |
-| **Interactive fetch wait** | Still a distinct **visual** pattern today (blue prompt + grey disabled box + ellipsis). In domain terms it is a **Current Stage** (waiting on a slow call). **Current Stage Indicator** line for fetch-wait is **deferred** after recall/MCQ layout ships; glossary should still say fetch-wait is a stage even before the indicator exists for it. |
+| **Interactive fetch wait** | **Current Stage** with banded **Current Stage Indicator** (phase 3): blue label + ellipsis on the band, banded separator, grey disabled box. |
 
 ## Layout (TTY live region, top to bottom)
 
@@ -57,11 +57,11 @@ So: no separate “plan phase.” When implementation starts, **fold the domain 
 
 1. **Recall loading + MCQ TTY layout** — **Done.** Current Stage Indicator above the box with full-width **Current stage band** + banded separator; `countPromptBlockLinesAboveInputBoxTop` keeps TTY cursor math aligned with `buildLiveRegionLines`; `CURRENT_STAGE_BAND_BACKGROUND_SGR` / `buildCurrentPromptSeparatorForStageBand` in `renderer.ts`; Vitest in `renderer.test.ts`, MCQ TTY test uses banded separator; `.cursor/rules/cli.mdc` glossary updated.
 2. **Vocabulary pass** — **Done.** `currentStageIndicatorLines`, `DEFAULT_RECALL_LOADING_STAGE_INDICATOR`; `OutputAdapter.writeCurrentPrompt` JSDoc in `types.ts`; TTY adapter comments. No CLI E2E strings referenced the old symbol names.
-3. **(Optional) Interactive fetch wait + Current Stage Indicator** — Reuse the **Current stage band** + indicator line pattern for slow interactive calls (today: blue first prompt + grey box + ellipsis in `interactiveFetchWait.ts`). Unify or reconcile with the blue prompt styling; extend Vitest / TTY tests. *Skip this phase if the current fetch-wait UX is enough.*
+3. **Interactive fetch wait + Current Stage Indicator** — **Done.** Fetch-wait copy and ellipsis live on the **Current Stage Indicator** (full-width **Current stage band** + banded separator); blue `INTERACTIVE_FETCH_WAIT_PROMPT_FG` on the band; `needsGapBeforeBox` accounts for indicator-only prompt blocks; Vitest in `renderer.test.ts`, `interactiveFetchWait.test.ts`.
 
 **Deploy gate** between phases if the team requires CD before the next slice (see `.cursor/rules/planning.mdc`).
 
 ## Resolved decisions
 
-- **Interactive fetch wait:** Treat as a **Current Stage** in the glossary; **do not** add a Current Stage Indicator line for fetch-wait in phase 1 — **phase 3 (optional)** if you want one band + label for slow calls.
+- **Interactive fetch wait:** Treat as a **Current Stage** in the glossary; phase 1 left fetch-wait without a banded indicator; **phase 3** added the same **Current stage band** + indicator pattern as recall loading (blue label + ellipsis on the band).
 - **Band fill:** Use one **Current stage band** SGR constant (domain-named). Start with the **same numeric color** as today’s `GREY_BG` (`48;5;236`); change the palette only if the band is confused with **history** or **input box** chrome in practice.

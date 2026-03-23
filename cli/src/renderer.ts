@@ -450,7 +450,7 @@ export interface BuildBoxLinesOptions {
 }
 
 export type LiveRegionPaintOptions = BuildBoxLinesOptions & {
-  /** Default grey. Interactive fetch wait uses `INTERACTIVE_FETCH_WAIT_PROMPT_FG`. */
+  /** Default grey for wrapped Current prompt rows (MCQ stem, token prompt, …). */
   currentPromptSgr?: string
 }
 
@@ -488,9 +488,14 @@ export function getLastLine(buffer: string): string {
 
 export function needsGapBeforeBox(
   history: ChatHistory,
-  currentPromptWrappedLines: string[]
+  currentPromptWrappedLines: string[],
+  currentStageIndicatorLines: string[] = []
 ): boolean {
-  return history.length > 0 && currentPromptWrappedLines.length === 0
+  return (
+    history.length > 0 &&
+    currentPromptWrappedLines.length === 0 &&
+    currentStageIndicatorLines.length === 0
+  )
 }
 
 export function buildLiveRegionLines(
@@ -687,7 +692,11 @@ export function renderFullDisplay(
     }
   }
   if (
-    needsGapBeforeBox(history, currentPromptLines ?? []) &&
+    needsGapBeforeBox(
+      history,
+      currentPromptLines ?? [],
+      currentStageIndicatorLines
+    ) &&
     lines[lines.length - 1] !== ''
   ) {
     lines.push('')

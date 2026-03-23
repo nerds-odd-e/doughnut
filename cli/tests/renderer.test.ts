@@ -14,9 +14,12 @@ import {
   buildLiveRegionLines,
   CURRENT_STAGE_BAND_BACKGROUND_SGR,
   DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
+  INTERACTIVE_FETCH_WAIT_PROMPT_FG,
   visibleLength,
   wrapTextToVisibleWidthLines,
   terminalColumnsOfPlainGrapheme,
+  formatInteractiveFetchWaitPromptLine,
+  RESET,
 } from '../src/renderer.js'
 import type { ChatHistory } from '../src/types.js'
 
@@ -155,6 +158,16 @@ describe('needsGapBeforeBox', () => {
       false
     )
   })
+
+  test('false when Current Stage Indicator is present but wrapped prompt is empty', () => {
+    expect(
+      needsGapBeforeBox(
+        [{ type: 'input', content: 'x' }],
+        [],
+        [`${INTERACTIVE_FETCH_WAIT_PROMPT_FG}Loading${RESET}`]
+      )
+    ).toBe(false)
+  })
 })
 
 describe('buildLiveRegionLines', () => {
@@ -215,6 +228,23 @@ describe('buildLiveRegionLines', () => {
     expect(stripAnsi(lines[2])).toBe('Notebook: X')
     expect(stripAnsi(lines[3])).toBe('Stem?')
     expect(boxTopIndex).toBe(4)
+  })
+
+  test('interactive fetch wait: banded Current Stage Indicator + separator, then box', () => {
+    const width = 44
+    const base = INTERACTIVE_FETCH_WAIT_LINES.recallNext
+    const label = `${INTERACTIVE_FETCH_WAIT_PROMPT_FG}${formatInteractiveFetchWaitPromptLine(base, 0)}${RESET}`
+    const lines = buildLiveRegionLines('', width, [], [], [label], {
+      placeholderContext: 'interactiveFetchWait',
+    })
+    const boxTopIndex = lines.findIndex((l) => stripAnsi(l).startsWith('┌'))
+    expect(boxTopIndex).toBe(2)
+    expect(lines[0]).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
+    expect(lines[0]).toContain(INTERACTIVE_FETCH_WAIT_PROMPT_FG)
+    expect(stripAnsi(lines[0])).toMatch(new RegExp(`^${base}\\.\\s+$`))
+    expect(visibleLength(stripAnsi(lines[0]))).toBe(width)
+    expect(lines[1]).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
+    expect(stripAnsi(lines[1])).toBe('─'.repeat(width))
   })
 })
 
