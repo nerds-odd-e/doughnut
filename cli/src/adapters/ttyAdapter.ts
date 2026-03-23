@@ -1,7 +1,12 @@
 import * as readline from 'node:readline'
 import { Writable } from 'node:stream'
 import type { AccessTokenEntry, AccessTokenLabel } from '../accessToken.js'
-import type { CommandDoc } from '../help.js'
+import { formatVersionOutput } from '../version.js'
+import {
+  filterCommandsByPrefix,
+  getTabCompletion,
+  interactiveDocs,
+} from '../help.js'
 import {
   CLI_USER_ABORTED_WAIT_MESSAGE,
   userVisibleOutcomeFromCommandError,
@@ -45,14 +50,30 @@ import {
 } from '../interactions/selectListInteraction.js'
 import {
   applyChatHistoryOutputTone,
+  buildBoxLines,
+  buildCurrentPromptSeparator,
+  buildLiveRegionLines,
+  buildSuggestionLines,
+  buildTokenListLines,
+  CLEAR_SCREEN,
   countPromptBlockLinesAboveInputBoxTop,
+  DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
+  getLastLine,
+  getTerminalWidth,
+  GREY,
   greyCurrentStageIndicatorLabel,
+  HIDE_CURSOR,
   interactiveFetchWaitStageIndicatorLine,
   interactiveInputReadyOscSuffix,
   isCommittedInteractiveInput,
   isGreyDisabledInputChrome,
+  needsGapBeforeBox,
+  PROMPT,
+  recallMcqCurrentGuidanceLines,
+  renderFullDisplay,
+  renderPastInput,
+  SHOW_CURSOR,
   wrapTextToLines,
-  type LiveRegionPaintOptions,
   type PlaceholderContext,
 } from '../renderer.js'
 import type {
@@ -88,19 +109,7 @@ export interface TTYDeps {
   getNumberedChoiceListCurrentPromptWrappedLines: (
     width: number
   ) => string[] | null
-  formatNumberedChoiceGuidanceLines: (
-    choices: readonly string[],
-    selectedIndex: number,
-    width: number
-  ) => string[]
   usesSessionYesNoInputChrome: (inTokenList: boolean) => boolean
-  getSessionPayloadLoadingIndicator: () => string
-  buildTokenListLines: (
-    tokens: AccessTokenEntry[],
-    defaultLabel: AccessTokenLabel | undefined,
-    width: number,
-    highlightIndex: number
-  ) => string[]
   getDefaultTokenLabel: () => AccessTokenLabel | undefined
   listAccessTokens: () => AccessTokenEntry[]
   removeAccessToken: (label: AccessTokenLabel) => boolean
@@ -109,58 +118,6 @@ export interface TTYDeps {
     signal?: AbortSignal
   ) => Promise<void>
   setDefaultTokenLabel: (label: AccessTokenLabel) => void
-  formatVersionOutput: () => string
-  getLastLine: (buffer: string) => string
-  buildBoxLines: (
-    buffer: string,
-    width: number,
-    options?: { placeholderContext?: PlaceholderContext }
-  ) => string[]
-  buildSuggestionLines: (
-    buffer: string,
-    highlightIndex: number,
-    width: number,
-    options?: { forceCommandsHint?: boolean }
-  ) => string[]
-  getTerminalWidth: () => number
-  buildCurrentPromptSeparator: (width: number) => string
-  buildLiveRegionLines: (
-    buffer: string,
-    width: number,
-    currentPromptWrappedLines: string[],
-    suggestionLines: string[],
-    currentStageIndicatorLines: string[],
-    options?: LiveRegionPaintOptions
-  ) => string[]
-  needsGapBeforeBox: (
-    history: ChatHistory,
-    currentPromptWrappedLines: string[],
-    currentStageIndicatorLines: string[]
-  ) => boolean
-  renderFullDisplay: (
-    history: ChatHistory,
-    buffer: string,
-    width: number,
-    suggestionLines: string[],
-    currentStageIndicatorLines: string[],
-    currentPromptLines?: string[],
-    options?: LiveRegionPaintOptions
-  ) => string[]
-  renderPastInput: (input: string, width: number) => string
-  GREY: string
-  HIDE_CURSOR: string
-  SHOW_CURSOR: string
-  CLEAR_SCREEN: string
-  PROMPT: string
-  filterCommandsByPrefix: (
-    commands: readonly CommandDoc[],
-    prefix: string
-  ) => readonly CommandDoc[]
-  getTabCompletion: (
-    buffer: string,
-    commands: readonly CommandDoc[]
-  ) => { completed: string; count: number }
-  interactiveDocs: readonly CommandDoc[]
   TOKEN_LIST_COMMANDS: Record<string, AccessTokenPickerCommandConfig>
   getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
 }
@@ -245,33 +202,12 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     isNumberedChoiceListActive,
     getNumberedChoiceListChoices,
     getNumberedChoiceListCurrentPromptWrappedLines,
-    formatNumberedChoiceGuidanceLines,
     usesSessionYesNoInputChrome,
-    getSessionPayloadLoadingIndicator,
-    buildTokenListLines,
     getDefaultTokenLabel,
     listAccessTokens,
     removeAccessToken,
     removeAccessTokenCompletely,
     setDefaultTokenLabel,
-    formatVersionOutput,
-    getLastLine,
-    buildBoxLines,
-    buildSuggestionLines,
-    getTerminalWidth,
-    buildCurrentPromptSeparator,
-    buildLiveRegionLines,
-    needsGapBeforeBox,
-    renderFullDisplay,
-    renderPastInput,
-    GREY,
-    HIDE_CURSOR,
-    SHOW_CURSOR,
-    CLEAR_SCREEN,
-    PROMPT,
-    filterCommandsByPrefix,
-    getTabCompletion,
-    interactiveDocs,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
   } = deps
@@ -291,7 +227,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       return [greyCurrentStageIndicatorLabel(tokenPicker.stageIndicator)]
     }
     if (sessionPayloadLoading) {
-      return [getSessionPayloadLoadingIndicator()]
+      return [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
     }
     return []
   }
@@ -474,7 +410,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       : stopConfirmDisplay
         ? stopConfirmDisplay.guidance
         : numberedChoices !== null
-          ? formatNumberedChoiceGuidanceLines(
+          ? recallMcqCurrentGuidanceLines(
               numberedChoices,
               numberedChoiceHighlightIndex,
               width

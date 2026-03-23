@@ -12,12 +12,7 @@ import {
 } from './accessToken.js'
 import { userVisibleOutcomeFromCommandError } from './fetchAbort.js'
 import { addGmailAccount, getLastEmailSubject } from './gmail.js'
-import {
-  filterCommandsByPrefix,
-  formatHelp,
-  getTabCompletion,
-  interactiveDocs,
-} from './help.js'
+import { formatHelp } from './help.js'
 import { renderMarkdownToTerminal } from './markdown.js'
 import {
   answerQuiz,
@@ -37,36 +32,19 @@ import {
   runInteractiveFetchWait,
   type InteractiveFetchWaitLine,
 } from './interactiveFetchWait.js'
-import { formatVersionOutput } from './version.js'
 import {
   dispatchRecallSessionConfirmKey,
   recallStopConfirmViewModelForContext,
   parseRecallSessionYesNoSubmit,
 } from './interactions/recallSessionConfirmInteraction.js'
 import {
-  buildBoxLines,
-  buildCurrentPromptSeparator,
-  buildLiveRegionLines,
-  needsGapBeforeBox,
   buildSuggestionLines,
-  buildTokenListLines,
   formatMcqChoiceLines,
-  recallMcqCurrentGuidanceLines,
-  wrapMarkdownTerminalToLines,
-  getLastLine,
   getTerminalWidth,
-  renderBox,
-  renderFullDisplay,
-  renderPastInput,
+  RECALL_SESSION_YES_NO_PLACEHOLDER,
+  wrapMarkdownTerminalToLines,
   wrapTextToLines,
   writeFullRedraw,
-  GREY,
-  HIDE_CURSOR,
-  SHOW_CURSOR,
-  CLEAR_SCREEN,
-  DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
-  PROMPT,
-  RECALL_SESSION_YES_NO_PLACEHOLDER,
   type PlaceholderContext,
 } from './renderer.js'
 import type {
@@ -409,13 +387,8 @@ const defaultOutput: OutputAdapter = {
   logUserNotice: (msg) => console.log(msg),
   writeCurrentPrompt: (msg) => console.log(msg),
   clearAndRedraw: () => {
-    writeFullRedraw(
-      [],
-      '',
-      getTerminalWidth(),
-      buildSuggestionLines('', 0, getTerminalWidth()),
-      []
-    )
+    const width = getTerminalWidth()
+    writeFullRedraw([], '', width, buildSuggestionLines('', 0, width), [])
   },
 }
 
@@ -696,34 +669,12 @@ function buildTTYDeps() {
     isNumberedChoiceListActive,
     getNumberedChoiceListChoices,
     getNumberedChoiceListCurrentPromptWrappedLines,
-    formatNumberedChoiceGuidanceLines: recallMcqCurrentGuidanceLines,
     usesSessionYesNoInputChrome,
-    getSessionPayloadLoadingIndicator: () =>
-      DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
-    buildTokenListLines,
     getDefaultTokenLabel,
     listAccessTokens,
     removeAccessToken,
     removeAccessTokenCompletely,
     setDefaultTokenLabel,
-    formatVersionOutput,
-    buildBoxLines,
-    buildCurrentPromptSeparator,
-    buildLiveRegionLines,
-    needsGapBeforeBox,
-    buildSuggestionLines,
-    getLastLine,
-    getTerminalWidth,
-    renderFullDisplay,
-    renderPastInput,
-    GREY,
-    HIDE_CURSOR,
-    SHOW_CURSOR,
-    CLEAR_SCREEN,
-    PROMPT,
-    filterCommandsByPrefix,
-    getTabCompletion,
-    interactiveDocs,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
   }
@@ -732,12 +683,6 @@ function buildTTYDeps() {
 function buildPipedDeps() {
   return {
     processInput,
-    getTerminalWidth,
-    buildBoxLines,
-    buildSuggestionLines,
-    renderBox,
-    renderPastInput,
-    formatVersionOutput,
     getPlaceholderContext,
   }
 }

@@ -125,11 +125,17 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
-### Phase D — TTYDeps / `interactive.ts` cleanup (renderer imports)
+### Phase D — TTYDeps / `interactive.ts` cleanup (renderer imports) — **done**
 
 **Goal:** Business layer does not import presentation constants; deps are **data + callbacks** suitable to pass as React props later. Reduces **business↔presentation leakage** (complements **`ttyAdapter` vs domain naming**).
 
-- **Verify:** full CLI Vitest + recall E2E.
+**Delivered**
+
+- **`TTYDeps`** stripped of all pass-through renderer/help/version items: ANSI constants (`GREY`, `HIDE_CURSOR`, `SHOW_CURSOR`, `CLEAR_SCREEN`, `PROMPT`), rendering functions (`buildBoxLines`, `buildLiveRegionLines`, `buildSuggestionLines`, `buildTokenListLines`, `buildCurrentPromptSeparator`, `renderFullDisplay`, `renderPastInput`, `needsGapBeforeBox`, `getLastLine`, `getTerminalWidth`), `recallMcqCurrentGuidanceLines` (was `formatNumberedChoiceGuidanceLines`), `DEFAULT_RECALL_LOADING_STAGE_INDICATOR` (was `getSessionPayloadLoadingIndicator`), `formatVersionOutput`, `filterCommandsByPrefix`, `getTabCompletion`, `interactiveDocs`.
+- **`PipedDeps`** stripped to `processInput` + `getPlaceholderContext`; `ttyAdapter` and `pipedAdapter` import renderer/help/version functions directly.
+- **`buildTTYDeps()`** and **`buildPipedDeps()`** now expose only domain state + callbacks; `interactive.ts` retains only the renderer imports needed for its own business-facing code (`wrapTextToLines`, `wrapMarkdownTerminalToLines`, `getTerminalWidth`, `formatMcqChoiceLines`, `RECALL_SESSION_YES_NO_PLACEHOLDER`, `writeFullRedraw`, `buildSuggestionLines`).
+- `defaultOutput.clearAndRedraw` kept for observable `/clear` test coverage (non-interactive fallback).
+- **Tests:** `pnpm cli:test` (398 tests, all pass).
 
 ---
 
@@ -198,5 +204,5 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ## Notes
 
-- **Ordering:** Phases A–D deliver a safe **extract-and-thin-adapter** path even if Ink is deferred; E–I require the **decision gates** to be closed. **Next:** Phase D.
+- **Ordering:** Phases A–D deliver a safe **extract-and-thin-adapter** path even if Ink is deferred; E–I require the **decision gates** to be closed. **Next:** Phase E (Ink spike).
 - **Conflicts:** Any phase that would change PTY/E2E-visible behavior without product sign-off should stop at the nearest **decision gate** above.

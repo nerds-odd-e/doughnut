@@ -1,11 +1,17 @@
 import * as readline from 'node:readline'
 import { maskInteractiveInputForHistory } from '../inputHistoryMask.js'
 import {
+  buildBoxLines,
+  buildSuggestionLines,
+  getTerminalWidth,
   isCommittedInteractiveInput,
   RECALL_SESSION_YES_NO_PLACEHOLDER,
+  renderBox,
+  renderPastInput,
   type PlaceholderContext,
 } from '../renderer.js'
 import type { OutputAdapter } from '../types.js'
+import { formatVersionOutput } from '../version.js'
 
 export interface PipedDeps {
   processInput: (
@@ -13,16 +19,6 @@ export interface PipedDeps {
     output?: OutputAdapter,
     interactiveUi?: boolean
   ) => Promise<boolean>
-  getTerminalWidth: () => number
-  buildBoxLines: (buffer: string, width: number) => string[]
-  buildSuggestionLines: (
-    buffer: string,
-    highlightIndex: number,
-    width: number
-  ) => string[]
-  renderBox: (lines: string[], width: number) => string
-  renderPastInput: (input: string, width: number) => string
-  formatVersionOutput: () => string
   getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
 }
 
@@ -30,16 +26,7 @@ export async function runPiped(
   stdin: NodeJS.ReadableStream,
   deps: PipedDeps
 ): Promise<void> {
-  const {
-    processInput,
-    getTerminalWidth,
-    buildBoxLines,
-    buildSuggestionLines,
-    renderBox,
-    renderPastInput,
-    formatVersionOutput,
-    getPlaceholderContext,
-  } = deps
+  const { processInput, getPlaceholderContext } = deps
 
   const width = getTerminalWidth()
   console.log(formatVersionOutput())
