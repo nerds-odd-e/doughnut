@@ -1,23 +1,24 @@
 import assert from 'node:assert'
-import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import {
   FRONTEND_GITHUB_SHA_PLACEHOLDER,
+  loadDoughnutRouting,
   renderDoughnutAppServiceUrlMapTemplate,
-} from './renderDoughnutAppServiceUrlMap.mjs'
+  renderDoughnutAppServiceUrlMapYamlFromRouting,
+} from '../path-routing/doughnutRouting.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-test('render substitutes every placeholder with the commit sha', () => {
-  const templatePath = path.join(
+test('render from routing JSON substitutes SHA in static rewrites', () => {
+  const routingPath = path.join(
     __dirname,
-    'doughnut-app-service-map.template.yaml'
+    '../path-routing/doughnut-routing.json'
   )
-  const templateText = readFileSync(templatePath, 'utf8')
+  const routing = loadDoughnutRouting(routingPath)
   const sha = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-  const out = renderDoughnutAppServiceUrlMapTemplate(templateText, sha)
+  const out = renderDoughnutAppServiceUrlMapYamlFromRouting(routing, sha)
   assert.ok(!out.includes(FRONTEND_GITHUB_SHA_PLACEHOLDER))
   assert.ok(out.includes(`/frontend/${sha}/assets/`))
   assert.equal((out.match(new RegExp(sha, 'g')) ?? []).length, 5)
@@ -25,9 +26,27 @@ test('render substitutes every placeholder with the commit sha', () => {
 
 test('render rejects non-hex or wrong length', () => {
   assert.throws(() =>
-    renderDoughnutAppServiceUrlMapTemplate('__FRONTEND_GITHUB_SHA__', 'short')
+    renderDoughnutAppServiceUrlMapYamlFromRouting(
+      loadDoughnutRouting(
+        path.join(__dirname, '../path-routing/doughnut-routing.json')
+      ),
+      'short'
+    )
   )
   assert.throws(() =>
-    renderDoughnutAppServiceUrlMapTemplate('__FRONTEND_GITHUB_SHA__', 'g'.repeat(40))
+    renderDoughnutAppServiceUrlMapYamlFromRouting(
+      loadDoughnutRouting(
+        path.join(__dirname, '../path-routing/doughnut-routing.json')
+      ),
+      'g'.repeat(40)
+    )
   )
+})
+
+test('template string substitution still works for ad-hoc YAML', () => {
+  const out = renderDoughnutAppServiceUrlMapTemplate(
+    `pathPrefixRewrite: /frontend/${FRONTEND_GITHUB_SHA_PLACEHOLDER}/x`,
+    'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
+  )
+  assert.ok(out.includes('/frontend/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/x'))
 })

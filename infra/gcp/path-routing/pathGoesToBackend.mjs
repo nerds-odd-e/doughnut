@@ -3,18 +3,19 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const DEFAULT_HINTS_PATH = path.join(__dirname, 'backend-path-hints.json')
+const DEFAULT_ROUTING_PATH = path.join(__dirname, 'doughnut-routing.json')
 
 /**
- * @param {string} jsonPath
+ * @param {string} jsonPath doughnut-routing.json (or compatible doc with backendPathHints)
  * @returns {{
  *   exactPaths: string[],
  *   pathPrefixes: string[],
  *   pathPrefixesAllowBare?: string[]
  * }}
  */
-export function loadBackendPathHints(jsonPath = DEFAULT_HINTS_PATH) {
-  return JSON.parse(readFileSync(jsonPath, 'utf8'))
+export function loadBackendPathHints(jsonPath = DEFAULT_ROUTING_PATH) {
+  const doc = JSON.parse(readFileSync(jsonPath, 'utf8'))
+  return doc.backendPathHints ?? doc
 }
 
 /**

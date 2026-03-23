@@ -3,6 +3,8 @@
  * Used to validate prod routing without calling gcloud.
  */
 
+import { defaultDoughnutRoutingPath, loadDoughnutRouting } from './doughnutRouting.mjs'
+
 /**
  * @param {string} pattern GCP path pattern (e.g. /assets/* or /index.html)
  * @param {string} urlPath pathname only, no query
@@ -41,8 +43,11 @@ export function gcpRoutesToStaticBucket(urlPath, pathRules) {
 
 /**
  * Paths every prod URL map must route to the static (GCS) backend bucket.
- * Not derived from the frontend tree: structural requirements for SPA + Vite assets.
+ * Declared in doughnut-routing.json (structural SPA + asset probes).
+ * @param {string} [routingJsonPath]
  */
-export function mandatoryStaticBucketProbes() {
-  return ['/', '/index.html', '/assets/.doughnut-path-routing-probe']
+export function mandatoryStaticBucketProbes(
+  routingJsonPath = defaultDoughnutRoutingPath()
+) {
+  return loadDoughnutRouting(routingJsonPath).mandatoryStaticBucketProbes
 }

@@ -9,8 +9,10 @@ import {
 import { collectRequiredStaticPathsFromFrontend } from './requiredStaticPathsFromFrontend.mjs'
 import {
   FRONTEND_GITHUB_SHA_PLACEHOLDER,
+  loadDoughnutRouting,
   renderDoughnutAppServiceUrlMapTemplate,
-} from '../url-maps/renderDoughnutAppServiceUrlMap.mjs'
+  renderDoughnutAppServiceUrlMapYamlFromRouting,
+} from './doughnutRouting.mjs'
 
 function backendProbePaths(hints) {
   const out = new Set(hints.exactPaths)
@@ -85,7 +87,7 @@ export function validateUrlMapAgainstHintsAndStaticPaths({
     staticChecks++
     if (pathGoesToBackend(urlPath, hints)) {
       failures.push(
-        `required static path <${urlPath}> is classified as backend in backend-path-hints.json`
+        `required static path <${urlPath}> is classified as backend in doughnut-routing.json`
       )
       continue
     }
@@ -111,24 +113,22 @@ export const PATH_ROUTING_VALIDATION_DUMMY_SHA =
  * }} args
  */
 export function runRepoPathRoutingValidation({ repoRoot, urlMapPath, hintsPath }) {
-  const mapPath =
-    urlMapPath ??
-    path.join(
-      repoRoot,
-      'infra/gcp/url-maps/doughnut-app-service-map.template.yaml'
-    )
-  const hintsFile =
+  const routingFile =
     hintsPath ??
-    path.join(repoRoot, 'infra/gcp/path-routing/backend-path-hints.json')
-  let raw = readFileSync(mapPath, 'utf8')
-  if (raw.includes(FRONTEND_GITHUB_SHA_PLACEHOLDER)) {
-    raw = renderDoughnutAppServiceUrlMapTemplate(
-      raw,
-      process.env.PATH_ROUTING_VALIDATION_SHA ??
-        PATH_ROUTING_VALIDATION_DUMMY_SHA
-    )
+    path.join(repoRoot, 'infra/gcp/path-routing/doughnut-routing.json')
+  const sha =
+    process.env.PATH_ROUTING_VALIDATION_SHA ?? PATH_ROUTING_VALIDATION_DUMMY_SHA
+  let raw
+  if (urlMapPath) {
+    raw = readFileSync(urlMapPath, 'utf8')
+    if (raw.includes(FRONTEND_GITHUB_SHA_PLACEHOLDER)) {
+      raw = renderDoughnutAppServiceUrlMapTemplate(raw, sha)
+    }
+  } else {
+    const routing = loadDoughnutRouting(routingFile)
+    raw = renderDoughnutAppServiceUrlMapYamlFromRouting(routing, sha)
   }
-  const hints = loadBackendPathHints(hintsFile)
+  const hints = loadBackendPathHints(routingFile)
   const requiredStaticPaths = collectRequiredStaticPathsFromFrontend(repoRoot)
   return validateUrlMapAgainstHintsAndStaticPaths({
     urlMapYamlText: raw,

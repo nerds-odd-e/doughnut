@@ -3,15 +3,14 @@
  * Local fake LB for Cypress / dev. Behavior and ports: docs/gcp/prod_env.md (section **Local E2E / dev**).
  *
  * Env: E2E_STATIC_ROOT, E2E_PROXY_TARGET, E2E_PROXY_VITE_UPSTREAM, E2E_PROXY_LISTEN_PORT (defaults in code).
+ * E2E_BACKEND_PATH_HINTS_JSON: optional path to doughnut-routing.json (default: repo infra/gcp/path-routing/doughnut-routing.json).
  */
 import { createReadStream, existsSync, statSync } from 'node:fs'
 import http from 'node:http'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import {
-  loadBackendPathHints,
-  pathGoesToBackend,
-} from '../infra/gcp/path-routing/pathGoesToBackend.mjs'
+import { loadDoughnutRouting } from '../infra/gcp/path-routing/doughnutRouting.mjs'
+import { pathGoesToBackend } from '../infra/gcp/path-routing/pathGoesToBackend.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
@@ -23,10 +22,13 @@ const VITE_UPSTREAM = process.env.E2E_PROXY_VITE_UPSTREAM
   ? new URL(process.env.E2E_PROXY_VITE_UPSTREAM)
   : null
 const PORT = Number(process.env.E2E_PROXY_LISTEN_PORT ?? 5173)
-const BACKEND_PATH_HINTS = loadBackendPathHints(
-  process.env.E2E_BACKEND_PATH_HINTS_JSON
-    ? path.resolve(process.env.E2E_BACKEND_PATH_HINTS_JSON)
-    : path.join(repoRoot, 'infra/gcp/path-routing/backend-path-hints.json')
+const DOUGHNUT_ROUTING_PATH = process.env.E2E_BACKEND_PATH_HINTS_JSON
+  ? path.resolve(process.env.E2E_BACKEND_PATH_HINTS_JSON)
+  : path.join(repoRoot, 'infra/gcp/path-routing/doughnut-routing.json')
+const DOUGHNUT_ROUTING = loadDoughnutRouting(DOUGHNUT_ROUTING_PATH)
+const BACKEND_PATH_HINTS = DOUGHNUT_ROUTING.backendPathHints
+const LOCAL_SPA_SHELL_PATHS = new Set(
+  DOUGHNUT_ROUTING.localProxy?.spaShellInsteadOfBackendExactPaths ?? []
 )
 
 /** Same path as prod GCS object; local file from pnpm cli:bundle (phase 10). */
@@ -52,10 +54,7 @@ const MIME = {
 }
 
 function shouldProxyPath(urlPath) {
-  // Prod still maps /users/identify → MIG; locally Spring forwards to classpath
-  // index.html, but the SPA is built to frontend/dist only (not on the classpath).
-  // Serve the login shell from Vite or STATIC_ROOT like other SPA routes.
-  if (urlPath === '/users/identify') return false
+  if (LOCAL_SPA_SHELL_PATHS.has(urlPath)) return false
   return pathGoesToBackend(urlPath, BACKEND_PATH_HINTS)
 }
 

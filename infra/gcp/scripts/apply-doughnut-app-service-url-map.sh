@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Renders infra/gcp/url-maps/doughnut-app-service-map.template.yaml for GITHUB_SHA,
+# Renders prod URL map YAML from infra/gcp/path-routing/doughnut-routing.json for GITHUB_SHA,
 # runs path-routing validation, then imports the global URL map.
 # Env: GITHUB_SHA (40-char hex). Optional REPO_ROOT (default: repo root from this script).
 

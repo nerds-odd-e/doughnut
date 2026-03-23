@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Prod URL map checks (phase 8 + phase 2):
- * - static pathRules must not capture backend-classified paths (backend-path-hints.json)
+ * - static pathRules must not capture backend-classified paths (doughnut-routing.json)
  * - required static paths (from frontend + mandatory SPA/asset probes) must route to GCS bucket
  *
  * Optional: --url-map <file> (fully rendered YAML, e.g. deploy-time output)

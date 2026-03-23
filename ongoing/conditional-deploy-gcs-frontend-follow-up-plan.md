@@ -85,7 +85,7 @@ Finish the incomplete "single source of truth" story so that:
 
 **Status:** Implemented — `infra/gcp/path-routing/validateUrlMapPathRouting.mjs` runs backend + static checks; required paths come from `requiredStaticPathsFromFrontend.mjs` (source `index.html`, `public/`, optional `dist/index.html`) plus `mandatoryStaticBucketProbes()` for `/`, `/index.html`, and `/assets/*`. `pnpm test:path-routing` (in `lint:all`) covers fixtures; `pnpm validate:path-routing` is the repo entry point.
 
-**Later change expected:** This currently validates the committed prod URL-map YAML. If Phase 3 moves prod activation to deploy-time generation in CI, add that generated URL-map path as the new validation input in a later phase rather than re-opening Phase 2.
+**Later change (Phase 4):** Default validation input is now the URL map YAML **generated** from `doughnut-routing.json` (same as deploy); `--url-map` still accepts a rendered file for pre-import checks.
 
 ---
 
@@ -117,7 +117,7 @@ Finish the incomplete "single source of truth" story so that:
 - A successful `main` CI run makes the frontend for that commit live on the prod hostname without manual intervention.
 - Frontend-only changes no longer wait for a separate promotion step.
 
-**Status:** Implemented — `infra/gcp/url-maps/doughnut-app-service-map.template.yaml` + `renderDoughnutAppServiceUrlMap.mjs`; `apply-doughnut-app-service-url-map.sh` renders, runs `validate-url-map-static-vs-backend-hints.mjs --url-map`, then `gcloud compute url-maps import`. `deploy-backend-jar-to-gcp-mig.sh` invokes apply **before** the jar skip gate so frontend-only commits still activate. `pnpm validate:path-routing` validates the template (dummy SHA substitution). Tests: `renderDoughnutAppServiceUrlMap.test.mjs`, `apply-doughnut-app-service-url-map-wiring.test`, extended `deploy-backend-jar-to-gcp-mig.sh.test`.
+**Status:** Implemented — `renderDoughnutAppServiceUrlMap.mjs` + `doughnut-routing.json` (Phase 4); `apply-doughnut-app-service-url-map.sh` renders, runs `validate-url-map-static-vs-backend-hints.mjs --url-map`, then `gcloud compute url-maps import`. `deploy-backend-jar-to-gcp-mig.sh` invokes apply **before** the jar skip gate so frontend-only commits still activate. `pnpm validate:path-routing` validates generated YAML (dummy SHA). Tests: `renderDoughnutAppServiceUrlMap.test.mjs`, `apply-doughnut-app-service-url-map-wiring.test`, extended `deploy-backend-jar-to-gcp-mig.sh.test`.
 
 ---
 
@@ -145,6 +145,8 @@ Finish the incomplete "single source of truth" story so that:
 **Done when:**
 
 - Changing routing rules happens in one committed source, with downstream artifacts regenerated or validated from it.
+
+**Status:** Implemented — Single source [`infra/gcp/path-routing/doughnut-routing.json`](infra/gcp/path-routing/doughnut-routing.json): `backendPathHints` (proxy + validation), `gcpUrlMap` (deploy-time YAML via `renderDoughnutAppServiceUrlMapYamlFromRouting`), `mandatoryStaticBucketProbes`, `localProxy` (e.g. `/users/identify` SPA shell locally). `pnpm validate:path-routing` without `--url-map` validates that generated output. Removed `backend-path-hints.json` and `doughnut-app-service-map.template.yaml`.
 
 ---
 

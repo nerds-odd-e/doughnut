@@ -22,7 +22,7 @@ Do **not** treat `https://storage.googleapis.com/...` as the primary UI origin: 
 |----------|-------------|
 | GCS bucket (CI + LB) | `dough-01` |
 | Backend bucket (CDN on) | `doughnut-frontend-backend-bucket` → `dough-01` |
-| URL map (HTTPS) | `doughnut-app-service-map` — template in repo: [`infra/gcp/url-maps/doughnut-app-service-map.template.yaml`](../../infra/gcp/url-maps/doughnut-app-service-map.template.yaml); CI renders it with `GITHUB_SHA` and imports after each green `main` run |
+| URL map (HTTPS) | `doughnut-app-service-map` — routing source [`infra/gcp/path-routing/doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json); CI renders YAML with `GITHUB_SHA` and imports after each green `main` run |
 | HTTPS target proxy | `doughnut-app-service-map-target-proxy-2` → above URL map |
 | MIG backend service | `doughnut-app-service` (default path matcher + API traffic) |
 | GCS read for LB + CDN | `gs://dough-01` has `roles/storage.objectViewer` for `allUsers` so the backend bucket (and Cloud CDN cache fills) can read objects. The default Compute SA and `service-220715781008@compute-system.iam.gserviceaccount.com` are also granted `objectViewer`; with **Cloud CDN** enabled, Google’s docs require `service-<PROJECT_NUMBER>@cloud-cdn-fill.iam.gserviceaccount.com` (created after the first signed URL key on a backend bucket in the project) when the bucket is not publicly readable. |
@@ -35,9 +35,9 @@ Serving static through a **backend bucket** on the **same** multi-purpose bucket
 
 **Org constraint:** If your org forbids `allUsers` with IAM **conditions** (`PublicResourceAllowConditionCheck`), you cannot scope “public read only under `frontend/`” on a single bucket via conditional bindings; a dedicated bucket avoids that.
 
-**Normal release:** On green `main`, CI runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh) (render template + `pnpm validate:path-routing` equivalent + `gcloud compute url-maps import`) so the LB serves `frontend/<GITHUB_SHA>/` for that pipeline.
+**Normal release:** On green `main`, CI runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh) (render from `doughnut-routing.json` + `pnpm validate:path-routing` equivalent + `gcloud compute url-maps import`) so the LB serves `frontend/<GITHUB_SHA>/` for that pipeline.
 
-**Recovery / manual import:** Render the template for a known commit (40-char SHA) whose tree exists under `gs://dough-01/frontend/<SHA>/`, validate, then import:
+**Recovery / manual import:** Render for a known commit (40-char SHA) whose tree exists under `gs://dough-01/frontend/<SHA>/`, validate, then import:
 
 ```bash
 gcloud config set project carbon-syntax-298809
@@ -46,7 +46,7 @@ pnpm exec node scripts/validate-url-map-static-vs-backend-hints.mjs --url-map /t
 gcloud compute url-maps import doughnut-app-service-map --source=/tmp/url-map.yaml --global --quiet
 ```
 
-Add path rules in the **template** for any **new root-level** static files (same pattern as `odd-e.ico` / `odd-e.png`), merge to `main`, and let CI apply the updated map.
+Add entries under `gcpUrlMap.staticPathRules` in [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json) for any **new root-level** static files (same pattern as `odd-e.ico` / `odd-e.png`), merge to `main`, and let CI apply the updated map.
 
 HTTP forwarding (`doughnut-app-web-map-http`) is unchanged and does not use this map.
 
@@ -56,9 +56,9 @@ HTTP forwarding (`doughnut-app-web-map-http`) is unchanged and does not use this
 
 CI writes **immutable** prefixes: `frontend/<GITHUB_SHA>/`. The load balancer maps browser paths into **that** prefix for the commit that just passed the full pipeline.
 
-**Automatic:** Each successful `main` deploy job renders [`doughnut-app-service-map.template.yaml`](../../infra/gcp/url-maps/doughnut-app-service-map.template.yaml) with the pipeline’s `GITHUB_SHA` and imports the URL map (even when the backend jar deploy is skipped).
+**Automatic:** Each successful `main` deploy job renders from [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json) with the pipeline’s `GITHUB_SHA` and imports the URL map (even when the backend jar deploy is skipped).
 
-- **Rollback:** Render and import the template for a previous `<GITHUB_SHA>` that still exists under `frontend/` (see manual import above).
+- **Rollback:** Render and import for a previous `<GITHUB_SHA>` that still exists under `frontend/` (see manual import above).
 
 **Alternatives (tradeoffs):**
 
@@ -71,7 +71,7 @@ CI writes **immutable** prefixes: `frontend/<GITHUB_SHA>/`. The load balancer ma
 
 Order **specific** paths **before** the catch-all that sends traffic to GCS.
 
-The **canonical backend path list** used by the local prod-topology proxy and by CI checks against this URL map lives in [`infra/gcp/path-routing/backend-path-hints.json`](../../infra/gcp/path-routing/backend-path-hints.json). `pnpm validate:path-routing` also ensures root-level static paths implied by [`frontend/index.html`](../../frontend/index.html), [`frontend/public/`](../../frontend/public/), and (when present) `frontend/dist/index.html` are covered by a static (GCS backend bucket) pathRule—plus mandatory checks for `/`, `/index.html`, and `/assets/*`. Unit tests: `pnpm test:path-routing`.
+The **canonical routing** for prod URL-map generation, local prod-topology proxy backend classification, mandatory static probes, and CI validation lives in [`infra/gcp/path-routing/doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json) (`backendPathHints`, `gcpUrlMap.staticPathRules`, `mandatoryStaticBucketProbes`, `localProxy`). `pnpm validate:path-routing` checks the URL map YAML **generated** from that file (dummy SHA when no `--url-map`). It also ensures root-level static paths implied by [`frontend/index.html`](../../frontend/index.html), [`frontend/public/`](../../frontend/public/), and (when present) `frontend/dist/index.html` are covered by a static pathRule. Unit tests: `pnpm test:path-routing`.
 
 Send to the **backend service (MIG)** at least:
 
