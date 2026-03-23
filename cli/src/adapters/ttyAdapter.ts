@@ -1,5 +1,7 @@
+import React from 'react'
 import * as readline from 'node:readline'
 import { Writable } from 'node:stream'
+import { render } from 'ink'
 import type { AccessTokenEntry, AccessTokenLabel } from '../accessToken.js'
 import { formatVersionOutput } from '../version.js'
 import {
@@ -83,6 +85,7 @@ import type {
   ChatHistoryOutputTone,
   OutputAdapter,
 } from '../types.js'
+import { ConfirmDisplay } from '../ui/ConfirmDisplay.js'
 
 export interface TTYDeps {
   processInput: (
@@ -162,7 +165,7 @@ type TokenSelectionState = {
   highlightIndex: number
 }
 
-/** One submitted command’s buffered scrollback: lines + dominant tone for `commitHistoryOutput`. */
+/** One submitted command's buffered scrollback: lines + dominant tone for `commitHistoryOutput`. */
 type BufferedCommandTurn = { lines: string[]; tone: ChatHistoryOutputTone }
 
 /**
@@ -282,6 +285,89 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   let interactiveFetchWaitRepaintTimer: ReturnType<typeof setInterval> | null =
     null
 
+  // --- Ink island for confirm flows (Phase F1) ---
+  // The ANSI keypress handler dispatches keys; Ink is display-only (no useInput).
+  // MCQ and token list still use ANSI drawBox (Phase F2).
+  let inkDisplayInstance: ReturnType<typeof render> | null = null
+  let stopConfirmDraft = ''
+  let stopConfirmHint = ''
+  let sessionYesNoDraft = ''
+  let sessionYesNoHint = ''
+
+  function startOrUpdateInkDisplay(element: React.ReactElement): void {
+    if (inkDisplayInstance) {
+      inkDisplayInstance.rerender(element)
+      return
+    }
+    clearLiveRegionForRepaint(livePaint)
+    resetLivePaintCursor()
+    // Ink calls stdin.ref() / stdin.unref() to manage the event loop.
+    // Mock stdinpassed in tests don't have these; add noops to avoid errors.
+    const stdinForInk = stdin as NodeJS.ReadableStream & {
+      ref?: () => void
+      unref?: () => void
+    }
+    if (typeof stdinForInk.ref !== 'function')
+      stdinForInk.ref = () => {
+        /* noop — keep event loop alive */
+      }
+    if (typeof stdinForInk.unref !== 'function')
+      stdinForInk.unref = () => {
+        /* noop */
+      }
+    inkDisplayInstance = render(element, {
+      stdin: stdinForInk as NodeJS.ReadableStream,
+      stdout: process.stdout,
+      patchConsole: false,
+      exitOnCtrlC: false,
+      // maxFps:0 makes throttle interval 0ms so rerenders happen synchronously,
+      // allowing test write spies to capture output immediately after rerender().
+      maxFps: 0,
+    })
+  }
+
+  function unmountInkDisplay(): void {
+    if (inkDisplayInstance) {
+      // Rerender with empty content before unmounting so the final write
+      // (in debug/non-debug mode) doesn't repeat the previous UI state.
+      inkDisplayInstance.rerender(React.createElement(React.Fragment))
+      inkDisplayInstance.unmount()
+      inkDisplayInstance = null
+    }
+  }
+
+  function renderInkStopConfirm(): void {
+    const placeholderCtx = getPlaceholderContext(false)
+    const view = getStopConfirmationLiveView(placeholderCtx)
+    // Include stage indicator if still in a command session (e.g., recall active)
+    const stageLines = isInCommandSessionSubstate()
+      ? [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
+      : []
+    startOrUpdateInkDisplay(
+      React.createElement(ConfirmDisplay, {
+        guidanceLines: [
+          ...stageLines,
+          ...view.promptLines,
+          'Stop recall? (y/n)',
+        ],
+        placeholderText: view.placeholder,
+        hint: stopConfirmHint,
+        draft: stopConfirmDraft,
+      })
+    )
+  }
+
+  function renderInkSessionYesNo(): void {
+    startOrUpdateInkDisplay(
+      React.createElement(ConfirmDisplay, {
+        guidanceLines: [],
+        placeholderText: 'y or n; /stop to exit recall',
+        hint: sessionYesNoHint,
+        draft: sessionYesNoDraft,
+      })
+    )
+  }
+
   function rememberCommittedLine(raw: string): void {
     commandInput = {
       ...commandInput,
@@ -301,13 +387,17 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   function commitHistoryOutput(
     lines: readonly string[],
     tone: ChatHistoryOutputTone = 'plain',
-    options?: { inputAlreadyPaintedAboveLiveRegion?: boolean }
+    options?: {
+      inputAlreadyPaintedAboveLiveRegion?: boolean
+      skipDrawBox?: boolean
+    }
   ): void {
     chatHistory.push({ type: 'output', lines: [...lines], tone })
     clearLiveRegionForRepaint(livePaint)
     resetLivePaintCursor()
     paintCommittedScrollbackAppend(
-      options?.inputAlreadyPaintedAboveLiveRegion ?? false
+      options?.inputAlreadyPaintedAboveLiveRegion ?? false,
+      { skipDrawBox: options?.skipDrawBox }
     )
   }
 
@@ -641,8 +731,12 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
 
   const enterStopConfirmationFromEsc = (): void => {
     setPendingStopConfirmation(true)
+    stopConfirmDraft = ''
+    stopConfirmHint = ''
     commandInput = clearLiveCommandLine(commandInput)
-    drawBox()
+    // Unmount any existing Ink confirm (e.g., session y/n) before showing stop confirm
+    if (inkDisplayInstance) unmountInkDisplay()
+    renderInkStopConfirm()
   }
 
   ttyOutput = {
@@ -665,6 +759,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       chatHistory = []
       resetLiveLineDraftAndSlashSuggestions()
       tokenSelection = null
+      unmountInkDisplay()
       if (isInCommandSessionSubstate()) exitCommandSession()
       setPendingStopConfirmation(false)
       numberedChoiceHighlightIndex = 0
@@ -694,6 +789,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   const doExit = () => {
     stopInteractiveFetchWaitRepaintTimer()
     removeResizeListener()
+    unmountInkDisplay()
     process.stdout.write(SHOW_CURSOR)
     rl.close()
     process.exit(0)
@@ -720,18 +816,30 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           ctrl: !!key.ctrl,
           meta: !!key.meta,
           shift: !!key.shift,
-          lineDraft: commandInput.lineDraft,
+          lineDraft: stopConfirmDraft,
           submitPressed,
         },
         'treat-as-no'
       )
       switch (dispatch.result) {
         case 'cancel':
+          unmountInkDisplay()
           setPendingStopConfirmation(false)
+          stopConfirmDraft = ''
+          stopConfirmHint = ''
           commandInput = clearLiveCommandLine(commandInput)
-          drawBox()
+          if (usesSessionYesNoInputChrome(false)) {
+            sessionYesNoDraft = ''
+            sessionYesNoHint = ''
+            renderInkSessionYesNo()
+          } else {
+            drawBox()
+          }
           break
         case 'submit-yes':
+          unmountInkDisplay()
+          stopConfirmDraft = ''
+          stopConfirmHint = ''
           commandInput = clearLiveCommandLine(commandInput)
           setPendingStopConfirmation(false)
           exitCommandSession()
@@ -739,27 +847,36 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           commitHistoryOutput(getStopConfirmationYesOutcomeLines())
           break
         case 'submit-no':
+          unmountInkDisplay()
+          stopConfirmDraft = ''
+          stopConfirmHint = ''
           commandInput = clearLiveCommandLine(commandInput)
           setPendingStopConfirmation(false)
-          drawBox()
+          if (usesSessionYesNoInputChrome(false)) {
+            sessionYesNoDraft = ''
+            sessionYesNoHint = ''
+            renderInkSessionYesNo()
+          } else {
+            drawBox()
+          }
           break
         case 'invalid-submit':
-          commandInput = clearLiveCommandLine(commandInput)
-          setPendingStopConfirmation(false)
-          writeCurrentPromptLine(dispatch.hint)
-          setPendingStopConfirmation(true)
-          drawBox()
+          stopConfirmDraft = ''
+          stopConfirmHint = dispatch.hint
+          renderInkStopConfirm()
           break
         case 'edit-backspace':
-          commandInput = deleteBeforeCaret(commandInput)
-          drawBox()
+          stopConfirmDraft = stopConfirmDraft.slice(0, -1)
+          stopConfirmHint = ''
+          renderInkStopConfirm()
           break
         case 'edit-char':
-          commandInput = insertIntoDraft(commandInput, dispatch.char)
-          drawBox()
+          stopConfirmDraft += dispatch.char
+          stopConfirmHint = ''
+          renderInkStopConfirm()
           break
         case 'redraw':
-          drawBox()
+          renderInkStopConfirm()
           break
       }
       return
@@ -773,7 +890,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         key.name === 'backspace' ||
         (str !== undefined && str !== '' && !key.ctrl && !key.meta)
       const bareEnterOnSessionYesNo =
-        submitPressed && !key.shift && commandInput.lineDraft.trim() === ''
+        submitPressed && !key.shift && sessionYesNoDraft.trim() === ''
       if (keysForConfirmDispatch && !bareEnterOnSessionYesNo) {
         const dispatch = dispatchSessionYesNoKey(
           {
@@ -782,7 +899,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
             ctrl: !!key.ctrl,
             meta: !!key.meta,
             shift: !!key.shift,
-            lineDraft: commandInput.lineDraft,
+            lineDraft: sessionYesNoDraft,
             submitPressed,
           },
           'treat-as-invalid'
@@ -792,46 +909,60 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
             break
           case 'submit-yes':
           case 'submit-no': {
-            const input = commandInput.lineDraft
-            clearLiveRegionForRepaint(livePaint)
+            const effectiveLine = dispatch.result === 'submit-yes' ? 'y' : 'n'
+            unmountInkDisplay()
+            sessionYesNoDraft = ''
+            sessionYesNoHint = ''
             commandInput = clearLiveCommandLine(commandInput)
-            livePaint.lastPaintedLineCount = 0
             resetCommandTurnBuffer()
-            if (isCommittedInteractiveInput(input)) {
+            if (isCommittedInteractiveInput(effectiveLine)) {
               if (!usesSessionYesNoInputChrome(!!tokenSelection)) {
                 chatHistory.push({
                   type: 'input',
-                  content: maskInteractiveInputForHistory(input),
+                  content: maskInteractiveInputForHistory(effectiveLine),
                 })
-                rememberCommittedLine(input)
+                rememberCommittedLine(effectiveLine)
               }
-              const lineForProcess =
-                dispatch.result === 'submit-yes' ? 'y' : 'n'
-              if (await processInput(lineForProcess, ttyOutput, true)) {
+              if (await processInput(effectiveLine, ttyOutput, true)) {
                 commitExitTurnToScrollback()
                 doExit()
                 return
               }
-              commitHistoryOutput(commandTurn.lines, commandTurn.tone)
+              // Commit history then check if we need Ink again (another y/n)
+              const newSessionYesNo = usesSessionYesNoInputChrome(false)
+              commitHistoryOutput(commandTurn.lines, commandTurn.tone, {
+                skipDrawBox: newSessionYesNo,
+              })
+              if (newSessionYesNo) {
+                sessionYesNoDraft = ''
+                sessionYesNoHint = ''
+                renderInkSessionYesNo()
+              }
             }
             break
           }
           case 'invalid-submit':
-            writeCurrentPromptLine(dispatch.hint)
-            drawBox()
+            sessionYesNoHint = dispatch.hint
+            renderInkSessionYesNo()
             break
           case 'edit-backspace':
-            commandInput = deleteBeforeCaret(commandInput)
-            drawBox()
+            sessionYesNoDraft = sessionYesNoDraft.slice(0, -1)
+            sessionYesNoHint = ''
+            renderInkSessionYesNo()
             break
           case 'edit-char':
-            commandInput = insertIntoDraft(commandInput, dispatch.char)
-            drawBox()
+            sessionYesNoDraft += dispatch.char
+            sessionYesNoHint = ''
+            renderInkSessionYesNo()
             break
           case 'redraw':
-            drawBox()
+            renderInkSessionYesNo()
             break
         }
+        return
+      }
+      if (key.name === 'escape' && isInCommandSessionSubstate()) {
+        enterStopConfirmationFromEsc()
         return
       }
     }
@@ -886,7 +1017,16 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
             doExit()
             return
           }
-          commitHistoryOutput(commandTurn.lines, commandTurn.tone)
+          // After MCQ submit, check for session y/n (Ink) or normal (ANSI drawBox)
+          const newSessionYesNo = usesSessionYesNoInputChrome(false)
+          commitHistoryOutput(commandTurn.lines, commandTurn.tone, {
+            skipDrawBox: newSessionYesNo,
+          })
+          if (newSessionYesNo) {
+            sessionYesNoDraft = ''
+            sessionYesNoHint = ''
+            renderInkSessionYesNo()
+          }
           break
         }
         case 'edit-backspace':
@@ -1054,7 +1194,16 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
             doExit()
             return
           }
-          commitHistoryOutput(commandTurn.lines, commandTurn.tone)
+          // Start Ink for session y/n; MCQ and normal stay ANSI
+          const newSessionYesNo = usesSessionYesNoInputChrome(false)
+          commitHistoryOutput(commandTurn.lines, commandTurn.tone, {
+            skipDrawBox: newSessionYesNo,
+          })
+          if (newSessionYesNo) {
+            sessionYesNoDraft = ''
+            sessionYesNoHint = ''
+            renderInkSessionYesNo()
+          }
           return
         }
         if (isNumberedChoiceListActive()) {

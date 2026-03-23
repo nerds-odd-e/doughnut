@@ -3,6 +3,8 @@
     "target": "ES2022",
     "module": "Node16",
     "moduleResolution": "Node16",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
     "outDir": "./build",
     "strict": true,
     "esModuleInterop": true,

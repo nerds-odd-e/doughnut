@@ -139,24 +139,49 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
-### Phase E — Add Ink: **spike** + dependency decision
+### Phase E — Add Ink: **spike** + dependency decision — **done** (spike removed)
 
 **Goal:** Prove stdin lifecycle, bundle size, and CI build with a **minimal** Ink tree (e.g. only stop-recall confirm OR a dev-only flag).
 
-- Add `react`, `ink`; optionally `@inkjs/ui` (**decision gate: ink-ui**).
-- Wire `render()` with explicit `stdin`/`stdout`; document **`patchConsole`** choice.
-- **Decision gate:** **single root vs islands** — resolve before expanding scope.
-- **Verify:** spike scenario green; measure bundle impact (`pnpm cli:bundle`).
+**What we learned (keep for Phase F)**
+
+- **`react` + `ink`** on the CLI bundle to ~**2.6 MiB**; **`@inkjs/ui`** still a separate **decision gate**.
+- **`patchConsole: false`** on a minimal `render()` is viable for smoke paths; full shell chooses later.
+- **esbuild:** alias **`react-devtools-core`** to a no-op shim (Ink pulls it when `DEV=true`). **Bundled ESM** may need a **`createRequire` preamble** so CJS deps under Ink (e.g. `signal-exit` → `assert` / `events`) work — reapply both when adding Ink back.
+- **Decision gate: single root vs islands:** target **one `render()` root** for the full interactive TTY; avoid multi-`render` islands.
+
+**Current tree:** Phase E **spike code, env flag, Vitest, and `ink`/`react` deps are removed** so the CLI stays lean until Phase F reintroduces them.
+
+**Next:** Phase F (migrate confirm/select to Ink — add `react`/`ink` again and reuse the bundle notes above).
 
 ---
 
-### Phase F — Migrate confirm + select flows to Ink components
+### Phase F1 — Migrate **confirm** flows to Ink components — **done**
 
-**Goal:** Replace ANSI implementation of confirm/select with Ink (`useInput` and/or ink-ui `ConfirmInput` / `Select`). **Primary phase for removing remaining ANSI confirm/select branches and live-region paint from `ttyAdapter`** (mechanism deps already hide domain names; Ink replaces the ANSI body).
+**Goal:** Replace ANSI confirm UI (stop-recall confirm, recall-session y/n) with Ink `ConfirmDisplay` component. Key dispatch stays in the ANSI keypress handler; Ink is **display-only** (no `useInput`).
 
-- Remove redundant key branches and view-model paint code from `ttyAdapter` **once** E2E/Vitest show parity.
-- **Remove** tests that only asserted removed adapter internals; keep **stdout-level** coverage.
-- **Decision gates as needed:** **focus model**, **wrapping**.
+**Delivered**
+
+- **`cli/src/ui/ConfirmDisplay.tsx`**: display-only Ink component for y/n confirm (stop-recall and session y/n).
+- **`ttyAdapter.ts`**: Ink island lifecycle (`startOrUpdateInkDisplay`, `unmountInkDisplay`, `renderInkStopConfirm`, `renderInkSessionYesNo`). Stop-confirm and session y/n render via Ink; MCQ and token-list remain ANSI `drawBox()`.
+- **Vitest**: `CI: '0'`, `FORCE_COLOR: '1'` in `test.env`; `is-in-ci` stub in `tests/__mocks__/`; `vi.mock('is-in-ci')` in `tests/setup.ts` so Ink renders to stdout in tests.
+- **Tests**: 398/398 pass. E2E `cli_recall.feature` unchanged (1 pre-existing failure, unrelated).
+
+**Architecture note:** Ink island approach — Ink renders to stdout as display layer; the ANSI readline keypress handler dispatches keys and calls `inkDisplayInstance.rerender(element)` to update the Ink display. This avoids readline-vs-raw-stdin conflicts (`useInput` listens to raw stdin `data` events, not readline `keypress` events).
+
+---
+
+### Phase F2 — Migrate **select** flows to Ink components
+
+**Goal:** Extend the Ink island to MCQ numbered-choice select and access-token list picker (replacing their `drawBox()` rendering), bringing `ttyAdapter` confirm/select branches fully to Ink.
+
+**Remaining work:**
+
+- Replace MCQ branch (`numberedChoices !== null`) with `renderInkMcqDisplay(choices, highlightIndex)` — Ink `McqDisplay` component stub exists in `cli/src/ui/McqDisplay.tsx`.
+- Replace token-list branch with `renderInkTokenListDisplay(items, highlightIndex)` — Ink `TokenListDisplay` stub in `cli/src/ui/TokenListDisplay.tsx`.
+- Update cursor-position tests (`recallMcqTtyCursorPosition.test.ts`) and ANSI-visual tests (`interactiveTtyTokenList.test.ts`) to match Ink rendering (the `→` input row, `┌` box border, `\x1b[?25l` cursor-hide must come from Ink components or cursor positioning calls).
+- **Decision gates as needed:** **cursor model**, **visual parity** for stage band + bordered input box.
+- Keep `maxFps: 0` for synchronous Ink renders in tests.
 
 ---
 
@@ -204,5 +229,5 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ## Notes
 
-- **Ordering:** Phases A–D deliver a safe **extract-and-thin-adapter** path even if Ink is deferred; E–I require the **decision gates** to be closed. **Next:** Phase E (Ink spike).
+- **Ordering:** Phases A–D deliver a safe **extract-and-thin-adapter** path even if Ink is deferred; E–I require the **decision gates** to be closed. **Next:** Phase F (Ink confirm/select).
 - **Conflicts:** Any phase that would change PTY/E2E-visible behavior without product sign-off should stop at the nearest **decision gate** above.
