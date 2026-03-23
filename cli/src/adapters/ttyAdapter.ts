@@ -287,13 +287,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   let interactiveFetchWaitEllipsisTick = 0
   let interactiveFetchWaitRepaintTimer: ReturnType<typeof setInterval> | null =
     null
-  /**
-   * True while `processInput` is executing. Used to suppress premature
-   * INTERACTIVE_INPUT_READY_OSC from `onInteractiveFetchWaitChanged` drawBox
-   * calls that fire inside `processInput` before `commitHistoryOutput` paints
-   * the results.
-   */
-  let insideProcessInput = false
 
   // --- Ink island for confirm flows (Phase F1) ---
   // The ANSI keypress handler dispatches keys; Ink is display-only (no useInput).
@@ -376,7 +369,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         draft: sessionYesNoDraft,
       })
     )
-    process.stdout.write(INTERACTIVE_INPUT_READY_OSC)
   }
 
   function renderInkMcqDisplay(): void {
@@ -492,19 +484,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
 
   function resetCommandTurnBuffer(): void {
     commandTurn = { lines: [], tone: 'plain' }
-  }
-
-  async function runProcessInput(input: string): Promise<boolean> {
-    insideProcessInput = true
-    try {
-      return await processInput(input, ttyOutput, true)
-    } finally {
-      insideProcessInput = false
-      // Reset livePaint so clearLiveRegionForRepaint in commitHistoryOutput is a
-      // no-op: any ANSI boxes drawn inside processInput stay in the transcript,
-      // keeping the section-parser-visible separator above the final ┌─┐ box.
-      resetLivePaintCursor()
-    }
   }
 
   /** Builds lines for input box, optional Current Stage Indicator + Current prompt (above box), and Current guidance (below box). */
@@ -660,14 +639,12 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       process.stdout.write(SHOW_CURSOR)
       positionCursorInInputBox()
     }
-    if (!insideProcessInput) {
-      process.stdout.write(
-        interactiveInputReadyOscSuffix({
-          lineDraft: commandInput.lineDraft,
-          interactiveFetchWaitLine: getInteractiveFetchWaitLine(),
-        })
-      )
-    }
+    process.stdout.write(
+      interactiveInputReadyOscSuffix({
+        lineDraft: commandInput.lineDraft,
+        interactiveFetchWaitLine: getInteractiveFetchWaitLine(),
+      })
+    )
   }
 
   function doFullRedraw() {
@@ -850,12 +827,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         }, INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS)
       } else {
         resetLiveLineDraftAndSlashSuggestions()
-        // Skip drawBox when inside processInput: the fetch-end ANSI box would
-        // land before the separator written by showRecallPrompt, confusing the
-        // section parser. commitHistoryOutput draws the final box after processInput.
-        if (!insideProcessInput) {
-          drawBox()
-        }
+        drawBox()
       }
     },
   }
@@ -1001,16 +973,16 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
                 })
                 rememberCommittedLine(effectiveLine)
               }
-              if (await runProcessInput(effectiveLine)) {
+              if (await processInput(effectiveLine, ttyOutput, true)) {
                 commitExitTurnToScrollback()
                 doExit()
                 return
               }
-              // Commit history then check if we need Ink again (another y/n).
-              // drawBox always runs so ANSI ┌─┐ appears after history content,
-              // allowing the E2E section parser to find it in currentPromptLines.
+              // Commit history then check if we need Ink again (another y/n)
               const newSessionYesNo = usesSessionYesNoInputChrome(false)
-              commitHistoryOutput(commandTurn.lines, commandTurn.tone)
+              commitHistoryOutput(commandTurn.lines, commandTurn.tone, {
+                skipDrawBox: newSessionYesNo,
+              })
               if (newSessionYesNo) {
                 sessionYesNoDraft = ''
                 sessionYesNoHint = ''
@@ -1091,16 +1063,16 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           if (isCommittedInteractiveInput(inputForHistory)) {
             rememberCommittedLine(inputForHistory)
           }
-          if (await runProcessInput(effectiveInput)) {
+          if (await processInput(effectiveInput, ttyOutput, true)) {
             commitExitTurnToScrollback()
             doExit()
             return
           }
-          // After MCQ submit, commit history (always runs drawBox so ANSI ┌─┐
-          // lands after history content, keeping section parser working), then
-          // optionally render session y/n confirm on top.
+          // After MCQ submit, check for session y/n (Ink) or normal (ANSI drawBox)
           const newSessionYesNo = usesSessionYesNoInputChrome(false)
-          commitHistoryOutput(commandTurn.lines, commandTurn.tone)
+          commitHistoryOutput(commandTurn.lines, commandTurn.tone, {
+            skipDrawBox: newSessionYesNo,
+          })
           if (newSessionYesNo) {
             sessionYesNoDraft = ''
             sessionYesNoHint = ''
@@ -1268,15 +1240,16 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
             })
             rememberCommittedLine(input)
           }
-          if (await runProcessInput(input)) {
+          if (await processInput(input, ttyOutput, true)) {
             commitExitTurnToScrollback()
             doExit()
             return
           }
-          // Commit history (drawBox always runs for correct section parsing),
-          // then render session y/n confirm on top if needed.
+          // Start Ink for session y/n; MCQ and normal stay ANSI
           const newSessionYesNo = usesSessionYesNoInputChrome(false)
-          commitHistoryOutput(commandTurn.lines, commandTurn.tone)
+          commitHistoryOutput(commandTurn.lines, commandTurn.tone, {
+            skipDrawBox: newSessionYesNo,
+          })
           if (newSessionYesNo) {
             sessionYesNoDraft = ''
             sessionYesNoHint = ''

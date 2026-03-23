@@ -188,9 +188,13 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ### Phase F3 — Fix OSC ordering so MCQ answer E2E tests pass
 
-**Goal:** Fix the pre-existing E2E timing issue where `INTERACTIVE_INPUT_READY_OSC` fires from `onInteractiveFetchWaitChanged` (inside `processInput`) before `commitHistoryOutput` writes the MCQ result to stdout. The E2E `ptyWritePayloadAndWaitForInputReady` catches the early OSC before history is painted; `getHistoryOutputContent` returns empty.
+**Goal:** Fix the pre-existing E2E timing issue where `INTERACTIVE_INPUT_READY_OSC` fires from `onInteractiveFetchWaitChanged` (inside `processInput`) before `commitHistoryOutput` writes the MCQ result to stdout.
 
-**Approach:** Suppress OSC emission from drawBox calls made during an active `processInput` execution (e.g. don't emit OSC when `interactiveFetchWaitLine !== null` and the drawBox is from the fetch-wait start path), or gate OSC on the session having exited active processing.
+**Root cause (confirmed):** After MCQ is answered, `continueRecallSession` → `runInteractiveFetchWait` finally block → `onInteractiveFetchWaitChanged` → ANSI `drawBox()` → `finalizeInteractiveLiveRegionPaint` → OSC fires. The `ptyWritePayloadAndWaitForInputReady` catches this early OSC before `commitHistoryOutput` writes "Correct!" etc. The section parser then places "Correct!" in `currentGuidanceLines` (after the last `└`) instead of `historyOutput` because the fetch-end ANSI `┌─┐` box appears **before** the separator written by `showRecallPrompt`, making the section parser see "Correct!" as current guidance rather than history.
+
+**Attempted but rolled back:** Suppressing OSC inside `processInput` and suppressing the fetch-end `drawBox()` in `onInteractiveFetchWaitChanged` fixed MCQ answer tests locally but broke "Recall session" and "Recall spelling" tests in CI due to PTY/timing differences. Reverted to the pre-F3 state.
+
+**Approach for next attempt:** Either update `cliSectionParser.ts` to also search `currentGuidanceLines` when looking for history output, or ensure the fetch-end ANSI box is drawn AFTER the separator so the section parser's `currentPromptLines` captures "Correct!".
 
 ---
 
