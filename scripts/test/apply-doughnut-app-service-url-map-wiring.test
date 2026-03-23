@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#
+# Ensures render + validate --url-map (deploy preflight) works for a sample SHA.
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+SHA=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+tmp="$(mktemp)"
+trap 'rm -f "$tmp"' EXIT
+
+node "$REPO_ROOT/infra/gcp/url-maps/renderDoughnutAppServiceUrlMap.mjs" \
+	--sha "$SHA" \
+	--write "$tmp"
+
+node "$REPO_ROOT/scripts/validate-url-map-static-vs-backend-hints.mjs" --url-map "$tmp"
+
+echo "apply-doughnut-app-service-url-map wiring: OK"

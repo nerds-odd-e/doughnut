@@ -1,0 +1,56 @@
+# Template for prod HTTPS URL map `doughnut-app-service-map`.
+# The pathPrefixRewrite values use a fixed token; deploy replaces it with the 40-char git SHA (CI: GITHUB_SHA).
+#
+# Import (after render):
+#   gcloud compute url-maps import doughnut-app-service-map \
+#     --source=<rendered.yaml> --global --quiet
+#
+# Backend vs static path split must stay consistent with:
+#   infra/gcp/path-routing/backend-path-hints.json
+# (validated by: pnpm validate:path-routing — substitutes a dummy SHA in this template)
+name: doughnut-app-service-map
+defaultService: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/global/backendServices/doughnut-app-service
+hostRules:
+  - hosts:
+      - '*'
+    pathMatcher: doughnut-paths
+pathMatchers:
+  - name: doughnut-paths
+    defaultService: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/global/backendServices/doughnut-app-service
+    pathRules:
+      - paths:
+          - /assets/*
+        service: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/global/backendBuckets/doughnut-frontend-backend-bucket
+        routeAction:
+          urlRewrite:
+            pathPrefixRewrite: /frontend/__FRONTEND_GITHUB_SHA__/assets/
+      - paths:
+          - /index.html
+        service: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/global/backendBuckets/doughnut-frontend-backend-bucket
+        routeAction:
+          urlRewrite:
+            pathPrefixRewrite: /frontend/__FRONTEND_GITHUB_SHA__/index.html
+      - paths:
+          - /
+        service: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/global/backendBuckets/doughnut-frontend-backend-bucket
+        routeAction:
+          urlRewrite:
+            pathPrefixRewrite: /frontend/__FRONTEND_GITHUB_SHA__/index.html
+      - paths:
+          - /odd-e.ico
+        service: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/global/backendBuckets/doughnut-frontend-backend-bucket
+        routeAction:
+          urlRewrite:
+            pathPrefixRewrite: /frontend/__FRONTEND_GITHUB_SHA__/odd-e.ico
+      - paths:
+          - /odd-e.png
+        service: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/global/backendBuckets/doughnut-frontend-backend-bucket
+        routeAction:
+          urlRewrite:
+            pathPrefixRewrite: /frontend/__FRONTEND_GITHUB_SHA__/odd-e.png
+      - paths:
+          - /doughnut-cli-latest/*
+        service: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/global/backendBuckets/doughnut-frontend-backend-bucket
+        routeAction:
+          urlRewrite:
+            pathPrefixRewrite: /doughnut-cli-latest/
