@@ -87,8 +87,8 @@ export type OutputAdapter = {
    */
   writeCurrentPrompt?: (msg: string) => void
   /**
-   * TTY only: green separator before the first Current prompt line in a turn.
-   * When set, recall MCQ is painted entirely in the live region (stem + separator + box), not via grey `writeCurrentPrompt` lines.
+   * TTY only: starts a turn whose **Current prompt** block (optional **Current Stage Indicator**, separator,
+   * wrapped lines) and input box are painted in the live region. When unset, non-TTY MCQ uses `writeCurrentPrompt` / `log` instead.
    */
   beginCurrentPrompt?: () => void
   /** Optional: for /clear and resize. TTY provides a callback that clears and redraws. */

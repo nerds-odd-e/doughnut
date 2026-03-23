@@ -2,7 +2,7 @@
 export const GREY = '\x1b[90m'
 export const RED = '\x1b[31m'
 export const ITALIC = '\x1b[3m'
-/** Current prompt line while waiting on a slow interactive command (bright blue; distinct from separator, hints, commands). */
+/** Foreground for the **Current Stage Indicator** label during interactive fetch-wait on the TTY (bright blue). */
 export const INTERACTIVE_FETCH_WAIT_PROMPT_FG = '\x1b[94m'
 export const RESET = '\x1b[0m'
 export const REVERSE = '\x1b[7m'

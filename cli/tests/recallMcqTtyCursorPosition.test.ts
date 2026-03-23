@@ -1,5 +1,6 @@
 /**
- * Observable contract: after the TTY paints recall MCQ, the final cursor must sit on the live
+ * Observable contract: after the TTY paints recall MCQ (**Current Stage Indicator** + banded separator +
+ * stem in **Current prompt**, choices in **Current guidance**), the final cursor must sit on the live
  * input row (the bordered line with the → prompt). Wrong `liveLineCount` / `inputLineRowInLiveBlock`
  * (e.g. wrapped stem or choices counted with JS `.length` instead of terminal columns) breaks
  * CUU after `drawBox` — duplicate separators, drift, or a cursor off the → row.

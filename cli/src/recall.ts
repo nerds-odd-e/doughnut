@@ -221,8 +221,10 @@ export async function answerSpelling(
   return { correct: answered.answer?.correct ?? false }
 }
 
+type ContestRegenerateSuccess = Extract<RecallNextResult, { type: 'question' }>
+
 type ContestRegenerateOutcome =
-  | { ok: true; result: RecallNextResult }
+  | { ok: true; result: ContestRegenerateSuccess }
   | { ok: false; message: string }
 
 export async function contestAndRegenerate(
