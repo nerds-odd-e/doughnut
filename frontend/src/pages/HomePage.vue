@@ -61,7 +61,7 @@
 curl https://doughnut.odd-e.com/install -fsS | bash
 # Install (Windows PowerShell)
 irm 'https://doughnut.odd-e.com/install?win32=true' | iex
-# Run interactive session
+# Run CLI
 doughnut</code></pre>
   </div>
   <div class="ending">
