@@ -53,8 +53,25 @@ const notebookSettingsPage = () => {
       pageIsNotLoading()
     },
     exportForObsidian() {
-      cy.findByRole('button', { name: 'Export for Obsidian' }).click()
-      pageIsNotLoading()
+      cy.location('pathname').then((pathname) => {
+        const m = pathname.match(/\/notebooks\/(\d+)\//)
+        expect(m, 'on notebook edit page with id in URL').to.not.be.null
+        const notebookId = m![1]!
+        cy.findByRole('button', { name: 'Export for Obsidian' }).click()
+        const downloadsFolder = Cypress.config('downloadsFolder') as string
+        cy.request({
+          url: `/api/notebooks/${notebookId}/obsidian`,
+          encoding: 'binary',
+        }).then((response) => {
+          expect(response.status).to.eq(200)
+          cy.writeFile(
+            `${downloadsFolder}/e2e-obsidian-export.zip`,
+            response.body,
+            'binary'
+          )
+          pageIsNotLoading()
+        })
+      })
       return this
     },
     importObsidianData(filename: string) {

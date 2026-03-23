@@ -18,6 +18,10 @@ Finish the incomplete "single source of truth" story so that:
 - Keep **backend deploy skip** based on the backend jar hash.
 - Keep **frontend upload** unconditional for green packaging runs.
 - Add one explicit concept for frontend release state: the **active frontend SHA**.
+- Treat `/doughnut-cli-latest/doughnut` as a **static-only** path:
+  - served by GCS/LB in prod
+  - served by the fake LB from `cli/dist` locally
+  - never served by Spring on `9081`
 - Make routing validation cover both sides:
   - backend paths must not be routed to static
   - required static paths must be routed to static
@@ -162,6 +166,12 @@ Finish the incomplete "single source of truth" story so that:
 **Scope:**
 
 - Remove the misleading `cli:bundle-and-copy` alias and use the real behavior names directly.
+- Remove `copyCliBundle` entirely from `backend/build.gradle`, including all `dependsOn` wiring tied to `bootRun`.
+- Remove any remaining assumption in code, tests, scripts, or docs that Spring on `9081` serves `/doughnut-cli-latest/doughnut`.
+- Keep the CLI install story cohesive:
+  - the install script still points users at `/doughnut-cli-latest/doughnut`
+  - the fake LB serves that path locally from `cli/dist`
+  - prod serves that path from GCS through the LB
 - Revisit the `/users/identify` fake-LB special case and remove it if the local/prod routing model makes it unnecessary.
 - Keep the dev browser entry model simple:
   - browser-facing app routes come from Vite or built static,
@@ -176,6 +186,7 @@ Finish the incomplete "single source of truth" story so that:
 **Done when:**
 
 - The local topology has fewer exceptions and names reflect actual behavior.
+- No build or runtime path still relies on Spring resources for the CLI binary.
 
 ---
 
