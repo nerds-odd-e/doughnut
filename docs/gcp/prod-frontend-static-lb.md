@@ -67,7 +67,7 @@ CI writes **immutable** prefixes: `frontend/<GITHUB_SHA>/`. The load balancer mu
 
 Order **specific** paths **before** the catch-all that sends traffic to GCS.
 
-The **canonical backend path list** used by the local prod-topology proxy and by CI checks against this URL map lives in [`infra/gcp/path-routing/backend-path-hints.json`](../../infra/gcp/path-routing/backend-path-hints.json) (`pnpm validate:path-routing`).
+The **canonical backend path list** used by the local prod-topology proxy and by CI checks against this URL map lives in [`infra/gcp/path-routing/backend-path-hints.json`](../../infra/gcp/path-routing/backend-path-hints.json). `pnpm validate:path-routing` also ensures root-level static paths implied by [`frontend/index.html`](../../frontend/index.html), [`frontend/public/`](../../frontend/public/), and (when present) `frontend/dist/index.html` are covered by a static (GCS backend bucket) pathRule—plus mandatory checks for `/`, `/index.html`, and `/assets/*`. Unit tests: `pnpm test:path-routing`.
 
 Send to the **backend service (MIG)** at least:
 

@@ -79,6 +79,8 @@ Finish the incomplete "single source of truth" story so that:
 
 - Adding a new root-level public asset without corresponding prod routing causes CI failure.
 
+**Status:** Implemented — `infra/gcp/path-routing/validateUrlMapPathRouting.mjs` runs backend + static checks; required paths come from `requiredStaticPathsFromFrontend.mjs` (source `index.html`, `public/`, optional `dist/index.html`) plus `mandatoryStaticBucketProbes()` for `/`, `/index.html`, and `/assets/*`. `pnpm test:path-routing` (in `lint:all`) covers fixtures; `pnpm validate:path-routing` is the repo entry point.
+
 ---
 
 ## Phase 3 — Frontend promotion becomes one explicit operation

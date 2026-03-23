@@ -4,7 +4,7 @@
 #
 # Backend vs static path split must stay consistent with:
 #   infra/gcp/path-routing/backend-path-hints.json
-# (validated by: pnpm validate:path-routing)
+# (validated by: pnpm validate:path-routing — backend hints + required static paths)
 #
 # After CI uploads a new tree under gs://dough-01/frontend/<GITHUB_SHA>/, update
 # every pathPrefixRewrite below to use that SHA, then import again.
