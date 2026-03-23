@@ -6,6 +6,12 @@ On a green `main` pipeline, the **Deploy** job runs `infra/gcp/scripts/deploy-ba
 
 After a **full** deploy (upload + rolling replace), CI writes JSON to `deploy/last-successful-deploy.json` with `sha256`, `git_sha`, and `recorded_at`. The record is updated only when both steps succeed.
 
+## MIG template / startup changes without a new jar
+
+The deploy script only compares the **fat jar** hash to the record. Changes that affect VMs but **not** the built jar—startup scripts, instance templates, metadata, or edits made only in the GCP console—do **not** change that comparison. A green pipeline can still **skip** uploading the jar and **skip** the MIG rolling replace.
+
+To roll the MIG in those cases, use **force full deploy** (next section: `force-deployment: true` on the tip of `main`), run the deploy script with **`FORCE_FULL_DEPLOY=1`**, or perform a **manual** rolling replace / template update in GCP.
+
 ## Force a full deploy: `force-deployment: true`
 
 Include the following in the **subject or body** of the commit that ends up as **`GITHUB_SHA` on `main`** (the commit CI checks out for the Deploy job):

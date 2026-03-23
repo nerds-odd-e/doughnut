@@ -227,8 +227,6 @@ After phases that change prod behavior (especially 2, 5, 8, 10), follow your usu
 
 ---
 
-## Open questions (resolve before or during early phases)
+## Open questions
 
-- Where exactly to store **last successful deploy** metadata (GCS object, Firestore, etc.) and IAM for read vs write.
-- Whether **rolling replace** must run when only **startup script / template** changes but jar hash is unchanged (commit-message force covers intentional cases; template changes might need path filters or always-replace policy).
-- **Cookie/session:** straightforward with **single hostname + path-based routing** (phase 5 default); if using **separate static vs API hosts**, document `Domain` / `SameSite` and OAuth redirects.
+None remaining for this plan. **Non-jar MIG changes** (template, startup script, console-only edits): see **MIG template / startup changes without a new jar** in [`docs/gcp/conditional-backend-deploy.md`](docs/gcp/conditional-backend-deploy.md).
