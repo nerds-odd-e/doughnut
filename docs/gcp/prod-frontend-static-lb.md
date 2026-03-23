@@ -148,14 +148,14 @@ Treat URL map / backend edits as **production infrastructure**: restrict to proj
 
 ### GitHub Actions deploy SA and `url-maps import`
 
-CI runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh), which calls `gcloud compute url-maps import`. That API requires **`compute.backendServices.use`** on the MIG backend service and **`compute.backendBuckets.use`** on the static backend bucket (in addition to URL map edit permissions the SA may already have).
+CI runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh), which calls `gcloud compute url-maps import`. That needs:
 
-If Deploy fails with **403** and `Required 'compute.backendServices.use' permission` for `doughnut-app-service`, grant the deploy service account (e.g. `doughnut-ci-gcp-deploy-svc-acc@…`) **`roles/compute.loadBalancerServiceUser`** on **both** resources:
+1. **`compute.urlMaps.update`** on `doughnut-app-service-map` — grant the deploy SA **`roles/compute.loadBalancerAdmin`** on the **project** (URL maps do not expose per-resource `add-iam-policy-binding` in `gcloud` the way backend services do).
+2. **`compute.backendServices.use`** and **`compute.backendBuckets.use`** on the resources named in the map — grant **`roles/compute.loadBalancerServiceUser`** on **`doughnut-app-service`** (global) and **`doughnut-frontend-backend-bucket`**.
 
-- `gcloud compute backend-services add-iam-policy-binding doughnut-app-service --global --member=serviceAccount:… --role=roles/compute.loadBalancerServiceUser`
-- `gcloud compute backend-buckets add-iam-policy-binding doughnut-frontend-backend-bucket --member=serviceAccount:… --role=roles/compute.loadBalancerServiceUser`
+Typical **403** messages if something is missing: `compute.backendServices.use` or `compute.urlMaps.update`.
 
-One-shot script (same project defaults as other `infra/gcp/scripts/` helpers): [`grant-doughnut-ci-deploy-url-map-iam.sh`](../../infra/gcp/scripts/grant-doughnut-ci-deploy-url-map-iam.sh). Override SA with `CI_DEPLOY_GCP_SA=…@….iam.gserviceaccount.com` if needed.
+One-shot script (project + both backends): [`grant-doughnut-ci-deploy-url-map-iam.sh`](../../infra/gcp/scripts/grant-doughnut-ci-deploy-url-map-iam.sh). Override SA with `CI_DEPLOY_GCP_SA=…@….iam.gserviceaccount.com` if needed.
 
 ---
 
