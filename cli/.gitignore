@@ -1,0 +1,4 @@
+# Stryker mutation testing
+.stryker-tmp/
+reports/mutation/
+stryker-setup-*.js
