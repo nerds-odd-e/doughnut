@@ -61,6 +61,8 @@ backend/out
 
 # nodejs
 node_modules/
+# minimal npm install prefix (GitHub Deploy job URL map scripts)
+.ci-urlmap-node-deps/
 .wireit/
 **/package-lock.json
 **/tsconfig.tsbuildinfo

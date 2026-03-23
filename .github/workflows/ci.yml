@@ -219,10 +219,14 @@ jobs:
       ]
     steps:
       - uses: actions/checkout@v6
-      - uses: ./.github/setup_nodejs_with_cache
+      - uses: actions/setup-node@v6
         with:
-          node_version: ${{ vars.NODE_VERSION }}
-          pnpm_version: ${{ vars.PNPM_VERSION }}
+          node-version: ${{ vars.NODE_VERSION }}
+      - name: Install yaml for URL map scripts (avoid full monorepo pnpm)
+        run: |
+          mkdir -p node_modules
+          npm install --prefix "$(pwd)/.ci-urlmap-node-deps" yaml@2.8.3
+          ln -sfn "$(pwd)/.ci-urlmap-node-deps/node_modules/yaml" node_modules/yaml
       - uses: ./.github/gcloud_auth_n_sdk
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
