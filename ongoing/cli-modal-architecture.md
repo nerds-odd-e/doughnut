@@ -60,20 +60,21 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
-### Phase A — Interaction extract with Ink-shaped boundaries (no Ink dependency yet)
+### Phase A — Interaction extract with Ink-shaped boundaries (no Ink dependency yet) — **done**
 
 **Goal:** Same behavior; code organized so the next phase can swap “paint + keys” for Ink without duplicating business rules.
 
-- Extract **confirm** interaction (stop-recall y/n first): a small module that is **component-shaped**: input = `{ promptLines, placeholder, guidance }`, output = callbacks `onYes` / `onNo` / `onCancel`; internal parsing lives here (e.g. y/n + Enter), not in `ttyAdapter`.
-- **Rename** away from “CliModal” in new code: use **Confirm** / **confirm interaction** naming to match future `ConfirmInput` or `useInput` wrapper.
-- `ttyAdapter` only forwards key events into this module and renders from a **declared view model** (still ANSI via `renderer.ts`).
-- **Verify:** `pnpm cli:test`, relevant `cli_recall` E2E.
+**Delivered**
+
+- **`cli/src/interactions/recallStopConfirmInteraction.ts`** — stop-recall confirm only: **view model** `{ promptLines, placeholder, guidance }` (`recallStopConfirmViewModelForContext`), **key dispatch** `dispatchRecallStopConfirmKey` → `submit-yes` / `submit-no` / `cancel` / `invalid-submit` / draft edits / `redraw` (adapter maps these to scrollback + recall state; same intent as `onYes` / `onNo` / `onCancel` + invalid hint).
+- **`ttyAdapter`** paints from that view model and does not implement y/n parsing for this step.
+- Tests: `cli/tests/recallStopConfirmInteraction.test.ts`; verified with `pnpm cli:test` and `e2e_test/features/cli/cli_recall.feature`.
 
 ---
 
 ### Phase B — Unify recall y/n (load-more, just-review) through the same confirm interaction
 
-**Goal:** One confirm implementation, three business call sites; remove duplicate `parseYesNo` / pending flags where replaced by a **single stackable UI state** (conceptually: nested React state later).
+**Goal:** One confirm implementation, three business call sites; remove duplicate `parseYesNo` / pending flags where replaced by a **single stackable UI state** (conceptually: nested React state later). **Start from** generalizing or reusing the Phase A module (shared yes/no parse + dispatch + view model shape).
 
 - **Verify:** recall session E2E + Vitest.
 
@@ -160,5 +161,5 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ## Notes
 
-- **Ordering:** Phases A–D deliver a safe **extract-and-thin-adapter** path even if Ink is deferred; E–I require the **decision gates** to be closed.
+- **Ordering:** Phases A–D deliver a safe **extract-and-thin-adapter** path even if Ink is deferred; E–I require the **decision gates** to be closed. **Next:** Phase B.
 - **Conflicts:** Any phase that would change PTY/E2E-visible behavior without product sign-off should stop at the nearest **decision gate** above.

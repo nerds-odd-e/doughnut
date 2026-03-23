@@ -36,6 +36,10 @@ import {
   ttyArrowKeyUsesSlashSuggestionCycle,
 } from '../interactiveCommandInput.js'
 import {
+  dispatchRecallStopConfirmKey,
+  recallStopConfirmViewModelForContext,
+} from '../interactions/recallStopConfirmInteraction.js'
+import {
   applyChatHistoryOutputTone,
   countPromptBlockLinesAboveInputBoxTop,
   greyCurrentStageIndicatorLabel,
@@ -405,6 +409,9 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   function getDisplayContent() {
     const width = getTerminalWidth()
     const placeholderContext = getPlaceholderContext(!!tokenSelection)
+    const recallStopConfirmDisplay = isPendingRecallStopConfirmation()
+      ? recallStopConfirmViewModelForContext(placeholderContext)
+      : null
     const contentLines = buildBoxLines(commandInput.lineDraft, width, {
       placeholderContext,
     })
@@ -416,6 +423,8 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     let currentPromptWrappedLines: string[]
     if (waitLine) {
       currentPromptWrappedLines = []
+    } else if (recallStopConfirmDisplay) {
+      currentPromptWrappedLines = recallStopConfirmDisplay.promptLines
     } else {
       const currentPromptText = tokenListConfig?.currentPrompt
       if (
@@ -458,8 +467,8 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           width,
           tokenSelection.highlightIndex
         )
-      : isPendingRecallStopConfirmation()
-        ? ['Stop recall? (y/n)']
+      : recallStopConfirmDisplay
+        ? recallStopConfirmDisplay.guidance
         : isMcqRecallPending(pendingRecallAnswer)
           ? recallMcqCurrentGuidanceLines(
               pendingRecallAnswer.choices,
@@ -777,36 +786,51 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       return
     }
     if (isPendingRecallStopConfirmation()) {
-      if (key.name === 'escape') {
-        setPendingRecallStopConfirmation(false)
-        commandInput = clearLiveCommandLine(commandInput)
-        drawBox()
-      } else if (submitPressed && !key.shift) {
-        const trimmed = commandInput.lineDraft.trim()
-        const answer = trimmed.toLowerCase()
-        const isYes = answer === 'y' || answer === 'yes'
-        const isNo = answer === 'n' || answer === 'no'
-        commandInput = clearLiveCommandLine(commandInput)
-        setPendingRecallStopConfirmation(false)
-        if (isYes) {
+      const dispatch = dispatchRecallStopConfirmKey({
+        keyName: key.name,
+        str,
+        ctrl: !!key.ctrl,
+        meta: !!key.meta,
+        shift: !!key.shift,
+        lineDraft: commandInput.lineDraft,
+        submitPressed,
+      })
+      switch (dispatch.result) {
+        case 'cancel':
+          setPendingRecallStopConfirmation(false)
+          commandInput = clearLiveCommandLine(commandInput)
+          drawBox()
+          break
+        case 'submit-yes':
+          commandInput = clearLiveCommandLine(commandInput)
+          setPendingRecallStopConfirmation(false)
           exitRecallMode()
           recallMcqSelectedChoiceIndex = 0
           commitHistoryOutput(['Stopped recall'])
-          return
-        }
-        if (!isNo && trimmed) {
-          writeCurrentPromptLine('Please answer y or n')
+          break
+        case 'submit-no':
+          commandInput = clearLiveCommandLine(commandInput)
+          setPendingRecallStopConfirmation(false)
+          drawBox()
+          break
+        case 'invalid-submit':
+          commandInput = clearLiveCommandLine(commandInput)
+          setPendingRecallStopConfirmation(false)
+          writeCurrentPromptLine(dispatch.hint)
           setPendingRecallStopConfirmation(true)
-        }
-        drawBox()
-      } else if (key.name === 'backspace') {
-        commandInput = deleteBeforeCaret(commandInput)
-        drawBox()
-      } else if (str && !key.ctrl && !key.meta) {
-        commandInput = insertIntoDraft(commandInput, str)
-        drawBox()
-      } else {
-        drawBox()
+          drawBox()
+          break
+        case 'edit-backspace':
+          commandInput = deleteBeforeCaret(commandInput)
+          drawBox()
+          break
+        case 'edit-char':
+          commandInput = insertIntoDraft(commandInput, dispatch.char)
+          drawBox()
+          break
+        case 'redraw':
+          drawBox()
+          break
       }
       return
     }
