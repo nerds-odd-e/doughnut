@@ -67,7 +67,12 @@ tasks.named('bootRun') {
   dependsOn('copyCliBundle')
 }
 
+tasks.named('jar') {
+  dependsOn('copyCliBundle')
+}
+
 tasks.named('bootJar', BootJar) {
+  dependsOn('copyCliBundle')
   exclude('static/**')
 }
 
