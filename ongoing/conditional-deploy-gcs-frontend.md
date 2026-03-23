@@ -8,7 +8,7 @@ Informal plan; delete or archive when done.
 2. **Reproducible builds** so the comparison is trustworthy (same sources → same jar hash for a given build environment).
 3. **Guardrail (implemented):** If the **`main`** commit CI deploys (`GITHUB_SHA`) has a message containing **`force-deployment: true`** (subject or body; optional spaces around `:`), always run the full deploy path when the job runs, **even when** the jar hash matches the last successful deploy record—subject to existing job success/`needs`. See `docs/gcp/conditional-backend-deploy.md`.
 4. **Later:** Ship the **frontend static assets from GCS** (or CDN in front of it) so **frontend-only** changes do not require a **backend MIG** rollout in prod.
-5. **E2E:** After (4), tests should mirror **prod routing**: the UI is **not** served from the jar (local static server and/or proxy), and how the browser reaches **static vs API** matches prod—whether that is **one hostname** (path-based LB) or a deliberate **split-origin** layout—without using real GCS in CI. **Phases 7–8:** one fake LB for **`pnpm sut`**, CI, and `pnpm test`; **one source of truth** for path rules vs prod GCP. **Phase 9:** SPA build output is **`frontend/dist`** (not `backend/.../static`); **phase 10** jar slimming removes embedding whatever remains from the CLI copy path.
+5. **E2E:** After (4), tests should mirror **prod routing**: the UI is **not** served from the jar (local static server and/or proxy), and how the browser reaches **static vs API** matches prod—whether that is **one hostname** (path-based LB) or a deliberate **split-origin** layout—without using real GCS in CI. **Phases 7–8:** one fake LB for **`pnpm sut`**, CI, and `pnpm test`; **one source of truth** for path rules vs prod GCP. **Phase 9:** SPA build output is **`frontend/dist`** (not `backend/.../static`); **phase 10** jar slimming excludes classpath **`static/**`** (CLI from GCS in prod; local proxy + `bootRun` copy).
 
 ---
 
@@ -87,7 +87,7 @@ Informal plan; delete or archive when done.
 
 ### Phase 4 implementation (done)
 
-- **Layout:** `gs://<GCS_BUCKET>/frontend/<GITHUB_SHA>/` — full tree from **`frontend/dist/`** after `pnpm bundle:all` (Vue SPA only; CLI install stays on the MIG under `/doughnut-cli-latest/`).
+- **Layout:** `gs://<GCS_BUCKET>/frontend/<GITHUB_SHA>/` — full tree from **`frontend/dist/`** after `pnpm bundle:all` (Vue SPA only; CLI install is uploaded separately — phase 10 — to `doughnut-cli-latest/doughnut` and served via the LB backend bucket).
 - **Script:** `infra/gcp/scripts/upload-frontend-static-to-gcs.sh` — env: `GCS_BUCKET`, `GITHUB_SHA`; optional `FRONTEND_STATIC_DIR` (default `frontend/dist`).
 - **CI:** `.github/workflows/ci.yml` `Package-artifacts` runs GCP auth then the script after the prod `build` (and `bundle:all`).
 - **Tests:** `scripts/test/upload-frontend-static-to-gcs.sh.test`.
@@ -189,7 +189,7 @@ Informal plan; delete or archive when done.
 - **Vite:** `frontend/vite.config.ts` — `build.outDir` is **`dist`** (i.e. `frontend/dist`).
 - **GCS:** `infra/gcp/scripts/upload-frontend-static-to-gcs.sh` — default **`FRONTEND_STATIC_DIR=frontend/dist`**.
 - **Fake LB / E2E:** `e2e_test/e2e-prod-topology-proxy.mjs` — default static root **`frontend/dist`** (`E2E_STATIC_ROOT` override unchanged).
-- **CLI:** `pnpm cli:bundle-and-copy` still copies the CLI bundle to `backend/src/main/resources/static/doughnut-cli-latest/` (unchanged until phase 10).
+- **CLI:** See phase 10 (GCS + `bootRun` copy only; not in deploy jar).
 - **Icons:** Canonical root assets are **`frontend/public/`** (`odd-e.ico`, `odd-e.png`); removed duplicate tracked **`backend/src/main/resources/static/odd-e.png`**.
 - **Docs / config:** `README.md`, `CLAUDE.md`, `docs/gcp/prod_env.md`, `.cursor/rules/cloud-agent-setup.mdc`, root `tsconfig.json` excludes, `.gitignore` (dropped obsolete SPA ignores under backend static).
 - **Tests:** `scripts/test/upload-frontend-static-to-gcs.sh.test` fixture path updated to `frontend/dist`.
@@ -201,6 +201,15 @@ Informal plan; delete or archive when done.
 **Outcome:** Backend jar for prod **excludes** embedded SPA (or includes only a minimal stub). **Conditional deploy** stays **backend-only** (jar hash vs last successful deploy record). **Frontend static** keeps **always uploading** on green pipeline (phases 4–5); **frontend-only** commits still **skip MIG** when the jar hash is unchanged, without any separate conditional frontend deploy mechanism.
 
 **User/system value:** Smaller backend deploy surface; frontend changes still publish to GCS every time.
+
+### Phase 10 implementation (done)
+
+- **Gradle:** `bootJar` excludes `static/**` (no SPA or CLI in the deploy jar). `copyCliBundle` copies `cli/dist/doughnut-cli.bundle.mjs` → `build/resources/main/static/doughnut-cli-latest/doughnut`; `bootRun` depends on it for local/E2E.
+- **CI:** `Package-artifacts` runs [`infra/gcp/scripts/upload-cli-binary-to-gcs.sh`](../infra/gcp/scripts/upload-cli-binary-to-gcs.sh) after frontend upload — `gs://<GCS_BUCKET>/doughnut-cli-latest/doughnut`.
+- **Prod LB:** [`infra/gcp/url-maps/doughnut-app-service-map.yaml`](../infra/gcp/url-maps/doughnut-app-service-map.yaml) — path rule `/doughnut-cli-latest/*` → backend bucket, rewrite prefix `/doughnut-cli-latest/` (apply with `gcloud compute url-maps import` per runbook).
+- **Hints:** Removed `/doughnut-cli-latest/` from [`backend-path-hints.json`](../infra/gcp/path-routing/backend-path-hints.json); fake LB serves that URL from `cli/dist` in [`e2e_test/e2e-prod-topology-proxy.mjs`](../e2e_test/e2e-prod-topology-proxy.mjs).
+- **Scripts:** `pnpm sut` / `pnpm test` run `pnpm cli:bundle` after install; `cli:bundle-and-copy` is `pnpm cli:bundle` only.
+- **Tests:** [`scripts/test/upload-cli-binary-to-gcs.sh.test`](../scripts/test/upload-cli-binary-to-gcs.sh.test).
 
 ---
 

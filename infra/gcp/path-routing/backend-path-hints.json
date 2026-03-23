@@ -4,7 +4,6 @@
     "/api/",
     "/attachments/",
     "/users/",
-    "/doughnut-cli-latest/",
     "/oauth2/",
     "/login/oauth2/"
   ],

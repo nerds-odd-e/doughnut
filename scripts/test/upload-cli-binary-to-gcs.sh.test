@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+#
+# Unit tests for infra/gcp/scripts/upload-cli-binary-to-gcs.sh
+# Uses fake gsutil on PATH (no real GCS).
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+UPLOAD_SCRIPT="$REPO_ROOT/infra/gcp/scripts/upload-cli-binary-to-gcs.sh"
+
+fail() {
+	echo "FAIL: $*" >&2
+	exit 1
+}
+
+assert_contains() {
+	local haystack=$1 needle=$2 msg=${3:-}
+	if [[ "$haystack" != *"$needle"* ]]; then
+		fail "${msg:+$msg — }expected log to contain <$needle>"
+	fi
+}
+
+write_fake_gsutil() {
+	local fake_bin=$1
+	mkdir -p "$fake_bin"
+	printf '#!%s\nset -e\nLOG="${GSUTIL_LOG:?}"\necho "gsutil $*" >>"$LOG"\nexit 0\n' "$(command -v bash)" >"$fake_bin/gsutil"
+	chmod +x "$fake_bin/gsutil"
+}
+
+test_fails_when_bundle_missing() {
+	local work fake_bin
+	work=$(mktemp -d)
+	trap "rm -rf '${work}'" EXIT
+	fake_bin="$work/bin"
+	write_fake_gsutil "$fake_bin"
+	log="$work/log"
+	touch "$log"
+	(
+		cd "$work"
+		PATH="$fake_bin:$PATH"
+		export GCS_BUCKET=bucket GSUTIL_LOG="$log"
+		if bash "$UPLOAD_SCRIPT" 2>/dev/null; then
+			fail "expected exit non-zero when CLI bundle missing"
+		fi
+	)
+}
+
+test_cp_invoked_with_dest() {
+	local work fake_bin
+	work=$(mktemp -d)
+	trap "rm -rf '${work}'" EXIT
+	fake_bin="$work/bin"
+	write_fake_gsutil "$fake_bin"
+	log="$work/log"
+	touch "$log"
+	mkdir -p "$work/cli/dist"
+	echo '#!/usr/bin/env node' >"$work/cli/dist/doughnut-cli.bundle.mjs"
+	(
+		cd "$work"
+		PATH="$fake_bin:$PATH"
+		export GCS_BUCKET=my-bucket GSUTIL_LOG="$log"
+		bash "$UPLOAD_SCRIPT"
+	)
+	local content
+	content=$(cat "$log")
+	assert_contains "$content" "cp" "gsutil args"
+	assert_contains "$content" "gs://my-bucket/doughnut-cli-latest/doughnut" "GCS dest"
+}
+
+main() {
+	test_fails_when_bundle_missing
+	test_cp_invoked_with_dest
+	echo "upload-cli-binary-to-gcs.sh tests: OK"
+}
+
+main "$@"

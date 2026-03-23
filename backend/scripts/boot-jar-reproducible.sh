@@ -87,7 +87,7 @@ else
 fi
 
 if [[ "$h1" != "$h2" ]]; then
-	fail "two clean bootJar runs produced different SHA-256 ($h1 vs $h2). Same sources and same embedded frontend/CLI bytes should yield identical jars. Check backend/build.gradle: preserveFileTimestamps=false on AbstractArchiveTask, JavaCompile UTF-8. If this script ran pnpm bundle:all (full mode), keep GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and CLI_VERSION fixed across both runs — they are baked into the CLI bundle."
+	fail "two clean bootJar runs produced different SHA-256 ($h1 vs $h2). Same backend sources should yield identical jars (deploy jar excludes classpath static). Check backend/build.gradle: preserveFileTimestamps=false on AbstractArchiveTask, JavaCompile UTF-8."
 fi
 
 echo "ok boot jar reproducible sha256=$h1"

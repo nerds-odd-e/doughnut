@@ -125,6 +125,8 @@ jobs:
         env:
           GITHUB_SHA: ${{ github.sha }}
         run: infra/gcp/scripts/upload-frontend-static-to-gcs.sh
+      - name: Upload CLI install binary to GCS
+        run: infra/gcp/scripts/upload-cli-binary-to-gcs.sh
       - uses: actions/upload-artifact@v7
         with:
           name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar

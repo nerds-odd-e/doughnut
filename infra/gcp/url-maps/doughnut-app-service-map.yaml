@@ -48,3 +48,9 @@ pathMatchers:
         routeAction:
           urlRewrite:
             pathPrefixRewrite: /frontend/9c3225c25eaab3d34ef5e0f1dd0a7487629352aa/odd-e.png
+      - paths:
+          - /doughnut-cli-latest/*
+        service: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/global/backendBuckets/doughnut-frontend-backend-bucket
+        routeAction:
+          urlRewrite:
+            pathPrefixRewrite: /doughnut-cli-latest/

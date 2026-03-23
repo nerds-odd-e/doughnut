@@ -95,6 +95,7 @@ Minimum to send to the **backend bucket** (with prefix rewrite to `frontend/<ACT
 - `/assets/*` — hashed JS/CSS/media
 - `/` and `/index.html` — SPA entry
 - Any other **real files** present at bucket root for that build (e.g. favicon if present)
+- `/doughnut-cli-latest/*` — CLI install binary at bucket prefix `doughnut-cli-latest/` (CI: [`upload-cli-binary-to-gcs.sh`](../../infra/gcp/scripts/upload-cli-binary-to-gcs.sh); not embedded in the Spring jar)
 
 ---
 
@@ -153,6 +154,6 @@ Confirm: **HTML/JS** responses are from the **expected** revision (e.g. unique h
 
 ---
 
-## Spring Boot / jar (this phase vs phase 7)
+## Spring Boot / jar (phase 10)
 
-For **phase 5**, it is acceptable for the **jar to still contain** the same static tree as today: the LB should steer browser traffic to GCS first. **Phase 7** (optional) can remove embedded SPA from the prod jar to shrink deploy surface; conditional MIG skip remains **jar-hash** based only.
+The **deployable boot jar** does **not** embed `classpath:/static/**` (no SPA, no CLI). **Conditional MIG skip** still compares only the **jar** hash. Each green **`Package-artifacts`** run uploads **frontend** (`upload-frontend-static-to-gcs.sh`) and the **CLI** (`upload-cli-binary-to-gcs.sh`) to the same bucket the LB uses.

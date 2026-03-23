@@ -92,7 +92,7 @@ doughnut/
 
 - Frontend API client is auto-generated from OpenAPI spec
 - After changing backend controller signatures, run `pnpm generateTypeScript`
-- Frontend production build outputs to `frontend/dist/` (CLI install bundle still copied to `backend/src/main/resources/static/doughnut-cli-latest/` via `pnpm cli:bundle-and-copy`)
+- Frontend production build outputs to `frontend/dist/`; CLI bundle is `cli/dist/doughnut-cli.bundle.mjs` (`pnpm cli:bundle`). Prod serves `/doughnut-cli-latest/doughnut` from GCS; locally `bootRun` copies the bundle into `backend/build/.../static/` (excluded from the deploy jar).
 - Dev server proxies `/api/`, `/attachments/`, `/logout/`, `/testability/` to backend
 
 ## Code Conventions

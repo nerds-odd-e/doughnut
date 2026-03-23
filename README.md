@@ -260,7 +260,7 @@ pnpm frontend:build
 pnpm backend:sut
 ```
 
-Expect the Vue production build under `frontend/dist` (and, after `pnpm bundle:all`, the CLI bundle under `backend/src/main/resources/static/doughnut-cli-latest/` for the Spring app).
+Expect the Vue production build under `frontend/dist`. The CLI install URL is served from GCS in prod; locally, `pnpm cli:bundle` produces `cli/dist/doughnut-cli.bundle.mjs`, and `bootRun` copies it into `backend/build/resources/main/static/doughnut-cli-latest/` (not packaged in the deploy jar).
 
 ### 8. [Integrating MCP server for IDE](./\.cursor/rules/mcp-server.mdc#how-to-use-this-mcp-server)
 

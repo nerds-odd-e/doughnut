@@ -29,6 +29,12 @@ const BACKEND_PATH_HINTS = loadBackendPathHints(
     : path.join(repoRoot, 'infra/gcp/path-routing/backend-path-hints.json')
 )
 
+/** Same path as prod GCS object; local file from pnpm cli:bundle (phase 10). */
+const CLI_INSTALL_BUNDLE = path.join(
+  repoRoot,
+  'cli/dist/doughnut-cli.bundle.mjs'
+)
+
 const MIME = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
@@ -99,6 +105,19 @@ function sendStatic(filePath, method, res) {
 function serveSpaIndex(method, res) {
   const indexPath = path.join(STATIC_ROOT, 'index.html')
   return sendStatic(indexPath, method, res)
+}
+
+/** Prod serves this URL from GCS; locally we stream the bundled CLI (not in the jar). */
+function tryServeCliInstallPath(urlPath, method, res) {
+  const pathname = (urlPath.split('?')[0] || '/').replace(/\/+$/, '') || '/'
+  if (pathname !== '/doughnut-cli-latest/doughnut') return false
+  if (method !== 'GET' && method !== 'HEAD') return false
+  if (!existsSync(CLI_INSTALL_BUNDLE)) {
+    res.statusCode = 404
+    res.end('Not Found')
+    return true
+  }
+  return sendStatic(CLI_INSTALL_BUNDLE, method, res)
 }
 
 function targetPort(target) {
@@ -248,12 +267,13 @@ const server = http.createServer((req, res) => {
     handleE2eReady(req, res)
     return
   }
+  const method = req.method ?? 'GET'
+  if (tryServeCliInstallPath(urlPath, method, res)) return
   const up = upstreamForPath(urlPath)
   if (up) {
     proxyHttp(req, res, up, proxyLogLabel(up))
     return
   }
-  const method = req.method ?? 'GET'
   if (method !== 'GET' && method !== 'HEAD') {
     res.statusCode = 405
     res.end('Method Not Allowed')

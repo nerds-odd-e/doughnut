@@ -1,4 +1,5 @@
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 buildscript {
   repositories {
@@ -38,6 +39,28 @@ tasks.withType(JavaCompile).configureEach {
 
 tasks.withType(AbstractArchiveTask).configureEach {
   preserveFileTimestamps = false
+}
+
+// CLI install binary: on classpath for bootRun/E2E only — excluded from bootJar (phase 10).
+tasks.register('copyCliBundle', Copy) {
+  description = 'Copy bundled CLI into build/resources for local run; not packaged in bootJar.'
+  def cliBundle = rootProject.file('cli/dist/doughnut-cli.bundle.mjs')
+  doFirst {
+    if (!cliBundle.isFile()) {
+      throw new GradleException("Missing CLI bundle at ${cliBundle} — run: pnpm cli:bundle")
+    }
+  }
+  from(cliBundle)
+  rename { 'doughnut' }
+  into(layout.buildDirectory.dir('resources/main/static/doughnut-cli-latest'))
+}
+
+tasks.named('bootRun') {
+  dependsOn('copyCliBundle')
+}
+
+tasks.named('bootJar', BootJar) {
+  exclude('static/**')
 }
 
 configurations {
