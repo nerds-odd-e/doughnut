@@ -5,13 +5,17 @@ import {
   mockRecallNext,
 } from './interactiveRecallMockAccess.js'
 import { isInRecallSubstate } from '../../src/interactive.js'
+import { stripAnsi } from '../../src/renderer.js'
 import {
   endTTYSession,
+  expectTtyRecallYesNoReplyScrollback,
+  pressEnter,
   pressKey,
   submitTTYCommand,
   tick,
   ttyOutput,
   ttySessionWithSpies,
+  typeString,
   type TTYStdin,
 } from './interactiveTestHelpers.js'
 import { recallNextQuestion } from '../recallNextTestShapes.js'
@@ -29,7 +33,7 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     endTTYSession(stdin)
   })
 
-  test('ESC in spelling prompt exits recall mode', async () => {
+  test('ESC in spelling shows stop confirmation, y exits recall mode', async () => {
     mockRecallNext.mockResolvedValue(
       recallNextQuestion(spellingRecallPrompt(100, 'test'))
     )
@@ -40,14 +44,53 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
       'type your answer; /stop to exit recall'
     )
 
+    mockAnswerSpelling.mockClear()
+    writeSpy.mockClear()
     pressKey(stdin, 'escape')
     await tick()
 
-    expect(isInRecallSubstate()).toBe(false)
+    const escRepaint = stripAnsi(ttyOutput(writeSpy))
+    expect(escRepaint).toContain('Stop recall? (y/n)')
+    expect(escRepaint).toContain('y or n; Esc to go back')
     expect(mockAnswerSpelling).not.toHaveBeenCalled()
+    expect(isInRecallSubstate()).toBe(true)
+
+    typeString(stdin, 'y')
+    await tick()
+    pressEnter(stdin)
+    await tick()
+
+    expect(ttyOutput(writeSpy)).toContain('Stopped recall')
+    expectTtyRecallYesNoReplyScrollback(writeSpy, 'y')
+    expect(mockAnswerSpelling).not.toHaveBeenCalled()
+    expect(isInRecallSubstate()).toBe(false)
   })
 
-  test('ESC in Yes I remember y/n prompt exits recall mode', async () => {
+  test('ESC then n in spelling cancels confirmation and stays in recall', async () => {
+    mockRecallNext.mockResolvedValue(
+      recallNextQuestion(spellingRecallPrompt(100, 'test'))
+    )
+    mockAnswerSpelling.mockResolvedValue({ correct: true })
+    await submitTTYCommand(stdin, '/recall')
+    mockAnswerSpelling.mockClear()
+    writeSpy.mockClear()
+
+    pressKey(stdin, 'escape')
+    await tick()
+
+    typeString(stdin, 'n')
+    await tick()
+    pressEnter(stdin)
+    await tick()
+
+    expect(isInRecallSubstate()).toBe(true)
+    expect(mockAnswerSpelling).not.toHaveBeenCalled()
+    expect(ttyOutput(writeSpy)).toContain(
+      'type your answer; /stop to exit recall'
+    )
+  })
+
+  test('ESC in Yes I remember shows stop confirmation, y exits recall mode', async () => {
     mockRecallNext.mockResolvedValue({
       type: 'just-review',
       memoryTrackerId: 42,
@@ -58,22 +101,90 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
 
     expect(ttyOutput(writeSpy)).toContain('y or n; /stop to exit recall')
 
+    mockMarkAsRecalled.mockClear()
+    writeSpy.mockClear()
     pressKey(stdin, 'escape')
     await tick()
 
-    expect(isInRecallSubstate()).toBe(false)
+    const escRepaint = stripAnsi(ttyOutput(writeSpy))
+    expect(escRepaint).toContain('Stop recall? (y/n)')
+    expect(escRepaint).toContain('y or n; Esc to go back')
     expect(mockMarkAsRecalled).not.toHaveBeenCalled()
+    expect(isInRecallSubstate()).toBe(true)
+
+    typeString(stdin, 'y')
+    await tick()
+    pressEnter(stdin)
+    await tick()
+
+    expect(ttyOutput(writeSpy)).toContain('Stopped recall')
+    expectTtyRecallYesNoReplyScrollback(writeSpy, 'y')
+    expect(mockMarkAsRecalled).not.toHaveBeenCalled()
+    expect(isInRecallSubstate()).toBe(false)
   })
 
-  test('ESC in Load more y/n prompt exits recall mode', async () => {
+  test('ESC then n in just-review cancels confirmation and stays in recall', async () => {
+    mockRecallNext.mockResolvedValue({
+      type: 'just-review',
+      memoryTrackerId: 42,
+      notebookTitle: 'Notebook',
+      title: 'Test note',
+    })
+    await submitTTYCommand(stdin, '/recall')
+    mockMarkAsRecalled.mockClear()
+    writeSpy.mockClear()
+
+    pressKey(stdin, 'escape')
+    await tick()
+
+    typeString(stdin, 'n')
+    await tick()
+    pressEnter(stdin)
+    await tick()
+
+    expect(isInRecallSubstate()).toBe(true)
+    expect(mockMarkAsRecalled).not.toHaveBeenCalled()
+    expect(ttyOutput(writeSpy)).toContain('y or n; /stop to exit recall')
+  })
+
+  test('ESC in Load more shows stop confirmation, y exits recall mode', async () => {
     mockRecallNext.mockResolvedValue({ type: 'none', message: '0 notes' })
     await submitTTYCommand(stdin, '/recall')
 
     expect(ttyOutput(writeSpy)).toContain('y or n; /stop to exit recall')
 
+    writeSpy.mockClear()
     pressKey(stdin, 'escape')
     await tick()
 
+    const escRepaint = stripAnsi(ttyOutput(writeSpy))
+    expect(escRepaint).toContain('Stop recall? (y/n)')
+    expect(escRepaint).toContain('y or n; Esc to go back')
+    expect(isInRecallSubstate()).toBe(true)
+
+    typeString(stdin, 'y')
+    await tick()
+    pressEnter(stdin)
+    await tick()
+
+    expect(ttyOutput(writeSpy)).toContain('Stopped recall')
+    expectTtyRecallYesNoReplyScrollback(writeSpy, 'y')
     expect(isInRecallSubstate()).toBe(false)
+  })
+
+  test('ESC then n in Load more cancels confirmation and stays in recall', async () => {
+    mockRecallNext.mockResolvedValue({ type: 'none', message: '0 notes' })
+    await submitTTYCommand(stdin, '/recall')
+
+    pressKey(stdin, 'escape')
+    await tick()
+
+    typeString(stdin, 'n')
+    await tick()
+    pressEnter(stdin)
+    await tick()
+
+    expect(isInRecallSubstate()).toBe(true)
+    expect(ttyOutput(writeSpy)).toContain('Load more from next 3 days? (y/n)')
   })
 })

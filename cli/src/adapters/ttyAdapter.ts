@@ -703,6 +703,12 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     return String(selectedChoiceIndex + 1)
   }
 
+  const enterRecallStopConfirmationFromEsc = (): void => {
+    setPendingRecallStopConfirmation(true)
+    commandInput = clearLiveCommandLine(commandInput)
+    drawBox()
+  }
+
   ttyOutput = {
     log: (msg) => {
       commandTurn.tone = 'plain'
@@ -808,9 +814,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     if (isMcqRecallPending(pendingRecallAnswer)) {
       const choices = pendingRecallAnswer.choices
       if (key.name === 'escape') {
-        setPendingRecallStopConfirmation(true)
-        commandInput = clearLiveCommandLine(commandInput)
-        drawBox()
+        enterRecallStopConfirmationFromEsc()
       } else if (key.name === 'up' || key.name === 'down') {
         const delta = key.name === 'up' ? -1 : 1
         recallMcqSelectedChoiceIndex = cycleIndex(
@@ -899,11 +903,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     }
     if (key.name === 'escape') {
       if (isInRecallSubstate()) {
-        exitRecallMode()
-        commandInput = clearLiveCommandLine(commandInput)
-        recallMcqSelectedChoiceIndex = 0
-        resetLivePaintCursor()
-        drawBox()
+        enterRecallStopConfirmationFromEsc()
         return
       }
       if (isCommandPrefixWithSuggestions(commandInput.lineDraft)) {
