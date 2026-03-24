@@ -84,6 +84,8 @@ After each phase: **delete dead code** that only served the old path; **delete o
 | Confirm / session y/n routing in ANSI adapter | **Mechanism deps done**; **F/H** = Ink owns UI |
 | Business importing **`renderer`** presentation constants | **D** (open) |
 | Legacy full-screen repaint + mode wiring | **H**, **I** |
+| Imperative caret CSI + pre-rerender cursor restore (Ink log-update mismatch) | **Interim** — remove in **J** |
+| Scattered `stdout.write` for interactive mode (vs one thin OSC/lifecycle layer) | **K** (after **J**) |
 
 ---
 
@@ -236,6 +238,45 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
+### Phase J — **Ink-native** live input and caret (remove adapter cursor CSI)
+
+**Goal:** The **bordered command line** and **hardware caret** are owned inside the **Ink/React** live subtree (e.g. `TextInput` from **@inkjs/ui**, a small focused component, or Ink-supported patterns), not by **`ttyAdapter` post-paint `process.stdout.write`** (no manual `CUU`/`CHA` to sit the caret in the box, no **`lastLiveRegionCaretDelta`** + **`HIDE_CURSOR`** + vertical restore before `rerender`).
+
+**User-visible outcome:** Same TTY behavior as today—correct caret position, no box “climbing” on each keystroke, no reliance on **Ink log-update** seeing a cursor row we secretly moved with CSI.
+
+**Why a dedicated phase (planning.mdc):** The current stack is **interim**: `handleShellRendered()` after Ink writes (correct ordering vs `onRender`), plus imperative caret placement, conflicts with Ink’s incremental cursor assumptions. That debt is **explicitly temporary** until the live **draft** is an Ink-controlled input.
+
+**Decision gates to close before/during J**
+
+- **Focus model** — Ink `useFocus` / `TextInput` vs today’s readline **`keypress`** path: either bridge keys into the component or migrate stdin handling (touches **single root vs stdin** gate).
+- **Wrapping** — Draft line must stay **`renderer.ts`**-aware for CJK/emoji if Ink’s input does not match column semantics.
+- **ink-ui vs custom** — **@inkjs/ui** `TextInput` vs bespoke `useInput` + `Text` border (styling vs dependency).
+
+**Deliverables**
+
+- Delete (or reduce to **OSC-only**) **`positionCursorInInputBox`**, **`restoreCursorRowAfterInteractiveCaretPlacement`**, and related state in **`ttyAdapter`** once Ink owns the typing surface.
+- **Regression:** keep **observable** Vitest TTY coverage (`cursor` row, top border column 0, **no** `ttyShowCaretCuUThenInk2KEraseBeforeNextHide`-class protocol violation); adjust assertions if the **observable** surface changes but behavior does not.
+- **E2E:** extend or run **`e2e_test/features/cli/`** for the main typing path if Phase J touches stdin ownership.
+
+**Interim behavior removed:** Post-Ink manual caret CSI and pre-rerender cursor restore (see commits around Ink shell + live region).
+
+---
+
+### Phase K — **Single owner** of interactive stdout (OSC + lifecycle glue)
+
+**Goal:** After **J**, any remaining **`process.stdout.write`** in the TTY path is **minimal and in one place**: e.g. **shell-integration OSC** (`INTERACTIVE_INPUT_READY_OSC`), resize/clear coordination, exit scrollback—**not** scattered CSI mixed with Ink’s stream.
+
+**User-visible outcome:** No user-facing change when done well; fewer classes of ordering bugs and easier reasoning for contributors.
+
+**Deliverables**
+
+- Audit **`ttyAdapter`** (and **`commitExitTurnToScrollback`**, etc.) for raw writes; fold into a **small module** or **Ink `render` options** / custom `stdout` wrapper if justified.
+- Document what **must** stay outside Ink (OSC, farewell lines) vs what **must not** return (layout/caret CSI for the live block).
+
+**Depends on:** **J** (caret and draft no longer need adapter-emitted `CUU`/`CHA`).
+
+---
+
 ## What the interactive UI layer is NOT (even after Ink)
 
 - Not where **recall business rules** live (what “yes” means, when to load more, quiz scoring).
@@ -254,5 +295,5 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ## Notes
 
-- **Ordering:** Phases A–D deliver a safe **extract-and-thin-adapter** path even if Ink is deferred; E–I require the **decision gates** to be closed. **Next:** Phase I (consolidation / dead-code pass).
+- **Ordering:** Phases A–D deliver a safe **extract-and-thin-adapter** path even if Ink is deferred; E–I require the **decision gates** to be closed. **Next:** Phase **I** (consolidation / dead-code pass), then **J** (Ink-native live input + caret — removes interim cursor CSI), then **K** (single stdout/OSC owner).
 - **Conflicts:** Any phase that would change PTY/E2E-visible behavior without product sign-off should stop at the nearest **decision gate** above.

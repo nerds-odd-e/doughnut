@@ -126,6 +126,52 @@ export function simulatedScreenFromTtyWrites(output: string): string {
 }
 
 /**
+ * 0-based row index of the last replayed line whose trimmed plain text matches the input box top
+ * outline (`┌` … `┐`). Returns -1 if none. Used to detect live-region vertical drift across redraws.
+ */
+export function lastReplayedInputBoxTopRowIndex(
+  rawWritesJoined: string
+): number {
+  const lines = simulatedScreenFromTtyWrites(rawWritesJoined).split('\n')
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const t = stripAnsiCsiAndCr(lines[i] ?? '').trim()
+    if (INPUT_BOX_TOP_OUTLINE_PATTERN.test(t)) return i
+  }
+  return -1
+}
+
+/**
+ * Minimum last-replayed input-box top row index seen when growing `raw` one byte at a time from
+ * `startLen` (for catching mid-stream vertical slip that whole-chunk prefixes miss).
+ */
+/**
+ * True when some `SHOW_CURSOR` span contains manual cursor-up + CHA (caret placement) and, before
+ * the next `HIDE_CURSOR`, Ink-style `\x1b[2K\x1b[1A` appears. That ordering means the live cursor was
+ * moved into the box after Ink painted, then log-update erased/moved from a mismatched vertical
+ * origin — the usual cause of the input box “climbing” on each keystroke.
+ */
+export function ttyShowCaretCuUThenInk2KEraseBeforeNextHide(
+  rawWritesJoined: string
+): boolean {
+  const show = '\x1b[?25h'
+  const hide = '\x1b[?25l'
+  let from = 0
+  while (from < rawWritesJoined.length) {
+    const si = rawWritesJoined.indexOf(show, from)
+    if (si < 0) return false
+    const afterShow = rawWritesJoined.slice(si + show.length)
+    const hideIdx = afterShow.indexOf(hide)
+    const window = hideIdx < 0 ? afterShow : afterShow.slice(0, hideIdx)
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: CSI CUU + CHA
+    const hasManualCaretPlacement = /\x1b\[\d+A\x1b\[\d+G/.test(window)
+    const hasInkEraseLineAndUp = window.includes('\x1b[2K\x1b[1A')
+    if (hasManualCaretPlacement && hasInkEraseLineAndUp) return true
+    from = si + show.length
+  }
+  return false
+}
+
+/**
  * Replays TTY writes and returns final cursor position plus the sparse line buffer (tests only).
  * Handles CUU/CUD, EL 2K, CUP column (G), printable text, newlines, and full-screen clear (`CLEAR_SCREEN`).
  */

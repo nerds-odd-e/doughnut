@@ -261,10 +261,20 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
 
   // --- Ink shell: Static history + live panel (Phase H) ---
   let shellInstance: ReturnType<typeof render> | null = null
+  /** Vertical offset last applied in {@link positionCursorInInputBox} (CUU positive, CUD negative). Reset before each rerender so Ink log-update matches the cursor row it expects. */
+  let lastLiveRegionCaretDelta = 0
   let stopConfirmDraft = ''
   let stopConfirmHint = ''
   let sessionYesNoDraft = ''
   let sessionYesNoHint = ''
+
+  function restoreCursorRowAfterInteractiveCaretPlacement(): void {
+    if (lastLiveRegionCaretDelta === 0) return
+    if (lastLiveRegionCaretDelta > 0)
+      process.stdout.write(`\x1b[${lastLiveRegionCaretDelta}B`)
+    else process.stdout.write(`\x1b[${-lastLiveRegionCaretDelta}A`)
+    lastLiveRegionCaretDelta = 0
+  }
 
   function patchStdinForInk(
     stream: NodeJS.ReadableStream & { ref?: () => void; unref?: () => void }
@@ -299,7 +309,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       return
     }
     const layout = measureLiveRegionLayout()
-    finalizeInteractiveLiveRegionPaint(layout.placeholderContext)
+    finalizeInteractiveLiveRegionPaint(layout)
   }
 
   function buildLivePanel(): React.ReactElement {
@@ -389,6 +399,10 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       unref?: () => void
     }
     patchStdinForInk(stdinForInk)
+    if (shellInstance && lastLiveRegionCaretDelta !== 0) {
+      process.stdout.write(HIDE_CURSOR)
+      restoreCursorRowAfterInteractiveCaretPlacement()
+    }
     const tree = buildShellTree()
     if (!shellInstance) {
       shellInstance = render(tree, {
@@ -582,9 +596,13 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     }
   }
 
-  const positionCursorInInputBox = () => {
+  /**
+   * After Ink writes the live region, the terminal cursor is typically on the line *after* the last
+   * rendered row (trailing newline). CHA (`G`) only moves along the current row — emit CUU/CUD
+   * first so the row matches the bordered input line (`buildLiveRegionLines` layout).
+   */
+  const positionCursorInInputBox = (layout: LiveRegionLayout) => {
     const { lineDraft, caretOffset } = commandInput
-    const contentLineCount = lineDraft.split('\n').length
     let row = 0
     let col = 0
     for (let i = 0; i < caretOffset; i++) {
@@ -595,24 +613,27 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         col++
       }
     }
-    const lastRow = Math.max(0, contentLineCount - 1)
-    const deltaUp = lastRow - row
-    if (deltaUp > 0) process.stdout.write(`\x1b[${deltaUp}A`)
-    else if (deltaUp < 0) process.stdout.write(`\x1b[${-deltaUp}B`)
+    const deltaFromInkEndToCaretRow =
+      layout.liveLineCount - layout.currentPromptLines - 1 - row
+    lastLiveRegionCaretDelta = deltaFromInkEndToCaretRow
+    if (deltaFromInkEndToCaretRow > 0)
+      process.stdout.write(`\x1b[${deltaFromInkEndToCaretRow}A`)
+    else if (deltaFromInkEndToCaretRow < 0)
+      process.stdout.write(`\x1b[${-deltaFromInkEndToCaretRow}B`)
     const prefixLen = row === 0 ? PROMPT.length : 2
     const colG = 3 + prefixLen + col
     process.stdout.write(`\x1b[${colG}G`)
   }
 
   /** Cursor visibility and column, then `INTERACTIVE_INPUT_READY_OSC` when the box accepts input. */
-  function finalizeInteractiveLiveRegionPaint(
-    placeholderContext: PlaceholderContext
-  ): void {
+  function finalizeInteractiveLiveRegionPaint(layout: LiveRegionLayout): void {
+    const { placeholderContext } = layout
     if (isGreyDisabledInputChrome(placeholderContext)) {
       process.stdout.write(HIDE_CURSOR)
+      lastLiveRegionCaretDelta = 0
     } else {
       process.stdout.write(SHOW_CURSOR)
-      positionCursorInInputBox()
+      positionCursorInInputBox(layout)
     }
     process.stdout.write(
       interactiveInputReadyOscSuffix({
@@ -624,6 +645,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
 
   function doFullRedraw() {
     process.stdout.write(CLEAR_SCREEN)
+    lastLiveRegionCaretDelta = 0
     if (shellInstance) {
       shellInstance.unmount()
       shellInstance = null
@@ -708,6 +730,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       chatHistory = []
       resetLiveLineDraftAndSlashSuggestions()
       tokenSelection = null
+      lastLiveRegionCaretDelta = 0
       if (shellInstance) {
         shellInstance.unmount()
         shellInstance = null
@@ -742,6 +765,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   const doExit = () => {
     stopInteractiveFetchWaitRepaintTimer()
     removeResizeListener()
+    lastLiveRegionCaretDelta = 0
     if (shellInstance) {
       shellInstance.unmount()
       shellInstance = null
@@ -1156,6 +1180,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           numberedChoiceHighlightIndex = 0
         }
         if (input.trim() === '' && shellInstance) {
+          lastLiveRegionCaretDelta = 0
           shellInstance.unmount()
           shellInstance = null
         }

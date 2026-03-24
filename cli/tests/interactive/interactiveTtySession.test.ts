@@ -5,6 +5,7 @@ import {
   INPUT_BOX_TOP_OUTLINE_PATTERN,
   cursorPositionAfterTtyWrites,
   liveRegionRepaintHasStaleCursorUpBeforeBoxTop,
+  ttyShowCaretCuUThenInk2KEraseBeforeNextHide,
   simulatedScreenFromTtyWrites,
 } from '../ttyWriteSimulation.js'
 import { filterCommandsByPrefix, interactiveDocs } from '../../src/help.js'
@@ -488,7 +489,7 @@ describe('TTY: shared interactive session', () => {
     })
   })
 
-  describe.skip('input box cursor row (regression)', () => {
+  describe('input box cursor row (regression)', () => {
     test('after initial paint, replayed cursor row matches the bordered prompt line (→ inside │ … │)', async () => {
       await tick()
       await tick()
@@ -536,6 +537,27 @@ describe('TTY: shared interactive session', () => {
           `Got cursorCol=${cursorCol}.`,
         ].join('\n')
       ).toBe(4)
+    })
+  })
+
+  describe('input box vertical stability on draft edits (regression)', () => {
+    test('must not place caret with CUU/CHA and then let Ink 2K+CUU run before the next hide', async () => {
+      await tick()
+      await tick()
+
+      typeString(stdin, 'x')
+      await tick()
+      await tick()
+
+      const raw = ttyOutput(writeSpy)
+      expect(
+        ttyShowCaretCuUThenInk2KEraseBeforeNextHide(raw),
+        [
+          'After SHOW_CURSOR, the adapter must not emit manual cursor-up + CHA to sit the caret in the input box and then allow Ink log-update to run \\x1b[2K\\x1b[1A (erase line + cursor up) before the next HIDE_CURSOR.',
+          'Ink assumes the cursor is still where it left off after the last render; moving the caret up for the user breaks that contract, so the next incremental repaint erases from the wrong row and the bordered input block walks up the screen (~a few lines per keystroke).',
+          'A real fix hides the cursor before Ink rerenders, avoids post-render CUU, or otherwise resyncs vertical state — do not weaken this check to only the final replayed frame (that snapshot can look fine while the protocol is wrong).',
+        ].join('\n')
+      ).toBe(false)
     })
   })
 
