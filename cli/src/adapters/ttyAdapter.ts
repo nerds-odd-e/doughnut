@@ -397,11 +397,11 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         patchConsole: false,
         exitOnCtrlC: false,
         maxFps: 0,
-        onRender: handleShellRendered,
       })
-      return
+    } else {
+      shellInstance.rerender(tree)
     }
-    shellInstance.rerender(tree)
+    handleShellRendered()
   }
 
   function rememberCommittedLine(raw: string): void {

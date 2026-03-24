@@ -447,7 +447,7 @@ describe('TTY: shared interactive session', () => {
     })
   })
 
-  describe.skip('input box top border (regression)', () => {
+  describe('input box top border (regression)', () => {
     test('initial paint: simulated top border row is exactly ┌─…┐ (no leading spaces)', async () => {
       await tick()
       await tick()
