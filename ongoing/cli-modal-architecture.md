@@ -257,22 +257,121 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
+## Architecture evaluation (audit — read-only)
+
+Post–Phase I review of the `cli/` subproject against the north star and open gates. **No implementation** was done for this audit.
+
+### North star vs current code
+
+| Goal | Status |
+|------|--------|
+| Single `render()` root, `Static` history, live column as React tree | **Met** — `InteractiveShellDisplay` + `buildLivePanel()` in `ttyAdapter.ts`. |
+| Ink vocabulary for confirm / MCQ / token list / fetch-wait | **Mostly met** — dedicated components; MCQ/token use `Box`/`Text`/`inverse` instead of only ANSI `drawBox`. |
+| **Full** Ink app (layout + **input** via `useInput` / focus) | **Not met** — `readline.createInterface` + `stdin.on('keypress')` own keystrokes; `finalizeInteractiveLiveRegionPaint` uses **manual ANSI** (`CUU`/`G`, cursor show/hide) for the command-line caret. Ink remains **display-first** on the default live column. |
+| `ttyAdapter` free of business-concept branching | **Met** — `TTYDeps` + `buildTTYDeps()`. |
+| `@inkjs/ui` | **Not adopted** — hand-rolled components; optional only as **thin** 1:1 replacements, not a new adapter stack. |
+
+**Summary:** A–I delivered the **shell + Static + Ink branches**. The remaining gap vs the north star is **stdin / caret / input** still outside Ink.
+
+### Cohesion, length, adapter layers
+
+- **Hybrid presentation:** Default command line: **`renderer.ts` → `buildLiveRegionLines` → ANSI-heavy strings** → `LiveRegionLines` as one `<Text>` per line. That is **less** idiomatic Ink than MCQ/token/fetch-wait (which already structure layout in React).
+- **Redundant work (not dead code):** On a typical **default** paint, `measureLiveRegionLayout()` can run **up to three times** per `drawBox()` (`buildShellTree`, `buildLivePanel` default branch, `handleShellRendered`). In **MCQ / token / wait / confirm** modes, the first pass can still build a full **`liveLines`** array that **`buildLivePanel` never renders** (it uses `McqDisplay` / etc.). Collapsing to **one snapshot per frame** shortens `ttyAdapter` and helps a later `useInput` migration.
+- **`LiveRegionLines`:** Thin wrapper; may fold into the shell when the default column is real Ink layout.
+
+### Dead code and tests
+
+- No **orphaned** CLI modules found; `renderer.ts` stays central for **piped** / `writeFullRedraw` and TTY string assembly.
+- **`cli/tests/selectListInteraction.test.ts`** contradicts an older note preferring only TTY/E2E coverage; tests are **useful** for dispatch contract but **overlap** observable paths — keep or fold into interactive tests as you prefer.
+- **`positionCursorInInputBox`** uses **UTF-16 column** math and `PROMPT.length`, not grapheme width — a latent bug for wide glyphs; may disappear when Ink owns the caret.
+
+### Decision gates — choices for the next track
+
+| Gate | Direction |
+|------|-----------|
+| **1 / 3 / 5** | Move to **Ink `useInput`**; optional **`@inkjs/ui`** only where it **replaces** bespoke UI 1:1. Define **focus** (single owner vs `useFocus`) and E2E impact. |
+| **4** | **Prefer Ink `Text` wrapping** + `Box` width for the **interactive** default column; keep **`renderer.ts` grapheme** helpers for **piped** until parity is proven. |
+| **6** | **Declined** — Ink-native look; no ANSI stage-band / border parity goal. |
+| **7** | **Declined for now** — keep `patchConsole: false` unless logging corrupts layout. |
+
+---
+
+## Phases J+ (planned — not started)
+
+**Order:** single layout snapshot → Ink wrap for default column → stdin/`useInput` migration → confirm → lists → optional ink-ui polish.
+
+### Phase J — One live layout snapshot per `drawBox`
+
+**Goal:** Run `getDisplayContent` / layout derivation **once** per paint; thread the snapshot into `buildShellTree`, `buildLivePanel`, and `handleShellRendered` so `measureLiveRegionLayout` is not repeated and non-default modes skip building unused `liveLines`.
+
+**User-visible:** None intended.
+
+**Verify:** `pnpm cli:test`; `cli_recall.feature` if needed.
+
+---
+
+### Phase K — Default live column: Ink layout + Ink `Text` wrap (gate 4)
+
+**Goal:** Replace **default** `buildLiveRegionLines` + `LiveRegionLines` with **`Box`/`Text`** and Ink-driven wrapping (`width` = terminal columns). Keep **`renderer.ts`** for piped `renderFullDisplay` / `writeFullRedraw` until a later unify.
+
+**User-visible:** Possible subtle wrap/styling differences; **no** ANSI visual parity (gate 6 declined).
+
+**Verify:** Interactive Vitest + CJK/emoji; E2E as needed.
+
+**Stop if:** Ink wrapping is insufficient — document and keep a **minimal** bridge, not a second UI framework.
+
+---
+
+### Phase L — `useInput` for the main command line (gates 1 & 3)
+
+**Goal:** Move typing, caret, Enter, arrows, Tab, multiline draft from **readline `keypress`** into the Ink tree. **Consistent stdin ownership** with Ink in command mode. Preserve scrollback, `INTERACTIVE_INPUT_READY_OSC`, slash suggestions, draft history, `/clear`, Ctrl+C.
+
+**User-visible:** Ideally unchanged; key/focus changes need sign-off.
+
+**Verify:** `cli/tests/interactive/*`, `interactiveCommandInput.test.ts`, E2E CLI recall.
+
+---
+
+### Phase M — Confirm / session y/n on Ink input
+
+**Goal:** Drive **`ConfirmDisplay`** drafts via **`useInput`** (or ink-ui `ConfirmInput` if 1:1), removing duplicate char/backspace handling from `ttyAdapter` for those modes.
+
+**Verify:** Session y/n and stop-confirm tests + E2E.
+
+---
+
+### Phase N — MCQ and token list: `useInput` inside the live subtree
+
+**Goal:** Handle **↑↓ / number / Enter / Esc** in **`McqDisplay` / `TokenListDisplay`** (or shared hook) with **callbacks** to deps; remove parallel list key branches from `ttyAdapter` when the shell is active.
+
+**Optional:** **`@inkjs/ui` `Select`** only if it **deletes** more code than it adds.
+
+**Verify:** `interactiveTtyMcq`, `interactiveTtyTokenList`, recall E2E.
+
+---
+
+### Phase O (optional) — ink-ui polish
+
+**Goal:** `Spinner` / `TextInput` / etc. from **`@inkjs/ui`** only where the API maps **directly** to current behavior — no generic modal adapter.
+
+---
+
 ## Open after Phase I (optional — not a backlog to “close”)
 
-Phases **A–I** are **done**. The items below are **intentionally unset** until you choose to act on them. They are the same themes as **Decision gates** and **Ink concepts** above—not deleted, not resolved here.
+Phases **A–I** are **done**. Follow-up work is spelled out in **Architecture evaluation** and **Phases J+** above (stdin → `useInput`, Ink `Text` wrap, optional ink-ui, gates 6–7 declined for now).
 
-- **Stdin / input model:** keep readline + display-only Ink vs move command input to Ink `useInput` (and/or **@inkjs/ui** `TextInput`).
-- **Focus and selection UX:** ↑↓ in guidance vs Ink `useFocus` / Tab (E2E and habit impact).
-- **Layout:** more `renderer.ts` pre-wrap vs more Ink `Text` `wrap` for CJK/emoji parity.
-- **Components:** adopt **@inkjs/ui** (`Spinner`, `Select`, …) vs hand-rolled `Box`/`Text`.
-- **Look:** closer ANSI parity (stage band, borders) vs slimmer Ink-native chrome.
-- **Logging:** `patchConsole` and rules for `console.log` during interactive mode.
+**Historical bullets** (themes unchanged; execution path is J+):
 
-When you pick one of these, work through the matching **Decision gate** (or add a short note under this section) before large refactors.
+- **Stdin / input model:** → Phases **L–N**.
+- **Focus and selection UX:** → Phases **L–N**.
+- **Layout:** → Phase **K**.
+- **Components:** → Phase **O** (optional).
+- **Look:** declined (gate 6).
+- **Logging:** deferred (gate 7).
 
 ---
 
 ## Notes
 
-- **Ordering:** Phases A–D were the safe **extract-and-thin-adapter** path; E–I added Ink and the shell. **Phases A–I are complete**; this file stays as reference until you archive it.
-- **Conflicts:** Any future change that would alter PTY/E2E-visible behavior without product sign-off should still stop at the nearest **decision gate** above.
+- **Ordering:** Phases A–D were the safe **extract-and-thin-adapter** path; E–I added Ink and the shell. **Phases A–I are complete.** **J+** are **planned only** until executed.
+- **Conflicts:** Any future change that would alter PTY/E2E-visible behavior without product sign-off should still stop at the nearest **decision gate** above or a **Phase J+ Stop if** note.
