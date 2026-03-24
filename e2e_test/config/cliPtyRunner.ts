@@ -14,7 +14,10 @@ import type { InteractiveCliPtyKeystroke } from './interactiveCliPtyTypes'
 const PTY_TIMEOUT_MS = 25_000
 const CLI_POLL_MS = 10
 /** After the readiness OSC appears, wait briefly so any trailing PTY chunks flush. */
-const INTERACTIVE_INPUT_READY_FLUSH_MS = 50
+const INTERACTIVE_INPUT_READY_FLUSH_MS = 80
+/** CI PTY can deliver Ink output in multiple chunks after the OSC; wait until length is stable. */
+const INTERACTIVE_INPUT_READY_STABLE_MS = 70
+const INTERACTIVE_INPUT_READY_DRAIN_MAX_MS = 450
 
 const PTY_OPTIONS = {
   name: 'xterm-256color' as const,
@@ -62,6 +65,22 @@ async function waitForInteractiveInputReadyOsc(
           : ''
     if (haystack.includes(INTERACTIVE_INPUT_READY_OSC)) {
       await sleep(INTERACTIVE_INPUT_READY_FLUSH_MS)
+      const drainDeadline = Date.now() + INTERACTIVE_INPUT_READY_DRAIN_MAX_MS
+      let lastLen = getStdout().length
+      let stableSince = Date.now()
+      while (Date.now() < drainDeadline) {
+        await sleep(CLI_POLL_MS)
+        const len = getStdout().length
+        if (len !== lastLen) {
+          lastLen = len
+          stableSince = Date.now()
+        } else if (
+          Date.now() - stableSince >=
+          INTERACTIVE_INPUT_READY_STABLE_MS
+        ) {
+          return
+        }
+      }
       return
     }
     await sleep(CLI_POLL_MS)
