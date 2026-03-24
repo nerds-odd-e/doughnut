@@ -9,6 +9,7 @@ import {
   ITALIC,
   RED,
   RESET,
+  REVERSE,
   HIDE_CURSOR,
   SHOW_CURSOR,
 } from './ansi.js'
@@ -449,23 +450,73 @@ export function renderPastInput(input: string, width: TerminalWidth): string {
   return [emptyRow, ...contentRows, emptyRow, ''].join('\n')
 }
 
-export function highlightRecognizedCommand(line: string): string {
-  if (!line.startsWith('/')) return line
-
+/** Length of the leading `/…` segment highlighted for a known interactive command (UTF-16 code units). */
+export function commandHighlightLength(line: string): number {
+  if (!line.startsWith('/')) return 0
   const usages = interactiveDocs.map((d) => d.usage)
   let highlightLen = 0
-
   for (const cmd of usages) {
     if (line.startsWith(cmd)) {
       highlightLen = Math.max(highlightLen, cmd.length)
     }
   }
+  return highlightLen
+}
 
+export function highlightRecognizedCommand(line: string): string {
+  const highlightLen = commandHighlightLength(line)
   if (highlightLen === 0) return line
-
   const prefix = line.slice(0, highlightLen)
   const rest = line.slice(highlightLen)
   return `${COMMAND_HIGHLIGHT}${prefix}${RESET}${rest}`
+}
+
+function highlightPlainSlice(
+  fullLine: string,
+  start: number,
+  len: number
+): string {
+  if (len === 0) return ''
+  const h = commandHighlightLength(fullLine)
+  const end = start + len
+  if (h === 0) return fullLine.slice(start, end)
+  const hlEnd = Math.min(h, end)
+  if (hlEnd <= start) return fullLine.slice(start, end)
+  const sub = fullLine.slice(start, end)
+  const firstHlLen = hlEnd - start
+  return `${COMMAND_HIGHLIGHT}${sub.slice(0, firstHlLen)}${RESET}${sub.slice(firstHlLen)}`
+}
+
+/** Snap a UTF-16 caret offset to the start of the grapheme it falls inside (plain text, no ANSI). */
+export function snapPlainCaretToGraphemeBoundary(
+  line: string,
+  caretUtf16: number
+): number {
+  if (caretUtf16 <= 0) return 0
+  if (caretUtf16 >= line.length) return line.length
+  let acc = 0
+  for (const { segment } of graphemeSegmenter.segment(line)) {
+    const next = acc + segment.length
+    if (caretUtf16 > acc && caretUtf16 < next) return acc
+    acc = next
+  }
+  return caretUtf16
+}
+
+/** Which logical line of `buffer` and UTF-16 offset within that line `caretOffset` refers to. */
+export function caretLineAndOffsetInBuffer(
+  buffer: string,
+  caretOffset: number
+): { lineIndex: number; offsetInLine: number } {
+  let lineIndex = 0
+  let lineStart = 0
+  for (let i = 0; i < caretOffset && i < buffer.length; i++) {
+    if (buffer[i] === '\n') {
+      lineIndex++
+      lineStart = i + 1
+    }
+  }
+  return { lineIndex, offsetInLine: caretOffset - lineStart }
 }
 
 export interface BuildBoxLinesOptions {
@@ -499,6 +550,110 @@ export function buildBoxLines(
   })
 }
 
+function buildDefaultBoxInnerLineWithCaret(
+  plainLine: string,
+  lineIndex: number,
+  buffer: string,
+  caretLine: number,
+  caretUtf16InLine: number,
+  context: PlaceholderContext
+): string {
+  const prefix = isGreyDisabledInputChrome(context)
+    ? ''
+    : lineIndex === 0
+      ? PROMPT
+      : '  '
+  if (lineIndex === 0 && buffer === '') {
+    const placeholder = PLACEHOLDER_BY_CONTEXT[context]
+    if (isGreyDisabledInputChrome(context)) {
+      return `${prefix}${GREY}${placeholder}${RESET}`
+    }
+    if (caretLine === 0 && caretUtf16InLine === 0) {
+      return `${prefix}${REVERSE} ${RESET}${GREY}${placeholder}${RESET}`
+    }
+    return `${prefix}${GREY}${placeholder}${RESET}`
+  }
+  if (plainLine === '') {
+    if (lineIndex === caretLine) {
+      return `${prefix}${REVERSE} ${RESET}`
+    }
+    return prefix
+  }
+  if (lineIndex !== caretLine) {
+    return prefix + highlightRecognizedCommand(plainLine)
+  }
+  const snap = snapPlainCaretToGraphemeBoundary(plainLine, caretUtf16InLine)
+  const tail = plainLine.slice(snap)
+  let atG = ''
+  for (const { segment } of graphemeSegmenter.segment(tail)) {
+    atG = segment
+    break
+  }
+  const before = plainLine.slice(0, snap)
+  const after = tail.slice(atG.length)
+  const caretShown =
+    tail.length === 0 ? `${REVERSE} ${RESET}` : `${REVERSE}${atG}${RESET}`
+  return (
+    prefix +
+    highlightPlainSlice(plainLine, 0, before.length) +
+    caretShown +
+    highlightPlainSlice(plainLine, snap + atG.length, after.length)
+  )
+}
+
+/**
+ * Inner input-box lines with a reverse-video caret at `caretOffset` (UTF-16 into `buffer`),
+ * grapheme-aware within each logical line. Same truncation/padding as {@link buildBoxLines}.
+ */
+export function buildBoxLinesWithCaret(
+  buffer: string,
+  width: TerminalWidth,
+  options: BuildBoxLinesOptions | undefined,
+  caretOffset: number
+): string[] {
+  const context = options?.placeholderContext ?? 'default'
+  if (isGreyDisabledInputChrome(context)) {
+    return buildBoxLines(buffer, width, options)
+  }
+  const bufferLines = buffer.split('\n')
+  const { lineIndex: caretLine, offsetInLine: caretUtf16InLine } =
+    caretLineAndOffsetInBuffer(buffer, caretOffset)
+  return bufferLines.map((plainLine, i) =>
+    buildDefaultBoxInnerLineWithCaret(
+      plainLine,
+      i,
+      buffer,
+      caretLine,
+      caretUtf16InLine,
+      context
+    )
+  )
+}
+
+export function buildLiveRegionHeaderLines(
+  width: TerminalWidth,
+  currentPromptWrappedLines: string[],
+  currentStageIndicatorLines: string[]
+): string[] {
+  const lines: string[] = []
+  const hasStageIndicator = currentStageIndicatorLines.length > 0
+  if (hasStageIndicator) {
+    for (const ind of currentStageIndicatorLines) {
+      lines.push(formatCurrentStageIndicatorLine(ind, width))
+    }
+    lines.push(buildCurrentPromptSeparatorForStageBand(width))
+  }
+  if (currentPromptWrappedLines.length > 0) {
+    if (!hasStageIndicator) {
+      lines.push(buildCurrentPromptSeparator(width))
+    }
+    for (const line of currentPromptWrappedLines) {
+      lines.push(`${GREY}${line}${RESET}`)
+    }
+  }
+  return lines
+}
+
 export function getTerminalWidth(): number {
   return process.stdout.columns || 80
 }
@@ -530,22 +685,13 @@ export function buildLiveRegionLines(
   currentStageIndicatorLines: string[],
   options?: LiveRegionPaintOptions
 ): string[] {
-  const lines: string[] = []
-  const hasStageIndicator = currentStageIndicatorLines.length > 0
-  if (hasStageIndicator) {
-    for (const ind of currentStageIndicatorLines) {
-      lines.push(formatCurrentStageIndicatorLine(ind, width))
-    }
-    lines.push(buildCurrentPromptSeparatorForStageBand(width))
-  }
-  if (currentPromptWrappedLines.length > 0) {
-    if (!hasStageIndicator) {
-      lines.push(buildCurrentPromptSeparator(width))
-    }
-    for (const line of currentPromptWrappedLines) {
-      lines.push(`${GREY}${line}${RESET}`)
-    }
-  }
+  const lines: string[] = [
+    ...buildLiveRegionHeaderLines(
+      width,
+      currentPromptWrappedLines,
+      currentStageIndicatorLines
+    ),
+  ]
   const rawBoxLines = renderBox(
     buildBoxLines(buffer, width, options),
     width

@@ -1,9 +1,9 @@
 import './interactiveTestMocks.js'
 import { describe, test, expect, type vi, beforeEach, afterEach } from 'vitest'
+import { REVERSE } from '../../src/ansi.js'
 import { stripAnsi, stripAnsiCsiAndCr } from '../../src/renderer.js'
 import {
   INPUT_BOX_TOP_OUTLINE_PATTERN,
-  cursorPositionAfterTtyWrites,
   liveRegionRepaintHasStaleCursorUpBeforeBoxTop,
   ttyShowCaretCuUThenInk2KEraseBeforeNextHide,
   simulatedScreenFromTtyWrites,
@@ -489,54 +489,25 @@ describe('TTY: shared interactive session', () => {
     })
   })
 
-  describe('input box cursor row (regression)', () => {
-    test('after initial paint, replayed cursor row matches the bordered prompt line (→ inside │ … │)', async () => {
+  describe('input box caret (Ink reverse-video, regression)', () => {
+    test('after initial paint, output uses reverse-video caret (replay strips SGR m from simulated rows)', async () => {
       await tick()
       await tick()
 
       const raw = ttyOutput(writeSpy)
-      const {
-        row: cursorRow,
-        col: cursorCol,
-        lines,
-      } = cursorPositionAfterTtyWrites(raw)
-      const plainLines = lines.map((l) => stripAnsiCsiAndCr(l))
-
-      let promptRow = -1
-      for (let i = plainLines.length - 1; i >= 0; i--) {
-        const p = plainLines[i] ?? ''
-        if (p.includes('→') && p.includes('│')) {
-          promptRow = i
-          break
-        }
-      }
-
+      const sim = simulatedScreenFromTtyWrites(raw)
       expect(
-        promptRow >= 0,
-        [
-          'Expected the replayed TTY frame to contain exactly one bordered input line: plain text should include both the box side "│" and the interactive prompt "→".',
-          'If this fails, the chrome or prompt glyph changed — narrow the matcher only if the product intentionally changed how the input box is drawn.',
-        ].join('\n')
+        sim.split('\n').some((row) => row.includes('→') && row.includes('│')),
+        'Expected a bordered input line with the interactive prompt "→" between box sides.'
       ).toBe(true)
 
       expect(
-        cursorRow,
+        raw.includes(REVERSE),
         [
-          'The interactive cursor must end on the same simulated row as the bordered prompt line (the row with "→" between "│" characters).',
-          'If the cursor is several rows lower, the adapter is probably emitting only a column move (CHA, \\x1b[nG) after Ink has already left the cursor on the last live-region line (e.g. the "/ commands" hint). CHA moves along the current row only — it does not move up into the input box.',
-          'Fix the product by restoring correct vertical positioning relative to where Ink leaves the cursor (e.g. emit CUU before CHA, or run the cursor hook in an order consistent with the final frame).',
-          `Replayed cursor: row=${cursorRow} col=${cursorCol}; expected row=${promptRow} (0-based, same coordinate space as cursorPositionAfterTtyWrites).`,
+          'The command-line caret is drawn as reverse video (SGR 7) in the Ink stream, not by post-paint CHA into the box.',
+          'TTY replay used elsewhere does not retain SGR in reconstructed rows — assert on raw writes, not replayed line text.',
         ].join('\n')
-      ).toBe(promptRow)
-
-      expect(
-        cursorCol,
-        [
-          'On an empty draft, the caret should sit immediately after the "→ " prefix inside the box (column index 4 in 0-based replay — CHA column 5).',
-          'If row matches but this fails, horizontal placement in positionCursorInInputBox regressed independently.',
-          `Got cursorCol=${cursorCol}.`,
-        ].join('\n')
-      ).toBe(4)
+      ).toBe(true)
     })
   })
 
