@@ -447,6 +447,46 @@ describe('TTY: shared interactive session', () => {
     })
   })
 
+  describe.skip('input box top border (regression)', () => {
+    test('initial paint: simulated top border row is exactly ┌─…┐ (no leading spaces)', async () => {
+      await tick()
+      await tick()
+
+      const raw = ttyOutput(writeSpy)
+      const lines = simulatedScreenFromTtyWrites(raw)
+        .split('\n')
+        .map((l) => stripAnsiCsiAndCr(l))
+
+      const outline = /^┌─+┐$/
+      let topRow: string | undefined
+      for (let i = lines.length - 1; i >= 0; i--) {
+        const line = lines[i] ?? ''
+        if (outline.test(line.trim())) {
+          topRow = line
+          break
+        }
+      }
+
+      expect(
+        topRow !== undefined,
+        [
+          'Expected the final TTY frame to include an input-box top outline: one "┌", a run of "─", and one "┐" on a single row (trimmed).',
+          'If this fails, the replayed screen may be missing the box or the outline format changed — update the test only if the product intentionally changed the chrome.',
+        ].join('\n')
+      ).toBe(true)
+
+      expect(
+        outline.test(topRow!),
+        [
+          'The input box top border must start at terminal column 0: the replayed row must be exactly "┌", horizontal rules, and "┐" with no leading or trailing spaces.',
+          'Leading spaces before "┌" produce the broken/stepped upper-left corner (often from Ink flex layout next to <Static> history after InteractiveShellDisplay refactors).',
+          'Do not "fix" this by asserting .trim() or stripping spaces — that would hide the regression.',
+          `Replayed top-border row (JSON): ${JSON.stringify(topRow)}`,
+        ].join('\n')
+      ).toBe(true)
+    })
+  })
+
   describe('empty Enter redraw (regression)', () => {
     test('empty Enter redraw must not emit a stale cursor-up before the input box top', async () => {
       writeSpy.mockClear()

@@ -290,7 +290,7 @@ if (error) {
 1. Focus on Component Behavior
    - Test through user interactions
    - Avoid testing implementation details
-   - Cross-cutting guidance (observable outcomes, stable entry points, not structure-mapped tests): `.cursor/rules/planning.mdc` → **Observable behavior first**
+   - Cross-cutting guidance (observable outcomes, high-level entry points — tests need not import the component/module under change, no 1:1 test ↔ file mapping): `.cursor/rules/planning.mdc` → **Observable behavior first**
    - Use data-testid for test selectors
    - Test with vitest-browser-mode as [mentioned here](https://howtotestfrontend.com/resources/vitest-browser-mode-guide-and-setup-info) & [official guide](https://vitest.dev/guide/browser/); i.e. prefer real browser rendering in tests over mocking (stop using jsdom).
 
