@@ -87,7 +87,7 @@ After each phase: **delete dead code** that only served the old path; **delete o
 | Confirm / session y/n in the TTY path | **Done** (mechanism deps + Ink `ConfirmDisplay` in shell) |
 | Business importing **`renderer`** only where needed | **Done** (Phase D); `interactive.ts` keeps a small renderer surface for prompts / redraw helpers |
 | Legacy full-screen repaint + mode wiring | **Done** (Phase H shell + Phase I cleanup) |
-| Imperative caret CSI + pre-rerender cursor restore (Ink log-update mismatch) | **Done** — **J** |
+| Imperative caret CSI + pre-rerender cursor restore (Ink log-update mismatch) | **Interim** — remove in **J** |
 | Scattered `stdout.write` for interactive mode (vs one thin OSC/lifecycle layer) | **K** (after **J**) |
 
 ---
@@ -243,21 +243,27 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
-### Phase J — **Ink-native** live input and caret (remove adapter cursor CSI) — **done**
+### Phase J — **Ink-native** live input and caret (remove adapter cursor CSI)
 
-**Goal:** The **bordered command line** and **caret** are owned inside the **Ink/React** live subtree (reverse-video cell in the streamed box text), not by **`ttyAdapter` post-paint `process.stdout.write`** (no manual `CUU`/`CHA`, no **`lastLiveRegionCaretDelta`** + pre-rerender vertical restore before `rerender`).
+**Goal:** The **bordered command line** and **hardware caret** are owned inside the **Ink/React** live subtree (e.g. `TextInput` from **@inkjs/ui**, a small focused component, or Ink-supported patterns), not by **`ttyAdapter` post-paint `process.stdout.write`** (no manual `CUU`/`CHA` to sit the caret in the box, no **`lastLiveRegionCaretDelta`** + **`HIDE_CURSOR`** + vertical restore before `rerender`).
 
-**User-visible outcome:** Same typing path as today; caret is **drawn in the frame** (SGR 7); hardware cursor stays hidden on the default command line so Ink log-update stays consistent.
+**User-visible outcome:** Same TTY behavior as today—correct caret position, no box “climbing” on each keystroke, no reliance on **Ink log-update** seeing a cursor row we secretly moved with CSI.
 
-**Decision gates (how J was closed):** Kept **readline `keypress`** for keys; no **@inkjs/ui**; caret uses **`renderer.ts`** grapheme snap + slash highlight split (`buildBoxLinesWithCaret`).
+**Why a dedicated phase (planning.mdc):** The current stack is **interim**: `handleShellRendered()` after Ink writes (correct ordering vs `onRender`), plus imperative caret placement, conflicts with Ink’s incremental cursor assumptions. That debt is **explicitly temporary** until the live **draft** is an Ink-controlled input.
 
-**Delivered**
+**Decision gates to close before/during J**
 
-- **`positionCursorInInputBox`**, **`restoreCursorRowAfterInteractiveCaretPlacement`**, **`lastLiveRegionCaretDelta`** removed from **`ttyAdapter`**; **`finalizeInteractiveLiveRegionPaint`** hides hardware cursor and emits OSC only.
-- **`CommandLineLivePanel`**: header (`buildLiveRegionHeaderLines`) + bordered box from **`buildBoxLinesWithCaret`** + guidance; **`buildLiveRegionLines`** refactored to share header helper (piped / full display unchanged).
-- **Regression:** `ttyShowCaretCuUThenInk2KEraseBeforeNextHide` still false; caret assertion uses raw **`REVERSE`** in output; token-list cancel expects **`HIDE_CURSOR`** + inverse caret, not **`SHOW_CURSOR`** on return to the command line.
+- **Focus model** — Ink `useFocus` / `TextInput` vs today’s readline **`keypress`** path: either bridge keys into the component or migrate stdin handling (touches **single root vs stdin** gate).
+- **Wrapping** — Draft line must stay **`renderer.ts`**-aware for CJK/emoji if Ink’s input does not match column semantics.
+- **ink-ui vs custom** — **@inkjs/ui** `TextInput` vs bespoke `useInput` + `Text` border (styling vs dependency).
 
-**Not in J (later gates):** stdin → Ink **`useInput`** (plan **L**); optional **ink-ui** `TextInput` (**O**).
+**Deliverables**
+
+- Delete (or reduce to **OSC-only**) **`positionCursorInInputBox`**, **`restoreCursorRowAfterInteractiveCaretPlacement`**, and related state in **`ttyAdapter`** once Ink owns the typing surface.
+- **Regression:** keep **observable** Vitest TTY coverage (`cursor` row, top border column 0, **no** `ttyShowCaretCuUThenInk2KEraseBeforeNextHide`-class protocol violation); adjust assertions if the **observable** surface changes but behavior does not.
+- **E2E:** extend or run **`e2e_test/features/cli/`** for the main typing path if Phase J touches stdin ownership.
+
+**Interim behavior removed:** Post-Ink manual caret CSI and pre-rerender cursor restore (see commits around Ink shell + live region).
 
 ---
 
@@ -422,5 +428,5 @@ Phases **A–I** are **done**. Follow-up work is spelled out in **Architecture e
 
 ## Notes
 
-- **Ordering:** Phases A–D delivered a safe **extract-and-thin-adapter** path; E–I added Ink and the shell; **J** removed adapter caret CSI (Ink-stream reverse caret). **Next:** **K** (single stdout/OSC owner). This file stays as reference until you archive it.
+- **Ordering:** Phases A–D delivered a safe **extract-and-thin-adapter** path; E–I added Ink and the shell. **Phases A–I are complete** on `main`. **Next:** Phase **J** (Ink-native live input + caret — removes interim cursor CSI), then **K** (single stdout/OSC owner). This file stays as reference until you archive it.
 - **Conflicts:** Any future change that would alter PTY/E2E-visible behavior without product sign-off should still stop at the nearest **decision gate** above.

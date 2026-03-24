@@ -1,6 +1,5 @@
 import './interactiveTestMocks.js'
 import { describe, test, expect, type vi, beforeEach, afterEach } from 'vitest'
-import { HIDE_CURSOR, REVERSE } from '../../src/ansi.js'
 import { resetRecallStateForTesting } from '../../src/interactive.js'
 import { stripAnsiCsiAndCr } from '../../src/renderer.js'
 import {
@@ -183,8 +182,7 @@ describe('TTY token list interactive mode', () => {
     expect(output).toContain('Cancelled by user.')
     expect(output).toContain('/ commands')
     expect(output).not.toContain('Alpha')
-    expect(output).toContain(HIDE_CURSOR)
-    expect(output).toContain(REVERSE)
+    expect(output).toContain('\x1b[?25h')
   })
 
   test('ESC cancels token list and shows Cancelled by user. in history', async () => {
