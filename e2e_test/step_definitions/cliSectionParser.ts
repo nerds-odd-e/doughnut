@@ -274,16 +274,12 @@ function replayInteractiveCliPtyTranscriptOntoGrid(
   let col = 0
   let i = 0
   const ESC = '\x1b' as const
-  const cursorUpRe = new RegExp(`^${ESC}\\[(\\d*)A`)
-  const cursorDownRe = new RegExp(`^${ESC}\\[(\\d*)B`)
-  const cursorForwardRe = new RegExp(`^${ESC}\\[(\\d*)C`)
-  const cursorBackRe = new RegExp(`^${ESC}\\[(\\d*)D`)
+  const cursorUpRe = new RegExp(`^${ESC}\\[(\\d+)A`)
+  const cursorDownRe = new RegExp(`^${ESC}\\[(\\d+)B`)
   const eraseLineRe = new RegExp(`^${ESC}\\[2K`)
   const cursorColRe = new RegExp(`^${ESC}\\[(\\d+)G`)
-  /** ED: erase display — treat common forms like full clear (Linux PTY often uses 2J ± 3J). */
-  const clearScreenRe = new RegExp(`^${ESC}\\[[023]?J`)
-  /** CUP: cursor position (1-based row;col). \x1b[H is empty params → 1;1. */
-  const cupRe = new RegExp(`^${ESC}\\[(\\d*);?(\\d*)([Hf])`)
+  const clearScreenRe = new RegExp(`^${ESC}\\[[02]?J`) // \x1b[J, \x1b[2J clear screen
+  const cursorHomeRe = new RegExp(`^${ESC}\\[H`) // \x1b[H cursor home
   /** DEC private mode CSI: SHOW_CURSOR / HIDE_CURSOR (\x1b[?25h), etc. */
   const decPrivateCsiRe = new RegExp(`^${ESC}\\[[?][0-9;]*[a-zA-Z]`)
   const ansiRe = new RegExp(`^${ESC}\\[[0-9;]*[A-Za-z]`)
@@ -307,35 +303,18 @@ function replayInteractiveCliPtyTranscriptOntoGrid(
     if (ptyTranscript.startsWith('\x1b[', i)) {
       const cursorUpMatch = ptyTranscript.slice(i).match(cursorUpRe)
       const cursorDownMatch = ptyTranscript.slice(i).match(cursorDownRe)
-      const cursorForwardMatch = ptyTranscript.slice(i).match(cursorForwardRe)
-      const cursorBackMatch = ptyTranscript.slice(i).match(cursorBackRe)
       const eraseLineMatch = ptyTranscript.slice(i).match(eraseLineRe)
       const cursorColMatch = ptyTranscript.slice(i).match(cursorColRe)
       const clearScreenMatch = ptyTranscript.slice(i).match(clearScreenRe)
-      const cupMatch = ptyTranscript.slice(i).match(cupRe)
+      const cursorHomeMatch = ptyTranscript.slice(i).match(cursorHomeRe)
       if (cursorUpMatch) {
-        const n = cursorUpMatch[1] === '' ? 1 : Number(cursorUpMatch[1])
-        row = Math.max(0, row - n)
+        row = Math.max(0, row - Number(cursorUpMatch[1]))
         i += cursorUpMatch[0].length
         continue
       }
       if (cursorDownMatch) {
-        const n = cursorDownMatch[1] === '' ? 1 : Number(cursorDownMatch[1])
-        row += n
+        row += Number(cursorDownMatch[1])
         i += cursorDownMatch[0].length
-        continue
-      }
-      if (cursorForwardMatch) {
-        const n =
-          cursorForwardMatch[1] === '' ? 1 : Number(cursorForwardMatch[1])
-        col += n
-        i += cursorForwardMatch[0].length
-        continue
-      }
-      if (cursorBackMatch) {
-        const n = cursorBackMatch[1] === '' ? 1 : Number(cursorBackMatch[1])
-        col = Math.max(0, col - n)
-        i += cursorBackMatch[0].length
         continue
       }
       if (eraseLineMatch) {
@@ -359,12 +338,10 @@ function replayInteractiveCliPtyTranscriptOntoGrid(
         i += clearScreenMatch[0].length
         continue
       }
-      if (cupMatch) {
-        const row1 = cupMatch[1] === '' ? 1 : Number(cupMatch[1])
-        const col1 = cupMatch[2] === '' ? 1 : Number(cupMatch[2])
-        row = Math.max(0, row1 - 1)
-        col = Math.max(0, col1 - 1)
-        i += cupMatch[0].length
+      if (cursorHomeMatch) {
+        row = 0
+        col = 0
+        i += cursorHomeMatch[0].length
         continue
       }
       const decPrivateMatch = ptyTranscript.slice(i).match(decPrivateCsiRe)
