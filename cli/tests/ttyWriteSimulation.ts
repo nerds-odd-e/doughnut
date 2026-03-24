@@ -22,31 +22,6 @@ export function liveRegionRepaintHasStaleCursorUpBeforeBoxTop(
   return /\x1b\[\d+A\x1b\[\d+A$/.test(prefix)
 }
 
-export function countInputBoxTopOutlinesBeforeFirstBoxContent(
-  rawWritesJoined: string
-): number {
-  const normalized = stripAnsiCsiAndCr(rawWritesJoined)
-  const lines = normalized.split('\n')
-  let searchStart = 0
-  for (let i = 0; i < lines.length; i++) {
-    if (/doughnut \d+\.\d+\.\d+/.test(lines[i] ?? '')) {
-      searchStart = i + 1
-      break
-    }
-  }
-  let count = 0
-  for (let i = searchStart; i < lines.length; i++) {
-    const line = (lines[i] ?? '').trim()
-    if (line.includes('│')) {
-      break
-    }
-    if (INPUT_BOX_TOP_OUTLINE_PATTERN.test(line)) {
-      count++
-    }
-  }
-  return count
-}
-
 const ESC = '\x1b'
 const cursorUpRe = new RegExp(`^${ESC}\\[(\\d+)A`)
 const cursorDownRe = new RegExp(`^${ESC}\\[(\\d+)B`)
@@ -141,7 +116,10 @@ function replayTtyWrites(
 
 /** Apply CUU/CUD, EL, CUP, and printable chars to build a naive terminal frame (tests only). */
 export function simulatedScreenFromTtyWrites(output: string): string {
-  return replayTtyWrites(output, {}).lines.join('\n')
+  return replayTtyWrites(output, {
+    clearScreen: CLEAR_SCREEN,
+    skipOsc: true,
+  }).lines.join('\n')
 }
 
 /**

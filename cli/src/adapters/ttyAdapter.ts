@@ -73,7 +73,6 @@ import {
   needsGapBeforeBox,
   PROMPT,
   recallMcqCurrentGuidanceLines,
-  renderFullDisplay,
   renderPastInput,
   SHOW_CURSOR,
   wrapTextToLines,
@@ -88,6 +87,8 @@ import type {
 } from '../types.js'
 import { ConfirmDisplay } from '../ui/ConfirmDisplay.js'
 import { FetchWaitDisplay } from '../ui/FetchWaitDisplay.js'
+import { InteractiveShellDisplay } from '../ui/InteractiveShellDisplay.js'
+import { LiveRegionLines } from '../ui/LiveRegionLines.js'
 import { McqDisplay } from '../ui/McqDisplay.js'
 import { TokenListDisplay } from '../ui/TokenListDisplay.js'
 
@@ -127,33 +128,6 @@ export interface TTYDeps {
   setDefaultTokenLabel: (label: AccessTokenLabel) => void
   TOKEN_LIST_COMMANDS: Record<string, AccessTokenPickerCommandConfig>
   getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
-}
-
-/**
- * Tracks incremental repaint of the TTY live region (Current prompt + input box + Current guidance).
- * After {@link clearLiveRegionForRepaint}, the cursor sits on the top line of that region and
- * {@link LiveRegionPaintCursor.cursorUpStepsToLiveRegionTop} must be 0 before the next paint.
- */
-type LiveRegionPaintCursor = {
-  /**
-   * CUU count from the input-line cursor row to the top line of the live region — same value
-   * written at the end of the previous paint as `inputRowFromTop(...)`.
-   */
-  cursorUpStepsToLiveRegionTop: number
-  /** Line count of the last painted live block; used to erase lines when the block shrinks. */
-  lastPaintedLineCount: number
-}
-
-function clearLiveRegionForRepaint(cursor: LiveRegionPaintCursor): void {
-  const up = cursor.cursorUpStepsToLiveRegionTop
-  const n = cursor.lastPaintedLineCount
-  if (up > 0) process.stdout.write(`\x1b[${up}A`)
-  for (let i = 0; i < n; i++) {
-    process.stdout.write('\r\x1b[2K')
-    if (i < n - 1) process.stdout.write('\x1b[1B')
-  }
-  if (n > 1) process.stdout.write(`\x1b[${n - 1}A`)
-  cursor.cursorUpStepsToLiveRegionTop = 0
 }
 
 function isSubmitKey(keyName: string): boolean {
@@ -279,75 +253,70 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   }
   let highlightIndex = 0
   let suggestionsDismissed = false
-  const livePaint: LiveRegionPaintCursor = {
-    cursorUpStepsToLiveRegionTop: 0,
-    lastPaintedLineCount: 0,
-  }
   let tokenSelection: TokenSelectionState | null = null
   let numberedChoiceHighlightIndex = 0
   let interactiveFetchWaitEllipsisTick = 0
   let interactiveFetchWaitRepaintTimer: ReturnType<typeof setInterval> | null =
     null
 
-  // --- Ink island: confirm, select, fetch-wait (Phases F–G) ---
-  // The ANSI keypress handler dispatches keys; Ink is display-only (no useInput).
-  let inkDisplayInstance: ReturnType<typeof render> | null = null
+  // --- Ink shell: Static history + live panel (Phase H) ---
+  let shellInstance: ReturnType<typeof render> | null = null
   let stopConfirmDraft = ''
   let stopConfirmHint = ''
   let sessionYesNoDraft = ''
   let sessionYesNoHint = ''
 
-  function startOrUpdateInkDisplay(element: React.ReactElement): void {
-    if (inkDisplayInstance) {
-      inkDisplayInstance.rerender(element)
-      return
-    }
-    clearLiveRegionForRepaint(livePaint)
-    resetLivePaintCursor()
-    // Ink calls stdin.ref() / stdin.unref() to manage the event loop.
-    // Mock stdinpassed in tests don't have these; add noops to avoid errors.
-    const stdinForInk = stdin as NodeJS.ReadableStream & {
-      ref?: () => void
-      unref?: () => void
-    }
-    if (typeof stdinForInk.ref !== 'function')
-      stdinForInk.ref = () => {
+  function patchStdinForInk(
+    stream: NodeJS.ReadableStream & { ref?: () => void; unref?: () => void }
+  ): void {
+    if (typeof stream.ref !== 'function')
+      stream.ref = () => {
         /* noop — keep event loop alive */
       }
-    if (typeof stdinForInk.unref !== 'function')
-      stdinForInk.unref = () => {
+    if (typeof stream.unref !== 'function')
+      stream.unref = () => {
         /* noop */
       }
-    inkDisplayInstance = render(element, {
-      stdin: stdinForInk as NodeJS.ReadableStream,
-      stdout: process.stdout,
-      patchConsole: false,
-      exitOnCtrlC: false,
-      // maxFps:0 makes throttle interval 0ms so rerenders happen synchronously,
-      // allowing test write spies to capture output immediately after rerender().
-      maxFps: 0,
-    })
   }
 
-  function unmountInkDisplay(): void {
-    if (inkDisplayInstance) {
-      // Rerender with empty content before unmounting so the final write
-      // (in debug/non-debug mode) doesn't repeat the previous UI state.
-      inkDisplayInstance.rerender(React.createElement(React.Fragment))
-      inkDisplayInstance.unmount()
-      inkDisplayInstance = null
+  function handleShellRendered(): void {
+    if (getInteractiveFetchWaitLine() !== null) {
+      process.stdout.write(HIDE_CURSOR)
+      return
     }
+    if (
+      isPendingStopConfirmation() ||
+      usesSessionYesNoInputChrome(!!tokenSelection)
+    ) {
+      return
+    }
+    if (getNumberedChoiceListChoices() !== null) {
+      process.stdout.write(INTERACTIVE_INPUT_READY_OSC)
+      return
+    }
+    if (tokenSelection) {
+      process.stdout.write(INTERACTIVE_INPUT_READY_OSC)
+      return
+    }
+    const layout = measureLiveRegionLayout()
+    finalizeInteractiveLiveRegionPaint(layout.placeholderContext)
   }
 
-  function renderInkStopConfirm(): void {
-    const placeholderCtx = getPlaceholderContext(false)
-    const view = getStopConfirmationLiveView(placeholderCtx)
-    // Include stage indicator if still in a command session (e.g., recall active)
-    const stageLines = isInCommandSessionSubstate()
-      ? [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
-      : []
-    startOrUpdateInkDisplay(
-      React.createElement(ConfirmDisplay, {
+  function buildLivePanel(): React.ReactElement {
+    const waitLine = getInteractiveFetchWaitLine()
+    if (waitLine !== null) {
+      return React.createElement(FetchWaitDisplay, {
+        waitLine,
+        ellipsisTick: interactiveFetchWaitEllipsisTick,
+      })
+    }
+    if (isPendingStopConfirmation()) {
+      const placeholderCtx = getPlaceholderContext(false)
+      const view = getStopConfirmationLiveView(placeholderCtx)
+      const stageLines = isInCommandSessionSubstate()
+        ? [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
+        : []
+      return React.createElement(ConfirmDisplay, {
         guidanceLines: [
           ...stageLines,
           ...view.promptLines,
@@ -357,68 +326,82 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         hint: stopConfirmHint,
         draft: stopConfirmDraft,
       })
-    )
-  }
-
-  function renderInkSessionYesNo(): void {
-    startOrUpdateInkDisplay(
-      React.createElement(ConfirmDisplay, {
+    }
+    if (usesSessionYesNoInputChrome(!!tokenSelection)) {
+      return React.createElement(ConfirmDisplay, {
         guidanceLines: [],
         placeholderText: 'y or n; /stop to exit recall',
         hint: sessionYesNoHint,
         draft: sessionYesNoDraft,
       })
-    )
-  }
-
-  function renderInkMcqDisplay(): void {
-    const width = getTerminalWidth()
-    const choices = getNumberedChoiceListChoices() ?? []
-    const promptLines =
-      getNumberedChoiceListCurrentPromptWrappedLines(width) ?? []
-    startOrUpdateInkDisplay(
-      React.createElement(McqDisplay, {
+    }
+    const numberedChoices = getNumberedChoiceListChoices()
+    if (numberedChoices !== null) {
+      const width = getTerminalWidth()
+      const promptLines =
+        getNumberedChoiceListCurrentPromptWrappedLines(width) ?? []
+      return React.createElement(McqDisplay, {
         stageIndicatorLine: DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
         currentPromptLines: promptLines,
-        choices,
+        choices: numberedChoices,
         highlightIndex: numberedChoiceHighlightIndex,
       })
-    )
-    process.stdout.write(INTERACTIVE_INPUT_READY_OSC)
-  }
-
-  function renderInkTokenListDisplay(): void {
-    if (!tokenSelection) return
-    const tokenListConfig = TOKEN_LIST_COMMANDS[tokenSelection.command]
-    const width = getTerminalWidth()
-    const promptLines = tokenListConfig?.currentPrompt
-      ? wrapTextToLines(tokenListConfig.currentPrompt, width)
-      : []
-    const stageIndicatorLine = tokenListConfig
-      ? greyCurrentStageIndicatorLabel(tokenListConfig.stageIndicator)
-      : ''
-    startOrUpdateInkDisplay(
-      React.createElement(TokenListDisplay, {
+    }
+    if (tokenSelection) {
+      const tokenListConfig = TOKEN_LIST_COMMANDS[tokenSelection.command]
+      const width = getTerminalWidth()
+      const promptLines = tokenListConfig?.currentPrompt
+        ? wrapTextToLines(tokenListConfig.currentPrompt, width)
+        : []
+      const stageIndicatorLine = tokenListConfig
+        ? greyCurrentStageIndicatorLabel(tokenListConfig.stageIndicator)
+        : ''
+      return React.createElement(TokenListDisplay, {
         stageIndicatorLine,
         currentPromptLines: promptLines,
         items: tokenSelection.items,
         defaultLabel: getDefaultTokenLabel(),
         highlightIndex: tokenSelection.highlightIndex,
       })
-    )
-    process.stdout.write(INTERACTIVE_INPUT_READY_OSC)
+    }
+    const layout = measureLiveRegionLayout()
+    return React.createElement(LiveRegionLines, { lines: layout.liveLines })
   }
 
-  function renderInkFetchWaitDisplay(): void {
-    const waitLine = getInteractiveFetchWaitLine()
-    if (waitLine === null) return
-    startOrUpdateInkDisplay(
-      React.createElement(FetchWaitDisplay, {
-        waitLine,
-        ellipsisTick: interactiveFetchWaitEllipsisTick,
-      })
+  function buildShellTree(): React.ReactElement {
+    const layout = measureLiveRegionLayout()
+    const liveLeadingGap = needsGapBeforeBox(
+      chatHistory,
+      layout.currentPromptWrappedLines,
+      layout.currentStageIndicatorLines
     )
-    process.stdout.write(HIDE_CURSOR)
+    return React.createElement(InteractiveShellDisplay, {
+      history: chatHistory,
+      terminalWidth: getTerminalWidth(),
+      liveLeadingGap,
+      livePanel: buildLivePanel(),
+    })
+  }
+
+  function drawBox(): void {
+    const stdinForInk = stdin as NodeJS.ReadableStream & {
+      ref?: () => void
+      unref?: () => void
+    }
+    patchStdinForInk(stdinForInk)
+    const tree = buildShellTree()
+    if (!shellInstance) {
+      shellInstance = render(tree, {
+        stdin: stdinForInk as NodeJS.ReadStream,
+        stdout: process.stdout,
+        patchConsole: false,
+        exitOnCtrlC: false,
+        maxFps: 0,
+        onRender: handleShellRendered,
+      })
+      return
+    }
+    shellInstance.rerender(tree)
   }
 
   function rememberCommittedLine(raw: string): void {
@@ -432,45 +415,25 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     saveCliCommandHistory(getConfigDir(), commandInput.committedCommands)
   }
 
-  function resetLivePaintCursor(): void {
-    livePaint.cursorUpStepsToLiveRegionTop = 0
-    livePaint.lastPaintedLineCount = 0
-  }
-
   function commitHistoryOutput(
     lines: readonly string[],
     tone: ChatHistoryOutputTone = 'plain',
-    options?: {
-      inputAlreadyPaintedAboveLiveRegion?: boolean
-      skipDrawBox?: boolean
-    }
+    options?: { skipDrawBox?: boolean }
   ): void {
-    chatHistory.push({ type: 'output', lines: [...lines], tone })
-    clearLiveRegionForRepaint(livePaint)
-    resetLivePaintCursor()
-    paintCommittedScrollbackAppend(
-      options?.inputAlreadyPaintedAboveLiveRegion ?? false,
-      { skipDrawBox: options?.skipDrawBox }
-    )
+    chatHistory = [...chatHistory, { type: 'output', lines: [...lines], tone }]
+    if (!options?.skipDrawBox) {
+      drawBox()
+    }
   }
 
-  /** Ends token-list mode: records the slash command as input, then the outcome line in scrollback. */
+  /** Ends token-list mode: outcome line in scrollback (slash command was committed when the picker opened). */
   function commitTokenListResult(
     message: string,
     tone: ChatHistoryOutputTone = 'plain'
   ) {
-    unmountInkDisplay()
-    const command = tokenSelection?.command ?? ''
-    clearLiveRegionForRepaint(livePaint)
-    chatHistory.push({
-      type: 'input',
-      content: maskInteractiveInputForHistory(command),
-    })
     tokenSelection = null
     commandInput = clearLiveCommandLine(commandInput)
-    commitHistoryOutput([message], tone, {
-      inputAlreadyPaintedAboveLiveRegion: true,
-    })
+    commitHistoryOutput([message], tone)
   }
 
   function beginTokenSelection(
@@ -660,123 +623,12 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   }
 
   function doFullRedraw() {
-    const waitLine = getInteractiveFetchWaitLine()
-    const layout = measureLiveRegionLayout()
-
     process.stdout.write(CLEAR_SCREEN)
-    const fullLines = renderFullDisplay(
-      chatHistory,
-      commandInput.lineDraft,
-      layout.terminalWidth,
-      layout.suggestionLines,
-      layout.currentStageIndicatorLines,
-      layout.currentPromptWrappedLines,
-      {
-        placeholderContext: layout.placeholderContext,
-        omitLiveRegion: waitLine !== null,
-      }
-    )
-    for (const line of fullLines) {
-      process.stdout.write(`${line}\n`)
+    if (shellInstance) {
+      shellInstance.unmount()
+      shellInstance = null
     }
-
-    if (waitLine !== null) {
-      resetLivePaintCursor()
-      unmountInkDisplay()
-      renderInkFetchWaitDisplay()
-      return
-    }
-
-    livePaint.lastPaintedLineCount = layout.liveLineCount
-    livePaint.cursorUpStepsToLiveRegionTop = layout.inputLineRowInLiveBlock
-
-    process.stdout.write(
-      `\x1b[${layout.liveLineCount - layout.inputLineRowInLiveBlock}A`
-    )
-    finalizeInteractiveLiveRegionPaint(layout.placeholderContext)
-  }
-
-  function drawBox() {
-    if (getInteractiveFetchWaitLine() !== null) {
-      renderInkFetchWaitDisplay()
-      return
-    }
-    if (getNumberedChoiceListChoices() !== null) {
-      renderInkMcqDisplay()
-      return
-    }
-    if (tokenSelection) {
-      renderInkTokenListDisplay()
-      return
-    }
-    const layout = measureLiveRegionLayout()
-    const { liveLines, liveLineCount, inputLineRowInLiveBlock } = layout
-
-    if (livePaint.cursorUpStepsToLiveRegionTop > 0) {
-      process.stdout.write(`\x1b[${livePaint.cursorUpStepsToLiveRegionTop}A`)
-    } else if (
-      livePaint.lastPaintedLineCount === 0 &&
-      needsGapBeforeBox(
-        chatHistory,
-        layout.currentPromptWrappedLines,
-        layout.currentStageIndicatorLines
-      )
-    ) {
-      process.stdout.write('\n')
-    }
-    process.stdout.write('\r')
-
-    for (const line of liveLines) {
-      process.stdout.write(`\x1b[2K${line}\n`)
-    }
-    const extra = livePaint.lastPaintedLineCount - liveLineCount
-    for (let i = 0; i < extra; i++) {
-      process.stdout.write('\x1b[2K\n')
-    }
-
-    const totalWritten = Math.max(liveLineCount, livePaint.lastPaintedLineCount)
-    process.stdout.write(`\x1b[${totalWritten - inputLineRowInLiveBlock}A`)
-    livePaint.cursorUpStepsToLiveRegionTop = inputLineRowInLiveBlock
-    livePaint.lastPaintedLineCount = liveLineCount
-
-    finalizeInteractiveLiveRegionPaint(layout.placeholderContext)
-  }
-
-  /**
-   * Writes the newest `chatHistory` slice to stdout (no {@link CLEAR_SCREEN}), then {@link drawBox} unless
-   * {@link options.skipDrawBox}. Normal turn is grey input + output; session yes/no steps add output only (no
-   * grey history-input row). Token-list already wrote `renderPastInput` before this.
-   */
-  function paintCommittedScrollbackAppend(
-    inputAlreadyPainted: boolean,
-    options?: { skipDrawBox?: boolean }
-  ): void {
-    const h = chatHistory
-    const last = h[h.length - 1]
-    const prev = h[h.length - 2]
-    if (!last || last.type !== 'output') {
-      doFullRedraw()
-      return
-    }
-
-    const width = getTerminalWidth()
-    const outTone = last.tone ?? 'plain'
-    if (prev?.type === 'input') {
-      if (!inputAlreadyPainted) {
-        process.stdout.write(renderPastInput(prev.content, width))
-        process.stdout.write('\n')
-      }
-      for (const line of last.lines) {
-        process.stdout.write(`${applyChatHistoryOutputTone(line, outTone)}\n`)
-      }
-    } else {
-      for (const line of last.lines) {
-        process.stdout.write(`${applyChatHistoryOutputTone(line, outTone)}\n`)
-      }
-    }
-    if (!options?.skipDrawBox) {
-      drawBox()
-    }
+    drawBox()
   }
 
   /** Before fetch-wait chrome paints and emits input-ready OSC, persist buffered `log` lines so PTY captures are not ahead of scrollback. */
@@ -786,16 +638,30 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       skipDrawBox: true,
     })
     resetCommandTurnBuffer()
+    drawBox()
   }
 
   function commitExitTurnToScrollback(): void {
-    chatHistory.push({
-      type: 'output',
-      lines: [...commandTurn.lines],
-      tone: commandTurn.tone,
-    })
-    resetLivePaintCursor()
-    paintCommittedScrollbackAppend(false, { skipDrawBox: true })
+    chatHistory = [
+      ...chatHistory,
+      {
+        type: 'output',
+        lines: [...commandTurn.lines],
+        tone: commandTurn.tone,
+      },
+    ]
+    const last = chatHistory[chatHistory.length - 1]
+    const prev = chatHistory[chatHistory.length - 2]
+    if (!last || last.type !== 'output') return
+    const width = getTerminalWidth()
+    const outTone = last.tone ?? 'plain'
+    if (prev?.type === 'input') {
+      process.stdout.write(renderPastInput(prev.content, width))
+      process.stdout.write('\n')
+    }
+    for (const line of last.lines) {
+      process.stdout.write(`${applyChatHistoryOutputTone(line, outTone)}\n`)
+    }
   }
 
   function stopInteractiveFetchWaitRepaintTimer(): void {
@@ -818,9 +684,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     stopConfirmDraft = ''
     stopConfirmHint = ''
     commandInput = clearLiveCommandLine(commandInput)
-    // Unmount any existing Ink confirm (e.g., session y/n) before showing stop confirm
-    if (inkDisplayInstance) unmountInkDisplay()
-    renderInkStopConfirm()
+    drawBox()
   }
 
   ttyOutput = {
@@ -840,14 +704,18 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     writeCurrentPrompt: writeCurrentPromptLine,
     beginCurrentPrompt: doBeginCurrentPrompt,
     clearAndRedraw: () => {
+      process.stdout.write(CLEAR_SCREEN)
       chatHistory = []
       resetLiveLineDraftAndSlashSuggestions()
       tokenSelection = null
-      unmountInkDisplay()
+      if (shellInstance) {
+        shellInstance.unmount()
+        shellInstance = null
+      }
       if (isInCommandSessionSubstate()) exitCommandSession()
       setPendingStopConfirmation(false)
       numberedChoiceHighlightIndex = 0
-      doFullRedraw()
+      drawBox()
     },
     onInteractiveFetchWaitChanged: () => {
       stopInteractiveFetchWaitRepaintTimer()
@@ -862,7 +730,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         }, INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS)
       } else {
         resetLiveLineDraftAndSlashSuggestions()
-        unmountInkDisplay()
         drawBox()
       }
     },
@@ -875,7 +742,10 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   const doExit = () => {
     stopInteractiveFetchWaitRepaintTimer()
     removeResizeListener()
-    unmountInkDisplay()
+    if (shellInstance) {
+      shellInstance.unmount()
+      shellInstance = null
+    }
     process.stdout.write(SHOW_CURSOR)
     rl.close()
     process.exit(0)
@@ -893,7 +763,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     if (newSessionYesNo) {
       sessionYesNoDraft = ''
       sessionYesNoHint = ''
-      renderInkSessionYesNo()
+      drawBox()
     }
   }
 
@@ -925,7 +795,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       )
       switch (dispatch.result) {
         case 'cancel':
-          unmountInkDisplay()
           setPendingStopConfirmation(false)
           stopConfirmDraft = ''
           stopConfirmHint = ''
@@ -933,13 +802,10 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           if (usesSessionYesNoInputChrome(false)) {
             sessionYesNoDraft = ''
             sessionYesNoHint = ''
-            renderInkSessionYesNo()
-          } else {
-            drawBox()
           }
+          drawBox()
           break
         case 'submit-yes':
-          unmountInkDisplay()
           stopConfirmDraft = ''
           stopConfirmHint = ''
           commandInput = clearLiveCommandLine(commandInput)
@@ -949,7 +815,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           commitHistoryOutput(getStopConfirmationYesOutcomeLines())
           break
         case 'submit-no':
-          unmountInkDisplay()
           stopConfirmDraft = ''
           stopConfirmHint = ''
           commandInput = clearLiveCommandLine(commandInput)
@@ -957,28 +822,26 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           if (usesSessionYesNoInputChrome(false)) {
             sessionYesNoDraft = ''
             sessionYesNoHint = ''
-            renderInkSessionYesNo()
-          } else {
-            drawBox()
           }
+          drawBox()
           break
         case 'invalid-submit':
           stopConfirmDraft = ''
           stopConfirmHint = dispatch.hint
-          renderInkStopConfirm()
+          drawBox()
           break
         case 'edit-backspace':
           stopConfirmDraft = stopConfirmDraft.slice(0, -1)
           stopConfirmHint = ''
-          renderInkStopConfirm()
+          drawBox()
           break
         case 'edit-char':
           stopConfirmDraft += dispatch.char
           stopConfirmHint = ''
-          renderInkStopConfirm()
+          drawBox()
           break
         case 'redraw':
-          renderInkStopConfirm()
+          drawBox()
           break
       }
       return
@@ -1012,17 +875,19 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           case 'submit-yes':
           case 'submit-no': {
             const effectiveLine = dispatch.result === 'submit-yes' ? 'y' : 'n'
-            unmountInkDisplay()
             sessionYesNoDraft = ''
             sessionYesNoHint = ''
             commandInput = clearLiveCommandLine(commandInput)
             resetCommandTurnBuffer()
             if (isCommittedInteractiveInput(effectiveLine)) {
               if (!usesSessionYesNoInputChrome(!!tokenSelection)) {
-                chatHistory.push({
-                  type: 'input',
-                  content: maskInteractiveInputForHistory(effectiveLine),
-                })
+                chatHistory = [
+                  ...chatHistory,
+                  {
+                    type: 'input',
+                    content: maskInteractiveInputForHistory(effectiveLine),
+                  },
+                ]
                 rememberCommittedLine(effectiveLine)
               }
               if (await processInput(effectiveLine, ttyOutput, true)) {
@@ -1036,20 +901,20 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           }
           case 'invalid-submit':
             sessionYesNoHint = dispatch.hint
-            renderInkSessionYesNo()
+            drawBox()
             break
           case 'edit-backspace':
             sessionYesNoDraft = sessionYesNoDraft.slice(0, -1)
             sessionYesNoHint = ''
-            renderInkSessionYesNo()
+            drawBox()
             break
           case 'edit-char':
             sessionYesNoDraft += dispatch.char
             sessionYesNoHint = ''
-            renderInkSessionYesNo()
+            drawBox()
             break
           case 'redraw':
-            renderInkSessionYesNo()
+            drawBox()
             break
         }
         return
@@ -1092,17 +957,17 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           break
         case 'submit-with-line': {
           const effectiveInput = listDispatch.lineForProcessInput
-          unmountInkDisplay()
-          clearLiveRegionForRepaint(livePaint)
           const inputForHistory = commandInput.lineDraft || effectiveInput
           commandInput = clearLiveCommandLine(commandInput)
           numberedChoiceHighlightIndex = 0
-          livePaint.lastPaintedLineCount = 0
           resetCommandTurnBuffer()
-          chatHistory.push({
-            type: 'input',
-            content: maskInteractiveInputForHistory(inputForHistory),
-          })
+          chatHistory = [
+            ...chatHistory,
+            {
+              type: 'input',
+              content: maskInteractiveInputForHistory(inputForHistory),
+            },
+          ]
           if (isCommittedInteractiveInput(inputForHistory)) {
             rememberCommittedLine(inputForHistory)
           }
@@ -1233,34 +1098,36 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           return
         }
 
-        const width = getTerminalWidth()
         const input = commandInput.lineDraft
         commandInput = clearLiveCommandLine(commandInput)
-
-        clearLiveRegionForRepaint(livePaint)
 
         const tokenSelect = TOKEN_LIST_COMMANDS[trimmedInput] ?? null
         if (tokenSelect) {
           const tokens = listAccessTokens()
           if (tokens.length === 0) {
-            chatHistory.push({
-              type: 'input',
-              content: maskInteractiveInputForHistory(trimmedInput),
-            })
+            chatHistory = [
+              ...chatHistory,
+              {
+                type: 'input',
+                content: maskInteractiveInputForHistory(trimmedInput),
+              },
+            ]
             rememberCommittedLine(trimmedInput)
             commitHistoryOutput(['No access tokens stored.'])
             return
           } else {
             if (isCommittedInteractiveInput(input)) {
-              process.stdout.write(
-                renderPastInput(maskInteractiveInputForHistory(input), width)
-              )
-              process.stdout.write('\n')
+              chatHistory = [
+                ...chatHistory,
+                {
+                  type: 'input',
+                  content: maskInteractiveInputForHistory(input),
+                },
+              ]
             }
             rememberCommittedLine(trimmedInput)
             beginTokenSelection(trimmedInput, tokenSelect.action, tokens)
           }
-          livePaint.lastPaintedLineCount = 0
           drawBox()
           return
         }
@@ -1268,10 +1135,13 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         resetCommandTurnBuffer()
         if (isCommittedInteractiveInput(input)) {
           if (!usesSessionYesNoInputChrome(!!tokenSelection)) {
-            chatHistory.push({
-              type: 'input',
-              content: maskInteractiveInputForHistory(input),
-            })
+            chatHistory = [
+              ...chatHistory,
+              {
+                type: 'input',
+                content: maskInteractiveInputForHistory(input),
+              },
+            ]
             rememberCommittedLine(input)
           }
           if (await processInput(input, ttyOutput, true)) {
@@ -1284,6 +1154,10 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         }
         if (isNumberedChoiceListActive()) {
           numberedChoiceHighlightIndex = 0
+        }
+        if (input.trim() === '' && shellInstance) {
+          shellInstance.unmount()
+          shellInstance = null
         }
         drawBox()
       }

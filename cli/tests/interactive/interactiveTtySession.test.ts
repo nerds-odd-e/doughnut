@@ -2,7 +2,6 @@ import './interactiveTestMocks.js'
 import { describe, test, expect, type vi, beforeEach, afterEach } from 'vitest'
 import { stripAnsi, stripAnsiCsiAndCr } from '../../src/renderer.js'
 import {
-  countInputBoxTopOutlinesBeforeFirstBoxContent,
   INPUT_BOX_TOP_OUTLINE_PATTERN,
   liveRegionRepaintHasStaleCursorUpBeforeBoxTop,
   simulatedScreenFromTtyWrites,
@@ -427,7 +426,13 @@ describe('TTY: shared interactive session', () => {
       await tick()
 
       const output = ttyOutput(writeSpy)
-      expect(countInputBoxTopOutlinesBeforeFirstBoxContent(output)).toBe(1)
+      const visualOutput = simulatedScreenFromTtyWrites(output)
+      const boxTopLines = visualOutput
+        .split('\n')
+        .filter((l) =>
+          INPUT_BOX_TOP_OUTLINE_PATTERN.test(stripAnsiCsiAndCr(l).trim())
+        )
+      expect(boxTopLines).toHaveLength(1)
     })
 
     test('after /help, there is one empty line between history output and input box', async () => {

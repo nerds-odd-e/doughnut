@@ -210,12 +210,20 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
-### Phase H — Ink shell: **Static** history + live column
+### Phase H — Ink shell: **Static** history + live column — **done**
 
 **Goal:** Top-level layout matches Ink idioms: **`Static`** for committed history lines (only if **decision gate: Static** approves), dynamic column for current prompt, guidance, and input (`TextInput` / custom bordered field).
 
-- **Large deletion:** legacy full-screen repaint logic in `ttyAdapter` that Ink subsumes—**clears most remaining mode-specific ANSI wiring** in the adapter (see **`ttyAdapter` vs domain naming**).
-- **Verify:** full interactive Vitest + CLI E2E suite; fix step parsers only if escape sequences change.
+**Delivered**
+
+- **`InteractiveShellDisplay`**: Ink `Static` over `chatHistory` (input/output blocks) + live column (`LiveRegionLines`, `ConfirmDisplay`, `McqDisplay`, `TokenListDisplay`, `FetchWaitDisplay`).
+- **`ttyAdapter`**: single `render()` / `rerender` shell; removed ANSI scrollback append + incremental live-region erase/repaint; **`buildLivePanel`** orders **stop confirm** before **MCQ** so Esc overlay wins while choices stay active in the domain layer.
+- **History updates** use **immutable** `chatHistory` arrays so Ink sees prop changes; **`doFullRedraw`** / resize: `CLEAR_SCREEN` + shell **unmount** + fresh `drawBox()` so `Static` replays history after clear.
+- **Exit path:** `commitExitTurnToScrollback` still writes grey input + toned lines to stdout before unmount (farewell visible without relying on Ink after exit).
+- **Empty Enter** after no-op submit: **unmount + remount** shell so Ink repaints when it would otherwise skip an identical frame.
+- **Tests:** `simulatedScreenFromTtyWrites` honors `CLEAR_SCREEN` + skips OSC; removed unused `countInputBoxTopOutlinesBeforeFirstBoxContent`; aligned `/clear` box assertions with simulation.
+
+- **Verify:** `pnpm cli:test` (399/399).
 
 ---
 
@@ -246,5 +254,5 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ## Notes
 
-- **Ordering:** Phases A–D deliver a safe **extract-and-thin-adapter** path even if Ink is deferred; E–I require the **decision gates** to be closed. **Next:** Phase G onward (Ink shell / fetch-wait).
+- **Ordering:** Phases A–D deliver a safe **extract-and-thin-adapter** path even if Ink is deferred; E–I require the **decision gates** to be closed. **Next:** Phase I (consolidation / dead-code pass).
 - **Conflicts:** Any phase that would change PTY/E2E-visible behavior without product sign-off should stop at the nearest **decision gate** above.
