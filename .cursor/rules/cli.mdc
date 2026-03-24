@@ -37,7 +37,7 @@ cli/
 
 ## Vitest: observable behavior
 
-For **interactive** behavior, prefer **`runInteractive`** with a mock TTY or piped stdin and assert **stdout** / visible output. Use **`processInput`** + mock **`OutputAdapter`** only for **non-interactive** (`-c`), helpers, or when there is no stable hook. See **Testing strategy → Observable behavior first** in `.cursor/rules/planning.mdc`.
+For **interactive** behavior, prefer **`runInteractive`** with a mock TTY or piped stdin and assert **stdout** / visible output — the test may **not import** the adapter or helper you changed; coverage through the CLI surface is enough. Use **`processInput`** + mock **`OutputAdapter`** only for **non-interactive** (`-c`), helpers, or when there is no stable hook. See **Testing strategy → Observable behavior first** in `.cursor/rules/planning.mdc`.
 
 - **TTY-specific behavior:** `cli/tests/interactive/interactiveTty*.test.ts` (or equivalent `runInteractive` harness).
 - **`cli/tests/interactive/processInput.test.ts`:** Contract for **`processInput`** with the **default adapter** (same surface as `-c` / piped), not a second interactive engine.
