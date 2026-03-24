@@ -106,7 +106,10 @@ function replayTtyWrites(
       continue
     }
     while (lines.length <= row) lines.push('')
-    const line = lines[row] ?? ''
+    let line = lines[row] ?? ''
+    if (col > line.length) {
+      line += ' '.repeat(col - line.length)
+    }
     lines[row] = line.slice(0, col) + output[i] + line.slice(col + 1)
     col++
     i++
