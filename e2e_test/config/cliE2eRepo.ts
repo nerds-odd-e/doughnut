@@ -3,7 +3,7 @@
  */
 
 import { spawnSync } from 'node:child_process'
-import { existsSync } from 'node:fs'
+import { existsSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { cliEnv } from './cliEnv'
 
@@ -16,13 +16,77 @@ export const CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH =
 const CLI_E2E_INSTALL_BUNDLE_OUTFILE =
   './dist/e2e-install-doughnut-cli.bundle.mjs'
 
+/** Env: set to `1` to spawn `tsx src/index.ts` instead of the bundle (debug only). */
+export const CLI_E2E_USE_TSX_ENV = 'DOUGHNUT_CLI_E2E_USE_TSX' as const
+
+const SKIP_DIR_NAMES = new Set(['node_modules', '.git'])
+
 /** Max wall time for one non-interactive `spawnCliFromRepo` run before SIGKILL. */
 export const CLI_NON_INTERACTIVE_SPAWN_TIMEOUT_MS = 25_000
 
-/** How Cypress starts `pnpm … tsx` or the bundled `.mjs` from `repoRoot`. */
+/** How Cypress starts the CLI from `repoRoot` (bundle after freshness check, or tsx when opted in). */
 export type CliRepoSpawn = {
   command: string
   baseArgs: string[]
+}
+
+function maxMtimeMsOfFiles(repoRoot: string, relPaths: string[]): number {
+  let max = 0
+  for (const rel of relPaths) {
+    const p = join(repoRoot, rel)
+    if (!existsSync(p)) continue
+    const st = statSync(p)
+    if (st.mtimeMs > max) max = st.mtimeMs
+  }
+  return max
+}
+
+function maxMtimeMsUnderDir(absDir: string): number {
+  let max = 0
+  const walk = (dir: string) => {
+    let entries
+    try {
+      entries = readdirSync(dir, { withFileTypes: true })
+    } catch {
+      return
+    }
+    for (const e of entries) {
+      if (SKIP_DIR_NAMES.has(e.name)) continue
+      const full = join(dir, e.name)
+      if (e.isDirectory()) {
+        walk(full)
+      } else if (e.isFile()) {
+        try {
+          const st = statSync(full)
+          if (st.mtimeMs > max) max = st.mtimeMs
+        } catch {
+          /* skip broken symlinks */
+        }
+      }
+    }
+  }
+  walk(absDir)
+  return max
+}
+
+/** Rebuild `cli/dist/doughnut-cli.bundle.mjs` when missing or older than CLI / doughnut-api sources. */
+export function ensureCliBundleFresh(repoRoot: string): void {
+  const bundlePath = join(repoRoot, CLI_BUNDLE_RELATIVE_PATH)
+  let inputMax = maxMtimeMsOfFiles(repoRoot, [
+    'cli/package.json',
+    'cli/tsconfig.json',
+  ])
+  for (const rel of ['cli/src', 'packages/doughnut-api/src'] as const) {
+    const d = join(repoRoot, rel)
+    if (existsSync(d)) {
+      inputMax = Math.max(inputMax, maxMtimeMsUnderDir(d))
+    }
+  }
+  const stale =
+    !existsSync(bundlePath) || statSync(bundlePath).mtimeMs < inputMax
+  if (stale) {
+    runShellCommandSync('pnpm -C cli bundle', { cwd: repoRoot })
+  }
 }
 
 export function runShellCommandSync(
@@ -60,15 +124,16 @@ export function bundleCliE2eInstall(repoRoot: string, env?: NodeJS.ProcessEnv) {
 }
 
 export function cliRepoSpawnFromRoot(repoRoot: string): CliRepoSpawn {
-  if (process.env.CI === '1') {
+  if (process.env[CLI_E2E_USE_TSX_ENV] === '1') {
     return {
-      command: process.execPath,
-      baseArgs: [join(repoRoot, CLI_BUNDLE_RELATIVE_PATH)],
+      command: 'pnpm',
+      baseArgs: ['-C', join(repoRoot, 'cli'), 'exec', 'tsx', 'src/index.ts'],
     }
   }
+  ensureCliBundleFresh(repoRoot)
   return {
-    command: 'pnpm',
-    baseArgs: ['-C', join(repoRoot, 'cli'), 'exec', 'tsx', 'src/index.ts'],
+    command: process.execPath,
+    baseArgs: [join(repoRoot, CLI_BUNDLE_RELATIVE_PATH)],
   }
 }
 
