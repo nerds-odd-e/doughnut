@@ -51,7 +51,7 @@ CURSOR_DEV=true nix develop -c bash -c 'cd cli && pnpm test:mutation'
 
 3. **`coverageAnalysis: 'perTest'`** — Can show **no effective coverage** on some ESM / boundary setups; **`coverageAnalysis: 'off'`** with a **small** dedicated test set is acceptable for targeted runs.
 
-4. **Pure interaction helpers** — Where the **stable contract** is the extracted function (inputs → dispatch / string result), black-box unit tests are appropriate — same idea as `cli/tests/recallSessionConfirmInteraction.test.ts`. **End-to-end product behavior** still belongs in **TTY / E2E** tests at the right level; see **When mutants survive** above when choosing depth.
+4. **Pure interaction helpers** — Where the **stable contract** is the extracted function (inputs → dispatch / string result), black-box unit tests are appropriate — same idea as `cli/tests/sessionYesNoInteraction.test.ts`. **End-to-end product behavior** still belongs in **TTY / E2E** tests at the right level; see **When mutants survive** above when choosing depth.
 
 ## Ignore (per package that runs Stryker)
 

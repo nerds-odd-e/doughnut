@@ -41,11 +41,12 @@ import {
   onArrowUp,
   ttyArrowKeyUsesSlashSuggestionCycle,
 } from '../interactiveCommandInput.js'
-import type {
-  SessionYesNoLineDispatchResult,
-  SessionYesNoLineEmptySubmit,
-  SessionYesNoLineKeyEvent,
-} from '../interactions/recallSessionConfirmInteraction.js'
+import {
+  RECALL_STOP_CONFIRM_GUIDANCE_LINE,
+  type SessionYesNoLineDispatchResult,
+  type SessionYesNoLineEmptySubmit,
+  type SessionYesNoLineKeyEvent,
+} from '../interactions/sessionYesNoInteraction.js'
 import {
   cycleListSelectionIndex,
   dispatchSelectListKey,
@@ -320,7 +321,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         guidanceLines: [
           ...stageLines,
           ...view.promptLines,
-          'Stop recall? (y/n)',
+          RECALL_STOP_CONFIRM_GUIDANCE_LINE,
         ],
         placeholderText: view.placeholder,
         hint: stopConfirmHint,
