@@ -20,7 +20,7 @@ Optional **@inkjs/ui** (**Context7:** `vadimdemedes/ink-ui`) supplies patterns c
 |-------|------------------|---------------|
 | **Business** | `interactive.ts`, `recall.ts`, etc. Domain orchestration and state transitions. | Unchanged domain language; exposes props/callbacks to the UI root (e.g. “submit recall answer”, “exit recall”). |
 | **Interactive UI** | Was “CliModal” / adapter-specific modals; becomes **React state + components** (confirm flows, pickers, loading row). | `useState` / reducers, small presentational components; **no business branching** beyond dispatching callbacks passed from business layer. |
-| **TTY adapter** (transitional) | Raw mode, key events, ANSI live region **until** Ink subsumes it. | **No business-concept leakage in code shape:** `ttyAdapter` consumes **mechanism-only** `TTYDeps` (`isNumberedChoiceListActive`, `dispatchSessionYesNoKey`, `usesSessionYesNoInputChrome`, …); `interactive.ts` hides recall/MCQ types. **Still transitional:** imports types from `recallSessionConfirmInteraction.ts` (filename/path); target thin shell in **F/H**. |
+| **TTY adapter** (transitional) | Raw mode, key events, ANSI live region **until** Ink subsumes it. | **No business-concept leakage in code shape:** `ttyAdapter` consumes **mechanism-only** `TTYDeps` (`isNumberedChoiceListActive`, `dispatchSessionYesNoKey`, `usesSessionYesNoInputChrome`, …); `interactive.ts` hides recall/MCQ types. Session y/n types live in **`sessionYesNoInteraction.ts`** (mechanism-named path). |
 | **Ink shell** | Owns stdin/stdout, `render()` instance (`waitUntilExit`, `unmount`, `clear`), and the top-level layout split (e.g. history vs live). | One place that configures `render(..., { stdin, stdout, stderr, patchConsole, exitOnCtrlC, ... })` per Ink’s API. |
 | **Layout / terminal width** | Correct column width for CJK, emoji, graphemes. | **Bridge:** keep **`cli/src/renderer.ts`** as the source of truth for wrapping/truncation where Ink’s `Text` wrapping is insufficient; feed Ink pre-wrapped lines or wrap in a thin helper until a deliberate choice is made (see **Decision gate: wrapping**). |
 
@@ -75,7 +75,6 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 **Remaining before Ink / steady state:**
 
-- **Filename/path:** `ttyAdapter` still imports types from **`recallSessionConfirmInteraction.ts`** (cosmetic leakage; optional rename to e.g. `sessionYesNoInteraction.ts`).
 - **Ink + deletion:** replace ANSI branches and large repaint with Ink tree (**F**, **H**); **D** drops **`renderer`** imports from business where possible.
 
 | What to fix | Status / phases |
@@ -95,9 +94,9 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 **Delivered**
 
-- **`cli/src/interactions/recallSessionConfirmInteraction.ts`** (evolved from Phase A extract): **view model** for stop-recall only (`recallStopConfirmViewModelForContext`); shared **parse** + **dispatch** for all recall y/n (see Phase B).
+- **`cli/src/interactions/sessionYesNoInteraction.ts`** (evolved from Phase A extract): **view model** for stop-recall only (`recallStopConfirmViewModelForContext`); shared **parse** + **dispatch** for all recall y/n (see Phase B).
 - **`ttyAdapter`** paints stop confirm via deps (**`getStopConfirmationLiveView`**) — no ad-hoc y/n parsing in the adapter for that step.
-- Tests: `cli/tests/recallSessionConfirmInteraction.test.ts`; `pnpm cli:test` + `e2e_test/features/cli/cli_recall.feature`.
+- Tests: `cli/tests/sessionYesNoInteraction.test.ts`; `pnpm cli:test` + `e2e_test/features/cli/cli_recall.feature`.
 
 ---
 
@@ -206,7 +205,7 @@ After each phase: **delete dead code** that only served the old path; **delete o
 **Delivered**
 
 - **`cli/src/ui/FetchWaitDisplay.tsx`**: Ink display for interactive fetch-wait (`formatInteractiveFetchWaitPromptLine` + `PLACEHOLDER_BY_CONTEXT.interactiveFetchWait`).
-- **`ttyAdapter.ts`**: `drawBox()` routes fetch-wait first to `renderInkFetchWaitDisplay()`; `onInteractiveFetchWaitChanged` unmounts Ink when wait ends; `doFullRedraw` uses `renderFullDisplay(..., { omitLiveRegion: true })` + Ink fetch-wait so resize does not duplicate ANSI live region.
+- **`ttyAdapter.ts`**: `drawBox()` routes fetch-wait to `FetchWaitDisplay` inside the Ink shell; `onInteractiveFetchWaitChanged` ends the wait branch in the live panel. (Post–Phase H, resize / clear use `CLEAR_SCREEN`, shell unmount, and `drawBox()` — no `renderFullDisplay` in the TTY path.)
 - **`renderer.ts`**: `LiveRegionPaintOptions.omitLiveRegion` for history-only full redraw.
 - **Tests:** `renderer.test.ts` (`omitLiveRegion`); `pnpm cli:test` + relevant E2E as needed.
 
@@ -229,12 +228,16 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
-### Phase I — Consolidation and dead-code pass
+### Phase I — Consolidation and dead-code pass — **done**
 
 **Goal:** No parallel interactive engines; one Ink app entry for TTY interactive mode—**finishes** the **`ttyAdapter` vs domain naming** cleanup alongside Phase H.
 
-- Delete unused `renderer.ts` helpers **only** when no caller remains; if `renderer.ts` stays as wrap helper, document it as **layout bridge**, not a second UI framework.
-- Final **test audit:** every removed internal test must be replaced by observable coverage or explicitly accepted gap.
+**Delivered**
+
+- **`sessionYesNoInteraction.ts`:** renamed from `recallSessionConfirmInteraction.ts` so the TTY adapter’s import path is mechanism-named; tests and docs updated.
+- **`renderer.ts`:** module comment documents it as the **layout bridge** (wrap/ANSI live-region assembly for Ink + piped boxes), not a second UI framework.
+- **`ttyAdapter`:** stop-confirm Ink guidance uses **`RECALL_STOP_CONFIRM_GUIDANCE_LINE`** (single source with the interaction module / view model).
+- **`renderer.ts` helpers:** no unused exports removed in this pass — all remaining exports still have callers (production or tests). Further deletion only when a symbol truly goes unused.
 
 ---
 
@@ -295,5 +298,5 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ## Notes
 
-- **Ordering:** Phases A–D deliver a safe **extract-and-thin-adapter** path even if Ink is deferred; E–I require the **decision gates** to be closed. **Next:** Phase **I** (consolidation / dead-code pass), then **J** (Ink-native live input + caret — removes interim cursor CSI), then **K** (single stdout/OSC owner).
+- **Ordering:** Phases A–D deliver a safe **extract-and-thin-adapter** path even if Ink is deferred; E–I require the **decision gates** to be closed. Ink shell work through Phase **I** is complete on `main`. **Next:** Phase **J** (Ink-native live input + caret — removes interim cursor CSI), then **K** (single stdout/OSC owner).
 - **Conflicts:** Any phase that would change PTY/E2E-visible behavior without product sign-off should stop at the nearest **decision gate** above.

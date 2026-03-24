@@ -11,15 +11,16 @@ Single revert commit: `6a5df5126` — *Revert Terry Yin commits after 5eece4b*.
 3. `efdcfb14ae11fd19db0458e9efb73810d0e1c80e` — Revert "Enhance cursor handling in CLI section parser for improved input navigation"
 4. `2dba23e1946b6b46b73acb4a36452c455d2d15d8` — Enhance cursor handling in CLI section parser for improved input navigation
 5. `cf4a9f39bb653a47cf5b8aa8bfa68b5e7468a720` — Refine CLI modal architecture and finalize Ink migration
-6. `d61b1f3a9ca3e423d7e15c2dea782566bb2520c5` — Add session confirmation interaction and tests for yes/no input handling
+6. `d61b1f3a9ca3e423d7e15c2dea782566bb2520c5` — Add session confirmation interaction and tests for yes/no input handling *(cherry-picked back onto `main`)*
 
 ## Reapply later (Terry-only; chronological order)
 
 Other authors’ commits that landed between these on `main` are still present; replay only the above if you intend to restore Terry’s changes without redoing dependency bumps:
 
+**Cherry-picked onto `main`:** `d61b1f3a9ca3e423d7e15c2dea782566bb2520c5` — Add session confirmation interaction and tests for yes/no input handling (`ongoing/cli-modal-architecture.md` Notes conflict resolved: Phase I complete, next J/K).
+
 ```bash
-git cherry-pick d61b1f3a9ca3e423d7e15c2dea782566bb2520c5 \
-  cf4a9f39bb653a47cf5b8aa8bfa68b5e7468a720 \
+git cherry-pick cf4a9f39bb653a47cf5b8aa8bfa68b5e7468a720 \
   2dba23e1946b6b46b73acb4a36452c455d2d15d8 \
   efdcfb14ae11fd19db0458e9efb73810d0e1c80e \
   fcf3d890d3451c7c07639442ab4f7af66ea73bbd \

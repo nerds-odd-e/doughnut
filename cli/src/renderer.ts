@@ -1,3 +1,8 @@
+/**
+ * Terminal layout bridge: grapheme-aware width and wrapping, ANSI strings for the live region
+ * (assembled into Ink via `LiveRegionLines` and related paths), piped-adapter box rendering, and
+ * shared placeholders / tone helpers. Complements the Ink shell; not a second interactive UI engine.
+ */
 import {
   GREY,
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
