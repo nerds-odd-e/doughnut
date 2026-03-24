@@ -76,6 +76,7 @@ export type NoteTestData = {
     Details?: string;
     'Parent Title'?: string;
     'Skip Memory Tracking'?: boolean;
+    'Remember Spelling'?: boolean;
     'Image Url'?: string;
     'Image Mask'?: string;
     'Wikidata Id'?: string;

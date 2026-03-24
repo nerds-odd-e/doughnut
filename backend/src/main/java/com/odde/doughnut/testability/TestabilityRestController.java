@@ -100,6 +100,10 @@ class TestabilityRestController {
     @Setter
     private Boolean skipMemoryTracking;
 
+    @JsonProperty("Remember Spelling")
+    @Setter
+    private Boolean rememberSpelling;
+
     @JsonProperty("Image Url")
     @Setter
     private String imageUrl;
@@ -122,6 +126,9 @@ class TestabilityRestController {
       note.setUpdatedAt(currentUTCTimestamp);
       if (skipMemoryTracking != null) {
         note.getRecallSetting().setSkipMemoryTracking(skipMemoryTracking);
+      }
+      if (rememberSpelling != null) {
+        note.getRecallSetting().setRememberSpelling(rememberSpelling);
       }
       content.setImageMask(imageMask);
       content.setImageUrl(imageUrl);

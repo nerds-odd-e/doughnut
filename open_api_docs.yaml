@@ -3015,6 +3015,8 @@ components:
           type: string
         Skip Memory Tracking:
           type: boolean
+        Remember Spelling:
+          type: boolean
         Image Url:
           type: string
         Image Mask:

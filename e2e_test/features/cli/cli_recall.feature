@@ -5,12 +5,12 @@ Feature: CLI recall status and recall session
     Given I am logged in as an existing user
     And I have a valid Doughnut Access Token with label "for cli"
     And I run doughnut -c "/add-access-token" with the saved token
+    And I have a notebook with the head note "English" which skips memory tracking
 
   @disableOpenAiService
   @interactiveCLI
   Scenario: Recall status shows count when notes are due
-    Given I have a notebook with the head note "English" which skips memory tracking
-    And there are some notes:
+    Given there are some notes:
       | Title    | Details                        | Parent Title |
       | sedition | Sedition means incite violence | English      |
       | sedation | Put to sleep is sedation       | English      |
@@ -22,8 +22,7 @@ Feature: CLI recall status and recall session
   @disableOpenAiService
   @interactiveCLI
   Scenario: Recall Just Review
-    Given I have a notebook with the head note "English" which skips memory tracking
-    And there are some notes:
+    Given there are some notes:
       | Title    | Details                        | Parent Title |
       | sedation | **Put** to sleep is _sedation_ | English      |
     And the note "sedation" was assimilated on day 1
@@ -39,8 +38,7 @@ Feature: CLI recall status and recall session
   @disableOpenAiService
   @interactiveCLI
   Scenario: Recall session - complete all due notes, see summary, then load more from future days
-    Given I have a notebook with the head note "English" which skips memory tracking
-    And there are some notes:
+    Given there are some notes:
       | Title    | Details                        | Parent Title |
       | sedition | Sedition means incite violence | English      |
       | sedation | Put to sleep is sedation       | English      |
@@ -61,8 +59,7 @@ Feature: CLI recall status and recall session
   @usingMockedOpenAiService
   @interactiveCLI
   Scenario: Recall MCQ - choose correct answer and see success
-    Given I have a notebook with the head note "English" which skips memory tracking
-    And there are some notes:
+    Given there are some notes:
       | Title    | Details                        | Parent Title |
       | sedition | Sedition means incite violence | English      |
       | sedation | Put to sleep is sedation       | English      |
@@ -81,8 +78,7 @@ Feature: CLI recall status and recall session
   @usingMockedOpenAiService
   @interactiveCLI
   Scenario: Recall MCQ - ESC cancels with y/n confirmation
-    Given I have a notebook with the head note "English" which skips memory tracking
-    And there are some notes:
+    Given there are some notes:
       | Title    | Details                        | Parent Title |
       | sedition | Sedition means incite violence | English      |
       | sedation | Put to sleep is sedation       | English      |
@@ -101,8 +97,7 @@ Feature: CLI recall status and recall session
   @usingMockedOpenAiService
   @interactiveCLI
   Scenario: Recall MCQ - down arrow and Enter to select
-    Given I have a notebook with the head note "English" which skips memory tracking
-    And there are some notes:
+    Given there are some notes:
       | Title    | Details                        | Parent Title |
       | sedition | Sedition means incite violence | English      |
       | sedation | Put to sleep is sedation       | English      |
@@ -118,8 +113,7 @@ Feature: CLI recall status and recall session
   @usingMockedOpenAiService
   @interactiveCLI
   Scenario: Recall MCQ - contest and regenerate before answering
-    Given I have a notebook with the head note "English" which skips memory tracking
-    And there are some notes:
+    Given there are some notes:
       | Title    | Details                        | Parent Title |
       | sedition | Sedition means incite violence | English      |
       | sedation | Put to sleep is sedation       | English      |
@@ -143,13 +137,11 @@ Feature: CLI recall status and recall session
   @disableOpenAiService
   @interactiveCLI
   Scenario: Recall spelling - type correct spelling and see success
-    Given I have a notebook with the head note "English" which skips memory tracking
-    And there are some notes:
-      | Title    | Details                        | Parent Title |
-      | sedition | Sedition means incite violence | English      |
-      | sedation | Put to sleep is sedation       | English      |
-    And It's day 1
-    And I assimilate the note "sedition" with the option of remembering spelling
+    Given there are some notes:
+      | Title    | Details                        | Parent Title | Remember Spelling |
+      | sedition | Sedition means incite violence | English      | true              |
+      | sedation | Put to sleep is sedation       | English      |                   |
+    And the note "sedition" was assimilated on day 1
     And It's day 2
     When I enter the slash command "/recall" in the interactive CLI
     Then I should see "Yes, I remember?" in the Current guidance
