@@ -298,7 +298,7 @@ Post–Phase I review of the `cli/` subproject against the north star and open g
 
 ## Phases J+ (planned — not started)
 
-**Order:** single layout snapshot → Ink wrap for default column → stdin/`useInput` migration → confirm → lists → optional ink-ui polish.
+**Order:** single layout snapshot → **terminal resize (Ink-aligned)** → Ink wrap for default column → stdin/`useInput` migration → confirm → lists → optional ink-ui polish.
 
 ### Phase J — One live layout snapshot per `drawBox`
 
@@ -307,6 +307,20 @@ Post–Phase I review of the `cli/` subproject against the north star and open g
 **User-visible:** None intended.
 
 **Verify:** `pnpm cli:test`; `cli_recall.feature` if needed.
+
+---
+
+### Phase J2 — Terminal resize: Ink-aligned refresh (replace clear + unmount)
+
+**Goal:** Stop treating resize as a legacy full-screen reset. Today `ttyAdapter` uses `doFullRedraw` (`CLEAR_SCREEN` + shell **unmount** + `drawBox()`), partly because props like `terminalWidth` only refresh when the adapter rebuilds the tree—Ink’s own `stdout.on('resize')` does **not** call `drawBox()`. Move toward Ink convention: rely on Ink’s built-in resize handling where it applies; on resize, ensure the shell gets a **fresh `rerender(buildShellTree())`** (or equivalent) so `getTerminalWidth()` and width-dependent layout stay correct. Prefer **incremental** rerender and Ink’s shrink behavior over clear/unmount **unless** `Static`, `log-update`, caret, or `INTERACTIVE_INPUT_READY_OSC` still require the heavier path (prove with tests).
+
+**User-visible:** Ideally unchanged—correct reflow after terminal width change, no worse flicker.
+
+**Verify:** `cli/tests/interactive/interactiveTtySession.test.ts` (resize expectations may change if the clear sequence is no longer required); `recallMcqTtyCursorPosition` (narrow → resize); `pnpm cli:test`; E2E if needed.
+
+**Note:** Ink **does not** attach its resize listener when `is-in-ci` is true; Vitest keeps `resize` meaningful via the adapter listener or an explicit test strategy—document whichever remains.
+
+**Synergy:** Land after **Phase J** so a resize-triggered paint reuses a **single** layout snapshot instead of duplicating measurement paths.
 
 ---
 
@@ -358,13 +372,13 @@ Post–Phase I review of the `cli/` subproject against the north star and open g
 
 ## Open after Phase I (optional — not a backlog to “close”)
 
-Phases **A–I** are **done**. Follow-up work is spelled out in **Architecture evaluation** and **Phases J+** above (stdin → `useInput`, Ink `Text` wrap, optional ink-ui, gates 6–7 declined for now).
+Phases **A–I** are **done**. Follow-up work is spelled out in **Architecture evaluation** and **Phases J+** above (layout snapshot **J**, Ink-aligned resize **J2**, default column Ink wrap **K**, stdin → `useInput` **L–N**, optional ink-ui **O**; gates 6–7 declined for now).
 
 **Historical bullets** (themes unchanged; execution path is J+):
 
 - **Stdin / input model:** → Phases **L–N**.
 - **Focus and selection UX:** → Phases **L–N**.
-- **Layout:** → Phase **K**.
+- **Layout / paint:** → Phases **J** (snapshot per `drawBox`), **J2** (Ink-aligned resize), **K** (default column Ink wrap).
 - **Components:** → Phase **O** (optional).
 - **Look:** declined (gate 6).
 - **Logging:** deferred (gate 7).
