@@ -87,7 +87,7 @@ After each phase: **delete dead code** that only served the old path; **delete o
 | Confirm / session y/n in the TTY path | **Done** (mechanism deps + Ink `ConfirmDisplay` in shell) |
 | Business importing **`renderer`** only where needed | **Done** (Phase D); `interactive.ts` keeps a small renderer surface for prompts / redraw helpers |
 | Legacy full-screen repaint + mode wiring | **Done** (Phase H shell + Phase I cleanup) |
-| Imperative caret CSI + pre-rerender cursor restore (Ink log-update mismatch) | **Interim** — remove in **J** |
+| Imperative caret CSI + pre-rerender cursor restore (Ink log-update mismatch) | **Interim** — remove in **J2** (after unmount-erase fix **J1**) |
 | Scattered `stdout.write` for interactive mode (vs one thin OSC/lifecycle layer) | **K** (after **J**) |
 
 ---
@@ -267,6 +267,73 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
+#### Failed attempt — commit `1466a2d80` (reverted) — lessons for sub-phases
+
+**What was attempted in one commit:** `CommandLineLivePanel` component (reverse-video caret as `REVERSE` character), `buildBoxLinesWithCaret`, `finalizeInteractiveLiveRegionPaint` always using `HIDE_CURSOR`, and removal of all cursor CSI code.
+
+**E2E failure — "found 3 boxes":** The test `After /clear, Enter on empty input does not show duplicate top border` found 3 `┌─┐` borders in the cumulative PTY grid instead of 1.
+
+**Root cause — `instance.unmount()` does NOT erase screen content:** Ink 6's `unmount()` calls `log.done()` (in `log-update.js`), which only resets internal state (`previousOutput = ''`, `previousLineCount = 0`) and shows the cursor — it writes **nothing** to stdout. The live region stays on screen at whatever rows it occupied. Phase H deliberately introduced the "empty Enter → unmount + remount" pattern because Ink's `hasChanges` guard skips rerenders when the content string is identical. Without an erase before remount, each cycle writes a new box below the old one.
+
+**Concrete accumulation:**
+1. `/clear` → `CLEAR_SCREEN` (cursor → row 0) + `unmount()` (no erase) + new render → box at rows 0..N, cursor at row N.
+2. Empty Enter → `unmount()` (no erase, cursor still at row N) + new render from row N → second box at rows N..2N. **2 boxes visible**.
+3. Empty Enter → same → third box at rows 2N..3N. **3 boxes visible** — matches E2E "found 3".
+
+**The fix for J1:** Call `shellInstance.clear()` **before** `shellInstance.unmount()` in the empty Enter path. Ink's `instance.clear()` calls `log.clear()` which writes `eraseLines(previousLineCount)` — erases the live region and leaves the cursor at the top of the erased area. After that, `unmount()` / `log.done()` resets internal state, and the next `drawBox()` new-render writes at the correct position.
+
+**Why Vitest tests did not catch the E2E failure:** Vitest tests for `/clear + Enter` use `writeSpy.mockClear()` before the final keypress and call `simulatedScreenFromTtyWrites` on only that last render's writes (a fresh render writes from scratch with no CUU — always shows 1 box in isolation). The E2E test uses the **full accumulated PTY transcript** replayed through a grid simulation — the correct oracle for detecting accumulation. **The E2E test is the primary correctness signal for this bug class; Vitest alone is insufficient.**
+
+**Additional trap — removing `unmount()` naively:** Simply replacing unmount+remount with `rerender()` does not work because Ink's `hasChanges` guard skips the write when content is identical. The Vitest test that clears the spy before the second Enter then finds 0 boxes. Any fix must preserve a visible write — either keep unmount+remount (with `clear()` first) or introduce a state change that forces `hasChanges` to return true.
+
+---
+
+### Phase J1 — Fix unmount-erase lifecycle
+
+**Goal:** Ensure the "empty Enter → unmount + remount" path correctly erases the live region before the new render. **Prerequisite for J2; do not mix with caret changes.**
+
+**The change (one line in `ttyAdapter`):** Add `shellInstance.clear()` before `shellInstance.unmount()` in the empty Enter path:
+
+```typescript
+if (input.trim() === '' && shellInstance) {
+  shellInstance.clear()   // erases live region: log.clear() → eraseLines(previousLineCount)
+  shellInstance.unmount()
+  shellInstance = null
+}
+drawBox()
+```
+
+**Verify with both test surfaces — both are required:**
+- Vitest `after /clear, Enter on empty input does not show duplicate input box top border` and companion test — 1 box in the fresh render output.
+- **E2E `After /clear, Enter on empty input does not show duplicate top border`** — 1 box in the full accumulated PTY grid. **This is the definitive test for this bug class.**
+- `pnpm cli:test` full suite green.
+
+**No other changes in J1.** Do not touch cursor CSI code or introduce `CommandLineLivePanel`.
+
+---
+
+### Phase J2 — Reverse-video caret inside the Ink tree
+
+**Goal:** Replace the hardware cursor in the input box with a reverse-video character rendered inside a new `CommandLineLivePanel` component. Switch to always `HIDE_CURSOR`. Remove `positionCursorInInputBox`, `restoreCursorRowAfterInteractiveCaretPlacement`, and `lastLiveRegionCaretDelta`. **Only attempt after J1 is confirmed green on both Vitest and E2E.**
+
+**Decision gates to close before/during J2**
+
+- **Focus model** — Ink `useFocus` / `TextInput` vs today's readline **`keypress`** path: either bridge keys into the component or migrate stdin handling (touches **single root vs stdin** gate).
+- **Wrapping** — Draft line must stay **`renderer.ts`**-aware for CJK/emoji if Ink's input does not match column semantics.
+- **ink-ui vs custom** — **@inkjs/ui** `TextInput` vs bespoke `useInput` + `Text` border (styling vs dependency).
+
+**Deliverables**
+
+- `buildBoxLinesWithCaret` in `renderer.ts` — grapheme-aware `REVERSE`-video caret insertion.
+- `CommandLineLivePanel` Ink component — renders header lines, box with caret, suggestion lines.
+- `buildLivePanel()` returns `CommandLineLivePanel` for the default branch; `finalizeInteractiveLiveRegionPaint` always `HIDE_CURSOR`.
+- Delete `positionCursorInInputBox`, `restoreCursorRowAfterInteractiveCaretPlacement`, and related state in `ttyAdapter`.
+- **Regression:** `ttyShowCaretCuUThenInk2KEraseBeforeNextHide` must return false. E2E full CLI suite green.
+
+**Interim behavior removed:** Post-Ink manual caret CSI and pre-rerender cursor restore.
+
+---
+
 ### Phase K — **Single owner** of interactive stdout (OSC + lifecycle glue)
 
 **Goal:** After **J**, any remaining **`process.stdout.write`** in the TTY path is **minimal and in one place**: e.g. **shell-integration OSC** (`INTERACTIVE_INPUT_READY_OSC`), resize/clear coordination, exit scrollback—**not** scattered CSI mixed with Ink’s stream.
@@ -339,9 +406,9 @@ Post–Phase I review of the `cli/` subproject against the north star and open g
 
 ## Phases J+ (planned — not started)
 
-**Order:** single layout snapshot → **terminal resize (Ink-aligned)** → Ink wrap for default column → stdin/`useInput` migration → confirm → lists → optional ink-ui polish.
+**Order:** fix unmount-erase lifecycle (J1) → reverse-video caret (J2) → single layout snapshot (J3) → **terminal resize (Ink-aligned, J4)** → Ink wrap for default column (K) → stdin/`useInput` migration → confirm → lists → optional ink-ui polish.
 
-### Phase J — One live layout snapshot per `drawBox`
+### Phase J3 — One live layout snapshot per `drawBox`
 
 **Goal:** Run `getDisplayContent` / layout derivation **once** per paint; thread the snapshot into `buildShellTree`, `buildLivePanel`, and `handleShellRendered` so `measureLiveRegionLayout` is not repeated and non-default modes skip building unused `liveLines`.
 
@@ -351,7 +418,7 @@ Post–Phase I review of the `cli/` subproject against the north star and open g
 
 ---
 
-### Phase J2 — Terminal resize: Ink-aligned refresh (replace clear + unmount)
+### Phase J4 — Terminal resize: Ink-aligned refresh (replace clear + unmount)
 
 **Goal:** Stop treating resize as a legacy full-screen reset. Today `ttyAdapter` uses `doFullRedraw` (`CLEAR_SCREEN` + shell **unmount** + `drawBox()`), partly because props like `terminalWidth` only refresh when the adapter rebuilds the tree—Ink’s own `stdout.on('resize')` does **not** call `drawBox()`. Move toward Ink convention: rely on Ink’s built-in resize handling where it applies; on resize, ensure the shell gets a **fresh `rerender(buildShellTree())`** (or equivalent) so `getTerminalWidth()` and width-dependent layout stay correct. Prefer **incremental** rerender and Ink’s shrink behavior over clear/unmount **unless** `Static`, `log-update`, caret, or `INTERACTIVE_INPUT_READY_OSC` still require the heavier path (prove with tests).
 
@@ -361,7 +428,7 @@ Post–Phase I review of the `cli/` subproject against the north star and open g
 
 **Note:** Ink **does not** attach its resize listener when `is-in-ci` is true; Vitest keeps `resize` meaningful via the adapter listener or an explicit test strategy—document whichever remains.
 
-**Synergy:** Land after **Phase J** so a resize-triggered paint reuses a **single** layout snapshot instead of duplicating measurement paths.
+**Synergy:** Land after **Phase J3** so a resize-triggered paint reuses a **single** layout snapshot instead of duplicating measurement paths.
 
 ---
 
@@ -413,13 +480,13 @@ Post–Phase I review of the `cli/` subproject against the north star and open g
 
 ## Open after Phase I (optional — not a backlog to “close”)
 
-Phases **A–I** are **done**. Follow-up work is spelled out in **Architecture evaluation** and **Phases J+** above (layout snapshot **J**, Ink-aligned resize **J2**, default column Ink wrap **K**, stdin → `useInput` **L–N**, optional ink-ui **O**; gates 6–7 declined for now).
+Phases **A–I** are **done**. Follow-up work is spelled out in **Architecture evaluation** and **Phases J+** above (unmount-erase fix **J1**, reverse-video caret **J2**, layout snapshot **J3**, Ink-aligned resize **J4**, default column Ink wrap **K**, stdin → `useInput` **L–N**, optional ink-ui **O**; gates 6–7 declined for now).
 
 **Historical bullets** (themes unchanged; execution path is J+):
 
 - **Stdin / input model:** → Phases **L–N**.
 - **Focus and selection UX:** → Phases **L–N**.
-- **Layout / paint:** → Phases **J** (snapshot per `drawBox`), **J2** (Ink-aligned resize), **K** (default column Ink wrap).
+- **Layout / paint:** → Phases **J1** (unmount-erase fix), **J2** (reverse-video caret), **J3** (snapshot per `drawBox`), **J4** (Ink-aligned resize), **K** (default column Ink wrap).
 - **Components:** → Phase **O** (optional).
 - **Look:** declined (gate 6).
 - **Logging:** deferred (gate 7).
@@ -428,5 +495,5 @@ Phases **A–I** are **done**. Follow-up work is spelled out in **Architecture e
 
 ## Notes
 
-- **Ordering:** Phases A–D delivered a safe **extract-and-thin-adapter** path; E–I added Ink and the shell. **Phases A–I are complete** on `main`. **Next:** Phase **J** (Ink-native live input + caret — removes interim cursor CSI), then **K** (single stdout/OSC owner). This file stays as reference until you archive it.
+- **Ordering:** Phases A–D delivered a safe **extract-and-thin-adapter** path; E–I added Ink and the shell. **Phases A–I are complete** on `main`. **Next:** Phase **J1** (fix unmount-erase lifecycle), then **J2** (reverse-video caret — removes interim cursor CSI), then **J3/J4** (snapshot/resize), then **K** (single stdout/OSC owner). This file stays as reference until you archive it.
 - **Conflicts:** Any future change that would alter PTY/E2E-visible behavior without product sign-off should still stop at the nearest **decision gate** above.
