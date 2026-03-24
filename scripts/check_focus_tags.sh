@@ -17,7 +17,7 @@ if [ -n "$FOCUS_FILES" ]; then
     echo ""
     echo "❌ ERROR: Found @focus tags in the following feature files:"
     echo ""
-    
+
     for file in $FOCUS_FILES; do
         echo "📁 File: $file"
         # Show the specific lines with @focus tags
@@ -26,7 +26,7 @@ if [ -n "$FOCUS_FILES" ]; then
         done
         echo ""
     done
-    
+
     echo "🚫 @focus tags should only be used for local development and debugging."
     echo "   Please remove all @focus tags before committing to prevent other scenarios from being skipped in CI."
     echo ""
@@ -34,7 +34,7 @@ if [ -n "$FOCUS_FILES" ]; then
     echo "   1. Remove the @focus tags from the files listed above"
     echo "   2. Commit the changes"
     echo "   3. Push again"
-    
+
     EXIT_CODE=1
 else
     echo "✅ No @focus tags found in feature files. All good!"

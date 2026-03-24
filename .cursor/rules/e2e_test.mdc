@@ -40,7 +40,8 @@ CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_gene
 
 **Important notes:**
 - Don't use `cypress run -- --spec`. The empty `--` will ignore the `--spec` parameter after it.
-- If a scenario has the "@focus" tag, the other scenarios in the same feature file are ignored.
+- **Default tag filter:** `TAGS` in the Cypress config (`e2e_test/config/ci.ts`, e.g. `not @ignore`). Override per run with `--env TAGS='…'` when needed.
+- **`@focus` and `@only` (preprocessor):** `@badeball/cypress-cucumber-preprocessor` scans each **feature document**. If **any** node in that file is tagged `@focus` or `@only`, scenarios in **that file** are filtered to **`@focus or @only` only** — the config `TAGS` expression does **not** apply for that file. Use for local debugging; **do not commit** them (CI runs `./scripts/check_focus_tags.sh` on `.feature` files to block `@focus`; treat `@only` the same).
 
 ## Technology Stack
 - Cypress for E2E testing
@@ -65,7 +66,7 @@ The backend service log is located at `backend/logs/doughnut-e2e.log`. Please ma
 
 - Write features in Gherkin syntax focusing on business value
 - Group related features in domain-specific folders
-- Use tags (e.g., `@usingMockedOpenAiService`, `@mockBrowserTime`) to control test execution
+- Use tags (e.g., `@usingMockedOpenAiService`, `@mockBrowserTime`) to control test execution; see **Run E2E** → `@focus` / `@only` (temporary only, not for commit)
 - Keep scenarios focused and concise
 
 ### 2. Step Definitions
