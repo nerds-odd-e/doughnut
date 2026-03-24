@@ -4,13 +4,15 @@
 
 The **interactive TTY experience** is implemented as an **Ink** application: a React component tree rendered with Ink’s `render()`, using **flexbox layout** (`Box`), styled output (`Text`), keyboard handling (`useInput`, optionally `useFocus`), and—where it matches product behavior—**append-only history** via Ink’s `Static` (**Context7:** `vadimdemedes/ink` — `Static` only adds new items; mutating past items is not re-rendered).
 
+**Current implementation (post Phase H–I):** one **`render()`** root in `ttyAdapter` (`InteractiveShellDisplay`: `Static` history + live panel). **Keystrokes** for the command line and pickers still go through **readline** (and shared dispatch helpers), not Ink `useInput`—that remains an **optional** direction; see **Decision gates** (especially stdin ownership and focus model). **`@inkjs/ui`** is also still optional (decision gate 5).
+
 Optional **@inkjs/ui** (**Context7:** `vadimdemedes/ink-ui`) supplies patterns close to this codebase’s flows: `ConfirmInput`, `Select`, `TextInput`, `Spinner`, `ProgressBar`.
 
 **Out of scope for “Ink vocabulary”:** business-domain language stays as today (`recall`, `notebook`, `MCQ` as product concepts, `processInput` orchestration, etc.). Only **CLI UI framing** shifts toward Ink/React terms so future work does not translate between “modal” and “component” mentally.
 
 **Non-interactive** (`-c`, piped) remains the **`processInput` + `pipedAdapter`** path unless a later decision explicitly unifies surfaces.
 
-**Adapter rule:** **`ttyAdapter` (and any equivalent stdin/stdout bridge) must not leak business concepts**—no branching on product notions such as *recall*, *MCQ*, *notebook*, *memory tracker*, or quiz rules. Those belong in the **business** layer; the adapter only moves bytes, repaints, and forwards **opaque** interaction handles / callbacks from deps (or delegates to `processInput`). **ANSI era:** neutral **`TTYDeps`** in `interactive.ts` already enforce this for the live TTY (see **`ttyAdapter` vs domain naming`**). Phases **D–I** finish business/renderer cleanup and Ink migration.
+**Adapter rule:** **`ttyAdapter` (and any equivalent stdin/stdout bridge) must not leak business concepts**—no branching on product notions such as *recall*, *MCQ*, *notebook*, *memory tracker*, or quiz rules. Those belong in the **business** layer; the adapter only moves bytes, repaints, and forwards **opaque** interaction handles / callbacks from deps (or delegates to `processInput`). Neutral **`TTYDeps`** in `interactive.ts` enforce this for the live TTY (see **`ttyAdapter` vs domain naming`**). Phases **D–I** delivered business/renderer cleanup and the Ink shell migration.
 
 ---
 
@@ -20,7 +22,7 @@ Optional **@inkjs/ui** (**Context7:** `vadimdemedes/ink-ui`) supplies patterns c
 |-------|------------------|---------------|
 | **Business** | `interactive.ts`, `recall.ts`, etc. Domain orchestration and state transitions. | Unchanged domain language; exposes props/callbacks to the UI root (e.g. “submit recall answer”, “exit recall”). |
 | **Interactive UI** | Was “CliModal” / adapter-specific modals; becomes **React state + components** (confirm flows, pickers, loading row). | `useState` / reducers, small presentational components; **no business branching** beyond dispatching callbacks passed from business layer. |
-| **TTY adapter** (transitional) | Raw mode, key events, ANSI live region **until** Ink subsumes it. | **No business-concept leakage in code shape:** `ttyAdapter` consumes **mechanism-only** `TTYDeps` (`isNumberedChoiceListActive`, `dispatchSessionYesNoKey`, `usesSessionYesNoInputChrome`, …); `interactive.ts` hides recall/MCQ types. Session y/n types live in **`sessionYesNoInteraction.ts`** (mechanism-named path). |
+| **TTY adapter** | Readline, raw-ish key routing, cursor placement, OSC; composes the Ink shell tree. | **No business-concept leakage in code shape:** `ttyAdapter` consumes **mechanism-only** `TTYDeps` (`isNumberedChoiceListActive`, `dispatchSessionYesNoKey`, `usesSessionYesNoInputChrome`, …); `interactive.ts` hides recall/MCQ types. Session y/n types live in **`sessionYesNoInteraction.ts`** (mechanism-named path). |
 | **Ink shell** | Owns stdin/stdout, `render()` instance (`waitUntilExit`, `unmount`, `clear`), and the top-level layout split (e.g. history vs live). | One place that configures `render(..., { stdin, stdout, stderr, patchConsole, exitOnCtrlC, ... })` per Ink’s API. |
 | **Layout / terminal width** | Correct column width for CJK, emoji, graphemes. | **Bridge:** keep **`cli/src/renderer.ts`** as the source of truth for wrapping/truncation where Ink’s `Text` wrapping is insufficient; feed Ink pre-wrapped lines or wrap in a thin helper until a deliberate choice is made (see **Decision gate: wrapping**). |
 
@@ -68,21 +70,23 @@ After each phase: **delete dead code** that only served the old path; **delete o
 **Done (ANSI / current `ttyAdapter`):**
 
 - **`TTYDeps`** are **mechanism-named** only; **`buildTTYDeps()`** in `interactive.ts` maps business state (`pendingRecallAnswer`, `isMcqRecallPending`, …) to those hooks.
-- **`ttyAdapter.ts`** does **not** import **`recall.js`** or **`PendingRecallAnswer` / `McqRecallPending`**; numbered-choice prompt lines and guidance come from **`getNumberedChoiceListCurrentPromptWrappedLines`**, **`getNumberedChoiceListChoices`**, **`formatNumberedChoiceGuidanceLines`**.
+- **`ttyAdapter.ts`** does **not** import **`recall.js`** or **`PendingRecallAnswer` / `McqRecallPending`**; numbered-choice prompt lines come from **`getNumberedChoiceListCurrentPromptWrappedLines`**; choices from **`getNumberedChoiceListChoices`**; MCQ guidance rows are built with **`recallMcqCurrentGuidanceLines`** in the adapter (from `renderer.ts`).
 - Confirm / session y/n: **`dispatchSessionYesNoKey`**, **`getStopConfirmationLiveView`**, **`usesSessionYesNoInputChrome`**, **`getStopConfirmationYesOutcomeLines`** (product copy for “stopped” stays behind the dep).
 - **Select-list keys:** **`cli/src/interactions/selectListInteraction.ts`** + delegation from `ttyAdapter` for numbered-choice and token-list modes.
 - **Testing preference:** no standalone unit file for `selectListInteraction`; **observable** coverage via existing **`cli/tests/interactive/`** + **`e2e_test/features/cli/cli_recall.feature`**.
 
-**Remaining before Ink / steady state:**
+**Snapshot after Phase I (migration track complete):**
 
-- **Ink + deletion:** replace ANSI branches and large repaint with Ink tree (**F**, **H**); **D** drops **`renderer`** imports from business where possible.
+- **Ink:** single shell (`InteractiveShellDisplay`); confirm, select, fetch-wait, and default live region are Ink components; history is **`Static`**.
+- **`renderer.ts`:** still the **layout bridge**—grapheme-aware wrap, `buildLiveRegionLines` (ANSI-shaped strings) for the normal command-line **`LiveRegionLines`** branch, piped `renderBox`, `writeFullRedraw` for non-interactive paths, etc.
+- **Optional later:** ink-ui `Select` / moving more layout into pure Ink (see **Decision gates**: wrapping, visual parity, ink-ui).
 
 | What to fix | Status / phases |
 |-------------|-----------------|
-| List-selection logic and recall-shaped **types/names** in `ttyAdapter` | **Done** (extract + neutral deps); **F** = Ink `Select` |
-| Confirm / session y/n routing in ANSI adapter | **Mechanism deps done**; **F/H** = Ink owns UI |
-| Business importing **`renderer`** presentation constants | **D** (open) |
-| Legacy full-screen repaint + mode wiring | **H**, **I** |
+| List-selection logic and recall-shaped **types/names** in `ttyAdapter` | **Done** (extract + neutral deps; Ink display components, not necessarily ink-ui `Select`) |
+| Confirm / session y/n in the TTY path | **Done** (mechanism deps + Ink `ConfirmDisplay` in shell) |
+| Business importing **`renderer`** only where needed | **Done** (Phase D); `interactive.ts` keeps a small renderer surface for prompts / redraw helpers |
+| Legacy full-screen repaint + mode wiring | **Done** (Phase H shell + Phase I cleanup) |
 | Imperative caret CSI + pre-rerender cursor restore (Ink log-update mismatch) | **Interim** — remove in **J** |
 | Scattered `stdout.write` for interactive mode (vs one thin OSC/lifecycle layer) | **K** (after **J**) |
 
@@ -121,7 +125,7 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 - **`cli/src/interactions/selectListInteraction.ts`:** `cycleListSelectionIndex`, `selectListSubmitLineForSlashAndNumber`, `dispatchSelectListKey` with `slash-and-number-or-highlight` vs `highlight-only` draft policy and `signal-escape` vs `abort-list` Esc policy.
 - **`ttyAdapter`:** numbered-choice and token-list key handling delegate to that module; slash-command picker still uses `cycleListSelectionIndex` only (shared cycle helper).
-- **Neutral `TTYDeps`:** adapter no longer imports **`recall.js`** or recall-pending types; **`interactive.ts`** exposes **`isNumberedChoiceListActive`**, **`getNumberedChoiceListChoices`**, **`getNumberedChoiceListCurrentPromptWrappedLines`**, **`formatNumberedChoiceGuidanceLines`**, **`dispatchSessionYesNoKey`**, **`getStopConfirmationLiveView`**, **`usesSessionYesNoInputChrome`**, **`getSessionPayloadLoadingIndicator`**, **`getStopConfirmationYesOutcomeLines`**, **`isInCommandSessionSubstate`**, **`exitCommandSession`**, etc.
+- **Neutral `TTYDeps`:** adapter no longer imports **`recall.js`** or recall-pending types; **`interactive.ts`** exposes **`isNumberedChoiceListActive`**, **`getNumberedChoiceListChoices`**, **`getNumberedChoiceListCurrentPromptWrappedLines`**, **`dispatchSessionYesNoKey`**, **`getStopConfirmationLiveView`**, **`usesSessionYesNoInputChrome`**, **`getStopConfirmationYesOutcomeLines`**, **`isInCommandSessionSubstate`**, **`exitCommandSession`**, token-list config hooks, **`getPlaceholderContext`**, etc. (Later phases dropped pass-through renderer symbols from deps; the adapter imports **`renderer.ts`** directly where needed.)
 - **Tests:** no dedicated `selectListInteraction` unit file — **observable** coverage via **`cli/tests/interactive/`** + **`e2e_test/features/cli/cli_recall.feature`**; **`pnpm cli:test`**.
 
 ---
@@ -140,48 +144,46 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
-### Phase E — Add Ink: **spike** + dependency decision — **done** (spike removed)
+### Phase E — Add Ink: **spike** + dependency decision — **done** (spike retired; Ink shipped in F–H)
 
 **Goal:** Prove stdin lifecycle, bundle size, and CI build with a **minimal** Ink tree (e.g. only stop-recall confirm OR a dev-only flag).
 
-**What we learned (keep for Phase F)**
+**What we learned (still relevant)**
 
-- **`react` + `ink`** on the CLI bundle to ~**2.6 MiB**; **`@inkjs/ui`** still a separate **decision gate**.
-- **`patchConsole: false`** on a minimal `render()` is viable for smoke paths; full shell chooses later.
-- **esbuild:** alias **`react-devtools-core`** to a no-op shim (Ink pulls it when `DEV=true`). **Bundled ESM** may need a **`createRequire` preamble** so CJS deps under Ink (e.g. `signal-exit` → `assert` / `events`) work — reapply both when adding Ink back.
-- **Decision gate: single root vs islands:** target **one `render()` root** for the full interactive TTY; avoid multi-`render` islands.
+- **`react` + `ink`** add ~**2.6 MiB** to the CLI bundle; **`@inkjs/ui`** remains a separate **decision gate** (not adopted in this track).
+- **`patchConsole: false`** on `render()` is what the shell uses today; revisiting is **decision gate 7**.
+- **esbuild:** alias **`react-devtools-core`** to a no-op shim; **`createRequire` preamble** in the bundle for CJS deps under Ink — both remain required for the shipped bundle.
+- **Single `render()` root** for the full interactive TTY was chosen; **Phase H** replaced the brief **F1/F2 “island”** pattern (separate `rerender` overlay) with one shell.
 
-**Current tree:** Phase E **spike code, env flag, Vitest, and `ink`/`react` deps are removed** so the CLI stays lean until Phase F reintroduces them.
-
-**Next:** Phase G onward (F1–F3 Ink confirm/select + OSC ordering done).
+**Historical note:** After the spike, Ink was temporarily removed from the tree; **Phase F onward** reintroduced **`react`/`ink`** for real. Do not read “spike removed” as “CLI has no Ink today.”
 
 ---
 
 ### Phase F1 — Migrate **confirm** flows to Ink components — **done**
 
-**Goal:** Replace ANSI confirm UI (stop-recall confirm, recall-session y/n) with Ink `ConfirmDisplay` component. Key dispatch stays in the ANSI keypress handler; Ink is **display-only** (no `useInput`).
+**Goal:** Replace ANSI confirm UI (stop-recall confirm, recall-session y/n) with Ink `ConfirmDisplay` component. Key dispatch stays in the readline keypress handler; Ink is **display-only** (no `useInput` on these surfaces).
 
 **Delivered**
 
 - **`cli/src/ui/ConfirmDisplay.tsx`**: display-only Ink component for y/n confirm (stop-recall and session y/n).
-- **`ttyAdapter.ts`**: Ink island lifecycle (`startOrUpdateInkDisplay`, `unmountInkDisplay`, `renderInkStopConfirm`, `renderInkSessionYesNo`). Stop-confirm and session y/n render via Ink; MCQ and token-list remain ANSI `drawBox()`.
+- **`ttyAdapter.ts`**: first shipped confirm via a separate Ink `render`/`rerender` path (“island”) before **Phase H** folded everything into **`buildLivePanel()`** inside the single shell. The **components and dispatch split** (readline → deps → repaint) remain.
 - **Vitest**: `CI: '0'`, `FORCE_COLOR: '1'` in `test.env`; `is-in-ci` stub in `tests/__mocks__/`; `vi.mock('is-in-ci')` in `tests/setup.ts` so Ink renders to stdout in tests.
-- **Tests**: 398/398 pass. E2E `cli_recall.feature` tracked in F2/F3.
+- **Tests**: green with E2E `cli_recall.feature` tracked in F2/F3.
 
-**Architecture note:** Ink island approach — Ink renders to stdout as display layer; the ANSI readline keypress handler dispatches keys and calls `inkDisplayInstance.rerender(element)` to update the Ink display. This avoids readline-vs-raw-stdin conflicts (`useInput` listens to raw stdin `data` events, not readline `keypress` events).
+**Architecture note:** Display-only Ink avoids readline-vs-raw-stdin fights for **confirm**; whether **all** typing eventually moves to Ink `useInput` is still **decision gates 1 and 3**.
 
 ---
 
 ### Phase F2 — Migrate **select** flows to Ink components — **done**
 
-**Goal:** Extend the Ink island to MCQ numbered-choice select and access-token list picker (replacing their `drawBox()` rendering), bringing `ttyAdapter` confirm/select branches fully to Ink.
+**Goal:** MCQ numbered-choice select and access-token list picker as Ink components (replacing ANSI `drawBox()` for those modes).
 
 **Delivered**
 
 - **`cli/src/ui/McqDisplay.tsx`** and **`cli/src/ui/TokenListDisplay.tsx`**: Ink display-only components for MCQ and token list.
-- **`ttyAdapter.ts`**: `renderInkMcqDisplay()`, `renderInkTokenListDisplay()` functions; `drawBox()` routes to these when MCQ or token list is active; `unmountInkDisplay()` called on MCQ submit and `commitTokenListResult()`; `INTERACTIVE_INPUT_READY_OSC` emitted after each Ink render.
-- **Tests updated:** `recallMcqTtyCursorPosition.test.ts` (→ checks Ink McqDisplay renders `→` and doesn't overwrite history), `interactiveTtyTokenList.test.ts` (→ checks Ink output content, no ANSI box border checks), `interactiveTtyMcq.test.ts` (→ checks OSC emission and no grey writeCurrentPrompt for choices).
-- **Bundle fix:** `cli/package.json` banner now uses `$'...'` syntax so `createRequire` preamble actually executes (was `\n` literal instead of newline).
+- **`ttyAdapter.ts`**: **Phase H** routes these through **`buildLivePanel()`** (same single `render` as confirm/fetch-wait). Earlier F2 used dedicated `renderInk*` helpers and unmount hooks; those responsibilities are now “which branch of `buildLivePanel`” + shell lifecycle. **`INTERACTIVE_INPUT_READY_OSC`** still follows the adapter’s `onRender` / layout rules for selectable modes.
+- **Tests updated:** `recallMcqTtyCursorPosition.test.ts`, `interactiveTtyTokenList.test.ts`, `interactiveTtyMcq.test.ts` (stdout / OSC–level assertions).
+- **Bundle fix:** `cli/package.json` banner uses `$'...'` so the `createRequire` preamble runs.
 - **E2E fix:** `e2e_test/config/cliEnv.ts` sets `CI=0` so Ink renders in non-CI mode in E2E tests.
 
 ---
@@ -296,7 +298,22 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
+## Open after Phase I (optional — not a backlog to “close”)
+
+Phases **A–I** are **done**. The items below are **intentionally unset** until you choose to act on them. They are the same themes as **Decision gates** and **Ink concepts** above—not deleted, not resolved here.
+
+- **Stdin / input model:** keep readline + display-only Ink vs move command input to Ink `useInput` (and/or **@inkjs/ui** `TextInput`).
+- **Focus and selection UX:** ↑↓ in guidance vs Ink `useFocus` / Tab (E2E and habit impact).
+- **Layout:** more `renderer.ts` pre-wrap vs more Ink `Text` `wrap` for CJK/emoji parity.
+- **Components:** adopt **@inkjs/ui** (`Spinner`, `Select`, …) vs hand-rolled `Box`/`Text`.
+- **Look:** closer ANSI parity (stage band, borders) vs slimmer Ink-native chrome.
+- **Logging:** `patchConsole` and rules for `console.log` during interactive mode.
+
+When you pick one of these, work through the matching **Decision gate** (or add a short note under this section) before large refactors.
+
+---
+
 ## Notes
 
-- **Ordering:** Phases A–D deliver a safe **extract-and-thin-adapter** path even if Ink is deferred; E–I require the **decision gates** to be closed. Ink shell work through Phase **I** is complete on `main`. **Next:** Phase **J** (Ink-native live input + caret — removes interim cursor CSI), then **K** (single stdout/OSC owner).
-- **Conflicts:** Any phase that would change PTY/E2E-visible behavior without product sign-off should stop at the nearest **decision gate** above.
+- **Ordering:** Phases A–D delivered a safe **extract-and-thin-adapter** path; E–I added Ink and the shell. **Phases A–I are complete** on `main`. **Next:** Phase **J** (Ink-native live input + caret — removes interim cursor CSI), then **K** (single stdout/OSC owner). This file stays as reference until you archive it.
+- **Conflicts:** Any future change that would alter PTY/E2E-visible behavior without product sign-off should still stop at the nearest **decision gate** above.

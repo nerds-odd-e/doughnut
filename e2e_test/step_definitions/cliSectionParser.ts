@@ -275,6 +275,7 @@ function replayInteractiveCliPtyTranscriptOntoGrid(
   let i = 0
   const ESC = '\x1b' as const
   const cursorUpRe = new RegExp(`^${ESC}\\[(\\d+)A`)
+  const cursorDownRe = new RegExp(`^${ESC}\\[(\\d+)B`)
   const eraseLineRe = new RegExp(`^${ESC}\\[2K`)
   const cursorColRe = new RegExp(`^${ESC}\\[(\\d+)G`)
   const clearScreenRe = new RegExp(`^${ESC}\\[[02]?J`) // \x1b[J, \x1b[2J clear screen
@@ -301,6 +302,7 @@ function replayInteractiveCliPtyTranscriptOntoGrid(
     }
     if (ptyTranscript.startsWith('\x1b[', i)) {
       const cursorUpMatch = ptyTranscript.slice(i).match(cursorUpRe)
+      const cursorDownMatch = ptyTranscript.slice(i).match(cursorDownRe)
       const eraseLineMatch = ptyTranscript.slice(i).match(eraseLineRe)
       const cursorColMatch = ptyTranscript.slice(i).match(cursorColRe)
       const clearScreenMatch = ptyTranscript.slice(i).match(clearScreenRe)
@@ -308,6 +310,11 @@ function replayInteractiveCliPtyTranscriptOntoGrid(
       if (cursorUpMatch) {
         row = Math.max(0, row - Number(cursorUpMatch[1]))
         i += cursorUpMatch[0].length
+        continue
+      }
+      if (cursorDownMatch) {
+        row += Number(cursorDownMatch[1])
+        i += cursorDownMatch[0].length
         continue
       }
       if (eraseLineMatch) {
