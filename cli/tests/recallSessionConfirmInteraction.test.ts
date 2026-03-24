@@ -4,7 +4,7 @@ import {
   parseRecallSessionYesNoSubmit,
   recallStopConfirmViewModel,
   RECALL_STOP_CONFIRM_GUIDANCE_LINE,
-} from '../src/interactions/sessionYesNoInteraction.js'
+} from '../src/interactions/recallSessionConfirmInteraction.js'
 
 describe('parseRecallSessionYesNoSubmit', () => {
   describe('empty-is-no (stop-recall confirm)', () => {

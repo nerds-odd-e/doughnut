@@ -1,5 +1,5 @@
 ---
-description: Stryker + Vitest mutation testing; survived mutants may be dead code — do not auto-add tests; prefer high-level entry-point tests (may not import mutated code); setup pitfalls; extend to other packages later
+description: Stryker + Vitest mutation testing; survived mutants may be dead code — do not auto-add tests; prefer observable entry points; setup pitfalls; extend to other packages later
 globs: cli/**,**/stryker.conf.mjs,**/vitest.stryker.config.ts
 alwaysApply: false
 ---
@@ -19,7 +19,7 @@ A **survived** mutant often means **no test executes that branch** — it can al
 
 **Do not** “fix” a survived mutant by adding **shallow** tests that **reach into inner structure**, call **non–entry-point** helpers, or assert on **internal state** (private fields, implementation-only types, test-only hooks) just to flip Stryker green. Those tests **refactor badly** and **miss real wiring bugs** (see **Observable behavior first** in `.cursor/rules/planning.mdc`).
 
-**Do** add or extend coverage by driving a **high-level entry point** (controller, mounted page, `runInteractive`, real CLI, public module API): the test may **not import or call the mutated code directly** and still execute it through the stack. Assert only what an **integrator or user can observe**: HTTP response / body, **CLI stdout**, DOM, **black-box** inputs and outputs (no peering inside). **Do not** add a narrow test solely to match one source file — see **Observable behavior first** in `.cursor/rules/planning.mdc`.
+**Do** add or extend coverage from a **higher-level, domain-stable entry point**, and assert only what an **integrator or user can observe**: HTTP response / body, **CLI stdout** from `runInteractive` or the real CLI surface, DOM from a **mounted** page, **public** module API with **black-box** inputs and outputs (no peering inside).
 
 **Pure helpers** (e.g. `dispatchX(…) → result object`, formatting with no hidden globals) may keep **direct-import** tests **only** when that API **is** the intentional stable contract — still **black-box**: arguments in, return value out, no internal spies.
 
@@ -51,7 +51,7 @@ CURSOR_DEV=true nix develop -c bash -c 'cd cli && pnpm test:mutation'
 
 3. **`coverageAnalysis: 'perTest'`** — Can show **no effective coverage** on some ESM / boundary setups; **`coverageAnalysis: 'off'`** with a **small** dedicated test set is acceptable for targeted runs.
 
-4. **Pure interaction helpers** — Where the **stable contract** is the extracted function (inputs → dispatch / string result), black-box unit tests are appropriate — same idea as `cli/tests/sessionYesNoInteraction.test.ts`. **End-to-end product behavior** still belongs in **TTY / E2E** through the appropriate surface; see **When mutants survive** above when choosing depth.
+4. **Pure interaction helpers** — Where the **stable contract** is the extracted function (inputs → dispatch / string result), black-box unit tests are appropriate — same idea as `cli/tests/recallSessionConfirmInteraction.test.ts`. **End-to-end product behavior** still belongs in **TTY / E2E** tests at the right level; see **When mutants survive** above when choosing depth.
 
 ## Ignore (per package that runs Stryker)
 

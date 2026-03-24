@@ -4,15 +4,13 @@
 
 The **interactive TTY experience** is implemented as an **Ink** application: a React component tree rendered with Ink’s `render()`, using **flexbox layout** (`Box`), styled output (`Text`), keyboard handling (`useInput`, optionally `useFocus`), and—where it matches product behavior—**append-only history** via Ink’s `Static` (**Context7:** `vadimdemedes/ink` — `Static` only adds new items; mutating past items is not re-rendered).
 
-**Current implementation (post Phase H–I):** one **`render()`** root in `ttyAdapter` (`InteractiveShellDisplay`: `Static` history + live panel). **Keystrokes** for the command line and pickers still go through **readline** (and shared dispatch helpers), not Ink `useInput`—that remains an **optional** direction; see **Decision gates** (especially stdin ownership and focus model). **`@inkjs/ui`** is also still optional (decision gate 5).
-
 Optional **@inkjs/ui** (**Context7:** `vadimdemedes/ink-ui`) supplies patterns close to this codebase’s flows: `ConfirmInput`, `Select`, `TextInput`, `Spinner`, `ProgressBar`.
 
 **Out of scope for “Ink vocabulary”:** business-domain language stays as today (`recall`, `notebook`, `MCQ` as product concepts, `processInput` orchestration, etc.). Only **CLI UI framing** shifts toward Ink/React terms so future work does not translate between “modal” and “component” mentally.
 
 **Non-interactive** (`-c`, piped) remains the **`processInput` + `pipedAdapter`** path unless a later decision explicitly unifies surfaces.
 
-**Adapter rule:** **`ttyAdapter` (and any equivalent stdin/stdout bridge) must not leak business concepts**—no branching on product notions such as *recall*, *MCQ*, *notebook*, *memory tracker*, or quiz rules. Those belong in the **business** layer; the adapter only moves bytes, repaints, and forwards **opaque** interaction handles / callbacks from deps (or delegates to `processInput`). Neutral **`TTYDeps`** in `interactive.ts` enforce this for the live TTY (see **`ttyAdapter` vs domain naming`**). Phases **D–I** delivered business/renderer cleanup and the Ink shell migration.
+**Adapter rule:** **`ttyAdapter` (and any equivalent stdin/stdout bridge) must not leak business concepts**—no branching on product notions such as *recall*, *MCQ*, *notebook*, *memory tracker*, or quiz rules. Those belong in the **business** layer; the adapter only moves bytes, repaints, and forwards **opaque** interaction handles / callbacks from deps (or delegates to `processInput`). **ANSI era:** neutral **`TTYDeps`** in `interactive.ts` already enforce this for the live TTY (see **`ttyAdapter` vs domain naming`**). Phases **D–I** finish business/renderer cleanup and Ink migration.
 
 ---
 
@@ -22,7 +20,7 @@ Optional **@inkjs/ui** (**Context7:** `vadimdemedes/ink-ui`) supplies patterns c
 |-------|------------------|---------------|
 | **Business** | `interactive.ts`, `recall.ts`, etc. Domain orchestration and state transitions. | Unchanged domain language; exposes props/callbacks to the UI root (e.g. “submit recall answer”, “exit recall”). |
 | **Interactive UI** | Was “CliModal” / adapter-specific modals; becomes **React state + components** (confirm flows, pickers, loading row). | `useState` / reducers, small presentational components; **no business branching** beyond dispatching callbacks passed from business layer. |
-| **TTY adapter** | Readline, raw-ish key routing, cursor placement, OSC; composes the Ink shell tree. | **No business-concept leakage in code shape:** `ttyAdapter` consumes **mechanism-only** `TTYDeps` (`isNumberedChoiceListActive`, `dispatchSessionYesNoKey`, `usesSessionYesNoInputChrome`, …); `interactive.ts` hides recall/MCQ types. Session y/n types live in **`sessionYesNoInteraction.ts`** (mechanism-named path). |
+| **TTY adapter** (transitional) | Raw mode, key events, ANSI live region **until** Ink subsumes it. | **No business-concept leakage in code shape:** `ttyAdapter` consumes **mechanism-only** `TTYDeps` (`isNumberedChoiceListActive`, `dispatchSessionYesNoKey`, `usesSessionYesNoInputChrome`, …); `interactive.ts` hides recall/MCQ types. **Still transitional:** imports types from `recallSessionConfirmInteraction.ts` (filename/path); target thin shell in **F/H**. |
 | **Ink shell** | Owns stdin/stdout, `render()` instance (`waitUntilExit`, `unmount`, `clear`), and the top-level layout split (e.g. history vs live). | One place that configures `render(..., { stdin, stdout, stderr, patchConsole, exitOnCtrlC, ... })` per Ink’s API. |
 | **Layout / terminal width** | Correct column width for CJK, emoji, graphemes. | **Bridge:** keep **`cli/src/renderer.ts`** as the source of truth for wrapping/truncation where Ink’s `Text` wrapping is insufficient; feed Ink pre-wrapped lines or wrap in a thin helper until a deliberate choice is made (see **Decision gate: wrapping**). |
 
@@ -70,23 +68,22 @@ After each phase: **delete dead code** that only served the old path; **delete o
 **Done (ANSI / current `ttyAdapter`):**
 
 - **`TTYDeps`** are **mechanism-named** only; **`buildTTYDeps()`** in `interactive.ts` maps business state (`pendingRecallAnswer`, `isMcqRecallPending`, …) to those hooks.
-- **`ttyAdapter.ts`** does **not** import **`recall.js`** or **`PendingRecallAnswer` / `McqRecallPending`**; numbered-choice prompt lines come from **`getNumberedChoiceListCurrentPromptWrappedLines`**; choices from **`getNumberedChoiceListChoices`**; MCQ guidance rows are built with **`recallMcqCurrentGuidanceLines`** in the adapter (from `renderer.ts`).
+- **`ttyAdapter.ts`** does **not** import **`recall.js`** or **`PendingRecallAnswer` / `McqRecallPending`**; numbered-choice prompt lines and guidance come from **`getNumberedChoiceListCurrentPromptWrappedLines`**, **`getNumberedChoiceListChoices`**, **`formatNumberedChoiceGuidanceLines`**.
 - Confirm / session y/n: **`dispatchSessionYesNoKey`**, **`getStopConfirmationLiveView`**, **`usesSessionYesNoInputChrome`**, **`getStopConfirmationYesOutcomeLines`** (product copy for “stopped” stays behind the dep).
 - **Select-list keys:** **`cli/src/interactions/selectListInteraction.ts`** + delegation from `ttyAdapter` for numbered-choice and token-list modes.
 - **Testing preference:** no standalone unit file for `selectListInteraction`; **observable** coverage via existing **`cli/tests/interactive/`** + **`e2e_test/features/cli/cli_recall.feature`**.
 
-**Snapshot after Phase I (migration track complete):**
+**Remaining before Ink / steady state:**
 
-- **Ink:** single shell (`InteractiveShellDisplay`); confirm, select, fetch-wait, and default live region are Ink components; history is **`Static`**.
-- **`renderer.ts`:** still the **layout bridge**—grapheme-aware wrap, `buildLiveRegionLines` (ANSI-shaped strings) for the normal command-line **`LiveRegionLines`** branch, piped `renderBox`, `writeFullRedraw` for non-interactive paths, etc.
-- **Optional later:** ink-ui `Select` / moving more layout into pure Ink (see **Decision gates**: wrapping, visual parity, ink-ui).
+- **Filename/path:** `ttyAdapter` still imports types from **`recallSessionConfirmInteraction.ts`** (cosmetic leakage; optional rename to e.g. `sessionYesNoInteraction.ts`).
+- **Ink + deletion:** replace ANSI branches and large repaint with Ink tree (**F**, **H**); **D** drops **`renderer`** imports from business where possible.
 
-| What to fix | Status |
-|-------------|--------|
-| List-selection logic and recall-shaped **types/names** in `ttyAdapter` | **Done** (extract + neutral deps; Ink display components, not necessarily ink-ui `Select`) |
-| Confirm / session y/n in the TTY path | **Done** (mechanism deps + Ink `ConfirmDisplay` in shell) |
-| Business importing **`renderer`** only where needed | **Done** (Phase D); `interactive.ts` keeps a small renderer surface for prompts / redraw helpers |
-| Legacy full-screen repaint + mode wiring | **Done** (Phase H shell + Phase I cleanup) |
+| What to fix | Status / phases |
+|-------------|-----------------|
+| List-selection logic and recall-shaped **types/names** in `ttyAdapter` | **Done** (extract + neutral deps); **F** = Ink `Select` |
+| Confirm / session y/n routing in ANSI adapter | **Mechanism deps done**; **F/H** = Ink owns UI |
+| Business importing **`renderer`** presentation constants | **D** (open) |
+| Legacy full-screen repaint + mode wiring | **H**, **I** |
 
 ---
 
@@ -96,9 +93,9 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 **Delivered**
 
-- **`cli/src/interactions/sessionYesNoInteraction.ts`** (evolved from Phase A extract): **view model** for stop-recall only (`recallStopConfirmViewModelForContext`); shared **parse** + **dispatch** for all recall y/n (see Phase B).
+- **`cli/src/interactions/recallSessionConfirmInteraction.ts`** (evolved from Phase A extract): **view model** for stop-recall only (`recallStopConfirmViewModelForContext`); shared **parse** + **dispatch** for all recall y/n (see Phase B).
 - **`ttyAdapter`** paints stop confirm via deps (**`getStopConfirmationLiveView`**) — no ad-hoc y/n parsing in the adapter for that step.
-- Tests: `cli/tests/sessionYesNoInteraction.test.ts`; `pnpm cli:test` + `e2e_test/features/cli/cli_recall.feature`.
+- Tests: `cli/tests/recallSessionConfirmInteraction.test.ts`; `pnpm cli:test` + `e2e_test/features/cli/cli_recall.feature`.
 
 ---
 
@@ -123,7 +120,7 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 - **`cli/src/interactions/selectListInteraction.ts`:** `cycleListSelectionIndex`, `selectListSubmitLineForSlashAndNumber`, `dispatchSelectListKey` with `slash-and-number-or-highlight` vs `highlight-only` draft policy and `signal-escape` vs `abort-list` Esc policy.
 - **`ttyAdapter`:** numbered-choice and token-list key handling delegate to that module; slash-command picker still uses `cycleListSelectionIndex` only (shared cycle helper).
-- **Neutral `TTYDeps`:** adapter no longer imports **`recall.js`** or recall-pending types; **`interactive.ts`** exposes **`isNumberedChoiceListActive`**, **`getNumberedChoiceListChoices`**, **`getNumberedChoiceListCurrentPromptWrappedLines`**, **`dispatchSessionYesNoKey`**, **`getStopConfirmationLiveView`**, **`usesSessionYesNoInputChrome`**, **`getStopConfirmationYesOutcomeLines`**, **`isInCommandSessionSubstate`**, **`exitCommandSession`**, token-list config hooks, **`getPlaceholderContext`**, etc. (Later phases dropped pass-through renderer symbols from deps; the adapter imports **`renderer.ts`** directly where needed.)
+- **Neutral `TTYDeps`:** adapter no longer imports **`recall.js`** or recall-pending types; **`interactive.ts`** exposes **`isNumberedChoiceListActive`**, **`getNumberedChoiceListChoices`**, **`getNumberedChoiceListCurrentPromptWrappedLines`**, **`formatNumberedChoiceGuidanceLines`**, **`dispatchSessionYesNoKey`**, **`getStopConfirmationLiveView`**, **`usesSessionYesNoInputChrome`**, **`getSessionPayloadLoadingIndicator`**, **`getStopConfirmationYesOutcomeLines`**, **`isInCommandSessionSubstate`**, **`exitCommandSession`**, etc.
 - **Tests:** no dedicated `selectListInteraction` unit file — **observable** coverage via **`cli/tests/interactive/`** + **`e2e_test/features/cli/cli_recall.feature`**; **`pnpm cli:test`**.
 
 ---
@@ -142,46 +139,48 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
-### Phase E — Add Ink: **spike** + dependency decision — **done** (spike retired; Ink shipped in F–H)
+### Phase E — Add Ink: **spike** + dependency decision — **done** (spike removed)
 
 **Goal:** Prove stdin lifecycle, bundle size, and CI build with a **minimal** Ink tree (e.g. only stop-recall confirm OR a dev-only flag).
 
-**What we learned (still relevant)**
+**What we learned (keep for Phase F)**
 
-- **`react` + `ink`** add ~**2.6 MiB** to the CLI bundle; **`@inkjs/ui`** remains a separate **decision gate** (not adopted in this track).
-- **`patchConsole: false`** on `render()` is what the shell uses today; revisiting is **decision gate 7**.
-- **esbuild:** alias **`react-devtools-core`** to a no-op shim; **`createRequire` preamble** in the bundle for CJS deps under Ink — both remain required for the shipped bundle.
-- **Single `render()` root** for the full interactive TTY was chosen; **Phase H** replaced the brief **F1/F2 “island”** pattern (separate `rerender` overlay) with one shell.
+- **`react` + `ink`** on the CLI bundle to ~**2.6 MiB**; **`@inkjs/ui`** still a separate **decision gate**.
+- **`patchConsole: false`** on a minimal `render()` is viable for smoke paths; full shell chooses later.
+- **esbuild:** alias **`react-devtools-core`** to a no-op shim (Ink pulls it when `DEV=true`). **Bundled ESM** may need a **`createRequire` preamble** so CJS deps under Ink (e.g. `signal-exit` → `assert` / `events`) work — reapply both when adding Ink back.
+- **Decision gate: single root vs islands:** target **one `render()` root** for the full interactive TTY; avoid multi-`render` islands.
 
-**Historical note:** After the spike, Ink was temporarily removed from the tree; **Phase F onward** reintroduced **`react`/`ink`** for real. Do not read “spike removed” as “CLI has no Ink today.”
+**Current tree:** Phase E **spike code, env flag, Vitest, and `ink`/`react` deps are removed** so the CLI stays lean until Phase F reintroduces them.
+
+**Next:** Phase G onward (F1–F3 Ink confirm/select + OSC ordering done).
 
 ---
 
 ### Phase F1 — Migrate **confirm** flows to Ink components — **done**
 
-**Goal:** Replace ANSI confirm UI (stop-recall confirm, recall-session y/n) with Ink `ConfirmDisplay` component. Key dispatch stays in the readline keypress handler; Ink is **display-only** (no `useInput` on these surfaces).
+**Goal:** Replace ANSI confirm UI (stop-recall confirm, recall-session y/n) with Ink `ConfirmDisplay` component. Key dispatch stays in the ANSI keypress handler; Ink is **display-only** (no `useInput`).
 
 **Delivered**
 
 - **`cli/src/ui/ConfirmDisplay.tsx`**: display-only Ink component for y/n confirm (stop-recall and session y/n).
-- **`ttyAdapter.ts`**: first shipped confirm via a separate Ink `render`/`rerender` path (“island”) before **Phase H** folded everything into **`buildLivePanel()`** inside the single shell. The **components and dispatch split** (readline → deps → repaint) remain.
+- **`ttyAdapter.ts`**: Ink island lifecycle (`startOrUpdateInkDisplay`, `unmountInkDisplay`, `renderInkStopConfirm`, `renderInkSessionYesNo`). Stop-confirm and session y/n render via Ink; MCQ and token-list remain ANSI `drawBox()`.
 - **Vitest**: `CI: '0'`, `FORCE_COLOR: '1'` in `test.env`; `is-in-ci` stub in `tests/__mocks__/`; `vi.mock('is-in-ci')` in `tests/setup.ts` so Ink renders to stdout in tests.
-- **Tests**: green with E2E `cli_recall.feature` tracked in F2/F3.
+- **Tests**: 398/398 pass. E2E `cli_recall.feature` tracked in F2/F3.
 
-**Architecture note:** Display-only Ink avoids readline-vs-raw-stdin fights for **confirm**; whether **all** typing eventually moves to Ink `useInput` is still **decision gates 1 and 3**.
+**Architecture note:** Ink island approach — Ink renders to stdout as display layer; the ANSI readline keypress handler dispatches keys and calls `inkDisplayInstance.rerender(element)` to update the Ink display. This avoids readline-vs-raw-stdin conflicts (`useInput` listens to raw stdin `data` events, not readline `keypress` events).
 
 ---
 
 ### Phase F2 — Migrate **select** flows to Ink components — **done**
 
-**Goal:** MCQ numbered-choice select and access-token list picker as Ink components (replacing ANSI `drawBox()` for those modes).
+**Goal:** Extend the Ink island to MCQ numbered-choice select and access-token list picker (replacing their `drawBox()` rendering), bringing `ttyAdapter` confirm/select branches fully to Ink.
 
 **Delivered**
 
 - **`cli/src/ui/McqDisplay.tsx`** and **`cli/src/ui/TokenListDisplay.tsx`**: Ink display-only components for MCQ and token list.
-- **`ttyAdapter.ts`**: **Phase H** routes these through **`buildLivePanel()`** (same single `render` as confirm/fetch-wait). Earlier F2 used dedicated `renderInk*` helpers and unmount hooks; those responsibilities are now “which branch of `buildLivePanel`” + shell lifecycle. **`INTERACTIVE_INPUT_READY_OSC`** still follows the adapter’s `onRender` / layout rules for selectable modes.
-- **Tests updated:** `recallMcqTtyCursorPosition.test.ts`, `interactiveTtyTokenList.test.ts`, `interactiveTtyMcq.test.ts` (stdout / OSC–level assertions).
-- **Bundle fix:** `cli/package.json` banner uses `$'...'` so the `createRequire` preamble runs.
+- **`ttyAdapter.ts`**: `renderInkMcqDisplay()`, `renderInkTokenListDisplay()` functions; `drawBox()` routes to these when MCQ or token list is active; `unmountInkDisplay()` called on MCQ submit and `commitTokenListResult()`; `INTERACTIVE_INPUT_READY_OSC` emitted after each Ink render.
+- **Tests updated:** `recallMcqTtyCursorPosition.test.ts` (→ checks Ink McqDisplay renders `→` and doesn't overwrite history), `interactiveTtyTokenList.test.ts` (→ checks Ink output content, no ANSI box border checks), `interactiveTtyMcq.test.ts` (→ checks OSC emission and no grey writeCurrentPrompt for choices).
+- **Bundle fix:** `cli/package.json` banner now uses `$'...'` syntax so `createRequire` preamble actually executes (was `\n` literal instead of newline).
 - **E2E fix:** `e2e_test/config/cliEnv.ts` sets `CI=0` so Ink renders in non-CI mode in E2E tests.
 
 ---
@@ -205,7 +204,7 @@ After each phase: **delete dead code** that only served the old path; **delete o
 **Delivered**
 
 - **`cli/src/ui/FetchWaitDisplay.tsx`**: Ink display for interactive fetch-wait (`formatInteractiveFetchWaitPromptLine` + `PLACEHOLDER_BY_CONTEXT.interactiveFetchWait`).
-- **`ttyAdapter.ts`**: `drawBox()` routes fetch-wait to `FetchWaitDisplay` inside the Ink shell; `onInteractiveFetchWaitChanged` ends the wait branch in the live panel. (Post–Phase H, resize / clear use `CLEAR_SCREEN`, shell unmount, and `drawBox()` — no `renderFullDisplay` in the TTY path.)
+- **`ttyAdapter.ts`**: `drawBox()` routes fetch-wait first to `renderInkFetchWaitDisplay()`; `onInteractiveFetchWaitChanged` unmounts Ink when wait ends; `doFullRedraw` uses `renderFullDisplay(..., { omitLiveRegion: true })` + Ink fetch-wait so resize does not duplicate ANSI live region.
 - **`renderer.ts`**: `LiveRegionPaintOptions.omitLiveRegion` for history-only full redraw.
 - **Tests:** `renderer.test.ts` (`omitLiveRegion`); `pnpm cli:test` + relevant E2E as needed.
 
@@ -228,16 +227,12 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
-### Phase I — Consolidation and dead-code pass — **done**
+### Phase I — Consolidation and dead-code pass
 
 **Goal:** No parallel interactive engines; one Ink app entry for TTY interactive mode—**finishes** the **`ttyAdapter` vs domain naming** cleanup alongside Phase H.
 
-**Delivered**
-
-- **`sessionYesNoInteraction.ts`:** renamed from `recallSessionConfirmInteraction.ts` so the TTY adapter’s import path is mechanism-named; tests and docs updated.
-- **`renderer.ts`:** module comment documents it as the **layout bridge** (wrap/ANSI live-region assembly for Ink + piped boxes), not a second UI framework.
-- **`ttyAdapter`:** stop-confirm Ink guidance uses **`RECALL_STOP_CONFIRM_GUIDANCE_LINE`** (single source with the interaction module / view model).
-- **`renderer.ts` helpers:** no unused exports removed in this pass — all remaining exports still have callers (production or tests). Further deletion only when a symbol truly goes unused.
+- Delete unused `renderer.ts` helpers **only** when no caller remains; if `renderer.ts` stays as wrap helper, document it as **layout bridge**, not a second UI framework.
+- Final **test audit:** every removed internal test must be replaced by observable coverage or explicitly accepted gap.
 
 ---
 
@@ -257,135 +252,7 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
-## Architecture evaluation (audit — read-only)
-
-Post–Phase I review of the `cli/` subproject against the north star and open gates. **No implementation** was done for this audit.
-
-### North star vs current code
-
-| Goal | Status |
-|------|--------|
-| Single `render()` root, `Static` history, live column as React tree | **Met** — `InteractiveShellDisplay` + `buildLivePanel()` in `ttyAdapter.ts`. |
-| Ink vocabulary for confirm / MCQ / token list / fetch-wait | **Mostly met** — dedicated components; MCQ/token use `Box`/`Text`/`inverse` instead of only ANSI `drawBox`. |
-| **Full** Ink app (layout + **input** via `useInput` / focus) | **Not met** — `readline.createInterface` + `stdin.on('keypress')` own keystrokes; `finalizeInteractiveLiveRegionPaint` uses **manual ANSI** (`CUU`/`G`, cursor show/hide) for the command-line caret. Ink remains **display-first** on the default live column. |
-| `ttyAdapter` free of business-concept branching | **Met** — `TTYDeps` + `buildTTYDeps()`. |
-| `@inkjs/ui` | **Not adopted** — hand-rolled components; optional only as **thin** 1:1 replacements, not a new adapter stack. |
-
-**Summary:** A–I delivered the **shell + Static + Ink branches**. The remaining gap vs the north star is **stdin / caret / input** still outside Ink.
-
-### Cohesion, length, adapter layers
-
-- **Hybrid presentation:** Default command line: **`renderer.ts` → `buildLiveRegionLines` → ANSI-heavy strings** → `LiveRegionLines` as one `<Text>` per line. That is **less** idiomatic Ink than MCQ/token/fetch-wait (which already structure layout in React).
-- **Redundant work (not dead code):** On a typical **default** paint, `measureLiveRegionLayout()` can run **up to three times** per `drawBox()` (`buildShellTree`, `buildLivePanel` default branch, `handleShellRendered`). In **MCQ / token / wait / confirm** modes, the first pass can still build a full **`liveLines`** array that **`buildLivePanel` never renders** (it uses `McqDisplay` / etc.). Collapsing to **one snapshot per frame** shortens `ttyAdapter` and helps a later `useInput` migration.
-- **`LiveRegionLines`:** Thin wrapper; may fold into the shell when the default column is real Ink layout.
-
-### Dead code and tests
-
-- No **orphaned** CLI modules found; `renderer.ts` stays central for **piped** / `writeFullRedraw` and TTY string assembly.
-- **`cli/tests/selectListInteraction.test.ts`** contradicts an older note preferring only TTY/E2E coverage; tests are **useful** for dispatch contract but **overlap** observable paths — keep or fold into interactive tests as you prefer.
-- **`positionCursorInInputBox`** uses **UTF-16 column** math and `PROMPT.length`, not grapheme width — a latent bug for wide glyphs; may disappear when Ink owns the caret.
-
-### Decision gates — choices for the next track
-
-| Gate | Direction |
-|------|-----------|
-| **1 / 3 / 5** | Move to **Ink `useInput`**; optional **`@inkjs/ui`** only where it **replaces** bespoke UI 1:1. Define **focus** (single owner vs `useFocus`) and E2E impact. |
-| **4** | **Prefer Ink `Text` wrapping** + `Box` width for the **interactive** default column; keep **`renderer.ts` grapheme** helpers for **piped** until parity is proven. |
-| **6** | **Declined** — Ink-native look; no ANSI stage-band / border parity goal. |
-| **7** | **Declined for now** — keep `patchConsole: false` unless logging corrupts layout. |
-
----
-
-## Phases J+ (planned — not started)
-
-**Order:** single layout snapshot → **terminal resize (Ink-aligned)** → Ink wrap for default column → stdin/`useInput` migration → confirm → lists → optional ink-ui polish.
-
-### Phase J — One live layout snapshot per `drawBox`
-
-**Goal:** Run `getDisplayContent` / layout derivation **once** per paint; thread the snapshot into `buildShellTree`, `buildLivePanel`, and `handleShellRendered` so `measureLiveRegionLayout` is not repeated and non-default modes skip building unused `liveLines`.
-
-**User-visible:** None intended.
-
-**Verify:** `pnpm cli:test`; `cli_recall.feature` if needed.
-
----
-
-### Phase J2 — Terminal resize: Ink-aligned refresh (replace clear + unmount)
-
-**Goal:** Stop treating resize as a legacy full-screen reset. Today `ttyAdapter` uses `doFullRedraw` (`CLEAR_SCREEN` + shell **unmount** + `drawBox()`), partly because props like `terminalWidth` only refresh when the adapter rebuilds the tree—Ink’s own `stdout.on('resize')` does **not** call `drawBox()`. Move toward Ink convention: rely on Ink’s built-in resize handling where it applies; on resize, ensure the shell gets a **fresh `rerender(buildShellTree())`** (or equivalent) so `getTerminalWidth()` and width-dependent layout stay correct. Prefer **incremental** rerender and Ink’s shrink behavior over clear/unmount **unless** `Static`, `log-update`, caret, or `INTERACTIVE_INPUT_READY_OSC` still require the heavier path (prove with tests).
-
-**User-visible:** Ideally unchanged—correct reflow after terminal width change, no worse flicker.
-
-**Verify:** `cli/tests/interactive/interactiveTtySession.test.ts` (resize expectations may change if the clear sequence is no longer required); `recallMcqTtyCursorPosition` (narrow → resize); `pnpm cli:test`; E2E if needed.
-
-**Note:** Ink **does not** attach its resize listener when `is-in-ci` is true; Vitest keeps `resize` meaningful via the adapter listener or an explicit test strategy—document whichever remains.
-
-**Synergy:** Land after **Phase J** so a resize-triggered paint reuses a **single** layout snapshot instead of duplicating measurement paths.
-
----
-
-### Phase K — Default live column: Ink layout + Ink `Text` wrap (gate 4)
-
-**Goal:** Replace **default** `buildLiveRegionLines` + `LiveRegionLines` with **`Box`/`Text`** and Ink-driven wrapping (`width` = terminal columns). Keep **`renderer.ts`** for piped `renderFullDisplay` / `writeFullRedraw` until a later unify.
-
-**User-visible:** Possible subtle wrap/styling differences; **no** ANSI visual parity (gate 6 declined).
-
-**Verify:** Interactive Vitest + CJK/emoji; E2E as needed.
-
-**Stop if:** Ink wrapping is insufficient — document and keep a **minimal** bridge, not a second UI framework.
-
----
-
-### Phase L — `useInput` for the main command line (gates 1 & 3)
-
-**Goal:** Move typing, caret, Enter, arrows, Tab, multiline draft from **readline `keypress`** into the Ink tree. **Consistent stdin ownership** with Ink in command mode. Preserve scrollback, `INTERACTIVE_INPUT_READY_OSC`, slash suggestions, draft history, `/clear`, Ctrl+C.
-
-**User-visible:** Ideally unchanged; key/focus changes need sign-off.
-
-**Verify:** `cli/tests/interactive/*`, `interactiveCommandInput.test.ts`, E2E CLI recall.
-
----
-
-### Phase M — Confirm / session y/n on Ink input
-
-**Goal:** Drive **`ConfirmDisplay`** drafts via **`useInput`** (or ink-ui `ConfirmInput` if 1:1), removing duplicate char/backspace handling from `ttyAdapter` for those modes.
-
-**Verify:** Session y/n and stop-confirm tests + E2E.
-
----
-
-### Phase N — MCQ and token list: `useInput` inside the live subtree
-
-**Goal:** Handle **↑↓ / number / Enter / Esc** in **`McqDisplay` / `TokenListDisplay`** (or shared hook) with **callbacks** to deps; remove parallel list key branches from `ttyAdapter` when the shell is active.
-
-**Optional:** **`@inkjs/ui` `Select`** only if it **deletes** more code than it adds.
-
-**Verify:** `interactiveTtyMcq`, `interactiveTtyTokenList`, recall E2E.
-
----
-
-### Phase O (optional) — ink-ui polish
-
-**Goal:** `Spinner` / `TextInput` / etc. from **`@inkjs/ui`** only where the API maps **directly** to current behavior — no generic modal adapter.
-
----
-
-## Open after Phase I (optional — not a backlog to “close”)
-
-Phases **A–I** are **done**. Follow-up work is spelled out in **Architecture evaluation** and **Phases J+** above (layout snapshot **J**, Ink-aligned resize **J2**, default column Ink wrap **K**, stdin → `useInput` **L–N**, optional ink-ui **O**; gates 6–7 declined for now).
-
-**Historical bullets** (themes unchanged; execution path is J+):
-
-- **Stdin / input model:** → Phases **L–N**.
-- **Focus and selection UX:** → Phases **L–N**.
-- **Layout / paint:** → Phases **J** (snapshot per `drawBox`), **J2** (Ink-aligned resize), **K** (default column Ink wrap).
-- **Components:** → Phase **O** (optional).
-- **Look:** declined (gate 6).
-- **Logging:** deferred (gate 7).
-
----
-
 ## Notes
 
-- **Ordering:** Phases A–D were the safe **extract-and-thin-adapter** path; E–I added Ink and the shell. **Phases A–I are complete.** **J+** are **planned only** until executed.
-- **Conflicts:** Any future change that would alter PTY/E2E-visible behavior without product sign-off should still stop at the nearest **decision gate** above or a **Phase J+ Stop if** note.
+- **Ordering:** Phases A–D deliver a safe **extract-and-thin-adapter** path even if Ink is deferred; E–I require the **decision gates** to be closed. **Next:** Phase I (consolidation / dead-code pass).
+- **Conflicts:** Any phase that would change PTY/E2E-visible behavior without product sign-off should stop at the nearest **decision gate** above.

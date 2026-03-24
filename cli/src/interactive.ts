@@ -36,7 +36,7 @@ import {
   dispatchRecallSessionConfirmKey,
   recallStopConfirmViewModelForContext,
   parseRecallSessionYesNoSubmit,
-} from './interactions/sessionYesNoInteraction.js'
+} from './interactions/recallSessionConfirmInteraction.js'
 import {
   buildSuggestionLines,
   formatMcqChoiceLines,
