@@ -124,9 +124,6 @@ function interactive() {
     pressEnter() {
       applyInteractiveCliPtyKeystroke({ kind: 'enter' })
     },
-    pressEsc() {
-      applyInteractiveCliPtyKeystroke({ kind: 'escape' })
-    },
     typeRawKey(char: string) {
       applyInteractiveCliPtyKeystroke({ kind: 'rawKey', char })
     },

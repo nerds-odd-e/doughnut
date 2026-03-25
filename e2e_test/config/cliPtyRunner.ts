@@ -1,6 +1,6 @@
 /**
  * Runs the Doughnut CLI in a pseudo-terminal (PTY) for interactive E2E tests.
- * Uses @lydell/node-pty so that keypress handling (ESC, arrows, etc.) works.
+ * Uses @lydell/node-pty so that keypress handling (arrows, list keys, etc.) works.
  */
 
 import type { IPty } from '@lydell/node-pty'
@@ -359,8 +359,6 @@ export async function applyInteractiveCliPtyKeystroke(
       return ptyWriteDraftThenCarriageReturnAndWait(`${keystroke.commandLine} `)
     case 'enter':
       return ptyWritePayloadAndWaitForInputReady('\r')
-    case 'escape':
-      return ptyWritePayloadAndWaitForInputReady('\x1b')
     case 'rawKey': {
       if (keystroke.char.length !== 1) {
         throw new Error(

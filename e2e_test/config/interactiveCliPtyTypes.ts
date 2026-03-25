@@ -23,7 +23,6 @@ export type InteractiveCliPtyKeystroke =
       text: string
     }
   | { kind: 'enter' }
-  | { kind: 'escape' }
   | {
       /** One UTF-16 code unit, sent alone (no Enter). For list modes that cancel on “other keys”. */
       kind: 'rawKey'
