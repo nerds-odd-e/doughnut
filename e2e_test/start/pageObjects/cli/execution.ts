@@ -127,9 +127,10 @@ function interactive() {
     typeRawKey(char: string) {
       applyInteractiveCliPtyKeystroke({ kind: 'rawKey', char })
     },
+    /** Recall Ink y/n: one keypress (a separate Enter would mean “no”). */
     answerToPrompt(answer: string, expectedPromptText: string) {
       currentGuidance().expectContains(expectedPromptText)
-      applyInteractiveCliPtyKeystroke({ kind: 'line', text: answer })
+      applyInteractiveCliPtyKeystroke({ kind: 'rawKey', char: answer })
     },
     inputDownArrowSelection(commandLine: string) {
       cy.task<string>(INTERACTIVE_CLI_PTY_KEYSTROKE_TASK, {
