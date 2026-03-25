@@ -11,7 +11,7 @@ import {
   interactiveDocs,
   type CommandDoc,
 } from '../src/help.js'
-import { run } from '../src/index.js'
+import { run } from '../src/run.js'
 
 describe('formatHelp', () => {
   test('includes all command names', () => {

@@ -1,6 +1,6 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { formatHelp, INTERACTIVE_ONLY_REJECTION_MESSAGE } from '../src/help.js'
-import { run } from '../src/index.js'
+import { run } from '../src/run.js'
 import { formatVersionOutput } from '../src/version.js'
 
 describe('CLI', () => {
