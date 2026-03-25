@@ -87,7 +87,7 @@ After each phase: **delete dead code** that only served the old path; **delete o
 | Confirm / session y/n in the TTY path | **Done** (mechanism deps + Ink `ConfirmDisplay` in shell) |
 | Business importing **`renderer`** only where needed | **Done** (Phase D); `interactive.ts` keeps a small renderer surface for prompts / redraw helpers |
 | Legacy full-screen repaint + mode wiring | **Done** (Phase H shell + Phase I cleanup) |
-| Imperative caret CSI + pre-rerender cursor restore (Ink log-update mismatch) | **Interim** — remove in **J2** (after unmount-erase fix **J1**) |
+| Imperative caret CSI + pre-rerender cursor restore (Ink log-update mismatch) | **Interim** — remove in **J2** (**J1** unmount-erase fix **done**) |
 | Scattered `stdout.write` for interactive mode (vs one thin OSC/lifecycle layer) | **K** (after **J**) |
 
 ---
@@ -288,33 +288,24 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
-### Phase J1 — Fix unmount-erase lifecycle
+### Phase J1 — Fix unmount-erase lifecycle — **done**
 
 **Goal:** Ensure the "empty Enter → unmount + remount" path correctly erases the live region before the new render. **Prerequisite for J2; do not mix with caret changes.**
 
-**The change (one line in `ttyAdapter`):** Add `shellInstance.clear()` before `shellInstance.unmount()` in the empty Enter path:
+**Delivered**
 
-```typescript
-if (input.trim() === '' && shellInstance) {
-  shellInstance.clear()   // erases live region: log.clear() → eraseLines(previousLineCount)
-  shellInstance.unmount()
-  shellInstance = null
-}
-drawBox()
-```
+- **`ttyAdapter.ts`:** `shellInstance.clear()` before `shellInstance.unmount()` when `input.trim() === '' && shellInstance` (empty Enter path), so Ink’s live region is erased (`log.clear()` → `eraseLines(previousLineCount)`) before internal state reset and remount.
 
 **Verify with both test surfaces — both are required:**
 - Vitest `after /clear, Enter on empty input does not show duplicate input box top border` and companion test — 1 box in the fresh render output.
-- **E2E `After /clear, Enter on empty input does not show duplicate top border`** — 1 box in the full accumulated PTY grid. **This is the definitive test for this bug class.**
+- **E2E `After /clear, Enter on empty input does not show duplicate top border`** (`e2e_test/features/cli/cli_interactive_mode.feature`) — 1 box in the full accumulated PTY grid. **This is the definitive test for this bug class.**
 - `pnpm cli:test` full suite green.
-
-**No other changes in J1.** Do not touch cursor CSI code or introduce `CommandLineLivePanel`.
 
 ---
 
 ### Phase J2 — Reverse-video caret inside the Ink tree
 
-**Goal:** Replace the hardware cursor in the input box with a reverse-video character rendered inside a new `CommandLineLivePanel` component. Switch to always `HIDE_CURSOR`. Remove `positionCursorInInputBox`, `restoreCursorRowAfterInteractiveCaretPlacement`, and `lastLiveRegionCaretDelta`. **Only attempt after J1 is confirmed green on both Vitest and E2E.**
+**Goal:** Replace the hardware cursor in the input box with a reverse-video character rendered inside a new `CommandLineLivePanel` component. Switch to always `HIDE_CURSOR`. Remove `positionCursorInInputBox`, `restoreCursorRowAfterInteractiveCaretPlacement`, and `lastLiveRegionCaretDelta`. **Prerequisite:** J1 (Vitest + E2E) — **done**.
 
 **Decision gates to close before/during J2**
 
@@ -404,9 +395,9 @@ Post–Phase I review of the `cli/` subproject against the north star and open g
 
 ---
 
-## Phases J+ (planned — not started)
+## Phases J+ (J1 done; J2 onward planned)
 
-**Order:** fix unmount-erase lifecycle (J1) → reverse-video caret (J2) → single layout snapshot (J3) → **terminal resize (Ink-aligned, J4)** → Ink wrap for default column (K) → stdin/`useInput` migration → confirm → lists → optional ink-ui polish.
+**Order:** ~~fix unmount-erase lifecycle (J1)~~ **done** → reverse-video caret (J2) → single layout snapshot (J3) → **terminal resize (Ink-aligned, J4)** → Ink wrap for default column (K) → stdin/`useInput` migration → confirm → lists → optional ink-ui polish.
 
 ### Phase J3 — One live layout snapshot per `drawBox`
 
@@ -480,13 +471,13 @@ Post–Phase I review of the `cli/` subproject against the north star and open g
 
 ## Open after Phase I (optional — not a backlog to “close”)
 
-Phases **A–I** are **done**. Follow-up work is spelled out in **Architecture evaluation** and **Phases J+** above (unmount-erase fix **J1**, reverse-video caret **J2**, layout snapshot **J3**, Ink-aligned resize **J4**, default column Ink wrap **K**, stdin → `useInput` **L–N**, optional ink-ui **O**; gates 6–7 declined for now).
+Phases **A–I** are **done**; **J1** (unmount-erase) is **done**. Follow-up work is spelled out in **Architecture evaluation** and **Phases J+** above (reverse-video caret **J2**, layout snapshot **J3**, Ink-aligned resize **J4**, default column Ink wrap **K**, stdin → `useInput` **L–N**, optional ink-ui **O**; gates 6–7 declined for now).
 
 **Historical bullets** (themes unchanged; execution path is J+):
 
 - **Stdin / input model:** → Phases **L–N**.
 - **Focus and selection UX:** → Phases **L–N**.
-- **Layout / paint:** → Phases **J1** (unmount-erase fix), **J2** (reverse-video caret), **J3** (snapshot per `drawBox`), **J4** (Ink-aligned resize), **K** (default column Ink wrap).
+- **Layout / paint:** → **J1** done; **J2** (reverse-video caret), **J3** (snapshot per `drawBox`), **J4** (Ink-aligned resize), **K** (default column Ink wrap).
 - **Components:** → Phase **O** (optional).
 - **Look:** declined (gate 6).
 - **Logging:** deferred (gate 7).
@@ -495,5 +486,5 @@ Phases **A–I** are **done**. Follow-up work is spelled out in **Architecture e
 
 ## Notes
 
-- **Ordering:** Phases A–D delivered a safe **extract-and-thin-adapter** path; E–I added Ink and the shell. **Phases A–I are complete** on `main`. **Next:** Phase **J1** (fix unmount-erase lifecycle), then **J2** (reverse-video caret — removes interim cursor CSI), then **J3/J4** (snapshot/resize), then **K** (single stdout/OSC owner). This file stays as reference until you archive it.
+- **Ordering:** Phases A–D delivered a safe **extract-and-thin-adapter** path; E–I added Ink and the shell. **Phases A–I are complete** on `main`; **J1** (unmount-erase before empty-Enter remount) is **done**. **Next:** **J2** (reverse-video caret — removes interim cursor CSI), then **J3/J4** (snapshot/resize), then **K** (single stdout/OSC owner). This file stays as reference until you archive it.
 - **Conflicts:** Any future change that would alter PTY/E2E-visible behavior without product sign-off should still stop at the nearest **decision gate** above.

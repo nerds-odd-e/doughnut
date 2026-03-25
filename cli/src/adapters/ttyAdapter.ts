@@ -1182,6 +1182,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         }
         if (input.trim() === '' && shellInstance) {
           lastLiveRegionCaretDelta = 0
+          shellInstance.clear()
           shellInstance.unmount()
           shellInstance = null
         }
