@@ -12,7 +12,7 @@ Interactive TTY = **one Ink `render()`** root (`InteractiveShellDisplay`: **`Sta
 
 **Adapter rule:** `ttyAdapter` must **not** branch on product concepts (*recall*, *MCQ*, …). Only **mechanism** `TTYDeps` from `interactive.ts` (`buildTTYDeps()`).
 
-**Layout bridge:** `cli/src/renderer.ts` — grapheme-aware width/wrap where Ink’s `Text` is insufficient (especially **piped** until parity is proven).
+**Layout bridge:** `cli/src/renderer.ts` — grapheme-aware width/wrap for **piped** `writeFullRedraw` and for structures that must stay column-exact (input box via `renderBox` / `truncateToWidth`). TTY default live **current guidance** + optional **current prompt** use Ink wrap (phase 1).
 
 **Raw stdout:** Interactive glue lives in **`cli/src/adapters/interactiveTtyStdout.ts`** (OSC, cursor, clear, exit farewell). Ink still renders the live tree on its own stream.
 
@@ -44,9 +44,9 @@ Interactive TTY = **one Ink `render()`** root (`InteractiveShellDisplay`: **`Sta
 1. Single Ink root vs islands / hybrid — **stdin ownership**
 2. **`Static`** vs rewriting old history lines
 3. **`useFocus`** / Tab vs ↑↓ in guidance / selection mode
-4. Ink `Text` wrap vs `renderer.ts` grapheme wrap (**CJK/emoji**)
+4. Ink `Text` wrap vs `renderer.ts` grapheme wrap (**CJK/emoji**) — **resolved:** TTY default live column uses Ink `Text` `wrap` inside `Box width={terminalWidth}` for current prompt + guidance; piped path unchanged (`buildLiveRegionLines`, `buildSuggestionLines`). Subtle wrap differences vs grapheme-aware wrap accepted (gate 6).
 5. **`@inkjs/ui`** vs hand-rolled `useInput`
-6. Visual parity (stage band, borders) — **currently declined**; slimmer Ink look OK
+6. Visual parity (stage band, borders) — **declined** for this migration; slimmer Ink look OK
 7. **`patchConsole`** / `console.log` vs layout corruption
 
 ---
@@ -55,19 +55,18 @@ Interactive TTY = **one Ink `render()`** root (`InteractiveShellDisplay`: **`Sta
 
 Ink shell, neutral `TTYDeps`, confirm/MCQ/token/fetch-wait display components, **J1** empty-Enter path **`shellInstance.clear()` before `unmount()`** (avoids stacked boxes — **E2E** `cli_interactive_mode` is the strong check), reverse-video caret in **`CommandLineLivePanel`**, one layout snapshot per `drawBox`, resize → rerender without full-screen clear, **`interactiveTtyStdout`** as single owner of adapter `stdout` writes.
 
+### Phase 1 (done) — default live column: Ink `Box` / `Text` wrap
+
+- **`CommandLineLivePanel`** builds the default live block in Ink (stage band, separators, optional grey current prompt, input box, guidance). No **`buildLiveRegionLinesWithCaret`** on this path; removed unused **`LiveRegionLines.tsx`**.
+- **`buildSuggestionLinesForInk`** in **`renderer.ts`**: same rows as **`buildSuggestionLines`** but no per-line **`truncateToWidth`**; **`ttyAdapter`** uses it for **`CommandLineLivePanel`** props. Piped **`writeFullRedraw`** still uses **`buildLiveRegionLines`** + **`buildSuggestionLines`** (grapheme-aware).
+- **Ink note:** this Ink version’s **`Text`** has no `width` prop — wrap width comes from a parent **`Box width={terminalWidth}`** per wrappable block. Do **not** put **`width={terminalWidth}`** on the **root** live column **`Box`** (breaks resize: box border stayed at old columns when **`stdout.columns`** changed in Vitest).
+- **Verify:** `pnpm cli:test`; **`renderer.test.ts`** covers **`buildSuggestionLinesForInk`**.
+
 ---
 
-## Future phases (numbered)
+## Remaining phases (numbered)
 
-**Order:** **1 → 2 → 3 → 4 → 5 (optional) → 6**
-
-### Phase 1 — Default live column: Ink `Box`/`Text` wrap (gate 4)
-
-Replace default **`buildLiveRegionLines` + `LiveRegionLines`** with Ink layout and **`Text` `wrap`** at terminal width. Keep **`renderer.ts`** for piped **`writeFullRedraw`** until/unless you unify.
-
-- **User-visible:** Possible subtle wrap differences (gate 6 declined).
-- **Verify:** `pnpm cli:test` (interactive + CJK/emoji if you touch width); E2E CLI if behavior shifts.
-- **Stop if:** Ink wrapping cannot match — document minimal `renderer.ts` bridge.
+**Order:** **2 → 3 → 4 → 5 (optional) → 6** (phase 1 done)
 
 ### Phase 2 — `useInput` for main command line (gates 1 & 3)
 
@@ -91,7 +90,7 @@ Drive **`ConfirmDisplay`** via **`useInput`** (or **`@inkjs/ui` `ConfirmInput`**
 
 ### Phase 6 — Ink-idiomatic stdout (shrink `interactiveTtyStdout`)
 
-After phase 1 (and ideally **2–4**), reduce raw **`process.stdout.write`** using Ink-supported patterns: e.g. **`render(..., { stdout })`** via a thin **`Writable`**, **`Static`** for append-only exit tails if PTY rules allow, cursor/show-hide via the unified input path, revisit **gate 7** if it removes duplicate prompt logging **without** corrupting layout.
+After **2–4** (and with phase 1 done for default live wrap), reduce raw **`process.stdout.write`** using Ink-supported patterns: e.g. **`render(..., { stdout })`** via a thin **`Writable`**, **`Static`** for append-only exit tails if PTY rules allow, cursor/show-hide via the unified input path, revisit **gate 7** if it removes duplicate prompt logging **without** corrupting layout.
 
 - **Expect residue:** Private OSC (**`INTERACTIVE_INPUT_READY_OSC`**) may stay documented in a tiny layer.
 - **Verify:** Interactive Vitest + E2E for history and OSC ordering.

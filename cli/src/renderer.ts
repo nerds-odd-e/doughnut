@@ -450,20 +450,22 @@ export function renderPastInput(input: string, width: TerminalWidth): string {
   return [emptyRow, ...contentRows, emptyRow, ''].join('\n')
 }
 
-export function highlightRecognizedCommand(line: string): string {
-  if (!line.startsWith('/')) return line
-
+/** UTF-16 length of longest `interactiveDocs` usage prefix matching `line` when it starts with `/`; else 0. */
+function slashCommandHighlightUtf16Length(line: string): number {
+  if (!line.startsWith('/')) return 0
   const usages = interactiveDocs.map((d) => d.usage)
   let highlightLen = 0
-
   for (const cmd of usages) {
     if (line.startsWith(cmd)) {
       highlightLen = Math.max(highlightLen, cmd.length)
     }
   }
+  return highlightLen
+}
 
+export function highlightRecognizedCommand(line: string): string {
+  const highlightLen = slashCommandHighlightUtf16Length(line)
   if (highlightLen === 0) return line
-
   const prefix = line.slice(0, highlightLen)
   const rest = line.slice(highlightLen)
   return `${COMMAND_HIGHLIGHT}${prefix}${RESET}${rest}`
@@ -478,6 +480,17 @@ export type LiveRegionPaintOptions = BuildBoxLinesOptions & {
   omitLiveRegion?: boolean
 }
 
+function inputBoxLinePrefix(
+  lineIndex: number,
+  context: PlaceholderContext
+): string {
+  return isGreyDisabledInputChrome(context)
+    ? ''
+    : lineIndex === 0
+      ? PROMPT
+      : '  '
+}
+
 export function buildBoxLines(
   buffer: string,
   width: TerminalWidth,
@@ -487,11 +500,7 @@ export function buildBoxLines(
   const context = options?.placeholderContext ?? 'default'
   const placeholder = PLACEHOLDER_BY_CONTEXT[context]
   return bufferLines.map((line, i) => {
-    const prefix = isGreyDisabledInputChrome(context)
-      ? ''
-      : i === 0
-        ? PROMPT
-        : '  '
+    const prefix = inputBoxLinePrefix(i, context)
     if (i === 0 && buffer === '') {
       return `${prefix}${GREY}${placeholder}${RESET}`
     }
@@ -539,13 +548,7 @@ function buildLineWithCaret(line: string, offsetInLine: number): string {
   if (!line.startsWith('/')) {
     return plainInsertCaret(line, offsetInLine)
   }
-  const usages = interactiveDocs.map((d) => d.usage)
-  let highlightLen = 0
-  for (const cmd of usages) {
-    if (line.startsWith(cmd)) {
-      highlightLen = Math.max(highlightLen, cmd.length)
-    }
-  }
+  const highlightLen = slashCommandHighlightUtf16Length(line)
   if (highlightLen === 0) {
     return plainInsertCaret(line, offsetInLine)
   }
@@ -577,11 +580,7 @@ export function buildBoxLinesWithCaret(
   const context = options?.placeholderContext ?? 'default'
   const placeholder = PLACEHOLDER_BY_CONTEXT[context]
   return bufferLines.map((line, i) => {
-    const prefix = isGreyDisabledInputChrome(context)
-      ? ''
-      : i === 0
-        ? PROMPT
-        : '  '
+    const prefix = inputBoxLinePrefix(i, context)
     let inner: string
     if (i === 0 && buffer === '') {
       inner =
@@ -620,13 +619,10 @@ export function needsGapBeforeBox(
   )
 }
 
-export function buildLiveRegionLines(
-  buffer: string,
+function buildLiveRegionLinesAboveInputBox(
   width: TerminalWidth,
   currentPromptWrappedLines: string[],
-  suggestionLines: string[],
-  currentStageIndicatorLines: string[],
-  options?: LiveRegionPaintOptions
+  currentStageIndicatorLines: string[]
 ): string[] {
   const lines: string[] = []
   const hasStageIndicator = currentStageIndicatorLines.length > 0
@@ -644,16 +640,37 @@ export function buildLiveRegionLines(
       lines.push(`${GREY}${line}${RESET}`)
     }
   }
+  return lines
+}
+
+function maybeGreyDisabledBoxLines(
+  rawBoxLines: string[],
+  options?: LiveRegionPaintOptions
+): string[] {
+  return options?.placeholderContext &&
+    isGreyDisabledInputChrome(options.placeholderContext)
+    ? grayDisabledInputBoxLines(rawBoxLines)
+    : rawBoxLines
+}
+
+export function buildLiveRegionLines(
+  buffer: string,
+  width: TerminalWidth,
+  currentPromptWrappedLines: string[],
+  suggestionLines: string[],
+  currentStageIndicatorLines: string[],
+  options?: LiveRegionPaintOptions
+): string[] {
+  const lines = buildLiveRegionLinesAboveInputBox(
+    width,
+    currentPromptWrappedLines,
+    currentStageIndicatorLines
+  )
   const rawBoxLines = renderBox(
     buildBoxLines(buffer, width, options),
     width
   ).split('\n')
-  const boxLines =
-    options?.placeholderContext &&
-    isGreyDisabledInputChrome(options.placeholderContext)
-      ? grayDisabledInputBoxLines(rawBoxLines)
-      : rawBoxLines
-  lines.push(...boxLines)
+  lines.push(...maybeGreyDisabledBoxLines(rawBoxLines, options))
   lines.push(...suggestionLines)
   return lines
 }
@@ -668,32 +685,16 @@ export function buildLiveRegionLinesWithCaret(
   currentStageIndicatorLines: string[],
   options?: LiveRegionPaintOptions
 ): string[] {
-  const lines: string[] = []
-  const hasStageIndicator = currentStageIndicatorLines.length > 0
-  if (hasStageIndicator) {
-    for (const ind of currentStageIndicatorLines) {
-      lines.push(formatCurrentStageIndicatorLine(ind, width))
-    }
-    lines.push(buildCurrentPromptSeparatorForStageBand(width))
-  }
-  if (currentPromptWrappedLines.length > 0) {
-    if (!hasStageIndicator) {
-      lines.push(buildCurrentPromptSeparator(width))
-    }
-    for (const line of currentPromptWrappedLines) {
-      lines.push(`${GREY}${line}${RESET}`)
-    }
-  }
+  const lines = buildLiveRegionLinesAboveInputBox(
+    width,
+    currentPromptWrappedLines,
+    currentStageIndicatorLines
+  )
   const rawBoxLines = renderBox(
     buildBoxLinesWithCaret(buffer, width, caretOffset, options),
     width
   ).split('\n')
-  const boxLines =
-    options?.placeholderContext &&
-    isGreyDisabledInputChrome(options.placeholderContext)
-      ? grayDisabledInputBoxLines(rawBoxLines)
-      : rawBoxLines
-  lines.push(...boxLines)
+  lines.push(...maybeGreyDisabledBoxLines(rawBoxLines, options))
   lines.push(...suggestionLines)
   return lines
 }
@@ -779,6 +780,29 @@ export function recallMcqCurrentGuidanceLines(
   )
 }
 
+type SuggestionMode =
+  | { kind: 'commandsHint' }
+  | {
+      kind: 'completion'
+      filtered: ReturnType<typeof filterCommandsByPrefix>
+    }
+
+function suggestionModeFromBuffer(
+  buffer: string,
+  options?: { forceCommandsHint?: boolean }
+): SuggestionMode {
+  const lastLine = getLastLine(buffer)
+  const showHint =
+    options?.forceCommandsHint ||
+    !lastLine.startsWith('/') ||
+    lastLine.endsWith(' ')
+  if (showHint) return { kind: 'commandsHint' }
+  return {
+    kind: 'completion',
+    filtered: filterCommandsByPrefix(interactiveDocs, lastLine),
+  }
+}
+
 /** Returns lines for Current guidance (command completion or / commands hint). */
 export function buildSuggestionLines(
   buffer: string,
@@ -786,17 +810,12 @@ export function buildSuggestionLines(
   width: TerminalWidth,
   options?: { forceCommandsHint?: boolean }
 ): string[] {
-  const lastLine = getLastLine(buffer)
-  const showHint =
-    options?.forceCommandsHint ||
-    !lastLine.startsWith('/') ||
-    lastLine.endsWith(' ')
-  if (showHint) {
+  const mode = suggestionModeFromBuffer(buffer, options)
+  if (mode.kind === 'commandsHint') {
     return [truncateToWidth(COMMANDS_HINT, width)]
   }
-  const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
   return renderCurrentGuidanceForSelectableLines(
-    formatCommandCompletionLines(filtered),
+    formatCommandCompletionLines(mode.filtered),
     highlightIndex,
     width
   )
@@ -811,17 +830,12 @@ export function buildSuggestionLinesForInk(
   highlightIndex: number,
   options?: { forceCommandsHint?: boolean }
 ): string[] {
-  const lastLine = getLastLine(buffer)
-  const showHint =
-    options?.forceCommandsHint ||
-    !lastLine.startsWith('/') ||
-    lastLine.endsWith(' ')
-  if (showHint) {
+  const mode = suggestionModeFromBuffer(buffer, options)
+  if (mode.kind === 'commandsHint') {
     return [COMMANDS_HINT]
   }
-  const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
   return formatHighlightedList(
-    formatCommandCompletionLines(filtered),
+    formatCommandCompletionLines(mode.filtered),
     CURRENT_GUIDANCE_MAX_VISIBLE,
     highlightIndex
   )
