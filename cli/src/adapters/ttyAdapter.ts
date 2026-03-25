@@ -53,13 +53,10 @@ import {
 } from '../interactions/selectListInteraction.js'
 import {
   applyChatHistoryOutputTone,
-  buildBoxLines,
   buildCurrentPromptSeparator,
-  buildLiveRegionLines,
   buildSuggestionLines,
   buildTokenListLines,
   CLEAR_SCREEN,
-  countPromptBlockLinesAboveInputBoxTop,
   DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
   getLastLine,
   getTerminalWidth,
@@ -70,9 +67,7 @@ import {
   INTERACTIVE_INPUT_READY_OSC,
   interactiveInputReadyOscSuffix,
   isCommittedInteractiveInput,
-  isGreyDisabledInputChrome,
   needsGapBeforeBox,
-  PROMPT,
   recallMcqCurrentGuidanceLines,
   renderPastInput,
   SHOW_CURSOR,
@@ -86,10 +81,10 @@ import type {
   ChatHistoryOutputTone,
   OutputAdapter,
 } from '../types.js'
+import { CommandLineLivePanel } from '../ui/CommandLineLivePanel.js'
 import { ConfirmDisplay } from '../ui/ConfirmDisplay.js'
 import { FetchWaitDisplay } from '../ui/FetchWaitDisplay.js'
 import { InteractiveShellDisplay } from '../ui/InteractiveShellDisplay.js'
-import { LiveRegionLines } from '../ui/LiveRegionLines.js'
 import { McqDisplay } from '../ui/McqDisplay.js'
 import { TokenListDisplay } from '../ui/TokenListDisplay.js'
 
@@ -147,21 +142,12 @@ type TokenSelectionState = {
 /** One submitted command's buffered scrollback: lines + dominant tone for `commitHistoryOutput`. */
 type BufferedCommandTurn = { lines: string[]; tone: ChatHistoryOutputTone }
 
-/**
- * Measured live region for one paint: Current prompt, input box, and Current guidance
- * (same inputs as {@link buildLiveRegionLines} / full-display tail).
- */
+/** Measured live region for one paint: props for {@link CommandLineLivePanel} and shell gap. */
 type LiveRegionLayout = {
   currentPromptWrappedLines: string[]
-  currentPromptLines: number
   suggestionLines: string[]
   currentStageIndicatorLines: string[]
   placeholderContext: PlaceholderContext
-  liveLines: string[]
-  /** Line count of the live block (used for CUU cursor positioning). */
-  liveLineCount: number
-  /** Rows from live block top to the input line (prompt + box content lines). */
-  inputLineRowInLiveBlock: number
   terminalWidth: number
 }
 
@@ -262,20 +248,10 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
 
   // --- Ink shell: Static history + live panel (Phase H) ---
   let shellInstance: ReturnType<typeof render> | null = null
-  /** Vertical offset last applied in {@link positionCursorInInputBox} (CUU positive, CUD negative). Reset before each rerender so Ink log-update matches the cursor row it expects. */
-  let lastLiveRegionCaretDelta = 0
   let stopConfirmDraft = ''
   let stopConfirmHint = ''
   let sessionYesNoDraft = ''
   let sessionYesNoHint = ''
-
-  function restoreCursorRowAfterInteractiveCaretPlacement(): void {
-    if (lastLiveRegionCaretDelta === 0) return
-    if (lastLiveRegionCaretDelta > 0)
-      process.stdout.write(`\x1b[${lastLiveRegionCaretDelta}B`)
-    else process.stdout.write(`\x1b[${-lastLiveRegionCaretDelta}A`)
-    lastLiveRegionCaretDelta = 0
-  }
 
   function patchStdinForInk(
     stream: NodeJS.ReadableStream & { ref?: () => void; unref?: () => void }
@@ -309,8 +285,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       process.stdout.write(INTERACTIVE_INPUT_READY_OSC)
       return
     }
-    const layout = measureLiveRegionLayout()
-    finalizeInteractiveLiveRegionPaint(layout)
+    finalizeInteractiveLiveRegionPaint()
   }
 
   function buildLivePanel(): React.ReactElement {
@@ -376,7 +351,15 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       })
     }
     const layout = measureLiveRegionLayout()
-    return React.createElement(LiveRegionLines, { lines: layout.liveLines })
+    return React.createElement(CommandLineLivePanel, {
+      buffer: commandInput.lineDraft,
+      caretOffset: commandInput.caretOffset,
+      width: layout.terminalWidth,
+      currentPromptWrappedLines: layout.currentPromptWrappedLines,
+      suggestionLines: layout.suggestionLines,
+      currentStageIndicatorLines: layout.currentStageIndicatorLines,
+      placeholderContext: layout.placeholderContext,
+    })
   }
 
   function buildShellTree(): React.ReactElement {
@@ -400,10 +383,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       unref?: () => void
     }
     patchStdinForInk(stdinForInk)
-    if (shellInstance && lastLiveRegionCaretDelta !== 0) {
-      process.stdout.write(HIDE_CURSOR)
-      restoreCursorRowAfterInteractiveCaretPlacement()
-    }
     const tree = buildShellTree()
     if (!shellInstance) {
       shellInstance = render(tree, {
@@ -483,9 +462,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     const stopConfirmDisplay = isPendingStopConfirmation()
       ? getStopConfirmationLiveView(placeholderContext)
       : null
-    const contentLines = buildBoxLines(commandInput.lineDraft, width, {
-      placeholderContext,
-    })
     const numberedChoicePromptLines =
       getNumberedChoiceListCurrentPromptWrappedLines(width)
     const waitLine = getInteractiveFetchWaitLine()
@@ -517,10 +493,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       tokenListConfig,
       isInCommandSessionSubstate()
     )
-    const currentPromptLines = countPromptBlockLinesAboveInputBoxTop(
-      currentStageIndicatorLines,
-      currentPromptWrappedLines
-    )
     const numberedChoices = getNumberedChoiceListChoices()
     const suggestionLines = tokenSelection
       ? buildTokenListLines(
@@ -548,94 +520,32 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
               }
             )
     return {
-      contentLines,
       currentPromptWrappedLines,
-      currentPromptLines,
       suggestionLines,
       currentStageIndicatorLines,
       placeholderContext,
     }
   }
 
-  /** Row index of input box content from top of drawn area. Used for cursor positioning. */
-  const inputRowFromTop = (
-    currentPromptLines: number,
-    contentLinesLength: number
-  ) => currentPromptLines + contentLinesLength
-
   function measureLiveRegionLayout(): LiveRegionLayout {
     const {
-      contentLines,
       currentPromptWrappedLines,
-      currentPromptLines,
       suggestionLines,
       currentStageIndicatorLines,
       placeholderContext,
     } = getDisplayContent()
-    const terminalWidth = getTerminalWidth()
-    const liveLines = buildLiveRegionLines(
-      commandInput.lineDraft,
-      terminalWidth,
-      currentPromptWrappedLines,
-      suggestionLines,
-      currentStageIndicatorLines,
-      { placeholderContext }
-    )
     return {
       currentPromptWrappedLines,
-      currentPromptLines,
       suggestionLines,
       currentStageIndicatorLines,
       placeholderContext,
-      liveLines,
-      liveLineCount: liveLines.length,
-      inputLineRowInLiveBlock: inputRowFromTop(
-        currentPromptLines,
-        contentLines.length
-      ),
-      terminalWidth,
+      terminalWidth: getTerminalWidth(),
     }
   }
 
-  /**
-   * After Ink writes the live region, the terminal cursor is typically on the line *after* the last
-   * rendered row (trailing newline). CHA (`G`) only moves along the current row — emit CUU/CUD
-   * first so the row matches the bordered input line (`buildLiveRegionLines` layout).
-   */
-  const positionCursorInInputBox = (layout: LiveRegionLayout) => {
-    const { lineDraft, caretOffset } = commandInput
-    let row = 0
-    let col = 0
-    for (let i = 0; i < caretOffset; i++) {
-      if (lineDraft[i] === '\n') {
-        row++
-        col = 0
-      } else {
-        col++
-      }
-    }
-    const deltaFromInkEndToCaretRow =
-      layout.liveLineCount - layout.currentPromptLines - 1 - row
-    lastLiveRegionCaretDelta = deltaFromInkEndToCaretRow
-    if (deltaFromInkEndToCaretRow > 0)
-      process.stdout.write(`\x1b[${deltaFromInkEndToCaretRow}A`)
-    else if (deltaFromInkEndToCaretRow < 0)
-      process.stdout.write(`\x1b[${-deltaFromInkEndToCaretRow}B`)
-    const prefixLen = row === 0 ? PROMPT.length : 2
-    const colG = 3 + prefixLen + col
-    process.stdout.write(`\x1b[${colG}G`)
-  }
-
-  /** Cursor visibility and column, then `INTERACTIVE_INPUT_READY_OSC` when the box accepts input. */
-  function finalizeInteractiveLiveRegionPaint(layout: LiveRegionLayout): void {
-    const { placeholderContext } = layout
-    if (isGreyDisabledInputChrome(placeholderContext)) {
-      process.stdout.write(HIDE_CURSOR)
-      lastLiveRegionCaretDelta = 0
-    } else {
-      process.stdout.write(SHOW_CURSOR)
-      positionCursorInInputBox(layout)
-    }
+  /** Hardware cursor stays hidden; caret is reverse-video inside Ink. Then input-ready OSC when applicable. */
+  function finalizeInteractiveLiveRegionPaint(): void {
+    process.stdout.write(HIDE_CURSOR)
     process.stdout.write(
       interactiveInputReadyOscSuffix({
         lineDraft: commandInput.lineDraft,
@@ -646,7 +556,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
 
   function doFullRedraw() {
     process.stdout.write(CLEAR_SCREEN)
-    lastLiveRegionCaretDelta = 0
     if (shellInstance) {
       shellInstance.unmount()
       shellInstance = null
@@ -731,7 +640,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       chatHistory = []
       resetLiveLineDraftAndSlashSuggestions()
       tokenSelection = null
-      lastLiveRegionCaretDelta = 0
       if (shellInstance) {
         shellInstance.unmount()
         shellInstance = null
@@ -766,7 +674,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   const doExit = () => {
     stopInteractiveFetchWaitRepaintTimer()
     removeResizeListener()
-    lastLiveRegionCaretDelta = 0
     if (shellInstance) {
       shellInstance.unmount()
       shellInstance = null
@@ -1181,7 +1088,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           numberedChoiceHighlightIndex = 0
         }
         if (input.trim() === '' && shellInstance) {
-          lastLiveRegionCaretDelta = 0
           shellInstance.clear()
           shellInstance.unmount()
           shellInstance = null

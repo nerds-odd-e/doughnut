@@ -3,7 +3,6 @@ import { describe, test, expect, type vi, beforeEach, afterEach } from 'vitest'
 import { stripAnsi, stripAnsiCsiAndCr } from '../../src/renderer.js'
 import {
   INPUT_BOX_TOP_OUTLINE_PATTERN,
-  cursorPositionAfterTtyWrites,
   liveRegionRepaintHasStaleCursorUpBeforeBoxTop,
   ttyShowCaretCuUThenInk2KEraseBeforeNextHide,
   simulatedScreenFromTtyWrites,
@@ -489,18 +488,14 @@ describe('TTY: shared interactive session', () => {
     })
   })
 
-  describe('input box cursor row (regression)', () => {
-    test('after initial paint, replayed cursor row matches the bordered prompt line (→ inside │ … │)', async () => {
+  describe('input box caret (reverse video in Ink)', () => {
+    test('after initial paint, bordered prompt line exists and stdout includes reverse-video caret', async () => {
       await tick()
       await tick()
 
       const raw = ttyOutput(writeSpy)
-      const {
-        row: cursorRow,
-        col: cursorCol,
-        lines,
-      } = cursorPositionAfterTtyWrites(raw)
-      const plainLines = lines.map((l) => stripAnsiCsiAndCr(l))
+      const visual = simulatedScreenFromTtyWrites(raw)
+      const plainLines = visual.split('\n').map((l) => stripAnsiCsiAndCr(l))
 
       let promptRow = -1
       for (let i = plainLines.length - 1; i >= 0; i--) {
@@ -520,23 +515,9 @@ describe('TTY: shared interactive session', () => {
       ).toBe(true)
 
       expect(
-        cursorRow,
-        [
-          'The interactive cursor must end on the same simulated row as the bordered prompt line (the row with "→" between "│" characters).',
-          'If the cursor is several rows lower, the adapter is probably emitting only a column move (CHA, \\x1b[nG) after Ink has already left the cursor on the last live-region line (e.g. the "/ commands" hint). CHA moves along the current row only — it does not move up into the input box.',
-          'Fix the product by restoring correct vertical positioning relative to where Ink leaves the cursor (e.g. emit CUU before CHA, or run the cursor hook in an order consistent with the final frame).',
-          `Replayed cursor: row=${cursorRow} col=${cursorCol}; expected row=${promptRow} (0-based, same coordinate space as cursorPositionAfterTtyWrites).`,
-        ].join('\n')
-      ).toBe(promptRow)
-
-      expect(
-        cursorCol,
-        [
-          'On an empty draft, the caret should sit immediately after the "→ " prefix inside the box (column index 4 in 0-based replay — CHA column 5).',
-          'If row matches but this fails, horizontal placement in positionCursorInInputBox regressed independently.',
-          `Got cursorCol=${cursorCol}.`,
-        ].join('\n')
-      ).toBe(4)
+        raw.includes('\x1b[7m'),
+        'Caret is drawn as reverse video (\\x1b[7m) inside the Ink live region; hardware cursor stays hidden.'
+      ).toBe(true)
     })
   })
 

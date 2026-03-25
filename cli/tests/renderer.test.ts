@@ -12,6 +12,8 @@ import {
   stripAnsiCsiAndCr,
   needsGapBeforeBox,
   buildLiveRegionLines,
+  buildLiveRegionLinesWithCaret,
+  buildBoxLinesWithCaret,
   CURRENT_STAGE_BAND_BACKGROUND_SGR,
   DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
   greyCurrentStageIndicatorLabel,
@@ -272,6 +274,37 @@ describe('buildLiveRegionLines', () => {
         .map((l) => stripAnsi(l))
         .join('\n')
     ).toContain('Select and enter')
+  })
+})
+
+describe('buildBoxLinesWithCaret', () => {
+  test('empty buffer: reverse-video space before grey placeholder', () => {
+    const rows = buildBoxLinesWithCaret('', 80, 0)
+    expect(rows).toHaveLength(1)
+    expect(rows[0]).toContain('\x1b[7m')
+    expect(rows[0]).toMatch(/^→ /)
+    expect(stripAnsi(rows[0])).toContain('`exit` to quit.')
+  })
+
+  test('caret at end of line: trailing reverse space', () => {
+    const rows = buildBoxLinesWithCaret('ab', 80, 2)
+    expect(rows[0]).toContain('→ ab')
+    expect(rows[0]).toContain('\x1b[7m \x1b[0m')
+  })
+
+  test('CJK: caret inverts full grapheme', () => {
+    const rows = buildBoxLinesWithCaret('aあb', 80, 1)
+    expect(rows[0]).toContain('\x1b[7mあ\x1b[0m')
+  })
+})
+
+describe('buildLiveRegionLinesWithCaret', () => {
+  test('matches buildLiveRegionLines structure with caret in box', () => {
+    const withCaret = buildLiveRegionLinesWithCaret('', 80, 0, [], [], [])
+    const plain = buildLiveRegionLines('', 80, [], [], [])
+    expect(withCaret.length).toBe(plain.length)
+    const i = withCaret.findIndex((l) => stripAnsi(l).includes('→'))
+    expect(withCaret[i]).toContain('\x1b[7m')
   })
 })
 

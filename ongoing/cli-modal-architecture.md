@@ -87,7 +87,7 @@ After each phase: **delete dead code** that only served the old path; **delete o
 | Confirm / session y/n in the TTY path | **Done** (mechanism deps + Ink `ConfirmDisplay` in shell) |
 | Business importing **`renderer`** only where needed | **Done** (Phase D); `interactive.ts` keeps a small renderer surface for prompts / redraw helpers |
 | Legacy full-screen repaint + mode wiring | **Done** (Phase H shell + Phase I cleanup) |
-| Imperative caret CSI + pre-rerender cursor restore (Ink log-update mismatch) | **Interim** — remove in **J2** (**J1** unmount-erase fix **done**) |
+| Imperative caret CSI + pre-rerender cursor restore (Ink log-update mismatch) | **Done** — **J2** (reverse-video caret; hardware cursor hidden in command line) |
 | Scattered `stdout.write` for interactive mode (vs one thin OSC/lifecycle layer) | **K** (after **J**) |
 
 ---
@@ -303,23 +303,18 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
-### Phase J2 — Reverse-video caret inside the Ink tree
+### Phase J2 — Reverse-video caret inside the Ink tree — **done**
 
 **Goal:** Replace the hardware cursor in the input box with a reverse-video character rendered inside a new `CommandLineLivePanel` component. Switch to always `HIDE_CURSOR`. Remove `positionCursorInInputBox`, `restoreCursorRowAfterInteractiveCaretPlacement`, and `lastLiveRegionCaretDelta`. **Prerequisite:** J1 (Vitest + E2E) — **done**.
 
-**Decision gates to close before/during J2**
+**Decision gates (J2 resolution):** Kept readline **`keypress`** + display-only Ink; caret is ANSI `REVERSE` inside pre-wrapped strings from **`renderer.ts`** (grapheme-aware cell); no **@inkjs/ui** `TextInput`.
 
-- **Focus model** — Ink `useFocus` / `TextInput` vs today's readline **`keypress`** path: either bridge keys into the component or migrate stdin handling (touches **single root vs stdin** gate).
-- **Wrapping** — Draft line must stay **`renderer.ts`**-aware for CJK/emoji if Ink's input does not match column semantics.
-- **ink-ui vs custom** — **@inkjs/ui** `TextInput` vs bespoke `useInput` + `Text` border (styling vs dependency).
+**Delivered**
 
-**Deliverables**
-
-- `buildBoxLinesWithCaret` in `renderer.ts` — grapheme-aware `REVERSE`-video caret insertion.
-- `CommandLineLivePanel` Ink component — renders header lines, box with caret, suggestion lines.
-- `buildLivePanel()` returns `CommandLineLivePanel` for the default branch; `finalizeInteractiveLiveRegionPaint` always `HIDE_CURSOR`.
-- Delete `positionCursorInInputBox`, `restoreCursorRowAfterInteractiveCaretPlacement`, and related state in `ttyAdapter`.
-- **Regression:** `ttyShowCaretCuUThenInk2KEraseBeforeNextHide` must return false. E2E full CLI suite green.
+- **`renderer.ts`:** `buildBoxLinesWithCaret`, `buildLiveRegionLinesWithCaret` (grapheme-aware caret; slash-command highlight split preserved).
+- **`cli/src/ui/CommandLineLivePanel.tsx`:** default live panel; **`buildLivePanel()`** uses it instead of `LiveRegionLines`.
+- **`ttyAdapter.ts`:** `finalizeInteractiveLiveRegionPaint()` always **`HIDE_CURSOR`** + input-ready OSC; removed manual `CUU`/`CHA` caret path and `lastLiveRegionCaretDelta` / pre-rerender restore.
+- **Tests:** `ttyShowCaretCuUThenInk2KEraseBeforeNextHide` stays false; Vitest + E2E `cli_interactive_mode` + `cli_recall` green.
 
 **Interim behavior removed:** Post-Ink manual caret CSI and pre-rerender cursor restore.
 
@@ -395,9 +390,9 @@ Post–Phase I review of the `cli/` subproject against the north star and open g
 
 ---
 
-## Phases J+ (J1 done; J2 onward planned)
+## Phases J+ (J1–J2 done; J3 onward planned)
 
-**Order:** ~~fix unmount-erase lifecycle (J1)~~ **done** → reverse-video caret (J2) → single layout snapshot (J3) → **terminal resize (Ink-aligned, J4)** → Ink wrap for default column (K) → stdin/`useInput` migration → confirm → lists → optional ink-ui polish.
+**Order:** ~~fix unmount-erase lifecycle (J1)~~ **done** → ~~reverse-video caret (J2)~~ **done** → single layout snapshot (J3) → **terminal resize (Ink-aligned, J4)** → Ink wrap for default column (K) → stdin/`useInput` migration → confirm → lists → optional ink-ui polish.
 
 ### Phase J3 — One live layout snapshot per `drawBox`
 
@@ -471,13 +466,13 @@ Post–Phase I review of the `cli/` subproject against the north star and open g
 
 ## Open after Phase I (optional — not a backlog to “close”)
 
-Phases **A–I** are **done**; **J1** (unmount-erase) is **done**. Follow-up work is spelled out in **Architecture evaluation** and **Phases J+** above (reverse-video caret **J2**, layout snapshot **J3**, Ink-aligned resize **J4**, default column Ink wrap **K**, stdin → `useInput` **L–N**, optional ink-ui **O**; gates 6–7 declined for now).
+Phases **A–I** are **done**; **J1** (unmount-erase) and **J2** (reverse-video caret) are **done**. Follow-up work is spelled out in **Architecture evaluation** and **Phases J+** above (layout snapshot **J3**, Ink-aligned resize **J4**, default column Ink wrap **K**, stdin → `useInput` **L–N**, optional ink-ui **O**; gates 6–7 declined for now).
 
 **Historical bullets** (themes unchanged; execution path is J+):
 
 - **Stdin / input model:** → Phases **L–N**.
 - **Focus and selection UX:** → Phases **L–N**.
-- **Layout / paint:** → **J1** done; **J2** (reverse-video caret), **J3** (snapshot per `drawBox`), **J4** (Ink-aligned resize), **K** (default column Ink wrap).
+- **Layout / paint:** → **J1**–**J2** done; **J3** (snapshot per `drawBox`), **J4** (Ink-aligned resize), **K** (default column Ink wrap).
 - **Components:** → Phase **O** (optional).
 - **Look:** declined (gate 6).
 - **Logging:** deferred (gate 7).
@@ -486,5 +481,5 @@ Phases **A–I** are **done**; **J1** (unmount-erase) is **done**. Follow-up wor
 
 ## Notes
 
-- **Ordering:** Phases A–D delivered a safe **extract-and-thin-adapter** path; E–I added Ink and the shell. **Phases A–I are complete** on `main`; **J1** (unmount-erase before empty-Enter remount) is **done**. **Next:** **J2** (reverse-video caret — removes interim cursor CSI), then **J3/J4** (snapshot/resize), then **K** (single stdout/OSC owner). This file stays as reference until you archive it.
+- **Ordering:** Phases A–D delivered a safe **extract-and-thin-adapter** path; E–I added Ink and the shell. **Phases A–I are complete** on `main`; **J1** (unmount-erase) and **J2** (reverse-video caret, no hardware caret in box) are **done**. **Next:** **J3/J4** (snapshot/resize), then **K** (single stdout/OSC owner). This file stays as reference until you archive it.
 - **Conflicts:** Any future change that would alter PTY/E2E-visible behavior without product sign-off should still stop at the nearest **decision gate** above.

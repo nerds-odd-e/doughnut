@@ -9,6 +9,7 @@ import {
   ITALIC,
   RED,
   RESET,
+  REVERSE,
   HIDE_CURSOR,
   SHOW_CURSOR,
 } from './ansi.js'
@@ -499,6 +500,103 @@ export function buildBoxLines(
   })
 }
 
+function caretLineAndOffsetInBuffer(
+  buffer: string,
+  caretOffset: number
+): { lineIndex: number; offsetInLine: number } {
+  const co = Math.max(0, Math.min(caretOffset, buffer.length))
+  let lineIndex = 0
+  let lineStart = 0
+  for (let i = lineStart; i < co; i++) {
+    if (buffer[i] === '\n') {
+      lineIndex++
+      lineStart = i + 1
+    }
+  }
+  return { lineIndex, offsetInLine: co - lineStart }
+}
+
+function firstGraphemeFromOffset(line: string, utf16Offset: number): string {
+  const slice = line.slice(utf16Offset)
+  for (const { segment } of graphemeSegmenter.segment(slice)) {
+    return segment
+  }
+  return ' '
+}
+
+function plainInsertCaret(line: string, offsetInLine: number): string {
+  const o = Math.max(0, Math.min(offsetInLine, line.length))
+  const before = line.slice(0, o)
+  if (o >= line.length) {
+    return `${before}${REVERSE} ${RESET}`
+  }
+  const g = firstGraphemeFromOffset(line, o)
+  const after = line.slice(o + g.length)
+  return `${before}${REVERSE}${g}${RESET}${after}`
+}
+
+function buildLineWithCaret(line: string, offsetInLine: number): string {
+  if (!line.startsWith('/')) {
+    return plainInsertCaret(line, offsetInLine)
+  }
+  const usages = interactiveDocs.map((d) => d.usage)
+  let highlightLen = 0
+  for (const cmd of usages) {
+    if (line.startsWith(cmd)) {
+      highlightLen = Math.max(highlightLen, cmd.length)
+    }
+  }
+  if (highlightLen === 0) {
+    return plainInsertCaret(line, offsetInLine)
+  }
+  if (offsetInLine < highlightLen) {
+    const before = line.slice(0, offsetInLine)
+    const g = firstGraphemeFromOffset(line, offsetInLine)
+    const afterInCmd = line.slice(offsetInLine + g.length, highlightLen)
+    const tail = line.slice(highlightLen)
+    return `${COMMAND_HIGHLIGHT}${before}${REVERSE}${g}${RESET}${COMMAND_HIGHLIGHT}${afterInCmd}${RESET}${tail}`
+  }
+  const highlightedCmd = `${COMMAND_HIGHLIGHT}${line.slice(0, highlightLen)}${RESET}`
+  const rest = line.slice(highlightLen)
+  return highlightedCmd + plainInsertCaret(rest, offsetInLine - highlightLen)
+}
+
+/**
+ * Like {@link buildBoxLines}, but inserts a reverse-video caret at `caretOffset` in the buffer
+ * (UTF-16 index, newline-aware), grapheme-aware for the inverted cell.
+ */
+export function buildBoxLinesWithCaret(
+  buffer: string,
+  _width: TerminalWidth,
+  caretOffset: number,
+  options?: BuildBoxLinesOptions
+): string[] {
+  const bufferLines = buffer.split('\n')
+  const { lineIndex: caretLineIndex, offsetInLine } =
+    caretLineAndOffsetInBuffer(buffer, caretOffset)
+  const context = options?.placeholderContext ?? 'default'
+  const placeholder = PLACEHOLDER_BY_CONTEXT[context]
+  return bufferLines.map((line, i) => {
+    const prefix = isGreyDisabledInputChrome(context)
+      ? ''
+      : i === 0
+        ? PROMPT
+        : '  '
+    let inner: string
+    if (i === 0 && buffer === '') {
+      inner =
+        caretLineIndex === 0 && offsetInLine === 0
+          ? `${REVERSE} ${RESET}${GREY}${placeholder}${RESET}`
+          : `${GREY}${placeholder}${RESET}`
+    } else if (i === caretLineIndex) {
+      inner = buildLineWithCaret(line, offsetInLine)
+    } else {
+      inner = highlightRecognizedCommand(line)
+    }
+    return prefix + inner
+  })
+}
+
 export function getTerminalWidth(): number {
   return process.stdout.columns || 80
 }
@@ -548,6 +646,46 @@ export function buildLiveRegionLines(
   }
   const rawBoxLines = renderBox(
     buildBoxLines(buffer, width, options),
+    width
+  ).split('\n')
+  const boxLines =
+    options?.placeholderContext &&
+    isGreyDisabledInputChrome(options.placeholderContext)
+      ? grayDisabledInputBoxLines(rawBoxLines)
+      : rawBoxLines
+  lines.push(...boxLines)
+  lines.push(...suggestionLines)
+  return lines
+}
+
+/** Same layout as {@link buildLiveRegionLines}, with a reverse-video caret in the input box. */
+export function buildLiveRegionLinesWithCaret(
+  buffer: string,
+  width: TerminalWidth,
+  caretOffset: number,
+  currentPromptWrappedLines: string[],
+  suggestionLines: string[],
+  currentStageIndicatorLines: string[],
+  options?: LiveRegionPaintOptions
+): string[] {
+  const lines: string[] = []
+  const hasStageIndicator = currentStageIndicatorLines.length > 0
+  if (hasStageIndicator) {
+    for (const ind of currentStageIndicatorLines) {
+      lines.push(formatCurrentStageIndicatorLine(ind, width))
+    }
+    lines.push(buildCurrentPromptSeparatorForStageBand(width))
+  }
+  if (currentPromptWrappedLines.length > 0) {
+    if (!hasStageIndicator) {
+      lines.push(buildCurrentPromptSeparator(width))
+    }
+    for (const line of currentPromptWrappedLines) {
+      lines.push(`${GREY}${line}${RESET}`)
+    }
+  }
+  const rawBoxLines = renderBox(
+    buildBoxLinesWithCaret(buffer, width, caretOffset, options),
     width
   ).split('\n')
   const boxLines =

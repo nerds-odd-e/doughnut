@@ -182,7 +182,8 @@ describe('TTY token list interactive mode', () => {
     expect(output).toContain('Cancelled by user.')
     expect(output).toContain('/ commands')
     expect(output).not.toContain('Alpha')
-    expect(output).toContain('\x1b[?25h')
+    expect(output).toContain('\x1b[?25l')
+    expect(output).toContain('\x1b[7m')
   })
 
   test('ESC cancels token list and shows Cancelled by user. in history', async () => {
