@@ -44,8 +44,6 @@ import {
 import {
   RECALL_STOP_CONFIRM_GUIDANCE_LINE,
   type SessionYesNoLineDispatchResult,
-  type SessionYesNoLineEmptySubmit,
-  type SessionYesNoLineKeyEvent,
 } from '../interactions/sessionYesNoInteraction.js'
 import {
   cycleListSelectionIndex,
@@ -74,7 +72,7 @@ import type {
   OutputAdapter,
 } from '../types.js'
 import { CommandLineLivePanel } from '../ui/CommandLineLivePanel.js'
-import { ConfirmDisplay } from '../ui/ConfirmDisplay.js'
+import { ConfirmLivePanel } from '../ui/ConfirmLivePanel.js'
 import { FetchWaitDisplay } from '../ui/FetchWaitDisplay.js'
 import { InteractiveShellDisplay } from '../ui/InteractiveShellDisplay.js'
 import { McqDisplay } from '../ui/McqDisplay.js'
@@ -96,10 +94,6 @@ export interface TTYDeps {
     placeholder: string
     guidance: string[]
   }
-  dispatchSessionYesNoKey: (
-    e: SessionYesNoLineKeyEvent,
-    emptySubmit: SessionYesNoLineEmptySubmit
-  ) => SessionYesNoLineDispatchResult
   isNumberedChoiceListActive: () => boolean
   getNumberedChoiceListChoices: () => readonly string[] | null
   getNumberedChoiceListCurrentPromptWrappedLines: (
@@ -175,7 +169,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     exitCommandSession,
     getStopConfirmationYesOutcomeLines,
     getStopConfirmationLiveView,
-    dispatchSessionYesNoKey,
     isNumberedChoiceListActive,
     getNumberedChoiceListChoices,
     getNumberedChoiceListCurrentPromptWrappedLines,
@@ -256,10 +249,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
 
   // --- Ink shell: Static history + live panel (Phase H) ---
   let shellInstance: ReturnType<typeof render> | null = null
-  let stopConfirmDraft = ''
-  let stopConfirmHint = ''
-  let sessionYesNoDraft = ''
-  let sessionYesNoHint = ''
 
   function patchStdinForInk(
     stream: NodeJS.ReadableStream & { ref?: () => void; unref?: () => void }
@@ -421,23 +410,41 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       const stageLines = isInCommandSessionSubstate()
         ? [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
         : []
-      return React.createElement(ConfirmDisplay, {
+      return React.createElement(ConfirmLivePanel, {
+        key: 'confirm-stop-recall',
         guidanceLines: [
           ...stageLines,
           ...view.promptLines,
           RECALL_STOP_CONFIRM_GUIDANCE_LINE,
         ],
         placeholderText: view.placeholder,
-        hint: stopConfirmHint,
-        draft: stopConfirmDraft,
+        emptySubmit: 'treat-as-no',
+        escapeToNestedStopConfirm: false,
+        isInCommandSessionSubstate,
+        onNestedStopConfirm: enterStopConfirmationFromEsc,
+        onInputReadySignal: signalConfirmInputReady,
+        onInterrupt: () => {
+          interactiveTtyStdout.ctrlCExitNewline()
+          doExit()
+        },
+        onDispatchResult: (d) => handleStopConfirmDispatch(d),
       })
     }
     if (usesSessionYesNoInputChrome(!!tokenSelection)) {
-      return React.createElement(ConfirmDisplay, {
+      return React.createElement(ConfirmLivePanel, {
+        key: 'confirm-session-yes-no',
         guidanceLines: [],
         placeholderText: 'y or n; /stop to exit recall',
-        hint: sessionYesNoHint,
-        draft: sessionYesNoDraft,
+        emptySubmit: 'treat-as-invalid',
+        escapeToNestedStopConfirm: true,
+        isInCommandSessionSubstate,
+        onNestedStopConfirm: enterStopConfirmationFromEsc,
+        onInputReadySignal: signalConfirmInputReady,
+        onInterrupt: () => {
+          interactiveTtyStdout.ctrlCExitNewline()
+          doExit()
+        },
+        onDispatchResult: (d) => handleSessionYesNoDispatch(d),
       })
     }
     const numberedChoices = getNumberedChoiceListChoices()
@@ -651,8 +658,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
 
   const enterStopConfirmationFromEsc = (): void => {
     setPendingStopConfirmation(true)
-    stopConfirmDraft = ''
-    stopConfirmHint = ''
     commandInput = clearLiveCommandLine(commandInput)
     drawBox()
   }
@@ -703,6 +708,72 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         drawBox()
       }
     },
+  }
+
+  const signalConfirmInputReady = () => {
+    interactiveTtyStdout.inputReadyOsc()
+  }
+
+  async function handleStopConfirmDispatch(
+    dispatch: SessionYesNoLineDispatchResult
+  ): Promise<void> {
+    switch (dispatch.result) {
+      case 'cancel':
+        setPendingStopConfirmation(false)
+        commandInput = clearLiveCommandLine(commandInput)
+        drawBox()
+        break
+      case 'submit-yes':
+        commandInput = clearLiveCommandLine(commandInput)
+        setPendingStopConfirmation(false)
+        exitCommandSession()
+        numberedChoiceHighlightIndex = 0
+        commitHistoryOutput(getStopConfirmationYesOutcomeLines())
+        break
+      case 'submit-no':
+        commandInput = clearLiveCommandLine(commandInput)
+        setPendingStopConfirmation(false)
+        drawBox()
+        break
+      default:
+        break
+    }
+  }
+
+  async function handleSessionYesNoDispatch(
+    dispatch: SessionYesNoLineDispatchResult
+  ): Promise<void> {
+    switch (dispatch.result) {
+      case 'cancel':
+        break
+      case 'submit-yes':
+      case 'submit-no': {
+        const effectiveLine = dispatch.result === 'submit-yes' ? 'y' : 'n'
+        commandInput = clearLiveCommandLine(commandInput)
+        resetCommandTurnBuffer()
+        if (isCommittedInteractiveInput(effectiveLine)) {
+          if (!usesSessionYesNoInputChrome(!!tokenSelection)) {
+            chatHistory = [
+              ...chatHistory,
+              {
+                type: 'input',
+                content: maskInteractiveInputForHistory(effectiveLine),
+              },
+            ]
+            rememberCommittedLine(effectiveLine)
+          }
+          if (await processInput(effectiveLine, ttyOutput, true)) {
+            commitExitTurnToScrollback()
+            doExit()
+            return
+          }
+          finishProcessInputTurnAfterAwait()
+        }
+        break
+      }
+      default:
+        break
+    }
   }
 
   handleCommandLineInkInput = async (
@@ -915,8 +986,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       drawBox()
     }
     if (newSessionYesNo) {
-      sessionYesNoDraft = ''
-      sessionYesNoHint = ''
       drawBox()
     }
   }
@@ -938,149 +1007,11 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     if (!isAlternateLivePanel()) {
       return
     }
-    if (isPendingStopConfirmation()) {
-      const dispatch = dispatchSessionYesNoKey(
-        {
-          keyName: key.name,
-          str,
-          ctrl: !!key.ctrl,
-          meta: !!key.meta,
-          shift: !!key.shift,
-          lineDraft: stopConfirmDraft,
-          submitPressed,
-        },
-        'treat-as-no'
-      )
-      switch (dispatch.result) {
-        case 'cancel':
-          setPendingStopConfirmation(false)
-          stopConfirmDraft = ''
-          stopConfirmHint = ''
-          commandInput = clearLiveCommandLine(commandInput)
-          if (usesSessionYesNoInputChrome(false)) {
-            sessionYesNoDraft = ''
-            sessionYesNoHint = ''
-          }
-          drawBox()
-          break
-        case 'submit-yes':
-          stopConfirmDraft = ''
-          stopConfirmHint = ''
-          commandInput = clearLiveCommandLine(commandInput)
-          setPendingStopConfirmation(false)
-          exitCommandSession()
-          numberedChoiceHighlightIndex = 0
-          commitHistoryOutput(getStopConfirmationYesOutcomeLines())
-          break
-        case 'submit-no':
-          stopConfirmDraft = ''
-          stopConfirmHint = ''
-          commandInput = clearLiveCommandLine(commandInput)
-          setPendingStopConfirmation(false)
-          if (usesSessionYesNoInputChrome(false)) {
-            sessionYesNoDraft = ''
-            sessionYesNoHint = ''
-          }
-          drawBox()
-          break
-        case 'invalid-submit':
-          stopConfirmDraft = ''
-          stopConfirmHint = dispatch.hint
-          drawBox()
-          break
-        case 'edit-backspace':
-          stopConfirmDraft = stopConfirmDraft.slice(0, -1)
-          stopConfirmHint = ''
-          drawBox()
-          break
-        case 'edit-char':
-          stopConfirmDraft += dispatch.char
-          stopConfirmHint = ''
-          drawBox()
-          break
-        case 'redraw':
-          drawBox()
-          break
-      }
+    if (
+      isPendingStopConfirmation() ||
+      usesSessionYesNoInputChrome(!!tokenSelection)
+    ) {
       return
-    }
-    const sessionYesNoInputChrome = usesSessionYesNoInputChrome(
-      !!tokenSelection
-    )
-    if (sessionYesNoInputChrome) {
-      const keysForConfirmDispatch =
-        submitPressed ||
-        key.name === 'backspace' ||
-        (str !== undefined && str !== '' && !key.ctrl && !key.meta)
-      const bareEnterOnSessionYesNo =
-        submitPressed && !key.shift && sessionYesNoDraft.trim() === ''
-      if (keysForConfirmDispatch && !bareEnterOnSessionYesNo) {
-        const dispatch = dispatchSessionYesNoKey(
-          {
-            keyName: key.name,
-            str,
-            ctrl: !!key.ctrl,
-            meta: !!key.meta,
-            shift: !!key.shift,
-            lineDraft: sessionYesNoDraft,
-            submitPressed,
-          },
-          'treat-as-invalid'
-        )
-        switch (dispatch.result) {
-          case 'cancel':
-            break
-          case 'submit-yes':
-          case 'submit-no': {
-            const effectiveLine = dispatch.result === 'submit-yes' ? 'y' : 'n'
-            sessionYesNoDraft = ''
-            sessionYesNoHint = ''
-            commandInput = clearLiveCommandLine(commandInput)
-            resetCommandTurnBuffer()
-            if (isCommittedInteractiveInput(effectiveLine)) {
-              if (!usesSessionYesNoInputChrome(!!tokenSelection)) {
-                chatHistory = [
-                  ...chatHistory,
-                  {
-                    type: 'input',
-                    content: maskInteractiveInputForHistory(effectiveLine),
-                  },
-                ]
-                rememberCommittedLine(effectiveLine)
-              }
-              if (await processInput(effectiveLine, ttyOutput, true)) {
-                commitExitTurnToScrollback()
-                doExit()
-                return
-              }
-              finishProcessInputTurnAfterAwait()
-            }
-            break
-          }
-          case 'invalid-submit':
-            sessionYesNoHint = dispatch.hint
-            drawBox()
-            break
-          case 'edit-backspace':
-            sessionYesNoDraft = sessionYesNoDraft.slice(0, -1)
-            sessionYesNoHint = ''
-            drawBox()
-            break
-          case 'edit-char':
-            sessionYesNoDraft += dispatch.char
-            sessionYesNoHint = ''
-            drawBox()
-            break
-          case 'redraw':
-            drawBox()
-            break
-        }
-        return
-      }
-      if (key.name === 'escape' && isInCommandSessionSubstate()) {
-        enterStopConfirmationFromEsc()
-        return
-      }
     }
     const numberedChoices = getNumberedChoiceListChoices()
     if (numberedChoices !== null) {

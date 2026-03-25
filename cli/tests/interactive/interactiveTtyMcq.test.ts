@@ -17,6 +17,8 @@ import {
   pressEnter,
   pressKey,
   pressRealBackspace,
+  pushTTYCommandBytes,
+  pushTTYCommandEnter,
   startTTYSessionWithoutRecallReset,
   submitTTYCommand,
   tick,
@@ -169,9 +171,9 @@ describe('TTY recall MCQ', () => {
       ).toBe(1)
       expect(escRepaint).toContain('y or n; Esc to go back')
 
-      typeString(stdin, 'y')
+      pushTTYCommandBytes(stdin, 'y')
       await tick()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
 
       const out = ttyOutput(writeSpy)
@@ -189,9 +191,9 @@ describe('TTY recall MCQ', () => {
       pressKey(stdin, 'escape')
       await tick()
 
-      typeString(stdin, 'n')
+      pushTTYCommandBytes(stdin, 'n')
       await tick()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
 
       expect(isInRecallSubstate()).toBe(true)

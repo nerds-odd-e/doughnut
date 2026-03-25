@@ -33,7 +33,6 @@ import {
   type InteractiveFetchWaitLine,
 } from './interactiveFetchWait.js'
 import {
-  dispatchRecallSessionConfirmKey,
   recallStopConfirmViewModelForContext,
   parseRecallSessionYesNoSubmit,
 } from './interactions/sessionYesNoInteraction.js'
@@ -665,7 +664,6 @@ function buildTTYDeps() {
     exitCommandSession: exitRecallMode,
     getStopConfirmationYesOutcomeLines: () => ['Stopped recall'] as const,
     getStopConfirmationLiveView: recallStopConfirmViewModelForContext,
-    dispatchSessionYesNoKey: dispatchRecallSessionConfirmKey,
     isNumberedChoiceListActive,
     getNumberedChoiceListChoices,
     getNumberedChoiceListCurrentPromptWrappedLines,

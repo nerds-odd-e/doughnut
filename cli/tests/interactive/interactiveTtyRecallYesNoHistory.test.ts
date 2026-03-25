@@ -7,12 +7,12 @@ import { resetRecallStateForTesting } from '../../src/interactive.js'
 import {
   endTTYSession,
   expectTtyRecallYesNoReplyScrollback,
-  pressEnter,
+  pushTTYCommandBytes,
+  pushTTYCommandEnter,
   startTTYSessionWithoutRecallReset,
   submitTTYCommand,
   tick,
   ttyOutput,
-  typeString,
   type TTYStdin,
 } from './interactiveTestHelpers.js'
 
@@ -34,9 +34,9 @@ describe('TTY: recall-session y/n answers (scrollback)', () => {
     await submitTTYCommand(stdin, '/recall')
 
     writeSpy.mockClear()
-    typeString(stdin, 'n')
+    pushTTYCommandBytes(stdin, 'n')
     await tick()
-    pressEnter(stdin)
+    pushTTYCommandEnter(stdin)
     await tick()
 
     const out = ttyOutput(writeSpy)
@@ -55,9 +55,9 @@ describe('TTY: recall-session y/n answers (scrollback)', () => {
     await submitTTYCommand(stdin, '/recall')
 
     writeSpy.mockClear()
-    typeString(stdin, 'y')
+    pushTTYCommandBytes(stdin, 'y')
     await tick()
-    pressEnter(stdin)
+    pushTTYCommandEnter(stdin)
     await tick()
 
     const out = ttyOutput(writeSpy)
@@ -77,9 +77,9 @@ describe('TTY: recall-session y/n answers (scrollback)', () => {
     await submitTTYCommand(stdin, '/recall')
 
     writeSpy.mockClear()
-    typeString(stdin, 'n')
+    pushTTYCommandBytes(stdin, 'n')
     await tick()
-    pressEnter(stdin)
+    pushTTYCommandEnter(stdin)
     await tick()
 
     const out = ttyOutput(writeSpy)

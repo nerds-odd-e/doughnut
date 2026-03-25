@@ -9,15 +9,14 @@ import { stripAnsi } from '../../src/renderer.js'
 import {
   endTTYSession,
   expectTtyRecallYesNoReplyScrollback,
-  pressEnter,
-  pressKey,
-  pressRealBackspace,
+  pushTTYCommandBytes,
+  pushTTYCommandEnter,
   pushTTYCommandEscape,
+  pushTTYCommandKey,
   submitTTYCommand,
   tick,
   ttyOutput,
   ttySessionWithSpies,
-  typeString,
   type TTYStdin,
 } from './interactiveTestHelpers.js'
 import { recallNextQuestion } from '../recallNextTestShapes.js'
@@ -59,12 +58,13 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     expect(mockAnswerSpelling).not.toHaveBeenCalled()
     expect(isInRecallSubstate()).toBe(true)
 
-    typeString(stdin, 'y')
+    pushTTYCommandBytes(stdin, 'y')
     await vi.waitFor(() => {
       const p = stripAnsi(ttyOutput(writeSpy))
       expect(p).toMatch(/Stop recall\?\s*\(y\/n\)[\s\S]*\n\s*y(?:\s|$)/m)
     })
-    pressEnter(stdin)
+    await tick()
+    pushTTYCommandEnter(stdin)
     await tick()
 
     expect(ttyOutput(writeSpy)).toContain('Stopped recall')
@@ -84,9 +84,9 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
 
     await pushTTYCommandEscape(stdin)
 
-    typeString(stdin, 'n')
+    pushTTYCommandBytes(stdin, 'n')
     await tick()
-    pressEnter(stdin)
+    pushTTYCommandEnter(stdin)
     await tick()
 
     expect(isInRecallSubstate()).toBe(true)
@@ -109,8 +109,7 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
 
     mockMarkAsRecalled.mockClear()
     writeSpy.mockClear()
-    pressKey(stdin, 'escape')
-    await tick()
+    await pushTTYCommandEscape(stdin)
 
     const escRepaint = stripAnsi(ttyOutput(writeSpy))
     expect(escRepaint).toContain('Stop recall? (y/n)')
@@ -118,9 +117,9 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     expect(mockMarkAsRecalled).not.toHaveBeenCalled()
     expect(isInRecallSubstate()).toBe(true)
 
-    typeString(stdin, 'y')
+    pushTTYCommandBytes(stdin, 'y')
     await tick()
-    pressEnter(stdin)
+    pushTTYCommandEnter(stdin)
     await tick()
 
     expect(ttyOutput(writeSpy)).toContain('Stopped recall')
@@ -140,12 +139,11 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     mockMarkAsRecalled.mockClear()
     writeSpy.mockClear()
 
-    pressKey(stdin, 'escape')
-    await tick()
+    await pushTTYCommandEscape(stdin)
 
-    typeString(stdin, 'n')
+    pushTTYCommandBytes(stdin, 'n')
     await tick()
-    pressEnter(stdin)
+    pushTTYCommandEnter(stdin)
     await tick()
 
     expect(isInRecallSubstate()).toBe(true)
@@ -160,17 +158,16 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     expect(ttyOutput(writeSpy)).toContain('y or n; /stop to exit recall')
 
     writeSpy.mockClear()
-    pressKey(stdin, 'escape')
-    await tick()
+    await pushTTYCommandEscape(stdin)
 
     const escRepaint = stripAnsi(ttyOutput(writeSpy))
     expect(escRepaint).toContain('Stop recall? (y/n)')
     expect(escRepaint).toContain('y or n; Esc to go back')
     expect(isInRecallSubstate()).toBe(true)
 
-    typeString(stdin, 'y')
+    pushTTYCommandBytes(stdin, 'y')
     await tick()
-    pressEnter(stdin)
+    pushTTYCommandEnter(stdin)
     await tick()
 
     expect(ttyOutput(writeSpy)).toContain('Stopped recall')
@@ -186,21 +183,17 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     await pushTTYCommandEscape(stdin)
     writeSpy.mockClear()
 
-    // Real TTY backspace: str='\x7f' (DEL char, truthy). If the handler checks
-    // `str && !ctrl && !meta` before `key.name === 'backspace'`, it inserts '\x7f'
-    // into the draft instead of deleting. On enter, '\x7f'.trim() is non-empty
-    // and not 'y'/'n', triggering "Please answer y or n".
-    pressRealBackspace(stdin)
+    // Real TTY: DEL as stdin byte; Ink maps to `delete` — ConfirmLivePanel must treat
+    // like backspace before any printable `input` path (same ordering hazard as readline).
+    pushTTYCommandKey(stdin, 'backspace')
     await tick()
-    pressEnter(stdin)
+    pushTTYCommandEnter(stdin)
     await tick()
 
     expect(
       stripAnsi(ttyOutput(writeSpy)),
       'Backspace on empty stop-confirmation input must be a no-op. ' +
-        'If this fails, the `str && !ctrl && !meta` branch fires before `key.name === "backspace"` ' +
-        'in the isPendingStopConfirmation handler, inserting the DEL character \\x7f. ' +
-        'Fix: move the backspace check above the str-insertion check in that handler.'
+        'If this fails, printable-input handling may run before backspace/delete in ConfirmLivePanel.'
     ).not.toContain('Please answer y or n')
     expect(isInRecallSubstate()).toBe(true)
   })
@@ -209,12 +202,11 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     mockRecallNext.mockResolvedValue({ type: 'none', message: '0 notes' })
     await submitTTYCommand(stdin, '/recall')
 
-    pressKey(stdin, 'escape')
-    await tick()
+    await pushTTYCommandEscape(stdin)
 
-    typeString(stdin, 'n')
+    pushTTYCommandBytes(stdin, 'n')
     await tick()
-    pressEnter(stdin)
+    pushTTYCommandEnter(stdin)
     await tick()
 
     expect(isInRecallSubstate()).toBe(true)

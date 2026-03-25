@@ -93,7 +93,7 @@ export async function pushTTYCommandEscape(stdin: TTYStdin) {
   await tick()
 }
 
-/** Alternate panels (confirm, MCQ, token list, …): synthetic readline `keypress`. */
+/** MCQ, token list, fetch-wait (until migrated): synthetic readline `keypress`. */
 export function typeString(stdin: TTYStdin, str: string) {
   for (const ch of str) {
     stdin.emit('keypress', ch, {
