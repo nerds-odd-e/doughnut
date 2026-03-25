@@ -1,4 +1,5 @@
-import { Box, Text, useInput, type Key } from 'ink'
+import { useLayoutEffect, useRef } from 'react'
+import { Box, Text, useFocus, useInput, type Key } from 'ink'
 import {
   buildBoxLinesWithCaret,
   buildCurrentPromptSeparator,
@@ -12,6 +13,9 @@ import {
   type PlaceholderContext,
   type TerminalWidth,
 } from '../renderer.js'
+import { INK_LIVE_SOLE_FOCUS_REGION_REFLEX } from './liveFocusPhaseFlags.js'
+
+export const COMMAND_LINE_INK_FOCUS_ID = 'command-line'
 
 export type CommandLineLivePanelProps = {
   buffer: string
@@ -37,12 +41,27 @@ export function CommandLineLivePanel({
   onCommandKey,
   onInterrupt,
 }: CommandLineLivePanelProps) {
+  const { isFocused, focus } = useFocus({
+    id: COMMAND_LINE_INK_FOCUS_ID,
+    autoFocus: true,
+  })
+  const isFocusedRef = useRef(isFocused)
+  isFocusedRef.current = isFocused
+  const inkFocusEverEstablishedRef = useRef(false)
+  if (isFocused) inkFocusEverEstablishedRef.current = true
+
+  useLayoutEffect(() => {
+    if (!INK_LIVE_SOLE_FOCUS_REGION_REFLEX || isFocused) return
+    focus(COMMAND_LINE_INK_FOCUS_ID)
+  }, [isFocused, focus])
+
   useInput(
     (input, key) => {
       if (key.ctrl && input === 'c') {
         onInterrupt()
         return
       }
+      if (!isFocusedRef.current && inkFocusEverEstablishedRef.current) return
       Promise.resolve(onCommandKey(input, key)).catch(() => undefined)
     },
     { isActive: true }

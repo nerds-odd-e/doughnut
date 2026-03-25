@@ -292,6 +292,16 @@ describe('TTY: shared interactive session', () => {
       expect(output).not.toContain('/help')
     })
 
+    test('after ESC on a partial slash draft, the next typed character still edits the line (Ink focus)', async () => {
+      pushTTYCommandBytes(stdin, '/ex')
+      await tick()
+      await pushTTYCommandEscape(stdin)
+      await tick()
+      pushTTYCommandBytes(stdin, 't')
+      await tick()
+      expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /ext')
+    })
+
     test('Enter with only `/` inserts first highlighted command', async () => {
       writeSpy.mockClear()
       pushTTYCommandBytes(stdin, '/')

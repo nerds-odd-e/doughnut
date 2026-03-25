@@ -68,7 +68,7 @@ Ink shell, neutral `TTYDeps`, confirm/MCQ/token/fetch-wait display components, *
 
 ## Remaining phases (numbered)
 
-**Order:** **2 → 3 → 4 → 5 → 6 → 7 → 8 (optional) → 9** (phases 1–3 done)
+**Order:** **2 → 3 → 4 → 5 → 6 → 7 → 8 (optional) → 9** (phases 1–4 done)
 
 **Rationale (planning.mdc):** **Phase 4** is its own **user-visible** slice (new keyboard/focus model — gate 3). **Phase 5** then moves list input onto Ink **`Select`** so ↑↓ apply **inside** the focused list (gate 5 + gate 3 together at the list). **Phase 6** is a separate UX slice (simpler y/n). **Phase 7** is the mandatory duplicate-path audit.
 
@@ -88,19 +88,19 @@ Ink shell, neutral `TTYDeps`, confirm/MCQ/token/fetch-wait display components, *
 - **`ttyAdapter`:** no confirm/session y/n handling on **`keypress`** (early return); **`dispatchSessionYesNoKey`** removed from **`TTYDeps`**.
 - **Verify:** `pnpm cli:test`; Vitest uses **`pushTTYCommandBytes` / `pushTTYCommandEnter`** (and **`pushTTYCommandEscape`** from session) for these panels; **`await tick()`** after typing before Enter where needed for Ink scheduling.
 
-### Phase 4 — Focus-based keyboard model (gate 3)
+### Phase 4 (done) — Focus-based keyboard model (gate 3)
 
-**User outcome:** The TTY no longer uses one global meaning for **↑↓** across command draft history and lists. **Tab** / **Shift+Tab** move focus between **Ink focusable** regions in the live column; **arrow keys** affect **only** the focused region.
+**User outcome:** **↑↓** for draft history / slash-picker cycling run only while the **command-line** Ink region has focus; **Tab** / **Shift+Tab** cycle Ink focus (second region in phase 5). **No extra chrome** (gate 6).
 
-**Scope:**
+**Shipped:**
 
-- Introduce **`useFocus`** (or Ink-supported equivalent) for the **default** live column: at minimum the **command line** is a focusable region with **↑↓** bound to **draft / input command history** **only when** it has focus.
-- Define **focus order** and visible/indirect cues as needed (focus ring, dimming, or documented “no extra chrome” per gate 6).
-- **Confirm** / fetch-wait / other alternate panels: keep **one owner** per mode; align with focus rules (e.g. when confirm is active, focus stays on confirm subtree — no duplicate **`ttyAdapter`** list routing).
+- **`CommandLineLivePanel`:** `useFocus` (`command-line`), `useInput` gated with **`inkFocusEverEstablishedRef`** so keys work before the first focus commit; **`useLayoutEffect`** refocus after Ink clears focus on **Esc** while **`INK_LIVE_SOLE_FOCUS_REGION_REFLEX`** is true (**phase 5:** delete the flag file and this refocus logic — see below).
+- **`ConfirmLivePanel`:** same Esc refocus + gating pattern (`confirm-live`).
+- **`liveFocusPhaseFlags.ts`:** `INK_LIVE_SOLE_FOCUS_REGION_REFLEX` (**removed entirely in phase 5**).
 
-**Interim (allowed, planning.mdc):** Until **phase 5**, MCQ/token/slash list selection may still use **`keypress`** briefly. **Phase 4** should still land **focus plumbing** and **command-line-local** ↑↓ so behavior and tests move in the right direction; **phase 5** adds the **second** focus target (**`Select`**) and removes list **`keypress`**.
+**Interim:** MCQ/token list still **`keypress`** until **phase 5**.
 
-**Verify:** `pnpm cli:test` interactive suites touching command line + draft history + Tab; extend **`e2e_test/features/cli/`** only if E2E currently encodes old global ↑↓ (prefer Vitest for exact focus behavior).
+**Verify:** `pnpm cli:test`; Vitest `interactiveTtySession` (Esc then type); extend E2E only if needed.
 
 ### Phase 5 — MCQ and token list: Ink-owned list input (gates 3 & 5)
 
@@ -108,6 +108,7 @@ Ink shell, neutral `TTYDeps`, confirm/MCQ/token/fetch-wait display components, *
 
 - **Complete replacement (this phase):** remove **all** parallel list-selection key handling from **`ttyAdapter`** when the shell is active (including MCQ, token list, slash-selection mode). Keep **`cli/src/interactions/selectListInteraction.ts`** only as **pure policy** (e.g. submit-line derivation) invoked **from** Ink/`Select` handlers if still useful — not a second stdin listener.
 - **Gate 3:** List **`Select`** participates in the same **Tab** / focus order as the command line from phase 4.
+- **Remove phase-4 Esc reflex:** delete **`cli/src/ui/liveFocusPhaseFlags.ts`** and the **`useLayoutEffect`** blocks that call **`focus(...)`** when **`INK_LIVE_SOLE_FOCUS_REGION_REFLEX`** is set — from **`CommandLineLivePanel`** and **`ConfirmLivePanel`**. Replace with whatever Esc/focus behavior the two-region tree needs (no automatic snap-back to the command line).
 - **Verify:** `cli/tests/interactive/*`, mutation/tests touching **`selectListInteraction`** as appropriate, `e2e_test/features/cli/` for recall / list flows.
 
 ### Phase 6 (planned) — Simpler recall confirms + `@inkjs/ui` `ConfirmInput`

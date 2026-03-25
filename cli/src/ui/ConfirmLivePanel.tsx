@@ -1,5 +1,11 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
-import { useInput, type Key } from 'ink'
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useCallback,
+} from 'react'
+import { useFocus, useInput, type Key } from 'ink'
 import {
   dispatchRecallSessionConfirmKey,
   type SessionYesNoLineDispatchResult,
@@ -7,6 +13,9 @@ import {
   type SessionYesNoLineKeyEvent,
 } from '../interactions/sessionYesNoInteraction.js'
 import { ConfirmDisplay } from './ConfirmDisplay.js'
+import { INK_LIVE_SOLE_FOCUS_REGION_REFLEX } from './liveFocusPhaseFlags.js'
+
+const CONFIRM_LIVE_INK_FOCUS_ID = 'confirm-live'
 
 function isSubmitKeyInk(key: Key, input: string): boolean {
   return !!(key.return || input === '\n' || input === '\r')
@@ -115,6 +124,20 @@ export function ConfirmLivePanel({
     onDispatchResult,
   }
 
+  const { isFocused, focus } = useFocus({
+    id: CONFIRM_LIVE_INK_FOCUS_ID,
+    autoFocus: true,
+  })
+  const isFocusedRef = useRef(isFocused)
+  isFocusedRef.current = isFocused
+  const inkFocusEverEstablishedRef = useRef(false)
+  if (isFocused) inkFocusEverEstablishedRef.current = true
+
+  useLayoutEffect(() => {
+    if (!INK_LIVE_SOLE_FOCUS_REGION_REFLEX || isFocused) return
+    focus(CONFIRM_LIVE_INK_FOCUS_ID)
+  }, [isFocused, focus])
+
   useEffect(() => {
     if (skipNextOsc.current) {
       skipNextOsc.current = false
@@ -124,6 +147,13 @@ export function ConfirmLivePanel({
   }, [draft, hint, onInputReadySignal])
 
   const handleKey = useCallback((input: string, key: Key) => {
+    const p0 = propsRef.current
+    if (key.ctrl && input === 'c') {
+      p0.onInterrupt()
+      return
+    }
+    if (!isFocusedRef.current && inkFocusEverEstablishedRef.current) return
+
     const processOne = (inp: string, ky: Key) => {
       const p = propsRef.current
       const lineDraft = draftRef.current
