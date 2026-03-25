@@ -295,3 +295,4 @@ Expect the Vue production build under `frontend/dist`. The CLI install URL is se
 - FOSS style; Fork and submit GitHub PR.
   - Please keep the PR small and on only one topic
   - The code need to come with tests.
+  
