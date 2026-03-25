@@ -17,6 +17,8 @@ const CLI_POLL_MS = 10
 const INTERACTIVE_INPUT_READY_FLUSH_MS = 80
 /** CI PTY can deliver Ink output in multiple chunks after the OSC; wait until length is stable. */
 const INTERACTIVE_INPUT_READY_STABLE_MS = 70
+/** When the CLI omits a fresh readiness OSC (see `handleShellRendered`), require longer quiet output before continuing. */
+const INTERACTIVE_INPUT_READY_SETTLED_FALLBACK_STABLE_MS = 220
 const INTERACTIVE_INPUT_READY_DRAIN_MAX_MS = 450
 
 const PTY_OPTIONS = {
@@ -83,6 +85,72 @@ async function waitForInteractiveInputReadyOsc(
       }
       return
     }
+    await sleep(CLI_POLL_MS)
+  }
+  throw new Error(formatTimeoutError(getStdout()))
+}
+
+/**
+ * After a PTY write, the CLI often appends {@link INTERACTIVE_INPUT_READY_OSC}. Fetch-wait omits
+ * it (see `handleShellRendered` in `ttyAdapter`). Accept either a fresh OSC in bytes after
+ * `afterLen`, or stdout that grew past `afterLen` and then stayed stable — same idea as the
+ * post-OSC drain loop.
+ */
+async function waitForInteractiveInputReadyOscOrSettled(
+  options: WaitForInteractiveInputReadyOptions
+): Promise<void> {
+  const {
+    getStdout,
+    maxWaitMs,
+    onlyInStdoutAfterByteLength: afterLen,
+    formatTimeoutError,
+  } = options
+  const start = Date.now()
+  let lastLen = getStdout().length
+  let stableSince = Date.now()
+  while (Date.now() - start < maxWaitMs) {
+    const stdout = getStdout()
+    const haystack =
+      afterLen === undefined
+        ? stdout
+        : stdout.length > afterLen
+          ? stdout.slice(afterLen)
+          : ''
+
+    if (haystack.includes(INTERACTIVE_INPUT_READY_OSC)) {
+      await sleep(INTERACTIVE_INPUT_READY_FLUSH_MS)
+      const drainDeadline = Date.now() + INTERACTIVE_INPUT_READY_DRAIN_MAX_MS
+      lastLen = getStdout().length
+      stableSince = Date.now()
+      while (Date.now() < drainDeadline) {
+        await sleep(CLI_POLL_MS)
+        const len = getStdout().length
+        if (len !== lastLen) {
+          lastLen = len
+          stableSince = Date.now()
+        } else if (
+          Date.now() - stableSince >=
+          INTERACTIVE_INPUT_READY_STABLE_MS
+        ) {
+          return
+        }
+      }
+      return
+    }
+
+    const len = stdout.length
+    if (len !== lastLen) {
+      lastLen = len
+      stableSince = Date.now()
+    } else if (
+      afterLen !== undefined &&
+      len > afterLen &&
+      Date.now() - stableSince >=
+        INTERACTIVE_INPUT_READY_SETTLED_FALLBACK_STABLE_MS
+    ) {
+      return
+    }
+
     await sleep(CLI_POLL_MS)
   }
   throw new Error(formatTimeoutError(getStdout()))
@@ -176,15 +244,25 @@ export async function runCliInPty(opts: {
       formatTimeoutError: (stdout) =>
         `CLI prompt did not appear within 10s. stdout: ${stdout.slice(-300).replace(/\r/g, '\\r')}`,
     })
-      .then(() => {
+      .then(async () => {
         assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks(
           handle.stdout.value
         )
         sawInteractiveInputReadyOsc = true
-        const input = opts.input.endsWith('\n') ? opts.input : `${opts.input}\n`
-        handle.pty.write(input)
-      })
-      .then(() => {
+        const withoutTrailingNl = opts.input.replace(/\r?\n+$/, '')
+        const isSingleSegment = !(
+          withoutTrailingNl.includes('\n') || withoutTrailingNl.includes('\r')
+        )
+        if (isSingleSegment) {
+          handle.pty.write(withoutTrailingNl)
+          await sleep(INTERACTIVE_INPUT_READY_FLUSH_MS)
+          handle.pty.write('\r')
+        } else {
+          const input = opts.input.endsWith('\n')
+            ? opts.input
+            : `${opts.input}\n`
+          handle.pty.write(input)
+        }
         inputSent = true
       })
       .catch(reject)
@@ -217,19 +295,34 @@ export async function startInteractiveCli(opts: {
   interactiveHandle = handle
 }
 
-function interactiveCliPtyKeystrokeToBytes(
-  keystroke: InteractiveCliPtyKeystroke
-): string {
-  switch (keystroke.kind) {
-    case 'slashCommand':
-      return `${keystroke.commandLine} \n`
-    case 'line':
-      return `${keystroke.text}\n`
-    case 'enter':
-      return '\n'
-    case 'escape':
-      return '\x1b'
+/**
+ * One stdin `read()` must not contain text + CR together: Ink treats that as pasted text (literal
+ * `\r` in the box). Send the draft, pause for Ink, then send `\r` alone (same idea as Vitest
+ * `pushTTYCommandBytes` + `pushTTYCommandEnter`).
+ */
+async function ptyWriteDraftThenCarriageReturnAndWait(
+  draftBytes: string
+): Promise<string> {
+  if (!interactiveHandle) {
+    throw new Error(
+      'No interactive CLI running. Ensure @interactiveCLI Before hook ran.'
+    )
   }
+  interactiveHandle.pty.write(draftBytes)
+  await sleep(INTERACTIVE_INPUT_READY_FLUSH_MS)
+  const lenBeforeSubmit = interactiveHandle.stdout.value.length
+  interactiveHandle.pty.write('\r')
+  await waitForInteractiveInputReadyOscOrSettled({
+    getStdout: () => interactiveHandle!.stdout.value,
+    maxWaitMs: 15_000,
+    onlyInStdoutAfterByteLength: lenBeforeSubmit,
+    formatTimeoutError: (stdout) =>
+      `CLI did not show input box after send within 15s. stdout grew by ${stdout.length - lenBeforeSubmit} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`,
+  })
+  assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks(
+    interactiveHandle.stdout.value
+  )
+  return interactiveHandle.stdout.value
 }
 
 async function ptyWritePayloadAndWaitForInputReady(
@@ -242,7 +335,7 @@ async function ptyWritePayloadAndWaitForInputReady(
   }
   const lenBeforeSend = interactiveHandle.stdout.value.length
   interactiveHandle.pty.write(payload)
-  await waitForInteractiveInputReadyOsc({
+  await waitForInteractiveInputReadyOscOrSettled({
     getStdout: () => interactiveHandle!.stdout.value,
     maxWaitMs: 15_000,
     onlyInStdoutAfterByteLength: lenBeforeSend,
@@ -259,9 +352,24 @@ async function ptyWritePayloadAndWaitForInputReady(
 export async function applyInteractiveCliPtyKeystroke(
   keystroke: InteractiveCliPtyKeystroke
 ): Promise<string> {
-  return ptyWritePayloadAndWaitForInputReady(
-    interactiveCliPtyKeystrokeToBytes(keystroke)
-  )
+  switch (keystroke.kind) {
+    case 'line':
+      return ptyWriteDraftThenCarriageReturnAndWait(keystroke.text)
+    case 'slashCommand':
+      return ptyWriteDraftThenCarriageReturnAndWait(`${keystroke.commandLine} `)
+    case 'enter':
+      return ptyWritePayloadAndWaitForInputReady('\r')
+    case 'escape':
+      return ptyWritePayloadAndWaitForInputReady('\x1b')
+    case 'rawKey': {
+      if (keystroke.char.length !== 1) {
+        throw new Error(
+          `rawKey keystroke expects a single character, got ${JSON.stringify(keystroke.char)}`
+        )
+      }
+      return ptyWritePayloadAndWaitForInputReady(keystroke.char)
+    }
+  }
 }
 
 export async function stopInteractiveCli(): Promise<void> {

@@ -41,6 +41,12 @@ When('I enter {string} in the interactive CLI', (line: string) =>
   cli.interactive().enterLine(line)
 )
 When('I press ESC in the interactive CLI', () => cli.interactive().pressEsc())
+When('I type raw key {string} in the interactive CLI', (char: string) =>
+  cli.interactive().typeRawKey(char)
+)
+When('I cancel the token list with q in the interactive CLI', () =>
+  cli.interactive().typeRawKey('q')
+)
 When('I press Enter in the interactive CLI', () =>
   cli.interactive().pressEnter()
 )

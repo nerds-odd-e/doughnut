@@ -14,13 +14,18 @@ export const INTERACTIVE_CLI_PTY_KEYSTROKE_TASK =
 export type InteractiveCliPtyKeystroke =
   | {
       kind: 'slashCommand'
-      /** Full slash line as typed (e.g. `/recall`); runner appends space + Enter. */
+      /** Full slash line as typed (e.g. `/recall`); runner writes `line + ` then `\r` in a second chunk. */
       commandLine: string
     }
   | {
       kind: 'line'
-      /** One line of input; runner appends Enter (recall answers, `hello`, etc.). */
+      /** One line of input; runner writes text then `\r` in a second chunk (Ink stdin). */
       text: string
     }
   | { kind: 'enter' }
   | { kind: 'escape' }
+  | {
+      /** One UTF-16 code unit, sent alone (no Enter). For list modes that cancel on “other keys”. */
+      kind: 'rawKey'
+      char: string
+    }

@@ -283,6 +283,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       isPendingStopConfirmation() ||
       usesSessionYesNoInputChrome(!!tokenSelection)
     ) {
+      interactiveTtyStdout.inputReadyOsc()
       return
     }
     if (getNumberedChoiceListChoices() !== null) {
@@ -391,6 +392,17 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     if (getNumberedChoiceListChoices() !== null) return true
     if (tokenSelection) return true
     return false
+  }
+
+  const stdinTty = stdin as TTYInput
+  const innerSetRawMode = stdinTty.setRawMode?.bind(stdinTty)
+  if (typeof innerSetRawMode === 'function') {
+    stdinTty.setRawMode = (enable: boolean) => {
+      if (!enable && isAlternateLivePanel()) {
+        return stdinTty
+      }
+      return innerSetRawMode(enable)
+    }
   }
 
   function buildLivePanel(
@@ -517,6 +529,10 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       shellInstance.rerender(tree)
     }
     handleShellRendered()
+    if (isAlternateLivePanel()) {
+      stdinTty.ref?.()
+      stdinTty.setRawMode?.(true)
+    }
   }
 
   function rememberCommittedLine(raw: string): void {

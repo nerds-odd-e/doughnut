@@ -127,6 +127,9 @@ function interactive() {
     pressEsc() {
       applyInteractiveCliPtyKeystroke({ kind: 'escape' })
     },
+    typeRawKey(char: string) {
+      applyInteractiveCliPtyKeystroke({ kind: 'rawKey', char })
+    },
     answerToPrompt(answer: string, expectedPromptText: string) {
       currentGuidance().expectContains(expectedPromptText)
       applyInteractiveCliPtyKeystroke({ kind: 'line', text: answer })
