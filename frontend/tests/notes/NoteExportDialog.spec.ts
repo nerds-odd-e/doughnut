@@ -138,7 +138,7 @@ describe("NoteExportDialog", () => {
     // Should call API once
     expect(getGraphSpy).toHaveBeenCalledWith({
       path: { note: note.id },
-      query: { tokenLimit: 5000 },
+      query: { tokenLimit: 2000 },
     })
   })
 
