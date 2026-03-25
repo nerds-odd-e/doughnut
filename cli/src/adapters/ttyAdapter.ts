@@ -1118,7 +1118,16 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     }
   }
 
-  stdin.on('keypress', async (str: string | undefined, key: ReadlineKey) => {
+  /**
+   * Readline `emitKeypressEvents` runs alongside Ink on the same stdin. Ink owns normal typing
+   * and list navigation (`useInput` in live panels). This listener is only for:
+   * - Ctrl+C (always; exit before other routing).
+   * - Fetch-wait Esc cancel — {@link FetchWaitDisplay} has no `useInput`.
+   * - Esc on MCQ / token list when keypress ordering means the list panel’s Ink handler is unreliable
+   *   (Ink still handles Esc when it receives it; handlers are idempotent where both fire).
+   * When {@link isAlternateLivePanel} is false, return immediately so the default command line is Ink-only.
+   */
+  stdin.on('keypress', (_str, key: ReadlineKey) => {
     if (key.ctrl && key.name === 'c') {
       interactiveTtyStdout.ctrlCExitNewline()
       doExit()
@@ -1143,9 +1152,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     }
     if (key.name === 'escape' && tokenSelection) {
       commitTokenListResult(CLI_USER_ABORTED_WAIT_MESSAGE, 'userNotice')
-      return
-    }
-    if (getNumberedChoiceListChoices() !== null || tokenSelection) {
       return
     }
   })
