@@ -33,9 +33,10 @@ import {
   type InteractiveFetchWaitLine,
 } from './interactiveFetchWait.js'
 import {
-  recallStopConfirmViewModelForContext,
-  parseRecallSessionYesNoSubmit,
-} from './interactions/sessionYesNoInteraction.js'
+  parseRecallPipedYesNo,
+  recallStopConfirmInkModelForContext,
+  RECALL_PIPED_YES_NO_REPROMPT,
+} from './interactions/recallYesNo.js'
 import {
   buildSuggestionLines,
   formatMcqChoiceLines,
@@ -487,7 +488,7 @@ export async function processInput(
     return false
   }
   if (pendingRecallLoadMore) {
-    const parsed = parseRecallSessionYesNoSubmit(trimmed, 'empty-is-invalid')
+    const parsed = parseRecallPipedYesNo(trimmed)
     if (parsed === 'yes') {
       pendingRecallLoadMore = false
       recallSessionDueDays = 3
@@ -497,7 +498,7 @@ export async function processInput(
       output.log(formatRecallSessionSummary(sessionRecallCount))
       endRecallSession()
     } else {
-      writeCurrentPrompt('Please answer y or n')
+      writeCurrentPrompt(RECALL_PIPED_YES_NO_REPROMPT)
       return false
     }
     return false
@@ -550,7 +551,7 @@ export async function processInput(
         await continueRecallSession(false, output, writeCurrentPrompt)
     } else {
       const { memoryTrackerId } = pendingRecallAnswer
-      const parsed = parseRecallSessionYesNoSubmit(trimmed, 'empty-is-invalid')
+      const parsed = parseRecallPipedYesNo(trimmed)
       if (parsed === 'yes') {
         try {
           await markAsRecalled(memoryTrackerId, true)
@@ -566,7 +567,7 @@ export async function processInput(
           output.logError(err)
         }
       } else {
-        writeCurrentPrompt('Please answer y or n')
+        writeCurrentPrompt(RECALL_PIPED_YES_NO_REPROMPT)
         return false
       }
       pendingRecallAnswer = null
@@ -663,7 +664,7 @@ function buildTTYDeps() {
     isInCommandSessionSubstate: isInRecallSubstate,
     exitCommandSession: exitRecallMode,
     getStopConfirmationYesOutcomeLines: () => ['Stopped recall'] as const,
-    getStopConfirmationLiveView: recallStopConfirmViewModelForContext,
+    getRecallStopConfirmInkModel: recallStopConfirmInkModelForContext,
     isNumberedChoiceListActive,
     getNumberedChoiceListChoices,
     getNumberedChoiceListCurrentPromptWrappedLines,

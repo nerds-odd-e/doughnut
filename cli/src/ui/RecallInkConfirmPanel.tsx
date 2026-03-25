@@ -1,54 +1,45 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Box, Text, useFocus, useInput, type Key } from 'ink'
-import { ConfirmInput, StatusMessage } from '@inkjs/ui'
-import type { SessionYesNoLineDispatchResult } from '../interactions/sessionYesNoInteraction.js'
+import { StatusMessage } from '@inkjs/ui'
+import type { RecallInkConfirmChoice } from '../interactions/recallYesNo.js'
 import { eachLogicalInkStdinChunk } from './inkStdinLogicalKeys.js'
 
-const CONFIRM_LIVE_INK_FOCUS_ID = 'confirm-live'
+const RECALL_INK_CONFIRM_FOCUS_ID = 'recall-ink-confirm'
 
 const INVALID_CHOICE_MESSAGE = 'Please press y or n'
 
-export type ConfirmLivePanelProps = {
-  guidanceLines: string[]
-  placeholderText: string
-  /** Session y/n: Esc opens nested stop-confirm when still in command session. */
-  escapeToNestedStopConfirm: boolean
-  isInCommandSessionSubstate: () => boolean
-  onNestedStopConfirm: () => void
-  onInputReadySignal: () => void
-  onInterrupt: () => void
-  onDispatchResult: (r: SessionYesNoLineDispatchResult) => void | Promise<void>
+function fireAdapterChoice(
+  onResult: (r: RecallInkConfirmChoice) => void | Promise<void>,
+  choice: RecallInkConfirmChoice
+): void {
+  Promise.resolve(onResult(choice)).catch(() => undefined)
 }
 
-export function ConfirmLivePanel({
-  guidanceLines,
-  placeholderText,
-  escapeToNestedStopConfirm,
-  isInCommandSessionSubstate,
-  onNestedStopConfirm,
-  onInputReadySignal,
-  onInterrupt,
-  onDispatchResult,
-}: ConfirmLivePanelProps) {
+type RecallInkConfirmPanelSharedProps = {
+  guidanceLines: readonly string[]
+  placeholderText: string
+  onInputReadySignal: () => void
+  onInterrupt: () => void
+  onResult: (r: RecallInkConfirmChoice) => void | Promise<void>
+}
+
+export type RecallInkConfirmPanelProps =
+  | (RecallInkConfirmPanelSharedProps & { variant: 'stop-recall' })
+  | (RecallInkConfirmPanelSharedProps & {
+      variant: 'in-session'
+      whenInActiveRecallSession: () => boolean
+      onEscapeOpensStopRecallSheet: () => void
+    })
+
+export function RecallInkConfirmPanel(props: RecallInkConfirmPanelProps) {
+  const { onInputReadySignal, guidanceLines, placeholderText } = props
   const [hint, setHint] = useState('')
   const skipNextOsc = useRef(true)
-  const propsRef = useRef({
-    escapeToNestedStopConfirm,
-    isInCommandSessionSubstate,
-    onNestedStopConfirm,
-    onInterrupt,
-    onDispatchResult,
-  })
-  propsRef.current = {
-    escapeToNestedStopConfirm,
-    isInCommandSessionSubstate,
-    onNestedStopConfirm,
-    onInterrupt,
-    onDispatchResult,
-  }
+  const propsRef = useRef(props)
+  propsRef.current = props
 
   const { isFocused } = useFocus({
-    id: CONFIRM_LIVE_INK_FOCUS_ID,
+    id: RECALL_INK_CONFIRM_FOCUS_ID,
     autoFocus: true,
   })
   const isFocusedRef = useRef(isFocused)
@@ -77,39 +68,31 @@ export function ConfirmLivePanel({
       if (!isFocusedRef.current && inkFocusEverEstablishedRef.current) return
 
       if (ky.escape) {
-        if (p.escapeToNestedStopConfirm && p.isInCommandSessionSubstate()) {
+        if (p.variant === 'in-session' && p.whenInActiveRecallSession()) {
           dispatched = true
-          p.onNestedStopConfirm()
+          p.onEscapeOpensStopRecallSheet()
           return
         }
         dispatched = true
-        Promise.resolve(p.onDispatchResult({ result: 'cancel' })).catch(
-          () => undefined
-        )
+        fireAdapterChoice(p.onResult, { result: 'cancel' })
         return
       }
 
       if (ky.return && !ky.shift) {
         dispatched = true
-        Promise.resolve(p.onDispatchResult({ result: 'submit-no' })).catch(
-          () => undefined
-        )
+        fireAdapterChoice(p.onResult, { result: 'submit-no' })
         return
       }
 
       const ch = inp.length === 1 ? inp.toLowerCase() : ''
       if (ch === 'y') {
         dispatched = true
-        Promise.resolve(p.onDispatchResult({ result: 'submit-yes' })).catch(
-          () => undefined
-        )
+        fireAdapterChoice(p.onResult, { result: 'submit-yes' })
         return
       }
       if (ch === 'n') {
         dispatched = true
-        Promise.resolve(p.onDispatchResult({ result: 'submit-no' })).catch(
-          () => undefined
-        )
+        fireAdapterChoice(p.onResult, { result: 'submit-no' })
         return
       }
 
@@ -146,13 +129,7 @@ export function ConfirmLivePanel({
       ))}
       {placeholderText ? <Text dimColor>{placeholderText}</Text> : null}
       {hint ? <StatusMessage variant="error">{hint}</StatusMessage> : null}
-      <ConfirmInput
-        isDisabled
-        defaultChoice="cancel"
-        submitOnEnter
-        onConfirm={() => undefined}
-        onCancel={() => undefined}
-      />
+      <Text dimColor>y/N</Text>
     </Box>
   )
 }

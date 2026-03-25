@@ -41,10 +41,10 @@ import {
   onArrowUp,
   ttyArrowKeyUsesSlashSuggestionCycle,
 } from '../interactiveCommandInput.js'
-import {
-  RECALL_STOP_CONFIRM_GUIDANCE_LINE,
-  type SessionYesNoLineDispatchResult,
-} from '../interactions/sessionYesNoInteraction.js'
+import type {
+  RecallInkConfirmChoice,
+  RecallStopConfirmInkModel,
+} from '../interactions/recallYesNo.js'
 import {
   cycleListSelectionIndex,
   dispatchSelectListKey,
@@ -73,7 +73,7 @@ import type {
   OutputAdapter,
 } from '../types.js'
 import { CommandLineLivePanel } from '../ui/CommandLineLivePanel.js'
-import { ConfirmLivePanel } from '../ui/ConfirmLivePanel.js'
+import { RecallInkConfirmPanel } from '../ui/RecallInkConfirmPanel.js'
 import { FetchWaitDisplay } from '../ui/FetchWaitDisplay.js'
 import { InteractiveShellDisplay } from '../ui/InteractiveShellDisplay.js'
 import {
@@ -92,11 +92,9 @@ export interface TTYDeps {
   isInCommandSessionSubstate: () => boolean
   exitCommandSession: () => void
   getStopConfirmationYesOutcomeLines: () => readonly string[]
-  getStopConfirmationLiveView: (ctx: PlaceholderContext) => {
-    promptLines: string[]
-    placeholder: string
-    guidance: string[]
-  }
+  getRecallStopConfirmInkModel: (
+    ctx: PlaceholderContext
+  ) => RecallStopConfirmInkModel
   isNumberedChoiceListActive: () => boolean
   getNumberedChoiceListChoices: () => readonly string[] | null
   getNumberedChoiceListCurrentPromptWrappedLines: (
@@ -144,11 +142,7 @@ type LiveRegionLayout = {
 type LiveRegionPromptStageSnapshot = {
   width: number
   placeholderContext: PlaceholderContext
-  stopConfirmDisplay: {
-    promptLines: string[]
-    placeholder: string
-    guidance: string[]
-  } | null
+  recallStopConfirmInkModel: RecallStopConfirmInkModel | null
   currentPromptWrappedLines: string[]
   currentStageIndicatorLines: string[]
 }
@@ -167,7 +161,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     isInCommandSessionSubstate,
     exitCommandSession,
     getStopConfirmationYesOutcomeLines,
-    getStopConfirmationLiveView,
+    getRecallStopConfirmInkModel,
     isNumberedChoiceListActive,
     getNumberedChoiceListChoices,
     getNumberedChoiceListCurrentPromptWrappedLines,
@@ -288,8 +282,8 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   function getLiveRegionPromptAndStageLines(): LiveRegionPromptStageSnapshot {
     const width = getTerminalWidth()
     const placeholderContext = getPlaceholderContext(!!tokenSelection)
-    const stopConfirmDisplay = isPendingStopConfirmation()
-      ? getStopConfirmationLiveView(placeholderContext)
+    const recallStopConfirmInkModel = isPendingStopConfirmation()
+      ? getRecallStopConfirmInkModel(placeholderContext)
       : null
     const numberedChoicePromptLines =
       getNumberedChoiceListCurrentPromptWrappedLines(width)
@@ -300,8 +294,8 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     let currentPromptWrappedLines: string[]
     if (waitLine) {
       currentPromptWrappedLines = []
-    } else if (stopConfirmDisplay) {
-      currentPromptWrappedLines = stopConfirmDisplay.promptLines
+    } else if (recallStopConfirmInkModel) {
+      currentPromptWrappedLines = [...recallStopConfirmInkModel.promptLines]
     } else {
       const currentPromptText = tokenListConfig?.currentPrompt
       if (
@@ -325,7 +319,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     return {
       width,
       placeholderContext,
-      stopConfirmDisplay,
+      recallStopConfirmInkModel,
       currentPromptWrappedLines,
       currentStageIndicatorLines,
     }
@@ -344,8 +338,8 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         tokenSelection.highlightIndex
       )
     }
-    if (promptStage.stopConfirmDisplay) {
-      return promptStage.stopConfirmDisplay.guidance
+    if (promptStage.recallStopConfirmInkModel) {
+      return [...promptStage.recallStopConfirmInkModel.confirmQuestionLines]
     }
     if (numberedChoices !== null) {
       return recallMcqCurrentGuidanceLines(
@@ -410,37 +404,35 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     }
     if (isPendingStopConfirmation()) {
       const placeholderCtx = getPlaceholderContext(false)
-      const view = getStopConfirmationLiveView(placeholderCtx)
+      const model = getRecallStopConfirmInkModel(placeholderCtx)
       const stageLines = isInCommandSessionSubstate()
         ? [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
         : []
-      return React.createElement(ConfirmLivePanel, {
+      return React.createElement(RecallInkConfirmPanel, {
         key: 'confirm-stop-recall',
+        variant: 'stop-recall',
         guidanceLines: [
           ...stageLines,
-          ...view.promptLines,
-          RECALL_STOP_CONFIRM_GUIDANCE_LINE,
+          ...model.promptLines,
+          ...model.confirmQuestionLines,
         ],
-        placeholderText: view.placeholder,
-        escapeToNestedStopConfirm: false,
-        isInCommandSessionSubstate,
-        onNestedStopConfirm: enterStopConfirmationFromEsc,
+        placeholderText: model.placeholder,
         onInputReadySignal: signalConfirmInputReady,
         onInterrupt: interruptInkShell,
-        onDispatchResult: (d) => handleStopConfirmDispatch(d),
+        onResult: (d) => handleStopConfirmDispatch(d),
       })
     }
     if (usesSessionYesNoInputChrome(!!tokenSelection)) {
-      return React.createElement(ConfirmLivePanel, {
+      return React.createElement(RecallInkConfirmPanel, {
         key: 'confirm-session-yes-no',
+        variant: 'in-session',
         guidanceLines: [],
         placeholderText: 'y or n; /stop to exit recall',
-        escapeToNestedStopConfirm: true,
-        isInCommandSessionSubstate,
-        onNestedStopConfirm: enterStopConfirmationFromEsc,
+        whenInActiveRecallSession: isInCommandSessionSubstate,
+        onEscapeOpensStopRecallSheet: enterStopConfirmationFromEsc,
         onInputReadySignal: signalConfirmInputReady,
         onInterrupt: interruptInkShell,
-        onDispatchResult: (d) => handleSessionYesNoDispatch(d),
+        onResult: (d) => handleSessionYesNoDispatch(d),
       })
     }
     const numberedChoices = getNumberedChoiceListChoices()
@@ -720,7 +712,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   }
 
   async function handleStopConfirmDispatch(
-    dispatch: SessionYesNoLineDispatchResult
+    dispatch: RecallInkConfirmChoice
   ): Promise<void> {
     switch (dispatch.result) {
       case 'cancel':
@@ -746,7 +738,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   }
 
   async function handleSessionYesNoDispatch(
-    dispatch: SessionYesNoLineDispatchResult
+    dispatch: RecallInkConfirmChoice
   ): Promise<void> {
     switch (dispatch.result) {
       case 'cancel':
