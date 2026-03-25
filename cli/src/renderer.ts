@@ -1,6 +1,6 @@
 /**
  * Terminal layout bridge: grapheme-aware width and wrapping, ANSI strings for the live region
- * (assembled into Ink via `LiveRegionLines` and related paths), piped-adapter box rendering, and
+ * (assembled into Ink via `CommandLineLivePanel` and related paths), piped-adapter box rendering, and
  * shared placeholders / tone helpers. Complements the Ink shell; not a second interactive UI engine.
  */
 import {
@@ -396,7 +396,7 @@ function stripTrailingSgrReset(s: string): string {
 }
 
 /** One full-width screen line: Current stage band + padded label (visible width = `width`). */
-function formatCurrentStageIndicatorLine(
+export function formatCurrentStageIndicatorLine(
   labelWithLeadingSgr: string,
   width: TerminalWidth
 ): string {
@@ -799,6 +799,31 @@ export function buildSuggestionLines(
     formatCommandCompletionLines(filtered),
     highlightIndex,
     width
+  )
+}
+
+/**
+ * Current guidance for the default TTY live column: same rows as {@link buildSuggestionLines} but
+ * without per-line truncation — Ink `Text` `wrap` owns line breaks (gate 4).
+ */
+export function buildSuggestionLinesForInk(
+  buffer: string,
+  highlightIndex: number,
+  options?: { forceCommandsHint?: boolean }
+): string[] {
+  const lastLine = getLastLine(buffer)
+  const showHint =
+    options?.forceCommandsHint ||
+    !lastLine.startsWith('/') ||
+    lastLine.endsWith(' ')
+  if (showHint) {
+    return [COMMANDS_HINT]
+  }
+  const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
+  return formatHighlightedList(
+    formatCommandCompletionLines(filtered),
+    CURRENT_GUIDANCE_MAX_VISIBLE,
+    highlightIndex
   )
 }
 

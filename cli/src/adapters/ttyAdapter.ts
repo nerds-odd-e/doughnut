@@ -52,7 +52,7 @@ import {
   dispatchSelectListKey,
 } from '../interactions/selectListInteraction.js'
 import {
-  buildSuggestionLines,
+  buildSuggestionLinesForInk,
   buildTokenListLines,
   DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
   getLastLine,
@@ -361,7 +361,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         width
       )
     }
-    return buildSuggestionLines(commandInput.lineDraft, highlightIndex, width, {
+    return buildSuggestionLinesForInk(commandInput.lineDraft, highlightIndex, {
       forceCommandsHint:
         suggestionsDismissed &&
         isCommandPrefixWithSuggestions(commandInput.lineDraft),

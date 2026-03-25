@@ -1,6 +1,13 @@
 import { Box, Text } from 'ink'
 import {
-  buildLiveRegionLinesWithCaret,
+  buildBoxLinesWithCaret,
+  buildCurrentPromptSeparator,
+  buildCurrentPromptSeparatorForStageBand,
+  formatCurrentStageIndicatorLine,
+  grayDisabledInputBoxLines,
+  isGreyDisabledInputChrome,
+  renderBox,
+  stripAnsi,
   type LiveRegionPaintOptions,
   type PlaceholderContext,
   type TerminalWidth,
@@ -26,19 +33,52 @@ export function CommandLineLivePanel({
   placeholderContext,
 }: CommandLineLivePanelProps) {
   const paint: LiveRegionPaintOptions = { placeholderContext }
-  const lines = buildLiveRegionLinesWithCaret(
-    buffer,
-    width,
-    caretOffset,
-    currentPromptWrappedLines,
-    suggestionLines,
-    currentStageIndicatorLines,
-    paint
-  )
+  const hasStageIndicator = currentStageIndicatorLines.length > 0
+  const rawBoxLines = renderBox(
+    buildBoxLinesWithCaret(buffer, width, caretOffset, paint),
+    width
+  ).split('\n')
+  const boxLines =
+    placeholderContext && isGreyDisabledInputChrome(placeholderContext)
+      ? grayDisabledInputBoxLines(rawBoxLines)
+      : rawBoxLines
+
+  const promptPlainForInk =
+    currentPromptWrappedLines.length > 0
+      ? currentPromptWrappedLines.map((l) => stripAnsi(l)).join('\n')
+      : null
+
   return (
     <Box flexDirection="column">
-      {lines.map((line, i) => (
-        <Text key={i}>{line}</Text>
+      {hasStageIndicator ? (
+        <>
+          {currentStageIndicatorLines.map((ind, i) => (
+            <Text key={`stage-${i}`}>
+              {formatCurrentStageIndicatorLine(ind, width)}
+            </Text>
+          ))}
+          <Text>{buildCurrentPromptSeparatorForStageBand(width)}</Text>
+        </>
+      ) : null}
+      {promptPlainForInk ? (
+        <>
+          {!hasStageIndicator ? (
+            <Text>{buildCurrentPromptSeparator(width)}</Text>
+          ) : null}
+          <Box width={width}>
+            <Text color="grey" wrap="wrap">
+              {promptPlainForInk}
+            </Text>
+          </Box>
+        </>
+      ) : null}
+      {boxLines.map((line, i) => (
+        <Text key={`box-${i}`}>{line}</Text>
+      ))}
+      {suggestionLines.map((line, i) => (
+        <Box key={`sug-${i}`} width={width}>
+          <Text wrap="wrap">{line}</Text>
+        </Box>
       ))}
     </Box>
   )

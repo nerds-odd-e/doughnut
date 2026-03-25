@@ -13,6 +13,8 @@ import {
   needsGapBeforeBox,
   buildLiveRegionLines,
   buildLiveRegionLinesWithCaret,
+  buildSuggestionLines,
+  buildSuggestionLinesForInk,
   buildBoxLinesWithCaret,
   CURRENT_STAGE_BAND_BACKGROUND_SGR,
   DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
@@ -173,6 +175,24 @@ describe('needsGapBeforeBox', () => {
         [`${INTERACTIVE_FETCH_WAIT_PROMPT_FG}Loading${RESET}`]
       )
     ).toBe(false)
+  })
+})
+
+describe('buildSuggestionLinesForInk', () => {
+  test('matches buildSuggestionLines when every row fits terminal width', () => {
+    const w = 200
+    expect(buildSuggestionLinesForInk('/h', 0)).toEqual(
+      buildSuggestionLines('/h', 0, w)
+    )
+  })
+
+  test('keeps full rows where buildSuggestionLines would truncate', () => {
+    const narrow = 24
+    const truncated = buildSuggestionLines('/', 0, narrow)
+    const ink = buildSuggestionLinesForInk('/', 0)
+    expect(truncated.some((l) => stripAnsi(l).includes('...'))).toBe(true)
+    expect(ink.some((l) => stripAnsi(l).includes('...'))).toBe(false)
+    expect(ink.length).toBe(truncated.length)
   })
 })
 
