@@ -4,30 +4,40 @@ Informal plan; update as work proceeds. **Testing:** observable behavior first �
 
 ---
 
-## North star
+## North star (phases 1–8 shipped; 9+ = structural / Ink-native shell)
 
-Interactive TTY = **one Ink `render()`** root (`InteractiveShellDisplay`: **`Static`** history + live panel). **End state:** while the shell is active, **one stdin / keyboard owner** (Ink `useInput` and, for lists and confirms, **`@inkjs/ui`** where it matches behavior — see gate 5). **No parallel paths:** **readline** / **`ttyAdapter` keypress** must not handle typing, confirm, or list navigation for modes the Ink tree owns — **phase 7** leaves only documented residue (Ctrl+C, fetch-wait Esc, list Esc bridge); see JSDoc on **`stdin.on('keypress')`** in **`ttyAdapter.ts`**.
+Interactive TTY = **one Ink `render()`** root: **`Static`** for append-only scrollback + **live subtree** driven by **`useInput`** / **`useFocus`** / **`@inkjs/ui`** where it fits (gate 5). **Business domain** owns the meaning of **chat history** and **command turns** (types + transitions); the shell expresses them as **React state** feeding **`Static` items** and live props — not as opaque mutable blobs inside a fat “adapter.”
+
+**End state (this document, phases 9–14):**
+
+- **No `ttyAdapter` monolith** — replace with a **thin TTY I/O + mount** entry (streams, raw mode, documented bridges only) and **Ink-root state** for shell UI.
+- **Piped / `-c` and TTY interactive are separate modules** — **no piped-only code** in the TTY interactive path (see phase 9).
+- **`patchConsole: true`** on `render()` once the TTY path no longer relies on raw `console.log` fighting Ink (phase 13).
+- **Do not patch, fight, or sidestep Ink** for keys/layout Ink already owns; remaining non-Ink bytes are **listed under [Special cases (approved Ink exceptions)](#special-cases-approved-ink-exceptions)**.
+
+**Current shipped (phases 1–8):** while the shell is active, **one stdin / keyboard owner** for command line, confirm, and lists. **readline** / **`keypress`** — only documented residue (Ctrl+C, fetch-wait Esc, list Esc bridge); see JSDoc on **`stdin.on('keypress')`** in **`ttyAdapter.ts`** (to be relocated with thin TTY entry in phase 11).
 
 **Phase 5 (done):** MCQ and token lists use Ink **`RecallMcqChoicesLivePanel`** / **`AccessTokenPickerLivePanel`** in **`liveSelectionGuidanceInk.tsx`** (`useInput` + **`selectListInteraction`**); readline **`keypress`** handles **Esc** on those lists only (bridge). **Phases 3–6 (done):** stop-confirm + session y/n on Ink (**`RecallInkConfirmPanel`**, shared stdin coalescing in **`inkStdinLogicalKeys.ts`**; **`@inkjs/ui` `StatusMessage`** for invalid keys). **Phase 7 (done):** audited **`ttyAdapter`** — no duplicate handlers for command line, confirm, or list keys; **`readline.createInterface` + `emitKeypressEvents`** kept only to attach this listener; list **Esc** bridge kept (documented on the **`keypress`** handler).
 
-**Non-interactive** (`-c`, piped): **`processInput` + `pipedAdapter`** unless you explicitly unify.
+**Non-interactive** (`-c`, piped): **`processInput` + `pipedAdapter` only** — not mixed into the TTY interactive module (phase 9).
 
-**Adapter rule:** `ttyAdapter` must **not** branch on product concepts (*recall*, *MCQ*, …). Only **mechanism** `TTYDeps` from `interactive.ts` (`buildTTYDeps()`).
+**Shell rule (replaces fat “adapter”):** TTY entry file may only wire **mechanism** (`TTYDeps` / streams / `render` options). **Domain branching** stays in **`interactive.ts`** (and siblings); **scrollback and turn state** are named domain concepts surfaced to the Ink root (phases 10–11).
 
-**Layout bridge:** `cli/src/renderer.ts` — grapheme-aware width/wrap for **piped** `writeFullRedraw` and for structures that must stay column-exact (input box via `renderBox` / `truncateToWidth`). TTY default live **current guidance** + optional **current prompt** use Ink wrap (phase 1).
+**Layout bridge:** `cli/src/renderer.ts` — **shrink for TTY** (phase 12): keep grapheme-aware width/wrap for **piped** `writeFullRedraw` and any shared string builders still needed for props. TTY live column stays Ink **`Text` / `Box`** wrap (phase 1; gate 4).
 
-**Raw stdout:** Interactive glue lives in **`cli/src/adapters/interactiveTtyStdout.ts`** (OSC, cursor, clear, exit farewell). Ink still renders the live tree on its own stream.
+**Raw stdout:** Phase 13–14 converge on Ink-managed stdout + **`patchConsole: true`**; **`interactiveTtyStdout`** shrinks to **documented non-Ink bytes** (OSC, exit farewell, cursor) only if still required after migration.
 
 ---
 
-## Layering
+## Layering (target after phase 11)
 
 | Layer | Role |
 |-------|------|
-| **Business** | `interactive.ts`, `recall.ts`, … — orchestration; exposes data/callbacks to UI. |
-| **Interactive UI** | React/Ink components + state; no domain rules beyond dispatching props. |
-| **TTY adapter** | Composes shell + `interactiveTtyStdout`; key handling for Ink-owned modes is not duplicated except documented **`keypress` residue** (phase 7). |
-| **Ink shell** | `render` / rerender, `Static` + live column. |
+| **Business** | `interactive.ts`, `recall.ts`, … — orchestration; **chat history** and **command turns** as explicit domain concepts and callbacks. |
+| **Shell state (Ink)** | Root React state / reducer (or equivalent) — **`Static` items** + live props; updated from business callbacks, not duplicated ad hoc in a legacy adapter. |
+| **Interactive UI** | Presentational Ink components + **`useInput`**; dispatch via props; no product rules. |
+| **TTY entry (thin)** | `render` options, stdin/stdout, raw mode, **`patchConsole`** (phase 13), documented **`keypress` residue** only where listed in [Special cases](#special-cases-approved-ink-exceptions). |
+| **Piped** | `pipedAdapter` + `processInput` path only — **no imports of piped layout from TTY files** (phase 9). |
 
 ---
 
@@ -47,9 +57,9 @@ Interactive TTY = **one Ink `render()`** root (`InteractiveShellDisplay`: **`Sta
 2. **`Static`** vs rewriting old history lines — **resolved:** **`Static` only** — append-only history scrollback; no in-place mutation of lines already emitted into history. If a future feature needs a mutating line, treat it as **live** subtree or a **new** gate — not silent rewriting of `Static` items.
 3. **`useFocus`** / Tab vs ↑↓ in guidance / selection mode — **resolved:** **do not preserve** the legacy TTY model where **↑↓** globally toggled draft command history vs list selection. **New model:** Ink **`useFocus`** (or equivalent); **Tab** / **Shift+Tab** move focus among **focusable regions** in the live column. **↑↓** (and list-specific keys) apply **only inside** the focused region (draft history in the command area when that area is focused; choice highlight when the list/`Select` region is focused). **Phase 4** ships this for the command line + focus plumbing; **phase 5** attaches MCQ/token/slash **`Select`** as a peer focus target. Update **Vitest + E2E** and any **`.cursor/rules/cli.mdc`** terminology that still describes the old global ↑↓ behavior when phase 4 lands.
 4. Ink `Text` wrap vs `renderer.ts` grapheme wrap (**CJK/emoji**) — **resolved:** TTY default live column uses Ink `Text` `wrap` inside `Box width={terminalWidth}` for current prompt + guidance; piped path unchanged (`buildLiveRegionLines`, `buildSuggestionLines`). Subtle wrap differences vs grapheme-aware wrap accepted.
-5. **`@inkjs/ui`** vs hand-rolled `useInput` — **resolved:** **complete replacement** toward Ink ecosystem — use **`Select`**, **`ConfirmInput`**, **`TextInput`** from **`@inkjs/ui`** when behavior maps **1:1** (or close enough with thin wrappers). If a primitive does not fit, use Ink **`useInput` inside the live subtree** only — **not** a second handler in **`ttyAdapter`**. Pure policy helpers (e.g. submit-line derivation in **`selectListInteraction`**) may stay **called from** Ink handlers; they are not a duplicate stdin path.
+5. **`@inkjs/ui`** vs hand-rolled `useInput` — **resolved:** **complete replacement** toward Ink ecosystem — use **`Select`**, **`ConfirmInput`**, **`TextInput`** from **`@inkjs/ui`** when behavior maps **1:1** (or close enough with thin wrappers). If a primitive does not fit, use Ink **`useInput` inside the live subtree** only — **not** a second handler in the **TTY entry** / legacy **`ttyAdapter`**. Pure policy helpers (e.g. submit-line derivation in **`selectListInteraction`**) may stay **called from** Ink handlers; they are not a duplicate stdin path.
 6. Visual parity (stage band, borders) — **declined** for this migration; slimmer Ink look OK
-7. **`patchConsole`** / `console.log` vs layout corruption
+7. **`patchConsole`** / `console.log` vs layout corruption — **resolved (direction):** **`patchConsole: true`** in **phase 13** after TTY path routes user-visible output through Ink / `useStdout().write` / domain hooks — not raw `console.log` in the hot path. **Escape hatch:** if a regression cannot be fixed quickly, revert **`patchConsole`** only for that phase and fix forward (do not leave dual strategies long term).
 
 ---
 
@@ -68,9 +78,11 @@ Ink shell, neutral `TTYDeps`, confirm/MCQ/token/fetch-wait display components, *
 
 ## Remaining phases (numbered)
 
-**Order:** **2 → 3 → 4 → 5 → 6 → 7 → 8 → 9** (phases 1–8 done)
+**Order (historical):** **2 → 3 → 4 → 5 → 6 → 7 → 8** (done).
 
-**Rationale (planning.mdc):** **Phase 4** is its own **user-visible** slice (new keyboard/focus model — gate 3). **Phase 5** moves MCQ/token list input onto Ink (**`useInput`** list panels; gate 5 hand-rolled fallback vs **`@inkjs/ui` `Select`**). **Phase 6** is a separate UX slice (simpler y/n). **Phase 7** is the mandatory duplicate-path audit.
+**Order (extended track):** **9 → 10 → 11 → 12 → 13 → 14** — **remove `ttyAdapter`**, **separate piped from TTY**, **domain-shaped shell state + `Static` / `useInput`**, **shrink `renderer.ts` for TTY**, **`patchConsole: true`**, **final residue audit**.
+
+**Rationale (planning.mdc):** Phases **9** and **12** are **structure-first** (no new user story); justify each with **full interactive Vitest + targeted E2E** unchanged. Phases **10–11** can be split further if two user-visible slices are clearer (e.g. “history append correctness” vs “command turn flush”) — keep **at most one intentionally failing test** per planning TDD note when driving. **Phase 13** is user-visible only as “no corrupted interleaved logs”; treat **`patchConsole`** flip as **verify-heavy**. **Phase 14** is **audit + documentation** of approved exceptions.
 
 ### Phase 2 (done) — `useInput` for main command line (gate 1)
 
@@ -134,34 +146,83 @@ Ink shell, neutral `TTYDeps`, confirm/MCQ/token/fetch-wait display components, *
 
 Interactive fetch-wait: **`@inkjs/ui` `Spinner`** (`type="dots"`) in **`FetchWaitDisplay`**; removed adapter **`setInterval`** ellipsis tick + **`INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS`**. Stage-band layout string is static blue label (**`interactiveFetchWaitStageIndicatorLine`**) for **`needsGapBeforeBox`** / piped paths only.
 
-### Phase 9 — Ink-idiomatic stdout (shrink `interactiveTtyStdout`)
+### Phase 9 — Piped vs TTY module boundary
 
-After **2–8** (and with phase 1 done for default live wrap), reduce raw **`process.stdout.write`** using Ink-supported patterns: e.g. **`render(..., { stdout })`** via a thin **`Writable`**, **`Static`** for append-only exit tails if PTY rules allow, cursor/show-hide via the unified input path, revisit **gate 7** if it removes duplicate prompt logging **without** corrupting layout.
+**Goal:** **Zero piped / `writeFullRedraw` / non-interactive layout imports** inside the TTY interactive module (today’s **`ttyAdapter.ts`** and anything that replaces it for **`runTTY`**). Piped stays **`pipedAdapter`** + its call chain only.
 
-- **Expect residue:** Private OSC (**`INTERACTIVE_INPUT_READY_OSC`**) may stay documented in a tiny layer.
-- **Verify:** Interactive Vitest + E2E for history and OSC ordering.
-- **Stop if:** tests fail — keep **`interactiveTtyStdout`** as escape hatch.
+- **Outcome:** Clear dependency direction: **TTY shell** → business + Ink; **piped** → **`processInput`** + grapheme **`renderer`** helpers — **no shared file** that branches “if piped” inside TTY code.
+- **Verify:** Grep gate (no piped symbols in TTY module); **`pnpm cli:test`** interactive + **`processInput.test.ts`**; spot E2E if imports moved.
+
+### Phase 10 — Domain: chat history + command turns as first-class concepts
+
+**Goal:** **`ChatHistory`** / scrollback entries and **command-turn** buffering are **named types and transitions** in the **business** layer (or a small **`cli/src/shell/`** module owned by business), with stable verbs (append output, commit input line, flush turn, etc.) — **not** ad-hoc arrays only inside a legacy adapter.
+
+- **Ink mapping:** **`Static` `items`** = function of domain history (append-only, gate 2); live region = function of current turn + stage — **one directional flow** from domain updates to props.
+- **Verify:** Same observable transcripts as today (Vitest **`runInteractive`**, key E2E); optional **narrow unit** tests on pure transition helpers if they become the stable contract.
+
+### Phase 11 — Remove `ttyAdapter`: thin TTY entry + Ink root state
+
+**Goal:** Delete the **`ttyAdapter` monolith** — replace with **(a)** a **thin TTY session file** (mount Ink, streams, raw mode, **`exitOnCtrlC`**, documented **`keypress` residue** only per [Special cases](#special-cases-approved-ink-exceptions)) and **(b)** **Ink root** (`InteractiveShellDisplay` or successor) holding **React state / reducer** that subscribes to domain callbacks instead of mirroring state in closure variables beside Ink.
+
+- **Principle:** **Rerender** from React state updates; avoid **manual `drawBox`** orchestration that duplicates Ink’s update cycle unless a listed **special case** requires it.
+- **Verify:** Full interactive Vitest suite + **`cli_interactive_mode`** / recall E2E as appropriate; **J1** empty-Enter **`clear` before `unmount`** still holds.
+
+### Phase 12 — Greatly shrink `renderer.ts` for TTY
+
+**Goal:** **TTY path** stops depending on large grapheme **live-region line builders** where Ink already wraps (gate 4). **`renderer.ts`** keeps **piped** column-exact **`writeFullRedraw`**, **`renderBox`**, **`truncateToWidth`**, shared tone/ANSI helpers, and any **string props** still passed into Ink (MCQ lines, separators) **without duplicating** a second layout engine.
+
+- **Verify:** **`renderer.test.ts`** for retained piped/shared helpers; interactive tests for TTY wrap unchanged in user-visible terms.
+
+### Phase 13 — `patchConsole: true` + Ink-idiomatic stdout
+
+**Goal:** **`render(..., { patchConsole: true })`**; route intentional logging through **`useStdout().write`** or domain **`OutputAdapter`** hooks that cooperate with Ink — **no** raw **`console.log`** on the interactive TTY hot path fighting the tree. Shrink **`interactiveTtyStdout`** to what Ink cannot own (see phase 14 + special cases).
+
+- **Gate 7:** Closed here per [Decision gates](#decision-gates-pause-and-get-sign-off).
+- **Verify:** Interactive Vitest + E2E; **`pnpm cli:lint`**. **Stop if:** persistent corruption — temporarily revert **`patchConsole`** only as a **short** escape hatch while fixing root cause.
+
+### Phase 14 — Residue audit + special cases doc in code
+
+**Goal:** Single checklist of **approved non-Ink** behavior (OSC, exit farewell, cursor, **readline `keypress`** bridges). Remove any **unlisted** sideways hacks. Update **`.cursor/rules/cli.mdc`** if terminology moves from “ttyAdapter” to “TTY session entry” / “Ink shell root.”
+
+- **Verify:** Grep + JSDoc on the thin TTY file; no duplicate stdin handlers beyond the list.
+
+---
+
+## Special cases (approved Ink exceptions)
+
+These are **intentional** places the stack is **not** pure Ink — document **why** next to the code and keep the list minimal.
+
+| Case | Why Ink alone is insufficient (today) |
+|------|----------------------------------------|
+| **Private OSC** **`INTERACTIVE_INPUT_READY_OSC`** | Invisible integrator signal (PTY / shell integration); not a React layout concern. |
+| **Hardware cursor hide/show + exit farewell** | Lifecycle **after** `unmount` / outside Ink’s paint cycle for some paths. |
+| **readline `keypress`** (Ctrl+C, fetch-wait Esc, list Esc bridge) | **Phase 7** residue: stdin ordering / components without `useInput` for that key; **prefer eliminating** each bridge inside later sub-steps if Ink can own it without fighting. |
+| **Full-screen clear (`/clear`)** | May remain explicit CSI via thin stdout layer if not expressed as `Static` reset. |
+
+**Rule:** If a new exception is needed, **add it here and in JSDoc** in the same PR — no silent “just this once” `process.stdout.write`.
 
 ---
 
 ## Replacement bar (summary)
 
-| Mode | Owner after migration | `ttyAdapter` / readline |
-|------|------------------------|-------------------------|
+| Mode | Owner after migration | Thin TTY entry / readline |
+|------|------------------------|---------------------------|
 | Main command line | Ink **`useInput`** + **focus** (phases 2 + 4) | No duplicate key handling |
 | Confirm / y/n | **`RecallInkConfirmPanel`** + **`@inkjs/ui` `StatusMessage`** (phase 6) | No duplicate |
-| Lists (MCQ, tokens, selection) | **`RecallMcqChoicesLivePanel`** / **`AccessTokenPickerLivePanel`** + **`selectListInteraction`**; Esc bridge on **`keypress`** | No duplicate list keys except Esc bridge |
-| Residue check | — | **Done** — see **`ttyAdapter`** `keypress` JSDoc |
+| Lists (MCQ, tokens, selection) | **`RecallMcqChoicesLivePanel`** / **`AccessTokenPickerLivePanel`** + **`selectListInteraction`**; Esc bridge on **`keypress`** until removed | No duplicate list keys except **listed** Esc bridge |
+| Scrollback / turns | Domain model → **`Static` items** + live props (phases 10–11) | Not stored only in legacy adapter closures |
+| Piped / `-c` | **`pipedAdapter`** + **`renderer`** grapheme path | **Not** in TTY module (phase 9) |
+| Residue | — | **Phase 14** + [Special cases](#special-cases-approved-ink-exceptions) (replaces “see ttyAdapter JSDoc” as sole doc) |
 
 ---
 
 ## What the UI layer is not
 
-Not **business rules**, not a second **`processInput`**, not **domain branching** in **`ttyAdapter`**. Piped mode unchanged unless you extend scope.
+Not **business rules**, not a second **`processInput`**. **Not** a place for **piped** or **`-c`** layout. **Not** a second mutable copy of **chat history** / **command turns** that disagrees with domain state (phases 10–11). Domain branching stays in **`interactive.ts`** (and related modules), not in the thin TTY file.
 
 ---
 
 ## References (Context7)
 
-- **Ink** — `vadimdemedes/ink`: `render`, `Box`, `Text`, `Static`, `useInput`, `useApp`, `useFocus`, instance `clear` / `unmount`, `render` options.
+- **Ink** — `vadimdemedes/ink`: `render` (options: **`patchConsole`**, custom **`stdout`**), `Box`, `Text`, **`Static`**, **`useInput`**, **`useStdout`** / **`write`**, `useApp`, `useFocus`, instance **`clear`** / **`unmount`**.
 - **Ink UI** — `vadimdemedes/ink-ui`: `TextInput`, `ConfirmInput`, `Select`, `Spinner`, `ProgressBar`.
