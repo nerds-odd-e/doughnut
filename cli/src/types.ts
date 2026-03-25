@@ -55,7 +55,7 @@ export type ChatHistoryOutputEntry = {
   tone?: ChatHistoryOutputTone
 }
 export type ChatHistoryEntry = ChatHistoryInputEntry | ChatHistoryOutputEntry
-/** Ordered log of user inputs and command outputs for re-render on resize. */
+/** Ordered log of user inputs and command outputs (Ink `Static` history; adapter may rerender on resize). */
 export type ChatHistory = ChatHistoryEntry[]
 
 /** Slash-command token-picker modes for `/list-access-token` and related TTY flows. */
@@ -91,7 +91,7 @@ export type OutputAdapter = {
    * wrapped lines) and input box are painted in the live region. When unset, non-TTY MCQ uses `writeCurrentPrompt` / `log` instead.
    */
   beginCurrentPrompt?: () => void
-  /** Optional: for /clear and resize. TTY provides a callback that clears and redraws. */
+  /** Optional: for `/clear`. TTY clears history and redraws; resize repaints via the adapter without this hook. */
   clearAndRedraw?: () => void
   /**
    * TTY only: invoked when interactive fetch-wait starts or finishes (see `runInteractiveFetchWait`).

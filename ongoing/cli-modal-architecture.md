@@ -392,7 +392,7 @@ Post–Phase I review of the `cli/` subproject against the north star and open g
 
 ## Phases J+ (J1–J2 done; J3 onward planned)
 
-**Order:** ~~fix unmount-erase lifecycle (J1)~~ **done** → ~~reverse-video caret (J2)~~ **done** → ~~single layout snapshot (J3)~~ **done** → **terminal resize (Ink-aligned, J4)** → Ink wrap for default column (K) → stdin/`useInput` migration → confirm → lists → optional ink-ui polish.
+**Order:** ~~fix unmount-erase lifecycle (J1)~~ **done** → ~~reverse-video caret (J2)~~ **done** → ~~single layout snapshot (J3)~~ **done** → ~~terminal resize (Ink-aligned, J4)~~ **done** → Ink wrap for default column (K) → stdin/`useInput` migration → confirm → lists → optional ink-ui polish.
 
 ### Phase J3 — One live layout snapshot per `drawBox` — **done**
 
@@ -410,15 +410,18 @@ Post–Phase I review of the `cli/` subproject against the north star and open g
 
 ---
 
-### Phase J4 — Terminal resize: Ink-aligned refresh (replace clear + unmount)
+### Phase J4 — Terminal resize: Ink-aligned refresh (replace clear + unmount) — **done**
 
 **Goal:** Stop treating resize as a legacy full-screen reset. Today `ttyAdapter` uses `doFullRedraw` (`CLEAR_SCREEN` + shell **unmount** + `drawBox()`), partly because props like `terminalWidth` only refresh when the adapter rebuilds the tree—Ink’s own `stdout.on('resize')` does **not** call `drawBox()`. Move toward Ink convention: rely on Ink’s built-in resize handling where it applies; on resize, ensure the shell gets a **fresh `rerender(buildShellTree())`** (or equivalent) so `getTerminalWidth()` and width-dependent layout stay correct. Prefer **incremental** rerender and Ink’s shrink behavior over clear/unmount **unless** `Static`, `log-update`, caret, or `INTERACTIVE_INPUT_READY_OSC` still require the heavier path (prove with tests).
 
 **User-visible:** Ideally unchanged—correct reflow after terminal width change, no worse flicker.
 
-**Verify:** `cli/tests/interactive/interactiveTtySession.test.ts` (resize expectations may change if the clear sequence is no longer required); `recallMcqTtyCursorPosition` (narrow → resize); `pnpm cli:test`; E2E if needed.
+**Delivered**
 
-**Note:** Ink **does not** attach its resize listener when `is-in-ci` is true; Vitest keeps `resize` meaningful via the adapter listener or an explicit test strategy—document whichever remains.
+- **`ttyAdapter.ts`:** `process.stdout.on('resize', drawBox)` — same path as any other paint: `shellInstance.rerender(tree)` when the shell exists; **no** `CLEAR_SCREEN` or unmount on resize. **`clearAndRedraw`** (`/clear`) unchanged (still clear + unmount + `drawBox()`).
+- **Tests:** `interactiveTtySession` resize case asserts no full-screen clear, input box top border width matches new `columns`, committed history still present before the isolated resize delta; resize delta intentionally does **not** re-contain prior history text (Ink `Static` does not re-print committed items in that slice). `interactiveTtyOutput`: only `/clear` is documented as emitting `CLEAR_SCREEN`, not resize. `recallMcqTtyCursorPosition` (narrow → resize) unchanged / green.
+
+**Note:** Ink **does not** attach its resize listener when `is-in-ci` is true; Vitest still drives resize via **`ttyAdapter`**’s `process.stdout.on('resize', drawBox)`.
 
 **Synergy:** Land after **Phase J3** so a resize-triggered paint reuses a **single** layout snapshot instead of duplicating measurement paths.
 
@@ -472,7 +475,7 @@ Post–Phase I review of the `cli/` subproject against the north star and open g
 
 ## Open after Phase I (optional — not a backlog to “close”)
 
-Phases **A–I** are **done**; **J1**–**J3** are **done**. Follow-up work is spelled out in **Architecture evaluation** and **Phases J+** above (Ink-aligned resize **J4**, default column Ink wrap **K**, stdin → `useInput` **L–N**, optional ink-ui **O**; gates 6–7 declined for now).
+Phases **A–I** are **done**; **J1**–**J4** are **done**. Follow-up work is spelled out in **Architecture evaluation** and **Phases J+** above (default column Ink wrap **K**, stdin → `useInput` **L–N**, optional ink-ui **O**; gates 6–7 declined for now).
 
 **Historical bullets** (themes unchanged; execution path is J+):
 
@@ -487,5 +490,5 @@ Phases **A–I** are **done**; **J1**–**J3** are **done**. Follow-up work is s
 
 ## Notes
 
-- **Ordering:** Phases A–D delivered a safe **extract-and-thin-adapter** path; E–I added Ink and the shell. **Phases A–I are complete** on `main`; **J1**–**J3** are **done**. **Next:** **J4** (Ink-aligned resize), then **K** (single stdout/OSC owner). This file stays as reference until you archive it.
+- **Ordering:** Phases A–D delivered a safe **extract-and-thin-adapter** path; E–I added Ink and the shell. **Phases A–I are complete** on `main`; **J1**–**J4** are **done**. **Next:** **Phases J+** (default-column Ink wrap, stdin/`useInput`, …) and the **migration-status table** stdout-audit row (**K**, after J). This file stays as reference until you archive it.
 - **Conflicts:** Any future change that would alter PTY/E2E-visible behavior without product sign-off should still stop at the nearest **decision gate** above.

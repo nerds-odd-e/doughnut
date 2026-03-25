@@ -50,7 +50,7 @@ describe('TTY: normal command output must not full-screen clear', () => {
 
     expect(
       ttyOutput(writeSpy),
-      'Command output should append to history without full-screen clear; only /clear and resize should emit CLEAR_SCREEN'
+      'Command output should append to history without full-screen clear; only /clear should emit CLEAR_SCREEN'
     ).not.toContain(CLEAR_SCREEN)
   })
 })

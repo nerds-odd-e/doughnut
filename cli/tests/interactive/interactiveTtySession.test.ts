@@ -587,11 +587,13 @@ describe('TTY: shared interactive session', () => {
   })
 
   describe('resize', () => {
-    test('resize triggers full clear and re-render with new width', async () => {
+    test('resize rerenders Ink shell with new width without full-screen clear', async () => {
       typeString(stdin, 'hello')
       await tick()
       pressEnter(stdin)
       await tick()
+
+      expect(ttyOutput(writeSpy)).toContain('hello')
 
       writeSpy.mockClear()
       Object.defineProperty(process.stdout, 'columns', {
@@ -603,11 +605,14 @@ describe('TTY: shared interactive session', () => {
       await tick()
 
       const output = ttyOutput(writeSpy)
-      expect(output).toContain('\x1b[H\x1b[2J')
+      expect(output).not.toContain('\x1b[H\x1b[2J')
       const boxTopMatch = output.match(/┌─+┐/)
       expect(boxTopMatch).toBeTruthy()
       expect(stripAnsi(boxTopMatch![0]).length).toBe(50)
-      expect(output).toContain('hello')
+      expect(
+        output,
+        'Ink rerender on resize updates the live block; Static history is not re-printed in the resize delta'
+      ).not.toContain('hello')
     })
   })
 })

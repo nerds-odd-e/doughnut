@@ -584,15 +584,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     )
   }
 
-  function doFullRedraw() {
-    process.stdout.write(CLEAR_SCREEN)
-    if (shellInstance) {
-      shellInstance.unmount()
-      shellInstance = null
-    }
-    drawBox()
-  }
-
   /** Before fetch-wait chrome paints and emits input-ready OSC, persist buffered `log` lines so PTY captures are not ahead of scrollback. */
   function flushCommandTurnToScrollbackBeforeFetchWait(): void {
     if (commandTurn.lines.length === 0) return
@@ -699,8 +690,8 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
 
   drawBox()
 
-  process.stdout.on('resize', doFullRedraw)
-  const removeResizeListener = () => process.stdout.off('resize', doFullRedraw)
+  process.stdout.on('resize', drawBox)
+  const removeResizeListener = () => process.stdout.off('resize', drawBox)
   const doExit = () => {
     stopInteractiveFetchWaitRepaintTimer()
     removeResizeListener()
