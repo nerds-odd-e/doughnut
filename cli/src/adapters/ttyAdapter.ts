@@ -151,6 +151,19 @@ type LiveRegionLayout = {
   terminalWidth: number
 }
 
+/** Prompt + stage lines for `needsGapBeforeBox`; cheap vs full command-line guidance. */
+type LiveRegionPromptStageSnapshot = {
+  width: number
+  placeholderContext: PlaceholderContext
+  stopConfirmDisplay: {
+    promptLines: string[]
+    placeholder: string
+    guidance: string[]
+  } | null
+  currentPromptWrappedLines: string[]
+  currentStageIndicatorLines: string[]
+}
+
 type TTYInput = NodeJS.ReadableStream & {
   setRawMode?: (mode: boolean) => void
   resume?: () => void
@@ -288,7 +301,106 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     finalizeInteractiveLiveRegionPaint()
   }
 
-  function buildLivePanel(): React.ReactElement {
+  function getLiveRegionPromptAndStageLines(): LiveRegionPromptStageSnapshot {
+    const width = getTerminalWidth()
+    const placeholderContext = getPlaceholderContext(!!tokenSelection)
+    const stopConfirmDisplay = isPendingStopConfirmation()
+      ? getStopConfirmationLiveView(placeholderContext)
+      : null
+    const numberedChoicePromptLines =
+      getNumberedChoiceListCurrentPromptWrappedLines(width)
+    const waitLine = getInteractiveFetchWaitLine()
+    const tokenListConfig = tokenSelection
+      ? TOKEN_LIST_COMMANDS[tokenSelection.command]
+      : undefined
+    let currentPromptWrappedLines: string[]
+    if (waitLine) {
+      currentPromptWrappedLines = []
+    } else if (stopConfirmDisplay) {
+      currentPromptWrappedLines = stopConfirmDisplay.promptLines
+    } else {
+      const currentPromptText = tokenListConfig?.currentPrompt
+      if (
+        !tokenSelection &&
+        numberedChoicePromptLines !== null &&
+        !isPendingStopConfirmation()
+      ) {
+        currentPromptWrappedLines = numberedChoicePromptLines
+      } else if (currentPromptText) {
+        currentPromptWrappedLines = wrapTextToLines(currentPromptText, width)
+      } else {
+        currentPromptWrappedLines = []
+      }
+    }
+    const currentStageIndicatorLines = currentStageIndicatorLinesForLiveRegion(
+      waitLine,
+      interactiveFetchWaitEllipsisTick,
+      tokenListConfig,
+      isInCommandSessionSubstate()
+    )
+    return {
+      width,
+      placeholderContext,
+      stopConfirmDisplay,
+      currentPromptWrappedLines,
+      currentStageIndicatorLines,
+    }
+  }
+
+  function buildSuggestionLinesFromPromptStage(
+    promptStage: LiveRegionPromptStageSnapshot
+  ): string[] {
+    const width = promptStage.width
+    const numberedChoices = getNumberedChoiceListChoices()
+    if (tokenSelection) {
+      return buildTokenListLines(
+        tokenSelection.items,
+        getDefaultTokenLabel(),
+        width,
+        tokenSelection.highlightIndex
+      )
+    }
+    if (promptStage.stopConfirmDisplay) {
+      return promptStage.stopConfirmDisplay.guidance
+    }
+    if (numberedChoices !== null) {
+      return recallMcqCurrentGuidanceLines(
+        numberedChoices,
+        numberedChoiceHighlightIndex,
+        width
+      )
+    }
+    return buildSuggestionLines(commandInput.lineDraft, highlightIndex, width, {
+      forceCommandsHint:
+        suggestionsDismissed &&
+        isCommandPrefixWithSuggestions(commandInput.lineDraft),
+    })
+  }
+
+  function measureLiveRegionLayoutFromSnapshot(
+    promptStage: LiveRegionPromptStageSnapshot
+  ): LiveRegionLayout {
+    return {
+      currentPromptWrappedLines: promptStage.currentPromptWrappedLines,
+      suggestionLines: buildSuggestionLinesFromPromptStage(promptStage),
+      currentStageIndicatorLines: promptStage.currentStageIndicatorLines,
+      placeholderContext: promptStage.placeholderContext,
+      terminalWidth: promptStage.width,
+    }
+  }
+
+  function isAlternateLivePanel(): boolean {
+    if (getInteractiveFetchWaitLine() !== null) return true
+    if (isPendingStopConfirmation()) return true
+    if (usesSessionYesNoInputChrome(!!tokenSelection)) return true
+    if (getNumberedChoiceListChoices() !== null) return true
+    if (tokenSelection) return true
+    return false
+  }
+
+  function buildLivePanel(
+    commandLineLayout: LiveRegionLayout | undefined
+  ): React.ReactElement {
     const waitLine = getInteractiveFetchWaitLine()
     if (waitLine !== null) {
       return React.createElement(FetchWaitDisplay, {
@@ -350,7 +462,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         highlightIndex: tokenSelection.highlightIndex,
       })
     }
-    const layout = measureLiveRegionLayout()
+    const layout = commandLineLayout!
     return React.createElement(CommandLineLivePanel, {
       buffer: commandInput.lineDraft,
       caretOffset: commandInput.caretOffset,
@@ -362,18 +474,15 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     })
   }
 
-  function buildShellTree(): React.ReactElement {
-    const layout = measureLiveRegionLayout()
-    const liveLeadingGap = needsGapBeforeBox(
-      chatHistory,
-      layout.currentPromptWrappedLines,
-      layout.currentStageIndicatorLines
-    )
+  function buildShellTree(
+    liveLeadingGap: boolean,
+    commandLineLayout: LiveRegionLayout | undefined
+  ): React.ReactElement {
     return React.createElement(InteractiveShellDisplay, {
       history: chatHistory,
       terminalWidth: getTerminalWidth(),
       liveLeadingGap,
-      livePanel: buildLivePanel(),
+      livePanel: buildLivePanel(commandLineLayout),
     })
   }
 
@@ -383,7 +492,16 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       unref?: () => void
     }
     patchStdinForInk(stdinForInk)
-    const tree = buildShellTree()
+    const promptStage = getLiveRegionPromptAndStageLines()
+    const liveLeadingGap = needsGapBeforeBox(
+      chatHistory,
+      promptStage.currentPromptWrappedLines,
+      promptStage.currentStageIndicatorLines
+    )
+    const commandLineLayout = isAlternateLivePanel()
+      ? undefined
+      : measureLiveRegionLayoutFromSnapshot(promptStage)
+    const tree = buildShellTree(liveLeadingGap, commandLineLayout)
     if (!shellInstance) {
       shellInstance = render(tree, {
         stdin: stdinForInk as NodeJS.ReadStream,
@@ -453,94 +571,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
 
   function resetCommandTurnBuffer(): void {
     commandTurn = { lines: [], tone: 'plain' }
-  }
-
-  /** Builds lines for input box, optional Current Stage Indicator + Current prompt (above box), and Current guidance (below box). */
-  function getDisplayContent() {
-    const width = getTerminalWidth()
-    const placeholderContext = getPlaceholderContext(!!tokenSelection)
-    const stopConfirmDisplay = isPendingStopConfirmation()
-      ? getStopConfirmationLiveView(placeholderContext)
-      : null
-    const numberedChoicePromptLines =
-      getNumberedChoiceListCurrentPromptWrappedLines(width)
-    const waitLine = getInteractiveFetchWaitLine()
-    const tokenListConfig = tokenSelection
-      ? TOKEN_LIST_COMMANDS[tokenSelection.command]
-      : undefined
-    let currentPromptWrappedLines: string[]
-    if (waitLine) {
-      currentPromptWrappedLines = []
-    } else if (stopConfirmDisplay) {
-      currentPromptWrappedLines = stopConfirmDisplay.promptLines
-    } else {
-      const currentPromptText = tokenListConfig?.currentPrompt
-      if (
-        !tokenSelection &&
-        numberedChoicePromptLines !== null &&
-        !isPendingStopConfirmation()
-      ) {
-        currentPromptWrappedLines = numberedChoicePromptLines
-      } else if (currentPromptText) {
-        currentPromptWrappedLines = wrapTextToLines(currentPromptText, width)
-      } else {
-        currentPromptWrappedLines = []
-      }
-    }
-    const currentStageIndicatorLines = currentStageIndicatorLinesForLiveRegion(
-      waitLine,
-      interactiveFetchWaitEllipsisTick,
-      tokenListConfig,
-      isInCommandSessionSubstate()
-    )
-    const numberedChoices = getNumberedChoiceListChoices()
-    const suggestionLines = tokenSelection
-      ? buildTokenListLines(
-          tokenSelection.items,
-          getDefaultTokenLabel(),
-          width,
-          tokenSelection.highlightIndex
-        )
-      : stopConfirmDisplay
-        ? stopConfirmDisplay.guidance
-        : numberedChoices !== null
-          ? recallMcqCurrentGuidanceLines(
-              numberedChoices,
-              numberedChoiceHighlightIndex,
-              width
-            )
-          : buildSuggestionLines(
-              commandInput.lineDraft,
-              highlightIndex,
-              width,
-              {
-                forceCommandsHint:
-                  suggestionsDismissed &&
-                  isCommandPrefixWithSuggestions(commandInput.lineDraft),
-              }
-            )
-    return {
-      currentPromptWrappedLines,
-      suggestionLines,
-      currentStageIndicatorLines,
-      placeholderContext,
-    }
-  }
-
-  function measureLiveRegionLayout(): LiveRegionLayout {
-    const {
-      currentPromptWrappedLines,
-      suggestionLines,
-      currentStageIndicatorLines,
-      placeholderContext,
-    } = getDisplayContent()
-    return {
-      currentPromptWrappedLines,
-      suggestionLines,
-      currentStageIndicatorLines,
-      placeholderContext,
-      terminalWidth: getTerminalWidth(),
-    }
   }
 
   /** Hardware cursor stays hidden; caret is reverse-video inside Ink. Then input-ready OSC when applicable. */

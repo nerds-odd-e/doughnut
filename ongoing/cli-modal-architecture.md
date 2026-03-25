@@ -370,7 +370,7 @@ Post–Phase I review of the `cli/` subproject against the north star and open g
 ### Cohesion, length, adapter layers
 
 - **Hybrid presentation:** Default command line: **`renderer.ts` → `buildLiveRegionLines` → ANSI-heavy strings** → `LiveRegionLines` as one `<Text>` per line. That is **less** idiomatic Ink than MCQ/token/fetch-wait (which already structure layout in React).
-- **Redundant work (not dead code):** On a typical **default** paint, `measureLiveRegionLayout()` can run **up to three times** per `drawBox()` (`buildShellTree`, `buildLivePanel` default branch, `handleShellRendered`). In **MCQ / token / wait / confirm** modes, the first pass can still build a full **`liveLines`** array that **`buildLivePanel` never renders** (it uses `McqDisplay` / etc.). Collapsing to **one snapshot per frame** shortens `ttyAdapter` and helps a later `useInput` migration.
+- **Redundant work (not dead code):** ~~On a typical **default** paint, `measureLiveRegionLayout()` could run **up to three times** per `drawBox()`~~ **J3:** one prompt/stage snapshot per `drawBox`, full command-line layout only on the default branch; alternate modes skip unused guidance construction. **`handleShellRendered`** still does not repeat layout. MCQ/token branches still call `getTerminalWidth()` / prompt helpers inside `buildLivePanel` (unchanged).
 - **`LiveRegionLines`:** Thin wrapper; may fold into the shell when the default column is real Ink layout.
 
 ### Dead code and tests
@@ -392,15 +392,21 @@ Post–Phase I review of the `cli/` subproject against the north star and open g
 
 ## Phases J+ (J1–J2 done; J3 onward planned)
 
-**Order:** ~~fix unmount-erase lifecycle (J1)~~ **done** → ~~reverse-video caret (J2)~~ **done** → single layout snapshot (J3) → **terminal resize (Ink-aligned, J4)** → Ink wrap for default column (K) → stdin/`useInput` migration → confirm → lists → optional ink-ui polish.
+**Order:** ~~fix unmount-erase lifecycle (J1)~~ **done** → ~~reverse-video caret (J2)~~ **done** → ~~single layout snapshot (J3)~~ **done** → **terminal resize (Ink-aligned, J4)** → Ink wrap for default column (K) → stdin/`useInput` migration → confirm → lists → optional ink-ui polish.
 
-### Phase J3 — One live layout snapshot per `drawBox`
+### Phase J3 — One live layout snapshot per `drawBox` — **done**
 
 **Goal:** Run `getDisplayContent` / layout derivation **once** per paint; thread the snapshot into `buildShellTree`, `buildLivePanel`, and `handleShellRendered` so `measureLiveRegionLayout` is not repeated and non-default modes skip building unused `liveLines`.
 
 **User-visible:** None intended.
 
-**Verify:** `pnpm cli:test`; `cli_recall.feature` if needed.
+**Delivered**
+
+- **`drawBox()`:** `getLiveRegionPromptAndStageLines()` once → `needsGapBeforeBox` + (if not alternate panel) `measureLiveRegionLayoutFromSnapshot` → `buildShellTree(liveLeadingGap, commandLineLayout)` → `buildLivePanel(commandLineLayout)`.
+- **Alternate modes** (fetch-wait, confirm, session y/n, MCQ, token list): no `buildSuggestionLines` / token-list / MCQ guidance strings for the unused default column.
+- **`handleShellRendered`:** unchanged (it never called layout); no duplicate measurement there.
+
+**Verify:** `pnpm cli:test` green; `cli_recall.feature` if needed.
 
 ---
 
@@ -466,7 +472,7 @@ Post–Phase I review of the `cli/` subproject against the north star and open g
 
 ## Open after Phase I (optional — not a backlog to “close”)
 
-Phases **A–I** are **done**; **J1** (unmount-erase) and **J2** (reverse-video caret) are **done**. Follow-up work is spelled out in **Architecture evaluation** and **Phases J+** above (layout snapshot **J3**, Ink-aligned resize **J4**, default column Ink wrap **K**, stdin → `useInput` **L–N**, optional ink-ui **O**; gates 6–7 declined for now).
+Phases **A–I** are **done**; **J1**–**J3** are **done**. Follow-up work is spelled out in **Architecture evaluation** and **Phases J+** above (Ink-aligned resize **J4**, default column Ink wrap **K**, stdin → `useInput` **L–N**, optional ink-ui **O**; gates 6–7 declined for now).
 
 **Historical bullets** (themes unchanged; execution path is J+):
 
@@ -481,5 +487,5 @@ Phases **A–I** are **done**; **J1** (unmount-erase) and **J2** (reverse-video 
 
 ## Notes
 
-- **Ordering:** Phases A–D delivered a safe **extract-and-thin-adapter** path; E–I added Ink and the shell. **Phases A–I are complete** on `main`; **J1** (unmount-erase) and **J2** (reverse-video caret, no hardware caret in box) are **done**. **Next:** **J3/J4** (snapshot/resize), then **K** (single stdout/OSC owner). This file stays as reference until you archive it.
+- **Ordering:** Phases A–D delivered a safe **extract-and-thin-adapter** path; E–I added Ink and the shell. **Phases A–I are complete** on `main`; **J1**–**J3** are **done**. **Next:** **J4** (Ink-aligned resize), then **K** (single stdout/OSC owner). This file stays as reference until you archive it.
 - **Conflicts:** Any future change that would alter PTY/E2E-visible behavior without product sign-off should still stop at the nearest **decision gate** above.
