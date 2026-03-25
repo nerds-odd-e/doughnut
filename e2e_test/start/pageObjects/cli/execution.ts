@@ -7,7 +7,7 @@ import {
   type InteractiveCliPtyKeystroke,
 } from '../../../config/interactiveCliPtyTypes'
 import { e2eAppBaseUrl } from '../../../support/e2eAppUrl'
-import { currentGuidance } from './outputAssertions'
+import { currentGuidance, historyOutput } from './outputAssertions'
 
 const GOOGLE_MOCK_BASE_URL = 'http://localhost:5003'
 
@@ -105,9 +105,9 @@ function nonInteractive() {
 function applyInteractiveCliPtyKeystroke(
   keystroke: InteractiveCliPtyKeystroke
 ) {
-  cy.task<string>(INTERACTIVE_CLI_PTY_KEYSTROKE_TASK, keystroke).as(
-    'doughnutOutput'
-  )
+  return cy
+    .task<string>(INTERACTIVE_CLI_PTY_KEYSTROKE_TASK, keystroke)
+    .as('doughnutOutput')
 }
 
 function interactive() {
@@ -146,6 +146,15 @@ function accessToken() {
   const runAccessTokenCommand = (command: string, value: string) =>
     runCliWithScenarioConfigDir(['-c', `${command} ${value}`])
   return {
+    addSavedTokenInteractive() {
+      cy.get<string>('@savedAccessToken').then((token) =>
+        applyInteractiveCliPtyKeystroke({
+          kind: 'slashCommand',
+          commandLine: `/add-access-token ${token}`,
+        })
+      )
+      historyOutput().expectContains('Token added')
+    },
     runWithSavedToken(command: string) {
       cy.get<string>('@savedAccessToken').then((token) =>
         runAccessTokenCommand(command, token)

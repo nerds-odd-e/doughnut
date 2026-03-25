@@ -37,84 +37,95 @@ Not allowed without TTY:
 
 ## Phased delivery (scenario-first, order by value)
 
-Each phase should be **justified and tested inside the phase** (see `.cursor/rules/planning.mdc`). Suggested order:
+### Phase discipline — every phase must finish green
 
-### Phase 1 — Entry behavior: no `-c`, no `help` subcommand, interactive requires TTY
+**Do not merge a phase** until **all** of the following pass (same bar for each phase):
 
-**User-visible outcome**
+1. **Unit tests:** at minimum **`CURSOR_DEV=true nix develop -c pnpm cli:test`**. If the team’s merge bar is repo-wide, run **`pnpm verify`** (or **`pnpm test`**) so **backend + frontend + CLI unit tests** stay green, not only `cli/`.
+2. **Full E2E suite** (same scope CI uses for Cypress): e.g. **`CURSOR_DEV=true nix develop -c pnpm cy:run`** (see `package.json` / CI if the command changes).
+3. **Lint/format** for touched packages as usual (`pnpm cli:lint`, `pnpm cy:lint`, etc.).
 
-- Passing `-c` or `-c=` is an **error** (unknown flag or explicit “removed” message — pick one consistent style with other args).
-- **`doughnut help`** removed; **`/help`** remains in interactive mode only.
-- `doughnut` with **no subcommand** and **stdin not a TTY** exits **non-zero** with a short message (e.g. interactive shell requires a terminal).
-- **`doughnut version`** (and `-v` / `--version`) and **`doughnut update`** still run without a TTY.
+**Why reorder phases below:** Removing `-c` or piped **before** E2E stops using them would **break the full E2E run**. So **migrate Cypress CLI features and tasks first** (product still supports old entry points), then **remove** `-c` / `help` subcommand / non-TTY interactive, then **delete** the piped implementation and shrink Vitest — each step leaves **unit + full E2E** green.
 
-**Implementation sketch**
+---
 
-- `cli/src/run.ts`: remove `-c` handling; remove **`subcommand === 'help'`** branch; related imports (`isInteractiveOnlyCommand`, `INTERACTIVE_ONLY_REJECTION_MESSAGE` if only used for `-c`).
-- `cli/src/help.ts`: remove or repurpose `isInteractiveOnlyCommand` / `INTERACTIVE_ONLY_REJECTION_MESSAGE` if nothing else needs them.
-- `runInteractive`: if `!stdin.isTTY`, print error and `process.exit(1)` (or throw to `main` — match existing error style).
+### Phase 1 — E2E only: PTY for slash commands; no reliance on `-c` or piped spawn
 
-**Tests**
+**Product change:** none required (CLI may still accept `-c` and piped stdin for this phase).
 
-- `cli/tests/index.test.ts`: **delete** `-c` examples; add/adjust tests for “no TTY + no subcommand” failure, “`-c` rejected/unknown”, and **no `run(['help'])` success path** (or assert `help` subcommand is gone).
-- `cli/tests/help.test.ts`: **do not** replace `-c` with `doughnut help`. Drop non-TTY help entry tests; keep or extend **TTY / `runInteractive`** coverage for **`/help`** content if not already redundant with `interactiveTty*` / E2E.
-
-### Phase 2 — Delete piped interactive stack
-
-**User-visible outcome**
-
-- No user-facing change beyond phase 1 (piped interactive already subsumed by “require TTY”).
+**User-visible outcome (tests only):** Scenarios prove the same behaviors through **`@interactiveCLI`** and subcommand spawn where appropriate.
 
 **Implementation sketch**
 
-- Delete `cli/src/adapters/pipedAdapter.ts` and **`runPiped` / `buildPipedDeps`** from `interactive.ts`.
-- Remove imports and comments that refer to “piped adapter” / “piped mode” in `renderer.ts`, `interactiveTtyStdout.ts`, etc., where they are no longer accurate.
-- **`processInput`:** after TTY-only audit, remove **`parseRecallPipedYesNo` / `RECALL_PIPED_YES_NO_REPROMPT`** usage if **unreachable** when `interactiveUi === true` and no other caller exists; otherwise narrow naming to what remains.
-- `defaultOutput` / `writeFullRedraw` paths in `processInput`: trim if **only** served piped layout; keep whatever TTY `OutputAdapter` still relies on.
+- **Delete** `e2e_test/features/cli/cli_non_interactive_mode.feature` (or replace with a single **subcommand** scenario if something unique must remain — prefer moving **version** assertion next to `cli_install_and_run` if needed).
+- **`cli_recall.feature`**, **`cli_access_token.feature`**, **`cli_gmail.feature`:** rewrite so **token setup**, Gmail, and access-token flows use **interactive PTY** only (`startInteractiveCli`, slash commands, **history output** / **Current guidance** assertions).
+- **Remove** Cypress steps/tasks/page objects that only exist for **`doughnut -c …`** or **`runCliDirectWithInput`** / piped full-CLI spawn **once nothing references them**.
+- **`outputAssertions` / `cliSectionParser`:** adjust naming/copy toward **subcommand stdout** vs interactive sections as needed; keep assertions valid for migrated scenarios.
+- **Gmail:** OAuth simulation must work on the PTY path (extend **`cliPtyRunner` / plugin tasks** if required).
 
-**Tests (simplify aggressively)**
+**Unit tests:** unchanged in intent — full **`pnpm cli:test`** must still pass.
 
-- **Remove** `cli/tests/interactive/interactivePiped.test.ts` and **`runPipedInteractive`** (and trim **`interactiveTestHelpers.ts`** to only what TTY tests still need).
-- **`interactiveExitFarewell.test.ts`:** drop piped sections or fold into TTY if one case remains valuable.
-- **`cli/tests/interactive/processInput.test.ts`:** **shrink** — delete bulk “console contract” scenarios that duplicated piped / `-c`; keep **only** what still guards real TTY-driven behavior **or** move remaining value into **`runInteractive` + mock TTY** so there is **one** primary style.
-- **`cli/tests/recallYesNo.test.ts`:** drop or replace if `parseRecallPipedYesNo` is removed.
-- **`cli/tests/interactiveFetchWait.test.ts`:** re-home or delete cases that only served non-TTY `processInput`.
+**Phase gate:** `pnpm cli:test` + **full** `pnpm cy:run` (or equivalent) green.
 
-### Phase 3 — E2E: features, steps, page objects, tasks (minimize glue)
+---
+
+### Phase 2 — Entry behavior: remove `-c`, remove `help` subcommand, interactive requires TTY
 
 **User-visible outcome**
 
-- No `cli_non_interactive_mode.feature`.
-- **`cli_recall.feature`:** token setup uses **interactive PTY** (e.g. `/add-access-token` with saved token + assertions on **history output** / **Current guidance**), not `-c` or piped spawn.
-- **`cli_access_token.feature`** and **`cli_gmail.feature`:** same **@interactiveCLI** pattern as recall.
-- Install / **version** / **update** scenarios keep **plain spawn** (no PTY) where they only need stdout — see `cli_install_and_run.feature`.
+- Passing `-c` or `-c=` is an **error**.
+- **`doughnut help`** removed; **`/help`** remains in the TTY shell only.
+- `doughnut` with **no subcommand** and **stdin not a TTY** exits **non-zero** (clear message).
+- **`doughnut version`** / **`-v`** / **`--version`** and **`doughnut update`** still work without a TTY.
 
 **Implementation sketch**
 
-- **Delete** `e2e_test/features/cli/cli_non_interactive_mode.feature`.
-- **`cli_recall.feature`:** rewrite Background / steps that used **`doughnut -c "/add-access-token"`** to **start interactive CLI** + **enter slash command** + token flow (reuse access-token page objects / steps to avoid duplication).
-- **Rewrite** `cli_access_token.feature` and `cli_gmail.feature` with **`@interactiveCLI`**; OAuth simulation must work on PTY (extend **`cliPtyRunner` / plugin tasks** if needed).
-- **`e2e_test/step_definitions/cli.ts`:** **delete** all steps that only exist for `-c` / `doughnut -c …`; keep the smallest set of **interactive** + **subcommand** steps.
-- **`e2e_test/start/pageObjects/cli/execution.ts`:** remove **`nonInteractive().runWithCommand`**; remove **`runWithInput`** / **`runCliDirectWithInput`** paths if unused. **`accessToken()`** → PTY-only helpers (or inline one pattern).
-- **`cliE2ePluginTasks.ts` / `cliE2eRepo.ts`:** remove **`runCliDirectWithInput`** and any spawn helper that pipes stdin into the full CLI.
-- **`outputAssertions.ts` / `cliSectionParser.ts`:** update copy; **plain stdout** assertions apply only to **`version` / `update`** (and similar), not `help`.
+- `cli/src/run.ts`: remove `-c`; remove **`help` subcommand** branch; clean related **`help.ts`** exports if unused (`isInteractiveOnlyCommand`, `INTERACTIVE_ONLY_REJECTION_MESSAGE`, etc.).
+- `runInteractive`: if `!stdin.isTTY`, error + non-zero exit.
 
-**Test simplification goal**
+**Unit tests**
 
-- One obvious way to run “interactive” scenarios; **no** parallel “non-interactive output” steps for slash commands. Rename **“non-interactive output”** → something accurate (e.g. **subcommand stdout**) if the section is only for `version` / `update`.
+- `cli/tests/index.test.ts`: drop `-c` coverage; add **`-c` rejected**, **no TTY + no subcommand** failure, **`help` subcommand gone**.
+- `cli/tests/help.test.ts`: remove non-TTY **`doughnut help`** / **`-c` /help** style tests; rely on **TTY / `runInteractive`** (or existing `interactiveTty*`) for **`/help`** content.
 
-### Phase 4 — Docs and stray references
+**Phase gate:** `pnpm cli:test` + **full** E2E green (Phase 1 already removed E2E dependence on `-c` / `help` subcommand).
 
-- **`.cursor/rules/cli.mdc`**: terminology for TTY-only interactive; no `-c` / piped; **remove `help` subcommand** from docs; “Adding new commands”: verify with **`pnpm cli`** → **`/help`**, not `-c`.
-- **`CLAUDE.md`**: same.
-- **`ongoing/cli-osc-test-optimization.md`**: delete or rewrite piped / `-c` bullets.
-- **`ongoing/cli-modal-architecture.md`**: trim piped sections that contradict TTY-only interactive.
+---
+
+### Phase 3 — Delete piped interactive stack; shrink CLI unit tests
+
+**User-visible outcome**
+
+- No piped line-by-line interactive shell; **TTY only** for `runInteractive`.
+
+**Implementation sketch**
+
+- Delete **`pipedAdapter.ts`**, **`runPiped`**, **`buildPipedDeps`**; **`runInteractive`** always **`runTTY`** after the non-TTY guard.
+- **`processInput`:** audit and remove **`parseRecallPipedYesNo`** / reprompt / dead **`defaultOutput`** paths if TTY-only; trim **`renderer` / `interactiveTtyStdout`** comments that mention piped.
+- **Dead E2E:** confirm **`runCliDirectWithInput`** and any piped spawn helpers are **gone** (should already be unused after Phase 1); delete from **`cliE2ePluginTasks`** / **`cliE2eRepo`** if still present.
+
+**Unit tests (simplify aggressively, same commit)**
+
+- Delete **`interactivePiped.test.ts`**, **`runPipedInteractive`** and other piped-only helpers; fold any unique assertion into **mock TTY** tests if worth keeping.
+- Shrink **`processInput.test.ts`**, **`interactiveExitFarewell.test.ts`**, **`interactiveFetchWait.test.ts`**, **`recallYesNo.test.ts`** per audit — **no intentionally failing tests** left at phase end.
+
+**Phase gate:** `pnpm cli:test` + **full** E2E green.
+
+---
+
+### Phase 4 — Docs and `ongoing/` cleanup
+
+- **`.cursor/rules/cli.mdc`**, **`CLAUDE.md`**, **`ongoing/cli-osc-test-optimization.md`**, **`ongoing/cli-modal-architecture.md`**: align with TTY-only interactive, no `-c` / piped / `doughnut help`.
+
+**Phase gate:** same as **Phase discipline** — unit bar (`pnpm cli:test` or repo `pnpm verify` / `pnpm test` per team rule) + **full** E2E green (sanity run; docs should not change code paths).
 
 ## Verification commands (when executing)
 
-- `CURSOR_DEV=true nix develop -c pnpm cli:test`
-- `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_access_token.feature` (and gmail, recall, install as touched)
-- `pnpm cli:lint` / format as usual
+Per **Phase discipline** above — each phase ends with:
+
+- `CURSOR_DEV=true nix develop -c pnpm cli:test` (and **`pnpm verify`** or **`pnpm test`** if that is the required unit-test bar for merge)
+- `CURSOR_DEV=true nix develop -c pnpm cy:run` (full E2E; adjust if CI uses a different target)
+- `pnpm cli:lint` / `pnpm cy:lint` (and other linters) as needed for touched files
 
 ## Risks / open questions
 

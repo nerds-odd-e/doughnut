@@ -1,10 +1,11 @@
 @withCliConfig
+@interactiveCLI
 Feature: CLI recall status and recall session
 
   Background:
     Given I am logged in as an existing user
     And I have a valid Doughnut Access Token with label "for cli"
-    And I run doughnut -c "/add-access-token" with the saved token
+    When I add the saved access token in the interactive CLI using add-access-token
     And I have a notebook with the head note "English" which skips memory tracking
 
   Rule: Shared English notebook notes (sedation details use markdown)
@@ -16,7 +17,6 @@ Feature: CLI recall status and recall session
         | sedation | **Put** to sleep is _sedation_ | English      |
 
     @disableOpenAiService
-    @interactiveCLI
     Scenario: Recall status shows count when notes are due
       Given the note "sedition" was assimilated on day 1
       And It's day 2
@@ -24,7 +24,6 @@ Feature: CLI recall status and recall session
       Then I should see "1 note to recall today" in the history output
 
     @disableOpenAiService
-    @interactiveCLI
     Scenario: Recall Just Review
       Given the note "sedation" was assimilated on day 1
       And It's day 2
@@ -37,7 +36,6 @@ Feature: CLI recall status and recall session
       Then I should see "Recalled successfully" in the history output
 
     @disableOpenAiService
-    @interactiveCLI
     Scenario: Recall session - complete all due notes, see summary, then load more from future days
       Given the note "sedition" was assimilated on day 1
       And the note "sedation" was assimilated on day 1
@@ -54,7 +52,6 @@ Feature: CLI recall status and recall session
       Then I should see "Recalled successfully" in the history output
 
     @usingMockedOpenAiService
-    @interactiveCLI
     Scenario: Recall MCQ - choose correct answer and see success
       And OpenAI generates this question:
         | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
@@ -69,7 +66,6 @@ Feature: CLI recall status and recall session
       And I should see "Recalled successfully" in the history output
 
     @usingMockedOpenAiService
-    @interactiveCLI
     Scenario: Recall MCQ - ESC cancels with y/n confirmation
       And OpenAI generates this question:
         | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
@@ -84,7 +80,6 @@ Feature: CLI recall status and recall session
       Then I should see "1 note to recall today" in the history output
 
     @usingMockedOpenAiService
-    @interactiveCLI
     Scenario: Recall MCQ - down arrow and Enter to select
       And OpenAI generates this question:
         | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
@@ -96,7 +91,6 @@ Feature: CLI recall status and recall session
       And I should see "Recalled successfully" in the history output
 
     @usingMockedOpenAiService
-    @interactiveCLI
     Scenario: Recall MCQ - contest and regenerate before answering
       And OpenAI generates this as second question:
         | Question Stem         | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
@@ -124,7 +118,6 @@ Feature: CLI recall status and recall session
         | sedation | **Put** to sleep is _sedation_ | English      |                   |
 
     @disableOpenAiService
-    @interactiveCLI
     Scenario: Recall spelling - type correct spelling and see success
       And the note "sedition" was assimilated on day 1
       And It's day 2
