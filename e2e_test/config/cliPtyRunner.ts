@@ -11,6 +11,24 @@ import {
 import { cliEnv } from './cliEnv'
 import type { InteractiveCliPtyKeystroke } from './interactiveCliPtyTypes'
 
+type OAuthSimulationState = { done: boolean }
+
+/** When PTY stdout contains a Google OAuth URL, hit the redirect_uri with a mock code (E2E only). */
+function notifyOAuthSimulationIfNeeded(
+  fullStdout: string,
+  state: OAuthSimulationState
+): void {
+  if (state.done) return
+  const authMatch = fullStdout.match(/https:\/\/accounts\.google\.com\/[^\s]+/)
+  if (!authMatch) return
+  const redirectUri = new URL(authMatch[0]).searchParams.get('redirect_uri')
+  if (!redirectUri) return
+  state.done = true
+  fetch(`${redirectUri}?code=e2e_mock_auth_code`).catch(() => {
+    /* ignore OAuth callback errors */
+  })
+}
+
 const PTY_TIMEOUT_MS = 25_000
 const CLI_POLL_MS = 10
 /** After the readiness OSC appears, wait briefly so any trailing PTY chunks flush. */
@@ -185,6 +203,7 @@ function spawnPty(opts: {
   args: string[]
   cwd: string
   env?: NodeJS.ProcessEnv
+  simulateOAuthCallback?: boolean
 }): PtyHandle {
   const pty = require('@lydell/node-pty') as {
     spawn: (file: string, args: string[], options: object) => IPty
@@ -196,8 +215,12 @@ function spawnPty(opts: {
     env: envMerged as { [key: string]: string },
   })
   const stdout = { value: '' }
+  const oauthState: OAuthSimulationState = { done: false }
   const disposeData = ptyProcess.onData((data) => {
     stdout.value += data
+    if (opts.simulateOAuthCallback) {
+      notifyOAuthSimulationIfNeeded(stdout.value, oauthState)
+    }
   })
   return { pty: ptyProcess, stdout, dispose: () => disposeData.dispose() }
 }
@@ -299,6 +322,7 @@ export async function startInteractiveCli(opts: {
   args: string[]
   cwd: string
   env?: NodeJS.ProcessEnv
+  simulateOAuthCallback?: boolean
 }): Promise<void> {
   if (interactiveHandle) {
     throw new Error(

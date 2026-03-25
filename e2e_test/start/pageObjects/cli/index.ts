@@ -12,7 +12,6 @@ import {
   nonInteractive,
   interactive,
   accessToken,
-  gmail,
 } from './execution'
 import { backend } from './backend'
 import { setup } from './setup'
@@ -22,7 +21,7 @@ import { setup } from './setup'
  * - Output sections (non-interactive, history, current guidance)
  * - Recall session assertions
  * - Access-token removal assertions
- * - Execution (installation, non-interactive, interactive, access-token, gmail)
+ * - Execution (installation, non-interactive, interactive, access-token)
  * - Backend (bundle, install script)
  * - Setup (config dir, interactive session lifecycle)
  */
@@ -38,7 +37,6 @@ export const cli = {
   nonInteractive,
   interactive,
   accessToken,
-  gmail,
   backend,
   setup,
 }

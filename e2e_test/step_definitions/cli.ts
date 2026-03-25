@@ -122,10 +122,3 @@ Given(
     )
   }
 )
-
-When('I run the CLI add gmail command with simulated OAuth callback', () =>
-  cli.gmail().addWithSimulatedOAuth()
-)
-When('I run the CLI last email command with pre-configured account', () =>
-  cli.gmail().lastEmailWithPreconfiguredAccount()
-)

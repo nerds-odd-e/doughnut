@@ -6,6 +6,21 @@ import { spawnSync } from 'node:child_process'
 import { existsSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { cliEnv } from './cliEnv'
+import {
+  GMAIL_E2E_GOOGLE_CLIENT_ID,
+  GMAIL_E2E_GOOGLE_CLIENT_SECRET,
+} from './cliGmailE2eConfig'
+
+export function rebuildCliBundleWithGmailE2eSecrets(repoRoot: string): void {
+  runShellCommandSync('pnpm -C cli bundle', {
+    cwd: repoRoot,
+    env: {
+      ...process.env,
+      GOOGLE_CLIENT_ID: GMAIL_E2E_GOOGLE_CLIENT_ID,
+      GOOGLE_CLIENT_SECRET: GMAIL_E2E_GOOGLE_CLIENT_SECRET,
+    },
+  })
+}
 
 export const CLI_BUNDLE_RELATIVE_PATH = 'cli/dist/doughnut-cli.bundle.mjs'
 
@@ -142,7 +157,6 @@ export type SpawnCliFromRepoOptions = {
   args?: string[]
   stdin?: string
   env?: NodeJS.ProcessEnv
-  simulateOAuthCallback?: boolean
   timeoutMs?: number
 }
 
@@ -159,29 +173,9 @@ export async function spawnCliFromRepo(
       stdio: ['pipe', 'pipe', 'pipe'],
     })
     let stdout = ''
-    const append = (chunk: string) => {
-      stdout += chunk
-      return stdout
-    }
     proc.stdout?.on('data', (chunk: Buffer) => {
-      const out = append(chunk.toString())
-      if (opts.simulateOAuthCallback) {
-        const authMatch = out.match(/https:\/\/accounts\.google\.com\/[^\s]+/)
-        if (authMatch) {
-          const redirectUri = new URL(authMatch[0]).searchParams.get(
-            'redirect_uri'
-          )
-          if (redirectUri) {
-            fetch(`${redirectUri}?code=e2e_mock_auth_code`).catch(() => {
-              /* ignore OAuth callback errors */
-            })
-          }
-        }
-      }
+      stdout += chunk.toString()
     })
-    if (opts.simulateOAuthCallback) {
-      proc.stderr?.on('data', (chunk: Buffer) => append(chunk.toString()))
-    }
     const timeout =
       opts.timeoutMs &&
       setTimeout(() => {

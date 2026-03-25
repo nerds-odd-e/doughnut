@@ -10,6 +10,7 @@ import {
   CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH,
   CLI_NON_INTERACTIVE_SPAWN_TIMEOUT_MS,
   cliRepoSpawnFromRoot,
+  rebuildCliBundleWithGmailE2eSecrets,
   runShellCommandSync,
   spawnCliFromRepo,
 } from './cliE2eRepo'
@@ -29,11 +30,14 @@ type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
 
 type RunCliDirectWithInputTask = WithOptionalCliEnv & {
   input: string
-  simulateOAuthCallback?: boolean
 }
 
 type RunCliDirectWithArgsTask = WithOptionalCliEnv & {
   args: string[]
+}
+
+type StartInteractiveCliTask = WithOptionalCliEnv & {
+  simulateOAuthCallback?: boolean
 }
 
 type RunInstalledCliTask = WithOptionalCliEnv & {
@@ -67,6 +71,10 @@ export function createCliE2ePluginTasks(repoRoot: string) {
         JSON.stringify(gmailConfig, null, 2)
       )
       return configDir
+    },
+    bundleCliWithGmailE2eSecrets() {
+      rebuildCliBundleWithGmailE2eSecrets(repoRoot)
+      return true
     },
     async bundleCliE2eInstall() {
       return bundleCliE2eInstallOrThrow(repoRoot)
@@ -108,26 +116,25 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       }
       return doughnutPath
     },
-    async runCliDirectWithInput({
-      input,
-      env,
-      simulateOAuthCallback,
-    }: RunCliDirectWithInputTask) {
+    async runCliDirectWithInput({ input, env }: RunCliDirectWithInputTask) {
       return spawnCliFromRepo({
         repoRoot,
         stdin: input,
         env,
-        simulateOAuthCallback,
         timeoutMs: CLI_NON_INTERACTIVE_SPAWN_TIMEOUT_MS,
       })
     },
-    async startInteractiveCli({ env }: WithOptionalCliEnv) {
+    async startInteractiveCli({
+      env,
+      simulateOAuthCallback,
+    }: StartInteractiveCliTask) {
       const { command, baseArgs } = cliRepoSpawnFromRoot(repoRoot)
       await startInteractiveCliPtySession({
         command,
         args: baseArgs,
         cwd: repoRoot,
         env: { ...cliEnv(env) },
+        simulateOAuthCallback,
       })
       return true
     },

@@ -20,14 +20,15 @@ export function envForCliWithConfigDir(
   }
 }
 
-function envForGmail(
+/** PTY env for Gmail CLI E2E (mock Google HTTP + optional headless OAuth). */
+export function envForInteractiveGmail(
   configDir: string,
-  noBrowser = false
+  opts: { noBrowser?: boolean } = {}
 ): Record<string, string> {
   return {
-    DOUGHNUT_CONFIG_DIR: configDir,
+    ...envForCliWithConfigDir(configDir),
     GOOGLE_BASE_URL: GOOGLE_MOCK_BASE_URL,
-    ...(noBrowser && { DOUGHNUT_NO_BROWSER: '1' }),
+    ...(opts.noBrowser ? { DOUGHNUT_NO_BROWSER: '1' } : {}),
   }
 }
 
@@ -156,50 +157,4 @@ function accessToken() {
   }
 }
 
-const gmailConfigForAdd = {
-  clientId: 'e2e-test-client',
-  clientSecret: 'e2e-test-secret',
-  accounts: [],
-}
-const gmailConfigWithMockAccount = {
-  accounts: [
-    {
-      email: 'e2e@gmail.com',
-      accessToken: 'mock_access_token',
-      refreshToken: 'mock_refresh_token',
-      expiresAt: Date.now() + 3600_000,
-    },
-  ],
-}
-
-function gmail() {
-  return {
-    addWithSimulatedOAuth() {
-      cy.task<string>('createCliConfigDirWithGmail', gmailConfigForAdd).then(
-        (configDir) =>
-          cy
-            .task('runCliDirectWithInput', {
-              input: '/add gmail\nexit',
-              env: envForGmail(configDir, true),
-              simulateOAuthCallback: true,
-            })
-            .as('doughnutOutput')
-      )
-    },
-    lastEmailWithPreconfiguredAccount() {
-      cy.task<string>(
-        'createCliConfigDirWithGmail',
-        gmailConfigWithMockAccount
-      ).then((configDir) =>
-        cy
-          .task('runCliDirectWithInput', {
-            input: '/last email\nexit',
-            env: envForGmail(configDir),
-          })
-          .as('doughnutOutput')
-      )
-    },
-  }
-}
-
-export { installation, nonInteractive, interactive, accessToken, gmail }
+export { installation, nonInteractive, interactive, accessToken }

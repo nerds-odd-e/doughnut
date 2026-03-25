@@ -2,7 +2,7 @@
  * CLI setup page object. Domain: test lifecycle (config dir, interactive session).
  * Used by Before/After hooks for CLI scenarios.
  */
-import { envForCliWithConfigDir } from './execution'
+import { envForCliWithConfigDir, envForInteractiveGmail } from './execution'
 
 export function setup() {
   return {
@@ -14,6 +14,18 @@ export function setup() {
       cy.get<string>('@cliConfigDir').then((configDir) =>
         cy.task('startInteractiveCli', {
           env: envForCliWithConfigDir(configDir),
+        })
+      )
+    },
+    /** Gmail E2E: mock Google HTTP; optional OAuth callback simulation on the PTY stdout stream. */
+    startInteractiveGmailSession(opts: { oauthSimulated: boolean }) {
+      cy.task('stopInteractiveCli')
+      cy.get<string>('@cliConfigDir').then((configDir) =>
+        cy.task('startInteractiveCli', {
+          env: envForInteractiveGmail(configDir, {
+            noBrowser: opts.oauthSimulated,
+          }),
+          simulateOAuthCallback: opts.oauthSimulated,
         })
       )
     },
