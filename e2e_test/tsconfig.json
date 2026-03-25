@@ -4,7 +4,6 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
-    "baseUrl": "../e2e_test",
     "lib": ["dom", "dom.iterable", "ESNext"],
     "types": ["cypress", "node", "jquery", "@testing-library/cypress"],
     "typeRoots": ["types", "../node_modules/@types"],

@@ -7,7 +7,6 @@
     "resolveJsonModule": true,
     "moduleDetection": "force",
     "verbatimModuleSyntax": true,
-    "baseUrl": ".",
     "lib": ["es2022", "dom", "dom.iterable"],
     "types": [
       "vite/client",
@@ -17,8 +16,8 @@
       "es-toolkit"
     ],
     "paths": {
-      "@/*": ["src/*"],
-      "@tests/*": ["tests/*"],
+      "@/*": ["./src/*"],
+      "@tests/*": ["./tests/*"],
       "@generated/doughnut-backend-api": ["../packages/generated/doughnut-backend-api"],
       "@generated/doughnut-backend-api/*": ["../packages/generated/doughnut-backend-api/*"],
       "@generated/*": ["../packages/generated/doughnut-backend-api/*"],
@@ -26,7 +25,8 @@
     },
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "rootDir": ".."
   },
   "compileOnSave": true,
   "typeAcquisition": {
