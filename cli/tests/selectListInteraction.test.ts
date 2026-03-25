@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   cycleListSelectionIndex,
   dispatchSelectListKey,
+  selectListKeyEventFromInk,
   selectListSubmitLineForSlashAndNumber,
 } from '../src/interactions/selectListInteraction.js'
 
@@ -31,6 +32,29 @@ describe('selectListSubmitLineForSlashAndNumber', () => {
   })
   it('treats 0 as out of range, not a valid choice index', () => {
     expect(selectListSubmitLineForSlashAndNumber('0', 3, 1)).toBe('2')
+  })
+})
+
+describe('selectListKeyEventFromInk', () => {
+  const emptyKey = {}
+
+  it('treats bare CR/LF as submit, not typed text', () => {
+    expect(selectListKeyEventFromInk('\n', emptyKey, 'draft')).toMatchObject({
+      submitPressed: true,
+      str: undefined,
+      lineDraft: 'draft',
+    })
+    expect(selectListKeyEventFromInk('\r', emptyKey, '')).toMatchObject({
+      submitPressed: true,
+      str: undefined,
+    })
+  })
+
+  it('maps a plain character with empty key flags', () => {
+    expect(selectListKeyEventFromInk('a', emptyKey, '')).toMatchObject({
+      submitPressed: false,
+      str: 'a',
+    })
   })
 })
 

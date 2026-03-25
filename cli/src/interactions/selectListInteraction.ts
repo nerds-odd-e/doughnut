@@ -140,8 +140,15 @@ export function selectListKeyEventFromInk(
     key.delete ||
     key.upArrow ||
     key.downArrow
+  const bareLineEnding = input === '\n' || input === '\r'
   let str: string | undefined
-  if (!isNavigationOrEditKey && input.length > 0 && !key.ctrl && !key.meta) {
+  if (
+    !isNavigationOrEditKey &&
+    input.length > 0 &&
+    !key.ctrl &&
+    !key.meta &&
+    !bareLineEnding
+  ) {
     str = input
   }
 

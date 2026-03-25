@@ -1,33 +1,6 @@
 import type { Key } from 'ink'
 
 /**
- * Ink’s `Key` type is all booleans, all required — there is no “empty” key.
- * Reused for replaying coalesced printable bytes: one character + this shape means “typed char”.
- */
-const inkKeyNeutral: Key = {
-  upArrow: false,
-  downArrow: false,
-  leftArrow: false,
-  rightArrow: false,
-  pageDown: false,
-  pageUp: false,
-  home: false,
-  end: false,
-  return: false,
-  escape: false,
-  ctrl: false,
-  shift: false,
-  tab: false,
-  backspace: false,
-  delete: false,
-  meta: false,
-  super: false,
-  hyper: false,
-  capsLock: false,
-  numLock: false,
-}
-
-/**
  * Ink may merge several printable bytes plus CR/LF into one `useInput` callback.
  * Invoke `fn` once per logical key so list/confirm policy matches one key at a time.
  */
@@ -43,9 +16,9 @@ export function eachLogicalInkStdinChunk(
     /^[\x20-\x7e]+$/.test(input.slice(0, -1))
   ) {
     for (const ch of input.slice(0, -1)) {
-      fn(ch, inkKeyNeutral)
+      fn(ch, {} as Key)
     }
-    fn(last!, { ...inkKeyNeutral, return: true })
+    fn(last!, {} as Key)
     return
   }
   fn(input, key)
