@@ -8,7 +8,6 @@ import {
   endTTYSession,
   expectTtyRecallYesNoReplyScrollback,
   pushTTYCommandBytes,
-  pushTTYCommandEnter,
   startTTYSessionWithoutRecallReset,
   submitTTYCommand,
   tick,
@@ -36,8 +35,6 @@ describe('TTY: recall-session y/n answers (scrollback)', () => {
     writeSpy.mockClear()
     pushTTYCommandBytes(stdin, 'n')
     await tick()
-    pushTTYCommandEnter(stdin)
-    await tick()
 
     const out = ttyOutput(writeSpy)
     expect(out).toContain('0 notes to recall today')
@@ -56,8 +53,6 @@ describe('TTY: recall-session y/n answers (scrollback)', () => {
 
     writeSpy.mockClear()
     pushTTYCommandBytes(stdin, 'y')
-    await tick()
-    pushTTYCommandEnter(stdin)
     await tick()
 
     const out = ttyOutput(writeSpy)
@@ -78,8 +73,6 @@ describe('TTY: recall-session y/n answers (scrollback)', () => {
 
     writeSpy.mockClear()
     pushTTYCommandBytes(stdin, 'n')
-    await tick()
-    pushTTYCommandEnter(stdin)
     await tick()
 
     const out = ttyOutput(writeSpy)

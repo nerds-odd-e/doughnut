@@ -19,6 +19,7 @@
     "lint": "biome check src/ tests/"
   },
   "dependencies": {
+    "@inkjs/ui": "^2.0.0",
     "doughnut-api": "workspace:*",
     "ink": "^6.8.0",
     "markdansi": "0.2.1",

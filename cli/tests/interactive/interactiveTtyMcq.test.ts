@@ -165,8 +165,6 @@ describe('TTY recall MCQ', () => {
 
       pushTTYCommandBytes(stdin, 'y')
       await tick()
-      pushTTYCommandEnter(stdin)
-      await tick()
 
       const out = ttyOutput(writeSpy)
       expect(out).toContain('Stopped recall')
@@ -184,8 +182,6 @@ describe('TTY recall MCQ', () => {
       await tick()
 
       pushTTYCommandBytes(stdin, 'n')
-      await tick()
-      pushTTYCommandEnter(stdin)
       await tick()
 
       expect(isInRecallSubstate()).toBe(true)

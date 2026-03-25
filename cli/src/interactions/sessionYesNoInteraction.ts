@@ -46,51 +46,10 @@ export function parseRecallSessionYesNoSubmit(
   return 'invalid'
 }
 
-export type RecallSessionConfirmKeyEvent = {
-  keyName: string | undefined
-  str: string | undefined
-  ctrl: boolean
-  meta: boolean
-  shift: boolean
-  lineDraft: string
-  submitPressed: boolean
-}
-
-export type RecallSessionConfirmDispatchResult =
+/** Outcomes from recall TTY confirm panels (stop-recall and in-session y/n) to the adapter. */
+export type SessionYesNoLineDispatchResult =
   | { result: 'cancel' }
   | { result: 'submit-yes' }
   | { result: 'submit-no' }
-  | { result: 'invalid-submit'; hint: string }
-  | { result: 'edit-backspace' }
-  | { result: 'edit-char'; char: string }
-  | { result: 'redraw' }
 
-export type RecallSessionConfirmEmptySubmit = 'treat-as-no' | 'treat-as-invalid'
-
-/** Maps raw keypress to recall y/n intent; draft edits are returned for the adapter to apply with shared command-line helpers. */
-export function dispatchRecallSessionConfirmKey(
-  e: RecallSessionConfirmKeyEvent,
-  emptySubmit: RecallSessionConfirmEmptySubmit
-): RecallSessionConfirmDispatchResult {
-  const emptyPolicy: RecallSessionYesNoEmptyPolicy =
-    emptySubmit === 'treat-as-no' ? 'empty-is-no' : 'empty-is-invalid'
-  if (e.keyName === 'escape') return { result: 'cancel' }
-  if (e.submitPressed && !e.shift) {
-    const parsed = parseRecallSessionYesNoSubmit(
-      e.lineDraft.trim(),
-      emptyPolicy
-    )
-    if (parsed === 'yes') return { result: 'submit-yes' }
-    if (parsed === 'no') return { result: 'submit-no' }
-    return { result: 'invalid-submit', hint: 'Please answer y or n' }
-  }
-  if (e.keyName === 'backspace') return { result: 'edit-backspace' }
-  if (e.str && !e.ctrl && !e.meta) return { result: 'edit-char', char: e.str }
-  return { result: 'redraw' }
-}
-
-/** Neutral aliases for TTY deps — keeps product words out of the transport adapter. */
-export type SessionYesNoLineKeyEvent = RecallSessionConfirmKeyEvent
-export type SessionYesNoLineDispatchResult = RecallSessionConfirmDispatchResult
-export type SessionYesNoLineEmptySubmit = RecallSessionConfirmEmptySubmit
 export type StopConfirmationLiveView = RecallStopConfirmViewModel
