@@ -20,15 +20,6 @@ When(
   () => cli.installation().runUpdate()
 )
 
-When('I run the doughnut command with input {string}', (input: string) =>
-  cli.nonInteractive().runWithInput(input)
-)
-When('I run the doughnut command with -c {string}', (input: string) =>
-  cli.nonInteractive().runWithCommand(input)
-)
-When('I run the doughnut version command', () =>
-  cli.nonInteractive().runVersion()
-)
 When('the backend serves the CLI with version {string}', (version: string) =>
   cli.backend().serveVersion(version)
 )

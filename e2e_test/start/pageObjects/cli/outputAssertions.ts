@@ -2,8 +2,8 @@
  * Cucumber step assertions on `@doughnutOutput`.
  *
  * Capture kinds:
- * - **Non-interactive** — `-c`, piped stdin, subcommands: full stdout, no PTY input-ready OSC.
- * - **PTY interactive** — node-pty sessions: same stdout includes `INTERACTIVE_INPUT_READY_OSC`.
+ * - **Non-interactive** — installed CLI subcommands (`version`, `update`): full stdout, no PTY input-ready OSC.
+ * - **PTY interactive** — node-pty sessions: stdout includes `INTERACTIVE_INPUT_READY_OSC`.
  */
 import {
   countInputBoxTopBorderLinesInInteractivePtyTranscript,
@@ -30,13 +30,12 @@ const CONTENT_PREVIEW_LEN = 500
 
 const WRONG_NON_INTERACTIVE_STEP =
   'This capture includes the PTY-only “input ready” OSC (real TTY session). ' +
-  'Use: Then I should see "…" in the history output — or Current guidance / history input — not non-interactive output. ' +
-  'Piped runs omit that marker even when they draw a box.'
+  'Use: Then I should see "…" in the history output — or Current guidance / history input — not non-interactive output.'
 
 const wrongPtyInteractiveStep = (
   section: SectionLabel | 'interactive CLI input box'
 ) =>
-  'No PTY input-ready marker in this capture (piped / -c / subcommand). ' +
+  'No PTY input-ready marker in this capture (subcommand / one-shot spawn). ' +
   `Use: Then I should see "…" in the non-interactive output — not in the ${section}.`
 
 type ExpectedInStdout =

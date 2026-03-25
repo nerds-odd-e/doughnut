@@ -1,6 +1,6 @@
 /**
  * CLI execution page objects.
- * Domain: installation, non-interactive, interactive, access token, Gmail.
+ * Domain: installation, interactive, access token, Gmail.
  */
 import {
   INTERACTIVE_CLI_PTY_KEYSTROKE_TASK,
@@ -30,17 +30,6 @@ export function envForInteractiveGmail(
     GOOGLE_BASE_URL: GOOGLE_MOCK_BASE_URL,
     ...(opts.noBrowser ? { DOUGHNUT_NO_BROWSER: '1' } : {}),
   }
-}
-
-function runCliWithScenarioConfigDir(args: string[]) {
-  cy.get<string>('@cliConfigDir').then((configDir) =>
-    cy
-      .task('runCliDirectWithArgs', {
-        args,
-        env: envForCliWithConfigDir(configDir),
-      })
-      .as('doughnutOutput')
-  )
 }
 
 function installation() {
@@ -78,27 +67,6 @@ function installation() {
           env: { BASE_URL: baseUrl },
         }).as('doughnutOutput')
       })
-    },
-  }
-}
-
-function nonInteractive() {
-  return {
-    runWithInput(input: string) {
-      const trimmed = input.trim()
-      const exitSuffix =
-        trimmed === 'exit' || trimmed === '/exit' ? '' : `\nexit`
-      cy.task('runCliDirectWithInput', {
-        input: `${input}${exitSuffix}`,
-      }).as('doughnutOutput')
-    },
-    runWithCommand(cmd: string) {
-      runCliWithScenarioConfigDir(['-c', cmd])
-    },
-    runVersion() {
-      cy.task('runCliDirectWithArgs', { args: ['version'] }).as(
-        'doughnutOutput'
-      )
     },
   }
 }
@@ -157,4 +125,4 @@ function accessToken() {
   }
 }
 
-export { installation, nonInteractive, interactive, accessToken }
+export { installation, interactive, accessToken }

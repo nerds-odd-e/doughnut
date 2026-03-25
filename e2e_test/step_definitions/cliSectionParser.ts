@@ -1,7 +1,7 @@
 /**
  * Parses CLI stdout into domain sections for E2E assertions.
  *
- * Non-interactive output: entire stdout when running non-interactively, no parsing.
+ * Subcommand / one-shot stdout: entire capture when not using the interactive PTY session, no section parsing.
  *
  * Interactive-only sections:
  * - History input: Past user input lines
@@ -172,7 +172,7 @@ function collectSectionLines(
 export const INTERACTIVE_INPUT_READY_OSC =
   '\x1b]900;doughnut-interactive-input-ready\x07' as const
 
-/** True only for real PTY captures; piped `runPiped` draws a box but never emits the OSC. */
+/** True when the capture is from a real PTY interactive session (emits `INTERACTIVE_INPUT_READY_OSC`). */
 export function ptyStdoutHasInputReadyMarker(stdout: string): boolean {
   return stdout.includes(INTERACTIVE_INPUT_READY_OSC)
 }

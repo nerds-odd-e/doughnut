@@ -15,3 +15,19 @@ Feature: CLI interactive mode
     And I press Enter in the interactive CLI
     And I press Enter in the interactive CLI
     Then the input box UI should be normal
+
+  @withCliConfig
+  @interactiveCLI
+  Scenario: /help lists subcommands and interactive commands
+    When I enter the slash command "/help" in the interactive CLI
+    Then I should see "/add gmail" in the history output
+    And I should see "/last email" in the history output
+    And I should see "exit" in the history output
+    And I should see "update" in the history output
+    And I should see "version" in the history output
+
+  @withCliConfig
+  @interactiveCLI
+  Scenario: exit ends the session after Bye
+    When I enter "exit" in the interactive CLI
+    Then I should see "Bye." in the history output

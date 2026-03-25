@@ -67,6 +67,8 @@ Not allowed without TTY:
 
 **Phase gate:** `pnpm cli:test` + **full** `pnpm cy:run` (or equivalent) green.
 
+**Done (Phase 1):** Removed `cli_non_interactive_mode.feature`; `/help` + `exit` + plain-line coverage live in `cli_interactive_mode.feature`; dropped `runCliDirectWithInput` / `runCliDirectWithArgs` / `spawnCliFromRepo` from E2E; recall / access-token / Gmail were already PTY-only. Run full `pnpm cy:run` on merge if not already.
+
 ---
 
 ### Phase 2 — Entry behavior: remove `-c`, remove `help` subcommand, interactive requires TTY

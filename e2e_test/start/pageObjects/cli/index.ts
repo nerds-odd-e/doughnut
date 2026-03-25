@@ -7,12 +7,7 @@ import {
 } from './outputAssertions'
 import { recallSession } from './recallSession'
 import { removeToken } from './removeToken'
-import {
-  installation,
-  nonInteractive,
-  interactive,
-  accessToken,
-} from './execution'
+import { installation, interactive, accessToken } from './execution'
 import { backend } from './backend'
 import { setup } from './setup'
 
@@ -21,7 +16,7 @@ import { setup } from './setup'
  * - Output sections (non-interactive, history, current guidance)
  * - Recall session assertions
  * - Access-token removal assertions
- * - Execution (installation, non-interactive, interactive, access-token)
+ * - Execution (installation, interactive, access-token)
  * - Backend (bundle, install script)
  * - Setup (config dir, interactive session lifecycle)
  */
@@ -34,7 +29,6 @@ export const cli = {
   recallSession,
   removeToken,
   installation,
-  nonInteractive,
   interactive,
   accessToken,
   backend,

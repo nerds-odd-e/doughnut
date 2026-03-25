@@ -5,7 +5,6 @@
 import { spawnSync } from 'node:child_process'
 import { existsSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { cliEnv } from './cliEnv'
 import {
   GMAIL_E2E_GOOGLE_CLIENT_ID,
   GMAIL_E2E_GOOGLE_CLIENT_SECRET,
@@ -35,9 +34,6 @@ const CLI_E2E_INSTALL_BUNDLE_OUTFILE =
 export const CLI_E2E_USE_TSX_ENV = 'DOUGHNUT_CLI_E2E_USE_TSX' as const
 
 const SKIP_DIR_NAMES = new Set(['node_modules', '.git'])
-
-/** Max wall time for one non-interactive `spawnCliFromRepo` run before SIGKILL. */
-export const CLI_NON_INTERACTIVE_SPAWN_TIMEOUT_MS = 25_000
 
 /** How Cypress starts the CLI from `repoRoot` (bundle after freshness check, or tsx when opted in). */
 export type CliRepoSpawn = {
@@ -150,58 +146,4 @@ export function cliRepoSpawnFromRoot(repoRoot: string): CliRepoSpawn {
     command: process.execPath,
     baseArgs: [join(repoRoot, CLI_BUNDLE_RELATIVE_PATH)],
   }
-}
-
-export type SpawnCliFromRepoOptions = {
-  repoRoot: string
-  args?: string[]
-  stdin?: string
-  env?: NodeJS.ProcessEnv
-  timeoutMs?: number
-}
-
-export async function spawnCliFromRepo(
-  opts: SpawnCliFromRepoOptions
-): Promise<string> {
-  const { spawn } = await import('node:child_process')
-  const config = cliRepoSpawnFromRoot(opts.repoRoot)
-  const args = [...config.baseArgs, ...(opts.args ?? [])]
-  return new Promise<string>((resolve, reject) => {
-    const proc = spawn(config.command, args, {
-      cwd: opts.repoRoot,
-      env: { ...process.env, ...cliEnv(opts.env) },
-      stdio: ['pipe', 'pipe', 'pipe'],
-    })
-    let stdout = ''
-    proc.stdout?.on('data', (chunk: Buffer) => {
-      stdout += chunk.toString()
-    })
-    const timeout =
-      opts.timeoutMs &&
-      setTimeout(() => {
-        proc.kill('SIGKILL')
-        reject(
-          new Error(
-            `CLI timed out after ${opts.timeoutMs}ms. stdout tail: ${stdout.slice(-300)}`
-          )
-        )
-      }, opts.timeoutMs)
-    if (opts.stdin !== undefined) {
-      proc.stdin?.write(
-        opts.stdin.endsWith('\n') ? opts.stdin : `${opts.stdin}\n`
-      )
-      proc.stdin?.end()
-    } else {
-      proc.stdin?.end()
-    }
-    proc.on('close', (code) => {
-      if (timeout) clearTimeout(timeout)
-      if (code === 0) resolve(stdout)
-      else reject(new Error(`CLI exited with code ${code}`))
-    })
-    proc.on('error', (err) => {
-      if (timeout) clearTimeout(timeout)
-      reject(err)
-    })
-  })
 }
