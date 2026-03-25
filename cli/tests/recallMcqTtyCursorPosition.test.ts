@@ -1,5 +1,5 @@
 /**
- * Observable contract: after the TTY paints recall MCQ via Ink (NumberedChoiceListLivePanel), the display
+ * Observable contract: after the TTY paints recall MCQ via Ink (`RecallMcqChoicesLivePanel`), the display
  * contains the stage indicator, MCQ stem, choices, guidance, and the → prompt on the last line.
  * After rerenders (↓↑↓ key presses), the MCQ display must not overwrite the /recall history.
  */

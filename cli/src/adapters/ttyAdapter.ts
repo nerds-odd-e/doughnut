@@ -76,8 +76,10 @@ import { CommandLineLivePanel } from '../ui/CommandLineLivePanel.js'
 import { ConfirmLivePanel } from '../ui/ConfirmLivePanel.js'
 import { FetchWaitDisplay } from '../ui/FetchWaitDisplay.js'
 import { InteractiveShellDisplay } from '../ui/InteractiveShellDisplay.js'
-import { NumberedChoiceListLivePanel } from '../ui/NumberedChoiceListLivePanel.js'
-import { TokenListLivePanel } from '../ui/TokenListLivePanel.js'
+import {
+  AccessTokenPickerLivePanel,
+  RecallMcqChoicesLivePanel,
+} from '../ui/liveSelectionGuidanceInk.js'
 
 export interface TTYDeps {
   processInput: (
@@ -394,6 +396,11 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   function buildLivePanel(
     commandLineLayout: LiveRegionLayout | undefined
   ): React.ReactElement {
+    const interruptInkShell = () => {
+      interactiveTtyStdout.ctrlCExitNewline()
+      doExit()
+    }
+
     const waitLine = getInteractiveFetchWaitLine()
     if (waitLine !== null) {
       return React.createElement(FetchWaitDisplay, {
@@ -420,10 +427,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         isInCommandSessionSubstate,
         onNestedStopConfirm: enterStopConfirmationFromEsc,
         onInputReadySignal: signalConfirmInputReady,
-        onInterrupt: () => {
-          interactiveTtyStdout.ctrlCExitNewline()
-          doExit()
-        },
+        onInterrupt: interruptInkShell,
         onDispatchResult: (d) => handleStopConfirmDispatch(d),
       })
     }
@@ -437,10 +441,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         isInCommandSessionSubstate,
         onNestedStopConfirm: enterStopConfirmationFromEsc,
         onInputReadySignal: signalConfirmInputReady,
-        onInterrupt: () => {
-          interactiveTtyStdout.ctrlCExitNewline()
-          doExit()
-        },
+        onInterrupt: interruptInkShell,
         onDispatchResult: (d) => handleSessionYesNoDispatch(d),
       })
     }
@@ -449,19 +450,16 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       const width = getTerminalWidth()
       const promptLines =
         getNumberedChoiceListCurrentPromptWrappedLines(width) ?? []
-      return React.createElement(NumberedChoiceListLivePanel, {
+      return React.createElement(RecallMcqChoicesLivePanel, {
         stageIndicatorLine: DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
         currentPromptLines: promptLines,
         choices: numberedChoices,
         highlightIndex: numberedChoiceHighlightIndex,
         lineDraft: commandInput.lineDraft,
         width,
-        onInterrupt: () => {
-          interactiveTtyStdout.ctrlCExitNewline()
-          doExit()
-        },
-        onInkKey: (inp, ky) =>
-          Promise.resolve(handleNumberedChoiceListInkInput(inp, ky)).catch(
+        onInterrupt: interruptInkShell,
+        onGuidanceListKey: (inp, ky) =>
+          Promise.resolve(routeRecallMcqChoicesInkStdin(inp, ky)).catch(
             () => undefined
           ),
       })
@@ -475,18 +473,15 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       const stageIndicatorLine = tokenListConfig
         ? greyCurrentStageIndicatorLabel(tokenListConfig.stageIndicator)
         : ''
-      return React.createElement(TokenListLivePanel, {
+      return React.createElement(AccessTokenPickerLivePanel, {
         stageIndicatorLine,
         currentPromptLines: promptLines,
         items: tokenSelection.items,
         defaultLabel: getDefaultTokenLabel(),
         highlightIndex: tokenSelection.highlightIndex,
-        onInterrupt: () => {
-          interactiveTtyStdout.ctrlCExitNewline()
-          doExit()
-        },
-        onInkKey: (inp, ky) =>
-          Promise.resolve(handleTokenListInkInput(inp, ky)).catch(
+        onInterrupt: interruptInkShell,
+        onGuidanceListKey: (inp, ky) =>
+          Promise.resolve(routeAccessTokenPickerInkStdin(inp, ky)).catch(
             () => undefined
           ),
       })
@@ -504,10 +499,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         Promise.resolve(handleCommandLineInkInput(input, key)).catch(
           () => undefined
         ),
-      onInterrupt: () => {
-        interactiveTtyStdout.ctrlCExitNewline()
-        doExit()
-      },
+      onInterrupt: interruptInkShell,
     })
   }
 
@@ -1005,7 +997,8 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     }
   }
 
-  async function handleNumberedChoiceListInkInput(
+  /** Recall MCQ: map one Ink stdin chunk through `dispatchSelectListKey` (draft + highlight). */
+  async function routeRecallMcqChoicesInkStdin(
     input: string,
     key: Key
   ): Promise<void> {
@@ -1075,7 +1068,8 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     }
   }
 
-  async function handleTokenListInkInput(
+  /** Access-token picker: map one Ink stdin chunk through `dispatchSelectListKey` (highlight-only). */
+  async function routeAccessTokenPickerInkStdin(
     input: string,
     key: Key
   ): Promise<void> {

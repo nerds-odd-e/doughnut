@@ -1,6 +1,7 @@
 /**
- * Shared ↑↓ / Enter / Esc / draft handling for TTY list selection (MCQ choices, access-token list).
- * Ink-shaped: maps to future `Select` / `useInput` list behavior without domain names here.
+ * Policy for **Current guidance** list selection on the TTY: recall MCQ (numbered choices + optional
+ * answer draft) and access-token picker (highlight row only). Callers map readline or Ink stdin into
+ * {@link SelectListKeyEvent} then {@link dispatchSelectListKey}.
  */
 
 export function cycleListSelectionIndex(
@@ -107,7 +108,7 @@ export function dispatchSelectListKey(
     : { result: 'abort-highlight-only-list' }
 }
 
-/** Subset of Ink `Key` — avoids coupling this module to `ink`. */
+/** Same boolean flags Ink uses on `Key` for stdin routing; kept here so this file stays free of `ink`. */
 export type InkLikeKey = {
   escape?: boolean
   return?: boolean

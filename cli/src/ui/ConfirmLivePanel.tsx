@@ -7,35 +7,12 @@ import {
   type SessionYesNoLineKeyEvent,
 } from '../interactions/sessionYesNoInteraction.js'
 import { ConfirmDisplay } from './ConfirmDisplay.js'
+import { eachLogicalInkStdinChunk } from './inkStdinLogicalKeys.js'
+
 const CONFIRM_LIVE_INK_FOCUS_ID = 'confirm-live'
 
 function isSubmitKeyInk(key: Key, input: string): boolean {
   return !!(key.return || input === '\n' || input === '\r')
-}
-
-function emptyInkKey(): Key {
-  return {
-    upArrow: false,
-    downArrow: false,
-    leftArrow: false,
-    rightArrow: false,
-    pageDown: false,
-    pageUp: false,
-    home: false,
-    end: false,
-    return: false,
-    escape: false,
-    ctrl: false,
-    shift: false,
-    tab: false,
-    backspace: false,
-    delete: false,
-    meta: false,
-    super: false,
-    hyper: false,
-    capsLock: false,
-    numLock: false,
-  }
 }
 
 function sessionKeyEventFromInk(
@@ -200,20 +177,7 @@ export function ConfirmLivePanel({
       }
     }
 
-    const last = input.at(-1)
-    if (
-      input.length >= 2 &&
-      (last === '\r' || last === '\n') &&
-      /^[\x20-\x7e]+$/.test(input.slice(0, -1))
-    ) {
-      for (const c of input.slice(0, -1)) {
-        processOne(c, emptyInkKey())
-      }
-      processOne(last!, { ...emptyInkKey(), return: true })
-      return
-    }
-
-    processOne(input, key)
+    eachLogicalInkStdinChunk(input, key, processOne)
   }, [])
 
   useInput(handleKey, { isActive: true })
