@@ -20,6 +20,34 @@ const INTERACTIVE_INPUT_READY_STABLE_MS = 70
 /** When the CLI omits a fresh readiness OSC (see `handleShellRendered`), require longer quiet output before continuing. */
 const INTERACTIVE_INPUT_READY_SETTLED_FALLBACK_STABLE_MS = 220
 const INTERACTIVE_INPUT_READY_DRAIN_MAX_MS = 450
+/**
+ * Inspect only the end of post-submit stdout. Fetch-wait UIs omit the readiness OSC until work
+ * finishes; byte-length can go quiet mid-load and falsely trigger the settled fallback — see
+ * `INTERACTIVE_FETCH_WAIT_LINES` in `cli/src/interactiveFetchWait.ts` and `interactiveFetchWait`
+ * placeholder in `cli/src/renderer.ts`.
+ */
+const FETCH_WAIT_TAIL_WINDOW_CHARS = 12_000
+
+/** Keep in sync with `INTERACTIVE_FETCH_WAIT_LINES` in `cli/src/interactiveFetchWait.ts`. */
+const INTERACTIVE_FETCH_WAIT_SNIPPETS = [
+  'Loading recall questions',
+  'Regenerating question',
+  'Loading recall status',
+  'Adding access token',
+  'Creating access token',
+  'Removing access token',
+  'Connecting Gmail',
+  'Loading last email',
+] as const
+
+/** Lowercase animated hint under the input box during TTY fetch-wait (`placeholderText.interactiveFetchWait`). */
+function tailLooksLikeInteractiveFetchWait(haystack: string): boolean {
+  const tail = haystack.slice(-FETCH_WAIT_TAIL_WINDOW_CHARS)
+  for (const s of INTERACTIVE_FETCH_WAIT_SNIPPETS) {
+    if (tail.includes(s)) return true
+  }
+  return /loading \.{1,3}/.test(tail)
+}
 
 const PTY_OPTIONS = {
   name: 'xterm-256color' as const,
@@ -148,7 +176,10 @@ async function waitForInteractiveInputReadyOscOrSettled(
       Date.now() - stableSince >=
         INTERACTIVE_INPUT_READY_SETTLED_FALLBACK_STABLE_MS
     ) {
-      return
+      if (!tailLooksLikeInteractiveFetchWait(haystack)) {
+        return
+      }
+      stableSince = Date.now()
     }
 
     await sleep(CLI_POLL_MS)
