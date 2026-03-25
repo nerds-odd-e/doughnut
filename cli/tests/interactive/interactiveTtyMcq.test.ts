@@ -14,16 +14,14 @@ import { INTERACTIVE_INPUT_READY_OSC, stripAnsi } from '../../src/renderer.js'
 import {
   endTTYSession,
   expectTtyRecallYesNoReplyScrollback,
-  pressEnter,
   pressKey,
-  pressRealBackspace,
   pushTTYCommandBytes,
   pushTTYCommandEnter,
+  pushTTYCommandKey,
   startTTYSessionWithoutRecallReset,
   submitTTYCommand,
   tick,
   ttyOutput,
-  typeString,
   type TTYStdin,
 } from './interactiveTestHelpers.js'
 import { recallNextQuestion } from '../recallNextTestShapes.js'
@@ -93,7 +91,7 @@ describe('TTY recall MCQ', () => {
       expect(afterSubmit).toContain('  2. 3')
 
       writeSpy.mockClear()
-      pressKey(stdin, 'down')
+      pushTTYCommandKey(stdin, 'down')
       await tick()
 
       const output = ttyOutput(writeSpy)
@@ -104,7 +102,7 @@ describe('TTY recall MCQ', () => {
     test('Enter submits highlighted choice and calls answerQuiz', async () => {
       await submitTTYCommand(stdin, '/recall')
 
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
       await new Promise((r) => setTimeout(r, 50))
 
@@ -115,9 +113,9 @@ describe('TTY recall MCQ', () => {
     test('typed number still works', async () => {
       await submitTTYCommand(stdin, '/recall')
 
-      typeString(stdin, '2')
+      pushTTYCommandBytes(stdin, '2')
       await tick()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
 
       expect(mockAnswerQuiz).toHaveBeenCalledWith(100, 1, expect.any(Number))
@@ -128,23 +126,17 @@ describe('TTY recall MCQ', () => {
       mockAnswerQuiz.mockClear()
 
       // Type '2' to select choice 2, then delete it — should revert to default choice (1)
-      typeString(stdin, '2')
+      pushTTYCommandBytes(stdin, '2')
       await tick()
-      // Real TTY backspace: str='\x7f'. If the handler checks `str && !ctrl && !meta`
-      // before `key.name === 'backspace'`, it inserts '\x7f', making the draft '2\x7f'.
-      // parseInt('2\x7f') = 2, so choice 2 is still submitted despite the "delete".
-      pressRealBackspace(stdin)
+      pushTTYCommandKey(stdin, 'backspace')
       await tick()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
       await new Promise((r) => setTimeout(r, 50))
 
       expect(
         mockAnswerQuiz.mock.calls[0],
-        'After typing "2" and pressing real backspace, the draft should be empty so the ' +
-          'default highlighted choice (index 0) is submitted. If backspace instead inserts ' +
-          '\\x7f, parseInt("2\\x7f") still parses as 2 and submits choice index 1. ' +
-          'Fix: move the backspace check above the str-insertion check in the MCQ handler.'
+        'After typing "2" and backspace, the draft should be empty so the highlighted choice (index 0) is submitted.'
       ).toEqual([100, 0, expect.any(Number)])
     })
 
@@ -215,7 +207,7 @@ describe('TTY recall MCQ', () => {
           /^ {2}\d+\. /.test(plain)
         )
       ).toBe(0)
-      // INTERACTIVE_INPUT_READY_OSC is emitted synchronously from renderInkMcqDisplay
+      // INTERACTIVE_INPUT_READY_OSC is emitted when the numbered-choice list panel is shown
       const raw = ttyOutput(writeSpy)
       expect(raw).toContain(INTERACTIVE_INPUT_READY_OSC)
     })
@@ -259,7 +251,7 @@ describe('TTY recall MCQ wrapped choices (narrow terminal)', () => {
   test('first choice wraps; down arrow highlights only the second choice', async () => {
     await submitTTYCommand(stdin, '/recall')
     writeSpy.mockClear()
-    pressKey(stdin, 'down')
+    pushTTYCommandKey(stdin, 'down')
     await tick()
 
     const output = ttyOutput(writeSpy)

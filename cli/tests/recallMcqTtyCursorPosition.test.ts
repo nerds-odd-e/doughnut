@@ -1,5 +1,5 @@
 /**
- * Observable contract: after the TTY paints recall MCQ via Ink (McqDisplay), the display
+ * Observable contract: after the TTY paints recall MCQ via Ink (NumberedChoiceListLivePanel), the display
  * contains the stage indicator, MCQ stem, choices, guidance, and the → prompt on the last line.
  * After rerenders (↓↑↓ key presses), the MCQ display must not overwrite the /recall history.
  */
@@ -14,7 +14,7 @@ import {
 } from './interactive/interactiveRecallMockAccess.js'
 import {
   endTTYSession,
-  pressKey,
+  pushTTYCommandKey,
   startTTYSessionWithoutRecallReset,
   submitTTYCommand,
   tick,
@@ -28,7 +28,7 @@ import {
 import { recallNextQuestion } from './recallNextTestShapes.js'
 import { mcqRecallPrompt } from './recallPromptFixtures.js'
 
-describe('recall MCQ on TTY: Ink McqDisplay render', () => {
+describe('recall MCQ on TTY: Ink numbered-choice list render', () => {
   let stdin: TTYStdin
   let writeSpy: ReturnType<typeof vi.spyOn>
   let savedColumns: number | undefined
@@ -59,7 +59,7 @@ describe('recall MCQ on TTY: Ink McqDisplay render', () => {
     const promptRow = lastRowIndexContainingPlain(lines, '→')
     expect(
       promptRow,
-      'Ink McqDisplay should render the → prompt on the last line.'
+      'Ink MCQ panel should render the → prompt on the last line.'
     ).toBeGreaterThanOrEqual(0)
   }
 
@@ -86,7 +86,7 @@ describe('recall MCQ on TTY: Ink McqDisplay render', () => {
     await sessionWithColumns(30)
     await submitTTYCommand(stdin, '/recall')
     await tick()
-    pressKey(stdin, 'down')
+    pushTTYCommandKey(stdin, 'down')
     await tick()
     assertMcqRenderedWithPrompt(ttyOutput(writeSpy))
   })
@@ -106,11 +106,11 @@ describe('recall MCQ on TTY: Ink McqDisplay render', () => {
     ).toBeGreaterThanOrEqual(5)
     await submitTTYCommand(stdin, '/recall')
     await tick()
-    pressKey(stdin, 'down')
+    pushTTYCommandKey(stdin, 'down')
     await tick()
-    pressKey(stdin, 'up')
+    pushTTYCommandKey(stdin, 'up')
     await tick()
-    pressKey(stdin, 'down')
+    pushTTYCommandKey(stdin, 'down')
     await tick()
     const raw = ttyOutput(writeSpy)
     // /recall history entry appears in raw output (rendered as grey history input)

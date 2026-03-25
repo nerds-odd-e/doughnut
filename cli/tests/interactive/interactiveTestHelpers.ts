@@ -93,7 +93,7 @@ export async function pushTTYCommandEscape(stdin: TTYStdin) {
   await tick()
 }
 
-/** MCQ, token list, fetch-wait (until migrated): synthetic readline `keypress`. */
+/** Legacy: synthetic readline `keypress` per character (prefer `pushTTYCommandBytes` for Ink stdin). */
 export function typeString(stdin: TTYStdin, str: string) {
   for (const ch of str) {
     stdin.emit('keypress', ch, {

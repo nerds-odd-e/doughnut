@@ -711,7 +711,7 @@ export function wrapMarkdownTerminalToLines(
     )
 }
 
-function formatMcqChoiceLinesWithIndices(
+export function formatMcqChoiceLinesWithIndices(
   choices: RecallMcqChoiceTexts,
   width: TerminalWidth
 ): { lines: string[]; itemIndexPerLine: number[] } {

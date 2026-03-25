@@ -106,3 +106,51 @@ export function dispatchSelectListKey(
     ? { result: 'redraw' }
     : { result: 'abort-highlight-only-list' }
 }
+
+/** Subset of Ink `Key` — avoids coupling this module to `ink`. */
+export type InkLikeKey = {
+  escape?: boolean
+  return?: boolean
+  upArrow?: boolean
+  downArrow?: boolean
+  backspace?: boolean
+  delete?: boolean
+  ctrl?: boolean
+  meta?: boolean
+  shift?: boolean
+}
+
+export function selectListKeyEventFromInk(
+  input: string,
+  key: InkLikeKey,
+  lineDraft: string
+): SelectListKeyEvent {
+  const submitPressed = !!(key.return || input === '\n' || input === '\r')
+  let keyName: string | undefined
+  if (key.escape) keyName = 'escape'
+  else if (key.upArrow) keyName = 'up'
+  else if (key.downArrow) keyName = 'down'
+  else if (key.backspace || key.delete) keyName = 'backspace'
+
+  const isNavigationOrEditKey =
+    key.escape ||
+    key.return ||
+    key.backspace ||
+    key.delete ||
+    key.upArrow ||
+    key.downArrow
+  let str: string | undefined
+  if (!isNavigationOrEditKey && input.length > 0 && !key.ctrl && !key.meta) {
+    str = input
+  }
+
+  return {
+    keyName,
+    str,
+    ctrl: !!key.ctrl,
+    meta: !!key.meta,
+    shift: !!key.shift,
+    lineDraft,
+    submitPressed,
+  }
+}

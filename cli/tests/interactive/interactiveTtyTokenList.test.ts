@@ -9,13 +9,14 @@ import {
 import {
   endTTYSession,
   makeTempConfigDir,
-  pressEnter,
   pressKey,
+  pushTTYCommandBytes,
+  pushTTYCommandEnter,
+  pushTTYCommandKey,
   startTTYSessionWithoutRecallReset,
   submitTTYCommand,
   tick,
   ttyOutput,
-  typeString,
   type TTYStdin,
   withConfigDir,
 } from './interactiveTestHelpers.js'
@@ -102,9 +103,9 @@ describe('TTY token list interactive mode', () => {
     await submitTTYCommand(stdin, '/list-access-token')
     writeSpy.mockClear()
 
-    pressKey(stdin, 'down')
+    pushTTYCommandKey(stdin, 'down')
     await tick()
-    pressKey(stdin, 'down')
+    pushTTYCommandKey(stdin, 'down')
     await tick()
 
     const output = ttyOutput(writeSpy)
@@ -125,7 +126,7 @@ describe('TTY token list interactive mode', () => {
     await submitTTYCommand(stdin, '/list-access-token')
     writeSpy.mockClear()
 
-    pressKey(stdin, 'down')
+    pushTTYCommandKey(stdin, 'down')
     await tick()
 
     const output = ttyOutput(writeSpy)
@@ -145,10 +146,10 @@ describe('TTY token list interactive mode', () => {
   test('Enter sets highlighted token as default and confirms', async () => {
     await submitTTYCommand(stdin, '/list-access-token')
 
-    pressKey(stdin, 'down')
+    pushTTYCommandKey(stdin, 'down')
     await tick()
     writeSpy.mockClear()
-    pressEnter(stdin)
+    pushTTYCommandEnter(stdin)
     await tick()
 
     expect(ttyOutput(writeSpy)).toContain('Default token set to: Beta')
@@ -160,7 +161,7 @@ describe('TTY token list interactive mode', () => {
   test('selection mode: Ink renders token list items and guidance, no input box borders', async () => {
     await submitTTYCommand(stdin, '/list-access-token')
     const output = ttyOutput(writeSpy)
-    // Ink TokenListDisplay renders items and guidance
+    // Ink token list panel renders items and guidance
     expect(output).toContain('Alpha')
     expect(output).toContain('Beta')
     expect(output).toContain('↑↓ Enter to select; other keys cancel')
@@ -175,7 +176,7 @@ describe('TTY token list interactive mode', () => {
     await submitTTYCommand(stdin, '/list-access-token')
     writeSpy.mockClear()
 
-    typeString(stdin, 'q')
+    pushTTYCommandBytes(stdin, 'q')
     await tick()
 
     const output = ttyOutput(writeSpy)
@@ -209,9 +210,9 @@ describe('TTY token list interactive mode', () => {
     {
       action: 'select',
       setup: async () => {
-        pressKey(stdin, 'down')
+        pushTTYCommandKey(stdin, 'down')
         await tick()
-        pressEnter(stdin)
+        pushTTYCommandEnter(stdin)
         await tick()
       },
       expectMsg: 'Default token set to:',
@@ -219,7 +220,7 @@ describe('TTY token list interactive mode', () => {
     {
       action: 'cancel',
       setup: async () => {
-        typeString(stdin, 'q')
+        pushTTYCommandBytes(stdin, 'q')
         await tick()
       },
       expectMsg: 'Cancelled by user.',
@@ -258,7 +259,7 @@ describe('TTY token list interactive mode', () => {
     expect(midOutput).toContain('Beta')
 
     writeSpy.mockClear()
-    pressEnter(stdin)
+    pushTTYCommandEnter(stdin)
     await tick()
 
     expect(ttyOutput(writeSpy)).toContain('Token "Alpha" removed.')

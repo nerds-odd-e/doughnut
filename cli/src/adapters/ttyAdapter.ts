@@ -48,6 +48,7 @@ import {
 import {
   cycleListSelectionIndex,
   dispatchSelectListKey,
+  selectListKeyEventFromInk,
 } from '../interactions/selectListInteraction.js'
 import {
   buildSuggestionLinesForInk,
@@ -75,8 +76,8 @@ import { CommandLineLivePanel } from '../ui/CommandLineLivePanel.js'
 import { ConfirmLivePanel } from '../ui/ConfirmLivePanel.js'
 import { FetchWaitDisplay } from '../ui/FetchWaitDisplay.js'
 import { InteractiveShellDisplay } from '../ui/InteractiveShellDisplay.js'
-import { McqDisplay } from '../ui/McqDisplay.js'
-import { TokenListDisplay } from '../ui/TokenListDisplay.js'
+import { NumberedChoiceListLivePanel } from '../ui/NumberedChoiceListLivePanel.js'
+import { TokenListLivePanel } from '../ui/TokenListLivePanel.js'
 
 export interface TTYDeps {
   processInput: (
@@ -110,10 +111,6 @@ export interface TTYDeps {
   setDefaultTokenLabel: (label: AccessTokenLabel) => void
   TOKEN_LIST_COMMANDS: Record<string, AccessTokenPickerCommandConfig>
   getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
-}
-
-function isSubmitKey(keyName: string): boolean {
-  return keyName === 'return' || keyName === 'enter'
 }
 
 function isInkSubmitPressed(key: Key, input: string): boolean {
@@ -452,11 +449,21 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       const width = getTerminalWidth()
       const promptLines =
         getNumberedChoiceListCurrentPromptWrappedLines(width) ?? []
-      return React.createElement(McqDisplay, {
+      return React.createElement(NumberedChoiceListLivePanel, {
         stageIndicatorLine: DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
         currentPromptLines: promptLines,
         choices: numberedChoices,
         highlightIndex: numberedChoiceHighlightIndex,
+        lineDraft: commandInput.lineDraft,
+        width,
+        onInterrupt: () => {
+          interactiveTtyStdout.ctrlCExitNewline()
+          doExit()
+        },
+        onInkKey: (inp, ky) =>
+          Promise.resolve(handleNumberedChoiceListInkInput(inp, ky)).catch(
+            () => undefined
+          ),
       })
     }
     if (tokenSelection) {
@@ -468,12 +475,20 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       const stageIndicatorLine = tokenListConfig
         ? greyCurrentStageIndicatorLabel(tokenListConfig.stageIndicator)
         : ''
-      return React.createElement(TokenListDisplay, {
+      return React.createElement(TokenListLivePanel, {
         stageIndicatorLine,
         currentPromptLines: promptLines,
         items: tokenSelection.items,
         defaultLabel: getDefaultTokenLabel(),
         highlightIndex: tokenSelection.highlightIndex,
+        onInterrupt: () => {
+          interactiveTtyStdout.ctrlCExitNewline()
+          doExit()
+        },
+        onInkKey: (inp, ky) =>
+          Promise.resolve(handleTokenListInkInput(inp, ky)).catch(
+            () => undefined
+          ),
       })
     }
     const layout = commandLineLayout!
@@ -990,11 +1005,136 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     }
   }
 
+  async function handleNumberedChoiceListInkInput(
+    input: string,
+    key: Key
+  ): Promise<void> {
+    const numberedChoices = getNumberedChoiceListChoices()
+    if (numberedChoices === null) return
+
+    const ev = selectListKeyEventFromInk(input, key, commandInput.lineDraft)
+    const listDispatch = dispatchSelectListKey(
+      ev,
+      numberedChoiceHighlightIndex,
+      {
+        kind: 'slash-and-number-or-highlight',
+        choiceCount: numberedChoices.length,
+      },
+      'signal-escape'
+    )
+    switch (listDispatch.result) {
+      case 'escape-signaled':
+        enterStopConfirmationFromEsc()
+        break
+      case 'move-highlight':
+        numberedChoiceHighlightIndex = cycleListSelectionIndex(
+          numberedChoiceHighlightIndex,
+          listDispatch.delta,
+          numberedChoices.length
+        )
+        drawBox()
+        break
+      case 'submit-with-line': {
+        const effectiveInput = listDispatch.lineForProcessInput
+        const inputForHistory = commandInput.lineDraft || effectiveInput
+        commandInput = clearLiveCommandLine(commandInput)
+        numberedChoiceHighlightIndex = 0
+        resetCommandTurnBuffer()
+        chatHistory = [
+          ...chatHistory,
+          {
+            type: 'input',
+            content: maskInteractiveInputForHistory(inputForHistory),
+          },
+        ]
+        if (isCommittedInteractiveInput(inputForHistory)) {
+          rememberCommittedLine(inputForHistory)
+        }
+        if (await processInput(effectiveInput, ttyOutput, true)) {
+          commitExitTurnToScrollback()
+          doExit()
+          return
+        }
+        finishProcessInputTurnAfterAwait()
+        break
+      }
+      case 'edit-backspace':
+        commandInput = deleteBeforeCaret(commandInput)
+        drawBox()
+        break
+      case 'edit-char':
+        commandInput = insertIntoDraft(commandInput, listDispatch.char)
+        drawBox()
+        break
+      case 'redraw':
+        drawBox()
+        break
+      default:
+        drawBox()
+        break
+    }
+  }
+
+  async function handleTokenListInkInput(
+    input: string,
+    key: Key
+  ): Promise<void> {
+    if (!tokenSelection) return
+
+    const ev = selectListKeyEventFromInk(input, key, commandInput.lineDraft)
+    const listDispatch = dispatchSelectListKey(
+      ev,
+      tokenSelection.highlightIndex,
+      { kind: 'highlight-only' },
+      'abort-list'
+    )
+    switch (listDispatch.result) {
+      case 'abort-highlight-only-list':
+        commitTokenListResult(CLI_USER_ABORTED_WAIT_MESSAGE, 'userNotice')
+        break
+      case 'move-highlight':
+        tokenSelection.highlightIndex = cycleListSelectionIndex(
+          tokenSelection.highlightIndex,
+          listDispatch.delta,
+          tokenSelection.items.length
+        )
+        drawBox()
+        break
+      case 'submit-highlight-index': {
+        const selectedLabel = tokenSelection.items[listDispatch.index]!.label
+        const action = tokenSelection.action
+        let message = ''
+        let tone: ChatHistoryOutputTone = 'plain'
+        if (action === 'set-default') {
+          setDefaultTokenLabel(selectedLabel)
+          message = `Default token set to: ${selectedLabel}`
+        } else if (action === 'remove') {
+          removeAccessToken(selectedLabel)
+          message = `Token "${selectedLabel}" removed.`
+        } else {
+          try {
+            await runInteractiveFetchWait(
+              ttyOutput,
+              INTERACTIVE_FETCH_WAIT_LINES.removeAccessTokenCompletely,
+              (signal) => removeAccessTokenCompletely(selectedLabel, signal)
+            )
+            message = `Token "${selectedLabel}" removed locally and from server.`
+          } catch (err) {
+            const o = userVisibleOutcomeFromCommandError(err)
+            message = o.text
+            tone = o.tone
+          }
+        }
+        commitTokenListResult(message, tone)
+        break
+      }
+      default:
+        commitTokenListResult(CLI_USER_ABORTED_WAIT_MESSAGE, 'userNotice')
+        break
+    }
+  }
+
   stdin.on('keypress', async (str: string | undefined, key: ReadlineKey) => {
-    const submitPressed =
-      (key.name !== undefined && isSubmitKey(key.name)) ||
-      str === '\n' ||
-      str === '\r'
     if (key.ctrl && key.name === 'c') {
       interactiveTtyStdout.ctrlCExitNewline()
       doExit()
@@ -1013,137 +1153,15 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     ) {
       return
     }
-    const numberedChoices = getNumberedChoiceListChoices()
-    if (numberedChoices !== null) {
-      const listDispatch = dispatchSelectListKey(
-        {
-          keyName: key.name,
-          str,
-          ctrl: !!key.ctrl,
-          meta: !!key.meta,
-          shift: !!key.shift,
-          lineDraft: commandInput.lineDraft,
-          submitPressed,
-        },
-        numberedChoiceHighlightIndex,
-        {
-          kind: 'slash-and-number-or-highlight',
-          choiceCount: numberedChoices.length,
-        },
-        'signal-escape'
-      )
-      switch (listDispatch.result) {
-        case 'escape-signaled':
-          enterStopConfirmationFromEsc()
-          break
-        case 'move-highlight':
-          numberedChoiceHighlightIndex = cycleListSelectionIndex(
-            numberedChoiceHighlightIndex,
-            listDispatch.delta,
-            numberedChoices.length
-          )
-          drawBox()
-          break
-        case 'submit-with-line': {
-          const effectiveInput = listDispatch.lineForProcessInput
-          const inputForHistory = commandInput.lineDraft || effectiveInput
-          commandInput = clearLiveCommandLine(commandInput)
-          numberedChoiceHighlightIndex = 0
-          resetCommandTurnBuffer()
-          chatHistory = [
-            ...chatHistory,
-            {
-              type: 'input',
-              content: maskInteractiveInputForHistory(inputForHistory),
-            },
-          ]
-          if (isCommittedInteractiveInput(inputForHistory)) {
-            rememberCommittedLine(inputForHistory)
-          }
-          if (await processInput(effectiveInput, ttyOutput, true)) {
-            commitExitTurnToScrollback()
-            doExit()
-            return
-          }
-          finishProcessInputTurnAfterAwait()
-          break
-        }
-        case 'edit-backspace':
-          commandInput = deleteBeforeCaret(commandInput)
-          drawBox()
-          break
-        case 'edit-char':
-          commandInput = insertIntoDraft(commandInput, listDispatch.char)
-          drawBox()
-          break
-        case 'redraw':
-          drawBox()
-          break
-        default:
-          drawBox()
-          break
-      }
+    if (key.name === 'escape' && getNumberedChoiceListChoices() !== null) {
+      enterStopConfirmationFromEsc()
       return
     }
-    if (tokenSelection) {
-      const listDispatch = dispatchSelectListKey(
-        {
-          keyName: key.name,
-          str,
-          ctrl: !!key.ctrl,
-          meta: !!key.meta,
-          shift: !!key.shift,
-          lineDraft: commandInput.lineDraft,
-          submitPressed,
-        },
-        tokenSelection.highlightIndex,
-        { kind: 'highlight-only' },
-        'abort-list'
-      )
-      switch (listDispatch.result) {
-        case 'abort-highlight-only-list':
-          commitTokenListResult(CLI_USER_ABORTED_WAIT_MESSAGE, 'userNotice')
-          break
-        case 'move-highlight':
-          tokenSelection.highlightIndex = cycleListSelectionIndex(
-            tokenSelection.highlightIndex,
-            listDispatch.delta,
-            tokenSelection.items.length
-          )
-          drawBox()
-          break
-        case 'submit-highlight-index': {
-          const selectedLabel = tokenSelection.items[listDispatch.index]!.label
-          const action = tokenSelection.action
-          let message = ''
-          let tone: ChatHistoryOutputTone = 'plain'
-          if (action === 'set-default') {
-            setDefaultTokenLabel(selectedLabel)
-            message = `Default token set to: ${selectedLabel}`
-          } else if (action === 'remove') {
-            removeAccessToken(selectedLabel)
-            message = `Token "${selectedLabel}" removed.`
-          } else {
-            try {
-              await runInteractiveFetchWait(
-                ttyOutput,
-                INTERACTIVE_FETCH_WAIT_LINES.removeAccessTokenCompletely,
-                (signal) => removeAccessTokenCompletely(selectedLabel, signal)
-              )
-              message = `Token "${selectedLabel}" removed locally and from server.`
-            } catch (err) {
-              const o = userVisibleOutcomeFromCommandError(err)
-              message = o.text
-              tone = o.tone
-            }
-          }
-          commitTokenListResult(message, tone)
-          break
-        }
-        default:
-          commitTokenListResult(CLI_USER_ABORTED_WAIT_MESSAGE, 'userNotice')
-          break
-      }
+    if (key.name === 'escape' && tokenSelection) {
+      commitTokenListResult(CLI_USER_ABORTED_WAIT_MESSAGE, 'userNotice')
+      return
+    }
+    if (getNumberedChoiceListChoices() !== null || tokenSelection) {
       return
     }
   })

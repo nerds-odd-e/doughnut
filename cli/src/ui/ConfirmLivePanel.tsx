@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-  useCallback,
-} from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { useFocus, useInput, type Key } from 'ink'
 import {
   dispatchRecallSessionConfirmKey,
@@ -13,8 +7,6 @@ import {
   type SessionYesNoLineKeyEvent,
 } from '../interactions/sessionYesNoInteraction.js'
 import { ConfirmDisplay } from './ConfirmDisplay.js'
-import { INK_LIVE_SOLE_FOCUS_REGION_REFLEX } from './liveFocusPhaseFlags.js'
-
 const CONFIRM_LIVE_INK_FOCUS_ID = 'confirm-live'
 
 function isSubmitKeyInk(key: Key, input: string): boolean {
@@ -124,7 +116,7 @@ export function ConfirmLivePanel({
     onDispatchResult,
   }
 
-  const { isFocused, focus } = useFocus({
+  const { isFocused } = useFocus({
     id: CONFIRM_LIVE_INK_FOCUS_ID,
     autoFocus: true,
   })
@@ -132,11 +124,6 @@ export function ConfirmLivePanel({
   isFocusedRef.current = isFocused
   const inkFocusEverEstablishedRef = useRef(false)
   if (isFocused) inkFocusEverEstablishedRef.current = true
-
-  useLayoutEffect(() => {
-    if (!INK_LIVE_SOLE_FOCUS_REGION_REFLEX || isFocused) return
-    focus(CONFIRM_LIVE_INK_FOCUS_ID)
-  }, [isFocused, focus])
 
   useEffect(() => {
     if (skipNextOsc.current) {

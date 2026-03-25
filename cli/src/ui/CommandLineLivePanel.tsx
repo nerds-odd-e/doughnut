@@ -13,8 +13,6 @@ import {
   type PlaceholderContext,
   type TerminalWidth,
 } from '../renderer.js'
-import { INK_LIVE_SOLE_FOCUS_REGION_REFLEX } from './liveFocusPhaseFlags.js'
-
 export const COMMAND_LINE_INK_FOCUS_ID = 'command-line'
 
 export type CommandLineLivePanelProps = {
@@ -51,7 +49,7 @@ export function CommandLineLivePanel({
   if (isFocused) inkFocusEverEstablishedRef.current = true
 
   useLayoutEffect(() => {
-    if (!INK_LIVE_SOLE_FOCUS_REGION_REFLEX || isFocused) return
+    if (isFocused) return
     focus(COMMAND_LINE_INK_FOCUS_ID)
   }, [isFocused, focus])
 
