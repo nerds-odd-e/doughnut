@@ -1,4 +1,5 @@
 @withCliConfig
+@interactiveCLI
 Feature: CLI access token management
 
   Background:
@@ -6,35 +7,30 @@ Feature: CLI access token management
 
   Scenario: Add access token and list it
     And I have a valid Doughnut Access Token with label "E2E CLI Token"
-    When I run doughnut -c "/add-access-token" with the saved token
-    Then I should see "Token added" in the non-interactive output
-    When I run the doughnut command with -c "/list-access-token"
-    Then I should see "E2E CLI Token" in the non-interactive output
+    When I add the saved access token in the interactive CLI using add-access-token
+    When I enter the slash command "/list-access-token" in the interactive CLI
+    Then I should see "E2E CLI Token" in the Current guidance
 
   Scenario: Add invalid access token
-    When I run doughnut -c "/add-access-token" with token "invalid-token-xxx"
-    Then I should see "Access token is invalid or expired" in the non-interactive output
+    When I enter the slash command "/add-access-token invalid-token-xxx" in the interactive CLI
+    Then I should see "Access token is invalid or expired" in the history output
 
   Scenario Outline: Remove access token
     And I have a valid Doughnut Access Token with label "<label>"
-    When I run doughnut -c "/add-access-token" with the saved token
-    Then I should see "Token added" in the non-interactive output
-    When I run doughnut -c "<action>" with label "<label>"
+    When I add the saved access token in the interactive CLI using add-access-token
+    When I enter the slash command "<action> <label>" in the interactive CLI
     Then I should see the <removal_type> remove success message for "<label>"
-    When I run the doughnut command with -c "/list-access-token"
-    Then I should see "No access tokens stored." in the non-interactive output
+    When I enter the slash command "/list-access-token" in the interactive CLI
+    Then I should see "No access tokens stored." in the history output
 
     Examples:
       | label           | action                          | removal_type |
       | Remove Me Token | /remove-access-token            | local        |
       | Revoke Me Token | /remove-access-token-completely | complete     |
 
-  
-  @interactiveCLI
   Scenario: Another key cancels remove-access-token selection
     And I have a valid Doughnut Access Token with label "E2E CLI Token"
-    When I run doughnut -c "/add-access-token" with the saved token
-    Then I should see "Token added" in the non-interactive output
+    When I add the saved access token in the interactive CLI using add-access-token
     When I enter the slash command "/remove-access-token" in the interactive CLI
     Then I should see "E2E CLI Token" in the Current guidance
     When I cancel the token list with q in the interactive CLI
@@ -44,9 +40,8 @@ Feature: CLI access token management
 
   Scenario: Create access token via CLI
     And I have a valid Doughnut Access Token with label "Default Token"
-    When I run doughnut -c "/add-access-token" with the saved token
-    Then I should see "Token added" in the non-interactive output
-    When I run doughnut -c "/create-access-token" with label "New CLI Token"
-    Then I should see "Token created" in the non-interactive output
-    When I run the doughnut command with -c "/list-access-token"
-    Then I should see "New CLI Token" in the non-interactive output
+    When I add the saved access token in the interactive CLI using add-access-token
+    When I enter the slash command "/create-access-token New CLI Token" in the interactive CLI
+    Then I should see "Token created" in the history output
+    When I enter the slash command "/list-access-token" in the interactive CLI
+    Then I should see "New CLI Token" in the Current guidance

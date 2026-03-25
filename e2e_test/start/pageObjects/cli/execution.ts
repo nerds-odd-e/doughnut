@@ -143,8 +143,6 @@ function interactive() {
 }
 
 function accessToken() {
-  const runAccessTokenCommand = (command: string, value: string) =>
-    runCliWithScenarioConfigDir(['-c', `${command} ${value}`])
   return {
     addSavedTokenInteractive() {
       cy.get<string>('@savedAccessToken').then((token) =>
@@ -154,17 +152,6 @@ function accessToken() {
         })
       )
       historyOutput().expectContains('Token added')
-    },
-    runWithSavedToken(command: string) {
-      cy.get<string>('@savedAccessToken').then((token) =>
-        runAccessTokenCommand(command, token)
-      )
-    },
-    runWithToken(command: string, token: string) {
-      runAccessTokenCommand(command, token)
-    },
-    runWithLabel(command: string, label: string) {
-      runAccessTokenCommand(command, label)
     },
   }
 }

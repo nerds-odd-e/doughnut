@@ -60,19 +60,6 @@ When(
   'I add the saved access token in the interactive CLI using add-access-token',
   () => cli.accessToken().addSavedTokenInteractive()
 )
-When('I run doughnut -c {string} with the saved token', (command: string) =>
-  cli.accessToken().runWithSavedToken(command)
-)
-When(
-  'I run doughnut -c {string} with token {string}',
-  (command: string, token: string) =>
-    cli.accessToken().runWithToken(command, token)
-)
-When(
-  'I run doughnut -c {string} with label {string}',
-  (command: string, label: string) =>
-    cli.accessToken().runWithLabel(command, label)
-)
 
 Then(
   'I should see the {word} remove success message for {string}',
