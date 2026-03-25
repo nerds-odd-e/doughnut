@@ -81,7 +81,7 @@ const expandedDescendants = ref(false)
 const expandedGraph = ref(false)
 const jsonDescendants = ref("")
 const jsonGraph = ref("")
-const tokenLimit = ref(5000)
+const tokenLimit = ref(2000)
 const loadingGraph = ref(false)
 
 watch(
