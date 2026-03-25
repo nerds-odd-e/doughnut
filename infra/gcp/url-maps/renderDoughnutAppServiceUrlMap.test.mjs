@@ -21,7 +21,7 @@ test('render from routing JSON substitutes SHA in static rewrites', () => {
   const out = renderDoughnutAppServiceUrlMapYamlFromRouting(routing, sha)
   assert.ok(!out.includes(FRONTEND_GITHUB_SHA_PLACEHOLDER))
   assert.ok(out.includes(`/frontend/${sha}/assets/`))
-  assert.equal((out.match(new RegExp(sha, 'g')) ?? []).length, 5)
+  assert.equal((out.match(new RegExp(sha, 'g')) ?? []).length, 6)
 })
 
 test('render rejects non-hex or wrong length', () => {

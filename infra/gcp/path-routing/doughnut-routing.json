@@ -44,6 +44,10 @@
         "pathPrefixRewrite": "/frontend/__FRONTEND_GITHUB_SHA__/odd-e.png"
       },
       {
+        "paths": ["/mcp-server.bundle.mjs"],
+        "pathPrefixRewrite": "/frontend/__FRONTEND_GITHUB_SHA__/mcp-server.bundle.mjs"
+      },
+      {
         "paths": ["/doughnut-cli-latest/*"],
         "pathPrefixRewrite": "/doughnut-cli-latest/"
       }
