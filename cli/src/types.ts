@@ -95,7 +95,7 @@ export type OutputAdapter = {
   clearAndRedraw?: () => void
   /**
    * TTY only: invoked when interactive fetch-wait starts or finishes (see `runInteractiveFetchWait`).
-   * On start: repaint live region and run ellipsis animation. On end: discard line draft typed during the
+   * On start: repaint live region (Ink `Spinner` animates in `FetchWaitDisplay`). On end: discard line draft typed during the
    * grey disabled input box, reset `/` command-picker highlight state, repaint.
    */
   onInteractiveFetchWaitChanged?: () => void

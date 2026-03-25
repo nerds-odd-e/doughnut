@@ -14,7 +14,6 @@ import {
   userVisibleOutcomeFromCommandError,
 } from '../fetchAbort.js'
 import {
-  INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS,
   INTERACTIVE_FETCH_WAIT_LINES,
   cancelInteractiveFetchWaitFor,
   getInteractiveFetchWaitLine,
@@ -177,14 +176,11 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
 
   function currentStageIndicatorLinesForLiveRegion(
     waitLine: InteractiveFetchWaitLine | null,
-    fetchWaitEllipsisTick: number,
     tokenPicker: AccessTokenPickerCommandConfig | undefined,
     sessionPayloadLoading: boolean
   ): string[] {
     if (waitLine != null) {
-      return [
-        interactiveFetchWaitStageIndicatorLine(waitLine, fetchWaitEllipsisTick),
-      ]
+      return [interactiveFetchWaitStageIndicatorLine(waitLine)]
     }
     if (tokenPicker != null) {
       return [greyCurrentStageIndicatorLabel(tokenPicker.stageIndicator)]
@@ -236,10 +232,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   let suggestionsDismissed = false
   let tokenSelection: TokenSelectionState | null = null
   let numberedChoiceHighlightIndex = 0
-  let interactiveFetchWaitEllipsisTick = 0
-  let interactiveFetchWaitRepaintTimer: ReturnType<typeof setInterval> | null =
-    null
-
   // --- Ink shell: Static history + live panel (Phase H) ---
   let shellInstance: ReturnType<typeof render> | null = null
 
@@ -312,7 +304,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     }
     const currentStageIndicatorLines = currentStageIndicatorLinesForLiveRegion(
       waitLine,
-      interactiveFetchWaitEllipsisTick,
       tokenListConfig,
       isInCommandSessionSubstate()
     )
@@ -397,10 +388,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
 
     const waitLine = getInteractiveFetchWaitLine()
     if (waitLine !== null) {
-      return React.createElement(FetchWaitDisplay, {
-        waitLine,
-        ellipsisTick: interactiveFetchWaitEllipsisTick,
-      })
+      return React.createElement(FetchWaitDisplay, { waitLine })
     }
     if (isPendingStopConfirmation()) {
       const placeholderCtx = getPlaceholderContext(false)
@@ -638,14 +626,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     })
   }
 
-  function stopInteractiveFetchWaitRepaintTimer(): void {
-    if (interactiveFetchWaitRepaintTimer) {
-      clearInterval(interactiveFetchWaitRepaintTimer)
-      interactiveFetchWaitRepaintTimer = null
-    }
-    interactiveFetchWaitEllipsisTick = 0
-  }
-
   /** Clears the live input line and `/` command-picker state (used by `/clear` and when fetch-wait ends). */
   function resetLiveLineDraftAndSlashSuggestions(): void {
     commandInput = clearLiveCommandLine(commandInput)
@@ -690,16 +670,10 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       drawBox()
     },
     onInteractiveFetchWaitChanged: () => {
-      stopInteractiveFetchWaitRepaintTimer()
       const activeWaitPrompt = getInteractiveFetchWaitLine()
       if (activeWaitPrompt) {
         flushCommandTurnToScrollbackBeforeFetchWait()
         drawBox()
-        interactiveFetchWaitRepaintTimer = setInterval(() => {
-          interactiveFetchWaitEllipsisTick =
-            (interactiveFetchWaitEllipsisTick + 1) % 3
-          drawBox()
-        }, INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS)
       } else {
         resetLiveLineDraftAndSlashSuggestions()
         drawBox()
@@ -962,7 +936,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   process.stdout.on('resize', drawBox)
   const removeResizeListener = () => process.stdout.off('resize', drawBox)
   const doExit = () => {
-    stopInteractiveFetchWaitRepaintTimer()
     removeResizeListener()
     if (shellInstance) {
       shellInstance.unmount()

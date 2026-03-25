@@ -1,20 +1,16 @@
+import { Spinner } from '@inkjs/ui'
 import { Box, Text } from 'ink'
 import type { InteractiveFetchWaitLine } from '../interactiveFetchWait.js'
-import {
-  formatInteractiveFetchWaitPromptLine,
-  PLACEHOLDER_BY_CONTEXT,
-} from '../renderer.js'
+import { PLACEHOLDER_BY_CONTEXT } from '../renderer.js'
 
 type Props = {
   waitLine: InteractiveFetchWaitLine
-  ellipsisTick: number
 }
 
-export function FetchWaitDisplay({ waitLine, ellipsisTick }: Props) {
-  const label = formatInteractiveFetchWaitPromptLine(waitLine, ellipsisTick)
+export function FetchWaitDisplay({ waitLine }: Props) {
   return (
     <Box flexDirection="column">
-      <Text color="blue">{label}</Text>
+      <Spinner label={waitLine} type="dots" />
       <Text dimColor>{PLACEHOLDER_BY_CONTEXT.interactiveFetchWait}</Text>
     </Box>
   )

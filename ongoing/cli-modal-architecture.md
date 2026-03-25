@@ -68,7 +68,7 @@ Ink shell, neutral `TTYDeps`, confirm/MCQ/token/fetch-wait display components, *
 
 ## Remaining phases (numbered)
 
-**Order:** **2 → 3 → 4 → 5 → 6 → 7 → 8 (optional) → 9** (phases 1–7 done)
+**Order:** **2 → 3 → 4 → 5 → 6 → 7 → 8 → 9** (phases 1–8 done)
 
 **Rationale (planning.mdc):** **Phase 4** is its own **user-visible** slice (new keyboard/focus model — gate 3). **Phase 5** moves MCQ/token list input onto Ink (**`useInput`** list panels; gate 5 hand-rolled fallback vs **`@inkjs/ui` `Select`**). **Phase 6** is a separate UX slice (simpler y/n). **Phase 7** is the mandatory duplicate-path audit.
 
@@ -130,13 +130,13 @@ Ink shell, neutral `TTYDeps`, confirm/MCQ/token/fetch-wait display components, *
 
 - **Verify:** `pnpm cli:test` interactive suite; **`ttyAdapter`** grep: **`keypress`** / **`readline`** only as above.
 
-### Phase 8 (optional) — ink-ui polish
+### Phase 8 (done) — ink-ui polish
 
-**`Spinner`**, extra **`TextInput`** polish, etc., only where API maps **directly** to current behavior — does not block phase 7.
+Interactive fetch-wait: **`@inkjs/ui` `Spinner`** (`type="dots"`) in **`FetchWaitDisplay`**; removed adapter **`setInterval`** ellipsis tick + **`INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS`**. Stage-band layout string is static blue label (**`interactiveFetchWaitStageIndicatorLine`**) for **`needsGapBeforeBox`** / piped paths only.
 
 ### Phase 9 — Ink-idiomatic stdout (shrink `interactiveTtyStdout`)
 
-After **2–7** (and with phase 1 done for default live wrap), reduce raw **`process.stdout.write`** using Ink-supported patterns: e.g. **`render(..., { stdout })`** via a thin **`Writable`**, **`Static`** for append-only exit tails if PTY rules allow, cursor/show-hide via the unified input path, revisit **gate 7** if it removes duplicate prompt logging **without** corrupting layout.
+After **2–8** (and with phase 1 done for default live wrap), reduce raw **`process.stdout.write`** using Ink-supported patterns: e.g. **`render(..., { stdout })`** via a thin **`Writable`**, **`Static`** for append-only exit tails if PTY rules allow, cursor/show-hide via the unified input path, revisit **gate 7** if it removes duplicate prompt logging **without** corrupting layout.
 
 - **Expect residue:** Private OSC (**`INTERACTIVE_INPUT_READY_OSC`**) may stay documented in a tiny layer.
 - **Verify:** Interactive Vitest + E2E for history and OSC ordering.

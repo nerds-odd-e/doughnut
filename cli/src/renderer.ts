@@ -136,22 +136,11 @@ export function isGreyDisabledInputChrome(ctx: PlaceholderContext): boolean {
   return ctx === 'tokenList' || ctx === 'interactiveFetchWait'
 }
 
-const ELLIPSIS_PHASE = ['.', '..', '...'] as const
-
-/** Appends `.` / `..` / `...` to the wait prompt base (TTY cycles `ellipsisTick`). */
-export function formatInteractiveFetchWaitPromptLine(
-  baseLine: InteractiveFetchWaitLine,
-  ellipsisTick: number
-): string {
-  return `${baseLine}${ELLIPSIS_PHASE[ellipsisTick % 3]!}`
-}
-
-/** One **Current Stage Indicator** line for interactive fetch-wait (blue label + ellipsis on the band). */
+/** One **Current Stage Indicator** line for interactive fetch-wait layout (blue label; TTY animates via Ink `Spinner`). */
 export function interactiveFetchWaitStageIndicatorLine(
-  baseLine: InteractiveFetchWaitLine,
-  ellipsisTick: number
+  baseLine: InteractiveFetchWaitLine
 ): string {
-  return `${INTERACTIVE_FETCH_WAIT_PROMPT_FG}${formatInteractiveFetchWaitPromptLine(baseLine, ellipsisTick)}${RESET}`
+  return `${INTERACTIVE_FETCH_WAIT_PROMPT_FG}${baseLine}${RESET}`
 }
 
 /** Full grey outline for the input box when the user is not free-typing a command. */

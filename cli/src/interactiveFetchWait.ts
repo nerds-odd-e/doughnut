@@ -1,11 +1,8 @@
 import type { OutputAdapter } from './types.js'
 
-/** Interval for cycling `.` / `..` / `...` on the fetch-wait Current prompt (TTY only). */
-export const INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS = 400
-
 /**
  * Plain-text base for the **Current Stage Indicator** while the TTY awaits a slow
- * network/backend call. Ellipsis animation uses `formatInteractiveFetchWaitPromptLine` in `renderer.ts`.
+ * network/backend call. TTY animation is `Spinner` in `FetchWaitDisplay.tsx`.
  */
 export const INTERACTIVE_FETCH_WAIT_LINES = {
   recallNext: 'Loading recall questions',

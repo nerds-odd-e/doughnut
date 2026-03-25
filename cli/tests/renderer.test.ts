@@ -259,7 +259,7 @@ describe('buildLiveRegionLines', () => {
   test('interactive fetch wait: banded Current Stage Indicator + separator, then box', () => {
     const width = 44
     const base = INTERACTIVE_FETCH_WAIT_LINES.recallNext
-    const label = interactiveFetchWaitStageIndicatorLine(base, 0)
+    const label = interactiveFetchWaitStageIndicatorLine(base)
     const lines = buildLiveRegionLines('', width, [], [], [label], {
       placeholderContext: 'interactiveFetchWait',
     })
@@ -267,7 +267,7 @@ describe('buildLiveRegionLines', () => {
     expect(boxTopIndex).toBe(2)
     expect(lines[0]).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
     expect(lines[0]).toContain(INTERACTIVE_FETCH_WAIT_PROMPT_FG)
-    expect(stripAnsi(lines[0])).toMatch(new RegExp(`^${base}\\.\\s+$`))
+    expect(stripAnsi(lines[0])).toMatch(new RegExp(`^${base}\\s+$`))
     expect(visibleLength(stripAnsi(lines[0]))).toBe(width)
     expect(lines[1]).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
     expect(stripAnsi(lines[1])).toBe('─'.repeat(width))

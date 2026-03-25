@@ -15,7 +15,6 @@ import {
   buildBoxLines,
   buildLiveRegionLines,
   CURRENT_STAGE_BAND_BACKGROUND_SGR,
-  formatInteractiveFetchWaitPromptLine,
   interactiveFetchWaitStageIndicatorLine,
   isGreyDisabledInputChrome,
   stripAnsi,
@@ -75,13 +74,10 @@ describe('userVisibleOutcomeFromCommandError', () => {
 })
 
 describe('interactive fetch wait UI', () => {
-  test('renderer: ellipsis, grey chrome contexts, live region colors', () => {
+  test('renderer: fetch-wait stage label, grey chrome contexts, live region colors', () => {
     const recallLine = INTERACTIVE_FETCH_WAIT_LINES.recallNext
-    expect(formatInteractiveFetchWaitPromptLine(recallLine, 0)).toBe(
-      `${recallLine}.`
-    )
-    expect(formatInteractiveFetchWaitPromptLine(recallLine, 3)).toBe(
-      `${recallLine}.`
+    expect(stripAnsi(interactiveFetchWaitStageIndicatorLine(recallLine))).toBe(
+      recallLine
     )
 
     expect(isGreyDisabledInputChrome('interactiveFetchWait')).toBe(true)
@@ -95,7 +91,7 @@ describe('interactive fetch wait UI', () => {
     expect(boxLine).not.toContain('→')
     expect(boxLine).toContain('loading ...')
 
-    const label = interactiveFetchWaitStageIndicatorLine(recallLine, 1)
+    const label = interactiveFetchWaitStageIndicatorLine(recallLine)
     const live = buildLiveRegionLines('', 80, [], [], [label], {
       placeholderContext: 'interactiveFetchWait',
     })
@@ -110,9 +106,8 @@ describe('interactive fetch wait UI', () => {
 
     expect(
       stripAnsi(
-        formatInteractiveFetchWaitPromptLine(
-          INTERACTIVE_FETCH_WAIT_LINES.recallStatus,
-          0
+        interactiveFetchWaitStageIndicatorLine(
+          INTERACTIVE_FETCH_WAIT_LINES.recallStatus
         )
       )
     ).toContain(INTERACTIVE_FETCH_WAIT_LINES.recallStatus)
