@@ -52,28 +52,20 @@ import {
   dispatchSelectListKey,
 } from '../interactions/selectListInteraction.js'
 import {
-  applyChatHistoryOutputTone,
-  buildCurrentPromptSeparator,
   buildSuggestionLines,
   buildTokenListLines,
-  CLEAR_SCREEN,
   DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
   getLastLine,
   getTerminalWidth,
-  GREY,
   greyCurrentStageIndicatorLabel,
-  HIDE_CURSOR,
   interactiveFetchWaitStageIndicatorLine,
-  INTERACTIVE_INPUT_READY_OSC,
-  interactiveInputReadyOscSuffix,
   isCommittedInteractiveInput,
   needsGapBeforeBox,
   recallMcqCurrentGuidanceLines,
-  renderPastInput,
-  SHOW_CURSOR,
   wrapTextToLines,
   type PlaceholderContext,
 } from '../renderer.js'
+import { interactiveTtyStdout } from './interactiveTtyStdout.js'
 import type {
   AccessTokenPickerAction,
   AccessTokenPickerCommandConfig,
@@ -214,11 +206,10 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   }
 
   const writeCurrentPromptLine = (msg: string) =>
-    process.stdout.write(`${GREY}${msg}\x1b[0m\n`)
+    interactiveTtyStdout.greyCurrentPromptLine(msg)
 
   const doBeginCurrentPrompt = () => {
-    const sep = buildCurrentPromptSeparator(getTerminalWidth())
-    process.stdout.write(`${sep}\n`)
+    interactiveTtyStdout.currentPromptSeparator(getTerminalWidth())
   }
 
   function isCommandPrefixWithSuggestions(lineDraft: string): boolean {
@@ -281,7 +272,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
 
   function handleShellRendered(): void {
     if (getInteractiveFetchWaitLine() !== null) {
-      process.stdout.write(HIDE_CURSOR)
+      interactiveTtyStdout.hideCursor()
       return
     }
     if (
@@ -291,11 +282,11 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       return
     }
     if (getNumberedChoiceListChoices() !== null) {
-      process.stdout.write(INTERACTIVE_INPUT_READY_OSC)
+      interactiveTtyStdout.inputReadyOsc()
       return
     }
     if (tokenSelection) {
-      process.stdout.write(INTERACTIVE_INPUT_READY_OSC)
+      interactiveTtyStdout.inputReadyOsc()
       return
     }
     finalizeInteractiveLiveRegionPaint()
@@ -575,13 +566,10 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
 
   /** Hardware cursor stays hidden; caret is reverse-video inside Ink. Then input-ready OSC when applicable. */
   function finalizeInteractiveLiveRegionPaint(): void {
-    process.stdout.write(HIDE_CURSOR)
-    process.stdout.write(
-      interactiveInputReadyOscSuffix({
-        lineDraft: commandInput.lineDraft,
-        interactiveFetchWaitLine: getInteractiveFetchWaitLine(),
-      })
-    )
+    interactiveTtyStdout.finalizeDefaultLiveAfterInk({
+      lineDraft: commandInput.lineDraft,
+      interactiveFetchWaitLine: getInteractiveFetchWaitLine(),
+    })
   }
 
   /** Before fetch-wait chrome paints and emits input-ready OSC, persist buffered `log` lines so PTY captures are not ahead of scrollback. */
@@ -608,13 +596,12 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     if (!last || last.type !== 'output') return
     const width = getTerminalWidth()
     const outTone = last.tone ?? 'plain'
-    if (prev?.type === 'input') {
-      process.stdout.write(renderPastInput(prev.content, width))
-      process.stdout.write('\n')
-    }
-    for (const line of last.lines) {
-      process.stdout.write(`${applyChatHistoryOutputTone(line, outTone)}\n`)
-    }
+    interactiveTtyStdout.exitFarewellBlock({
+      width,
+      previousInputContent: prev?.type === 'input' ? prev.content : undefined,
+      outputLines: last.lines,
+      tone: outTone,
+    })
   }
 
   function stopInteractiveFetchWaitRepaintTimer(): void {
@@ -657,7 +644,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     writeCurrentPrompt: writeCurrentPromptLine,
     beginCurrentPrompt: doBeginCurrentPrompt,
     clearAndRedraw: () => {
-      process.stdout.write(CLEAR_SCREEN)
+      interactiveTtyStdout.clearScreen()
       chatHistory = []
       resetLiveLineDraftAndSlashSuggestions()
       tokenSelection = null
@@ -699,7 +686,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       shellInstance.unmount()
       shellInstance = null
     }
-    process.stdout.write(SHOW_CURSOR)
+    interactiveTtyStdout.showCursor()
     rl.close()
     process.exit(0)
   }
@@ -726,7 +713,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       str === '\n' ||
       str === '\r'
     if (key.ctrl && key.name === 'c') {
-      process.stdout.write(`\x1b[${1}B\r\n`)
+      interactiveTtyStdout.ctrlCExitNewline()
       doExit()
     }
     if (key.name === 'escape' && cancelInteractiveFetchWaitFor(ttyOutput)) {

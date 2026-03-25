@@ -88,7 +88,7 @@ After each phase: **delete dead code** that only served the old path; **delete o
 | Business importing **`renderer`** only where needed | **Done** (Phase D); `interactive.ts` keeps a small renderer surface for prompts / redraw helpers |
 | Legacy full-screen repaint + mode wiring | **Done** (Phase H shell + Phase I cleanup) |
 | Imperative caret CSI + pre-rerender cursor restore (Ink log-update mismatch) | **Done** — **J2** (reverse-video caret; hardware cursor hidden in command line) |
-| Scattered `stdout.write` for interactive mode (vs one thin OSC/lifecycle layer) | **K** (after **J**) |
+| Scattered `stdout.write` for interactive mode (vs one thin OSC/lifecycle layer) | **Done** — **`cli/src/adapters/interactiveTtyStdout.ts`** (`runTTY` has no direct `process.stdout.write`) |
 
 ---
 
@@ -320,16 +320,16 @@ After each phase: **delete dead code** that only served the old path; **delete o
 
 ---
 
-### Phase K — **Single owner** of interactive stdout (OSC + lifecycle glue)
+### Phase K — **Single owner** of interactive stdout (OSC + lifecycle glue) — **done**
 
 **Goal:** After **J**, any remaining **`process.stdout.write`** in the TTY path is **minimal and in one place**: e.g. **shell-integration OSC** (`INTERACTIVE_INPUT_READY_OSC`), resize/clear coordination, exit scrollback—**not** scattered CSI mixed with Ink’s stream.
 
 **User-visible outcome:** No user-facing change when done well; fewer classes of ordering bugs and easier reasoning for contributors.
 
-**Deliverables**
+**Delivered**
 
-- Audit **`ttyAdapter`** (and **`commitExitTurnToScrollback`**, etc.) for raw writes; fold into a **small module** or **Ink `render` options** / custom `stdout` wrapper if justified.
-- Document what **must** stay outside Ink (OSC, farewell lines) vs what **must not** return (layout/caret CSI for the live block).
+- **`cli/src/adapters/interactiveTtyStdout.ts`:** all interactive TTY raw writes from **`ttyAdapter`** (`greyCurrentPromptLine`, current-prompt separator, hide/show cursor, clear screen, input-ready OSC, finalize-after-Ink, exit farewell block, Ctrl+C newline). Module file comment documents what stays outside Ink vs what must not return.
+- **`ttyAdapter.ts`:** no **`process.stdout.write`**; delegates to **`interactiveTtyStdout`**.
 
 **Depends on:** **J** (caret and draft no longer need adapter-emitted `CUU`/`CHA`).
 
@@ -490,5 +490,5 @@ Phases **A–I** are **done**; **J1**–**J4** are **done**. Follow-up work is s
 
 ## Notes
 
-- **Ordering:** Phases A–D delivered a safe **extract-and-thin-adapter** path; E–I added Ink and the shell. **Phases A–I are complete** on `main`; **J1**–**J4** are **done**. **Next:** **Phases J+** (default-column Ink wrap, stdin/`useInput`, …) and the **migration-status table** stdout-audit row (**K**, after J). This file stays as reference until you archive it.
+- **Ordering:** Phases A–D delivered a safe **extract-and-thin-adapter** path; E–I added Ink and the shell. **Phases A–I are complete** on `main`; **J1**–**J4** and **K** (stdout single owner) are **done**. **Next:** **Phases J+** default-column Ink wrap (still labeled “K” in the J+ list — rename when editing), then stdin/`useInput` (**L**+). This file stays as reference until you archive it.
 - **Conflicts:** Any future change that would alter PTY/E2E-visible behavior without product sign-off should still stop at the nearest **decision gate** above.
