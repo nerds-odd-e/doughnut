@@ -141,7 +141,7 @@ importers:
   cli:
     dependencies:
       '@inkjs/ui':
-        specifier: ^2.0.0
+        specifier: 2.0.0
         version: 2.0.0(ink@6.8.0(@types/react@19.2.14)(react@19.2.4))
       doughnut-api:
         specifier: workspace:*
