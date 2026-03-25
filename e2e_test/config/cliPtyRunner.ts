@@ -57,6 +57,42 @@ const PTY_OPTIONS = {
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
+const INTERACTIVE_CLI_PROMPT_WAIT_MS = 10_000
+
+function stdoutHaystackAfter(
+  stdout: string,
+  onlyAfterByteLength: number | undefined
+): string {
+  if (onlyAfterByteLength === undefined) return stdout
+  return stdout.length > onlyAfterByteLength
+    ? stdout.slice(onlyAfterByteLength)
+    : ''
+}
+
+/** After {@link INTERACTIVE_INPUT_READY_OSC} appears, flush then wait until PTY output length stabilizes. */
+async function drainStdoutUntilStableAfterOsc(
+  getStdout: () => string
+): Promise<void> {
+  await sleep(INTERACTIVE_INPUT_READY_FLUSH_MS)
+  const drainDeadline = Date.now() + INTERACTIVE_INPUT_READY_DRAIN_MAX_MS
+  let lastLen = getStdout().length
+  let stableSince = Date.now()
+  while (Date.now() < drainDeadline) {
+    await sleep(CLI_POLL_MS)
+    const len = getStdout().length
+    if (len !== lastLen) {
+      lastLen = len
+      stableSince = Date.now()
+    } else if (Date.now() - stableSince >= INTERACTIVE_INPUT_READY_STABLE_MS) {
+      return
+    }
+  }
+}
+
+function formatCliPromptDidNotAppearError(stdout: string): string {
+  return `CLI prompt did not appear within ${INTERACTIVE_CLI_PROMPT_WAIT_MS / 1000}s. stdout: ${stdout.slice(-300).replace(/\r/g, '\\r')}`
+}
+
 interface PtyHandle {
   pty: IPty
   stdout: { value: string }
@@ -86,31 +122,9 @@ async function waitForInteractiveInputReadyOsc(
   } = options
   const start = Date.now()
   while (Date.now() - start < maxWaitMs) {
-    const stdout = getStdout()
-    const haystack =
-      afterLen === undefined
-        ? stdout
-        : stdout.length > afterLen
-          ? stdout.slice(afterLen)
-          : ''
+    const haystack = stdoutHaystackAfter(getStdout(), afterLen)
     if (haystack.includes(INTERACTIVE_INPUT_READY_OSC)) {
-      await sleep(INTERACTIVE_INPUT_READY_FLUSH_MS)
-      const drainDeadline = Date.now() + INTERACTIVE_INPUT_READY_DRAIN_MAX_MS
-      let lastLen = getStdout().length
-      let stableSince = Date.now()
-      while (Date.now() < drainDeadline) {
-        await sleep(CLI_POLL_MS)
-        const len = getStdout().length
-        if (len !== lastLen) {
-          lastLen = len
-          stableSince = Date.now()
-        } else if (
-          Date.now() - stableSince >=
-          INTERACTIVE_INPUT_READY_STABLE_MS
-        ) {
-          return
-        }
-      }
+      await drainStdoutUntilStableAfterOsc(getStdout)
       return
     }
     await sleep(CLI_POLL_MS)
@@ -138,31 +152,10 @@ async function waitForInteractiveInputReadyOscOrSettled(
   let stableSince = Date.now()
   while (Date.now() - start < maxWaitMs) {
     const stdout = getStdout()
-    const haystack =
-      afterLen === undefined
-        ? stdout
-        : stdout.length > afterLen
-          ? stdout.slice(afterLen)
-          : ''
+    const haystack = stdoutHaystackAfter(stdout, afterLen)
 
     if (haystack.includes(INTERACTIVE_INPUT_READY_OSC)) {
-      await sleep(INTERACTIVE_INPUT_READY_FLUSH_MS)
-      const drainDeadline = Date.now() + INTERACTIVE_INPUT_READY_DRAIN_MAX_MS
-      lastLen = getStdout().length
-      stableSince = Date.now()
-      while (Date.now() < drainDeadline) {
-        await sleep(CLI_POLL_MS)
-        const len = getStdout().length
-        if (len !== lastLen) {
-          lastLen = len
-          stableSince = Date.now()
-        } else if (
-          Date.now() - stableSince >=
-          INTERACTIVE_INPUT_READY_STABLE_MS
-        ) {
-          return
-        }
-      }
+      await drainStdoutUntilStableAfterOsc(getStdout)
       return
     }
 
@@ -271,9 +264,8 @@ export async function runCliInPty(opts: {
     })
     waitForInteractiveInputReadyOsc({
       getStdout: () => handle.stdout.value,
-      maxWaitMs: 10_000,
-      formatTimeoutError: (stdout) =>
-        `CLI prompt did not appear within 10s. stdout: ${stdout.slice(-300).replace(/\r/g, '\\r')}`,
+      maxWaitMs: INTERACTIVE_CLI_PROMPT_WAIT_MS,
+      formatTimeoutError: formatCliPromptDidNotAppearError,
     })
       .then(async () => {
         assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks(
@@ -316,9 +308,8 @@ export async function startInteractiveCli(opts: {
   const handle = spawnPty(opts)
   await waitForInteractiveInputReadyOsc({
     getStdout: () => handle.stdout.value,
-    maxWaitMs: 10_000,
-    formatTimeoutError: (stdout) =>
-      `CLI prompt did not appear within 10s. stdout: ${stdout.slice(-300).replace(/\r/g, '\\r')}`,
+    maxWaitMs: INTERACTIVE_CLI_PROMPT_WAIT_MS,
+    formatTimeoutError: formatCliPromptDidNotAppearError,
   })
   assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks(
     handle.stdout.value
@@ -331,52 +322,59 @@ export async function startInteractiveCli(opts: {
  * `\r` in the box). Send the draft, pause for Ink, then send `\r` alone (same idea as Vitest
  * `pushTTYCommandBytes` + `pushTTYCommandEnter`).
  */
-async function ptyWriteDraftThenCarriageReturnAndWait(
-  draftBytes: string
-): Promise<string> {
+function requireInteractivePtyHandle(): PtyHandle {
   if (!interactiveHandle) {
     throw new Error(
       'No interactive CLI running. Ensure @interactiveCLI Before hook ran.'
     )
   }
-  interactiveHandle.pty.write(draftBytes)
-  await sleep(INTERACTIVE_INPUT_READY_FLUSH_MS)
-  const lenBeforeSubmit = interactiveHandle.stdout.value.length
-  interactiveHandle.pty.write('\r')
+  return interactiveHandle
+}
+
+const PTY_INPUT_READY_AFTER_SEND_MAX_MS = 15_000
+
+function formatPtyInputBoxTimeoutError(
+  stdout: string,
+  lenBeforeSend: number
+): string {
+  return `CLI did not show input box after send within ${PTY_INPUT_READY_AFTER_SEND_MAX_MS / 1000}s. stdout grew by ${stdout.length - lenBeforeSend} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`
+}
+
+async function ptyWaitForInputReadyAfterWrite(
+  handle: PtyHandle,
+  lenBeforeSend: number
+): Promise<string> {
   await waitForInteractiveInputReadyOscOrSettled({
-    getStdout: () => interactiveHandle!.stdout.value,
-    maxWaitMs: 15_000,
-    onlyInStdoutAfterByteLength: lenBeforeSubmit,
+    getStdout: () => handle.stdout.value,
+    maxWaitMs: PTY_INPUT_READY_AFTER_SEND_MAX_MS,
+    onlyInStdoutAfterByteLength: lenBeforeSend,
     formatTimeoutError: (stdout) =>
-      `CLI did not show input box after send within 15s. stdout grew by ${stdout.length - lenBeforeSubmit} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`,
+      formatPtyInputBoxTimeoutError(stdout, lenBeforeSend),
   })
   assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks(
-    interactiveHandle.stdout.value
+    handle.stdout.value
   )
-  return interactiveHandle.stdout.value
+  return handle.stdout.value
+}
+
+async function ptyWriteDraftThenCarriageReturnAndWait(
+  draftBytes: string
+): Promise<string> {
+  const handle = requireInteractivePtyHandle()
+  handle.pty.write(draftBytes)
+  await sleep(INTERACTIVE_INPUT_READY_FLUSH_MS)
+  const lenBeforeSubmit = handle.stdout.value.length
+  handle.pty.write('\r')
+  return ptyWaitForInputReadyAfterWrite(handle, lenBeforeSubmit)
 }
 
 async function ptyWritePayloadAndWaitForInputReady(
   payload: string
 ): Promise<string> {
-  if (!interactiveHandle) {
-    throw new Error(
-      'No interactive CLI running. Ensure @interactiveCLI Before hook ran.'
-    )
-  }
-  const lenBeforeSend = interactiveHandle.stdout.value.length
-  interactiveHandle.pty.write(payload)
-  await waitForInteractiveInputReadyOscOrSettled({
-    getStdout: () => interactiveHandle!.stdout.value,
-    maxWaitMs: 15_000,
-    onlyInStdoutAfterByteLength: lenBeforeSend,
-    formatTimeoutError: (stdout) =>
-      `CLI did not show input box after send within 15s. stdout grew by ${stdout.length - lenBeforeSend} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`,
-  })
-  assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks(
-    interactiveHandle.stdout.value
-  )
-  return interactiveHandle.stdout.value
+  const handle = requireInteractivePtyHandle()
+  const lenBeforeSend = handle.stdout.value.length
+  handle.pty.write(payload)
+  return ptyWaitForInputReadyAfterWrite(handle, lenBeforeSend)
 }
 
 /** Deliver one keystroke to the shared interactive PTY and wait until the input box is ready again. */
