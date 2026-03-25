@@ -1,5 +1,3 @@
 {
-  "setup-worktree": [
-    "nix develop -c pnpm install"
-  ]
+  "setup-worktree": ["nix develop -c pnpm install"]
 }
