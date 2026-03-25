@@ -14,6 +14,8 @@ Interactive TTY = **one Ink `render()`** root: **`Static`** for append-only scro
 - **Piped / `-c` and TTY interactive are separate modules** — **no piped-only code** in the TTY interactive path (see phase 9).
 - **`patchConsole: true`** on `render()` once the TTY path no longer relies on raw `console.log` fighting Ink (phase 13).
 - **Do not patch, fight, or sidestep Ink** for keys/layout Ink already owns; remaining non-Ink bytes are **listed under [Special cases (approved Ink exceptions)](#special-cases-approved-ink-exceptions)**.
+- **Cursor and command input** follow **Ink / `@inkjs/ui` convention** (e.g. **`TextInput`** or Ink’s caret behavior) — **no obligation** to keep today’s reverse-video caret, bordered box, or hidden-hardware-cursor pairing if something else fits Ink better (gate 8).
+- **`/clear`:** **Allowed to remove entirely** if it conflicts with Ink + `Static` history or adds non-Ink CSI complexity — prefer dropping the command over preserving legacy full-screen clear (gate 9).
 
 **Current shipped (phases 1–8):** while the shell is active, **one stdin / keyboard owner** for command line, confirm, and lists. **readline** / **`keypress`** — only documented residue (Ctrl+C, fetch-wait Esc, list Esc bridge); see JSDoc on **`stdin.on('keypress')`** in **`ttyAdapter.ts`** (to be relocated with thin TTY entry in phase 11).
 
@@ -25,7 +27,7 @@ Interactive TTY = **one Ink `render()`** root: **`Static`** for append-only scro
 
 **Layout bridge:** `cli/src/renderer.ts` — **shrink for TTY** (phase 12): keep grapheme-aware width/wrap for **piped** `writeFullRedraw` and any shared string builders still needed for props. TTY live column stays Ink **`Text` / `Box`** wrap (phase 1; gate 4).
 
-**Raw stdout:** Phase 13–14 converge on Ink-managed stdout + **`patchConsole: true`**; **`interactiveTtyStdout`** shrinks to **documented non-Ink bytes** (OSC, exit farewell, cursor) only if still required after migration.
+**Raw stdout:** Phase 13–14 converge on Ink-managed stdout + **`patchConsole: true`**; **`interactiveTtyStdout`** shrinks to **documented non-Ink bytes** (OSC, exit farewell) and **cursor hooks only if Ink does not fully own the caret** after gate 8.
 
 ---
 
@@ -48,6 +50,7 @@ Interactive TTY = **one Ink `render()`** root: **`Static`** for append-only scro
 | Modal stack | Conditional subtree / stacked UI state at root |
 | Adapter “paints” | Props → `<Box>` / `<Text>` / `Static` |
 | History scrollback | **`Static`** items — **append-only** (gate 2); do not rewrite prior history lines |
+| Reverse-video caret + hidden HW cursor | Ink / **`TextInput`** caret and focus (gate 8) |
 
 ---
 
@@ -60,6 +63,8 @@ Interactive TTY = **one Ink `render()`** root: **`Static`** for append-only scro
 5. **`@inkjs/ui`** vs hand-rolled `useInput` — **resolved:** **complete replacement** toward Ink ecosystem — use **`Select`**, **`ConfirmInput`**, **`TextInput`** from **`@inkjs/ui`** when behavior maps **1:1** (or close enough with thin wrappers). If a primitive does not fit, use Ink **`useInput` inside the live subtree** only — **not** a second handler in the **TTY entry** / legacy **`ttyAdapter`**. Pure policy helpers (e.g. submit-line derivation in **`selectListInteraction`**) may stay **called from** Ink handlers; they are not a duplicate stdin path.
 6. Visual parity (stage band, borders) — **declined** for this migration; slimmer Ink look OK
 7. **`patchConsole`** / `console.log` vs layout corruption — **resolved (direction):** **`patchConsole: true`** in **phase 13** after TTY path routes user-visible output through Ink / `useStdout().write` / domain hooks — not raw `console.log` in the hot path. **Escape hatch:** if a regression cannot be fixed quickly, revert **`patchConsole`** only for that phase and fix forward (do not leave dual strategies long term).
+8. **Cursor + input box (TTY)** — **resolved:** Follow **Ink’s convention**; **input box UI/UX may change** (e.g. **`@inkjs/ui` `TextInput`**, Ink-native focus/caret). Do **not** keep reverse-video caret + `HIDE_CURSOR` / manual caret sync **for nostalgia** — drop that model when migrating if Ink-native input is simpler.
+9. **`/clear` command** — **resolved:** **May be removed completely** if it blocks Ink-native shell history or requires awkward CSI / dual state; **no product requirement** to preserve it. If kept, it must be implementable **without** fighting `Static` append-only semantics (e.g. domain “reset history” + rerender); otherwise **delete command + tests + help**.
 
 ---
 
@@ -165,7 +170,9 @@ Interactive fetch-wait: **`@inkjs/ui` `Spinner`** (`type="dots"`) in **`FetchWai
 **Goal:** Delete the **`ttyAdapter` monolith** — replace with **(a)** a **thin TTY session file** (mount Ink, streams, raw mode, **`exitOnCtrlC`**, documented **`keypress` residue** only per [Special cases](#special-cases-approved-ink-exceptions)) and **(b)** **Ink root** (`InteractiveShellDisplay` or successor) holding **React state / reducer** that subscribes to domain callbacks instead of mirroring state in closure variables beside Ink.
 
 - **Principle:** **Rerender** from React state updates; avoid **manual `drawBox`** orchestration that duplicates Ink’s update cycle unless a listed **special case** requires it.
-- **Verify:** Full interactive Vitest suite + **`cli_interactive_mode`** / recall E2E as appropriate; **J1** empty-Enter **`clear` before `unmount`** still holds.
+- **Cursor / input (gate 8):** Prefer **`@inkjs/ui` `TextInput`** or equivalent Ink-first command line; remove bespoke caret / `interactiveTtyStdout.hideCursor` coupling **when** the new component owns the UX. Update Vitest + E2E expectations for visible chrome.
+- **`/clear` (gate 9):** Either reimplement as **domain clear of scrollback state** (Ink `Static` items reset) with tests, or **remove** `/clear`, help entries, and scenarios that depend on full-screen CSI.
+- **Verify:** Full interactive Vitest suite + **`cli_interactive_mode`** / recall E2E as appropriate; **J1** empty-Enter **`clear` before `unmount`** still holds (Ink instance lifecycle, unrelated to **`/clear`** command).
 
 ### Phase 12 — Greatly shrink `renderer.ts` for TTY
 
@@ -182,7 +189,7 @@ Interactive fetch-wait: **`@inkjs/ui` `Spinner`** (`type="dots"`) in **`FetchWai
 
 ### Phase 14 — Residue audit + special cases doc in code
 
-**Goal:** Single checklist of **approved non-Ink** behavior (OSC, exit farewell, cursor, **readline `keypress`** bridges). Remove any **unlisted** sideways hacks. Update **`.cursor/rules/cli.mdc`** if terminology moves from “ttyAdapter” to “TTY session entry” / “Ink shell root.”
+**Goal:** Single checklist of **approved non-Ink** behavior (OSC, exit farewell, **readline `keypress`** bridges, and **hardware cursor** only if gate 8 leaves a gap). Remove any **unlisted** sideways hacks. Update **`.cursor/rules/cli.mdc`** for **input box** / **TTY entry** naming and for **`/clear`** if removed (gate 9).
 
 - **Verify:** Grep + JSDoc on the thin TTY file; no duplicate stdin handlers beyond the list.
 
@@ -195,9 +202,10 @@ These are **intentional** places the stack is **not** pure Ink — document **wh
 | Case | Why Ink alone is insufficient (today) |
 |------|----------------------------------------|
 | **Private OSC** **`INTERACTIVE_INPUT_READY_OSC`** | Invisible integrator signal (PTY / shell integration); not a React layout concern. |
-| **Hardware cursor hide/show + exit farewell** | Lifecycle **after** `unmount` / outside Ink’s paint cycle for some paths. |
+| **Exit farewell** (and **cursor show** on exit if still needed) | Lifecycle **after** `unmount` / outside Ink’s paint cycle for some paths. **Hardware cursor hide/show during interactive typing** — **prefer dropping** once command line uses Ink-native caret (gate 8); only list here if a gap remains. |
 | **readline `keypress`** (Ctrl+C, fetch-wait Esc, list Esc bridge) | **Phase 7** residue: stdin ordering / components without `useInput` for that key; **prefer eliminating** each bridge inside later sub-steps if Ink can own it without fighting. |
-| **Full-screen clear (`/clear`)** | May remain explicit CSI via thin stdout layer if not expressed as `Static` reset. |
+
+**Not a special case:** **`/clear`** — **remove the command** rather than adding CSI exceptions (gate 9), unless a trivial domain-level “empty history” ships without fighting Ink.
 
 **Rule:** If a new exception is needed, **add it here and in JSDoc** in the same PR — no silent “just this once” `process.stdout.write`.
 
@@ -207,7 +215,7 @@ These are **intentional** places the stack is **not** pure Ink — document **wh
 
 | Mode | Owner after migration | Thin TTY entry / readline |
 |------|------------------------|---------------------------|
-| Main command line | Ink **`useInput`** + **focus** (phases 2 + 4) | No duplicate key handling |
+| Main command line | Ink **`useInput`** / **`@inkjs/ui` `TextInput`** + **focus** (phases 2 + 4; gate 8 evolves chrome) | No duplicate key handling |
 | Confirm / y/n | **`RecallInkConfirmPanel`** + **`@inkjs/ui` `StatusMessage`** (phase 6) | No duplicate |
 | Lists (MCQ, tokens, selection) | **`RecallMcqChoicesLivePanel`** / **`AccessTokenPickerLivePanel`** + **`selectListInteraction`**; Esc bridge on **`keypress`** until removed | No duplicate list keys except **listed** Esc bridge |
 | Scrollback / turns | Domain model → **`Static` items** + live props (phases 10–11) | Not stored only in legacy adapter closures |
