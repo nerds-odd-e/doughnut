@@ -10,7 +10,9 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "paths": {
-      "@generated/*": ["../packages/generated/doughnut-backend-api/*"]
+      "@generated/*": ["../packages/generated/doughnut-backend-api/*"],
+      "support/*": ["./support/*"],
+      "start/*": ["./start/*"]
     }
   },
   "include": [
