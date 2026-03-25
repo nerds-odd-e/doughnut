@@ -12,11 +12,13 @@ import {
 import { stripAnsi } from '../../src/renderer.js'
 import {
   endTTYSession,
+  pressEnter,
   pressKey,
   startTTYSessionWithoutRecallReset,
   submitTTYCommand,
   tick,
   ttyOutput,
+  typeString,
   type TTYStdin,
 } from './interactiveTestHelpers.js'
 import { recallNextQuestion } from '../recallNextTestShapes.js'
@@ -132,8 +134,13 @@ describe('TTY contest wait — Esc cancels', () => {
 
   test('Esc aborts contest fetch and shows Cancelled by user.', async () => {
     await submitTTYCommand(stdin, '/recall')
-    await submitTTYCommand(stdin, '/contest')
+    // MCQ uses the readline keypress path, not Ink stdin — `submitTTYCommand` would buffer bytes.
+    typeString(stdin, '/contest ')
     await tick()
+    pressEnter(stdin)
+    await vi.waitFor(() =>
+      expect(ttyOutput(writeSpy)).toContain('Regenerating question')
+    )
     pressKey(stdin, 'escape')
     await tick()
     await vi.waitFor(() =>

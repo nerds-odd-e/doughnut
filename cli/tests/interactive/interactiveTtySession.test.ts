@@ -12,13 +12,14 @@ import {
   endTTYSession,
   GREY_BG_PAST_INPUT,
   lastStdoutLineContaining,
-  pressEnter,
-  pressKey,
+  pushTTYCommandBytes,
+  pushTTYCommandEnter,
+  pushTTYCommandEscape,
+  pushTTYCommandKey,
   submitTTYCommand,
   tick,
   ttyOutput,
   ttySessionWithSpies,
-  typeString,
   type TTYStdin,
 } from './interactiveTestHelpers.js'
 
@@ -43,7 +44,7 @@ describe('TTY: shared interactive session', () => {
 
     test('typing non-slash keeps Current guidance hint instead of command list', async () => {
       writeSpy.mockClear()
-      typeString(stdin, 'h')
+      pushTTYCommandBytes(stdin, 'h')
       await tick()
 
       const output = ttyOutput(writeSpy)
@@ -54,7 +55,7 @@ describe('TTY: shared interactive session', () => {
     })
 
     test('typing "/" shows command suggestions in the Current guidance', async () => {
-      typeString(stdin, '/')
+      pushTTYCommandBytes(stdin, '/')
       await tick()
 
       const output = ttyOutput(writeSpy)
@@ -68,7 +69,7 @@ describe('TTY: shared interactive session', () => {
 
     test('first candidate is highlighted with reverse video', async () => {
       writeSpy.mockClear()
-      typeString(stdin, '/')
+      pushTTYCommandBytes(stdin, '/')
       await tick()
 
       const output = ttyOutput(writeSpy)
@@ -83,13 +84,13 @@ describe('TTY: shared interactive session', () => {
     })
 
     test('Enter inserts highlighted command with space', async () => {
-      typeString(stdin, '/')
+      pushTTYCommandBytes(stdin, '/')
       await tick()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
-      typeString(stdin, 'x')
+      pushTTYCommandBytes(stdin, 'x')
       await tick()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await new Promise((r) => setTimeout(r, 50))
 
       expect(ttyOutput(writeSpy)).toContain('Not supported')
@@ -97,7 +98,7 @@ describe('TTY: shared interactive session', () => {
 
     test('prefix filtering shows only matching commands', async () => {
       writeSpy.mockClear()
-      typeString(stdin, '/add')
+      pushTTYCommandBytes(stdin, '/add')
       await tick()
 
       const output = ttyOutput(writeSpy)
@@ -110,20 +111,20 @@ describe('TTY: shared interactive session', () => {
     })
 
     test('Enter with prefix inserts first matching command', async () => {
-      typeString(stdin, '/add')
+      pushTTYCommandBytes(stdin, '/add')
       await tick()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await new Promise((r) => setTimeout(r, 50))
 
       expect(ttyOutput(writeSpy)).toContain('/add gmail ')
     })
 
     test('no suggestions after space when command inserted', async () => {
-      typeString(stdin, '/')
+      pushTTYCommandBytes(stdin, '/')
       await tick()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
 
       const output = ttyOutput(writeSpy)
@@ -149,9 +150,9 @@ describe('TTY: shared interactive session', () => {
       const lastUsage = filtered[filtered.length - 1]!.usage
 
       writeSpy.mockClear()
-      typeString(stdin, '/')
+      pushTTYCommandBytes(stdin, '/')
       await tick()
-      pressKey(stdin, 'up')
+      pushTTYCommandKey(stdin, 'up')
       await tick()
 
       const afterFirstUp = ttyOutput(writeSpy)
@@ -165,7 +166,7 @@ describe('TTY: shared interactive session', () => {
         'Phase A1: first ↑ with caret after `/` must move to column 0, not cycle slash highlights yet'
       ).toContain('\x1b[7m')
 
-      pressKey(stdin, 'up')
+      pushTTYCommandKey(stdin, 'up')
       await tick()
 
       const afterSecondUp = ttyOutput(writeSpy)
@@ -184,11 +185,11 @@ describe('TTY: shared interactive session', () => {
       const secondUsage = filtered[1]!.usage
 
       writeSpy.mockClear()
-      typeString(stdin, '/')
+      pushTTYCommandBytes(stdin, '/')
       await tick()
-      pressKey(stdin, 'up')
+      pushTTYCommandKey(stdin, 'up')
       await tick()
-      pressKey(stdin, 'down')
+      pushTTYCommandKey(stdin, 'down')
       await tick()
 
       const out = ttyOutput(writeSpy)
@@ -211,9 +212,9 @@ describe('TTY: shared interactive session', () => {
       const needleSecond = `  ${secondUsage}`
 
       writeSpy.mockClear()
-      typeString(stdin, '/')
+      pushTTYCommandBytes(stdin, '/')
       await tick()
-      pressKey(stdin, 'down')
+      pushTTYCommandKey(stdin, 'down')
       await tick()
 
       const afterDown = ttyOutput(writeSpy)
@@ -231,7 +232,7 @@ describe('TTY: shared interactive session', () => {
         'After Down, the first command row must no longer be highlighted.'
       ).not.toContain('\x1b[7m')
 
-      pressKey(stdin, 'up')
+      pushTTYCommandKey(stdin, 'up')
       await tick()
 
       const afterFirstUp = ttyOutput(writeSpy)
@@ -244,7 +245,7 @@ describe('TTY: shared interactive session', () => {
         'First row stays unhighlighted after the caret-only ↑.'
       ).not.toContain('\x1b[7m')
 
-      pressKey(stdin, 'up')
+      pushTTYCommandKey(stdin, 'up')
       await tick()
 
       const afterSecondUp = ttyOutput(writeSpy)
@@ -264,12 +265,11 @@ describe('TTY: shared interactive session', () => {
     })
 
     test('ESC when buffer is only "/" dismisses suggestions and clears buffer', async () => {
-      typeString(stdin, '/')
+      pushTTYCommandBytes(stdin, '/')
       await tick()
       writeSpy.mockClear()
 
-      pressKey(stdin, 'escape')
-      await tick()
+      await pushTTYCommandEscape(stdin)
 
       const output = ttyOutput(writeSpy)
       expect(output).toContain('  / commands')
@@ -278,12 +278,11 @@ describe('TTY: shared interactive session', () => {
     })
 
     test('ESC when partial command "/ex" hides suggestions but keeps buffer', async () => {
-      typeString(stdin, '/ex')
+      pushTTYCommandBytes(stdin, '/ex')
       await tick()
       writeSpy.mockClear()
 
-      pressKey(stdin, 'escape')
-      await tick()
+      await pushTTYCommandEscape(stdin)
 
       const output = ttyOutput(writeSpy)
       const plain = stripAnsi(output)
@@ -295,77 +294,77 @@ describe('TTY: shared interactive session', () => {
 
     test('Enter with only `/` inserts first highlighted command', async () => {
       writeSpy.mockClear()
-      typeString(stdin, '/')
+      pushTTYCommandBytes(stdin, '/')
       await tick()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
 
       expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /help ')
     })
 
     test('Tab with /he completes to /help with space', async () => {
-      typeString(stdin, '/he')
+      pushTTYCommandBytes(stdin, '/he')
       await tick()
       writeSpy.mockClear()
 
-      pressKey(stdin, 'tab')
+      pushTTYCommandKey(stdin, 'tab')
       await tick()
 
       expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /help ')
     })
 
     test('Tab with /rec completes to common prefix /recall', async () => {
-      typeString(stdin, '/rec')
+      pushTTYCommandBytes(stdin, '/rec')
       await tick()
       writeSpy.mockClear()
 
-      pressKey(stdin, 'tab')
+      pushTTYCommandKey(stdin, 'tab')
       await tick()
 
       expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /recall')
     })
 
     test('Tab with /unknown does nothing', async () => {
-      typeString(stdin, '/unknown')
+      pushTTYCommandBytes(stdin, '/unknown')
       await tick()
 
-      pressKey(stdin, 'tab')
+      pushTTYCommandKey(stdin, 'tab')
       await tick()
 
       expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /unknown')
     })
 
     test('Tab when buffer has no leading slash does nothing', async () => {
-      typeString(stdin, 'hello')
+      pushTTYCommandBytes(stdin, 'hello')
       await tick()
 
-      pressKey(stdin, 'tab')
+      pushTTYCommandKey(stdin, 'tab')
       await tick()
 
       expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ hello')
     })
 
     test('Tab with single match shows completed command', async () => {
-      typeString(stdin, '/add-a')
+      pushTTYCommandBytes(stdin, '/add-a')
       await tick()
       writeSpy.mockClear()
 
-      pressKey(stdin, 'tab')
+      pushTTYCommandKey(stdin, 'tab')
       await tick()
 
       expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /add-access-token ')
     })
 
     test('/clear clears screen and redraws prompt box', async () => {
-      typeString(stdin, '/help ')
+      pushTTYCommandBytes(stdin, '/help ')
       await tick()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
-      typeString(stdin, '/clear')
+      pushTTYCommandBytes(stdin, '/clear')
       await tick()
       writeSpy.mockClear()
 
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
 
       const output = ttyOutput(writeSpy)
@@ -377,13 +376,13 @@ describe('TTY: shared interactive session', () => {
     })
 
     test('after /clear, Enter on empty input does not show duplicate input box top border', async () => {
-      typeString(stdin, '/clear')
+      pushTTYCommandBytes(stdin, '/clear')
       await tick()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
       writeSpy.mockClear()
 
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
 
       const output = ttyOutput(writeSpy)
@@ -397,19 +396,19 @@ describe('TTY: shared interactive session', () => {
     })
 
     test('after /help then /clear, run /help again shows help output', async () => {
-      typeString(stdin, '/help ')
+      pushTTYCommandBytes(stdin, '/help ')
       await tick()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
-      typeString(stdin, '/clear')
+      pushTTYCommandBytes(stdin, '/clear')
       await tick()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
       writeSpy.mockClear()
 
-      typeString(stdin, '/help ')
+      pushTTYCommandBytes(stdin, '/help ')
       await tick()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
 
       const output = ttyOutput(writeSpy)
@@ -418,12 +417,12 @@ describe('TTY: shared interactive session', () => {
     })
 
     test('after /clear then Enter, input box has exactly one top border (no double border)', async () => {
-      typeString(stdin, '/clear')
+      pushTTYCommandBytes(stdin, '/clear')
       await tick()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
       writeSpy.mockClear()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
 
       const output = ttyOutput(writeSpy)
@@ -526,7 +525,7 @@ describe('TTY: shared interactive session', () => {
       await tick()
       await tick()
 
-      typeString(stdin, 'x')
+      pushTTYCommandBytes(stdin, 'x')
       await tick()
       await tick()
 
@@ -545,7 +544,7 @@ describe('TTY: shared interactive session', () => {
   describe('empty Enter redraw (regression)', () => {
     test('empty Enter redraw must not emit a stale cursor-up before the input box top', async () => {
       writeSpy.mockClear()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
       await tick()
 
@@ -569,9 +568,9 @@ describe('TTY: shared interactive session', () => {
       ).toBe(0)
 
       writeSpy.mockClear()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
 
       writeSpy.mockClear()
@@ -588,9 +587,9 @@ describe('TTY: shared interactive session', () => {
 
   describe('resize', () => {
     test('resize rerenders Ink shell with new width without full-screen clear', async () => {
-      typeString(stdin, 'hello')
+      pushTTYCommandBytes(stdin, 'hello')
       await tick()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
 
       expect(ttyOutput(writeSpy)).toContain('hello')

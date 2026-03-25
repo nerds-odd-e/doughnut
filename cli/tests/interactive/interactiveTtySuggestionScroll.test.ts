@@ -3,11 +3,11 @@ import { afterEach, beforeEach, describe, expect, test, type vi } from 'vitest'
 import { resetRecallStateForTesting } from '../../src/interactive.js'
 import {
   endTTYSession,
-  pressKey,
+  pushTTYCommandBytes,
+  pushTTYCommandKey,
   startTTYSessionWithoutRecallReset,
   tick,
   ttyOutput,
-  typeString,
   type TTYStdin,
 } from './interactiveTestHelpers.js'
 
@@ -28,10 +28,10 @@ describe('TTY mode slash command suggestions with scroll', () => {
 
   test('repeated Down moves highlight through a long list; window can show ↑ more above', async () => {
     writeSpy.mockClear()
-    typeString(stdin, '/')
+    pushTTYCommandBytes(stdin, '/')
     await tick()
     for (let i = 0; i < 8; i++) {
-      pressKey(stdin, 'down')
+      pushTTYCommandKey(stdin, 'down')
       await tick()
     }
 
@@ -46,10 +46,10 @@ describe('TTY mode slash command suggestions with scroll', () => {
 
   test('enough Down presses move highlight to the last command in a long list', async () => {
     writeSpy.mockClear()
-    typeString(stdin, '/')
+    pushTTYCommandBytes(stdin, '/')
     await tick()
     for (let i = 0; i < 11; i++) {
-      pressKey(stdin, 'down')
+      pushTTYCommandKey(stdin, 'down')
       await tick()
     }
 

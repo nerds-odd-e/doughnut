@@ -4,7 +4,8 @@ import { resetRecallStateForTesting } from '../../src/interactive.js'
 import {
   createMockTTYStdin,
   endTTYSession,
-  pressEnter,
+  pushTTYCommandBytes,
+  pushTTYCommandEnter,
   runPipedInteractive,
   spyConsoleLogNoop,
   spyExitNoop,
@@ -12,7 +13,6 @@ import {
   startInteractiveOnStdin,
   tick,
   ttyOutput,
-  typeString,
   type TTYStdin,
 } from './interactiveTestHelpers.js'
 
@@ -36,10 +36,10 @@ describe('interactive exit: Bye. in user-visible output', () => {
     })
 
     test('after Enter on exit, scrollback includes Bye.', async () => {
-      typeString(stdin, 'exit')
+      pushTTYCommandBytes(stdin, 'exit')
       await tick()
       writeSpy.mockClear()
-      pressEnter(stdin)
+      pushTTYCommandEnter(stdin)
       await tick()
       await vi.waitFor(() => expect(exitSpy).toHaveBeenCalledWith(0))
       expect(ttyOutput(writeSpy)).toContain('Bye.')

@@ -6,7 +6,8 @@ import {
   createMockTTYStdin,
   endTTYSession,
   GREY_BG_PAST_INPUT,
-  pressEnter,
+  pushTTYCommandBytes,
+  pushTTYCommandEnter,
   spyConsoleLogNoop,
   spyExitNoop,
   spyStdoutWriteTrue,
@@ -15,7 +16,6 @@ import {
   submitTTYCommand,
   tick,
   ttyOutput,
-  typeString,
   type TTYStdin,
 } from './interactiveTestHelpers.js'
 
@@ -74,10 +74,10 @@ describe('TTY exit: no full-screen redraw', () => {
   })
 
   test('after Enter on exit, stdout must not clear and repaint the full UI (cursor must not land in input box)', async () => {
-    typeString(stdin, 'exit')
+    pushTTYCommandBytes(stdin, 'exit')
     await tick()
     writeSpy.mockClear()
-    pressEnter(stdin)
+    pushTTYCommandEnter(stdin)
     await tick()
     await vi.waitFor(() => expect(exitSpy).toHaveBeenCalledWith(0))
 
@@ -89,10 +89,10 @@ describe('TTY exit: no full-screen redraw', () => {
   })
 
   test('after Enter on exit, committed line appears as grey history input (same as other submits)', async () => {
-    typeString(stdin, 'exit')
+    pushTTYCommandBytes(stdin, 'exit')
     await tick()
     writeSpy.mockClear()
-    pressEnter(stdin)
+    pushTTYCommandEnter(stdin)
     await tick()
     await vi.waitFor(() => expect(exitSpy).toHaveBeenCalledWith(0))
 

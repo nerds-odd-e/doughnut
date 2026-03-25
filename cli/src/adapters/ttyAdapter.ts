@@ -1,7 +1,7 @@
 import React from 'react'
 import * as readline from 'node:readline'
 import { Writable } from 'node:stream'
-import { render } from 'ink'
+import { render, type Key } from 'ink'
 import type { AccessTokenEntry, AccessTokenLabel } from '../accessToken.js'
 import { formatVersionOutput } from '../version.js'
 import {
@@ -120,6 +120,10 @@ export interface TTYDeps {
 
 function isSubmitKey(keyName: string): boolean {
   return keyName === 'return' || keyName === 'enter'
+}
+
+function isInkSubmitPressed(key: Key, input: string): boolean {
+  return key.return || input === '\n' || input === '\r'
 }
 
 type ReadlineKey = Pick<readline.Key, 'name' | 'shift' | 'ctrl' | 'meta'>
@@ -462,6 +466,14 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       suggestionLines: layout.suggestionLines,
       currentStageIndicatorLines: layout.currentStageIndicatorLines,
       placeholderContext: layout.placeholderContext,
+      onCommandKey: (input, key) =>
+        Promise.resolve(handleCommandLineInkInput(input, key)).catch(
+          () => undefined
+        ),
+      onInterrupt: () => {
+        interactiveTtyStdout.ctrlCExitNewline()
+        doExit()
+      },
     })
   }
 
@@ -559,6 +571,8 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   /** Buffered `processInput` stdout for one submitted command (numbered-choice path or normal Enter). */
   let commandTurn: BufferedCommandTurn = { lines: [], tone: 'plain' }
   let ttyOutput: OutputAdapter
+
+  let handleCommandLineInkInput: (input: string, key: Key) => Promise<void>
 
   function resetCommandTurnBuffer(): void {
     commandTurn = { lines: [], tone: 'plain' }
@@ -675,6 +689,190 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     },
   }
 
+  handleCommandLineInkInput = async (
+    input: string,
+    key: Key
+  ): Promise<void> => {
+    const submitPressed = isInkSubmitPressed(key, input)
+    if (key.escape) {
+      if (isInCommandSessionSubstate()) {
+        enterStopConfirmationFromEsc()
+        return
+      }
+      if (isCommandPrefixWithSuggestions(commandInput.lineDraft)) {
+        highlightIndex = 0
+        const lastLine = getLastLine(commandInput.lineDraft)
+        if (lastLine === '/') {
+          commandInput = afterBareSlashEscape(commandInput)
+        } else {
+          suggestionsDismissed = true
+        }
+        drawBox()
+      }
+      return
+    }
+    if (submitPressed) {
+      if (key.shift) {
+        commandInput = insertIntoDraft(commandInput, '\n')
+        drawBox()
+      } else {
+        const trimmedInput = commandInput.lineDraft.trim()
+
+        if (trimmedInput === '/clear') {
+          ttyOutput.clearAndRedraw?.()
+          return
+        }
+
+        if (isCommandPrefixWithSuggestions(commandInput.lineDraft)) {
+          const filtered = filterCommandsByPrefix(
+            interactiveDocs,
+            getLastLine(commandInput.lineDraft)
+          )
+          const selectedCommand = `${filtered[highlightIndex].usage} `
+          commandInput = applyLastLineEdit(commandInput, selectedCommand)
+          highlightIndex = 0
+          drawBox()
+          return
+        }
+
+        const inputLine = commandInput.lineDraft
+        commandInput = clearLiveCommandLine(commandInput)
+
+        const tokenSelect = TOKEN_LIST_COMMANDS[trimmedInput] ?? null
+        if (tokenSelect) {
+          const tokens = listAccessTokens()
+          if (tokens.length === 0) {
+            chatHistory = [
+              ...chatHistory,
+              {
+                type: 'input',
+                content: maskInteractiveInputForHistory(trimmedInput),
+              },
+            ]
+            rememberCommittedLine(trimmedInput)
+            commitHistoryOutput(['No access tokens stored.'])
+            return
+          } else {
+            if (isCommittedInteractiveInput(inputLine)) {
+              chatHistory = [
+                ...chatHistory,
+                {
+                  type: 'input',
+                  content: maskInteractiveInputForHistory(inputLine),
+                },
+              ]
+            }
+            rememberCommittedLine(trimmedInput)
+            beginTokenSelection(trimmedInput, tokenSelect.action, tokens)
+          }
+          drawBox()
+          return
+        }
+
+        resetCommandTurnBuffer()
+        if (isCommittedInteractiveInput(inputLine)) {
+          if (!usesSessionYesNoInputChrome(!!tokenSelection)) {
+            chatHistory = [
+              ...chatHistory,
+              {
+                type: 'input',
+                content: maskInteractiveInputForHistory(inputLine),
+              },
+            ]
+            rememberCommittedLine(inputLine)
+          }
+          if (await processInput(inputLine, ttyOutput, true)) {
+            commitExitTurnToScrollback()
+            doExit()
+            return
+          }
+          finishProcessInputTurnAfterAwait()
+          return
+        }
+        if (isNumberedChoiceListActive()) {
+          numberedChoiceHighlightIndex = 0
+        }
+        if (inputLine.trim() === '' && shellInstance) {
+          shellInstance.clear()
+          shellInstance.unmount()
+          shellInstance = null
+        }
+        drawBox()
+      }
+    } else if (key.backspace || key.delete) {
+      const prevLen = commandInput.lineDraft.length
+      commandInput = deleteBeforeCaret(commandInput)
+      if (commandInput.lineDraft.length !== prevLen) {
+        highlightIndex = 0
+        suggestionsDismissed = false
+      }
+      drawBox()
+    } else if (key.upArrow || key.downArrow) {
+      const dir = key.upArrow ? 'up' : 'down'
+      if (
+        ttyArrowKeyUsesSlashSuggestionCycle(
+          dir,
+          commandInput,
+          suggestionsDismissed,
+          isCommandPrefixWithSuggestions(commandInput.lineDraft)
+        )
+      ) {
+        const filtered = filterCommandsByPrefix(
+          interactiveDocs,
+          getLastLine(commandInput.lineDraft)
+        )
+        const delta = key.upArrow ? -1 : 1
+        highlightIndex = cycleListSelectionIndex(
+          highlightIndex,
+          delta,
+          filtered.length
+        )
+      } else {
+        const prevDraft = commandInput.lineDraft
+        commandInput =
+          dir === 'up'
+            ? onArrowUp(commandInput, isCommandPrefixWithSuggestions)
+            : onArrowDown(commandInput, isCommandPrefixWithSuggestions)
+        if (commandInput.lineDraft !== prevDraft) {
+          highlightIndex = 0
+          suggestionsDismissed = false
+        }
+      }
+      drawBox()
+    } else if (key.leftArrow) {
+      commandInput = caretOneLeft(commandInput)
+      drawBox()
+    } else if (key.rightArrow) {
+      commandInput = caretOneRight(commandInput)
+      drawBox()
+    } else if (key.home) {
+      commandInput = { ...commandInput, caretOffset: 0 }
+      drawBox()
+    } else if (key.end) {
+      commandInput = {
+        ...commandInput,
+        caretOffset: commandInput.lineDraft.length,
+      }
+      drawBox()
+    } else if (key.tab) {
+      const lastLine = getLastLine(commandInput.lineDraft)
+      if (lastLine.startsWith('/') && !lastLine.endsWith(' ')) {
+        const { completed, count } = getTabCompletion(lastLine, interactiveDocs)
+        if (count > 0 && completed !== lastLine) {
+          commandInput = applyLastLineEdit(commandInput, completed)
+          highlightIndex = 0
+          suggestionsDismissed = false
+          drawBox()
+        }
+      }
+    } else if (input.length > 0 && !key.ctrl && !key.meta) {
+      commandInput = insertIntoDraft(commandInput, input)
+      highlightIndex = 0
+      suggestionsDismissed = false
+      drawBox()
+    }
+  }
+
   drawBox()
 
   process.stdout.on('resize', drawBox)
@@ -715,9 +913,13 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     if (key.ctrl && key.name === 'c') {
       interactiveTtyStdout.ctrlCExitNewline()
       doExit()
+      return
     }
     if (key.name === 'escape' && cancelInteractiveFetchWaitFor(ttyOutput)) {
       drawBox()
+      return
+    }
+    if (!isAlternateLivePanel()) {
       return
     }
     if (isPendingStopConfirmation()) {
@@ -996,182 +1198,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
           break
       }
       return
-    }
-    if (key.name === 'escape') {
-      if (isInCommandSessionSubstate()) {
-        enterStopConfirmationFromEsc()
-        return
-      }
-      if (isCommandPrefixWithSuggestions(commandInput.lineDraft)) {
-        highlightIndex = 0
-        const lastLine = getLastLine(commandInput.lineDraft)
-        if (lastLine === '/') {
-          commandInput = afterBareSlashEscape(commandInput)
-        } else {
-          suggestionsDismissed = true
-        }
-        drawBox()
-      }
-      return
-    }
-    if (submitPressed) {
-      if (key.shift) {
-        commandInput = insertIntoDraft(commandInput, '\n')
-        drawBox()
-      } else {
-        const trimmedInput = commandInput.lineDraft.trim()
-
-        if (trimmedInput === '/clear') {
-          ttyOutput.clearAndRedraw?.()
-          return
-        }
-
-        if (isCommandPrefixWithSuggestions(commandInput.lineDraft)) {
-          const filtered = filterCommandsByPrefix(
-            interactiveDocs,
-            getLastLine(commandInput.lineDraft)
-          )
-          const selectedCommand = `${filtered[highlightIndex].usage} `
-          commandInput = applyLastLineEdit(commandInput, selectedCommand)
-          highlightIndex = 0
-          drawBox()
-          return
-        }
-
-        const input = commandInput.lineDraft
-        commandInput = clearLiveCommandLine(commandInput)
-
-        const tokenSelect = TOKEN_LIST_COMMANDS[trimmedInput] ?? null
-        if (tokenSelect) {
-          const tokens = listAccessTokens()
-          if (tokens.length === 0) {
-            chatHistory = [
-              ...chatHistory,
-              {
-                type: 'input',
-                content: maskInteractiveInputForHistory(trimmedInput),
-              },
-            ]
-            rememberCommittedLine(trimmedInput)
-            commitHistoryOutput(['No access tokens stored.'])
-            return
-          } else {
-            if (isCommittedInteractiveInput(input)) {
-              chatHistory = [
-                ...chatHistory,
-                {
-                  type: 'input',
-                  content: maskInteractiveInputForHistory(input),
-                },
-              ]
-            }
-            rememberCommittedLine(trimmedInput)
-            beginTokenSelection(trimmedInput, tokenSelect.action, tokens)
-          }
-          drawBox()
-          return
-        }
-
-        resetCommandTurnBuffer()
-        if (isCommittedInteractiveInput(input)) {
-          if (!usesSessionYesNoInputChrome(!!tokenSelection)) {
-            chatHistory = [
-              ...chatHistory,
-              {
-                type: 'input',
-                content: maskInteractiveInputForHistory(input),
-              },
-            ]
-            rememberCommittedLine(input)
-          }
-          if (await processInput(input, ttyOutput, true)) {
-            commitExitTurnToScrollback()
-            doExit()
-            return
-          }
-          finishProcessInputTurnAfterAwait()
-          return
-        }
-        if (isNumberedChoiceListActive()) {
-          numberedChoiceHighlightIndex = 0
-        }
-        if (input.trim() === '' && shellInstance) {
-          shellInstance.clear()
-          shellInstance.unmount()
-          shellInstance = null
-        }
-        drawBox()
-      }
-    } else if (key.name === 'backspace') {
-      const prevLen = commandInput.lineDraft.length
-      commandInput = deleteBeforeCaret(commandInput)
-      if (commandInput.lineDraft.length !== prevLen) {
-        highlightIndex = 0
-        suggestionsDismissed = false
-      }
-      drawBox()
-    } else if (key.name === 'up' || key.name === 'down') {
-      if (
-        ttyArrowKeyUsesSlashSuggestionCycle(
-          key.name === 'up' ? 'up' : 'down',
-          commandInput,
-          suggestionsDismissed,
-          isCommandPrefixWithSuggestions(commandInput.lineDraft)
-        )
-      ) {
-        const filtered = filterCommandsByPrefix(
-          interactiveDocs,
-          getLastLine(commandInput.lineDraft)
-        )
-        const delta = key.name === 'up' ? -1 : 1
-        highlightIndex = cycleListSelectionIndex(
-          highlightIndex,
-          delta,
-          filtered.length
-        )
-      } else {
-        const prevDraft = commandInput.lineDraft
-        commandInput =
-          key.name === 'up'
-            ? onArrowUp(commandInput, isCommandPrefixWithSuggestions)
-            : onArrowDown(commandInput, isCommandPrefixWithSuggestions)
-        if (commandInput.lineDraft !== prevDraft) {
-          highlightIndex = 0
-          suggestionsDismissed = false
-        }
-      }
-      drawBox()
-    } else if (key.name === 'left') {
-      commandInput = caretOneLeft(commandInput)
-      drawBox()
-    } else if (key.name === 'right') {
-      commandInput = caretOneRight(commandInput)
-      drawBox()
-    } else if (key.name === 'home') {
-      commandInput = { ...commandInput, caretOffset: 0 }
-      drawBox()
-    } else if (key.name === 'end') {
-      commandInput = {
-        ...commandInput,
-        caretOffset: commandInput.lineDraft.length,
-      }
-      drawBox()
-    } else if (key.name === 'tab') {
-      const lastLine = getLastLine(commandInput.lineDraft)
-      if (lastLine.startsWith('/') && !lastLine.endsWith(' ')) {
-        const { completed, count } = getTabCompletion(lastLine, interactiveDocs)
-        if (count > 0 && completed !== lastLine) {
-          commandInput = applyLastLineEdit(commandInput, completed)
-          highlightIndex = 0
-          suggestionsDismissed = false
-          drawBox()
-        }
-      }
-    } else if (str && !key.ctrl && !key.meta) {
-      commandInput = insertIntoDraft(commandInput, str)
-      highlightIndex = 0
-      suggestionsDismissed = false
-      drawBox()
     }
   })
 }

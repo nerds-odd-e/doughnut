@@ -1,4 +1,4 @@
-import { describe, test, expect, type vi, beforeEach, afterEach } from 'vitest'
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
   mockAnswerSpelling,
   mockMarkAsRecalled,
@@ -12,6 +12,7 @@ import {
   pressEnter,
   pressKey,
   pressRealBackspace,
+  pushTTYCommandEscape,
   submitTTYCommand,
   tick,
   ttyOutput,
@@ -47,8 +48,10 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
 
     mockAnswerSpelling.mockClear()
     writeSpy.mockClear()
-    pressKey(stdin, 'escape')
-    await tick()
+    await pushTTYCommandEscape(stdin)
+    await vi.waitFor(() =>
+      expect(stripAnsi(ttyOutput(writeSpy))).toContain('Stop recall? (y/n)')
+    )
 
     const escRepaint = stripAnsi(ttyOutput(writeSpy))
     expect(escRepaint).toContain('Stop recall? (y/n)')
@@ -57,7 +60,10 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     expect(isInRecallSubstate()).toBe(true)
 
     typeString(stdin, 'y')
-    await tick()
+    await vi.waitFor(() => {
+      const p = stripAnsi(ttyOutput(writeSpy))
+      expect(p).toMatch(/Stop recall\?\s*\(y\/n\)[\s\S]*\n\s*y(?:\s|$)/m)
+    })
     pressEnter(stdin)
     await tick()
 
@@ -76,8 +82,7 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     mockAnswerSpelling.mockClear()
     writeSpy.mockClear()
 
-    pressKey(stdin, 'escape')
-    await tick()
+    await pushTTYCommandEscape(stdin)
 
     typeString(stdin, 'n')
     await tick()
@@ -178,8 +183,7 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
       recallNextQuestion(spellingRecallPrompt(100, 'test'))
     )
     await submitTTYCommand(stdin, '/recall')
-    pressKey(stdin, 'escape')
-    await tick()
+    await pushTTYCommandEscape(stdin)
     writeSpy.mockClear()
 
     // Real TTY backspace: str='\x7f' (DEL char, truthy). If the handler checks

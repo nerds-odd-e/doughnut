@@ -55,6 +55,45 @@ export function createMockTTYStdin() {
 
 export type TTYStdin = ReturnType<typeof createMockTTYStdin>
 
+/** Raw bytes for the default command line (Ink `useInput`). */
+export function pushTTYCommandBytes(stdin: TTYStdin, str: string) {
+  for (const ch of str) {
+    stdin.push(ch)
+  }
+}
+
+export function pushTTYCommandEnter(stdin: TTYStdin) {
+  stdin.push('\r')
+}
+
+const TTY_COMMAND_KEY_BYTES: Record<string, string> = {
+  up: '\x1b[A',
+  down: '\x1b[B',
+  left: '\x1b[D',
+  right: '\x1b[C',
+  escape: '\x1b',
+  tab: '\t',
+  /** TTY DEL; Ink maps this to `delete` — command handler treats like backspace. */
+  backspace: '\x7f',
+}
+
+/** Arrow / tab / escape / backspace on the default command line (Ink stdin). */
+export function pushTTYCommandKey(stdin: TTYStdin, name: string) {
+  const seq = TTY_COMMAND_KEY_BYTES[name]
+  if (seq === undefined) {
+    throw new Error(`pushTTYCommandKey: unsupported key ${name}`)
+  }
+  stdin.push(seq)
+}
+
+/** Lone `\x1b` stays pending until Ink flushes it (see `input-parser`); use after other command keys too if needed. */
+export async function pushTTYCommandEscape(stdin: TTYStdin) {
+  pushTTYCommandKey(stdin, 'escape')
+  await tick()
+  await tick()
+}
+
+/** Alternate panels (confirm, MCQ, token list, …): synthetic readline `keypress`. */
 export function typeString(stdin: TTYStdin, str: string) {
   for (const ch of str) {
     stdin.emit('keypress', ch, {
@@ -101,9 +140,9 @@ export function pressRealBackspace(stdin: TTYStdin) {
 }
 
 export async function submitTTYCommand(stdin: TTYStdin, command: string) {
-  typeString(stdin, `${command} `)
+  pushTTYCommandBytes(stdin, `${command} `)
   await tick()
-  pressEnter(stdin)
+  pushTTYCommandEnter(stdin)
   await tick()
 }
 

@@ -4,7 +4,8 @@ import { resetRecallStateForTesting } from '../../src/interactive.js'
 import { INTERACTIVE_INPUT_READY_OSC } from '../../src/renderer.js'
 import {
   endTTYSession,
-  pressKey,
+  pushTTYCommandBytes,
+  pushTTYCommandKey,
   startTTYSessionWithoutRecallReset,
   submitTTYCommand,
   tick,
@@ -49,9 +50,9 @@ describe('TTY: line draft must not survive interactive fetch wait', () => {
     )
 
     writeSpy.mockClear()
-    typeString(stdin, 'x')
+    pushTTYCommandBytes(stdin, 'x')
     await tick()
-    pressKey(stdin, 'backspace')
+    pushTTYCommandKey(stdin, 'backspace')
     await tick()
 
     expect(ttyOutput(writeSpy)).toContain(INTERACTIVE_INPUT_READY_OSC)

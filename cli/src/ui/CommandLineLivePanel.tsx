@@ -1,4 +1,4 @@
-import { Box, Text } from 'ink'
+import { Box, Text, useInput, type Key } from 'ink'
 import {
   buildBoxLinesWithCaret,
   buildCurrentPromptSeparator,
@@ -21,6 +21,9 @@ export type CommandLineLivePanelProps = {
   suggestionLines: string[]
   currentStageIndicatorLines: string[]
   placeholderContext: PlaceholderContext
+  /** Ink-owned stdin for the main command line (phase 2); not used for alternate live panels. */
+  onCommandKey: (input: string, key: Key) => void | Promise<void>
+  onInterrupt: () => void
 }
 
 export function CommandLineLivePanel({
@@ -31,7 +34,20 @@ export function CommandLineLivePanel({
   suggestionLines,
   currentStageIndicatorLines,
   placeholderContext,
+  onCommandKey,
+  onInterrupt,
 }: CommandLineLivePanelProps) {
+  useInput(
+    (input, key) => {
+      if (key.ctrl && input === 'c') {
+        onInterrupt()
+        return
+      }
+      Promise.resolve(onCommandKey(input, key)).catch(() => undefined)
+    },
+    { isActive: true }
+  )
+
   const paint: LiveRegionPaintOptions = { placeholderContext }
   const hasStageIndicator = currentStageIndicatorLines.length > 0
   const rawBoxLines = renderBox(

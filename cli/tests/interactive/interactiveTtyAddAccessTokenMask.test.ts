@@ -13,11 +13,11 @@ import './interactiveTestMocks.js'
 import { stripAnsi } from '../../src/renderer.js'
 import {
   endTTYSession,
-  pressEnter,
+  pushTTYCommandBytes,
+  pushTTYCommandEnter,
   tick,
   ttyOutput,
   ttySessionWithSpies,
-  typeString,
   type TTYStdin,
 } from './interactiveTestHelpers.js'
 
@@ -35,8 +35,9 @@ describe('TTY: /add-access-token masking in scrollback', () => {
 
   test('history grey block shows redacted line, not the raw token', async () => {
     const secret = 'tty-mask-secret-never-leak'
-    typeString(stdin, `/add-access-token ${secret}`)
-    pressEnter(stdin)
+    pushTTYCommandBytes(stdin, `/add-access-token ${secret}`)
+    await tick()
+    pushTTYCommandEnter(stdin)
     await tick()
     await tick()
     await tick()
