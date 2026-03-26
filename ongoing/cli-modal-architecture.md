@@ -31,7 +31,7 @@ Interactive TTY = **one Ink `render()`** root: **`Static`** for append-only scro
 
 **Shell rule (replaces fat “adapter”):** TTY entry file may only wire **mechanism** (`TTYDeps` / streams / `render` options). **Domain branching** stays in **`interactive.ts`** (and siblings); **scrollback and turn state** are named domain concepts surfaced to the Ink root (phases **10 → 11**; **10.5** is input chrome only; **11.5** completes gate 8 command line if deferred).
 
-**Layout bridge:** `cli/src/renderer.ts` — **shrink for TTY** (phase 12): keep grapheme-aware width/wrap for **shared string props** into Ink. **`writeFullRedraw` / `renderFullDisplay` / `clearAndRedraw`** removed with **`/clear`** (phase 9.5). **`buildLiveRegionLines`** etc. remain for fetch-wait tests and Ink string props. **Not** piped stdin, **not** **`-c`**, **not** a second product UI. TTY live column stays Ink **`Text` / `Box`** wrap (phase 1; gate 4).
+**Layout bridge:** `cli/src/renderer.ts` — **shrink for TTY** (phase 12): keep grapheme-aware width/wrap for **shared string props** into Ink. **`writeFullRedraw` / `renderFullDisplay` / `clearAndRedraw`** removed with **`/clear`** (phase 9.5). Command-line paint for Ink is **`formatInteractiveCommandLineInkRows`** (+ stage/separator helpers); **no** legacy string `buildLiveRegionLines` / **`renderBox`**. **Not** piped stdin, **not** **`-c`**, **not** a second product UI. TTY live column stays Ink **`Text` / `Box`** wrap (phase 1; gate 4).
 
 **Raw stdout:** Phase 13–14 converge on Ink-managed stdout + **`patchConsole: true`**; **`interactiveTtyStdout`** shrinks to **documented non-Ink bytes** (OSC, exit farewell) and **cursor hooks only if Ink does not fully own the caret** after gate 8.
 
@@ -65,7 +65,7 @@ Interactive TTY = **one Ink `render()`** root: **`Static`** for append-only scro
 1. Single Ink root vs islands / hybrid — **stdin ownership** — **resolved:** one Ink root (phases 1–3 shipped).
 2. **`Static`** vs rewriting old history lines — **resolved:** **`Static` only** — append-only history scrollback; no in-place mutation of lines already emitted into history. If a future feature needs a mutating line, treat it as **live** subtree or a **new** gate — not silent rewriting of `Static` items.
 3. **`useFocus`** / Tab vs ↑↓ in guidance / selection mode — **resolved:** **do not preserve** the legacy TTY model where **↑↓** globally toggled draft command history vs list selection. **New model:** Ink **`useFocus`** (or equivalent); **Tab** / **Shift+Tab** move focus among **focusable regions** in the live column. **↑↓** (and list-specific keys) apply **only inside** the focused region (draft history in the command area when that area is focused; choice highlight when the list/`Select` region is focused). **Phase 4** ships this for the command line + focus plumbing; **phase 5** attaches MCQ/token/slash **`Select`** as a peer focus target. Update **Vitest + E2E** and any **`.cursor/rules/cli.mdc`** terminology that still describes the old global ↑↓ behavior when phase 4 lands.
-4. Ink `Text` wrap vs `renderer.ts` grapheme wrap (**CJK/emoji**) — **resolved:** TTY default live column uses Ink `Text` `wrap` inside `Box width={terminalWidth}` for current prompt + guidance; **`buildLiveRegionLines`** / **`buildSuggestionLines`** remain for **grapheme-correct strings** fed into Ink and for any **remaining** test-only redraw helpers **after phase 9.5** (must not exist solely for removed **`/clear`**). That path is **not** “piped mode” — **no** stdin shell, **no** **`-c`**. Subtle wrap differences vs grapheme-aware wrap accepted.
+4. Ink `Text` wrap vs `renderer.ts` grapheme wrap (**CJK/emoji**) — **resolved:** TTY default live column uses Ink `Text` `wrap` inside `Box width={terminalWidth}` for current prompt + guidance; **`buildSuggestionLines`** / **`formatInteractiveCommandLineInkRows`** (truncate/pad) feed **grapheme-correct** strings into Ink where needed. That path is **not** “piped mode” — **no** stdin shell, **no** **`-c`**. Subtle wrap differences vs grapheme-aware wrap accepted.
 5. **`@inkjs/ui`** vs hand-rolled `useInput` — **resolved:** **complete replacement** toward Ink ecosystem — use **`Select`**, **`ConfirmInput`**, **`TextInput`** from **`@inkjs/ui`** when behavior maps **1:1** (or close enough with thin wrappers). If a primitive does not fit, use Ink **`useInput` inside the live subtree** only — **not** a second handler in the **TTY entry** / legacy **`ttyAdapter`**. Pure policy helpers (e.g. submit-line derivation in **`selectListInteraction`**) may stay **called from** Ink handlers; they are not a duplicate stdin path.
 6. Visual parity (stage band, borders) — **declined** for this migration; slimmer Ink look OK
 7. **`patchConsole`** / `console.log` vs layout corruption — **resolved (direction):** **`patchConsole: true`** in **phase 13** after TTY path routes user-visible output through Ink / `useStdout().write` / domain hooks — not raw `console.log` in the hot path. **Escape hatch:** if a regression cannot be fixed quickly, revert **`patchConsole`** only for that phase and fix forward (do not leave dual strategies long term).
@@ -80,7 +80,7 @@ Ink shell, neutral `TTYDeps`, confirm/MCQ/token/fetch-wait display components, *
 
 ### Phase 1 (done) — default live column: Ink `Box` / `Text` wrap
 
-- **`CommandLineLivePanel`** builds the default live block in Ink (stage band, separators, optional grey current prompt, input box, guidance). No **`buildLiveRegionLinesWithCaret`** on this path; removed unused **`LiveRegionLines.tsx`**.
+- **`CommandLineLivePanel`** builds the default live block in Ink (stage band, separators, optional grey current prompt, **`formatInteractiveCommandLineInkRows`**, guidance).
 - **`buildSuggestionLinesForInk`** in **`renderer.ts`**: same rows as **`buildSuggestionLines`** but no per-line **`truncateToWidth`**; **`ttyAdapter`** uses it for **`CommandLineLivePanel`** props. **Before phase 9.5:** **`writeFullRedraw`** via **`defaultOutput`** existed for **`/clear`** in **`processInput` tests**; **9.5 removes** that path — **not** a user-facing piped layout path.
 - **Ink note:** this Ink version’s **`Text`** has no `width` prop — wrap width comes from a parent **`Box width={terminalWidth}`** per wrappable block. Do **not** put **`width={terminalWidth}`** on the **root** live column **`Box`** (breaks resize: box border stayed at old columns when **`stdout.columns`** changed in Vitest).
 - **Verify:** `pnpm cli:test`; **`renderer.test.ts`** covers **`buildSuggestionLinesForInk`**.
@@ -155,7 +155,7 @@ Ink shell, neutral `TTYDeps`, confirm/MCQ/token/fetch-wait display components, *
 
 ### Phase 8 (done) — ink-ui polish
 
-Interactive fetch-wait: **`@inkjs/ui` `Spinner`** (`type="dots"`) in **`FetchWaitDisplay`**; removed adapter **`setInterval`** ellipsis tick + **`INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS`**. Stage-band layout string is static blue label (**`interactiveFetchWaitStageIndicatorLine`**) for **`needsGapBeforeBox`** / **`renderFullDisplay`** (e.g. **`writeFullRedraw`**) only.
+Interactive fetch-wait: **`@inkjs/ui` `Spinner`** (`type="dots"`) in **`FetchWaitDisplay`**; removed adapter **`setInterval`** ellipsis tick + **`INTERACTIVE_FETCH_WAIT_ELLIPSIS_MS`**. Stage-band layout string is static blue label (**`interactiveFetchWaitStageIndicatorLine`**); **`needsGapBeforeLiveRegion`** gates the leading blank before the live column.
 
 ### Phase 9 (done) — No second shell / clean TTY boundary
 
@@ -172,7 +172,7 @@ Interactive fetch-wait: **`@inkjs/ui` `Spinner`** (`type="dots"`) in **`FetchWai
 
 - **Product:** Remove the slash command from **`processInput`**, **`ttyAdapter`** (including **`clearAndRedraw`** on the TTY **`OutputAdapter`** if it exists **only** to implement screen/history reset for **`/clear`**), **`help.ts`**, and any E2E / Vitest that asserts **`/clear`** behavior.
 - **No historical trace:** Do **not** leave “removed `/clear`” comments, deprecated stubs, or doc sections that describe the old command. **Excise** strings and branches; the plan file may mention the phase, but **application code and user-facing copy** should read as if **`/clear` never existed**.
-- **Abstractions:** Remove **`OutputAdapter.clearAndRedraw`**, **`writeFullRedraw`**, **`renderFullDisplay`**, **`buildLiveRegionLines`** (and siblings), or **`defaultOutput`** wiring **when** their **only** remaining purpose was **`/clear`** or test-only full redraw for that path. If a helper is still needed for **fetch-wait**, resize, or another **named** behavior, **keep it under that use case** — narrow signatures and names so **`/clear` is not** the implicit owner. **No** optional “clear screen” hooks kept “for later.”
+- **Abstractions:** Remove **`OutputAdapter.clearAndRedraw`**, **`writeFullRedraw`**, **`renderFullDisplay`**, or **`defaultOutput`** wiring **when** their **only** remaining purpose was **`/clear`** or test-only full redraw for that path. **No** optional “clear screen” hooks kept “for later.”
 - **Verify:** **`pnpm cli:test`** (full CLI suite); **`pnpm cli:lint`** / format; repo **`rg`** for **`/clear`**, **`clearAndRedraw`**, and any removed symbols — **zero** hits in **`cli/`** (and **E2E** / **`help`**) except where the string appears inside **unrelated** content (if any); fix or rename to avoid false positives. Run any E2E feature that previously mentioned **`/clear`** only after deleting those scenarios or replacing them with unrelated coverage.
 
 ### Phase 10 (done) — Domain: chat history + command turns as first-class concepts
@@ -185,7 +185,7 @@ Interactive fetch-wait: **`@inkjs/ui` `Spinner`** (`type="dots"`) in **`FetchWai
 
 ### Phase 10.5 (done) — Command-line input: no border (optional background-only)
 
-**User outcome:** The main command-line input is **easier to maintain and test** — **no** bordered `Box` around the editable line (**gate 6**). **Shipped:** **`formatBorderlessCommandInputPaintLines`** + **`CommandLineLivePanel`** uses **`buildBoxLinesWithCaret`** → borderless full-width rows (grey disabled chrome path unchanged via **`inputBoxBorderLinesWithContextChrome`**). Vitest **`ttyWriteSimulation`** + **`interactiveTtySession`** assert **`→`** / column-0 prompt, not **`┌─┐`**. E2E **`cliSectionParser`** treats the live **`→`** row as the command-line boundary (function name **`countInputBoxTopBorderLines…`** kept for call-site stability).
+**User outcome:** The main command-line input is **easier to maintain and test** — **no** bordered `Box` around the editable line (**gate 6**). **Shipped:** **`formatInteractiveCommandLineInkRows`** (draft → width → **`applyCommandInputPaintChrome`**). Vitest **`ttyWriteSimulation`** + **`interactiveTtySession`** assert **`→`** / column-0 prompt. E2E **`cliSectionParser`** treats the live **`→`** row as the command-line boundary (function name **`countInputBoxTopBorderLines…`** kept for call-site stability).
 
 **Verify:** **`pnpm cli:test`**; **`pnpm cypress run --spec e2e_test/features/cli/cli_interactive_mode.feature`**.
 
@@ -206,7 +206,7 @@ Interactive fetch-wait: **`@inkjs/ui` `Spinner`** (`type="dots"`) in **`FetchWai
 
 ### Phase 12 — Greatly shrink `renderer.ts` for TTY
 
-**Goal:** **TTY path** stops depending on large grapheme **live-region line builders** where Ink already wraps (gate 4). **`renderer.ts`** keeps **`renderBox`**, **`truncateToWidth`**, shared tone/ANSI helpers, and **string props** into Ink (MCQ lines, separators) **without duplicating** a second layout engine. **`writeFullRedraw` / `renderFullDisplay` / `buildLiveRegionLines`** may **shrink or fold** after **phase 9.5** stripped **`/clear`**-only callers — **never** to bring back **piped** or **`-c`**; only to simplify **remaining** legitimate layout / test surfaces.
+**Goal:** **TTY path** stops depending on large grapheme **live-region line builders** where Ink already wraps (gate 4). **`renderer.ts`** keeps **`truncateToWidth`**, shared tone/ANSI helpers, and **string props** into Ink (MCQ lines, separators) **without duplicating** a second layout engine — **never** to bring back **piped** or **`-c`**.
 
 - **Verify:** **`renderer.test.ts`** for retained helpers; interactive tests for TTY wrap unchanged in user-visible terms.
 

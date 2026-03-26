@@ -5,21 +5,22 @@ import {
   interactiveInputReadyOscSuffix,
   truncateToWidth,
   isCommittedInteractiveInput,
-  grayDisabledInputBoxLines,
-  inputBoxBorderLinesWithContextChrome,
+  greyOutCommandInputPaintLines,
+  applyCommandInputPaintChrome,
   applyChatHistoryOutputTone,
   stripAnsi,
   stripAnsiCsiAndCr,
-  needsGapBeforeBox,
-  buildLiveRegionLines,
-  buildLiveRegionLinesWithCaret,
+  needsGapBeforeLiveRegion,
   buildSuggestionLines,
   buildSuggestionLinesForInk,
-  buildBoxLinesWithCaret,
+  buildCommandInputDraftLinesWithCaret,
+  formatInteractiveCommandLineInkRows,
+  formatCurrentStageIndicatorLine,
   CURRENT_STAGE_BAND_BACKGROUND_SGR,
   DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
   greyCurrentStageIndicatorLabel,
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
+  GREY,
   visibleLength,
   wrapTextToLines,
   wrapTextToVisibleWidthLines,
@@ -137,29 +138,29 @@ describe('isCommittedInteractiveInput', () => {
   })
 })
 
-describe('grayDisabledInputBoxLines', () => {
-  test('replaces internal RESET with GREY so right border stays gray', () => {
+describe('greyOutCommandInputPaintLines', () => {
+  test('replaces internal RESET with GREY so trailing segments stay grey', () => {
     const line = '│ \x1b[90mtext\x1b[0m                    │'
-    const result = grayDisabledInputBoxLines([line])
+    const result = greyOutCommandInputPaintLines([line])
     expect(result[0]).toContain('\x1b[90m')
     // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI RESET, intentional
     expect(/\x1b\[0m\s*│/.test(result[0])).toBe(false)
   })
 })
 
-describe('inputBoxBorderLinesWithContextChrome', () => {
+describe('applyCommandInputPaintChrome', () => {
   test('leaves lines unchanged for default command-line context', () => {
-    const lines = ['┌──┐']
+    const lines = ['→ hello']
     expect(
-      inputBoxBorderLinesWithContextChrome(lines, {
+      applyCommandInputPaintChrome(lines, {
         placeholderContext: 'default',
       })
     ).toEqual(lines)
   })
 
-  test('greys full box outline for interactive fetch-wait context', () => {
-    const lines = ['┌──┐']
-    const out = inputBoxBorderLinesWithContextChrome(lines, {
+  test('greys full paint row for interactive fetch-wait context', () => {
+    const lines = ['loading …']
+    const out = applyCommandInputPaintChrome(lines, {
       placeholderContext: 'interactiveFetchWait',
     })
     expect(out[0]).toContain('\x1b[90m')
@@ -173,21 +174,21 @@ describe('stripAnsiCsiAndCr', () => {
   })
 })
 
-describe('needsGapBeforeBox', () => {
+describe('needsGapBeforeLiveRegion', () => {
   test('returns true only when history is non-empty and no current prompt', () => {
-    expect(needsGapBeforeBox([], [], [])).toBe(false)
-    expect(needsGapBeforeBox([], ['line'], [])).toBe(false)
-    expect(needsGapBeforeBox([{ type: 'input', content: 'x' }], [], [])).toBe(
-      true
-    )
+    expect(needsGapBeforeLiveRegion([], [], [])).toBe(false)
+    expect(needsGapBeforeLiveRegion([], ['line'], [])).toBe(false)
     expect(
-      needsGapBeforeBox([{ type: 'input', content: 'x' }], ['line'], [])
+      needsGapBeforeLiveRegion([{ type: 'input', content: 'x' }], [], [])
+    ).toBe(true)
+    expect(
+      needsGapBeforeLiveRegion([{ type: 'input', content: 'x' }], ['line'], [])
     ).toBe(false)
   })
 
   test('false when Current Stage Indicator is present but wrapped prompt is empty', () => {
     expect(
-      needsGapBeforeBox(
+      needsGapBeforeLiveRegion(
         [{ type: 'input', content: 'x' }],
         [],
         [`${INTERACTIVE_FETCH_WAIT_PROMPT_FG}Loading${RESET}`]
@@ -214,110 +215,37 @@ describe('buildSuggestionLinesForInk', () => {
   })
 })
 
-describe('buildLiveRegionLines', () => {
-  test('prompt-present: includes separator and grey prompt lines before box', () => {
-    const lines = buildLiveRegionLines(
-      '',
-      80,
-      ['Select token', 'wrapped'],
-      [],
-      []
-    )
-    const boxTopIndex = lines.findIndex((l) => stripAnsi(l).startsWith('┌'))
-    expect(boxTopIndex).toBeGreaterThan(0)
-    expect(stripAnsi(lines[0])).toMatch(/^─+$/)
-    expect(stripAnsi(lines[1])).toBe('Select token')
-    expect(stripAnsi(lines[2])).toBe('wrapped')
-    expect(boxTopIndex).toBe(3)
+describe('formatInteractiveCommandLineInkRows', () => {
+  test('default: one row with prompt, caret, and placeholder', () => {
+    const rows = formatInteractiveCommandLineInkRows('', 80, 0, {
+      placeholderContext: 'default',
+    })
+    expect(rows).toHaveLength(1)
+    expect(rows[0]).toContain('\x1b[7m')
+    expect(rows[0]).toMatch(/^→ /)
+    expect(stripAnsi(rows[0])).toContain('`exit` to quit.')
   })
 
-  test('prompt-absent: box first, no separator', () => {
-    const lines = buildLiveRegionLines('', 80, [], [], [])
-    expect(stripAnsi(lines[0])).toMatch(/^┌.*┐$/)
-  })
-
-  test('recall stage: Current Stage Indicator and banded separator above box, not below', () => {
-    const width = 40
-    const lines = buildLiveRegionLines(
-      '',
-      width,
-      [],
-      [],
-      [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
-    )
-    const boxTopIndex = lines.findIndex((l) => stripAnsi(l).startsWith('┌'))
-    expect(boxTopIndex).toBeGreaterThan(1)
-    expect(lines[0]).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
-    expect(stripAnsi(lines[0])).toMatch(/^Recalling +$/)
-    expect(visibleLength(stripAnsi(lines[0]))).toBe(width)
-    expect(lines[1]).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
-    expect(stripAnsi(lines[1])).toBe('─'.repeat(width))
-    expect(boxTopIndex).toBe(2)
-    const recallBelowBox = lines.slice(boxTopIndex).join('\n')
-    expect(recallBelowBox).not.toContain('Recalling')
-  })
-
-  test('recall stage + MCQ prompt: indicator, banded separator, stem lines, then box', () => {
-    const width = 50
-    const lines = buildLiveRegionLines(
-      '',
-      width,
-      ['Notebook: X', 'Stem?'],
-      [],
-      [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
-    )
-    const boxTopIndex = lines.findIndex((l) => stripAnsi(l).startsWith('┌'))
-    expect(stripAnsi(lines[0])).toMatch(/^Recalling +$/)
-    expect(stripAnsi(lines[1])).toBe('─'.repeat(width))
-    expect(stripAnsi(lines[2])).toBe('Notebook: X')
-    expect(stripAnsi(lines[3])).toBe('Stem?')
-    expect(boxTopIndex).toBe(4)
-  })
-
-  test('interactive fetch wait: banded Current Stage Indicator + separator, then box', () => {
-    const width = 44
-    const base = INTERACTIVE_FETCH_WAIT_LINES.recallNext
-    const label = interactiveFetchWaitStageIndicatorLine(base)
-    const lines = buildLiveRegionLines('', width, [], [], [label], {
+  test('fetch-wait context: grey paint, no arrow prompt', () => {
+    const rows = formatInteractiveCommandLineInkRows('', 44, 0, {
       placeholderContext: 'interactiveFetchWait',
     })
-    const boxTopIndex = lines.findIndex((l) => stripAnsi(l).startsWith('┌'))
-    expect(boxTopIndex).toBe(2)
-    expect(lines[0]).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
-    expect(lines[0]).toContain(INTERACTIVE_FETCH_WAIT_PROMPT_FG)
-    expect(stripAnsi(lines[0])).toMatch(new RegExp(`^${base}\\s+$`))
-    expect(visibleLength(stripAnsi(lines[0]))).toBe(width)
-    expect(lines[1]).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
-    expect(stripAnsi(lines[1])).toBe('─'.repeat(width))
+    expect(rows[0]).toContain(GREY)
+    expect(stripAnsi(rows[0])).not.toContain('→')
+    expect(stripAnsi(rows[0])).toContain('loading')
   })
 
-  test('access token list: grey stage indicator, banded separator, wrapped instruction, then box', () => {
-    const width = 48
-    const instruction = 'Select and enter to change the default access token'
-    const lines = buildLiveRegionLines(
-      '',
-      width,
-      wrapTextToLines(instruction, width),
-      [],
-      [greyCurrentStageIndicatorLabel('Access tokens')],
-      { placeholderContext: 'tokenList' }
-    )
-    const boxTopIndex = lines.findIndex((l) => stripAnsi(l).startsWith('┌'))
-    expect(stripAnsi(lines[0])).toMatch(/^Access tokens +$/)
-    expect(stripAnsi(lines[1])).toBe('─'.repeat(width))
-    expect(boxTopIndex).toBeGreaterThan(2)
-    expect(
-      lines
-        .slice(0, boxTopIndex)
-        .map((l) => stripAnsi(l))
-        .join('\n')
-    ).toContain('Select and enter')
+  test('token list context greys placeholder row', () => {
+    const rows = formatInteractiveCommandLineInkRows('', 80, 0, {
+      placeholderContext: 'tokenList',
+    })
+    expect(rows[0]).toContain(GREY)
   })
 })
 
-describe('buildBoxLinesWithCaret', () => {
+describe('buildCommandInputDraftLinesWithCaret', () => {
   test('empty buffer: reverse-video space before grey placeholder', () => {
-    const rows = buildBoxLinesWithCaret('', 80, 0)
+    const rows = buildCommandInputDraftLinesWithCaret('', 80, 0)
     expect(rows).toHaveLength(1)
     expect(rows[0]).toContain('\x1b[7m')
     expect(rows[0]).toMatch(/^→ /)
@@ -325,24 +253,52 @@ describe('buildBoxLinesWithCaret', () => {
   })
 
   test('caret at end of line: trailing reverse space', () => {
-    const rows = buildBoxLinesWithCaret('ab', 80, 2)
+    const rows = buildCommandInputDraftLinesWithCaret('ab', 80, 2)
     expect(rows[0]).toContain('→ ab')
     expect(rows[0]).toContain('\x1b[7m \x1b[0m')
   })
 
   test('CJK: caret inverts full grapheme', () => {
-    const rows = buildBoxLinesWithCaret('aあb', 80, 1)
+    const rows = buildCommandInputDraftLinesWithCaret('aあb', 80, 1)
     expect(rows[0]).toContain('\x1b[7mあ\x1b[0m')
   })
 })
 
-describe('buildLiveRegionLinesWithCaret', () => {
-  test('matches buildLiveRegionLines structure with caret in box', () => {
-    const withCaret = buildLiveRegionLinesWithCaret('', 80, 0, [], [], [])
-    const plain = buildLiveRegionLines('', 80, [], [], [])
-    expect(withCaret.length).toBe(plain.length)
-    const i = withCaret.findIndex((l) => stripAnsi(l).includes('→'))
-    expect(withCaret[i]).toContain('\x1b[7m')
+describe('Current Stage Indicator (band lines for Ink)', () => {
+  test('recall loading indicator is full-width band', () => {
+    const width = 40
+    const line = formatCurrentStageIndicatorLine(
+      DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
+      width
+    )
+    expect(line).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
+    expect(stripAnsi(line)).toMatch(/^Recalling +$/)
+    expect(visibleLength(stripAnsi(line))).toBe(width)
+  })
+
+  test('fetch-wait indicator carries blue label and band padding', () => {
+    const width = 44
+    const base = INTERACTIVE_FETCH_WAIT_LINES.recallNext
+    const label = interactiveFetchWaitStageIndicatorLine(base)
+    const line = formatCurrentStageIndicatorLine(label, width)
+    expect(line).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
+    expect(line).toContain(INTERACTIVE_FETCH_WAIT_PROMPT_FG)
+    expect(stripAnsi(line)).toMatch(new RegExp(`^${base}\\s+$`))
+    expect(visibleLength(stripAnsi(line))).toBe(width)
+  })
+
+  test('access-token stage label + wrapped instruction (grey prompt block)', () => {
+    const width = 48
+    const instruction = 'Select and enter to change the default access token'
+    const stage = formatCurrentStageIndicatorLine(
+      greyCurrentStageIndicatorLabel('Access tokens'),
+      width
+    )
+    const wrapped = wrapTextToLines(instruction, width).map(
+      (l) => `${GREY}${l}${RESET}`
+    )
+    expect(stripAnsi(stage)).toMatch(/^Access tokens +$/)
+    expect(wrapped.map(stripAnsi).join('\n')).toContain('Select and enter')
   })
 })
 

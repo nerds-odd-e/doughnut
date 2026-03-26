@@ -1,7 +1,7 @@
 /**
- * Terminal layout bridge: grapheme-aware width and wrapping, ANSI strings for the live region
- * (assembled into Ink via `CommandLineLivePanel` and related paths), box rendering helpers, and
- * shared placeholders / tone helpers. Complements the Ink shell; not a second interactive UI engine.
+ * Terminal layout bridge: grapheme-aware width and wrapping, **command-line paint** strings for Ink
+ * (`CommandLineLivePanel`), stage-band / separator helpers, and shared tone helpers. Complements the
+ * Ink shell; not a second interactive UI engine.
  */
 import {
   GREY,
@@ -130,7 +130,7 @@ export function interactiveInputReadyOscSuffix(
   return INTERACTIVE_INPUT_READY_OSC
 }
 
-/** Token list pick or interactive fetch wait: grey bordered box, no →, cursor hidden. */
+/** Token list pick or interactive fetch wait: full grey paint, no `→` prompt, cursor hidden. */
 export function isGreyDisabledInputChrome(ctx: PlaceholderContext): boolean {
   return ctx === 'tokenList' || ctx === 'interactiveFetchWait'
 }
@@ -142,8 +142,8 @@ export function interactiveFetchWaitStageIndicatorLine(
   return `${INTERACTIVE_FETCH_WAIT_PROMPT_FG}${baseLine}${RESET}`
 }
 
-/** Full grey outline for the input box when the user is not free-typing a command. */
-export function grayDisabledInputBoxLines(lines: string[]): string[] {
+/** Force entire paint row to grey (disabled command-line chrome). */
+export function greyOutCommandInputPaintLines(lines: string[]): string[] {
   return lines.map((l) => `${GREY}${l.split(RESET).join(GREY)}${RESET}`)
 }
 
@@ -152,7 +152,7 @@ export const COMMANDS_HINT = `${GREY}  / commands${RESET}`
 
 /**
  * Grey foreground SGR for one **Current Stage Indicator** label; full-width band padding is applied in
- * {@link buildLiveRegionLines}.
+ * {@link formatCurrentStageIndicatorLine}.
  */
 export function greyCurrentStageIndicatorLabel(plainText: string): string {
   return `${GREY}${plainText}${RESET}`
@@ -390,47 +390,6 @@ export function formatCurrentStageIndicatorLine(
   return `${CURRENT_STAGE_BAND_BACKGROUND_SGR}${padEndVisible(opened, width)}${RESET}`
 }
 
-/**
- * Line count from the top of the live region through the last Current prompt line (separator and
- * wrapped prompt rows), immediately above the command-line paint block. Matches
- * {@link buildLiveRegionLines} layout rules.
- */
-export function countPromptBlockLinesAboveInputBoxTop(
-  currentStageIndicatorLines: string[],
-  currentPromptWrappedLines: string[]
-): number {
-  let n = 0
-  if (currentStageIndicatorLines.length > 0) {
-    n += currentStageIndicatorLines.length + 1
-  }
-  if (currentPromptWrappedLines.length > 0) {
-    if (currentStageIndicatorLines.length === 0) n += 1
-    n += currentPromptWrappedLines.length
-  }
-  return n
-}
-
-export function renderBox(lines: string[], width: TerminalWidth): string {
-  const innerWidth = width - 4
-  const top = `┌${'─'.repeat(width - 2)}┐`
-  const bottom = `└${'─'.repeat(width - 2)}┘`
-  const rows = lines.map(
-    (line) =>
-      `│ ${padEndVisible(truncateToWidth(line, innerWidth), innerWidth)} │`
-  )
-  return [top, ...rows, bottom].join('\n')
-}
-
-/** Borderless TTY command-line paint rows (Ink {@link CommandLineLivePanel}): one row per draft line, full width. */
-export function formatBorderlessCommandInputPaintLines(
-  innerLines: string[],
-  width: TerminalWidth
-): string[] {
-  return innerLines.map((line) =>
-    padEndVisible(truncateToWidth(line, width), width)
-  )
-}
-
 /** Submitted buffer counts as history input (and past-input paint) only when non-blank after trim. */
 export function isCommittedInteractiveInput(submitted: string): boolean {
   return submitted.trim().length > 0
@@ -467,11 +426,12 @@ export function highlightRecognizedCommand(line: string): string {
   return `${COMMAND_HIGHLIGHT}${prefix}${RESET}${rest}`
 }
 
-export interface BuildBoxLinesOptions {
+/** Placeholder and grey-disabled chrome for command-line draft rows. */
+export type CommandInputPaintOptions = {
   placeholderContext?: PlaceholderContext
 }
 
-function inputBoxLinePrefix(
+function commandInputDraftLinePrefix(
   lineIndex: number,
   context: PlaceholderContext
 ): string {
@@ -482,16 +442,17 @@ function inputBoxLinePrefix(
       : '  '
 }
 
-export function buildBoxLines(
+/** Logical draft rows (prompt prefix, placeholder, slash highlight) before width trim for Ink. */
+export function buildCommandInputDraftLines(
   buffer: string,
   width: TerminalWidth,
-  options?: BuildBoxLinesOptions
+  options?: CommandInputPaintOptions
 ): string[] {
   const bufferLines = buffer.split('\n')
   const context = options?.placeholderContext ?? 'default'
   const placeholder = PLACEHOLDER_BY_CONTEXT[context]
   return bufferLines.map((line, i) => {
-    const prefix = inputBoxLinePrefix(i, context)
+    const prefix = commandInputDraftLinePrefix(i, context)
     if (i === 0 && buffer === '') {
       return `${prefix}${GREY}${placeholder}${RESET}`
     }
@@ -556,14 +517,14 @@ function buildLineWithCaret(line: string, offsetInLine: number): string {
 }
 
 /**
- * Like {@link buildBoxLines}, but inserts a reverse-video caret at `caretOffset` in the buffer
- * (UTF-16 index, newline-aware), grapheme-aware for the inverted cell.
+ * Like {@link buildCommandInputDraftLines}, with a reverse-video caret at `caretOffset` (UTF-16,
+ * newline-aware), grapheme-aware for the inverted cell.
  */
-export function buildBoxLinesWithCaret(
+export function buildCommandInputDraftLinesWithCaret(
   buffer: string,
   _width: TerminalWidth,
   caretOffset: number,
-  options?: BuildBoxLinesOptions
+  options?: CommandInputPaintOptions
 ): string[] {
   const bufferLines = buffer.split('\n')
   const { lineIndex: caretLineIndex, offsetInLine } =
@@ -571,7 +532,7 @@ export function buildBoxLinesWithCaret(
   const context = options?.placeholderContext ?? 'default'
   const placeholder = PLACEHOLDER_BY_CONTEXT[context]
   return bufferLines.map((line, i) => {
-    const prefix = inputBoxLinePrefix(i, context)
+    const prefix = commandInputDraftLinePrefix(i, context)
     let inner: string
     if (i === 0 && buffer === '') {
       inner =
@@ -597,8 +558,8 @@ export function getLastLine(buffer: string): string {
   return lines[lines.length - 1] ?? ''
 }
 
-/** Blank line before the live region when scrollback exists but there is no Current prompt block (no wrapped lines and no stage indicator). */
-export function needsGapBeforeBox(
+/** Blank line before the live Ink column when scrollback exists but there is no Current prompt block. */
+export function needsGapBeforeLiveRegion(
   history: ChatHistory,
   currentPromptWrappedLines: string[],
   currentStageIndicatorLines: string[]
@@ -610,88 +571,44 @@ export function needsGapBeforeBox(
   )
 }
 
-function buildLiveRegionLinesAboveInputBox(
-  width: TerminalWidth,
-  currentPromptWrappedLines: string[],
-  currentStageIndicatorLines: string[]
+/** Per-row width fit for Ink: one terminal row per draft line. */
+export function formatBorderlessCommandInputPaintLines(
+  innerLines: string[],
+  width: TerminalWidth
 ): string[] {
-  const lines: string[] = []
-  const hasStageIndicator = currentStageIndicatorLines.length > 0
-  if (hasStageIndicator) {
-    for (const ind of currentStageIndicatorLines) {
-      lines.push(formatCurrentStageIndicatorLine(ind, width))
-    }
-    lines.push(buildCurrentPromptSeparatorForStageBand(width))
-  }
-  if (currentPromptWrappedLines.length > 0) {
-    if (!hasStageIndicator) {
-      lines.push(buildCurrentPromptSeparator(width))
-    }
-    for (const line of currentPromptWrappedLines) {
-      lines.push(`${GREY}${line}${RESET}`)
-    }
-  }
-  return lines
+  return innerLines.map((line) =>
+    padEndVisible(truncateToWidth(line, width), width)
+  )
 }
 
-/**
- * Bordered input box lines from {@link renderBox}: full grey outline for token list and fetch-wait
- * (same rule as {@link buildLiveRegionLines}).
- */
-export function inputBoxBorderLinesWithContextChrome(
-  rawBoxLines: string[],
-  options?: BuildBoxLinesOptions
+/** Grey-out entire rows when `placeholderContext` is fetch-wait or token list. */
+export function applyCommandInputPaintChrome(
+  paintLines: string[],
+  options?: CommandInputPaintOptions
 ): string[] {
   const ctx = options?.placeholderContext
   return ctx && isGreyDisabledInputChrome(ctx)
-    ? grayDisabledInputBoxLines(rawBoxLines)
-    : rawBoxLines
+    ? greyOutCommandInputPaintLines(paintLines)
+    : paintLines
 }
 
-export function buildLiveRegionLines(
-  buffer: string,
-  width: TerminalWidth,
-  currentPromptWrappedLines: string[],
-  suggestionLines: string[],
-  currentStageIndicatorLines: string[],
-  options?: BuildBoxLinesOptions
-): string[] {
-  const lines = buildLiveRegionLinesAboveInputBox(
-    width,
-    currentPromptWrappedLines,
-    currentStageIndicatorLines
-  )
-  const rawBoxLines = renderBox(
-    buildBoxLines(buffer, width, options),
-    width
-  ).split('\n')
-  lines.push(...inputBoxBorderLinesWithContextChrome(rawBoxLines, options))
-  lines.push(...suggestionLines)
-  return lines
-}
-
-/** Same layout as {@link buildLiveRegionLines}, with a reverse-video caret in the input box. */
-export function buildLiveRegionLinesWithCaret(
+/** Draft → terminal width → disabled chrome — the only command-line paint path for Ink. */
+export function formatInteractiveCommandLineInkRows(
   buffer: string,
   width: TerminalWidth,
   caretOffset: number,
-  currentPromptWrappedLines: string[],
-  suggestionLines: string[],
-  currentStageIndicatorLines: string[],
-  options?: BuildBoxLinesOptions
+  options?: CommandInputPaintOptions
 ): string[] {
-  const lines = buildLiveRegionLinesAboveInputBox(
+  const draft = buildCommandInputDraftLinesWithCaret(
+    buffer,
     width,
-    currentPromptWrappedLines,
-    currentStageIndicatorLines
+    caretOffset,
+    options
   )
-  const rawBoxLines = renderBox(
-    buildBoxLinesWithCaret(buffer, width, caretOffset, options),
-    width
-  ).split('\n')
-  lines.push(...inputBoxBorderLinesWithContextChrome(rawBoxLines, options))
-  lines.push(...suggestionLines)
-  return lines
+  return applyCommandInputPaintChrome(
+    formatBorderlessCommandInputPaintLines(draft, width),
+    options
+  )
 }
 
 /** Newline-aware terminal wrap for markdown-rendered text (may contain ANSI). */

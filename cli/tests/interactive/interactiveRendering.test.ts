@@ -1,14 +1,15 @@
 /**
- * Terminal layout from `renderer.ts` (visible width, box, past input, slash highlight).
+ * Terminal layout from `renderer.ts` (visible width, command-line draft rows, past input, slash highlight).
  * TTY integration lives in `interactiveTty*.test.ts`.
  */
 import './interactiveTestMocks.js'
 import { describe, test, expect } from 'vitest'
 import {
-  buildBoxLines,
+  buildCommandInputDraftLines,
+  formatBorderlessCommandInputPaintLines,
   highlightRecognizedCommand,
-  renderBox,
   renderPastInput,
+  stripAnsi,
   visibleLength,
   buildSuggestionLines,
 } from '../../src/renderer.js'
@@ -23,55 +24,6 @@ describe('visibleLength', () => {
     expect(visibleLength('hello')).toBe(5)
     expect(visibleLength('\x1b[90mhello\x1b[0m')).toBe(5)
     expect(visibleLength('→ \x1b[90m`exit` to quit.\x1b[0m')).toBe(17)
-  })
-})
-
-describe('renderBox', () => {
-  test.each([
-    { width: 100, check: 'top' as const },
-    { width: 120, check: 'content' as const },
-  ])('box respects width $width ($check row)', ({ width, check }) => {
-    const result = renderBox(['hi'], width)
-    const line = result.split('\n')[check === 'top' ? 0 : 1]
-    if (check === 'top') expect(line.length).toBe(width)
-    else expect(visibleLength(line)).toBe(width)
-  })
-
-  test('renders a single-line box', () => {
-    const result = renderBox(['hello'], 20)
-    const lines = result.split('\n')
-    expect(lines).toHaveLength(3)
-    expect(lines[0]).toBe('┌──────────────────┐')
-    expect(lines[1]).toContain('hello')
-    expect(lines[1]).toMatch(/^│.*│$/)
-    expect(lines[2]).toBe('└──────────────────┘')
-  })
-
-  test('renders a multi-line box (box expands with newlines)', () => {
-    const result = renderBox(['line 1', 'line 2', 'line 3'], 20)
-    const lines = result.split('\n')
-    expect(lines).toHaveLength(5)
-    expect(lines[0]).toBe('┌──────────────────┐')
-    expect(lines[1]).toContain('line 1')
-    expect(lines[2]).toContain('line 2')
-    expect(lines[3]).toContain('line 3')
-    expect(lines[4]).toBe('└──────────────────┘')
-  })
-
-  test('pads short lines to fill the box width', () => {
-    const result = renderBox(['hi'], 20)
-    const lines = result.split('\n')
-    expect(lines[1]).toBe('│ hi               │')
-    expect(lines[1].length).toBe(20)
-  })
-
-  test('pads correctly when line contains ANSI codes', () => {
-    const grey = '\x1b[90m'
-    const reset = '\x1b[0m'
-    const result = renderBox([`${grey}hi${reset}`], 20)
-    const lines = result.split('\n')
-    expect(visibleLength(lines[1])).toBe(20)
-    expect(lines[1]).toContain('hi')
   })
 })
 
@@ -103,22 +55,22 @@ describe('highlightRecognizedCommand', () => {
   })
 })
 
-describe('buildBoxLines', () => {
+describe('buildCommandInputDraftLines', () => {
   test('empty buffer shows placeholder with prompt', () => {
-    const lines = buildBoxLines('', 40)
+    const lines = buildCommandInputDraftLines('', 40)
     expect(lines).toHaveLength(1)
     expect(lines[0]).toContain('→')
     expect(lines[0]).toContain('`exit` to quit.')
   })
 
   test('single-line buffer shows prompt + text', () => {
-    const lines = buildBoxLines('hello', 40)
+    const lines = buildCommandInputDraftLines('hello', 40)
     expect(lines).toHaveLength(1)
     expect(lines[0]).toBe('→ hello')
   })
 
   test('multi-line buffer produces one line per newline', () => {
-    const lines = buildBoxLines('line1\nline2\nline3', 40)
+    const lines = buildCommandInputDraftLines('line1\nline2\nline3', 40)
     expect(lines).toHaveLength(3)
     expect(lines[0]).toBe('→ line1')
     expect(lines[1]).toBe('  line2')
@@ -126,33 +78,37 @@ describe('buildBoxLines', () => {
   })
 
   test('recognized command gets bold+colored in first line', () => {
-    const lines = buildBoxLines('/help', 40)
+    const lines = buildCommandInputDraftLines('/help', 40)
     expect(lines[0]).toContain('→')
     expect(lines[0]).toContain(`${BOLD_CYAN}/help${ANSI_RESET}`)
   })
 
   test('non-command line has no ANSI highlight', () => {
-    const lines = buildBoxLines('hello', 40)
+    const lines = buildCommandInputDraftLines('hello', 40)
     // biome-ignore lint/suspicious/noControlCharactersInRegex: checking ANSI codes
     expect(lines[0]).not.toMatch(/\x1b\[1;36m/)
   })
 
   test('command with param highlights only command part', () => {
-    const lines = buildBoxLines('/add-access-token mylabel', 40)
+    const lines = buildCommandInputDraftLines('/add-access-token mylabel', 40)
     expect(lines[0]).toContain(
       `${BOLD_CYAN}/add-access-token${ANSI_RESET} mylabel`
     )
   })
 
   test('empty buffer in selection mode shows placeholder without arrow', () => {
-    const lines = buildBoxLines('', 80, { placeholderContext: 'tokenList' })
+    const lines = buildCommandInputDraftLines('', 80, {
+      placeholderContext: 'tokenList',
+    })
     expect(lines).toHaveLength(1)
     expect(lines[0]).not.toContain('→')
     expect(lines[0]).toContain('↑↓ Enter to select; other keys cancel')
   })
 
   test('empty buffer with default context shows default placeholder', () => {
-    const lines = buildBoxLines('', 80, { placeholderContext: 'default' })
+    const lines = buildCommandInputDraftLines('', 80, {
+      placeholderContext: 'default',
+    })
     expect(lines[0]).toContain('`exit` to quit.')
   })
 
@@ -162,20 +118,21 @@ describe('buildBoxLines', () => {
     ['recallYesNo', 'y or n; /stop to exit recall'],
     ['recallSpelling', 'type your answer; /stop to exit recall'],
   ] as const)('placeholderContext %s shows correct placeholder', (ctx, phrase) => {
-    const lines = buildBoxLines('', 80, { placeholderContext: ctx })
+    const lines = buildCommandInputDraftLines('', 80, {
+      placeholderContext: ctx,
+    })
     expect(lines[0]).toContain(phrase)
   })
 
   test('placeholder truncates in narrow window for any long context', () => {
     const width = 25
-    const lines = buildBoxLines('', width, { placeholderContext: 'tokenList' })
-    const box = renderBox(lines, width)
-    const boxLines = box.split('\n')
-    for (let i = 1; i < boxLines.length - 1; i++) {
-      expect(visibleLength(boxLines[i])).toBeLessThanOrEqual(width)
-    }
+    const lines = buildCommandInputDraftLines('', width, {
+      placeholderContext: 'tokenList',
+    })
+    const paint = formatBorderlessCommandInputPaintLines(lines, width)[0]!
+    expect(visibleLength(paint)).toBeLessThanOrEqual(width)
     expect(lines[0]).toContain('↑↓')
-    expect(boxLines[1]).toContain('...')
+    expect(stripAnsi(paint)).toContain('...')
   })
 })
 

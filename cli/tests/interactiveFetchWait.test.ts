@@ -12,9 +12,12 @@ import {
   userVisibleOutcomeFromCommandError,
 } from '../src/fetchAbort.js'
 import {
-  buildBoxLines,
-  buildLiveRegionLines,
+  applyCommandInputPaintChrome,
+  buildCommandInputDraftLines,
+  buildCurrentPromptSeparatorForStageBand,
   CURRENT_STAGE_BAND_BACKGROUND_SGR,
+  formatBorderlessCommandInputPaintLines,
+  formatCurrentStageIndicatorLine,
   interactiveFetchWaitStageIndicatorLine,
   isGreyDisabledInputChrome,
   stripAnsi,
@@ -85,24 +88,32 @@ describe('interactive fetch wait UI', () => {
     expect(isGreyDisabledInputChrome('default')).toBe(false)
     expect(isGreyDisabledInputChrome('recallMcq')).toBe(false)
 
-    const boxLine = buildBoxLines('', 80, {
+    const draft = buildCommandInputDraftLines('', 80, {
       placeholderContext: 'interactiveFetchWait',
     })[0]!
-    expect(boxLine).not.toContain('→')
-    expect(boxLine).toContain('loading ...')
+    expect(draft).not.toContain('→')
+    expect(draft).toContain('loading ...')
 
+    const width = 80
     const label = interactiveFetchWaitStageIndicatorLine(recallLine)
-    const live = buildLiveRegionLines('', 80, [], [], [label], {
-      placeholderContext: 'interactiveFetchWait',
-    })
-    expect(live[0]).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
-    expect(live[0]).toContain(INTERACTIVE_FETCH_WAIT_PROMPT_FG)
-    expect(stripAnsi(live[0])).toContain(recallLine)
-    expect(live[1]).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
-    expect(live[1]).toContain('\x1b[32m')
-    const boxTopIdx = live.findIndex((l) => stripAnsi(l).startsWith('┌'))
-    expect(boxTopIdx).toBe(2)
-    expect(live[boxTopIdx]).toContain(GREY)
+    const bandTop = formatCurrentStageIndicatorLine(label, width)
+    const bandSep = buildCurrentPromptSeparatorForStageBand(width)
+    expect(bandTop).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
+    expect(bandTop).toContain(INTERACTIVE_FETCH_WAIT_PROMPT_FG)
+    expect(stripAnsi(bandTop)).toContain(recallLine)
+    expect(bandSep).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
+    expect(bandSep).toContain('\x1b[32m')
+
+    const paint = applyCommandInputPaintChrome(
+      formatBorderlessCommandInputPaintLines(
+        buildCommandInputDraftLines('', width, {
+          placeholderContext: 'interactiveFetchWait',
+        }),
+        width
+      ),
+      { placeholderContext: 'interactiveFetchWait' }
+    )
+    expect(paint[0]).toContain(GREY)
 
     expect(
       stripAnsi(

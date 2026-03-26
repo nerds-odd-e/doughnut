@@ -58,7 +58,7 @@ import {
   greyCurrentStageIndicatorLabel,
   interactiveFetchWaitStageIndicatorLine,
   isCommittedInteractiveInput,
-  needsGapBeforeBox,
+  needsGapBeforeLiveRegion,
   recallMcqCurrentGuidanceLines,
   wrapTextToLines,
   type PlaceholderContext,
@@ -144,7 +144,7 @@ type LiveRegionLayout = {
   terminalWidth: number
 }
 
-/** Prompt + stage lines for `needsGapBeforeBox`; cheap vs full command-line guidance. */
+/** Prompt + stage lines for `needsGapBeforeLiveRegion`; cheap vs full command-line guidance. */
 type LiveRegionPromptStageSnapshot = {
   width: number
   placeholderContext: PlaceholderContext
@@ -507,7 +507,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     }
     patchStdinForInk(stdinForInk)
     const promptStage = getLiveRegionPromptAndStageLines()
-    const liveLeadingGap = needsGapBeforeBox(
+    const liveLeadingGap = needsGapBeforeLiveRegion(
       chatHistory,
       promptStage.currentPromptWrappedLines,
       promptStage.currentStageIndicatorLines

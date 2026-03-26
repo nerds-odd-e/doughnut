@@ -1,12 +1,10 @@
 import { useLayoutEffect, useRef } from 'react'
 import { Box, Text, useFocus, useInput, type Key } from 'ink'
 import {
-  buildBoxLinesWithCaret,
   buildCurrentPromptSeparator,
   buildCurrentPromptSeparatorForStageBand,
-  formatBorderlessCommandInputPaintLines,
   formatCurrentStageIndicatorLine,
-  inputBoxBorderLinesWithContextChrome,
+  formatInteractiveCommandLineInkRows,
   stripAnsi,
   type PlaceholderContext,
   type TerminalWidth,
@@ -63,17 +61,13 @@ export function CommandLineLivePanel({
     { isActive: true }
   )
 
-  const boxPaint = { placeholderContext } as const
+  const paintOptions = { placeholderContext } as const
   const hasStageIndicator = currentStageIndicatorLines.length > 0
-  const innerLines = buildBoxLinesWithCaret(
+  const commandPaintLines = formatInteractiveCommandLineInkRows(
     buffer,
     width,
     caretOffset,
-    boxPaint
-  )
-  const boxLines = inputBoxBorderLinesWithContextChrome(
-    formatBorderlessCommandInputPaintLines(innerLines, width),
-    boxPaint
+    paintOptions
   )
 
   const promptPlainForInk =
@@ -105,8 +99,8 @@ export function CommandLineLivePanel({
           </Box>
         </>
       ) : null}
-      {boxLines.map((line, i) => (
-        <Text key={`box-${i}`}>{line}</Text>
+      {commandPaintLines.map((line, i) => (
+        <Text key={`cmd-${i}`}>{line}</Text>
       ))}
       {suggestionLines.map((line, i) => (
         <Box key={`sug-${i}`} width={width}>
