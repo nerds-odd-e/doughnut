@@ -12,6 +12,7 @@ import {
   getHistoryInputContent,
   getHistoryOutputContent,
   getRecallDisplaySections,
+  interactiveCliPtyTranscriptApproxVisiblePlainText,
   ptyStdoutHasInputReadyMarker,
 } from '../../../step_definitions/cliSectionParser'
 
@@ -22,6 +23,7 @@ const SECTION = {
   historyOutput: 'history output',
   historyInput: 'history input',
   currentGuidance: 'Current guidance',
+  simulatedVisiblePtyScreen: 'simulated visible PTY screen',
 } as const
 
 type SectionLabel = (typeof SECTION)[keyof typeof SECTION]
@@ -151,6 +153,29 @@ function currentGuidanceFailureMessage(
   ].join('\n')
 }
 
+function visibleInteractivePtyScreen() {
+  const target = SECTION.simulatedVisiblePtyScreen
+  return {
+    /** Assert substring appears after CSI/cursor replay — closer to what a human sees than raw line-split transcript parsing. */
+    expectContains(expected: string) {
+      withStdoutFor(
+        { kind: 'ptyInteractive', assertionTarget: target },
+        (stdout) => {
+          const visible =
+            interactiveCliPtyTranscriptApproxVisiblePlainText(stdout)
+          const tail = visible.slice(-1200)
+          const hint =
+            `Expected "${expected}" on ${target} (PTY bytes replayed with erase/cursor moves). ` +
+            `If this fails while older "Current guidance" checks passed, the string may exist only in scrollback ` +
+            `while Ink repainted the live region — feed session y/n questions via RecallInkConfirmPanel guidanceLines ` +
+            `(ShellSessionRoot in-session), not only grey writeCurrentPrompt lines. Tail:\n${tail}`
+          expect(visible, hint).to.include(expected)
+        }
+      )
+    },
+  }
+}
+
 function currentGuidance() {
   const target = SECTION.currentGuidance
   return {
@@ -214,5 +239,6 @@ export {
   historyOutput,
   historyInput,
   currentGuidance,
+  visibleInteractivePtyScreen,
   inputBoxTopBorder,
 }

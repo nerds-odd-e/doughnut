@@ -7,7 +7,7 @@ import {
   type InteractiveCliPtyKeystroke,
 } from '../../../config/interactiveCliPtyTypes'
 import { e2eAppBaseUrl } from '../../../support/e2eAppUrl'
-import { currentGuidance, historyOutput } from './outputAssertions'
+import { historyOutput, visibleInteractivePtyScreen } from './outputAssertions'
 
 const GOOGLE_MOCK_BASE_URL = 'http://localhost:5003'
 
@@ -98,7 +98,7 @@ function interactive() {
     },
     /** Recall Ink y/n: one keypress (a separate Enter would mean “no”). */
     answerToPrompt(answer: string, expectedPromptText: string) {
-      currentGuidance().expectContains(expectedPromptText)
+      visibleInteractivePtyScreen().expectContains(expectedPromptText)
       applyInteractiveCliPtyKeystroke({ kind: 'rawKey', char: answer })
     },
     inputDownArrowSelection(commandLine: string) {

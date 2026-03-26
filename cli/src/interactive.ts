@@ -61,6 +61,8 @@ let sessionRecallCount = 0
 let recallSessionDueDays = 0
 let pendingRecallLoadMore = false
 let pendingRecallStopConfirmation = false
+/** TTY: lines shown in RecallInkConfirmPanel for session y/n (grey writeCurrentPrompt is covered by Ink’s live repaint). */
+let recallSessionYesNoInkGuidanceLines: readonly string[] = []
 
 export * from './interactiveFetchWait.js'
 
@@ -71,6 +73,7 @@ export function resetRecallStateForTesting(): void {
   recallSessionDueDays = 0
   pendingRecallLoadMore = false
   pendingRecallStopConfirmation = false
+  recallSessionYesNoInkGuidanceLines = []
   resetInteractiveFetchWaitForTesting()
 }
 
@@ -95,6 +98,7 @@ function exitRecallMode(): void {
   recallSessionDueDays = 0
   pendingRecallLoadMore = false
   pendingRecallStopConfirmation = false
+  recallSessionYesNoInkGuidanceLines = []
 }
 
 function formatRecallSessionSummary(count: number): string {
@@ -151,11 +155,23 @@ function emitMcqRecallQuestionForNonInteractiveOutput(
   output.log(`Enter your choice (1-${choices.length}):`)
 }
 
+function emitSessionYesNoReprompt(
+  output: OutputAdapter,
+  writeCurrentPrompt: (msg: string) => void
+): void {
+  if (output.beginCurrentPrompt) {
+    recallSessionYesNoInkGuidanceLines = [RECALL_YES_NO_REPROMPT]
+  } else {
+    writeCurrentPrompt(RECALL_YES_NO_REPROMPT)
+  }
+}
+
 function showRecallPrompt(
   result: RecallPromptResult,
   output: OutputAdapter,
   writeCurrentPrompt: (msg: string) => void
 ): void {
+  recallSessionYesNoInkGuidanceLines = []
   if (result.type === 'question') {
     const p = result.prompt
     if (p.questionType === 'MCQ' && p.multipleChoicesQuestion) {
@@ -200,14 +216,32 @@ function showRecallPrompt(
     return
   }
   output.beginCurrentPrompt?.()
-  writeCurrentPrompt(
-    formatRecallNotebookCurrentPromptLine(result.notebookTitle)
-  )
-  writeCurrentPrompt(result.title)
-  if (result.details) {
-    writeCurrentPrompt(renderMarkdownToTerminal(result.details))
+  const width = getTerminalWidth()
+  if (output.beginCurrentPrompt) {
+    recallSessionYesNoInkGuidanceLines = [
+      ...wrapTextToVisibleWidthLines(
+        formatRecallNotebookCurrentPromptLine(result.notebookTitle),
+        width
+      ),
+      ...wrapTextToVisibleWidthLines(result.title, width),
+      ...(result.details
+        ? wrapMarkdownTerminalToLines(
+            renderMarkdownToTerminal(result.details),
+            width
+          )
+        : []),
+      ...wrapTextToVisibleWidthLines('Yes, I remember? (y/n)', width),
+    ]
+  } else {
+    writeCurrentPrompt(
+      formatRecallNotebookCurrentPromptLine(result.notebookTitle)
+    )
+    writeCurrentPrompt(result.title)
+    if (result.details) {
+      writeCurrentPrompt(renderMarkdownToTerminal(result.details))
+    }
+    writeCurrentPrompt('Yes, I remember? (y/n)')
   }
-  writeCurrentPrompt('Yes, I remember? (y/n)')
   pendingRecallAnswer = { memoryTrackerId: result.memoryTrackerId }
 }
 
@@ -349,7 +383,15 @@ async function continueRecallSession(
       if (recallSessionDueDays === 0) {
         pendingRecallLoadMore = true
         output.beginCurrentPrompt?.()
-        writeCurrentPrompt('Load more from next 3 days? (y/n)')
+        const loadMoreLine = 'Load more from next 3 days? (y/n)'
+        if (output.beginCurrentPrompt) {
+          recallSessionYesNoInkGuidanceLines = wrapTextToVisibleWidthLines(
+            loadMoreLine,
+            getTerminalWidth()
+          )
+        } else {
+          writeCurrentPrompt(loadMoreLine)
+        }
         return
       }
       output.log(formatRecallSessionSummary(sessionRecallCount))
@@ -488,7 +530,7 @@ export async function processInput(
       output.log(formatRecallSessionSummary(sessionRecallCount))
       endRecallSession()
     } else {
-      writeCurrentPrompt(RECALL_YES_NO_REPROMPT)
+      emitSessionYesNoReprompt(output, writeCurrentPrompt)
       return false
     }
     return false
@@ -557,7 +599,7 @@ export async function processInput(
           output.logError(err)
         }
       } else {
-        writeCurrentPrompt(RECALL_YES_NO_REPROMPT)
+        emitSessionYesNoReprompt(output, writeCurrentPrompt)
         return false
       }
       pendingRecallAnswer = null
@@ -592,7 +634,15 @@ export async function processInput(
       if (result.type === 'none') {
         pendingRecallLoadMore = true
         output.beginCurrentPrompt?.()
-        writeCurrentPrompt('Load more from next 3 days? (y/n)')
+        const loadMoreLine = 'Load more from next 3 days? (y/n)'
+        if (output.beginCurrentPrompt) {
+          recallSessionYesNoInkGuidanceLines = wrapTextToVisibleWidthLines(
+            loadMoreLine,
+            getTerminalWidth()
+          )
+        } else {
+          writeCurrentPrompt(loadMoreLine)
+        }
       } else {
         showRecallPrompt(result, output, writeCurrentPrompt)
       }
@@ -637,6 +687,10 @@ function usesSessionYesNoInputChrome(inTokenList: boolean): boolean {
   )
 }
 
+function getRecallSessionYesNoInkGuidanceLines(): readonly string[] {
+  return recallSessionYesNoInkGuidanceLines
+}
+
 function buildTTYDeps() {
   return {
     processInput,
@@ -657,6 +711,7 @@ function buildTTYDeps() {
     setDefaultTokenLabel,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
+    getRecallSessionYesNoInkGuidanceLines,
   }
 }
 

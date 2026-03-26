@@ -244,7 +244,7 @@ function buildLivePanel(
     return React.createElement(RecallInkConfirmPanel, {
       key: 'confirm-session-yes-no',
       variant: 'in-session',
-      guidanceLines: [],
+      guidanceLines: deps.getRecallSessionYesNoInkGuidanceLines(),
       placeholderText: 'y or n; /stop to exit recall',
       whenInActiveRecallSession: handlers.whenInActiveRecallSession,
       onEscapeOpensStopRecallSheet: handlers.onEnterStopConfirmationFromEsc,

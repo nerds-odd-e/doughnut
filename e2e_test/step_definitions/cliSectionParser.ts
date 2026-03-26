@@ -260,6 +260,13 @@ function toInteractiveCliSimulatedPlainScreen(
   }
 }
 
+/** Plain text after replaying PTY cursor motion and erases — approximates what the user sees (see `replayInteractiveCliPtyTranscriptOntoGrid`). */
+export function interactiveCliPtyTranscriptApproxVisiblePlainText(
+  ptyTranscript: string
+): string {
+  return toInteractiveCliSimulatedPlainScreen(ptyTranscript).asPlainTextGrid
+}
+
 /** Applies cursor motion, line erase, and screen clear from a PTY byte stream onto a logical character grid. */
 function replayInteractiveCliPtyTranscriptOntoGrid(
   ptyTranscript: string
