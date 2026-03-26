@@ -4,10 +4,8 @@
  */
 
 import type { IPty } from '@lydell/node-pty'
-import {
-  assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks,
-  INTERACTIVE_INPUT_READY_OSC,
-} from '../step_definitions/cliSectionParser'
+import { assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks } from '../step_definitions/cliSectionParser'
+import { INTERACTIVE_INPUT_READY_OSC } from './interactiveInputReadyOsc'
 import { cliEnv } from './cliEnv'
 import type { InteractiveCliPtyKeystroke } from './interactiveCliPtyTypes'
 
@@ -121,53 +119,46 @@ interface PtyHandle {
 type WaitForInteractiveInputReadyOptions = {
   getStdout: () => string
   maxWaitMs: number
+  allowSettledFallback: boolean
   /**
    * When set, only search output appended after this byte offset (e.g. length before a `pty.write`).
    * Omit for startup: the marker may already exist earlier in the capture.
    */
   onlyInStdoutAfterByteLength?: number
-  formatTimeoutError: (stdout: string) => string
-}
-
-async function waitForInteractiveInputReadyOsc(
-  options: WaitForInteractiveInputReadyOptions
-): Promise<void> {
-  const {
-    getStdout,
-    maxWaitMs,
-    onlyInStdoutAfterByteLength: afterLen,
-    formatTimeoutError,
-  } = options
-  const start = Date.now()
-  while (Date.now() - start < maxWaitMs) {
-    const haystack = stdoutHaystackAfter(getStdout(), afterLen)
-    if (haystack.includes(INTERACTIVE_INPUT_READY_OSC)) {
-      await drainStdoutUntilStableAfterOsc(getStdout)
-      return
+  formatTimeoutError: (
+    stdout: string,
+    details: {
+      mode:
+        | 'waiting-for-osc'
+        | 'waiting-for-settled-fallback'
+        | 'fetch-wait-tail-active'
+      bytesAfterWindow: number
     }
-    await sleep(CLI_POLL_MS)
-  }
-  throw new Error(formatTimeoutError(getStdout()))
+  ) => string
 }
 
 /**
- * After a PTY write, the CLI often appends {@link INTERACTIVE_INPUT_READY_OSC}. Fetch-wait omits
- * it (see `handleShellRendered` in `interactiveTtySession`). Accept either a fresh OSC in bytes after
- * `afterLen`, or stdout that grew past `afterLen` and then stayed stable — same idea as the
- * post-OSC drain loop.
+ * Input-ready sync contract used by PTY E2E:
+ * - startup waits for a real readiness OSC
+ * - post-write waits for OSC first, then allows settled fallback when fetch-wait omits OSC
  */
-async function waitForInteractiveInputReadyOscOrSettled(
+async function waitForInteractiveInputReady(
   options: WaitForInteractiveInputReadyOptions
 ): Promise<void> {
   const {
     getStdout,
     maxWaitMs,
+    allowSettledFallback,
     onlyInStdoutAfterByteLength: afterLen,
     formatTimeoutError,
   } = options
   const start = Date.now()
   let lastLen = getStdout().length
   let stableSince = Date.now()
+  let timeoutMode:
+    | 'waiting-for-osc'
+    | 'waiting-for-settled-fallback'
+    | 'fetch-wait-tail-active' = 'waiting-for-osc'
   while (Date.now() - start < maxWaitMs) {
     const stdout = getStdout()
     const haystack = stdoutHaystackAfter(stdout, afterLen)
@@ -182,6 +173,7 @@ async function waitForInteractiveInputReadyOscOrSettled(
       lastLen = len
       stableSince = Date.now()
     } else if (
+      allowSettledFallback &&
       afterLen !== undefined &&
       len > afterLen &&
       Date.now() - stableSince >=
@@ -190,12 +182,21 @@ async function waitForInteractiveInputReadyOscOrSettled(
       if (!tailLooksLikeInteractiveFetchWait(haystack)) {
         return
       }
+      timeoutMode = 'fetch-wait-tail-active'
       stableSince = Date.now()
+    } else if (allowSettledFallback) {
+      timeoutMode = 'waiting-for-settled-fallback'
     }
 
     await sleep(CLI_POLL_MS)
   }
-  throw new Error(formatTimeoutError(getStdout()))
+  const stdout = getStdout()
+  throw new Error(
+    formatTimeoutError(stdout, {
+      mode: timeoutMode,
+      bytesAfterWindow: stdoutHaystackAfter(stdout, afterLen).length,
+    })
+  )
 }
 
 function spawnPty(opts: {
@@ -285,10 +286,11 @@ export async function runCliInPty(opts: {
       if (exitCode === 0) resolve(handle.stdout.value)
       else reject(new Error(`CLI exited with code ${exitCode}`))
     })
-    waitForInteractiveInputReadyOsc({
+    waitForInteractiveInputReady({
       getStdout: () => handle.stdout.value,
       maxWaitMs: INTERACTIVE_CLI_PROMPT_WAIT_MS,
-      formatTimeoutError: formatCliPromptDidNotAppearError,
+      allowSettledFallback: false,
+      formatTimeoutError: (stdout) => formatCliPromptDidNotAppearError(stdout),
     })
       .then(async () => {
         assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks(
@@ -330,10 +332,11 @@ export async function startInteractiveCli(opts: {
     )
   }
   const handle = spawnPty(opts)
-  await waitForInteractiveInputReadyOsc({
+  await waitForInteractiveInputReady({
     getStdout: () => handle.stdout.value,
     maxWaitMs: INTERACTIVE_CLI_PROMPT_WAIT_MS,
-    formatTimeoutError: formatCliPromptDidNotAppearError,
+    allowSettledFallback: false,
+    formatTimeoutError: (stdout) => formatCliPromptDidNotAppearError(stdout),
   })
   assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks(
     handle.stdout.value
@@ -359,21 +362,29 @@ const PTY_INPUT_READY_AFTER_SEND_MAX_MS = 15_000
 
 function formatPtyInputBoxTimeoutError(
   stdout: string,
-  lenBeforeSend: number
+  lenBeforeSend: number,
+  details: {
+    mode:
+      | 'waiting-for-osc'
+      | 'waiting-for-settled-fallback'
+      | 'fetch-wait-tail-active'
+    bytesAfterWindow: number
+  }
 ): string {
-  return `CLI did not show input box after send within ${PTY_INPUT_READY_AFTER_SEND_MAX_MS / 1000}s. stdout grew by ${stdout.length - lenBeforeSend} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`
+  return `CLI did not show input box after send within ${PTY_INPUT_READY_AFTER_SEND_MAX_MS / 1000}s. mode=${details.mode}, bytes after send window=${details.bytesAfterWindow}, stdout grew by ${stdout.length - lenBeforeSend} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`
 }
 
 async function ptyWaitForInputReadyAfterWrite(
   handle: PtyHandle,
   lenBeforeSend: number
 ): Promise<string> {
-  await waitForInteractiveInputReadyOscOrSettled({
+  await waitForInteractiveInputReady({
     getStdout: () => handle.stdout.value,
     maxWaitMs: PTY_INPUT_READY_AFTER_SEND_MAX_MS,
+    allowSettledFallback: true,
     onlyInStdoutAfterByteLength: lenBeforeSend,
-    formatTimeoutError: (stdout) =>
-      formatPtyInputBoxTimeoutError(stdout, lenBeforeSend),
+    formatTimeoutError: (stdout, details) =>
+      formatPtyInputBoxTimeoutError(stdout, lenBeforeSend, details),
   })
   assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks(
     handle.stdout.value

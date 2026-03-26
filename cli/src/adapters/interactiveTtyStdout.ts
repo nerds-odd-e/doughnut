@@ -46,6 +46,12 @@ export const interactiveTtyStdout = {
     write(INTERACTIVE_INPUT_READY_OSC)
   },
 
+  /**
+   * Default command-line contract:
+   * - emits OSC when the draft is empty and fetch-wait is inactive
+   * - emits nothing while typing or fetch-wait is active
+   * Consumers in E2E use this to decide when keystrokes are safe.
+   */
   finalizeDefaultLiveAfterInk(paint: InteractiveInputReadyPaint): void {
     write(interactiveInputReadyOscSuffix(paint))
   },

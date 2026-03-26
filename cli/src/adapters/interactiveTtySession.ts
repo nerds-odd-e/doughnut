@@ -182,6 +182,10 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
   }
 
   function handleShellRendered(): void {
+    // OSC contract for interactive readiness:
+    // - fetch-wait omits the OSC (typing is blocked)
+    // - confirm/list selection surfaces emit OSC directly
+    // - default command line delegates to interactiveInputReadyOscSuffix
     if (getInteractiveFetchWaitLine() !== null) {
       interactiveTtyStdout.hideCursor()
       return

@@ -5,6 +5,7 @@
  * - **Line-split merge** (`getRecallDisplaySections`): newline-based regions; can retain text after Ink clears the live grid (e.g. MCQ stem after `/stop`). Not the same as {@link ptyTranscriptSimulatedPlainScreen}.
  * - **Simulated screen** (`ptyTranscriptSimulatedPlainScreen`): cursor/erase replay → plain text ≈ user-visible cells.
  */
+import { INTERACTIVE_INPUT_READY_OSC } from '../config/interactiveInputReadyOsc'
 
 // --- ANSI stripping ---
 const HISTORY_INPUT_BG = '\x1b[48;5;236m'
@@ -158,13 +159,6 @@ function collectSectionLines(
   }
   return result
 }
-
-/**
- * TTY writes this when the input box is ready; PTY E2E waits on it.
- * Byte-identical to `cli/src/renderer.ts` (Cypress plugin must not import `cli/`).
- */
-export const INTERACTIVE_INPUT_READY_OSC =
-  '\x1b]900;doughnut-interactive-input-ready\x07' as const
 
 /** True when the capture is from a real PTY interactive session (emits `INTERACTIVE_INPUT_READY_OSC`). */
 export function ptyStdoutHasInputReadyMarker(stdout: string): boolean {

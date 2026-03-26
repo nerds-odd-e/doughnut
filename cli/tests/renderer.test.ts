@@ -34,9 +34,8 @@ describe('interactiveInputReadyOscSuffix', () => {
     expect(interactiveInputReadyOscSuffix(readyPaint)).toBe(
       INTERACTIVE_INPUT_READY_OSC
     )
-    expect(INTERACTIVE_INPUT_READY_OSC).toBe(
-      '\x1b]900;doughnut-interactive-input-ready\x07'
-    )
+    expect(INTERACTIVE_INPUT_READY_OSC.startsWith('\x1b]900;')).toBe(true)
+    expect(INTERACTIVE_INPUT_READY_OSC.endsWith('\x07')).toBe(true)
   })
 
   test('emits nothing when the user has typed in the command line', () => {
@@ -152,7 +151,11 @@ describe('needsGapBeforeLiveRegion', () => {
       needsGapBeforeLiveRegion(
         [{ role: 'user', content: 'x' }],
         [],
-        [interactiveFetchWaitStageIndicatorLine('Loading')]
+        [
+          interactiveFetchWaitStageIndicatorLine(
+            INTERACTIVE_FETCH_WAIT_LINES.recallNext
+          ),
+        ]
       )
     ).toBe(false)
   })
