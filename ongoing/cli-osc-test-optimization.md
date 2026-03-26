@@ -19,7 +19,9 @@ The E2E layer is **fragile and complex** because the OSC is **absent** during fe
 
 ## North star
 
-**One clear contract** for “automation may send keystrokes” that tests can wait on, with **minimal magic timers** and **one canonical definition** of the marker string in the repo.
+**End state:** test synchronization is based on **manual-observable terminal behavior only** (prompt/guidance/loading transitions), with **no OSC dependency** in E2E or Vitest.
+
+**Interim state:** keep OSC as a temporary sync primitive only while visible-state waiters are introduced and proven stable.
 
 **Non-goals (unless a phase explicitly expands):** Changing user-visible TTY layout; rewriting the whole Ink shell.
 
@@ -30,6 +32,7 @@ The E2E layer is **fragile and complex** because the OSC is **absent** during fe
 - **Production:** OSC must stay **private** (not FinalTerm 133) so shell integration does not treat it as a prompt boundary — see comment on `INTERACTIVE_INPUT_READY_OSC` in `renderer.ts`.
 - **OSC scope:** Emitted for **TTY interactive** only; subcommand / script runs (`version`, `update`) have no input-ready OSC — E2E distinguishes PTY vs one-shot stdout (`outputAssertions.ts`).
 - **Fetch-wait:** Today the OSC is **omitted** while loading; any simplification must **preserve** correct sync for slow paths (no flaky “type before UI ready”).
+- **Removal bar:** do not remove OSC until visible-state waiters pass repeated interactive E2E runs (including fetch-wait and MCQ paths) with no regression in flake rate.
 
 ---
 
@@ -68,14 +71,52 @@ The E2E layer is **fragile and complex** because the OSC is **absent** during fe
 
 **Verify:** `pnpm cli:test` interactive suite.
 
+### Phase 5 — Add visible readiness predicates in E2E (manual-observable contract)
+
+**Outcome:** `cliPtyRunner` can wait for readiness using **only visible transcript/simulated-screen conditions**, not OSC bytes.
+
+**Direction:** Add explicit readiness predicates built from existing parser helpers (`ptyTranscriptSimulatedPlainScreen`, section parsers), e.g.:
+
+- command line row visible and stable
+- not in fetch-wait visible state (`loading ...` and known fetch-wait labels absent when expecting input)
+- expected panel state present (MCQ choices, yes/no prompt, token list) before sending next key
+
+Keep this path behind an internal toggle (`osc` vs `visible`) so both strategies can be run in CI while migrating.
+
+**Verify:** targeted interactive `cli/*.feature` specs pass under visible strategy.
+
+### Phase 6 — Make visible strategy default; OSC fallback only
+
+**Outcome:** all interactive E2E uses visible waits by default; OSC path exists only as fallback/debug gate.
+
+**Direction:** switch default waiter mode to visible strategy, keep temporary fallback for triage, and add failure diagnostics that explain which visible predicate timed out.
+
+**Verify:** repeat-run fetch-wait + MCQ + yes/no scenarios; confirm no increased flakes vs baseline.
+
+### Phase 7 — Remove OSC from tests completely
+
+**Outcome:** no test code depends on OSC sequence.
+
+**Direction:**
+
+1. Remove OSC-based wait path and test constants from E2E.
+2. Remove Vitest assertions that require OSC bytes.
+3. Remove any test-only docs/comments that prescribe OSC sync.
+
+Keep production OSC temporarily if needed for non-test consumers; removal from production path can be a follow-up plan only if still justified.
+
+**Verify:** interactive E2E and CLI Vitest suites stay green with visible-only synchronization.
+
 ---
 
 ## Done checklist
 
-- [ ] Canonical OSC string in one place.
-- [ ] Contract documented (emit / omit / suffix).
-- [ ] `cliPtyRunner` simpler or explicitly state-machine with less duplicated magic.
-- [ ] Interactive E2E + Vitest green.
+- [ ] Canonical OSC string in one place (interim).
+- [ ] Contract documented (emit / omit / suffix) with migration note.
+- [ ] `cliPtyRunner` supports visible readiness predicates.
+- [ ] Visible strategy is default in E2E.
+- [ ] OSC removed from all tests (E2E + Vitest assertions).
+- [ ] Interactive E2E + Vitest green under visible-only sync.
 
 ---
 
@@ -85,5 +126,6 @@ The E2E layer is **fragile and complex** because the OSC is **absent** during fe
 - `cli/src/adapters/interactiveTtyStdout.ts` — writes OSC
 - `cli/src/adapters/interactiveTtySession.ts` — `handleShellRendered`, fetch-wait buffering notes
 - `e2e_test/config/cliPtyRunner.ts` — wait loops and timings
-- `e2e_test/step_definitions/cliSectionParser.ts` — duplicated OSC + `ptyStdoutHasInputReadyMarker`
+- `e2e_test/step_definitions/cliSectionParser.ts` — visible transcript/screen parsing helpers
+- `e2e_test/start/pageObjects/cli/outputAssertions.ts` — PTY vs non-interactive output assertions
 - `ongoing/cli-strict-ink-north-star.md` — strict caret / TextInput follow-up
