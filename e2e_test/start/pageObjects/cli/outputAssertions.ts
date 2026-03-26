@@ -8,10 +8,8 @@
 import {
   countInputBoxTopBorderLinesInInteractivePtyTranscript,
   getCurrentGuidanceAndHistoryRaw,
-  getCurrentGuidanceDebug,
   getHistoryInputContent,
   getHistoryOutputContent,
-  getRecallDisplaySections,
   interactiveCliPtyTranscriptApproxVisiblePlainText,
   ptyStdoutHasInputReadyMarker,
 } from '../../../step_definitions/cliSectionParser'
@@ -133,26 +131,6 @@ function historyInput() {
   }
 }
 
-function currentGuidanceFailureMessage(
-  stdout: string,
-  expected: string
-): string {
-  const { currentGuidanceContent, inputBoxLineRange, lineCount, rawTail } =
-    getCurrentGuidanceDebug(stdout)
-  const linesAfterBox =
-    inputBoxLineRange.end >= 0 ? lineCount - inputBoxLineRange.end - 1 : 0
-  return [
-    `Expected "${expected}" in ${SECTION.currentGuidance} (prompts, hints, options for the current input).`,
-    ``,
-    `Parser: command line row at line ${inputBoxLineRange.start}–${inputBoxLineRange.end} of ${lineCount} lines. Lines after command line: ${linesAfterBox}.`,
-    ``,
-    `${SECTION.currentGuidance}: ${currentGuidanceContent ? `"${currentGuidanceContent}"` : '(empty)'}`,
-    ``,
-    `Raw output tail (\\r→\\r \\n→\\n ):`,
-    rawTail,
-  ].join('\n')
-}
-
 function visibleInteractivePtyScreen() {
   const target = SECTION.simulatedVisiblePtyScreen
   return {
@@ -179,18 +157,25 @@ function visibleInteractivePtyScreen() {
 function currentGuidance() {
   const target = SECTION.currentGuidance
   return {
+    /** Gherkin “Current guidance” names the live recall / hints area; we assert on visible PTY replay, not line-split “guidance” parsing. */
     expectContains(expected: string) {
       withStdoutFor(
         { kind: 'ptyInteractive', assertionTarget: target },
         (stdout) => {
-          const { currentGuidanceAndHistory } = getRecallDisplaySections(stdout)
-          const msg = currentGuidanceAndHistory.includes(expected)
-            ? undefined
-            : currentGuidanceFailureMessage(stdout, expected)
-          expect(currentGuidanceAndHistory, msg).to.include(expected)
+          const visible =
+            interactiveCliPtyTranscriptApproxVisiblePlainText(stdout)
+          const tail = visible.slice(-1200)
+          const hint =
+            `Expected "${expected}" for step "… in the Current guidance" ` +
+            `(checked on ${SECTION.simulatedVisiblePtyScreen} after cursor/erase replay). Tail:\n${tail}`
+          expect(visible, hint).to.include(expected)
         }
       )
     },
+    /**
+     * Bold/italic: PTY cursor replay skips SGR (`m`) sequences, so replayed “raw” grids drop ANSI.
+     * Use merged transcript+history raw (Ink output still in the byte stream) for styling only.
+     */
     expectStyled(expected: string) {
       withStdoutFor(
         { kind: 'ptyInteractive', assertionTarget: target },
@@ -199,13 +184,13 @@ function currentGuidance() {
           expectSectionContainsSubstring(
             raw,
             expected,
-            `raw ${SECTION.currentGuidance}`
+            `raw ${SECTION.currentGuidance} (transcript merge; SGR not in cursor replay grid)`
           )
           const hasBold = raw.includes('\x1b[1m')
           const hasItalic = raw.includes('\x1b[3m')
           expect(
             hasBold || hasItalic,
-            `Expected ANSI styling (bold or italic) in ${SECTION.currentGuidance}. Raw length: ${raw.length}`
+            `Expected ANSI bold or italic in Ink output for styled Current guidance step. Raw length: ${raw.length}`
           ).to.be.true
         }
       )

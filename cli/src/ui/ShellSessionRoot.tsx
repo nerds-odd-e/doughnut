@@ -104,6 +104,8 @@ export function getLiveRegionPromptStageSnapshot(
     : null
   const numberedChoicePromptLines =
     deps.getNumberedChoiceListCurrentPromptWrappedLines(width)
+  const spellingPromptLines =
+    deps.getSpellingRecallCurrentPromptWrappedLines(width)
   const waitLine = getInteractiveFetchWaitLine()
   const tokenListConfig = session.tokenSelection
     ? deps.TOKEN_LIST_COMMANDS[session.tokenSelection.command]
@@ -121,6 +123,12 @@ export function getLiveRegionPromptStageSnapshot(
       !deps.isPendingStopConfirmation()
     ) {
       currentPromptWrappedLines = numberedChoicePromptLines
+    } else if (
+      !session.tokenSelection &&
+      spellingPromptLines !== null &&
+      !deps.isPendingStopConfirmation()
+    ) {
+      currentPromptWrappedLines = spellingPromptLines
     } else if (currentPromptText) {
       currentPromptWrappedLines = wrapTextToVisibleWidthLines(
         currentPromptText,

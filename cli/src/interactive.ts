@@ -202,14 +202,21 @@ function showRecallPrompt(
         p.spellingQuestion?.notebook ?? p.notebook,
         p.note
       )
-      output.beginCurrentPrompt?.()
-      writeCurrentPrompt(formatRecallNotebookCurrentPromptLine(notebookTitle))
       const stem = p.spellingQuestion?.stem ?? ''
-      writeCurrentPrompt(`Spell: ${renderMarkdownToTerminal(stem || '...')}`)
+      const spellLineRenderedForTerminal = `Spell: ${renderMarkdownToTerminal(
+        stem || '...'
+      )}`
+      output.beginCurrentPrompt?.()
+      if (!output.beginCurrentPrompt) {
+        writeCurrentPrompt(formatRecallNotebookCurrentPromptLine(notebookTitle))
+        writeCurrentPrompt(spellLineRenderedForTerminal)
+      }
       pendingRecallAnswer = {
         recallPromptId: p.id,
         type: 'spelling',
         shownAt: Date.now(),
+        notebookTitle,
+        spellLineRenderedForTerminal,
       }
       return
     }
@@ -563,7 +570,14 @@ export async function processInput(
     } else if (isSpellingRecallPending(pendingRecallAnswer)) {
       const { recallPromptId } = pendingRecallAnswer
       if (!trimmed) {
-        writeCurrentPrompt('Please type your spelling')
+        if (output.beginCurrentPrompt) {
+          pendingRecallAnswer = {
+            ...pendingRecallAnswer,
+            ttyRepromptLine: 'Please type your spelling',
+          }
+        } else {
+          writeCurrentPrompt('Please type your spelling')
+        }
         return false
       }
       try {
@@ -671,6 +685,23 @@ function getNumberedChoiceListCurrentPromptWrappedLines(
   ]
 }
 
+function getSpellingRecallCurrentPromptWrappedLines(
+  width: number
+): string[] | null {
+  const p = pendingRecallAnswer
+  if (!isSpellingRecallPending(p)) return null
+  if (p.ttyRepromptLine !== undefined) {
+    return wrapTextToVisibleWidthLines(p.ttyRepromptLine, width)
+  }
+  return [
+    ...wrapTextToVisibleWidthLines(
+      formatRecallNotebookCurrentPromptLine(p.notebookTitle),
+      width
+    ),
+    ...wrapMarkdownTerminalToLines(p.spellLineRenderedForTerminal, width),
+  ]
+}
+
 function isNumberedChoiceListActive(): boolean {
   return isMcqRecallPending(pendingRecallAnswer)
 }
@@ -703,6 +734,7 @@ function buildTTYDeps() {
     isNumberedChoiceListActive,
     getNumberedChoiceListChoices,
     getNumberedChoiceListCurrentPromptWrappedLines,
+    getSpellingRecallCurrentPromptWrappedLines,
     usesSessionYesNoInputChrome,
     getDefaultTokenLabel,
     listAccessTokens,

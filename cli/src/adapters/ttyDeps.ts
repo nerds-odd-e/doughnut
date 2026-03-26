@@ -22,6 +22,7 @@ export interface TTYDeps {
   getNumberedChoiceListCurrentPromptWrappedLines: (
     width: number
   ) => string[] | null
+  getSpellingRecallCurrentPromptWrappedLines: (width: number) => string[] | null
   usesSessionYesNoInputChrome: (inTokenList: boolean) => boolean
   getDefaultTokenLabel: () => AccessTokenLabel | undefined
   listAccessTokens: () => AccessTokenEntry[]

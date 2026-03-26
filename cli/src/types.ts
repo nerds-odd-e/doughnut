@@ -25,6 +25,11 @@ export type SpellingRecallPending = {
   recallPromptId: RecallPrompt['id']
   type: 'spelling'
   shownAt: number
+  notebookTitle: string
+  /** `Spell: …` with markdown rendered for terminal (may include SGR). */
+  spellLineRenderedForTerminal: string
+  /** TTY: empty submit — show only this reprompt line until the next valid answer attempt. */
+  ttyRepromptLine?: string
 }
 
 /** Just-review step: user answers y/n on whether they remember the note. */
