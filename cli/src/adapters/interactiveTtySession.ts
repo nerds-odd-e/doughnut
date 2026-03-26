@@ -417,15 +417,11 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
     interactiveTtyStdout.inputReadyOsc()
   }
 
-  /** Drop one readline Esc after Ink dismisses stop confirm so MCQ is not re-armed by the same key. */
-  let suppressReadlineEscapeOpensStopConfirmOnce = false
-
   async function handleStopConfirmDispatch(
     dispatch: RecallInkConfirmChoice
   ): Promise<void> {
     switch (dispatch.result) {
       case 'cancel':
-        suppressReadlineEscapeOpensStopConfirmOnce = true
         setPendingStopConfirmation(false)
         patchAndDraw((s) => ({
           ...s,
@@ -443,7 +439,6 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
         commitHistoryOutput(getStopConfirmationYesOutcomeLines())
         break
       case 'submit-no':
-        suppressReadlineEscapeOpensStopConfirmOnce = true
         setPendingStopConfirmation(false)
         patchAndDraw((s) => ({
           ...s,
@@ -902,11 +897,12 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
 
   /**
    * Readline `emitKeypressEvents` runs alongside Ink on the same stdin. Ink owns normal typing
-   * and list navigation (`useInput` in live panels). This listener is only for:
+   * and MCQ list keys (stdin). This listener is only for:
    * - Ctrl+C (always; exit before other routing).
    * - Fetch-wait Esc cancel — {@link FetchWaitDisplay} has no `useInput`.
-   * - Esc on MCQ / token list when keypress ordering means the list panel’s Ink handler is unreliable
-   *   (Ink still handles Esc when it receives it; handlers are idempotent where both fire).
+   * - Esc on the access-token list when needed (Ink still handles Esc when it receives it).
+   * Do not handle MCQ Esc here: the same byte is already consumed by Ink; a second readline Esc
+   * (often after `escapeCodeTimeout`) would re-open stop confirmation after Ink dismissed it.
    * When the default command line is active, return immediately so readline does not handle command-line keys.
    */
   stdin.on('keypress', (_str, key: ReadlineKey) => {
@@ -926,14 +922,6 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
       isPendingStopConfirmation() ||
       usesSessionYesNoInputChrome(!!session.tokenSelection)
     ) {
-      return
-    }
-    if (key.name === 'escape' && getNumberedChoiceListChoices() !== null) {
-      if (suppressReadlineEscapeOpensStopConfirmOnce) {
-        suppressReadlineEscapeOpensStopConfirmOnce = false
-        return
-      }
-      enterStopConfirmationFromEsc()
       return
     }
     if (key.name === 'escape' && session.tokenSelection) {

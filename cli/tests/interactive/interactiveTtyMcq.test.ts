@@ -14,7 +14,6 @@ import { INTERACTIVE_INPUT_READY_OSC, stripAnsi } from '../../src/renderer.js'
 import {
   endTTYSession,
   expectTtyRecallYesNoReplyScrollback,
-  pressKey,
   pushTTYCommandBytes,
   pushTTYCommandEnter,
   pushTTYCommandEscape,
@@ -154,8 +153,7 @@ describe('TTY recall MCQ', () => {
       mockAnswerQuiz.mockClear()
       writeSpy.mockClear()
 
-      pressKey(stdin, 'escape')
-      await tick()
+      await pushTTYCommandEscape(stdin)
 
       const escRepaint = stripAnsi(ttyOutput(writeSpy))
       expect(
@@ -187,8 +185,7 @@ describe('TTY recall MCQ', () => {
       mockAnswerQuiz.mockClear()
       writeSpy.mockClear()
 
-      pressKey(stdin, 'escape')
-      await tick()
+      await pushTTYCommandEscape(stdin)
 
       pushTTYCommandBytes(stdin, 'n')
       await tick()
@@ -206,7 +203,7 @@ describe('TTY recall MCQ', () => {
       await submitTTYCommand(stdin, '/recall')
       mockAnswerQuiz.mockClear()
 
-      pressKey(stdin, 'escape')
+      await pushTTYCommandEscape(stdin)
       await vi.waitFor(() =>
         expect(stripAnsi(ttyOutput(writeSpy))).toContain('Stop recall? (y/n)')
       )
@@ -227,7 +224,7 @@ describe('TTY recall MCQ', () => {
       ).toBeGreaterThan(-1)
       expect(
         stopIdx === -1 || stemIdx > stopIdx,
-        'Stop sheet must stay dismissed: if the last “Stop recall?” is after the last MCQ stem, a late readline Esc likely re-opened stop confirmation after Ink cancelled (flicker then stuck on y/n).'
+        'Stop sheet must stay dismissed: if the last “Stop recall?” is after the last MCQ stem, stop confirmation was re-opened after Esc “go back” (duplicate Esc handling).'
       ).toBe(true)
     })
   })
