@@ -3,6 +3,7 @@ import { Box, Text, useFocus, useInput, type Key } from 'ink'
 import type { AccessTokenEntry, AccessTokenLabel } from '../accessToken.js'
 import type { RecallMcqChoiceTexts } from '../types.js'
 import {
+  buildCurrentPromptSeparatorForStageBand,
   formatMcqChoiceLinesWithIndices,
   PROMPT,
   stripAnsi,
@@ -97,6 +98,7 @@ export function RecallMcqChoicesLivePanel({
 export type AccessTokenPickerLivePanelProps = {
   stageIndicatorLine: string
   currentPromptLines: string[]
+  width: TerminalWidth
   items: AccessTokenEntry[]
   defaultLabel: AccessTokenLabel | undefined
   highlightIndex: number
@@ -108,6 +110,7 @@ export type AccessTokenPickerLivePanelProps = {
 export function AccessTokenPickerLivePanel({
   stageIndicatorLine,
   currentPromptLines,
+  width,
   items,
   defaultLabel,
   highlightIndex,
@@ -117,8 +120,9 @@ export function AccessTokenPickerLivePanel({
   useLiveSelectionGuidanceStdin(onGuidanceListKey, onInterrupt)
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" width={width}>
       <Text>{stageIndicatorLine}</Text>
+      <Text>{buildCurrentPromptSeparatorForStageBand(width)}</Text>
       {currentPromptLines.map((line, i) => (
         <Text key={i}>{line}</Text>
       ))}

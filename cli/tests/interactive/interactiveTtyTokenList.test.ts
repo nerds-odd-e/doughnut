@@ -1,7 +1,20 @@
 import './interactiveTestMocks.js'
 import { describe, test, expect, type vi, beforeEach, afterEach } from 'vitest'
 import { resetRecallStateForTesting } from '../../src/interactive.js'
-import { stripAnsiCsiAndCr } from '../../src/renderer.js'
+import {
+  buildCurrentPromptSeparatorForStageBand,
+  getTerminalWidth,
+  stripAnsiCsiAndCr,
+} from '../../src/renderer.js'
+
+/** Ink may close colors with `39m`/`49m` instead of trailing `0m`; assert the band + rule body only. */
+function bandedCurrentPromptSeparatorBody(width: number): string {
+  const ansiResetAtEnd = new RegExp(`${String.fromCharCode(0x1b)}\\[0m$`)
+  return buildCurrentPromptSeparatorForStageBand(width).replace(
+    ansiResetAtEnd,
+    ''
+  )
+}
 import {
   maxConsecutiveBlankLines,
   simulatedScreenFromTtyWrites,
@@ -41,6 +54,38 @@ describe('TTY token list interactive mode', () => {
   afterEach(() => {
     restoreConfigDir()
     endTTYSession(stdin)
+  })
+
+  test('/list-access-token: banded Current prompt separator between stage line and instruction (TTY bytes)', async () => {
+    writeSpy.mockClear()
+    await submitTTYCommand(stdin, '/list-access-token')
+
+    const output = ttyOutput(writeSpy)
+    const width = getTerminalWidth()
+    const bandedSeparatorBody = bandedCurrentPromptSeparatorBody(width)
+    const stageLabel = 'Access tokens'
+    const instructionNeedle = 'Select and enter to change the default'
+
+    const stageIdx = output.indexOf(stageLabel)
+    const instructionIdx = output.indexOf(instructionNeedle)
+    expect(
+      stageIdx,
+      `TTY capture must include stage label "${stageLabel}" (token list Current Stage indicator).`
+    ).toBeGreaterThanOrEqual(0)
+    expect(
+      instructionIdx,
+      `TTY capture must include instruction starting with "${instructionNeedle}".`
+    ).toBeGreaterThanOrEqual(0)
+    expect(
+      instructionIdx,
+      `Instruction must render after "${stageLabel}" in the live Current prompt block. stageIdx=${stageIdx}, instructionIdx=${instructionIdx}`
+    ).toBeGreaterThan(stageIdx)
+
+    const betweenStageAndInstruction = output.slice(stageIdx, instructionIdx)
+    expect(
+      betweenStageAndInstruction.includes(bandedSeparatorBody),
+      `Missing banded separator (grey bg + ${width} green box-drawing columns) between stage and instruction — same as CommandLineLivePanel under a stage indicator. Preview after stage: ${JSON.stringify(betweenStageAndInstruction.slice(0, 160))}`
+    ).toBe(true)
   })
 
   test('Ink renders token list content after /list-access-token', async () => {

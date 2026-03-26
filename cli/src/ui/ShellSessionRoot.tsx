@@ -9,6 +9,7 @@ import {
   buildSuggestionLinesForInk,
   buildTokenListLines,
   DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
+  formatCurrentStageIndicatorLine,
   getLastLine,
   getTerminalWidth,
   greyCurrentStageIndicatorLabel,
@@ -279,11 +280,15 @@ function buildLivePanel(
       ? wrapTextToVisibleWidthLines(tokenListConfig.currentPrompt, width)
       : []
     const stageIndicatorLine = tokenListConfig
-      ? greyCurrentStageIndicatorLabel(tokenListConfig.stageIndicator)
+      ? formatCurrentStageIndicatorLine(
+          greyCurrentStageIndicatorLabel(tokenListConfig.stageIndicator),
+          width
+        )
       : ''
     return React.createElement(AccessTokenPickerLivePanel, {
       stageIndicatorLine,
       currentPromptLines: promptLines,
+      width,
       items: session.tokenSelection.items,
       defaultLabel: deps.getDefaultTokenLabel(),
       highlightIndex: session.tokenSelection.highlightIndex,
