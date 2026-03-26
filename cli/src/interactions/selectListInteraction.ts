@@ -111,6 +111,7 @@ export function dispatchSelectListKey(
 /** Same boolean flags Ink uses on `Key` for stdin routing; kept here so this file stays free of `ink`. */
 export type InkLikeKey = {
   escape?: boolean
+  name?: string
   return?: boolean
   upArrow?: boolean
   downArrow?: boolean
@@ -127,14 +128,15 @@ export function selectListKeyEventFromInk(
   lineDraft: string
 ): SelectListKeyEvent {
   const submitPressed = !!(key.return || input === '\n' || input === '\r')
+  const isEscape = key.escape || key.name === 'escape' || input === '\u001b'
   let keyName: string | undefined
-  if (key.escape) keyName = 'escape'
+  if (isEscape) keyName = 'escape'
   else if (key.upArrow) keyName = 'up'
   else if (key.downArrow) keyName = 'down'
   else if (key.backspace || key.delete) keyName = 'backspace'
 
   const isNavigationOrEditKey =
-    key.escape ||
+    isEscape ||
     key.return ||
     key.backspace ||
     key.delete ||

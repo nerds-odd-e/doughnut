@@ -59,8 +59,9 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     expect(isInRecallSubstate()).toBe(true)
 
     pushTTYCommandBytes(stdin, 'y')
-    await vi.waitFor(() =>
-      expect(ttyOutput(writeSpy)).toContain('Stopped recall')
+    await vi.waitFor(
+      () => expect(ttyOutput(writeSpy)).toContain('Stopped recall'),
+      { timeout: 3000 }
     )
     expectTtyRecallYesNoReplyScrollback(writeSpy, 'y')
     expect(mockAnswerSpelling).not.toHaveBeenCalled()
@@ -77,9 +78,16 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     writeSpy.mockClear()
 
     await pushTTYCommandEscape(stdin)
+    await vi.waitFor(() =>
+      expect(stripAnsi(ttyOutput(writeSpy))).toContain('Stop recall? (y/n)')
+    )
 
     pushTTYCommandBytes(stdin, 'n')
-    await tick()
+    await vi.waitFor(() =>
+      expect(ttyOutput(writeSpy)).toContain(
+        'type your answer; /stop to exit recall'
+      )
+    )
 
     expect(isInRecallSubstate()).toBe(true)
     expect(mockAnswerSpelling).not.toHaveBeenCalled()
@@ -102,6 +110,9 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     mockMarkAsRecalled.mockClear()
     writeSpy.mockClear()
     await pushTTYCommandEscape(stdin)
+    await vi.waitFor(() =>
+      expect(stripAnsi(ttyOutput(writeSpy))).toContain('Stop recall? (y/n)')
+    )
 
     const escRepaint = stripAnsi(ttyOutput(writeSpy))
     expect(escRepaint).toContain('Stop recall? (y/n)')
@@ -110,7 +121,9 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     expect(isInRecallSubstate()).toBe(true)
 
     pushTTYCommandBytes(stdin, 'y')
-    await tick()
+    await vi.waitFor(() =>
+      expect(ttyOutput(writeSpy)).toContain('Stopped recall')
+    )
 
     expect(ttyOutput(writeSpy)).toContain('Stopped recall')
     expectTtyRecallYesNoReplyScrollback(writeSpy, 'y')
@@ -130,9 +143,14 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     writeSpy.mockClear()
 
     await pushTTYCommandEscape(stdin)
+    await vi.waitFor(() =>
+      expect(stripAnsi(ttyOutput(writeSpy))).toContain('Stop recall? (y/n)')
+    )
 
     pushTTYCommandBytes(stdin, 'n')
-    await tick()
+    await vi.waitFor(() =>
+      expect(ttyOutput(writeSpy)).toContain('y or n; /stop to exit recall')
+    )
 
     expect(isInRecallSubstate()).toBe(true)
     expect(mockMarkAsRecalled).not.toHaveBeenCalled()
@@ -147,6 +165,9 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
 
     writeSpy.mockClear()
     await pushTTYCommandEscape(stdin)
+    await vi.waitFor(() =>
+      expect(stripAnsi(ttyOutput(writeSpy))).toContain('Stop recall? (y/n)')
+    )
 
     const escRepaint = stripAnsi(ttyOutput(writeSpy))
     expect(escRepaint).toContain('Stop recall? (y/n)')
@@ -154,7 +175,9 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     expect(isInRecallSubstate()).toBe(true)
 
     pushTTYCommandBytes(stdin, 'y')
-    await tick()
+    await vi.waitFor(() =>
+      expect(ttyOutput(writeSpy)).toContain('Stopped recall')
+    )
 
     expect(ttyOutput(writeSpy)).toContain('Stopped recall')
     expectTtyRecallYesNoReplyScrollback(writeSpy, 'y')
@@ -187,9 +210,14 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
     await submitTTYCommand(stdin, '/recall')
 
     await pushTTYCommandEscape(stdin)
+    await vi.waitFor(() =>
+      expect(stripAnsi(ttyOutput(writeSpy))).toContain('Stop recall? (y/n)')
+    )
 
     pushTTYCommandBytes(stdin, 'n')
-    await tick()
+    await vi.waitFor(() =>
+      expect(ttyOutput(writeSpy)).toContain('Load more from next 3 days? (y/n)')
+    )
 
     expect(isInRecallSubstate()).toBe(true)
     expect(ttyOutput(writeSpy)).toContain('Load more from next 3 days? (y/n)')

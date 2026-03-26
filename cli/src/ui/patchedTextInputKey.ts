@@ -18,8 +18,9 @@ export function applyPatchedTextInputKey(
   if (key.return || input === '\r' || input === '\n') {
     return { kind: 'submit' }
   }
+  const isEscape = key.escape || key.name === 'escape' || input === '\u001b'
   if (
-    key.escape ||
+    isEscape ||
     key.tab ||
     (key.shift && key.tab) ||
     key.upArrow ||

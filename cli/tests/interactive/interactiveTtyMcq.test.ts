@@ -155,6 +155,9 @@ describe('TTY recall MCQ', () => {
       writeSpy.mockClear()
 
       await pushTTYCommandEscape(stdin)
+      await vi.waitFor(() =>
+        expect(stripAnsi(ttyOutput(writeSpy))).toContain('Stop recall? (y/n)')
+      )
 
       const escRepaint = stripAnsi(ttyOutput(writeSpy))
       expect(
@@ -172,7 +175,9 @@ describe('TTY recall MCQ', () => {
       expect(escRepaint).toContain('y or n; Esc to go back')
 
       pushTTYCommandBytes(stdin, 'y')
-      await tick()
+      await vi.waitFor(() =>
+        expect(ttyOutput(writeSpy)).toContain('Stopped recall')
+      )
 
       const out = ttyOutput(writeSpy)
       expect(out).toContain('Stopped recall')
@@ -187,9 +192,12 @@ describe('TTY recall MCQ', () => {
       writeSpy.mockClear()
 
       await pushTTYCommandEscape(stdin)
+      await vi.waitFor(() =>
+        expect(stripAnsi(ttyOutput(writeSpy))).toContain('Stop recall? (y/n)')
+      )
 
       pushTTYCommandBytes(stdin, 'n')
-      await tick()
+      await vi.waitFor(() => expect(ttyOutput(writeSpy)).toContain('  1. 4'))
 
       expect(isInRecallSubstate()).toBe(true)
       expect(mockAnswerQuiz).not.toHaveBeenCalled()

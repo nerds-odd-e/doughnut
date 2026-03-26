@@ -67,7 +67,8 @@ export function RecallInkConfirmPanel(props: RecallInkConfirmPanelProps) {
       }
       if (!isFocusedRef.current && inkFocusEverEstablishedRef.current) return
 
-      if (ky.escape) {
+      const isEscape = ky.escape || ky.name === 'escape' || inp === '\u001b'
+      if (isEscape) {
         if (p.variant === 'in-session' && p.whenInActiveRecallSession()) {
           dispatched = true
           p.onEscapeOpensStopRecallSheet()

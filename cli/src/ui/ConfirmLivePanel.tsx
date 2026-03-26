@@ -22,14 +22,15 @@ function sessionKeyEventFromInk(
 ): SessionYesNoLineKeyEvent {
   const submitPressed = isSubmitKeyInk(key, input)
   let keyName: string | undefined
-  if (key.escape) keyName = 'escape'
+  const isEscape = key.escape || key.name === 'escape' || input === '\u001b'
+  if (isEscape) keyName = 'escape'
   else if (key.return || submitPressed) keyName = 'return'
   else if (key.backspace || key.delete) keyName = 'backspace'
 
   const bareLineEnding = input === '\n' || input === '\r'
   let str: string | undefined
   if (
-    !(key.escape || key.return || key.backspace || key.delete) &&
+    !(isEscape || key.return || key.backspace || key.delete) &&
     input.length > 0 &&
     !key.ctrl &&
     !key.meta &&
@@ -127,7 +128,7 @@ export function ConfirmLivePanel({
         p.onInterrupt()
         return
       }
-      if (ky.escape) {
+      if (ky.escape || ky.name === 'escape' || inp === '\u001b') {
         if (p.escapeToNestedStopConfirm && p.isInCommandSessionSubstate()) {
           p.onNestedStopConfirm()
           return

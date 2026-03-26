@@ -1,5 +1,5 @@
 import './interactiveTestMocks.js'
-import { describe, test, expect, type vi, beforeEach, afterEach } from 'vitest'
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { resetRecallStateForTesting } from '../../src/interactive.js'
 import {
   buildCurrentPromptSeparatorForStageBand,
@@ -286,6 +286,9 @@ describe('TTY token list interactive mode', () => {
     writeSpy.mockClear()
 
     await pushTTYCommandEscape(stdin)
+    await vi.waitFor(() =>
+      expect(ttyOutput(writeSpy)).toContain('Cancelled by user.')
+    )
 
     const output = ttyOutput(writeSpy)
     expect(output).toContain('Cancelled by user.')

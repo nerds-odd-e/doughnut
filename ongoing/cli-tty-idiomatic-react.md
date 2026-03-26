@@ -10,12 +10,20 @@ Informal plan. Delete or shrink when this refactor is done or parked.
 - **Delete dead code and the tests that exist only to cover it** in the same change. Do **not** keep tests as anchors for removed product behavior.
 - **Remove excessive abstraction**: merge thin wrappers, collapse props-drilling layers, inline one-off helpers, fold **`ShellSessionRoot` / `InteractiveShellDisplay` / live panels** where a single tree reads clearer after the React root move.
 
-## Current shape (research)
+## Status snapshot (2026-03-27)
 
-- **`runInteractiveTtySession`** holds **`session: ShellSessionState`** in a closure. **`patch`** applies `applyShellSessionPatch`; **`patchAndDraw`** patches then **`drawBox()`**.
-- **`drawBox`** builds `React.createElement(ShellSessionRoot, { session, deps, handlers })`, calls **`render` once** or **`shellInstance.rerender(tree)`**, then **`handleShellRendered()`** (input-ready OSC, cursor hide/show, **`finalizeInteractiveLiveRegionPaint`**).
-- **`ShellSessionRoot`** is already a pure function of **`session` + `deps` + `handlers`**; the bloat is **dual ownership of truth** (closure + forced **`rerender`**) and **many call sites**.
-- **Hybrid “state”**: **`getInteractiveFetchWaitLine()`**, **`TTYDeps`** flags — post-paint effects must track **visible mode** without reintroducing a manual “repaint everything” knob.
+- **Phase 1 is implemented and green in `cli` tests.**
+- `runInteractiveTtySession` now uses a **single Ink mount** and a reducer-driven React root (`InteractiveTtyInkApp` inside the adapter file).
+- The old imperative repaint loop is removed: no adapter-level `drawBox`, `patchAndDraw`, or manual `shellInstance.rerender`.
+- `ShellSessionRoot` remains as the view boundary for now (not inlined yet).
+- No Phase 2 architecture move yet: terminal side-effect contract still runs via adapter-owned logic, even though render lifecycle is now React-driven.
+
+## Current shape (after Phase 1)
+
+- **`runInteractiveTtySession`** mounts Ink **once** and renders an internal app component with **React-owned session state**.
+- State transitions are routed through reducer patching + refs so async handlers read current state without closure drift.
+- **`ShellSessionRoot`** continues to be a pure function of **`session` + `deps` + `handlers`**.
+- Repaint-sensitive behavior is now primarily governed by state transitions and effect timing, not explicit draw calls.
 
 ### `commandTurn` and repaint discipline
 
@@ -44,9 +52,10 @@ Order by **net simplification + safety**. Prefer **one user-visible slice** per 
 
 ### Phase 1 — React root + remove `drawBox`
 
-- **`InteractiveTtyInkApp`** (or similar): **`useReducer`** (+ **ref** for non-UI buffers if kept).
-- **`runInteractiveTtySession`**: **one `render`**; eliminate **`drawBox` / `patchAndDraw` / manual `rerender`**.
-- **Collapse** obvious glue: e.g. **inline `ShellSessionRoot` into one app component** if props/handlers shrink after **`useReducer`**.
+- ✅ Implemented.
+- `runInteractiveTtySession` now performs one Ink `render` and no longer drives UI through imperative redraw helpers.
+- Kept `ShellSessionRoot` as-is for this phase to minimize behavior churn and keep Phase 2 isolated.
+- Related interactive Vitest coverage was adjusted to assert observable outcomes where repaint-byte timing changed under the new render model.
 
 ### Phase 2 — Terminal side effects + external signals
 
@@ -69,8 +78,9 @@ Order by **net simplification + safety**. Prefer **one user-visible slice** per 
 
 ## Risks / watch list
 
-- **Stale closures** in async **`processInput`**: use **functional `dispatch`** / refs.
-- **OSC timing**: let **failing tests** choose **`useLayoutEffect`** vs follow-up microtask — **only for kept behavior**.
+- **ESC/input event shape differences** (`key.escape`, `key.name`, raw `\u001b`) surfaced during Phase 1; treat them as one normalized escape signal in interaction handlers.
+- **Stale closures** in async **`processInput`** still require ref-backed reads where state freshness matters.
+- **OSC timing** still has edge sensitivity; Phase 2 should consolidate side effects in one render-tied place.
 - **E2E / Gherkin**: delete or rewrite scenarios that **only** encoded removed UI; do **not** preserve steps for deleted features.
 
 ## Non-goals
