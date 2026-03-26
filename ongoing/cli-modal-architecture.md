@@ -91,7 +91,7 @@ Ink shell, neutral `TTYDeps`, confirm/MCQ/token/fetch-wait display components, *
 
 **Order (historical):** **2 → 3 → 4 → 5 → 6 → 7 → 8** (done).
 
-**Order (extended track):** **~~9~~ (done)** → **~~9.5~~ (done)** → **10 → 11 → 12 → 13 → 14** — then **remove `ttyAdapter`**, **domain-shaped shell state + `Static` / `useInput`**, **shrink `renderer.ts` for TTY**, **`patchConsole: true`**, **final residue audit**.
+**Order (extended track):** **~~9~~ (done)** → **~~9.5~~ (done)** → **~~10~~ (done)** → **11 → 12 → 13 → 14** — then **remove `ttyAdapter`**, **domain-shaped shell state + `Static` / `useInput`**, **shrink `renderer.ts` for TTY**, **`patchConsole: true`**, **final residue audit**.
 
 **Rationale (planning.mdc):** Phase **12** is **structure-first** (no new user story); justify with **full interactive Vitest + targeted E2E** unchanged. Phases **10–11** can be split further if two user-visible slices are clearer (e.g. “history append correctness” vs “command turn flush”) — keep **at most one intentionally failing test** per planning TDD note when driving. **Phase 13** is user-visible only as “no corrupted interleaved logs”; treat **`patchConsole`** flip as **verify-heavy**. **Phase 14** is **audit + documentation** of approved exceptions.
 
@@ -175,12 +175,13 @@ Interactive fetch-wait: **`@inkjs/ui` `Spinner`** (`type="dots"`) in **`FetchWai
 - **Abstractions:** Remove **`OutputAdapter.clearAndRedraw`**, **`writeFullRedraw`**, **`renderFullDisplay`**, **`buildLiveRegionLines`** (and siblings), or **`defaultOutput`** wiring **when** their **only** remaining purpose was **`/clear`** or test-only full redraw for that path. If a helper is still needed for **fetch-wait**, resize, or another **named** behavior, **keep it under that use case** — narrow signatures and names so **`/clear` is not** the implicit owner. **No** optional “clear screen” hooks kept “for later.”
 - **Verify:** **`pnpm cli:test`** (full CLI suite); **`pnpm cli:lint`** / format; repo **`rg`** for **`/clear`**, **`clearAndRedraw`**, and any removed symbols — **zero** hits in **`cli/`** (and **E2E** / **`help`**) except where the string appears inside **unrelated** content (if any); fix or rename to avoid false positives. Run any E2E feature that previously mentioned **`/clear`** only after deleting those scenarios or replacing them with unrelated coverage.
 
-### Phase 10 — Domain: chat history + command turns as first-class concepts
+### Phase 10 (done) — Domain: chat history + command turns as first-class concepts
 
 **Goal:** **`ChatHistory`** / scrollback entries and **command-turn** buffering are **named types and transitions** in the **business** layer (or a small **`cli/src/shell/`** module owned by business), with stable verbs (append output, commit input line, flush turn, etc.) — **not** ad-hoc arrays only inside a legacy adapter.
 
+- **Shipped:** **`cli/src/shell/scrollbackModel.ts`** — `CommandTurnBuffer`, `commandTurnBufferAppendLog` / `AppendError` / `AppendUserNotice`, `scrollbackAppendOutput`, `scrollbackCommitInputLine`, `scrollbackFlushCommandTurnIfNonEmpty`. **`ttyAdapter`** routes TTY scrollback and `OutputAdapter` buffering through these helpers (immutable transitions + local `let` assignment).
 - **Ink mapping:** **`Static` `items`** = function of domain history (append-only, gate 2); live region = function of current turn + stage — **one directional flow** from domain updates to props.
-- **Verify:** Same observable transcripts as today (Vitest **`runInteractive`**, key E2E); optional **narrow unit** tests on pure transition helpers if they become the stable contract.
+- **Verify:** Same observable transcripts as today (Vitest **`runInteractive`**, key E2E); **`cli/tests/shell/scrollbackModel.test.ts`** on the transition helpers.
 
 ### Phase 11 — Remove `ttyAdapter`: thin TTY entry + Ink root state
 

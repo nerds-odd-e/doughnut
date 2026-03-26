@@ -55,7 +55,7 @@ export type ChatHistoryOutputEntry = {
   tone?: ChatHistoryOutputTone
 }
 export type ChatHistoryEntry = ChatHistoryInputEntry | ChatHistoryOutputEntry
-/** Ordered log of user inputs and command outputs (Ink `Static` history; adapter may rerender on resize). */
+/** Ordered log of user inputs and command outputs (Ink `Static` history; append-only via `shell/scrollbackModel.ts`). */
 export type ChatHistory = ChatHistoryEntry[]
 
 /** Slash-command token-picker modes for `/list-access-token` and related TTY flows. */

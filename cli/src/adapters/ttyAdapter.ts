@@ -64,6 +64,16 @@ import {
   type PlaceholderContext,
 } from '../renderer.js'
 import { interactiveTtyStdout } from './interactiveTtyStdout.js'
+import {
+  commandTurnBufferAppendError,
+  commandTurnBufferAppendLog,
+  commandTurnBufferAppendUserNotice,
+  emptyCommandTurnBuffer,
+  scrollbackAppendOutput,
+  scrollbackCommitInputLine,
+  scrollbackFlushCommandTurnIfNonEmpty,
+  type CommandTurnBuffer,
+} from '../shell/scrollbackModel.js'
 import type {
   AccessTokenPickerAction,
   AccessTokenPickerCommandConfig,
@@ -124,9 +134,6 @@ type TokenSelectionState = {
   action: AccessTokenPickerAction
   highlightIndex: number
 }
-
-/** One submitted command's buffered scrollback: lines + dominant tone for `commitHistoryOutput`. */
-type BufferedCommandTurn = { lines: string[]; tone: ChatHistoryOutputTone }
 
 /** Measured live region for one paint: props for {@link CommandLineLivePanel} and shell gap. */
 type LiveRegionLayout = {
@@ -543,7 +550,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     tone: ChatHistoryOutputTone = 'plain',
     options?: { skipDrawBox?: boolean }
   ): void {
-    chatHistory = [...chatHistory, { type: 'output', lines: [...lines], tone }]
+    chatHistory = scrollbackAppendOutput(chatHistory, lines, tone)
     if (!options?.skipDrawBox) {
       drawBox()
     }
@@ -577,13 +584,13 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   }
 
   /** Buffered `processInput` stdout for one submitted command (numbered-choice path or normal Enter). */
-  let commandTurn: BufferedCommandTurn = { lines: [], tone: 'plain' }
+  let commandTurn: CommandTurnBuffer = emptyCommandTurnBuffer()
   let ttyOutput: OutputAdapter
 
   let handleCommandLineInkInput: (input: string, key: Key) => Promise<void>
 
   function resetCommandTurnBuffer(): void {
-    commandTurn = { lines: [], tone: 'plain' }
+    commandTurn = emptyCommandTurnBuffer()
   }
 
   /** Hardware cursor stays hidden; caret is reverse-video inside Ink. Then input-ready OSC when applicable. */
@@ -597,22 +604,21 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
   /** Before fetch-wait chrome paints and emits input-ready OSC, persist buffered `log` lines so PTY captures are not ahead of scrollback. */
   function flushCommandTurnToScrollbackBeforeFetchWait(): void {
     if (commandTurn.lines.length === 0) return
-    commitHistoryOutput(commandTurn.lines, commandTurn.tone, {
-      skipDrawBox: true,
-    })
-    resetCommandTurnBuffer()
+    const flushed = scrollbackFlushCommandTurnIfNonEmpty(
+      chatHistory,
+      commandTurn
+    )
+    chatHistory = flushed.history
+    commandTurn = flushed.turn
     drawBox()
   }
 
   function commitExitTurnToScrollback(): void {
-    chatHistory = [
-      ...chatHistory,
-      {
-        type: 'output',
-        lines: [...commandTurn.lines],
-        tone: commandTurn.tone,
-      },
-    ]
+    chatHistory = scrollbackAppendOutput(
+      chatHistory,
+      commandTurn.lines,
+      commandTurn.tone
+    )
     const last = chatHistory[chatHistory.length - 1]
     const prev = chatHistory[chatHistory.length - 2]
     if (!last || last.type !== 'output') return
@@ -641,17 +647,13 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
 
   ttyOutput = {
     log: (msg) => {
-      commandTurn.tone = 'plain'
-      commandTurn.lines.push(...msg.split('\n'))
+      commandTurn = commandTurnBufferAppendLog(commandTurn, msg)
     },
     logError: (err) => {
-      const msg = err instanceof Error ? err.message : String(err)
-      commandTurn.tone = 'error'
-      commandTurn.lines.push(...msg.split('\n'))
+      commandTurn = commandTurnBufferAppendError(commandTurn, err)
     },
     logUserNotice: (msg) => {
-      commandTurn.tone = 'userNotice'
-      commandTurn.lines.push(...msg.split('\n'))
+      commandTurn = commandTurnBufferAppendUserNotice(commandTurn, msg)
     },
     writeCurrentPrompt: writeCurrentPromptLine,
     beginCurrentPrompt: doBeginCurrentPrompt,
@@ -710,13 +712,10 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         resetCommandTurnBuffer()
         if (isCommittedInteractiveInput(effectiveLine)) {
           if (!usesSessionYesNoInputChrome(!!tokenSelection)) {
-            chatHistory = [
-              ...chatHistory,
-              {
-                type: 'input',
-                content: maskInteractiveInputForHistory(effectiveLine),
-              },
-            ]
+            chatHistory = scrollbackCommitInputLine(
+              chatHistory,
+              maskInteractiveInputForHistory(effectiveLine)
+            )
             rememberCommittedLine(effectiveLine)
           }
           if (await processInput(effectiveLine, ttyOutput, true)) {
@@ -781,25 +780,19 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         if (tokenSelect) {
           const tokens = listAccessTokens()
           if (tokens.length === 0) {
-            chatHistory = [
-              ...chatHistory,
-              {
-                type: 'input',
-                content: maskInteractiveInputForHistory(trimmedInput),
-              },
-            ]
+            chatHistory = scrollbackCommitInputLine(
+              chatHistory,
+              maskInteractiveInputForHistory(trimmedInput)
+            )
             rememberCommittedLine(trimmedInput)
             commitHistoryOutput(['No access tokens stored.'])
             return
           } else {
             if (isCommittedInteractiveInput(inputLine)) {
-              chatHistory = [
-                ...chatHistory,
-                {
-                  type: 'input',
-                  content: maskInteractiveInputForHistory(inputLine),
-                },
-              ]
+              chatHistory = scrollbackCommitInputLine(
+                chatHistory,
+                maskInteractiveInputForHistory(inputLine)
+              )
             }
             rememberCommittedLine(trimmedInput)
             beginTokenSelection(trimmedInput, tokenSelect.action, tokens)
@@ -811,13 +804,10 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         resetCommandTurnBuffer()
         if (isCommittedInteractiveInput(inputLine)) {
           if (!usesSessionYesNoInputChrome(!!tokenSelection)) {
-            chatHistory = [
-              ...chatHistory,
-              {
-                type: 'input',
-                content: maskInteractiveInputForHistory(inputLine),
-              },
-            ]
+            chatHistory = scrollbackCommitInputLine(
+              chatHistory,
+              maskInteractiveInputForHistory(inputLine)
+            )
             rememberCommittedLine(inputLine)
           }
           if (await processInput(inputLine, ttyOutput, true)) {
@@ -977,13 +967,10 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         commandInput = clearLiveCommandLine(commandInput)
         numberedChoiceHighlightIndex = 0
         resetCommandTurnBuffer()
-        chatHistory = [
-          ...chatHistory,
-          {
-            type: 'input',
-            content: maskInteractiveInputForHistory(inputForHistory),
-          },
-        ]
+        chatHistory = scrollbackCommitInputLine(
+          chatHistory,
+          maskInteractiveInputForHistory(inputForHistory)
+        )
         if (isCommittedInteractiveInput(inputForHistory)) {
           rememberCommittedLine(inputForHistory)
         }
