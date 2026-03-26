@@ -516,14 +516,16 @@ describe('TTY: shared interactive session', () => {
 
     test('after blank submits, full redraw must not paint past-input grey blocks (history parity)', async () => {
       writeSpy.mockClear()
-      process.stdout.emit('resize')
+      pushTTYCommandBytes(stdin, ' ')
+      await tick()
+      pushTTYCommandKey(stdin, 'backspace')
       await tick()
       const redrawBaseline = ttyOutput(writeSpy)
       const baselineMatches =
         redrawBaseline.split(GREY_BG_PAST_INPUT).length - 1
       expect(
         baselineMatches,
-        'baseline resize should not use GREY_BG (only renderPastUserMessage uses this code)'
+        'baseline redraw should not use GREY_BG (only renderPastUserMessage uses this code)'
       ).toBe(0)
 
       writeSpy.mockClear()
@@ -533,7 +535,9 @@ describe('TTY: shared interactive session', () => {
       await tick()
 
       writeSpy.mockClear()
-      process.stdout.emit('resize')
+      pushTTYCommandBytes(stdin, ' ')
+      await tick()
+      pushTTYCommandKey(stdin, 'backspace')
       await tick()
 
       const redrawAfterEmptySubmits = ttyOutput(writeSpy)
@@ -541,31 +545,6 @@ describe('TTY: shared interactive session', () => {
         redrawAfterEmptySubmits.split(GREY_BG_PAST_INPUT).length - 1,
         'blank Enter must not add history rows that only appear on full redraw'
       ).toBe(baselineMatches)
-    })
-  })
-
-  describe('resize', () => {
-    test('resize rerenders Ink shell with new width without full-screen clear', async () => {
-      pushTTYCommandBytes(stdin, 'hello')
-      await tick()
-      pushTTYCommandEnter(stdin)
-      await tick()
-
-      expect(ttyOutput(writeSpy)).toContain('hello')
-
-      writeSpy.mockClear()
-      Object.defineProperty(process.stdout, 'columns', {
-        value: 50,
-        writable: true,
-        configurable: true,
-      })
-      process.stdout.emit('resize')
-      await tick()
-
-      const output = ttyOutput(writeSpy)
-      const promptMatch = output.match(/→[^\n]*/)
-      expect(promptMatch).toBeTruthy()
-      expect(stripAnsi(promptMatch![0]).length).toBeLessThanOrEqual(50)
     })
   })
 })

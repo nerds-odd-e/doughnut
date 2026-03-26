@@ -119,28 +119,4 @@ describe('recall MCQ on TTY: Ink numbered-choice list render', () => {
     expect(raw).toContain('First option')
     expect(raw).toContain('Second option')
   })
-
-  test('narrow then resize (guidance shrinks): Ink still renders → prompt', async () => {
-    const choices = [
-      'First option with enough text to wrap across multiple rows at narrow width',
-      'B',
-    ] as const
-    mockRecallNext.mockResolvedValue(
-      recallNextQuestion(mcqRecallPrompt(3, 'Pick:', [...choices]))
-    )
-    await sessionWithColumns(36)
-    expect(
-      formatMcqChoiceLines([...choices], 36).length
-    ).toBeGreaterThanOrEqual(3)
-    await submitTTYCommand(stdin, '/recall')
-    await tick()
-    Object.defineProperty(process.stdout, 'columns', {
-      value: 100,
-      writable: true,
-      configurable: true,
-    })
-    process.stdout.emit('resize')
-    await tick()
-    assertMcqRenderedWithPrompt(ttyOutput(writeSpy))
-  })
 })

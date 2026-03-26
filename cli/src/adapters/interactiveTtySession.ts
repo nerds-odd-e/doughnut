@@ -377,11 +377,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
     }))
   }
 
-  const removeResizeListenerRef: { current: (() => void) | null } = {
-    current: null,
-  }
   const doExit = () => {
-    removeResizeListenerRef.current?.()
     if (shellInstance) {
       shellInstance.unmount()
       shellInstance = null
@@ -861,9 +857,6 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
   }
 
   drawBox()
-
-  process.stdout.on('resize', drawBox)
-  removeResizeListenerRef.current = () => process.stdout.off('resize', drawBox)
 
   /**
    * Readline `emitKeypressEvents` runs alongside Ink on the same stdin. Ink owns typing, list keys,
