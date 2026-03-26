@@ -4,9 +4,9 @@ import {
   buildBoxLinesWithCaret,
   buildCurrentPromptSeparator,
   buildCurrentPromptSeparatorForStageBand,
+  formatBorderlessCommandInputPaintLines,
   formatCurrentStageIndicatorLine,
   inputBoxBorderLinesWithContextChrome,
-  renderBox,
   stripAnsi,
   type PlaceholderContext,
   type TerminalWidth,
@@ -65,11 +65,16 @@ export function CommandLineLivePanel({
 
   const boxPaint = { placeholderContext } as const
   const hasStageIndicator = currentStageIndicatorLines.length > 0
-  const rawBoxLines = renderBox(
-    buildBoxLinesWithCaret(buffer, width, caretOffset, boxPaint),
-    width
-  ).split('\n')
-  const boxLines = inputBoxBorderLinesWithContextChrome(rawBoxLines, boxPaint)
+  const innerLines = buildBoxLinesWithCaret(
+    buffer,
+    width,
+    caretOffset,
+    boxPaint
+  )
+  const boxLines = inputBoxBorderLinesWithContextChrome(
+    formatBorderlessCommandInputPaintLines(innerLines, width),
+    boxPaint
+  )
 
   const promptPlainForInk =
     currentPromptWrappedLines.length > 0

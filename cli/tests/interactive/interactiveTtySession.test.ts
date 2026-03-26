@@ -2,7 +2,6 @@ import './interactiveTestMocks.js'
 import { describe, test, expect, type vi, beforeEach, afterEach } from 'vitest'
 import { stripAnsi, stripAnsiCsiAndCr } from '../../src/renderer.js'
 import {
-  INPUT_BOX_TOP_OUTLINE_PATTERN,
   liveRegionRepaintHasStaleCursorUpBeforeBoxTop,
   ttyShowCaretCuUThenInk2KEraseBeforeNextHide,
   simulatedScreenFromTtyWrites,
@@ -365,7 +364,7 @@ describe('TTY: shared interactive session', () => {
       expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /add-access-token ')
     })
 
-    test('after /help, consecutive Enter on empty input keeps a single input box top border', async () => {
+    test('after /help, consecutive Enter on empty input keeps a single command-line prompt row', async () => {
       await submitTTYCommand(stdin, '/help')
       await tick()
       pushTTYCommandEnter(stdin)
@@ -379,12 +378,10 @@ describe('TTY: shared interactive session', () => {
 
       const output = ttyOutput(writeSpy)
       const visualOutput = simulatedScreenFromTtyWrites(output)
-      const boxTopLines = visualOutput
+      const promptRows = visualOutput
         .split('\n')
-        .filter((l) =>
-          INPUT_BOX_TOP_OUTLINE_PATTERN.test(stripAnsiCsiAndCr(l).trim())
-        )
-      expect(boxTopLines).toHaveLength(1)
+        .filter((l) => stripAnsiCsiAndCr(l).trimStart().startsWith('→'))
+      expect(promptRows).toHaveLength(1)
     })
 
     test('second /help after first still shows help output', async () => {
@@ -400,20 +397,20 @@ describe('TTY: shared interactive session', () => {
       expect(stripAnsi(output)).toContain('List available commands')
     })
 
-    test('after /help, there is one empty line between history output and input box', async () => {
+    test('after /help, there is one empty line between history output and command line', async () => {
       writeSpy.mockClear()
       await submitTTYCommand(stdin, '/help')
 
       const visualOutput = simulatedScreenFromTtyWrites(ttyOutput(writeSpy))
       const lines = visualOutput.split('\n').map((l) => stripAnsiCsiAndCr(l))
-      const boxTopIndex = lines.findIndex((l) => /^┌─+┐$/.test(l.trim()))
-      expect(boxTopIndex).toBeGreaterThan(0)
-      expect(lines[boxTopIndex - 1]).toBe('')
+      const promptIndex = lines.findIndex((l) => l.trimStart().startsWith('→'))
+      expect(promptIndex).toBeGreaterThan(0)
+      expect(lines[promptIndex - 1]).toBe('')
     })
   })
 
-  describe('input box top border (regression)', () => {
-    test('initial paint: simulated top border row is exactly ┌─…┐ (no leading spaces)', async () => {
+  describe('command-line prompt row (regression)', () => {
+    test('initial paint: command-line row has no leading spaces before →', async () => {
       await tick()
       await tick()
 
@@ -422,38 +419,35 @@ describe('TTY: shared interactive session', () => {
         .split('\n')
         .map((l) => stripAnsiCsiAndCr(l))
 
-      const outline = /^┌─+┐$/
-      let topRow: string | undefined
+      let promptRow: string | undefined
       for (let i = lines.length - 1; i >= 0; i--) {
         const line = lines[i] ?? ''
-        if (outline.test(line.trim())) {
-          topRow = line
+        if (line.trimStart().startsWith('→')) {
+          promptRow = line
           break
         }
       }
 
       expect(
-        topRow !== undefined,
+        promptRow !== undefined,
         [
-          'Expected the final TTY frame to include an input-box top outline: one "┌", a run of "─", and one "┐" on a single row (trimmed).',
-          'If this fails, the replayed screen may be missing the box or the outline format changed — update the test only if the product intentionally changed the chrome.',
+          'Expected the final TTY frame to include a command line row starting with "→".',
+          'If this fails, the replayed screen may be missing the live prompt — update the test only if the product intentionally changed the chrome.',
         ].join('\n')
       ).toBe(true)
 
       expect(
-        outline.test(topRow!),
+        promptRow === promptRow!.trimStart(),
         [
-          'The input box top border must start at terminal column 0: the replayed row must be exactly "┌", horizontal rules, and "┐" with no leading or trailing spaces.',
-          'Leading spaces before "┌" produce the broken/stepped upper-left corner (often from Ink flex layout next to <Static> history after InteractiveShellDisplay refactors).',
-          'Do not "fix" this by asserting .trim() or stripping spaces — that would hide the regression.',
-          `Replayed top-border row (JSON): ${JSON.stringify(topRow)}`,
+          'The command line must start at terminal column 0: no leading spaces before "→" (Ink flex next to <Static> history can otherwise indent the live block).',
+          `Replayed prompt row (JSON): ${JSON.stringify(promptRow)}`,
         ].join('\n')
       ).toBe(true)
     })
   })
 
-  describe('input box caret (reverse video in Ink)', () => {
-    test('after initial paint, bordered prompt line exists and stdout includes reverse-video caret', async () => {
+  describe('command-line caret (reverse video in Ink)', () => {
+    test('after initial paint, prompt line exists and stdout includes reverse-video caret', async () => {
       await tick()
       await tick()
 
@@ -464,7 +458,7 @@ describe('TTY: shared interactive session', () => {
       let promptRow = -1
       for (let i = plainLines.length - 1; i >= 0; i--) {
         const p = plainLines[i] ?? ''
-        if (p.includes('→') && p.includes('│')) {
+        if (p.trimStart().startsWith('→')) {
           promptRow = i
           break
         }
@@ -473,8 +467,8 @@ describe('TTY: shared interactive session', () => {
       expect(
         promptRow >= 0,
         [
-          'Expected the replayed TTY frame to contain exactly one bordered input line: plain text should include both the box side "│" and the interactive prompt "→".',
-          'If this fails, the chrome or prompt glyph changed — narrow the matcher only if the product intentionally changed how the input box is drawn.',
+          'Expected the replayed TTY frame to contain a command line row starting with "→".',
+          'If this fails, the chrome or prompt glyph changed — narrow the matcher only if the product intentionally changed how the command line is drawn.',
         ].join('\n')
       ).toBe(true)
 
@@ -498,8 +492,8 @@ describe('TTY: shared interactive session', () => {
       expect(
         ttyShowCaretCuUThenInk2KEraseBeforeNextHide(raw),
         [
-          'After SHOW_CURSOR, the adapter must not emit manual cursor-up + CHA to sit the caret in the input box and then allow Ink log-update to run \\x1b[2K\\x1b[1A (erase line + cursor up) before the next HIDE_CURSOR.',
-          'Ink assumes the cursor is still where it left off after the last render; moving the caret up for the user breaks that contract, so the next incremental repaint erases from the wrong row and the bordered input block walks up the screen (~a few lines per keystroke).',
+          'After SHOW_CURSOR, the adapter must not emit manual cursor-up + CHA to sit the caret in the command line and then allow Ink log-update to run \\x1b[2K\\x1b[1A (erase line + cursor up) before the next HIDE_CURSOR.',
+          'Ink assumes the cursor is still where it left off after the last render; moving the caret up for the user breaks that contract, so the next incremental repaint erases from the wrong row and the live block walks up the screen (~a few lines per keystroke).',
           'A real fix hides the cursor before Ink rerenders, avoids post-render CUU, or otherwise resyncs vertical state — do not weaken this check to only the final replayed frame (that snapshot can look fine while the protocol is wrong).',
         ].join('\n')
       ).toBe(false)
@@ -507,7 +501,7 @@ describe('TTY: shared interactive session', () => {
   })
 
   describe('empty Enter redraw (regression)', () => {
-    test('empty Enter redraw must not emit a stale cursor-up before the input box top', async () => {
+    test('empty Enter redraw must not emit a stale cursor-up before the command-line row', async () => {
       writeSpy.mockClear()
       pushTTYCommandEnter(stdin)
       await tick()
@@ -516,7 +510,7 @@ describe('TTY: shared interactive session', () => {
       const output = ttyOutput(writeSpy)
       expect(
         liveRegionRepaintHasStaleCursorUpBeforeBoxTop(output),
-        `Stale double cursor-up before \\r\\x1b[2K┌ — input box shifts up (prefix tail): ${JSON.stringify(output.slice(Math.max(0, output.indexOf('\r\x1b[2K┌') - 40), output.indexOf('\r\x1b[2K┌') + 5))}`
+        'Stale double cursor-up before \\r\\x1b[2K on the command-line row — live block shifts up'
       ).toBe(false)
     })
 
@@ -570,9 +564,9 @@ describe('TTY: shared interactive session', () => {
 
       const output = ttyOutput(writeSpy)
       expect(output).not.toContain('\x1b[H\x1b[2J')
-      const boxTopMatch = output.match(/┌─+┐/)
-      expect(boxTopMatch).toBeTruthy()
-      expect(stripAnsi(boxTopMatch![0]).length).toBe(50)
+      const promptMatch = output.match(/→[^\n]*/)
+      expect(promptMatch).toBeTruthy()
+      expect(stripAnsi(promptMatch![0]).length).toBeLessThanOrEqual(50)
       expect(
         output,
         'Ink rerender on resize updates the live block; Static history is not re-printed in the resize delta'

@@ -142,7 +142,7 @@ function currentGuidanceFailureMessage(
   return [
     `Expected "${expected}" in ${SECTION.currentGuidance} (prompts, hints, options for the current input).`,
     ``,
-    `Parser: input box ┌ at line ${inputBoxLineRange.start}, └ at line ${inputBoxLineRange.end} of ${lineCount} lines. Lines after └: ${linesAfterBox}.`,
+    `Parser: command line row at line ${inputBoxLineRange.start}–${inputBoxLineRange.end} of ${lineCount} lines. Lines after command line: ${linesAfterBox}.`,
     ``,
     `${SECTION.currentGuidance}: ${currentGuidanceContent ? `"${currentGuidanceContent}"` : '(empty)'}`,
     ``,
@@ -201,7 +201,7 @@ function inputBoxTopBorder() {
             countInputBoxTopBorderLinesInInteractivePtyTranscript(stdout)
           expect(
             count,
-            `Expected exactly one input box top border (┌─┐) in simulated interactive PTY grid, found ${count}`
+            `Expected exactly one live command-line prompt row (→) in simulated interactive PTY grid, found ${count}`
           ).to.equal(1)
         }
       )

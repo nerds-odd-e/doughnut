@@ -4,22 +4,30 @@
  */
 import { stripAnsiCsiAndCr } from '../src/renderer.js'
 
-/** Top border line of the bordered input box (plain text, after stripping ANSI). */
-export const INPUT_BOX_TOP_OUTLINE_PATTERN = /^┌─*┐$/
-
 /**
- * True when a live-region clear is immediately followed by an extra cursor-up before the first
- * full-line erase that draws the input box top (`┌`). That sequence shifts the box one row up.
+ * True when a live-region erase (`\\r\\x1b[2K`) before the command-line row is preceded by an
+ * extra cursor-up sequence. That ordering shifts the live block up (regression guard).
  */
 export function liveRegionRepaintHasStaleCursorUpBeforeBoxTop(
   rawWritesJoined: string
 ): boolean {
-  const marker = '\r\x1b[2K┌'
-  const idx = rawWritesJoined.indexOf(marker)
-  if (idx < 0) return false
-  const prefix = rawWritesJoined.slice(0, idx)
-  // biome-ignore lint/suspicious/noControlCharactersInRegex: CSI CUU
-  return /\x1b\[\d+A\x1b\[\d+A$/.test(prefix)
+  const eraseSeq = '\r\x1b[2K'
+  let searchFrom = 0
+  while (searchFrom < rawWritesJoined.length) {
+    const idx = rawWritesJoined.indexOf(eraseSeq, searchFrom)
+    if (idx < 0) return false
+    const after = rawWritesJoined.slice(
+      idx + eraseSeq.length,
+      idx + eraseSeq.length + 512
+    )
+    if (after.includes('→')) {
+      const prefix = rawWritesJoined.slice(0, idx)
+      // biome-ignore lint/suspicious/noControlCharactersInRegex: CSI CUU
+      return /\x1b\[\d+A\x1b\[\d+A$/.test(prefix)
+    }
+    searchFrom = idx + 1
+  }
+  return false
 }
 
 const ESC = '\x1b'
@@ -113,16 +121,16 @@ export function simulatedScreenFromTtyWrites(output: string): string {
 }
 
 /**
- * 0-based row index of the last replayed line whose trimmed plain text matches the input box top
- * outline (`┌` … `┐`). Returns -1 if none. Used to detect live-region vertical drift across redraws.
+ * 0-based row index of the last replayed line whose plain text starts with the command prompt (`→`).
+ * Returns -1 if none.
  */
 export function lastReplayedInputBoxTopRowIndex(
   rawWritesJoined: string
 ): number {
   const lines = simulatedScreenFromTtyWrites(rawWritesJoined).split('\n')
   for (let i = lines.length - 1; i >= 0; i--) {
-    const t = stripAnsiCsiAndCr(lines[i] ?? '').trim()
-    if (INPUT_BOX_TOP_OUTLINE_PATTERN.test(t)) return i
+    const t = stripAnsiCsiAndCr(lines[i] ?? '').trimStart()
+    if (t.startsWith('→')) return i
   }
   return -1
 }

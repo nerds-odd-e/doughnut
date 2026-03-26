@@ -6,7 +6,7 @@
  * Interactive-only sections:
  * - History input: Past user input lines
  * - History output: Past command results
- * - Current guidance: Prompts, hints, options for the current input (above input box:
+ * - Current guidance: Prompts, hints, options for the current input (above the live command line:
  *   recall, MCQ, y/n; below: / commands, token list)
  */
 
@@ -14,8 +14,7 @@
 const HISTORY_INPUT_BG = '\x1b[48;5;236m'
 const CURRENT_PROMPT_SEPARATOR_GREEN = '\x1b[32m'
 const CURRENT_PROMPT_HINT = '\x1b[90m'
-const INPUT_BOX_TOP = '┌'
-const INPUT_BOX_BOTTOM = '└'
+const COMMAND_LINE_PROMPT_START = '→'
 // biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI escapes
 const ANSI_PATTERN = /\x1b\[[0-9;]*m/g
 // CSI sequences like \x1b[2K (erase line), \x1b[3A (cursor up)
@@ -46,7 +45,7 @@ function isCurrentPromptHintLine(line: string): boolean {
   return line.includes(CURRENT_PROMPT_HINT) && !line.includes(HISTORY_INPUT_BG)
 }
 
-// --- Input box boundaries ---
+// --- Live command-line row (borderless TTY; phase 10.5) ---
 function findLastSeparatorIndex(lines: string[]): number {
   for (let i = lines.length - 1; i >= 0; i--) {
     if (isCurrentPromptSeparatorLine(lines[i]!)) {
@@ -57,8 +56,11 @@ function findLastSeparatorIndex(lines: string[]): number {
 }
 
 function findLastInputBoxStart(lines: string[]): number {
-  for (let i = lines.length - 1; i >= 0; i--) {
-    if (lines[i]?.includes(INPUT_BOX_TOP)) {
+  const separatorIdx = findLastSeparatorIndex(lines)
+  const scanFrom = separatorIdx >= 0 ? separatorIdx + 1 : 0
+  for (let i = lines.length - 1; i >= scanFrom; i--) {
+    const plain = stripAllAnsi(lines[i] ?? '').trimStart()
+    if (plain.startsWith(COMMAND_LINE_PROMPT_START)) {
       return i
     }
   }
@@ -70,12 +72,7 @@ function findLastInputBoxEnd(lines: string[]): number {
   if (boxStart >= lines.length) {
     return -1
   }
-  for (let i = boxStart + 1; i < lines.length; i++) {
-    if (lines[i]?.includes(INPUT_BOX_BOTTOM)) {
-      return i
-    }
-  }
-  return -1
+  return boxStart
 }
 
 // --- Section extraction ---
@@ -244,12 +241,10 @@ export function getCurrentGuidanceAndHistoryRaw(output: string): string {
   return parseLiveRegion(output, false).currentGuidanceAndHistory
 }
 
-const INPUT_BOX_TOP_BORDER_LINE = /^┌─*┐$/
-
 /**
  * Plain grid after replaying an interactive CLI PTY transcript through a minimal
  * cursor/erase model and stripping SGR + CSI. Used to approximate what the user sees
- * (e.g. duplicate `┌─┐`, stray ESC written as text when a sequence is unhandled).
+ * (e.g. duplicate command-line `→` rows, stray ESC written as text when a sequence is unhandled).
  */
 export type InteractiveCliSimulatedPlainScreen = Readonly<{
   asPlainTextGrid: string
@@ -436,7 +431,7 @@ export function assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks(
   }
 }
 
-/** Counts input box top borders (`┌─┐`) in the simulated plain grid (entire transcript). */
+/** Counts live command-line prompt rows (`→` …) in the simulated plain grid (entire transcript). */
 export function countInputBoxTopBorderLinesInInteractivePtyTranscript(
   ptyTranscript: string
 ): number {
@@ -444,5 +439,6 @@ export function countInputBoxTopBorderLinesInInteractivePtyTranscript(
     toInteractiveCliSimulatedPlainScreen(ptyTranscript)
   return asPlainTextGrid
     .split('\n')
-    .filter((l) => INPUT_BOX_TOP_BORDER_LINE.test((l ?? '').trim())).length
+    .filter((l) => (l ?? '').trimStart().startsWith(COMMAND_LINE_PROMPT_START))
+    .length
 }

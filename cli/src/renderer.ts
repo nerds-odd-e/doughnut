@@ -392,7 +392,7 @@ export function formatCurrentStageIndicatorLine(
 
 /**
  * Line count from the top of the live region through the last Current prompt line (separator and
- * wrapped prompt rows), immediately above the input box top border. Matches
+ * wrapped prompt rows), immediately above the command-line paint block. Matches
  * {@link buildLiveRegionLines} layout rules.
  */
 export function countPromptBlockLinesAboveInputBoxTop(
@@ -419,6 +419,16 @@ export function renderBox(lines: string[], width: TerminalWidth): string {
       `│ ${padEndVisible(truncateToWidth(line, innerWidth), innerWidth)} │`
   )
   return [top, ...rows, bottom].join('\n')
+}
+
+/** Borderless TTY command-line paint rows (Ink {@link CommandLineLivePanel}): one row per draft line, full width. */
+export function formatBorderlessCommandInputPaintLines(
+  innerLines: string[],
+  width: TerminalWidth
+): string[] {
+  return innerLines.map((line) =>
+    padEndVisible(truncateToWidth(line, width), width)
+  )
 }
 
 /** Submitted buffer counts as history input (and past-input paint) only when non-blank after trim. */
