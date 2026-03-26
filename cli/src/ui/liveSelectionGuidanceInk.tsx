@@ -4,13 +4,13 @@ import type { AccessTokenEntry, AccessTokenLabel } from '../accessToken.js'
 import type { RecallMcqChoiceTexts } from '../types.js'
 import {
   buildCurrentPromptSeparatorForStageBand,
-  formatInteractiveCommandLineInkRows,
   formatMcqChoiceLinesWithIndices,
   PROMPT,
   stripAnsi,
   type TerminalWidth,
 } from '../renderer.js'
 import { eachLogicalInkStdinChunk } from './inkStdinLogicalKeys.js'
+import { PrimaryLiveInkPanel } from './PrimaryLiveInkPanel.js'
 
 /** Ink `useFocus` id while **Current guidance** list selection (recall MCQ or access-token picker) owns stdin. */
 export const LIVE_SELECTION_GUIDANCE_INK_FOCUS_ID = 'live-selection-guidance'
@@ -121,31 +121,37 @@ export function AccessTokenPickerLivePanel({
   onInterrupt,
   onGuidanceListKey,
 }: AccessTokenPickerLivePanelProps) {
-  useLiveSelectionGuidanceStdin(onGuidanceListKey, onInterrupt)
-
-  const commandPaintLines = formatInteractiveCommandLineInkRows(
-    lineDraft,
-    width,
-    caretOffset,
-    { placeholderContext: 'tokenList' }
-  )
-
-  return (
-    <Box flexDirection="column" width={width}>
+  const aboveCommandLine = (
+    <>
       <Text>{stageIndicatorLine}</Text>
       <Text>{buildCurrentPromptSeparatorForStageBand(width)}</Text>
       {currentPromptLines.map((line, i) => (
         <Text key={i}>{line}</Text>
       ))}
-      {commandPaintLines.map((line, i) => (
-        <Text key={`tok-cmd-${i}`}>{line}</Text>
-      ))}
-      {items.map((item, i) => (
-        <Text key={item.label} inverse={i === highlightIndex}>
-          {item.label === defaultLabel ? '★ ' : '  '}
-          {item.label}
-        </Text>
-      ))}
-    </Box>
+    </>
+  )
+
+  const guidance = items.map((item, i) => (
+    <Text key={item.label} inverse={i === highlightIndex}>
+      {item.label === defaultLabel ? '★ ' : '  '}
+      {item.label}
+    </Text>
+  ))
+
+  return (
+    <PrimaryLiveInkPanel
+      focusId={LIVE_SELECTION_GUIDANCE_INK_FOCUS_ID}
+      width={width}
+      buffer={lineDraft}
+      caretOffset={caretOffset}
+      placeholderContext="tokenList"
+      onInkKey={onGuidanceListKey}
+      onInterrupt={onInterrupt}
+      refocusWhenUnfocused={false}
+      stdinLogicalChunks
+      ignoreKeysWhenNotFocused={false}
+      aboveCommandLine={aboveCommandLine}
+      guidance={guidance}
+    />
   )
 }

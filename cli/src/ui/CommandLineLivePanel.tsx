@@ -1,19 +1,14 @@
-/**
- * Main command line: one `useInput` + session (`handleCommandLineInkInput`). Caret styling matches
- * `@inkjs/ui` TextInput (`chalk.inverse` in `renderer.ts`); stock TextInput is not mounted here
- * (uncontrolled-only upstream; ↑↓/Tab domain keys need this hook).
- */
-import { useLayoutEffect, useRef } from 'react'
-import { Box, Text, useFocus, useInput, type Key } from 'ink'
+import { Box, Text, type Key } from 'ink'
 import {
   buildCurrentPromptSeparator,
   buildCurrentPromptSeparatorForStageBand,
   formatCurrentStageIndicatorLine,
-  formatInteractiveCommandLineInkRows,
   stripAnsi,
   type PlaceholderContext,
   type TerminalWidth,
 } from '../renderer.js'
+import { PrimaryLiveInkPanel } from './PrimaryLiveInkPanel.js'
+
 export const COMMAND_LINE_INK_FOCUS_ID = 'command-line'
 
 export type CommandLineLivePanelProps = {
@@ -41,48 +36,14 @@ export function CommandLineLivePanel({
   onCommandKey,
   onInterrupt,
 }: CommandLineLivePanelProps) {
-  const { isFocused, focus } = useFocus({
-    id: COMMAND_LINE_INK_FOCUS_ID,
-    autoFocus: true,
-  })
-  const isFocusedRef = useRef(isFocused)
-  isFocusedRef.current = isFocused
-  const inkFocusEverEstablishedRef = useRef(false)
-  if (isFocused) inkFocusEverEstablishedRef.current = true
-
-  useLayoutEffect(() => {
-    if (isFocused) return
-    focus(COMMAND_LINE_INK_FOCUS_ID)
-  }, [isFocused, focus])
-
-  useInput(
-    (input, key) => {
-      if (key.ctrl && input === 'c') {
-        onInterrupt()
-        return
-      }
-      if (!isFocusedRef.current && inkFocusEverEstablishedRef.current) return
-      Promise.resolve(onCommandKey(input, key)).catch(() => undefined)
-    },
-    { isActive: true }
-  )
-
-  const paintOptions = { placeholderContext } as const
   const hasStageIndicator = currentStageIndicatorLines.length > 0
-  const commandPaintLines = formatInteractiveCommandLineInkRows(
-    buffer,
-    width,
-    caretOffset,
-    paintOptions
-  )
-
   const promptPlainForInk =
     currentPromptWrappedLines.length > 0
       ? currentPromptWrappedLines.map((l) => stripAnsi(l)).join('\n')
       : null
 
-  return (
-    <Box flexDirection="column">
+  const aboveCommandLine = (
+    <>
       {hasStageIndicator ? (
         <>
           {currentStageIndicatorLines.map((ind, i) => (
@@ -105,14 +66,29 @@ export function CommandLineLivePanel({
           </Box>
         </>
       ) : null}
-      {commandPaintLines.map((line, i) => (
-        <Text key={`cmd-${i}`}>{line}</Text>
-      ))}
-      {currentGuidanceLines.map((line, i) => (
-        <Box key={`sug-${i}`} width={width}>
-          <Text wrap="wrap">{line}</Text>
-        </Box>
-      ))}
+    </>
+  )
+
+  const guidance = currentGuidanceLines.map((line, i) => (
+    <Box key={`sug-${i}`} width={width}>
+      <Text wrap="wrap">{line}</Text>
     </Box>
+  ))
+
+  return (
+    <PrimaryLiveInkPanel
+      focusId={COMMAND_LINE_INK_FOCUS_ID}
+      width={width}
+      buffer={buffer}
+      caretOffset={caretOffset}
+      placeholderContext={placeholderContext}
+      onInkKey={onCommandKey}
+      onInterrupt={onInterrupt}
+      refocusWhenUnfocused
+      stdinLogicalChunks={false}
+      ignoreKeysWhenNotFocused
+      aboveCommandLine={aboveCommandLine}
+      guidance={guidance}
+    />
   )
 }
