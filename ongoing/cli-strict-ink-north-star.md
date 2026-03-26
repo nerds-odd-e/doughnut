@@ -91,6 +91,15 @@ Slash completion styling (inverse segments, grapheme-aware width) must either ma
 - Delete dead helpers only when **no** test or product path needs them; **no** duplicate editor code paths.
 - **Verify:** `pnpm cli:lint`; `rg` for orphaned `formatInteractiveCommandLineInkRows` / caret-only paths if fully superseded.
 
+**Status:** done.
+
+- Removed dead duplicate command-line editor helper `cli/src/interactions/mainCommandLineInkTyping.ts`; main command-line key-edit behavior now has one shared reducer in `cli/src/ui/patchedTextInputKey.ts` used by `PatchedTextInput`.
+- Kept and updated `cli/tests/mainCommandLineInkTyping.test.ts` to validate the shared reducer contract (no test deletion).
+- `formatInteractiveCommandLineInkRows` remains intentionally used for non-TextInput live strips (recall MCQ/token list) and renderer-level transcript behavior tests.
+- Verify run:
+  - `CURSOR_DEV=true nix develop -c pnpm -C /Users/lia/doughnut/cli lint`
+  - `CURSOR_DEV=true nix develop -c pnpm -C /Users/lia/doughnut/cli test tests/mainCommandLineInkTyping.test.ts tests/renderer.test.ts tests/interactive/interactiveTtySession.test.ts`
+
 ### Phase 6 — Readline `keypress` bridges (successor to old “phase 16”)
 
 **Goal:** Shrink `stdin.on('keypress')` in `interactiveTtySession.ts` wherever Ink can own the key **without** TTY stdin ordering or raw-mode lifecycle regressions.

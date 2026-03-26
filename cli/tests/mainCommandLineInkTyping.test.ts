@@ -1,7 +1,6 @@
 import type { Key } from 'ink'
 import { describe, expect, test } from 'vitest'
-import { tryApplyMainCommandLineInkTyping } from '../src/interactions/mainCommandLineInkTyping.js'
-import { emptyInteractiveCommandInput } from '../src/interactiveCommandInput.js'
+import { applyPatchedTextInputKey } from '../src/ui/patchedTextInputKey.js'
 
 function nk(p: Partial<Key>): Key {
   return {
@@ -29,74 +28,75 @@ function nk(p: Partial<Key>): Key {
   }
 }
 
-describe('tryApplyMainCommandLineInkTyping', () => {
-  test('insert printable updates draft and requests slash-picker reset', () => {
-    const cmd = {
-      ...emptyInteractiveCommandInput(),
-      lineDraft: 'ab',
-      caretOffset: 1,
-    }
-    const r = tryApplyMainCommandLineInkTyping(cmd, 'x', nk({}))
+describe('applyPatchedTextInputKey', () => {
+  test('insert printable updates draft and caret', () => {
+    const r = applyPatchedTextInputKey(
+      { value: 'ab', caretOffset: 1 },
+      'x',
+      nk({})
+    )
     expect(r).toEqual({
-      nextCommandInput: expect.objectContaining({
-        lineDraft: 'axb',
-        caretOffset: 2,
-      }),
-      resetSlashPicker: true,
+      kind: 'change',
+      next: { value: 'axb', caretOffset: 2 },
     })
   })
 
-  test('left arrow moves caret without slash-picker reset', () => {
-    const cmd = {
-      ...emptyInteractiveCommandInput(),
-      lineDraft: 'a',
-      caretOffset: 1,
-    }
-    const r = tryApplyMainCommandLineInkTyping(cmd, '', nk({ leftArrow: true }))
+  test('left arrow moves caret', () => {
+    const r = applyPatchedTextInputKey(
+      { value: 'a', caretOffset: 1 },
+      '',
+      nk({ leftArrow: true })
+    )
     expect(r).toEqual({
-      nextCommandInput: expect.objectContaining({
-        lineDraft: 'a',
-        caretOffset: 0,
-      }),
-      resetSlashPicker: false,
+      kind: 'change',
+      next: { value: 'a', caretOffset: 0 },
     })
   })
 
   test('home and end', () => {
-    const cmd = {
-      ...emptyInteractiveCommandInput(),
-      lineDraft: 'hey',
-      caretOffset: 1,
-    }
     expect(
-      tryApplyMainCommandLineInkTyping(cmd, '', nk({ home: true }))
-    ).toEqual({
-      nextCommandInput: expect.objectContaining({ caretOffset: 0 }),
-      resetSlashPicker: false,
-    })
+      applyPatchedTextInputKey(
+        { value: 'hey', caretOffset: 1 },
+        '',
+        nk({ home: true })
+      )
+    ).toEqual({ kind: 'change', next: { value: 'hey', caretOffset: 0 } })
     expect(
-      tryApplyMainCommandLineInkTyping(cmd, '', nk({ end: true }))
-    ).toEqual({
-      nextCommandInput: expect.objectContaining({ caretOffset: 3 }),
-      resetSlashPicker: false,
-    })
+      applyPatchedTextInputKey(
+        { value: 'hey', caretOffset: 1 },
+        '',
+        nk({ end: true })
+      )
+    ).toEqual({ kind: 'change', next: { value: 'hey', caretOffset: 3 } })
   })
 
-  test('returns null for keys handled by command-line special handler', () => {
-    const cmd = emptyInteractiveCommandInput()
-    expect(tryApplyMainCommandLineInkTyping(cmd, '', nk({}))).toBe(null)
+  test('returns unhandled for command-line special keys', () => {
     expect(
-      tryApplyMainCommandLineInkTyping(cmd, '', nk({ upArrow: true }))
-    ).toBe(null)
+      applyPatchedTextInputKey({ value: '', caretOffset: 0 }, '', nk({}))
+    ).toEqual({ kind: 'unhandled' })
     expect(
-      tryApplyMainCommandLineInkTyping(cmd, '\r', nk({ return: true }))
-    ).toBe(null)
+      applyPatchedTextInputKey(
+        { value: '', caretOffset: 0 },
+        '',
+        nk({ upArrow: true })
+      )
+    ).toEqual({ kind: 'unhandled' })
+    expect(
+      applyPatchedTextInputKey(
+        { value: '', caretOffset: 0 },
+        '\r',
+        nk({ return: true })
+      )
+    ).toEqual({ kind: 'submit' })
   })
 
   test('ignores ctrl/meta printable', () => {
-    const cmd = emptyInteractiveCommandInput()
-    expect(tryApplyMainCommandLineInkTyping(cmd, 'a', nk({ ctrl: true }))).toBe(
-      null
-    )
+    expect(
+      applyPatchedTextInputKey(
+        { value: '', caretOffset: 0 },
+        'a',
+        nk({ ctrl: true })
+      )
+    ).toEqual({ kind: 'unhandled' })
   })
 })

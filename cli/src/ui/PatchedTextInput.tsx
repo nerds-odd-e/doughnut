@@ -7,6 +7,7 @@ import {
   truncateToWidth,
   visibleLength,
 } from '../renderer.js'
+import { applyPatchedTextInputKey } from './patchedTextInputKey.js'
 
 type PatchedTextInputProps = {
   value: string
@@ -33,52 +34,20 @@ export function PatchedTextInput({
 }: PatchedTextInputProps) {
   useInput(
     (input, key) => {
-      if (key.return || input === '\r' || input === '\n') {
+      const result = applyPatchedTextInputKey(
+        { value, caretOffset },
+        input,
+        key
+      )
+      if (result.kind === 'submit') {
         onSubmit(value)
         return
       }
-      if (
-        key.escape ||
-        key.tab ||
-        (key.shift && key.tab) ||
-        key.upArrow ||
-        key.downArrow ||
-        (key.ctrl && input === 'c')
-      ) {
+      if (result.kind === 'unhandled') {
         onUnhandledKey(input, key)
         return
       }
-      if (key.leftArrow) {
-        onChange(value, Math.max(0, caretOffset - 1))
-        return
-      }
-      if (key.rightArrow) {
-        onChange(value, Math.min(value.length, caretOffset + 1))
-        return
-      }
-      if (key.home) {
-        onChange(value, 0)
-        return
-      }
-      if (key.end) {
-        onChange(value, value.length)
-        return
-      }
-      if (key.backspace || key.delete) {
-        const nextCaret = Math.max(0, caretOffset - 1)
-        const nextValue =
-          value.slice(0, nextCaret) +
-          value.slice(Math.min(value.length, nextCaret + 1))
-        onChange(nextValue, nextCaret)
-        return
-      }
-      if (input.length > 0 && !key.ctrl && !key.meta) {
-        const nextValue =
-          value.slice(0, caretOffset) + input + value.slice(caretOffset)
-        onChange(nextValue, caretOffset + input.length)
-        return
-      }
-      onUnhandledKey(input, key)
+      onChange(result.next.value, result.next.caretOffset)
     },
     { isActive }
   )
