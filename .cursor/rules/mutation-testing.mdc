@@ -45,7 +45,7 @@ CURSOR_DEV=true nix develop -c bash -c 'cd cli && pnpm test:mutation'
 
 ## Lessons from CLI (`selectListInteraction`)
 
-1. **`vitest.related` (Stryker default via plugin)** — Vitest may only run tests it considers “related” to mutated files. If production code reaches the module **indirectly** (e.g. TTY → `ttyAdapter` → interaction), related resolution can **skip** the tests that actually execute it → **0 mutants killed** while behavior is still covered elsewhere. **Fix:** set `vitest: { related: false }` in `stryker.conf.mjs` **or** add **direct-import** tests that import the mutated source (NodeNext: `../src/.../module.js`).
+1. **`vitest.related` (Stryker default via plugin)** — Vitest may only run tests it considers “related” to mutated files. If production code reaches the module **indirectly** (e.g. TTY → `interactiveTtySession` → interaction), related resolution can **skip** the tests that actually execute it → **0 mutants killed** while behavior is still covered elsewhere. **Fix:** set `vitest: { related: false }` in `stryker.conf.mjs` **or** add **direct-import** tests that import the mutated source (NodeNext: `../src/.../module.js`).
 
 2. **`mergeConfig` + `test.include`** — Merging a “full suite” Vitest config with `{ include: ['tests/foo.test.ts'] }` can **union** includes so Stryker still runs **many** tests per mutant. **Fix:** standalone `vitest.stryker.config.ts` that **only** includes the tests that import the mutated file(s) (and duplicates `resolve` / `setupFiles` as needed).
 

@@ -1,3 +1,20 @@
+/**
+ * Thin TTY entry: **`runTTY`** → {@link runInteractiveTtySession}.
+ *
+ * ## Product invariant
+ * - **No `-c`** — rejected in `cli/src/run.ts`.
+ * - **No piped-stdin interactive shell** and **no `pipedAdapter`** (removed).
+ *
+ * ## Approved non-Ink bytes / stdin bridges (keep minimal)
+ * Document new cases here **and** next to the code; do not add ad-hoc `process.stdout.write` “just once.”
+ *
+ * 1. **Private OSC** — input-ready signal for PTY integration (`interactiveTtyStdout`, `renderer`).
+ * 2. **Hardware cursor** — CSI hide/show coordinated with Ink live paint (`interactiveTtyStdout`, `ansi.ts`).
+ * 3. **Exit path** — farewell lines, Ctrl+C newline before exit (`interactiveTtyStdout.exitFarewellBlock`, `ctrlCExitNewline`).
+ * 4. **Pre-Ink banner** — `process.stdout.write` for version lines before `render()` (`interactiveTtySession`).
+ * 5. **`patchConsole`** — enabled when `console.Console` is constructible; off under Vitest `spyOn(console, …)` (`inkPatchConsoleSupported` in `interactiveTtySession`).
+ * 6. **readline `keypress`** — **only** Ctrl+C, fetch-wait Esc (no Ink `useInput` there), and token-list Esc bridge. See `stdin.on('keypress')` JSDoc in `interactiveTtySession.ts`. **Do not** handle MCQ Esc on readline (duplicate / wrong ordering).
+ */
 import { runInteractiveTtySession } from './interactiveTtySession.js'
 import type { TTYDeps } from './ttyDeps.js'
 
