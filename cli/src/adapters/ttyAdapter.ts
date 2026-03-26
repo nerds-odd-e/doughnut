@@ -626,7 +626,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     })
   }
 
-  /** Clears the live input line and `/` command-picker state (used by `/clear` and when fetch-wait ends). */
+  /** Clears the live input line and `/` command-picker state (e.g. when fetch-wait ends). */
   function resetLiveLineDraftAndSlashSuggestions(): void {
     commandInput = clearLiveCommandLine(commandInput)
     highlightIndex = 0
@@ -655,20 +655,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
     },
     writeCurrentPrompt: writeCurrentPromptLine,
     beginCurrentPrompt: doBeginCurrentPrompt,
-    clearAndRedraw: () => {
-      interactiveTtyStdout.clearScreen()
-      chatHistory = []
-      resetLiveLineDraftAndSlashSuggestions()
-      tokenSelection = null
-      if (shellInstance) {
-        shellInstance.unmount()
-        shellInstance = null
-      }
-      if (isInCommandSessionSubstate()) exitCommandSession()
-      setPendingStopConfirmation(false)
-      numberedChoiceHighlightIndex = 0
-      drawBox()
-    },
     onInteractiveFetchWaitChanged: () => {
       const activeWaitPrompt = getInteractiveFetchWaitLine()
       if (activeWaitPrompt) {
@@ -775,11 +761,6 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
         drawBox()
       } else {
         const trimmedInput = commandInput.lineDraft.trim()
-
-        if (trimmedInput === '/clear') {
-          ttyOutput.clearAndRedraw?.()
-          return
-        }
 
         if (isCommandPrefixWithSuggestions(commandInput.lineDraft)) {
           const filtered = filterCommandsByPrefix(

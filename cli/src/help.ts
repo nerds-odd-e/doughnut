@@ -28,12 +28,6 @@ export const interactiveDocs: CommandDoc[] = [
     category: 'interactive' as const,
   },
   {
-    name: '/clear',
-    usage: '/clear',
-    description: 'Clear screen and chat history',
-    category: 'interactive' as const,
-  },
-  {
     name: '/exit',
     usage: '/exit',
     description: 'Quit the CLI',

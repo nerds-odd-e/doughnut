@@ -91,8 +91,6 @@ export type OutputAdapter = {
    * wrapped lines) and input box are painted in the live region. When unset, non-TTY MCQ uses `writeCurrentPrompt` / `log` instead.
    */
   beginCurrentPrompt?: () => void
-  /** Optional: for `/clear`. TTY clears history and redraws; resize repaints via the adapter without this hook. */
-  clearAndRedraw?: () => void
   /**
    * TTY only: invoked when interactive fetch-wait starts or finishes (see `runInteractiveFetchWait`).
    * On start: repaint live region (Ink `Spinner` animates in `FetchWaitDisplay`). On end: discard line draft typed during the

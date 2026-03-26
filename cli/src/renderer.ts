@@ -34,7 +34,6 @@ import type {
   RecallMcqChoiceTexts,
 } from './types.js'
 import type { InteractiveFetchWaitLine } from './interactiveFetchWait.js'
-import { formatVersionOutput } from './version.js'
 
 export {
   GREY,
@@ -464,10 +463,7 @@ export interface BuildBoxLinesOptions {
   placeholderContext?: PlaceholderContext
 }
 
-export type LiveRegionPaintOptions = BuildBoxLinesOptions & {
-  /** When true, history (+ version header) only — no Current prompt / box / guidance tail. */
-  omitLiveRegion?: boolean
-}
+export type LiveRegionPaintOptions = BuildBoxLinesOptions
 
 function inputBoxLinePrefix(
   lineIndex: number,
@@ -852,78 +848,4 @@ export function buildTokenListLines(
     highlightIndex,
     width
   )
-}
-
-/**
- * Renders the full display. `currentPromptLines` is wrapped Current prompt text (stem, etc.).
- * `currentStageIndicatorLines` drives the **Current Stage Indicator** line(s) and banded separator when
- * non-empty (first lines of the Current prompt block). `suggestionLines` are Current guidance
- * (below the input box).
- */
-export function renderFullDisplay(
-  history: ChatHistory,
-  buffer: string,
-  width: TerminalWidth,
-  suggestionLines: string[],
-  currentStageIndicatorLines: string[],
-  currentPromptLines?: string[],
-  options?: LiveRegionPaintOptions
-): string[] {
-  const lines: string[] = [formatVersionOutput(), '']
-  for (const entry of history) {
-    if (entry.type === 'input') {
-      lines.push(...renderPastInput(entry.content, width).split('\n'))
-    } else {
-      const tone = entry.tone ?? 'plain'
-      lines.push(
-        ...entry.lines.map((line) => applyChatHistoryOutputTone(line, tone))
-      )
-    }
-  }
-  if (
-    needsGapBeforeBox(
-      history,
-      currentPromptLines ?? [],
-      currentStageIndicatorLines
-    ) &&
-    lines[lines.length - 1] !== ''
-  ) {
-    lines.push('')
-  }
-  if (!options?.omitLiveRegion) {
-    lines.push(
-      ...buildLiveRegionLines(
-        buffer,
-        width,
-        currentPromptLines ?? [],
-        suggestionLines,
-        currentStageIndicatorLines,
-        options
-      )
-    )
-  }
-  return lines
-}
-
-export function writeFullRedraw(
-  history: ChatHistory,
-  buffer: string,
-  width: TerminalWidth,
-  suggestionLines: string[],
-  currentStageIndicatorLines: string[],
-  liveRegionOptions?: LiveRegionPaintOptions
-): void {
-  process.stdout.write(CLEAR_SCREEN)
-  const lines = renderFullDisplay(
-    history,
-    buffer,
-    width,
-    suggestionLines,
-    currentStageIndicatorLines,
-    undefined,
-    liveRegionOptions
-  )
-  for (const line of lines) {
-    process.stdout.write(`${line}\n`)
-  }
 }

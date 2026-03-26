@@ -5,7 +5,7 @@
  * adapter-emitted byte sequence so ordering stays explicit and grep-friendly.
  *
  * **Belongs here:** shell-integration OSC (`INTERACTIVE_INPUT_READY_OSC`), cursor show/hide
- * coordinated with Ink’s paint callbacks, full-screen clear for `/clear`, Ctrl+C line advance
+ * coordinated with Ink’s paint callbacks, Ctrl+C line advance
  * before exit, exit farewell lines (grey committed input + toned output after shell unmount),
  * and “current prompt” separator lines from `OutputAdapter` hooks.
  *
@@ -17,7 +17,6 @@ import type { ChatHistoryOutputTone } from '../types.js'
 import {
   applyChatHistoryOutputTone,
   buildCurrentPromptSeparator,
-  CLEAR_SCREEN,
   GREY,
   HIDE_CURSOR,
   INTERACTIVE_INPUT_READY_OSC,
@@ -39,10 +38,6 @@ export const interactiveTtyStdout = {
 
   showCursor(): void {
     write(SHOW_CURSOR)
-  },
-
-  clearScreen(): void {
-    write(CLEAR_SCREEN)
   },
 
   inputReadyOsc(): void {

@@ -169,7 +169,7 @@ describe('Input command history: recalled drafts leave slash suggestion picker',
       commandInputWith({
         lineDraft: 'draft',
         caretOffset: 0,
-        committedCommands: ['/help_hist', '/clear_hist'],
+        committedCommands: ['/help_hist', '/hist_beta'],
       }),
       pickerWouldApply
     )
@@ -181,21 +181,21 @@ describe('Input command history: recalled drafts leave slash suggestion picker',
       commandInputWith({
         lineDraft: 'draft',
         caretOffset: 0,
-        committedCommands: ['/clear_hist', '/help_hist'],
+        committedCommands: ['/hist_beta', '/help_hist'],
       }),
       pickerWouldApply
     )
     expect(fromOlder.historyWalkIndex).toBe(0)
-    expect(fromOlder.lineDraft).toBe('/clear_hist')
+    expect(fromOlder.lineDraft).toBe('/hist_beta')
 
     const showingHelp = onArrowUp(fromOlder, pickerWouldApply)
     expect(showingHelp.historyWalkIndex).toBe(1)
     expect(showingHelp.lineDraft).toBe('/help_hist ')
 
-    const backToClear = onArrowDown(showingHelp, pickerWouldApply)
-    expect(backToClear.historyWalkIndex).toBe(0)
-    expect(backToClear.lineDraft).toBe('/clear_hist')
-    expect(backToClear.caretOffset).toBe('/clear_hist'.length)
+    const backToBeta = onArrowDown(showingHelp, pickerWouldApply)
+    expect(backToBeta.historyWalkIndex).toBe(0)
+    expect(backToBeta.lineDraft).toBe('/hist_beta')
+    expect(backToBeta.caretOffset).toBe('/hist_beta'.length)
   })
 })
 

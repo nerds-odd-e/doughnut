@@ -7,7 +7,6 @@ import {
   isCommittedInteractiveInput,
   grayDisabledInputBoxLines,
   applyChatHistoryOutputTone,
-  renderFullDisplay,
   stripAnsi,
   stripAnsiCsiAndCr,
   needsGapBeforeBox,
@@ -27,7 +26,6 @@ import {
   interactiveFetchWaitStageIndicatorLine,
   RESET,
 } from '../src/renderer.js'
-import type { ChatHistory } from '../src/types.js'
 
 describe('interactiveInputReadyOscSuffix', () => {
   const readyPaint = {
@@ -328,52 +326,25 @@ describe('buildLiveRegionLinesWithCaret', () => {
   })
 })
 
-describe('renderFullDisplay', () => {
-  test('has one empty line between history output and input box', () => {
-    const history: ChatHistory = [
-      { type: 'input', content: '/help' },
-      { type: 'output', lines: ['Available commands...'] },
-    ]
-    const lines = renderFullDisplay(history, '', 80, [], [])
-    const boxTopIndex = lines.findIndex((l) => stripAnsi(l).startsWith('┌'))
-    expect(boxTopIndex).toBeGreaterThan(0)
-    expect(stripAnsi(lines[boxTopIndex - 1])).toBe('')
-  })
-
-  test('styles error and userNotice history output lines', () => {
-    const history: ChatHistory = [
-      { type: 'output', lines: ['Network down'], tone: 'error' },
-      { type: 'output', lines: ['Cancelled by user.'], tone: 'userNotice' },
-    ]
-    const lines = renderFullDisplay(history, '', 80, [], [])
-    const errorLine = lines.find((l) => l.includes('Network down'))
-    const noticeLine = lines.find((l) => l.includes('Cancelled by user.'))
-    expect(errorLine).toContain('\x1b[31m')
-    expect(noticeLine).toContain('\x1b[90m')
-    expect(noticeLine).toContain('\x1b[3m')
-  })
-
-  test('omitLiveRegion skips live region (box and guidance)', () => {
-    const history: ChatHistory = [{ type: 'input', content: '/help' }]
-    const lines = renderFullDisplay(
-      history,
-      '',
-      80,
-      ['guidance only'],
-      [],
-      [],
-      {
-        omitLiveRegion: true,
-      }
-    )
-    expect(lines.some((l) => stripAnsi(l).startsWith('┌'))).toBe(false)
-    expect(lines.join('\n')).not.toContain('guidance only')
-  })
-})
-
 describe('applyChatHistoryOutputTone', () => {
   test('plain leaves text unchanged', () => {
     expect(applyChatHistoryOutputTone('ok', 'plain')).toBe('ok')
+  })
+
+  test('error uses red', () => {
+    expect(applyChatHistoryOutputTone('Network down', 'error')).toContain(
+      'Network down'
+    )
+    expect(applyChatHistoryOutputTone('Network down', 'error')).toContain(
+      '\x1b[31m'
+    )
+  })
+
+  test('userNotice uses grey italic', () => {
+    const line = applyChatHistoryOutputTone('Cancelled.', 'userNotice')
+    expect(line).toContain('Cancelled.')
+    expect(line).toContain('\x1b[90m')
+    expect(line).toContain('\x1b[3m')
   })
 })
 

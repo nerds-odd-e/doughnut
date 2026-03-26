@@ -100,20 +100,6 @@ describe('processInput', () => {
     expect(logSpy).toHaveBeenCalledWith('Not supported')
   })
 
-  test('returns false and writes clear-screen sequence and prompt box for /clear', async () => {
-    const writeSpy = vi
-      .spyOn(process.stdout, 'write')
-      .mockImplementation(() => true)
-    expect(await processInput('/clear')).toBe(false)
-    const output = writeSpy.mock.calls.map((c) => c[0]).join('')
-    expect(output).toContain('\x1b[H\x1b[2J')
-    expect(output).toContain('doughnut')
-    expect(output).toContain('┌')
-    expect(output).toContain('┘')
-    expect(output).toContain('→')
-    writeSpy.mockRestore()
-  })
-
   test('returns false and shows usage for /add-access-token without token', async () => {
     expect(await processInput('/add-access-token')).toBe(false)
     expect(logSpy).toHaveBeenCalledWith('Usage: /add-access-token <token>')

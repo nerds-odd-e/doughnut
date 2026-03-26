@@ -2,7 +2,7 @@
 
 Informal plan; update as work proceeds. **Testing:** observable behavior first — `runInteractive` / E2E; see `.cursor/rules/planning.mdc` and `.cursor/rules/cli.mdc`.
 
-**Shipped (incl. TTY-only refactor):** Interactive shell is **TTY-only** (`runInteractive` → `runTTY`). **Non-TTY** `runInteractive` **exits** with an error; **`run.ts` rejects `-c`** (and `help` subcommand). **`pipedAdapter.ts` is removed** — there is **no** piped-stdin shell or `-c` script path. **`processInput`** remains the **shared command engine** wired from **`ttyAdapter`** and from **Vitest** via **`defaultOutput`**. **Phase 9.5** removes **`/clear`** and any test-only **`writeFullRedraw`** / **`clearAndRedraw`** surface that exists **only** for that command (see below). **`doughnut help`** is **gone** (use **`/help`** in the TTY).
+**Shipped (incl. TTY-only refactor):** Interactive shell is **TTY-only** (`runInteractive` → `runTTY`). **Non-TTY** `runInteractive` **exits** with an error; **`run.ts` rejects `-c`** (and `help` subcommand). **`pipedAdapter.ts` is removed** — there is **no** piped-stdin shell or `-c` script path. **`processInput`** remains the **shared command engine** wired from **`ttyAdapter`** and from **Vitest** via **`defaultOutput`**. **Phase 9.5 (done):** **`/clear`** removed; **`writeFullRedraw`**, **`renderFullDisplay`**, **`clearAndRedraw`**, and TTY **`clearScreen`** hook removed with it. **`doughnut help`** is **gone** (use **`/help`** in the TTY).
 
 ## Plan invariant (non-negotiable)
 
@@ -10,11 +10,11 @@ There is **no** product support for **piped stdin** as an interactive shell and 
 
 ---
 
-## North star (phases 1–9 shipped; **9.5** = remove `/clear` + related dead API; **10+** = structural / Ink-native shell)
+## North star (phases 1–9.5 shipped; **10+** = structural / Ink-native shell)
 
 Interactive TTY = **one Ink `render()`** root: **`Static`** for append-only scrollback + **live subtree** driven by **`useInput`** / **`useFocus`** / **`@inkjs/ui`** where it fits (gate 5). **Business domain** owns the meaning of **chat history** and **command turns** (types + transitions); the shell expresses them as **React state** feeding **`Static` items** and live props — not as opaque mutable blobs inside a fat “adapter.”
 
-**End state (this document, phases 9.5 + 10–14; phase 9 TTY-only boundary shipped):**
+**End state (this document, phases 10–14; phases 9–9.5 TTY boundary + `/clear` removal shipped):**
 
 - **No `ttyAdapter` monolith** — replace with a **thin TTY I/O + mount** entry (streams, raw mode, documented bridges only) and **Ink-root state** for shell UI.
 - **TTY interactive module** stays free of **non-shell** layout drivers — **`renderer.ts`** vs Ink is **one** product surface (TTY); there is **no** second stdin-driven shell, **no** `pipedAdapter`, and **no** branching on “piped vs TTY” for the interactive shell.
@@ -31,7 +31,7 @@ Interactive TTY = **one Ink `render()`** root: **`Static`** for append-only scro
 
 **Shell rule (replaces fat “adapter”):** TTY entry file may only wire **mechanism** (`TTYDeps` / streams / `render` options). **Domain branching** stays in **`interactive.ts`** (and siblings); **scrollback and turn state** are named domain concepts surfaced to the Ink root (phases 10–11).
 
-**Layout bridge:** `cli/src/renderer.ts` — **shrink for TTY** (phase 12): keep grapheme-aware width/wrap for **shared string props** into Ink. **After phase 9.5:** no **`/clear`** on **`defaultOutput`**; any **`writeFullRedraw` / `renderFullDisplay` / `clearAndRedraw`** left in the tree must serve a **non–`/clear`** need (or be deleted with 9.5). **Not** piped stdin, **not** **`-c`**, **not** a second product UI. TTY live column stays Ink **`Text` / `Box`** wrap (phase 1; gate 4).
+**Layout bridge:** `cli/src/renderer.ts` — **shrink for TTY** (phase 12): keep grapheme-aware width/wrap for **shared string props** into Ink. **`writeFullRedraw` / `renderFullDisplay` / `clearAndRedraw`** removed with **`/clear`** (phase 9.5). **`buildLiveRegionLines`** etc. remain for fetch-wait tests and Ink string props. **Not** piped stdin, **not** **`-c`**, **not** a second product UI. TTY live column stays Ink **`Text` / `Box`** wrap (phase 1; gate 4).
 
 **Raw stdout:** Phase 13–14 converge on Ink-managed stdout + **`patchConsole: true`**; **`interactiveTtyStdout`** shrinks to **documented non-Ink bytes** (OSC, exit farewell) and **cursor hooks only if Ink does not fully own the caret** after gate 8.
 
@@ -91,7 +91,7 @@ Ink shell, neutral `TTYDeps`, confirm/MCQ/token/fetch-wait display components, *
 
 **Order (historical):** **2 → 3 → 4 → 5 → 6 → 7 → 8** (done).
 
-**Order (extended track):** **~~9~~ (done)** → **9.5** → **10 → 11 → 12 → 13 → 14** — **delete `/clear` + dead abstraction**, then **remove `ttyAdapter`**, **domain-shaped shell state + `Static` / `useInput`**, **shrink `renderer.ts` for TTY**, **`patchConsole: true`**, **final residue audit**.
+**Order (extended track):** **~~9~~ (done)** → **~~9.5~~ (done)** → **10 → 11 → 12 → 13 → 14** — then **remove `ttyAdapter`**, **domain-shaped shell state + `Static` / `useInput`**, **shrink `renderer.ts` for TTY**, **`patchConsole: true`**, **final residue audit**.
 
 **Rationale (planning.mdc):** Phase **12** is **structure-first** (no new user story); justify with **full interactive Vitest + targeted E2E** unchanged. Phases **10–11** can be split further if two user-visible slices are clearer (e.g. “history append correctness” vs “command turn flush”) — keep **at most one intentionally failing test** per planning TDD note when driving. **Phase 13** is user-visible only as “no corrupted interleaved logs”; treat **`patchConsole`** flip as **verify-heavy**. **Phase 14** is **audit + documentation** of approved exceptions.
 
@@ -166,7 +166,7 @@ Interactive fetch-wait: **`@inkjs/ui` `Spinner`** (`type="dots"`) in **`FetchWai
 - **Optional residual:** Grep in PRs that we do not reintroduce **`-c`**, a piped shell, or a non-Ink full-screen **product** path for the interactive shell.
 - **Verify:** **`pnpm cli:test`** interactive + **`processInput.test.ts`**.
 
-### Phase 9.5 — Remove `/clear` (product, tests, and dead abstraction)
+### Phase 9.5 (done) — Remove `/clear` (product, tests, and dead abstraction)
 
 **Goal:** **`/clear` does not exist** — not as a command, not as a test scenario, not as a comment or help string. **Gate 9** is satisfied by **deletion**, not by a replacement feature.
 

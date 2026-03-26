@@ -61,8 +61,8 @@ describe('TTY: shared interactive session', () => {
       const output = ttyOutput(writeSpy)
       expect(output).toContain('/help')
       expect(output).toContain('List available commands')
-      expect(output).toContain('/clear')
-      expect(output).toContain('Clear screen and chat history')
+      expect(output).toContain('/exit')
+      expect(output).toContain('Quit the CLI')
       expect(output).toContain('/list-access-token')
       expect(output).toContain('↓ more below')
     })
@@ -78,7 +78,7 @@ describe('TTY: shared interactive session', () => {
       expect(suggestionStart).toBeGreaterThanOrEqual(0)
       expect(lines[suggestionStart]).toContain('\x1b[7m')
       const laterSuggestion = lines.findIndex(
-        (l) => l.includes('/clear') && !l.includes('\x1b[7m')
+        (l) => l.includes('/exit') && !l.includes('\x1b[7m')
       )
       expect(laterSuggestion).toBeGreaterThan(suggestionStart)
     })
@@ -365,28 +365,10 @@ describe('TTY: shared interactive session', () => {
       expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ /add-access-token ')
     })
 
-    test('/clear clears screen and redraws prompt box', async () => {
-      pushTTYCommandBytes(stdin, '/help ')
+    test('after /help, consecutive Enter on empty input keeps a single input box top border', async () => {
+      await submitTTYCommand(stdin, '/help')
       await tick()
       pushTTYCommandEnter(stdin)
-      await tick()
-      pushTTYCommandBytes(stdin, '/clear')
-      await tick()
-      writeSpy.mockClear()
-
-      pushTTYCommandEnter(stdin)
-      await tick()
-
-      const output = ttyOutput(writeSpy)
-      expect(output).toContain('\x1b[H\x1b[2J')
-      expect(output).toContain('doughnut')
-      expect(output).toContain('┌')
-      expect(output).toContain('┘')
-      expect(output).toContain('→')
-    })
-
-    test('after /clear, Enter on empty input does not show duplicate input box top border', async () => {
-      pushTTYCommandBytes(stdin, '/clear')
       await tick()
       pushTTYCommandEnter(stdin)
       await tick()
@@ -405,44 +387,17 @@ describe('TTY: shared interactive session', () => {
       expect(boxTopLines).toHaveLength(1)
     })
 
-    test('after /help then /clear, run /help again shows help output', async () => {
-      pushTTYCommandBytes(stdin, '/help ')
-      await tick()
-      pushTTYCommandEnter(stdin)
-      await tick()
-      pushTTYCommandBytes(stdin, '/clear')
-      await tick()
-      pushTTYCommandEnter(stdin)
+    test('second /help after first still shows help output', async () => {
+      await submitTTYCommand(stdin, '/help')
       await tick()
       writeSpy.mockClear()
 
-      pushTTYCommandBytes(stdin, '/help ')
-      await tick()
-      pushTTYCommandEnter(stdin)
+      await submitTTYCommand(stdin, '/help')
       await tick()
 
       const output = ttyOutput(writeSpy)
       expect(stripAnsi(output)).toContain('/help')
       expect(stripAnsi(output)).toContain('List available commands')
-    })
-
-    test('after /clear then Enter, input box has exactly one top border (no double border)', async () => {
-      pushTTYCommandBytes(stdin, '/clear')
-      await tick()
-      pushTTYCommandEnter(stdin)
-      await tick()
-      writeSpy.mockClear()
-      pushTTYCommandEnter(stdin)
-      await tick()
-
-      const output = ttyOutput(writeSpy)
-      const visualOutput = simulatedScreenFromTtyWrites(output)
-      const boxTopLines = visualOutput
-        .split('\n')
-        .filter((l) =>
-          INPUT_BOX_TOP_OUTLINE_PATTERN.test(stripAnsiCsiAndCr(l).trim())
-        )
-      expect(boxTopLines).toHaveLength(1)
     })
 
     test('after /help, there is one empty line between history output and input box', async () => {

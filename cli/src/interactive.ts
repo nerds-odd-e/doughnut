@@ -38,13 +38,11 @@ import {
   RECALL_YES_NO_REPROMPT,
 } from './interactions/recallYesNo.js'
 import {
-  buildSuggestionLines,
   formatMcqChoiceLines,
   getTerminalWidth,
   RECALL_SESSION_YES_NO_PLACEHOLDER,
   wrapMarkdownTerminalToLines,
   wrapTextToLines,
-  writeFullRedraw,
   type PlaceholderContext,
 } from './renderer.js'
 import type {
@@ -386,10 +384,6 @@ const defaultOutput: OutputAdapter = {
     console.log(err instanceof Error ? err.message : String(err)),
   logUserNotice: (msg) => console.log(msg),
   writeCurrentPrompt: (msg) => console.log(msg),
-  clearAndRedraw: () => {
-    const width = getTerminalWidth()
-    writeFullRedraw([], '', width, buildSuggestionLines('', 0, width), [])
-  },
 }
 
 export async function processInput(
@@ -442,10 +436,6 @@ export async function processInput(
   }
   if (trimmed === '/help') {
     output.log(formatHelp())
-    return false
-  }
-  if (trimmed === '/clear') {
-    output.clearAndRedraw?.()
     return false
   }
   if (await handleParamCommand(trimmed, output)) {
