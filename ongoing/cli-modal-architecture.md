@@ -10,11 +10,11 @@ There is **no** product support for **piped stdin** as an interactive shell and 
 
 ---
 
-## North star (phases 1–9.5 shipped; **10–14** = structural / Ink-native shell; **15–16** = optional follow-up)
+## North star (phases 1–9.5 shipped; **10–16** = structural / Ink-native shell + readline residue cleanup)
 
 Interactive TTY = **one Ink `render()`** root: **`Static`** for append-only scrollback + **live subtree** driven by **`useInput`** / **`useFocus`** / **`@inkjs/ui`** where it fits (gate 5). **Business domain** owns the meaning of **chat history** and **command turns** (types + transitions); the shell expresses them as **React state** feeding **`Static` items** and live props — not as opaque mutable blobs inside a fat “adapter.”
 
-**End state (this document, phases 10–14 incl. **10.5**; phases 9–9.5 TTY boundary + `/clear` removal shipped):**
+**End state (this document, phases 10–16 incl. **10.5**; phases 9–9.5 TTY boundary + `/clear` removal shipped):**
 
 - **No `ttyAdapter` monolith** — replace with a **thin TTY I/O + mount** entry (streams, raw mode, documented bridges only) and **Ink-root state** for shell UI.
 - **TTY interactive module** stays free of **non-shell** layout drivers — **`renderer.ts`** vs Ink is **one** product surface (TTY); there is **no** second stdin-driven shell, **no** `pipedAdapter`, and **no** branching on “piped vs TTY” for the interactive shell.
@@ -91,7 +91,7 @@ Ink shell, neutral `TTYDeps`, confirm/MCQ/token/fetch-wait display components, *
 
 **Order (historical):** **2 → 3 → 4 → 5 → 6 → 7 → 8** (done).
 
-**Order (extended track):** **~~9~~ (done)** → **~~9.5~~ (done)** → **~~10~~ (done)** → **~~10.5~~ (done)** → **~~11~~ (done)** → **~~11.5~~ (done)** → **~~11.6~~ (done)** → **~~12~~ (done)** → **~~13~~ (done)** → **~~14~~ (done)** → **~~15~~ (done)** → **16** (open) — **~~10.5~~** = command-line **input chrome**: bordered `Box` removed from **`CommandLineLivePanel`** (borderless prompt row + full-width paint lines); **11** = thin TTY + Ink root state (today’s command-line **`useInput`** + reverse-video caret, no bordered input box); **~~11.5~~** = **gate 8** caret aligned with **`@inkjs/ui` `TextInput`** (`chalk.inverse` + fetch-wait disabled **`TextInput`**); editable multiline line still one **`useInput`** (see phase **11.5** note); **~~11.6~~** = **`terminalChalk`** (`Chalk({ level: 3 })`) + chalk-wrapped paint in **`renderer`**, **`listDisplay`**, **`interactiveTtyStdout`**; **`ansi.ts`** = cursor + **`RESET`** only; **~~12~~** = **`terminalLayout.ts`** + smaller **`renderer.ts`**, removed duplicate TTY **`buildSuggestionLines`** / dead **`ShellSessionRoot`** suggestion branches; **~~13~~** = **`patchConsole`** when `console.Console` works (real TTY); pre-Ink banner via **`process.stdout.write`**; **`index.test`** `process.exit` mock throws so **`exitCliError` `never`** is not violated under mock; **~~14~~** = **residue audit** + **`.cursor/rules/cli.mdc`** + **`ttyEntry.ts`** checklist; **~~15~~** = main command line **stdin contract** aligned with **`@inkjs/ui` `TextInput`** (typing keys factored + pass-through for return/escape/tab/↑↓ like stock `TextInput`); **visible** stock `<TextInput>` stays on **fetch-wait** only — package `TextInput` is **uncontrolled** and **cursor-at-end-only** on mount, so the default strip keeps **slash-aware** `formatInteractiveCommandLineInkRows` + one `useInput` owner; **16** = shrink or remove **readline `keypress`** bridges where Ink can own the key without stdin ordering fights.
+**Order (extended track):** **~~9~~ (done)** → **~~9.5~~ (done)** → **~~10~~ (done)** → **~~10.5~~ (done)** → **~~11~~ (done)** → **~~11.5~~ (done)** → **~~11.6~~ (done)** → **~~12~~ (done)** → **~~13~~ (done)** → **~~14~~ (done)** → **~~15~~ (done)** → **~~16~~ (done)** — **~~10.5~~** = command-line **input chrome**: bordered `Box` removed from **`CommandLineLivePanel`** (borderless prompt row + full-width paint lines); **11** = thin TTY + Ink root state (today’s command-line **`useInput`** + reverse-video caret, no bordered input box); **~~11.5~~** = **gate 8** caret aligned with **`@inkjs/ui` `TextInput`** (`chalk.inverse`; fetch-wait strip later **~~16~~** → dim **`Text`** + **`useInput`**); editable multiline line still one **`useInput`** (see phase **11.5** note); **~~11.6~~** = **`terminalChalk`** (`Chalk({ level: 3 })`) + chalk-wrapped paint in **`renderer`**, **`listDisplay`**, **`interactiveTtyStdout`**; **`ansi.ts`** = cursor + **`RESET`** only; **~~12~~** = **`terminalLayout.ts`** + smaller **`renderer.ts`**, removed duplicate TTY **`buildSuggestionLines`** / dead **`ShellSessionRoot`** suggestion branches; **~~13~~** = **`patchConsole`** when `console.Console` works (real TTY); pre-Ink banner via **`process.stdout.write`**; **`index.test`** `process.exit` mock throws so **`exitCliError` `never`** is not violated under mock; **~~14~~** = **residue audit** + **`.cursor/rules/cli.mdc`** + **`ttyEntry.ts`** checklist; **~~15~~** = main command line **stdin contract** aligned with **`@inkjs/ui` `TextInput`** (typing keys factored + pass-through for return/escape/tab/↑↓ like stock `TextInput`); **visible** stock `<TextInput>` stays on **fetch-wait** only — package `TextInput` is **uncontrolled** and **cursor-at-end-only** on mount, so the default strip keeps **slash-aware** `formatInteractiveCommandLineInkRows` + one `useInput` owner; **~~16~~** = **readline `keypress`** reduced to **Ctrl+C**; fetch-wait **Esc** on **`FetchWaitDisplay` `useInput`**; token-list **Esc** Ink-only (removed readline bridge); MCQ **Esc** unchanged (never on readline).
 
 **Invariant discipline (done):** Phase **9** “optional residual” (do not reintroduce **`-c`**, piped-stdin shell, or non-Ink full-screen product paths) plus the **Special cases** rule (new raw stdout / stdin exceptions only with table + JSDoc in the same PR) are **standing process** — satisfied by **phase 14** deliverables and review habit; **no** separate numbered phase.
 
@@ -151,9 +151,9 @@ Ink shell, neutral `TTYDeps`, confirm/MCQ/token/fetch-wait display components, *
 
 ### Phase 7 (done) — Complete replacement gate (mandatory)
 
-**Audit:** No second path for command-line keys, recall y/n, or list arrows / Enter / typing — all Ink **`useInput`**. **Removed:** redundant trailing no-ops in the **`keypress`** handler (list keys already fell through). **Intentional residue** (see JSDoc on **`stdin.on('keypress')`** in **`ttyAdapter.ts`**): Ctrl+C; fetch-wait Esc (**`FetchWaitDisplay`** has no `useInput`); MCQ/token **Esc** bridge when stdin ordering is unfriendly to Ink. **`readline.Interface`** output is **`noopOutput`** — no **`line`** event path.
+**Audit:** No second path for command-line keys, recall y/n, or list arrows / Enter / typing — all Ink **`useInput`**. **Removed:** redundant trailing no-ops in the **`keypress`** handler (list keys already fell through). **Residue then:** Ctrl+C plus readline bridges for fetch-wait Esc and token-list Esc — **phase 16** shrank **`keypress`** to **Ctrl+C** only (Ink owns those Esc paths). **`readline.Interface`** output is **`noopOutput`** — no **`line`** event path.
 
-- **Verify:** `pnpm cli:test` interactive suite; **`ttyAdapter`** grep: **`keypress`** / **`readline`** only as above.
+- **Verify:** `pnpm cli:test` interactive suite; **`interactiveTtySession`** grep: **`keypress`** / **`readline`** only as documented.
 
 ### Phase 8 (done) — ink-ui polish
 
@@ -195,7 +195,7 @@ Interactive fetch-wait: **`@inkjs/ui` `Spinner`** (`type="dots"`) in **`FetchWai
 
 **Goal:** Delete the **`ttyAdapter` monolith** — replace with **(a)** a **thin TTY session file** (mount Ink, streams, raw mode, **`exitOnCtrlC`**, documented **`keypress` residue** only per [Special cases](#special-cases-approved-ink-exceptions)) and **(b)** **Ink root** (`InteractiveShellDisplay` or successor) holding **React state / reducer** that subscribes to domain callbacks instead of mirroring state in closure variables beside Ink.
 
-- **Shipped:** **`cli/src/adapters/ttyEntry.ts`** — **`runTTY`** only. **`cli/src/adapters/interactiveTtySession.ts`** — readline + **`keypress`** bridge, **`render` / `rerender`**, **`patch` + `applyShellSessionPatch`** session model. **`cli/src/ui/ShellSessionRoot.tsx`** — Ink tree (`InteractiveShellDisplay` + live panels) from **`ShellSessionState`** + **`TTYDeps`** + handlers. **`cli/src/shell/shellSessionState.ts`**, **`cli/src/adapters/ttyDeps.ts`**. **`ttyAdapter.ts` removed.** Command line still **`CommandLineLivePanel`** **`useInput`**; gate **8** / **11.5** moved caret paint to **`chalk.inverse`** (TextInput-equivalent) + fetch-wait **`TextInput`**.
+- **Shipped:** **`cli/src/adapters/ttyEntry.ts`** — **`runTTY`** only. **`cli/src/adapters/interactiveTtySession.ts`** — readline + **`keypress`** (post–**phase 16:** Ctrl+C only), **`render` / `rerender`**, **`patch` + `applyShellSessionPatch`** session model. **`cli/src/ui/ShellSessionRoot.tsx`** — Ink tree (`InteractiveShellDisplay` + live panels) from **`ShellSessionState`** + **`TTYDeps`** + handlers. **`cli/src/shell/shellSessionState.ts`**, **`cli/src/adapters/ttyDeps.ts`**. **`ttyAdapter.ts` removed.** Command line still **`CommandLineLivePanel`** **`useInput`**; gate **8** / **11.5** moved caret paint to **`chalk.inverse`** (TextInput-equivalent); fetch-wait strip used disabled **`TextInput`** until **phase 16** (dim **`Text`** + **`useInput`**).
 - **Principle:** Session updates go through **immutable `ShellSessionPatch`** and **`drawBox`/`rerender`**; domain (`setPendingStopConfirmation`, etc.) stays ordered **before** paint where the prior adapter did.
 - **`/clear`:** Unchanged (**phase 9.5**).
 - **Verify:** **`pnpm cli:test`** green; **`pnpm cli:lint`** green.
@@ -204,7 +204,7 @@ Interactive fetch-wait: **`@inkjs/ui` `Spinner`** (`type="dots"`) in **`FetchWai
 
 **Goal:** **North star** for the main command line: Ink-native editing — **`@inkjs/ui` `TextInput`** (or equivalent) **replaces** the bespoke **`useInput`** line editor + reverse-video caret where that swap is correct for behavior (draft history, slash picker, focus, submit). Remove **`interactiveTtyStdout.hideCursor`** / manual caret coupling **when** `TextInput` owns the UX. Further controls may move to `TextInput` in the same phase or a **later** small phase if each slice stays **test-green** with **no dead code**.
 
-- **Shipped:** Command-line caret/placeholder inverse video uses **`chalk.inverse`** (same SGR sequence as `@inkjs/ui` TextInput; `Chalk({ level: 3 })` so Vitest always sees escapes). **Fetch-wait** live strip: disabled **`TextInput`** for the “loading …” line (`FetchWaitDisplay.tsx`) — `isDisabled` keeps Ink `useInput` inactive (no stdin fight). **Not shipped:** mounting stock **`TextInput`** for the **editable** command line — upstream is `defaultValue`-only; Ink delivers stdin to every `useInput`, so a second TextInput `useInput` would double-handle keys with `CommandLineLivePanel` unless the session editor is refactored into one owner. **After multiline removal:** the live buffer is **single-line** (paste newlines → spaces), which aligns the product with that upstream limitation.
+- **Shipped:** Command-line caret/placeholder inverse video uses **`chalk.inverse`** (same SGR sequence as `@inkjs/ui` TextInput; `Chalk({ level: 3 })` so Vitest always sees escapes). **Fetch-wait** live strip at **11.5:** disabled **`TextInput`** for “loading …” — **phase 16** replaced it with dim **`Text`** plus dedicated **`useInput`** because ink-ui’s disabled **`TextInput` still registers `useInput` with `isActive: true`**, which blocked fetch-wait **Esc** on Ink until readline was removed. **Not shipped:** mounting stock **`TextInput`** for the **editable** command line — upstream is `defaultValue`-only; Ink delivers stdin to every `useInput`, so a second TextInput `useInput` would double-handle keys with `CommandLineLivePanel` unless the session editor is refactored into one owner. **After multiline removal:** the live buffer is **single-line** (paste newlines → spaces), which aligns the product with that upstream limitation.
 - **Verify:** **`pnpm cli:test`**; **`pnpm cli:lint`**. Targeted E2E `cli_interactive_mode.feature` when Cypress is available locally/CI.
 
 ### Phase 11.6 (done) — Chalk: migrate remaining TTY paint (after 11.5)
@@ -243,16 +243,16 @@ Interactive fetch-wait: **`@inkjs/ui` `Spinner`** (`type="dots"`) in **`FetchWai
 
 **Goal (as shipped):** One **`useInput`** owner on the default strip; **typing** keys (caret, insert, delete, home/end) run through **`tryApplyMainCommandLineInkTyping`** (`cli/src/interactions/mainCommandLineInkTyping.ts`) and **`onCommandLineTyping`** into session state; **return**, **escape**, **tab**, **↑↓** (and **Shift+Tab**) match stock **`TextInput`** by **not** consuming them here so **`handleCommandLineInkInput`** handles them unchanged. **Guards** treat **`\r`/`\n`** as non-typing so Enter is not applied as printable text.
 
-**Why not a second mounted `<TextInput>` on the default strip:** **`@inkjs/ui` `TextInput`** is **uncontrolled** (`defaultValue` only; cursor initializes at **end**). Mounting it **enabled** alongside **`LiveColumnInkPanel`’s** `useInput` would **double-handle** stdin; a **disabled** copy would be **dead** UI. **Slash** highlighting and **grapheme**-aware paint stay on **`formatInteractiveCommandLineInkRows`**. Stock **`<TextInput>`** remains on **`FetchWaitDisplay`**.
+**Why not a second mounted `<TextInput>` on the default strip:** **`@inkjs/ui` `TextInput`** is **uncontrolled** (`defaultValue` only; cursor initializes at **end**). Mounting it **enabled** alongside **`LiveColumnInkPanel`’s** `useInput` would **double-handle** stdin; a **disabled** copy would be **dead** UI. **Slash** highlighting and **grapheme**-aware paint stay on **`formatInteractiveCommandLineInkRows`**. **`FetchWaitDisplay`** used a disabled **`TextInput`** briefly; **phase 16** moved fetch-wait to dim **`Text`** + **`useInput`** (see **phase 16**).
 
 - **Verify:** **`pnpm cli:test`**; **`pnpm cli:lint`**; targeted E2E **`cli_interactive_mode.feature`** when Cypress is available.
 
-### Phase 16 (open) — Readline `keypress` bridges
+### Phase 16 (done) — Readline `keypress` bridges
 
-**Goal:** For each case in [Special cases](#special-cases-approved-ink-exceptions) under **readline `keypress`** (Ctrl+C policy aside if it must stay at the TTY layer, fetch-wait **Esc**, MCQ/token list **Esc**), **prefer eliminating** the bridge if a component can own the key via Ink **`useInput`** without stdin ordering regressions.
+**Goal:** Eliminate readline bridges where Ink can own the key without stdin ordering regressions.
 
-- **Outcome:** Smaller **`stdin.on('keypress')`** handler; table and **`ttyEntry.ts`** / **`interactiveTtySession.ts`** JSDoc updated when a row is removed or narrowed.
-- **Verify:** **`pnpm cli:test`** (interactive + affected flows); **`pnpm cli:lint`**; E2E for recall / token / fetch-wait as touched.
+- **Shipped:** **`stdin.on('keypress')`** handles **Ctrl+C** only. **Fetch-wait Esc:** **`FetchWaitDisplay`** **`useInput`** → **`onFetchWaitEscape`** → **`cancelInteractiveFetchWaitFor`** + **`drawBox`**. Disabled **`@inkjs/ui` `TextInput`** was replaced by dim **`Text`** for “loading …” so ink-ui does not keep a second active **`useInput`** on that strip. **Token-list Esc:** readline bridge removed (Ink list-selection path only); Vitest **`interactiveTtyTokenList`** and **`interactiveTtyFetchWaitEsc`** use **`pushTTYCommandEscape`** (stdin bytes for Ink, not synthetic readline-only **`pressKey('escape')`**). **MCQ Esc:** unchanged — never on readline (duplicate stop-confirm risk).
+- **Verify:** **`pnpm cli:test`**; **`pnpm cli:lint`**; **`.cursor/rules/cli.mdc`** + **`ttyEntry.ts`** + plan **Special cases** table updated.
 
 ---
 
@@ -264,7 +264,7 @@ These are **intentional** places the stack is **not** pure Ink — document **wh
 |------|----------------------------------------|
 | **Private OSC** **`INTERACTIVE_INPUT_READY_OSC`** | Invisible integrator signal (PTY / shell integration); not a React layout concern. |
 | **Exit farewell** (and **cursor show** on exit if still needed) | Lifecycle **after** `unmount` / outside Ink’s paint cycle for some paths. **Hardware cursor hide/show during interactive typing** — **prefer dropping** once command line uses Ink-native caret (gate 8); only list here if a gap remains. |
-| **readline `keypress`** (Ctrl+C, fetch-wait Esc, list Esc bridge) | **Phase 7** residue: stdin ordering / components without `useInput` for that key; **phase 16** targets removing or shrinking each bridge where Ink can own the key without fighting. |
+| **readline `keypress`** (Ctrl+C only) | **Phase 16:** fetch-wait **Esc** moved to **`FetchWaitDisplay` `useInput`**; token-list **Esc** is Ink-only (same as MCQ). **Ctrl+C** stays on readline so exit runs before other routing. |
 
 **Not a special case:** **`/clear`** — **removed in phase 9.5**; do **not** add CSI or adapter exceptions for a screen-clear command (gate 9).
 
@@ -276,13 +276,13 @@ These are **intentional** places the stack is **not** pure Ink — document **wh
 
 | Mode | Owner after migration | Thin TTY entry / readline |
 |------|------------------------|---------------------------|
-| Main command line | After **11:** Ink **`useInput`** + **focus** (phases 2 + 4); **11.5** = caret aligned with **`TextInput`**; **15** = typing keys + pass-through match **`@inkjs/ui` `TextInput`**; paint stays **`formatInteractiveCommandLineInkRows`**; stock **`<TextInput>`** on fetch-wait only | No duplicate key handling |
+| Main command line | After **11:** Ink **`useInput`** + **focus** (phases 2 + 4); **11.5** = caret aligned with **`TextInput`**; **15** = typing keys + pass-through match **`@inkjs/ui` `TextInput`**; paint stays **`formatInteractiveCommandLineInkRows`**; **16** = fetch-wait is dim **`Text`** + **`useInput`**, not **`TextInput`** | No duplicate key handling |
 | Confirm / y/n | **`RecallInkConfirmPanel`** + **`@inkjs/ui` `StatusMessage`** (phase 6) | No duplicate |
-| Lists (MCQ, tokens, selection) | **`RecallMcqChoicesLivePanel`** / **`AccessTokenPickerLivePanel`** + **`selectListInteraction`**; Esc bridge on **`keypress`** until removed | No duplicate list keys except **listed** Esc bridge |
+| Lists (MCQ, tokens, selection) | **`RecallMcqChoicesLivePanel`** / **`AccessTokenPickerLivePanel`** + **`selectListInteraction`**; **16** = Esc Ink-only (no token-list readline bridge) | No duplicate list keys |
 | Scrollback / turns | Domain model → **`Static` items** + live props (phases 10–11) | Not stored only in legacy adapter closures |
 | **`-c` / piped stdin shell** | **Must not exist** — **`run.ts`** errors on **`-c`**; **`runInteractive`** requires TTY | **Do not** add code paths that bypass this |
 | **`processInput` + `defaultOutput`** | **Test harness** — **after 9.5:** no **`/clear`**; **`defaultOutput`** only carries hooks still needed for real **`processInput`** tests | Same engine as TTY; **not** piped shell, **not** **`-c`** |
-| Residue | — | **Phase 14** + [Special cases](#special-cases-approved-ink-exceptions); **phase 16** shrinks approved **`keypress`** rows where possible |
+| Residue | — | **Phase 14** + [Special cases](#special-cases-approved-ink-exceptions); **phase 16** shrank **`keypress`** to **Ctrl+C** |
 | Invariant (no **`-c`**, no piped shell, doc’d exceptions only) | — | **Done** — standing discipline; see **Invariant discipline (done)** under [Remaining phases](#remaining-phases-numbered) |
 
 ---

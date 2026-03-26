@@ -33,9 +33,9 @@ function firstRowIndexContainingPlain(
 import {
   endTTYSession,
   makeTempConfigDir,
-  pressKey,
   pushTTYCommandBytes,
   pushTTYCommandEnter,
+  pushTTYCommandEscape,
   pushTTYCommandKey,
   startTTYSessionWithoutRecallReset,
   submitTTYCommand,
@@ -284,8 +284,7 @@ describe('TTY token list interactive mode', () => {
     await submitTTYCommand(stdin, '/remove-access-token')
     writeSpy.mockClear()
 
-    pressKey(stdin, 'escape')
-    await tick()
+    await pushTTYCommandEscape(stdin)
 
     const output = ttyOutput(writeSpy)
     expect(output).toContain('Cancelled by user.')

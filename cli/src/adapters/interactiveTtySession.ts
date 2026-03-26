@@ -848,6 +848,11 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
     signalConfirmInputReady,
     onEnterStopConfirmationFromEsc: enterStopConfirmationFromEsc,
     whenInActiveRecallSession: isInCommandSessionSubstate,
+    onFetchWaitEscape: () => {
+      if (cancelInteractiveFetchWaitFor(ttyOutput)) {
+        drawBox()
+      }
+    },
   }
 
   drawBox()
@@ -856,37 +861,15 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
   removeResizeListenerRef.current = () => process.stdout.off('resize', drawBox)
 
   /**
-   * Readline `emitKeypressEvents` runs alongside Ink on the same stdin. Ink owns normal typing
-   * and MCQ list keys (stdin). This listener is only for:
-   * - Ctrl+C (always; exit before other routing).
-   * - Fetch-wait Esc cancel — {@link FetchWaitDisplay} has no `useInput`.
-   * - Esc on the access-token list when needed (Ink still handles Esc when it receives it).
-   * Do not handle MCQ Esc here: the same byte is already consumed by Ink; a second readline Esc
-   * (often after `escapeCodeTimeout`) would re-open stop confirmation after Ink dismissed it.
-   * When the default command line is active, return immediately so readline does not handle command-line keys.
+   * Readline `emitKeypressEvents` runs alongside Ink on the same stdin. Ink owns typing, list keys,
+   * fetch-wait Esc (`FetchWaitDisplay` `useInput`), and token-list Esc (list-selection live column).
+   * This listener is only for **Ctrl+C** (exit before Ink routing). Do not add MCQ Esc here: a late readline
+   * `escape` after Ink already handled it can duplicate stop-confirm behavior.
    */
   stdin.on('keypress', (_str, key: ReadlineKey) => {
     if (key.ctrl && key.name === 'c') {
       interactiveTtyStdout.ctrlCExitNewline()
       doExit()
-      return
-    }
-    if (key.name === 'escape' && cancelInteractiveFetchWaitFor(ttyOutput)) {
-      drawBox()
-      return
-    }
-    if (!isAlternateLivePanel(session, deps)) {
-      return
-    }
-    if (
-      isPendingStopConfirmation() ||
-      usesSessionYesNoInputChrome(!!session.tokenSelection)
-    ) {
-      return
-    }
-    if (key.name === 'escape' && session.tokenSelection) {
-      commitTokenListResult(CLI_USER_ABORTED_WAIT_MESSAGE, 'userNotice')
-      return
     }
   })
 }

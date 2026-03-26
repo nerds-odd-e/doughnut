@@ -104,6 +104,7 @@ export function pressEnter(stdin: TTYStdin) {
   })
 }
 
+/** Synthetic readline event only — does not push bytes into Ink. For **Esc** on the TTY shell, prefer {@link pushTTYCommandEscape}. */
 export function pressKey(
   stdin: TTYStdin,
   name: string,

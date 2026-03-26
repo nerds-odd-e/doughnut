@@ -41,7 +41,7 @@ function setActiveWaitLine(
 
 /**
  * Backend/network work executed while the interactive fetch-wait chrome is shown.
- * The same `abortSignal` is aborted if the user presses Esc on this `output`.
+ * The same `abortSignal` is aborted if the user presses Esc (TTY: `FetchWaitDisplay` `useInput` → `cancelInteractiveFetchWaitFor`).
  */
 export type InteractiveFetchWaitTask<T> = (
   abortSignal: AbortSignal
