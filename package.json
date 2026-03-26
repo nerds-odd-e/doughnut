@@ -138,7 +138,8 @@
       "dompurify": ">=3.3.2",
       "express-rate-limit": ">=8.2.2",
       "flatted": ">=3.4.2",
-      "yauzl": ">=3.2.1"
+      "yauzl": ">=3.2.1",
+      "picomatch": ">=4.0.4"
     },
     "onlyBuiltDependencies": [
       "@badeball/cypress-cucumber-preprocessor",
