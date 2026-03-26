@@ -25,14 +25,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref, onMounted, watch } from "vue"
 import type { MemoryTracker } from "@generated/doughnut-backend-api"
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import NoteTitleWithLink from "@/components/notes/NoteTitleWithLink.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
+import { useRecentMemoryTrackersRefreshTick } from "@/composables/useRecentMemoryTrackersRefresh"
 
 const memoryTrackers = ref<MemoryTracker[] | undefined>(undefined)
+const { recentMemoryTrackersRefreshTick } = useRecentMemoryTrackersRefreshTick()
 
 const fetchData = async () => {
   const { data: trackers, error } =
@@ -43,6 +45,10 @@ const fetchData = async () => {
 }
 
 onMounted(() => {
+  fetchData()
+})
+
+watch(recentMemoryTrackersRefreshTick, () => {
   fetchData()
 })
 </script>

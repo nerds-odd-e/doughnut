@@ -10,11 +10,27 @@ import helper, {
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
+import { requestRecentMemoryTrackersRefresh } from "@/composables/useRecentMemoryTrackersRefresh"
 import { computed, ref } from "vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 
 vi.mock("@/composables/useRecallData")
 vi.mock("@/composables/useAssimilationCount")
+vi.mock(
+  "@/composables/useRecentMemoryTrackersRefresh",
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import("@/composables/useRecentMemoryTrackersRefresh")
+      >()
+    return {
+      ...actual,
+      requestRecentMemoryTrackersRefresh: vi.fn(
+        actual.requestRecentMemoryTrackersRefresh
+      ),
+    }
+  }
+)
 
 let renderer: RenderingHelper<typeof Assimilation>
 let assimilateSpy: ReturnType<typeof mockSdkService<"assimilate">>
@@ -116,6 +132,7 @@ describe("Assimilation component", () => {
       expect(wrapper.emitted()).toHaveProperty("assimilationDone")
       expect(mockedTotalAssimilatedCount.value).toBe(2)
       expect(mockedIncrementAssimilatedCount).toHaveBeenCalledWith(2)
+      expect(requestRecentMemoryTrackersRefresh).toHaveBeenCalled()
     })
   })
 
@@ -250,6 +267,7 @@ describe("Assimilation component", () => {
         body: { noteId: note.id, skipMemoryTracking: false },
       })
       expect(wrapper.emitted()).toHaveProperty("assimilationDone")
+      expect(requestRecentMemoryTrackersRefresh).toHaveBeenCalled()
     })
   })
 })

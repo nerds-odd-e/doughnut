@@ -58,6 +58,7 @@ import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
 import { computed, ref } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
+import { requestRecentMemoryTrackersRefresh } from "@/composables/useRecentMemoryTrackersRefresh"
 
 const { note } = defineProps<{
   note: Note
@@ -147,6 +148,7 @@ const doAssimilate = async (skipMemoryTracking: boolean) => {
       totalAssimilatedCount.value += newTrackerCount
     }
     incrementAssimilatedCount(newTrackerCount)
+    requestRecentMemoryTrackersRefresh()
 
     if (skipMemoryTracking) {
       emit("reloadNeeded")

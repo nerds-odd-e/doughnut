@@ -1,4 +1,5 @@
 import RecentlyLearnedNotes from "@/components/recent/RecentlyLearnedNotes.vue"
+import { requestRecentMemoryTrackersRefresh } from "@/composables/useRecentMemoryTrackersRefresh"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -39,5 +40,25 @@ describe("RecentlyLearnedNotes", () => {
     // Verify removed memory tracker has correct styling
     const removedRow = rows[1]
     expect(removedRow?.classes()).toContain("removed")
+  })
+
+  it("refetches when recent memory trackers refresh is requested", async () => {
+    const getRecentMemoryTrackersSpy = mockSdkService(
+      "getRecentMemoryTrackers",
+      mockMemoryTrackers
+    )
+    getRecentMemoryTrackersSpy.mockClear()
+    helper.component(RecentlyLearnedNotes).withRouter().mount()
+
+    await flushPromises()
+    const callsAfterMount = getRecentMemoryTrackersSpy.mock.calls.length
+    expect(callsAfterMount).toBeGreaterThanOrEqual(1)
+
+    requestRecentMemoryTrackersRefresh()
+    await flushPromises()
+
+    expect(getRecentMemoryTrackersSpy.mock.calls.length).toBeGreaterThan(
+      callsAfterMount
+    )
   })
 })
