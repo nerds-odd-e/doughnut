@@ -57,6 +57,8 @@ repositories {
 
 ext['flyway.version'] = '11.20.3'
 
+def jdkUnsafeMemoryAccessJvmArgs = ['--sun-misc-unsafe-memory-access=allow']
+
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -83,9 +85,14 @@ dependencies {
 
 test {
   useJUnitPlatform()
+  jvmArgs(jdkUnsafeMemoryAccessJvmArgs)
   testLogging {
     exceptionFormat = 'full'
   }
+}
+
+tasks.named('bootRun') {
+  jvmArgs(jdkUnsafeMemoryAccessJvmArgs)
 }
 
 tasks.register("bootRunE2E") {
@@ -120,6 +127,7 @@ def configureSpringBootTask = { task, description, taskName ->
   task.systemProperty("spring.profiles.active", "test")
   task.args = ['--server.port=0'] // Using 0 will let Spring Boot pick a random available port
   task.systemProperty("odd-e.doughnut.task", taskName)
+  task.jvmArgs(jdkUnsafeMemoryAccessJvmArgs)
 }
 
 // Register and configure the migrateTestDB task

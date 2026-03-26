@@ -25,7 +25,7 @@ fi
 # Set up Java environment (headless for Cloud VM - no display)
 export JAVA_HOME=/tmp/java25/zulu25.30.17-ca-jdk25.0.1-linux_x64
 export PATH=$JAVA_HOME/bin:$PATH
-export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:-} -Djava.awt.headless=true"
+export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:-} -Djava.awt.headless=true --sun-misc-unsafe-memory-access=allow"
 export GRADLE_OPTS="${GRADLE_OPTS:-} -Djava.awt.headless=true"
 
 # Verify Java installation
