@@ -2,6 +2,7 @@ import type { AccessTokenEntry } from '../accessToken.js'
 import type { AccessTokenPickerAction } from '../types.js'
 import {
   emptyInteractiveCommandInput,
+  singleLineCommandDraft,
   type InteractiveCommandInput,
 } from '../interactiveCommandInput.js'
 import { loadCliCommandHistory } from '../cliCommandHistoryFile.js'
@@ -43,7 +44,9 @@ export function createInitialShellSessionState(): ShellSessionState {
     chatHistory: [],
     commandInput: {
       ...emptyInteractiveCommandInput(),
-      committedCommands: loadCliCommandHistory(getConfigDir()),
+      committedCommands: loadCliCommandHistory(getConfigDir())
+        .map((s) => singleLineCommandDraft(s).trim())
+        .filter((s) => s.length > 0),
     },
     highlightIndex: 0,
     suggestionsDismissed: false,

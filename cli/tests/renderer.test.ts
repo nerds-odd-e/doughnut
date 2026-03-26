@@ -48,7 +48,7 @@ describe('interactiveInputReadyOscSuffix', () => {
     ).toBe('')
     expect(
       interactiveInputReadyOscSuffix({
-        lineDraft: ' \n',
+        lineDraft: '  ',
         interactiveFetchWaitLine: null,
       })
     ).toBe('')

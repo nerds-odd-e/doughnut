@@ -1,14 +1,20 @@
 /**
- * TTY interactive command line: multiline {@link InteractiveCommandInput.lineDraft},
- * caret, and in-memory ↑↓ recall of prior commits (newest first).
+ * TTY interactive command line: single-line {@link InteractiveCommandInput.lineDraft},
+ * caret, and in-memory ↑↓ recall of prior commits (newest first). Newlines from paste are
+ * collapsed to spaces; Shift+Enter does not insert a newline.
  */
 
 /** Cap on recalled lines; same order as chat commits, trimmed non-empty only. */
 export const MAX_COMMITTED_COMMANDS = 100
 
+/** Collapse CR/LF to spaces so the draft stays one logical line. */
+export function singleLineCommandDraft(s: string): string {
+  return s.replace(/\r\n|\r|\n/g, ' ')
+}
+
 /**
- * Whether the last logical line of `lineDraft` would open the TTY slash-command
- * suggestion list (same contract as `isCommandPrefixWithSuggestions` in `renderer.ts`).
+ * Whether `lineDraft` would open the TTY slash-command suggestion list (same contract as
+ * `isCommandPrefixWithSuggestions` in `renderer.ts`).
  */
 export type SlashSuggestionPickerApplies = (lineDraft: string) => boolean
 
@@ -44,7 +50,7 @@ export function appendCommittedCommand(
   committedCommands: string[],
   rawLine: string
 ): string[] {
-  const trimmed = rawLine.trim()
+  const trimmed = singleLineCommandDraft(rawLine).trim()
   if (trimmed.length === 0) return committedCommands
   const next = [trimmed, ...committedCommands]
   if (next.length > MAX_COMMITTED_COMMANDS) next.length = MAX_COMMITTED_COMMANDS
@@ -58,16 +64,6 @@ function endHistoryWalk(): Pick<
   return { historyWalkIndex: null, lineDraftBeforeHistoryWalk: null }
 }
 
-/** Replace the last logical line of a multiline draft; single-line draft becomes `newLastLine`. */
-export function replaceLastLogicalLine(
-  lineDraft: string,
-  newLastLine: string
-): string {
-  const lines = lineDraft.split('\n')
-  if (lines.length <= 1) return newLastLine
-  return [...lines.slice(0, -1), newLastLine].join('\n')
-}
-
 /**
  * When recalling a committed line into the box during ↑↓ history walk, an incomplete `/…`
  * prefix that would show slash suggestions is stored without a trailing space. Append one
@@ -77,10 +73,9 @@ export function normalizeRecalledLineDraftForSlashSuggestionExit(
   lineDraft: string,
   slashPickerWouldApplyToRecalledLine: boolean
 ): string {
-  if (!slashPickerWouldApplyToRecalledLine) return lineDraft
-  const lines = lineDraft.split('\n')
-  const last = lines[lines.length - 1] ?? ''
-  return replaceLastLogicalLine(lineDraft, `${last} `)
+  const d = singleLineCommandDraft(lineDraft)
+  if (!slashPickerWouldApplyToRecalledLine) return d
+  return `${d} `
 }
 
 /** Recalled committed line as it should appear in the input box (exit slash picker when needed). */
@@ -88,19 +83,17 @@ function recalledDraftForInputBox(
   recalled: string,
   slashPickerApplies: SlashSuggestionPickerApplies
 ): string {
+  const one = singleLineCommandDraft(recalled)
   return normalizeRecalledLineDraftForSlashSuggestionExit(
-    recalled,
-    slashPickerApplies(recalled)
+    one,
+    slashPickerApplies(one)
   )
 }
 
-/** After Esc when the last line is exactly `/`: clear one-line draft, or drop the last line. */
+/** Esc on a bare `/` prefix: clear the draft; otherwise normalize to a single line. */
 export function lineDraftAfterEscapingBareSlash(lineDraft: string): string {
-  const lines = lineDraft.split('\n')
-  const last = lines[lines.length - 1] ?? ''
-  if (last !== '/') return lineDraft
-  if (lines.length === 1) return ''
-  return lines.slice(0, -1).join('\n')
+  const one = singleLineCommandDraft(lineDraft)
+  return one === '/' ? '' : one
 }
 
 /** Esc on a bare `/` prefix: clear or drop last line; ends any history walk; caret at end. */
@@ -116,12 +109,12 @@ export function afterBareSlashEscape(
   }
 }
 
-/** Tab completion or Enter-pick: new last line, caret at end, any history walk ends. */
+/** Tab completion or Enter-pick: new draft, caret at end, any history walk ends. */
 export function applyLastLineEdit(
   state: InteractiveCommandInput,
-  newLastLine: string
+  newLine: string
 ): InteractiveCommandInput {
-  const lineDraft = replaceLastLogicalLine(state.lineDraft, newLastLine)
+  const lineDraft = singleLineCommandDraft(newLine)
   return {
     ...state,
     ...endHistoryWalk(),
@@ -251,13 +244,15 @@ export function insertIntoDraft(
   text: string
 ): InteractiveCommandInput {
   const s = stateForTypingEdit(state)
+  const chunk = singleLineCommandDraft(text)
   const { lineDraft, caretOffset } = s
-  const nextDraft =
-    lineDraft.slice(0, caretOffset) + text + lineDraft.slice(caretOffset)
+  const nextDraft = singleLineCommandDraft(
+    lineDraft.slice(0, caretOffset) + chunk + lineDraft.slice(caretOffset)
+  )
   return {
     ...s,
     lineDraft: nextDraft,
-    caretOffset: caretOffset + text.length,
+    caretOffset: caretOffset + chunk.length,
   }
 }
 

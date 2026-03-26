@@ -40,11 +40,7 @@ import {
   dispatchSelectListKey,
   selectListKeyEventFromInk,
 } from '../interactions/selectListInteraction.js'
-import {
-  getLastLine,
-  getTerminalWidth,
-  isCommittedInteractiveInput,
-} from '../renderer.js'
+import { getTerminalWidth, isCommittedInteractiveInput } from '../renderer.js'
 import { interactiveTtyStdout } from './interactiveTtyStdout.js'
 import {
   commandTurnBufferAppendError,
@@ -667,7 +663,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
       }
       if (isCommandPrefixWithSuggestions(session.commandInput.lineDraft)) {
         patch((s) => {
-          const lastLine = getLastLine(s.commandInput.lineDraft)
+          const lastLine = s.commandInput.lineDraft
           let next = { ...s, highlightIndex: 0 }
           if (lastLine === '/') {
             next = {
@@ -684,96 +680,88 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
       return
     }
     if (submitPressed) {
-      if (key.shift) {
+      const trimmedInput = session.commandInput.lineDraft.trim()
+
+      if (isCommandPrefixWithSuggestions(session.commandInput.lineDraft)) {
+        const pickIndex = session.highlightIndex
+        const filtered = filterCommandsByPrefix(
+          interactiveDocs,
+          session.commandInput.lineDraft
+        )
+        const selectedCommand = `${filtered[pickIndex].usage} `
         patchAndDraw((s) => ({
           ...s,
-          commandInput: insertIntoDraft(s.commandInput, '\n'),
+          commandInput: applyLastLineEdit(s.commandInput, selectedCommand),
+          highlightIndex: 0,
         }))
-      } else {
-        const trimmedInput = session.commandInput.lineDraft.trim()
-
-        if (isCommandPrefixWithSuggestions(session.commandInput.lineDraft)) {
-          const pickIndex = session.highlightIndex
-          const filtered = filterCommandsByPrefix(
-            interactiveDocs,
-            getLastLine(session.commandInput.lineDraft)
-          )
-          const selectedCommand = `${filtered[pickIndex].usage} `
-          patchAndDraw((s) => ({
-            ...s,
-            commandInput: applyLastLineEdit(s.commandInput, selectedCommand),
-            highlightIndex: 0,
-          }))
-          return
-        }
-
-        const inputLine = session.commandInput.lineDraft
-        patch((s) => ({
-          ...s,
-          commandInput: clearLiveCommandLine(s.commandInput),
-        }))
-
-        const tokenSelect = TOKEN_LIST_COMMANDS[trimmedInput] ?? null
-        if (tokenSelect) {
-          const tokens = listAccessTokens()
-          if (tokens.length === 0) {
-            patch((s) => ({
-              ...s,
-              chatHistory: scrollbackCommitInputLine(
-                s.chatHistory,
-                maskInteractiveInputForHistory(trimmedInput)
-              ),
-            }))
-            rememberCommittedLine(trimmedInput)
-            commitHistoryOutput(['No access tokens stored.'])
-            return
-          } else {
-            if (isCommittedInteractiveInput(inputLine)) {
-              patch((s) => ({
-                ...s,
-                chatHistory: scrollbackCommitInputLine(
-                  s.chatHistory,
-                  maskInteractiveInputForHistory(inputLine)
-                ),
-              }))
-            }
-            rememberCommittedLine(trimmedInput)
-            beginTokenSelection(trimmedInput, tokenSelect.action, tokens)
-          }
-          drawBox()
-          return
-        }
-
-        resetCommandTurnBuffer()
-        if (isCommittedInteractiveInput(inputLine)) {
-          if (!usesSessionYesNoInputChrome(!!session.tokenSelection)) {
-            patch((s) => ({
-              ...s,
-              chatHistory: scrollbackCommitInputLine(
-                s.chatHistory,
-                maskInteractiveInputForHistory(inputLine)
-              ),
-            }))
-            rememberCommittedLine(inputLine)
-          }
-          if (await processInput(inputLine, ttyOutput, true)) {
-            commitExitTurnToScrollback()
-            doExit()
-            return
-          }
-          finishProcessInputTurnAfterAwait()
-          return
-        }
-        if (deps.isNumberedChoiceListActive()) {
-          patch((s) => ({ ...s, numberedChoiceHighlightIndex: 0 }))
-        }
-        if (inputLine.trim() === '' && shellInstance) {
-          shellInstance.clear()
-          shellInstance.unmount()
-          shellInstance = null
-        }
-        drawBox()
+        return
       }
+
+      const inputLine = session.commandInput.lineDraft
+      patch((s) => ({
+        ...s,
+        commandInput: clearLiveCommandLine(s.commandInput),
+      }))
+
+      const tokenSelect = TOKEN_LIST_COMMANDS[trimmedInput] ?? null
+      if (tokenSelect) {
+        const tokens = listAccessTokens()
+        if (tokens.length === 0) {
+          patch((s) => ({
+            ...s,
+            chatHistory: scrollbackCommitInputLine(
+              s.chatHistory,
+              maskInteractiveInputForHistory(trimmedInput)
+            ),
+          }))
+          rememberCommittedLine(trimmedInput)
+          commitHistoryOutput(['No access tokens stored.'])
+          return
+        }
+        if (isCommittedInteractiveInput(inputLine)) {
+          patch((s) => ({
+            ...s,
+            chatHistory: scrollbackCommitInputLine(
+              s.chatHistory,
+              maskInteractiveInputForHistory(inputLine)
+            ),
+          }))
+        }
+        rememberCommittedLine(trimmedInput)
+        beginTokenSelection(trimmedInput, tokenSelect.action, tokens)
+        drawBox()
+        return
+      }
+
+      resetCommandTurnBuffer()
+      if (isCommittedInteractiveInput(inputLine)) {
+        if (!usesSessionYesNoInputChrome(!!session.tokenSelection)) {
+          patch((s) => ({
+            ...s,
+            chatHistory: scrollbackCommitInputLine(
+              s.chatHistory,
+              maskInteractiveInputForHistory(inputLine)
+            ),
+          }))
+          rememberCommittedLine(inputLine)
+        }
+        if (await processInput(inputLine, ttyOutput, true)) {
+          commitExitTurnToScrollback()
+          doExit()
+          return
+        }
+        finishProcessInputTurnAfterAwait()
+        return
+      }
+      if (deps.isNumberedChoiceListActive()) {
+        patch((s) => ({ ...s, numberedChoiceHighlightIndex: 0 }))
+      }
+      if (inputLine.trim() === '' && shellInstance) {
+        shellInstance.clear()
+        shellInstance.unmount()
+        shellInstance = null
+      }
+      drawBox()
     } else if (key.backspace || key.delete) {
       const prevLen = session.commandInput.lineDraft.length
       patch((s) => ({
@@ -800,7 +788,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
       ) {
         const filtered = filterCommandsByPrefix(
           interactiveDocs,
-          getLastLine(session.commandInput.lineDraft)
+          session.commandInput.lineDraft
         )
         const delta = key.upArrow ? -1 : 1
         patchAndDraw((s) => ({
@@ -853,7 +841,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
         },
       }))
     } else if (key.tab) {
-      const lastLine = getLastLine(session.commandInput.lineDraft)
+      const lastLine = session.commandInput.lineDraft
       if (lastLine.startsWith('/') && !lastLine.endsWith(' ')) {
         const { completed, count } = getTabCompletion(lastLine, interactiveDocs)
         if (count > 0 && completed !== lastLine) {

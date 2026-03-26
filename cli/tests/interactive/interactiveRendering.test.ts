@@ -65,12 +65,10 @@ describe('buildCommandInputDraftLines', () => {
     expect(lines[0]).toBe('→ hello')
   })
 
-  test('multi-line buffer produces one line per newline', () => {
-    const lines = buildCommandInputDraftLines('line1\nline2\nline3', 40)
-    expect(lines).toHaveLength(3)
-    expect(lines[0]).toBe('→ line1')
-    expect(lines[1]).toBe('  line2')
-    expect(lines[2]).toBe('  line3')
+  test('command-line draft is a single Ink row (no embedded newlines in buffer)', () => {
+    const lines = buildCommandInputDraftLines('line1 line2', 40)
+    expect(lines).toHaveLength(1)
+    expect(lines[0]).toBe('→ line1 line2')
   })
 
   test('recognized command gets bold+colored in first line', () => {

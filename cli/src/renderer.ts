@@ -31,6 +31,7 @@ import type {
   RecallMcqChoiceTexts,
 } from './types.js'
 import type { InteractiveFetchWaitLine } from './interactiveFetchWait.js'
+import { singleLineCommandDraft } from './interactiveCommandInput.js'
 import {
   padEndVisible,
   stripTrailingSgrReset,
@@ -226,8 +227,8 @@ function commandInputDraftLinePrefix(
 }
 
 /**
- * Logical draft rows: prompt or grey-disabled placeholder, optional caret, slash-command highlight.
- * Pass `caretOffset` for the live TTY line editor; omit for static draft strings.
+ * Logical draft row: single-line TTY command buffer (prompt or grey placeholder, optional caret,
+ * slash-command highlight). Pass `caretOffset` for the live TTY editor; omit for static strings.
  */
 export function buildCommandInputDraftLines(
   buffer: string,
@@ -236,52 +237,28 @@ export function buildCommandInputDraftLines(
 ): string[] {
   const context = options?.placeholderContext ?? 'default'
   const placeholder = PLACEHOLDER_BY_CONTEXT[context]
-  const bufferLines = buffer.split('\n')
+  const line = buffer
   const caretOffset = options?.caretOffset
+  const prefix = commandInputDraftLinePrefix(0, context)
 
   if (caretOffset === undefined) {
-    return bufferLines.map((line, i) => {
-      const prefix = commandInputDraftLinePrefix(i, context)
-      if (i === 0 && buffer === '') {
-        return `${prefix}${terminalChalk.gray(placeholder)}`
-      }
-      return prefix + highlightRecognizedCommand(line)
-    })
+    if (line === '') {
+      return [`${prefix}${terminalChalk.gray(placeholder)}`]
+    }
+    return [prefix + highlightRecognizedCommand(line)]
   }
 
-  const { lineIndex: caretLineIndex, offsetInLine } =
-    caretLineAndOffsetInBuffer(buffer, caretOffset)
-  return bufferLines.map((line, i) => {
-    const prefix = commandInputDraftLinePrefix(i, context)
-    let inner: string
-    if (i === 0 && buffer === '') {
-      inner =
-        caretLineIndex === 0 && offsetInLine === 0
-          ? `${terminalChalk.inverse(' ')}${terminalChalk.gray(placeholder)}`
-          : `${terminalChalk.gray(placeholder)}`
-    } else if (i === caretLineIndex) {
-      inner = buildLineWithCaret(line, offsetInLine)
-    } else {
-      inner = highlightRecognizedCommand(line)
-    }
-    return prefix + inner
-  })
-}
-
-function caretLineAndOffsetInBuffer(
-  buffer: string,
-  caretOffset: number
-): { lineIndex: number; offsetInLine: number } {
-  const co = Math.max(0, Math.min(caretOffset, buffer.length))
-  let lineIndex = 0
-  let lineStart = 0
-  for (let i = lineStart; i < co; i++) {
-    if (buffer[i] === '\n') {
-      lineIndex++
-      lineStart = i + 1
-    }
+  const co = Math.max(0, Math.min(caretOffset, line.length))
+  let inner: string
+  if (line === '') {
+    inner =
+      co === 0
+        ? `${terminalChalk.inverse(' ')}${terminalChalk.gray(placeholder)}`
+        : `${terminalChalk.gray(placeholder)}`
+  } else {
+    inner = buildLineWithCaret(line, co)
   }
-  return { lineIndex, offsetInLine: co - lineStart }
+  return [prefix + inner]
 }
 
 function firstGraphemeFromOffset(line: string, utf16Offset: number): string {
@@ -327,10 +304,9 @@ export function getTerminalWidth(): number {
   return process.stdout.columns || 80
 }
 
-/** Last line of buffer (for slash-command prefix detection). */
+/** Normalized command-line buffer for slash-command prefix detection (newlines → spaces). */
 export function getLastLine(buffer: string): string {
-  const lines = buffer.split('\n')
-  return lines[lines.length - 1] ?? ''
+  return singleLineCommandDraft(buffer)
 }
 
 /** Blank line before the live Ink column when scrollback exists but there is no Current prompt block. */

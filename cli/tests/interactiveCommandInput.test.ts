@@ -13,7 +13,7 @@ import {
   normalizeRecalledLineDraftForSlashSuggestionExit,
   onArrowDown,
   onArrowUp,
-  replaceLastLogicalLine,
+  singleLineCommandDraft,
   ttyArrowKeyUsesSlashSuggestionCycle,
   type InteractiveCommandInput,
   type SlashSuggestionPickerApplies,
@@ -32,6 +32,10 @@ describe('appendCommittedCommand', () => {
 
   test('stores trimmed text', () => {
     expect(appendCommittedCommand([], '  a  ')).toEqual(['a'])
+  })
+
+  test('collapses newlines to spaces before trim', () => {
+    expect(appendCommittedCommand([], 'a\nb')).toEqual(['a b'])
   })
 
   test('prepends so the newest commit is first', () => {
@@ -53,13 +57,10 @@ describe('appendCommittedCommand', () => {
   })
 })
 
-describe('replaceLastLogicalLine', () => {
-  test('replaces the whole draft when it is a single line', () => {
-    expect(replaceLastLogicalLine('a', 'b')).toBe('b')
-  })
-
-  test('replaces only the last line when the draft is multiline', () => {
-    expect(replaceLastLogicalLine('x\ny', 'z')).toBe('x\nz')
+describe('singleLineCommandDraft', () => {
+  test('replaces newlines with spaces', () => {
+    expect(singleLineCommandDraft('x\ny')).toBe('x y')
+    expect(singleLineCommandDraft('a\r\nb')).toBe('a b')
   })
 })
 
@@ -68,11 +69,7 @@ describe('lineDraftAfterEscapingBareSlash', () => {
     expect(lineDraftAfterEscapingBareSlash('/')).toBe('')
   })
 
-  test('drops the last line when it is exactly `/`', () => {
-    expect(lineDraftAfterEscapingBareSlash('a\n/')).toBe('a')
-  })
-
-  test('returns the draft unchanged when the last line is not bare `/`', () => {
+  test('normalizes then leaves non-`/` drafts unchanged aside from newlines', () => {
     expect(lineDraftAfterEscapingBareSlash('/ex')).toBe('/ex')
   })
 })
@@ -94,16 +91,16 @@ describe('afterBareSlashEscape', () => {
 })
 
 describe('applyLastLineEdit', () => {
-  test('replaces the last line, ends history walk, and puts the caret at end', () => {
+  test('replaces the draft, ends history walk, and puts the caret at end', () => {
     const out = applyLastLineEdit(
       commandInputWith({
-        lineDraft: 'a\nb',
+        lineDraft: 'ab',
         historyWalkIndex: 0,
         lineDraftBeforeHistoryWalk: 'z',
       }),
       '/help '
     )
-    expect(out.lineDraft).toBe('a\n/help ')
+    expect(out.lineDraft).toBe('/help ')
     expect(out.caretOffset).toBe(out.lineDraft.length)
     expect(out.historyWalkIndex).toBe(null)
     expect(out.lineDraftBeforeHistoryWalk).toBe(null)
@@ -149,7 +146,7 @@ describe('Input command history: slash suggestion picker vs ↑↓ while editing
 })
 
 describe('Input command history: recalled drafts leave slash suggestion picker', () => {
-  test('normalizeRecalledLineDraftForSlashSuggestionExit appends a trailing space only on the last line when needed', () => {
+  test('normalizeRecalledLineDraftForSlashSuggestionExit appends a trailing space when needed', () => {
     expect(
       normalizeRecalledLineDraftForSlashSuggestionExit('/help_hist', true)
     ).toBe('/help_hist ')
@@ -158,7 +155,7 @@ describe('Input command history: recalled drafts leave slash suggestion picker',
     ).toBe('/help_hist')
     expect(
       normalizeRecalledLineDraftForSlashSuggestionExit('a\n/help_hist', true)
-    ).toBe('a\n/help_hist ')
+    ).toBe('a /help_hist ')
   })
 
   test('↑↓ through history still walks entries when a recalled line would have opened the picker', () => {
@@ -301,6 +298,15 @@ describe('insertIntoDraft', () => {
     expect(out.lineDraftBeforeHistoryWalk).toBe(null)
     expect(out.lineDraft).toBe('Zh')
     expect(out.caretOffset).toBe(1)
+  })
+
+  test('turns pasted newlines into spaces', () => {
+    const out = insertIntoDraft(
+      commandInputWith({ lineDraft: 'a', caretOffset: 1 }),
+      'x\ny'
+    )
+    expect(out.lineDraft).toBe('ax y')
+    expect(out.caretOffset).toBe(4)
   })
 })
 
