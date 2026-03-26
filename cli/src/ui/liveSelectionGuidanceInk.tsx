@@ -4,6 +4,7 @@ import type { AccessTokenEntry, AccessTokenLabel } from '../accessToken.js'
 import type { RecallMcqChoiceTexts } from '../types.js'
 import {
   buildCurrentPromptSeparatorForStageBand,
+  formatInteractiveCommandLineInkRows,
   formatMcqChoiceLinesWithIndices,
   PROMPT,
   stripAnsi,
@@ -98,6 +99,8 @@ export function RecallMcqChoicesLivePanel({
 export type AccessTokenPickerLivePanelProps = {
   stageIndicatorLine: string
   currentPromptLines: string[]
+  lineDraft: string
+  caretOffset: number
   width: TerminalWidth
   items: AccessTokenEntry[]
   defaultLabel: AccessTokenLabel | undefined
@@ -106,10 +109,11 @@ export type AccessTokenPickerLivePanelProps = {
   onGuidanceListKey: (input: string, key: Key) => void | Promise<void>
 }
 
-/** `/list-access-token`, `/remove-access-token`, etc.: pick a row from Current guidance. */
 export function AccessTokenPickerLivePanel({
   stageIndicatorLine,
   currentPromptLines,
+  lineDraft,
+  caretOffset,
   width,
   items,
   defaultLabel,
@@ -119,6 +123,13 @@ export function AccessTokenPickerLivePanel({
 }: AccessTokenPickerLivePanelProps) {
   useLiveSelectionGuidanceStdin(onGuidanceListKey, onInterrupt)
 
+  const commandPaintLines = formatInteractiveCommandLineInkRows(
+    lineDraft,
+    width,
+    caretOffset,
+    { placeholderContext: 'tokenList' }
+  )
+
   return (
     <Box flexDirection="column" width={width}>
       <Text>{stageIndicatorLine}</Text>
@@ -126,13 +137,15 @@ export function AccessTokenPickerLivePanel({
       {currentPromptLines.map((line, i) => (
         <Text key={i}>{line}</Text>
       ))}
+      {commandPaintLines.map((line, i) => (
+        <Text key={`tok-cmd-${i}`}>{line}</Text>
+      ))}
       {items.map((item, i) => (
         <Text key={item.label} inverse={i === highlightIndex}>
           {item.label === defaultLabel ? '★ ' : '  '}
           {item.label}
         </Text>
       ))}
-      <Text dimColor>↑↓ Enter to select; other keys cancel</Text>
     </Box>
   )
 }

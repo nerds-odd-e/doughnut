@@ -228,6 +228,8 @@ function buildLivePanel(
     return React.createElement(AccessTokenPickerLivePanel, {
       stageIndicatorLine,
       currentPromptLines: promptLines,
+      lineDraft: session.commandInput.lineDraft,
+      caretOffset: session.commandInput.caretOffset,
       width,
       items: session.tokenSelection.items,
       defaultLabel: deps.getDefaultTokenLabel(),

@@ -19,6 +19,17 @@ import {
   maxConsecutiveBlankLines,
   simulatedScreenFromTtyWrites,
 } from '../ttyWriteSimulation.js'
+
+/** First replayed row (naive CUU/EL replay) whose plain text includes `substring`. */
+function firstRowIndexContainingPlain(
+  lines: readonly string[],
+  substring: string
+): number {
+  for (let i = 0; i < lines.length; i++) {
+    if (stripAnsiCsiAndCr(lines[i] ?? '').includes(substring)) return i
+  }
+  return -1
+}
 import {
   endTTYSession,
   makeTempConfigDir,
@@ -101,6 +112,43 @@ describe('TTY token list interactive mode', () => {
     expect(output).toContain('Beta')
     expect(output).toContain('Gamma')
     expect(output).toContain('↑↓ Enter to select; other keys cancel')
+  })
+
+  test('/list-access-token: disabled input row sits between Current prompt and token choices (TTY replay)', async () => {
+    const instruction = 'Select and enter to change the default access token'
+    const navigationHint = '↑↓ Enter to select; other keys cancel'
+    const firstTokenLabel = 'Alpha'
+
+    writeSpy.mockClear()
+    await submitTTYCommand(stdin, '/list-access-token')
+
+    const lines = simulatedScreenFromTtyWrites(ttyOutput(writeSpy)).split('\n')
+    const instructionRow = firstRowIndexContainingPlain(lines, instruction)
+    const hintRow = firstRowIndexContainingPlain(lines, navigationHint)
+    const tokenRow = firstRowIndexContainingPlain(lines, firstTokenLabel)
+
+    expect(
+      instructionRow,
+      'Replayed screen must include /list-access-token Current prompt instruction.'
+    ).toBeGreaterThanOrEqual(0)
+    expect(
+      tokenRow,
+      'Replayed screen must include a token list row (fixture label Alpha).'
+    ).toBeGreaterThanOrEqual(0)
+    expect(
+      hintRow,
+      'Replayed screen must include token-list navigation copy (also tokenList placeholder).'
+    ).toBeGreaterThanOrEqual(0)
+
+    expect(
+      instructionRow,
+      'Instruction must be above the first token row in the live column.'
+    ).toBeLessThan(tokenRow)
+
+    expect(
+      hintRow,
+      `Navigation/placeholder row (${hintRow}) must be above first token row (${tokenRow}), same as CommandLineLivePanel: grey disabled box between prompt and Current guidance. Got instruction@${instructionRow}, hint@${hintRow}, token@${tokenRow}.`
+    ).toBeLessThan(tokenRow)
   })
 
   test.each([
