@@ -56,12 +56,28 @@ Slash completion styling (inverse segments, grapheme-aware width) must either ma
 - Delete dead helpers only when **no** test or product path needs them; **no** duplicate editor code paths.
 - **Verify:** `pnpm cli:lint`; `rg` for orphaned `formatInteractiveCommandLineInkRows` / caret-only paths if fully superseded.
 
+### Phase 6 — Readline `keypress` bridges (successor to old “phase 16”)
+
+**Goal:** Shrink `stdin.on('keypress')` in `interactiveTtySession.ts` wherever Ink can own the key **without** TTY stdin ordering or raw-mode lifecycle regressions.
+
+**Today (baseline):** The handler does **Ctrl+C** (exit before other routing) and **fetch-wait Esc** → `cancelInteractiveFetchWaitFor` + `drawBox`. **`FetchWaitDisplay`** deliberately has **no** active Ink `useInput`: it must match the old **disabled** `@inkjs/ui` `TextInput` footprint (`{ isActive: false }`). Mounting **active** `useInput` on that strip broke the fetch-wait → recall / MCQ transition on a real PTY (`cli_recall.feature` saw no stdout growth after raw keypresses).
+
+**Re-open this phase** only with a design that satisfies at least one of:
+
+- Fetch-wait cancel without an **extra** active Ink stdin owner on the loading strip (e.g. different primitive than `useInput`, or Ink/raw-mode fixes that preserve the disabled-TextInput lifecycle), **or**
+- Explicit product + harness contract: e.g. guaranteed readiness OSC (or equivalent) after single-key handling so E2E can wait without `len > lenBeforeSend`.
+
+**Vitest:** Esc that must hit the readline bridge uses **`pressKey(stdin, 'escape')`** (`interactiveTestHelpers.ts`); **`pushTTYCommandEscape`** pushes bytes for Ink-only paths — do not assume `Readable.push('\x1b')` emits readline `keypress` on the mock TTY.
+
+**Verify:** `pnpm cli:test` (`interactiveTtyFetchWaitEsc`, etc.); targeted E2E `e2e_test/features/cli/cli_recall.feature` (and any feature that hits fetch-wait then recall/MCQ).
+
 ## Phase discipline
 
 Before closing each phase: tests green for that slice, **no dead code**, update this doc’s snapshot (what’s done / what’s next). Deploy gate per team habit (`planning.mdc`).
 
 ## References
 
+- Fetch-wait UI + readline bridge: `cli/src/ui/FetchWaitDisplay.tsx`, `cli/src/adapters/interactiveTtySession.ts` (`stdin.on('keypress')`)
 - Current live column: `cli/src/ui/liveColumnInk.tsx`, `cli/src/interactions/mainCommandLineInkTyping.ts`
 - Cursor + OSC hooks: `cli/src/adapters/interactiveTtyStdout.ts`, `cli/src/adapters/interactiveTtySession.ts` (`handleShellRendered`)
 - Ink UI: `@inkjs/ui` `TextInput` (package version in `cli/package.json`)
