@@ -13,10 +13,12 @@ import com.odde.doughnut.services.ai.PointExtractionResult;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @SessionScope
@@ -101,10 +103,10 @@ public class AiController {
 
     String details = note.getDetails();
     if (details == null || details.trim().isEmpty()) {
-      throw new IllegalArgumentException("Note details cannot be empty");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Note details cannot be empty");
     }
     if (request.getPoints() == null || request.getPoints().isEmpty()) {
-      throw new IllegalArgumentException("Points to remove cannot be empty");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Points to remove cannot be empty");
     }
 
     String newDetails =
@@ -121,20 +123,7 @@ public class AiController {
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
       @RequestBody PointsRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
-
-    authorizationService.assertAuthorization(note);
-
-    String point = getSinglePoint(request);
-    PointExtractionResult aiResult =
-        notebookAssistantForNoteServiceFactory
-            .createNoteAutomationService(note)
-            .promotePointToChild(point);
-
-    if (aiResult == null) {
-      throw new RuntimeException("AI failed to generate extraction result");
-    }
-
-    return noteConstructionService.createNoteFromPromotedPointToChild(note, aiResult);
+    return promotePoint(note, request, true);
   }
 
   @PostMapping("/promote-point-to-sibling/{note}")
@@ -143,26 +132,31 @@ public class AiController {
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
       @RequestBody PointsRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
+    return promotePoint(note, request, false);
+  }
 
+  private NoteCreationResult promotePoint(Note note, PointsRequestDTO request, boolean toChild)
+      throws UnexpectedNoAccessRightException, JsonProcessingException {
     authorizationService.assertAuthorization(note);
-
     String point = getSinglePoint(request);
+    var automation = notebookAssistantForNoteServiceFactory.createNoteAutomationService(note);
     PointExtractionResult aiResult =
-        notebookAssistantForNoteServiceFactory
-            .createNoteAutomationService(note)
-            .promotePointToSibling(point);
-
+        toChild ? automation.promotePointToChild(point) : automation.promotePointToSibling(point);
     if (aiResult == null) {
-      throw new RuntimeException("AI failed to generate extraction result");
+      throw new ResponseStatusException(
+          HttpStatus.SERVICE_UNAVAILABLE, "AI failed to generate extraction result");
     }
-
-    return noteConstructionService.createNoteFromPromotedPointToSibling(note, aiResult);
+    return toChild
+        ? noteConstructionService.createNoteFromPromotedPointToChild(note, aiResult)
+        : noteConstructionService.createNoteFromPromotedPointToSibling(note, aiResult);
   }
 
   private static String getSinglePoint(PointsRequestDTO request) {
-    if (request.getPoints() == null || request.getPoints().isEmpty()) {
-      throw new IllegalArgumentException("points must contain exactly one point");
+    List<String> points = request.getPoints();
+    if (points == null || points.size() != 1) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "points must contain exactly one point");
     }
-    return request.getPoints().getFirst();
+    return points.getFirst();
   }
 }

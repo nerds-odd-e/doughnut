@@ -40,23 +40,22 @@ public class ChatCompletionNoteAutomationService {
   }
 
   public PointExtractionResult promotePointToChild(String point) throws JsonProcessingException {
-    String noteTitle = note.getTitle() != null ? note.getTitle() : "";
-    String noteDetails = note.getDetails() != null ? note.getDetails() : "";
-    return executeWithTool(
-        AiToolFactory.promotePointToChildAiTool(point, noteTitle, noteDetails),
-        PointExtractionResult.class,
-        result -> result,
-        null);
+    return runPromotePointExtraction(point, true);
   }
 
   public PointExtractionResult promotePointToSibling(String point) throws JsonProcessingException {
-    String noteTitle = note.getTitle() != null ? note.getTitle() : "";
-    String noteDetails = note.getDetails() != null ? note.getDetails() : "";
-    return executeWithTool(
-        AiToolFactory.promotePointToSiblingAiTool(point, noteTitle, noteDetails),
-        PointExtractionResult.class,
-        result -> result,
-        null);
+    return runPromotePointExtraction(point, false);
+  }
+
+  private PointExtractionResult runPromotePointExtraction(String point, boolean toChild)
+      throws JsonProcessingException {
+    String t = note.getTitle() != null ? note.getTitle() : "";
+    String d = note.getDetails() != null ? note.getDetails() : "";
+    InstructionAndSchema tool =
+        toChild
+            ? AiToolFactory.promotePointToChildAiTool(point, t, d)
+            : AiToolFactory.promotePointToSiblingAiTool(point, t, d);
+    return executeWithTool(tool, PointExtractionResult.class, result -> result, null);
   }
 
   private <T, R> R executeWithTool(

@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -29,13 +28,18 @@ import com.openai.models.models.ModelListPage;
 import com.openai.services.blocking.ImageService;
 import com.openai.services.blocking.ModelService;
 import java.util.List;
+import java.util.stream.Stream;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -343,9 +347,9 @@ class AiControllerTest extends ControllerTestBase {
       testNote.setDetails("Some note content.");
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.points = List.of();
-      assertThatThrownBy(() -> controller.removePointFromNote(testNote, requestDTO))
-          .isInstanceOf(IllegalArgumentException.class)
-          .hasMessageContaining("Points to remove cannot be empty");
+      assertBadRequestContaining(
+          () -> controller.removePointFromNote(testNote, requestDTO),
+          "Points to remove cannot be empty");
     }
 
     @Test
@@ -353,9 +357,9 @@ class AiControllerTest extends ControllerTestBase {
       testNote.setDetails("");
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.points = List.of("some point");
-      assertThatThrownBy(() -> controller.removePointFromNote(testNote, requestDTO))
-          .isInstanceOf(IllegalArgumentException.class)
-          .hasMessageContaining("Note details cannot be empty");
+      assertBadRequestContaining(
+          () -> controller.removePointFromNote(testNote, requestDTO),
+          "Note details cannot be empty");
     }
   }
 
@@ -401,22 +405,17 @@ class AiControllerTest extends ControllerTestBase {
           () -> controller.promotePointToChild(testNote, requestDTO));
     }
 
-    @Test
-    void shouldThrowWhenPointsIsEmpty() {
-      PointsRequestDTO requestDTO = new PointsRequestDTO();
-      requestDTO.setPoints(List.of());
-      assertThrows(
-          IllegalArgumentException.class,
-          () -> controller.promotePointToChild(testNote, requestDTO));
+    static Stream<List<String>> invalidPromotePointLists() {
+      return Stream.of(null, List.of(), List.of("a", "b"));
     }
 
-    @Test
-    void shouldThrowWhenPointsIsNull() {
+    @ParameterizedTest
+    @MethodSource("invalidPromotePointLists")
+    void shouldRejectInvalidPointCount(List<String> points) {
       PointsRequestDTO requestDTO = new PointsRequestDTO();
-      requestDTO.setPoints(null);
-      assertThrows(
-          IllegalArgumentException.class,
-          () -> controller.promotePointToChild(testNote, requestDTO));
+      requestDTO.setPoints(points);
+      assertResponseStatus(
+          () -> controller.promotePointToChild(testNote, requestDTO), HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -425,8 +424,9 @@ class AiControllerTest extends ControllerTestBase {
       openAIChatCompletionMock.mockNullChatCompletion();
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.setPoints(List.of("a point"));
-      assertThrows(
-          RuntimeException.class, () -> controller.promotePointToChild(testNote, requestDTO));
+      assertResponseStatus(
+          () -> controller.promotePointToChild(testNote, requestDTO),
+          HttpStatus.SERVICE_UNAVAILABLE);
     }
   }
 
@@ -473,13 +473,17 @@ class AiControllerTest extends ControllerTestBase {
           () -> controller.promotePointToSibling(testNote, requestDTO));
     }
 
-    @Test
-    void shouldThrowWhenPointsIsEmpty() {
+    static Stream<List<String>> invalidPromotePointLists() {
+      return Stream.of(null, List.of(), List.of("a", "b"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidPromotePointLists")
+    void shouldRejectInvalidPointCount(List<String> points) {
       PointsRequestDTO requestDTO = new PointsRequestDTO();
-      requestDTO.setPoints(List.of());
-      assertThrows(
-          IllegalArgumentException.class,
-          () -> controller.promotePointToSibling(testNote, requestDTO));
+      requestDTO.setPoints(points);
+      assertResponseStatus(
+          () -> controller.promotePointToSibling(testNote, requestDTO), HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -488,8 +492,20 @@ class AiControllerTest extends ControllerTestBase {
       openAIChatCompletionMock.mockNullChatCompletion();
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.setPoints(List.of("a point"));
-      assertThrows(
-          RuntimeException.class, () -> controller.promotePointToSibling(testNote, requestDTO));
+      assertResponseStatus(
+          () -> controller.promotePointToSibling(testNote, requestDTO),
+          HttpStatus.SERVICE_UNAVAILABLE);
     }
+  }
+
+  private static void assertResponseStatus(Executable action, HttpStatus expected) {
+    assertThat(assertThrows(ResponseStatusException.class, action).getStatusCode())
+        .isEqualTo(expected);
+  }
+
+  private static void assertBadRequestContaining(Executable action, String substring) {
+    ResponseStatusException ex = assertThrows(ResponseStatusException.class, action);
+    assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    assertThat(ex.getReason()).contains(substring);
   }
 }
