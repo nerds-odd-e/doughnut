@@ -1,29 +1,13 @@
 import { Spinner } from '@inkjs/ui'
-import { Box, Text, useInput } from 'ink'
+import { Box, Text } from 'ink'
 import type { InteractiveFetchWaitLine } from '../interactiveFetchWait.js'
 import { PLACEHOLDER_BY_CONTEXT } from '../renderer.js'
 
 type Props = {
   waitLine: InteractiveFetchWaitLine
-  onEscapeCancel: () => void
-  onInterrupt: () => void
 }
 
-export function FetchWaitDisplay({
-  waitLine,
-  onEscapeCancel,
-  onInterrupt,
-}: Props) {
-  useInput((input, key) => {
-    if (key.ctrl && input === 'c') {
-      onInterrupt()
-      return
-    }
-    if (key.escape) {
-      onEscapeCancel()
-    }
-  })
-
+export function FetchWaitDisplay({ waitLine }: Props) {
   return (
     <Box flexDirection="column">
       <Spinner label={waitLine} type="dots" />

@@ -146,7 +146,6 @@ export type ShellSessionInkHandlers = {
   signalConfirmInputReady: () => void
   onEnterStopConfirmationFromEsc: () => void
   whenInActiveRecallSession: () => boolean
-  onFetchWaitEscape: () => void
 }
 
 function buildLivePanel(
@@ -157,11 +156,7 @@ function buildLivePanel(
 ): React.ReactElement {
   const waitLine = getInteractiveFetchWaitLine()
   if (waitLine !== null) {
-    return React.createElement(FetchWaitDisplay, {
-      waitLine,
-      onEscapeCancel: handlers.onFetchWaitEscape,
-      onInterrupt: handlers.onInterrupt,
-    })
+    return React.createElement(FetchWaitDisplay, { waitLine })
   }
   if (deps.isPendingStopConfirmation()) {
     const placeholderCtx = deps.getPlaceholderContext(false)

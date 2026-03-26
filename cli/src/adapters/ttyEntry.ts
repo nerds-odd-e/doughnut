@@ -13,7 +13,7 @@
  * 3. **Exit path** — farewell lines, Ctrl+C newline before exit (`interactiveTtyStdout.exitFarewellBlock`, `ctrlCExitNewline`).
  * 4. **Pre-Ink banner** — `process.stdout.write` for version lines before `render()` (`interactiveTtySession`).
  * 5. **`patchConsole`** — enabled when `console.Console` is constructible; off under Vitest `spyOn(console, …)` (`inkPatchConsoleSupported` in `interactiveTtySession`).
- * 6. **readline `keypress`** — **only** Ctrl+C (Ink still receives keys; this exits first). Fetch-wait Esc and token-list Esc are Ink-owned. See `stdin.on('keypress')` in `interactiveTtySession.ts`. **Do not** handle MCQ Esc on readline (duplicate / wrong ordering).
+ * 6. **readline `keypress`** — **Ctrl+C** (exit before Ink) and fetch-wait **Esc** cancel. Token-list Esc is Ink-owned. See `stdin.on('keypress')` in `interactiveTtySession.ts`. **Do not** handle MCQ Esc on readline (duplicate / wrong ordering).
  */
 import { runInteractiveTtySession } from './interactiveTtySession.js'
 import type { TTYDeps } from './ttyDeps.js'

@@ -856,11 +856,6 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
     signalConfirmInputReady,
     onEnterStopConfirmationFromEsc: enterStopConfirmationFromEsc,
     whenInActiveRecallSession: isInCommandSessionSubstate,
-    onFetchWaitEscape: () => {
-      if (cancelInteractiveFetchWaitFor(ttyOutput)) {
-        drawBox()
-      }
-    },
   }
 
   drawBox()
@@ -870,14 +865,20 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
 
   /**
    * Readline `emitKeypressEvents` runs alongside Ink on the same stdin. Ink owns typing, list keys,
-   * fetch-wait Esc (`FetchWaitDisplay` `useInput`), and token-list Esc (list-selection live column).
-   * This listener is only for **Ctrl+C** (exit before Ink routing). Do not add MCQ Esc here: a late readline
-   * `escape` after Ink already handled it can duplicate stop-confirm behavior.
+   * and token-list Esc (list-selection live column). Fetch-wait has no active Ink `useInput` (same as
+   * disabled `@inkjs/ui` `TextInput`); **Esc** to cancel that wait is handled here so raw-mode
+   * lifecycle matches the pre–phase-16 shell. This listener is also **Ctrl+C** (exit before Ink).
+   * Do not add MCQ Esc here: a late readline `escape` after Ink already handled it can duplicate
+   * stop-confirm behavior.
    */
   stdin.on('keypress', (_str, key: ReadlineKey) => {
     if (key.ctrl && key.name === 'c') {
       interactiveTtyStdout.ctrlCExitNewline()
       doExit()
+      return
+    }
+    if (key.name === 'escape' && cancelInteractiveFetchWaitFor(ttyOutput)) {
+      drawBox()
     }
   })
 }

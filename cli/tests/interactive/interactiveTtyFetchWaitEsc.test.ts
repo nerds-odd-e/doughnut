@@ -12,9 +12,9 @@ import {
 import { stripAnsi } from '../../src/renderer.js'
 import {
   endTTYSession,
+  pressKey,
   pushTTYCommandBytes,
   pushTTYCommandEnter,
-  pushTTYCommandEscape,
   startTTYSessionWithoutRecallReset,
   submitTTYCommand,
   tick,
@@ -54,7 +54,7 @@ describe('TTY recall load wait — Esc cancels', () => {
   test('Esc aborts recall fetch and shows Cancelled by user.', async () => {
     await submitTTYCommand(stdin, '/recall')
     await tick()
-    await pushTTYCommandEscape(stdin)
+    pressKey(stdin, 'escape')
     await vi.waitFor(() =>
       expect(ttyOutput(writeSpy)).toContain('Cancelled by user.')
     )
@@ -98,7 +98,7 @@ describe('TTY recall-status wait — Esc cancels', () => {
   test('Esc aborts recall-status fetch and shows Cancelled by user.', async () => {
     await submitTTYCommand(stdin, '/recall-status')
     await tick()
-    await pushTTYCommandEscape(stdin)
+    pressKey(stdin, 'escape')
     await vi.waitFor(() =>
       expect(ttyOutput(writeSpy)).toContain('Cancelled by user.')
     )
@@ -138,7 +138,7 @@ describe('TTY contest wait — Esc cancels', () => {
     await vi.waitFor(() =>
       expect(ttyOutput(writeSpy)).toContain('Regenerating question')
     )
-    await pushTTYCommandEscape(stdin)
+    pressKey(stdin, 'escape')
     await vi.waitFor(() =>
       expect(ttyOutput(writeSpy)).toContain('Cancelled by user.')
     )
