@@ -45,7 +45,7 @@ export {
 
 /**
  * Private OSC (not FinalTerm 133) so terminals with shell integration do not treat it
- * as a shell prompt boundary. Invisible on screen. Appended when the input box is ready.
+ * as a shell prompt boundary. Invisible on screen.
  */
 export const INTERACTIVE_INPUT_READY_OSC =
   '\x1b]900;doughnut-interactive-input-ready\x07' as const
@@ -81,10 +81,8 @@ export const COMMAND_HIGHLIGHT = '\x1b[1;36m' // bold + cyan
 export const PROMPT = '→ '
 
 /**
- * Which placeholder and input chrome apply in the live region.
- * `interactiveFetchWait`: slow backend/network call in flight — same grey, no-→ box as token list pickers.
- * `recallYesNo`: recall-session y/n (load more, just-review) on the TTY Ink strip (y/n keys; Enter alone means no).
- * Answers are not stored as grey history-input rows or in on-disk command history (outcome lines only).
+ * Which placeholder and command-line chrome apply while the user is in that mode.
+ * `interactiveFetchWait` and `tokenList`: typing is disabled — grey paint, no `→` prompt.
  */
 export type PlaceholderContext =
   | 'default'
@@ -109,18 +107,13 @@ export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
 export const RECALL_SESSION_YES_NO_PLACEHOLDER =
   'recallYesNo' as const satisfies PlaceholderContext
 
-/** Same-frame paint facts the TTY already has when finishing the live region (cursor + readiness signal). */
+/** Facts for whether to append the interactive-input-ready OSC after an Ink paint. */
 export type InteractiveInputReadyPaint = {
-  /** Input box draft; empty means the user has not started typing. */
   lineDraft: string
-  /** When set, a slow command is in flight and the live region is still animating — not ready for input. */
   interactiveFetchWaitLine: InteractiveFetchWaitLine | null
 }
 
-/**
- * Suffix to append after cursor placement when the interactive input box accepts input;
- * empty during interactive fetch wait or while the user has typed a draft.
- */
+/** Empty string while the user is typing or fetch-wait is active; else the input-ready OSC. */
 export function interactiveInputReadyOscSuffix(
   paint: InteractiveInputReadyPaint
 ): InteractiveInputReadyOsc | '' {
@@ -130,8 +123,7 @@ export function interactiveInputReadyOscSuffix(
   return INTERACTIVE_INPUT_READY_OSC
 }
 
-/** Token list pick or interactive fetch wait: full grey paint, no `→` prompt, cursor hidden. */
-export function isGreyDisabledInputChrome(ctx: PlaceholderContext): boolean {
+function usesGreyNoArrowCommandLinePaint(ctx: PlaceholderContext): boolean {
   return ctx === 'tokenList' || ctx === 'interactiveFetchWait'
 }
 
@@ -140,11 +132,6 @@ export function interactiveFetchWaitStageIndicatorLine(
   baseLine: InteractiveFetchWaitLine
 ): string {
   return `${INTERACTIVE_FETCH_WAIT_PROMPT_FG}${baseLine}${RESET}`
-}
-
-/** Force entire paint row to grey (disabled command-line chrome). */
-export function greyOutCommandInputPaintLines(lines: string[]): string[] {
-  return lines.map((l) => `${GREY}${l.split(RESET).join(GREY)}${RESET}`)
 }
 
 /** Shown in Current guidance when user has not typed a slash command prefix. */
@@ -281,11 +268,6 @@ function* terminalVisualTokens(str: string): Generator<string> {
 function terminalTokenVisibleWidth(token: string): number {
   if (token.startsWith('\x1b')) return 0
   return terminalColumnsOfPlainGrapheme(token)
-}
-
-/** Wraps plain text to terminal columns (same rules as {@link wrapTextToVisibleWidthLines} without ANSI). */
-export function wrapTextToLines(text: string, width: TerminalWidth): string[] {
-  return wrapTextToVisibleWidthLines(text, width)
 }
 
 /** Wrap one paragraph to `width` visible columns; preserves ANSI sequences. */
@@ -426,38 +408,64 @@ export function highlightRecognizedCommand(line: string): string {
   return `${COMMAND_HIGHLIGHT}${prefix}${RESET}${rest}`
 }
 
-/** Placeholder and grey-disabled chrome for command-line draft rows. */
-export type CommandInputPaintOptions = {
+/** Options for building the interactive command-line draft (logical rows before terminal width fit). */
+export type CommandInputDraftOptions = {
   placeholderContext?: PlaceholderContext
+  /** UTF-16 index in `buffer`; when set, inserts reverse-video caret (Ink TTY command line). */
+  caretOffset?: number
 }
 
 function commandInputDraftLinePrefix(
   lineIndex: number,
   context: PlaceholderContext
 ): string {
-  return isGreyDisabledInputChrome(context)
+  return usesGreyNoArrowCommandLinePaint(context)
     ? ''
     : lineIndex === 0
       ? PROMPT
       : '  '
 }
 
-/** Logical draft rows (prompt prefix, placeholder, slash highlight) before width trim for Ink. */
+/**
+ * Logical draft rows: prompt or grey-disabled placeholder, optional caret, slash-command highlight.
+ * Pass `caretOffset` for the live TTY line editor; omit for static draft strings.
+ */
 export function buildCommandInputDraftLines(
   buffer: string,
-  width: TerminalWidth,
-  options?: CommandInputPaintOptions
+  _width: TerminalWidth,
+  options?: CommandInputDraftOptions
 ): string[] {
-  const bufferLines = buffer.split('\n')
   const context = options?.placeholderContext ?? 'default'
   const placeholder = PLACEHOLDER_BY_CONTEXT[context]
+  const bufferLines = buffer.split('\n')
+  const caretOffset = options?.caretOffset
+
+  if (caretOffset === undefined) {
+    return bufferLines.map((line, i) => {
+      const prefix = commandInputDraftLinePrefix(i, context)
+      if (i === 0 && buffer === '') {
+        return `${prefix}${GREY}${placeholder}${RESET}`
+      }
+      return prefix + highlightRecognizedCommand(line)
+    })
+  }
+
+  const { lineIndex: caretLineIndex, offsetInLine } =
+    caretLineAndOffsetInBuffer(buffer, caretOffset)
   return bufferLines.map((line, i) => {
     const prefix = commandInputDraftLinePrefix(i, context)
+    let inner: string
     if (i === 0 && buffer === '') {
-      return `${prefix}${GREY}${placeholder}${RESET}`
+      inner =
+        caretLineIndex === 0 && offsetInLine === 0
+          ? `${REVERSE} ${RESET}${GREY}${placeholder}${RESET}`
+          : `${GREY}${placeholder}${RESET}`
+    } else if (i === caretLineIndex) {
+      inner = buildLineWithCaret(line, offsetInLine)
+    } else {
+      inner = highlightRecognizedCommand(line)
     }
-    const highlighted = highlightRecognizedCommand(line)
-    return prefix + highlighted
+    return prefix + inner
   })
 }
 
@@ -516,38 +524,6 @@ function buildLineWithCaret(line: string, offsetInLine: number): string {
   return highlightedCmd + plainInsertCaret(rest, offsetInLine - highlightLen)
 }
 
-/**
- * Like {@link buildCommandInputDraftLines}, with a reverse-video caret at `caretOffset` (UTF-16,
- * newline-aware), grapheme-aware for the inverted cell.
- */
-export function buildCommandInputDraftLinesWithCaret(
-  buffer: string,
-  _width: TerminalWidth,
-  caretOffset: number,
-  options?: CommandInputPaintOptions
-): string[] {
-  const bufferLines = buffer.split('\n')
-  const { lineIndex: caretLineIndex, offsetInLine } =
-    caretLineAndOffsetInBuffer(buffer, caretOffset)
-  const context = options?.placeholderContext ?? 'default'
-  const placeholder = PLACEHOLDER_BY_CONTEXT[context]
-  return bufferLines.map((line, i) => {
-    const prefix = commandInputDraftLinePrefix(i, context)
-    let inner: string
-    if (i === 0 && buffer === '') {
-      inner =
-        caretLineIndex === 0 && offsetInLine === 0
-          ? `${REVERSE} ${RESET}${GREY}${placeholder}${RESET}`
-          : `${GREY}${placeholder}${RESET}`
-    } else if (i === caretLineIndex) {
-      inner = buildLineWithCaret(line, offsetInLine)
-    } else {
-      inner = highlightRecognizedCommand(line)
-    }
-    return prefix + inner
-  })
-}
-
 export function getTerminalWidth(): number {
   return process.stdout.columns || 80
 }
@@ -571,44 +547,32 @@ export function needsGapBeforeLiveRegion(
   )
 }
 
-/** Per-row width fit for Ink: one terminal row per draft line. */
-export function formatBorderlessCommandInputPaintLines(
-  innerLines: string[],
-  width: TerminalWidth
-): string[] {
-  return innerLines.map((line) =>
-    padEndVisible(truncateToWidth(line, width), width)
-  )
+function greyOutFullPaintRow(line: string): string {
+  return `${GREY}${line.split(RESET).join(GREY)}${RESET}`
 }
 
-/** Grey-out entire rows when `placeholderContext` is fetch-wait or token list. */
-export function applyCommandInputPaintChrome(
-  paintLines: string[],
-  options?: CommandInputPaintOptions
-): string[] {
-  const ctx = options?.placeholderContext
-  return ctx && isGreyDisabledInputChrome(ctx)
-    ? greyOutCommandInputPaintLines(paintLines)
-    : paintLines
-}
-
-/** Draft → terminal width → disabled chrome — the only command-line paint path for Ink. */
+/**
+ * Terminal rows for the Ink command line: draft with caret, grapheme-aware width fit, then
+ * grey-out when typing is disabled (token list / fetch wait).
+ */
 export function formatInteractiveCommandLineInkRows(
   buffer: string,
   width: TerminalWidth,
   caretOffset: number,
-  options?: CommandInputPaintOptions
+  options?: CommandInputDraftOptions
 ): string[] {
-  const draft = buildCommandInputDraftLinesWithCaret(
-    buffer,
-    width,
+  const draft = buildCommandInputDraftLines(buffer, width, {
+    ...options,
     caretOffset,
-    options
+  })
+  const fitted = draft.map((line) =>
+    padEndVisible(truncateToWidth(line, width), width)
   )
-  return applyCommandInputPaintChrome(
-    formatBorderlessCommandInputPaintLines(draft, width),
-    options
-  )
+  const ctx = options?.placeholderContext ?? 'default'
+  if (usesGreyNoArrowCommandLinePaint(ctx)) {
+    return fitted.map(greyOutFullPaintRow)
+  }
+  return fitted
 }
 
 /** Newline-aware terminal wrap for markdown-rendered text (may contain ANSI). */

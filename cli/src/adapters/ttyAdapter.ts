@@ -60,7 +60,7 @@ import {
   isCommittedInteractiveInput,
   needsGapBeforeLiveRegion,
   recallMcqCurrentGuidanceLines,
-  wrapTextToLines,
+  wrapTextToVisibleWidthLines,
   type PlaceholderContext,
 } from '../renderer.js'
 import { interactiveTtyStdout } from './interactiveTtyStdout.js'
@@ -304,7 +304,10 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       ) {
         currentPromptWrappedLines = numberedChoicePromptLines
       } else if (currentPromptText) {
-        currentPromptWrappedLines = wrapTextToLines(currentPromptText, width)
+        currentPromptWrappedLines = wrapTextToVisibleWidthLines(
+          currentPromptText,
+          width
+        )
       } else {
         currentPromptWrappedLines = []
       }
@@ -453,7 +456,7 @@ export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
       const tokenListConfig = TOKEN_LIST_COMMANDS[tokenSelection.command]
       const width = getTerminalWidth()
       const promptLines = tokenListConfig?.currentPrompt
-        ? wrapTextToLines(tokenListConfig.currentPrompt, width)
+        ? wrapTextToVisibleWidthLines(tokenListConfig.currentPrompt, width)
         : []
       const stageIndicatorLine = tokenListConfig
         ? greyCurrentStageIndicatorLabel(tokenListConfig.stageIndicator)

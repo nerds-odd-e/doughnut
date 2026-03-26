@@ -33,7 +33,7 @@ cli/
 
 **Do not use** JavaScript string `.length` or UTF-16 code units to measure how wide text is on screen. Terminals use **column count**: CJK and many emoji render as **2 columns**; grapheme clusters (flags, ZWJ families, text + VS16) must be measured as units.
 
-- **Single API in code:** `visibleLength`, `wrapTextToVisibleWidthLines`, `wrapTextToLines`, `truncateToWidth`, and **`terminalColumnsOfPlainGrapheme`** (plain grapheme, no ANSI) in **`cli/src/renderer.ts`**. New layout or wrap logic should go through these — not ad-hoc counting.
+- **Single API in code:** `visibleLength`, `wrapTextToVisibleWidthLines`, `truncateToWidth`, and **`terminalColumnsOfPlainGrapheme`** (plain grapheme, no ANSI) in **`cli/src/renderer.ts`**. New layout or wrap logic should go through these — not ad-hoc counting.
 
 ## Vitest: observable behavior
 

@@ -5,15 +5,12 @@ import {
   interactiveInputReadyOscSuffix,
   truncateToWidth,
   isCommittedInteractiveInput,
-  greyOutCommandInputPaintLines,
-  applyCommandInputPaintChrome,
   applyChatHistoryOutputTone,
   stripAnsi,
   stripAnsiCsiAndCr,
   needsGapBeforeLiveRegion,
   buildSuggestionLines,
   buildSuggestionLinesForInk,
-  buildCommandInputDraftLinesWithCaret,
   formatInteractiveCommandLineInkRows,
   formatCurrentStageIndicatorLine,
   CURRENT_STAGE_BAND_BACKGROUND_SGR,
@@ -22,7 +19,6 @@ import {
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
   GREY,
   visibleLength,
-  wrapTextToLines,
   wrapTextToVisibleWidthLines,
   terminalColumnsOfPlainGrapheme,
   interactiveFetchWaitStageIndicatorLine,
@@ -44,7 +40,7 @@ describe('interactiveInputReadyOscSuffix', () => {
     )
   })
 
-  test('emits nothing when the user has typed in the input box', () => {
+  test('emits nothing when the user has typed in the command line', () => {
     expect(
       interactiveInputReadyOscSuffix({
         lineDraft: 'x',
@@ -88,11 +84,6 @@ describe('wrapTextToVisibleWidthLines (recall MCQ stem / ANSI terminal strings)'
   })
 
   test('CJK wide characters count as 2 terminal columns each', () => {
-    // 'あ' through 'た' = 16 hiragana characters × 2 terminal columns = 32 cols > 30
-    // Real terminals render each as 2 columns; the stem auto-wraps on screen.
-    // If wide chars are counted as 1, currentPromptWrappedLines is 1 line short,
-    // cursorUpStepsToLiveRegionTop is too small, and ↓ leaves the old separator
-    // on screen above the repainted live region — appearing duplicated.
     const japanese16 = 'あいうえおかきくけこさしすせそた'
     expect(
       visibleLength(japanese16),
@@ -135,35 +126,6 @@ describe('isCommittedInteractiveInput', () => {
     expect(isCommittedInteractiveInput('a')).toBe(true)
     expect(isCommittedInteractiveInput('  x  ')).toBe(true)
     expect(isCommittedInteractiveInput('\nhi')).toBe(true)
-  })
-})
-
-describe('greyOutCommandInputPaintLines', () => {
-  test('replaces internal RESET with GREY so trailing segments stay grey', () => {
-    const line = '│ \x1b[90mtext\x1b[0m                    │'
-    const result = greyOutCommandInputPaintLines([line])
-    expect(result[0]).toContain('\x1b[90m')
-    // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI RESET, intentional
-    expect(/\x1b\[0m\s*│/.test(result[0])).toBe(false)
-  })
-})
-
-describe('applyCommandInputPaintChrome', () => {
-  test('leaves lines unchanged for default command-line context', () => {
-    const lines = ['→ hello']
-    expect(
-      applyCommandInputPaintChrome(lines, {
-        placeholderContext: 'default',
-      })
-    ).toEqual(lines)
-  })
-
-  test('greys full paint row for interactive fetch-wait context', () => {
-    const lines = ['loading …']
-    const out = applyCommandInputPaintChrome(lines, {
-      placeholderContext: 'interactiveFetchWait',
-    })
-    expect(out[0]).toContain('\x1b[90m')
   })
 })
 
@@ -226,40 +188,22 @@ describe('formatInteractiveCommandLineInkRows', () => {
     expect(stripAnsi(rows[0])).toContain('`exit` to quit.')
   })
 
-  test('fetch-wait context: grey paint, no arrow prompt', () => {
+  test('fetch-wait: grey row with loading placeholder', () => {
     const rows = formatInteractiveCommandLineInkRows('', 44, 0, {
       placeholderContext: 'interactiveFetchWait',
     })
     expect(rows[0]).toContain(GREY)
-    expect(stripAnsi(rows[0])).not.toContain('→')
     expect(stripAnsi(rows[0])).toContain('loading')
   })
 
-  test('token list context greys placeholder row', () => {
-    const rows = formatInteractiveCommandLineInkRows('', 80, 0, {
-      placeholderContext: 'tokenList',
-    })
-    expect(rows[0]).toContain(GREY)
-  })
-})
-
-describe('buildCommandInputDraftLinesWithCaret', () => {
-  test('empty buffer: reverse-video space before grey placeholder', () => {
-    const rows = buildCommandInputDraftLinesWithCaret('', 80, 0)
-    expect(rows).toHaveLength(1)
-    expect(rows[0]).toContain('\x1b[7m')
-    expect(rows[0]).toMatch(/^→ /)
-    expect(stripAnsi(rows[0])).toContain('`exit` to quit.')
-  })
-
   test('caret at end of line: trailing reverse space', () => {
-    const rows = buildCommandInputDraftLinesWithCaret('ab', 80, 2)
+    const rows = formatInteractiveCommandLineInkRows('ab', 80, 2)
     expect(rows[0]).toContain('→ ab')
     expect(rows[0]).toContain('\x1b[7m \x1b[0m')
   })
 
   test('CJK: caret inverts full grapheme', () => {
-    const rows = buildCommandInputDraftLinesWithCaret('aあb', 80, 1)
+    const rows = formatInteractiveCommandLineInkRows('aあb', 80, 1)
     expect(rows[0]).toContain('\x1b[7mあ\x1b[0m')
   })
 })
@@ -294,7 +238,7 @@ describe('Current Stage Indicator (band lines for Ink)', () => {
       greyCurrentStageIndicatorLabel('Access tokens'),
       width
     )
-    const wrapped = wrapTextToLines(instruction, width).map(
+    const wrapped = wrapTextToVisibleWidthLines(instruction, width).map(
       (l) => `${GREY}${l}${RESET}`
     )
     expect(stripAnsi(stage)).toMatch(/^Access tokens +$/)

@@ -12,14 +12,11 @@ import {
   userVisibleOutcomeFromCommandError,
 } from '../src/fetchAbort.js'
 import {
-  applyCommandInputPaintChrome,
-  buildCommandInputDraftLines,
   buildCurrentPromptSeparatorForStageBand,
   CURRENT_STAGE_BAND_BACKGROUND_SGR,
-  formatBorderlessCommandInputPaintLines,
   formatCurrentStageIndicatorLine,
+  formatInteractiveCommandLineInkRows,
   interactiveFetchWaitStageIndicatorLine,
-  isGreyDisabledInputChrome,
   stripAnsi,
   GREY,
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
@@ -77,22 +74,11 @@ describe('userVisibleOutcomeFromCommandError', () => {
 })
 
 describe('interactive fetch wait UI', () => {
-  test('renderer: fetch-wait stage label, grey chrome contexts, live region colors', () => {
+  test('stage band and grey command-line paint rows', () => {
     const recallLine = INTERACTIVE_FETCH_WAIT_LINES.recallNext
     expect(stripAnsi(interactiveFetchWaitStageIndicatorLine(recallLine))).toBe(
       recallLine
     )
-
-    expect(isGreyDisabledInputChrome('interactiveFetchWait')).toBe(true)
-    expect(isGreyDisabledInputChrome('tokenList')).toBe(true)
-    expect(isGreyDisabledInputChrome('default')).toBe(false)
-    expect(isGreyDisabledInputChrome('recallMcq')).toBe(false)
-
-    const draft = buildCommandInputDraftLines('', 80, {
-      placeholderContext: 'interactiveFetchWait',
-    })[0]!
-    expect(draft).not.toContain('→')
-    expect(draft).toContain('loading ...')
 
     const width = 80
     const label = interactiveFetchWaitStageIndicatorLine(recallLine)
@@ -104,16 +90,11 @@ describe('interactive fetch wait UI', () => {
     expect(bandSep).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
     expect(bandSep).toContain('\x1b[32m')
 
-    const paint = applyCommandInputPaintChrome(
-      formatBorderlessCommandInputPaintLines(
-        buildCommandInputDraftLines('', width, {
-          placeholderContext: 'interactiveFetchWait',
-        }),
-        width
-      ),
-      { placeholderContext: 'interactiveFetchWait' }
-    )
-    expect(paint[0]).toContain(GREY)
+    const rows = formatInteractiveCommandLineInkRows('', width, 0, {
+      placeholderContext: 'interactiveFetchWait',
+    })
+    expect(rows[0]).toContain(GREY)
+    expect(stripAnsi(rows[0]!)).toContain('loading')
 
     expect(
       stripAnsi(

@@ -42,7 +42,7 @@ import {
   getTerminalWidth,
   RECALL_SESSION_YES_NO_PLACEHOLDER,
   wrapMarkdownTerminalToLines,
-  wrapTextToLines,
+  wrapTextToVisibleWidthLines,
   type PlaceholderContext,
 } from './renderer.js'
 import type {
@@ -613,7 +613,7 @@ function getNumberedChoiceListCurrentPromptWrappedLines(
   const p = pendingRecallAnswer
   if (!isMcqRecallPending(p)) return null
   return [
-    ...wrapTextToLines(
+    ...wrapTextToVisibleWidthLines(
       formatRecallNotebookCurrentPromptLine(p.notebookTitle),
       width
     ),

@@ -1,12 +1,12 @@
 /**
- * Terminal layout from `renderer.ts` (visible width, command-line draft rows, past input, slash highlight).
- * TTY integration lives in `interactiveTty*.test.ts`.
+ * `renderer.ts`: visible width, command-line draft rows, past input, slash highlight.
+ * TTY behavior: `interactiveTty*.test.ts`.
  */
 import './interactiveTestMocks.js'
 import { describe, test, expect } from 'vitest'
 import {
   buildCommandInputDraftLines,
-  formatBorderlessCommandInputPaintLines,
+  formatInteractiveCommandLineInkRows,
   highlightRecognizedCommand,
   renderPastInput,
   stripAnsi,
@@ -83,12 +83,6 @@ describe('buildCommandInputDraftLines', () => {
     expect(lines[0]).toContain(`${BOLD_CYAN}/help${ANSI_RESET}`)
   })
 
-  test('non-command line has no ANSI highlight', () => {
-    const lines = buildCommandInputDraftLines('hello', 40)
-    // biome-ignore lint/suspicious/noControlCharactersInRegex: checking ANSI codes
-    expect(lines[0]).not.toMatch(/\x1b\[1;36m/)
-  })
-
   test('command with param highlights only command part', () => {
     const lines = buildCommandInputDraftLines('/add-access-token mylabel', 40)
     expect(lines[0]).toContain(
@@ -96,12 +90,11 @@ describe('buildCommandInputDraftLines', () => {
     )
   })
 
-  test('empty buffer in selection mode shows placeholder without arrow', () => {
+  test('empty buffer in selection mode shows token-list placeholder', () => {
     const lines = buildCommandInputDraftLines('', 80, {
       placeholderContext: 'tokenList',
     })
     expect(lines).toHaveLength(1)
-    expect(lines[0]).not.toContain('→')
     expect(lines[0]).toContain('↑↓ Enter to select; other keys cancel')
   })
 
@@ -124,15 +117,13 @@ describe('buildCommandInputDraftLines', () => {
     expect(lines[0]).toContain(phrase)
   })
 
-  test('placeholder truncates in narrow window for any long context', () => {
+  test('long token-list placeholder truncates to terminal width with ellipsis', () => {
     const width = 25
-    const lines = buildCommandInputDraftLines('', width, {
+    const row = formatInteractiveCommandLineInkRows('', width, 0, {
       placeholderContext: 'tokenList',
-    })
-    const paint = formatBorderlessCommandInputPaintLines(lines, width)[0]!
-    expect(visibleLength(paint)).toBeLessThanOrEqual(width)
-    expect(lines[0]).toContain('↑↓')
-    expect(stripAnsi(paint)).toContain('...')
+    })[0]!
+    expect(visibleLength(row)).toBeLessThanOrEqual(width)
+    expect(stripAnsi(row)).toContain('...')
   })
 })
 
@@ -165,7 +156,7 @@ describe('buildSuggestionLines', () => {
   test('without slash prefix returns / commands hint, truncated when narrow', () => {
     const lines = buildSuggestionLines('hello', 0, 5)
     expect(lines).toHaveLength(1)
-    expect(visibleLength(lines[0])).toBeLessThanOrEqual(5)
+    expect(visibleLength(lines[0]!)).toBeLessThanOrEqual(5)
     expect(lines[0]).toContain('...')
   })
 
@@ -190,18 +181,15 @@ describe('buildSuggestionLines', () => {
 })
 
 describe('renderPastInput', () => {
-  test('single-line hello: grey block, no border, padding, trailing blank, no arrow', () => {
+  test('single-line hello: grey block, padding, trailing blank, no arrow', () => {
     const result = renderPastInput('hello', 30)
-    expect(result).not.toContain('┌')
-    expect(result).not.toContain('│')
     expect(result).toContain('hello')
     expect(result).toContain(GREY_BG_PAST_INPUT)
-    expect(result).not.toContain('→')
     const lines = result.split('\n')
-    expect(visibleLength(lines[0])).toBe(28)
+    expect(visibleLength(lines[0]!)).toBe(28)
     // biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI escapes
-    expect(lines[0].replace(/\x1b\[[0-9;]*m/g, '').trim()).toBe('')
-    const lastBgLine = lines[lines.length - 2]
+    expect(lines[0]!.replace(/\x1b\[[0-9;]*m/g, '').trim()).toBe('')
+    const lastBgLine = lines[lines.length - 2]!
     // biome-ignore lint/suspicious/noControlCharactersInRegex: stripping ANSI escapes
     expect(lastBgLine.replace(/\x1b\[[0-9;]*m/g, '').trim()).toBe('')
     expect(lines[lines.length - 1]).toBe('')

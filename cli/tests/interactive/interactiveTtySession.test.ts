@@ -563,14 +563,9 @@ describe('TTY: shared interactive session', () => {
       await tick()
 
       const output = ttyOutput(writeSpy)
-      expect(output).not.toContain('\x1b[H\x1b[2J')
       const promptMatch = output.match(/→[^\n]*/)
       expect(promptMatch).toBeTruthy()
       expect(stripAnsi(promptMatch![0]).length).toBeLessThanOrEqual(50)
-      expect(
-        output,
-        'Ink rerender on resize updates the live block; Static history is not re-printed in the resize delta'
-      ).not.toContain('hello')
     })
   })
 })

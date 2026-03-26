@@ -185,7 +185,7 @@ Interactive fetch-wait: **`@inkjs/ui` `Spinner`** (`type="dots"`) in **`FetchWai
 
 ### Phase 10.5 (done) — Command-line input: no border (optional background-only)
 
-**User outcome:** The main command-line input is **easier to maintain and test** — **no** bordered `Box` around the editable line (**gate 6**). **Shipped:** **`formatInteractiveCommandLineInkRows`** (draft → width → **`applyCommandInputPaintChrome`**). Vitest **`ttyWriteSimulation`** + **`interactiveTtySession`** assert **`→`** / column-0 prompt. E2E **`cliSectionParser`** treats the live **`→`** row as the command-line boundary (function name **`countInputBoxTopBorderLines…`** kept for call-site stability).
+**User outcome:** The main command-line input is **easier to maintain and test** — **no** bordered `Box` around the editable line (**gate 6**). **Shipped:** **`formatInteractiveCommandLineInkRows`** (draft + caret, width fit, grey when typing disabled). Vitest **`ttyWriteSimulation`** + **`interactiveTtySession`** assert **`→`** / column-0 prompt. E2E **`cliSectionParser`** treats the live **`→`** row as the command-line boundary (function name **`countInputBoxTopBorderLines…`** kept for call-site stability).
 
 **Verify:** **`pnpm cli:test`**; **`pnpm cypress run --spec e2e_test/features/cli/cli_interactive_mode.feature`**.
 
