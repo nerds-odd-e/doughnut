@@ -1,7 +1,7 @@
 /**
  * Cucumber assertions on `@doughnutOutput`.
  *
- * - **Non-interactive**: one-shot CLI (no input-ready OSC).
+ * - **Non-interactive**: one-shot CLI output.
  * - **Past messages**: parsed transcript — domain steps “past CLI assistant messages” / “past user messages”.
  * - **Simulated PTY screen**: cursor/erase replay — “user-visible” plain text.
  * - **Recall /stop (MCQ)**: line-split merge can still hold the stem after Ink cleared the live grid.

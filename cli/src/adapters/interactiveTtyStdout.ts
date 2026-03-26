@@ -7,7 +7,7 @@
  * through Ink — avoid ad-hoc logging on the interactive hot path. This module holds
  * adapter-emitted byte sequences Ink does not own so ordering stays explicit and grep-friendly.
  *
- * **Belongs here:** shell-integration OSC (interactive input-ready marker), explicit cursor
+ * **Belongs here:** shell-integration ready control sequence, explicit cursor
  * visibility for exception flows (fetch-wait / shutdown), Ctrl+C line advance
  * before exit, exit farewell lines (grey committed input + toned output after shell unmount),
  * and “current prompt” separator lines from `OutputAdapter` hooks.
@@ -52,7 +52,7 @@ export const interactiveTtyStdout = {
 
   /**
    * Default command-line contract:
-   * - emits OSC when the draft is empty and fetch-wait is inactive
+   * - emits ready control sequence when the draft is empty and fetch-wait is inactive
    * - emits nothing while typing or fetch-wait is active
    * Consumers in E2E use this to decide when keystrokes are safe.
    */

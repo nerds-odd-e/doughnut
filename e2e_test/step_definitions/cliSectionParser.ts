@@ -397,11 +397,11 @@ function interactiveCliSimulatedScreenEscapeLeakFailureMessage(
   return (
     `Interactive CLI PTY simulator still has raw ESC (\\x1b) after stripping —` +
     ` an escape was treated as printable text. Add handling in replayInteractiveCliPtyTranscriptOntoGrid ` +
-    `(e.g. DEC private CSI \\x1b[?25h, OSC \\x1b]…\\x07). Sample rows:\n${examples}`
+    `(e.g. DEC private CSI \\x1b[?25h, terminal title/control sequences \\x1b]…\\x07). Sample rows:\n${examples}`
   )
 }
 
-/** After each interactive “input ready” paint, the PTY transcript must replay to a grid without escape leaks. */
+/** After each interactive ready paint, the PTY transcript must replay to a grid without escape leaks. */
 export function assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks(
   ptyTranscript: string
 ): void {

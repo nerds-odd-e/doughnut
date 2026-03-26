@@ -107,20 +107,20 @@ export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
 export const RECALL_SESSION_YES_NO_PLACEHOLDER =
   'recallYesNo' as const satisfies PlaceholderContext
 
-/** Facts for whether to append the interactive-input-ready OSC after an Ink paint. */
+/** Facts for whether to append the interactive-input-ready control sequence after an Ink paint. */
 export type InteractiveInputReadyPaint = {
   lineDraft: string
   interactiveFetchWaitLine: InteractiveFetchWaitLine | null
 }
 
-/** Empty string while the user is typing or fetch-wait is active; else the input-ready OSC. */
+/** Empty string while the user is typing or fetch-wait is active; else the input-ready sequence. */
 export function interactiveInputReadyOscSuffix(
   paint: InteractiveInputReadyPaint
 ): InteractiveInputReadyOsc | '' {
   if (paint.lineDraft !== '' || paint.interactiveFetchWaitLine !== null) {
     return ''
   }
-  // Private OSC (not FinalTerm 133) so shell integration does not treat it as a prompt boundary.
+  // Private terminal control sequence (not FinalTerm 133) so shell integration does not treat it as a prompt boundary.
   return '\x1b]900;doughnut-interactive-input-ready\x07'
 }
 

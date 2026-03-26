@@ -48,7 +48,7 @@ Vocabulary for Cucumber steps and page objects (`e2e_test/start/pageObjects/cli/
 
 | Term | Definition |
 |------|-------------|
-| **Non-interactive output** | Full stdout for E2E subcommand spawns (e.g. installed `version` / `update`) and similar one-shot runs; no PTY input-ready OSC. |
+| **Non-interactive output** | Full stdout for E2E subcommand spawns (e.g. installed `version` / `update`) and similar one-shot runs; no PTY interactive input-ready control sequence. |
 | **Past CLI assistant messages** | Interactive: past CLI output blocks (parsed transcript section). Gherkin: `in past CLI assistant messages`. |
 | **Past user messages** | Interactive: past user lines (grey blocks). Gherkin: `in past user messages`. Recall **y/n** confirmations (stop recall, load more, just-review) do **not** add a separate past user message row — only the outcome lines appear. |
 | **User input history** | TTY: committed lines for ↑↓ recall + persistence (`interactiveCommandInput.ts`, `userInputHistoryFile.ts`) **while the command-line Ink region has focus**. The live command buffer is **single-line** (newlines from paste become spaces; no Shift+Enter newline). Masked before storage/display. Recall **y/n** answers are not appended (same rule as past user messages). |
@@ -77,7 +77,7 @@ Document new cases in `cli/src/adapters/ttyEntry.ts` and next to code; avoid ad-
 
 | Path | Allowed |
 |------|---------|
-| **Private OSC** | Input-ready PTY signal (`interactiveTtyStdout`, `renderer`). |
+| **Private terminal control sequence** | Input-ready PTY signal (`interactiveTtyStdout`, `renderer`). |
 | **Hardware cursor** | Explicit hide/show only for exception flows (fetch-wait, exit). Default command-line live paint must not emit `HIDE_CURSOR`. |
 | **Exit path** | Ctrl+C newline and farewell lines (`interactiveTtyStdout.exitFarewellBlock`, `ctrlCExitNewline`). |
 | **Pre-Ink banner** | Version lines before Ink `render()` (`interactiveTtySession`). |

@@ -35,12 +35,7 @@ const CLI_POLL_MS = 10
 const DRAFT_THEN_ENTER_GAP_MS = 80
 /** Visible readiness requires briefly stable stdout to avoid PTY chunk races. */
 const VISIBLE_READY_STABLE_MS = 120
-/**
- * Inspect only the end of post-submit stdout. Fetch-wait UIs omit the readiness OSC until work
- * finishes; byte-length can go quiet mid-load and falsely trigger the settled fallback — see
- * `INTERACTIVE_FETCH_WAIT_LINES` in `cli/src/interactiveFetchWait.ts` and `interactiveFetchWait`
- * placeholder in `cli/src/renderer.ts`.
- */
+/** Inspect only tail output while waiting for visible readiness. */
 const FETCH_WAIT_TAIL_WINDOW_CHARS = 12_000
 
 /** Keep in sync with `INTERACTIVE_FETCH_WAIT_LINES` in `cli/src/interactiveFetchWait.ts`. */
@@ -64,9 +59,6 @@ const VISIBLE_READY_TAIL_SNIPPETS = [
 ] as const
 // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI stripping for PTY readiness checks
 const ANSI_AND_CSI_RE = /\x1b(?:\[[0-9;?]*[A-Za-z]|].*?(?:\x07|\x1b\\))/g
-
-const INPUT_READY_WAIT_MODE = (process.env.DOUGHNUT_CLI_E2E_INPUT_READY_MODE ??
-  'visible') as 'visible' | 'osc'
 
 /** Lowercase animated hint under the input box during TTY fetch-wait (`placeholderText.interactiveFetchWait`). */
 function tailLooksLikeInteractiveFetchWait(haystack: string): boolean {
@@ -107,20 +99,16 @@ interface PtyHandle {
   dispose: () => void
 }
 
-/** Wait until stdout contains the interactive CLI’s invisible “ready for keystrokes” marker. */
 type WaitForInteractiveInputReadyOptions = {
   getStdout: () => string
   maxWaitMs: number
-  mode: 'visible' | 'osc'
   /**
-   * When set, only search output appended after this byte offset (e.g. length before a `pty.write`).
-   * Omit for startup: the marker may already exist earlier in the capture.
+   * When set, only inspect output appended after this byte offset (e.g. length before a `pty.write`).
    */
   onlyInStdoutAfterByteLength?: number
   formatTimeoutError: (
     stdout: string,
     details: {
-      mode: 'waiting-for-visible-ready' | 'waiting-for-osc'
       visiblePredicate:
         | 'loading-tail-active'
         | 'no-command-line-row'
@@ -131,18 +119,12 @@ type WaitForInteractiveInputReadyOptions = {
   ) => string
 }
 
-/**
- * Input-ready sync contract used by PTY E2E:
- * - visible mode waits for manual-observable readiness
- * - osc mode remains as temporary migration fallback
- */
 async function waitForInteractiveInputReady(
   options: WaitForInteractiveInputReadyOptions
 ): Promise<void> {
   const {
     getStdout,
     maxWaitMs,
-    mode,
     onlyInStdoutAfterByteLength: afterLen,
     formatTimeoutError,
   } = options
@@ -162,14 +144,6 @@ async function waitForInteractiveInputReady(
       lastLen = len
       stableSince = Date.now()
     }
-    if (mode === 'osc') {
-      if (haystack.includes('\x1b]900;doughnut-interactive-input-ready\x07')) {
-        return
-      }
-      await sleep(CLI_POLL_MS)
-      continue
-    }
-
     const simulated = ptyTranscriptSimulatedPlainScreen(stdout)
     const screenTail = simulated
       .split('\n')
@@ -208,11 +182,7 @@ async function waitForInteractiveInputReady(
 
     if (Date.now() - stableSince >= VISIBLE_READY_STABLE_MS) {
       visiblePredicate = 'ready'
-      if (
-        afterLen === undefined ||
-        stdout.length > afterLen ||
-        mode === 'visible'
-      ) {
+      if (afterLen === undefined || stdout.length > afterLen) {
         return
       }
     }
@@ -223,8 +193,6 @@ async function waitForInteractiveInputReady(
   const stdout = getStdout()
   throw new Error(
     formatTimeoutError(stdout, {
-      mode:
-        mode === 'visible' ? 'waiting-for-visible-ready' : 'waiting-for-osc',
       visiblePredicate,
       bytesAfterWindow: stdoutHaystackAfter(stdout, afterLen).length,
     })
@@ -263,13 +231,11 @@ function formatPtyTimeoutDiagnostics(opts: {
   cwd: string
   stdout: string
   inputSent: boolean
-  inputReadyMode: 'visible' | 'osc'
 }): string {
   const lines = [
     `PTY timed out after ${PTY_TIMEOUT_MS / 1000}s`,
     `spawn: ${opts.spawnLabel}`,
     `cwd: ${opts.cwd}`,
-    `input ready wait mode: ${opts.inputReadyMode}`,
     `input sent: ${opts.inputSent}`,
     `stdout (${opts.stdout.length} chars):`,
     opts.stdout
@@ -306,7 +272,6 @@ export async function runCliInPty(opts: {
             cwd: opts.cwd,
             stdout: handle.stdout.value,
             inputSent,
-            inputReadyMode: INPUT_READY_WAIT_MODE,
           })
         )
       )
@@ -320,7 +285,6 @@ export async function runCliInPty(opts: {
     waitForInteractiveInputReady({
       getStdout: () => handle.stdout.value,
       maxWaitMs: INTERACTIVE_CLI_PROMPT_WAIT_MS,
-      mode: INPUT_READY_WAIT_MODE,
       formatTimeoutError: (stdout) => formatCliPromptDidNotAppearError(stdout),
     })
       .then(async () => {
@@ -365,7 +329,6 @@ export async function startInteractiveCli(opts: {
   await waitForInteractiveInputReady({
     getStdout: () => handle.stdout.value,
     maxWaitMs: INTERACTIVE_CLI_PROMPT_WAIT_MS,
-    mode: INPUT_READY_WAIT_MODE,
     formatTimeoutError: (stdout) => formatCliPromptDidNotAppearError(stdout),
   })
   assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks(
@@ -394,7 +357,6 @@ function formatPtyInputBoxTimeoutError(
   stdout: string,
   lenBeforeSend: number,
   details: {
-    mode: 'waiting-for-visible-ready' | 'waiting-for-osc'
     visiblePredicate:
       | 'loading-tail-active'
       | 'no-command-line-row'
@@ -403,7 +365,7 @@ function formatPtyInputBoxTimeoutError(
     bytesAfterWindow: number
   }
 ): string {
-  return `CLI did not show input box after send within ${PTY_INPUT_READY_AFTER_SEND_MAX_MS / 1000}s. mode=${details.mode}, visible predicate=${details.visiblePredicate}, bytes after send window=${details.bytesAfterWindow}, stdout grew by ${stdout.length - lenBeforeSend} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`
+  return `CLI did not show input box after send within ${PTY_INPUT_READY_AFTER_SEND_MAX_MS / 1000}s. visible predicate=${details.visiblePredicate}, bytes after send window=${details.bytesAfterWindow}, stdout grew by ${stdout.length - lenBeforeSend} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`
 }
 
 async function ptyWaitForInputReadyAfterWrite(
@@ -413,7 +375,6 @@ async function ptyWaitForInputReadyAfterWrite(
   await waitForInteractiveInputReady({
     getStdout: () => handle.stdout.value,
     maxWaitMs: PTY_INPUT_READY_AFTER_SEND_MAX_MS,
-    mode: INPUT_READY_WAIT_MODE,
     onlyInStdoutAfterByteLength: lenBeforeSend,
     formatTimeoutError: (stdout, details) =>
       formatPtyInputBoxTimeoutError(stdout, lenBeforeSend, details),

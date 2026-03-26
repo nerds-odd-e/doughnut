@@ -38,8 +38,8 @@ const cursorColRe = new RegExp(`^${ESC}\\[(\\d+)G`)
 const csiRe = new RegExp(`^${ESC}\\[[\\d;?]*[A-Za-z]`)
 
 type TtyWriteReplayOptions = {
-  /** Skip `OSC ... BEL` sequences (e.g. interactive input-ready). */
-  skipOsc?: boolean
+  /** Skip terminal title/control sequences (`ESC ] ... BEL`). */
+  skipTerminalControlSequence?: boolean
 }
 
 function replayTtyWrites(
@@ -51,7 +51,11 @@ function replayTtyWrites(
   let col = 0
   let i = 0
   while (i < output.length) {
-    if (opts.skipOsc && output[i] === ESC && output[i + 1] === ']') {
+    if (
+      opts.skipTerminalControlSequence &&
+      output[i] === ESC &&
+      output[i + 1] === ']'
+    ) {
       const bel = output.indexOf('\x07', i)
       if (bel >= 0) {
         i = bel + 1
@@ -117,7 +121,9 @@ function replayTtyWrites(
 
 /** Apply CUU/CUD, EL, CUP, and printable chars to build a naive terminal frame (tests only). */
 export function simulatedScreenFromTtyWrites(output: string): string {
-  return replayTtyWrites(output, { skipOsc: true }).lines.join('\n')
+  return replayTtyWrites(output, {
+    skipTerminalControlSequence: true,
+  }).lines.join('\n')
 }
 
 /**
@@ -175,7 +181,7 @@ export function cursorPositionAfterTtyWrites(output: string): {
   col: number
   lines: string[]
 } {
-  return replayTtyWrites(output, { skipOsc: true })
+  return replayTtyWrites(output, { skipTerminalControlSequence: true })
 }
 
 /** Last row index whose plain text contains `substring` (after `plain` transform). Returns -1 if none. */

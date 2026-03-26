@@ -8,7 +8,7 @@ export const INTERACTIVE_CLI_PTY_KEYSTROKE_TASK =
   'applyInteractiveCliPtyKeystroke' as const
 
 /**
- * One logical TTY action once the CLI has drawn the input box (ready OSC).
+ * One logical TTY action once the CLI has visibly drawn a ready input surface.
  * Maps to exact bytes in `cliPtyRunner` — no trimming or slash detection here.
  */
 export type InteractiveCliPtyKeystroke =

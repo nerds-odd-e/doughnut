@@ -29,7 +29,7 @@ describe('interactiveInputReadyOscSuffix', () => {
     interactiveFetchWaitLine: null,
   } as const
 
-  test('emits private ready OSC when draft is empty and no interactive fetch wait', () => {
+  test('emits private ready sequence when draft is empty and no interactive fetch wait', () => {
     expect(interactiveInputReadyOscSuffix(readyPaint)).toBe(
       '\x1b]900;doughnut-interactive-input-ready\x07'
     )
