@@ -3,16 +3,13 @@
  * (`CommandLineLivePanel`), stage-band / separator helpers, and shared tone helpers. Complements the
  * Ink shell; not a second interactive UI engine.
  */
-import { Chalk } from 'chalk'
+import { RESET, HIDE_CURSOR, SHOW_CURSOR } from './ansi.js'
 import {
   GREY,
+  GREY_BG,
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
-  ITALIC,
-  RED,
-  RESET,
-  HIDE_CURSOR,
-  SHOW_CURSOR,
-} from './ansi.js'
+  terminalChalk,
+} from './terminalChalk.js'
 import {
   filterCommandsByPrefix,
   formatCommandCompletionLines,
@@ -35,11 +32,9 @@ import type {
 } from './types.js'
 import type { InteractiveFetchWaitLine } from './interactiveFetchWait.js'
 
-/** For command-line paint: inverse caret matches `@inkjs/ui` TextInput; `level` forced so Vitest always sees SGR. */
-const paintChalk = new Chalk({ level: 3 })
-
 export {
   GREY,
+  GREY_BG,
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
   RESET,
   HIDE_CURSOR,
@@ -59,9 +54,6 @@ export type InteractiveInputReadyOsc = typeof INTERACTIVE_INPUT_READY_OSC
 /** Terminal column count; used for truncation and line width. */
 export type TerminalWidth = number
 
-export const GREEN = '\x1b[32m'
-export const GREY_BG = '\x1b[48;5;236m'
-
 /**
  * Background SGR for the **Current stage band**: full-width Current Stage Indicator line and,
  * when that indicator is shown, the matching Current prompt separator strip (same color index as
@@ -70,14 +62,14 @@ export const GREY_BG = '\x1b[48;5;236m'
 export const CURRENT_STAGE_BAND_BACKGROUND_SGR = GREY_BG
 
 export function buildCurrentPromptSeparator(width: TerminalWidth): string {
-  return `${GREEN}${'─'.repeat(width)}${RESET}`
+  return terminalChalk.green('─'.repeat(width))
 }
 
 /** Green rule on the Current stage band (after the Current Stage Indicator line). */
 export function buildCurrentPromptSeparatorForStageBand(
   width: TerminalWidth
 ): string {
-  return `${CURRENT_STAGE_BAND_BACKGROUND_SGR}${GREEN}${'─'.repeat(width)}${RESET}`
+  return terminalChalk.bgAnsi256(236).green('─'.repeat(width))
 }
 
 export const PROMPT = '→ '
@@ -133,18 +125,18 @@ function usesGreyNoArrowCommandLinePaint(ctx: PlaceholderContext): boolean {
 export function interactiveFetchWaitStageIndicatorLine(
   baseLine: InteractiveFetchWaitLine
 ): string {
-  return `${INTERACTIVE_FETCH_WAIT_PROMPT_FG}${baseLine}${RESET}`
+  return terminalChalk.blueBright(baseLine)
 }
 
 /** Shown in Current guidance when user has not typed a slash command prefix. */
-export const COMMANDS_HINT = `${GREY}  / commands${RESET}`
+export const COMMANDS_HINT = terminalChalk.gray('  / commands')
 
 /**
  * Grey foreground SGR for one **Current Stage Indicator** label; full-width band padding is applied in
  * {@link formatCurrentStageIndicatorLine}.
  */
 export function greyCurrentStageIndicatorLabel(plainText: string): string {
-  return `${GREY}${plainText}${RESET}`
+  return terminalChalk.gray(plainText)
 }
 
 /** Default **Current Stage Indicator** line while recall payload is loading (label: “Recalling”). */
@@ -361,8 +353,13 @@ function padEndVisible(str: string, targetLen: number): string {
 }
 
 function stripTrailingSgrReset(s: string): string {
-  // biome-ignore lint/suspicious/noControlCharactersInRegex: strip trailing SGR reset
-  return s.replace(/\x1b\[0m$/, '')
+  let out = s
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: strip trailing SGR closes (chalk or full reset)
+  const trailing = /\x1b\[(?:0|39|49|27|23|22)m$/
+  while (trailing.test(out)) {
+    out = out.replace(trailing, '')
+  }
+  return out
 }
 
 /** One full-width screen line: Current stage band + padded label (visible width = `width`). */
@@ -382,9 +379,10 @@ export function isCommittedInteractiveInput(submitted: string): boolean {
 export function renderPastInput(input: string, width: TerminalWidth): string {
   const innerWidth = width - 2
   const lines = input.split('\n')
-  const emptyRow = `${GREY_BG}${' '.repeat(innerWidth)}${RESET}`
-  const contentRows = lines.map(
-    (line) => `${GREY_BG} ${padEndVisible(line, innerWidth - 1)}${RESET}`
+  const bg = terminalChalk.bgAnsi256(236)
+  const emptyRow = bg(' '.repeat(innerWidth))
+  const contentRows = lines.map((line) =>
+    bg(` ${padEndVisible(line, innerWidth - 1)}`)
   )
   return [emptyRow, ...contentRows, emptyRow, ''].join('\n')
 }
@@ -407,7 +405,7 @@ export function highlightRecognizedCommand(line: string): string {
   if (highlightLen === 0) return line
   const prefix = line.slice(0, highlightLen)
   const rest = line.slice(highlightLen)
-  return `${paintChalk.cyan.bold(prefix)}${rest}`
+  return `${terminalChalk.cyan.bold(prefix)}${rest}`
 }
 
 /** Options for building the interactive command-line draft (logical rows before terminal width fit). */
@@ -446,7 +444,7 @@ export function buildCommandInputDraftLines(
     return bufferLines.map((line, i) => {
       const prefix = commandInputDraftLinePrefix(i, context)
       if (i === 0 && buffer === '') {
-        return `${prefix}${GREY}${placeholder}${RESET}`
+        return `${prefix}${terminalChalk.gray(placeholder)}`
       }
       return prefix + highlightRecognizedCommand(line)
     })
@@ -460,8 +458,8 @@ export function buildCommandInputDraftLines(
     if (i === 0 && buffer === '') {
       inner =
         caretLineIndex === 0 && offsetInLine === 0
-          ? `${paintChalk.inverse(' ')}${GREY}${placeholder}${RESET}`
-          : `${GREY}${placeholder}${RESET}`
+          ? `${terminalChalk.inverse(' ')}${terminalChalk.gray(placeholder)}`
+          : `${terminalChalk.gray(placeholder)}`
     } else if (i === caretLineIndex) {
       inner = buildLineWithCaret(line, offsetInLine)
     } else {
@@ -499,11 +497,11 @@ function plainInsertCaret(line: string, offsetInLine: number): string {
   const o = Math.max(0, Math.min(offsetInLine, line.length))
   const before = line.slice(0, o)
   if (o >= line.length) {
-    return `${before}${paintChalk.inverse(' ')}`
+    return `${before}${terminalChalk.inverse(' ')}`
   }
   const g = firstGraphemeFromOffset(line, o)
   const after = line.slice(o + g.length)
-  return `${before}${paintChalk.inverse(g)}${after}`
+  return `${before}${terminalChalk.inverse(g)}${after}`
 }
 
 function buildLineWithCaret(line: string, offsetInLine: number): string {
@@ -519,9 +517,9 @@ function buildLineWithCaret(line: string, offsetInLine: number): string {
     const g = firstGraphemeFromOffset(line, offsetInLine)
     const afterInCmd = line.slice(offsetInLine + g.length, highlightLen)
     const tail = line.slice(highlightLen)
-    return `${paintChalk.cyan.bold(before)}${paintChalk.inverse(g)}${paintChalk.cyan.bold(afterInCmd)}${tail}`
+    return `${terminalChalk.cyan.bold(before)}${terminalChalk.inverse(g)}${terminalChalk.cyan.bold(afterInCmd)}${tail}`
   }
-  const highlightedCmd = paintChalk.cyan.bold(line.slice(0, highlightLen))
+  const highlightedCmd = terminalChalk.cyan.bold(line.slice(0, highlightLen))
   const rest = line.slice(highlightLen)
   return highlightedCmd + plainInsertCaret(rest, offsetInLine - highlightLen)
 }
@@ -724,8 +722,8 @@ export function applyChatHistoryOutputTone(
   line: string,
   tone: ChatHistoryOutputTone
 ): string {
-  if (tone === 'error') return `${RED}${line}${RESET}`
-  if (tone === 'userNotice') return `${GREY}${ITALIC}${line}${RESET}`
+  if (tone === 'error') return terminalChalk.red(line)
+  if (tone === 'userNotice') return terminalChalk.gray.italic(line)
   return line
 }
 

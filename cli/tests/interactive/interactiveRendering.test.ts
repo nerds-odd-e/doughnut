@@ -159,16 +159,18 @@ describe('buildSuggestionLines', () => {
     expect(lines).toHaveLength(0)
   })
 
+  const sgrCloserEnd = new RegExp(
+    `${String.fromCharCode(27)}\\[(?:0|39|49|23|22|24|25|26|27|55|59|53|65)m$`
+  )
   test.each([
     ['/list', 25],
     ['/list', 30],
     ['/', 25],
     ['/', 30],
-  ] as const)('Current guidance lines with ANSI end with RESET for buffer %s width %s', (buffer, width) => {
+  ] as const)('Current guidance lines with ANSI end with an SGR closer for buffer %s width %s', (buffer, width) => {
     for (const line of buildSuggestionLines(buffer, 0, width)) {
       if (line.includes('\x1b')) {
-        // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI RESET escape, intentional
-        expect(line).toMatch(/\x1b\[0m$/)
+        expect(line).toMatch(sgrCloserEnd)
       }
     }
   })

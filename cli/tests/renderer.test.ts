@@ -153,7 +153,7 @@ describe('needsGapBeforeLiveRegion', () => {
       needsGapBeforeLiveRegion(
         [{ type: 'input', content: 'x' }],
         [],
-        [`${INTERACTIVE_FETCH_WAIT_PROMPT_FG}Loading${RESET}`]
+        [interactiveFetchWaitStageIndicatorLine('Loading')]
       )
     ).toBe(false)
   })

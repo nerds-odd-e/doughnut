@@ -12,12 +12,10 @@
  * **Do not reintroduce:** CSI that lays out or positions the live block (Phase J2 — caret and
  * draft chrome live inside Ink).
  */
-import { RESET } from '../ansi.js'
 import type { ChatHistoryOutputTone } from '../types.js'
 import {
   applyChatHistoryOutputTone,
   buildCurrentPromptSeparator,
-  GREY,
   HIDE_CURSOR,
   INTERACTIVE_INPUT_READY_OSC,
   interactiveInputReadyOscSuffix,
@@ -26,6 +24,7 @@ import {
   SHOW_CURSOR,
   type TerminalWidth,
 } from '../renderer.js'
+import { terminalChalk } from '../terminalChalk.js'
 
 function write(chunk: string): void {
   process.stdout.write(chunk)
@@ -50,7 +49,7 @@ export const interactiveTtyStdout = {
   },
 
   greyCurrentPromptLine(msg: string): void {
-    write(`${GREY}${msg}${RESET}\n`)
+    write(`${terminalChalk.gray(msg)}\n`)
   },
 
   currentPromptSeparator(width: TerminalWidth): void {
@@ -73,6 +72,7 @@ export const interactiveTtyStdout = {
     }
   },
 
+  /** Cursor down one row + CRLF — raw CUD CSI, not chalk styling. */
   ctrlCExitNewline(): void {
     write(`\x1b[${1}B\r\n`)
   },

@@ -1,4 +1,4 @@
-import { GREY, RESET, REVERSE } from './ansi.js'
+import { terminalChalk } from './terminalChalk.js'
 
 /** Max visible lines in Current guidance scrollable lists (commands, tokens, MCQ). */
 export const CURRENT_GUIDANCE_MAX_VISIBLE = 8
@@ -30,8 +30,8 @@ export function formatHighlightedList(
   if (!isOverflowing) {
     return lines.map((line, i) =>
       isHighlightedLine(i)
-        ? `${REVERSE}${line}${RESET}`
-        : `${GREY}${line}${RESET}`
+        ? terminalChalk.inverse(line)
+        : terminalChalk.gray(line)
     )
   }
 
@@ -54,16 +54,16 @@ export function formatHighlightedList(
   const lastOptionIndex = showMoreBelow ? window.length - 2 : window.length - 1
 
   const result: string[] = []
-  if (showMoreAbove) result.push(`${GREY}  ↑ more above${RESET}`)
+  if (showMoreAbove) result.push(terminalChalk.gray('  ↑ more above'))
   for (let i = firstOptionIndex; i <= lastOptionIndex; i++) {
     const line = window[i]!
     result.push(
       isHighlightedLine(scrollOffset + i)
-        ? `${REVERSE}${line}${RESET}`
-        : `${GREY}${line}${RESET}`
+        ? terminalChalk.inverse(line)
+        : terminalChalk.gray(line)
     )
   }
-  if (showMoreBelow) result.push(`${GREY}  ↓ more below${RESET}`)
+  if (showMoreBelow) result.push(terminalChalk.gray('  ↓ more below'))
   return result
 }
 

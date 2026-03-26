@@ -34,7 +34,16 @@ import {
 const MCQ_NOTEBOOK_TITLE = 'McqEscStopConfirmNb_k9Qz'
 
 const GREY_SGR = '\x1b[90m'
-const SGR_RESET_LINE = '\x1b[0m\n'
+
+function greyWholeLineWriteChunk(chunk: string): boolean {
+  if (!chunk.startsWith(GREY_SGR)) return false
+  return (
+    chunk.endsWith('\x1b[0m\n') ||
+    chunk.endsWith('\x1b[39m\n') ||
+    chunk.endsWith('\x1b[0m') ||
+    chunk.endsWith('\x1b[39m')
+  )
+}
 
 function countGreyWholeLineWriteCurrentPromptsWhere(
   writeSpy: ReturnType<typeof vi.spyOn>,
@@ -44,8 +53,7 @@ function countGreyWholeLineWriteCurrentPromptsWhere(
   for (const call of writeSpy.mock.calls) {
     const chunk = String(call[0] ?? '')
     if (chunk.includes('\x1b[2K')) continue
-    if (!(chunk.startsWith(GREY_SGR) && chunk.endsWith(SGR_RESET_LINE)))
-      continue
+    if (!greyWholeLineWriteChunk(chunk)) continue
     const plain = stripAnsi(chunk).trimEnd()
     if (predicate(plain)) count++
   }
