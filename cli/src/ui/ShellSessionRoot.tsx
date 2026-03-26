@@ -1,12 +1,10 @@
 import React from 'react'
 import type { Key } from 'ink'
-import { filterCommandsByPrefix, interactiveDocs } from '../help.js'
 import type { RecallInkConfirmChoice } from '../interactions/recallYesNo.js'
 import {
   buildSuggestionLinesForInk,
   DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
   formatCurrentStageIndicatorLine,
-  getLastLine,
   getTerminalWidth,
   greyCurrentStageIndicatorLabel,
   interactiveFetchWaitStageIndicatorLine,
@@ -15,6 +13,7 @@ import {
   type PlaceholderContext,
   type TerminalWidth,
 } from '../renderer.js'
+import { hasInteractiveSlashCompletions } from '../slashCompletion.js'
 import type { ShellSessionState } from '../shell/shellSessionState.js'
 import type { TTYDeps } from '../adapters/ttyDeps.js'
 import {
@@ -66,13 +65,6 @@ function currentStageIndicatorLinesForLiveRegion(
     return [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
   }
   return []
-}
-
-export function isCommandPrefixWithSuggestions(lineDraft: string): boolean {
-  const lastLine = getLastLine(lineDraft)
-  if (!lastLine.startsWith('/') || lastLine.endsWith(' ')) return false
-  const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
-  return filtered.length > 0
 }
 
 export function isAlternateLivePanel(
@@ -286,7 +278,7 @@ export function ShellSessionRoot({
             {
               forceCommandsHint:
                 session.suggestionsDismissed &&
-                isCommandPrefixWithSuggestions(session.commandInput.lineDraft),
+                hasInteractiveSlashCompletions(session.commandInput.lineDraft),
             }
           ),
         }

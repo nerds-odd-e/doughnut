@@ -1,7 +1,6 @@
 /**
- * TTY interactive command line: single-line {@link InteractiveCommandInput.lineDraft},
- * caret, and in-memory ↑↓ recall of prior commits (newest first). Newlines from paste are
- * collapsed to spaces; Shift+Enter does not insert a newline.
+ * TTY **command line** state: single-line {@link InteractiveCommandInput.lineDraft}, caret,
+ * and in-memory ↑↓ recall of prior commits (newest first). Newlines from paste collapse to spaces.
  */
 
 /** Cap on recalled lines; same order as chat commits, trimmed non-empty only. */
@@ -12,20 +11,14 @@ export function singleLineCommandDraft(s: string): string {
   return s.replace(/\r\n|\r|\n/g, ' ')
 }
 
-/**
- * Whether `lineDraft` would open the TTY slash-command suggestion list (same contract as
- * `isCommandPrefixWithSuggestions` in `renderer.ts`).
- */
-export type SlashSuggestionPickerApplies = (lineDraft: string) => boolean
-
 export type InteractiveCommandInput = {
   lineDraft: string
   /** UTF-16 code unit offset into `lineDraft` (matches JS string indexing). */
   caretOffset: number
-  /** Newest commit at `[0]`; entries are `trim()`med. */
+  /** Newest commit at `[0]`; entries are trimmed single lines. */
   committedCommands: string[]
   /**
-   * `null` = user is editing the live draft. Otherwise index into `committedCommands`
+   * `null` = editing the live draft. Otherwise index into `committedCommands`
    * (`0` = most recent commit, larger = older).
    */
   historyWalkIndex: number | null
@@ -64,43 +57,36 @@ function endHistoryWalk(): Pick<
   return { historyWalkIndex: null, lineDraftBeforeHistoryWalk: null }
 }
 
-/**
- * When recalling a committed line into the box during ↑↓ history walk, an incomplete `/…`
- * prefix that would show slash suggestions is stored without a trailing space. Append one
- * so TTY suggestion mode does not apply to the recalled draft (arrows stay on history).
- */
-export function normalizeRecalledLineDraftForSlashSuggestionExit(
-  lineDraft: string,
-  slashPickerWouldApplyToRecalledLine: boolean
+function recalledDraftWithSlashPickerSuppressed(
+  recalledCommittedLine: string,
+  slashPickerWouldApply: boolean
 ): string {
-  const d = singleLineCommandDraft(lineDraft)
-  if (!slashPickerWouldApplyToRecalledLine) return d
+  const d = singleLineCommandDraft(recalledCommittedLine)
+  if (!slashPickerWouldApply) return d
   return `${d} `
 }
 
-/** Recalled committed line as it should appear in the input box (exit slash picker when needed). */
-function recalledDraftForInputBox(
-  recalled: string,
-  slashPickerApplies: SlashSuggestionPickerApplies
+function recalledLineForCommandBox(
+  recalledCommittedLine: string,
+  slashPickerWouldApplyForDraft: (draft: string) => boolean
 ): string {
-  const one = singleLineCommandDraft(recalled)
-  return normalizeRecalledLineDraftForSlashSuggestionExit(
+  const one = singleLineCommandDraft(recalledCommittedLine)
+  return recalledDraftWithSlashPickerSuppressed(
     one,
-    slashPickerApplies(one)
+    slashPickerWouldApplyForDraft(one)
   )
 }
 
-/** Esc on a bare `/` prefix: clear the draft; otherwise normalize to a single line. */
-export function lineDraftAfterEscapingBareSlash(lineDraft: string): string {
+function draftAfterBareSlashEscape(lineDraft: string): string {
   const one = singleLineCommandDraft(lineDraft)
   return one === '/' ? '' : one
 }
 
-/** Esc on a bare `/` prefix: clear or drop last line; ends any history walk; caret at end. */
+/** User dismissed a lone `/` on Esc: clear draft, end history walk, caret at end. */
 export function afterBareSlashEscape(
   state: InteractiveCommandInput
 ): InteractiveCommandInput {
-  const lineDraft = lineDraftAfterEscapingBareSlash(state.lineDraft)
+  const lineDraft = draftAfterBareSlashEscape(state.lineDraft)
   return {
     ...state,
     ...endHistoryWalk(),
@@ -109,12 +95,12 @@ export function afterBareSlashEscape(
   }
 }
 
-/** Tab completion or Enter-pick: new draft, caret at end, any history walk ends. */
-export function applyLastLineEdit(
+/** Replace the whole live draft (tab complete, slash pick); ends history walk. */
+export function replaceLiveCommandDraft(
   state: InteractiveCommandInput,
-  newLine: string
+  newDraft: string
 ): InteractiveCommandInput {
-  const lineDraft = singleLineCommandDraft(newLine)
+  const lineDraft = singleLineCommandDraft(newDraft)
   return {
     ...state,
     ...endHistoryWalk(),
@@ -135,10 +121,8 @@ export function clearLiveCommandLine(
 }
 
 /**
- * Whether the TTY should move slash-command suggestion highlight on ↑/↓ instead of
- * {@link onArrowUp} / {@link onArrowDown}. Slash cycling applies only while editing the live
- * draft (`historyWalkIndex === null`). A caret not at column 0 (for ↑) or not at
- * `lineDraft.length` (for ↓) takes precedence — first ↑ goes home, first ↓ goes to end.
+ * Whether ↑/↓ should move the slash suggestion highlight instead of draft history / caret.
+ * Only while editing the live draft (`historyWalkIndex === null`). First ↑ goes home, first ↓ end.
  */
 export function ttyArrowKeyUsesSlashSuggestionCycle(
   key: 'up' | 'down',
@@ -147,10 +131,9 @@ export function ttyArrowKeyUsesSlashSuggestionCycle(
     'historyWalkIndex' | 'caretOffset' | 'lineDraft'
   >,
   suggestionsDismissed: boolean,
-  slashSuggestionPickerVisibleForDraft: boolean
+  slashCompletionListVisible: boolean
 ): boolean {
-  if (suggestionsDismissed || !slashSuggestionPickerVisibleForDraft)
-    return false
+  if (suggestionsDismissed || !slashCompletionListVisible) return false
   if (state.historyWalkIndex !== null) return false
   if (key === 'up') return state.caretOffset === 0
   return state.caretOffset === state.lineDraft.length
@@ -158,15 +141,15 @@ export function ttyArrowKeyUsesSlashSuggestionCycle(
 
 export function onArrowUp(
   state: InteractiveCommandInput,
-  slashPickerApplies: SlashSuggestionPickerApplies = () => false
+  slashPickerWouldApplyForDraft: (draft: string) => boolean = () => false
 ): InteractiveCommandInput {
   const { lineDraft, caretOffset, committedCommands, historyWalkIndex } = state
   if (historyWalkIndex !== null) {
     const nextIdx = historyWalkIndex + 1
     if (nextIdx >= committedCommands.length) return state
-    const line = recalledDraftForInputBox(
+    const line = recalledLineForCommandBox(
       committedCommands[nextIdx]!,
-      slashPickerApplies
+      slashPickerWouldApplyForDraft
     )
     return {
       ...state,
@@ -179,9 +162,9 @@ export function onArrowUp(
     return { ...state, caretOffset: 0 }
   }
   if (committedCommands.length === 0) return state
-  const line = recalledDraftForInputBox(
+  const line = recalledLineForCommandBox(
     committedCommands[0]!,
-    slashPickerApplies
+    slashPickerWouldApplyForDraft
   )
   return {
     ...state,
@@ -194,7 +177,7 @@ export function onArrowUp(
 
 export function onArrowDown(
   state: InteractiveCommandInput,
-  slashPickerApplies: SlashSuggestionPickerApplies = () => false
+  slashPickerWouldApplyForDraft: (draft: string) => boolean = () => false
 ): InteractiveCommandInput {
   const {
     lineDraft,
@@ -206,9 +189,9 @@ export function onArrowDown(
   if (historyWalkIndex !== null) {
     if (historyWalkIndex > 0) {
       const nextIdx = historyWalkIndex - 1
-      const line = recalledDraftForInputBox(
+      const line = recalledLineForCommandBox(
         committedCommands[nextIdx]!,
-        slashPickerApplies
+        slashPickerWouldApplyForDraft
       )
       return {
         ...state,

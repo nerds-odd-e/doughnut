@@ -24,7 +24,6 @@ import { maskInteractiveInputForHistory } from '../inputHistoryMask.js'
 import {
   afterBareSlashEscape,
   appendCommittedCommand,
-  applyLastLineEdit,
   caretOneLeft,
   caretOneRight,
   clearLiveCommandLine,
@@ -32,6 +31,7 @@ import {
   insertIntoDraft,
   onArrowDown,
   onArrowUp,
+  replaceLiveCommandDraft,
   ttyArrowKeyUsesSlashSuggestionCycle,
 } from '../interactiveCommandInput.js'
 import type { RecallInkConfirmChoice } from '../interactions/recallYesNo.js'
@@ -62,9 +62,9 @@ import type {
   ChatHistoryOutputTone,
   OutputAdapter,
 } from '../types.js'
+import { hasInteractiveSlashCompletions } from '../slashCompletion.js'
 import {
   isAlternateLivePanel,
-  isCommandPrefixWithSuggestions,
   isInkSubmitPressed,
   ShellSessionRoot,
   type ShellSessionInkHandlers,
@@ -661,7 +661,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
         enterStopConfirmationFromEsc()
         return
       }
-      if (isCommandPrefixWithSuggestions(session.commandInput.lineDraft)) {
+      if (hasInteractiveSlashCompletions(session.commandInput.lineDraft)) {
         patch((s) => {
           const lastLine = s.commandInput.lineDraft
           let next = { ...s, highlightIndex: 0 }
@@ -682,7 +682,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
     if (submitPressed) {
       const trimmedInput = session.commandInput.lineDraft.trim()
 
-      if (isCommandPrefixWithSuggestions(session.commandInput.lineDraft)) {
+      if (hasInteractiveSlashCompletions(session.commandInput.lineDraft)) {
         const pickIndex = session.highlightIndex
         const filtered = filterCommandsByPrefix(
           interactiveDocs,
@@ -691,7 +691,10 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
         const selectedCommand = `${filtered[pickIndex].usage} `
         patchAndDraw((s) => ({
           ...s,
-          commandInput: applyLastLineEdit(s.commandInput, selectedCommand),
+          commandInput: replaceLiveCommandDraft(
+            s.commandInput,
+            selectedCommand
+          ),
           highlightIndex: 0,
         }))
         return
@@ -783,7 +786,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
           dir,
           session.commandInput,
           session.suggestionsDismissed,
-          isCommandPrefixWithSuggestions(session.commandInput.lineDraft)
+          hasInteractiveSlashCompletions(session.commandInput.lineDraft)
         )
       ) {
         const filtered = filterCommandsByPrefix(
@@ -805,8 +808,8 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
           ...s,
           commandInput:
             dir === 'up'
-              ? onArrowUp(s.commandInput, isCommandPrefixWithSuggestions)
-              : onArrowDown(s.commandInput, isCommandPrefixWithSuggestions),
+              ? onArrowUp(s.commandInput, hasInteractiveSlashCompletions)
+              : onArrowDown(s.commandInput, hasInteractiveSlashCompletions),
         }))
         if (session.commandInput.lineDraft !== prevDraft) {
           patch((s) => ({
@@ -847,7 +850,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
         if (count > 0 && completed !== lastLine) {
           patchAndDraw((s) => ({
             ...s,
-            commandInput: applyLastLineEdit(s.commandInput, completed),
+            commandInput: replaceLiveCommandDraft(s.commandInput, completed),
             highlightIndex: 0,
             suggestionsDismissed: false,
           }))

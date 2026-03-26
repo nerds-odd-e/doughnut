@@ -3,20 +3,17 @@ import {
   MAX_COMMITTED_COMMANDS,
   afterBareSlashEscape,
   appendCommittedCommand,
-  applyLastLineEdit,
   caretOneLeft,
   clearLiveCommandLine,
   deleteBeforeCaret,
   emptyInteractiveCommandInput,
   insertIntoDraft,
-  lineDraftAfterEscapingBareSlash,
-  normalizeRecalledLineDraftForSlashSuggestionExit,
   onArrowDown,
   onArrowUp,
+  replaceLiveCommandDraft,
   singleLineCommandDraft,
   ttyArrowKeyUsesSlashSuggestionCycle,
   type InteractiveCommandInput,
-  type SlashSuggestionPickerApplies,
 } from '../src/interactiveCommandInput.js'
 
 function commandInputWith(
@@ -64,18 +61,8 @@ describe('singleLineCommandDraft', () => {
   })
 })
 
-describe('lineDraftAfterEscapingBareSlash', () => {
-  test('returns empty string when the draft is only `/`', () => {
-    expect(lineDraftAfterEscapingBareSlash('/')).toBe('')
-  })
-
-  test('normalizes then leaves non-`/` drafts unchanged aside from newlines', () => {
-    expect(lineDraftAfterEscapingBareSlash('/ex')).toBe('/ex')
-  })
-})
-
 describe('afterBareSlashEscape', () => {
-  test('clears a one-line `/` draft, ends history walk, and leaves caret at end', () => {
+  test('clears a draft that is only `/`, ends history walk, caret at end', () => {
     const out = afterBareSlashEscape(
       commandInputWith({
         lineDraft: '/',
@@ -88,11 +75,19 @@ describe('afterBareSlashEscape', () => {
     expect(out.historyWalkIndex).toBe(null)
     expect(out.lineDraftBeforeHistoryWalk).toBe(null)
   })
+
+  test('leaves `/foo` unchanged (only a lone `/` is dismissed)', () => {
+    const out = afterBareSlashEscape(
+      commandInputWith({ lineDraft: '/foo', caretOffset: 4 })
+    )
+    expect(out.lineDraft).toBe('/foo')
+    expect(out.caretOffset).toBe(4)
+  })
 })
 
-describe('applyLastLineEdit', () => {
-  test('replaces the draft, ends history walk, and puts the caret at end', () => {
-    const out = applyLastLineEdit(
+describe('replaceLiveCommandDraft', () => {
+  test('replaces the draft, ends history walk, caret at end', () => {
+    const out = replaceLiveCommandDraft(
       commandInputWith({
         lineDraft: 'ab',
         historyWalkIndex: 0,
@@ -146,21 +141,8 @@ describe('Input command history: slash suggestion picker vs ↑↓ while editing
 })
 
 describe('Input command history: recalled drafts leave slash suggestion picker', () => {
-  test('normalizeRecalledLineDraftForSlashSuggestionExit appends a trailing space when needed', () => {
-    expect(
-      normalizeRecalledLineDraftForSlashSuggestionExit('/help_hist', true)
-    ).toBe('/help_hist ')
-    expect(
-      normalizeRecalledLineDraftForSlashSuggestionExit('/help_hist', false)
-    ).toBe('/help_hist')
-    expect(
-      normalizeRecalledLineDraftForSlashSuggestionExit('a\n/help_hist', true)
-    ).toBe('a /help_hist ')
-  })
-
-  test('↑↓ through history still walks entries when a recalled line would have opened the picker', () => {
-    const pickerWouldApply: SlashSuggestionPickerApplies = (d) =>
-      d === '/help_hist'
+  test('↑↓ through history when a recalled line would open the picker (test predicate)', () => {
+    const slashPickerWouldApplyForDraft = (d: string) => d === '/help_hist'
 
     const intoNewest = onArrowUp(
       commandInputWith({
@@ -168,7 +150,7 @@ describe('Input command history: recalled drafts leave slash suggestion picker',
         caretOffset: 0,
         committedCommands: ['/help_hist', '/hist_beta'],
       }),
-      pickerWouldApply
+      slashPickerWouldApplyForDraft
     )
     expect(intoNewest.historyWalkIndex).toBe(0)
     expect(intoNewest.lineDraft).toBe('/help_hist ')
@@ -180,19 +162,31 @@ describe('Input command history: recalled drafts leave slash suggestion picker',
         caretOffset: 0,
         committedCommands: ['/hist_beta', '/help_hist'],
       }),
-      pickerWouldApply
+      slashPickerWouldApplyForDraft
     )
     expect(fromOlder.historyWalkIndex).toBe(0)
     expect(fromOlder.lineDraft).toBe('/hist_beta')
 
-    const showingHelp = onArrowUp(fromOlder, pickerWouldApply)
+    const showingHelp = onArrowUp(fromOlder, slashPickerWouldApplyForDraft)
     expect(showingHelp.historyWalkIndex).toBe(1)
     expect(showingHelp.lineDraft).toBe('/help_hist ')
 
-    const backToBeta = onArrowDown(showingHelp, pickerWouldApply)
+    const backToBeta = onArrowDown(showingHelp, slashPickerWouldApplyForDraft)
     expect(backToBeta.historyWalkIndex).toBe(0)
     expect(backToBeta.lineDraft).toBe('/hist_beta')
     expect(backToBeta.caretOffset).toBe('/hist_beta'.length)
+  })
+
+  test('recalled line with embedded newline is normalized before the trailing-space rule', () => {
+    const out = onArrowUp(
+      commandInputWith({
+        lineDraft: 'x',
+        caretOffset: 0,
+        committedCommands: ['a\n/help_hist'],
+      }),
+      (d) => d === 'a /help_hist'
+    )
+    expect(out.lineDraft).toBe('a /help_hist ')
   })
 })
 

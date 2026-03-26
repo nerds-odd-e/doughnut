@@ -10,11 +10,7 @@ import {
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
   terminalChalk,
 } from './terminalChalk.js'
-import {
-  filterCommandsByPrefix,
-  formatCommandCompletionLines,
-  interactiveDocs,
-} from './help.js'
+import { formatCommandCompletionLines, interactiveDocs } from './help.js'
 import {
   formatTokenLines,
   type AccessTokenEntry,
@@ -31,7 +27,7 @@ import type {
   RecallMcqChoiceTexts,
 } from './types.js'
 import type { InteractiveFetchWaitLine } from './interactiveFetchWait.js'
-import { singleLineCommandDraft } from './interactiveCommandInput.js'
+import { slashGuidanceForInk } from './slashCompletion.js'
 import {
   padEndVisible,
   stripTrailingSgrReset,
@@ -304,11 +300,6 @@ export function getTerminalWidth(): number {
   return process.stdout.columns || 80
 }
 
-/** Normalized command-line buffer for slash-command prefix detection (newlines → spaces). */
-export function getLastLine(buffer: string): string {
-  return singleLineCommandDraft(buffer)
-}
-
 /** Blank line before the live Ink column when scrollback exists but there is no Current prompt block. */
 export function needsGapBeforeLiveRegion(
   history: ChatHistory,
@@ -430,17 +421,18 @@ export function buildSuggestionLinesForInk(
   highlightIndex: number,
   options?: { forceCommandsHint?: boolean }
 ): string[] {
-  const lastLine = getLastLine(buffer)
-  const showCommandsHint =
-    options?.forceCommandsHint ||
-    !lastLine.startsWith('/') ||
-    lastLine.endsWith(' ')
-  if (showCommandsHint) {
+  if (options?.forceCommandsHint) {
     return [COMMANDS_HINT]
   }
-  const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
+  const g = slashGuidanceForInk(buffer)
+  if (g.show === 'hint') {
+    return [COMMANDS_HINT]
+  }
+  if (g.show === 'empty') {
+    return []
+  }
   return formatHighlightedList(
-    formatCommandCompletionLines(filtered),
+    formatCommandCompletionLines(g.docs),
     CURRENT_GUIDANCE_MAX_VISIBLE,
     highlightIndex
   )
