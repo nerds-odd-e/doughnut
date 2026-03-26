@@ -37,10 +37,10 @@ cli/
 
 ## Vitest: observable behavior
 
-For **interactive** behavior, prefer **`runInteractive`** with a mock TTY or piped stdin and assert **stdout** / visible output — the test may **not import** the adapter or helper you changed; coverage through the CLI surface is enough. Use **`processInput`** + mock **`OutputAdapter`** only for **non-interactive** (`-c`), helpers, or when there is no stable hook. See **Testing strategy → Observable behavior first** in `.cursor/rules/planning.mdc`.
+For **interactive** behavior, prefer **`runInteractive`** with a **mock TTY** stdin and assert **stdout** / visible output — the test may **not import** the adapter or helper you changed; coverage through the CLI surface is enough. Use **`processInput`** + mock **`OutputAdapter`** for the **default console adapter** contract, helpers, or when there is no stable TTY hook. See **Testing strategy → Observable behavior first** in `.cursor/rules/planning.mdc`.
 
 - **TTY-specific behavior:** `cli/tests/interactive/interactiveTty*.test.ts` (or equivalent `runInteractive` harness).
-- **`cli/tests/interactive/processInput.test.ts`:** Contract for **`processInput`** with the **default adapter** (same surface as `-c` / piped), not a second interactive engine.
+- **`cli/tests/interactive/processInput.test.ts`:** Contract for **`processInput`** with the **default adapter** (`console.log` / `writeCurrentPrompt`), not a second interactive engine.
 
 ## Domain terminology
 
@@ -65,10 +65,11 @@ Vocabulary for Cucumber steps and page objects (`e2e_test/start/pageObjects/cli/
 
 **`/add-access-token`:** Never persist or show raw tokens in history; `inputHistoryMask.ts`.
 
-## Interactive vs non-interactive
+## Entry points
 
-- **Interactive:** TTY or piped `runInteractive`; multi-turn commands (e.g. `/recall`).
-- **Non-interactive:** `-c` or single piped command; multi-turn commands fail with a clear message. Recall **MCQ** over `processInput`: stem on `OutputAdapter.writeCurrentPrompt` (or `log` if unset); numbered choices and “Enter your choice…” on **`log` only** — same stem vs list split as the TTY, without duplicating choices through both hooks.
+- **Interactive shell:** **TTY only** (`runInteractive` → `runTTY`). No piped stdin shell; **`-c` is rejected**; there is **no `doughnut help` subcommand** (use **`/help`** in the TTY).
+- **Non-TTY:** **`doughnut version`** / **`-v`** / **`--version`** and **`doughnut update`** only.
+- **`processInput`** (used by the TTY adapter): Recall **MCQ** stem on `OutputAdapter.writeCurrentPrompt` (or `log` if unset); numbered choices and “Enter your choice…” on **`log` only** — same stem vs list split as the TTY UI, without duplicating choices through both hooks.
 
 ## CLI E2E
 
@@ -111,5 +112,5 @@ Ensure `/help` lists the command:
 
 1. Export **CommandDoc** from the handler module (`category`: `subcommand` | `interactive`).
 2. Register in **`help.ts`** (`subcommandDocs`, module doc arrays, or `interactiveDocs`).
-3. Wire **`processInput()`** (interactive) or **`index.ts`** (subcommand).
+3. Wire **`processInput()`** (slash commands) or **`run.ts`** (`version` / `update` subcommands).
 4. Verify with `pnpm cli` → `/help` in the TTY shell.

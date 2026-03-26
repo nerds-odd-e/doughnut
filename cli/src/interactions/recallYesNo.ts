@@ -28,19 +28,18 @@ export function recallStopConfirmInkModelForContext(
   return recallStopConfirmInkModel(PLACEHOLDER_BY_CONTEXT[ctx])
 }
 
-/** Parsed recall y/n for piped / `-c` input (words allowed; TTY uses single-key y/n only). */
-export type RecallPipedYesNoParse = 'yes' | 'no' | 'invalid'
+/** Parsed recall y/n from a committed line (Ink confirm dispatches `y` / `n`; words allowed). */
+export type RecallYesNoLineParse = 'yes' | 'no' | 'invalid'
 
-/** Reprompt when piped recall y/n is empty or not y/n/yes/no. */
-export const RECALL_PIPED_YES_NO_REPROMPT = 'Please answer y or n'
+export const RECALL_YES_NO_REPROMPT = 'Please answer y or n'
 
 /**
- * Piped stdin during recall (load-more, just-review). Empty line is invalid — unlike the TTY panel,
- * where Enter alone means “no”.
+ * Load-more and just-review recall answers. Empty line is invalid — unlike the Ink panel, where
+ * Enter alone can mean “no” for some confirms.
  */
-export function parseRecallPipedYesNo(
+export function parseRecallYesNoLine(
   trimmedLine: string
-): RecallPipedYesNoParse {
+): RecallYesNoLineParse {
   if (trimmedLine === '') return 'invalid'
   const a = trimmedLine.toLowerCase()
   if (a === 'y' || a === 'yes') return 'yes'

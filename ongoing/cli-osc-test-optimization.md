@@ -28,7 +28,7 @@ The E2E layer is **fragile and complex** because the OSC is **absent** during fe
 ## Constraints
 
 - **Production:** OSC must stay **private** (not FinalTerm 133) so shell integration does not treat it as a prompt boundary — see comment on `INTERACTIVE_INPUT_READY_OSC` in `renderer.ts`.
-- **Piped / `-c`:** No marker in those captures — steps already distinguish PTY vs non-interactive (`outputAssertions.ts`).
+- **OSC scope:** Emitted for **TTY interactive** only; subcommand / script runs (`version`, `update`) have no input-ready OSC — E2E distinguishes PTY vs one-shot stdout (`outputAssertions.ts`).
 - **Fetch-wait:** Today the OSC is **omitted** while loading; any simplification must **preserve** correct sync for slow paths (no flaky “type before UI ready”).
 
 ---

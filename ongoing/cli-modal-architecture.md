@@ -2,6 +2,8 @@
 
 Informal plan; update as work proceeds. **Testing:** observable behavior first — `runInteractive` / E2E; see `.cursor/rules/planning.mdc` and `.cursor/rules/cli.mdc`.
 
+**Shipped:** Interactive shell is **TTY-only** (`runTTY`). **`pipedAdapter`**, piped stdin into the shell, **`-c`**, and **`doughnut help`** are **gone**. Later mentions of “piped” are **historical** (layout/module boundaries), not a second live entry mode.
+
 ---
 
 ## North star (phases 1–8 shipped; 9+ = structural / Ink-native shell)
@@ -11,7 +13,7 @@ Interactive TTY = **one Ink `render()`** root: **`Static`** for append-only scro
 **End state (this document, phases 9–14):**
 
 - **No `ttyAdapter` monolith** — replace with a **thin TTY I/O + mount** entry (streams, raw mode, documented bridges only) and **Ink-root state** for shell UI.
-- **Piped / `-c` and TTY interactive are separate modules** — **no piped-only code** in the TTY interactive path (see phase 9).
+- **TTY interactive module** stays free of **non-shell** layout drivers — historical “piped vs TTY” file split informed **`renderer.ts`** vs Ink (see phase 9); there is no second stdin-driven shell anymore.
 - **`patchConsole: true`** on `render()` once the TTY path no longer relies on raw `console.log` fighting Ink (phase 13).
 - **Do not patch, fight, or sidestep Ink** for keys/layout Ink already owns; remaining non-Ink bytes are **listed under [Special cases (approved Ink exceptions)](#special-cases-approved-ink-exceptions)**.
 - **Cursor and command input** follow **Ink / `@inkjs/ui` convention** (e.g. **`TextInput`** or Ink’s caret behavior) — **no obligation** to keep today’s reverse-video caret, bordered box, or hidden-hardware-cursor pairing if something else fits Ink better (gate 8).
@@ -21,7 +23,7 @@ Interactive TTY = **one Ink `render()`** root: **`Static`** for append-only scro
 
 **Phase 5 (done):** MCQ and token lists use Ink **`RecallMcqChoicesLivePanel`** / **`AccessTokenPickerLivePanel`** in **`liveSelectionGuidanceInk.tsx`** (`useInput` + **`selectListInteraction`**); readline **`keypress`** handles **Esc** on those lists only (bridge). **Phases 3–6 (done):** stop-confirm + session y/n on Ink (**`RecallInkConfirmPanel`**, shared stdin coalescing in **`inkStdinLogicalKeys.ts`**; **`@inkjs/ui` `StatusMessage`** for invalid keys). **Phase 7 (done):** audited **`ttyAdapter`** — no duplicate handlers for command line, confirm, or list keys; **`readline.createInterface` + `emitKeypressEvents`** kept only to attach this listener; list **Esc** bridge kept (documented on the **`keypress`** handler).
 
-**Non-interactive** (`-c`, piped): **`processInput` + `pipedAdapter` only** — not mixed into the TTY interactive module (phase 9).
+**`processInput`:** Shared command engine for the TTY adapter; **not** a second interactive UI — business branching stays out of duplicate shells (phase 9 intent).
 
 **Shell rule (replaces fat “adapter”):** TTY entry file may only wire **mechanism** (`TTYDeps` / streams / `render` options). **Domain branching** stays in **`interactive.ts`** (and siblings); **scrollback and turn state** are named domain concepts surfaced to the Ink root (phases 10–11).
 
@@ -133,7 +135,7 @@ Ink shell, neutral `TTYDeps`, confirm/MCQ/token/fetch-wait display components, *
 
 | Topic | Choice |
 |-------|--------|
-| Typed `yes` / `no` + Enter | **Not supported** on TTY — **y** / **n** only. Piped **`processInput`** uses **`parseRecallPipedYesNo`**. |
+| Typed `yes` / `no` + Enter | **Not supported** on TTY — **y** / **n** only. **`processInput`** still parses committed **`y`/`n`/`yes`/`no`** lines from the Ink confirm path via **`parseRecallYesNoLine`**. |
 | Wrong keys | **`@inkjs/ui` `StatusMessage`** variant **`error`** (e.g. “Please press y or n”). |
 | Session + stop: bare Enter | **`defaultChoice="cancel"`** semantics (Enter = **no**); one path for both (replaces session empty-Enter **noop**). |
 

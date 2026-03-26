@@ -1,5 +1,4 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
-import { formatHelp, INTERACTIVE_ONLY_REJECTION_MESSAGE } from '../src/help.js'
 import { run } from '../src/run.js'
 import { formatVersionOutput } from '../src/version.js'
 
@@ -8,16 +7,9 @@ describe('CLI', () => {
     const output = formatVersionOutput()
     expect(output).toMatch(/^doughnut \d+\.\d+\.\d+$/)
   })
-
-  test('help subcommand logs formatHelp()', async () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    await run(['help'])
-    expect(logSpy).toHaveBeenCalledWith(formatHelp())
-    logSpy.mockRestore()
-  })
 })
 
-describe('run with -c option', () => {
+describe('run entry routing', () => {
   let logSpy: ReturnType<typeof vi.spyOn>
   let errorSpy: ReturnType<typeof vi.spyOn>
   let exitSpy: ReturnType<typeof vi.spyOn>
@@ -36,51 +28,71 @@ describe('run with -c option', () => {
     exitSpy.mockRestore()
   })
 
-  test('-c "hello" prints version and "Not supported", then exits 0', async () => {
-    run(['-c', 'hello'])
+  test('-c is rejected with exit 1', async () => {
+    await run(['-c', 'hello'])
     await new Promise((r) => setImmediate(r))
-    const output = logSpy.mock.calls.flat().join('\n')
-    expect(output).toMatch(/doughnut \d+\.\d+\.\d+/)
-    expect(output).toContain('Not supported')
-    expect(exitSpy).toHaveBeenCalledWith(0)
-  })
-
-  test('-c "exit" prints version and exits 0', async () => {
-    run(['-c', 'exit'])
-    await new Promise((r) => setImmediate(r))
-    const output = logSpy.mock.calls.flat().join('\n')
-    expect(output).toMatch(/doughnut \d+\.\d+\.\d+/)
-    expect(exitSpy).toHaveBeenCalledWith(0)
-  })
-
-  test('-c "/exit" prints version and exits 0', async () => {
-    run(['-c', '/exit'])
-    await new Promise((r) => setImmediate(r))
-    const output = logSpy.mock.calls.flat().join('\n')
-    expect(output).toMatch(/doughnut \d+\.\d+\.\d+/)
-    expect(exitSpy).toHaveBeenCalledWith(0)
-  })
-
-  test('-c "/recall" rejects interactive-only command with message and exits 1', async () => {
-    run(['-c', '/recall'])
-    await new Promise((r) => setImmediate(r))
-    expect(errorSpy).toHaveBeenCalledWith(INTERACTIVE_ONLY_REJECTION_MESSAGE)
+    expect(errorSpy).toHaveBeenCalledWith(
+      'doughnut: -c is not supported. Run `doughnut` in a terminal for the interactive shell.'
+    )
     expect(exitSpy).toHaveBeenCalledWith(1)
   })
 
-  test('-c with no value prints error and exits 1', async () => {
-    run(['-c'])
+  test('-c= form is rejected with exit 1', async () => {
+    await run(['-c=hello'])
     await new Promise((r) => setImmediate(r))
-    expect(errorSpy).toHaveBeenCalledWith('doughnut: -c requires an argument')
     expect(exitSpy).toHaveBeenCalledWith(1)
   })
 
-  test('-c=value form works', async () => {
-    run(['-c=hello'])
+  test('help subcommand is rejected with exit 1', async () => {
+    await run(['help'])
     await new Promise((r) => setImmediate(r))
-    const output = logSpy.mock.calls.flat().join('\n')
-    expect(output).toMatch(/doughnut \d+\.\d+\.\d+/)
-    expect(output).toContain('Not supported')
-    expect(exitSpy).toHaveBeenCalledWith(0)
+    expect(errorSpy).toHaveBeenCalledWith(
+      'doughnut: there is no help subcommand. Run `doughnut` in a terminal, then type /help.'
+    )
+    expect(exitSpy).toHaveBeenCalledWith(1)
+  })
+
+  test('interactive path without TTY exits 1', async () => {
+    const orig = process.stdin.isTTY
+    Object.defineProperty(process.stdin, 'isTTY', {
+      value: false,
+      configurable: true,
+      writable: true,
+    })
+    try {
+      await run([])
+      await new Promise((r) => setImmediate(r))
+      expect(errorSpy).toHaveBeenCalledWith(
+        'doughnut: interactive mode requires a terminal. For scripts, use `doughnut version` or `doughnut update`.'
+      )
+      expect(exitSpy).toHaveBeenCalledWith(1)
+    } finally {
+      Object.defineProperty(process.stdin, 'isTTY', {
+        value: orig,
+        configurable: true,
+        writable: true,
+      })
+    }
+  })
+
+  test('version without TTY still prints version', async () => {
+    const orig = process.stdin.isTTY
+    Object.defineProperty(process.stdin, 'isTTY', {
+      value: false,
+      configurable: true,
+      writable: true,
+    })
+    try {
+      await run(['version'])
+      await new Promise((r) => setImmediate(r))
+      expect(logSpy).toHaveBeenCalledWith(formatVersionOutput())
+      expect(exitSpy).not.toHaveBeenCalled()
+    } finally {
+      Object.defineProperty(process.stdin, 'isTTY', {
+        value: orig,
+        configurable: true,
+        writable: true,
+      })
+    }
   })
 })

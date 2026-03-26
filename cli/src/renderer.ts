@@ -1,6 +1,6 @@
 /**
  * Terminal layout bridge: grapheme-aware width and wrapping, ANSI strings for the live region
- * (assembled into Ink via `CommandLineLivePanel` and related paths), piped-adapter box rendering, and
+ * (assembled into Ink via `CommandLineLivePanel` and related paths), box rendering helpers, and
  * shared placeholders / tone helpers. Complements the Ink shell; not a second interactive UI engine.
  */
 import {
@@ -85,7 +85,7 @@ export const PROMPT = '→ '
  * Which placeholder and input chrome apply in the live region.
  * `interactiveFetchWait`: slow backend/network call in flight — same grey, no-→ box as token list pickers.
  * `recallYesNo`: recall-session y/n (load more, just-review) on the TTY Ink strip (y/n keys; Enter alone means no).
- * Answers are not stored as grey history-input rows or in on-disk command history (outcome lines only). Piped input uses full lines.
+ * Answers are not stored as grey history-input rows or in on-disk command history (outcome lines only).
  */
 export type PlaceholderContext =
   | 'default'

@@ -1,4 +1,3 @@
-import { runPiped } from './adapters/pipedAdapter.js'
 import { runTTY } from './adapters/ttyAdapter.js'
 import {
   addAccessToken,
@@ -33,9 +32,9 @@ import {
   type InteractiveFetchWaitLine,
 } from './interactiveFetchWait.js'
 import {
-  parseRecallPipedYesNo,
+  parseRecallYesNoLine,
   recallStopConfirmInkModelForContext,
-  RECALL_PIPED_YES_NO_REPROMPT,
+  RECALL_YES_NO_REPROMPT,
 } from './interactions/recallYesNo.js'
 import {
   buildSuggestionLines,
@@ -488,7 +487,7 @@ export async function processInput(
     return false
   }
   if (pendingRecallLoadMore) {
-    const parsed = parseRecallPipedYesNo(trimmed)
+    const parsed = parseRecallYesNoLine(trimmed)
     if (parsed === 'yes') {
       pendingRecallLoadMore = false
       recallSessionDueDays = 3
@@ -498,7 +497,7 @@ export async function processInput(
       output.log(formatRecallSessionSummary(sessionRecallCount))
       endRecallSession()
     } else {
-      writeCurrentPrompt(RECALL_PIPED_YES_NO_REPROMPT)
+      writeCurrentPrompt(RECALL_YES_NO_REPROMPT)
       return false
     }
     return false
@@ -551,7 +550,7 @@ export async function processInput(
         await continueRecallSession(false, output, writeCurrentPrompt)
     } else {
       const { memoryTrackerId } = pendingRecallAnswer
-      const parsed = parseRecallPipedYesNo(trimmed)
+      const parsed = parseRecallYesNoLine(trimmed)
       if (parsed === 'yes') {
         try {
           await markAsRecalled(memoryTrackerId, true)
@@ -567,7 +566,7 @@ export async function processInput(
           output.logError(err)
         }
       } else {
-        writeCurrentPrompt(RECALL_PIPED_YES_NO_REPROMPT)
+        writeCurrentPrompt(RECALL_YES_NO_REPROMPT)
         return false
       }
       pendingRecallAnswer = null
@@ -679,17 +678,13 @@ function buildTTYDeps() {
   }
 }
 
-function buildPipedDeps() {
-  return {
-    processInput,
-    getPlaceholderContext,
-  }
-}
-
 export async function runInteractive(stdin = process.stdin): Promise<void> {
-  if (stdin.isTTY) {
-    await runTTY(stdin, buildTTYDeps())
-  } else {
-    await runPiped(stdin, buildPipedDeps())
+  if (!stdin.isTTY) {
+    console.error(
+      'doughnut: interactive mode requires a terminal. For scripts, use `doughnut version` or `doughnut update`.'
+    )
+    process.exit(1)
+    return
   }
+  await runTTY(stdin, buildTTYDeps())
 }

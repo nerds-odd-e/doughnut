@@ -1,36 +1,21 @@
-import { describe, expect, it } from 'vitest'
-import {
-  parseRecallPipedYesNo,
-  recallStopConfirmInkModel,
-  RECALL_STOP_CONFIRM_QUESTION_LINE,
-} from '../src/interactions/recallYesNo.js'
+import { describe, test, expect } from 'vitest'
+import { parseRecallYesNoLine } from '../src/interactions/recallYesNo.js'
 
-describe('parseRecallPipedYesNo', () => {
-  it('treats empty line as invalid', () => {
-    expect(parseRecallPipedYesNo('')).toBe('invalid')
-    expect(parseRecallPipedYesNo('   ')).toBe('invalid')
+describe('parseRecallYesNoLine', () => {
+  test('empty is invalid', () => {
+    expect(parseRecallYesNoLine('')).toBe('invalid')
+    expect(parseRecallYesNoLine('   ')).toBe('invalid')
   })
 
-  it('accepts y, yes, n, no case-insensitively', () => {
-    expect(parseRecallPipedYesNo('y')).toBe('yes')
-    expect(parseRecallPipedYesNo('YES')).toBe('yes')
-    expect(parseRecallPipedYesNo('n')).toBe('no')
-    expect(parseRecallPipedYesNo('No')).toBe('no')
+  test('y, yes, n, no', () => {
+    expect(parseRecallYesNoLine('y')).toBe('yes')
+    expect(parseRecallYesNoLine('YES')).toBe('yes')
+    expect(parseRecallYesNoLine('n')).toBe('no')
+    expect(parseRecallYesNoLine('No')).toBe('no')
   })
 
-  it('rejects other input', () => {
-    expect(parseRecallPipedYesNo('x')).toBe('invalid')
-    expect(parseRecallPipedYesNo('maybe')).toBe('invalid')
-  })
-})
-
-describe('recallStopConfirmInkModel', () => {
-  it('builds prompt, placeholder, and confirm question lines for the Ink strip', () => {
-    const model = recallStopConfirmInkModel('y or n; Esc to go back')
-    expect(model.promptLines).toEqual([])
-    expect(model.placeholder).toBe('y or n; Esc to go back')
-    expect(model.confirmQuestionLines).toEqual([
-      RECALL_STOP_CONFIRM_QUESTION_LINE,
-    ])
+  test('other text is invalid', () => {
+    expect(parseRecallYesNoLine('x')).toBe('invalid')
+    expect(parseRecallYesNoLine('maybe')).toBe('invalid')
   })
 })

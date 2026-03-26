@@ -9,7 +9,6 @@ export interface CommandDoc {
   usage: string
   description: string
   category: 'subcommand' | 'interactive'
-  interactiveOnly?: boolean
 }
 
 const exitDoc = {
@@ -19,12 +18,6 @@ const exitDoc = {
   category: 'subcommand' as const,
 }
 const subcommandDocs = [versionDoc, updateDoc, exitDoc]
-const helpDocEntry = {
-  name: 'help',
-  usage: 'help',
-  description: 'List available commands',
-  category: 'subcommand' as const,
-}
 export const interactiveDocs: CommandDoc[] = [
   {
     name: '/help',
@@ -100,7 +93,7 @@ export function formatCommandCompletionLines(
   return commands.map((d) => `  ${d.usage.padEnd(20)} ${d.description}`)
 }
 
-const allSubcommandDocs = [...subcommandDocs, helpDocEntry]
+const allSubcommandDocs = subcommandDocs
 
 function formatSection(title: string, docs: readonly CommandDoc[]): string {
   const lines = docs.map((d) => {
@@ -109,15 +102,6 @@ function formatSection(title: string, docs: readonly CommandDoc[]): string {
   })
   return `${title}:\n${lines.join('\n')}`
 }
-
-const interactiveOnlyUsages = new Set(
-  interactiveDocs.filter((c) => c.interactiveOnly).map((c) => c.usage)
-)
-export function isInteractiveOnlyCommand(cmd: string): boolean {
-  return interactiveOnlyUsages.has(cmd.trim())
-}
-export const INTERACTIVE_ONLY_REJECTION_MESSAGE =
-  'This command requires interactive mode. Run `doughnut` without -c.'
 
 export function formatHelp(): string {
   return [

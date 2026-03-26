@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, test, expect } from 'vitest'
 import {
   CURRENT_GUIDANCE_MAX_VISIBLE,
   formatHighlightedList,
@@ -11,14 +11,12 @@ import {
   interactiveDocs,
   type CommandDoc,
 } from '../src/help.js'
-import { run } from '../src/run.js'
-
 describe('formatHelp', () => {
   test('includes all command names', () => {
     const output = formatHelp()
     expect(output).toContain('version')
     expect(output).toContain('update')
-    expect(output).toContain('help')
+    expect(output).toContain('/help')
     expect(output).toContain('/clear')
     expect(output).toContain('/add gmail')
     expect(output).toContain('/last email')
@@ -212,31 +210,5 @@ describe('formatCommandCompletionLines', () => {
       0
     )
     expect(lines.some((l) => l.includes('↓ more below'))).toBe(true)
-  })
-})
-
-describe('non-interactive entry: -c /help', () => {
-  let logSpy: ReturnType<typeof vi.spyOn>
-  let exitSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    exitSpy = vi
-      .spyOn(process, 'exit')
-      .mockImplementation((() => undefined) as unknown as typeof process.exit)
-  })
-
-  afterEach(() => {
-    logSpy.mockRestore()
-    exitSpy.mockRestore()
-  })
-
-  test('prints help and exits 0; does not treat /help as unknown', async () => {
-    await run(['-c', '/help'])
-    const output = logSpy.mock.calls.flat().join('\n')
-    expect(output).toContain('Subcommands:')
-    expect(output).toContain('Interactive commands (in prompt):')
-    expect(output).not.toContain('Not supported')
-    expect(exitSpy).toHaveBeenCalledWith(0)
   })
 })

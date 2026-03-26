@@ -20,17 +20,6 @@ export const BOLD_CYAN = '\x1b[1;36m'
 export const ANSI_RESET = '\x1b[0m'
 export const GREY_BG_PAST_INPUT = '\x1b[48;5;236m'
 
-export function createMockStdin(input: string): NodeJS.ReadableStream {
-  const stream = new Readable({
-    read() {
-      /* no-op */
-    },
-  })
-  stream.push(input)
-  stream.push(null)
-  return Object.assign(stream, { isTTY: false })
-}
-
 export function createMockTTYStdin() {
   const stream = new Readable({
     read() {
@@ -232,10 +221,4 @@ export async function startTTYSessionWithoutRecallReset(): Promise<{
 export function endTTYSession(stdin: TTYStdin) {
   pressKey(stdin, 'c', { ctrl: true })
   vi.restoreAllMocks()
-}
-
-export async function runPipedInteractive(input: string) {
-  const stdin = createMockStdin(input)
-  runInteractive(stdin as unknown as Parameters<typeof runInteractive>[0])
-  await tick()
 }

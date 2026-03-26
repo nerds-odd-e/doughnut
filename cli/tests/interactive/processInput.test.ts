@@ -38,7 +38,7 @@ import { stripAnsi } from '../../src/renderer.js'
 import { makeTempConfigDir, withConfigDir } from './interactiveTestHelpers.js'
 import { recallNextQuestion } from '../recallNextTestShapes.js'
 
-// Contract: processInput + default console adapter (same surface as -c / piped log). Not TTY bytes — see interactiveTty*.test.ts and .cursor/rules/cli.mdc → Vitest.
+// Contract: processInput + default console adapter (log / writeCurrentPrompt). Not TTY bytes — see interactiveTty*.test.ts and .cursor/rules/cli.mdc → Vitest.
 
 vi.mock('doughnut-api', () => ({
   getApiConfig: () => ({ apiBaseUrl: 'http://localhost:9081' }),
@@ -80,7 +80,7 @@ describe('processInput', () => {
     logSpy.mockRestore()
   })
 
-  // contract: default console (same observable surface as -c / piped log; not TTY bytes — see interactiveTty*.test.ts)
+  // contract: default console (not TTY bytes — see interactiveTty*.test.ts)
 
   test('returns true for exit commands', async () => {
     expect(await processInput('exit')).toBe(true)

@@ -7,7 +7,7 @@
  * **Belongs here:** shell-integration OSC (`INTERACTIVE_INPUT_READY_OSC`), cursor show/hide
  * coordinated with Ink’s paint callbacks, full-screen clear for `/clear`, Ctrl+C line advance
  * before exit, exit farewell lines (grey committed input + toned output after shell unmount),
- * and piped-style “current prompt” separator lines from `OutputAdapter` hooks.
+ * and “current prompt” separator lines from `OutputAdapter` hooks.
  *
  * **Do not reintroduce:** CSI that lays out or positions the live block (Phase J2 — caret and
  * draft chrome live inside Ink).
