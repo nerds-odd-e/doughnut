@@ -21,14 +21,14 @@ import {
   type InteractiveFetchWaitLine,
 } from '../interactiveFetchWait.js'
 import type { AccessTokenPickerCommandConfig } from '../types.js'
-import { CommandLineLivePanel } from './CommandLineLivePanel.js'
 import { RecallInkConfirmPanel } from './RecallInkConfirmPanel.js'
 import { FetchWaitDisplay } from './FetchWaitDisplay.js'
 import { InteractiveShellDisplay } from './InteractiveShellDisplay.js'
 import {
   AccessTokenPickerLivePanel,
+  CommandLineLivePanel,
   RecallMcqChoicesLivePanel,
-} from './liveSelectionGuidanceInk.js'
+} from './liveColumnInk.js'
 
 export function isInkSubmitPressed(key: Key, input: string): boolean {
   return key.return || input === '\n' || input === '\r'

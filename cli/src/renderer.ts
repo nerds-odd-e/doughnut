@@ -1,5 +1,5 @@
 /**
- * TTY layout bridge: **command-line paint** strings for Ink (`CommandLineLivePanel`), stage-band /
+ * TTY layout bridge: **command-line paint** strings for Ink (`liveColumnInk.tsx`), stage-band /
  * separator helpers, MCQ/token guidance strings, and tone helpers. Grapheme width / wrap / truncate
  * live in `terminalLayout.ts`. Not a second interactive UI engine.
  */

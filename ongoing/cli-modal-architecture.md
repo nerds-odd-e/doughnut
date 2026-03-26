@@ -25,7 +25,7 @@ Interactive TTY = **one Ink `render()`** root: **`Static`** for append-only scro
 
 **Current shipped (phases 1–9):** while the shell is active, **one stdin / keyboard owner** for command line, confirm, and lists. **readline** / **`keypress`** — only documented residue (Ctrl+C, fetch-wait Esc, token-list Esc bridge); see module JSDoc on **`ttyEntry.ts`** and **`stdin.on('keypress')`** in **`interactiveTtySession.ts`** (phase **14**).
 
-**Phase 5 (done):** MCQ and token lists use Ink **`RecallMcqChoicesLivePanel`** / **`AccessTokenPickerLivePanel`** in **`liveSelectionGuidanceInk.tsx`** (`useInput` + **`selectListInteraction`**); readline **`keypress`** handles **Esc** on those lists only (bridge). **Phases 3–6 (done):** stop-confirm + session y/n on Ink (**`RecallInkConfirmPanel`**, shared stdin coalescing in **`inkStdinLogicalKeys.ts`**; **`@inkjs/ui` `StatusMessage`** for invalid keys). **Phase 7 (done):** audited **`ttyAdapter`** — no duplicate handlers for command line, confirm, or list keys; **`readline.createInterface` + `emitKeypressEvents`** kept only to attach this listener; list **Esc** bridge kept (documented on the **`keypress`** handler).
+**Phase 5 (done):** MCQ and token lists use Ink **`RecallMcqChoicesLivePanel`** / **`AccessTokenPickerLivePanel`** in **`liveColumnInk.tsx`** (`useInput` + **`selectListInteraction`**); readline **`keypress`** handles **Esc** on those lists only (bridge). **Phases 3–6 (done):** stop-confirm + session y/n on Ink (**`RecallInkConfirmPanel`**, shared stdin coalescing in **`inkStdinLogicalKeys.ts`**; **`@inkjs/ui` `StatusMessage`** for invalid keys). **Phase 7 (done):** audited **`ttyAdapter`** — no duplicate handlers for command line, confirm, or list keys; **`readline.createInterface` + `emitKeypressEvents`** kept only to attach this listener; list **Esc** bridge kept (documented on the **`keypress`** handler).
 
 **`processInput`:** Shared command engine for the TTY adapter and for **tests** via **`defaultOutput`**; **not** a second interactive UI.
 
@@ -128,9 +128,9 @@ Ink shell, neutral `TTYDeps`, confirm/MCQ/token/fetch-wait display components, *
 
 ### Phase 5 (done) — MCQ and token list: Ink-owned list input (gates 3 & 5)
 
-- **Shipped:** Hand-rolled Ink in **`liveSelectionGuidanceInk.tsx`** (plan fallback vs **`@inkjs/ui`**). Shared stdin coalescing: **`inkStdinLogicalKeys.ts`** (also used by **`RecallInkConfirmPanel`**). Policy in **`selectListInteraction.ts`** (`dispatchSelectListKey`, `selectListKeyEventFromInk`).
+- **Shipped:** Hand-rolled Ink in **`liveColumnInk.tsx`** (plan fallback vs **`@inkjs/ui`**). Shared stdin coalescing: **`inkStdinLogicalKeys.ts`** (also used by **`RecallInkConfirmPanel`**). Policy in **`selectListInteraction.ts`** (`dispatchSelectListKey`, `selectListKeyEventFromInk`).
 - **`ttyAdapter`:** list arrows / Enter / printable draft / backspace go through Ink; **`keypress`** returns early for those modes. **Esc** on MCQ (stop-confirm) and token list (abort) is handled on **`keypress`** as a small bridge.
-- **Focus:** **`LIVE_SELECTION_GUIDANCE_INK_FOCUS_ID`**; command line keeps Esc refocus **`useLayoutEffect`**.
+- **Focus:** **`LIST_SELECTION_INK_FOCUS_ID`**; command line keeps Esc refocus **`useLayoutEffect`**.
 - **Layout:** Exported **`formatMcqChoiceLinesWithIndices`** for grapheme-wrapped MCQ lines + highlight by choice index in the list panel.
 
 ### Phase 6 (done) — Simpler recall confirms + `@inkjs/ui` `ConfirmInput`
