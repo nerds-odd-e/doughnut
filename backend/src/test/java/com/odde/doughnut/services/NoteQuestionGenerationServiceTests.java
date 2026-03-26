@@ -133,7 +133,7 @@ class NoteQuestionGenerationServiceTests {
     void shouldBuildRequestWithNoteInstructions() {
       ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
 
-      assertThat(userMessageContains(request, "The JSON below is available only to you"), is(true));
+      assertThat(userMessageContains(request, "The JSON below is visible only to you"), is(true));
     }
 
     @Test

@@ -10,6 +10,7 @@ import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.PointExtractionResult;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +93,10 @@ public class AiController {
     }
   }
 
+  @Operation(
+      summary = "Remove points from note details (response only)",
+      description =
+          "Returns AI-regenerated note details in the response. Does not persist the note; the client must save the returned text (for example via the note update API).")
   @PostMapping("/remove-point-from-note/{note}")
   @Transactional
   public RemovePointsResponseDTO removePointFromNote(

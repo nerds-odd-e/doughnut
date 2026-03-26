@@ -53,24 +53,12 @@ public class NoteQuestionGenerationService {
 
   private MCQWithAnswer generateQuestionWithChatCompletion(
       Note note, String customPrompt, String additionalMessage) {
-    OpenAIChatRequestBuilder chatRequestBuilder = requestBuilder.getChatRequestBuilder(note);
-
-    String instructions = note.getNotebookAssistantInstructions();
-    if (instructions != null && !instructions.trim().isEmpty()) {
-      chatRequestBuilder.addToOverallSystemMessage(instructions);
-    }
-
-    // Add any additional message if provided (before the question generation instruction)
-    // Note: responseJsonSchema will add the question generation instruction
-    if (additionalMessage != null) {
-      chatRequestBuilder.addUserMessage(additionalMessage);
-    }
-
     RelationType relationType = note.isRelation() ? note.getRelationType() : null;
     NoteType noteType = note.getNoteType();
     String prompt = (customPrompt != null) ? customPrompt : AiToolFactory.getDefaultMcqPrompt();
     InstructionAndSchema tool = AiToolFactory.questionAiTool(prompt, relationType, noteType);
-    chatRequestBuilder.responseJsonSchema(tool);
+    OpenAIChatRequestBuilder chatRequestBuilder =
+        requestBuilder.openAiChatRequestForQuestionGeneration(note, additionalMessage);
 
     return openAiApiHandler
         .requestAndGetJsonSchemaResult(tool, chatRequestBuilder)
@@ -98,12 +86,8 @@ public class NoteQuestionGenerationService {
 
   private Optional<QuestionEvaluation> evaluateQuestionWithChatCompletion(
       Note note, MCQWithAnswer question) {
-    OpenAIChatRequestBuilder chatRequestBuilder = requestBuilder.getChatRequestBuilder(note);
-
-    String instructions = note.getNotebookAssistantInstructions();
-    if (instructions != null && !instructions.trim().isEmpty()) {
-      chatRequestBuilder.addToOverallSystemMessage(instructions);
-    }
+    OpenAIChatRequestBuilder chatRequestBuilder =
+        requestBuilder.openAiChatRequestForQuestionGeneration(note, null);
 
     Optional<JsonNode> result =
         openAiApiHandler.requestAndGetJsonSchemaResult(

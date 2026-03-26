@@ -1704,6 +1704,10 @@ paths:
     post:
       tags:
       - ai-controller
+      summary: Remove points from note details (response only)
+      description: Returns AI-regenerated note details in the response. Does not persist
+        the note; the client must save the returned text (for example via the note
+        update API).
       operationId: removePointFromNote
       parameters:
       - name: note

@@ -984,6 +984,11 @@ export class AiController {
         return (options.client ?? client).post<SuggestTitleResponses, unknown, ThrowOnError>({ url: '/api/ai/suggest-title/{note}', ...options });
     }
     
+    /**
+     * Remove points from note details (response only)
+     *
+     * Returns AI-regenerated note details in the response. Does not persist the note; the client must save the returned text (for example via the note update API).
+     */
     public static removePointFromNote<ThrowOnError extends boolean = false>(options: Options<RemovePointFromNoteData, ThrowOnError>) {
         return (options.client ?? client).post<RemovePointFromNoteResponses, unknown, ThrowOnError>({
             url: '/api/ai/remove-point-from-note/{note}',
