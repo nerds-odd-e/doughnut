@@ -76,6 +76,8 @@ type TTYInput = NodeJS.ReadableStream & {
   setRawMode?: (mode: boolean) => void
   resume?: () => void
   setEncoding?: (encoding: BufferEncoding) => void
+  ref?: () => void
+  unref?: () => void
 }
 
 const inkPatchConsoleProbeOut = new Writable({
@@ -829,10 +831,8 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
     }
   }
 
-  function applyCommandLineTypingFromInk(
-    next: InteractiveCommandInput,
-    resetSlashPicker: boolean
-  ): void {
+  function applyCommandLineTypingFromInk(next: InteractiveCommandInput): void {
+    const resetSlashPicker = next.lineDraft !== session.commandInput.lineDraft
     patchAndDraw((s) => ({
       ...s,
       commandInput: next,

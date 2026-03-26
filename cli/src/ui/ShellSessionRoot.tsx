@@ -139,10 +139,7 @@ export type ShellSessionInkHandlers = {
   onRecallMcqGuidanceKey: (input: string, key: Key) => Promise<void>
   onTokenPickerGuidanceKey: (input: string, key: Key) => Promise<void>
   onCommandLineKey: (input: string, key: Key) => Promise<void>
-  onCommandLineTyping: (
-    next: InteractiveCommandInput,
-    resetSlashPicker: boolean
-  ) => void
+  onCommandLineTyping: (next: InteractiveCommandInput) => void
   signalConfirmInputReady: () => void
   onEnterStopConfirmationFromEsc: () => void
   whenInActiveRecallSession: () => boolean

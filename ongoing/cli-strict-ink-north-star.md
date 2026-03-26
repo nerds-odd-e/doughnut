@@ -23,6 +23,11 @@ Pick **one** path and record the outcome here (issue link, fork name, or “wait
 | **Fork / patch** | Vendor a minimal `TextInput` fork in-repo or patch package until upstream merges. |
 | **Replace primitive** | Use another Ink input component that supports controlled + caret **and** allows one `useInput` owner for the tree. |
 
+**Phase 1 gate decision (closed): `Fork / patch`.**
+
+- Current upstream docs explicitly state `@inkjs/ui` `TextInput` is **uncontrolled** (`defaultValue`, no controlled `value`/caret API): [ink-ui TextInput docs](https://github.com/vadimdemedes/ink-ui/blob/main/docs/text-input.md).
+- For Doughnut command-line parity (shared `InteractiveCommandInput` state + explicit caret/history coordination), we need a controlled surface; waiting upstream blocks phase 2, so we proceed with a minimal local patch/fork path.
+
 **Do not** land “half TextInput” (mounted but disabled, or second component) — same rule as phase 15: **no dead UI**, **no duplicate stdin handlers**.
 
 Slash completion styling (inverse segments, grapheme-aware width) must either map onto the chosen component, live in **non-editable** rows (guidance only), or get an explicit **new gate** if product requires pixel-parity with today’s paint.
@@ -34,11 +39,26 @@ Slash completion styling (inverse segments, grapheme-aware width) must either ma
 - Confirm chosen path from the table above; smallest spike (e.g. Vitest or local TTY) proving **one** stdin owner can edit the line with **caret not** duplicated by the hardware cursor.
 - **Verify:** short note in this file; no user-facing change required if spike-only.
 
+**Status:** done.
+
+- Added `cli/tests/textInputSingleOwnerSpike.test.ts` and verified with:
+  - `CURSOR_DEV=true nix develop -c pnpm -C /Users/lia/doughnut/cli test tests/textInputSingleOwnerSpike.test.ts`
+- Spike result: one mounted `TextInput` receives stdin and supports edit-at-caret behavior (`a`, left, `b` => `ba`) while rendering inverse-caret SGR output from the component itself (no parallel Doughnut line-editor path in this test).
+- Spike test removed after phase-2 parity wiring landed (no long-term duplicate test path).
+
 ### Phase 2 — Single-owner main line (behavior parity)
 
 - Implement the chosen input primitive so **typing, caret, delete, home/end** and **session state** (`InteractiveCommandInput`) stay correct; **↑↓** draft history and **Tab** focus still match **live column focus** rules (`cli.mdc`).
 - Preserve **Enter / Esc / Tab** semantics and integration with `handleCommandLineInkInput` (submit, slash picker dismiss, focus cycle) — likely by **narrow** `useInput` at root **only** for keys the TextInput does not consume, **without** duplicating character insertion (same contract as `mainCommandLineInkTyping.ts` today, or superseded by TextInput callbacks only).
 - **Verify:** `pnpm cli:test` interactive + `mainCommandLineInkTyping` tests **updated or replaced** so they still assert **observable** transcripts/behavior, not internal split details unless that API is the deliberate contract.
+
+**Status:** done.
+
+- Main command line now uses `PatchedTextInput` (`cli/src/ui/PatchedTextInput.tsx`) as the single stdin owner for typing/caret/editing in the default command-line panel.
+- `LiveColumnInkPanel` no longer runs command-line character editing through its own `useInput` branch; root `useInput` remains for list-selection panels and command-line special-key routing only.
+- `InteractiveCommandInput` remains the source of truth; text changes flow via `onCommandLineTyping(next)` and slash picker reset is derived from draft change.
+- Verify run:
+  - `CURSOR_DEV=true nix develop -c pnpm -C /Users/lia/doughnut/cli test tests/interactive/interactiveTtySession.test.ts tests/interactive/interactiveTtySuggestionScroll.test.ts tests/mainCommandLineInkTyping.test.ts`
 
 ### Phase 3 — Slash / placeholder / width
 
@@ -78,6 +98,6 @@ Before closing each phase: tests green for that slice, **no dead code**, update 
 ## References
 
 - Fetch-wait UI + readline bridge: `cli/src/ui/FetchWaitDisplay.tsx`, `cli/src/adapters/interactiveTtySession.ts` (`stdin.on('keypress')`)
-- Current live column: `cli/src/ui/liveColumnInk.tsx`, `cli/src/interactions/mainCommandLineInkTyping.ts`
+- Current live column: `cli/src/ui/liveColumnInk.tsx`, `cli/src/ui/PatchedTextInput.tsx`
 - Cursor + OSC hooks: `cli/src/adapters/interactiveTtyStdout.ts`, `cli/src/adapters/interactiveTtySession.ts` (`handleShellRendered`)
 - Ink UI: `@inkjs/ui` `TextInput` (package version in `cli/package.json`)
