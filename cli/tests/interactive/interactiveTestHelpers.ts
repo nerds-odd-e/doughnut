@@ -2,6 +2,7 @@ import { Readable } from 'node:stream'
 import { mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { Chalk } from 'chalk'
 import { expect, vi } from 'vitest'
 import type { AccessTokenEntry } from '../../src/accessToken.js'
 import {
@@ -12,8 +13,13 @@ import { getTerminalWidth, renderPastInput } from '../../src/renderer.js'
 
 export const tick = () => new Promise<void>((r) => setImmediate(r))
 
-export const BOLD_CYAN = '\x1b[1;36m'
-export const ANSI_RESET = '\x1b[0m'
+const testPaintChalk = new Chalk({ level: 3 })
+
+/** Same as `renderer` slash styling (`paintChalk.cyan.bold`). */
+export function boldCyan(text: string): string {
+  return testPaintChalk.cyan.bold(text)
+}
+
 export const GREY_BG_PAST_INPUT = '\x1b[48;5;236m'
 
 export function createMockTTYStdin() {

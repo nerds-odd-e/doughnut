@@ -13,9 +13,6 @@ import {
   HIDE_CURSOR,
   SHOW_CURSOR,
 } from './ansi.js'
-
-/** Same inverse caret SGR as `@inkjs/ui` TextInput (`use-text-input.js`); level forced so Vitest sees escapes. */
-const commandLineCaretChalk = new Chalk({ level: 3 })
 import {
   filterCommandsByPrefix,
   formatCommandCompletionLines,
@@ -37,6 +34,9 @@ import type {
   RecallMcqChoiceTexts,
 } from './types.js'
 import type { InteractiveFetchWaitLine } from './interactiveFetchWait.js'
+
+/** For command-line paint: inverse caret matches `@inkjs/ui` TextInput; `level` forced so Vitest always sees SGR. */
+const paintChalk = new Chalk({ level: 3 })
 
 export {
   GREY,
@@ -79,7 +79,6 @@ export function buildCurrentPromptSeparatorForStageBand(
 ): string {
   return `${CURRENT_STAGE_BAND_BACKGROUND_SGR}${GREEN}${'─'.repeat(width)}${RESET}`
 }
-export const COMMAND_HIGHLIGHT = '\x1b[1;36m' // bold + cyan
 
 export const PROMPT = '→ '
 
@@ -408,7 +407,7 @@ export function highlightRecognizedCommand(line: string): string {
   if (highlightLen === 0) return line
   const prefix = line.slice(0, highlightLen)
   const rest = line.slice(highlightLen)
-  return `${COMMAND_HIGHLIGHT}${prefix}${RESET}${rest}`
+  return `${paintChalk.cyan.bold(prefix)}${rest}`
 }
 
 /** Options for building the interactive command-line draft (logical rows before terminal width fit). */
@@ -461,7 +460,7 @@ export function buildCommandInputDraftLines(
     if (i === 0 && buffer === '') {
       inner =
         caretLineIndex === 0 && offsetInLine === 0
-          ? `${commandLineCaretChalk.inverse(' ')}${GREY}${placeholder}${RESET}`
+          ? `${paintChalk.inverse(' ')}${GREY}${placeholder}${RESET}`
           : `${GREY}${placeholder}${RESET}`
     } else if (i === caretLineIndex) {
       inner = buildLineWithCaret(line, offsetInLine)
@@ -500,11 +499,11 @@ function plainInsertCaret(line: string, offsetInLine: number): string {
   const o = Math.max(0, Math.min(offsetInLine, line.length))
   const before = line.slice(0, o)
   if (o >= line.length) {
-    return `${before}${commandLineCaretChalk.inverse(' ')}`
+    return `${before}${paintChalk.inverse(' ')}`
   }
   const g = firstGraphemeFromOffset(line, o)
   const after = line.slice(o + g.length)
-  return `${before}${commandLineCaretChalk.inverse(g)}${after}`
+  return `${before}${paintChalk.inverse(g)}${after}`
 }
 
 function buildLineWithCaret(line: string, offsetInLine: number): string {
@@ -520,9 +519,9 @@ function buildLineWithCaret(line: string, offsetInLine: number): string {
     const g = firstGraphemeFromOffset(line, offsetInLine)
     const afterInCmd = line.slice(offsetInLine + g.length, highlightLen)
     const tail = line.slice(highlightLen)
-    return `${COMMAND_HIGHLIGHT}${before}${commandLineCaretChalk.inverse(g)}${COMMAND_HIGHLIGHT}${afterInCmd}${RESET}${tail}`
+    return `${paintChalk.cyan.bold(before)}${paintChalk.inverse(g)}${paintChalk.cyan.bold(afterInCmd)}${tail}`
   }
-  const highlightedCmd = `${COMMAND_HIGHLIGHT}${line.slice(0, highlightLen)}${RESET}`
+  const highlightedCmd = paintChalk.cyan.bold(line.slice(0, highlightLen))
   const rest = line.slice(highlightLen)
   return highlightedCmd + plainInsertCaret(rest, offsetInLine - highlightLen)
 }

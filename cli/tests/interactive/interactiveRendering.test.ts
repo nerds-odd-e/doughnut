@@ -13,11 +13,7 @@ import {
   visibleLength,
   buildSuggestionLines,
 } from '../../src/renderer.js'
-import {
-  ANSI_RESET,
-  BOLD_CYAN,
-  GREY_BG_PAST_INPUT,
-} from './interactiveTestHelpers.js'
+import { boldCyan, GREY_BG_PAST_INPUT } from './interactiveTestHelpers.js'
 
 describe('visibleLength', () => {
   test('returns length without ANSI codes', () => {
@@ -38,12 +34,12 @@ describe('highlightRecognizedCommand', () => {
 
   test('highlights exact command match', () => {
     const result = highlightRecognizedCommand('/help')
-    expect(result).toStrictEqual(`${BOLD_CYAN}/help${ANSI_RESET}`)
+    expect(result).toStrictEqual(boldCyan('/help'))
   })
 
   test('highlights only command part when param follows', () => {
     const result = highlightRecognizedCommand('/add-access-token x')
-    expect(result).toStrictEqual(`${BOLD_CYAN}/add-access-token${ANSI_RESET} x`)
+    expect(result).toStrictEqual(`${boldCyan('/add-access-token')} x`)
   })
 
   test('returns plain when no match', () => {
@@ -80,14 +76,12 @@ describe('buildCommandInputDraftLines', () => {
   test('recognized command gets bold+colored in first line', () => {
     const lines = buildCommandInputDraftLines('/help', 40)
     expect(lines[0]).toContain('→')
-    expect(lines[0]).toContain(`${BOLD_CYAN}/help${ANSI_RESET}`)
+    expect(lines[0]).toContain(boldCyan('/help'))
   })
 
   test('command with param highlights only command part', () => {
     const lines = buildCommandInputDraftLines('/add-access-token mylabel', 40)
-    expect(lines[0]).toContain(
-      `${BOLD_CYAN}/add-access-token${ANSI_RESET} mylabel`
-    )
+    expect(lines[0]).toContain(`${boldCyan('/add-access-token')} mylabel`)
   })
 
   test('empty buffer in selection mode shows token-list placeholder', () => {
