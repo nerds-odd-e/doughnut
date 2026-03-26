@@ -83,7 +83,7 @@ The E2E layer is **fragile and complex** because the OSC is **absent** during fe
 
 - `cli/src/renderer.ts` — `INTERACTIVE_INPUT_READY_OSC`, `interactiveInputReadyOscSuffix`
 - `cli/src/adapters/interactiveTtyStdout.ts` — writes OSC
-- `cli/src/adapters/ttyAdapter.ts` — `handleShellRendered`, fetch-wait buffering notes
+- `cli/src/adapters/interactiveTtySession.ts` — `handleShellRendered`, fetch-wait buffering notes
 - `e2e_test/config/cliPtyRunner.ts` — wait loops and timings
 - `e2e_test/step_definitions/cliSectionParser.ts` — duplicated OSC + `ptyStdoutHasInputReadyMarker`
-- `ongoing/cli-modal-architecture.md` — phase 9 residue note
+- `ongoing/cli-strict-ink-north-star.md` — strict caret / TextInput follow-up
