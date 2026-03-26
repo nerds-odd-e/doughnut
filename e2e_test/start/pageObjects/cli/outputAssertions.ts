@@ -13,7 +13,6 @@ import {
   getRecallDisplaySections,
   getRecallMergedTranscriptRaw,
   ptyTranscriptSimulatedPlainScreen,
-  ptyStdoutHasInputReadyMarker,
 } from '../../../step_definitions/cliSectionParser'
 
 export const OUTPUT_ALIAS = '@doughnutOutput'
@@ -33,13 +32,13 @@ const CONTENT_PREVIEW_LEN = 500
 const SIMULATED_SCREEN_TAIL_LEN = 1200
 
 const WRONG_NON_INTERACTIVE_STEP =
-  'This capture includes the PTY-only “input ready” OSC (real TTY session). ' +
+  'This capture looks like PTY interactive output. ' +
   'Use: Then I should see "…" in past CLI assistant messages — or Current guidance / past user messages — not non-interactive output.'
 
 const wrongPtyInteractiveStep = (
   section: SectionLabel | 'interactive CLI input box'
 ) =>
-  'No PTY input-ready marker in this capture (subcommand / one-shot spawn). ' +
+  'No interactive command-line prompt row detected in this capture (likely subcommand / one-shot spawn). ' +
   `Use: Then I should see "…" in the non-interactive output — not in the ${section}.`
 
 type ExpectedInStdout =
@@ -53,12 +52,17 @@ function assertStdoutMatchesStepKind(
   stdout: string,
   expected: ExpectedInStdout
 ): void {
-  const hasMarker = ptyStdoutHasInputReadyMarker(stdout)
+  const looksInteractive =
+    countInputBoxTopBorderLinesInInteractivePtyTranscript(stdout) > 0 ||
+    stdout.includes('\x1b[2K') ||
+    stdout.includes('y or n; /stop to exit recall') ||
+    stdout.includes('↑↓ Enter or number to select; Esc to cancel') ||
+    stdout.includes('↑↓ Enter to select; other keys cancel')
   if (expected.kind === 'nonInteractive') {
-    expect(!hasMarker, WRONG_NON_INTERACTIVE_STEP).to.be.true
+    expect(!looksInteractive, WRONG_NON_INTERACTIVE_STEP).to.be.true
   } else {
-    expect(hasMarker, wrongPtyInteractiveStep(expected.assertionTarget)).to.be
-      .true
+    expect(looksInteractive, wrongPtyInteractiveStep(expected.assertionTarget))
+      .to.be.true
   }
 }
 

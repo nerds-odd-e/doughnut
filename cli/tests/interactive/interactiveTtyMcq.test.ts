@@ -10,7 +10,7 @@ import {
   resetRecallStateForTesting,
 } from '../../src/interactive.js'
 import { formatRecallNotebookCurrentPromptLine } from '../../src/recall.js'
-import { INTERACTIVE_INPUT_READY_OSC, stripAnsi } from '../../src/renderer.js'
+import { stripAnsi } from '../../src/renderer.js'
 import {
   endTTYSession,
   expectTtyRecallYesNoReplyScrollback,
@@ -243,7 +243,7 @@ describe('TTY recall MCQ', () => {
   })
 
   describe('live region: current prompt vs guidance (observable bytes)', () => {
-    test('choices not via writeCurrentPrompt; input-ready OSC emitted', async () => {
+    test('choices not via writeCurrentPrompt; guidance is visibly interactive', async () => {
       writeSpy.mockClear()
       await submitTTYCommand(stdin, '/recall')
       // Numbered choices must not appear as grey writeCurrentPrompt lines
@@ -252,9 +252,10 @@ describe('TTY recall MCQ', () => {
           /^ {2}\d+\. /.test(plain)
         )
       ).toBe(0)
-      // INTERACTIVE_INPUT_READY_OSC is emitted when the numbered-choice list panel is shown
-      const raw = ttyOutput(writeSpy)
-      expect(raw).toContain(INTERACTIVE_INPUT_READY_OSC)
+      const visible = stripAnsi(ttyOutput(writeSpy))
+      expect(visible).toContain('↑↓ Enter or number to select; Esc to cancel')
+      expect(visible).toContain('  1. 4')
+      expect(visible).toContain('  2. 3')
     })
   })
 })

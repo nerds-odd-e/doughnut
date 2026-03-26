@@ -54,15 +54,8 @@ export {
   truncateToWidth,
 } from './terminalLayout.js'
 
-/**
- * Private OSC (not FinalTerm 133) so terminals with shell integration do not treat it
- * as a shell prompt boundary. Invisible on screen.
- */
-export const INTERACTIVE_INPUT_READY_OSC =
-  '\x1b]900;doughnut-interactive-input-ready\x07' as const
-
 /** Byte sequence written to stdout when the interactive CLI announces input readiness. */
-export type InteractiveInputReadyOsc = typeof INTERACTIVE_INPUT_READY_OSC
+export type InteractiveInputReadyOsc = string
 
 /** Terminal column count; used for truncation and line width. */
 export type TerminalWidth = number
@@ -127,7 +120,8 @@ export function interactiveInputReadyOscSuffix(
   if (paint.lineDraft !== '' || paint.interactiveFetchWaitLine !== null) {
     return ''
   }
-  return INTERACTIVE_INPUT_READY_OSC
+  // Private OSC (not FinalTerm 133) so shell integration does not treat it as a prompt boundary.
+  return '\x1b]900;doughnut-interactive-input-ready\x07'
 }
 
 function usesGreyNoArrowCommandLinePaint(ctx: PlaceholderContext): boolean {

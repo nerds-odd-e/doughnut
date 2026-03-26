@@ -1,7 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import { INTERACTIVE_FETCH_WAIT_LINES } from '../src/interactiveFetchWait.js'
 import {
-  INTERACTIVE_INPUT_READY_OSC,
   interactiveInputReadyOscSuffix,
   truncateToWidth,
   isCommittedInteractiveInput,
@@ -32,10 +31,8 @@ describe('interactiveInputReadyOscSuffix', () => {
 
   test('emits private ready OSC when draft is empty and no interactive fetch wait', () => {
     expect(interactiveInputReadyOscSuffix(readyPaint)).toBe(
-      INTERACTIVE_INPUT_READY_OSC
+      '\x1b]900;doughnut-interactive-input-ready\x07'
     )
-    expect(INTERACTIVE_INPUT_READY_OSC.startsWith('\x1b]900;')).toBe(true)
-    expect(INTERACTIVE_INPUT_READY_OSC.endsWith('\x07')).toBe(true)
   })
 
   test('emits nothing when the user has typed in the command line', () => {

@@ -7,7 +7,7 @@
  * through Ink — avoid ad-hoc logging on the interactive hot path. This module holds
  * adapter-emitted byte sequences Ink does not own so ordering stays explicit and grep-friendly.
  *
- * **Belongs here:** shell-integration OSC (`INTERACTIVE_INPUT_READY_OSC`), explicit cursor
+ * **Belongs here:** shell-integration OSC (interactive input-ready marker), explicit cursor
  * visibility for exception flows (fetch-wait / shutdown), Ctrl+C line advance
  * before exit, exit farewell lines (grey committed input + toned output after shell unmount),
  * and “current prompt” separator lines from `OutputAdapter` hooks.
@@ -20,7 +20,6 @@ import {
   applyCliAssistantMessageTone,
   buildCurrentPromptSeparator,
   HIDE_CURSOR,
-  INTERACTIVE_INPUT_READY_OSC,
   interactiveInputReadyOscSuffix,
   type InteractiveInputReadyPaint,
   renderPastUserMessage,
@@ -43,7 +42,12 @@ export const interactiveTtyStdout = {
   },
 
   inputReadyOsc(): void {
-    write(INTERACTIVE_INPUT_READY_OSC)
+    write(
+      interactiveInputReadyOscSuffix({
+        lineDraft: '',
+        interactiveFetchWaitLine: null,
+      })
+    )
   },
 
   /**

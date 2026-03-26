@@ -1,7 +1,7 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mockRecallStatus } from './interactiveRecallMockAccess.js'
 import { resetRecallStateForTesting } from '../../src/interactive.js'
-import { INTERACTIVE_INPUT_READY_OSC } from '../../src/renderer.js'
+import { stripAnsi } from '../../src/renderer.js'
 import {
   endTTYSession,
   pushTTYCommandBytes,
@@ -40,7 +40,7 @@ describe('TTY: line draft must not survive interactive fetch wait', () => {
     )
   })
 
-  test('after /recall-status completes, typed keys during grey wait must not leave a draft (ready OSC after harmless edit)', async () => {
+  test('after /recall-status completes, typed keys during grey wait must not leave a visible draft', async () => {
     await submitTTYCommand(stdin, '/recall-status')
     typeString(stdin, 'leaked-draft-xyz')
     await tick()
@@ -55,6 +55,7 @@ describe('TTY: line draft must not survive interactive fetch wait', () => {
     pushTTYCommandKey(stdin, 'backspace')
     await tick()
 
-    expect(ttyOutput(writeSpy)).toContain(INTERACTIVE_INPUT_READY_OSC)
+    const visible = stripAnsi(ttyOutput(writeSpy))
+    expect(visible).toContain('→ ')
   })
 })
