@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "doughnut-test-fixtures": "workspace:*",
-    "@modelcontextprotocol/sdk": "^1.27.1",
+    "@modelcontextprotocol/sdk": "^1.28.0",
     "@types/node": "25.5.0",
     "esbuild": "0.27.4",
     "typescript": "6.0.2",
