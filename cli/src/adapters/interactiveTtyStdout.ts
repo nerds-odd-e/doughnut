@@ -1,8 +1,11 @@
 /**
  * Single owner of `process.stdout.write` for interactive TTY mode (`runTTY` + Ink shell).
  *
- * Ink writes the live React tree to stdout on its own stream path; this module holds every
- * adapter-emitted byte sequence so ordering stays explicit and grep-friendly.
+ * Ink writes the live React tree to stdout on its own stream path; when `render()` uses
+ * **`patchConsole`** (enabled on real Node TTY; skipped when `console.Console` is not
+ * constructible, e.g. Vitest `spyOn(console, 'log')`), `console.log` in that session is routed
+ * through Ink — avoid ad-hoc logging on the interactive hot path. This module holds
+ * adapter-emitted byte sequences Ink does not own so ordering stays explicit and grep-friendly.
  *
  * **Belongs here:** shell-integration OSC (`INTERACTIVE_INPUT_READY_OSC`), cursor show/hide
  * coordinated with Ink’s paint callbacks, Ctrl+C line advance

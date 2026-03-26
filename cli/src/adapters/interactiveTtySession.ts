@@ -83,6 +83,29 @@ type TTYInput = NodeJS.ReadableStream & {
   setEncoding?: (encoding: BufferEncoding) => void
 }
 
+const inkPatchConsoleProbeOut = new Writable({
+  write(_chunk, _encoding, cb) {
+    cb()
+  },
+})
+const inkPatchConsoleProbeErr = new Writable({
+  write(_chunk, _encoding, cb) {
+    cb()
+  },
+})
+
+/** Ink's patch-console calls `new console.Console(...)`. Vitest `spyOn(console, 'log')` can break that constructor; real Node TTY keeps patching enabled. */
+function inkPatchConsoleSupported(): boolean {
+  const C = console.Console
+  if (typeof C !== 'function') return false
+  try {
+    Reflect.construct(C, [inkPatchConsoleProbeOut, inkPatchConsoleProbeErr])
+    return true
+  } catch {
+    return false
+  }
+}
+
 export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
   const {
     processInput,
@@ -108,8 +131,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
     interactiveTtyStdout.currentPromptSeparator(getTerminalWidth())
   }
 
-  console.log(formatVersionOutput())
-  console.log()
+  process.stdout.write(`${formatVersionOutput()}\n\n`)
 
   stdin.setRawMode?.(true)
   stdin.resume?.()
@@ -207,7 +229,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
       shellInstance = render(tree, {
         stdin: stdinForInk as NodeJS.ReadStream,
         stdout: process.stdout,
-        patchConsole: false,
+        patchConsole: inkPatchConsoleSupported(),
         exitOnCtrlC: false,
         maxFps: 0,
       })

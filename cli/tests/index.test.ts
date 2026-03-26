@@ -2,6 +2,15 @@ import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { run } from '../src/run.js'
 import { formatVersionOutput } from '../src/version.js'
 
+class ProcessExitForTest extends Error {
+  readonly code: number | undefined
+  constructor(code?: number) {
+    super(`process.exit(${code})`)
+    this.name = 'ProcessExitForTest'
+    this.code = code
+  }
+}
+
 describe('CLI', () => {
   test('version command outputs doughnut prefix with version', () => {
     const output = formatVersionOutput()
@@ -17,9 +26,9 @@ describe('run entry routing', () => {
   beforeEach(() => {
     logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
     errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
-    exitSpy = vi
-      .spyOn(process, 'exit')
-      .mockImplementation((() => undefined) as unknown as typeof process.exit)
+    exitSpy = vi.spyOn(process, 'exit').mockImplementation(((code?: number) => {
+      throw new ProcessExitForTest(code)
+    }) as typeof process.exit)
   })
 
   afterEach(() => {
@@ -32,7 +41,7 @@ describe('run entry routing', () => {
     for (const argv of [['-c', 'hello'], ['-c=hello']] as const) {
       errorSpy.mockClear()
       exitSpy.mockClear()
-      await run([...argv])
+      await expect(run([...argv])).rejects.toThrow(ProcessExitForTest)
       await new Promise((r) => setImmediate(r))
       expect(errorSpy).toHaveBeenCalledWith('doughnut: invalid option')
       expect(exitSpy).toHaveBeenCalledWith(1)
@@ -40,7 +49,7 @@ describe('run entry routing', () => {
   })
 
   test('help subcommand is rejected with exit 1', async () => {
-    await run(['help'])
+    await expect(run(['help'])).rejects.toThrow(ProcessExitForTest)
     await new Promise((r) => setImmediate(r))
     expect(errorSpy).toHaveBeenCalledWith('doughnut: use /help in the shell')
     expect(exitSpy).toHaveBeenCalledWith(1)
@@ -54,7 +63,7 @@ describe('run entry routing', () => {
       writable: true,
     })
     try {
-      await run([])
+      await expect(run([])).rejects.toThrow(ProcessExitForTest)
       await new Promise((r) => setImmediate(r))
       expect(errorSpy).toHaveBeenCalledWith(
         'doughnut: not a terminal (use version or update)'
