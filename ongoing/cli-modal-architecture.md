@@ -185,18 +185,18 @@ Interactive fetch-wait: **`@inkjs/ui` `Spinner`** (`type="dots"`) in **`FetchWai
 
 ### Phase 10.5 (done) — Command-line input: no border (optional background-only)
 
-**User outcome:** The main command-line input is **easier to maintain and test** — **no** bordered `Box` around the editable line (**gate 6**). **Shipped:** **`formatInteractiveCommandLineInkRows`** (draft + caret, width fit, grey when typing disabled). Vitest **`ttyWriteSimulation`** + **`interactiveTtySession`** assert **`→`** / column-0 prompt. E2E **`cliSectionParser`** treats the live **`→`** row as the command-line boundary (function name **`countInputBoxTopBorderLines…`** kept for call-site stability).
+**User outcome:** The main command-line input is **easier to maintain and test** — **no** bordered `Box` around the editable line (**gate 6**). **Shipped:** **`formatInteractiveCommandLineInkRows`** (draft + caret, width fit, grey when typing disabled). Vitest **`ttyWriteSimulation`** + **`interactiveTty*.test.ts`** assert **`→`** / column-0 prompt. E2E **`cliSectionParser`** treats the live **`→`** row as the command-line boundary (function name **`countInputBoxTopBorderLines…`** kept for call-site stability).
 
 **Verify:** **`pnpm cli:test`**; **`pnpm cypress run --spec e2e_test/features/cli/cli_interactive_mode.feature`**.
 
-### Phase 11 — Remove `ttyAdapter`: thin TTY entry + Ink root state
+### Phase 11 (done) — Remove `ttyAdapter`: thin TTY entry + Ink root state
 
 **Goal:** Delete the **`ttyAdapter` monolith** — replace with **(a)** a **thin TTY session file** (mount Ink, streams, raw mode, **`exitOnCtrlC`**, documented **`keypress` residue** only per [Special cases](#special-cases-approved-ink-exceptions)) and **(b)** **Ink root** (`InteractiveShellDisplay` or successor) holding **React state / reducer** that subscribes to domain callbacks instead of mirroring state in closure variables beside Ink.
 
-- **Principle:** **Rerender** from React state updates; avoid **manual `drawBox`** orchestration that duplicates Ink’s update cycle unless a listed **special case** requires it.
-- **Gate 8 in this phase:** **Optional.** If **`TextInput`** + removing bespoke caret would make **11** too large, **11** may **keep** the existing **`CommandLineLivePanel`** **`useInput`** + reverse-video caret — **after phase 10.5**, input chrome is **borderless** (or background-only per **10.5**); observable behavior aside from wiring moves matches **10.5** + today’s semantics. **Do not** land a partial **`TextInput`** and leave old caret/`hideCursor` paths unused (**no dead code**).
-- **`/clear`:** Handled in **phase 9.5** (removed); phase 11 does **not** reintroduce it.
-- **Verify:** Full interactive Vitest suite + **`cli_interactive_mode`** / recall E2E as appropriate; **J1** empty-Enter **`clear` before `unmount`** still holds (Ink instance lifecycle — **`shellInstance.clear()`**, unrelated to the removed **`/clear`** slash command).
+- **Shipped:** **`cli/src/adapters/ttyEntry.ts`** — **`runTTY`** only. **`cli/src/adapters/interactiveTtySession.ts`** — readline + **`keypress`** bridge, **`render` / `rerender`**, **`patch` + `applyShellSessionPatch`** session model. **`cli/src/ui/ShellSessionRoot.tsx`** — Ink tree (`InteractiveShellDisplay` + live panels) from **`ShellSessionState`** + **`TTYDeps`** + handlers. **`cli/src/shell/shellSessionState.ts`**, **`cli/src/adapters/ttyDeps.ts`**. **`ttyAdapter.ts` removed.** Command line still **`CommandLineLivePanel`** **`useInput`** (gate **8** → phase **11.5**).
+- **Principle:** Session updates go through **immutable `ShellSessionPatch`** and **`drawBox`/`rerender`**; domain (`setPendingStopConfirmation`, etc.) stays ordered **before** paint where the prior adapter did.
+- **`/clear`:** Unchanged (**phase 9.5**).
+- **Verify:** **`pnpm cli:test`** green; **`pnpm cli:lint`** green.
 
 ### Phase 11.5 — Gate 8: command line → `@inkjs/ui` `TextInput` (and align cursor)
 

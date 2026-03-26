@@ -1,4 +1,4 @@
-import { runTTY } from './adapters/ttyAdapter.js'
+import { runTTY } from './adapters/ttyEntry.js'
 import { exitCliError } from './cliExit.js'
 import {
   addAccessToken,

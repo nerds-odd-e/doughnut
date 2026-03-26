@@ -152,7 +152,7 @@ async function waitForInteractiveInputReadyOsc(
 
 /**
  * After a PTY write, the CLI often appends {@link INTERACTIVE_INPUT_READY_OSC}. Fetch-wait omits
- * it (see `handleShellRendered` in `ttyAdapter`). Accept either a fresh OSC in bytes after
+ * it (see `handleShellRendered` in `interactiveTtySession`). Accept either a fresh OSC in bytes after
  * `afterLen`, or stdout that grew past `afterLen` and then stayed stable — same idea as the
  * post-OSC drain loop.
  */
