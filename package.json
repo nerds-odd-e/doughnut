@@ -139,7 +139,8 @@
       "express-rate-limit": ">=8.2.2",
       "flatted": ">=3.4.2",
       "yauzl": ">=3.2.1",
-      "picomatch": ">=4.0.4"
+      "picomatch": ">=4.0.4",
+      "yaml": "^2.8.3"
     },
     "onlyBuiltDependencies": [
       "@badeball/cypress-cucumber-preprocessor",
