@@ -1,3 +1,8 @@
+/**
+ * Main command line: one `useInput` + session (`handleCommandLineInkInput`). Caret styling matches
+ * `@inkjs/ui` TextInput (`chalk.inverse` in `renderer.ts`); stock TextInput is not mounted here
+ * (single-line, uncontrolled-only upstream; multiline + ↑↓/Tab domain keys need this hook).
+ */
 import { useLayoutEffect, useRef } from 'react'
 import { Box, Text, useFocus, useInput, type Key } from 'ink'
 import {

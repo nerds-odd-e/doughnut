@@ -196,15 +196,15 @@ describe('formatInteractiveCommandLineInkRows', () => {
     expect(stripAnsi(rows[0])).toContain('loading')
   })
 
-  test('caret at end of line: trailing reverse space', () => {
+  test('caret at end of line: trailing inverse space (ink-ui TextInput style)', () => {
     const rows = formatInteractiveCommandLineInkRows('ab', 80, 2)
     expect(rows[0]).toContain('→ ab')
-    expect(rows[0]).toContain('\x1b[7m \x1b[0m')
+    expect(rows[0]).toContain('\x1b[7m \x1b[27m')
   })
 
   test('CJK: caret inverts full grapheme', () => {
     const rows = formatInteractiveCommandLineInkRows('aあb', 80, 1)
-    expect(rows[0]).toContain('\x1b[7mあ\x1b[0m')
+    expect(rows[0]).toContain('\x1b[7mあ\x1b[27m')
   })
 })
 

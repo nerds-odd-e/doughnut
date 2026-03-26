@@ -1,5 +1,5 @@
-import { Spinner } from '@inkjs/ui'
-import { Box, Text } from 'ink'
+import { Spinner, TextInput } from '@inkjs/ui'
+import { Box } from 'ink'
 import type { InteractiveFetchWaitLine } from '../interactiveFetchWait.js'
 import { PLACEHOLDER_BY_CONTEXT } from '../renderer.js'
 
@@ -11,7 +11,11 @@ export function FetchWaitDisplay({ waitLine }: Props) {
   return (
     <Box flexDirection="column">
       <Spinner label={waitLine} type="dots" />
-      <Text dimColor>{PLACEHOLDER_BY_CONTEXT.interactiveFetchWait}</Text>
+      <TextInput
+        isDisabled
+        placeholder={PLACEHOLDER_BY_CONTEXT.interactiveFetchWait}
+        defaultValue=""
+      />
     </Box>
   )
 }

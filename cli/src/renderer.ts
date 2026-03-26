@@ -3,16 +3,19 @@
  * (`CommandLineLivePanel`), stage-band / separator helpers, and shared tone helpers. Complements the
  * Ink shell; not a second interactive UI engine.
  */
+import { Chalk } from 'chalk'
 import {
   GREY,
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
   ITALIC,
   RED,
   RESET,
-  REVERSE,
   HIDE_CURSOR,
   SHOW_CURSOR,
 } from './ansi.js'
+
+/** Same inverse caret SGR as `@inkjs/ui` TextInput (`use-text-input.js`); level forced so Vitest sees escapes. */
+const commandLineCaretChalk = new Chalk({ level: 3 })
 import {
   filterCommandsByPrefix,
   formatCommandCompletionLines,
@@ -411,7 +414,7 @@ export function highlightRecognizedCommand(line: string): string {
 /** Options for building the interactive command-line draft (logical rows before terminal width fit). */
 export type CommandInputDraftOptions = {
   placeholderContext?: PlaceholderContext
-  /** UTF-16 index in `buffer`; when set, inserts reverse-video caret (Ink TTY command line). */
+  /** UTF-16 index in `buffer`; when set, inserts inverse caret (Ink-ui TextInput–style). */
   caretOffset?: number
 }
 
@@ -458,7 +461,7 @@ export function buildCommandInputDraftLines(
     if (i === 0 && buffer === '') {
       inner =
         caretLineIndex === 0 && offsetInLine === 0
-          ? `${REVERSE} ${RESET}${GREY}${placeholder}${RESET}`
+          ? `${commandLineCaretChalk.inverse(' ')}${GREY}${placeholder}${RESET}`
           : `${GREY}${placeholder}${RESET}`
     } else if (i === caretLineIndex) {
       inner = buildLineWithCaret(line, offsetInLine)
@@ -497,11 +500,11 @@ function plainInsertCaret(line: string, offsetInLine: number): string {
   const o = Math.max(0, Math.min(offsetInLine, line.length))
   const before = line.slice(0, o)
   if (o >= line.length) {
-    return `${before}${REVERSE} ${RESET}`
+    return `${before}${commandLineCaretChalk.inverse(' ')}`
   }
   const g = firstGraphemeFromOffset(line, o)
   const after = line.slice(o + g.length)
-  return `${before}${REVERSE}${g}${RESET}${after}`
+  return `${before}${commandLineCaretChalk.inverse(g)}${after}`
 }
 
 function buildLineWithCaret(line: string, offsetInLine: number): string {
@@ -517,7 +520,7 @@ function buildLineWithCaret(line: string, offsetInLine: number): string {
     const g = firstGraphemeFromOffset(line, offsetInLine)
     const afterInCmd = line.slice(offsetInLine + g.length, highlightLen)
     const tail = line.slice(highlightLen)
-    return `${COMMAND_HIGHLIGHT}${before}${REVERSE}${g}${RESET}${COMMAND_HIGHLIGHT}${afterInCmd}${RESET}${tail}`
+    return `${COMMAND_HIGHLIGHT}${before}${commandLineCaretChalk.inverse(g)}${COMMAND_HIGHLIGHT}${afterInCmd}${RESET}${tail}`
   }
   const highlightedCmd = `${COMMAND_HIGHLIGHT}${line.slice(0, highlightLen)}${RESET}`
   const rest = line.slice(highlightLen)
