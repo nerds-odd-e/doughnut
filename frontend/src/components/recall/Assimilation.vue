@@ -70,7 +70,7 @@ const emit = defineEmits<{
 
 // Composables
 const { popups } = usePopups()
-const { totalAssimilatedCount } = useRecallData()
+const { totalAssimilatedCount, requestDueRecallsRefresh } = useRecallData()
 
 const { incrementAssimilatedCount } = useAssimilationCount()
 
@@ -147,6 +147,8 @@ const doAssimilate = async (skipMemoryTracking: boolean) => {
       totalAssimilatedCount.value += newTrackerCount
     }
     incrementAssimilatedCount(newTrackerCount)
+
+    requestDueRecallsRefresh()
 
     if (skipMemoryTracking) {
       emit("reloadNeeded")

@@ -20,6 +20,7 @@ let renderer: RenderingHelper<typeof Assimilation>
 let assimilateSpy: ReturnType<typeof mockSdkService<"assimilate">>
 let showNoteSpy: ReturnType<typeof mockSdkService<"showNote">>
 const mockedIncrementAssimilatedCount = vi.fn()
+const mockedRequestDueRecallsRefresh = vi.fn()
 const mockedTotalAssimilatedCount = ref(0)
 const toRepeat = ref<
   Array<{ memoryTrackerId?: number; spelling?: boolean }> | undefined
@@ -63,6 +64,8 @@ beforeEach(() => {
     setTreadmillMode: vi.fn(),
     setCurrentIndex: vi.fn(),
     setDiligentMode: vi.fn(),
+    dueRecallsRefreshNonce: ref(0),
+    requestDueRecallsRefresh: mockedRequestDueRecallsRefresh,
   })
 
   vi.mocked(useAssimilationCount).mockReturnValue({
@@ -116,6 +119,7 @@ describe("Assimilation component", () => {
       expect(wrapper.emitted()).toHaveProperty("assimilationDone")
       expect(mockedTotalAssimilatedCount.value).toBe(2)
       expect(mockedIncrementAssimilatedCount).toHaveBeenCalledWith(2)
+      expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()
     })
   })
 
@@ -250,6 +254,7 @@ describe("Assimilation component", () => {
         body: { noteId: note.id, skipMemoryTracking: false },
       })
       expect(wrapper.emitted()).toHaveProperty("assimilationDone")
+      expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()
     })
   })
 })

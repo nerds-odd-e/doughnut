@@ -11,6 +11,8 @@ const treadmillMode = ref<boolean>(false)
 const currentIndex = ref(0)
 const diligentMode = ref<boolean>(false)
 
+const dueRecallsRefreshNonce = ref(0)
+
 const toRepeatCount = computed(() => {
   const length = toRepeat.value?.length ?? 0
   const index = currentIndex.value
@@ -57,6 +59,10 @@ export function useRecallData() {
     diligentMode.value = enabled
   }
 
+  const requestDueRecallsRefresh = () => {
+    dueRecallsRefreshNonce.value += 1
+  }
+
   return {
     toRepeatCount,
     toRepeat,
@@ -76,5 +82,7 @@ export function useRecallData() {
     setTreadmillMode,
     setCurrentIndex,
     setDiligentMode,
+    dueRecallsRefreshNonce,
+    requestDueRecallsRefresh,
   }
 }

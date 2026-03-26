@@ -101,6 +101,8 @@ const createUseRecallDataMock = (overrides?: {
     setTreadmillMode: vi.fn(),
     setCurrentIndex: vi.fn(),
     setDiligentMode: vi.fn(),
+    dueRecallsRefreshNonce: ref(0),
+    requestDueRecallsRefresh: vi.fn(),
   }
 }
 

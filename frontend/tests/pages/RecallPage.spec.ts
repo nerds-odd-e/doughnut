@@ -59,6 +59,7 @@ const createUseRecallDataMock = (overrides?: {
   const treadmillModeRef = ref(overrides?.treadmillMode ?? false)
   const currentIndexRef = ref(overrides?.currentIndex ?? 0)
   const diligentModeRef = ref(overrides?.diligentMode ?? false)
+  const dueRecallsRefreshNonce = ref(0)
   return {
     toRepeatCount: computed(() => toRepeatRef.value?.length ?? 0),
     toRepeat: toRepeatRef,
@@ -85,6 +86,10 @@ const createUseRecallDataMock = (overrides?: {
     }),
     setDiligentMode: vi.fn((enabled: boolean) => {
       diligentModeRef.value = enabled
+    }),
+    dueRecallsRefreshNonce,
+    requestDueRecallsRefresh: vi.fn(() => {
+      dueRecallsRefreshNonce.value += 1
     }),
   }
 }
@@ -155,6 +160,25 @@ describe("repeat page", () => {
       const wrapper = await mountPage()
       const globalBar = wrapper.findComponent({ name: "GlobalBar" })
       expect(globalBar.text()).toContain("1/")
+    })
+  })
+
+  describe("due recalls refresh after assimilation", () => {
+    it("calls recalling when dueRecallsRefreshNonce increments", async () => {
+      const mockData = createUseRecallDataMock({ toRepeat: undefined })
+      vi.mocked(useRecallData).mockReturnValue(mockData)
+      await mountPage()
+      recallingSpy.mockClear()
+      mockData.dueRecallsRefreshNonce.value += 1
+      await flushPromises()
+      expect(recallingSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          query: expect.objectContaining({
+            timezone: "Asia/Shanghai",
+            dueindays: 0,
+          }),
+        })
+      )
     })
   })
 

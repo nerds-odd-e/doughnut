@@ -115,6 +115,7 @@ const {
   setToRepeat,
   diligentMode,
   setDiligentMode,
+  dueRecallsRefreshNonce,
 } = useRecallData()
 
 defineProps({
@@ -403,6 +404,10 @@ const loadCurrentDueRecalls = async () => {
     setCurrentRecallWindowEndAt(response.currentRecallWindowEndAt)
   }
 }
+
+watch(dueRecallsRefreshNonce, async () => {
+  await loadCurrentDueRecalls()
+})
 
 onMounted(() => {
   loadPreviouslyAnsweredRecallPrompts()
