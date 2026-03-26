@@ -417,11 +417,15 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
     interactiveTtyStdout.inputReadyOsc()
   }
 
+  /** Drop one readline Esc after Ink dismisses stop confirm so MCQ is not re-armed by the same key. */
+  let suppressReadlineEscapeOpensStopConfirmOnce = false
+
   async function handleStopConfirmDispatch(
     dispatch: RecallInkConfirmChoice
   ): Promise<void> {
     switch (dispatch.result) {
       case 'cancel':
+        suppressReadlineEscapeOpensStopConfirmOnce = true
         setPendingStopConfirmation(false)
         patchAndDraw((s) => ({
           ...s,
@@ -439,6 +443,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
         commitHistoryOutput(getStopConfirmationYesOutcomeLines())
         break
       case 'submit-no':
+        suppressReadlineEscapeOpensStopConfirmOnce = true
         setPendingStopConfirmation(false)
         patchAndDraw((s) => ({
           ...s,
@@ -924,6 +929,10 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
       return
     }
     if (key.name === 'escape' && getNumberedChoiceListChoices() !== null) {
+      if (suppressReadlineEscapeOpensStopConfirmOnce) {
+        suppressReadlineEscapeOpensStopConfirmOnce = false
+        return
+      }
       enterStopConfirmationFromEsc()
       return
     }

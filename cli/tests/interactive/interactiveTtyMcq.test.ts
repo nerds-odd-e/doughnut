@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { describe, test, expect, type vi, beforeEach, afterEach } from 'vitest'
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import {
   mockAnswerQuiz,
@@ -17,6 +17,7 @@ import {
   pressKey,
   pushTTYCommandBytes,
   pushTTYCommandEnter,
+  pushTTYCommandEscape,
   pushTTYCommandKey,
   startTTYSessionWithoutRecallReset,
   submitTTYCommand,
@@ -198,6 +199,36 @@ describe('TTY recall MCQ', () => {
       const output = ttyOutput(writeSpy)
       expect(output).toContain('  1. 4')
       expect(output).toContain('  2. 3')
+    })
+
+    test('ESC on stop sheet returns to MCQ without stop sheet repainting after the question', async () => {
+      const mcqStem = 'What is 2+2?'
+      await submitTTYCommand(stdin, '/recall')
+      mockAnswerQuiz.mockClear()
+
+      pressKey(stdin, 'escape')
+      await vi.waitFor(() =>
+        expect(stripAnsi(ttyOutput(writeSpy))).toContain('Stop recall? (y/n)')
+      )
+
+      writeSpy.mockClear()
+      await pushTTYCommandEscape(stdin)
+      await tick()
+      await tick()
+      await new Promise((r) => setTimeout(r, 120))
+
+      const out = stripAnsi(ttyOutput(writeSpy))
+      const stemIdx = out.lastIndexOf(mcqStem)
+      const stopIdx = out.lastIndexOf('Stop recall? (y/n)')
+
+      expect(
+        stemIdx,
+        'Second Esc should dismiss the stop sheet and show the MCQ stem again.'
+      ).toBeGreaterThan(-1)
+      expect(
+        stopIdx === -1 || stemIdx > stopIdx,
+        'Stop sheet must stay dismissed: if the last “Stop recall?” is after the last MCQ stem, a late readline Esc likely re-opened stop confirmation after Ink cancelled (flicker then stuck on y/n).'
+      ).toBe(true)
     })
   })
 
