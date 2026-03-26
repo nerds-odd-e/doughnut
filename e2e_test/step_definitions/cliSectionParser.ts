@@ -1,13 +1,9 @@
 /**
- * Parses CLI stdout into domain sections for E2E assertions.
+ * Parses interactive CLI PTY stdout for E2E assertions.
  *
- * Subcommand / one-shot stdout: entire capture when not using the interactive PTY session, no section parsing.
- *
- * Interactive-only sections:
- * - History input: Past user input lines
- * - History output: Past command results
- * - Current guidance: Prompts, hints, options for the current input (above the live command line:
- *   recall, MCQ, y/n; below: / commands, token list)
+ * - **Chat history** (`getHistoryOutputContent`, `getHistoryInputContent`): domain “history output / input” steps.
+ * - **Line-split merge** (`getRecallDisplaySections`): newline-based regions; can retain text after Ink clears the live grid (e.g. MCQ stem after `/stop`). Not the same as {@link ptyTranscriptSimulatedPlainScreen}.
+ * - **Simulated screen** (`ptyTranscriptSimulatedPlainScreen`): cursor/erase replay → plain text ≈ user-visible cells.
  */
 
 // --- ANSI stripping ---
@@ -189,56 +185,45 @@ export function getHistoryInputContent(output: string): string {
   return getSectionContent(output, 'history-input')
 }
 
-export function getCurrentGuidanceDebug(output: string): {
-  currentGuidanceContent: string
-  inputBoxLineRange: { start: number; end: number }
-  lineCount: number
-  rawTail: string
-} {
-  const lines = output.split('\n')
-  const boxStart = findLastInputBoxStart(lines)
-  const boxEnd = findLastInputBoxEnd(lines)
-  const { currentGuidanceAndHistory } = getRecallDisplaySections(output)
-  return {
-    currentGuidanceContent: stripAllAnsi(currentGuidanceAndHistory).trim(),
-    inputBoxLineRange: { start: boxStart, end: boxEnd },
-    lineCount: lines.length,
-    rawTail: output.slice(-1200).replace(/\r/g, '\\r').replace(/\n/g, '\\n '),
-  }
-}
-
 function parseLiveRegion(
   output: string,
   stripAnsiForAssertions: boolean
-): { currentGuidanceAndHistory: string; historyOutput: string } {
+): { mergedTranscriptPlain: string; chatHistoryOutputPlain: string } {
   const boundaries = parseCliOutput(output)
   const strip = stripAnsiForAssertions
-  const historyOutput = collectSectionLines(
+  const chatHistoryOutputPlain = collectSectionLines(
     boundaries,
     'history-output',
     strip
   ).join('\n')
-  const currentGuidanceAndHistory = [
+  const mergedTranscriptPlain = [
     collectSectionLines(boundaries, 'current-prompt', strip).join('\n'),
     collectSectionLines(boundaries, 'current-guidance', strip).join('\n'),
-    historyOutput,
+    chatHistoryOutputPlain,
   ]
     .join('\n')
     .trim()
-  return { currentGuidanceAndHistory, historyOutput }
+  return { mergedTranscriptPlain, chatHistoryOutputPlain }
 }
 
-/** Strip-ansi “live” region: current prompt, guidance, plus parsed history-output (recall-style assertions). */
-export function getRecallDisplaySections(output: string): {
-  currentGuidanceAndHistory: string
-  historyOutput: string
-} {
+/** Line-split slices for recall edge cases (e.g. stem still in transcript after live UI cleared). */
+export type PtyRecallAssertionSlices = Readonly<{
+  mergedTranscriptPlain: string
+  chatHistoryOutputPlain: string
+}>
+
+export function getRecallDisplaySections(
+  output: string
+): PtyRecallAssertionSlices {
   return parseLiveRegion(output, true)
 }
 
-/** Raw ANSI for styling checks on the same logical region as `getRecallDisplaySections`. */
-export function getCurrentGuidanceAndHistoryRaw(output: string): string {
-  return parseLiveRegion(output, false).currentGuidanceAndHistory
+/**
+ * Raw ANSI merge of prompt + guidance + history-output rows (styling checks).
+ * PTY cursor replay drops SGR (`m`), so this is not interchangeable with {@link ptyTranscriptSimulatedPlainScreen}.
+ */
+export function getRecallMergedTranscriptRaw(output: string): string {
+  return parseLiveRegion(output, false).mergedTranscriptPlain
 }
 
 /**
@@ -260,8 +245,8 @@ function toInteractiveCliSimulatedPlainScreen(
   }
 }
 
-/** Plain text after replaying PTY cursor motion and erases — approximates what the user sees (see `replayInteractiveCliPtyTranscriptOntoGrid`). */
-export function interactiveCliPtyTranscriptApproxVisiblePlainText(
+/** Plain text after replaying PTY cursor motion and erases — approximates on-screen cells (see `replayInteractiveCliPtyTranscriptOntoGrid`). */
+export function ptyTranscriptSimulatedPlainScreen(
   ptyTranscript: string
 ): string {
   return toInteractiveCliSimulatedPlainScreen(ptyTranscript).asPlainTextGrid

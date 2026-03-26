@@ -19,10 +19,8 @@ export interface TTYDeps {
   ) => RecallStopConfirmInkModel
   isNumberedChoiceListActive: () => boolean
   getNumberedChoiceListChoices: () => readonly string[] | null
-  getNumberedChoiceListCurrentPromptWrappedLines: (
-    width: number
-  ) => string[] | null
-  getSpellingRecallCurrentPromptWrappedLines: (width: number) => string[] | null
+  /** MCQ notebook+stem or spelling notebook+Spell line; `null` if no such recall question is pending. */
+  getRecallCurrentPromptWrappedLines: (width: number) => string[] | null
   usesSessionYesNoInputChrome: (inTokenList: boolean) => boolean
   getDefaultTokenLabel: () => AccessTokenLabel | undefined
   listAccessTokens: () => AccessTokenEntry[]

@@ -55,6 +55,8 @@ import type {
 
 type RecallPromptResult = Exclude<RecallNextResult, { type: 'none' }>
 
+const RECALL_SESSION_LOAD_MORE_LINE = 'Load more from next 3 days? (y/n)'
+
 let pendingRecallAnswer: PendingRecallAnswer = null
 let recallSessionMode = false
 let sessionRecallCount = 0
@@ -163,6 +165,22 @@ function emitSessionYesNoReprompt(
     recallSessionYesNoInkGuidanceLines = [RECALL_YES_NO_REPROMPT]
   } else {
     writeCurrentPrompt(RECALL_YES_NO_REPROMPT)
+  }
+}
+
+function enterRecallLoadMorePromptState(
+  output: OutputAdapter,
+  writeCurrentPrompt: (msg: string) => void
+): void {
+  pendingRecallLoadMore = true
+  output.beginCurrentPrompt?.()
+  if (output.beginCurrentPrompt) {
+    recallSessionYesNoInkGuidanceLines = wrapTextToVisibleWidthLines(
+      RECALL_SESSION_LOAD_MORE_LINE,
+      getTerminalWidth()
+    )
+  } else {
+    writeCurrentPrompt(RECALL_SESSION_LOAD_MORE_LINE)
   }
 }
 
@@ -388,17 +406,7 @@ async function continueRecallSession(
     )
     if (result.type === 'none') {
       if (recallSessionDueDays === 0) {
-        pendingRecallLoadMore = true
-        output.beginCurrentPrompt?.()
-        const loadMoreLine = 'Load more from next 3 days? (y/n)'
-        if (output.beginCurrentPrompt) {
-          recallSessionYesNoInkGuidanceLines = wrapTextToVisibleWidthLines(
-            loadMoreLine,
-            getTerminalWidth()
-          )
-        } else {
-          writeCurrentPrompt(loadMoreLine)
-        }
+        enterRecallLoadMorePromptState(output, writeCurrentPrompt)
         return
       }
       output.log(formatRecallSessionSummary(sessionRecallCount))
@@ -646,17 +654,7 @@ export async function processInput(
         (signal) => recallNext(0, signal)
       )
       if (result.type === 'none') {
-        pendingRecallLoadMore = true
-        output.beginCurrentPrompt?.()
-        const loadMoreLine = 'Load more from next 3 days? (y/n)'
-        if (output.beginCurrentPrompt) {
-          recallSessionYesNoInkGuidanceLines = wrapTextToVisibleWidthLines(
-            loadMoreLine,
-            getTerminalWidth()
-          )
-        } else {
-          writeCurrentPrompt(loadMoreLine)
-        }
+        enterRecallLoadMorePromptState(output, writeCurrentPrompt)
       } else {
         showRecallPrompt(result, output, writeCurrentPrompt)
       }
@@ -671,35 +669,31 @@ export async function processInput(
   return false
 }
 
-function getNumberedChoiceListCurrentPromptWrappedLines(
-  width: number
-): string[] | null {
+/** TTY Current prompt lines for an active recall question (MCQ stem block or spelling block). */
+function getRecallCurrentPromptWrappedLines(width: number): string[] | null {
   const p = pendingRecallAnswer
-  if (!isMcqRecallPending(p)) return null
-  return [
-    ...wrapTextToVisibleWidthLines(
-      formatRecallNotebookCurrentPromptLine(p.notebookTitle),
-      width
-    ),
-    ...wrapMarkdownTerminalToLines(p.stemRenderedForTerminal, width),
-  ]
-}
-
-function getSpellingRecallCurrentPromptWrappedLines(
-  width: number
-): string[] | null {
-  const p = pendingRecallAnswer
-  if (!isSpellingRecallPending(p)) return null
-  if (p.ttyRepromptLine !== undefined) {
-    return wrapTextToVisibleWidthLines(p.ttyRepromptLine, width)
+  if (isMcqRecallPending(p)) {
+    return [
+      ...wrapTextToVisibleWidthLines(
+        formatRecallNotebookCurrentPromptLine(p.notebookTitle),
+        width
+      ),
+      ...wrapMarkdownTerminalToLines(p.stemRenderedForTerminal, width),
+    ]
   }
-  return [
-    ...wrapTextToVisibleWidthLines(
-      formatRecallNotebookCurrentPromptLine(p.notebookTitle),
-      width
-    ),
-    ...wrapMarkdownTerminalToLines(p.spellLineRenderedForTerminal, width),
-  ]
+  if (isSpellingRecallPending(p)) {
+    if (p.ttyRepromptLine !== undefined) {
+      return wrapTextToVisibleWidthLines(p.ttyRepromptLine, width)
+    }
+    return [
+      ...wrapTextToVisibleWidthLines(
+        formatRecallNotebookCurrentPromptLine(p.notebookTitle),
+        width
+      ),
+      ...wrapMarkdownTerminalToLines(p.spellLineRenderedForTerminal, width),
+    ]
+  }
+  return null
 }
 
 function isNumberedChoiceListActive(): boolean {
@@ -733,8 +727,7 @@ function buildTTYDeps() {
     getRecallStopConfirmInkModel: recallStopConfirmInkModelForContext,
     isNumberedChoiceListActive,
     getNumberedChoiceListChoices,
-    getNumberedChoiceListCurrentPromptWrappedLines,
-    getSpellingRecallCurrentPromptWrappedLines,
+    getRecallCurrentPromptWrappedLines,
     usesSessionYesNoInputChrome,
     getDefaultTokenLabel,
     listAccessTokens,

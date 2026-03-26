@@ -51,14 +51,6 @@ type DefaultCommandLineInkLayout = LiveColumnLeadingSnapshot & {
   currentGuidanceLines: string[]
 }
 
-/** MCQ recall **Current prompt** lines; empty array when the adapter has no stem to show. */
-function mcqRecallCurrentPromptLines(
-  deps: TTYDeps,
-  width: TerminalWidth
-): string[] {
-  return deps.getNumberedChoiceListCurrentPromptWrappedLines(width) ?? []
-}
-
 function currentStageIndicatorLinesForLiveRegion(
   waitLine: InteractiveFetchWaitLine | null,
   tokenPicker: AccessTokenPickerCommandConfig | undefined,
@@ -106,10 +98,8 @@ function computeLiveColumnLeadingSnapshot(
   const stopRecallConfirm = deps.isPendingStopConfirmation()
     ? deps.getRecallStopConfirmInkModel(placeholderContext)
     : null
-  const numberedChoicePromptLines =
-    deps.getNumberedChoiceListCurrentPromptWrappedLines(terminalWidth)
-  const spellingPromptLines =
-    deps.getSpellingRecallCurrentPromptWrappedLines(terminalWidth)
+  const recallQuestionPromptLines =
+    deps.getRecallCurrentPromptWrappedLines(terminalWidth)
   const waitLine = getInteractiveFetchWaitLine()
   const tokenListConfig = session.tokenSelection
     ? deps.TOKEN_LIST_COMMANDS[session.tokenSelection.command]
@@ -123,16 +113,10 @@ function computeLiveColumnLeadingSnapshot(
     const currentPromptText = tokenListConfig?.currentPrompt
     if (
       !session.tokenSelection &&
-      numberedChoicePromptLines !== null &&
+      recallQuestionPromptLines !== null &&
       !deps.isPendingStopConfirmation()
     ) {
-      currentPromptWrappedLines = numberedChoicePromptLines
-    } else if (
-      !session.tokenSelection &&
-      spellingPromptLines !== null &&
-      !deps.isPendingStopConfirmation()
-    ) {
-      currentPromptWrappedLines = spellingPromptLines
+      currentPromptWrappedLines = recallQuestionPromptLines
     } else if (currentPromptText) {
       currentPromptWrappedLines = wrapTextToVisibleWidthLines(
         currentPromptText,
@@ -213,7 +197,7 @@ function buildLivePanel(
   const numberedChoices = deps.getNumberedChoiceListChoices()
   if (numberedChoices !== null) {
     const width = getTerminalWidth()
-    const promptLines = mcqRecallCurrentPromptLines(deps, width)
+    const promptLines = deps.getRecallCurrentPromptWrappedLines(width) ?? []
     return React.createElement(RecallMcqChoicesLivePanel, {
       stageIndicatorLine: DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
       currentPromptLines: promptLines,

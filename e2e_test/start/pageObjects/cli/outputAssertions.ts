@@ -1,16 +1,18 @@
 /**
- * Cucumber step assertions on `@doughnutOutput`.
+ * Cucumber assertions on `@doughnutOutput`.
  *
- * Capture kinds:
- * - **Non-interactive** — installed CLI subcommands (`version`, `update`): full stdout, no PTY input-ready OSC.
- * - **PTY interactive** — node-pty sessions: stdout includes `INTERACTIVE_INPUT_READY_OSC`.
+ * - **Non-interactive**: one-shot CLI (no input-ready OSC).
+ * - **Chat history**: parsed scrollback — domain steps “history output / input”.
+ * - **Simulated PTY screen**: cursor/erase replay — “user-visible” plain text.
+ * - **Recall /stop (MCQ)**: line-split merge can still hold the stem after Ink cleared the live grid.
  */
 import {
   countInputBoxTopBorderLinesInInteractivePtyTranscript,
-  getCurrentGuidanceAndHistoryRaw,
   getHistoryInputContent,
   getHistoryOutputContent,
-  interactiveCliPtyTranscriptApproxVisiblePlainText,
+  getRecallDisplaySections,
+  getRecallMergedTranscriptRaw,
+  ptyTranscriptSimulatedPlainScreen,
   ptyStdoutHasInputReadyMarker,
 } from '../../../step_definitions/cliSectionParser'
 
@@ -22,11 +24,13 @@ const SECTION = {
   historyInput: 'history input',
   currentGuidance: 'Current guidance',
   simulatedVisiblePtyScreen: 'simulated visible PTY screen',
+  recallStopAssertion: 'interactive CLI transcript (recall /stop)',
 } as const
 
 type SectionLabel = (typeof SECTION)[keyof typeof SECTION]
 
 const CONTENT_PREVIEW_LEN = 500
+const SIMULATED_SCREEN_TAIL_LEN = 1200
 
 const WRONG_NON_INTERACTIVE_STEP =
   'This capture includes the PTY-only “input ready” OSC (real TTY session). ' +
@@ -87,6 +91,25 @@ function expectSectionContainsSubstring(
   ).to.include(needle)
 }
 
+/** Substring must appear on the simulated plain screen (Ink live region, not line-split merge). */
+function expectInteractivePtySimulatedScreenContains(args: {
+  assertionTarget: SectionLabel | 'interactive CLI input box'
+  needle: string
+  whenMissing: string
+}): void {
+  withStdoutFor(
+    { kind: 'ptyInteractive', assertionTarget: args.assertionTarget },
+    (stdout) => {
+      const plain = ptyTranscriptSimulatedPlainScreen(stdout)
+      const tail = plain.slice(-SIMULATED_SCREEN_TAIL_LEN)
+      expect(
+        plain,
+        `Expected "${args.needle}". ${args.whenMissing}\nTail:\n${tail}`
+      ).to.include(args.needle)
+    }
+  )
+}
+
 function nonInteractiveOutput() {
   return {
     expectContains(expected: string) {
@@ -131,67 +154,68 @@ function historyInput() {
   }
 }
 
-function visibleInteractivePtyScreen() {
-  const target = SECTION.simulatedVisiblePtyScreen
+function currentGuidance() {
+  const target = SECTION.currentGuidance
   return {
-    /** Assert substring appears after CSI/cursor replay — closer to what a human sees than raw line-split transcript parsing. */
     expectContains(expected: string) {
+      expectInteractivePtySimulatedScreenContains({
+        assertionTarget: target,
+        needle: expected,
+        whenMissing: `Gherkin step “… in the Current guidance” uses ${SECTION.simulatedVisiblePtyScreen} (cursor/erase replay).`,
+      })
+    },
+    /**
+     * Bold/italic: PTY replay skips SGR (`m`), so use merged transcript bytes (Ink still emits ANSI there).
+     */
+    expectStyled(expected: string) {
       withStdoutFor(
         { kind: 'ptyInteractive', assertionTarget: target },
         (stdout) => {
-          const visible =
-            interactiveCliPtyTranscriptApproxVisiblePlainText(stdout)
-          const tail = visible.slice(-1200)
-          const hint =
-            `Expected "${expected}" on ${target} (PTY bytes replayed with erase/cursor moves). ` +
-            `If this fails while older "Current guidance" checks passed, the string may exist only in scrollback ` +
-            `while Ink repainted the live region — feed session y/n questions via RecallInkConfirmPanel guidanceLines ` +
-            `(ShellSessionRoot in-session), not only grey writeCurrentPrompt lines. Tail:\n${tail}`
-          expect(visible, hint).to.include(expected)
+          const raw = getRecallMergedTranscriptRaw(stdout)
+          expectSectionContainsSubstring(
+            raw,
+            expected,
+            `raw merged transcript (${SECTION.currentGuidance} styled step)`
+          )
+          const hasBold = raw.includes('\x1b[1m')
+          const hasItalic = raw.includes('\x1b[3m')
+          expect(
+            hasBold || hasItalic,
+            `Expected ANSI bold or italic in merged transcript for styled Current guidance. Raw length: ${raw.length}`
+          ).to.be.true
         }
       )
     },
   }
 }
 
-function currentGuidance() {
-  const target = SECTION.currentGuidance
+/** Recall session y/n: prompt must appear on simulated PTY screen (not only in line-split merge / scrollback ghosts). */
+function assertRecallSessionPromptOnSimulatedPtyScreen(
+  expectedPromptSubstring: string
+): void {
+  expectInteractivePtySimulatedScreenContains({
+    assertionTarget: SECTION.simulatedVisiblePtyScreen,
+    needle: expectedPromptSubstring,
+    whenMissing: `If this fails but other substring checks passed, the text may exist only in scrollback while Ink repainted the live region — use RecallInkConfirmPanel guidanceLines (ShellSessionRoot in-session), not only grey writeCurrentPrompt.`,
+  })
+}
+
+function recallSession() {
   return {
-    /** Gherkin “Current guidance” names the live recall / hints area; we assert on visible PTY replay, not line-split “guidance” parsing. */
-    expectContains(expected: string) {
+    /** MCQ stem may be gone from simulated screen after /stop; line-split merge + chat history still hold it. */
+    expectStopped() {
       withStdoutFor(
-        { kind: 'ptyInteractive', assertionTarget: target },
+        {
+          kind: 'ptyInteractive',
+          assertionTarget: SECTION.recallStopAssertion,
+        },
         (stdout) => {
-          const visible =
-            interactiveCliPtyTranscriptApproxVisiblePlainText(stdout)
-          const tail = visible.slice(-1200)
-          const hint =
-            `Expected "${expected}" for step "… in the Current guidance" ` +
-            `(checked on ${SECTION.simulatedVisiblePtyScreen} after cursor/erase replay). Tail:\n${tail}`
-          expect(visible, hint).to.include(expected)
-        }
-      )
-    },
-    /**
-     * Bold/italic: PTY cursor replay skips SGR (`m`) sequences, so replayed “raw” grids drop ANSI.
-     * Use merged transcript+history raw (Ink output still in the byte stream) for styling only.
-     */
-    expectStyled(expected: string) {
-      withStdoutFor(
-        { kind: 'ptyInteractive', assertionTarget: target },
-        (stdout) => {
-          const raw = getCurrentGuidanceAndHistoryRaw(stdout)
-          expectSectionContainsSubstring(
-            raw,
-            expected,
-            `raw ${SECTION.currentGuidance} (transcript merge; SGR not in cursor replay grid)`
+          const { mergedTranscriptPlain, chatHistoryOutputPlain } =
+            getRecallDisplaySections(stdout)
+          expect(mergedTranscriptPlain).to.include(
+            'What is the meaning of sedition?'
           )
-          const hasBold = raw.includes('\x1b[1m')
-          const hasItalic = raw.includes('\x1b[3m')
-          expect(
-            hasBold || hasItalic,
-            `Expected ANSI bold or italic in Ink output for styled Current guidance step. Raw length: ${raw.length}`
-          ).to.be.true
+          expect(chatHistoryOutputPlain).to.include('Stopped recall')
         }
       )
     },
@@ -224,6 +248,7 @@ export {
   historyOutput,
   historyInput,
   currentGuidance,
-  visibleInteractivePtyScreen,
+  recallSession,
+  assertRecallSessionPromptOnSimulatedPtyScreen,
   inputBoxTopBorder,
 }

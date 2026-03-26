@@ -3,9 +3,9 @@ import {
   historyOutput,
   historyInput,
   currentGuidance,
+  recallSession,
   inputBoxTopBorder,
 } from './outputAssertions'
-import { recallSession } from './recallSession'
 import { removeToken } from './removeToken'
 import { installation, interactive, accessToken } from './execution'
 import { backend } from './backend'
@@ -13,8 +13,7 @@ import { setup } from './setup'
 
 /**
  * CLI page objects. Domain ordering:
- * - Output sections (non-interactive, history, current guidance)
- * - Recall session assertions
+ * - Output assertions (`outputAssertions`: non-interactive, chat history, current guidance, recall /stop)
  * - Access-token removal assertions
  * - Execution (installation, interactive, access-token)
  * - Backend (bundle, install script)
