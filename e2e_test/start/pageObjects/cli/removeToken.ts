@@ -2,7 +2,7 @@
  * CLI access-token removal success assertions.
  * Domain: local (config only) vs complete (config + server revocation).
  */
-import { historyOutput } from './outputAssertions'
+import { pastCliAssistantMessages } from './outputAssertions'
 
 function removeToken() {
   return {
@@ -11,7 +11,7 @@ function removeToken() {
         removalType === 'complete'
           ? 'removed locally and from server'
           : `Token "${label}" removed.`
-      historyOutput().expectContains(expected)
+      pastCliAssistantMessages().expectContains(expected)
     },
   }
 }

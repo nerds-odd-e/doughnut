@@ -1,5 +1,5 @@
 /**
- * `renderer.ts`: visible width, command-line draft rows, past input, slash highlight.
+ * `renderer.ts`: visible width, command-line draft rows, past user message paint, slash highlight.
  * TTY behavior: `interactiveTty*.test.ts`.
  */
 import './interactiveTestMocks.js'
@@ -8,7 +8,7 @@ import {
   buildCommandInputDraftLines,
   formatInteractiveCommandLineInkRows,
   highlightRecognizedCommand,
-  renderPastInput,
+  renderPastUserMessage,
   stripAnsi,
   visibleLength,
   buildSuggestionLinesForInk,
@@ -157,9 +157,9 @@ describe('buildSuggestionLinesForInk', () => {
   })
 })
 
-describe('renderPastInput', () => {
+describe('renderPastUserMessage', () => {
   test('single-line hello: grey block, padding, trailing blank, no arrow', () => {
-    const result = renderPastInput('hello', 30)
+    const result = renderPastUserMessage('hello', 30)
     expect(result).toContain('hello')
     expect(result).toContain(GREY_BG_PAST_INPUT)
     const lines = result.split('\n')
@@ -173,7 +173,7 @@ describe('renderPastInput', () => {
   })
 
   test('handles multi-line input', () => {
-    const result = renderPastInput('line1\nline2', 30)
+    const result = renderPastUserMessage('line1\nline2', 30)
     expect(result).toContain('line1')
     expect(result).toContain('line2')
     const lines = result.split('\n')

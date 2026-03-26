@@ -22,8 +22,8 @@ import {
 } from './listDisplay.js'
 import { renderMarkdownToTerminal } from './markdown.js'
 import type {
-  ChatHistory,
-  ChatHistoryOutputTone,
+  CliAssistantMessageTone,
+  PastMessages,
   RecallMcqChoiceTexts,
 } from './types.js'
 import type { InteractiveFetchWaitLine } from './interactiveFetchWait.js'
@@ -167,12 +167,15 @@ export function formatCurrentStageIndicatorLine(
   return `${CURRENT_STAGE_BAND_BACKGROUND_SGR}${padEndVisible(opened, width)}${RESET}`
 }
 
-/** Submitted buffer counts as history input (and past-input paint) only when non-blank after trim. */
+/** Submitted buffer counts as a past user message (and past-user paint) only when non-blank after trim. */
 export function isCommittedInteractiveInput(submitted: string): boolean {
   return submitted.trim().length > 0
 }
 
-export function renderPastInput(input: string, width: TerminalWidth): string {
+export function renderPastUserMessage(
+  input: string,
+  width: TerminalWidth
+): string {
   const innerWidth = width - 2
   const lines = input.split('\n')
   const bg = terminalChalk.bgAnsi256(236)
@@ -300,14 +303,14 @@ export function getTerminalWidth(): number {
   return process.stdout.columns || 80
 }
 
-/** Blank line before the live Ink column when scrollback exists but there is no Current prompt block. */
+/** Blank line before the live Ink column when past messages exist but there is no Current prompt block. */
 export function needsGapBeforeLiveRegion(
-  history: ChatHistory,
+  pastMessages: PastMessages,
   currentPromptWrappedLines: string[],
   currentStageIndicatorLines: string[]
 ): boolean {
   return (
-    history.length > 0 &&
+    pastMessages.length > 0 &&
     currentPromptWrappedLines.length === 0 &&
     currentStageIndicatorLines.length === 0
   )
@@ -438,10 +441,10 @@ export function buildSuggestionLinesForInk(
   )
 }
 
-/** SGR wrapper for one line of scrollback from {@link ChatHistoryOutputEntry}. */
-export function applyChatHistoryOutputTone(
+/** SGR wrapper for one line of a past CLI assistant message. */
+export function applyCliAssistantMessageTone(
   line: string,
-  tone: ChatHistoryOutputTone
+  tone: CliAssistantMessageTone
 ): string {
   if (tone === 'error') return terminalChalk.red(line)
   if (tone === 'userNotice') return terminalChalk.gray.italic(line)

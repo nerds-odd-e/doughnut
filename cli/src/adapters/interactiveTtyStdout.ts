@@ -15,15 +15,15 @@
  * **Do not reintroduce:** CSI that lays out or positions the live block (Phase J2 — caret and
  * draft chrome live inside Ink).
  */
-import type { ChatHistoryOutputTone } from '../types.js'
+import type { CliAssistantMessageTone } from '../types.js'
 import {
-  applyChatHistoryOutputTone,
+  applyCliAssistantMessageTone,
   buildCurrentPromptSeparator,
   HIDE_CURSOR,
   INTERACTIVE_INPUT_READY_OSC,
   interactiveInputReadyOscSuffix,
   type InteractiveInputReadyPaint,
-  renderPastInput,
+  renderPastUserMessage,
   SHOW_CURSOR,
   type TerminalWidth,
 } from '../renderer.js'
@@ -63,15 +63,15 @@ export const interactiveTtyStdout = {
     width: TerminalWidth
     previousInputContent: string | undefined
     outputLines: readonly string[]
-    tone: ChatHistoryOutputTone
+    tone: CliAssistantMessageTone
   }): void {
     const { width, previousInputContent, outputLines, tone } = options
     if (previousInputContent !== undefined) {
-      write(renderPastInput(previousInputContent, width))
+      write(renderPastUserMessage(previousInputContent, width))
       write('\n')
     }
     for (const line of outputLines) {
-      write(`${applyChatHistoryOutputTone(line, tone)}\n`)
+      write(`${applyCliAssistantMessageTone(line, tone)}\n`)
     }
   },
 

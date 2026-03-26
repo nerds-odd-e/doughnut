@@ -1,8 +1,8 @@
 import { describe, test, expect } from 'vitest'
 import {
-  MAX_COMMITTED_COMMANDS,
+  MAX_USER_INPUT_HISTORY_LINES,
   afterBareSlashEscape,
-  appendCommittedCommand,
+  appendUserInputHistoryLine,
   caretOneLeft,
   clearLiveCommandLine,
   deleteBeforeCaret,
@@ -22,34 +22,34 @@ function commandInputWith(
   return { ...emptyInteractiveCommandInput(), ...partial }
 }
 
-describe('appendCommittedCommand', () => {
+describe('appendUserInputHistoryLine', () => {
   test('ignores whitespace-only lines', () => {
-    expect(appendCommittedCommand([], '   ')).toEqual([])
+    expect(appendUserInputHistoryLine([], '   ')).toEqual([])
   })
 
   test('stores trimmed text', () => {
-    expect(appendCommittedCommand([], '  a  ')).toEqual(['a'])
+    expect(appendUserInputHistoryLine([], '  a  ')).toEqual(['a'])
   })
 
   test('collapses newlines to spaces before trim', () => {
-    expect(appendCommittedCommand([], 'a\nb')).toEqual(['a b'])
+    expect(appendUserInputHistoryLine([], 'a\nb')).toEqual(['a b'])
   })
 
   test('prepends so the newest commit is first', () => {
-    const once = appendCommittedCommand([], 'a')
-    expect(appendCommittedCommand(once, 'b')).toEqual(['b', 'a'])
+    const once = appendUserInputHistoryLine([], 'a')
+    expect(appendUserInputHistoryLine(once, 'b')).toEqual(['b', 'a'])
   })
 
   test('drops the oldest entry when over the max length', () => {
     const full = Array.from(
-      { length: MAX_COMMITTED_COMMANDS },
+      { length: MAX_USER_INPUT_HISTORY_LINES },
       (_, i) => `h${i}`
     )
-    const next = appendCommittedCommand(full, 'new')
-    expect(next.length).toBe(MAX_COMMITTED_COMMANDS)
+    const next = appendUserInputHistoryLine(full, 'new')
+    expect(next.length).toBe(MAX_USER_INPUT_HISTORY_LINES)
     expect(next[0]).toBe('new')
-    expect(next[MAX_COMMITTED_COMMANDS - 1]).toBe(
-      `h${MAX_COMMITTED_COMMANDS - 2}`
+    expect(next[MAX_USER_INPUT_HISTORY_LINES - 1]).toBe(
+      `h${MAX_USER_INPUT_HISTORY_LINES - 2}`
     )
   })
 })
@@ -62,18 +62,18 @@ describe('singleLineCommandDraft', () => {
 })
 
 describe('afterBareSlashEscape', () => {
-  test('clears a draft that is only `/`, ends history walk, caret at end', () => {
+  test('clears a draft that is only `/`, ends user input history walk, caret at end', () => {
     const out = afterBareSlashEscape(
       commandInputWith({
         lineDraft: '/',
-        historyWalkIndex: 0,
-        lineDraftBeforeHistoryWalk: 'x',
+        userInputHistoryWalkIndex: 0,
+        lineDraftBeforeUserInputHistoryWalk: 'x',
       })
     )
     expect(out.lineDraft).toBe('')
     expect(out.caretOffset).toBe(0)
-    expect(out.historyWalkIndex).toBe(null)
-    expect(out.lineDraftBeforeHistoryWalk).toBe(null)
+    expect(out.userInputHistoryWalkIndex).toBe(null)
+    expect(out.lineDraftBeforeUserInputHistoryWalk).toBe(null)
   })
 
   test('leaves `/foo` unchanged (only a lone `/` is dismissed)', () => {
@@ -86,30 +86,30 @@ describe('afterBareSlashEscape', () => {
 })
 
 describe('replaceLiveCommandDraft', () => {
-  test('replaces the draft, ends history walk, caret at end', () => {
+  test('replaces the draft, ends user input history walk, caret at end', () => {
     const out = replaceLiveCommandDraft(
       commandInputWith({
         lineDraft: 'ab',
-        historyWalkIndex: 0,
-        lineDraftBeforeHistoryWalk: 'z',
+        userInputHistoryWalkIndex: 0,
+        lineDraftBeforeUserInputHistoryWalk: 'z',
       }),
       '/help '
     )
     expect(out.lineDraft).toBe('/help ')
     expect(out.caretOffset).toBe(out.lineDraft.length)
-    expect(out.historyWalkIndex).toBe(null)
-    expect(out.lineDraftBeforeHistoryWalk).toBe(null)
+    expect(out.userInputHistoryWalkIndex).toBe(null)
+    expect(out.lineDraftBeforeUserInputHistoryWalk).toBe(null)
   })
 })
 
-describe('Input command history: slash suggestion picker vs ↑↓ while editing live draft', () => {
+describe('User input history: slash suggestion picker vs ↑↓ while editing live draft', () => {
   test('first ↑ moves caret home without cycling highlights when the picker would apply', () => {
     const lineDraft = '/help_tty_arrow_up'
     const state = commandInputWith({
       lineDraft,
       caretOffset: 2,
-      historyWalkIndex: null,
-      committedCommands: ['/version'],
+      userInputHistoryWalkIndex: null,
+      userInputHistoryLines: ['/version'],
     })
     expect(
       ttyArrowKeyUsesSlashSuggestionCycle('up', state, false, true),
@@ -118,7 +118,7 @@ describe('Input command history: slash suggestion picker vs ↑↓ while editing
     const after = onArrowUp(state)
     expect(after.lineDraft).toBe(lineDraft)
     expect(after.caretOffset).toBe(0)
-    expect(after.historyWalkIndex).toBe(null)
+    expect(after.userInputHistoryWalkIndex).toBe(null)
   })
 
   test('first ↓ moves caret to end without cycling highlights when the picker would apply', () => {
@@ -126,8 +126,8 @@ describe('Input command history: slash suggestion picker vs ↑↓ while editing
     const state = commandInputWith({
       lineDraft,
       caretOffset: 2,
-      historyWalkIndex: null,
-      committedCommands: ['/version'],
+      userInputHistoryWalkIndex: null,
+      userInputHistoryLines: ['/version'],
     })
     expect(
       ttyArrowKeyUsesSlashSuggestionCycle('down', state, false, true),
@@ -136,23 +136,23 @@ describe('Input command history: slash suggestion picker vs ↑↓ while editing
     const after = onArrowDown(state)
     expect(after.lineDraft).toBe(lineDraft)
     expect(after.caretOffset).toBe(lineDraft.length)
-    expect(after.historyWalkIndex).toBe(null)
+    expect(after.userInputHistoryWalkIndex).toBe(null)
   })
 })
 
-describe('Input command history: recalled drafts leave slash suggestion picker', () => {
-  test('↑↓ through history when a recalled line would open the picker (test predicate)', () => {
+describe('User input history: recalled drafts leave slash suggestion picker', () => {
+  test('↑↓ through user input history when a recalled line would open the picker (test predicate)', () => {
     const slashPickerWouldApplyForDraft = (d: string) => d === '/help_hist'
 
     const intoNewest = onArrowUp(
       commandInputWith({
         lineDraft: 'draft',
         caretOffset: 0,
-        committedCommands: ['/help_hist', '/hist_beta'],
+        userInputHistoryLines: ['/help_hist', '/hist_beta'],
       }),
       slashPickerWouldApplyForDraft
     )
-    expect(intoNewest.historyWalkIndex).toBe(0)
+    expect(intoNewest.userInputHistoryWalkIndex).toBe(0)
     expect(intoNewest.lineDraft).toBe('/help_hist ')
     expect(intoNewest.caretOffset).toBe(0)
 
@@ -160,19 +160,19 @@ describe('Input command history: recalled drafts leave slash suggestion picker',
       commandInputWith({
         lineDraft: 'draft',
         caretOffset: 0,
-        committedCommands: ['/hist_beta', '/help_hist'],
+        userInputHistoryLines: ['/hist_beta', '/help_hist'],
       }),
       slashPickerWouldApplyForDraft
     )
-    expect(fromOlder.historyWalkIndex).toBe(0)
+    expect(fromOlder.userInputHistoryWalkIndex).toBe(0)
     expect(fromOlder.lineDraft).toBe('/hist_beta')
 
     const showingHelp = onArrowUp(fromOlder, slashPickerWouldApplyForDraft)
-    expect(showingHelp.historyWalkIndex).toBe(1)
+    expect(showingHelp.userInputHistoryWalkIndex).toBe(1)
     expect(showingHelp.lineDraft).toBe('/help_hist ')
 
     const backToBeta = onArrowDown(showingHelp, slashPickerWouldApplyForDraft)
-    expect(backToBeta.historyWalkIndex).toBe(0)
+    expect(backToBeta.userInputHistoryWalkIndex).toBe(0)
     expect(backToBeta.lineDraft).toBe('/hist_beta')
     expect(backToBeta.caretOffset).toBe('/hist_beta'.length)
   })
@@ -182,7 +182,7 @@ describe('Input command history: recalled drafts leave slash suggestion picker',
       commandInputWith({
         lineDraft: 'x',
         caretOffset: 0,
-        committedCommands: ['a\n/help_hist'],
+        userInputHistoryLines: ['a\n/help_hist'],
       }),
       (d) => d === 'a /help_hist'
     )
@@ -196,12 +196,12 @@ describe('onArrowUp', () => {
       commandInputWith({
         lineDraft: 'ab',
         caretOffset: 2,
-        committedCommands: ['x'],
+        userInputHistoryLines: ['x'],
       })
     )
     expect(out.lineDraft).toBe('ab')
     expect(out.caretOffset).toBe(0)
-    expect(out.historyWalkIndex).toBe(null)
+    expect(out.userInputHistoryWalkIndex).toBe(null)
   })
 
   test('loads the newest committed line when the caret is already at the start', () => {
@@ -209,12 +209,12 @@ describe('onArrowUp', () => {
       commandInputWith({
         lineDraft: 'ab',
         caretOffset: 2,
-        committedCommands: ['x'],
+        userInputHistoryLines: ['x'],
       })
     )
     const out = onArrowUp(afterCaretHome)
-    expect(out.lineDraftBeforeHistoryWalk).toBe('ab')
-    expect(out.historyWalkIndex).toBe(0)
+    expect(out.lineDraftBeforeUserInputHistoryWalk).toBe('ab')
+    expect(out.userInputHistoryWalkIndex).toBe(0)
     expect(out.lineDraft).toBe('x')
     expect(out.caretOffset).toBe(0)
   })
@@ -222,9 +222,9 @@ describe('onArrowUp', () => {
   test('does nothing when already showing the oldest committed line', () => {
     const state = commandInputWith({
       lineDraft: 'older',
-      committedCommands: ['newest', 'older'],
-      historyWalkIndex: 1,
-      lineDraftBeforeHistoryWalk: 'd',
+      userInputHistoryLines: ['newest', 'older'],
+      userInputHistoryWalkIndex: 1,
+      lineDraftBeforeUserInputHistoryWalk: 'd',
     })
     expect(onArrowUp(state)).toEqual(state)
   })
@@ -236,12 +236,12 @@ describe('onArrowDown', () => {
       commandInputWith({
         lineDraft: 'older',
         caretOffset: 0,
-        committedCommands: ['newest', 'older'],
-        historyWalkIndex: 1,
-        lineDraftBeforeHistoryWalk: 'draft',
+        userInputHistoryLines: ['newest', 'older'],
+        userInputHistoryWalkIndex: 1,
+        lineDraftBeforeUserInputHistoryWalk: 'draft',
       })
     )
-    expect(out.historyWalkIndex).toBe(0)
+    expect(out.userInputHistoryWalkIndex).toBe(0)
     expect(out.lineDraft).toBe('newest')
     expect(out.caretOffset).toBe('newest'.length)
   })
@@ -251,24 +251,24 @@ describe('onArrowDown', () => {
       commandInputWith({
         lineDraft: 'newest',
         caretOffset: 6,
-        committedCommands: ['newest', 'older'],
-        historyWalkIndex: 0,
-        lineDraftBeforeHistoryWalk: 'draft',
+        userInputHistoryLines: ['newest', 'older'],
+        userInputHistoryWalkIndex: 0,
+        lineDraftBeforeUserInputHistoryWalk: 'draft',
       })
     )
     expect(out.lineDraft).toBe('draft')
     expect(out.caretOffset).toBe(5)
-    expect(out.historyWalkIndex).toBe(null)
+    expect(out.userInputHistoryWalkIndex).toBe(null)
   })
 
-  test('clears the draft when leaving history with no suspended draft', () => {
+  test('clears the draft when leaving user input history walk with no suspended draft', () => {
     const out = onArrowDown(
       commandInputWith({
         lineDraft: 'only',
         caretOffset: 4,
-        committedCommands: ['only'],
-        historyWalkIndex: 0,
-        lineDraftBeforeHistoryWalk: null,
+        userInputHistoryLines: ['only'],
+        userInputHistoryWalkIndex: 0,
+        lineDraftBeforeUserInputHistoryWalk: null,
       })
     )
     expect(out.lineDraft).toBe('')
@@ -277,19 +277,19 @@ describe('onArrowDown', () => {
 })
 
 describe('insertIntoDraft', () => {
-  test('ends history walk before inserting text', () => {
+  test('ends user input history walk before inserting text', () => {
     const out = insertIntoDraft(
       commandInputWith({
         lineDraft: 'h',
         caretOffset: 0,
-        committedCommands: ['h'],
-        historyWalkIndex: 0,
-        lineDraftBeforeHistoryWalk: 'x',
+        userInputHistoryLines: ['h'],
+        userInputHistoryWalkIndex: 0,
+        lineDraftBeforeUserInputHistoryWalk: 'x',
       }),
       'Z'
     )
-    expect(out.historyWalkIndex).toBe(null)
-    expect(out.lineDraftBeforeHistoryWalk).toBe(null)
+    expect(out.userInputHistoryWalkIndex).toBe(null)
+    expect(out.lineDraftBeforeUserInputHistoryWalk).toBe(null)
     expect(out.lineDraft).toBe('Zh')
     expect(out.caretOffset).toBe(1)
   })
@@ -324,20 +324,20 @@ describe('caretOneLeft', () => {
 })
 
 describe('clearLiveCommandLine', () => {
-  test('empties the draft and walk state but keeps committed commands', () => {
+  test('empties the draft and walk state but keeps user input history lines', () => {
     const out = clearLiveCommandLine(
       commandInputWith({
         lineDraft: 'x',
         caretOffset: 1,
-        committedCommands: ['a'],
-        historyWalkIndex: 0,
-        lineDraftBeforeHistoryWalk: 'd',
+        userInputHistoryLines: ['a'],
+        userInputHistoryWalkIndex: 0,
+        lineDraftBeforeUserInputHistoryWalk: 'd',
       })
     )
     expect(out.lineDraft).toBe('')
     expect(out.caretOffset).toBe(0)
-    expect(out.committedCommands).toEqual(['a'])
-    expect(out.historyWalkIndex).toBe(null)
-    expect(out.lineDraftBeforeHistoryWalk).toBe(null)
+    expect(out.userInputHistoryLines).toEqual(['a'])
+    expect(out.userInputHistoryWalkIndex).toBe(null)
+    expect(out.lineDraftBeforeUserInputHistoryWalk).toBe(null)
   })
 })

@@ -48,7 +48,7 @@ describe('TTY recall: notebook first in Current prompt (all question kinds)', ()
     expect(plain.indexOf(nb)).toBeLessThan(plain.indexOf('Q?'))
   })
 
-  test('spelling: notebook line precedes Spell prompt in scrollback', async () => {
+  test('spelling: notebook line precedes Spell prompt in past messages', async () => {
     const chem = makeMe.aNotebook
     chem.notebuilder.title('Chem')
     mockRecallNext.mockResolvedValue(

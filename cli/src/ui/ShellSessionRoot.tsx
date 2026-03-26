@@ -36,7 +36,7 @@ export function isInkSubmitPressed(key: Key, input: string): boolean {
 }
 
 /**
- * Stage band + wrapped **Current prompt** copy (above the command line). Used for scrollback gap
+ * Stage band + wrapped **Current prompt** copy (above the command line). Used for past-messages gap
  * and passed through to the default command-line Ink panel.
  */
 type LiveColumnLeadingSnapshot = {
@@ -278,7 +278,7 @@ export function ShellSessionRoot({
 }: ShellSessionRootProps): React.ReactElement {
   const leading = computeLiveColumnLeadingSnapshot(session, deps)
   const liveLeadingGap = needsGapBeforeLiveRegion(
-    session.chatHistory,
+    session.pastMessages,
     leading.currentPromptWrappedLines,
     leading.currentStageIndicatorLines
   )
@@ -304,7 +304,7 @@ export function ShellSessionRoot({
     handlers
   )
   return React.createElement(InteractiveShellDisplay, {
-    history: session.chatHistory,
+    pastMessages: session.pastMessages,
     terminalWidth: getTerminalWidth(),
     liveLeadingGap,
     livePanel,

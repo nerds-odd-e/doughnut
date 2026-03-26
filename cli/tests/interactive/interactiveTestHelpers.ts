@@ -9,7 +9,7 @@ import {
   resetRecallStateForTesting,
   runInteractive,
 } from '../../src/interactive.js'
-import { getTerminalWidth, renderPastInput } from '../../src/renderer.js'
+import { getTerminalWidth, renderPastUserMessage } from '../../src/renderer.js'
 
 export const tick = () => new Promise<void>((r) => setImmediate(r))
 
@@ -142,13 +142,15 @@ export function ttyOutput(writeSpy: ReturnType<typeof vi.spyOn>) {
   return writeSpy.mock.calls.map((c: [string]) => c[0]).join('')
 }
 
-/** Recall-session y/n answers append to scrollback without a grey input row for the key line. */
+/** Recall-session y/n answers append to past CLI assistant messages without a grey past-user row for the key line. */
 export function expectTtyRecallYesNoReplyScrollback(
   writeSpy: ReturnType<typeof vi.spyOn>,
   answerLine: string
 ) {
   const out = ttyOutput(writeSpy)
-  expect(out).not.toContain(renderPastInput(answerLine, getTerminalWidth()))
+  expect(out).not.toContain(
+    renderPastUserMessage(answerLine, getTerminalWidth())
+  )
 }
 
 /** Latest line in captured TTY stdout containing `needle` (successive repaints overwrite the same logical rows). */

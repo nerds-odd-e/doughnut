@@ -21,7 +21,7 @@ import {
   type TTYStdin,
 } from './interactiveTestHelpers.js'
 
-describe('TTY: /add-access-token masking in scrollback', () => {
+describe('TTY: /add-access-token masking in past user messages', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
   let stdin: TTYStdin
 

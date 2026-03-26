@@ -1,6 +1,6 @@
-import type { ChatHistoryOutputTone } from './types.js'
+import type { CliAssistantMessageTone } from './types.js'
 
-/** Shown in history when the user aborts an interactive network wait (e.g. Esc). */
+/** Shown in past CLI assistant messages when the user aborts an interactive network wait (e.g. Esc). */
 export const CLI_USER_ABORTED_WAIT_MESSAGE = 'Cancelled by user.' as const
 
 /**
@@ -23,10 +23,10 @@ export function isFetchAbortedByCaller(error: unknown): boolean {
   )
 }
 
-/** One line + scrollback tone for failures surfaced after a command or fetch-wait (TTY or tests). */
+/** One line + CLI assistant message tone for failures surfaced after a command or fetch-wait (TTY or tests). */
 export function userVisibleOutcomeFromCommandError(err: unknown): {
   text: string
-  tone: ChatHistoryOutputTone
+  tone: CliAssistantMessageTone
 } {
   if (isFetchAbortedByCaller(err))
     return { text: CLI_USER_ABORTED_WAIT_MESSAGE, tone: 'userNotice' }

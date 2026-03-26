@@ -1,7 +1,7 @@
 import {
   nonInteractiveOutput,
-  historyOutput,
-  historyInput,
+  pastCliAssistantMessages,
+  pastUserMessages,
   currentGuidance,
   recallSession,
   inputBoxTopBorder,
@@ -13,7 +13,7 @@ import { setup } from './setup'
 
 /**
  * CLI page objects. Domain ordering:
- * - Output assertions (`outputAssertions`: non-interactive, chat history, current guidance, recall /stop)
+ * - Output assertions (`outputAssertions`: non-interactive, past messages, current guidance, recall /stop)
  * - Access-token removal assertions
  * - Execution (installation, interactive, access-token)
  * - Backend (bundle, install script)
@@ -21,8 +21,8 @@ import { setup } from './setup'
  */
 export const cli = {
   nonInteractiveOutput,
-  historyOutput,
-  historyInput,
+  pastCliAssistantMessages,
+  pastUserMessages,
   currentGuidance,
   inputBoxTopBorder,
   recallSession,

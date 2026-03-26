@@ -16,7 +16,7 @@ import {
 } from './interactiveTestHelpers.js'
 
 describe('interactive exit: Bye. in user-visible output', () => {
-  describe('TTY (PTY scrollback)', () => {
+  describe('TTY (PTY past transcript)', () => {
     let writeSpy: ReturnType<typeof vi.spyOn>
     let exitSpy: ReturnType<typeof vi.spyOn>
     let stdin: TTYStdin
@@ -34,7 +34,7 @@ describe('interactive exit: Bye. in user-visible output', () => {
       endTTYSession(stdin)
     })
 
-    test('after Enter on exit, scrollback includes Bye.', async () => {
+    test('after Enter on exit, past messages include Bye.', async () => {
       pushTTYCommandBytes(stdin, 'exit')
       await tick()
       writeSpy.mockClear()

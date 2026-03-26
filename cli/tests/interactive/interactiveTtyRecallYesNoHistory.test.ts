@@ -15,7 +15,7 @@ import {
   type TTYStdin,
 } from './interactiveTestHelpers.js'
 
-describe('TTY: recall-session y/n answers (scrollback)', () => {
+describe('TTY: recall-session y/n answers (past messages)', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
   let stdin: TTYStdin
 
@@ -28,7 +28,7 @@ describe('TTY: recall-session y/n answers (scrollback)', () => {
     endTTYSession(stdin)
   })
 
-  test('load more: n omits history input; session summary still logged', async () => {
+  test('load more: n omits past user message row; session summary still logged', async () => {
     mockRecallNext.mockResolvedValue({ type: 'none', message: '0 notes' })
     await submitTTYCommand(stdin, '/recall')
 
@@ -41,7 +41,7 @@ describe('TTY: recall-session y/n answers (scrollback)', () => {
     expectTtyRecallYesNoReplyScrollback(writeSpy, 'n')
   })
 
-  test('just-review: y omits history input; outcome still logged', async () => {
+  test('just-review: y omits past user message row; outcome still logged', async () => {
     mockRecallNext.mockResolvedValue({
       type: 'just-review',
       memoryTrackerId: 42,
@@ -61,7 +61,7 @@ describe('TTY: recall-session y/n answers (scrollback)', () => {
     expectTtyRecallYesNoReplyScrollback(writeSpy, 'y')
   })
 
-  test('just-review: n omits history input', async () => {
+  test('just-review: n omits past user message row', async () => {
     mockRecallNext.mockResolvedValue({
       type: 'just-review',
       memoryTrackerId: 7,

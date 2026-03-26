@@ -1,12 +1,12 @@
-import type { ChatHistory, ChatHistoryOutputTone } from '../types.js'
+import type { CliAssistantMessageTone, PastMessages } from '../types.js'
 
 /**
- * Buffered stdout for one in-flight command turn (between Enter and flush to scrollback).
+ * Buffered stdout for one in-flight command turn (between Enter and flush to past messages).
  * Mirrors {@link OutputAdapter} `log` / `logError` / `logUserNotice` semantics.
  */
 export type CommandTurnBuffer = {
   readonly lines: readonly string[]
-  readonly tone: ChatHistoryOutputTone
+  readonly tone: CliAssistantMessageTone
 }
 
 export function emptyCommandTurnBuffer(): CommandTurnBuffer {
@@ -47,36 +47,40 @@ export function commandTurnBufferAppendUserNotice(
   }
 }
 
-/** Append one output block to scrollback (Ink `Static` item; gate 2 — append-only). */
-export function scrollbackAppendOutput(
-  history: ChatHistory,
+/** Append one CLI assistant block as a past message (Ink `Static` item; append-only). */
+export function pastMessagesAppendCliAssistantBlock(
+  pastMessages: PastMessages,
   lines: readonly string[],
-  tone: ChatHistoryOutputTone = 'plain'
-): ChatHistory {
-  return [...history, { type: 'output', lines: [...lines], tone }]
+  tone: CliAssistantMessageTone = 'plain'
+): PastMessages {
+  return [...pastMessages, { role: 'cli-assistant', lines: [...lines], tone }]
 }
 
-/** Append one user input row to scrollback (masked content; adapter applies masking before call). */
-export function scrollbackCommitInputLine(
-  history: ChatHistory,
+/** Append one user line as a past message (masked content; adapter applies masking before call). */
+export function pastMessagesCommitUserLine(
+  pastMessages: PastMessages,
   content: string
-): ChatHistory {
-  return [...history, { type: 'input', content }]
+): PastMessages {
+  return [...pastMessages, { role: 'user', content }]
 }
 
 /**
- * If the turn buffer has lines, append them as one output entry and return an empty buffer.
- * Otherwise leave history and buffer unchanged.
+ * If the turn buffer has lines, append them as one CLI assistant past message and return an empty buffer.
+ * Otherwise leave past messages and buffer unchanged.
  */
-export function scrollbackFlushCommandTurnIfNonEmpty(
-  history: ChatHistory,
+export function pastMessagesFlushCommandTurnIfNonEmpty(
+  pastMessages: PastMessages,
   turn: CommandTurnBuffer
-): { history: ChatHistory; turn: CommandTurnBuffer } {
+): { pastMessages: PastMessages; turn: CommandTurnBuffer } {
   if (turn.lines.length === 0) {
-    return { history, turn }
+    return { pastMessages, turn }
   }
   return {
-    history: scrollbackAppendOutput(history, turn.lines, turn.tone),
+    pastMessages: pastMessagesAppendCliAssistantBlock(
+      pastMessages,
+      turn.lines,
+      turn.tone
+    ),
     turn: emptyCommandTurnBuffer(),
   }
 }

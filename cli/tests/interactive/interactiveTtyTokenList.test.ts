@@ -338,7 +338,7 @@ describe('TTY token list interactive mode', () => {
     const blanks = maxConsecutiveBlankLines(beforeResult)
     expect(
       blanks,
-      `Expected at most one empty simulated line before result (full redraw uses renderPastInput + optional gap). Got ${blanks}. Lines before result: ${JSON.stringify(beforeResult)}`
+      `Expected at most one empty simulated line before result (full redraw uses renderPastUserMessage + optional gap). Got ${blanks}. Lines before result: ${JSON.stringify(beforeResult)}`
     ).toBeLessThanOrEqual(1)
   })
 

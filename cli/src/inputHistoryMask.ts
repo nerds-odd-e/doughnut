@@ -1,5 +1,5 @@
 /**
- * Strings stored in interactive scrollback and ↑↓ command history must never
+ * Strings stored in past user messages and **user input history** must never
  * include raw secrets for `/add-access-token`.
  */
 
@@ -9,10 +9,10 @@ const ADD_ACCESS_TOKEN = '/add-access-token'
 const ADD_ACCESS_TOKEN_WITH_SECRET = /^\/add-access-token\s+(.+)$/i
 
 /**
- * Returns a display-safe copy of a committed input line for history and persistence.
+ * Returns a display-safe copy of a committed input line before it is stored in past user messages or user input history.
  * Unchanged lines are returned as-is (including original whitespace shape).
  */
-export function maskInteractiveInputForHistory(line: string): string {
+export function maskInteractiveInputLineForStorage(line: string): string {
   const segments = line.split('\n')
   let changed = false
   const out = segments.map((segment) => {

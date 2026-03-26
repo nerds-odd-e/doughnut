@@ -62,11 +62,12 @@ Then(
   'I should see {string} in the non-interactive output',
   (expected: string) => cli.nonInteractiveOutput().expectContains(expected)
 )
-Then('I should see {string} in the history output', (expected: string) =>
-  cli.historyOutput().expectContains(expected)
+Then(
+  'I should see {string} in past CLI assistant messages',
+  (expected: string) => cli.pastCliAssistantMessages().expectContains(expected)
 )
-Then('I should see {string} in the history input', (expected: string) =>
-  cli.historyInput().expectContains(expected)
+Then('I should see {string} in past user messages', (expected: string) =>
+  cli.pastUserMessages().expectContains(expected)
 )
 Then('I should see {string} in the Current guidance', (expected: string) =>
   cli.currentGuidance().expectContains(expected)

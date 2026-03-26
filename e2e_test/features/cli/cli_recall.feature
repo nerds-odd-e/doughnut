@@ -21,7 +21,7 @@ Feature: CLI recall status and recall session
       Given the note "sedition" was assimilated on day 1
       And It's day 2
       When I enter the slash command "/recall-status" in the interactive CLI
-      Then I should see "1 note to recall today" in the history output
+      Then I should see "1 note to recall today" in past CLI assistant messages
 
     @disableOpenAiService
     Scenario: Recall Just Review
@@ -33,7 +33,7 @@ Feature: CLI recall status and recall session
       And I should see "Put" styled in the Current guidance
       And I should see "Yes, I remember?" in the Current guidance
       When I enter "y" in the interactive CLI
-      Then I should see "Recalled successfully" in the history output
+      Then I should see "Recalled successfully" in past CLI assistant messages
 
     @disableOpenAiService
     Scenario: Recall session - complete all due notes, see summary, then load more from future days
@@ -45,11 +45,11 @@ Feature: CLI recall status and recall session
       When I answer "y" in the interactive CLI to prompt "Yes, I remember?"
       And I answer "y" in the interactive CLI to prompt "Yes, I remember?"
       And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
-      Then I should see "Recalled 2 notes" in the history output
+      Then I should see "Recalled 2 notes" in past CLI assistant messages
       When I enter the slash command "/recall" in the interactive CLI
       And I answer "y" in the interactive CLI to prompt "Load more from next 3 days?"
       When I answer "y" in the interactive CLI to prompt "Yes, I remember?"
-      Then I should see "Recalled successfully" in the history output
+      Then I should see "Recalled successfully" in past CLI assistant messages
 
     @usingMockedOpenAiService
     Scenario: Recall MCQ - choose correct answer and see success
@@ -62,8 +62,8 @@ Feature: CLI recall status and recall session
       Then I should see "What is the meaning of sedition?" in the Current guidance
       And I should see "to incite violence" in the Current guidance
       When I enter "1" in the interactive CLI
-      Then I should see "Correct!" in the history output
-      And I should see "Recalled successfully" in the history output
+      Then I should see "Correct!" in past CLI assistant messages
+      And I should see "Recalled successfully" in past CLI assistant messages
 
     @usingMockedOpenAiService
     Scenario: Recall MCQ - ESC cancels with y/n confirmation
@@ -77,7 +77,7 @@ Feature: CLI recall status and recall session
       When I enter the slash command "/stop" in the interactive CLI
       Then the recall session was stopped
       When I enter the slash command "/recall-status" in the interactive CLI
-      Then I should see "1 note to recall today" in the history output
+      Then I should see "1 note to recall today" in past CLI assistant messages
 
     @usingMockedOpenAiService
     Scenario: Recall MCQ - down arrow and Enter to select
@@ -87,8 +87,8 @@ Feature: CLI recall status and recall session
       And the note "sedition" was assimilated on day 1
       And It's day 2
       When I input down-arrow selection for "/recall" in the interactive CLI
-      Then I should see "Incorrect" in the history output
-      And I should see "Recalled successfully" in the history output
+      Then I should see "Incorrect" in past CLI assistant messages
+      And I should see "Recalled successfully" in past CLI assistant messages
 
     @usingMockedOpenAiService
     Scenario: Recall MCQ - contest and regenerate before answering
@@ -106,8 +106,8 @@ Feature: CLI recall status and recall session
       When I enter the slash command "/contest" in the interactive CLI
       Then I should see "What is the meaning of sedition?" in the Current guidance
       When I enter "1" in the interactive CLI
-      Then I should see "Correct!" in the history output
-      And I should see "Recalled successfully" in the history output
+      Then I should see "Correct!" in past CLI assistant messages
+      And I should see "Recalled successfully" in past CLI assistant messages
 
   Rule: Spelling recall needs remember spelling on sedition
 
@@ -126,5 +126,5 @@ Feature: CLI recall status and recall session
       When I enter "y" in the interactive CLI
       Then I should see "Spell:" in the Current guidance
       When I enter "sedition" in the interactive CLI
-      Then I should see "Correct!" in the history output
-      And I should see "Recalled successfully" in the history output
+      Then I should see "Correct!" in past CLI assistant messages
+      And I should see "Recalled successfully" in past CLI assistant messages

@@ -1,17 +1,20 @@
 import { Box, Newline, Static, Text } from 'ink'
 import type { ReactNode } from 'react'
-import type { ChatHistory, ChatHistoryEntry } from '../types.js'
-import { applyChatHistoryOutputTone, renderPastInput } from '../renderer.js'
+import type { PastMessage } from '../types.js'
+import {
+  applyCliAssistantMessageTone,
+  renderPastUserMessage,
+} from '../renderer.js'
 
-function HistoryBlock({
+function PastMessageBlock({
   entry,
   width,
 }: {
-  entry: ChatHistoryEntry
+  entry: PastMessage
   width: number
 }) {
-  if (entry.type === 'input') {
-    const raw = renderPastInput(entry.content, width)
+  if (entry.role === 'user') {
+    const raw = renderPastUserMessage(entry.content, width)
     const lines = raw.split('\n')
     while (lines.length > 0 && lines[lines.length - 1] === '') {
       lines.pop()
@@ -28,31 +31,31 @@ function HistoryBlock({
   return (
     <Box flexDirection="column">
       {entry.lines.map((line, i) => (
-        <Text key={i}>{applyChatHistoryOutputTone(line, tone)}</Text>
+        <Text key={i}>{applyCliAssistantMessageTone(line, tone)}</Text>
       ))}
     </Box>
   )
 }
 
 export type InteractiveShellDisplayProps = {
-  history: ChatHistory
+  pastMessages: PastMessage[]
   terminalWidth: number
   liveLeadingGap: boolean
   livePanel: ReactNode
 }
 
 export function InteractiveShellDisplay({
-  history,
+  pastMessages,
   terminalWidth,
   liveLeadingGap,
   livePanel,
 }: InteractiveShellDisplayProps) {
   return (
     <Box flexDirection="column">
-      <Static items={history} style={{ position: 'relative' }}>
+      <Static items={pastMessages} style={{ position: 'relative' }}>
         {(entry, index) => (
           <Box key={index} flexDirection="column">
-            <HistoryBlock entry={entry} width={terminalWidth} />
+            <PastMessageBlock entry={entry} width={terminalWidth} />
           </Box>
         )}
       </Static>

@@ -9,7 +9,7 @@ import {
 import { e2eAppBaseUrl } from '../../../support/e2eAppUrl'
 import {
   assertRecallSessionPromptOnSimulatedPtyScreen,
-  historyOutput,
+  pastCliAssistantMessages,
 } from './outputAssertions'
 
 const GOOGLE_MOCK_BASE_URL = 'http://localhost:5003'
@@ -123,7 +123,7 @@ function accessToken() {
           commandLine: `/add-access-token ${token}`,
         })
       )
-      historyOutput().expectContains('Token added')
+      pastCliAssistantMessages().expectContains('Token added')
     },
   }
 }

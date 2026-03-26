@@ -12,7 +12,7 @@ import {
   type TTYStdin,
 } from './interactiveTestHelpers.js'
 
-describe('TTY: input command history (↑↓)', () => {
+describe('TTY: user input history (↑↓)', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
   let stdin: TTYStdin
 

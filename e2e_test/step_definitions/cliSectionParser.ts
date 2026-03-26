@@ -1,7 +1,7 @@
 /**
  * Parses interactive CLI PTY stdout for E2E assertions.
  *
- * - **Chat history** (`getHistoryOutputContent`, `getHistoryInputContent`): domain “history output / input” steps.
+ * - **Past messages** (`getPastCliAssistantMessagesContent`, `getPastUserMessagesContent`): domain steps for CLI assistant vs user transcript.
  * - **Line-split merge** (`getRecallDisplaySections`): newline-based regions; can retain text after Ink clears the live grid (e.g. MCQ stem after `/stop`). Not the same as {@link ptyTranscriptSimulatedPlainScreen}.
  * - **Simulated screen** (`ptyTranscriptSimulatedPlainScreen`): cursor/erase replay → plain text ≈ user-visible cells.
  */
@@ -29,7 +29,7 @@ function stripAllAnsi(str: string): string {
 }
 
 // --- Line classification ---
-function isHistoryInputLine(line: string): boolean {
+function isPastUserMessageLine(line: string): boolean {
   return line.includes(HISTORY_INPUT_BG)
 }
 
@@ -73,7 +73,7 @@ function findLastInputBoxEnd(lines: string[]): number {
 
 // --- Section extraction ---
 type Boundaries = {
-  historyLines: string[]
+  pastTranscriptLines: string[]
   currentPromptLines: string[]
   currentGuidanceLines: string[]
 }
@@ -83,21 +83,21 @@ function parseCliOutput(output: string): Boundaries {
   const separatorIdx = findLastSeparatorIndex(lines)
   const boxStart = findLastInputBoxStart(lines)
   const boxEnd = findLastInputBoxEnd(lines)
-  const historyEnd = separatorIdx >= 0 ? separatorIdx : lines.length
-  const historyLines = lines.slice(0, historyEnd)
+  const pastEnd = separatorIdx >= 0 ? separatorIdx : lines.length
+  const pastTranscriptLines = lines.slice(0, pastEnd)
   const currentPromptLines =
     separatorIdx >= 0 ? lines.slice(separatorIdx + 1, boxStart) : []
   const currentGuidanceLines = boxEnd >= 0 ? lines.slice(boxEnd + 1) : []
   return {
-    historyLines,
+    pastTranscriptLines,
     currentPromptLines,
     currentGuidanceLines,
   }
 }
 
 type Section =
-  | 'history-input'
-  | 'history-output'
+  | 'past-user-messages'
+  | 'past-cli-assistant-messages'
   | 'current-prompt'
   | 'current-guidance'
 
@@ -106,7 +106,8 @@ function collectSectionLines(
   section: Section,
   strip: boolean
 ): string[] {
-  const { historyLines, currentPromptLines, currentGuidanceLines } = boundaries
+  const { pastTranscriptLines, currentPromptLines, currentGuidanceLines } =
+    boundaries
   const result: string[] = []
 
   if (section === 'current-guidance') {
@@ -119,18 +120,18 @@ function collectSectionLines(
     return result
   }
 
-  if (section === 'history-input') {
-    for (const line of historyLines) {
-      if (isHistoryInputLine(line)) {
+  if (section === 'past-user-messages') {
+    for (const line of pastTranscriptLines) {
+      if (isPastUserMessageLine(line)) {
         const content = strip ? stripAnsi(line) : line
         if (content.trim()) {
           result.push(content)
         }
       }
     }
-  } else if (section === 'history-output') {
-    for (const line of historyLines) {
-      if (!isHistoryInputLine(line)) {
+  } else if (section === 'past-cli-assistant-messages') {
+    for (const line of pastTranscriptLines) {
+      if (!isPastUserMessageLine(line)) {
         const content = strip ? stripAnsi(line) : line
         if (content.trim()) {
           result.push(content)
@@ -177,39 +178,39 @@ function getSectionContent(output: string, section: Section): string {
   return collectSectionLines(boundaries, section, true).join('\n')
 }
 
-export function getHistoryOutputContent(output: string): string {
-  return getSectionContent(output, 'history-output')
+export function getPastCliAssistantMessagesContent(output: string): string {
+  return getSectionContent(output, 'past-cli-assistant-messages')
 }
 
-export function getHistoryInputContent(output: string): string {
-  return getSectionContent(output, 'history-input')
+export function getPastUserMessagesContent(output: string): string {
+  return getSectionContent(output, 'past-user-messages')
 }
 
 function parseLiveRegion(
   output: string,
   stripAnsiForAssertions: boolean
-): { mergedTranscriptPlain: string; chatHistoryOutputPlain: string } {
+): { mergedTranscriptPlain: string; pastCliAssistantMessagesPlain: string } {
   const boundaries = parseCliOutput(output)
   const strip = stripAnsiForAssertions
-  const chatHistoryOutputPlain = collectSectionLines(
+  const pastCliAssistantMessagesPlain = collectSectionLines(
     boundaries,
-    'history-output',
+    'past-cli-assistant-messages',
     strip
   ).join('\n')
   const mergedTranscriptPlain = [
     collectSectionLines(boundaries, 'current-prompt', strip).join('\n'),
     collectSectionLines(boundaries, 'current-guidance', strip).join('\n'),
-    chatHistoryOutputPlain,
+    pastCliAssistantMessagesPlain,
   ]
     .join('\n')
     .trim()
-  return { mergedTranscriptPlain, chatHistoryOutputPlain }
+  return { mergedTranscriptPlain, pastCliAssistantMessagesPlain }
 }
 
 /** Line-split slices for recall edge cases (e.g. stem still in transcript after live UI cleared). */
 export type PtyRecallAssertionSlices = Readonly<{
   mergedTranscriptPlain: string
-  chatHistoryOutputPlain: string
+  pastCliAssistantMessagesPlain: string
 }>
 
 export function getRecallDisplaySections(
@@ -219,7 +220,7 @@ export function getRecallDisplaySections(
 }
 
 /**
- * Raw ANSI merge of prompt + guidance + history-output rows (styling checks).
+ * Raw ANSI merge of prompt + guidance + past CLI assistant message rows (styling checks).
  * PTY cursor replay drops SGR (`m`), so this is not interchangeable with {@link ptyTranscriptSimulatedPlainScreen}.
  */
 export function getRecallMergedTranscriptRaw(output: string): string {

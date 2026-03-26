@@ -33,7 +33,7 @@ describe('TTY exit', () => {
     endTTYSession(stdin)
   })
 
-  test('after Enter on exit, committed line appears as grey history input (same as other submits)', async () => {
+  test('after Enter on exit, committed line appears as grey past user message (same as other submits)', async () => {
     pushTTYCommandBytes(stdin, 'exit')
     await tick()
     writeSpy.mockClear()

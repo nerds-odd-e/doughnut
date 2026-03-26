@@ -114,7 +114,7 @@ Then('I should see {string} in the non-interactive output', (expected: string) =
 
 ### 4. CLI E2E and page objects
 
-CLI steps use `cli.xxx` page objects (in `e2e_test/start/pageObjects/cli/`), not `start.xxx`. Use `cli.nonInteractiveOutput()`, `cli.historyOutput()`, `cli.currentGuidance()`, etc., for output assertions; use `cli.interactive()`, `cli.installation()`, etc., for actions (Gmail: `@interactiveCLIGmail*` hooks + slash commands in `cli_gmail.feature`).
+CLI steps use `cli.xxx` page objects (in `e2e_test/start/pageObjects/cli/`), not `start.xxx`. Use `cli.nonInteractiveOutput()`, `cli.pastCliAssistantMessages()`, `cli.pastUserMessages()`, `cli.currentGuidance()`, etc., for output assertions; use `cli.interactive()`, `cli.installation()`, etc., for actions (Gmail: `@interactiveCLIGmail*` hooks + slash commands in `cli_gmail.feature`).
 
 ### 5. Test Data Management
 

@@ -44,24 +44,26 @@ export type PendingRecallAnswer =
   | SpellingRecallPending
   | null
 
-/** User-submitted input in the prompt (what they typed). */
-export type ChatHistoryInputEntry = { type: 'input'; content: string }
-
 /**
- * TTY scrollback styling for one command’s output block.
+ * Styling for one **past CLI assistant message** block (Ink `Static` item).
  * `userNotice` = user cancelled a wait or left a picker — not an application failure.
  */
-export type ChatHistoryOutputTone = 'plain' | 'error' | 'userNotice'
+export type CliAssistantMessageTone = 'plain' | 'error' | 'userNotice'
 
-/** Command output lines (what was displayed in response). */
-export type ChatHistoryOutputEntry = {
-  type: 'output'
+/** One **past user message** in the transcript (what they typed; masked before append when required). */
+export type PastUserMessage = { role: 'user'; content: string }
+
+/** One **past CLI assistant message** in the transcript (command output lines). */
+export type PastCliAssistantMessage = {
+  role: 'cli-assistant'
   lines: readonly string[]
-  tone?: ChatHistoryOutputTone
+  tone?: CliAssistantMessageTone
 }
-export type ChatHistoryEntry = ChatHistoryInputEntry | ChatHistoryOutputEntry
-/** Ordered log of user inputs and command outputs (Ink `Static` history; append-only via `shell/scrollbackModel.ts`). */
-export type ChatHistory = ChatHistoryEntry[]
+
+export type PastMessage = PastUserMessage | PastCliAssistantMessage
+
+/** Ordered transcript (Ink `Static` items; append-only via `shell/pastMessagesModel.ts`). */
+export type PastMessages = PastMessage[]
 
 /** Slash-command token-picker modes for `/list-access-token` and related TTY flows. */
 export type AccessTokenPickerAction =
@@ -82,7 +84,7 @@ export interface AccessTokenPickerCommandConfig {
 export type OutputAdapter = {
   log: (msg: string) => void
   logError: (err: unknown) => void
-  /** Optional: user-facing notice (e.g. cancelled wait); TTY paints as distinct scrollback tone. */
+  /** Optional: user-facing notice (e.g. cancelled wait); TTY paints as distinct tone on CLI assistant messages. */
   logUserNotice?: (msg: string) => void
   /**
    * Optional: short prompts (e.g. "Please answer y or n"). For non-TTY MCQ recall, notebook line then stem

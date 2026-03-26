@@ -18,12 +18,12 @@ import {
   getInteractiveFetchWaitLine,
   runInteractiveFetchWait,
 } from '../interactiveFetchWait.js'
-import { saveCliCommandHistory } from '../cliCommandHistoryFile.js'
+import { saveUserInputHistory } from '../userInputHistoryFile.js'
 import { getConfigDir } from '../configDir.js'
-import { maskInteractiveInputForHistory } from '../inputHistoryMask.js'
+import { maskInteractiveInputLineForStorage } from '../inputHistoryMask.js'
 import {
   afterBareSlashEscape,
-  appendCommittedCommand,
+  appendUserInputHistoryLine,
   clearLiveCommandLine,
   deleteBeforeCaret,
   insertIntoDraft,
@@ -46,10 +46,10 @@ import {
   commandTurnBufferAppendLog,
   commandTurnBufferAppendUserNotice,
   emptyCommandTurnBuffer,
-  scrollbackAppendOutput,
-  scrollbackCommitInputLine,
-  scrollbackFlushCommandTurnIfNonEmpty,
-} from '../shell/scrollbackModel.js'
+  pastMessagesAppendCliAssistantBlock,
+  pastMessagesCommitUserLine,
+  pastMessagesFlushCommandTurnIfNonEmpty,
+} from '../shell/pastMessagesModel.js'
 import {
   applyShellSessionPatch,
   createInitialShellSessionState,
@@ -58,7 +58,7 @@ import {
 import type { AccessTokenEntry } from '../accessToken.js'
 import type {
   AccessTokenPickerAction,
-  ChatHistoryOutputTone,
+  CliAssistantMessageTone,
   OutputAdapter,
 } from '../types.js'
 import { hasInteractiveSlashCompletions } from '../slashCompletion.js'
@@ -243,26 +243,30 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
       ...s,
       commandInput: {
         ...s.commandInput,
-        committedCommands: appendCommittedCommand(
-          s.commandInput.committedCommands,
-          maskInteractiveInputForHistory(raw)
+        userInputHistoryLines: appendUserInputHistoryLine(
+          s.commandInput.userInputHistoryLines,
+          maskInteractiveInputLineForStorage(raw)
         ),
       },
     }))
-    saveCliCommandHistory(
+    saveUserInputHistory(
       getConfigDir(),
-      session.commandInput.committedCommands
+      session.commandInput.userInputHistoryLines
     )
   }
 
   function commitHistoryOutput(
     lines: readonly string[],
-    tone: ChatHistoryOutputTone = 'plain',
+    tone: CliAssistantMessageTone = 'plain',
     options?: { skipDrawBox?: boolean }
   ): void {
     patch((s) => ({
       ...s,
-      chatHistory: scrollbackAppendOutput(s.chatHistory, lines, tone),
+      pastMessages: pastMessagesAppendCliAssistantBlock(
+        s.pastMessages,
+        lines,
+        tone
+      ),
     }))
     if (!options?.skipDrawBox) {
       drawBox()
@@ -271,13 +275,17 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
 
   function commitTokenListResult(
     message: string,
-    tone: ChatHistoryOutputTone = 'plain'
+    tone: CliAssistantMessageTone = 'plain'
   ) {
     patch((s) => ({
       ...s,
       tokenSelection: null,
       commandInput: clearLiveCommandLine(s.commandInput),
-      chatHistory: scrollbackAppendOutput(s.chatHistory, [message], tone),
+      pastMessages: pastMessagesAppendCliAssistantBlock(
+        s.pastMessages,
+        [message],
+        tone
+      ),
     }))
     drawBox()
   }
@@ -308,38 +316,38 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
     patch((s) => ({ ...s, commandTurn: emptyCommandTurnBuffer() }))
   }
 
-  function flushCommandTurnToScrollbackBeforeFetchWait(): void {
+  function flushCommandTurnToPastMessagesBeforeFetchWait(): void {
     if (session.commandTurn.lines.length === 0) return
-    const flushed = scrollbackFlushCommandTurnIfNonEmpty(
-      session.chatHistory,
+    const flushed = pastMessagesFlushCommandTurnIfNonEmpty(
+      session.pastMessages,
       session.commandTurn
     )
     patch((s) => ({
       ...s,
-      chatHistory: flushed.history,
+      pastMessages: flushed.pastMessages,
       commandTurn: flushed.turn,
     }))
     drawBox()
   }
 
-  function commitExitTurnToScrollback(): void {
+  function commitExitTurnToPastMessages(): void {
     patch((s) => ({
       ...s,
-      chatHistory: scrollbackAppendOutput(
-        s.chatHistory,
+      pastMessages: pastMessagesAppendCliAssistantBlock(
+        s.pastMessages,
         s.commandTurn.lines,
         s.commandTurn.tone
       ),
     }))
-    const ch = session.chatHistory
+    const ch = session.pastMessages
     const last = ch[ch.length - 1]
     const prev = ch[ch.length - 2]
-    if (!last || last.type !== 'output') return
+    if (!last || last.role !== 'cli-assistant') return
     const width = getTerminalWidth()
     const outTone = last.tone ?? 'plain'
     interactiveTtyStdout.exitFarewellBlock({
       width,
-      previousInputContent: prev?.type === 'input' ? prev.content : undefined,
+      previousInputContent: prev?.role === 'user' ? prev.content : undefined,
       outputLines: last.lines,
       tone: outTone,
     })
@@ -400,7 +408,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
     onInteractiveFetchWaitChanged: () => {
       const activeWaitPrompt = getInteractiveFetchWaitLine()
       if (activeWaitPrompt) {
-        flushCommandTurnToScrollbackBeforeFetchWait()
+        flushCommandTurnToPastMessagesBeforeFetchWait()
         drawBox()
       } else {
         resetLiveLineDraftAndSlashSuggestions()
@@ -477,15 +485,15 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
           if (!usesSessionYesNoInputChrome(!!session.tokenSelection)) {
             patch((s) => ({
               ...s,
-              chatHistory: scrollbackCommitInputLine(
-                s.chatHistory,
-                maskInteractiveInputForHistory(effectiveLine)
+              pastMessages: pastMessagesCommitUserLine(
+                s.pastMessages,
+                maskInteractiveInputLineForStorage(effectiveLine)
               ),
             }))
             rememberCommittedLine(effectiveLine)
           }
           if (await processInput(effectiveLine, ttyOutput, true)) {
-            commitExitTurnToScrollback()
+            commitExitTurnToPastMessages()
             doExit()
             return
           }
@@ -541,16 +549,16 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
           commandInput: clearLiveCommandLine(s.commandInput),
           numberedChoiceHighlightIndex: 0,
           commandTurn: emptyCommandTurnBuffer(),
-          chatHistory: scrollbackCommitInputLine(
-            s.chatHistory,
-            maskInteractiveInputForHistory(inputForHistory)
+          pastMessages: pastMessagesCommitUserLine(
+            s.pastMessages,
+            maskInteractiveInputLineForStorage(inputForHistory)
           ),
         }))
         if (isCommittedInteractiveInput(inputForHistory)) {
           rememberCommittedLine(inputForHistory)
         }
         if (await processInput(effectiveInput, ttyOutput, true)) {
-          commitExitTurnToScrollback()
+          commitExitTurnToPastMessages()
           doExit()
           return
         }
@@ -620,7 +628,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
           session.tokenSelection.items[listDispatch.index]!.label
         const action = session.tokenSelection.action
         let message = ''
-        let tone: ChatHistoryOutputTone = 'plain'
+        let tone: CliAssistantMessageTone = 'plain'
         if (action === 'set-default') {
           setDefaultTokenLabel(selectedLabel)
           message = `Default token set to: ${selectedLabel}`
@@ -711,9 +719,9 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
         if (tokens.length === 0) {
           patch((s) => ({
             ...s,
-            chatHistory: scrollbackCommitInputLine(
-              s.chatHistory,
-              maskInteractiveInputForHistory(trimmedInput)
+            pastMessages: pastMessagesCommitUserLine(
+              s.pastMessages,
+              maskInteractiveInputLineForStorage(trimmedInput)
             ),
           }))
           rememberCommittedLine(trimmedInput)
@@ -723,9 +731,9 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
         if (isCommittedInteractiveInput(inputLine)) {
           patch((s) => ({
             ...s,
-            chatHistory: scrollbackCommitInputLine(
-              s.chatHistory,
-              maskInteractiveInputForHistory(inputLine)
+            pastMessages: pastMessagesCommitUserLine(
+              s.pastMessages,
+              maskInteractiveInputLineForStorage(inputLine)
             ),
           }))
         }
@@ -740,15 +748,15 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
         if (!usesSessionYesNoInputChrome(!!session.tokenSelection)) {
           patch((s) => ({
             ...s,
-            chatHistory: scrollbackCommitInputLine(
-              s.chatHistory,
-              maskInteractiveInputForHistory(inputLine)
+            pastMessages: pastMessagesCommitUserLine(
+              s.pastMessages,
+              maskInteractiveInputLineForStorage(inputLine)
             ),
           }))
           rememberCommittedLine(inputLine)
         }
         if (await processInput(inputLine, ttyOutput, true)) {
-          commitExitTurnToScrollback()
+          commitExitTurnToPastMessages()
           doExit()
           return
         }

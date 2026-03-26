@@ -2,14 +2,14 @@
  * Cucumber assertions on `@doughnutOutput`.
  *
  * - **Non-interactive**: one-shot CLI (no input-ready OSC).
- * - **Chat history**: parsed scrollback — domain steps “history output / input”.
+ * - **Past messages**: parsed transcript — domain steps “past CLI assistant messages” / “past user messages”.
  * - **Simulated PTY screen**: cursor/erase replay — “user-visible” plain text.
  * - **Recall /stop (MCQ)**: line-split merge can still hold the stem after Ink cleared the live grid.
  */
 import {
   countInputBoxTopBorderLinesInInteractivePtyTranscript,
-  getHistoryInputContent,
-  getHistoryOutputContent,
+  getPastUserMessagesContent,
+  getPastCliAssistantMessagesContent,
   getRecallDisplaySections,
   getRecallMergedTranscriptRaw,
   ptyTranscriptSimulatedPlainScreen,
@@ -20,8 +20,8 @@ export const OUTPUT_ALIAS = '@doughnutOutput'
 
 const SECTION = {
   nonInteractive: 'non-interactive output',
-  historyOutput: 'history output',
-  historyInput: 'history input',
+  pastCliAssistantMessages: 'past CLI assistant messages',
+  pastUserMessages: 'past user messages',
   currentGuidance: 'Current guidance',
   simulatedVisiblePtyScreen: 'simulated visible PTY screen',
   recallStopAssertion: 'interactive CLI transcript (recall /stop)',
@@ -34,7 +34,7 @@ const SIMULATED_SCREEN_TAIL_LEN = 1200
 
 const WRONG_NON_INTERACTIVE_STEP =
   'This capture includes the PTY-only “input ready” OSC (real TTY session). ' +
-  'Use: Then I should see "…" in the history output — or Current guidance / history input — not non-interactive output.'
+  'Use: Then I should see "…" in past CLI assistant messages — or Current guidance / past user messages — not non-interactive output.'
 
 const wrongPtyInteractiveStep = (
   section: SectionLabel | 'interactive CLI input box'
@@ -120,15 +120,15 @@ function nonInteractiveOutput() {
   }
 }
 
-function historyOutput() {
-  const target = SECTION.historyOutput
+function pastCliAssistantMessages() {
+  const target = SECTION.pastCliAssistantMessages
   return {
     expectContains(expected: string) {
       withStdoutFor(
         { kind: 'ptyInteractive', assertionTarget: target },
         (stdout) =>
           expectSectionContainsSubstring(
-            getHistoryOutputContent(stdout),
+            getPastCliAssistantMessagesContent(stdout),
             expected,
             target
           )
@@ -137,15 +137,15 @@ function historyOutput() {
   }
 }
 
-function historyInput() {
-  const target = SECTION.historyInput
+function pastUserMessages() {
+  const target = SECTION.pastUserMessages
   return {
     expectContains(expected: string) {
       withStdoutFor(
         { kind: 'ptyInteractive', assertionTarget: target },
         (stdout) =>
           expectSectionContainsSubstring(
-            getHistoryInputContent(stdout),
+            getPastUserMessagesContent(stdout),
             expected,
             target
           )
@@ -189,20 +189,20 @@ function currentGuidance() {
   }
 }
 
-/** Recall session y/n: prompt must appear on simulated PTY screen (not only in line-split merge / scrollback ghosts). */
+/** Recall session y/n: prompt must appear on simulated PTY screen (not only in line-split merge / Ink repaint ghosts). */
 function assertRecallSessionPromptOnSimulatedPtyScreen(
   expectedPromptSubstring: string
 ): void {
   expectInteractivePtySimulatedScreenContains({
     assertionTarget: SECTION.simulatedVisiblePtyScreen,
     needle: expectedPromptSubstring,
-    whenMissing: `If this fails but other substring checks passed, the text may exist only in scrollback while Ink repainted the live region — use RecallInkConfirmPanel guidanceLines (ShellSessionRoot in-session), not only grey writeCurrentPrompt.`,
+    whenMissing: `If this fails but other substring checks passed, the text may exist only in the past-messages region while Ink repainted the live region — use RecallInkConfirmPanel guidanceLines (ShellSessionRoot in-session), not only grey writeCurrentPrompt.`,
   })
 }
 
 function recallSession() {
   return {
-    /** MCQ stem may be gone from simulated screen after /stop; line-split merge + chat history still hold it. */
+    /** MCQ stem may be gone from simulated screen after /stop; line-split merge + past CLI assistant messages still hold it. */
     expectStopped() {
       withStdoutFor(
         {
@@ -210,12 +210,12 @@ function recallSession() {
           assertionTarget: SECTION.recallStopAssertion,
         },
         (stdout) => {
-          const { mergedTranscriptPlain, chatHistoryOutputPlain } =
+          const { mergedTranscriptPlain, pastCliAssistantMessagesPlain } =
             getRecallDisplaySections(stdout)
           expect(mergedTranscriptPlain).to.include(
             'What is the meaning of sedition?'
           )
-          expect(chatHistoryOutputPlain).to.include('Stopped recall')
+          expect(pastCliAssistantMessagesPlain).to.include('Stopped recall')
         }
       )
     },
@@ -245,8 +245,8 @@ function inputBoxTopBorder() {
 
 export {
   nonInteractiveOutput,
-  historyOutput,
-  historyInput,
+  pastCliAssistantMessages,
+  pastUserMessages,
   currentGuidance,
   recallSession,
   assertRecallSessionPromptOnSimulatedPtyScreen,

@@ -112,7 +112,7 @@ describe('recall MCQ on TTY: Ink numbered-choice list render', () => {
     pushTTYCommandKey(stdin, 'down')
     await tick()
     const raw = ttyOutput(writeSpy)
-    // /recall history entry appears in raw output (rendered as grey history input)
+    // /recall user line appears in raw output (rendered as grey past user message)
     expect(raw).toContain('/recall')
     // MCQ Ink display renders → and choices after the history
     assertMcqRenderedWithPrompt(raw)

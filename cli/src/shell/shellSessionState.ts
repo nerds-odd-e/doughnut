@@ -5,13 +5,13 @@ import {
   singleLineCommandDraft,
   type InteractiveCommandInput,
 } from '../interactiveCommandInput.js'
-import { loadCliCommandHistory } from '../cliCommandHistoryFile.js'
+import { loadUserInputHistory } from '../userInputHistoryFile.js'
 import { getConfigDir } from '../configDir.js'
 import {
   emptyCommandTurnBuffer,
   type CommandTurnBuffer,
-} from './scrollbackModel.js'
-import type { ChatHistory } from '../types.js'
+} from './pastMessagesModel.js'
+import type { PastMessages } from '../types.js'
 
 export type TokenSelectionState = {
   items: AccessTokenEntry[]
@@ -21,7 +21,7 @@ export type TokenSelectionState = {
 }
 
 export type ShellSessionState = {
-  chatHistory: ChatHistory
+  pastMessages: PastMessages
   commandInput: InteractiveCommandInput
   highlightIndex: number
   suggestionsDismissed: boolean
@@ -41,10 +41,10 @@ export function applyShellSessionPatch(
 
 export function createInitialShellSessionState(): ShellSessionState {
   return {
-    chatHistory: [],
+    pastMessages: [],
     commandInput: {
       ...emptyInteractiveCommandInput(),
-      committedCommands: loadCliCommandHistory(getConfigDir())
+      userInputHistoryLines: loadUserInputHistory(getConfigDir())
         .map((s) => singleLineCommandDraft(s).trim())
         .filter((s) => s.length > 0),
     },

@@ -397,7 +397,7 @@ describe('TTY: shared interactive session', () => {
       expect(stripAnsi(output)).toContain('List available commands')
     })
 
-    test('after /help, there is one empty line between history output and command line', async () => {
+    test('after /help, there is one empty line between past CLI assistant messages and command line', async () => {
       writeSpy.mockClear()
       await submitTTYCommand(stdin, '/help')
 
@@ -523,7 +523,7 @@ describe('TTY: shared interactive session', () => {
         redrawBaseline.split(GREY_BG_PAST_INPUT).length - 1
       expect(
         baselineMatches,
-        'baseline resize should not use GREY_BG (only renderPastInput uses this code)'
+        'baseline resize should not use GREY_BG (only renderPastUserMessage uses this code)'
       ).toBe(0)
 
       writeSpy.mockClear()

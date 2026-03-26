@@ -1,10 +1,10 @@
 /**
  * TTY **command line** state: single-line {@link InteractiveCommandInput.lineDraft}, caret,
- * and in-memory ↑↓ recall of prior commits (newest first). Newlines from paste collapse to spaces.
+ * and in-memory ↑↓ recall of **user input history** (newest first). Newlines from paste collapse to spaces.
  */
 
-/** Cap on recalled lines; same order as chat commits, trimmed non-empty only. */
-export const MAX_COMMITTED_COMMANDS = 100
+/** Cap on recalled lines; same order as commits, trimmed non-empty only. */
+export const MAX_USER_INPUT_HISTORY_LINES = 100
 
 /** Collapse CR/LF to spaces so the draft stays one logical line. */
 export function singleLineCommandDraft(s: string): string {
@@ -16,45 +16,49 @@ export type InteractiveCommandInput = {
   /** UTF-16 code unit offset into `lineDraft` (matches JS string indexing). */
   caretOffset: number
   /** Newest commit at `[0]`; entries are trimmed single lines. */
-  committedCommands: string[]
+  userInputHistoryLines: string[]
   /**
-   * `null` = editing the live draft. Otherwise index into `committedCommands`
+   * `null` = editing the live draft. Otherwise index into `userInputHistoryLines`
    * (`0` = most recent commit, larger = older).
    */
-  historyWalkIndex: number | null
+  userInputHistoryWalkIndex: number | null
   /**
-   * When {@link historyWalkIndex} became non-null, a copy of the live `lineDraft`;
+   * When {@link userInputHistoryWalkIndex} became non-null, a copy of the live `lineDraft`;
    * restored when walking forward past the newest commit.
    */
-  lineDraftBeforeHistoryWalk: string | null
+  lineDraftBeforeUserInputHistoryWalk: string | null
 }
 
 export function emptyInteractiveCommandInput(): InteractiveCommandInput {
   return {
     lineDraft: '',
     caretOffset: 0,
-    committedCommands: [],
-    historyWalkIndex: null,
-    lineDraftBeforeHistoryWalk: null,
+    userInputHistoryLines: [],
+    userInputHistoryWalkIndex: null,
+    lineDraftBeforeUserInputHistoryWalk: null,
   }
 }
 
-export function appendCommittedCommand(
-  committedCommands: string[],
+export function appendUserInputHistoryLine(
+  lines: string[],
   rawLine: string
 ): string[] {
   const trimmed = singleLineCommandDraft(rawLine).trim()
-  if (trimmed.length === 0) return committedCommands
-  const next = [trimmed, ...committedCommands]
-  if (next.length > MAX_COMMITTED_COMMANDS) next.length = MAX_COMMITTED_COMMANDS
+  if (trimmed.length === 0) return lines
+  const next = [trimmed, ...lines]
+  if (next.length > MAX_USER_INPUT_HISTORY_LINES)
+    next.length = MAX_USER_INPUT_HISTORY_LINES
   return next
 }
 
-function endHistoryWalk(): Pick<
+function endUserInputHistoryWalk(): Pick<
   InteractiveCommandInput,
-  'historyWalkIndex' | 'lineDraftBeforeHistoryWalk'
+  'userInputHistoryWalkIndex' | 'lineDraftBeforeUserInputHistoryWalk'
 > {
-  return { historyWalkIndex: null, lineDraftBeforeHistoryWalk: null }
+  return {
+    userInputHistoryWalkIndex: null,
+    lineDraftBeforeUserInputHistoryWalk: null,
+  }
 }
 
 function recalledDraftWithSlashPickerSuppressed(
@@ -82,20 +86,20 @@ function draftAfterBareSlashEscape(lineDraft: string): string {
   return one === '/' ? '' : one
 }
 
-/** User dismissed a lone `/` on Esc: clear draft, end history walk, caret at end. */
+/** User dismissed a lone `/` on Esc: clear draft, end user input history walk, caret at end. */
 export function afterBareSlashEscape(
   state: InteractiveCommandInput
 ): InteractiveCommandInput {
   const lineDraft = draftAfterBareSlashEscape(state.lineDraft)
   return {
     ...state,
-    ...endHistoryWalk(),
+    ...endUserInputHistoryWalk(),
     lineDraft,
     caretOffset: lineDraft.length,
   }
 }
 
-/** Replace the whole live draft (tab complete, slash pick); ends history walk. */
+/** Replace the whole live draft (tab complete, slash pick); ends user input history walk. */
 export function replaceLiveCommandDraft(
   state: InteractiveCommandInput,
   newDraft: string
@@ -103,7 +107,7 @@ export function replaceLiveCommandDraft(
   const lineDraft = singleLineCommandDraft(newDraft)
   return {
     ...state,
-    ...endHistoryWalk(),
+    ...endUserInputHistoryWalk(),
     lineDraft,
     caretOffset: lineDraft.length,
   }
@@ -116,25 +120,25 @@ export function clearLiveCommandLine(
     ...state,
     lineDraft: '',
     caretOffset: 0,
-    ...endHistoryWalk(),
+    ...endUserInputHistoryWalk(),
   }
 }
 
 /**
- * Whether ↑/↓ should move the slash suggestion highlight instead of draft history / caret.
- * Only while editing the live draft (`historyWalkIndex === null`). First ↑ goes home, first ↓ end.
+ * Whether ↑/↓ should move the slash suggestion highlight instead of user input history / caret.
+ * Only while editing the live draft (`userInputHistoryWalkIndex === null`). First ↑ goes home, first ↓ end.
  */
 export function ttyArrowKeyUsesSlashSuggestionCycle(
   key: 'up' | 'down',
   state: Pick<
     InteractiveCommandInput,
-    'historyWalkIndex' | 'caretOffset' | 'lineDraft'
+    'userInputHistoryWalkIndex' | 'caretOffset' | 'lineDraft'
   >,
   suggestionsDismissed: boolean,
   slashCompletionListVisible: boolean
 ): boolean {
   if (suggestionsDismissed || !slashCompletionListVisible) return false
-  if (state.historyWalkIndex !== null) return false
+  if (state.userInputHistoryWalkIndex !== null) return false
   if (key === 'up') return state.caretOffset === 0
   return state.caretOffset === state.lineDraft.length
 }
@@ -143,17 +147,22 @@ export function onArrowUp(
   state: InteractiveCommandInput,
   slashPickerWouldApplyForDraft: (draft: string) => boolean = () => false
 ): InteractiveCommandInput {
-  const { lineDraft, caretOffset, committedCommands, historyWalkIndex } = state
-  if (historyWalkIndex !== null) {
-    const nextIdx = historyWalkIndex + 1
-    if (nextIdx >= committedCommands.length) return state
+  const {
+    lineDraft,
+    caretOffset,
+    userInputHistoryLines,
+    userInputHistoryWalkIndex,
+  } = state
+  if (userInputHistoryWalkIndex !== null) {
+    const nextIdx = userInputHistoryWalkIndex + 1
+    if (nextIdx >= userInputHistoryLines.length) return state
     const line = recalledLineForCommandBox(
-      committedCommands[nextIdx]!,
+      userInputHistoryLines[nextIdx]!,
       slashPickerWouldApplyForDraft
     )
     return {
       ...state,
-      historyWalkIndex: nextIdx,
+      userInputHistoryWalkIndex: nextIdx,
       lineDraft: line,
       caretOffset: 0,
     }
@@ -161,15 +170,15 @@ export function onArrowUp(
   if (caretOffset > 0) {
     return { ...state, caretOffset: 0 }
   }
-  if (committedCommands.length === 0) return state
+  if (userInputHistoryLines.length === 0) return state
   const line = recalledLineForCommandBox(
-    committedCommands[0]!,
+    userInputHistoryLines[0]!,
     slashPickerWouldApplyForDraft
   )
   return {
     ...state,
-    lineDraftBeforeHistoryWalk: lineDraft,
-    historyWalkIndex: 0,
+    lineDraftBeforeUserInputHistoryWalk: lineDraft,
+    userInputHistoryWalkIndex: 0,
     lineDraft: line,
     caretOffset: 0,
   }
@@ -182,28 +191,28 @@ export function onArrowDown(
   const {
     lineDraft,
     caretOffset,
-    committedCommands,
-    historyWalkIndex,
-    lineDraftBeforeHistoryWalk,
+    userInputHistoryLines,
+    userInputHistoryWalkIndex,
+    lineDraftBeforeUserInputHistoryWalk,
   } = state
-  if (historyWalkIndex !== null) {
-    if (historyWalkIndex > 0) {
-      const nextIdx = historyWalkIndex - 1
+  if (userInputHistoryWalkIndex !== null) {
+    if (userInputHistoryWalkIndex > 0) {
+      const nextIdx = userInputHistoryWalkIndex - 1
       const line = recalledLineForCommandBox(
-        committedCommands[nextIdx]!,
+        userInputHistoryLines[nextIdx]!,
         slashPickerWouldApplyForDraft
       )
       return {
         ...state,
-        historyWalkIndex: nextIdx,
+        userInputHistoryWalkIndex: nextIdx,
         lineDraft: line,
         caretOffset: line.length,
       }
     }
-    const restored = lineDraftBeforeHistoryWalk ?? ''
+    const restored = lineDraftBeforeUserInputHistoryWalk ?? ''
     return {
       ...state,
-      ...endHistoryWalk(),
+      ...endUserInputHistoryWalk(),
       lineDraft: restored,
       caretOffset: restored.length,
     }
@@ -217,9 +226,9 @@ export function onArrowDown(
 function stateForTypingEdit(
   state: InteractiveCommandInput
 ): InteractiveCommandInput {
-  return state.historyWalkIndex === null
+  return state.userInputHistoryWalkIndex === null
     ? state
-    : { ...state, ...endHistoryWalk() }
+    : { ...state, ...endUserInputHistoryWalk() }
 }
 
 export function insertIntoDraft(

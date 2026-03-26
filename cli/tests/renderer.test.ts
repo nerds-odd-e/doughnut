@@ -5,7 +5,7 @@ import {
   interactiveInputReadyOscSuffix,
   truncateToWidth,
   isCommittedInteractiveInput,
-  applyChatHistoryOutputTone,
+  applyCliAssistantMessageTone,
   stripAnsi,
   stripAnsiCsiAndCr,
   needsGapBeforeLiveRegion,
@@ -136,21 +136,21 @@ describe('stripAnsiCsiAndCr', () => {
 })
 
 describe('needsGapBeforeLiveRegion', () => {
-  test('returns true only when history is non-empty and no current prompt', () => {
+  test('returns true only when past messages are non-empty and no current prompt', () => {
     expect(needsGapBeforeLiveRegion([], [], [])).toBe(false)
     expect(needsGapBeforeLiveRegion([], ['line'], [])).toBe(false)
     expect(
-      needsGapBeforeLiveRegion([{ type: 'input', content: 'x' }], [], [])
+      needsGapBeforeLiveRegion([{ role: 'user', content: 'x' }], [], [])
     ).toBe(true)
     expect(
-      needsGapBeforeLiveRegion([{ type: 'input', content: 'x' }], ['line'], [])
+      needsGapBeforeLiveRegion([{ role: 'user', content: 'x' }], ['line'], [])
     ).toBe(false)
   })
 
   test('false when Current Stage Indicator is present but wrapped prompt is empty', () => {
     expect(
       needsGapBeforeLiveRegion(
-        [{ type: 'input', content: 'x' }],
+        [{ role: 'user', content: 'x' }],
         [],
         [interactiveFetchWaitStageIndicatorLine('Loading')]
       )
@@ -251,22 +251,22 @@ describe('Current Stage Indicator (band lines for Ink)', () => {
   })
 })
 
-describe('applyChatHistoryOutputTone', () => {
+describe('applyCliAssistantMessageTone', () => {
   test('plain leaves text unchanged', () => {
-    expect(applyChatHistoryOutputTone('ok', 'plain')).toBe('ok')
+    expect(applyCliAssistantMessageTone('ok', 'plain')).toBe('ok')
   })
 
   test('error uses red', () => {
-    expect(applyChatHistoryOutputTone('Network down', 'error')).toContain(
+    expect(applyCliAssistantMessageTone('Network down', 'error')).toContain(
       'Network down'
     )
-    expect(applyChatHistoryOutputTone('Network down', 'error')).toContain(
+    expect(applyCliAssistantMessageTone('Network down', 'error')).toContain(
       '\x1b[31m'
     )
   })
 
   test('userNotice uses grey italic', () => {
-    const line = applyChatHistoryOutputTone('Cancelled.', 'userNotice')
+    const line = applyCliAssistantMessageTone('Cancelled.', 'userNotice')
     expect(line).toContain('Cancelled.')
     expect(line).toContain('\x1b[90m')
     expect(line).toContain('\x1b[3m')
