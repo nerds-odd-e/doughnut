@@ -33,6 +33,7 @@ function firstRowIndexContainingPlain(
 import {
   endTTYSession,
   makeTempConfigDir,
+  pressKey,
   pushTTYCommandBytes,
   pushTTYCommandEnter,
   pushTTYCommandEscape,
@@ -296,6 +297,18 @@ describe('TTY token list interactive mode', () => {
     const remaining = listAccessTokens()
     expect(remaining).toHaveLength(3)
     expect(remaining.map((t) => t.label)).toContain('Alpha')
+  })
+
+  test('readline-only ESC does not cancel token list selection mode', async () => {
+    await submitTTYCommand(stdin, '/remove-access-token')
+    writeSpy.mockClear()
+
+    pressKey(stdin, 'escape')
+    await tick()
+
+    const output = ttyOutput(writeSpy)
+    expect(output).not.toContain('Cancelled by user.')
+    expect(output).toBe('')
   })
 
   test.each([

@@ -14,6 +14,7 @@ import { INTERACTIVE_INPUT_READY_OSC, stripAnsi } from '../../src/renderer.js'
 import {
   endTTYSession,
   expectTtyRecallYesNoReplyScrollback,
+  pressKey,
   pushTTYCommandBytes,
   pushTTYCommandEnter,
   pushTTYCommandEscape,
@@ -196,6 +197,18 @@ describe('TTY recall MCQ', () => {
       const output = ttyOutput(writeSpy)
       expect(output).toContain('  1. 4')
       expect(output).toContain('  2. 3')
+    })
+
+    test('readline-only ESC does not open stop confirmation in MCQ mode', async () => {
+      await submitTTYCommand(stdin, '/recall')
+      writeSpy.mockClear()
+
+      pressKey(stdin, 'escape')
+      await tick()
+
+      const output = stripAnsi(ttyOutput(writeSpy))
+      expect(output).not.toContain('Stop recall? (y/n)')
+      expect(output).toBe('')
     })
 
     test('ESC on stop sheet returns to MCQ without stop sheet repainting after the question', async () => {
