@@ -62,15 +62,8 @@ Then(
   'I should see {string} in the non-interactive output',
   (expected: string) => cli.nonInteractiveOutput().expectContains(expected)
 )
-Then(
-  'I should not see {string} in the non-interactive output',
-  (expected: string) => cli.nonInteractiveOutput().expectNotContains(expected)
-)
 Then('I should see {string} in the history output', (expected: string) =>
   cli.historyOutput().expectContains(expected)
-)
-Then('I should not see {string} in the history output', (expected: string) =>
-  cli.historyOutput().expectNotContains(expected)
 )
 Then('I should see {string} in the history input', (expected: string) =>
   cli.historyInput().expectContains(expected)

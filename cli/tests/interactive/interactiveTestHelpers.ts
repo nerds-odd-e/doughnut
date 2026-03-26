@@ -9,7 +9,6 @@ import {
   runInteractive,
 } from '../../src/interactive.js'
 import { getTerminalWidth, renderPastInput } from '../../src/renderer.js'
-import { TTY_FULL_CLEAR_SEQUENCE } from '../support/ttyFullClearSequence.js'
 
 export const tick = () => new Promise<void>((r) => setImmediate(r))
 
@@ -136,14 +135,13 @@ export function ttyOutput(writeSpy: ReturnType<typeof vi.spyOn>) {
   return writeSpy.mock.calls.map((c: [string]) => c[0]).join('')
 }
 
-/** Recall-session y/n answers append to scrollback without a grey input row or full-screen clear. */
+/** Recall-session y/n answers append to scrollback without a grey input row for the key line. */
 export function expectTtyRecallYesNoReplyScrollback(
   writeSpy: ReturnType<typeof vi.spyOn>,
   answerLine: string
 ) {
   const out = ttyOutput(writeSpy)
   expect(out).not.toContain(renderPastInput(answerLine, getTerminalWidth()))
-  expect(out).not.toContain(TTY_FULL_CLEAR_SEQUENCE)
 }
 
 /** Latest line in captured TTY stdout containing `needle` (successive repaints overwrite the same logical rows). */

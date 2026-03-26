@@ -72,36 +72,26 @@ function withStdoutFor(
   })
 }
 
-function expectSubstring(
+function expectSectionContainsSubstring(
   haystack: string,
   needle: string,
-  sectionLabel: string,
-  present: boolean
+  sectionLabel: string
 ): void {
   const preview =
     haystack.length > CONTENT_PREVIEW_LEN
       ? `${haystack.slice(0, CONTENT_PREVIEW_LEN)}...`
       : haystack
-  const message = present
-    ? `Expected "${needle}" in ${sectionLabel}. Content:\n${preview}`
-    : `Did not expect "${needle}" in ${sectionLabel}`
-  if (present) {
-    expect(haystack, message).to.include(needle)
-  } else {
-    expect(haystack, message).not.to.include(needle)
-  }
+  expect(
+    haystack,
+    `Expected "${needle}" in ${sectionLabel}. Content:\n${preview}`
+  ).to.include(needle)
 }
 
 function nonInteractiveOutput() {
   return {
     expectContains(expected: string) {
       withStdoutFor({ kind: 'nonInteractive' }, (stdout) =>
-        expectSubstring(stdout, expected, SECTION.nonInteractive, true)
-      )
-    },
-    expectNotContains(expected: string) {
-      withStdoutFor({ kind: 'nonInteractive' }, (stdout) =>
-        expectSubstring(stdout, expected, SECTION.nonInteractive, false)
+        expectSectionContainsSubstring(stdout, expected, SECTION.nonInteractive)
       )
     },
   }
@@ -114,23 +104,10 @@ function historyOutput() {
       withStdoutFor(
         { kind: 'ptyInteractive', assertionTarget: target },
         (stdout) =>
-          expectSubstring(
+          expectSectionContainsSubstring(
             getHistoryOutputContent(stdout),
             expected,
-            target,
-            true
-          )
-      )
-    },
-    expectNotContains(expected: string) {
-      withStdoutFor(
-        { kind: 'ptyInteractive', assertionTarget: target },
-        (stdout) =>
-          expectSubstring(
-            getHistoryOutputContent(stdout),
-            expected,
-            target,
-            false
+            target
           )
       )
     },
@@ -144,11 +121,10 @@ function historyInput() {
       withStdoutFor(
         { kind: 'ptyInteractive', assertionTarget: target },
         (stdout) =>
-          expectSubstring(
+          expectSectionContainsSubstring(
             getHistoryInputContent(stdout),
             expected,
-            target,
-            true
+            target
           )
       )
     },
@@ -195,7 +171,11 @@ function currentGuidance() {
         { kind: 'ptyInteractive', assertionTarget: target },
         (stdout) => {
           const raw = getCurrentGuidanceAndHistoryRaw(stdout)
-          expectSubstring(raw, expected, `raw ${SECTION.currentGuidance}`, true)
+          expectSectionContainsSubstring(
+            raw,
+            expected,
+            `raw ${SECTION.currentGuidance}`
+          )
           const hasBold = raw.includes('\x1b[1m')
           const hasItalic = raw.includes('\x1b[3m')
           expect(

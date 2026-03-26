@@ -3,7 +3,6 @@
  * simulate cursor movement / erase, and detect repaint bugs (e.g. stale CUU before the input box).
  */
 import { stripAnsiCsiAndCr } from '../src/renderer.js'
-import { TTY_FULL_CLEAR_SEQUENCE } from './support/ttyFullClearSequence.js'
 
 /** Top border line of the bordered input box (plain text, after stripping ANSI). */
 export const INPUT_BOX_TOP_OUTLINE_PATTERN = /^┌─*┐$/
@@ -31,8 +30,6 @@ const cursorColRe = new RegExp(`^${ESC}\\[(\\d+)G`)
 const csiRe = new RegExp(`^${ESC}\\[[\\d;?]*[A-Za-z]`)
 
 type TtyWriteReplayOptions = {
-  /** When this exact substring is seen, clear the simulated buffer (full redraw). */
-  clearScreen?: string
   /** Skip `OSC ... BEL` sequences (e.g. interactive input-ready). */
   skipOsc?: boolean
 }
@@ -45,15 +42,7 @@ function replayTtyWrites(
   let row = 0
   let col = 0
   let i = 0
-  const clear = opts.clearScreen
   while (i < output.length) {
-    if (clear && output.startsWith(clear, i)) {
-      lines.length = 0
-      row = 0
-      col = 0
-      i += clear.length
-      continue
-    }
     if (opts.skipOsc && output[i] === ESC && output[i + 1] === ']') {
       const bel = output.indexOf('\x07', i)
       if (bel >= 0) {
@@ -120,10 +109,7 @@ function replayTtyWrites(
 
 /** Apply CUU/CUD, EL, CUP, and printable chars to build a naive terminal frame (tests only). */
 export function simulatedScreenFromTtyWrites(output: string): string {
-  return replayTtyWrites(output, {
-    clearScreen: TTY_FULL_CLEAR_SEQUENCE,
-    skipOsc: true,
-  }).lines.join('\n')
+  return replayTtyWrites(output, { skipOsc: true }).lines.join('\n')
 }
 
 /**
@@ -174,17 +160,14 @@ export function ttyShowCaretCuUThenInk2KEraseBeforeNextHide(
 
 /**
  * Replays TTY writes and returns final cursor position plus the sparse line buffer (tests only).
- * Handles CUU/CUD, EL 2K, CUP column (G), printable text, newlines, and full-screen clear replay (`TTY_FULL_CLEAR_SEQUENCE`).
+ * Handles CUU/CUD, EL 2K, CUP column (G), printable text, and newlines.
  */
 export function cursorPositionAfterTtyWrites(output: string): {
   row: number
   col: number
   lines: string[]
 } {
-  return replayTtyWrites(output, {
-    clearScreen: TTY_FULL_CLEAR_SEQUENCE,
-    skipOsc: true,
-  })
+  return replayTtyWrites(output, { skipOsc: true })
 }
 
 /** Last row index whose plain text contains `substring` (after `plain` transform). Returns -1 if none. */
