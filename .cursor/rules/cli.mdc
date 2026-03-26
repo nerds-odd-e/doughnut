@@ -67,7 +67,7 @@ Vocabulary for Cucumber steps and page objects (`e2e_test/start/pageObjects/cli/
 
 ## Entry points
 
-- **Interactive shell:** **TTY only** (`runInteractive` → `runTTY`). No piped stdin shell; **`-c` is rejected**; there is **no `doughnut help` subcommand** (use **`/help`** in the TTY).
+- **Interactive shell:** **TTY only** (`runInteractive` → `runTTY`). Slash-command reference is **`/help`** after the shell starts.
 - **Non-TTY:** **`doughnut version`** / **`-v`** / **`--version`** and **`doughnut update`** only.
 - **`processInput`** (used by the TTY adapter): Recall **MCQ** stem on `OutputAdapter.writeCurrentPrompt` (or `log` if unset); numbered choices and “Enter your choice…” on **`log` only** — same stem vs list split as the TTY UI, without duplicating choices through both hooks.
 

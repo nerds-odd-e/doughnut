@@ -2,6 +2,7 @@ import { chmodSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
+import { exitCliError } from './cliExit.js'
 import {
   getVersion,
   formatVersionOutput,
@@ -13,12 +14,15 @@ const BASE_URL =
   process.env.BASE_URL ?? 'https://storage.googleapis.com/dough-01'
 const DOWNLOAD_PATH = `${BASE_URL}/doughnut-cli-latest/doughnut`
 
+function exceptionText(e: unknown): string {
+  return e instanceof Error ? e.message : String(e)
+}
+
 export async function runUpdate(): Promise<void> {
   const currentVersion = getVersion()
   const currentPath = process.argv[1]
   if (!currentPath) {
-    console.error('Could not determine executable path')
-    process.exit(1)
+    exitCliError('could not determine executable path')
   }
   const tempFile = join(tmpdir(), `doughnut-update-${Date.now()}`)
 
@@ -26,13 +30,11 @@ export async function runUpdate(): Promise<void> {
   try {
     response = await fetch(DOWNLOAD_PATH)
   } catch (e) {
-    console.error(`Failed to download: ${e instanceof Error ? e.message : e}`)
-    process.exit(1)
+    exitCliError(`failed to download: ${exceptionText(e)}`)
   }
 
   if (!response.ok) {
-    console.error(`Download failed: HTTP ${response.status}`)
-    process.exit(1)
+    exitCliError(`download failed: HTTP ${response.status}`)
   }
 
   const buffer = await response.arrayBuffer()
@@ -42,15 +44,13 @@ export async function runUpdate(): Promise<void> {
   const result = spawnSync(tempFile, ['version'], { encoding: 'utf8' })
   if (result.error || result.status !== 0) {
     rmSync(tempFile, { force: true })
-    console.error('Downloaded binary is invalid or failed to run')
-    process.exit(1)
+    exitCliError('downloaded binary is invalid or failed to run')
   }
 
   const incomingVersion = parseVersionFromOutput(result.stdout)
   if (!incomingVersion) {
     rmSync(tempFile, { force: true })
-    console.error('Could not determine version of downloaded binary')
-    process.exit(1)
+    exitCliError('could not determine version of downloaded binary')
   }
 
   if (compareVersions(incomingVersion, currentVersion) <= 0) {
@@ -64,10 +64,7 @@ export async function runUpdate(): Promise<void> {
     chmodSync(currentPath, 0o755)
   } catch (e) {
     rmSync(tempFile, { force: true })
-    console.error(
-      `Failed to replace binary: ${e instanceof Error ? e.message : e}`
-    )
-    process.exit(1)
+    exitCliError(`failed to replace binary: ${exceptionText(e)}`)
   }
 
   console.log(`Updated doughnut from ${currentVersion} to ${incomingVersion}`)

@@ -61,7 +61,7 @@ describe('runUpdate', () => {
     await expect(runUpdate()).rejects.toThrow('exit')
 
     expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Download failed')
+      expect.stringMatching(/doughnut: download failed: HTTP 404/)
     )
     expect(exitSpy).toHaveBeenCalledWith(1)
   })

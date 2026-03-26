@@ -1,14 +1,11 @@
+import { exitCliError } from './cliExit.js'
 import { runInteractive } from './interactive.js'
 import { runUpdate } from './update.js'
 import { formatVersionOutput } from './version.js'
 
 export async function run(args: string[]): Promise<void> {
   if (args.some((a) => a === '-c' || a.startsWith('-c='))) {
-    console.error(
-      'doughnut: -c is not supported. Run `doughnut` in a terminal for the interactive shell.'
-    )
-    process.exit(1)
-    return
+    exitCliError('invalid option')
   }
 
   const hasVersionFlag = args.includes('--version') || args.includes('-v')
@@ -25,11 +22,7 @@ export async function run(args: string[]): Promise<void> {
   }
 
   if (subcommand === 'help') {
-    console.error(
-      'doughnut: there is no help subcommand. Run `doughnut` in a terminal, then type /help.'
-    )
-    process.exit(1)
-    return
+    exitCliError('use /help in the shell')
   }
 
   await runInteractive()

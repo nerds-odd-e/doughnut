@@ -4,11 +4,13 @@ import { recallCommandDocs } from './recall.js'
 import { updateDoc } from './update.js'
 import { versionDoc } from './version.js'
 
+export type CommandDocCategory = 'subcommand' | 'interactive'
+
 export interface CommandDoc {
   name: string
   usage: string
   description: string
-  category: 'subcommand' | 'interactive'
+  category: CommandDocCategory
 }
 
 const exitDoc = {
@@ -86,14 +88,11 @@ export function filterCommandsByPrefix(
     })
 }
 
-/** Raw lines for command completion choices: "  /usage        description". */
 export function formatCommandCompletionLines(
   commands: readonly CommandDoc[]
 ): string[] {
   return commands.map((d) => `  ${d.usage.padEnd(20)} ${d.description}`)
 }
-
-const allSubcommandDocs = subcommandDocs
 
 function formatSection(title: string, docs: readonly CommandDoc[]): string {
   const lines = docs.map((d) => {
@@ -105,7 +104,7 @@ function formatSection(title: string, docs: readonly CommandDoc[]): string {
 
 export function formatHelp(): string {
   return [
-    formatSection('Subcommands', allSubcommandDocs),
+    formatSection('Subcommands', subcommandDocs),
     '',
     formatSection('Interactive commands (in prompt)', interactiveDocs),
   ].join('\n')

@@ -28,27 +28,21 @@ describe('run entry routing', () => {
     exitSpy.mockRestore()
   })
 
-  test('-c is rejected with exit 1', async () => {
-    await run(['-c', 'hello'])
-    await new Promise((r) => setImmediate(r))
-    expect(errorSpy).toHaveBeenCalledWith(
-      'doughnut: -c is not supported. Run `doughnut` in a terminal for the interactive shell.'
-    )
-    expect(exitSpy).toHaveBeenCalledWith(1)
-  })
-
-  test('-c= form is rejected with exit 1', async () => {
-    await run(['-c=hello'])
-    await new Promise((r) => setImmediate(r))
-    expect(exitSpy).toHaveBeenCalledWith(1)
+  test('invalid option and exit 1 for disallowed argv', async () => {
+    for (const argv of [['-c', 'hello'], ['-c=hello']] as const) {
+      errorSpy.mockClear()
+      exitSpy.mockClear()
+      await run([...argv])
+      await new Promise((r) => setImmediate(r))
+      expect(errorSpy).toHaveBeenCalledWith('doughnut: invalid option')
+      expect(exitSpy).toHaveBeenCalledWith(1)
+    }
   })
 
   test('help subcommand is rejected with exit 1', async () => {
     await run(['help'])
     await new Promise((r) => setImmediate(r))
-    expect(errorSpy).toHaveBeenCalledWith(
-      'doughnut: there is no help subcommand. Run `doughnut` in a terminal, then type /help.'
-    )
+    expect(errorSpy).toHaveBeenCalledWith('doughnut: use /help in the shell')
     expect(exitSpy).toHaveBeenCalledWith(1)
   })
 
@@ -63,7 +57,7 @@ describe('run entry routing', () => {
       await run([])
       await new Promise((r) => setImmediate(r))
       expect(errorSpy).toHaveBeenCalledWith(
-        'doughnut: interactive mode requires a terminal. For scripts, use `doughnut version` or `doughnut update`.'
+        'doughnut: not a terminal (use version or update)'
       )
       expect(exitSpy).toHaveBeenCalledWith(1)
     } finally {

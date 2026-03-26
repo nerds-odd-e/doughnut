@@ -1,4 +1,5 @@
 import { runTTY } from './adapters/ttyAdapter.js'
+import { exitCliError } from './cliExit.js'
 import {
   addAccessToken,
   createAccessToken,
@@ -680,11 +681,7 @@ function buildTTYDeps() {
 
 export async function runInteractive(stdin = process.stdin): Promise<void> {
   if (!stdin.isTTY) {
-    console.error(
-      'doughnut: interactive mode requires a terminal. For scripts, use `doughnut version` or `doughnut update`.'
-    )
-    process.exit(1)
-    return
+    exitCliError('not a terminal (use version or update)')
   }
   await runTTY(stdin, buildTTYDeps())
 }
