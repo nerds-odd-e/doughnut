@@ -45,6 +45,7 @@ export function appendUserInputHistoryLine(
 ): string[] {
   const trimmed = singleLineCommandDraft(rawLine).trim()
   if (trimmed.length === 0) return lines
+  if (lines[0] === trimmed) return lines
   const next = [trimmed, ...lines]
   if (next.length > MAX_USER_INPUT_HISTORY_LINES)
     next.length = MAX_USER_INPUT_HISTORY_LINES

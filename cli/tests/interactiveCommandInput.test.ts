@@ -40,6 +40,20 @@ describe('appendUserInputHistoryLine', () => {
     expect(appendUserInputHistoryLine(once, 'b')).toEqual(['b', 'a'])
   })
 
+  test('does not prepend when identical to the newest entry', () => {
+    const once = appendUserInputHistoryLine([], 'x')
+    expect(appendUserInputHistoryLine(once, 'x')).toEqual(['x'])
+    expect(appendUserInputHistoryLine(once, '  x  ')).toEqual(['x'])
+  })
+
+  test('prepends again when same text is not consecutive with newest', () => {
+    const bab = appendUserInputHistoryLine(
+      appendUserInputHistoryLine(appendUserInputHistoryLine([], 'a'), 'b'),
+      'a'
+    )
+    expect(bab).toEqual(['a', 'b', 'a'])
+  })
+
   test('drops the oldest entry when over the max length', () => {
     const full = Array.from(
       { length: MAX_USER_INPUT_HISTORY_LINES },
@@ -51,6 +65,18 @@ describe('appendUserInputHistoryLine', () => {
     expect(next[MAX_USER_INPUT_HISTORY_LINES - 1]).toBe(
       `h${MAX_USER_INPUT_HISTORY_LINES - 2}`
     )
+  })
+
+  test('duplicate of newest when full does not grow or duplicate at front', () => {
+    const full = Array.from(
+      { length: MAX_USER_INPUT_HISTORY_LINES },
+      (_, i) => `h${i}`
+    )
+    const newest = full[0]!
+    const next = appendUserInputHistoryLine(full, newest)
+    expect(next.length).toBe(MAX_USER_INPUT_HISTORY_LINES)
+    expect(next[0]).toBe(newest)
+    expect(next[1]).toBe(full[1])
   })
 })
 

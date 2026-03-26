@@ -728,6 +728,8 @@ function buildTTYDeps() {
     isNumberedChoiceListActive,
     getNumberedChoiceListChoices,
     getRecallCurrentPromptWrappedLines,
+    shouldRecordCommittedLineInUserInputHistory: () =>
+      pendingRecallAnswer === null,
     usesSessionYesNoInputChrome,
     getDefaultTokenLabel,
     listAccessTokens,

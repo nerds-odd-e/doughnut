@@ -21,6 +21,11 @@ export interface TTYDeps {
   getNumberedChoiceListChoices: () => readonly string[] | null
   /** MCQ notebook+stem or spelling notebook+Spell line; `null` if no such recall question is pending. */
   getRecallCurrentPromptWrappedLines: (width: number) => string[] | null
+  /**
+   * False while a recall answer is expected (MCQ, spelling, session y/n); committed lines are not
+   * copied to user input history.
+   */
+  shouldRecordCommittedLineInUserInputHistory: () => boolean
   usesSessionYesNoInputChrome: (inTokenList: boolean) => boolean
   getDefaultTokenLabel: () => AccessTokenLabel | undefined
   listAccessTokens: () => AccessTokenEntry[]

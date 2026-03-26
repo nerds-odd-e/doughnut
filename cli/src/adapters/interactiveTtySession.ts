@@ -241,6 +241,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
   }
 
   function rememberCommittedLine(raw: string): void {
+    if (!deps.shouldRecordCommittedLineInUserInputHistory()) return
     patch((s) => ({
       ...s,
       commandInput: {
@@ -556,9 +557,6 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
             maskInteractiveInputLineForStorage(inputForHistory)
           ),
         }))
-        if (isCommittedInteractiveInput(inputForHistory)) {
-          rememberCommittedLine(inputForHistory)
-        }
         if (await processInput(effectiveInput, ttyOutput, true)) {
           commitExitTurnToPastMessages()
           doExit()
