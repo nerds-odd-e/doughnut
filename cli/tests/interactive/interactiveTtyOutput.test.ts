@@ -1,7 +1,7 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mockRecallStatus } from './interactiveRecallMockAccess.js'
 import { resetRecallStateForTesting } from '../../src/interactive.js'
-import { CLEAR_SCREEN } from '../../src/renderer.js'
+import { TTY_FULL_CLEAR_SEQUENCE } from '../support/ttyFullClearSequence.js'
 import {
   createMockTTYStdin,
   endTTYSession,
@@ -43,7 +43,7 @@ describe('TTY: normal command output must not full-screen clear', () => {
   test.each([
     ['/help', 'List available commands'],
     ['/recall-status', '0 notes to recall today'],
-  ] as const)('after %s, stdout writes must not include CLEAR_SCREEN', async (cmd, waitForText) => {
+  ] as const)('after %s, stdout writes must not include full-screen clear', async (cmd, waitForText) => {
     writeSpy.mockClear()
     await submitTTYCommand(stdin, cmd)
     await vi.waitFor(() => expect(ttyOutput(writeSpy)).toContain(waitForText))
@@ -51,7 +51,7 @@ describe('TTY: normal command output must not full-screen clear', () => {
     expect(
       ttyOutput(writeSpy),
       'Command output should append to history without full-screen clear'
-    ).not.toContain(CLEAR_SCREEN)
+    ).not.toContain(TTY_FULL_CLEAR_SEQUENCE)
   })
 })
 
@@ -85,7 +85,7 @@ describe('TTY exit: no full-screen redraw', () => {
     expect(
       outAfterSubmit,
       'Exit should not run doFullRedraw (clear screen + live region); that leaves the cursor in the input row after exit'
-    ).not.toContain(CLEAR_SCREEN)
+    ).not.toContain(TTY_FULL_CLEAR_SEQUENCE)
   })
 
   test('after Enter on exit, committed line appears as grey history input (same as other submits)', async () => {

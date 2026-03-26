@@ -2,7 +2,8 @@
  * Helpers for interpreting raw `process.stdout.write` chunks from the interactive TTY adapter:
  * simulate cursor movement / erase, and detect repaint bugs (e.g. stale CUU before the input box).
  */
-import { CLEAR_SCREEN, stripAnsiCsiAndCr } from '../src/renderer.js'
+import { stripAnsiCsiAndCr } from '../src/renderer.js'
+import { TTY_FULL_CLEAR_SEQUENCE } from './support/ttyFullClearSequence.js'
 
 /** Top border line of the bordered input box (plain text, after stripping ANSI). */
 export const INPUT_BOX_TOP_OUTLINE_PATTERN = /^┌─*┐$/
@@ -120,7 +121,7 @@ function replayTtyWrites(
 /** Apply CUU/CUD, EL, CUP, and printable chars to build a naive terminal frame (tests only). */
 export function simulatedScreenFromTtyWrites(output: string): string {
   return replayTtyWrites(output, {
-    clearScreen: CLEAR_SCREEN,
+    clearScreen: TTY_FULL_CLEAR_SEQUENCE,
     skipOsc: true,
   }).lines.join('\n')
 }
@@ -173,14 +174,17 @@ export function ttyShowCaretCuUThenInk2KEraseBeforeNextHide(
 
 /**
  * Replays TTY writes and returns final cursor position plus the sparse line buffer (tests only).
- * Handles CUU/CUD, EL 2K, CUP column (G), printable text, newlines, and full-screen clear (`CLEAR_SCREEN`).
+ * Handles CUU/CUD, EL 2K, CUP column (G), printable text, newlines, and full-screen clear replay (`TTY_FULL_CLEAR_SEQUENCE`).
  */
 export function cursorPositionAfterTtyWrites(output: string): {
   row: number
   col: number
   lines: string[]
 } {
-  return replayTtyWrites(output, { clearScreen: CLEAR_SCREEN, skipOsc: true })
+  return replayTtyWrites(output, {
+    clearScreen: TTY_FULL_CLEAR_SEQUENCE,
+    skipOsc: true,
+  })
 }
 
 /** Last row index whose plain text contains `substring` (after `plain` transform). Returns -1 if none. */

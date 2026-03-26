@@ -8,11 +8,8 @@ import {
   resetRecallStateForTesting,
   runInteractive,
 } from '../../src/interactive.js'
-import {
-  CLEAR_SCREEN,
-  getTerminalWidth,
-  renderPastInput,
-} from '../../src/renderer.js'
+import { getTerminalWidth, renderPastInput } from '../../src/renderer.js'
+import { TTY_FULL_CLEAR_SEQUENCE } from '../support/ttyFullClearSequence.js'
 
 export const tick = () => new Promise<void>((r) => setImmediate(r))
 
@@ -146,7 +143,7 @@ export function expectTtyRecallYesNoReplyScrollback(
 ) {
   const out = ttyOutput(writeSpy)
   expect(out).not.toContain(renderPastInput(answerLine, getTerminalWidth()))
-  expect(out).not.toContain(CLEAR_SCREEN)
+  expect(out).not.toContain(TTY_FULL_CLEAR_SEQUENCE)
 }
 
 /** Latest line in captured TTY stdout containing `needle` (successive repaints overwrite the same logical rows). */

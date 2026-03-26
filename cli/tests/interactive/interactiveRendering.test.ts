@@ -1,3 +1,7 @@
+/**
+ * Terminal layout from `renderer.ts` (visible width, box, past input, slash highlight).
+ * TTY integration lives in `interactiveTty*.test.ts`.
+ */
 import './interactiveTestMocks.js'
 import { describe, test, expect } from 'vitest'
 import {
@@ -6,8 +10,8 @@ import {
   renderBox,
   renderPastInput,
   visibleLength,
-} from '../../src/interactive.js'
-import { buildSuggestionLines } from '../../src/renderer.js'
+  buildSuggestionLines,
+} from '../../src/renderer.js'
 import {
   ANSI_RESET,
   BOLD_CYAN,

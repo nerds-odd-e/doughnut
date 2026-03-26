@@ -147,8 +147,6 @@ export function grayDisabledInputBoxLines(lines: string[]): string[] {
   return lines.map((l) => `${GREY}${l.split(RESET).join(GREY)}${RESET}`)
 }
 
-export const CLEAR_SCREEN = '\x1b[H\x1b[2J'
-
 /** Shown in Current guidance when user has not typed a slash command prefix. */
 export const COMMANDS_HINT = `${GREY}  / commands${RESET}`
 
@@ -463,8 +461,6 @@ export interface BuildBoxLinesOptions {
   placeholderContext?: PlaceholderContext
 }
 
-export type LiveRegionPaintOptions = BuildBoxLinesOptions
-
 function inputBoxLinePrefix(
   lineIndex: number,
   context: PlaceholderContext
@@ -628,12 +624,16 @@ function buildLiveRegionLinesAboveInputBox(
   return lines
 }
 
-function maybeGreyDisabledBoxLines(
+/**
+ * Bordered input box lines from {@link renderBox}: full grey outline for token list and fetch-wait
+ * (same rule as {@link buildLiveRegionLines}).
+ */
+export function inputBoxBorderLinesWithContextChrome(
   rawBoxLines: string[],
-  options?: LiveRegionPaintOptions
+  options?: BuildBoxLinesOptions
 ): string[] {
-  return options?.placeholderContext &&
-    isGreyDisabledInputChrome(options.placeholderContext)
+  const ctx = options?.placeholderContext
+  return ctx && isGreyDisabledInputChrome(ctx)
     ? grayDisabledInputBoxLines(rawBoxLines)
     : rawBoxLines
 }
@@ -644,7 +644,7 @@ export function buildLiveRegionLines(
   currentPromptWrappedLines: string[],
   suggestionLines: string[],
   currentStageIndicatorLines: string[],
-  options?: LiveRegionPaintOptions
+  options?: BuildBoxLinesOptions
 ): string[] {
   const lines = buildLiveRegionLinesAboveInputBox(
     width,
@@ -655,7 +655,7 @@ export function buildLiveRegionLines(
     buildBoxLines(buffer, width, options),
     width
   ).split('\n')
-  lines.push(...maybeGreyDisabledBoxLines(rawBoxLines, options))
+  lines.push(...inputBoxBorderLinesWithContextChrome(rawBoxLines, options))
   lines.push(...suggestionLines)
   return lines
 }
@@ -668,7 +668,7 @@ export function buildLiveRegionLinesWithCaret(
   currentPromptWrappedLines: string[],
   suggestionLines: string[],
   currentStageIndicatorLines: string[],
-  options?: LiveRegionPaintOptions
+  options?: BuildBoxLinesOptions
 ): string[] {
   const lines = buildLiveRegionLinesAboveInputBox(
     width,
@@ -679,7 +679,7 @@ export function buildLiveRegionLinesWithCaret(
     buildBoxLinesWithCaret(buffer, width, caretOffset, options),
     width
   ).split('\n')
-  lines.push(...maybeGreyDisabledBoxLines(rawBoxLines, options))
+  lines.push(...inputBoxBorderLinesWithContextChrome(rawBoxLines, options))
   lines.push(...suggestionLines)
   return lines
 }

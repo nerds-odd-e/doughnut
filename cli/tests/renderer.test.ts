@@ -6,6 +6,7 @@ import {
   truncateToWidth,
   isCommittedInteractiveInput,
   grayDisabledInputBoxLines,
+  inputBoxBorderLinesWithContextChrome,
   applyChatHistoryOutputTone,
   stripAnsi,
   stripAnsiCsiAndCr,
@@ -143,6 +144,25 @@ describe('grayDisabledInputBoxLines', () => {
     expect(result[0]).toContain('\x1b[90m')
     // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI RESET, intentional
     expect(/\x1b\[0m\s*│/.test(result[0])).toBe(false)
+  })
+})
+
+describe('inputBoxBorderLinesWithContextChrome', () => {
+  test('leaves lines unchanged for default command-line context', () => {
+    const lines = ['┌──┐']
+    expect(
+      inputBoxBorderLinesWithContextChrome(lines, {
+        placeholderContext: 'default',
+      })
+    ).toEqual(lines)
+  })
+
+  test('greys full box outline for interactive fetch-wait context', () => {
+    const lines = ['┌──┐']
+    const out = inputBoxBorderLinesWithContextChrome(lines, {
+      placeholderContext: 'interactiveFetchWait',
+    })
+    expect(out[0]).toContain('\x1b[90m')
   })
 })
 

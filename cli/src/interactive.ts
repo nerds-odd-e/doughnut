@@ -607,15 +607,6 @@ export async function processInput(
   return false
 }
 
-export {
-  visibleLength,
-  renderBox,
-  renderPastInput,
-  isCommittedInteractiveInput,
-  buildBoxLines,
-  highlightRecognizedCommand,
-} from './renderer.js'
-
 function getNumberedChoiceListCurrentPromptWrappedLines(
   width: number
 ): string[] | null {

@@ -5,11 +5,9 @@ import {
   buildCurrentPromptSeparator,
   buildCurrentPromptSeparatorForStageBand,
   formatCurrentStageIndicatorLine,
-  grayDisabledInputBoxLines,
-  isGreyDisabledInputChrome,
+  inputBoxBorderLinesWithContextChrome,
   renderBox,
   stripAnsi,
-  type LiveRegionPaintOptions,
   type PlaceholderContext,
   type TerminalWidth,
 } from '../renderer.js'
@@ -65,16 +63,13 @@ export function CommandLineLivePanel({
     { isActive: true }
   )
 
-  const paint: LiveRegionPaintOptions = { placeholderContext }
+  const boxPaint = { placeholderContext } as const
   const hasStageIndicator = currentStageIndicatorLines.length > 0
   const rawBoxLines = renderBox(
-    buildBoxLinesWithCaret(buffer, width, caretOffset, paint),
+    buildBoxLinesWithCaret(buffer, width, caretOffset, boxPaint),
     width
   ).split('\n')
-  const boxLines =
-    placeholderContext && isGreyDisabledInputChrome(placeholderContext)
-      ? grayDisabledInputBoxLines(rawBoxLines)
-      : rawBoxLines
+  const boxLines = inputBoxBorderLinesWithContextChrome(rawBoxLines, boxPaint)
 
   const promptPlainForInk =
     currentPromptWrappedLines.length > 0
