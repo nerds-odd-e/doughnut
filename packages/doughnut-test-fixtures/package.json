@@ -11,7 +11,7 @@
     "@generated/doughnut-backend-api": "workspace:*"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.8"
+    "@biomejs/biome": "2.4.9"
   },
   "exports": {
     "./makeMe": "./src/makeMe.ts"
