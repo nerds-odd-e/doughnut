@@ -2,6 +2,8 @@ import { useLayoutEffect, useRef } from 'react'
 import type { ReactNode } from 'react'
 import { Box, Text, useFocus, useInput, type Key } from 'ink'
 import type { AccessTokenEntry, AccessTokenLabel } from '../accessToken.js'
+import { tryApplyMainCommandLineInkTyping } from '../interactions/mainCommandLineInkTyping.js'
+import type { InteractiveCommandInput } from '../interactiveCommandInput.js'
 import type { RecallMcqChoiceTexts } from '../types.js'
 import {
   buildCurrentPromptSeparator,
@@ -39,6 +41,15 @@ type LiveColumnInkPanelProps = {
   stdinPolicy: LiveColumnStdinPolicy
   onInkKey: (input: string, key: Key) => void | Promise<void>
   onInterrupt: () => void
+  /**
+   * Default command line only: typing keys match `@inkjs/ui` `TextInput` (caret/insert/delete);
+   * other keys go to `onInkKey`.
+   */
+  fullCommandInput?: InteractiveCommandInput
+  onCommandLineTyping?: (
+    next: InteractiveCommandInput,
+    resetSlashPicker: boolean
+  ) => void
   /** Current prompt block (stage band, separators, grey stem lines) — above the command-line paint. */
   aboveCommandLine: ReactNode
   /** Current guidance — below the command-line paint (slash hints, MCQ rows, token rows). */
@@ -72,12 +83,18 @@ function LiveColumnInkPanel({
   stdinPolicy,
   onInkKey,
   onInterrupt,
+  fullCommandInput,
+  onCommandLineTyping,
   aboveCommandLine,
   guidance,
 }: LiveColumnInkPanelProps) {
   const refocusWhenUnfocused = stdinPolicy === 'commandLine'
   const stdinLogicalChunks = stdinPolicy === 'listSelection'
   const ignoreKeysWhenNotFocused = stdinPolicy === 'commandLine'
+  const useCommandLineTypingSplit =
+    stdinPolicy === 'commandLine' &&
+    fullCommandInput !== undefined &&
+    onCommandLineTyping !== undefined
 
   const { isFocused, focus } = useFocus({
     id: focusId,
@@ -90,6 +107,10 @@ function LiveColumnInkPanel({
 
   const onKeyRef = useRef(onInkKey)
   onKeyRef.current = onInkKey
+  const onTypingRef = useRef(onCommandLineTyping)
+  onTypingRef.current = onCommandLineTyping
+  const fullCommandInputRef = useRef(fullCommandInput)
+  fullCommandInputRef.current = fullCommandInput
 
   useLayoutEffect(() => {
     if (!refocusWhenUnfocused || isFocused) return
@@ -110,6 +131,20 @@ function LiveColumnInkPanel({
         return
       }
       const dispatch = (inp: string, ky: Key) => {
+        if (useCommandLineTypingSplit) {
+          const applied = tryApplyMainCommandLineInkTyping(
+            fullCommandInputRef.current!,
+            inp,
+            ky
+          )
+          if (applied) {
+            onTypingRef.current!(
+              applied.nextCommandInput,
+              applied.resetSlashPicker
+            )
+            return
+          }
+        }
         Promise.resolve(onKeyRef.current(inp, ky)).catch(() => undefined)
       }
       if (stdinLogicalChunks) {
@@ -140,28 +175,33 @@ function LiveColumnInkPanel({
 }
 
 export type CommandLineLivePanelProps = {
-  buffer: string
-  caretOffset: number
+  commandInput: InteractiveCommandInput
   width: TerminalWidth
   currentPromptWrappedLines: string[]
   currentGuidanceLines: string[]
   currentStageIndicatorLines: string[]
   placeholderContext: PlaceholderContext
   onCommandKey: (input: string, key: Key) => void | Promise<void>
+  onCommandLineTyping: (
+    next: InteractiveCommandInput,
+    resetSlashPicker: boolean
+  ) => void
   onInterrupt: () => void
 }
 
 export function CommandLineLivePanel({
-  buffer,
-  caretOffset,
+  commandInput,
   width,
   currentPromptWrappedLines,
   currentGuidanceLines,
   currentStageIndicatorLines,
   placeholderContext,
   onCommandKey,
+  onCommandLineTyping,
   onInterrupt,
 }: CommandLineLivePanelProps) {
+  const buffer = commandInput.lineDraft
+  const caretOffset = commandInput.caretOffset
   const hasStageIndicator = currentStageIndicatorLines.length > 0
   const promptPlainForInk =
     currentPromptWrappedLines.length > 0
@@ -211,6 +251,8 @@ export function CommandLineLivePanel({
       stdinPolicy="commandLine"
       onInkKey={onCommandKey}
       onInterrupt={onInterrupt}
+      fullCommandInput={commandInput}
+      onCommandLineTyping={onCommandLineTyping}
       aboveCommandLine={aboveCommandLine}
       guidance={guidance}
     />

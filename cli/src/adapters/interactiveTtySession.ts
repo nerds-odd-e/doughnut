@@ -24,8 +24,6 @@ import { maskInteractiveInputForHistory } from '../inputHistoryMask.js'
 import {
   afterBareSlashEscape,
   appendCommittedCommand,
-  caretOneLeft,
-  caretOneRight,
   clearLiveCommandLine,
   deleteBeforeCaret,
   insertIntoDraft,
@@ -33,6 +31,7 @@ import {
   onArrowUp,
   replaceLiveCommandDraft,
   ttyArrowKeyUsesSlashSuggestionCycle,
+  type InteractiveCommandInput,
 } from '../interactiveCommandInput.js'
 import type { RecallInkConfirmChoice } from '../interactions/recallYesNo.js'
 import {
@@ -765,20 +764,6 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
         shellInstance = null
       }
       drawBox()
-    } else if (key.backspace || key.delete) {
-      const prevLen = session.commandInput.lineDraft.length
-      patch((s) => ({
-        ...s,
-        commandInput: deleteBeforeCaret(s.commandInput),
-      }))
-      if (session.commandInput.lineDraft.length !== prevLen) {
-        patch((s) => ({
-          ...s,
-          highlightIndex: 0,
-          suggestionsDismissed: false,
-        }))
-      }
-      drawBox()
     } else if (key.upArrow || key.downArrow) {
       const dir = key.upArrow ? 'up' : 'down'
       if (
@@ -820,29 +805,6 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
         }
         drawBox()
       }
-    } else if (key.leftArrow) {
-      patchAndDraw((s) => ({
-        ...s,
-        commandInput: caretOneLeft(s.commandInput),
-      }))
-    } else if (key.rightArrow) {
-      patchAndDraw((s) => ({
-        ...s,
-        commandInput: caretOneRight(s.commandInput),
-      }))
-    } else if (key.home) {
-      patchAndDraw((s) => ({
-        ...s,
-        commandInput: { ...s.commandInput, caretOffset: 0 },
-      }))
-    } else if (key.end) {
-      patchAndDraw((s) => ({
-        ...s,
-        commandInput: {
-          ...s.commandInput,
-          caretOffset: s.commandInput.lineDraft.length,
-        },
-      }))
     } else if (key.tab) {
       const lastLine = session.commandInput.lineDraft
       if (lastLine.startsWith('/') && !lastLine.endsWith(' ')) {
@@ -856,14 +818,20 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
           }))
         }
       }
-    } else if (input.length > 0 && !key.ctrl && !key.meta) {
-      patchAndDraw((s) => ({
-        ...s,
-        commandInput: insertIntoDraft(s.commandInput, input),
-        highlightIndex: 0,
-        suggestionsDismissed: false,
-      }))
     }
+  }
+
+  function applyCommandLineTypingFromInk(
+    next: InteractiveCommandInput,
+    resetSlashPicker: boolean
+  ): void {
+    patchAndDraw((s) => ({
+      ...s,
+      commandInput: next,
+      ...(resetSlashPicker
+        ? { highlightIndex: 0, suggestionsDismissed: false }
+        : {}),
+    }))
   }
 
   const handlers: ShellSessionInkHandlers = {
@@ -876,6 +844,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
     onRecallMcqGuidanceKey: routeRecallMcqChoicesInkStdin,
     onTokenPickerGuidanceKey: routeAccessTokenPickerInkStdin,
     onCommandLineKey: handleCommandLineInkInput,
+    onCommandLineTyping: applyCommandLineTypingFromInk,
     signalConfirmInputReady,
     onEnterStopConfirmationFromEsc: enterStopConfirmationFromEsc,
     whenInActiveRecallSession: isInCommandSessionSubstate,

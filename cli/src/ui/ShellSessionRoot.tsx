@@ -1,6 +1,7 @@
 import React from 'react'
 import type { Key } from 'ink'
 import type { RecallInkConfirmChoice } from '../interactions/recallYesNo.js'
+import type { InteractiveCommandInput } from '../interactiveCommandInput.js'
 import {
   buildSuggestionLinesForInk,
   DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
@@ -138,6 +139,10 @@ export type ShellSessionInkHandlers = {
   onRecallMcqGuidanceKey: (input: string, key: Key) => Promise<void>
   onTokenPickerGuidanceKey: (input: string, key: Key) => Promise<void>
   onCommandLineKey: (input: string, key: Key) => Promise<void>
+  onCommandLineTyping: (
+    next: InteractiveCommandInput,
+    resetSlashPicker: boolean
+  ) => void
   signalConfirmInputReady: () => void
   onEnterStopConfirmationFromEsc: () => void
   whenInActiveRecallSession: () => boolean
@@ -240,8 +245,7 @@ function buildLivePanel(
   }
   const layout = defaultCommandLineLayout!
   return React.createElement(CommandLineLivePanel, {
-    buffer: session.commandInput.lineDraft,
-    caretOffset: session.commandInput.caretOffset,
+    commandInput: session.commandInput,
     width: layout.terminalWidth,
     currentPromptWrappedLines: layout.currentPromptWrappedLines,
     currentGuidanceLines: layout.currentGuidanceLines,
@@ -251,6 +255,7 @@ function buildLivePanel(
       Promise.resolve(handlers.onCommandLineKey(input, key)).catch(
         () => undefined
       ),
+    onCommandLineTyping: handlers.onCommandLineTyping,
     onInterrupt: handlers.onInterrupt,
   })
 }
