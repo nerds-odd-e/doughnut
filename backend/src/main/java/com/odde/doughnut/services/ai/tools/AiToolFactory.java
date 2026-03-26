@@ -173,19 +173,6 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
         generateUnderstandingChecklist());
   }
 
-  public static InstructionAndSchema regenerateDetailsFromPointsAiTool(List<String> points) {
-    String pointsBlock = String.join("\n", points);
-    String message =
-        """
-            Based on the following points, regenerate the note details. Rewrite them into coherent, well-structured markdown. Preserve the meaning of each point. Output only the new details.
-
-            Points:
-            %s
-            """
-            .formatted(pointsBlock);
-    return new InstructionAndSchema(message, RegeneratedNoteDetails.class);
-  }
-
   public static InstructionAndSchema removePointsFromDetailsAiTool(List<String> pointsToRemove) {
     String pointsBlock = String.join("\n", pointsToRemove);
     String message =

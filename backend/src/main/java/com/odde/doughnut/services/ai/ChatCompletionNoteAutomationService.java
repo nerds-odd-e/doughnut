@@ -93,17 +93,6 @@ public class ChatCompletionNoteAutomationService {
     return chatRequestBuilder;
   }
 
-  public String regenerateDetailsFromPoints(List<String> points) throws JsonProcessingException {
-    if (points == null || points.isEmpty()) {
-      return "";
-    }
-    return executeWithTool(
-        AiToolFactory.regenerateDetailsFromPointsAiTool(points),
-        RegeneratedNoteDetails.class,
-        r -> r.details,
-        "");
-  }
-
   public String removePointsAndRegenerateDetails(List<String> pointsToRemove)
       throws JsonProcessingException {
     if (pointsToRemove == null || pointsToRemove.isEmpty()) {
