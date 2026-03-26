@@ -11,7 +11,7 @@ import {
   renderPastInput,
   stripAnsi,
   visibleLength,
-  buildSuggestionLines,
+  buildSuggestionLinesForInk,
 } from '../../src/renderer.js'
 import { boldCyan, GREY_BG_PAST_INPUT } from './interactiveTestHelpers.js'
 
@@ -121,54 +121,37 @@ describe('buildCommandInputDraftLines', () => {
   })
 })
 
-describe('buildSuggestionLines', () => {
-  test('with /rec and narrow width (40), each line has visible length ≤ width or ends with "..."', () => {
-    const lines = buildSuggestionLines('/rec', 0, 40)
-    expect(lines.length).toBeGreaterThan(0)
-    for (const line of lines) {
-      expect(visibleLength(line)).toBeLessThanOrEqual(40)
-      if (visibleLength(line) === 40) {
-        expect(line).toContain('...')
-      }
-    }
-  })
-
-  test('with /rec and wide width (120), no truncation', () => {
-    const lines = buildSuggestionLines('/rec', 0, 120)
+describe('buildSuggestionLinesForInk', () => {
+  test('with /rec, returns non-empty completion rows (Ink wraps to terminal width)', () => {
+    const lines = buildSuggestionLinesForInk('/rec', 0)
     expect(lines.length).toBeGreaterThan(0)
     expect(lines.some((l) => l.endsWith('...'))).toBe(false)
   })
 
-  test('with /recall-status prefix, narrow width truncates long descriptions', () => {
-    const lines = buildSuggestionLines('/recall-status', 0, 30)
+  test('with /recall-status prefix, returns rows without string-level ellipsis', () => {
+    const lines = buildSuggestionLinesForInk('/recall-status', 0)
     expect(lines.length).toBeGreaterThan(0)
-    for (const line of lines) {
-      expect(visibleLength(line)).toBeLessThanOrEqual(30)
-    }
+    expect(lines.some((l) => l.includes('...'))).toBe(false)
   })
 
-  test('without slash prefix returns / commands hint, truncated when narrow', () => {
-    const lines = buildSuggestionLines('hello', 0, 5)
+  test('without slash prefix returns / commands hint (one line)', () => {
+    const lines = buildSuggestionLinesForInk('hello', 0)
     expect(lines).toHaveLength(1)
-    expect(visibleLength(lines[0]!)).toBeLessThanOrEqual(5)
-    expect(lines[0]).toContain('...')
+    expect(stripAnsi(lines[0]!)).toContain('/ commands')
   })
 
   test('with slash prefix but no match returns empty', () => {
-    const lines = buildSuggestionLines('/unknown', 0, 80)
-    expect(lines).toHaveLength(0)
+    expect(buildSuggestionLinesForInk('/unknown', 0)).toHaveLength(0)
   })
 
   const sgrCloserEnd = new RegExp(
     `${String.fromCharCode(27)}\\[(?:0|39|49|23|22|24|25|26|27|55|59|53|65)m$`
   )
   test.each([
-    ['/list', 25],
-    ['/list', 30],
-    ['/', 25],
-    ['/', 30],
-  ] as const)('Current guidance lines with ANSI end with an SGR closer for buffer %s width %s', (buffer, width) => {
-    for (const line of buildSuggestionLines(buffer, 0, width)) {
+    ['/list'],
+    ['/'],
+  ] as const)('Current guidance Ink rows with ANSI end with an SGR closer for buffer %s', (buffer) => {
+    for (const line of buildSuggestionLinesForInk(buffer, 0)) {
       if (line.includes('\x1b')) {
         expect(line).toMatch(sgrCloserEnd)
       }

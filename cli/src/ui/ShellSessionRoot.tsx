@@ -7,7 +7,6 @@ import type {
 } from '../interactions/recallYesNo.js'
 import {
   buildSuggestionLinesForInk,
-  buildTokenListLines,
   DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
   formatCurrentStageIndicatorLine,
   getLastLine,
@@ -15,7 +14,6 @@ import {
   greyCurrentStageIndicatorLabel,
   interactiveFetchWaitStageIndicatorLine,
   needsGapBeforeLiveRegion,
-  recallMcqCurrentGuidanceLines,
   wrapTextToVisibleWidthLines,
   type PlaceholderContext,
 } from '../renderer.js'
@@ -152,53 +150,20 @@ export function getLiveRegionPromptStageSnapshot(
   }
 }
 
-export function buildSuggestionLinesFromPromptStage(
-  session: ShellSessionState,
-  deps: TTYDeps,
-  promptStage: LiveRegionPromptStageSnapshot
-): string[] {
-  const width = promptStage.width
-  const numberedChoices = deps.getNumberedChoiceListChoices()
-  if (session.tokenSelection) {
-    return buildTokenListLines(
-      session.tokenSelection.items,
-      deps.getDefaultTokenLabel(),
-      width,
-      session.tokenSelection.highlightIndex
-    )
-  }
-  if (promptStage.recallStopConfirmInkModel) {
-    return [...promptStage.recallStopConfirmInkModel.confirmQuestionLines]
-  }
-  if (numberedChoices !== null) {
-    return recallMcqCurrentGuidanceLines(
-      numberedChoices,
-      session.numberedChoiceHighlightIndex,
-      width
-    )
-  }
-  return buildSuggestionLinesForInk(
-    session.commandInput.lineDraft,
-    session.highlightIndex,
-    {
-      forceCommandsHint:
-        session.suggestionsDismissed &&
-        isCommandPrefixWithSuggestions(session.commandInput.lineDraft),
-    }
-  )
-}
-
 export function measureLiveRegionLayoutFromSnapshot(
   session: ShellSessionState,
-  deps: TTYDeps,
   promptStage: LiveRegionPromptStageSnapshot
 ): LiveRegionLayout {
   return {
     currentPromptWrappedLines: promptStage.currentPromptWrappedLines,
-    suggestionLines: buildSuggestionLinesFromPromptStage(
-      session,
-      deps,
-      promptStage
+    suggestionLines: buildSuggestionLinesForInk(
+      session.commandInput.lineDraft,
+      session.highlightIndex,
+      {
+        forceCommandsHint:
+          session.suggestionsDismissed &&
+          isCommandPrefixWithSuggestions(session.commandInput.lineDraft),
+      }
     ),
     currentStageIndicatorLines: promptStage.currentStageIndicatorLines,
     placeholderContext: promptStage.placeholderContext,
@@ -343,7 +308,7 @@ export function ShellSessionRoot({
   )
   const commandLineLayout = isAlternateLivePanel(session, deps)
     ? undefined
-    : measureLiveRegionLayoutFromSnapshot(session, deps, promptStage)
+    : measureLiveRegionLayoutFromSnapshot(session, promptStage)
   const livePanel = buildLivePanel(session, deps, commandLineLayout, handlers)
   return React.createElement(InteractiveShellDisplay, {
     history: session.chatHistory,

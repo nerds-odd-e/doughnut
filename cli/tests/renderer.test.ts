@@ -9,7 +9,6 @@ import {
   stripAnsi,
   stripAnsiCsiAndCr,
   needsGapBeforeLiveRegion,
-  buildSuggestionLines,
   buildSuggestionLinesForInk,
   formatInteractiveCommandLineInkRows,
   formatCurrentStageIndicatorLine,
@@ -160,20 +159,26 @@ describe('needsGapBeforeLiveRegion', () => {
 })
 
 describe('buildSuggestionLinesForInk', () => {
-  test('matches buildSuggestionLines when every row fits terminal width', () => {
-    const w = 200
-    expect(buildSuggestionLinesForInk('/h', 0)).toEqual(
-      buildSuggestionLines('/h', 0, w)
-    )
+  test('slash completion returns rows without per-line ellipsis (Ink wraps)', () => {
+    const ink = buildSuggestionLinesForInk('/h', 0)
+    expect(ink.length).toBeGreaterThan(0)
+    expect(ink.some((l) => stripAnsi(l).includes('...'))).toBe(false)
   })
 
-  test('keeps full rows where buildSuggestionLines would truncate', () => {
-    const narrow = 24
-    const truncated = buildSuggestionLines('/', 0, narrow)
+  test('many completions: full rows, no truncation marker in strings', () => {
     const ink = buildSuggestionLinesForInk('/', 0)
-    expect(truncated.some((l) => stripAnsi(l).includes('...'))).toBe(true)
+    expect(ink.length).toBeGreaterThan(1)
     expect(ink.some((l) => stripAnsi(l).includes('...'))).toBe(false)
-    expect(ink.length).toBe(truncated.length)
+  })
+
+  test('non-slash buffer yields single / commands hint line', () => {
+    const ink = buildSuggestionLinesForInk('hello', 0)
+    expect(ink).toHaveLength(1)
+    expect(stripAnsi(ink[0]!)).toContain('/ commands')
+  })
+
+  test('unknown slash prefix returns empty', () => {
+    expect(buildSuggestionLinesForInk('/unknown', 0)).toEqual([])
   })
 })
 
