@@ -474,7 +474,7 @@ describe('TTY: shared interactive session', () => {
 
       expect(
         raw.includes('\x1b[7m'),
-        'Caret is drawn as reverse video (\\x1b[7m) inside the Ink live region; hardware cursor stays hidden.'
+        'Caret is drawn as reverse video (\\x1b[7m) inside the Ink live region.'
       ).toBe(true)
     })
   })

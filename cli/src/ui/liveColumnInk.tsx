@@ -153,6 +153,7 @@ function LiveColumnInkPanel({
           <PatchedTextInput
             value={commandInputRef.current!.lineDraft}
             caretOffset={commandInputRef.current!.caretOffset}
+            placeholderContext={placeholderContext}
             placeholder={PLACEHOLDER_BY_CONTEXT[placeholderContext]}
             maxWidth={width}
             isActive={

@@ -71,6 +71,19 @@ Vocabulary for Cucumber steps and page objects (`e2e_test/start/pageObjects/cli/
 - **Non-TTY:** **`doughnut version`** / **`-v`** / **`--version`** and **`doughnut update`** only.
 - **`processInput`:** Shared slash-command engine; wired from the interactive TTY session’s `OutputAdapter` and from Vitest via `defaultOutput` — **not** a second interactive UI. Recall **MCQ** stem on `OutputAdapter.writeCurrentPrompt` (or `log` if unset); numbered choices and “Enter your choice…” on **`log` only** — same stem vs list split as the TTY UI, without duplicating choices through both hooks.
 
+## Approved non-Ink bytes / stdin bridges
+
+Document new cases in `cli/src/adapters/ttyEntry.ts` and next to code; avoid ad-hoc `process.stdout.write`.
+
+| Path | Allowed |
+|------|---------|
+| **Private OSC** | Input-ready PTY signal (`interactiveTtyStdout`, `renderer`). |
+| **Hardware cursor** | Explicit hide/show only for exception flows (fetch-wait, exit). Default command-line live paint must not emit `HIDE_CURSOR`. |
+| **Exit path** | Ctrl+C newline and farewell lines (`interactiveTtyStdout.exitFarewellBlock`, `ctrlCExitNewline`). |
+| **Pre-Ink banner** | Version lines before Ink `render()` (`interactiveTtySession`). |
+| **`patchConsole` guard** | Enable only when `console.Console` is constructible (`inkPatchConsoleSupported`). |
+| **readline `keypress` bridge** | `Ctrl+C` + fetch-wait `Esc` only; do not handle MCQ/token-list `Esc` here. |
+
 ## CLI E2E
 
 Features: **`e2e_test/features/cli/`**. Steps and page objects: **`e2e_test/step_definitions/cli.ts`**, **`e2e_test/start/pageObjects/cli/`**.

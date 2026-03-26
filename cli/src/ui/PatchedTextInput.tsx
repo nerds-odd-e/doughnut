@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import {
   buildCommandInputDraftLines,
   PROMPT,
+  type PlaceholderContext,
   truncateToWidth,
   visibleLength,
 } from '../renderer.js'
@@ -10,6 +11,7 @@ import {
 type PatchedTextInputProps = {
   value: string
   caretOffset: number
+  placeholderContext: PlaceholderContext
   placeholder: string
   maxWidth: number
   isActive: boolean
@@ -21,6 +23,7 @@ type PatchedTextInputProps = {
 export function PatchedTextInput({
   value,
   caretOffset,
+  placeholderContext,
   placeholder,
   maxWidth,
   isActive,
@@ -82,7 +85,7 @@ export function PatchedTextInput({
 
   const rendered = useMemo(() => {
     const withPrompt = buildCommandInputDraftLines(value, maxWidth, {
-      placeholderContext: 'default',
+      placeholderContext,
       caretOffset,
     })[0]!
     const withoutPrompt = withPrompt.startsWith(PROMPT)
@@ -95,7 +98,7 @@ export function PatchedTextInput({
         : value
     const body = prefixOnly ? fallback : withoutPrompt
     return truncateToWidth(body, Math.max(1, maxWidth - visibleLength(PROMPT)))
-  }, [value, caretOffset, placeholder, maxWidth])
+  }, [value, caretOffset, placeholderContext, placeholder, maxWidth])
 
   return <Text wrap="truncate-end">{rendered}</Text>
 }

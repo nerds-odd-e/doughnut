@@ -276,7 +276,7 @@ describe('TTY token list interactive mode', () => {
     expect(output).toContain('Cancelled by user.')
     expect(output).toContain('/ commands')
     expect(output).not.toContain('Alpha')
-    expect(output).toContain('\x1b[?25l')
+    expect(output).not.toContain('\x1b[?25l')
     expect(output).toContain('\x1b[7m')
   })
 

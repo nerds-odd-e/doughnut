@@ -78,6 +78,14 @@ Slash completion styling (inverse segments, grapheme-aware width) must either ma
 - Update **`ttyEntry.ts`** checklist and **`.cursor/rules/cli.mdc`** “approved non-Ink” table — **no silent** new `process.stdout.write` paths.
 - **Verify:** `pnpm cli:test`; real TTY smoke (no double caret, no flash); E2E if PTY-visible.
 
+**Status:** done.
+
+- `interactiveTtyStdout.finalizeDefaultLiveAfterInk` no longer emits `HIDE_CURSOR`; default command-line live paint now emits only the input-ready OSC suffix.
+- `hideCursor()` remains for explicit exception paths (fetch-wait); `showCursor()` remains on shutdown.
+- Updated the non-Ink write checklist in `cli/src/adapters/ttyEntry.ts` and added the same policy table to `.cursor/rules/cli.mdc`.
+- Verify run:
+  - `CURSOR_DEV=true nix develop -c pnpm -C /Users/lia/doughnut/cli test tests/interactive/interactiveTtySession.test.ts tests/interactive/interactiveTtyTokenList.test.ts tests/interactive/interactiveTtyMcq.test.ts`
+
 ### Phase 5 — Cleanup
 
 - Delete dead helpers only when **no** test or product path needs them; **no** duplicate editor code paths.
