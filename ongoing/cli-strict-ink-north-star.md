@@ -65,6 +65,13 @@ Slash completion styling (inverse segments, grapheme-aware width) must either ma
 - Restore or re-spec **slash-aware** and **placeholder** presentation under the new editor (may be TextInput-only, or helper rows + plain TextInput — **one** coherent design).
 - **Verify:** `pnpm cli:test` (slash completion, `renderer`/`terminalLayout` consumers); targeted E2E `cli_interactive_mode.feature` if live strip shape changes.
 
+**Status:** done.
+
+- `PatchedTextInput` now builds its visible row from `renderer` command-line helpers (`buildCommandInputDraftLines`), restoring slash-command prefix highlighting and grapheme-aware caret rendering in the single-owner TextInput path.
+- The TextInput row now applies renderer width fitting (`truncateToWidth`) with prompt-aware available width, so placeholder/draft rendering stays coherent at narrow terminal widths.
+- Verify run:
+  - `CURSOR_DEV=true nix develop -c pnpm -C /Users/lia/doughnut/cli test tests/slashCompletion.test.ts tests/renderer.test.ts tests/interactive/interactiveTtySession.test.ts`
+
 ### Phase 4 — Remove hardware cursor from default live path
 
 - After the main line no longer relies on hiding the HW cursor for Ink-drawn caret, remove or narrow **`hideCursor` / `finalizeDefaultLiveAfterInk`** so default command-line paint does not emit **`HIDE_CURSOR`**.

@@ -1,36 +1,28 @@
 import { Text, useInput, type Key } from 'ink'
 import { useMemo } from 'react'
-import { terminalChalk } from '../terminalChalk.js'
+import {
+  buildCommandInputDraftLines,
+  PROMPT,
+  truncateToWidth,
+  visibleLength,
+} from '../renderer.js'
 
 type PatchedTextInputProps = {
   value: string
   caretOffset: number
   placeholder: string
+  maxWidth: number
   isActive: boolean
   onChange: (nextValue: string, nextCaretOffset: number) => void
   onSubmit: (value: string) => void
   onUnhandledKey: (input: string, key: Key) => void
 }
 
-function renderWithCaret(value: string, caretOffset: number): string {
-  const co = Math.max(0, Math.min(caretOffset, value.length))
-  if (value.length === 0) return terminalChalk.inverse(' ')
-  let index = 0
-  let result = ''
-  for (const char of value) {
-    result += index === co ? terminalChalk.inverse(char) : char
-    index++
-  }
-  if (co === value.length) {
-    result += terminalChalk.inverse(' ')
-  }
-  return result
-}
-
 export function PatchedTextInput({
   value,
   caretOffset,
   placeholder,
+  maxWidth,
   isActive,
   onChange,
   onSubmit,
@@ -89,9 +81,21 @@ export function PatchedTextInput({
   )
 
   const rendered = useMemo(() => {
-    if (value.length > 0) return renderWithCaret(value, caretOffset)
-    return `${terminalChalk.inverse(' ')}${terminalChalk.gray(placeholder)}`
-  }, [value, caretOffset, placeholder])
+    const withPrompt = buildCommandInputDraftLines(value, maxWidth, {
+      placeholderContext: 'default',
+      caretOffset,
+    })[0]!
+    const withoutPrompt = withPrompt.startsWith(PROMPT)
+      ? withPrompt.slice(PROMPT.length)
+      : withPrompt
+    const prefixOnly = withoutPrompt === withPrompt
+    const fallback =
+      value.length === 0
+        ? `\x1b[7m \x1b[27m\x1b[90m${placeholder}\x1b[0m`
+        : value
+    const body = prefixOnly ? fallback : withoutPrompt
+    return truncateToWidth(body, Math.max(1, maxWidth - visibleLength(PROMPT)))
+  }, [value, caretOffset, placeholder, maxWidth])
 
-  return <Text>{rendered}</Text>
+  return <Text wrap="truncate-end">{rendered}</Text>
 }

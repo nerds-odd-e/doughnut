@@ -154,6 +154,7 @@ function LiveColumnInkPanel({
             value={commandInputRef.current!.lineDraft}
             caretOffset={commandInputRef.current!.caretOffset}
             placeholder={PLACEHOLDER_BY_CONTEXT[placeholderContext]}
+            maxWidth={width}
             isActive={
               !ignoreKeysWhenNotFocused ||
               isFocusedRef.current ||
