@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'vitest'
 import {
   formatMcqChoiceLines,
-  recallMcqCurrentGuidanceLines,
+  formatMcqChoiceLinesWithIndices,
+  renderCurrentGuidanceForSelectableLines,
   stripAnsi,
   wrapMarkdownTerminalToLines,
 } from '../src/renderer.js'
@@ -18,7 +19,16 @@ describe('recall MCQ terminal display', () => {
   })
 
   test('Current guidance: exactly one highlighted row for the selected choice index', () => {
-    const out = recallMcqCurrentGuidanceLines(['a', 'b', 'c'], 1, 120)
+    const { lines, itemIndexPerLine } = formatMcqChoiceLinesWithIndices(
+      ['a', 'b', 'c'],
+      120
+    )
+    const out = renderCurrentGuidanceForSelectableLines(
+      lines,
+      1,
+      120,
+      itemIndexPerLine
+    )
     const highlighted = out.filter((l) => l.includes('\x1b[7m'))
     expect(highlighted).toHaveLength(1)
     expect(stripAnsi(highlighted[0]!)).toMatch(/ {2}2\. /)
@@ -27,7 +37,16 @@ describe('recall MCQ terminal display', () => {
   test('narrow width: one choice can span multiple rows; highlight covers every wrapped row', () => {
     const long =
       'This answer text is long enough to require wrapping at thirty columns wide.'
-    const out = recallMcqCurrentGuidanceLines([long, 'B'], 0, 30)
+    const { lines, itemIndexPerLine } = formatMcqChoiceLinesWithIndices(
+      [long, 'B'],
+      30
+    )
+    const out = renderCurrentGuidanceForSelectableLines(
+      lines,
+      0,
+      30,
+      itemIndexPerLine
+    )
     const highlighted = out.filter((l) => l.includes('\x1b[7m'))
     expect(highlighted.length).toBeGreaterThan(1)
     expect(stripAnsi(highlighted[0]!)).toContain('This')
@@ -38,7 +57,16 @@ describe('recall MCQ terminal display', () => {
   test('narrow width: selected index is per choice, not per wrapped line', () => {
     const long =
       'First choice is long so it occupies multiple physical guidance lines here.'
-    const out = recallMcqCurrentGuidanceLines([long, 'Second'], 1, 28)
+    const { lines, itemIndexPerLine } = formatMcqChoiceLinesWithIndices(
+      [long, 'Second'],
+      28
+    )
+    const out = renderCurrentGuidanceForSelectableLines(
+      lines,
+      1,
+      28,
+      itemIndexPerLine
+    )
     const highlighted = out.filter((l) => l.includes('\x1b[7m'))
     expect(highlighted).toHaveLength(1)
     expect(stripAnsi(highlighted[0]!)).toContain('Second')

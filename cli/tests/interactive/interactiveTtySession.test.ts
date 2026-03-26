@@ -134,12 +134,12 @@ describe('TTY: shared interactive session', () => {
         stripAnsi(l).includes('→ /help ')
       )
       const afterInsert = lines.slice(lastBoxLineIdx + 1).join('\n')
-      const suggestionLinesAfterInsert = afterInsert
+      const guidanceLinesAfterInsert = afterInsert
         .split('\n')
         .filter(
           (l) => l.includes('/help') && l.includes('List available commands')
         )
-      expect(suggestionLinesAfterInsert).toHaveLength(0)
+      expect(guidanceLinesAfterInsert).toHaveLength(0)
     })
 
     test('first Up from `/` moves caret home; second Up wraps highlight to the last matching command', async () => {

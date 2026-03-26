@@ -21,7 +21,8 @@ export type CommandLineLivePanelProps = {
   caretOffset: number
   width: TerminalWidth
   currentPromptWrappedLines: string[]
-  suggestionLines: string[]
+  /** Current guidance (slash hint + completion list); Ink `Text` wrap — see `buildSuggestionLinesForInk`. */
+  currentGuidanceLines: string[]
   currentStageIndicatorLines: string[]
   placeholderContext: PlaceholderContext
   /** Ink-owned stdin for the main command line (phase 2); not used for alternate live panels. */
@@ -34,7 +35,7 @@ export function CommandLineLivePanel({
   caretOffset,
   width,
   currentPromptWrappedLines,
-  suggestionLines,
+  currentGuidanceLines,
   currentStageIndicatorLines,
   placeholderContext,
   onCommandKey,
@@ -107,7 +108,7 @@ export function CommandLineLivePanel({
       {commandPaintLines.map((line, i) => (
         <Text key={`cmd-${i}`}>{line}</Text>
       ))}
-      {suggestionLines.map((line, i) => (
+      {currentGuidanceLines.map((line, i) => (
         <Box key={`sug-${i}`} width={width}>
           <Text wrap="wrap">{line}</Text>
         </Box>

@@ -219,7 +219,7 @@ Interactive fetch-wait: **`@inkjs/ui` `Spinner`** (`type="dots"`) in **`FetchWai
 
 **Goal:** **TTY path** stops depending on large grapheme **live-region line builders** where Ink already wraps (gate 4). **`renderer.ts`** keeps shared tone helpers and **string props** into Ink (MCQ lines, separators); grapheme width / wrap / **`truncateToWidth`** live in **`terminalLayout.ts`** (re-exported from **`renderer`**). **No** duplicate pre-wrap suggestion builder: removed **`buildSuggestionLines`**; **`ShellSessionRoot`** only feeds **`buildSuggestionLinesForInk`** for the default live column (token/MCQ alternate panels never used the removed branches). **Never** bring back **piped** or **`-c`**.
 
-- **Shipped:** **`cli/src/terminalLayout.ts`**; **`renderer.ts`** reduced; **`buildSuggestionLines`** deleted; **`measureLiveRegionLayoutFromSnapshot`** no longer takes unused **`deps`**; tests updated for Ink-first guidance.
+- **Shipped:** **`cli/src/terminalLayout.ts`**; **`renderer.ts`** reduced; **`buildSuggestionLines`** deleted; **`ShellSessionRoot`** inlines default-panel guidance into **`DefaultCommandLineInkLayout`** (no separate measure step); tests updated for Ink-first guidance.
 - **Verify:** **`pnpm cli:test`**; **`pnpm cli:lint`**.
 
 ### Phase 13 — `patchConsole: true` + Ink-idiomatic stdout

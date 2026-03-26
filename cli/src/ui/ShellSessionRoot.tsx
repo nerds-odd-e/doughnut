@@ -1,10 +1,7 @@
 import React from 'react'
 import type { Key } from 'ink'
 import { filterCommandsByPrefix, interactiveDocs } from '../help.js'
-import type {
-  RecallInkConfirmChoice,
-  RecallStopConfirmInkModel,
-} from '../interactions/recallYesNo.js'
+import type { RecallInkConfirmChoice } from '../interactions/recallYesNo.js'
 import {
   buildSuggestionLinesForInk,
   DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
@@ -16,6 +13,7 @@ import {
   needsGapBeforeLiveRegion,
   wrapTextToVisibleWidthLines,
   type PlaceholderContext,
+  type TerminalWidth,
 } from '../renderer.js'
 import type { ShellSessionState } from '../shell/shellSessionState.js'
 import type { TTYDeps } from '../adapters/ttyDeps.js'
@@ -37,20 +35,28 @@ export function isInkSubmitPressed(key: Key, input: string): boolean {
   return key.return || input === '\n' || input === '\r'
 }
 
-type LiveRegionLayout = {
-  currentPromptWrappedLines: string[]
-  suggestionLines: string[]
-  currentStageIndicatorLines: string[]
+/**
+ * Stage band + wrapped **Current prompt** copy (above the command line). Used for scrollback gap
+ * and passed through to the default command-line Ink panel.
+ */
+type LiveColumnLeadingSnapshot = {
+  terminalWidth: TerminalWidth
   placeholderContext: PlaceholderContext
-  terminalWidth: number
+  currentPromptWrappedLines: string[]
+  currentStageIndicatorLines: string[]
 }
 
-type LiveRegionPromptStageSnapshot = {
-  width: number
-  placeholderContext: PlaceholderContext
-  recallStopConfirmInkModel: RecallStopConfirmInkModel | null
-  currentPromptWrappedLines: string[]
-  currentStageIndicatorLines: string[]
+/** Default live column only: {@link LiveColumnLeadingSnapshot} + **Current guidance** rows. */
+type DefaultCommandLineInkLayout = LiveColumnLeadingSnapshot & {
+  currentGuidanceLines: string[]
+}
+
+/** MCQ recall **Current prompt** lines; empty array when the adapter has no stem to show. */
+function mcqRecallCurrentPromptLines(
+  deps: TTYDeps,
+  width: TerminalWidth
+): string[] {
+  return deps.getNumberedChoiceListCurrentPromptWrappedLines(width) ?? []
 }
 
 function currentStageIndicatorLinesForLiveRegion(
@@ -89,21 +95,21 @@ export function isAlternateLivePanel(
   return false
 }
 
-export function getLiveRegionPromptStageSnapshot(
+function computeLiveColumnLeadingSnapshot(
   session: ShellSessionState,
   deps: TTYDeps
-): LiveRegionPromptStageSnapshot {
-  const width = getTerminalWidth()
+): LiveColumnLeadingSnapshot {
+  const terminalWidth = getTerminalWidth()
   const placeholderContext = deps.getPlaceholderContext(
     !!session.tokenSelection
   )
-  const recallStopConfirmInkModel = deps.isPendingStopConfirmation()
+  const stopRecallConfirm = deps.isPendingStopConfirmation()
     ? deps.getRecallStopConfirmInkModel(placeholderContext)
     : null
   const numberedChoicePromptLines =
-    deps.getNumberedChoiceListCurrentPromptWrappedLines(width)
+    deps.getNumberedChoiceListCurrentPromptWrappedLines(terminalWidth)
   const spellingPromptLines =
-    deps.getSpellingRecallCurrentPromptWrappedLines(width)
+    deps.getSpellingRecallCurrentPromptWrappedLines(terminalWidth)
   const waitLine = getInteractiveFetchWaitLine()
   const tokenListConfig = session.tokenSelection
     ? deps.TOKEN_LIST_COMMANDS[session.tokenSelection.command]
@@ -111,8 +117,8 @@ export function getLiveRegionPromptStageSnapshot(
   let currentPromptWrappedLines: string[]
   if (waitLine) {
     currentPromptWrappedLines = []
-  } else if (recallStopConfirmInkModel) {
-    currentPromptWrappedLines = [...recallStopConfirmInkModel.promptLines]
+  } else if (stopRecallConfirm) {
+    currentPromptWrappedLines = [...stopRecallConfirm.promptLines]
   } else {
     const currentPromptText = tokenListConfig?.currentPrompt
     if (
@@ -130,7 +136,7 @@ export function getLiveRegionPromptStageSnapshot(
     } else if (currentPromptText) {
       currentPromptWrappedLines = wrapTextToVisibleWidthLines(
         currentPromptText,
-        width
+        terminalWidth
       )
     } else {
       currentPromptWrappedLines = []
@@ -142,32 +148,10 @@ export function getLiveRegionPromptStageSnapshot(
     deps.isInCommandSessionSubstate()
   )
   return {
-    width,
+    terminalWidth,
     placeholderContext,
-    recallStopConfirmInkModel,
     currentPromptWrappedLines,
     currentStageIndicatorLines,
-  }
-}
-
-export function measureLiveRegionLayoutFromSnapshot(
-  session: ShellSessionState,
-  promptStage: LiveRegionPromptStageSnapshot
-): LiveRegionLayout {
-  return {
-    currentPromptWrappedLines: promptStage.currentPromptWrappedLines,
-    suggestionLines: buildSuggestionLinesForInk(
-      session.commandInput.lineDraft,
-      session.highlightIndex,
-      {
-        forceCommandsHint:
-          session.suggestionsDismissed &&
-          isCommandPrefixWithSuggestions(session.commandInput.lineDraft),
-      }
-    ),
-    currentStageIndicatorLines: promptStage.currentStageIndicatorLines,
-    placeholderContext: promptStage.placeholderContext,
-    terminalWidth: promptStage.width,
   }
 }
 
@@ -186,7 +170,7 @@ export type ShellSessionInkHandlers = {
 function buildLivePanel(
   session: ShellSessionState,
   deps: TTYDeps,
-  commandLineLayout: LiveRegionLayout | undefined,
+  defaultCommandLineLayout: DefaultCommandLineInkLayout | undefined,
   handlers: ShellSessionInkHandlers
 ): React.ReactElement {
   const waitLine = getInteractiveFetchWaitLine()
@@ -229,8 +213,7 @@ function buildLivePanel(
   const numberedChoices = deps.getNumberedChoiceListChoices()
   if (numberedChoices !== null) {
     const width = getTerminalWidth()
-    const promptLines =
-      deps.getNumberedChoiceListCurrentPromptWrappedLines(width) ?? []
+    const promptLines = mcqRecallCurrentPromptLines(deps, width)
     return React.createElement(RecallMcqChoicesLivePanel, {
       stageIndicatorLine: DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
       currentPromptLines: promptLines,
@@ -272,13 +255,13 @@ function buildLivePanel(
         ),
     })
   }
-  const layout = commandLineLayout!
+  const layout = defaultCommandLineLayout!
   return React.createElement(CommandLineLivePanel, {
     buffer: session.commandInput.lineDraft,
     caretOffset: session.commandInput.caretOffset,
     width: layout.terminalWidth,
     currentPromptWrappedLines: layout.currentPromptWrappedLines,
-    suggestionLines: layout.suggestionLines,
+    currentGuidanceLines: layout.currentGuidanceLines,
     currentStageIndicatorLines: layout.currentStageIndicatorLines,
     placeholderContext: layout.placeholderContext,
     onCommandKey: (input, key) =>
@@ -300,16 +283,33 @@ export function ShellSessionRoot({
   deps,
   handlers,
 }: ShellSessionRootProps): React.ReactElement {
-  const promptStage = getLiveRegionPromptStageSnapshot(session, deps)
+  const leading = computeLiveColumnLeadingSnapshot(session, deps)
   const liveLeadingGap = needsGapBeforeLiveRegion(
     session.chatHistory,
-    promptStage.currentPromptWrappedLines,
-    promptStage.currentStageIndicatorLines
+    leading.currentPromptWrappedLines,
+    leading.currentStageIndicatorLines
   )
-  const commandLineLayout = isAlternateLivePanel(session, deps)
-    ? undefined
-    : measureLiveRegionLayoutFromSnapshot(session, promptStage)
-  const livePanel = buildLivePanel(session, deps, commandLineLayout, handlers)
+  const defaultCommandLineLayout: DefaultCommandLineInkLayout | undefined =
+    isAlternateLivePanel(session, deps)
+      ? undefined
+      : {
+          ...leading,
+          currentGuidanceLines: buildSuggestionLinesForInk(
+            session.commandInput.lineDraft,
+            session.highlightIndex,
+            {
+              forceCommandsHint:
+                session.suggestionsDismissed &&
+                isCommandPrefixWithSuggestions(session.commandInput.lineDraft),
+            }
+          ),
+        }
+  const livePanel = buildLivePanel(
+    session,
+    deps,
+    defaultCommandLineLayout,
+    handlers
+  )
   return React.createElement(InteractiveShellDisplay, {
     history: session.chatHistory,
     terminalWidth: getTerminalWidth(),

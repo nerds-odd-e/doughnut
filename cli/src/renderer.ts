@@ -386,10 +386,16 @@ export function wrapMarkdownTerminalToLines(
     )
 }
 
+/** Physical **Current guidance** rows for recall MCQ; `itemIndexPerLine[i]` is the choice index for row `i`. */
+export type McqGuidancePhysicalRows = {
+  lines: string[]
+  itemIndexPerLine: number[]
+}
+
 export function formatMcqChoiceLinesWithIndices(
   choices: RecallMcqChoiceTexts,
   width: TerminalWidth
-): { lines: string[]; itemIndexPerLine: number[] } {
+): McqGuidancePhysicalRows {
   const lines: string[] = []
   const itemIndexPerLine: number[] = []
   for (let i = 0; i < choices.length; i++) {
@@ -421,8 +427,9 @@ export function formatMcqChoiceLines(
 }
 
 /**
- * Plain selectable rows (commands, tokens, …) → Current guidance:
- * highlight one row, truncate to width, scroll window when needed.
+ * Scroll-window **Current guidance** for plain rows (token list, tests, non-Ink paths): grey /
+ * inverse highlight, optional per-item wrapped lines, then **truncate** each row to `width`.
+ * Default command-line slash completion uses {@link buildSuggestionLinesForInk} + Ink wrap instead.
  */
 export function renderCurrentGuidanceForSelectableLines(
   plainLines: readonly string[],
@@ -438,46 +445,6 @@ export function renderCurrentGuidanceForSelectableLines(
   ).map((line) => truncateToWidth(line, width))
 }
 
-export function recallMcqCurrentGuidanceLines(
-  choices: RecallMcqChoiceTexts,
-  selectedChoiceIndex: number,
-  width: TerminalWidth
-): string[] {
-  const { lines, itemIndexPerLine } = formatMcqChoiceLinesWithIndices(
-    choices,
-    width
-  )
-  return renderCurrentGuidanceForSelectableLines(
-    lines,
-    selectedChoiceIndex,
-    width,
-    itemIndexPerLine
-  )
-}
-
-type SuggestionMode =
-  | { kind: 'commandsHint' }
-  | {
-      kind: 'completion'
-      filtered: ReturnType<typeof filterCommandsByPrefix>
-    }
-
-function suggestionModeFromBuffer(
-  buffer: string,
-  options?: { forceCommandsHint?: boolean }
-): SuggestionMode {
-  const lastLine = getLastLine(buffer)
-  const showHint =
-    options?.forceCommandsHint ||
-    !lastLine.startsWith('/') ||
-    lastLine.endsWith(' ')
-  if (showHint) return { kind: 'commandsHint' }
-  return {
-    kind: 'completion',
-    filtered: filterCommandsByPrefix(interactiveDocs, lastLine),
-  }
-}
-
 /**
  * Current guidance for the default TTY live column: command completion or `/` hint.
  * No per-line grapheme truncation — Ink `Text` `wrap` inside `Box width={terminalWidth}` (gate 4).
@@ -487,12 +454,17 @@ export function buildSuggestionLinesForInk(
   highlightIndex: number,
   options?: { forceCommandsHint?: boolean }
 ): string[] {
-  const mode = suggestionModeFromBuffer(buffer, options)
-  if (mode.kind === 'commandsHint') {
+  const lastLine = getLastLine(buffer)
+  const showCommandsHint =
+    options?.forceCommandsHint ||
+    !lastLine.startsWith('/') ||
+    lastLine.endsWith(' ')
+  if (showCommandsHint) {
     return [COMMANDS_HINT]
   }
+  const filtered = filterCommandsByPrefix(interactiveDocs, lastLine)
   return formatHighlightedList(
-    formatCommandCompletionLines(mode.filtered),
+    formatCommandCompletionLines(filtered),
     CURRENT_GUIDANCE_MAX_VISIBLE,
     highlightIndex
   )
