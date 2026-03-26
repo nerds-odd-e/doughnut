@@ -1,7 +1,6 @@
 /**
- * Observable contract: after the TTY paints recall MCQ via Ink (`RecallMcqChoicesLivePanel`), the display
- * contains the stage indicator, MCQ stem, choices, guidance, and the → prompt on the last line.
- * After rerenders (↓↑↓ key presses), the MCQ display must not overwrite the /recall history.
+ * Observable contract: recall MCQ paints like other live columns — stage band, stem, then `→` command line
+ * (with recallMcq placeholder when empty), then numbered choices. After ↓↑↓ repaints, history must stay intact.
  */
 import process from 'node:process'
 import { afterEach, describe, expect, test, type vi } from 'vitest'
@@ -59,7 +58,7 @@ describe('recall MCQ on TTY: Ink numbered-choice list render', () => {
     const promptRow = lastRowIndexContainingPlain(lines, '→')
     expect(
       promptRow,
-      'Ink MCQ panel should render the → prompt on the last line.'
+      'Ink MCQ panel should render the → command line (above numbered choices).'
     ).toBeGreaterThanOrEqual(0)
   }
 

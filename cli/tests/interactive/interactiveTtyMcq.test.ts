@@ -289,8 +289,13 @@ describe('TTY recall MCQ wrapped choices (narrow terminal)', () => {
     const output = ttyOutput(writeSpy)
     const highlighted = output
       .split('\n')
-      .filter((l: string) => l.includes('\x1b[7m'))
-    expect(highlighted.length).toBe(1)
+      .filter(
+        (l: string) => l.includes('\x1b[7m') && / {2}\d+\. /.test(stripAnsi(l))
+      )
+    expect(
+      highlighted.length,
+      'Only one numbered MCQ guidance row should be inverse; the → row may also use reverse video for the caret.'
+    ).toBe(1)
     expect(stripAnsi(highlighted[0]!)).toMatch(/ {2}2\. /)
   })
 })

@@ -1,44 +1,16 @@
-import { useCallback, useRef } from 'react'
-import { Box, Text, useFocus, useInput, type Key } from 'ink'
+import { Box, Text, type Key } from 'ink'
 import type { AccessTokenEntry, AccessTokenLabel } from '../accessToken.js'
 import type { RecallMcqChoiceTexts } from '../types.js'
 import {
   buildCurrentPromptSeparatorForStageBand,
   formatMcqChoiceLinesWithIndices,
-  PROMPT,
   stripAnsi,
   type TerminalWidth,
 } from '../renderer.js'
-import { eachLogicalInkStdinChunk } from './inkStdinLogicalKeys.js'
 import { PrimaryLiveInkPanel } from './PrimaryLiveInkPanel.js'
 
 /** Ink `useFocus` id while **Current guidance** list selection (recall MCQ or access-token picker) owns stdin. */
 export const LIVE_SELECTION_GUIDANCE_INK_FOCUS_ID = 'live-selection-guidance'
-
-function useLiveSelectionGuidanceStdin(
-  onLogicalKey: (input: string, key: Key) => void | Promise<void>,
-  onInterrupt: () => void
-): void {
-  useFocus({
-    id: LIVE_SELECTION_GUIDANCE_INK_FOCUS_ID,
-    autoFocus: true,
-  })
-  const onKeyRef = useRef(onLogicalKey)
-  onKeyRef.current = onLogicalKey
-  const handleKey = useCallback(
-    (input: string, key: Key) => {
-      if (key.ctrl && input === 'c') {
-        onInterrupt()
-        return
-      }
-      eachLogicalInkStdinChunk(input, key, (inp, ky) => {
-        Promise.resolve(onKeyRef.current(inp, ky)).catch(() => undefined)
-      })
-    },
-    [onInterrupt]
-  )
-  useInput(handleKey, { isActive: true })
-}
 
 export type RecallMcqChoicesLivePanelProps = {
   stageIndicatorLine: string
@@ -46,24 +18,23 @@ export type RecallMcqChoicesLivePanelProps = {
   choices: RecallMcqChoiceTexts
   highlightIndex: number
   lineDraft: string
+  caretOffset: number
   width: TerminalWidth
   onInterrupt: () => void
   onGuidanceListKey: (input: string, key: Key) => void | Promise<void>
 }
 
-/** Recall MCQ: numbered choices in Current guidance, optional answer draft after `PROMPT`. */
 export function RecallMcqChoicesLivePanel({
   stageIndicatorLine,
   currentPromptLines,
   choices,
   highlightIndex,
   lineDraft,
+  caretOffset,
   width,
   onInterrupt,
   onGuidanceListKey,
 }: RecallMcqChoicesLivePanelProps) {
-  useLiveSelectionGuidanceStdin(onGuidanceListKey, onInterrupt)
-
   const { lines, itemIndexPerLine } = formatMcqChoiceLinesWithIndices(
     choices,
     width
@@ -74,25 +45,45 @@ export function RecallMcqChoicesLivePanel({
       ? currentPromptLines.map((l) => stripAnsi(l)).join('\n')
       : null
 
-  return (
-    <Box flexDirection="column" width={width}>
-      <Text>{stageIndicatorLine}</Text>
-      {promptPlain ? (
-        <Text color="grey" wrap="wrap">
-          {promptPlain}
-        </Text>
+  const aboveCommandLine = (
+    <>
+      {stageIndicatorLine ? (
+        <>
+          <Text>{stageIndicatorLine}</Text>
+          <Text>{buildCurrentPromptSeparatorForStageBand(width)}</Text>
+        </>
       ) : null}
-      {lines.map((line, i) => (
-        <Text key={i} inverse={itemIndexPerLine[i] === highlightIndex}>
-          {stripAnsi(line)}
-        </Text>
-      ))}
-      <Text dimColor>↑↓ Enter or number to select; Esc to cancel</Text>
-      <Text>
-        {PROMPT}
-        {lineDraft}
-      </Text>
-    </Box>
+      {promptPlain ? (
+        <Box width={width}>
+          <Text color="grey" wrap="wrap">
+            {promptPlain}
+          </Text>
+        </Box>
+      ) : null}
+    </>
+  )
+
+  const guidance = lines.map((line, i) => (
+    <Text key={i} inverse={itemIndexPerLine[i] === highlightIndex}>
+      {stripAnsi(line)}
+    </Text>
+  ))
+
+  return (
+    <PrimaryLiveInkPanel
+      focusId={LIVE_SELECTION_GUIDANCE_INK_FOCUS_ID}
+      width={width}
+      buffer={lineDraft}
+      caretOffset={caretOffset}
+      placeholderContext="recallMcq"
+      onInkKey={onGuidanceListKey}
+      onInterrupt={onInterrupt}
+      refocusWhenUnfocused={false}
+      stdinLogicalChunks
+      ignoreKeysWhenNotFocused={false}
+      aboveCommandLine={aboveCommandLine}
+      guidance={guidance}
+    />
   )
 }
 

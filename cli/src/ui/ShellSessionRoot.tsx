@@ -190,12 +190,17 @@ function buildLivePanel(
   if (numberedChoices !== null) {
     const width = getTerminalWidth()
     const promptLines = deps.getRecallCurrentPromptWrappedLines(width) ?? []
+    const recallStageLine = formatCurrentStageIndicatorLine(
+      DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
+      width
+    )
     return React.createElement(RecallMcqChoicesLivePanel, {
-      stageIndicatorLine: DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
+      stageIndicatorLine: recallStageLine,
       currentPromptLines: promptLines,
       choices: numberedChoices,
       highlightIndex: session.numberedChoiceHighlightIndex,
       lineDraft: session.commandInput.lineDraft,
+      caretOffset: session.commandInput.caretOffset,
       width,
       onInterrupt: handlers.onInterrupt,
       onGuidanceListKey: (inp, ky) =>
