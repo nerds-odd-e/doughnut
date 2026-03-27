@@ -29,7 +29,6 @@ import {
   useAccessTokenListStage,
   type AccessTokenListStageNavigation,
 } from './accessTokenListStage.js'
-import type { AppStage } from './interactiveAppStage.js'
 import type { InteractiveAppTerminalContract } from './interactiveAppTerminalContract.js'
 import {
   useInteractiveShellStage,
@@ -60,21 +59,19 @@ export function InteractiveApp({
     initialSession
   )
 
-  const [appStage, setAppStage] = React.useState<AppStage>({ kind: 'shell' })
+  const [tokenSelection, setTokenSelection] =
+    React.useState<TokenSelectionState | null>(null)
 
   const applyAccessTokenListNavigation = React.useCallback(
     (nav: AccessTokenListStageNavigation) => {
-      if (nav.kind === 'shell') setAppStage({ kind: 'shell' })
-      else setAppStage({ kind: 'accessTokenList', picker: nav.picker })
+      if (nav.kind === 'shell') setTokenSelection(null)
+      else setTokenSelection(nav.picker)
     },
     []
   )
 
   const latestTokenPickerRef = React.useRef<TokenSelectionState | null>(null)
   const ttyOutputHolder = React.useRef<OutputAdapter | null>(null)
-
-  const tokenSelection =
-    appStage.kind === 'accessTokenList' ? appStage.picker : null
 
   const patch = React.useCallback(
     (reducerPatch: (s: ShellSessionState) => ShellSessionState) => {
@@ -204,7 +201,7 @@ export function InteractiveApp({
     ttyOutputRef,
     ttyOutput,
     exitSession,
-    hasActiveTokenPicker: () => appStage.kind === 'accessTokenList',
+    hasActiveTokenPicker: () => tokenSelection !== null,
     commitHistoryOutput,
     rememberCommittedLine,
     applyAccessTokenListNavigation,
