@@ -696,10 +696,6 @@ function getRecallCurrentPromptWrappedLines(width: number): string[] | null {
   return null
 }
 
-function isNumberedChoiceListActive(): boolean {
-  return isMcqRecallPending(pendingRecallAnswer)
-}
-
 function getNumberedChoiceListChoices(): readonly string[] | null {
   const p = pendingRecallAnswer
   if (!isMcqRecallPending(p)) return null
@@ -725,7 +721,6 @@ function buildTTYDeps() {
     exitCommandSession: exitRecallMode,
     getStopConfirmationYesOutcomeLines: () => ['Stopped recall'] as const,
     getRecallStopConfirmInkModel: recallStopConfirmInkModelForContext,
-    isNumberedChoiceListActive,
     getNumberedChoiceListChoices,
     getRecallCurrentPromptWrappedLines,
     shouldRecordCommittedLineInUserInputHistory: () =>

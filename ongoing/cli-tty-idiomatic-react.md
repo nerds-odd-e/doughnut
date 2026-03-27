@@ -13,13 +13,17 @@ Informal plan. Delete or shrink when this refactor is done or parked.
 ## Status snapshot (2026-03-27)
 
 - **Phase 0 is done:** trimmed unused public surface (module-private types/helpers where nothing imported them) and removed **`ConfirmLivePanel.tsx`** — it was unreachable from the bundle and referenced non-existent modules (`sessionYesNoInteraction`, `ConfirmDisplay`). **`selectListInteraction.test.ts`** now builds full `SelectListKeyEvent` shapes for `dispatchSelectListKey` (internal type is no longer exported).
-- **Phases 1–2 are implemented and green in `cli` tests.**
+- **Phases 1–3 are implemented and green in `cli` tests** (Phase 3: targeted interactive Vitest files; no plan-file edits).
 - `runInteractiveTtySession` uses a **single Ink mount** and a reducer-driven React root (`InteractiveTtyInkApp` inside the adapter file).
 - The old imperative repaint loop is removed: no adapter-level `drawBox`, `patchAndDraw`, or manual `shellInstance.rerender`.
+- **No identity `forceRedraw` in the adapter:** repaints that only existed to re-run **`handleShellRendered`** use **`bumpTtyContractEpoch`** (`ttyContractEpoch` on **`ShellSessionState`**).
+- Shared **`runProcessInputTurn`** covers session y/n, MCQ submit, and normal command-line **`processInput`** await/exit paths.
+- **`TTYDeps`:** removed **`isNumberedChoiceListActive`**; call sites use **`getNumberedChoiceListChoices() !== null`**.
+- **`OutputAdapter`:** **`writeCurrentPrompt` / `beginCurrentPrompt`** left split (TTY vs non-TTY recall paths unchanged in Phase 3).
 - `ShellSessionRoot` remains as the view boundary for now (not inlined yet).
-- **Phase 2:** Fetch-wait changes bump **`ttyContractEpoch`** on `ShellSessionState` so `useLayoutEffect` re-runs **`handleShellRendered`** without identity **`forceRedraw`**. Fetch-wait **Esc** relies on `runInteractiveFetchWait` **`finally`** → **`setActiveWaitLine`** → **`onInteractiveFetchWaitChanged`** (no separate **`redrawRef`** tick).
+- **Phase 2:** Fetch-wait changes bump **`ttyContractEpoch`** on `ShellSessionState` so `useLayoutEffect` re-runs **`handleShellRendered`** without identity redraw. Fetch-wait **Esc** relies on `runInteractiveFetchWait` **`finally`** → **`setActiveWaitLine`** → **`onInteractiveFetchWaitChanged`** (no separate **`redrawRef`** tick).
 
-## Current shape (after Phase 1)
+## Current shape (after Phase 3)
 
 - **`runInteractiveTtySession`** mounts Ink **once** and renders an internal app component with **React-owned session state**.
 - State transitions are routed through reducer patching + refs so async handlers read current state without closure drift.
@@ -68,15 +72,15 @@ Order by **net simplification + safety**. Prefer **one user-visible slice** per 
 
 ### Phase 3 — Simplify handlers and deps wiring
 
-- **Fewer** `useCallback` layers if **dispatch** + **thin actions** suffice; **merge** `TTYDeps` facets only where it drops boilerplate without hiding domains.
-- Revisit **`OutputAdapter`** shape: if **`writeCurrentPrompt` / `beginCurrentPrompt`** split exists only for historical TTY quirks, **unify** when UX allows.
-- **Deferred (remaining identity `forceRedraw` in `interactiveTtySession.ts`, not fetch-wait):** replace with real state transitions, deps-driven layout effects, or delete if redundant.
-
-| Location | Trigger |
-| --- | --- |
-| `finishProcessInputTurnAfterAwait` | Empty command turn / session y/n chrome after `processInput` |
-| `routeRecallMcqChoicesInkStdin` | `redraw` / default branches from `dispatchSelectListKey` |
-| `handleCommandLineInkInput` | Esc on slash completions; empty slash pick on submit; history arrow path |
+- ✅ **Done (2026-03-27).**
+- Removed **`forceRedraw`** from **`interactiveTtySession.ts`**. **`bumpTtyContractEpoch`** replaces identity spreads where the goal was to re-run **`useLayoutEffect`** / terminal contract.
+- **`finishProcessInputTurnAfterAwait`:** after flushing command-turn to past messages, bumps epoch when the turn was empty or session y/n chrome is active.
+- **`routeRecallMcqChoicesInkStdin`:** list **`redraw` / default** → epoch bump; **`runProcessInputTurn`** for submit.
+- **`handleCommandLineInkInput`:** redundant redraws after state-changing **`patch`** removed; empty submit / MCQ highlight reset use epoch bump; slash-picker submit falls back to **`filtered[0]`** when highlight is out of range (no no-op redraw).
+- **`runProcessInputTurn`:** single path for **`processInput` → exit or `finishProcessInputTurnAfterAwait`** (session y/n, MCQ, command line).
+- **`TTYDeps`:** dropped **`isNumberedChoiceListActive`**; **`buildTTYDeps`** in **`interactive.ts`** updated.
+- **`OutputAdapter`:** evaluated; **not** unified in this phase — split still carries TTY vs console recall behavior.
+- **Tests:** `interactiveTtySession`, `interactiveTtySuggestionScroll`, `interactiveTtyMcq`, `interactiveTtyBufferAfterFetchWait` Vitest files green.
 
 ### Phase 4 — UI structure and remaining fat
 
@@ -92,7 +96,7 @@ Order by **net simplification + safety**. Prefer **one user-visible slice** per 
 
 - **ESC/input event shape differences** (`key.escape`, `key.name`, raw `\u001b`) surfaced during Phase 1; treat them as one normalized escape signal in interaction handlers.
 - **Stale closures** in async **`processInput`** still require ref-backed reads where state freshness matters.
-- **OSC timing** still has edge sensitivity; Phase 2 consolidated fetch-wait-driven side effects on **`ttyContractEpoch`** + **`useLayoutEffect`**; remaining **`forceRedraw`** sites are Phase 3.
+- **OSC timing** still has edge sensitivity; fetch-wait and post-**`processInput`** repaints both route through **`ttyContractEpoch`** + **`useLayoutEffect`** (Phase 2–3).
 - **E2E / Gherkin**: delete or rewrite scenarios that **only** encoded removed UI; do **not** preserve steps for deleted features.
 
 ## Non-goals

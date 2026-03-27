@@ -17,7 +17,6 @@ export interface TTYDeps {
   getRecallStopConfirmInkModel: (
     ctx: PlaceholderContext
   ) => RecallStopConfirmInkModel
-  isNumberedChoiceListActive: () => boolean
   getNumberedChoiceListChoices: () => readonly string[] | null
   /** MCQ notebook+stem or spelling notebook+Spell line; `null` if no such recall question is pending. */
   getRecallCurrentPromptWrappedLines: (width: number) => string[] | null

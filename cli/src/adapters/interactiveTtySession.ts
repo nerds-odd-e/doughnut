@@ -244,9 +244,9 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
       []
     )
 
-    const forceRedraw = React.useCallback(() => {
-      patch((s) => ({ ...s }))
-    }, [])
+    const bumpTtyContractEpoch = React.useCallback(() => {
+      patch((s) => ({ ...s, ttyContractEpoch: s.ttyContractEpoch + 1 }))
+    }, [patch])
 
     React.useLayoutEffect(() => {
       latestSessionRef.current = session
@@ -453,17 +453,26 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
       }
     }
 
+    async function runProcessInputTurn(
+      effectiveLine: string
+    ): Promise<'exited' | 'continued'> {
+      if (await processInput(effectiveLine, ttyOutput, true)) {
+        commitExitTurnToPastMessages()
+        doExit()
+        return 'exited'
+      }
+      finishProcessInputTurnAfterAwait()
+      return 'continued'
+    }
+
     function finishProcessInputTurnAfterAwait(): void {
       const newSessionYesNo = usesSessionYesNoInputChrome(false)
       const latest = latestSessionRef.current
       if (latest.commandTurn.lines.length > 0) {
         commitHistoryOutput(latest.commandTurn.lines, latest.commandTurn.tone)
-      } else if (!newSessionYesNo) {
-        forceRedraw()
       }
-      if (newSessionYesNo) {
-        forceRedraw()
-      }
+      if (newSessionYesNo || latest.commandTurn.lines.length === 0)
+        bumpTtyContractEpoch()
     }
 
     async function handleSessionYesNoDispatch(
@@ -495,12 +504,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
               }))
               rememberCommittedLine(effectiveLine)
             }
-            if (await processInput(effectiveLine, ttyOutput, true)) {
-              commitExitTurnToPastMessages()
-              doExit()
-              return
-            }
-            finishProcessInputTurnAfterAwait()
+            if ((await runProcessInputTurn(effectiveLine)) === 'exited') return
           }
           break
         }
@@ -559,12 +563,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
               maskInteractiveInputLineForStorage(inputForHistory)
             ),
           }))
-          if (await processInput(effectiveInput, ttyOutput, true)) {
-            commitExitTurnToPastMessages()
-            doExit()
-            return
-          }
-          finishProcessInputTurnAfterAwait()
+          if ((await runProcessInputTurn(effectiveInput)) === 'exited') return
           break
         }
         case 'edit-backspace':
@@ -580,10 +579,10 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
           }))
           break
         case 'redraw':
-          forceRedraw()
+          bumpTtyContractEpoch()
           break
         default:
-          forceRedraw()
+          bumpTtyContractEpoch()
           break
       }
     }
@@ -687,7 +686,6 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
             }
             return next
           })
-          forceRedraw()
         }
         return
       }
@@ -701,9 +699,8 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
             interactiveDocs,
             latest.commandInput.lineDraft
           )
-          const selected = filtered[pickIndex]
+          const selected = filtered[pickIndex] ?? filtered[0]
           if (!selected) {
-            forceRedraw()
             return
           }
           const selectedCommand = `${selected.usage} `
@@ -765,19 +762,14 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
             }))
             rememberCommittedLine(inputLine)
           }
-          if (await processInput(inputLine, ttyOutput, true)) {
-            commitExitTurnToPastMessages()
-            doExit()
-            return
-          }
-          finishProcessInputTurnAfterAwait()
+          if ((await runProcessInputTurn(inputLine)) === 'exited') return
           return
         }
 
-        if (deps.isNumberedChoiceListActive()) {
+        if (deps.getNumberedChoiceListChoices() !== null) {
           patch((s) => ({ ...s, numberedChoiceHighlightIndex: 0 }))
         }
-        forceRedraw()
+        bumpTtyContractEpoch()
       } else if (key.upArrow || key.downArrow) {
         const dir = key.upArrow ? 'up' : 'down'
         const now = latestSessionRef.current
@@ -815,7 +807,6 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
               ? { highlightIndex: 0, suggestionsDismissed: false }
               : {}),
           }))
-          forceRedraw()
         }
       } else if (key.tab) {
         const lastLine = latest.commandInput.lineDraft
