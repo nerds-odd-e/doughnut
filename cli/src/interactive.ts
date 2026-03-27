@@ -8,7 +8,6 @@ import {
   listAccessTokens,
   removeAccessToken,
   removeAccessTokenCompletely,
-  setDefaultTokenLabel,
 } from './commands/accessToken.js'
 import { userVisibleOutcomeFromCommandError } from './fetchAbort.js'
 import { addGmailAccount, getLastEmailSubject } from './commands/gmail.js'
@@ -714,7 +713,6 @@ function buildInteractiveShellDeps() {
     shouldRecordCommittedLineInUserInputHistory: () =>
       pendingRecallAnswer === null,
     getDefaultTokenLabel,
-    setDefaultTokenLabel,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
     getRecallSessionYesNoInkGuidanceLines: () =>

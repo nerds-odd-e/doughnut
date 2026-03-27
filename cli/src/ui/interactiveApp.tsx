@@ -56,6 +56,7 @@ import {
   listAccessTokens,
   removeAccessToken,
   removeAccessTokenCompletely,
+  setDefaultTokenLabel,
   type AccessTokenEntry,
 } from '../commands/accessToken.js'
 import type {
@@ -119,7 +120,6 @@ export function InteractiveApp({
     getStopConfirmationYesOutcomeLines,
     getPlaceholderContext,
     getDefaultTokenLabel,
-    setDefaultTokenLabel,
     TOKEN_LIST_COMMANDS,
     getNumberedChoiceListChoices,
   } = deps

@@ -26,7 +26,6 @@ export interface InteractiveShellDeps {
    */
   shouldRecordCommittedLineInUserInputHistory: () => boolean
   getDefaultTokenLabel: () => AccessTokenLabel | undefined
-  setDefaultTokenLabel: (label: AccessTokenLabel) => void
   TOKEN_LIST_COMMANDS: Record<string, AccessTokenPickerCommandConfig>
   getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
   getRecallSessionYesNoInkGuidanceLines: () => readonly string[]

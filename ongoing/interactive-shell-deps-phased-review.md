@@ -40,6 +40,7 @@
 1. **Usages:** `InteractiveApp` (token picker default action).
 2. **Inline?** Direct `accessToken` import — viable.
 3. **Alternatives:** Same.
+4. **Outcome (done):** **Move** — `InteractiveApp` imports `setDefaultTokenLabel` from `accessToken.js`; removed from `InteractiveShellDeps` and `buildInteractiveShellDeps`. Not used on `processInput` slash paths (only the Ink picker).
 
 ## Phase 5 — `getDefaultTokenLabel`
 
