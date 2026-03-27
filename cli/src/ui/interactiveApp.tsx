@@ -11,6 +11,7 @@ import {
 } from '../fetchAbort.js'
 import {
   INTERACTIVE_FETCH_WAIT_LINES,
+  cancelInteractiveFetchWaitFor,
   getInteractiveFetchWaitLine,
   runInteractiveFetchWait,
 } from '../interactiveFetchWait.js'
@@ -748,6 +749,9 @@ export function InteractiveApp({
     onInterrupt: () => {
       terminalContract.writeCtrlCExitNewline()
       exitSession()
+    },
+    onFetchWaitCancel: () => {
+      cancelInteractiveFetchWaitFor(ttyOutput)
     },
     onStopConfirmResult: handleStopConfirmDispatch,
     onSessionYesNoResult: handleSessionYesNoDispatch,

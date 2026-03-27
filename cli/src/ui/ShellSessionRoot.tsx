@@ -143,6 +143,7 @@ function computeLiveColumnLeadingSnapshot(
 
 export type ShellSessionInkHandlers = {
   onInterrupt: () => void
+  onFetchWaitCancel: () => void
   onStopConfirmResult: (d: RecallInkConfirmChoice) => Promise<void>
   onSessionYesNoResult: (d: RecallInkConfirmChoice) => Promise<void>
   onRecallMcqGuidanceKey: (input: string, key: Key) => Promise<void>
@@ -192,7 +193,10 @@ function buildLivePanel(
 ): React.ReactElement {
   const waitLine = getInteractiveFetchWaitLine()
   if (waitLine !== null) {
-    return React.createElement(FetchWaitDisplay, { waitLine })
+    return React.createElement(FetchWaitDisplay, {
+      waitLine,
+      onCancelWait: handlers.onFetchWaitCancel,
+    })
   }
   if (deps.isPendingStopConfirmation()) {
     const placeholderCtx = deps.getPlaceholderContext(false)

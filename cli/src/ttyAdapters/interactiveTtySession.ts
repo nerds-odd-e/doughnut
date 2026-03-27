@@ -13,7 +13,7 @@
  * 3. **Exit path** — farewell lines, Ctrl+C newline before exit (`interactiveTtyStdout.exitFarewellBlock`, `ctrlCExitNewline`).
  * 4. **Pre-Ink banner** — `process.stdout.write` for version lines before `render()` (below).
  * 5. **`patchConsole`** — enabled when `console.Console` is constructible; off under Vitest `spyOn(console, …)` (`inkPatchConsoleSupported`).
- * 6. **readline `keypress`** — **Ctrl+C** (exit before Ink) and fetch-wait **Esc** cancel. Token-list Esc is Ink-owned. **Do not** handle MCQ Esc on readline (duplicate / wrong ordering).
+ * 6. **readline `keypress`** — **Ctrl+C** (exit before Ink) only. Fetch-wait **Esc** is Ink `useInput` in `FetchWaitDisplay`. Token-list Esc is Ink-owned. **Do not** handle MCQ Esc on readline (duplicate / wrong ordering).
  *
  * **`InteractiveAppTerminalContract`** is the only path from **`ui/interactiveApp.tsx`** to TTY bytes, cursor, and OSC — the UI package does not import `interactiveTtyStdout` or call `process.stdout.write` for shell chrome.
  */
@@ -22,10 +22,7 @@ import * as readline from 'node:readline'
 import { Writable } from 'node:stream'
 import { render } from 'ink'
 import { formatVersionOutput } from '../commands/version.js'
-import {
-  cancelInteractiveFetchWaitFor,
-  getInteractiveFetchWaitLine,
-} from '../interactiveFetchWait.js'
+import { getInteractiveFetchWaitLine } from '../interactiveFetchWait.js'
 import {
   createInitialShellSessionState,
   type ShellSessionState,
@@ -212,23 +209,14 @@ export function runInteractiveTtySession(
 
   /**
    * Readline `emitKeypressEvents` runs alongside Ink on the same stdin. Ink owns typing, list keys,
-   * and token-list Esc (list-selection live column). Fetch-wait has no active Ink `useInput` (same as
-   * disabled `@inkjs/ui` `TextInput`); **Esc** to cancel that wait is handled here so raw-mode
-   * lifecycle matches the pre–phase-16 shell. This listener is also **Ctrl+C** (exit before Ink).
-   * Do not add MCQ Esc here: a late readline `escape` after Ink already handled it can duplicate
-   * stop-confirm behavior.
+   * fetch-wait Esc (`FetchWaitDisplay`), and token-list Esc (list-selection live column). This
+   * listener is **Ctrl+C** (exit before Ink) only. Do not add MCQ Esc here: a late readline
+   * `escape` after Ink already handled it can duplicate stop-confirm behavior.
    */
   stdin.on('keypress', (_str, key: ReadlineKey) => {
     if (key.ctrl && key.name === 'c') {
       interactiveTtyStdout.ctrlCExitNewline()
       doExit()
-      return
-    }
-    if (
-      key.name === 'escape' &&
-      ttyOutputRef.current &&
-      cancelInteractiveFetchWaitFor(ttyOutputRef.current)
-    ) {
       return
     }
   })
