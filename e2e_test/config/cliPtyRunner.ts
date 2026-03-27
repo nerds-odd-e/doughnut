@@ -54,6 +54,7 @@ const VISIBLE_TAIL_LINES_WINDOW = 10
 const VISIBLE_COMMAND_LINE_PREFIX = '→ '
 const VISIBLE_READY_TAIL_SNIPPETS = [
   'y or n; /stop to exit recall',
+  'type your answer; /stop to exit recall',
   'y/N',
   'n/Y',
   '↑↓ Enter or number to select; Esc to cancel',
@@ -117,6 +118,9 @@ type WaitForInteractiveInputReadyOptions = {
         | 'unstable-output'
         | 'ready'
       bytesAfterWindow: number
+      hasVisibleCommandLineRow: boolean
+      hasVisibleReadyPanel: boolean
+      hasActiveFetchWaitTail: boolean
     }
   ) => string
 }
@@ -131,21 +135,21 @@ async function waitForInteractiveInputReady(
     formatTimeoutError,
   } = options
   const start = Date.now()
-  let lastLen = getStdout().length
   let stableSince = Date.now()
+  let lastVisualSignature = ''
   let visiblePredicate:
     | 'loading-tail-active'
     | 'no-command-line-row'
     | 'unstable-output'
     | 'ready' = 'unstable-output'
+  let timeoutDetails = {
+    hasVisibleCommandLineRow: false,
+    hasVisibleReadyPanel: false,
+    hasActiveFetchWaitTail: false,
+  }
   while (Date.now() - start < maxWaitMs) {
     const stdout = getStdout()
     const haystack = stdoutHaystackAfter(stdout, afterLen)
-    const len = stdout.length
-    if (len !== lastLen) {
-      lastLen = len
-      stableSince = Date.now()
-    }
     const simulated = ptyTranscriptSimulatedPlainScreen(stdout)
     const screenTail = simulated
       .split('\n')
@@ -168,6 +172,18 @@ async function waitForInteractiveInputReady(
         screenTail.includes(snippet) || rawTailPlain.includes(snippet)
     )
     const hasActiveFetchWaitTail = tailLooksLikeInteractiveFetchWait(screenTail)
+    timeoutDetails = {
+      hasVisibleCommandLineRow,
+      hasVisibleReadyPanel,
+      hasActiveFetchWaitTail,
+    }
+    const visualSignature = [screenTail, rawTailPlain.slice(-600)].join(
+      '\n---\n'
+    )
+    if (visualSignature !== lastVisualSignature) {
+      lastVisualSignature = visualSignature
+      stableSince = Date.now()
+    }
 
     if (
       hasActiveFetchWaitTail &&
@@ -192,8 +208,7 @@ async function waitForInteractiveInputReady(
       }
       if (
         afterLen !== undefined &&
-        hasVisibleCommandLineRow &&
-        !hasActiveFetchWaitTail
+        (hasVisibleCommandLineRow || hasVisibleReadyPanel)
       ) {
         return
       }
@@ -207,6 +222,7 @@ async function waitForInteractiveInputReady(
     formatTimeoutError(stdout, {
       visiblePredicate,
       bytesAfterWindow: stdoutHaystackAfter(stdout, afterLen).length,
+      ...timeoutDetails,
     })
   )
 }
@@ -375,9 +391,12 @@ function formatPtyInputBoxTimeoutError(
       | 'unstable-output'
       | 'ready'
     bytesAfterWindow: number
+    hasVisibleCommandLineRow: boolean
+    hasVisibleReadyPanel: boolean
+    hasActiveFetchWaitTail: boolean
   }
 ): string {
-  return `CLI did not show input box after send within ${PTY_INPUT_READY_AFTER_SEND_MAX_MS / 1000}s. visible predicate=${details.visiblePredicate}, bytes after send window=${details.bytesAfterWindow}, stdout grew by ${stdout.length - lenBeforeSend} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`
+  return `CLI did not show input box after send within ${PTY_INPUT_READY_AFTER_SEND_MAX_MS / 1000}s. visible predicate=${details.visiblePredicate}, has command row=${details.hasVisibleCommandLineRow}, has ready panel=${details.hasVisibleReadyPanel}, fetch wait tail=${details.hasActiveFetchWaitTail}, bytes after send window=${details.bytesAfterWindow}, stdout grew by ${stdout.length - lenBeforeSend} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`
 }
 
 async function ptyWaitForInputReadyAfterWrite(
