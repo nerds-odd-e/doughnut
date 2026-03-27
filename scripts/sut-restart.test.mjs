@@ -81,7 +81,10 @@ test('terminateTcpListenersOnPort ends a child TCP listener', async () => {
     await checkTcpConnects('127.0.0.1', port)
     await terminateTcpListenersOnPort(port)
     await once(child, 'exit')
-    await assert.rejects(checkTcpConnects('127.0.0.1', port, 500), /ECONNREFUSED|timeout/)
+    await assert.rejects(
+      checkTcpConnects('127.0.0.1', port, 500),
+      /ECONNREFUSED|timeout/
+    )
   } finally {
     if (!child.killed) child.kill('SIGKILL')
   }

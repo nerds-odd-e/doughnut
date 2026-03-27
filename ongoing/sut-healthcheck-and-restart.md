@@ -9,6 +9,17 @@
 - **Local fake LB:** rename everything around the old **prod-topology / e2e-proxy** naming to **`lb`**. No leftover script names, paths, env prefixes, log tags, or doc phrasing that implies “E2E-only proxy.”
 - Update **CLAUDE.md**, **`.cursor/rules/general.mdc`**, **`.cursor/rules/cloud-agent-setup.mdc`**, **`docs/gcp/prod_env.md`**, and any other references so humans and agents know what to run when unsure whether SUT is up.
 
+**Phases 1–2 (implemented):**
+
+| Command | Implementation |
+|---------|------------------|
+| `pnpm sut:healthcheck` | [`scripts/sut-healthcheck.mjs`](../scripts/sut-healthcheck.mjs) — TCP 2525 / 9081 / 5173 / 5174 + HTTP readiness (still **`/__e2e__/ready`** until Phase 3 renames the LB path). |
+| `pnpm sut:restart` | [`scripts/sut-restart.mjs`](../scripts/sut-restart.mjs) — `lsof` + `SIGTERM` on **5173, 5174, 9081** only, then `pnpm sut`. Mountebank **2525** left alone. |
+| Tests | `pnpm test:sut-healthcheck`, `pnpm test:sut-restart` (both run from **`pnpm lint:all`**). |
+| `lsof` | In [`flake.nix`](../flake.nix) `basePackages` for reproducible **`nix develop`**. |
+
+Run via project convention: `CURSOR_DEV=true nix develop -c pnpm sut:healthcheck` (and same prefix for `sut:restart`).
+
 ---
 
 ## Advice: “starting” vs “down”
@@ -24,13 +35,13 @@
 **Why not only “up/down”?**  
 A single binary “down” blurs “forgot to start” with “backend still booting” or “Vite crashed.” Per-service lines (mountebank, backend, local LB, Vite) plus the **readiness HTTP probe** (see below) give actionable detail without requiring a formal state machine.
 
-**Optional refinement (later):** a short **retry loop** (e.g. 15–30s total, 1s interval) only for the readiness URL so CI/agents treat “warming up” as OK; for interactive dev, default can stay **fail fast**. Decide in implementation: one mode flag vs always quick retries with max wait.
+**Optional refinement (later — Phase 5 only if needed):** If CI/agents often fail right after SUT start (warm-up), add something like **`--wait-ready`** (retry HTTP readiness only, capped total wait, default remains **fail fast**). Don’t add until that failure mode shows up in practice.
 
 **Exit codes (suggestion):**
 
 - `0` — all checks passed.
 - `1` — unhealthy / incomplete (listeners or readiness failed).
-- Avoid a separate exit code for “starting” unless automation needs it; text + optional `--wait-ready` is enough.
+- Avoid a separate exit code for “starting” unless automation needs it; text + optional `--wait-ready` (if implemented) is enough.
 
 ---
 
@@ -59,20 +70,24 @@ From root `package.json` **`sut`** (script names will become `local:lb:vite` —
 
 **Today:** `GET http://127.0.0.1:5173/__e2e__/ready` (used by `wait-on`, Cypress flow, cloud-agent docs).
 
-**Target:** Use an **`lb`-named path** everywhere, e.g. **`/__lb__/ready`** (exact string to choose in implementation — must not collide with app routes). **Implementation:** register the same handler for the new path; **remove** `/__e2e__/ready` once all repo references are migrated so there is no dual “historical” surface.
+**Target (decided):** **`GET http://127.0.0.1:5173/__lb__/ready`** — same reserved-segment idea as `__e2e__`, unlikely to collide with SPA routes; **not** `/local-lb/ready`. **Implementation (Phase 3):** register the handler on the new path; **remove** `/__e2e__/ready` once all consumers are migrated (no dual surface).
 
-**Update consumers:** root `package.json` (`cy:run-with-sut`, `cy:run-on-sut`, any new `sut:healthcheck`), **`.github/workflows`**, **`.cursor/rules/cloud-agent-setup.mdc`**, **`docs/gcp/prod_env.md`**, **`cypress`** config / plugins if they hardcode the old path, **`wait-on`** invocations, **E2E constants** if any reference the path.
+**Document** the URL in **`docs/gcp/prod_env.md`** and the **`scripts/local-lb.mjs`** header when Phase 3 lands.
+
+**Update consumers:** root `package.json` (`cy:run-with-sut`, `cy:run-on-sut`, `sut:healthcheck` default), **`.github/workflows`**, **`.cursor/rules/cloud-agent-setup.mdc`**, **`docs/gcp/prod_env.md`**, **`cypress`** config / plugins if they hardcode the old path, **`wait-on`** invocations, **E2E constants** if any reference the path.
 
 ---
 
 ## `pnpm sut:restart` behavior
 
-1. **Stop** processes listening on **5173, 5174, 9081** (see open decisions for **2525**).
-2. **Start** `pnpm sut` (same as today — includes install + `cli:bundle`).
+**Implemented** in [`scripts/sut-restart.mjs`](../scripts/sut-restart.mjs).
 
-**Risks:** port-based kill can touch unrelated apps on those ports. Output should name ports and PIDs; keep implementation **simple** (e.g. `lsof` on macOS/Linux as in dev env). Nix/Linux: confirm `lsof` or equivalent is in dev shell.
+1. **Stop** — For each of **5173, 5174, 9081**, `lsof … -sTCP:LISTEN -t`, then `SIGTERM` those PIDs. **2525** (mountebank) is **not** stopped (matches `start:mb` idempotency).
+2. **Start** — `pnpm sut` from repo root (`stdio: inherit`, same install + `cli:bundle` + `run-p` stack as a manual `pnpm sut`).
 
-**Edge case:** user runs backend on 9081 for something else — same risk as today; document briefly.
+**Risks:** Anything else bound to those ports can be signalled. Logs list **port** and **PID(s)** per step.
+
+**Edge case:** Backend or another app on **9081** unrelated to SUT — same port-based risk as the design assumes; stop that process yourself if needed.
 
 ---
 
@@ -150,36 +165,41 @@ Add a short, consistent **“Unsure if SUT is running?”** block:
 
 - **`CLAUDE.md`** — Common commands table + local dev paragraph (**`local:lb`**, **`local:lb:vite`**).
 - **`.cursor/rules/general.mdc`** — same guidance near `pnpm sut`.
-- **`.cursor/rules/cloud-agent-setup.mdc`** — VM instructions: **`local:lb`**, new readiness URL, **`pnpm sut:healthcheck`** when debugging.
-- **`docs/gcp/prod_env.md`** — single write-up: ports, **`scripts/local-lb.mjs`**, env vars, readiness URL.
+- **`.cursor/rules/cloud-agent-setup.mdc`** — VM instructions: **`local:lb`**, readiness **`/__lb__/ready`**, **`pnpm sut:healthcheck`** when debugging; if the VM has **no Nix**, say to run the same **`pnpm`** scripts from repo root and that **`sut:restart`** needs **`lsof`** on `PATH`.
+- **`docs/gcp/prod_env.md`** — single write-up: ports, **`scripts/local-lb.mjs`**, env vars, readiness URL **`/__lb__/ready`** (post–Phase 3).
+
+Also state the **standard agent command form** here: `CURSOR_DEV=true nix develop -c pnpm sut:healthcheck` / `… sut:restart` (same as project rules), so Phase 4 does not scatter one-off variants.
 
 ---
 
 ## Phased delivery (value first)
 
 1. **Phase 1 — Healthcheck**  
-   Implement `pnpm sut:healthcheck` (readiness URL = **`/__lb__/ready`** after Phase 3, or temporary old path + switch in same PR as rename — prefer **one PR** for LB rename + path so healthcheck never encodes the dead URL).
-   Status: done (`scripts/sut-healthcheck.mjs`, `scripts/sut-healthcheck.test.mjs`, `package.json` scripts `sut:healthcheck` and `test:sut-healthcheck`).
+   Implement `pnpm sut:healthcheck` (readiness URL switches to **`/__lb__/ready`** in **Phase 3** with the LB rename — same PR as proxy move so the tree does not sit on a dead path).
+   Status: **done** — `scripts/sut-healthcheck.mjs`, `scripts/sut-healthcheck.test.mjs`, `sut:healthcheck`, `test:sut-healthcheck`, covered by `lint:all`.
 
 2. **Phase 2 — Restart**  
    Implement `pnpm sut:restart` (stop by port + spawn `pnpm sut`).  
-   Status: done (`scripts/sut-restart.mjs`, `scripts/sut-restart.test.mjs`, `package.json` scripts `sut:restart` and `test:sut-restart`; `lsof` in `flake.nix`).
+   Status: **done** — `scripts/sut-restart.mjs`, `scripts/sut-restart.test.mjs`, `sut:restart`, `test:sut-restart`, `lsof` in `flake.nix`, covered by `lint:all`.
 
 3. **Phase 3 — LB rename (complete)**  
    New scripts **`local:lb`** / **`local:lb:vite`**, move to **`scripts/local-lb.mjs`**, **`LOCAL_LB_*` env**, **`[local-lb]`** logs, readiness path **`/__lb__/ready`**, remove old file and all references listed above. CI, docs, rules, Cypress/wait-on updated in the **same phase** so the tree never sits half-renamed.
 
 4. **Phase 4 — Docs / rules**  
-   “Unsure if SUT is running?” + any remaining cross-links.
+   “Unsure if SUT is running?” + **`/__lb__/ready`** + **`local:lb` / `local:lb:vite`** + **nix-prefixed** `sut:healthcheck` / `sut:restart` as the default agent recipe, with **cloud-agent-setup** covering the no-Nix / `lsof` caveat. Keep **`docs/gcp/prod_env.md`** as the port/URL source of truth.
 
-**Optional Phase 5:** `--wait-ready` on healthcheck.
+**Optional Phase 5:** **`--wait-ready`** on healthcheck — only if warm-up flakiness appears in CI/agents; default stays fail-fast.
 
 ---
 
-## Open decisions
+## Decisions (resolved)
 
-- **Mountebank on restart:** always kill **2525** vs leave if already up — recommend **leave** by default in `sut:restart` to match `start:mb` idempotency; document `mb` stop if tests need a clean imposter state.
-- **Healthcheck and `nix develop`:** root scripts should run under the same prefix as other commands (`CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`) per project rules; document for agents.
-- **Readiness path string:** finalize **`/__lb__/ready`** vs e.g. `/local-lb/ready` (must not conflict with SPA routes — `__lb__` mirrors prior `__e2e__` pattern).
+| Topic | Decision |
+|-------|-----------|
+| **Mountebank on restart** | **Leave 2525** (implemented in `sut:restart`). Clean imposters: restart mountebank separately if needed. |
+| **Readiness path (Phase 3)** | **`/__lb__/ready`** at the LB (not `/local-lb/ready`). Migrate all consumers in the same PR as the proxy rename; drop **`/__e2e__/ready`**. |
+| **Healthcheck / restart invocation** | **Standard:** `CURSOR_DEV=true nix develop -c pnpm sut:healthcheck` and `… pnpm sut:restart`. **Phase 4** writes this into CLAUDE, **general.mdc**, **cloud-agent-setup** (plus no-Nix note), and **prod_env.md**. |
+| **Phase 5 `--wait-ready`** | **Defer** until there is a concrete “just started SUT” failure mode to fix. |
 
 ### Completion check
 

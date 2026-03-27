@@ -10,14 +10,19 @@ import { fileURLToPath } from 'node:url'
 /** Ports used by `pnpm sut` except mountebank (2525). See docs/gcp/prod_env.md */
 export const SUT_RESTART_PORTS = [5173, 5174, 9081]
 
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+const repoRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..'
+)
 
 export function parsePidsFromLsofStdout(stdout) {
   const lines = String(stdout)
     .split(/\r?\n/)
     .map((s) => s.trim())
     .filter(Boolean)
-  return [...new Set(lines.map(Number).filter((n) => Number.isInteger(n) && n > 0))]
+  return [
+    ...new Set(lines.map(Number).filter((n) => Number.isInteger(n) && n > 0)),
+  ]
 }
 
 /**
