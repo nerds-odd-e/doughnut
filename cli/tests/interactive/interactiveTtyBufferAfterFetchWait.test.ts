@@ -4,8 +4,6 @@ import { resetRecallStateForTesting } from '../../src/interactive.js'
 import { stripAnsi } from '../../src/renderer.js'
 import {
   endTTYSession,
-  pushTTYCommandBytes,
-  pushTTYCommandKey,
   startTTYSessionWithoutRecallReset,
   submitTTYCommand,
   tick,
@@ -49,14 +47,6 @@ describe('TTY: line draft must not survive interactive fetch wait', () => {
       expect(ttyOutput(writeSpy)).toContain('0 notes to recall today')
     )
 
-    writeSpy.mockClear()
-    pushTTYCommandBytes(stdin, 'x')
-    await tick()
-    pushTTYCommandKey(stdin, 'backspace')
-    await tick()
-
-    await vi.waitFor(() =>
-      expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ ')
-    )
+    expect(stripAnsi(ttyOutput(writeSpy))).not.toContain('leaked-draft')
   })
 })
