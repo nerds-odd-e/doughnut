@@ -137,15 +137,6 @@ export function runInteractiveTtySession(
     process.exit(0)
   }
 
-  function finalizeInteractiveLiveRegionPaint(
-    session: ShellSessionState
-  ): void {
-    interactiveTtyStdout.finalizeDefaultLiveAfterInk({
-      lineDraft: session.commandInput.lineDraft,
-      interactiveFetchWaitLine: getInteractiveFetchWaitLine(),
-    })
-  }
-
   function handleShellRendered(
     session: ShellSessionState,
     shellDeps: InteractiveShellDeps
@@ -171,7 +162,6 @@ export function runInteractiveTtySession(
     if (session.tokenSelection) {
       return
     }
-    finalizeInteractiveLiveRegionPaint(session)
   }
 
   const terminalContract: InteractiveAppTerminalContract = {

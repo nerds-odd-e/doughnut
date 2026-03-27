@@ -20,8 +20,6 @@ import {
   applyCliAssistantMessageTone,
   buildCurrentPromptSeparator,
   HIDE_CURSOR,
-  interactiveInputReadyOscSuffix,
-  type InteractiveInputReadyPaint,
   renderPastUserMessage,
   SHOW_CURSOR,
   type TerminalWidth,
@@ -39,16 +37,6 @@ export const interactiveTtyStdout = {
 
   showCursor(): void {
     write(SHOW_CURSOR)
-  },
-
-  /**
-   * Default command-line contract:
-   * - emits ready control sequence when the draft is empty and fetch-wait is inactive
-   * - emits nothing while typing or fetch-wait is active
-   * Consumers in E2E use this to decide when keystrokes are safe.
-   */
-  finalizeDefaultLiveAfterInk(paint: InteractiveInputReadyPaint): void {
-    write(interactiveInputReadyOscSuffix(paint))
   },
 
   greyCurrentPromptLine(msg: string): void {
