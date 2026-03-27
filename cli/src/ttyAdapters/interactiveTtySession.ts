@@ -192,9 +192,6 @@ export function runInteractiveTtySession(
         tone,
       })
     },
-    signalConfirmInputReady: () => {
-      // no-op: stdout adapter does not emit the OSC input-ready signal
-    },
     writeCtrlCExitNewline: () => {
       interactiveTtyStdout.ctrlCExitNewline()
     },

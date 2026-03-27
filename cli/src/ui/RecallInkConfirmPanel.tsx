@@ -18,7 +18,6 @@ function fireAdapterChoice(
 type RecallInkConfirmPanelSharedProps = {
   guidanceLines: readonly string[]
   placeholderText: string
-  onInputReadySignal: () => void
   onInterrupt: () => void
   onResult: (r: RecallInkConfirmChoice) => void | Promise<void>
 }
@@ -32,7 +31,7 @@ type RecallInkConfirmPanelProps =
     })
 
 export function RecallInkConfirmPanel(props: RecallInkConfirmPanelProps) {
-  const { onInputReadySignal, guidanceLines, placeholderText } = props
+  const { guidanceLines, placeholderText } = props
   const [hint, setHint] = useState('')
   const skipNextOsc = useRef(true)
   const propsRef = useRef(props)
@@ -52,8 +51,7 @@ export function RecallInkConfirmPanel(props: RecallInkConfirmPanelProps) {
       skipNextOsc.current = false
       return
     }
-    onInputReadySignal()
-  }, [hint, onInputReadySignal])
+  }, [hint])
 
   const handleKey = useCallback((input: string, key: Key) => {
     let dispatched = false

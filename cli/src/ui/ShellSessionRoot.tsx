@@ -149,7 +149,6 @@ export type ShellSessionInkHandlers = {
   onTokenPickerGuidanceKey: (input: string, key: Key) => Promise<void>
   onCommandLineKey: (input: string, key: Key) => Promise<void>
   onCommandLineTyping: (next: InteractiveCommandInput) => void
-  signalConfirmInputReady: () => void
   onEnterStopConfirmationFromEsc: () => void
   whenInActiveRecallSession: () => boolean
 }
@@ -210,7 +209,6 @@ function buildLivePanel(
         ...model.confirmQuestionLines,
       ],
       placeholderText: model.placeholder,
-      onInputReadySignal: handlers.signalConfirmInputReady,
       onInterrupt: handlers.onInterrupt,
       onResult: (d) => handlers.onStopConfirmResult(d),
     })
@@ -226,7 +224,6 @@ function buildLivePanel(
       placeholderText: 'y or n; /stop to exit recall',
       whenInActiveRecallSession: handlers.whenInActiveRecallSession,
       onEscapeOpensStopRecallSheet: handlers.onEnterStopConfirmationFromEsc,
-      onInputReadySignal: handlers.signalConfirmInputReady,
       onInterrupt: handlers.onInterrupt,
       onResult: (d) => handlers.onSessionYesNoResult(d),
     })

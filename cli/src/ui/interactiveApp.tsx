@@ -105,7 +105,6 @@ export type InteractiveAppTerminalContract = {
     outputLines: readonly string[]
     tone: CliAssistantMessageTone
   }) => void
-  signalConfirmInputReady: () => void
   writeCtrlCExitNewline: () => void
 }
 
@@ -312,9 +311,6 @@ export function InteractiveApp({
   }
   const ttyOutput = ttyOutputHolder.current
   ttyOutputRef.current = ttyOutput
-
-  const signalConfirmInputReady = () =>
-    terminalContract.signalConfirmInputReady()
 
   async function handleStopConfirmDispatch(
     dispatch: RecallInkConfirmChoice
@@ -759,7 +755,6 @@ export function InteractiveApp({
     onTokenPickerGuidanceKey: routeAccessTokenPickerInkStdin,
     onCommandLineKey: handleCommandLineInkInput,
     onCommandLineTyping: applyCommandLineTypingFromInk,
-    signalConfirmInputReady,
     onEnterStopConfirmationFromEsc: enterStopConfirmationFromEsc,
     whenInActiveRecallSession: isInCommandSessionSubstate,
   }
