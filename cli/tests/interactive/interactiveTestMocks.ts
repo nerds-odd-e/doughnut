@@ -9,14 +9,12 @@ const {
   mockRecallNext,
   mockRecallStatus,
   mockAnswerQuiz,
-  mockAnswerSpelling,
   mockMarkAsRecalled,
   mockContestAndRegenerate,
 } = vi.hoisted(() => ({
   mockRecallNext: vi.fn(),
   mockRecallStatus: vi.fn(),
   mockAnswerQuiz: vi.fn(),
-  mockAnswerSpelling: vi.fn(),
   mockMarkAsRecalled: vi.fn(),
   mockContestAndRegenerate: vi.fn(),
 }))
@@ -32,7 +30,6 @@ vi.mock('../../src/commands/recall.js', async (importOriginal) => {
     recallNext: mockRecallNext,
     recallStatus: mockRecallStatus,
     answerQuiz: mockAnswerQuiz,
-    answerSpelling: mockAnswerSpelling,
     markAsRecalled: mockMarkAsRecalled,
     contestAndRegenerate: mockContestAndRegenerate,
   }

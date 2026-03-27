@@ -1,6 +1,5 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
-  mockAnswerSpelling,
   mockMarkAsRecalled,
   mockRecallNext,
 } from './interactiveRecallMockAccess.js'
@@ -20,9 +19,9 @@ import {
   type TTYStdin,
 } from './interactiveTestHelpers.js'
 import { recallNextQuestion } from '../recallNextTestShapes.js'
-import { spellingRecallPrompt } from '../recallPromptFixtures.js'
+import { mcqRecallPrompt } from '../recallPromptFixtures.js'
 
-describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
+describe('TTY recall substates ESC (MCQ, y/n, load-more)', () => {
   let stdin: TTYStdin
   let writeSpy: ReturnType<typeof vi.spyOn>
 
@@ -32,68 +31,6 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
 
   afterEach(() => {
     endTTYSession(stdin)
-  })
-
-  test('ESC in spelling shows stop confirmation, y exits recall mode', async () => {
-    mockRecallNext.mockResolvedValue(
-      recallNextQuestion(spellingRecallPrompt(100, 'test'))
-    )
-    mockAnswerSpelling.mockResolvedValue({ correct: true })
-    await submitTTYCommand(stdin, '/recall')
-
-    expect(ttyOutput(writeSpy)).toContain(
-      'type your answer; /stop to exit recall'
-    )
-
-    mockAnswerSpelling.mockClear()
-    writeSpy.mockClear()
-    await pushTTYCommandEscape(stdin)
-    await vi.waitFor(() =>
-      expect(stripAnsi(ttyOutput(writeSpy))).toContain('Stop recall? (y/n)')
-    )
-
-    const escRepaint = stripAnsi(ttyOutput(writeSpy))
-    expect(escRepaint).toContain('Stop recall? (y/n)')
-    expect(escRepaint).toContain('y or n; Esc to go back')
-    expect(mockAnswerSpelling).not.toHaveBeenCalled()
-    expect(isInRecallSubstate()).toBe(true)
-
-    pushTTYCommandBytes(stdin, 'y')
-    await vi.waitFor(
-      () => expect(ttyOutput(writeSpy)).toContain('Stopped recall'),
-      { timeout: 3000 }
-    )
-    expectTtyRecallYesNoReplyScrollback(writeSpy, 'y')
-    expect(mockAnswerSpelling).not.toHaveBeenCalled()
-    expect(isInRecallSubstate()).toBe(false)
-  })
-
-  test('ESC then n in spelling cancels confirmation and stays in recall', async () => {
-    mockRecallNext.mockResolvedValue(
-      recallNextQuestion(spellingRecallPrompt(100, 'test'))
-    )
-    mockAnswerSpelling.mockResolvedValue({ correct: true })
-    await submitTTYCommand(stdin, '/recall')
-    mockAnswerSpelling.mockClear()
-    writeSpy.mockClear()
-
-    await pushTTYCommandEscape(stdin)
-    await vi.waitFor(() =>
-      expect(stripAnsi(ttyOutput(writeSpy))).toContain('Stop recall? (y/n)')
-    )
-
-    pushTTYCommandBytes(stdin, 'n')
-    await vi.waitFor(() =>
-      expect(ttyOutput(writeSpy)).toContain(
-        'type your answer; /stop to exit recall'
-      )
-    )
-
-    expect(isInRecallSubstate()).toBe(true)
-    expect(mockAnswerSpelling).not.toHaveBeenCalled()
-    expect(ttyOutput(writeSpy)).toContain(
-      'type your answer; /stop to exit recall'
-    )
   })
 
   test('ESC in Yes I remember shows stop confirmation, y exits recall mode', async () => {
@@ -186,7 +123,7 @@ describe('TTY recall substates ESC (spelling, y/n, load-more)', () => {
 
   test('real backspace (str=\\x7f) in stop confirmation on empty input is a no-op, not DEL insertion', async () => {
     mockRecallNext.mockResolvedValue(
-      recallNextQuestion(spellingRecallPrompt(100, 'test'))
+      recallNextQuestion(mcqRecallPrompt(100, 'test', ['a', 'b', 'c']))
     )
     await submitTTYCommand(stdin, '/recall')
     await pushTTYCommandEscape(stdin)

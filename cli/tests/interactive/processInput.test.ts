@@ -20,7 +20,6 @@ import {
 } from '../../src/fetchAbort.js'
 import {
   mockAnswerQuiz,
-  mockAnswerSpelling,
   mockContestAndRegenerate,
   mockMarkAsRecalled,
   mockRecallNext,
@@ -53,7 +52,6 @@ vi.mock('doughnut-api', () => ({
   },
   RecallPromptController: {
     answerQuiz: vi.fn(),
-    answerSpelling: vi.fn(),
     contest: vi.fn(),
     regenerate: vi.fn(),
   },
@@ -70,7 +68,6 @@ describe('processInput', () => {
     mockRecallNext.mockClear()
     mockMarkAsRecalled.mockClear()
     mockAnswerQuiz.mockClear()
-    mockAnswerSpelling.mockClear()
     mockContestAndRegenerate.mockClear()
     logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
   })
@@ -158,57 +155,13 @@ describe('processInput', () => {
 
   // contract: /recall via processInput — default console (below) and OutputAdapter + real recallNext (load cancel).
 
-  test('spelling: prompt with markdown stem shows ANSI codes, not raw markdown', async () => {
-    mockRecallNext.mockResolvedValue(
-      recallNextQuestion(spellingRecallPrompt(100, '**bold** and *italic*'))
-    )
-
-    await processInput('/recall')
-    const spellCall = logSpy.mock.calls.find(
-      (c: unknown[]) => typeof c[0] === 'string' && c[0].includes('Spell:')
-    )
-    expect(spellCall).toBeDefined()
-    const output = spellCall![0] as string
-    expect(output).toContain('\x1b[')
-    expect(output).not.toContain('**')
-    expect(output).not.toContain('*italic*')
-    expect(stripAnsi(output)).toContain('bold')
-    expect(stripAnsi(output)).toContain('italic')
-  })
-
-  test('spelling: Spell prompt, answer calls answerSpelling with thinkingTimeMs, then success messages', async () => {
-    vi.useFakeTimers()
+  test('/recall: SPELLING question logs Not supported and exits recall mode', async () => {
     mockRecallNext.mockResolvedValue(
       recallNextQuestion(spellingRecallPrompt(100, 'means incite violence'))
     )
-    mockAnswerSpelling.mockResolvedValue({ correct: true })
-
     await processInput('/recall')
-    expect(logSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Spell: means incite violence')
-    )
-    logSpy.mockClear()
-
-    vi.advanceTimersByTime(5000)
-    await processInput('sedition')
-    expect(mockAnswerSpelling).toHaveBeenCalledWith(100, 'sedition', 5000)
-    expect(logSpy).toHaveBeenCalledWith('Correct!')
-    expect(logSpy).toHaveBeenCalledWith('Recalled successfully')
-  })
-
-  test('spelling: empty input prompts to type', async () => {
-    mockRecallNext.mockResolvedValue(
-      recallNextQuestion(spellingRecallPrompt(100, '...'))
-    )
-    mockAnswerSpelling.mockResolvedValue({ correct: false })
-
-    await processInput('/recall')
-    logSpy.mockClear()
-    expect(await processInput('')).toBe(false)
-    expect(logSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Please type your spelling')
-    )
-    await processInput('clear') // clear pending state for subsequent tests
+    expect(logSpy).toHaveBeenCalledWith('Not supported')
+    expect(isInRecallSubstate()).toBe(false)
   })
 
   test('/recall load more: user says n, shows 0 notes to recall today', async () => {

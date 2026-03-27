@@ -12,7 +12,6 @@ import { formatHelp } from './commands/help.js'
 import { renderMarkdownToTerminal } from './markdown.js'
 import {
   answerQuiz,
-  answerSpelling,
   contestAndRegenerate,
   formatRecallNotebookCurrentPromptLine,
   markAsRecalled,
@@ -45,7 +44,6 @@ import type {
   McqRecallPending,
   OutputAdapter,
   PendingRecallAnswer,
-  SpellingRecallPending,
 } from './types.js'
 
 type RecallPromptResult = Exclude<RecallNextResult, { type: 'none' }>
@@ -106,15 +104,8 @@ function isMcqRecallPending(p: PendingRecallAnswer): p is McqRecallPending {
   return p !== null && 'choices' in p
 }
 
-function isSpellingRecallPending(
-  p: PendingRecallAnswer
-): p is SpellingRecallPending {
-  return p !== null && 'type' in p && p.type === 'spelling'
-}
-
 function getContestablePromptId(): number | null {
-  return isMcqRecallPending(pendingRecallAnswer) ||
-    isSpellingRecallPending(pendingRecallAnswer)
+  return isMcqRecallPending(pendingRecallAnswer)
     ? pendingRecallAnswer.recallPromptId
     : null
 }
@@ -124,7 +115,6 @@ function getPlaceholderContext(): PlaceholderContext {
   if (pendingRecallStopConfirmation) return 'recallStopConfirmation'
   if (pendingRecallLoadMore) return RECALL_SESSION_YES_NO_PLACEHOLDER
   if (isMcqRecallPending(pendingRecallAnswer)) return 'recallMcq'
-  if (isSpellingRecallPending(pendingRecallAnswer)) return 'recallSpelling'
   if (pendingRecallAnswer !== null) return RECALL_SESSION_YES_NO_PLACEHOLDER
   return 'default'
 }
@@ -208,26 +198,8 @@ function showRecallPrompt(
       return
     }
     if (p.questionType === 'SPELLING') {
-      const notebookTitle = resolveRecallNotebookTitle(
-        p.spellingQuestion?.notebook ?? p.notebook,
-        p.note
-      )
-      const stem = p.spellingQuestion?.stem ?? ''
-      const spellLineRenderedForTerminal = `Spell: ${renderMarkdownToTerminal(
-        stem || '...'
-      )}`
-      output.beginCurrentPrompt?.()
-      if (!output.beginCurrentPrompt) {
-        writeCurrentPrompt(formatRecallNotebookCurrentPromptLine(notebookTitle))
-        writeCurrentPrompt(spellLineRenderedForTerminal)
-      }
-      pendingRecallAnswer = {
-        recallPromptId: p.id,
-        type: 'spelling',
-        shownAt: Date.now(),
-        notebookTitle,
-        spellLineRenderedForTerminal,
-      }
+      output.log('Not supported')
+      exitRecallMode()
       return
     }
     return
@@ -540,34 +512,6 @@ export async function processInput(
         writeCurrentPrompt(`Enter a number from 1 to ${choices.length}`)
         return false
       }
-    } else if (isSpellingRecallPending(pendingRecallAnswer)) {
-      const { recallPromptId } = pendingRecallAnswer
-      if (!trimmed) {
-        if (output.beginCurrentPrompt) {
-          pendingRecallAnswer = {
-            ...pendingRecallAnswer,
-            ttyRepromptLine: 'Please type your spelling',
-          }
-        } else {
-          writeCurrentPrompt('Please type your spelling')
-        }
-        return false
-      }
-      try {
-        const thinkingTimeMs = Date.now() - pendingRecallAnswer.shownAt
-        const { correct } = await answerSpelling(
-          recallPromptId,
-          trimmed,
-          thinkingTimeMs
-        )
-        output.log(correct ? 'Correct!' : 'Incorrect')
-        output.log('Recalled successfully')
-      } catch (err) {
-        output.logError(err)
-      }
-      pendingRecallAnswer = null
-      if (recallSessionMode)
-        await continueRecallSession(false, output, writeCurrentPrompt)
     } else {
       const { memoryTrackerId } = pendingRecallAnswer
       const parsed = parseRecallYesNoLine(trimmed)
@@ -634,7 +578,7 @@ export async function processInput(
   return false
 }
 
-/** TTY Current prompt lines for an active recall question (MCQ stem block or spelling block). */
+/** TTY Current prompt lines for an active recall question (MCQ stem block). */
 function getRecallCurrentPromptWrappedLines(width: number): string[] | null {
   const p = pendingRecallAnswer
   if (isMcqRecallPending(p)) {
@@ -644,18 +588,6 @@ function getRecallCurrentPromptWrappedLines(width: number): string[] | null {
         width
       ),
       ...wrapMarkdownTerminalToLines(p.stemRenderedForTerminal, width),
-    ]
-  }
-  if (isSpellingRecallPending(p)) {
-    if (p.ttyRepromptLine !== undefined) {
-      return wrapTextToVisibleWidthLines(p.ttyRepromptLine, width)
-    }
-    return [
-      ...wrapTextToVisibleWidthLines(
-        formatRecallNotebookCurrentPromptLine(p.notebookTitle),
-        width
-      ),
-      ...wrapMarkdownTerminalToLines(p.spellLineRenderedForTerminal, width),
     ]
   }
   return null

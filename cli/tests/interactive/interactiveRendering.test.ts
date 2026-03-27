@@ -101,7 +101,6 @@ describe('buildCommandInputDraftLines', () => {
     ['recallMcq', '↑↓ Enter or number to select; Esc to cancel'],
     ['recallStopConfirmation', 'y or n; Esc to go back'],
     ['recallYesNo', 'y or n; /stop to exit recall'],
-    ['recallSpelling', 'type your answer; /stop to exit recall'],
   ] as const)('placeholderContext %s shows correct placeholder', (ctx, phrase) => {
     const lines = buildCommandInputDraftLines('', 80, {
       placeholderContext: ctx,

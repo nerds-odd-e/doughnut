@@ -117,6 +117,7 @@ Feature: CLI recall status and recall session
         | sedition | Sedition means incite violence | English      | true              |
         | sedation | **Put** to sleep is _sedation_ | English      |                   |
 
+    @ignore
     @disableOpenAiService
     Scenario: Recall spelling - type correct spelling and see success
       And the note "sedition" was assimilated on day 1

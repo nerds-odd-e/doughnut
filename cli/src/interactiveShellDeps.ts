@@ -16,10 +16,10 @@ export interface InteractiveShellDeps {
     ctx: PlaceholderContext
   ) => RecallStopConfirmInkModel
   getNumberedChoiceListChoices: () => readonly string[] | null
-  /** MCQ notebook+stem or spelling notebook+Spell line; `null` if no such recall question is pending. */
+  /** MCQ notebook+stem; `null` if no such recall question is pending. */
   getRecallCurrentPromptWrappedLines: (width: number) => string[] | null
   /**
-   * False while a recall answer is expected (MCQ, spelling, session y/n); committed lines are not
+   * False while a recall answer is expected (MCQ, session y/n); committed lines are not
    * copied to user input history.
    */
   shouldRecordCommittedLineInUserInputHistory: () => boolean

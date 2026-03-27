@@ -3,10 +3,7 @@ import { describe, test, expect, type vi, beforeEach, afterEach } from 'vitest'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { mockRecallNext } from './interactiveRecallMockAccess.js'
 import { recallNextQuestion } from '../recallNextTestShapes.js'
-import {
-  mcqRecallPromptWithNotebook,
-  spellingRecallPromptWithNotebook,
-} from '../recallPromptFixtures.js'
+import { mcqRecallPromptWithNotebook } from '../recallPromptFixtures.js'
 import { resetRecallStateForTesting } from '../../src/interactive.js'
 import { formatRecallNotebookCurrentPromptLine } from '../../src/commands/recall.js'
 import { stripAnsi } from '../../src/renderer.js'
@@ -19,7 +16,7 @@ import {
   type TTYStdin,
 } from './interactiveTestHelpers.js'
 
-describe('TTY recall: notebook first in Current prompt (all question kinds)', () => {
+describe('TTY recall: notebook first in Current prompt (MCQ and just-review)', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
   let stdin: TTYStdin
 
@@ -46,22 +43,6 @@ describe('TTY recall: notebook first in Current prompt (all question kinds)', ()
     const nb = formatRecallNotebookCurrentPromptLine('Chem')
     expect(plain).toContain(nb)
     expect(plain.indexOf(nb)).toBeLessThan(plain.indexOf('Q?'))
-  })
-
-  test('spelling: notebook line precedes Spell prompt in past messages', async () => {
-    const chem = makeMe.aNotebook
-    chem.notebuilder.title('Chem')
-    mockRecallNext.mockResolvedValue(
-      recallNextQuestion(
-        spellingRecallPromptWithNotebook(2, 'word', chem.please())
-      )
-    )
-    await submitTTYCommand(stdin, '/recall')
-    await tick()
-    const plain = stripAnsi(ttyOutput(writeSpy))
-    const nb = formatRecallNotebookCurrentPromptLine('Chem')
-    expect(plain).toContain(nb)
-    expect(plain.indexOf(nb)).toBeLessThan(plain.indexOf('Spell:'))
   })
 
   test('just-review: notebook line precedes note title', async () => {

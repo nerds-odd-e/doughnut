@@ -91,7 +91,6 @@ export type PlaceholderContext =
   | 'recallMcq'
   | 'recallStopConfirmation'
   | 'recallYesNo'
-  | 'recallSpelling'
 
 export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
   default: '`exit` to quit.',
@@ -100,7 +99,6 @@ export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
   recallMcq: '↑↓ Enter or number to select; Esc to cancel',
   recallStopConfirmation: 'y or n; Esc to go back',
   recallYesNo: 'y or n; /stop to exit recall',
-  recallSpelling: 'type your answer; /stop to exit recall',
 }
 
 /** Load-more or just-review y/n — `PlaceholderContext` while the recall session waits for that answer. */

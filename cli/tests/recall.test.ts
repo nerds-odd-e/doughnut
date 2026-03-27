@@ -20,7 +20,6 @@ import { addAccessToken } from '../src/commands/accessToken.js'
 import { userAbortError } from '../src/fetchAbort.js'
 import {
   answerQuiz,
-  answerSpelling,
   contestAndRegenerate,
   markAsRecalled,
   recallNext,
@@ -41,7 +40,6 @@ vi.mock('doughnut-api', () => ({
   },
   RecallPromptController: {
     answerQuiz: vi.fn(),
-    answerSpelling: vi.fn(),
     contest: vi.fn(),
     regenerate: vi.fn(),
   },
@@ -678,79 +676,6 @@ describe('answerQuiz', () => {
         throwOnError: true,
         path: { recallPrompt: 100 },
         body: { choiceIndex: 0, thinkingTimeMs: 3000 },
-      })
-    )
-  })
-})
-
-describe('answerSpelling', () => {
-  let originalConfigDir: string | undefined
-
-  beforeEach(() => {
-    originalConfigDir = process.env.DOUGHNUT_CONFIG_DIR
-    process.env.DOUGHNUT_CONFIG_DIR = createTempDir()
-    vi.clearAllMocks()
-  })
-
-  afterEach(() => {
-    if (originalConfigDir === undefined) {
-      delete process.env.DOUGHNUT_CONFIG_DIR
-    } else {
-      process.env.DOUGHNUT_CONFIG_DIR = originalConfigDir
-    }
-  })
-
-  test('calls answerSpelling with spellingAnswer and returns correct true', async () => {
-    vi.mocked(RecallPromptController.answerSpelling).mockResolvedValue({
-      data: makeMe.aRecallPrompt.withAnswer({ id: 1, correct: true }).please(),
-    } as never)
-    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
-      data: { id: 1, label: 'Test Token' },
-    } as never)
-    await addAccessToken('test-token')
-
-    const result = await answerSpelling(100, 'sedition')
-
-    expect(result).toEqual({ correct: true })
-    expect(RecallPromptController.answerSpelling).toHaveBeenCalledWith(
-      expect.objectContaining({
-        throwOnError: true,
-        path: { recallPrompt: 100 },
-        body: { spellingAnswer: 'sedition' },
-      })
-    )
-  })
-
-  test('returns correct false when spelling is wrong', async () => {
-    vi.mocked(RecallPromptController.answerSpelling).mockResolvedValue({
-      data: makeMe.aRecallPrompt.withAnswer({ id: 1, correct: false }).please(),
-    } as never)
-    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
-      data: { id: 1, label: 'Test Token' },
-    } as never)
-    await addAccessToken('test-token')
-
-    const result = await answerSpelling(100, 'sedicion')
-
-    expect(result).toEqual({ correct: false })
-  })
-
-  test('passes thinkingTimeMs to API when provided', async () => {
-    vi.mocked(RecallPromptController.answerSpelling).mockResolvedValue({
-      data: makeMe.aRecallPrompt.withAnswer({ id: 1, correct: true }).please(),
-    } as never)
-    vi.mocked(UserController.getTokenInfo).mockResolvedValue({
-      data: { id: 1, label: 'Test Token' },
-    } as never)
-    await addAccessToken('test-token')
-
-    await answerSpelling(100, 'sedition', 5000)
-
-    expect(RecallPromptController.answerSpelling).toHaveBeenCalledWith(
-      expect.objectContaining({
-        throwOnError: true,
-        path: { recallPrompt: 100 },
-        body: { spellingAnswer: 'sedition', thinkingTimeMs: 5000 },
       })
     )
   })

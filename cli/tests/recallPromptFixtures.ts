@@ -38,14 +38,3 @@ export function spellingRecallPrompt(id: number, stem: string): RecallPrompt {
     notebook: undefined,
   }
 }
-
-export function spellingRecallPromptWithNotebook(
-  id: number,
-  stem: string,
-  notebook: Notebook
-): RecallPrompt {
-  return {
-    ...makeMe.aRecallPrompt.withId(id).withSpellingStem(stem).please(),
-    notebook,
-  }
-}
