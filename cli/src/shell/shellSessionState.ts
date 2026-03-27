@@ -25,7 +25,6 @@ export type ShellSessionState = {
   commandInput: InteractiveCommandInput
   highlightIndex: number
   suggestionsDismissed: boolean
-  tokenSelection: TokenSelectionState | null
   numberedChoiceHighlightIndex: number
   commandTurn: CommandTurnBuffer
   /** Bumps when module-level fetch-wait (or similar) changes without other session fields; re-runs TTY layout effect. */
@@ -52,7 +51,6 @@ export function createInitialShellSessionState(): ShellSessionState {
     },
     highlightIndex: 0,
     suggestionsDismissed: false,
-    tokenSelection: null,
     numberedChoiceHighlightIndex: 0,
     commandTurn: emptyCommandTurnBuffer(),
     ttyContractEpoch: 0,

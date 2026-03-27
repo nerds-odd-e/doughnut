@@ -20,7 +20,10 @@ import {
 } from '../renderer.js'
 import { hasInteractiveSlashCompletions } from '../slashCompletion.js'
 import { getDefaultTokenLabel } from '../commands/accessToken.js'
-import type { ShellSessionState } from '../shell/shellSessionState.js'
+import type {
+  ShellSessionState,
+  TokenSelectionState,
+} from '../shell/shellSessionState.js'
 import type { InteractiveShellDeps } from '../interactiveShellDeps.js'
 import { TOKEN_LIST_COMMANDS } from '../shell/tokenListCommands.js'
 import {
@@ -75,20 +78,19 @@ function currentStageIndicatorLinesForLiveRegion(
 
 function computeLiveColumnLeadingSnapshot(
   session: ShellSessionState,
-  deps: InteractiveShellDeps
+  deps: InteractiveShellDeps,
+  tokenSelection: TokenSelectionState | null
 ): LiveColumnLeadingSnapshot {
   const terminalWidth = getTerminalWidth()
-  const placeholderContext = deps.getPlaceholderContext(
-    !!session.tokenSelection
-  )
+  const placeholderContext = deps.getPlaceholderContext(!!tokenSelection)
   const stopRecallConfirm = deps.isPendingStopConfirmation()
     ? deps.getRecallStopConfirmInkModel(placeholderContext)
     : null
   const recallQuestionPromptLines =
     deps.getRecallCurrentPromptWrappedLines(terminalWidth)
   const waitLine = getInteractiveFetchWaitLine()
-  const tokenListConfig = session.tokenSelection
-    ? TOKEN_LIST_COMMANDS[session.tokenSelection.command]
+  const tokenListConfig = tokenSelection
+    ? TOKEN_LIST_COMMANDS[tokenSelection.command]
     : undefined
   let currentPromptWrappedLines: string[]
   if (waitLine) {
@@ -98,7 +100,7 @@ function computeLiveColumnLeadingSnapshot(
   } else {
     const currentPromptText = tokenListConfig?.currentPrompt
     if (
-      !session.tokenSelection &&
+      !tokenSelection &&
       recallQuestionPromptLines !== null &&
       !deps.isPendingStopConfirmation()
     ) {
@@ -172,6 +174,7 @@ function PastMessageBlock({
 function buildLivePanel(
   session: ShellSessionState,
   deps: InteractiveShellDeps,
+  tokenSelection: TokenSelectionState | null,
   defaultCommandLineLayout: DefaultCommandLineInkLayout,
   handlers: ShellSessionInkHandlers
 ): React.ReactElement {
@@ -202,7 +205,7 @@ function buildLivePanel(
     })
   }
   if (
-    deps.getPlaceholderContext(!!session.tokenSelection) ===
+    deps.getPlaceholderContext(!!tokenSelection) ===
     RECALL_SESSION_YES_NO_PLACEHOLDER
   ) {
     return React.createElement(RecallInkConfirmPanel, {
@@ -239,8 +242,8 @@ function buildLivePanel(
         ),
     })
   }
-  if (session.tokenSelection) {
-    const tokenListConfig = TOKEN_LIST_COMMANDS[session.tokenSelection.command]
+  if (tokenSelection) {
+    const tokenListConfig = TOKEN_LIST_COMMANDS[tokenSelection.command]
     const width = getTerminalWidth()
     const promptLines = tokenListConfig?.currentPrompt
       ? wrapTextToVisibleWidthLines(tokenListConfig.currentPrompt, width)
@@ -257,9 +260,9 @@ function buildLivePanel(
       lineDraft: session.commandInput.lineDraft,
       caretOffset: session.commandInput.caretOffset,
       width,
-      items: session.tokenSelection.items,
+      items: tokenSelection.items,
       defaultLabel: getDefaultTokenLabel(),
-      highlightIndex: session.tokenSelection.highlightIndex,
+      highlightIndex: tokenSelection.highlightIndex,
       onInterrupt: handlers.onInterrupt,
       onGuidanceListKey: (inp, ky) =>
         Promise.resolve(handlers.onTokenPickerGuidanceKey(inp, ky)).catch(
@@ -286,16 +289,22 @@ function buildLivePanel(
 
 type ShellSessionRootProps = {
   session: ShellSessionState
+  tokenSelection: TokenSelectionState | null
   deps: InteractiveShellDeps
   handlers: ShellSessionInkHandlers
 }
 
 export function ShellSessionRoot({
   session,
+  tokenSelection,
   deps,
   handlers,
 }: ShellSessionRootProps): React.ReactElement {
-  const leading = computeLiveColumnLeadingSnapshot(session, deps)
+  const leading = computeLiveColumnLeadingSnapshot(
+    session,
+    deps,
+    tokenSelection
+  )
   const liveLeadingGap = needsGapBeforeLiveRegion(
     session.pastMessages,
     leading.currentPromptWrappedLines,
@@ -316,6 +325,7 @@ export function ShellSessionRoot({
   const livePanel = buildLivePanel(
     session,
     deps,
+    tokenSelection,
     defaultCommandLineLayout,
     handlers
   )
