@@ -42,12 +42,7 @@ export const interactiveTtyStdout = {
   },
 
   inputReadyOsc(): void {
-    write(
-      interactiveInputReadyOscSuffix({
-        lineDraft: '',
-        interactiveFetchWaitLine: null,
-      })
-    )
+    // no-op: stdout adapter does not emit the OSC input-ready signal
   },
 
   /**
