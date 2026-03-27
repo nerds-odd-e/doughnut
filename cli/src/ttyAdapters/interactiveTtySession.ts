@@ -12,7 +12,7 @@ import { interactiveTtyStdout } from './interactiveTtyStdout.js'
 import type { OutputAdapter } from '../types.js'
 import { isAlternateLivePanel } from '../ui/ShellSessionRoot.js'
 import type { TTYDeps } from './ttyDeps.js'
-import { InteractiveTtyInkApp } from './interactiveTtyInkApp.js'
+import { InteractiveApp } from '../ui/interactiveApp.js'
 
 type ReadlineKey = Pick<readline.Key, 'name' | 'shift' | 'ctrl' | 'meta'>
 
@@ -111,7 +111,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
   }
   patchStdinForInk(stdinForInk)
   shellInstance = render(
-    React.createElement(InteractiveTtyInkApp, {
+    React.createElement(InteractiveApp, {
       initialSession,
       deps,
       latestSessionRef,

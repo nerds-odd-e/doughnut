@@ -68,13 +68,13 @@ Vocabulary for Cucumber steps and page objects (`e2e_test/start/pageObjects/cli/
 
 ## Entry points
 
-- **Interactive shell:** **TTY only** (`runInteractive` → `runTTY` in `cli/src/adapters/ttyEntry.ts` → `runInteractiveTtySession` in `cli/src/adapters/interactiveTtySession.ts`). Slash-command reference is **`/help`** after the shell starts. **No `-c`**, no piped-stdin shell, no `pipedAdapter`.
+- **Interactive shell:** **TTY only** (`runInteractive` → `runTTY` in `cli/src/ttyAdapters/ttyEntry.ts` → `runInteractiveTtySession` in `cli/src/ttyAdapters/interactiveTtySession.ts`). Slash-command reference is **`/help`** after the shell starts. **No `-c`**, no piped-stdin shell, no `pipedAdapter`.
 - **Non-TTY:** **`doughnut version`** / **`-v`** / **`--version`** and **`doughnut update`** only.
 - **`processInput`:** Shared slash-command engine; wired from the interactive TTY session’s `OutputAdapter` and from Vitest via `defaultOutput` — **not** a second interactive UI. Recall **MCQ** stem on `OutputAdapter.writeCurrentPrompt` (or `log` if unset); numbered choices and “Enter your choice…” on **`log` only** — same stem vs list split as the TTY UI, without duplicating choices through both hooks.
 
 ## Approved non-Ink bytes / stdin bridges
 
-Document new cases in `cli/src/adapters/ttyEntry.ts` and next to code; avoid ad-hoc `process.stdout.write`.
+Document new cases in `cli/src/ttyAdapters/ttyEntry.ts` and next to code; avoid ad-hoc `process.stdout.write`.
 
 | Path | Allowed |
 |------|---------|

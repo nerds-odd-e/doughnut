@@ -19,7 +19,7 @@ import {
 } from '../renderer.js'
 import { hasInteractiveSlashCompletions } from '../slashCompletion.js'
 import type { ShellSessionState } from '../shell/shellSessionState.js'
-import type { TTYDeps } from '../adapters/ttyDeps.js'
+import type { TTYDeps } from '../ttyAdapters/ttyDeps.js'
 import {
   getInteractiveFetchWaitLine,
   type InteractiveFetchWaitLine,

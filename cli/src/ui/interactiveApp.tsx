@@ -36,7 +36,7 @@ import {
   selectListKeyEventFromInk,
 } from '../interactions/selectListInteraction.js'
 import { getTerminalWidth, isCommittedInteractiveInput } from '../renderer.js'
-import { interactiveTtyStdout } from './interactiveTtyStdout.js'
+import { interactiveTtyStdout } from '../ttyAdapters/interactiveTtyStdout.js'
 import {
   commandTurnBufferAppendError,
   commandTurnBufferAppendLog,
@@ -62,8 +62,8 @@ import {
   isInkSubmitPressed,
   ShellSessionRoot,
   type ShellSessionInkHandlers,
-} from '../ui/ShellSessionRoot.js'
-import type { TTYDeps } from './ttyDeps.js'
+} from './ShellSessionRoot.js'
+import type { TTYDeps } from '../ttyAdapters/ttyDeps.js'
 
 type InkKeyWithName = Key & { name?: string }
 
@@ -73,7 +73,7 @@ type StdinTtyForInk = NodeJS.ReadableStream & {
   setRawMode?: (enable: boolean) => void
 }
 
-type InteractiveTtyInkAppProps = {
+type InteractiveAppProps = {
   initialSession: ShellSessionState
   deps: TTYDeps
   latestSessionRef: React.MutableRefObject<ShellSessionState>
@@ -117,14 +117,14 @@ function finalizeInteractiveLiveRegionPaint(session: ShellSessionState): void {
   })
 }
 
-export function InteractiveTtyInkApp({
+export function InteractiveApp({
   initialSession,
   deps,
   latestSessionRef,
   stdinTty,
   ttyOutputRef,
   exitSession,
-}: InteractiveTtyInkAppProps): React.ReactElement {
+}: InteractiveAppProps): React.ReactElement {
   const {
     processInput,
     setPendingStopConfirmation,
