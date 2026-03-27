@@ -19,6 +19,7 @@ import {
   type TerminalWidth,
 } from '../renderer.js'
 import { hasInteractiveSlashCompletions } from '../slashCompletion.js'
+import { getDefaultTokenLabel } from '../commands/accessToken.js'
 import type { ShellSessionState } from '../shell/shellSessionState.js'
 import type { InteractiveShellDeps } from '../interactiveShellDeps.js'
 import {
@@ -272,7 +273,7 @@ function buildLivePanel(
       caretOffset: session.commandInput.caretOffset,
       width,
       items: session.tokenSelection.items,
-      defaultLabel: deps.getDefaultTokenLabel(),
+      defaultLabel: getDefaultTokenLabel(),
       highlightIndex: session.tokenSelection.highlightIndex,
       onInterrupt: handlers.onInterrupt,
       onGuidanceListKey: (inp, ky) =>

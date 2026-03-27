@@ -53,6 +53,7 @@ import {
   type ShellSessionState,
 } from '../shell/shellSessionState.js'
 import {
+  getDefaultTokenLabel,
   listAccessTokens,
   removeAccessToken,
   removeAccessTokenCompletely,
@@ -119,7 +120,6 @@ export function InteractiveApp({
     exitCommandSession,
     getStopConfirmationYesOutcomeLines,
     getPlaceholderContext,
-    getDefaultTokenLabel,
     TOKEN_LIST_COMMANDS,
     getNumberedChoiceListChoices,
   } = deps

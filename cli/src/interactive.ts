@@ -712,7 +712,6 @@ function buildInteractiveShellDeps() {
     getRecallCurrentPromptWrappedLines,
     shouldRecordCommittedLineInUserInputHistory: () =>
       pendingRecallAnswer === null,
-    getDefaultTokenLabel,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
     getRecallSessionYesNoInkGuidanceLines: () =>

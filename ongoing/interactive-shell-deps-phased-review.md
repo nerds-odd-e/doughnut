@@ -47,6 +47,7 @@
 1. **Usages:** `ShellSessionRoot` (default label for token picker UI).
 2. **Inline?** `ShellSessionRoot` importing `accessToken` — viable; watch bundle boundaries if `ui/` should stay free of command modules (today it already depends on many `cli/src` modules).
 3. **Alternatives:** Pass only `defaultLabel: AccessTokenLabel | undefined` as **derived props** from `InteractiveApp` if you want `ShellSessionRoot` free of storage knowledge.
+4. **Outcome (done):** **Move** — `ShellSessionRoot` and `InteractiveApp` import `getDefaultTokenLabel` from `accessToken.js`; removed from `InteractiveShellDeps` and `buildInteractiveShellDeps`. `interactive.ts` still imports it for `formatTokenLines` in slash paths.
 
 ## Phase 6 — `TOKEN_LIST_COMMANDS`
 
