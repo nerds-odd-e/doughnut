@@ -57,9 +57,6 @@ export {
   truncateToWidth,
 } from './terminalLayout.js'
 
-/** Byte sequence written to stdout when the interactive CLI announces input readiness. */
-type InteractiveInputReadyOsc = string
-
 /** Terminal column count; used for truncation and line width. */
 export type TerminalWidth = number
 
@@ -109,23 +106,6 @@ export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
 /** Load-more or just-review y/n — `PlaceholderContext` while the recall session waits for that answer. */
 export const RECALL_SESSION_YES_NO_PLACEHOLDER =
   'recallYesNo' as const satisfies PlaceholderContext
-
-/** Facts for whether to append the interactive-input-ready control sequence after an Ink paint. */
-export type InteractiveInputReadyPaint = {
-  lineDraft: string
-  interactiveFetchWaitLine: InteractiveFetchWaitLine | null
-}
-
-/** Empty string while the user is typing or fetch-wait is active; else the input-ready sequence. */
-export function interactiveInputReadyOscSuffix(
-  paint: InteractiveInputReadyPaint
-): InteractiveInputReadyOsc | '' {
-  if (paint.lineDraft !== '' || paint.interactiveFetchWaitLine !== null) {
-    return ''
-  }
-  // Private terminal control sequence (not FinalTerm 133) so shell integration does not treat it as a prompt boundary.
-  return '\x1b]900;doughnut-interactive-input-ready\x07'
-}
 
 function usesGreyNoArrowCommandLinePaint(ctx: PlaceholderContext): boolean {
   return ctx === 'tokenList' || ctx === 'interactiveFetchWait'

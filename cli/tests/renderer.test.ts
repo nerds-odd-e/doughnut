@@ -1,7 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import { INTERACTIVE_FETCH_WAIT_LINES } from '../src/interactiveFetchWait.js'
 import {
-  interactiveInputReadyOscSuffix,
   truncateToWidth,
   isCommittedInteractiveInput,
   applyCliAssistantMessageTone,
@@ -22,43 +21,6 @@ import {
   interactiveFetchWaitStageIndicatorLine,
   RESET,
 } from '../src/renderer.js'
-
-describe('interactiveInputReadyOscSuffix', () => {
-  const readyPaint = {
-    lineDraft: '',
-    interactiveFetchWaitLine: null,
-  } as const
-
-  test('emits private ready sequence when draft is empty and no interactive fetch wait', () => {
-    expect(interactiveInputReadyOscSuffix(readyPaint)).toBe(
-      '\x1b]900;doughnut-interactive-input-ready\x07'
-    )
-  })
-
-  test('emits nothing when the user has typed in the command line', () => {
-    expect(
-      interactiveInputReadyOscSuffix({
-        lineDraft: 'x',
-        interactiveFetchWaitLine: null,
-      })
-    ).toBe('')
-    expect(
-      interactiveInputReadyOscSuffix({
-        lineDraft: '  ',
-        interactiveFetchWaitLine: null,
-      })
-    ).toBe('')
-  })
-
-  test('emits nothing while interactive fetch wait is shown', () => {
-    expect(
-      interactiveInputReadyOscSuffix({
-        lineDraft: '',
-        interactiveFetchWaitLine: INTERACTIVE_FETCH_WAIT_LINES.recallNext,
-      })
-    ).toBe('')
-  })
-})
 
 describe('wrapTextToVisibleWidthLines (recall MCQ stem / ANSI terminal strings)', () => {
   test('wraps plain text at visible width with word break when possible', () => {
