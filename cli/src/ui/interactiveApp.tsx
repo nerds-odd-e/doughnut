@@ -72,6 +72,7 @@ import {
   type ShellSessionInkHandlers,
 } from './ShellSessionRoot.js'
 import type { InteractiveShellDeps } from '../interactiveShellDeps.js'
+import { TOKEN_LIST_COMMANDS } from '../shell/tokenListCommands.js'
 
 type InkKeyWithName = Key & { name?: string }
 
@@ -120,7 +121,6 @@ export function InteractiveApp({
     exitCommandSession,
     getStopConfirmationYesOutcomeLines,
     getPlaceholderContext,
-    TOKEN_LIST_COMMANDS,
     getNumberedChoiceListChoices,
   } = deps
 

@@ -73,7 +73,7 @@ export type AccessTokenPickerAction =
 
 /**
  * One access-token picker command: **Current Stage Indicator** label, optional wrapped **Current prompt**
- * under the band (`interactive.ts` → `TOKEN_LIST_COMMANDS`).
+ * under the band (`shell/tokenListCommands.ts` → `TOKEN_LIST_COMMANDS`).
  */
 export interface AccessTokenPickerCommandConfig {
   action: AccessTokenPickerAction

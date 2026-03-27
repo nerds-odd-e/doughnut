@@ -54,6 +54,7 @@
 1. **Usages:** `ShellSessionRoot` (lookup by `session.tokenSelection.command`); `InteractiveApp` destructures for handlers (verify all uses).
 2. **Inline?** Moving the record to e.g. `commands/` or `shell/tokenListCommands.ts` as **pure data + types** removes “interactive module owns config” leakage; consumers import one module.
 3. **Alternatives:** Co-locate with `AccessTokenPickerCommandConfig` / slash registration so **one place** defines both user-visible command and TTY stage copy.
+4. **Outcome (done):** **Move** — `TOKEN_LIST_COMMANDS` lives in `shell/tokenListCommands.ts`; `InteractiveApp` and `ShellSessionRoot` import it; removed from `InteractiveShellDeps` and `buildInteractiveShellDeps`. Slash strings in `processInput` remain in `interactive.ts` (unchanged behavior).
 
 ## Phase 7 — `getStopConfirmationYesOutcomeLines`
 

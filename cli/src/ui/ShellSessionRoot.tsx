@@ -22,6 +22,7 @@ import { hasInteractiveSlashCompletions } from '../slashCompletion.js'
 import { getDefaultTokenLabel } from '../commands/accessToken.js'
 import type { ShellSessionState } from '../shell/shellSessionState.js'
 import type { InteractiveShellDeps } from '../interactiveShellDeps.js'
+import { TOKEN_LIST_COMMANDS } from '../shell/tokenListCommands.js'
 import {
   getInteractiveFetchWaitLine,
   type InteractiveFetchWaitLine,
@@ -103,7 +104,7 @@ function computeLiveColumnLeadingSnapshot(
     deps.getRecallCurrentPromptWrappedLines(terminalWidth)
   const waitLine = getInteractiveFetchWaitLine()
   const tokenListConfig = session.tokenSelection
-    ? deps.TOKEN_LIST_COMMANDS[session.tokenSelection.command]
+    ? TOKEN_LIST_COMMANDS[session.tokenSelection.command]
     : undefined
   let currentPromptWrappedLines: string[]
   if (waitLine) {
@@ -254,8 +255,7 @@ function buildLivePanel(
     })
   }
   if (session.tokenSelection) {
-    const tokenListConfig =
-      deps.TOKEN_LIST_COMMANDS[session.tokenSelection.command]
+    const tokenListConfig = TOKEN_LIST_COMMANDS[session.tokenSelection.command]
     const width = getTerminalWidth()
     const promptLines = tokenListConfig?.currentPrompt
       ? wrapTextToVisibleWidthLines(tokenListConfig.currentPrompt, width)

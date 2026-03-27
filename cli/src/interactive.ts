@@ -45,7 +45,6 @@ import {
   type PlaceholderContext,
 } from './renderer.js'
 import type {
-  AccessTokenPickerCommandConfig,
   McqRecallPending,
   OutputAdapter,
   PendingRecallAnswer,
@@ -416,22 +415,6 @@ async function continueRecallSession(
   }
 }
 
-const TOKEN_LIST_COMMANDS: Record<string, AccessTokenPickerCommandConfig> = {
-  '/list-access-token': {
-    action: 'set-default',
-    stageIndicator: 'Access tokens',
-    currentPrompt: 'Select and enter to change the default access token',
-  },
-  '/remove-access-token': {
-    action: 'remove',
-    stageIndicator: 'Remove access token',
-  },
-  '/remove-access-token-completely': {
-    action: 'remove-completely',
-    stageIndicator: 'Remove access token completely',
-  },
-}
-
 const defaultOutput: OutputAdapter = {
   log: (msg) => console.log(msg),
   logError: (err) =>
@@ -712,7 +695,6 @@ function buildInteractiveShellDeps() {
     getRecallCurrentPromptWrappedLines,
     shouldRecordCommittedLineInUserInputHistory: () =>
       pendingRecallAnswer === null,
-    TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
     getRecallSessionYesNoInkGuidanceLines: () =>
       recallSessionYesNoInkGuidanceLines,

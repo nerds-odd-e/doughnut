@@ -1,6 +1,6 @@
 import type { RecallStopConfirmInkModel } from './interactions/recallYesNo.js'
 import type { PlaceholderContext } from './renderer.js'
-import type { AccessTokenPickerCommandConfig, OutputAdapter } from './types.js'
+import type { OutputAdapter } from './types.js'
 
 export interface InteractiveShellDeps {
   processInput: (
@@ -24,7 +24,6 @@ export interface InteractiveShellDeps {
    * copied to user input history.
    */
   shouldRecordCommittedLineInUserInputHistory: () => boolean
-  TOKEN_LIST_COMMANDS: Record<string, AccessTokenPickerCommandConfig>
   getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
   getRecallSessionYesNoInkGuidanceLines: () => readonly string[]
 }
