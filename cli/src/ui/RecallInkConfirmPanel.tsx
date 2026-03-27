@@ -23,7 +23,7 @@ type RecallInkConfirmPanelSharedProps = {
   onResult: (r: RecallInkConfirmChoice) => void | Promise<void>
 }
 
-export type RecallInkConfirmPanelProps =
+type RecallInkConfirmPanelProps =
   | (RecallInkConfirmPanelSharedProps & { variant: 'stop-recall' })
   | (RecallInkConfirmPanelSharedProps & {
       variant: 'in-session'

@@ -13,7 +13,7 @@ export function cycleListSelectionIndex(
 }
 
 /** How Enter combines the highlighted row with the optional input draft. */
-export type SelectListDraftPolicy =
+type SelectListDraftPolicy =
   | {
       kind: 'slash-and-number-or-highlight'
       /** Number of choices (1-based indices 1..choiceCount). */
@@ -22,9 +22,9 @@ export type SelectListDraftPolicy =
   | { kind: 'highlight-only' }
 
 /** Esc: token-style lists abort; slash-number lists signal so the host can show a nested confirm. */
-export type SelectListEscapePolicy = 'abort-list' | 'signal-escape'
+type SelectListEscapePolicy = 'abort-list' | 'signal-escape'
 
-export type SelectListKeyEvent = {
+type SelectListKeyEvent = {
   keyName: string | undefined
   str: string | undefined
   ctrl: boolean
@@ -34,7 +34,7 @@ export type SelectListKeyEvent = {
   submitPressed: boolean
 }
 
-export type SelectListKeyDispatchResult =
+type SelectListKeyDispatchResult =
   | { result: 'move-highlight'; delta: 1 | -1 }
   | { result: 'submit-with-line'; lineForProcessInput: string }
   | { result: 'submit-highlight-index'; index: number }
@@ -109,7 +109,7 @@ export function dispatchSelectListKey(
 }
 
 /** Same boolean flags Ink uses on `Key` for stdin routing; kept here so this file stays free of `ink`. */
-export type InkLikeKey = {
+type InkLikeKey = {
   escape?: boolean
   name?: string
   return?: boolean

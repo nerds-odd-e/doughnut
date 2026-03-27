@@ -4,13 +4,11 @@ import { recallCommandDocs } from './recall.js'
 import { updateDoc } from './update.js'
 import { versionDoc } from './version.js'
 
-export type CommandDocCategory = 'subcommand' | 'interactive'
-
 export interface CommandDoc {
   name: string
   usage: string
   description: string
-  category: CommandDocCategory
+  category: 'subcommand' | 'interactive'
 }
 
 const exitDoc = {

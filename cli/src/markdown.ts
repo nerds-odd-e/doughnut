@@ -11,7 +11,7 @@ function looksLikeHtml(content: string): boolean {
   return content.includes('</') || /<\w[^>]*>/.test(content)
 }
 
-export function htmlToMarkdown(content: string): string {
+function htmlToMarkdown(content: string): string {
   return turndownService.turndown(content)
 }
 

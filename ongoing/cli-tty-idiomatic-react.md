@@ -12,6 +12,7 @@ Informal plan. Delete or shrink when this refactor is done or parked.
 
 ## Status snapshot (2026-03-27)
 
+- **Phase 0 is done:** trimmed unused public surface (module-private types/helpers where nothing imported them) and removed **`ConfirmLivePanel.tsx`** — it was unreachable from the bundle and referenced non-existent modules (`sessionYesNoInteraction`, `ConfirmDisplay`). **`selectListInteraction.test.ts`** now builds full `SelectListKeyEvent` shapes for `dispatchSelectListKey` (internal type is no longer exported).
 - **Phases 1–2 are implemented and green in `cli` tests.**
 - `runInteractiveTtySession` uses a **single Ink mount** and a reducer-driven React root (`InteractiveTtyInkApp` inside the adapter file).
 - The old imperative repaint loop is removed: no adapter-level `drawBox`, `patchAndDraw`, or manual `shellInstance.rerender`.
@@ -45,10 +46,12 @@ Informal plan. Delete or shrink when this refactor is done or parked.
 
 Order by **net simplification + safety**. Prefer **one user-visible slice** per phase where possible. Tests: **observable** behavior for **kept** features; **delete** tests tied only to **removed** code.
 
-### Phase 0 — Inventory and cut dead weight (optional first slice)
+### Phase 0 — Inventory and cut dead weight
 
-- Find **unused exports, unreachable branches, duplicate helpers**, and tests that **only** exist for them → **delete together**.
-- Quick wins before structural moves reduce merge pain.
+- ✅ **Done (2026-03-27).**
+- **Removed dead module:** `cli/src/ui/ConfirmLivePanel.tsx` (no importers; broken imports).
+- **Narrowed exports → file-private** where repo-wide grep showed no external use: e.g. `htmlToMarkdown`, `CommandDocCategory` (inlined on `CommandDoc`), `recallStopConfirmInkModel`, several Ink panel prop types, `McqGuidancePhysicalRows` / `CommandInputDraftOptions` / `InteractiveInputReadyOsc`, `PatchedTextInput*` state types, and internal-only types in `selectListInteraction.ts`.
+- **Tests:** adjusted `selectListInteraction.test.ts` only to satisfy the non-exported event type; no behavioral test deletions.
 
 ### Phase 1 — React root + remove `drawBox`
 

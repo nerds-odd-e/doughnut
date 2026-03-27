@@ -1,11 +1,11 @@
 import type { Key } from 'ink'
 
-export type PatchedTextInputState = {
+type PatchedTextInputState = {
   value: string
   caretOffset: number
 }
 
-export type PatchedTextInputApplyResult =
+type PatchedTextInputApplyResult =
   | { kind: 'submit' }
   | { kind: 'change'; next: PatchedTextInputState }
   | { kind: 'unhandled' }

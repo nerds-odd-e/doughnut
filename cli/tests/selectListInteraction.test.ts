@@ -60,6 +60,8 @@ describe('selectListKeyEventFromInk', () => {
 
 describe('dispatchSelectListKey', () => {
   const base = {
+    keyName: undefined as string | undefined,
+    str: undefined as string | undefined,
     ctrl: false,
     meta: false,
     shift: false,

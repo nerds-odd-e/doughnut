@@ -37,7 +37,7 @@ function PastMessageBlock({
   )
 }
 
-export type InteractiveShellDisplayProps = {
+type InteractiveShellDisplayProps = {
   pastMessages: PastMessage[]
   terminalWidth: number
   liveLeadingGap: boolean

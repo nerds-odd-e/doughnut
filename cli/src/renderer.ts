@@ -55,7 +55,7 @@ export {
 } from './terminalLayout.js'
 
 /** Byte sequence written to stdout when the interactive CLI announces input readiness. */
-export type InteractiveInputReadyOsc = string
+type InteractiveInputReadyOsc = string
 
 /** Terminal column count; used for truncation and line width. */
 export type TerminalWidth = number
@@ -202,7 +202,7 @@ export function highlightRecognizedCommand(line: string): string {
 }
 
 /** Options for building the interactive command-line draft (logical rows before terminal width fit). */
-export type CommandInputDraftOptions = {
+type CommandInputDraftOptions = {
   placeholderContext?: PlaceholderContext
   /** UTF-16 index in `buffer`; when set, inserts inverse caret (Ink-ui TextInput–style). */
   caretOffset?: number
@@ -351,7 +351,7 @@ export function wrapMarkdownTerminalToLines(
 }
 
 /** Physical **Current guidance** rows for recall MCQ; `itemIndexPerLine[i]` is the choice index for row `i`. */
-export type McqGuidancePhysicalRows = {
+type McqGuidancePhysicalRows = {
   lines: string[]
   itemIndexPerLine: number[]
 }

@@ -190,7 +190,7 @@ function LiveColumnInkPanel({
   )
 }
 
-export type CommandLineLivePanelProps = {
+type CommandLineLivePanelProps = {
   commandInput: InteractiveCommandInput
   width: TerminalWidth
   currentPromptWrappedLines: string[]
@@ -272,7 +272,7 @@ export function CommandLineLivePanel({
   )
 }
 
-export type RecallMcqChoicesLivePanelProps = {
+type RecallMcqChoicesLivePanelProps = {
   stageIndicatorLine: string
   currentPromptLines: string[]
   choices: RecallMcqChoiceTexts
@@ -343,7 +343,7 @@ export function RecallMcqChoicesLivePanel({
   )
 }
 
-export type AccessTokenPickerLivePanelProps = {
+type AccessTokenPickerLivePanelProps = {
   stageIndicatorLine: string
   currentPromptLines: string[]
   lineDraft: string

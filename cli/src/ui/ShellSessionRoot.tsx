@@ -257,7 +257,7 @@ function buildLivePanel(
   })
 }
 
-export type ShellSessionRootProps = {
+type ShellSessionRootProps = {
   session: ShellSessionState
   deps: TTYDeps
   handlers: ShellSessionInkHandlers

@@ -12,7 +12,7 @@ export type RecallStopConfirmInkModel = {
 
 export const RECALL_STOP_CONFIRM_QUESTION_LINE = 'Stop recall? (y/n)'
 
-export function recallStopConfirmInkModel(
+function recallStopConfirmInkModel(
   visiblePlaceholder: string
 ): RecallStopConfirmInkModel {
   return {
