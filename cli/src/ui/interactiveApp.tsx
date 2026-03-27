@@ -35,7 +35,10 @@ import {
   dispatchSelectListKey,
   selectListKeyEventFromInk,
 } from '../interactions/selectListInteraction.js'
-import { isCommittedInteractiveInput } from '../renderer.js'
+import {
+  isCommittedInteractiveInput,
+  RECALL_SESSION_YES_NO_PLACEHOLDER,
+} from '../renderer.js'
 import {
   commandTurnBufferAppendError,
   commandTurnBufferAppendLog,
@@ -109,7 +112,7 @@ export function InteractiveApp({
     isInCommandSessionSubstate,
     exitCommandSession,
     getStopConfirmationYesOutcomeLines,
-    usesSessionYesNoInputChrome,
+    getPlaceholderContext,
     getDefaultTokenLabel,
     listAccessTokens,
     removeAccessToken,
@@ -355,7 +358,8 @@ export function InteractiveApp({
   }
 
   function finishProcessInputTurnAfterAwait(): void {
-    const newSessionYesNo = usesSessionYesNoInputChrome(false)
+    const newSessionYesNo =
+      getPlaceholderContext(false) === RECALL_SESSION_YES_NO_PLACEHOLDER
     const latest = latestSessionRef.current
     if (latest.commandTurn.lines.length > 0) {
       commitHistoryOutput(latest.commandTurn.lines, latest.commandTurn.tone)
@@ -380,9 +384,8 @@ export function InteractiveApp({
         }))
         if (isCommittedInteractiveInput(effectiveLine)) {
           if (
-            !usesSessionYesNoInputChrome(
-              !!latestSessionRef.current.tokenSelection
-            )
+            getPlaceholderContext(!!latestSessionRef.current.tokenSelection) !==
+            RECALL_SESSION_YES_NO_PLACEHOLDER
           ) {
             patch((s) => ({
               ...s,
@@ -640,7 +643,10 @@ export function InteractiveApp({
 
       resetCommandTurnBuffer()
       if (isCommittedInteractiveInput(inputLine)) {
-        if (!usesSessionYesNoInputChrome(!!latest.tokenSelection)) {
+        if (
+          getPlaceholderContext(!!latest.tokenSelection) !==
+          RECALL_SESSION_YES_NO_PLACEHOLDER
+        ) {
           patch((s) => ({
             ...s,
             pastMessages: pastMessagesCommitUserLine(

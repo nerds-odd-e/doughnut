@@ -10,6 +10,7 @@ import {
   formatCurrentStageIndicatorLine,
   getTerminalWidth,
   greyCurrentStageIndicatorLabel,
+  RECALL_SESSION_YES_NO_PLACEHOLDER,
   interactiveFetchWaitStageIndicatorLine,
   needsGapBeforeLiveRegion,
   renderPastUserMessage,
@@ -76,7 +77,11 @@ export function isAlternateLivePanel(
 ): boolean {
   if (getInteractiveFetchWaitLine() !== null) return true
   if (deps.isPendingStopConfirmation()) return true
-  if (deps.usesSessionYesNoInputChrome(!!session.tokenSelection)) return true
+  if (
+    deps.getPlaceholderContext(!!session.tokenSelection) ===
+    RECALL_SESSION_YES_NO_PLACEHOLDER
+  )
+    return true
   if (deps.getNumberedChoiceListChoices() !== null) return true
   if (session.tokenSelection) return true
   return false
@@ -208,7 +213,10 @@ function buildLivePanel(
       onResult: (d) => handlers.onStopConfirmResult(d),
     })
   }
-  if (deps.usesSessionYesNoInputChrome(!!session.tokenSelection)) {
+  if (
+    deps.getPlaceholderContext(!!session.tokenSelection) ===
+    RECALL_SESSION_YES_NO_PLACEHOLDER
+  ) {
     return React.createElement(RecallInkConfirmPanel, {
       key: 'confirm-session-yes-no',
       variant: 'in-session',

@@ -1,3 +1,22 @@
+/**
+ * TTY interactive shell — **`runInteractiveTtySession`** (started from the interactive CLI entry in `interactive.ts`).
+ *
+ * ## Product invariant
+ * - **No `-c`** — rejected in `cli/src/run.ts`.
+ * - **No piped-stdin interactive shell** and **no `pipedAdapter`** (removed).
+ *
+ * ## Approved non-Ink bytes / stdin bridges (keep minimal)
+ * Document new cases here **and** next to the code; do not add ad-hoc `process.stdout.write` “just once.”
+ *
+ * 1. **Private terminal control sequence** — input-ready signal for PTY integration (`interactiveTtyStdout`, `renderer`).
+ * 2. **Hardware cursor** — explicit CSI hide/show only for exception flows (e.g. fetch-wait, exit). Default command-line live paint must not emit `HIDE_CURSOR` (`interactiveTtyStdout`, `ansi.ts`).
+ * 3. **Exit path** — farewell lines, Ctrl+C newline before exit (`interactiveTtyStdout.exitFarewellBlock`, `ctrlCExitNewline`).
+ * 4. **Pre-Ink banner** — `process.stdout.write` for version lines before `render()` (below).
+ * 5. **`patchConsole`** — enabled when `console.Console` is constructible; off under Vitest `spyOn(console, …)` (`inkPatchConsoleSupported`).
+ * 6. **readline `keypress`** — **Ctrl+C** (exit before Ink) and fetch-wait **Esc** cancel. Token-list Esc is Ink-owned. **Do not** handle MCQ Esc on readline (duplicate / wrong ordering).
+ *
+ * **`InteractiveAppTerminalContract`** is the only path from **`ui/interactiveApp.tsx`** to TTY bytes, cursor, and OSC — the UI package does not import `interactiveTtyStdout` or call `process.stdout.write` for shell chrome.
+ */
 import React from 'react'
 import * as readline from 'node:readline'
 import { Writable } from 'node:stream'
@@ -13,7 +32,10 @@ import {
 } from '../shell/shellSessionState.js'
 import { interactiveTtyStdout } from './interactiveTtyStdout.js'
 import type { OutputAdapter } from '../types.js'
-import { getTerminalWidth } from '../renderer.js'
+import {
+  getTerminalWidth,
+  RECALL_SESSION_YES_NO_PLACEHOLDER,
+} from '../renderer.js'
 import { isAlternateLivePanel } from '../ui/ShellSessionRoot.js'
 import {
   InteractiveApp,
@@ -138,7 +160,8 @@ export function runInteractiveTtySession(
     }
     if (
       shellDeps.isPendingStopConfirmation() ||
-      shellDeps.usesSessionYesNoInputChrome(!!session.tokenSelection)
+      shellDeps.getPlaceholderContext(!!session.tokenSelection) ===
+        RECALL_SESSION_YES_NO_PLACEHOLDER
     ) {
       interactiveTtyStdout.inputReadyOsc()
       return

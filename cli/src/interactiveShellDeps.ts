@@ -25,7 +25,6 @@ export interface InteractiveShellDeps {
    * copied to user input history.
    */
   shouldRecordCommittedLineInUserInputHistory: () => boolean
-  usesSessionYesNoInputChrome: (inTokenList: boolean) => boolean
   getDefaultTokenLabel: () => AccessTokenLabel | undefined
   listAccessTokens: () => AccessTokenEntry[]
   removeAccessToken: (label: AccessTokenLabel) => boolean

@@ -1,4 +1,4 @@
-import { runTTY } from './ttyAdapters/ttyEntry.js'
+import { runInteractiveTtySession } from './ttyAdapters/interactiveTtySession.js'
 import { exitCliError } from './cliExit.js'
 import {
   addAccessToken,
@@ -702,16 +702,6 @@ function getNumberedChoiceListChoices(): readonly string[] | null {
   return p.choices
 }
 
-function usesSessionYesNoInputChrome(inTokenList: boolean): boolean {
-  return (
-    getPlaceholderContext(inTokenList) === RECALL_SESSION_YES_NO_PLACEHOLDER
-  )
-}
-
-function getRecallSessionYesNoInkGuidanceLines(): readonly string[] {
-  return recallSessionYesNoInkGuidanceLines
-}
-
 function buildInteractiveShellDeps() {
   return {
     processInput,
@@ -725,7 +715,6 @@ function buildInteractiveShellDeps() {
     getRecallCurrentPromptWrappedLines,
     shouldRecordCommittedLineInUserInputHistory: () =>
       pendingRecallAnswer === null,
-    usesSessionYesNoInputChrome,
     getDefaultTokenLabel,
     listAccessTokens,
     removeAccessToken,
@@ -733,13 +722,14 @@ function buildInteractiveShellDeps() {
     setDefaultTokenLabel,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
-    getRecallSessionYesNoInkGuidanceLines,
+    getRecallSessionYesNoInkGuidanceLines: () =>
+      recallSessionYesNoInkGuidanceLines,
   }
 }
 
-export async function runInteractive(stdin = process.stdin): Promise<void> {
+export function runInteractive(stdin = process.stdin): void {
   if (!stdin.isTTY) {
     exitCliError('not a terminal (use version or update)')
   }
-  await runTTY(stdin, buildInteractiveShellDeps())
+  runInteractiveTtySession(stdin, buildInteractiveShellDeps())
 }

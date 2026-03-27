@@ -1,5 +1,5 @@
 /**
- * Single owner of `process.stdout.write` for interactive TTY mode (`runTTY` + Ink shell).
+ * Single owner of `process.stdout.write` for interactive TTY mode (`runInteractiveTtySession` + Ink shell).
  *
  * Ink writes the live React tree to stdout on its own stream path; when `render()` uses
  * **`patchConsole`** (enabled on real Node TTY; skipped when `console.Console` is not

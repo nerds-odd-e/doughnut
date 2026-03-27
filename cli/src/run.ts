@@ -25,5 +25,5 @@ export async function run(args: string[]): Promise<void> {
     exitCliError('use /help in the shell')
   }
 
-  await runInteractive()
+  runInteractive()
 }
