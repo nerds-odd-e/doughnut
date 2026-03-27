@@ -38,6 +38,7 @@ import {
   CommandLineLivePanel,
   RecallMcqChoicesLivePanel,
 } from './liveColumnInk.js'
+import { useTokenPicker } from './tokenPicker.js'
 
 export function isInkSubmitPressed(key: Key, input: string): boolean {
   return key.return || input === '\n' || input === '\r'
@@ -284,17 +285,16 @@ function buildLivePanel(
 
 type ShellSessionRootProps = {
   session: ShellSessionState
-  tokenSelection: TokenSelectionState | null
   deps: InteractiveShellDeps
   handlers: ShellSessionInkHandlers
 }
 
 export function ShellSessionRoot({
   session,
-  tokenSelection,
   deps,
   handlers,
 }: ShellSessionRootProps): React.ReactElement {
+  const { tokenSelection } = useTokenPicker()
   const leading = computeLiveColumnLeadingSnapshot(deps, tokenSelection)
   const liveLeadingGap = needsGapBeforeLiveRegion(
     session.pastMessages,

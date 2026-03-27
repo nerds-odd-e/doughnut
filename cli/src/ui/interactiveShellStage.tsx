@@ -45,10 +45,7 @@ import {
 } from './ShellSessionRoot.js'
 import type { InteractiveAppTerminalContract } from './interactiveAppTerminalContract.js'
 import type { InteractiveShellDeps } from '../interactiveShellDeps.js'
-import type {
-  AccessTokenListStageNavigation,
-  TokenListSlashSubmitResult,
-} from './accessTokenListStage.js'
+import type { TokenListSlashSubmitResult } from './accessTokenListStage.js'
 
 type InkKeyWithName = Key & { name?: string }
 
@@ -70,7 +67,6 @@ export type InteractiveShellSharedContext = {
     tone?: CliAssistantMessageTone
   ) => void
   rememberCommittedLine: (raw: string) => void
-  applyAccessTokenListNavigation: (nav: AccessTokenListStageNavigation) => void
 }
 
 export type InteractiveShellInkHandlers = Omit<
@@ -97,7 +93,6 @@ export function useInteractiveShellStage(
     exitSession,
     commitHistoryOutput,
     rememberCommittedLine,
-    applyAccessTokenListNavigation,
   } = shared
   const {
     processInput,
@@ -374,9 +369,6 @@ export function useInteractiveShellStage(
         inputLine
       )
       if (slashResult.handled) {
-        if (slashResult.navigation) {
-          applyAccessTokenListNavigation(slashResult.navigation)
-        }
         return
       }
 
