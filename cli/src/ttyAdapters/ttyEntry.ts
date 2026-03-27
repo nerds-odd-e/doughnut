@@ -14,6 +14,8 @@
  * 4. **Pre-Ink banner** — `process.stdout.write` for version lines before `render()` (`interactiveTtySession`).
  * 5. **`patchConsole`** — enabled when `console.Console` is constructible; off under Vitest `spyOn(console, …)` (`inkPatchConsoleSupported` in `interactiveTtySession`).
  * 6. **readline `keypress`** — **Ctrl+C** (exit before Ink) and fetch-wait **Esc** cancel. Token-list Esc is Ink-owned. See `stdin.on('keypress')` in `interactiveTtySession.ts`. **Do not** handle MCQ Esc on readline (duplicate / wrong ordering).
+ *
+ * **`InteractiveAppTerminalContract`** in `interactiveTtySession.ts` is the only path from **`ui/interactiveApp.tsx`** to TTY bytes, cursor, and OSC — the UI package does not import `interactiveTtyStdout` or call `process.stdout.write` for shell chrome.
  */
 import { runInteractiveTtySession } from './interactiveTtySession.js'
 import type { InteractiveShellDeps } from '../interactiveShellDeps.js'

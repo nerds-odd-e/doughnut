@@ -76,6 +76,8 @@ Vocabulary for Cucumber steps and page objects (`e2e_test/start/pageObjects/cli/
 
 Document new cases in `cli/src/ttyAdapters/ttyEntry.ts` and next to code; avoid ad-hoc `process.stdout.write`.
 
+**From Ink:** `InteractiveApp` receives **`InteractiveAppTerminalContract`** from `interactiveTtySession` only — no direct `process.stdout` / `interactiveTtyStdout` from `cli/src/ui/` for shell chrome.
+
 | Path | Allowed |
 |------|---------|
 | **Private terminal control sequence** | Input-ready PTY signal (`interactiveTtyStdout`, `renderer`). |
