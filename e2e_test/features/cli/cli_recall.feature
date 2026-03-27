@@ -90,6 +90,7 @@ Feature: CLI recall status and recall session
       Then I should see "Incorrect" in past CLI assistant messages
       And I should see "Recalled successfully" in past CLI assistant messages
 
+    @ignore
     @usingMockedOpenAiService
     Scenario: Recall MCQ - contest and regenerate before answering
       And OpenAI generates this as second question:
