@@ -292,6 +292,58 @@ describe('TTY token list interactive mode', () => {
     expect(output).toContain('\x1b[7m')
   })
 
+  test('after canceling token list, /list-access-token opens the picker again (shell stage)', async () => {
+    await submitTTYCommand(stdin, '/list-access-token')
+    writeSpy.mockClear()
+    pushTTYCommandBytes(stdin, 'q')
+    await tick()
+
+    const afterCancel = ttyOutput(writeSpy)
+    expect(
+      afterCancel.includes('Cancelled by user.'),
+      'Prerequisite: cancel must finish so we assert re-entry, not a stuck picker.'
+    ).toBe(true)
+
+    writeSpy.mockClear()
+    await submitTTYCommand(stdin, '/list-access-token')
+    const afterSecondOpen = ttyOutput(writeSpy)
+
+    expect(
+      afterSecondOpen,
+      'Second /list-access-token should show the Access tokens stage again. If this is empty or only slash hints, the app likely stayed on access-token-list without clearing stage after cancel.'
+    ).toContain('Access tokens')
+    expect(
+      afterSecondOpen,
+      'Second open must list stored tokens (fixture Alpha). Missing label implies picker did not render.'
+    ).toContain('Alpha')
+  })
+
+  test('after confirming token list choice, /list-access-token opens the picker again (shell stage)', async () => {
+    await submitTTYCommand(stdin, '/list-access-token')
+    writeSpy.mockClear()
+    pushTTYCommandEnter(stdin)
+    await tick()
+
+    const afterConfirm = ttyOutput(writeSpy)
+    expect(
+      afterConfirm.includes('Default token set to:'),
+      'Prerequisite: Enter must commit selection so we test exit-after-success, not cancel.'
+    ).toBe(true)
+
+    writeSpy.mockClear()
+    await submitTTYCommand(stdin, '/list-access-token')
+    const afterSecondOpen = ttyOutput(writeSpy)
+
+    expect(
+      afterSecondOpen,
+      'Second /list-access-token should show the Access tokens stage again after a successful pick. If not, exit-from-success path may omit returning to shell stage.'
+    ).toContain('Access tokens')
+    expect(
+      afterSecondOpen,
+      'Second open must still list tokens (fixture Alpha).'
+    ).toContain('Alpha')
+  })
+
   test('ESC cancels token list and shows Cancelled by user. in history', async () => {
     await submitTTYCommand(stdin, '/remove-access-token')
     writeSpy.mockClear()

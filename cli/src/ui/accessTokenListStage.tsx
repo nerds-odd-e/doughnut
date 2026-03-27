@@ -1,4 +1,4 @@
-import type { Dispatch, MutableRefObject, SetStateAction } from 'react'
+import type { MutableRefObject } from 'react'
 import type { Key } from 'ink'
 import {
   getDefaultTokenLabel,
@@ -33,13 +33,20 @@ import type {
 } from '../shell/shellSessionState.js'
 import { TOKEN_LIST_COMMANDS } from '../shell/tokenListCommands.js'
 import type { CliAssistantMessageTone, OutputAdapter } from '../types.js'
-import type { AppStage } from './interactiveAppStage.js'
+
+/** Parent maps this to interactive app stage; this module does not call setState. */
+export type AccessTokenListStageNavigation =
+  | { kind: 'shell' }
+  | { kind: 'picker'; picker: TokenSelectionState }
+
+export type TokenListSlashSubmitResult =
+  | { handled: false }
+  | { handled: true; navigation?: AccessTokenListStageNavigation }
 
 export type AccessTokenListStageContext = {
   patch: (reducerPatch: (s: ShellSessionState) => ShellSessionState) => void
   latestSessionRef: MutableRefObject<ShellSessionState>
   latestTokenPickerRef: MutableRefObject<TokenSelectionState | null>
-  setAppStage: Dispatch<SetStateAction<AppStage>>
   ttyOutput: OutputAdapter
   commitHistoryOutput: (
     lines: readonly string[],
@@ -49,27 +56,28 @@ export type AccessTokenListStageContext = {
 }
 
 export function useAccessTokenListStage(ctx: AccessTokenListStageContext): {
-  onTokenPickerGuidanceKey: (input: string, key: Key) => Promise<void>
+  handleTokenPickerKey: (
+    input: string,
+    key: Key
+  ) => Promise<AccessTokenListStageNavigation | null>
   tryHandleTokenListSlashSubmit: (
     trimmedInput: string,
     inputLine: string
-  ) => boolean
+  ) => TokenListSlashSubmitResult
 } {
   const {
     patch,
     latestSessionRef,
     latestTokenPickerRef,
-    setAppStage,
     ttyOutput,
     commitHistoryOutput,
     rememberCommittedLine,
   } = ctx
 
-  function commitTokenListResult(
+  function patchSessionAfterTokenListClose(
     message: string,
     tone: CliAssistantMessageTone = 'plain'
   ): void {
-    setAppStage({ kind: 'shell' })
     patch((s) => ({
       ...s,
       commandInput: clearLiveCommandLine(s.commandInput),
@@ -81,12 +89,12 @@ export function useAccessTokenListStage(ctx: AccessTokenListStageContext): {
     }))
   }
 
-  async function onTokenPickerGuidanceKey(
+  async function handleTokenPickerKey(
     input: string,
     key: Key
-  ): Promise<void> {
+  ): Promise<AccessTokenListStageNavigation | null> {
     const activeTokenSelection = latestTokenPickerRef.current
-    if (!activeTokenSelection) return
+    if (!activeTokenSelection) return null
 
     const ev = selectListKeyEventFromInk(
       input,
@@ -101,24 +109,23 @@ export function useAccessTokenListStage(ctx: AccessTokenListStageContext): {
     )
     switch (listDispatch.result) {
       case 'abort-highlight-only-list':
-        commitTokenListResult(CLI_USER_ABORTED_WAIT_MESSAGE, 'userNotice')
-        break
+        patchSessionAfterTokenListClose(
+          CLI_USER_ABORTED_WAIT_MESSAGE,
+          'userNotice'
+        )
+        return { kind: 'shell' }
       case 'move-highlight':
-        setAppStage((prev) => {
-          if (prev.kind !== 'accessTokenList') return prev
-          return {
-            ...prev,
-            picker: {
-              ...prev.picker,
-              highlightIndex: cycleListSelectionIndex(
-                prev.picker.highlightIndex,
-                listDispatch.delta,
-                prev.picker.items.length
-              ),
-            },
-          }
-        })
-        break
+        return {
+          kind: 'picker',
+          picker: {
+            ...activeTokenSelection,
+            highlightIndex: cycleListSelectionIndex(
+              activeTokenSelection.highlightIndex,
+              listDispatch.delta,
+              activeTokenSelection.items.length
+            ),
+          },
+        }
       case 'submit-highlight-index': {
         const selectedLabel =
           activeTokenSelection.items[listDispatch.index]!.label
@@ -145,21 +152,24 @@ export function useAccessTokenListStage(ctx: AccessTokenListStageContext): {
             tone = o.tone
           }
         }
-        commitTokenListResult(message, tone)
-        break
+        patchSessionAfterTokenListClose(message, tone)
+        return { kind: 'shell' }
       }
       default:
-        commitTokenListResult(CLI_USER_ABORTED_WAIT_MESSAGE, 'userNotice')
-        break
+        patchSessionAfterTokenListClose(
+          CLI_USER_ABORTED_WAIT_MESSAGE,
+          'userNotice'
+        )
+        return { kind: 'shell' }
     }
   }
 
   function tryHandleTokenListSlashSubmit(
     trimmedInput: string,
     inputLine: string
-  ): boolean {
+  ): TokenListSlashSubmitResult {
     const tokenSelect = TOKEN_LIST_COMMANDS[trimmedInput] ?? null
-    if (!tokenSelect) return false
+    if (!tokenSelect) return { handled: false }
 
     const tokens = listAccessTokens()
     if (tokens.length === 0) {
@@ -172,7 +182,7 @@ export function useAccessTokenListStage(ctx: AccessTokenListStageContext): {
       }))
       rememberCommittedLine(trimmedInput)
       commitHistoryOutput(['No access tokens stored.'])
-      return true
+      return { handled: true }
     }
     if (isCommittedInteractiveInput(inputLine)) {
       patch((s) => ({
@@ -185,20 +195,22 @@ export function useAccessTokenListStage(ctx: AccessTokenListStageContext): {
     }
     rememberCommittedLine(trimmedInput)
     const defaultLabel = getDefaultTokenLabel()
-    setAppStage({
-      kind: 'accessTokenList',
-      picker: {
-        items: tokens,
-        command: trimmedInput,
-        action: tokenSelect.action,
-        highlightIndex: Math.max(
-          0,
-          tokens.findIndex((token) => token.label === defaultLabel)
-        ),
+    return {
+      handled: true,
+      navigation: {
+        kind: 'picker',
+        picker: {
+          items: tokens,
+          command: trimmedInput,
+          action: tokenSelect.action,
+          highlightIndex: Math.max(
+            0,
+            tokens.findIndex((token) => token.label === defaultLabel)
+          ),
+        },
       },
-    })
-    return true
+    }
   }
 
-  return { onTokenPickerGuidanceKey, tryHandleTokenListSlashSubmit }
+  return { handleTokenPickerKey, tryHandleTokenListSlashSubmit }
 }
