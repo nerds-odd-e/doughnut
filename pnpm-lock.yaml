@@ -42,6 +42,7 @@ overrides:
   yauzl: '>=3.2.1'
   picomatch: '>=4.0.4'
   yaml: ^2.8.3
+  handlebars: '>=4.7.9'
 
 patchedDependencies:
   find-cypress-specs@1.54.9:
@@ -3649,8 +3650,8 @@ packages:
   gsap@3.14.2:
     resolution: {integrity: sha512-P8/mMxVLU7o4+55+1TCnQrPmgjPKnwkzkXOK1asnR9Jg2lna4tEY5qBJjMmAaOBDDZWtlRjBXjLa0w53G/uBLA==}
 
-  handlebars@4.7.8:
-    resolution: {integrity: sha512-vafaFqs8MZkRrSX7sFVUdo3ap/eNiLnb4IakshzvP56X5Nr1iGKAIqdX6tMlm6HcNRIkr6AxO5jFEoJzzpT8aQ==}
+  handlebars@4.7.9:
+    resolution: {integrity: sha512-4E71E0rpOaQuJR2A3xDZ+GM1HyWYv1clR58tC8emQNeQe3RH7MAzSbat+V0wG78LQBo6m6bzSG/L4pBuCsgnUQ==}
     engines: {node: '>=0.4.7'}
     hasBin: true
 
@@ -8100,7 +8101,7 @@ snapshots:
       cookie: 0.7.2
       dotenv: 16.4.7
       glob: 13.0.6
-      handlebars: 4.7.8
+      handlebars: 4.7.9
       https-proxy-agent: 7.0.6
       mobx: 6.15.0
       picomatch: 4.0.4
@@ -10513,7 +10514,7 @@ snapshots:
 
   gsap@3.14.2: {}
 
-  handlebars@4.7.8:
+  handlebars@4.7.9:
     dependencies:
       minimist: 1.2.8
       neo-async: 2.6.2
