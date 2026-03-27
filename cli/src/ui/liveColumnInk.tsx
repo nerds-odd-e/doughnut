@@ -1,7 +1,10 @@
 import { useLayoutEffect, useRef } from 'react'
 import type { ReactNode } from 'react'
 import { Box, Text, useFocus, useInput, type Key } from 'ink'
-import type { AccessTokenEntry, AccessTokenLabel } from '../accessToken.js'
+import type {
+  AccessTokenEntry,
+  AccessTokenLabel,
+} from '../commands/accessToken.js'
 import type { InteractiveCommandInput } from '../interactiveCommandInput.js'
 import type { RecallMcqChoiceTexts } from '../types.js'
 import {

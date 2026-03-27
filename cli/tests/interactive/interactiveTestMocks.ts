@@ -21,8 +21,9 @@ const {
   mockContestAndRegenerate: vi.fn(),
 }))
 
-vi.mock('../../src/recall.js', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../src/recall.js')>()
+vi.mock('../../src/commands/recall.js', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('../../src/commands/recall.js')>()
   mockRecallStatus.mockImplementation((signal?: AbortSignal) =>
     actual.recallStatus(signal)
   )
@@ -37,8 +38,9 @@ vi.mock('../../src/recall.js', async (importOriginal) => {
   }
 })
 
-vi.mock('../../src/help.js', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../src/help.js')>()
+vi.mock('../../src/commands/help.js', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('../../src/commands/help.js')>()
   const manyCommands = Array.from({ length: 12 }, (_, i) => ({
     name: `cmd${i}`,
     usage: `/cmd${i}`,

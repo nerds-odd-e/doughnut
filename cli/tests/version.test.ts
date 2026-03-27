@@ -4,7 +4,7 @@ import {
   formatVersionOutput,
   parseVersionFromOutput,
   compareVersions,
-} from '../src/version.js'
+} from '../src/commands/version.js'
 
 describe('version', () => {
   test('getVersion returns version string', () => {

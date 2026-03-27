@@ -16,7 +16,7 @@ import {
   spellingRecallPrompt,
 } from './recallPromptFixtures.js'
 import { recallNextQuestion } from './recallNextTestShapes.js'
-import { addAccessToken } from '../src/accessToken.js'
+import { addAccessToken } from '../src/commands/accessToken.js'
 import { userAbortError } from '../src/fetchAbort.js'
 import {
   answerQuiz,
@@ -26,7 +26,7 @@ import {
   recallNext,
   recallStatus,
   RECALL_LOAD_CLI_TEST_DELAY_MS_ENV,
-} from '../src/recall.js'
+} from '../src/commands/recall.js'
 
 vi.mock('doughnut-api', () => ({
   getApiConfig: () => ({ apiBaseUrl: 'http://localhost:9081' }),

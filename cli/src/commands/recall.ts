@@ -18,7 +18,7 @@ import {
   runDefaultBackendJson,
   runWithDefaultBackendClient,
 } from './accessToken.js'
-import { isFetchAbortedByCaller, userAbortError } from './fetchAbort.js'
+import { isFetchAbortedByCaller, userAbortError } from '../fetchAbort.js'
 
 /**
  * Env var: milliseconds to wait before the first `recalling` HTTP call when `recallNext` receives an

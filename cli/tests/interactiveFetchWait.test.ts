@@ -28,16 +28,18 @@ const { mockRecallNext, mockRecallStatus } = vi.hoisted(() => ({
 const { mockAddAccessToken } = vi.hoisted(() => ({
   mockAddAccessToken: vi.fn(),
 }))
-vi.mock('../src/recall.js', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../src/recall.js')>()
+vi.mock('../src/commands/recall.js', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('../src/commands/recall.js')>()
   return {
     ...actual,
     recallNext: mockRecallNext,
     recallStatus: mockRecallStatus,
   }
 })
-vi.mock('../src/accessToken.js', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../src/accessToken.js')>()
+vi.mock('../src/commands/accessToken.js', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('../src/commands/accessToken.js')>()
   return { ...actual, addAccessToken: mockAddAccessToken }
 })
 

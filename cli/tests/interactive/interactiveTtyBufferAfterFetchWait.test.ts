@@ -32,9 +32,9 @@ describe('TTY: line draft must not survive interactive fetch wait', () => {
 
   afterEach(async () => {
     endTTYSession(stdin)
-    const actual = await vi.importActual<typeof import('../../src/recall.js')>(
-      '../../src/recall.js'
-    )
+    const actual = await vi.importActual<
+      typeof import('../../src/commands/recall.js')
+    >('../../src/commands/recall.js')
     mockRecallStatus.mockImplementation((signal?: AbortSignal) =>
       actual.recallStatus(signal)
     )

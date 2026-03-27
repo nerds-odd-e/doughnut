@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Chalk } from 'chalk'
 import { expect, vi } from 'vitest'
-import type { AccessTokenEntry } from '../../src/accessToken.js'
+import type { AccessTokenEntry } from '../../src/commands/accessToken.js'
 import {
   resetRecallStateForTesting,
   runInteractive,

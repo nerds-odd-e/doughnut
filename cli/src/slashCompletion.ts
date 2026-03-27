@@ -6,7 +6,7 @@ import {
   filterCommandsByPrefix,
   interactiveDocs,
   type CommandDoc,
-} from './help.js'
+} from './commands/help.js'
 import { singleLineCommandDraft } from './interactiveCommandInput.js'
 
 /** Same normalization as the live command line (paste newlines → spaces). */

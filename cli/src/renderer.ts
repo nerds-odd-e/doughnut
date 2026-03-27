@@ -10,12 +10,15 @@ import {
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
   terminalChalk,
 } from './terminalChalk.js'
-import { formatCommandCompletionLines, interactiveDocs } from './help.js'
+import {
+  formatCommandCompletionLines,
+  interactiveDocs,
+} from './commands/help.js'
 import {
   formatTokenLines,
   type AccessTokenEntry,
   type AccessTokenLabel,
-} from './accessToken.js'
+} from './commands/accessToken.js'
 import {
   CURRENT_GUIDANCE_MAX_VISIBLE,
   formatHighlightedList,

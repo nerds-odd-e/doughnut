@@ -21,7 +21,7 @@ import React from 'react'
 import * as readline from 'node:readline'
 import { Writable } from 'node:stream'
 import { render } from 'ink'
-import { formatVersionOutput } from '../version.js'
+import { formatVersionOutput } from '../commands/version.js'
 import {
   cancelInteractiveFetchWaitFor,
   getInteractiveFetchWaitLine,

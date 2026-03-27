@@ -9,10 +9,10 @@ import {
   removeAccessToken,
   removeAccessTokenCompletely,
   setDefaultTokenLabel,
-} from './accessToken.js'
+} from './commands/accessToken.js'
 import { userVisibleOutcomeFromCommandError } from './fetchAbort.js'
-import { addGmailAccount, getLastEmailSubject } from './gmail.js'
-import { formatHelp } from './help.js'
+import { addGmailAccount, getLastEmailSubject } from './commands/gmail.js'
+import { formatHelp } from './commands/help.js'
 import { renderMarkdownToTerminal } from './markdown.js'
 import {
   answerQuiz,
@@ -24,7 +24,7 @@ import {
   recallStatus,
   resolveRecallNotebookTitle,
   type RecallNextResult,
-} from './recall.js'
+} from './commands/recall.js'
 import {
   getInteractiveFetchWaitLine,
   INTERACTIVE_FETCH_WAIT_LINES,

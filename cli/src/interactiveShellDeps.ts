@@ -1,4 +1,7 @@
-import type { AccessTokenEntry, AccessTokenLabel } from './accessToken.js'
+import type {
+  AccessTokenEntry,
+  AccessTokenLabel,
+} from './commands/accessToken.js'
 import type { RecallStopConfirmInkModel } from './interactions/recallYesNo.js'
 import type { PlaceholderContext } from './renderer.js'
 import type { AccessTokenPickerCommandConfig, OutputAdapter } from './types.js'

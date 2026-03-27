@@ -2,7 +2,7 @@ import { chmodSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
-import { exitCliError } from './cliExit.js'
+import { exitCliError } from '../cliExit.js'
 import {
   getVersion,
   formatVersionOutput,

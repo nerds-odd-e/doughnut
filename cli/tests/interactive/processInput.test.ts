@@ -13,7 +13,7 @@ import {
   mcqRecallPrompt,
   spellingRecallPrompt,
 } from '../recallPromptFixtures.js'
-import { addAccessToken } from '../../src/accessToken.js'
+import { addAccessToken } from '../../src/commands/accessToken.js'
 import {
   CLI_USER_ABORTED_WAIT_MESSAGE,
   userAbortError,
@@ -28,7 +28,7 @@ import {
 import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { cancelInteractiveFetchWaitFor } from '../../src/interactiveFetchWait.js'
-import { RECALL_LOAD_CLI_TEST_DELAY_MS_ENV } from '../../src/recall.js'
+import { RECALL_LOAD_CLI_TEST_DELAY_MS_ENV } from '../../src/commands/recall.js'
 import {
   isInRecallSubstate,
   processInput,
@@ -556,14 +556,14 @@ describe('processInput', () => {
   })
 
   describe('contract: /recall load — real recallNext + OutputAdapter cancel', () => {
-    let realRecallNext: typeof import('../../src/recall.js')['recallNext']
+    let realRecallNext: typeof import('../../src/commands/recall.js')['recallNext']
     let originalConfigDir: string | undefined
     let originalSlow: string | undefined
 
     beforeAll(async () => {
-      const mod = await vi.importActual<typeof import('../../src/recall.js')>(
-        '../../src/recall.js'
-      )
+      const mod = await vi.importActual<
+        typeof import('../../src/commands/recall.js')
+      >('../../src/commands/recall.js')
       realRecallNext = mod.recallNext
     })
 

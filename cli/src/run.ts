@@ -1,7 +1,7 @@
 import { exitCliError } from './cliExit.js'
 import { runInteractive } from './interactive.js'
-import { runUpdate } from './update.js'
-import { formatVersionOutput } from './version.js'
+import { runUpdate } from './commands/update.js'
+import { formatVersionOutput } from './commands/version.js'
 
 export async function run(args: string[]): Promise<void> {
   if (args.some((a) => a === '-c' || a.startsWith('-c='))) {

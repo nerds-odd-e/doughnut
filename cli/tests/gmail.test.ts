@@ -7,7 +7,7 @@ import {
   loadConfig,
   saveConfig,
   type GmailConfig,
-} from '../src/gmail.js'
+} from '../src/commands/gmail.js'
 
 function createTempDir(): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-gmail-test-'))

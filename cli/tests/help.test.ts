@@ -10,7 +10,7 @@ import {
   getTabCompletion,
   interactiveDocs,
   type CommandDoc,
-} from '../src/help.js'
+} from '../src/commands/help.js'
 describe('formatHelp', () => {
   test('includes all command names', () => {
     const output = formatHelp()

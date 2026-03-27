@@ -6,7 +6,10 @@ import {
   ttyShowCaretCuUThenInk2KEraseBeforeNextHide,
   simulatedScreenFromTtyWrites,
 } from '../ttyWriteSimulation.js'
-import { filterCommandsByPrefix, interactiveDocs } from '../../src/help.js'
+import {
+  filterCommandsByPrefix,
+  interactiveDocs,
+} from '../../src/commands/help.js'
 import {
   endTTYSession,
   GREY_BG_PAST_INPUT,

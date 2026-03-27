@@ -1,5 +1,5 @@
 import './interactiveTestMocks.js'
-import * as recall from '../../src/recall.js'
+import * as recall from '../../src/commands/recall.js'
 import { vi } from 'vitest'
 
 export const mockRecallNext = vi.mocked(recall.recallNext)

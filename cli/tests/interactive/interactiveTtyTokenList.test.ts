@@ -248,7 +248,9 @@ describe('TTY token list interactive mode', () => {
 
     expect(ttyOutput(writeSpy)).toContain('Default token set to: Beta')
 
-    const { getDefaultTokenLabel } = await import('../../src/accessToken.js')
+    const { getDefaultTokenLabel } = await import(
+      '../../src/commands/accessToken.js'
+    )
     expect(getDefaultTokenLabel()).toBe('Beta')
   })
 
@@ -296,7 +298,9 @@ describe('TTY token list interactive mode', () => {
     expect(output).not.toContain('Alpha')
     expect(output).not.toContain('Token "Alpha" removed')
 
-    const { listAccessTokens } = await import('../../src/accessToken.js')
+    const { listAccessTokens } = await import(
+      '../../src/commands/accessToken.js'
+    )
     const remaining = listAccessTokens()
     expect(remaining).toHaveLength(3)
     expect(remaining.map((t) => t.label)).toContain('Alpha')
@@ -372,7 +376,9 @@ describe('TTY token list interactive mode', () => {
 
     expect(ttyOutput(writeSpy)).toContain('Token "Alpha" removed.')
 
-    const { listAccessTokens } = await import('../../src/accessToken.js')
+    const { listAccessTokens } = await import(
+      '../../src/commands/accessToken.js'
+    )
     const remaining = listAccessTokens()
     expect(remaining).toHaveLength(2)
     expect(remaining.map((t) => t.label)).not.toContain('Alpha')

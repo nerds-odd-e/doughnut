@@ -9,8 +9,8 @@ import {
   type TokenConfigDto,
   type UserToken,
 } from 'doughnut-api'
-import { getConfigDir } from './configDir.js'
-import { isFetchAbortedByCaller } from './fetchAbort.js'
+import { getConfigDir } from '../configDir.js'
+import { isFetchAbortedByCaller } from '../fetchAbort.js'
 
 /**
  * For every call to the generated Doughnut HTTP client that runs inside

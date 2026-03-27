@@ -4,7 +4,7 @@ import {
   filterCommandsByPrefix,
   getTabCompletion,
   interactiveDocs,
-} from '../help.js'
+} from '../commands/help.js'
 import {
   CLI_USER_ABORTED_WAIT_MESSAGE,
   userVisibleOutcomeFromCommandError,
@@ -52,7 +52,7 @@ import {
   applyShellSessionPatch,
   type ShellSessionState,
 } from '../shell/shellSessionState.js'
-import type { AccessTokenEntry } from '../accessToken.js'
+import type { AccessTokenEntry } from '../commands/accessToken.js'
 import type {
   AccessTokenPickerAction,
   CliAssistantMessageTone,

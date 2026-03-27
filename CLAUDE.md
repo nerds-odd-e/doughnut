@@ -123,7 +123,7 @@ doughnut/
 - Never modify committed migrations; create new ones
 
 ### CLI (`cli/`)
-- Optional recall-load delay for manual testing or stable Vitest coverage: set `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` to a positive number of milliseconds (capped at 60000). Applies only when the TTY passes an abortable `recallNext` load (`/recall` and recall session continuations that use the same path). Default is off. See `cli/src/recall.ts` and `.cursor/rules/cli.mdc`.
+- Optional recall-load delay for manual testing or stable Vitest coverage: set `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` to a positive number of milliseconds (capped at 60000). Applies only when the TTY passes an abortable `recallNext` load (`/recall` and recall session continuations that use the same path). Default is off. See `cli/src/commands/recall.ts` and `.cursor/rules/cli.mdc`.
 
 ## Planning and phased delivery
 

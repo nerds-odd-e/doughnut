@@ -8,7 +8,7 @@ import {
   spellingRecallPromptWithNotebook,
 } from '../recallPromptFixtures.js'
 import { resetRecallStateForTesting } from '../../src/interactive.js'
-import { formatRecallNotebookCurrentPromptLine } from '../../src/recall.js'
+import { formatRecallNotebookCurrentPromptLine } from '../../src/commands/recall.js'
 import { stripAnsi } from '../../src/renderer.js'
 import {
   endTTYSession,

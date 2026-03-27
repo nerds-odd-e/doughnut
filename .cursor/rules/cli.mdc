@@ -11,7 +11,8 @@ TypeScript CLI for Doughnut. Lives in `cli/`.
 
 ```
 cli/
-  src/           # Production code
+  src/           # Production code (shell, TTY, UI, `processInput`; slash/subcommand handlers in `src/commands/`)
+  src/commands/  # Slash-command and subcommand implementations + aggregated help
   src/shims/     # Modules referenced only from the esbuild `bundle` script (aliases)
   tests/         # Vitest unit tests (*.test.ts)
   vitest.config.ts
@@ -116,7 +117,7 @@ Features: **`e2e_test/features/cli/`**. Steps and page objects: **`e2e_test/step
 
 Default production API: `https://doughnut.odd-e.com`. **`pnpm cli`** sets `DOUGHNUT_API_BASE_URL=http://localhost:9081` and `DOUGHNUT_CONFIG_DIR=~/.config/doughnut-dev`. Production-style: `pnpm cli -P` / `--production`. Self-hosted: set `DOUGHNUT_API_BASE_URL`.
 
-**Recall load delay (tests/manual):** `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` — see `cli/src/recall.ts`.
+**Recall load delay (tests/manual):** `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` — see `cli/src/commands/recall.ts`.
 
 ## OAuth credentials (Gmail)
 
@@ -127,6 +128,6 @@ Build-time injection. Local: `cli/.env.local` from `cli/.env.local.example`. CI:
 Ensure `/help` lists the command:
 
 1. Export **CommandDoc** from the handler module (`category`: `subcommand` | `interactive`).
-2. Register in **`help.ts`** (`subcommandDocs`, module doc arrays, or `interactiveDocs`).
+2. Register in **`commands/help.ts`** (`subcommandDocs`, module doc arrays, or `interactiveDocs`).
 3. Wire **`processInput()`** (slash commands) or **`run.ts`** (`version` / `update` subcommands).
 4. Verify with `pnpm cli` → `/help` in the TTY shell.

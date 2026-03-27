@@ -32,7 +32,7 @@ describe('runUpdate', () => {
 
     process.env.BASE_URL = 'http://localhost:9081'
 
-    const { runUpdate } = await import('../src/update.js')
+    const { runUpdate } = await import('../src/commands/update.js')
     await runUpdate()
 
     expect(consoleSpy).toHaveBeenCalledWith(
@@ -57,7 +57,7 @@ describe('runUpdate', () => {
 
     process.env.BASE_URL = 'http://localhost:9081'
 
-    const { runUpdate } = await import('../src/update.js')
+    const { runUpdate } = await import('../src/commands/update.js')
     await expect(runUpdate()).rejects.toThrow('exit')
 
     expect(consoleSpy).toHaveBeenCalledWith(

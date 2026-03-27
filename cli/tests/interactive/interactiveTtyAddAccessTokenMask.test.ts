@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
-vi.mock('../../src/accessToken.js', async (importOriginal) => {
+vi.mock('../../src/commands/accessToken.js', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('../../src/accessToken.js')>()
+    await importOriginal<typeof import('../../src/commands/accessToken.js')>()
   return {
     ...actual,
     addAccessToken: vi.fn().mockResolvedValue(undefined),

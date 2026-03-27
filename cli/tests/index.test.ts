@@ -1,6 +1,6 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { run } from '../src/run.js'
-import { formatVersionOutput } from '../src/version.js'
+import { formatVersionOutput } from '../src/commands/version.js'
 
 class ProcessExitForTest extends Error {
   readonly code: number | undefined

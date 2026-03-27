@@ -23,7 +23,7 @@ import {
   removeAccessToken,
   removeAccessTokenCompletely,
   setDefaultTokenLabel,
-} from '../src/accessToken.js'
+} from '../src/commands/accessToken.js'
 import { buildTokenListLines, visibleLength } from '../src/renderer.js'
 
 function createTempDir(): string {

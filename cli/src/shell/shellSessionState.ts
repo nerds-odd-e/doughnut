@@ -1,4 +1,4 @@
-import type { AccessTokenEntry } from '../accessToken.js'
+import type { AccessTokenEntry } from '../commands/accessToken.js'
 import type { AccessTokenPickerAction } from '../types.js'
 import {
   emptyInteractiveCommandInput,
