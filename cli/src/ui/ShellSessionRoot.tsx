@@ -77,7 +77,6 @@ function currentStageIndicatorLinesForLiveRegion(
 }
 
 function computeLiveColumnLeadingSnapshot(
-  session: ShellSessionState,
   deps: InteractiveShellDeps,
   tokenSelection: TokenSelectionState | null
 ): LiveColumnLeadingSnapshot {
@@ -100,7 +99,6 @@ function computeLiveColumnLeadingSnapshot(
   } else {
     const currentPromptText = tokenListConfig?.currentPrompt
     if (
-      !tokenSelection &&
       recallQuestionPromptLines !== null &&
       !deps.isPendingStopConfirmation()
     ) {
@@ -297,11 +295,7 @@ export function ShellSessionRoot({
   deps,
   handlers,
 }: ShellSessionRootProps): React.ReactElement {
-  const leading = computeLiveColumnLeadingSnapshot(
-    session,
-    deps,
-    tokenSelection
-  )
+  const leading = computeLiveColumnLeadingSnapshot(deps, tokenSelection)
   const liveLeadingGap = needsGapBeforeLiveRegion(
     session.pastMessages,
     leading.currentPromptWrappedLines,
