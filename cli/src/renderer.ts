@@ -383,13 +383,6 @@ export function formatMcqChoiceLinesWithIndices(
   return { lines, itemIndexPerLine }
 }
 
-export function formatMcqChoiceLines(
-  choices: RecallMcqChoiceTexts,
-  width: TerminalWidth
-): string[] {
-  return formatMcqChoiceLinesWithIndices(choices, width).lines
-}
-
 /**
  * Scroll-window **Current guidance** for plain rows (token list, tests, non-Ink paths): grey /
  * inverse highlight, optional per-item wrapped lines, then **truncate** each row to `width`.

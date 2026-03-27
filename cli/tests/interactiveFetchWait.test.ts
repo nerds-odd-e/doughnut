@@ -1,11 +1,10 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
+import { processInput, resetRecallStateForTesting } from '../src/interactive.js'
 import {
-  INTERACTIVE_FETCH_WAIT_LINES,
-  processInput,
-  resetRecallStateForTesting,
-  runInteractiveFetchWait,
   getInteractiveFetchWaitLine,
-} from '../src/interactive.js'
+  INTERACTIVE_FETCH_WAIT_LINES,
+  runInteractiveFetchWait,
+} from '../src/interactiveFetchWait.js'
 import {
   CLI_USER_ABORTED_WAIT_MESSAGE,
   userAbortError,

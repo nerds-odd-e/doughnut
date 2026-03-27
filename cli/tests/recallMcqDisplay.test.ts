@@ -1,6 +1,5 @@
 import { describe, expect, test } from 'vitest'
 import {
-  formatMcqChoiceLines,
   formatMcqChoiceLinesWithIndices,
   renderCurrentGuidanceForSelectableLines,
   stripAnsi,
@@ -9,7 +8,10 @@ import {
 
 describe('recall MCQ terminal display', () => {
   test('numbered choice lines: one row per API choice; embedded newlines in a choice do not add extra rows', () => {
-    const lines = formatMcqChoiceLines(['line1\n\nline2', 'second'], 1000)
+    const { lines } = formatMcqChoiceLinesWithIndices(
+      ['line1\n\nline2', 'second'],
+      1000
+    )
     expect(lines).toHaveLength(2)
     expect(lines.every((l) => stripAnsi(l).trim().length > 0)).toBe(true)
     expect(stripAnsi(lines[0]!)).toMatch(/^ {2}1\. /)

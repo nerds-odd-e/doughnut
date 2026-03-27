@@ -6,7 +6,7 @@ import process from 'node:process'
 import { afterEach, describe, expect, test, type vi } from 'vitest'
 import './interactive/interactiveTestMocks.js'
 import { resetRecallStateForTesting } from '../src/interactive.js'
-import { formatMcqChoiceLines } from '../src/renderer.js'
+import { formatMcqChoiceLinesWithIndices } from '../src/renderer.js'
 import {
   mockAnswerQuiz,
   mockRecallNext,
@@ -100,7 +100,7 @@ describe('recall MCQ on TTY: Ink numbered-choice list render', () => {
     )
     await sessionWithColumns(36)
     expect(
-      formatMcqChoiceLines([...choices], 36).length,
+      formatMcqChoiceLinesWithIndices([...choices], 36).lines.length,
       'Sanity: both choices must produce multiple physical lines at width 36.'
     ).toBeGreaterThanOrEqual(5)
     await submitTTYCommand(stdin, '/recall')

@@ -38,7 +38,7 @@ import {
   RECALL_YES_NO_REPROMPT,
 } from './interactions/recallYesNo.js'
 import {
-  formatMcqChoiceLines,
+  formatMcqChoiceLinesWithIndices,
   getTerminalWidth,
   RECALL_SESSION_YES_NO_PLACEHOLDER,
   wrapMarkdownTerminalToLines,
@@ -65,8 +65,6 @@ let pendingRecallLoadMore = false
 let pendingRecallStopConfirmation = false
 /** TTY: lines shown in RecallInkConfirmPanel for session y/n (grey writeCurrentPrompt is covered by Ink’s live repaint). */
 let recallSessionYesNoInkGuidanceLines: readonly string[] = []
-
-export * from './interactiveFetchWait.js'
 
 export function resetRecallStateForTesting(): void {
   pendingRecallAnswer = null
@@ -151,7 +149,7 @@ function emitMcqRecallQuestionForNonInteractiveOutput(
   writePrompt(formatRecallNotebookCurrentPromptLine(notebookTitle))
   writePrompt(stemRenderedForTerminal)
   const width = getTerminalWidth()
-  for (const line of formatMcqChoiceLines(choices, width)) {
+  for (const line of formatMcqChoiceLinesWithIndices(choices, width).lines) {
     output.log(line)
   }
   output.log(`Enter your choice (1-${choices.length}):`)
