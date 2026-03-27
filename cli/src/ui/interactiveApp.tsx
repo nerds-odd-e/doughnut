@@ -35,8 +35,7 @@ import {
   dispatchSelectListKey,
   selectListKeyEventFromInk,
 } from '../interactions/selectListInteraction.js'
-import { getTerminalWidth, isCommittedInteractiveInput } from '../renderer.js'
-import { interactiveTtyStdout } from '../ttyAdapters/interactiveTtyStdout.js'
+import { isCommittedInteractiveInput } from '../renderer.js'
 import {
   commandTurnBufferAppendError,
   commandTurnBufferAppendLog,
@@ -58,26 +57,19 @@ import type {
 } from '../types.js'
 import { hasInteractiveSlashCompletions } from '../slashCompletion.js'
 import {
-  isAlternateLivePanel,
   isInkSubmitPressed,
   ShellSessionRoot,
   type ShellSessionInkHandlers,
 } from './ShellSessionRoot.js'
-import type { TTYDeps } from '../ttyAdapters/ttyDeps.js'
+import type { InteractiveShellDeps } from '../interactiveShellDeps.js'
 
 type InkKeyWithName = Key & { name?: string }
 
-type StdinTtyForInk = NodeJS.ReadableStream & {
-  ref?: () => void
-  unref?: () => void
-  setRawMode?: (enable: boolean) => void
-}
-
 type InteractiveAppProps = {
   initialSession: ShellSessionState
-  deps: TTYDeps
+  deps: InteractiveShellDeps
   latestSessionRef: React.MutableRefObject<ShellSessionState>
-  stdinTty: StdinTtyForInk
+  terminalContract: InteractiveAppTerminalContract
   ttyOutputRef: React.MutableRefObject<OutputAdapter | null>
   exitSession: () => void
 }
@@ -87,41 +79,27 @@ function isEscapeInkKey(key: Key): boolean {
   return !!(key.escape || withName.name === 'escape')
 }
 
-function handleShellRendered(session: ShellSessionState, deps: TTYDeps): void {
-  if (getInteractiveFetchWaitLine() !== null) {
-    interactiveTtyStdout.hideCursor()
-    return
-  }
-  if (
-    deps.isPendingStopConfirmation() ||
-    deps.usesSessionYesNoInputChrome(!!session.tokenSelection)
-  ) {
-    interactiveTtyStdout.inputReadyOsc()
-    return
-  }
-  if (deps.getNumberedChoiceListChoices() !== null) {
-    interactiveTtyStdout.inputReadyOsc()
-    return
-  }
-  if (session.tokenSelection) {
-    interactiveTtyStdout.inputReadyOsc()
-    return
-  }
-  finalizeInteractiveLiveRegionPaint(session)
-}
-
-function finalizeInteractiveLiveRegionPaint(session: ShellSessionState): void {
-  interactiveTtyStdout.finalizeDefaultLiveAfterInk({
-    lineDraft: session.commandInput.lineDraft,
-    interactiveFetchWaitLine: getInteractiveFetchWaitLine(),
-  })
+export type InteractiveAppTerminalContract = {
+  writeCurrentPromptLine: (msg: string) => void
+  beginCurrentPrompt: () => void
+  onShellSessionLayoutEffect: (
+    session: ShellSessionState,
+    deps: InteractiveShellDeps
+  ) => void
+  writeExitFarewellBlock: (options: {
+    previousInputContent: string | undefined
+    outputLines: readonly string[]
+    tone: CliAssistantMessageTone
+  }) => void
+  signalConfirmInputReady: () => void
+  writeCtrlCExitNewline: () => void
 }
 
 export function InteractiveApp({
   initialSession,
   deps,
   latestSessionRef,
-  stdinTty,
+  terminalContract,
   ttyOutputRef,
   exitSession,
 }: InteractiveAppProps): React.ReactElement {
@@ -142,11 +120,9 @@ export function InteractiveApp({
   } = deps
 
   const writeCurrentPromptLine = (msg: string) =>
-    interactiveTtyStdout.greyCurrentPromptLine(msg)
+    terminalContract.writeCurrentPromptLine(msg)
 
-  const doBeginCurrentPrompt = () => {
-    interactiveTtyStdout.currentPromptSeparator(getTerminalWidth())
-  }
+  const doBeginCurrentPrompt = () => terminalContract.beginCurrentPrompt()
 
   const [session, setSession] = React.useReducer(
     (_state: ShellSessionState, next: ShellSessionState) => next,
@@ -171,11 +147,7 @@ export function InteractiveApp({
 
   React.useLayoutEffect(() => {
     latestSessionRef.current = session
-    handleShellRendered(session, deps)
-    if (isAlternateLivePanel(session, deps)) {
-      stdinTty.ref?.()
-      stdinTty.setRawMode?.(true)
-    }
+    terminalContract.onShellSessionLayoutEffect(session, deps)
   }, [session])
 
   function rememberCommittedLine(raw: string): void {
@@ -273,13 +245,10 @@ export function InteractiveApp({
     const last = updatedPastMessages[updatedPastMessages.length - 1]
     const prev = updatedPastMessages[updatedPastMessages.length - 2]
     if (!last || last.role !== 'cli-assistant') return
-    const width = getTerminalWidth()
-    const outTone = last.tone ?? 'plain'
-    interactiveTtyStdout.exitFarewellBlock({
-      width,
+    terminalContract.writeExitFarewellBlock({
       previousInputContent: prev?.role === 'user' ? prev.content : undefined,
       outputLines: last.lines,
-      tone: outTone,
+      tone: last.tone ?? 'plain',
     })
   }
 
@@ -337,9 +306,8 @@ export function InteractiveApp({
   const ttyOutput = ttyOutputHolder.current
   ttyOutputRef.current = ttyOutput
 
-  const signalConfirmInputReady = () => {
-    interactiveTtyStdout.inputReadyOsc()
-  }
+  const signalConfirmInputReady = () =>
+    terminalContract.signalConfirmInputReady()
 
   async function handleStopConfirmDispatch(
     dispatch: RecallInkConfirmChoice
@@ -772,7 +740,7 @@ export function InteractiveApp({
 
   const handlers: ShellSessionInkHandlers = {
     onInterrupt: () => {
-      interactiveTtyStdout.ctrlCExitNewline()
+      terminalContract.writeCtrlCExitNewline()
       exitSession()
     },
     onStopConfirmResult: handleStopConfirmDispatch,

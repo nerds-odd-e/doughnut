@@ -13,20 +13,21 @@ Informal plan. Delete or shrink when this refactor is done or parked.
 ## Status snapshot (2026-03-27)
 
 - **Phase 0 is done:** trimmed unused public surface (module-private types/helpers where nothing imported them) and removed **`ConfirmLivePanel.tsx`** — it was unreachable from the bundle and referenced non-existent modules (`sessionYesNoInteraction`, `ConfirmDisplay`). **`selectListInteraction.test.ts`** now builds full `SelectListKeyEvent` shapes for `dispatchSelectListKey` (internal type is no longer exported).
-- **Phases 1–5 are implemented** (run **`pnpm cli:test`** after Phase 5 layout changes).
+- **Phases 1–6 are implemented** (run **`pnpm cli:test`** after the boundary cleanup in Phase 6).
 - `runInteractiveTtySession` uses a **single Ink mount** and a reducer-driven React root (**`InteractiveApp`** in **`cli/src/ui/interactiveApp.tsx`**).
 - The old imperative repaint loop is removed: no adapter-level `drawBox`, `patchAndDraw`, or manual `shellInstance.rerender`.
 - **No identity `forceRedraw` in the adapter:** repaints that only existed to re-run **`handleShellRendered`** use **`bumpTtyContractEpoch`** (`ttyContractEpoch` on **`ShellSessionState`**).
 - Shared **`runProcessInputTurn`** covers session y/n, MCQ submit, and normal command-line **`processInput`** await/exit paths.
-- **`TTYDeps`:** removed **`isNumberedChoiceListActive`**; call sites use **`getNumberedChoiceListChoices() !== null`**.
+- **Deps interface:** removed **`isNumberedChoiceListActive`**; call sites use **`getNumberedChoiceListChoices() !== null`**.
 - **`OutputAdapter`:** **`writeCurrentPrompt` / `beginCurrentPrompt`** left split (TTY vs non-TTY recall paths unchanged in Phase 3).
 - `ShellSessionRoot` now owns both transcript rendering and live-column routing; `InteractiveShellDisplay.tsx` is removed.
 - **Phase 2:** Fetch-wait changes bump **`ttyContractEpoch`** on `ShellSessionState` so `useLayoutEffect` re-runs **`handleShellRendered`** without identity redraw. Fetch-wait **Esc** relies on `runInteractiveFetchWait` **`finally`** → **`setActiveWaitLine`** → **`onInteractiveFetchWaitChanged`** (no separate **`redrawRef`** tick).
 
-## Current shape (after Phase 5)
+## Current shape (after Phase 6)
 
-- **`cli/src/ttyAdapters/`** — TTY/process I/O only: **`ttyEntry`**, **`interactiveTtySession`**, **`interactiveTtyStdout`**, **`ttyDeps`**.
-- **`cli/src/ui/interactiveApp.tsx`** — Ink **composition root** (**`InteractiveApp`**): session reducer, **`ShellSessionRoot`**, and terminal contract hooks (**`interactiveTtyStdout`**, stdin **`setRawMode`** when the live column uses an alternate panel).
+- **`cli/src/ttyAdapters/`** — TTY/process I/O only: **`ttyEntry`**, **`interactiveTtySession`**, **`interactiveTtyStdout`**.
+- **`cli/src/interactiveShellDeps.ts`** — shell-domain dependency contract for the interactive app; no longer stored in `ttyAdapters`.
+- **`cli/src/ui/interactiveApp.tsx`** — Ink **composition root** (**`InteractiveApp`**): session reducer + handlers + **`ShellSessionRoot`**; receives a terminal contract from the adapter, and contains no direct TTY byte/raw-mode code.
 - **`runInteractiveTtySession`** mounts Ink **once** and renders **`InteractiveApp`** with **React-owned session state**.
 - State transitions are routed through reducer patching + refs so async handlers read current state without closure drift.
 - **`ShellSessionRoot`** is a pure function of **`session` + `deps` + `handlers`**, and directly renders **past transcript + live column**.
@@ -47,7 +48,7 @@ Informal plan. Delete or shrink when this refactor is done or parked.
 1. **Single Ink mount**; **visible shell state** in **React**; **`commandTurn`** (or successor) structured for **minimal reconciles**.
 2. **Terminal contract** (OSC, cursor, live-region finalize) in **`useLayoutEffect`** (or equivalent **one** place), not scattered after imperative paints.
 3. **Fewer modules and types** as a **success metric** — periodic diffstat / “could this be one file?” check.
-4. **`processInput` / `TTYDeps`**: **simplify internals and call sites** when it **net-reduces** code; avoid **gratuitous** public behavior changes **without** simplification payoff (scripts, E2E, MCP still need a stable story).
+4. **`processInput` / `InteractiveShellDeps`**: **simplify internals and call sites** when it **net-reduces** code; avoid **gratuitous** public behavior changes **without** simplification payoff (scripts, E2E, MCP still need a stable story).
 
 ## Phasing (per `.cursor/rules/planning.mdc`)
 
@@ -81,7 +82,7 @@ Order by **net simplification + safety**. Prefer **one user-visible slice** per 
 - **`routeRecallMcqChoicesInkStdin`:** list **`redraw` / default** → epoch bump; **`runProcessInputTurn`** for submit.
 - **`handleCommandLineInkInput`:** redundant redraws after state-changing **`patch`** removed; empty submit / MCQ highlight reset use epoch bump; slash-picker submit falls back to **`filtered[0]`** when highlight is out of range (no no-op redraw).
 - **`runProcessInputTurn`:** single path for **`processInput` → exit or `finishProcessInputTurnAfterAwait`** (session y/n, MCQ, command line).
-- **`TTYDeps`:** dropped **`isNumberedChoiceListActive`**; **`buildTTYDeps`** in **`interactive.ts`** updated.
+- **Deps interface (then named `TTYDeps`):** dropped **`isNumberedChoiceListActive`**; `interactive.ts` builder updated.
 - **`OutputAdapter`:** evaluated; **not** unified in this phase — split still carries TTY vs console recall behavior.
 - **Tests:** `interactiveTtySession`, `interactiveTtySuggestionScroll`, `interactiveTtyMcq`, `interactiveTtyBufferAfterFetchWait` Vitest files green.
 
@@ -96,13 +97,22 @@ Order by **net simplification + safety**. Prefer **one user-visible slice** per 
 ### Phase 5 — `ttyAdapters` + `InteractiveApp` in `ui/`
 
 - ✅ **Done (2026-03-27).**
-- **Rename:** `cli/src/adapters` → **`cli/src/ttyAdapters`** so the folder name matches **TTY-only** I/O wiring (entry, session, stdout helpers, **`TTYDeps`** type).
+- **Rename:** `cli/src/adapters` → **`cli/src/ttyAdapters`** so the folder name matches **TTY-only** I/O wiring (entry, session, stdout helpers).
 - **Move + rename component:** `interactiveTtyInkApp.tsx` → **`cli/src/ui/interactiveApp.tsx`**, export **`InteractiveApp`** (props type **`InteractiveAppProps`**). **`runInteractiveTtySession`** imports it from **`../ui/interactiveApp.js`**.
-- **Imports:** **`ShellSessionRoot`** (and any other **`ui/`** that needs **`TTYDeps`**) use **`../ttyAdapters/ttyDeps.js`**; **`InteractiveApp`** imports **`interactiveTtyStdout`** and **`TTYDeps`** from **`ttyAdapters`**. **`interactive.ts`** imports **`runTTY`** from **`./ttyAdapters/ttyEntry.js`**.
+- **Imports:** **`interactive.ts`** imports **`runTTY`** from **`./ttyAdapters/ttyEntry.js`**.
 - **Docs:** **`.cursor/rules/cli.mdc`** paths updated to **`ttyAdapters`**.
 - **Tests:** no import of the old module path expected; full **`pnpm cli:test`** green.
 
-### Phase 6 — Docs and exit
+### Phase 6 — UI/adapters boundary cleanup
+
+- ✅ **Done (2026-03-27).**
+- **Moved dependency interface out of adapter:** `ttyAdapters/ttyDeps.ts` → **`cli/src/interactiveShellDeps.ts`** (`InteractiveShellDeps`).
+- **UI is TTY-agnostic:** `ui/interactiveApp.tsx` no longer imports `interactiveTtyStdout`, terminal width helpers, raw-mode stream methods, or any module under `ttyAdapters`; it consumes **`InteractiveAppTerminalContract`** props.
+- **Adapter owns TTY side effects:** `ttyAdapters/interactiveTtySession.ts` now owns `handleShellRendered`, default-live finalize bytes, input-ready OSC, cursor hide/show for fetch-wait, prompt separator width, exit-farewell write, and alternate-panel raw-mode retention, then passes these via `terminalContract` to `InteractiveApp`.
+- **Type wiring:** `ttyEntry`, `interactiveTtySession`, `ShellSessionRoot`, and `InteractiveApp` use `InteractiveShellDeps`.
+- **Tests:** full **`pnpm cli:test`** green.
+
+### Phase 7 — Docs and exit
 
 - **`ttyEntry.ts`** approved-bytes list stays accurate.
 - Remove or archive this file when done.

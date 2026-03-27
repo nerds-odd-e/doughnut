@@ -19,7 +19,7 @@ import {
 } from '../renderer.js'
 import { hasInteractiveSlashCompletions } from '../slashCompletion.js'
 import type { ShellSessionState } from '../shell/shellSessionState.js'
-import type { TTYDeps } from '../ttyAdapters/ttyDeps.js'
+import type { InteractiveShellDeps } from '../interactiveShellDeps.js'
 import {
   getInteractiveFetchWaitLine,
   type InteractiveFetchWaitLine,
@@ -72,7 +72,7 @@ function currentStageIndicatorLinesForLiveRegion(
 
 export function isAlternateLivePanel(
   session: ShellSessionState,
-  deps: TTYDeps
+  deps: InteractiveShellDeps
 ): boolean {
   if (getInteractiveFetchWaitLine() !== null) return true
   if (deps.isPendingStopConfirmation()) return true
@@ -84,7 +84,7 @@ export function isAlternateLivePanel(
 
 function computeLiveColumnLeadingSnapshot(
   session: ShellSessionState,
-  deps: TTYDeps
+  deps: InteractiveShellDeps
 ): LiveColumnLeadingSnapshot {
   const terminalWidth = getTerminalWidth()
   const placeholderContext = deps.getPlaceholderContext(
@@ -180,7 +180,7 @@ function PastMessageBlock({
 
 function buildLivePanel(
   session: ShellSessionState,
-  deps: TTYDeps,
+  deps: InteractiveShellDeps,
   defaultCommandLineLayout: DefaultCommandLineInkLayout | undefined,
   handlers: ShellSessionInkHandlers
 ): React.ReactElement {
@@ -292,7 +292,7 @@ function buildLivePanel(
 
 type ShellSessionRootProps = {
   session: ShellSessionState
-  deps: TTYDeps
+  deps: InteractiveShellDeps
   handlers: ShellSessionInkHandlers
 }
 

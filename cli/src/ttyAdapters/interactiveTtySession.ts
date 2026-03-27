@@ -3,16 +3,23 @@ import * as readline from 'node:readline'
 import { Writable } from 'node:stream'
 import { render } from 'ink'
 import { formatVersionOutput } from '../version.js'
-import { cancelInteractiveFetchWaitFor } from '../interactiveFetchWait.js'
+import {
+  cancelInteractiveFetchWaitFor,
+  getInteractiveFetchWaitLine,
+} from '../interactiveFetchWait.js'
 import {
   createInitialShellSessionState,
   type ShellSessionState,
 } from '../shell/shellSessionState.js'
 import { interactiveTtyStdout } from './interactiveTtyStdout.js'
 import type { OutputAdapter } from '../types.js'
+import { getTerminalWidth } from '../renderer.js'
 import { isAlternateLivePanel } from '../ui/ShellSessionRoot.js'
-import type { TTYDeps } from './ttyDeps.js'
-import { InteractiveApp } from '../ui/interactiveApp.js'
+import {
+  InteractiveApp,
+  type InteractiveAppTerminalContract,
+} from '../ui/interactiveApp.js'
+import type { InteractiveShellDeps } from '../interactiveShellDeps.js'
 
 type ReadlineKey = Pick<readline.Key, 'name' | 'shift' | 'ctrl' | 'meta'>
 
@@ -47,7 +54,10 @@ function inkPatchConsoleSupported(): boolean {
   }
 }
 
-export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
+export function runInteractiveTtySession(
+  stdin: TTYInput,
+  deps: InteractiveShellDeps
+): void {
   process.stdout.write(`${formatVersionOutput()}\n\n`)
 
   stdin.setRawMode?.(true)
@@ -105,6 +115,71 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
     process.exit(0)
   }
 
+  function finalizeInteractiveLiveRegionPaint(
+    session: ShellSessionState
+  ): void {
+    interactiveTtyStdout.finalizeDefaultLiveAfterInk({
+      lineDraft: session.commandInput.lineDraft,
+      interactiveFetchWaitLine: getInteractiveFetchWaitLine(),
+    })
+  }
+
+  function handleShellRendered(
+    session: ShellSessionState,
+    shellDeps: InteractiveShellDeps
+  ): void {
+    if (isAlternateLivePanel(session, shellDeps)) {
+      stdinTty.ref?.()
+      stdinTty.setRawMode?.(true)
+    }
+    if (getInteractiveFetchWaitLine() !== null) {
+      interactiveTtyStdout.hideCursor()
+      return
+    }
+    if (
+      shellDeps.isPendingStopConfirmation() ||
+      shellDeps.usesSessionYesNoInputChrome(!!session.tokenSelection)
+    ) {
+      interactiveTtyStdout.inputReadyOsc()
+      return
+    }
+    if (shellDeps.getNumberedChoiceListChoices() !== null) {
+      interactiveTtyStdout.inputReadyOsc()
+      return
+    }
+    if (session.tokenSelection) {
+      interactiveTtyStdout.inputReadyOsc()
+      return
+    }
+    finalizeInteractiveLiveRegionPaint(session)
+  }
+
+  const terminalContract: InteractiveAppTerminalContract = {
+    writeCurrentPromptLine: (msg) => {
+      interactiveTtyStdout.greyCurrentPromptLine(msg)
+    },
+    beginCurrentPrompt: () => {
+      interactiveTtyStdout.currentPromptSeparator(getTerminalWidth())
+    },
+    onShellSessionLayoutEffect: (session, shellDeps) => {
+      handleShellRendered(session, shellDeps)
+    },
+    writeExitFarewellBlock: ({ previousInputContent, outputLines, tone }) => {
+      interactiveTtyStdout.exitFarewellBlock({
+        width: getTerminalWidth(),
+        previousInputContent,
+        outputLines,
+        tone,
+      })
+    },
+    signalConfirmInputReady: () => {
+      interactiveTtyStdout.inputReadyOsc()
+    },
+    writeCtrlCExitNewline: () => {
+      interactiveTtyStdout.ctrlCExitNewline()
+    },
+  }
+
   const stdinForInk = stdin as NodeJS.ReadableStream & {
     ref?: () => void
     unref?: () => void
@@ -115,7 +190,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
       initialSession,
       deps,
       latestSessionRef,
-      stdinTty,
+      terminalContract,
       ttyOutputRef,
       exitSession: doExit,
     }),

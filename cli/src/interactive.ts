@@ -712,7 +712,7 @@ function getRecallSessionYesNoInkGuidanceLines(): readonly string[] {
   return recallSessionYesNoInkGuidanceLines
 }
 
-function buildTTYDeps() {
+function buildInteractiveShellDeps() {
   return {
     processInput,
     isPendingStopConfirmation: isPendingRecallStopConfirmation,
@@ -741,5 +741,5 @@ export async function runInteractive(stdin = process.stdin): Promise<void> {
   if (!stdin.isTTY) {
     exitCliError('not a terminal (use version or update)')
   }
-  await runTTY(stdin, buildTTYDeps())
+  await runTTY(stdin, buildInteractiveShellDeps())
 }

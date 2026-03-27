@@ -16,9 +16,9 @@
  * 6. **readline `keypress`** — **Ctrl+C** (exit before Ink) and fetch-wait **Esc** cancel. Token-list Esc is Ink-owned. See `stdin.on('keypress')` in `interactiveTtySession.ts`. **Do not** handle MCQ Esc on readline (duplicate / wrong ordering).
  */
 import { runInteractiveTtySession } from './interactiveTtySession.js'
-import type { TTYDeps } from './ttyDeps.js'
+import type { InteractiveShellDeps } from '../interactiveShellDeps.js'
 
-export type { TTYDeps } from './ttyDeps.js'
+export type { InteractiveShellDeps } from '../interactiveShellDeps.js'
 
 type TTYInput = NodeJS.ReadableStream & {
   setRawMode?: (mode: boolean) => void
@@ -26,6 +26,9 @@ type TTYInput = NodeJS.ReadableStream & {
   setEncoding?: (encoding: BufferEncoding) => void
 }
 
-export async function runTTY(stdin: TTYInput, deps: TTYDeps): Promise<void> {
+export async function runTTY(
+  stdin: TTYInput,
+  deps: InteractiveShellDeps
+): Promise<void> {
   runInteractiveTtySession(stdin, deps)
 }
