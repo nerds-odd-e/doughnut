@@ -30,7 +30,6 @@ import {
   useInteractiveShellStage,
   type InteractiveShellSharedContext,
 } from './interactiveShellStage.js'
-import { TokenPickerProvider, useTokenPicker } from './tokenPicker.js'
 
 export type { InteractiveAppTerminalContract } from './interactiveAppTerminalContract.js'
 
@@ -41,66 +40,6 @@ type InteractiveAppProps = {
   terminalContract: InteractiveAppTerminalContract
   ttyOutputRef: React.MutableRefObject<OutputAdapter | null>
   exitSession: () => void
-}
-
-type InteractiveAppShellProps = {
-  session: ShellSessionState
-  deps: InteractiveShellDeps
-  latestSessionRef: React.MutableRefObject<ShellSessionState>
-  terminalContract: InteractiveAppTerminalContract
-  ttyOutputRef: React.MutableRefObject<OutputAdapter | null>
-  ttyOutput: OutputAdapter
-  exitSession: () => void
-  patch: (reducerPatch: (s: ShellSessionState) => ShellSessionState) => void
-  commitHistoryOutput: (
-    lines: readonly string[],
-    tone?: CliAssistantMessageTone
-  ) => void
-  rememberCommittedLine: (raw: string) => void
-}
-
-function InteractiveAppShell({
-  session,
-  deps,
-  latestSessionRef,
-  terminalContract,
-  ttyOutputRef,
-  ttyOutput,
-  exitSession,
-  patch,
-  commitHistoryOutput,
-  rememberCommittedLine,
-}: InteractiveAppShellProps): React.ReactElement {
-  const tokenStage = useAccessTokenListStage({
-    patch,
-    commitHistoryOutput,
-    rememberCommittedLine,
-  })
-
-  const { onTokenPickerGuidanceKey } = useTokenPicker()
-
-  const shellShared: InteractiveShellSharedContext = {
-    deps,
-    patch,
-    latestSessionRef,
-    terminalContract,
-    ttyOutputRef,
-    ttyOutput,
-    exitSession,
-    commitHistoryOutput,
-    rememberCommittedLine,
-  }
-
-  const { handlers: shellHandlers } = useInteractiveShellStage(shellShared, {
-    tryHandleTokenListSlashSubmit: tokenStage.tryHandleTokenListSlashSubmit,
-  })
-
-  const handlers: ShellSessionInkHandlers = {
-    ...shellHandlers,
-    onTokenPickerGuidanceKey,
-  }
-
-  return <ShellSessionRoot session={session} deps={deps} handlers={handlers} />
 }
 
 export function InteractiveApp({
@@ -228,24 +167,42 @@ export function InteractiveApp({
   const ttyOutput = ttyOutputHolder.current
   ttyOutputRef.current = ttyOutput
 
+  const tokenStage = useAccessTokenListStage({
+    patch,
+    latestSessionRef,
+    ttyOutput,
+    commitHistoryOutput,
+    rememberCommittedLine,
+  })
+
+  const shellShared: InteractiveShellSharedContext = {
+    deps,
+    patch,
+    latestSessionRef,
+    terminalContract,
+    ttyOutputRef,
+    ttyOutput,
+    exitSession,
+    commitHistoryOutput,
+    rememberCommittedLine,
+    applyAccessTokenListNavigation: tokenStage.applyAccessTokenListNavigation,
+  }
+
+  const { handlers: shellHandlers } = useInteractiveShellStage(shellShared, {
+    tryHandleTokenListSlashSubmit: tokenStage.tryHandleTokenListSlashSubmit,
+  })
+
+  const handlers: ShellSessionInkHandlers = {
+    ...shellHandlers,
+    onTokenPickerGuidanceKey: tokenStage.onTokenPickerGuidanceKey,
+  }
+
   return (
-    <TokenPickerProvider
-      patch={patch}
-      latestSessionRef={latestSessionRef}
-      ttyOutput={ttyOutput}
-    >
-      <InteractiveAppShell
-        session={session}
-        deps={deps}
-        latestSessionRef={latestSessionRef}
-        terminalContract={terminalContract}
-        ttyOutputRef={ttyOutputRef}
-        ttyOutput={ttyOutput}
-        exitSession={exitSession}
-        patch={patch}
-        commitHistoryOutput={commitHistoryOutput}
-        rememberCommittedLine={rememberCommittedLine}
-      />
-    </TokenPickerProvider>
+    <ShellSessionRoot
+      session={session}
+      tokenSelection={tokenStage.tokenSelection}
+      deps={deps}
+      handlers={handlers}
+    />
   )
 }
