@@ -29,10 +29,7 @@ import {
 } from '../shell/shellSessionState.js'
 import { interactiveTtyStdout } from './interactiveTtyStdout.js'
 import type { OutputAdapter } from '../types.js'
-import {
-  getTerminalWidth,
-  RECALL_SESSION_YES_NO_PLACEHOLDER,
-} from '../renderer.js'
+import { getTerminalWidth } from '../renderer.js'
 import { isAlternateLivePanel } from '../ui/ShellSessionRoot.js'
 import {
   InteractiveApp,
@@ -144,20 +141,6 @@ export function runInteractiveTtySession(
     }
     if (getInteractiveFetchWaitLine() !== null) {
       interactiveTtyStdout.hideCursor()
-      return
-    }
-    if (
-      shellDeps.isPendingStopConfirmation() ||
-      shellDeps.getPlaceholderContext(!!session.tokenSelection) ===
-        RECALL_SESSION_YES_NO_PLACEHOLDER
-    ) {
-      return
-    }
-    if (shellDeps.getNumberedChoiceListChoices() !== null) {
-      return
-    }
-    if (session.tokenSelection) {
-      return
     }
   }
 

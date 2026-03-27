@@ -85,7 +85,6 @@ export function isAlternateLivePanel(
   )
     return true
   if (deps.getNumberedChoiceListChoices() !== null) return true
-  if (session.tokenSelection) return true
   return false
 }
 
