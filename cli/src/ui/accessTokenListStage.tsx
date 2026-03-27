@@ -71,7 +71,6 @@ export function useAccessTokenListStage(ctx: AccessTokenListStageContext): {
     inputLine: string
   ) => TokenListSlashSubmitResult
   applyAccessTokenListNavigation: (nav: AccessTokenListStageNavigation) => void
-  hasActiveTokenPicker: () => boolean
   onTokenPickerGuidanceKey: (input: string, key: Key) => Promise<void>
 } {
   const {
@@ -96,11 +95,6 @@ export function useAccessTokenListStage(ctx: AccessTokenListStageContext): {
       else setTokenSelection(nav.picker)
     },
     []
-  )
-
-  const hasActiveTokenPicker = useCallback(
-    () => tokenSelection !== null,
-    [tokenSelection]
   )
 
   function patchSessionAfterTokenListClose(
@@ -254,7 +248,6 @@ export function useAccessTokenListStage(ctx: AccessTokenListStageContext): {
     handleTokenPickerKey,
     tryHandleTokenListSlashSubmit,
     applyAccessTokenListNavigation,
-    hasActiveTokenPicker,
     onTokenPickerGuidanceKey,
   }
 }

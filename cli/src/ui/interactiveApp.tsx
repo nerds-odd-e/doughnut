@@ -183,7 +183,6 @@ export function InteractiveApp({
     ttyOutputRef,
     ttyOutput,
     exitSession,
-    hasActiveTokenPicker: tokenStage.hasActiveTokenPicker,
     commitHistoryOutput,
     rememberCommittedLine,
     applyAccessTokenListNavigation: tokenStage.applyAccessTokenListNavigation,

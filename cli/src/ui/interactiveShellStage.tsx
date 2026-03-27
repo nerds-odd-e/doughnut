@@ -65,7 +65,6 @@ export type InteractiveShellSharedContext = {
   ttyOutputRef: React.MutableRefObject<OutputAdapter | null>
   ttyOutput: OutputAdapter
   exitSession: () => void
-  hasActiveTokenPicker: () => boolean
   commitHistoryOutput: (
     lines: readonly string[],
     tone?: CliAssistantMessageTone
@@ -96,7 +95,6 @@ export function useInteractiveShellStage(
     ttyOutputRef,
     ttyOutput,
     exitSession,
-    hasActiveTokenPicker,
     commitHistoryOutput,
     rememberCommittedLine,
     applyAccessTokenListNavigation,
@@ -194,7 +192,7 @@ export function useInteractiveShellStage(
 
   function finishProcessInputTurnAfterAwait(): void {
     const newSessionYesNo =
-      getPlaceholderContext(false) === RECALL_SESSION_YES_NO_PLACEHOLDER
+      getPlaceholderContext() === RECALL_SESSION_YES_NO_PLACEHOLDER
     const latest = latestSessionRef.current
     if (latest.commandTurn.lines.length > 0) {
       commitHistoryOutput(latest.commandTurn.lines, latest.commandTurn.tone)
@@ -218,10 +216,7 @@ export function useInteractiveShellStage(
           commandTurn: emptyCommandTurnBuffer(),
         }))
         if (isCommittedInteractiveInput(effectiveLine)) {
-          if (
-            getPlaceholderContext(hasActiveTokenPicker()) !==
-            RECALL_SESSION_YES_NO_PLACEHOLDER
-          ) {
+          if (getPlaceholderContext() !== RECALL_SESSION_YES_NO_PLACEHOLDER) {
             patch((s) => ({
               ...s,
               pastMessages: pastMessagesCommitUserLine(
@@ -387,10 +382,7 @@ export function useInteractiveShellStage(
 
       resetCommandTurnBuffer()
       if (isCommittedInteractiveInput(inputLine)) {
-        if (
-          getPlaceholderContext(hasActiveTokenPicker()) !==
-          RECALL_SESSION_YES_NO_PLACEHOLDER
-        ) {
+        if (getPlaceholderContext() !== RECALL_SESSION_YES_NO_PLACEHOLDER) {
           patch((s) => ({
             ...s,
             pastMessages: pastMessagesCommitUserLine(

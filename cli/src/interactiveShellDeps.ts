@@ -23,6 +23,6 @@ export interface InteractiveShellDeps {
    * copied to user input history.
    */
   shouldRecordCommittedLineInUserInputHistory: () => boolean
-  getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext
+  getPlaceholderContext: () => PlaceholderContext
   getRecallSessionYesNoInkGuidanceLines: () => readonly string[]
 }

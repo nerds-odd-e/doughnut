@@ -82,7 +82,7 @@ function computeLiveColumnLeadingSnapshot(
   tokenSelection: TokenSelectionState | null
 ): LiveColumnLeadingSnapshot {
   const terminalWidth = getTerminalWidth()
-  const placeholderContext = deps.getPlaceholderContext(!!tokenSelection)
+  const placeholderContext = deps.getPlaceholderContext()
   const stopRecallConfirm = deps.isPendingStopConfirmation()
     ? deps.getRecallStopConfirmInkModel(placeholderContext)
     : null
@@ -186,7 +186,7 @@ function buildLivePanel(
     })
   }
   if (deps.isPendingStopConfirmation()) {
-    const placeholderCtx = deps.getPlaceholderContext(false)
+    const placeholderCtx = deps.getPlaceholderContext()
     const model = deps.getRecallStopConfirmInkModel(placeholderCtx)
     const stageLines = deps.isInCommandSessionSubstate()
       ? [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
@@ -204,10 +204,7 @@ function buildLivePanel(
       onResult: (d) => handlers.onStopConfirmResult(d),
     })
   }
-  if (
-    deps.getPlaceholderContext(!!tokenSelection) ===
-    RECALL_SESSION_YES_NO_PLACEHOLDER
-  ) {
+  if (deps.getPlaceholderContext() === RECALL_SESSION_YES_NO_PLACEHOLDER) {
     return React.createElement(RecallInkConfirmPanel, {
       key: 'confirm-session-yes-no',
       variant: 'in-session',

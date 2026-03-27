@@ -119,9 +119,8 @@ function getContestablePromptId(): number | null {
     : null
 }
 
-function getPlaceholderContext(inTokenList: boolean): PlaceholderContext {
+function getPlaceholderContext(): PlaceholderContext {
   if (getInteractiveFetchWaitLine() !== null) return 'interactiveFetchWait'
-  if (inTokenList) return 'tokenList'
   if (pendingRecallStopConfirmation) return 'recallStopConfirmation'
   if (pendingRecallLoadMore) return RECALL_SESSION_YES_NO_PLACEHOLDER
   if (isMcqRecallPending(pendingRecallAnswer)) return 'recallMcq'
