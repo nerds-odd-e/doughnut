@@ -26,10 +26,6 @@ export interface InteractiveShellDeps {
    */
   shouldRecordCommittedLineInUserInputHistory: () => boolean
   getDefaultTokenLabel: () => AccessTokenLabel | undefined
-  removeAccessTokenCompletely: (
-    label: AccessTokenLabel,
-    signal?: AbortSignal
-  ) => Promise<void>
   setDefaultTokenLabel: (label: AccessTokenLabel) => void
   TOKEN_LIST_COMMANDS: Record<string, AccessTokenPickerCommandConfig>
   getPlaceholderContext: (inTokenList: boolean) => PlaceholderContext

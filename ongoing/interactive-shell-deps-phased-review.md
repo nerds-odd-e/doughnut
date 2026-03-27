@@ -33,6 +33,7 @@
 1. **Usages:** `InteractiveApp` (async remove with fetch-wait line); string label in `interactiveFetchWait.ts` is separate.
 2. **Inline?** Direct import from `accessToken` — viable.
 3. **Alternatives:** If fetch-wait + token removal stay coupled, a small `tokenRemovalWithWait(adapter, …)` helper could live next to `InteractiveApp` or `interactiveFetchWait` without keeping it on `InteractiveShellDeps`.
+4. **Outcome (done):** **Move** — `InteractiveApp` imports `removeAccessTokenCompletely` from `accessToken.js`; removed from `InteractiveShellDeps` and `buildInteractiveShellDeps`. `interactive.ts` still imports it for `processInput` slash paths.
 
 ## Phase 4 — `setDefaultTokenLabel`
 

@@ -714,7 +714,6 @@ function buildInteractiveShellDeps() {
     shouldRecordCommittedLineInUserInputHistory: () =>
       pendingRecallAnswer === null,
     getDefaultTokenLabel,
-    removeAccessTokenCompletely,
     setDefaultTokenLabel,
     TOKEN_LIST_COMMANDS,
     getPlaceholderContext,
