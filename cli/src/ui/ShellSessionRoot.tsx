@@ -1,8 +1,10 @@
 import React from 'react'
 import type { Key } from 'ink'
+import { Box, Newline, Static, Text } from 'ink'
 import type { RecallInkConfirmChoice } from '../interactions/recallYesNo.js'
 import type { InteractiveCommandInput } from '../interactiveCommandInput.js'
 import {
+  applyCliAssistantMessageTone,
   buildSuggestionLinesForInk,
   DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
   formatCurrentStageIndicatorLine,
@@ -10,6 +12,7 @@ import {
   greyCurrentStageIndicatorLabel,
   interactiveFetchWaitStageIndicatorLine,
   needsGapBeforeLiveRegion,
+  renderPastUserMessage,
   wrapTextToVisibleWidthLines,
   type PlaceholderContext,
   type TerminalWidth,
@@ -21,10 +24,9 @@ import {
   getInteractiveFetchWaitLine,
   type InteractiveFetchWaitLine,
 } from '../interactiveFetchWait.js'
-import type { AccessTokenPickerCommandConfig } from '../types.js'
+import type { AccessTokenPickerCommandConfig, PastMessage } from '../types.js'
 import { RecallInkConfirmPanel } from './RecallInkConfirmPanel.js'
 import { FetchWaitDisplay } from './FetchWaitDisplay.js'
-import { InteractiveShellDisplay } from './InteractiveShellDisplay.js'
 import {
   AccessTokenPickerLivePanel,
   CommandLineLivePanel,
@@ -143,6 +145,37 @@ export type ShellSessionInkHandlers = {
   signalConfirmInputReady: () => void
   onEnterStopConfirmationFromEsc: () => void
   whenInActiveRecallSession: () => boolean
+}
+
+function PastMessageBlock({
+  entry,
+  width,
+}: {
+  entry: PastMessage
+  width: number
+}): React.ReactElement {
+  if (entry.role === 'user') {
+    const raw = renderPastUserMessage(entry.content, width)
+    const lines = raw.split('\n')
+    while (lines.length > 0 && lines[lines.length - 1] === '') {
+      lines.pop()
+    }
+    return (
+      <Box flexDirection="column">
+        {lines.map((line, i) => (
+          <Text key={i}>{line}</Text>
+        ))}
+      </Box>
+    )
+  }
+  const tone = entry.tone ?? 'plain'
+  return (
+    <Box flexDirection="column">
+      {entry.lines.map((line, i) => (
+        <Text key={i}>{applyCliAssistantMessageTone(line, tone)}</Text>
+      ))}
+    </Box>
+  )
 }
 
 function buildLivePanel(
@@ -295,10 +328,20 @@ export function ShellSessionRoot({
     defaultCommandLineLayout,
     handlers
   )
-  return React.createElement(InteractiveShellDisplay, {
-    pastMessages: session.pastMessages,
-    terminalWidth: getTerminalWidth(),
-    liveLeadingGap,
-    livePanel,
-  })
+  const terminalWidth = getTerminalWidth()
+  return (
+    <Box flexDirection="column">
+      <Static items={session.pastMessages} style={{ position: 'relative' }}>
+        {(entry, index) => (
+          <Box key={index} flexDirection="column">
+            <PastMessageBlock entry={entry} width={terminalWidth} />
+          </Box>
+        )}
+      </Static>
+      <Box flexDirection="column">
+        {liveLeadingGap ? <Newline /> : null}
+        {livePanel}
+      </Box>
+    </Box>
+  )
 }

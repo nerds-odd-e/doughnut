@@ -13,21 +13,22 @@ Informal plan. Delete or shrink when this refactor is done or parked.
 ## Status snapshot (2026-03-27)
 
 - **Phase 0 is done:** trimmed unused public surface (module-private types/helpers where nothing imported them) and removed **`ConfirmLivePanel.tsx`** — it was unreachable from the bundle and referenced non-existent modules (`sessionYesNoInteraction`, `ConfirmDisplay`). **`selectListInteraction.test.ts`** now builds full `SelectListKeyEvent` shapes for `dispatchSelectListKey` (internal type is no longer exported).
-- **Phases 1–3 are implemented and green in `cli` tests** (Phase 3: targeted interactive Vitest files; no plan-file edits).
+- **Phases 1–4 are implemented and green in `cli` tests + scoped CLI E2E**.
 - `runInteractiveTtySession` uses a **single Ink mount** and a reducer-driven React root (`InteractiveTtyInkApp` inside the adapter file).
 - The old imperative repaint loop is removed: no adapter-level `drawBox`, `patchAndDraw`, or manual `shellInstance.rerender`.
 - **No identity `forceRedraw` in the adapter:** repaints that only existed to re-run **`handleShellRendered`** use **`bumpTtyContractEpoch`** (`ttyContractEpoch` on **`ShellSessionState`**).
 - Shared **`runProcessInputTurn`** covers session y/n, MCQ submit, and normal command-line **`processInput`** await/exit paths.
 - **`TTYDeps`:** removed **`isNumberedChoiceListActive`**; call sites use **`getNumberedChoiceListChoices() !== null`**.
 - **`OutputAdapter`:** **`writeCurrentPrompt` / `beginCurrentPrompt`** left split (TTY vs non-TTY recall paths unchanged in Phase 3).
-- `ShellSessionRoot` remains as the view boundary for now (not inlined yet).
+- `ShellSessionRoot` now owns both transcript rendering and live-column routing; `InteractiveShellDisplay.tsx` is removed.
 - **Phase 2:** Fetch-wait changes bump **`ttyContractEpoch`** on `ShellSessionState` so `useLayoutEffect` re-runs **`handleShellRendered`** without identity redraw. Fetch-wait **Esc** relies on `runInteractiveFetchWait` **`finally`** → **`setActiveWaitLine`** → **`onInteractiveFetchWaitChanged`** (no separate **`redrawRef`** tick).
 
-## Current shape (after Phase 3)
+## Current shape (after Phase 4)
 
 - **`runInteractiveTtySession`** mounts Ink **once** and renders an internal app component with **React-owned session state**.
 - State transitions are routed through reducer patching + refs so async handlers read current state without closure drift.
-- **`ShellSessionRoot`** continues to be a pure function of **`session` + `deps` + `handlers`**.
+- **`ShellSessionRoot`** is a pure function of **`session` + `deps` + `handlers`**, and directly renders **past transcript + live column**.
+- **`liveColumnInk`** shares `LiveColumnPromptBlock` across command-line, MCQ, and token-picker modes to reduce repeated stage/prompt composition.
 - Repaint-sensitive behavior is now primarily governed by state transitions and effect timing, not explicit draw calls.
 
 ### `commandTurn` and repaint discipline
@@ -84,8 +85,11 @@ Order by **net simplification + safety**. Prefer **one user-visible slice** per 
 
 ### Phase 4 — UI structure and remaining fat
 
-- **`InteractiveShellDisplay` vs `liveColumnInk` vs panels**: **merge or flatten** until the tree matches **one mental model** (past transcript + live column).
-- **UX tweaks** allowed: fewer bands, simpler prompts, Ink-native components — **update** `cli.mdc` and **trim** E2E steps that asserted obsolete chrome.
+- ✅ **Done (2026-03-27).**
+- Removed the thin display wrapper layer by folding transcript rendering into `ShellSessionRoot`; deleted `cli/src/ui/InteractiveShellDisplay.tsx`.
+- Reduced repeated stage/prompt JSX in `liveColumnInk.tsx` with shared `LiveColumnPromptBlock` used by command-line, MCQ, and token-picker panels.
+- Kept stdin/focus contracts unchanged (`LiveColumnStdinPolicy`, `isAlternateLivePanel`, Ink-only list Esc handling).
+- Validation: targeted interactive Vitest, full `pnpm cli:test`, and scoped CLI E2E (`e2e_test/features/cli/**/*.feature`) all green.
 
 ### Phase 5 — Docs and exit
 

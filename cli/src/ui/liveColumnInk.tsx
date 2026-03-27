@@ -69,6 +69,60 @@ function ListSelectionLiveColumn(props: ListSelectionLiveColumnProps) {
   )
 }
 
+type LiveColumnPromptBlockProps = {
+  width: TerminalWidth
+  stageIndicatorLines: string[]
+  currentPromptLines: string[]
+  includeSeparatorWithoutStage: boolean
+  tone: 'plain' | 'grey'
+  stripPromptAnsi: boolean
+}
+
+function LiveColumnPromptBlock({
+  width,
+  stageIndicatorLines,
+  currentPromptLines,
+  includeSeparatorWithoutStage,
+  tone,
+  stripPromptAnsi,
+}: LiveColumnPromptBlockProps): ReactNode {
+  const promptLines = stripPromptAnsi
+    ? currentPromptLines.map((line) => stripAnsi(line))
+    : currentPromptLines
+  const hasStageIndicator = stageIndicatorLines.length > 0
+  const hasPromptLines = promptLines.length > 0
+  if (!(hasStageIndicator || hasPromptLines)) return null
+  const renderPrompt =
+    tone === 'grey' ? (
+      <Box width={width}>
+        <Text color="grey" wrap="wrap">
+          {promptLines.join('\n')}
+        </Text>
+      </Box>
+    ) : (
+      <>
+        {promptLines.map((line, i) => (
+          <Text key={`prompt-${i}`}>{line}</Text>
+        ))}
+      </>
+    )
+  return (
+    <>
+      {stageIndicatorLines.map((line, i) => (
+        <Text key={`stage-${i}`}>{line}</Text>
+      ))}
+      {hasPromptLines ? (
+        hasStageIndicator ? (
+          <Text>{buildCurrentPromptSeparatorForStageBand(width)}</Text>
+        ) : includeSeparatorWithoutStage ? (
+          <Text>{buildCurrentPromptSeparator(width)}</Text>
+        ) : null
+      ) : null}
+      {hasPromptLines ? renderPrompt : null}
+    </>
+  )
+}
+
 function LiveColumnInkPanel({
   focusId,
   width,
@@ -215,37 +269,18 @@ export function CommandLineLivePanel({
 }: CommandLineLivePanelProps) {
   const buffer = commandInput.lineDraft
   const caretOffset = commandInput.caretOffset
-  const hasStageIndicator = currentStageIndicatorLines.length > 0
-  const promptPlainForInk =
-    currentPromptWrappedLines.length > 0
-      ? currentPromptWrappedLines.map((l) => stripAnsi(l)).join('\n')
-      : null
-
+  const stageIndicatorLines = currentStageIndicatorLines.map((line) =>
+    formatCurrentStageIndicatorLine(line, width)
+  )
   const aboveCommandLine = (
-    <>
-      {hasStageIndicator ? (
-        <>
-          {currentStageIndicatorLines.map((ind, i) => (
-            <Text key={`stage-${i}`}>
-              {formatCurrentStageIndicatorLine(ind, width)}
-            </Text>
-          ))}
-          <Text>{buildCurrentPromptSeparatorForStageBand(width)}</Text>
-        </>
-      ) : null}
-      {promptPlainForInk ? (
-        <>
-          {!hasStageIndicator ? (
-            <Text>{buildCurrentPromptSeparator(width)}</Text>
-          ) : null}
-          <Box width={width}>
-            <Text color="grey" wrap="wrap">
-              {promptPlainForInk}
-            </Text>
-          </Box>
-        </>
-      ) : null}
-    </>
+    <LiveColumnPromptBlock
+      width={width}
+      stageIndicatorLines={stageIndicatorLines}
+      currentPromptLines={currentPromptWrappedLines}
+      includeSeparatorWithoutStage={true}
+      tone="grey"
+      stripPromptAnsi={true}
+    />
   )
 
   const guidance = currentGuidanceLines.map((line, i) => (
@@ -299,28 +334,16 @@ export function RecallMcqChoicesLivePanel({
     choices,
     width
   )
-
-  const promptPlain =
-    currentPromptLines.length > 0
-      ? currentPromptLines.map((l) => stripAnsi(l)).join('\n')
-      : null
-
+  const stageIndicatorLines = stageIndicatorLine ? [stageIndicatorLine] : []
   const aboveCommandLine = (
-    <>
-      {stageIndicatorLine ? (
-        <>
-          <Text>{stageIndicatorLine}</Text>
-          <Text>{buildCurrentPromptSeparatorForStageBand(width)}</Text>
-        </>
-      ) : null}
-      {promptPlain ? (
-        <Box width={width}>
-          <Text color="grey" wrap="wrap">
-            {promptPlain}
-          </Text>
-        </Box>
-      ) : null}
-    </>
+    <LiveColumnPromptBlock
+      width={width}
+      stageIndicatorLines={stageIndicatorLines}
+      currentPromptLines={currentPromptLines}
+      includeSeparatorWithoutStage={false}
+      tone="grey"
+      stripPromptAnsi={true}
+    />
   )
 
   const guidance = lines.map((line, i) => (
@@ -368,14 +391,16 @@ export function AccessTokenPickerLivePanel({
   onInterrupt,
   onGuidanceListKey,
 }: AccessTokenPickerLivePanelProps) {
+  const stageIndicatorLines = stageIndicatorLine ? [stageIndicatorLine] : []
   const aboveCommandLine = (
-    <>
-      <Text>{stageIndicatorLine}</Text>
-      <Text>{buildCurrentPromptSeparatorForStageBand(width)}</Text>
-      {currentPromptLines.map((line, i) => (
-        <Text key={i}>{line}</Text>
-      ))}
-    </>
+    <LiveColumnPromptBlock
+      width={width}
+      stageIndicatorLines={stageIndicatorLines}
+      currentPromptLines={currentPromptLines}
+      includeSeparatorWithoutStage={false}
+      tone="plain"
+      stripPromptAnsi={false}
+    />
   )
 
   const guidance = items.map((item, i) => (
