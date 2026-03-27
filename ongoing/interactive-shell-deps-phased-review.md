@@ -26,6 +26,7 @@
 1. **Usages:** `InteractiveApp` (token picker remove path).
 2. **Inline?** Same as phase 1 — direct `accessToken` import is viable.
 3. **Alternatives:** Same.
+4. **Outcome (done):** **Move** — `InteractiveApp` imports `removeAccessToken` from `accessToken.js`; removed from `InteractiveShellDeps` and `buildInteractiveShellDeps`. `interactive.ts` still imports it for `processInput` slash paths.
 
 ## Phase 3 — `removeAccessTokenCompletely`
 

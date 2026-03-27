@@ -54,6 +54,7 @@ import {
 } from '../shell/shellSessionState.js'
 import {
   listAccessTokens,
+  removeAccessToken,
   type AccessTokenEntry,
 } from '../commands/accessToken.js'
 import type {
@@ -117,7 +118,6 @@ export function InteractiveApp({
     getStopConfirmationYesOutcomeLines,
     getPlaceholderContext,
     getDefaultTokenLabel,
-    removeAccessToken,
     removeAccessTokenCompletely,
     setDefaultTokenLabel,
     TOKEN_LIST_COMMANDS,

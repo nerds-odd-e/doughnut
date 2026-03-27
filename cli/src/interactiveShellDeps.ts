@@ -26,7 +26,6 @@ export interface InteractiveShellDeps {
    */
   shouldRecordCommittedLineInUserInputHistory: () => boolean
   getDefaultTokenLabel: () => AccessTokenLabel | undefined
-  removeAccessToken: (label: AccessTokenLabel) => boolean
   removeAccessTokenCompletely: (
     label: AccessTokenLabel,
     signal?: AbortSignal
