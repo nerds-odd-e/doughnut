@@ -17,7 +17,6 @@ import {
 import {
   applyShellSessionPatch,
   type ShellSessionState,
-  type TokenSelectionState,
 } from '../shell/shellSessionState.js'
 import type { CliAssistantMessageTone, OutputAdapter } from '../types.js'
 import {
@@ -25,10 +24,7 @@ import {
   type ShellSessionInkHandlers,
 } from './ShellSessionRoot.js'
 import type { InteractiveShellDeps } from '../interactiveShellDeps.js'
-import {
-  useAccessTokenListStage,
-  type AccessTokenListStageNavigation,
-} from './accessTokenListStage.js'
+import { useAccessTokenListStage } from './accessTokenListStage.js'
 import type { InteractiveAppTerminalContract } from './interactiveAppTerminalContract.js'
 import {
   useInteractiveShellStage,
@@ -59,18 +55,6 @@ export function InteractiveApp({
     initialSession
   )
 
-  const [tokenSelection, setTokenSelection] =
-    React.useState<TokenSelectionState | null>(null)
-
-  const applyAccessTokenListNavigation = React.useCallback(
-    (nav: AccessTokenListStageNavigation) => {
-      if (nav.kind === 'shell') setTokenSelection(null)
-      else setTokenSelection(nav.picker)
-    },
-    []
-  )
-
-  const latestTokenPickerRef = React.useRef<TokenSelectionState | null>(null)
   const ttyOutputHolder = React.useRef<OutputAdapter | null>(null)
 
   const patch = React.useCallback(
@@ -186,8 +170,6 @@ export function InteractiveApp({
   const tokenStage = useAccessTokenListStage({
     patch,
     latestSessionRef,
-    latestTokenPickerRef,
-    activeTokenSelection: tokenSelection,
     ttyOutput,
     commitHistoryOutput,
     rememberCommittedLine,
@@ -201,10 +183,10 @@ export function InteractiveApp({
     ttyOutputRef,
     ttyOutput,
     exitSession,
-    hasActiveTokenPicker: () => tokenSelection !== null,
+    hasActiveTokenPicker: tokenStage.hasActiveTokenPicker,
     commitHistoryOutput,
     rememberCommittedLine,
-    applyAccessTokenListNavigation,
+    applyAccessTokenListNavigation: tokenStage.applyAccessTokenListNavigation,
   }
 
   const { handlers: shellHandlers } = useInteractiveShellStage(shellShared, {
@@ -213,16 +195,13 @@ export function InteractiveApp({
 
   const handlers: ShellSessionInkHandlers = {
     ...shellHandlers,
-    onTokenPickerGuidanceKey: async (input, key) => {
-      const nav = await tokenStage.handleTokenPickerKey(input, key)
-      if (nav) applyAccessTokenListNavigation(nav)
-    },
+    onTokenPickerGuidanceKey: tokenStage.onTokenPickerGuidanceKey,
   }
 
   return (
     <ShellSessionRoot
       session={session}
-      tokenSelection={tokenSelection}
+      tokenSelection={tokenStage.tokenSelection}
       deps={deps}
       handlers={handlers}
     />

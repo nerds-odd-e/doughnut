@@ -1,4 +1,10 @@
-import { useLayoutEffect, type MutableRefObject } from 'react'
+import {
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type MutableRefObject,
+} from 'react'
 import type { Key } from 'ink'
 import {
   getDefaultTokenLabel,
@@ -46,9 +52,6 @@ export type TokenListSlashSubmitResult =
 export type AccessTokenListStageContext = {
   patch: (reducerPatch: (s: ShellSessionState) => ShellSessionState) => void
   latestSessionRef: MutableRefObject<ShellSessionState>
-  latestTokenPickerRef: MutableRefObject<TokenSelectionState | null>
-  /** Synced into `latestTokenPickerRef` each layout; `null` when not in token-list stage. */
-  activeTokenSelection: TokenSelectionState | null
   ttyOutput: OutputAdapter
   commitHistoryOutput: (
     lines: readonly string[],
@@ -58,6 +61,7 @@ export type AccessTokenListStageContext = {
 }
 
 export function useAccessTokenListStage(ctx: AccessTokenListStageContext): {
+  tokenSelection: TokenSelectionState | null
   handleTokenPickerKey: (
     input: string,
     key: Key
@@ -66,20 +70,38 @@ export function useAccessTokenListStage(ctx: AccessTokenListStageContext): {
     trimmedInput: string,
     inputLine: string
   ) => TokenListSlashSubmitResult
+  applyAccessTokenListNavigation: (nav: AccessTokenListStageNavigation) => void
+  hasActiveTokenPicker: () => boolean
+  onTokenPickerGuidanceKey: (input: string, key: Key) => Promise<void>
 } {
   const {
     patch,
     latestSessionRef,
-    latestTokenPickerRef,
-    activeTokenSelection,
     ttyOutput,
     commitHistoryOutput,
     rememberCommittedLine,
   } = ctx
 
+  const [tokenSelection, setTokenSelection] =
+    useState<TokenSelectionState | null>(null)
+  const latestTokenPickerRef = useRef<TokenSelectionState | null>(null)
+
   useLayoutEffect(() => {
-    latestTokenPickerRef.current = activeTokenSelection
-  }, [activeTokenSelection])
+    latestTokenPickerRef.current = tokenSelection
+  }, [tokenSelection])
+
+  const applyAccessTokenListNavigation = useCallback(
+    (nav: AccessTokenListStageNavigation) => {
+      if (nav.kind === 'shell') setTokenSelection(null)
+      else setTokenSelection(nav.picker)
+    },
+    []
+  )
+
+  const hasActiveTokenPicker = useCallback(
+    () => tokenSelection !== null,
+    [tokenSelection]
+  )
 
   function patchSessionAfterTokenListClose(
     message: string,
@@ -219,5 +241,20 @@ export function useAccessTokenListStage(ctx: AccessTokenListStageContext): {
     }
   }
 
-  return { handleTokenPickerKey, tryHandleTokenListSlashSubmit }
+  async function onTokenPickerGuidanceKey(
+    input: string,
+    key: Key
+  ): Promise<void> {
+    const nav = await handleTokenPickerKey(input, key)
+    if (nav) applyAccessTokenListNavigation(nav)
+  }
+
+  return {
+    tokenSelection,
+    handleTokenPickerKey,
+    tryHandleTokenListSlashSubmit,
+    applyAccessTokenListNavigation,
+    hasActiveTokenPicker,
+    onTokenPickerGuidanceKey,
+  }
 }
