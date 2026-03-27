@@ -50,6 +50,8 @@ const INTERACTIVE_FETCH_WAIT_SNIPPETS = [
   'Loading last email',
 ] as const
 const VISIBLE_TAIL_LINES_WINDOW = 10
+/** Match `PROMPT` in `cli/src/renderer.ts` — full-grid scan avoids missing `→` when replay leaves many trailing blank rows after long output (e.g. `/help`). */
+const VISIBLE_COMMAND_LINE_PREFIX = '→ '
 const VISIBLE_READY_TAIL_SNIPPETS = [
   'y or n; /stop to exit recall',
   'y/N',
@@ -151,12 +153,15 @@ async function waitForInteractiveInputReady(
       .join('\n')
     const rawTail = haystack.slice(-FETCH_WAIT_TAIL_WINDOW_CHARS)
     const rawTailPlain = rawTail.replace(ANSI_AND_CSI_RE, '')
-    const hasCommandLineRow = screenTail
+    const rawFullPlain = stdout.replace(ANSI_AND_CSI_RE, '')
+    const lineLooksLikeCommandPrompt = (line: string) =>
+      line.trimStart().startsWith(VISIBLE_COMMAND_LINE_PREFIX)
+    const hasCommandLineRow = simulated
       .split('\n')
-      .some((line) => line.trimStart().startsWith('→ '))
-    const hasRawCommandLineRow = rawTailPlain
+      .some(lineLooksLikeCommandPrompt)
+    const hasRawCommandLineRow = rawFullPlain
       .split('\n')
-      .some((line) => line.trimStart().startsWith('→ '))
+      .some(lineLooksLikeCommandPrompt)
     const hasVisibleCommandLineRow = hasCommandLineRow || hasRawCommandLineRow
     const hasVisibleReadyPanel = VISIBLE_READY_TAIL_SNIPPETS.some(
       (snippet) =>
@@ -183,6 +188,13 @@ async function waitForInteractiveInputReady(
     if (Date.now() - stableSince >= VISIBLE_READY_STABLE_MS) {
       visiblePredicate = 'ready'
       if (afterLen === undefined || stdout.length > afterLen) {
+        return
+      }
+      if (
+        afterLen !== undefined &&
+        hasVisibleCommandLineRow &&
+        !hasActiveFetchWaitTail
+      ) {
         return
       }
     }

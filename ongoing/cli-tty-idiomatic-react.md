@@ -12,11 +12,11 @@ Informal plan. Delete or shrink when this refactor is done or parked.
 
 ## Status snapshot (2026-03-27)
 
-- **Phase 1 is implemented and green in `cli` tests.**
-- `runInteractiveTtySession` now uses a **single Ink mount** and a reducer-driven React root (`InteractiveTtyInkApp` inside the adapter file).
+- **Phases 1–2 are implemented and green in `cli` tests.**
+- `runInteractiveTtySession` uses a **single Ink mount** and a reducer-driven React root (`InteractiveTtyInkApp` inside the adapter file).
 - The old imperative repaint loop is removed: no adapter-level `drawBox`, `patchAndDraw`, or manual `shellInstance.rerender`.
 - `ShellSessionRoot` remains as the view boundary for now (not inlined yet).
-- No Phase 2 architecture move yet: terminal side-effect contract still runs via adapter-owned logic, even though render lifecycle is now React-driven.
+- **Phase 2:** Fetch-wait changes bump **`ttyContractEpoch`** on `ShellSessionState` so `useLayoutEffect` re-runs **`handleShellRendered`** without identity **`forceRedraw`**. Fetch-wait **Esc** relies on `runInteractiveFetchWait` **`finally`** → **`setActiveWaitLine`** → **`onInteractiveFetchWaitChanged`** (no separate **`redrawRef`** tick).
 
 ## Current shape (after Phase 1)
 
@@ -59,12 +59,21 @@ Order by **net simplification + safety**. Prefer **one user-visible slice** per 
 
 ### Phase 2 — Terminal side effects + external signals
 
-- **`handleShellRendered` / `finalizeInteractiveLiveRegionPaint`** → **`useLayoutEffect`**; **`onInteractiveFetchWaitChanged`** → **dispatch** or tick that triggers the same effect — **no** one-off repaint escape hatch.
+- ✅ Implemented.
+- **Checklist:** `ttyContractEpoch` on **`ShellSessionState`**; **`onInteractiveFetchWaitChanged`** flushes command-turn / resets live line as before, then **`patch` increments epoch** (never **`forceRedraw`** there); fetch-wait **Esc** = abort + **`finally`** clears wait line and bumps epoch via the same callback — **`redrawRef`** removed.
+- **`handleShellRendered` / `finalizeInteractiveLiveRegionPaint`** run from **`useLayoutEffect` `[session]`** (including when only **`ttyContractEpoch`** changed).
 
 ### Phase 3 — Simplify handlers and deps wiring
 
 - **Fewer** `useCallback` layers if **dispatch** + **thin actions** suffice; **merge** `TTYDeps` facets only where it drops boilerplate without hiding domains.
 - Revisit **`OutputAdapter`** shape: if **`writeCurrentPrompt` / `beginCurrentPrompt`** split exists only for historical TTY quirks, **unify** when UX allows.
+- **Deferred (remaining identity `forceRedraw` in `interactiveTtySession.ts`, not fetch-wait):** replace with real state transitions, deps-driven layout effects, or delete if redundant.
+
+| Location | Trigger |
+| --- | --- |
+| `finishProcessInputTurnAfterAwait` | Empty command turn / session y/n chrome after `processInput` |
+| `routeRecallMcqChoicesInkStdin` | `redraw` / default branches from `dispatchSelectListKey` |
+| `handleCommandLineInkInput` | Esc on slash completions; empty slash pick on submit; history arrow path |
 
 ### Phase 4 — UI structure and remaining fat
 
@@ -80,7 +89,7 @@ Order by **net simplification + safety**. Prefer **one user-visible slice** per 
 
 - **ESC/input event shape differences** (`key.escape`, `key.name`, raw `\u001b`) surfaced during Phase 1; treat them as one normalized escape signal in interaction handlers.
 - **Stale closures** in async **`processInput`** still require ref-backed reads where state freshness matters.
-- **OSC timing** still has edge sensitivity; Phase 2 should consolidate side effects in one render-tied place.
+- **OSC timing** still has edge sensitivity; Phase 2 consolidated fetch-wait-driven side effects on **`ttyContractEpoch`** + **`useLayoutEffect`**; remaining **`forceRedraw`** sites are Phase 3.
 - **E2E / Gherkin**: delete or rewrite scenarios that **only** encoded removed UI; do **not** preserve steps for deleted features.
 
 ## Non-goals

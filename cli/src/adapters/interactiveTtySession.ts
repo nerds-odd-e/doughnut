@@ -154,7 +154,6 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
   const latestSessionRef: { current: ShellSessionState } = {
     current: initialSession,
   }
-  const redrawRef: { current: (() => void) | null } = { current: null }
   const ttyOutputRef: { current: OutputAdapter | null } = { current: null }
   let shellInstance: ReturnType<typeof render> | null = null
 
@@ -248,8 +247,6 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
     const forceRedraw = React.useCallback(() => {
       patch((s) => ({ ...s }))
     }, [])
-
-    redrawRef.current = forceRedraw
 
     React.useLayoutEffect(() => {
       latestSessionRef.current = session
@@ -409,10 +406,10 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
           const activeWaitPrompt = getInteractiveFetchWaitLine()
           if (activeWaitPrompt) {
             flushCommandTurnToPastMessagesBeforeFetchWait()
-            forceRedraw()
           } else {
             resetLiveLineDraftAndSlashSuggestions()
           }
+          patch((s) => ({ ...s, ttyContractEpoch: s.ttyContractEpoch + 1 }))
         },
       }
     }
@@ -922,7 +919,7 @@ export function runInteractiveTtySession(stdin: TTYInput, deps: TTYDeps): void {
       ttyOutputRef.current &&
       cancelInteractiveFetchWaitFor(ttyOutputRef.current)
     ) {
-      redrawRef.current?.()
+      return
     }
   })
 }
