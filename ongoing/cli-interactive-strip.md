@@ -73,7 +73,7 @@ Work **bottom-to-top** (scenario list as in file):
 | Sub-phase | Scenario (summary) |
 |-----------|-------------------|
 | ~~1.1.1~~ | ~~Recall spelling — type correct spelling and see success~~ **done** (`@ignore` + CLI spelling path removed) |
-| 1.1.x | Recall MCQ — contest and regenerate before answering |
+| ~~1.1.2~~ | ~~Recall MCQ — contest and regenerate before answering~~ **done** (`@ignore`; product `/contest` unchanged — still covered by Vitest until Part 2) |
 | 1.1.x | Recall MCQ — down arrow and Enter to select |
 | 1.1.x | Recall MCQ — ESC cancels with y/n confirmation |
 | 1.1.x | Recall MCQ — choose correct answer and see success |
