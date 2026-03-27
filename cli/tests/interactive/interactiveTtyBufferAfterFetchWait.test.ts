@@ -55,7 +55,8 @@ describe('TTY: line draft must not survive interactive fetch wait', () => {
     pushTTYCommandKey(stdin, 'backspace')
     await tick()
 
-    const visible = stripAnsi(ttyOutput(writeSpy))
-    expect(visible).toContain('→ ')
+    await vi.waitFor(() =>
+      expect(stripAnsi(ttyOutput(writeSpy))).toContain('→ ')
+    )
   })
 })
