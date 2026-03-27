@@ -108,19 +108,6 @@ describe('processInput', () => {
     expect(logSpy).toHaveBeenCalledWith('Usage: /add-access-token <token>')
   })
 
-  test('returns false and shows tokens with default marker for /list-access-token', async () => {
-    const configDir = makeTempConfigDir([
-      { label: 'Token A', token: 'a' },
-      { label: 'Token B', token: 'b' },
-    ])
-    const restore = withConfigDir(configDir)
-    expect(await processInput('/list-access-token')).toBe(false)
-    const output = logSpy.mock.calls.flat().join('\n')
-    expect(output).toContain('★ Token A')
-    expect(output).toContain('  Token B')
-    restore()
-  })
-
   test('returns false and removes token for /remove-access-token with label', async () => {
     const configDir = makeTempConfigDir([
       { label: 'Token A', token: 'a' },

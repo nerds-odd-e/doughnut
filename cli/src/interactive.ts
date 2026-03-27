@@ -3,9 +3,6 @@ import { exitCliError } from './cliExit.js'
 import {
   addAccessToken,
   createAccessToken,
-  formatTokenLines,
-  getDefaultTokenLabel,
-  listAccessTokens,
   removeAccessToken,
   removeAccessTokenCompletely,
 } from './commands/accessToken.js'
@@ -476,17 +473,6 @@ export async function processInput(
     return false
   }
   if (await handleParamCommand(trimmed, output)) {
-    return false
-  }
-  if (trimmed === '/list-access-token') {
-    const tokens = listAccessTokens()
-    if (tokens.length === 0) {
-      output.log('No access tokens stored.')
-    } else {
-      for (const line of formatTokenLines(tokens, getDefaultTokenLabel())) {
-        output.log(line)
-      }
-    }
     return false
   }
   if (trimmed === '/add gmail') {

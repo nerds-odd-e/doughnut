@@ -193,6 +193,15 @@ describe('TTY token list interactive mode', () => {
     }
   })
 
+  test('/list-access-token: default token ★ prefix and two-space prefix on others (formatTokenLines parity)', async () => {
+    writeSpy.mockClear()
+    await submitTTYCommand(stdin, '/list-access-token')
+    const output = ttyOutput(writeSpy)
+    expect(output).toContain('★ Alpha')
+    expect(output).toContain('  Beta')
+    expect(output).toContain('  Gamma')
+  })
+
   test('Current prompt appears once when selection changes in token list, not duplicated', async () => {
     await submitTTYCommand(stdin, '/list-access-token')
     writeSpy.mockClear()
