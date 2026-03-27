@@ -1,4 +1,4 @@
-import type { MutableRefObject } from 'react'
+import { useLayoutEffect, type MutableRefObject } from 'react'
 import type { Key } from 'ink'
 import {
   getDefaultTokenLabel,
@@ -47,6 +47,8 @@ export type AccessTokenListStageContext = {
   patch: (reducerPatch: (s: ShellSessionState) => ShellSessionState) => void
   latestSessionRef: MutableRefObject<ShellSessionState>
   latestTokenPickerRef: MutableRefObject<TokenSelectionState | null>
+  /** Synced into `latestTokenPickerRef` each layout; `null` when not in token-list stage. */
+  activeTokenSelection: TokenSelectionState | null
   ttyOutput: OutputAdapter
   commitHistoryOutput: (
     lines: readonly string[],
@@ -69,10 +71,15 @@ export function useAccessTokenListStage(ctx: AccessTokenListStageContext): {
     patch,
     latestSessionRef,
     latestTokenPickerRef,
+    activeTokenSelection,
     ttyOutput,
     commitHistoryOutput,
     rememberCommittedLine,
   } = ctx
+
+  useLayoutEffect(() => {
+    latestTokenPickerRef.current = activeTokenSelection
+  }, [activeTokenSelection])
 
   function patchSessionAfterTokenListClose(
     message: string,

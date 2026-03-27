@@ -73,6 +73,9 @@ export function InteractiveApp({
   const latestTokenPickerRef = React.useRef<TokenSelectionState | null>(null)
   const ttyOutputHolder = React.useRef<OutputAdapter | null>(null)
 
+  const tokenSelection =
+    appStage.kind === 'accessTokenList' ? appStage.picker : null
+
   const patch = React.useCallback(
     (reducerPatch: (s: ShellSessionState) => ShellSessionState) => {
       const next = applyShellSessionPatch(
@@ -84,11 +87,6 @@ export function InteractiveApp({
     },
     []
   )
-
-  React.useLayoutEffect(() => {
-    latestTokenPickerRef.current =
-      appStage.kind === 'accessTokenList' ? appStage.picker : null
-  }, [appStage])
 
   React.useLayoutEffect(() => {
     latestSessionRef.current = session
@@ -192,6 +190,7 @@ export function InteractiveApp({
     patch,
     latestSessionRef,
     latestTokenPickerRef,
+    activeTokenSelection: tokenSelection,
     ttyOutput,
     commitHistoryOutput,
     rememberCommittedLine,
@@ -222,9 +221,6 @@ export function InteractiveApp({
       if (nav) applyAccessTokenListNavigation(nav)
     },
   }
-
-  const tokenSelection =
-    appStage.kind === 'accessTokenList' ? appStage.picker : null
 
   return (
     <ShellSessionRoot
