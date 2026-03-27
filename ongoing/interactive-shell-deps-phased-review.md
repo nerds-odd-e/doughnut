@@ -61,6 +61,7 @@
 1. **Usages:** `InteractiveApp` — commits assistant lines after “yes” on stop recall confirm.
 2. **Inline?** Trivial constant at call site risks drift if another path should show the same text; better a **named constant** in recall or `renderer` copy module.
 3. **Alternatives:** Constant export `RECALL_STOP_CONFIRM_YES_LINES`; deps object drops this field.
+4. **Outcome (done):** **Move** — `RECALL_STOP_CONFIRM_YES_LINES` in `interactions/recallYesNo.ts` (next to stop-confirm copy); `InteractiveApp` imports it; removed from `InteractiveShellDeps` and `buildInteractiveShellDeps`.
 
 ## Phase 8 — `getRecallSessionYesNoInkGuidanceLines`
 

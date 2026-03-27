@@ -12,6 +12,9 @@ export type RecallStopConfirmInkModel = {
 
 export const RECALL_STOP_CONFIRM_QUESTION_LINE = 'Stop recall? (y/n)'
 
+/** Assistant transcript lines after the user confirms stop recall (Ink y/n strip). */
+export const RECALL_STOP_CONFIRM_YES_LINES = ['Stopped recall'] as const
+
 function recallStopConfirmInkModel(
   visiblePlaceholder: string
 ): RecallStopConfirmInkModel {

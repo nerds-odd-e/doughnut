@@ -29,7 +29,10 @@ import {
   ttyArrowKeyUsesSlashSuggestionCycle,
   type InteractiveCommandInput,
 } from '../interactiveCommandInput.js'
-import type { RecallInkConfirmChoice } from '../interactions/recallYesNo.js'
+import {
+  RECALL_STOP_CONFIRM_YES_LINES,
+  type RecallInkConfirmChoice,
+} from '../interactions/recallYesNo.js'
 import {
   cycleListSelectionIndex,
   dispatchSelectListKey,
@@ -119,7 +122,6 @@ export function InteractiveApp({
     setPendingStopConfirmation,
     isInCommandSessionSubstate,
     exitCommandSession,
-    getStopConfirmationYesOutcomeLines,
     getPlaceholderContext,
     getNumberedChoiceListChoices,
   } = deps
@@ -333,7 +335,7 @@ export function InteractiveApp({
           numberedChoiceHighlightIndex: 0,
         }))
         exitCommandSession()
-        commitHistoryOutput(getStopConfirmationYesOutcomeLines())
+        commitHistoryOutput(RECALL_STOP_CONFIRM_YES_LINES)
         break
       case 'submit-no':
         setPendingStopConfirmation(false)

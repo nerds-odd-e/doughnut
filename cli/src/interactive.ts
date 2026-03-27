@@ -689,7 +689,6 @@ function buildInteractiveShellDeps() {
     setPendingStopConfirmation: setPendingRecallStopConfirmation,
     isInCommandSessionSubstate: isInRecallSubstate,
     exitCommandSession: exitRecallMode,
-    getStopConfirmationYesOutcomeLines: () => ['Stopped recall'] as const,
     getRecallStopConfirmInkModel: recallStopConfirmInkModelForContext,
     getNumberedChoiceListChoices,
     getRecallCurrentPromptWrappedLines,

@@ -12,7 +12,6 @@ export interface InteractiveShellDeps {
   setPendingStopConfirmation: (value: boolean) => void
   isInCommandSessionSubstate: () => boolean
   exitCommandSession: () => void
-  getStopConfirmationYesOutcomeLines: () => readonly string[]
   getRecallStopConfirmInkModel: (
     ctx: PlaceholderContext
   ) => RecallStopConfirmInkModel
