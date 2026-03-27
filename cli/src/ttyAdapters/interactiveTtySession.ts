@@ -163,15 +163,12 @@ export function runInteractiveTtySession(
       shellDeps.getPlaceholderContext(!!session.tokenSelection) ===
         RECALL_SESSION_YES_NO_PLACEHOLDER
     ) {
-      interactiveTtyStdout.inputReadyOsc()
       return
     }
     if (shellDeps.getNumberedChoiceListChoices() !== null) {
-      interactiveTtyStdout.inputReadyOsc()
       return
     }
     if (session.tokenSelection) {
-      interactiveTtyStdout.inputReadyOsc()
       return
     }
     finalizeInteractiveLiveRegionPaint(session)
@@ -196,7 +193,7 @@ export function runInteractiveTtySession(
       })
     },
     signalConfirmInputReady: () => {
-      interactiveTtyStdout.inputReadyOsc()
+      // no-op: stdout adapter does not emit the OSC input-ready signal
     },
     writeCtrlCExitNewline: () => {
       interactiveTtyStdout.ctrlCExitNewline()

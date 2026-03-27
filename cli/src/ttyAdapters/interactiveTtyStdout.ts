@@ -41,10 +41,6 @@ export const interactiveTtyStdout = {
     write(SHOW_CURSOR)
   },
 
-  inputReadyOsc(): void {
-    // no-op: stdout adapter does not emit the OSC input-ready signal
-  },
-
   /**
    * Default command-line contract:
    * - emits ready control sequence when the draft is empty and fetch-wait is inactive
