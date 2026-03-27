@@ -26,9 +26,9 @@ All services automatically restart when code changes are made. The developer doe
 
 **If services are not running**, suggest the user to run `pnpm sut` in a separate terminal first.
 
-## Local E2E topology
+## Local LB (Cypress origin)
 
-**`http://localhost:5173`** is always the Cypress app origin (fake LB). CI vs `pnpm sut`, `wait-on`, `NO_PROXY`, env vars: **`docs/gcp/prod_env.md`** — paragraph **Local E2E / dev** under §6.
+**`http://localhost:5173`** is always the Cypress app origin (local LB). CI vs `pnpm sut`, `wait-on`, `NO_PROXY`, env vars: **`docs/gcp/prod_env.md`** — **Local dev / Cypress** under §6.
 
 ## Run E2E Test in Terminal
 

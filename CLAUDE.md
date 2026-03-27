@@ -18,10 +18,18 @@ pnpm sut
 
 This starts all services with auto-reload:
 - Backend (Spring Boot with Gradle continuous build)
-- Frontend (Vite + local proxy; browser **http://localhost:5173** — see `docs/gcp/prod_env.md` Local E2E / dev)
+- **Local LB** on **5173** (`pnpm local:lb:vite` inside `sut`) proxying to Vite on **5174** and Spring on **9081** — browser **http://localhost:5173** (ports, env, readiness: `docs/gcp/prod_env.md` Local dev / Cypress)
 - Mountebank (mock external services)
 
 **DO NOT restart services after code changes** - they auto-reload.
+
+### Unsure if SUT is running?
+
+1. Run **`CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`** (agents and developers outside an active `nix develop` shell).
+2. If not OK, run **`CURSOR_DEV=true nix develop -c pnpm sut:restart`**, or start **`pnpm sut`** in a terminal if nothing was listening.
+3. Do **not** restart `pnpm sut` after normal code edits — services auto-reload (see above).
+
+**Cloud VM** (no Nix): run **`pnpm sut:healthcheck`** and **`pnpm sut:restart`** from the repo root; **`sut:restart`** needs **`lsof`** on `PATH`. See `.cursor/rules/cloud-agent-setup.mdc`.
 
 ### Running Commands
 
@@ -37,6 +45,10 @@ CURSOR_DEV=true nix develop -c <command>
 | Task | Command |
 |------|---------|
 | Start all services | `pnpm sut` |
+| Check SUT (ports + LB readiness) | `CURSOR_DEV=true nix develop -c pnpm sut:healthcheck` |
+| Stop stray listeners on 5173/5174/9081 and start SUT again | `CURSOR_DEV=true nix develop -c pnpm sut:restart` |
+| Local LB only (static + backend, no Vite) | `pnpm local:lb` |
+| Local LB with Vite upstream (as in `pnpm sut`) | `pnpm local:lb:vite` |
 | Run backend tests | `pnpm backend:verify` |
 | Run backend tests (no migration) | `pnpm backend:test_only` |
 | Run frontend tests | `pnpm frontend:test` |
@@ -92,7 +104,7 @@ doughnut/
 
 - Frontend API client is auto-generated from OpenAPI spec
 - After changing backend controller signatures, run `pnpm generateTypeScript`
-- Frontend production build outputs to `frontend/dist/`; CLI bundle is `cli/dist/doughnut-cli.bundle.mjs` (`pnpm cli:bundle`). Prod serves `/doughnut-cli-latest/doughnut` from GCS; local E2E/dev serves that path from `scripts/local-lb.mjs` reading `cli/dist` (not Spring on 9081). The CLI bundle aliases optional Ink DevTools import `react-devtools-core` to a stub under `cli/src/shims/`; see **Build output** in `.cursor/rules/cli.mdc`. **CLI:** multiline shell is **TTY-only**; scripts use **`doughnut version`** or **`doughnut update`**. Command list in the shell: **`/help`**.
+- Frontend production build outputs to `frontend/dist/`; CLI bundle is `cli/dist/doughnut-cli.bundle.mjs` (`pnpm cli:bundle`). Prod serves `/doughnut-cli-latest/doughnut` from GCS; local dev / Cypress serves that path from `scripts/local-lb.mjs` reading `cli/dist` (not Spring on 9081). The CLI bundle aliases optional Ink DevTools import `react-devtools-core` to a stub under `cli/src/shims/`; see **Build output** in `.cursor/rules/cli.mdc`. **CLI:** multiline shell is **TTY-only**; scripts use **`doughnut version`** or **`doughnut update`**. Command list in the shell: **`/help`**.
 - Dev server proxies `/api/`, `/attachments/`, `/logout/`, `/testability/` to backend
 
 ## Code Conventions

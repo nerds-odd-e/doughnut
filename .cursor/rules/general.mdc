@@ -39,6 +39,8 @@ This command starts:
 
 **If services are not running or if you need to suggest starting them**, recommend running `pnpm sut` in a separate terminal first. But once running, DO NOT suggest restarting after code changes.
 
+**Unsure if SUT is running?** Run **`CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`**. If not OK, run **`CURSOR_DEV=true nix develop -c pnpm sut:restart`**, or start **`pnpm sut`** if nothing was listening. Do **not** tell people to restart `pnpm sut` after normal code edits. **Cloud VM** (no Nix): same **`pnpm sut:healthcheck`** / **`pnpm sut:restart`** from repo root; **`sut:restart`** needs **`lsof`** — see **`cloud-agent-setup`**.
+
 ## Running Commands in Terminal
 
 **For Cloud VM setup, see the `cloud-agent-setup` rule.**

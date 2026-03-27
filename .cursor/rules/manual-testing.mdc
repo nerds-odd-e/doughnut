@@ -19,7 +19,7 @@ To use AI services, set `OPENAI_API_TOKEN` environment variable before running `
 
 ## Access Points
 
-- Frontend web-app: http://localhost:5173/ (see `docs/gcp/prod_env.md` Local E2E / dev)
+- Frontend web-app: http://localhost:5173/ (see `docs/gcp/prod_env.md` Local dev / Cypress)
 - Backend API: http://localhost:9081
 
 ## Test Accounts

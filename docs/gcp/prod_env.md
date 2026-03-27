@@ -93,7 +93,20 @@ The CLI install binary goes to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/d
 
 **Prod routing:** HTTPS load balancer sends static paths to a **backend bucket** (and optional Cloud CDN); API, OAuth, `/attachments`, `/logout`, `/install`, etc. stay on the MIG. Full runbook (including a one-page release checklist): [prod-frontend-static-lb.md](prod-frontend-static-lb.md).
 
-**Local E2E / dev (single write-up):** Cypress **`baseUrl`** is **`http://localhost:5173`** — always **`scripts/local-lb.mjs`** (local fake LB). **CI** and **`pnpm test`** run **`pnpm local:lb`** (no Vite upstream): built static from **`frontend/dist`** (run **`pnpm frontend:build`** or **`pnpm bundle:all`** first), API/OAuth/etc. paths forwarded to Spring **9081**. **`/doughnut-cli-latest/doughnut`** is served by the LB from **`cli/dist/doughnut-cli.bundle.mjs`** (run **`pnpm cli:bundle`** — **`pnpm sut`** / **`pnpm test`** do this after install). **`pnpm sut`** runs **`pnpm local:lb:vite`**, which sets **`LOCAL_LB_VITE_UPSTREAM=http://127.0.0.1:5174`** so UI + HMR WebSockets go to Vite (**`frontend/vite.config.ts`** `server.port`). **`wait-on`** should use **`http://127.0.0.1:5173/__lb__/ready`** (Spring health checked from inside the LB; avoids **`HTTP_PROXY`** breaking loopback **9081**). Set **`NO_PROXY=127.0.0.1,localhost`** for `wait-on` in CI anyway. Full env list: file header on **`scripts/local-lb.mjs`** (`LOCAL_LB_STATIC_ROOT`, `LOCAL_LB_BACKEND`, `LOCAL_LB_VITE_UPSTREAM`, `LOCAL_LB_LISTEN_PORT`, `LOCAL_LB_ROUTING_JSON`).
+**Local dev / Cypress (ports and LB — source of truth):**
+
+| Port | Role |
+|------|------|
+| **2525** | Mountebank |
+| **9081** | Spring (sut / E2E profile) |
+| **5173** | Local LB (`scripts/local-lb.mjs`) — browser and Cypress **`baseUrl`** **`http://localhost:5173`** |
+| **5174** | Vite dev server — only when using **`pnpm sut`** / **`pnpm local:lb:vite`** |
+
+**Readiness:** **`GET http://127.0.0.1:5173/__lb__/ready`** → **200** (Spring health probed from the LB; use for **`wait-on`** / automation; set **`NO_PROXY=127.0.0.1,localhost`** in CI to avoid proxy issues on loopback).
+
+**Scripts:** **`pnpm local:lb`** — static from **`frontend/dist`** + Spring **9081** (no Vite). **`pnpm local:lb:vite`** — same LB with **`LOCAL_LB_VITE_UPSTREAM=http://127.0.0.1:5174`** for UI + HMR (**`frontend/vite.config.ts`** `server.port`). **CI** and **`pnpm test`** use **`local:lb`**; **`pnpm sut`** uses **`local:lb:vite`** + **`frontend:sut`**. Build static first when needed: **`pnpm frontend:build`** or **`pnpm bundle:all`**. **`/doughnut-cli-latest/doughnut`** is served from **`cli/dist/doughnut-cli.bundle.mjs`** (**`pnpm cli:bundle`** — **`pnpm sut`** / **`pnpm test`** run this after install). Full env list: header on **`scripts/local-lb.mjs`** (`LOCAL_LB_STATIC_ROOT`, `LOCAL_LB_BACKEND`, `LOCAL_LB_VITE_UPSTREAM`, `LOCAL_LB_LISTEN_PORT`, `LOCAL_LB_ROUTING_JSON`).
+
+**Verify the stack:** **`pnpm sut:healthcheck`**. If unhealthy or stray processes: **`pnpm sut:restart`** or start **`pnpm sut`**. With Nix (typical local agent): **`CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`** / **`… sut:restart`** — see **`CLAUDE.md`**.
 
 Operational note: creating a Cloud SQL VECTOR index may fail with
 "Vector index: not enough data to train" if the table has too few embeddings.

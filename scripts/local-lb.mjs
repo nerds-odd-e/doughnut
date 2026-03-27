@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Local fake LB for Cypress / dev. Behavior and ports: docs/gcp/prod_env.md (section **Local E2E / dev**).
+ * Local LB for Cypress / dev. Behavior and ports: docs/gcp/prod_env.md (**Local dev / Cypress**).
  *
  * Env: LOCAL_LB_STATIC_ROOT, LOCAL_LB_BACKEND, LOCAL_LB_VITE_UPSTREAM, LOCAL_LB_LISTEN_PORT (defaults in code).
  * LOCAL_LB_ROUTING_JSON: optional path to doughnut-routing.json (default: repo infra/gcp/path-routing/doughnut-routing.json).

@@ -2,7 +2,7 @@
 /**
  * Local SUT healthcheck for `pnpm sut`.
  * Run in this repo's shell wrapper: `CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`.
- * Topology reference: docs/gcp/prod_env.md (Local E2E / dev).
+ * Topology reference: docs/gcp/prod_env.md (Local dev / Cypress).
  */
 import http from 'node:http'
 import net from 'node:net'
