@@ -159,6 +159,7 @@ Add a short, consistent **“Unsure if SUT is running?”** block:
 
 1. **Phase 1 — Healthcheck**  
    Implement `pnpm sut:healthcheck` (readiness URL = **`/__lb__/ready`** after Phase 3, or temporary old path + switch in same PR as rename — prefer **one PR** for LB rename + path so healthcheck never encodes the dead URL).
+   Status: done (`scripts/sut-healthcheck.mjs`, `scripts/sut-healthcheck.test.mjs`, `package.json` scripts `sut:healthcheck` and `test:sut-healthcheck`).
 
 2. **Phase 2 — Restart**  
    Implement `pnpm sut:restart` (stop by port + spawn `pnpm sut`).
