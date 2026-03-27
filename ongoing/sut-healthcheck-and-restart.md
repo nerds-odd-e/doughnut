@@ -162,7 +162,8 @@ Add a short, consistent **“Unsure if SUT is running?”** block:
    Status: done (`scripts/sut-healthcheck.mjs`, `scripts/sut-healthcheck.test.mjs`, `package.json` scripts `sut:healthcheck` and `test:sut-healthcheck`).
 
 2. **Phase 2 — Restart**  
-   Implement `pnpm sut:restart` (stop by port + spawn `pnpm sut`).
+   Implement `pnpm sut:restart` (stop by port + spawn `pnpm sut`).  
+   Status: done (`scripts/sut-restart.mjs`, `scripts/sut-restart.test.mjs`, `package.json` scripts `sut:restart` and `test:sut-restart`; `lsof` in `flake.nix`).
 
 3. **Phase 3 — LB rename (complete)**  
    New scripts **`local:lb`** / **`local:lb:vite`**, move to **`scripts/local-lb.mjs`**, **`LOCAL_LB_*` env**, **`[local-lb]`** logs, readiness path **`/__lb__/ready`**, remove old file and all references listed above. CI, docs, rules, Cypress/wait-on updated in the **same phase** so the tree never sits half-renamed.

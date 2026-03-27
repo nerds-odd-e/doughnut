@@ -45,6 +45,7 @@
           zulu25
           nodejs_24
           corepack_24
+          lsof
           fzf
           git-secret
           gitleaks
