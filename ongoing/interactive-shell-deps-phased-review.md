@@ -19,6 +19,7 @@
 1. **Usages:** `buildInteractiveShellDeps` → `InteractiveApp` (token picker / listing). Slash handling uses it inside `processInput` in `interactive.ts` (not via deps there).
 2. **Inline?** `InteractiveApp` could import `listAccessTokens` from `commands/accessToken.js` directly — **no** duplication if the function stays the single source of truth.
 3. **Alternatives:** Direct import from `accessToken` module; keep injection only if tests need to swap storage (currently they do not).
+4. **Outcome (done):** **Move** — `InteractiveApp` imports `listAccessTokens` from `accessToken.js`; removed from `InteractiveShellDeps` and `buildInteractiveShellDeps`. `interactive.ts` still imports it for `processInput` slash paths.
 
 ## Phase 2 — `removeAccessToken`
 

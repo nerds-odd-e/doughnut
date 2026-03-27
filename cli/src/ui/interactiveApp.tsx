@@ -52,7 +52,10 @@ import {
   applyShellSessionPatch,
   type ShellSessionState,
 } from '../shell/shellSessionState.js'
-import type { AccessTokenEntry } from '../commands/accessToken.js'
+import {
+  listAccessTokens,
+  type AccessTokenEntry,
+} from '../commands/accessToken.js'
 import type {
   AccessTokenPickerAction,
   CliAssistantMessageTone,
@@ -114,7 +117,6 @@ export function InteractiveApp({
     getStopConfirmationYesOutcomeLines,
     getPlaceholderContext,
     getDefaultTokenLabel,
-    listAccessTokens,
     removeAccessToken,
     removeAccessTokenCompletely,
     setDefaultTokenLabel,

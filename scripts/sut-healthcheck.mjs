@@ -20,11 +20,7 @@ export const DEFAULT_READYNESS_URL = 'http://127.0.0.1:5173/__e2e__/ready'
 const TCP_TIMEOUT_MS = 1_500
 const HTTP_TIMEOUT_MS = 10_000
 
-export function checkTcpPort({
-  host,
-  port,
-  timeoutMs = TCP_TIMEOUT_MS,
-}) {
+export function checkTcpPort({ host, port, timeoutMs = TCP_TIMEOUT_MS }) {
   return new Promise((resolve) => {
     const socket = net.createConnection({ host, port })
     let settled = false
@@ -47,15 +43,14 @@ export function checkTcpPort({
   })
 }
 
-export function checkHttpReady({
-  url,
-  timeoutMs = HTTP_TIMEOUT_MS,
-}) {
+export function checkHttpReady({ url, timeoutMs = HTTP_TIMEOUT_MS }) {
   return new Promise((resolve) => {
     const req = http.get(url, { timeout: timeoutMs }, (res) => {
       const status = res.statusCode ?? 0
       res.resume()
-      res.on('end', () => resolve({ ok: status >= 200 && status < 300, status }))
+      res.on('end', () =>
+        resolve({ ok: status >= 200 && status < 300, status })
+      )
     })
     req.once('timeout', () => {
       req.destroy()
@@ -74,7 +69,8 @@ function formatTcpLine(result) {
 }
 
 function formatReadyLine(result) {
-  if (result.skipped) return `SKIP HTTP readiness ${result.url} - ${result.reason}`
+  if (result.skipped)
+    return `SKIP HTTP readiness ${result.url} - ${result.reason}`
   if (result.ok) return `PASS HTTP readiness ${result.url} - ${result.status}`
   if (result.status !== undefined) {
     return `FAIL HTTP readiness ${result.url} - ${result.status}`
