@@ -83,7 +83,7 @@ CI writes **immutable** prefixes: `frontend/<GITHUB_SHA>/`. See [Release at a gl
 
 Order **specific** paths **before** the catch-all that sends traffic to GCS.
 
-The **canonical routing** for prod URL-map generation, local prod-topology proxy backend classification, mandatory static probes, and CI validation lives in [`infra/gcp/path-routing/doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json) (`backendPathHints`, `gcpUrlMap.staticPathRules`, `mandatoryStaticBucketProbes`, `localProxy`). `pnpm validate:path-routing` checks the URL map YAML **generated** from that file (dummy SHA when no `--url-map`). It also ensures root-level static paths implied by [`frontend/index.html`](../../frontend/index.html), [`frontend/public/`](../../frontend/public/), and (when present) `frontend/dist/index.html` are covered by a static pathRule. Unit tests: `pnpm test:path-routing`.
+The **canonical routing** for prod URL-map generation, local LB backend classification, mandatory static probes, and CI validation lives in [`infra/gcp/path-routing/doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json) (`backendPathHints`, `gcpUrlMap.staticPathRules`, `mandatoryStaticBucketProbes`, `localProxy`). `pnpm validate:path-routing` checks the URL map YAML **generated** from that file (dummy SHA when no `--url-map`). It also ensures root-level static paths implied by [`frontend/index.html`](../../frontend/index.html), [`frontend/public/`](../../frontend/public/), and (when present) `frontend/dist/index.html` are covered by a static pathRule. Unit tests: `pnpm test:path-routing`.
 
 Send to the **backend service (MIG)** at least:
 

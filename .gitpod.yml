@@ -19,7 +19,7 @@ tasks:
       cd /workspace/doughnut && direnv allow
 
 ports:
-  # Fake LB (browser entry when using pnpm sut); CI E2E prod-topology proxy
+  # Local LB (browser entry when using pnpm sut; CI E2E)
   - port: 5173
     onOpen: open-browser
     visibility: public

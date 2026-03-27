@@ -55,7 +55,7 @@ test('checkHttpReady returns ok for HTTP 200 response', async () => {
 
   try {
     const result = await checkHttpReady({
-      url: `http://127.0.0.1:${address.port}/__e2e__/ready`,
+      url: `http://127.0.0.1:${address.port}/__lb__/ready`,
       timeoutMs: 1_000,
     })
     assert.equal(result.ok, true)
@@ -79,7 +79,7 @@ test('checkHttpReady returns failure for HTTP 503 response', async () => {
 
   try {
     const result = await checkHttpReady({
-      url: `http://127.0.0.1:${address.port}/__e2e__/ready`,
+      url: `http://127.0.0.1:${address.port}/__lb__/ready`,
       timeoutMs: 1_000,
     })
     assert.equal(result.ok, false)

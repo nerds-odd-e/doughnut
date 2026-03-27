@@ -16,7 +16,7 @@ export const DEFAULT_TCP_CHECKS = [
   { service: 'frontend vite', host: '127.0.0.1', port: 5174 },
 ]
 
-export const DEFAULT_READYNESS_URL = 'http://127.0.0.1:5173/__e2e__/ready'
+export const DEFAULT_READYNESS_URL = 'http://127.0.0.1:5173/__lb__/ready'
 const TCP_TIMEOUT_MS = 1_500
 const HTTP_TIMEOUT_MS = 10_000
 

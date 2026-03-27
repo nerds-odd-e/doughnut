@@ -80,10 +80,10 @@ source /workspace/scripts/cloud_agent_setup.sh
 
 # Build and start (matches CI: fake LB serves `frontend/dist`, API on Spring; no Vite dev server)
 pnpm bundle:all
-pnpm exec run-p -clnr backend:sut:ci start:mb e2e:prod-topology-proxy &
+pnpm exec run-p -clnr backend:sut:ci start:mb local:lb &
 
 # Wait for backend and Mountebank
-NO_PROXY=127.0.0.1,localhost pnpm exec wait-on http://127.0.0.1:5173/__e2e__/ready --timeout 120000
+NO_PROXY=127.0.0.1,localhost pnpm exec wait-on http://127.0.0.1:5173/__lb__/ready --timeout 120000
 
 # Run tests (xvfb-run required - Cloud VM has no display)
 xvfb-run pnpm cypress run --spec e2e_test/features/<feature-file>.feature --config-file e2e_test/config/ci.ts
@@ -95,7 +95,7 @@ xvfb-run pnpm cypress run --spec e2e_test/features/<feature-file>.feature --conf
 
 1. **Do NOT use `CURSOR_DEV=true nix develop -c` prefix** - run commands directly
 2. **Backend tests:** Require one-time setup script for Java and MySQL
-3. **E2E tests:** **MUST source the setup script first** (to set `INPUT_DB_URL` and `CI=1`). Then follow **E2E Tests** above: `pnpm bundle:all`, `run-p` `backend:sut:ci` + `start:mb` + **`e2e:prod-topology-proxy`**, `wait-on` **`http://127.0.0.1:5173/__e2e__/ready`**, **`NO_PROXY=127.0.0.1,localhost`**, then `xvfb-run pnpm cypress run ...` + `e2e_test/config/ci.ts`. Why **5173** / **9081**: **`docs/gcp/prod_env.md`** (Local E2E / dev).
+3. **E2E tests:** **MUST source the setup script first** (to set `INPUT_DB_URL` and `CI=1`). Then follow **E2E Tests** above: `pnpm bundle:all`, `run-p` `backend:sut:ci` + `start:mb` + **`local:lb`**, `wait-on` **`http://127.0.0.1:5173/__lb__/ready`**, **`NO_PROXY=127.0.0.1,localhost`**, then `xvfb-run pnpm cypress run ...` + `e2e_test/config/ci.ts`. Why **5173** / **9081**: **`docs/gcp/prod_env.md`** (Local E2E / dev).
 4. **Service ports:** **9081** Spring; **5173** fake LB for Cypress here. (Full port map: same doc paragraph.)
 5. **Test execution:** Frontend tests work without nix
 6. **Linting errors:** TypeScript/vue-tsc errors may appear but don't prevent test execution

@@ -93,7 +93,7 @@ Document new cases in `cli/src/ttyAdapters/interactiveTtySession.ts` (file heade
 Features: **`e2e_test/features/cli/`**. Steps and page objects: **`e2e_test/step_definitions/cli.ts`**, **`e2e_test/start/pageObjects/cli/`**.
 
 - **Run:** Cypress Node tasks spawn `cli/dist/doughnut-cli.bundle.mjs` via `node` (same locally and in GitHub Actions). Before spawn, `ensureCliBundleFresh` rebuilds the bundle when `cli/src`, `cli/package.json`, `cli/tsconfig.json`, or `packages/doughnut-api/src` are newer than the bundle. Set **`DOUGHNUT_CLI_E2E_USE_TSX=1`** to force `pnpm -C cli exec tsx src/index.ts` for debugging. Installation scenarios use the E2E install bundle path (see `@bundleCliE2eInstall`).
-- **`@bundleCliE2eInstall`:** Builds `cli/dist/e2e-install-doughnut-cli.bundle.mjs` before each scenario and removes it after; the prod-topology proxy serves `/doughnut-cli-latest/doughnut` from that file when present so install tests do not overwrite `cli/dist/doughnut-cli.bundle.mjs`.
+- **`@bundleCliE2eInstall`:** Builds `cli/dist/e2e-install-doughnut-cli.bundle.mjs` before each scenario and removes it after; the local LB (`scripts/local-lb.mjs`) serves `/doughnut-cli-latest/doughnut` from that file when present so install tests do not overwrite `cli/dist/doughnut-cli.bundle.mjs`.
 - **`@interactiveCLI`:** One PTY-backed process per scenario (hooks in `e2e_test/step_definitions/hook.ts`). Copy existing scenarios for **when/how** to send input and assert (past CLI assistant messages, past user messages, Current guidance). Draft-line ↑↓ **user input history** is **Vitest-only** (not in `InteractiveCliPtyKeystroke`); E2E down-arrow is for **selection mode** (see recall features).
 - **Recall y/n after asserting a prompt:** **`I answer … in the interactive CLI to prompt …`** (`answerToPrompt` — one keypress for the Ink confirm strip; do not send Enter after **y**/**n**, or it counts as “no”).
 - **New PTY input shapes:** Extend **`InteractiveCliPtyKeystroke`** (`e2e_test/config/interactiveCliPtyTypes.ts`) and the encoder in **`e2e_test/config/cliPtyRunner.ts`** together — not a second `cy.task`.
@@ -103,7 +103,7 @@ Features: **`e2e_test/features/cli/`**. Steps and page objects: **`e2e_test/step
 
 - Bundle: `cli/dist/doughnut-cli.bundle.mjs` (shebang)
 - Release: `gs://dough-01/doughnut-cli-latest/doughnut` (`cli-release.yml`)
-- Local install URL: fake LB serves `/doughnut-cli-latest/doughnut` (see `e2e_test/e2e-prod-topology-proxy.mjs`, `docs/gcp/prod_env.md`)
+- Local install URL: local LB serves `/doughnut-cli-latest/doughnut` (see `scripts/local-lb.mjs`, `docs/gcp/prod_env.md`)
 
 **Ink + esbuild (`react-devtools-core`):** Ink may load `devtools.js`, which imports `react-devtools-core`. That package is optional in Ink (used when `DEV=true`; see Ink’s README). Esbuild still resolves the import when producing the single-file bundle, so `cli/package.json` `bundle` aliases `react-devtools-core` to `cli/src/shims/react-devtools-core-stub.ts`. The shipped bundle therefore does not depend on installing `react-devtools-core`. For React DevTools against an **unbundled** run (e.g. `pnpm -C cli exec tsx src/index.ts`), install `react-devtools-core` and use `DEV=true` as Ink documents.
 

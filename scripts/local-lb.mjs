@@ -2,8 +2,8 @@
 /**
  * Local fake LB for Cypress / dev. Behavior and ports: docs/gcp/prod_env.md (section **Local E2E / dev**).
  *
- * Env: E2E_STATIC_ROOT, E2E_PROXY_TARGET, E2E_PROXY_VITE_UPSTREAM, E2E_PROXY_LISTEN_PORT (defaults in code).
- * E2E_BACKEND_PATH_HINTS_JSON: optional path to doughnut-routing.json (default: repo infra/gcp/path-routing/doughnut-routing.json).
+ * Env: LOCAL_LB_STATIC_ROOT, LOCAL_LB_BACKEND, LOCAL_LB_VITE_UPSTREAM, LOCAL_LB_LISTEN_PORT (defaults in code).
+ * LOCAL_LB_ROUTING_JSON: optional path to doughnut-routing.json (default: repo infra/gcp/path-routing/doughnut-routing.json).
  */
 import { createReadStream, existsSync, statSync } from 'node:fs'
 import http from 'node:http'
@@ -15,15 +15,15 @@ import { pathGoesToBackend } from '../infra/gcp/path-routing/pathGoesToBackend.m
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
 const STATIC_ROOT = path.resolve(
-  process.env.E2E_STATIC_ROOT ?? path.join(repoRoot, 'frontend/dist')
+  process.env.LOCAL_LB_STATIC_ROOT ?? path.join(repoRoot, 'frontend/dist')
 )
-const BACKEND = new URL(process.env.E2E_PROXY_TARGET ?? 'http://127.0.0.1:9081')
-const VITE_UPSTREAM = process.env.E2E_PROXY_VITE_UPSTREAM
-  ? new URL(process.env.E2E_PROXY_VITE_UPSTREAM)
+const BACKEND = new URL(process.env.LOCAL_LB_BACKEND ?? 'http://127.0.0.1:9081')
+const VITE_UPSTREAM = process.env.LOCAL_LB_VITE_UPSTREAM
+  ? new URL(process.env.LOCAL_LB_VITE_UPSTREAM)
   : null
-const PORT = Number(process.env.E2E_PROXY_LISTEN_PORT ?? 5173)
-const DOUGHNUT_ROUTING_PATH = process.env.E2E_BACKEND_PATH_HINTS_JSON
-  ? path.resolve(process.env.E2E_BACKEND_PATH_HINTS_JSON)
+const PORT = Number(process.env.LOCAL_LB_LISTEN_PORT ?? 5173)
+const DOUGHNUT_ROUTING_PATH = process.env.LOCAL_LB_ROUTING_JSON
+  ? path.resolve(process.env.LOCAL_LB_ROUTING_JSON)
   : path.join(repoRoot, 'infra/gcp/path-routing/doughnut-routing.json')
 const DOUGHNUT_ROUTING = loadDoughnutRouting(DOUGHNUT_ROUTING_PATH)
 const BACKEND_PATH_HINTS = DOUGHNUT_ROUTING.backendPathHints
@@ -37,13 +37,14 @@ const CLI_DEFAULT_INSTALL_BUNDLE = path.join(
   'cli/dist/doughnut-cli.bundle.mjs'
 )
 /** Cypress `@bundleCliE2eInstall` builds here so install scenarios do not overwrite the default bundle. */
-const CLI_E2E_INSTALL_BUNDLE = path.join(
+const CLI_CYPRESS_ALT_INSTALL_BUNDLE = path.join(
   repoRoot,
   'cli/dist/e2e-install-doughnut-cli.bundle.mjs'
 )
 
 function cliInstallBundlePath() {
-  if (existsSync(CLI_E2E_INSTALL_BUNDLE)) return CLI_E2E_INSTALL_BUNDLE
+  if (existsSync(CLI_CYPRESS_ALT_INSTALL_BUNDLE))
+    return CLI_CYPRESS_ALT_INSTALL_BUNDLE
   return CLI_DEFAULT_INSTALL_BUNDLE
 }
 
@@ -68,7 +69,7 @@ function shouldProxyPath(urlPath) {
   return pathGoesToBackend(urlPath, BACKEND_PATH_HINTS)
 }
 
-/** Backend vs Vite for normal app traffic (not `/__e2e__/ready`). */
+/** Backend vs Vite for normal app traffic (not `/__lb__/ready`). */
 function upstreamForPath(urlPath) {
   if (shouldProxyPath(urlPath)) return BACKEND
   if (VITE_UPSTREAM) return VITE_UPSTREAM
@@ -168,7 +169,7 @@ function probeBackendHealth(done) {
   pReq.end()
 }
 
-function handleE2eReady(req, res) {
+function handleLbReady(req, res) {
   const method = req.method ?? 'GET'
   if (method !== 'GET' && method !== 'HEAD') {
     res.statusCode = 405
@@ -209,7 +210,7 @@ function proxyHttp(clientReq, clientRes, target, logLabel) {
     pRes.pipe(clientRes)
   })
   pReq.on('error', (err) => {
-    console.error(`[e2e-prod-topology-proxy] ${logLabel} error:`, err.message)
+    console.error(`[local-lb] ${logLabel} error:`, err.message)
     if (!clientRes.headersSent) {
       clientRes.statusCode = 502
       clientRes.end('Bad Gateway')
@@ -261,24 +262,21 @@ function proxyUpgrade(clientReq, clientSocket, head, target, logLabel) {
     clientSocket.pipe(pSocket)
   })
   pReq.on('error', (err) => {
-    console.error(
-      `[e2e-prod-topology-proxy] ${logLabel} upgrade error:`,
-      err.message
-    )
+    console.error(`[local-lb] ${logLabel} upgrade error:`, err.message)
     clientSocket.destroy()
   })
   pReq.end(head)
 }
 
 if (!(VITE_UPSTREAM || existsSync(STATIC_ROOT))) {
-  console.error(`[e2e-prod-topology-proxy] static root missing: ${STATIC_ROOT}`)
+  console.error(`[local-lb] static root missing: ${STATIC_ROOT}`)
   process.exit(1)
 }
 
 const server = http.createServer((req, res) => {
   const urlPath = (req.url ?? '/').split('?')[0] || '/'
-  if (urlPath === '/__e2e__/ready') {
-    handleE2eReady(req, res)
+  if (urlPath === '/__lb__/ready') {
+    handleLbReady(req, res)
     return
   }
   const method = req.method ?? 'GET'
@@ -319,6 +317,6 @@ server.listen(PORT, '0.0.0.0', () => {
     ? `vite=${VITE_UPSTREAM.origin}`
     : `static=${STATIC_ROOT}`
   console.log(
-    `[e2e-prod-topology-proxy] http://127.0.0.1:${PORT} ${staticOrVite} -> ${BACKEND.origin}`
+    `[local-lb] http://127.0.0.1:${PORT} ${staticOrVite} -> ${BACKEND.origin}`
   )
 })
