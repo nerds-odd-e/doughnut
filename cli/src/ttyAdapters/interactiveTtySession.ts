@@ -30,7 +30,6 @@ import {
 import { interactiveTtyStdout } from './interactiveTtyStdout.js'
 import type { OutputAdapter } from '../types.js'
 import { getTerminalWidth } from '../renderer.js'
-import { isAlternateLivePanel } from '../ui/ShellSessionRoot.js'
 import {
   InteractiveApp,
   type InteractiveAppTerminalContract,
@@ -97,17 +96,6 @@ export function runInteractiveTtySession(
   const ttyOutputRef: { current: OutputAdapter | null } = { current: null }
   let shellInstance: ReturnType<typeof render> | null = null
 
-  const stdinTty = stdin as TTYInput
-  const innerSetRawMode = stdinTty.setRawMode?.bind(stdinTty)
-  if (typeof innerSetRawMode === 'function') {
-    stdinTty.setRawMode = (enable: boolean) => {
-      if (!enable && isAlternateLivePanel(latestSessionRef.current, deps)) {
-        return stdinTty
-      }
-      return innerSetRawMode(enable)
-    }
-  }
-
   function patchStdinForInk(
     stream: NodeJS.ReadableStream & { ref?: () => void; unref?: () => void }
   ): void {
@@ -131,19 +119,6 @@ export function runInteractiveTtySession(
     process.exit(0)
   }
 
-  function handleShellRendered(
-    session: ShellSessionState,
-    shellDeps: InteractiveShellDeps
-  ): void {
-    if (isAlternateLivePanel(session, shellDeps)) {
-      stdinTty.ref?.()
-      stdinTty.setRawMode?.(true)
-    }
-    if (getInteractiveFetchWaitLine() !== null) {
-      interactiveTtyStdout.hideCursor()
-    }
-  }
-
   const terminalContract: InteractiveAppTerminalContract = {
     writeCurrentPromptLine: (msg) => {
       interactiveTtyStdout.greyCurrentPromptLine(msg)
@@ -151,8 +126,10 @@ export function runInteractiveTtySession(
     beginCurrentPrompt: () => {
       interactiveTtyStdout.currentPromptSeparator(getTerminalWidth())
     },
-    onShellSessionLayoutEffect: (session, shellDeps) => {
-      handleShellRendered(session, shellDeps)
+    onShellSessionLayoutEffect: () => {
+      if (getInteractiveFetchWaitLine() !== null) {
+        interactiveTtyStdout.hideCursor()
+      }
     },
     writeExitFarewellBlock: ({ previousInputContent, outputLines, tone }) => {
       interactiveTtyStdout.exitFarewellBlock({

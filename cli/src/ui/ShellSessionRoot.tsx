@@ -73,21 +73,6 @@ function currentStageIndicatorLinesForLiveRegion(
   return []
 }
 
-export function isAlternateLivePanel(
-  session: ShellSessionState,
-  deps: InteractiveShellDeps
-): boolean {
-  if (getInteractiveFetchWaitLine() !== null) return true
-  if (deps.isPendingStopConfirmation()) return true
-  if (
-    deps.getPlaceholderContext(!!session.tokenSelection) ===
-    RECALL_SESSION_YES_NO_PLACEHOLDER
-  )
-    return true
-  if (deps.getNumberedChoiceListChoices() !== null) return true
-  return false
-}
-
 function computeLiveColumnLeadingSnapshot(
   session: ShellSessionState,
   deps: InteractiveShellDeps
@@ -187,7 +172,7 @@ function PastMessageBlock({
 function buildLivePanel(
   session: ShellSessionState,
   deps: InteractiveShellDeps,
-  defaultCommandLineLayout: DefaultCommandLineInkLayout | undefined,
+  defaultCommandLineLayout: DefaultCommandLineInkLayout,
   handlers: ShellSessionInkHandlers
 ): React.ReactElement {
   const waitLine = getInteractiveFetchWaitLine()
@@ -282,7 +267,7 @@ function buildLivePanel(
         ),
     })
   }
-  const layout = defaultCommandLineLayout!
+  const layout = defaultCommandLineLayout
   return React.createElement(CommandLineLivePanel, {
     commandInput: session.commandInput,
     width: layout.terminalWidth,
@@ -316,21 +301,18 @@ export function ShellSessionRoot({
     leading.currentPromptWrappedLines,
     leading.currentStageIndicatorLines
   )
-  const defaultCommandLineLayout: DefaultCommandLineInkLayout | undefined =
-    isAlternateLivePanel(session, deps)
-      ? undefined
-      : {
-          ...leading,
-          currentGuidanceLines: buildSuggestionLinesForInk(
-            session.commandInput.lineDraft,
-            session.highlightIndex,
-            {
-              forceCommandsHint:
-                session.suggestionsDismissed &&
-                hasInteractiveSlashCompletions(session.commandInput.lineDraft),
-            }
-          ),
-        }
+  const defaultCommandLineLayout: DefaultCommandLineInkLayout = {
+    ...leading,
+    currentGuidanceLines: buildSuggestionLinesForInk(
+      session.commandInput.lineDraft,
+      session.highlightIndex,
+      {
+        forceCommandsHint:
+          session.suggestionsDismissed &&
+          hasInteractiveSlashCompletions(session.commandInput.lineDraft),
+      }
+    ),
+  }
   const livePanel = buildLivePanel(
     session,
     deps,
