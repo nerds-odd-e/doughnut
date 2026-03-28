@@ -3,13 +3,9 @@ import { mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Chalk } from 'chalk'
-import { expect, vi } from 'vitest'
+import { vi } from 'vitest'
 import type { AccessTokenEntry } from '../../src/commands/accessToken.js'
-import {
-  resetRecallStateForTesting,
-  runInteractive,
-} from '../../src/interactive.js'
-import { getTerminalWidth, renderPastUserMessage } from '../../src/renderer.js'
+import { runInteractive } from '../../src/interactive.js'
 
 export const tick = () => new Promise<void>((r) => setImmediate(r))
 
@@ -142,17 +138,6 @@ export function ttyOutput(writeSpy: ReturnType<typeof vi.spyOn>) {
   return writeSpy.mock.calls.map((c: [string]) => c[0]).join('')
 }
 
-/** Recall-session y/n answers append to past CLI assistant messages without a grey past-user row for the key line. */
-export function expectTtyRecallYesNoReplyScrollback(
-  writeSpy: ReturnType<typeof vi.spyOn>,
-  answerLine: string
-) {
-  const out = ttyOutput(writeSpy)
-  expect(out).not.toContain(
-    renderPastUserMessage(answerLine, getTerminalWidth())
-  )
-}
-
 /** Latest line in captured TTY stdout containing `needle` (successive repaints overwrite the same logical rows). */
 export function lastStdoutLineContaining(
   output: string,
@@ -200,26 +185,6 @@ export function spyExitNoop(): ReturnType<typeof vi.spyOn> {
 export async function startInteractiveOnStdin(stdin: TTYStdin) {
   runInteractive(stdin as unknown as Parameters<typeof runInteractive>[0])
   await tick()
-}
-
-export async function ttySessionWithSpies(): Promise<{
-  stdin: TTYStdin
-  writeSpy: ReturnType<typeof vi.spyOn>
-}> {
-  resetRecallStateForTesting()
-  return startTTYSessionWithoutRecallReset()
-}
-
-export async function startTTYSessionWithoutRecallReset(): Promise<{
-  stdin: TTYStdin
-  writeSpy: ReturnType<typeof vi.spyOn>
-}> {
-  spyConsoleLogNoop()
-  const writeSpy = spyStdoutWriteTrue()
-  spyExitNoop()
-  const stdin = createMockTTYStdin()
-  await startInteractiveOnStdin(stdin)
-  return { stdin, writeSpy }
 }
 
 export async function endTTYSession(stdin: TTYStdin) {

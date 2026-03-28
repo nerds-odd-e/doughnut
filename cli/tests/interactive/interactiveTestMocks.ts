@@ -5,30 +5,6 @@ export const interactiveHelpMockState = {
   useManyCommandsForScrollTests: false,
 }
 
-const {
-  mockRecallNext,
-  mockAnswerQuiz,
-  mockMarkAsRecalled,
-  mockContestAndRegenerate,
-} = vi.hoisted(() => ({
-  mockRecallNext: vi.fn(),
-  mockAnswerQuiz: vi.fn(),
-  mockMarkAsRecalled: vi.fn(),
-  mockContestAndRegenerate: vi.fn(),
-}))
-
-vi.mock('../../src/commands/recall.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../../src/commands/recall.js')>()
-  return {
-    ...actual,
-    recallNext: mockRecallNext,
-    answerQuiz: mockAnswerQuiz,
-    markAsRecalled: mockMarkAsRecalled,
-    contestAndRegenerate: mockContestAndRegenerate,
-  }
-})
-
 vi.mock('../../src/commands/help.js', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('../../src/commands/help.js')>()

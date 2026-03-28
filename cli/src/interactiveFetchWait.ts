@@ -5,8 +5,6 @@ import type { OutputAdapter } from './types.js'
  * network/backend call. TTY animation is `Spinner` in `FetchWaitDisplay.tsx`.
  */
 export const INTERACTIVE_FETCH_WAIT_LINES = {
-  recallNext: 'Loading recall questions',
-  contest: 'Regenerating question',
   addAccessToken: 'Adding access token',
   createAccessToken: 'Creating access token',
   removeAccessTokenCompletely: 'Removing access token',

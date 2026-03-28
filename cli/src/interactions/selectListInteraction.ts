@@ -1,7 +1,6 @@
 /**
- * Policy for **Current guidance** list selection on the TTY: recall MCQ (numbered choices + optional
- * answer draft) and access-token picker (highlight row only). Callers map readline or Ink stdin into
- * {@link SelectListKeyEvent} then {@link dispatchSelectListKey}.
+ * Policy for **Current guidance** list selection on the TTY: access-token picker (highlight row only).
+ * Callers map readline or Ink stdin into {@link SelectListKeyEvent} then {@link dispatchSelectListKey}.
  */
 
 export function cycleListSelectionIndex(

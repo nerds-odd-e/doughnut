@@ -21,20 +21,9 @@ import {
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
 } from '../src/renderer.js'
 
-const { mockRecallNext } = vi.hoisted(() => ({
-  mockRecallNext: vi.fn(),
-}))
 const { mockAddAccessToken } = vi.hoisted(() => ({
   mockAddAccessToken: vi.fn(),
 }))
-vi.mock('../src/commands/recall.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../src/commands/recall.js')>()
-  return {
-    ...actual,
-    recallNext: mockRecallNext,
-  }
-})
 vi.mock('../src/commands/accessToken.js', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('../src/commands/accessToken.js')>()
@@ -51,7 +40,6 @@ function minimalOutputAdapter() {
 
 beforeEach(() => {
   resetRecallStateForTesting()
-  mockRecallNext.mockReset()
   mockAddAccessToken.mockReset()
 })
 
@@ -73,18 +61,18 @@ describe('userVisibleOutcomeFromCommandError', () => {
 
 describe('interactive fetch wait UI', () => {
   test('stage band and grey command-line paint rows', () => {
-    const recallLine = INTERACTIVE_FETCH_WAIT_LINES.recallNext
-    expect(stripAnsi(interactiveFetchWaitStageIndicatorLine(recallLine))).toBe(
-      recallLine
+    const waitLine = INTERACTIVE_FETCH_WAIT_LINES.addAccessToken
+    expect(stripAnsi(interactiveFetchWaitStageIndicatorLine(waitLine))).toBe(
+      waitLine
     )
 
     const width = 80
-    const label = interactiveFetchWaitStageIndicatorLine(recallLine)
+    const label = interactiveFetchWaitStageIndicatorLine(waitLine)
     const bandTop = formatCurrentStageIndicatorLine(label, width)
     const bandSep = buildCurrentPromptSeparatorForStageBand(width)
     expect(bandTop).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
     expect(bandTop).toContain(INTERACTIVE_FETCH_WAIT_PROMPT_FG)
-    expect(stripAnsi(bandTop)).toContain(recallLine)
+    expect(stripAnsi(bandTop)).toContain(waitLine)
     expect(bandSep).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
     expect(bandSep).toContain('\x1b[32m')
 
@@ -97,17 +85,10 @@ describe('interactive fetch wait UI', () => {
     expect(
       stripAnsi(
         interactiveFetchWaitStageIndicatorLine(
-          INTERACTIVE_FETCH_WAIT_LINES.addAccessToken
+          INTERACTIVE_FETCH_WAIT_LINES.createAccessToken
         )
       )
-    ).toContain(INTERACTIVE_FETCH_WAIT_LINES.addAccessToken)
-  })
-
-  test('processInput /recall: rejected recallNext surfaces logError', async () => {
-    mockRecallNext.mockRejectedValueOnce(new Error('network'))
-    const out = minimalOutputAdapter()
-    await processInput('/recall', out)
-    expect(out.logError).toHaveBeenCalled()
+    ).toContain(INTERACTIVE_FETCH_WAIT_LINES.createAccessToken)
   })
 
   test('processInput /add-access-token passes AbortSignal and logs Token added', async () => {
@@ -134,7 +115,7 @@ describe('interactive fetch wait UI', () => {
     await expect(
       runInteractiveFetchWait(
         out,
-        INTERACTIVE_FETCH_WAIT_LINES.recallNext,
+        INTERACTIVE_FETCH_WAIT_LINES.addAccessToken,
         async () => {
           throw new Error('fail')
         }

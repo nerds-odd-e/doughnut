@@ -17,7 +17,7 @@ describe('formatHelp', () => {
     expect(output).toContain('version')
     expect(output).toContain('update')
     expect(output).toContain('/help')
-    expect(output).toContain('/recall')
+    expect(output).toContain('/add-access-token')
     expect(output).toContain('exit')
   })
 
@@ -26,7 +26,7 @@ describe('formatHelp', () => {
     expect(output).toContain('Show CLI version')
     expect(output).toContain('Update CLI to latest version')
     expect(output).toContain('List available commands')
-    expect(output).toContain('Recall all due notes in a session')
+    expect(output).toContain('Add a Doughnut access token')
     expect(output).toContain('Quit the CLI')
   })
 
@@ -52,21 +52,21 @@ describe('filterCommandsByPrefix', () => {
       category: 'interactive',
     },
     {
-      name: 'recall',
-      usage: '/recall',
-      description: 'Recall',
+      name: 'token',
+      usage: '/list-access-token',
+      description: 'List',
       category: 'interactive',
     },
   ]
 
   test('matches from beginning', () => {
-    const result = filterCommandsByPrefix(commands, '/recall')
-    expect(result.map((c) => c.usage)).toEqual(['/recall'])
+    const result = filterCommandsByPrefix(commands, '/list-access-token')
+    expect(result.map((c) => c.usage)).toEqual(['/list-access-token'])
   })
 
   test('matches anywhere with beginning prioritized', () => {
-    const result = filterCommandsByPrefix(commands, 'recall')
-    expect(result.map((c) => c.usage)).toEqual(['/recall'])
+    const result = filterCommandsByPrefix(commands, 'list-access')
+    expect(result.map((c) => c.usage)).toEqual(['/list-access-token'])
   })
 
   test('prioritizes beginning match over substring match', () => {
@@ -128,16 +128,9 @@ describe('getTabCompletion', () => {
     })
   })
 
-  test('/rec completes to /recall with trailing space', () => {
-    expect(getTabCompletion('/rec', interactiveDocs)).toEqual({
-      completed: '/recall ',
-      count: 1,
-    })
-  })
-
-  test('/recall completes to /recall with trailing space', () => {
-    expect(getTabCompletion('/recall', interactiveDocs)).toEqual({
-      completed: '/recall ',
+  test('/cre completes to /create-access-token with trailing space', () => {
+    expect(getTabCompletion('/cre', interactiveDocs)).toEqual({
+      completed: '/create-access-token ',
       count: 1,
     })
   })

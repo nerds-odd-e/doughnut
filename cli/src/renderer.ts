@@ -1,6 +1,6 @@
 /**
  * TTY layout bridge: **command-line paint** strings for Ink (`liveColumnInk.tsx`), stage-band /
- * separator helpers, MCQ/token guidance strings, and tone helpers. Grapheme width / wrap / truncate
+ * separator helpers, token guidance strings, and tone helpers. Grapheme width / wrap / truncate
  * live in `terminalLayout.ts`. Not a second interactive UI engine.
  */
 import { RESET, HIDE_CURSOR, SHOW_CURSOR } from './ansi.js'
@@ -23,19 +23,13 @@ import {
   CURRENT_GUIDANCE_MAX_VISIBLE,
   formatHighlightedList,
 } from './listDisplay.js'
-import { renderMarkdownToTerminal } from './markdown.js'
-import type {
-  CliAssistantMessageTone,
-  PastMessages,
-  RecallMcqChoiceTexts,
-} from './types.js'
+import type { CliAssistantMessageTone, PastMessages } from './types.js'
 import type { InteractiveFetchWaitLine } from './interactiveFetchWait.js'
 import { slashGuidanceForInk } from './slashCompletion.js'
 import {
   padEndVisible,
   stripTrailingSgrReset,
   truncateToWidth,
-  visibleLength,
   wrapTextToVisibleWidthLines,
 } from './terminalLayout.js'
 
@@ -88,22 +82,12 @@ export type PlaceholderContext =
   | 'default'
   | 'tokenList'
   | 'interactiveFetchWait'
-  | 'recallMcq'
-  | 'recallStopConfirmation'
-  | 'recallYesNo'
 
 export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
   default: '`exit` to quit.',
   tokenList: '↑↓ Enter to select; other keys cancel',
   interactiveFetchWait: 'loading ...',
-  recallMcq: '↑↓ Enter or number to select; Esc to cancel',
-  recallStopConfirmation: 'y or n; Esc to go back',
-  recallYesNo: 'y or n; /stop to exit recall',
 }
-
-/** Load-more or just-review y/n — `PlaceholderContext` while the recall session waits for that answer. */
-export const RECALL_SESSION_YES_NO_PLACEHOLDER =
-  'recallYesNo' as const satisfies PlaceholderContext
 
 function usesGreyNoArrowCommandLinePaint(ctx: PlaceholderContext): boolean {
   return ctx === 'tokenList' || ctx === 'interactiveFetchWait'
@@ -126,10 +110,6 @@ export const COMMANDS_HINT = terminalChalk.gray('  / commands')
 export function greyCurrentStageIndicatorLabel(plainText: string): string {
   return terminalChalk.gray(plainText)
 }
-
-/** Default **Current Stage Indicator** line while recall payload is loading (label: “Recalling”). */
-export const DEFAULT_RECALL_LOADING_STAGE_INDICATOR =
-  greyCurrentStageIndicatorLabel('Recalling')
 
 const graphemeSegmenter = new Intl.Segmenter('en', { granularity: 'grapheme' })
 
@@ -329,39 +309,6 @@ export function wrapMarkdownTerminalToLines(
     .flatMap((p) =>
       p.length === 0 ? [''] : wrapTextToVisibleWidthLines(p, width)
     )
-}
-
-/** Physical **Current guidance** rows for recall MCQ; `itemIndexPerLine[i]` is the choice index for row `i`. */
-type McqGuidancePhysicalRows = {
-  lines: string[]
-  itemIndexPerLine: number[]
-}
-
-export function formatMcqChoiceLinesWithIndices(
-  choices: RecallMcqChoiceTexts,
-  width: TerminalWidth
-): McqGuidancePhysicalRows {
-  const lines: string[] = []
-  const itemIndexPerLine: number[] = []
-  for (let i = 0; i < choices.length; i++) {
-    const rendered = renderMarkdownToTerminal(choices[i]!)
-      .replace(/\n+/g, ' ')
-      .trim()
-    const prefix = `  ${i + 1}. `
-    const indent = ' '.repeat(visibleLength(prefix))
-    const innerWidth = Math.max(1, width - visibleLength(prefix))
-    const bodyLines = wrapTextToVisibleWidthLines(rendered, innerWidth)
-    if (bodyLines.length === 0) {
-      lines.push(prefix)
-      itemIndexPerLine.push(i)
-      continue
-    }
-    for (let r = 0; r < bodyLines.length; r++) {
-      lines.push((r === 0 ? prefix : indent) + bodyLines[r]!)
-      itemIndexPerLine.push(i)
-    }
-  }
-  return { lines, itemIndexPerLine }
 }
 
 /**

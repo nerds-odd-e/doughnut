@@ -47,8 +47,8 @@ Part 1 is **complete:** non-install CLI scenarios are **`@ignore`**, E2E harness
 | Phase | Target (confirm at execution time) |
 |-------|-----------------------------------|
 | 2.1 | ~~`cli/tests/interactive/`~~ **Done (TTY batch):** removed `interactiveTty*.test.ts` and `interactiveExitFarewell.test.ts`. **Still in folder:** `processInput.test.ts` (phase 2.6), `interactiveRendering.test.ts` (2.7), `interactiveTestHelpers.ts` / mocks (shared with phase 2.2). No product deletion this batch — recall + remaining Vitest still exercise `runInteractive` / TTY stack. |
-| 2.2 | `recall*.test.ts`, `recallYesNo.test.ts`, `recallMcq*.test.ts`, `recallNextTestShapes.ts`, `recallPromptFixtures.ts` + recall-only interactive code |
-| 2.3 | `accessToken.test.ts`, `selectListInteraction.test.ts`, `listDisplay.test.ts`, `interactiveCommandInput.test.ts`, `userInputHistoryFile.test.ts`, `inputHistoryMask.test.ts`, `shell/pastMessagesModel.test.ts` + token/list TTY-only product if applicable |
+| 2.2 | ~~`recall*.test.ts`, recall fixtures, `RecallInkConfirmPanel` / `recallYesNo.ts`, interactive `/recall` + TTY recall UI~~ **Done** — `recall.ts` retains `recallStatus` for `sdkHttpErrorClassification.test.ts`; `/recall` removed from help and `processInput`. |
+| 2.3 | ~~`accessToken.test.ts`, `selectListInteraction.test.ts`, `listDisplay.test.ts`, `interactiveCommandInput.test.ts`, `userInputHistoryFile.test.ts`, `inputHistoryMask.test.ts`, `shell/pastMessagesModel.test.ts`~~ **Done** — tests removed; interactive shell still uses these modules (no orphan product). Stryker now uses `vitest.config.ts` + `related: false`; removed `vitest.stryker.config.ts`. |
 | 2.4 | `mainCommandLineInkTyping.test.ts`, `interactiveFetchWait.test.ts`, `ttyWriteSimulation.ts` (if tests-only) |
 | 2.5 | `slashCompletion.test.ts`, `help.test.ts` if slash/help no longer exposed |
 | 2.6 | `processInput.test.ts` only with `processInput` / slash engine removed or stubbed **same sub-phase** |

@@ -6,8 +6,8 @@ const config = {
   reporters: ['clear-text', 'progress'],
   testRunner: 'vitest',
   vitest: {
-    /** Direct import tests so instrumented selectListInteraction.ts is executed */
-    configFile: 'vitest.stryker.config.ts',
+    /** Full Vitest include list; `related: false` runs the suite per mutant (no direct-import test for this module). */
+    configFile: 'vitest.config.ts',
     related: false,
   },
   coverageAnalysis: 'off',

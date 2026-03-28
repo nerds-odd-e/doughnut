@@ -1,4 +1,3 @@
-import type { RecallStopConfirmInkModel } from './interactions/recallYesNo.js'
 import type { PlaceholderContext } from './renderer.js'
 import type { OutputAdapter } from './types.js'
 
@@ -8,21 +7,6 @@ export interface InteractiveShellDeps {
     output?: OutputAdapter,
     interactiveUi?: boolean
   ) => Promise<boolean>
-  isPendingStopConfirmation: () => boolean
-  setPendingStopConfirmation: (value: boolean) => void
-  isInCommandSessionSubstate: () => boolean
-  exitCommandSession: () => void
-  getRecallStopConfirmInkModel: (
-    ctx: PlaceholderContext
-  ) => RecallStopConfirmInkModel
-  getNumberedChoiceListChoices: () => readonly string[] | null
-  /** MCQ notebook+stem; `null` if no such recall question is pending. */
-  getRecallCurrentPromptWrappedLines: (width: number) => string[] | null
-  /**
-   * False while a recall answer is expected (MCQ, session y/n); committed lines are not
-   * copied to user input history.
-   */
-  shouldRecordCommittedLineInUserInputHistory: () => boolean
   getPlaceholderContext: () => PlaceholderContext
-  getRecallSessionYesNoInkGuidanceLines: () => readonly string[]
+  shouldRecordCommittedLineInUserInputHistory: () => boolean
 }

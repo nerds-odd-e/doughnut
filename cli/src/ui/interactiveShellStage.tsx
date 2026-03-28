@@ -10,27 +10,13 @@ import { maskInteractiveInputLineForStorage } from '../inputHistoryMask.js'
 import {
   afterBareSlashEscape,
   clearLiveCommandLine,
-  deleteBeforeCaret,
-  insertIntoDraft,
   onArrowDown,
   onArrowUp,
   replaceLiveCommandDraft,
   ttyArrowKeyUsesSlashSuggestionCycle,
   type InteractiveCommandInput,
 } from '../interactiveCommandInput.js'
-import {
-  RECALL_STOP_CONFIRM_YES_LINES,
-  type RecallInkConfirmChoice,
-} from '../interactions/recallYesNo.js'
-import {
-  cycleListSelectionIndex,
-  dispatchSelectListKey,
-  selectListKeyEventFromInk,
-} from '../interactions/selectListInteraction.js'
-import {
-  isCommittedInteractiveInput,
-  RECALL_SESSION_YES_NO_PLACEHOLDER,
-} from '../renderer.js'
+import { isCommittedInteractiveInput } from '../renderer.js'
 import {
   emptyCommandTurnBuffer,
   pastMessagesAppendCliAssistantBlock,
@@ -49,6 +35,7 @@ import type {
   AccessTokenListStageNavigation,
   TokenListSlashSubmitResult,
 } from './accessTokenListStage.js'
+import { cycleListSelectionIndex } from '../interactions/selectListInteraction.js'
 
 type InkKeyWithName = Key & { name?: string }
 
@@ -99,14 +86,7 @@ export function useInteractiveShellStage(
     rememberCommittedLine,
     applyAccessTokenListNavigation,
   } = shared
-  const {
-    processInput,
-    setPendingStopConfirmation,
-    isInCommandSessionSubstate,
-    exitCommandSession,
-    getPlaceholderContext,
-    getNumberedChoiceListChoices,
-  } = deps
+  const { processInput } = deps
 
   const bumpTtyContractEpoch = React.useCallback(() => {
     patch((s) => ({ ...s, ttyContractEpoch: s.ttyContractEpoch + 1 }))
@@ -137,47 +117,6 @@ export function useInteractiveShellStage(
     })
   }
 
-  const enterStopConfirmationFromEsc = (): void => {
-    setPendingStopConfirmation(true)
-    patch((s) => ({
-      ...s,
-      commandInput: clearLiveCommandLine(s.commandInput),
-    }))
-  }
-
-  async function handleStopConfirmDispatch(
-    dispatch: RecallInkConfirmChoice
-  ): Promise<void> {
-    switch (dispatch.result) {
-      case 'cancel':
-        setPendingStopConfirmation(false)
-        patch((s) => ({
-          ...s,
-          commandInput: clearLiveCommandLine(s.commandInput),
-        }))
-        break
-      case 'submit-yes':
-        setPendingStopConfirmation(false)
-        patch((s) => ({
-          ...s,
-          commandInput: clearLiveCommandLine(s.commandInput),
-          numberedChoiceHighlightIndex: 0,
-        }))
-        exitCommandSession()
-        commitHistoryOutput(RECALL_STOP_CONFIRM_YES_LINES)
-        break
-      case 'submit-no':
-        setPendingStopConfirmation(false)
-        patch((s) => ({
-          ...s,
-          commandInput: clearLiveCommandLine(s.commandInput),
-        }))
-        break
-      default:
-        break
-    }
-  }
-
   async function runProcessInputTurn(
     effectiveLine: string
   ): Promise<'exited' | 'continued'> {
@@ -191,121 +130,11 @@ export function useInteractiveShellStage(
   }
 
   function finishProcessInputTurnAfterAwait(): void {
-    const newSessionYesNo =
-      getPlaceholderContext() === RECALL_SESSION_YES_NO_PLACEHOLDER
     const latest = latestSessionRef.current
     if (latest.commandTurn.lines.length > 0) {
       commitHistoryOutput(latest.commandTurn.lines, latest.commandTurn.tone)
     }
-    if (newSessionYesNo || latest.commandTurn.lines.length === 0)
-      bumpTtyContractEpoch()
-  }
-
-  async function handleSessionYesNoDispatch(
-    dispatch: RecallInkConfirmChoice
-  ): Promise<void> {
-    switch (dispatch.result) {
-      case 'cancel':
-        break
-      case 'submit-yes':
-      case 'submit-no': {
-        const effectiveLine = dispatch.result === 'submit-yes' ? 'y' : 'n'
-        patch((s) => ({
-          ...s,
-          commandInput: clearLiveCommandLine(s.commandInput),
-          commandTurn: emptyCommandTurnBuffer(),
-        }))
-        if (isCommittedInteractiveInput(effectiveLine)) {
-          if (getPlaceholderContext() !== RECALL_SESSION_YES_NO_PLACEHOLDER) {
-            patch((s) => ({
-              ...s,
-              pastMessages: pastMessagesCommitUserLine(
-                s.pastMessages,
-                maskInteractiveInputLineForStorage(effectiveLine)
-              ),
-            }))
-            rememberCommittedLine(effectiveLine)
-          }
-          if ((await runProcessInputTurn(effectiveLine)) === 'exited') return
-        }
-        break
-      }
-      default:
-        break
-    }
-  }
-
-  async function routeRecallMcqChoicesInkStdin(
-    input: string,
-    key: Key
-  ): Promise<void> {
-    const numberedChoices = getNumberedChoiceListChoices()
-    if (numberedChoices === null) return
-    const latest = latestSessionRef.current
-
-    const ev = selectListKeyEventFromInk(
-      input,
-      key,
-      latest.commandInput.lineDraft
-    )
-    const listDispatch = dispatchSelectListKey(
-      ev,
-      latest.numberedChoiceHighlightIndex,
-      {
-        kind: 'slash-and-number-or-highlight',
-        choiceCount: numberedChoices.length,
-      },
-      'signal-escape'
-    )
-    switch (listDispatch.result) {
-      case 'escape-signaled':
-        enterStopConfirmationFromEsc()
-        break
-      case 'move-highlight':
-        patch((s) => ({
-          ...s,
-          numberedChoiceHighlightIndex: cycleListSelectionIndex(
-            s.numberedChoiceHighlightIndex,
-            listDispatch.delta,
-            numberedChoices.length
-          ),
-        }))
-        break
-      case 'submit-with-line': {
-        const effectiveInput = listDispatch.lineForProcessInput
-        const inputForHistory = latest.commandInput.lineDraft || effectiveInput
-        patch((s) => ({
-          ...s,
-          commandInput: clearLiveCommandLine(s.commandInput),
-          numberedChoiceHighlightIndex: 0,
-          commandTurn: emptyCommandTurnBuffer(),
-          pastMessages: pastMessagesCommitUserLine(
-            s.pastMessages,
-            maskInteractiveInputLineForStorage(inputForHistory)
-          ),
-        }))
-        if ((await runProcessInputTurn(effectiveInput)) === 'exited') return
-        break
-      }
-      case 'edit-backspace':
-        patch((s) => ({
-          ...s,
-          commandInput: deleteBeforeCaret(s.commandInput),
-        }))
-        break
-      case 'edit-char':
-        patch((s) => ({
-          ...s,
-          commandInput: insertIntoDraft(s.commandInput, listDispatch.char),
-        }))
-        break
-      case 'redraw':
-        bumpTtyContractEpoch()
-        break
-      default:
-        bumpTtyContractEpoch()
-        break
-    }
+    if (latest.commandTurn.lines.length === 0) bumpTtyContractEpoch()
   }
 
   async function handleCommandLineInkInput(
@@ -316,10 +145,6 @@ export function useInteractiveShellStage(
     const latest = latestSessionRef.current
 
     if (isEscapeInkKey(key) || input === '\u001b') {
-      if (isInCommandSessionSubstate()) {
-        enterStopConfirmationFromEsc()
-        return
-      }
       if (hasInteractiveSlashCompletions(latest.commandInput.lineDraft)) {
         patch((s) => {
           const lastLine = s.commandInput.lineDraft
@@ -382,23 +207,18 @@ export function useInteractiveShellStage(
 
       resetCommandTurnBuffer()
       if (isCommittedInteractiveInput(inputLine)) {
-        if (getPlaceholderContext() !== RECALL_SESSION_YES_NO_PLACEHOLDER) {
-          patch((s) => ({
-            ...s,
-            pastMessages: pastMessagesCommitUserLine(
-              s.pastMessages,
-              maskInteractiveInputLineForStorage(inputLine)
-            ),
-          }))
-          rememberCommittedLine(inputLine)
-        }
+        patch((s) => ({
+          ...s,
+          pastMessages: pastMessagesCommitUserLine(
+            s.pastMessages,
+            maskInteractiveInputLineForStorage(inputLine)
+          ),
+        }))
+        rememberCommittedLine(inputLine)
         if ((await runProcessInputTurn(inputLine)) === 'exited') return
         return
       }
 
-      if (deps.getNumberedChoiceListChoices() !== null) {
-        patch((s) => ({ ...s, numberedChoiceHighlightIndex: 0 }))
-      }
       bumpTtyContractEpoch()
     } else if (key.upArrow || key.downArrow) {
       const dir = key.upArrow ? 'up' : 'down'
@@ -488,13 +308,8 @@ export function useInteractiveShellStage(
     onFetchWaitCancel: () => {
       cancelInteractiveFetchWaitFor(ttyOutput)
     },
-    onStopConfirmResult: handleStopConfirmDispatch,
-    onSessionYesNoResult: handleSessionYesNoDispatch,
-    onRecallMcqGuidanceKey: routeRecallMcqChoicesInkStdin,
     onCommandLineKey: handleCommandLineInkInput,
     onCommandLineTyping: applyCommandLineTypingFromInk,
-    onEnterStopConfirmationFromEsc: enterStopConfirmationFromEsc,
-    whenInActiveRecallSession: isInCommandSessionSubstate,
   }
 
   return { handlers }

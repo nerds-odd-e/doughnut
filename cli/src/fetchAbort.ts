@@ -11,7 +11,7 @@ export function userAbortError(): DOMException {
 }
 
 /**
- * `fetch` / generated client: user or caller aborted the request (e.g. Esc during recall load).
+ * `fetch` / generated client: user or caller aborted the request (e.g. Esc during fetch-wait).
  * Distinct from “service unavailable” and other network failures.
  */
 export function isFetchAbortedByCaller(error: unknown): boolean {

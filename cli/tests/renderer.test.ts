@@ -11,7 +11,6 @@ import {
   formatInteractiveCommandLineInkRows,
   formatCurrentStageIndicatorLine,
   CURRENT_STAGE_BAND_BACKGROUND_SGR,
-  DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
   greyCurrentStageIndicatorLabel,
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
   GREY,
@@ -22,7 +21,7 @@ import {
   RESET,
 } from '../src/renderer.js'
 
-describe('wrapTextToVisibleWidthLines (recall MCQ stem / ANSI terminal strings)', () => {
+describe('wrapTextToVisibleWidthLines (ANSI terminal strings)', () => {
   test('wraps plain text at visible width with word break when possible', () => {
     expect(wrapTextToVisibleWidthLines('hello world', 5)).toEqual([
       'hello',
@@ -112,7 +111,7 @@ describe('needsGapBeforeLiveRegion', () => {
         [],
         [
           interactiveFetchWaitStageIndicatorLine(
-            INTERACTIVE_FETCH_WAIT_LINES.recallNext
+            INTERACTIVE_FETCH_WAIT_LINES.addAccessToken
           ),
         ]
       )
@@ -176,20 +175,20 @@ describe('formatInteractiveCommandLineInkRows', () => {
 })
 
 describe('Current Stage Indicator (band lines for Ink)', () => {
-  test('recall loading indicator is full-width band', () => {
+  test('grey stage label is full-width band', () => {
     const width = 40
     const line = formatCurrentStageIndicatorLine(
-      DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
+      greyCurrentStageIndicatorLabel('Access tokens'),
       width
     )
     expect(line).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)
-    expect(stripAnsi(line)).toMatch(/^Recalling +$/)
+    expect(stripAnsi(line)).toMatch(/^Access tokens +$/)
     expect(visibleLength(stripAnsi(line))).toBe(width)
   })
 
   test('fetch-wait indicator carries blue label and band padding', () => {
     const width = 44
-    const base = INTERACTIVE_FETCH_WAIT_LINES.recallNext
+    const base = INTERACTIVE_FETCH_WAIT_LINES.addAccessToken
     const label = interactiveFetchWaitStageIndicatorLine(base)
     const line = formatCurrentStageIndicatorLine(label, width)
     expect(line).toContain(CURRENT_STAGE_BAND_BACKGROUND_SGR)

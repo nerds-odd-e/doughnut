@@ -6,7 +6,6 @@ import type {
   AccessTokenLabel,
 } from '../commands/accessToken.js'
 import type { InteractiveCommandInput } from '../interactiveCommandInput.js'
-import type { RecallMcqChoiceTexts } from '../types.js'
 import {
   PLACEHOLDER_BY_CONTEXT,
   PROMPT,
@@ -14,7 +13,6 @@ import {
   buildCurrentPromptSeparatorForStageBand,
   formatCurrentStageIndicatorLine,
   formatInteractiveCommandLineInkRows,
-  formatMcqChoiceLinesWithIndices,
   stripAnsi,
   type PlaceholderContext,
   type TerminalWidth,
@@ -26,7 +24,7 @@ import { PatchedTextInput } from './PatchedTextInput.js'
 export const COMMAND_LINE_INK_FOCUS_ID = 'command-line'
 
 /**
- * Recall MCQ + access-token list: `dispatchSelectListKey` on stdin; logical byte coalescing
+ * Access-token list: `dispatchSelectListKey` on stdin; logical byte coalescing
  * (`eachLogicalInkStdinChunk`). String value is the stable Ink `useFocus` id.
  */
 export const LIST_SELECTION_INK_FOCUS_ID = 'live-selection-guidance'
@@ -58,8 +56,7 @@ type ListSelectionLiveColumnProps = Omit<
   LiveColumnInkPanelProps,
   'focusId' | 'stdinPolicy'
 > & {
-  /** MCQ vs token list: different `PLACEHOLDER_BY_CONTEXT` for the live strip. */
-  placeholderContext: 'recallMcq' | 'tokenList'
+  placeholderContext: 'tokenList'
 }
 
 function ListSelectionLiveColumn(props: ListSelectionLiveColumnProps) {
@@ -304,65 +301,6 @@ export function CommandLineLivePanel({
       onInterrupt={onInterrupt}
       commandInput={commandInput}
       onCommandLineTyping={onCommandLineTyping}
-      aboveCommandLine={aboveCommandLine}
-      guidance={guidance}
-    />
-  )
-}
-
-type RecallMcqChoicesLivePanelProps = {
-  stageIndicatorLine: string
-  currentPromptLines: string[]
-  choices: RecallMcqChoiceTexts
-  highlightIndex: number
-  lineDraft: string
-  caretOffset: number
-  width: TerminalWidth
-  onInterrupt: () => void
-  onGuidanceListKey: (input: string, key: Key) => void | Promise<void>
-}
-
-export function RecallMcqChoicesLivePanel({
-  stageIndicatorLine,
-  currentPromptLines,
-  choices,
-  highlightIndex,
-  lineDraft,
-  caretOffset,
-  width,
-  onInterrupt,
-  onGuidanceListKey,
-}: RecallMcqChoicesLivePanelProps) {
-  const { lines, itemIndexPerLine } = formatMcqChoiceLinesWithIndices(
-    choices,
-    width
-  )
-  const stageIndicatorLines = stageIndicatorLine ? [stageIndicatorLine] : []
-  const aboveCommandLine = (
-    <LiveColumnPromptBlock
-      width={width}
-      stageIndicatorLines={stageIndicatorLines}
-      currentPromptLines={currentPromptLines}
-      includeSeparatorWithoutStage={false}
-      tone="grey"
-      stripPromptAnsi={true}
-    />
-  )
-
-  const guidance = lines.map((line, i) => (
-    <Text key={i} inverse={itemIndexPerLine[i] === highlightIndex}>
-      {stripAnsi(line)}
-    </Text>
-  ))
-
-  return (
-    <ListSelectionLiveColumn
-      width={width}
-      buffer={lineDraft}
-      caretOffset={caretOffset}
-      placeholderContext="recallMcq"
-      onInkKey={onGuidanceListKey}
-      onInterrupt={onInterrupt}
       aboveCommandLine={aboveCommandLine}
       guidance={guidance}
     />

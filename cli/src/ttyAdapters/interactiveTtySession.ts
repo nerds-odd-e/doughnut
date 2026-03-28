@@ -13,7 +13,7 @@
  * 3. **Exit path** — farewell lines, Ctrl+C newline before exit (`interactiveTtyStdout.exitFarewellBlock`, `ctrlCExitNewline`).
  * 4. **Pre-Ink banner** — `process.stdout.write` for version lines before `render()` (below).
  * 5. **`patchConsole`** — enabled when `console.Console` is constructible; off under Vitest `spyOn(console, …)` (`inkPatchConsoleSupported`).
- * 6. **readline `keypress`** — **Ctrl+C** (exit before Ink) only. Fetch-wait **Esc** is Ink `useInput` in `FetchWaitDisplay`. Token-list Esc is Ink-owned. **Do not** handle MCQ Esc on readline (duplicate / wrong ordering).
+ * 6. **readline `keypress`** — **Ctrl+C** (exit before Ink) only. Fetch-wait **Esc** is Ink `useInput` in `FetchWaitDisplay`. Token-list Esc is Ink-owned.
  *
  * **`InteractiveAppTerminalContract`** is the only path from **`ui/interactiveApp.tsx`** to TTY bytes, cursor, and OSC — the UI package does not import `interactiveTtyStdout` or call `process.stdout.write` for shell chrome.
  */
@@ -170,8 +170,7 @@ export function runInteractiveTtySession(
   /**
    * Readline `emitKeypressEvents` runs alongside Ink on the same stdin. Ink owns typing, list keys,
    * fetch-wait Esc (`FetchWaitDisplay`), and token-list Esc (list-selection live column). This
-   * listener is **Ctrl+C** (exit before Ink) only. Do not add MCQ Esc here: a late readline
-   * `escape` after Ink already handled it can duplicate stop-confirm behavior.
+   * listener is **Ctrl+C** (exit before Ink) only.
    */
   stdin.on('keypress', (_str, key: ReadlineKey) => {
     if (key.ctrl && key.name === 'c') {

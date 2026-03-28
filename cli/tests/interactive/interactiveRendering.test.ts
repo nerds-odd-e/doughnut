@@ -97,17 +97,6 @@ describe('buildCommandInputDraftLines', () => {
     expect(lines[0]).toContain('`exit` to quit.')
   })
 
-  test.each([
-    ['recallMcq', '↑↓ Enter or number to select; Esc to cancel'],
-    ['recallStopConfirmation', 'y or n; Esc to go back'],
-    ['recallYesNo', 'y or n; /stop to exit recall'],
-  ] as const)('placeholderContext %s shows correct placeholder', (ctx, phrase) => {
-    const lines = buildCommandInputDraftLines('', 80, {
-      placeholderContext: ctx,
-    })
-    expect(lines[0]).toContain(phrase)
-  })
-
   test('long token-list placeholder truncates to terminal width with ellipsis', () => {
     const width = 25
     const row = formatInteractiveCommandLineInkRows('', width, 0, {
@@ -119,8 +108,8 @@ describe('buildCommandInputDraftLines', () => {
 })
 
 describe('buildSuggestionLinesForInk', () => {
-  test('with /rec, returns non-empty completion rows (Ink wraps to terminal width)', () => {
-    const lines = buildSuggestionLinesForInk('/rec', 0)
+  test('with /list, returns non-empty completion rows (Ink wraps to terminal width)', () => {
+    const lines = buildSuggestionLinesForInk('/list', 0)
     expect(lines.length).toBeGreaterThan(0)
     expect(lines.some((l) => l.endsWith('...'))).toBe(false)
   })

@@ -1,16 +1,13 @@
 import React from 'react'
 import type { Key } from 'ink'
 import { Box, Newline, Static, Text } from 'ink'
-import type { RecallInkConfirmChoice } from '../interactions/recallYesNo.js'
 import type { InteractiveCommandInput } from '../interactiveCommandInput.js'
 import {
   applyCliAssistantMessageTone,
   buildSuggestionLinesForInk,
-  DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
   formatCurrentStageIndicatorLine,
   getTerminalWidth,
   greyCurrentStageIndicatorLabel,
-  RECALL_SESSION_YES_NO_PLACEHOLDER,
   interactiveFetchWaitStageIndicatorLine,
   needsGapBeforeLiveRegion,
   renderPastUserMessage,
@@ -31,22 +28,16 @@ import {
   type InteractiveFetchWaitLine,
 } from '../interactiveFetchWait.js'
 import type { AccessTokenPickerCommandConfig, PastMessage } from '../types.js'
-import { RecallInkConfirmPanel } from './RecallInkConfirmPanel.js'
 import { FetchWaitDisplay } from './FetchWaitDisplay.js'
 import {
   AccessTokenPickerLivePanel,
   CommandLineLivePanel,
-  RecallMcqChoicesLivePanel,
 } from './liveColumnInk.js'
 
 export function isInkSubmitPressed(key: Key, input: string): boolean {
   return key.return || input === '\n' || input === '\r'
 }
 
-/**
- * Stage band + wrapped **Current prompt** copy (above the command line). Used for past-messages gap
- * and passed through to the default command-line Ink panel.
- */
 type LiveColumnLeadingSnapshot = {
   terminalWidth: TerminalWidth
   placeholderContext: PlaceholderContext
@@ -54,24 +45,19 @@ type LiveColumnLeadingSnapshot = {
   currentStageIndicatorLines: string[]
 }
 
-/** Default live column only: {@link LiveColumnLeadingSnapshot} + **Current guidance** rows. */
 type DefaultCommandLineInkLayout = LiveColumnLeadingSnapshot & {
   currentGuidanceLines: string[]
 }
 
 function currentStageIndicatorLinesForLiveRegion(
   waitLine: InteractiveFetchWaitLine | null,
-  tokenPicker: AccessTokenPickerCommandConfig | undefined,
-  sessionPayloadLoading: boolean
+  tokenPicker: AccessTokenPickerCommandConfig | undefined
 ): string[] {
   if (waitLine != null) {
     return [interactiveFetchWaitStageIndicatorLine(waitLine)]
   }
   if (tokenPicker != null) {
     return [greyCurrentStageIndicatorLabel(tokenPicker.stageIndicator)]
-  }
-  if (sessionPayloadLoading) {
-    return [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
   }
   return []
 }
@@ -82,11 +68,6 @@ function computeLiveColumnLeadingSnapshot(
 ): LiveColumnLeadingSnapshot {
   const terminalWidth = getTerminalWidth()
   const placeholderContext = deps.getPlaceholderContext()
-  const stopRecallConfirm = deps.isPendingStopConfirmation()
-    ? deps.getRecallStopConfirmInkModel(placeholderContext)
-    : null
-  const recallQuestionPromptLines =
-    deps.getRecallCurrentPromptWrappedLines(terminalWidth)
   const waitLine = getInteractiveFetchWaitLine()
   const tokenListConfig = tokenSelection
     ? TOKEN_LIST_COMMANDS[tokenSelection.command]
@@ -94,16 +75,9 @@ function computeLiveColumnLeadingSnapshot(
   let currentPromptWrappedLines: string[]
   if (waitLine) {
     currentPromptWrappedLines = []
-  } else if (stopRecallConfirm) {
-    currentPromptWrappedLines = [...stopRecallConfirm.promptLines]
   } else {
     const currentPromptText = tokenListConfig?.currentPrompt
-    if (
-      recallQuestionPromptLines !== null &&
-      !deps.isPendingStopConfirmation()
-    ) {
-      currentPromptWrappedLines = recallQuestionPromptLines
-    } else if (currentPromptText) {
+    if (currentPromptText) {
       currentPromptWrappedLines = wrapTextToVisibleWidthLines(
         currentPromptText,
         terminalWidth
@@ -114,8 +88,7 @@ function computeLiveColumnLeadingSnapshot(
   }
   const currentStageIndicatorLines = currentStageIndicatorLinesForLiveRegion(
     waitLine,
-    tokenListConfig,
-    deps.isInCommandSessionSubstate()
+    tokenListConfig
   )
   return {
     terminalWidth,
@@ -128,14 +101,9 @@ function computeLiveColumnLeadingSnapshot(
 export type ShellSessionInkHandlers = {
   onInterrupt: () => void
   onFetchWaitCancel: () => void
-  onStopConfirmResult: (d: RecallInkConfirmChoice) => Promise<void>
-  onSessionYesNoResult: (d: RecallInkConfirmChoice) => Promise<void>
-  onRecallMcqGuidanceKey: (input: string, key: Key) => Promise<void>
   onTokenPickerGuidanceKey: (input: string, key: Key) => Promise<void>
   onCommandLineKey: (input: string, key: Key) => Promise<void>
   onCommandLineTyping: (next: InteractiveCommandInput) => void
-  onEnterStopConfirmationFromEsc: () => void
-  whenInActiveRecallSession: () => boolean
 }
 
 function PastMessageBlock({
@@ -171,7 +139,6 @@ function PastMessageBlock({
 
 function buildLivePanel(
   session: ShellSessionState,
-  deps: InteractiveShellDeps,
   tokenSelection: TokenSelectionState | null,
   defaultCommandLineLayout: DefaultCommandLineInkLayout,
   handlers: ShellSessionInkHandlers
@@ -181,60 +148,6 @@ function buildLivePanel(
     return React.createElement(FetchWaitDisplay, {
       waitLine,
       onCancelWait: handlers.onFetchWaitCancel,
-    })
-  }
-  if (deps.isPendingStopConfirmation()) {
-    const placeholderCtx = deps.getPlaceholderContext()
-    const model = deps.getRecallStopConfirmInkModel(placeholderCtx)
-    const stageLines = deps.isInCommandSessionSubstate()
-      ? [DEFAULT_RECALL_LOADING_STAGE_INDICATOR]
-      : []
-    return React.createElement(RecallInkConfirmPanel, {
-      key: 'confirm-stop-recall',
-      variant: 'stop-recall',
-      guidanceLines: [
-        ...stageLines,
-        ...model.promptLines,
-        ...model.confirmQuestionLines,
-      ],
-      placeholderText: model.placeholder,
-      onInterrupt: handlers.onInterrupt,
-      onResult: (d) => handlers.onStopConfirmResult(d),
-    })
-  }
-  if (deps.getPlaceholderContext() === RECALL_SESSION_YES_NO_PLACEHOLDER) {
-    return React.createElement(RecallInkConfirmPanel, {
-      key: 'confirm-session-yes-no',
-      variant: 'in-session',
-      guidanceLines: deps.getRecallSessionYesNoInkGuidanceLines(),
-      placeholderText: 'y or n; /stop to exit recall',
-      whenInActiveRecallSession: handlers.whenInActiveRecallSession,
-      onEscapeOpensStopRecallSheet: handlers.onEnterStopConfirmationFromEsc,
-      onInterrupt: handlers.onInterrupt,
-      onResult: (d) => handlers.onSessionYesNoResult(d),
-    })
-  }
-  const numberedChoices = deps.getNumberedChoiceListChoices()
-  if (numberedChoices !== null) {
-    const width = getTerminalWidth()
-    const promptLines = deps.getRecallCurrentPromptWrappedLines(width) ?? []
-    const recallStageLine = formatCurrentStageIndicatorLine(
-      DEFAULT_RECALL_LOADING_STAGE_INDICATOR,
-      width
-    )
-    return React.createElement(RecallMcqChoicesLivePanel, {
-      stageIndicatorLine: recallStageLine,
-      currentPromptLines: promptLines,
-      choices: numberedChoices,
-      highlightIndex: session.numberedChoiceHighlightIndex,
-      lineDraft: session.commandInput.lineDraft,
-      caretOffset: session.commandInput.caretOffset,
-      width,
-      onInterrupt: handlers.onInterrupt,
-      onGuidanceListKey: (inp, ky) =>
-        Promise.resolve(handlers.onRecallMcqGuidanceKey(inp, ky)).catch(
-          () => undefined
-        ),
     })
   }
   if (tokenSelection) {
@@ -315,7 +228,6 @@ export function ShellSessionRoot({
   }
   const livePanel = buildLivePanel(
     session,
-    deps,
     tokenSelection,
     defaultCommandLineLayout,
     handlers

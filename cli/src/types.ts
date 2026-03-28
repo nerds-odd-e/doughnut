@@ -1,40 +1,4 @@
-import type {
-  MemoryTrackerLite,
-  MultipleChoicesQuestion,
-  RecallPrompt,
-} from 'doughnut-api'
-
-/** Choice strings from a recall multiple-choice prompt (API payload; may embed line breaks). */
-export type RecallMcqChoiceTexts = Readonly<
-  MultipleChoicesQuestion['f1__choices']
->
-
-/** User is answering a multiple-choice recall question (choices in Current guidance; TTY stem in Current prompt). */
-export type McqRecallPending = {
-  recallPromptId: RecallPrompt['id']
-  choices: RecallMcqChoiceTexts
-  /** Stem with markdown applied for the terminal (may include ANSI SGR). */
-  stemRenderedForTerminal: string
-  /** Resolved notebook name; first Current prompt line is emoji + this title. */
-  notebookTitle: string
-  shownAt: number
-}
-
-/** Just-review step: user answers y/n on whether they remember the note. */
-export type RecallJustReviewPending = Required<
-  Pick<MemoryTrackerLite, 'memoryTrackerId'>
->
-
-/** What recall is waiting for next, if anything. */
-export type PendingRecallAnswer =
-  | RecallJustReviewPending
-  | McqRecallPending
-  | null
-
-/**
- * Styling for one **past CLI assistant message** block (Ink `Static` item).
- * `userNotice` = user cancelled a wait or left a picker — not an application failure.
- */
+/** Styling for one **past CLI assistant message** block (Ink `Static` item). */
 export type CliAssistantMessageTone = 'plain' | 'error' | 'userNotice'
 
 /** One **past user message** in the transcript (what they typed; masked before append when required). */
@@ -74,21 +38,16 @@ export type OutputAdapter = {
   /** Optional: user-facing notice (e.g. cancelled wait); TTY paints as distinct tone on CLI assistant messages. */
   logUserNotice?: (msg: string) => void
   /**
-   * Optional: short prompts (e.g. "Please answer y or n"). For non-TTY MCQ recall, notebook line then stem
-   * are sent here; numbered choices and the "Enter your choice" line use `log`. Defaults to log.
-   * On TTY, MCQ stem and notebook line are part of the **Current prompt** live region (above the input box),
-   * not **Current guidance**; recall loading uses a separate **Current Stage Indicator** line there.
+   * Optional: short prompts. Defaults to `log`.
    */
   writeCurrentPrompt?: (msg: string) => void
   /**
    * TTY only: starts a turn whose **Current prompt** block (optional **Current Stage Indicator**, separator,
-   * wrapped lines) and input box are painted in the live region. When unset, non-TTY MCQ uses `writeCurrentPrompt` / `log` instead.
+   * wrapped lines) and input box are painted in the live region.
    */
   beginCurrentPrompt?: () => void
   /**
    * TTY only: invoked when interactive fetch-wait starts or finishes (see `runInteractiveFetchWait`).
-   * On start: repaint live region (Ink `Spinner` animates in `FetchWaitDisplay`). On end: discard line draft typed during the
-   * grey disabled input box, reset `/` command-picker highlight state, repaint.
    */
   onInteractiveFetchWaitChanged?: () => void
 }
