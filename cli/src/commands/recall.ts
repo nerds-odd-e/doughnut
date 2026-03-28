@@ -244,10 +244,4 @@ export const recallCommandDocs = [
     description: 'Recall all due notes in a session',
     category: 'interactive' as const,
   },
-  {
-    name: '/recall-status',
-    usage: '/recall-status',
-    description: 'Show how many notes to recall today',
-    category: 'interactive' as const,
-  },
 ]

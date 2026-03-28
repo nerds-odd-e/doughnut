@@ -7,7 +7,6 @@ import type { OutputAdapter } from './types.js'
 export const INTERACTIVE_FETCH_WAIT_LINES = {
   recallNext: 'Loading recall questions',
   contest: 'Regenerating question',
-  recallStatus: 'Loading recall status',
   addAccessToken: 'Adding access token',
   createAccessToken: 'Creating access token',
   removeAccessTokenCompletely: 'Removing access token',

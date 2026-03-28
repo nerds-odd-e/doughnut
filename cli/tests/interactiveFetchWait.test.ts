@@ -21,9 +21,8 @@ import {
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
 } from '../src/renderer.js'
 
-const { mockRecallNext, mockRecallStatus } = vi.hoisted(() => ({
+const { mockRecallNext } = vi.hoisted(() => ({
   mockRecallNext: vi.fn(),
-  mockRecallStatus: vi.fn(),
 }))
 const { mockAddAccessToken } = vi.hoisted(() => ({
   mockAddAccessToken: vi.fn(),
@@ -34,7 +33,6 @@ vi.mock('../src/commands/recall.js', async (importOriginal) => {
   return {
     ...actual,
     recallNext: mockRecallNext,
-    recallStatus: mockRecallStatus,
   }
 })
 vi.mock('../src/commands/accessToken.js', async (importOriginal) => {
@@ -54,7 +52,6 @@ function minimalOutputAdapter() {
 beforeEach(() => {
   resetRecallStateForTesting()
   mockRecallNext.mockReset()
-  mockRecallStatus.mockReset()
   mockAddAccessToken.mockReset()
 })
 
@@ -100,10 +97,10 @@ describe('interactive fetch wait UI', () => {
     expect(
       stripAnsi(
         interactiveFetchWaitStageIndicatorLine(
-          INTERACTIVE_FETCH_WAIT_LINES.recallStatus
+          INTERACTIVE_FETCH_WAIT_LINES.addAccessToken
         )
       )
-    ).toContain(INTERACTIVE_FETCH_WAIT_LINES.recallStatus)
+    ).toContain(INTERACTIVE_FETCH_WAIT_LINES.addAccessToken)
   })
 
   test('processInput /recall: rejected recallNext surfaces logError', async () => {
@@ -111,13 +108,6 @@ describe('interactive fetch wait UI', () => {
     const out = minimalOutputAdapter()
     await processInput('/recall', out)
     expect(out.logError).toHaveBeenCalled()
-  })
-
-  test('processInput /recall-status resolves and logs status text', async () => {
-    mockRecallStatus.mockResolvedValueOnce('2 notes to recall today')
-    const out = minimalOutputAdapter()
-    await processInput('/recall-status', out)
-    expect(out.log).toHaveBeenCalledWith('2 notes to recall today')
   })
 
   test('processInput /add-access-token passes AbortSignal and logs Token added', async () => {

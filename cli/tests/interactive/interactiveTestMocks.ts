@@ -7,13 +7,11 @@ export const interactiveHelpMockState = {
 
 const {
   mockRecallNext,
-  mockRecallStatus,
   mockAnswerQuiz,
   mockMarkAsRecalled,
   mockContestAndRegenerate,
 } = vi.hoisted(() => ({
   mockRecallNext: vi.fn(),
-  mockRecallStatus: vi.fn(),
   mockAnswerQuiz: vi.fn(),
   mockMarkAsRecalled: vi.fn(),
   mockContestAndRegenerate: vi.fn(),
@@ -22,13 +20,9 @@ const {
 vi.mock('../../src/commands/recall.js', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('../../src/commands/recall.js')>()
-  mockRecallStatus.mockImplementation((signal?: AbortSignal) =>
-    actual.recallStatus(signal)
-  )
   return {
     ...actual,
     recallNext: mockRecallNext,
-    recallStatus: mockRecallStatus,
     answerQuiz: mockAnswerQuiz,
     markAsRecalled: mockMarkAsRecalled,
     contestAndRegenerate: mockContestAndRegenerate,

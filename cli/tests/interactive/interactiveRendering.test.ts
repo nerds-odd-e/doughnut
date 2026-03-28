@@ -125,8 +125,11 @@ describe('buildSuggestionLinesForInk', () => {
     expect(lines.some((l) => l.endsWith('...'))).toBe(false)
   })
 
-  test('with /recall-status prefix, returns rows without string-level ellipsis', () => {
-    const lines = buildSuggestionLinesForInk('/recall-status', 0)
+  test('with /remove-access-token-completely prefix, returns rows without string-level ellipsis', () => {
+    const lines = buildSuggestionLinesForInk(
+      '/remove-access-token-completely',
+      0
+    )
     expect(lines.length).toBeGreaterThan(0)
     expect(lines.some((l) => l.includes('...'))).toBe(false)
   })

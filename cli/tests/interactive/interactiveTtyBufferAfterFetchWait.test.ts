@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
-import { mockRecallStatus } from './interactiveRecallMockAccess.js'
+import { mockRecallNext } from './interactiveRecallMockAccess.js'
 import { resetRecallStateForTesting } from '../../src/interactive.js'
 import { stripAnsi } from '../../src/renderer.js'
 import {
@@ -18,11 +18,18 @@ describe('TTY: line draft must not survive interactive fetch wait', () => {
 
   beforeEach(async () => {
     resetRecallStateForTesting()
-    mockRecallStatus.mockReset()
-    mockRecallStatus.mockImplementation(
+    mockRecallNext.mockReset()
+    mockRecallNext.mockImplementation(
       () =>
         new Promise((resolve) =>
-          setTimeout(() => resolve('0 notes to recall today'), 120)
+          setTimeout(
+            () =>
+              resolve({
+                type: 'none',
+                message: '0 notes to recall today',
+              } as const),
+            120
+          )
         )
     )
     ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
@@ -33,18 +40,18 @@ describe('TTY: line draft must not survive interactive fetch wait', () => {
     const actual = await vi.importActual<
       typeof import('../../src/commands/recall.js')
     >('../../src/commands/recall.js')
-    mockRecallStatus.mockImplementation((signal?: AbortSignal) =>
-      actual.recallStatus(signal)
+    mockRecallNext.mockImplementation((due, signal) =>
+      actual.recallNext(due, signal)
     )
   })
 
-  test('after /recall-status completes, typed keys during grey wait must not leave a visible draft', async () => {
-    await submitTTYCommand(stdin, '/recall-status')
+  test('after /recall completes, typed keys during grey wait must not leave a visible draft', async () => {
+    await submitTTYCommand(stdin, '/recall')
     typeString(stdin, 'leaked-draft-xyz')
     await tick()
 
     await vi.waitFor(() =>
-      expect(ttyOutput(writeSpy)).toContain('0 notes to recall today')
+      expect(ttyOutput(writeSpy)).toContain('Load more from next 3 days')
     )
 
     expect(stripAnsi(ttyOutput(writeSpy))).not.toContain('leaked-draft')

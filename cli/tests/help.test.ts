@@ -19,7 +19,6 @@ describe('formatHelp', () => {
     expect(output).toContain('/help')
     expect(output).toContain('/add gmail')
     expect(output).toContain('/last email')
-    expect(output).toContain('/recall-status')
     expect(output).toContain('/recall')
     expect(output).toContain('exit')
   })
@@ -31,7 +30,6 @@ describe('formatHelp', () => {
     expect(output).toContain('List available commands')
     expect(output).toContain('Add Gmail account via OAuth')
     expect(output).toContain('Show subject of last email')
-    expect(output).toContain('Show how many notes to recall today')
     expect(output).toContain('Recall all due notes in a session')
     expect(output).toContain('Quit the CLI')
   })
@@ -63,22 +61,16 @@ describe('filterCommandsByPrefix', () => {
       description: 'Recall',
       category: 'interactive',
     },
-    {
-      name: 'recall-status',
-      usage: '/recall-status',
-      description: 'Recall status',
-      category: 'interactive',
-    },
   ]
 
   test('matches from beginning', () => {
     const result = filterCommandsByPrefix(commands, '/recall')
-    expect(result.map((c) => c.usage)).toEqual(['/recall', '/recall-status'])
+    expect(result.map((c) => c.usage)).toEqual(['/recall'])
   })
 
   test('matches anywhere with beginning prioritized', () => {
     const result = filterCommandsByPrefix(commands, 'recall')
-    expect(result.map((c) => c.usage)).toEqual(['/recall', '/recall-status'])
+    expect(result.map((c) => c.usage)).toEqual(['/recall'])
   })
 
   test('prioritizes beginning match over substring match', () => {
@@ -97,7 +89,7 @@ describe('filterCommandsByPrefix', () => {
 
   test('empty prefix returns all commands', () => {
     const result = filterCommandsByPrefix(commands, '')
-    expect(result).toHaveLength(4)
+    expect(result).toHaveLength(3)
   })
 
   test('no match returns empty array', () => {
@@ -140,17 +132,17 @@ describe('getTabCompletion', () => {
     })
   })
 
-  test('/rec completes to common prefix /recall for recall and recall-status', () => {
+  test('/rec completes to /recall with trailing space', () => {
     expect(getTabCompletion('/rec', interactiveDocs)).toEqual({
-      completed: '/recall',
-      count: 2,
+      completed: '/recall ',
+      count: 1,
     })
   })
 
-  test('/recall with multiple matches returns buffer unchanged', () => {
+  test('/recall completes to /recall with trailing space', () => {
     expect(getTabCompletion('/recall', interactiveDocs)).toEqual({
-      completed: '/recall',
-      count: 2,
+      completed: '/recall ',
+      count: 1,
     })
   })
 

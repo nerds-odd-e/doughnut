@@ -16,7 +16,6 @@ import {
   formatRecallNotebookCurrentPromptLine,
   markAsRecalled,
   recallNext,
-  recallStatus,
   resolveRecallNotebookTitle,
   type RecallNextResult,
 } from './commands/recall.js'
@@ -536,19 +535,6 @@ export async function processInput(
       pendingRecallAnswer = null
       if (recallSessionMode)
         await continueRecallSession(false, output, writeCurrentPrompt)
-    }
-    return false
-  }
-  if (trimmed === '/recall-status') {
-    try {
-      const message = await runInteractiveFetchWait(
-        output,
-        INTERACTIVE_FETCH_WAIT_LINES.recallStatus,
-        (signal) => recallStatus(signal)
-      )
-      output.log(message)
-    } catch (err) {
-      logCancelledOrError(err, output)
     }
     return false
   }

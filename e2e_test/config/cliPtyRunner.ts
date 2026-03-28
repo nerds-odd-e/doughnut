@@ -42,7 +42,6 @@ const FETCH_WAIT_TAIL_WINDOW_CHARS = 12_000
 const INTERACTIVE_FETCH_WAIT_SNIPPETS = [
   'Loading recall questions',
   'Regenerating question',
-  'Loading recall status',
   'Adding access token',
   'Creating access token',
   'Removing access token',
