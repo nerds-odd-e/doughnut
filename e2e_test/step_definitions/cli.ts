@@ -24,3 +24,12 @@ Then(
   'I should see {string} in the non-interactive output',
   (expected: string) => cli.nonInteractiveOutput().expectContains(expected)
 )
+
+When('I run the installed doughnut command in interactive mode', () =>
+  cli.installation().runInteractiveMode()
+)
+
+Then(
+  'I should see {string} in past CLI assistant messages',
+  (expected: string) => cli.pastCliAssistantMessages().expectContains(expected)
+)

@@ -28,7 +28,7 @@ Expect **one** scenario (interactive install). Failure should say **why** the PT
 
 **Deliverables**
 
-- Cypress task **`runInstalledCliInteractive`**: spawn `node <installed doughnutPath>` with **no args**, **PTY** (`node-pty`), merge env with `cliEnv()` (`e2e_test/config/cliEnv.ts`), capture output for a bounded time or until process exit, then **kill** if still running so Cypress does not hang.
+- Cypress task **`runInstalledCliInteractive`**: spawn `node <installed doughnutPath>` with **no args**, **PTY** (**`@lydell/node-pty`** — same API as `node-pty`, platform prebuilds via optional deps), merge env with `cliEnv()` (`e2e_test/config/cliEnv.ts`), capture output for a bounded time or until process exit, then **kill** if still running so Cypress does not hang.
 - Page object: **`installation().runInteractiveMode()`** → task → alias **`@cliInteractivePtyOutput`**.
 - Centralized assertion: **`Then I should see {string} in past CLI assistant messages`** — search **ANSI-stripped** transcript; on miss, throw with **expected substring**, **length**, and a **truncated preview** (empty transcript called out explicitly).
 - Step: **`When I run the installed doughnut command in interactive mode`** → `runInteractiveMode()` only.

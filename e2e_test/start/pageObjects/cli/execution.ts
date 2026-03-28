@@ -29,6 +29,13 @@ function installation() {
         }).as('doughnutOutput')
       })
     },
+    runInteractiveMode() {
+      cy.get<string>('@doughnutPath').then((doughnutPath) => {
+        cy.task<string>('runInstalledCliInteractive', { doughnutPath }).as(
+          'cliInteractivePtyOutput'
+        )
+      })
+    },
   }
 }
 

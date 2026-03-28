@@ -14,8 +14,9 @@ Feature: CLI install and run
   Scenario: Install and run the CLI in interactive mode
     When I run the installed doughnut command in interactive mode
     Then I should see "doughnut 0.1.0" in past CLI assistant messages
-    When I enter "exit" in the interactive CLI
-    And I should see "exit" in past user messages
+    # Phase 2: uncomment when /exit E2E is ready
+    # When I enter the slash command "/exit" in the interactive CLI
+    # And I should see "/exit" in past user messages
 
   Scenario: Update from 0.1.0 to 0.2.0
     Given the backend serves the CLI with version "0.2.0"

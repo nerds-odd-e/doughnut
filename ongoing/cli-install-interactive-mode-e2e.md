@@ -61,7 +61,7 @@ And I should see "/exit" in past user messages
 
 **E2E (moved forward from the old “Phase 3/4” split):**
 
-- Add a Cypress `task` that spawns **`node <installed doughnutPath>`** with **no args** over a **PTY** (e.g. `node-pty` or equivalent — native addon / ABI: pin and document).
+- Add a Cypress `task` that spawns **`node <installed doughnutPath>`** with **no args** over a **PTY** (e.g. **`@lydell/node-pty`** — prebuilt per platform, same API as `node-pty`).
 - Pass env via existing `cliEnv()` (`e2e_test/config/cliEnv.ts`).
 - Thin step + page object: **`When I run the installed doughnut command in interactive mode`** → task + alias for captured PTY output / session handle.
 - Centralized assertion layer: **`Then I should see … in past CLI assistant messages`** for this scenario (smallest parser that can find the version line in visible transcript; roadmap §9). Add **minimal** failure diagnostics if cheap (roadmap §10.2).

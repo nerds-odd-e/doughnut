@@ -1,4 +1,7 @@
-import { nonInteractiveOutput } from './outputAssertions'
+import {
+  nonInteractiveOutput,
+  pastCliAssistantMessages,
+} from './outputAssertions'
 import { installation } from './execution'
 import { backend } from './backend'
 
@@ -10,6 +13,7 @@ import { backend } from './backend'
  */
 export const cli = {
   nonInteractiveOutput,
+  pastCliAssistantMessages,
   installation,
   backend,
 }

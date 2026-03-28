@@ -19,6 +19,12 @@ type RunInstalledCliTask = WithOptionalCliEnv & {
   args?: string[]
 }
 
+type RunInstalledCliInteractiveTask = WithOptionalCliEnv & {
+  doughnutPath: string
+}
+
+const INTERACTIVE_PTY_CAPTURE_MS = 8000
+
 async function bundleCliE2eInstallOrThrow(
   repoRoot: string,
   env?: NodeJS.ProcessEnv
@@ -104,6 +110,53 @@ export function createCliE2ePluginTasks(repoRoot: string) {
         })
         proc.on('error', reject)
       })
+    },
+    async runInstalledCliInteractive({
+      doughnutPath,
+      env,
+    }: RunInstalledCliInteractiveTask): Promise<string> {
+      if (!doughnutPath) {
+        throw new Error(
+          `runInstalledCliInteractive: doughnutPath required, got ${JSON.stringify(doughnutPath)}`
+        )
+      }
+      if (!existsSync(doughnutPath)) {
+        throw new Error(
+          `runInstalledCliInteractive: doughnut binary not found at ${doughnutPath}. Ensure prior install step succeeded.`
+        )
+      }
+      const cwd = dirname(doughnutPath)
+      const { spawn } = await import('@lydell/node-pty')
+      const p = spawn(process.execPath, [doughnutPath], {
+        name: 'xterm-256color',
+        cols: 120,
+        rows: 32,
+        cwd,
+        env: { ...process.env, ...cliEnv(env) },
+      })
+      let output = ''
+      p.onData((data: string) => {
+        output += data
+      })
+      await new Promise<void>((resolve) => {
+        let settled = false
+        const finish = () => {
+          if (settled) return
+          settled = true
+          resolve()
+        }
+        const timer = setTimeout(finish, INTERACTIVE_PTY_CAPTURE_MS)
+        p.onExit(() => {
+          clearTimeout(timer)
+          finish()
+        })
+      })
+      try {
+        p.kill()
+      } catch {
+        /* already exited */
+      }
+      return output
     },
   }
 }
