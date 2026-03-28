@@ -30,6 +30,12 @@ cli/
 | Format | `pnpm cli:format` |
 | Lint | `pnpm cli:lint` |
 
+## Architecture Roadmap
+
+The archittecture roadmap can be found at ongoing/cli-architecture-roadmap.md
+
+The roadmap services as a guideline for growing the architecture. It is not for immediately direct implimentation. The architecture part is only applied and must be apppled when a feature requires it. The decision should be challenged before followed. It also need to be updated with new decision and the visionary part of it should be continously refined with latest understanding.
+
 ## Terminal column width (TTY layout)
 
 **Do not use** JavaScript string `.length` or UTF-16 code units to measure how wide text is on screen. Terminals use **column count**: CJK and many emoji render as **2 columns**; grapheme clusters (flags, ZWJ families, text + VS16) must be measured as units.
