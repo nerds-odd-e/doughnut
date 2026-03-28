@@ -8,7 +8,6 @@ import {
   type TokenConfigDto,
 } from 'doughnut-api'
 import { getConfigDir } from '../configDir.js'
-import { isFetchAbortedByCaller } from '../fetchAbort.js'
 
 /**
  * For every call to the generated Doughnut HTTP client that runs inside
@@ -196,6 +195,19 @@ function loadConfig(): AccessTokenConfig {
   } catch {
     return { tokens: [] }
   }
+}
+
+/**
+ * `fetch` / generated client: user or caller aborted the request (e.g. Esc during fetch-wait).
+ * Distinct from “service unavailable” and other network failures.
+ */
+function isFetchAbortedByCaller(error: unknown): boolean {
+  return (
+    (typeof DOMException !== 'undefined' &&
+      error instanceof DOMException &&
+      error.name === 'AbortError') ||
+    (error instanceof Error && error.name === 'AbortError')
+  )
 }
 
 async function withBackendClient<T>(
