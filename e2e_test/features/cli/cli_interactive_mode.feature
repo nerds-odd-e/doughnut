@@ -8,6 +8,7 @@ Feature: CLI interactive mode
     Then I should see "Not supported" in past CLI assistant messages
     And I should see "hello" in past user messages
 
+  @ignore
   @withCliConfig
   @interactiveCLI
   Scenario: After /help, consecutive Enter on empty input keeps a normal input box
@@ -17,6 +18,7 @@ Feature: CLI interactive mode
     And I press Enter in the interactive CLI
     Then the input box UI should be normal
 
+  @ignore
   @withCliConfig
   @interactiveCLI
   Scenario: /help lists subcommands and interactive commands
@@ -26,6 +28,7 @@ Feature: CLI interactive mode
     And I should see "update" in past CLI assistant messages
     And I should see "version" in past CLI assistant messages
 
+  @ignore
   @withCliConfig
   @interactiveCLI
   Scenario: exit ends the session after Bye

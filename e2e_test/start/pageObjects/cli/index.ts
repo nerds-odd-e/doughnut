@@ -2,7 +2,6 @@ import {
   nonInteractiveOutput,
   pastCliAssistantMessages,
   pastUserMessages,
-  inputBoxTopBorder,
 } from './outputAssertions'
 import { installation, interactive } from './execution'
 import { backend } from './backend'
@@ -19,7 +18,6 @@ export const cli = {
   nonInteractiveOutput,
   pastCliAssistantMessages,
   pastUserMessages,
-  inputBoxTopBorder,
   installation,
   interactive,
   backend,

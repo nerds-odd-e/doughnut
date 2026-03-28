@@ -65,17 +65,8 @@ function applyInteractiveCliPtyKeystroke(
 
 function interactive() {
   return {
-    enterSlashCommand(commandLine: string) {
-      applyInteractiveCliPtyKeystroke({
-        kind: 'slashCommand',
-        commandLine,
-      })
-    },
     enterLine(text: string) {
       applyInteractiveCliPtyKeystroke({ kind: 'line', text })
-    },
-    pressEnter() {
-      applyInteractiveCliPtyKeystroke({ kind: 'enter' })
     },
   }
 }

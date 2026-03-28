@@ -114,9 +114,9 @@ Bottom-to-top:
 
 | Sub-phase | Scenario (summary) |
 |-----------|-------------------|
-| 1.4.x | exit ends the session after Bye |
-| 1.4.x | /help lists subcommands and interactive commands |
-| 1.4.x | After /help, consecutive Enter on empty input keeps a normal input box |
+| ~~1.4.1~~ | ~~exit ends the session after Bye~~ **done** (`@ignore`; `exit` + `Bye.` unchanged — `cli_install_and_run` still sends `exit`; Vitest `interactiveExitFarewell.test.ts`) |
+| ~~1.4.2~~ | ~~/help lists subcommands and interactive commands~~ **done** (`@ignore`; `/help` + help copy unchanged — Vitest `help.test.ts` / `processInput.test.ts`) |
+| ~~1.4.3~~ | ~~After /help, consecutive Enter on empty input keeps a normal input box~~ **done** (`@ignore`; E2E steps `slash command` / `press Enter` / `input box UI should be normal` + `enterSlashCommand` / `pressEnter` / `inputBoxTopBorder` removed; `InteractiveCliPtyKeystroke` is `line` only; `/help` + empty-line UX unchanged — Vitest) |
 | 1.4.x | TTY interactive responds "Not supported" to a plain line |
 
 After this file is fully **`@ignore`**, verify **`cli_install_and_run`** still passes; implement the **minimal** interactive path it needs (version banner, `exit`, transcript layout) without restoring full `/help` or recall behavior.

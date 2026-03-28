@@ -400,27 +400,11 @@ async function ptyWriteDraftThenCarriageReturnAndWait(
   return ptyWaitForInputReadyAfterWrite(handle, lenBeforeSubmit)
 }
 
-async function ptyWritePayloadAndWaitForInputReady(
-  payload: string
-): Promise<string> {
-  const handle = requireInteractivePtyHandle()
-  const lenBeforeSend = handle.stdout.value.length
-  handle.pty.write(payload)
-  return ptyWaitForInputReadyAfterWrite(handle, lenBeforeSend)
-}
-
 /** Deliver one keystroke to the shared interactive PTY and wait until the input box is ready again. */
 export async function applyInteractiveCliPtyKeystroke(
   keystroke: InteractiveCliPtyKeystroke
 ): Promise<string> {
-  switch (keystroke.kind) {
-    case 'line':
-      return ptyWriteDraftThenCarriageReturnAndWait(keystroke.text)
-    case 'slashCommand':
-      return ptyWriteDraftThenCarriageReturnAndWait(`${keystroke.commandLine} `)
-    case 'enter':
-      return ptyWritePayloadAndWaitForInputReady('\r')
-  }
+  return ptyWriteDraftThenCarriageReturnAndWait(keystroke.text)
 }
 
 export async function stopInteractiveCli(): Promise<void> {

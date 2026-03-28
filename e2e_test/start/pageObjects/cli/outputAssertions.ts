@@ -131,30 +131,4 @@ function pastUserMessages() {
   }
 }
 
-function inputBoxTopBorder() {
-  return {
-    expectExactlyOne() {
-      withStdoutFor(
-        {
-          kind: 'ptyInteractive',
-          assertionTarget: 'interactive CLI input box',
-        },
-        (stdout) => {
-          const count =
-            countInputBoxTopBorderLinesInInteractivePtyTranscript(stdout)
-          expect(
-            count,
-            `Expected exactly one live command-line prompt row (→) in simulated interactive PTY grid, found ${count}`
-          ).to.equal(1)
-        }
-      )
-    },
-  }
-}
-
-export {
-  nonInteractiveOutput,
-  pastCliAssistantMessages,
-  pastUserMessages,
-  inputBoxTopBorder,
-}
+export { nonInteractiveOutput, pastCliAssistantMessages, pastUserMessages }

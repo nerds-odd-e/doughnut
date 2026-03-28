@@ -23,15 +23,8 @@ When('the backend serves the CLI with version {string}', (version: string) =>
   cli.backend().serveVersion(version)
 )
 
-When(
-  'I enter the slash command {string} in the interactive CLI',
-  (command: string) => cli.interactive().enterSlashCommand(command)
-)
 When('I enter {string} in the interactive CLI', (line: string) =>
   cli.interactive().enterLine(line)
-)
-When('I press Enter in the interactive CLI', () =>
-  cli.interactive().pressEnter()
 )
 Then(
   'I should see {string} in the non-interactive output',
@@ -43,7 +36,4 @@ Then(
 )
 Then('I should see {string} in past user messages', (expected: string) =>
   cli.pastUserMessages().expectContains(expected)
-)
-Then('the input box UI should be normal', () =>
-  cli.inputBoxTopBorder().expectExactlyOne()
 )
