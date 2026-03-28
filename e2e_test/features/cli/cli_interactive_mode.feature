@@ -9,14 +9,6 @@ Feature: CLI interactive mode
     And I should see "hello" in past user messages
 
   @ignore
-  Scenario: After /help, consecutive Enter on empty input keeps a normal input box
-    When I enter the slash command "/help" in the interactive CLI
-    And I press Enter in the interactive CLI
-    And I press Enter in the interactive CLI
-    And I press Enter in the interactive CLI
-    Then the input box UI should be normal
-
-  @ignore
   Scenario: /help lists subcommands and interactive commands
     When I enter the slash command "/help" in the interactive CLI
     Then I should see "/help" in past CLI assistant messages
