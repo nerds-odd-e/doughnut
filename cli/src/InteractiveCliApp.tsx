@@ -47,6 +47,7 @@ export function InteractiveCliApp() {
       <Text>
         {'> '}
         {buffer}
+        <Text inverse> </Text>
       </Text>
     </Box>
   )
