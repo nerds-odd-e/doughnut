@@ -66,7 +66,7 @@ describe('TTY: shared interactive session', () => {
       expect(output).toContain('/exit')
       expect(output).toContain('Quit the CLI')
       expect(output).toContain('/list-access-token')
-      expect(output).toContain('↓ more below')
+      expect(output).toContain('/recall')
     })
 
     test('first candidate is highlighted with reverse video', async () => {
@@ -106,12 +106,12 @@ describe('TTY: shared interactive session', () => {
       await tick()
 
       const output = ttyOutput(writeSpy)
-      expect(output).toContain('/add gmail')
+      expect(output).toContain('/add-access-token')
       const plain = stripAnsi(output)
       const lastDrawStart = plain.lastIndexOf('→ /add')
       expect(lastDrawStart).toBeGreaterThanOrEqual(0)
       expect(plain.slice(lastDrawStart)).not.toContain('/help')
-      expect(plain.slice(lastDrawStart)).not.toContain('/last email')
+      expect(plain.slice(lastDrawStart)).not.toContain('/recall')
     })
 
     test('Enter with prefix inserts first matching command', async () => {
@@ -122,7 +122,7 @@ describe('TTY: shared interactive session', () => {
       pushTTYCommandEnter(stdin)
       await new Promise((r) => setTimeout(r, 50))
 
-      expect(ttyOutput(writeSpy)).toContain('/add gmail ')
+      expect(ttyOutput(writeSpy)).toContain('/add-access-token ')
     })
 
     test('no suggestions after space when command inserted', async () => {

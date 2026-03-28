@@ -260,7 +260,7 @@ async function refreshAccessToken(
   const clientId = config.clientId || BUILTIN_CLIENT_ID || undefined
   const clientSecret = config.clientSecret || BUILTIN_CLIENT_SECRET || undefined
   if (!(clientId && clientSecret)) {
-    throw new Error('Missing client credentials. Run /add gmail again.')
+    throw new Error('Missing client credentials for Gmail OAuth.')
   }
 
   const body = new URLSearchParams({
@@ -278,7 +278,7 @@ async function refreshAccessToken(
   if (!res.ok) {
     const err = (await res.json().catch(() => ({}))) as { error?: string }
     if (err.error === 'invalid_grant') {
-      throw new Error('Session expired. Run /add gmail to re-authenticate.')
+      throw new Error('Session expired. Re-authenticate Gmail.')
     }
     throw new Error(`Token refresh failed: ${res.status}`)
   }
@@ -306,7 +306,7 @@ export async function getLastEmailSubject(
   const config = loadConfig(configPath)
   const account = config.accounts[0]
   if (!account) {
-    throw new Error('No Gmail account configured. Run /add gmail first.')
+    throw new Error('No Gmail account configured.')
   }
 
   let accessToken = account.accessToken
@@ -349,12 +349,3 @@ export async function getLastEmailSubject(
   }
   return getSubjectFromMessage(msgData)
 }
-
-export const gmailCommandDocs = [
-  {
-    name: '/add gmail',
-    usage: '/add gmail',
-    description: 'Add Gmail account via OAuth',
-    category: 'interactive' as const,
-  },
-]

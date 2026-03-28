@@ -1,5 +1,4 @@
 import { accessTokenCommandDocs } from './accessToken.js'
-import { gmailCommandDocs } from './gmail.js'
 import { recallCommandDocs } from './recall.js'
 import { updateDoc } from './update.js'
 import { versionDoc } from './version.js'
@@ -32,7 +31,6 @@ export const interactiveDocs: CommandDoc[] = [
     category: 'interactive' as const,
   },
   ...accessTokenCommandDocs,
-  ...gmailCommandDocs,
   ...recallCommandDocs,
 ]
 

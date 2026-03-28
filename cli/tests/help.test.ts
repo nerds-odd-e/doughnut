@@ -17,7 +17,6 @@ describe('formatHelp', () => {
     expect(output).toContain('version')
     expect(output).toContain('update')
     expect(output).toContain('/help')
-    expect(output).toContain('/add gmail')
     expect(output).toContain('/recall')
     expect(output).toContain('exit')
   })
@@ -27,7 +26,6 @@ describe('formatHelp', () => {
     expect(output).toContain('Show CLI version')
     expect(output).toContain('Update CLI to latest version')
     expect(output).toContain('List available commands')
-    expect(output).toContain('Add Gmail account via OAuth')
     expect(output).toContain('Recall all due notes in a session')
     expect(output).toContain('Quit the CLI')
   })
@@ -144,10 +142,10 @@ describe('getTabCompletion', () => {
     })
   })
 
-  test('/add completes to common prefix /add for add gmail and add-access-token', () => {
+  test('/add completes to /add-access-token with trailing space', () => {
     expect(getTabCompletion('/add', interactiveDocs)).toEqual({
-      completed: '/add',
-      count: 2,
+      completed: '/add-access-token ',
+      count: 1,
     })
   })
 

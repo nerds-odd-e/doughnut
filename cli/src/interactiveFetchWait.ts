@@ -10,7 +10,6 @@ export const INTERACTIVE_FETCH_WAIT_LINES = {
   addAccessToken: 'Adding access token',
   createAccessToken: 'Creating access token',
   removeAccessTokenCompletely: 'Removing access token',
-  addGmail: 'Connecting Gmail',
 } as const
 
 export type InteractiveFetchWaitLine =

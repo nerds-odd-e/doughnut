@@ -102,9 +102,11 @@ Bottom-to-top:
 | Sub-phase | Scenario (summary) |
 |-----------|-------------------|
 | ~~1.3.1~~ | ~~last email shows subject when account is configured~~ **done** (`@ignore`; `/last email` TTY + `processInput` path and help doc removed — `getLastEmailSubject` + `gmail.test.ts` kept) |
-| 1.3.2 | add gmail adds account when OAuth callback is simulated |
+| ~~1.3.2~~ | ~~add gmail adds account when OAuth callback is simulated~~ **done** (`@ignore`; `/add gmail` TTY + help entry + Gmail E2E harness removed — `addGmailAccount` + `gmail.test.ts` kept) |
 
 E2E: tag **`@ignore`**, remove Gmail-specific step defs / page object helpers / hooks tags **`@interactiveCLIGmail*`** / env builders **only when unused**. Product: delete **Gmail Ink/TTY UI**; **retain** low-level Gmail services + **unit tests** (`cli/tests/gmail.test.ts` and direct dependencies that are not UI).
+
+**Part 1.3 complete:** every scenario in `cli_gmail.feature` is **`@ignore`**; Gmail-specific E2E harness and mock Google service removed.
 
 ### Part 1.4 — Feature: `cli_interactive_mode.feature`
 

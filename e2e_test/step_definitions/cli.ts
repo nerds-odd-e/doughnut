@@ -1,5 +1,4 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
-import { mock_services } from '../start'
 import { cli } from '../start/pageObjects/cli'
 
 Given('the backend is serving the CLI and install script', () =>
@@ -47,16 +46,4 @@ Then('I should see {string} in past user messages', (expected: string) =>
 )
 Then('the input box UI should be normal', () =>
   cli.inputBoxTopBorder().expectExactlyOne()
-)
-
-Given(
-  'the Google API mock returns tokens and profile for {string}',
-  (email: string) => {
-    cy.wrap(
-      mock_services
-        .google()
-        .stubTokenExchange('mock_access_token', 'mock_refresh_token')
-        .then(() => mock_services.google().stubGmailProfile(email))
-    )
-  }
 )

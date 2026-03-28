@@ -7,7 +7,6 @@ import {
   removeAccessTokenCompletely,
 } from './commands/accessToken.js'
 import { userVisibleOutcomeFromCommandError } from './fetchAbort.js'
-import { addGmailAccount } from './commands/gmail.js'
 import { formatHelp } from './commands/help.js'
 import { renderMarkdownToTerminal } from './markdown.js'
 import {
@@ -443,18 +442,6 @@ export async function processInput(
     return false
   }
   if (await handleParamCommand(trimmed, output)) {
-    return false
-  }
-  if (trimmed === '/add gmail') {
-    try {
-      await runInteractiveFetchWait(
-        output,
-        INTERACTIVE_FETCH_WAIT_LINES.addGmail,
-        (signal) => addGmailAccount(undefined, signal)
-      )
-    } catch (err) {
-      logCancelledOrError(err, output)
-    }
     return false
   }
   if (pendingRecallLoadMore) {

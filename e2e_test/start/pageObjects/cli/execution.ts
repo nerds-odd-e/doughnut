@@ -1,32 +1,18 @@
 /**
  * CLI execution page objects.
- * Domain: installation, interactive, access token, Gmail.
+ * Domain: installation, interactive, access token.
  */
 import {
   INTERACTIVE_CLI_PTY_KEYSTROKE_TASK,
   type InteractiveCliPtyKeystroke,
 } from '../../../config/interactiveCliPtyTypes'
 import { e2eAppBaseUrl } from '../../../support/e2eAppUrl'
-const GOOGLE_MOCK_BASE_URL = 'http://localhost:5003'
-
 export function envForCliWithConfigDir(
   configDir: string
 ): Record<string, string> {
   return {
     DOUGHNUT_CONFIG_DIR: configDir,
     DOUGHNUT_API_BASE_URL: e2eAppBaseUrl(),
-  }
-}
-
-/** PTY env for Gmail CLI E2E (mock Google HTTP + optional headless OAuth). */
-export function envForInteractiveGmail(
-  configDir: string,
-  opts: { noBrowser?: boolean } = {}
-): Record<string, string> {
-  return {
-    ...envForCliWithConfigDir(configDir),
-    GOOGLE_BASE_URL: GOOGLE_MOCK_BASE_URL,
-    ...(opts.noBrowser ? { DOUGHNUT_NO_BROWSER: '1' } : {}),
   }
 }
 

@@ -9,7 +9,6 @@ import {
   bundleCliE2eInstall,
   CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH,
   cliRepoSpawnFromRoot,
-  rebuildCliBundleWithGmailE2eSecrets,
   runShellCommandSync,
 } from './cliE2eRepo'
 import { cliEnv } from './cliEnv'
@@ -26,9 +25,7 @@ import {
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
 
-type StartInteractiveCliTask = WithOptionalCliEnv & {
-  simulateOAuthCallback?: boolean
-}
+type StartInteractiveCliTask = WithOptionalCliEnv
 
 type RunInstalledCliTask = WithOptionalCliEnv & {
   doughnutPath: string
@@ -53,18 +50,6 @@ export function createCliE2ePluginTasks(repoRoot: string) {
   return {
     createCliConfigDir() {
       return mkdtempSync(join(tmpdir(), 'cypress-cli-config-'))
-    },
-    createCliConfigDirWithGmail(gmailConfig: Record<string, unknown>) {
-      const configDir = mkdtempSync(join(tmpdir(), 'cypress-cli-gmail-'))
-      writeFileSync(
-        join(configDir, 'gmail.json'),
-        JSON.stringify(gmailConfig, null, 2)
-      )
-      return configDir
-    },
-    bundleCliWithGmailE2eSecrets() {
-      rebuildCliBundleWithGmailE2eSecrets(repoRoot)
-      return true
     },
     async bundleCliE2eInstall() {
       return bundleCliE2eInstallOrThrow(repoRoot)
@@ -106,17 +91,13 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       }
       return doughnutPath
     },
-    async startInteractiveCli({
-      env,
-      simulateOAuthCallback,
-    }: StartInteractiveCliTask) {
+    async startInteractiveCli({ env }: StartInteractiveCliTask) {
       const { command, baseArgs } = cliRepoSpawnFromRoot(repoRoot)
       await startInteractiveCliPtySession({
         command,
         args: baseArgs,
         cwd: repoRoot,
         env: { ...cliEnv(env) },
-        simulateOAuthCallback,
       })
       return true
     },

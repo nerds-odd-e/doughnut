@@ -5,22 +5,6 @@
 import { spawnSync } from 'node:child_process'
 import { existsSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import {
-  GMAIL_E2E_GOOGLE_CLIENT_ID,
-  GMAIL_E2E_GOOGLE_CLIENT_SECRET,
-} from './cliGmailE2eConfig'
-
-export function rebuildCliBundleWithGmailE2eSecrets(repoRoot: string): void {
-  runShellCommandSync('pnpm -C cli bundle', {
-    cwd: repoRoot,
-    env: {
-      ...process.env,
-      GOOGLE_CLIENT_ID: GMAIL_E2E_GOOGLE_CLIENT_ID,
-      GOOGLE_CLIENT_SECRET: GMAIL_E2E_GOOGLE_CLIENT_SECRET,
-    },
-  })
-}
-
 export const CLI_BUNDLE_RELATIVE_PATH = 'cli/dist/doughnut-cli.bundle.mjs'
 
 /** Cypress install scenarios build here so version bumps do not overwrite the default bundle. */
