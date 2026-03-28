@@ -96,3 +96,12 @@ Before({ tags: '@bundleCliE2eInstall' }, () =>
 After({ tags: '@bundleCliE2eInstall' }, () =>
   cli.backend().removeE2eInstallCliBundle()
 )
+
+Before({ tags: '@interactiveCLI' }, () => {
+  cy.task('cliInteractivePtyDispose')
+  cy.task('runRepoCliInteractive')
+})
+
+After({ tags: '@interactiveCLI' }, () => {
+  cy.task('cliInteractivePtyDispose')
+})

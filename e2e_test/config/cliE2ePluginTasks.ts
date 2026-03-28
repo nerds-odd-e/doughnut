@@ -8,6 +8,7 @@ import { dirname, join } from 'node:path'
 import {
   bundleCliE2eInstall,
   CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH,
+  cliRepoSpawnFromRoot,
   runShellCommandSync,
 } from './cliE2eRepo'
 import { cliEnv } from './cliEnv'
@@ -23,6 +24,8 @@ type RunInstalledCliTask = WithOptionalCliEnv & {
 type RunInstalledCliInteractiveTask = WithOptionalCliEnv & {
   doughnutPath: string
 }
+
+type RunRepoCliInteractiveTask = WithOptionalCliEnv
 
 type CliInteractiveWriteLineTask = {
   line: string
@@ -85,7 +88,7 @@ export function createCliE2ePluginTasks(repoRoot: string) {
               : stripped
           reject(
             new Error(
-              `Timeout after ${timeoutMs}ms waiting for substring ${JSON.stringify(needle)} in installed CLI interactive PTY output. Preview (ANSI-stripped):\n${preview}`
+              `Timeout after ${timeoutMs}ms waiting for substring ${JSON.stringify(needle)} in interactive CLI PTY output. Preview (ANSI-stripped):\n${preview}`
             )
           )
           return
@@ -94,6 +97,33 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       }
       tick()
     })
+  }
+
+  async function startInteractiveCliPtySession(opts: {
+    command: string
+    args: string[]
+    cwd: string
+    env?: NodeJS.ProcessEnv
+  }): Promise<void> {
+    disposeInteractiveCliPtySession()
+    const { spawn } = await import('@lydell/node-pty')
+    const p = spawn(opts.command, opts.args, {
+      name: 'xterm-256color',
+      cols: 120,
+      rows: 32,
+      cwd: opts.cwd,
+      env: { ...process.env, ...cliEnv(opts.env) },
+    })
+    const buf = { text: '' }
+    p.onData((data: string) => {
+      buf.text += data
+    })
+    interactiveCliPtySession = { pty: p, buf }
+    await installedCliInteractiveWaitForSubstring(
+      () => buf.text,
+      INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING,
+      INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS
+    )
   }
 
   return {
@@ -183,27 +213,24 @@ export function createCliE2ePluginTasks(repoRoot: string) {
           `runInstalledCliInteractive: doughnut binary not found at ${doughnutPath}. Ensure prior install step succeeded.`
         )
       }
-      disposeInteractiveCliPtySession()
-
-      const cwd = dirname(doughnutPath)
-      const { spawn } = await import('@lydell/node-pty')
-      const p = spawn(process.execPath, [doughnutPath], {
-        name: 'xterm-256color',
-        cols: 120,
-        rows: 32,
-        cwd,
-        env: { ...process.env, ...cliEnv(env) },
+      await startInteractiveCliPtySession({
+        command: process.execPath,
+        args: [doughnutPath],
+        cwd: dirname(doughnutPath),
+        env,
       })
-      const buf = { text: '' }
-      p.onData((data: string) => {
-        buf.text += data
+      return null
+    },
+    async runRepoCliInteractive({
+      env,
+    }: RunRepoCliInteractiveTask = {}): Promise<null> {
+      const { command, baseArgs } = cliRepoSpawnFromRoot(repoRoot)
+      await startInteractiveCliPtySession({
+        command,
+        args: baseArgs,
+        cwd: repoRoot,
+        env,
       })
-      interactiveCliPtySession = { pty: p, buf }
-      await installedCliInteractiveWaitForSubstring(
-        () => buf.text,
-        INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING,
-        INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS
-      )
       return null
     },
     cliInteractivePtyDispose() {
@@ -213,7 +240,7 @@ export function createCliE2ePluginTasks(repoRoot: string) {
     cliInteractivePtyGetBuffer(): string {
       if (!interactiveCliPtySession) {
         throw new Error(
-          'cliInteractivePtyGetBuffer: no active interactive CLI PTY session. Run installation interactive mode first.'
+          'cliInteractivePtyGetBuffer: no active interactive CLI PTY session. Ensure @interactiveCLI started the session or run the installed CLI in interactive mode first.'
         )
       }
       return interactiveCliPtySession.buf.text
@@ -223,7 +250,7 @@ export function createCliE2ePluginTasks(repoRoot: string) {
     }: CliInteractiveWriteLineTask): Promise<null> {
       if (!interactiveCliPtySession) {
         throw new Error(
-          'cliInteractiveWriteLine: no active interactive CLI PTY session. Run installation interactive mode first.'
+          'cliInteractiveWriteLine: no active interactive CLI PTY session. Ensure @interactiveCLI started the session or run the installed CLI in interactive mode first.'
         )
       }
       const { pty } = interactiveCliPtySession

@@ -1,5 +1,6 @@
 /**
- * Current installed interactive CLI (started by `installation().runInteractiveMode()`).
+ * Interactive CLI PTY session: `@interactiveCLI` starts the repo bundle (`runRepoCliInteractive`);
+ * install scenarios use `installation().runInteractiveMode()` (`runInstalledCliInteractive`).
  * Transcript assertions use `cliInteractivePtyGetBuffer` in the Cypress plugin.
  */
 import { pastCliAssistantMessages, pastUserMessages } from './outputAssertions'

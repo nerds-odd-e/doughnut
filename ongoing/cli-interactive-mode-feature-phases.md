@@ -6,9 +6,11 @@
 
 **Planning rules** (`.cursor/rules/planning.mdc`): observable assertions first, at most one intentionally failing enabled scenario while driving a change, no dead code.
 
-**Cucumber order:** `Before` runs **before** `Background` and steps. **`Before(@interactiveCLI)`** must **install + start the PTY** (cannot rely on Background for `doughnutPath`). Use **`After(@interactiveCLI)`** + **dispose at start of `Before`** so leaks are bounded when `After` does not run on failure (see `hook.ts` MCP comment).
+**Cucumber order:** `Before` runs **before** `Background` and steps. **`Before(@interactiveCLI)`** must **start the PTY on the repo CLI** (cannot rely on Background). Use **`After(@interactiveCLI)`** + **dispose at start of `Before`** so leaks are bounded when `After` does not run on failure (see `hook.ts` MCP comment).
 
-**Tagging:** Add **`@bundleCliE2eInstall`** on this feature (or each scenario) so `installCli` matches `cli_install_and_run.feature`. **`@withCliConfig`:** add a hook when a scenario needs it; not assumed for every phase below.
+**Interactive vs install E2E:** The step **“I run the installed doughnut command in interactive mode”** (`runInstalledCliInteractive` + `installCli`) exercises the **installed** binary — keep that for `cli_install_and_run.feature`. The **`@interactiveCLI` hook** runs the repo CLI via **`runRepoCliInteractive`** (**`cliRepoSpawnFromRoot`**: bundle + **`ensureCliBundleFresh`**, or `tsx` when **`DOUGHNUT_CLI_E2E_USE_TSX=1`**).
+
+**Tagging:** **`@bundleCliE2eInstall`** is for install-from-LB scenarios; **not** required on `cli_interactive_mode.feature` when the hook only spawns the default bundle. **`@withCliConfig`:** when a scenario needs it (already on the feature).
 
 **Recommended order:** Complete **Foundation** once, then **Phase 1 → 2 → 3 → 4** in sequence (later phases may reuse steps/assertions added earlier).
 
@@ -18,21 +20,21 @@
 
 Shared by all four scenarios; not itself a Gherkin scenario.
 
-### F.1 — PTY dispose task (plugin)
+### F.1 — PTY dispose task (plugin) — **done**
 
-- Expose e.g. `cliInteractivePtyDispose`: **`pty.kill()`**, clear session reference, **idempotent**, clear errors.
-- **CI:** Green.
+- **`cliInteractivePtyDispose`** in `e2e_test/config/cliE2ePluginTasks.ts`: **`pty.kill()`**, clear session reference, **idempotent**, swallow errors from already-dead PTY.
 
-### F.2 — `@interactiveCLI` Before / After + feature tags
+### F.2 — `@interactiveCLI` Before / After (bundle PTY) — **done**
 
-- `Before({ tags: '@interactiveCLI' })`: `cliInteractivePtyDispose` → `installCli(e2eAppBaseUrl())` → `.as('doughnutPath')` → `runInstalledCliInteractive({ doughnutPath })`.
+- `Before({ tags: '@interactiveCLI' })` in `hook.ts`: `cliInteractivePtyDispose` → **`runRepoCliInteractive`** (PTY via **`cliRepoSpawnFromRoot`**).
 - `After({ tags: '@interactiveCLI' })`: `cliInteractivePtyDispose`.
-- Feature file: **`@bundleCliE2eInstall`** (and `@withCliConfig` only if/when hooked).
+- **`runRepoCliInteractive`** + shared **`startInteractiveCliPtySession`** in `cliE2ePluginTasks.ts` (also used by **`runInstalledCliInteractive`**).
 - **CI:** Green; all scenarios still `@ignore`.
+- **No** `installCli` / **`@bundleCliE2eInstall`** in this hook unless a scenario explicitly tests the install path.
 
 ### Note on other features
 
-`cli_access_token.feature` and `cli_recall.feature` also use `@interactiveCLI`. When enabling them, drop redundant install/PTY start steps so the hook owns the session.
+`cli_access_token.feature` and `cli_recall.feature` also use `@interactiveCLI`. When the hook owns bundle PTY startup, drop redundant **PTY start** (and any duplicate **install**) steps from those features if they only needed a session.
 
 ---
 
@@ -46,7 +48,7 @@ Shared by all four scenarios; not itself a Gherkin scenario.
 
 - Step: `When('I enter {string} in the interactive CLI', …)` → `cliInteractiveWriteLine` (no leading `/` required).
 - Remove `@ignore` from **this scenario only**.
-- **Failure should cite** missing `"Not supported"` or `"hello"` in the parsed sections, not PTY/install errors.
+- **Failure should cite** missing `"Not supported"` or `"hello"` in the parsed sections, not PTY/bundle errors.
 - **CI:** Red until 1.2 unless merged with 1.2 in one PR.
 
 ### 1.2 — Product
@@ -123,8 +125,8 @@ Shared by all four scenarios; not itself a Gherkin scenario.
 
 | Block | What | CI |
 |-------|------|-----|
-| F.1 | `cliInteractivePtyDispose` | Green |
-| F.2 | `@interactiveCLI` hooks + `@bundleCliE2eInstall` | Green |
+| F.1 | `cliInteractivePtyDispose` | **Done** |
+| F.2 | `@interactiveCLI` hooks; PTY = repo bundle + `ensureCliBundleFresh` | **Done** |
 | 1.1–1.2 | Plain line → Not supported | Green after 1.2 |
 | 2.1–2.2 | `/help` + empty Enters → normal input UI | Green after 2.2 |
 | 3.1–3.2 | `/help` lists recall, exit, update, version | Green after 3.2 |
