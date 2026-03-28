@@ -44,7 +44,7 @@ Shared by all four scenarios; not itself a Gherkin scenario.
 
 **Outcome:** `hello` appears in **past user messages**; **Not supported** in **past CLI assistant messages**.
 
-### 1.1 — E2E
+### 1.1 — E2E — **done**
 
 - Step: `When('I enter {string} in the interactive CLI', …)` → `cliInteractiveWriteLine` (no leading `/` required).
 - Remove `@ignore` from **this scenario only**.
@@ -127,7 +127,8 @@ Shared by all four scenarios; not itself a Gherkin scenario.
 |-------|------|-----|
 | F.1 | `cliInteractivePtyDispose` | **Done** |
 | F.2 | `@interactiveCLI` hooks; PTY = repo bundle + `ensureCliBundleFresh` | **Done** |
-| 1.1–1.2 | Plain line → Not supported | Green after 1.2 |
+| 1.1 | E2E step + un-ignore first scenario | **Done** (CI red until 1.2) |
+| 1.2 | Plain line → Not supported (product) | Green after 1.2 |
 | 2.1–2.2 | `/help` + empty Enters → normal input UI | Green after 2.2 |
 | 3.1–3.2 | `/help` lists recall, exit, update, version | Green after 3.2 |
 | 4.1–4.2 | `exit` → Bye. | Green after 4.2 |

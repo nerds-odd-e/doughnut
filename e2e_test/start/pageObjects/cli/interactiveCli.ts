@@ -5,10 +5,17 @@
  */
 import { pastCliAssistantMessages, pastUserMessages } from './outputAssertions'
 
+function writeInteractiveLineToPty(line: string) {
+  cy.task('cliInteractiveWriteLine', { line })
+}
+
 function interactiveCli() {
   return {
+    writeInteractiveLine(line: string) {
+      writeInteractiveLineToPty(line)
+    },
     enterSlashCommandInInteractiveCli(command: string) {
-      cy.task('cliInteractiveWriteLine', { line: command })
+      writeInteractiveLineToPty(command)
     },
     pastCliAssistantMessages,
     pastUserMessages,

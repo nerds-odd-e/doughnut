@@ -35,6 +35,10 @@ Then(
     cli.interactiveCli().pastCliAssistantMessages().expectContains(expected)
 )
 
+When('I enter {string} in the interactive CLI', (line: string) =>
+  cli.interactiveCli().writeInteractiveLine(line)
+)
+
 When(
   'I enter the slash command {string} in the interactive CLI',
   (command: string) =>
