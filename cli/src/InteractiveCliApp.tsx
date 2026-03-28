@@ -31,13 +31,11 @@ export function InteractiveCliApp() {
       if (line === '') {
         return
       }
-      if (!line.startsWith('/')) {
-        setMessages((prev) => [
-          ...prev,
-          { role: 'user', text: line },
-          { role: 'assistant', text: 'Not supported' },
-        ])
-      }
+      setMessages((prev) => [
+        ...prev,
+        { role: 'user', text: line },
+        { role: 'assistant', text: 'Not supported' },
+      ])
     })
   })
 
