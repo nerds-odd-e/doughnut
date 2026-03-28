@@ -32,7 +32,7 @@ overrides:
   minimatch: '>=10.2.3'
   ajv: '>=8.18.0'
   rollup: '>=4.59.0'
-  serialize-javascript: '>=7.0.3'
+  serialize-javascript: '>=7.0.5'
   immutable: '>=5.1.5'
   mailparser: '>=3.9.3'
   '@tootallnate/once': '>=3.0.1'
@@ -5542,8 +5542,8 @@ packages:
     resolution: {integrity: sha512-1gnZf7DFcoIcajTjTwjwuDjzuz4PPcY2StKPlsGAQ1+YH20IRVrBaXSWmdjowTJ6u8Rc01PoYOGHXfP1mYcZNQ==}
     engines: {node: '>= 18'}
 
-  serialize-javascript@7.0.3:
-    resolution: {integrity: sha512-h+cZ/XXarqDgCjo+YSyQU/ulDEESGGf8AMK9pPNmhNSl/FzPl6L8pMp1leca5z6NuG6tvV/auC8/43tmovowww==}
+  serialize-javascript@7.0.5:
+    resolution: {integrity: sha512-F4LcB0UqUl1zErq+1nYEEzSHJnIwb3AF2XWB94b+afhrekOUijwooAYqFyRbjYkm2PAKBabx6oYv/xDxNi8IBw==}
     engines: {node: '>=20.0.0'}
 
   serve-static@2.2.1:
@@ -11634,7 +11634,7 @@ snapshots:
       minimatch: 10.2.3
       ms: 2.1.3
       picocolors: 1.1.1
-      serialize-javascript: 7.0.3
+      serialize-javascript: 7.0.5
       strip-json-comments: 3.1.1
       supports-color: 8.1.1
       workerpool: 9.3.4
@@ -12577,7 +12577,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  serialize-javascript@7.0.3: {}
+  serialize-javascript@7.0.5: {}
 
   serve-static@2.2.1:
     dependencies:

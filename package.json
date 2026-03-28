@@ -135,7 +135,7 @@
       "minimatch": ">=10.2.3",
       "ajv": ">=8.18.0",
       "rollup": ">=4.59.0",
-      "serialize-javascript": ">=7.0.3",
+      "serialize-javascript": ">=7.0.5",
       "immutable": ">=5.1.5",
       "mailparser": ">=3.9.3",
       "@tootallnate/once": ">=3.0.1",
