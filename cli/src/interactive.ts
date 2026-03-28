@@ -7,7 +7,6 @@ import {
   removeAccessTokenCompletely,
 } from './commands/accessToken.js'
 import { userVisibleOutcomeFromCommandError } from './fetchAbort.js'
-import { formatHelp } from './commands/help.js'
 import {
   getInteractiveFetchWaitLine,
   INTERACTIVE_FETCH_WAIT_LINES,
@@ -151,10 +150,6 @@ export async function processInput(
       output.log('Bye.')
     }
     return true
-  }
-  if (trimmed === '/help') {
-    output.log(formatHelp())
-    return false
   }
   if (await handleParamCommand(trimmed, output)) {
     return false

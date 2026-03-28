@@ -97,11 +97,8 @@ describe('processInput', () => {
     expect(logSpy).toHaveBeenCalledWith('Not supported')
   })
 
-  test('/help lists commands', async () => {
+  test('/help is not supported', async () => {
     expect(await processInput('/help')).toBe(false)
-    expect(logSpy).toHaveBeenCalled()
-    const helpText = String(logSpy.mock.calls[0]![0])
-    expect(helpText).toContain('Interactive commands')
-    expect(helpText).toContain('/help')
+    expect(logSpy).toHaveBeenCalledWith('Not supported')
   })
 })

@@ -69,7 +69,7 @@ Vocabulary for Cucumber steps and page objects (`e2e_test/start/pageObjects/cli/
 
 ## Entry points
 
-- **Interactive shell:** **TTY only** (`runInteractive` → `runInteractiveTtySession` in `cli/src/ttyAdapters/interactiveTtySession.ts`). Slash-command reference is **`/help`** after the shell starts. **No `-c`**, no piped-stdin shell, no `pipedAdapter`.
+- **Interactive shell:** **TTY only** (`runInteractive` → `runInteractiveTtySession` in `cli/src/ttyAdapters/interactiveTtySession.ts`). Current guidance shows a grey **`/ commands`** hint only (no `/help`, tab completion, or slash picker). **No `-c`**, no piped-stdin shell, no `pipedAdapter`.
 - **Non-TTY:** **`doughnut version`** / **`-v`** / **`--version`** and **`doughnut update`** only.
 - **`processInput`:** Shared slash-command engine; wired from the interactive TTY session’s `OutputAdapter` and from Vitest via `defaultOutput` — **not** a second interactive UI.
 
@@ -124,9 +124,7 @@ Build-time injection. Local: `cli/.env.local` from `cli/.env.local.example`. CI:
 
 ## Adding new commands
 
-Ensure `/help` lists the command:
-
 1. Export **CommandDoc** from the handler module (`category`: `subcommand` | `interactive`).
-2. Register in **`commands/help.ts`** (`subcommandDocs`, module doc arrays, or `interactiveDocs`).
+2. Register in **`commands/help.ts`** (`interactiveDocs` for TTY cyan prefix highlight on known slash usages).
 3. Wire **`processInput()`** (slash commands) or **`run.ts`** (`version` / `update` subcommands).
-4. Verify with `pnpm cli` → `/help` in the TTY shell.
+4. Verify with **`pnpm cli`** and exercise the new slash or subcommand in the TTY or non-interactive path as appropriate.

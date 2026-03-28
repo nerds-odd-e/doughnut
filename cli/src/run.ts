@@ -22,7 +22,7 @@ export async function run(args: string[]): Promise<void> {
   }
 
   if (subcommand === 'help') {
-    exitCliError('use /help in the shell')
+    exitCliError('not a terminal (use version or update)')
   }
 
   runInteractive()

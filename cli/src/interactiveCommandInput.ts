@@ -62,26 +62,6 @@ function endUserInputHistoryWalk(): Pick<
   }
 }
 
-function recalledDraftWithSlashPickerSuppressed(
-  recalledCommittedLine: string,
-  slashPickerWouldApply: boolean
-): string {
-  const d = singleLineCommandDraft(recalledCommittedLine)
-  if (!slashPickerWouldApply) return d
-  return `${d} `
-}
-
-function recalledLineForCommandBox(
-  recalledCommittedLine: string,
-  slashPickerWouldApplyForDraft: (draft: string) => boolean
-): string {
-  const one = singleLineCommandDraft(recalledCommittedLine)
-  return recalledDraftWithSlashPickerSuppressed(
-    one,
-    slashPickerWouldApplyForDraft(one)
-  )
-}
-
 function draftAfterBareSlashEscape(lineDraft: string): string {
   const one = singleLineCommandDraft(lineDraft)
   return one === '/' ? '' : one
@@ -92,20 +72,6 @@ export function afterBareSlashEscape(
   state: InteractiveCommandInput
 ): InteractiveCommandInput {
   const lineDraft = draftAfterBareSlashEscape(state.lineDraft)
-  return {
-    ...state,
-    ...endUserInputHistoryWalk(),
-    lineDraft,
-    caretOffset: lineDraft.length,
-  }
-}
-
-/** Replace the whole live draft (tab complete, slash pick); ends user input history walk. */
-export function replaceLiveCommandDraft(
-  state: InteractiveCommandInput,
-  newDraft: string
-): InteractiveCommandInput {
-  const lineDraft = singleLineCommandDraft(newDraft)
   return {
     ...state,
     ...endUserInputHistoryWalk(),
@@ -125,28 +91,8 @@ export function clearLiveCommandLine(
   }
 }
 
-/**
- * Whether ↑/↓ should move the slash suggestion highlight instead of user input history / caret.
- * Only while editing the live draft (`userInputHistoryWalkIndex === null`). First ↑ goes home, first ↓ end.
- */
-export function ttyArrowKeyUsesSlashSuggestionCycle(
-  key: 'up' | 'down',
-  state: Pick<
-    InteractiveCommandInput,
-    'userInputHistoryWalkIndex' | 'caretOffset' | 'lineDraft'
-  >,
-  suggestionsDismissed: boolean,
-  slashCompletionListVisible: boolean
-): boolean {
-  if (suggestionsDismissed || !slashCompletionListVisible) return false
-  if (state.userInputHistoryWalkIndex !== null) return false
-  if (key === 'up') return state.caretOffset === 0
-  return state.caretOffset === state.lineDraft.length
-}
-
 export function onArrowUp(
-  state: InteractiveCommandInput,
-  slashPickerWouldApplyForDraft: (draft: string) => boolean = () => false
+  state: InteractiveCommandInput
 ): InteractiveCommandInput {
   const {
     lineDraft,
@@ -157,10 +103,7 @@ export function onArrowUp(
   if (userInputHistoryWalkIndex !== null) {
     const nextIdx = userInputHistoryWalkIndex + 1
     if (nextIdx >= userInputHistoryLines.length) return state
-    const line = recalledLineForCommandBox(
-      userInputHistoryLines[nextIdx]!,
-      slashPickerWouldApplyForDraft
-    )
+    const line = singleLineCommandDraft(userInputHistoryLines[nextIdx]!)
     return {
       ...state,
       userInputHistoryWalkIndex: nextIdx,
@@ -172,10 +115,7 @@ export function onArrowUp(
     return { ...state, caretOffset: 0 }
   }
   if (userInputHistoryLines.length === 0) return state
-  const line = recalledLineForCommandBox(
-    userInputHistoryLines[0]!,
-    slashPickerWouldApplyForDraft
-  )
+  const line = singleLineCommandDraft(userInputHistoryLines[0]!)
   return {
     ...state,
     lineDraftBeforeUserInputHistoryWalk: lineDraft,
@@ -186,8 +126,7 @@ export function onArrowUp(
 }
 
 export function onArrowDown(
-  state: InteractiveCommandInput,
-  slashPickerWouldApplyForDraft: (draft: string) => boolean = () => false
+  state: InteractiveCommandInput
 ): InteractiveCommandInput {
   const {
     lineDraft,
@@ -199,10 +138,7 @@ export function onArrowDown(
   if (userInputHistoryWalkIndex !== null) {
     if (userInputHistoryWalkIndex > 0) {
       const nextIdx = userInputHistoryWalkIndex - 1
-      const line = recalledLineForCommandBox(
-        userInputHistoryLines[nextIdx]!,
-        slashPickerWouldApplyForDraft
-      )
+      const line = singleLineCommandDraft(userInputHistoryLines[nextIdx]!)
       return {
         ...state,
         userInputHistoryWalkIndex: nextIdx,

@@ -120,26 +120,13 @@ describe('needsGapBeforeLiveRegion', () => {
 })
 
 describe('buildSuggestionLinesForInk', () => {
-  test('slash completion returns rows without per-line ellipsis (Ink wraps)', () => {
-    const ink = buildSuggestionLinesForInk('/h', 0)
-    expect(ink.length).toBeGreaterThan(0)
-    expect(ink.some((l) => stripAnsi(l).includes('...'))).toBe(false)
-  })
-
-  test('many completions: full rows, no truncation marker in strings', () => {
-    const ink = buildSuggestionLinesForInk('/', 0)
-    expect(ink.length).toBeGreaterThan(1)
-    expect(ink.some((l) => stripAnsi(l).includes('...'))).toBe(false)
-  })
-
-  test('non-slash buffer yields single / commands hint line', () => {
-    const ink = buildSuggestionLinesForInk('hello', 0)
-    expect(ink).toHaveLength(1)
-    expect(stripAnsi(ink[0]!)).toContain('/ commands')
-  })
-
-  test('unknown slash prefix returns empty', () => {
-    expect(buildSuggestionLinesForInk('/unknown', 0)).toEqual([])
+  test('always one hint line without ellipsis', () => {
+    for (const buffer of ['/h', '/', 'hello', '/unknown'] as const) {
+      const ink = buildSuggestionLinesForInk(buffer, 0)
+      expect(ink).toHaveLength(1)
+      expect(stripAnsi(ink[0]!)).toContain('/ commands')
+      expect(ink.some((l) => stripAnsi(l).includes('...'))).toBe(false)
+    }
   })
 })
 

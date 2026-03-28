@@ -2,7 +2,6 @@
  * `renderer.ts`: visible width, command-line draft rows, past user message paint, slash highlight.
  * TTY behavior: `interactiveTty*.test.ts`.
  */
-import './interactiveTestMocks.js'
 import { describe, test, expect } from 'vitest'
 import {
   buildCommandInputDraftLines,
@@ -33,8 +32,8 @@ describe('highlightRecognizedCommand', () => {
   })
 
   test('highlights exact command match', () => {
-    const result = highlightRecognizedCommand('/help')
-    expect(result).toStrictEqual(boldCyan('/help'))
+    const result = highlightRecognizedCommand('/exit')
+    expect(result).toStrictEqual(boldCyan('/exit'))
   })
 
   test('highlights only command part when param follows', () => {
@@ -72,9 +71,9 @@ describe('buildCommandInputDraftLines', () => {
   })
 
   test('recognized command gets bold+colored in first line', () => {
-    const lines = buildCommandInputDraftLines('/help', 40)
+    const lines = buildCommandInputDraftLines('/exit', 40)
     expect(lines[0]).toContain('→')
-    expect(lines[0]).toContain(boldCyan('/help'))
+    expect(lines[0]).toContain(boldCyan('/exit'))
   })
 
   test('command with param highlights only command part', () => {
@@ -108,39 +107,20 @@ describe('buildCommandInputDraftLines', () => {
 })
 
 describe('buildSuggestionLinesForInk', () => {
-  test('with /list, returns non-empty completion rows (Ink wraps to terminal width)', () => {
-    const lines = buildSuggestionLinesForInk('/list', 0)
-    expect(lines.length).toBeGreaterThan(0)
-    expect(lines.some((l) => l.endsWith('...'))).toBe(false)
-  })
-
-  test('with /remove-access-token-completely prefix, returns rows without string-level ellipsis', () => {
-    const lines = buildSuggestionLinesForInk(
-      '/remove-access-token-completely',
-      0
-    )
-    expect(lines.length).toBeGreaterThan(0)
-    expect(lines.some((l) => l.includes('...'))).toBe(false)
-  })
-
-  test('without slash prefix returns / commands hint (one line)', () => {
-    const lines = buildSuggestionLinesForInk('hello', 0)
-    expect(lines).toHaveLength(1)
-    expect(stripAnsi(lines[0]!)).toContain('/ commands')
-  })
-
-  test('with slash prefix but no match returns empty', () => {
-    expect(buildSuggestionLinesForInk('/unknown', 0)).toHaveLength(0)
+  test('always returns single / commands hint line (no completion list)', () => {
+    for (const buffer of ['/list', '/unknown', 'hello', '/']) {
+      const lines = buildSuggestionLinesForInk(buffer, 0)
+      expect(lines).toHaveLength(1)
+      expect(stripAnsi(lines[0]!)).toContain('/ commands')
+      expect(lines.some((l) => l.includes('...'))).toBe(false)
+    }
   })
 
   const sgrCloserEnd = new RegExp(
     `${String.fromCharCode(27)}\\[(?:0|39|49|23|22|24|25|26|27|55|59|53|65)m$`
   )
-  test.each([
-    ['/list'],
-    ['/'],
-  ] as const)('Current guidance Ink rows with ANSI end with an SGR closer for buffer %s', (buffer) => {
-    for (const line of buildSuggestionLinesForInk(buffer, 0)) {
+  test('Current guidance hint line with ANSI ends with an SGR closer', () => {
+    for (const line of buildSuggestionLinesForInk('/list', 0)) {
       if (line.includes('\x1b')) {
         expect(line).toMatch(sgrCloserEnd)
       }

@@ -1,10 +1,5 @@
 import React from 'react'
 import type { Key } from 'ink'
-import {
-  filterCommandsByPrefix,
-  getTabCompletion,
-  interactiveDocs,
-} from '../commands/help.js'
 import { cancelInteractiveFetchWaitFor } from '../interactiveFetchWait.js'
 import { maskInteractiveInputLineForStorage } from '../inputHistoryMask.js'
 import {
@@ -12,8 +7,7 @@ import {
   clearLiveCommandLine,
   onArrowDown,
   onArrowUp,
-  replaceLiveCommandDraft,
-  ttyArrowKeyUsesSlashSuggestionCycle,
+  singleLineCommandDraft,
   type InteractiveCommandInput,
 } from '../interactiveCommandInput.js'
 import { isCommittedInteractiveInput } from '../renderer.js'
@@ -24,7 +18,6 @@ import {
 } from '../shell/pastMessagesModel.js'
 import type { ShellSessionState } from '../shell/shellSessionState.js'
 import type { CliAssistantMessageTone, OutputAdapter } from '../types.js'
-import { hasInteractiveSlashCompletions } from '../slashCompletion.js'
 import {
   isInkSubmitPressed,
   type ShellSessionInkHandlers,
@@ -35,7 +28,6 @@ import type {
   AccessTokenListStageNavigation,
   TokenListSlashSubmitResult,
 } from './accessTokenListStage.js'
-import { cycleListSelectionIndex } from '../interactions/selectListInteraction.js'
 
 type InkKeyWithName = Key & { name?: string }
 
@@ -145,48 +137,18 @@ export function useInteractiveShellStage(
     const latest = latestSessionRef.current
 
     if (isEscapeInkKey(key) || input === '\u001b') {
-      if (hasInteractiveSlashCompletions(latest.commandInput.lineDraft)) {
-        patch((s) => {
-          const lastLine = s.commandInput.lineDraft
-          let next = { ...s, highlightIndex: 0 }
-          if (lastLine === '/') {
-            next = {
-              ...next,
-              commandInput: afterBareSlashEscape(next.commandInput),
-            }
-          } else {
-            next = { ...next, suggestionsDismissed: true }
-          }
-          return next
-        })
+      if (singleLineCommandDraft(latest.commandInput.lineDraft) === '/') {
+        patch((s) => ({
+          ...s,
+          commandInput: afterBareSlashEscape(s.commandInput),
+          highlightIndex: 0,
+        }))
       }
       return
     }
 
     if (submitPressed) {
       const trimmedInput = latest.commandInput.lineDraft.trim()
-
-      if (hasInteractiveSlashCompletions(latest.commandInput.lineDraft)) {
-        const pickIndex = latest.highlightIndex
-        const filtered = filterCommandsByPrefix(
-          interactiveDocs,
-          latest.commandInput.lineDraft
-        )
-        const selected = filtered[pickIndex] ?? filtered[0]
-        if (!selected) {
-          return
-        }
-        const selectedCommand = `${selected.usage} `
-        patch((s) => ({
-          ...s,
-          commandInput: replaceLiveCommandDraft(
-            s.commandInput,
-            selectedCommand
-          ),
-          highlightIndex: 0,
-        }))
-        return
-      }
 
       const inputLine = latest.commandInput.lineDraft
       patch((s) => ({
@@ -223,54 +185,18 @@ export function useInteractiveShellStage(
     } else if (key.upArrow || key.downArrow) {
       const dir = key.upArrow ? 'up' : 'down'
       const now = latestSessionRef.current
-      if (
-        ttyArrowKeyUsesSlashSuggestionCycle(
-          dir,
-          now.commandInput,
-          now.suggestionsDismissed,
-          hasInteractiveSlashCompletions(now.commandInput.lineDraft)
-        )
-      ) {
-        const filtered = filterCommandsByPrefix(
-          interactiveDocs,
-          now.commandInput.lineDraft
-        )
-        const delta = key.upArrow ? -1 : 1
-        patch((s) => ({
-          ...s,
-          highlightIndex: cycleListSelectionIndex(
-            s.highlightIndex,
-            delta,
-            filtered.length
-          ),
-        }))
-      } else {
-        const prevDraft = now.commandInput.lineDraft
-        const nextCommandInput =
-          dir === 'up'
-            ? onArrowUp(now.commandInput, hasInteractiveSlashCompletions)
-            : onArrowDown(now.commandInput, hasInteractiveSlashCompletions)
-        patch((s) => ({
-          ...s,
-          commandInput: nextCommandInput,
-          ...(nextCommandInput.lineDraft !== prevDraft
-            ? { highlightIndex: 0, suggestionsDismissed: false }
-            : {}),
-        }))
-      }
-    } else if (key.tab) {
-      const lastLine = latest.commandInput.lineDraft
-      if (lastLine.startsWith('/') && !lastLine.endsWith(' ')) {
-        const { completed, count } = getTabCompletion(lastLine, interactiveDocs)
-        if (count > 0 && completed !== lastLine) {
-          patch((s) => ({
-            ...s,
-            commandInput: replaceLiveCommandDraft(s.commandInput, completed),
-            highlightIndex: 0,
-            suggestionsDismissed: false,
-          }))
-        }
-      }
+      const prevDraft = now.commandInput.lineDraft
+      const nextCommandInput =
+        dir === 'up'
+          ? onArrowUp(now.commandInput)
+          : onArrowDown(now.commandInput)
+      patch((s) => ({
+        ...s,
+        commandInput: nextCommandInput,
+        ...(nextCommandInput.lineDraft !== prevDraft
+          ? { highlightIndex: 0, suggestionsDismissed: false }
+          : {}),
+      }))
     }
   }
 

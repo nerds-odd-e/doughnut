@@ -51,7 +51,9 @@ describe('run entry routing', () => {
   test('help subcommand is rejected with exit 1', async () => {
     await expect(run(['help'])).rejects.toThrow(ProcessExitForTest)
     await new Promise((r) => setImmediate(r))
-    expect(errorSpy).toHaveBeenCalledWith('doughnut: use /help in the shell')
+    expect(errorSpy).toHaveBeenCalledWith(
+      'doughnut: not a terminal (use version or update)'
+    )
     expect(exitSpy).toHaveBeenCalledWith(1)
   })
 

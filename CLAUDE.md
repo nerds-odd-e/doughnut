@@ -104,7 +104,7 @@ doughnut/
 
 - Frontend API client is auto-generated from OpenAPI spec
 - After changing backend controller signatures, run `pnpm generateTypeScript`
-- Frontend production build outputs to `frontend/dist/`; CLI bundle is `cli/dist/doughnut-cli.bundle.mjs` (`pnpm cli:bundle`). Prod serves `/doughnut-cli-latest/doughnut` from GCS; local dev / Cypress serves that path from `scripts/local-lb.mjs` reading `cli/dist` (not Spring on 9081). The CLI bundle aliases optional Ink DevTools import `react-devtools-core` to a stub under `cli/src/shims/`; see **Build output** in `.cursor/rules/cli.mdc`. **CLI:** multiline shell is **TTY-only**; scripts use **`doughnut version`** or **`doughnut update`**. Command list in the shell: **`/help`**.
+- Frontend production build outputs to `frontend/dist/`; CLI bundle is `cli/dist/doughnut-cli.bundle.mjs` (`pnpm cli:bundle`). Prod serves `/doughnut-cli-latest/doughnut` from GCS; local dev / Cypress serves that path from `scripts/local-lb.mjs` reading `cli/dist` (not Spring on 9081). The CLI bundle aliases optional Ink DevTools import `react-devtools-core` to a stub under `cli/src/shims/`; see **Build output** in `.cursor/rules/cli.mdc`. **CLI:** multiline shell is **TTY-only**; scripts use **`doughnut version`** or **`doughnut update`**. Interactive shell shows a **`/ commands`** hint only (no `/help` or completion UI).
 - Dev server proxies `/api/`, `/attachments/`, `/logout/`, `/testability/` to backend
 
 ## Code Conventions

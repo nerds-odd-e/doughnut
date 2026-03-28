@@ -10,10 +10,7 @@ import {
   INTERACTIVE_FETCH_WAIT_PROMPT_FG,
   terminalChalk,
 } from './terminalChalk.js'
-import {
-  formatCommandCompletionLines,
-  interactiveDocs,
-} from './commands/help.js'
+import { interactiveDocs } from './commands/help.js'
 import {
   formatTokenLines,
   type AccessTokenEntry,
@@ -25,7 +22,6 @@ import {
 } from './listDisplay.js'
 import type { CliAssistantMessageTone, PastMessages } from './types.js'
 import type { InteractiveFetchWaitLine } from './interactiveFetchWait.js'
-import { slashGuidanceForInk } from './slashCompletion.js'
 import {
   padEndVisible,
   stripTrailingSgrReset,
@@ -314,7 +310,7 @@ export function wrapMarkdownTerminalToLines(
 /**
  * Scroll-window **Current guidance** for plain rows (token list, tests, non-Ink paths): grey /
  * inverse highlight, optional per-item wrapped lines, then **truncate** each row to `width`.
- * Default command-line slash completion uses {@link buildSuggestionLinesForInk} + Ink wrap instead.
+ * Default command-line guidance uses {@link buildSuggestionLinesForInk} + Ink wrap instead.
  */
 export function renderCurrentGuidanceForSelectableLines(
   plainLines: readonly string[],
@@ -331,29 +327,14 @@ export function renderCurrentGuidanceForSelectableLines(
 }
 
 /**
- * Current guidance for the default TTY live column: command completion or `/` hint.
+ * Current guidance for the default TTY live column: static `/ commands` hint (no completion list).
  * No per-line grapheme truncation — Ink `Text` `wrap` inside `Box width={terminalWidth}` (gate 4).
  */
 export function buildSuggestionLinesForInk(
-  buffer: string,
-  highlightIndex: number,
-  options?: { forceCommandsHint?: boolean }
+  _buffer: string,
+  _highlightIndex: number
 ): string[] {
-  if (options?.forceCommandsHint) {
-    return [COMMANDS_HINT]
-  }
-  const g = slashGuidanceForInk(buffer)
-  if (g.show === 'hint') {
-    return [COMMANDS_HINT]
-  }
-  if (g.show === 'empty') {
-    return []
-  }
-  return formatHighlightedList(
-    formatCommandCompletionLines(g.docs),
-    CURRENT_GUIDANCE_MAX_VISIBLE,
-    highlightIndex
-  )
+  return [COMMANDS_HINT]
 }
 
 /** SGR wrapper for one line of a past CLI assistant message. */

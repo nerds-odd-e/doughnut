@@ -15,7 +15,6 @@ import {
   type PlaceholderContext,
   type TerminalWidth,
 } from '../renderer.js'
-import { hasInteractiveSlashCompletions } from '../slashCompletion.js'
 import { getDefaultTokenLabel } from '../commands/accessToken.js'
 import type {
   ShellSessionState,
@@ -218,12 +217,7 @@ export function ShellSessionRoot({
     ...leading,
     currentGuidanceLines: buildSuggestionLinesForInk(
       session.commandInput.lineDraft,
-      session.highlightIndex,
-      {
-        forceCommandsHint:
-          session.suggestionsDismissed &&
-          hasInteractiveSlashCompletions(session.commandInput.lineDraft),
-      }
+      session.highlightIndex
     ),
   }
   const livePanel = buildLivePanel(
