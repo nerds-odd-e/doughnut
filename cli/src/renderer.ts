@@ -26,7 +26,6 @@ import {
   padEndVisible,
   stripTrailingSgrReset,
   truncateToWidth,
-  wrapTextToVisibleWidthLines,
 } from './terminalLayout.js'
 
 export {
@@ -293,18 +292,6 @@ export function formatInteractiveCommandLineInkRows(
     return fitted.map(greyOutFullPaintRow)
   }
   return fitted
-}
-
-/** Newline-aware terminal wrap for markdown-rendered text (may contain ANSI). */
-export function wrapMarkdownTerminalToLines(
-  text: string,
-  width: TerminalWidth
-): string[] {
-  return text
-    .split('\n')
-    .flatMap((p) =>
-      p.length === 0 ? [''] : wrapTextToVisibleWidthLines(p, width)
-    )
 }
 
 /**
