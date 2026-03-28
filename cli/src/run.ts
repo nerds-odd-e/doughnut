@@ -25,5 +25,5 @@ export async function run(args: string[]): Promise<void> {
     exitCliError('not a terminal (use version or update)')
   }
 
-  runInteractive()
+  await runInteractive()
 }

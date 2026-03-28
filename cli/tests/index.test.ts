@@ -1,4 +1,6 @@
+import { Readable } from 'node:stream'
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
+import { runInteractive } from '../src/interactive.js'
 import { run } from '../src/run.js'
 import { formatVersionOutput } from '../src/commands/version.js'
 
@@ -92,5 +94,23 @@ describe('run entry routing', () => {
         writable: true,
       })
     }
+  })
+
+  test('TTY interactive prints version then waits for stdin to end', async () => {
+    const stdin = new Readable({
+      read() {
+        // no-op: test drives stdin via push()
+      },
+    }) as Readable & { isTTY: boolean }
+    stdin.isTTY = true
+
+    const session = runInteractive(stdin)
+    await new Promise((r) => setImmediate(r))
+    expect(logSpy).toHaveBeenCalledWith(formatVersionOutput())
+    expect(exitSpy).not.toHaveBeenCalled()
+
+    stdin.push(null)
+    await session
+    expect(exitSpy).not.toHaveBeenCalled()
   })
 })
