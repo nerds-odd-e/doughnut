@@ -78,6 +78,8 @@ And I should see "/exit" in past user messages
 
 ## Phase 2 — `/exit` slash command + uncomment last two steps
 
+Sub-phases and status: [`ongoing/cli-install-phase2-exit-e2e.md`](cli-install-phase2-exit-e2e.md).
+
 **User-visible outcome:** Full scenario passes: **`/exit`** is recorded as **`/exit`** in **past user messages**, session ends cleanly.
 
 **Production:**
@@ -101,7 +103,7 @@ And I should see "/exit" in past user messages
 
 ## Phase 3 — Lock documentation and retire this plan
 
-- Update `.cursor/rules/cli.mdc` **Active CLI E2E** bullet: this scenario is fully active (all four steps), not ignored.
+- `.cursor/rules/cli.mdc` **Active CLI E2E** — updated in Phase 2 sub-phase **2d** (`ongoing/cli-install-phase2-exit-e2e.md`).
 - Final sanity: run `cli_install_and_run.feature` spec.
 - Delete **this** plan file when the team no longer needs the checklist (or archive elsewhere).
 
