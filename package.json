@@ -145,7 +145,8 @@
       "yauzl": ">=3.2.1",
       "picomatch": ">=4.0.4",
       "yaml": "^2.8.3",
-      "handlebars": ">=4.7.9"
+      "handlebars": ">=4.7.9",
+      "path-to-regexp": ">=8.4.0"
     },
     "onlyBuiltDependencies": [
       "@badeball/cypress-cucumber-preprocessor",
