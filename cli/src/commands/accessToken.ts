@@ -3,11 +3,9 @@ import * as path from 'node:path'
 import {
   configureClient,
   getApiConfig,
-  UserController,
   type GeneratedTokenDto,
   type RequestOptions,
   type TokenConfigDto,
-  type UserToken,
 } from 'doughnut-api'
 import { getConfigDir } from '../configDir.js'
 import { isFetchAbortedByCaller } from '../fetchAbort.js'
@@ -200,12 +198,6 @@ function loadConfig(): AccessTokenConfig {
   }
 }
 
-function saveConfig(config: AccessTokenConfig): void {
-  const p = getConfigPath()
-  fs.mkdirSync(path.dirname(p), { recursive: true })
-  fs.writeFileSync(p, JSON.stringify(config, null, 2), 'utf-8')
-}
-
 async function withBackendClient<T>(
   token: string,
   fn: () => Promise<T>
@@ -245,61 +237,6 @@ export async function runDefaultBackendJson<T>(
   return (envelope as { data: T }).data
 }
 
-/** Like {@link runDefaultBackendJson}, but authenticates with the given bearer token string. */
-export async function withBackendJson<T>(
-  bearerToken: string,
-  fn: () => Promise<unknown>
-): Promise<T> {
-  const envelope = await withBackendClient(bearerToken, fn)
-  return (envelope as { data: T }).data
-}
-
-export async function addAccessToken(
-  token: string,
-  signal?: AbortSignal
-): Promise<void> {
-  const identity = await withBackendJson<UserToken>(token, () =>
-    UserController.getTokenInfo(doughnutSdkOptions(signal))
-  )
-  const config = loadConfig()
-  if (config.tokens.some((t) => t.token === token)) {
-    throw new Error('Token already added.')
-  }
-  config.tokens.push({ label: identity.label, token })
-  saveConfig(config)
-}
-
-export function listAccessTokens(): AccessTokenEntry[] {
-  return loadConfig().tokens
-}
-
-export function removeAccessToken(label: AccessTokenLabel): boolean {
-  const config = loadConfig()
-  const index = config.tokens.findIndex((t) => t.label === label)
-  if (index === -1) return false
-  config.tokens.splice(index, 1)
-  if (config.defaultLabel === label) {
-    delete config.defaultLabel
-  }
-  saveConfig(config)
-  return true
-}
-
-export async function removeAccessTokenCompletely(
-  label: AccessTokenLabel,
-  signal?: AbortSignal
-): Promise<void> {
-  const config = loadConfig()
-  const entry = config.tokens.find((t) => t.label === label)
-  if (!entry) {
-    throw new Error(`Token "${label}" not found.`)
-  }
-  await withBackendClient(entry.token, () =>
-    UserController.revokeToken(doughnutSdkOptions(signal))
-  )
-  removeAccessToken(label)
-}
-
 export function getDefaultTokenLabel(): AccessTokenLabel | undefined {
   const config = loadConfig()
   if (config.tokens.length === 0) return undefined
@@ -310,43 +247,4 @@ export function getDefaultTokenLabel(): AccessTokenLabel | undefined {
     return config.defaultLabel
   }
   return config.tokens[0]!.label
-}
-
-export function setDefaultTokenLabel(label: AccessTokenLabel): void {
-  const config = loadConfig()
-  config.defaultLabel = label
-  saveConfig(config)
-}
-
-export async function createAccessToken(
-  label: AccessTokenLabel,
-  signal?: AbortSignal
-): Promise<void> {
-  const config = loadConfig()
-  const defaultLabel = getDefaultTokenLabel()
-  const defaultEntry = config.tokens.find((t) => t.label === defaultLabel)
-  if (!defaultEntry) {
-    throw new Error(
-      authenticatedBackendCallFailureAdvice.noDefaultTokenInConfig
-    )
-  }
-  const body: TokenConfigDto = { label }
-  const row = await withBackendJson<GeneratedTokenDto>(defaultEntry.token, () =>
-    UserController.generateToken({
-      body,
-      ...doughnutSdkOptions(signal),
-    })
-  )
-  config.tokens.push({ label: row.label, token: row.token })
-  saveConfig(config)
-}
-
-export function formatTokenLines(
-  tokens: AccessTokenEntry[],
-  defaultLabel: AccessTokenLabel | undefined
-): string[] {
-  return tokens.map((t) => {
-    const prefix = t.label === defaultLabel ? '★ ' : '  '
-    return `${prefix}${t.label}`
-  })
 }
