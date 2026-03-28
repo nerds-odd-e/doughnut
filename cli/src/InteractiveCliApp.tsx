@@ -16,7 +16,7 @@ export function InteractiveCliApp() {
   const bufferRef = useRef('')
 
   useInput((input, key) => {
-    if (key.return) {
+    const commitLine = () => {
       const line = bufferRef.current
       bufferRef.current = ''
       setBuffer('')
@@ -26,22 +26,33 @@ export function InteractiveCliApp() {
           exit()
         }, 0)
       }
-      return
     }
+
     if (key.backspace || key.delete) {
-      setBuffer((b) => {
-        const next = b.slice(0, -1)
-        bufferRef.current = next
-        return next
-      })
+      const next = bufferRef.current.slice(0, -1)
+      bufferRef.current = next
+      setBuffer(next)
       return
     }
-    if (input) {
-      setBuffer((b) => {
-        const next = b + input
-        bufferRef.current = next
-        return next
-      })
+
+    for (let i = 0; i < input.length; i++) {
+      const ch = input[i]!
+      if (ch === '\r') {
+        commitLine()
+        if (input[i + 1] === '\n') i++
+        continue
+      }
+      if (ch === '\n') {
+        commitLine()
+        continue
+      }
+      const next = bufferRef.current + ch
+      bufferRef.current = next
+      setBuffer(next)
+    }
+
+    if (key.return) {
+      commitLine()
     }
   })
 
