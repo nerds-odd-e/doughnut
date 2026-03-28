@@ -9,7 +9,6 @@ import {
   countInputBoxTopBorderLinesInInteractivePtyTranscript,
   getPastUserMessagesContent,
   getPastCliAssistantMessagesContent,
-  getRecallMergedTranscriptRaw,
   ptyTranscriptSimulatedPlainScreen,
 } from '../../../step_definitions/cliSectionParser'
 
@@ -164,28 +163,6 @@ function currentGuidance() {
         needle: expected,
         whenMissing: `Gherkin step “… in the Current guidance” uses ${SECTION.simulatedVisiblePtyScreen} (cursor/erase replay).`,
       })
-    },
-    /**
-     * Bold/italic: PTY replay skips SGR (`m`), so use merged transcript bytes (Ink still emits ANSI there).
-     */
-    expectStyled(expected: string) {
-      withStdoutFor(
-        { kind: 'ptyInteractive', assertionTarget: target },
-        (stdout) => {
-          const raw = getRecallMergedTranscriptRaw(stdout)
-          expectSectionContainsSubstring(
-            raw,
-            expected,
-            `raw merged transcript (${SECTION.currentGuidance} styled step)`
-          )
-          const hasBold = raw.includes('\x1b[1m')
-          const hasItalic = raw.includes('\x1b[3m')
-          expect(
-            hasBold || hasItalic,
-            `Expected ANSI bold or italic in merged transcript for styled Current guidance. Raw length: ${raw.length}`
-          ).to.be.true
-        }
-      )
     },
   }
 }

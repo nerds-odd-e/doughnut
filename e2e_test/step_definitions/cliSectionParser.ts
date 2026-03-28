@@ -102,8 +102,7 @@ type Section =
 
 function collectSectionLines(
   boundaries: Boundaries,
-  section: Section,
-  strip: boolean
+  section: Section
 ): string[] {
   const { pastTranscriptLines, currentPromptLines, currentGuidanceLines } =
     boundaries
@@ -111,7 +110,7 @@ function collectSectionLines(
 
   if (section === 'current-guidance') {
     for (const line of currentGuidanceLines) {
-      const content = strip ? stripAnsi(line) : line
+      const content = stripAnsi(line)
       if (content.trim()) {
         result.push(content)
       }
@@ -122,7 +121,7 @@ function collectSectionLines(
   if (section === 'past-user-messages') {
     for (const line of pastTranscriptLines) {
       if (isPastUserMessageLine(line)) {
-        const content = strip ? stripAnsi(line) : line
+        const content = stripAnsi(line)
         if (content.trim()) {
           result.push(content)
         }
@@ -131,7 +130,7 @@ function collectSectionLines(
   } else if (section === 'past-cli-assistant-messages') {
     for (const line of pastTranscriptLines) {
       if (!isPastUserMessageLine(line)) {
-        const content = strip ? stripAnsi(line) : line
+        const content = stripAnsi(line)
         if (content.trim()) {
           result.push(content)
         }
@@ -139,7 +138,7 @@ function collectSectionLines(
     }
     for (const line of currentPromptLines) {
       if (!isCurrentPromptHintLine(line)) {
-        const content = strip ? stripAnsi(line) : line
+        const content = stripAnsi(line)
         if (content.trim()) {
           result.push(content)
         }
@@ -148,7 +147,7 @@ function collectSectionLines(
   } else if (section === 'current-prompt') {
     for (const line of currentPromptLines) {
       if (isCurrentPromptHintLine(line)) {
-        const content = strip ? stripAnsi(line) : line
+        const content = stripAnsi(line)
         if (content.trim()) {
           result.push(content)
         }
@@ -162,7 +161,7 @@ function collectSectionLines(
 
 function getSectionContent(output: string, section: Section): string {
   const boundaries = parseCliOutput(output)
-  return collectSectionLines(boundaries, section, true).join('\n')
+  return collectSectionLines(boundaries, section).join('\n')
 }
 
 export function getPastCliAssistantMessagesContent(output: string): string {
@@ -171,35 +170,6 @@ export function getPastCliAssistantMessagesContent(output: string): string {
 
 export function getPastUserMessagesContent(output: string): string {
   return getSectionContent(output, 'past-user-messages')
-}
-
-function parseLiveRegion(
-  output: string,
-  stripAnsiForAssertions: boolean
-): { mergedTranscriptPlain: string; pastCliAssistantMessagesPlain: string } {
-  const boundaries = parseCliOutput(output)
-  const strip = stripAnsiForAssertions
-  const pastCliAssistantMessagesPlain = collectSectionLines(
-    boundaries,
-    'past-cli-assistant-messages',
-    strip
-  ).join('\n')
-  const mergedTranscriptPlain = [
-    collectSectionLines(boundaries, 'current-prompt', strip).join('\n'),
-    collectSectionLines(boundaries, 'current-guidance', strip).join('\n'),
-    pastCliAssistantMessagesPlain,
-  ]
-    .join('\n')
-    .trim()
-  return { mergedTranscriptPlain, pastCliAssistantMessagesPlain }
-}
-
-/**
- * Raw ANSI merge of prompt + guidance + past CLI assistant message rows (styling checks).
- * PTY cursor replay drops SGR (`m`), so this is not interchangeable with {@link ptyTranscriptSimulatedPlainScreen}.
- */
-export function getRecallMergedTranscriptRaw(output: string): string {
-  return parseLiveRegion(output, false).mergedTranscriptPlain
 }
 
 /**

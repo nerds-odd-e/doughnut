@@ -62,10 +62,6 @@ Then('I should see {string} in past user messages', (expected: string) =>
 Then('I should see {string} in the Current guidance', (expected: string) =>
   cli.currentGuidance().expectContains(expected)
 )
-Then(
-  'I should see {string} styled in the Current guidance',
-  (expected: string) => cli.currentGuidance().expectStyled(expected)
-)
 Then('the input box UI should be normal', () =>
   cli.inputBoxTopBorder().expectExactlyOne()
 )

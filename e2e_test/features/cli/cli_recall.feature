@@ -23,6 +23,7 @@ Feature: CLI recall status and recall session
       When I enter the slash command "/recall-status" in the interactive CLI
       Then I should see "1 note to recall today" in past CLI assistant messages
 
+    @ignore
     @disableOpenAiService
     Scenario: Recall Just Review
       Given the note "sedation" was assimilated on day 1

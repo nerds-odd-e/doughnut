@@ -78,7 +78,7 @@ Work **bottom-to-top** (scenario list as in file):
 | ~~1.1.4~~ | ~~Recall MCQ — `/stop` during MCQ (scenario title: ESC/y/n); transcript “Stopped recall”~~ **done** (`@ignore`; E2E step `the recall session was stopped` + `getRecallDisplaySections` removed — `/stop` still covered by Vitest) |
 | ~~1.1.5~~ | ~~Recall MCQ — choose correct answer and see success~~ **done** (`@ignore`; MCQ number entry + “Correct!” still covered by Vitest `interactiveTtyMcq.test.ts`) |
 | ~~1.1.6~~ | ~~Recall session — complete all due notes, summary, load more~~ **done** (`@ignore`; E2E step `I answer … to prompt …` + `answerToPrompt` / `assertRecallSessionPromptOnSimulatedPtyScreen` removed — load more + summaries still covered by Vitest) |
-| 1.1.x | Recall Just Review |
+| ~~1.1.7~~ | ~~Recall Just Review~~ **done** (`@ignore`; E2E step `… styled in the Current guidance` + `expectStyled` / `getRecallMergedTranscriptRaw` removed — markdown in recall still covered by Vitest e.g. `processInput.test.ts`) |
 | 1.1.x | Recall status shows count |
 
 For each row: **A** then **B** (commit stops). Shared **Background** steps become deletable only when **no** non-ignored scenario in this file (or others) still uses them.
