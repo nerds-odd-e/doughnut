@@ -1,10 +1,6 @@
 import { Readable } from 'node:stream'
-import { mkdtempSync, writeFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
 import { Chalk } from 'chalk'
 import { vi } from 'vitest'
-import type { AccessTokenEntry } from '../../src/commands/accessToken.js'
 import { runInteractive } from '../../src/interactive.js'
 
 export const tick = () => new Promise<void>((r) => setImmediate(r))
@@ -148,24 +144,6 @@ export function lastStdoutLineContaining(
     if (line.includes(needle)) found = line
   }
   return found
-}
-
-export function makeTempConfigDir(tokens: AccessTokenEntry[]) {
-  const configDir = mkdtempSync(join(tmpdir(), 'doughnut-test-'))
-  writeFileSync(
-    join(configDir, 'access-tokens.json'),
-    JSON.stringify({ tokens })
-  )
-  return configDir
-}
-
-export function withConfigDir(configDir: string): () => void {
-  const original = process.env.DOUGHNUT_CONFIG_DIR
-  process.env.DOUGHNUT_CONFIG_DIR = configDir
-  return () => {
-    if (original === undefined) delete process.env.DOUGHNUT_CONFIG_DIR
-    else process.env.DOUGHNUT_CONFIG_DIR = original
-  }
 }
 
 export function spyConsoleLogNoop() {

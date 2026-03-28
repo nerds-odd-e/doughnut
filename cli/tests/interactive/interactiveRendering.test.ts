@@ -37,8 +37,8 @@ describe('highlightRecognizedCommand', () => {
   })
 
   test('highlights only command part when param follows', () => {
-    const result = highlightRecognizedCommand('/add-access-token x')
-    expect(result).toStrictEqual(`${boldCyan('/add-access-token')} x`)
+    const result = highlightRecognizedCommand('/exit x')
+    expect(result).toStrictEqual(`${boldCyan('/exit')} x`)
   })
 
   test('returns plain when no match', () => {
@@ -77,8 +77,8 @@ describe('buildCommandInputDraftLines', () => {
   })
 
   test('command with param highlights only command part', () => {
-    const lines = buildCommandInputDraftLines('/add-access-token mylabel', 40)
-    expect(lines[0]).toContain(`${boldCyan('/add-access-token')} mylabel`)
+    const lines = buildCommandInputDraftLines('/exit extra', 40)
+    expect(lines[0]).toContain(`${boldCyan('/exit')} extra`)
   })
 
   test('empty buffer in selection mode shows token-list placeholder', () => {

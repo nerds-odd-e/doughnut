@@ -1,5 +1,3 @@
-import { accessTokenCommandDocs } from './accessToken.js'
-
 export interface CommandDoc {
   name: string
   usage: string
@@ -15,5 +13,4 @@ export const interactiveDocs: CommandDoc[] = [
     description: 'Quit the CLI',
     category: 'interactive',
   },
-  ...accessTokenCommandDocs,
 ]

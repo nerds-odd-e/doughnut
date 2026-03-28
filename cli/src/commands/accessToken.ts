@@ -35,12 +35,11 @@ export function doughnutSdkOptions(
  * {@link authenticatedBackendCallFailureAdvice.noDefaultTokenInConfig}).
  */
 const authenticatedBackendCallFailureAdvice = {
-  noDefaultTokenInConfig:
-    'No default access token. Add one first with /add-access-token.',
+  noDefaultTokenInConfig: 'No default access token. Run doughnut login first.',
   serviceUnreachableOrUnclassifiedFailure:
     'Doughnut service is not available. Check DOUGHNUT_API_BASE_URL and ensure the service is running.',
   http401StoredTokenRejected:
-    'Access token is invalid or expired. Run doughnut login or add a new token with /add-access-token.',
+    'Access token is invalid or expired. Run doughnut login or configure a new token.',
   http403StoredTokenForbidden:
     'Access token does not have permission for this operation. Contact support if you believe this is an error.',
   http502Upstream: 'A dependency service failed (HTTP 502). Try again later.',
@@ -351,36 +350,3 @@ export function formatTokenLines(
     return `${prefix}${t.label}`
   })
 }
-
-export const accessTokenCommandDocs = [
-  {
-    name: '/add-access-token',
-    usage: '/add-access-token',
-    description: 'Add a Doughnut access token',
-    category: 'interactive' as const,
-  },
-  {
-    name: '/list-access-token',
-    usage: '/list-access-token',
-    description: 'List stored access tokens',
-    category: 'interactive' as const,
-  },
-  {
-    name: '/remove-access-token',
-    usage: '/remove-access-token',
-    description: 'Remove a local access token',
-    category: 'interactive' as const,
-  },
-  {
-    name: '/remove-access-token-completely',
-    usage: '/remove-access-token-completely',
-    description: 'Remove token locally and from server',
-    category: 'interactive' as const,
-  },
-  {
-    name: '/create-access-token',
-    usage: '/create-access-token',
-    description: 'Create a new access token on the server',
-    category: 'interactive' as const,
-  },
-]

@@ -11,7 +11,7 @@ TypeScript CLI for Doughnut. Lives in `cli/`.
 
 ```
 cli/
-  src/           # Production code (shell, TTY, UI, `processInput`; slash/subcommand handlers in `src/commands/`)
+  src/           # Production code (shell, TTY, UI, `processInput` exit gate; subcommand handlers in `src/commands/`)
   src/commands/  # Slash-command and subcommand implementations + aggregated help
   src/shims/     # Modules referenced only from the esbuild `bundle` script (aliases)
   tests/         # Vitest unit tests (*.test.ts)
@@ -71,7 +71,7 @@ Vocabulary for Cucumber steps and page objects (`e2e_test/start/pageObjects/cli/
 
 - **Interactive shell:** **TTY only** (`runInteractive` → `runInteractiveTtySession` in `cli/src/ttyAdapters/interactiveTtySession.ts`). Current guidance shows a grey **`/ commands`** hint only (no `/help`, tab completion, or slash picker). **No `-c`**, no piped-stdin shell, no `pipedAdapter`.
 - **Non-TTY:** **`doughnut version`** / **`-v`** / **`--version`** and **`doughnut update`** only.
-- **`processInput`:** Shared slash-command engine; wired from the interactive TTY session’s `OutputAdapter` and from Vitest via `defaultOutput` — **not** a second interactive UI.
+- **`processInput`:** Committed command-line handler: **`exit` / `/exit`** (optional `Bye.` via adapter) vs **`Not supported`** for any other non-empty line; wired from the TTY `OutputAdapter` and Vitest via `defaultOutput` — **not** a second interactive UI.
 
 ## Approved non-Ink bytes / stdin bridges
 
@@ -125,6 +125,6 @@ Build-time injection. Local: `cli/.env.local` from `cli/.env.local.example`. CI:
 ## Adding new commands
 
 1. Export **CommandDoc** from the handler module (`category`: `subcommand` | `interactive`).
-2. Register in **`commands/help.ts`** (`interactiveDocs` for TTY cyan prefix highlight on known slash usages).
-3. Wire **`processInput()`** (slash commands) or **`run.ts`** (`version` / `update` subcommands).
-4. Verify with **`pnpm cli`** and exercise the new slash or subcommand in the TTY or non-interactive path as appropriate.
+2. For a **`/` prefix** shown cyan while typing, add **`interactiveDocs`** in **`commands/help.ts`** and implement handling in **`processInput()`** (`interactive.ts`) if the line should do more than `Not supported`.
+3. Wire **`run.ts`** for non-interactive subcommands (`version` / `update`, etc.).
+4. Verify with **`pnpm cli`** and exercise the new behavior in the TTY or non-interactive path as appropriate.
