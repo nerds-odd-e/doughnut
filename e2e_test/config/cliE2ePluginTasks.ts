@@ -30,6 +30,8 @@ type CliInteractiveWriteLineTask = {
 
 const INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING = 'doughnut 0.1.0'
 const INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS = 20_000
+/** Let Ink process the line before CR so stdin is not one chunk `line+\r` (Ink would not set key.return). */
+const INSTALLED_CLI_INTERACTIVE_LINE_BEFORE_RETURN_MS = 50
 const INSTALLED_CLI_INTERACTIVE_WRITE_SETTLE_MS = 500
 
 const PREVIEW_LEN = 500
@@ -215,7 +217,11 @@ export function createCliE2ePluginTasks(repoRoot: string) {
         )
       }
       const { pty, buf } = interactiveCliPtySession
-      pty.write(`${line}\r`)
+      pty.write(line)
+      await new Promise<void>((resolve) =>
+        setTimeout(resolve, INSTALLED_CLI_INTERACTIVE_LINE_BEFORE_RETURN_MS)
+      )
+      pty.write('\r')
       await new Promise<void>((resolve) =>
         setTimeout(resolve, INSTALLED_CLI_INTERACTIVE_WRITE_SETTLE_MS)
       )
