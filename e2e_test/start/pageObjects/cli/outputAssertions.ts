@@ -91,6 +91,87 @@ function pastCliAssistantMessages() {
   }
 }
 
+/** Gray background from chalk `bgGray` / bright black (past user message block). */
+const PAST_USER_MSG_GRAY_BG_SGR = '\x1b[100m'
+/** Gray foreground from chalk `grey` — not sufficient for a past user message block. */
+const GRAY_FG_ONLY_SGR = '\x1b[90m'
+
+function assertPastUserMessageBlock(
+  raw: string,
+  stripped: string,
+  expected: string
+): void {
+  const previewLen = 500
+  const preview =
+    stripped.length > previewLen
+      ? `${stripped.slice(0, previewLen)}...`
+      : stripped
+
+  if (!stripped.includes(expected)) {
+    expect(
+      false,
+      `Past user messages: expected text ${JSON.stringify(expected)} in the transcript (ANSI-stripped).\n` +
+        `  Transcript length: ${stripped.length}\n` +
+        `  Preview:\n${preview}`
+    ).to.be.true
+    return
+  }
+
+  const lastIdx = raw.lastIndexOf(expected)
+  const windowBefore = raw.slice(Math.max(0, lastIdx - 120), lastIdx)
+  const hasGrayBg = windowBefore.includes(PAST_USER_MSG_GRAY_BG_SGR)
+  const hasGrayFgOnly = windowBefore.includes(GRAY_FG_ONLY_SGR) && !hasGrayBg
+
+  if (hasGrayFgOnly) {
+    expect(
+      false,
+      `Past user message ${JSON.stringify(expected)} must appear in a gray-background block in the past message area (ANSI ${JSON.stringify(PAST_USER_MSG_GRAY_BG_SGR)} before the text in the final paint). ` +
+        `Found gray foreground only (${JSON.stringify(GRAY_FG_ONLY_SGR)}), which is not a gray-background block.`
+    ).to.be.true
+    return
+  }
+
+  if (!hasGrayBg) {
+    expect(
+      false,
+      `Past user message ${JSON.stringify(expected)} must appear in a gray-background block (expect ANSI ${JSON.stringify(PAST_USER_MSG_GRAY_BG_SGR)} immediately before the text). ` +
+        `No gray-background SGR in the bytes before the last occurrence of that text.`
+    ).to.be.true
+    return
+  }
+
+  const normalized = stripped.replace(/\r/g, '')
+  const lines = normalized.split('\n')
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i]
+    if (line === undefined || !line.includes(expected)) continue
+    if (i === 0) {
+      expect(
+        false,
+        `Past user message line containing ${JSON.stringify(expected)} must have one blank line above it (top padding). ` +
+          `It is the first line of the stripped transcript (no line above). Preview:\n${preview}`
+      ).to.be.true
+      return
+    }
+    const lineAbove = lines[i - 1]
+    const prev = (lineAbove ?? '').trim()
+    if (prev !== '') {
+      expect(
+        false,
+        `Past user message line containing ${JSON.stringify(expected)} must have one blank line above it (top padding in the past message area). ` +
+          `The line above is not blank: ${JSON.stringify((lineAbove ?? '').slice(0, 200))}`
+      ).to.be.true
+      return
+    }
+    return
+  }
+
+  expect(
+    false,
+    `Internal: stripped transcript includes ${JSON.stringify(expected)} but no line contained it when splitting on newlines.`
+  ).to.be.true
+}
+
 function pastUserMessages() {
   return {
     expectContains(expected: string) {
@@ -103,18 +184,7 @@ function pastUserMessages() {
           ).to.be.true
           return
         }
-        const previewLen = 500
-        const preview =
-          stripped.length > previewLen
-            ? `${stripped.slice(0, previewLen)}...`
-            : stripped
-        expect(
-          stripped.includes(expected),
-          `Expected substring in past user messages (ANSI-stripped).\n` +
-            `  Expected: ${JSON.stringify(expected)}\n` +
-            `  Transcript length: ${stripped.length}\n` +
-            `  Preview:\n${preview}`
-        ).to.be.true
+        assertPastUserMessageBlock(raw, stripped, expected)
       })
     },
   }
