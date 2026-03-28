@@ -11,7 +11,6 @@ export const INTERACTIVE_FETCH_WAIT_LINES = {
   createAccessToken: 'Creating access token',
   removeAccessTokenCompletely: 'Removing access token',
   addGmail: 'Connecting Gmail',
-  lastEmail: 'Loading last email',
 } as const
 
 export type InteractiveFetchWaitLine =

@@ -10,14 +10,3 @@ export const GMAIL_E2E_OAUTH_ADD_CONFIG = {
   clientSecret: GMAIL_E2E_GOOGLE_CLIENT_SECRET,
   accounts: [],
 }
-
-export const GMAIL_E2E_MOCK_ACCOUNT_CONFIG = {
-  accounts: [
-    {
-      email: 'e2e@gmail.com',
-      accessToken: 'mock_access_token',
-      refreshToken: 'mock_refresh_token',
-      expiresAt: Date.now() + 3600_000,
-    },
-  ],
-}

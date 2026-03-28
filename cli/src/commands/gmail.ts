@@ -357,10 +357,4 @@ export const gmailCommandDocs = [
     description: 'Add Gmail account via OAuth',
     category: 'interactive' as const,
   },
-  {
-    name: '/last email',
-    usage: '/last email',
-    description: 'Show subject of last email',
-    category: 'interactive' as const,
-  },
 ]

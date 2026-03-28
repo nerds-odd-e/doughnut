@@ -22,7 +22,6 @@ Feature: CLI interactive mode
   Scenario: /help lists subcommands and interactive commands
     When I enter the slash command "/help" in the interactive CLI
     Then I should see "/add gmail" in past CLI assistant messages
-    And I should see "/last email" in past CLI assistant messages
     And I should see "exit" in past CLI assistant messages
     And I should see "update" in past CLI assistant messages
     And I should see "version" in past CLI assistant messages

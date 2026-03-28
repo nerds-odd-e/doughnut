@@ -143,14 +143,9 @@ describe('processInput', () => {
     restore()
   })
 
-  test('returns false and logs error for /last email when no account configured', async () => {
-    const configDir = mkdtempSync(`${tmpdir()}/doughnut-test-`)
-    const restore = withConfigDir(configDir)
+  test('/last email is not a supported slash command', async () => {
     expect(await processInput('/last email')).toBe(false)
-    expect(logSpy).toHaveBeenCalledWith(
-      'No Gmail account configured. Run /add gmail first.'
-    )
-    restore()
+    expect(logSpy).toHaveBeenCalledWith('Not supported')
   })
 
   // contract: /recall via processInput — default console (below) and OutputAdapter + real recallNext (load cancel).

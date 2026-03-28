@@ -46,7 +46,6 @@ const INTERACTIVE_FETCH_WAIT_SNIPPETS = [
   'Creating access token',
   'Removing access token',
   'Connecting Gmail',
-  'Loading last email',
 ] as const
 const VISIBLE_TAIL_LINES_WINDOW = 10
 /** Match `PROMPT` in `cli/src/renderer.ts` — full-grid scan avoids missing `→` when replay leaves many trailing blank rows after long output (e.g. `/help`). */

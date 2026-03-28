@@ -60,15 +60,3 @@ Given(
     )
   }
 )
-
-Given(
-  'the Google API mock returns messages and message {string} with subject {string}',
-  (messageId: string, subject: string) => {
-    cy.wrap(
-      mock_services
-        .google()
-        .stubGmailMessages([{ id: messageId }])
-        .then(() => mock_services.google().stubGmailMessage(messageId, subject))
-    )
-  }
-)

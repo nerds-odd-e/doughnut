@@ -4,10 +4,7 @@
 // @ts-check
 
 import { After, Before } from '@badeball/cypress-cucumber-preprocessor'
-import {
-  GMAIL_E2E_MOCK_ACCOUNT_CONFIG,
-  GMAIL_E2E_OAUTH_ADD_CONFIG,
-} from '../config/cliGmailE2eConfig'
+import { GMAIL_E2E_OAUTH_ADD_CONFIG } from '../config/cliGmailE2eConfig'
 import start, { mock_services } from '../start'
 import { cli } from '../start/pageObjects/cli'
 
@@ -121,25 +118,11 @@ Before({ tags: '@withCliGmailOAuthAddConfig', order: 1 }, () =>
     .as('cliConfigDir')
 )
 
-Before({ tags: '@withCliGmailMockAccountConfig', order: 1 }, () =>
-  cy
-    .task('createCliConfigDirWithGmail', GMAIL_E2E_MOCK_ACCOUNT_CONFIG)
-    .as('cliConfigDir')
-)
-
 Before({ tags: '@interactiveCLIGmailOAuth', order: 2 }, () =>
   cli.setup().startInteractiveGmailSession({ oauthSimulated: true })
 )
 
-Before({ tags: '@interactiveCLIGmail', order: 2 }, () =>
-  cli.setup().startInteractiveGmailSession({ oauthSimulated: false })
-)
-
 After({ tags: '@interactiveCLIGmailOAuth' }, () =>
-  cli.setup().stopInteractiveSession()
-)
-
-After({ tags: '@interactiveCLIGmail' }, () =>
   cli.setup().stopInteractiveSession()
 )
 

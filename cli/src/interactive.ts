@@ -7,7 +7,7 @@ import {
   removeAccessTokenCompletely,
 } from './commands/accessToken.js'
 import { userVisibleOutcomeFromCommandError } from './fetchAbort.js'
-import { addGmailAccount, getLastEmailSubject } from './commands/gmail.js'
+import { addGmailAccount } from './commands/gmail.js'
 import { formatHelp } from './commands/help.js'
 import { renderMarkdownToTerminal } from './markdown.js'
 import {
@@ -452,19 +452,6 @@ export async function processInput(
         INTERACTIVE_FETCH_WAIT_LINES.addGmail,
         (signal) => addGmailAccount(undefined, signal)
       )
-    } catch (err) {
-      logCancelledOrError(err, output)
-    }
-    return false
-  }
-  if (trimmed === '/last email') {
-    try {
-      const subject = await runInteractiveFetchWait(
-        output,
-        INTERACTIVE_FETCH_WAIT_LINES.lastEmail,
-        (signal) => getLastEmailSubject(undefined, signal)
-      )
-      output.log(subject)
     } catch (err) {
       logCancelledOrError(err, output)
     }

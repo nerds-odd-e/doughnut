@@ -25,24 +25,6 @@ const googleService = () => {
         emailAddress: email,
       })
     },
-
-    async stubGmailMessages(messages: { id: string }[]) {
-      return serviceMocker.stubGetterPathOnly('/gmail/v1/users/me/messages', {
-        messages,
-      })
-    },
-
-    async stubGmailMessage(id: string, subject: string) {
-      return serviceMocker.stubGetterPathOnly(
-        `/gmail/v1/users/me/messages/${id}`,
-        {
-          id,
-          payload: {
-            headers: [{ name: 'Subject', value: subject }],
-          },
-        }
-      )
-    },
   }
 }
 
