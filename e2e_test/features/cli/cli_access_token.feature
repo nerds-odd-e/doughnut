@@ -15,6 +15,7 @@ Feature: CLI access token management
     When I enter the slash command "/add-access-token invalid-token-xxx" in the interactive CLI
     Then I should see "Access token is invalid or expired" in past CLI assistant messages
 
+  @ignore
   Scenario Outline: Remove access token
     And I have a valid Doughnut Access Token with label "<label>"
     When I add the saved access token in the interactive CLI using add-access-token

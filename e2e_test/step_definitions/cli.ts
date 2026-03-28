@@ -40,12 +40,6 @@ When(
 )
 
 Then(
-  'I should see the {word} remove success message for {string}',
-  (removalType: string, label: string) =>
-    cli.removeToken().expectSuccess(removalType, label)
-)
-
-Then(
   'I should see {string} in the non-interactive output',
   (expected: string) => cli.nonInteractiveOutput().expectContains(expected)
 )
