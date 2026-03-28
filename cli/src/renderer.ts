@@ -69,15 +69,6 @@ export function buildCurrentPromptSeparatorForStageBand(
 
 export const PROMPT = '→ '
 
-/**
- * Which placeholder and command-line chrome apply while the user is in that mode.
- * `interactiveFetchWait` and `tokenList`: typing is disabled — grey paint, no `→` prompt.
- */
-export type PlaceholderContext =
-  | 'default'
-  | 'tokenList'
-  | 'interactiveFetchWait'
-
 export const PLACEHOLDER_BY_CONTEXT: Record<PlaceholderContext, string> = {
   default: '`exit` to quit.',
   tokenList: '↑↓ Enter to select; other keys cancel',
