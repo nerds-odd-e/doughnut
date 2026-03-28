@@ -54,10 +54,10 @@ Part 1 is **complete:** non-install CLI scenarios are **`@ignore`**, E2E harness
 | 2.5 | ~~`slashCompletion.test.ts`, `help.test.ts`~~ **Done** — removed `/help`, tab completion, slash picker, and `slashCompletion.ts`; `commands/help.ts` is `interactiveDocs` only; dropped `interactiveTestMocks.ts`; trimmed `interactiveCommandInput` (no tab/replace/slash-arrow helpers). |
 | 2.6 | ~~`processInput.test.ts`~~ **Done** — `processInput` handles only `exit` / `/exit` and logs `Not supported` for any other non-empty line; removed param-command table and fetch-wait wiring from `interactive.ts`. `interactiveDocs` is `/exit` only; dropped `accessTokenCommandDocs`; adjusted token error copy. Trimmed `processInput` tests; renderer tests use `/exit` for param highlight; removed `makeTempConfigDir` / `withConfigDir` from interactive test helpers (were only used by removed cases). |
 | 2.7 | ~~`renderer.test.ts`, `interactive/interactiveRendering.test.ts`~~ **Done** — removed; install E2E is non-interactive `version`/`update`. Dropped unused `wrapMarkdownTerminalToLines` from `renderer.ts`; deleted `interactiveTestHelpers.ts` (only used by removed rendering tests). TTY still uses `renderer.ts` via Ink. |
-| 2.8 | **Retain** `cli/tests/markdown.test.ts` and `cli/tests/sdkHttpErrorClassification.test.ts` (no removal / no empty `test.skip` for these files). **`index.test.ts`** — keep if required for `version`/`update`/entry; else trim per skip/delete rules |
+| 2.8 | ~~**Retain** `markdown.test.ts` / `sdkHttpErrorClassification.test.ts`; **`index.test.ts`** — removed duplicate `formatVersionOutput` test (covered by `version.test.ts`); kept `run` entry routing tests~~ **Done** |
 | 2.9 | **`gmail.test.ts`** — do not remove without changing the Gmail exception |
-| 2.10 | **`version.test.ts`, `update.test.ts`** — align with install feature |
-| 2.11 | `cli/vitest.config.ts`, Stryker configs — drop includes for deleted tests |
+| 2.10 | ~~**`version.test.ts`, `update.test.ts`** — align with install feature~~ **Done** — default version pinned to `0.1.0` (`cli_install_and_run`); update success asserts `Updated doughnut from 0.1.0 to 0.2.0`; `update.test.ts` mocks `node:fs` `renameSync`/`chmodSync` so success path does not touch real `argv[1]`. |
+| 2.11 | ~~`cli/vitest.config.ts`, Stryker configs~~ **Done** — removed Ink-only `FORCE_COLOR`/`CI` test `env` from `vitest.config.ts`; Stryker `mutate` now `src/markdown.ts` (tests still cover it); dropped stale `selectListInteraction` mutation target. |
 
 ---
 

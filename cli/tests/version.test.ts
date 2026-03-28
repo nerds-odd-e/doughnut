@@ -7,6 +7,10 @@ import {
 } from '../src/commands/version.js'
 
 describe('version', () => {
+  test('default version matches cli_install_and_run.feature (0.1.0)', () => {
+    expect(getVersion()).toBe('0.1.0')
+  })
+
   test('getVersion returns version string', () => {
     expect(getVersion()).toMatch(/^\d+\.\d+\.\d+$/)
   })

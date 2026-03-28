@@ -11,13 +11,6 @@ class ProcessExitForTest extends Error {
   }
 }
 
-describe('CLI', () => {
-  test('version command outputs doughnut prefix with version', () => {
-    const output = formatVersionOutput()
-    expect(output).toMatch(/^doughnut \d+\.\d+\.\d+$/)
-  })
-})
-
 describe('run entry routing', () => {
   let logSpy: ReturnType<typeof vi.spyOn>
   let errorSpy: ReturnType<typeof vi.spyOn>

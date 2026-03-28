@@ -5,6 +5,15 @@ vi.mock('node:child_process', () => ({
   spawnSync: vi.fn(),
 }))
 
+vi.mock('node:fs', async (importOriginal) => {
+  const fs = await importOriginal<typeof import('node:fs')>()
+  return {
+    ...fs,
+    renameSync: vi.fn(),
+    chmodSync: vi.fn(),
+  }
+})
+
 beforeEach(() => {
   process.argv[1] = '/path/to/doughnut'
 })
@@ -37,6 +46,36 @@ describe('runUpdate', () => {
 
     expect(consoleSpy).toHaveBeenCalledWith(
       'doughnut 0.1.0 is already the latest version'
+    )
+  })
+
+  test('reports Updated doughnut from … to … when incoming version is newer (install E2E)', async () => {
+    const consoleSpy = vi
+      .spyOn(console, 'log')
+      .mockImplementation(() => undefined)
+
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+      })
+    )
+
+    vi.mocked(childProcess.spawnSync).mockReturnValue({
+      stdout: 'doughnut 0.2.0',
+      stderr: '',
+      status: 0,
+      error: undefined,
+    } as ReturnType<typeof childProcess.spawnSync>)
+
+    process.env.BASE_URL = 'http://localhost:9081'
+
+    const { runUpdate } = await import('../src/commands/update.js')
+    await runUpdate()
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Updated doughnut from 0.1.0 to 0.2.0'
     )
   })
 

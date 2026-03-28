@@ -6,12 +6,12 @@ const config = {
   reporters: ['clear-text', 'progress'],
   testRunner: 'vitest',
   vitest: {
-    /** Full Vitest include list; `related: false` runs the suite per mutant (no direct-import test for this module). */
+    /** `related: false` runs the full Vitest suite per mutant so mutants in `markdown.ts` are exercised. */
     configFile: 'vitest.config.ts',
     related: false,
   },
   coverageAnalysis: 'off',
-  mutate: ['src/interactions/selectListInteraction.ts'],
+  mutate: ['src/markdown.ts'],
   thresholds: { high: 100, low: 80, break: 0 },
 }
 export default config
