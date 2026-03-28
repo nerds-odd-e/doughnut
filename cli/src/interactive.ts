@@ -1,22 +1,21 @@
 import type { Readable } from 'node:stream'
+import React from 'react'
+import { render } from 'ink'
 import { exitCliError } from './cliExit.js'
-import { formatVersionOutput } from './commands/version.js'
+import { InteractiveCliApp } from './InteractiveCliApp.js'
 
 export async function runInteractive(
-  stdin: Readable & { isTTY?: boolean } = process.stdin
+  stdin: Readable & { isTTY?: boolean } = process.stdin,
+  stdout: NodeJS.WriteStream = process.stdout
 ): Promise<void> {
   if (!stdin.isTTY) {
     exitCliError('not a terminal (use version or update)')
   }
-  console.log(formatVersionOutput())
-  if (stdin.readableEnded) {
-    return
-  }
-  await new Promise<void>((resolve, reject) => {
-    const done = () => resolve()
-    stdin.once('end', done)
-    stdin.once('close', done)
-    stdin.once('error', reject)
-    stdin.resume()
+  const { waitUntilExit } = render(React.createElement(InteractiveCliApp), {
+    stdin: stdin as NodeJS.ReadStream,
+    stdout,
+    exitOnCtrlC: true,
+    patchConsole: false,
   })
+  await waitUntilExit()
 }

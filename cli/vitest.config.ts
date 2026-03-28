@@ -12,7 +12,7 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
-    include: ['tests/**/*.test.ts'],
+    include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx'],
     exclude: ['node_modules', 'build'],
     globals: false,
     setupFiles: ['tests/setup.ts'],
@@ -21,8 +21,7 @@ export default defineConfig({
       // even when stdout is not a real TTY (as in test environments).
       FORCE_COLOR: '1',
       // Override CI=1 set by the nix dev environment. is-in-ci checks `env[key] !== '0'`,
-      // so CI='0' makes it evaluate to false — Ink then uses log-update cursor-positioning
-      // output so the test write spy can capture and replay frame updates correctly.
+      // so CI='0' makes it evaluate to false for consistent Ink behavior in tests.
       CI: '0',
     },
   },
