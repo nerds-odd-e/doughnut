@@ -1,14 +1,12 @@
 /**
- * Cucumber assertions on `@doughnutOutput`.
+ * Cucumber assertions on CLI output.
  *
- * - **Non-interactive**: one-shot CLI output (installed `version` / `update` spawns).
- * - **Interactive PTY**: `@cliInteractivePtyOutput` — use via `interactiveCli()` (plugin `interactiveCliPtySession`).
+ * - **Non-interactive**: one-shot CLI output (installed `version` / `update` spawns) via `@doughnutOutput`.
+ * - **Interactive PTY**: transcript from plugin task `cliInteractivePtyGetBuffer` (session in `interactiveCliPtySession`).
  */
 import { stripAnsiCliPty } from '../../../config/cliPtyAnsi'
 
 export const OUTPUT_ALIAS = '@doughnutOutput'
-
-export const CLI_INTERACTIVE_PTY_OUTPUT_ALIAS = '@cliInteractivePtyOutput'
 
 const SECTION = {
   nonInteractive: 'non-interactive output',
@@ -17,6 +15,9 @@ const SECTION = {
 const CONTENT_PREVIEW_LEN = 500
 
 const MAX_SNAPSHOT_CHARS = 12_000
+
+const CLI_OUTPUT_ASSERT_RETRY_MS = 50
+const CLI_OUTPUT_ASSERT_TIMEOUT_MS = 3000
 
 const WRONG_NON_INTERACTIVE_STEP =
   'Expected non-interactive CLI output (e.g. `version` / `update` spawn), but this capture looks like an interactive PTY session.'
@@ -88,44 +89,78 @@ function assertSectionContainsSubstring(
   )
 }
 
+/** Re-read value each attempt; retry until assert passes or timeout, then screenshot and throw. */
+function retryCliOutputAssertion(
+  readRaw: () => Cypress.Chainable<string>,
+  assert: (raw: string) => void,
+  screenshotName: string
+): void {
+  const tryOnce = (deadline: number) => {
+    readRaw().then((raw) => {
+      let lastError: Error | undefined
+      try {
+        assert(raw)
+        return
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err))
+      }
+      if (Date.now() >= deadline) {
+        cy.screenshot(screenshotName).then(() => {
+          throw lastError
+        })
+        return
+      }
+      cy.wait(CLI_OUTPUT_ASSERT_RETRY_MS).then(() => tryOnce(deadline))
+    })
+  }
+  cy.wrap(null).then(() => {
+    tryOnce(Date.now() + CLI_OUTPUT_ASSERT_TIMEOUT_MS)
+  })
+}
+
 function nonInteractiveOutput() {
   return {
     expectContains(expected: string) {
-      cy.get<string>(OUTPUT_ALIAS).then((stdout) => {
-        assertNonInteractiveCliOutput(stdout)
-        assertSectionContainsSubstring(stdout, expected, SECTION.nonInteractive)
-      })
+      retryCliOutputAssertion(
+        () => cy.get<string>(OUTPUT_ALIAS),
+        (stdout) => {
+          assertNonInteractiveCliOutput(stdout)
+          assertSectionContainsSubstring(
+            stdout,
+            expected,
+            SECTION.nonInteractive
+          )
+        },
+        'cli-non-interactive-output-assertion'
+      )
     },
   }
 }
 
-function pastCliAssistantMessages() {
-  return {
-    expectContains(expected: string) {
-      cy.get<string>(CLI_INTERACTIVE_PTY_OUTPUT_ALIAS).then((raw) => {
-        const stripped = stripAnsiCliPty(raw)
-        if (stripped.length === 0) {
-          failCliAssertion(
-            `Expected ${JSON.stringify(expected)} in past CLI assistant messages, but the PTY transcript is empty after stripping ANSI escape codes.`,
-            raw
-          )
-        }
-        if (stripped.includes(expected)) return
-        const previewLen = 500
-        const preview =
-          stripped.length > previewLen
-            ? `${stripped.slice(0, previewLen)}...`
-            : stripped
-        failCliAssertion(
-          `Expected substring in past CLI assistant messages (ANSI-stripped).\n` +
-            `  Expected: ${JSON.stringify(expected)}\n` +
-            `  Transcript length: ${stripped.length}\n` +
-            `  Preview:\n${preview}`,
-          raw
-        )
-      })
-    },
+function assertPastCliAssistantMessagesContains(
+  raw: string,
+  expected: string
+): void {
+  const stripped = stripAnsiCliPty(raw)
+  if (stripped.length === 0) {
+    failCliAssertion(
+      `Expected ${JSON.stringify(expected)} in past CLI assistant messages, but the PTY transcript is empty after stripping ANSI escape codes.`,
+      raw
+    )
   }
+  if (stripped.includes(expected)) return
+  const previewLen = 500
+  const preview =
+    stripped.length > previewLen
+      ? `${stripped.slice(0, previewLen)}...`
+      : stripped
+  failCliAssertion(
+    `Expected substring in past CLI assistant messages (ANSI-stripped).\n` +
+      `  Expected: ${JSON.stringify(expected)}\n` +
+      `  Transcript length: ${stripped.length}\n` +
+      `  Preview:\n${preview}`,
+    raw
+  )
 }
 
 /** Gray background from chalk `bgGray` / bright black (past user message block). */
@@ -204,19 +239,37 @@ function assertPastUserMessageBlock(
   )
 }
 
+function assertPastUserMessagesContains(raw: string, expected: string): void {
+  const stripped = stripAnsiCliPty(raw)
+  if (stripped.length === 0) {
+    failCliAssertion(
+      `Expected ${JSON.stringify(expected)} in past user messages, but the PTY transcript is empty after stripping ANSI escape codes.`,
+      raw
+    )
+  }
+  assertPastUserMessageBlock(raw, stripped, expected)
+}
+
+function pastCliAssistantMessages() {
+  return {
+    expectContains(expected: string) {
+      retryCliOutputAssertion(
+        () => cy.task<string>('cliInteractivePtyGetBuffer'),
+        (raw) => assertPastCliAssistantMessagesContains(raw, expected),
+        'cli-interactive-pty-past-assistant-assertion'
+      )
+    },
+  }
+}
+
 function pastUserMessages() {
   return {
     expectContains(expected: string) {
-      cy.get<string>(CLI_INTERACTIVE_PTY_OUTPUT_ALIAS).then((raw) => {
-        const stripped = stripAnsiCliPty(raw)
-        if (stripped.length === 0) {
-          failCliAssertion(
-            `Expected ${JSON.stringify(expected)} in past user messages, but the PTY transcript is empty after stripping ANSI escape codes.`,
-            raw
-          )
-        }
-        assertPastUserMessageBlock(raw, stripped, expected)
-      })
+      retryCliOutputAssertion(
+        () => cy.task<string>('cliInteractivePtyGetBuffer'),
+        (raw) => assertPastUserMessagesContains(raw, expected),
+        'cli-interactive-pty-past-user-assertion'
+      )
     },
   }
 }

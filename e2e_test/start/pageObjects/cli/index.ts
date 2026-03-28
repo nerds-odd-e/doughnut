@@ -6,7 +6,7 @@ import { interactiveCli } from './interactiveCli'
 /**
  * CLI page objects. Domain ordering:
  * - Output assertions (`outputAssertions`: non-interactive install runs)
- * - `interactiveCli()`: current interactive transcript (`@cliInteractivePtyOutput`); PTY handle in plugin `interactiveCliPtySession`
+ * - `interactiveCli()`: interactive PTY session; transcript via plugin task `cliInteractivePtyGetBuffer`
  * - Execution (installation)
  * - Backend (bundle, install script)
  */

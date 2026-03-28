@@ -172,7 +172,7 @@ export function createCliE2ePluginTasks(repoRoot: string) {
     async runInstalledCliInteractive({
       doughnutPath,
       env,
-    }: RunInstalledCliInteractiveTask): Promise<string> {
+    }: RunInstalledCliInteractiveTask): Promise<null> {
       if (!doughnutPath) {
         throw new Error(
           `runInstalledCliInteractive: doughnutPath required, got ${JSON.stringify(doughnutPath)}`
@@ -204,22 +204,30 @@ export function createCliE2ePluginTasks(repoRoot: string) {
         INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING,
         INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS
       )
-      return buf.text
+      return null
+    },
+    cliInteractivePtyGetBuffer(): string {
+      if (!interactiveCliPtySession) {
+        throw new Error(
+          'cliInteractivePtyGetBuffer: no active interactive CLI PTY session. Run installation interactive mode first.'
+        )
+      }
+      return interactiveCliPtySession.buf.text
     },
     async cliInteractiveWriteLine({
       line,
-    }: CliInteractiveWriteLineTask): Promise<string> {
+    }: CliInteractiveWriteLineTask): Promise<null> {
       if (!interactiveCliPtySession) {
         throw new Error(
           'cliInteractiveWriteLine: no active interactive CLI PTY session. Run installation interactive mode first.'
         )
       }
-      const { pty, buf } = interactiveCliPtySession
+      const { pty } = interactiveCliPtySession
       pty.write(`${line}\r`)
       await new Promise<void>((resolve) =>
         setTimeout(resolve, INSTALLED_CLI_INTERACTIVE_WRITE_SETTLE_MS)
       )
-      return buf.text
+      return null
     },
   }
 }
