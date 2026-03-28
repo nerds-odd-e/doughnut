@@ -114,7 +114,7 @@ Then('I should see {string} in the non-interactive output', (expected: string) =
 
 ### 4. CLI E2E and page objects
 
-CLI steps use `cli.xxx` page objects (in `e2e_test/start/pageObjects/cli/`), not `start.xxx`. For the **install** feature: `cli.backend()`, `cli.installation()`, and `cli.nonInteractiveOutput()` (spawned `version` / `update` stdout). Other `features/cli/*.feature` files are **`@ignore`** in CI; extend Vitest under `cli/tests/interactive/` for interactive TTY coverage instead of new Cypress PTY harness.
+CLI steps use `cli.xxx` page objects (in `e2e_test/start/pageObjects/cli/`), not `start.xxx`. For the **install** feature: `cli.backend()`, `cli.installation()`, and `cli.nonInteractiveOutput()` (spawned `version` / `update` stdout). Other `features/cli/*.feature` files are **`@ignore`** in CI; do not add a Cypress PTY harness — use Vitest in `cli/tests/` if you need new CLI automation.
 
 ### 5. Test Data Management
 
@@ -227,7 +227,7 @@ A scenario describes **one fixed path**. Prefer **dumb** automation: the path is
 - **Distinguish variants at the caller:** use different steps and/or different page-object methods (and scenarios when needed), not one “smart” API that infers what to do from parameters.
 - **State the condition in step wording** when behavior differs—for example **slash command** (space then Enter) vs **plain line** (line then Enter) vs **Enter** alone vs **ESC**—so readers and tools see a fixed sequence without opening implementation code.
 
-**Motivating example (CLI):** the retained Cypress path is **non-interactive** install checks (`runInstalledCli` with stdin closed). Prefer **explicit** step wording and small page-object methods; do not infer “interactive vs one-shot” from a single vague parameter. For TTY sequences, add or extend **Vitest** (`cli/tests/interactive/`) rather than a second Cypress PTY stack.
+**Motivating example (CLI):** the retained Cypress path is **non-interactive** install checks (`runInstalledCli` with stdin closed). Prefer **explicit** step wording and small page-object methods; do not infer “interactive vs one-shot” from a single vague parameter. For TTY sequences, add or extend **Vitest** under `cli/tests/` rather than a second Cypress PTY stack.
 
 ## Linting Errors and E2E Tests
 

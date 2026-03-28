@@ -64,7 +64,7 @@ function mockRecalling(toRepeat: MemoryTrackerLite[] = []) {
     .mockResolvedValue(dueTrackersData(toRepeat))
 }
 
-// recall.ts API and HTTP wiring. Multi-turn /recall via processInput (console or OutputAdapter): interactive/processInput.test.ts.
+// recall.ts API and HTTP wiring.
 describe('recallStatus', () => {
   let originalConfigDir: string | undefined
 
