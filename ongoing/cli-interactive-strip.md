@@ -130,7 +130,7 @@ Single or few sub-phases (each with commit stop):
 - ~~Trim **`e2e_test/step_definitions/cli.ts`** and **`e2e_test/start/pageObjects/cli/*`** to what **`cli_install_and_run`** + shared backend steps still need~~ **done** (install-only steps + `backend` / `installation` / `nonInteractiveOutput`; dead **`@interactiveCLI`** tags removed from ignored CLI features).
 - ~~Remove unused mock Gmail **Given** steps from `cli.ts` if no feature references them~~ **n/a** (Gmail **Given** text only remains in ignored `cli_gmail.feature`; no Gmail steps in `cli.ts`).
 
-**Part 1.5 complete.** **Next:** Part 2 (Vitest cleanup), starting with **2.2** (recall-focused tests).
+**Part 1.5 complete.** **Next:** Part 2 (Vitest cleanup), starting with **2.1** (`cli/tests/interactive/`).
 
 ### Part 1.6 — Feature: `cli_install_and_run.feature` (optional strip inside the install feature)
 
@@ -151,7 +151,7 @@ Run these **after** Part 1 is complete (or when a group is discovered orphaned m
 
 | Phase | Likely target (confirm at execution time) |
 |-------|-------------------------------------------|
-| ~~2.1~~ | ~~Entire `cli/tests/interactive/` tree~~ **done** (directory removed; `recallMcqTtyCursorPosition.test.ts` removed — depended on interactive harness only) |
+| 2.1 | Entire `cli/tests/interactive/` tree if any file remains |
 | 2.2 | Recall-focused tests: `recall*.test.ts`, `recallYesNo.test.ts`, `recallMcq*.test.ts`, `recallNextTestShapes.ts`, `recallPromptFixtures.ts` |
 | 2.3 | Token/list/shell UX: `accessToken.test.ts`, `selectListInteraction.test.ts`, `listDisplay.test.ts`, `interactiveCommandInput.test.ts`, `userInputHistoryFile.test.ts`, `inputHistoryMask.test.ts`, `shell/pastMessagesModel.test.ts` |
 | 2.4 | TTY/Ink-heavy: `mainCommandLineInkTyping.test.ts`, `interactiveFetchWait.test.ts`, `ttyWriteSimulation.ts` (if only tests) |
