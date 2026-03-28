@@ -34,14 +34,9 @@ cli/
 
 **Do not use** JavaScript string `.length` or UTF-16 code units to measure how wide text is on screen. Terminals use **column count**: CJK and many emoji render as **2 columns**; grapheme clusters (flags, ZWJ families, text + VS16) must be measured as units.
 
-- **Single API in code:** `visibleLength`, `wrapTextToVisibleWidthLines`, `truncateToWidth`, and **`terminalColumnsOfPlainGrapheme`** (plain grapheme, no ANSI) in **`cli/src/terminalLayout.ts`** (re-exported from **`cli/src/renderer.ts`**). New layout or wrap logic should go through these — not ad-hoc counting.
-
 ## Vitest: observable behavior
 
 For **interactive** behavior, prefer **`runInteractive`** with a **mock TTY** stdin and assert **stdout** / visible output — the test may **not import** the adapter or helper you changed; coverage through the CLI surface is enough. Use **`processInput`** + mock **`OutputAdapter`** for the **default console adapter** contract, helpers, or when there is no stable TTY hook. See **Testing strategy → Observable behavior first** in `.cursor/rules/planning.mdc`.
-
-- **TTY-specific behavior:** `runInteractive` with a mock TTY and stdout assertions where needed.
-- **`cli/tests/interactive/processInput.test.ts`:** Contract for **`processInput`** with the **default adapter** (`console.log` / `writeCurrentPrompt`), not a second interactive engine.
 
 ## Domain terminology
 
@@ -58,35 +53,6 @@ Vocabulary for Cucumber steps and page objects (`e2e_test/start/pageObjects/cli/
 | **Current stage band** | Shared background for the Current Stage Indicator line and, when the indicator is shown, the **Current prompt** separator under it, so the top of the block reads as one strip. Implemented as `CURRENT_STAGE_BAND_BACKGROUND_SGR` in `cli/src/renderer.ts`. |
 | **Current prompt** | Block above the **command line** (live typing strip): optional **Current Stage Indicator** + separator (banded when the indicator is shown), then wrapped lines (MCQ stem and notebook line, fetch-wait prompt, y/n text, token-list copy, etc.). Recall **MCQ** (TTY): **numbered choices** live in **Current guidance**, not here. |
 | **Current guidance** | Below the command line: `/` hints, token lists, **MCQ numbered choices** (wrapped to terminal width; ↑↓ selects by choice index). |
-| **TTY shell view model** | `ShellSessionRoot` renders exactly two visible regions: past transcript (`Static` past messages) and one live column panel selected by mode (command line, selection list, y/n confirm, fetch wait). |
-| **Command line (live strip)** | Borderless live typing area (`CommandLineLivePanel` in `liveColumnInk.tsx`); no bordered “input box” chrome (phase 10.5). |
-| **Live column focus (TTY)** | Ink `useFocus`: **Tab** / **Shift+Tab** cycle focus among focusable regions in the live column. **↑↓** for **user input history** walk and slash-picker cycling apply **only** while the **command line** region is focused. `LiveColumnStdinPolicy` **`commandLine`** refocuses after slash-picker **Esc**; **`listSelection`** drives MCQ + token lists with `LIST_SELECTION_INK_FOCUS_ID` (`liveColumnInk.tsx`). **MCQ** and **token list** Esc are Ink-only — readline `keypress` must **not** handle them (duplicate stop-confirm risk for MCQ). **Fetch-wait** Esc is `FetchWaitDisplay` `useInput`. Readline `keypress` in `interactiveTtySession.ts` is **Ctrl+C** (exit) only. |
-| **Selection mode** | Access-token picking: `AccessTokenPickerLivePanel` in `liveColumnInk.tsx` + `dispatchSelectListKey` (`selectListInteraction.ts`); list **Esc** goes through Ink `useInput` on stdin. |
-| **Interactive fetch wait** | Domain: a **Current Stage**. TTY: **Current stage band** (`Spinner` + wait label) + banded separator, dim “loading …” line; **`FetchWaitDisplay`** uses Ink **`useInput`** for **Esc** (abort). **Ctrl+C** remains readline `keypress` (exit before Ink). Not `@inkjs/ui` **`TextInput`** (disabled `TextInput` still registers active `useInput` in ink-ui). See `interactiveFetchWait.ts`, `FetchWaitDisplay.tsx`, `interactiveTtySession.ts`. |
-| **Access token list / pick (TTY)** | **Current Stage**; banded indicator text from `AccessTokenPickerCommandConfig.stageIndicator` (`types.ts`, values in `shell/tokenListCommands.ts` → `TOKEN_LIST_COMMANDS`); `greyCurrentStageIndicatorLabel` in `renderer.ts`. `/list-access-token` keeps the long instruction as wrapped **Current prompt** lines under the band. |
-
-**`/add-access-token`:** Never persist or show raw tokens in past user messages or user input history; `maskInteractiveInputLineForStorage` in `inputHistoryMask.ts`.
-
-## Entry points
-
-- **Interactive shell:** **TTY only** (`runInteractive` → `runInteractiveTtySession` in `cli/src/ttyAdapters/interactiveTtySession.ts`). Current guidance shows a grey **`/ commands`** hint only (no `/help`, tab completion, or slash picker). **No `-c`**, no piped-stdin shell, no `pipedAdapter`.
-- **Non-TTY:** **`doughnut version`** / **`-v`** / **`--version`** and **`doughnut update`** only.
-- **`processInput`:** Committed command-line handler: **`exit` / `/exit`** (optional `Bye.` via adapter) vs **`Not supported`** for any other non-empty line; wired from the TTY `OutputAdapter` and Vitest via `defaultOutput` — **not** a second interactive UI.
-
-## Approved non-Ink bytes / stdin bridges
-
-Document new cases in `cli/src/ttyAdapters/interactiveTtySession.ts` (file header) and next to code; avoid ad-hoc `process.stdout.write`.
-
-**From Ink:** `InteractiveApp` receives **`InteractiveAppTerminalContract`** from `interactiveTtySession` only — no direct `process.stdout` / `interactiveTtyStdout` from `cli/src/ui/` for shell chrome.
-
-| Path | Allowed |
-|------|---------|
-| **Private terminal control sequence** | Input-ready PTY signal (`interactiveTtyStdout`, `renderer`). |
-| **Hardware cursor** | Explicit hide/show only for exception flows (fetch-wait, exit). Default command-line live paint must not emit `HIDE_CURSOR`. |
-| **Exit path** | Ctrl+C newline and farewell lines (`interactiveTtyStdout.exitFarewellBlock`, `ctrlCExitNewline`). |
-| **Pre-Ink banner** | Version lines before Ink `render()` (`interactiveTtySession`). |
-| **`patchConsole` guard** | Enable only when `console.Console` is constructible (`inkPatchConsoleSupported`). |
-| **readline `keypress` bridge** | `Ctrl+C` only; do not handle MCQ/token-list/fetch-wait `Esc` here. |
 
 ## CLI E2E
 
@@ -95,8 +61,6 @@ Features: **`e2e_test/features/cli/`**. Steps and page objects: **`e2e_test/step
 - **Run:** Cypress Node tasks spawn `cli/dist/doughnut-cli.bundle.mjs` via `node` (same locally and in GitHub Actions). Before spawn, `ensureCliBundleFresh` rebuilds the bundle when `cli/src`, `cli/package.json`, `cli/tsconfig.json`, or `packages/doughnut-api/src` are newer than the bundle. Set **`DOUGHNUT_CLI_E2E_USE_TSX=1`** to force `pnpm -C cli exec tsx src/index.ts` for debugging. Installation scenarios use the E2E install bundle path (see `@bundleCliE2eInstall`).
 - **`@bundleCliE2eInstall`:** Builds `cli/dist/e2e-install-doughnut-cli.bundle.mjs` before each scenario and removes it after; the local LB (`scripts/local-lb.mjs`) serves `/doughnut-cli-latest/doughnut` from that file when present so install tests do not overwrite `cli/dist/doughnut-cli.bundle.mjs`.
 - **Active CLI E2E (CI):** `e2e_test/features/cli/cli_install_and_run.feature` non-ignored scenarios only. **`installCli`** runs the install script; **`runInstalledCli`** spawns `node <installed binary> …` with stdin closed (e.g. `version`, `update`). Assertions use **`cli.nonInteractiveOutput().expectContains`**, which rejects captures that look like an interactive PTY session (`e2e_test/start/pageObjects/cli/outputAssertions.ts`).
-- **Ignored CLI features:** Other `e2e_test/features/cli/*.feature` files stay on disk with **`@ignore`**; their Gherkin is not executed in CI. Remaining interactive Vitest coverage includes **`cli/tests/interactive/processInput.test.ts`** (plus other `cli/tests/*.test.ts` as listed in `vitest.config.ts`).
-- **Flaky:** Avoid Cypress for **transient loading lines**; prefer focused Vitest at the CLI surface where needed.
 
 ## Build output
 
@@ -111,20 +75,3 @@ Features: **`e2e_test/features/cli/`**. Steps and page objects: **`e2e_test/step
 - Bash: `backend/src/main/resources/install.sh`
 - PowerShell: `backend/src/main/resources/install.ps1`
 - Served at `/install` (`InstallController`; `?win32=true` for PowerShell)
-
-## API base URL
-
-Default production API: `https://doughnut.odd-e.com`. **`pnpm cli`** sets `DOUGHNUT_API_BASE_URL=http://localhost:9081` and `DOUGHNUT_CONFIG_DIR=~/.config/doughnut-dev`. Production-style: `pnpm cli -P` / `--production`. Self-hosted: set `DOUGHNUT_API_BASE_URL`.
-
-**Recall load delay (tests/manual):** `DOUGHNUT_CLI_SLOW_RECALL_LOAD_MS` — see `cli/src/commands/recall.ts`.
-
-## OAuth credentials (Gmail)
-
-Build-time injection. Local: `cli/.env.local` from `cli/.env.local.example`. CI: `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` secrets.
-
-## Adding new commands
-
-1. Export **CommandDoc** from the handler module (`category`: `subcommand` | `interactive`).
-2. For a **`/` prefix** shown cyan while typing, add **`interactiveDocs`** in **`commands/help.ts`** and implement handling in **`processInput()`** (`interactive.ts`) if the line should do more than `Not supported`.
-3. Wire **`run.ts`** for non-interactive subcommands (`version` / `update`, etc.).
-4. Verify with **`pnpm cli`** and exercise the new behavior in the TTY or non-interactive path as appropriate.
