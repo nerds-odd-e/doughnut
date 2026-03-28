@@ -83,7 +83,7 @@ Work **bottom-to-top** (scenario list as in file):
 
 For each row: **A** then **B** (commit stops). Shared **Background** steps become deletable only when **no** non-ignored scenario in this file (or others) still uses them.
 
-### Part 1.2 — Feature: `cli_access_token.feature`
+### Part 1.2 — Feature: `cli_access_token.feature` (all scenarios `@ignore`)
 
 Bottom-to-top:
 
@@ -92,8 +92,8 @@ Bottom-to-top:
 | ~~1.2.1~~ | ~~Create access token via CLI~~ **done** (`@ignore`; `/create-access-token` still covered by Vitest `accessToken.test.ts`, `processInput.test.ts`) |
 | ~~1.2.2~~ | ~~Another key cancels remove-access-token selection~~ **done** (`@ignore`; E2E `rawKey` keystroke + step removed — “other keys cancel” still in Vitest `interactiveTtyTokenList.test.ts`) |
 | ~~1.2.3~~ | ~~Scenario Outline: Remove access token (both examples)~~ **done** (`@ignore`; E2E step `… remove success message …` + `removeToken` page object removed — removal still in Vitest `accessToken.test.ts`, `processInput.test.ts`, `interactiveTtyTokenList.test.ts`) |
-| 1.2.x | Add invalid access token |
-| 1.2.x | Add access token and list it |
+| ~~1.2.4~~ | ~~Add invalid access token~~ **done** (`@ignore`; invalid-token message still in Vitest `accessToken.test.ts`, `recall.test.ts`, `sdkHttpErrorClassification.test.ts`) |
+| ~~1.2.x~~ | ~~Add access token and list it~~ **done** (`@ignore`; E2E `addSavedTokenInteractive` + `… in the Current guidance` removed — add/list still in Vitest `accessToken.test.ts`, `processInput.test.ts`, `interactiveTtyTokenList.test.ts`) |
 
 ### Part 1.3 — Feature: `cli_gmail.feature`
 

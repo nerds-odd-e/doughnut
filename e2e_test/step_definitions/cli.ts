@@ -34,11 +34,6 @@ When('I enter {string} in the interactive CLI', (line: string) =>
 When('I press Enter in the interactive CLI', () =>
   cli.interactive().pressEnter()
 )
-When(
-  'I add the saved access token in the interactive CLI using add-access-token',
-  () => cli.accessToken().addSavedTokenInteractive()
-)
-
 Then(
   'I should see {string} in the non-interactive output',
   (expected: string) => cli.nonInteractiveOutput().expectContains(expected)
@@ -49,9 +44,6 @@ Then(
 )
 Then('I should see {string} in past user messages', (expected: string) =>
   cli.pastUserMessages().expectContains(expected)
-)
-Then('I should see {string} in the Current guidance', (expected: string) =>
-  cli.currentGuidance().expectContains(expected)
 )
 Then('the input box UI should be normal', () =>
   cli.inputBoxTopBorder().expectExactlyOne()

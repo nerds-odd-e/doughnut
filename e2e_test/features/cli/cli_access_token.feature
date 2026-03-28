@@ -5,12 +5,14 @@ Feature: CLI access token management
   Background:
     Given I am logged in as "old_learner"
 
+  @ignore
   Scenario: Add access token and list it
     And I have a valid Doughnut Access Token with label "E2E CLI Token"
     When I add the saved access token in the interactive CLI using add-access-token
     When I enter the slash command "/list-access-token" in the interactive CLI
     Then I should see "E2E CLI Token" in the Current guidance
 
+  @ignore
   Scenario: Add invalid access token
     When I enter the slash command "/add-access-token invalid-token-xxx" in the interactive CLI
     Then I should see "Access token is invalid or expired" in past CLI assistant messages

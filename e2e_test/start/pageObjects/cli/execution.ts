@@ -7,8 +7,6 @@ import {
   type InteractiveCliPtyKeystroke,
 } from '../../../config/interactiveCliPtyTypes'
 import { e2eAppBaseUrl } from '../../../support/e2eAppUrl'
-import { pastCliAssistantMessages } from './outputAssertions'
-
 const GOOGLE_MOCK_BASE_URL = 'http://localhost:5003'
 
 export function envForCliWithConfigDir(
@@ -96,18 +94,4 @@ function interactive() {
   }
 }
 
-function accessToken() {
-  return {
-    addSavedTokenInteractive() {
-      cy.get<string>('@savedAccessToken').then((token) =>
-        applyInteractiveCliPtyKeystroke({
-          kind: 'slashCommand',
-          commandLine: `/add-access-token ${token}`,
-        })
-      )
-      pastCliAssistantMessages().expectContains('Token added')
-    },
-  }
-}
-
-export { installation, interactive, accessToken }
+export { installation, interactive }

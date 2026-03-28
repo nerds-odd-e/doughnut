@@ -9,7 +9,6 @@ import {
   countInputBoxTopBorderLinesInInteractivePtyTranscript,
   getPastUserMessagesContent,
   getPastCliAssistantMessagesContent,
-  ptyTranscriptSimulatedPlainScreen,
 } from '../../../step_definitions/cliSectionParser'
 
 export const OUTPUT_ALIAS = '@doughnutOutput'
@@ -18,18 +17,15 @@ const SECTION = {
   nonInteractive: 'non-interactive output',
   pastCliAssistantMessages: 'past CLI assistant messages',
   pastUserMessages: 'past user messages',
-  currentGuidance: 'Current guidance',
-  simulatedVisiblePtyScreen: 'simulated visible PTY screen',
 } as const
 
 type SectionLabel = (typeof SECTION)[keyof typeof SECTION]
 
 const CONTENT_PREVIEW_LEN = 500
-const SIMULATED_SCREEN_TAIL_LEN = 1200
 
 const WRONG_NON_INTERACTIVE_STEP =
   'This capture looks like PTY interactive output. ' +
-  'Use: Then I should see "…" in past CLI assistant messages — or Current guidance / past user messages — not non-interactive output.'
+  'Use: Then I should see "…" in past CLI assistant messages or past user messages — not non-interactive output.'
 
 const wrongPtyInteractiveStep = (
   section: SectionLabel | 'interactive CLI input box'
@@ -91,25 +87,6 @@ function expectSectionContainsSubstring(
   ).to.include(needle)
 }
 
-/** Substring must appear on the simulated plain screen (Ink live region, not line-split merge). */
-function expectInteractivePtySimulatedScreenContains(args: {
-  assertionTarget: SectionLabel | 'interactive CLI input box'
-  needle: string
-  whenMissing: string
-}): void {
-  withStdoutFor(
-    { kind: 'ptyInteractive', assertionTarget: args.assertionTarget },
-    (stdout) => {
-      const plain = ptyTranscriptSimulatedPlainScreen(stdout)
-      const tail = plain.slice(-SIMULATED_SCREEN_TAIL_LEN)
-      expect(
-        plain,
-        `Expected "${args.needle}". ${args.whenMissing}\nTail:\n${tail}`
-      ).to.include(args.needle)
-    }
-  )
-}
-
 function nonInteractiveOutput() {
   return {
     expectContains(expected: string) {
@@ -154,19 +131,6 @@ function pastUserMessages() {
   }
 }
 
-function currentGuidance() {
-  const target = SECTION.currentGuidance
-  return {
-    expectContains(expected: string) {
-      expectInteractivePtySimulatedScreenContains({
-        assertionTarget: target,
-        needle: expected,
-        whenMissing: `Gherkin step “… in the Current guidance” uses ${SECTION.simulatedVisiblePtyScreen} (cursor/erase replay).`,
-      })
-    },
-  }
-}
-
 function inputBoxTopBorder() {
   return {
     expectExactlyOne() {
@@ -192,6 +156,5 @@ export {
   nonInteractiveOutput,
   pastCliAssistantMessages,
   pastUserMessages,
-  currentGuidance,
   inputBoxTopBorder,
 }

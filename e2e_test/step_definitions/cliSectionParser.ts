@@ -62,35 +62,23 @@ function findLastInputBoxStart(lines: string[]): number {
   return lines.length
 }
 
-function findLastInputBoxEnd(lines: string[]): number {
-  const boxStart = findLastInputBoxStart(lines)
-  if (boxStart >= lines.length) {
-    return -1
-  }
-  return boxStart
-}
-
 // --- Section extraction ---
 type Boundaries = {
   pastTranscriptLines: string[]
   currentPromptLines: string[]
-  currentGuidanceLines: string[]
 }
 
 function parseCliOutput(output: string): Boundaries {
   const lines = output.split('\n')
   const separatorIdx = findLastSeparatorIndex(lines)
   const boxStart = findLastInputBoxStart(lines)
-  const boxEnd = findLastInputBoxEnd(lines)
   const pastEnd = separatorIdx >= 0 ? separatorIdx : lines.length
   const pastTranscriptLines = lines.slice(0, pastEnd)
   const currentPromptLines =
     separatorIdx >= 0 ? lines.slice(separatorIdx + 1, boxStart) : []
-  const currentGuidanceLines = boxEnd >= 0 ? lines.slice(boxEnd + 1) : []
   return {
     pastTranscriptLines,
     currentPromptLines,
-    currentGuidanceLines,
   }
 }
 
@@ -98,25 +86,13 @@ type Section =
   | 'past-user-messages'
   | 'past-cli-assistant-messages'
   | 'current-prompt'
-  | 'current-guidance'
 
 function collectSectionLines(
   boundaries: Boundaries,
   section: Section
 ): string[] {
-  const { pastTranscriptLines, currentPromptLines, currentGuidanceLines } =
-    boundaries
+  const { pastTranscriptLines, currentPromptLines } = boundaries
   const result: string[] = []
-
-  if (section === 'current-guidance') {
-    for (const line of currentGuidanceLines) {
-      const content = stripAnsi(line)
-      if (content.trim()) {
-        result.push(content)
-      }
-    }
-    return result
-  }
 
   if (section === 'past-user-messages') {
     for (const line of pastTranscriptLines) {
