@@ -39,6 +39,7 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
 
     const combined = frames.join('\n')
     expect(combined).toContain('/exit')
+    expect(combined).toContain('Bye.')
     expect(combined).toContain('\x1b[100m')
   })
 
@@ -63,6 +64,7 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
 
     const combined = frames.join('\n')
     expect(combined).toContain('/exit')
+    expect(combined).toContain('Bye.')
     expect(combined).toContain('\x1b[100m')
 
     const snapshot =

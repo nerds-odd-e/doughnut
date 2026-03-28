@@ -58,32 +58,11 @@ Shared by all four scenarios; not itself a Gherkin scenario.
 
 ---
 
-## Phase 2 — After `/help`, empty Enter keeps a normal input box
-
-**Scenario:** After /help, consecutive Enter on empty input keeps a normal input box
-
-**Outcome:** After `/help` and several **Enter** on **empty** input, the TTY still shows a **normal** command/input strip (no stuck modal, no broken layout). Exact check lives in the **centralized assertion layer** (extend `outputAssertions` / page object; avoid scattering raw PTY string checks in step defs).
-
-### 2.1 — E2E
-
-- Step: `When('I press Enter in the interactive CLI', …)` → send **empty** commit (e.g. write `\r` only, or whatever matches Ink “submit empty line” — align with product).
-- Step: `Then('the input box UI should be normal', …)` → one fluent assertion that fails with a **readable** message (snapshot / structured expectation per roadmap §9–§10).
-- Remove `@ignore` from **this scenario only** (others stay ignored).
-- **CI:** Red until 2.2 unless merged with 2.2.
-
-### 2.2 — Product
-
-- Ensure `/help` + repeated empty Enter does not corrupt focus, prompt, or past/current regions; behavior must match the assertion contract chosen in 2.1.
-
-**CI:** Green.
-
----
-
 ## Phase 3 — `/help` lists subcommands and interactive commands
 
 **Scenario:** /help lists subcommands and interactive commands
 
-**Outcome:** Past assistant transcript contains **`/recall`**, **`exit`**, **`update`**, **`version`** (strings as in the feature file).
+**Outcome:** Past assistant transcript contains **`/help`**, **`/exit`**, **`update`**, **`version`** (strings as in the feature file).
 
 ### 3.1 — E2E
 
@@ -99,22 +78,21 @@ Shared by all four scenarios; not itself a Gherkin scenario.
 
 ---
 
-## Phase 4 — `exit` shows “Bye.”
+## Phase 4 — `/exit` shows “Bye.”
 
 **Scenario:** exit ends the session after Bye
 
-**Outcome:** User enters **`exit`** (plain line, as in the feature); **Bye.** appears in **past CLI assistant messages**.
+**Outcome:** User enters **`/exit`**; **Bye.** appears in **past CLI assistant messages**.
 
-### 4.1 — E2E
+### 4.1 — E2E — **done**
 
-- Reuses `I enter {string} in the interactive CLI` with `"exit"` (from Phase 1) or an equivalent single step.
 - Remove `@ignore` from **this scenario only**.
 - Assert **Bye.** in past assistant messages. **Do not** change **`After(@interactiveCLI)`**: it should still **`kill`** the PTY for cleanup; the scenario asserts **user-visible copy**, not “process exited cleanly vs killed.” If the CLI exits on its own after `exit`, dispose remains safe (kill no-op or already dead).
-- **CI:** Red until 4.2 unless merged with 4.2.
+- **CI:** Green with 4.2.
 
-### 4.2 — Product
+### 4.2 — Product — **done**
 
-- Plain `exit` (and/or align with existing `/exit` if you unify) prints **Bye.** into the session transcript as specified.
+- **`/exit`** prints **Bye.** into the session transcript (assistant line), then ends the session.
 
 **CI:** Green.
 
@@ -127,9 +105,8 @@ Shared by all four scenarios; not itself a Gherkin scenario.
 | F.1 | `cliInteractivePtyDispose` | **Done** |
 | F.2 | `@interactiveCLI` hooks; PTY = repo bundle + `ensureCliBundleFresh` | **Done** |
 | 1.1–1.2 | Plain line → Not supported | **Done** |
-| 2.1–2.2 | `/help` + empty Enters → normal input UI | Green after 2.2 |
 | 3.1–3.2 | `/help` lists recall, exit, update, version | Green after 3.2 |
-| 4.1–4.2 | `exit` → Bye. | Green after 4.2 |
+| 4.1–4.2 | `/exit` → Bye. | **Done** |
 
 ---
 

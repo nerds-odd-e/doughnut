@@ -18,7 +18,11 @@ export function InteractiveCliApp() {
   useInput((input, key) => {
     applyInput(input, key, (line) => {
       if (line === '/exit') {
-        setMessages((prev) => [...prev, { role: 'user', text: line }])
+        setMessages((prev) => [
+          ...prev,
+          { role: 'user', text: line },
+          { role: 'assistant', text: 'Bye.' },
+        ])
         setTimeout(() => {
           exit()
         }, 0)
