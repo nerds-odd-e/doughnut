@@ -8,7 +8,6 @@ import {
   GOOGLE_CLIENT_SECRET as BUILTIN_CLIENT_SECRET,
 } from '../credentials.js'
 import { getConfigDir } from '../configDir.js'
-import { userAbortError } from '../fetchAbort.js'
 
 const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly'
 const DEFAULT_OAUTH_TOKEN_URL = 'https://oauth2.googleapis.com/token'
@@ -25,6 +24,10 @@ export interface GmailConfig {
   clientId?: string
   clientSecret?: string
   accounts: GmailAccount[]
+}
+
+function userAbortError(): DOMException {
+  return new DOMException('The operation was aborted', 'AbortError')
 }
 
 function getConfigPath(customPath?: string): string {
