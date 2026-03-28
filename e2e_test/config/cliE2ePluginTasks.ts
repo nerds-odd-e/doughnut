@@ -11,6 +11,7 @@ import {
   runShellCommandSync,
 } from './cliE2eRepo'
 import { cliEnv } from './cliEnv'
+import { stripAnsiCliPty } from './cliPtyAnsi'
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
 
@@ -23,7 +24,20 @@ type RunInstalledCliInteractiveTask = WithOptionalCliEnv & {
   doughnutPath: string
 }
 
-const INTERACTIVE_PTY_CAPTURE_MS = 8000
+type CliInteractiveWriteLineTask = {
+  line: string
+}
+
+const INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING = 'doughnut 0.1.0'
+const INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS = 20_000
+const INSTALLED_CLI_INTERACTIVE_WRITE_SETTLE_MS = 500
+
+const PREVIEW_LEN = 500
+
+type CliInteractivePtySession = {
+  buf: { text: string }
+  pty: { write(data: string): void; kill(): void }
+}
 
 async function bundleCliE2eInstallOrThrow(
   repoRoot: string,
@@ -39,6 +53,49 @@ async function bundleCliE2eInstallOrThrow(
 }
 
 export function createCliE2ePluginTasks(repoRoot: string) {
+  let interactiveCliPtySession: CliInteractivePtySession | null = null
+
+  function disposeInteractiveCliPtySession(): void {
+    if (!interactiveCliPtySession) return
+    try {
+      interactiveCliPtySession.pty.kill()
+    } catch {
+      /* already exited */
+    }
+    interactiveCliPtySession = null
+  }
+
+  function installedCliInteractiveWaitForSubstring(
+    getRawOutput: () => string,
+    needle: string,
+    timeoutMs: number
+  ): Promise<void> {
+    const started = Date.now()
+    return new Promise((resolve, reject) => {
+      const tick = () => {
+        const stripped = stripAnsiCliPty(getRawOutput())
+        if (stripped.includes(needle)) {
+          resolve()
+          return
+        }
+        if (Date.now() - started >= timeoutMs) {
+          const preview =
+            stripped.length > PREVIEW_LEN
+              ? `${stripped.slice(0, PREVIEW_LEN)}...`
+              : stripped
+          reject(
+            new Error(
+              `Timeout after ${timeoutMs}ms waiting for substring ${JSON.stringify(needle)} in installed CLI interactive PTY output. Preview (ANSI-stripped):\n${preview}`
+            )
+          )
+          return
+        }
+        setTimeout(tick, 50)
+      }
+      tick()
+    })
+  }
+
   return {
     async bundleCliE2eInstall() {
       return bundleCliE2eInstallOrThrow(repoRoot)
@@ -55,6 +112,7 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       return null
     },
     async installCli(baseUrl: string) {
+      disposeInteractiveCliPtySession()
       const installDir = mkdtempSync(join(tmpdir(), 'cypress-doughnut-cli-'))
       const installScriptPath = join(installDir, 'install.sh')
       const response = await fetch(`${baseUrl}/install`)
@@ -125,6 +183,8 @@ export function createCliE2ePluginTasks(repoRoot: string) {
           `runInstalledCliInteractive: doughnut binary not found at ${doughnutPath}. Ensure prior install step succeeded.`
         )
       }
+      disposeInteractiveCliPtySession()
+
       const cwd = dirname(doughnutPath)
       const { spawn } = await import('@lydell/node-pty')
       const p = spawn(process.execPath, [doughnutPath], {
@@ -134,29 +194,32 @@ export function createCliE2ePluginTasks(repoRoot: string) {
         cwd,
         env: { ...process.env, ...cliEnv(env) },
       })
-      let output = ''
+      const buf = { text: '' }
       p.onData((data: string) => {
-        output += data
+        buf.text += data
       })
-      await new Promise<void>((resolve) => {
-        let settled = false
-        const finish = () => {
-          if (settled) return
-          settled = true
-          resolve()
-        }
-        const timer = setTimeout(finish, INTERACTIVE_PTY_CAPTURE_MS)
-        p.onExit(() => {
-          clearTimeout(timer)
-          finish()
-        })
-      })
-      try {
-        p.kill()
-      } catch {
-        /* already exited */
+      interactiveCliPtySession = { pty: p, buf }
+      await installedCliInteractiveWaitForSubstring(
+        () => buf.text,
+        INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING,
+        INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS
+      )
+      return buf.text
+    },
+    async cliInteractiveWriteLine({
+      line,
+    }: CliInteractiveWriteLineTask): Promise<string> {
+      if (!interactiveCliPtySession) {
+        throw new Error(
+          'cliInteractiveWriteLine: no active interactive CLI PTY session. Run installation interactive mode first.'
+        )
       }
-      return output
+      const { pty, buf } = interactiveCliPtySession
+      pty.write(`${line}\r`)
+      await new Promise<void>((resolve) =>
+        setTimeout(resolve, INSTALLED_CLI_INTERACTIVE_WRITE_SETTLE_MS)
+      )
+      return buf.text
     },
   }
 }

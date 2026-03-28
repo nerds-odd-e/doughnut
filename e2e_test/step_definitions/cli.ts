@@ -31,5 +31,16 @@ When('I run the installed doughnut command in interactive mode', () =>
 
 Then(
   'I should see {string} in past CLI assistant messages',
-  (expected: string) => cli.pastCliAssistantMessages().expectContains(expected)
+  (expected: string) =>
+    cli.interactiveCli().pastCliAssistantMessages().expectContains(expected)
+)
+
+When(
+  'I enter the slash command {string} in the interactive CLI',
+  (command: string) =>
+    cli.interactiveCli().enterSlashCommandInInteractiveCli(command)
+)
+
+Then('I should see {string} in past user messages', (expected: string) =>
+  cli.interactiveCli().pastUserMessages().expectContains(expected)
 )
