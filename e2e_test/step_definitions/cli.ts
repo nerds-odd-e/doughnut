@@ -75,10 +75,6 @@ Then('the input box UI should be normal', () =>
   cli.inputBoxTopBorder().expectExactlyOne()
 )
 
-Then('the recall session was stopped', () =>
-  cli.recallSession().expectStopped()
-)
-
 Given(
   'the Google API mock returns tokens and profile for {string}',
   (email: string) => {

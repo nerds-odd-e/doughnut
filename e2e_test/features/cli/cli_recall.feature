@@ -65,6 +65,7 @@ Feature: CLI recall status and recall session
       Then I should see "Correct!" in past CLI assistant messages
       And I should see "Recalled successfully" in past CLI assistant messages
 
+    @ignore
     @usingMockedOpenAiService
     Scenario: Recall MCQ - ESC cancels with y/n confirmation
       And OpenAI generates this question:

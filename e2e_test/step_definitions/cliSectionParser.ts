@@ -2,7 +2,6 @@
  * Parses interactive CLI PTY stdout for E2E assertions.
  *
  * - **Past messages** (`getPastCliAssistantMessagesContent`, `getPastUserMessagesContent`): domain steps for CLI assistant vs user transcript.
- * - **Line-split merge** (`getRecallDisplaySections`): newline-based regions; can retain text after Ink clears the live grid (e.g. MCQ stem after `/stop`). Not the same as {@link ptyTranscriptSimulatedPlainScreen}.
  * - **Simulated screen** (`ptyTranscriptSimulatedPlainScreen`): cursor/erase replay → plain text ≈ user-visible cells.
  */
 
@@ -193,18 +192,6 @@ function parseLiveRegion(
     .join('\n')
     .trim()
   return { mergedTranscriptPlain, pastCliAssistantMessagesPlain }
-}
-
-/** Line-split slices for recall edge cases (e.g. stem still in transcript after live UI cleared). */
-export type PtyRecallAssertionSlices = Readonly<{
-  mergedTranscriptPlain: string
-  pastCliAssistantMessagesPlain: string
-}>
-
-export function getRecallDisplaySections(
-  output: string
-): PtyRecallAssertionSlices {
-  return parseLiveRegion(output, true)
 }
 
 /**

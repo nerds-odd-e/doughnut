@@ -3,7 +3,6 @@ import {
   pastCliAssistantMessages,
   pastUserMessages,
   currentGuidance,
-  recallSession,
   inputBoxTopBorder,
 } from './outputAssertions'
 import { removeToken } from './removeToken'
@@ -13,7 +12,7 @@ import { setup } from './setup'
 
 /**
  * CLI page objects. Domain ordering:
- * - Output assertions (`outputAssertions`: non-interactive, past messages, current guidance, recall /stop)
+ * - Output assertions (`outputAssertions`: non-interactive, past messages, current guidance)
  * - Access-token removal assertions
  * - Execution (installation, interactive, access-token)
  * - Backend (bundle, install script)
@@ -25,7 +24,6 @@ export const cli = {
   pastUserMessages,
   currentGuidance,
   inputBoxTopBorder,
-  recallSession,
   removeToken,
   installation,
   interactive,

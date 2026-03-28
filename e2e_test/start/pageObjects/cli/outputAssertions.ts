@@ -4,13 +4,11 @@
  * - **Non-interactive**: one-shot CLI output.
  * - **Past messages**: parsed transcript — domain steps “past CLI assistant messages” / “past user messages”.
  * - **Simulated PTY screen**: cursor/erase replay — “user-visible” plain text.
- * - **Recall /stop (MCQ)**: line-split merge can still hold the stem after Ink cleared the live grid.
  */
 import {
   countInputBoxTopBorderLinesInInteractivePtyTranscript,
   getPastUserMessagesContent,
   getPastCliAssistantMessagesContent,
-  getRecallDisplaySections,
   getRecallMergedTranscriptRaw,
   ptyTranscriptSimulatedPlainScreen,
 } from '../../../step_definitions/cliSectionParser'
@@ -23,7 +21,6 @@ const SECTION = {
   pastUserMessages: 'past user messages',
   currentGuidance: 'Current guidance',
   simulatedVisiblePtyScreen: 'simulated visible PTY screen',
-  recallStopAssertion: 'interactive CLI transcript (recall /stop)',
 } as const
 
 type SectionLabel = (typeof SECTION)[keyof typeof SECTION]
@@ -204,28 +201,6 @@ function assertRecallSessionPromptOnSimulatedPtyScreen(
   })
 }
 
-function recallSession() {
-  return {
-    /** MCQ stem may be gone from simulated screen after /stop; line-split merge + past CLI assistant messages still hold it. */
-    expectStopped() {
-      withStdoutFor(
-        {
-          kind: 'ptyInteractive',
-          assertionTarget: SECTION.recallStopAssertion,
-        },
-        (stdout) => {
-          const { mergedTranscriptPlain, pastCliAssistantMessagesPlain } =
-            getRecallDisplaySections(stdout)
-          expect(mergedTranscriptPlain).to.include(
-            'What is the meaning of sedition?'
-          )
-          expect(pastCliAssistantMessagesPlain).to.include('Stopped recall')
-        }
-      )
-    },
-  }
-}
-
 function inputBoxTopBorder() {
   return {
     expectExactlyOne() {
@@ -252,7 +227,6 @@ export {
   pastCliAssistantMessages,
   pastUserMessages,
   currentGuidance,
-  recallSession,
   assertRecallSessionPromptOnSimulatedPtyScreen,
   inputBoxTopBorder,
 }

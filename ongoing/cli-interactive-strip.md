@@ -75,7 +75,7 @@ Work **bottom-to-top** (scenario list as in file):
 | ~~1.1.1~~ | ~~Recall spelling — type correct spelling and see success~~ **done** (`@ignore` + CLI spelling path removed) |
 | ~~1.1.2~~ | ~~Recall MCQ — contest and regenerate before answering~~ **done** (`@ignore`; product `/contest` unchanged — still covered by Vitest until Part 2) |
 | ~~1.1.3~~ | ~~Recall MCQ — down arrow and Enter to select~~ **done** (`@ignore`; E2E step `inputDownArrowSelection` removed — Vitest covers MCQ ↑↓ in `interactiveTtyMcq.test.ts`) |
-| 1.1.x | Recall MCQ — ESC cancels with y/n confirmation |
+| ~~1.1.4~~ | ~~Recall MCQ — `/stop` during MCQ (scenario title: ESC/y/n); transcript “Stopped recall”~~ **done** (`@ignore`; E2E step `the recall session was stopped` + `getRecallDisplaySections` removed — `/stop` still covered by Vitest) |
 | 1.1.x | Recall MCQ — choose correct answer and see success |
 | 1.1.x | Recall session — complete all due notes, summary, load more |
 | 1.1.x | Recall Just Review |
