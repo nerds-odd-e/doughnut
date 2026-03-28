@@ -2,7 +2,7 @@
 
 Informal plan for the scenario **“Install and run the CLI in interactive mode”** — see `e2e_test/features/cli/cli_install_and_run.feature`.
 
-After **Phase 1**, the scenario is **no longer `@ignore`**: the first two steps run in CI; the **`/exit`** steps stay **commented out** in the feature file until a later phase uncomments them (see below).
+After **Phase 1**, the scenario is **no longer `@ignore`**: the first two steps run in CI. **Phase 2 sub-plan** (`ongoing/cli-install-phase2-exit-e2e.md`): **uncomment** the **`/exit`** steps in the **same** scenario (no duplicate WIP scenario); **2a** wraps the interactive spawn for reuse; full four-step scenario goes **green** with **`/exit`** in **2c** (see sub-plan for CI red between **2a** and **2c** if applicable).
 
 **Scenario steps (authoritative):**
 
@@ -15,8 +15,8 @@ And I should see "/exit" in past user messages
 
 **Progressive feature file (by phase):**
 
-- **After Phase 1:** Remove `@ignore` from the scenario. Leave steps 3–4 **commented** (with a one-line note, e.g. `# Phase 2: uncomment when /exit E2E is ready`), so Cucumber runs only steps 1–2.
-- **Phase 2 onward:** Uncomment each step **as soon as** that step’s production + E2E behavior works (steps 3–4 together when `/exit` is done).
+- **After Phase 1:** Remove `@ignore` from the scenario. Steps 3–4 may stay **commented** until Phase 2 work starts.
+- **Phase 2 (sub-plan 2a):** **Uncomment** steps 3–4 in **this** scenario only (no second scenario). Wire E2E to the **same** PTY session started in step 1; **no new** Cucumber session hook — timeout teardown is acceptable until clean exit exists. The spec may be **red** until **`/exit`** ships (**2c**); batch commits if CI must stay green.
 
 **Scope:** Only production behavior and automated tests required for **this** scenario. No extra CLI features, no un-ignoring other interactive features unless they become unavoidable shared infrastructure.
 
@@ -91,9 +91,9 @@ And I should see "/exit" in past user messages
 
 **E2E:**
 
-- Extend PTY session / page object: **`When I enter the slash command "/exit" in the interactive CLI`** (reuse the shared slash-command step shape used in other CLI features if it fits).
+- Extend the **wrapped** interactive session from step 1: **`When I enter the slash command "/exit" in the interactive CLI`** (reuse the shared slash-command step shape used in other CLI features if it fits).
 - **`And I should see "/exit" in past user messages`** via the centralized assertion layer.
-- **Uncomment** the two previously commented Gherkin lines in `cli_install_and_run.feature`.
+- **Uncomment** the two Gherkin lines in **`cli_install_and_run.feature`** as part of **Phase 2a** (sub-plan), not a separate scenario.
 
 **Failure diagnostics:** Extend Phase 1 diagnostics if assertions on user transcript need clearer diffs.
 

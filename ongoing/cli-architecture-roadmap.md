@@ -268,6 +268,8 @@ The current direction already includes:
 - a hook/tag mechanism that ensures the bundled TypeScript CLI is up to date before execution
 - launching the bundled CLI process and connecting it to the PTY within the test environment
 
+**Install + interactive E2E (narrow slice):** Prefer **reusing the PTY started by the first interactive step** for later steps in the **same** scenario, without introducing **extra** scenario-wide session hooks solely for that flow; rely on normal step/scenario timeouts to tear down a still-running child when clean exit is not yet implemented.
+
 This should remain part of the test architecture baseline.
 
 ### 8.3 Thin step definitions
