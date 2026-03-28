@@ -14,6 +14,20 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     expect(lastFrame()).toContain(formatVersionOutput())
   })
 
+  test('plain committed line records user message and Not supported', async () => {
+    const { stdin, frames } = render(<InteractiveCliApp />)
+
+    stdin.write('hello\r')
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 50)
+    })
+
+    const combined = frames.join('\n')
+    expect(combined).toContain('hello')
+    expect(combined).toContain('Not supported')
+    expect(combined).toContain('\x1b[100m')
+  })
+
   test('submitting /exit as one chunk line+CR records it in output', async () => {
     const { lastFrame, stdin, frames } = render(<InteractiveCliApp />)
     expect(lastFrame()).toContain(formatVersionOutput())

@@ -3,7 +3,6 @@
 Feature: CLI interactive mode
   As a user, I want the TTY interactive CLI to record input and render the UI correctly.
 
-  @ignore
   Scenario: TTY interactive responds "Not supported" to a plain line
     When I enter "hello" in the interactive CLI
     Then I should see "Not supported" in past CLI assistant messages

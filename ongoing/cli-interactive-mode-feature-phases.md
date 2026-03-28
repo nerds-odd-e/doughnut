@@ -49,11 +49,10 @@ Shared by all four scenarios; not itself a Gherkin scenario.
 - Step: `When('I enter {string} in the interactive CLI', …)` → `cliInteractiveWriteLine` (no leading `/` required).
 - Remove `@ignore` from **this scenario only**.
 - **Failure should cite** missing `"Not supported"` or `"hello"` in the parsed sections, not PTY/bundle errors.
-- **CI:** Red until 1.2 unless merged with 1.2 in one PR.
 
-### 1.2 — Product
+### 1.2 — Product — **done**
 
-- Interactive path: unknown / non-slash line → user message + assistant line **Not supported** (exact string).
+- Interactive path: unknown / non-slash line → user message + assistant line **Not supported** (exact string). Empty committed line is a no-op (for Phase 2).
 
 **CI:** Green.
 
@@ -127,8 +126,7 @@ Shared by all four scenarios; not itself a Gherkin scenario.
 |-------|------|-----|
 | F.1 | `cliInteractivePtyDispose` | **Done** |
 | F.2 | `@interactiveCLI` hooks; PTY = repo bundle + `ensureCliBundleFresh` | **Done** |
-| 1.1 | E2E step + un-ignore first scenario | **Done** (CI red until 1.2) |
-| 1.2 | Plain line → Not supported (product) | Green after 1.2 |
+| 1.1–1.2 | Plain line → Not supported | **Done** |
 | 2.1–2.2 | `/help` + empty Enters → normal input UI | Green after 2.2 |
 | 3.1–3.2 | `/help` lists recall, exit, update, version | Green after 3.2 |
 | 4.1–4.2 | `exit` → Bye. | Green after 4.2 |

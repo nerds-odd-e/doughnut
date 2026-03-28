@@ -22,6 +22,17 @@ export function InteractiveCliApp() {
         setTimeout(() => {
           exit()
         }, 0)
+        return
+      }
+      if (line === '') {
+        return
+      }
+      if (!line.startsWith('/')) {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'user', text: line },
+          { role: 'assistant', text: 'Not supported' },
+        ])
       }
     })
   })
