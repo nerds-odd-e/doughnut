@@ -7,10 +7,7 @@ import {
   type InteractiveCliPtyKeystroke,
 } from '../../../config/interactiveCliPtyTypes'
 import { e2eAppBaseUrl } from '../../../support/e2eAppUrl'
-import {
-  assertRecallSessionPromptOnSimulatedPtyScreen,
-  pastCliAssistantMessages,
-} from './outputAssertions'
+import { pastCliAssistantMessages } from './outputAssertions'
 
 const GOOGLE_MOCK_BASE_URL = 'http://localhost:5003'
 
@@ -98,11 +95,6 @@ function interactive() {
     },
     typeRawKey(char: string) {
       applyInteractiveCliPtyKeystroke({ kind: 'rawKey', char })
-    },
-    /** Recall Ink y/n: one keypress (a separate Enter would mean “no”). */
-    answerToPrompt(answer: string, expectedPromptText: string) {
-      assertRecallSessionPromptOnSimulatedPtyScreen(expectedPromptText)
-      applyInteractiveCliPtyKeystroke({ kind: 'rawKey', char: answer })
     },
   }
 }

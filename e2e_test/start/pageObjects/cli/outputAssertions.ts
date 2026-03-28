@@ -190,17 +190,6 @@ function currentGuidance() {
   }
 }
 
-/** Recall session y/n: prompt must appear on simulated PTY screen (not only in line-split merge / Ink repaint ghosts). */
-function assertRecallSessionPromptOnSimulatedPtyScreen(
-  expectedPromptSubstring: string
-): void {
-  expectInteractivePtySimulatedScreenContains({
-    assertionTarget: SECTION.simulatedVisiblePtyScreen,
-    needle: expectedPromptSubstring,
-    whenMissing: `If this fails but other substring checks passed, the text may exist only in the past-messages region while Ink repainted the live region — use RecallInkConfirmPanel guidanceLines (ShellSessionRoot in-session), not only grey writeCurrentPrompt.`,
-  })
-}
-
 function inputBoxTopBorder() {
   return {
     expectExactlyOne() {
@@ -227,6 +216,5 @@ export {
   pastCliAssistantMessages,
   pastUserMessages,
   currentGuidance,
-  assertRecallSessionPromptOnSimulatedPtyScreen,
   inputBoxTopBorder,
 }

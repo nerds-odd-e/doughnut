@@ -38,11 +38,6 @@ When('I press Enter in the interactive CLI', () =>
   cli.interactive().pressEnter()
 )
 When(
-  'I answer {string} in the interactive CLI to prompt {string}',
-  (answer: string, expectedPromptText: string) =>
-    cli.interactive().answerToPrompt(answer, expectedPromptText)
-)
-When(
   'I add the saved access token in the interactive CLI using add-access-token',
   () => cli.accessToken().addSavedTokenInteractive()
 )

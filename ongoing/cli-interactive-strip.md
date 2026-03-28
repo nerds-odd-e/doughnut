@@ -61,7 +61,7 @@ Use this for **leftover** Vitest groups after large deletes, or when a test file
 
 Recommended **order** (heavy / shared steps first, then independent shells):
 
-1. **`cli_recall.feature`** — most scenarios and recall-specific steps (`answerToPrompt`, down-arrow MCQ, `recall session was stopped`, etc.).
+1. **`cli_recall.feature`** — most scenarios and recall-specific steps (down-arrow MCQ, `recall session was stopped`, etc.; `answerToPrompt` removed with 1.1.6).
 2. **`cli_access_token.feature`** — shared steps with recall (`addSavedTokenInteractive`, token list); easier to strip after recall is fully ignored.
 3. **`cli_gmail.feature`** — two scenarios; remove Gmail **UI** while keeping low-level modules + `gmail.test.ts` (and any other UT tied to non-UI Gmail).
 4. **`cli_interactive_mode.feature`** — generic TTY assertions (`Current guidance`, input box border, plain line, `/help`, `exit`).
@@ -77,7 +77,7 @@ Work **bottom-to-top** (scenario list as in file):
 | ~~1.1.3~~ | ~~Recall MCQ — down arrow and Enter to select~~ **done** (`@ignore`; E2E step `inputDownArrowSelection` removed — Vitest covers MCQ ↑↓ in `interactiveTtyMcq.test.ts`) |
 | ~~1.1.4~~ | ~~Recall MCQ — `/stop` during MCQ (scenario title: ESC/y/n); transcript “Stopped recall”~~ **done** (`@ignore`; E2E step `the recall session was stopped` + `getRecallDisplaySections` removed — `/stop` still covered by Vitest) |
 | ~~1.1.5~~ | ~~Recall MCQ — choose correct answer and see success~~ **done** (`@ignore`; MCQ number entry + “Correct!” still covered by Vitest `interactiveTtyMcq.test.ts`) |
-| 1.1.x | Recall session — complete all due notes, summary, load more |
+| ~~1.1.6~~ | ~~Recall session — complete all due notes, summary, load more~~ **done** (`@ignore`; E2E step `I answer … to prompt …` + `answerToPrompt` / `assertRecallSessionPromptOnSimulatedPtyScreen` removed — load more + summaries still covered by Vitest) |
 | 1.1.x | Recall Just Review |
 | 1.1.x | Recall status shows count |
 

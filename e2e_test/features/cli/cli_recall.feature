@@ -35,6 +35,7 @@ Feature: CLI recall status and recall session
       When I enter "y" in the interactive CLI
       Then I should see "Recalled successfully" in past CLI assistant messages
 
+    @ignore
     @disableOpenAiService
     Scenario: Recall session - complete all due notes, see summary, then load more from future days
       Given the note "sedition" was assimilated on day 1
