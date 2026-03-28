@@ -206,6 +206,10 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       )
       return null
     },
+    cliInteractivePtyDispose() {
+      disposeInteractiveCliPtySession()
+      return null
+    },
     cliInteractivePtyGetBuffer(): string {
       if (!interactiveCliPtySession) {
         throw new Error(
