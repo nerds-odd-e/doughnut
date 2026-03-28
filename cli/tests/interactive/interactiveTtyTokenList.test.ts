@@ -63,9 +63,9 @@ describe('TTY token list interactive mode', () => {
     ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
   })
 
-  afterEach(() => {
+  afterEach(async () => {
     restoreConfigDir()
-    endTTYSession(stdin)
+    await endTTYSession(stdin)
   })
 
   test('/list-access-token: banded Current prompt separator between stage line and instruction (TTY bytes)', async () => {

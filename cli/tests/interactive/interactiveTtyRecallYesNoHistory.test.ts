@@ -24,8 +24,8 @@ describe('TTY: recall-session y/n answers (past messages)', () => {
     ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
   })
 
-  afterEach(() => {
-    endTTYSession(stdin)
+  afterEach(async () => {
+    await endTTYSession(stdin)
   })
 
   test('load more: n omits past user message row; session summary still logged', async () => {

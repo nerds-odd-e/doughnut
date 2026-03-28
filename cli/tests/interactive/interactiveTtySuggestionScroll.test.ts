@@ -21,9 +21,9 @@ describe('TTY mode slash command suggestions with scroll', () => {
     ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
   })
 
-  afterEach(() => {
+  afterEach(async () => {
     interactiveHelpMockState.useManyCommandsForScrollTests = false
-    endTTYSession(stdin)
+    await endTTYSession(stdin)
   })
 
   test('repeated Down moves highlight through a long list; window can show ↑ more above', async () => {

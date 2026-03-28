@@ -41,8 +41,8 @@ describe('TTY recall load wait — Esc cancels', () => {
     ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
   })
 
-  afterEach(() => {
-    endTTYSession(stdin)
+  afterEach(async () => {
+    await endTTYSession(stdin)
   })
 
   test('while recall fetch is in flight, prompt shows loading recall copy', async () => {
@@ -80,7 +80,7 @@ describe('TTY recall-status wait — Esc cancels', () => {
   })
 
   afterEach(async () => {
-    endTTYSession(stdin)
+    await endTTYSession(stdin)
     const actual = await vi.importActual<
       typeof import('../../src/commands/recall.js')
     >('../../src/commands/recall.js')
@@ -126,8 +126,8 @@ describe('TTY contest wait — Esc cancels', () => {
     ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
   })
 
-  afterEach(() => {
-    endTTYSession(stdin)
+  afterEach(async () => {
+    await endTTYSession(stdin)
   })
 
   test('Esc aborts contest fetch and shows Cancelled by user.', async () => {

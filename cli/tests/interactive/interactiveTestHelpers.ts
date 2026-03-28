@@ -222,7 +222,10 @@ export async function startTTYSessionWithoutRecallReset(): Promise<{
   return { stdin, writeSpy }
 }
 
-export function endTTYSession(stdin: TTYStdin) {
+export async function endTTYSession(stdin: TTYStdin) {
   pressKey(stdin, 'c', { ctrl: true })
+  await tick()
+  await tick()
+  await tick()
   vi.restoreAllMocks()
 }

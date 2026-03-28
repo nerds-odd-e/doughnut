@@ -30,8 +30,8 @@ describe('interactive exit: Bye. in user-visible output', () => {
       await startInteractiveOnStdin(stdin)
     })
 
-    afterEach(() => {
-      endTTYSession(stdin)
+    afterEach(async () => {
+      await endTTYSession(stdin)
     })
 
     test('after Enter on exit, past messages include Bye.', async () => {

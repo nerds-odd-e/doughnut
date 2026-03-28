@@ -29,8 +29,8 @@ describe('TTY exit', () => {
     await startInteractiveOnStdin(stdin)
   })
 
-  afterEach(() => {
-    endTTYSession(stdin)
+  afterEach(async () => {
+    await endTTYSession(stdin)
   })
 
   test('after Enter on exit, committed line appears as grey past user message (same as other submits)', async () => {

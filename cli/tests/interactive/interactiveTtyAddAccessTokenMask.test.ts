@@ -29,8 +29,8 @@ describe('TTY: /add-access-token masking in past user messages', () => {
     ;({ stdin, writeSpy } = await ttySessionWithSpies())
   })
 
-  afterEach(() => {
-    endTTYSession(stdin)
+  afterEach(async () => {
+    await endTTYSession(stdin)
   })
 
   test('history grey block shows redacted line, not the raw token', async () => {

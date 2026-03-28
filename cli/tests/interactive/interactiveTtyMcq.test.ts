@@ -83,8 +83,8 @@ describe('TTY recall MCQ', () => {
     ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
   })
 
-  afterEach(() => {
-    endTTYSession(stdin)
+  afterEach(async () => {
+    await endTTYSession(stdin)
   })
 
   describe('choice selection', () => {
@@ -293,8 +293,8 @@ describe('TTY recall MCQ wrapped choices (narrow terminal)', () => {
     ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
   })
 
-  afterEach(() => {
-    endTTYSession(stdin)
+  afterEach(async () => {
+    await endTTYSession(stdin)
     Object.defineProperty(process.stdout, 'columns', {
       value: savedColumns,
       writable: true,

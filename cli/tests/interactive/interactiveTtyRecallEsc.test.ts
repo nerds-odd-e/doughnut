@@ -29,8 +29,8 @@ describe('TTY recall substates ESC (MCQ, y/n, load-more)', () => {
     ;({ stdin, writeSpy } = await ttySessionWithSpies())
   })
 
-  afterEach(() => {
-    endTTYSession(stdin)
+  afterEach(async () => {
+    await endTTYSession(stdin)
   })
 
   test('ESC in Yes I remember shows stop confirmation, y exits recall mode', async () => {

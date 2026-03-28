@@ -25,8 +25,8 @@ describe('TTY recall: notebook first in Current prompt (MCQ and just-review)', (
     ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
   })
 
-  afterEach(() => {
-    endTTYSession(stdin)
+  afterEach(async () => {
+    await endTTYSession(stdin)
   })
 
   test('MCQ: emoji notebook line precedes stem in live region', async () => {

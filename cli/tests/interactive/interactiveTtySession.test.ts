@@ -33,8 +33,8 @@ describe('TTY: shared interactive session', () => {
     ;({ stdin, writeSpy } = await ttySessionWithSpies())
   })
 
-  afterEach(() => {
-    endTTYSession(stdin)
+  afterEach(async () => {
+    await endTTYSession(stdin)
   })
 
   describe('slash command suggestions', () => {

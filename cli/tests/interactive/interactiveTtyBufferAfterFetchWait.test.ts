@@ -29,7 +29,7 @@ describe('TTY: line draft must not survive interactive fetch wait', () => {
   })
 
   afterEach(async () => {
-    endTTYSession(stdin)
+    await endTTYSession(stdin)
     const actual = await vi.importActual<
       typeof import('../../src/commands/recall.js')
     >('../../src/commands/recall.js')

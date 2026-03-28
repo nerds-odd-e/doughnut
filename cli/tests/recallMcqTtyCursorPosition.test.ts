@@ -32,8 +32,8 @@ describe('recall MCQ on TTY: Ink numbered-choice list render', () => {
   let writeSpy: ReturnType<typeof vi.spyOn>
   let savedColumns: number | undefined
 
-  afterEach(() => {
-    endTTYSession(stdin)
+  afterEach(async () => {
+    await endTTYSession(stdin)
     Object.defineProperty(process.stdout, 'columns', {
       value: savedColumns,
       writable: true,

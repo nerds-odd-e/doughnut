@@ -34,8 +34,8 @@ describe('TTY: user input history (↑↓)', () => {
       ;({ stdin, writeSpy } = await ttySessionWithSpies())
     })
 
-    afterEach(() => {
-      endTTYSession(stdin)
+    afterEach(async () => {
+      await endTTYSession(stdin)
     })
 
     test('shows the previous submitted line in the input box after ↑↑ with a new draft', async () => {
@@ -78,8 +78,8 @@ describe('TTY: user input history (↑↓)', () => {
       ;({ stdin, writeSpy } = await startTTYSessionWithoutRecallReset())
     })
 
-    afterEach(() => {
-      endTTYSession(stdin)
+    afterEach(async () => {
+      await endTTYSession(stdin)
     })
 
     test('after recall session ends, ↑ recalls /recall not the MCQ choice line', async () => {
