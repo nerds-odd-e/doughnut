@@ -7,6 +7,8 @@ export function cliEnv(overrides?: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
     // Override CI=1 (set by nix dev env) so Ink uses non-CI rendering mode,
     // which writes interactive UI output to stdout for E2E assertions.
     CI: '0',
+    // Chalk/Ink gray backgrounds (e.g. \x1b[100m) for past user rows in PTY captures.
+    FORCE_COLOR: '1',
     ...overrides,
   }
 }
