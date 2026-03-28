@@ -127,8 +127,10 @@ Single or few sub-phases (each with commit stop):
 
 - ~~Remove **`@interactiveCLI`** Before/After hooks and **long-lived** PTY session tasks~~ **done** with 1.4.x (no remaining non-ignored `@interactiveCLI` scenarios).
 - ~~Prune **`InteractiveCliPtyKeystroke`** / long-lived session in **`cliPtyRunner`** / **`interactiveCliPtyTypes`**~~ **done** with 1.4.x; **`runCliInPty`** / **`cliPtyRunner`** removed with **1.6.1** (`runInstalledCli` spawn-only).
-- Trim **`e2e_test/step_definitions/cli.ts`** and **`e2e_test/start/pageObjects/cli/*`** to what **`cli_install_and_run`** + shared backend steps still need.
-- Remove unused mock Gmail **Given** steps from `cli.ts` if no feature references them.
+- ~~Trim **`e2e_test/step_definitions/cli.ts`** and **`e2e_test/start/pageObjects/cli/*`** to what **`cli_install_and_run`** + shared backend steps still need~~ **done** (install-only steps + `backend` / `installation` / `nonInteractiveOutput`; dead **`@interactiveCLI`** tags removed from ignored CLI features).
+- ~~Remove unused mock Gmail **Given** steps from `cli.ts` if no feature references them~~ **n/a** (Gmail **Given** text only remains in ignored `cli_gmail.feature`; no Gmail steps in `cli.ts`).
+
+**Part 1.5 complete.** **Next:** Part 2 (Vitest cleanup), starting with **2.1** (`cli/tests/interactive/`).
 
 ### Part 1.6 — Feature: `cli_install_and_run.feature` (optional strip inside the install feature)
 
@@ -175,5 +177,5 @@ Each row: apply **Unit test removal** workflow (section above); one commit stop 
 
 ## Docs / rules (after implementation, not in first commit)
 
-- Update `.cursor/rules/cli.mdc` (and any E2E rule sections) to match the **new** CLI surface so future agents do not reintroduce removed terminology.
+- ~~Update `.cursor/rules/cli.mdc` (and any E2E rule sections) to match the **new** CLI surface~~ **done** with Part 1.5 (`cli.mdc` CLI E2E section, `e2e_test.mdc` §4 + motivating example).
 - This file **`ongoing/cli-interactive-strip.md`** should be deleted or archived when the cleanup is done.

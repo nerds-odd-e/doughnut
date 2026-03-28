@@ -4,7 +4,7 @@ import { backend } from './backend'
 
 /**
  * CLI page objects. Domain ordering:
- * - Output assertions (`outputAssertions`: non-interactive, past messages)
+ * - Output assertions (`outputAssertions`: non-interactive install runs)
  * - Execution (installation)
  * - Backend (bundle, install script)
  */
