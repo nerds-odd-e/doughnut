@@ -8,6 +8,26 @@ function stripAnsi(s: string): string {
   return s.replace(new RegExp(`${esc}\\[[0-9;?]*[a-zA-Z]`, 'g'), '')
 }
 
+/** Advance the event loop until `predicate` holds or `maxTicks` is exhausted (no fixed wall-clock sleep). */
+async function waitForFrames(
+  getCombined: () => string,
+  predicate: (combined: string) => boolean,
+  maxTicks = 5000,
+): Promise<void> {
+  for (let i = 0; i < maxTicks; i++) {
+    if (predicate(getCombined())) {
+      return
+    }
+    await new Promise<void>((resolve) => {
+      setImmediate(resolve)
+    })
+  }
+  const combined = getCombined()
+  throw new Error(
+    `Output condition not met within ${maxTicks} event-loop turns. Last frames:\n${combined}`,
+  )
+}
+
 describe('InteractiveCliApp (ink-testing-library)', () => {
   test('shows version in the first frame', () => {
     const { lastFrame } = render(<InteractiveCliApp />)
@@ -18,9 +38,11 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     const { stdin, frames } = render(<InteractiveCliApp />)
 
     stdin.write('hello\r')
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 50)
-    })
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        c.includes('hello') && c.includes('Not supported') && c.includes('\x1b[100m'),
+    )
 
     const combined = frames.join('\n')
     expect(combined).toContain('hello')
@@ -33,9 +55,11 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     expect(lastFrame()).toContain(formatVersionOutput())
 
     stdin.write('/exit\r')
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 50)
-    })
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        c.includes('/exit') && c.includes('Bye.') && c.includes('\x1b[100m'),
+    )
 
     const combined = frames.join('\n')
     expect(combined).toContain('/exit')
@@ -47,10 +71,6 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     const { lastFrame, stdin, frames } = render(<InteractiveCliApp />)
     expect(lastFrame()).toContain(formatVersionOutput())
 
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 50)
-    })
-
     for (const ch of '/exit') {
       stdin.write(ch)
       await new Promise<void>((r) => {
@@ -58,9 +78,11 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
       })
     }
     stdin.write('\r')
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 50)
-    })
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        c.includes('/exit') && c.includes('Bye.') && c.includes('\x1b[100m'),
+    )
 
     const combined = frames.join('\n')
     expect(combined).toContain('/exit')
