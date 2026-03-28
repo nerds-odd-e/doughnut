@@ -22,7 +22,6 @@ import * as readline from 'node:readline'
 import { Writable } from 'node:stream'
 import { render } from 'ink'
 import { formatVersionOutput } from '../commands/version.js'
-import { getInteractiveFetchWaitLine } from '../interactiveFetchWait.js'
 import {
   createInitialShellSessionState,
   type ShellSessionState,
@@ -127,9 +126,7 @@ export function runInteractiveTtySession(
       interactiveTtyStdout.currentPromptSeparator(getTerminalWidth())
     },
     onShellSessionLayoutEffect: () => {
-      if (getInteractiveFetchWaitLine() !== null) {
-        interactiveTtyStdout.hideCursor()
-      }
+      interactiveTtyStdout.hideCursor()
     },
     writeExitFarewellBlock: ({ previousInputContent, outputLines, tone }) => {
       interactiveTtyStdout.exitFarewellBlock({

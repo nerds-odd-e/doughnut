@@ -20,12 +20,10 @@ import type {
   ShellSessionState,
   TokenSelectionState,
 } from '../shell/shellSessionState.js'
+import type { InteractiveFetchWaitLine } from '../interactiveFetchWait.js'
+import { getInteractiveFetchWaitLine } from '../interactiveFetchWait.js'
 import type { InteractiveShellDeps } from '../interactiveShellDeps.js'
 import { TOKEN_LIST_COMMANDS } from '../shell/tokenListCommands.js'
-import {
-  getInteractiveFetchWaitLine,
-  type InteractiveFetchWaitLine,
-} from '../interactiveFetchWait.js'
 import type { AccessTokenPickerCommandConfig, PastMessage } from '../types.js'
 import { FetchWaitDisplay } from './FetchWaitDisplay.js'
 import {

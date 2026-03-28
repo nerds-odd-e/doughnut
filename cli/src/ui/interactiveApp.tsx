@@ -2,11 +2,7 @@ import React from 'react'
 import { saveUserInputHistory } from '../userInputHistoryFile.js'
 import { getConfigDir } from '../configDir.js'
 import { maskInteractiveInputLineForStorage } from '../inputHistoryMask.js'
-import {
-  appendUserInputHistoryLine,
-  clearLiveCommandLine,
-} from '../interactiveCommandInput.js'
-import { getInteractiveFetchWaitLine } from '../interactiveFetchWait.js'
+import { appendUserInputHistoryLine } from '../interactiveCommandInput.js'
 import {
   commandTurnBufferAppendError,
   commandTurnBufferAppendLog,
@@ -122,15 +118,6 @@ export function InteractiveApp({
     }))
   }
 
-  function resetLiveLineDraftAndSlashSuggestions(): void {
-    patch((s) => ({
-      ...s,
-      commandInput: clearLiveCommandLine(s.commandInput),
-      highlightIndex: 0,
-      suggestionsDismissed: false,
-    }))
-  }
-
   if (!ttyOutputHolder.current) {
     ttyOutputHolder.current = {
       log: (msg) => {
@@ -154,12 +141,7 @@ export function InteractiveApp({
       writeCurrentPrompt: writeCurrentPromptLine,
       beginCurrentPrompt: doBeginCurrentPrompt,
       onInteractiveFetchWaitChanged: () => {
-        const activeWaitPrompt = getInteractiveFetchWaitLine()
-        if (activeWaitPrompt) {
-          flushCommandTurnToPastMessagesBeforeFetchWait()
-        } else {
-          resetLiveLineDraftAndSlashSuggestions()
-        }
+        flushCommandTurnToPastMessagesBeforeFetchWait()
         patch((s) => ({ ...s, ttyContractEpoch: s.ttyContractEpoch + 1 }))
       },
     }

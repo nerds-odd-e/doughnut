@@ -1,6 +1,5 @@
 import React from 'react'
 import type { Key } from 'ink'
-import { cancelInteractiveFetchWaitFor } from '../interactiveFetchWait.js'
 import { maskInteractiveInputLineForStorage } from '../inputHistoryMask.js'
 import {
   afterBareSlashEscape,
@@ -18,6 +17,7 @@ import {
 } from '../shell/pastMessagesModel.js'
 import type { ShellSessionState } from '../shell/shellSessionState.js'
 import type { CliAssistantMessageTone, OutputAdapter } from '../types.js'
+import { cancelInteractiveFetchWaitFor } from '../interactiveFetchWait.js'
 import {
   isInkSubmitPressed,
   type ShellSessionInkHandlers,

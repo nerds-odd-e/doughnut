@@ -17,12 +17,12 @@ import {
   CLI_USER_ABORTED_WAIT_MESSAGE,
   userVisibleOutcomeFromCommandError,
 } from '../fetchAbort.js'
+import { maskInteractiveInputLineForStorage } from '../inputHistoryMask.js'
+import { clearLiveCommandLine } from '../interactiveCommandInput.js'
 import {
   INTERACTIVE_FETCH_WAIT_LINES,
   runInteractiveFetchWait,
 } from '../interactiveFetchWait.js'
-import { maskInteractiveInputLineForStorage } from '../inputHistoryMask.js'
-import { clearLiveCommandLine } from '../interactiveCommandInput.js'
 import {
   cycleListSelectionIndex,
   dispatchSelectListKey,
