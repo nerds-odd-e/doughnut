@@ -96,13 +96,3 @@ Before({ tags: '@bundleCliE2eInstall' }, () =>
 After({ tags: '@bundleCliE2eInstall' }, () =>
   cli.backend().removeE2eInstallCliBundle()
 )
-
-Before({ tags: '@withCliConfig', order: 1 }, () =>
-  cli.setup().createConfigDir()
-)
-
-Before({ tags: '@interactiveCLI', order: 2 }, () =>
-  cli.setup().startInteractiveSession()
-)
-
-After({ tags: '@interactiveCLI' }, () => cli.setup().stopInteractiveSession())

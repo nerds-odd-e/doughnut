@@ -1,6 +1,7 @@
 Feature: CLI interactive mode
   As a user, I want the TTY interactive CLI to record input and render the UI correctly.
 
+  @ignore
   @withCliConfig
   @interactiveCLI
   Scenario: TTY interactive responds "Not supported" to a plain line

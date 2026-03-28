@@ -9,8 +9,6 @@ import {
   ptyTranscriptSimulatedPlainScreen,
 } from '../step_definitions/cliSectionParser'
 import { cliEnv } from './cliEnv'
-import type { InteractiveCliPtyKeystroke } from './interactiveCliPtyTypes'
-
 const PTY_TIMEOUT_MS = 25_000
 const CLI_POLL_MS = 10
 /** After writing draft bytes, pause before carriage return so Ink does not treat it as pasted text. */
@@ -311,106 +309,4 @@ export async function runCliInPty(opts: {
       })
       .catch(reject)
   })
-}
-
-let interactiveHandle: PtyHandle | null = null
-
-export async function startInteractiveCli(opts: {
-  command: string
-  args: string[]
-  cwd: string
-  env?: NodeJS.ProcessEnv
-}): Promise<void> {
-  if (interactiveHandle) {
-    throw new Error(
-      'Interactive CLI already running. Call stopInteractiveCli first.'
-    )
-  }
-  const handle = spawnPty(opts)
-  await waitForInteractiveInputReady({
-    getStdout: () => handle.stdout.value,
-    maxWaitMs: INTERACTIVE_CLI_PROMPT_WAIT_MS,
-    formatTimeoutError: (stdout) => formatCliPromptDidNotAppearError(stdout),
-  })
-  assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks(
-    handle.stdout.value
-  )
-  interactiveHandle = handle
-}
-
-/**
- * One stdin `read()` must not contain text + CR together: Ink treats that as pasted text (literal
- * `\r` in the box). Send the draft, pause for Ink, then send `\r` alone (same idea as Vitest
- * `pushTTYCommandBytes` + `pushTTYCommandEnter`).
- */
-function requireInteractivePtyHandle(): PtyHandle {
-  if (!interactiveHandle) {
-    throw new Error(
-      'No interactive CLI running. Ensure @interactiveCLI Before hook ran.'
-    )
-  }
-  return interactiveHandle
-}
-
-const PTY_INPUT_READY_AFTER_SEND_MAX_MS = 15_000
-
-function formatPtyInputBoxTimeoutError(
-  stdout: string,
-  lenBeforeSend: number,
-  details: {
-    visiblePredicate:
-      | 'loading-tail-active'
-      | 'no-command-line-row'
-      | 'unstable-output'
-      | 'ready'
-    bytesAfterWindow: number
-    hasVisibleCommandLineRow: boolean
-    hasVisibleReadyPanel: boolean
-    hasActiveFetchWaitTail: boolean
-  }
-): string {
-  return `CLI did not show input box after send within ${PTY_INPUT_READY_AFTER_SEND_MAX_MS / 1000}s. visible predicate=${details.visiblePredicate}, has command row=${details.hasVisibleCommandLineRow}, has ready panel=${details.hasVisibleReadyPanel}, fetch wait tail=${details.hasActiveFetchWaitTail}, bytes after send window=${details.bytesAfterWindow}, stdout grew by ${stdout.length - lenBeforeSend} chars. Tail: ${stdout.slice(-400).replace(/\r/g, '\\r')}`
-}
-
-async function ptyWaitForInputReadyAfterWrite(
-  handle: PtyHandle,
-  lenBeforeSend: number
-): Promise<string> {
-  await waitForInteractiveInputReady({
-    getStdout: () => handle.stdout.value,
-    maxWaitMs: PTY_INPUT_READY_AFTER_SEND_MAX_MS,
-    onlyInStdoutAfterByteLength: lenBeforeSend,
-    formatTimeoutError: (stdout, details) =>
-      formatPtyInputBoxTimeoutError(stdout, lenBeforeSend, details),
-  })
-  assertInteractiveCliPtyTranscriptHasNoSimulatedEscapeLeaks(
-    handle.stdout.value
-  )
-  return handle.stdout.value
-}
-
-async function ptyWriteDraftThenCarriageReturnAndWait(
-  draftBytes: string
-): Promise<string> {
-  const handle = requireInteractivePtyHandle()
-  handle.pty.write(draftBytes)
-  await sleep(DRAFT_THEN_ENTER_GAP_MS)
-  const lenBeforeSubmit = handle.stdout.value.length
-  handle.pty.write('\r')
-  return ptyWaitForInputReadyAfterWrite(handle, lenBeforeSubmit)
-}
-
-/** Deliver one keystroke to the shared interactive PTY and wait until the input box is ready again. */
-export async function applyInteractiveCliPtyKeystroke(
-  keystroke: InteractiveCliPtyKeystroke
-): Promise<string> {
-  return ptyWriteDraftThenCarriageReturnAndWait(keystroke.text)
-}
-
-export async function stopInteractiveCli(): Promise<void> {
-  if (!interactiveHandle) return
-  const { pty, dispose } = interactiveHandle
-  interactiveHandle = null
-  pty.kill('SIGKILL')
-  dispose()
 }

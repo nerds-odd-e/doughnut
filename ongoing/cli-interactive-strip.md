@@ -117,16 +117,16 @@ Bottom-to-top:
 | ~~1.4.1~~ | ~~exit ends the session after Bye~~ **done** (`@ignore`; `exit` + `Bye.` unchanged — `cli_install_and_run` still sends `exit`; Vitest `interactiveExitFarewell.test.ts`) |
 | ~~1.4.2~~ | ~~/help lists subcommands and interactive commands~~ **done** (`@ignore`; `/help` + help copy unchanged — Vitest `help.test.ts` / `processInput.test.ts`) |
 | ~~1.4.3~~ | ~~After /help, consecutive Enter on empty input keeps a normal input box~~ **done** (`@ignore`; E2E steps `slash command` / `press Enter` / `input box UI should be normal` + `enterSlashCommand` / `pressEnter` / `inputBoxTopBorder` removed; `InteractiveCliPtyKeystroke` is `line` only; `/help` + empty-line UX unchanged — Vitest) |
-| 1.4.x | TTY interactive responds "Not supported" to a plain line |
+| ~~1.4.x~~ | ~~TTY interactive responds "Not supported" to a plain line~~ **done** (`@ignore`; step `I enter {string} in the interactive CLI` + long-lived `@interactiveCLI` PTY harness removed — plain-line “Not supported” still in Vitest `processInput.test.ts` / `interactiveTtySession.test.ts`) |
 
-After this file is fully **`@ignore`**, verify **`cli_install_and_run`** still passes; implement the **minimal** interactive path it needs (version banner, `exit`, transcript layout) without restoring full `/help` or recall behavior.
+**Part 1.4 complete:** every scenario in `cli_interactive_mode.feature` is **`@ignore`**; `cli_install_and_run` still uses **`runInstalledCli`** PTY one-shot only.
 
 ### Part 1.5 — E2E harness cleanup (once all non-install CLI features are fully ignored)
 
 Single or few sub-phases (each with commit stop):
 
-- Remove **`@interactiveCLI`** Before/After hooks and **long-lived** PTY session tasks if nothing references them.
-- Prune **`InteractiveCliPtyKeystroke`** / `cliPtyRunner` / `interactiveCliPtyTypes` **only** if no step and no `runInstalledCli` path needs them (install may keep a **narrower** PTY helper).
+- ~~Remove **`@interactiveCLI`** Before/After hooks and **long-lived** PTY session tasks~~ **done** with 1.4.x (no remaining non-ignored `@interactiveCLI` scenarios).
+- ~~Prune **`InteractiveCliPtyKeystroke`** / long-lived session in **`cliPtyRunner`** / **`interactiveCliPtyTypes`**~~ **done** with 1.4.x; **`runCliInPty`** retained for **`runInstalledCli`**.
 - Trim **`e2e_test/step_definitions/cli.ts`** and **`e2e_test/start/pageObjects/cli/*`** to what **`cli_install_and_run`** + shared backend steps still need.
 - Remove unused mock Gmail **Given** steps from `cli.ts` if no feature references them.
 

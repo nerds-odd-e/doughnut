@@ -23,9 +23,6 @@ When('the backend serves the CLI with version {string}', (version: string) =>
   cli.backend().serveVersion(version)
 )
 
-When('I enter {string} in the interactive CLI', (line: string) =>
-  cli.interactive().enterLine(line)
-)
 Then(
   'I should see {string} in the non-interactive output',
   (expected: string) => cli.nonInteractiveOutput().expectContains(expected)

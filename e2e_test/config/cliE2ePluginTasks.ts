@@ -8,24 +8,12 @@ import { dirname, join } from 'node:path'
 import {
   bundleCliE2eInstall,
   CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH,
-  cliRepoSpawnFromRoot,
   runShellCommandSync,
 } from './cliE2eRepo'
 import { cliEnv } from './cliEnv'
-import {
-  applyInteractiveCliPtyKeystroke,
-  runCliInPty,
-  startInteractiveCli as startInteractiveCliPtySession,
-  stopInteractiveCli as stopInteractiveCliPtySession,
-} from './cliPtyRunner'
-import {
-  INTERACTIVE_CLI_PTY_KEYSTROKE_TASK,
-  type InteractiveCliPtyKeystroke,
-} from './interactiveCliPtyTypes'
+import { runCliInPty } from './cliPtyRunner'
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
-
-type StartInteractiveCliTask = WithOptionalCliEnv
 
 type RunInstalledCliTask = WithOptionalCliEnv & {
   doughnutPath: string
@@ -48,9 +36,6 @@ async function bundleCliE2eInstallOrThrow(
 
 export function createCliE2ePluginTasks(repoRoot: string) {
   return {
-    createCliConfigDir() {
-      return mkdtempSync(join(tmpdir(), 'cypress-cli-config-'))
-    },
     async bundleCliE2eInstall() {
       return bundleCliE2eInstallOrThrow(repoRoot)
     },
@@ -90,23 +75,6 @@ export function createCliE2ePluginTasks(repoRoot: string) {
         )
       }
       return doughnutPath
-    },
-    async startInteractiveCli({ env }: StartInteractiveCliTask) {
-      const { command, baseArgs } = cliRepoSpawnFromRoot(repoRoot)
-      await startInteractiveCliPtySession({
-        command,
-        args: baseArgs,
-        cwd: repoRoot,
-        env: { ...cliEnv(env) },
-      })
-      return true
-    },
-    [INTERACTIVE_CLI_PTY_KEYSTROKE_TASK]: (
-      keystroke: InteractiveCliPtyKeystroke
-    ) => applyInteractiveCliPtyKeystroke(keystroke),
-    async stopInteractiveCli() {
-      await stopInteractiveCliPtySession()
-      return null
     },
     async runInstalledCli({
       doughnutPath,
