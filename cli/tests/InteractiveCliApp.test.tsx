@@ -34,6 +34,25 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     expect(lastFrame()).toContain(formatVersionOutput())
   })
 
+  test('empty committed line leaves transcript unchanged; later line still commits', async () => {
+    const { stdin, frames } = render(<InteractiveCliApp />)
+    const before = frames.join('\n')
+    expect(before).toContain(formatVersionOutput())
+    expect(before).not.toContain('Not supported')
+
+    stdin.write('\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => c === before && !c.includes('Not supported')
+    )
+
+    stdin.write('x\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => c.includes('Not supported') && c.includes('x')
+    )
+  })
+
   test('plain committed line records user message and Not supported', async () => {
     const { stdin, frames } = render(<InteractiveCliApp />)
 
