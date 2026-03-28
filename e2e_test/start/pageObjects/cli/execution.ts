@@ -93,9 +93,6 @@ function interactive() {
     pressEnter() {
       applyInteractiveCliPtyKeystroke({ kind: 'enter' })
     },
-    typeRawKey(char: string) {
-      applyInteractiveCliPtyKeystroke({ kind: 'rawKey', char })
-    },
   }
 }
 

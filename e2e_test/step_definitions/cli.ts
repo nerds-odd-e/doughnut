@@ -31,9 +31,6 @@ When(
 When('I enter {string} in the interactive CLI', (line: string) =>
   cli.interactive().enterLine(line)
 )
-When('I cancel the token list with q in the interactive CLI', () =>
-  cli.interactive().typeRawKey('q')
-)
 When('I press Enter in the interactive CLI', () =>
   cli.interactive().pressEnter()
 )

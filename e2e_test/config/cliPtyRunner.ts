@@ -446,14 +446,6 @@ export async function applyInteractiveCliPtyKeystroke(
       return ptyWriteDraftThenCarriageReturnAndWait(`${keystroke.commandLine} `)
     case 'enter':
       return ptyWritePayloadAndWaitForInputReady('\r')
-    case 'rawKey': {
-      if (keystroke.char.length !== 1) {
-        throw new Error(
-          `rawKey keystroke expects a single character, got ${JSON.stringify(keystroke.char)}`
-        )
-      }
-      return ptyWritePayloadAndWaitForInputReady(keystroke.char)
-    }
   }
 }
 

@@ -89,8 +89,8 @@ Bottom-to-top:
 
 | Sub-phase | Scenario (summary) |
 |-----------|-------------------|
-| 1.2.x | Create access token via CLI |
-| 1.2.x | Another key cancels remove-access-token selection |
+| ~~1.2.1~~ | ~~Create access token via CLI~~ **done** (`@ignore`; `/create-access-token` still covered by Vitest `accessToken.test.ts`, `processInput.test.ts`) |
+| ~~1.2.2~~ | ~~Another key cancels remove-access-token selection~~ **done** (`@ignore`; E2E `rawKey` keystroke + step removed — “other keys cancel” still in Vitest `interactiveTtyTokenList.test.ts`) |
 | 1.2.x | Scenario Outline: Remove access token (both examples — can be one E2E sub-phase if both ignored together, still follow A/B commits) |
 | 1.2.x | Add invalid access token |
 | 1.2.x | Add access token and list it |
