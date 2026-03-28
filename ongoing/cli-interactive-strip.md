@@ -132,12 +132,14 @@ Single or few sub-phases (each with commit stop):
 
 ### Part 1.6 — Feature: `cli_install_and_run.feature` (optional strip inside the install feature)
 
+**Part 1.6 complete:** remaining active scenarios are **version (non-interactive)** and **update**; interactive install scenario remains **`@ignore`**.
+
 Bottom-to-top (scenario order in file):
 
 | Sub-phase | Scenario (summary) |
 |-----------|-------------------|
 | ~~1.6.1~~ | ~~**Install and run the CLI in interactive mode**~~ **done** (`@ignore`; removed interactive install steps, past-message page objects, PTY **`runInstalledCli`** path, `cliPtyRunner`, `cliSectionParser`, **`@lydell/node-pty`**). |
-| 1.6.x | (Reserved) further install-feature trims if desired — e.g. rename misleading “TTY (interactive)” scenario title without changing steps |
+| ~~1.6.x~~ | ~~Rename misleading “TTY (interactive)” install scenario~~ **done** (title now **Install from localhost and verify the CLI version (non-interactive)**; steps unchanged) |
 
 ---
 

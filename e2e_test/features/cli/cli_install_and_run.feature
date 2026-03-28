@@ -6,7 +6,7 @@ Feature: CLI install and run
     Given the backend is serving the CLI and install script
     And I install the CLI from localhost without affecting my system
 
-  Scenario: Install from localhost and run the CLI in a TTY (interactive)
+  Scenario: Install from localhost and verify the CLI version (non-interactive)
     When I run the installed doughnut version command
     Then I should see "doughnut 0.1.0" in the non-interactive output
 
