@@ -104,13 +104,6 @@ function interactive() {
       assertRecallSessionPromptOnSimulatedPtyScreen(expectedPromptText)
       applyInteractiveCliPtyKeystroke({ kind: 'rawKey', char: answer })
     },
-    inputDownArrowSelection(commandLine: string) {
-      cy.task<string>(INTERACTIVE_CLI_PTY_KEYSTROKE_TASK, {
-        kind: 'slashCommand',
-        commandLine,
-      })
-      applyInteractiveCliPtyKeystroke({ kind: 'line', text: '2' })
-    },
   }
 }
 

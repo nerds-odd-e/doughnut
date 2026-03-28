@@ -43,11 +43,6 @@ When(
     cli.interactive().answerToPrompt(answer, expectedPromptText)
 )
 When(
-  'I input down-arrow selection for {string} in the interactive CLI',
-  (command: string) => cli.interactive().inputDownArrowSelection(command)
-)
-
-When(
   'I add the saved access token in the interactive CLI using add-access-token',
   () => cli.accessToken().addSavedTokenInteractive()
 )

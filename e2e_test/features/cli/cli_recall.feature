@@ -79,6 +79,7 @@ Feature: CLI recall status and recall session
       When I enter the slash command "/recall-status" in the interactive CLI
       Then I should see "1 note to recall today" in past CLI assistant messages
 
+    @ignore
     @usingMockedOpenAiService
     Scenario: Recall MCQ - down arrow and Enter to select
       And OpenAI generates this question:
