@@ -1,75 +1,31 @@
 /**
  * Cucumber assertions on `@doughnutOutput`.
  *
- * - **Non-interactive**: one-shot CLI output.
- * - **Past messages**: parsed transcript — domain steps “past CLI assistant messages” / “past user messages”.
- * - **Simulated PTY screen**: cursor/erase replay — “user-visible” plain text.
+ * - **Non-interactive**: one-shot CLI output (installed `version` / `update` spawns).
  */
-import {
-  countInputBoxTopBorderLinesInInteractivePtyTranscript,
-  getPastUserMessagesContent,
-  getPastCliAssistantMessagesContent,
-} from '../../../step_definitions/cliSectionParser'
-
 export const OUTPUT_ALIAS = '@doughnutOutput'
 
 const SECTION = {
   nonInteractive: 'non-interactive output',
-  pastCliAssistantMessages: 'past CLI assistant messages',
-  pastUserMessages: 'past user messages',
 } as const
-
-type SectionLabel = (typeof SECTION)[keyof typeof SECTION]
 
 const CONTENT_PREVIEW_LEN = 500
 
 const WRONG_NON_INTERACTIVE_STEP =
-  'This capture looks like PTY interactive output. ' +
-  'Use: Then I should see "…" in past CLI assistant messages or past user messages — not non-interactive output.'
+  'Expected non-interactive CLI output (e.g. `version` / `update` spawn), but this capture looks like an interactive PTY session.'
 
-const wrongPtyInteractiveStep = (
-  section: SectionLabel | 'interactive CLI input box'
-) =>
-  'No interactive command-line prompt row detected in this capture (likely subcommand / one-shot spawn). ' +
-  `Use: Then I should see "…" in the non-interactive output — not in the ${section}.`
-
-type ExpectedInStdout =
-  | { kind: 'nonInteractive' }
-  | {
-      kind: 'ptyInteractive'
-      assertionTarget: SectionLabel | 'interactive CLI input box'
-    }
-
-function assertStdoutMatchesStepKind(
-  stdout: string,
-  expected: ExpectedInStdout
-): void {
-  const looksInteractive =
-    countInputBoxTopBorderLinesInInteractivePtyTranscript(stdout) > 0 ||
-    stdout.includes('\x1b[2K') ||
-    stdout.includes('y or n; /stop to exit recall') ||
-    stdout.includes('↑↓ Enter or number to select; Esc to cancel') ||
-    stdout.includes('↑↓ Enter to select; other keys cancel')
-  if (expected.kind === 'nonInteractive') {
-    expect(!looksInteractive, WRONG_NON_INTERACTIVE_STEP).to.be.true
-  } else {
-    expect(looksInteractive, wrongPtyInteractiveStep(expected.assertionTarget))
-      .to.be.true
-  }
-}
-
-function withStdout(run: (stdout: string) => void): void {
-  cy.get<string>(OUTPUT_ALIAS).then(run)
-}
-
-function withStdoutFor(
-  expected: ExpectedInStdout,
-  run: (stdout: string) => void
-): void {
-  withStdout((stdout) => {
-    assertStdoutMatchesStepKind(stdout, expected)
-    run(stdout)
-  })
+function stdoutLooksLikeInteractiveCliPtyCapture(stdout: string): boolean {
+  if (stdout.includes('\x1b[2K')) return true
+  const snippets = [
+    'y or n; /stop to exit recall',
+    'type your answer; /stop to exit recall',
+    'y/N',
+    'n/Y',
+    '↑↓ Enter or number to select; Esc to cancel',
+    '↑↓ Enter to select; other keys cancel',
+  ] as const
+  if (snippets.some((s) => stdout.includes(s))) return true
+  return stdout.includes('\x1b[') && stdout.includes('→')
 }
 
 function expectSectionContainsSubstring(
@@ -90,45 +46,15 @@ function expectSectionContainsSubstring(
 function nonInteractiveOutput() {
   return {
     expectContains(expected: string) {
-      withStdoutFor({ kind: 'nonInteractive' }, (stdout) =>
+      cy.get<string>(OUTPUT_ALIAS).then((stdout) => {
+        expect(
+          !stdoutLooksLikeInteractiveCliPtyCapture(stdout),
+          WRONG_NON_INTERACTIVE_STEP
+        ).to.be.true
         expectSectionContainsSubstring(stdout, expected, SECTION.nonInteractive)
-      )
+      })
     },
   }
 }
 
-function pastCliAssistantMessages() {
-  const target = SECTION.pastCliAssistantMessages
-  return {
-    expectContains(expected: string) {
-      withStdoutFor(
-        { kind: 'ptyInteractive', assertionTarget: target },
-        (stdout) =>
-          expectSectionContainsSubstring(
-            getPastCliAssistantMessagesContent(stdout),
-            expected,
-            target
-          )
-      )
-    },
-  }
-}
-
-function pastUserMessages() {
-  const target = SECTION.pastUserMessages
-  return {
-    expectContains(expected: string) {
-      withStdoutFor(
-        { kind: 'ptyInteractive', assertionTarget: target },
-        (stdout) =>
-          expectSectionContainsSubstring(
-            getPastUserMessagesContent(stdout),
-            expected,
-            target
-          )
-      )
-    },
-  }
-}
-
-export { nonInteractiveOutput, pastCliAssistantMessages, pastUserMessages }
+export { nonInteractiveOutput }

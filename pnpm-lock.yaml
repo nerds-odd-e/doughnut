@@ -75,9 +75,6 @@ importers:
       '@hey-api/openapi-ts':
         specifier: 0.94.5
         version: 0.94.5(typescript@6.0.2)
-      '@lydell/node-pty':
-        specifier: ^1.2.0-beta.10
-        version: 1.2.0-beta.10
       '@mbtest/mountebank':
         specifier: 2.9.3
         version: 2.9.3
@@ -1308,39 +1305,6 @@ packages:
 
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
-
-  '@lydell/node-pty-darwin-arm64@1.2.0-beta.10':
-    resolution: {integrity: sha512-C+eqDyRNHRYvx7RaHj6VVCx6nCpRBPuuxhTcc3JH3GuBMoxTsYeY4GkWH2XOktrgbAq1BG8e/Y8bu/wNQreCEw==}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@lydell/node-pty-darwin-x64@1.2.0-beta.10':
-    resolution: {integrity: sha512-aZoIK6HtJO5BiT4ELm683U4dyHtt8b7wNgq3NJqYAQwSXrcPv576Z8vY3BIulVxfcFkht/SPLKou9TtdFXdNpg==}
-    cpu: [x64]
-    os: [darwin]
-
-  '@lydell/node-pty-linux-arm64@1.2.0-beta.10':
-    resolution: {integrity: sha512-0cKX2iMyXFNBE4fGtGK6B7IkdXcDMZajyEDoGMOgQQs/DDtoI5tSPcBcqNY9VitVrsRQA8+gFt6eKYU9Ye/lUA==}
-    cpu: [arm64]
-    os: [linux]
-
-  '@lydell/node-pty-linux-x64@1.2.0-beta.10':
-    resolution: {integrity: sha512-J9HnxvSzEeMH748+Ul1VrmCLWMo7iCVJy9EGijRR62+YO/Yk5GaCydUTZ+KzlH0/X5aTrgt5cfiof4vx45tRRg==}
-    cpu: [x64]
-    os: [linux]
-
-  '@lydell/node-pty-win32-arm64@1.2.0-beta.10':
-    resolution: {integrity: sha512-PlDJpJX/pnKyy6OmADKzhf+INZDDnzTBGaI0LT4laVNc6NblZNqUSkCMjLFWbeakeuQp0VG37M49WQSN9FDfeA==}
-    cpu: [arm64]
-    os: [win32]
-
-  '@lydell/node-pty-win32-x64@1.2.0-beta.10':
-    resolution: {integrity: sha512-ExFgWrzyldNAMi45U9PLIOu+g/RatP+f0c/dZxaooifME6yLW32BoHveH26/TtoAjZyJrc2iL0u48pgnR1fzmg==}
-    cpu: [x64]
-    os: [win32]
-
-  '@lydell/node-pty@1.2.0-beta.10':
-    resolution: {integrity: sha512-Fv+A3+MZVA8qhkBIZsM1E6dCdHNMyXXz22mAYiMWd03LlyK///F3OH6CKPX9mj4id7LUlxpr45yPzyBVy9aDPw==}
 
   '@mbtest/mountebank-formatters@0.0.2':
     resolution: {integrity: sha512-wN5yd3WBtmyrZIapIwYH4rAxQVYF8Qoro7UU4SeCbA8M/TtTBMfVQg+2cZkat79IeJujrjS4NOAZLya9rEf/mw==}
@@ -7784,33 +7748,6 @@ snapshots:
       jsep: 1.4.0
 
   '@keyv/serialize@1.1.1': {}
-
-  '@lydell/node-pty-darwin-arm64@1.2.0-beta.10':
-    optional: true
-
-  '@lydell/node-pty-darwin-x64@1.2.0-beta.10':
-    optional: true
-
-  '@lydell/node-pty-linux-arm64@1.2.0-beta.10':
-    optional: true
-
-  '@lydell/node-pty-linux-x64@1.2.0-beta.10':
-    optional: true
-
-  '@lydell/node-pty-win32-arm64@1.2.0-beta.10':
-    optional: true
-
-  '@lydell/node-pty-win32-x64@1.2.0-beta.10':
-    optional: true
-
-  '@lydell/node-pty@1.2.0-beta.10':
-    optionalDependencies:
-      '@lydell/node-pty-darwin-arm64': 1.2.0-beta.10
-      '@lydell/node-pty-darwin-x64': 1.2.0-beta.10
-      '@lydell/node-pty-linux-arm64': 1.2.0-beta.10
-      '@lydell/node-pty-linux-x64': 1.2.0-beta.10
-      '@lydell/node-pty-win32-arm64': 1.2.0-beta.10
-      '@lydell/node-pty-win32-x64': 1.2.0-beta.10
 
   '@mbtest/mountebank-formatters@0.0.2':
     dependencies:

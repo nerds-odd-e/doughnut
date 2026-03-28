@@ -12,17 +12,6 @@ function installation() {
         .and('not.be.empty')
         .as('doughnutPath')
     },
-    runInstalled() {
-      cy.get<string>('@doughnutPath')
-        .should('be.a', 'string')
-        .and('not.be.empty')
-        .then((doughnutPath) => {
-          cy.task<string>('runInstalledCli', {
-            doughnutPath,
-            input: 'exit\n',
-          }).as('doughnutOutput')
-        })
-    },
     runVersion() {
       cy.get<string>('@doughnutPath').then((doughnutPath) => {
         cy.task<string>('runInstalledCli', {

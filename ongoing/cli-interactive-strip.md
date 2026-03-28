@@ -2,7 +2,7 @@
 
 ## Goal
 
-- **Single active CLI E2E feature:** `e2e_test/features/cli/cli_install_and_run.feature`. Ignored scenarios there use **`@ignore`** like the rest of the suite. **Open:** sub-phase **1.6.1** tags the **second** scenario (interactive install transcript); the first and third scenarios stay non-ignored until a later phase says otherwise.
+- **Single active CLI E2E feature:** `e2e_test/features/cli/cli_install_and_run.feature` — scenarios that stay runnable have **no** `@ignore`; the **Install and run the CLI in interactive mode** scenario is ignored in sub-phase **1.6.1** (PTY transcript / past-message assertions pruned from E2E harness).
 - **All other** `e2e_test/features/cli/*.feature` files **remain on disk**; scenarios are progressively tagged **`@ignore`** until every scenario in those files is ignored. **Do not delete** those feature files at the end.
 - **Remove** interactive product code and tests that exist only for the removed scenarios, while **keeping** the **Ink** dependency in the project (bundle may retain a minimal Ink surface or a tiny placeholder — decide during implementation).
 - **Gmail exception:** keep **low-level** Gmail implementation (HTTP/OAuth/token plumbing, non-UI modules) and their **unit tests**; remove **Gmail UI** (Ink / TTY paths for `/add gmail`, `/last email`, etc.). Gmail E2E in `cli_gmail.feature` is still **ignored** like the other non-install features.
@@ -20,8 +20,8 @@
 
 `cli_install_and_run.feature` depends on:
 
-- Install task + `runInstalledCli`: **spawn** (no PTY `input`) for **`version`** / **`update`** (first and third scenarios). ~~PTY + `input: 'exit\n'`~~ was only for the **second** scenario — removed with **1.6.1** (then prune the `input` branch in `runInstalledCli` / `runCliInPty` if unused).
-- **`non-interactive output`** assertions (`outputAssertions.ts` + tasks). ~~Transcript parsing for **`past CLI assistant messages`** / **`past user messages`**~~ — **1.6.1** removes those steps and helpers once no non-ignored scenario references them (all other CLI features are already `@ignore`).
+- Install task + `runInstalledCli` (**spawn** only for `version` / `update` after **1.6.1** — no PTY `input` path).
+- **`non-interactive output`** guard in `e2e_test/start/pageObjects/cli/outputAssertions.ts` (heuristic: reject captures that look like interactive PTY).
 
 Any refactor must keep **`pnpm cypress run --spec e2e_test/features/cli/cli_install_and_run.feature`** (with Nix wrapper per project rules) green after each logical batch.
 
@@ -65,7 +65,6 @@ Recommended **order** (heavy / shared steps first, then independent shells):
 2. **`cli_access_token.feature`** — shared steps with recall (`addSavedTokenInteractive`, token list); easier to strip after recall is fully ignored.
 3. **`cli_gmail.feature`** — two scenarios; remove Gmail **UI** while keeping low-level modules + `gmail.test.ts` (and any other UT tied to non-UI Gmail).
 4. **`cli_interactive_mode.feature`** — generic TTY assertions (`Current guidance`, input box border, plain line, `/help`, `exit`).
-5. **`cli_install_and_run.feature`** — **1.6.1** only (second scenario: interactive transcript + `exit`); run after **Part 1.5** harness trim or fold 1.6.1 into the same commit wave as the last 1.5 bullet if convenient.
 
 ### Part 1.1 — Feature: `cli_recall.feature`
 
@@ -120,24 +119,25 @@ Bottom-to-top:
 | ~~1.4.3~~ | ~~After /help, consecutive Enter on empty input keeps a normal input box~~ **done** (`@ignore`; E2E steps `slash command` / `press Enter` / `input box UI should be normal` + `enterSlashCommand` / `pressEnter` / `inputBoxTopBorder` removed; `InteractiveCliPtyKeystroke` is `line` only; `/help` + empty-line UX unchanged — Vitest) |
 | ~~1.4.x~~ | ~~TTY interactive responds "Not supported" to a plain line~~ **done** (`@ignore`; step `I enter {string} in the interactive CLI` + long-lived `@interactiveCLI` PTY harness removed — plain-line “Not supported” still in Vitest `processInput.test.ts` / `interactiveTtySession.test.ts`) |
 
-**Part 1.4 complete:** every scenario in `cli_interactive_mode.feature` is **`@ignore`**; `cli_install_and_run` still used **`runInstalledCli`** with a PTY `input` path for the **interactive install** scenario until **1.6.1**.
+**Part 1.4 complete:** every scenario in `cli_interactive_mode.feature` is **`@ignore`**; `cli_install_and_run` still used **`runInstalledCli`** PTY one-shot until **1.6.1** (then spawn-only for remaining scenarios).
 
 ### Part 1.5 — E2E harness cleanup (once all non-install CLI features are fully ignored)
 
 Single or few sub-phases (each with commit stop):
 
 - ~~Remove **`@interactiveCLI`** Before/After hooks and **long-lived** PTY session tasks~~ **done** with 1.4.x (no remaining non-ignored `@interactiveCLI` scenarios).
-- ~~Prune **`InteractiveCliPtyKeystroke`** / long-lived session in **`cliPtyRunner`** / **`interactiveCliPtyTypes`**~~ **done** with 1.4.x; **`runCliInPty`** retained for **`runInstalledCli`**.
-- Trim **`e2e_test/step_definitions/cli.ts`** and **`e2e_test/start/pageObjects/cli/*`** to what **`cli_install_and_run`** + shared backend steps still need (after **1.6.1**, no past-message steps or `runInstalled` — see below).
+- ~~Prune **`InteractiveCliPtyKeystroke`** / long-lived session in **`cliPtyRunner`** / **`interactiveCliPtyTypes`**~~ **done** with 1.4.x; **`runCliInPty`** / **`cliPtyRunner`** removed with **1.6.1** (`runInstalledCli` spawn-only).
+- Trim **`e2e_test/step_definitions/cli.ts`** and **`e2e_test/start/pageObjects/cli/*`** to what **`cli_install_and_run`** + shared backend steps still need.
 - Remove unused mock Gmail **Given** steps from `cli.ts` if no feature references them.
 
-### Part 1.6 — Feature: `cli_install_and_run.feature` (strip interactive transcript scenario)
+### Part 1.6 — Feature: `cli_install_and_run.feature` (optional strip inside the install feature)
 
-**Order note:** Global workflow is bottom-up per file; **1.6.1** is an explicit exception — target the **second** scenario while keeping the **third** (update) active.
+Bottom-to-top (scenario order in file):
 
 | Sub-phase | Scenario (summary) |
 |-----------|-------------------|
-| 1.6.1 | Install and run the CLI in interactive mode — **open** (`@ignore` on this scenario; **A** remove When `I run the installed doughnut command in interactive mode` + Then `… in past CLI assistant messages` / `… in past user messages` if unused elsewhere; drop `installation.runInstalled` from `e2e_test/start/pageObjects/cli/execution.ts`; remove `pastCliAssistantMessages` / `pastUserMessages` from `outputAssertions.ts` / `cli` index when sole users were ignored features + this scenario; trim **`runInstalledCli`** so the PTY + `input` path and any **install-only** `runCliInPty` glue in `cliPtyRunner.ts` / types go away if nothing else calls them; **B** only if something in `cli/` existed solely for this E2E surface — otherwise skip **B**). |
+| ~~1.6.1~~ | ~~**Install and run the CLI in interactive mode**~~ **done** (`@ignore`; removed interactive install steps, past-message page objects, PTY **`runInstalledCli`** path, `cliPtyRunner`, `cliSectionParser`, **`@lydell/node-pty`**). |
+| 1.6.x | (Reserved) further install-feature trims if desired — e.g. rename misleading “TTY (interactive)” scenario title without changing steps |
 
 ---
 

@@ -10,6 +10,7 @@ Feature: CLI install and run
     When I run the installed doughnut version command
     Then I should see "doughnut 0.1.0" in the non-interactive output
 
+  @ignore
   Scenario: Install and run the CLI in interactive mode
     When I run the installed doughnut command in interactive mode
     Then I should see "doughnut 0.1.0" in past CLI assistant messages

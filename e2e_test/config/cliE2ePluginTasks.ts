@@ -11,13 +11,11 @@ import {
   runShellCommandSync,
 } from './cliE2eRepo'
 import { cliEnv } from './cliEnv'
-import { runCliInPty } from './cliPtyRunner'
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
 
 type RunInstalledCliTask = WithOptionalCliEnv & {
   doughnutPath: string
-  input?: string
   args?: string[]
 }
 
@@ -76,12 +74,7 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       }
       return doughnutPath
     },
-    async runInstalledCli({
-      doughnutPath,
-      input,
-      args,
-      env,
-    }: RunInstalledCliTask) {
+    async runInstalledCli({ doughnutPath, args, env }: RunInstalledCliTask) {
       if (!doughnutPath) {
         throw new Error(
           `runInstalledCli: doughnutPath required, got ${JSON.stringify(doughnutPath)}`
@@ -93,15 +86,6 @@ export function createCliE2ePluginTasks(repoRoot: string) {
         )
       }
       const cwd = dirname(doughnutPath)
-      if (input !== undefined) {
-        return runCliInPty({
-          executablePath: doughnutPath,
-          args: args ?? [],
-          input,
-          cwd,
-          env,
-        })
-      }
       const { spawn } = await import('node:child_process')
       return new Promise<string>((resolve, reject) => {
         const proc = spawn(process.execPath, [doughnutPath, ...(args ?? [])], {
