@@ -1,7 +1,7 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { MAX_USER_INPUT_HISTORY_LINES } from './interactiveCommandInput.js'
 
+const MAX_USER_INPUT_HISTORY_LINES = 100
 export const USER_INPUT_HISTORY_FILENAME = 'user-input-history.json'
 
 export function userInputHistoryPath(configDir: string): string {

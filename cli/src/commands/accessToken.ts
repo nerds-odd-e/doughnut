@@ -176,8 +176,8 @@ function inferredStatusForBackendErrorType(errorType: string): number {
   }
 }
 
-export type AccessTokenEntry = Pick<GeneratedTokenDto, 'label' | 'token'>
-export type AccessTokenLabel = TokenConfigDto['label']
+type AccessTokenEntry = Pick<GeneratedTokenDto, 'label' | 'token'>
+type AccessTokenLabel = TokenConfigDto['label']
 
 interface AccessTokenConfig {
   tokens: AccessTokenEntry[]
