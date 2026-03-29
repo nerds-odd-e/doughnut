@@ -2,7 +2,7 @@ import { createElement, useCallback, useEffect, useState } from 'react'
 import type { ComponentType } from 'react'
 import { Box, Text, useApp } from 'ink'
 import { MainInteractivePrompt } from './MainInteractivePrompt.js'
-import { interactiveSlashCommandByLine } from './commands/interactiveSlashCommands.js'
+import { resolveInteractiveSlashCommand } from './commands/interactiveSlashCommands.js'
 import type {
   InteractiveSlashCommandStageProps,
   TranscriptMessage,
@@ -31,7 +31,7 @@ export function InteractiveCliApp() {
   }, [])
 
   const onCommittedLine = useCallback((line: string) => {
-    const command = interactiveSlashCommandByLine.get(line)
+    const command = resolveInteractiveSlashCommand(line)
     if (command) {
       setMessages((prev) => [...prev, { role: 'user', text: line }])
       const Stage = command.stageComponent
@@ -40,7 +40,7 @@ export function InteractiveCliApp() {
         setActiveStageComponent(() => Stage)
         return
       }
-      Promise.resolve(command.run())
+      Promise.resolve(command.run(line))
         .then((r) => {
           setMessages((prev) => [
             ...prev,

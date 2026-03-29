@@ -3,9 +3,11 @@ import * as path from 'node:path'
 import {
   configureClient,
   getApiConfig,
+  UserController,
   type GeneratedTokenDto,
   type RequestOptions,
   type TokenConfigDto,
+  type UserToken,
 } from 'doughnut-api'
 import { getConfigDir } from '../configDir.js'
 
@@ -197,6 +199,12 @@ function loadConfig(): AccessTokenConfig {
   }
 }
 
+function saveConfig(config: AccessTokenConfig): void {
+  const p = getConfigPath()
+  fs.mkdirSync(path.dirname(p), { recursive: true })
+  fs.writeFileSync(p, JSON.stringify(config, null, 2), 'utf-8')
+}
+
 /**
  * `fetch` / generated client: user or caller aborted the request (e.g. Esc during fetch-wait).
  * Distinct from “service unavailable” and other network failures.
@@ -222,6 +230,29 @@ async function withBackendClient<T>(
     if (isFetchAbortedByCaller(e)) throw e
     throw new Error(userVisibleMessageForSdkThrowable(e))
   }
+}
+
+async function withBackendJson<T>(
+  bearerToken: string,
+  fn: () => Promise<unknown>
+): Promise<T> {
+  const envelope = await withBackendClient(bearerToken, fn)
+  return (envelope as { data: T }).data
+}
+
+export async function addAccessToken(
+  token: string,
+  signal?: AbortSignal
+): Promise<void> {
+  const identity = await withBackendJson<UserToken>(token, () =>
+    UserController.getTokenInfo(doughnutSdkOptions(signal))
+  )
+  const config = loadConfig()
+  if (config.tokens.some((t) => t.token === token)) {
+    throw new Error('Token already added.')
+  }
+  config.tokens.push({ label: identity.label, token })
+  saveConfig(config)
 }
 
 export async function runWithDefaultBackendClient<T>(

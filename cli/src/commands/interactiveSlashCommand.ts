@@ -22,5 +22,12 @@ export interface InteractiveSlashCommand {
   readonly line: string
   readonly doc: CommandDoc
   readonly stageComponent?: ComponentType<InteractiveSlashCommandStageProps>
-  run(): InteractiveSlashCommandResult | Promise<InteractiveSlashCommandResult>
+  /**
+   * When the committed line is not exactly `line` (e.g. `/cmd arg…`), return true so
+   * resolution can still dispatch here after the exact `line` map miss.
+   */
+  readonly matchesCommittedLine?: (line: string) => boolean
+  run(
+    committedLine?: string
+  ): InteractiveSlashCommandResult | Promise<InteractiveSlashCommandResult>
 }
