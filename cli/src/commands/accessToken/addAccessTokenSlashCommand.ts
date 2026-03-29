@@ -15,7 +15,7 @@ const PREFIX = '/add-access-token'
 export const addAccessTokenSlashCommand: InteractiveSlashCommand = {
   line: PREFIX,
   doc: addAccessTokenDoc,
-  argumentName: 'access token',
+  argument: { name: 'access token', optional: false },
   async run(argument) {
     await addAccessToken(argument!)
     return { assistantMessage: 'Token added successfully' }

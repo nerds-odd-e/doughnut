@@ -25,8 +25,7 @@ const removeAccessTokenCompletelyDoc: CommandDoc = {
 export const removeAccessTokenSlashCommand: InteractiveSlashCommand = {
   line: '/remove-access-token',
   doc: removeAccessTokenDoc,
-  argumentName: 'label',
-  argumentOptional: true,
+  argument: { name: 'label', optional: true },
   stageComponent: RemoveAccessTokenPickerStage,
   run(argument) {
     removeAccessTokenLocal(argument!)
@@ -40,8 +39,7 @@ export const removeAccessTokenCompletelySlashCommand: InteractiveSlashCommand =
   {
     line: '/remove-access-token-completely',
     doc: removeAccessTokenCompletelyDoc,
-    argumentName: 'label',
-    argumentOptional: true,
+    argument: { name: 'label', optional: true },
     stageComponent: RemoveAccessTokenCompletelyPickerStage,
     async run(argument) {
       await removeAccessTokenCompletely(argument!)

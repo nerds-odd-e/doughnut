@@ -50,18 +50,18 @@ export function InteractiveCliApp() {
       const argumentMissing = argument === undefined || argument === ''
       const openPickerStage =
         command.stageComponent !== undefined &&
-        (command.argumentName === undefined ? true : argumentMissing)
+        (command.argument === undefined ? true : argumentMissing)
       if (
-        command.argumentName !== undefined &&
+        command.argument !== undefined &&
         argumentMissing &&
-        !command.argumentOptional
+        !command.argument.optional
       ) {
         setMessages((prev) => [
           ...prev,
           { role: 'user', text: line },
           {
             role: 'assistant',
-            text: `Missing ${command.argumentName}. Usage: ${command.doc.usage}`,
+            text: `Missing ${command.argument.name}. Usage: ${command.doc.usage}`,
           },
         ])
         return
