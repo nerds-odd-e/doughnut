@@ -1,9 +1,8 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Key } from 'ink'
 import { Box, Text, useInput } from 'ink'
 import { interactiveSlashCommands } from './commands/interactiveSlashCommands.js'
 import type { InteractiveSlashCommand } from './commands/interactiveSlashCommand.js'
-import { useInteractiveCliLineBuffer } from './interactiveCliInput.js'
 
 const DEFAULT_INTERACTIVE_GUIDANCE = '/ commands'
 
@@ -67,7 +66,6 @@ type SlashGuidanceForInk =
         readonly usage: string
         readonly description: string
       }[]
-      readonly highlightIndex: number
     }
 
 function slashGuidanceForInk(draft: string): SlashGuidanceForInk {
@@ -79,19 +77,36 @@ function slashGuidanceForInk(draft: string): SlashGuidanceForInk {
     usage: c.doc.usage,
     description: c.doc.description,
   }))
-  return { show: 'list', rows, highlightIndex: 0 }
+  return { show: 'list', rows }
+}
+
+function ttyArrowKeyUsesSlashSuggestionCycle(
+  key: 'up' | 'down',
+  caretOffset: number,
+  lineDraft: string,
+  slashCompletionListVisible: boolean
+): boolean {
+  if (!slashCompletionListVisible) return false
+  if (key === 'up') return caretOffset === 0
+  return caretOffset === lineDraft.length
 }
 
 function visibleListRows(
   rows: readonly { readonly usage: string; readonly description: string }[],
   highlightIndex: number
 ): { readonly rows: typeof rows; readonly highlightIndex: number } {
-  if (rows.length <= GUIDANCE_LIST_MAX_VISIBLE) {
+  const max = GUIDANCE_LIST_MAX_VISIBLE
+  if (rows.length <= max) {
     return { rows, highlightIndex }
   }
+  const maxStart = Math.max(0, rows.length - max)
+  const start = Math.min(
+    Math.max(0, highlightIndex - Math.floor(max / 2)),
+    maxStart
+  )
   return {
-    rows: rows.slice(0, GUIDANCE_LIST_MAX_VISIBLE),
-    highlightIndex: Math.min(highlightIndex, GUIDANCE_LIST_MAX_VISIBLE - 1),
+    rows: rows.slice(start, start + max),
+    highlightIndex: highlightIndex - start,
   }
 }
 
@@ -100,49 +115,199 @@ export function MainInteractivePrompt({
 }: {
   readonly onCommittedLine: (line: string) => void
 }) {
-  const { buffer, applyInput, replaceBuffer, readBuffer } =
-    useInteractiveCliLineBuffer()
+  const [buffer, setBuffer] = useState('')
+  const [caretOffset, setCaretOffset] = useState(0)
+  const [slashHighlightIndex, setSlashHighlightIndex] = useState(0)
+
+  const bufferRef = useRef('')
+  const caretRef = useRef(0)
+  const slashHighlightRef = useRef(0)
+  const onCommittedLineRef = useRef(onCommittedLine)
+
+  useEffect(() => {
+    onCommittedLineRef.current = onCommittedLine
+  }, [onCommittedLine])
 
   const guidance = useMemo(() => slashGuidanceForInk(buffer), [buffer])
 
-  const handleInput = useCallback(
-    (input: string, key: Key) => {
-      if (key.tab) {
-        const draft = normalizedInteractiveDraft(readBuffer())
-        if (draft.startsWith('/') && !draft.endsWith(' ')) {
-          const { completed } = getSlashTabCompletion(
-            draft,
-            interactiveSlashCommands
-          )
-          if (completed !== draft) {
-            replaceBuffer(completed)
-          }
+  const handleInput = useCallback((input: string, key: Key) => {
+    const readBuf = () => bufferRef.current
+    const readCaret = () => caretRef.current
+    const readHighlight = () => slashHighlightRef.current
+
+    const setAll = (nextBuf: string, nextCaret: number, nextHi?: number) => {
+      const hi = nextHi ?? 0
+      bufferRef.current = nextBuf
+      caretRef.current = nextCaret
+      slashHighlightRef.current = hi
+      setBuffer(nextBuf)
+      setCaretOffset(nextCaret)
+      setSlashHighlightIndex(hi)
+    }
+
+    const setCaretOnly = (nextCaret: number) => {
+      caretRef.current = nextCaret
+      setCaretOffset(nextCaret)
+    }
+
+    const setHighlightOnly = (nextHi: number) => {
+      slashHighlightRef.current = nextHi
+      setSlashHighlightIndex(nextHi)
+    }
+
+    const commitLine = () => {
+      const line = readBuf()
+      setAll('', 0, 0)
+      if (line !== '') {
+        onCommittedLineRef.current(line)
+      }
+    }
+
+    if (key.tab) {
+      const draft = normalizedInteractiveDraft(readBuf())
+      if (draft.startsWith('/') && !draft.endsWith(' ')) {
+        const { completed } = getSlashTabCompletion(
+          draft,
+          interactiveSlashCommands
+        )
+        if (completed !== draft) {
+          const c = completed.length
+          setAll(completed, c, 0)
         }
+      }
+      return
+    }
+
+    if (key.leftArrow) {
+      const c = readCaret()
+      if (c > 0) setCaretOnly(c - 1)
+      return
+    }
+    if (key.rightArrow) {
+      const buf = readBuf()
+      const c = readCaret()
+      if (c < buf.length) setCaretOnly(c + 1)
+      return
+    }
+    if (key.home) {
+      setCaretOnly(0)
+      return
+    }
+    if (key.end) {
+      setCaretOnly(readBuf().length)
+      return
+    }
+
+    const g = slashGuidanceForInk(readBuf())
+    const slashRows = g.show === 'list' ? g.rows : []
+    const listVisible = slashRows.length > 0
+
+    if (key.upArrow || key.downArrow) {
+      const dir = key.upArrow ? 'up' : 'down'
+      const buf = readBuf()
+      const caret = readCaret()
+      if (ttyArrowKeyUsesSlashSuggestionCycle(dir, caret, buf, listVisible)) {
+        const rowCount = slashRows.length
+        const hi = readHighlight()
+        const next =
+          dir === 'down' ? (hi + 1) % rowCount : (hi - 1 + rowCount) % rowCount
+        setHighlightOnly(next)
         return
       }
-      applyInput(input, key, (line) => {
-        if (line === '') {
-          return
+      if (dir === 'up') {
+        if (caret > 0) setCaretOnly(0)
+        return
+      }
+      if (caret < buf.length) setCaretOnly(buf.length)
+      return
+    }
+
+    if (key.backspace) {
+      const buf = readBuf()
+      const c = readCaret()
+      if (c === 0) return
+      const nextBuf = buf.slice(0, c - 1) + buf.slice(c)
+      setAll(nextBuf, c - 1, 0)
+      return
+    }
+
+    if (key.delete) {
+      const buf = readBuf()
+      const c = readCaret()
+      if (c === buf.length && c > 0) {
+        const nextBuf = buf.slice(0, c - 1) + buf.slice(c)
+        setAll(nextBuf, c - 1, 0)
+        return
+      }
+      if (c >= buf.length) return
+      const nextBuf = buf.slice(0, c) + buf.slice(c + 1)
+      setAll(nextBuf, c, 0)
+      return
+    }
+
+    if (key.return) {
+      commitLine()
+      return
+    }
+
+    if (input.length > 0) {
+      if (!(input.includes('\r') || input.includes('\n'))) {
+        const buf = readBuf()
+        const c = readCaret()
+        const inserted = normalizedInteractiveDraft(input)
+        setAll(
+          buf.slice(0, c) + inserted + buf.slice(c),
+          c + inserted.length,
+          0
+        )
+        return
+      }
+      let curBuf = readBuf()
+      let c = readCaret()
+      for (let i = 0; i < input.length; i++) {
+        const ch = input[i]!
+        if (ch === '\r') {
+          const line = curBuf
+          setAll('', 0, 0)
+          if (line !== '') onCommittedLineRef.current(line)
+          curBuf = ''
+          c = 0
+          if (input[i + 1] === '\n') i++
+          continue
         }
-        onCommittedLine(line)
-      })
-    },
-    [applyInput, onCommittedLine, readBuffer, replaceBuffer]
-  )
+        if (ch === '\n') {
+          const line = curBuf
+          setAll('', 0, 0)
+          if (line !== '') onCommittedLineRef.current(line)
+          curBuf = ''
+          c = 0
+          continue
+        }
+        curBuf = curBuf.slice(0, c) + ch + curBuf.slice(c)
+        c += 1
+      }
+      setAll(curBuf, c, 0)
+      return
+    }
+  }, [])
 
   useInput(handleInput)
 
   const listWindow =
     guidance.show === 'list'
-      ? visibleListRows(guidance.rows, guidance.highlightIndex)
+      ? visibleListRows(guidance.rows, slashHighlightIndex)
       : null
+
+  const beforeCaret = buffer.slice(0, caretOffset)
+  const afterCaret = buffer.slice(caretOffset)
 
   return (
     <Box flexDirection="column">
       <Text>
         {'> '}
-        {buffer}
+        {beforeCaret}
         <Text inverse> </Text>
+        {afterCaret}
       </Text>
       {guidance.show === 'hint' ? (
         <Text>{DEFAULT_INTERACTIVE_GUIDANCE}</Text>

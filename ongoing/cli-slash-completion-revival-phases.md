@@ -1,6 +1,6 @@
 # Revive interactive `/` completion (Tab + ↑↓) — phased plan
 
-**Status:** Phases 1–2 implemented; Phases 3–5 pending.  
+**Status:** Phases 1–3 implemented; Phases 4–5 pending.  
 **Scope:** Restore slash-command completion behavior **inside `cli/src/MainInteractivePrompt.tsx` only** (local state, local pure helpers in the same file if needed). **No new E2E.** Cover with **high-level Vitest** using **ink-testing-library + real stdin** (no adapter mocks), same spirit as `cli/tests/InteractiveCliApp.test.tsx` / `renderApp` patterns in `.cursor/rules/cli.mdc`.
 
 **Command inventory:** Derive completion candidates from **`interactiveSlashCommands`** (map each entry’s `line` / `doc` to the same strings the shell actually resolves) so completion cannot drift from runtime behavior.
@@ -69,11 +69,13 @@ Logic was spread across **`interactiveApp.tsx`**, **`ShellSessionRoot`**, **`ren
 
 ---
 
-### Phase 3 — Caret + ↑↓ when the completion list is active
+### Phase 3 — Caret + ↑↓ when the completion list is active ✅
 
-**Outcome:** The prompt is **not** append-only: add **caret** (left/right, home/end, backspace/delete at caret) so **↑↓** can mean either **cycle suggestion highlight** (when list visible, not dismissed, and caret at **start** / **end** per old `ttyArrowKeyUsesSlashSuggestionCycle`) or **move caret to home/end** on the first press in the non-history case.
+**Outcome:** The prompt is **not** append-only: **caret** (left/right, home/end, backspace/delete at caret) so **↑↓** mean either **cycle suggestion highlight** (when list visible and caret at **start** / **end** per old `ttyArrowKeyUsesSlashSuggestionCycle`) or **move caret to home/end** when not cycling (no user input history in this phase).
 
-**Tests:** With list visible: caret at end, ↓ cycles highlight; caret in middle, ↓ moves to end first (if that was prior behavior). Adjust assertions to the **documented** rules you preserve from `d18b5097b`.
+**Shipped:** `MainInteractivePrompt.tsx` — local buffer + caret + `slashHighlightIndex`; `ttyArrowKeyUsesSlashSuggestionCycle` ported inline; completion list window **scrolls** with highlight when there are more rows than `GUIDANCE_LIST_MAX_VISIBLE`. Line editing previously in `interactiveCliInput.ts` is folded here (that file removed).
+
+**Tests:** `cli/tests/MainInteractivePrompt.test.tsx` — `/re` + ↓ from end advances highlight; caret moved left once + ↓ keeps first-row highlight then ↓ selects second row (by description text in inverse row).
 
 **Optional follow-up (separate phase if scope explodes):** **User input history** (↑↓ after home/end) with the same semantics as old `interactiveCommandInput` + file persistence (`userInputHistoryFile`). Only add if product still wants file-backed recall; otherwise keep **in-memory** history for the session to limit scope.
 

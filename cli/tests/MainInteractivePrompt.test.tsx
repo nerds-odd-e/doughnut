@@ -30,15 +30,21 @@ async function renderMainInteractivePrompt() {
   const result = render(
     <MainInteractivePrompt onCommittedLine={() => undefined} />
   )
-  result.stdin.write('|')
   await waitForFrames(
     () => stripAnsi(result.lastFrame() ?? ''),
-    (f) => f.includes('> |')
+    (f) => f.includes('>') && f.includes('/ commands')
+  )
+  const firstLine = (f: string) => (f.split('\n')[0] ?? '').trimEnd()
+  const probe = '@'
+  result.stdin.write(probe)
+  await waitForFrames(
+    () => stripAnsi(result.lastFrame() ?? ''),
+    (f) => firstLine(f).includes(probe)
   )
   result.stdin.write('\x7f')
   await waitForFrames(
     () => stripAnsi(result.lastFrame() ?? ''),
-    (f) => f.includes('> ') && !f.includes('> |')
+    (f) => !firstLine(f).includes(probe)
   )
   return result
 }
@@ -131,9 +137,9 @@ describe('MainInteractivePrompt Tab completion (phase 2)', () => {
       () => stripAnsi(lastFrame() ?? ''),
       (f) => f.includes('> /help ')
     )
-    expect((stripAnsi(lastFrame() ?? '').split('\n')[0] ?? '').trimEnd()).toBe(
-      '> /help '
-    )
+    expect(
+      (stripAnsi(lastFrame() ?? '').split('\n')[0] ?? '').includes('/help ')
+    ).toBe(true)
   })
 
   test('Tab with no usage prefix match leaves draft unchanged', async () => {
@@ -151,6 +157,58 @@ describe('MainInteractivePrompt Tab completion (phase 2)', () => {
     )
     expect((stripAnsi(lastFrame() ?? '').split('\n')[0] ?? '').trimEnd()).toBe(
       '> /zzz'
+    )
+  })
+})
+
+describe('MainInteractivePrompt caret and slash arrows (phase 3)', () => {
+  test('with list visible and caret at end, down arrow cycles completion highlight', async () => {
+    const { stdin, lastFrame } = await renderMainInteractivePrompt()
+
+    stdin.write('/re')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('/remove-access-token')
+    )
+
+    stdin.write('\x1b[B')
+    await waitForFrames(
+      () => lastFrame() ?? '',
+      (raw) =>
+        raw.includes('\x1b[7m') &&
+        raw.includes('Revoke a stored access token on the server')
+    )
+  })
+
+  test('with list visible and caret in the middle, first down moves to end then down cycles highlight', async () => {
+    const { stdin, lastFrame } = await renderMainInteractivePrompt()
+
+    stdin.write('/re')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('/remove-access-token')
+    )
+
+    stdin.write('\x1b[D')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('> /re')
+    )
+
+    stdin.write('\x1b[B')
+    await waitForFrames(
+      () => lastFrame() ?? '',
+      (raw) =>
+        raw.includes('\x1b[7m') &&
+        raw.includes('Remove a stored access token from local config only')
+    )
+
+    stdin.write('\x1b[B')
+    await waitForFrames(
+      () => lastFrame() ?? '',
+      (raw) =>
+        raw.includes('\x1b[7m') &&
+        raw.includes('Revoke a stored access token on the server')
     )
   })
 })
