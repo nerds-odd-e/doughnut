@@ -35,6 +35,8 @@
 
 ## Phase 1 — Default token: picker + `setDefaultTokenLabel` + tests
 
+**Status:** Done (Vitest green: `pnpm cli:test`). Stage keyboard input is forwarded from `InteractiveCliApp` via `SetStageKeyHandlerContext` so Ink delivers keys after swapping off `MainInteractivePrompt`.
+
 **User-visible slice:** With at least one stored token, **`/list-access-token`** opens a picker; **↑↓** moves selection (start at current default if still present); **Enter** persists default and shows confirmation; **Esc** cancels with the shared abort line.
 
 **Implementation sketch:**

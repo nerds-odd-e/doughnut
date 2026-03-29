@@ -101,7 +101,7 @@ describe('InteractiveCliApp /add-access-token', () => {
     )
   })
 
-  test('/list-access-token shows list until Escape; then transcript and default guidance', async () => {
+  test('/list-access-token Esc closes picker with abort line (no list dump)', async () => {
     const { stdin, frames } = await renderApp()
 
     stdin.write('/add-access-token unit-test-token-value\r')
@@ -113,20 +113,59 @@ describe('InteractiveCliApp /add-access-token', () => {
     stdin.write('/list-access-token\r')
     await waitForFrames(
       () => frames.join('\n'),
-      (c) =>
-        c.includes('Stored access tokens:') &&
-        c.includes('1. Vitest token label')
+      (c) => c.includes('Access tokens') && c.includes('1. Vitest token label')
     )
 
     stdin.write('\u001b')
     await waitForFrames(
       () => frames.join('\n'),
       (c) =>
+        c.includes('Cancelled.') &&
         c.includes('/list-access-token') &&
-        c.includes('1. Vitest token label') &&
         c.includes('> ') &&
         c.includes('/ commands')
     )
+
+    expect(frames.join('\n')).not.toContain('Stored access tokens:')
+  })
+
+  test('/list-access-token Down+Enter sets default token in access-tokens.json', async () => {
+    fs.writeFileSync(
+      path.join(configDir, 'access-tokens.json'),
+      JSON.stringify({
+        tokens: [
+          { label: 'Alpha', token: 't1' },
+          { label: 'Beta', token: 't2' },
+        ],
+        defaultLabel: 'Alpha',
+      }),
+      'utf-8'
+    )
+
+    const { stdin, frames } = await renderApp()
+
+    stdin.write('/list-access-token\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => c.includes('Access tokens') && c.includes('2. Beta')
+    )
+
+    stdin.write('\u001b[B')
+    await waitForFrames(
+      () => frames.at(-1) ?? '',
+      (f) => f.includes('\x1b[7m2.')
+    )
+
+    stdin.write('\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => c.includes('Default token set to: Beta')
+    )
+
+    const stored = JSON.parse(
+      fs.readFileSync(path.join(configDir, 'access-tokens.json'), 'utf-8')
+    ) as { tokens: { label: string; token: string }[]; defaultLabel?: string }
+    expect(stored.defaultLabel).toBe('Beta')
   })
 
   test('/list-access-token with no tokens commits assistant line without Escape', async () => {

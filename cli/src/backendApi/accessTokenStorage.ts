@@ -43,6 +43,15 @@ export function getDefaultTokenLabel(): AccessTokenLabel | undefined {
   return config.tokens[0]!.label
 }
 
+export function setDefaultTokenLabel(label: AccessTokenLabel): void {
+  const config = loadAccessTokenConfig()
+  if (!config.tokens.some((t) => t.label === label)) {
+    throw new Error(`No access token stored with label "${label}".`)
+  }
+  config.defaultLabel = label
+  saveAccessTokenConfig(config)
+}
+
 export function getStoredAccessTokenLabels(): string[] {
   return loadAccessTokenConfig().tokens.map((t) => t.label)
 }

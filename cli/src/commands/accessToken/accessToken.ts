@@ -14,6 +14,7 @@ export {
   getDefaultTokenLabel,
   getStoredAccessTokenLabels,
   removeAccessTokenLocal,
+  setDefaultTokenLabel,
 } from '../../backendApi/accessTokenStorage.js'
 
 export async function addAccessToken(

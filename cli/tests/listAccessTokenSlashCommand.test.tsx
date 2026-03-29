@@ -4,10 +4,6 @@ import * as path from 'node:path'
 import { render } from 'ink-testing-library'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { ListAccessTokenStage } from '../src/commands/accessToken/listAccessToken/ListAccessTokenStage.js'
-import {
-  formatNumberedListForTerminal,
-  resolvedTerminalWidth,
-} from '../src/terminalColumns.js'
 import { waitForFrames } from './inkTestHelpers.js'
 
 describe('ListAccessTokenStage', () => {
@@ -26,7 +22,7 @@ describe('ListAccessTokenStage', () => {
     fs.rmSync(configDir, { recursive: true, force: true })
   })
 
-  test('Escape settles with full assistant text when tokens exist', async () => {
+  test('Escape settles with picker abort message when tokens exist', async () => {
     fs.writeFileSync(
       path.join(configDir, 'access-tokens.json'),
       JSON.stringify({
@@ -58,12 +54,7 @@ describe('ListAccessTokenStage', () => {
       () => settled !== null
     )
 
-    expect(settled).toBe(
-      `Stored access tokens:\n\n${formatNumberedListForTerminal(
-        ['Alpha', 'Beta'],
-        resolvedTerminalWidth()
-      )}`
-    )
+    expect(settled).toBe('Cancelled.')
   })
 
   test('empty list auto-settles without Escape (past assistant message path)', async () => {
