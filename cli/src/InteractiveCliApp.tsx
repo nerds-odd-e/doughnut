@@ -11,8 +11,8 @@ import type {
 import { formatVersionOutput } from './commands/version.js'
 import { PastUserMessageBlock } from './pastUserMessageBlock.js'
 import { userVisibleSlashCommandError } from './userVisibleSlashCommandError.js'
-import type { StageKeyHandler } from './stageKeyForwardContext.js'
-import { SetStageKeyHandlerContext } from './stageKeyForwardContext.js'
+import type { StageKeyHandler } from './commands/accessToken/stageKeyForwardContext.js'
+import { SetStageKeyHandlerContext } from './commands/accessToken/stageKeyForwardContext.js'
 
 export function InteractiveCliApp() {
   const { exit } = useApp()

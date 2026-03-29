@@ -24,7 +24,7 @@ import {
   getStoredAccessTokenLabels,
   setDefaultTokenLabel,
 } from '../accessToken.js'
-import { SetStageKeyHandlerContext } from '../../../stageKeyForwardContext.js'
+import { SetStageKeyHandlerContext } from '../stageKeyForwardContext.js'
 
 /** Same short copy as `userVisibleSlashCommandError` for user-initiated abort. */
 const PICKER_ABORTED_MESSAGE = 'Cancelled.'
