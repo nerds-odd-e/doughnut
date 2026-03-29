@@ -10,8 +10,6 @@ export type TranscriptMessage =
 
 export type InteractiveSlashCommandResult = {
   assistantMessage: string
-  /** When set, replaces the Current guidance region (below the `> ` line). */
-  currentGuidance?: string
 }
 
 export interface CommandDoc {
@@ -26,7 +24,7 @@ export interface InteractiveSlashCommand {
   /** When set, a non-empty argument is required; InteractiveCliApp shows usage if missing. */
   readonly argumentName?: string
   readonly stageComponent?: ComponentType<InteractiveSlashCommandStageProps>
-  run(
+  readonly run?: (
     argument?: string
-  ): InteractiveSlashCommandResult | Promise<InteractiveSlashCommandResult>
+  ) => InteractiveSlashCommandResult | Promise<InteractiveSlashCommandResult>
 }

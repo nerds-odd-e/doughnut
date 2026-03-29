@@ -1,7 +1,6 @@
 import { createElement, useCallback, useEffect, useState } from 'react'
 import type { ComponentType } from 'react'
 import { Box, Text, useApp } from 'ink'
-import { DEFAULT_INTERACTIVE_GUIDANCE } from './interactiveGuidanceDefault.js'
 import { MainInteractivePrompt } from './MainInteractivePrompt.js'
 import { resolveInteractiveSlashCommand } from './commands/interactiveSlashCommands.js'
 import type {
@@ -20,9 +19,6 @@ export function InteractiveCliApp() {
   const [activeStageComponent, setActiveStageComponent] =
     useState<ComponentType<InteractiveSlashCommandStageProps> | null>(null)
   const [exitAfterCommit, setExitAfterCommit] = useState(false)
-  const [currentGuidance, setCurrentGuidance] = useState(
-    DEFAULT_INTERACTIVE_GUIDANCE
-  )
 
   useEffect(() => {
     if (!exitAfterCommit) return
@@ -59,15 +55,23 @@ export function InteractiveCliApp() {
         setActiveStageComponent(() => Stage)
         return
       }
-      Promise.resolve(command.run(argument))
+      const run = command.run
+      if (!run) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            text: 'Internal error: command has no run handler.',
+          },
+        ])
+        return
+      }
+      Promise.resolve(run(argument))
         .then((r) => {
           setMessages((prev) => [
             ...prev,
             { role: 'assistant', text: r.assistantMessage },
           ])
-          if (r.currentGuidance !== undefined) {
-            setCurrentGuidance(r.currentGuidance)
-          }
           if (line === '/exit') setExitAfterCommit(true)
         })
         .catch((err: unknown) => {
@@ -102,10 +106,7 @@ export function InteractiveCliApp() {
           onSettled: handleAsyncSlashSettled,
         })
       ) : exitAfterCommit ? null : (
-        <Box flexDirection="column">
-          <MainInteractivePrompt onCommittedLine={onCommittedLine} />
-          <Text>{currentGuidance}</Text>
-        </Box>
+        <MainInteractivePrompt onCommittedLine={onCommittedLine} />
       )}
     </Box>
   )

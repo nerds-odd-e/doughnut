@@ -1,5 +1,4 @@
 import { AddGmailStage } from '../AddGmailStage.js'
-import { runAddGmailInteractiveAssistantMessage } from './gmail.js'
 import type {
   CommandDoc,
   InteractiveSlashCommand,
@@ -15,9 +14,4 @@ export const addGmailSlashCommand: InteractiveSlashCommand = {
   line: '/add gmail',
   doc: addGmailDoc,
   stageComponent: AddGmailStage,
-  async run() {
-    return {
-      assistantMessage: await runAddGmailInteractiveAssistantMessage(),
-    }
-  },
 }

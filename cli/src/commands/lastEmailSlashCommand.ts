@@ -1,5 +1,4 @@
 import { LastEmailStage } from '../LastEmailStage.js'
-import { runLastEmailInteractiveAssistantMessage } from './gmail.js'
 import type {
   CommandDoc,
   InteractiveSlashCommand,
@@ -15,9 +14,4 @@ export const lastEmailSlashCommand: InteractiveSlashCommand = {
   line: '/last email',
   doc: lastEmailDoc,
   stageComponent: LastEmailStage,
-  async run() {
-    return {
-      assistantMessage: await runLastEmailInteractiveAssistantMessage(),
-    }
-  },
 }

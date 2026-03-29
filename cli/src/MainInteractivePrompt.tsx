@@ -1,7 +1,9 @@
 import { useCallback } from 'react'
 import type { Key } from 'ink'
-import { Text, useInput } from 'ink'
+import { Box, Text, useInput } from 'ink'
 import { useInteractiveCliLineBuffer } from './interactiveCliInput.js'
+
+const DEFAULT_INTERACTIVE_GUIDANCE = '/ commands'
 
 export function MainInteractivePrompt({
   onCommittedLine,
@@ -25,10 +27,13 @@ export function MainInteractivePrompt({
   useInput(handleInput)
 
   return (
-    <Text>
-      {'> '}
-      {buffer}
-      <Text inverse> </Text>
-    </Text>
+    <Box flexDirection="column">
+      <Text>
+        {'> '}
+        {buffer}
+        <Text inverse> </Text>
+      </Text>
+      <Text>{DEFAULT_INTERACTIVE_GUIDANCE}</Text>
+    </Box>
   )
 }
