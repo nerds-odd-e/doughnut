@@ -14,6 +14,27 @@ function normalizedInteractiveDraft(draft: string): string {
   return draft.replace(/\n/g, ' ')
 }
 
+function getSlashTabCompletion(
+  buffer: string,
+  commands: readonly InteractiveSlashCommand[]
+): { completed: string; count: number } {
+  if (!buffer.startsWith('/')) return { completed: buffer, count: 0 }
+  const matches = commands.filter((c) => c.doc.usage.startsWith(buffer))
+  if (matches.length === 0) return { completed: buffer, count: 0 }
+  if (matches.length === 1)
+    return { completed: `${matches[0]!.doc.usage} `, count: 1 }
+  const usages = matches.map((m) => m.doc.usage)
+  let prefix = usages[0]!
+  for (let i = 1; i < usages.length; i++) {
+    while (!usages[i]!.startsWith(prefix) && prefix.length > 0) {
+      prefix = prefix.slice(0, -1)
+    }
+  }
+  if (prefix.length > buffer.length)
+    return { completed: prefix, count: matches.length }
+  return { completed: buffer, count: matches.length }
+}
+
 function filterSlashCommandsByPrefix(
   commands: readonly InteractiveSlashCommand[],
   prefix: string
@@ -79,12 +100,26 @@ export function MainInteractivePrompt({
 }: {
   readonly onCommittedLine: (line: string) => void
 }) {
-  const { buffer, applyInput } = useInteractiveCliLineBuffer()
+  const { buffer, applyInput, replaceBuffer, readBuffer } =
+    useInteractiveCliLineBuffer()
 
   const guidance = useMemo(() => slashGuidanceForInk(buffer), [buffer])
 
   const handleInput = useCallback(
     (input: string, key: Key) => {
+      if (key.tab) {
+        const draft = normalizedInteractiveDraft(readBuffer())
+        if (draft.startsWith('/') && !draft.endsWith(' ')) {
+          const { completed } = getSlashTabCompletion(
+            draft,
+            interactiveSlashCommands
+          )
+          if (completed !== draft) {
+            replaceBuffer(completed)
+          }
+        }
+        return
+      }
       applyInput(input, key, (line) => {
         if (line === '') {
           return
@@ -92,7 +127,7 @@ export function MainInteractivePrompt({
         onCommittedLine(line)
       })
     },
-    [applyInput, onCommittedLine]
+    [applyInput, onCommittedLine, readBuffer, replaceBuffer]
   )
 
   useInput(handleInput)

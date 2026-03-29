@@ -1,6 +1,6 @@
 # Revive interactive `/` completion (Tab + ↑↓) — phased plan
 
-**Status:** Phase 1 implemented; Phases 2–5 pending.  
+**Status:** Phases 1–2 implemented; Phases 3–5 pending.  
 **Scope:** Restore slash-command completion behavior **inside `cli/src/MainInteractivePrompt.tsx` only** (local state, local pure helpers in the same file if needed). **No new E2E.** Cover with **high-level Vitest** using **ink-testing-library + real stdin** (no adapter mocks), same spirit as `cli/tests/InteractiveCliApp.test.tsx` / `renderApp` patterns in `.cursor/rules/cli.mdc`.
 
 **Command inventory:** Derive completion candidates from **`interactiveSlashCommands`** (map each entry’s `line` / `doc` to the same strings the shell actually resolves) so completion cannot drift from runtime behavior.
@@ -61,11 +61,11 @@ Logic was spread across **`interactiveApp.tsx`**, **`ShellSessionRoot`**, **`ren
 
 ---
 
-### Phase 2 — Tab completion (longest common prefix + unique match finishes with space)
+### Phase 2 — Tab completion (longest common prefix + unique match finishes with space) ✅
 
-**Outcome:** With a `/…` draft **not** ending in space, **Tab** applies **`getTabCompletion`-equivalent** logic against the same candidate set as Phase 1.
+**Outcome:** With a `/…` draft **not** ending in space, **Tab** applies **`getTabCompletion`-equivalent** logic: matches are commands whose **`doc.usage` starts with** the draft (same as historic `help.ts`); unique match → `usage + ' '`; several matches → extend to **LCP** of their `usage` strings; no matches → unchanged. **`useInteractiveCliLineBuffer().replaceBuffer`** applies the new draft (Tab is not a printable append in Ink).
 
-**Tests:** Multiple matches share a prefix → Tab extends draft to LCP; single match → `usage + ' '`; no matches → unchanged.
+**Tests:** `cli/tests/MainInteractivePrompt.test.tsx` — `/remove` + Tab → `/remove-access-token`; `/hel` + Tab → `/help `; `/zzz` + Tab → unchanged.
 
 ---
 

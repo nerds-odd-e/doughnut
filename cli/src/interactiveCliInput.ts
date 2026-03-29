@@ -40,6 +40,13 @@ export function useInteractiveCliLineBuffer() {
   const [buffer, setBuffer] = useState('')
   const bufferRef = useRef('')
 
+  const replaceBuffer = useCallback((next: string) => {
+    bufferRef.current = next
+    setBuffer(next)
+  }, [])
+
+  const readBuffer = useCallback(() => bufferRef.current, [])
+
   const applyInput = useCallback(
     (input: string, key: Key, onCommittedLine: (line: string) => void) => {
       const commitLine = () => {
@@ -53,5 +60,5 @@ export function useInteractiveCliLineBuffer() {
     []
   )
 
-  return { buffer, applyInput }
+  return { buffer, applyInput, replaceBuffer, readBuffer }
 }

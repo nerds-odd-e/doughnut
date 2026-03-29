@@ -96,3 +96,61 @@ describe('MainInteractivePrompt slash guidance (phase 1)', () => {
     expect(frame).not.toMatch(/\/help\s+List available commands/)
   })
 })
+
+describe('MainInteractivePrompt Tab completion (phase 2)', () => {
+  test('Tab with several usages sharing a prefix extends draft to longest common prefix', async () => {
+    const { stdin, lastFrame } = await renderMainInteractivePrompt()
+
+    stdin.write('/remove')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('> /remove')
+    )
+    stdin.write('\t')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) =>
+        (f.split('\n')[0] ?? '').trimEnd().startsWith('> /remove-access-token')
+    )
+    const firstLine = (
+      stripAnsi(lastFrame() ?? '').split('\n')[0] ?? ''
+    ).trimEnd()
+    expect(firstLine.startsWith('> /remove-access-token')).toBe(true)
+  })
+
+  test('Tab with a unique matching usage completes to usage plus trailing space', async () => {
+    const { stdin, lastFrame } = await renderMainInteractivePrompt()
+
+    stdin.write('/hel')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('> /hel')
+    )
+    stdin.write('\t')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('> /help ')
+    )
+    expect((stripAnsi(lastFrame() ?? '').split('\n')[0] ?? '').trimEnd()).toBe(
+      '> /help '
+    )
+  })
+
+  test('Tab with no usage prefix match leaves draft unchanged', async () => {
+    const { stdin, lastFrame } = await renderMainInteractivePrompt()
+
+    stdin.write('/zzz')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('> /zzz')
+    )
+    stdin.write('\t')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('> /zzz')
+    )
+    expect((stripAnsi(lastFrame() ?? '').split('\n')[0] ?? '').trimEnd()).toBe(
+      '> /zzz'
+    )
+  })
+})
