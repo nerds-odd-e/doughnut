@@ -3,7 +3,7 @@ import * as os from 'node:os'
 import * as path from 'node:path'
 import { render } from 'ink-testing-library'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
-import { ListAccessTokenStage } from '../src/commands/listAccessTokenSlashCommand.js'
+import { ListAccessTokenStage } from '../src/commands/accessToken/listAccessToken/ListAccessTokenStage.js'
 import {
   formatNumberedListForTerminal,
   resolvedTerminalWidth,

@@ -1,14 +1,14 @@
-import { addAccessTokenSlashCommand } from './addAccessTokenSlashCommand.js'
-import { addGmailSlashCommand } from './addGmailSlashCommand.js'
+import { addAccessTokenSlashCommand } from './accessToken/addAccessTokenSlashCommand.js'
+import { addGmailSlashCommand } from './gmail/addGmail/addGmailSlashCommand.js'
 import { exitSlashCommand } from './exit.js'
 import { helpSlashCommand } from './help.js'
 import type { InteractiveSlashCommand } from './interactiveSlashCommand.js'
-import { lastEmailSlashCommand } from './lastEmailSlashCommand.js'
-import { listAccessTokenSlashCommand } from './listAccessTokenSlashCommand.js'
+import { lastEmailSlashCommand } from './gmail/lastEmail/lastEmailSlashCommand.js'
+import { listAccessTokenSlashCommand } from './accessToken/listAccessToken/listAccessTokenSlashCommand.js'
 import {
   removeAccessTokenCompletelySlashCommand,
   removeAccessTokenSlashCommand,
-} from './removeAccessTokenSlashCommands.js'
+} from './accessToken/removeAccessTokenSlashCommands.js'
 
 export const interactiveSlashCommands: readonly InteractiveSlashCommand[] = [
   helpSlashCommand,

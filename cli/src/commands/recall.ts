@@ -1,5 +1,8 @@
 import { RecallsController, type DueMemoryTrackers } from 'doughnut-api'
-import { doughnutSdkOptions, runDefaultBackendJson } from './accessToken.js'
+import {
+  doughnutSdkOptions,
+  runDefaultBackendJson,
+} from './accessToken/accessToken.js'
 
 function dueRecallQuery(dueindays: number) {
   return {

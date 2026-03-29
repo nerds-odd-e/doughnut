@@ -45,7 +45,7 @@ The following **`main`** commits removed or hollowed out access-token behavior d
 
 ## Shared facts (from current + historical code)
 
-- **Storage:** `{ configDir }/access-tokens.json` — JSON with `tokens: { label, token }[]` and optional `defaultLabel`. Path via `getConfigDir()` (see `cli/src/commands/accessToken.ts`).
+- **Storage:** `{ configDir }/access-tokens.json` — JSON with `tokens: { label, token }[]` and optional `defaultLabel`. Path via `getConfigDir()` (see `cli/src/commands/accessToken/accessToken.ts`).
 - **Validate add:** call backend with the bearer token (historically `UserController.getTokenInfo`); on failure, user sees a message consistent with **`Access token is invalid or expired`** (match Gherkin in scenario 2; may need a dedicated validation error string vs generic `http401StoredTokenRejected` if copy diverges).
 - **Create:** authenticated as **current default** token → `UserController.generateToken` → append to config.
 - **Remove local:** drop entry from config; adjust `defaultLabel` if needed.

@@ -6,8 +6,8 @@ import { spawn } from 'node:child_process'
 import {
   GOOGLE_CLIENT_ID as BUILTIN_CLIENT_ID,
   GOOGLE_CLIENT_SECRET as BUILTIN_CLIENT_SECRET,
-} from '../credentials.js'
-import { getConfigDir } from '../configDir.js'
+} from '../../credentials.js'
+import { getConfigDir } from '../../configDir.js'
 
 const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly'
 const DEFAULT_OAUTH_TOKEN_URL = 'https://oauth2.googleapis.com/token'
