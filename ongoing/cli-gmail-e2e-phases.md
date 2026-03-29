@@ -35,7 +35,7 @@ Informal working plan for bringing back `e2e_test/features/cli/cli_gmail.feature
 
 ### 1.3 — E2E: Bundle embeds E2E OAuth client + PTY env + OAuth callback simulation
 
-- **Bundle:** Extend `cliE2eRepo` (or a small helper) with **`rebuildCliBundleWithGmailE2eSecrets`** / Cypress task **`bundleCliWithGmailE2eSecrets`**: `pnpm -C cli bundle` with `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` set from `cliGmailE2eConfig`. Invoke from a **`@cliGmailBundledSecrets`** `Before` with **`order: 0`** so the default E2E bundle matches the config file’s client id/secret **before** `ensureCliBundleFresh` / spawn.
+- **Bundle:** `ensureCliBundleFresh` always rebuilds `cli/dist/doughnut-cli.bundle.mjs` with `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` from `cliGmailE2eConfig` when the bundle is missing, older than inputs (including `cliGmailE2eConfig.ts`), or does not contain the E2E client id string — no `@cliGmailBundledSecrets` tag.
 - **`runRepoCliInteractive` env** for Gmail scenarios: `GOOGLE_BASE_URL=http://localhost:5003`, `DOUGHNUT_CONFIG_DIR=<temp>`, `DOUGHNUT_NO_BROWSER=1` (suppress `xdg-open` in CI/dev).
 - **OAuth simulation:** When the PTY output contains a Google auth URL, issue **`fetch(`${redirect_uri}?code=...`)`** (8210c94: `e2e_mock_auth_code`) so the CLI’s local callback server receives the code. Implement in the plugin PTY path used by `runRepoCliInteractive` (either extend `cliE2ePluginTasks` or shared helper), gated by an option/env so non-Gmail interactive tests are unchanged.
 - **Failure check:** After `/add gmail`, assertion fails with missing **`Added account e2e@gmail.com`** (or a stable assistant error string), not timeout on prompt or wrong host.

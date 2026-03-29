@@ -3,9 +3,31 @@
  */
 
 import { spawnSync } from 'node:child_process'
-import { existsSync, readdirSync, statSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import {
+  GMAIL_E2E_GOOGLE_CLIENT_ID,
+  GMAIL_E2E_GOOGLE_CLIENT_SECRET,
+} from './cliGmailE2eConfig'
+
 export const CLI_BUNDLE_RELATIVE_PATH = 'cli/dist/doughnut-cli.bundle.mjs'
+
+function envForDefaultE2eCliBundle(): NodeJS.ProcessEnv {
+  return {
+    ...process.env,
+    GOOGLE_CLIENT_ID: GMAIL_E2E_GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: GMAIL_E2E_GOOGLE_CLIENT_SECRET,
+  }
+}
+
+function defaultCliBundleHasGmailE2eClientId(repoRoot: string): boolean {
+  const bundlePath = join(repoRoot, CLI_BUNDLE_RELATIVE_PATH)
+  try {
+    return readFileSync(bundlePath, 'utf8').includes(GMAIL_E2E_GOOGLE_CLIENT_ID)
+  } catch {
+    return false
+  }
+}
 
 /** Cypress install scenarios build here so version bumps do not overwrite the default bundle. */
 export const CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH =
@@ -70,6 +92,7 @@ export function ensureCliBundleFresh(repoRoot: string): void {
   let inputMax = maxMtimeMsOfFiles(repoRoot, [
     'cli/package.json',
     'cli/tsconfig.json',
+    'e2e_test/config/cliGmailE2eConfig.ts',
   ])
   for (const rel of ['cli/src', 'packages/doughnut-api/src'] as const) {
     const d = join(repoRoot, rel)
@@ -78,9 +101,14 @@ export function ensureCliBundleFresh(repoRoot: string): void {
     }
   }
   const stale =
-    !existsSync(bundlePath) || statSync(bundlePath).mtimeMs < inputMax
+    !existsSync(bundlePath) ||
+    statSync(bundlePath).mtimeMs < inputMax ||
+    !defaultCliBundleHasGmailE2eClientId(repoRoot)
   if (stale) {
-    runShellCommandSync('pnpm -C cli bundle', { cwd: repoRoot })
+    runShellCommandSync('pnpm -C cli bundle', {
+      cwd: repoRoot,
+      env: envForDefaultE2eCliBundle(),
+    })
   }
 }
 

@@ -25,10 +25,30 @@ type RunInstalledCliInteractiveTask = WithOptionalCliEnv & {
   doughnutPath: string
 }
 
-type RunRepoCliInteractiveTask = WithOptionalCliEnv
+type RunRepoCliInteractiveTask = WithOptionalCliEnv & {
+  simulateOAuthCallback?: boolean
+}
 
 type CliInteractiveWriteLineTask = {
   line: string
+}
+
+type OAuthSimulationState = { done: boolean }
+
+/** When PTY stdout contains a Google OAuth URL, hit the redirect_uri with a mock code (E2E only). */
+function notifyOAuthSimulationIfNeeded(
+  fullStdout: string,
+  state: OAuthSimulationState
+): void {
+  if (state.done) return
+  const authMatch = fullStdout.match(/https:\/\/accounts\.google\.com\/[^\s]+/)
+  if (!authMatch) return
+  const redirectUri = new URL(authMatch[0]).searchParams.get('redirect_uri')
+  if (!redirectUri) return
+  state.done = true
+  fetch(`${redirectUri}?code=e2e_mock_auth_code`).catch(() => {
+    /* ignore OAuth callback errors */
+  })
 }
 
 const INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING = 'doughnut 0.1.0'
@@ -104,6 +124,7 @@ export function createCliE2ePluginTasks(repoRoot: string) {
     args: string[]
     cwd: string
     env?: NodeJS.ProcessEnv
+    simulateOAuthCallback?: boolean
   }): Promise<void> {
     disposeInteractiveCliPtySession()
     const { spawn } = await import('@lydell/node-pty')
@@ -115,8 +136,14 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       env: { ...process.env, ...cliEnv(opts.env) },
     })
     const buf = { text: '' }
+    const oauthState: OAuthSimulationState | null = opts.simulateOAuthCallback
+      ? { done: false }
+      : null
     p.onData((data: string) => {
       buf.text += data
+      if (oauthState) {
+        notifyOAuthSimulationIfNeeded(buf.text, oauthState)
+      }
     })
     interactiveCliPtySession = { pty: p, buf }
     await installedCliInteractiveWaitForSubstring(
@@ -234,6 +261,7 @@ export function createCliE2ePluginTasks(repoRoot: string) {
     },
     async runRepoCliInteractive({
       env,
+      simulateOAuthCallback,
     }: RunRepoCliInteractiveTask = {}): Promise<null> {
       const { command, baseArgs } = cliRepoSpawnFromRoot(repoRoot)
       await startInteractiveCliPtySession({
@@ -241,6 +269,7 @@ export function createCliE2ePluginTasks(repoRoot: string) {
         args: baseArgs,
         cwd: repoRoot,
         env,
+        simulateOAuthCallback,
       })
       return null
     },

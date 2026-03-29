@@ -1,7 +1,8 @@
 import { Mountebank } from '@anev/ts-mountebank'
+import { GMAIL_E2E_GOOGLE_MOCK_PORT } from '../../config/cliGmailE2eConfig'
 import ServiceMocker from '../../support/ServiceMocker'
 
-const GOOGLE_PORT = 5003
+const GOOGLE_PORT = GMAIL_E2E_GOOGLE_MOCK_PORT
 const mountebank = new Mountebank()
 
 const googleService = () => {

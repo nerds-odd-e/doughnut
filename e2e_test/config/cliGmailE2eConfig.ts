@@ -1,6 +1,10 @@
 /**
- * Shared Gmail E2E fixtures: config dir JSON and OAuth client ids baked into the CLI bundle (phase 1.3+).
+ * Shared Gmail E2E fixtures: config dir JSON and OAuth client ids.
+ * `ensureCliBundleFresh` bakes these into `cli/dist/doughnut-cli.bundle.mjs` for repo CLI E2E.
  */
+
+export const GMAIL_E2E_GOOGLE_MOCK_PORT = 5003
+export const GMAIL_E2E_GOOGLE_MOCK_BASE_URL = `http://localhost:${GMAIL_E2E_GOOGLE_MOCK_PORT}`
 
 export const GMAIL_E2E_GOOGLE_CLIENT_ID = 'e2e-test-client'
 export const GMAIL_E2E_GOOGLE_CLIENT_SECRET = 'e2e-test-secret'
