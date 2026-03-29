@@ -68,6 +68,14 @@ After({ tags: '@usingMockedOpenAiService' }, () => {
   mock_services.openAi().restore()
 })
 
+Before({ tags: '@usingMockedGoogleService' }, () => {
+  mock_services.google().mock()
+})
+
+After({ tags: '@usingMockedGoogleService' }, () => {
+  mock_services.google().restore()
+})
+
 Before({ tags: '@disableOpenAiService' }, () => {
   mock_services.openAi().disable()
 })
