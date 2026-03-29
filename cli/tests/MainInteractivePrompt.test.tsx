@@ -238,6 +238,121 @@ describe('MainInteractivePrompt Enter picks completion (phase 4)', () => {
   })
 })
 
+describe('MainInteractivePrompt user input history (↑↓ recall)', () => {
+  test('after Enter, up recalls committed line; down restores pre-walk draft', async () => {
+    const onCommittedLine = vi.fn()
+    const { stdin, lastFrame } =
+      await renderMainInteractivePrompt(onCommittedLine)
+
+    stdin.write('alpha')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => (f.split('\n')[0] ?? '').includes('alpha')
+    )
+    stdin.write('\r')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => !(f.split('\n')[0] ?? '').includes('alpha')
+    )
+    expect(onCommittedLine).toHaveBeenCalledWith('alpha')
+
+    stdin.write('\x1b[A')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => (f.split('\n')[0] ?? '').includes('alpha')
+    )
+
+    stdin.write('\x1b[B')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => !(f.split('\n')[0] ?? '').includes('alpha')
+    )
+  })
+
+  test('with slash list dismissed, up at caret 0 recalls history instead of cycling list', async () => {
+    const onCommittedLine = vi.fn()
+    const { stdin, lastFrame } =
+      await renderMainInteractivePrompt(onCommittedLine)
+
+    stdin.write('memo\r')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => !(f.split('\n')[0] ?? '').includes('memo')
+    )
+    expect(onCommittedLine).toHaveBeenCalledWith('memo')
+
+    stdin.write('/he')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('/help') && f.includes('List available commands')
+    )
+    stdin.write('\x1b')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) =>
+        f.includes('/ commands') &&
+        (f.split('\n')[0] ?? '').trimEnd().endsWith('/he')
+    )
+
+    stdin.write('\x1b[D\x1b[D\x1b[D')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => (f.split('\n')[0] ?? '').includes('/he')
+    )
+
+    stdin.write('\x1b[A')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => (f.split('\n')[0] ?? '').includes('memo')
+    )
+  })
+
+  test('after Esc hides slash list, up recalls history; down restores pre-walk /re draft', async () => {
+    const { stdin, lastFrame } = await renderMainInteractivePrompt()
+
+    stdin.write('z\r')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => !(f.split('\n')[0] ?? '').includes('z')
+    )
+
+    stdin.write('/re')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('/remove-access-token')
+    )
+
+    stdin.write('\x1b')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) =>
+        f.includes('/ commands') &&
+        (f.split('\n')[0] ?? '').trimEnd().endsWith('/re')
+    )
+
+    stdin.write('\x1b[D\x1b[D\x1b[D')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => (f.split('\n')[0] ?? '').includes('/re')
+    )
+
+    stdin.write('\x1b[A')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => (f.split('\n')[0] ?? '').includes('z')
+    )
+
+    stdin.write('\x1b[B')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) =>
+        (f.split('\n')[0] ?? '').includes('/re') &&
+        !(f.split('\n')[0] ?? '').includes('z') &&
+        f.includes('/remove-access-token')
+    )
+  })
+})
+
 describe('MainInteractivePrompt Esc dismiss (phase 5)', () => {
   test('Esc on bare / clears the draft', async () => {
     const { stdin, lastFrame } = await renderMainInteractivePrompt()

@@ -3,6 +3,13 @@ import type { Key } from 'ink'
 import { Box, Text, useInput } from 'ink'
 import { interactiveSlashCommands } from './commands/interactiveSlashCommands.js'
 import type { InteractiveSlashCommand } from './commands/interactiveSlashCommand.js'
+import {
+  appendUserInputHistoryLine,
+  exitHistoryWalkOnDraftEdit,
+  onArrowDown,
+  onArrowUp,
+  type MainInteractivePromptHistoryState,
+} from './mainInteractivePromptHistory.js'
 
 const DEFAULT_INTERACTIVE_GUIDANCE = '/ commands'
 
@@ -134,6 +141,9 @@ export function MainInteractivePrompt({
   const slashHighlightRef = useRef(0)
   const suggestionsDismissedRef = useRef(false)
   const onCommittedLineRef = useRef(onCommittedLine)
+  const historyLinesRef = useRef<string[]>([])
+  const historyWalkIndexRef = useRef<number | null>(null)
+  const draftBeforeWalkRef = useRef<string | null>(null)
 
   useEffect(() => {
     onCommittedLineRef.current = onCommittedLine
@@ -144,10 +154,37 @@ export function MainInteractivePrompt({
     [buffer, suggestionsDismissed]
   )
 
+  /**
+   * Input precedence: Tab / Esc / arrows / editing use the same buffer+caret refs.
+   * ↑↓: If walking user input history, history owns ↑↓ (slash list does not steal).
+   * Else if slash completion list is visible and caret is at the list-cycle boundary
+   * (caret 0 for ↑, EOL for ↓), cycle slash highlight.
+   * Else apply history+caret rules from mainInteractivePromptHistory (recall, caret jump).
+   * When a history step changes the draft, reset slash highlight and suggestionsDismissed.
+   * Typing, backspace, delete, Tab, and Esc that clear `/` end the history walk first.
+   */
   const handleInput = useCallback((input: string, key: Key) => {
     const readBuf = () => bufferRef.current
     const readCaret = () => caretRef.current
     const readHighlight = () => slashHighlightRef.current
+
+    const historyState = (): MainInteractivePromptHistoryState => ({
+      lineDraft: readBuf(),
+      caretOffset: readCaret(),
+      userInputHistoryLines: historyLinesRef.current,
+      userInputHistoryWalkIndex: historyWalkIndexRef.current,
+      lineDraftBeforeUserInputHistoryWalk: draftBeforeWalkRef.current,
+    })
+
+    const syncWalkFrom = (s: MainInteractivePromptHistoryState) => {
+      historyWalkIndexRef.current = s.userInputHistoryWalkIndex
+      draftBeforeWalkRef.current = s.lineDraftBeforeUserInputHistoryWalk
+    }
+
+    const endWalkBeforeDraftEdit = () => {
+      const next = exitHistoryWalkOnDraftEdit(historyState())
+      syncWalkFrom(next)
+    }
 
     const setAll = (nextBuf: string, nextCaret: number, nextHi?: number) => {
       suggestionsDismissedRef.current = false
@@ -171,8 +208,42 @@ export function MainInteractivePrompt({
       setSlashHighlightIndex(nextHi)
     }
 
+    const applyHistoryArrow = (dir: 'up' | 'down') => {
+      const prev = historyState()
+      const next = dir === 'up' ? onArrowUp(prev) : onArrowDown(prev)
+      if (
+        prev.lineDraft === next.lineDraft &&
+        prev.caretOffset === next.caretOffset &&
+        prev.userInputHistoryWalkIndex === next.userInputHistoryWalkIndex &&
+        prev.lineDraftBeforeUserInputHistoryWalk ===
+          next.lineDraftBeforeUserInputHistoryWalk
+      ) {
+        return
+      }
+      syncWalkFrom(next)
+      const draftChanged = prev.lineDraft !== next.lineDraft
+      if (draftChanged) {
+        suggestionsDismissedRef.current = false
+        setSuggestionsDismissed(false)
+        bufferRef.current = next.lineDraft
+        caretRef.current = next.caretOffset
+        slashHighlightRef.current = 0
+        setBuffer(next.lineDraft)
+        setCaretOffset(next.caretOffset)
+        setSlashHighlightIndex(0)
+      } else {
+        setCaretOnly(next.caretOffset)
+      }
+    }
+
     const commitLine = () => {
       const line = readBuf()
+      historyLinesRef.current = appendUserInputHistoryLine(
+        historyLinesRef.current,
+        line
+      )
+      historyWalkIndexRef.current = null
+      draftBeforeWalkRef.current = null
       setAll('', 0, 0)
       if (line !== '') {
         onCommittedLineRef.current(line)
@@ -180,6 +251,7 @@ export function MainInteractivePrompt({
     }
 
     if (key.tab) {
+      endWalkBeforeDraftEdit()
       const draft = normalizedInteractiveDraft(readBuf())
       if (draft.startsWith('/') && !draft.endsWith(' ')) {
         const { completed } = getSlashTabCompletion(
@@ -198,6 +270,8 @@ export function MainInteractivePrompt({
       const raw = readBuf()
       const draft = normalizedInteractiveDraft(raw)
       if (draft === '/') {
+        historyWalkIndexRef.current = null
+        draftBeforeWalkRef.current = null
         setAll('', 0, 0)
         return
       }
@@ -238,7 +312,11 @@ export function MainInteractivePrompt({
       const dir = key.upArrow ? 'up' : 'down'
       const buf = readBuf()
       const caret = readCaret()
-      if (ttyArrowKeyUsesSlashSuggestionCycle(dir, caret, buf, listVisible)) {
+      const walkingHistory = historyWalkIndexRef.current !== null
+      if (
+        !walkingHistory &&
+        ttyArrowKeyUsesSlashSuggestionCycle(dir, caret, buf, listVisible)
+      ) {
         const rowCount = slashRows.length
         const hi = readHighlight()
         const next =
@@ -246,15 +324,12 @@ export function MainInteractivePrompt({
         setHighlightOnly(next)
         return
       }
-      if (dir === 'up') {
-        if (caret > 0) setCaretOnly(0)
-        return
-      }
-      if (caret < buf.length) setCaretOnly(buf.length)
+      applyHistoryArrow(dir)
       return
     }
 
     if (key.backspace) {
+      endWalkBeforeDraftEdit()
       const buf = readBuf()
       const c = readCaret()
       if (c === 0) return
@@ -264,6 +339,7 @@ export function MainInteractivePrompt({
     }
 
     if (key.delete) {
+      endWalkBeforeDraftEdit()
       const buf = readBuf()
       const c = readCaret()
       if (c === buf.length && c > 0) {
@@ -285,6 +361,7 @@ export function MainInteractivePrompt({
       )
       const pickRows = gPick.show === 'list' ? gPick.rows : []
       if (pickRows.length > 0) {
+        endWalkBeforeDraftEdit()
         const hi = readHighlight()
         const row = pickRows[hi] ?? pickRows[0]!
         const completed = `${row.usage} `
@@ -297,6 +374,7 @@ export function MainInteractivePrompt({
 
     if (input.length > 0) {
       if (!(input.includes('\r') || input.includes('\n'))) {
+        endWalkBeforeDraftEdit()
         const buf = readBuf()
         const c = readCaret()
         const inserted = normalizedInteractiveDraft(input)
@@ -307,12 +385,19 @@ export function MainInteractivePrompt({
         )
         return
       }
+      endWalkBeforeDraftEdit()
       let curBuf = readBuf()
       let c = readCaret()
       for (let i = 0; i < input.length; i++) {
         const ch = input[i]!
         if (ch === '\r') {
           const line = curBuf
+          historyLinesRef.current = appendUserInputHistoryLine(
+            historyLinesRef.current,
+            line
+          )
+          historyWalkIndexRef.current = null
+          draftBeforeWalkRef.current = null
           setAll('', 0, 0)
           if (line !== '') onCommittedLineRef.current(line)
           curBuf = ''
@@ -322,6 +407,12 @@ export function MainInteractivePrompt({
         }
         if (ch === '\n') {
           const line = curBuf
+          historyLinesRef.current = appendUserInputHistoryLine(
+            historyLinesRef.current,
+            line
+          )
+          historyWalkIndexRef.current = null
+          draftBeforeWalkRef.current = null
           setAll('', 0, 0)
           if (line !== '') onCommittedLineRef.current(line)
           curBuf = ''
