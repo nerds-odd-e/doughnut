@@ -79,7 +79,7 @@ export function InteractiveCliApp() {
         createElement(activeStageComponent, {
           onSettled: handleAsyncSlashSettled,
         })
-      ) : (
+      ) : exitAfterCommit ? null : (
         <MainInteractivePrompt onCommittedLine={onCommittedLine} />
       )}
     </Box>

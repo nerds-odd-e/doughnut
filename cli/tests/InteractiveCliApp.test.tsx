@@ -8,6 +8,16 @@ function stripAnsi(s: string): string {
   return s.replace(new RegExp(`${esc}\\[[0-9;?]*[a-zA-Z]`, 'g'), '')
 }
 
+/** True when a frame shows the /exit farewell and then paints another empty REPL line (`> `). */
+function farewellFollowedByCommandPrompt(ansiStrippedFrame: string): boolean {
+  const farewell = 'Bye.'
+  if (!ansiStrippedFrame.includes(farewell)) return false
+  const after = ansiStrippedFrame.slice(
+    ansiStrippedFrame.lastIndexOf(farewell) + farewell.length
+  )
+  return /\n\s*>\s/.test(after)
+}
+
 /** Advance the event loop until `predicate` holds or `maxTicks` is exhausted (no fixed wall-clock sleep). */
 async function waitForFrames(
   getCombined: () => string,
@@ -142,8 +152,38 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     expect(lines[userIdx + 1]?.trim()).toBe('')
     expect(
       lines.slice(userIdx + 2).some((l) => l.includes('>')),
-      'command prompt should appear after the bottom padding row'
-    ).toBe(true)
+      'after Bye., the REPL must not paint another "> " line (see dedicated /exit TTY test)'
+    ).toBe(false)
+  })
+
+  test('after /exit, TTY must not repaint the empty command line below Bye.', async () => {
+    const { stdin, frames } = await renderApp()
+
+    stdin.write('/exit\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => c.includes('Bye.') && c.includes('/exit')
+    )
+
+    for (let t = 0; t < 300; t++) {
+      await new Promise<void>((resolve) => {
+        setImmediate(resolve)
+      })
+    }
+
+    const offenders = frames.filter((f) =>
+      farewellFollowedByCommandPrompt(stripAnsi(f))
+    )
+    expect(
+      offenders,
+      [
+        'After /exit prints "Bye.", the terminal must not show another interactive read prompt',
+        '(the "> " line with the block cursor). That means the REPL drew one more input line',
+        'before shutdown — the farewell should be the last interactive chrome.',
+        'ANSI stripped offending frame(s):',
+        ...offenders.map((f) => `---\n${stripAnsi(f)}\n---`),
+      ].join('\n')
+    ).toEqual([])
   })
 
   test('submitting /exit character by character records it in output', async () => {
