@@ -47,6 +47,7 @@ describe('InteractiveCliApp /add-access-token', () => {
   let configDir: string
   let savedConfigDir: string | undefined
   let getTokenInfoSpy: ReturnType<typeof vi.spyOn>
+  let revokeTokenSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
     configDir = fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-cli-at-'))
@@ -57,10 +58,16 @@ describe('InteractiveCliApp /add-access-token', () => {
       .mockResolvedValue({
         data: { id: 1, label: 'Vitest token label' },
       } as Awaited<ReturnType<typeof UserController.getTokenInfo>>)
+    revokeTokenSpy = vi
+      .spyOn(UserController, 'revokeToken')
+      .mockResolvedValue(
+        {} as Awaited<ReturnType<typeof UserController.revokeToken>>
+      )
   })
 
   afterEach(() => {
     getTokenInfoSpy.mockRestore()
+    revokeTokenSpy.mockRestore()
     if (savedConfigDir === undefined) delete process.env.DOUGHNUT_CONFIG_DIR
     else process.env.DOUGHNUT_CONFIG_DIR = savedConfigDir
     fs.rmSync(configDir, { recursive: true, force: true })
@@ -140,5 +147,77 @@ describe('InteractiveCliApp /add-access-token', () => {
         c.includes('> ') &&
         c.includes('/ commands')
     )
+  })
+
+  test('/list-access-token with no tokens commits assistant line without Escape', async () => {
+    const { stdin, frames } = await renderApp()
+
+    stdin.write('/list-access-token\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        c.includes('No access tokens stored.') &&
+        c.includes('/list-access-token') &&
+        c.includes('> ') &&
+        c.includes('/ commands')
+    )
+  })
+
+  test('/remove-access-token removes stored label and list is empty in transcript', async () => {
+    const { stdin, frames } = await renderApp()
+
+    stdin.write('/add-access-token unit-test-token-value\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => c.includes('Token added successfully')
+    )
+
+    stdin.write('/remove-access-token Vitest token label\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => c.includes('Token "Vitest token label" removed.')
+    )
+
+    stdin.write('/list-access-token\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => c.includes('No access tokens stored.')
+    )
+
+    const afterList = JSON.parse(
+      fs.readFileSync(path.join(configDir, 'access-tokens.json'), 'utf-8')
+    ) as { tokens: { label: string; token: string }[] }
+    expect(afterList.tokens).toEqual([])
+    expect(revokeTokenSpy).not.toHaveBeenCalled()
+  })
+
+  test('/remove-access-token-completely revokes then clears config', async () => {
+    const { stdin, frames } = await renderApp()
+
+    stdin.write('/add-access-token unit-test-token-value\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => c.includes('Token added successfully')
+    )
+
+    stdin.write('/remove-access-token-completely Vitest token label\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        c.includes(
+          'Token "Vitest token label" removed locally and from server.'
+        ) && revokeTokenSpy.mock.calls.length >= 1
+    )
+
+    stdin.write('/list-access-token\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => c.includes('No access tokens stored.')
+    )
+
+    const afterList = JSON.parse(
+      fs.readFileSync(path.join(configDir, 'access-tokens.json'), 'utf-8')
+    ) as { tokens: { label: string; token: string }[] }
+    expect(afterList.tokens).toEqual([])
   })
 })

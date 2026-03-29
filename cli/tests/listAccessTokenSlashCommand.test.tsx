@@ -81,9 +81,9 @@ describe('ListAccessTokenStage', () => {
     )
   })
 
-  test('Escape settles with empty message when no tokens', async () => {
+  test('empty list auto-settles without Escape (past assistant message path)', async () => {
     let settled: string | null = null
-    const { stdin, frames } = render(
+    render(
       <ListAccessTokenStage
         onSettled={(t) => {
           settled = t
@@ -92,13 +92,7 @@ describe('ListAccessTokenStage', () => {
     )
 
     await waitForFrames(
-      () => frames.join('\n'),
-      (c) => c.includes('No access tokens stored.')
-    )
-
-    stdin.write('\u001b')
-    await waitForFrames(
-      () => frames.join('\n'),
+      () => (settled !== null ? settled : ''),
       () => settled !== null
     )
 

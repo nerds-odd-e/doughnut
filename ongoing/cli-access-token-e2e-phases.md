@@ -120,20 +120,20 @@ The following **`main`** commits removed or hollowed out access-token behavior d
 
 **Outcome:** After add, `/remove-access-token <label>` or `/remove-access-token-completely <label>` shows the right success copy; `/list-access-token` then shows **`No access tokens stored.`** in past assistant messages.
 
-### 3a — E2E
+### 3a — E2E (**done**)
 
-- Implement `Then I should see the <removal_type> remove success message for "<label>"` in page objects (historically: **local** → `Token "<label>" removed.`; **complete** → substring like **`removed locally and from server`**). Centralize in e.g. `removeToken.ts` + re-export from `cli` index.
-- Confirm failure messages include **removal type**, **label**, and transcript preview.
+- `e2e_test/start/pageObjects/cli/removeToken.ts` — `expectedLocalRemoveSuccessMessage` / `expectedCompleteRemoveSuccessMessage`, `removeToken().expectRemoveSuccess(type, label)` + `cy.log` context; `cli` index re-exports `removeToken`.
+- `e2e_test/step_definitions/cli.ts` — `Then I should see the {word} remove success message for {string}`.
 
-### 3b — Product: remove commands (no dead subcommands)
+### 3b — Product (**done**)
 
-- **`/remove-access-token <label>`:** remove from config only; emit local success line.
-- **`/remove-access-token-completely <label>`:** `revokeToken` then local remove; emit complete success line.
-- **Empty list copy:** When there are no tokens, `/list-access-token` must put **`No access tokens stored.`** in the **past CLI assistant messages** region (as Gherkin specifies), not only in guidance.
+- **`/remove-access-token <label>`:** `removeAccessTokenLocal` → `Token "<label>" removed.`
+- **`/remove-access-token-completely <label>`:** `UserController.revokeToken` with that entry’s bearer, then local remove → `Token "<label>" removed locally and from server.`
+- **Empty list:** `ListAccessTokenStage` `useEffect` auto-`onSettled('No access tokens stored.')` so `/list-access-token` commits to transcript without Esc.
 
-### 3c — Close phase
+### 3c — Close phase (**done**)
 
-- Remove `@ignore` for the outline scenario; both examples must pass.
+- `@ignore` removed from the outline scenario; Vitest + Cypress `cli_access_token.feature` green.
 
 ---
 
@@ -202,6 +202,6 @@ The following **`main`** commits removed or hollowed out access-token behavior d
 |------:|----------------------------------|-----------------|-------|
 | 1     | Add access token and list it     | ☐               |       |
 | 2     | Add invalid access token         | ☑               |       |
-| 3     | Remove access token (outline)    | ☐               |       |
+| 3     | Remove access token (outline)    | ☑               |       |
 | 4     | `q` cancels remove selection     | ☐               |       |
 | 5     | Create access token via CLI      | ☐               |       |

@@ -295,3 +295,33 @@ export function getDefaultTokenLabel(): AccessTokenLabel | undefined {
 export function getStoredAccessTokenLabels(): string[] {
   return loadConfig().tokens.map((t) => t.label)
 }
+
+export function removeAccessTokenLocal(label: string): void {
+  const config = loadConfig()
+  const idx = config.tokens.findIndex((t) => t.label === label)
+  if (idx < 0) {
+    throw new Error(`No access token stored with label "${label}".`)
+  }
+  config.tokens.splice(idx, 1)
+  if (config.tokens.length === 0) {
+    delete config.defaultLabel
+  } else if (config.defaultLabel === label) {
+    config.defaultLabel = config.tokens[0]!.label
+  }
+  saveConfig(config)
+}
+
+export async function removeAccessTokenCompletely(
+  label: string,
+  signal?: AbortSignal
+): Promise<void> {
+  const config = loadConfig()
+  const entry = config.tokens.find((t) => t.label === label)
+  if (!entry) {
+    throw new Error(`No access token stored with label "${label}".`)
+  }
+  await withBackendClient(entry.token, () =>
+    UserController.revokeToken(doughnutSdkOptions(signal))
+  )
+  removeAccessTokenLocal(label)
+}

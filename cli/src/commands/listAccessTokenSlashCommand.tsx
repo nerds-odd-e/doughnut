@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import type { Key } from 'ink'
 import { Box, Text, useInput } from 'ink'
 import {
@@ -32,6 +32,13 @@ export function ListAccessTokenStage({
   onSettled,
 }: InteractiveSlashCommandStageProps) {
   const labels = useMemo(() => getStoredAccessTokenLabels(), [])
+  const emptySettledRef = useRef(false)
+
+  useEffect(() => {
+    if (labels.length > 0 || emptySettledRef.current) return
+    emptySettledRef.current = true
+    onSettled('No access tokens stored.')
+  }, [labels.length, onSettled])
 
   const listText = useMemo(
     () =>

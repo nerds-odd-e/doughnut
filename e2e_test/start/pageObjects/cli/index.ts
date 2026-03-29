@@ -2,6 +2,7 @@ import { nonInteractiveOutput } from './outputAssertions'
 import { installation } from './execution'
 import { backend } from './backend'
 import { interactiveCli } from './interactiveCli'
+import { removeToken } from './removeToken'
 
 /**
  * CLI page objects. Domain ordering:
@@ -13,6 +14,7 @@ import { interactiveCli } from './interactiveCli'
 export const cli = {
   nonInteractiveOutput,
   interactiveCli,
+  removeToken,
   installation,
   backend,
 }
