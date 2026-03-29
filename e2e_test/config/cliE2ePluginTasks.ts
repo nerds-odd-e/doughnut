@@ -2,6 +2,7 @@
  * Cypress `task` handlers for CLI E2E. Depends only on `repoRoot` (repo checkout path).
  */
 
+import type { IPty } from '@lydell/node-pty'
 import { existsSync, mkdtempSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
@@ -25,9 +26,7 @@ type RunInstalledCliInteractiveTask = WithOptionalCliEnv & {
   doughnutPath: string
 }
 
-type RunRepoCliInteractiveTask = WithOptionalCliEnv & {
-  simulateOAuthCallback?: boolean
-}
+type RunRepoCliInteractiveTask = WithOptionalCliEnv
 
 type CliInteractiveWriteLineTask = {
   line: string
@@ -59,7 +58,7 @@ const PREVIEW_LEN = 500
 
 type CliInteractivePtySession = {
   buf: { text: string }
-  pty: { write(data: string): void; kill(): void }
+  pty: IPty
 }
 
 async function bundleCliE2eInstallOrThrow(
@@ -124,7 +123,6 @@ export function createCliE2ePluginTasks(repoRoot: string) {
     args: string[]
     cwd: string
     env?: NodeJS.ProcessEnv
-    simulateOAuthCallback?: boolean
   }): Promise<void> {
     disposeInteractiveCliPtySession()
     const { spawn } = await import('@lydell/node-pty')
@@ -136,16 +134,11 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       env: { ...process.env, ...cliEnv(opts.env) },
     })
     const buf = { text: '' }
-    const oauthState: OAuthSimulationState | null = opts.simulateOAuthCallback
-      ? { done: false }
-      : null
+    const session: CliInteractivePtySession = { pty: p, buf }
     p.onData((data: string) => {
       buf.text += data
-      if (oauthState) {
-        notifyOAuthSimulationIfNeeded(buf.text, oauthState)
-      }
     })
-    interactiveCliPtySession = { pty: p, buf }
+    interactiveCliPtySession = session
     await installedCliInteractiveWaitForSubstring(
       () => buf.text,
       INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING,
@@ -261,7 +254,6 @@ export function createCliE2ePluginTasks(repoRoot: string) {
     },
     async runRepoCliInteractive({
       env,
-      simulateOAuthCallback,
     }: RunRepoCliInteractiveTask = {}): Promise<null> {
       const { command, baseArgs } = cliRepoSpawnFromRoot(repoRoot)
       await startInteractiveCliPtySession({
@@ -269,7 +261,26 @@ export function createCliE2ePluginTasks(repoRoot: string) {
         args: baseArgs,
         cwd: repoRoot,
         env,
-        simulateOAuthCallback,
+      })
+      return null
+    },
+    /**
+     * Registers a second `onData` handler that completes Google OAuth by `fetch`ing the redirect with a mock code.
+     *
+     * **Call at most once per PTY / per scenario** (after `runRepoCliInteractive` or `runInstalledCliInteractive`,
+     * before steps that print the OAuth URL). Calling this task again on the same live session stacks listeners
+     * and can fire duplicate callbacks; there is no unsubscribe. The PTY teardown (`cliInteractivePtyDispose`) drops the process.
+     */
+    cliInteractivePtyEnableGoogleOAuthSimulation() {
+      const session = interactiveCliPtySession
+      if (!session) {
+        throw new Error(
+          'cliInteractivePtyEnableGoogleOAuthSimulation: no active interactive CLI PTY. Start the session first (e.g. runRepoCliInteractive).'
+        )
+      }
+      const oauthState: OAuthSimulationState = { done: false }
+      session.pty.onData(() => {
+        notifyOAuthSimulationIfNeeded(session.buf.text, oauthState)
       })
       return null
     },

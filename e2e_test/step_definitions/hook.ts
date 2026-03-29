@@ -131,14 +131,15 @@ Before({ tags: '@interactiveCLI', order: 2 }, () => {
 Before({ tags: '@interactiveCLIGmailOAuth', order: 2 }, () => {
   cy.task('cliInteractivePtyDispose')
   cy.get<string>('@cliConfigDir').then((configDir) =>
-    cy.task('runRepoCliInteractive', {
-      env: {
-        DOUGHNUT_CONFIG_DIR: configDir,
-        GOOGLE_BASE_URL: GMAIL_E2E_GOOGLE_MOCK_BASE_URL,
-        DOUGHNUT_NO_BROWSER: '1',
-      },
-      simulateOAuthCallback: true,
-    })
+    cy
+      .task('runRepoCliInteractive', {
+        env: {
+          DOUGHNUT_CONFIG_DIR: configDir,
+          GOOGLE_BASE_URL: GMAIL_E2E_GOOGLE_MOCK_BASE_URL,
+          DOUGHNUT_NO_BROWSER: '1',
+        },
+      })
+      .then(() => cy.task('cliInteractivePtyEnableGoogleOAuthSimulation'))
   )
 })
 

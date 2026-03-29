@@ -37,7 +37,7 @@ Informal working plan for bringing back `e2e_test/features/cli/cli_gmail.feature
 
 - **Bundle:** `ensureCliBundleFresh` always rebuilds `cli/dist/doughnut-cli.bundle.mjs` with `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` from `cliGmailE2eConfig` when the bundle is missing, older than inputs (including `cliGmailE2eConfig.ts`), or does not contain the E2E client id string — no `@cliGmailBundledSecrets` tag.
 - **`runRepoCliInteractive` env** for Gmail scenarios: `GOOGLE_BASE_URL=http://localhost:5003`, `DOUGHNUT_CONFIG_DIR=<temp>`, `DOUGHNUT_NO_BROWSER=1` (suppress `xdg-open` in CI/dev).
-- **OAuth simulation:** When the PTY output contains a Google auth URL, issue **`fetch(`${redirect_uri}?code=...`)`** (8210c94: `e2e_mock_auth_code`) so the CLI’s local callback server receives the code. Implement in the plugin PTY path used by `runRepoCliInteractive` (either extend `cliE2ePluginTasks` or shared helper), gated by an option/env so non-Gmail interactive tests are unchanged.
+- **OAuth simulation:** Optional Cypress task **`cliInteractivePtyEnableGoogleOAuthSimulation`** (after **`runRepoCliInteractive`**): when PTY output contains a Google auth URL, issue **`fetch(`${redirect_uri}?code=...`)`** (`e2e_mock_auth_code`) so the CLI’s local callback server receives the code. Callers that do not run this task get no simulation.
 - **Failure check:** After `/add gmail`, assertion fails with missing **`Added account e2e@gmail.com`** (or a stable assistant error string), not timeout on prompt or wrong host.
 
 ### 1.4 — Product: Interactive `/add gmail`
@@ -64,7 +64,7 @@ Informal working plan for bringing back `e2e_test/features/cli/cli_gmail.feature
   for scenario 2 only (scenario 1 keeps the shorter Given).
 - Step implementation: stub `messages` list + stub `GET .../messages/msg-1` with Subject header.
 - Tag **`@withCliGmailMockAccountConfig`** + task payload **`GMAIL_E2E_MOCK_ACCOUNT_CONFIG`** (accounts entry with `accessToken` / `refreshToken` / `expiresAt` far in the future).
-- Gmail-specific interactive start **without** OAuth simulation (`oauthSimulated: false`) or reuse env flags only; align with Phase 1 PTY env (`GOOGLE_BASE_URL`, `DOUGHNUT_CONFIG_DIR`, `DOUGHNUT_NO_BROWSER`, same bundled secrets).
+- Gmail-specific interactive start **without** calling **`cliInteractivePtyEnableGoogleOAuthSimulation`** (or reuse env flags only); align with Phase 1 PTY env (`GOOGLE_BASE_URL`, `DOUGHNUT_CONFIG_DIR`, `DOUGHNUT_NO_BROWSER`, same bundled secrets).
 
 ### 2.2 — E2E: Failure mode before product
 
