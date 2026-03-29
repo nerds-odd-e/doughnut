@@ -28,6 +28,18 @@ async function waitForFrames(
   )
 }
 
+/** Render the app and wait for Ink's useInput effect to register the stdin 'readable' listener. */
+async function renderApp() {
+  const result = render(<InteractiveCliApp />)
+  // useInput registers its stdin listener via useEffect (scheduled asynchronously by React).
+  // Waiting until the 'readable' listener count rises above 0 ensures stdin writes are handled.
+  await waitForFrames(
+    () => String(result.stdin.listenerCount('readable')),
+    (c) => c !== '0'
+  )
+  return result
+}
+
 describe('InteractiveCliApp (ink-testing-library)', () => {
   test('shows version in the first frame', () => {
     const { lastFrame } = render(<InteractiveCliApp />)
@@ -35,7 +47,7 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
   })
 
   test('empty committed line leaves transcript unchanged; later line still commits', async () => {
-    const { stdin, frames } = render(<InteractiveCliApp />)
+    const { stdin, frames } = await renderApp()
     const before = frames.join('\n')
     expect(before).toContain(formatVersionOutput())
     expect(before).not.toContain('Not supported')
@@ -54,7 +66,7 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
   })
 
   test('/help records user line and assistant help listing', async () => {
-    const { stdin, frames } = render(<InteractiveCliApp />)
+    const { stdin, frames } = await renderApp()
 
     stdin.write('/help\r')
     await waitForFrames(
@@ -74,7 +86,7 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
   })
 
   test('plain committed line records user message and Not supported', async () => {
-    const { stdin, frames } = render(<InteractiveCliApp />)
+    const { stdin, frames } = await renderApp()
 
     stdin.write('hello\r')
     await waitForFrames(
@@ -92,33 +104,10 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
   })
 
   test('submitting /exit as one chunk line+CR records it in output', async () => {
-    const { lastFrame, stdin, frames } = render(<InteractiveCliApp />)
+    const { lastFrame, stdin, frames } = await renderApp()
     expect(lastFrame()).toContain(formatVersionOutput())
 
     stdin.write('/exit\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        c.includes('/exit') && c.includes('Bye.') && c.includes('\x1b[100m')
-    )
-
-    const combined = frames.join('\n')
-    expect(combined).toContain('/exit')
-    expect(combined).toContain('Bye.')
-    expect(combined).toContain('\x1b[100m')
-  })
-
-  test('submitting /exit records it in output', async () => {
-    const { lastFrame, stdin, frames } = render(<InteractiveCliApp />)
-    expect(lastFrame()).toContain(formatVersionOutput())
-
-    for (const ch of '/exit') {
-      stdin.write(ch)
-      await new Promise<void>((r) => {
-        setImmediate(r)
-      })
-    }
-    stdin.write('\r')
     await waitForFrames(
       () => frames.join('\n'),
       (c) =>
@@ -147,5 +136,32 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
       lines.slice(userIdx + 2).some((l) => l.includes('>')),
       'command prompt should appear after the bottom padding row'
     ).toBe(true)
+  })
+
+  test('submitting /exit character by character records it in output', async () => {
+    const { lastFrame, stdin, frames } = await renderApp()
+    expect(lastFrame()).toContain(formatVersionOutput())
+
+    let expectedBuffer = ''
+    for (const ch of '/exit') {
+      expectedBuffer += ch
+      stdin.write(ch)
+      const expected = expectedBuffer
+      await waitForFrames(
+        () => stripAnsi(lastFrame() ?? ''),
+        (f) => f.includes(`> ${expected}`)
+      )
+    }
+    stdin.write('\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        c.includes('/exit') && c.includes('Bye.') && c.includes('\x1b[100m')
+    )
+
+    const combined = frames.join('\n')
+    expect(combined).toContain('/exit')
+    expect(combined).toContain('Bye.')
+    expect(combined).toContain('\x1b[100m')
   })
 })
