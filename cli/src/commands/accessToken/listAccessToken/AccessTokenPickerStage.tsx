@@ -14,7 +14,6 @@ import {
   dispatchSelectListKey,
   selectListKeyEventFromInk,
 } from '../../../interactions/selectListInteraction.js'
-import type { TokenListCommandConfig } from '../../../shell/tokenListCommands.js'
 import {
   numberedTerminalListLines,
   resolvedTerminalWidth,
@@ -30,6 +29,9 @@ import { SetStageKeyHandlerContext } from '../../../stageKeyForwardContext.js'
 /** Same short copy as `userVisibleSlashCommandError` for user-initiated abort. */
 const PICKER_ABORTED_MESSAGE = 'Cancelled.'
 
+const STAGE_INDICATOR = 'Access tokens'
+const CURRENT_PROMPT = 'Select and enter to change the default access token'
+
 function initialHighlightIndex(labels: readonly string[]): number {
   if (labels.length === 0) return 0
   const d = getDefaultTokenLabel()
@@ -39,10 +41,7 @@ function initialHighlightIndex(labels: readonly string[]): number {
 
 export function AccessTokenPickerStage({
   onSettled,
-  tokenListConfig,
-}: InteractiveSlashCommandStageProps & {
-  readonly tokenListConfig: TokenListCommandConfig
-}) {
+}: InteractiveSlashCommandStageProps) {
   const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
   const labels = useMemo(() => getStoredAccessTokenLabels(), [])
   const emptySettledRef = useRef(false)
@@ -86,20 +85,15 @@ export function AccessTokenPickerStage({
           return
         case 'submit-highlight-index': {
           const selectedLabel = labels[listDispatch.index]!
-          if (tokenListConfig.action === 'set-default') {
-            setDefaultTokenLabel(selectedLabel)
-            onSettled(`Default token set to: ${selectedLabel}`)
-            return
-          }
-          throw new Error(
-            `AccessTokenPickerStage: action ${tokenListConfig.action} not implemented`
-          )
+          setDefaultTokenLabel(selectedLabel)
+          onSettled(`Default token set to: ${selectedLabel}`)
+          return
         }
         default:
           onSettled(PICKER_ABORTED_MESSAGE)
       }
     },
-    [highlightIndex, labels, onSettled, tokenListConfig.action]
+    [highlightIndex, labels, onSettled]
   )
 
   useLayoutEffect(() => {
@@ -124,10 +118,8 @@ export function AccessTokenPickerStage({
 
   return (
     <Box flexDirection="column">
-      <Text>{tokenListConfig.stageIndicator}</Text>
-      {tokenListConfig.currentPrompt ? (
-        <Text>{tokenListConfig.currentPrompt}</Text>
-      ) : null}
+      <Text>{STAGE_INDICATOR}</Text>
+      <Text>{CURRENT_PROMPT}</Text>
       <Box flexDirection="column">
         {listLines.map((line, row) => (
           <Text key={row} inverse={line.itemIndex === highlightIndex}>
