@@ -17,9 +17,7 @@ const SECTION = {
 } as const
 
 const CONTENT_PREVIEW_LEN = 500
-
 const MAX_SNAPSHOT_CHARS = 12_000
-
 const CLI_OUTPUT_ASSERT_RETRY_MS = 50
 const CLI_OUTPUT_ASSERT_TIMEOUT_MS = 3000
 
@@ -57,6 +55,18 @@ function failCliAssertion(message: string, raw: string): never {
   )
 }
 
+function headPreview(text: string): string {
+  return text.length > CONTENT_PREVIEW_LEN
+    ? `${text.slice(0, CONTENT_PREVIEW_LEN)}...`
+    : text
+}
+
+function tailPreview(text: string): string {
+  return text.length > CONTENT_PREVIEW_LEN
+    ? text.slice(-CONTENT_PREVIEW_LEN)
+    : text
+}
+
 function stdoutLooksLikeInteractiveCliPtyCapture(stdout: string): boolean {
   if (stdout.includes('\x1b[2K')) return true
   const snippets = [
@@ -83,12 +93,8 @@ function assertSectionContainsSubstring(
   sectionLabel: string
 ): void {
   if (haystack.includes(needle)) return
-  const preview =
-    haystack.length > CONTENT_PREVIEW_LEN
-      ? `${haystack.slice(0, CONTENT_PREVIEW_LEN)}...`
-      : haystack
   failCliAssertion(
-    `Expected "${needle}" in ${sectionLabel}. Content:\n${preview}`,
+    `Expected "${needle}" in ${sectionLabel}. Content:\n${headPreview(haystack)}`,
     haystack
   )
 }
@@ -122,6 +128,17 @@ function retryCliOutputAssertion(
   })
 }
 
+function retryInteractiveAssertion(
+  assert: (raw: string) => void,
+  screenshotName: string
+): void {
+  retryCliOutputAssertion(
+    () => cy.task<string>('cliInteractivePtyGetBuffer'),
+    assert,
+    screenshotName
+  )
+}
+
 function nonInteractiveOutput() {
   return {
     expectContains(expected: string) {
@@ -143,7 +160,6 @@ function nonInteractiveOutput() {
 
 const PAST_CLI_ASSISTANT_SECTION =
   'past CLI assistant messages (ANSI-stripped transcript; assistant lines, not gray user blocks)'
-const PAST_ASSISTANT_TAIL_PREVIEW_LEN = 500
 
 function assertPastCliAssistantMessagesContains(
   raw: string,
@@ -157,21 +173,12 @@ function assertPastCliAssistantMessagesContains(
     )
   }
   if (stripped.includes(expected)) return
-  const previewLen = 500
-  const headPreview =
-    stripped.length > previewLen
-      ? `${stripped.slice(0, previewLen)}...`
-      : stripped
-  const tailPreview =
-    stripped.length > PAST_ASSISTANT_TAIL_PREVIEW_LEN
-      ? stripped.slice(-PAST_ASSISTANT_TAIL_PREVIEW_LEN)
-      : stripped
   failCliAssertion(
     `Expected substring in ${PAST_CLI_ASSISTANT_SECTION}.\n` +
       `  Expected: ${JSON.stringify(expected)}\n` +
       `  Transcript length: ${stripped.length}\n` +
-      `  Head preview:\n${headPreview}\n` +
-      `  Tail preview:\n${tailPreview}`,
+      `  Head preview:\n${headPreview(stripped)}\n` +
+      `  Tail preview:\n${tailPreview(stripped)}`,
     raw
   )
 }
@@ -186,11 +193,7 @@ function assertPastUserMessageBlock(
   stripped: string,
   expected: string
 ): void {
-  const previewLen = 500
-  const preview =
-    stripped.length > previewLen
-      ? `${stripped.slice(0, previewLen)}...`
-      : stripped
+  const preview = headPreview(stripped)
 
   if (!stripped.includes(expected)) {
     failCliAssertion(
@@ -253,7 +256,6 @@ function assertPastUserMessageBlock(
 }
 
 const CURRENT_GUIDANCE_SECTION = 'Current guidance (simulated visible screen)'
-const GUIDANCE_TAIL_PREVIEW_LEN = 500
 
 function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -264,45 +266,57 @@ function boldStyledTextPattern(text: string): RegExp {
   return new RegExp(`\\x1b\\[1m(?:\\x1b\\[[0-9;]*m)*${escapeRegex(text)}`)
 }
 
-function assertCurrentGuidanceContainsBold(raw: string, text: string): void {
+function getGuidanceContext(raw: string): {
+  replayedPlain: string
+  guidancePlain: string
+} {
   const replayedPlain = ptyTranscriptToVisiblePlaintext(raw)
   const guidancePlain =
     extractCurrentGuidanceFromReplayedPlaintext(replayedPlain)
-  if (!guidancePlain.includes(text)) {
-    assertCurrentGuidanceContains(raw, text)
-  }
-  if (boldStyledTextPattern(text).test(raw)) return
-  const tailPreview =
-    replayedPlain.length > GUIDANCE_TAIL_PREVIEW_LEN
-      ? replayedPlain.slice(-GUIDANCE_TAIL_PREVIEW_LEN)
-      : replayedPlain
-  failCliAssertion(
-    `Expected ${JSON.stringify(text)} with **bold** styling in ${CURRENT_GUIDANCE_SECTION}.\n` +
-      `  Plain guidance includes the substring, but the PTY transcript did not contain a bold SGR sequence (e.g. \\x1b[1m) immediately before that text.\n` +
-      `  (Recall layout / markdown rendering may be wrong, or text is not in the guidance region.)\n` +
-      `  Guidance region (replayed plain):\n` +
-      `${guidancePlain.length > GUIDANCE_TAIL_PREVIEW_LEN ? `${guidancePlain.slice(-GUIDANCE_TAIL_PREVIEW_LEN)}\n… (${guidancePlain.length} chars)` : guidancePlain || '(empty)'}\n` +
-      `  Tail preview of full replayed screen (plain):\n${tailPreview}`,
-    raw
+  return { replayedPlain, guidancePlain }
+}
+
+function formatGuidanceRegion(
+  guidancePlain: string,
+  replayedPlain: string
+): string {
+  const guidanceSection =
+    guidancePlain.length > CONTENT_PREVIEW_LEN
+      ? `${guidancePlain.slice(-CONTENT_PREVIEW_LEN)}\n… (${guidancePlain.length} chars)`
+      : guidancePlain || '(empty)'
+  return (
+    `  Guidance region (replayed plain):\n${guidanceSection}\n` +
+    `  Tail preview of full replayed screen (plain):\n${tailPreview(replayedPlain)}`
   )
 }
 
 function assertCurrentGuidanceContains(raw: string, expected: string): void {
-  const replayedPlain = ptyTranscriptToVisiblePlaintext(raw)
-  const guidancePlain =
-    extractCurrentGuidanceFromReplayedPlaintext(replayedPlain)
+  const { replayedPlain, guidancePlain } = getGuidanceContext(raw)
   if (guidancePlain.includes(expected)) return
-
-  const tailPreview =
-    replayedPlain.length > GUIDANCE_TAIL_PREVIEW_LEN
-      ? replayedPlain.slice(-GUIDANCE_TAIL_PREVIEW_LEN)
-      : replayedPlain
   failCliAssertion(
     `Expected substring in ${CURRENT_GUIDANCE_SECTION} (not raw PTY bytes).\n` +
       `  Expected: ${JSON.stringify(expected)}\n` +
       `  Guidance region (after last line containing ${JSON.stringify('> ')}), replayed plain:\n` +
-      `${guidancePlain.length > GUIDANCE_TAIL_PREVIEW_LEN ? `${guidancePlain.slice(-GUIDANCE_TAIL_PREVIEW_LEN)}\n… (${guidancePlain.length} chars)` : guidancePlain || '(empty)'}\n` +
-      `  Tail preview of full replayed screen (plain):\n${tailPreview}`,
+      formatGuidanceRegion(guidancePlain, replayedPlain),
+    raw
+  )
+}
+
+function assertCurrentGuidanceContainsBold(raw: string, text: string): void {
+  const { replayedPlain, guidancePlain } = getGuidanceContext(raw)
+  if (!guidancePlain.includes(text)) {
+    failCliAssertion(
+      `Expected ${JSON.stringify(text)} in ${CURRENT_GUIDANCE_SECTION}.\n` +
+        formatGuidanceRegion(guidancePlain, replayedPlain),
+      raw
+    )
+  }
+  if (boldStyledTextPattern(text).test(raw)) return
+  failCliAssertion(
+    `Expected ${JSON.stringify(text)} with **bold** styling in ${CURRENT_GUIDANCE_SECTION}.\n` +
+      `  Plain guidance includes the substring, but the PTY transcript did not contain a bold SGR sequence (e.g. \\x1b[1m) immediately before that text.\n` +
+      `  (Recall layout / markdown rendering may be wrong, or text is not in the guidance region.)\n` +
+      formatGuidanceRegion(guidancePlain, replayedPlain),
     raw
   )
 }
@@ -321,8 +335,7 @@ function assertPastUserMessagesContains(raw: string, expected: string): void {
 function pastCliAssistantMessages() {
   return {
     expectContains(expected: string) {
-      retryCliOutputAssertion(
-        () => cy.task<string>('cliInteractivePtyGetBuffer'),
+      retryInteractiveAssertion(
         (raw) => assertPastCliAssistantMessagesContains(raw, expected),
         'cli-interactive-pty-past-assistant-assertion'
       )
@@ -333,8 +346,7 @@ function pastCliAssistantMessages() {
 function pastUserMessages() {
   return {
     expectContains(expected: string) {
-      retryCliOutputAssertion(
-        () => cy.task<string>('cliInteractivePtyGetBuffer'),
+      retryInteractiveAssertion(
         (raw) => assertPastUserMessagesContains(raw, expected),
         'cli-interactive-pty-past-user-assertion'
       )
@@ -345,15 +357,13 @@ function pastUserMessages() {
 function currentGuidance() {
   return {
     expectContains(expected: string) {
-      retryCliOutputAssertion(
-        () => cy.task<string>('cliInteractivePtyGetBuffer'),
+      retryInteractiveAssertion(
         (raw) => assertCurrentGuidanceContains(raw, expected),
         'cli-interactive-pty-current-guidance-assertion'
       )
     },
     expectContainsBold(text: string) {
-      retryCliOutputAssertion(
-        () => cy.task<string>('cliInteractivePtyGetBuffer'),
+      retryInteractiveAssertion(
         (raw) => assertCurrentGuidanceContainsBold(raw, text),
         'cli-interactive-pty-current-guidance-bold-assertion'
       )
