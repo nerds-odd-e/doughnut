@@ -17,13 +17,25 @@ export const interactiveSlashCommandByLine = new Map(
   interactiveSlashCommands.map((c) => [c.line, c] as const)
 )
 
+export type ResolvedInteractiveSlashCommand = {
+  command: InteractiveSlashCommand
+  argument: string | undefined
+}
+
 export function resolveInteractiveSlashCommand(
   line: string
-): InteractiveSlashCommand | undefined {
+): ResolvedInteractiveSlashCommand | undefined {
   const exact = interactiveSlashCommandByLine.get(line)
-  if (exact) return exact
-  for (const c of interactiveSlashCommands) {
-    if (c.matchesCommittedLine?.(line)) return c
+  if (exact) return { command: exact, argument: undefined }
+
+  const prefix = [...interactiveSlashCommands]
+    .sort((a, b) => b.line.length - a.line.length)
+    .find((c) => line.startsWith(`${c.line} `))
+  if (!prefix) return undefined
+
+  const rest = line.slice(prefix.line.length + 1).trim()
+  return {
+    command: prefix,
+    argument: rest === '' ? undefined : rest,
   }
-  return undefined
 }

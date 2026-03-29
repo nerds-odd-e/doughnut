@@ -31,8 +31,23 @@ export function InteractiveCliApp() {
   }, [])
 
   const onCommittedLine = useCallback((line: string) => {
-    const command = resolveInteractiveSlashCommand(line)
-    if (command) {
+    const resolved = resolveInteractiveSlashCommand(line)
+    if (resolved) {
+      const { command, argument } = resolved
+      if (
+        command.argumentName !== undefined &&
+        (argument === undefined || argument === '')
+      ) {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'user', text: line },
+          {
+            role: 'assistant',
+            text: `Missing ${command.argumentName}. Usage: ${command.doc.usage}`,
+          },
+        ])
+        return
+      }
       setMessages((prev) => [...prev, { role: 'user', text: line }])
       const Stage = command.stageComponent
       if (Stage) {
@@ -40,7 +55,7 @@ export function InteractiveCliApp() {
         setActiveStageComponent(() => Stage)
         return
       }
-      Promise.resolve(command.run(line))
+      Promise.resolve(command.run(argument))
         .then((r) => {
           setMessages((prev) => [
             ...prev,

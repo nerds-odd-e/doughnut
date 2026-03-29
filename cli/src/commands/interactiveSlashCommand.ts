@@ -21,13 +21,10 @@ export interface CommandDoc {
 export interface InteractiveSlashCommand {
   readonly line: string
   readonly doc: CommandDoc
+  /** When set, a non-empty argument is required; InteractiveCliApp shows usage if missing. */
+  readonly argumentName?: string
   readonly stageComponent?: ComponentType<InteractiveSlashCommandStageProps>
-  /**
-   * When the committed line is not exactly `line` (e.g. `/cmd arg…`), return true so
-   * resolution can still dispatch here after the exact `line` map miss.
-   */
-  readonly matchesCommittedLine?: (line: string) => boolean
   run(
-    committedLine?: string
+    argument?: string
   ): InteractiveSlashCommandResult | Promise<InteractiveSlashCommandResult>
 }

@@ -15,23 +15,9 @@ const PREFIX = '/add-access-token'
 export const addAccessTokenSlashCommand: InteractiveSlashCommand = {
   line: PREFIX,
   doc: addAccessTokenDoc,
-  matchesCommittedLine: (line) =>
-    line === PREFIX || line.startsWith(`${PREFIX} `),
-  async run(committedLine = PREFIX) {
-    if (committedLine === PREFIX) {
-      return {
-        assistantMessage:
-          'Missing access token. Usage: /add-access-token <token>',
-      }
-    }
-    const token = committedLine.slice(`${PREFIX} `.length).trim()
-    if (token === '') {
-      return {
-        assistantMessage:
-          'Missing access token. Usage: /add-access-token <token>',
-      }
-    }
-    await addAccessToken(token)
+  argumentName: 'access token',
+  async run(argument) {
+    await addAccessToken(argument!)
     return { assistantMessage: 'Token added successfully' }
   },
 }
