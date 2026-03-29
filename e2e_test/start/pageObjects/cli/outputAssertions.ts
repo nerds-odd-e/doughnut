@@ -4,6 +4,10 @@
  * - **Non-interactive**: one-shot CLI output (installed `version` / `update` spawns) via `@doughnutOutput`.
  * - **Interactive PTY**: transcript from plugin task `cliInteractivePtyGetBuffer` (session in `interactiveCliPtySession`).
  */
+import {
+  extractCurrentGuidanceFromReplayedPlaintext,
+  ptyTranscriptToVisiblePlaintext,
+} from '../../../config/cliPtyTerminalReplay'
 import { stripAnsiCliPty } from '../../../config/cliPtyAnsi'
 
 export const OUTPUT_ALIAS = '@doughnutOutput'
@@ -239,6 +243,29 @@ function assertPastUserMessageBlock(
   )
 }
 
+const CURRENT_GUIDANCE_SECTION = 'Current guidance (simulated visible screen)'
+const GUIDANCE_TAIL_PREVIEW_LEN = 500
+
+function assertCurrentGuidanceContains(raw: string, expected: string): void {
+  const replayedPlain = ptyTranscriptToVisiblePlaintext(raw)
+  const guidancePlain =
+    extractCurrentGuidanceFromReplayedPlaintext(replayedPlain)
+  if (guidancePlain.includes(expected)) return
+
+  const tailPreview =
+    replayedPlain.length > GUIDANCE_TAIL_PREVIEW_LEN
+      ? replayedPlain.slice(-GUIDANCE_TAIL_PREVIEW_LEN)
+      : replayedPlain
+  failCliAssertion(
+    `Expected substring in ${CURRENT_GUIDANCE_SECTION} (not raw PTY bytes).\n` +
+      `  Expected: ${JSON.stringify(expected)}\n` +
+      `  Guidance region (after last line containing ${JSON.stringify('> ')}), replayed plain:\n` +
+      `${guidancePlain.length > GUIDANCE_TAIL_PREVIEW_LEN ? `${guidancePlain.slice(-GUIDANCE_TAIL_PREVIEW_LEN)}\n… (${guidancePlain.length} chars)` : guidancePlain || '(empty)'}\n` +
+      `  Tail preview of full replayed screen (plain):\n${tailPreview}`,
+    raw
+  )
+}
+
 function assertPastUserMessagesContains(raw: string, expected: string): void {
   const stripped = stripAnsiCliPty(raw)
   if (stripped.length === 0) {
@@ -274,4 +301,21 @@ function pastUserMessages() {
   }
 }
 
-export { nonInteractiveOutput, pastCliAssistantMessages, pastUserMessages }
+function currentGuidance() {
+  return {
+    expectContains(expected: string) {
+      retryCliOutputAssertion(
+        () => cy.task<string>('cliInteractivePtyGetBuffer'),
+        (raw) => assertCurrentGuidanceContains(raw, expected),
+        'cli-interactive-pty-current-guidance-assertion'
+      )
+    },
+  }
+}
+
+export {
+  currentGuidance,
+  nonInteractiveOutput,
+  pastCliAssistantMessages,
+  pastUserMessages,
+}

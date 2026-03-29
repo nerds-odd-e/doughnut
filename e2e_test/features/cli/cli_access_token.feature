@@ -7,10 +7,10 @@ Feature: CLI access token management
 
   @ignore
   Scenario: Add access token and list it
-    And I have a valid Doughnut Access Token with label "E2E CLI Token"
+    Given I have a valid Doughnut Access Token with label "E2E CLI Token"
     When I add the saved access token in the interactive CLI using add-access-token
-    When I enter the slash command "/list-access-token" in the interactive CLI
-    Then I should see "E2E CLI Token" in the Current guidance
+    Then I enter the slash command "/list-access-token" in the interactive CLI
+    And I should see "E2E CLI Token" in the Current guidance
 
   @ignore
   Scenario: Add invalid access token
@@ -19,7 +19,7 @@ Feature: CLI access token management
 
   @ignore
   Scenario Outline: Remove access token
-    And I have a valid Doughnut Access Token with label "<label>"
+    Given I have a valid Doughnut Access Token with label "<label>"
     When I add the saved access token in the interactive CLI using add-access-token
     When I enter the slash command "<action> <label>" in the interactive CLI
     Then I should see the <removal_type> remove success message for "<label>"
@@ -33,7 +33,7 @@ Feature: CLI access token management
 
   @ignore
   Scenario: Another key cancels remove-access-token selection
-    And I have a valid Doughnut Access Token with label "E2E CLI Token"
+    Given I have a valid Doughnut Access Token with label "E2E CLI Token"
     When I add the saved access token in the interactive CLI using add-access-token
     When I enter the slash command "/remove-access-token" in the interactive CLI
     Then I should see "E2E CLI Token" in the Current guidance
@@ -44,7 +44,7 @@ Feature: CLI access token management
 
   @ignore
   Scenario: Create access token via CLI
-    And I have a valid Doughnut Access Token with label "Default Token"
+    Given I have a valid Doughnut Access Token with label "Default Token"
     When I add the saved access token in the interactive CLI using add-access-token
     When I enter the slash command "/create-access-token New CLI Token" in the interactive CLI
     Then I should see "Token created" in past CLI assistant messages

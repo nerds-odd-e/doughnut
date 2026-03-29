@@ -14,6 +14,10 @@ import {
   runShellCommandSync,
 } from './cliE2eRepo'
 import { cliEnv } from './cliEnv'
+import {
+  CLI_INTERACTIVE_PTY_COLS,
+  CLI_INTERACTIVE_PTY_ROWS,
+} from './cliInteractivePtyGeometry'
 import { stripAnsiCliPty } from './cliPtyAnsi'
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
@@ -111,8 +115,8 @@ export function createCliE2ePluginTasks(repoRoot: string) {
     const { spawn } = await import('@lydell/node-pty')
     const p = spawn(opts.command, opts.args, {
       name: 'xterm-256color',
-      cols: 120,
-      rows: 32,
+      cols: CLI_INTERACTIVE_PTY_COLS,
+      rows: CLI_INTERACTIVE_PTY_ROWS,
       cwd: opts.cwd,
       env: { ...process.env, ...cliEnv(opts.env) },
     })

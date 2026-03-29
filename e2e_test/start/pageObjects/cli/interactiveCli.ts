@@ -3,7 +3,11 @@
  * install scenarios use `installation().runInteractiveMode()` (`runInstalledCliInteractive`).
  * Transcript assertions use `cliInteractivePtyGetBuffer` in the Cypress plugin.
  */
-import { pastCliAssistantMessages, pastUserMessages } from './outputAssertions'
+import {
+  currentGuidance,
+  pastCliAssistantMessages,
+  pastUserMessages,
+} from './outputAssertions'
 
 function writeInteractiveLineToPty(line: string) {
   cy.task('cliInteractiveWriteLine', { line })
@@ -19,6 +23,7 @@ function interactiveCli() {
     },
     pastCliAssistantMessages,
     pastUserMessages,
+    currentGuidance,
   }
 }
 

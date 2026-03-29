@@ -45,6 +45,22 @@ When(
     cli.interactiveCli().enterSlashCommandInInteractiveCli(command)
 )
 
+When(
+  'I add the saved access token in the interactive CLI using add-access-token',
+  () => {
+    cy.get<string>('@savedAccessToken').then((token) => {
+      expect(token, 'saved access token').to.be.a('string')
+      cli
+        .interactiveCli()
+        .enterSlashCommandInInteractiveCli(`/add-access-token ${token}`)
+    })
+  }
+)
+
+Then('I should see {string} in the Current guidance', (expected: string) =>
+  cli.interactiveCli().currentGuidance().expectContains(expected)
+)
+
 Then('I should see {string} in past user messages', (expected: string) =>
   cli.interactiveCli().pastUserMessages().expectContains(expected)
 )

@@ -74,12 +74,13 @@ The following **`main`** commits removed or hollowed out access-token behavior d
 
 **Outcome:** User can paste/add the API token from the test fixture into the interactive CLI and see the label under **Current guidance** after `/list-access-token`.
 
-### 1a — E2E wiring + failing test
+### 1a — E2E wiring + failing test (**done**)
 
-- Implement missing glue: `When I add the saved access token in the interactive CLI using add-access-token` (read `@savedAccessToken` from existing user step, send `/add-access-token <token>` via interactive PTY).
-- Add **`Then I should see "…" in the Current guidance`** (and exports on `cli` page object): implement via **centralized** assertion layer — **simulated visible PTY screen** (cursor/erase replay) or the same technique the project uses for recall “visible” checks; **do not** scatter one-off parsing in step defs. Failure message must state: expected text, that guidance uses simulated screen, and show a **tail preview** of plain replay.
-- **Mid-step assertion (optional but matches old behavior):** after add, expect **`Token added`** in past CLI assistant messages so failures distinguish “command missing” vs “list wrong”.
-- Remove `@ignore` only after 1b is ready, or use a **wip tag** for local runs.
+- **Glue:** `e2e_test/step_definitions/cli.ts` — `When I add the saved access token in the interactive CLI using add-access-token` (`@savedAccessToken` → `/add-access-token <token>`); `Then I should see "…" in the Current guidance` → `cli.interactiveCli().currentGuidance().expectContains`.
+- **Simulated screen:** `e2e_test/config/cliInteractivePtyGeometry.ts` (cols/rows, shared with `cliE2ePluginTasks` spawn) + `e2e_test/config/cliPtyTerminalReplay.ts` (`ptyTranscriptToVisiblePlaintext`, `extractCurrentGuidanceFromReplayedPlaintext` — region = lines after the last row containing `> `).
+- **Assertion layer:** `e2e_test/start/pageObjects/cli/outputAssertions.ts` (`currentGuidance`) + `interactiveCli.ts` export.
+- **Feature:** scenario 1 tagged `@cliAccessTokenP1` (still `@ignore` for default CI). **Local run:** `pnpm exec cypress run --config-file e2e_test/config/ci.ts --spec e2e_test/features/cli/cli_access_token.feature --env TAGS='@cliAccessTokenP1'` (SUT up). **Expected until 1b:** fails with missing `"E2E CLI Token"` in guidance (currently `Not supported` for slash commands).
+- **Mid-step `Token added` assertion:** not added (optional); can add in 1b if useful.
 
 ### 1b — Product: `/add-access-token` + `/list-access-token` (minimal)
 
