@@ -246,6 +246,16 @@ export function MainInteractivePrompt({
     }
 
     if (key.return) {
+      const bufForPick = readBuf()
+      const gPick = slashGuidanceForInk(bufForPick)
+      const pickRows = gPick.show === 'list' ? gPick.rows : []
+      if (pickRows.length > 0) {
+        const hi = readHighlight()
+        const row = pickRows[hi] ?? pickRows[0]!
+        const completed = `${row.usage} `
+        setAll(completed, completed.length, 0)
+        return
+      }
       commitLine()
       return
     }

@@ -1,6 +1,6 @@
 # Revive interactive `/` completion (Tab + ↑↓) — phased plan
 
-**Status:** Phases 1–3 implemented; Phases 4–5 pending.  
+**Status:** Phases 1–4 implemented; Phase 5 pending.  
 **Scope:** Restore slash-command completion behavior **inside `cli/src/MainInteractivePrompt.tsx` only** (local state, local pure helpers in the same file if needed). **No new E2E.** Cover with **high-level Vitest** using **ink-testing-library + real stdin** (no adapter mocks), same spirit as `cli/tests/InteractiveCliApp.test.tsx` / `renderApp` patterns in `.cursor/rules/cli.mdc`.
 
 **Command inventory:** Derive completion candidates from **`interactiveSlashCommands`** (map each entry’s `line` / `doc` to the same strings the shell actually resolves) so completion cannot drift from runtime behavior.
@@ -81,11 +81,11 @@ Logic was spread across **`interactiveApp.tsx`**, **`ShellSessionRoot`**, **`ren
 
 ---
 
-### Phase 4 — Enter selects highlighted command when the list is open
+### Phase 4 — Enter selects highlighted command when the list is open ✅
 
 **Outcome:** If the completion list is showing, **Enter** does **not** call `onCommittedLine` with the partial draft; it **replaces** the draft with **`selected.usage + ' '`** and resets selection state (mirror `handleCommandLineInkInput` in old `interactiveApp.tsx`). If the list is **not** showing, **Enter** keeps current behavior (commit line).
 
-**Tests:** Open list, move highlight, Enter → draft becomes chosen command + space; no assistant message yet.
+**Shipped:** `MainInteractivePrompt.tsx` — `key.return` branches on `slashGuidanceForInk` list visibility; picks `rows[slashHighlightIndex]` (fallback first row). **Tests:** `cli/tests/MainInteractivePrompt.test.tsx`.
 
 ---
 

@@ -1,11 +1,13 @@
 import { render } from 'ink-testing-library'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 import { MainInteractivePrompt } from '../src/MainInteractivePrompt.js'
 import { stripAnsi, waitForFrames } from './inkTestHelpers.js'
 
-async function renderMainInteractivePrompt() {
+async function renderMainInteractivePrompt(
+  onCommittedLine: (line: string) => void = () => undefined
+) {
   const result = render(
-    <MainInteractivePrompt onCommittedLine={() => undefined} />
+    <MainInteractivePrompt onCommittedLine={onCommittedLine} />
   )
   await waitForFrames(
     () => stripAnsi(result.lastFrame() ?? ''),
@@ -187,5 +189,51 @@ describe('MainInteractivePrompt caret and slash arrows (phase 3)', () => {
         raw.includes('\x1b[7m') &&
         raw.includes('Revoke a stored access token on the server')
     )
+  })
+})
+
+describe('MainInteractivePrompt Enter picks completion (phase 4)', () => {
+  test('Enter with list open replaces draft with highlighted usage plus space and does not commit', async () => {
+    const onCommittedLine = vi.fn()
+    const { stdin, lastFrame } =
+      await renderMainInteractivePrompt(onCommittedLine)
+    stdin.write('/re')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('/remove-access-token')
+    )
+    stdin.write('\x1b[B')
+    await waitForFrames(
+      () => lastFrame() ?? '',
+      (raw) =>
+        raw.includes('\x1b[7m') &&
+        raw.includes('Revoke a stored access token on the server')
+    )
+    stdin.write('\r')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) =>
+        (f.split('\n')[0] ?? '').includes(
+          '/remove-access-token-completely <label>'
+        )
+    )
+    expect(onCommittedLine).not.toHaveBeenCalled()
+  })
+
+  test('Enter with list open and default highlight picks first match usage plus space', async () => {
+    const onCommittedLine = vi.fn()
+    const { stdin, lastFrame } =
+      await renderMainInteractivePrompt(onCommittedLine)
+    stdin.write('/re')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('/remove-access-token')
+    )
+    stdin.write('\r')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => (f.split('\n')[0] ?? '').includes('/remove-access-token <label>')
+    )
+    expect(onCommittedLine).not.toHaveBeenCalled()
   })
 })
