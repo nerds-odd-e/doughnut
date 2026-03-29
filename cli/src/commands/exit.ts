@@ -16,9 +16,9 @@ export function createExitCommand(
     line: '/exit',
     doc: exitDoc,
     run() {
-      setTimeout(() => {
+      setImmediate(() => {
         exitApp()
-      }, 0)
+      })
       return { assistantMessage: 'Bye.' }
     },
   }

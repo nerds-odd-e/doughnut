@@ -28,14 +28,22 @@ async function waitForFrames(
   )
 }
 
-/** Render the app and wait for Ink's useInput effect to register the stdin 'readable' listener. */
+/** Render the app and confirm end-to-end input handling is active before returning. */
 async function renderApp() {
   const result = render(<InteractiveCliApp />)
-  // useInput registers its stdin listener via useEffect (scheduled asynchronously by React).
-  // Waiting until the 'readable' listener count rises above 0 ensures stdin writes are handled.
+  // React 19 registers useInput's listeners via useEffect in deferred phases.
+  // Probe: write a character and wait for it to appear (confirms both the raw-mode
+  // 'readable' listener and the 'input' event-emitter listener are fully active),
+  // then delete it to restore the initial empty-buffer state.
+  result.stdin.write('|')
   await waitForFrames(
-    () => String(result.stdin.listenerCount('readable')),
-    (c) => c !== '0'
+    () => stripAnsi(result.lastFrame() ?? ''),
+    (f) => f.includes('> |')
+  )
+  result.stdin.write('\x7f') // DEL — removes the probe character
+  await waitForFrames(
+    () => stripAnsi(result.lastFrame() ?? ''),
+    (f) => f.includes('> ') && !f.includes('> |')
   )
   return result
 }

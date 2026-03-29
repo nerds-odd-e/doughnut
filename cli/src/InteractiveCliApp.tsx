@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import type { Key } from 'ink'
 import { Box, Text, useApp, useInput } from 'ink'
 import { createInteractiveSlashCommands } from './commands/interactiveSlashCommands.js'
 import type {
@@ -37,39 +38,44 @@ export function InteractiveCliApp() {
   ])
   const { buffer, applyInput } = useInteractiveCliLineBuffer()
 
-  useInput((input, key) => {
-    applyInput(input, key, (line) => {
-      if (line === '') {
-        return
-      }
-      const command = slashByLine.get(line)
-      if (command) {
-        setMessages((prev) => [...prev, { role: 'user', text: line }])
-        Promise.resolve(command.run())
-          .then((r) => {
-            setMessages((prev) => [
-              ...prev,
-              { role: 'assistant', text: r.assistantMessage },
-            ])
-          })
-          .catch((err: unknown) => {
-            setMessages((prev) => [
-              ...prev,
-              {
-                role: 'assistant',
-                text: userVisibleSlashCommandError(err),
-              },
-            ])
-          })
-        return
-      }
-      setMessages((prev) => [
-        ...prev,
-        { role: 'user', text: line },
-        { role: 'assistant', text: 'Not supported' },
-      ])
-    })
-  })
+  const handleInput = useCallback(
+    (input: string, key: Key) => {
+      applyInput(input, key, (line) => {
+        if (line === '') {
+          return
+        }
+        const command = slashByLine.get(line)
+        if (command) {
+          setMessages((prev) => [...prev, { role: 'user', text: line }])
+          Promise.resolve(command.run())
+            .then((r) => {
+              setMessages((prev) => [
+                ...prev,
+                { role: 'assistant', text: r.assistantMessage },
+              ])
+            })
+            .catch((err: unknown) => {
+              setMessages((prev) => [
+                ...prev,
+                {
+                  role: 'assistant',
+                  text: userVisibleSlashCommandError(err),
+                },
+              ])
+            })
+          return
+        }
+        setMessages((prev) => [
+          ...prev,
+          { role: 'user', text: line },
+          { role: 'assistant', text: 'Not supported' },
+        ])
+      })
+    },
+    [applyInput, slashByLine, setMessages]
+  )
+
+  useInput(handleInput)
 
   return (
     <Box flexDirection="column">
