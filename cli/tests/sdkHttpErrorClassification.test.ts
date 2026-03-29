@@ -4,7 +4,7 @@ import type * as net from 'node:net'
 import * as os from 'node:os'
 import * as path from 'node:path'
 import { afterAll, beforeAll, describe, expect, test } from 'vitest'
-import { recallStatus } from '../src/commands/recall.js'
+import { recallStatus } from '../src/commands/recallStatus.js'
 
 function tempConfigWithToken(): string {
   const configDir = fs.mkdtempSync(

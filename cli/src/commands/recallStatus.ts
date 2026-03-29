@@ -8,7 +8,6 @@ import type {
   InteractiveSlashCommand,
 } from './interactiveSlashCommand.js'
 import { dueRecallQuery } from './recall/dueRecallQuery.js'
-import { RecallJustReviewStage } from './recall/RecallJustReviewStage.js'
 
 export async function recallStatus(signal?: AbortSignal): Promise<string> {
   const trackers = await runDefaultBackendJson<DueMemoryTrackers>(() =>
@@ -37,16 +36,4 @@ export const recallStatusSlashCommand: InteractiveSlashCommand = {
     const assistantMessage = await recallStatus()
     return { assistantMessage }
   },
-}
-
-const recallDoc: CommandDoc = {
-  name: '/recall',
-  usage: '/recall',
-  description: 'Recall the next due note (just review when no quiz is pending)',
-}
-
-export const recallSlashCommand: InteractiveSlashCommand = {
-  line: '/recall',
-  doc: recallDoc,
-  stageComponent: RecallJustReviewStage,
 }
