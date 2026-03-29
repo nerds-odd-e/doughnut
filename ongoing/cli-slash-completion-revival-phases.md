@@ -1,6 +1,6 @@
 # Revive interactive `/` completion (Tab + ↑↓) — phased plan
 
-**Status:** planning only — **do not implement until phases are agreed.**  
+**Status:** Phase 1 implemented; Phases 2–5 pending.  
 **Scope:** Restore slash-command completion behavior **inside `cli/src/MainInteractivePrompt.tsx` only** (local state, local pure helpers in the same file if needed). **No new E2E.** Cover with **high-level Vitest** using **ink-testing-library + real stdin** (no adapter mocks), same spirit as `cli/tests/InteractiveCliApp.test.tsx` / `renderApp` patterns in `.cursor/rules/cli.mdc`.
 
 **Command inventory:** Derive completion candidates from **`interactiveSlashCommands`** (map each entry’s `line` / `doc` to the same strings the shell actually resolves) so completion cannot drift from runtime behavior.
@@ -51,13 +51,13 @@ Logic was spread across **`interactiveApp.tsx`**, **`ShellSessionRoot`**, **`ren
 
 ## Phases (one user-visible slice each, value first)
 
-### Phase 1 — Slash guidance strip (filter + highlight display, no Tab/Enter special-case)
+### Phase 1 — Slash guidance strip (filter + highlight display, no Tab/Enter special-case) ✅
 
 **Outcome:** After `/` and a non-space prefix, the user sees a **list of matching commands** under the prompt with a **visible selection** (e.g. inverse row). Trailing space on the command line shows the **hint only** (same rule as old `slashGuidanceForInk`). No matches → empty guidance or equivalent minimal feedback (match prior product choice).
 
 **Tests:** Type `/` then partial prefix; assert list content and that **first row** is highlighted.
 
-**Notes:** Reimplement minimal **`formatHighlightedList` / max-visible window** inside `MainInteractivePrompt.tsx` (old `listDisplay.ts` is gone) **or** a deliberately simplified window (e.g. cap lines) if the full scroll semantics are deferred — if deferred, state that as a **later phase**.
+**Shipped:** `cli/src/MainInteractivePrompt.tsx` — candidates from `interactiveSlashCommands` + `doc.usage` / `doc.description`, filter/sort aligned with old `filterCommandsByPrefix`. **Simplified window:** at most **8** rows, **no** “more above/below” scroll chrome (defer to a later phase if long lists need it). Vitest: `cli/tests/MainInteractivePrompt.test.tsx`.
 
 ---
 
