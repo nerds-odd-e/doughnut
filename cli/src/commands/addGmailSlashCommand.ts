@@ -16,14 +16,12 @@ export async function runAddGmailInteractiveAssistantMessage(): Promise<string> 
   return formatAddedGmailAccountMessage(email)
 }
 
-export function createAddGmailCommand(): InteractiveSlashCommand {
-  return {
-    line: '/add gmail',
-    doc: addGmailDoc,
-    async run() {
-      return {
-        assistantMessage: await runAddGmailInteractiveAssistantMessage(),
-      }
-    },
-  }
+export const addGmailSlashCommand: InteractiveSlashCommand = {
+  line: '/add gmail',
+  doc: addGmailDoc,
+  async run() {
+    return {
+      assistantMessage: await runAddGmailInteractiveAssistantMessage(),
+    }
+  },
 }

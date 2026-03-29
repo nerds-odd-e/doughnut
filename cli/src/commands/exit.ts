@@ -9,12 +9,10 @@ const exitDoc: CommandDoc = {
   description: 'Quit the CLI',
 }
 
-export function createExitCommand(): InteractiveSlashCommand {
-  return {
-    line: '/exit',
-    doc: exitDoc,
-    run() {
-      return { assistantMessage: 'Bye.' }
-    },
-  }
+export const exitSlashCommand: InteractiveSlashCommand = {
+  line: '/exit',
+  doc: exitDoc,
+  run() {
+    return { assistantMessage: 'Bye.' }
+  },
 }

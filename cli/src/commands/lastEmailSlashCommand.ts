@@ -15,14 +15,12 @@ export async function runLastEmailInteractiveAssistantMessage(): Promise<string>
   return getLastEmailSubject(undefined, undefined)
 }
 
-export function createLastEmailCommand(): InteractiveSlashCommand {
-  return {
-    line: '/last email',
-    doc: lastEmailDoc,
-    async run() {
-      return {
-        assistantMessage: await runLastEmailInteractiveAssistantMessage(),
-      }
-    },
-  }
+export const lastEmailSlashCommand: InteractiveSlashCommand = {
+  line: '/last email',
+  doc: lastEmailDoc,
+  async run() {
+    return {
+      assistantMessage: await runLastEmailInteractiveAssistantMessage(),
+    }
+  },
 }

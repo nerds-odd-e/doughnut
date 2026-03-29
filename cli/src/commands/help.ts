@@ -1,7 +1,10 @@
+import { addGmailSlashCommand } from './addGmailSlashCommand.js'
+import { exitSlashCommand } from './exit.js'
 import type {
   CommandDoc,
   InteractiveSlashCommand,
 } from './interactiveSlashCommand.js'
+import { lastEmailSlashCommand } from './lastEmailSlashCommand.js'
 import { updateDoc } from './update.js'
 import { versionDoc } from './version.js'
 
@@ -34,16 +37,17 @@ function formatInteractiveHelp(interactiveDocs: readonly CommandDoc[]): string {
   ].join('\n')
 }
 
-export function createHelpCommand(
-  getInteractiveDocs: () => readonly CommandDoc[]
-): InteractiveSlashCommand {
-  return {
-    line: '/help',
-    doc: helpDoc,
-    run() {
-      return {
-        assistantMessage: formatInteractiveHelp(getInteractiveDocs()),
-      }
-    },
-  }
+export const helpSlashCommand: InteractiveSlashCommand = {
+  line: '/help',
+  doc: helpDoc,
+  run() {
+    return {
+      assistantMessage: formatInteractiveHelp([
+        helpDoc,
+        addGmailSlashCommand.doc,
+        lastEmailSlashCommand.doc,
+        exitSlashCommand.doc,
+      ]),
+    }
+  },
 }
