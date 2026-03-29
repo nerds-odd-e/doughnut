@@ -1,5 +1,5 @@
 import { AsyncAssistantFetchStage } from './AsyncAssistantFetchStage.js'
-import { runAddGmailInteractiveAssistantMessage } from './commands/addGmailSlashCommand.js'
+import { runAddGmailInteractiveAssistantMessage } from './commands/gmail.js'
 
 export const ADD_GMAIL_STAGE_STATUS_LABEL = 'Connecting Gmail…'
 

@@ -356,3 +356,12 @@ export async function getLastEmailSubject(
   }
   return getSubjectFromMessage(msgData)
 }
+
+export async function runAddGmailInteractiveAssistantMessage(): Promise<string> {
+  const email = await addGmailAccount(undefined, undefined)
+  return formatAddedGmailAccountMessage(email)
+}
+
+export async function runLastEmailInteractiveAssistantMessage(): Promise<string> {
+  return getLastEmailSubject(undefined, undefined)
+}

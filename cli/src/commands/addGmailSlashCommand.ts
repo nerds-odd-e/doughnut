@@ -1,4 +1,5 @@
-import { addGmailAccount, formatAddedGmailAccountMessage } from './gmail.js'
+import { AddGmailStage } from '../AddGmailStage.js'
+import { runAddGmailInteractiveAssistantMessage } from './gmail.js'
 import type {
   CommandDoc,
   InteractiveSlashCommand,
@@ -10,15 +11,10 @@ const addGmailDoc: CommandDoc = {
   description: 'Connect a Gmail account (OAuth)',
 }
 
-/** OAuth + profile; returns one assistant transcript line. Throws on failure. */
-export async function runAddGmailInteractiveAssistantMessage(): Promise<string> {
-  const email = await addGmailAccount(undefined, undefined)
-  return formatAddedGmailAccountMessage(email)
-}
-
 export const addGmailSlashCommand: InteractiveSlashCommand = {
   line: '/add gmail',
   doc: addGmailDoc,
+  stageComponent: AddGmailStage,
   async run() {
     return {
       assistantMessage: await runAddGmailInteractiveAssistantMessage(),

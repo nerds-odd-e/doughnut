@@ -1,26 +1,25 @@
-import { useCallback, useEffect, useState } from 'react'
+import { createElement, useCallback, useEffect, useState } from 'react'
+import type { ComponentType } from 'react'
 import { Box, Text, useApp } from 'ink'
-import { AddGmailStage } from './AddGmailStage.js'
-import { LastEmailStage } from './LastEmailStage.js'
 import { MainInteractivePrompt } from './MainInteractivePrompt.js'
 import { interactiveSlashCommandByLine } from './commands/interactiveSlashCommands.js'
-import type { TranscriptMessage } from './commands/interactiveSlashCommand.js'
+import type {
+  InteractiveSlashCommandStageProps,
+  TranscriptMessage,
+} from './commands/interactiveSlashCommand.js'
 import { formatVersionOutput } from './commands/version.js'
 import { PastUserMessageBlock } from './pastUserMessageBlock.js'
 import { userVisibleSlashCommandError } from './userVisibleSlashCommandError.js'
 
-const ADD_GMAIL_LINE = '/add gmail'
-const LAST_EMAIL_LINE = '/last email'
 const EXIT_LINE = '/exit'
-
-type InteractiveStage = 'main' | 'addGmail' | 'lastEmail'
 
 export function InteractiveCliApp() {
   const { exit } = useApp()
   const [messages, setMessages] = useState<TranscriptMessage[]>([
     { role: 'assistant', text: formatVersionOutput() },
   ])
-  const [stage, setStage] = useState<InteractiveStage>('main')
+  const [activeStageComponent, setActiveStageComponent] =
+    useState<ComponentType<InteractiveSlashCommandStageProps> | null>(null)
   const [exitAfterCommit, setExitAfterCommit] = useState(false)
 
   useEffect(() => {
@@ -30,23 +29,19 @@ export function InteractiveCliApp() {
 
   const handleAsyncSlashSettled = useCallback((assistantText: string) => {
     setMessages((prev) => [...prev, { role: 'assistant', text: assistantText }])
-    setStage('main')
+    setActiveStageComponent(null)
   }, [])
 
   const onCommittedLine = useCallback((line: string) => {
-    if (line === ADD_GMAIL_LINE) {
-      setMessages((prev) => [...prev, { role: 'user', text: line }])
-      setStage('addGmail')
-      return
-    }
-    if (line === LAST_EMAIL_LINE) {
-      setMessages((prev) => [...prev, { role: 'user', text: line }])
-      setStage('lastEmail')
-      return
-    }
     const command = interactiveSlashCommandByLine.get(line)
     if (command) {
       setMessages((prev) => [...prev, { role: 'user', text: line }])
+      const Stage = command.stageComponent
+      if (Stage) {
+        // setState(fn) treats fn as updater; bare `Stage` would be called with prior state as props.
+        setActiveStageComponent(() => Stage)
+        return
+      }
       Promise.resolve(command.run())
         .then((r) => {
           setMessages((prev) => [
@@ -82,14 +77,12 @@ export function InteractiveCliApp() {
           <Text key={index}>{item.text}</Text>
         )
       )}
-      {stage === 'main' && (
+      {activeStageComponent ? (
+        createElement(activeStageComponent, {
+          onSettled: handleAsyncSlashSettled,
+        })
+      ) : (
         <MainInteractivePrompt onCommittedLine={onCommittedLine} />
-      )}
-      {stage === 'addGmail' && (
-        <AddGmailStage onSettled={handleAsyncSlashSettled} />
-      )}
-      {stage === 'lastEmail' && (
-        <LastEmailStage onSettled={handleAsyncSlashSettled} />
       )}
     </Box>
   )

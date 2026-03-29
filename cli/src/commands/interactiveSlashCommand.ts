@@ -1,3 +1,9 @@
+import type { ComponentType } from 'react'
+
+export type InteractiveSlashCommandStageProps = {
+  readonly onSettled: (assistantText: string) => void
+}
+
 export type TranscriptMessage =
   | { readonly role: 'assistant'; readonly text: string }
   | { readonly role: 'user'; readonly text: string }
@@ -15,5 +21,6 @@ export interface CommandDoc {
 export interface InteractiveSlashCommand {
   readonly line: string
   readonly doc: CommandDoc
+  readonly stageComponent?: ComponentType<InteractiveSlashCommandStageProps>
   run(): InteractiveSlashCommandResult | Promise<InteractiveSlashCommandResult>
 }

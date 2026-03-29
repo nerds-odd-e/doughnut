@@ -1,4 +1,5 @@
-import { getLastEmailSubject } from './gmail.js'
+import { LastEmailStage } from '../LastEmailStage.js'
+import { runLastEmailInteractiveAssistantMessage } from './gmail.js'
 import type {
   CommandDoc,
   InteractiveSlashCommand,
@@ -10,14 +11,10 @@ const lastEmailDoc: CommandDoc = {
   description: 'Show subject of last email',
 }
 
-/** Gmail list + metadata; returns one assistant transcript line. Throws on failure. */
-export async function runLastEmailInteractiveAssistantMessage(): Promise<string> {
-  return getLastEmailSubject(undefined, undefined)
-}
-
 export const lastEmailSlashCommand: InteractiveSlashCommand = {
   line: '/last email',
   doc: lastEmailDoc,
+  stageComponent: LastEmailStage,
   async run() {
     return {
       assistantMessage: await runLastEmailInteractiveAssistantMessage(),

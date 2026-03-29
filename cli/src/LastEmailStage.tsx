@@ -1,5 +1,5 @@
 import { AsyncAssistantFetchStage } from './AsyncAssistantFetchStage.js'
-import { runLastEmailInteractiveAssistantMessage } from './commands/lastEmailSlashCommand.js'
+import { runLastEmailInteractiveAssistantMessage } from './commands/gmail.js'
 
 export const LAST_EMAIL_STAGE_STATUS_LABEL = 'Loading last email…'
 
