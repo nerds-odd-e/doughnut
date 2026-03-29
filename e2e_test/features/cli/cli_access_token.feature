@@ -11,7 +11,6 @@ Feature: CLI access token management
     Then I enter the slash command "/list-access-token" in the interactive CLI
     And I should see "E2E CLI Token" in the Current guidance
 
-  @ignore
   Scenario: Add invalid access token
     When I enter the slash command "/add-access-token invalid-token-xxx" in the interactive CLI
     Then I should see "Access token is invalid or expired" in past CLI assistant messages

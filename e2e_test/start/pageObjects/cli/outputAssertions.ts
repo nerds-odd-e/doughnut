@@ -141,6 +141,10 @@ function nonInteractiveOutput() {
   }
 }
 
+const PAST_CLI_ASSISTANT_SECTION =
+  'past CLI assistant messages (ANSI-stripped transcript; assistant lines, not gray user blocks)'
+const PAST_ASSISTANT_TAIL_PREVIEW_LEN = 500
+
 function assertPastCliAssistantMessagesContains(
   raw: string,
   expected: string
@@ -148,21 +152,26 @@ function assertPastCliAssistantMessagesContains(
   const stripped = stripAnsiCliPty(raw)
   if (stripped.length === 0) {
     failCliAssertion(
-      `Expected ${JSON.stringify(expected)} in past CLI assistant messages, but the PTY transcript is empty after stripping ANSI escape codes.`,
+      `Expected ${JSON.stringify(expected)} in ${PAST_CLI_ASSISTANT_SECTION}, but the PTY transcript is empty after stripping ANSI escape codes.`,
       raw
     )
   }
   if (stripped.includes(expected)) return
   const previewLen = 500
-  const preview =
+  const headPreview =
     stripped.length > previewLen
       ? `${stripped.slice(0, previewLen)}...`
       : stripped
+  const tailPreview =
+    stripped.length > PAST_ASSISTANT_TAIL_PREVIEW_LEN
+      ? stripped.slice(-PAST_ASSISTANT_TAIL_PREVIEW_LEN)
+      : stripped
   failCliAssertion(
-    `Expected substring in past CLI assistant messages (ANSI-stripped).\n` +
+    `Expected substring in ${PAST_CLI_ASSISTANT_SECTION}.\n` +
       `  Expected: ${JSON.stringify(expected)}\n` +
       `  Transcript length: ${stripped.length}\n` +
-      `  Preview:\n${preview}`,
+      `  Head preview:\n${headPreview}\n` +
+      `  Tail preview:\n${tailPreview}`,
     raw
   )
 }

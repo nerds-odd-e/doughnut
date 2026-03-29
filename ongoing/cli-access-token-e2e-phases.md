@@ -102,17 +102,17 @@ The following **`main`** commits removed or hollowed out access-token behavior d
 
 **Outcome:** `/add-access-token invalid-token-xxx` surfaces **`Access token is invalid or expired`** in **past CLI assistant messages**.
 
-### 2a — E2E
+### 2a — E2E (**done**)
 
-- Scenario already phrased; ensure assertion path for past assistant messages is **clear** on failure (reuse existing `pastCliAssistantMessages` copy in `outputAssertions.ts`).
+- Scenario already phrased; `assertPastCliAssistantMessagesContains` uses an explicit **past CLI assistant messages** section label plus head/tail transcript previews on failure.
 
-### 2b — Product
+### 2b — Product (**done**)
 
-- Invalid token path on `/add-access-token`: no file write; assistant/past message with **exact** substring the feature expects (normalize with `authenticatedBackendCallFailureAdvice` or a single user-visible string used both here and for 401 paths).
+- Invalid token path on `/add-access-token`: `getTokenInfo` failure → `withBackendClient` → `userVisibleMessageForSdkThrowable` (401 → `http401StoredTokenRejected`, substring **Access token is invalid or expired**); no `saveConfig` (no file write).
 
-### 2c — Close phase
+### 2c — Close phase (**done**)
 
-- Remove `@ignore` for scenario 2 only; run CLI tests + this feature file.
+- `@ignore` removed for scenario 2 only; `pnpm cli:test` + Cypress `e2e_test/features/cli/cli_access_token.feature`.
 
 ---
 
@@ -201,7 +201,7 @@ The following **`main`** commits removed or hollowed out access-token behavior d
 | Phase | Scenario                         | @ignore removed | Notes |
 |------:|----------------------------------|-----------------|-------|
 | 1     | Add access token and list it     | ☐               |       |
-| 2     | Add invalid access token         | ☐               |       |
+| 2     | Add invalid access token         | ☑               |       |
 | 3     | Remove access token (outline)    | ☐               |       |
 | 4     | `q` cancels remove selection     | ☐               |       |
 | 5     | Create access token via CLI      | ☐               |       |

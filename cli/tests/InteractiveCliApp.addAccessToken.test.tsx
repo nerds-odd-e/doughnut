@@ -99,6 +99,21 @@ describe('InteractiveCliApp /add-access-token', () => {
     expect(getTokenInfoSpy).not.toHaveBeenCalled()
   })
 
+  test('invalid token shows assistant error and does not write access-tokens.json', async () => {
+    getTokenInfoSpy.mockRejectedValue({ status: 401 })
+    const { stdin, frames } = await renderApp()
+
+    stdin.write('/add-access-token bad-token\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => c.includes('Access token is invalid or expired')
+    )
+
+    expect(fs.existsSync(path.join(configDir, 'access-tokens.json'))).toBe(
+      false
+    )
+  })
+
   test('/list-access-token shows list until Escape; then transcript and default guidance', async () => {
     const { stdin, frames } = await renderApp()
 
