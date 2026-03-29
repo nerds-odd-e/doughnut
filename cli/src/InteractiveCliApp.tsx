@@ -11,8 +11,6 @@ import { formatVersionOutput } from './commands/version.js'
 import { PastUserMessageBlock } from './pastUserMessageBlock.js'
 import { userVisibleSlashCommandError } from './userVisibleSlashCommandError.js'
 
-const EXIT_LINE = '/exit'
-
 export function InteractiveCliApp() {
   const { exit } = useApp()
   const [messages, setMessages] = useState<TranscriptMessage[]>([
@@ -48,7 +46,7 @@ export function InteractiveCliApp() {
             ...prev,
             { role: 'assistant', text: r.assistantMessage },
           ])
-          if (line === EXIT_LINE) setExitAfterCommit(true)
+          if (line === '/exit') setExitAfterCommit(true)
         })
         .catch((err: unknown) => {
           setMessages((prev) => [
