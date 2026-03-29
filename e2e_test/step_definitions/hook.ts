@@ -4,6 +4,7 @@
 // @ts-check
 
 import { After, Before } from '@badeball/cypress-cucumber-preprocessor'
+import { GMAIL_E2E_OAUTH_ADD_CONFIG } from '../config/cliGmailE2eConfig'
 import start, { mock_services } from '../start'
 import { cli } from '../start/pageObjects/cli'
 
@@ -105,9 +106,23 @@ After({ tags: '@bundleCliE2eInstall' }, () =>
   cli.backend().removeE2eInstallCliBundle()
 )
 
-Before({ tags: '@interactiveCLI' }, () => {
+Before({ tags: '@withCliConfig', order: 1 }, () => {
+  cy.task('createCliConfigDir').as('cliConfigDir')
+})
+
+Before({ tags: '@withCliGmailOAuthAddConfig', order: 1 }, () => {
+  cy.task('createCliConfigDirWithGmail', GMAIL_E2E_OAUTH_ADD_CONFIG).as(
+    'cliConfigDir'
+  )
+})
+
+Before({ tags: '@interactiveCLI', order: 2 }, () => {
   cy.task('cliInteractivePtyDispose')
-  cy.task('runRepoCliInteractive')
+  cy.get<string>('@cliConfigDir').then((configDir) =>
+    cy.task('runRepoCliInteractive', {
+      env: { DOUGHNUT_CONFIG_DIR: configDir },
+    })
+  )
 })
 
 After({ tags: '@interactiveCLI' }, () => {

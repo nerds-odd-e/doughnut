@@ -127,6 +127,17 @@ export function createCliE2ePluginTasks(repoRoot: string) {
   }
 
   return {
+    createCliConfigDir() {
+      return mkdtempSync(join(tmpdir(), 'cypress-cli-config-'))
+    },
+    createCliConfigDirWithGmail(gmailConfig: Record<string, unknown>) {
+      const configDir = mkdtempSync(join(tmpdir(), 'cypress-cli-gmail-'))
+      writeFileSync(
+        join(configDir, 'gmail.json'),
+        JSON.stringify(gmailConfig, null, 2)
+      )
+      return configDir
+    },
     async bundleCliE2eInstall() {
       return bundleCliE2eInstallOrThrow(repoRoot)
     },
