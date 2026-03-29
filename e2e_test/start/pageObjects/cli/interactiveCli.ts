@@ -9,17 +9,19 @@ import {
   pastUserMessages,
 } from './outputAssertions'
 
-function writeInteractiveLineToPty(line: string) {
-  cy.task('cliInteractiveWriteLine', { line })
+function writeInteractiveLineToPty(line: string): Cypress.Chainable<null> {
+  return cy.task('cliInteractiveWriteLine', { line })
 }
 
 function interactiveCli() {
   return {
-    writeInteractiveLine(line: string) {
-      writeInteractiveLineToPty(line)
+    writeInteractiveLine(line: string): Cypress.Chainable<null> {
+      return writeInteractiveLineToPty(line)
     },
-    enterSlashCommandInInteractiveCli(command: string) {
-      writeInteractiveLineToPty(command)
+    enterSlashCommandInInteractiveCli(
+      command: string
+    ): Cypress.Chainable<null> {
+      return writeInteractiveLineToPty(command)
     },
     pastCliAssistantMessages,
     pastUserMessages,

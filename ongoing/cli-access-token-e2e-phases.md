@@ -80,12 +80,12 @@ The following **`main`** commits removed or hollowed out access-token behavior d
 - **Simulated screen:** `e2e_test/config/cliInteractivePtyGeometry.ts` (cols/rows, shared with `cliE2ePluginTasks` spawn) + `e2e_test/config/cliPtyTerminalReplay.ts` (`ptyTranscriptToVisiblePlaintext`, `extractCurrentGuidanceFromReplayedPlaintext` — region = lines after the last row containing `> `).
 - **Assertion layer:** `e2e_test/start/pageObjects/cli/outputAssertions.ts` (`currentGuidance`) + `interactiveCli.ts` export.
 - **Feature:** scenario 1 tagged `@cliAccessTokenP1` (still `@ignore` for default CI). **Local run:** `pnpm exec cypress run --config-file e2e_test/config/ci.ts --spec e2e_test/features/cli/cli_access_token.feature --env TAGS='@cliAccessTokenP1'` (SUT up). **Expected until 1b:** fails with missing `"E2E CLI Token"` in guidance (currently `Not supported` for slash commands).
-- **Mid-step `Token added` assertion:** not added (optional); can add in 1b if useful.
+- **Mid-step assertion:** the add-access-token step asserts **`Token added successfully`** in past CLI assistant messages (after the PTY line is sent).
 
 ### 1b — Product: `/add-access-token` + `/list-access-token` (minimal)
 
 - **Persistence:** write `access-tokens.json` (historical shape). **`addAccessToken`:** validate with backend, then append `{ label, token }`.
-- **Interactive UX:** On success, append assistant message **`Token added`** (or exact string E2E asserts).
+- **Interactive UX:** On success, append assistant message **`Token added successfully`** (must match the step assertion).
 - **`/list-access-token`:** Show stored tokens in **Current guidance** (numbered list consistent with other list UIs; **column-aware** wrapping per cli.mdc). Label text must include the stored label e.g. `E2E CLI Token`. Default marker (e.g. `★`) optional in this phase if not asserted.
 - **Stage:** Prefer a **small** dedicated Ink stage or composed component for the list — self-contained, no parent leakage (roadmap §4.2). Do **not** revive the old `accessTokenListStage` shape blindly; match **behavior** first.
 
