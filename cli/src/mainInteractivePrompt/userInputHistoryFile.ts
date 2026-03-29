@@ -1,11 +1,15 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
+import { MAX_USER_INPUT_HISTORY_LINES } from './history.js'
 
-const MAX_USER_INPUT_HISTORY_LINES = 100
 export const USER_INPUT_HISTORY_FILENAME = 'user-input-history.json'
 
 export function userInputHistoryPath(configDir: string): string {
   return path.join(configDir, USER_INPUT_HISTORY_FILENAME)
+}
+
+export function shouldSkipUserInputHistoryPersistence(): boolean {
+  return process.env.DOUGHNUT_CLI_DISABLE_INPUT_HISTORY === '1'
 }
 
 function normalizeLoadedHistory(raw: unknown): string[] {
@@ -15,6 +19,7 @@ function normalizeLoadedHistory(raw: unknown): string[] {
 }
 
 export function loadUserInputHistory(configDir: string): string[] {
+  if (shouldSkipUserInputHistoryPersistence()) return []
   const p = userInputHistoryPath(configDir)
   try {
     const data = fs.readFileSync(p, 'utf-8')
@@ -28,6 +33,7 @@ export function saveUserInputHistory(
   configDir: string,
   lines: readonly string[]
 ): void {
+  if (shouldSkipUserInputHistoryPersistence()) return
   const p = userInputHistoryPath(configDir)
   fs.mkdirSync(path.dirname(p), { recursive: true })
   fs.writeFileSync(p, `${JSON.stringify([...lines])}\n`, 'utf-8')

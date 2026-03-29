@@ -1,7 +1,33 @@
+import * as fs from 'node:fs'
+import * as os from 'node:os'
+import * as path from 'node:path'
 import { render } from 'ink-testing-library'
-import { describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { MainInteractivePrompt } from '../src/mainInteractivePrompt/index.js'
+import { USER_INPUT_HISTORY_FILENAME } from '../src/mainInteractivePrompt/userInputHistoryFile.js'
 import { stripAnsi, waitForFrames } from './inkTestHelpers.js'
+
+let promptConfigDir: string
+let prevDoughnutConfigDir: string | undefined
+
+beforeEach(() => {
+  prevDoughnutConfigDir = process.env.DOUGHNUT_CONFIG_DIR
+  promptConfigDir = fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-mip-'))
+  process.env.DOUGHNUT_CONFIG_DIR = promptConfigDir
+})
+
+afterEach(() => {
+  if (prevDoughnutConfigDir === undefined) {
+    delete process.env.DOUGHNUT_CONFIG_DIR
+  } else {
+    process.env.DOUGHNUT_CONFIG_DIR = prevDoughnutConfigDir
+  }
+  try {
+    fs.rmSync(promptConfigDir, { recursive: true, force: true })
+  } catch {
+    // temp dir may be missing
+  }
+})
 
 async function renderMainInteractivePrompt(
   onCommittedLine: (line: string) => void = () => undefined
@@ -350,6 +376,65 @@ describe('MainInteractivePrompt user input history (↑↓ recall)', () => {
         !(f.split('\n')[0] ?? '').includes('z') &&
         f.includes('/remove-access-token')
     )
+  })
+})
+
+describe('MainInteractivePrompt user input history persistence (phase 4)', () => {
+  test('writes user-input-history.json after Enter commits (newest first)', async () => {
+    const onCommittedLine = vi.fn()
+    const { stdin, lastFrame } =
+      await renderMainInteractivePrompt(onCommittedLine)
+
+    stdin.write('first\r')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => !(f.split('\n')[0] ?? '').includes('first')
+    )
+
+    stdin.write('second\r')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => !(f.split('\n')[0] ?? '').includes('second')
+    )
+
+    const p = path.join(promptConfigDir, USER_INPUT_HISTORY_FILENAME)
+    expect(JSON.parse(fs.readFileSync(p, 'utf-8'))).toEqual(['second', 'first'])
+  })
+
+  test('fresh mount loads history from disk; up recalls stored line', async () => {
+    fs.writeFileSync(
+      path.join(promptConfigDir, USER_INPUT_HISTORY_FILENAME),
+      `${JSON.stringify(['from-disk'])}\n`,
+      'utf-8'
+    )
+
+    const { stdin, lastFrame } = await renderMainInteractivePrompt()
+
+    stdin.write('\x1b[A')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => (f.split('\n')[0] ?? '').includes('from-disk')
+    )
+  })
+
+  test('DOUGHNUT_CLI_DISABLE_INPUT_HISTORY=1 skips writing history file', async () => {
+    process.env.DOUGHNUT_CLI_DISABLE_INPUT_HISTORY = '1'
+    try {
+      const onCommittedLine = vi.fn()
+      const { stdin, lastFrame } =
+        await renderMainInteractivePrompt(onCommittedLine)
+
+      stdin.write('no-file\r')
+      await waitForFrames(
+        () => stripAnsi(lastFrame() ?? ''),
+        (f) => !(f.split('\n')[0] ?? '').includes('no-file')
+      )
+
+      const p = path.join(promptConfigDir, USER_INPUT_HISTORY_FILENAME)
+      expect(fs.existsSync(p)).toBe(false)
+    } finally {
+      delete process.env.DOUGHNUT_CLI_DISABLE_INPUT_HISTORY
+    }
   })
 })
 

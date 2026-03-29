@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Key } from 'ink'
 import { Box, Text, useInput } from 'ink'
+import { getConfigDir } from '../configDir.js'
 import {
   appendUserInputHistoryLine,
   exitHistoryWalkOnDraftEdit,
@@ -9,6 +10,10 @@ import {
   onArrowUp,
   type PromptHistoryState,
 } from './history.js'
+import {
+  loadUserInputHistory,
+  saveUserInputHistory,
+} from './userInputHistoryFile.js'
 import {
   COMPLETION_USAGE_PAD,
   DEFAULT_INTERACTIVE_GUIDANCE,
@@ -44,6 +49,10 @@ export function MainInteractivePrompt({
   useEffect(() => {
     onCommittedLineRef.current = onCommittedLine
   }, [onCommittedLine])
+
+  useEffect(() => {
+    historyLinesRef.current = loadUserInputHistory(getConfigDir())
+  }, [])
 
   const guidance = useMemo(
     () => effectiveSlashGuidance(buffer, suggestionsDismissed),
@@ -122,6 +131,7 @@ export function MainInteractivePrompt({
         historyLinesRef.current,
         maskInteractiveInputLineForStorage(line)
       )
+      saveUserInputHistory(getConfigDir(), historyLinesRef.current)
       historyWalkIndexRef.current = null
       draftBeforeWalkRef.current = null
       setAll('', 0, 0)
@@ -277,6 +287,7 @@ export function MainInteractivePrompt({
             historyLinesRef.current,
             maskInteractiveInputLineForStorage(line)
           )
+          saveUserInputHistory(getConfigDir(), historyLinesRef.current)
           historyWalkIndexRef.current = null
           draftBeforeWalkRef.current = null
           setAll('', 0, 0)
@@ -292,6 +303,7 @@ export function MainInteractivePrompt({
             historyLinesRef.current,
             maskInteractiveInputLineForStorage(line)
           )
+          saveUserInputHistory(getConfigDir(), historyLinesRef.current)
           historyWalkIndexRef.current = null
           draftBeforeWalkRef.current = null
           setAll('', 0, 0)

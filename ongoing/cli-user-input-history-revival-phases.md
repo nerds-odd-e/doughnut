@@ -1,6 +1,6 @@
 # CLI user input history (↑↓) — phased revival
 
-**Status:** Phases **1–3** are implemented under **`cli/src/mainInteractivePrompt/`**. Phases **4–5** remain. This note is planning only for what is left; it does not trigger implementation by itself.
+**Status:** Phases **1–4** are implemented under **`cli/src/mainInteractivePrompt/`**. Phase **5** remains.
 
 **Scope:** Command-line user input history (recall committed lines with ↑↓, single-line draft, optional disk persistence). **Layout:** Interactive prompt code lives in the folder **`cli/src/mainInteractivePrompt/`** (not a single top-level `MainInteractivePrompt.tsx`). **`MainInteractivePrompt.tsx`** orchestrates Ink + `useInput` and composes:
 
@@ -89,15 +89,13 @@ When a history step **changes the draft**, reset **`slashHighlightIndex`** and *
 
 ---
 
-## Phase 4 — Load/save `user-input-history.json`
+## Phase 4 — Load/save `user-input-history.json` — **done**
 
-**Outcome:** On **mount** of **`MainInteractivePrompt`** (or one-shot init — prefer **single home** in the component, **file I/O + path helpers colocated under `mainInteractivePrompt/`** with history), **`loadUserInputHistory(getConfigDir())`**. After each append, **`saveUserInputHistory(getConfigDir(), lines)`**.
+**Outcome:** **`MainInteractivePrompt`** runs **`loadUserInputHistory(getConfigDir())`** on mount; after each history append **`saveUserInputHistory(getConfigDir(), lines)`**. File helpers live in **`cli/src/mainInteractivePrompt/userInputHistoryFile.ts`** (replaces removed top-level **`cli/src/userInputHistoryFile.ts`**).
 
-**Policy:** Replace removed **`shouldRecordCommittedLineInUserInputHistory`** with something explicit: e.g. always save **unless** `process.env.DOUGHNUT_CLI_DISABLE_INPUT_HISTORY === '1'` for CI isolation — only if needed; otherwise temp config dir in tests is enough.
+**Policy:** Persist by default; skip load + save when **`DOUGHNUT_CLI_DISABLE_INPUT_HISTORY === '1'`**.
 
-**Tests:** Set **`DOUGHNUT_CONFIG_DIR`** to a **real** temp directory, commit lines in ink test or a small integration test, assert file contents on disk after append; restart component or new test instance and assert **loaded** history appears on ↑.
-
-**Exit:** Persistence proven; all CLI unit tests green for touched files.
+**Tests:** **`cli/tests/MainInteractivePrompt.test.tsx`** — temp **`DOUGHNUT_CONFIG_DIR`** per test; file contents + reload + disable flag.
 
 ---
 
