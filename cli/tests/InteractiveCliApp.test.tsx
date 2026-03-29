@@ -53,6 +53,25 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     )
   })
 
+  test('/help records user line and assistant help listing', async () => {
+    const { stdin, frames } = render(<InteractiveCliApp />)
+
+    stdin.write('/help\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        c.includes('/help') &&
+        c.includes('/exit') &&
+        c.includes('update') &&
+        c.includes('version') &&
+        c.includes('\x1b[100m')
+    )
+
+    const combined = frames.join('\n')
+    expect(combined).toMatch(/Subcommands:/)
+    expect(combined).toMatch(/Interactive commands/)
+  })
+
   test('plain committed line records user message and Not supported', async () => {
     const { stdin, frames } = render(<InteractiveCliApp />)
 

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Box, Text, useApp, useInput } from 'ink'
+import { formatInteractiveHelp } from './commands/help.js'
 import { formatVersionOutput } from './commands/version.js'
 import { useInteractiveCliLineBuffer } from './interactiveCliInput.js'
 import { PastUserMessageBlock } from './pastUserMessageBlock.js'
@@ -26,6 +27,14 @@ export function InteractiveCliApp() {
         setTimeout(() => {
           exit()
         }, 0)
+        return
+      }
+      if (line === '/help') {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'user', text: line },
+          { role: 'assistant', text: formatInteractiveHelp() },
+        ])
         return
       }
       if (line === '') {

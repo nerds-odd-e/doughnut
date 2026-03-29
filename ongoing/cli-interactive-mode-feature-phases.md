@@ -58,21 +58,21 @@ Shared by all four scenarios; not itself a Gherkin scenario.
 
 ---
 
-## Phase 3 — `/help` lists subcommands and interactive commands
+## Phase 3 — `/help` lists subcommands and interactive commands — **done**
 
 **Scenario:** /help lists subcommands and interactive commands
 
 **Outcome:** Past assistant transcript contains **`/help`**, **`/exit`**, **`update`**, **`version`** (strings as in the feature file).
 
-### 3.1 — E2E
+### 3.1 — E2E — **done**
 
 - Reuses `I enter the slash command "/help"…` and existing `pastCliAssistantMessages` assertions.
 - Remove `@ignore` from **this scenario only**.
-- **CI:** Red until 3.2 unless merged with 3.2.
+- **CI:** Green with 3.2.
 
-### 3.2 — Product
+### 3.2 — Product — **done**
 
-- `/help` output (interactive) includes those entries — preferably by reusing the same help aggregation as non-interactive help where that already exists (**roadmap §2.1 / §7** reuse), without duplicating command lists in two divergent places.
+- `/help` output (interactive) includes those entries — **`formatInteractiveHelp()`** in `cli/src/commands/help.ts` builds from **`versionDoc` / `updateDoc`** (same objects as the `version` / `update` subcommand path) plus **`interactiveDocs`** (`/help`, `/exit` only for this slim shell).
 
 **CI:** Green.
 
@@ -105,7 +105,7 @@ Shared by all four scenarios; not itself a Gherkin scenario.
 | F.1 | `cliInteractivePtyDispose` | **Done** |
 | F.2 | `@interactiveCLI` hooks; PTY = repo bundle + `ensureCliBundleFresh` | **Done** |
 | 1.1–1.2 | Plain line → Not supported | **Done** |
-| 3.1–3.2 | `/help` lists recall, exit, update, version | Green after 3.2 |
+| 3.1–3.2 | `/help` lists /help, /exit, update, version | **Done** |
 | 4.1–4.2 | `/exit` → Bye. | **Done** |
 
 ---

@@ -8,7 +8,6 @@ Feature: CLI interactive mode
     Then I should see "Not supported" in past CLI assistant messages
     And I should see "hello" in past user messages
 
-  @ignore
   Scenario: /help lists subcommands and interactive commands
     When I enter the slash command "/help" in the interactive CLI
     Then I should see "/help" in past CLI assistant messages
