@@ -1,31 +1,18 @@
-import type { InteractiveSlashCommand } from './interactiveSlashCommand.js'
+import type {
+  CommandDoc,
+  InteractiveSlashCommand,
+} from './interactiveSlashCommand.js'
 import { updateDoc } from './update.js'
 import { versionDoc } from './version.js'
 
-export interface CommandDoc {
-  name: string
-  usage: string
-  description: string
-  category: 'subcommand' | 'interactive'
-}
-
 const subcommandDocs: CommandDoc[] = [versionDoc, updateDoc]
 
-/** Slash commands and metadata for interactive /help and future TTY hints. */
-export const interactiveDocs: CommandDoc[] = [
-  {
-    name: '/help',
-    usage: '/help',
-    description: 'List available commands',
-    category: 'interactive',
-  },
-  {
-    name: '/exit',
-    usage: '/exit',
-    description: 'Quit the CLI',
-    category: 'interactive',
-  },
-]
+const helpDoc: CommandDoc = {
+  name: '/help',
+  usage: '/help',
+  description: 'List available commands',
+  category: 'interactive',
+}
 
 function formatSection(title: string, docs: readonly CommandDoc[]): string {
   const lines = docs.map((d) => {
@@ -35,8 +22,7 @@ function formatSection(title: string, docs: readonly CommandDoc[]): string {
   return `${title}:\n${lines.join('\n')}`
 }
 
-/** Text shown after interactive `/help` (subcommands from `run.ts` + slash commands). */
-export function formatInteractiveHelp(): string {
+function formatInteractiveHelp(interactiveDocs: readonly CommandDoc[]): string {
   return [
     formatSection('Subcommands', subcommandDocs),
     '',
@@ -44,9 +30,16 @@ export function formatInteractiveHelp(): string {
   ].join('\n')
 }
 
-export const helpInteractiveSlashCommand: InteractiveSlashCommand = {
-  line: '/help',
-  run() {
-    return { assistantMessage: formatInteractiveHelp() }
-  },
+export function createHelpCommand(
+  getInteractiveDocs: () => readonly CommandDoc[]
+): InteractiveSlashCommand {
+  return {
+    line: '/help',
+    doc: helpDoc,
+    run() {
+      return {
+        assistantMessage: formatInteractiveHelp(getInteractiveDocs()),
+      }
+    },
+  }
 }

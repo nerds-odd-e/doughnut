@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Box, Text, useApp, useInput } from 'ink'
-import { helpInteractiveSlashCommand } from './commands/help.js'
-import { createExitCommand } from './commands/exit.js'
+import { createInteractiveSlashCommands } from './commands/interactiveSlashCommands.js'
 import type { InteractiveSlashCommand } from './commands/interactiveSlashCommand.js'
 import { formatVersionOutput } from './commands/version.js'
 import { useInteractiveCliLineBuffer } from './interactiveCliInput.js'
@@ -14,7 +13,7 @@ type TranscriptMessage =
 export function InteractiveCliApp() {
   const { exit } = useApp()
   const slashCommands: InteractiveSlashCommand[] = useMemo(
-    () => [helpInteractiveSlashCommand, createExitCommand(exit)],
+    () => createInteractiveSlashCommands(exit),
     [exit]
   )
   const slashByLine = useMemo(
