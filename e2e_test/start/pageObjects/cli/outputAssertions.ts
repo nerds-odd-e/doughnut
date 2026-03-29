@@ -255,6 +255,38 @@ function assertPastUserMessageBlock(
 const CURRENT_GUIDANCE_SECTION = 'Current guidance (simulated visible screen)'
 const GUIDANCE_TAIL_PREVIEW_LEN = 500
 
+function escapeRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/** Bold start SGR (e.g. markdansi / chalk); optional other SGR between bold-on and text. */
+function boldStyledTextPattern(text: string): RegExp {
+  return new RegExp(`\\x1b\\[1m(?:\\x1b\\[[0-9;]*m)*${escapeRegex(text)}`)
+}
+
+function assertCurrentGuidanceContainsBold(raw: string, text: string): void {
+  const replayedPlain = ptyTranscriptToVisiblePlaintext(raw)
+  const guidancePlain =
+    extractCurrentGuidanceFromReplayedPlaintext(replayedPlain)
+  if (!guidancePlain.includes(text)) {
+    assertCurrentGuidanceContains(raw, text)
+  }
+  if (boldStyledTextPattern(text).test(raw)) return
+  const tailPreview =
+    replayedPlain.length > GUIDANCE_TAIL_PREVIEW_LEN
+      ? replayedPlain.slice(-GUIDANCE_TAIL_PREVIEW_LEN)
+      : replayedPlain
+  failCliAssertion(
+    `Expected ${JSON.stringify(text)} with **bold** styling in ${CURRENT_GUIDANCE_SECTION}.\n` +
+      `  Plain guidance includes the substring, but the PTY transcript did not contain a bold SGR sequence (e.g. \\x1b[1m) immediately before that text.\n` +
+      `  (Recall layout / markdown rendering may be wrong, or text is not in the guidance region.)\n` +
+      `  Guidance region (replayed plain):\n` +
+      `${guidancePlain.length > GUIDANCE_TAIL_PREVIEW_LEN ? `${guidancePlain.slice(-GUIDANCE_TAIL_PREVIEW_LEN)}\n… (${guidancePlain.length} chars)` : guidancePlain || '(empty)'}\n` +
+      `  Tail preview of full replayed screen (plain):\n${tailPreview}`,
+    raw
+  )
+}
+
 function assertCurrentGuidanceContains(raw: string, expected: string): void {
   const replayedPlain = ptyTranscriptToVisiblePlaintext(raw)
   const guidancePlain =
@@ -317,6 +349,13 @@ function currentGuidance() {
         () => cy.task<string>('cliInteractivePtyGetBuffer'),
         (raw) => assertCurrentGuidanceContains(raw, expected),
         'cli-interactive-pty-current-guidance-assertion'
+      )
+    },
+    expectContainsBold(text: string) {
+      retryCliOutputAssertion(
+        () => cy.task<string>('cliInteractivePtyGetBuffer'),
+        (raw) => assertCurrentGuidanceContainsBold(raw, text),
+        'cli-interactive-pty-current-guidance-bold-assertion'
       )
     },
   }

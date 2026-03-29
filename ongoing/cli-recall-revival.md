@@ -1,6 +1,6 @@
 # CLI recall revival (plan only)
 
-**Status:** Planning — do not treat as implementation spec.  
+**Status:** Phase 1 complete (recall status). Phase 2.1 complete (Just Review E2E un-ignored + bold guidance assertion). Phases 2.2–8 still ahead; this file stays high-level planning, not a step-by-step implementation spec.  
 **Goal:** Restore behaviors in `e2e_test/features/cli/cli_recall.feature` with **observable E2E coverage**, **minimal dead code**, and **architecture that does not repeat the pre-removal shape** (heavy global mutable recall state and recall orchestration embedded in `interactive.ts`).
 
 **Guidance:** `.cursor/rules/planning.mdc`, `.cursor/rules/cli.mdc`, `ongoing/cli-architecture-roadmap.md` — prefer **Ink/React composition and stage-local state**, **thin Cucumber steps**, **centralized terminal assertions**, and **reuse of shared API client code** (`doughnut-api` / existing backend client helpers). Challenge big abstractions until repetition justifies them.
@@ -20,7 +20,7 @@ Recent removals (around **2026-03-28**) show what existed before strip-down; use
 
 **Prior shape (avoid repeating):** `interactive.ts` imported many recall helpers and owned **module-level mutable recall session state** (`pendingRecallAnswer`, `recallSessionMode`, load-more, stop confirmation, MCQ guidance lines, etc.). `cli/src/commands/recall.ts` was ~250 lines mixing HTTP, result typing, and some formatting. **Replace with** a bounded recall **stage** (or cohesive module + single parent component) so `interactive.ts` stays orchestration-light.
 
-**Still in tree today:** `cli/src/commands/recall.ts` retains **`recallStatus` only** (plus unit tests in `sdkHttpErrorClassification.test.ts`). Backend `RecallsController` / recall domain remains; web E2E recall steps (`e2e_test/step_definitions/recall.ts`, etc.) are unrelated to CLI.
+**Still in tree today:** `cli/src/commands/recall.ts` retains **`recallStatus` only** (plus HTTP error classification via `recallStatus` in `cli/tests/sdkHttpErrorClassification.test.ts`, and pluralization in `cli/tests/recallStatus.test.ts`). Backend `RecallsController` / recall domain remains; web E2E recall steps (`e2e_test/step_definitions/recall.ts`, etc.) are unrelated to CLI.
 
 ---
 
@@ -35,27 +35,14 @@ Recent removals (around **2026-03-28**) show what existed before strip-down; use
 
 ---
 
-## Phase 1 — Scenario: *Recall status shows count when notes are due*
+## Phase 1 — Scenario: *Recall status shows count when notes are due* — **complete**
 
-**User outcome:** `/recall-status` shows `1 note to recall today` (and by extension correct pluralization for other counts when implemented).
+**User outcome:** `/recall-status` shows `1 note to recall today` (E2E); other counts covered by unit tests below.
 
-### Phase 1.1 — E2E fails for the right reason
+- **1.1 / 1.2:** First scenario in `e2e_test/features/cli/cli_recall.feature` is active (no `@ignore`); `/recall-status` wired to `recallStatus`; copy appears in past CLI assistant messages; help lists the command where the project aggregates slash commands.
+- **1.3:** `cli/tests/recallStatus.test.ts` — black-box `recallStatus` against a local HTTP stub returning `DueMemoryTrackers` JSON: `0` notes (missing and empty `toRepeat`), `1` note, `2` notes, `10` notes. No timezone/query unit tests (no client-side branching on that in `recallStatus`).
 
-- Remove `@ignore` from this scenario only (leave others ignored until their phase).
-- Run E2E; failure should be **missing command / unknown slash / no matching assistant output**, not timeout or assertion infrastructure errors.
-- If the failure is opaque, improve **step definitions or assertion messages** (still scenario-scoped).
-
-### Phase 1.2 — Pass E2E with minimum production change
-
-- Wire **`/recall-status`** in the interactive command registry to call existing **`recallStatus`** in `cli/src/commands/recall.ts` (or relocate that function only if cohesion demands it — avoid drive-by refactors).
-- Surface assistant line in **past CLI assistant messages** per feature.
-- Update help/guidance strings if the project lists slash commands centrally.
-- **No dead code:** anything added must be used by this scenario or existing tests.
-
-### Phase 1.3 — Edge cases (scenario scope only)
-
-- **Plural / zero notes:** If E2E stays at exactly “1 note…”, add **unit tests** for `recallStatus` string formatting for `0`, `2`, etc. (black-box: mock SDK or controller response shape — follow existing `sdkHttpErrorClassification` patterns without widening exports unnecessarily).
-- **Timezone/query:** Only unit-test if there is real branching worth locking; do not overlap later recall-session phases.
+**Next:** Phase 2 (*Recall Just Review*).
 
 ---
 
@@ -63,9 +50,10 @@ Recent removals (around **2026-03-28**) show what existed before strip-down; use
 
 **User outcome:** `/recall` enters recall; **current guidance** shows note title, markdown-stripped details, styled emphasis, and “Yes, I remember?”; `y` → **past** assistant shows “Recalled successfully”.
 
-### Phase 2.1 — E2E fails for the right reason
+### Phase 2.1 — E2E fails for the right reason — **complete**
 
-- Un-ignore this scenario; ensure failure indicates **missing `/recall`**, wrong prompt layout, or missing success message — not generic PTY flake.
+- Un-ignored **Recall Just Review**; added missing step **`… styled in the Current guidance`** → `currentGuidance().expectContainsBold` (bold SGR + substring in replayed guidance).
+- Failures surface as **missing expected text in Current guidance** (with replayed guidance + tail preview) or **bold styling** message, or **past assistant** missing `Recalled successfully` — not undefined steps or opaque PTY-only errors.
 
 ### Phase 2.2 — Pass E2E with minimum production change
 

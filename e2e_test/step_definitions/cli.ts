@@ -67,6 +67,10 @@ Then('I should see {string} in the Current guidance', (expected: string) =>
   cli.interactiveCli().currentGuidance().expectContains(expected)
 )
 
+Then('I should see {string} styled in the Current guidance', (text: string) =>
+  cli.interactiveCli().currentGuidance().expectContainsBold(text)
+)
+
 Then(
   'I should see the {word} remove success message for {string}',
   (removalType: string, label: string) => {
