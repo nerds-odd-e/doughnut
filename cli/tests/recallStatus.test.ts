@@ -1,25 +1,10 @@
 import * as fs from 'node:fs'
 import * as http from 'node:http'
 import type * as net from 'node:net'
-import * as os from 'node:os'
-import * as path from 'node:path'
 import { afterAll, beforeAll, describe, expect, test } from 'vitest'
 import type { DueMemoryTrackers } from 'doughnut-api'
 import { recallStatus } from '../src/commands/recallStatus.js'
-
-function tempConfigWithToken(): string {
-  const configDir = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'doughnut-recall-status-')
-  )
-  fs.writeFileSync(
-    path.join(configDir, 'access-tokens.json'),
-    JSON.stringify({
-      tokens: [{ label: 't', token: 'fake-bearer' }],
-      defaultLabel: 't',
-    })
-  )
-  return configDir
-}
+import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
 async function withRecallingResponse(
   trackers: DueMemoryTrackers,

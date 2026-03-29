@@ -1,24 +1,9 @@
 import * as fs from 'node:fs'
 import * as http from 'node:http'
 import type * as net from 'node:net'
-import * as os from 'node:os'
-import * as path from 'node:path'
 import { afterAll, beforeAll, describe, expect, test } from 'vitest'
 import { recallStatus } from '../src/commands/recallStatus.js'
-
-function tempConfigWithToken(): string {
-  const configDir = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'doughnut-sdk-http-classify-')
-  )
-  fs.writeFileSync(
-    path.join(configDir, 'access-tokens.json'),
-    JSON.stringify({
-      tokens: [{ label: 't', token: 'fake-bearer' }],
-      defaultLabel: 't',
-    })
-  )
-  return configDir
-}
+import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
 describe('real SDK HTTP errors classify for user-visible messages', () => {
   let savedConfigDir: string | undefined
