@@ -47,9 +47,14 @@ export function InteractiveCliApp() {
     const resolved = resolveInteractiveSlashCommand(line)
     if (resolved) {
       const { command, argument } = resolved
+      const argumentMissing = argument === undefined || argument === ''
+      const openPickerStage =
+        command.stageComponent !== undefined &&
+        (command.argumentName === undefined ? true : argumentMissing)
       if (
         command.argumentName !== undefined &&
-        (argument === undefined || argument === '')
+        argumentMissing &&
+        !command.argumentOptional
       ) {
         setMessages((prev) => [
           ...prev,
@@ -63,7 +68,7 @@ export function InteractiveCliApp() {
       }
       setMessages((prev) => [...prev, { role: 'user', text: line }])
       const Stage = command.stageComponent
-      if (Stage) {
+      if (Stage && openPickerStage) {
         // setState(fn) treats fn as updater; bare `Stage` would be called with prior state as props.
         setActiveStageComponent(() => Stage)
         return

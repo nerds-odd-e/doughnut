@@ -55,6 +55,8 @@
 
 ## Phase 2 — Bare remove + remove-completely pickers + tests
 
+**Status:** Done (`pnpm cli:test`). Shared UI is **`AccessTokenLabelPickerStage`** in `accessToken/`; **`RemoveAccessTokenPickerStage`** / **`RemoveAccessTokenCompletelyPickerStage`** colocate copy and outcomes; **`InteractiveCliApp`** opens stage when `stageComponent` is set and either there is no `argumentName` (list) or the argument is empty (remove commands).
+
 **User-visible slice:** **`/remove-access-token`** and **`/remove-access-token-completely`** with **no** label open the same picker pattern; **Enter** runs local remove or full revoke+remove; errors match current non-interactive semantics.
 
 **Implementation sketch:**

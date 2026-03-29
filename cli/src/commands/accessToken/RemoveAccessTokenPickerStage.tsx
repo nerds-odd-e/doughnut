@@ -1,14 +1,15 @@
 import { useMemo } from 'react'
-import type { InteractiveSlashCommandStageProps } from '../../interactiveSlashCommand.js'
+import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
 import {
   getDefaultTokenLabel,
   getStoredAccessTokenLabels,
-  setDefaultTokenLabel,
-} from '../accessToken.js'
-import { AccessTokenLabelPickerStage } from '../AccessTokenLabelPickerStage.js'
+  removeAccessTokenLocal,
+} from './accessToken.js'
+import { AccessTokenLabelPickerStage } from './AccessTokenLabelPickerStage.js'
 
-const STAGE_INDICATOR = 'Access tokens'
-const CURRENT_PROMPT = 'Select and enter to change the default access token'
+const STAGE_INDICATOR = 'Remove access token'
+const CURRENT_PROMPT =
+  'Select and enter to remove the token from local config only'
 
 function initialHighlightIndexPreferDefault(labels: readonly string[]): number {
   if (labels.length === 0) return 0
@@ -17,7 +18,7 @@ function initialHighlightIndexPreferDefault(labels: readonly string[]): number {
   return Math.max(0, idx)
 }
 
-export function ListAccessTokenStage({
+export function RemoveAccessTokenPickerStage({
   onSettled,
 }: InteractiveSlashCommandStageProps) {
   const labels = useMemo(() => getStoredAccessTokenLabels(), [])
@@ -30,8 +31,8 @@ export function ListAccessTokenStage({
       currentPrompt={CURRENT_PROMPT}
       initialHighlightIndex={initialHighlightIndexPreferDefault}
       onPick={(label) => {
-        setDefaultTokenLabel(label)
-        onSettled(`Default token set to: ${label}`)
+        removeAccessTokenLocal(label)
+        onSettled(`Token "${label}" removed.`)
       }}
     />
   )

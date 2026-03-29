@@ -21,8 +21,13 @@ export interface CommandDoc {
 export interface InteractiveSlashCommand {
   readonly line: string
   readonly doc: CommandDoc
-  /** When set, a non-empty argument is required; InteractiveCliApp shows usage if missing. */
+  /**
+   * When set, a non-empty argument is required unless `argumentOptional` is true; InteractiveCliApp
+   * shows usage if missing and not optional.
+   */
   readonly argumentName?: string
+  /** When true, an empty argument is allowed (e.g. open `stageComponent` or call `run` without a value). */
+  readonly argumentOptional?: boolean
   readonly stageComponent?: ComponentType<InteractiveSlashCommandStageProps>
   readonly run?: (
     argument?: string

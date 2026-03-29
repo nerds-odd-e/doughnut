@@ -6,6 +6,8 @@ import type {
   CommandDoc,
   InteractiveSlashCommand,
 } from '../interactiveSlashCommand.js'
+import { RemoveAccessTokenCompletelyPickerStage } from './RemoveAccessTokenCompletelyPickerStage.js'
+import { RemoveAccessTokenPickerStage } from './RemoveAccessTokenPickerStage.js'
 
 const removeAccessTokenDoc: CommandDoc = {
   name: '/remove-access-token',
@@ -24,6 +26,8 @@ export const removeAccessTokenSlashCommand: InteractiveSlashCommand = {
   line: '/remove-access-token',
   doc: removeAccessTokenDoc,
   argumentName: 'label',
+  argumentOptional: true,
+  stageComponent: RemoveAccessTokenPickerStage,
   run(argument) {
     removeAccessTokenLocal(argument!)
     return {
@@ -37,6 +41,8 @@ export const removeAccessTokenCompletelySlashCommand: InteractiveSlashCommand =
     line: '/remove-access-token-completely',
     doc: removeAccessTokenCompletelyDoc,
     argumentName: 'label',
+    argumentOptional: true,
+    stageComponent: RemoveAccessTokenCompletelyPickerStage,
     async run(argument) {
       await removeAccessTokenCompletely(argument!)
       return {

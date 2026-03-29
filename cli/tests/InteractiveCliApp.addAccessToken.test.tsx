@@ -182,6 +182,93 @@ describe('InteractiveCliApp /add-access-token', () => {
     )
   })
 
+  test('bare /remove-access-token opens picker; Down+Enter removes selected token from file', async () => {
+    fs.writeFileSync(
+      path.join(configDir, 'access-tokens.json'),
+      JSON.stringify({
+        tokens: [
+          { label: 'Alpha', token: 't1' },
+          { label: 'Beta', token: 't2' },
+        ],
+        defaultLabel: 'Alpha',
+      }),
+      'utf-8'
+    )
+
+    const { stdin, frames } = await renderApp()
+
+    stdin.write('/remove-access-token\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        c.includes('Remove access token') &&
+        c.includes('1. Alpha') &&
+        c.includes('2. Beta')
+    )
+
+    stdin.write('\u001b[B')
+    await waitForFrames(
+      () => frames.at(-1) ?? '',
+      (f) => f.includes('\x1b[7m2.')
+    )
+
+    stdin.write('\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => c.includes('Token "Beta" removed.')
+    )
+
+    const stored = JSON.parse(
+      fs.readFileSync(path.join(configDir, 'access-tokens.json'), 'utf-8')
+    ) as { tokens: { label: string; token: string }[]; defaultLabel?: string }
+    expect(stored.tokens).toEqual([{ label: 'Alpha', token: 't1' }])
+    expect(stored.defaultLabel).toBe('Alpha')
+    expect(revokeTokenSpy).not.toHaveBeenCalled()
+  })
+
+  test('bare /remove-access-token-completely opens picker; Down+Enter revokes selected token', async () => {
+    fs.writeFileSync(
+      path.join(configDir, 'access-tokens.json'),
+      JSON.stringify({
+        tokens: [
+          { label: 'Alpha', token: 't1' },
+          { label: 'Beta', token: 't2' },
+        ],
+        defaultLabel: 'Alpha',
+      }),
+      'utf-8'
+    )
+
+    const { stdin, frames } = await renderApp()
+
+    stdin.write('/remove-access-token-completely\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        c.includes('Remove access token completely') && c.includes('2. Beta')
+    )
+
+    stdin.write('\u001b[B')
+    await waitForFrames(
+      () => frames.at(-1) ?? '',
+      (f) => f.includes('\x1b[7m2.')
+    )
+
+    stdin.write('\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        c.includes('Token "Beta" removed locally and from server.') &&
+        revokeTokenSpy.mock.calls.length >= 1
+    )
+
+    const stored = JSON.parse(
+      fs.readFileSync(path.join(configDir, 'access-tokens.json'), 'utf-8')
+    ) as { tokens: { label: string; token: string }[]; defaultLabel?: string }
+    expect(stored.tokens).toEqual([{ label: 'Alpha', token: 't1' }])
+    expect(stored.defaultLabel).toBe('Alpha')
+  })
+
   test('/remove-access-token removes stored label and list is empty in transcript', async () => {
     const { stdin, frames } = await renderApp()
 
