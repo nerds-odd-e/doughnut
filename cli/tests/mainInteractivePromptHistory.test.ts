@@ -7,7 +7,7 @@ import {
   onArrowDown,
   onArrowUp,
   singleLineCommandDraft,
-} from '../src/mainInteractivePromptHistory.js'
+} from '../src/mainInteractivePrompt/mainInteractivePromptHistory.js'
 
 describe('singleLineCommandDraft', () => {
   test('collapses CR, LF, and CRLF to spaces', () => {

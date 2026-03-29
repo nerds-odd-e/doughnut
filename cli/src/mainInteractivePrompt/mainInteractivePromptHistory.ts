@@ -1,6 +1,6 @@
 /**
  * Pure command-line draft, caret, and ↑↓ user input history (newest first).
- * Single-line draft only; wired from MainInteractivePrompt.
+ * Single-line draft only; used by MainInteractivePrompt in this folder.
  */
 
 export const MAX_USER_INPUT_HISTORY_LINES = 100

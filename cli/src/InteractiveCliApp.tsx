@@ -1,7 +1,7 @@
 import { createElement, useCallback, useEffect, useState } from 'react'
 import type { ComponentType } from 'react'
 import { Box, Text, useApp } from 'ink'
-import { MainInteractivePrompt } from './MainInteractivePrompt.js'
+import { MainInteractivePrompt } from './mainInteractivePrompt/index.js'
 import { resolveInteractiveSlashCommand } from './commands/interactiveSlashCommands.js'
 import type {
   InteractiveSlashCommandStageProps,

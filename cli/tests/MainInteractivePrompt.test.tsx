@@ -1,6 +1,6 @@
 import { render } from 'ink-testing-library'
 import { describe, expect, test, vi } from 'vitest'
-import { MainInteractivePrompt } from '../src/MainInteractivePrompt.js'
+import { MainInteractivePrompt } from '../src/mainInteractivePrompt/index.js'
 import { stripAnsi, waitForFrames } from './inkTestHelpers.js'
 
 async function renderMainInteractivePrompt(

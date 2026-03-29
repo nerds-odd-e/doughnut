@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Key } from 'ink'
 import { Box, Text, useInput } from 'ink'
-import { interactiveSlashCommands } from './commands/interactiveSlashCommands.js'
-import type { InteractiveSlashCommand } from './commands/interactiveSlashCommand.js'
 import {
   appendUserInputHistoryLine,
   exitHistoryWalkOnDraftEdit,
@@ -10,121 +8,18 @@ import {
   onArrowUp,
   type MainInteractivePromptHistoryState,
 } from './mainInteractivePromptHistory.js'
-
-const DEFAULT_INTERACTIVE_GUIDANCE = '/ commands'
-
-const GUIDANCE_LIST_MAX_VISIBLE = 5
-const COMPLETION_USAGE_PAD = 20
-
-function normalizedInteractiveDraft(draft: string): string {
-  return draft.replace(/\n/g, ' ')
-}
-
-function getSlashTabCompletion(
-  buffer: string,
-  commands: readonly InteractiveSlashCommand[]
-): { completed: string; count: number } {
-  if (!buffer.startsWith('/')) return { completed: buffer, count: 0 }
-  const matches = commands.filter((c) => c.doc.usage.startsWith(buffer))
-  if (matches.length === 0) return { completed: buffer, count: 0 }
-  if (matches.length === 1)
-    return { completed: `${matches[0]!.doc.usage} `, count: 1 }
-  const usages = matches.map((m) => m.doc.usage)
-  let prefix = usages[0]!
-  for (let i = 1; i < usages.length; i++) {
-    while (!usages[i]!.startsWith(prefix) && prefix.length > 0) {
-      prefix = prefix.slice(0, -1)
-    }
-  }
-  if (prefix.length > buffer.length)
-    return { completed: prefix, count: matches.length }
-  return { completed: buffer, count: matches.length }
-}
-
-function filterSlashCommandsByPrefix(
-  commands: readonly InteractiveSlashCommand[],
-  prefix: string
-): InteractiveSlashCommand[] {
-  const searchTerm =
-    prefix.startsWith('/') && prefix.length > 1 ? prefix.slice(1) : prefix
-  if (!searchTerm) return [...commands]
-
-  return [...commands]
-    .filter((c) => c.doc.usage.includes(searchTerm))
-    .sort((a, b) => {
-      const aBegins =
-        a.doc.usage.startsWith(prefix) ||
-        (prefix.startsWith('/') && a.doc.usage.startsWith(`/${searchTerm}`))
-      const bBegins =
-        b.doc.usage.startsWith(prefix) ||
-        (prefix.startsWith('/') && b.doc.usage.startsWith(`/${searchTerm}`))
-      if (aBegins && !bBegins) return -1
-      if (!aBegins && bBegins) return 1
-      return 0
-    })
-}
-
-type SlashGuidanceForInk =
-  | { show: 'hint' }
-  | { show: 'empty' }
-  | {
-      show: 'list'
-      readonly rows: readonly {
-        readonly usage: string
-        readonly description: string
-      }[]
-    }
-
-function slashGuidanceForInk(draft: string): SlashGuidanceForInk {
-  const p = normalizedInteractiveDraft(draft)
-  if (!p.startsWith('/') || p.endsWith(' ')) return { show: 'hint' }
-  const matches = filterSlashCommandsByPrefix(interactiveSlashCommands, p)
-  if (matches.length === 0) return { show: 'empty' }
-  const rows = matches.map((c) => ({
-    usage: c.doc.usage,
-    description: c.doc.description,
-  }))
-  return { show: 'list', rows }
-}
-
-function effectiveSlashGuidance(
-  draft: string,
-  suggestionsDismissed: boolean
-): SlashGuidanceForInk {
-  const g = slashGuidanceForInk(draft)
-  if (suggestionsDismissed && g.show === 'list') return { show: 'hint' }
-  return g
-}
-
-function ttyArrowKeyUsesSlashSuggestionCycle(
-  key: 'up' | 'down',
-  caretOffset: number,
-  lineDraft: string,
-  slashCompletionListVisible: boolean
-): boolean {
-  if (!slashCompletionListVisible) return false
-  if (key === 'up') return caretOffset === 0
-  return caretOffset === lineDraft.length
-}
-
-function visibleListRows(
-  rows: readonly { readonly usage: string; readonly description: string }[],
-  highlightIndex: number
-): { readonly rows: typeof rows; readonly highlightIndex: number } {
-  const max = GUIDANCE_LIST_MAX_VISIBLE
-  if (rows.length <= max) {
-    return { rows, highlightIndex }
-  }
-  const maxStart = Math.max(0, rows.length - max)
-  const start = Math.min(
-    Math.max(0, highlightIndex - Math.floor(max / 2)),
-    maxStart
-  )
-  return {
-    rows: rows.slice(start, start + max),
-    highlightIndex: highlightIndex - start,
-  }
-}
+import {
+  COMPLETION_USAGE_PAD,
+  DEFAULT_INTERACTIVE_GUIDANCE,
+  cycleSlashHighlight,
+  effectiveSlashGuidance,
+  getSlashTabCompletion,
+  isBareDraftSlash,
+  isSlashListArrowKey,
+  normalizeInputForSlash,
+  slashGuidanceForInk,
+  visibleListRows,
+} from './slashCommandCompletion.js'
 
 export function MainInteractivePrompt({
   onCommittedLine,
@@ -154,15 +49,6 @@ export function MainInteractivePrompt({
     [buffer, suggestionsDismissed]
   )
 
-  /**
-   * Input precedence: Tab / Esc / arrows / editing use the same buffer+caret refs.
-   * ↑↓: If walking user input history, history owns ↑↓ (slash list does not steal).
-   * Else if slash completion list is visible and caret is at the list-cycle boundary
-   * (caret 0 for ↑, EOL for ↓), cycle slash highlight.
-   * Else apply history+caret rules from mainInteractivePromptHistory (recall, caret jump).
-   * When a history step changes the draft, reset slash highlight and suggestionsDismissed.
-   * Typing, backspace, delete, Tab, and Esc that clear `/` end the history walk first.
-   */
   const handleInput = useCallback((input: string, key: Key) => {
     const readBuf = () => bufferRef.current
     const readCaret = () => caretRef.current
@@ -223,14 +109,7 @@ export function MainInteractivePrompt({
       syncWalkFrom(next)
       const draftChanged = prev.lineDraft !== next.lineDraft
       if (draftChanged) {
-        suggestionsDismissedRef.current = false
-        setSuggestionsDismissed(false)
-        bufferRef.current = next.lineDraft
-        caretRef.current = next.caretOffset
-        slashHighlightRef.current = 0
-        setBuffer(next.lineDraft)
-        setCaretOffset(next.caretOffset)
-        setSlashHighlightIndex(0)
+        setAll(next.lineDraft, next.caretOffset, 0)
       } else {
         setCaretOnly(next.caretOffset)
       }
@@ -250,26 +129,23 @@ export function MainInteractivePrompt({
       }
     }
 
+    // --- Slash completion: Tab ---
     if (key.tab) {
       endWalkBeforeDraftEdit()
-      const draft = normalizedInteractiveDraft(readBuf())
+      const draft = normalizeInputForSlash(readBuf())
       if (draft.startsWith('/') && !draft.endsWith(' ')) {
-        const { completed } = getSlashTabCompletion(
-          draft,
-          interactiveSlashCommands
-        )
+        const { completed } = getSlashTabCompletion(draft)
         if (completed !== draft) {
-          const c = completed.length
-          setAll(completed, c, 0)
+          setAll(completed, completed.length, 0)
         }
       }
       return
     }
 
+    // --- Slash completion: Esc ---
     if (key.escape) {
       const raw = readBuf()
-      const draft = normalizedInteractiveDraft(raw)
-      if (draft === '/') {
+      if (isBareDraftSlash(raw)) {
         historyWalkIndexRef.current = null
         draftBeforeWalkRef.current = null
         setAll('', 0, 0)
@@ -284,6 +160,7 @@ export function MainInteractivePrompt({
       return
     }
 
+    // --- Caret movement: left, right, home, end ---
     if (key.leftArrow) {
       const c = readCaret()
       if (c > 0) setCaretOnly(c - 1)
@@ -304,30 +181,31 @@ export function MainInteractivePrompt({
       return
     }
 
-    const g = effectiveSlashGuidance(readBuf(), suggestionsDismissedRef.current)
-    const slashRows = g.show === 'list' ? g.rows : []
-    const listVisible = slashRows.length > 0
-
+    // --- ↑↓: slash list cycling vs history walk ---
     if (key.upArrow || key.downArrow) {
       const dir = key.upArrow ? 'up' : 'down'
       const buf = readBuf()
       const caret = readCaret()
+
+      const g = effectiveSlashGuidance(buf, suggestionsDismissedRef.current)
+      const slashRows = g.show === 'list' ? g.rows : []
+      const listVisible = slashRows.length > 0
       const walkingHistory = historyWalkIndexRef.current !== null
+
       if (
         !walkingHistory &&
-        ttyArrowKeyUsesSlashSuggestionCycle(dir, caret, buf, listVisible)
+        isSlashListArrowKey(dir, caret, buf, listVisible)
       ) {
-        const rowCount = slashRows.length
-        const hi = readHighlight()
-        const next =
-          dir === 'down' ? (hi + 1) % rowCount : (hi - 1 + rowCount) % rowCount
-        setHighlightOnly(next)
+        setHighlightOnly(
+          cycleSlashHighlight(dir, readHighlight(), slashRows.length)
+        )
         return
       }
       applyHistoryArrow(dir)
       return
     }
 
+    // --- Editing: backspace, delete ---
     if (key.backspace) {
       endWalkBeforeDraftEdit()
       const buf = readBuf()
@@ -353,6 +231,7 @@ export function MainInteractivePrompt({
       return
     }
 
+    // --- Enter: slash completion pick or commit ---
     if (key.return) {
       const bufForPick = readBuf()
       const gPick = effectiveSlashGuidance(
@@ -372,12 +251,13 @@ export function MainInteractivePrompt({
       return
     }
 
+    // --- Character input (including multi-char paste) ---
     if (input.length > 0) {
       if (!(input.includes('\r') || input.includes('\n'))) {
         endWalkBeforeDraftEdit()
         const buf = readBuf()
         const c = readCaret()
-        const inserted = normalizedInteractiveDraft(input)
+        const inserted = normalizeInputForSlash(input)
         setAll(
           buf.slice(0, c) + inserted + buf.slice(c),
           c + inserted.length,
