@@ -27,23 +27,3 @@ Feature: CLI access token management
       | label           | action                          | removal_type |
       | Remove Me Token | /remove-access-token            | local        |
       | Revoke Me Token | /remove-access-token-completely | complete     |
-
-  @ignore
-  Scenario: Another key cancels remove-access-token selection
-    Given I have a valid Doughnut Access Token with label "E2E CLI Token"
-    When I add the saved access token in the interactive CLI using add-access-token
-    When I enter the slash command "/remove-access-token" in the interactive CLI
-    Then I should see "E2E CLI Token" in the Current guidance
-    When I cancel the token list with q in the interactive CLI
-    Then I should see "/ commands" in the Current guidance
-    When I enter the slash command "/list-access-token" in the interactive CLI
-    Then I should see "E2E CLI Token" in the Current guidance
-
-  @ignore
-  Scenario: Create access token via CLI
-    Given I have a valid Doughnut Access Token with label "Default Token"
-    When I add the saved access token in the interactive CLI using add-access-token
-    When I enter the slash command "/create-access-token New CLI Token" in the interactive CLI
-    Then I should see "Token created" in past CLI assistant messages
-    When I enter the slash command "/list-access-token" in the interactive CLI
-    Then I should see "New CLI Token" in the Current guidance
