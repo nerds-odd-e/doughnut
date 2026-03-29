@@ -105,16 +105,6 @@ export function isSlashListArrowKey(
   return caretOffset === lineDraft.length
 }
 
-export function cycleSlashHighlight(
-  dir: 'up' | 'down',
-  current: number,
-  rowCount: number
-): number {
-  return dir === 'down'
-    ? (current + 1) % rowCount
-    : (current - 1 + rowCount) % rowCount
-}
-
 export function visibleListRows(
   rows: readonly { readonly usage: string; readonly description: string }[],
   highlightIndex: number

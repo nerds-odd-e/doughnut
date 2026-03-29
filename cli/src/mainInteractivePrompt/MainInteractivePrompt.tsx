@@ -14,10 +14,10 @@ import {
   loadUserInputHistory,
   saveUserInputHistory,
 } from './userInputHistoryFile.js'
+import { cycleListSelectionIndex } from '../interactions/selectListInteraction.js'
 import {
   COMPLETION_USAGE_PAD,
   DEFAULT_INTERACTIVE_GUIDANCE,
-  cycleSlashHighlight,
   effectiveSlashGuidance,
   getSlashTabCompletion,
   isBareDraftSlash,
@@ -208,7 +208,11 @@ export function MainInteractivePrompt({
         isSlashListArrowKey(dir, caret, buf, listVisible)
       ) {
         setHighlightOnly(
-          cycleSlashHighlight(dir, readHighlight(), slashRows.length)
+          cycleListSelectionIndex(
+            readHighlight(),
+            dir === 'down' ? 1 : -1,
+            slashRows.length
+          )
         )
         return
       }

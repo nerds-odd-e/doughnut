@@ -185,6 +185,32 @@ describe('MainInteractivePrompt caret and slash arrows (phase 3)', () => {
     )
   })
 
+  test('with list visible and caret at end, second down wraps highlight to first row', async () => {
+    const { stdin, lastFrame } = await renderMainInteractivePrompt()
+
+    stdin.write('/re')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('/remove-access-token')
+    )
+
+    stdin.write('\x1b[B')
+    await waitForFrames(
+      () => lastFrame() ?? '',
+      (raw) =>
+        raw.includes('\x1b[7m') &&
+        raw.includes('Revoke a stored access token on the server')
+    )
+
+    stdin.write('\x1b[B')
+    await waitForFrames(
+      () => lastFrame() ?? '',
+      (raw) =>
+        raw.includes('\x1b[7m') &&
+        raw.includes('Remove a stored access token from local config only')
+    )
+  })
+
   test('with list visible and caret in the middle, first down moves to end then down cycles highlight', async () => {
     const { stdin, lastFrame } = await renderMainInteractivePrompt()
 
