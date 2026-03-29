@@ -61,6 +61,7 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
       () => frames.join('\n'),
       (c) =>
         c.includes('/help') &&
+        c.includes('/add gmail') &&
         c.includes('/exit') &&
         c.includes('update') &&
         c.includes('version') &&

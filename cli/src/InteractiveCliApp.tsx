@@ -1,14 +1,26 @@
 import { useMemo, useState } from 'react'
 import { Box, Text, useApp, useInput } from 'ink'
 import { createInteractiveSlashCommands } from './commands/interactiveSlashCommands.js'
-import type { InteractiveSlashCommand } from './commands/interactiveSlashCommand.js'
+import type {
+  InteractiveSlashCommand,
+  TranscriptMessage,
+} from './commands/interactiveSlashCommand.js'
 import { formatVersionOutput } from './commands/version.js'
 import { useInteractiveCliLineBuffer } from './interactiveCliInput.js'
 import { PastUserMessageBlock } from './pastUserMessageBlock.js'
 
-type TranscriptMessage =
-  | { readonly role: 'assistant'; readonly text: string }
-  | { readonly role: 'user'; readonly text: string }
+function userVisibleSlashCommandError(err: unknown): string {
+  if (
+    (typeof DOMException !== 'undefined' &&
+      err instanceof DOMException &&
+      err.name === 'AbortError') ||
+    (err instanceof Error && err.name === 'AbortError')
+  ) {
+    return 'Cancelled.'
+  }
+  if (err instanceof Error) return err.message
+  return String(err)
+}
 
 export function InteractiveCliApp() {
   const { exit } = useApp()
@@ -27,17 +39,28 @@ export function InteractiveCliApp() {
 
   useInput((input, key) => {
     applyInput(input, key, (line) => {
-      const command = slashByLine.get(line)
-      if (command) {
-        const { assistantMessage } = command.run()
-        setMessages((prev) => [
-          ...prev,
-          { role: 'user', text: line },
-          { role: 'assistant', text: assistantMessage },
-        ])
+      if (line === '') {
         return
       }
-      if (line === '') {
+      const command = slashByLine.get(line)
+      if (command) {
+        setMessages((prev) => [...prev, { role: 'user', text: line }])
+        Promise.resolve(command.run())
+          .then((r) => {
+            setMessages((prev) => [
+              ...prev,
+              { role: 'assistant', text: r.assistantMessage },
+            ])
+          })
+          .catch((err: unknown) => {
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: 'assistant',
+                text: userVisibleSlashCommandError(err),
+              },
+            ])
+          })
         return
       }
       setMessages((prev) => [

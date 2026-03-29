@@ -26,6 +26,10 @@ export interface GmailConfig {
   accounts: GmailAccount[]
 }
 
+export function formatAddedGmailAccountMessage(email: string): string {
+  return `Added account ${email}`
+}
+
 function userAbortError(): DOMException {
   return new DOMException('The operation was aborted', 'AbortError')
 }
@@ -187,7 +191,7 @@ async function getProfileEmail(
 export async function addGmailAccount(
   configPath?: string,
   signal?: AbortSignal
-): Promise<void> {
+): Promise<string> {
   if (signal?.aborted) throw userAbortError()
 
   const config = loadConfig(configPath)
@@ -252,7 +256,7 @@ export async function addGmailAccount(
 
   config.accounts.push(account)
   saveConfig(config, configPath)
-  console.log(`Added account ${email}`)
+  return email
 }
 
 async function refreshAccessToken(

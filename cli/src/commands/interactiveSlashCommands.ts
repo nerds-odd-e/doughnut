@@ -1,3 +1,4 @@
+import { createAddGmailCommand } from './addGmailSlashCommand.js'
 import { createExitCommand } from './exit.js'
 import { createHelpCommand } from './help.js'
 import type { InteractiveSlashCommand } from './interactiveSlashCommand.js'
@@ -7,6 +8,6 @@ export function createInteractiveSlashCommands(
 ): InteractiveSlashCommand[] {
   const commands: InteractiveSlashCommand[] = []
   const helpCmd = createHelpCommand(() => commands.map((c) => c.doc))
-  commands.push(helpCmd, createExitCommand(exitApp))
+  commands.push(helpCmd, createAddGmailCommand(), createExitCommand(exitApp))
   return commands
 }

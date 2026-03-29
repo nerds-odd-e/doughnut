@@ -1,7 +1,6 @@
 Feature: CLI Gmail integration
   As a user, I want to connect my Gmail account and read the last email subject.
 
-  @ignore
   @usingMockedGoogleService
   @withCliGmailOAuthAddConfig
   @interactiveCLIGmailOAuth
