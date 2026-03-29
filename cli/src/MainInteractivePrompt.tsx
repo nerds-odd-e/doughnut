@@ -80,6 +80,15 @@ function slashGuidanceForInk(draft: string): SlashGuidanceForInk {
   return { show: 'list', rows }
 }
 
+function effectiveSlashGuidance(
+  draft: string,
+  suggestionsDismissed: boolean
+): SlashGuidanceForInk {
+  const g = slashGuidanceForInk(draft)
+  if (suggestionsDismissed && g.show === 'list') return { show: 'hint' }
+  return g
+}
+
 function ttyArrowKeyUsesSlashSuggestionCycle(
   key: 'up' | 'down',
   caretOffset: number,
@@ -118,17 +127,22 @@ export function MainInteractivePrompt({
   const [buffer, setBuffer] = useState('')
   const [caretOffset, setCaretOffset] = useState(0)
   const [slashHighlightIndex, setSlashHighlightIndex] = useState(0)
+  const [suggestionsDismissed, setSuggestionsDismissed] = useState(false)
 
   const bufferRef = useRef('')
   const caretRef = useRef(0)
   const slashHighlightRef = useRef(0)
+  const suggestionsDismissedRef = useRef(false)
   const onCommittedLineRef = useRef(onCommittedLine)
 
   useEffect(() => {
     onCommittedLineRef.current = onCommittedLine
   }, [onCommittedLine])
 
-  const guidance = useMemo(() => slashGuidanceForInk(buffer), [buffer])
+  const guidance = useMemo(
+    () => effectiveSlashGuidance(buffer, suggestionsDismissed),
+    [buffer, suggestionsDismissed]
+  )
 
   const handleInput = useCallback((input: string, key: Key) => {
     const readBuf = () => bufferRef.current
@@ -136,6 +150,8 @@ export function MainInteractivePrompt({
     const readHighlight = () => slashHighlightRef.current
 
     const setAll = (nextBuf: string, nextCaret: number, nextHi?: number) => {
+      suggestionsDismissedRef.current = false
+      setSuggestionsDismissed(false)
       const hi = nextHi ?? 0
       bufferRef.current = nextBuf
       caretRef.current = nextCaret
@@ -178,6 +194,22 @@ export function MainInteractivePrompt({
       return
     }
 
+    if (key.escape) {
+      const raw = readBuf()
+      const draft = normalizedInteractiveDraft(raw)
+      if (draft === '/') {
+        setAll('', 0, 0)
+        return
+      }
+      const g = slashGuidanceForInk(raw)
+      if (g.show === 'list') {
+        suggestionsDismissedRef.current = true
+        setSuggestionsDismissed(true)
+        setHighlightOnly(0)
+      }
+      return
+    }
+
     if (key.leftArrow) {
       const c = readCaret()
       if (c > 0) setCaretOnly(c - 1)
@@ -198,7 +230,7 @@ export function MainInteractivePrompt({
       return
     }
 
-    const g = slashGuidanceForInk(readBuf())
+    const g = effectiveSlashGuidance(readBuf(), suggestionsDismissedRef.current)
     const slashRows = g.show === 'list' ? g.rows : []
     const listVisible = slashRows.length > 0
 
@@ -247,7 +279,10 @@ export function MainInteractivePrompt({
 
     if (key.return) {
       const bufForPick = readBuf()
-      const gPick = slashGuidanceForInk(bufForPick)
+      const gPick = effectiveSlashGuidance(
+        bufForPick,
+        suggestionsDismissedRef.current
+      )
       const pickRows = gPick.show === 'list' ? gPick.rows : []
       if (pickRows.length > 0) {
         const hi = readHighlight()

@@ -1,6 +1,6 @@
 # CLI access token management — phased plan
 
-**Scope:** Re-enable the ignored scenarios in `e2e_test/features/cli/cli_access_token.feature`, **one scenario per top-level phase**, with **sub-phases** small enough to commit often, keep **CI green**, and avoid **dead production code**.
+**Scope:** E2E for `e2e_test/features/cli/cli_access_token.feature` — **three scenarios** (add + list, invalid add, remove outline). Phases 4–5 (interactive cancel with `q`, `/create-access-token`) are **out of scope**; scenarios removed from the feature file.
 
 **Planning discipline:** `.cursor/rules/planning.mdc` — scenario-first phases, **observable** E2E at the PTY boundary, **at most one** intentionally failing test while driving a change, phase-complete tests, no dead code justified only by unit tests on happy paths.
 

@@ -1,6 +1,6 @@
 # Revive interactive `/` completion (Tab + ↑↓) — phased plan
 
-**Status:** Phases 1–4 implemented; Phase 5 pending.  
+**Status:** Phases 1–5 implemented.  
 **Scope:** Restore slash-command completion behavior **inside `cli/src/MainInteractivePrompt.tsx` only** (local state, local pure helpers in the same file if needed). **No new E2E.** Cover with **high-level Vitest** using **ink-testing-library + real stdin** (no adapter mocks), same spirit as `cli/tests/InteractiveCliApp.test.tsx` / `renderApp` patterns in `.cursor/rules/cli.mdc`.
 
 **Command inventory:** Derive completion candidates from **`interactiveSlashCommands`** (map each entry’s `line` / `doc` to the same strings the shell actually resolves) so completion cannot drift from runtime behavior.
@@ -89,11 +89,11 @@ Logic was spread across **`interactiveApp.tsx`**, **`ShellSessionRoot`**, **`ren
 
 ---
 
-### Phase 5 — Esc dismiss (lone `/` vs hide list)
+### Phase 5 — Esc dismiss (lone `/` vs hide list) ✅
 
 **Outcome:** **Esc** clears a **bare** `/` draft; otherwise sets **suggestions dismissed** so the list hides but the draft stays. Typing again clears dismissed state (old patch behavior).
 
-**Tests:** Esc on `/` → empty draft; Esc on `/he` with list → list hidden, draft unchanged.
+**Shipped:** `MainInteractivePrompt.tsx` — `suggestionsDismissed` + `effectiveSlashGuidance`; `setAll` clears dismissed on any draft change. **Tests:** `cli/tests/MainInteractivePrompt.test.tsx`.
 
 ---
 

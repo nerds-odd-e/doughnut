@@ -237,3 +237,46 @@ describe('MainInteractivePrompt Enter picks completion (phase 4)', () => {
     expect(onCommittedLine).not.toHaveBeenCalled()
   })
 })
+
+describe('MainInteractivePrompt Esc dismiss (phase 5)', () => {
+  test('Esc on bare / clears the draft', async () => {
+    const { stdin, lastFrame } = await renderMainInteractivePrompt()
+
+    stdin.write('/')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('> /')
+    )
+    stdin.write('\x1b')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => !(f.split('\n')[0] ?? '').includes('/')
+    )
+    const first = (stripAnsi(lastFrame() ?? '').split('\n')[0] ?? '').trimEnd()
+    expect(first).toBe('>')
+  })
+
+  test('Esc on /he with list hides list and keeps draft; typing restores list', async () => {
+    const { stdin, lastFrame } = await renderMainInteractivePrompt()
+
+    stdin.write('/he')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('/help') && f.includes('List available commands')
+    )
+    stdin.write('\x1b')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) =>
+        f.includes('/ commands') &&
+        (f.split('\n')[0] ?? '').trimEnd().endsWith('/he') &&
+        !f.includes('List available commands')
+    )
+
+    stdin.write('l')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('/help') && f.includes('List available commands')
+    )
+  })
+})
