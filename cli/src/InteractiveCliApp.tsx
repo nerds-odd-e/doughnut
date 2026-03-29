@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { Box, Text, useApp } from 'ink'
 import { AddGmailStage } from './AddGmailStage.js'
+import { LastEmailStage } from './LastEmailStage.js'
 import { MainInteractivePrompt } from './MainInteractivePrompt.js'
 import { createInteractiveSlashCommands } from './commands/interactiveSlashCommands.js'
 import type {
@@ -12,8 +13,9 @@ import { PastUserMessageBlock } from './pastUserMessageBlock.js'
 import { userVisibleSlashCommandError } from './userVisibleSlashCommandError.js'
 
 const ADD_GMAIL_LINE = '/add gmail'
+const LAST_EMAIL_LINE = '/last email'
 
-type InteractiveStage = 'main' | 'addGmail'
+type InteractiveStage = 'main' | 'addGmail' | 'lastEmail'
 
 export function InteractiveCliApp() {
   const { exit } = useApp()
@@ -30,7 +32,7 @@ export function InteractiveCliApp() {
   ])
   const [stage, setStage] = useState<InteractiveStage>('main')
 
-  const handleAddGmailSettled = useCallback((assistantText: string) => {
+  const handleAsyncSlashSettled = useCallback((assistantText: string) => {
     setMessages((prev) => [...prev, { role: 'assistant', text: assistantText }])
     setStage('main')
   }, [])
@@ -40,6 +42,11 @@ export function InteractiveCliApp() {
       if (line === ADD_GMAIL_LINE) {
         setMessages((prev) => [...prev, { role: 'user', text: line }])
         setStage('addGmail')
+        return
+      }
+      if (line === LAST_EMAIL_LINE) {
+        setMessages((prev) => [...prev, { role: 'user', text: line }])
+        setStage('lastEmail')
         return
       }
       const command = slashByLine.get(line)
@@ -85,7 +92,10 @@ export function InteractiveCliApp() {
         <MainInteractivePrompt onCommittedLine={onCommittedLine} />
       )}
       {stage === 'addGmail' && (
-        <AddGmailStage onSettled={handleAddGmailSettled} />
+        <AddGmailStage onSettled={handleAsyncSlashSettled} />
+      )}
+      {stage === 'lastEmail' && (
+        <LastEmailStage onSettled={handleAsyncSlashSettled} />
       )}
     </Box>
   )

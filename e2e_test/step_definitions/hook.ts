@@ -6,6 +6,7 @@
 import { After, Before } from '@badeball/cypress-cucumber-preprocessor'
 import {
   GMAIL_E2E_GOOGLE_MOCK_BASE_URL,
+  GMAIL_E2E_MOCK_ACCOUNT_CONFIG,
   GMAIL_E2E_OAUTH_ADD_CONFIG,
 } from '../config/cliGmailE2eConfig'
 import start, { mock_services } from '../start'
@@ -119,6 +120,12 @@ Before({ tags: '@withCliGmailOAuthAddConfig', order: 1 }, () => {
   )
 })
 
+Before({ tags: '@withCliGmailMockAccountConfig', order: 1 }, () => {
+  cy.task('createCliConfigDirWithGmail', GMAIL_E2E_MOCK_ACCOUNT_CONFIG).as(
+    'cliConfigDir'
+  )
+})
+
 Before({ tags: '@interactiveCLI', order: 2 }, () => {
   cy.task('cliInteractivePtyDispose')
   cy.get<string>('@cliConfigDir').then((configDir) =>
@@ -128,7 +135,7 @@ Before({ tags: '@interactiveCLI', order: 2 }, () => {
   )
 })
 
-Before({ tags: '@interactiveCLIGmailOAuth', order: 2 }, () => {
+Before({ tags: '@interactiveCLIGmail', order: 2 }, () => {
   cy.task('cliInteractivePtyDispose')
   cy.get<string>('@cliConfigDir').then((configDir) =>
     cy.task('runRepoCliInteractive', {
@@ -145,6 +152,6 @@ After({ tags: '@interactiveCLI' }, () => {
   cy.task('cliInteractivePtyDispose')
 })
 
-After({ tags: '@interactiveCLIGmailOAuth' }, () => {
+After({ tags: '@interactiveCLIGmail' }, () => {
   cy.task('cliInteractivePtyDispose')
 })

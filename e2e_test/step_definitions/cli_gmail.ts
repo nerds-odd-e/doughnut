@@ -24,3 +24,14 @@ Given(
     })
   }
 )
+
+Given(
+  'the Google API mock returns messages and message {string} with subject {string}',
+  (messageId: string, subject: string) => {
+    const google = mock_services.google()
+    cy.wrap(null).then(async () => {
+      await google.stubGmailMessages([{ id: messageId }])
+      await google.stubGmailMessage(messageId, subject)
+    })
+  }
+)

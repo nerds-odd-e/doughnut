@@ -3,18 +3,17 @@ Feature: CLI Gmail integration
 
   @usingMockedGoogleService
   @withCliGmailOAuthAddConfig
-  @interactiveCLIGmailOAuth
+  @interactiveCLIGmail
   Scenario: add gmail adds account when OAuth callback is simulated
     Given the Google API mock returns tokens and profile for "e2e@gmail.com"
     And the interactive CLI has Google OAuth callback simulation enabled
     When I enter the slash command "/add gmail" in the interactive CLI
     Then I should see "Added account e2e@gmail.com" in past CLI assistant messages
 
-  @ignore
-  @withCliConfig
-  @interactiveCLI
   @usingMockedGoogleService
+  @withCliGmailMockAccountConfig
+  @interactiveCLIGmail
   Scenario: last email shows subject when account is configured
-    Given the Google API mock returns tokens and profile for "e2e@gmail.com"
+    Given the Google API mock returns messages and message "msg-1" with subject "Welcome to Doughnut"
     When I enter the slash command "/last email" in the interactive CLI
     Then I should see "Welcome to Doughnut" in past CLI assistant messages

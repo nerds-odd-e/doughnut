@@ -77,7 +77,7 @@ Informal working plan for bringing back `e2e_test/features/cli/cli_gmail.feature
 
 ### 2.4 — Gate
 
-- Remove **`@ignore`** from scenario 2 when stable; run the same single-feature Cypress command.
+- Remove **`@ignore`** from scenario 2 when stable; run the same single-feature Cypress command. **Complete:** scenario 2 active in **`cli_gmail.feature`**; run `pnpm cypress run --spec e2e_test/features/cli/cli_gmail.feature`.
 
 ---
 

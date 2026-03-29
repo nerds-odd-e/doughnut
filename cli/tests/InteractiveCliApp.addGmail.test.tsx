@@ -148,3 +148,87 @@ describe('InteractiveCliApp /add gmail staging (mocked addGmailAccount)', () => 
     expect(combined.split(successLine).length - 1).toBe(1)
   })
 })
+
+describe('InteractiveCliApp /last email staging (mocked getLastEmailSubject)', () => {
+  afterEach(() => {
+    vi.doUnmock('../src/commands/gmail.js')
+    vi.unstubAllEnvs()
+    vi.resetModules()
+  })
+
+  test('while last email is in flight: shows stage status and hides main command line', async () => {
+    const getLastEmailSubject = vi.fn(
+      () =>
+        new Promise<string>((resolve) => {
+          queueMicrotask(() => {
+            queueMicrotask(() => resolve('Welcome'))
+          })
+        })
+    )
+    vi.doMock('../src/commands/gmail.js', () => ({
+      getLastEmailSubject,
+    }))
+
+    const { stdin, lastFrame } = await renderApp()
+
+    stdin.write('/last email\r')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) =>
+        f.includes('Loading last email') &&
+        f.includes('/last email') &&
+        !f.includes('> ')
+    )
+  })
+
+  test('after last email completes: subject line once and main prompt returns', async () => {
+    const getLastEmailSubject = vi.fn(
+      () =>
+        new Promise<string>((resolve) => {
+          queueMicrotask(() => {
+            queueMicrotask(() => resolve('Welcome to Doughnut'))
+          })
+        })
+    )
+    vi.doMock('../src/commands/gmail.js', () => ({
+      getLastEmailSubject,
+    }))
+
+    const { stdin, frames, lastFrame } = await renderApp()
+
+    stdin.write('/last email\r')
+    const successLine = 'Welcome to Doughnut'
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes(successLine) && f.includes('> ')
+    )
+    const final = stripAnsi(lastFrame() ?? '')
+    expect(final.split(successLine).length - 1).toBe(1)
+    const combined = stripAnsi(frames.join('\n'))
+    expect(combined.split(successLine).length - 1).toBe(1)
+  })
+
+  test('shows no-account error in transcript after /last email', async () => {
+    const getLastEmailSubject = vi.fn(() =>
+      Promise.reject(new Error('No Gmail account configured.'))
+    )
+    vi.doMock('../src/commands/gmail.js', () => ({
+      getLastEmailSubject,
+    }))
+
+    const { stdin, frames, lastFrame } = await renderApp()
+
+    stdin.write('/last email\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        c.includes('/last email') &&
+        c.includes('No Gmail account configured.') &&
+        c.includes('\x1b[100m')
+    )
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('> ')
+    )
+  })
+})
