@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Box, Text, useApp } from 'ink'
 import { AddGmailStage } from './AddGmailStage.js'
 import { LastEmailStage } from './LastEmailStage.js'
@@ -14,14 +14,15 @@ import { userVisibleSlashCommandError } from './userVisibleSlashCommandError.js'
 
 const ADD_GMAIL_LINE = '/add gmail'
 const LAST_EMAIL_LINE = '/last email'
+const EXIT_LINE = '/exit'
 
 type InteractiveStage = 'main' | 'addGmail' | 'lastEmail'
 
 export function InteractiveCliApp() {
   const { exit } = useApp()
   const slashCommands: InteractiveSlashCommand[] = useMemo(
-    () => createInteractiveSlashCommands(exit),
-    [exit]
+    () => createInteractiveSlashCommands(),
+    []
   )
   const slashByLine = useMemo(
     () => new Map(slashCommands.map((c) => [c.line, c])),
@@ -31,6 +32,12 @@ export function InteractiveCliApp() {
     { role: 'assistant', text: formatVersionOutput() },
   ])
   const [stage, setStage] = useState<InteractiveStage>('main')
+  const [exitAfterCommit, setExitAfterCommit] = useState(false)
+
+  useEffect(() => {
+    if (!exitAfterCommit) return
+    exit()
+  }, [exitAfterCommit, exit])
 
   const handleAsyncSlashSettled = useCallback((assistantText: string) => {
     setMessages((prev) => [...prev, { role: 'assistant', text: assistantText }])
@@ -58,6 +65,7 @@ export function InteractiveCliApp() {
               ...prev,
               { role: 'assistant', text: r.assistantMessage },
             ])
+            if (line === EXIT_LINE) setExitAfterCommit(true)
           })
           .catch((err: unknown) => {
             setMessages((prev) => [

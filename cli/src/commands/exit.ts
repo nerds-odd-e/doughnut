@@ -9,18 +9,11 @@ const exitDoc: CommandDoc = {
   description: 'Quit the CLI',
 }
 
-export function createExitCommand(
-  exitApp: () => void
-): InteractiveSlashCommand {
+export function createExitCommand(): InteractiveSlashCommand {
   return {
     line: '/exit',
     doc: exitDoc,
     run() {
-      setImmediate(() => {
-        setImmediate(() => {
-          exitApp()
-        })
-      })
       return { assistantMessage: 'Bye.' }
     },
   }

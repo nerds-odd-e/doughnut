@@ -19,46 +19,27 @@ async function waitForFrames(
   maxTicks = 5000
 ): Promise<void> {
   for (let i = 0; i < maxTicks; i++) {
-    if (predicate(getCombined())) {
-      return
-    }
+    if (predicate(getCombined())) return
     await new Promise<void>((resolve) => {
       setImmediate(resolve)
     })
   }
-  const combined = getCombined()
   throw new Error(
-    `Output condition not met within ${maxTicks} event-loop turns. Last frames:\n${combined}`
+    `Output condition not met within ${maxTicks} event-loop turns. Last frames:\n${getCombined()}`
   )
+}
+
+function waitForLastFrame(
+  lastFrame: () => string | undefined,
+  predicate: (frame: string) => boolean,
+  maxTicks = 5000
+) {
+  return waitForFrames(() => stripAnsi(lastFrame() ?? ''), predicate, maxTicks)
 }
 
 function parseOAuthLocalhostPort(output: string): number | undefined {
   const m = output.match(/redirect_uri=http%3A%2F%2Flocalhost%3A(\d+)/)
   return m ? Number(m[1]) : undefined
-}
-
-function triggerOAuthRedirectCallback(port: number): Promise<void> {
-  return new Promise((resolve, reject) => {
-    http
-      .get(`http://127.0.0.1:${port}/?code=unit-test-auth-code`, (res) => {
-        res.resume()
-        resolve()
-      })
-      .on('error', reject)
-  })
-}
-
-async function waitForOAuthRedirectInLog(
-  getOAuthLog: () => string
-): Promise<void> {
-  await waitForFrames(
-    getOAuthLog,
-    (s) => parseOAuthLocalhostPort(s) !== undefined
-  )
-}
-
-function callbackOAuthFromLog(getOAuthLog: () => string): Promise<void> {
-  return triggerOAuthRedirectCallback(parseOAuthLocalhostPort(getOAuthLog())!)
 }
 
 function stubGmailApiFetchForAddAccount(email: string) {
@@ -124,18 +105,6 @@ function writeLastEmailFixtureGmailConfig(configDir: string): void {
   })
 }
 
-async function waitForTranscriptErrorThenPrompt(
-  getTranscript: () => string,
-  lastFrame: () => string | undefined,
-  transcriptPredicate: (c: string) => boolean
-): Promise<void> {
-  await waitForFrames(getTranscript, transcriptPredicate)
-  await waitForFrames(
-    () => stripAnsi(lastFrame() ?? ''),
-    (f) => f.includes('> ')
-  )
-}
-
 function expectSuccessLineOnceInOutput(
   successLine: string,
   frames: string[],
@@ -146,105 +115,151 @@ function expectSuccessLineOnceInOutput(
   expect(stripAnsi(frames.join('\n')).split(successLine).length - 1).toBe(1)
 }
 
+function createTestConfigDir(): string {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-cli-test-'))
+  vi.stubEnv('DOUGHNUT_CONFIG_DIR', dir)
+  return dir
+}
+
+function cleanupTestEnv(configDir: string) {
+  vi.unstubAllGlobals()
+  vi.unstubAllEnvs()
+  vi.resetModules()
+  fs.rmSync(configDir, { recursive: true, force: true })
+}
+
+function captureOAuthLog() {
+  let tee = ''
+  const origLog = console.log.bind(console)
+  const logSpy = vi
+    .spyOn(console, 'log')
+    .mockImplementation((...args: unknown[]) => {
+      tee += `${args.map(String).join(' ')}\n`
+      origLog(...args)
+    })
+  return {
+    get: () => tee,
+    restore: () => logSpy.mockRestore(),
+  }
+}
+
 async function renderApp() {
   const { InteractiveCliApp } = await import('../src/InteractiveCliApp.js')
   const result = render(<InteractiveCliApp />)
   result.stdin.write('|')
-  await waitForFrames(
-    () => stripAnsi(result.lastFrame() ?? ''),
-    (f) => f.includes('> |')
-  )
+  await waitForLastFrame(result.lastFrame, (f) => f.includes('> |'))
   result.stdin.write('\x7f')
-  await waitForFrames(
-    () => stripAnsi(result.lastFrame() ?? ''),
+  await waitForLastFrame(
+    result.lastFrame,
     (f) => f.includes('> ') && !f.includes('> |')
   )
   return result
 }
 
-describe('InteractiveCliApp /add gmail (real gmail module, missing credentials)', () => {
+function triggerOAuthRedirectCallback(port: number): Promise<void> {
+  return new Promise((resolve, reject) => {
+    http
+      .get(`http://127.0.0.1:${port}/?code=unit-test-auth-code`, (res) => {
+        res.resume()
+        resolve()
+      })
+      .on('error', reject)
+  })
+}
+
+async function completeOAuthFromLog(getOAuthLog: () => string) {
+  await triggerOAuthRedirectCallback(parseOAuthLocalhostPort(getOAuthLog())!)
+}
+
+async function submitAndCompleteOAuth(
+  stdin: { write: (s: string) => void },
+  getOAuthLog: () => string
+) {
+  stdin.write('/add gmail\r')
+  await waitForFrames(
+    getOAuthLog,
+    (s) => parseOAuthLocalhostPort(s) !== undefined
+  )
+  await completeOAuthFromLog(getOAuthLog)
+}
+
+async function submitCommandAndExpectError(
+  stdin: { write: (s: string) => void },
+  frames: string[],
+  lastFrame: () => string | undefined,
+  command: string,
+  errorSnippet: string
+) {
+  stdin.write(`${command}\r`)
+  await waitForFrames(
+    () => frames.join('\n'),
+    (c) =>
+      c.includes(command) && c.includes(errorSnippet) && c.includes('\x1b[100m')
+  )
+  await waitForLastFrame(lastFrame, (f) => f.includes('> '))
+}
+
+describe('InteractiveCliApp /add gmail (missing credentials)', () => {
   let configDir: string
 
   beforeEach(() => {
-    configDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'doughnut-cli-addgmail-isolated-')
-    )
+    configDir = createTestConfigDir()
     vi.stubEnv('GOOGLE_CLIENT_ID', '')
     vi.stubEnv('GOOGLE_CLIENT_SECRET', '')
-    vi.stubEnv('DOUGHNUT_CONFIG_DIR', configDir)
   })
 
-  afterEach(() => {
-    vi.unstubAllEnvs()
-    vi.resetModules()
-    fs.rmSync(configDir, { recursive: true, force: true })
-  })
+  afterEach(() => cleanupTestEnv(configDir))
 
   test('shows missing-credentials error in transcript after /add gmail', async () => {
     const { stdin, frames, lastFrame } = await renderApp()
-
-    stdin.write('/add gmail\r')
-    await waitForTranscriptErrorThenPrompt(
-      () => frames.join('\n'),
+    await submitCommandAndExpectError(
+      stdin,
+      frames,
       lastFrame,
-      (c) =>
-        c.includes('/add gmail') &&
-        c.includes(MISSING_OAUTH_SNIPPET) &&
-        c.includes('\x1b[100m')
+      '/add gmail',
+      MISSING_OAUTH_SNIPPET
     )
     expect(frames.join('\n')).toContain(MISSING_OAUTH_SNIPPET)
   })
 })
 
-describe('InteractiveCliApp /add gmail (real gmail module, mocked HTTP APIs)', () => {
+describe('InteractiveCliApp /add gmail (mocked HTTP APIs)', () => {
   let configDir: string
-  let oauthLogTee: string
-  let logSpy: ReturnType<typeof vi.spyOn>
+  let oauthLog: ReturnType<typeof captureOAuthLog>
 
   beforeEach(() => {
-    oauthLogTee = ''
-    configDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'doughnut-cli-addgmail-oauth-')
-    )
+    configDir = createTestConfigDir()
     vi.stubEnv('GOOGLE_CLIENT_ID', 'unit-test-client-id')
     vi.stubEnv('GOOGLE_CLIENT_SECRET', 'unit-test-client-secret')
-    vi.stubEnv('DOUGHNUT_CONFIG_DIR', configDir)
     vi.stubEnv('DOUGHNUT_NO_BROWSER', '1')
-    const origLog = console.log.bind(console)
-    logSpy = vi
-      .spyOn(console, 'log')
-      .mockImplementation((...args: unknown[]) => {
-        oauthLogTee += `${args.map(String).join(' ')}\n`
-        origLog(...args)
-      })
+    oauthLog = captureOAuthLog()
     stubGmailApiFetchForAddAccount('staged@test.com')
   })
 
   afterEach(() => {
-    logSpy.mockRestore()
-    vi.unstubAllGlobals()
-    vi.unstubAllEnvs()
-    vi.resetModules()
-    fs.rmSync(configDir, { recursive: true, force: true })
+    oauthLog.restore()
+    cleanupTestEnv(configDir)
   })
 
   test('while add gmail is in flight: shows stage status and hides main command line', async () => {
     const { stdin, lastFrame } = await renderApp()
 
     stdin.write('/add gmail\r')
-    await waitForOAuthRedirectInLog(() => oauthLogTee)
     await waitForFrames(
-      () => stripAnsi(lastFrame() ?? ''),
+      oauthLog.get,
+      (s) => parseOAuthLocalhostPort(s) !== undefined
+    )
+    await waitForLastFrame(
+      lastFrame,
       (f) =>
         f.includes('Connecting Gmail') &&
         f.includes('/add gmail') &&
         !f.includes('> ')
     )
-    const port = parseOAuthLocalhostPort(oauthLogTee)
-    expect(port).toBeDefined()
-    await callbackOAuthFromLog(() => oauthLogTee)
-    await waitForFrames(
-      () => stripAnsi(lastFrame() ?? ''),
+    expect(parseOAuthLocalhostPort(oauthLog.get())).toBeDefined()
+    await completeOAuthFromLog(oauthLog.get)
+    await waitForLastFrame(
+      lastFrame,
       (f) => f.includes('Added account staged@test.com') && f.includes('> ')
     )
   })
@@ -253,33 +268,23 @@ describe('InteractiveCliApp /add gmail (real gmail module, mocked HTTP APIs)', (
     const { stdin, frames, lastFrame } = await renderApp()
     const successLine = 'Added account staged@test.com'
 
-    stdin.write('/add gmail\r')
-    await waitForOAuthRedirectInLog(() => oauthLogTee)
-    await callbackOAuthFromLog(() => oauthLogTee)
-    await waitForFrames(
-      () => stripAnsi(lastFrame() ?? ''),
+    await submitAndCompleteOAuth(stdin, oauthLog.get)
+    await waitForLastFrame(
+      lastFrame,
       (f) => f.includes(successLine) && f.includes('> ')
     )
     expectSuccessLineOnceInOutput(successLine, frames, lastFrame)
   })
 })
 
-describe('InteractiveCliApp /last email (real gmail module, mocked HTTP APIs)', () => {
+describe('InteractiveCliApp /last email (mocked HTTP APIs)', () => {
   let configDir: string
 
   beforeEach(() => {
-    configDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'doughnut-cli-lastemail-')
-    )
-    vi.stubEnv('DOUGHNUT_CONFIG_DIR', configDir)
+    configDir = createTestConfigDir()
   })
 
-  afterEach(() => {
-    vi.unstubAllGlobals()
-    vi.unstubAllEnvs()
-    vi.resetModules()
-    fs.rmSync(configDir, { recursive: true, force: true })
-  })
+  afterEach(() => cleanupTestEnv(configDir))
 
   test('while last email is in flight: shows stage status and hides main command line', async () => {
     writeLastEmailFixtureGmailConfig(configDir)
@@ -288,7 +293,7 @@ describe('InteractiveCliApp /last email (real gmail module, mocked HTTP APIs)', 
       vi.fn(
         () =>
           new Promise<Response>(() => {
-            /* never resolves — in-flight fetch */
+            /* never resolves — in-flight UI */
           })
       )
     )
@@ -296,8 +301,8 @@ describe('InteractiveCliApp /last email (real gmail module, mocked HTTP APIs)', 
     const { stdin, lastFrame, unmount } = await renderApp()
 
     stdin.write('/last email\r')
-    await waitForFrames(
-      () => stripAnsi(lastFrame() ?? ''),
+    await waitForLastFrame(
+      lastFrame,
       (f) =>
         f.includes('Loading last email') &&
         f.includes('/last email') &&
@@ -331,8 +336,8 @@ describe('InteractiveCliApp /last email (real gmail module, mocked HTTP APIs)', 
     const successLine = 'Welcome to Doughnut'
 
     stdin.write('/last email\r')
-    await waitForFrames(
-      () => stripAnsi(lastFrame() ?? ''),
+    await waitForLastFrame(
+      lastFrame,
       (f) => f.includes(successLine) && f.includes('> ')
     )
     expectSuccessLineOnceInOutput(successLine, frames, lastFrame)
@@ -342,15 +347,12 @@ describe('InteractiveCliApp /last email (real gmail module, mocked HTTP APIs)', 
     writeGmailConfig(configDir, { accounts: [] })
 
     const { stdin, frames, lastFrame } = await renderApp()
-
-    stdin.write('/last email\r')
-    await waitForTranscriptErrorThenPrompt(
-      () => frames.join('\n'),
+    await submitCommandAndExpectError(
+      stdin,
+      frames,
       lastFrame,
-      (c) =>
-        c.includes('/last email') &&
-        c.includes('No Gmail account configured.') &&
-        c.includes('\x1b[100m')
+      '/last email',
+      'No Gmail account configured.'
     )
   })
 })
