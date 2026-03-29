@@ -7,6 +7,7 @@ Feature: CLI Gmail integration
   @interactiveCLIGmailOAuth
   Scenario: add gmail adds account when OAuth callback is simulated
     Given the Google API mock returns tokens and profile for "e2e@gmail.com"
+    And the interactive CLI has Google OAuth callback simulation enabled
     When I enter the slash command "/add gmail" in the interactive CLI
     Then I should see "Added account e2e@gmail.com" in past CLI assistant messages
 
