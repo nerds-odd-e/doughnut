@@ -1,27 +1,14 @@
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import { render } from 'ink-testing-library'
 import { UserController } from 'doughnut-api'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { formatVersionOutput } from '../src/commands/version.js'
-import { stripAnsi, waitForFrames } from './inkTestHelpers.js'
-
-async function renderApp() {
-  const result = render(<InteractiveCliApp />)
-  result.stdin.write('|')
-  await waitForFrames(
-    () => stripAnsi(result.lastFrame() ?? ''),
-    (f) => f.includes('> |')
-  )
-  result.stdin.write('\x7f')
-  await waitForFrames(
-    () => stripAnsi(result.lastFrame() ?? ''),
-    (f) => f.includes('> ') && !f.includes('> |')
-  )
-  return result
-}
+import {
+  renderInkWhenCommandLineReady,
+  waitForFrames,
+} from './inkTestHelpers.js'
 
 describe('InteractiveCliApp /add-access-token', () => {
   let configDir: string
@@ -54,7 +41,9 @@ describe('InteractiveCliApp /add-access-token', () => {
   })
 
   test('valid token line shows success and persists access-tokens.json', async () => {
-    const { stdin, frames } = await renderApp()
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
     expect(frames.join('\n')).toContain(formatVersionOutput())
 
     stdin.write('/add-access-token unit-test-token-value\r')
@@ -74,7 +63,9 @@ describe('InteractiveCliApp /add-access-token', () => {
   })
 
   test('bare /add-access-token shows usage hint', async () => {
-    const { stdin, frames } = await renderApp()
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
 
     stdin.write('/add-access-token\r')
     await waitForFrames(
@@ -88,7 +79,9 @@ describe('InteractiveCliApp /add-access-token', () => {
 
   test('invalid token shows assistant error and does not write access-tokens.json', async () => {
     getTokenInfoSpy.mockRejectedValue({ status: 401 })
-    const { stdin, frames } = await renderApp()
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
 
     stdin.write('/add-access-token bad-token\r')
     await waitForFrames(
@@ -102,7 +95,9 @@ describe('InteractiveCliApp /add-access-token', () => {
   })
 
   test('/list-access-token Esc closes picker with abort line (no list dump)', async () => {
-    const { stdin, frames } = await renderApp()
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
 
     stdin.write('/add-access-token unit-test-token-value\r')
     await waitForFrames(
@@ -142,7 +137,9 @@ describe('InteractiveCliApp /add-access-token', () => {
       'utf-8'
     )
 
-    const { stdin, frames } = await renderApp()
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
 
     stdin.write('/list-access-token\r')
     await waitForFrames(
@@ -169,7 +166,9 @@ describe('InteractiveCliApp /add-access-token', () => {
   })
 
   test('/list-access-token with no tokens commits assistant line without Escape', async () => {
-    const { stdin, frames } = await renderApp()
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
 
     stdin.write('/list-access-token\r')
     await waitForFrames(
@@ -195,7 +194,9 @@ describe('InteractiveCliApp /add-access-token', () => {
       'utf-8'
     )
 
-    const { stdin, frames } = await renderApp()
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
 
     stdin.write('/remove-access-token\r')
     await waitForFrames(
@@ -239,7 +240,9 @@ describe('InteractiveCliApp /add-access-token', () => {
       'utf-8'
     )
 
-    const { stdin, frames } = await renderApp()
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
 
     stdin.write('/remove-access-token-completely\r')
     await waitForFrames(
@@ -270,7 +273,9 @@ describe('InteractiveCliApp /add-access-token', () => {
   })
 
   test('/remove-access-token removes stored label and list is empty in transcript', async () => {
-    const { stdin, frames } = await renderApp()
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
 
     stdin.write('/add-access-token unit-test-token-value\r')
     await waitForFrames(
@@ -298,7 +303,9 @@ describe('InteractiveCliApp /add-access-token', () => {
   })
 
   test('/remove-access-token-completely revokes then clears config', async () => {
-    const { stdin, frames } = await renderApp()
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
 
     stdin.write('/add-access-token unit-test-token-value\r')
     await waitForFrames(

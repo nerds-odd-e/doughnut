@@ -2,7 +2,11 @@ import { render } from 'ink-testing-library'
 import { describe, expect, test } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { formatVersionOutput } from '../src/commands/version.js'
-import { stripAnsi, waitForFrames } from './inkTestHelpers.js'
+import {
+  renderInkWhenCommandLineReady,
+  stripAnsi,
+  waitForFrames,
+} from './inkTestHelpers.js'
 
 /** True when a frame shows the /exit farewell and then paints another empty REPL line (`> `). */
 function farewellFollowedByCommandPrompt(ansiStrippedFrame: string): boolean {
@@ -14,26 +18,6 @@ function farewellFollowedByCommandPrompt(ansiStrippedFrame: string): boolean {
   return /\n\s*>\s/.test(after)
 }
 
-/** Render the app and confirm end-to-end input handling is active before returning. */
-async function renderApp() {
-  const result = render(<InteractiveCliApp />)
-  // React 19 registers useInput's listeners via useEffect in deferred phases.
-  // Probe: write a character and wait for it to appear (confirms both the raw-mode
-  // 'readable' listener and the 'input' event-emitter listener are fully active),
-  // then delete it to restore the initial empty-buffer state.
-  result.stdin.write('|')
-  await waitForFrames(
-    () => stripAnsi(result.lastFrame() ?? ''),
-    (f) => f.includes('> |')
-  )
-  result.stdin.write('\x7f') // DEL — removes the probe character
-  await waitForFrames(
-    () => stripAnsi(result.lastFrame() ?? ''),
-    (f) => f.includes('> ') && !f.includes('> |')
-  )
-  return result
-}
-
 describe('InteractiveCliApp (ink-testing-library)', () => {
   test('shows version in the first frame', () => {
     const { lastFrame } = render(<InteractiveCliApp />)
@@ -41,7 +25,9 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
   })
 
   test('empty committed line leaves transcript unchanged; later line still commits', async () => {
-    const { stdin, frames } = await renderApp()
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
     const before = frames.join('\n')
     expect(before).toContain(formatVersionOutput())
     expect(before).not.toContain('Not supported')
@@ -60,7 +46,9 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
   })
 
   test('/help records user line and assistant help listing', async () => {
-    const { stdin, frames } = await renderApp()
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
 
     stdin.write('/help\r')
     await waitForFrames(
@@ -85,7 +73,9 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
   })
 
   test('plain committed line records user message and Not supported', async () => {
-    const { stdin, frames } = await renderApp()
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
 
     stdin.write('hello\r')
     await waitForFrames(
@@ -103,7 +93,9 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
   })
 
   test('submitting /exit as one chunk line+CR records it in output', async () => {
-    const { lastFrame, stdin, frames } = await renderApp()
+    const { lastFrame, stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
     expect(lastFrame()).toContain(formatVersionOutput())
 
     stdin.write('/exit\r')
@@ -138,7 +130,9 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
   })
 
   test('after /exit, TTY must not repaint the empty command line below Bye.', async () => {
-    const { stdin, frames } = await renderApp()
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
 
     stdin.write('/exit\r')
     await waitForFrames(
@@ -168,7 +162,9 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
   })
 
   test('submitting /exit character by character records it in output', async () => {
-    const { lastFrame, stdin, frames } = await renderApp()
+    const { lastFrame, stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
     expect(lastFrame()).toContain(formatVersionOutput())
 
     let expectedBuffer = ''

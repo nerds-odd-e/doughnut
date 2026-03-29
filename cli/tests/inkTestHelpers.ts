@@ -1,3 +1,6 @@
+import { render } from 'ink-testing-library'
+import type { ReactElement } from 'react'
+
 export function stripAnsi(s: string): string {
   const esc = String.fromCharCode(0x1b)
   return s.replace(new RegExp(`${esc}\\[[0-9;?]*[a-zA-Z]`, 'g'), '')
@@ -29,4 +32,20 @@ export function waitForLastFrame(
   maxTicks = 5000
 ): Promise<void> {
   return waitForFrames(() => stripAnsi(lastFrame() ?? ''), predicate, maxTicks)
+}
+
+/**
+ * `useInput` attaches after `useEffect`; writing to stdin immediately after `render()` can race.
+ * Probe with a character, wait until it appears on the command line, then delete it.
+ */
+export async function renderInkWhenCommandLineReady(element: ReactElement) {
+  const result = render(element)
+  result.stdin.write('|')
+  await waitForLastFrame(result.lastFrame, (f) => f.includes('> |'))
+  result.stdin.write('\x7f')
+  await waitForLastFrame(
+    result.lastFrame,
+    (f) => f.includes('> ') && !f.includes('> |')
+  )
+  return result
 }

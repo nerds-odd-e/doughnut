@@ -1,27 +1,15 @@
 import * as fs from 'node:fs'
 import * as http from 'node:http'
 import type * as net from 'node:net'
-import { render } from 'ink-testing-library'
 import { describe, expect, test } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { formatVersionOutput } from '../src/commands/version.js'
-import { stripAnsi, waitForFrames } from './inkTestHelpers.js'
+import {
+  renderInkWhenCommandLineReady,
+  stripAnsi,
+  waitForFrames,
+} from './inkTestHelpers.js'
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
-
-async function renderApp() {
-  const result = render(<InteractiveCliApp />)
-  result.stdin.write('|')
-  await waitForFrames(
-    () => stripAnsi(result.lastFrame() ?? ''),
-    (f) => f.includes('> |')
-  )
-  result.stdin.write('\x7f')
-  await waitForFrames(
-    () => stripAnsi(result.lastFrame() ?? ''),
-    (f) => f.includes('> ') && !f.includes('> |')
-  )
-  return result
-}
 
 type StubOpts = {
   readonly memoryTrackerJson: Record<string, unknown>
@@ -132,7 +120,9 @@ describe('recall just-review (interactive)', () => {
         }),
       },
       async () => {
-        const { stdin, frames } = await renderApp()
+        const { stdin, frames } = await renderInkWhenCommandLineReady(
+          <InteractiveCliApp />
+        )
         expect(stripAnsi(frames.join('\n'))).toContain(formatVersionOutput())
 
         stdin.write('/recall\r')
@@ -188,7 +178,9 @@ describe('recall just-review (interactive)', () => {
         }),
       },
       async () => {
-        const { stdin, frames } = await renderApp()
+        const { stdin, frames } = await renderInkWhenCommandLineReady(
+          <InteractiveCliApp />
+        )
         stdin.write('/recall\r')
         await waitForFrames(
           () => frames.join('\n'),

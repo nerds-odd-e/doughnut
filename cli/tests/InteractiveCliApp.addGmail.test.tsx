@@ -2,9 +2,13 @@ import * as fs from 'node:fs'
 import * as http from 'node:http'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import { render } from 'ink-testing-library'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
-import { stripAnsi, waitForFrames, waitForLastFrame } from './inkTestHelpers.js'
+import {
+  renderInkWhenCommandLineReady,
+  stripAnsi,
+  waitForFrames,
+  waitForLastFrame,
+} from './inkTestHelpers.js'
 
 const MISSING_OAUTH_SNIPPET =
   'Missing OAuth credentials. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET'
@@ -117,15 +121,7 @@ function captureOAuthLog() {
 
 async function renderApp() {
   const { InteractiveCliApp } = await import('../src/InteractiveCliApp.js')
-  const result = render(<InteractiveCliApp />)
-  result.stdin.write('|')
-  await waitForLastFrame(result.lastFrame, (f) => f.includes('> |'))
-  result.stdin.write('\x7f')
-  await waitForLastFrame(
-    result.lastFrame,
-    (f) => f.includes('> ') && !f.includes('> |')
-  )
-  return result
+  return renderInkWhenCommandLineReady(<InteractiveCliApp />)
 }
 
 function triggerOAuthRedirectCallback(port: number): Promise<void> {
