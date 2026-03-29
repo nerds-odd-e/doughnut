@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Box, Text, useApp, useInput } from 'ink'
-import { formatInteractiveHelp } from './commands/help.js'
+import { helpInteractiveSlashCommand } from './commands/help.js'
+import { createExitCommand } from './commands/exit.js'
+import type { InteractiveSlashCommand } from './commands/interactiveSlashCommand.js'
 import { formatVersionOutput } from './commands/version.js'
 import { useInteractiveCliLineBuffer } from './interactiveCliInput.js'
 import { PastUserMessageBlock } from './pastUserMessageBlock.js'
@@ -11,6 +13,14 @@ type TranscriptMessage =
 
 export function InteractiveCliApp() {
   const { exit } = useApp()
+  const slashCommands: InteractiveSlashCommand[] = useMemo(
+    () => [helpInteractiveSlashCommand, createExitCommand(exit)],
+    [exit]
+  )
+  const slashByLine = useMemo(
+    () => new Map(slashCommands.map((c) => [c.line, c])),
+    [slashCommands]
+  )
   const [messages, setMessages] = useState<TranscriptMessage[]>([
     { role: 'assistant', text: formatVersionOutput() },
   ])
@@ -18,22 +28,13 @@ export function InteractiveCliApp() {
 
   useInput((input, key) => {
     applyInput(input, key, (line) => {
-      if (line === '/exit') {
+      const command = slashByLine.get(line)
+      if (command) {
+        const { assistantMessage } = command.run()
         setMessages((prev) => [
           ...prev,
           { role: 'user', text: line },
-          { role: 'assistant', text: 'Bye.' },
-        ])
-        setTimeout(() => {
-          exit()
-        }, 0)
-        return
-      }
-      if (line === '/help') {
-        setMessages((prev) => [
-          ...prev,
-          { role: 'user', text: line },
-          { role: 'assistant', text: formatInteractiveHelp() },
+          { role: 'assistant', text: assistantMessage },
         ])
         return
       }

@@ -1,3 +1,4 @@
+import type { InteractiveSlashCommand } from './interactiveSlashCommand.js'
 import { updateDoc } from './update.js'
 import { versionDoc } from './version.js'
 
@@ -41,4 +42,11 @@ export function formatInteractiveHelp(): string {
     '',
     formatSection('Interactive commands (in prompt)', interactiveDocs),
   ].join('\n')
+}
+
+export const helpInteractiveSlashCommand: InteractiveSlashCommand = {
+  line: '/help',
+  run() {
+    return { assistantMessage: formatInteractiveHelp() }
+  },
 }
