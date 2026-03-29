@@ -4,7 +4,7 @@ import {
   type RequestOptions,
 } from 'doughnut-api'
 import {
-  getDefaultTokenLabel,
+  defaultAccessTokenLabel,
   loadAccessTokenConfig,
 } from './accessTokenStorage.js'
 
@@ -202,8 +202,11 @@ export async function runWithDefaultBackendClient<T>(
   fn: () => Promise<T>
 ): Promise<T> {
   const config = loadAccessTokenConfig()
-  const label = getDefaultTokenLabel()
-  const entry = config.tokens.find((t) => t.label === label)
+  const label = defaultAccessTokenLabel(config)
+  const entry =
+    label === undefined
+      ? undefined
+      : config.tokens.find((t) => t.label === label)
   if (!entry) {
     throw new Error(
       authenticatedBackendCallFailureAdvice.noDefaultTokenInConfig
