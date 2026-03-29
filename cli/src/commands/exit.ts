@@ -7,7 +7,6 @@ const exitDoc: CommandDoc = {
   name: '/exit',
   usage: '/exit',
   description: 'Quit the CLI',
-  category: 'interactive',
 }
 
 export function createExitCommand(

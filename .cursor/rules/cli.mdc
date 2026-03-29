@@ -20,6 +20,10 @@ cli/
   package.json
 ```
 
+## TypeScript module exports
+
+Keep each module’s **public surface small**: `export` only what other modules actually use. Prefer leaving helpers, constants, and types **unexported** when they are implementation details. Do not add exports “for tests” or “maybe later” — if only tests need a symbol, test through a higher-level entry point when possible (see **Vitest: observable behavior** below). Avoid widening the export list when a single import site could instead live next to the code.
+
 ## Commands
 
 | Task | Command |

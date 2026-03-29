@@ -74,5 +74,4 @@ export const updateDoc = {
   name: 'update',
   usage: 'update',
   description: 'Update CLI to latest version',
-  category: 'subcommand' as const,
 }

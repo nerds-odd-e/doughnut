@@ -26,5 +26,4 @@ export const versionDoc = {
   name: 'version',
   usage: 'version | --version | -v',
   description: 'Show CLI version',
-  category: 'subcommand' as const,
 }

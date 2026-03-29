@@ -6,7 +6,6 @@ export interface CommandDoc {
   readonly name: string
   readonly usage: string
   readonly description: string
-  readonly category: 'subcommand' | 'interactive'
 }
 
 export interface InteractiveSlashCommand {
