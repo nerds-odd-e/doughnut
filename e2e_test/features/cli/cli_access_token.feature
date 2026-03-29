@@ -8,8 +8,8 @@ Feature: CLI access token management
   Scenario: Add access token and list it
     Given I have a valid Doughnut Access Token with label "E2E CLI Token"
     When I add the saved access token in the interactive CLI using add-access-token
-    #Then I enter the slash command "/list-access-token" in the interactive CLI
-    #And I should see "E2E CLI Token" in the Current guidance
+    Then I enter the slash command "/list-access-token" in the interactive CLI
+    And I should see "E2E CLI Token" in the Current guidance
 
   @ignore
   Scenario: Add invalid access token

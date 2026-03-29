@@ -291,3 +291,7 @@ export function getDefaultTokenLabel(): AccessTokenLabel | undefined {
   }
   return config.tokens[0]!.label
 }
+
+export function getStoredAccessTokenLabels(): string[] {
+  return loadConfig().tokens.map((t) => t.label)
+}

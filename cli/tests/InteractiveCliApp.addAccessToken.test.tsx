@@ -98,4 +98,22 @@ describe('InteractiveCliApp /add-access-token', () => {
     )
     expect(getTokenInfoSpy).not.toHaveBeenCalled()
   })
+
+  test('/list-access-token shows numbered labels in Current guidance', async () => {
+    const { stdin, frames } = await renderApp()
+
+    stdin.write('/add-access-token unit-test-token-value\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => c.includes('Token added successfully')
+    )
+
+    stdin.write('/list-access-token\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        c.includes('Stored access tokens:') &&
+        c.includes('1. Vitest token label')
+    )
+  })
 })

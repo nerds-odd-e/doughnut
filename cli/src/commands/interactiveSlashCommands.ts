@@ -4,10 +4,12 @@ import { exitSlashCommand } from './exit.js'
 import { helpSlashCommand } from './help.js'
 import type { InteractiveSlashCommand } from './interactiveSlashCommand.js'
 import { lastEmailSlashCommand } from './lastEmailSlashCommand.js'
+import { listAccessTokenSlashCommand } from './listAccessTokenSlashCommand.js'
 
 export const interactiveSlashCommands: readonly InteractiveSlashCommand[] = [
   helpSlashCommand,
   addAccessTokenSlashCommand,
+  listAccessTokenSlashCommand,
   addGmailSlashCommand,
   lastEmailSlashCommand,
   exitSlashCommand,

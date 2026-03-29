@@ -92,6 +92,7 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
       (c) =>
         c.includes('/help') &&
         c.includes('/add-access-token') &&
+        c.includes('/list-access-token') &&
         c.includes('/add gmail') &&
         c.includes('/exit') &&
         c.includes('update') &&

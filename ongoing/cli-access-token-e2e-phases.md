@@ -82,12 +82,12 @@ The following **`main`** commits removed or hollowed out access-token behavior d
 - **Feature:** scenario 1 tagged `@cliAccessTokenP1` (still `@ignore` for default CI). **Local run:** `pnpm exec cypress run --config-file e2e_test/config/ci.ts --spec e2e_test/features/cli/cli_access_token.feature --env TAGS='@cliAccessTokenP1'` (SUT up). **Expected until 1b:** fails with missing `"E2E CLI Token"` in guidance (currently `Not supported` for slash commands).
 - **Mid-step assertion:** the add-access-token step asserts **`Token added successfully`** in past CLI assistant messages (after the PTY line is sent).
 
-### 1b — Product: `/add-access-token` + `/list-access-token` (minimal)
+### 1b — Product: `/add-access-token` + `/list-access-token` (**done**)
 
 - **Persistence:** write `access-tokens.json` (historical shape). **`addAccessToken`:** validate with backend, then append `{ label, token }`.
 - **Interactive UX:** On success, append assistant message **`Token added successfully`** (must match the step assertion).
-- **`/list-access-token`:** Show stored tokens in **Current guidance** (numbered list consistent with other list UIs; **column-aware** wrapping per cli.mdc). Label text must include the stored label e.g. `E2E CLI Token`. Default marker (e.g. `★`) optional in this phase if not asserted.
-- **Stage:** Prefer a **small** dedicated Ink stage or composed component for the list — self-contained, no parent leakage (roadmap §4.2). Do **not** revive the old `accessTokenListStage` shape blindly; match **behavior** first.
+- **`/list-access-token`:** Show stored tokens in **Current guidance** (numbered list; **`string-width`** + grapheme wrap in `cli/src/terminalColumns.ts`). **`InteractiveCliApp`** renders default **`/ commands`** and slash results’ optional **`currentGuidance`** on lines **below** the `> ` prompt so E2E `extractCurrentGuidanceFromReplayedPlaintext` sees them. Empty list: assistant **`No access tokens stored.`**, guidance reset to default.
+- **Stage:** List is synchronous (no separate Ink stage) — enough for this scenario; dedicated selection stage remains for later remove/cancel phases.
 
 ### 1c — Close phase
 

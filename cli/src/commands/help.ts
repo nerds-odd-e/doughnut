@@ -1,6 +1,7 @@
 import { addAccessTokenSlashCommand } from './addAccessTokenSlashCommand.js'
 import { addGmailSlashCommand } from './addGmailSlashCommand.js'
 import { exitSlashCommand } from './exit.js'
+import { listAccessTokenSlashCommand } from './listAccessTokenSlashCommand.js'
 import type {
   CommandDoc,
   InteractiveSlashCommand,
@@ -46,6 +47,7 @@ export const helpSlashCommand: InteractiveSlashCommand = {
       assistantMessage: formatInteractiveHelp([
         helpDoc,
         addAccessTokenSlashCommand.doc,
+        listAccessTokenSlashCommand.doc,
         addGmailSlashCommand.doc,
         lastEmailSlashCommand.doc,
         exitSlashCommand.doc,

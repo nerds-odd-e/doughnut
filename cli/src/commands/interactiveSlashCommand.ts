@@ -10,6 +10,8 @@ export type TranscriptMessage =
 
 export type InteractiveSlashCommandResult = {
   assistantMessage: string
+  /** When set, replaces the Current guidance region (below the `> ` line). */
+  currentGuidance?: string
 }
 
 export interface CommandDoc {
