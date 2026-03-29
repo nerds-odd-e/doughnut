@@ -32,7 +32,7 @@ export function singleLineCommandDraft(s: string): string {
   return s.replace(/\r\n|\r|\n/g, ' ')
 }
 
-export type MainInteractivePromptHistoryState = {
+export type PromptHistoryState = {
   lineDraft: string
   caretOffset: number
   userInputHistoryLines: string[]
@@ -40,7 +40,7 @@ export type MainInteractivePromptHistoryState = {
   lineDraftBeforeUserInputHistoryWalk: string | null
 }
 
-export function emptyMainInteractivePromptHistoryState(): MainInteractivePromptHistoryState {
+export function emptyPromptHistoryState(): PromptHistoryState {
   return {
     lineDraft: '',
     caretOffset: 0,
@@ -65,7 +65,7 @@ export function appendUserInputHistoryLine(
 }
 
 function endUserInputHistoryWalk(): Pick<
-  MainInteractivePromptHistoryState,
+  PromptHistoryState,
   'userInputHistoryWalkIndex' | 'lineDraftBeforeUserInputHistoryWalk'
 > {
   return {
@@ -76,15 +76,13 @@ function endUserInputHistoryWalk(): Pick<
 
 /** End history walk before mutating the draft so edits apply to a normal line. */
 export function exitHistoryWalkOnDraftEdit(
-  state: MainInteractivePromptHistoryState
-): MainInteractivePromptHistoryState {
+  state: PromptHistoryState
+): PromptHistoryState {
   if (state.userInputHistoryWalkIndex === null) return state
   return { ...state, ...endUserInputHistoryWalk() }
 }
 
-export function onArrowUp(
-  state: MainInteractivePromptHistoryState
-): MainInteractivePromptHistoryState {
+export function onArrowUp(state: PromptHistoryState): PromptHistoryState {
   const {
     lineDraft,
     caretOffset,
@@ -116,9 +114,7 @@ export function onArrowUp(
   }
 }
 
-export function onArrowDown(
-  state: MainInteractivePromptHistoryState
-): MainInteractivePromptHistoryState {
+export function onArrowDown(state: PromptHistoryState): PromptHistoryState {
   const {
     lineDraft,
     caretOffset,

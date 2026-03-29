@@ -2,13 +2,13 @@ import { describe, expect, test } from 'vitest'
 import {
   MAX_USER_INPUT_HISTORY_LINES,
   appendUserInputHistoryLine,
-  emptyMainInteractivePromptHistoryState,
+  emptyPromptHistoryState,
   exitHistoryWalkOnDraftEdit,
   maskInteractiveInputLineForStorage,
   onArrowDown,
   onArrowUp,
   singleLineCommandDraft,
-} from '../src/mainInteractivePrompt/mainInteractivePromptHistory.js'
+} from '../src/mainInteractivePrompt/history.js'
 
 describe('maskInteractiveInputLineForStorage', () => {
   test('redacts trailing secret after /add-access-token', () => {
@@ -43,7 +43,7 @@ describe('history append uses mask: recalled line is redacted', () => {
     )
     expect(lines[0]).toBe('/add-access-token <redacted>')
     const s = {
-      ...emptyMainInteractivePromptHistoryState(),
+      ...emptyPromptHistoryState(),
       lineDraft: '',
       caretOffset: 0,
       userInputHistoryLines: lines,
@@ -92,7 +92,7 @@ describe('appendUserInputHistoryLine', () => {
 describe('onArrowUp / onArrowDown (history + caret, no slash list)', () => {
   test('with empty history: up moves caret to 0 when caret > 0', () => {
     const s = {
-      ...emptyMainInteractivePromptHistoryState(),
+      ...emptyPromptHistoryState(),
       lineDraft: 'abc',
       caretOffset: 2,
     }
@@ -101,7 +101,7 @@ describe('onArrowUp / onArrowDown (history + caret, no slash list)', () => {
 
   test('with empty history: up is no-op at caret 0', () => {
     const s = {
-      ...emptyMainInteractivePromptHistoryState(),
+      ...emptyPromptHistoryState(),
       lineDraft: 'x',
       caretOffset: 0,
     }
@@ -110,7 +110,7 @@ describe('onArrowUp / onArrowDown (history + caret, no slash list)', () => {
 
   test('with empty history: down moves caret to EOL when before end', () => {
     const s = {
-      ...emptyMainInteractivePromptHistoryState(),
+      ...emptyPromptHistoryState(),
       lineDraft: 'abc',
       caretOffset: 1,
     }
@@ -119,7 +119,7 @@ describe('onArrowUp / onArrowDown (history + caret, no slash list)', () => {
 
   test('with empty history: down is no-op at EOL', () => {
     const s = {
-      ...emptyMainInteractivePromptHistoryState(),
+      ...emptyPromptHistoryState(),
       lineDraft: 'ab',
       caretOffset: 2,
     }
@@ -127,8 +127,8 @@ describe('onArrowUp / onArrowDown (history + caret, no slash list)', () => {
   })
 
   test('starts walk at newest line when caret at 0 and history non-empty', () => {
-    const s: ReturnType<typeof emptyMainInteractivePromptHistoryState> = {
-      ...emptyMainInteractivePromptHistoryState(),
+    const s: ReturnType<typeof emptyPromptHistoryState> = {
+      ...emptyPromptHistoryState(),
       lineDraft: 'typing',
       caretOffset: 0,
       userInputHistoryLines: ['newest', 'older'],
@@ -143,8 +143,8 @@ describe('onArrowUp / onArrowDown (history + caret, no slash list)', () => {
   })
 
   test('walks to older entries on repeated up', () => {
-    let s: ReturnType<typeof emptyMainInteractivePromptHistoryState> = {
-      ...emptyMainInteractivePromptHistoryState(),
+    let s: ReturnType<typeof emptyPromptHistoryState> = {
+      ...emptyPromptHistoryState(),
       lineDraft: '',
       caretOffset: 0,
       userInputHistoryLines: ['a', 'b', 'c'],
@@ -163,8 +163,8 @@ describe('onArrowUp / onArrowDown (history + caret, no slash list)', () => {
   })
 
   test('down from oldest walks forward; down from newest restores pre-walk draft', () => {
-    let s: ReturnType<typeof emptyMainInteractivePromptHistoryState> = {
-      ...emptyMainInteractivePromptHistoryState(),
+    let s: ReturnType<typeof emptyPromptHistoryState> = {
+      ...emptyPromptHistoryState(),
       lineDraft: 'c',
       caretOffset: 0,
       userInputHistoryLines: ['a', 'b', 'c'],
@@ -187,8 +187,8 @@ describe('onArrowUp / onArrowDown (history + caret, no slash list)', () => {
   })
 
   test('down from newest with null saved draft restores empty string', () => {
-    const s: ReturnType<typeof emptyMainInteractivePromptHistoryState> = {
-      ...emptyMainInteractivePromptHistoryState(),
+    const s: ReturnType<typeof emptyPromptHistoryState> = {
+      ...emptyPromptHistoryState(),
       lineDraft: 'only',
       caretOffset: 0,
       userInputHistoryLines: ['only'],
@@ -204,8 +204,8 @@ describe('onArrowUp / onArrowDown (history + caret, no slash list)', () => {
 
 describe('exitHistoryWalkOnDraftEdit', () => {
   test('clears walk fields when walking, keeps draft and caret', () => {
-    const s: ReturnType<typeof emptyMainInteractivePromptHistoryState> = {
-      ...emptyMainInteractivePromptHistoryState(),
+    const s: ReturnType<typeof emptyPromptHistoryState> = {
+      ...emptyPromptHistoryState(),
       lineDraft: 'from history',
       caretOffset: 3,
       userInputHistoryLines: ['from history'],
@@ -221,7 +221,7 @@ describe('exitHistoryWalkOnDraftEdit', () => {
 
   test('is identity when not walking', () => {
     const s = {
-      ...emptyMainInteractivePromptHistoryState(),
+      ...emptyPromptHistoryState(),
       lineDraft: 'x',
       caretOffset: 1,
     }

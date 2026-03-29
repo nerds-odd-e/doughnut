@@ -7,8 +7,8 @@ import {
   maskInteractiveInputLineForStorage,
   onArrowDown,
   onArrowUp,
-  type MainInteractivePromptHistoryState,
-} from './mainInteractivePromptHistory.js'
+  type PromptHistoryState,
+} from './history.js'
 import {
   COMPLETION_USAGE_PAD,
   DEFAULT_INTERACTIVE_GUIDANCE,
@@ -55,7 +55,7 @@ export function MainInteractivePrompt({
     const readCaret = () => caretRef.current
     const readHighlight = () => slashHighlightRef.current
 
-    const historyState = (): MainInteractivePromptHistoryState => ({
+    const historyState = (): PromptHistoryState => ({
       lineDraft: readBuf(),
       caretOffset: readCaret(),
       userInputHistoryLines: historyLinesRef.current,
@@ -63,7 +63,7 @@ export function MainInteractivePrompt({
       lineDraftBeforeUserInputHistoryWalk: draftBeforeWalkRef.current,
     })
 
-    const syncWalkFrom = (s: MainInteractivePromptHistoryState) => {
+    const syncWalkFrom = (s: PromptHistoryState) => {
       historyWalkIndexRef.current = s.userInputHistoryWalkIndex
       draftBeforeWalkRef.current = s.lineDraftBeforeUserInputHistoryWalk
     }

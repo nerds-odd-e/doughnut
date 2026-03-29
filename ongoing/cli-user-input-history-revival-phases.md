@@ -7,7 +7,7 @@
 | Module | Responsibility |
 |--------|----------------|
 | **`slashCommandCompletion.ts`** | Slash guidance rows, tab completion, list visibility, **`isSlashListArrowKey`** (↑ at caret 0 / ↓ at EOL when list visible). |
-| **`mainInteractivePromptHistory.ts`** | **All user input history domain** — pure draft/caret/history walk (`onArrowUp` / `onArrowDown`, `appendUserInputHistoryLine`, `exitHistoryWalkOnDraftEdit`, `maskInteractiveInputLineForStorage`, …). **Phase 4 work** (load/save file helpers) stays in this module or a **sibling `*.ts` under the same folder** if splitting improves clarity; do **not** push history rules into `slashCommandCompletion.ts` or grow ad hoc logic in the component. |
+| **`history.ts`** | **All user input history domain** — pure draft/caret/history walk (`onArrowUp` / `onArrowDown`, `appendUserInputHistoryLine`, `exitHistoryWalkOnDraftEdit`, `maskInteractiveInputLineForStorage`, …). **Phase 4 work** (load/save file helpers) stays in this module or a **sibling `*.ts` under the same folder** if splitting improves clarity; do **not** push history rules into `slashCommandCompletion.ts` or grow ad hoc logic in the component. |
 
 **Public import:** `InteractiveCliApp` (and tests) use **`./mainInteractivePrompt/index.js`** → **`MainInteractivePrompt`**.
 
@@ -18,7 +18,7 @@
 - `cli/src/mainInteractivePrompt/index.ts` — re-export `MainInteractivePrompt`
 - `cli/src/mainInteractivePrompt/MainInteractivePrompt.tsx` — component + input precedence (slash vs history vs editing)
 - `cli/src/mainInteractivePrompt/slashCommandCompletion.ts` — slash completion UI helpers
-- `cli/src/mainInteractivePrompt/mainInteractivePromptHistory.ts` — user input history pure model
+- `cli/src/mainInteractivePrompt/history.ts` — user input history pure model
 
 No revival of the old `ShellSessionRoot` / `liveColumnInk` architecture.
 
@@ -59,7 +59,7 @@ Relevant removals (≈ Mar 28, 2026):
 
 1. **Walking history:** History owns ↑↓; slash list does not steal keys.
 2. **Else — slash suggestion list:** When the filtered list is visible, **↑** at **caret 0** and **↓** at **caret at EOL** cycle highlight (**`isSlashListArrowKey`** in **`slashCommandCompletion.ts`**).
-3. **Else:** **`mainInteractivePromptHistory`** rules — recall, caret jump, walk up/down.
+3. **Else:** **`history`** module rules — recall, caret jump, walk up/down.
 
 When a history step **changes the draft**, reset **`slashHighlightIndex`** and **`suggestionsDismissed`**. With list visible and caret at **0**, **↑** still cycles completions first — recall history only when that branch does not apply (e.g. list dismissed, or walking history).
 
@@ -67,7 +67,7 @@ When a history step **changes the draft**, reset **`slashHighlightIndex`** and *
 
 ## Phase 1 — Pure history model + unit tests (no UI) — **done**
 
-**Outcome:** **`cli/src/mainInteractivePrompt/mainInteractivePromptHistory.ts`** — `singleLineCommandDraft`, `appendUserInputHistoryLine` (+ max 100), `onArrowUp` / `onArrowDown`, `exitHistoryWalkOnDraftEdit`, types.
+**Outcome:** **`cli/src/mainInteractivePrompt/history.ts`** — `singleLineCommandDraft`, `appendUserInputHistoryLine` (+ max 100), `onArrowUp` / `onArrowDown`, `exitHistoryWalkOnDraftEdit`, types.
 
 **Tests:** **`cli/tests/mainInteractivePromptHistory.test.ts`**.
 
@@ -83,7 +83,7 @@ When a history step **changes the draft**, reset **`slashHighlightIndex`** and *
 
 ## Phase 3 — Secret masking for stored/recalled lines — **done**
 
-**Outcome:** **`maskInteractiveInputLineForStorage`** in **`mainInteractivePromptHistory.ts`** (same behavior as deleted **`inputHistoryMask.ts`**). **`MainInteractivePrompt`** passes masked lines into **`appendUserInputHistoryLine`** only (past user transcript unchanged).
+**Outcome:** **`maskInteractiveInputLineForStorage`** in **`history.ts`** (same behavior as deleted **`inputHistoryMask.ts`**). **`MainInteractivePrompt`** passes masked lines into **`appendUserInputHistoryLine`** only (past user transcript unchanged).
 
 **Tests:** **`cli/tests/mainInteractivePromptHistory.test.ts`** — mask cases + append + **`onArrowUp`** recall shows redacted form.
 
@@ -103,7 +103,7 @@ When a history step **changes the draft**, reset **`slashHighlightIndex`** and *
 
 ## Phase 5 — Cleanup and documentation touchpoints
 
-**Outcome:** Update **`.cursor/rules/cli.mdc`** “User input history” row: paths **`mainInteractivePrompt/mainInteractivePromptHistory.ts`** (and persistence file module if added), not deleted `interactiveCommandInput.ts`. Remove obsolete notes from this **`ongoing/`** file when the feature is done (per project doc rules).
+**Outcome:** Update **`.cursor/rules/cli.mdc`** “User input history” row: paths **`mainInteractivePrompt/history.ts`** (and persistence file module if added), not deleted `interactiveCommandInput.ts`. Remove obsolete notes from this **`ongoing/`** file when the feature is done (per project doc rules).
 
 **Exit:** No dead code; plan archived or deleted.
 
