@@ -4,6 +4,7 @@ import { Box, Text, useInput } from 'ink'
 import {
   appendUserInputHistoryLine,
   exitHistoryWalkOnDraftEdit,
+  maskInteractiveInputLineForStorage,
   onArrowDown,
   onArrowUp,
   type MainInteractivePromptHistoryState,
@@ -119,7 +120,7 @@ export function MainInteractivePrompt({
       const line = readBuf()
       historyLinesRef.current = appendUserInputHistoryLine(
         historyLinesRef.current,
-        line
+        maskInteractiveInputLineForStorage(line)
       )
       historyWalkIndexRef.current = null
       draftBeforeWalkRef.current = null
@@ -274,7 +275,7 @@ export function MainInteractivePrompt({
           const line = curBuf
           historyLinesRef.current = appendUserInputHistoryLine(
             historyLinesRef.current,
-            line
+            maskInteractiveInputLineForStorage(line)
           )
           historyWalkIndexRef.current = null
           draftBeforeWalkRef.current = null
@@ -289,7 +290,7 @@ export function MainInteractivePrompt({
           const line = curBuf
           historyLinesRef.current = appendUserInputHistoryLine(
             historyLinesRef.current,
-            line
+            maskInteractiveInputLineForStorage(line)
           )
           historyWalkIndexRef.current = null
           draftBeforeWalkRef.current = null

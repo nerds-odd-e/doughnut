@@ -4,10 +4,56 @@ import {
   appendUserInputHistoryLine,
   emptyMainInteractivePromptHistoryState,
   exitHistoryWalkOnDraftEdit,
+  maskInteractiveInputLineForStorage,
   onArrowDown,
   onArrowUp,
   singleLineCommandDraft,
 } from '../src/mainInteractivePrompt/mainInteractivePromptHistory.js'
+
+describe('maskInteractiveInputLineForStorage', () => {
+  test('redacts trailing secret after /add-access-token', () => {
+    expect(
+      maskInteractiveInputLineForStorage('/add-access-token my-secret-token')
+    ).toBe('/add-access-token <redacted>')
+  })
+
+  test('command match is case-insensitive', () => {
+    expect(maskInteractiveInputLineForStorage('/Add-Access-Token  abc  ')).toBe(
+      '/add-access-token <redacted>'
+    )
+  })
+
+  test('leaves line unchanged when argument is only whitespace', () => {
+    expect(maskInteractiveInputLineForStorage('/add-access-token   ')).toBe(
+      '/add-access-token   '
+    )
+  })
+
+  test('leaves other slash commands unchanged', () => {
+    expect(maskInteractiveInputLineForStorage('/exit')).toBe('/exit')
+  })
+})
+
+describe('history append uses mask: recalled line is redacted', () => {
+  test('append masked storage then ↑ shows redacted form, not raw secret', () => {
+    const raw = '/add-access-token super-secret-value'
+    const lines = appendUserInputHistoryLine(
+      [],
+      maskInteractiveInputLineForStorage(raw)
+    )
+    expect(lines[0]).toBe('/add-access-token <redacted>')
+    const s = {
+      ...emptyMainInteractivePromptHistoryState(),
+      lineDraft: '',
+      caretOffset: 0,
+      userInputHistoryLines: lines,
+    }
+    expect(onArrowUp(s)).toMatchObject({
+      lineDraft: '/add-access-token <redacted>',
+      userInputHistoryWalkIndex: 0,
+    })
+  })
+})
 
 describe('singleLineCommandDraft', () => {
   test('collapses CR, LF, and CRLF to spaces', () => {

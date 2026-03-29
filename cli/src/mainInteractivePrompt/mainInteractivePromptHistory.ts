@@ -3,6 +3,29 @@
  * Single-line draft only; used by MainInteractivePrompt in this folder.
  */
 
+const ADD_ACCESS_TOKEN = '/add-access-token'
+
+/** Match `/add-access-token` + whitespace + non-empty argument (case-insensitive on the command). */
+const ADD_ACCESS_TOKEN_WITH_SECRET = /^\/add-access-token\s+(.+)$/i
+
+/**
+ * Display-safe line before it is stored in user input history (phase 4: same for disk).
+ * Unchanged lines are returned as-is (including original whitespace shape per segment).
+ */
+export function maskInteractiveInputLineForStorage(line: string): string {
+  const segments = line.split('\n')
+  let changed = false
+  const out = segments.map((segment) => {
+    const t = segment.trim()
+    if (t.length === 0) return segment
+    const m = t.match(ADD_ACCESS_TOKEN_WITH_SECRET)
+    if (!m || m[1]!.trim().length === 0) return segment
+    changed = true
+    return `${ADD_ACCESS_TOKEN} <redacted>`
+  })
+  return changed ? out.join('\n') : line
+}
+
 export const MAX_USER_INPUT_HISTORY_LINES = 100
 
 export function singleLineCommandDraft(s: string): string {

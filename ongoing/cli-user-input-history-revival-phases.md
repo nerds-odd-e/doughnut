@@ -1,10 +1,26 @@
 # CLI user input history (↑↓) — phased revival
 
-**Scope:** Bring back **command-line** user input history (recall committed lines with ↑↓, single-line draft, optional disk persistence). **Constraint:** Behavior and state live in **`cli/src/MainInteractivePrompt.tsx`** and, only where it keeps cohesion, **small colocated helpers in the same file** or **existing shared modules** already used for config/history files (`configDir`, `userInputHistoryFile`). No revival of the old `ShellSessionRoot` / `liveColumnInk` architecture.
+**Status:** Phases **1–3** are implemented under **`cli/src/mainInteractivePrompt/`**. Phases **4–5** remain. This note is planning only for what is left; it does not trigger implementation by itself.
 
-**Tests:** No new E2E. **High-level unit tests without mocks** — prefer pure **state → state** tests for history logic and/or **`ink-testing-library`** + real stdin driving **`MainInteractivePrompt`**, asserting `lastFrame()` (see `.cursor/rules/cli.mdc` / `inkTestHelpers.ts`). For persistence, point **`DOUGHNUT_CONFIG_DIR`** at a real temp directory (real `fs`, not spies).
+**Scope:** Command-line user input history (recall committed lines with ↑↓, single-line draft, optional disk persistence). **Layout:** Interactive prompt code lives in the folder **`cli/src/mainInteractivePrompt/`** (not a single top-level `MainInteractivePrompt.tsx`). **`MainInteractivePrompt.tsx`** orchestrates Ink + `useInput` and composes:
 
-**Do not execute this plan in this task** — planning only.
+| Module | Responsibility |
+|--------|----------------|
+| **`slashCommandCompletion.ts`** | Slash guidance rows, tab completion, list visibility, **`isSlashListArrowKey`** (↑ at caret 0 / ↓ at EOL when list visible). |
+| **`mainInteractivePromptHistory.ts`** | **All user input history domain** — pure draft/caret/history walk (`onArrowUp` / `onArrowDown`, `appendUserInputHistoryLine`, `exitHistoryWalkOnDraftEdit`, `maskInteractiveInputLineForStorage`, …). **Phase 4 work** (load/save file helpers) stays in this module or a **sibling `*.ts` under the same folder** if splitting improves clarity; do **not** push history rules into `slashCommandCompletion.ts` or grow ad hoc logic in the component. |
+
+**Public import:** `InteractiveCliApp` (and tests) use **`./mainInteractivePrompt/index.js`** → **`MainInteractivePrompt`**.
+
+**Tests:** No new E2E. **High-level unit tests without mocks** — pure **state → state** tests in **`cli/tests/mainInteractivePromptHistory.test.ts`**; **`ink-testing-library`** + stdin in **`cli/tests/MainInteractivePrompt.test.tsx`**. For persistence (phase 4), **`DOUGHNUT_CONFIG_DIR`** on a real temp directory (real `fs`, not spies).
+
+**Repository layout (refactor `4e79ade61`):**
+
+- `cli/src/mainInteractivePrompt/index.ts` — re-export `MainInteractivePrompt`
+- `cli/src/mainInteractivePrompt/MainInteractivePrompt.tsx` — component + input precedence (slash vs history vs editing)
+- `cli/src/mainInteractivePrompt/slashCommandCompletion.ts` — slash completion UI helpers
+- `cli/src/mainInteractivePrompt/mainInteractivePromptHistory.ts` — user input history pure model
+
+No revival of the old `ShellSessionRoot` / `liveColumnInk` architecture.
 
 ---
 
@@ -37,59 +53,45 @@ Relevant removals (≈ Mar 28, 2026):
 
 - **`PatchedTextInput` + `patchedTextInputKey`:** Passed **↑↓ through** as **unhandled** so the parent could run history + slash logic.
 
-### Current `MainInteractivePrompt` interaction
+### Current `MainInteractivePrompt` interaction (implemented)
 
-↑↓ are already used for:
+↑↓ precedence in **`MainInteractivePrompt.tsx`** (see comment above `handleInput`):
 
-1. **Slash suggestion list:** When the filtered list is visible, **↑** at **caret 0** and **↓** at **caret at EOL** cycle **`slashHighlightIndex`** (`ttyArrowKeyUsesSlashSuggestionCycle`).
-2. **Else:** **↑** → caret to **0**; **↓** → caret to **EOL** (no history today).
+1. **Walking history:** History owns ↑↓; slash list does not steal keys.
+2. **Else — slash suggestion list:** When the filtered list is visible, **↑** at **caret 0** and **↓** at **caret at EOL** cycle highlight (**`isSlashListArrowKey`** in **`slashCommandCompletion.ts`**).
+3. **Else:** **`mainInteractivePromptHistory`** rules — recall, caret jump, walk up/down.
 
-**Revival must define precedence:** When both **slash list** and **history** could apply, **keep existing slash behavior first** (caret at boundary + list visible → cycle suggestions). When that branch does **not** apply, apply the **history** rules above. When **walking history**, slash list rules should likely **not** steal ↑↓ (draft changes with walk; align with old “reset highlight when draft changes”).
-
----
-
-## Phase 1 — Pure history model + unit tests (no UI)
-
-**Outcome:** A **testable, dependency-free** module (recommended: **`cli/src/mainInteractivePromptHistory.ts`** imported only from **`MainInteractivePrompt.tsx`**, or private functions at bottom of that file if you want zero new files) that reimplements the **documented** behavior of:
-
-- `singleLineCommandDraft`
-- `appendUserInputHistoryLine` (+ max 100)
-- `onArrowUp` / `onArrowDown` for **history walk + caret** only (no slash list)
-
-**Tests:** Black-box **state in → state out** (no mocks). Cover: empty history, walk up/down through multiple lines, restore draft on down from newest, caret-only moves when not walking, typing clears walk (via a small `exitHistoryWalkIfEditing` or equivalent used when applying edits).
-
-**Exit:** All new tests green; **not** wired to Ink yet.
+When a history step **changes the draft**, reset **`slashHighlightIndex`** and **`suggestionsDismissed`**. With list visible and caret at **0**, **↑** still cycles completions first — recall history only when that branch does not apply (e.g. list dismissed, or walking history).
 
 ---
 
-## Phase 2 — Wire walk + append-only history into `MainInteractivePrompt`
+## Phase 1 — Pure history model + unit tests (no UI) — **done**
 
-**Outcome:**
+**Outcome:** **`cli/src/mainInteractivePrompt/mainInteractivePromptHistory.ts`** — `singleLineCommandDraft`, `appendUserInputHistoryLine` (+ max 100), `onArrowUp` / `onArrowDown`, `exitHistoryWalkOnDraftEdit`, types.
 
-- Component holds **`historyLines`** (newest first), **`historyWalkIndex`**, **`draftBeforeWalk`** alongside existing buffer/caret/slash state.
-- **Commit path:** When a line is committed (Enter), **append** masked line (see Phase 3 — can stub mask as identity in Phase 2 if you strictly TDD one failing test first).
-- **↑↓ handler:** After evaluating **slash suggestion** branch (`ttyArrowKeyUsesSlashSuggestionCycle`), call history reducers when appropriate. When history changes the draft, reset **`slashHighlightIndex`** and **`suggestionsDismissed`** like the old shell did.
-- **Typing / backspace / delete / Tab / Esc:** End history walk when the user mutates the draft (equivalent to old `stateForTypingEdit`); Esc behavior for lone `/` stays as today.
-
-**Tests:** **`ink-testing-library`** + stdin: type commands, Enter, then ↑ to see previous line in frame; ↓ to restore; no mocked `OutputAdapter`. Use **`waitForFrames` / `waitForLastFrame`** from **`cli/tests/inkTestHelpers.ts`**.
-
-**Exit:** Interactive tests green; slash completion + history coexist per precedence above.
+**Tests:** **`cli/tests/mainInteractivePromptHistory.test.ts`**.
 
 ---
 
-## Phase 3 — Secret masking for stored/recalled lines
+## Phase 2 — Wire walk + append-only history into `MainInteractivePrompt` — **done**
 
-**Outcome:** Restore **`maskInteractiveInputLineForStorage`** (same behavior as deleted **`inputHistoryMask.ts`**: redact **`/add-access-token`** trailing secret). Apply **only** when appending to **history** (and when persisting to disk), not necessarily when painting **past user** transcript — **`InteractiveCliApp`** already stores user lines; align product decision in implementation (minimal change: mask at history append only matches old `rememberCommittedLine`).
+**Outcome:** **`MainInteractivePrompt.tsx`** holds **`historyLinesRef`**, **`historyWalkIndexRef`**, **`draftBeforeWalkRef`**; commit path appends via **`appendUserInputHistoryLine(maskInteractiveInputLineForStorage(line))`**; ↑↓ after **`isSlashListArrowKey`** delegates to history reducers; draft-changing history steps reset slash highlight + suggestions; Tab / edit / Esc clear walk as specified.
 
-**Tests:** Pure test: append line with fake token → recalled history shows redacted form (same string as old `inputHistoryMask` behavior). No mocks.
+**Tests:** **`cli/tests/MainInteractivePrompt.test.tsx`** (`user input history (↑↓ recall)`).
 
-**Exit:** Masking tests + Phase 2 tests still green.
+---
+
+## Phase 3 — Secret masking for stored/recalled lines — **done**
+
+**Outcome:** **`maskInteractiveInputLineForStorage`** in **`mainInteractivePromptHistory.ts`** (same behavior as deleted **`inputHistoryMask.ts`**). **`MainInteractivePrompt`** passes masked lines into **`appendUserInputHistoryLine`** only (past user transcript unchanged).
+
+**Tests:** **`cli/tests/mainInteractivePromptHistory.test.ts`** — mask cases + append + **`onArrowUp`** recall shows redacted form.
 
 ---
 
 ## Phase 4 — Load/save `user-input-history.json`
 
-**Outcome:** On **mount** of **`MainInteractivePrompt`** (or one-shot init in parent — prefer **single home** in **`MainInteractivePrompt`** to respect the constraint), **`loadUserInputHistory(getConfigDir())`**. After each append, **`saveUserInputHistory(getConfigDir(), lines)`**.
+**Outcome:** On **mount** of **`MainInteractivePrompt`** (or one-shot init — prefer **single home** in the component, **file I/O + path helpers colocated under `mainInteractivePrompt/`** with history), **`loadUserInputHistory(getConfigDir())`**. After each append, **`saveUserInputHistory(getConfigDir(), lines)`**.
 
 **Policy:** Replace removed **`shouldRecordCommittedLineInUserInputHistory`** with something explicit: e.g. always save **unless** `process.env.DOUGHNUT_CLI_DISABLE_INPUT_HISTORY === '1'` for CI isolation — only if needed; otherwise temp config dir in tests is enough.
 
@@ -101,7 +103,7 @@ Relevant removals (≈ Mar 28, 2026):
 
 ## Phase 5 — Cleanup and documentation touchpoints
 
-**Outcome:** Update **`.cursor/rules/cli.mdc`** “User input history” row if file paths or focus rules change. Remove obsolete notes from this **`ongoing/`** file when the feature is done (per project doc rules).
+**Outcome:** Update **`.cursor/rules/cli.mdc`** “User input history” row: paths **`mainInteractivePrompt/mainInteractivePromptHistory.ts`** (and persistence file module if added), not deleted `interactiveCommandInput.ts`. Remove obsolete notes from this **`ongoing/`** file when the feature is done (per project doc rules).
 
 **Exit:** No dead code; plan archived or deleted.
 
@@ -109,5 +111,5 @@ Relevant removals (≈ Mar 28, 2026):
 
 ## Risk / design notes
 
-- **Precedence bugs** are the main regression risk: document the decision tree in a short comment block above **`handleInput`** in **`MainInteractivePrompt.tsx`** (current state only, no history essay).
-- **Stage overlay:** When **`activeStageComponent`** is mounted, **`MainInteractivePrompt`** unmounts — history state will reset unless lifted to **`InteractiveCliApp`**. For strict “only **`MainInteractivePrompt.tsx`**” wording, accept **in-memory reset during stages** or later lift **only refs** — call out in Phase 2 if product requires history across stages (old shell kept one `commandInput` for the whole session).
+- **Precedence bugs** are the main regression risk: decision tree lives in a short comment above **`handleInput`** in **`MainInteractivePrompt.tsx`**; keep it in sync when slash or history modules change.
+- **Stage overlay:** When **`activeStageComponent`** is mounted, **`MainInteractivePrompt`** unmounts — history state will reset unless lifted to **`InteractiveCliApp`**. Accept **in-memory reset during stages** or later lift **only refs** if product requires history across stages (old shell kept one `commandInput` for the whole session).
