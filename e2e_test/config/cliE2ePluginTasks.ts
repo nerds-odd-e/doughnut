@@ -6,6 +6,7 @@ import type { IPty } from '@lydell/node-pty'
 import { existsSync, mkdtempSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
+import { attachGoogleOAuthSimulation } from './cliE2eGoogleOAuthSimulation'
 import {
   bundleCliE2eInstall,
   CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH,
@@ -30,24 +31,6 @@ type RunRepoCliInteractiveTask = WithOptionalCliEnv
 
 type CliInteractiveWriteLineTask = {
   line: string
-}
-
-type OAuthSimulationState = { done: boolean }
-
-/** When PTY stdout contains a Google OAuth URL, hit the redirect_uri with a mock code (E2E only). */
-function notifyOAuthSimulationIfNeeded(
-  fullStdout: string,
-  state: OAuthSimulationState
-): void {
-  if (state.done) return
-  const authMatch = fullStdout.match(/https:\/\/accounts\.google\.com\/[^\s]+/)
-  if (!authMatch) return
-  const redirectUri = new URL(authMatch[0]).searchParams.get('redirect_uri')
-  if (!redirectUri) return
-  state.done = true
-  fetch(`${redirectUri}?code=e2e_mock_auth_code`).catch(() => {
-    /* ignore OAuth callback errors */
-  })
 }
 
 const INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING = 'doughnut 0.1.0'
@@ -264,13 +247,6 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       })
       return null
     },
-    /**
-     * Registers a second `onData` handler that completes Google OAuth by `fetch`ing the redirect with a mock code.
-     *
-     * **Call at most once per PTY / per scenario** (after `runRepoCliInteractive` or `runInstalledCliInteractive`,
-     * before steps that print the OAuth URL). Calling this task again on the same live session stacks listeners
-     * and can fire duplicate callbacks; there is no unsubscribe. The PTY teardown (`cliInteractivePtyDispose`) drops the process.
-     */
     cliInteractivePtyEnableGoogleOAuthSimulation() {
       const session = interactiveCliPtySession
       if (!session) {
@@ -278,10 +254,7 @@ export function createCliE2ePluginTasks(repoRoot: string) {
           'cliInteractivePtyEnableGoogleOAuthSimulation: no active interactive CLI PTY. Start the session first (e.g. runRepoCliInteractive).'
         )
       }
-      const oauthState: OAuthSimulationState = { done: false }
-      session.pty.onData(() => {
-        notifyOAuthSimulationIfNeeded(session.buf.text, oauthState)
-      })
+      attachGoogleOAuthSimulation(session)
       return null
     },
     cliInteractivePtyDispose() {
