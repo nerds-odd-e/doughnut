@@ -1,11 +1,7 @@
 import { render } from 'ink-testing-library'
 import { describe, expect, test } from 'vitest'
 import { PastUserMessageBlock } from '../src/pastUserMessageBlock.js'
-
-function stripAnsi(s: string): string {
-  const esc = String.fromCharCode(0x1b)
-  return s.replace(new RegExp(`${esc}\\[[0-9;?]*[a-zA-Z]`, 'g'), '')
-}
+import { stripAnsi } from './inkTestHelpers.js'
 
 describe('PastUserMessageBlock', () => {
   test('gray background (100m), blank padded row above and below the text', () => {

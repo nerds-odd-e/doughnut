@@ -8,22 +8,7 @@ import {
   formatNumberedListForTerminal,
   resolvedTerminalWidth,
 } from '../src/terminalColumns.js'
-
-async function waitForFrames(
-  getCombined: () => string,
-  predicate: (combined: string) => boolean,
-  maxTicks = 5000
-): Promise<void> {
-  for (let i = 0; i < maxTicks; i++) {
-    if (predicate(getCombined())) return
-    await new Promise<void>((resolve) => {
-      setImmediate(resolve)
-    })
-  }
-  throw new Error(
-    `Output condition not met within ${maxTicks} event-loop turns. Last frames:\n${getCombined()}`
-  )
-}
+import { waitForFrames } from './inkTestHelpers.js'
 
 describe('ListAccessTokenStage', () => {
   let configDir: string

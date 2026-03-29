@@ -6,27 +6,7 @@ import { UserController } from 'doughnut-api'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { formatVersionOutput } from '../src/commands/version.js'
-
-function stripAnsi(s: string): string {
-  const esc = String.fromCharCode(0x1b)
-  return s.replace(new RegExp(`${esc}\\[[0-9;?]*[a-zA-Z]`, 'g'), '')
-}
-
-async function waitForFrames(
-  getCombined: () => string,
-  predicate: (combined: string) => boolean,
-  maxTicks = 5000
-): Promise<void> {
-  for (let i = 0; i < maxTicks; i++) {
-    if (predicate(getCombined())) return
-    await new Promise<void>((resolve) => {
-      setImmediate(resolve)
-    })
-  }
-  throw new Error(
-    `Output condition not met within ${maxTicks} event-loop turns. Last frames:\n${getCombined()}`
-  )
-}
+import { stripAnsi, waitForFrames } from './inkTestHelpers.js'
 
 async function renderApp() {
   const result = render(<InteractiveCliApp />)

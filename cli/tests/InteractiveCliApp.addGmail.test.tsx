@@ -4,38 +4,10 @@ import * as os from 'node:os'
 import * as path from 'node:path'
 import { render } from 'ink-testing-library'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import { stripAnsi, waitForFrames, waitForLastFrame } from './inkTestHelpers.js'
 
 const MISSING_OAUTH_SNIPPET =
   'Missing OAuth credentials. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET'
-
-function stripAnsi(s: string): string {
-  const esc = String.fromCharCode(0x1b)
-  return s.replace(new RegExp(`${esc}\\[[0-9;?]*[a-zA-Z]`, 'g'), '')
-}
-
-async function waitForFrames(
-  getCombined: () => string,
-  predicate: (combined: string) => boolean,
-  maxTicks = 5000
-): Promise<void> {
-  for (let i = 0; i < maxTicks; i++) {
-    if (predicate(getCombined())) return
-    await new Promise<void>((resolve) => {
-      setImmediate(resolve)
-    })
-  }
-  throw new Error(
-    `Output condition not met within ${maxTicks} event-loop turns. Last frames:\n${getCombined()}`
-  )
-}
-
-function waitForLastFrame(
-  lastFrame: () => string | undefined,
-  predicate: (frame: string) => boolean,
-  maxTicks = 5000
-) {
-  return waitForFrames(() => stripAnsi(lastFrame() ?? ''), predicate, maxTicks)
-}
 
 function parseOAuthLocalhostPort(output: string): number | undefined {
   const m = output.match(/redirect_uri=http%3A%2F%2Flocalhost%3A(\d+)/)

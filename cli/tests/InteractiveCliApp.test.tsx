@@ -2,11 +2,7 @@ import { render } from 'ink-testing-library'
 import { describe, expect, test } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { formatVersionOutput } from '../src/commands/version.js'
-
-function stripAnsi(s: string): string {
-  const esc = String.fromCharCode(0x1b)
-  return s.replace(new RegExp(`${esc}\\[[0-9;?]*[a-zA-Z]`, 'g'), '')
-}
+import { stripAnsi, waitForFrames } from './inkTestHelpers.js'
 
 /** True when a frame shows the /exit farewell and then paints another empty REPL line (`> `). */
 function farewellFollowedByCommandPrompt(ansiStrippedFrame: string): boolean {
@@ -16,26 +12,6 @@ function farewellFollowedByCommandPrompt(ansiStrippedFrame: string): boolean {
     ansiStrippedFrame.lastIndexOf(farewell) + farewell.length
   )
   return /\n\s*>\s/.test(after)
-}
-
-/** Advance the event loop until `predicate` holds or `maxTicks` is exhausted (no fixed wall-clock sleep). */
-async function waitForFrames(
-  getCombined: () => string,
-  predicate: (combined: string) => boolean,
-  maxTicks = 5000
-): Promise<void> {
-  for (let i = 0; i < maxTicks; i++) {
-    if (predicate(getCombined())) {
-      return
-    }
-    await new Promise<void>((resolve) => {
-      setImmediate(resolve)
-    })
-  }
-  const combined = getCombined()
-  throw new Error(
-    `Output condition not met within ${maxTicks} event-loop turns. Last frames:\n${combined}`
-  )
 }
 
 /** Render the app and confirm end-to-end input handling is active before returning. */

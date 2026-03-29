@@ -1,30 +1,7 @@
 import { render } from 'ink-testing-library'
 import { describe, expect, test } from 'vitest'
 import { MainInteractivePrompt } from '../src/MainInteractivePrompt.js'
-
-function stripAnsi(s: string): string {
-  const esc = String.fromCharCode(0x1b)
-  return s.replace(new RegExp(`${esc}\\[[0-9;?]*[a-zA-Z]`, 'g'), '')
-}
-
-async function waitForFrames(
-  getCombined: () => string,
-  predicate: (combined: string) => boolean,
-  maxTicks = 5000
-): Promise<void> {
-  for (let i = 0; i < maxTicks; i++) {
-    if (predicate(getCombined())) {
-      return
-    }
-    await new Promise<void>((resolve) => {
-      setImmediate(resolve)
-    })
-  }
-  const combined = getCombined()
-  throw new Error(
-    `Output condition not met within ${maxTicks} event-loop turns. Last:\n${combined}`
-  )
-}
+import { stripAnsi, waitForFrames } from './inkTestHelpers.js'
 
 async function renderMainInteractivePrompt() {
   const result = render(
