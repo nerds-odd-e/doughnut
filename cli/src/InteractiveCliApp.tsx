@@ -72,7 +72,7 @@ export function InteractiveCliApp() {
             ...prev,
             { role: 'assistant', text: r.assistantMessage },
           ])
-          if (line === '/exit') setExitAfterCommit(true)
+          if (command.line === '/exit') setExitAfterCommit(true)
         })
         .catch((err: unknown) => {
           setMessages((prev) => [

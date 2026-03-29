@@ -182,6 +182,11 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     }
     stdin.write('\r')
     await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('> /exit ')
+    )
+    stdin.write('\r')
+    await waitForFrames(
       () => frames.join('\n'),
       (c) =>
         c.includes('/exit') && c.includes('Bye.') && c.includes('\x1b[100m')
