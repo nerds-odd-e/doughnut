@@ -72,6 +72,7 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
         c.includes('/remove-access-token') &&
         c.includes('/remove-access-token-completely') &&
         c.includes('/add gmail') &&
+        c.includes('/recall-status') &&
         c.includes('/exit') &&
         c.includes('update') &&
         c.includes('version') &&

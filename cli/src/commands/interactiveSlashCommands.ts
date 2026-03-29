@@ -5,6 +5,7 @@ import { helpSlashCommand } from './help.js'
 import type { InteractiveSlashCommand } from './interactiveSlashCommand.js'
 import { lastEmailSlashCommand } from './gmail/lastEmail/lastEmailSlashCommand.js'
 import { listAccessTokenSlashCommand } from './accessToken/listAccessToken/listAccessTokenSlashCommand.js'
+import { recallStatusSlashCommand } from './recall.js'
 import {
   removeAccessTokenCompletelySlashCommand,
   removeAccessTokenSlashCommand,
@@ -18,6 +19,7 @@ export const interactiveSlashCommands: readonly InteractiveSlashCommand[] = [
   removeAccessTokenCompletelySlashCommand,
   addGmailSlashCommand,
   lastEmailSlashCommand,
+  recallStatusSlashCommand,
   exitSlashCommand,
 ]
 

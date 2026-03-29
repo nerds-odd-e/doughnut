@@ -3,6 +3,10 @@ import {
   doughnutSdkOptions,
   runDefaultBackendJson,
 } from '../backendApi/doughnutBackendClient.js'
+import type {
+  CommandDoc,
+  InteractiveSlashCommand,
+} from './interactiveSlashCommand.js'
 
 function dueRecallQuery(dueindays: number) {
   return {
@@ -23,4 +27,19 @@ export async function recallStatus(signal?: AbortSignal): Promise<string> {
     return '1 note to recall today'
   }
   return `${count} notes to recall today`
+}
+
+const recallStatusDoc: CommandDoc = {
+  name: '/recall-status',
+  usage: '/recall-status',
+  description: 'Show how many notes are due for recall today',
+}
+
+export const recallStatusSlashCommand: InteractiveSlashCommand = {
+  line: '/recall-status',
+  doc: recallStatusDoc,
+  async run() {
+    const assistantMessage = await recallStatus()
+    return { assistantMessage }
+  },
 }

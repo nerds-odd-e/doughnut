@@ -16,7 +16,6 @@ Feature: CLI recall status and recall session
         | sedition | Sedition means incite violence | English      |
         | sedation | **Put** to sleep is _sedation_ | English      |
 
-    @ignore
     @disableOpenAiService
     Scenario: Recall status shows count when notes are due
       Given the note "sedition" was assimilated on day 1

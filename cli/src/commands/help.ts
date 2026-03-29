@@ -11,6 +11,7 @@ import type {
   InteractiveSlashCommand,
 } from './interactiveSlashCommand.js'
 import { lastEmailSlashCommand } from './gmail/lastEmail/lastEmailSlashCommand.js'
+import { recallStatusSlashCommand } from './recall.js'
 import { updateDoc } from './update.js'
 import { versionDoc } from './version.js'
 
@@ -56,6 +57,7 @@ export const helpSlashCommand: InteractiveSlashCommand = {
         removeAccessTokenCompletelySlashCommand.doc,
         addGmailSlashCommand.doc,
         lastEmailSlashCommand.doc,
+        recallStatusSlashCommand.doc,
         exitSlashCommand.doc,
       ]),
     }
