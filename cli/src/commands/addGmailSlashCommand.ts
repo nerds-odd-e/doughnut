@@ -10,14 +10,19 @@ const addGmailDoc: CommandDoc = {
   description: 'Connect a Gmail account (OAuth)',
 }
 
+/** OAuth + profile; returns one assistant transcript line. Throws on failure. */
+export async function runAddGmailInteractiveAssistantMessage(): Promise<string> {
+  const email = await addGmailAccount(undefined, undefined)
+  return formatAddedGmailAccountMessage(email)
+}
+
 export function createAddGmailCommand(): InteractiveSlashCommand {
   return {
     line: '/add gmail',
     doc: addGmailDoc,
     async run() {
-      const email = await addGmailAccount(undefined, undefined)
       return {
-        assistantMessage: formatAddedGmailAccountMessage(email),
+        assistantMessage: await runAddGmailInteractiveAssistantMessage(),
       }
     },
   }

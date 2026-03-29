@@ -50,6 +50,13 @@ For **interactive** behavior, prefer **`runInteractive`** with a **mock TTY** st
 
 **No fixed-time waits in unit tests** — Do not use `sleep`, `setTimeout(…, N)` with a duration, or similar wall-clock delays to “let Ink/React catch up.” Prefer driving the real async surface: `setImmediate` / microtask turns in a loop until an **observable** condition holds (e.g. `frames` or stdout contains the expected text), with a **turn-count** cap and a clear failure message if the condition never becomes true. E2E may still use bounded retries where appropriate; Vitest unit tests under `cli/tests/` should stay deterministic without arbitrary milliseconds.
 
+## Ink + React + Node (avoid flaky interactive tests)
+
+- **Defer `useApp().exit()` / unmount after UI updates:** In Node, **`setTimeout(fn, 0)` runs in the timers phase**, which can fire **before** **`setImmediate`** callbacks. React’s scheduler (and Ink’s deferred work) often uses **`setImmediate`**. Scheduling exit with **`setTimeout(…, 0)`** can unmount **before** a pending commit (e.g. transcript line + “Bye.”) lands → intermittent missing output. For “next tick after this synchronous handler,” prefer **`setImmediate`** so ordering stays consistent with React’s queue (see `cli/src/commands/exit.ts`).
+- **Stable `useInput` handler:** Pass **`useCallback`** (with correct deps) to **`useInput`**, not a new inline function every render. Ink’s `useInput` effect depends on the handler reference; a new function each render tears down and re-attaches the internal listener and can drop keystrokes under load.
+- **`ink-testing-library` + stdin:** **`useInput` registers via `useEffect`** — **`stdin.write` immediately after `render()` can race** empty listeners. Before real input, **wait on an observable** (e.g. write a harmless probe key, **`waitForFrames` until `lastFrame()` shows it**, then undo if needed), or reuse the **`renderApp`** pattern in `cli/tests/InteractiveCliApp.test.tsx`.
+- **Typing simulations:** Do not use **`setImmediate` per character** as “Ink is ready.” **Wait until the frame shows the expected buffer** (or combined `frames` text) before the next `stdin.write`.
+
 ## Domain terminology
 
 Vocabulary for Cucumber steps and page objects (`e2e_test/start/pageObjects/cli/`). **Exact TTY behavior** (past messages, user input history, cursor, rendering) lives in code + Vitest; **scenario-shaped coverage** in `e2e_test/features/cli/*.feature`.

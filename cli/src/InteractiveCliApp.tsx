@@ -1,27 +1,19 @@
 import { useCallback, useMemo, useState } from 'react'
-import type { Key } from 'ink'
-import { Box, Text, useApp, useInput } from 'ink'
+import { Box, Text, useApp } from 'ink'
+import { AddGmailStage } from './AddGmailStage.js'
+import { MainInteractivePrompt } from './MainInteractivePrompt.js'
 import { createInteractiveSlashCommands } from './commands/interactiveSlashCommands.js'
 import type {
   InteractiveSlashCommand,
   TranscriptMessage,
 } from './commands/interactiveSlashCommand.js'
 import { formatVersionOutput } from './commands/version.js'
-import { useInteractiveCliLineBuffer } from './interactiveCliInput.js'
 import { PastUserMessageBlock } from './pastUserMessageBlock.js'
+import { userVisibleSlashCommandError } from './userVisibleSlashCommandError.js'
 
-function userVisibleSlashCommandError(err: unknown): string {
-  if (
-    (typeof DOMException !== 'undefined' &&
-      err instanceof DOMException &&
-      err.name === 'AbortError') ||
-    (err instanceof Error && err.name === 'AbortError')
-  ) {
-    return 'Cancelled.'
-  }
-  if (err instanceof Error) return err.message
-  return String(err)
-}
+const ADD_GMAIL_LINE = '/add gmail'
+
+type InteractiveStage = 'main' | 'addGmail'
 
 export function InteractiveCliApp() {
   const { exit } = useApp()
@@ -36,46 +28,49 @@ export function InteractiveCliApp() {
   const [messages, setMessages] = useState<TranscriptMessage[]>([
     { role: 'assistant', text: formatVersionOutput() },
   ])
-  const { buffer, applyInput } = useInteractiveCliLineBuffer()
+  const [stage, setStage] = useState<InteractiveStage>('main')
 
-  const handleInput = useCallback(
-    (input: string, key: Key) => {
-      applyInput(input, key, (line) => {
-        if (line === '') {
-          return
-        }
-        const command = slashByLine.get(line)
-        if (command) {
-          setMessages((prev) => [...prev, { role: 'user', text: line }])
-          Promise.resolve(command.run())
-            .then((r) => {
-              setMessages((prev) => [
-                ...prev,
-                { role: 'assistant', text: r.assistantMessage },
-              ])
-            })
-            .catch((err: unknown) => {
-              setMessages((prev) => [
-                ...prev,
-                {
-                  role: 'assistant',
-                  text: userVisibleSlashCommandError(err),
-                },
-              ])
-            })
-          return
-        }
-        setMessages((prev) => [
-          ...prev,
-          { role: 'user', text: line },
-          { role: 'assistant', text: 'Not supported' },
-        ])
-      })
+  const handleAddGmailSettled = useCallback((assistantText: string) => {
+    setMessages((prev) => [...prev, { role: 'assistant', text: assistantText }])
+    setStage('main')
+  }, [])
+
+  const onCommittedLine = useCallback(
+    (line: string) => {
+      if (line === ADD_GMAIL_LINE) {
+        setMessages((prev) => [...prev, { role: 'user', text: line }])
+        setStage('addGmail')
+        return
+      }
+      const command = slashByLine.get(line)
+      if (command) {
+        setMessages((prev) => [...prev, { role: 'user', text: line }])
+        Promise.resolve(command.run())
+          .then((r) => {
+            setMessages((prev) => [
+              ...prev,
+              { role: 'assistant', text: r.assistantMessage },
+            ])
+          })
+          .catch((err: unknown) => {
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: 'assistant',
+                text: userVisibleSlashCommandError(err),
+              },
+            ])
+          })
+        return
+      }
+      setMessages((prev) => [
+        ...prev,
+        { role: 'user', text: line },
+        { role: 'assistant', text: 'Not supported' },
+      ])
     },
-    [applyInput, slashByLine, setMessages]
+    [slashByLine]
   )
-
-  useInput(handleInput)
 
   return (
     <Box flexDirection="column">
@@ -86,11 +81,12 @@ export function InteractiveCliApp() {
           <Text key={index}>{item.text}</Text>
         )
       )}
-      <Text>
-        {'> '}
-        {buffer}
-        <Text inverse> </Text>
-      </Text>
+      {stage === 'main' && (
+        <MainInteractivePrompt onCommittedLine={onCommittedLine} />
+      )}
+      {stage === 'addGmail' && (
+        <AddGmailStage onSettled={handleAddGmailSettled} />
+      )}
     </Box>
   )
 }

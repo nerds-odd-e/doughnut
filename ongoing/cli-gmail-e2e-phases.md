@@ -42,9 +42,9 @@ Informal working plan for bringing back `e2e_test/features/cli/cli_gmail.feature
 
 ### 1.4 — Product: Interactive `/add gmail`
 
-- Wire slash command **`/add gmail`** to **`addGmailAccount`** from `cli/src/commands/gmail.ts` (fetch-wait / stage strings consistent with existing interactive patterns, e.g. “Connecting Gmail” in `interactiveFetchWait` if used).
-- Ensure success text visible in **past CLI assistant messages** matches the scenario: include **`Added account <email>`** (same wording as `console.log` in `gmail.ts` or adjust one place only).
-- **Unit tests (only if E2E alone would leave dead paths):** Prefer **`runInteractive`**-style coverage; add **narrow** tests only for **pure** behavior (e.g. error messages) if needed — see Phase 3.
+- Wire slash command **`/add gmail`** to **`addGmailAccount`** via the **`AddGmailStage`** flow in the interactive app: while OAuth runs, the **main `> ` prompt is unmounted** and a **spinner + “Connecting Gmail…”** line is shown; **only one** assistant transcript line is appended on success or error (no interim lines in the Ink message list). Details and Vitest coverage: `ongoing/cli-add-gmail-blocking-stage.md` (implemented).
+- Ensure success text visible in **past CLI assistant messages** matches the scenario: include **`Added account <email>`** (same wording as `formatAddedGmailAccountMessage` in `cli/src/commands/gmail.ts` or adjust one place only).
+- **Unit tests:** `cli/tests/InteractiveCliApp.addGmail.test.tsx` (staging + missing-credentials regression).
 
 ### 1.5 — Gate
 
