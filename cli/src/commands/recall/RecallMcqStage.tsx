@@ -14,11 +14,7 @@ import {
   choiceIndexFromSelectListSubmitLine,
   handleSelectListInkKey,
 } from '../../interactions/selectListInteraction.js'
-import {
-  GUIDANCE_MORE_ABOVE_LABEL,
-  GUIDANCE_MORE_BELOW_LABEL,
-  layoutNumberedListGuidanceWindow,
-} from '../../guidanceListWindow.js'
+import { GuidanceListInk } from '../../guidanceListWindowInk.js'
 import { resolvedTerminalWidth } from '../../terminalColumns.js'
 import { renderMarkdownToTerminal } from '../../markdown.js'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
@@ -66,11 +62,6 @@ export function RecallMcqStage({
   const listLines = useMemo(
     () => numberedMcqMarkdownLinesForTerminal(choices, width),
     [choices, width]
-  )
-
-  const choiceDisplayLines = useMemo(
-    () => layoutNumberedListGuidanceWindow(listLines, highlightIndex),
-    [listLines, highlightIndex]
   )
 
   const runSubmit = useCallback(
@@ -226,30 +217,11 @@ export function RecallMcqStage({
         <Text key={`s-${i}`}>{line.length > 0 ? line : ' '}</Text>
       ))}
       <Box flexDirection="column">
-        {choiceDisplayLines.map((row, i) => {
-          if (row.kind === 'moreAbove') {
-            return (
-              <Text key={`up-${i}`} color="gray">
-                {GUIDANCE_MORE_ABOVE_LABEL}
-              </Text>
-            )
-          }
-          if (row.kind === 'moreBelow') {
-            return (
-              <Text key={`dn-${i}`} color="gray">
-                {GUIDANCE_MORE_BELOW_LABEL}
-              </Text>
-            )
-          }
-          return (
-            <Text
-              key={`${row.itemIndex}-${i}`}
-              inverse={row.itemIndex === highlightIndex}
-            >
-              {row.text}
-            </Text>
-          )
-        })}
+        <GuidanceListInk
+          mode="numbered"
+          lines={listLines}
+          highlightItemIndex={highlightIndex}
+        />
       </Box>
       <Text>{MCQ_HINT}</Text>
     </Box>

@@ -10,11 +10,7 @@ import {
 import type { Key } from 'ink'
 import { Box, Text, useInput } from 'ink'
 import { handleSelectListInkKey } from '../../interactions/selectListInteraction.js'
-import {
-  GUIDANCE_MORE_ABOVE_LABEL,
-  GUIDANCE_MORE_BELOW_LABEL,
-  layoutNumberedListGuidanceWindow,
-} from '../../guidanceListWindow.js'
+import { GuidanceListInk } from '../../guidanceListWindowInk.js'
 import {
   numberedTerminalListLines,
   resolvedTerminalWidth,
@@ -56,11 +52,6 @@ export function AccessTokenLabelPickerStage({
   const listLines = useMemo(
     () => numberedTerminalListLines(labels, width),
     [labels, width]
-  )
-
-  const displayLines = useMemo(
-    () => layoutNumberedListGuidanceWindow(listLines, highlightIndex),
-    [listLines, highlightIndex]
   )
 
   const handleInput = useCallback(
@@ -117,30 +108,11 @@ export function AccessTokenLabelPickerStage({
       <Text>{stageIndicator}</Text>
       <Text>{currentPrompt}</Text>
       <Box flexDirection="column">
-        {displayLines.map((row, i) => {
-          if (row.kind === 'moreAbove') {
-            return (
-              <Text key={`up-${i}`} color="gray">
-                {GUIDANCE_MORE_ABOVE_LABEL}
-              </Text>
-            )
-          }
-          if (row.kind === 'moreBelow') {
-            return (
-              <Text key={`dn-${i}`} color="gray">
-                {GUIDANCE_MORE_BELOW_LABEL}
-              </Text>
-            )
-          }
-          return (
-            <Text
-              key={`${row.itemIndex}-${i}`}
-              inverse={row.itemIndex === highlightIndex}
-            >
-              {row.text}
-            </Text>
-          )
-        })}
+        <GuidanceListInk
+          mode="numbered"
+          lines={listLines}
+          highlightItemIndex={highlightIndex}
+        />
       </Box>
     </Box>
   )
