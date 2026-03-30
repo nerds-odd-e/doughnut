@@ -70,6 +70,8 @@ Each phase below has the same **subphases**:
 
 **Subphases:** Manual check → TDD if missing.
 
+**Done:** First-page branch uses `contentRows: budget - 1` with `showBottom: true` so the bottom budget row is the indicator, not a fifth option line. Generic `(showTop, showBottom)` layout uses `c = budget - t - b`, so a bottom indicator always reduces content rows by one. Vitest locks “more below” as the last non-empty line whenever it appears (slash + numbered): [`cli/tests/guidanceListWindowInk.test.tsx`](../cli/tests/guidanceListWindowInk.test.tsx).
+
 ---
 
 ## Phase 5 — Both indicators + middle scroll (deep index)

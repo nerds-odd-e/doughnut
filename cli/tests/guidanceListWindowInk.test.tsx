@@ -76,6 +76,42 @@ describe('GuidanceListInk slash mode', () => {
     expect(listLines).toHaveLength(ROW_BUDGET)
   })
 
+  test('Phase 4 — when more below is shown it is the last guidance row (slash)', () => {
+    const rows = slashRows(11)
+    for (const highlightIndex of [0, 1, 2, 3, 4, 5]) {
+      const p = renderGuidancePlain({
+        mode: 'slash',
+        rows,
+        highlightIndex,
+      })
+      if (!p.includes(MORE_BELOW)) continue
+      const lines = p
+        .split('\n')
+        .map((l) => l.trimEnd())
+        .filter((l) => l.length > 0)
+      expect(lines[lines.length - 1]).toContain(MORE_BELOW)
+    }
+  })
+
+  test('Phase 4 — highlighted option sits above more below on first page (slash)', () => {
+    const rows = slashRows(11)
+    const p = renderGuidancePlain({
+      mode: 'slash',
+      rows,
+      highlightIndex: 2,
+    })
+    expect(p).toContain(MORE_BELOW)
+    const lines = p
+      .split('\n')
+      .map((l) => l.trimEnd())
+      .filter((l) => l.length > 0)
+    const idxCmd2 = lines.findIndex((l) => l.includes('/cmd2'))
+    const idxBelow = lines.findIndex((l) => l.includes(MORE_BELOW))
+    expect(idxCmd2).toBeGreaterThanOrEqual(0)
+    expect(idxBelow).toBeGreaterThan(idxCmd2)
+    expect(idxBelow).toBe(lines.length - 1)
+  })
+
   test('overflow first page: highlight before bottom row keeps only bottom indicator', () => {
     const rows = slashRows(11)
     const p = renderGuidancePlain({
@@ -284,6 +320,26 @@ describe('GuidanceListInk numbered mode', () => {
           /^\d+\.\s+x$/.test(l.trim())
       )
     expect(numberedOrIndicator).toHaveLength(ROW_BUDGET)
+  })
+
+  test('Phase 4 — when more below is shown it is the last guidance row (numbered)', () => {
+    const many = Array.from({ length: 12 }, (_, i) => ({
+      itemIndex: i,
+      text: `${i + 1}. x`,
+    }))
+    for (const highlightItemIndex of [0, 1, 2, 3, 4, 5, 6]) {
+      const p = renderGuidancePlain({
+        mode: 'numbered',
+        lines: many,
+        highlightItemIndex,
+      })
+      if (!p.includes(MORE_BELOW)) continue
+      const lines = p
+        .split('\n')
+        .map((l) => l.trimEnd())
+        .filter((l) => l.length > 0)
+      expect(lines[lines.length - 1]).toContain(MORE_BELOW)
+    }
   })
 })
 
