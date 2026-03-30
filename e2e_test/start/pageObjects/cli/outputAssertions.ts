@@ -161,26 +161,41 @@ function nonInteractiveOutput() {
 const PAST_CLI_ASSISTANT_SECTION =
   'past CLI assistant messages (ANSI-stripped transcript; assistant lines, not gray user blocks)'
 
-function assertPastCliAssistantMessagesContains(
+const ANSWERED_QUESTIONS_SECTION =
+  'answered questions (recall session answered lines; ANSI-stripped transcript)'
+
+function assertStrippedPtyTranscriptContains(
   raw: string,
-  expected: string
+  expected: string,
+  sectionLabel: string
 ): void {
   const stripped = stripAnsiCliPty(raw)
   if (stripped.length === 0) {
     failCliAssertion(
-      `Expected ${JSON.stringify(expected)} in ${PAST_CLI_ASSISTANT_SECTION}, but the PTY transcript is empty after stripping ANSI escape codes.`,
+      `Expected ${JSON.stringify(expected)} in ${sectionLabel}, but the PTY transcript is empty after stripping ANSI escape codes.`,
       raw
     )
   }
   if (stripped.includes(expected)) return
   failCliAssertion(
-    `Expected substring in ${PAST_CLI_ASSISTANT_SECTION}.\n` +
+    `Expected substring in ${sectionLabel}.\n` +
       `  Expected: ${JSON.stringify(expected)}\n` +
       `  Transcript length: ${stripped.length}\n` +
       `  Head preview:\n${headPreview(stripped)}\n` +
       `  Tail preview:\n${tailPreview(stripped)}`,
     raw
   )
+}
+
+function assertPastCliAssistantMessagesContains(
+  raw: string,
+  expected: string
+): void {
+  assertStrippedPtyTranscriptContains(raw, expected, PAST_CLI_ASSISTANT_SECTION)
+}
+
+function assertAnsweredQuestionsContains(raw: string, expected: string): void {
+  assertStrippedPtyTranscriptContains(raw, expected, ANSWERED_QUESTIONS_SECTION)
 }
 
 /** Gray background from chalk `bgGray` / bright black (past user message block). */
@@ -372,6 +387,17 @@ function pastCliAssistantMessages() {
   }
 }
 
+function answeredQuestions() {
+  return {
+    expectContains(expected: string) {
+      retryInteractiveAssertion(
+        (raw) => assertAnsweredQuestionsContains(raw, expected),
+        'cli-interactive-pty-answered-questions-assertion'
+      )
+    },
+  }
+}
+
 function pastUserMessages() {
   return {
     expectContains(expected: string) {
@@ -401,6 +427,7 @@ function currentGuidance() {
 }
 
 export {
+  answeredQuestions,
   currentGuidance,
   nonInteractiveOutput,
   pastCliAssistantMessages,

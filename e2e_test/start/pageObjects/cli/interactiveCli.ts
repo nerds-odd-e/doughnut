@@ -4,6 +4,7 @@
  * Transcript assertions use `cliInteractivePtyGetBuffer` in the Cypress plugin.
  */
 import {
+  answeredQuestions,
   currentGuidance,
   pastCliAssistantMessages,
   pastUserMessages,
@@ -35,6 +36,7 @@ function interactiveCli() {
       )
     },
     pastCliAssistantMessages,
+    answeredQuestions,
     pastUserMessages,
     currentGuidance,
   }
