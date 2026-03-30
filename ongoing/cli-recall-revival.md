@@ -1,6 +1,6 @@
 # CLI recall revival (plan only)
 
-**Status:** Phase 1 complete (recall status). Phase 2.1 complete (Just Review E2E un-ignored + bold guidance assertion). Phase 2.2 complete (`/recall` just-review stage, PTY rows 48 for stable guidance replay). Phase 2.3 complete (just-review edge Vitest: invalid y/n commits, empty title/details + no notebook line). Phase 5.1 complete (full *Recall session* scenario un-ignored; `I answer … to prompt …` waits on Current guidance). Phase 5.3 complete (empty load-more after two recalls + `recallSessionSummaryLine` unit tests). Phase 6.4 complete (MCQ stem and choices through `renderMarkdownToTerminal`; `numberedMcqMarkdownLinesForTerminal`; Vitest in `recallMcqInteractive.test.tsx`). Phase 7.1–7.2 complete (**MCQ only** — Esc → leave confirm). Phase **7.3** complete (**just-review** — Esc → same leave confirm as MCQ; Vitest `recallJustReviewInteractive.test.tsx`). Phase **7.4** complete (**spelling** — Esc → same leave confirm as MCQ; Vitest `recallSpellingInteractive.test.tsx`). Phase **7.5** complete (shared `leaveRecallSessionCopy.ts` + `LeaveRecallConfirmPrompt.tsx`; `RecallSessionStage` uses `RECALL_SESSION_STOPPED_LINE`; recall interactive Vitests import copy constants). Phase **7.6** complete (load-more **Esc** = decline load more / session summary, not card-level leave confirm; Vitest `Escape on load more acts like no → Recalled 1 note` in `recallJustReviewInteractive.test.tsx`). Phase **7.7** complete (leave-confirm edges: MCQ highlight + buffer + empty Enter; just-review single `Yes, I remember?` + empty Enter; spelling empty Enter + buffer — Vitest in recall interactive files). Phase **10.1–10.3** complete (spelling recall E2E; spell-first `SpellingRecallStage`; mid-session **Correct!** in `RecallSessionStage` answered-lines strip above the active card; due-list tie-break `IFNULL(spelling,0) DESC`; spelling edges Vitest in `recallSpellingInteractive.test.tsx` + `spellingAnswerLine.test.ts`). **Next:** Phases 3–4 (Temp1 / Temp2) before Phase 5.2. Remaining: 5.2, 6.1–6.3, 8–9, as applicable; this file stays high-level planning, not a step-by-step implementation spec.  
+**Status:** Phase 1 complete (recall status). Phase 2.1 complete (Just Review E2E un-ignored + bold guidance assertion). Phase 2.2 complete (`/recall` just-review stage, PTY rows 48 for stable guidance replay). Phase 2.3 complete (just-review edge Vitest: invalid y/n commits, empty title/details + no notebook line). Phase 5.1 complete (full *Recall session* scenario un-ignored; `I answer … to prompt …` waits on Current guidance). Phase 5.3 complete (empty load-more after two recalls + `recallSessionSummaryLine` unit tests). Phase 6.4 complete (MCQ stem and choices through `renderMarkdownToTerminal`; `numberedMcqMarkdownLinesForTerminal`; Vitest in `recallMcqInteractive.test.tsx`). Phase 7.1–7.2 complete (**MCQ only** — Esc → leave confirm). Phase **7.3** complete (**just-review** — Esc → same leave confirm as MCQ; Vitest `recallJustReviewInteractive.test.tsx`). Phase **7.4** complete (**spelling** — Esc → same leave confirm as MCQ; Vitest `recallSpellingInteractive.test.tsx`). Phase **7.5** complete (shared `leaveRecallSessionCopy.ts` + `LeaveRecallConfirmPrompt.tsx`; `RecallSessionStage` uses `RECALL_SESSION_STOPPED_LINE`; recall interactive Vitests import copy constants). Phase **7.6** complete (load-more **Esc** = decline load more / session summary, not card-level leave confirm; Vitest `Escape on load more acts like no → Recalled 1 note` in `recallJustReviewInteractive.test.tsx`). Phase **7.7** complete (leave-confirm edges: MCQ highlight + buffer + empty Enter; just-review single `Yes, I remember?` + empty Enter; spelling empty Enter + buffer — Vitest in recall interactive files). Phase **8** complete (**MCQ down-arrow E2E**: `cliInteractiveWriteRaw` in `e2e_test/config/cliE2ePluginTasks.ts`; `inputDownArrowSelectionForSlashCommand` + Cucumber **When**; **Then** `I should see {string} in answered questions` (scenario asserts **Incorrect** there); wrong MCQ path `onSettled('Incorrect.\nRecalled successfully')` in `RecallMcqStage`; Vitest wrong-choice cases assert both lines; **Recall MCQ - down arrow and Enter to select** active in `cli_recall.feature`). Phase **10.1–10.3** complete (spelling recall E2E; spell-first `SpellingRecallStage`; mid-session **Correct!** in `RecallSessionStage` answered-lines strip above the active card; due-list tie-break `IFNULL(spelling,0) DESC`; spelling edges Vitest in `recallSpellingInteractive.test.tsx` + `spellingAnswerLine.test.ts`). **Next:** Phases 3–4 (Temp1 / Temp2) before Phase 5.2. Remaining: 5.2, 6.1–6.3, 9, as applicable; this file stays high-level planning, not a step-by-step implementation spec.  
 **Goal:** Restore behaviors in `e2e_test/features/cli/cli_recall.feature` with **observable E2E coverage**, **minimal dead code**, and **architecture that does not repeat the pre-removal shape** (heavy global mutable recall state and recall orchestration embedded in `interactive.ts`).
 
 **Guidance:** `.cursor/rules/planning.mdc`, `.cursor/rules/cli.mdc`, `ongoing/cli-architecture-roadmap.md` — prefer **Ink/React composition and stage-local state**, **thin Cucumber steps**, **centralized terminal assertions**, and **reuse of shared API client code** (`doughnut-api` / existing backend client helpers). Challenge big abstractions until repetition justifies them.
@@ -225,25 +225,26 @@ Extracted shared **`LEAVE_RECALL_PROMPT`** and **`RECALL_SESSION_STOPPED_LINE`**
 
 ---
 
-## Phase 8 — Scenario: *Recall MCQ — down arrow and Enter to select*
+## Phase 8 — Scenario: *Recall MCQ — down arrow and Enter to select* — **complete**
 
 **Scope:** **MCQ recall only** — numbered choices in **current guidance** (`RecallMcqStage`). **Spelling** recall uses **typed text** on the command line (`SpellingRecallStage`); it does **not** use the MCQ ↑↓ list, so Phase **8** does **not** apply to spelling cards and needs **no** spelling-specific E2E or Vitest unless shared list primitives are refactored (unlikely).
 
 **User outcome:** Down-arrow moves selection; Enter submits **incorrect** choice; still ends with “Incorrect” (or equivalent) and “Recalled successfully” per feature.
 
-### Phase 8.1 — E2E fails for the right reason
+### Phase 8.1 — E2E fails for the right reason — **complete**
 
-- Un-ignore; ensure step `When I input down-arrow selection for "/recall"…` is implemented or replaced — failure should point at **selection index** or **Enter handling**, not Phase 6-only code.
+- Scenario **Recall MCQ - down arrow and Enter to select** is active; **`When I input down-arrow selection for "/recall"…`** implemented via **`cliInteractiveWriteRaw`** (arrow + Enter without forced line `\r` on every write) and **`inputDownArrowSelectionForSlashCommand`** waiting on Current guidance for the MCQ stem.
 
-### Phase 8.2 — Pass E2E with minimum production change
+### Phase 8.2 — Pass E2E with minimum production change — **complete**
 
-- Align **list selection** with existing `MainInteractivePrompt` patterns (e.g. `cycleListSelectionIndex`) so MCQ choice navigation does not fork a second keyboard model.
-- Wire Enter to submit selected index.
+- MCQ list selection remains **`handleSelectListInkKey`** / **`selectListInteraction`** (same model as other ↑↓ lists); E2E drives **↓** then **Enter** over PTY.
+- Wrong answer: **`RecallMcqStage`** calls **`onSettled('Incorrect.\nRecalled successfully')`** so the feature can assert **Incorrect** (answered-questions step / full transcript) and **Recalled successfully** in past assistant messages.
 
 ### Phase 8.3 — Edge cases (scenario scope only)
 
-- **Wrap-around** at ends of choice list: unit tests if quick.
-- **Width wrapping** of long choices: unit tests for line breaking if not E2E-stable.
+- **Wrap-around** / **long-choice width:** Optional extra Vitest if not already covered by **`selectListInteraction`** / **`numberedMcqMarkdownLines`** tests; not required for Phase 8 closure.
+
+**Done:** `e2e_test/config/cliE2ePluginTasks.ts` — **`cliInteractiveWriteRaw`**; `e2e_test/start/pageObjects/cli/interactiveCli.ts` — **`inputDownArrowSelectionForSlashCommand`**; `e2e_test/step_definitions/cli.ts` — **When** down-arrow selection + **Then** `… in answered questions`; `cli_recall.feature` — **Incorrect** asserted with **answered questions**; `RecallMcqStage` wrong path + **`recallMcqInteractive.test.tsx`** wrong-choice assertions; **`pnpm cypress run --spec e2e_test/features/cli/cli_recall.feature`** green for this scenario.
 
 ---
 
@@ -325,4 +326,4 @@ flowchart LR
   P2 --> P10
 ```
 
-Phases **8–9** depend on **MCQ** (Phase 6) and do **not** gate on spelling. **Phase 7** (Esc + y/n leave recall) is **Vitest-only** — no node in `cli_recall.feature`; **7.1–7.7** **complete** (MCQ, just-review, spelling, shared leave-confirm cohesion, load-more **Esc** semantics, **7.7** edges). **Phase 6.4** refines MCQ presentation (markdown stem/choices); it does not add a new top-level scenario node. Phase **10** is **complete** (10.1–10.3).
+Phases **8–9** depend on **MCQ** (Phase 6) and do **not** gate on spelling. **Phase 7** (Esc + y/n leave recall) is **Vitest-only** — no node in `cli_recall.feature`; **7.1–7.7** **complete** (MCQ, just-review, spelling, shared leave-confirm cohesion, load-more **Esc** semantics, **7.7** edges). **Phase 6.4** refines MCQ presentation (markdown stem/choices); it does not add a new top-level scenario node. Phase **8** is **complete** (MCQ down-arrow E2E + answered-questions assertion for **Incorrect**). Phase **10** is **complete** (10.1–10.3).

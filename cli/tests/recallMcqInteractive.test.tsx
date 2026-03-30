@@ -175,7 +175,7 @@ describe('recall MCQ (interactive)', () => {
 
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Incorrect') && p.includes('Recalled successfully')
+      (p) => p.includes('Incorrect')
     )
 
     expect(answerQuizSpy).toHaveBeenCalledTimes(1)
@@ -290,7 +290,7 @@ describe('recall MCQ (interactive)', () => {
 
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Incorrect') && p.includes('Recalled successfully')
+      (p) => p.includes('Incorrect')
     )
 
     expect(answerQuizSpy).toHaveBeenCalledTimes(1)

@@ -108,7 +108,7 @@ export function RecallSessionStage({
         setCard(next)
         return
       }
-      onSettled('Correct!\nRecalled successfully')
+      onSettled('Correct!')
     } catch (loadErr: unknown) {
       onSettled(userVisibleSlashCommandError(loadErr))
     }
@@ -116,14 +116,20 @@ export function RecallSessionStage({
 
   const onSpellingSessionComplete = useCallback(async () => {
     successfulRecallsRef.current += 1
+    const spellCard = cardRef.current
+    const spellTitle =
+      spellCard?.variant === 'spelling-session'
+        ? spellCard.payload.noteTitle
+        : 'Note'
+    const spellCorrectLine = `Spell correct: ${spellTitle}`
     try {
       const next = await loadNextRecallCardIfAny(0)
       if (next !== null) {
-        setAnsweredRecallLines((prev) => [...prev, 'Correct!'])
+        setAnsweredRecallLines((prev) => [...prev, spellCorrectLine])
         setCard(next)
         return
       }
-      onSettled('Correct!\nRecalled successfully')
+      onSettled(spellCorrectLine)
     } catch (loadErr: unknown) {
       onSettled(userVisibleSlashCommandError(loadErr))
     }
@@ -234,7 +240,7 @@ export function RecallSessionStage({
             startedWithEmptyTodayRef.current &&
             successfulRecallsRef.current === 1
           ) {
-            onSettled('Recalled successfully')
+            onSettled(`Reviewed: ${p.noteTitle}`)
           } else {
             setUiMode('loadMore')
           }

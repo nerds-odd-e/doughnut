@@ -58,10 +58,12 @@ export async function loadNextRecallCardIfAny(
   const notebookTitle = note?.noteTopology?.notebookTitle?.trim()
 
   if (mt.spelling) {
+    const noteTitle = note?.noteTopology?.title?.trim() || 'Note'
     return {
       variant: 'spelling-session',
       payload: {
         memoryTrackerId: mt.id,
+        noteTitle,
         notebookTitle,
       },
     }

@@ -69,7 +69,7 @@ export function RecallMcqStage({
         const updated = await submitMcqAnswer(payload.recallPromptId, choiceIdx)
         const correct = updated.answer?.correct === true
         if (!correct) {
-          onSettled('Incorrect.\nRecalled successfully')
+          onSettled('Incorrect.')
           return
         }
         await onMcqSucceeded()

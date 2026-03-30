@@ -201,7 +201,7 @@ describe('recall spelling (interactive)', () => {
 
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Correct!') && p.includes('Recalled successfully')
+      (p) => p.includes('Spell correct: sedition')
     )
 
     expect(answerSpellingSpy).toHaveBeenCalledTimes(1)
@@ -242,7 +242,7 @@ describe('recall spelling (interactive)', () => {
 
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Correct!') && p.includes('Recalled successfully')
+      (p) => p.includes('Spell correct: sedition')
     )
 
     expect(answerSpellingSpy).toHaveBeenCalledWith(

@@ -8,7 +8,7 @@ Feature: CLI recall status and recall session
     When I add the saved access token in the interactive CLI using add-access-token
     And I have a notebook with the head note "English" which skips memory tracking
 
-  Rule: Shared English notebook notes (sedation details use markdown)
+  Rule: English notebook with two notes (sedition vs sedation; markdown in details)
 
     Background:
       Given there are some notes:
@@ -24,7 +24,7 @@ Feature: CLI recall status and recall session
       Then I should see "1 note to recall today" in past CLI assistant messages
 
     @disableOpenAiService
-    Scenario: Recall Just Review
+    Scenario: Recall using just review
       Given the note "sedation" was assimilated on day 1
       And It's day 2
       When I enter the slash command "/recall" in the interactive CLI
@@ -37,7 +37,7 @@ Feature: CLI recall status and recall session
       Then I should see "Recalled 1 note" in past CLI assistant messages
 
     @disableOpenAiService
-    Scenario: Recall session - complete all due notes, see summary, then load more from future days
+    Scenario: Complete all due notes, decline load more, then recall from a later window
       Given the note "sedition" was assimilated on day 1
       And the note "sedation" was assimilated on day 1
       And It's day 2
@@ -50,10 +50,10 @@ Feature: CLI recall status and recall session
       When I enter the slash command "/recall" in the interactive CLI
       And I answer "y" in the interactive CLI to prompt "Load more from next 3 days?"
       When I answer "y" in the interactive CLI to prompt "Yes, I remember?"
-      Then I should see "Recalled successfully" in past CLI assistant messages
+      Then I should see "Reviewed: sedition" in answered questions
 
     @usingMockedOpenAiService
-    Scenario: Recall MCQ - choose correct answer and see success
+    Scenario: MCQ — choose the correct answer
       Given OpenAI generates this question:
         | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
         | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
@@ -63,24 +63,22 @@ Feature: CLI recall status and recall session
       Then I should see "What is the meaning of sedition?" in the Current guidance
       And I should see "to incite violence" in the Current guidance
       When I enter "1" in the interactive CLI
-      Then I should see "Correct!" in past CLI assistant messages
-      And I should see "Recalled successfully" in past CLI assistant messages
+      Then I should see "Correct!" in answered questions
 
     @usingMockedOpenAiService
-    Scenario: Recall MCQ - down arrow and Enter to select
-      And OpenAI generates this question:
+    Scenario: MCQ — wrong choice via down arrow and Enter
+      Given OpenAI generates this question:
         | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
         | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
       And the note "sedition" was assimilated on day 1
       And It's day 2
       When I input down-arrow selection for "/recall" in the interactive CLI
       Then I should see "Incorrect" in answered questions
-      And I should see "Recalled successfully" in past CLI assistant messages
 
     @ignore
     @usingMockedOpenAiService
-    Scenario: Recall MCQ - contest and regenerate before answering
-      And OpenAI generates this as second question:
+    Scenario: MCQ — contest and regenerate before answering
+      Given OpenAI generates this as second question:
         | Question Stem         | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
         | Regenerated question? | to incite violence | to sleep           | Open Water Diver   |
       And OpenAI evaluates the question as not legitimate
@@ -94,10 +92,9 @@ Feature: CLI recall status and recall session
       When I enter the slash command "/contest" in the interactive CLI
       Then I should see "What is the meaning of sedition?" in the Current guidance
       When I enter "1" in the interactive CLI
-      Then I should see "Correct!" in past CLI assistant messages
-      And I should see "Recalled successfully" in past CLI assistant messages
+      Then I should see "Correct!" in answered questions
 
-  Rule: Spelling recall needs remember spelling on sedition
+  Rule: Spelling recall when the note has remember spelling enabled
 
     Background:
       Given there are some notes:
@@ -105,13 +102,13 @@ Feature: CLI recall status and recall session
         | sedition | Sedition means incite violence | English      | true              |
 
     @disableOpenAiService
-    Scenario: Recall spelling - type correct spelling and see success
-      And the note "sedition" was assimilated on day 1
+    Scenario: Recall spelling — correct answer then just review
+      Given the note "sedition" was assimilated on day 1
       And It's day 2
       When I enter the slash command "/recall" in the interactive CLI
       Then I should see "Spell:" in the Current guidance
       When I enter "sedition" in the interactive CLI
-      Then I should see my spelling answer is correct in the answered questions
+      Then I should see "Spell correct: sedition" in answered questions
       When I answer "y" in the interactive CLI to prompt "Yes, I remember?"
       And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
       Then I should see "Recalled 2 notes" in past CLI assistant messages

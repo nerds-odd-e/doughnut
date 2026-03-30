@@ -11,6 +11,7 @@ import {
 /** Spelling memory tracker: server spelling question first (same order as web recall). */
 export type SpellingRecallSessionPayload = {
   readonly memoryTrackerId: number
+  readonly noteTitle: string
   readonly notebookTitle?: string
 }
 
