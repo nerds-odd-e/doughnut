@@ -7,6 +7,10 @@ import {
 import type { RecallPrompt } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import {
+  LEAVE_RECALL_PROMPT,
+  RECALL_SESSION_STOPPED_LINE,
+} from '../src/commands/recall/leaveRecallSessionCopy.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
   pressEscape,
@@ -24,9 +28,6 @@ const baseNoteTimes = {
 
 const MEMORY_TRACKER_ID = 1
 const SPELL_PROMPT_ID = 42
-
-const LEAVE_RECALL_CONFIRM = 'Leave recall?'
-const RECALL_SESSION_STOPPED = 'Recall session stopped.'
 
 /** Wrong spelling still POSTs an answer; SRS rescheduling is server-side (RecallPromptControllerTests.WrongAnswer). */
 async function waitForSpellingPromptVisible(
@@ -264,7 +265,7 @@ describe('recall spelling (interactive)', () => {
     pressEscape(stdin)
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_CONFIRM) && p.includes('(y/n)')
+      (p) => p.includes(LEAVE_RECALL_PROMPT) && p.includes('(y/n)')
     )
 
     expect(answerSpellingSpy).not.toHaveBeenCalled()
@@ -280,14 +281,14 @@ describe('recall spelling (interactive)', () => {
     pressEscape(stdin)
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_CONFIRM)
+      (p) => p.includes(LEAVE_RECALL_PROMPT)
     )
 
     stdin.write('y\r')
 
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(RECALL_SESSION_STOPPED)
+      (p) => p.includes(RECALL_SESSION_STOPPED_LINE)
     )
 
     expect(answerSpellingSpy).not.toHaveBeenCalled()
@@ -307,7 +308,7 @@ describe('recall spelling (interactive)', () => {
     pressEscape(stdin)
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_CONFIRM)
+      (p) => p.includes(LEAVE_RECALL_PROMPT)
     )
 
     stdin.write('n\r')
@@ -318,7 +319,7 @@ describe('recall spelling (interactive)', () => {
         p.includes('Spell:') &&
         p.includes('Spell the title') &&
         p.includes('> par') &&
-        !p.includes(LEAVE_RECALL_CONFIRM)
+        !p.includes(LEAVE_RECALL_PROMPT)
     )
 
     expect(answerSpellingSpy).not.toHaveBeenCalled()

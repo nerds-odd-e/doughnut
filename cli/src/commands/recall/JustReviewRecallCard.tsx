@@ -3,11 +3,10 @@ import { Text } from 'ink'
 import { renderMarkdownToTerminal } from '../../markdown.js'
 import { resolvedTerminalWidth } from '../../terminalColumns.js'
 import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
+import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import type { RecallJustReviewPayload } from './justReviewLoad.js'
 
 const STAGE_LABEL = 'Recalling'
-
-const LEAVE_RECALL_PROMPT = 'Leave recall?'
 
 export function JustReviewRecallCard({
   payload,
@@ -49,16 +48,9 @@ export function JustReviewRecallCard({
 
   if (showLeaveConfirm) {
     return (
-      <YesNoStagePrompt
-        prompt={LEAVE_RECALL_PROMPT}
-        onAnswer={(yes) => {
-          if (yes) {
-            onLeaveRecallConfirmed()
-            return
-          }
-          setShowLeaveConfirm(false)
-        }}
-        onCancel={() => setShowLeaveConfirm(false)}
+      <LeaveRecallConfirmPrompt
+        onConfirmLeave={onLeaveRecallConfirmed}
+        onDismiss={() => setShowLeaveConfirm(false)}
         inputBlockedRef={inputBlockedRef}
         header={headerEl}
       />

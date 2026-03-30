@@ -23,6 +23,7 @@ import { markMemoryTrackerRecalled } from './markMemoryTrackerRecalled.js'
 import { JustReviewRecallCard } from './JustReviewRecallCard.js'
 import { RecallMcqStage } from './RecallMcqStage.js'
 import { SpellingRecallStage } from './SpellingRecallStage.js'
+import { RECALL_SESSION_STOPPED_LINE } from './leaveRecallSessionCopy.js'
 import { recallSessionSummaryLine } from './recallSessionSummary.js'
 
 const STAGE_LABEL = 'Recalling'
@@ -258,7 +259,7 @@ export function RecallSessionStage({
   }, [])
 
   const leaveJustReviewSession = useCallback(() => {
-    onSettled('Recall session stopped.')
+    onSettled(RECALL_SESSION_STOPPED_LINE)
   }, [onSettled])
 
   const escapeLoadMorePrompt = useCallback(() => {

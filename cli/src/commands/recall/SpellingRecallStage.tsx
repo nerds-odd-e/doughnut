@@ -17,7 +17,8 @@ import { resolvedTerminalWidth } from '../../terminalColumns.js'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
 import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
-import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
+import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
+import { RECALL_SESSION_STOPPED_LINE } from './leaveRecallSessionCopy.js'
 import {
   fetchSpellingRecallPrompt,
   submitSpellingAnswer,
@@ -26,10 +27,6 @@ import {
 import { normalizeSpellingLineForSubmit } from './spellingAnswerLine.js'
 
 const STAGE_LABEL = 'Recalling'
-
-const LEAVE_RECALL_PROMPT = 'Leave recall?'
-
-const RECALL_SESSION_STOPPED_LINE = 'Recall session stopped.'
 
 type LoadState =
   | { readonly status: 'loading' }
@@ -198,16 +195,9 @@ export function SpellingRecallStage({
 
   if (showLeaveConfirm) {
     return (
-      <YesNoStagePrompt
-        prompt={LEAVE_RECALL_PROMPT}
-        onAnswer={(yes) => {
-          if (yes) {
-            onSettled(RECALL_SESSION_STOPPED_LINE)
-            return
-          }
-          setShowLeaveConfirm(false)
-        }}
-        onCancel={() => setShowLeaveConfirm(false)}
+      <LeaveRecallConfirmPrompt
+        onConfirmLeave={() => onSettled(RECALL_SESSION_STOPPED_LINE)}
+        onDismiss={() => setShowLeaveConfirm(false)}
         inputBlockedRef={inputBlockedRef}
         header={
           <Fragment>

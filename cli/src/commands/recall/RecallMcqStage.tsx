@@ -20,7 +20,8 @@ import { renderMarkdownToTerminal } from '../../markdown.js'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
 import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
-import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
+import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
+import { RECALL_SESSION_STOPPED_LINE } from './leaveRecallSessionCopy.js'
 import { numberedMcqMarkdownLinesForTerminal } from './numberedMcqMarkdownLines.js'
 import { submitMcqAnswer, type RecallMcqCardPayload } from './recallMcqLoad.js'
 
@@ -28,10 +29,6 @@ const STAGE_LABEL = 'Recalling'
 
 const MCQ_HINT =
   '↑↓ Enter or number to select; Esc asks to leave recall (y/n confirm)'
-
-const LEAVE_RECALL_PROMPT = 'Leave recall?'
-
-const RECALL_SESSION_STOPPED_LINE = 'Recall session stopped.'
 
 export function RecallMcqStage({
   onSettled,
@@ -178,16 +175,9 @@ export function RecallMcqStage({
 
   if (showLeaveConfirm) {
     return (
-      <YesNoStagePrompt
-        prompt={LEAVE_RECALL_PROMPT}
-        onAnswer={(yes) => {
-          if (yes) {
-            onSettled(RECALL_SESSION_STOPPED_LINE)
-            return
-          }
-          setShowLeaveConfirm(false)
-        }}
-        onCancel={() => setShowLeaveConfirm(false)}
+      <LeaveRecallConfirmPrompt
+        onConfirmLeave={() => onSettled(RECALL_SESSION_STOPPED_LINE)}
+        onDismiss={() => setShowLeaveConfirm(false)}
         inputBlockedRef={inputBlockedRef}
         header={
           <Fragment>

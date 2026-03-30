@@ -2,6 +2,10 @@ import * as fs from 'node:fs'
 import { MemoryTrackerController, RecallsController } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import {
+  LEAVE_RECALL_PROMPT,
+  RECALL_SESSION_STOPPED_LINE,
+} from '../src/commands/recall/leaveRecallSessionCopy.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { formatVersionOutput } from '../src/commands/version.js'
 import {
@@ -18,9 +22,6 @@ const baseNoteTimes = {
   createdAt: '2026-01-01T00:00:00Z',
   updatedAt: '2026-01-01T00:00:00Z',
 }
-
-const LEAVE_RECALL_CONFIRM = 'Leave recall?'
-const RECALL_SESSION_STOPPED = 'Recall session stopped.'
 
 describe('recall just-review (interactive)', () => {
   let configDir: string
@@ -326,7 +327,7 @@ describe('recall just-review (interactive)', () => {
     pressEscape(stdin)
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_CONFIRM) && p.includes('(y/n)')
+      (p) => p.includes(LEAVE_RECALL_PROMPT) && p.includes('(y/n)')
     )
 
     expect(markAsRecalledSpy).not.toHaveBeenCalled()
@@ -345,11 +346,11 @@ describe('recall just-review (interactive)', () => {
     pressEscape(stdin)
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_CONFIRM)
+      (p) => p.includes(LEAVE_RECALL_PROMPT)
     )
 
     stdin.write('y\r')
-    await untilPlain(frames, (p) => p.includes(RECALL_SESSION_STOPPED))
+    await untilPlain(frames, (p) => p.includes(RECALL_SESSION_STOPPED_LINE))
 
     expect(markAsRecalledSpy).not.toHaveBeenCalled()
   })
@@ -367,7 +368,7 @@ describe('recall just-review (interactive)', () => {
     pressEscape(stdin)
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_CONFIRM)
+      (p) => p.includes(LEAVE_RECALL_PROMPT)
     )
 
     stdin.write('n\r')
@@ -375,7 +376,7 @@ describe('recall just-review (interactive)', () => {
       return (
         f.includes('Yes, I remember?') &&
         f.includes('Alpha') &&
-        !f.includes(LEAVE_RECALL_CONFIRM)
+        !f.includes(LEAVE_RECALL_PROMPT)
       )
     })
 

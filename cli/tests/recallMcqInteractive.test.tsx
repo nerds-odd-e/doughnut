@@ -7,6 +7,10 @@ import {
 import type { RecallPrompt } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import {
+  LEAVE_RECALL_PROMPT,
+  RECALL_SESSION_STOPPED_LINE,
+} from '../src/commands/recall/leaveRecallSessionCopy.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
   pressEscape,
@@ -25,8 +29,6 @@ const baseNoteTimes = {
 const RECALL_PROMPT_ID = 42
 
 const MCQ_HINT_SUBSTR = '↑↓ Enter or number to select'
-const LEAVE_RECALL_CONFIRM = 'Leave recall?'
-const RECALL_SESSION_STOPPED = 'Recall session stopped.'
 
 const EXPECT_GUIDANCE_MORE_BELOW = '↓ more below'
 
@@ -198,7 +200,7 @@ describe('recall MCQ (interactive)', () => {
     pressEscape(stdin)
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_CONFIRM) && p.includes('(y/n)')
+      (p) => p.includes(LEAVE_RECALL_PROMPT) && p.includes('(y/n)')
     )
 
     expect(answerQuizSpy).not.toHaveBeenCalled()
@@ -214,14 +216,14 @@ describe('recall MCQ (interactive)', () => {
     pressEscape(stdin)
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_CONFIRM)
+      (p) => p.includes(LEAVE_RECALL_PROMPT)
     )
 
     stdin.write('y\r')
 
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(RECALL_SESSION_STOPPED)
+      (p) => p.includes(RECALL_SESSION_STOPPED_LINE)
     )
 
     expect(answerQuizSpy).not.toHaveBeenCalled()
@@ -237,7 +239,7 @@ describe('recall MCQ (interactive)', () => {
     pressEscape(stdin)
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_CONFIRM)
+      (p) => p.includes(LEAVE_RECALL_PROMPT)
     )
 
     stdin.write('n\r')
@@ -248,7 +250,7 @@ describe('recall MCQ (interactive)', () => {
         p.includes('Choose') &&
         p.includes('Alpha') &&
         p.includes(MCQ_HINT_SUBSTR) &&
-        !p.includes(LEAVE_RECALL_CONFIRM)
+        !p.includes(LEAVE_RECALL_PROMPT)
     )
 
     expect(answerQuizSpy).not.toHaveBeenCalled()
