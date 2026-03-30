@@ -74,7 +74,7 @@ function stdoutLooksLikeInteractiveCliPtyCapture(stdout: string): boolean {
     'type your answer; /stop to exit recall',
     'y/N',
     'n/Y',
-    '↑↓ Enter or number to select; Esc to cancel',
+    '↑↓ Enter or number to select; Esc asks to leave recall (y/n confirm)',
     '↑↓ Enter to select; other keys cancel',
   ] as const
   if (snippets.some((s) => stdout.includes(s))) return true

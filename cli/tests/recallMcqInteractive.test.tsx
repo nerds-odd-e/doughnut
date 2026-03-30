@@ -9,9 +9,11 @@ import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
+  pressEscape,
   renderInkWhenCommandLineReady,
   stripAnsi,
   waitForFrames,
+  waitForLastFrame,
 } from './inkTestHelpers.js'
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
@@ -21,6 +23,22 @@ const baseNoteTimes = {
 }
 
 const RECALL_PROMPT_ID = 42
+
+const MCQ_HINT_SUBSTR = '↑↓ Enter or number to select'
+const LEAVE_RECALL_CONFIRM = 'Leave recall?'
+const RECALL_SESSION_STOPPED = 'Recall session stopped.'
+
+async function waitForMcqVisible(frames: string[]): Promise<void> {
+  await waitForFrames(
+    () => stripAnsi(frames.join('\n')),
+    (p) =>
+      p.includes('Choose') &&
+      p.includes('Alpha') &&
+      !p.includes('**') &&
+      p.includes('Beta') &&
+      p.includes(MCQ_HINT_SUBSTR)
+  )
+}
 
 describe('recall MCQ (interactive)', () => {
   let configDir: string
@@ -113,15 +131,7 @@ describe('recall MCQ (interactive)', () => {
 
     stdin.write('/recall\r')
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) =>
-        p.includes('Choose') &&
-        p.includes('Alpha') &&
-        !p.includes('**') &&
-        p.includes('Beta') &&
-        p.includes('↑↓ Enter or number to select')
-    )
+    await waitForMcqVisible(frames)
 
     expect(frames.join('\n')).toContain('\u001b[')
 
@@ -139,5 +149,74 @@ describe('recall MCQ (interactive)', () => {
         body: { choiceIndex: 1 },
       })
     )
+  })
+
+  test('Esc from MCQ shows leave recall confirmation without calling answerQuiz', async () => {
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForMcqVisible(frames)
+
+    expect(answerQuizSpy).not.toHaveBeenCalled()
+
+    pressEscape(stdin)
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(LEAVE_RECALL_CONFIRM) && p.includes('(y/n)')
+    )
+
+    expect(answerQuizSpy).not.toHaveBeenCalled()
+  })
+
+  test('after Esc, y settles with Recall session stopped and never calls answerQuiz', async () => {
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForMcqVisible(frames)
+    pressEscape(stdin)
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(LEAVE_RECALL_CONFIRM)
+    )
+
+    stdin.write('y\r')
+
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(RECALL_SESSION_STOPPED)
+    )
+
+    expect(answerQuizSpy).not.toHaveBeenCalled()
+  })
+
+  test('after Esc, n returns to MCQ without answerQuiz', async () => {
+    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForMcqVisible(frames)
+    pressEscape(stdin)
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(LEAVE_RECALL_CONFIRM)
+    )
+
+    stdin.write('n\r')
+
+    await waitForLastFrame(
+      lastFrame,
+      (p) =>
+        p.includes('Choose') &&
+        p.includes('Alpha') &&
+        p.includes(MCQ_HINT_SUBSTR) &&
+        !p.includes(LEAVE_RECALL_CONFIRM)
+    )
+
+    expect(answerQuizSpy).not.toHaveBeenCalled()
   })
 })

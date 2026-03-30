@@ -1,4 +1,5 @@
 import {
+  Fragment,
   useCallback,
   useContext,
   useLayoutEffect,
@@ -18,12 +19,18 @@ import { renderMarkdownToTerminal } from '../../markdown.js'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
 import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
+import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
 import { numberedMcqMarkdownLinesForTerminal } from './numberedMcqMarkdownLines.js'
 import { submitMcqAnswer, type RecallMcqCardPayload } from './recallMcqLoad.js'
 
 const STAGE_LABEL = 'Recalling'
 
-const MCQ_HINT = '↑↓ Enter or number to select; Esc to cancel'
+const MCQ_HINT =
+  '↑↓ Enter or number to select; Esc asks to leave recall (y/n confirm)'
+
+const LEAVE_RECALL_PROMPT = 'Leave recall?'
+
+const RECALL_SESSION_STOPPED_LINE = 'Recall session stopped.'
 
 export function RecallMcqStage({
   onSettled,
@@ -39,6 +46,7 @@ export function RecallMcqStage({
   const [buffer, setBuffer] = useState('')
   const bufferRef = useRef('')
   const [highlightIndex, setHighlightIndex] = useState(0)
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
 
   const width = resolvedTerminalWidth()
   const stemRendered = useMemo(
@@ -111,7 +119,9 @@ export function RecallMcqStage({
             clearDraft()
             runSubmit(idx).catch(() => undefined)
           },
-          onEscapeSignaled: () => undefined,
+          onEscapeSignaled: () => {
+            setShowLeaveConfirm(true)
+          },
           onEditBackspace: () => {
             const cur = bufferRef.current
             if (cur.length === 0) return
@@ -154,15 +164,42 @@ export function RecallMcqStage({
 
   useLayoutEffect(() => {
     if (setStageKeyHandler === undefined) return
+    if (showLeaveConfirm) return
     setStageKeyHandler(handleInput)
     return () => {
       setStageKeyHandler(null)
     }
-  }, [setStageKeyHandler, handleInput])
+  }, [setStageKeyHandler, handleInput, showLeaveConfirm])
 
   useInput(handleInput, {
-    isActive: setStageKeyHandler === undefined,
+    isActive: setStageKeyHandler === undefined && !showLeaveConfirm,
   })
+
+  if (showLeaveConfirm) {
+    return (
+      <YesNoStagePrompt
+        prompt={LEAVE_RECALL_PROMPT}
+        onAnswer={(yes) => {
+          if (yes) {
+            onSettled(RECALL_SESSION_STOPPED_LINE)
+            return
+          }
+          setShowLeaveConfirm(false)
+        }}
+        onCancel={() => setShowLeaveConfirm(false)}
+        inputBlockedRef={inputBlockedRef}
+        header={
+          <Fragment>
+            <Text>{STAGE_LABEL}</Text>
+            {payload.notebookTitle !== undefined &&
+            payload.notebookTitle !== '' ? (
+              <Text>{payload.notebookTitle}</Text>
+            ) : null}
+          </Fragment>
+        }
+      />
+    )
+  }
 
   return (
     <Box flexDirection="column">
