@@ -9,8 +9,9 @@ import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError
 import {
   loadRecallJustReviewPayloadIfAny,
   markJustReviewRecalled,
-  type RecallJustReviewPayload,
+  type RecallSessionPayload,
 } from './justReviewLoad.js'
+import { RecallMcqStage } from './RecallMcqStage.js'
 import { recallSessionSummaryLine } from './recallSessionSummary.js'
 
 const STAGE_LABEL = 'Recalling'
@@ -18,10 +19,10 @@ const STAGE_LABEL = 'Recalling'
 export function RecallJustReviewStage({
   onSettled,
 }: InteractiveSlashCommandStageProps) {
-  const [payload, setPayload] = useState<RecallJustReviewPayload | null>(null)
+  const [payload, setPayload] = useState<RecallSessionPayload | null>(null)
   const [uiMode, setUiMode] = useState<'card' | 'loadMore'>('card')
   const [initialResolved, setInitialResolved] = useState(false)
-  const payloadRef = useRef<RecallJustReviewPayload | null>(null)
+  const payloadRef = useRef<RecallSessionPayload | null>(null)
   const submittingRef = useRef(false)
   const successfulRecallsRef = useRef(0)
   const startedWithEmptyTodayRef = useRef(false)
@@ -58,6 +59,20 @@ export function RecallJustReviewStage({
     onSettled(recallSessionSummaryLine(successfulRecallsRef.current))
   }, [onSettled])
 
+  const onMcqSucceeded = useCallback(async () => {
+    successfulRecallsRef.current += 1
+    try {
+      const next = await loadRecallJustReviewPayloadIfAny(0)
+      if (next !== null) {
+        setPayload(next)
+        return
+      }
+      onSettled('Correct!\nRecalled successfully')
+    } catch (loadErr: unknown) {
+      onSettled(userVisibleSlashCommandError(loadErr))
+    }
+  }, [onSettled])
+
   const submitLoadMore = useCallback(
     async (accept: boolean) => {
       if (submittingRef.current) return
@@ -87,7 +102,8 @@ export function RecallJustReviewStage({
   const submit = useCallback(
     async (successful: boolean) => {
       const p = payloadRef.current
-      if (p === null || submittingRef.current) return
+      if (p === null || p.kind !== 'just-review' || submittingRef.current)
+        return
       submittingRef.current = true
       try {
         await markJustReviewRecalled(p.memoryTrackerId, successful)
@@ -162,6 +178,18 @@ export function RecallJustReviewStage({
       <Box>
         <Spinner label="Loading recall…" />
       </Box>
+    )
+  }
+
+  if (payload.kind === 'mcq') {
+    return (
+      <RecallMcqStage
+        key={payload.recallPromptId}
+        onSettled={onSettled}
+        payload={payload}
+        inputBlockedRef={submittingRef}
+        onMcqSucceeded={onMcqSucceeded}
+      />
     )
   }
 

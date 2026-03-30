@@ -22,6 +22,7 @@ describe('recall just-review (interactive)', () => {
   let recallingSpy: ReturnType<typeof vi.spyOn>
   let showMemoryTrackerSpy: ReturnType<typeof vi.spyOn>
   let getRecallPromptsSpy: ReturnType<typeof vi.spyOn>
+  let askAQuestionSpy: ReturnType<typeof vi.spyOn>
   let markAsRecalledSpy: ReturnType<typeof vi.spyOn>
 
   async function untilPlain(
@@ -220,6 +221,10 @@ describe('recall just-review (interactive)', () => {
         data: [],
       } as Awaited<ReturnType<typeof MemoryTrackerController.getRecallPrompts>>)
 
+    askAQuestionSpy = vi
+      .spyOn(MemoryTrackerController, 'askAQuestion')
+      .mockRejectedValue(new Error('stub: no quiz in just-review tests'))
+
     markAsRecalledSpy = vi
       .spyOn(MemoryTrackerController, 'markAsRecalled')
       .mockResolvedValue({
@@ -231,6 +236,7 @@ describe('recall just-review (interactive)', () => {
     recallingSpy.mockRestore()
     showMemoryTrackerSpy.mockRestore()
     getRecallPromptsSpy.mockRestore()
+    askAQuestionSpy.mockRestore()
     markAsRecalledSpy.mockRestore()
     if (savedConfigDir === undefined) {
       delete process.env.DOUGHNUT_CONFIG_DIR

@@ -63,6 +63,16 @@ function wrapParagraphToWidths(
   return out.length > 0 ? out : ['']
 }
 
+/** Plain-text stem / labels; widths are terminal columns (not UTF-16 length). */
+export function wrapPlainTextLinesForTerminal(
+  text: string,
+  width: number
+): string[] {
+  const t = text.trim()
+  if (t === '') return []
+  return wrapParagraphToWidths(t, width, width)
+}
+
 export type NumberedTerminalListLine = {
   readonly itemIndex: number
   readonly text: string

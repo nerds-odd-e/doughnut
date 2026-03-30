@@ -340,8 +340,12 @@ export function MainInteractivePrompt({
   const beforeCaret = buffer.slice(0, caretOffset)
   const afterCaret = buffer.slice(caretOffset)
 
+  if (!isActive) {
+    return null
+  }
+
   return (
-    <Box flexDirection="column" display={isActive ? 'flex' : 'none'}>
+    <Box flexDirection="column">
       <Text>
         {'> '}
         {beforeCaret}

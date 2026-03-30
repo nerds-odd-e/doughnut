@@ -52,10 +52,9 @@ Feature: CLI recall status and recall session
       When I answer "y" in the interactive CLI to prompt "Yes, I remember?"
       Then I should see "Recalled successfully" in past CLI assistant messages
 
-    @ignore
     @usingMockedOpenAiService
     Scenario: Recall MCQ - choose correct answer and see success
-      And OpenAI generates this question:
+      Given OpenAI generates this question:
         | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
         | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
       And the note "sedition" was assimilated on day 1
