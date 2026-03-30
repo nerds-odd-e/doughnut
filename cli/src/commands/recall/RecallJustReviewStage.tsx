@@ -1,9 +1,19 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { Box, Text } from 'ink'
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type MutableRefObject,
+} from 'react'
+import type { Key } from 'ink'
+import { Box, Text, useInput } from 'ink'
 import { Spinner } from '@inkjs/ui'
 import { renderMarkdownToTerminal } from '../../markdown.js'
 import { resolvedTerminalWidth } from '../../terminalColumns.js'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
+import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext.js'
 import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import {
@@ -26,15 +36,18 @@ export function RecallJustReviewStage({
   const submittingRef = useRef(false)
   const successfulRecallsRef = useRef(0)
   const startedWithEmptyTodayRef = useRef(false)
+  const activeOperationAbortRef = useRef<AbortController | null>(null)
 
   payloadRef.current = payload
 
   useEffect(() => {
-    let cancelled = false
-    const run = async () => {
+    let unmounted = false
+    const ac = new AbortController()
+    activeOperationAbortRef.current = ac
+    ;(async () => {
       try {
-        const p = await loadRecallJustReviewPayloadIfAny(0)
-        if (cancelled) return
+        const p = await loadRecallJustReviewPayloadIfAny(0, ac.signal)
+        if (unmounted || ac.signal.aborted) return
         if (p !== null) {
           startedWithEmptyTodayRef.current = false
           setPayload(p)
@@ -46,12 +59,20 @@ export function RecallJustReviewStage({
         }
         setInitialResolved(true)
       } catch (err: unknown) {
-        if (!cancelled) onSettled(userVisibleSlashCommandError(err))
+        if (unmounted) return
+        onSettled(userVisibleSlashCommandError(err))
+      } finally {
+        if (activeOperationAbortRef.current === ac) {
+          activeOperationAbortRef.current = null
+        }
       }
-    }
-    run().catch(() => undefined)
+    })().catch(() => undefined)
     return () => {
-      cancelled = true
+      unmounted = true
+      ac.abort()
+      if (activeOperationAbortRef.current === ac) {
+        activeOperationAbortRef.current = null
+      }
     }
   }, [onSettled])
 
@@ -77,14 +98,27 @@ export function RecallJustReviewStage({
     async (accept: boolean) => {
       if (submittingRef.current) return
       submittingRef.current = true
+      if (!accept) {
+        submittingRef.current = false
+        settleSessionSummary()
+        return
+      }
+      const ac = new AbortController()
+      activeOperationAbortRef.current = ac
       try {
-        if (!accept) {
-          submittingRef.current = false
-          settleSessionSummary()
+        const next = await loadRecallJustReviewPayloadIfAny(3, ac.signal)
+        submittingRef.current = false
+        if (activeOperationAbortRef.current === ac) {
+          activeOperationAbortRef.current = null
+        }
+        if (ac.signal.aborted) {
+          onSettled(
+            userVisibleSlashCommandError(
+              new DOMException('Aborted', 'AbortError')
+            )
+          )
           return
         }
-        const next = await loadRecallJustReviewPayloadIfAny(3)
-        submittingRef.current = false
         if (next === null) {
           settleSessionSummary()
         } else {
@@ -93,6 +127,9 @@ export function RecallJustReviewStage({
         }
       } catch (loadErr: unknown) {
         submittingRef.current = false
+        if (activeOperationAbortRef.current === ac) {
+          activeOperationAbortRef.current = null
+        }
         onSettled(userVisibleSlashCommandError(loadErr))
       }
     },
@@ -104,23 +141,54 @@ export function RecallJustReviewStage({
       const p = payloadRef.current
       if (p === null || p.kind !== 'just-review' || submittingRef.current)
         return
+      const ac = new AbortController()
+      activeOperationAbortRef.current = ac
       submittingRef.current = true
       try {
-        await markJustReviewRecalled(p.memoryTrackerId, successful)
+        await markJustReviewRecalled(p.memoryTrackerId, successful, ac.signal)
       } catch (err: unknown) {
         submittingRef.current = false
+        if (activeOperationAbortRef.current === ac) {
+          activeOperationAbortRef.current = null
+        }
         onSettled(userVisibleSlashCommandError(err))
+        return
+      }
+      if (ac.signal.aborted) {
+        submittingRef.current = false
+        if (activeOperationAbortRef.current === ac) {
+          activeOperationAbortRef.current = null
+        }
+        onSettled(
+          userVisibleSlashCommandError(
+            new DOMException('Aborted', 'AbortError')
+          )
+        )
         return
       }
       if (!successful) {
         submittingRef.current = false
+        if (activeOperationAbortRef.current === ac) {
+          activeOperationAbortRef.current = null
+        }
         onSettled('Marked as not recalled.')
         return
       }
       successfulRecallsRef.current += 1
       try {
-        const next = await loadRecallJustReviewPayloadIfAny(0)
+        const next = await loadRecallJustReviewPayloadIfAny(0, ac.signal)
         submittingRef.current = false
+        if (activeOperationAbortRef.current === ac) {
+          activeOperationAbortRef.current = null
+        }
+        if (ac.signal.aborted) {
+          onSettled(
+            userVisibleSlashCommandError(
+              new DOMException('Aborted', 'AbortError')
+            )
+          )
+          return
+        }
         if (next === null) {
           if (
             startedWithEmptyTodayRef.current &&
@@ -135,6 +203,9 @@ export function RecallJustReviewStage({
         }
       } catch (loadErr: unknown) {
         submittingRef.current = false
+        if (activeOperationAbortRef.current === ac) {
+          activeOperationAbortRef.current = null
+        }
         onSettled(userVisibleSlashCommandError(loadErr))
       }
     },
@@ -149,12 +220,19 @@ export function RecallJustReviewStage({
     submitLoadMore(false).catch(() => undefined)
   }, [submitLoadMore])
 
+  const abortInFlightOperation = useCallback(() => {
+    activeOperationAbortRef.current?.abort()
+  }, [])
+
   const width = resolvedTerminalWidth()
 
   if (!initialResolved) {
     return (
-      <Box>
-        <Spinner label="Loading recall…" />
+      <Box flexDirection="column">
+        <RecallJustReviewEscSpinner abortRef={activeOperationAbortRef} />
+        <Box>
+          <Spinner label="Loading recall…" />
+        </Box>
       </Box>
     )
   }
@@ -167,6 +245,7 @@ export function RecallJustReviewStage({
         onAnswer={submitLoadMore}
         defaultAnswer={true}
         onCancel={cancelLoadMorePrompt}
+        onEscapeWhileInputBlocked={abortInFlightOperation}
         inputBlockedRef={submittingRef}
         header={<Text>{STAGE_LABEL}</Text>}
       />
@@ -175,8 +254,11 @@ export function RecallJustReviewStage({
 
   if (payload === null) {
     return (
-      <Box>
-        <Spinner label="Loading recall…" />
+      <Box flexDirection="column">
+        <RecallJustReviewEscSpinner abortRef={activeOperationAbortRef} />
+        <Box>
+          <Spinner label="Loading recall…" />
+        </Box>
       </Box>
     )
   }
@@ -205,6 +287,7 @@ export function RecallJustReviewStage({
       prompt="Yes, I remember?"
       onAnswer={submit}
       onCancel={cancelJustReviewCard}
+      onEscapeWhileInputBlocked={abortInFlightOperation}
       inputBlockedRef={submittingRef}
       header={
         <>
@@ -225,4 +308,34 @@ export function RecallJustReviewStage({
       }
     />
   )
+}
+
+function RecallJustReviewEscSpinner({
+  abortRef,
+}: {
+  readonly abortRef: MutableRefObject<AbortController | null>
+}) {
+  const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
+  const handleStageInput = useCallback(
+    (input: string, key: Key) => {
+      const isEscape = key.escape === true || input === '\u001b'
+      if (!isEscape) return
+      abortRef.current?.abort()
+    },
+    [abortRef]
+  )
+
+  useLayoutEffect(() => {
+    if (setStageKeyHandler === undefined) return
+    setStageKeyHandler(handleStageInput)
+    return () => {
+      setStageKeyHandler(null)
+    }
+  }, [setStageKeyHandler, handleStageInput])
+
+  useInput(handleStageInput, {
+    isActive: setStageKeyHandler === undefined,
+  })
+
+  return null
 }

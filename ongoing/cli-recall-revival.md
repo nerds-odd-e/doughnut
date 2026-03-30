@@ -147,25 +147,37 @@ Recent removals (around **2026-03-28**) show what existed before strip-down; use
 - **Wrong answer path:** Unit or Vitest for messaging if not covered by later scenarios.
 - **Choice ordering / shuffling:** If API can shuffle, unit-test mapping from index to choice id — only if needed for MCQ correctness.
 
+### Phase 6.4 — MCQ stem and choices: markdown on the TTY
+
+**User outcome:** MCQ **stem** and **choice strings** from the API are treated as **markdown** (same assumption as note details / web recall): render through the existing terminal markdown path (e.g. **`renderMarkdownToTerminal`** in `cli/src/markdown.ts`), with **bold / emphasis** and other supported styles visible in **Current guidance**; no raw `**` / `_` markers left for learners when the source is markdown.
+
+- **Implementation:** Replace plain **`wrapPlainTextLinesForTerminal`** (and any plain-text-only choice rows) in **`RecallMcqStage`** with markdown rendering per **stem** and **each choice**, still respecting **`resolvedTerminalWidth()`** and `cli.mdc` column-width rules (grapheme / `string-width`, not UTF-16 `.length` for layout).
+- **Selection UI:** Numbered list + ↑↓ highlight must stay correct: each choice remains one logical option after render (handle multi-line markdown output per choice without breaking index → `choiceIndex` mapping).
+- **E2E / tests:** Add or extend a **scenario or Vitest** only if a **user-visible** styling or stripped-text assertion is needed (e.g. **`… styled in the Current guidance`** pattern from Phase 2); otherwise keep existing MCQ happy-path green.
+- **Order:** Can ship **after** Phase 6.2 (and optionally after 6.3); does not unblock Phase 7–9.
+
 ---
 
-## Phase 7 — Scenario: *Recall MCQ — ESC cancels with y/n confirmation*
+## Phase 7 — Leave recall during MCQ: **Esc** + y/n confirm (**Vitest**, no `cli_recall.feature` scenario)
 
-**User outcome:** `/stop` during MCQ → recall session stopped (per step `the recall session was stopped`); `/recall-status` still shows due count.
+**User outcome:** While in **MCQ recall**, **Escape** means “leave recall”; the CLI shows a **y/n confirmation** (e.g. leave vs stay); **y** ends the recall session with a clear **assistant-visible** outcome (session stopped / cancelled — same product intent as the old `the recall session was stopped` step, but **not** exercised via Cypress). **n** returns to the MCQ question. **Do not** use **`/stop`** as the primary user action for this flow.
 
-### Phase 7.1 — E2E fails for the right reason
+**Coverage:** **Unit-test driven** — extend or add **`cli/tests/*.test.tsx`** driving **`InteractiveCliApp`** with **`vi.spyOn`** on **`doughnut-api`** controllers (`cli.mdc` observable-behavior pattern). No new or restored Gherkin scenario in **`e2e_test/features/cli/cli_recall.feature`** for Phase 7.
 
-- Un-ignore; failure should say stop/confirm/stop-session behavior missing, not MCQ from Phase 6.
+### Phase 7.1 — Vitest fails for the right reason
 
-### Phase 7.2 — Pass E2E with minimum production change
+- Add failing cases first: **Esc** from MCQ shows **confirm** copy; **y** settles with expected assistant text and clears recall stage; **n** returns to MCQ UI; failures name **missing confirm / wrong branch / extra API call** (e.g. `answerQuiz` when user only aborted), not generic MCQ.
 
-- Implement **`/stop`** (or equivalent documented in help) in recall stage: **y/n confirmation**, session teardown, no orphaned pending API state.
-- Confirm **due note not consumed** incorrectly when stopping (status count unchanged).
+### Phase 7.2 — Pass with minimum production change
 
-### Phase 7.3 — Edge cases (scenario scope only)
+- On **`RecallMcqStage`**, **Esc** → **y/n confirmation** (reuse existing stage patterns: **`YesNoStagePrompt`**, substage, or equivalent — keep stage-local state). **y** → **`onSettled`** with agreed copy + teardown; **n** → resume MCQ with no quiz submit.
+- Confirm **due note not consumed** incorrectly on abort (assert controller calls / no successful answer path as appropriate).
+- Align on-screen **hint** with behavior (today’s **`↑↓ Enter or number to select; Esc to cancel`** implies cancel is possible; post–Phase 7 it should match the **confirm** UX).
 
-- **n** on stop confirmation → return to MCQ (if product expects — only if scenario or help implies; otherwise defer to avoid scope creep).
-- **Escape vs /stop:** If both exist, document one source of truth; unit-test the branch that E2E does not hit.
+### Phase 7.3 — Edge cases (Vitest scope)
+
+- **n** on confirmation → back to MCQ with stable highlight/buffer.
+- Invalid keys during confirm — only if quick Vitest; defer if redundant with **`YesNoStagePrompt`** coverage.
 
 ---
 
@@ -232,7 +244,7 @@ Recent removals (around **2026-03-28**) show what existed before strip-down; use
 ## After all phases
 
 - Remove any remaining `@ignore` on these scenarios; confirm **CI policy** for CLI E2E (today only install feature is active — decide whether recall feature joins CI or stays tag-gated; document in team process, not necessarily in this file).
-- **Optional:** Update `ongoing/cli-architecture-roadmap.md` with one short **decision record** (where recall stage lives, how `/stop` and `/contest` relate to command registry) if it clarifies future work.
+- **Optional:** Update `ongoing/cli-architecture-roadmap.md` with one short **decision record** (where recall stage lives, how **Esc exit** and **`/contest`** relate to command registry) if it clarifies future work.
 - Delete or shrink **this** plan when revival is complete.
 
 ---
@@ -247,7 +259,7 @@ flowchart LR
   P4[Phase 4 Temp2 load-more n]
   P5[Phase 5 full session]
   P6[Phase 6 MCQ happy]
-  P7[Phase 7 stop confirm]
+  P7[Phase 7 Esc y/n exit]
   P8[Phase 8 MCQ arrows]
   P9[Phase 9 contest]
   P10[Phase 10 spelling]
@@ -262,4 +274,4 @@ flowchart LR
   P2 --> P10
 ```
 
-Phases 7–9 depend on MCQ (Phase 6). Phase 10 can proceed in parallel with Phases 3–9 after Phase 2 if resourcing splits, but **sequential delivery** per scenario order is the default.
+Phases 7–9 depend on MCQ (Phase 6). **Phase 7** (Esc + y/n leave recall) is **Vitest-only** — no node in `cli_recall.feature`. **Phase 6.4** refines MCQ presentation (markdown stem/choices); it does not add a new top-level scenario node. Phase 10 can proceed in parallel with Phases 3–9 after Phase 2 if resourcing splits, but **sequential delivery** per scenario order is the default.

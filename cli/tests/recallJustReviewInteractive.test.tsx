@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { formatVersionOutput } from '../src/commands/version.js'
 import {
+  pressEscapeAndWaitForCancelledLine,
   renderInkWhenCommandLineReady,
   stripAnsi,
   waitForFrames,
@@ -434,6 +435,81 @@ describe('recall just-review (interactive)', () => {
     stdin.write('n\r')
     await untilPlain(frames, (p) => p.includes('Recalled 2 notes'))
     expect(markAsRecalledCount.n).toBe(2)
+  })
+
+  test('Escape during initial load shows Cancelled when recalling honors signal', async () => {
+    recallingSpy.mockImplementation(
+      async (options: { signal?: AbortSignal }) => {
+        const { signal } = options
+        if (signal === undefined) {
+          throw new Error('expected AbortSignal from recall load')
+        }
+        await new Promise<never>((_, reject) => {
+          signal.addEventListener(
+            'abort',
+            () => {
+              reject(new DOMException('Aborted', 'AbortError'))
+            },
+            { once: true }
+          )
+        })
+      }
+    )
+
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    startRecall(stdin)
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => stripAnsi(c).includes('Loading recall')
+    )
+
+    await pressEscapeAndWaitForCancelledLine(stdin, () => frames.join('\n'), {
+      normalize: stripAnsi,
+    })
+    expect(stripAnsi(frames.join('\n'))).toContain('/recall')
+  })
+
+  test('Escape during mark as recalled shows Cancelled when mark honors signal', async () => {
+    mockShowMemoryTrackerCardForRealm(alphaNoteRealm())
+    let markEntered = false
+    markAsRecalledSpy.mockImplementation(
+      async (options: { signal?: AbortSignal }) => {
+        const { signal } = options
+        if (signal === undefined) {
+          throw new Error('expected AbortSignal from markAsRecalled')
+        }
+        markEntered = true
+        await new Promise<never>((_, reject) => {
+          signal.addEventListener(
+            'abort',
+            () => {
+              reject(new DOMException('Aborted', 'AbortError'))
+            },
+            { once: true }
+          )
+        })
+      }
+    )
+
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    startRecall(stdin)
+    await waitRememberAlpha(frames)
+
+    stdin.write('y\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      () => markEntered
+    )
+
+    await pressEscapeAndWaitForCancelledLine(stdin, () => frames.join('\n'), {
+      normalize: stripAnsi,
+    })
   })
 
   test('empty Enter and non-y/n on second item do not recall; y then completes session', async () => {

@@ -58,12 +58,13 @@ function mcqPayloadFromRecallPrompt(
 
 /** Next due recall card (just-review or MCQ), or `null` when nothing is due in that window. */
 export async function loadRecallJustReviewPayloadIfAny(
-  dueInDays = 0
+  dueInDays = 0,
+  signal?: AbortSignal
 ): Promise<RecallSessionPayload | null> {
   const due = await runDefaultBackendJson<DueMemoryTrackers>(() =>
     RecallsController.recalling({
       query: dueRecallQuery(dueInDays),
-      ...doughnutSdkOptions(),
+      ...doughnutSdkOptions(signal),
     })
   )
   const trackers = due.toRepeat ?? []
@@ -74,7 +75,7 @@ export async function loadRecallJustReviewPayloadIfAny(
   const mt = await runDefaultBackendJson<MemoryTracker>(() =>
     MemoryTrackerController.showMemoryTracker({
       path: { memoryTracker: id },
-      ...doughnutSdkOptions(),
+      ...doughnutSdkOptions(signal),
     })
   )
   if (mt.spelling) {
@@ -83,7 +84,7 @@ export async function loadRecallJustReviewPayloadIfAny(
   const prompts = await runDefaultBackendJson<RecallPrompt[]>(() =>
     MemoryTrackerController.getRecallPrompts({
       path: { memoryTracker: id },
-      ...doughnutSdkOptions(),
+      ...doughnutSdkOptions(signal),
     })
   )
   const note = mt.note
@@ -95,7 +96,7 @@ export async function loadRecallJustReviewPayloadIfAny(
       const asked = await runDefaultBackendJson<RecallPrompt>(() =>
         MemoryTrackerController.askAQuestion({
           path: { memoryTracker: id },
-          ...doughnutSdkOptions(),
+          ...doughnutSdkOptions(signal),
         })
       )
       if (asked.questionType === 'MCQ' && asked.answer == null) {
@@ -124,13 +125,14 @@ export async function loadRecallJustReviewPayloadIfAny(
 
 export async function markJustReviewRecalled(
   memoryTrackerId: number,
-  successful: boolean
+  successful: boolean,
+  signal?: AbortSignal
 ): Promise<void> {
   await runDefaultBackendJson(() =>
     MemoryTrackerController.markAsRecalled({
       path: { memoryTracker: memoryTrackerId },
       query: { successful },
-      ...doughnutSdkOptions(),
+      ...doughnutSdkOptions(signal),
     })
   )
 }

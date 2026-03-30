@@ -34,6 +34,8 @@ export type YesNoStagePromptProps = {
   onAnswer: (yes: boolean) => void | Promise<void>
   defaultAnswer?: boolean
   onCancel?: () => void | Promise<void>
+  /** Invoked on Esc while {@link inputBlockedRef} is true (e.g. abort in-flight network). */
+  onEscapeWhileInputBlocked?: () => void | Promise<void>
   inputBlockedRef?: MutableRefObject<boolean>
   header?: ReactNode
   belowBuffer?: ReactNode
@@ -44,6 +46,7 @@ export function YesNoStagePrompt({
   onAnswer,
   defaultAnswer,
   onCancel,
+  onEscapeWhileInputBlocked,
   inputBlockedRef,
   header,
   belowBuffer,
@@ -58,11 +61,23 @@ export function YesNoStagePrompt({
   const onCancelRef = useRef(onCancel)
   onCancelRef.current = onCancel
 
+  const onEscapeWhileInputBlockedRef = useRef(onEscapeWhileInputBlocked)
+  onEscapeWhileInputBlockedRef.current = onEscapeWhileInputBlocked
+
   const handleInput = useCallback(
     (input: string, key: Key) => {
+      const isEscape = key.escape === true || input === '\u001b'
+      if (
+        isEscape &&
+        inputBlockedRef?.current &&
+        onEscapeWhileInputBlockedRef.current !== undefined
+      ) {
+        runOnCancel(onEscapeWhileInputBlockedRef.current)
+        return
+      }
+
       if (inputBlockedRef?.current) return
 
-      const isEscape = key.escape === true || input === '\u001b'
       if (isEscape && onCancelRef.current !== undefined) {
         runOnCancel(onCancelRef.current)
         return

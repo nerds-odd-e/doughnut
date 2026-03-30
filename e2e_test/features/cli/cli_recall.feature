@@ -68,21 +68,6 @@ Feature: CLI recall status and recall session
 
     @ignore
     @usingMockedOpenAiService
-    Scenario: Recall MCQ - ESC cancels with y/n confirmation
-      And OpenAI generates this question:
-        | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
-        | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
-      And the note "sedition" was assimilated on day 1
-      And It's day 2
-      When I enter the slash command "/recall" in the interactive CLI
-      Then I should see "What is the meaning of sedition?" in the Current guidance
-      When I enter the slash command "/stop" in the interactive CLI
-      Then the recall session was stopped
-      When I enter the slash command "/recall-status" in the interactive CLI
-      Then I should see "1 note to recall today" in past CLI assistant messages
-
-    @ignore
-    @usingMockedOpenAiService
     Scenario: Recall MCQ - down arrow and Enter to select
       And OpenAI generates this question:
         | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
