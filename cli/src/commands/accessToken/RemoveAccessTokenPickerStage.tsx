@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
 import {
   getDefaultTokenLabel,
@@ -19,9 +19,19 @@ function initialHighlightIndexPreferDefault(labels: readonly string[]): number {
 }
 
 export function RemoveAccessTokenPickerStage({
+  argument,
   onSettled,
 }: InteractiveSlashCommandStageProps) {
   const labels = useMemo(() => getStoredAccessTokenLabels(), [])
+
+  useEffect(() => {
+    if (argument) {
+      removeAccessTokenLocal(argument)
+      onSettled(`Token "${argument}" removed.`)
+    }
+  }, [argument, onSettled])
+
+  if (argument) return null
 
   return (
     <AccessTokenLabelPickerStage

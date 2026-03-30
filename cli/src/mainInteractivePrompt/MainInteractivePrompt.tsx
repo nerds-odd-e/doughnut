@@ -29,13 +29,18 @@ import {
 
 export function MainInteractivePrompt({
   onCommittedLine,
+  isActive = true,
 }: {
   readonly onCommittedLine: (line: string) => void
+  readonly isActive?: boolean
 }) {
   const [buffer, setBuffer] = useState('')
   const [caretOffset, setCaretOffset] = useState(0)
   const [slashHighlightIndex, setSlashHighlightIndex] = useState(0)
   const [suggestionsDismissed, setSuggestionsDismissed] = useState(false)
+
+  const isActiveRef = useRef(isActive)
+  isActiveRef.current = isActive
 
   const bufferRef = useRef('')
   const caretRef = useRef(0)
@@ -60,6 +65,7 @@ export function MainInteractivePrompt({
   )
 
   const handleInput = useCallback((input: string, key: Key) => {
+    if (!isActiveRef.current) return
     const readBuf = () => bufferRef.current
     const readCaret = () => caretRef.current
     const readHighlight = () => slashHighlightRef.current
@@ -335,7 +341,7 @@ export function MainInteractivePrompt({
   const afterCaret = buffer.slice(caretOffset)
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" display={isActive ? 'flex' : 'none'}>
       <Text>
         {'> '}
         {beforeCaret}

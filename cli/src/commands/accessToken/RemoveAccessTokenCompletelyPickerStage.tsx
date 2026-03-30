@@ -20,10 +20,13 @@ function initialHighlightIndexPreferDefault(labels: readonly string[]): number {
 }
 
 export function RemoveAccessTokenCompletelyPickerStage({
+  argument,
   onSettled,
 }: InteractiveSlashCommandStageProps) {
   const labels = useMemo(() => getStoredAccessTokenLabels(), [])
-  const [revokeLabel, setRevokeLabel] = useState<string | null>(null)
+  const [revokeLabel, setRevokeLabel] = useState<string | null>(
+    argument ?? null
+  )
 
   if (revokeLabel !== null) {
     return (

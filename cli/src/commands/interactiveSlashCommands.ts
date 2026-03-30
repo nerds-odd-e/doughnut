@@ -32,32 +32,13 @@ export const interactiveSlashCommandByLine = new Map(
 export type ResolvedInteractiveSlashCommand = {
   command: InteractiveSlashCommand
   argument: string | undefined
-  /** Set by the resolver from the command shape and parsed line — shell should not re-derive. */
-  mountStage: boolean
-}
-
-function mountStageForResolved(
-  command: InteractiveSlashCommand,
-  argument: string | undefined
-): boolean {
-  const argumentMissing = argument === undefined || argument === ''
-  return (
-    command.stageComponent !== undefined &&
-    (command.argument === undefined ? true : argumentMissing)
-  )
 }
 
 export function resolveInteractiveSlashCommand(
   line: string
 ): ResolvedInteractiveSlashCommand | undefined {
   const exact = interactiveSlashCommandByLine.get(line)
-  if (exact) {
-    return {
-      command: exact,
-      argument: undefined,
-      mountStage: mountStageForResolved(exact, undefined),
-    }
-  }
+  if (exact) return { command: exact, argument: undefined }
 
   const prefix = [...interactiveSlashCommands]
     .sort((a, b) => b.line.length - a.line.length)
@@ -65,10 +46,8 @@ export function resolveInteractiveSlashCommand(
   if (!prefix) return undefined
 
   const rest = line.slice(prefix.line.length + 1).trim()
-  const argument = rest === '' ? undefined : rest
   return {
     command: prefix,
-    argument,
-    mountStage: mountStageForResolved(prefix, argument),
+    argument: rest === '' ? undefined : rest,
   }
 }

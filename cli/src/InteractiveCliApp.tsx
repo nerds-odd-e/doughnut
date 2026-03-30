@@ -17,6 +17,7 @@ import { SetStageKeyHandlerContext } from './commands/accessToken/stageKeyForwar
 export function InteractiveCliApp() {
   const { exit } = useApp()
   const stageKeyHandlerRef = useRef<StageKeyHandler | null>(null)
+  const stageArgumentRef = useRef<string | undefined>(undefined)
   const setStageKeyHandler = useCallback((handler: StageKeyHandler | null) => {
     stageKeyHandlerRef.current = handler
   }, [])
@@ -41,30 +42,31 @@ export function InteractiveCliApp() {
   const handleAsyncSlashSettled = useCallback((assistantText: string) => {
     setMessages((prev) => [...prev, { role: 'assistant', text: assistantText }])
     setActiveStageComponent(null)
+    stageArgumentRef.current = undefined
   }, [])
 
   const onCommittedLine = useCallback((line: string) => {
     const resolved = resolveInteractiveSlashCommand(line)
     if (resolved) {
-      const { command, argument, mountStage } = resolved
+      const { command, argument } = resolved
+      setMessages((prev) => [...prev, { role: 'user', text: line }])
+      const Stage = command.stageComponent
+      if (Stage) {
+        stageArgumentRef.current = argument
+        // setState(fn) treats fn as updater; bare `Stage` would be called with prior state as props.
+        setActiveStageComponent(() => Stage)
+        return
+      }
       const argumentMissing = argument === undefined || argument === ''
       const argSpec = command.argument
       if (argSpec !== undefined && argumentMissing && !argSpec.optional) {
         setMessages((prev) => [
           ...prev,
-          { role: 'user', text: line },
           {
             role: 'assistant',
             text: `Missing ${argSpec.name}. Usage: ${command.doc.usage}`,
           },
         ])
-        return
-      }
-      setMessages((prev) => [...prev, { role: 'user', text: line }])
-      const Stage = command.stageComponent
-      if (Stage && mountStage) {
-        // setState(fn) treats fn as updater; bare `Stage` would be called with prior state as props.
-        setActiveStageComponent(() => Stage)
         return
       }
       const run = command.run
@@ -114,12 +116,16 @@ export function InteractiveCliApp() {
             <Text key={index}>{item.text}</Text>
           )
         )}
-        {activeStageComponent ? (
+        {activeStageComponent &&
           createElement(activeStageComponent, {
+            argument: stageArgumentRef.current,
             onSettled: handleAsyncSlashSettled,
-          })
-        ) : exitAfterCommit ? null : (
-          <MainInteractivePrompt onCommittedLine={onCommittedLine} />
+          })}
+        {!exitAfterCommit && (
+          <MainInteractivePrompt
+            onCommittedLine={onCommittedLine}
+            isActive={!activeStageComponent}
+          />
         )}
       </Box>
     </SetStageKeyHandlerContext.Provider>

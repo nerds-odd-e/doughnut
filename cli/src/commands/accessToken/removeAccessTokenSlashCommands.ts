@@ -1,7 +1,3 @@
-import {
-  removeAccessTokenCompletely,
-  removeAccessTokenLocal,
-} from './accessToken.js'
 import type {
   CommandDoc,
   InteractiveSlashCommand,
@@ -25,26 +21,12 @@ const removeAccessTokenCompletelyDoc: CommandDoc = {
 export const removeAccessTokenSlashCommand: InteractiveSlashCommand = {
   line: '/remove-access-token',
   doc: removeAccessTokenDoc,
-  argument: { name: 'label', optional: true },
   stageComponent: RemoveAccessTokenPickerStage,
-  run(argument) {
-    removeAccessTokenLocal(argument!)
-    return {
-      assistantMessage: `Token "${argument}" removed.`,
-    }
-  },
 }
 
 export const removeAccessTokenCompletelySlashCommand: InteractiveSlashCommand =
   {
     line: '/remove-access-token-completely',
     doc: removeAccessTokenCompletelyDoc,
-    argument: { name: 'label', optional: true },
     stageComponent: RemoveAccessTokenCompletelyPickerStage,
-    async run(argument) {
-      await removeAccessTokenCompletely(argument!)
-      return {
-        assistantMessage: `Token "${argument}" removed locally and from server.`,
-      }
-    },
   }

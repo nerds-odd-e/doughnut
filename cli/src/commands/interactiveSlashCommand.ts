@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 
 export type InteractiveSlashCommandStageProps = {
+  readonly argument?: string
   readonly onSettled: (assistantText: string) => void
 }
 
