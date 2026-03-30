@@ -23,6 +23,12 @@ import {
 
 const STAGE_LABEL = 'Recalling'
 
+function sessionSummaryLine(successfulRecalls: number): string {
+  return successfulRecalls === 1
+    ? 'Recalled 1 note'
+    : `Recalled ${successfulRecalls} notes`
+}
+
 function normalizeCommittedLine(s: string): string {
   return s.replace(/\r\n/g, ' ').replace(/\n/g, ' ').trim()
 }
@@ -32,10 +38,12 @@ export function RecallJustReviewStage({
 }: InteractiveSlashCommandStageProps) {
   const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
   const [payload, setPayload] = useState<RecallJustReviewPayload | null>(null)
+  const [uiMode, setUiMode] = useState<'card' | 'loadMore'>('card')
   const [buffer, setBuffer] = useState('')
   const bufferRef = useRef('')
   const payloadRef = useRef<RecallJustReviewPayload | null>(null)
   const submittingRef = useRef(false)
+  const successfulRecallsRef = useRef(0)
 
   payloadRef.current = payload
 
@@ -59,6 +67,38 @@ export function RecallJustReviewStage({
     }
   }, [onSettled])
 
+  const settleSessionSummary = useCallback(() => {
+    onSettled(sessionSummaryLine(successfulRecallsRef.current))
+  }, [onSettled])
+
+  const submitLoadMore = useCallback(
+    async (accept: boolean) => {
+      if (submittingRef.current) return
+      submittingRef.current = true
+      try {
+        if (!accept) {
+          submittingRef.current = false
+          settleSessionSummary()
+          return
+        }
+        const next = await loadRecallJustReviewPayloadIfAny(3)
+        submittingRef.current = false
+        if (next === null) {
+          settleSessionSummary()
+        } else {
+          bufferRef.current = ''
+          setBuffer('')
+          setUiMode('card')
+          setPayload(next)
+        }
+      } catch (loadErr: unknown) {
+        submittingRef.current = false
+        onSettled(userVisibleSlashCommandError(loadErr))
+      }
+    },
+    [onSettled, settleSessionSummary]
+  )
+
   const submit = useCallback(
     async (successful: boolean) => {
       const p = payloadRef.current
@@ -76,11 +116,14 @@ export function RecallJustReviewStage({
         onSettled('Marked as not recalled.')
         return
       }
+      successfulRecallsRef.current += 1
       try {
-        const next = await loadRecallJustReviewPayloadIfAny()
+        const next = await loadRecallJustReviewPayloadIfAny(0)
         submittingRef.current = false
         if (next === null) {
-          onSettled('Recalled successfully')
+          bufferRef.current = ''
+          setBuffer('')
+          setUiMode('loadMore')
         } else {
           bufferRef.current = ''
           setBuffer('')
@@ -96,10 +139,10 @@ export function RecallJustReviewStage({
 
   const handleInput = useCallback(
     (input: string, key: Key) => {
-      if (payloadRef.current === null) return
+      if (payload === null) return
       if (submittingRef.current) return
 
-      const tryCommit = () => {
+      const tryCommitReview = () => {
         const line = normalizeCommittedLine(bufferRef.current)
         if (line === 'y' || line === 'Y') {
           submit(true).catch(() => undefined)
@@ -110,6 +153,21 @@ export function RecallJustReviewStage({
           return
         }
       }
+
+      const tryCommitLoadMore = () => {
+        const line = normalizeCommittedLine(bufferRef.current)
+        if (line === 'y' || line === 'Y') {
+          submitLoadMore(true).catch(() => undefined)
+          return
+        }
+        if (line === 'n' || line === 'N') {
+          submitLoadMore(false).catch(() => undefined)
+          return
+        }
+      }
+
+      const tryCommit =
+        uiMode === 'loadMore' ? tryCommitLoadMore : tryCommitReview
 
       /** PTY often sends `y\r` in one chunk; Ink parses it as one keypress with no `return` flag. */
       if (input.includes('\r') || input.includes('\n')) {
@@ -144,7 +202,7 @@ export function RecallJustReviewStage({
       bufferRef.current = next
       setBuffer(next)
     },
-    [submit]
+    [payload, uiMode, submit, submitLoadMore]
   )
 
   useLayoutEffect(() => {
@@ -165,6 +223,20 @@ export function RecallJustReviewStage({
     return (
       <Box>
         <Spinner label="Loading recall…" />
+      </Box>
+    )
+  }
+
+  if (uiMode === 'loadMore') {
+    return (
+      <Box flexDirection="column">
+        <Text>{STAGE_LABEL}</Text>
+        <Text>
+          {'> '}
+          {buffer}
+          <Text inverse> </Text>
+        </Text>
+        <Text>Load more from next 3 days? (y/n)</Text>
       </Box>
     )
   }

@@ -117,7 +117,7 @@ describe('recall just-review (interactive)', () => {
       () => frames.join('\n'),
       (c) =>
         stripAnsi(c).includes('Yes, I remember?') &&
-        !stripAnsi(c).includes('Recalled successfully')
+        !stripAnsi(c).includes('Recalled 1 note')
     )
 
     stdin.write('q\r')
@@ -125,7 +125,7 @@ describe('recall just-review (interactive)', () => {
       () => frames.join('\n'),
       (c) =>
         stripAnsi(c).includes('Yes, I remember?') &&
-        !stripAnsi(c).includes('Recalled successfully')
+        !stripAnsi(c).includes('Recalled 1 note')
     )
 
     stdin.write('\x7f')
@@ -137,7 +137,12 @@ describe('recall just-review (interactive)', () => {
     stdin.write('y\r')
     await waitForFrames(
       () => frames.join('\n'),
-      (c) => stripAnsi(c).includes('Recalled successfully')
+      (c) => stripAnsi(c).includes('Load more from next 3 days?')
+    )
+    stdin.write('n\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => stripAnsi(c).includes('Recalled 1 note')
     )
     expect(markAsRecalledCount.n).toBe(1)
   })
@@ -183,7 +188,7 @@ describe('recall just-review (interactive)', () => {
     )
   })
 
-  test('two due just-review items: y twice then recalled successfully', async () => {
+  test('two due just-review items: y twice then n on load more → Recalled 2 notes', async () => {
     let recallN = 0
     recallingSpy.mockImplementation(async () => {
       recallN += 1
@@ -255,7 +260,12 @@ describe('recall just-review (interactive)', () => {
     stdin.write('y\r')
     await waitForFrames(
       () => frames.join('\n'),
-      (c) => stripAnsi(c).includes('Recalled successfully')
+      (c) => stripAnsi(c).includes('Load more from next 3 days?')
+    )
+    stdin.write('n\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => stripAnsi(c).includes('Recalled 2 notes')
     )
     expect(markAsRecalledCount.n).toBe(2)
   })
@@ -335,7 +345,7 @@ describe('recall just-review (interactive)', () => {
       (c) =>
         stripAnsi(c).includes('Yes, I remember?') &&
         stripAnsi(c).includes('Beta') &&
-        !stripAnsi(c).includes('Recalled successfully')
+        !stripAnsi(c).includes('Recalled 2 notes')
     )
 
     stdin.write('q\r')
@@ -344,7 +354,7 @@ describe('recall just-review (interactive)', () => {
       (c) =>
         stripAnsi(c).includes('Yes, I remember?') &&
         stripAnsi(c).includes('Beta') &&
-        !stripAnsi(c).includes('Recalled successfully')
+        !stripAnsi(c).includes('Recalled 2 notes')
     )
 
     stdin.write('\x7f')
@@ -358,7 +368,12 @@ describe('recall just-review (interactive)', () => {
     stdin.write('y\r')
     await waitForFrames(
       () => frames.join('\n'),
-      (c) => stripAnsi(c).includes('Recalled successfully')
+      (c) => stripAnsi(c).includes('Load more from next 3 days?')
+    )
+    stdin.write('n\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => stripAnsi(c).includes('Recalled 2 notes')
     )
     expect(markAsRecalledCount.n).toBe(2)
   })

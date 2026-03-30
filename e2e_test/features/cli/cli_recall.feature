@@ -33,7 +33,8 @@ Feature: CLI recall status and recall session
       And I should see "Put" styled in the Current guidance
       And I should see "Yes, I remember?" in the Current guidance
       When I enter "y" in the interactive CLI
-      Then I should see "Recalled successfully" in past CLI assistant messages
+      And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
+      Then I should see "Recalled 1 note" in past CLI assistant messages
 
     @disableOpenAiService
     Scenario: Temp1 - multiple notes in session
@@ -44,7 +45,6 @@ Feature: CLI recall status and recall session
       When I answer "y" in the interactive CLI to prompt "Yes, I remember?"
       And I answer "y" in the interactive CLI to prompt "Yes, I remember?"
 
-    @ignore
     @disableOpenAiService
     Scenario: Temp2 - ending session with n
       Given the note "sedition" was assimilated on day 1

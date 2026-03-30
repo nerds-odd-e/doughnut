@@ -24,10 +24,12 @@ function hasPendingMcq(prompts: RecallPrompt[]): boolean {
   return prompts.some((p) => p.questionType === 'MCQ' && p.answer == null)
 }
 
-async function fetchRecallJustReviewPayloadOrNull(): Promise<RecallJustReviewPayload | null> {
+async function fetchRecallJustReviewPayloadOrNull(
+  dueInDays = 0
+): Promise<RecallJustReviewPayload | null> {
   const due = await runDefaultBackendJson<DueMemoryTrackers>(() =>
     RecallsController.recalling({
-      query: dueRecallQuery(0),
+      query: dueRecallQuery(dueInDays),
       ...doughnutSdkOptions(),
     })
   )
@@ -66,9 +68,11 @@ async function fetchRecallJustReviewPayloadOrNull(): Promise<RecallJustReviewPay
   }
 }
 
-/** Next due just-review card, or `null` when nothing is due (normal end of session after the last recall). */
-export async function loadRecallJustReviewPayloadIfAny(): Promise<RecallJustReviewPayload | null> {
-  return fetchRecallJustReviewPayloadOrNull()
+/** Next due just-review card, or `null` when nothing is due in that window. */
+export async function loadRecallJustReviewPayloadIfAny(
+  dueInDays = 0
+): Promise<RecallJustReviewPayload | null> {
+  return fetchRecallJustReviewPayloadOrNull(dueInDays)
 }
 
 export async function loadRecallJustReviewPayload(): Promise<RecallJustReviewPayload> {
