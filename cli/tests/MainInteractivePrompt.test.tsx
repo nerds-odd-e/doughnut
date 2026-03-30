@@ -263,7 +263,7 @@ describe('MainInteractivePrompt caret and slash arrows (phase 3)', () => {
       (raw) =>
         rawLineIncludesBoldMarker(
           raw,
-          'Recall the next due note (just review when no quiz is pending)'
+          'Recall the next due note (just review when no quiz is pe'
         )
     )
   })

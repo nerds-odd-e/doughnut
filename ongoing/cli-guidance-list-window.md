@@ -7,15 +7,15 @@ Informal plan for **Current guidance** / list UIs: slash-command candidates, acc
 | Surface | Location | Today |
 |--------|----------|--------|
 | All three list UIs | `guidanceListWindowInk.tsx` (`GuidanceListInk`), row budget 5 | Long lists: fixed-height window; “↑ more above” / “↓ more below” replace option rows inside the budget. Short lists (lines ≤ budget): **no** indicators; **all** rows shown. |
-| Slash candidates | `MainInteractivePrompt.tsx`, `slashCommandCompletion.ts` | Full match list passed into `GuidanceListInk` mode `slash`. |
-| Token picker | `AccessTokenLabelPickerStage.tsx`, `numberedTerminalListLines` | Wrapped label lines → `GuidanceListInk` mode `numbered`. |
+| Slash candidates | `MainInteractivePrompt.tsx`, `slashCommandCompletion.ts` | Full match list passed into `GuidanceListInk` mode `slash` (single-row usage + description; truncate with `…` when narrower than `terminalColumns`). |
+| Token picker | `AccessTokenLabelPickerStage.tsx`, `numberedTerminalListLines` | One truncated line per label → `GuidanceListInk` mode `numbered` (no wrap). |
 | MCQ choices | `RecallMcqStage.tsx`, `numberedMcqMarkdownLinesForTerminal` | Wrapped choice lines → `GuidanceListInk` mode `numbered`. |
 
 Copy for indicators lives in `guidanceListWindowInk.tsx`.
 
 ## Shared concepts (for implementers)
 
-- **Row budget**: The maximum number of **terminal rows** occupied by the list region (command list: one row per candidate; token list: one row per rendered line today—may change when switching to single-line truncate; MCQ: one row per wrapped line segment, grouped by `itemIndex`). Phases that speak of a “fixed window” mean this budget stays constant; **indicator lines consume slots inside the budget**, they do not add rows below the budget.
+- **Row budget**: The maximum number of **terminal rows** occupied by the list region (command list: one row per candidate; token list: one row per label; MCQ: one row per wrapped line segment, grouped by `itemIndex`). Phases that speak of a “fixed window” mean this budget stays constant; **indicator lines consume slots inside the budget**, they do not add rows below the budget.
 - **Column width**: Use terminal **column** width (grapheme-aware), not UTF-16 `.length` (see `.cursor/rules/cli.mdc`).
 - **Tests**: Prefer **observable** checks—`runInteractive` + mock TTY stdout, or existing Ink helpers (`cli/tests/inkTestHelpers.ts`)—over tests that only mirror private helpers, unless a pure **inputs → visible rows** function is the deliberate contract.
 
@@ -91,6 +91,8 @@ Each phase below has the same **subphases**:
 **Subphases:** Manual check (shrink `COLUMNS` / narrow terminal) → TDD if missing.
 
 **Out of scope for this phase:** MCQ choice lines (Phase 7).
+
+**Done:** `truncateToTerminalColumns` + `inkTerminalColumns` in [`cli/src/terminalColumns.ts`](../cli/src/terminalColumns.ts); `numberedTerminalListLines` emits one row per item; slash layout in [`cli/src/guidanceListWindowInk.tsx`](../cli/src/guidanceListWindowInk.tsx) splits `terminalColumns` between usage and description (wide terminals show full usage when it fits). [`cli/src/mainInteractivePrompt/MainInteractivePrompt.tsx`](../cli/src/mainInteractivePrompt/MainInteractivePrompt.tsx) passes `terminalColumns`; token picker uses `useStdout` + `inkTerminalColumns`. Vitest: [`cli/tests/terminalColumnsTruncate.test.ts`](../cli/tests/terminalColumnsTruncate.test.ts), narrow slash case in [`cli/tests/guidanceListWindowInk.test.tsx`](../cli/tests/guidanceListWindowInk.test.tsx).
 
 ---
 

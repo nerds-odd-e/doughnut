@@ -84,6 +84,28 @@ describe('GuidanceListInk slash mode', () => {
     expect(optionLines).toHaveLength(ROW_BUDGET)
   })
 
+  test('narrow terminalColumns: one row per option with ellipsis', () => {
+    const rows = [
+      {
+        usage: '/very-long-slash-command-here',
+        description: 'Description text that cannot fit on one line here',
+      },
+    ]
+    const p = renderGuidancePlain({
+      mode: 'slash',
+      rows,
+      highlightIndex: 0,
+      terminalColumns: 36,
+    })
+    const contentLines = p
+      .split('\n')
+      .map((l) => l.trimEnd())
+      .filter((l) => l.trim().length > 0)
+    expect(contentLines).toHaveLength(1)
+    expect(p).toContain('…')
+    expect(p).not.toContain('/very-long-slash-command-here')
+  })
+
   test('overflow: fixed row count; bottom indicator replaces an option row', () => {
     const rows = slashRows(11)
     const p = renderGuidancePlain({

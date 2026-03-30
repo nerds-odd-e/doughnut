@@ -8,12 +8,12 @@ import {
   useState,
 } from 'react'
 import type { Key } from 'ink'
-import { Box, Text, useInput } from 'ink'
+import { Box, Text, useInput, useStdout } from 'ink'
 import { handleSelectListInkKey } from '../../interactions/selectListInteraction.js'
 import { GuidanceListInk } from '../../guidanceListWindowInk.js'
 import {
+  inkTerminalColumns,
   numberedTerminalListLines,
-  resolvedTerminalWidth,
 } from '../../terminalColumns.js'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
 import { SetStageKeyHandlerContext } from './stageKeyForwardContext.js'
@@ -48,7 +48,8 @@ export function AccessTokenLabelPickerStage({
     initialHighlightIndex(labels)
   )
 
-  const width = resolvedTerminalWidth()
+  const { stdout } = useStdout()
+  const width = inkTerminalColumns(stdout.columns)
   const listLines = useMemo(
     () => numberedTerminalListLines(labels, width),
     [labels, width]

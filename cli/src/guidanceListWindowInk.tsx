@@ -4,12 +4,18 @@
  */
 
 import { useMemo } from 'react'
-import { Box, Text } from 'ink'
+import stringWidth from 'string-width'
+import { Box, Text, useStdout } from 'ink'
 import {
-  formatSlashGuidanceUsageCell,
+  SLASH_GUIDANCE_USAGE_COL_CAP,
+  padSlashListUsageColumn,
   slashGuidanceUsageColumnWidth,
 } from './mainInteractivePrompt/slashCommandCompletion.js'
-import type { NumberedTerminalListLine } from './terminalColumns.js'
+import {
+  inkTerminalColumns,
+  truncateToTerminalColumns,
+  type NumberedTerminalListLine,
+} from './terminalColumns.js'
 
 const GUIDANCE_LIST_ROW_BUDGET = 5
 
@@ -174,6 +180,7 @@ export type GuidanceListInkProps =
         readonly description: string
       }[]
       readonly highlightIndex: number
+      readonly terminalColumns?: number
     }
   | {
       readonly mode: 'numbered'
@@ -191,7 +198,11 @@ export function GuidanceListInk(props: GuidanceListInkProps) {
 function SlashGuidanceListInk({
   rows,
   highlightIndex,
+  terminalColumns: terminalColumnsProp,
 }: Extract<GuidanceListInkProps, { mode: 'slash' }>) {
+  const { stdout } = useStdout()
+  const termCols = inkTerminalColumns(terminalColumnsProp ?? stdout.columns)
+
   const display = useMemo(
     () =>
       rows.length === 0
@@ -200,11 +211,35 @@ function SlashGuidanceListInk({
     [rows, highlightIndex]
   )
 
-  const usageColWidth = useMemo(() => {
-    if (display === null) return 0
+  const { usageColWidth, descBudget } = useMemo(() => {
+    if (display === null) return { usageColWidth: 0, descBudget: 0 }
     const optionRows = display.filter((r) => r.kind === 'option')
-    return slashGuidanceUsageColumnWidth(optionRows)
-  }, [display])
+    const fixed = 4
+    const rowInner = Math.max(0, termCols - fixed)
+    const minDescCols = 8
+    const maxUsageW = optionRows.reduce(
+      (m, r) => Math.max(m, stringWidth(r.usage)),
+      0
+    )
+    const alignW = slashGuidanceUsageColumnWidth(optionRows)
+    let usageCol = Math.min(maxUsageW, Math.max(0, rowInner - minDescCols))
+    if (alignW > 0) {
+      usageCol = Math.max(usageCol, alignW)
+    }
+    if (usageCol === 0 && rowInner > minDescCols) {
+      usageCol = Math.min(SLASH_GUIDANCE_USAGE_COL_CAP, rowInner - minDescCols)
+    }
+    usageCol = Math.min(usageCol, rowInner)
+    let desc = rowInner - usageCol
+    while (desc < 1 && usageCol > 0) {
+      usageCol -= 1
+      desc = rowInner - usageCol
+    }
+    return {
+      usageColWidth: usageCol,
+      descBudget: Math.max(1, desc),
+    }
+  }, [display, termCols])
 
   if (display === null || display.length === 0) {
     return null
@@ -231,27 +266,36 @@ function SlashGuidanceListInk({
       )
     }
     const hi = row.sourceIndex === highlightIndex
-    const usageCell = formatSlashGuidanceUsageCell(row.usage, usageColWidth)
+    const usageDisplay =
+      usageColWidth < 1
+        ? ''
+        : stringWidth(row.usage) <= usageColWidth
+          ? padSlashListUsageColumn(row.usage, usageColWidth)
+          : truncateToTerminalColumns(row.usage, usageColWidth)
+    const descriptionDisplay = truncateToTerminalColumns(
+      row.description,
+      descBudget
+    )
     return (
       <Box key={`g-${row.usage}-${row.sourceIndex}`} flexDirection="row">
         <Text>{gutter}</Text>
         {hi ? (
           <>
             <Text bold color="cyan">
-              {usageCell}
+              {usageDisplay}
             </Text>
             <Text bold color="cyan">
               {usageDescGap}
             </Text>
             <Text bold color="cyan">
-              {row.description}
+              {descriptionDisplay}
             </Text>
           </>
         ) : (
           <>
-            <Text color="gray">{usageCell}</Text>
+            <Text color="gray">{usageDisplay}</Text>
             <Text color="gray">{usageDescGap}</Text>
-            <Text color="gray">{row.description}</Text>
+            <Text color="gray">{descriptionDisplay}</Text>
           </>
         )}
       </Box>

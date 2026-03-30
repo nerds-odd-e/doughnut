@@ -5,6 +5,45 @@ export function resolvedTerminalWidth(): number {
   return typeof c === 'number' && c >= 40 ? c : 120
 }
 
+/** Matches MainInteractivePrompt / Ink guidance when `stdout.columns` is unset. */
+export function inkTerminalColumns(stdoutColumns: number | undefined): number {
+  return typeof stdoutColumns === 'number' && stdoutColumns > 0
+    ? stdoutColumns
+    : 80
+}
+
+const ELLIPSIS = '…'
+
+/** Truncate to terminal display width (grapheme clusters + string-width). */
+export function truncateToTerminalColumns(
+  text: string,
+  maxCols: number,
+  ellipsis: string = ELLIPSIS
+): string {
+  if (maxCols < 1) return ''
+  if (stringWidth(text) <= maxCols) return text
+  const ew = stringWidth(ellipsis)
+  if (maxCols <= ew) {
+    let acc = ''
+    const seg = new Intl.Segmenter('en', { granularity: 'grapheme' })
+    for (const { segment } of seg.segment(ellipsis)) {
+      const next = acc + segment
+      if (stringWidth(next) <= maxCols) acc = next
+      else break
+    }
+    return acc
+  }
+  const prefixBudget = maxCols - ew
+  let acc = ''
+  const seg = new Intl.Segmenter('en', { granularity: 'grapheme' })
+  for (const { segment } of seg.segment(text)) {
+    const next = acc + segment
+    if (stringWidth(next) <= prefixBudget) acc = next
+    else break
+  }
+  return (acc === '' ? '' : acc) + ellipsis
+}
+
 function breakLongGraphemeRun(text: string, maxWidth: number): string[] {
   if (maxWidth < 1) return [text]
   const lines: string[] = []
@@ -78,24 +117,18 @@ export type NumberedTerminalListLine = {
   readonly text: string
 }
 
-/** One logical row per wrapped segment; `itemIndex` groups continuation lines for one choice. */
+/** One terminal row per item; long labels truncate with ellipsis (token picker, not MCQ). */
 export function numberedTerminalListLines(
   items: readonly string[],
   width: number
 ): NumberedTerminalListLine[] {
   const out: NumberedTerminalListLine[] = []
-  const contIndent = '   '
-  const contW = stringWidth(contIndent)
   for (let i = 0; i < items.length; i++) {
     const prefix = `${i + 1}. `
     const pw = stringWidth(prefix)
-    const firstBudget = Math.max(1, width - pw)
-    const nextBudget = Math.max(1, width - contW)
-    const wrapped = wrapParagraphToWidths(items[i]!, firstBudget, nextBudget)
-    out.push({ itemIndex: i, text: prefix + (wrapped[0] ?? '') })
-    for (let w = 1; w < wrapped.length; w++) {
-      out.push({ itemIndex: i, text: contIndent + wrapped[w]! })
-    }
+    const bodyBudget = Math.max(1, width - pw)
+    const body = truncateToTerminalColumns(items[i]!, bodyBudget)
+    out.push({ itemIndex: i, text: prefix + body })
   }
   return out
 }
