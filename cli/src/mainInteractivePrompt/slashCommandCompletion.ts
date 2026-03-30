@@ -10,22 +10,14 @@ import type { InteractiveSlashCommand } from '../commands/interactiveSlashComman
 
 export const DEFAULT_INTERACTIVE_GUIDANCE = '/ commands'
 
+/** Wider usages are not padded; descriptions start after the full usage. */
+export const SLASH_GUIDANCE_USAGE_COL_CAP = 22
+
 export type SlashCompletionListRow = {
   readonly usage: string
   readonly description: string
   /** Buffer text after Tab/Enter pick (no `<argument>` placeholder). */
   readonly completionLine: string
-}
-
-export function slashListMaxUsageWidth(
-  rows: readonly { readonly usage: string }[]
-): number {
-  let m = 0
-  for (const r of rows) {
-    const w = stringWidth(r.usage)
-    if (w > m) m = w
-  }
-  return m
 }
 
 export function padSlashListUsageColumn(
@@ -35,6 +27,35 @@ export function padSlashListUsageColumn(
   const w = stringWidth(usage)
   if (w >= minCols) return usage
   return `${usage}${' '.repeat(minCols - w)}`
+}
+
+/** Target width for padded rows: at most `cap`, at least the widest usage that fits under `cap`. */
+export function slashGuidanceUsageColumnWidth(
+  rows: readonly { readonly usage: string }[],
+  cap: number = SLASH_GUIDANCE_USAGE_COL_CAP
+): number {
+  let m = 0
+  for (const r of rows) {
+    const w = stringWidth(r.usage)
+    if (w <= cap && w > m) m = w
+  }
+  return m === 0 ? 0 : Math.min(cap, m)
+}
+
+export function slashGuidanceUsageWiderThanCap(
+  usage: string,
+  cap: number = SLASH_GUIDANCE_USAGE_COL_CAP
+): boolean {
+  return stringWidth(usage) > cap
+}
+
+export function formatSlashGuidanceUsageCell(
+  usage: string,
+  colWidth: number,
+  cap: number = SLASH_GUIDANCE_USAGE_COL_CAP
+): string {
+  if (stringWidth(usage) > cap) return usage
+  return padSlashListUsageColumn(usage, colWidth)
 }
 
 function normalizedDraft(draft: string): string {

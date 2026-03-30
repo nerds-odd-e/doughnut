@@ -6,8 +6,9 @@
 import { useMemo } from 'react'
 import { Box, Text } from 'ink'
 import {
-  padSlashListUsageColumn,
-  slashListMaxUsageWidth,
+  formatSlashGuidanceUsageCell,
+  slashGuidanceUsageColumnWidth,
+  slashGuidanceUsageWiderThanCap,
 } from './mainInteractivePrompt/slashCommandCompletion.js'
 import type { NumberedTerminalListLine } from './terminalColumns.js'
 
@@ -184,7 +185,7 @@ function SlashGuidanceListInk({
   const usageColWidth = useMemo(() => {
     if (display === null) return 0
     const optionRows = display.filter((r) => r.kind === 'option')
-    return slashListMaxUsageWidth(optionRows)
+    return slashGuidanceUsageColumnWidth(optionRows)
   }, [display])
 
   if (display === null || display.length === 0) {
@@ -211,18 +212,21 @@ function SlashGuidanceListInk({
       )
     }
     const hi = row.sourceIndex === highlightIndex
-    const paddedUsage = padSlashListUsageColumn(row.usage, usageColWidth)
+    const usageCell = formatSlashGuidanceUsageCell(row.usage, usageColWidth)
+    const wideUsage = slashGuidanceUsageWiderThanCap(row.usage)
     return (
       <Box key={`g-${row.usage}-${row.sourceIndex}`} flexDirection="row">
         <Text>{gutter}</Text>
         {hi ? (
           <>
-            <Text inverse>{paddedUsage}</Text>
+            <Text inverse>{usageCell}</Text>
+            {wideUsage ? <Text inverse> </Text> : null}
             <Text inverse>{row.description}</Text>
           </>
         ) : (
           <>
-            <Text color="gray">{paddedUsage}</Text>
+            <Text color="gray">{usageCell}</Text>
+            {wideUsage ? <Text color="gray"> </Text> : null}
             <Text color="gray">{row.description}</Text>
           </>
         )}
