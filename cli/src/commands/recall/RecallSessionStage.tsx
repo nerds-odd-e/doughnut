@@ -251,13 +251,15 @@ export function RecallSessionStage({
     [onSettled]
   )
 
-  const escapeJustReviewCard = useCallback(() => {
+  const abortJustReviewInFlight = useCallback(() => {
     if (submittingRef.current) {
       activeOperationAbortRef.current?.abort()
-    } else {
-      submitJustReview(false).catch(() => undefined)
     }
-  }, [submitJustReview])
+  }, [])
+
+  const leaveJustReviewSession = useCallback(() => {
+    onSettled('Recall session stopped.')
+  }, [onSettled])
 
   const escapeLoadMorePrompt = useCallback(() => {
     if (submittingRef.current) {
@@ -343,7 +345,8 @@ export function RecallSessionStage({
         key={card.payload.memoryTrackerId}
         payload={card.payload}
         onAnswer={submitJustReview}
-        onCancel={escapeJustReviewCard}
+        onAbortInFlight={abortJustReviewInFlight}
+        onLeaveRecallConfirmed={leaveJustReviewSession}
         inputBlockedRef={submittingRef}
       />
     </RecallSessionChrome>

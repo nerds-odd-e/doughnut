@@ -5,10 +5,12 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { formatVersionOutput } from '../src/commands/version.js'
 import {
+  pressEscape,
   pressEscapeAndWaitForCancelledLine,
   renderInkWhenCommandLineReady,
   stripAnsi,
   waitForFrames,
+  waitForLastFrame,
 } from './inkTestHelpers.js'
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
@@ -16,6 +18,9 @@ const baseNoteTimes = {
   createdAt: '2026-01-01T00:00:00Z',
   updatedAt: '2026-01-01T00:00:00Z',
 }
+
+const LEAVE_RECALL_CONFIRM = 'Leave recall?'
+const RECALL_SESSION_STOPPED = 'Recall session stopped.'
 
 describe('recall just-review (interactive)', () => {
   let configDir: string
@@ -306,7 +311,7 @@ describe('recall just-review (interactive)', () => {
     expect(markAsRecalledCount.n).toBe(1)
   })
 
-  test('Escape on remember card acts like no → Marked as not recalled', async () => {
+  test('Esc from remember card shows leave recall confirm without markAsRecalled', async () => {
     mockMarkAsRecalledCounting()
     mockShowMemoryTrackerCardForRealm(alphaNoteRealm())
 
@@ -316,8 +321,65 @@ describe('recall just-review (interactive)', () => {
 
     startRecall(stdin)
     await waitRememberAlpha(frames)
-    stdin.write('\u001b')
-    await untilPlain(frames, (p) => p.includes('Marked as not recalled.'))
+    expect(markAsRecalledSpy).not.toHaveBeenCalled()
+
+    pressEscape(stdin)
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(LEAVE_RECALL_CONFIRM) && p.includes('(y/n)')
+    )
+
+    expect(markAsRecalledSpy).not.toHaveBeenCalled()
+  })
+
+  test('after Esc on remember card, y settles Recall session stopped without markAsRecalled', async () => {
+    mockMarkAsRecalledCounting()
+    mockShowMemoryTrackerCardForRealm(alphaNoteRealm())
+
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    startRecall(stdin)
+    await waitRememberAlpha(frames)
+    pressEscape(stdin)
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(LEAVE_RECALL_CONFIRM)
+    )
+
+    stdin.write('y\r')
+    await untilPlain(frames, (p) => p.includes(RECALL_SESSION_STOPPED))
+
+    expect(markAsRecalledSpy).not.toHaveBeenCalled()
+  })
+
+  test('after Esc on remember card, n returns to Yes, I remember without markAsRecalled', async () => {
+    mockMarkAsRecalledCounting()
+    mockShowMemoryTrackerCardForRealm(alphaNoteRealm())
+
+    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    startRecall(stdin)
+    await waitRememberAlpha(frames)
+    pressEscape(stdin)
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(LEAVE_RECALL_CONFIRM)
+    )
+
+    stdin.write('n\r')
+    await waitForLastFrame(lastFrame, (f) => {
+      return (
+        f.includes('Yes, I remember?') &&
+        f.includes('Alpha') &&
+        !f.includes(LEAVE_RECALL_CONFIRM)
+      )
+    })
+
+    expect(markAsRecalledSpy).not.toHaveBeenCalled()
   })
 
   test('Escape on load more acts like no → Recalled 1 note', async () => {
