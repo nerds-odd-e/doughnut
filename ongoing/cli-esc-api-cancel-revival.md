@@ -116,6 +116,8 @@ Follow **Test-driven workflow** in **`.cursor/rules/planning.mdc`**:
 
 - Align naming/types with Phase 1 **`runAssistantMessage(signal)`** usage.
 
+**Done:** Wrappers forward **`signal`** to **`addGmailAccount`** / **`getLastEmailSubject`**. Vitest: **`cli/tests/InteractiveCliApp.addGmail.test.tsx`** — Esc during OAuth wait (**`/add gmail`**) and during fetch (**`/last email`**, **`fetch`** mock honors **`AbortSignal`**) → **`Cancelled.`**.
+
 ---
 
 ## Phase 4 — Optional: current stage band parity with old “fetch wait line”

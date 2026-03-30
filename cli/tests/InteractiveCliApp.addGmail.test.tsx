@@ -243,6 +243,30 @@ describe('InteractiveCliApp /add gmail (mocked HTTP APIs)', () => {
     )
     expectSuccessLineOnceInOutput(successLine, frames, lastFrame)
   })
+
+  test('Escape during OAuth wait settles Cancelled and returns prompt', async () => {
+    const { stdin, frames, lastFrame } = await renderApp()
+
+    stdin.write('/add gmail\r')
+    await waitForFrames(
+      oauthLog.get,
+      (s) => parseOAuthLocalhostPort(s) !== undefined
+    )
+    await waitForLastFrame(
+      lastFrame,
+      (f) =>
+        f.includes('Connecting Gmail') &&
+        f.includes('/add gmail') &&
+        !f.includes('> ')
+    )
+
+    stdin.write('\u001b')
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (c) => c.includes('Cancelled.')
+    )
+    await waitForLastFrame(lastFrame, (f) => f.includes('> '))
+  })
 })
 
 describe('InteractiveCliApp /last email (mocked HTTP APIs)', () => {
@@ -277,6 +301,49 @@ describe('InteractiveCliApp /last email (mocked HTTP APIs)', () => {
         !f.includes('> ')
     )
     unmount()
+  })
+
+  test('Escape during last-email fetch settles Cancelled and returns prompt', async () => {
+    writeLastEmailFixtureGmailConfig(configDir)
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((_input: RequestInfo | URL, init?: RequestInit) => {
+        const { signal } = init ?? {}
+        return new Promise<Response>((_resolve, reject) => {
+          if (signal?.aborted) {
+            reject(new DOMException('The operation was aborted', 'AbortError'))
+            return
+          }
+          signal?.addEventListener(
+            'abort',
+            () => {
+              reject(
+                new DOMException('The operation was aborted', 'AbortError')
+              )
+            },
+            { once: true }
+          )
+        })
+      })
+    )
+
+    const { stdin, frames, lastFrame } = await renderApp()
+
+    stdin.write('/last email\r')
+    await waitForLastFrame(
+      lastFrame,
+      (f) =>
+        f.includes('Loading last email') &&
+        f.includes('/last email') &&
+        !f.includes('> ')
+    )
+
+    stdin.write('\u001b')
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (c) => c.includes('Cancelled.')
+    )
+    await waitForLastFrame(lastFrame, (f) => f.includes('> '))
   })
 
   test('after last email completes: subject line once and main prompt returns', async () => {
