@@ -1,9 +1,6 @@
 import * as fs from 'node:fs'
-import {
-  MemoryTrackerController,
-  RecallsController,
-  type MemoryTracker,
-} from 'doughnut-api'
+import { MemoryTrackerController, RecallsController } from 'doughnut-api'
+import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { formatVersionOutput } from '../src/commands/version.js'
@@ -17,14 +14,6 @@ import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 const baseNoteTimes = {
   createdAt: '2026-01-01T00:00:00Z',
   updatedAt: '2026-01-01T00:00:00Z',
-}
-
-function memoryTrackerWithNote(note: Record<string, unknown>): MemoryTracker {
-  return {
-    id: 1,
-    nextRecallAt: '2026-06-01T00:00:00Z',
-    note,
-  } as MemoryTracker
 }
 
 describe('recall just-review (interactive)', () => {
@@ -41,10 +30,10 @@ describe('recall just-review (interactive)', () => {
     process.env.DOUGHNUT_CONFIG_DIR = configDir
 
     recallingSpy = vi.spyOn(RecallsController, 'recalling').mockResolvedValue({
-      data: {
-        totalAssimilatedCount: 0,
-        toRepeat: [{ memoryTrackerId: 1 }],
-      },
+      data: makeMe.aDueMemoryTrackersList
+        .totalAssimilatedCount(0)
+        .toRepeat([{ memoryTrackerId: 1 }])
+        .please(),
     } as Awaited<ReturnType<typeof RecallsController.recalling>>)
 
     showMemoryTrackerSpy = vi.spyOn(
@@ -61,7 +50,7 @@ describe('recall just-review (interactive)', () => {
     markAsRecalledSpy = vi
       .spyOn(MemoryTrackerController, 'markAsRecalled')
       .mockResolvedValue({
-        data: {} as MemoryTracker,
+        data: makeMe.aMemoryTracker.please(),
       } as Awaited<ReturnType<typeof MemoryTrackerController.markAsRecalled>>)
   })
 
@@ -83,21 +72,23 @@ describe('recall just-review (interactive)', () => {
     markAsRecalledSpy.mockImplementation(async () => {
       markAsRecalledCount.n += 1
       return {
-        data: {} as MemoryTracker,
+        data: makeMe.aMemoryTracker.please(),
       } as Awaited<ReturnType<typeof MemoryTrackerController.markAsRecalled>>
     })
 
+    const noteRealm = makeMe.aNoteRealm
+      .title('Alpha')
+      .notebookTitle('NB')
+      .details('body')
+      .createdAt(baseNoteTimes.createdAt)
+      .updatedAt(baseNoteTimes.updatedAt)
+      .please()
+
     showMemoryTrackerSpy.mockResolvedValue({
-      data: memoryTrackerWithNote({
-        id: 99,
-        ...baseNoteTimes,
-        noteTopology: {
-          id: 1,
-          title: 'Alpha',
-          notebookTitle: 'NB',
-        },
-        details: 'body',
-      }),
+      data: makeMe.aMemoryTracker
+        .nextRecallAt('2026-06-01T00:00:00Z')
+        .ofNote(noteRealm)
+        .please(),
     } as Awaited<ReturnType<typeof MemoryTrackerController.showMemoryTracker>>)
 
     const { stdin, frames } = await renderInkWhenCommandLineReady(
@@ -144,15 +135,18 @@ describe('recall just-review (interactive)', () => {
   })
 
   test('missing note title falls back to Note; empty details; no notebook line', async () => {
+    const noteRealm = makeMe.aNoteRealm
+      .title('   ')
+      .details('')
+      .createdAt(baseNoteTimes.createdAt)
+      .updatedAt(baseNoteTimes.updatedAt)
+      .please()
+
     showMemoryTrackerSpy.mockResolvedValue({
-      data: memoryTrackerWithNote({
-        id: 99,
-        ...baseNoteTimes,
-        noteTopology: {
-          id: 1,
-          title: '   ',
-        },
-      }),
+      data: makeMe.aMemoryTracker
+        .nextRecallAt('2026-06-01T00:00:00Z')
+        .ofNote(noteRealm)
+        .please(),
     } as Awaited<ReturnType<typeof MemoryTrackerController.showMemoryTracker>>)
 
     const { stdin, frames } = await renderInkWhenCommandLineReady(
