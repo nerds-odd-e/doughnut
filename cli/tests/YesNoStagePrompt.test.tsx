@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react'
+import { render } from 'ink-testing-library'
 import { describe, expect, test, vi } from 'vitest'
 import { YesNoStagePrompt } from '../src/YesNoStagePrompt.js'
 import {
@@ -105,6 +107,48 @@ describe('YesNoStagePrompt', () => {
     )
     expect(onAnswer).toHaveBeenCalledTimes(1)
     expect(onAnswer).toHaveBeenCalledWith(true)
+  })
+
+  test('Escape calls onCancel when input is blocked', async () => {
+    const onAnswer = vi.fn()
+    const onCancel = vi.fn()
+    function BlockedYesNo() {
+      const blocked = useRef(false)
+      useEffect(() => {
+        blocked.current = true
+      })
+      return (
+        <YesNoStagePrompt
+          prompt="OK?"
+          onAnswer={onAnswer}
+          onCancel={onCancel}
+          inputBlockedRef={blocked}
+        />
+      )
+    }
+    const { stdin, frames } = render(
+      <StageKeyRoot>
+        <BlockedYesNo />
+      </StageKeyRoot>
+    )
+
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (c) => c.includes('OK?')
+    )
+    let drain = 0
+    await waitForFrames(
+      () => String(++drain),
+      (s) => Number(s) >= 30
+    )
+
+    stdin.write('\u001b')
+    await waitForFrames(
+      () => String(onCancel.mock.calls.length),
+      (c) => Number(c) >= 1
+    )
+    expect(onCancel).toHaveBeenCalledTimes(1)
+    expect(onAnswer).not.toHaveBeenCalled()
   })
 
   test('Escape calls onCancel when set', async () => {

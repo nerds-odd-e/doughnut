@@ -212,17 +212,21 @@ export function RecallJustReviewStage({
     [onSettled]
   )
 
-  const cancelJustReviewCard = useCallback(() => {
-    submit(false).catch(() => undefined)
+  const escapeJustReviewCard = useCallback(() => {
+    if (submittingRef.current) {
+      activeOperationAbortRef.current?.abort()
+    } else {
+      submit(false).catch(() => undefined)
+    }
   }, [submit])
 
-  const cancelLoadMorePrompt = useCallback(() => {
-    submitLoadMore(false).catch(() => undefined)
+  const escapeLoadMorePrompt = useCallback(() => {
+    if (submittingRef.current) {
+      activeOperationAbortRef.current?.abort()
+    } else {
+      submitLoadMore(false).catch(() => undefined)
+    }
   }, [submitLoadMore])
-
-  const abortInFlightOperation = useCallback(() => {
-    activeOperationAbortRef.current?.abort()
-  }, [])
 
   const width = resolvedTerminalWidth()
 
@@ -244,8 +248,7 @@ export function RecallJustReviewStage({
         prompt="Load more from next 3 days?"
         onAnswer={submitLoadMore}
         defaultAnswer={true}
-        onCancel={cancelLoadMorePrompt}
-        onEscapeWhileInputBlocked={abortInFlightOperation}
+        onCancel={escapeLoadMorePrompt}
         inputBlockedRef={submittingRef}
         header={<Text>{STAGE_LABEL}</Text>}
       />
@@ -286,8 +289,7 @@ export function RecallJustReviewStage({
       key={payload.memoryTrackerId}
       prompt="Yes, I remember?"
       onAnswer={submit}
-      onCancel={cancelJustReviewCard}
-      onEscapeWhileInputBlocked={abortInFlightOperation}
+      onCancel={escapeJustReviewCard}
       inputBlockedRef={submittingRef}
       header={
         <>

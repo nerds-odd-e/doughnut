@@ -33,9 +33,8 @@ export type YesNoStagePromptProps = {
   prompt: string
   onAnswer: (yes: boolean) => void | Promise<void>
   defaultAnswer?: boolean
+  /** Invoked on Esc before the input-blocked guard, so it can abort in-flight work when combined with {@link inputBlockedRef}. */
   onCancel?: () => void | Promise<void>
-  /** Invoked on Esc while {@link inputBlockedRef} is true (e.g. abort in-flight network). */
-  onEscapeWhileInputBlocked?: () => void | Promise<void>
   inputBlockedRef?: MutableRefObject<boolean>
   header?: ReactNode
   belowBuffer?: ReactNode
@@ -46,7 +45,6 @@ export function YesNoStagePrompt({
   onAnswer,
   defaultAnswer,
   onCancel,
-  onEscapeWhileInputBlocked,
   inputBlockedRef,
   header,
   belowBuffer,
@@ -61,27 +59,15 @@ export function YesNoStagePrompt({
   const onCancelRef = useRef(onCancel)
   onCancelRef.current = onCancel
 
-  const onEscapeWhileInputBlockedRef = useRef(onEscapeWhileInputBlocked)
-  onEscapeWhileInputBlockedRef.current = onEscapeWhileInputBlocked
-
   const handleInput = useCallback(
     (input: string, key: Key) => {
       const isEscape = key.escape === true || input === '\u001b'
-      if (
-        isEscape &&
-        inputBlockedRef?.current &&
-        onEscapeWhileInputBlockedRef.current !== undefined
-      ) {
-        runOnCancel(onEscapeWhileInputBlockedRef.current)
-        return
-      }
-
-      if (inputBlockedRef?.current) return
-
       if (isEscape && onCancelRef.current !== undefined) {
         runOnCancel(onCancelRef.current)
         return
       }
+
+      if (inputBlockedRef?.current) return
 
       const tryCommit = () => {
         const line = normalizeCommittedLine(bufferRef.current)
