@@ -24,6 +24,97 @@ describe('recall just-review (interactive)', () => {
   let getRecallPromptsSpy: ReturnType<typeof vi.spyOn>
   let markAsRecalledSpy: ReturnType<typeof vi.spyOn>
 
+  async function untilPlain(
+    frames: string[],
+    ok: (plain: string) => boolean
+  ): Promise<void> {
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => ok(stripAnsi(c))
+    )
+  }
+
+  async function untilPlainHas(
+    frames: string[],
+    includes: string[],
+    excludes?: string[]
+  ): Promise<void> {
+    await untilPlain(frames, (p) => {
+      if (!includes.every((s) => p.includes(s))) return false
+      if (excludes?.some((s) => p.includes(s))) return false
+      return true
+    })
+  }
+
+  async function untilLastFrame(
+    frames: string[],
+    ok: (plain: string) => boolean
+  ): Promise<void> {
+    await waitForFrames(
+      () => stripAnsi(frames.at(-1) ?? ''),
+      (f) => ok(f)
+    )
+  }
+
+  function startRecall(stdin: { write(data: string): void }) {
+    stdin.write('/recall\r')
+  }
+
+  async function waitRememberAlpha(
+    frames: string[],
+    opts?: { ynHint: boolean }
+  ) {
+    const inc = ['Yes, I remember?', 'Alpha']
+    if (opts?.ynHint) inc.push('(y/n)')
+    await untilPlainHas(frames, inc)
+  }
+
+  async function waitRememberBeta(frames: string[]) {
+    await untilPlainHas(frames, ['Yes, I remember?', 'Beta'])
+  }
+
+  async function waitLoadMore(frames: string[]) {
+    await untilPlainHas(frames, ['Load more from next 3 days?', '(Y/n)'])
+  }
+
+  async function backspaceClearsTyped(
+    stdin: { write(data: string): void },
+    frames: string[],
+    rejectedInBuffer: string
+  ) {
+    stdin.write('\x7f')
+    await untilLastFrame(
+      frames,
+      (f) => f.includes('> ') && !f.includes(rejectedInBuffer)
+    )
+  }
+
+  async function emptyEnterAndInvalidLineStayOnRemember(
+    stdin: { write(data: string): void },
+    frames: string[],
+    noteTitle: string,
+    summaryNotYet: string
+  ) {
+    await untilPlainHas(
+      frames,
+      ['Yes, I remember?', noteTitle],
+      [summaryNotYet]
+    )
+    stdin.write('\r')
+    await untilPlainHas(
+      frames,
+      ['Yes, I remember?', noteTitle],
+      [summaryNotYet]
+    )
+    stdin.write('q\r')
+    await untilPlainHas(
+      frames,
+      ['Yes, I remember?', noteTitle],
+      [summaryNotYet]
+    )
+    await backspaceClearsTyped(stdin, frames, '> q')
+  }
+
   function alphaNoteRealm() {
     return makeMe.aNoteRealm
       .title('Alpha')
@@ -158,49 +249,19 @@ describe('recall just-review (interactive)', () => {
     )
     expect(stripAnsi(frames.join('\n'))).toContain(formatVersionOutput())
 
-    stdin.write('/recall\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Yes, I remember?') &&
-        stripAnsi(c).includes('(y/n)') &&
-        stripAnsi(c).includes('Alpha')
-    )
-
-    stdin.write('\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Yes, I remember?') &&
-        !stripAnsi(c).includes('Recalled 1 note')
-    )
-
-    stdin.write('q\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Yes, I remember?') &&
-        !stripAnsi(c).includes('Recalled 1 note')
-    )
-
-    stdin.write('\x7f')
-    await waitForFrames(
-      () => stripAnsi(frames.at(-1) ?? ''),
-      (f) => f.includes('> ') && !f.includes('> q')
+    startRecall(stdin)
+    await waitRememberAlpha(frames, { ynHint: true })
+    await emptyEnterAndInvalidLineStayOnRemember(
+      stdin,
+      frames,
+      'Alpha',
+      'Recalled 1 note'
     )
 
     stdin.write('y\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Load more from next 3 days?') &&
-        stripAnsi(c).includes('(Y/n)')
-    )
+    await waitLoadMore(frames)
     stdin.write('n\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => stripAnsi(c).includes('Recalled 1 note')
-    )
+    await untilPlain(frames, (p) => p.includes('Recalled 1 note'))
     expect(markAsRecalledCount.n).toBe(1)
   })
 
@@ -212,26 +273,12 @@ describe('recall just-review (interactive)', () => {
       <InteractiveCliApp />
     )
 
-    stdin.write('/recall\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Yes, I remember?') &&
-        stripAnsi(c).includes('Alpha')
-    )
-
+    startRecall(stdin)
+    await waitRememberAlpha(frames)
     stdin.write('y\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Load more from next 3 days?') &&
-        stripAnsi(c).includes('(Y/n)')
-    )
+    await waitLoadMore(frames)
     stdin.write('\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => stripAnsi(c).includes('Recalled 1 note')
-    )
+    await untilPlain(frames, (p) => p.includes('Recalled 1 note'))
     expect(markAsRecalledCount.n).toBe(1)
   })
 
@@ -243,26 +290,12 @@ describe('recall just-review (interactive)', () => {
       <InteractiveCliApp />
     )
 
-    stdin.write('/recall\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Yes, I remember?') &&
-        stripAnsi(c).includes('Alpha')
-    )
-
+    startRecall(stdin)
+    await waitRememberAlpha(frames)
     stdin.write('y\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Load more from next 3 days?') &&
-        stripAnsi(c).includes('(Y/n)')
-    )
+    await waitLoadMore(frames)
     stdin.write('y\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => stripAnsi(c).includes('Recalled 1 note')
-    )
+    await untilPlain(frames, (p) => p.includes('Recalled 1 note'))
     expect(markAsRecalledCount.n).toBe(1)
   })
 
@@ -274,19 +307,10 @@ describe('recall just-review (interactive)', () => {
       <InteractiveCliApp />
     )
 
-    stdin.write('/recall\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Yes, I remember?') &&
-        stripAnsi(c).includes('Alpha')
-    )
-
+    startRecall(stdin)
+    await waitRememberAlpha(frames)
     stdin.write('\u001b')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => stripAnsi(c).includes('Marked as not recalled.')
-    )
+    await untilPlain(frames, (p) => p.includes('Marked as not recalled.'))
   })
 
   test('Escape on load more acts like no → Recalled 1 note', async () => {
@@ -297,26 +321,12 @@ describe('recall just-review (interactive)', () => {
       <InteractiveCliApp />
     )
 
-    stdin.write('/recall\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Yes, I remember?') &&
-        stripAnsi(c).includes('Alpha')
-    )
-
+    startRecall(stdin)
+    await waitRememberAlpha(frames)
     stdin.write('y\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Load more from next 3 days?') &&
-        stripAnsi(c).includes('(Y/n)')
-    )
+    await waitLoadMore(frames)
     stdin.write('\u001b')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => stripAnsi(c).includes('Recalled 1 note')
-    )
+    await untilPlain(frames, (p) => p.includes('Recalled 1 note'))
     expect(markAsRecalledCount.n).toBe(1)
   })
 
@@ -328,34 +338,14 @@ describe('recall just-review (interactive)', () => {
       <InteractiveCliApp />
     )
 
-    stdin.write('/recall\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Yes, I remember?') &&
-        stripAnsi(c).includes('Alpha')
-    )
-
+    startRecall(stdin)
+    await waitRememberAlpha(frames)
     stdin.write('y\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Yes, I remember?') &&
-        stripAnsi(c).includes('Beta')
-    )
-
+    await waitRememberBeta(frames)
     stdin.write('y\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Load more from next 3 days?') &&
-        stripAnsi(c).includes('(Y/n)')
-    )
+    await waitLoadMore(frames)
     stdin.write('y\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => stripAnsi(c).includes('Recalled 2 notes')
-    )
+    await untilPlain(frames, (p) => p.includes('Recalled 2 notes'))
     expect(markAsRecalledCount.n).toBe(2)
   })
 
@@ -382,26 +372,12 @@ describe('recall just-review (interactive)', () => {
       <InteractiveCliApp />
     )
 
-    stdin.write('/recall\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Yes, I remember?') &&
-        stripAnsi(c).includes('Alpha')
-    )
-
+    startRecall(stdin)
+    await waitRememberAlpha(frames)
     stdin.write('y\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Load more from next 3 days?') &&
-        stripAnsi(c).includes('(Y/n)')
-    )
+    await waitLoadMore(frames)
     stdin.write('n\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => stripAnsi(c).includes('Recalled 1 note')
-    )
+    await untilPlain(frames, (p) => p.includes('Recalled 1 note'))
 
     expect(dueindaysSeen).toEqual([0, 0])
   })
@@ -419,27 +395,20 @@ describe('recall just-review (interactive)', () => {
     const { stdin, frames } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />
     )
-    stdin.write('/recall\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => {
-        const plain = stripAnsi(c)
-        return (
-          plain.includes('Yes, I remember?') &&
-          plain.includes('Note') &&
-          !plain.includes('Alpha')
-        )
-      }
-    )
+    startRecall(stdin)
+    await untilPlain(frames, (p) => {
+      return (
+        p.includes('Yes, I remember?') &&
+        p.includes('Note') &&
+        !p.includes('Alpha')
+      )
+    })
 
     const combined = stripAnsi(frames.join('\n'))
     expect(combined).toContain('Note')
     expect(combined).not.toContain('Alpha')
     stdin.write('n\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => stripAnsi(c).includes('Marked as not recalled.')
-    )
+    await untilPlain(frames, (p) => p.includes('Marked as not recalled.'))
   })
 
   test('two due just-review items: y twice then n on load more → Recalled 2 notes', async () => {
@@ -450,34 +419,14 @@ describe('recall just-review (interactive)', () => {
       <InteractiveCliApp />
     )
 
-    stdin.write('/recall\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Yes, I remember?') &&
-        stripAnsi(c).includes('Alpha')
-    )
-
+    startRecall(stdin)
+    await waitRememberAlpha(frames)
     stdin.write('y\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Yes, I remember?') &&
-        stripAnsi(c).includes('Beta')
-    )
-
+    await waitRememberBeta(frames)
     stdin.write('y\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Load more from next 3 days?') &&
-        stripAnsi(c).includes('(Y/n)')
-    )
+    await waitLoadMore(frames)
     stdin.write('n\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => stripAnsi(c).includes('Recalled 2 notes')
-    )
+    await untilPlain(frames, (p) => p.includes('Recalled 2 notes'))
     expect(markAsRecalledCount.n).toBe(2)
   })
 
@@ -489,60 +438,23 @@ describe('recall just-review (interactive)', () => {
       <InteractiveCliApp />
     )
 
-    stdin.write('/recall\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Yes, I remember?') &&
-        stripAnsi(c).includes('Alpha')
-    )
-
+    startRecall(stdin)
+    await waitRememberAlpha(frames)
     stdin.write('y\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Yes, I remember?') &&
-        stripAnsi(c).includes('Beta')
-    )
-
-    stdin.write('\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Yes, I remember?') &&
-        stripAnsi(c).includes('Beta') &&
-        !stripAnsi(c).includes('Recalled 2 notes')
-    )
-
-    stdin.write('q\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Yes, I remember?') &&
-        stripAnsi(c).includes('Beta') &&
-        !stripAnsi(c).includes('Recalled 2 notes')
-    )
-
-    stdin.write('\x7f')
-    await waitForFrames(
-      () => stripAnsi(frames.at(-1) ?? ''),
-      (f) => f.includes('> ') && !f.includes('> q')
+    await waitRememberBeta(frames)
+    await emptyEnterAndInvalidLineStayOnRemember(
+      stdin,
+      frames,
+      'Beta',
+      'Recalled 2 notes'
     )
 
     expect(markAsRecalledCount.n).toBe(1)
 
     stdin.write('y\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        stripAnsi(c).includes('Load more from next 3 days?') &&
-        stripAnsi(c).includes('(Y/n)')
-    )
+    await waitLoadMore(frames)
     stdin.write('n\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => stripAnsi(c).includes('Recalled 2 notes')
-    )
+    await untilPlain(frames, (p) => p.includes('Recalled 2 notes'))
     expect(markAsRecalledCount.n).toBe(2)
   })
 })
