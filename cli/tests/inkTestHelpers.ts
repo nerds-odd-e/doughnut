@@ -1,5 +1,15 @@
 import { render } from 'ink-testing-library'
-import type { ReactElement } from 'react'
+import {
+  createElement,
+  useCallback,
+  useRef,
+  type ReactElement,
+  type ReactNode,
+} from 'react'
+import type { Key } from 'ink'
+import { Box, useInput } from 'ink'
+import type { StageKeyHandler } from '../src/commands/accessToken/stageKeyForwardContext.js'
+import { SetStageKeyHandlerContext } from '../src/commands/accessToken/stageKeyForwardContext.js'
 
 export function stripAnsi(s: string): string {
   const esc = String.fromCharCode(0x1b)
@@ -48,4 +58,23 @@ export async function renderInkWhenCommandLineReady(element: ReactElement) {
     (f) => f.includes('> ') && !f.includes('> |')
   )
   return result
+}
+
+/** Mirrors InteractiveCliApp stage key forwarding for tests. */
+export function StageKeyRoot(props: { readonly children: ReactNode }) {
+  const { children } = props
+  const stageKeyHandlerRef = useRef<StageKeyHandler | null>(null)
+  const setStageKeyHandler = useCallback((handler: StageKeyHandler | null) => {
+    stageKeyHandlerRef.current = handler
+  }, [])
+  useInput(
+    useCallback((input: string, key: Key) => {
+      stageKeyHandlerRef.current?.(input, key)
+    }, [])
+  )
+  return createElement(
+    SetStageKeyHandlerContext.Provider,
+    { value: setStageKeyHandler },
+    createElement(Box, null, children)
+  )
 }

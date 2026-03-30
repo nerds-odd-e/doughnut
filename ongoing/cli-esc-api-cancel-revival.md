@@ -61,7 +61,7 @@ Per **`.cursor/rules/planning.mdc`**: add/extend **one** failing **observable** 
 
 **User-visible outcome:** Cancelling during **revoke** (picker → **`AsyncAssistantFetchStage`**) cancels or abandons the in-flight client call as the SDK allows.
 
-**External verification:** **`removeAccessTokenCompletelyAbort`-style** test: hung **`DELETE`** (or equivalent) + Esc → **`Cancelled.`**
+**External verification:** Vitest [`cli/tests/InteractiveCliApp.removeAccessTokenCompletelyEsc.test.tsx`](../cli/tests/InteractiveCliApp.removeAccessTokenCompletelyEsc.test.tsx): full app, hung **`DELETE`** + Esc → **`Cancelled.`** in transcript (covers inline revoke; picker shares the same stage + **`signal`** path).
 
 **Implementation slice:** Pass stage **`signal`** into **`removeAccessTokenCompletely`** / **`doughnutSdkOptions(signal)`** from **`RemoveAccessTokenCompletelyPickerStage`** only.
 
@@ -145,7 +145,7 @@ Per **`.cursor/rules/planning.mdc`**: add/extend **one** failing **observable** 
 | Phase | User-visible slice                         | Primary verification                          |
 |-------|---------------------------------------------|-----------------------------------------------|
 | 1     | Esc on **`AsyncAssistantFetchStage`**       | Harness / app frame + **`Cancelled.`**        |
-| 2     | Revoke picker passes **`signal`**           | Hung HTTP + Esc                               |
+| 2     | Revoke picker passes **`signal`**           | `InteractiveCliApp.removeAccessTokenCompletelyEsc.test.tsx` (hung **`DELETE`** + Esc) |
 | 3     | Gmail spinners                              | **`InteractiveCliApp.addGmail`**-style tests  |
 | 4     | **`/recall-status`** spinner + Esc (done)   | `InteractiveCliApp.recallStatus.test.tsx`     |
 | 5     | **`/add-access-token`** inline + mount rule | Interactive + **`getTokenInfo`** abort mock   |

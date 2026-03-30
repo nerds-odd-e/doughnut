@@ -36,24 +36,6 @@ Feature: CLI recall status and recall session
       And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
       Then I should see "Recalled 1 note" in past CLI assistant messages
 
-    @disableOpenAiService
-    Scenario: Temp1 - multiple notes in session
-      Given the note "sedition" was assimilated on day 1
-      And the note "sedation" was assimilated on day 1
-      And It's day 2
-      When I enter the slash command "/recall" in the interactive CLI
-      When I answer "y" in the interactive CLI to prompt "Yes, I remember?"
-      And I answer "y" in the interactive CLI to prompt "Yes, I remember?"
-
-    @disableOpenAiService
-    Scenario: Temp2 - ending session with n
-      Given the note "sedition" was assimilated on day 1
-      And It's day 2
-      When I enter the slash command "/recall" in the interactive CLI
-      When I answer "y" in the interactive CLI to prompt "Yes, I remember?"
-      And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
-      Then I should see "Recalled 1 note" in past CLI assistant messages
-
     @ignore
     @disableOpenAiService
     Scenario: Recall session - complete all due notes, see summary, then load more from future days

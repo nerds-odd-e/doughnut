@@ -1,12 +1,7 @@
-import { useCallback, useRef, type ReactNode } from 'react'
-import type { Key } from 'ink'
-import { Box, useInput } from 'ink'
 import { render } from 'ink-testing-library'
 import { describe, expect, test } from 'vitest'
 import { AsyncAssistantFetchStage } from '../src/commands/gmail/AsyncAssistantFetchStage.js'
-import type { StageKeyHandler } from '../src/commands/accessToken/stageKeyForwardContext.js'
-import { SetStageKeyHandlerContext } from '../src/commands/accessToken/stageKeyForwardContext.js'
-import { waitForFrames } from './inkTestHelpers.js'
+import { StageKeyRoot, waitForFrames } from './inkTestHelpers.js'
 
 function pendingUntilAbort(signal: AbortSignal): Promise<string> {
   return new Promise<string>((_, reject) => {
@@ -18,24 +13,6 @@ function pendingUntilAbort(signal: AbortSignal): Promise<string> {
       { once: true }
     )
   })
-}
-
-/** Mirrors InteractiveCliApp stage key forwarding. */
-function StageKeyRoot({ children }: { readonly children: ReactNode }) {
-  const stageKeyHandlerRef = useRef<StageKeyHandler | null>(null)
-  const setStageKeyHandler = useCallback((handler: StageKeyHandler | null) => {
-    stageKeyHandlerRef.current = handler
-  }, [])
-  useInput(
-    useCallback((input: string, key: Key) => {
-      stageKeyHandlerRef.current?.(input, key)
-    }, [])
-  )
-  return (
-    <SetStageKeyHandlerContext.Provider value={setStageKeyHandler}>
-      <Box>{children}</Box>
-    </SetStageKeyHandlerContext.Provider>
-  )
 }
 
 describe('AsyncAssistantFetchStage', () => {
