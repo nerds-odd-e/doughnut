@@ -7,7 +7,6 @@ import type { InteractiveSlashCommandStageProps } from '../interactiveSlashComma
 import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import {
-  loadRecallJustReviewPayload,
   loadRecallJustReviewPayloadIfAny,
   markJustReviewRecalled,
   type RecallJustReviewPayload,
@@ -26,9 +25,11 @@ export function RecallJustReviewStage({
 }: InteractiveSlashCommandStageProps) {
   const [payload, setPayload] = useState<RecallJustReviewPayload | null>(null)
   const [uiMode, setUiMode] = useState<'card' | 'loadMore'>('card')
+  const [initialResolved, setInitialResolved] = useState(false)
   const payloadRef = useRef<RecallJustReviewPayload | null>(null)
   const submittingRef = useRef(false)
   const successfulRecallsRef = useRef(0)
+  const startedWithEmptyTodayRef = useRef(false)
 
   payloadRef.current = payload
 
@@ -36,8 +37,18 @@ export function RecallJustReviewStage({
     let cancelled = false
     const run = async () => {
       try {
-        const p = await loadRecallJustReviewPayload()
-        if (!cancelled) setPayload(p)
+        const p = await loadRecallJustReviewPayloadIfAny(0)
+        if (cancelled) return
+        if (p !== null) {
+          startedWithEmptyTodayRef.current = false
+          setPayload(p)
+          setUiMode('card')
+        } else {
+          startedWithEmptyTodayRef.current = true
+          setPayload(null)
+          setUiMode('loadMore')
+        }
+        setInitialResolved(true)
       } catch (err: unknown) {
         if (!cancelled) onSettled(userVisibleSlashCommandError(err))
       }
@@ -100,7 +111,14 @@ export function RecallJustReviewStage({
         const next = await loadRecallJustReviewPayloadIfAny(0)
         submittingRef.current = false
         if (next === null) {
-          setUiMode('loadMore')
+          if (
+            startedWithEmptyTodayRef.current &&
+            successfulRecallsRef.current === 1
+          ) {
+            onSettled('Recalled successfully')
+          } else {
+            setUiMode('loadMore')
+          }
         } else {
           setPayload(next)
         }
@@ -114,7 +132,7 @@ export function RecallJustReviewStage({
 
   const width = resolvedTerminalWidth()
 
-  if (payload === null) {
+  if (!initialResolved) {
     return (
       <Box>
         <Spinner label="Loading recall…" />
@@ -131,6 +149,14 @@ export function RecallJustReviewStage({
         inputBlockedRef={submittingRef}
         header={<Text>{STAGE_LABEL}</Text>}
       />
+    )
+  }
+
+  if (payload === null) {
+    return (
+      <Box>
+        <Spinner label="Loading recall…" />
+      </Box>
     )
   }
 

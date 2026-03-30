@@ -36,7 +36,6 @@ Feature: CLI recall status and recall session
       And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
       Then I should see "Recalled 1 note" in past CLI assistant messages
 
-    @ignore
     @disableOpenAiService
     Scenario: Recall session - complete all due notes, see summary, then load more from future days
       Given the note "sedition" was assimilated on day 1
