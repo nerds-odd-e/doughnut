@@ -94,6 +94,8 @@ Follow **Test-driven workflow** in **`.cursor/rules/planning.mdc`**:
 
 - Keep **one** pattern across **`AsyncAssistantFetchStage`** usages.
 
+**Done:** `RemoveAccessTokenCompletelyPickerStage` passes the stage **`signal`** into **`removeAccessTokenCompletely`**. Vitest: **`cli/tests/removeAccessTokenCompletelyAbort.test.tsx`** (hung **`DELETE /api/user/token-info`** + Esc → **`Cancelled.`**).
+
 ---
 
 ## Phase 3 — Gmail interactive entry points
