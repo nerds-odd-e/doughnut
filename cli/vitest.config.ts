@@ -17,7 +17,7 @@ export default defineConfig({
     globals: false,
     setupFiles: ['tests/setup.ts'],
     env: {
-      // Enable chalk ANSI colors so Ink renders styled output (e.g. inverse/highlight)
+      // Enable chalk ANSI colors so Ink renders styled output (e.g. bold / colors)
       // even when stdout is not a real TTY (as in test environments).
       FORCE_COLOR: '1',
       // Override CI=1 set by the nix dev environment. is-in-ci checks `env[key] !== '0'`,

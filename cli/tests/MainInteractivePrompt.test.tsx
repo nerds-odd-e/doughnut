@@ -19,6 +19,12 @@ function lineWithMainPrompt(plain: string): string {
   return plain.split('\n').find((l) => l.includes('→')) ?? ''
 }
 
+function rawLineIncludesBoldMarker(raw: string, marker: string): boolean {
+  return raw
+    .split('\n')
+    .some((line) => line.includes(marker) && line.includes('\x1b[1m'))
+}
+
 /** Typed buffer after `→`, before Ink right-padding / `│` column border. */
 function mainPromptDraftAfterArrow(plain: string): string {
   const lm = lineWithMainPrompt(plain)
@@ -79,7 +85,7 @@ describe('MainInteractivePrompt slash guidance (phase 1)', () => {
     expect(plain).toContain('`exit` to quit.')
   })
 
-  test('partial / prefix shows matching commands with first row inverse-highlighted', async () => {
+  test('partial / prefix shows matching commands with first row bold-highlighted', async () => {
     const { stdin, lastFrame } = await renderMainInteractivePrompt()
 
     stdin.write('/')
@@ -94,23 +100,12 @@ describe('MainInteractivePrompt slash guidance (phase 1)', () => {
     )
 
     const raw = lastFrame() ?? ''
-    expect(raw).toContain('\x1b[7m')
-    const helpLine = stripAnsi(raw)
+    const helpLineRaw = raw
       .split('\n')
       .find((l) => l.includes('/help') && l.includes('List available'))
-    expect(helpLine, 'expected a visible /help completion row').toBeTruthy()
-
-    const beforeHelp = raw.slice(0, raw.indexOf('/help'))
-    const openInverseBeforeHelp = beforeHelp.lastIndexOf('\x1b[7m')
-    const closeAfterOpen = beforeHelp.indexOf('\x1b[27m', openInverseBeforeHelp)
-    expect(
-      openInverseBeforeHelp,
-      'inverse SGR should start before /help on the first (highlighted) row'
-    ).toBeGreaterThan(-1)
-    expect(
-      closeAfterOpen === -1 || closeAfterOpen > openInverseBeforeHelp,
-      'highlight should extend through /help row start'
-    ).toBe(true)
+    expect(helpLineRaw, 'expected a visible /help completion row').toBeTruthy()
+    expect(helpLineRaw).toContain('\x1b[1m')
+    expect(helpLineRaw).not.toContain('\x1b[7m')
   })
 
   test('bare slash shows a fixed-height list with more-below when commands overflow budget', async () => {
@@ -236,12 +231,14 @@ describe('MainInteractivePrompt caret and slash arrows (phase 3)', () => {
     await waitForFrames(
       () => lastFrame() ?? '',
       (raw) =>
-        raw.includes('\x1b[7m') &&
-        raw.includes('Revoke a stored access token on the server')
+        rawLineIncludesBoldMarker(
+          raw,
+          'Revoke a stored access token on the server'
+        )
     )
   })
 
-  test('with list visible and caret at end, second down wraps highlight to first row', async () => {
+  test('with list visible and caret at end, each down advances highlight to the next matching usage', async () => {
     const { stdin, lastFrame } = await renderMainInteractivePrompt()
 
     stdin.write('/re')
@@ -254,16 +251,20 @@ describe('MainInteractivePrompt caret and slash arrows (phase 3)', () => {
     await waitForFrames(
       () => lastFrame() ?? '',
       (raw) =>
-        raw.includes('\x1b[7m') &&
-        raw.includes('Revoke a stored access token on the server')
+        rawLineIncludesBoldMarker(
+          raw,
+          'Revoke a stored access token on the server'
+        )
     )
 
     stdin.write('\x1b[B')
     await waitForFrames(
       () => lastFrame() ?? '',
       (raw) =>
-        raw.includes('\x1b[7m') &&
-        raw.includes('Remove a stored access token from local config only')
+        rawLineIncludesBoldMarker(
+          raw,
+          'Recall the next due note (just review when no quiz is pending)'
+        )
     )
   })
 
@@ -286,16 +287,20 @@ describe('MainInteractivePrompt caret and slash arrows (phase 3)', () => {
     await waitForFrames(
       () => lastFrame() ?? '',
       (raw) =>
-        raw.includes('\x1b[7m') &&
-        raw.includes('Remove a stored access token from local config only')
+        rawLineIncludesBoldMarker(
+          raw,
+          'Remove a stored access token from local config only'
+        )
     )
 
     stdin.write('\x1b[B')
     await waitForFrames(
       () => lastFrame() ?? '',
       (raw) =>
-        raw.includes('\x1b[7m') &&
-        raw.includes('Revoke a stored access token on the server')
+        rawLineIncludesBoldMarker(
+          raw,
+          'Revoke a stored access token on the server'
+        )
     )
   })
 })
@@ -314,8 +319,10 @@ describe('MainInteractivePrompt Enter picks completion (phase 4)', () => {
     await waitForFrames(
       () => lastFrame() ?? '',
       (raw) =>
-        raw.includes('\x1b[7m') &&
-        raw.includes('Revoke a stored access token on the server')
+        rawLineIncludesBoldMarker(
+          raw,
+          'Revoke a stored access token on the server'
+        )
     )
     stdin.write('\r')
     await waitForFrames(

@@ -16,6 +16,12 @@ import {
 const EXPECT_GUIDANCE_MORE_BELOW = '↓ more below'
 const EXPECT_GUIDANCE_ROW_BUDGET = 5
 
+function rawLineIncludesBoldAndText(raw: string, text: string): boolean {
+  return raw
+    .split('\n')
+    .some((line) => line.includes(text) && line.includes('\x1b[1m'))
+}
+
 describe('InteractiveCliApp /add-access-token', () => {
   let configDir: string
   let savedConfigDir: string | undefined
@@ -224,7 +230,7 @@ describe('InteractiveCliApp /add-access-token', () => {
     stdin.write('\u001b[B')
     await waitForFrames(
       () => frames.at(-1) ?? '',
-      (f) => f.includes('\x1b[7m2.')
+      (f) => rawLineIncludesBoldAndText(f, '2. Beta')
     )
 
     stdin.write('\r')
@@ -284,7 +290,7 @@ describe('InteractiveCliApp /add-access-token', () => {
     stdin.write('\u001b[B')
     await waitForFrames(
       () => frames.at(-1) ?? '',
-      (f) => f.includes('\x1b[7m2.')
+      (f) => rawLineIncludesBoldAndText(f, '2. Beta')
     )
 
     stdin.write('\r')
@@ -328,7 +334,7 @@ describe('InteractiveCliApp /add-access-token', () => {
     stdin.write('\u001b[B')
     await waitForFrames(
       () => frames.at(-1) ?? '',
-      (f) => f.includes('\x1b[7m2.')
+      (f) => rawLineIncludesBoldAndText(f, '2. Beta')
     )
 
     stdin.write('\r')

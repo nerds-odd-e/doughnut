@@ -237,9 +237,15 @@ function SlashGuidanceListInk({
         <Text>{gutter}</Text>
         {hi ? (
           <>
-            <Text inverse>{usageCell}</Text>
-            <Text inverse>{usageDescGap}</Text>
-            <Text inverse>{row.description}</Text>
+            <Text bold color="cyan">
+              {usageCell}
+            </Text>
+            <Text bold color="cyan">
+              {usageDescGap}
+            </Text>
+            <Text bold color="cyan">
+              {row.description}
+            </Text>
           </>
         ) : (
           <>
@@ -284,13 +290,13 @@ function NumberedGuidanceListInk({
         </Text>
       )
     }
-    return (
-      <Text
-        key={`g-${row.itemIndex}-${i}`}
-        inverse={row.itemIndex === highlightItemIndex}
-      >
+    const hi = row.itemIndex === highlightItemIndex
+    return hi ? (
+      <Text key={`g-${row.itemIndex}-${i}`} bold color="cyan">
         {row.text}
       </Text>
+    ) : (
+      <Text key={`g-${row.itemIndex}-${i}`}>{row.text}</Text>
     )
   })
 }
