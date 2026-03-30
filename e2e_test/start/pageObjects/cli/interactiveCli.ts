@@ -7,6 +7,7 @@ import {
   currentGuidance,
   pastCliAssistantMessages,
   pastUserMessages,
+  whenCurrentGuidanceContainsThen,
 } from './outputAssertions'
 
 function writeInteractiveLineToPty(line: string): Cypress.Chainable<null> {
@@ -22,6 +23,16 @@ function interactiveCli() {
       command: string
     ): Cypress.Chainable<null> {
       return writeInteractiveLineToPty(command)
+    },
+    answerWhenPromptVisible(
+      answer: string,
+      prompt: string
+    ): Cypress.Chainable<null> {
+      return whenCurrentGuidanceContainsThen(
+        prompt,
+        () => writeInteractiveLineToPty(answer),
+        'cli-interactive-answer-to-prompt'
+      )
     },
     pastCliAssistantMessages,
     pastUserMessages,

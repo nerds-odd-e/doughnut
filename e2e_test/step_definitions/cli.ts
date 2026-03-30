@@ -40,6 +40,17 @@ When('I enter {string} in the interactive CLI', (line: string) => {
 })
 
 When(
+  'I answer {string} in the interactive CLI to prompt {string}',
+  (answer: string, prompt: string) =>
+    new Cypress.Promise<void>((resolve) => {
+      cli
+        .interactiveCli()
+        .answerWhenPromptVisible(answer, prompt)
+        .then(() => resolve())
+    })
+)
+
+When(
   'I enter the slash command {string} in the interactive CLI',
   (command: string) => {
     cli.interactiveCli().enterSlashCommandInInteractiveCli(command)

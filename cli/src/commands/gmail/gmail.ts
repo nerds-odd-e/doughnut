@@ -357,11 +357,15 @@ export async function getLastEmailSubject(
   return getSubjectFromMessage(msgData)
 }
 
-export async function runAddGmailInteractiveAssistantMessage(): Promise<string> {
+export async function runAddGmailInteractiveAssistantMessage(
+  _signal: AbortSignal
+): Promise<string> {
   const email = await addGmailAccount(undefined, undefined)
   return formatAddedGmailAccountMessage(email)
 }
 
-export async function runLastEmailInteractiveAssistantMessage(): Promise<string> {
+export async function runLastEmailInteractiveAssistantMessage(
+  _signal: AbortSignal
+): Promise<string> {
   return getLastEmailSubject(undefined, undefined)
 }

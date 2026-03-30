@@ -29,7 +29,7 @@ export function RemoveAccessTokenCompletelyPickerStage({
     return (
       <AsyncAssistantFetchStage
         spinnerLabel="Revoking token…"
-        runAssistantMessage={async () => {
+        runAssistantMessage={async (_signal) => {
           await removeAccessTokenCompletely(revokeLabel)
           return `Token "${revokeLabel}" removed locally and from server.`
         }}

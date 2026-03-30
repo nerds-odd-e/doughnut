@@ -302,6 +302,35 @@ function assertCurrentGuidanceContains(raw: string, expected: string): void {
   )
 }
 
+/**
+ * Waits until Current guidance contains `prompt`, then runs `onReady` (e.g. PTY write).
+ * Failures reuse assertCurrentGuidanceContains diagnostics (expected prompt vs visible guidance).
+ */
+export function whenCurrentGuidanceContainsThen(
+  prompt: string,
+  onReady: () => Cypress.Chainable<null>,
+  screenshotName: string
+): Cypress.Chainable<null> {
+  const deadline = Date.now() + CLI_OUTPUT_ASSERT_TIMEOUT_MS
+  const tryOnce = (): Cypress.Chainable<null> => {
+    return cy.task<string>('cliInteractivePtyGetBuffer').then((raw) => {
+      try {
+        assertCurrentGuidanceContains(raw, prompt)
+        return onReady()
+      } catch (err) {
+        const lastError = err instanceof Error ? err : new Error(String(err))
+        if (Date.now() >= deadline) {
+          return cy.screenshot(screenshotName).then(() => {
+            throw lastError
+          })
+        }
+        return cy.wait(CLI_OUTPUT_ASSERT_RETRY_MS).then(() => tryOnce())
+      }
+    })
+  }
+  return cy.wrap(null).then(() => tryOnce())
+}
+
 function assertCurrentGuidanceContainsBold(raw: string, text: string): void {
   const { replayedPlain, guidancePlain } = getGuidanceContext(raw)
   if (!guidancePlain.includes(text)) {

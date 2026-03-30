@@ -1,6 +1,6 @@
 # CLI recall revival (plan only)
 
-**Status:** Phase 1 complete (recall status). Phase 2.1 complete (Just Review E2E un-ignored + bold guidance assertion). Phase 2.2 complete (`/recall` just-review stage, PTY rows 48 for stable guidance replay). Phase 2.3 complete (just-review edge Vitest: invalid y/n commits, empty title/details + no notebook line). Phases 3–8 still ahead; this file stays high-level planning, not a step-by-step implementation spec.  
+**Status:** Phase 1 complete (recall status). Phase 2.1 complete (Just Review E2E un-ignored + bold guidance assertion). Phase 2.2 complete (`/recall` just-review stage, PTY rows 48 for stable guidance replay). Phase 2.3 complete (just-review edge Vitest: invalid y/n commits, empty title/details + no notebook line). Phase 3.1 complete (session scenario un-ignored; `I answer … to prompt …` step waits on Current guidance so failures cite missing second just-review prompt, load-more prompt, or past-assistant summary). Phases 3.2–8 still ahead; this file stays high-level planning, not a step-by-step implementation spec.  
 **Goal:** Restore behaviors in `e2e_test/features/cli/cli_recall.feature` with **observable E2E coverage**, **minimal dead code**, and **architecture that does not repeat the pre-removal shape** (heavy global mutable recall state and recall orchestration embedded in `interactive.ts`).
 
 **Guidance:** `.cursor/rules/planning.mdc`, `.cursor/rules/cli.mdc`, `ongoing/cli-architecture-roadmap.md` — prefer **Ink/React composition and stage-local state**, **thin Cucumber steps**, **centralized terminal assertions**, and **reuse of shared API client code** (`doughnut-api` / existing backend client helpers). Challenge big abstractions until repetition justifies them.
@@ -73,9 +73,9 @@ Recent removals (around **2026-03-28**) show what existed before strip-down; use
 
 **User outcome:** Multiple just-review items in one `/recall` session; summary “Recalled 2 notes”; “Load more from next 3 days?” **n** then exit; new `/recall` + **y** on load more → continue; final “Recalled successfully”.
 
-### Phase 3.1 — E2E fails for the right reason
+### Phase 3.1 — E2E fails for the right reason — **complete**
 
-- Un-ignore; confirm failure mentions missing multi-step session, missing summary line, or load-more prompt behavior.
+- Un-ignored **Recall session** scenario; added **`When I answer … in the interactive CLI to prompt …`** — waits until **Current guidance** contains the prompt (same diagnostics as guidance assertions), then sends the line — so timeouts point at missing **Yes, I remember?** (second item), **Load more from next 3 days?**, or later steps fail past assistant with missing **Recalled 2 notes**.
 
 ### Phase 3.2 — Pass E2E with minimum production change
 
