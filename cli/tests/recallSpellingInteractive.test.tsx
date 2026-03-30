@@ -9,6 +9,7 @@ import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
+  pressEscape,
   renderInkWhenCommandLineReady,
   stripAnsi,
   waitForFrames,
@@ -23,6 +24,9 @@ const baseNoteTimes = {
 
 const MEMORY_TRACKER_ID = 1
 const SPELL_PROMPT_ID = 42
+
+const LEAVE_RECALL_CONFIRM = 'Leave recall?'
+const RECALL_SESSION_STOPPED = 'Recall session stopped.'
 
 /** Wrong spelling still POSTs an answer; SRS rescheduling is server-side (RecallPromptControllerTests.WrongAnswer). */
 async function waitForSpellingPromptVisible(
@@ -245,5 +249,78 @@ describe('recall spelling (interactive)', () => {
         body: { spellingAnswer: 'SeDiTiOn' },
       })
     )
+  })
+
+  test('Esc from spelling shows leave recall confirmation without calling answerSpelling', async () => {
+    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForSpellingPromptVisible(lastFrame)
+
+    expect(answerSpellingSpy).not.toHaveBeenCalled()
+
+    pressEscape(stdin)
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(LEAVE_RECALL_CONFIRM) && p.includes('(y/n)')
+    )
+
+    expect(answerSpellingSpy).not.toHaveBeenCalled()
+  })
+
+  test('after Esc from spelling, y settles with Recall session stopped and never calls answerSpelling', async () => {
+    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForSpellingPromptVisible(lastFrame)
+    pressEscape(stdin)
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(LEAVE_RECALL_CONFIRM)
+    )
+
+    stdin.write('y\r')
+
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(RECALL_SESSION_STOPPED)
+    )
+
+    expect(answerSpellingSpy).not.toHaveBeenCalled()
+  })
+
+  test('after Esc from spelling, n returns to spelling card without answerSpelling; buffer preserved', async () => {
+    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForSpellingPromptVisible(lastFrame)
+
+    stdin.write('par')
+    await waitForLastFrame(lastFrame, (p) => p.includes('> par'))
+
+    pressEscape(stdin)
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(LEAVE_RECALL_CONFIRM)
+    )
+
+    stdin.write('n\r')
+
+    await waitForLastFrame(
+      lastFrame,
+      (p) =>
+        p.includes('Spell:') &&
+        p.includes('Spell the title') &&
+        p.includes('> par') &&
+        !p.includes(LEAVE_RECALL_CONFIRM)
+    )
+
+    expect(answerSpellingSpy).not.toHaveBeenCalled()
   })
 })

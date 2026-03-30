@@ -1,4 +1,5 @@
 import {
+  Fragment,
   useCallback,
   useContext,
   useEffect,
@@ -16,6 +17,7 @@ import { resolvedTerminalWidth } from '../../terminalColumns.js'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
 import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
+import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
 import {
   fetchSpellingRecallPrompt,
   submitSpellingAnswer,
@@ -24,6 +26,10 @@ import {
 import { normalizeSpellingLineForSubmit } from './spellingAnswerLine.js'
 
 const STAGE_LABEL = 'Recalling'
+
+const LEAVE_RECALL_PROMPT = 'Leave recall?'
+
+const RECALL_SESSION_STOPPED_LINE = 'Recall session stopped.'
 
 type LoadState =
   | { readonly status: 'loading' }
@@ -47,6 +53,7 @@ export function SpellingRecallStage({
   const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
   const [buffer, setBuffer] = useState('')
   const bufferRef = useRef('')
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
 
   const width = resolvedTerminalWidth()
 
@@ -109,6 +116,11 @@ export function SpellingRecallStage({
     (input: string, key: Key) => {
       if (inputBlockedRef.current) return
 
+      if (key.escape === true) {
+        setShowLeaveConfirm(true)
+        return
+      }
+
       if (key.return || input === '\n' || input === '\r') {
         runSpellSubmit().catch(() => undefined)
         return
@@ -158,15 +170,16 @@ export function SpellingRecallStage({
 
   useLayoutEffect(() => {
     if (setStageKeyHandler === undefined) return
-    if (!spellReady) return
+    if (!spellReady || showLeaveConfirm) return
     setStageKeyHandler(handleSpellInput)
     return () => {
       setStageKeyHandler(null)
     }
-  }, [setStageKeyHandler, handleSpellInput, spellReady])
+  }, [setStageKeyHandler, handleSpellInput, spellReady, showLeaveConfirm])
 
   useInput(handleSpellInput, {
-    isActive: setStageKeyHandler === undefined && spellReady,
+    isActive:
+      setStageKeyHandler === undefined && spellReady && !showLeaveConfirm,
   })
 
   if (loadState.status === 'loading') {
@@ -180,6 +193,32 @@ export function SpellingRecallStage({
           <Spinner label="Loading spelling question…" />
         </Box>
       </Box>
+    )
+  }
+
+  if (showLeaveConfirm) {
+    return (
+      <YesNoStagePrompt
+        prompt={LEAVE_RECALL_PROMPT}
+        onAnswer={(yes) => {
+          if (yes) {
+            onSettled(RECALL_SESSION_STOPPED_LINE)
+            return
+          }
+          setShowLeaveConfirm(false)
+        }}
+        onCancel={() => setShowLeaveConfirm(false)}
+        inputBlockedRef={inputBlockedRef}
+        header={
+          <Fragment>
+            <Text>{STAGE_LABEL}</Text>
+            {payload.notebookTitle !== undefined &&
+            payload.notebookTitle !== '' ? (
+              <Text>{payload.notebookTitle}</Text>
+            ) : null}
+          </Fragment>
+        }
+      />
     )
   }
 
