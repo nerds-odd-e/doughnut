@@ -16,6 +16,11 @@ import {
 } from './userInputHistoryFile.js'
 import { cycleListSelectionIndex } from '../interactions/selectListInteraction.js'
 import {
+  GUIDANCE_MORE_ABOVE_LABEL,
+  GUIDANCE_MORE_BELOW_LABEL,
+  layoutSlashCommandGuidanceWindow,
+} from '../guidanceListWindow.js'
+import {
   COMPLETION_USAGE_PAD,
   DEFAULT_INTERACTIVE_GUIDANCE,
   effectiveSlashGuidance,
@@ -24,7 +29,6 @@ import {
   isSlashListArrowKey,
   normalizeInputForSlash,
   slashGuidanceForInk,
-  visibleListRows,
 } from './slashCommandCompletion.js'
 
 const MAIN_PROMPT_PLACEHOLDER = '`exit` to quit.'
@@ -337,9 +341,9 @@ export function MainInteractivePrompt({
   const { stdout } = useStdout()
   const cols = stdout.columns > 0 ? stdout.columns : 80
 
-  const listWindow =
+  const slashListDisplay =
     guidance.show === 'list'
-      ? visibleListRows(guidance.rows, slashHighlightIndex)
+      ? layoutSlashCommandGuidanceWindow(guidance.rows, slashHighlightIndex)
       : null
 
   const beforeCaret = buffer.slice(0, caretOffset)
@@ -364,23 +368,42 @@ export function MainInteractivePrompt({
       </Box>
       {guidance.show === 'hint' ? (
         <Text>{DEFAULT_INTERACTIVE_GUIDANCE}</Text>
-      ) : listWindow ? (
-        listWindow.rows.map((row, i) => (
-          <Text key={`${row.usage}-${i}`}>
-            {'  '}
-            {i === listWindow.highlightIndex ? (
-              <Text inverse>
-                {row.usage.padEnd(COMPLETION_USAGE_PAD)}
-                {row.description}
+      ) : slashListDisplay ? (
+        slashListDisplay.map((row, i) => {
+          if (row.kind === 'moreAbove') {
+            return (
+              <Text key={`mup-${i}`} color="gray">
+                {'  '}
+                {GUIDANCE_MORE_ABOVE_LABEL}
               </Text>
-            ) : (
-              <Text color="gray">
-                {row.usage.padEnd(COMPLETION_USAGE_PAD)}
-                {row.description}
+            )
+          }
+          if (row.kind === 'moreBelow') {
+            return (
+              <Text key={`mdn-${i}`} color="gray">
+                {'  '}
+                {GUIDANCE_MORE_BELOW_LABEL}
               </Text>
-            )}
-          </Text>
-        ))
+            )
+          }
+          const hi = row.sourceIndex === slashHighlightIndex
+          return (
+            <Text key={`${row.usage}-${row.sourceIndex}`}>
+              {'  '}
+              {hi ? (
+                <Text inverse>
+                  {row.usage.padEnd(COMPLETION_USAGE_PAD)}
+                  {row.description}
+                </Text>
+              ) : (
+                <Text color="gray">
+                  {row.usage.padEnd(COMPLETION_USAGE_PAD)}
+                  {row.description}
+                </Text>
+              )}
+            </Text>
+          )
+        })
       ) : null}
     </Box>
   )

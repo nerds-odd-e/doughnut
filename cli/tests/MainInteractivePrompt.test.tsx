@@ -3,6 +3,10 @@ import * as os from 'node:os'
 import * as path from 'node:path'
 import { render } from 'ink-testing-library'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import {
+  GUIDANCE_LIST_ROW_BUDGET,
+  GUIDANCE_MORE_BELOW_LABEL,
+} from '../src/guidanceListWindow.js'
 import { MainInteractivePrompt } from '../src/mainInteractivePrompt/index.js'
 import { USER_INPUT_HISTORY_FILENAME } from '../src/mainInteractivePrompt/userInputHistoryFile.js'
 import { stripAnsi, waitForFrames } from './inkTestHelpers.js'
@@ -107,6 +111,24 @@ describe('MainInteractivePrompt slash guidance (phase 1)', () => {
       closeAfterOpen === -1 || closeAfterOpen > openInverseBeforeHelp,
       'highlight should extend through /help row start'
     ).toBe(true)
+  })
+
+  test('bare slash shows a fixed-height list with more-below when commands overflow budget', async () => {
+    const { stdin, lastFrame } = await renderMainInteractivePrompt()
+
+    stdin.write('/')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) =>
+        lineWithMainPrompt(f).includes('→ /') &&
+        f.includes(GUIDANCE_MORE_BELOW_LABEL)
+    )
+
+    const frame = stripAnsi(lastFrame() ?? '')
+    const listRows = frame
+      .split('\n')
+      .filter((l) => l.includes(GUIDANCE_MORE_BELOW_LABEL) || l.includes('  /'))
+    expect(listRows.length).toBe(GUIDANCE_LIST_ROW_BUDGET)
   })
 
   test('trailing space after slash command shows hint only, not the completion list', async () => {

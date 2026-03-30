@@ -3,12 +3,17 @@ import * as os from 'node:os'
 import * as path from 'node:path'
 import { UserController } from 'doughnut-api'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import {
+  GUIDANCE_LIST_ROW_BUDGET,
+  GUIDANCE_MORE_BELOW_LABEL,
+} from '../src/guidanceListWindow.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { formatVersionOutput } from '../src/commands/version.js'
 import {
   pressEscapeAndWait,
   pressEscapeAndWaitForCancelledLine,
   renderInkWhenCommandLineReady,
+  stripAnsi,
   waitForFrames,
 } from './inkTestHelpers.js'
 
@@ -157,6 +162,41 @@ describe('InteractiveCliApp /add-access-token', () => {
     )
 
     expect(frames.join('\n')).not.toContain('Stored access tokens:')
+  })
+
+  test('/list-access-token with many labels uses a fixed-height list with more-below', async () => {
+    fs.writeFileSync(
+      path.join(configDir, 'access-tokens.json'),
+      JSON.stringify({
+        tokens: Array.from({ length: 8 }, (_, i) => ({
+          label: `L${i}`,
+          token: `t${i}`,
+        })),
+        defaultLabel: 'L0',
+      }),
+      'utf-8'
+    )
+
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/list-access-token\r')
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (c) =>
+        c.includes('Access tokens') &&
+        c.includes(GUIDANCE_MORE_BELOW_LABEL) &&
+        c.includes('1. L0')
+    )
+
+    const plain = stripAnsi(frames.join('\n'))
+    const rows = plain
+      .split('\n')
+      .filter(
+        (l) => l.includes(GUIDANCE_MORE_BELOW_LABEL) || /\d+\.\s+L\d/.test(l)
+      )
+    expect(rows.length).toBe(GUIDANCE_LIST_ROW_BUDGET)
   })
 
   test('/list-access-token Down+Enter sets default token in access-tokens.json', async () => {

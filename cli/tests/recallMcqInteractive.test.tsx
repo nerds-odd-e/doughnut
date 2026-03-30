@@ -7,6 +7,7 @@ import {
 import type { RecallPrompt } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import { GUIDANCE_MORE_BELOW_LABEL } from '../src/guidanceListWindow.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
   pressEscape,
@@ -114,6 +115,38 @@ describe('recall MCQ (interactive)', () => {
       process.env.DOUGHNUT_CONFIG_DIR = savedConfigDir
     }
     fs.rmSync(configDir, { recursive: true, force: true })
+  })
+
+  test('many MCQ choices use a fixed-height list with more-below', async () => {
+    getRecallPromptsSpy.mockResolvedValue({
+      data: [
+        makeMe.aRecallPrompt
+          .withId(RECALL_PROMPT_ID)
+          .withQuestionStem('Pick one')
+          .withChoices(Array.from({ length: 8 }, (_, i) => `c${i}`))
+          .withMemoryTrackerId(1)
+          .please(),
+      ],
+    } as Awaited<ReturnType<typeof MemoryTrackerController.getRecallPrompts>>)
+
+    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) =>
+        p.includes('Pick one') &&
+        p.includes(GUIDANCE_MORE_BELOW_LABEL) &&
+        p.includes('1. c0')
+    )
+
+    const plain = stripAnsi(lastFrame() ?? '')
+    expect(plain).toContain(GUIDANCE_MORE_BELOW_LABEL)
+    expect(plain).toMatch(/1\.\s*c0/)
+    expect(plain).not.toMatch(/8\.\s*c7/)
   })
 
   test('wrong MCQ choice shows Incorrect and sends 0-based choiceIndex to API', async () => {

@@ -1,6 +1,6 @@
 /**
  * Pure slash-command completion: filtering, guidance display, tab completion,
- * arrow highlight cycling, and visible-row windowing.
+ * and arrow highlight cycling. List window layout lives in guidanceListWindow.ts.
  * Used by MainInteractivePrompt in this folder.
  */
 
@@ -9,7 +9,6 @@ import type { InteractiveSlashCommand } from '../commands/interactiveSlashComman
 
 export const DEFAULT_INTERACTIVE_GUIDANCE = '/ commands'
 
-const GUIDANCE_LIST_MAX_VISIBLE = 5
 export const COMPLETION_USAGE_PAD = 20
 
 function normalizedDraft(draft: string): string {
@@ -103,25 +102,6 @@ export function isSlashListArrowKey(
   if (!slashCompletionListVisible) return false
   if (key === 'up') return caretOffset === 0
   return caretOffset === lineDraft.length
-}
-
-export function visibleListRows(
-  rows: readonly { readonly usage: string; readonly description: string }[],
-  highlightIndex: number
-): { readonly rows: typeof rows; readonly highlightIndex: number } {
-  const max = GUIDANCE_LIST_MAX_VISIBLE
-  if (rows.length <= max) {
-    return { rows, highlightIndex }
-  }
-  const maxStart = Math.max(0, rows.length - max)
-  const start = Math.min(
-    Math.max(0, highlightIndex - Math.floor(max / 2)),
-    maxStart
-  )
-  return {
-    rows: rows.slice(start, start + max),
-    highlightIndex: highlightIndex - start,
-  }
 }
 
 export function isBareDraftSlash(draft: string): boolean {
