@@ -15,18 +15,25 @@ import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext
 import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import {
+  doughnutSdkOptions,
+  runDefaultBackendJson,
+} from '../../backendApi/doughnutBackendClient.js'
+import { MemoryTrackerController, type RecallPrompt } from 'doughnut-api'
+import {
   loadNextRecallCardIfAny,
   type RecallCard,
 } from './nextRecallCardLoad.js'
 import { markJustReviewRecalled } from './justReviewLoad.js'
 import { JustReviewRecallCard } from './JustReviewRecallCard.js'
 import { RecallMcqStage } from './RecallMcqStage.js'
+import { RecallSpellingStage } from './RecallSpellingStage.js'
 import { recallSessionSummaryLine } from './recallSessionSummary.js'
 
 const STAGE_LABEL = 'Recalling'
 
 export function RecallSessionStage({
   onSettled,
+  onAssistantLine,
 }: InteractiveSlashCommandStageProps) {
   const [card, setCard] = useState<RecallCard | null>(null)
   const [uiMode, setUiMode] = useState<'card' | 'loadMore'>('card')
@@ -93,6 +100,21 @@ export function RecallSessionStage({
     }
   }, [onSettled])
 
+  const onSpellingSucceeded = useCallback(async () => {
+    successfulRecallsRef.current += 1
+    try {
+      const next = await loadNextRecallCardIfAny(0)
+      if (next !== null) {
+        onAssistantLine?.('Correct!')
+        setCard(next)
+        return
+      }
+      onSettled('Correct!\nRecalled successfully')
+    } catch (loadErr: unknown) {
+      onSettled(userVisibleSlashCommandError(loadErr))
+    }
+  }, [onAssistantLine, onSettled])
+
   const submitLoadMore = useCallback(
     async (accept: boolean) => {
       if (submittingRef.current) return
@@ -145,6 +167,54 @@ export function RecallSessionStage({
       submittingRef.current = true
       const p = c.payload
       try {
+        if (successful && p.spellingPhaseAfterReview) {
+          const prompt = await runDefaultBackendJson<RecallPrompt>(() =>
+            MemoryTrackerController.askAQuestion({
+              path: { memoryTracker: p.memoryTrackerId },
+              ...doughnutSdkOptions(ac.signal),
+            })
+          )
+          submittingRef.current = false
+          if (activeOperationAbortRef.current === ac) {
+            activeOperationAbortRef.current = null
+          }
+          if (ac.signal.aborted) {
+            onSettled(
+              userVisibleSlashCommandError(
+                new DOMException('Aborted', 'AbortError')
+              )
+            )
+            return
+          }
+          if (prompt.questionType !== 'SPELLING') {
+            onSettled(
+              userVisibleSlashCommandError(
+                new Error('Expected a spelling recall prompt from the server.')
+              )
+            )
+            return
+          }
+          const recallPromptId = prompt.id
+          if (recallPromptId === undefined) {
+            onSettled(
+              userVisibleSlashCommandError(
+                new Error('Spelling recall prompt has no id.')
+              )
+            )
+            return
+          }
+          setCard({
+            variant: 'spelling',
+            payload: {
+              memoryTrackerId: p.memoryTrackerId,
+              recallPromptId,
+              stemMarkdown: prompt.spellingQuestion?.stem ?? '',
+              notebookTitle: p.notebookTitle,
+            },
+          })
+          return
+        }
+
         await markJustReviewRecalled(p.memoryTrackerId, successful, ac.signal)
       } catch (err: unknown) {
         submittingRef.current = false
@@ -272,6 +342,18 @@ export function RecallSessionStage({
         payload={card.payload}
         inputBlockedRef={submittingRef}
         onMcqSucceeded={onMcqSucceeded}
+      />
+    )
+  }
+
+  if (card.variant === 'spelling') {
+    return (
+      <RecallSpellingStage
+        key={card.payload.recallPromptId}
+        onSettled={onSettled}
+        payload={card.payload}
+        inputBlockedRef={submittingRef}
+        onSpellingSucceeded={onSpellingSucceeded}
       />
     )
   }

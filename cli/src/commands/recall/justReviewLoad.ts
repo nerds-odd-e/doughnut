@@ -10,6 +10,8 @@ export type RecallJustReviewPayload = {
   readonly noteTitle: string
   readonly detailsMarkdown: string
   readonly notebookTitle?: string
+  /** Spelling memory tracker: after “yes”, show spelling prompt before marking recalled. */
+  readonly spellingPhaseAfterReview?: boolean
 }
 
 export function recallJustReviewPayloadFromMemoryTracker(

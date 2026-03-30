@@ -18,6 +18,7 @@ import {
   tryLoadMcqPayload,
   type RecallMcqCardPayload,
 } from './recallMcqLoad.js'
+import type { RecallSpellingCardPayload } from './recallSpellingLoad.js'
 
 export type RecallCard =
   | {
@@ -25,6 +26,10 @@ export type RecallCard =
       readonly payload: RecallJustReviewPayload
     }
   | { readonly variant: 'mcq'; readonly payload: RecallMcqCardPayload }
+  | {
+      readonly variant: 'spelling'
+      readonly payload: RecallSpellingCardPayload
+    }
 
 /** Next due recall card (MCQ or just-review), or `null` when nothing is due in that window. */
 export async function loadNextRecallCardIfAny(
@@ -49,10 +54,6 @@ export async function loadNextRecallCardIfAny(
       ...doughnutSdkOptions(signal),
     })
   )
-  if (mt.spelling) {
-    throw new Error('Spelling recall is not available in the CLI yet.')
-  }
-
   const prompts = await runDefaultBackendJson<RecallPrompt[]>(() =>
     MemoryTrackerController.getRecallPrompts({
       path: { memoryTracker: id },
@@ -67,8 +68,9 @@ export async function loadNextRecallCardIfAny(
     return { variant: 'mcq', payload: mcqPayload }
   }
 
+  const jr = recallJustReviewPayloadFromMemoryTracker(mt)
   return {
     variant: 'just-review',
-    payload: recallJustReviewPayloadFromMemoryTracker(mt),
+    payload: mt.spelling ? { ...jr, spellingPhaseAfterReview: true } : jr,
   }
 }

@@ -27,7 +27,7 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
       value =
           "SELECT rp.* "
               + byUserIdFrom
-              + " AND rp.next_recall_at <= :nextRecallAt ORDER BY rp.next_recall_at",
+              + " AND rp.next_recall_at <= :nextRecallAt ORDER BY rp.next_recall_at, IFNULL(rp.spelling, 0) DESC",
       nativeQuery = true)
   Stream<MemoryTracker> findAllByUserAndNextRecallAtLessThanEqualOrderByNextRecallAt(
       @Param("userId") Integer userId, @Param("nextRecallAt") Timestamp nextRecallAt);

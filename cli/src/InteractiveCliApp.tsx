@@ -45,6 +45,10 @@ export function InteractiveCliApp() {
     stageArgumentRef.current = undefined
   }, [])
 
+  const appendAssistantLine = useCallback((assistantText: string) => {
+    setMessages((prev) => [...prev, { role: 'assistant', text: assistantText }])
+  }, [])
+
   const onCommittedLine = useCallback((line: string) => {
     const resolved = resolveInteractiveSlashCommand(line)
     if (resolved) {
@@ -132,6 +136,7 @@ export function InteractiveCliApp() {
           createElement(activeStageComponent, {
             argument: stageArgumentRef.current,
             onSettled: handleAsyncSlashSettled,
+            onAssistantLine: appendAssistantLine,
           })}
         {!exitAfterCommit && (
           <MainInteractivePrompt

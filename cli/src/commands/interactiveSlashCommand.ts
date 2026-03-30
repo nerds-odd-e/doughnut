@@ -3,6 +3,8 @@ import type { ComponentType } from 'react'
 export type InteractiveSlashCommandStageProps = {
   readonly argument?: string
   readonly onSettled: (assistantText: string) => void
+  /** Append an assistant line without closing the stage (e.g. mid-session recall feedback). */
+  readonly onAssistantLine?: (assistantText: string) => void
 }
 
 export type TranscriptMessage =
