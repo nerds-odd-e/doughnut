@@ -2,15 +2,16 @@
 
 Informal plan for **Current guidance** / list UIs: slash-command candidates, access-token label picker, recall MCQ choices. Each **phase** is one **user-observable** behavior (see `.cursor/rules/planning.mdc`). **Do not** treat this as historical log—update or remove when work is done.
 
-## Current snapshot (before execution)
+## Current snapshot
 
 | Surface | Location | Today |
 |--------|----------|--------|
-| Slash candidates | `MainInteractivePrompt.tsx`, `slashCommandCompletion.ts` (`visibleListRows`, `GUIDANCE_LIST_MAX_VISIBLE = 5`) | At most 5 **command** rows; sliding window centered on highlight; **no** “more above/below” rows; usage + description on one Ink line (may wrap visually on narrow terminals—**not** ellipsis truncation). |
-| Token picker | `AccessTokenLabelPickerStage.tsx`, `numberedTerminalListLines` in `terminalColumns.ts` | **All** labels rendered; wrapped lines per label; **no** fixed window or scroll indicators. |
-| MCQ choices | `RecallMcqStage.tsx`, `numberedMcqMarkdownLines.ts` | **All** choices rendered with markdown + wrapping; **no** fixed window or scroll indicators. |
+| All three list UIs | `guidanceListWindowInk.tsx` (`GuidanceListInk`), row budget 5 | Long lists: fixed-height window; “↑ more above” / “↓ more below” replace option rows inside the budget. Short lists (lines ≤ budget): **no** indicators; **all** rows shown. |
+| Slash candidates | `MainInteractivePrompt.tsx`, `slashCommandCompletion.ts` | Full match list passed into `GuidanceListInk` mode `slash`. |
+| Token picker | `AccessTokenLabelPickerStage.tsx`, `numberedTerminalListLines` | Wrapped label lines → `GuidanceListInk` mode `numbered`. |
+| MCQ choices | `RecallMcqStage.tsx`, `numberedMcqMarkdownLinesForTerminal` | Wrapped choice lines → `GuidanceListInk` mode `numbered`. |
 
-Repo search: no strings like “more above” / “more below” yet—indicator UX is **not** implemented.
+Copy for indicators lives in `guidanceListWindowInk.tsx`.
 
 ## Shared concepts (for implementers)
 
@@ -46,6 +47,8 @@ Each phase below has the same **subphases**:
 **Subphases:** Manual check → TDD if missing.
 
 **Note:** For MCQ, “fits” may mean total rendered choice rows ≤ budget, not merely `choices.length ≤ N`.
+
+**Done:** Implemented by `layoutWindowedLineSlice` when `lineCount <= budget` in [`cli/src/guidanceListWindowInk.tsx`](../cli/src/guidanceListWindowInk.tsx). Vitest: slash and numbered boundary cases plus MCQ-shaped continuation lines in [`cli/tests/guidanceListWindowInk.test.tsx`](../cli/tests/guidanceListWindowInk.test.tsx). With `pnpm sut`, spot-check short slash matches, a short token list, and MCQ with few wrapped lines to confirm no indicators.
 
 ---
 

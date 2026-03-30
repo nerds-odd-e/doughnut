@@ -44,6 +44,22 @@ describe('GuidanceListInk slash mode', () => {
     expect(optionLines).toHaveLength(3)
   })
 
+  test('at row budget: all slash options, no scroll labels', () => {
+    const rows = slashRows(ROW_BUDGET)
+    const p = renderGuidancePlain({
+      mode: 'slash',
+      rows,
+      highlightIndex: 2,
+    })
+    expect(p).not.toContain(MORE_ABOVE)
+    expect(p).not.toContain(MORE_BELOW)
+    const optionLines = p
+      .split('\n')
+      .map((l) => l.trimEnd())
+      .filter((l) => l.includes('/cmd'))
+    expect(optionLines).toHaveLength(ROW_BUDGET)
+  })
+
   test('overflow: fixed row count; bottom indicator replaces an option row', () => {
     const rows = slashRows(11)
     const p = renderGuidancePlain({
@@ -113,6 +129,46 @@ describe('GuidanceListInk numbered mode', () => {
     expect(p).not.toContain(MORE_BELOW)
     expect(p).toContain('1. A')
     expect(p).toContain('2. B')
+  })
+
+  test('at row budget: five flat lines, no indicators', () => {
+    const fiveFlat = Array.from({ length: ROW_BUDGET }, (_, i) => ({
+      itemIndex: i,
+      text: `${i + 1}. choice`,
+    }))
+    const p = renderGuidancePlain({
+      mode: 'numbered',
+      lines: fiveFlat,
+      highlightItemIndex: 2,
+    })
+    expect(p).not.toContain(MORE_ABOVE)
+    expect(p).not.toContain(MORE_BELOW)
+    for (let i = 0; i < ROW_BUDGET; i++) {
+      expect(p).toContain(`${i + 1}. choice`)
+    }
+  })
+
+  test('MCQ-shaped: continuation lines count toward budget; all visible when lines ≤ budget', () => {
+    const wrappedFits = [
+      { itemIndex: 0, text: '1. A' },
+      { itemIndex: 1, text: '2. B' },
+      { itemIndex: 1, text: '   b2' },
+      { itemIndex: 2, text: '3. C' },
+      { itemIndex: 3, text: '4. D' },
+    ]
+    expect(wrappedFits.length).toBe(ROW_BUDGET)
+    const p = renderGuidancePlain({
+      mode: 'numbered',
+      lines: wrappedFits,
+      highlightItemIndex: 1,
+    })
+    expect(p).not.toContain(MORE_ABOVE)
+    expect(p).not.toContain(MORE_BELOW)
+    expect(p).toContain('1. A')
+    expect(p).toContain('2. B')
+    expect(p).toContain('   b2')
+    expect(p).toContain('3. C')
+    expect(p).toContain('4. D')
   })
 
   test('overflow: fixed budget; highlighted item with continuation stays visible', () => {

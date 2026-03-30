@@ -269,10 +269,12 @@ If **three** near-identical “leave confirm” blocks appear (MCQ, just-review,
 - Reuse markdown/styling rules from Phase 2 where applicable for the review phase before spelling.
 - **Done:** `spelling-session` when `mt.spelling`; `SpellingRecallStage` fetches spelling prompt on mount (spell first); `RecallSessionStage` keeps **answered recall lines** above the current card (e.g. **Correct!** before loading the next tracker); due queue tie-break `IFNULL(spelling,0) DESC`; slim spelling payload; just-review remains MCQ fallback only.
 
-### Phase 10.3 — Edge cases (scenario scope only)
+### Phase 10.3 — Edge cases (scenario scope only) — **complete**
 
 - **Wrong spelling:** Message + whether note stays due — unit tests aligned with backend contract.
 - **Case sensitivity / unicode:** Unit tests for normalization if client-side.
+
+**Done:** `cli/tests/recallSpellingInteractive.test.tsx` — wrong answer → `Incorrect.`, single `answerSpelling`, no success lines (SRS after wrong answer: `RecallPromptControllerTests.WrongAnswer`); mixed-case and NBSP-trim pass-through to API body. `cli/src/commands/recall/spellingAnswerLine.ts` + `cli/tests/spellingAnswerLine.test.ts` — newline → space and trim (including NBSP).
 
 ---
 
