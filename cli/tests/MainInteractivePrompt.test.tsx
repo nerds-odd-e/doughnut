@@ -183,6 +183,24 @@ describe('MainInteractivePrompt Tab completion (phase 2)', () => {
     ).toBe(true)
   })
 
+  test('Tab with a unique match does not append <argument> placeholder to the draft', async () => {
+    const { stdin, lastFrame } = await renderMainInteractivePrompt()
+
+    stdin.write('/add-acc')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('→ /add-acc')
+    )
+    stdin.write('\t')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('→ /add-access-token ')
+    )
+    expect(lineWithMainPrompt(stripAnsi(lastFrame() ?? ''))).not.toMatch(
+      /<token>/
+    )
+  })
+
   test('Tab with no usage prefix match leaves draft unchanged', async () => {
     const { stdin, lastFrame } = await renderMainInteractivePrompt()
 
@@ -300,10 +318,7 @@ describe('MainInteractivePrompt Enter picks completion (phase 4)', () => {
     stdin.write('\r')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) =>
-        lineWithMainPrompt(f).includes(
-          '/remove-access-token-completely <label>'
-        )
+      (f) => lineWithMainPrompt(f).includes('/remove-access-token-completely ')
     )
     expect(onCommittedLine).not.toHaveBeenCalled()
   })
@@ -320,7 +335,7 @@ describe('MainInteractivePrompt Enter picks completion (phase 4)', () => {
     stdin.write('\r')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => lineWithMainPrompt(f).includes('/remove-access-token <label>')
+      (f) => lineWithMainPrompt(f).includes('/remove-access-token ')
     )
     expect(onCommittedLine).not.toHaveBeenCalled()
   })

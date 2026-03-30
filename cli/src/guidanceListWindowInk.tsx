@@ -4,13 +4,17 @@
  */
 
 import { useMemo } from 'react'
-import { Text } from 'ink'
+import { Box, Text } from 'ink'
 import {
   GUIDANCE_MORE_ABOVE_LABEL,
   GUIDANCE_MORE_BELOW_LABEL,
   layoutNumberedListGuidanceWindow,
   layoutSlashCommandGuidanceWindow,
 } from './guidanceListWindow.js'
+import {
+  padSlashListUsageColumn,
+  slashListMaxUsageWidth,
+} from './mainInteractivePrompt/slashCommandCompletion.js'
 import type { NumberedTerminalListLine } from './terminalColumns.js'
 
 export type GuidanceListInkProps =
@@ -21,7 +25,6 @@ export type GuidanceListInkProps =
         readonly description: string
       }[]
       readonly highlightIndex: number
-      readonly usagePad: number
     }
   | {
       readonly mode: 'numbered'
@@ -39,7 +42,6 @@ export function GuidanceListInk(props: GuidanceListInkProps) {
 function SlashGuidanceListInk({
   rows,
   highlightIndex,
-  usagePad,
 }: Extract<GuidanceListInkProps, { mode: 'slash' }>) {
   const display = useMemo(
     () =>
@@ -48,6 +50,12 @@ function SlashGuidanceListInk({
         : layoutSlashCommandGuidanceWindow(rows, highlightIndex),
     [rows, highlightIndex]
   )
+
+  const usageColWidth = useMemo(() => {
+    if (display === null) return 0
+    const optionRows = display.filter((r) => r.kind === 'option')
+    return slashListMaxUsageWidth(optionRows)
+  }, [display])
 
   if (display === null || display.length === 0) {
     return null
@@ -73,21 +81,22 @@ function SlashGuidanceListInk({
       )
     }
     const hi = row.sourceIndex === highlightIndex
+    const paddedUsage = padSlashListUsageColumn(row.usage, usageColWidth)
     return (
-      <Text key={`g-${row.usage}-${row.sourceIndex}`}>
-        {gutter}
+      <Box key={`g-${row.usage}-${row.sourceIndex}`} flexDirection="row">
+        <Text>{gutter}</Text>
         {hi ? (
-          <Text inverse>
-            {row.usage.padEnd(usagePad)}
-            {row.description}
-          </Text>
+          <>
+            <Text inverse>{paddedUsage}</Text>
+            <Text inverse>{row.description}</Text>
+          </>
         ) : (
-          <Text color="gray">
-            {row.usage.padEnd(usagePad)}
-            {row.description}
-          </Text>
+          <>
+            <Text color="gray">{paddedUsage}</Text>
+            <Text color="gray">{row.description}</Text>
+          </>
         )}
-      </Text>
+      </Box>
     )
   })
 }

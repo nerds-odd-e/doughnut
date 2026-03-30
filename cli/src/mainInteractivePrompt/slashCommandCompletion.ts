@@ -4,12 +4,38 @@
  * Used by MainInteractivePrompt in this folder.
  */
 
+import stringWidth from 'string-width'
 import { interactiveSlashCommands } from '../commands/interactiveSlashCommands.js'
 import type { InteractiveSlashCommand } from '../commands/interactiveSlashCommand.js'
 
 export const DEFAULT_INTERACTIVE_GUIDANCE = '/ commands'
 
-export const COMPLETION_USAGE_PAD = 20
+export type SlashCompletionListRow = {
+  readonly usage: string
+  readonly description: string
+  /** Buffer text after Tab/Enter pick (no `<argument>` placeholder). */
+  readonly completionLine: string
+}
+
+export function slashListMaxUsageWidth(
+  rows: readonly { readonly usage: string }[]
+): number {
+  let m = 0
+  for (const r of rows) {
+    const w = stringWidth(r.usage)
+    if (w > m) m = w
+  }
+  return m
+}
+
+export function padSlashListUsageColumn(
+  usage: string,
+  minCols: number
+): string {
+  const w = stringWidth(usage)
+  if (w >= minCols) return usage
+  return `${usage}${' '.repeat(minCols - w)}`
+}
 
 function normalizedDraft(draft: string): string {
   return draft.replace(/\n/g, ' ')
@@ -25,11 +51,11 @@ export function getSlashTabCompletion(buffer: string): {
   )
   if (matches.length === 0) return { completed: buffer, count: 0 }
   if (matches.length === 1)
-    return { completed: `${matches[0]!.doc.usage} `, count: 1 }
-  const usages = matches.map((m) => m.doc.usage)
-  let prefix = usages[0]!
-  for (let i = 1; i < usages.length; i++) {
-    while (!usages[i]!.startsWith(prefix) && prefix.length > 0) {
+    return { completed: `${matches[0]!.line} `, count: 1 }
+  const lines = matches.map((m) => m.line)
+  let prefix = lines[0]!
+  for (let i = 1; i < lines.length; i++) {
+    while (!lines[i]!.startsWith(prefix) && prefix.length > 0) {
       prefix = prefix.slice(0, -1)
     }
   }
@@ -66,10 +92,7 @@ export type SlashGuidanceForInk =
   | { show: 'empty' }
   | {
       show: 'list'
-      readonly rows: readonly {
-        readonly usage: string
-        readonly description: string
-      }[]
+      readonly rows: readonly SlashCompletionListRow[]
     }
 
 export function slashGuidanceForInk(draft: string): SlashGuidanceForInk {
@@ -80,6 +103,7 @@ export function slashGuidanceForInk(draft: string): SlashGuidanceForInk {
   const rows = matches.map((c) => ({
     usage: c.doc.usage,
     description: c.doc.description,
+    completionLine: c.line,
   }))
   return { show: 'list', rows }
 }

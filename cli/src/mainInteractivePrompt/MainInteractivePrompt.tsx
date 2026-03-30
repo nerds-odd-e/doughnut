@@ -17,7 +17,6 @@ import {
 import { cycleListSelectionIndex } from '../interactions/selectListInteraction.js'
 import { GuidanceListInk } from '../guidanceListWindowInk.js'
 import {
-  COMPLETION_USAGE_PAD,
   DEFAULT_INTERACTIVE_GUIDANCE,
   effectiveSlashGuidance,
   getSlashTabCompletion,
@@ -266,7 +265,7 @@ export function MainInteractivePrompt({
         endWalkBeforeDraftEdit()
         const hi = readHighlight()
         const row = pickRows[hi] ?? pickRows[0]!
-        const completed = `${row.usage} `
+        const completed = `${row.completionLine} `
         setAll(completed, completed.length, 0)
         return
       }
@@ -364,7 +363,6 @@ export function MainInteractivePrompt({
           mode="slash"
           rows={guidance.rows}
           highlightIndex={slashHighlightIndex}
-          usagePad={COMPLETION_USAGE_PAD}
         />
       ) : null}
     </Box>
