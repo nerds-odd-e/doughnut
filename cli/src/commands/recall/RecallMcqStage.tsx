@@ -10,9 +10,8 @@ import {
 import type { Key } from 'ink'
 import { Box, Text, useInput } from 'ink'
 import {
-  cycleListSelectionIndex,
-  dispatchSelectListKey,
-  selectListKeyEventFromInk,
+  choiceIndexFromSelectListSubmitLine,
+  handleSelectListInkKey,
 } from '../../interactions/selectListInteraction.js'
 import {
   numberedTerminalListLines,
@@ -27,16 +26,6 @@ import { submitMcqAnswer, type RecallMcqCardPayload } from './recallMcqLoad.js'
 const STAGE_LABEL = 'Recalling'
 
 const MCQ_HINT = '↑↓ Enter or number to select; Esc to cancel'
-
-function choiceIndexFromSubmitLine(
-  line: string,
-  choiceCount: number
-): number | null {
-  if (line === '/stop' || line === '/contest') return null
-  const n = Number.parseInt(line, 10)
-  if (!Number.isFinite(n) || n < 1 || n > choiceCount) return null
-  return n - 1
-}
 
 export function RecallMcqStage({
   onSettled,
@@ -89,59 +78,52 @@ export function RecallMcqStage({
     (input: string, key: Key) => {
       if (inputBlockedRef.current) return
 
-      const ev = selectListKeyEventFromInk(input, key, bufferRef.current)
-      const listDispatch = dispatchSelectListKey(
-        ev,
+      const clearDraft = () => {
+        bufferRef.current = ''
+        setBuffer('')
+      }
+
+      handleSelectListInkKey(
+        input,
+        key,
+        bufferRef.current,
         highlightIndex,
+        choices.length,
         {
           kind: 'slash-and-number-or-highlight',
           choiceCount: choices.length,
         },
-        'signal-escape'
+        'signal-escape',
+        {
+          onSetHighlightIndex: setHighlightIndex,
+          onSubmitHighlightIndex: (index) => {
+            clearDraft()
+            runSubmit(index).catch(() => undefined)
+          },
+          onSubmitWithLine: (line) => {
+            const idx = choiceIndexFromSelectListSubmitLine(
+              line,
+              choices.length
+            )
+            if (idx === null) return
+            clearDraft()
+            runSubmit(idx).catch(() => undefined)
+          },
+          onEscapeSignaled: () => undefined,
+          onEditBackspace: () => {
+            const cur = bufferRef.current
+            if (cur.length === 0) return
+            const next = cur.slice(0, -1)
+            bufferRef.current = next
+            setBuffer(next)
+          },
+          onEditChar: (char) => {
+            const next = bufferRef.current + char
+            bufferRef.current = next
+            setBuffer(next)
+          },
+        }
       )
-
-      switch (listDispatch.result) {
-        case 'escape-signaled':
-          return
-        case 'move-highlight':
-          setHighlightIndex((hi) =>
-            cycleListSelectionIndex(hi, listDispatch.delta, choices.length)
-          )
-          return
-        case 'submit-with-line': {
-          const line = listDispatch.lineForProcessInput.trim()
-          const idx = choiceIndexFromSubmitLine(line, choices.length)
-          if (idx === null) return
-          bufferRef.current = ''
-          setBuffer('')
-          runSubmit(idx).catch(() => undefined)
-          return
-        }
-        case 'submit-highlight-index': {
-          bufferRef.current = ''
-          setBuffer('')
-          runSubmit(listDispatch.index).catch(() => undefined)
-          return
-        }
-        case 'edit-backspace': {
-          const cur = bufferRef.current
-          if (cur.length === 0) return
-          const next = cur.slice(0, -1)
-          bufferRef.current = next
-          setBuffer(next)
-          return
-        }
-        case 'edit-char': {
-          const next = bufferRef.current + listDispatch.char
-          bufferRef.current = next
-          setBuffer(next)
-          return
-        }
-        case 'redraw':
-          return
-        default:
-          return
-      }
     },
     [choices.length, highlightIndex, inputBlockedRef, runSubmit]
   )

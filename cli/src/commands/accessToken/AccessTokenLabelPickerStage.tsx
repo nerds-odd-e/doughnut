@@ -9,11 +9,7 @@ import {
 } from 'react'
 import type { Key } from 'ink'
 import { Box, Text, useInput } from 'ink'
-import {
-  cycleListSelectionIndex,
-  dispatchSelectListKey,
-  selectListKeyEventFromInk,
-} from '../../interactions/selectListInteraction.js'
+import { handleSelectListInkKey } from '../../interactions/selectListInteraction.js'
 import {
   numberedTerminalListLines,
   resolvedTerminalWidth,
@@ -61,31 +57,27 @@ export function AccessTokenLabelPickerStage({
     (input: string, key: Key) => {
       if (labels.length === 0) return
 
-      const ev = selectListKeyEventFromInk(input, key, '')
-      const listDispatch = dispatchSelectListKey(
-        ev,
+      handleSelectListInkKey(
+        input,
+        key,
+        '',
         highlightIndex,
+        labels.length,
         { kind: 'highlight-only' },
-        'abort-list'
-      )
-
-      switch (listDispatch.result) {
-        case 'abort-highlight-only-list':
-          onSettled(PICKER_ABORTED_MESSAGE)
-          return
-        case 'move-highlight':
-          setHighlightIndex((hi) =>
-            cycleListSelectionIndex(hi, listDispatch.delta, labels.length)
-          )
-          return
-        case 'submit-highlight-index': {
-          const selectedLabel = labels[listDispatch.index]!
-          onPick(selectedLabel)
-          return
+        'abort-list',
+        {
+          onSetHighlightIndex: setHighlightIndex,
+          onSubmitHighlightIndex: (index) => {
+            onPick(labels[index]!)
+          },
+          onAbortHighlightOnlyList: () => {
+            onSettled(PICKER_ABORTED_MESSAGE)
+          },
+          onOtherDispatch: () => {
+            onSettled(PICKER_ABORTED_MESSAGE)
+          },
         }
-        default:
-          onSettled(PICKER_ABORTED_MESSAGE)
-      }
+      )
     },
     [highlightIndex, labels, onPick, onSettled]
   )

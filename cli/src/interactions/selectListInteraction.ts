@@ -40,6 +40,19 @@ type SelectListKeyDispatchResult =
   | { result: 'abort-highlight-only-list' }
   | { result: 'redraw' }
 
+type InkLikeKey = {
+  escape?: boolean
+  name?: string
+  return?: boolean
+  upArrow?: boolean
+  downArrow?: boolean
+  backspace?: boolean
+  delete?: boolean
+  ctrl?: boolean
+  meta?: boolean
+  shift?: boolean
+}
+
 export function selectListSubmitLineForSlashAndNumber(
   trimmedDraft: string,
   choiceCount: number,
@@ -50,6 +63,91 @@ export function selectListSubmitLineForSlashAndNumber(
   const n = Number.parseInt(trimmedDraft, 10)
   if (n >= 1 && n <= choiceCount) return String(n)
   return String(selectedIndex + 1)
+}
+
+/** 0-based choice index from a submit line produced by the slash-and-number policy, or null if not a numeric choice (/stop, /contest, invalid). */
+export function choiceIndexFromSelectListSubmitLine(
+  line: string,
+  choiceCount: number
+): number | null {
+  const t = line.trim()
+  if (t === '/stop' || t === '/contest') return null
+  const n = Number.parseInt(t, 10)
+  if (!Number.isFinite(n) || n < 1 || n > choiceCount) return null
+  return n - 1
+}
+
+export type SelectListInkHandlers = {
+  readonly onSetHighlightIndex: (index: number) => void
+  readonly onSubmitHighlightIndex: (index: number) => void
+  readonly onSubmitWithLine?: (trimmedLine: string) => void
+  readonly onEscapeSignaled?: () => void
+  readonly onAbortHighlightOnlyList?: () => void
+  readonly onEditBackspace?: () => void
+  readonly onEditChar?: (char: string) => void
+  readonly onRedraw?: () => void
+  readonly onOtherDispatch?: () => void
+}
+
+export function handleSelectListInkKey(
+  input: string,
+  key: InkLikeKey,
+  lineDraft: string,
+  highlightIndex: number,
+  listLength: number,
+  draftPolicy: SelectListDraftPolicy,
+  escapePolicy: SelectListEscapePolicy,
+  handlers: SelectListInkHandlers
+): void {
+  const ev = selectListKeyEventFromInk(input, key, lineDraft)
+  const d = dispatchSelectListKey(ev, highlightIndex, draftPolicy, escapePolicy)
+
+  switch (d.result) {
+    case 'move-highlight':
+      handlers.onSetHighlightIndex(
+        cycleListSelectionIndex(highlightIndex, d.delta, listLength)
+      )
+      return
+    case 'submit-highlight-index':
+      handlers.onSubmitHighlightIndex(d.index)
+      return
+    case 'submit-with-line': {
+      const line = d.lineForProcessInput.trim()
+      if (handlers.onSubmitWithLine !== undefined) {
+        handlers.onSubmitWithLine(line)
+        return
+      }
+      handlers.onOtherDispatch?.()
+      return
+    }
+    case 'escape-signaled':
+      handlers.onEscapeSignaled?.()
+      return
+    case 'edit-backspace':
+      if (handlers.onEditBackspace !== undefined) {
+        handlers.onEditBackspace()
+        return
+      }
+      handlers.onOtherDispatch?.()
+      return
+    case 'edit-char':
+      if (handlers.onEditChar !== undefined) {
+        handlers.onEditChar(d.char)
+        return
+      }
+      handlers.onOtherDispatch?.()
+      return
+    case 'redraw':
+      handlers.onRedraw?.()
+      return
+    case 'abort-highlight-only-list':
+      handlers.onAbortHighlightOnlyList?.()
+      return
+    default: {
+      const _exhaustive: never = d
+      return _exhaustive
+    }
+  }
 }
 
 export function dispatchSelectListKey(
@@ -101,19 +199,6 @@ export function dispatchSelectListKey(
   return draftEnabled
     ? { result: 'redraw' }
     : { result: 'abort-highlight-only-list' }
-}
-
-type InkLikeKey = {
-  escape?: boolean
-  name?: string
-  return?: boolean
-  upArrow?: boolean
-  downArrow?: boolean
-  backspace?: boolean
-  delete?: boolean
-  ctrl?: boolean
-  meta?: boolean
-  shift?: boolean
 }
 
 export function selectListKeyEventFromInk(

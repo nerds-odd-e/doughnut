@@ -1,7 +1,9 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
+  choiceIndexFromSelectListSubmitLine,
   cycleListSelectionIndex,
   dispatchSelectListKey,
+  handleSelectListInkKey,
   selectListKeyEventFromInk,
   selectListSubmitLineForSlashAndNumber,
 } from '../src/interactions/selectListInteraction.js'
@@ -32,6 +34,139 @@ describe('selectListSubmitLineForSlashAndNumber', () => {
   })
   it('treats 0 as out of range, not a valid choice index', () => {
     expect(selectListSubmitLineForSlashAndNumber('0', 3, 1)).toBe('2')
+  })
+})
+
+describe('choiceIndexFromSelectListSubmitLine', () => {
+  it('returns null for slash commands', () => {
+    expect(choiceIndexFromSelectListSubmitLine('/stop', 3)).toBeNull()
+    expect(choiceIndexFromSelectListSubmitLine('/contest', 3)).toBeNull()
+  })
+  it('returns 0-based index for valid 1-based numbers', () => {
+    expect(choiceIndexFromSelectListSubmitLine('1', 3)).toBe(0)
+    expect(choiceIndexFromSelectListSubmitLine('  3  ', 3)).toBe(2)
+  })
+  it('returns null for out-of-range or non-numeric', () => {
+    expect(choiceIndexFromSelectListSubmitLine('0', 3)).toBeNull()
+    expect(choiceIndexFromSelectListSubmitLine('4', 3)).toBeNull()
+    expect(choiceIndexFromSelectListSubmitLine('x', 3)).toBeNull()
+  })
+})
+
+describe('handleSelectListInkKey', () => {
+  const emptyKey = {}
+
+  it('highlight-only: moves highlight and submits index', () => {
+    const onSetHighlightIndex = vi.fn()
+    const onSubmitHighlightIndex = vi.fn()
+    handleSelectListInkKey(
+      '',
+      { upArrow: true },
+      '',
+      1,
+      3,
+      { kind: 'highlight-only' },
+      'abort-list',
+      { onSetHighlightIndex, onSubmitHighlightIndex }
+    )
+    expect(onSetHighlightIndex).toHaveBeenCalledWith(0)
+
+    handleSelectListInkKey(
+      '\r',
+      { return: true },
+      '',
+      2,
+      3,
+      { kind: 'highlight-only' },
+      'abort-list',
+      { onSetHighlightIndex, onSubmitHighlightIndex }
+    )
+    expect(onSubmitHighlightIndex).toHaveBeenCalledWith(2)
+  })
+
+  it('highlight-only: abort calls onAbortHighlightOnlyList', () => {
+    const onAbortHighlightOnlyList = vi.fn()
+    handleSelectListInkKey(
+      '\u001b',
+      {},
+      '',
+      0,
+      2,
+      { kind: 'highlight-only' },
+      'abort-list',
+      {
+        onSetHighlightIndex: vi.fn(),
+        onSubmitHighlightIndex: vi.fn(),
+        onAbortHighlightOnlyList,
+      }
+    )
+    expect(onAbortHighlightOnlyList).toHaveBeenCalledOnce()
+  })
+
+  it('slash-and-number: edits draft and submits parsed line', () => {
+    const onSetHighlightIndex = vi.fn()
+    const onSubmitHighlightIndex = vi.fn()
+    const onSubmitWithLine = vi.fn()
+    handleSelectListInkKey(
+      '2',
+      emptyKey,
+      '',
+      0,
+      3,
+      {
+        kind: 'slash-and-number-or-highlight',
+        choiceCount: 3,
+      },
+      'signal-escape',
+      {
+        onSetHighlightIndex,
+        onSubmitHighlightIndex,
+        onSubmitWithLine,
+        onEditChar: vi.fn(),
+      }
+    )
+    expect(onSubmitWithLine).not.toHaveBeenCalled()
+
+    handleSelectListInkKey(
+      '\r',
+      { return: true },
+      '2',
+      0,
+      3,
+      {
+        kind: 'slash-and-number-or-highlight',
+        choiceCount: 3,
+      },
+      'signal-escape',
+      {
+        onSetHighlightIndex,
+        onSubmitHighlightIndex,
+        onSubmitWithLine,
+      }
+    )
+    expect(onSubmitWithLine).toHaveBeenCalledWith('2')
+  })
+
+  it('slash-and-number: escape signals only', () => {
+    const onEscapeSignaled = vi.fn()
+    handleSelectListInkKey(
+      '\u001b',
+      {},
+      '',
+      0,
+      2,
+      {
+        kind: 'slash-and-number-or-highlight',
+        choiceCount: 2,
+      },
+      'signal-escape',
+      {
+        onSetHighlightIndex: vi.fn(),
+        onSubmitHighlightIndex: vi.fn(),
+        onEscapeSignaled,
+      }
+    )
+    expect(onEscapeSignaled).toHaveBeenCalledOnce()
   })
 })
 
