@@ -4,7 +4,7 @@ import * as path from 'node:path'
 import { render } from 'ink-testing-library'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { ListAccessTokenStage } from '../src/commands/accessToken/listAccessToken/ListAccessTokenStage.js'
-import { waitForFrames } from './inkTestHelpers.js'
+import { pressEscapeAndWait, waitForFrames } from './inkTestHelpers.js'
 
 describe('ListAccessTokenStage', () => {
   let configDir: string
@@ -48,8 +48,8 @@ describe('ListAccessTokenStage', () => {
       (c) => c.includes('1. Alpha') && c.includes('2. Beta')
     )
 
-    stdin.write('\u001b')
-    await waitForFrames(
+    await pressEscapeAndWait(
+      stdin,
       () => frames.join('\n'),
       () => settled !== null
     )

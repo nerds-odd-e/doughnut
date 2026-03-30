@@ -1,9 +1,10 @@
 import * as fs from 'node:fs'
 import * as http from 'node:http'
 import type * as net from 'node:net'
-import { afterAll, beforeAll, describe, expect, test } from 'vitest'
+import { afterAll, beforeAll, describe, test } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
+  pressEscapeAndWaitForCancelledLine,
   renderInkWhenCommandLineReady,
   waitForFrames,
 } from './inkTestHelpers.js'
@@ -62,13 +63,7 @@ describe('InteractiveCliApp /remove-access-token-completely inline + Esc (hung H
         (c) => c.includes('Revoking token')
       )
 
-      stdin.write('\u001b')
-      await waitForFrames(
-        () => frames.join('\n'),
-        (c) => c.includes('Cancelled.')
-      )
-
-      expect(frames.join('\n')).toContain('Cancelled.')
+      await pressEscapeAndWaitForCancelledLine(stdin, () => frames.join('\n'))
     } finally {
       await new Promise<void>((resolve) => server.close(() => resolve()))
       fs.rmSync(configDir, { recursive: true, force: true })

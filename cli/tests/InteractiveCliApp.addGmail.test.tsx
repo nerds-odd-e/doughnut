@@ -4,6 +4,7 @@ import * as os from 'node:os'
 import * as path from 'node:path'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import {
+  pressEscapeAndWaitForCancelledLine,
   renderInkWhenCommandLineReady,
   stripAnsi,
   waitForFrames,
@@ -260,11 +261,9 @@ describe('InteractiveCliApp /add gmail (mocked HTTP APIs)', () => {
         !f.includes('> ')
     )
 
-    stdin.write('\u001b')
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (c) => c.includes('Cancelled.')
-    )
+    await pressEscapeAndWaitForCancelledLine(stdin, () => frames.join('\n'), {
+      normalize: stripAnsi,
+    })
     await waitForLastFrame(lastFrame, (f) => f.includes('> '))
   })
 })
@@ -338,11 +337,9 @@ describe('InteractiveCliApp /last email (mocked HTTP APIs)', () => {
         !f.includes('> ')
     )
 
-    stdin.write('\u001b')
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (c) => c.includes('Cancelled.')
-    )
+    await pressEscapeAndWaitForCancelledLine(stdin, () => frames.join('\n'), {
+      normalize: stripAnsi,
+    })
     await waitForLastFrame(lastFrame, (f) => f.includes('> '))
   })
 

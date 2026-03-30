@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { formatVersionOutput } from '../src/commands/version.js'
 import {
+  pressEscapeAndWait,
   renderInkWhenCommandLineReady,
   waitForFrames,
 } from './inkTestHelpers.js'
@@ -111,8 +112,8 @@ describe('InteractiveCliApp /add-access-token', () => {
       (c) => c.includes('Access tokens') && c.includes('1. Vitest token label')
     )
 
-    stdin.write('\u001b')
-    await waitForFrames(
+    await pressEscapeAndWait(
+      stdin,
       () => frames.join('\n'),
       (c) =>
         c.includes('Cancelled.') &&

@@ -16,6 +16,49 @@ export function stripAnsi(s: string): string {
   return s.replace(new RegExp(`${esc}\\[[0-9;?]*[a-zA-Z]`, 'g'), '')
 }
 
+/** Raw TTY ESC byte for Ink `useInput` and interactive tests. */
+export const TTY_ESCAPE = '\u001b'
+
+export function pressEscape(stdin: { write(data: string): void }): void {
+  stdin.write(TTY_ESCAPE)
+}
+
+/** Send Esc, then poll until `predicate(combined)` holds. */
+export async function pressEscapeAndWait(
+  stdin: { write(data: string): void },
+  getCombined: () => string,
+  predicate: (combined: string) => boolean,
+  maxTicks = 5000
+): Promise<void> {
+  pressEscape(stdin)
+  await waitForFrames(getCombined, predicate, maxTicks)
+}
+
+/** Poll until normalized output contains the cancelled assistant line. */
+export async function waitForCancelledLine(
+  getCombined: () => string,
+  options?: { readonly normalize?: (s: string) => string },
+  maxTicks = 5000
+): Promise<void> {
+  const norm = options?.normalize ?? ((s: string) => s)
+  await waitForFrames(
+    getCombined,
+    (c) => norm(c).includes('Cancelled.'),
+    maxTicks
+  )
+}
+
+/** Send Esc, then wait until output shows `Cancelled.` (after optional normalization). */
+export async function pressEscapeAndWaitForCancelledLine(
+  stdin: { write(data: string): void },
+  getCombined: () => string,
+  options?: { readonly normalize?: (s: string) => string },
+  maxTicks = 5000
+): Promise<void> {
+  pressEscape(stdin)
+  await waitForCancelledLine(getCombined, options, maxTicks)
+}
+
 /** Advance the event loop until `predicate` holds or `maxTicks` is exhausted (no fixed wall-clock sleep). */
 export async function waitForFrames(
   getCombined: () => string,

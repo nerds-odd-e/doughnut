@@ -1,7 +1,11 @@
 import { render } from 'ink-testing-library'
 import { describe, expect, test } from 'vitest'
 import { AsyncAssistantFetchStage } from '../src/commands/gmail/AsyncAssistantFetchStage.js'
-import { StageKeyRoot, waitForFrames } from './inkTestHelpers.js'
+import {
+  pressEscapeAndWait,
+  StageKeyRoot,
+  waitForFrames,
+} from './inkTestHelpers.js'
 
 function pendingUntilAbort(signal: AbortSignal): Promise<string> {
   return new Promise<string>((_, reject) => {
@@ -35,8 +39,8 @@ describe('AsyncAssistantFetchStage', () => {
       (c) => c.includes('Loading test')
     )
 
-    stdin.write('\u001b')
-    await waitForFrames(
+    await pressEscapeAndWait(
+      stdin,
       () => frames.join('\n'),
       () => settled !== null
     )

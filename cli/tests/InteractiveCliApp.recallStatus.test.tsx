@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { formatVersionOutput } from '../src/commands/version.js'
 import {
+  pressEscapeAndWait,
   renderInkWhenCommandLineReady,
   stripAnsi,
   waitForFrames,
@@ -62,8 +63,8 @@ describe('InteractiveCliApp /recall-status', () => {
       (c) => stripAnsi(c).includes('Loading recall status')
     )
 
-    stdin.write('\u001b')
-    await waitForFrames(
+    await pressEscapeAndWait(
+      stdin,
       () => frames.join('\n'),
       (c) =>
         stripAnsi(c).includes('/recall-status') &&
