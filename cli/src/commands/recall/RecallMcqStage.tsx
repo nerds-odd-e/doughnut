@@ -22,7 +22,7 @@ import {
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
 import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
-import { submitMcqAnswer, type RecallMcqCardPayload } from './justReviewLoad.js'
+import { submitMcqAnswer, type RecallMcqCardPayload } from './recallMcqLoad.js'
 
 const STAGE_LABEL = 'Recalling'
 

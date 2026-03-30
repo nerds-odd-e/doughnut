@@ -2,7 +2,7 @@ import type {
   CommandDoc,
   InteractiveSlashCommand,
 } from '../interactiveSlashCommand.js'
-import { RecallJustReviewStage } from './RecallJustReviewStage.js'
+import { RecallSessionStage } from './RecallSessionStage.js'
 
 const recallDoc: CommandDoc = {
   name: '/recall',
@@ -13,5 +13,5 @@ const recallDoc: CommandDoc = {
 export const recallSlashCommand: InteractiveSlashCommand = {
   line: '/recall',
   doc: recallDoc,
-  stageComponent: RecallJustReviewStage,
+  stageComponent: RecallSessionStage,
 }

@@ -10,35 +10,34 @@ import {
 import type { Key } from 'ink'
 import { Box, Text, useInput } from 'ink'
 import { Spinner } from '@inkjs/ui'
-import { renderMarkdownToTerminal } from '../../markdown.js'
-import { resolvedTerminalWidth } from '../../terminalColumns.js'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
 import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext.js'
 import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import {
-  loadRecallJustReviewPayloadIfAny,
-  markJustReviewRecalled,
-  type RecallSessionPayload,
-} from './justReviewLoad.js'
+  loadNextRecallCardIfAny,
+  type RecallCard,
+} from './nextRecallCardLoad.js'
+import { markJustReviewRecalled } from './justReviewLoad.js'
+import { JustReviewRecallCard } from './JustReviewRecallCard.js'
 import { RecallMcqStage } from './RecallMcqStage.js'
 import { recallSessionSummaryLine } from './recallSessionSummary.js'
 
 const STAGE_LABEL = 'Recalling'
 
-export function RecallJustReviewStage({
+export function RecallSessionStage({
   onSettled,
 }: InteractiveSlashCommandStageProps) {
-  const [payload, setPayload] = useState<RecallSessionPayload | null>(null)
+  const [card, setCard] = useState<RecallCard | null>(null)
   const [uiMode, setUiMode] = useState<'card' | 'loadMore'>('card')
   const [initialResolved, setInitialResolved] = useState(false)
-  const payloadRef = useRef<RecallSessionPayload | null>(null)
+  const cardRef = useRef<RecallCard | null>(null)
   const submittingRef = useRef(false)
   const successfulRecallsRef = useRef(0)
   const startedWithEmptyTodayRef = useRef(false)
   const activeOperationAbortRef = useRef<AbortController | null>(null)
 
-  payloadRef.current = payload
+  cardRef.current = card
 
   useEffect(() => {
     let unmounted = false
@@ -46,15 +45,15 @@ export function RecallJustReviewStage({
     activeOperationAbortRef.current = ac
     ;(async () => {
       try {
-        const p = await loadRecallJustReviewPayloadIfAny(0, ac.signal)
+        const next = await loadNextRecallCardIfAny(0, ac.signal)
         if (unmounted || ac.signal.aborted) return
-        if (p !== null) {
+        if (next !== null) {
           startedWithEmptyTodayRef.current = false
-          setPayload(p)
+          setCard(next)
           setUiMode('card')
         } else {
           startedWithEmptyTodayRef.current = true
-          setPayload(null)
+          setCard(null)
           setUiMode('loadMore')
         }
         setInitialResolved(true)
@@ -83,9 +82,9 @@ export function RecallJustReviewStage({
   const onMcqSucceeded = useCallback(async () => {
     successfulRecallsRef.current += 1
     try {
-      const next = await loadRecallJustReviewPayloadIfAny(0)
+      const next = await loadNextRecallCardIfAny(0)
       if (next !== null) {
-        setPayload(next)
+        setCard(next)
         return
       }
       onSettled('Correct!\nRecalled successfully')
@@ -106,7 +105,7 @@ export function RecallJustReviewStage({
       const ac = new AbortController()
       activeOperationAbortRef.current = ac
       try {
-        const next = await loadRecallJustReviewPayloadIfAny(3, ac.signal)
+        const next = await loadNextRecallCardIfAny(3, ac.signal)
         submittingRef.current = false
         if (activeOperationAbortRef.current === ac) {
           activeOperationAbortRef.current = null
@@ -123,7 +122,7 @@ export function RecallJustReviewStage({
           settleSessionSummary()
         } else {
           setUiMode('card')
-          setPayload(next)
+          setCard(next)
         }
       } catch (loadErr: unknown) {
         submittingRef.current = false
@@ -136,14 +135,15 @@ export function RecallJustReviewStage({
     [onSettled, settleSessionSummary]
   )
 
-  const submit = useCallback(
+  const submitJustReview = useCallback(
     async (successful: boolean) => {
-      const p = payloadRef.current
-      if (p === null || p.kind !== 'just-review' || submittingRef.current)
+      const c = cardRef.current
+      if (c === null || c.variant !== 'just-review' || submittingRef.current)
         return
       const ac = new AbortController()
       activeOperationAbortRef.current = ac
       submittingRef.current = true
+      const p = c.payload
       try {
         await markJustReviewRecalled(p.memoryTrackerId, successful, ac.signal)
       } catch (err: unknown) {
@@ -176,7 +176,7 @@ export function RecallJustReviewStage({
       }
       successfulRecallsRef.current += 1
       try {
-        const next = await loadRecallJustReviewPayloadIfAny(0, ac.signal)
+        const next = await loadNextRecallCardIfAny(0, ac.signal)
         submittingRef.current = false
         if (activeOperationAbortRef.current === ac) {
           activeOperationAbortRef.current = null
@@ -199,7 +199,7 @@ export function RecallJustReviewStage({
             setUiMode('loadMore')
           }
         } else {
-          setPayload(next)
+          setCard(next)
         }
       } catch (loadErr: unknown) {
         submittingRef.current = false
@@ -216,9 +216,9 @@ export function RecallJustReviewStage({
     if (submittingRef.current) {
       activeOperationAbortRef.current?.abort()
     } else {
-      submit(false).catch(() => undefined)
+      submitJustReview(false).catch(() => undefined)
     }
-  }, [submit])
+  }, [submitJustReview])
 
   const escapeLoadMorePrompt = useCallback(() => {
     if (submittingRef.current) {
@@ -228,12 +228,10 @@ export function RecallJustReviewStage({
     }
   }, [submitLoadMore])
 
-  const width = resolvedTerminalWidth()
-
   if (!initialResolved) {
     return (
       <Box flexDirection="column">
-        <RecallJustReviewEscSpinner abortRef={activeOperationAbortRef} />
+        <RecallSessionEscSpinner abortRef={activeOperationAbortRef} />
         <Box>
           <Spinner label="Loading recall…" />
         </Box>
@@ -255,10 +253,10 @@ export function RecallJustReviewStage({
     )
   }
 
-  if (payload === null) {
+  if (card === null) {
     return (
       <Box flexDirection="column">
-        <RecallJustReviewEscSpinner abortRef={activeOperationAbortRef} />
+        <RecallSessionEscSpinner abortRef={activeOperationAbortRef} />
         <Box>
           <Spinner label="Loading recall…" />
         </Box>
@@ -266,53 +264,30 @@ export function RecallJustReviewStage({
     )
   }
 
-  if (payload.kind === 'mcq') {
+  if (card.variant === 'mcq') {
     return (
       <RecallMcqStage
-        key={payload.recallPromptId}
+        key={card.payload.recallPromptId}
         onSettled={onSettled}
-        payload={payload}
+        payload={card.payload}
         inputBlockedRef={submittingRef}
         onMcqSucceeded={onMcqSucceeded}
       />
     )
   }
 
-  const detailsRendered = payload.detailsMarkdown
-    ? renderMarkdownToTerminal(payload.detailsMarkdown, width)
-    : ''
-  const detailLines =
-    detailsRendered.length > 0 ? detailsRendered.split('\n') : []
-
   return (
-    <YesNoStagePrompt
-      key={payload.memoryTrackerId}
-      prompt="Yes, I remember?"
-      onAnswer={submit}
+    <JustReviewRecallCard
+      key={card.payload.memoryTrackerId}
+      payload={card.payload}
+      onAnswer={submitJustReview}
       onCancel={escapeJustReviewCard}
       inputBlockedRef={submittingRef}
-      header={
-        <>
-          <Text>{STAGE_LABEL}</Text>
-          {payload.notebookTitle !== undefined &&
-          payload.notebookTitle !== '' ? (
-            <Text>{payload.notebookTitle}</Text>
-          ) : null}
-        </>
-      }
-      belowBuffer={
-        <>
-          <Text>{payload.noteTitle}</Text>
-          {detailLines.map((line, i) => (
-            <Text key={i}>{line.length > 0 ? line : ' '}</Text>
-          ))}
-        </>
-      }
     />
   )
 }
 
-function RecallJustReviewEscSpinner({
+function RecallSessionEscSpinner({
   abortRef,
 }: {
   readonly abortRef: MutableRefObject<AbortController | null>
