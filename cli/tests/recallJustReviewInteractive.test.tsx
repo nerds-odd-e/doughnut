@@ -373,10 +373,50 @@ describe('recall just-review (interactive)', () => {
 
     stdin.write('n\r')
     await waitForLastFrame(lastFrame, (f) => {
+      const plain = stripAnsi(f)
       return (
-        f.includes('Yes, I remember?') &&
-        f.includes('Alpha') &&
-        !f.includes(LEAVE_RECALL_PROMPT)
+        plain.includes('Yes, I remember?') &&
+        plain.includes('Alpha') &&
+        !plain.includes(LEAVE_RECALL_PROMPT) &&
+        (plain.match(/Yes, I remember\?/g) ?? []).length === 1
+      )
+    })
+
+    expect(markAsRecalledSpy).not.toHaveBeenCalled()
+  })
+
+  test('empty Enter on leave recall confirm stays on confirm; n returns to remember card', async () => {
+    mockMarkAsRecalledCounting()
+    mockShowMemoryTrackerCardForRealm(alphaNoteRealm())
+
+    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    startRecall(stdin)
+    await waitRememberAlpha(frames)
+    pressEscape(stdin)
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(LEAVE_RECALL_PROMPT)
+    )
+
+    stdin.write('\r')
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(LEAVE_RECALL_PROMPT)
+    )
+
+    expect(markAsRecalledSpy).not.toHaveBeenCalled()
+
+    stdin.write('n\r')
+    await waitForLastFrame(lastFrame, (f) => {
+      const plain = stripAnsi(f)
+      return (
+        plain.includes('Yes, I remember?') &&
+        plain.includes('Alpha') &&
+        !plain.includes(LEAVE_RECALL_PROMPT) &&
+        (plain.match(/Yes, I remember\?/g) ?? []).length === 1
       )
     })
 

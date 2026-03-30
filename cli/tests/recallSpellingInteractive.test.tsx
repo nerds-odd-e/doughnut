@@ -324,4 +324,40 @@ describe('recall spelling (interactive)', () => {
 
     expect(answerSpellingSpy).not.toHaveBeenCalled()
   })
+
+  test('empty Enter on spelling leave confirm stays on confirm; n returns with buffer', async () => {
+    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForSpellingPromptVisible(lastFrame)
+    stdin.write('par')
+    await waitForLastFrame(lastFrame, (p) => p.includes('> par'))
+
+    pressEscape(stdin)
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(LEAVE_RECALL_PROMPT)
+    )
+
+    stdin.write('\r')
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(LEAVE_RECALL_PROMPT)
+    )
+
+    expect(answerSpellingSpy).not.toHaveBeenCalled()
+
+    stdin.write('n\r')
+    await waitForLastFrame(
+      lastFrame,
+      (p) =>
+        p.includes('Spell:') &&
+        p.includes('> par') &&
+        !p.includes(LEAVE_RECALL_PROMPT)
+    )
+
+    expect(answerSpellingSpy).not.toHaveBeenCalled()
+  })
 })

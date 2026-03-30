@@ -255,4 +255,112 @@ describe('recall MCQ (interactive)', () => {
 
     expect(answerQuizSpy).not.toHaveBeenCalled()
   })
+
+  test('after Esc then n, MCQ list highlight preserved (Enter submits second choice)', async () => {
+    const pending = pendingMcqPrompt()
+    answerQuizSpy.mockResolvedValue({
+      data: {
+        ...pending,
+        answer: { id: 100, correct: false, choiceIndex: 1 },
+      },
+    } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
+
+    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForMcqVisible(frames)
+    stdin.write('\u001b[B')
+    await waitForLastFrame(lastFrame, (p) => stripAnsi(p).includes('2.'))
+
+    pressEscape(stdin)
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(LEAVE_RECALL_PROMPT)
+    )
+
+    stdin.write('n\r')
+    await waitForLastFrame(
+      lastFrame,
+      (p) => p.includes(MCQ_HINT_SUBSTR) && !p.includes(LEAVE_RECALL_PROMPT)
+    )
+
+    stdin.write('\r')
+
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes('Incorrect')
+    )
+
+    expect(answerQuizSpy).toHaveBeenCalledTimes(1)
+    expect(answerQuizSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: { recallPrompt: RECALL_PROMPT_ID },
+        body: { choiceIndex: 1 },
+      })
+    )
+  })
+
+  test('after Esc then n, MCQ command buffer preserved', async () => {
+    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForMcqVisible(frames)
+    stdin.write('z')
+    await waitForLastFrame(lastFrame, (p) => p.includes('> z'))
+
+    pressEscape(stdin)
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(LEAVE_RECALL_PROMPT)
+    )
+
+    stdin.write('n\r')
+
+    await waitForLastFrame(
+      lastFrame,
+      (p) =>
+        p.includes('> z') &&
+        p.includes(MCQ_HINT_SUBSTR) &&
+        !p.includes(LEAVE_RECALL_PROMPT)
+    )
+
+    expect(answerQuizSpy).not.toHaveBeenCalled()
+  })
+
+  test('empty Enter on leave recall confirm stays on confirm; n returns to MCQ', async () => {
+    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForMcqVisible(frames)
+    pressEscape(stdin)
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(LEAVE_RECALL_PROMPT)
+    )
+
+    stdin.write('\r')
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(LEAVE_RECALL_PROMPT)
+    )
+
+    expect(answerQuizSpy).not.toHaveBeenCalled()
+
+    stdin.write('n\r')
+    await waitForLastFrame(
+      lastFrame,
+      (p) =>
+        p.includes('Choose') &&
+        p.includes(MCQ_HINT_SUBSTR) &&
+        !p.includes(LEAVE_RECALL_PROMPT)
+    )
+
+    expect(answerQuizSpy).not.toHaveBeenCalled()
+  })
 })
