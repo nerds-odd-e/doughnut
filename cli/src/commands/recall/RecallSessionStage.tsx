@@ -11,6 +11,7 @@ import type { Key } from 'ink'
 import { Box, Text, useInput } from 'ink'
 import { Spinner } from '@inkjs/ui'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
+import { CliTranscriptAppendContext } from '../../cliTranscriptAppendContext.js'
 import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext.js'
 import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
@@ -29,6 +30,7 @@ const STAGE_LABEL = 'Recalling'
 export function RecallSessionStage({
   onSettled,
 }: InteractiveSlashCommandStageProps) {
+  const appendTranscript = useContext(CliTranscriptAppendContext)
   const [card, setCard] = useState<RecallCard | null>(null)
   const [uiMode, setUiMode] = useState<'card' | 'loadMore'>('card')
   const [initialResolved, setInitialResolved] = useState(false)
@@ -99,6 +101,7 @@ export function RecallSessionStage({
     try {
       const next = await loadNextRecallCardIfAny(0)
       if (next !== null) {
+        appendTranscript?.('Correct!')
         setCard(next)
         return
       }
@@ -106,7 +109,7 @@ export function RecallSessionStage({
     } catch (loadErr: unknown) {
       onSettled(userVisibleSlashCommandError(loadErr))
     }
-  }, [onSettled])
+  }, [appendTranscript, onSettled])
 
   const submitLoadMore = useCallback(
     async (accept: boolean) => {

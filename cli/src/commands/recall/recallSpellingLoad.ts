@@ -8,11 +8,9 @@ import {
   runDefaultBackendJson,
 } from '../../backendApi/doughnutBackendClient.js'
 
-/** Initial card for a spelling memory tracker (memory prompt, then server spelling question). */
+/** Spelling memory tracker: server spelling question first (same order as web recall). */
 export type SpellingRecallSessionPayload = {
   readonly memoryTrackerId: number
-  readonly noteTitle: string
-  readonly detailsMarkdown: string
   readonly notebookTitle?: string
 }
 

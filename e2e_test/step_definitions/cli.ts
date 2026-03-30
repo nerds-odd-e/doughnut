@@ -78,6 +78,10 @@ Then('I should see {string} in the Current guidance', (expected: string) =>
   cli.interactiveCli().currentGuidance().expectContains(expected)
 )
 
+Then('I should see my spelling answer is correct', () =>
+  cli.interactiveCli().pastCliAssistantMessages().expectContains('Correct!')
+)
+
 Then('I should see {string} styled in the Current guidance', (text: string) =>
   cli.interactiveCli().currentGuidance().expectContainsBold(text)
 )

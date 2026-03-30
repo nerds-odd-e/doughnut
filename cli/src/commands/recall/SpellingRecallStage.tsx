@@ -1,6 +1,7 @@
 import {
   useCallback,
   useContext,
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -9,13 +10,12 @@ import {
 } from 'react'
 import type { Key } from 'ink'
 import { Box, Text, useInput } from 'ink'
+import { Spinner } from '@inkjs/ui'
 import { renderMarkdownToTerminal } from '../../markdown.js'
 import { resolvedTerminalWidth } from '../../terminalColumns.js'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
 import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext.js'
-import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
-import { markMemoryTrackerRecalled } from './markMemoryTrackerRecalled.js'
 import {
   fetchSpellingRecallPrompt,
   submitSpellingAnswer,
@@ -24,10 +24,13 @@ import {
 
 const STAGE_LABEL = 'Recalling'
 
-type SpellPhaseState = {
-  readonly recallPromptId: number
-  readonly stemMarkdown: string
-}
+type LoadState =
+  | { readonly status: 'loading' }
+  | {
+      readonly status: 'ready'
+      readonly recallPromptId: number
+      readonly stemMarkdown: string
+    }
 
 export function SpellingRecallStage({
   onSettled,
@@ -39,32 +42,50 @@ export function SpellingRecallStage({
   readonly inputBlockedRef: MutableRefObject<boolean>
   readonly onSpellingSessionComplete: () => void | Promise<void>
 }) {
-  const [spellPhase, setSpellPhase] = useState<SpellPhaseState | null>(null)
+  const [loadState, setLoadState] = useState<LoadState>({ status: 'loading' })
   const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
   const [buffer, setBuffer] = useState('')
   const bufferRef = useRef('')
 
   const width = resolvedTerminalWidth()
-  const detailsRendered = payload.detailsMarkdown
-    ? renderMarkdownToTerminal(payload.detailsMarkdown, width)
-    : ''
-  const detailLines =
-    detailsRendered.length > 0 ? detailsRendered.split('\n') : []
 
-  const stemRendered = useMemo(
-    () =>
-      spellPhase
-        ? renderMarkdownToTerminal(spellPhase.stemMarkdown, width)
-        : '',
-    [spellPhase, width]
-  )
+  useEffect(() => {
+    let cancelled = false
+    const ac = new AbortController()
+    ;(async () => {
+      try {
+        const fetched = await fetchSpellingRecallPrompt(
+          payload.memoryTrackerId,
+          ac.signal
+        )
+        if (cancelled) return
+        setLoadState({
+          status: 'ready',
+          recallPromptId: fetched.recallPromptId,
+          stemMarkdown: fetched.stemMarkdown,
+        })
+      } catch (err: unknown) {
+        if (cancelled || ac.signal.aborted) return
+        onSettled(userVisibleSlashCommandError(err))
+      }
+    })().catch(() => undefined)
+    return () => {
+      cancelled = true
+      ac.abort()
+    }
+  }, [onSettled, payload.memoryTrackerId])
+
+  const stemRendered = useMemo(() => {
+    if (loadState.status !== 'ready') return ''
+    return renderMarkdownToTerminal(loadState.stemMarkdown, width)
+  }, [loadState, width])
   const stemLines = useMemo(
     () => (stemRendered.length > 0 ? stemRendered.split('\n') : []),
     [stemRendered]
   )
 
   const runSpellSubmit = useCallback(async () => {
-    if (spellPhase === null || inputBlockedRef.current) return
+    if (loadState.status !== 'ready' || inputBlockedRef.current) return
     const line = bufferRef.current
       .replace(/\r\n/g, ' ')
       .replace(/\n/g, ' ')
@@ -72,10 +93,7 @@ export function SpellingRecallStage({
     if (line === '') return
     inputBlockedRef.current = true
     try {
-      const updated = await submitSpellingAnswer(
-        spellPhase.recallPromptId,
-        line
-      )
+      const updated = await submitSpellingAnswer(loadState.recallPromptId, line)
       const correct = updated.answer?.correct === true
       if (!correct) {
         onSettled('Incorrect.')
@@ -87,7 +105,7 @@ export function SpellingRecallStage({
     } finally {
       inputBlockedRef.current = false
     }
-  }, [inputBlockedRef, onSettled, onSpellingSessionComplete, spellPhase])
+  }, [inputBlockedRef, loadState, onSettled, onSpellingSessionComplete])
 
   const processSpellKeyEvent = useCallback(
     (input: string, key: Key) => {
@@ -138,81 +156,32 @@ export function SpellingRecallStage({
     [inputBlockedRef, processSpellKeyEvent]
   )
 
+  const spellReady = loadState.status === 'ready'
+
   useLayoutEffect(() => {
     if (setStageKeyHandler === undefined) return
-    if (spellPhase === null) return
+    if (!spellReady) return
     setStageKeyHandler(handleSpellInput)
     return () => {
       setStageKeyHandler(null)
     }
-  }, [setStageKeyHandler, handleSpellInput, spellPhase])
+  }, [setStageKeyHandler, handleSpellInput, spellReady])
 
   useInput(handleSpellInput, {
-    isActive: setStageKeyHandler === undefined && spellPhase !== null,
+    isActive: setStageKeyHandler === undefined && spellReady,
   })
 
-  const onRememberAnswer = useCallback(
-    async (successful: boolean) => {
-      if (inputBlockedRef.current) return
-      const ac = new AbortController()
-      inputBlockedRef.current = true
-      try {
-        if (!successful) {
-          await markMemoryTrackerRecalled(
-            payload.memoryTrackerId,
-            false,
-            ac.signal
-          )
-          onSettled('Marked as not recalled.')
-          return
-        }
-        const fetched = await fetchSpellingRecallPrompt(
-          payload.memoryTrackerId,
-          ac.signal
-        )
-        bufferRef.current = ''
-        setBuffer('')
-        setSpellPhase(fetched)
-      } catch (err: unknown) {
-        onSettled(userVisibleSlashCommandError(err))
-      } finally {
-        inputBlockedRef.current = false
-      }
-    },
-    [inputBlockedRef, onSettled, payload.memoryTrackerId]
-  )
-
-  const escapeRemember = useCallback(() => {
-    if (inputBlockedRef.current) return
-    onRememberAnswer(false).catch(() => undefined)
-  }, [inputBlockedRef, onRememberAnswer])
-
-  if (spellPhase === null) {
+  if (loadState.status === 'loading') {
     return (
-      <YesNoStagePrompt
-        key={payload.memoryTrackerId}
-        prompt="Yes, I remember?"
-        onAnswer={onRememberAnswer}
-        onCancel={escapeRemember}
-        inputBlockedRef={inputBlockedRef}
-        header={
-          <>
-            <Text>{STAGE_LABEL}</Text>
-            {payload.notebookTitle !== undefined &&
-            payload.notebookTitle !== '' ? (
-              <Text>{payload.notebookTitle}</Text>
-            ) : null}
-          </>
-        }
-        belowBuffer={
-          <>
-            <Text>{payload.noteTitle}</Text>
-            {detailLines.map((line, i) => (
-              <Text key={i}>{line.length > 0 ? line : ' '}</Text>
-            ))}
-          </>
-        }
-      />
+      <Box flexDirection="column">
+        <Text>{STAGE_LABEL}</Text>
+        {payload.notebookTitle !== undefined && payload.notebookTitle !== '' ? (
+          <Text>{payload.notebookTitle}</Text>
+        ) : null}
+        <Box>
+          <Spinner label="Loading spelling question…" />
+        </Box>
+      </Box>
     )
   }
 

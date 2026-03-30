@@ -54,27 +54,25 @@ export async function loadNextRecallCardIfAny(
       ...doughnutSdkOptions(signal),
     })
   )
+  const note = mt.note
+  const notebookTitle = note?.noteTopology?.notebookTitle?.trim()
+
+  if (mt.spelling) {
+    return {
+      variant: 'spelling-session',
+      payload: {
+        memoryTrackerId: mt.id,
+        notebookTitle,
+      },
+    }
+  }
+
   const prompts = await runDefaultBackendJson<RecallPrompt[]>(() =>
     MemoryTrackerController.getRecallPrompts({
       path: { memoryTracker: id },
       ...doughnutSdkOptions(signal),
     })
   )
-  const note = mt.note
-  const notebookTitle = note?.noteTopology?.notebookTitle?.trim()
-
-  if (mt.spelling) {
-    const jr = recallJustReviewPayloadFromMemoryTracker(mt)
-    return {
-      variant: 'spelling-session',
-      payload: {
-        memoryTrackerId: jr.memoryTrackerId,
-        noteTitle: jr.noteTitle,
-        detailsMarkdown: jr.detailsMarkdown,
-        notebookTitle: jr.notebookTitle,
-      },
-    }
-  }
 
   const mcqPayload = await tryLoadMcqPayload(id, notebookTitle, prompts, signal)
   if (mcqPayload !== null) {
