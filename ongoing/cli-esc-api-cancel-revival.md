@@ -3,6 +3,8 @@
 **Status:** Planning — do not treat as an implementation spec.  
 **Goal:** Restore the user-visible behavior: **while the interactive CLI is waiting on a slow backend/network call (spinner / blocking stage), the user can press Esc to cancel**; the session shows a clear outcome and stays usable. **No new E2E scenarios** — cover with **Vitest** using the preferred **observable** style (`runInteractive` / `ink-testing-library` + mock TTY, or existing render patterns per `.cursor/rules/cli.mdc`).
 
+**Phasing (`.cursor/rules/planning.mdc`):** **One user-visible behavior per phase.** Each phase ships a slice you can **verify from outside** (transcript / last frame / assistant line text, exit from the happy path), then **commit/deploy** before the next phase if the team uses that gate. **Do not** land large bundles (e.g. `InteractiveCliApp` + three slash commands + recall + test helpers in one PR).
+
 **Guidance:** `.cursor/rules/planning.mdc`, `.cursor/rules/cli.mdc`, `ongoing/cli-architecture-roadmap.md` — especially **§3.2 async + cancellation**, **§4 stage isolation**, **§11.3 keyboard ownership**. **Do not** resurrect the pre-removal wiring; use it only to remember **behavior and copy**.
 
 ---
@@ -17,155 +19,134 @@ Relevant removals on **2026-03-28** (and the stack they sat on):
 | `2ab49528d` | Earlier step removing interactive fetch-wait from **`interactive.ts`** / **`ShellSessionRoot`** / **`interactiveApp`** (non–Ink path). |
 | Older chain (`babdc38e3`, `5274df4c4`, `099de3448`, …) | Iteration on fetch-wait + Esc; confirms the **product expectation**: cancellable waits during token / recall / similar flows. |
 
-**Prior shape to avoid:** **Global mutable state** (`activeWaitLine`, `escBinding`) keyed by **`OutputAdapter`**, plus adapter callbacks (**`onInteractiveFetchWaitChanged`**) to force redraws. That couples cancellation to **transport/layout** layers and makes **ownership of Esc** implicit and hard to test. **Replace with** stage-local lifecycle: **React mount/unmount + one obvious input owner** for the spinner sub-stage.
+**Prior shape to avoid:** **Global mutable state** (`activeWaitLine`, `escBinding`) keyed by **`OutputAdapter`**, plus adapter callbacks (**`onInteractiveFetchWaitChanged`**) to force redraws. **Replace with** stage-local lifecycle: **React mount/unmount + one obvious input owner** for the spinner sub-stage.
 
 **What already exists today (reuse):**
 
-- **`userVisibleSlashCommandError`** — maps **`AbortError`** to **`Cancelled.`** (same family as picker **`PICKER_ABORTED_MESSAGE`** in `AccessTokenLabelPickerStage`).
-- **Backend helpers** — e.g. **`removeAccessTokenCompletely(label, signal?)`**, **`addAccessToken(..., signal?)`**, **`doughnutSdkOptions(signal)`**; Gmail stack already accepts **`AbortSignal`** in **`addGmailAccount`**, **`getLastEmailSubject`**, **`waitForCallback`**, etc.
-- **Stage key forwarding** — **`InteractiveCliApp`** root **`useInput`** + **`SetStageKeyHandlerContext`**; **`AccessTokenLabelPickerStage`** registers **`useLayoutEffect`** / fallback **`useInput({ isActive })`** — **same pattern should own Esc during fetch-wait**, not a new global registry.
+- **`userVisibleSlashCommandError`** — maps **`AbortError`** to **`Cancelled.`**
+- **Backend helpers** — **`removeAccessTokenCompletely(label, signal?)`**, **`addAccessToken(..., signal?)`**, **`doughnutSdkOptions(signal)`**; Gmail stack already accepts **`AbortSignal`** in **`addGmailAccount`**, **`getLastEmailSubject`**, **`waitForCallback`**, etc.
+- **Stage key forwarding** — **`InteractiveCliApp`** root **`useInput`** + **`SetStageKeyHandlerContext`**.
 
-**Gap:** **`AsyncAssistantFetchStage`** starts work in **`useEffect`** with a **`cancelled`** flag on unmount only; it does **not** **`abort()`** the request, and **Esc does nothing**. Interactive wrappers **`runAddGmailInteractiveAssistantMessage`** / **`runLastEmailInteractiveAssistantMessage`** pass **`undefined`** signal into functions that already support cancellation.
+**Gap (before this work):** **`AsyncAssistantFetchStage`** must own Esc + **`AbortSignal`**; some call sites still omit **`signal`**; **`Promise.resolve(run)`** paths and custom stages (e.g. recall load) can still block without Esc.
 
 ---
 
 ## Cross-cutting constraints
 
-1. **Keyboard:** While a fetch stage is mounted, **Esc = cancel in-flight work** (not slash-suggestion dismiss — **`MainInteractivePrompt`** is not mounted then). Use a **stable `useCallback`** for the handler registered on the stage key forwarder (see **cli.mdc** Ink notes).
-2. **Cancellation semantics:** Prefer **real** propagation (**`AbortSignal`** into **`fetch` / generated client`**) where the stack already supports it; for work that cannot abort (pure CPU), document **best-effort** (still clear **`Cancelled.`** after Esc if the task respects signal, or avoid claiming cancel where impossible).
-3. **Tests:** **No new Cypress features.** Extend **`cli/tests/`** only: drive **`runInteractive`** (or the project’s **`renderApp`** pattern), assert **stdout / last frame** for spinner → Esc → **`Cancelled.`** (or settled without duplicate assistant lines). **No `setTimeout(…, N)`** waits — **`waitForFrames`** / turn-capped loops per **cli.mdc**.
-4. **Cohesion:** Prefer **one** cancellable async stage primitive (likely **`AsyncAssistantFetchStage`**) over duplicating **`AbortController`** in every parent stage.
-5. **Deploy gate:** Per **planning.mdc**, commit/deploy between phases if the team expects it.
+1. **Keyboard:** While a fetch stage is mounted, **Esc = cancel in-flight work**. **Stable `useCallback`** on the stage key forwarder (see **cli.mdc**).
+2. **Cancellation:** Prefer **`AbortSignal`** into **`fetch` / generated client`** where supported; document **non-cancellable** paths explicitly if any remain.
+3. **Tests:** **No new Cypress.** **`waitForFrames`** / turn-capped loops — **no `setTimeout(…, N)`** for Ink readiness (see **cli.mdc**). Hung SDK mocks should **reject on `signal` abort** so Esc produces **`Cancelled.`** in tests (not a forever-pending promise with no abort path).
+4. **Cohesion:** Prefer **`AsyncAssistantFetchStage`** for “one assistant string from async work” over ad hoc **`AbortController`** copies — except where the UI is **not** that shape (e.g. recall just-review load vs y/n).
+5. **Chained slash input in tests:** After an async stage unmounts, **`MainInteractivePrompt`**’s **`useInput`** may attach a tick later; use an **observable** probe (see **`renderInkWhenCommandLineReady`**) or a shared helper in **`cli/tests/inkTestHelpers.ts`** **when a phase’s test needs it** — keep that helper in the **same phase** that first requires chained input, or the immediately following test-only refactor phase if you must split.
 
 ---
 
 ## TDD workflow (every phase)
 
-Follow **Test-driven workflow** in **`.cursor/rules/planning.mdc`**:
-
-1. **Add or extend the test(s)** for the phase’s **observable** outcome (Vitest: **`runInteractive`** / **`renderApp`** + **`waitForFrames`**, no wall-clock sleeps).
-2. **Run** the relevant test file or **`pnpm cli:test`** (with **Nix** prefix from **general.mdc**); confirm the test **fails**.
-3. Confirm failure is **for the right reason** (missing Esc handling, signal not passed, etc.) — not env or typo.
-4. **Implement** the **smallest** change that makes the test(s) pass.
-5. **Refactor** with tests green.
-
-**Discipline:** While driving a phase, keep **at most one intentionally failing test** (the one you are implementing toward), per **planning.mdc**.
+Per **`.cursor/rules/planning.mdc`**: add/extend **one** failing **observable** test for the phase → run → implement **smallest** fix → green → refactor. **At most one intentionally failing test** while driving a phase.
 
 ---
 
 ## Phase 1 — Cancellable fetch stage (Esc + `AbortSignal` contract)
 
-**User outcome:** During any flow that uses the shared async spinner stage, **Esc** aborts the controller, the in-flight **`Promise`** rejects with **`AbortError`**, and the user sees **`Cancelled.`** (via existing **`userVisibleSlashCommandError`**), then returns to the normal prompt.
+**User-visible outcome:** On **`AsyncAssistantFetchStage`**, **Esc** aborts work; user sees **`Cancelled.`**; prompt returns.
 
-### 1.1 — Red: tests first
+**External verification:** Vitest (harness + **`SetStageKeyHandlerContext`** or full app): spinner visible → Esc → **`Cancelled.`** (and optional unmount case).
 
-- Add a **minimal interactive test** (preferred): tiny **harness** or **test-only stage** under **`SetStageKeyHandlerContext.Provider`** (same wiring as **`InteractiveCliApp`**), **`runAssistantMessage(signal)`** that **does not resolve** until aborted (or rejects on abort), send **Esc**, assert **`onSettled('Cancelled.')`** and/or visible frame text.
-- Add a second case **only if needed** in the same file: **unmount** while pending → same single outcome, no duplicate assistant lines.
-- Run tests → **fail** (Esc ignored, no **`AbortController`**, or wrong callback shape).
-
-### 1.2 — Green: implementation
-
-- Change **`runAssistantMessage`** to **`(signal: AbortSignal) => Promise<string>`** so call sites must thread **`signal`**.
-- In **`AsyncAssistantFetchStage`**: **`AbortController`** per effect, **`abort()` on unmount**, **Esc** via stage key registration (**`useLayoutEffect`** + **`SetStageKeyHandlerContext`**, fallback **`useInput(..., { isActive })`** like **`AccessTokenLabelPickerStage`**), **stable `useCallback`**.
-- One **`onSettled`** per attempt: guard **abort vs unmount** races (extend existing **`cancelled`** pattern).
-
-### 1.3 — Refactor
-
-- Adjust call sites to the new **`(signal) => …`** signature (stub implementations that ignore **`signal`** temporarily only if split across commits — prefer **one** commit that compiles).
-
-**Phase-complete when:** tests green; **no** new E2E.
+**Implementation slice:** **`runAssistantMessage(signal: AbortSignal) => Promise<string>`**; **`AbortController`** per effect; Esc on stage key forwarder; **`onSettled`** once per attempt.
 
 ---
 
-## Phase 2 — Doughnut API call sites behind the spinner
+## Phase 2 — Doughnut HTTP behind that spinner (picker revoke path)
 
-**User outcome:** Cancelling during **revoke/remove** (and any other **Doughnut** HTTP work using this stage) **actually cancels the HTTP request** where the client honors **`signal`** (generated SDK / **`fetch`**).
+**User-visible outcome:** Cancelling during **revoke** (picker → **`AsyncAssistantFetchStage`**) cancels or abandons the in-flight client call as the SDK allows.
 
-### 2.1 — Red: tests first
+**External verification:** **`removeAccessTokenCompletelyAbort`-style** test: hung **`DELETE`** (or equivalent) + Esc → **`Cancelled.`**
 
-- Add an **observable** test: e.g. drive **remove-completely** (or a minimal stage + mocked **`UserController.revokeToken`**) with a **deliberately slow** or **pending** request, **Esc**, assert **request cancellation** *or* a **user-visible** outcome that **only** occurs when **`signal`** is honored (prefer **stub `fetch` / mock client** that records **`signal.aborted`** after Esc if stable).
-- If proving HTTP abort in Vitest is too flaky, add **one** black-box test that still fails until **`signal`** is passed from the stage into **`removeAccessTokenCompletely(..., signal)`** — only if that remains **observable** (e.g. assistant **`Cancelled.`** only when underlying call respects abort); avoid tests that only assert “callback received signal” without user-visible effect unless that API is the **deliberate** contract (**planning.mdc**).
-
-### 2.2 — Green: implementation
-
-- Update **`RemoveAccessTokenCompletelyPickerStage`** (and any other **`AsyncAssistantFetchStage`** + Doughnut callers) to pass **`signal`** into **`removeAccessTokenCompletely`** / **`doughnutSdkOptions(signal)`**.
-
-### 2.3 — Refactor
-
-- Keep **one** pattern across **`AsyncAssistantFetchStage`** usages.
-
-**Done:** `RemoveAccessTokenCompletelyPickerStage` passes the stage **`signal`** into **`removeAccessTokenCompletely`**. Vitest: **`cli/tests/removeAccessTokenCompletelyAbort.test.tsx`** (hung **`DELETE /api/user/token-info`** + Esc → **`Cancelled.`**).
+**Implementation slice:** Pass stage **`signal`** into **`removeAccessTokenCompletely`** / **`doughnutSdkOptions(signal)`** from **`RemoveAccessTokenCompletelyPickerStage`** only.
 
 ---
 
-## Phase 3 — Gmail interactive entry points
+## Phase 3 — Gmail spinner entry points
 
-**User outcome:** **`/add gmail`** and **`/last email`** (spinner stages) respect **Esc**: OAuth wait / **`fetch`** paths receive **`AbortSignal`** (Gmail code already supports **`signal`** in **`addGmailAccount`**, **`getLastEmailSubject`**, etc.).
+**User-visible outcome:** **`/add gmail`** and **`/last email`** honor Esc during their spinner waits.
 
-### 3.1 — Red: tests first
+**External verification:** Vitest already targeted at **`InteractiveCliApp.addGmail.test.tsx`** (or equivalent): Esc → **`Cancelled.`**; mocks honor **`AbortSignal`**.
 
-- **`/last email`**: add **`runInteractive`** (or existing app harness) test — slow **`fetch`** (or mock) + **Esc** → assistant shows **`Cancelled.`**; run → **fail** until wrappers pass **`signal`**.
-- **`/add gmail`**: add a test that matches **CI stability** (e.g. **`DOUGHNUT_NO_BROWSER`**, mock **`GOOGLE_BASE_URL`** if the suite already does); if a full OAuth flow is untestable, add a **public**-boundary test (e.g. **`addGmailAccount(..., signal)`** rejects **`AbortError`** when aborted during **`waitForCallback`**) **only** if that function is the stable contract — otherwise one interactive case + manual checklist note.
-
-### 3.2 — Green: implementation
-
-- Change **`runAddGmailInteractiveAssistantMessage`** and **`runLastEmailInteractiveAssistantMessage`** to accept **`AbortSignal`** from the stage and forward to **`addGmailAccount`**, **`getLastEmailSubject`**.
-- Verify **`waitForCallback`** / **`server.close()`** on abort so ports do not leak.
-
-### 3.3 — Refactor
-
-- Align naming/types with Phase 1 **`runAssistantMessage(signal)`** usage.
-
-**Done:** Wrappers forward **`signal`** to **`addGmailAccount`** / **`getLastEmailSubject`**. Vitest: **`cli/tests/InteractiveCliApp.addGmail.test.tsx`** — Esc during OAuth wait (**`/add gmail`**) and during fetch (**`/last email`**, **`fetch`** mock honors **`AbortSignal`**) → **`Cancelled.`**.
+**Implementation slice:** Forward **`signal`** from **`AsyncAssistantFetchStage`** into **`runAddGmailInteractiveAssistantMessage`** / **`runLastEmailInteractiveAssistantMessage`**; no OAuth/port leaks on abort.
 
 ---
 
-## Phase 4 — Optional: current stage band parity with old “fetch wait line”
+## Phase 4 — `/recall-status`: spinner + Esc (no direct `run()` async)
 
-**User outcome (only if product still wants it):** The **first line** of the **current prompt** uses the **stage band** styling (see **cli.mdc** vocabulary) for long waits, not only the **`Spinner`** line — closer to the old **`INTERACTIVE_FETCH_WAIT_LINES`** UX.
+**User-visible outcome:** **`/recall-status`** shows a **loading** state; **Esc** during the fetch shows **`Cancelled.`**; success still shows the due-count line as today.
 
-**Trigger:** If designers / recall revival / access-token flows need **consistent** “Recalling”-style bands for **network wait**, add a **small** presentational wrapper around **`AsyncAssistantFetchStage`** (props: **`stageIndicator`**, **`spinnerLabel`**) using existing **`renderer`** / **`Text`** patterns — **without** reintroducing **`OutputAdapter`**-driven layout state.
+**External verification:** **`InteractiveCliApp`**: **`/recall-status`** + **`RecallsController.recalling`** mock that **hangs until `signal` abort** + Esc → transcript **`Cancelled.`** (separate test case: fast mock still shows **`N notes…`**).
 
-### TDD if executed
-
-1. **Red:** Extend an existing interactive test to expect **band / indicator** copy in output; run → fail.
-2. **Green:** Add wrapper / props and render band.
-3. **Refactor** layout only.
-
-**If spinner-only is enough:** **Skip this phase** and delete this section from the plan when closing the work.
+**Implementation slice:** **`RecallStatusStage`** (or equivalent) wrapping **`AsyncAssistantFetchStage`** calling **`recallStatus(signal)`**; slash command uses **`stageComponent`** and **drops** the bare **`async run()`** path for this command only. **No** `InteractiveCliApp` generic flags in this phase.
 
 ---
 
-## Phase 5 — Audit remaining long async interactive commands
+## Phase 5 — `InteractiveCliApp`: mount stage when inline argument + `/add-access-token` only
 
-**User outcome:** No silent “long wait without Esc” regressions for **interactive** Doughnut operations that **should** match the roadmap.
+**User-visible outcome:** **`/add-access-token <token>`** goes through the **cancellable spinner**; **Esc** during verify → **`Cancelled.`**; missing token still shows usage (unchanged product rule).
 
-### TDD if gaps found
+**External verification:** One **new or extended** interactive test: inline token + mock **`getTokenInfo`** that rejects on **`signal` abort** + Esc → **`Cancelled.`**; existing happy path still passes. If tests chain another slash command after add, introduce **`waitForMainInteractivePromptAfterAsyncStage`** (or equivalent probe) **in this phase** only if needed.
 
-1. **Red:** For each gap, add **one** failing **`runInteractive`** (or equivalent) test describing the missing cancel behavior.
-2. **Green:** Wire cancellation or document **non-cancellable** and adjust test to assert documented behavior.
+**Implementation slice:** **`InteractiveSlashCommand`**: optional **`useStageWhenArgumentProvided`**; **`InteractiveSlashCommandStageProps`**: optional **`initialSlashArgument`**; **`InteractiveCliApp`**: mount **`stageComponent`** when that flag is set and the user provided a non-empty argument; **`AddAccessTokenStage`** + remove **`run`** from **`addAccessTokenSlashCommand`**. **Do not** change **`/remove-access-token-completely`** yet.
 
-- Review **`command.run`** paths from **`InteractiveCliApp`** (non-stage **`Promise.resolve(run)`**) and staged flows.
-- **No new E2E** unless product changes that rule.
+---
+
+## Phase 6 — `/remove-access-token-completely <label>` inline → same spinner as picker
+
+**User-visible outcome:** When the user types **`/remove-access-token-completely <label>`** (no picker), **Esc** during revoke shows **`Cancelled.`** (same as picker path).
+
+**External verification:** **`InteractiveCliApp`** + temp config + hung **`DELETE`** + inline label + Esc → **`Cancelled.`**
+
+**Implementation slice:** Set **`useStageWhenArgumentProvided`** on **`removeAccessTokenCompletelySlashCommand`**; **remove** the **`run()`** branch for inline revoke; **`RemoveAccessTokenCompletelyPickerStage`** reads **`initialSlashArgument`** (trimmed) to skip picker when set. Depends on **Phase 5** mount rule.
+
+---
+
+## Phase 7 — `/recall` just-review: Esc during load and during mark-as-recalled
+
+**User-visible outcome:** **Esc** while **“Loading recall…”** or while **mark-as-recalled** is in flight → **`Cancelled.`**; y/n idle (no request in flight) can keep **Esc** as no-op or document in this phase.
+
+**External verification:** Two tests (can be one file): hung **`recalling`** with **abort-aware** mock + Esc; after **`y`**, hung **`markAsRecalled`** with **`signal`** + Esc → **`Cancelled.`**
+
+**Implementation slice:** **`loadRecallJustReviewPayload(signal?)`**, **`markJustReviewRecalled(..., signal?)`** threading **`doughnutSdkOptions(signal)`**; **`RecallJustReviewStage`**: **`AbortController`** for load + Esc; separate controller (or same pattern) for submit while **`submittingRef`**.
+
+---
+
+## Phase 8 — Audit remainder; document intentional non-cancellable paths
+
+**User-visible outcome:** No silent “long network wait without Esc” for **interactive** flows that should match the roadmap; anything else is **named** (e.g. help, exit, local-only **`/remove-access-token`** **`run`**, pickers with no network).
+
+**External verification:** **At most one** new test **per** newly found gap; if no gap, **update this plan** with the audit list only.
+
+**Implementation slice:** Read-only pass over **`interactiveSlashCommands`** + **`InteractiveCliApp`** **`run`** vs **`stageComponent`**; fix or document only what Phase 8 finds.
 
 ---
 
 ## Explicit non-goals (this revival)
 
 - Reintroducing **`interactiveFetchWait.ts`**, **`fetchAbort.ts`**, or **global** Esc binding keyed by **`OutputAdapter`**.
-- Rewiring **`processInput`** / non-Ink **`interactive.ts`** paths (removed in **`2ab49528d`**) unless the product explicitly revives that entry point.
-- New **Cucumber** coverage (per request).
+- Rewiring **`processInput`** / non-Ink **`interactive.ts`** unless product revives that entry point.
+- New **Cucumber** coverage (unless product changes that rule).
+- **Stage band / “Recalling”-style strip** for generic fetch spinners — **out of scope** for this document (spinner-only UX is enough).
 
 ---
 
 ## Summary
 
-| Phase | User-visible slice                          | TDD order (each phase)                                                                 | Primary mechanism                                      |
-|-------|---------------------------------------------|-----------------------------------------------------------------------------------------|--------------------------------------------------------|
-| 1     | Esc cancels spinner → **`Cancelled.`**      | **Test** (Esc + harness) → fail → **impl** **`AbortController`** + key forward → green | Stage-local cancellation, **`(signal) => Promise`**    |
-| 2     | Doughnut HTTP honors cancel                 | **Test** (abort observable) → fail → **impl** pass **`signal`** → green                 | **`removeAccessTokenCompletely`**, SDK **`signal`**     |
-| 3     | Gmail spinners honor cancel                 | **Test** (last email / add gmail scope) → fail → **impl** wrappers forward **`signal`** | **`run*InteractiveAssistantMessage`**                  |
-| 4     | (Optional) stage band + spinner             | **Test** expects band copy → fail → **impl** → green                                   | Presentational wrapper only                            |
-| 5     | No orphan long waits                        | **Test** per gap → fail → fix or document → green                                       | Audit **`run` / stages**                               |
+| Phase | User-visible slice                         | Primary verification                          |
+|-------|---------------------------------------------|-----------------------------------------------|
+| 1     | Esc on **`AsyncAssistantFetchStage`**       | Harness / app frame + **`Cancelled.`**        |
+| 2     | Revoke picker passes **`signal`**           | Hung HTTP + Esc                               |
+| 3     | Gmail spinners                              | **`InteractiveCliApp.addGmail`**-style tests  |
+| 4     | **`/recall-status`** spinner + Esc          | Interactive + abort-aware **`recalling`** mock |
+| 5     | **`/add-access-token`** inline + mount rule | Interactive + **`getTokenInfo`** abort mock   |
+| 6     | Inline **`remove-access-token-completely`** | Interactive + hung DELETE + Esc               |
+| 7     | **`/recall`** load + mark cancel           | Two interactive cases                         |
+| 8     | Audit + documented exceptions               | Tests only if new gaps                        |
 
 When implementation finishes, **update or remove** this document per **planning.mdc** phase discipline.

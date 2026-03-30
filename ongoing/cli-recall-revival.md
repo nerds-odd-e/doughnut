@@ -42,7 +42,7 @@ Recent removals (around **2026-03-28**) show what existed before strip-down; use
 - **1.1 / 1.2:** First scenario in `e2e_test/features/cli/cli_recall.feature` is active (no `@ignore`); `/recall-status` wired to `recallStatus`; copy appears in past CLI assistant messages; help lists the command where the project aggregates slash commands.
 - **1.3:** `cli/tests/recallStatus.test.ts` — black-box `recallStatus` against a local HTTP stub returning `DueMemoryTrackers` JSON: `0` notes (missing and empty `toRepeat`), `1` note, `2` notes, `10` notes. No timezone/query unit tests (no client-side branching on that in `recallStatus`).
 
-**Next:** Phase 2 (*Recall Just Review*), then Phases 3–4 (Temp1 / Temp2) before the full *Recall session* phase.
+**Next:** Phase 2 (*Recall Just Review*).
 
 ---
 
@@ -66,6 +66,8 @@ Recent removals (around **2026-03-28**) show what existed before strip-down; use
 
 - **Invalid key during y/n:** `cli/tests/recallJustReviewInteractive.test.tsx` drives `InteractiveCliApp` + stub API: empty Enter and `q`+Enter stay on prompt; `mark-as-recalled` fires once after `y`.
 - **Empty details / missing notebook title:** Same file: whitespace-only title → `Note`, omitted `details` and `notebookTitle`, then `n` → `Marked as not recalled.`
+
+**Next:** Phases 3–4 (*Temp1* / *Temp2*), then Phase 5 (*Recall session* full).
 
 ---
 
@@ -98,7 +100,7 @@ Recent removals (around **2026-03-28**) show what existed before strip-down; use
 ### Phase 4.2 — Pass E2E with minimum production change
 
 - After the last due item for the current window, surface **Load more from next 3 days?**; **n** ends the session and commits the **session summary** to **past assistant messages** with correct singular copy.
-- Depends on session counter / summary path introduced with multi-item work (Phase 3); keep **one** coherent session model.
+- Use the **same** recall session abstraction as Phase 3 (stage-local state, one session model for Temp1 and Temp2). Order Phases 3 then 4 so multi-item iteration lands before load-more / summary edge cases are finalized.
 
 ### Phase 4.3 — Edge cases (scenario scope only)
 

@@ -16,6 +16,7 @@ import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import {
   loadRecallJustReviewPayload,
+  loadRecallJustReviewPayloadIfAny,
   markJustReviewRecalled,
   type RecallJustReviewPayload,
 } from './justReviewLoad.js'
@@ -65,11 +66,29 @@ export function RecallJustReviewStage({
       submittingRef.current = true
       try {
         await markJustReviewRecalled(p.memoryTrackerId, successful)
-        onSettled(
-          successful ? 'Recalled successfully' : 'Marked as not recalled.'
-        )
       } catch (err: unknown) {
+        submittingRef.current = false
         onSettled(userVisibleSlashCommandError(err))
+        return
+      }
+      if (!successful) {
+        submittingRef.current = false
+        onSettled('Marked as not recalled.')
+        return
+      }
+      try {
+        const next = await loadRecallJustReviewPayloadIfAny()
+        submittingRef.current = false
+        if (next === null) {
+          onSettled('Recalled successfully')
+        } else {
+          bufferRef.current = ''
+          setBuffer('')
+          setPayload(next)
+        }
+      } catch (loadErr: unknown) {
+        submittingRef.current = false
+        onSettled(userVisibleSlashCommandError(loadErr))
       }
     },
     [onSettled]

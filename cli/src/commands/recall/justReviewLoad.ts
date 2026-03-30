@@ -11,6 +11,8 @@ import {
 } from '../../backendApi/doughnutBackendClient.js'
 import { dueRecallQuery } from './dueRecallQuery.js'
 
+const noNotesDueForRecallMessage = 'No notes due for recall.'
+
 export type RecallJustReviewPayload = {
   readonly memoryTrackerId: number
   readonly noteTitle: string
@@ -22,7 +24,7 @@ function hasPendingMcq(prompts: RecallPrompt[]): boolean {
   return prompts.some((p) => p.questionType === 'MCQ' && p.answer == null)
 }
 
-export async function loadRecallJustReviewPayload(): Promise<RecallJustReviewPayload> {
+async function fetchRecallJustReviewPayloadOrNull(): Promise<RecallJustReviewPayload | null> {
   const due = await runDefaultBackendJson<DueMemoryTrackers>(() =>
     RecallsController.recalling({
       query: dueRecallQuery(0),
@@ -30,11 +32,10 @@ export async function loadRecallJustReviewPayload(): Promise<RecallJustReviewPay
     })
   )
   const trackers = due.toRepeat ?? []
-  if (trackers.length === 0) {
-    throw new Error('No notes due for recall.')
-  }
+  if (trackers.length === 0) return null
   const first = trackers[0]!
   const id = first.memoryTrackerId
+  if (id === undefined) return null
   const mt = await runDefaultBackendJson<MemoryTracker>(() =>
     MemoryTrackerController.showMemoryTracker({
       path: { memoryTracker: id },
@@ -63,6 +64,17 @@ export async function loadRecallJustReviewPayload(): Promise<RecallJustReviewPay
     detailsMarkdown,
     notebookTitle,
   }
+}
+
+/** Next due just-review card, or `null` when nothing is due (normal end of session after the last recall). */
+export async function loadRecallJustReviewPayloadIfAny(): Promise<RecallJustReviewPayload | null> {
+  return fetchRecallJustReviewPayloadOrNull()
+}
+
+export async function loadRecallJustReviewPayload(): Promise<RecallJustReviewPayload> {
+  const p = await fetchRecallJustReviewPayloadOrNull()
+  if (p === null) throw new Error(noNotesDueForRecallMessage)
+  return p
 }
 
 export async function markJustReviewRecalled(

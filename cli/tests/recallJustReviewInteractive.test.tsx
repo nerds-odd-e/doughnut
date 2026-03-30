@@ -29,12 +29,20 @@ describe('recall just-review (interactive)', () => {
     savedConfigDir = process.env.DOUGHNUT_CONFIG_DIR
     process.env.DOUGHNUT_CONFIG_DIR = configDir
 
-    recallingSpy = vi.spyOn(RecallsController, 'recalling').mockResolvedValue({
-      data: makeMe.aDueMemoryTrackersList
-        .totalAssimilatedCount(0)
-        .toRepeat([{ memoryTrackerId: 1, spelling: false }])
-        .please(),
-    } as Awaited<ReturnType<typeof RecallsController.recalling>>)
+    let recallingCall = 0
+    recallingSpy = vi
+      .spyOn(RecallsController, 'recalling')
+      .mockImplementation(async () => {
+        recallingCall += 1
+        const trackers =
+          recallingCall === 1 ? [{ memoryTrackerId: 1, spelling: false }] : []
+        return {
+          data: makeMe.aDueMemoryTrackersList
+            .totalAssimilatedCount(0)
+            .toRepeat(trackers)
+            .please(),
+        } as Awaited<ReturnType<typeof RecallsController.recalling>>
+      })
 
     showMemoryTrackerSpy = vi.spyOn(
       MemoryTrackerController,
@@ -173,5 +181,82 @@ describe('recall just-review (interactive)', () => {
       () => frames.join('\n'),
       (c) => stripAnsi(c).includes('Marked as not recalled.')
     )
+  })
+
+  test('two due just-review items: y twice then recalled successfully', async () => {
+    let recallN = 0
+    recallingSpy.mockImplementation(async () => {
+      recallN += 1
+      const trackers =
+        recallN === 1
+          ? [{ memoryTrackerId: 1, spelling: false }]
+          : recallN === 2
+            ? [{ memoryTrackerId: 2, spelling: false }]
+            : []
+      return {
+        data: makeMe.aDueMemoryTrackersList
+          .totalAssimilatedCount(0)
+          .toRepeat(trackers)
+          .please(),
+      } as Awaited<ReturnType<typeof RecallsController.recalling>>
+    })
+
+    showMemoryTrackerSpy.mockImplementation(
+      async (opts: { path: { memoryTracker: number } }) => {
+        const id = opts.path.memoryTracker
+        const title = id === 1 ? 'Alpha' : 'Beta'
+        const noteRealm = makeMe.aNoteRealm
+          .title(title)
+          .notebookTitle('NB')
+          .details('body')
+          .createdAt(baseNoteTimes.createdAt)
+          .updatedAt(baseNoteTimes.updatedAt)
+          .please()
+
+        return {
+          data: makeMe.aMemoryTracker
+            .nextRecallAt('2026-06-01T00:00:00Z')
+            .ofNote(noteRealm)
+            .please(),
+        } as Awaited<
+          ReturnType<typeof MemoryTrackerController.showMemoryTracker>
+        >
+      }
+    )
+
+    const markAsRecalledCount = { n: 0 }
+    markAsRecalledSpy.mockImplementation(async () => {
+      markAsRecalledCount.n += 1
+      return {
+        data: makeMe.aMemoryTracker.please(),
+      } as Awaited<ReturnType<typeof MemoryTrackerController.markAsRecalled>>
+    })
+
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        stripAnsi(c).includes('Yes, I remember?') &&
+        stripAnsi(c).includes('Alpha')
+    )
+
+    stdin.write('y\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        stripAnsi(c).includes('Yes, I remember?') &&
+        stripAnsi(c).includes('Beta')
+    )
+
+    stdin.write('y\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => stripAnsi(c).includes('Recalled successfully')
+    )
+    expect(markAsRecalledCount.n).toBe(2)
   })
 })
