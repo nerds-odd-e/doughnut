@@ -44,7 +44,7 @@ describe('recallStatus', () => {
     recallingSpy.mockResolvedValue({
       data: {
         totalAssimilatedCount: 0,
-        toRepeat: [{ memoryTrackerId: 1 }],
+        toRepeat: [{ memoryTrackerId: 1, spelling: false }],
       },
     } as Awaited<ReturnType<typeof RecallsController.recalling>>)
     await expect(recallStatus()).resolves.toBe('1 note to recall today')
@@ -54,7 +54,10 @@ describe('recallStatus', () => {
     recallingSpy.mockResolvedValue({
       data: {
         totalAssimilatedCount: 0,
-        toRepeat: [{ memoryTrackerId: 1 }, { memoryTrackerId: 2 }],
+        toRepeat: [
+          { memoryTrackerId: 1, spelling: false },
+          { memoryTrackerId: 2, spelling: false },
+        ],
       },
     } as Awaited<ReturnType<typeof RecallsController.recalling>>)
     await expect(recallStatus()).resolves.toBe('2 notes to recall today')
@@ -63,6 +66,7 @@ describe('recallStatus', () => {
   test('plural for larger counts', async () => {
     const toRepeat = Array.from({ length: 10 }, (_, i) => ({
       memoryTrackerId: i + 1,
+      spelling: false,
     }))
     recallingSpy.mockResolvedValue({
       data: { totalAssimilatedCount: 0, toRepeat },

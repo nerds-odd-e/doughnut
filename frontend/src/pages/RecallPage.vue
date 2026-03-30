@@ -147,8 +147,9 @@ const getCurrentMemoryTracker = (): MemoryTrackerLite | undefined => {
   }
   // In treadmill mode, skip spelling trackers
   for (let i = currentIndex.value; i < toRepeat.value.length; i++) {
-    if (!toRepeat.value[i]?.spelling) {
-      return toRepeat.value[i]
+    const t = toRepeat.value[i]!
+    if (!t.spelling) {
+      return t
     }
   }
   return undefined
@@ -160,7 +161,7 @@ const getCurrentMemoryTrackerIndex = (): number => {
   // In treadmill mode, ensure we're pointing to a non-spelling tracker
   // If current index points to spelling, find next non-spelling
   let index = currentIndex.value
-  while (index < toRepeat.value.length && toRepeat.value[index]?.spelling) {
+  while (index < toRepeat.value.length && toRepeat.value[index]!.spelling) {
     index++
   }
   return index < toRepeat.value.length ? index : currentIndex.value
@@ -192,7 +193,7 @@ const getRemainingNonSpellingCount = (): number => {
   // Count non-spelling trackers from current index onwards
   let count = 0
   for (let i = currentIndex.value; i < toRepeat.value.length; i++) {
-    if (!toRepeat.value[i]?.spelling) {
+    if (!toRepeat.value[i]!.spelling) {
       count++
     }
   }
@@ -220,7 +221,7 @@ watch(
       // Move to first non-spelling tracker if current is spelling and treadmill mode is on
       if (treadmillMode.value) {
         const currentTracker = toRepeat.value[currentIndex.value]
-        if (currentTracker?.spelling) {
+        if (currentTracker !== undefined && currentTracker.spelling) {
           const firstNonSpelling = toRepeat.value.findIndex(
             (t, idx) => !t.spelling && idx >= currentIndex.value
           )
@@ -283,7 +284,7 @@ const moveToNextMemoryTracker = () => {
   let nextIndex = currentIndex.value + 1
   while (
     nextIndex < toRepeat.value.length &&
-    toRepeat.value[nextIndex]?.spelling
+    toRepeat.value[nextIndex]!.spelling
   ) {
     nextIndex += 1
   }
@@ -347,7 +348,7 @@ const handleTreadmillModeChanged = () => {
     if (treadmillMode.value) {
       // In treadmill mode, move to first non-spelling tracker from current position
       const currentTracker = toRepeat.value[currentIndex.value]
-      if (currentTracker?.spelling) {
+      if (currentTracker !== undefined && currentTracker.spelling) {
         const firstNonSpelling = toRepeat.value.findIndex(
           (t, idx) => !t.spelling && idx >= currentIndex.value
         )

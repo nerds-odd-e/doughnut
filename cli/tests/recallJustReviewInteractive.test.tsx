@@ -32,7 +32,7 @@ describe('recall just-review (interactive)', () => {
     recallingSpy = vi.spyOn(RecallsController, 'recalling').mockResolvedValue({
       data: makeMe.aDueMemoryTrackersList
         .totalAssimilatedCount(0)
-        .toRepeat([{ memoryTrackerId: 1 }])
+        .toRepeat([{ memoryTrackerId: 1, spelling: false }])
         .please(),
     } as Awaited<ReturnType<typeof RecallsController.recalling>>)
 

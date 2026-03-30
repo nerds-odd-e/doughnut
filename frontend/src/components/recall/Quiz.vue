@@ -85,8 +85,9 @@ const useQuestionFetching = (props: QuizProps) => {
       index++
     ) {
       const memoryTracker = memoryTrackerAt(index)
-      const memoryTrackerId = memoryTracker?.memoryTrackerId
-      if (memoryTrackerId === undefined) break
+      if (memoryTracker === undefined) break
+
+      const memoryTrackerId = memoryTracker.memoryTrackerId
 
       // All memory trackers (including spelling) can use askAQuestion
 

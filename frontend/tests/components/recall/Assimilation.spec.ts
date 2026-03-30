@@ -10,6 +10,7 @@ import helper, {
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
+import type { MemoryTrackerLite } from "@generated/doughnut-backend-api"
 import { computed, ref } from "vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 
@@ -22,9 +23,7 @@ let showNoteSpy: ReturnType<typeof mockSdkService<"showNote">>
 const mockedIncrementAssimilatedCount = vi.fn()
 const mockedRequestDueRecallsRefresh = vi.fn()
 const mockedTotalAssimilatedCount = ref(0)
-const toRepeat = ref<
-  Array<{ memoryTrackerId?: number; spelling?: boolean }> | undefined
->(undefined)
+const toRepeat = ref<MemoryTrackerLite[] | undefined>(undefined)
 
 afterEach(() => {
   document.body.innerHTML = ""

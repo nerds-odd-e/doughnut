@@ -35,9 +35,6 @@ export async function loadRecallJustReviewPayload(): Promise<RecallJustReviewPay
   }
   const first = trackers[0]!
   const id = first.memoryTrackerId
-  if (id === undefined) {
-    throw new Error('No notes due for recall.')
-  }
   const mt = await runDefaultBackendJson<MemoryTracker>(() =>
     MemoryTrackerController.showMemoryTracker({
       path: { memoryTracker: id },

@@ -3899,6 +3899,9 @@ components:
           format: int32
         spelling:
           type: boolean
+      required:
+      - memoryTrackerId
+      - spelling
     MenuDataDTO:
       type: object
       properties:

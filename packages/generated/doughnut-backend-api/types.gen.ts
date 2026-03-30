@@ -493,8 +493,8 @@ export type DueMemoryTrackers = {
 };
 
 export type MemoryTrackerLite = {
-    memoryTrackerId?: number;
-    spelling?: boolean;
+    memoryTrackerId: number;
+    spelling: boolean;
 };
 
 export type MenuDataDto = {

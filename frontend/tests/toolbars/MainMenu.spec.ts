@@ -2,7 +2,7 @@ import MainMenu from "@/components/toolbars/MainMenu.vue"
 import { useRecallData } from "@/composables/useRecallData"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import routes from "@/routes/routes"
-import type { User } from "@generated/doughnut-backend-api"
+import type { MemoryTrackerLite, User } from "@generated/doughnut-backend-api"
 import { fireEvent, screen } from "@testing-library/vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
@@ -30,6 +30,12 @@ vi.mock("@/managedApi/AiReplyEventSource", () => ({
 
 // Browser Mode: Use real matchMedia API!
 // We can spy on it to control behavior for tests
+const memoryTrackerLitesStub = (n: number): MemoryTrackerLite[] =>
+  Array.from({ length: n }, (_, i) => ({
+    memoryTrackerId: i + 1,
+    spelling: false,
+  }))
+
 const createMatchMediaSpy = (matches: boolean) =>
   vi.spyOn(window, "matchMedia").mockImplementation((query: string) => {
     const mediaQueryList = {
@@ -53,7 +59,7 @@ const defaultMenuData = {
     totalUnassimilatedCount: 0,
   },
   recallStatus: {
-    toRepeat: [] as Array<{ memoryTrackerId?: number; spelling?: boolean }>,
+    toRepeat: [] as MemoryTrackerLite[],
     currentRecallWindowEndAt: "",
     totalAssimilatedCount: 0,
   },
@@ -68,15 +74,15 @@ const createMenuData = (overrides?: Partial<typeof defaultMenuData>) => ({
 
 // Helper to create useRecallData mock return value
 const createUseRecallDataMock = (overrides?: {
-  toRepeat?: Array<{ memoryTrackerId?: number; spelling?: boolean }>
+  toRepeat?: MemoryTrackerLite[]
   isRecallPaused?: boolean
   currentIndex?: number
   resumeRecall?: () => void
   diligentMode?: boolean
 }) => {
-  const toRepeat = ref<
-    Array<{ memoryTrackerId?: number; spelling?: boolean }> | undefined
-  >(overrides?.toRepeat ?? [])
+  const toRepeat = ref<MemoryTrackerLite[] | undefined>(
+    overrides?.toRepeat ?? []
+  )
   const currentIndex = ref(overrides?.currentIndex ?? 0)
   return {
     toRepeatCount: computed(() => {
@@ -288,10 +294,7 @@ describe("main menu", () => {
         "getMenuData",
         createMenuData({
           recallStatus: {
-            toRepeat: Array(789).fill({}) as Array<{
-              memoryTrackerId?: number
-              spelling?: boolean
-            }>,
+            toRepeat: memoryTrackerLitesStub(789),
             currentRecallWindowEndAt: "",
             totalAssimilatedCount: 0,
           },
@@ -300,10 +303,7 @@ describe("main menu", () => {
 
       vi.mocked(useRecallData).mockReturnValue(
         createUseRecallDataMock({
-          toRepeat: Array(789).fill({}) as Array<{
-            memoryTrackerId?: number
-            spelling?: boolean
-          }>,
+          toRepeat: memoryTrackerLitesStub(789),
         })
       )
 
@@ -332,10 +332,7 @@ describe("main menu", () => {
     })
 
     it("decreases recall count when questions are answered (currentIndex increases)", async () => {
-      const toRepeat = Array(10).fill({}) as Array<{
-        memoryTrackerId?: number
-        spelling?: boolean
-      }>
+      const toRepeat = memoryTrackerLitesStub(10)
 
       const mockData = createUseRecallDataMock({
         toRepeat,
@@ -444,10 +441,7 @@ describe("main menu", () => {
       vi.mocked(useRecallData).mockReturnValue(
         createUseRecallDataMock({
           isRecallPaused: true,
-          toRepeat: Array(5).fill({}) as Array<{
-            memoryTrackerId?: number
-            spelling?: boolean
-          }>,
+          toRepeat: memoryTrackerLitesStub(5),
         })
       )
     })
@@ -516,10 +510,7 @@ describe("main menu", () => {
       vi.mocked(useRecallData).mockReturnValue(
         createUseRecallDataMock({
           isRecallPaused: true,
-          toRepeat: Array(5).fill({}) as Array<{
-            memoryTrackerId?: number
-            spelling?: boolean
-          }>,
+          toRepeat: memoryTrackerLitesStub(5),
           resumeRecall: resumeRecallSpy,
         })
       )
@@ -546,10 +537,7 @@ describe("main menu", () => {
         "getMenuData",
         createMenuData({
           recallStatus: {
-            toRepeat: Array(789).fill({}) as Array<{
-              memoryTrackerId?: number
-              spelling?: boolean
-            }>,
+            toRepeat: memoryTrackerLitesStub(789),
             currentRecallWindowEndAt: "",
             totalAssimilatedCount: 0,
           },
@@ -559,10 +547,7 @@ describe("main menu", () => {
       vi.mocked(useRecallData).mockReturnValue(
         createUseRecallDataMock({
           isRecallPaused: true,
-          toRepeat: Array(789).fill({}) as Array<{
-            memoryTrackerId?: number
-            spelling?: boolean
-          }>,
+          toRepeat: memoryTrackerLitesStub(789),
         })
       )
 
@@ -603,10 +588,7 @@ describe("main menu", () => {
         routeName: "notebooks",
         isRecallPaused: false,
         currentIndex: 1,
-        toRepeat: Array(5).fill({}) as Array<{
-          memoryTrackerId?: number
-          spelling?: boolean
-        }>,
+        toRepeat: memoryTrackerLitesStub(5),
         shouldShow: true,
       },
       {
@@ -633,10 +615,7 @@ describe("main menu", () => {
         routeName: "notebooks",
         isRecallPaused: true,
         currentIndex: 2,
-        toRepeat: Array(5).fill({}) as Array<{
-          memoryTrackerId?: number
-          spelling?: boolean
-        }>,
+        toRepeat: memoryTrackerLitesStub(5),
         shouldShow: true,
       },
       {
@@ -654,10 +633,7 @@ describe("main menu", () => {
         routeName: "notebooks",
         isRecallPaused: false,
         currentIndex: 5,
-        toRepeat: Array(5).fill({}) as Array<{
-          memoryTrackerId?: number
-          spelling?: boolean
-        }>,
+        toRepeat: memoryTrackerLitesStub(5),
         shouldShow: false,
       },
     ])("$description", async ({
@@ -724,10 +700,7 @@ describe("main menu", () => {
       vi.mocked(useRecallData).mockReturnValue(
         createUseRecallDataMock({
           isRecallPaused,
-          toRepeat: Array(5).fill({}) as Array<{
-            memoryTrackerId?: number
-            spelling?: boolean
-          }>,
+          toRepeat: memoryTrackerLitesStub(5),
           diligentMode,
         })
       )
