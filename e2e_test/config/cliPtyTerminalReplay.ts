@@ -285,9 +285,16 @@ export function ptyTranscriptToVisiblePlaintext(
 
 const DEFAULT_PROMPT_MARKER = '> '
 
+/** Ink command line with empty buffer: only `>` and horizontal whitespace (cursor may add a space cell). */
+function isEmptyInteractivePromptLine(line: string): boolean {
+  return /^\s*>\s*$/.test(line)
+}
+
 /**
- * Plaintext below the last line that contains the interactive prompt (`> `).
- * Fallback: last 8 rows of the simulated screen (see cli.mdc Current guidance).
+ * Plaintext below the interactive command line (`> ` with empty buffer).
+ * Markdown blockquotes also use a `> ` prefix; those lines must not be treated as the prompt.
+ * If no empty prompt row is found, falls back to the last line containing `> `.
+ * Fallback when neither matches: last 8 rows of the simulated screen (see cli.mdc Current guidance).
  */
 export function extractCurrentGuidanceFromReplayedPlaintext(
   plainScreen: string,
@@ -297,9 +304,18 @@ export function extractCurrentGuidanceFromReplayedPlaintext(
   let promptLineIdx = -1
   for (let i = lines.length - 1; i >= 0; i--) {
     const line = lines[i]
-    if (line !== undefined && line.includes(promptMarker)) {
+    if (line !== undefined && isEmptyInteractivePromptLine(line)) {
       promptLineIdx = i
       break
+    }
+  }
+  if (promptLineIdx < 0) {
+    for (let i = lines.length - 1; i >= 0; i--) {
+      const line = lines[i]
+      if (line !== undefined && line.includes(promptMarker)) {
+        promptLineIdx = i
+        break
+      }
     }
   }
   if (promptLineIdx < 0) {

@@ -296,7 +296,7 @@ function assertCurrentGuidanceContains(raw: string, expected: string): void {
   failCliAssertion(
     `Expected substring in ${CURRENT_GUIDANCE_SECTION} (not raw PTY bytes).\n` +
       `  Expected: ${JSON.stringify(expected)}\n` +
-      `  Guidance region (after last line containing ${JSON.stringify('> ')}), replayed plain:\n` +
+      `  Guidance region (below the empty interactive prompt row, else after last line with ${JSON.stringify('> ')}), replayed plain:\n` +
       formatGuidanceRegion(guidancePlain, replayedPlain),
     raw
   )

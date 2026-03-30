@@ -1,6 +1,6 @@
 # CLI recall revival (plan only)
 
-**Status:** Phase 1 complete (recall status). Phase 2.1 complete (Just Review E2E un-ignored + bold guidance assertion). Phase 2.2 complete (`/recall` just-review stage, PTY rows 48 for stable guidance replay). Phase 2.3 complete (just-review edge Vitest: invalid y/n commits, empty title/details + no notebook line). Phase 5.1 complete (full *Recall session* scenario un-ignored; `I answer … to prompt …` waits on Current guidance). Phase 5.3 complete (empty load-more after two recalls + `recallSessionSummaryLine` unit tests). Phase 6.4 complete (MCQ stem and choices through `renderMarkdownToTerminal`; `numberedMcqMarkdownLinesForTerminal`; Vitest in `recallMcqInteractive.test.tsx`). Phase 7.1–7.2 complete (MCQ Esc → `YesNoStagePrompt` leave recall; `Recall session stopped.`; no `answerQuiz` on abort; Vitest in `recallMcqInteractive.test.tsx`). **Next:** Phases 3–4 (Temp1 / Temp2) before Phase 5.2. Remaining: 5.2, 6.1–6.3, 7.3, 8–10 as applicable; this file stays high-level planning, not a step-by-step implementation spec.  
+**Status:** Phase 1 complete (recall status). Phase 2.1 complete (Just Review E2E un-ignored + bold guidance assertion). Phase 2.2 complete (`/recall` just-review stage, PTY rows 48 for stable guidance replay). Phase 2.3 complete (just-review edge Vitest: invalid y/n commits, empty title/details + no notebook line). Phase 5.1 complete (full *Recall session* scenario un-ignored; `I answer … to prompt …` waits on Current guidance). Phase 5.3 complete (empty load-more after two recalls + `recallSessionSummaryLine` unit tests). Phase 6.4 complete (MCQ stem and choices through `renderMarkdownToTerminal`; `numberedMcqMarkdownLinesForTerminal`; Vitest in `recallMcqInteractive.test.tsx`). Phase 7.1–7.2 complete (**MCQ only** — Esc → leave confirm). Phase 7 **scope expanded**: 7.3+ align **just-review** Esc (today conflated with “not recalled”), optional 7.4 **spelling** after Phase 10, 7.5 cohesion, 7.6 load-more semantics, 7.7 edges — see §Phase 7. **Next:** Phases 3–4 (Temp1 / Temp2) before Phase 5.2. Remaining: 5.2, 6.1–6.3, 7.3–7.7, 8–10 as applicable; this file stays high-level planning, not a step-by-step implementation spec.  
 **Goal:** Restore behaviors in `e2e_test/features/cli/cli_recall.feature` with **observable E2E coverage**, **minimal dead code**, and **architecture that does not repeat the pre-removal shape** (heavy global mutable recall state and recall orchestration embedded in `interactive.ts`).
 
 **Guidance:** `.cursor/rules/planning.mdc`, `.cursor/rules/cli.mdc`, `ongoing/cli-architecture-roadmap.md` — prefer **Ink/React composition and stage-local state**, **thin Cucumber steps**, **centralized terminal assertions**, and **reuse of shared API client code** (`doughnut-api` / existing backend client helpers). Challenge big abstractions until repetition justifies them.
@@ -160,28 +160,58 @@ Recent removals (around **2026-03-28**) show what existed before strip-down; use
 
 ---
 
-## Phase 7 — Leave recall during MCQ: **Esc** + y/n confirm (**Vitest**, no `cli_recall.feature` scenario)
+## Phase 7 — Leave recall from **any** recall card: **Esc** + y/n confirm (**Vitest**, no `cli_recall.feature` scenario)
 
-**User outcome:** While in **MCQ recall**, **Escape** means “leave recall”; the CLI shows a **y/n confirmation** (e.g. leave vs stay); **y** ends the recall session with a clear **assistant-visible** outcome (session stopped / cancelled — same product intent as the old `the recall session was stopped` step, but **not** exercised via Cypress). **n** returns to the MCQ question. **Do not** use **`/stop`** as the primary user action for this flow.
+**User outcome:** While **`/recall`** is showing **any** active recall card (today: **just-review** and **MCQ**; later: **spelling** and any new types), **Escape** means “leave recall” (end the recall **session**), not “answer the question.” The CLI shows the **same** **y/n confirmation** (shared copy intent: leave vs stay); **y** ends the recall session with a clear **assistant-visible** outcome (e.g. **`Recall session stopped.`** — same product intent as the old `the recall session was stopped` step, but **not** exercised via Cypress). **n** returns to the **same** question UI. **Do not** use **`/stop`** as the primary user action for this flow.
 
-**Coverage:** **Unit-test driven** — extend or add **`cli/tests/*.test.tsx`** driving **`InteractiveCliApp`** with **`vi.spyOn`** on **`doughnut-api`** controllers (`cli.mdc` observable-behavior pattern). No new or restored Gherkin scenario in **`e2e_test/features/cli/cli_recall.feature`** for Phase 7.
+**Coverage:** **Unit-test driven** — extend or add **`cli/tests/*.test.tsx`** driving **`InteractiveCliApp`** with **`vi.spyOn`** on **`doughnut-api`** controllers (`cli.mdc` observable-behavior pattern). No new or restored Gherkin scenario in **`e2e_test/features/cli/cli_recall.feature`** for Phase 7 unless the team later chooses to add one.
 
-### Phase 7.1 — Vitest fails for the right reason — **complete**
+**Today’s gap:** Esc → leave confirm is implemented for **MCQ** only (`RecallMcqStage`). **Just-review** still wires **`YesNoStagePrompt`**’s **`onCancel`** to **`escapeJustReviewCard`**, which immediately drives **`submitJustReview(false)`** → **`markJustReviewRecalled`** and **`Marked as not recalled.`** — that conflates **“I don’t remember” (n)** with **“leave the session” (Esc)**. Phase 7 subphases below align **Esc** across modes.
 
-- Add failing cases first: **Esc** from MCQ shows **confirm** copy; **y** settles with expected assistant text and clears recall stage; **n** returns to MCQ UI; failures name **missing confirm / wrong branch / extra API call** (e.g. `answerQuiz` when user only aborted), not generic MCQ.
+### Phase 7.1 — MCQ: Vitest fails for the right reason — **complete**
 
-### Phase 7.2 — Pass with minimum production change — **complete**
+- **Esc** from MCQ shows **confirm** copy; **y** settles with expected assistant text and clears recall stage; **n** returns to MCQ UI; failures name **missing confirm / wrong branch / extra API call** (e.g. `answerQuiz` when user only aborted), not generic MCQ.
 
-- On **`RecallMcqStage`**, **Esc** → **y/n confirmation** (reuse existing stage patterns: **`YesNoStagePrompt`**, substage, or equivalent — keep stage-local state). **y** → **`onSettled`** with agreed copy + teardown; **n** → resume MCQ with no quiz submit.
-- Confirm **due note not consumed** incorrectly on abort (assert controller calls / no successful answer path as appropriate).
-- Align on-screen **hint** with behavior (today’s **`↑↓ Enter or number to select; Esc to cancel`** implies cancel is possible; post–Phase 7 it should match the **confirm** UX).
+### Phase 7.2 — MCQ: pass with minimum production change — **complete**
 
-**Done:** `RecallMcqStage` — `showLeaveConfirm` + `YesNoStagePrompt` (`Leave recall?`); `Recall session stopped.` on **y**; Esc on confirm dismisses like **n**; MCQ hint documents Esc → confirm; `outputAssertions` PTY sniff string updated. `recallMcqInteractive.test.tsx` — Esc / y / n paths + `answerQuiz` never called on abort.
+- On **`RecallMcqStage`**, **Esc** → **y/n confirmation** (**`YesNoStagePrompt`**, stage-local state). **y** → **`onSettled`** with agreed copy + teardown; **n** → resume MCQ with no quiz submit.
+- Confirm **due note not consumed** incorrectly on abort (no **`answerQuiz`** on abort-only path).
+- MCQ **hint** documents Esc → confirm; **`outputAssertions`** PTY sniff string updated if the hint changes.
 
-### Phase 7.3 — Edge cases (Vitest scope)
+**Done:** `RecallMcqStage` — `showLeaveConfirm` + **`YesNoStagePrompt`** (`Leave recall?`); **`Recall session stopped.`** on **y**; Esc on confirm dismisses like **n**; `recallMcqInteractive.test.tsx` — Esc / y / n + **`answerQuiz`** never called on abort.
 
-- **n** on confirmation → back to MCQ with stable highlight/buffer.
-- Invalid keys during confirm — only if quick Vitest; defer if redundant with **`YesNoStagePrompt`** coverage.
+### Phase 7.3 — Just-review: Esc → same leave confirm (Vitest)
+
+**User outcome:** On **Yes, I remember?**, **Esc** opens the **same** leave-recall confirmation as MCQ (shared prompt / settled line preferred), not an immediate **not-recalled** API call.
+
+- **7.3.1 Vitest fails for the right reason** — From just-review card, **Esc** must show **`Leave recall?` (or shared constant)** + **`(y/n)`**; **`markAsRecalled` / `markJustReviewRecalled`** (whatever the code path uses) **not** called until the user commits **y** or **n** on the *question* itself. After **Esc** then **y**, transcript shows **`Recall session stopped.`** (or the shared stop line); spy counts prove no mistaken “not recalled” submit. Failures cite **wrong API call** or **missing confirm**, not generic recall.
+
+- **7.3.2 Pass with minimum production change** — Refactor **`JustReviewRecallCard`** and/or **`RecallSessionStage`** so **Esc** does **not** call **`escapeJustReviewCard` → `submitJustReview(false)`** directly. Options (pick smallest that stays cohesive): a **leave-confirm substage** inside the just-review card (mirror MCQ), or **session-level** state in **`RecallSessionStage`** that wraps both variants. **y** → **`onSettled(sharedStopLine)`** and end session **without** treating as “not recalled”; **n** → back to the just-review prompt; **`onCancel`** on the nested **`YesNoStagePrompt`** for the *question* should mean “dismiss leave confirm,” not “submit not recalled.”
+
+- **Product check:** **`n`** on **Yes, I remember?** remains **not recalled** (existing behavior); only **Esc** gains the leave-session path.
+
+### Phase 7.4 — Spelling (future): same Esc contract (**Vitest**, after Phase 10 card exists)
+
+**User outcome:** When a **spelling** recall card is implemented, **Esc** → same leave confirm; **y** → shared stop line; **n** → back to spelling prompt; **no** spelling-submit API on abort-only path.
+
+- **7.4.1** Vitest red: Esc / y / n + spy assertions analogous to MCQ (**no** premature submit).
+- **7.4.2** Implement using the same pattern as 7.2 / 7.3.2 (reuse shared helper or duplicated thin substage — see 7.5).
+
+*Until spelling exists, this subphase stays planning-only; no production code required.*
+
+### Phase 7.5 — Cohesion (optional, after 7.3.2)
+
+If **three** near-identical “leave confirm” blocks appear (MCQ, just-review, spelling), extract a **minimal** shared piece: e.g. shared **copy constants** (`LEAVE_RECALL_PROMPT`, **`RECALL_SESSION_STOPPED_LINE`**), or a tiny **`LeaveRecallConfirmPrompt`** wrapper around **`YesNoStagePrompt`**, **without** inventing a heavy recall framework. Challenge per **`cli-architecture-roadmap.md`** — extract only when repetition is real.
+
+### Phase 7.6 — Load-more and session chrome
+
+**Load more from next 3 days?** already uses **`YesNoStagePrompt`** with **`onCancel`** tied to **`escapeLoadMorePrompt`** (abort in-flight or **`submitLoadMore(false)`**). Document whether **Esc** there should mean “no, don’t load more” (today) vs a third “leave entire session” confirm; if product wants **one** global meaning for Esc during recall, adjust in a **small** follow-up slice with Vitest for that mode only. Avoid scope creep: default is **document + align only if inconsistent** with card-level leave behavior.
+
+### Phase 7.7 — Edge cases (Vitest scope)
+
+- **MCQ:** **n** on leave confirm → back to MCQ with stable highlight/buffer (may already be covered by 7.1–7.2).
+- **Just-review / spelling:** **n** on leave confirm → stable buffer / no duplicate prompts.
+- Invalid keys during leave confirm — only if not already covered by **`YesNoStagePrompt`** tests.
 
 ---
 
@@ -263,7 +293,7 @@ flowchart LR
   P4[Phase 4 Temp2 load-more n]
   P5[Phase 5 full session]
   P6[Phase 6 MCQ happy]
-  P7[Phase 7 Esc y/n exit]
+  P7[Phase 7 Esc leave recall all cards]
   P8[Phase 8 MCQ arrows]
   P9[Phase 9 contest]
   P10[Phase 10 spelling]
@@ -278,4 +308,4 @@ flowchart LR
   P2 --> P10
 ```
 
-Phases 7–9 depend on MCQ (Phase 6). **Phase 7** (Esc + y/n leave recall) is **Vitest-only** — no node in `cli_recall.feature`. **Phase 6.4** refines MCQ presentation (markdown stem/choices); it does not add a new top-level scenario node. Phase 10 can proceed in parallel with Phases 3–9 after Phase 2 if resourcing splits, but **sequential delivery** per scenario order is the default.
+Phases 8–9 depend on MCQ (Phase 6). **Phase 7** (Esc + y/n leave recall) is **Vitest-only** — no node in `cli_recall.feature`; **7.1–7.2** are MCQ-only and **complete**; **7.3+** extend the same UX to **just-review** and (when built) **spelling**, and optional cohesion (**7.5**) / load-more semantics (**7.6**). **Phase 6.4** refines MCQ presentation (markdown stem/choices); it does not add a new top-level scenario node. Phase 10 can proceed in parallel with Phases 3–9 after Phase 2 if resourcing splits, but **sequential delivery** per scenario order is the default; **Phase 7.4** trails the spelling card from Phase 10.
