@@ -150,7 +150,7 @@ export function handleSelectListInkKey(
   }
 }
 
-export function dispatchSelectListKey(
+function dispatchSelectListKey(
   e: SelectListKeyEvent,
   selectedIndex: number,
   draftPolicy: SelectListDraftPolicy,
