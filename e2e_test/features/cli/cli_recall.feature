@@ -66,7 +66,6 @@ Feature: CLI recall status and recall session
       Then I should see "Correct!" in past CLI assistant messages
       And I should see "Recalled successfully" in past CLI assistant messages
 
-    @ignore
     @usingMockedOpenAiService
     Scenario: Recall MCQ - down arrow and Enter to select
       And OpenAI generates this question:
@@ -75,7 +74,7 @@ Feature: CLI recall status and recall session
       And the note "sedition" was assimilated on day 1
       And It's day 2
       When I input down-arrow selection for "/recall" in the interactive CLI
-      Then I should see "Incorrect" in past CLI assistant messages
+      Then I should see "Incorrect" in answered questions
       And I should see "Recalled successfully" in past CLI assistant messages
 
     @ignore

@@ -35,6 +35,10 @@ Then(
     cli.interactiveCli().pastCliAssistantMessages().expectContains(expected)
 )
 
+Then('I should see {string} in answered questions', (expected: string) =>
+  cli.interactiveCli().answeredQuestions().expectContains(expected)
+)
+
 When('I enter {string} in the interactive CLI', (line: string) => {
   cli.interactiveCli().writeInteractiveLine(line)
 })
@@ -55,6 +59,17 @@ When(
   (command: string) => {
     cli.interactiveCli().enterSlashCommandInInteractiveCli(command)
   }
+)
+
+When(
+  'I input down-arrow selection for {string} in the interactive CLI',
+  (command: string) =>
+    new Cypress.Promise<void>((resolve) => {
+      cli
+        .interactiveCli()
+        .inputDownArrowSelectionForSlashCommand(command)
+        .then(() => resolve())
+    })
 )
 
 When(

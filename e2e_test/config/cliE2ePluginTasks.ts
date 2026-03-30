@@ -37,6 +37,10 @@ type CliInteractiveWriteLineTask = {
   line: string
 }
 
+type CliInteractiveWriteRawTask = {
+  data: string
+}
+
 const INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING = 'doughnut 0.1.0'
 const INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS = 20_000
 const INSTALLED_CLI_INTERACTIVE_WRITE_SETTLE_MS = 500
@@ -283,6 +287,21 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       }
       const { pty } = interactiveCliPtySession
       pty.write(`${line}\r`)
+      await new Promise<void>((resolve) =>
+        setTimeout(resolve, INSTALLED_CLI_INTERACTIVE_WRITE_SETTLE_MS)
+      )
+      return null
+    },
+    async cliInteractiveWriteRaw({
+      data,
+    }: CliInteractiveWriteRawTask): Promise<null> {
+      if (!interactiveCliPtySession) {
+        throw new Error(
+          'cliInteractiveWriteRaw: no active interactive CLI PTY session. Ensure @interactiveCLI started the session or run the installed CLI in interactive mode first.'
+        )
+      }
+      const { pty } = interactiveCliPtySession
+      pty.write(data)
       await new Promise<void>((resolve) =>
         setTimeout(resolve, INSTALLED_CLI_INTERACTIVE_WRITE_SETTLE_MS)
       )
