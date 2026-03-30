@@ -14,7 +14,6 @@ Feature: Recall Quiz
     Given It's day 1
     And I assimilate the note "sedition" with the option of remembering spelling
     When I am recalling my note on day 2
-    And I skip one question
     Then I should be asked spelling question "means incite violence" from notebook "English"
     When I type my answer "asdf"
     Then I should see that my spelling answer "asdf" is incorrect
@@ -23,7 +22,6 @@ Feature: Recall Quiz
     Given It's day 1
     And I assimilate the note "sedition" with the option of remembering spelling
     When I am recalling my note on day 2
-    And I skip one question
     Then I should be asked spelling question "means incite violence" from notebook "English"
     When I type my answer "Sedition"
     Then I should see that my answer is correct
