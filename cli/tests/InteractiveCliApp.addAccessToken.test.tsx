@@ -3,10 +3,6 @@ import * as os from 'node:os'
 import * as path from 'node:path'
 import { UserController } from 'doughnut-api'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
-import {
-  GUIDANCE_LIST_ROW_BUDGET,
-  GUIDANCE_MORE_BELOW_LABEL,
-} from '../src/guidanceListWindow.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { formatVersionOutput } from '../src/commands/version.js'
 import {
@@ -16,6 +12,9 @@ import {
   stripAnsi,
   waitForFrames,
 } from './inkTestHelpers.js'
+
+const EXPECT_GUIDANCE_MORE_BELOW = '↓ more below'
+const EXPECT_GUIDANCE_ROW_BUDGET = 5
 
 describe('InteractiveCliApp /add-access-token', () => {
   let configDir: string
@@ -186,7 +185,7 @@ describe('InteractiveCliApp /add-access-token', () => {
       () => stripAnsi(frames.join('\n')),
       (c) =>
         c.includes('Access tokens') &&
-        c.includes(GUIDANCE_MORE_BELOW_LABEL) &&
+        c.includes(EXPECT_GUIDANCE_MORE_BELOW) &&
         c.includes('1. L0')
     )
 
@@ -194,9 +193,9 @@ describe('InteractiveCliApp /add-access-token', () => {
     const rows = plain
       .split('\n')
       .filter(
-        (l) => l.includes(GUIDANCE_MORE_BELOW_LABEL) || /\d+\.\s+L\d/.test(l)
+        (l) => l.includes(EXPECT_GUIDANCE_MORE_BELOW) || /\d+\.\s+L\d/.test(l)
       )
-    expect(rows.length).toBe(GUIDANCE_LIST_ROW_BUDGET)
+    expect(rows.length).toBe(EXPECT_GUIDANCE_ROW_BUDGET)
   })
 
   test('/list-access-token Down+Enter sets default token in access-tokens.json', async () => {

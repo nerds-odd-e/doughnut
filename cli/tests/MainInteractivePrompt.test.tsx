@@ -3,13 +3,13 @@ import * as os from 'node:os'
 import * as path from 'node:path'
 import { render } from 'ink-testing-library'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
-import {
-  GUIDANCE_LIST_ROW_BUDGET,
-  GUIDANCE_MORE_BELOW_LABEL,
-} from '../src/guidanceListWindow.js'
 import { MainInteractivePrompt } from '../src/mainInteractivePrompt/index.js'
 import { USER_INPUT_HISTORY_FILENAME } from '../src/mainInteractivePrompt/userInputHistoryFile.js'
 import { stripAnsi, waitForFrames } from './inkTestHelpers.js'
+
+/** Expected scroll UI copy (private in guidanceListWindowInk). */
+const EXPECT_GUIDANCE_MORE_BELOW = '↓ more below'
+const EXPECT_GUIDANCE_ROW_BUDGET = 5
 
 let promptConfigDir: string
 let prevDoughnutConfigDir: string | undefined
@@ -121,14 +121,16 @@ describe('MainInteractivePrompt slash guidance (phase 1)', () => {
       () => stripAnsi(lastFrame() ?? ''),
       (f) =>
         lineWithMainPrompt(f).includes('→ /') &&
-        f.includes(GUIDANCE_MORE_BELOW_LABEL)
+        f.includes(EXPECT_GUIDANCE_MORE_BELOW)
     )
 
     const frame = stripAnsi(lastFrame() ?? '')
     const listRows = frame
       .split('\n')
-      .filter((l) => l.includes(GUIDANCE_MORE_BELOW_LABEL) || l.includes('  /'))
-    expect(listRows.length).toBe(GUIDANCE_LIST_ROW_BUDGET)
+      .filter(
+        (l) => l.includes(EXPECT_GUIDANCE_MORE_BELOW) || l.includes('  /')
+      )
+    expect(listRows.length).toBe(EXPECT_GUIDANCE_ROW_BUDGET)
   })
 
   test('trailing space after slash command shows hint only, not the completion list', async () => {

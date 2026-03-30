@@ -7,7 +7,6 @@ import {
 import type { RecallPrompt } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
-import { GUIDANCE_MORE_BELOW_LABEL } from '../src/guidanceListWindow.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
   pressEscape,
@@ -28,6 +27,8 @@ const RECALL_PROMPT_ID = 42
 const MCQ_HINT_SUBSTR = '↑↓ Enter or number to select'
 const LEAVE_RECALL_CONFIRM = 'Leave recall?'
 const RECALL_SESSION_STOPPED = 'Recall session stopped.'
+
+const EXPECT_GUIDANCE_MORE_BELOW = '↓ more below'
 
 async function waitForMcqVisible(frames: string[]): Promise<void> {
   await waitForFrames(
@@ -139,12 +140,12 @@ describe('recall MCQ (interactive)', () => {
       () => stripAnsi(frames.join('\n')),
       (p) =>
         p.includes('Pick one') &&
-        p.includes(GUIDANCE_MORE_BELOW_LABEL) &&
+        p.includes(EXPECT_GUIDANCE_MORE_BELOW) &&
         p.includes('1. c0')
     )
 
     const plain = stripAnsi(lastFrame() ?? '')
-    expect(plain).toContain(GUIDANCE_MORE_BELOW_LABEL)
+    expect(plain).toContain(EXPECT_GUIDANCE_MORE_BELOW)
     expect(plain).toMatch(/1\.\s*c0/)
     expect(plain).not.toMatch(/8\.\s*c7/)
   })
