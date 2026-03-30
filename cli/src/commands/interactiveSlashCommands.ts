@@ -25,27 +25,33 @@ export const interactiveSlashCommands: readonly InteractiveSlashCommand[] = [
   exitSlashCommand,
 ]
 
-export const interactiveSlashCommandByLine = new Map(
-  interactiveSlashCommands.map((c) => [c.line, c] as const)
-)
+export const interactiveSlashCommandByLine = new Map<
+  string,
+  InteractiveSlashCommand
+>(interactiveSlashCommands.map((c) => [c.line.slice(1), c] as const))
 
 export type ResolvedInteractiveSlashCommand = {
   command: InteractiveSlashCommand
   argument: string | undefined
 }
 
+/**
+ * @param body - Same string the resolver uses for lookup: after `/` when the user committed a
+ *   slash command, or the full committed line when they did not (e.g. `exit`).
+ */
 export function resolveInteractiveSlashCommand(
-  line: string
+  body: string
 ): ResolvedInteractiveSlashCommand | undefined {
-  const exact = interactiveSlashCommandByLine.get(line)
+  const exact = interactiveSlashCommandByLine.get(body)
   if (exact) return { command: exact, argument: undefined }
 
   const prefix = [...interactiveSlashCommands]
     .sort((a, b) => b.line.length - a.line.length)
-    .find((c) => line.startsWith(`${c.line} `))
+    .find((c) => body.startsWith(`${c.line.slice(1)} `))
   if (!prefix) return undefined
 
-  const rest = line.slice(prefix.line.length + 1).trim()
+  const cmdBody = prefix.line.slice(1)
+  const rest = body.slice(cmdBody.length + 1).trim()
   return {
     command: prefix,
     argument: rest === '' ? undefined : rest,

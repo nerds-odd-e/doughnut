@@ -129,6 +129,35 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     ).toBe(false)
   })
 
+  test('submitting exit without slash quits like /exit', async () => {
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('exit\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => c.includes('exit') && c.includes('Bye.') && c.includes('\x1b[100m')
+    )
+
+    const combined = frames.join('\n')
+    expect(combined).toContain('Bye.')
+    expect(
+      farewellFollowedByCommandPrompt(stripAnsi(combined)),
+      'bare exit must not leave a live command prompt after Bye.'
+    ).toBe(false)
+
+    const snapshot =
+      [...frames].reverse().find((f) => {
+        const lines = stripAnsi(f).split('\n')
+        return lines.some((l) => l.trim() === 'exit')
+      }) ?? ''
+    expect(snapshot).toMatch(/\S/)
+    const lines = stripAnsi(snapshot).split('\n')
+    const userIdx = lines.findIndex((l) => l.trim() === 'exit')
+    expect(userIdx).toBeGreaterThanOrEqual(0)
+  })
+
   test('after /exit, TTY must not repaint the empty command line below Bye.', async () => {
     const { stdin, frames } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />

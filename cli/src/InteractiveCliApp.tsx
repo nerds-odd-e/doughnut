@@ -46,7 +46,10 @@ export function InteractiveCliApp() {
   }, [])
 
   const onCommittedLine = useCallback((line: string) => {
-    const resolved = resolveInteractiveSlashCommand(line)
+    const resolved = resolveInteractiveSlashCommand(
+      line.startsWith('/') ? line.slice(1) : line
+    )
+
     if (resolved) {
       const { command, argument } = resolved
       setMessages((prev) => [...prev, { role: 'user', text: line }])

@@ -5,7 +5,7 @@ import type {
 
 const exitDoc: CommandDoc = {
   name: '/exit',
-  usage: '/exit',
+  usage: '/exit, exit',
   description: 'Quit the CLI',
 }
 
