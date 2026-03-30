@@ -46,29 +46,23 @@ export function InteractiveCliApp() {
   const onCommittedLine = useCallback((line: string) => {
     const resolved = resolveInteractiveSlashCommand(line)
     if (resolved) {
-      const { command, argument } = resolved
+      const { command, argument, mountStage } = resolved
       const argumentMissing = argument === undefined || argument === ''
-      const openPickerStage =
-        command.stageComponent !== undefined &&
-        (command.argument === undefined ? true : argumentMissing)
-      if (
-        command.argument !== undefined &&
-        argumentMissing &&
-        !command.argument.optional
-      ) {
+      const argSpec = command.argument
+      if (argSpec !== undefined && argumentMissing && !argSpec.optional) {
         setMessages((prev) => [
           ...prev,
           { role: 'user', text: line },
           {
             role: 'assistant',
-            text: `Missing ${command.argument.name}. Usage: ${command.doc.usage}`,
+            text: `Missing ${argSpec.name}. Usage: ${command.doc.usage}`,
           },
         ])
         return
       }
       setMessages((prev) => [...prev, { role: 'user', text: line }])
       const Stage = command.stageComponent
-      if (Stage && openPickerStage) {
+      if (Stage && mountStage) {
         // setState(fn) treats fn as updater; bare `Stage` would be called with prior state as props.
         setActiveStageComponent(() => Stage)
         return
