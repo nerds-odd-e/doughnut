@@ -125,6 +125,14 @@ export function RecallJustReviewStage({
     [onSettled]
   )
 
+  const cancelJustReviewCard = useCallback(() => {
+    submit(false).catch(() => undefined)
+  }, [submit])
+
+  const cancelLoadMorePrompt = useCallback(() => {
+    submitLoadMore(false).catch(() => undefined)
+  }, [submitLoadMore])
+
   const width = resolvedTerminalWidth()
 
   if (!initialResolved) {
@@ -141,6 +149,8 @@ export function RecallJustReviewStage({
         key="load-more"
         prompt="Load more from next 3 days?"
         onAnswer={submitLoadMore}
+        defaultAnswer={true}
+        onCancel={cancelLoadMorePrompt}
         inputBlockedRef={submittingRef}
         header={<Text>{STAGE_LABEL}</Text>}
       />
@@ -166,6 +176,7 @@ export function RecallJustReviewStage({
       key={payload.memoryTrackerId}
       prompt="Yes, I remember?"
       onAnswer={submit}
+      onCancel={cancelJustReviewCard}
       inputBlockedRef={submittingRef}
       header={
         <>
