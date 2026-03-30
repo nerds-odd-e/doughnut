@@ -152,7 +152,7 @@ describe('InteractiveCliApp /add-access-token', () => {
       (c) =>
         c.includes('Cancelled.') &&
         c.includes('/list-access-token') &&
-        c.includes('> ') &&
+        c.includes('→ ') &&
         c.includes('/ commands')
     )
 
@@ -211,7 +211,7 @@ describe('InteractiveCliApp /add-access-token', () => {
       (c) =>
         c.includes('No access tokens stored.') &&
         c.includes('/list-access-token') &&
-        c.includes('> ') &&
+        c.includes('→ ') &&
         c.includes('/ commands')
     )
   })

@@ -8,14 +8,14 @@ import {
   waitForFrames,
 } from './inkTestHelpers.js'
 
-/** True when a frame shows the /exit farewell and then paints another empty REPL line (`> `). */
+/** True when a frame shows the /exit farewell and then paints another main REPL prompt (`→`). */
 function farewellFollowedByCommandPrompt(ansiStrippedFrame: string): boolean {
   const farewell = 'Bye.'
   if (!ansiStrippedFrame.includes(farewell)) return false
   const after = ansiStrippedFrame.slice(
     ansiStrippedFrame.lastIndexOf(farewell) + farewell.length
   )
-  return /\n\s*>\s/.test(after)
+  return /\n[^\n]*→/.test(after)
 }
 
 describe('InteractiveCliApp (ink-testing-library)', () => {
@@ -124,8 +124,8 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     expect(lines[userIdx - 1]?.trim()).toBe('')
     expect(lines[userIdx + 1]?.trim()).toBe('')
     expect(
-      lines.slice(userIdx + 2).some((l) => l.includes('>')),
-      'after Bye., the REPL must not paint another "> " line (see dedicated /exit TTY test)'
+      lines.slice(userIdx + 2).some((l) => l.includes('→')),
+      'after Bye., the REPL must not paint another main prompt line (see dedicated /exit TTY test)'
     ).toBe(false)
   })
 
@@ -153,7 +153,7 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
       offenders,
       [
         'After /exit prints "Bye.", the terminal must not show another interactive read prompt',
-        '(the "> " line with the block cursor). That means the REPL drew one more input line',
+        '(the boxed main prompt with →). That means the REPL drew one more input line',
         'before shutdown — the farewell should be the last interactive chrome.',
         'ANSI stripped offending frame(s):',
         ...offenders.map((f) => `---\n${stripAnsi(f)}\n---`),
@@ -174,13 +174,13 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
       const expected = expectedBuffer
       await waitForFrames(
         () => stripAnsi(lastFrame() ?? ''),
-        (f) => f.includes(`> ${expected}`)
+        (f) => f.includes(`→ ${expected}`)
       )
     }
     stdin.write('\r')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => f.includes('> /exit ')
+      (f) => f.includes('→ /exit ')
     )
     stdin.write('\r')
     await waitForFrames(

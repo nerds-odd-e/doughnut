@@ -290,10 +290,13 @@ function isEmptyInteractivePromptLine(line: string): boolean {
   return /^\s*>\s*$/.test(line)
 }
 
+/** Bottom border of Ink `borderStyle="single"` main prompt box (light up-and-right). */
+const MAIN_PROMPT_BOX_BOTTOM_RE = /^\s*└/
+
 /**
- * Plaintext below the interactive command line (`> ` with empty buffer).
- * Markdown blockquotes also use a `> ` prefix; those lines must not be treated as the prompt.
- * If no empty prompt row is found, falls back to the last line containing `> `.
+ * Plaintext below the interactive command line.
+ * Main REPL: boxed prompt ends with a `└` box-drawing row; guidance is everything below that.
+ * Stages still use a bare `> ` line — empty `> ` row or last line containing `> ` (markdown blockquotes use `> ` too; see isEmptyInteractivePromptLine).
  * Fallback when neither matches: last 8 rows of the simulated screen (see cli.mdc Current guidance).
  */
 export function extractCurrentGuidanceFromReplayedPlaintext(
@@ -301,6 +304,12 @@ export function extractCurrentGuidanceFromReplayedPlaintext(
   promptMarker: string = DEFAULT_PROMPT_MARKER
 ): string {
   const lines = plainScreen.split('\n')
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i]
+    if (line !== undefined && MAIN_PROMPT_BOX_BOTTOM_RE.test(line)) {
+      return lines.slice(i + 1).join('\n')
+    }
+  }
   let promptLineIdx = -1
   for (let i = lines.length - 1; i >= 0; i--) {
     const line = lines[i]

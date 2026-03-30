@@ -10,6 +10,20 @@ import { stripAnsi, waitForFrames } from './inkTestHelpers.js'
 let promptConfigDir: string
 let prevDoughnutConfigDir: string | undefined
 
+/** StripAnsi line that contains the main `→` prompt (inside the bordered box). */
+function lineWithMainPrompt(plain: string): string {
+  return plain.split('\n').find((l) => l.includes('→')) ?? ''
+}
+
+/** Typed buffer after `→`, before Ink right-padding / `│` column border. */
+function mainPromptDraftAfterArrow(plain: string): string {
+  const lm = lineWithMainPrompt(plain)
+  const idx = lm.indexOf('→')
+  if (idx < 0) return ''
+  const after = lm.slice(idx + '→'.length).trimStart()
+  return after.replace(/\s*│.*$/, '').trimEnd()
+}
+
 beforeEach(() => {
   prevDoughnutConfigDir = process.env.DOUGHNUT_CONFIG_DIR
   promptConfigDir = fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-mip-'))
@@ -37,19 +51,18 @@ async function renderMainInteractivePrompt(
   )
   await waitForFrames(
     () => stripAnsi(result.lastFrame() ?? ''),
-    (f) => f.includes('>') && f.includes('/ commands')
+    (f) => f.includes('→') && f.includes('/ commands')
   )
-  const firstLine = (f: string) => (f.split('\n')[0] ?? '').trimEnd()
   const probe = '@'
   result.stdin.write(probe)
   await waitForFrames(
     () => stripAnsi(result.lastFrame() ?? ''),
-    (f) => firstLine(f).includes(probe)
+    (f) => lineWithMainPrompt(f).includes(probe)
   )
   result.stdin.write('\x7f')
   await waitForFrames(
     () => stripAnsi(result.lastFrame() ?? ''),
-    (f) => !firstLine(f).includes(probe)
+    (f) => !lineWithMainPrompt(f).includes(probe)
   )
   return result
 }
@@ -57,7 +70,9 @@ async function renderMainInteractivePrompt(
 describe('MainInteractivePrompt slash guidance (phase 1)', () => {
   test('default shows static / commands hint', async () => {
     const { lastFrame } = await renderMainInteractivePrompt()
-    expect(stripAnsi(lastFrame() ?? '')).toContain('/ commands')
+    const plain = stripAnsi(lastFrame() ?? '')
+    expect(plain).toContain('/ commands')
+    expect(plain).toContain('`exit` to quit.')
   })
 
   test('partial / prefix shows matching commands with first row inverse-highlighted', async () => {
@@ -66,7 +81,7 @@ describe('MainInteractivePrompt slash guidance (phase 1)', () => {
     stdin.write('/')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => f.includes('> /')
+      (f) => f.includes('→ /')
     )
     stdin.write('he')
     await waitForFrames(
@@ -100,7 +115,7 @@ describe('MainInteractivePrompt slash guidance (phase 1)', () => {
     stdin.write('/help ')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => f.includes('> /help ')
+      (f) => f.includes('→ /help ')
     )
     const frame = stripAnsi(lastFrame() ?? '')
     expect(frame).toContain('/ commands')
@@ -115,18 +130,17 @@ describe('MainInteractivePrompt Tab completion (phase 2)', () => {
     stdin.write('/remove')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => f.includes('> /remove')
+      (f) => f.includes('→ /remove')
     )
     stdin.write('\t')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) =>
-        (f.split('\n')[0] ?? '').trimEnd().startsWith('> /remove-access-token')
+      (f) => lineWithMainPrompt(f).trimEnd().includes('→ /remove-access-token')
     )
-    const firstLine = (
-      stripAnsi(lastFrame() ?? '').split('\n')[0] ?? ''
+    const promptLine = lineWithMainPrompt(
+      stripAnsi(lastFrame() ?? '')
     ).trimEnd()
-    expect(firstLine.startsWith('> /remove-access-token')).toBe(true)
+    expect(promptLine.includes('→ /remove-access-token')).toBe(true)
   })
 
   test('Tab with a unique matching usage completes to usage plus trailing space', async () => {
@@ -135,15 +149,15 @@ describe('MainInteractivePrompt Tab completion (phase 2)', () => {
     stdin.write('/hel')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => f.includes('> /hel')
+      (f) => f.includes('→ /hel')
     )
     stdin.write('\t')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => f.includes('> /help ')
+      (f) => f.includes('→ /help ')
     )
     expect(
-      (stripAnsi(lastFrame() ?? '').split('\n')[0] ?? '').includes('/help ')
+      lineWithMainPrompt(stripAnsi(lastFrame() ?? '')).includes('/help ')
     ).toBe(true)
   })
 
@@ -153,16 +167,16 @@ describe('MainInteractivePrompt Tab completion (phase 2)', () => {
     stdin.write('/zzz')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => f.includes('> /zzz')
+      (f) => f.includes('→ /zzz')
     )
     stdin.write('\t')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => f.includes('> /zzz')
+      (f) => f.includes('→ /zzz')
     )
-    expect((stripAnsi(lastFrame() ?? '').split('\n')[0] ?? '').trimEnd()).toBe(
-      '> /zzz'
-    )
+    expect(
+      lineWithMainPrompt(stripAnsi(lastFrame() ?? '')).trimEnd()
+    ).toContain('→ /zzz')
   })
 })
 
@@ -223,7 +237,7 @@ describe('MainInteractivePrompt caret and slash arrows (phase 3)', () => {
     stdin.write('\x1b[D')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => f.includes('> /re')
+      (f) => f.includes('→ /re')
     )
 
     stdin.write('\x1b[B')
@@ -265,7 +279,7 @@ describe('MainInteractivePrompt Enter picks completion (phase 4)', () => {
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
       (f) =>
-        (f.split('\n')[0] ?? '').includes(
+        lineWithMainPrompt(f).includes(
           '/remove-access-token-completely <label>'
         )
     )
@@ -284,7 +298,7 @@ describe('MainInteractivePrompt Enter picks completion (phase 4)', () => {
     stdin.write('\r')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => (f.split('\n')[0] ?? '').includes('/remove-access-token <label>')
+      (f) => lineWithMainPrompt(f).includes('/remove-access-token <label>')
     )
     expect(onCommittedLine).not.toHaveBeenCalled()
   })
@@ -299,25 +313,25 @@ describe('MainInteractivePrompt user input history (↑↓ recall)', () => {
     stdin.write('alpha')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => (f.split('\n')[0] ?? '').includes('alpha')
+      (f) => lineWithMainPrompt(f).includes('alpha')
     )
     stdin.write('\r')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => !(f.split('\n')[0] ?? '').includes('alpha')
+      (f) => !lineWithMainPrompt(f).includes('alpha')
     )
     expect(onCommittedLine).toHaveBeenCalledWith('alpha')
 
     stdin.write('\x1b[A')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => (f.split('\n')[0] ?? '').includes('alpha')
+      (f) => lineWithMainPrompt(f).includes('alpha')
     )
 
     stdin.write('\x1b[B')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => !(f.split('\n')[0] ?? '').includes('alpha')
+      (f) => !lineWithMainPrompt(f).includes('alpha')
     )
   })
 
@@ -329,7 +343,7 @@ describe('MainInteractivePrompt user input history (↑↓ recall)', () => {
     stdin.write('memo\r')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => !(f.split('\n')[0] ?? '').includes('memo')
+      (f) => !lineWithMainPrompt(f).includes('memo')
     )
     expect(onCommittedLine).toHaveBeenCalledWith('memo')
 
@@ -341,21 +355,19 @@ describe('MainInteractivePrompt user input history (↑↓ recall)', () => {
     stdin.write('\x1b')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) =>
-        f.includes('/ commands') &&
-        (f.split('\n')[0] ?? '').trimEnd().endsWith('/he')
+      (f) => f.includes('/ commands') && mainPromptDraftAfterArrow(f) === '/he'
     )
 
     stdin.write('\x1b[D\x1b[D\x1b[D')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => (f.split('\n')[0] ?? '').includes('/he')
+      (f) => lineWithMainPrompt(f).includes('/he')
     )
 
     stdin.write('\x1b[A')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => (f.split('\n')[0] ?? '').includes('memo')
+      (f) => lineWithMainPrompt(f).includes('memo')
     )
   })
 
@@ -365,7 +377,7 @@ describe('MainInteractivePrompt user input history (↑↓ recall)', () => {
     stdin.write('z\r')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => !(f.split('\n')[0] ?? '').includes('z')
+      (f) => !lineWithMainPrompt(f).includes('z')
     )
 
     stdin.write('/re')
@@ -377,29 +389,27 @@ describe('MainInteractivePrompt user input history (↑↓ recall)', () => {
     stdin.write('\x1b')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) =>
-        f.includes('/ commands') &&
-        (f.split('\n')[0] ?? '').trimEnd().endsWith('/re')
+      (f) => f.includes('/ commands') && mainPromptDraftAfterArrow(f) === '/re'
     )
 
     stdin.write('\x1b[D\x1b[D\x1b[D')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => (f.split('\n')[0] ?? '').includes('/re')
+      (f) => lineWithMainPrompt(f).includes('/re')
     )
 
     stdin.write('\x1b[A')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => (f.split('\n')[0] ?? '').includes('z')
+      (f) => lineWithMainPrompt(f).includes('z')
     )
 
     stdin.write('\x1b[B')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
       (f) =>
-        (f.split('\n')[0] ?? '').includes('/re') &&
-        !(f.split('\n')[0] ?? '').includes('z') &&
+        lineWithMainPrompt(f).includes('/re') &&
+        !lineWithMainPrompt(f).includes('z') &&
         f.includes('/remove-access-token')
     )
   })
@@ -414,13 +424,13 @@ describe('MainInteractivePrompt user input history persistence (phase 4)', () =>
     stdin.write('first\r')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => !(f.split('\n')[0] ?? '').includes('first')
+      (f) => !lineWithMainPrompt(f).includes('first')
     )
 
     stdin.write('second\r')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => !(f.split('\n')[0] ?? '').includes('second')
+      (f) => !lineWithMainPrompt(f).includes('second')
     )
 
     const p = path.join(promptConfigDir, USER_INPUT_HISTORY_FILENAME)
@@ -439,7 +449,7 @@ describe('MainInteractivePrompt user input history persistence (phase 4)', () =>
     stdin.write('\x1b[A')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => (f.split('\n')[0] ?? '').includes('from-disk')
+      (f) => lineWithMainPrompt(f).includes('from-disk')
     )
   })
 
@@ -453,7 +463,7 @@ describe('MainInteractivePrompt user input history persistence (phase 4)', () =>
       stdin.write('no-file\r')
       await waitForFrames(
         () => stripAnsi(lastFrame() ?? ''),
-        (f) => !(f.split('\n')[0] ?? '').includes('no-file')
+        (f) => !lineWithMainPrompt(f).includes('no-file')
       )
 
       const p = path.join(promptConfigDir, USER_INPUT_HISTORY_FILENAME)
@@ -471,15 +481,18 @@ describe('MainInteractivePrompt Esc dismiss (phase 5)', () => {
     stdin.write('/')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => f.includes('> /')
+      (f) => f.includes('→ /')
     )
     stdin.write('\x1b')
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
-      (f) => !(f.split('\n')[0] ?? '').includes('/')
+      (f) => !lineWithMainPrompt(f).includes('/')
     )
-    const first = (stripAnsi(lastFrame() ?? '').split('\n')[0] ?? '').trimEnd()
-    expect(first).toBe('>')
+    const promptLine = lineWithMainPrompt(
+      stripAnsi(lastFrame() ?? '')
+    ).trimEnd()
+    expect(promptLine).toContain('→')
+    expect(promptLine).not.toContain('/')
   })
 
   test('Esc on /he with list hides list and keeps draft; typing restores list', async () => {
@@ -495,7 +508,7 @@ describe('MainInteractivePrompt Esc dismiss (phase 5)', () => {
       () => stripAnsi(lastFrame() ?? ''),
       (f) =>
         f.includes('/ commands') &&
-        (f.split('\n')[0] ?? '').trimEnd().endsWith('/he') &&
+        mainPromptDraftAfterArrow(f) === '/he' &&
         !f.includes('List available commands')
     )
 

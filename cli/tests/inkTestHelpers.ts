@@ -94,11 +94,16 @@ export function waitForLastFrame(
 export async function renderInkWhenCommandLineReady(element: ReactElement) {
   const result = render(element)
   result.stdin.write('|')
-  await waitForLastFrame(result.lastFrame, (f) => f.includes('> |'))
+  await waitForLastFrame(
+    result.lastFrame,
+    (f) => f.includes('→ |') || f.includes('> |')
+  )
   result.stdin.write('\x7f')
   await waitForLastFrame(
     result.lastFrame,
-    (f) => f.includes('> ') && !f.includes('> |')
+    (f) =>
+      (f.includes('→ ') && !f.includes('→ |')) ||
+      (f.includes('> ') && !f.includes('> |'))
   )
   return result
 }

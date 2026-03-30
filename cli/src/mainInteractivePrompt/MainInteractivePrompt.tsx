@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Key } from 'ink'
-import { Box, Text, useInput } from 'ink'
+import { Box, Text, useInput, useStdout } from 'ink'
 import { getConfigDir } from '../configDir.js'
 import {
   appendUserInputHistoryLine,
@@ -26,6 +26,8 @@ import {
   slashGuidanceForInk,
   visibleListRows,
 } from './slashCommandCompletion.js'
+
+const MAIN_PROMPT_PLACEHOLDER = '`exit` to quit.'
 
 export function MainInteractivePrompt({
   onCommittedLine,
@@ -332,6 +334,9 @@ export function MainInteractivePrompt({
 
   useInput(handleInput)
 
+  const { stdout } = useStdout()
+  const cols = stdout.columns > 0 ? stdout.columns : 80
+
   const listWindow =
     guidance.show === 'list'
       ? visibleListRows(guidance.rows, slashHighlightIndex)
@@ -346,12 +351,17 @@ export function MainInteractivePrompt({
 
   return (
     <Box flexDirection="column">
-      <Text>
-        {'> '}
-        {beforeCaret}
-        <Text inverse> </Text>
-        {afterCaret}
-      </Text>
+      <Box width={cols} borderStyle="single" borderColor="white">
+        <Text>
+          {'→ '}
+          {beforeCaret}
+          <Text inverse> </Text>
+          {afterCaret}
+          {buffer === '' ? (
+            <Text color="gray">{MAIN_PROMPT_PLACEHOLDER}</Text>
+          ) : null}
+        </Text>
+      </Box>
       {guidance.show === 'hint' ? (
         <Text>{DEFAULT_INTERACTIVE_GUIDANCE}</Text>
       ) : listWindow ? (

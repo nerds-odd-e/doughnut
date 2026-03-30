@@ -165,7 +165,7 @@ async function submitCommandAndExpectError(
     (c) =>
       c.includes(command) && c.includes(errorSnippet) && c.includes('\x1b[100m')
   )
-  await waitForLastFrame(lastFrame, (f) => f.includes('> '))
+  await waitForLastFrame(lastFrame, (f) => f.includes('→ '))
 }
 
 describe('InteractiveCliApp /add gmail (missing credentials)', () => {
@@ -223,13 +223,13 @@ describe('InteractiveCliApp /add gmail (mocked HTTP APIs)', () => {
       (f) =>
         f.includes('Connecting Gmail') &&
         f.includes('/add gmail') &&
-        !f.includes('> ')
+        !f.includes('→ ')
     )
     expect(parseOAuthLocalhostPort(oauthLog.get())).toBeDefined()
     await completeOAuthFromLog(oauthLog.get)
     await waitForLastFrame(
       lastFrame,
-      (f) => f.includes('Added account staged@test.com') && f.includes('> ')
+      (f) => f.includes('Added account staged@test.com') && f.includes('→ ')
     )
   })
 
@@ -240,7 +240,7 @@ describe('InteractiveCliApp /add gmail (mocked HTTP APIs)', () => {
     await submitAndCompleteOAuth(stdin, oauthLog.get)
     await waitForLastFrame(
       lastFrame,
-      (f) => f.includes(successLine) && f.includes('> ')
+      (f) => f.includes(successLine) && f.includes('→ ')
     )
     expectSuccessLineOnceInOutput(successLine, frames, lastFrame)
   })
@@ -258,13 +258,13 @@ describe('InteractiveCliApp /add gmail (mocked HTTP APIs)', () => {
       (f) =>
         f.includes('Connecting Gmail') &&
         f.includes('/add gmail') &&
-        !f.includes('> ')
+        !f.includes('→ ')
     )
 
     await pressEscapeAndWaitForCancelledLine(stdin, () => frames.join('\n'), {
       normalize: stripAnsi,
     })
-    await waitForLastFrame(lastFrame, (f) => f.includes('> '))
+    await waitForLastFrame(lastFrame, (f) => f.includes('→ '))
   })
 })
 
@@ -297,7 +297,7 @@ describe('InteractiveCliApp /last email (mocked HTTP APIs)', () => {
       (f) =>
         f.includes('Loading last email') &&
         f.includes('/last email') &&
-        !f.includes('> ')
+        !f.includes('→ ')
     )
     unmount()
   })
@@ -334,13 +334,13 @@ describe('InteractiveCliApp /last email (mocked HTTP APIs)', () => {
       (f) =>
         f.includes('Loading last email') &&
         f.includes('/last email') &&
-        !f.includes('> ')
+        !f.includes('→ ')
     )
 
     await pressEscapeAndWaitForCancelledLine(stdin, () => frames.join('\n'), {
       normalize: stripAnsi,
     })
-    await waitForLastFrame(lastFrame, (f) => f.includes('> '))
+    await waitForLastFrame(lastFrame, (f) => f.includes('→ '))
   })
 
   test('after last email completes: subject line once and main prompt returns', async () => {
@@ -370,7 +370,7 @@ describe('InteractiveCliApp /last email (mocked HTTP APIs)', () => {
     stdin.write('/last email\r')
     await waitForLastFrame(
       lastFrame,
-      (f) => f.includes(successLine) && f.includes('> ')
+      (f) => f.includes(successLine) && f.includes('→ ')
     )
     expectSuccessLineOnceInOutput(successLine, frames, lastFrame)
   })
