@@ -27,6 +27,15 @@ function slashRows(n: number) {
   }))
 }
 
+function expectMoreBelowLastWhenPresent(plain: string) {
+  if (!plain.includes(MORE_BELOW)) return
+  const lines = plain
+    .split('\n')
+    .map((l) => l.trimEnd())
+    .filter((l) => l.length > 0)
+  expect(lines[lines.length - 1]).toContain(MORE_BELOW)
+}
+
 describe('GuidanceListInk slash mode', () => {
   test('short list: all options, no scroll labels', () => {
     const rows = slashRows(3)
@@ -74,42 +83,7 @@ describe('GuidanceListInk slash mode', () => {
       .map((l) => l.trimEnd())
       .filter((l) => l.includes(MORE_BELOW) || l.includes('  /cmd'))
     expect(listLines).toHaveLength(ROW_BUDGET)
-  })
-
-  test('Phase 4 — when more below is shown it is the last guidance row (slash)', () => {
-    const rows = slashRows(11)
-    for (const highlightIndex of [0, 1, 2, 3, 4, 5]) {
-      const p = renderGuidancePlain({
-        mode: 'slash',
-        rows,
-        highlightIndex,
-      })
-      if (!p.includes(MORE_BELOW)) continue
-      const lines = p
-        .split('\n')
-        .map((l) => l.trimEnd())
-        .filter((l) => l.length > 0)
-      expect(lines[lines.length - 1]).toContain(MORE_BELOW)
-    }
-  })
-
-  test('Phase 4 — highlighted option sits above more below on first page (slash)', () => {
-    const rows = slashRows(11)
-    const p = renderGuidancePlain({
-      mode: 'slash',
-      rows,
-      highlightIndex: 2,
-    })
-    expect(p).toContain(MORE_BELOW)
-    const lines = p
-      .split('\n')
-      .map((l) => l.trimEnd())
-      .filter((l) => l.length > 0)
-    const idxCmd2 = lines.findIndex((l) => l.includes('/cmd2'))
-    const idxBelow = lines.findIndex((l) => l.includes(MORE_BELOW))
-    expect(idxCmd2).toBeGreaterThanOrEqual(0)
-    expect(idxBelow).toBeGreaterThan(idxCmd2)
-    expect(idxBelow).toBe(lines.length - 1)
+    expectMoreBelowLastWhenPresent(p)
   })
 
   test('overflow first page: highlight before bottom row keeps only bottom indicator', () => {
@@ -131,6 +105,7 @@ describe('GuidanceListInk slash mode', () => {
       .map((l) => l.trimEnd())
       .filter((l) => l.includes(MORE_BELOW) || l.includes('  /cmd'))
     expect(listLines).toHaveLength(ROW_BUDGET)
+    expectMoreBelowLastWhenPresent(p)
   })
 
   test('overflow: highlight on bottom of first page shows more above without scrolling options below', () => {
@@ -157,6 +132,7 @@ describe('GuidanceListInk slash mode', () => {
           l.includes('  /cmd')
       )
     expect(listLines).toHaveLength(ROW_BUDGET)
+    expectMoreBelowLastWhenPresent(p)
   })
 
   test('overflow: after first-page bottom, next index scrolls (shows deeper item)', () => {
@@ -177,6 +153,7 @@ describe('GuidanceListInk slash mode', () => {
           l.includes('  /cmd')
       )
     expect(listLines).toHaveLength(ROW_BUDGET)
+    expectMoreBelowLastWhenPresent(p)
   })
 
   test('mid highlight: both indicators; inner option count is budget − 2', () => {
@@ -194,6 +171,7 @@ describe('GuidanceListInk slash mode', () => {
       .filter((l) => l.includes('  /cmd'))
     expect(optionLines).toHaveLength(ROW_BUDGET - 2)
     expect(p).toContain('/cmd5')
+    expectMoreBelowLastWhenPresent(p)
   })
 
   test('highlight near end: top indicator, no bottom when window reaches end', () => {
@@ -294,6 +272,7 @@ describe('GuidanceListInk numbered mode', () => {
           /^\s{3}\S/.test(l)
       )
     expect(listLines.length).toBe(ROW_BUDGET)
+    expectMoreBelowLastWhenPresent(p)
   })
 
   test('long flat list: both indicators when window is in the middle', () => {
@@ -320,26 +299,7 @@ describe('GuidanceListInk numbered mode', () => {
           /^\d+\.\s+x$/.test(l.trim())
       )
     expect(numberedOrIndicator).toHaveLength(ROW_BUDGET)
-  })
-
-  test('Phase 4 — when more below is shown it is the last guidance row (numbered)', () => {
-    const many = Array.from({ length: 12 }, (_, i) => ({
-      itemIndex: i,
-      text: `${i + 1}. x`,
-    }))
-    for (const highlightItemIndex of [0, 1, 2, 3, 4, 5, 6]) {
-      const p = renderGuidancePlain({
-        mode: 'numbered',
-        lines: many,
-        highlightItemIndex,
-      })
-      if (!p.includes(MORE_BELOW)) continue
-      const lines = p
-        .split('\n')
-        .map((l) => l.trimEnd())
-        .filter((l) => l.length > 0)
-      expect(lines[lines.length - 1]).toContain(MORE_BELOW)
-    }
+    expectMoreBelowLastWhenPresent(p)
   })
 })
 
@@ -352,5 +312,6 @@ describe('GuidanceListInk scroll labels in output', () => {
     })
     expect(p).toContain(MORE_ABOVE)
     expect(p).toContain(MORE_BELOW)
+    expectMoreBelowLastWhenPresent(p)
   })
 })
