@@ -19,9 +19,21 @@ function runOnAnswer(fn: (yes: boolean) => void | Promise<void>, yes: boolean) {
   Promise.resolve(fn(yes)).catch(() => undefined)
 }
 
+function runOnCancel(fn: () => void | Promise<void>) {
+  Promise.resolve(fn()).catch(() => undefined)
+}
+
+function yesNoHint(defaultAnswer: boolean | undefined): string {
+  if (defaultAnswer === true) return '(Y/n)'
+  if (defaultAnswer === false) return '(y/N)'
+  return '(y/n)'
+}
+
 export type YesNoStagePromptProps = {
   prompt: string
   onAnswer: (yes: boolean) => void | Promise<void>
+  defaultAnswer?: boolean
+  onCancel?: () => void | Promise<void>
   inputBlockedRef?: MutableRefObject<boolean>
   header?: ReactNode
   belowBuffer?: ReactNode
@@ -30,6 +42,8 @@ export type YesNoStagePromptProps = {
 export function YesNoStagePrompt({
   prompt,
   onAnswer,
+  defaultAnswer,
+  onCancel,
   inputBlockedRef,
   header,
   belowBuffer,
@@ -41,9 +55,18 @@ export function YesNoStagePrompt({
   const onAnswerRef = useRef(onAnswer)
   onAnswerRef.current = onAnswer
 
+  const onCancelRef = useRef(onCancel)
+  onCancelRef.current = onCancel
+
   const handleInput = useCallback(
     (input: string, key: Key) => {
       if (inputBlockedRef?.current) return
+
+      const isEscape = key.escape === true || input === '\u001b'
+      if (isEscape && onCancelRef.current !== undefined) {
+        runOnCancel(onCancelRef.current)
+        return
+      }
 
       const tryCommit = () => {
         const line = normalizeCommittedLine(bufferRef.current)
@@ -54,6 +77,9 @@ export function YesNoStagePrompt({
         if (line === 'n' || line === 'N') {
           runOnAnswer(onAnswerRef.current, false)
           return
+        }
+        if (line === '' && defaultAnswer !== undefined) {
+          runOnAnswer(onAnswerRef.current, defaultAnswer)
         }
       }
 
@@ -90,7 +116,7 @@ export function YesNoStagePrompt({
       bufferRef.current = next
       setBuffer(next)
     },
-    [inputBlockedRef]
+    [inputBlockedRef, defaultAnswer]
   )
 
   useLayoutEffect(() => {
@@ -114,7 +140,9 @@ export function YesNoStagePrompt({
         <Text inverse> </Text>
       </Text>
       {belowBuffer}
-      <Text>{prompt} (y/n)</Text>
+      <Text>
+        {prompt} {yesNoHint(defaultAnswer)}
+      </Text>
     </Box>
   )
 }
