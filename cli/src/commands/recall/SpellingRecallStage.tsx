@@ -21,6 +21,7 @@ import {
   submitSpellingAnswer,
   type SpellingRecallSessionPayload,
 } from './recallSpellingLoad.js'
+import { normalizeSpellingLineForSubmit } from './spellingAnswerLine.js'
 
 const STAGE_LABEL = 'Recalling'
 
@@ -86,10 +87,7 @@ export function SpellingRecallStage({
 
   const runSpellSubmit = useCallback(async () => {
     if (loadState.status !== 'ready' || inputBlockedRef.current) return
-    const line = bufferRef.current
-      .replace(/\r\n/g, ' ')
-      .replace(/\n/g, ' ')
-      .trim()
+    const line = normalizeSpellingLineForSubmit(bufferRef.current)
     if (line === '') return
     inputBlockedRef.current = true
     try {
