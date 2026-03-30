@@ -95,17 +95,19 @@ Per **`.cursor/rules/planning.mdc`**: add/extend **one** failing **observable** 
 
 **External verification:** One **new or extended** interactive test: inline token + mock **`getTokenInfo`** that rejects on **`signal` abort** + Esc → **`Cancelled.`**; existing happy path still passes. If tests chain another slash command after add, introduce **`waitForMainInteractivePromptAfterAsyncStage`** (or equivalent probe) **in this phase** only if needed.
 
-**Implementation slice:** **`InteractiveSlashCommand`**: optional **`useStageWhenArgumentProvided`**; **`InteractiveSlashCommandStageProps`**: optional **`initialSlashArgument`**; **`InteractiveCliApp`**: mount **`stageComponent`** when that flag is set and the user provided a non-empty argument; **`AddAccessTokenStage`** + remove **`run`** from **`addAccessTokenSlashCommand`**. **Do not** change **`/remove-access-token-completely`** yet.
+**Implementation slice:** **`InteractiveSlashCommandStageProps`**: optional **`argument`** (parsed tail after the command word; trimmed in **`resolveInteractiveSlashCommand`**); **`InteractiveCliApp`**: when a command has **`stageComponent`**, always mount it and pass **`argument`** from the committed line; **`AddAccessTokenStage`** + remove **`run`** from **`addAccessTokenSlashCommand`** where applicable. **`MainInteractivePrompt`** **`isActive`** false while a stage is mounted. **Do not** change **`/remove-access-token-completely`** in this phase.
 
 ---
 
 ## Phase 6 — `/remove-access-token-completely <label>` inline → same spinner as picker
 
+**Done:** Inline label flows through **`InteractiveCliApp`** as **`argument`**; **`RemoveAccessTokenCompletelyPickerStage`** seeds **`revokeLabel`** from **`argument`** and uses the same **`AsyncAssistantFetchStage`** + **`removeAccessTokenCompletely(..., signal)`** as the picker path (no separate **`run()`** for revoke-completely).
+
 **User-visible outcome:** When the user types **`/remove-access-token-completely <label>`** (no picker), **Esc** during revoke shows **`Cancelled.`** (same as picker path).
 
-**External verification:** **`InteractiveCliApp`** + temp config + hung **`DELETE`** + inline label + Esc → **`Cancelled.`**
+**External verification:** Vitest **`cli/tests/InteractiveCliApp.removeAccessTokenCompletelyEsc.test.tsx`**: **`InteractiveCliApp`** + temp config + hung **`DELETE`** + inline label + Esc → **`Cancelled.`**
 
-**Implementation slice:** Set **`useStageWhenArgumentProvided`** on **`removeAccessTokenCompletelySlashCommand`**; **remove** the **`run()`** branch for inline revoke; **`RemoveAccessTokenCompletelyPickerStage`** reads **`initialSlashArgument`** (trimmed) to skip picker when set. Depends on **Phase 5** mount rule.
+**Implementation slice:** (Shipped with Phase 5-style mount + **`argument`** prop.) No extra flags on **`removeAccessTokenCompletelySlashCommand`** beyond **`stageComponent`**.
 
 ---
 
@@ -147,7 +149,7 @@ Per **`.cursor/rules/planning.mdc`**: add/extend **one** failing **observable** 
 | 3     | Gmail spinners                              | **`InteractiveCliApp.addGmail`**-style tests  |
 | 4     | **`/recall-status`** spinner + Esc (done)   | `InteractiveCliApp.recallStatus.test.tsx`     |
 | 5     | **`/add-access-token`** inline + mount rule | Interactive + **`getTokenInfo`** abort mock   |
-| 6     | Inline **`remove-access-token-completely`** | Interactive + hung DELETE + Esc               |
+| 6     | Inline **`remove-access-token-completely`** | `InteractiveCliApp.removeAccessTokenCompletelyEsc.test.tsx` |
 | 7     | **`/recall`** load + mark cancel           | Two interactive cases                         |
 | 8     | Audit + documented exceptions               | Tests only if new gaps                        |
 
