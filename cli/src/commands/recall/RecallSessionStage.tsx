@@ -6,12 +6,12 @@ import {
   useRef,
   useState,
   type MutableRefObject,
+  type ReactNode,
 } from 'react'
 import type { Key } from 'ink'
 import { Box, Text, useInput } from 'ink'
 import { Spinner } from '@inkjs/ui'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
-import { CliTranscriptAppendContext } from '../../cliTranscriptAppendContext.js'
 import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext.js'
 import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
@@ -27,10 +27,27 @@ import { recallSessionSummaryLine } from './recallSessionSummary.js'
 
 const STAGE_LABEL = 'Recalling'
 
+function RecallSessionChrome({
+  answeredLines,
+  children,
+}: {
+  readonly answeredLines: readonly string[]
+  readonly children: ReactNode
+}) {
+  return (
+    <Box flexDirection="column">
+      {answeredLines.map((line, i) => (
+        <Text key={`${i}-${line}`}>{line}</Text>
+      ))}
+      {children}
+    </Box>
+  )
+}
+
 export function RecallSessionStage({
   onSettled,
 }: InteractiveSlashCommandStageProps) {
-  const appendTranscript = useContext(CliTranscriptAppendContext)
+  const [answeredRecallLines, setAnsweredRecallLines] = useState<string[]>([])
   const [card, setCard] = useState<RecallCard | null>(null)
   const [uiMode, setUiMode] = useState<'card' | 'loadMore'>('card')
   const [initialResolved, setInitialResolved] = useState(false)
@@ -101,7 +118,7 @@ export function RecallSessionStage({
     try {
       const next = await loadNextRecallCardIfAny(0)
       if (next !== null) {
-        appendTranscript?.('Correct!')
+        setAnsweredRecallLines((prev) => [...prev, 'Correct!'])
         setCard(next)
         return
       }
@@ -109,7 +126,7 @@ export function RecallSessionStage({
     } catch (loadErr: unknown) {
       onSettled(userVisibleSlashCommandError(loadErr))
     }
-  }, [appendTranscript, onSettled])
+  }, [onSettled])
 
   const submitLoadMore = useCallback(
     async (accept: boolean) => {
@@ -252,72 +269,84 @@ export function RecallSessionStage({
 
   if (!initialResolved) {
     return (
-      <Box flexDirection="column">
-        <RecallSessionEscSpinner abortRef={activeOperationAbortRef} />
-        <Box>
-          <Spinner label="Loading recall…" />
+      <RecallSessionChrome answeredLines={answeredRecallLines}>
+        <Box flexDirection="column">
+          <RecallSessionEscSpinner abortRef={activeOperationAbortRef} />
+          <Box>
+            <Spinner label="Loading recall…" />
+          </Box>
         </Box>
-      </Box>
+      </RecallSessionChrome>
     )
   }
 
   if (uiMode === 'loadMore') {
     return (
-      <YesNoStagePrompt
-        key="load-more"
-        prompt="Load more from next 3 days?"
-        onAnswer={submitLoadMore}
-        defaultAnswer={true}
-        onCancel={escapeLoadMorePrompt}
-        inputBlockedRef={submittingRef}
-        header={<Text>{STAGE_LABEL}</Text>}
-      />
+      <RecallSessionChrome answeredLines={answeredRecallLines}>
+        <YesNoStagePrompt
+          key="load-more"
+          prompt="Load more from next 3 days?"
+          onAnswer={submitLoadMore}
+          defaultAnswer={true}
+          onCancel={escapeLoadMorePrompt}
+          inputBlockedRef={submittingRef}
+          header={<Text>{STAGE_LABEL}</Text>}
+        />
+      </RecallSessionChrome>
     )
   }
 
   if (card === null) {
     return (
-      <Box flexDirection="column">
-        <RecallSessionEscSpinner abortRef={activeOperationAbortRef} />
-        <Box>
-          <Spinner label="Loading recall…" />
+      <RecallSessionChrome answeredLines={answeredRecallLines}>
+        <Box flexDirection="column">
+          <RecallSessionEscSpinner abortRef={activeOperationAbortRef} />
+          <Box>
+            <Spinner label="Loading recall…" />
+          </Box>
         </Box>
-      </Box>
+      </RecallSessionChrome>
     )
   }
 
   if (card.variant === 'mcq') {
     return (
-      <RecallMcqStage
-        key={card.payload.recallPromptId}
-        onSettled={onSettled}
-        payload={card.payload}
-        inputBlockedRef={submittingRef}
-        onMcqSucceeded={onMcqSucceeded}
-      />
+      <RecallSessionChrome answeredLines={answeredRecallLines}>
+        <RecallMcqStage
+          key={card.payload.recallPromptId}
+          onSettled={onSettled}
+          payload={card.payload}
+          inputBlockedRef={submittingRef}
+          onMcqSucceeded={onMcqSucceeded}
+        />
+      </RecallSessionChrome>
     )
   }
 
   if (card.variant === 'spelling-session') {
     return (
-      <SpellingRecallStage
-        key={card.payload.memoryTrackerId}
-        onSettled={onSettled}
-        payload={card.payload}
-        inputBlockedRef={submittingRef}
-        onSpellingSessionComplete={onSpellingSessionComplete}
-      />
+      <RecallSessionChrome answeredLines={answeredRecallLines}>
+        <SpellingRecallStage
+          key={card.payload.memoryTrackerId}
+          onSettled={onSettled}
+          payload={card.payload}
+          inputBlockedRef={submittingRef}
+          onSpellingSessionComplete={onSpellingSessionComplete}
+        />
+      </RecallSessionChrome>
     )
   }
 
   return (
-    <JustReviewRecallCard
-      key={card.payload.memoryTrackerId}
-      payload={card.payload}
-      onAnswer={submitJustReview}
-      onCancel={escapeJustReviewCard}
-      inputBlockedRef={submittingRef}
-    />
+    <RecallSessionChrome answeredLines={answeredRecallLines}>
+      <JustReviewRecallCard
+        key={card.payload.memoryTrackerId}
+        payload={card.payload}
+        onAnswer={submitJustReview}
+        onCancel={escapeJustReviewCard}
+        inputBlockedRef={submittingRef}
+      />
+    </RecallSessionChrome>
   )
 }
 

@@ -13,7 +13,6 @@ import { PastUserMessageBlock } from './pastUserMessageBlock.js'
 import { userVisibleSlashCommandError } from './userVisibleSlashCommandError.js'
 import type { StageKeyHandler } from './commands/accessToken/stageKeyForwardContext.js'
 import { SetStageKeyHandlerContext } from './commands/accessToken/stageKeyForwardContext.js'
-import { CliTranscriptAppendContext } from './cliTranscriptAppendContext.js'
 
 export function InteractiveCliApp() {
   const { exit } = useApp()
@@ -38,16 +37,12 @@ export function InteractiveCliApp() {
   useEffect(() => {
     if (!exitAfterCommit) return
     exit()
-  }, [exitAfterCommit, exit])
+  }, [exit, exitAfterCommit])
 
   const handleAsyncSlashSettled = useCallback((assistantText: string) => {
     setMessages((prev) => [...prev, { role: 'assistant', text: assistantText }])
     setActiveStageComponent(null)
     stageArgumentRef.current = undefined
-  }, [])
-
-  const appendTranscriptLine = useCallback((assistantText: string) => {
-    setMessages((prev) => [...prev, { role: 'assistant', text: assistantText }])
   }, [])
 
   const onCommittedLine = useCallback((line: string) => {
@@ -124,29 +119,27 @@ export function InteractiveCliApp() {
   }, [])
 
   return (
-    <CliTranscriptAppendContext.Provider value={appendTranscriptLine}>
-      <SetStageKeyHandlerContext.Provider value={setStageKeyHandler}>
-        <Box flexDirection="column">
-          {messages.map((item, index) =>
-            item.role === 'user' ? (
-              <PastUserMessageBlock key={index} text={item.text} />
-            ) : (
-              <Text key={index}>{item.text}</Text>
-            )
-          )}
-          {activeStageComponent &&
-            createElement(activeStageComponent, {
-              argument: stageArgumentRef.current,
-              onSettled: handleAsyncSlashSettled,
-            })}
-          {!exitAfterCommit && (
-            <MainInteractivePrompt
-              onCommittedLine={onCommittedLine}
-              isActive={!activeStageComponent}
-            />
-          )}
-        </Box>
-      </SetStageKeyHandlerContext.Provider>
-    </CliTranscriptAppendContext.Provider>
+    <SetStageKeyHandlerContext.Provider value={setStageKeyHandler}>
+      <Box flexDirection="column">
+        {messages.map((item, index) =>
+          item.role === 'user' ? (
+            <PastUserMessageBlock key={index} text={item.text} />
+          ) : (
+            <Text key={index}>{item.text}</Text>
+          )
+        )}
+        {activeStageComponent &&
+          createElement(activeStageComponent, {
+            argument: stageArgumentRef.current,
+            onSettled: handleAsyncSlashSettled,
+          })}
+        {!exitAfterCommit && (
+          <MainInteractivePrompt
+            onCommittedLine={onCommittedLine}
+            isActive={!activeStageComponent}
+          />
+        )}
+      </Box>
+    </SetStageKeyHandlerContext.Provider>
   )
 }
