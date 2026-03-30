@@ -52,6 +52,18 @@ export function InteractiveCliApp() {
       setMessages((prev) => [...prev, { role: 'user', text: line }])
       const Stage = command.stageComponent
       if (Stage) {
+        const argumentMissing = argument === undefined || argument === ''
+        const argSpec = command.argument
+        if (argSpec !== undefined && argumentMissing && !argSpec.optional) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: 'assistant',
+              text: `Missing ${argSpec.name}. Usage: ${command.doc.usage}`,
+            },
+          ])
+          return
+        }
         stageArgumentRef.current = argument
         // setState(fn) treats fn as updater; bare `Stage` would be called with prior state as props.
         setActiveStageComponent(() => Stage)

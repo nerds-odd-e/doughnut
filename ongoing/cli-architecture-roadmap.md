@@ -105,9 +105,11 @@ Architectural direction:
 - while an async action is in progress, the user should be able to cancel via **Escape** where appropriate
 - cancellation should be treated as part of the interaction contract, not as a late implementation detail
 
-Open design concern for later implementation:
+**Interactive slash commands — Esc and network (current audit):**
 
-- define clearly which operations are cancellable at the UI layer only and which support real cancellation propagation to the underlying task or network request
+- **Backend work behind `AsyncAssistantFetchStage` or recall stages** passes **`AbortSignal`** where the SDK supports it; **Esc** during those waits shows **`Cancelled.`** (mapped from **`AbortError`**).
+- **No long network wait:** **`/help`** (synchronous copy), **`/exit`** (immediate bye), **label pickers** that only read or mutate local config (**`/remove-access-token`**, **`/list-access-token`** list UI) until the user confirms an action that hits the network.
+- **`run()`-only commands** in **`InteractiveCliApp`** should stay limited to the above; new slow API work should use a **stage** with **`AbortSignal`**, not **`Promise.resolve(run(…))`**.
 
 ---
 

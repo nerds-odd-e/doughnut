@@ -1,8 +1,8 @@
-import { addAccessToken } from './accessToken.js'
 import type {
   CommandDoc,
   InteractiveSlashCommand,
 } from '../interactiveSlashCommand.js'
+import { AddAccessTokenStage } from './AddAccessTokenStage.js'
 
 const addAccessTokenDoc: CommandDoc = {
   name: '/add-access-token',
@@ -16,8 +16,5 @@ export const addAccessTokenSlashCommand: InteractiveSlashCommand = {
   line: PREFIX,
   doc: addAccessTokenDoc,
   argument: { name: 'access token', optional: false },
-  async run(argument) {
-    await addAccessToken(argument!)
-    return { assistantMessage: 'Token added successfully' }
-  },
+  stageComponent: AddAccessTokenStage,
 }

@@ -7,6 +7,7 @@ import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { formatVersionOutput } from '../src/commands/version.js'
 import {
   pressEscapeAndWait,
+  pressEscapeAndWaitForCancelledLine,
   renderInkWhenCommandLineReady,
   waitForFrames,
 } from './inkTestHelpers.js'
@@ -89,6 +90,39 @@ describe('InteractiveCliApp /add-access-token', () => {
       () => frames.join('\n'),
       (c) => c.includes('Access token is invalid or expired')
     )
+
+    expect(fs.existsSync(path.join(configDir, 'access-tokens.json'))).toBe(
+      false
+    )
+  })
+
+  test('Esc during verify shows Cancelled when getTokenInfo honors AbortSignal', async () => {
+    getTokenInfoSpy.mockImplementation((_opts?: { signal?: AbortSignal }) => {
+      return new Promise((_, reject) => {
+        const signal = _opts?.signal
+        if (signal?.aborted) {
+          reject(new DOMException('The operation was aborted', 'AbortError'))
+          return
+        }
+        const onAbort = () => {
+          signal?.removeEventListener('abort', onAbort)
+          reject(new DOMException('The operation was aborted', 'AbortError'))
+        }
+        signal?.addEventListener('abort', onAbort, { once: true })
+      })
+    })
+
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/add-access-token unit-test-token-value\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => c.includes('Verifying token')
+    )
+
+    await pressEscapeAndWaitForCancelledLine(stdin, () => frames.join('\n'))
 
     expect(fs.existsSync(path.join(configDir, 'access-tokens.json'))).toBe(
       false
