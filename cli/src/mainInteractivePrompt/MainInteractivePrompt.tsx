@@ -344,7 +344,7 @@ export function MainInteractivePrompt({
   }
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" marginTop={1}>
       <Box width={cols} borderStyle="single" borderColor="white">
         <Text>
           {'→ '}

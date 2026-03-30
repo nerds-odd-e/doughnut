@@ -121,12 +121,15 @@ export function InteractiveCliApp() {
   return (
     <SetStageKeyHandlerContext.Provider value={setStageKeyHandler}>
       <Box flexDirection="column">
-        {messages.map((item, index) =>
-          item.role === 'user' ? (
-            <PastUserMessageBlock key={index} text={item.text} />
-          ) : (
-            <Text key={index}>{item.text}</Text>
-          )
+        {messages.flatMap((item, index) =>
+          item.role === 'user'
+            ? [
+                <PastUserMessageBlock key={index} text={item.text} />,
+                ...(messages[index + 1]?.role === 'assistant'
+                  ? [<Box key={`${index}-gap`} height={1} />]
+                  : []),
+              ]
+            : [<Text key={index}>{item.text}</Text>]
         )}
         {activeStageComponent &&
           createElement(activeStageComponent, {
