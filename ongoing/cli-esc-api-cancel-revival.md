@@ -79,6 +79,8 @@ Per **`.cursor/rules/planning.mdc`**: add/extend **one** failing **observable** 
 
 ## Phase 4 — `/recall-status`: spinner + Esc (no direct `run()` async)
 
+**Done:** `RecallStatusStage` + `AsyncAssistantFetchStage` in [`cli/src/commands/recallStatus.tsx`](../cli/src/commands/recallStatus.tsx); Vitest [`cli/tests/InteractiveCliApp.recallStatus.test.tsx`](../cli/tests/InteractiveCliApp.recallStatus.test.tsx).
+
 **User-visible outcome:** **`/recall-status`** shows a **loading** state; **Esc** during the fetch shows **`Cancelled.`**; success still shows the due-count line as today.
 
 **External verification:** **`InteractiveCliApp`**: **`/recall-status`** + **`RecallsController.recalling`** mock that **hangs until `signal` abort** + Esc → transcript **`Cancelled.`** (separate test case: fast mock still shows **`N notes…`**).
@@ -143,7 +145,7 @@ Per **`.cursor/rules/planning.mdc`**: add/extend **one** failing **observable** 
 | 1     | Esc on **`AsyncAssistantFetchStage`**       | Harness / app frame + **`Cancelled.`**        |
 | 2     | Revoke picker passes **`signal`**           | Hung HTTP + Esc                               |
 | 3     | Gmail spinners                              | **`InteractiveCliApp.addGmail`**-style tests  |
-| 4     | **`/recall-status`** spinner + Esc          | Interactive + abort-aware **`recalling`** mock |
+| 4     | **`/recall-status`** spinner + Esc (done)   | `InteractiveCliApp.recallStatus.test.tsx`     |
 | 5     | **`/add-access-token`** inline + mount rule | Interactive + **`getTokenInfo`** abort mock   |
 | 6     | Inline **`remove-access-token-completely`** | Interactive + hung DELETE + Esc               |
 | 7     | **`/recall`** load + mark cancel           | Two interactive cases                         |

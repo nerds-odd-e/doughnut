@@ -3,9 +3,11 @@ import {
   doughnutSdkOptions,
   runDefaultBackendJson,
 } from '../backendApi/doughnutBackendClient.js'
+import { AsyncAssistantFetchStage } from './gmail/AsyncAssistantFetchStage.js'
 import type {
   CommandDoc,
   InteractiveSlashCommand,
+  InteractiveSlashCommandStageProps,
 } from './interactiveSlashCommand.js'
 import { dueRecallQuery } from './recall/dueRecallQuery.js'
 
@@ -23,6 +25,16 @@ export async function recallStatus(signal?: AbortSignal): Promise<string> {
   return `${count} notes to recall today`
 }
 
+function RecallStatusStage({ onSettled }: InteractiveSlashCommandStageProps) {
+  return (
+    <AsyncAssistantFetchStage
+      spinnerLabel="Loading recall status…"
+      runAssistantMessage={(signal) => recallStatus(signal)}
+      onSettled={onSettled}
+    />
+  )
+}
+
 const recallStatusDoc: CommandDoc = {
   name: '/recall-status',
   usage: '/recall-status',
@@ -32,8 +44,5 @@ const recallStatusDoc: CommandDoc = {
 export const recallStatusSlashCommand: InteractiveSlashCommand = {
   line: '/recall-status',
   doc: recallStatusDoc,
-  async run() {
-    const assistantMessage = await recallStatus()
-    return { assistantMessage }
-  },
+  stageComponent: RecallStatusStage,
 }
