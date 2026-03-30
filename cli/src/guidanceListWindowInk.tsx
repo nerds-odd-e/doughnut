@@ -8,7 +8,6 @@ import { Box, Text } from 'ink'
 import {
   formatSlashGuidanceUsageCell,
   slashGuidanceUsageColumnWidth,
-  slashGuidanceUsageWiderThanCap,
 } from './mainInteractivePrompt/slashCommandCompletion.js'
 import type { NumberedTerminalListLine } from './terminalColumns.js'
 
@@ -193,6 +192,7 @@ function SlashGuidanceListInk({
   }
 
   const gutter = '  '
+  const usageDescGap = '  '
 
   return display.map((row, i) => {
     if (row.kind === 'moreAbove') {
@@ -213,20 +213,19 @@ function SlashGuidanceListInk({
     }
     const hi = row.sourceIndex === highlightIndex
     const usageCell = formatSlashGuidanceUsageCell(row.usage, usageColWidth)
-    const wideUsage = slashGuidanceUsageWiderThanCap(row.usage)
     return (
       <Box key={`g-${row.usage}-${row.sourceIndex}`} flexDirection="row">
         <Text>{gutter}</Text>
         {hi ? (
           <>
             <Text inverse>{usageCell}</Text>
-            {wideUsage ? <Text inverse> </Text> : null}
+            <Text inverse>{usageDescGap}</Text>
             <Text inverse>{row.description}</Text>
           </>
         ) : (
           <>
             <Text color="gray">{usageCell}</Text>
-            {wideUsage ? <Text color="gray"> </Text> : null}
+            <Text color="gray">{usageDescGap}</Text>
             <Text color="gray">{row.description}</Text>
           </>
         )}

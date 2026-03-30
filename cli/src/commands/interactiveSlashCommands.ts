@@ -20,8 +20,8 @@ export const interactiveSlashCommands: readonly InteractiveSlashCommand[] = [
   removeAccessTokenCompletelySlashCommand,
   addGmailSlashCommand,
   lastEmailSlashCommand,
-  recallStatusSlashCommand,
   recallSlashCommand,
+  recallStatusSlashCommand,
   exitSlashCommand,
 ]
 
