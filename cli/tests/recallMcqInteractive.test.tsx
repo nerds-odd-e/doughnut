@@ -34,8 +34,8 @@ describe('recall MCQ (interactive)', () => {
   function pendingMcqPrompt(): RecallPrompt {
     return makeMe.aRecallPrompt
       .withId(RECALL_PROMPT_ID)
-      .withQuestionStem('Stem question?')
-      .withChoices(['First', 'Second', 'Third'])
+      .withQuestionStem('Choose **Alpha**?')
+      .withChoices(['First', '**Beta**', 'Third'])
       .withMemoryTrackerId(1)
       .please()
   }
@@ -116,10 +116,14 @@ describe('recall MCQ (interactive)', () => {
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
       (p) =>
-        p.includes('Stem question?') &&
-        p.includes('2. Second') &&
+        p.includes('Choose') &&
+        p.includes('Alpha') &&
+        !p.includes('**') &&
+        p.includes('Beta') &&
         p.includes('↑↓ Enter or number to select')
     )
+
+    expect(frames.join('\n')).toContain('\u001b[')
 
     stdin.write('2\r')
 

@@ -13,14 +13,12 @@ import {
   choiceIndexFromSelectListSubmitLine,
   handleSelectListInkKey,
 } from '../../interactions/selectListInteraction.js'
-import {
-  numberedTerminalListLines,
-  resolvedTerminalWidth,
-  wrapPlainTextLinesForTerminal,
-} from '../../terminalColumns.js'
+import { resolvedTerminalWidth } from '../../terminalColumns.js'
+import { renderMarkdownToTerminal } from '../../markdown.js'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
 import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
+import { numberedMcqMarkdownLinesForTerminal } from './numberedMcqMarkdownLines.js'
 import { submitMcqAnswer, type RecallMcqCardPayload } from './recallMcqLoad.js'
 
 const STAGE_LABEL = 'Recalling'
@@ -43,13 +41,17 @@ export function RecallMcqStage({
   const [highlightIndex, setHighlightIndex] = useState(0)
 
   const width = resolvedTerminalWidth()
-  const stemLines = useMemo(
-    () => wrapPlainTextLinesForTerminal(payload.stem, width),
+  const stemRendered = useMemo(
+    () => renderMarkdownToTerminal(payload.stem, width),
     [payload.stem, width]
+  )
+  const stemLines = useMemo(
+    () => (stemRendered.length > 0 ? stemRendered.split('\n') : []),
+    [stemRendered]
   )
   const choices = payload.choices
   const listLines = useMemo(
-    () => numberedTerminalListLines(choices, width),
+    () => numberedMcqMarkdownLinesForTerminal(choices, width),
     [choices, width]
   )
 

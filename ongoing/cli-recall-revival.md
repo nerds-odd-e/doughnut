@@ -1,6 +1,6 @@
 # CLI recall revival (plan only)
 
-**Status:** Phase 1 complete (recall status). Phase 2.1 complete (Just Review E2E un-ignored + bold guidance assertion). Phase 2.2 complete (`/recall` just-review stage, PTY rows 48 for stable guidance replay). Phase 2.3 complete (just-review edge Vitest: invalid y/n commits, empty title/details + no notebook line). Phase 5.1 complete (full *Recall session* scenario un-ignored; `I answer … to prompt …` waits on Current guidance). Phase 5.3 complete (empty load-more after two recalls + `recallSessionSummaryLine` unit tests). **Next:** Phases 3–4 (Temp1 / Temp2) before Phase 5.2. Phases 5.2–10 still ahead; this file stays high-level planning, not a step-by-step implementation spec.  
+**Status:** Phase 1 complete (recall status). Phase 2.1 complete (Just Review E2E un-ignored + bold guidance assertion). Phase 2.2 complete (`/recall` just-review stage, PTY rows 48 for stable guidance replay). Phase 2.3 complete (just-review edge Vitest: invalid y/n commits, empty title/details + no notebook line). Phase 5.1 complete (full *Recall session* scenario un-ignored; `I answer … to prompt …` waits on Current guidance). Phase 5.3 complete (empty load-more after two recalls + `recallSessionSummaryLine` unit tests). Phase 6.4 complete (MCQ stem and choices through `renderMarkdownToTerminal`; `numberedMcqMarkdownLinesForTerminal`; Vitest in `recallMcqInteractive.test.tsx`). **Next:** Phases 3–4 (Temp1 / Temp2) before Phase 5.2. Remaining: 5.2, 6.1–6.3, 7–10 as applicable; this file stays high-level planning, not a step-by-step implementation spec.  
 **Goal:** Restore behaviors in `e2e_test/features/cli/cli_recall.feature` with **observable E2E coverage**, **minimal dead code**, and **architecture that does not repeat the pre-removal shape** (heavy global mutable recall state and recall orchestration embedded in `interactive.ts`).
 
 **Guidance:** `.cursor/rules/planning.mdc`, `.cursor/rules/cli.mdc`, `ongoing/cli-architecture-roadmap.md` — prefer **Ink/React composition and stage-local state**, **thin Cucumber steps**, **centralized terminal assertions**, and **reuse of shared API client code** (`doughnut-api` / existing backend client helpers). Challenge big abstractions until repetition justifies them.
@@ -147,7 +147,7 @@ Recent removals (around **2026-03-28**) show what existed before strip-down; use
 - **Wrong answer path:** Unit or Vitest for messaging if not covered by later scenarios.
 - **Choice ordering / shuffling:** If API can shuffle, unit-test mapping from index to choice id — only if needed for MCQ correctness.
 
-### Phase 6.4 — MCQ stem and choices: markdown on the TTY
+### Phase 6.4 — MCQ stem and choices: markdown on the TTY — **complete**
 
 **User outcome:** MCQ **stem** and **choice strings** from the API are treated as **markdown** (same assumption as note details / web recall): render through the existing terminal markdown path (e.g. **`renderMarkdownToTerminal`** in `cli/src/markdown.ts`), with **bold / emphasis** and other supported styles visible in **Current guidance**; no raw `**` / `_` markers left for learners when the source is markdown.
 
@@ -155,6 +155,8 @@ Recent removals (around **2026-03-28**) show what existed before strip-down; use
 - **Selection UI:** Numbered list + ↑↓ highlight must stay correct: each choice remains one logical option after render (handle multi-line markdown output per choice without breaking index → `choiceIndex` mapping).
 - **E2E / tests:** Add or extend a **scenario or Vitest** only if a **user-visible** styling or stripped-text assertion is needed (e.g. **`… styled in the Current guidance`** pattern from Phase 2); otherwise keep existing MCQ happy-path green.
 - **Order:** Can ship **after** Phase 6.2 (and optionally after 6.3); does not unblock Phase 7–9.
+
+**Done:** `cli/src/commands/recall/RecallMcqStage.tsx` — stem lines from `renderMarkdownToTerminal`; choices via `numberedMcqMarkdownLinesForTerminal` in `cli/src/commands/recall/numberedMcqMarkdownLines.ts` (per-choice wrap width from `stringWidth` of the `N. ` prefix). `cli/tests/recallMcqInteractive.test.tsx` — markdown in stem/choice, stripped output has no literal `**`, raw output includes CSI for styling.
 
 ---
 
