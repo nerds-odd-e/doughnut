@@ -57,6 +57,21 @@ function eraseLineTo(grid: string[][], row: number, col: number): void {
   for (let c = 0; c <= col; c++) r[c] = ' '
 }
 
+function scrollUpOneRow(grid: string[][], rows: number, cols: number): void {
+  for (let r = 0; r < rows - 1; r++) {
+    const dest = grid[r]
+    const src = grid[r + 1]
+    if (!(dest && src)) continue
+    for (let c = 0; c < cols; c++) {
+      dest[c] = src[c] ?? ' '
+    }
+  }
+  const bottom = grid[rows - 1]
+  if (bottom) {
+    for (let c = 0; c < cols; c++) bottom[c] = ' '
+  }
+}
+
 function eraseDisplay(
   grid: string[][],
   mode: number,
@@ -94,6 +109,15 @@ export function ptyTranscriptToVisiblePlaintext(
   let col = 0
   const saved: { row: number; col: number }[] = []
 
+  const advanceRowOrScroll = (): void => {
+    if (row < rows - 1) {
+      row++
+    } else {
+      scrollUpOneRow(grid, rows, cols)
+    }
+    col = 0
+  }
+
   const writeChar = (ch: string): void => {
     if (ch === '\u0007') return
     const code = ch.charCodeAt(0)
@@ -110,7 +134,11 @@ export function ptyTranscriptToVisiblePlaintext(
     col++
     if (col >= cols) {
       col = 0
-      row = clampRow(row + 1, rows)
+      if (row < rows - 1) {
+        row++
+      } else {
+        scrollUpOneRow(grid, rows, cols)
+      }
     }
   }
 
@@ -240,8 +268,7 @@ export function ptyTranscriptToVisiblePlaintext(
       continue
     }
     if (ch === '\n') {
-      row = clampRow(row + 1, rows)
-      col = 0
+      advanceRowOrScroll()
       i++
       continue
     }
