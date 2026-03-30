@@ -36,6 +36,21 @@ function expectMoreBelowLastWhenPresent(plain: string) {
   expect(lines[lines.length - 1]).toContain(MORE_BELOW)
 }
 
+function expectBothScrollIndicatorsBracketOptions(plain: string) {
+  if (!(plain.includes(MORE_ABOVE) && plain.includes(MORE_BELOW))) return
+  const lines = plain
+    .split('\n')
+    .map((l) => l.trimEnd())
+    .filter((l) => l.length > 0)
+  expect(lines).toHaveLength(ROW_BUDGET)
+  expect(lines[0]).toContain(MORE_ABOVE)
+  expect(lines[lines.length - 1]).toContain(MORE_BELOW)
+  for (const mid of lines.slice(1, -1)) {
+    expect(mid).not.toContain(MORE_ABOVE)
+    expect(mid).not.toContain(MORE_BELOW)
+  }
+}
+
 describe('GuidanceListInk slash mode', () => {
   test('short list: all options, no scroll labels', () => {
     const rows = slashRows(3)
@@ -133,6 +148,7 @@ describe('GuidanceListInk slash mode', () => {
       )
     expect(listLines).toHaveLength(ROW_BUDGET)
     expectMoreBelowLastWhenPresent(p)
+    expectBothScrollIndicatorsBracketOptions(p)
   })
 
   test('overflow: after first-page bottom, next index scrolls (shows deeper item)', () => {
@@ -154,24 +170,56 @@ describe('GuidanceListInk slash mode', () => {
       )
     expect(listLines).toHaveLength(ROW_BUDGET)
     expectMoreBelowLastWhenPresent(p)
+    expectBothScrollIndicatorsBracketOptions(p)
   })
 
-  test('mid highlight: both indicators; inner option count is budget − 2', () => {
-    const rows = slashRows(11)
-    const p = renderGuidancePlain({
+  test('mid and deep highlight: both indicators bracket options; budget fixed', () => {
+    const rows11 = slashRows(11)
+    const pMid = renderGuidancePlain({
       mode: 'slash',
-      rows,
+      rows: rows11,
       highlightIndex: 5,
     })
-    expect(p).toContain(MORE_ABOVE)
-    expect(p).toContain(MORE_BELOW)
-    const optionLines = p
+    expect(pMid).toContain(MORE_ABOVE)
+    expect(pMid).toContain(MORE_BELOW)
+    const optionLinesMid = pMid
       .split('\n')
       .map((l) => l.trimEnd())
       .filter((l) => l.includes('  /cmd'))
-    expect(optionLines).toHaveLength(ROW_BUDGET - 2)
-    expect(p).toContain('/cmd5')
-    expectMoreBelowLastWhenPresent(p)
+    expect(optionLinesMid).toHaveLength(ROW_BUDGET - 2)
+    expect(pMid).toContain('/cmd5')
+    expectMoreBelowLastWhenPresent(pMid)
+    expectBothScrollIndicatorsBracketOptions(pMid)
+
+    const rows20 = slashRows(20)
+    const pDeep = renderGuidancePlain({
+      mode: 'slash',
+      rows: rows20,
+      highlightIndex: 12,
+    })
+    expect(pDeep).toContain(MORE_ABOVE)
+    expect(pDeep).toContain(MORE_BELOW)
+    expect(pDeep).toContain('/cmd12')
+    const optionLinesDeep = pDeep
+      .split('\n')
+      .map((l) => l.trimEnd())
+      .filter((l) => l.includes('  /cmd'))
+    expect(optionLinesDeep).toHaveLength(ROW_BUDGET - 2)
+    expectMoreBelowLastWhenPresent(pDeep)
+    expectBothScrollIndicatorsBracketOptions(pDeep)
+
+    const pStep = renderGuidancePlain({
+      mode: 'slash',
+      rows: rows20,
+      highlightIndex: 11,
+    })
+    expectBothScrollIndicatorsBracketOptions(pStep)
+    const minSlashCmd = (plain: string) =>
+      Math.min(
+        ...[...plain.matchAll(/ {2}\/cmd(\d+)\b/g)].map((m) => Number(m[1]))
+      )
+    expect(minSlashCmd(pStep)).toBe(10)
+    expect(minSlashCmd(pDeep)).toBe(11)
   })
 
   test('highlight near end: top indicator, no bottom when window reaches end', () => {
@@ -300,6 +348,49 @@ describe('GuidanceListInk numbered mode', () => {
       )
     expect(numberedOrIndicator).toHaveLength(ROW_BUDGET)
     expectMoreBelowLastWhenPresent(p)
+    expectBothScrollIndicatorsBracketOptions(p)
+
+    const manyLong = Array.from({ length: 20 }, (_, i) => ({
+      itemIndex: i,
+      text: `${i + 1}. x`,
+    }))
+    const pDeep = renderGuidancePlain({
+      mode: 'numbered',
+      lines: manyLong,
+      highlightItemIndex: 12,
+    })
+    expect(pDeep).toContain(MORE_ABOVE)
+    expect(pDeep).toContain(MORE_BELOW)
+    expect(pDeep).toContain('13. x')
+    const numberedDeep = pDeep
+      .split('\n')
+      .map((l) => l.trimEnd())
+      .filter(
+        (l) =>
+          l.includes(MORE_ABOVE) ||
+          l.includes(MORE_BELOW) ||
+          /^\d+\.\s+x$/.test(l.trim())
+      )
+    expect(numberedDeep).toHaveLength(ROW_BUDGET)
+    expectMoreBelowLastWhenPresent(pDeep)
+    expectBothScrollIndicatorsBracketOptions(pDeep)
+
+    const pNumStep = renderGuidancePlain({
+      mode: 'numbered',
+      lines: manyLong,
+      highlightItemIndex: 11,
+    })
+    expectBothScrollIndicatorsBracketOptions(pNumStep)
+    const minListedChoice = (plain: string) =>
+      Math.min(
+        ...plain
+          .split('\n')
+          .map((l) => l.trim())
+          .filter((l) => /^\d+\.\s+x$/.test(l))
+          .map((l) => Number(/^(\d+)/.exec(l)![1]))
+      )
+    expect(minListedChoice(pNumStep)).toBe(11)
+    expect(minListedChoice(pDeep)).toBe(12)
   })
 })
 
@@ -313,5 +404,6 @@ describe('GuidanceListInk scroll labels in output', () => {
     expect(p).toContain(MORE_ABOVE)
     expect(p).toContain(MORE_BELOW)
     expectMoreBelowLastWhenPresent(p)
+    expectBothScrollIndicatorsBracketOptions(p)
   })
 })

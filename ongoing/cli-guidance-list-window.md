@@ -80,6 +80,8 @@ Each phase below has the same **subphases**:
 
 **Subphases:** Manual check → TDD if missing.
 
+**Done:** `layoutWindowedLineSlice` generic branch already uses `c = budget − t − b` and centered `innerStart` with clamping, so both indicators imply `contentRows = budget − 2` and total rows = budget. Vitest: `expectBothScrollIndicatorsBracketOptions` (first row = more above, last = more below, middle lines contain no indicator copy, exactly `ROW_BUDGET` lines) runs on every slash/numbered case that already shows both arrows; mid + deep highlights on 11- and 20-row slash lists and 12-/20-line numbered lists assert highlighted item visible with `budget − 2` option rows; one-step highlight 11→12 checks the top visible choice advances by one (minimum scroll). See [`cli/tests/guidanceListWindowInk.test.tsx`](../cli/tests/guidanceListWindowInk.test.tsx).
+
 ---
 
 ## Phase 6 — Truncate with ellipsis (slash + token); no line wrapping for those lists
