@@ -15,25 +15,19 @@ import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext
 import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import {
-  doughnutSdkOptions,
-  runDefaultBackendJson,
-} from '../../backendApi/doughnutBackendClient.js'
-import { MemoryTrackerController, type RecallPrompt } from 'doughnut-api'
-import {
   loadNextRecallCardIfAny,
   type RecallCard,
 } from './nextRecallCardLoad.js'
-import { markJustReviewRecalled } from './justReviewLoad.js'
+import { markMemoryTrackerRecalled } from './markMemoryTrackerRecalled.js'
 import { JustReviewRecallCard } from './JustReviewRecallCard.js'
 import { RecallMcqStage } from './RecallMcqStage.js'
-import { RecallSpellingStage } from './RecallSpellingStage.js'
+import { SpellingRecallStage } from './SpellingRecallStage.js'
 import { recallSessionSummaryLine } from './recallSessionSummary.js'
 
 const STAGE_LABEL = 'Recalling'
 
 export function RecallSessionStage({
   onSettled,
-  onAssistantLine,
 }: InteractiveSlashCommandStageProps) {
   const [card, setCard] = useState<RecallCard | null>(null)
   const [uiMode, setUiMode] = useState<'card' | 'loadMore'>('card')
@@ -100,12 +94,11 @@ export function RecallSessionStage({
     }
   }, [onSettled])
 
-  const onSpellingSucceeded = useCallback(async () => {
+  const onSpellingSessionComplete = useCallback(async () => {
     successfulRecallsRef.current += 1
     try {
       const next = await loadNextRecallCardIfAny(0)
       if (next !== null) {
-        onAssistantLine?.('Correct!')
         setCard(next)
         return
       }
@@ -113,7 +106,7 @@ export function RecallSessionStage({
     } catch (loadErr: unknown) {
       onSettled(userVisibleSlashCommandError(loadErr))
     }
-  }, [onAssistantLine, onSettled])
+  }, [onSettled])
 
   const submitLoadMore = useCallback(
     async (accept: boolean) => {
@@ -167,55 +160,11 @@ export function RecallSessionStage({
       submittingRef.current = true
       const p = c.payload
       try {
-        if (successful && p.spellingPhaseAfterReview) {
-          const prompt = await runDefaultBackendJson<RecallPrompt>(() =>
-            MemoryTrackerController.askAQuestion({
-              path: { memoryTracker: p.memoryTrackerId },
-              ...doughnutSdkOptions(ac.signal),
-            })
-          )
-          submittingRef.current = false
-          if (activeOperationAbortRef.current === ac) {
-            activeOperationAbortRef.current = null
-          }
-          if (ac.signal.aborted) {
-            onSettled(
-              userVisibleSlashCommandError(
-                new DOMException('Aborted', 'AbortError')
-              )
-            )
-            return
-          }
-          if (prompt.questionType !== 'SPELLING') {
-            onSettled(
-              userVisibleSlashCommandError(
-                new Error('Expected a spelling recall prompt from the server.')
-              )
-            )
-            return
-          }
-          const recallPromptId = prompt.id
-          if (recallPromptId === undefined) {
-            onSettled(
-              userVisibleSlashCommandError(
-                new Error('Spelling recall prompt has no id.')
-              )
-            )
-            return
-          }
-          setCard({
-            variant: 'spelling',
-            payload: {
-              memoryTrackerId: p.memoryTrackerId,
-              recallPromptId,
-              stemMarkdown: prompt.spellingQuestion?.stem ?? '',
-              notebookTitle: p.notebookTitle,
-            },
-          })
-          return
-        }
-
-        await markJustReviewRecalled(p.memoryTrackerId, successful, ac.signal)
+        await markMemoryTrackerRecalled(
+          p.memoryTrackerId,
+          successful,
+          ac.signal
+        )
       } catch (err: unknown) {
         submittingRef.current = false
         if (activeOperationAbortRef.current === ac) {
@@ -346,14 +295,14 @@ export function RecallSessionStage({
     )
   }
 
-  if (card.variant === 'spelling') {
+  if (card.variant === 'spelling-session') {
     return (
-      <RecallSpellingStage
-        key={card.payload.recallPromptId}
+      <SpellingRecallStage
+        key={card.payload.memoryTrackerId}
         onSettled={onSettled}
         payload={card.payload}
         inputBlockedRef={submittingRef}
-        onSpellingSucceeded={onSpellingSucceeded}
+        onSpellingSessionComplete={onSpellingSessionComplete}
       />
     )
   }

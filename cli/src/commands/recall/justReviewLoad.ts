@@ -1,17 +1,11 @@
-import { MemoryTrackerController, type MemoryTracker } from 'doughnut-api'
-import {
-  doughnutSdkOptions,
-  runDefaultBackendJson,
-} from '../../backendApi/doughnutBackendClient.js'
+import type { MemoryTracker } from 'doughnut-api'
 
-/** Just-review recall card (no multiple-choice question). */
+/** Just-review recall card (fallback when MCQ is not available). */
 export type RecallJustReviewPayload = {
   readonly memoryTrackerId: number
   readonly noteTitle: string
   readonly detailsMarkdown: string
   readonly notebookTitle?: string
-  /** Spelling memory tracker: after “yes”, show spelling prompt before marking recalled. */
-  readonly spellingPhaseAfterReview?: boolean
 }
 
 export function recallJustReviewPayloadFromMemoryTracker(
@@ -27,18 +21,4 @@ export function recallJustReviewPayloadFromMemoryTracker(
     detailsMarkdown,
     notebookTitle,
   }
-}
-
-export async function markJustReviewRecalled(
-  memoryTrackerId: number,
-  successful: boolean,
-  signal?: AbortSignal
-): Promise<void> {
-  await runDefaultBackendJson(() =>
-    MemoryTrackerController.markAsRecalled({
-      path: { memoryTracker: memoryTrackerId },
-      query: { successful },
-      ...doughnutSdkOptions(signal),
-    })
-  )
 }

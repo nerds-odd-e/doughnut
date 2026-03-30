@@ -18,7 +18,7 @@ import {
   tryLoadMcqPayload,
   type RecallMcqCardPayload,
 } from './recallMcqLoad.js'
-import type { RecallSpellingCardPayload } from './recallSpellingLoad.js'
+import type { SpellingRecallSessionPayload } from './recallSpellingLoad.js'
 
 export type RecallCard =
   | {
@@ -27,11 +27,11 @@ export type RecallCard =
     }
   | { readonly variant: 'mcq'; readonly payload: RecallMcqCardPayload }
   | {
-      readonly variant: 'spelling'
-      readonly payload: RecallSpellingCardPayload
+      readonly variant: 'spelling-session'
+      readonly payload: SpellingRecallSessionPayload
     }
 
-/** Next due recall card (MCQ or just-review), or `null` when nothing is due in that window. */
+/** Next due recall card (MCQ, just-review fallback, or spelling session), or `null` when nothing is due. */
 export async function loadNextRecallCardIfAny(
   dueInDays = 0,
   signal?: AbortSignal
@@ -63,14 +63,26 @@ export async function loadNextRecallCardIfAny(
   const note = mt.note
   const notebookTitle = note?.noteTopology?.notebookTitle?.trim()
 
+  if (mt.spelling) {
+    const jr = recallJustReviewPayloadFromMemoryTracker(mt)
+    return {
+      variant: 'spelling-session',
+      payload: {
+        memoryTrackerId: jr.memoryTrackerId,
+        noteTitle: jr.noteTitle,
+        detailsMarkdown: jr.detailsMarkdown,
+        notebookTitle: jr.notebookTitle,
+      },
+    }
+  }
+
   const mcqPayload = await tryLoadMcqPayload(id, notebookTitle, prompts, signal)
   if (mcqPayload !== null) {
     return { variant: 'mcq', payload: mcqPayload }
   }
 
-  const jr = recallJustReviewPayloadFromMemoryTracker(mt)
   return {
     variant: 'just-review',
-    payload: mt.spelling ? { ...jr, spellingPhaseAfterReview: true } : jr,
+    payload: recallJustReviewPayloadFromMemoryTracker(mt),
   }
 }
