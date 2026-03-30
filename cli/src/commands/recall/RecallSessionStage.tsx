@@ -262,6 +262,7 @@ export function RecallSessionStage({
     onSettled(RECALL_SESSION_STOPPED_LINE)
   }, [onSettled])
 
+  /** Load-more prompt: Esc = decline load more (same as n → session summary), or abort in-flight fetch — not LeaveRecallConfirmPrompt. */
   const escapeLoadMorePrompt = useCallback(() => {
     if (submittingRef.current) {
       activeOperationAbortRef.current?.abort()
