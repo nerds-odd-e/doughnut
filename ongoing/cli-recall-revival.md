@@ -1,6 +1,6 @@
 # CLI recall revival (plan only)
 
-**Status:** Phase 1 complete (recall status). Phase 2.1 complete (Just Review E2E un-ignored + bold guidance assertion). Phase 2.2 complete (`/recall` just-review stage, PTY rows 48 for stable guidance replay). Phase 2.3 complete (just-review edge Vitest: invalid y/n commits, empty title/details + no notebook line). Phase 5.1 complete (full *Recall session* scenario un-ignored; `I answer … to prompt …` waits on Current guidance). **Next:** Phases 3–4 (Temp1 / Temp2) before Phase 5.2. Phases 5.2–10 still ahead; this file stays high-level planning, not a step-by-step implementation spec.  
+**Status:** Phase 1 complete (recall status). Phase 2.1 complete (Just Review E2E un-ignored + bold guidance assertion). Phase 2.2 complete (`/recall` just-review stage, PTY rows 48 for stable guidance replay). Phase 2.3 complete (just-review edge Vitest: invalid y/n commits, empty title/details + no notebook line). Phase 5.1 complete (full *Recall session* scenario un-ignored; `I answer … to prompt …` waits on Current guidance). Phase 5.3 complete (empty load-more after two recalls + `recallSessionSummaryLine` unit tests). **Next:** Phases 3–4 (Temp1 / Temp2) before Phase 5.2. Phases 5.2–10 still ahead; this file stays high-level planning, not a step-by-step implementation spec.  
 **Goal:** Restore behaviors in `e2e_test/features/cli/cli_recall.feature` with **observable E2E coverage**, **minimal dead code**, and **architecture that does not repeat the pre-removal shape** (heavy global mutable recall state and recall orchestration embedded in `interactive.ts`).
 
 **Guidance:** `.cursor/rules/planning.mdc`, `.cursor/rules/cli.mdc`, `ongoing/cli-architecture-roadmap.md` — prefer **Ink/React composition and stage-local state**, **thin Cucumber steps**, **centralized terminal assertions**, and **reuse of shared API client code** (`doughnut-api` / existing backend client helpers). Challenge big abstractions until repetition justifies them.
@@ -121,10 +121,10 @@ Recent removals (around **2026-03-28**) show what existed before strip-down; use
 - Complete the **full** session flow Phases 3–4 do not cover alone: plural summary **Recalled 2 notes**, second `/recall`, **y** on load more, and continued just-review through **Recalled successfully**.
 - **Load more** with `dueindays` (or equivalent API parameter) and any remaining session teardown; reuse the same session abstractions as Temp1/Temp2.
 
-### Phase 5.3 — Edge cases (scenario scope only)
+### Phase 5.3 — Edge cases (scenario scope only) — **complete**
 
-- **Load more when nothing left:** Unit-level behavior if API returns empty; do not duplicate MCQ/stop flows.
-- **Session summary wording:** Edge pluralization unit tests if not E2E-covered.
+- **Load more when nothing left:** `recallJustReviewInteractive.test.tsx` — empty extended window after one recall (`Recalled 1 note`) and after two recalls (`Recalled 2 notes`); no MCQ/stop duplication.
+- **Session summary wording:** `recallSessionSummary.test.ts` for `recallSessionSummaryLine` (0 / 1 / 2 / 10); formatter lives in `cli/src/commands/recall/recallSessionSummary.ts`.
 
 ---
 

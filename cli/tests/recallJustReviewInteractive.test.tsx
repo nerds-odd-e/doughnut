@@ -230,6 +230,43 @@ describe('recall just-review (interactive)', () => {
     expect(markAsRecalledCount.n).toBe(1)
   })
 
+  test('load more y with empty extended window after two recalls → Recalled 2 notes', async () => {
+    setupTwoDueJustReviewItemsMocks()
+    const markAsRecalledCount = mockMarkAsRecalledCounting()
+
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        stripAnsi(c).includes('Yes, I remember?') &&
+        stripAnsi(c).includes('Alpha')
+    )
+
+    stdin.write('y\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        stripAnsi(c).includes('Yes, I remember?') &&
+        stripAnsi(c).includes('Beta')
+    )
+
+    stdin.write('y\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => stripAnsi(c).includes('Load more from next 3 days?')
+    )
+    stdin.write('y\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => stripAnsi(c).includes('Recalled 2 notes')
+    )
+    expect(markAsRecalledCount.n).toBe(2)
+  })
+
   test('load more n does not call recalling with dueindays 3', async () => {
     const dueindaysSeen: number[] = []
     recallingSpy.mockImplementation(

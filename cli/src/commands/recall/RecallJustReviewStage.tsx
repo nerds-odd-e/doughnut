@@ -11,14 +11,9 @@ import {
   markJustReviewRecalled,
   type RecallJustReviewPayload,
 } from './justReviewLoad.js'
+import { recallSessionSummaryLine } from './recallSessionSummary.js'
 
 const STAGE_LABEL = 'Recalling'
-
-function sessionSummaryLine(successfulRecalls: number): string {
-  return successfulRecalls === 1
-    ? 'Recalled 1 note'
-    : `Recalled ${successfulRecalls} notes`
-}
 
 export function RecallJustReviewStage({
   onSettled,
@@ -60,7 +55,7 @@ export function RecallJustReviewStage({
   }, [onSettled])
 
   const settleSessionSummary = useCallback(() => {
-    onSettled(sessionSummaryLine(successfulRecallsRef.current))
+    onSettled(recallSessionSummaryLine(successfulRecallsRef.current))
   }, [onSettled])
 
   const submitLoadMore = useCallback(
