@@ -54,6 +54,25 @@ function layoutWindowedLineSlice(
     }
   }
   const focus = Math.max(0, Math.min(focusLineIndex, lineCount - 1))
+  if (budget >= 3) {
+    const lastLineOfFirstPage = budget - 2
+    if (focus < lastLineOfFirstPage) {
+      return {
+        innerStart: 0,
+        contentRows: budget - 1,
+        showTop: false,
+        showBottom: true,
+      }
+    }
+    if (focus === lastLineOfFirstPage) {
+      return {
+        innerStart: 1,
+        contentRows: budget - 2,
+        showTop: true,
+        showBottom: true,
+      }
+    }
+  }
   for (const showTop of [false, true] as const) {
     for (const showBottom of [false, true] as const) {
       const t = showTop ? 1 : 0

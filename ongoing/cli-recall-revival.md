@@ -1,6 +1,6 @@
 # CLI recall revival (plan only)
 
-**Status:** Phase 1 complete (recall status). Phase 2.1 complete (Just Review E2E un-ignored + bold guidance assertion). Phase 2.2 complete (`/recall` just-review stage, PTY rows 48 for stable guidance replay). Phase 2.3 complete (just-review edge Vitest: invalid y/n commits, empty title/details + no notebook line). Phase 5.1 complete (full *Recall session* scenario un-ignored; `I answer … to prompt …` waits on Current guidance). Phase 5.3 complete (empty load-more after two recalls + `recallSessionSummaryLine` unit tests). Phase 6.4 complete (MCQ stem and choices through `renderMarkdownToTerminal`; `numberedMcqMarkdownLinesForTerminal`; Vitest in `recallMcqInteractive.test.tsx`). Phase 7.1–7.2 complete (**MCQ only** — Esc → leave confirm). Phase 7 **scope expanded**: 7.3+ align **just-review** Esc (today conflated with “not recalled”), optional 7.4 **spelling** after Phase 10, 7.5 cohesion, 7.6 load-more semantics, 7.7 edges — see §Phase 7. Phase **10.1–10.3** complete (spelling recall E2E; spell-first `SpellingRecallStage`; mid-session **Correct!** in `RecallSessionStage` answered-lines strip above the active card; due-list tie-break `IFNULL(spelling,0) DESC`; spelling edges Vitest in `recallSpellingInteractive.test.tsx` + `spellingAnswerLine.test.ts`). **Next:** Phases 3–4 (Temp1 / Temp2) before Phase 5.2. Remaining: 5.2, 6.1–6.3, 7.3–7.7, 8–9, as applicable; this file stays high-level planning, not a step-by-step implementation spec.  
+**Status:** Phase 1 complete (recall status). Phase 2.1 complete (Just Review E2E un-ignored + bold guidance assertion). Phase 2.2 complete (`/recall` just-review stage, PTY rows 48 for stable guidance replay). Phase 2.3 complete (just-review edge Vitest: invalid y/n commits, empty title/details + no notebook line). Phase 5.1 complete (full *Recall session* scenario un-ignored; `I answer … to prompt …` waits on Current guidance). Phase 5.3 complete (empty load-more after two recalls + `recallSessionSummaryLine` unit tests). Phase 6.4 complete (MCQ stem and choices through `renderMarkdownToTerminal`; `numberedMcqMarkdownLinesForTerminal`; Vitest in `recallMcqInteractive.test.tsx`). Phase 7.1–7.2 complete (**MCQ only** — Esc → leave confirm). Phase 7 **scope expanded**: 7.3+ align **just-review** Esc (today conflated with “not recalled”); **7.4 spelling Esc** is **unblocked** now that Phase **10** spelling exists (`SpellingRecallStage`); then 7.5 cohesion, 7.6 load-more semantics, 7.7 edges — see §Phase 7. Phase **10.1–10.3** complete (spelling recall E2E; spell-first `SpellingRecallStage`; mid-session **Correct!** in `RecallSessionStage` answered-lines strip above the active card; due-list tie-break `IFNULL(spelling,0) DESC`; spelling edges Vitest in `recallSpellingInteractive.test.tsx` + `spellingAnswerLine.test.ts`). **Next:** Phases 3–4 (Temp1 / Temp2) before Phase 5.2. Remaining: 5.2, 6.1–6.3, 7.3–7.7, 8–9, as applicable; this file stays high-level planning, not a step-by-step implementation spec.  
 **Goal:** Restore behaviors in `e2e_test/features/cli/cli_recall.feature` with **observable E2E coverage**, **minimal dead code**, and **architecture that does not repeat the pre-removal shape** (heavy global mutable recall state and recall orchestration embedded in `interactive.ts`).
 
 **Guidance:** `.cursor/rules/planning.mdc`, `.cursor/rules/cli.mdc`, `ongoing/cli-architecture-roadmap.md` — prefer **Ink/React composition and stage-local state**, **thin Cucumber steps**, **centralized terminal assertions**, and **reuse of shared API client code** (`doughnut-api` / existing backend client helpers). Challenge big abstractions until repetition justifies them.
@@ -162,7 +162,9 @@ Recent removals (around **2026-03-28**) show what existed before strip-down; use
 
 ## Phase 7 — Leave recall from **any** recall card: **Esc** + y/n confirm (**Vitest**, no `cli_recall.feature` scenario)
 
-**User outcome:** While **`/recall`** is showing **any** active recall card (today: **just-review** and **MCQ**; later: **spelling** and any new types), **Escape** means “leave recall” (end the recall **session**), not “answer the question.” The CLI shows the **same** **y/n confirmation** (shared copy intent: leave vs stay); **y** ends the recall session with a clear **assistant-visible** outcome (e.g. **`Recall session stopped.`** — same product intent as the old `the recall session was stopped` step, but **not** exercised via Cypress). **n** returns to the **same** question UI. **Do not** use **`/stop`** as the primary user action for this flow.
+**User outcome:** While **`/recall`** is showing **any** active recall card (**just-review**, **MCQ**, and **spelling** — spelling via **`SpellingRecallStage`** / `spell-first` session branch), **Escape** means “leave recall” (end the recall **session**), not “answer the question.” The CLI shows the **same** **y/n confirmation** (shared copy intent: leave vs stay); **y** ends the recall session with a clear **assistant-visible** outcome (e.g. **`Recall session stopped.`** — same product intent as the old `the recall session was stopped` step, but **not** exercised via Cypress). **n** returns to the **same** question UI. **Do not** use **`/stop`** as the primary user action for this flow.
+
+**Spelling note:** Phase **10** delivers the spelling **card** and submit path; **Esc → leave confirm** on that card is **still Phase 7.4** (not part of 10.x).
 
 **Coverage:** **Unit-test driven** — extend or add **`cli/tests/*.test.tsx`** driving **`InteractiveCliApp`** with **`vi.spyOn`** on **`doughnut-api`** controllers (`cli.mdc` observable-behavior pattern). No new or restored Gherkin scenario in **`e2e_test/features/cli/cli_recall.feature`** for Phase 7 unless the team later chooses to add one.
 
@@ -190,18 +192,21 @@ Recent removals (around **2026-03-28**) show what existed before strip-down; use
 
 - **Product check:** **`n`** on **Yes, I remember?** remains **not recalled** (existing behavior); only **Esc** gains the leave-session path.
 
-### Phase 7.4 — Spelling (future): same Esc contract (**Vitest**, after Phase 10 card exists)
+### Phase 7.4 — Spelling: same Esc contract (**Vitest**)
 
-**User outcome:** When a **spelling** recall card is implemented, **Esc** → same leave confirm; **y** → shared stop line; **n** → back to spelling prompt; **no** spelling-submit API on abort-only path.
+**User outcome:** On the **spelling** recall card (**`SpellingRecallStage`**), **Esc** → same leave confirm as MCQ; **y** → shared stop line (`Recall session stopped.` or shared constant); **n** → back to spelling prompt (stem + **`Spell:`** + command buffer); **no** **`answerSpelling`** / premature submit on abort-only path.
 
-- **7.4.1** Vitest red: Esc / y / n + spy assertions analogous to MCQ (**no** premature submit).
-- **7.4.2** Implement using the same pattern as 7.2 / 7.3.2 (reuse shared helper or duplicated thin substage — see 7.5).
+**Prerequisite:** Phase **10** spelling card is **implemented** — this phase only adds **leave-session** UX, not spelling fetch/submit.
 
-*Until spelling exists, this subphase stays planning-only; no production code required.*
+- **7.4.1 Vitest fails for the right reason** — From spelling prompt (after question loaded), **Esc** shows **`Leave recall?`** + **`(y/n)`**; **`RecallPromptController.answerSpelling`** not called until the user commits Enter on a non-empty answer (or however submit is defined). After **Esc** then **y**, transcript shows shared stop line. Failures cite **wrong API call** or **missing confirm**, not generic recall.
 
-### Phase 7.5 — Cohesion (optional, after 7.3.2)
+- **7.4.2 Pass with minimum production change** — Mirror **7.2**: stage-local **`showLeaveConfirm`** (or equivalent) + **`YesNoStagePrompt`** inside **`SpellingRecallStage`**, or session-level wiring from **`RecallSessionStage`** if that stays smaller than duplicating MCQ. Reuse **`SetStageKeyHandlerContext`** / Esc handling pattern already used for spelling input. **n** on leave confirm → resume spelling UI with stable buffer.
 
-If **three** near-identical “leave confirm” blocks appear (MCQ, just-review, spelling), extract a **minimal** shared piece: e.g. shared **copy constants** (`LEAVE_RECALL_PROMPT`, **`RECALL_SESSION_STOPPED_LINE`**), or a tiny **`LeaveRecallConfirmPrompt`** wrapper around **`YesNoStagePrompt`**, **without** inventing a heavy recall framework. Challenge per **`cli-architecture-roadmap.md`** — extract only when repetition is real.
+- **Product check:** Wrong spelling / **`Incorrect.`** path (Phase **10.3**) is unchanged; leave confirm is only for **Esc** while the spelling card is active.
+
+### Phase 7.5 — Cohesion (optional, after 7.3.2 + 7.4.2)
+
+If **three** near-identical “leave confirm” blocks appear (**MCQ**, **just-review**, **spelling**), extract a **minimal** shared piece: e.g. shared **copy constants** (`LEAVE_RECALL_PROMPT`, shared **`Recall session stopped.`** line — today file-local in **`RecallMcqStage`**), or a tiny **`LeaveRecallConfirmPrompt`** wrapper around **`YesNoStagePrompt`**, **without** inventing a heavy recall framework. Challenge per **`cli-architecture-roadmap.md`** — extract only when repetition is real. **Order:** Prefer shipping **7.3** and **7.4** with acceptable duplication first; run **7.5** only when all three cards exist with leave confirm.
 
 ### Phase 7.6 — Load-more and session chrome
 
@@ -210,12 +215,15 @@ If **three** near-identical “leave confirm” blocks appear (MCQ, just-review,
 ### Phase 7.7 — Edge cases (Vitest scope)
 
 - **MCQ:** **n** on leave confirm → back to MCQ with stable highlight/buffer (may already be covered by 7.1–7.2).
-- **Just-review / spelling:** **n** on leave confirm → stable buffer / no duplicate prompts.
+- **Just-review:** **n** on leave confirm → stable y/n prompt / no duplicate lines (covered when **7.3** ships).
+- **Spelling:** **n** on leave confirm → stable spelling buffer / stem (covered when **7.4** ships).
 - Invalid keys during leave confirm — only if not already covered by **`YesNoStagePrompt`** tests.
 
 ---
 
 ## Phase 8 — Scenario: *Recall MCQ — down arrow and Enter to select*
+
+**Scope:** **MCQ recall only** — numbered choices in **current guidance** (`RecallMcqStage`). **Spelling** recall uses **typed text** on the command line (`SpellingRecallStage`); it does **not** use the MCQ ↑↓ list, so Phase **8** does **not** apply to spelling cards and needs **no** spelling-specific E2E or Vitest unless shared list primitives are refactored (unlikely).
 
 **User outcome:** Down-arrow moves selection; Enter submits **incorrect** choice; still ends with “Incorrect” (or equivalent) and “Recalled successfully” per feature.
 
@@ -236,6 +244,8 @@ If **three** near-identical “leave confirm” blocks appear (MCQ, just-review,
 ---
 
 ## Phase 9 — Scenario: *Recall MCQ — contest and regenerate before answering*
+
+**Scope:** **MCQ recall only** — **`/contest`** in the feature file is tied to **OpenAI-mocked MCQ** stems and **`RecallMcqStage`**. **Spelling** flow in `cli_recall.feature` (Phase **10** rule block) has **no** contest step; contest-on-spelling is **out of scope** for Phase **9** unless product adds a scenario later.
 
 **User outcome:** First question shown; `/contest` triggers legitimacy evaluation + regeneration; second stem appears; answer `1` → success messages.
 
@@ -311,4 +321,4 @@ flowchart LR
   P2 --> P10
 ```
 
-Phases 8–9 depend on MCQ (Phase 6). **Phase 7** (Esc + y/n leave recall) is **Vitest-only** — no node in `cli_recall.feature`; **7.1–7.2** are MCQ-only and **complete**; **7.3+** extend the same UX to **just-review** and (when built) **spelling**, and optional cohesion (**7.5**) / load-more semantics (**7.6**). **Phase 6.4** refines MCQ presentation (markdown stem/choices); it does not add a new top-level scenario node. Phase 10 can proceed in parallel with Phases 3–9 after Phase 2 if resourcing splits, but **sequential delivery** per scenario order is the default; **Phase 7.4** trails the spelling card from Phase 10.
+Phases **8–9** depend on **MCQ** (Phase 6) and do **not** gate on spelling. **Phase 7** (Esc + y/n leave recall) is **Vitest-only** — no node in `cli_recall.feature`; **7.1–7.2** are MCQ-only and **complete**; **7.3** (just-review) and **7.4** (spelling) extend the same UX; **7.4** is **unblocked** because Phase **10** spelling exists — implement after **7.3** or in parallel if teams split work. Optional cohesion (**7.5**) / load-more semantics (**7.6**). **Phase 6.4** refines MCQ presentation (markdown stem/choices); it does not add a new top-level scenario node. Phase **10** is **complete** (10.1–10.3); remaining revival work on **Esc** for spelling is **7.4**, not 10.x.

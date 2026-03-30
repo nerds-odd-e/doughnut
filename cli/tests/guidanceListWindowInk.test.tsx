@@ -76,6 +76,73 @@ describe('GuidanceListInk slash mode', () => {
     expect(listLines).toHaveLength(ROW_BUDGET)
   })
 
+  test('overflow first page: highlight before bottom row keeps only bottom indicator', () => {
+    const rows = slashRows(11)
+    const p = renderGuidancePlain({
+      mode: 'slash',
+      rows,
+      highlightIndex: 2,
+    })
+    expect(p).not.toContain(MORE_ABOVE)
+    expect(p).toContain(MORE_BELOW)
+    expect(p).toContain('/cmd0')
+    expect(p).toContain('/cmd1')
+    expect(p).toContain('/cmd2')
+    expect(p).toContain('/cmd3')
+    expect(p).not.toContain('/cmd4')
+    const listLines = p
+      .split('\n')
+      .map((l) => l.trimEnd())
+      .filter((l) => l.includes(MORE_BELOW) || l.includes('  /cmd'))
+    expect(listLines).toHaveLength(ROW_BUDGET)
+  })
+
+  test('overflow: highlight on bottom of first page shows more above without scrolling options below', () => {
+    const rows = slashRows(11)
+    const p = renderGuidancePlain({
+      mode: 'slash',
+      rows,
+      highlightIndex: 3,
+    })
+    expect(p).toContain(MORE_ABOVE)
+    expect(p).toContain(MORE_BELOW)
+    expect(p).not.toMatch(/ {2}\/cmd0\b/)
+    expect(p).toContain('/cmd1')
+    expect(p).toContain('/cmd2')
+    expect(p).toContain('/cmd3')
+    expect(p).not.toContain('/cmd4')
+    const listLines = p
+      .split('\n')
+      .map((l) => l.trimEnd())
+      .filter(
+        (l) =>
+          l.includes(MORE_ABOVE) ||
+          l.includes(MORE_BELOW) ||
+          l.includes('  /cmd')
+      )
+    expect(listLines).toHaveLength(ROW_BUDGET)
+  })
+
+  test('overflow: after first-page bottom, next index scrolls (shows deeper item)', () => {
+    const rows = slashRows(11)
+    const p = renderGuidancePlain({
+      mode: 'slash',
+      rows,
+      highlightIndex: 4,
+    })
+    expect(p).toContain('/cmd4')
+    const listLines = p
+      .split('\n')
+      .map((l) => l.trimEnd())
+      .filter(
+        (l) =>
+          l.includes(MORE_ABOVE) ||
+          l.includes(MORE_BELOW) ||
+          l.includes('  /cmd')
+      )
+    expect(listLines).toHaveLength(ROW_BUDGET)
+  })
+
   test('mid highlight: both indicators; inner option count is budget − 2', () => {
     const rows = slashRows(11)
     const p = renderGuidancePlain({

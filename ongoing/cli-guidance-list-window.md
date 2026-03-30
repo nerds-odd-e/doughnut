@@ -60,6 +60,8 @@ Each phase below has the same **subphases**:
 
 **Tests:** Assert frame/stdout sequence for specific highlight indices (no fixed `setTimeout`; drive Ink until observable text matches—see `cli.mdc`).
 
+**Done:** First-page branch + bottom-of-first-page layout in `layoutWindowedLineSlice` in [`cli/src/guidanceListWindowInk.tsx`](../cli/src/guidanceListWindowInk.tsx). Vitest: slash overflow highlights 2–4 in [`cli/tests/guidanceListWindowInk.test.tsx`](../cli/tests/guidanceListWindowInk.test.tsx).
+
 ---
 
 ## Phase 4 — “More below” row is budgeted
