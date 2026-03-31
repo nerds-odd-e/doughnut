@@ -1,5 +1,10 @@
 import type { ComponentType } from 'react'
 
+/**
+ * Contract for slash-command stages: communicate results only through these props (e.g.
+ * `onSettled`). Stages must not import or depend on the parent shell (`InteractiveCliApp`); the
+ * shell decides what happens after completion.
+ */
 export type InteractiveSlashCommandStageProps = {
   readonly argument?: string
   readonly onSettled: (assistantText: string) => void
@@ -29,6 +34,7 @@ export interface InteractiveSlashCommand {
    * missing and not optional.
    */
   readonly argument?: InteractiveSlashCommandArgument
+  /** Renders as the active stage; must honor `InteractiveSlashCommandStageProps` isolation. */
   readonly stageComponent?: ComponentType<InteractiveSlashCommandStageProps>
   readonly run?: (
     argument?: string

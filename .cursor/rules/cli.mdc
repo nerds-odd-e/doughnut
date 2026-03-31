@@ -11,7 +11,7 @@ TypeScript CLI for Doughnut. Lives in `cli/`.
 
 ```
 cli/
-  src/                 # Production code (shell, TTY, UI, `processInput` exit gate; subcommand handlers in `src/commands/`)
+  src/                 # Production code: `main`/`run`, `nonInteractiveCli`, `interactiveInkSession` + Ink app, `commands/`
   src/sessionScrollback/  # One Ink `<Static>` session history above the live column; transcript factories + recall answered rows; append context for stages
   src/commands/        # Slash-command and subcommand implementations + aggregated help
   src/shims/           # Modules referenced only from the esbuild `bundle` script (aliases)
@@ -49,7 +49,7 @@ It is a guideline for growing the architecture, not a direct implementation chec
 
 ## Vitest: observable behavior
 
-For **interactive** behavior, prefer **`runInteractive`** with a **mock TTY** stdin and assert **stdout** / visible output — the test may **not import** the adapter or helper you changed; coverage through the CLI surface is enough. Use **`processInput`** + mock **`OutputAdapter`** for the **default console adapter** contract, helpers, or when there is no stable TTY hook. See **Testing strategy → Observable behavior first** in `.cursor/rules/planning.mdc`.
+For **interactive** behavior, prefer **`runInteractive`** (from `interactive.js`, implemented in `interactiveInkSession.ts`) with a **mock TTY** stdin and assert **stdout** / visible output — the test may **not import** the module you changed; coverage through the CLI surface is enough. For **argv routing** (`version`, `help`, interactive fallback), use **`run`** from `run.js` (see `cli/tests/index.test.ts`). See **Testing strategy → Observable behavior first** in `.cursor/rules/planning.mdc`.
 
 **Mocking Doughnut HTTP from unit tests** — Use **`vi.spyOn`** on **`doughnut-api`** controller static methods (e.g. `RecallsController.recalling`, `MemoryTrackerController.showMemoryTracker`) and **`mockResolvedValue`** with the SDK success shape (`{ data: … }`, cast as **`Awaited<ReturnType<typeof Controller.method>>`** when needed). Build **`data`** values that match backend / SDK types with **`makeMe`** from **`doughnut-test-fixtures/makeMe`** (e.g. `makeMe.aMemoryTracker`, `makeMe.aNoteRealm`, `makeMe.aDueMemoryTrackersList`) instead of ad hoc object literals. Do **not** use **`http.createServer`** to fake `/api/…` for ordinary command behavior. Reserve a real local HTTP server for tests whose subject is transport or error classification (e.g. status codes), not for happy-path recall or token flows.
 

@@ -434,6 +434,8 @@ Clarify and protect:
 - TTY I/O adapter boundary
 - stage isolation principles
 
+**Where in code:** `cli/src/nonInteractiveCli.ts`, `cli/src/interactiveInkSession.ts` (re-exported from `interactive.ts`), `run.ts`; stage contract in `commands/interactiveSlashCommand.ts` (`InteractiveSlashCommandStageProps`).
+
 ### Phase 2 — Stabilize terminal testing foundations
 
 Strengthen and consolidate:
