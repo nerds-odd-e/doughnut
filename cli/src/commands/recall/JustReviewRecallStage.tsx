@@ -52,7 +52,6 @@ export function JustReviewRecallStage({
           await onRecallQuestionAnswered({
             successful: false,
             scrollbackLines: ['Reduced memory index.'],
-            advanceToNextCard: false,
           })
           return
         }

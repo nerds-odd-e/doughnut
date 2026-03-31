@@ -133,9 +133,6 @@ export function RecallSessionStage({
       for (const line of outcome.scrollbackLines) {
         appendScrollbackItem(recallAnsweredLine(line))
       }
-      if (outcome.advanceToNextCard === false) {
-        return
-      }
       try {
         const next = await loadNextRecallCardIfAny(0)
         if (next !== null) {
