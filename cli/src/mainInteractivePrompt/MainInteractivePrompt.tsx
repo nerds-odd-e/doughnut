@@ -363,6 +363,7 @@ export function MainInteractivePrompt({
           mode="slash"
           rows={guidance.rows}
           highlightIndex={slashHighlightIndex}
+          rowBudget={5}
           terminalColumns={cols}
         />
       ) : null}

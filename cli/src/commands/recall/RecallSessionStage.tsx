@@ -219,6 +219,7 @@ export function RecallSessionStage({
         <RecallMcqStage
           key={card.payload.recallPromptId}
           payload={card.payload}
+          choicesGuidanceRowBudget={10}
           inputBlockedRef={submittingRef}
           onRecallQuestionAnswered={onRecallQuestionAnswered}
           onReplaceCurrentRecallCard={setCard}

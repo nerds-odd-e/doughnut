@@ -3,7 +3,6 @@ import { render } from 'ink-testing-library'
 import { describe, expect, test } from 'vitest'
 import {
   GuidanceListInk,
-  MCQ_CHOICES_GUIDANCE_ROW_BUDGET,
   type GuidanceListInkProps,
 } from '../src/guidanceListWindowInk.js'
 import { stripAnsi } from './inkTestHelpers.js'
@@ -11,6 +10,7 @@ import { stripAnsi } from './inkTestHelpers.js'
 const MORE_ABOVE = '↑ more above'
 const MORE_BELOW = '↓ more below'
 const ROW_BUDGET = 5
+const TALL_NUMBERED_ROW_BUDGET = 10
 
 function renderGuidancePlain(props: GuidanceListInkProps) {
   const { lastFrame } = render(
@@ -57,6 +57,7 @@ describe('GuidanceListInk slash mode', () => {
     const rows = slashRows(3)
     const p = renderGuidancePlain({
       mode: 'slash',
+      rowBudget: ROW_BUDGET,
       rows,
       highlightIndex: 0,
     })
@@ -73,6 +74,7 @@ describe('GuidanceListInk slash mode', () => {
     const rows = slashRows(ROW_BUDGET)
     const p = renderGuidancePlain({
       mode: 'slash',
+      rowBudget: ROW_BUDGET,
       rows,
       highlightIndex: 2,
     })
@@ -94,6 +96,7 @@ describe('GuidanceListInk slash mode', () => {
     ]
     const p = renderGuidancePlain({
       mode: 'slash',
+      rowBudget: ROW_BUDGET,
       rows,
       highlightIndex: 0,
       terminalColumns: 36,
@@ -111,6 +114,7 @@ describe('GuidanceListInk slash mode', () => {
     const rows = slashRows(11)
     const p = renderGuidancePlain({
       mode: 'slash',
+      rowBudget: ROW_BUDGET,
       rows,
       highlightIndex: 0,
     })
@@ -128,6 +132,7 @@ describe('GuidanceListInk slash mode', () => {
     const rows = slashRows(11)
     const p = renderGuidancePlain({
       mode: 'slash',
+      rowBudget: ROW_BUDGET,
       rows,
       highlightIndex: 2,
     })
@@ -150,6 +155,7 @@ describe('GuidanceListInk slash mode', () => {
     const rows = slashRows(11)
     const p = renderGuidancePlain({
       mode: 'slash',
+      rowBudget: ROW_BUDGET,
       rows,
       highlightIndex: 3,
     })
@@ -178,6 +184,7 @@ describe('GuidanceListInk slash mode', () => {
     const rows = slashRows(11)
     const p = renderGuidancePlain({
       mode: 'slash',
+      rowBudget: ROW_BUDGET,
       rows,
       highlightIndex: 4,
     })
@@ -200,6 +207,7 @@ describe('GuidanceListInk slash mode', () => {
     const rows11 = slashRows(11)
     const pMid = renderGuidancePlain({
       mode: 'slash',
+      rowBudget: ROW_BUDGET,
       rows: rows11,
       highlightIndex: 5,
     })
@@ -217,6 +225,7 @@ describe('GuidanceListInk slash mode', () => {
     const rows20 = slashRows(20)
     const pDeep = renderGuidancePlain({
       mode: 'slash',
+      rowBudget: ROW_BUDGET,
       rows: rows20,
       highlightIndex: 12,
     })
@@ -233,6 +242,7 @@ describe('GuidanceListInk slash mode', () => {
 
     const pStep = renderGuidancePlain({
       mode: 'slash',
+      rowBudget: ROW_BUDGET,
       rows: rows20,
       highlightIndex: 11,
     })
@@ -249,6 +259,7 @@ describe('GuidanceListInk slash mode', () => {
     const rows = slashRows(11)
     const p = renderGuidancePlain({
       mode: 'slash',
+      rowBudget: ROW_BUDGET,
       rows,
       highlightIndex: 10,
     })
@@ -276,6 +287,7 @@ describe('GuidanceListInk numbered mode', () => {
       mode: 'numbered',
       lines: short,
       highlightItemIndex: 0,
+      rowBudget: ROW_BUDGET,
     })
     expect(p).not.toContain(MORE_ABOVE)
     expect(p).not.toContain(MORE_BELOW)
@@ -292,6 +304,7 @@ describe('GuidanceListInk numbered mode', () => {
       mode: 'numbered',
       lines: fiveFlat,
       highlightItemIndex: 2,
+      rowBudget: ROW_BUDGET,
     })
     expect(p).not.toContain(MORE_ABOVE)
     expect(p).not.toContain(MORE_BELOW)
@@ -300,9 +313,9 @@ describe('GuidanceListInk numbered mode', () => {
     }
   })
 
-  test('optional rowBudget allows taller window (MCQ)', () => {
+  test('larger rowBudget shows more choices without scroll labels', () => {
     const tenFlat = Array.from(
-      { length: MCQ_CHOICES_GUIDANCE_ROW_BUDGET },
+      { length: TALL_NUMBERED_ROW_BUDGET },
       (_, i) => ({
         itemIndex: i,
         text: `${i + 1}. choice`,
@@ -312,11 +325,11 @@ describe('GuidanceListInk numbered mode', () => {
       mode: 'numbered',
       lines: tenFlat,
       highlightItemIndex: 2,
-      rowBudget: MCQ_CHOICES_GUIDANCE_ROW_BUDGET,
+      rowBudget: TALL_NUMBERED_ROW_BUDGET,
     })
     expect(p).not.toContain(MORE_ABOVE)
     expect(p).not.toContain(MORE_BELOW)
-    for (let i = 0; i < MCQ_CHOICES_GUIDANCE_ROW_BUDGET; i++) {
+    for (let i = 0; i < TALL_NUMBERED_ROW_BUDGET; i++) {
       expect(p).toContain(`${i + 1}. choice`)
     }
   })
@@ -334,6 +347,7 @@ describe('GuidanceListInk numbered mode', () => {
       mode: 'numbered',
       lines: wrappedFits,
       highlightItemIndex: 1,
+      rowBudget: ROW_BUDGET,
     })
     expect(p).not.toContain(MORE_ABOVE)
     expect(p).not.toContain(MORE_BELOW)
@@ -349,6 +363,7 @@ describe('GuidanceListInk numbered mode', () => {
       mode: 'numbered',
       lines,
       highlightItemIndex: 1,
+      rowBudget: ROW_BUDGET,
     })
     expect(p.split('\n').filter((l) => l.includes('B')).length).toBeGreaterThan(
       0
@@ -376,6 +391,7 @@ describe('GuidanceListInk numbered mode', () => {
       mode: 'numbered',
       lines: many,
       highlightItemIndex: 6,
+      rowBudget: ROW_BUDGET,
     })
     expect(p).toContain(MORE_ABOVE)
     expect(p).toContain(MORE_BELOW)
@@ -402,6 +418,7 @@ describe('GuidanceListInk numbered mode', () => {
       mode: 'numbered',
       lines: manyLong,
       highlightItemIndex: 12,
+      rowBudget: ROW_BUDGET,
     })
     expect(pDeep).toContain(MORE_ABOVE)
     expect(pDeep).toContain(MORE_BELOW)
@@ -423,6 +440,7 @@ describe('GuidanceListInk numbered mode', () => {
       mode: 'numbered',
       lines: manyLong,
       highlightItemIndex: 11,
+      rowBudget: ROW_BUDGET,
     })
     expectBothScrollIndicatorsBracketOptions(pNumStep)
     const minListedChoice = (plain: string) =>
@@ -442,6 +460,7 @@ describe('GuidanceListInk scroll labels in output', () => {
   test('renders stable more-above / more-below copy when clipped', () => {
     const p = renderGuidancePlain({
       mode: 'slash',
+      rowBudget: ROW_BUDGET,
       rows: slashRows(11),
       highlightIndex: 5,
     })

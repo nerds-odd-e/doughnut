@@ -17,12 +17,6 @@ import {
   type NumberedTerminalListLine,
 } from './terminalColumns.js'
 
-const SLASH_GUIDANCE_LIST_ROW_BUDGET = 5
-const DEFAULT_NUMBERED_GUIDANCE_LIST_ROW_BUDGET = 5
-
-/** Recall MCQ choices in current guidance; other numbered lists use the default budget. */
-export const MCQ_CHOICES_GUIDANCE_ROW_BUDGET = 10
-
 const GUIDANCE_MORE_ABOVE_LABEL = '↑ more above'
 const GUIDANCE_MORE_BELOW_LABEL = '↓ more below'
 
@@ -121,7 +115,7 @@ function layoutWindowedLineSlice(
 function layoutSlashCommandGuidanceWindow(
   rows: readonly { readonly usage: string; readonly description: string }[],
   highlightIndex: number,
-  budget: number = SLASH_GUIDANCE_LIST_ROW_BUDGET
+  budget: number
 ): readonly SlashGuidanceDisplayRow[] {
   const n = rows.length
   if (n === 0) return []
@@ -155,7 +149,7 @@ function firstLineIndexForItem(
 function layoutNumberedListGuidanceWindow(
   lines: readonly NumberedTerminalListLine[],
   highlightItemIndex: number,
-  budget: number = DEFAULT_NUMBERED_GUIDANCE_LIST_ROW_BUDGET
+  budget: number
 ): readonly NumberedGuidanceDisplayRow[] {
   const n = lines.length
   if (n === 0) return []
@@ -184,13 +178,14 @@ export type GuidanceListInkProps =
         readonly description: string
       }[]
       readonly highlightIndex: number
+      readonly rowBudget: number
       readonly terminalColumns?: number
     }
   | {
       readonly mode: 'numbered'
       readonly lines: readonly NumberedTerminalListLine[]
       readonly highlightItemIndex: number
-      readonly rowBudget?: number
+      readonly rowBudget: number
     }
 
 export function GuidanceListInk(props: GuidanceListInkProps) {
@@ -203,6 +198,7 @@ export function GuidanceListInk(props: GuidanceListInkProps) {
 function SlashGuidanceListInk({
   rows,
   highlightIndex,
+  rowBudget,
   terminalColumns: terminalColumnsProp,
 }: Extract<GuidanceListInkProps, { mode: 'slash' }>) {
   const { stdout } = useStdout()
@@ -212,8 +208,8 @@ function SlashGuidanceListInk({
     () =>
       rows.length === 0
         ? null
-        : layoutSlashCommandGuidanceWindow(rows, highlightIndex),
-    [rows, highlightIndex]
+        : layoutSlashCommandGuidanceWindow(rows, highlightIndex, rowBudget),
+    [rows, highlightIndex, rowBudget]
   )
 
   const { usageColWidth, descBudget } = useMemo(() => {
@@ -311,7 +307,7 @@ function SlashGuidanceListInk({
 function NumberedGuidanceListInk({
   lines,
   highlightItemIndex,
-  rowBudget = DEFAULT_NUMBERED_GUIDANCE_LIST_ROW_BUDGET,
+  rowBudget,
 }: Extract<GuidanceListInkProps, { mode: 'numbered' }>) {
   const display = useMemo(
     () =>

@@ -113,6 +113,7 @@ export function AccessTokenLabelPickerStage({
           mode="numbered"
           lines={listLines}
           highlightItemIndex={highlightIndex}
+          rowBudget={5}
         />
       </Box>
     </Box>

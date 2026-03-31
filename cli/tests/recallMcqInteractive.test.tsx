@@ -11,7 +11,6 @@ import {
   LEAVE_RECALL_PROMPT,
   RECALL_SESSION_STOPPED_LINE,
 } from '../src/commands/recall/leaveRecallSessionCopy.js'
-import { MCQ_CHOICES_GUIDANCE_ROW_BUDGET } from '../src/guidanceListWindowInk.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
   pressEscape,
@@ -128,7 +127,7 @@ describe('recall MCQ (interactive)', () => {
   })
 
   test('many MCQ choices use a fixed-height list with more-below', async () => {
-    const manyChoicesCount = MCQ_CHOICES_GUIDANCE_ROW_BUDGET + 5
+    const manyChoicesCount = 15
     getRecallPromptsSpy.mockResolvedValue({
       data: [
         makeMe.aRecallPrompt

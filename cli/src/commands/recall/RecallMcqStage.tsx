@@ -20,10 +20,7 @@ import {
   choiceIndexFromSelectListSubmitLine,
   handleSelectListInkKey,
 } from '../../interactions/selectListInteraction.js'
-import {
-  GuidanceListInk,
-  MCQ_CHOICES_GUIDANCE_ROW_BUDGET,
-} from '../../guidanceListWindowInk.js'
+import { GuidanceListInk } from '../../guidanceListWindowInk.js'
 import { resolvedTerminalWidth } from '../../terminalColumns.js'
 import {
   doughnutSdkOptions,
@@ -165,6 +162,7 @@ const MCQ_HINT =
 
 export function RecallMcqStage({
   payload,
+  choicesGuidanceRowBudget,
   inputBlockedRef,
   onRecallQuestionAnswered,
   onReplaceCurrentRecallCard,
@@ -172,6 +170,7 @@ export function RecallMcqStage({
   onConfirmLeaveRecall,
 }: {
   readonly payload: RecallMcqCardPayload
+  readonly choicesGuidanceRowBudget: number
   readonly inputBlockedRef: MutableRefObject<boolean>
   readonly onRecallQuestionAnswered: (
     outcome: RecallQuestionAnswerOutcome
@@ -423,7 +422,7 @@ export function RecallMcqStage({
           mode="numbered"
           lines={listLines}
           highlightItemIndex={highlightIndex}
-          rowBudget={MCQ_CHOICES_GUIDANCE_ROW_BUDGET}
+          rowBudget={choicesGuidanceRowBudget}
         />
       </Box>
       <Text>{MCQ_HINT}</Text>
