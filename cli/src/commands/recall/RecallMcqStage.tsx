@@ -26,6 +26,10 @@ import {
   submitMcqAnswer,
   type RecallMcqCardPayload,
 } from './recallMcqLoad.js'
+import type { RecallCard } from './nextRecallCardLoad.js'
+import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
+import { recallAnsweredLine } from './recallAnsweredScrollback.js'
+import { useSessionScrollbackAppend } from '../../sessionScrollback/sessionScrollbackAppendContext.js'
 
 const STAGE_LABEL = 'Recalling'
 
@@ -35,22 +39,21 @@ const MCQ_HINT =
 export function RecallMcqStage({
   payload,
   inputBlockedRef,
-  onMcqSucceeded,
-  onMcqIncorrect,
+  onRecallQuestionAnswered,
+  onReplaceCurrentRecallCard,
   onRecallFatalError,
   onConfirmLeaveRecall,
-  onMcqPayloadReplace,
-  onMcqSessionNotice,
 }: {
   readonly payload: RecallMcqCardPayload
   readonly inputBlockedRef: MutableRefObject<boolean>
-  readonly onMcqSucceeded: () => void | Promise<void>
-  readonly onMcqIncorrect: () => void | Promise<void>
+  readonly onRecallQuestionAnswered: (
+    outcome: RecallQuestionAnswerOutcome
+  ) => void | Promise<void>
+  readonly onReplaceCurrentRecallCard: (card: RecallCard) => void
   readonly onRecallFatalError: (message: string) => void
   readonly onConfirmLeaveRecall: () => void
-  readonly onMcqPayloadReplace: (payload: RecallMcqCardPayload) => void
-  readonly onMcqSessionNotice?: (line: string) => void
 }) {
+  const { appendScrollbackItem } = useSessionScrollbackAppend()
   const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
   const [buffer, setBuffer] = useState('')
   const bufferRef = useRef('')
@@ -83,10 +86,17 @@ export function RecallMcqStage({
           bufferRef.current = ''
           setBuffer('')
           setHighlightIndex(0)
-          await onMcqIncorrect()
+          await onRecallQuestionAnswered({
+            successful: false,
+            scrollbackLines: ['Incorrect.'],
+          })
           return
         }
-        await onMcqSucceeded()
+        await onRecallQuestionAnswered({
+          successful: true,
+          scrollbackLines: [],
+          scrollbackLinesWhenQueueEmpty: ['Correct!'],
+        })
       } catch (err: unknown) {
         onRecallFatalError(userVisibleSlashCommandError(err))
       } finally {
@@ -95,9 +105,8 @@ export function RecallMcqStage({
     },
     [
       inputBlockedRef,
-      onMcqIncorrect,
-      onMcqSucceeded,
       onRecallFatalError,
+      onRecallQuestionAnswered,
       payload.recallPromptId,
     ]
   )
@@ -113,9 +122,12 @@ export function RecallMcqStage({
       )
       if (result.outcome === 'replaced') {
         setHighlightIndex(0)
-        onMcqPayloadReplace(result.payload)
+        onReplaceCurrentRecallCard({
+          variant: 'mcq',
+          payload: result.payload,
+        })
       } else {
-        onMcqSessionNotice?.(result.message)
+        appendScrollbackItem(recallAnsweredLine(result.message))
       }
     } catch (err: unknown) {
       onRecallFatalError(userVisibleSlashCommandError(err))
@@ -123,10 +135,10 @@ export function RecallMcqStage({
       inputBlockedRef.current = false
     }
   }, [
+    appendScrollbackItem,
     inputBlockedRef,
-    onMcqPayloadReplace,
-    onMcqSessionNotice,
     onRecallFatalError,
+    onReplaceCurrentRecallCard,
     payload.memoryTrackerId,
     payload.notebookTitle,
     payload.recallPromptId,

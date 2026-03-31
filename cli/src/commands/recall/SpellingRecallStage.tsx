@@ -23,6 +23,7 @@ import {
   type SpellingRecallSessionPayload,
 } from './recallSpellingLoad.js'
 import { normalizeSpellingLineForSubmit } from './spellingAnswerLine.js'
+import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 
 const STAGE_LABEL = 'Recalling'
 
@@ -37,15 +38,15 @@ type LoadState =
 export function SpellingRecallStage({
   payload,
   inputBlockedRef,
-  onSpellingSessionComplete,
-  onSpellingIncorrect,
+  onRecallQuestionAnswered,
   onRecallFatalError,
   onConfirmLeaveRecall,
 }: {
   readonly payload: SpellingRecallSessionPayload
   readonly inputBlockedRef: MutableRefObject<boolean>
-  readonly onSpellingSessionComplete: () => void | Promise<void>
-  readonly onSpellingIncorrect: () => void | Promise<void>
+  readonly onRecallQuestionAnswered: (
+    outcome: RecallQuestionAnswerOutcome
+  ) => void | Promise<void>
   readonly onRecallFatalError: (message: string) => void
   readonly onConfirmLeaveRecall: () => void
 }) {
@@ -103,10 +104,17 @@ export function SpellingRecallStage({
       if (!correct) {
         bufferRef.current = ''
         setBuffer('')
-        await onSpellingIncorrect()
+        await onRecallQuestionAnswered({
+          successful: false,
+          scrollbackLines: ['Incorrect.'],
+        })
         return
       }
-      await onSpellingSessionComplete()
+      const spellCorrectLine = `Spell correct: ${payload.noteTitle}`
+      await onRecallQuestionAnswered({
+        successful: true,
+        scrollbackLines: [spellCorrectLine],
+      })
     } catch (err: unknown) {
       onRecallFatalError(userVisibleSlashCommandError(err))
     } finally {
@@ -116,8 +124,8 @@ export function SpellingRecallStage({
     inputBlockedRef,
     loadState,
     onRecallFatalError,
-    onSpellingIncorrect,
-    onSpellingSessionComplete,
+    onRecallQuestionAnswered,
+    payload.noteTitle,
   ])
 
   const processSpellKeyEvent = useCallback(
