@@ -13,12 +13,12 @@ import { dueRecallQuery } from './dueRecallQuery.js'
 import {
   recallJustReviewPayloadFromMemoryTracker,
   type RecallJustReviewPayload,
-} from './justReviewLoad.js'
+} from './JustReviewRecallStage.js'
 import {
   tryLoadMcqPayload,
   type RecallMcqCardPayload,
-} from './recallMcqLoad.js'
-import type { SpellingRecallSessionPayload } from './recallSpellingLoad.js'
+} from './RecallMcqStage.js'
+import type { SpellingRecallSessionPayload } from './SpellingRecallStage.js'
 
 export type RecallCard =
   | {

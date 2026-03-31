@@ -2,7 +2,7 @@ import * as fs from 'node:fs'
 import { RecallPromptController } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
-import { contestAndRegenerateMcq } from '../src/commands/recall/recallMcqLoad.js'
+import { contestAndRegenerateMcq } from '../src/commands/recall/RecallMcqStage.js'
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
 describe('contestAndRegenerateMcq', () => {
