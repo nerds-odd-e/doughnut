@@ -92,6 +92,26 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     expect(combined).toContain('\x1b[100m')
   })
 
+  test('unknown slash command records user line and unsupported command', async () => {
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/no-such-command\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        c.includes('/no-such-command') &&
+        c.includes('unsupported command') &&
+        c.includes('\x1b[100m')
+    )
+
+    const combined = frames.join('\n')
+    expect(combined).toContain('/no-such-command')
+    expect(combined).toContain('unsupported command')
+    expect(combined).not.toContain('Not supported')
+  })
+
   test('submitting /exit as one chunk line+CR records it in output', async () => {
     const { lastFrame, stdin, frames } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />

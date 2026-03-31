@@ -46,32 +46,24 @@ export function InteractiveCliApp() {
   }, [])
 
   const onCommittedLine = useCallback((line: string) => {
-    const resolved = resolveInteractiveSlashCommand(
-      line.startsWith('/') ? line.slice(1) : line
-    )
+    const body = line.startsWith('/') ? line.slice(1) : line
+    const resolved = resolveInteractiveSlashCommand(body)
+    if (!resolved) {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'user', text: line },
+        {
+          role: 'assistant',
+          text: line.startsWith('/') ? 'unsupported command' : 'Not supported',
+        },
+      ])
+      return
+    }
 
-    if (resolved) {
-      const { command, argument } = resolved
-      setMessages((prev) => [...prev, { role: 'user', text: line }])
-      const Stage = command.stageComponent
-      if (Stage) {
-        const argumentMissing = argument === undefined || argument === ''
-        const argSpec = command.argument
-        if (argSpec !== undefined && argumentMissing && !argSpec.optional) {
-          setMessages((prev) => [
-            ...prev,
-            {
-              role: 'assistant',
-              text: `Missing ${argSpec.name}. Usage: ${command.doc.usage}`,
-            },
-          ])
-          return
-        }
-        stageArgumentRef.current = argument
-        // setState(fn) treats fn as updater; bare `Stage` would be called with prior state as props.
-        setActiveStageComponent(() => Stage)
-        return
-      }
+    const { command, argument } = resolved
+    setMessages((prev) => [...prev, { role: 'user', text: line }])
+    const Stage = command.stageComponent
+    if (Stage) {
       const argumentMissing = argument === undefined || argument === ''
       const argSpec = command.argument
       if (argSpec !== undefined && argumentMissing && !argSpec.optional) {
@@ -84,41 +76,51 @@ export function InteractiveCliApp() {
         ])
         return
       }
-      const run = command.run
-      if (!run) {
+      stageArgumentRef.current = argument
+      // setState(fn) treats fn as updater; bare `Stage` would be called with prior state as props.
+      setActiveStageComponent(() => Stage)
+      return
+    }
+    const argumentMissing = argument === undefined || argument === ''
+    const argSpec = command.argument
+    if (argSpec !== undefined && argumentMissing && !argSpec.optional) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          text: `Missing ${argSpec.name}. Usage: ${command.doc.usage}`,
+        },
+      ])
+      return
+    }
+    const run = command.run
+    if (!run) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          text: 'Internal error: command has no run handler.',
+        },
+      ])
+      return
+    }
+    Promise.resolve(run(argument))
+      .then((r) => {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', text: r.assistantMessage },
+        ])
+        if (command.line === '/exit') setExitAfterCommit(true)
+      })
+      .catch((err: unknown) => {
         setMessages((prev) => [
           ...prev,
           {
             role: 'assistant',
-            text: 'Internal error: command has no run handler.',
+            text: userVisibleSlashCommandError(err),
           },
         ])
-        return
-      }
-      Promise.resolve(run(argument))
-        .then((r) => {
-          setMessages((prev) => [
-            ...prev,
-            { role: 'assistant', text: r.assistantMessage },
-          ])
-          if (command.line === '/exit') setExitAfterCommit(true)
-        })
-        .catch((err: unknown) => {
-          setMessages((prev) => [
-            ...prev,
-            {
-              role: 'assistant',
-              text: userVisibleSlashCommandError(err),
-            },
-          ])
-        })
-      return
-    }
-    setMessages((prev) => [
-      ...prev,
-      { role: 'user', text: line },
-      { role: 'assistant', text: 'Not supported' },
-    ])
+      })
   }, [])
 
   return (
