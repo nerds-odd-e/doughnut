@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
   type MutableRefObject,
+  type ReactElement,
 } from 'react'
 import type { Key } from 'ink'
 import { Box, Text, useInput } from 'ink'
@@ -37,7 +38,7 @@ import {
 } from './nextRecallCardLoad.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 import {
-  recallAnsweredMcqInk,
+  RECALL_ANSWERED_BREADCRUMB_SEP,
   recallAnsweredPlainInk,
   recallAnsweredScrollbackItem,
 } from './recallAnsweredScrollback.js'
@@ -45,6 +46,61 @@ import { useSessionScrollbackAppend } from '../../sessionScrollback/sessionScrol
 
 const CONTEST_REJECTED_FALLBACK =
   'Contest was not accepted. Please answer the question.'
+
+function recallAnsweredMcqInk(args: {
+  readonly breadcrumbTitles: readonly string[]
+  readonly stem: string
+  readonly choices: readonly string[]
+  readonly selectedChoiceIndex: number
+  readonly updatedPrompt: RecallPrompt
+}): ReactElement {
+  const width = resolvedTerminalWidth()
+  const crumb = args.breadcrumbTitles.join(RECALL_ANSWERED_BREADCRUMB_SEP)
+  const correct = args.updatedPrompt.answer?.correct === true
+  const fromPredefined =
+    args.updatedPrompt.predefinedQuestion?.correctAnswerIndex
+  const correctChoiceIndex =
+    fromPredefined !== undefined && fromPredefined !== null
+      ? fromPredefined
+      : correct && args.updatedPrompt.answer?.choiceIndex !== undefined
+        ? args.updatedPrompt.answer.choiceIndex
+        : undefined
+
+  const stemRendered = renderMarkdownToTerminal(args.stem.trim(), width)
+  const stemLines =
+    stemRendered.length > 0 ? stemRendered.split('\n') : ([] as string[])
+  const listLines = numberedMcqMarkdownLinesForTerminal(args.choices, width)
+  const sel = args.selectedChoiceIndex
+
+  const choiceLineColor = (itemIndex: number): undefined | 'green' | 'red' => {
+    if (correctChoiceIndex !== undefined && itemIndex === correctChoiceIndex) {
+      return 'green'
+    }
+    if (!correct && itemIndex === sel) {
+      return 'red'
+    }
+    return undefined
+  }
+
+  return (
+    <Box flexDirection="column">
+      <Text>{crumb}</Text>
+      {stemLines.map((line, i) => (
+        <Text key={`st-${i}`}>{line.length > 0 ? line : ' '}</Text>
+      ))}
+      {listLines.map((line, i) => (
+        <Text key={`ch-${i}`} color={choiceLineColor(line.itemIndex)}>
+          {line.text}
+        </Text>
+      ))}
+      {correct ? (
+        <Text color="green">Correct!</Text>
+      ) : (
+        <Text color="red">Incorrect.</Text>
+      )}
+    </Box>
+  )
+}
 
 type ContestMcqOutcome =
   | { outcome: 'replaced'; payload: RecallMcqCardPayload }
