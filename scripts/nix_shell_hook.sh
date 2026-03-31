@@ -89,7 +89,8 @@ if [ "$CURSOR_DEV_MODE" != "true" ]; then
   # Start Redis if not running
   if ! lsof -i :6380 -sTCP:LISTEN >/dev/null 2>&1; then
     log "Starting Redis server..."
-    ./scripts/init_redis.sh
+    export PC_DISABLE_TUI=1
+    process-compose -f "${PWD}/process-compose.yaml" up -D redis
     check_redis_ready
   else
     log "Redis is running on port 6380 & ready to go! 🗄️"

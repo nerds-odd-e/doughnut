@@ -23,38 +23,56 @@ This starts all services with auto-reload:
 
 **DO NOT restart services after code changes** - they auto-reload.
 
-### Local MySQL (direnv / `nix develop` and process-compose)
+### Local MySQL and Redis (direnv / `nix develop` and process-compose)
 
-The Nix shell hook ([`scripts/nix_shell_hook.sh`](scripts/nix_shell_hook.sh)) loads [`process-compose.yaml`](process-compose.yaml). When **`CURSOR_DEV` is unset** (normal interactive `direnv` / `nix develop`), if **nothing is listening on TCP 3309**, the hook runs `process-compose -f process-compose.yaml up -D mysql`, waits until MySQL answers, then applies [`scripts/sql/init_doughnut_db.sql`](scripts/sql/init_doughnut_db.sql). If **3309 is already in use**, the hook **does not** start or restart MySQL.
+The Nix shell hook ([`scripts/nix_shell_hook.sh`](scripts/nix_shell_hook.sh)) loads [`process-compose.yaml`](process-compose.yaml), which defines supervised **`mysql`** and **`redis`**. It sets `MYSQL_*` and `REDIS_*` via `setup_mysql_env` / `setup_redis_env` in [`scripts/shell_setup.sh`](scripts/shell_setup.sh) (nix **`mysql84`** and **`redis`** from [`flake.nix`](flake.nix)).
 
-With **`CURSOR_DEV=true`**, that block is skipped (agents); start MySQL yourself only if you need it.
+**MySQL:** When **`CURSOR_DEV` is unset**, if **nothing is listening on TCP 3309**, the hook runs `process-compose -f process-compose.yaml up -D mysql`, waits until MySQL answers, then applies [`scripts/sql/init_doughnut_db.sql`](scripts/sql/init_doughnut_db.sql). If **3309 is already in use**, the hook **does not** start or restart MySQL.
 
-**Stop MySQL** (stops the detached process-compose project and the `mysql` process it supervises):
+**Redis:** When **`CURSOR_DEV` is unset**, if **nothing is listening on TCP 6380**, the hook runs `process-compose -f process-compose.yaml up -D redis`, then waits until Redis answers (`check_redis_ready`). If **6380 is already in use** (including a stray `redis-server` not started by process-compose), the hook **does not** start supervised Redis; free the port or stop the other process first.
+
+With **`CURSOR_DEV=true`**, those blocks are skipped (agents); start MySQL and/or Redis yourself only if you need them.
+
+**Stop MySQL and Redis** (stops the detached process-compose project and all processes it supervises):
 
 ```bash
 # From repo root, inside an active nix dev shell, or:
 CURSOR_DEV=true nix develop -c process-compose down
 ```
 
-**Manual start** (after `down`, or if the hook did not run, with **3309 free** and the usual `MYSQL_*` variables from `setup_mysql_env` in [`scripts/shell_setup.sh`](scripts/shell_setup.sh)—already set after entering `nix develop`):
+**Manual start** (after `down`, or if the hook did not run, with **3309** / **6380** free and the usual `MYSQL_*` / `REDIS_*` from [`scripts/shell_setup.sh`](scripts/shell_setup.sh)—already set after entering `nix develop`):
 
 ```bash
 process-compose -f process-compose.yaml up -D mysql
+process-compose -f process-compose.yaml up -D redis
 ```
 
-**Debug:**
+**Debug — MySQL:**
 
 - Server log: **`mysql/mysql.log`** (`$MYSQL_HOME/mysql.log`).
 - Quick check: `mysqladmin ping -h127.0.0.1 -P3309`.
 - Live supervisor UI: `process-compose attach` (same `PATH` as above).
 - Buffered process logs: `process-compose process logs mysql`.
 
-**Restart after a bad start or crash:**
+**Debug — Redis:**
+
+- Server log: **`redis/redis.log`** (`$REDIS_LOG_FILE`).
+- Quick check: `redis-cli -p 6380 ping`.
+- Buffered process logs: `process-compose process logs redis`.
+
+**Restart after a bad start or crash — MySQL:**
 
 1. Read `mysql/mysql.log` (datadir, socket, or port conflicts show up there).
 2. Run `process-compose down` (or `process-compose process stop mysql` to stop only the `mysql` process while the supervisor stays up).
 3. If **3309** is still in use, stop the stray server: `pgrep mysqld | xargs kill` (or `pkill mysqld`), then confirm with `lsof -i :3309`.
 4. Start again: re-enter the directory so direnv/`nix develop` runs the hook with a free **3309**, or run `process-compose -f process-compose.yaml up -D mysql` from the repo in a shell where `MYSQL_*` is already configured.
+
+**Restart after a bad start or crash — Redis:**
+
+1. Read `redis/redis.log` (port conflicts show up there).
+2. Run `process-compose down` or `process-compose process stop redis`.
+3. If **6380** is still in use, stop the stray `redis-server`, then confirm with `lsof -i :6380`.
+4. Start again with a free **6380** via the hook or `process-compose -f process-compose.yaml up -D redis` from the repo in a shell where `REDIS_*` is already configured.
 
 **direnv / `nix develop` “hanging” or “taking a while”:** The flake shellHook does a lot of work (pnpm, Biome, Cypress, MySQL, Redis). **`direnv`** often runs that hook **more than once** per `cd`; [`scripts/dev_setup.sh`](scripts/dev_setup.sh) **skips** **`corepack prepare`**, **`corepack use`**, and **`pnpm recursive install`** when **`pnpm-lock.yaml`**, root **`package.json`**, and **`pnpm-workspace.yaml`** are unchanged (fingerprint in **`.doughnut-pnpm-lock.sha256`**, gitignored). **`corepack use`** was still triggering a full workspace install even when **`pnpm install` was skipped**, which kept direnv past its default warn timeout. Force the full PNPM path with **`DOUGHNUT_SHELL_HOOK_FORCE_PNPM=1`**. After you see **`Environment setup complete!`**, Nix may still print **`removing profile version …`** while it updates your dev profile — that step is **outside** the repo hook. **`DIRENV_WARN_TIMEOUT`** in [`.envrc`](.envrc) uses a duration with a unit (**`120s`**); direnv’s timer may still start before `.envrc` runs — if the **5s** warning persists, set **`warn_timeout`** in **`~/.config/direnv/direnv.toml`** under **`[global]`**. For faster reloads after the first load, consider **[nix-direnv](https://github.com/nix-community/nix-direnv)** (`use flake` integration caches the environment).
 
@@ -96,8 +114,9 @@ CURSOR_DEV=true nix develop -c <command>
 | Lint shared API test fixtures only (Biome) | `pnpm test-fixtures:lint` |
 | Regenerate TypeScript from OpenAPI | `pnpm generateTypeScript` |
 | Connect to local DB | `mysql -S $MYSQL_HOME/mysql.sock -u doughnut -p` (password: doughnut) |
-| Stop local MySQL (process-compose) | `CURSOR_DEV=true nix develop -c process-compose down` |
+| Stop local MySQL and Redis (process-compose) | `CURSOR_DEV=true nix develop -c process-compose down` |
 | Attach to process-compose (supervisor TUI) | `CURSOR_DEV=true nix develop -c process-compose attach` |
+| Redis logs (process-compose) | `CURSOR_DEV=true nix develop -c process-compose process logs redis` |
 
 Unless you are already inside `nix develop`, wrap `pnpm` / Gradle invocations like the E2E row: `CURSOR_DEV=true nix develop -c <command>`. (Cloud VM: no wrapper — see above.)
 
