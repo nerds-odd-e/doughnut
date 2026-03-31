@@ -1,10 +1,10 @@
 import { createContext, useContext, type ReactNode } from 'react'
-import type { InteractiveScrollbackItem } from './interactiveSessionScrollback.js'
+import type { SessionScrollbackItem } from './SessionScrollback.js'
 
 export type SessionScrollbackAppendApi = {
-  readonly appendScrollbackItem: (item: InteractiveScrollbackItem) => void
+  readonly appendScrollbackItem: (item: SessionScrollbackItem) => void
   readonly appendScrollbackItems: (
-    items: readonly InteractiveScrollbackItem[]
+    items: readonly SessionScrollbackItem[]
   ) => void
 }
 

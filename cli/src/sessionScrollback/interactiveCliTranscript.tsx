@@ -1,15 +1,22 @@
-export type TranscriptItem =
-  | { readonly kind: 'user_line'; readonly id: string; readonly text: string }
-  | {
-      readonly kind: 'assistant_text'
-      readonly id: string
-      readonly text: string
-    }
+import { Box, Text } from 'ink'
+import { PastUserMessageBlock } from '../pastUserMessageBlock.js'
+import type { SessionScrollbackItem } from './SessionScrollback.js'
 
-export function transcriptUserLine(text: string): TranscriptItem {
-  return { kind: 'user_line', id: crypto.randomUUID(), text }
+export function transcriptUserLine(text: string): SessionScrollbackItem {
+  return {
+    id: crypto.randomUUID(),
+    element: <PastUserMessageBlock text={text} />,
+    endsWithUserLine: true,
+  }
 }
 
-export function transcriptAssistantText(text: string): TranscriptItem {
-  return { kind: 'assistant_text', id: crypto.randomUUID(), text }
+export function transcriptAssistantText(text: string): SessionScrollbackItem {
+  return {
+    id: crypto.randomUUID(),
+    element: (
+      <Box>
+        <Text>{text}</Text>
+      </Box>
+    ),
+  }
 }

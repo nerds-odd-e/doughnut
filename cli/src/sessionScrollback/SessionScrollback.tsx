@@ -1,23 +1,25 @@
 import { Static } from 'ink'
-import type { ReactNode } from 'react'
+import { Fragment, type ReactNode } from 'react'
 
-/** Minimal shape for Ink `<Static>` item keys; scrollback layer stays content-agnostic. */
+/**
+ * Scrollback entries are pre-rendered Ink trees. Optional `endsWithUserLine` is only for
+ * `InteractiveCliApp` append spacing (user block → following row); `<Static>` ignores it.
+ */
 export type SessionScrollbackItem = {
   readonly id: string
+  readonly element: ReactNode
+  readonly endsWithUserLine?: boolean
 }
 
-type SessionScrollbackProps<T extends SessionScrollbackItem> = {
-  readonly items: readonly T[]
-  readonly children: (item: T, index: number) => ReactNode
+type SessionScrollbackProps = {
+  readonly items: readonly SessionScrollbackItem[]
 }
 
-export function SessionScrollback<T extends SessionScrollbackItem>({
-  items,
-  children: renderItem,
-}: SessionScrollbackProps<T>) {
+/** One `<Static>` region; callers supply `{ id, element }` per Ink’s item + keyed root pattern. */
+export function SessionScrollback({ items }: SessionScrollbackProps) {
   return (
-    <Static items={items as T[]}>
-      {(item, index) => renderItem(item, index)}
+    <Static items={[...items]}>
+      {(item) => <Fragment key={item.id}>{item.element}</Fragment>}
     </Static>
   )
 }

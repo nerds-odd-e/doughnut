@@ -21,10 +21,28 @@ import {
   transcriptUserLine,
 } from './sessionScrollback/interactiveCliTranscript.js'
 import {
-  InteractiveSessionScrollback,
-  type InteractiveScrollbackItem,
-} from './sessionScrollback/interactiveSessionScrollback.js'
+  SessionScrollback,
+  type SessionScrollbackItem,
+} from './sessionScrollback/SessionScrollback.js'
 import { SessionScrollbackAppendProvider } from './sessionScrollback/sessionScrollbackAppendContext.js'
+
+function withLeadingGapAfterUserIfNeeded(
+  prev: readonly SessionScrollbackItem[],
+  item: SessionScrollbackItem
+): SessionScrollbackItem {
+  const last = prev[prev.length - 1]
+  if (last?.endsWithUserLine !== true) return item
+  return {
+    id: item.id,
+    element: (
+      <Box flexDirection="column">
+        <Box height={1} />
+        {item.element}
+      </Box>
+    ),
+    endsWithUserLine: item.endsWithUserLine,
+  }
+}
 
 export function InteractiveCliApp() {
   const { exit } = useApp()
@@ -40,7 +58,7 @@ export function InteractiveCliApp() {
     }, [])
   )
   const [scrollbackItems, setScrollbackItems] = useState<
-    InteractiveScrollbackItem[]
+    SessionScrollbackItem[]
   >(() => [transcriptAssistantText(formatVersionOutput())])
   const [activeStageComponent, setActiveStageComponent] =
     useState<ComponentType<InteractiveSlashCommandStageProps> | null>(null)
@@ -51,17 +69,23 @@ export function InteractiveCliApp() {
     exit()
   }, [exit, exitAfterCommit])
 
-  const appendScrollbackItem = useCallback(
-    (item: InteractiveScrollbackItem) => {
-      setScrollbackItems((prev) => [...prev, item])
-    },
-    []
-  )
+  const appendScrollbackItem = useCallback((item: SessionScrollbackItem) => {
+    setScrollbackItems((prev) => [
+      ...prev,
+      withLeadingGapAfterUserIfNeeded(prev, item),
+    ])
+  }, [])
 
   const appendScrollbackItems = useCallback(
-    (items: readonly InteractiveScrollbackItem[]) => {
+    (items: readonly SessionScrollbackItem[]) => {
       if (items.length === 0) return
-      setScrollbackItems((prev) => [...prev, ...items])
+      setScrollbackItems((prev) => {
+        const acc = [...prev]
+        for (const item of items) {
+          acc.push(withLeadingGapAfterUserIfNeeded(acc, item))
+        }
+        return acc
+      })
     },
     []
   )
@@ -70,7 +94,10 @@ export function InteractiveCliApp() {
     if (assistantText !== '') {
       setScrollbackItems((prev) => [
         ...prev,
-        transcriptAssistantText(assistantText),
+        withLeadingGapAfterUserIfNeeded(
+          prev,
+          transcriptAssistantText(assistantText)
+        ),
       ])
     }
     setActiveStageComponent(null)
@@ -81,7 +108,13 @@ export function InteractiveCliApp() {
     const commitUserLineWithAssistant = (assistantText: string) => {
       const user = transcriptUserLine(line)
       const assistant = transcriptAssistantText(assistantText)
-      setScrollbackItems((prev) => [...prev, user, assistant])
+      setScrollbackItems((prev) => {
+        const withUser = [...prev, withLeadingGapAfterUserIfNeeded(prev, user)]
+        return [
+          ...withUser,
+          withLeadingGapAfterUserIfNeeded(withUser, assistant),
+        ]
+      })
     }
 
     const lineOfCommand = line.startsWith('/')
@@ -103,7 +136,10 @@ export function InteractiveCliApp() {
 
     const { command, argument } = resolved
     const user = transcriptUserLine(line)
-    setScrollbackItems((prev) => [...prev, user])
+    setScrollbackItems((prev) => [
+      ...prev,
+      withLeadingGapAfterUserIfNeeded(prev, user),
+    ])
     const Stage = command.stageComponent
     if (Stage) {
       const argumentMissing = argument === undefined || argument === ''
@@ -112,7 +148,10 @@ export function InteractiveCliApp() {
         const assistant = transcriptAssistantText(
           `Missing ${argSpec.name}. Usage: ${command.doc.usage}`
         )
-        setScrollbackItems((prev) => [...prev, assistant])
+        setScrollbackItems((prev) => [
+          ...prev,
+          withLeadingGapAfterUserIfNeeded(prev, assistant),
+        ])
         return
       }
       stageArgumentRef.current = argument
@@ -126,7 +165,10 @@ export function InteractiveCliApp() {
       const assistant = transcriptAssistantText(
         `Missing ${argSpec.name}. Usage: ${command.doc.usage}`
       )
-      setScrollbackItems((prev) => [...prev, assistant])
+      setScrollbackItems((prev) => [
+        ...prev,
+        withLeadingGapAfterUserIfNeeded(prev, assistant),
+      ])
       return
     }
     const run = command.run
@@ -134,20 +176,29 @@ export function InteractiveCliApp() {
       const assistant = transcriptAssistantText(
         'Internal error: command has no run handler.'
       )
-      setScrollbackItems((prev) => [...prev, assistant])
+      setScrollbackItems((prev) => [
+        ...prev,
+        withLeadingGapAfterUserIfNeeded(prev, assistant),
+      ])
       return
     }
     Promise.resolve(run(argument))
       .then((r) => {
         const assistant = transcriptAssistantText(r.assistantMessage)
-        setScrollbackItems((prev) => [...prev, assistant])
+        setScrollbackItems((prev) => [
+          ...prev,
+          withLeadingGapAfterUserIfNeeded(prev, assistant),
+        ])
         if (command.line === '/exit') setExitAfterCommit(true)
       })
       .catch((err: unknown) => {
         const assistant = transcriptAssistantText(
           userVisibleSlashCommandError(err)
         )
-        setScrollbackItems((prev) => [...prev, assistant])
+        setScrollbackItems((prev) => [
+          ...prev,
+          withLeadingGapAfterUserIfNeeded(prev, assistant),
+        ])
       })
   }, [])
 
@@ -160,7 +211,7 @@ export function InteractiveCliApp() {
     <SetStageKeyHandlerContext.Provider value={setStageKeyHandler}>
       <SessionScrollbackAppendProvider value={scrollbackAppendApi}>
         <Box flexDirection="column">
-          <InteractiveSessionScrollback items={scrollbackItems} />
+          <SessionScrollback items={scrollbackItems} />
           {activeStageComponent &&
             createElement(activeStageComponent, {
               argument: stageArgumentRef.current,
