@@ -5,12 +5,43 @@ deactivate_nvm() {
   command -v nvm >/dev/null 2>&1 && { nvm deactivate; }
 }
 
+# Skip corepack + pnpm when direnv/nix runs the shell hook more than once per cd (corepack use triggers a workspace install by itself).
+DOUGHNUT_PNPM_FINGERPRINT_FILE="${DOUGHNUT_PNPM_FINGERPRINT_FILE:-.doughnut-pnpm-lock.sha256}"
+
+doughnut_workspace_deps_fingerprint() {
+  if [ ! -f "${PWD}/pnpm-lock.yaml" ] || [ ! -f "${PWD}/package.json" ]; then
+    return 1
+  fi
+  if command -v shasum >/dev/null 2>&1; then
+    (cat "${PWD}/pnpm-lock.yaml" "${PWD}/package.json" "${PWD}/pnpm-workspace.yaml" 2>/dev/null) | shasum -a 256 | awk '{print $1}'
+  elif command -v sha256sum >/dev/null 2>&1; then
+    (cat "${PWD}/pnpm-lock.yaml" "${PWD}/package.json" "${PWD}/pnpm-workspace.yaml" 2>/dev/null) | sha256sum | awk '{print $1}'
+  else
+    cksum "${PWD}/pnpm-lock.yaml" "${PWD}/package.json" 2>/dev/null | cksum | awk '{print $1}'
+  fi
+}
+
+doughnut_needs_pnpm_install() {
+  local current
+  [ "${DOUGHNUT_SHELL_HOOK_FORCE_PNPM:-}" = "1" ] && return 0
+  [ ! -d "${PWD}/node_modules" ] && return 0
+  current="$(doughnut_workspace_deps_fingerprint)" || return 0
+  [ -z "${current}" ] && return 0
+  [ ! -f "${PWD}/${DOUGHNUT_PNPM_FINGERPRINT_FILE}" ] && return 0
+  [ "$(cat "${PWD}/${DOUGHNUT_PNPM_FINGERPRINT_FILE}" 2>/dev/null)" != "${current}" ] && return 0
+  return 1
+}
+
 # Setup PNPM and Biome
 setup_pnpm_and_biome() {
   log "Setting up PNPM..."
-  corepack prepare pnpm@10.33.0 --activate
-  corepack use pnpm@10.33.0
-  pnpm --frozen-lockfile recursive install
+  if doughnut_needs_pnpm_install; then
+    corepack prepare pnpm@10.33.0 --activate
+    corepack use pnpm@10.33.0
+    pnpm --frozen-lockfile recursive install && doughnut_workspace_deps_fingerprint >"${PWD}/${DOUGHNUT_PNPM_FINGERPRINT_FILE}"
+  else
+    log "Skipping corepack/pnpm (workspace fingerprint unchanged). Set DOUGHNUT_SHELL_HOOK_FORCE_PNPM=1 to force."
+  fi
 
   if [ -e /etc/NIXOS ] || [ -e /etc/nixos ]; then
     log "Patching Biome binaries on NixOS..."

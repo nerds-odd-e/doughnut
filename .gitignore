@@ -1,4 +1,5 @@
 # Miscellaneous
+.doughnut-pnpm-lock.sha256
 *.class
 *.log
 *.pyc

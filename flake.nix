@@ -58,6 +58,7 @@
           nixfmt-classic
           hclfmt
           trash-cli
+          process-compose
         ];
 
         darwinPackages = with pkgs; lib.optionals stdenv.isDarwin [ sequelpro ];

@@ -78,8 +78,10 @@ if [ "$CURSOR_DEV_MODE" != "true" ]; then
   # Start MySQL if not running
   if ! lsof -i :3309 -sTCP:LISTEN >/dev/null 2>&1; then
     log "Starting MySQL server..."
-    ./scripts/init_mysql.sh
+    export PC_DISABLE_TUI=1
+    process-compose -f "${PWD}/process-compose.yaml" up -D mysql
     check_mysql_ready
+    "${MYSQL_BASEDIR}/bin/mysql" -u root -S "${MYSQL_UNIX_SOCKET}" < "${PWD}/scripts/sql/init_doughnut_db.sql"
   else
     log "MySQL is running on port 3309 & ready to go! 🐬"
   fi

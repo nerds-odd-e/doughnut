@@ -1,0 +1,5 @@
+version: "0.5"
+
+processes:
+  mysql:
+    command: "./scripts/run_mysql_process.sh"

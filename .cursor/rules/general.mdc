@@ -26,6 +26,7 @@ pnpm sut
 ```
 
 This command starts:
+
 - Backend (with auto-reload on Java code changes via Gradle continuous build)
 - Frontend (with hot module replacement on Vue code changes)
 - Mountebank (mock external services)
@@ -33,6 +34,7 @@ This command starts:
 **CRITICAL: All services automatically restart/reload when code changes are made.**
 
 **DO NOT tell developers to restart `pnpm sut` after making code changes!**
+
 - Backend: Uses Gradle continuous build (`-t` flag) which automatically detects changes, recompiles Java classes, and hot-reloads them into the running Spring Boot application
 - Frontend: Uses Vite with Hot Module Replacement (HMR) for instant Vue component updates
 - Developers should NEVER need to manually restart services during development
@@ -40,6 +42,31 @@ This command starts:
 **If services are not running or if you need to suggest starting them**, recommend running `pnpm sut` in a separate terminal first. But once running, DO NOT suggest restarting after code changes.
 
 **Unsure if SUT is running?** Run **`CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`**. If not OK, run **`CURSOR_DEV=true nix develop -c pnpm sut:restart`**, or start **`pnpm sut`** if nothing was listening. Do **not** tell people to restart `pnpm sut` after normal code edits. **Cloud VM** (no Nix): same **`pnpm sut:healthcheck`** / **`pnpm sut:restart`** from repo root; **`sut:restart`** needs **`lsof`** — see **`cloud-agent-setup`**.
+
+## Local MySQL (nix shell hook and process-compose)
+
+- **`scripts/nix_shell_hook.sh`** (via **`flake.nix`** shellHook) uses **`process-compose.yaml`**. When **`CURSOR_DEV` is unset** (normal interactive **`direnv`** / **`nix develop`**), if **nothing is listening on TCP 3309**, the hook runs **`process-compose -f process-compose.yaml up -D mysql`**, waits for readiness, then applies **`scripts/sql/init_doughnut_db.sql`**. If **3309 is already in use**, the hook **does not** start or restart MySQL.
+- With **`CURSOR_DEV=true`** (typical agent invocations), that block is **skipped**. If backend tests or other work need MySQL, start it explicitly (see below) or use a full interactive shell without **`CURSOR_DEV=true`** when appropriate.
+
+**Stop MySQL** (detached process-compose project and supervised **`mysql`**):
+
+```bash
+CURSOR_DEV=true nix develop -c process-compose down
+```
+
+(From repo root; same as **`process-compose down`** inside an active nix dev shell.)
+
+**Manual start** when **3309** is free and **`MYSQL_*`** is set (after **`setup_mysql_env`** in **`scripts/shell_setup.sh`**, i.e. inside **`nix develop`**):
+
+```bash
+process-compose -f process-compose.yaml up -D mysql
+```
+
+With only **`nix develop -c`**, set **`MYSQL_*`** the same way as the hook (e.g. source **`scripts/shell_setup.sh`** and call **`setup_mysql_env`** with the nix **`mysql84`** path) before **`process-compose up`**, or use an interactive **`nix develop`** / **`direnv`** session once with **`CURSOR_DEV` unset** so the hook starts MySQL.
+
+**Debug / restart:** log file **`mysql/mysql.log`** (also **`$MYSQL_HOME/mysql.log`**); **`mysqladmin ping -h127.0.0.1 -P3309`**; **`CURSOR_DEV=true nix develop -c process-compose attach`**; **`CURSOR_DEV=true nix develop -c process-compose process logs mysql`**. If MySQL misbehaves: **`CURSOR_DEV=true nix develop -c process-compose down`**, or stop only **`mysql`**: **`CURSOR_DEV=true nix develop -c process-compose process stop mysql`**, then if **3309** is still held use **`pkill mysqld`** or **`pgrep mysqld | xargs kill`** and **`lsof -i :3309`**. Start again with a free **3309** via the hook or **`process-compose -f process-compose.yaml up -D mysql`** as above.
+
+**direnv “taking a while” / post-hook pause:** After **`Environment setup complete!`**, Nix may still print **`removing profile version …`** while updating the dev profile (not the shell hook). **`.envrc`** sets **`DIRENV_WARN_TIMEOUT`** (e.g. **`120s`**); if the **5s** warning still appears, set **`warn_timeout`** in **`~/.config/direnv/direnv.toml`**. **`dev_setup.sh`** skips **`corepack`** + **`pnpm install`** when the workspace fingerprint is unchanged ( **`corepack use`** alone was still running a full install). The hook sets **`PC_DISABLE_TUI=1`** before **`process-compose`**. More: **`CLAUDE.md`** (Local MySQL / direnv).
 
 ## Running Commands in Terminal
 
@@ -55,17 +82,17 @@ When deleting files, instead of using `rm -f` or `rm -rf` prefer to use `trash` 
 
 It is the top priority to keep high cohesion all the time.
 
-* Minimize the duplicate and make sure the same concept has one representation acroess the whole system
-* The code should have good mapping to the ubiquitous business domain
-* Thing belong together should be placed together or close by, so that they are easy to use
+- Minimize the duplicate and make sure the same concept has one representation acroess the whole system
+- The code should have good mapping to the ubiquitous business domain
+- Thing belong together should be placed together or close by, so that they are easy to use
 
 ## Keep it simple
 
-* DO NOT follow the defensive programming style
-* Use the simplest solution and minimum code to achieve what the prompt asked to do.
+- DO NOT follow the defensive programming style
+- Use the simplest solution and minimum code to achieve what the prompt asked to do.
 
 ## Documentation
 
-* DO NOT add historical documentation, comments about past implementations, or completed task lists
-* Code readers only care about the current state, not development history
-* Exception: Temporary requirement documents in the `ongoing/` folder are allowed for active development
+- DO NOT add historical documentation, comments about past implementations, or completed task lists
+- Code readers only care about the current state, not development history
+- Exception: Temporary requirement documents in the `ongoing/` folder are allowed for active development
