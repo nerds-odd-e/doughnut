@@ -128,6 +128,19 @@ describe('recall spelling (interactive)', () => {
   })
 
   test('wrong spelling shows Incorrect., records answer with correct false, no success lines', async () => {
+    let recallingAfterWrong = 0
+    recallingSpy.mockImplementation(() => {
+      recallingAfterWrong += 1
+      const empty = makeMe.aDueMemoryTrackersList
+        .totalAssimilatedCount(0)
+        .toRepeat([])
+        .please()
+      const data = recallingAfterWrong === 1 ? spellingDueList() : empty
+      return Promise.resolve({
+        data,
+      } as Awaited<ReturnType<typeof RecallsController.recalling>>)
+    })
+
     const pending = pendingSpellingPrompt()
     answerSpellingSpy.mockResolvedValue({
       data: {
@@ -147,12 +160,13 @@ describe('recall spelling (interactive)', () => {
 
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Incorrect.')
+      (p) => p.includes('Incorrect.') && p.includes('Recalled 1 note')
     )
 
     const plain = stripAnsi(frames.join('\n'))
     expect(plain).not.toContain('Correct!')
     expect(plain).not.toContain('Recalled successfully')
+    expect(plain).toContain('Recalled 1 note')
 
     expect(answerSpellingSpy).toHaveBeenCalledTimes(1)
     expect(answerSpellingSpy).toHaveBeenCalledWith(

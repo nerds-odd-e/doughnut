@@ -14,13 +14,9 @@ import { Box, Text, useInput } from 'ink'
 import { Spinner } from '@inkjs/ui'
 import { renderMarkdownToTerminal } from '../../markdown.js'
 import { resolvedTerminalWidth } from '../../terminalColumns.js'
-import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
 import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
-import { RECALL_SESSION_STOPPED_LINE } from './leaveRecallSessionCopy.js'
-import { recallAnsweredLine } from './recallAnsweredScrollback.js'
-import { useSessionScrollbackAppend } from '../../sessionScrollback/sessionScrollbackAppendContext.js'
 import {
   fetchSpellingRecallPrompt,
   submitSpellingAnswer,
@@ -39,16 +35,20 @@ type LoadState =
     }
 
 export function SpellingRecallStage({
-  onSettled,
   payload,
   inputBlockedRef,
   onSpellingSessionComplete,
-}: InteractiveSlashCommandStageProps & {
+  onSpellingIncorrect,
+  onRecallFatalError,
+  onConfirmLeaveRecall,
+}: {
   readonly payload: SpellingRecallSessionPayload
   readonly inputBlockedRef: MutableRefObject<boolean>
   readonly onSpellingSessionComplete: () => void | Promise<void>
+  readonly onSpellingIncorrect: () => void | Promise<void>
+  readonly onRecallFatalError: (message: string) => void
+  readonly onConfirmLeaveRecall: () => void
 }) {
-  const { appendScrollbackItem } = useSessionScrollbackAppend()
   const [loadState, setLoadState] = useState<LoadState>({ status: 'loading' })
   const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
   const [buffer, setBuffer] = useState('')
@@ -74,14 +74,14 @@ export function SpellingRecallStage({
         })
       } catch (err: unknown) {
         if (cancelled || ac.signal.aborted) return
-        onSettled(userVisibleSlashCommandError(err))
+        onRecallFatalError(userVisibleSlashCommandError(err))
       }
     })().catch(() => undefined)
     return () => {
       cancelled = true
       ac.abort()
     }
-  }, [onSettled, payload.memoryTrackerId])
+  }, [onRecallFatalError, payload.memoryTrackerId])
 
   const stemRendered = useMemo(() => {
     if (loadState.status !== 'ready') return ''
@@ -101,21 +101,22 @@ export function SpellingRecallStage({
       const updated = await submitSpellingAnswer(loadState.recallPromptId, line)
       const correct = updated.answer?.correct === true
       if (!correct) {
-        appendScrollbackItem(recallAnsweredLine('Incorrect.'))
-        onSettled('')
+        bufferRef.current = ''
+        setBuffer('')
+        await onSpellingIncorrect()
         return
       }
       await onSpellingSessionComplete()
     } catch (err: unknown) {
-      onSettled(userVisibleSlashCommandError(err))
+      onRecallFatalError(userVisibleSlashCommandError(err))
     } finally {
       inputBlockedRef.current = false
     }
   }, [
-    appendScrollbackItem,
     inputBlockedRef,
     loadState,
-    onSettled,
+    onRecallFatalError,
+    onSpellingIncorrect,
     onSpellingSessionComplete,
   ])
 
@@ -206,7 +207,7 @@ export function SpellingRecallStage({
   if (showLeaveConfirm) {
     return (
       <LeaveRecallConfirmPrompt
-        onConfirmLeave={() => onSettled(RECALL_SESSION_STOPPED_LINE)}
+        onConfirmLeave={onConfirmLeaveRecall}
         onDismiss={() => setShowLeaveConfirm(false)}
         inputBlockedRef={inputBlockedRef}
         header={

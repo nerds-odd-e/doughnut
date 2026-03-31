@@ -17,14 +17,10 @@ import {
 import { GuidanceListInk } from '../../guidanceListWindowInk.js'
 import { resolvedTerminalWidth } from '../../terminalColumns.js'
 import { renderMarkdownToTerminal } from '../../markdown.js'
-import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
 import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
-import { RECALL_SESSION_STOPPED_LINE } from './leaveRecallSessionCopy.js'
 import { numberedMcqMarkdownLinesForTerminal } from './numberedMcqMarkdownLines.js'
-import { recallAnsweredLine } from './recallAnsweredScrollback.js'
-import { useSessionScrollbackAppend } from '../../sessionScrollback/sessionScrollbackAppendContext.js'
 import {
   contestAndRegenerateMcq,
   submitMcqAnswer,
@@ -37,20 +33,24 @@ const MCQ_HINT =
   '↑↓ Enter or number to select; Esc asks to leave recall (y/n confirm)'
 
 export function RecallMcqStage({
-  onSettled,
   payload,
   inputBlockedRef,
   onMcqSucceeded,
+  onMcqIncorrect,
+  onRecallFatalError,
+  onConfirmLeaveRecall,
   onMcqPayloadReplace,
   onMcqSessionNotice,
-}: InteractiveSlashCommandStageProps & {
+}: {
   readonly payload: RecallMcqCardPayload
   readonly inputBlockedRef: MutableRefObject<boolean>
   readonly onMcqSucceeded: () => void | Promise<void>
+  readonly onMcqIncorrect: () => void | Promise<void>
+  readonly onRecallFatalError: (message: string) => void
+  readonly onConfirmLeaveRecall: () => void
   readonly onMcqPayloadReplace: (payload: RecallMcqCardPayload) => void
   readonly onMcqSessionNotice?: (line: string) => void
 }) {
-  const { appendScrollbackItem } = useSessionScrollbackAppend()
   const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
   const [buffer, setBuffer] = useState('')
   const bufferRef = useRef('')
@@ -80,22 +80,24 @@ export function RecallMcqStage({
         const updated = await submitMcqAnswer(payload.recallPromptId, choiceIdx)
         const correct = updated.answer?.correct === true
         if (!correct) {
-          appendScrollbackItem(recallAnsweredLine('Incorrect.'))
-          onSettled('')
+          bufferRef.current = ''
+          setBuffer('')
+          setHighlightIndex(0)
+          await onMcqIncorrect()
           return
         }
         await onMcqSucceeded()
       } catch (err: unknown) {
-        onSettled(userVisibleSlashCommandError(err))
+        onRecallFatalError(userVisibleSlashCommandError(err))
       } finally {
         inputBlockedRef.current = false
       }
     },
     [
-      appendScrollbackItem,
       inputBlockedRef,
+      onMcqIncorrect,
       onMcqSucceeded,
-      onSettled,
+      onRecallFatalError,
       payload.recallPromptId,
     ]
   )
@@ -116,7 +118,7 @@ export function RecallMcqStage({
         onMcqSessionNotice?.(result.message)
       }
     } catch (err: unknown) {
-      onSettled(userVisibleSlashCommandError(err))
+      onRecallFatalError(userVisibleSlashCommandError(err))
     } finally {
       inputBlockedRef.current = false
     }
@@ -124,7 +126,7 @@ export function RecallMcqStage({
     inputBlockedRef,
     onMcqPayloadReplace,
     onMcqSessionNotice,
-    onSettled,
+    onRecallFatalError,
     payload.memoryTrackerId,
     payload.notebookTitle,
     payload.recallPromptId,
@@ -229,7 +231,7 @@ export function RecallMcqStage({
   if (showLeaveConfirm) {
     return (
       <LeaveRecallConfirmPrompt
-        onConfirmLeave={() => onSettled(RECALL_SESSION_STOPPED_LINE)}
+        onConfirmLeave={onConfirmLeaveRecall}
         onDismiss={() => setShowLeaveConfirm(false)}
         inputBlockedRef={inputBlockedRef}
         header={

@@ -159,6 +159,25 @@ describe('recall MCQ (interactive)', () => {
   })
 
   test('wrong MCQ choice shows Incorrect and sends 0-based choiceIndex to API', async () => {
+    let recallingAfterWrong = 0
+    recallingSpy.mockImplementation(() => {
+      recallingAfterWrong += 1
+      const empty = makeMe.aDueMemoryTrackersList
+        .totalAssimilatedCount(0)
+        .toRepeat([])
+        .please()
+      const data =
+        recallingAfterWrong === 1
+          ? makeMe.aDueMemoryTrackersList
+              .totalAssimilatedCount(0)
+              .toRepeat([{ memoryTrackerId: 1, spelling: false }])
+              .please()
+          : empty
+      return Promise.resolve({
+        data,
+      } as Awaited<ReturnType<typeof RecallsController.recalling>>)
+    })
+
     const pending = pendingMcqPrompt()
     answerQuizSpy.mockResolvedValue({
       data: {
@@ -181,7 +200,7 @@ describe('recall MCQ (interactive)', () => {
 
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Incorrect')
+      (p) => p.includes('Incorrect') && p.includes('Recalled 1 note')
     )
 
     expect(answerQuizSpy).toHaveBeenCalledTimes(1)
@@ -191,6 +210,144 @@ describe('recall MCQ (interactive)', () => {
         body: { choiceIndex: 1 },
       })
     )
+  })
+
+  test('wrong MCQ then next due tracker shows second question without ending recall', async () => {
+    const SECOND_PROMPT_ID = 99
+    const secondStem = 'SECOND_MCQ_STEM_UNIQUE'
+    const pending = pendingMcqPrompt()
+    const secondPrompt = makeMe.aRecallPrompt
+      .withId(SECOND_PROMPT_ID)
+      .withQuestionStem(secondStem)
+      .withChoices(['X', 'Y', 'Z'])
+      .withMemoryTrackerId(2)
+      .please()
+
+    const note1 = makeMe.aNoteRealm
+      .title('Alpha')
+      .notebookTitle('NB')
+      .details('body')
+      .createdAt(baseNoteTimes.createdAt)
+      .updatedAt(baseNoteTimes.updatedAt)
+      .please()
+    const note2 = makeMe.aNoteRealm
+      .title('Beta')
+      .notebookTitle('NB')
+      .details('body2')
+      .createdAt(baseNoteTimes.createdAt)
+      .updatedAt(baseNoteTimes.updatedAt)
+      .please()
+
+    let recallingN = 0
+    recallingSpy.mockImplementation(() => {
+      recallingN += 1
+      const empty = makeMe.aDueMemoryTrackersList
+        .totalAssimilatedCount(0)
+        .toRepeat([])
+        .please()
+      const row1 = { memoryTrackerId: 1, spelling: false as const }
+      const row2 = { memoryTrackerId: 2, spelling: false as const }
+      const data =
+        recallingN === 1
+          ? makeMe.aDueMemoryTrackersList
+              .totalAssimilatedCount(0)
+              .toRepeat([row1])
+              .please()
+          : recallingN === 2
+            ? makeMe.aDueMemoryTrackersList
+                .totalAssimilatedCount(0)
+                .toRepeat([row2])
+                .please()
+            : empty
+      return Promise.resolve({
+        data,
+      } as Awaited<ReturnType<typeof RecallsController.recalling>>)
+    })
+
+    showMemoryTrackerSpy.mockImplementation((opts) => {
+      const id = opts.path.memoryTracker
+      if (id === 1) {
+        return Promise.resolve({
+          data: makeMe.aMemoryTracker
+            .nextRecallAt('2026-06-01T00:00:00Z')
+            .ofNote(note1)
+            .please(),
+        } as Awaited<
+          ReturnType<typeof MemoryTrackerController.showMemoryTracker>
+        >)
+      }
+      if (id === 2) {
+        return Promise.resolve({
+          data: makeMe.aMemoryTracker
+            .nextRecallAt('2026-06-01T00:00:00Z')
+            .ofNote(note2)
+            .please(),
+        } as Awaited<
+          ReturnType<typeof MemoryTrackerController.showMemoryTracker>
+        >)
+      }
+      throw new Error(`unexpected memoryTracker ${String(id)}`)
+    })
+
+    getRecallPromptsSpy.mockImplementation((opts) => {
+      const id = opts.path.memoryTracker
+      if (id === 1) {
+        return Promise.resolve({
+          data: [pending],
+        } as Awaited<
+          ReturnType<typeof MemoryTrackerController.getRecallPrompts>
+        >)
+      }
+      if (id === 2) {
+        return Promise.resolve({
+          data: [secondPrompt],
+        } as Awaited<
+          ReturnType<typeof MemoryTrackerController.getRecallPrompts>
+        >)
+      }
+      throw new Error(`unexpected memoryTracker ${String(id)}`)
+    })
+
+    let answerN = 0
+    answerQuizSpy.mockImplementation(() => {
+      answerN += 1
+      if (answerN === 1) {
+        return Promise.resolve({
+          data: {
+            ...pending,
+            answer: { id: 100, correct: false, choiceIndex: 1 },
+          },
+        } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
+      }
+      return Promise.resolve({
+        data: {
+          ...secondPrompt,
+          answer: { id: 101, correct: true, choiceIndex: 0 },
+        },
+      } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
+    })
+
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForMcqVisible(frames)
+    stdin.write('2\r')
+
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes('Incorrect') && p.includes(secondStem)
+    )
+
+    expect(answerQuizSpy).toHaveBeenCalledTimes(1)
+
+    stdin.write('1\r')
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes('Correct!')
+    )
+    expect(answerQuizSpy).toHaveBeenCalledTimes(2)
   })
 
   test('Esc from MCQ shows leave recall confirmation without calling answerQuiz', async () => {

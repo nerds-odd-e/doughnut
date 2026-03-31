@@ -75,6 +75,7 @@ Feature: CLI recall status and recall session
       And It's day 2
       When I input down-arrow selection for "/recall" in the interactive CLI
       Then I should see "Incorrect" in answered questions
+      And I should see "Recalled 1 note" in past CLI assistant messages
 
     @usingMockedOpenAiService
     Scenario: MCQ — contest and regenerate before answering

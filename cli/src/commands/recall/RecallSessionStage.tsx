@@ -44,6 +44,8 @@ export function RecallSessionStage({
   const cardRef = useRef<RecallCard | null>(null)
   const submittingRef = useRef(false)
   const successfulRecallsRef = useRef(0)
+  /** MCQ/spelling answers submitted this session (correct or incorrect); drives summary when wrong exhausts the queue. */
+  const sessionAnsweredCardsRef = useRef(0)
   const startedWithEmptyTodayRef = useRef(false)
   const activeOperationAbortRef = useRef<AbortController | null>(null)
 
@@ -89,8 +91,20 @@ export function RecallSessionStage({
     onSettled(recallSessionSummaryLine(successfulRecallsRef.current))
   }, [onSettled])
 
+  const onRecallFatalError = useCallback(
+    (message: string) => {
+      onSettled(message)
+    },
+    [onSettled]
+  )
+
+  const onConfirmLeaveRecall = useCallback(() => {
+    onSettled(RECALL_SESSION_STOPPED_LINE)
+  }, [onSettled])
+
   const onMcqSucceeded = useCallback(async () => {
     successfulRecallsRef.current += 1
+    sessionAnsweredCardsRef.current += 1
     try {
       const next = await loadNextRecallCardIfAny(0)
       if (next !== null) {
@@ -104,8 +118,24 @@ export function RecallSessionStage({
     }
   }, [appendScrollbackItem, onSettled])
 
+  const onMcqIncorrect = useCallback(async () => {
+    sessionAnsweredCardsRef.current += 1
+    appendScrollbackItem(recallAnsweredLine('Incorrect.'))
+    try {
+      const next = await loadNextRecallCardIfAny(0)
+      if (next !== null) {
+        setCard(next)
+        return
+      }
+      onSettled(recallSessionSummaryLine(sessionAnsweredCardsRef.current))
+    } catch (loadErr: unknown) {
+      onSettled(userVisibleSlashCommandError(loadErr))
+    }
+  }, [appendScrollbackItem, onSettled])
+
   const onSpellingSessionComplete = useCallback(async () => {
     successfulRecallsRef.current += 1
+    sessionAnsweredCardsRef.current += 1
     const spellCard = cardRef.current
     const spellTitle =
       spellCard?.variant === 'spelling-session'
@@ -121,6 +151,21 @@ export function RecallSessionStage({
       }
       appendScrollbackItem(recallAnsweredLine(spellCorrectLine))
       onSettled('')
+    } catch (loadErr: unknown) {
+      onSettled(userVisibleSlashCommandError(loadErr))
+    }
+  }, [appendScrollbackItem, onSettled])
+
+  const onSpellingIncorrect = useCallback(async () => {
+    sessionAnsweredCardsRef.current += 1
+    appendScrollbackItem(recallAnsweredLine('Incorrect.'))
+    try {
+      const next = await loadNextRecallCardIfAny(0)
+      if (next !== null) {
+        setCard(next)
+        return
+      }
+      onSettled(recallSessionSummaryLine(sessionAnsweredCardsRef.current))
     } catch (loadErr: unknown) {
       onSettled(userVisibleSlashCommandError(loadErr))
     }
@@ -317,10 +362,12 @@ export function RecallSessionStage({
       <RecallSessionChrome>
         <RecallMcqStage
           key={card.payload.recallPromptId}
-          onSettled={onSettled}
           payload={card.payload}
           inputBlockedRef={submittingRef}
           onMcqSucceeded={onMcqSucceeded}
+          onMcqIncorrect={onMcqIncorrect}
+          onRecallFatalError={onRecallFatalError}
+          onConfirmLeaveRecall={onConfirmLeaveRecall}
           onMcqPayloadReplace={(p) => setCard({ variant: 'mcq', payload: p })}
           onMcqSessionNotice={(line) =>
             appendScrollbackItem(recallAnsweredLine(line))
@@ -335,10 +382,12 @@ export function RecallSessionStage({
       <RecallSessionChrome>
         <SpellingRecallStage
           key={card.payload.memoryTrackerId}
-          onSettled={onSettled}
           payload={card.payload}
           inputBlockedRef={submittingRef}
           onSpellingSessionComplete={onSpellingSessionComplete}
+          onSpellingIncorrect={onSpellingIncorrect}
+          onRecallFatalError={onRecallFatalError}
+          onConfirmLeaveRecall={onConfirmLeaveRecall}
         />
       </RecallSessionChrome>
     )
