@@ -17,6 +17,13 @@ export type RecallMcqCardPayload = {
   readonly notebookTitle?: string
 }
 
+const CONTEST_REJECTED_FALLBACK =
+  'Contest was not accepted. Please answer the question.'
+
+export type ContestMcqOutcome =
+  | { outcome: 'replaced'; payload: RecallMcqCardPayload }
+  | { outcome: 'rejected'; message: string }
+
 function firstPendingMcq(prompts: RecallPrompt[]): RecallPrompt | undefined {
   return prompts.find((p) => p.questionType === 'MCQ' && p.answer == null)
 }
@@ -73,13 +80,13 @@ export async function tryLoadMcqPayload(
   )
 }
 
-/** Contest then regenerate; `null` if contest was rejected (stay on current card). */
+/** Contest then regenerate, or rejected outcome with a user-visible message. */
 export async function contestAndRegenerateMcq(
   memoryTrackerId: number,
   notebookTitle: string | undefined,
   currentRecallPromptId: number,
   signal?: AbortSignal
-): Promise<RecallMcqCardPayload | null> {
+): Promise<ContestMcqOutcome> {
   const contestResult = await runDefaultBackendJson<QuestionContestResult>(() =>
     RecallPromptController.contest({
       path: { recallPrompt: currentRecallPromptId },
@@ -87,7 +94,8 @@ export async function contestAndRegenerateMcq(
     })
   )
   if (contestResult.rejected === true) {
-    return null
+    const message = contestResult.advice?.trim() || CONTEST_REJECTED_FALLBACK
+    return { outcome: 'rejected', message }
   }
   const regenerated = await runDefaultBackendJson<RecallPrompt>(() =>
     RecallPromptController.regenerate({
@@ -104,7 +112,7 @@ export async function contestAndRegenerateMcq(
   if (mapped === null) {
     throw new Error('Regenerated recall prompt is not a pending MCQ.')
   }
-  return mapped
+  return { outcome: 'replaced', payload: mapped }
 }
 
 export async function submitMcqAnswer(

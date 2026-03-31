@@ -52,6 +52,8 @@ describe('recall MCQ (interactive)', () => {
   let getRecallPromptsSpy: ReturnType<typeof vi.spyOn>
   let askAQuestionSpy: ReturnType<typeof vi.spyOn>
   let answerQuizSpy: ReturnType<typeof vi.spyOn>
+  let contestSpy: ReturnType<typeof vi.spyOn> | undefined
+  let regenerateSpy: ReturnType<typeof vi.spyOn> | undefined
 
   function pendingMcqPrompt(): RecallPrompt {
     return makeMe.aRecallPrompt
@@ -107,6 +109,10 @@ describe('recall MCQ (interactive)', () => {
   })
 
   afterEach(() => {
+    contestSpy?.mockRestore()
+    contestSpy = undefined
+    regenerateSpy?.mockRestore()
+    regenerateSpy = undefined
     recallingSpy.mockRestore()
     showMemoryTrackerSpy.mockRestore()
     getRecallPromptsSpy.mockRestore()
@@ -359,6 +365,61 @@ describe('recall MCQ (interactive)', () => {
         p.includes('Choose') &&
         p.includes(MCQ_HINT_SUBSTR) &&
         !p.includes(LEAVE_RECALL_PROMPT)
+    )
+
+    expect(answerQuizSpy).not.toHaveBeenCalled()
+  })
+
+  test('rejected contest shows advice in session strip and does not call regenerate', async () => {
+    const rejectAdvice = 'UNIQUE_REJECT_ADVICE_9_3'
+    contestSpy = vi.spyOn(RecallPromptController, 'contest').mockResolvedValue({
+      data: { rejected: true, advice: rejectAdvice },
+    } as Awaited<ReturnType<typeof RecallPromptController.contest>>)
+    regenerateSpy = vi
+      .spyOn(RecallPromptController, 'regenerate')
+      .mockResolvedValue({
+        data: pendingMcqPrompt(),
+      } as Awaited<ReturnType<typeof RecallPromptController.regenerate>>)
+
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForMcqVisible(frames)
+
+    stdin.write('/contest\r')
+
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(rejectAdvice)
+    )
+
+    const plain = stripAnsi(frames.join('\n'))
+    expect(plain).toContain(rejectAdvice)
+    expect(plain).toContain('Choose')
+    expect(plain).toContain(MCQ_HINT_SUBSTR)
+    expect(regenerateSpy).not.toHaveBeenCalled()
+    expect(answerQuizSpy).not.toHaveBeenCalled()
+  })
+
+  test('contest API error settles with user-visible message and leaves recall', async () => {
+    contestSpy = vi
+      .spyOn(RecallPromptController, 'contest')
+      .mockRejectedValue(new Error('contest failed hard'))
+
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForMcqVisible(frames)
+
+    stdin.write('/contest\r')
+
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes('Doughnut service is not available')
     )
 
     expect(answerQuizSpy).not.toHaveBeenCalled()

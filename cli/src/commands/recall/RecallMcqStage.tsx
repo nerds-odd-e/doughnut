@@ -40,11 +40,13 @@ export function RecallMcqStage({
   inputBlockedRef,
   onMcqSucceeded,
   onMcqPayloadReplace,
+  onMcqSessionNotice,
 }: InteractiveSlashCommandStageProps & {
   readonly payload: RecallMcqCardPayload
   readonly inputBlockedRef: MutableRefObject<boolean>
   readonly onMcqSucceeded: () => void | Promise<void>
   readonly onMcqPayloadReplace: (payload: RecallMcqCardPayload) => void
+  readonly onMcqSessionNotice?: (line: string) => void
 }) {
   const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
   const [buffer, setBuffer] = useState('')
@@ -92,14 +94,16 @@ export function RecallMcqStage({
     if (inputBlockedRef.current) return
     inputBlockedRef.current = true
     try {
-      const next = await contestAndRegenerateMcq(
+      const result = await contestAndRegenerateMcq(
         payload.memoryTrackerId,
         payload.notebookTitle,
         payload.recallPromptId
       )
-      if (next !== null) {
+      if (result.outcome === 'replaced') {
         setHighlightIndex(0)
-        onMcqPayloadReplace(next)
+        onMcqPayloadReplace(result.payload)
+      } else {
+        onMcqSessionNotice?.(result.message)
       }
     } catch (err: unknown) {
       onSettled(userVisibleSlashCommandError(err))
@@ -109,6 +113,7 @@ export function RecallMcqStage({
   }, [
     inputBlockedRef,
     onMcqPayloadReplace,
+    onMcqSessionNotice,
     onSettled,
     payload.memoryTrackerId,
     payload.notebookTitle,

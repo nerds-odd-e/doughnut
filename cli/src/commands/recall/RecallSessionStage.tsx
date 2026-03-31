@@ -329,6 +329,9 @@ export function RecallSessionStage({
           inputBlockedRef={submittingRef}
           onMcqSucceeded={onMcqSucceeded}
           onMcqPayloadReplace={(p) => setCard({ variant: 'mcq', payload: p })}
+          onMcqSessionNotice={(line) =>
+            setAnsweredRecallLines((prev) => [...prev, line])
+          }
         />
       </RecallSessionChrome>
     )
