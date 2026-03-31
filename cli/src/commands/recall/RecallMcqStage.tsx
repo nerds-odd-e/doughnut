@@ -23,6 +23,8 @@ import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import { RECALL_SESSION_STOPPED_LINE } from './leaveRecallSessionCopy.js'
 import { numberedMcqMarkdownLinesForTerminal } from './numberedMcqMarkdownLines.js'
+import { recallAnsweredLine } from './recallAnsweredScrollback.js'
+import { useSessionScrollbackAppend } from '../../sessionScrollback/sessionScrollbackAppendContext.js'
 import {
   contestAndRegenerateMcq,
   submitMcqAnswer,
@@ -48,6 +50,7 @@ export function RecallMcqStage({
   readonly onMcqPayloadReplace: (payload: RecallMcqCardPayload) => void
   readonly onMcqSessionNotice?: (line: string) => void
 }) {
+  const { appendScrollbackItem } = useSessionScrollbackAppend()
   const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
   const [buffer, setBuffer] = useState('')
   const bufferRef = useRef('')
@@ -77,7 +80,8 @@ export function RecallMcqStage({
         const updated = await submitMcqAnswer(payload.recallPromptId, choiceIdx)
         const correct = updated.answer?.correct === true
         if (!correct) {
-          onSettled('Incorrect.')
+          appendScrollbackItem(recallAnsweredLine('Incorrect.'))
+          onSettled('')
           return
         }
         await onMcqSucceeded()
@@ -87,7 +91,13 @@ export function RecallMcqStage({
         inputBlockedRef.current = false
       }
     },
-    [inputBlockedRef, onMcqSucceeded, onSettled, payload.recallPromptId]
+    [
+      appendScrollbackItem,
+      inputBlockedRef,
+      onMcqSucceeded,
+      onSettled,
+      payload.recallPromptId,
+    ]
   )
 
   const runContest = useCallback(async () => {

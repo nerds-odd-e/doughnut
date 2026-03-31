@@ -2,9 +2,9 @@ import {
   createElement,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
-  type ComponentProps,
 } from 'react'
 import type { ComponentType } from 'react'
 import type { Key } from 'ink'
@@ -17,14 +17,14 @@ import { userVisibleSlashCommandError } from './userVisibleSlashCommandError.js'
 import type { StageKeyHandler } from './commands/accessToken/stageKeyForwardContext.js'
 import { SetStageKeyHandlerContext } from './commands/accessToken/stageKeyForwardContext.js'
 import {
-  InteractiveCliScrollback,
   transcriptAssistantText,
   transcriptUserLine,
 } from './sessionScrollback/interactiveCliTranscript.js'
-
-type InteractiveCliScrollbackItem = ComponentProps<
-  typeof InteractiveCliScrollback
->['items'][number]
+import {
+  InteractiveSessionScrollback,
+  type InteractiveScrollbackItem,
+} from './sessionScrollback/interactiveSessionScrollback.js'
+import { SessionScrollbackAppendProvider } from './sessionScrollback/sessionScrollbackAppendContext.js'
 
 export function InteractiveCliApp() {
   const { exit } = useApp()
@@ -40,7 +40,7 @@ export function InteractiveCliApp() {
     }, [])
   )
   const [scrollbackItems, setScrollbackItems] = useState<
-    InteractiveCliScrollbackItem[]
+    InteractiveScrollbackItem[]
   >(() => [transcriptAssistantText(formatVersionOutput())])
   const [activeStageComponent, setActiveStageComponent] =
     useState<ComponentType<InteractiveSlashCommandStageProps> | null>(null)
@@ -51,9 +51,28 @@ export function InteractiveCliApp() {
     exit()
   }, [exit, exitAfterCommit])
 
+  const appendScrollbackItem = useCallback(
+    (item: InteractiveScrollbackItem) => {
+      setScrollbackItems((prev) => [...prev, item])
+    },
+    []
+  )
+
+  const appendScrollbackItems = useCallback(
+    (items: readonly InteractiveScrollbackItem[]) => {
+      if (items.length === 0) return
+      setScrollbackItems((prev) => [...prev, ...items])
+    },
+    []
+  )
+
   const handleAsyncSlashSettled = useCallback((assistantText: string) => {
-    const assistant = transcriptAssistantText(assistantText)
-    setScrollbackItems((prev) => [...prev, assistant])
+    if (assistantText !== '') {
+      setScrollbackItems((prev) => [
+        ...prev,
+        transcriptAssistantText(assistantText),
+      ])
+    }
     setActiveStageComponent(null)
     stageArgumentRef.current = undefined
   }, [])
@@ -132,22 +151,29 @@ export function InteractiveCliApp() {
       })
   }, [])
 
+  const scrollbackAppendApi = useMemo(
+    () => ({ appendScrollbackItem, appendScrollbackItems }),
+    [appendScrollbackItem, appendScrollbackItems]
+  )
+
   return (
     <SetStageKeyHandlerContext.Provider value={setStageKeyHandler}>
-      <Box flexDirection="column">
-        <InteractiveCliScrollback items={scrollbackItems} />
-        {activeStageComponent &&
-          createElement(activeStageComponent, {
-            argument: stageArgumentRef.current,
-            onSettled: handleAsyncSlashSettled,
-          })}
-        {!exitAfterCommit && (
-          <MainInteractivePrompt
-            onCommittedLine={onCommittedLine}
-            isActive={!activeStageComponent}
-          />
-        )}
-      </Box>
+      <SessionScrollbackAppendProvider value={scrollbackAppendApi}>
+        <Box flexDirection="column">
+          <InteractiveSessionScrollback items={scrollbackItems} />
+          {activeStageComponent &&
+            createElement(activeStageComponent, {
+              argument: stageArgumentRef.current,
+              onSettled: handleAsyncSlashSettled,
+            })}
+          {!exitAfterCommit && (
+            <MainInteractivePrompt
+              onCommittedLine={onCommittedLine}
+              isActive={!activeStageComponent}
+            />
+          )}
+        </Box>
+      </SessionScrollbackAppendProvider>
     </SetStageKeyHandlerContext.Provider>
   )
 }

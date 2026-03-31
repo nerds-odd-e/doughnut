@@ -25,30 +25,19 @@ import { RecallMcqStage } from './RecallMcqStage.js'
 import { SpellingRecallStage } from './SpellingRecallStage.js'
 import { RECALL_SESSION_STOPPED_LINE } from './leaveRecallSessionCopy.js'
 import { recallSessionSummaryLine } from './recallSessionSummary.js'
+import { recallAnsweredLine } from './recallAnsweredScrollback.js'
+import { useSessionScrollbackAppend } from '../../sessionScrollback/sessionScrollbackAppendContext.js'
 
 const STAGE_LABEL = 'Recalling'
 
-function RecallSessionChrome({
-  answeredLines,
-  children,
-}: {
-  readonly answeredLines: readonly string[]
-  readonly children: ReactNode
-}) {
-  return (
-    <Box flexDirection="column">
-      {answeredLines.map((line, i) => (
-        <Text key={`${i}-${line}`}>{line}</Text>
-      ))}
-      {children}
-    </Box>
-  )
+function RecallSessionChrome({ children }: { readonly children: ReactNode }) {
+  return <Box flexDirection="column">{children}</Box>
 }
 
 export function RecallSessionStage({
   onSettled,
 }: InteractiveSlashCommandStageProps) {
-  const [answeredRecallLines, setAnsweredRecallLines] = useState<string[]>([])
+  const { appendScrollbackItem } = useSessionScrollbackAppend()
   const [card, setCard] = useState<RecallCard | null>(null)
   const [uiMode, setUiMode] = useState<'card' | 'loadMore'>('card')
   const [initialResolved, setInitialResolved] = useState(false)
@@ -108,11 +97,12 @@ export function RecallSessionStage({
         setCard(next)
         return
       }
-      onSettled('Correct!')
+      appendScrollbackItem(recallAnsweredLine('Correct!'))
+      onSettled('')
     } catch (loadErr: unknown) {
       onSettled(userVisibleSlashCommandError(loadErr))
     }
-  }, [onSettled])
+  }, [appendScrollbackItem, onSettled])
 
   const onSpellingSessionComplete = useCallback(async () => {
     successfulRecallsRef.current += 1
@@ -125,15 +115,16 @@ export function RecallSessionStage({
     try {
       const next = await loadNextRecallCardIfAny(0)
       if (next !== null) {
-        setAnsweredRecallLines((prev) => [...prev, spellCorrectLine])
+        appendScrollbackItem(recallAnsweredLine(spellCorrectLine))
         setCard(next)
         return
       }
-      onSettled(spellCorrectLine)
+      appendScrollbackItem(recallAnsweredLine(spellCorrectLine))
+      onSettled('')
     } catch (loadErr: unknown) {
       onSettled(userVisibleSlashCommandError(loadErr))
     }
-  }, [onSettled])
+  }, [appendScrollbackItem, onSettled])
 
   const submitLoadMore = useCallback(
     async (accept: boolean) => {
@@ -240,11 +231,13 @@ export function RecallSessionStage({
             startedWithEmptyTodayRef.current &&
             successfulRecallsRef.current === 1
           ) {
-            onSettled(`Reviewed: ${p.noteTitle}`)
+            appendScrollbackItem(recallAnsweredLine(`Reviewed: ${p.noteTitle}`))
+            onSettled('')
           } else {
             setUiMode('loadMore')
           }
         } else {
+          appendScrollbackItem(recallAnsweredLine(`Reviewed: ${p.noteTitle}`))
           setCard(next)
         }
       } catch (loadErr: unknown) {
@@ -255,7 +248,7 @@ export function RecallSessionStage({
         onSettled(userVisibleSlashCommandError(loadErr))
       }
     },
-    [onSettled]
+    [appendScrollbackItem, onSettled]
   )
 
   const abortJustReviewInFlight = useCallback(() => {
@@ -279,7 +272,7 @@ export function RecallSessionStage({
 
   if (!initialResolved) {
     return (
-      <RecallSessionChrome answeredLines={answeredRecallLines}>
+      <RecallSessionChrome>
         <Box flexDirection="column">
           <RecallSessionEscSpinner abortRef={activeOperationAbortRef} />
           <Box>
@@ -292,7 +285,7 @@ export function RecallSessionStage({
 
   if (uiMode === 'loadMore') {
     return (
-      <RecallSessionChrome answeredLines={answeredRecallLines}>
+      <RecallSessionChrome>
         <YesNoStagePrompt
           key="load-more"
           prompt="Load more from next 3 days?"
@@ -308,7 +301,7 @@ export function RecallSessionStage({
 
   if (card === null) {
     return (
-      <RecallSessionChrome answeredLines={answeredRecallLines}>
+      <RecallSessionChrome>
         <Box flexDirection="column">
           <RecallSessionEscSpinner abortRef={activeOperationAbortRef} />
           <Box>
@@ -321,7 +314,7 @@ export function RecallSessionStage({
 
   if (card.variant === 'mcq') {
     return (
-      <RecallSessionChrome answeredLines={answeredRecallLines}>
+      <RecallSessionChrome>
         <RecallMcqStage
           key={card.payload.recallPromptId}
           onSettled={onSettled}
@@ -330,7 +323,7 @@ export function RecallSessionStage({
           onMcqSucceeded={onMcqSucceeded}
           onMcqPayloadReplace={(p) => setCard({ variant: 'mcq', payload: p })}
           onMcqSessionNotice={(line) =>
-            setAnsweredRecallLines((prev) => [...prev, line])
+            appendScrollbackItem(recallAnsweredLine(line))
           }
         />
       </RecallSessionChrome>
@@ -339,7 +332,7 @@ export function RecallSessionStage({
 
   if (card.variant === 'spelling-session') {
     return (
-      <RecallSessionChrome answeredLines={answeredRecallLines}>
+      <RecallSessionChrome>
         <SpellingRecallStage
           key={card.payload.memoryTrackerId}
           onSettled={onSettled}
@@ -352,7 +345,7 @@ export function RecallSessionStage({
   }
 
   return (
-    <RecallSessionChrome answeredLines={answeredRecallLines}>
+    <RecallSessionChrome>
       <JustReviewRecallCard
         key={card.payload.memoryTrackerId}
         payload={card.payload}

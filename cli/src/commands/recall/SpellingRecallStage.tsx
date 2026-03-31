@@ -19,6 +19,8 @@ import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import { RECALL_SESSION_STOPPED_LINE } from './leaveRecallSessionCopy.js'
+import { recallAnsweredLine } from './recallAnsweredScrollback.js'
+import { useSessionScrollbackAppend } from '../../sessionScrollback/sessionScrollbackAppendContext.js'
 import {
   fetchSpellingRecallPrompt,
   submitSpellingAnswer,
@@ -46,6 +48,7 @@ export function SpellingRecallStage({
   readonly inputBlockedRef: MutableRefObject<boolean>
   readonly onSpellingSessionComplete: () => void | Promise<void>
 }) {
+  const { appendScrollbackItem } = useSessionScrollbackAppend()
   const [loadState, setLoadState] = useState<LoadState>({ status: 'loading' })
   const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
   const [buffer, setBuffer] = useState('')
@@ -98,7 +101,8 @@ export function SpellingRecallStage({
       const updated = await submitSpellingAnswer(loadState.recallPromptId, line)
       const correct = updated.answer?.correct === true
       if (!correct) {
-        onSettled('Incorrect.')
+        appendScrollbackItem(recallAnsweredLine('Incorrect.'))
+        onSettled('')
         return
       }
       await onSpellingSessionComplete()
@@ -107,7 +111,13 @@ export function SpellingRecallStage({
     } finally {
       inputBlockedRef.current = false
     }
-  }, [inputBlockedRef, loadState, onSettled, onSpellingSessionComplete])
+  }, [
+    appendScrollbackItem,
+    inputBlockedRef,
+    loadState,
+    onSettled,
+    onSpellingSessionComplete,
+  ])
 
   const processSpellKeyEvent = useCallback(
     (input: string, key: Key) => {

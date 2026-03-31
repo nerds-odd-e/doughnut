@@ -525,7 +525,7 @@ describe('recall just-review (interactive)', () => {
     setupTwoDueJustReviewItemsMocks()
     const markAsRecalledCount = mockMarkAsRecalledCounting()
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
+    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />
     )
 
@@ -533,6 +533,7 @@ describe('recall just-review (interactive)', () => {
     await waitRememberAlpha(frames)
     stdin.write('y\r')
     await waitRememberBeta(frames)
+    await waitForLastFrame(lastFrame, (f) => f.includes('Reviewed: Alpha'))
     stdin.write('y\r')
     await waitLoadMore(frames)
     stdin.write('n\r')
