@@ -203,6 +203,26 @@ describe('recall MCQ (interactive)', () => {
       (p) => p.includes('Load more from next 3 days?')
     )
 
+    const plainWrong = stripAnsi(frames.join('\n'))
+    expect(plainWrong).toContain('Alpha')
+    expect(plainWrong).toContain('Choose')
+    expect(plainWrong).toContain('First')
+    expect(plainWrong).toContain('Beta')
+    expect(plainWrong).toContain('Incorrect.')
+
+    const rawWrong = frames.join('\n')
+    const incorrectIdx = rawWrong.indexOf('Incorrect.')
+    expect(incorrectIdx).toBeGreaterThan(-1)
+    const beforeIncorrect = rawWrong.slice(0, incorrectIdx)
+    expect(
+      beforeIncorrect.includes('\u001b[31m') ||
+        beforeIncorrect.includes('\u001b[91m')
+    ).toBe(true)
+    expect(
+      beforeIncorrect.includes('\u001b[32m') ||
+        beforeIncorrect.includes('\u001b[92m')
+    ).toBe(true)
+
     expect(answerQuizSpy).toHaveBeenCalledTimes(1)
     expect(answerQuizSpy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -340,6 +360,12 @@ describe('recall MCQ (interactive)', () => {
       (p) => p.includes('Incorrect') && p.includes(secondStem)
     )
 
+    const plainFirstWrong = stripAnsi(frames.join('\n'))
+    expect(plainFirstWrong).toContain('Alpha')
+    expect(plainFirstWrong).toContain('Choose')
+    expect(plainFirstWrong).toContain('First')
+    expect(plainFirstWrong).toContain('Beta')
+
     expect(answerQuizSpy).toHaveBeenCalledTimes(1)
 
     stdin.write('1\r')
@@ -347,6 +373,22 @@ describe('recall MCQ (interactive)', () => {
       () => stripAnsi(frames.join('\n')),
       (p) => p.includes('Correct!')
     )
+
+    const plainCorrect = stripAnsi(frames.join('\n'))
+    expect(plainCorrect).toContain('Beta')
+    expect(plainCorrect).toContain(secondStem)
+    expect(plainCorrect).toContain('X')
+    expect(plainCorrect).toContain('Correct!')
+
+    const rawCorrect = frames.join('\n')
+    const correctIdx = rawCorrect.lastIndexOf('Correct!')
+    expect(correctIdx).toBeGreaterThan(-1)
+    const beforeCorrect = rawCorrect.slice(0, correctIdx)
+    expect(
+      beforeCorrect.includes('\u001b[32m') ||
+        beforeCorrect.includes('\u001b[92m')
+    ).toBe(true)
+
     expect(answerQuizSpy).toHaveBeenCalledTimes(2)
   })
 

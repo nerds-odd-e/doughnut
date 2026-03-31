@@ -69,6 +69,7 @@ export type RecallMcqCardPayload = {
   readonly stem: string
   readonly choices: readonly string[]
   readonly notebookTitle?: string
+  readonly breadcrumbTitles: readonly string[]
 }
 
 function firstPendingMcq(prompts: RecallPrompt[]): RecallPrompt | undefined {
@@ -78,7 +79,8 @@ function firstPendingMcq(prompts: RecallPrompt[]): RecallPrompt | undefined {
 export function recallMcqPayloadFromRecallPrompt(
   memoryTrackerId: number,
   notebookTitle: string | undefined,
-  prompt: RecallPrompt
+  prompt: RecallPrompt,
+  breadcrumbTitles: readonly string[]
 ): RecallMcqCardPayload | null {
   if (prompt.questionType !== 'MCQ' || prompt.answer != null) return null
   const mq = prompt.multipleChoicesQuestion
@@ -90,6 +92,7 @@ export function recallMcqPayloadFromRecallPrompt(
     stem: mq?.f0__stem?.trim() ?? '',
     choices,
     notebookTitle,
+    breadcrumbTitles,
   }
 }
 
@@ -101,6 +104,7 @@ async function tryLoadMcqPayload(
   memoryTrackerId: number,
   notebookTitle: string | undefined,
   existingPrompts: RecallPrompt[],
+  breadcrumbTitles: readonly string[],
   signal?: AbortSignal
 ): Promise<RecallMcqCardPayload | null> {
   let mcqPrompt = firstPendingMcq(existingPrompts)
@@ -123,7 +127,8 @@ async function tryLoadMcqPayload(
   return recallMcqPayloadFromRecallPrompt(
     memoryTrackerId,
     notebookTitle,
-    mcqPrompt
+    mcqPrompt,
+    breadcrumbTitles
   )
 }
 
@@ -172,17 +177,17 @@ export async function loadNextRecallCardIfAny(
   )
   const note = mt.note
   const notebookTitle = note?.noteTopology?.notebookTitle?.trim()
+  const reviewPayload = recallJustReviewPayloadFromMemoryTracker(mt)
 
   if (mt.spelling) {
-    const p = recallJustReviewPayloadFromMemoryTracker(mt)
     return {
       variant: 'spelling-session',
       payload: {
-        memoryTrackerId: p.memoryTrackerId,
-        noteTitle: p.noteTitle,
-        notebookTitle: p.notebookTitle,
-        breadcrumbTitles: p.breadcrumbTitles,
-        detailsMarkdown: p.detailsMarkdown,
+        memoryTrackerId: reviewPayload.memoryTrackerId,
+        noteTitle: reviewPayload.noteTitle,
+        notebookTitle: reviewPayload.notebookTitle,
+        breadcrumbTitles: reviewPayload.breadcrumbTitles,
+        detailsMarkdown: reviewPayload.detailsMarkdown,
       },
     }
   }
@@ -194,13 +199,19 @@ export async function loadNextRecallCardIfAny(
     })
   )
 
-  const mcqPayload = await tryLoadMcqPayload(id, notebookTitle, prompts, signal)
+  const mcqPayload = await tryLoadMcqPayload(
+    id,
+    notebookTitle,
+    prompts,
+    reviewPayload.breadcrumbTitles,
+    signal
+  )
   if (mcqPayload !== null) {
     return { variant: 'mcq', payload: mcqPayload }
   }
 
   return {
     variant: 'just-review',
-    payload: recallJustReviewPayloadFromMemoryTracker(mt),
+    payload: reviewPayload,
   }
 }

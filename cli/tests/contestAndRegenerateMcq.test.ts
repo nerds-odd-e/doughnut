@@ -31,7 +31,7 @@ describe('contestAndRegenerateMcq', () => {
       data: { rejected: true, advice: 'Legitimate question.' },
     } as Awaited<ReturnType<typeof RecallPromptController.contest>>)
 
-    await expect(contestAndRegenerateMcq(1, 'NB', 7)).resolves.toEqual({
+    await expect(contestAndRegenerateMcq(1, 'NB', 7, [])).resolves.toEqual({
       outcome: 'rejected',
       message: 'Legitimate question.',
     })
@@ -46,7 +46,7 @@ describe('contestAndRegenerateMcq', () => {
       data: makeMe.aRecallPrompt.withId(7).withSpellingStem('spell').please(),
     } as Awaited<ReturnType<typeof RecallPromptController.regenerate>>)
 
-    await expect(contestAndRegenerateMcq(1, 'NB', 7)).rejects.toThrow(
+    await expect(contestAndRegenerateMcq(1, 'NB', 7, [])).rejects.toThrow(
       'Regenerated recall prompt is not a pending MCQ.'
     )
   })

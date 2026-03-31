@@ -68,6 +68,9 @@ Feature: CLI recall status and recall session
       And I should see "to incite violence" in the Current guidance
       When I enter "1" in the interactive CLI
       Then I should see "Correct!" in answered questions
+      And I should see "English › sedition" in answered questions
+      And I should see "What is the meaning of sedition?" in answered questions
+      And I should see "to incite violence" in answered questions
 
     @usingMockedOpenAiService
     Scenario: MCQ — wrong choice via down arrow and Enter
@@ -78,6 +81,9 @@ Feature: CLI recall status and recall session
       And It's day 2
       When I input down-arrow selection for "/recall" in the interactive CLI
       Then I should see "Incorrect" in answered questions
+      And I should see "English › sedition" in answered questions
+      And I should see "What is the meaning of sedition?" in answered questions
+      And I should see "to sleep" in answered questions
       And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
       And I should see "Recalled 1 note" in past CLI assistant messages
 

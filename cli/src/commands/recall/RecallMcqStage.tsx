@@ -37,6 +37,7 @@ import {
 } from './nextRecallCardLoad.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 import {
+  recallAnsweredMcqInk,
   recallAnsweredPlainInk,
   recallAnsweredScrollbackItem,
 } from './recallAnsweredScrollback.js'
@@ -54,6 +55,7 @@ export async function contestAndRegenerateMcq(
   memoryTrackerId: number,
   notebookTitle: string | undefined,
   currentRecallPromptId: number,
+  breadcrumbTitles: readonly string[],
   signal?: AbortSignal
 ): Promise<ContestMcqOutcome> {
   const contestResult = await runDefaultBackendJson<QuestionContestResult>(() =>
@@ -76,7 +78,8 @@ export async function contestAndRegenerateMcq(
   const mapped = recallMcqPayloadFromRecallPrompt(
     memoryTrackerId,
     notebookTitle,
-    regenerated
+    regenerated,
+    breadcrumbTitles
   )
   if (mapped === null) {
     throw new Error('Regenerated recall prompt is not a pending MCQ.')
@@ -155,13 +158,29 @@ export function RecallMcqStage({
           setHighlightIndex(0)
           await onRecallQuestionAnswered({
             successful: false,
-            answeredRows: [recallAnsweredPlainInk('Incorrect.')],
+            answeredRows: [
+              recallAnsweredMcqInk({
+                breadcrumbTitles: payload.breadcrumbTitles,
+                stem: payload.stem,
+                choices: payload.choices,
+                selectedChoiceIndex: choiceIdx,
+                updatedPrompt: updated,
+              }),
+            ],
           })
           return
         }
         await onRecallQuestionAnswered({
           successful: true,
-          answeredRows: [recallAnsweredPlainInk('Correct!')],
+          answeredRows: [
+            recallAnsweredMcqInk({
+              breadcrumbTitles: payload.breadcrumbTitles,
+              stem: payload.stem,
+              choices: payload.choices,
+              selectedChoiceIndex: choiceIdx,
+              updatedPrompt: updated,
+            }),
+          ],
         })
       } catch (err: unknown) {
         onRecallFatalError(userVisibleSlashCommandError(err))
@@ -173,7 +192,10 @@ export function RecallMcqStage({
       inputBlockedRef,
       onRecallFatalError,
       onRecallQuestionAnswered,
+      payload.breadcrumbTitles,
+      payload.choices,
       payload.recallPromptId,
+      payload.stem,
     ]
   )
 
@@ -184,7 +206,8 @@ export function RecallMcqStage({
       const result = await contestAndRegenerateMcq(
         payload.memoryTrackerId,
         payload.notebookTitle,
-        payload.recallPromptId
+        payload.recallPromptId,
+        payload.breadcrumbTitles
       )
       if (result.outcome === 'replaced') {
         setHighlightIndex(0)
@@ -207,6 +230,7 @@ export function RecallMcqStage({
     inputBlockedRef,
     onRecallFatalError,
     onReplaceCurrentRecallCard,
+    payload.breadcrumbTitles,
     payload.memoryTrackerId,
     payload.notebookTitle,
     payload.recallPromptId,

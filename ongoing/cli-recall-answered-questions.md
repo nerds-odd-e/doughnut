@@ -1,6 +1,6 @@
 # CLI recall — answered questions (rich session UI)
 
-**Status:** Phase 1 **done** — `answeredRows` on `RecallQuestionAnswerOutcome`. Phase 2 (just-review rich block) **done** — rows are `ReactNode` (Ink subtrees) via `recallAnsweredScrollback.tsx` helpers. Phase 3 (spelling rich block + correct/wrong color) **done**. Phases 4–5 (MCQ / consistency) not started.
+**Status:** Phase 1 **done** — `answeredRows` on `RecallQuestionAnswerOutcome`. Phase 2 (just-review rich block) **done** — rows are `ReactNode` (Ink subtrees) via `recallAnsweredScrollback.tsx` helpers. Phase 3 (spelling rich block + correct/wrong color) **done**. Phase 4 (MCQ rich answered block) **done**. Phase 5 (consistency / copy) not started.
 
 **Scope:** During `/recall`, after each question is answered, show a **readonly** summary in the “answered questions” region: breadcrumb ending in note title, note-facing content, and type-specific outcome (just review / spelling / MCQ). Only items answered **in this session**; **no** loading of “answered earlier today” (or any history) from the backend.
 
@@ -82,6 +82,8 @@
 ---
 
 ## Phase 4 — MCQ rich answered block with frontend-like choice styling
+
+**Done.** `RecallMcqCardPayload.breadcrumbTitles`; `recallAnsweredMcqInk` in `recallAnsweredScrollback.tsx`; `contestAndRegenerateMcq` preserves breadcrumbs; Vitest + `cli_recall.feature` MCQ assertions.
 
 **User-visible behavior:** After MCQ submission, answered block shows:
 
