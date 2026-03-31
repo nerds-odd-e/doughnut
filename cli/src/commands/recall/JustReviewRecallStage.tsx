@@ -33,22 +33,14 @@ function justReviewOutcomeLine(
   return `Reviewed: ${noteTitle}`
 }
 
-type RecallAnsweredJustReviewInkOpts = {
-  /** When `false`, omit note details markdown between breadcrumb and outcome. Default: show details. */
-  readonly showDetails?: boolean
-}
-
 function recallAnsweredJustReviewInk(
   payload: RecallJustReviewPayload,
-  remembered: boolean,
-  opts?: RecallAnsweredJustReviewInkOpts
+  remembered: boolean
 ): ReactElement {
-  const showDetails = opts?.showDetails !== false
   const width = resolvedTerminalWidth()
   const crumb = payload.breadcrumbTitles.join(JUST_REVIEW_BREADCRUMB_SEP)
   const md = payload.detailsMarkdown.trim()
-  const rendered =
-    showDetails && md.length > 0 ? renderMarkdownToTerminal(md, width) : ''
+  const rendered = md.length > 0 ? renderMarkdownToTerminal(md, width) : ''
   const detailLines =
     rendered.length > 0 ? rendered.split('\n') : ([] as string[])
   const outcome: 'remembered' | 'reduced' = remembered
@@ -72,7 +64,6 @@ export function JustReviewRecallStage({
   onRecallQuestionAnswered,
   onRecallFatalError,
   onConfirmLeaveRecall,
-  answeredJustReviewInkOpts,
 }: {
   readonly payload: RecallJustReviewPayload
   readonly inputBlockedRef: MutableRefObject<boolean>
@@ -82,8 +73,6 @@ export function JustReviewRecallStage({
   ) => void | Promise<void>
   readonly onRecallFatalError: (message: string) => void
   readonly onConfirmLeaveRecall: () => void
-  /** Forwarded to `recallAnsweredJustReviewInk` (e.g. `{ showDetails: false }`). */
-  readonly answeredJustReviewInkOpts?: RecallAnsweredJustReviewInkOpts
 }) {
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
 
@@ -118,17 +107,13 @@ export function JustReviewRecallStage({
         if (!yesIRemember) {
           await onRecallQuestionAnswered({
             successful: false,
-            answeredRows: [
-              recallAnsweredJustReviewInk(p, false, answeredJustReviewInkOpts),
-            ],
+            answeredRows: [recallAnsweredJustReviewInk(p, false)],
           })
           return
         }
         await onRecallQuestionAnswered({
           successful: true,
-          answeredRows: [
-            recallAnsweredJustReviewInk(p, true, answeredJustReviewInkOpts),
-          ],
+          answeredRows: [recallAnsweredJustReviewInk(p, true)],
         })
       } finally {
         inputBlockedRef.current = false
@@ -141,7 +126,6 @@ export function JustReviewRecallStage({
       activeOperationAbortRef,
       inputBlockedRef,
       onRecallFatalError,
-      answeredJustReviewInkOpts,
       onRecallQuestionAnswered,
       payload,
     ]

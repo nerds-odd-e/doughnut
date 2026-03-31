@@ -9,7 +9,7 @@
 **Current baseline (already implemented)**
 
 - Recall stages emit `RecallQuestionAnswerOutcome` (`answeredRows: readonly ReactNode[]`) to `onRecallQuestionAnswered` in `cli/src/commands/recall/RecallSessionStage.tsx`.
-- `RecallSessionStage` appends each row via `useSessionScrollbackAppend()` + `recallAnsweredScrollbackItem(node)`. Helpers: `recallAnsweredPlainInk`, `recallAnsweredJustReviewInk` (optional `showDetails: false` omits note markdown between breadcrumb and outcome).
+- `RecallSessionStage` appends each row via `useSessionScrollbackAppend()` + `recallAnsweredScrollbackItem(node)`. Helpers: `recallAnsweredPlainInk`, `recallAnsweredJustReviewInk` (breadcrumb, rendered note details, outcome line).
 - `onSettled` is for stage/session lifecycle outcomes (summary, stop, fatal errors), not per-answer success lines.
 - Further recall types in Phases 3–4 can pass custom `ReactNode`s or new helpers in `recallAnsweredScrollback.tsx`.
 
