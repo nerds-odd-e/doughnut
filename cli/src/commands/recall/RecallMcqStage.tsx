@@ -23,7 +23,11 @@ import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import { RECALL_SESSION_STOPPED_LINE } from './leaveRecallSessionCopy.js'
 import { numberedMcqMarkdownLinesForTerminal } from './numberedMcqMarkdownLines.js'
-import { submitMcqAnswer, type RecallMcqCardPayload } from './recallMcqLoad.js'
+import {
+  contestAndRegenerateMcq,
+  submitMcqAnswer,
+  type RecallMcqCardPayload,
+} from './recallMcqLoad.js'
 
 const STAGE_LABEL = 'Recalling'
 
@@ -35,10 +39,12 @@ export function RecallMcqStage({
   payload,
   inputBlockedRef,
   onMcqSucceeded,
+  onMcqPayloadReplace,
 }: InteractiveSlashCommandStageProps & {
   readonly payload: RecallMcqCardPayload
   readonly inputBlockedRef: MutableRefObject<boolean>
   readonly onMcqSucceeded: () => void | Promise<void>
+  readonly onMcqPayloadReplace: (payload: RecallMcqCardPayload) => void
 }) {
   const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
   const [buffer, setBuffer] = useState('')
@@ -82,6 +88,33 @@ export function RecallMcqStage({
     [inputBlockedRef, onMcqSucceeded, onSettled, payload.recallPromptId]
   )
 
+  const runContest = useCallback(async () => {
+    if (inputBlockedRef.current) return
+    inputBlockedRef.current = true
+    try {
+      const next = await contestAndRegenerateMcq(
+        payload.memoryTrackerId,
+        payload.notebookTitle,
+        payload.recallPromptId
+      )
+      if (next !== null) {
+        setHighlightIndex(0)
+        onMcqPayloadReplace(next)
+      }
+    } catch (err: unknown) {
+      onSettled(userVisibleSlashCommandError(err))
+    } finally {
+      inputBlockedRef.current = false
+    }
+  }, [
+    inputBlockedRef,
+    onMcqPayloadReplace,
+    onSettled,
+    payload.memoryTrackerId,
+    payload.notebookTitle,
+    payload.recallPromptId,
+  ])
+
   const processKeyEvent = useCallback(
     (input: string, key: Key) => {
       if (inputBlockedRef.current) return
@@ -109,6 +142,11 @@ export function RecallMcqStage({
             runSubmit(index).catch(() => undefined)
           },
           onSubmitWithLine: (line) => {
+            if (line.trim() === '/contest') {
+              clearDraft()
+              runContest().catch(() => undefined)
+              return
+            }
             const idx = choiceIndexFromSelectListSubmitLine(
               line,
               choices.length
@@ -135,7 +173,7 @@ export function RecallMcqStage({
         }
       )
     },
-    [choices.length, highlightIndex, inputBlockedRef, runSubmit]
+    [choices.length, highlightIndex, inputBlockedRef, runContest, runSubmit]
   )
 
   const handleInput = useCallback(

@@ -328,6 +328,7 @@ export function RecallSessionStage({
           payload={card.payload}
           inputBlockedRef={submittingRef}
           onMcqSucceeded={onMcqSucceeded}
+          onMcqPayloadReplace={(p) => setCard({ variant: 'mcq', payload: p })}
         />
       </RecallSessionChrome>
     )

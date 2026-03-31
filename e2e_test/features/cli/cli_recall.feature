@@ -75,7 +75,6 @@ Feature: CLI recall status and recall session
       When I input down-arrow selection for "/recall" in the interactive CLI
       Then I should see "Incorrect" in answered questions
 
-    @ignore
     @usingMockedOpenAiService
     Scenario: MCQ — contest and regenerate before answering
       Given OpenAI generates this as second question:
@@ -89,7 +88,7 @@ Feature: CLI recall status and recall session
       And It's day 2
       When I enter the slash command "/recall" in the interactive CLI
       Then I should see "What is the meaning of sedition?" in the Current guidance
-      When I enter the slash command "/contest" in the interactive CLI
+      When I enter the slash sub-command "/contest" in the interactive CLI
       Then I should see "What is the meaning of sedition?" in the Current guidance
       When I enter "1" in the interactive CLI
       Then I should see "Correct!" in answered questions

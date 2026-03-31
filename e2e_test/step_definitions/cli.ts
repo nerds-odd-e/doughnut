@@ -62,6 +62,13 @@ When(
 )
 
 When(
+  'I enter the slash sub-command {string} in the interactive CLI',
+  (line: string) => {
+    cli.interactiveCli().writeInteractiveLine(line)
+  }
+)
+
+When(
   'I input down-arrow selection for {string} in the interactive CLI',
   (command: string) =>
     new Cypress.Promise<void>((resolve) => {

@@ -1,6 +1,7 @@
 import {
   MemoryTrackerController,
   RecallPromptController,
+  type QuestionContestResult,
   type RecallPrompt,
 } from 'doughnut-api'
 import {
@@ -20,7 +21,7 @@ function firstPendingMcq(prompts: RecallPrompt[]): RecallPrompt | undefined {
   return prompts.find((p) => p.questionType === 'MCQ' && p.answer == null)
 }
 
-function mcqPayloadFromRecallPrompt(
+export function recallMcqPayloadFromRecallPrompt(
   memoryTrackerId: number,
   notebookTitle: string | undefined,
   prompt: RecallPrompt
@@ -65,7 +66,45 @@ export async function tryLoadMcqPayload(
     }
   }
   if (mcqPrompt === undefined) return null
-  return mcqPayloadFromRecallPrompt(memoryTrackerId, notebookTitle, mcqPrompt)
+  return recallMcqPayloadFromRecallPrompt(
+    memoryTrackerId,
+    notebookTitle,
+    mcqPrompt
+  )
+}
+
+/** Contest then regenerate; `null` if contest was rejected (stay on current card). */
+export async function contestAndRegenerateMcq(
+  memoryTrackerId: number,
+  notebookTitle: string | undefined,
+  currentRecallPromptId: number,
+  signal?: AbortSignal
+): Promise<RecallMcqCardPayload | null> {
+  const contestResult = await runDefaultBackendJson<QuestionContestResult>(() =>
+    RecallPromptController.contest({
+      path: { recallPrompt: currentRecallPromptId },
+      ...doughnutSdkOptions(signal),
+    })
+  )
+  if (contestResult.rejected === true) {
+    return null
+  }
+  const regenerated = await runDefaultBackendJson<RecallPrompt>(() =>
+    RecallPromptController.regenerate({
+      path: { recallPrompt: currentRecallPromptId },
+      body: contestResult,
+      ...doughnutSdkOptions(signal),
+    })
+  )
+  const mapped = recallMcqPayloadFromRecallPrompt(
+    memoryTrackerId,
+    notebookTitle,
+    regenerated
+  )
+  if (mapped === null) {
+    throw new Error('Regenerated recall prompt is not a pending MCQ.')
+  }
+  return mapped
 }
 
 export async function submitMcqAnswer(
