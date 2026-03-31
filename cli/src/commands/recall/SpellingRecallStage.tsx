@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
   type MutableRefObject,
+  type ReactElement,
 } from 'react'
 import type { Key } from 'ink'
 import { Box, Text, useInput } from 'ink'
@@ -28,8 +29,8 @@ import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import { normalizeSpellingLineForSubmit } from './spellingAnswerLine.js'
 import type { SpellingRecallSessionPayload } from './nextRecallCardLoad.js'
-import { recallAnsweredSpellingInk } from './recallAnsweredScrollback.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
+import { RECALL_ANSWERED_BREADCRUMB_SEP } from './recallAnsweredScrollback.js'
 
 async function fetchSpellingRecallPrompt(
   memoryTrackerId: number,
@@ -65,6 +66,35 @@ async function submitSpellingAnswer(
       body: { spellingAnswer },
       ...doughnutSdkOptions(signal),
     })
+  )
+}
+
+function recallAnsweredSpellingInk(args: {
+  readonly breadcrumbTitles: readonly string[]
+  readonly detailsMarkdown: string
+  readonly spellingAnswerDisplay: string
+  readonly correct: boolean
+}): ReactElement {
+  const width = resolvedTerminalWidth()
+  const crumb = args.breadcrumbTitles.join(RECALL_ANSWERED_BREADCRUMB_SEP)
+  const md = args.detailsMarkdown.trim()
+  const rendered = md.length > 0 ? renderMarkdownToTerminal(md, width) : ''
+  const detailLines =
+    rendered.length > 0 ? rendered.split('\n') : ([] as string[])
+  const ans = args.spellingAnswerDisplay
+  return (
+    <Box flexDirection="column">
+      <Text>{crumb}</Text>
+      {detailLines.map((line, i) => (
+        <Text key={i}>{line.length > 0 ? line : ' '}</Text>
+      ))}
+      <Text>{`Your answer: ${ans}`}</Text>
+      {args.correct ? (
+        <Text color="green">Correct!</Text>
+      ) : (
+        <Text color="red">Incorrect.</Text>
+      )}
+    </Box>
   )
 }
 
