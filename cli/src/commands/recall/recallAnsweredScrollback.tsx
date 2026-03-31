@@ -1,14 +1,13 @@
-import { Box, Text } from 'ink'
+import { Text } from 'ink'
 import type { ReactElement, ReactNode } from 'react'
 import type { SessionScrollbackItem } from '../../sessionScrollback/SessionScrollback.js'
-
-export const RECALL_ANSWERED_BREADCRUMB_SEP = ' › '
+import { RecallAnsweredBlockShell } from './recallAnsweredInkShared.js'
 
 export function recallAnsweredPlainInk(text: string): ReactElement {
   return (
-    <Box>
+    <RecallAnsweredBlockShell>
       <Text>{text}</Text>
-    </Box>
+    </RecallAnsweredBlockShell>
   )
 }
 

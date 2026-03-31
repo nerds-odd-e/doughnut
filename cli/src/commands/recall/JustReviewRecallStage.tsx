@@ -6,7 +6,7 @@ import {
   type MutableRefObject,
   type ReactElement,
 } from 'react'
-import { Box, Text } from 'ink'
+import { Text } from 'ink'
 import {
   doughnutSdkOptions,
   runDefaultBackendJson,
@@ -18,7 +18,11 @@ import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import type { RecallJustReviewPayload } from './nextRecallCardLoad.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
-import { RECALL_ANSWERED_BREADCRUMB_SEP } from './recallAnsweredScrollback.js'
+import {
+  RecallAnsweredBlockShell,
+  recallAnsweredBreadcrumbText,
+  recallAnsweredMarkdownToDisplayLines,
+} from './recallAnsweredInkShared.js'
 
 const STAGE_LABEL = 'Recalling'
 
@@ -37,22 +41,22 @@ function recallAnsweredJustReviewInk(
   remembered: boolean
 ): ReactElement {
   const width = resolvedTerminalWidth()
-  const crumb = payload.breadcrumbTitles.join(RECALL_ANSWERED_BREADCRUMB_SEP)
-  const md = payload.detailsMarkdown.trim()
-  const rendered = md.length > 0 ? renderMarkdownToTerminal(md, width) : ''
-  const detailLines =
-    rendered.length > 0 ? rendered.split('\n') : ([] as string[])
+  const crumb = recallAnsweredBreadcrumbText(payload.breadcrumbTitles)
+  const detailLines = recallAnsweredMarkdownToDisplayLines(
+    payload.detailsMarkdown,
+    width
+  )
   const outcome: 'remembered' | 'reduced' = remembered
     ? 'remembered'
     : 'reduced'
   return (
-    <Box flexDirection="column">
+    <RecallAnsweredBlockShell>
       <Text>{crumb}</Text>
       {detailLines.map((line, i) => (
         <Text key={i}>{line.length > 0 ? line : ' '}</Text>
       ))}
       <Text>{justReviewOutcomeLine(outcome, payload.noteTitle)}</Text>
-    </Box>
+    </RecallAnsweredBlockShell>
   )
 }
 

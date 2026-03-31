@@ -22,7 +22,6 @@ import {
 } from '../../interactions/selectListInteraction.js'
 import { GuidanceListInk } from '../../guidanceListWindowInk.js'
 import { resolvedTerminalWidth } from '../../terminalColumns.js'
-import { renderMarkdownToTerminal } from '../../markdown.js'
 import {
   doughnutSdkOptions,
   runDefaultBackendJson,
@@ -38,7 +37,12 @@ import {
 } from './nextRecallCardLoad.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 import {
-  RECALL_ANSWERED_BREADCRUMB_SEP,
+  RecallAnsweredBlockShell,
+  recallAnsweredBreadcrumbText,
+  recallAnsweredMarkdownToDisplayLines,
+  recallAnsweredQuizOutcomeInk,
+} from './recallAnsweredInkShared.js'
+import {
   recallAnsweredPlainInk,
   recallAnsweredScrollbackItem,
 } from './recallAnsweredScrollback.js'
@@ -55,7 +59,7 @@ function recallAnsweredMcqInk(args: {
   readonly updatedPrompt: RecallPrompt
 }): ReactElement {
   const width = resolvedTerminalWidth()
-  const crumb = args.breadcrumbTitles.join(RECALL_ANSWERED_BREADCRUMB_SEP)
+  const crumb = recallAnsweredBreadcrumbText(args.breadcrumbTitles)
   const correct = args.updatedPrompt.answer?.correct === true
   const fromPredefined =
     args.updatedPrompt.predefinedQuestion?.correctAnswerIndex
@@ -66,9 +70,7 @@ function recallAnsweredMcqInk(args: {
         ? args.updatedPrompt.answer.choiceIndex
         : undefined
 
-  const stemRendered = renderMarkdownToTerminal(args.stem.trim(), width)
-  const stemLines =
-    stemRendered.length > 0 ? stemRendered.split('\n') : ([] as string[])
+  const stemLines = recallAnsweredMarkdownToDisplayLines(args.stem, width)
   const listLines = numberedMcqMarkdownLinesForTerminal(args.choices, width)
   const sel = args.selectedChoiceIndex
 
@@ -83,7 +85,7 @@ function recallAnsweredMcqInk(args: {
   }
 
   return (
-    <Box flexDirection="column">
+    <RecallAnsweredBlockShell>
       <Text>{crumb}</Text>
       {stemLines.map((line, i) => (
         <Text key={`st-${i}`}>{line.length > 0 ? line : ' '}</Text>
@@ -93,12 +95,8 @@ function recallAnsweredMcqInk(args: {
           {line.text}
         </Text>
       ))}
-      {correct ? (
-        <Text color="green">Correct!</Text>
-      ) : (
-        <Text color="red">Incorrect.</Text>
-      )}
-    </Box>
+      {recallAnsweredQuizOutcomeInk(correct)}
+    </RecallAnsweredBlockShell>
   )
 }
 
@@ -187,13 +185,9 @@ export function RecallMcqStage({
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
 
   const width = resolvedTerminalWidth()
-  const stemRendered = useMemo(
-    () => renderMarkdownToTerminal(payload.stem, width),
-    [payload.stem, width]
-  )
   const stemLines = useMemo(
-    () => (stemRendered.length > 0 ? stemRendered.split('\n') : []),
-    [stemRendered]
+    () => recallAnsweredMarkdownToDisplayLines(payload.stem, width),
+    [payload.stem, width]
   )
   const choices = payload.choices
   const listLines = useMemo(

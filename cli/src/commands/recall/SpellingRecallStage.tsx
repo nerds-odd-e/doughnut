@@ -30,7 +30,12 @@ import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import { normalizeSpellingLineForSubmit } from './spellingAnswerLine.js'
 import type { SpellingRecallSessionPayload } from './nextRecallCardLoad.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
-import { RECALL_ANSWERED_BREADCRUMB_SEP } from './recallAnsweredScrollback.js'
+import {
+  RecallAnsweredBlockShell,
+  recallAnsweredBreadcrumbText,
+  recallAnsweredMarkdownToDisplayLines,
+  recallAnsweredQuizOutcomeInk,
+} from './recallAnsweredInkShared.js'
 
 async function fetchSpellingRecallPrompt(
   memoryTrackerId: number,
@@ -76,25 +81,21 @@ function recallAnsweredSpellingInk(args: {
   readonly correct: boolean
 }): ReactElement {
   const width = resolvedTerminalWidth()
-  const crumb = args.breadcrumbTitles.join(RECALL_ANSWERED_BREADCRUMB_SEP)
-  const md = args.detailsMarkdown.trim()
-  const rendered = md.length > 0 ? renderMarkdownToTerminal(md, width) : ''
-  const detailLines =
-    rendered.length > 0 ? rendered.split('\n') : ([] as string[])
+  const crumb = recallAnsweredBreadcrumbText(args.breadcrumbTitles)
+  const detailLines = recallAnsweredMarkdownToDisplayLines(
+    args.detailsMarkdown,
+    width
+  )
   const ans = args.spellingAnswerDisplay
   return (
-    <Box flexDirection="column">
+    <RecallAnsweredBlockShell>
       <Text>{crumb}</Text>
       {detailLines.map((line, i) => (
         <Text key={i}>{line.length > 0 ? line : ' '}</Text>
       ))}
       <Text>{`Your answer: ${ans}`}</Text>
-      {args.correct ? (
-        <Text color="green">Correct!</Text>
-      ) : (
-        <Text color="red">Incorrect.</Text>
-      )}
-    </Box>
+      {recallAnsweredQuizOutcomeInk(args.correct)}
+    </RecallAnsweredBlockShell>
   )
 }
 
