@@ -11,7 +11,10 @@ import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import type { RecallJustReviewPayload } from './nextRecallCardLoad.js'
-import { justReviewRecallAnsweredRow } from './recallAnsweredRowPayload.js'
+import {
+  recallAnsweredJustReviewInk,
+  type RecallAnsweredJustReviewInkOpts,
+} from './recallAnsweredScrollback.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 
 const STAGE_LABEL = 'Recalling'
@@ -23,6 +26,7 @@ export function JustReviewRecallStage({
   onRecallQuestionAnswered,
   onRecallFatalError,
   onConfirmLeaveRecall,
+  answeredJustReviewInkOpts,
 }: {
   readonly payload: RecallJustReviewPayload
   readonly inputBlockedRef: MutableRefObject<boolean>
@@ -32,6 +36,8 @@ export function JustReviewRecallStage({
   ) => void | Promise<void>
   readonly onRecallFatalError: (message: string) => void
   readonly onConfirmLeaveRecall: () => void
+  /** Forwarded to `recallAnsweredJustReviewInk` (e.g. `{ showDetails: false }`). */
+  readonly answeredJustReviewInkOpts?: RecallAnsweredJustReviewInkOpts
 }) {
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
 
@@ -66,13 +72,17 @@ export function JustReviewRecallStage({
         if (!yesIRemember) {
           await onRecallQuestionAnswered({
             successful: false,
-            answeredRows: [justReviewRecallAnsweredRow(p, false)],
+            answeredRows: [
+              recallAnsweredJustReviewInk(p, false, answeredJustReviewInkOpts),
+            ],
           })
           return
         }
         await onRecallQuestionAnswered({
           successful: true,
-          answeredRows: [justReviewRecallAnsweredRow(p, true)],
+          answeredRows: [
+            recallAnsweredJustReviewInk(p, true, answeredJustReviewInkOpts),
+          ],
         })
       } finally {
         inputBlockedRef.current = false
@@ -85,6 +95,7 @@ export function JustReviewRecallStage({
       activeOperationAbortRef,
       inputBlockedRef,
       onRecallFatalError,
+      answeredJustReviewInkOpts,
       onRecallQuestionAnswered,
       payload,
     ]

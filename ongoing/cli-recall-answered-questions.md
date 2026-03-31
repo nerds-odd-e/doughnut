@@ -1,6 +1,6 @@
 # CLI recall — answered questions (rich session UI)
 
-**Status:** Phase 1 **done** — `answeredRows` + `RecallAnsweredRowPayload` union. Phase 2 (just-review rich block) **done**. Phases 3–5 (spelling / MCQ / consistency) not started.
+**Status:** Phase 1 **done** — `answeredRows` on `RecallQuestionAnswerOutcome`. Phase 2 (just-review rich block) **done** — rows are `ReactNode` (Ink subtrees) via `recallAnsweredScrollback.tsx` helpers. Phases 3–5 (spelling / MCQ / consistency) not started.
 
 **Scope:** During `/recall`, after each question is answered, show a **readonly** summary in the “answered questions” region: breadcrumb ending in note title, note-facing content, and type-specific outcome (just review / spelling / MCQ). Only items answered **in this session**; **no** loading of “answered earlier today” (or any history) from the backend.
 
@@ -8,10 +8,10 @@
 
 **Current baseline (already implemented)**
 
-- Recall stages emit `RecallQuestionAnswerOutcome` (`answeredRows: readonly RecallAnsweredRowPayload[]`) to `onRecallQuestionAnswered` in `cli/src/commands/recall/RecallSessionStage.tsx`.
-- `RecallSessionStage` appends each row via `useSessionScrollbackAppend()` + `recallAnsweredScrollbackItem(...)`. Just-review uses `justReviewRecallAnsweredRow(...)`; spelling/MCQ/contest still use `plainRecallAnsweredRow(...)`.
+- Recall stages emit `RecallQuestionAnswerOutcome` (`answeredRows: readonly ReactNode[]`) to `onRecallQuestionAnswered` in `cli/src/commands/recall/RecallSessionStage.tsx`.
+- `RecallSessionStage` appends each row via `useSessionScrollbackAppend()` + `recallAnsweredScrollbackItem(node)`. Helpers: `recallAnsweredPlainInk`, `recallAnsweredJustReviewInk` (optional `showDetails: false` omits note markdown between breadcrumb and outcome).
 - `onSettled` is for stage/session lifecycle outcomes (summary, stop, fatal errors), not per-answer success lines.
-- `RecallAnsweredRow` renders `kind: 'plain'` as one line; `kind: 'just-review'` as breadcrumb (` › `) + markdown details + outcome line (`cli/src/commands/recall/recallAnsweredScrollback.tsx`). Further `kind` variants in Phases 3–4.
+- Further recall types in Phases 3–4 can pass custom `ReactNode`s or new helpers in `recallAnsweredScrollback.tsx`.
 
 **References**
 
@@ -20,8 +20,7 @@
 - Just-review answer flow: `cli/src/commands/recall/JustReviewRecallStage.tsx`.
 - Spelling answer flow: `cli/src/commands/recall/SpellingRecallStage.tsx`.
 - MCQ answer flow + contest notices: `cli/src/commands/recall/RecallMcqStage.tsx`.
-- Answered row payload: `cli/src/commands/recall/recallAnsweredRowPayload.ts`.
-- Answered scrollback row: `cli/src/commands/recall/recallAnsweredScrollback.tsx`.
+- Answered scrollback Ink helpers + item wrapper: `cli/src/commands/recall/recallAnsweredScrollback.tsx`.
 - Web parity (styling intent): `frontend/src/components/recall/QuestionChoices.vue`, `frontend/src/components/recall/AnsweredSpellingQuestion.vue`, `frontend/src/components/recall/NoteUnderQuestion.vue`.
 - E2E assertions: `e2e_test/features/cli/cli_recall.feature` and `e2e_test/start/pageObjects/cli/outputAssertions.ts`.
 - Session scrollback architecture: `ongoing/cli-session-scrollback.md`.
@@ -41,7 +40,7 @@
 
 ## Phase 1 — Answered row data model for rich readonly blocks
 
-**Done.** Typed `RecallAnsweredRowPayload` and `answeredRows` on `RecallQuestionAnswerOutcome`. Union includes `plain` and (from Phase 2) `just-review`.
+**Done.** `answeredRows` typed as `readonly ReactNode[]`; stages supply Ink trees (plain line or just-review block).
 
 **Tests:** Existing high-level recall Vitest coverage; no new Cucumber in this phase.
 
@@ -49,7 +48,7 @@
 
 ## Phase 2 — Just review rich answered block
 
-**Done.** `RecallJustReviewPayload.breadcrumbTitles` from `noteTopology` (root → note, same order as web `Breadcrumb`); `kind: 'just-review'` payload + `RecallAnsweredRow` rendering; Vitest + `cli_recall.feature` assertions.
+**Done.** `RecallJustReviewPayload.breadcrumbTitles` from `noteTopology` (root → note, same order as web `Breadcrumb`); `recallAnsweredJustReviewInk` rendering; Vitest + `cli_recall.feature` assertions.
 
 **User-visible behavior:** After just-review answer, answered block shows:
 
@@ -113,5 +112,5 @@
 
 ## Resolved (Phase 1)
 
-- **Outcome shape:** `RecallQuestionAnswerOutcome` stays minimal (`successful` + `answeredRows`). Rich fields live on future `RecallAnsweredRowPayload` variants; stages construct payloads when those variants exist.
-- **MCQ contest notices:** Same answered-region path as other rows (`plainRecallAnsweredRow` + `recallAnsweredScrollbackItem`); revisit styling in Phase 4/5 if needed.
+- **Outcome shape:** `RecallQuestionAnswerOutcome` stays minimal (`successful` + `answeredRows` as Ink `ReactNode`s).
+- **MCQ contest notices:** Same answered-region path as other rows (`recallAnsweredPlainInk` + `recallAnsweredScrollbackItem`); revisit styling in Phase 4/5 if needed.

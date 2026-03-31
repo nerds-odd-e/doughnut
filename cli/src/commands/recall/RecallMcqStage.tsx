@@ -35,9 +35,11 @@ import {
   type RecallCard,
   type RecallMcqCardPayload,
 } from './nextRecallCardLoad.js'
-import { plainRecallAnsweredRow } from './recallAnsweredRowPayload.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
-import { recallAnsweredScrollbackItem } from './recallAnsweredScrollback.js'
+import {
+  recallAnsweredPlainInk,
+  recallAnsweredScrollbackItem,
+} from './recallAnsweredScrollback.js'
 import { useSessionScrollbackAppend } from '../../sessionScrollback/sessionScrollbackAppendContext.js'
 
 const CONTEST_REJECTED_FALLBACK =
@@ -153,13 +155,13 @@ export function RecallMcqStage({
           setHighlightIndex(0)
           await onRecallQuestionAnswered({
             successful: false,
-            answeredRows: [plainRecallAnsweredRow('Incorrect.')],
+            answeredRows: [recallAnsweredPlainInk('Incorrect.')],
           })
           return
         }
         await onRecallQuestionAnswered({
           successful: true,
-          answeredRows: [plainRecallAnsweredRow('Correct!')],
+          answeredRows: [recallAnsweredPlainInk('Correct!')],
         })
       } catch (err: unknown) {
         onRecallFatalError(userVisibleSlashCommandError(err))
@@ -192,7 +194,7 @@ export function RecallMcqStage({
         })
       } else {
         appendScrollbackItem(
-          recallAnsweredScrollbackItem(plainRecallAnsweredRow(result.message))
+          recallAnsweredScrollbackItem(recallAnsweredPlainInk(result.message))
         )
       }
     } catch (err: unknown) {
