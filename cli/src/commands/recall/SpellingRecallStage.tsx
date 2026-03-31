@@ -28,6 +28,7 @@ import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import { normalizeSpellingLineForSubmit } from './spellingAnswerLine.js'
 import type { SpellingRecallSessionPayload } from './nextRecallCardLoad.js'
+import { plainRecallAnsweredRow } from './recallAnsweredRowPayload.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 
 async function fetchSpellingRecallPrompt(
@@ -148,14 +149,14 @@ export function SpellingRecallStage({
         setBuffer('')
         await onRecallQuestionAnswered({
           successful: false,
-          scrollbackLines: ['Incorrect.'],
+          answeredRows: [plainRecallAnsweredRow('Incorrect.')],
         })
         return
       }
       const spellCorrectLine = `Spell correct: ${payload.noteTitle}`
       await onRecallQuestionAnswered({
         successful: true,
-        scrollbackLines: [spellCorrectLine],
+        answeredRows: [plainRecallAnsweredRow(spellCorrectLine)],
       })
     } catch (err: unknown) {
       onRecallFatalError(userVisibleSlashCommandError(err))

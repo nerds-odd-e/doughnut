@@ -11,6 +11,7 @@ import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import type { RecallJustReviewPayload } from './nextRecallCardLoad.js'
+import { plainRecallAnsweredRow } from './recallAnsweredRowPayload.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 
 const STAGE_LABEL = 'Recalling'
@@ -65,13 +66,13 @@ export function JustReviewRecallStage({
         if (!yesIRemember) {
           await onRecallQuestionAnswered({
             successful: false,
-            scrollbackLines: ['Reduced memory index.'],
+            answeredRows: [plainRecallAnsweredRow('Reduced memory index.')],
           })
           return
         }
         await onRecallQuestionAnswered({
           successful: true,
-          scrollbackLines: [`Reviewed: ${p.noteTitle}`],
+          answeredRows: [plainRecallAnsweredRow(`Reviewed: ${p.noteTitle}`)],
         })
       } finally {
         inputBlockedRef.current = false

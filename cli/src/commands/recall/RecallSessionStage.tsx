@@ -24,7 +24,7 @@ import { RecallMcqStage } from './RecallMcqStage.js'
 import { SpellingRecallStage } from './SpellingRecallStage.js'
 import { RECALL_SESSION_STOPPED_LINE } from './leaveRecallSessionCopy.js'
 import { recallSessionSummaryLine } from './recallSessionSummary.js'
-import { recallAnsweredLine } from './recallAnsweredScrollback.js'
+import { recallAnsweredScrollbackItem } from './recallAnsweredScrollback.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 import { useSessionScrollbackAppend } from '../../sessionScrollback/sessionScrollbackAppendContext.js'
 
@@ -103,8 +103,8 @@ export function RecallSessionStage({
     async (outcome: RecallQuestionAnswerOutcome) => {
       sessionAnsweredCardsRef.current += 1
 
-      for (const line of outcome.scrollbackLines) {
-        appendScrollbackItem(recallAnsweredLine(line))
+      for (const row of outcome.answeredRows) {
+        appendScrollbackItem(recallAnsweredScrollbackItem(row))
       }
       try {
         const next = await loadNextRecallCardIfAny(0)

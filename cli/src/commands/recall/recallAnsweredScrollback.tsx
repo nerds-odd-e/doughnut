@@ -1,18 +1,26 @@
 import { Box, Text } from 'ink'
 import type { SessionScrollbackItem } from '../../sessionScrollback/SessionScrollback.js'
+import type { RecallAnsweredRowPayload } from './recallAnsweredRowPayload.js'
 
-export function RecallAnsweredRow(props: { readonly text: string }) {
-  const { text } = props
-  return (
-    <Box>
-      <Text>{text}</Text>
-    </Box>
-  )
+export function RecallAnsweredRow(props: {
+  readonly payload: RecallAnsweredRowPayload
+}) {
+  const { payload } = props
+  switch (payload.kind) {
+    case 'plain':
+      return (
+        <Box>
+          <Text>{payload.text}</Text>
+        </Box>
+      )
+  }
 }
 
-export function recallAnsweredLine(text: string): SessionScrollbackItem {
+export function recallAnsweredScrollbackItem(
+  payload: RecallAnsweredRowPayload
+): SessionScrollbackItem {
   return {
     id: crypto.randomUUID(),
-    element: <RecallAnsweredRow text={text} />,
+    element: <RecallAnsweredRow payload={payload} />,
   }
 }
