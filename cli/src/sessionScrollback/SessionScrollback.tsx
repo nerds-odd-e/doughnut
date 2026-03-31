@@ -1,21 +1,23 @@
 import { Static } from 'ink'
-import type { ScrollbackEntry } from './scrollbackEntry.js'
-import { ScrollbackLine } from './ScrollbackLine.js'
+import type { ReactNode } from 'react'
 
-type SessionScrollbackProps = {
-  readonly entries: readonly ScrollbackEntry[]
+/** Minimal shape for Ink `<Static>` item keys; scrollback layer stays content-agnostic. */
+export type SessionScrollbackItem = {
+  readonly id: string
 }
 
-export function SessionScrollback({ entries }: SessionScrollbackProps) {
+type SessionScrollbackProps<T extends SessionScrollbackItem> = {
+  readonly items: readonly T[]
+  readonly children: (item: T, index: number) => ReactNode
+}
+
+export function SessionScrollback<T extends SessionScrollbackItem>({
+  items,
+  children: renderItem,
+}: SessionScrollbackProps<T>) {
   return (
-    <Static items={entries}>
-      {(entry, index) => (
-        <ScrollbackLine
-          key={entry.id}
-          entry={entry}
-          nextEntry={entries[index + 1]}
-        />
-      )}
+    <Static items={items as T[]}>
+      {(item, index) => renderItem(item, index)}
     </Static>
   )
 }
