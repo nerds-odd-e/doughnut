@@ -105,8 +105,36 @@ export function RecallSessionStage({
         successfulRecallsRef.current += 1
       }
       sessionAnsweredCardsRef.current += 1
+
+      if (outcome.justReviewSuccessfulRecall !== undefined) {
+        const { noteTitle } = outcome.justReviewSuccessfulRecall
+        try {
+          const next = await loadNextRecallCardIfAny(0)
+          if (next !== null) {
+            appendScrollbackItem(recallAnsweredLine(`Reviewed: ${noteTitle}`))
+            setCard(next)
+            return
+          }
+          if (
+            startedWithEmptyTodayRef.current &&
+            successfulRecallsRef.current === 1
+          ) {
+            appendScrollbackItem(recallAnsweredLine(`Reviewed: ${noteTitle}`))
+            onSettled('')
+          } else {
+            setUiMode('loadMore')
+          }
+        } catch (loadErr: unknown) {
+          onSettled(userVisibleSlashCommandError(loadErr))
+        }
+        return
+      }
+
       for (const line of outcome.scrollbackLines) {
         appendScrollbackItem(recallAnsweredLine(line))
+      }
+      if (outcome.advanceToNextCard === false) {
+        return
       }
       try {
         const next = await loadNextRecallCardIfAny(0)
@@ -256,11 +284,9 @@ export function RecallSessionStage({
         payload={card.payload}
         inputBlockedRef={submittingRef}
         activeOperationAbortRef={activeOperationAbortRef}
-        startedWithEmptyTodayRef={startedWithEmptyTodayRef}
-        successfulRecallsRef={successfulRecallsRef}
-        onSettled={onSettled}
-        setCard={setCard}
-        setUiMode={setUiMode}
+        onRecallQuestionAnswered={onRecallQuestionAnswered}
+        onRecallFatalError={onRecallFatalError}
+        onConfirmLeaveRecall={onConfirmLeaveRecall}
       />
     </RecallSessionChrome>
   )

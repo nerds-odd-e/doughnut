@@ -518,7 +518,7 @@ describe('recall just-review (interactive)', () => {
     expect(combined).toContain('Note')
     expect(combined).not.toContain('Alpha')
     stdin.write('n\r')
-    await untilPlain(frames, (p) => p.includes('Marked as not recalled.'))
+    await untilPlain(frames, (p) => p.includes('Reduced memory index.'))
   })
 
   test('two due just-review items: y twice then n on load more → Recalled 2 notes', async () => {
