@@ -94,8 +94,7 @@ export function RecallMcqStage({
         }
         await onRecallQuestionAnswered({
           successful: true,
-          scrollbackLines: [],
-          scrollbackLinesWhenQueueEmpty: ['Correct!'],
+          scrollbackLines: ['Correct!'],
         })
       } catch (err: unknown) {
         onRecallFatalError(userVisibleSlashCommandError(err))

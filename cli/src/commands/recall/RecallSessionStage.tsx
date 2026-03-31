@@ -114,10 +114,6 @@ export function RecallSessionStage({
           setCard(next)
           return
         }
-        const tail = outcome.scrollbackLinesWhenQueueEmpty ?? []
-        for (const line of tail) {
-          appendScrollbackItem(recallAnsweredLine(line))
-        }
         if (outcome.successful) {
           onSettled('')
         } else {
