@@ -1,6 +1,12 @@
 import { MemoryTrackerController } from 'doughnut-api'
-import { Fragment, useCallback, useState, type MutableRefObject } from 'react'
-import { Text } from 'ink'
+import {
+  Fragment,
+  useCallback,
+  useState,
+  type MutableRefObject,
+  type ReactElement,
+} from 'react'
+import { Box, Text } from 'ink'
 import {
   doughnutSdkOptions,
   runDefaultBackendJson,
@@ -11,13 +17,53 @@ import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import type { RecallJustReviewPayload } from './nextRecallCardLoad.js'
-import {
-  recallAnsweredJustReviewInk,
-  type RecallAnsweredJustReviewInkOpts,
-} from './recallAnsweredScrollback.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 
+const JUST_REVIEW_BREADCRUMB_SEP = ' › '
+
 const STAGE_LABEL = 'Recalling'
+
+function justReviewOutcomeLine(
+  outcome: 'remembered' | 'reduced',
+  noteTitle: string
+): string {
+  if (outcome === 'reduced') {
+    return 'Reduced memory index.'
+  }
+  return `Reviewed: ${noteTitle}`
+}
+
+type RecallAnsweredJustReviewInkOpts = {
+  /** When `false`, omit note details markdown between breadcrumb and outcome. Default: show details. */
+  readonly showDetails?: boolean
+}
+
+function recallAnsweredJustReviewInk(
+  payload: RecallJustReviewPayload,
+  remembered: boolean,
+  opts?: RecallAnsweredJustReviewInkOpts
+): ReactElement {
+  const showDetails = opts?.showDetails !== false
+  const width = resolvedTerminalWidth()
+  const crumb = payload.breadcrumbTitles.join(JUST_REVIEW_BREADCRUMB_SEP)
+  const md = payload.detailsMarkdown.trim()
+  const rendered =
+    showDetails && md.length > 0 ? renderMarkdownToTerminal(md, width) : ''
+  const detailLines =
+    rendered.length > 0 ? rendered.split('\n') : ([] as string[])
+  const outcome: 'remembered' | 'reduced' = remembered
+    ? 'remembered'
+    : 'reduced'
+  return (
+    <Box flexDirection="column">
+      <Text>{crumb}</Text>
+      {detailLines.map((line, i) => (
+        <Text key={i}>{line.length > 0 ? line : ' '}</Text>
+      ))}
+      <Text>{justReviewOutcomeLine(outcome, payload.noteTitle)}</Text>
+    </Box>
+  )
+}
 
 export function JustReviewRecallStage({
   payload,
