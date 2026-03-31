@@ -160,13 +160,12 @@ describe('recall spelling (interactive)', () => {
 
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Incorrect.') && p.includes('Recalled 1 note')
+      (p) => p.includes('Incorrect.')
     )
 
     const plain = stripAnsi(frames.join('\n'))
     expect(plain).not.toContain('Correct!')
     expect(plain).not.toContain('Recalled successfully')
-    expect(plain).toContain('Recalled 1 note')
 
     expect(answerSpellingSpy).toHaveBeenCalledTimes(1)
     expect(answerSpellingSpy).toHaveBeenCalledWith(

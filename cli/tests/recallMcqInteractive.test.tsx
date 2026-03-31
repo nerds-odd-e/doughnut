@@ -200,7 +200,7 @@ describe('recall MCQ (interactive)', () => {
 
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Incorrect') && p.includes('Recalled 1 note')
+      (p) => p.includes('Load more from next 3 days?')
     )
 
     expect(answerQuizSpy).toHaveBeenCalledTimes(1)

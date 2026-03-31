@@ -42,8 +42,6 @@ export function RecallSessionStage({
   const [uiMode, setUiMode] = useState<'card' | 'loadMore'>('card')
   const [initialResolved, setInitialResolved] = useState(false)
   const submittingRef = useRef(false)
-  const successfulRecallsRef = useRef(0)
-  /** Answers submitted this session (correct or incorrect); drives summary when wrong exhausts the queue. */
   const sessionAnsweredCardsRef = useRef(0)
   const startedWithEmptyTodayRef = useRef(false)
   const activeOperationAbortRef = useRef<AbortController | null>(null)
@@ -87,7 +85,7 @@ export function RecallSessionStage({
   }, [onSettled])
 
   const settleSessionSummary = useCallback(() => {
-    onSettled(recallSessionSummaryLine(successfulRecallsRef.current))
+    onSettled(recallSessionSummaryLine(sessionAnsweredCardsRef.current))
   }, [onSettled])
 
   const onRecallFatalError = useCallback(
@@ -103,9 +101,6 @@ export function RecallSessionStage({
 
   const onRecallQuestionAnswered = useCallback(
     async (outcome: RecallQuestionAnswerOutcome) => {
-      if (outcome.successful) {
-        successfulRecallsRef.current += 1
-      }
       sessionAnsweredCardsRef.current += 1
 
       for (const line of outcome.scrollbackLines) {
@@ -117,22 +112,7 @@ export function RecallSessionStage({
           setCard(next)
           return
         }
-        if (outcome.successful) {
-          const answeredVariant = currentRecallCardRef.current?.variant
-          if (
-            answeredVariant === 'just-review' &&
-            !(
-              startedWithEmptyTodayRef.current &&
-              successfulRecallsRef.current === 1
-            )
-          ) {
-            setUiMode('loadMore')
-          } else {
-            onSettled('')
-          }
-        } else {
-          onSettled(recallSessionSummaryLine(sessionAnsweredCardsRef.current))
-        }
+        setUiMode('loadMore')
       } catch (loadErr: unknown) {
         onSettled(userVisibleSlashCommandError(loadErr))
       }
