@@ -133,6 +133,24 @@ describe('recall just-review (interactive)', () => {
       .please()
   }
 
+  function childNoteUnderEnglish() {
+    const english = makeMe.aNoteRealm
+      .title('English')
+      .notebookTitle('NB')
+      .details('')
+      .createdAt(baseNoteTimes.createdAt)
+      .updatedAt(baseNoteTimes.updatedAt)
+      .please()
+    return makeMe.aNoteRealm
+      .title('Sedition')
+      .notebookTitle('NB')
+      .details('Sedition means incite violence')
+      .under(english)
+      .createdAt(baseNoteTimes.createdAt)
+      .updatedAt(baseNoteTimes.updatedAt)
+      .please()
+  }
+
   function mockShowMemoryTrackerCardForRealm(
     noteRealm: ReturnType<typeof alphaNoteRealm>
   ) {
@@ -276,6 +294,34 @@ describe('recall just-review (interactive)', () => {
     stdin.write('n\r')
     await untilPlain(frames, (p) => p.includes('Recalled 1 note'))
     expect(markAsRecalledCount.n).toBe(1)
+    const out = stripAnsi(frames.join('\n'))
+    expect(out).toContain('body')
+    expect(out).toContain('Reviewed: Alpha')
+    expect(out).toContain('Alpha')
+  })
+
+  test('just-review answered block: breadcrumb parent › child, details, Reviewed line', async () => {
+    mockMarkAsRecalledCounting()
+    mockShowMemoryTrackerCardForRealm(childNoteUnderEnglish())
+
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    startRecall(stdin)
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes('Yes, I remember?') && p.includes('Sedition')
+    )
+    stdin.write('y\r')
+    await untilPlain(frames, (p) => {
+      const plain = stripAnsi(p)
+      return (
+        plain.includes('English › Sedition') &&
+        plain.includes('Sedition means incite violence') &&
+        plain.includes('Reviewed: Sedition')
+      )
+    })
   })
 
   test('load more empty Enter uses default yes → Recalled 1 note', async () => {
@@ -518,7 +564,9 @@ describe('recall just-review (interactive)', () => {
     expect(combined).toContain('Note')
     expect(combined).not.toContain('Alpha')
     stdin.write('n\r')
-    await untilPlain(frames, (p) => p.includes('Reduced memory index.'))
+    await untilPlain(frames, (p) =>
+      stripAnsi(p).includes('Reduced memory index.')
+    )
   })
 
   test('two due just-review items: y twice then n on load more → Recalled 2 notes', async () => {
@@ -533,7 +581,14 @@ describe('recall just-review (interactive)', () => {
     await waitRememberAlpha(frames)
     stdin.write('y\r')
     await waitRememberBeta(frames)
-    await waitForLastFrame(lastFrame, (f) => f.includes('Reviewed: Alpha'))
+    await waitForLastFrame(lastFrame, (f) => {
+      const plain = stripAnsi(f)
+      return (
+        plain.includes('Reviewed: Alpha') &&
+        plain.includes('body') &&
+        plain.includes('Alpha')
+      )
+    })
     stdin.write('y\r')
     await waitLoadMore(frames)
     stdin.write('n\r')

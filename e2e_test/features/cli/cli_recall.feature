@@ -33,6 +33,9 @@ Feature: CLI recall status and recall session
       And I should see "Put" styled in the Current guidance
       And I should see "Yes, I remember?" in the Current guidance
       When I enter "y" in the interactive CLI
+      Then I should see "English › sedation" in answered questions
+      And I should see "Put to sleep" in answered questions
+      And I should see "Reviewed: sedation" in answered questions
       And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
       Then I should see "Recalled 1 note" in past CLI assistant messages
 
@@ -112,5 +115,8 @@ Feature: CLI recall status and recall session
       When I enter "sedition" in the interactive CLI
       Then I should see "Spell correct: sedition" in answered questions
       When I answer "y" in the interactive CLI to prompt "Yes, I remember?"
+      Then I should see "English › sedition" in answered questions
+      And I should see "Sedition means incite violence" in answered questions
+      And I should see "Reviewed: sedition" in answered questions
       And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
       Then I should see "Recalled 2 notes" in past CLI assistant messages

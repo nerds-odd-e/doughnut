@@ -11,26 +11,55 @@ import {
 } from '../../backendApi/doughnutBackendClient.js'
 import { dueRecallQuery } from './dueRecallQuery.js'
 
+type NoteTopologyWalk = {
+  readonly title?: string | null
+  readonly notebookTitle?: string | null
+  readonly parentOrSubjectNoteTopology?: NoteTopologyWalk | null
+}
+
+/** Root → current note, same order as web `Breadcrumb` with `includingSelf: true`. */
+function breadcrumbTitlesFromNoteTopology(
+  topology: NoteTopologyWalk | undefined
+): readonly string[] {
+  if (topology === undefined) {
+    return ['Note']
+  }
+  const chain: NoteTopologyWalk[] = []
+  let current: NoteTopologyWalk | undefined = topology
+  while (current !== undefined) {
+    chain.push(current)
+    current = current.parentOrSubjectNoteTopology ?? undefined
+  }
+  chain.reverse()
+  return chain.map((n) => {
+    const t = n.title?.trim()
+    return t !== undefined && t.length > 0 ? t : 'Note'
+  })
+}
+
 /** Just-review recall card (fallback when MCQ is not available). */
 export type RecallJustReviewPayload = {
   readonly memoryTrackerId: number
   readonly noteTitle: string
   readonly detailsMarkdown: string
   readonly notebookTitle?: string
+  readonly breadcrumbTitles: readonly string[]
 }
 
 function recallJustReviewPayloadFromMemoryTracker(
   mt: MemoryTracker
 ): RecallJustReviewPayload {
   const note = mt.note
-  const noteTitle = note?.noteTopology?.title?.trim() || 'Note'
+  const topo = note?.noteTopology as NoteTopologyWalk | undefined
+  const noteTitle = topo?.title?.trim() || 'Note'
   const detailsMarkdown = (note?.details ?? '').trim()
-  const notebookTitle = note?.noteTopology?.notebookTitle?.trim()
+  const notebookTitle = topo?.notebookTitle?.trim()
   return {
     memoryTrackerId: mt.id,
     noteTitle,
     detailsMarkdown,
     notebookTitle,
+    breadcrumbTitles: breadcrumbTitlesFromNoteTopology(topo),
   }
 }
 
