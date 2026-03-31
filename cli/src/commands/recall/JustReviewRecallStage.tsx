@@ -1,9 +1,15 @@
-import { useCallback, type MutableRefObject } from 'react'
+import { Fragment, useCallback, useState, type MutableRefObject } from 'react'
+import { Text } from 'ink'
+import { renderMarkdownToTerminal } from '../../markdown.js'
+import { resolvedTerminalWidth } from '../../terminalColumns.js'
+import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
+import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import { markMemoryTrackerRecalled } from './markMemoryTrackerRecalled.js'
-import { JustReviewRecallCard } from './JustReviewRecallCard.js'
 import type { RecallJustReviewPayload } from './justReviewLoad.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
+
+const STAGE_LABEL = 'Recalling'
 
 export function JustReviewRecallStage({
   payload,
@@ -22,6 +28,8 @@ export function JustReviewRecallStage({
   readonly onRecallFatalError: (message: string) => void
   readonly onConfirmLeaveRecall: () => void
 }) {
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
+
   const submitJustReview = useCallback(
     async (yesIRemember: boolean) => {
       if (inputBlockedRef.current) return
@@ -81,14 +89,57 @@ export function JustReviewRecallStage({
     }
   }, [activeOperationAbortRef, inputBlockedRef])
 
+  const width = resolvedTerminalWidth()
+  const detailsRendered = payload.detailsMarkdown
+    ? renderMarkdownToTerminal(payload.detailsMarkdown, width)
+    : ''
+  const detailLines =
+    detailsRendered.length > 0 ? detailsRendered.split('\n') : []
+
+  const headerEl = (
+    <Fragment>
+      <Text>{STAGE_LABEL}</Text>
+      {payload.notebookTitle !== undefined && payload.notebookTitle !== '' ? (
+        <Text>{payload.notebookTitle}</Text>
+      ) : null}
+    </Fragment>
+  )
+
+  const handleQuestionEsc = useCallback(() => {
+    if (inputBlockedRef.current) {
+      abortJustReviewInFlight()
+      return
+    }
+    setShowLeaveConfirm(true)
+  }, [abortJustReviewInFlight, inputBlockedRef])
+
+  if (showLeaveConfirm) {
+    return (
+      <LeaveRecallConfirmPrompt
+        onConfirmLeave={onConfirmLeaveRecall}
+        onDismiss={() => setShowLeaveConfirm(false)}
+        inputBlockedRef={inputBlockedRef}
+        header={headerEl}
+      />
+    )
+  }
+
   return (
-    <JustReviewRecallCard
+    <YesNoStagePrompt
       key={payload.memoryTrackerId}
-      payload={payload}
+      prompt="Yes, I remember?"
       onAnswer={submitJustReview}
-      onAbortInFlight={abortJustReviewInFlight}
-      onLeaveRecallConfirmed={onConfirmLeaveRecall}
+      onCancel={handleQuestionEsc}
       inputBlockedRef={inputBlockedRef}
+      header={headerEl}
+      belowBuffer={
+        <>
+          <Text>{payload.noteTitle}</Text>
+          {detailLines.map((line, i) => (
+            <Text key={i}>{line.length > 0 ? line : ' '}</Text>
+          ))}
+        </>
+      }
     />
   )
 }
