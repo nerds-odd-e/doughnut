@@ -57,8 +57,7 @@ export function JustReviewRecallStage({
         }
         await onRecallQuestionAnswered({
           successful: true,
-          scrollbackLines: [],
-          justReviewSuccessfulRecall: { noteTitle: p.noteTitle },
+          scrollbackLines: [`Reviewed: ${p.noteTitle}`],
         })
       } finally {
         inputBlockedRef.current = false

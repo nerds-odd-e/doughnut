@@ -47,6 +47,8 @@ export function RecallSessionStage({
   const sessionAnsweredCardsRef = useRef(0)
   const startedWithEmptyTodayRef = useRef(false)
   const activeOperationAbortRef = useRef<AbortController | null>(null)
+  const currentRecallCardRef = useRef<RecallCard | null>(null)
+  currentRecallCardRef.current = card
 
   useEffect(() => {
     let unmounted = false
@@ -106,30 +108,6 @@ export function RecallSessionStage({
       }
       sessionAnsweredCardsRef.current += 1
 
-      if (outcome.justReviewSuccessfulRecall !== undefined) {
-        const { noteTitle } = outcome.justReviewSuccessfulRecall
-        try {
-          const next = await loadNextRecallCardIfAny(0)
-          if (next !== null) {
-            appendScrollbackItem(recallAnsweredLine(`Reviewed: ${noteTitle}`))
-            setCard(next)
-            return
-          }
-          if (
-            startedWithEmptyTodayRef.current &&
-            successfulRecallsRef.current === 1
-          ) {
-            appendScrollbackItem(recallAnsweredLine(`Reviewed: ${noteTitle}`))
-            onSettled('')
-          } else {
-            setUiMode('loadMore')
-          }
-        } catch (loadErr: unknown) {
-          onSettled(userVisibleSlashCommandError(loadErr))
-        }
-        return
-      }
-
       for (const line of outcome.scrollbackLines) {
         appendScrollbackItem(recallAnsweredLine(line))
       }
@@ -140,7 +118,18 @@ export function RecallSessionStage({
           return
         }
         if (outcome.successful) {
-          onSettled('')
+          const answeredVariant = currentRecallCardRef.current?.variant
+          if (
+            answeredVariant === 'just-review' &&
+            !(
+              startedWithEmptyTodayRef.current &&
+              successfulRecallsRef.current === 1
+            )
+          ) {
+            setUiMode('loadMore')
+          } else {
+            onSettled('')
+          }
         } else {
           onSettled(recallSessionSummaryLine(sessionAnsweredCardsRef.current))
         }
