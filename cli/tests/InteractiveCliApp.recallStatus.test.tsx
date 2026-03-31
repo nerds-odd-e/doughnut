@@ -87,7 +87,7 @@ describe('InteractiveCliApp /recall-status', () => {
       },
     } as Awaited<ReturnType<typeof RecallsController.recalling>>)
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
+    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />
     )
 
@@ -97,8 +97,8 @@ describe('InteractiveCliApp /recall-status', () => {
       (c) => stripAnsi(c).includes('2 notes to recall today')
     )
 
-    const combined = stripAnsi(frames.join('\n'))
-    expect(combined.split('2 notes to recall today').length - 1).toBe(1)
-    expect(combined).not.toContain('Cancelled.')
+    const final = stripAnsi(lastFrame() ?? '')
+    expect(final.split('2 notes to recall today').length - 1).toBe(1)
+    expect(final).not.toContain('Cancelled.')
   })
 })

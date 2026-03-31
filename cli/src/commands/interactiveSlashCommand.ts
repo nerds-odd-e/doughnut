@@ -5,10 +5,6 @@ export type InteractiveSlashCommandStageProps = {
   readonly onSettled: (assistantText: string) => void
 }
 
-export type TranscriptMessage =
-  | { readonly role: 'assistant'; readonly text: string }
-  | { readonly role: 'user'; readonly text: string }
-
 export type InteractiveSlashCommandResult = {
   assistantMessage: string
 }

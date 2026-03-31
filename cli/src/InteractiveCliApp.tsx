@@ -1,18 +1,20 @@
 import { createElement, useCallback, useEffect, useRef, useState } from 'react'
 import type { ComponentType } from 'react'
 import type { Key } from 'ink'
-import { Box, Text, useApp, useInput } from 'ink'
+import { Box, useApp, useInput } from 'ink'
 import { MainInteractivePrompt } from './mainInteractivePrompt/index.js'
 import { resolveInteractiveSlashCommand } from './commands/interactiveSlashCommands.js'
-import type {
-  InteractiveSlashCommandStageProps,
-  TranscriptMessage,
-} from './commands/interactiveSlashCommand.js'
+import type { InteractiveSlashCommandStageProps } from './commands/interactiveSlashCommand.js'
 import { formatVersionOutput } from './commands/version.js'
-import { PastUserMessageBlock } from './pastUserMessageBlock.js'
 import { userVisibleSlashCommandError } from './userVisibleSlashCommandError.js'
 import type { StageKeyHandler } from './commands/accessToken/stageKeyForwardContext.js'
 import { SetStageKeyHandlerContext } from './commands/accessToken/stageKeyForwardContext.js'
+import { SessionScrollback } from './sessionScrollback/SessionScrollback.js'
+import {
+  type ScrollbackEntry,
+  scrollbackAssistantText,
+  scrollbackUserLine,
+} from './sessionScrollback/scrollbackEntry.js'
 
 export function InteractiveCliApp() {
   const { exit } = useApp()
@@ -27,9 +29,9 @@ export function InteractiveCliApp() {
       stageKeyHandlerRef.current?.(input, key)
     }, [])
   )
-  const [messages, setMessages] = useState<TranscriptMessage[]>([
-    { role: 'assistant', text: formatVersionOutput() },
-  ])
+  const [scrollbackEntries, setScrollbackEntries] = useState<ScrollbackEntry[]>(
+    () => [scrollbackAssistantText(formatVersionOutput())]
+  )
   const [activeStageComponent, setActiveStageComponent] =
     useState<ComponentType<InteractiveSlashCommandStageProps> | null>(null)
   const [exitAfterCommit, setExitAfterCommit] = useState(false)
@@ -40,18 +42,17 @@ export function InteractiveCliApp() {
   }, [exit, exitAfterCommit])
 
   const handleAsyncSlashSettled = useCallback((assistantText: string) => {
-    setMessages((prev) => [...prev, { role: 'assistant', text: assistantText }])
+    const assistant = scrollbackAssistantText(assistantText)
+    setScrollbackEntries((prev) => [...prev, assistant])
     setActiveStageComponent(null)
     stageArgumentRef.current = undefined
   }, [])
 
   const onCommittedLine = useCallback((line: string) => {
     const commitUserLineWithAssistant = (assistantText: string) => {
-      setMessages((prev) => [
-        ...prev,
-        { role: 'user', text: line },
-        { role: 'assistant', text: assistantText },
-      ])
+      const user = scrollbackUserLine(line)
+      const assistant = scrollbackAssistantText(assistantText)
+      setScrollbackEntries((prev) => [...prev, user, assistant])
     }
 
     const lineOfCommand = line.startsWith('/')
@@ -72,19 +73,17 @@ export function InteractiveCliApp() {
     }
 
     const { command, argument } = resolved
-    setMessages((prev) => [...prev, { role: 'user', text: line }])
+    const user = scrollbackUserLine(line)
+    setScrollbackEntries((prev) => [...prev, user])
     const Stage = command.stageComponent
     if (Stage) {
       const argumentMissing = argument === undefined || argument === ''
       const argSpec = command.argument
       if (argSpec !== undefined && argumentMissing && !argSpec.optional) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            text: `Missing ${argSpec.name}. Usage: ${command.doc.usage}`,
-          },
-        ])
+        const assistant = scrollbackAssistantText(
+          `Missing ${argSpec.name}. Usage: ${command.doc.usage}`
+        )
+        setScrollbackEntries((prev) => [...prev, assistant])
         return
       }
       stageArgumentRef.current = argument
@@ -95,58 +94,38 @@ export function InteractiveCliApp() {
     const argumentMissing = argument === undefined || argument === ''
     const argSpec = command.argument
     if (argSpec !== undefined && argumentMissing && !argSpec.optional) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          text: `Missing ${argSpec.name}. Usage: ${command.doc.usage}`,
-        },
-      ])
+      const assistant = scrollbackAssistantText(
+        `Missing ${argSpec.name}. Usage: ${command.doc.usage}`
+      )
+      setScrollbackEntries((prev) => [...prev, assistant])
       return
     }
     const run = command.run
     if (!run) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          text: 'Internal error: command has no run handler.',
-        },
-      ])
+      const assistant = scrollbackAssistantText(
+        'Internal error: command has no run handler.'
+      )
+      setScrollbackEntries((prev) => [...prev, assistant])
       return
     }
     Promise.resolve(run(argument))
       .then((r) => {
-        setMessages((prev) => [
-          ...prev,
-          { role: 'assistant', text: r.assistantMessage },
-        ])
+        const assistant = scrollbackAssistantText(r.assistantMessage)
+        setScrollbackEntries((prev) => [...prev, assistant])
         if (command.line === '/exit') setExitAfterCommit(true)
       })
       .catch((err: unknown) => {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            text: userVisibleSlashCommandError(err),
-          },
-        ])
+        const assistant = scrollbackAssistantText(
+          userVisibleSlashCommandError(err)
+        )
+        setScrollbackEntries((prev) => [...prev, assistant])
       })
   }, [])
 
   return (
     <SetStageKeyHandlerContext.Provider value={setStageKeyHandler}>
       <Box flexDirection="column">
-        {messages.flatMap((item, index) =>
-          item.role === 'user'
-            ? [
-                <PastUserMessageBlock key={index} text={item.text} />,
-                ...(messages[index + 1]?.role === 'assistant'
-                  ? [<Box key={`${index}-gap`} height={1} />]
-                  : []),
-              ]
-            : [<Text key={index}>{item.text}</Text>]
-        )}
+        <SessionScrollback entries={scrollbackEntries} />
         {activeStageComponent &&
           createElement(activeStageComponent, {
             argument: stageArgumentRef.current,

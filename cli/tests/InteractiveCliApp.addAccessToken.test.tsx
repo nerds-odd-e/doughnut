@@ -182,7 +182,7 @@ describe('InteractiveCliApp /add-access-token', () => {
       'utf-8'
     )
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
+    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />
     )
 
@@ -195,7 +195,7 @@ describe('InteractiveCliApp /add-access-token', () => {
         c.includes('1. L0')
     )
 
-    const plain = stripAnsi(frames.join('\n'))
+    const plain = stripAnsi(lastFrame() ?? '')
     const rows = plain
       .split('\n')
       .filter(

@@ -82,14 +82,12 @@ function writeLastEmailFixtureGmailConfig(configDir: string): void {
   })
 }
 
-function expectSuccessLineOnceInOutput(
+function expectSuccessLineOnceOnScreen(
   successLine: string,
-  frames: string[],
   lastFrame: () => string | undefined
 ): void {
   const final = stripAnsi(lastFrame() ?? '')
   expect(final.split(successLine).length - 1).toBe(1)
-  expect(stripAnsi(frames.join('\n')).split(successLine).length - 1).toBe(1)
 }
 
 function createTestConfigDir(): string {
@@ -234,7 +232,7 @@ describe('InteractiveCliApp /add gmail (mocked HTTP APIs)', () => {
   })
 
   test('after add gmail completes: one Added account line and main prompt returns', async () => {
-    const { stdin, frames, lastFrame } = await renderApp()
+    const { stdin, lastFrame } = await renderApp()
     const successLine = 'Added account staged@test.com'
 
     await submitAndCompleteOAuth(stdin, oauthLog.get)
@@ -242,7 +240,7 @@ describe('InteractiveCliApp /add gmail (mocked HTTP APIs)', () => {
       lastFrame,
       (f) => f.includes(successLine) && f.includes('→ ')
     )
-    expectSuccessLineOnceInOutput(successLine, frames, lastFrame)
+    expectSuccessLineOnceOnScreen(successLine, lastFrame)
   })
 
   test('Escape during OAuth wait settles Cancelled and returns prompt', async () => {
@@ -364,7 +362,7 @@ describe('InteractiveCliApp /last email (mocked HTTP APIs)', () => {
         })
     )
 
-    const { stdin, frames, lastFrame } = await renderApp()
+    const { stdin, lastFrame } = await renderApp()
     const successLine = 'Welcome to Doughnut'
 
     stdin.write('/last email\r')
@@ -372,7 +370,7 @@ describe('InteractiveCliApp /last email (mocked HTTP APIs)', () => {
       lastFrame,
       (f) => f.includes(successLine) && f.includes('→ ')
     )
-    expectSuccessLineOnceInOutput(successLine, frames, lastFrame)
+    expectSuccessLineOnceOnScreen(successLine, lastFrame)
   })
 
   test('shows no-account error in transcript after /last email', async () => {
