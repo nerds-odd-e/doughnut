@@ -28,7 +28,7 @@ import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import { normalizeSpellingLineForSubmit } from './spellingAnswerLine.js'
 import type { SpellingRecallSessionPayload } from './nextRecallCardLoad.js'
-import { recallAnsweredPlainInk } from './recallAnsweredScrollback.js'
+import { recallAnsweredSpellingInk } from './recallAnsweredScrollback.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 
 async function fetchSpellingRecallPrompt(
@@ -144,19 +144,26 @@ export function SpellingRecallStage({
     try {
       const updated = await submitSpellingAnswer(loadState.recallPromptId, line)
       const correct = updated.answer?.correct === true
+      const spellingAnswerDisplay =
+        updated.answer?.spellingAnswer?.trim() || line
+      const answeredBlock = recallAnsweredSpellingInk({
+        breadcrumbTitles: payload.breadcrumbTitles,
+        detailsMarkdown: payload.detailsMarkdown,
+        spellingAnswerDisplay,
+        correct,
+      })
       if (!correct) {
         bufferRef.current = ''
         setBuffer('')
         await onRecallQuestionAnswered({
           successful: false,
-          answeredRows: [recallAnsweredPlainInk('Incorrect.')],
+          answeredRows: [answeredBlock],
         })
         return
       }
-      const spellCorrectLine = `Spell correct: ${payload.noteTitle}`
       await onRecallQuestionAnswered({
         successful: true,
-        answeredRows: [recallAnsweredPlainInk(spellCorrectLine)],
+        answeredRows: [answeredBlock],
       })
     } catch (err: unknown) {
       onRecallFatalError(userVisibleSlashCommandError(err))
@@ -168,7 +175,7 @@ export function SpellingRecallStage({
     loadState,
     onRecallFatalError,
     onRecallQuestionAnswered,
-    payload.noteTitle,
+    payload,
   ])
 
   const processSpellKeyEvent = useCallback(

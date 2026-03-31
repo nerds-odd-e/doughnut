@@ -132,6 +132,8 @@ export type SpellingRecallSessionPayload = {
   readonly memoryTrackerId: number
   readonly noteTitle: string
   readonly notebookTitle?: string
+  readonly breadcrumbTitles: readonly string[]
+  readonly detailsMarkdown: string
 }
 
 export type RecallCard =
@@ -172,13 +174,15 @@ export async function loadNextRecallCardIfAny(
   const notebookTitle = note?.noteTopology?.notebookTitle?.trim()
 
   if (mt.spelling) {
-    const noteTitle = note?.noteTopology?.title?.trim() || 'Note'
+    const p = recallJustReviewPayloadFromMemoryTracker(mt)
     return {
       variant: 'spelling-session',
       payload: {
-        memoryTrackerId: mt.id,
-        noteTitle,
-        notebookTitle,
+        memoryTrackerId: p.memoryTrackerId,
+        noteTitle: p.noteTitle,
+        notebookTitle: p.notebookTitle,
+        breadcrumbTitles: p.breadcrumbTitles,
+        detailsMarkdown: p.detailsMarkdown,
       },
     }
   }

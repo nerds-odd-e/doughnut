@@ -1,6 +1,6 @@
 # CLI recall — answered questions (rich session UI)
 
-**Status:** Phase 1 **done** — `answeredRows` on `RecallQuestionAnswerOutcome`. Phase 2 (just-review rich block) **done** — rows are `ReactNode` (Ink subtrees) via `recallAnsweredScrollback.tsx` helpers. Phases 3–5 (spelling / MCQ / consistency) not started.
+**Status:** Phase 1 **done** — `answeredRows` on `RecallQuestionAnswerOutcome`. Phase 2 (just-review rich block) **done** — rows are `ReactNode` (Ink subtrees) via `recallAnsweredScrollback.tsx` helpers. Phase 3 (spelling rich block + correct/wrong color) **done**. Phases 4–5 (MCQ / consistency) not started.
 
 **Scope:** During `/recall`, after each question is answered, show a **readonly** summary in the “answered questions” region: breadcrumb ending in note title, note-facing content, and type-specific outcome (just review / spelling / MCQ). Only items answered **in this session**; **no** loading of “answered earlier today” (or any history) from the backend.
 
@@ -65,6 +65,8 @@
 
 ## Phase 3 — Spelling rich answered block + correct/wrong styling
 
+**Done.** `SpellingRecallSessionPayload` includes `breadcrumbTitles` / `detailsMarkdown` from `recallJustReviewPayloadFromMemoryTracker`; `recallAnsweredSpellingInk` in `recallAnsweredScrollback.tsx`; green `Correct!` / red `Incorrect.`; shared `RECALL_ANSWERED_BREADCRUMB_SEP` with just-review.
+
 **User-visible behavior:** After spelling submission, answered block shows:
 
 - Breadcrumb ending with note title.
@@ -74,8 +76,8 @@
 
 **Tests**
 
-- **Unit:** High-level spelling correct/wrong paths via `runInteractive`; assert answer text and style cue in output.
-- **E2E:** Strengthen existing spelling scenario assertions only.
+- **Unit:** `recallSpellingInteractive.test.tsx` — rich block text + raw SGR for red/green.
+- **E2E:** `cli_recall.feature` spelling scenario — `Correct!`, `Your answer: …`, breadcrumb, details before just-review steps.
 
 ---
 

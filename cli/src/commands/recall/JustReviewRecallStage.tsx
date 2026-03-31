@@ -18,8 +18,7 @@ import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import type { RecallJustReviewPayload } from './nextRecallCardLoad.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
-
-const JUST_REVIEW_BREADCRUMB_SEP = ' › '
+import { RECALL_ANSWERED_BREADCRUMB_SEP } from './recallAnsweredScrollback.js'
 
 const STAGE_LABEL = 'Recalling'
 
@@ -38,7 +37,7 @@ function recallAnsweredJustReviewInk(
   remembered: boolean
 ): ReactElement {
   const width = resolvedTerminalWidth()
-  const crumb = payload.breadcrumbTitles.join(JUST_REVIEW_BREADCRUMB_SEP)
+  const crumb = payload.breadcrumbTitles.join(RECALL_ANSWERED_BREADCRUMB_SEP)
   const md = payload.detailsMarkdown.trim()
   const rendered = md.length > 0 ? renderMarkdownToTerminal(md, width) : ''
   const detailLines =

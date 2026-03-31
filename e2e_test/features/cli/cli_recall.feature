@@ -113,7 +113,10 @@ Feature: CLI recall status and recall session
       When I enter the slash command "/recall" in the interactive CLI
       Then I should see "Spell:" in the Current guidance
       When I enter "sedition" in the interactive CLI
-      Then I should see "Spell correct: sedition" in answered questions
+      Then I should see "Correct!" in answered questions
+      And I should see "Your answer: sedition" in answered questions
+      And I should see "English › sedition" in answered questions
+      And I should see "Sedition means incite violence" in answered questions
       When I answer "y" in the interactive CLI to prompt "Yes, I remember?"
       Then I should see "English › sedition" in answered questions
       And I should see "Sedition means incite violence" in answered questions

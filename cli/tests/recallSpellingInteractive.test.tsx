@@ -160,8 +160,20 @@ describe('recall spelling (interactive)', () => {
 
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Incorrect.')
+      (p) =>
+        p.includes('Incorrect.') &&
+        p.includes('Your answer: typo') &&
+        p.includes('body')
     )
+
+    const raw = frames.join('\n')
+    const incorrectIdx = raw.indexOf('Incorrect.')
+    expect(incorrectIdx).toBeGreaterThan(-1)
+    const beforeIncorrect = raw.slice(0, incorrectIdx)
+    expect(
+      beforeIncorrect.includes('\u001b[31m') ||
+        beforeIncorrect.includes('\u001b[91m')
+    ).toBe(true)
 
     const plain = stripAnsi(frames.join('\n'))
     expect(plain).not.toContain('Correct!')
@@ -214,8 +226,20 @@ describe('recall spelling (interactive)', () => {
 
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Spell correct: sedition')
+      (p) =>
+        p.includes('Correct!') &&
+        p.includes('Your answer: SeDiTiOn') &&
+        p.includes('body')
     )
+
+    const rawOk = frames.join('\n')
+    const correctIdx = rawOk.lastIndexOf('Correct!')
+    expect(correctIdx).toBeGreaterThan(-1)
+    const beforeCorrect = rawOk.slice(0, correctIdx)
+    expect(
+      beforeCorrect.includes('\u001b[32m') ||
+        beforeCorrect.includes('\u001b[92m')
+    ).toBe(true)
 
     expect(answerSpellingSpy).toHaveBeenCalledTimes(1)
   })
@@ -255,7 +279,10 @@ describe('recall spelling (interactive)', () => {
 
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Spell correct: sedition')
+      (p) =>
+        p.includes('Correct!') &&
+        p.includes('Your answer: SeDiTiOn') &&
+        p.includes('body')
     )
 
     expect(answerSpellingSpy).toHaveBeenCalledWith(
