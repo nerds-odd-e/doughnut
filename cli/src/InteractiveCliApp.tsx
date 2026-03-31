@@ -54,19 +54,20 @@ export function InteractiveCliApp() {
       ])
     }
 
-    const slash = line.startsWith('/')
-    const body = slash ? line.slice(1) : line.trim() === 'exit' ? 'exit' : null
+    const lineOfCommand = line.startsWith('/')
+      ? line.slice(1)
+      : line.trim() === 'exit'
+        ? 'exit'
+        : undefined
 
-    if (body === null) {
+    if (!lineOfCommand) {
       commitUserLineWithAssistant('Not supported')
       return
     }
 
-    const resolved = resolveInteractiveSlashCommand(body)
+    const resolved = resolveInteractiveSlashCommand(lineOfCommand)
     if (!resolved) {
-      commitUserLineWithAssistant(
-        slash ? 'unsupported command' : 'Not supported'
-      )
+      commitUserLineWithAssistant('unsupported command')
       return
     }
 
