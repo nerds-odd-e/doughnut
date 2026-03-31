@@ -413,6 +413,7 @@ export function RecallMcqStage({
         {'> '}
         {buffer}
         <Text inverse> </Text>
+        {buffer === '' ? <Text color="gray">{MCQ_HINT}</Text> : null}
       </Text>
       {stemLines.map((line, i) => (
         <Text key={`s-${i}`}>{line.length > 0 ? line : ' '}</Text>
@@ -425,7 +426,6 @@ export function RecallMcqStage({
           rowBudget={choicesGuidanceRowBudget}
         />
       </Box>
-      <Text>{MCQ_HINT}</Text>
     </Box>
   )
 }

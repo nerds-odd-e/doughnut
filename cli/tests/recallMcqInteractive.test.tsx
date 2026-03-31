@@ -534,7 +534,7 @@ describe('recall MCQ (interactive)', () => {
       lastFrame,
       (p) =>
         p.includes('> z') &&
-        p.includes(MCQ_HINT_SUBSTR) &&
+        p.includes('Choose') &&
         !p.includes(LEAVE_RECALL_PROMPT)
     )
 
