@@ -19,8 +19,7 @@ import {
   loadNextRecallCardIfAny,
   type RecallCard,
 } from './nextRecallCardLoad.js'
-import { markMemoryTrackerRecalled } from './markMemoryTrackerRecalled.js'
-import { JustReviewRecallCard } from './JustReviewRecallCard.js'
+import { JustReviewRecallStage } from './JustReviewRecallStage.js'
 import { RecallMcqStage } from './RecallMcqStage.js'
 import { SpellingRecallStage } from './SpellingRecallStage.js'
 import { RECALL_SESSION_STOPPED_LINE } from './leaveRecallSessionCopy.js'
@@ -42,15 +41,12 @@ export function RecallSessionStage({
   const [card, setCard] = useState<RecallCard | null>(null)
   const [uiMode, setUiMode] = useState<'card' | 'loadMore'>('card')
   const [initialResolved, setInitialResolved] = useState(false)
-  const cardRef = useRef<RecallCard | null>(null)
   const submittingRef = useRef(false)
   const successfulRecallsRef = useRef(0)
   /** Answers submitted this session (correct or incorrect); drives summary when wrong exhausts the queue. */
   const sessionAnsweredCardsRef = useRef(0)
   const startedWithEmptyTodayRef = useRef(false)
   const activeOperationAbortRef = useRef<AbortController | null>(null)
-
-  cardRef.current = card
 
   useEffect(() => {
     let unmounted = false
@@ -176,99 +172,6 @@ export function RecallSessionStage({
     [onSettled, settleSessionSummary]
   )
 
-  const submitJustReview = useCallback(
-    async (successful: boolean) => {
-      const c = cardRef.current
-      if (c === null || c.variant !== 'just-review' || submittingRef.current)
-        return
-      const ac = new AbortController()
-      activeOperationAbortRef.current = ac
-      submittingRef.current = true
-      const p = c.payload
-      try {
-        await markMemoryTrackerRecalled(
-          p.memoryTrackerId,
-          successful,
-          ac.signal
-        )
-      } catch (err: unknown) {
-        submittingRef.current = false
-        if (activeOperationAbortRef.current === ac) {
-          activeOperationAbortRef.current = null
-        }
-        onSettled(userVisibleSlashCommandError(err))
-        return
-      }
-      if (ac.signal.aborted) {
-        submittingRef.current = false
-        if (activeOperationAbortRef.current === ac) {
-          activeOperationAbortRef.current = null
-        }
-        onSettled(
-          userVisibleSlashCommandError(
-            new DOMException('Aborted', 'AbortError')
-          )
-        )
-        return
-      }
-      if (!successful) {
-        submittingRef.current = false
-        if (activeOperationAbortRef.current === ac) {
-          activeOperationAbortRef.current = null
-        }
-        onSettled('Marked as not recalled.')
-        return
-      }
-      successfulRecallsRef.current += 1
-      try {
-        const next = await loadNextRecallCardIfAny(0, ac.signal)
-        submittingRef.current = false
-        if (activeOperationAbortRef.current === ac) {
-          activeOperationAbortRef.current = null
-        }
-        if (ac.signal.aborted) {
-          onSettled(
-            userVisibleSlashCommandError(
-              new DOMException('Aborted', 'AbortError')
-            )
-          )
-          return
-        }
-        if (next === null) {
-          if (
-            startedWithEmptyTodayRef.current &&
-            successfulRecallsRef.current === 1
-          ) {
-            appendScrollbackItem(recallAnsweredLine(`Reviewed: ${p.noteTitle}`))
-            onSettled('')
-          } else {
-            setUiMode('loadMore')
-          }
-        } else {
-          appendScrollbackItem(recallAnsweredLine(`Reviewed: ${p.noteTitle}`))
-          setCard(next)
-        }
-      } catch (loadErr: unknown) {
-        submittingRef.current = false
-        if (activeOperationAbortRef.current === ac) {
-          activeOperationAbortRef.current = null
-        }
-        onSettled(userVisibleSlashCommandError(loadErr))
-      }
-    },
-    [appendScrollbackItem, onSettled]
-  )
-
-  const abortJustReviewInFlight = useCallback(() => {
-    if (submittingRef.current) {
-      activeOperationAbortRef.current?.abort()
-    }
-  }, [])
-
-  const leaveJustReviewSession = useCallback(() => {
-    onSettled(RECALL_SESSION_STOPPED_LINE)
-  }, [onSettled])
-
   /** Load-more prompt: Esc = decline load more (same as n → session summary), or abort in-flight fetch — not LeaveRecallConfirmPrompt. */
   const escapeLoadMorePrompt = useCallback(() => {
     if (submittingRef.current) {
@@ -353,13 +256,15 @@ export function RecallSessionStage({
 
   return (
     <RecallSessionChrome>
-      <JustReviewRecallCard
-        key={card.payload.memoryTrackerId}
+      <JustReviewRecallStage
         payload={card.payload}
-        onAnswer={submitJustReview}
-        onAbortInFlight={abortJustReviewInFlight}
-        onLeaveRecallConfirmed={leaveJustReviewSession}
         inputBlockedRef={submittingRef}
+        activeOperationAbortRef={activeOperationAbortRef}
+        startedWithEmptyTodayRef={startedWithEmptyTodayRef}
+        successfulRecallsRef={successfulRecallsRef}
+        onSettled={onSettled}
+        setCard={setCard}
+        setUiMode={setUiMode}
       />
     </RecallSessionChrome>
   )
