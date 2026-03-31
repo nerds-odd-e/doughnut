@@ -1,11 +1,15 @@
+import { MemoryTrackerController } from 'doughnut-api'
 import { Fragment, useCallback, useState, type MutableRefObject } from 'react'
 import { Text } from 'ink'
+import {
+  doughnutSdkOptions,
+  runDefaultBackendJson,
+} from '../../backendApi/doughnutBackendClient.js'
 import { renderMarkdownToTerminal } from '../../markdown.js'
 import { resolvedTerminalWidth } from '../../terminalColumns.js'
 import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
-import { markMemoryTrackerRecalled } from './markMemoryTrackerRecalled.js'
 import type { RecallJustReviewPayload } from './nextRecallCardLoad.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 
@@ -39,10 +43,12 @@ export function JustReviewRecallStage({
       const p = payload
       try {
         try {
-          await markMemoryTrackerRecalled(
-            p.memoryTrackerId,
-            yesIRemember,
-            ac.signal
+          await runDefaultBackendJson(() =>
+            MemoryTrackerController.markAsRecalled({
+              path: { memoryTracker: p.memoryTrackerId },
+              query: { successful: yesIRemember },
+              ...doughnutSdkOptions(ac.signal),
+            })
           )
         } catch (err: unknown) {
           onRecallFatalError(userVisibleSlashCommandError(err))
