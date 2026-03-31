@@ -377,7 +377,9 @@ Because the CLI is message-based and stage-based, define a clear distinction bet
 - current stage-specific state
 - transient async operation state
 
-This does not need full design now, but the separation should remain visible.
+**Current direction (interactive):** session history is **one** append-only Ink `<Static>` region above the live prompt column. Shell transcript items and recall-specific scrollback rows share that list; stages append through a small shared context rather than mounting a second `<Static>`. Boundaries (generic scrollback vs domain row components): `ongoing/cli-session-scrollback.md`.
+
+The separation above should stay visible as the CLI grows.
 
 ### 11.2 Error handling model
 
@@ -491,7 +493,7 @@ The CLI architecture should move forward with a few strong ideas kept stable:
 
 - separate **non-interactive commands** from the **interactive TUI application**
 - build the interactive experience idiomatically with **Ink + React**
-- treat the interactive CLI as a **message-based, stage-aware session**
+- treat the interactive CLI as a **message-based, stage-aware session** with **one** append-only static region for past messages above the live UI
 - keep substages **self-contained** and independent from parent internals
 - isolate terminal mechanics behind a **TTY I/O adapter**
 - reuse shared backend/API code where it already fits

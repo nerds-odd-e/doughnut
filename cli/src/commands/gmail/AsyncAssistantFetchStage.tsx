@@ -9,17 +9,22 @@ import type { Key } from 'ink'
 import { Box, useInput } from 'ink'
 import { Spinner } from '@inkjs/ui'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
+import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
 import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext.js'
+
+type AsyncAssistantFetchStageProps = Pick<
+  InteractiveSlashCommandStageProps,
+  'onSettled'
+> & {
+  readonly spinnerLabel: string
+  readonly runAssistantMessage: (signal: AbortSignal) => Promise<string>
+}
 
 export function AsyncAssistantFetchStage({
   spinnerLabel,
   runAssistantMessage,
   onSettled,
-}: {
-  readonly spinnerLabel: string
-  readonly runAssistantMessage: (signal: AbortSignal) => Promise<string>
-  readonly onSettled: (assistantText: string) => void
-}) {
+}: AsyncAssistantFetchStageProps) {
   const runRef = useRef(runAssistantMessage)
   runRef.current = runAssistantMessage
 

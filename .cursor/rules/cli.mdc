@@ -11,10 +11,11 @@ TypeScript CLI for Doughnut. Lives in `cli/`.
 
 ```
 cli/
-  src/           # Production code (shell, TTY, UI, `processInput` exit gate; subcommand handlers in `src/commands/`)
-  src/commands/  # Slash-command and subcommand implementations + aggregated help
-  src/shims/     # Modules referenced only from the esbuild `bundle` script (aliases)
-  tests/         # Vitest unit tests (*.test.ts)
+  src/                 # Production code (shell, TTY, UI, `processInput` exit gate; subcommand handlers in `src/commands/`)
+  src/sessionScrollback/  # One Ink `<Static>` session history above the live column; transcript factories + recall answered rows; append context for stages
+  src/commands/        # Slash-command and subcommand implementations + aggregated help
+  src/shims/           # Modules referenced only from the esbuild `bundle` script (aliases)
+  tests/               # Vitest unit tests (*.test.ts)
   vitest.config.ts
   tsconfig.json
   package.json
@@ -36,9 +37,11 @@ Keep each module’s **public surface small**: `export` only what other modules 
 
 ## Architecture Roadmap
 
-The archittecture roadmap can be found at ongoing/cli-architecture-roadmap.md
+The architecture roadmap is at `ongoing/cli-architecture-roadmap.md`.
 
-The roadmap services as a guideline for growing the architecture. It is not for immediately direct implimentation. The architecture part is only applied and must be apppled when a feature requires it. The decision should be challenged before followed. It also need to be updated with new decision and the visionary part of it should be continously refined with latest understanding.
+It is a guideline for growing the architecture, not a direct implementation checklist. Apply it when a feature needs it; challenge the fit first. Update it as decisions land and refine the forward-looking parts as understanding changes.
+
+**Session scrollback (interactive)** — Past session lines use **one** Ink `<Static>` (append-only) above the live column (stage + `MainInteractivePrompt`). Generic `SessionScrollback` stays domain-agnostic; shell transcript shapes live in `interactiveCliTranscript.tsx`; recall “answered” outcomes use `recallAnsweredScrollback.tsx`; stages append via `sessionScrollbackAppendContext`. Boundaries and optional follow-ups: `ongoing/cli-session-scrollback.md`.
 
 ## Terminal column width (TTY layout)
 
@@ -58,6 +61,7 @@ For **interactive** behavior, prefer **`runInteractive`** with a **mock TTY** st
 - **Stable `useInput` handler:** Pass **`useCallback`** (with correct deps) to **`useInput`**, not a new inline function every render. Ink’s `useInput` effect depends on the handler reference; a new function each render tears down and re-attaches the internal listener and can drop keystrokes under load.
 - **`ink-testing-library` + stdin:** **`useInput` registers via `useEffect`** — **`stdin.write` immediately after `render()` can race** empty listeners. Before real input, **wait on an observable** (e.g. write a harmless probe key, **`waitForFrames` until `lastFrame()` shows it**, then undo if needed), or use **`renderInkWhenCommandLineReady`** from `cli/tests/inkTestHelpers.ts` (probe key + wait; see `InteractiveCliApp` ink tests).
 - **Ink test async helpers:** Import **`waitForFrames`**, **`waitForLastFrame`**, and **`stripAnsi`** from **`cli/tests/inkTestHelpers.ts`** instead of duplicating the `setImmediate` poll loop (or ANSI stripping) in each test file.
+- **`<Static>` scrollback:** Session history is rendered inside Ink `<Static>`; captured **`frames`** can **repeat** the same scrollback text every frame. For “appears once on screen” or row budgets, prefer **`lastFrame()`** (or equivalent), not counting substrings across **`frames.join('\n')`**.
 - **Typing simulations:** Do not use **`setImmediate` per character** as “Ink is ready.” **Wait until the frame shows the expected buffer** (or combined `frames` text) before the next `stdin.write`.
 
 ## Domain terminology
@@ -67,7 +71,7 @@ Vocabulary for Cucumber steps and page objects (`e2e_test/start/pageObjects/cli/
 | Term | Definition |
 |------|-------------|
 | **Non-interactive output** | Full stdout for E2E subcommand spawns (e.g. installed `version` / `update`) and similar one-shot runs; no PTY interactive input-ready control sequence. |
-| **Past CLI assistant messages** | Interactive: past CLI output blocks (parsed transcript section). Gherkin: `in past CLI assistant messages`. |
+| **Past CLI assistant messages** | Interactive: past CLI output blocks in the session scrollback (shell assistant lines, errors, session summaries, and recall **answered** lines such as `Correct!` / `Reviewed:` — the latter as `RecallAnsweredItem`, not duplicate `onSettled` assistant text). Gherkin: `in past CLI assistant messages`. |
 | **Past user messages** | Interactive: past user lines as gray-background blocks (`\x1b[100m`…), one blank padded row above the text (E2E checks this); one padded row below before the command line (see Vitest `pastUserMessageBlock` / `InteractiveCliApp.test`). Gherkin: `in past user messages`. Recall **y/n** confirmations (stop recall, load more, just-review; prompt footer may show `(y/n)` or `(Y/n)` / `(y/N)` when Enter commits a default) do **not** add a separate past user message row — only the outcome lines appear. On **Load more from next 3 days?**, **Esc** declines load more (same outcome as **n**, session summary), not the card-level leave-recall confirm. |
 | **User input history** | TTY: committed lines for ↑↓ recall + persistence (`mainInteractivePrompt/history.ts`, `mainInteractivePrompt/userInputHistoryFile.ts`) **while the command-line Ink region has focus**. The live command buffer is **single-line** (newlines from paste become spaces; no Shift+Enter newline). Masked before storage/display. Recall **y/n** answers are not appended (same rule as past user messages). |
 | **Current Stage** | Conceptual state during a multi-step or long-running command (e.g. recall session, slow interactive network call). |
