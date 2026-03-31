@@ -25,12 +25,11 @@ export const interactiveSlashCommands: readonly InteractiveSlashCommand[] = [
   exitSlashCommand,
 ]
 
-export const interactiveSlashCommandByLine = new Map<
-  string,
-  InteractiveSlashCommand
->(interactiveSlashCommands.map((c) => [c.line.slice(1), c] as const))
+const interactiveSlashCommandByLine = new Map<string, InteractiveSlashCommand>(
+  interactiveSlashCommands.map((c) => [c.line.slice(1), c] as const)
+)
 
-export type ResolvedInteractiveSlashCommand = {
+type ResolvedInteractiveSlashCommand = {
   command: InteractiveSlashCommand
   argument: string | undefined
 }

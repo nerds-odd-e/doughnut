@@ -46,17 +46,27 @@ export function InteractiveCliApp() {
   }, [])
 
   const onCommittedLine = useCallback((line: string) => {
-    const body = line.startsWith('/') ? line.slice(1) : line
-    const resolved = resolveInteractiveSlashCommand(body)
-    if (!resolved) {
+    const commitUserLineWithAssistant = (assistantText: string) => {
       setMessages((prev) => [
         ...prev,
         { role: 'user', text: line },
-        {
-          role: 'assistant',
-          text: line.startsWith('/') ? 'unsupported command' : 'Not supported',
-        },
+        { role: 'assistant', text: assistantText },
       ])
+    }
+
+    const slash = line.startsWith('/')
+    const body = slash ? line.slice(1) : line.trim() === 'exit' ? 'exit' : null
+
+    if (body === null) {
+      commitUserLineWithAssistant('Not supported')
+      return
+    }
+
+    const resolved = resolveInteractiveSlashCommand(body)
+    if (!resolved) {
+      commitUserLineWithAssistant(
+        slash ? 'unsupported command' : 'Not supported'
+      )
       return
     }
 

@@ -72,6 +72,26 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     expect(combined).toMatch(/Interactive commands/)
   })
 
+  test('bare recall without slash is Not supported, not a command', async () => {
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('recall\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        c.includes('recall') &&
+        c.includes('Not supported') &&
+        c.includes('\x1b[100m')
+    )
+
+    const combined = frames.join('\n')
+    expect(combined).toContain('recall')
+    expect(combined).toContain('Not supported')
+    expect(combined).not.toContain('Recalling')
+  })
+
   test('plain committed line records user message and Not supported', async () => {
     const { stdin, frames } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />
