@@ -27,14 +27,8 @@ import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import { normalizeSpellingLineForSubmit } from './spellingAnswerLine.js'
+import type { SpellingRecallSessionPayload } from './nextRecallCardLoad.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
-
-/** Spelling memory tracker: server spelling question first (same order as web recall). */
-export type SpellingRecallSessionPayload = {
-  readonly memoryTrackerId: number
-  readonly noteTitle: string
-  readonly notebookTitle?: string
-}
 
 async function fetchSpellingRecallPrompt(
   memoryTrackerId: number,
