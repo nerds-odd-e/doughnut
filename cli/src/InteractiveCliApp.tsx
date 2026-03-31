@@ -1,55 +1,30 @@
-import { createElement, useCallback, useEffect, useRef, useState } from 'react'
+import {
+  createElement,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ComponentProps,
+} from 'react'
 import type { ComponentType } from 'react'
 import type { Key } from 'ink'
-import { Box, Text, useApp, useInput } from 'ink'
+import { Box, useApp, useInput } from 'ink'
 import { MainInteractivePrompt } from './mainInteractivePrompt/index.js'
 import { resolveInteractiveSlashCommand } from './commands/interactiveSlashCommands.js'
 import type { InteractiveSlashCommandStageProps } from './commands/interactiveSlashCommand.js'
 import { formatVersionOutput } from './commands/version.js'
-import { PastUserMessageBlock } from './pastUserMessageBlock.js'
 import { userVisibleSlashCommandError } from './userVisibleSlashCommandError.js'
 import type { StageKeyHandler } from './commands/accessToken/stageKeyForwardContext.js'
 import { SetStageKeyHandlerContext } from './commands/accessToken/stageKeyForwardContext.js'
-import { SessionScrollback } from './sessionScrollback/SessionScrollback.js'
+import {
+  InteractiveCliScrollback,
+  transcriptAssistantText,
+  transcriptUserLine,
+} from './sessionScrollback/interactiveCliTranscript.js'
 
-type InteractiveCliTranscriptItem =
-  | { readonly kind: 'user_line'; readonly id: string; readonly text: string }
-  | {
-      readonly kind: 'assistant_text'
-      readonly id: string
-      readonly text: string
-    }
-
-function transcriptUserLine(text: string): InteractiveCliTranscriptItem {
-  return { kind: 'user_line', id: crypto.randomUUID(), text }
-}
-
-function transcriptAssistantText(text: string): InteractiveCliTranscriptItem {
-  return { kind: 'assistant_text', id: crypto.randomUUID(), text }
-}
-
-function InteractiveCliTranscriptItemView({
-  entry,
-  nextEntry,
-}: {
-  readonly entry: InteractiveCliTranscriptItem
-  readonly nextEntry: InteractiveCliTranscriptItem | undefined
-}) {
-  if (entry.kind === 'user_line') {
-    const gapBeforeAssistant = nextEntry?.kind === 'assistant_text'
-    return (
-      <Box flexDirection="column">
-        <PastUserMessageBlock text={entry.text} />
-        {gapBeforeAssistant ? <Box height={1} /> : null}
-      </Box>
-    )
-  }
-  return (
-    <Box>
-      <Text>{entry.text}</Text>
-    </Box>
-  )
-}
+type InteractiveCliScrollbackItem = ComponentProps<
+  typeof InteractiveCliScrollback
+>['items'][number]
 
 export function InteractiveCliApp() {
   const { exit } = useApp()
@@ -65,7 +40,7 @@ export function InteractiveCliApp() {
     }, [])
   )
   const [scrollbackItems, setScrollbackItems] = useState<
-    InteractiveCliTranscriptItem[]
+    InteractiveCliScrollbackItem[]
   >(() => [transcriptAssistantText(formatVersionOutput())])
   const [activeStageComponent, setActiveStageComponent] =
     useState<ComponentType<InteractiveSlashCommandStageProps> | null>(null)
@@ -160,15 +135,7 @@ export function InteractiveCliApp() {
   return (
     <SetStageKeyHandlerContext.Provider value={setStageKeyHandler}>
       <Box flexDirection="column">
-        <SessionScrollback items={scrollbackItems}>
-          {(entry, index) => (
-            <InteractiveCliTranscriptItemView
-              key={entry.id}
-              entry={entry}
-              nextEntry={scrollbackItems[index + 1]}
-            />
-          )}
-        </SessionScrollback>
+        <InteractiveCliScrollback items={scrollbackItems} />
         {activeStageComponent &&
           createElement(activeStageComponent, {
             argument: stageArgumentRef.current,
