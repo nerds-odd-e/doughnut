@@ -17,7 +17,11 @@ import {
   type NumberedTerminalListLine,
 } from './terminalColumns.js'
 
-const GUIDANCE_LIST_ROW_BUDGET = 5
+const SLASH_GUIDANCE_LIST_ROW_BUDGET = 5
+const DEFAULT_NUMBERED_GUIDANCE_LIST_ROW_BUDGET = 5
+
+/** Recall MCQ choices in current guidance; other numbered lists use the default budget. */
+export const MCQ_CHOICES_GUIDANCE_ROW_BUDGET = 10
 
 const GUIDANCE_MORE_ABOVE_LABEL = '↑ more above'
 const GUIDANCE_MORE_BELOW_LABEL = '↓ more below'
@@ -117,7 +121,7 @@ function layoutWindowedLineSlice(
 function layoutSlashCommandGuidanceWindow(
   rows: readonly { readonly usage: string; readonly description: string }[],
   highlightIndex: number,
-  budget: number = GUIDANCE_LIST_ROW_BUDGET
+  budget: number = SLASH_GUIDANCE_LIST_ROW_BUDGET
 ): readonly SlashGuidanceDisplayRow[] {
   const n = rows.length
   if (n === 0) return []
@@ -151,7 +155,7 @@ function firstLineIndexForItem(
 function layoutNumberedListGuidanceWindow(
   lines: readonly NumberedTerminalListLine[],
   highlightItemIndex: number,
-  budget: number = GUIDANCE_LIST_ROW_BUDGET
+  budget: number = DEFAULT_NUMBERED_GUIDANCE_LIST_ROW_BUDGET
 ): readonly NumberedGuidanceDisplayRow[] {
   const n = lines.length
   if (n === 0) return []
@@ -186,6 +190,7 @@ export type GuidanceListInkProps =
       readonly mode: 'numbered'
       readonly lines: readonly NumberedTerminalListLine[]
       readonly highlightItemIndex: number
+      readonly rowBudget?: number
     }
 
 export function GuidanceListInk(props: GuidanceListInkProps) {
@@ -306,13 +311,18 @@ function SlashGuidanceListInk({
 function NumberedGuidanceListInk({
   lines,
   highlightItemIndex,
+  rowBudget = DEFAULT_NUMBERED_GUIDANCE_LIST_ROW_BUDGET,
 }: Extract<GuidanceListInkProps, { mode: 'numbered' }>) {
   const display = useMemo(
     () =>
       lines.length === 0
         ? null
-        : layoutNumberedListGuidanceWindow(lines, highlightItemIndex),
-    [lines, highlightItemIndex]
+        : layoutNumberedListGuidanceWindow(
+            lines,
+            highlightItemIndex,
+            rowBudget
+          ),
+    [lines, highlightItemIndex, rowBudget]
   )
 
   if (display === null || display.length === 0) {

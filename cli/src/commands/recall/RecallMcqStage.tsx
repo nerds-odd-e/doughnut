@@ -20,7 +20,10 @@ import {
   choiceIndexFromSelectListSubmitLine,
   handleSelectListInkKey,
 } from '../../interactions/selectListInteraction.js'
-import { GuidanceListInk } from '../../guidanceListWindowInk.js'
+import {
+  GuidanceListInk,
+  MCQ_CHOICES_GUIDANCE_ROW_BUDGET,
+} from '../../guidanceListWindowInk.js'
 import { resolvedTerminalWidth } from '../../terminalColumns.js'
 import {
   doughnutSdkOptions,
@@ -420,6 +423,7 @@ export function RecallMcqStage({
           mode="numbered"
           lines={listLines}
           highlightItemIndex={highlightIndex}
+          rowBudget={MCQ_CHOICES_GUIDANCE_ROW_BUDGET}
         />
       </Box>
       <Text>{MCQ_HINT}</Text>

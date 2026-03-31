@@ -3,6 +3,7 @@ import { render } from 'ink-testing-library'
 import { describe, expect, test } from 'vitest'
 import {
   GuidanceListInk,
+  MCQ_CHOICES_GUIDANCE_ROW_BUDGET,
   type GuidanceListInkProps,
 } from '../src/guidanceListWindowInk.js'
 import { stripAnsi } from './inkTestHelpers.js'
@@ -295,6 +296,27 @@ describe('GuidanceListInk numbered mode', () => {
     expect(p).not.toContain(MORE_ABOVE)
     expect(p).not.toContain(MORE_BELOW)
     for (let i = 0; i < ROW_BUDGET; i++) {
+      expect(p).toContain(`${i + 1}. choice`)
+    }
+  })
+
+  test('optional rowBudget allows taller window (MCQ)', () => {
+    const tenFlat = Array.from(
+      { length: MCQ_CHOICES_GUIDANCE_ROW_BUDGET },
+      (_, i) => ({
+        itemIndex: i,
+        text: `${i + 1}. choice`,
+      })
+    )
+    const p = renderGuidancePlain({
+      mode: 'numbered',
+      lines: tenFlat,
+      highlightItemIndex: 2,
+      rowBudget: MCQ_CHOICES_GUIDANCE_ROW_BUDGET,
+    })
+    expect(p).not.toContain(MORE_ABOVE)
+    expect(p).not.toContain(MORE_BELOW)
+    for (let i = 0; i < MCQ_CHOICES_GUIDANCE_ROW_BUDGET; i++) {
       expect(p).toContain(`${i + 1}. choice`)
     }
   })

@@ -11,6 +11,7 @@ import {
   LEAVE_RECALL_PROMPT,
   RECALL_SESSION_STOPPED_LINE,
 } from '../src/commands/recall/leaveRecallSessionCopy.js'
+import { MCQ_CHOICES_GUIDANCE_ROW_BUDGET } from '../src/guidanceListWindowInk.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
   pressEscape,
@@ -127,12 +128,15 @@ describe('recall MCQ (interactive)', () => {
   })
 
   test('many MCQ choices use a fixed-height list with more-below', async () => {
+    const manyChoicesCount = MCQ_CHOICES_GUIDANCE_ROW_BUDGET + 5
     getRecallPromptsSpy.mockResolvedValue({
       data: [
         makeMe.aRecallPrompt
           .withId(RECALL_PROMPT_ID)
           .withQuestionStem('Pick one')
-          .withChoices(Array.from({ length: 8 }, (_, i) => `c${i}`))
+          .withChoices(
+            Array.from({ length: manyChoicesCount }, (_, i) => `c${i}`)
+          )
           .withMemoryTrackerId(1)
           .please(),
       ],
@@ -155,7 +159,9 @@ describe('recall MCQ (interactive)', () => {
     const plain = stripAnsi(lastFrame() ?? '')
     expect(plain).toContain(EXPECT_GUIDANCE_MORE_BELOW)
     expect(plain).toMatch(/1\.\s*c0/)
-    expect(plain).not.toMatch(/8\.\s*c7/)
+    expect(plain).not.toMatch(
+      new RegExp(`${manyChoicesCount}\\.\\s*c${manyChoicesCount - 1}`)
+    )
   })
 
   test('wrong MCQ choice shows Incorrect and sends 0-based choiceIndex to API', async () => {
