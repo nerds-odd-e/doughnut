@@ -54,10 +54,10 @@ export function AsyncAssistantFetchStage({
     const ac = new AbortController()
     abortControllerRef.current = ac
     let settled = false
-    const settleOnce = (text: string) => {
+    const settleOnce = (text: string, isError = false) => {
       if (settled) return
       settled = true
-      onSettled(text)
+      onSettled(text, isError)
     }
     const run = async () => {
       try {
@@ -66,7 +66,7 @@ export function AsyncAssistantFetchStage({
           settleOnce(text)
         }
       } catch (err: unknown) {
-        settleOnce(userVisibleSlashCommandError(err))
+        settleOnce(userVisibleSlashCommandError(err), true)
       }
     }
     run().catch(() => undefined)

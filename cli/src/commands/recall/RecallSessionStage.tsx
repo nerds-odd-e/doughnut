@@ -101,7 +101,7 @@ export function RecallSessionStage({
         setInitialResolved(true)
       } catch (err: unknown) {
         if (unmounted) return
-        onSettled(userVisibleSlashCommandError(err))
+        onSettled(userVisibleSlashCommandError(err), true)
       } finally {
         if (activeOperationAbortRef.current === ac) {
           activeOperationAbortRef.current = null
@@ -123,7 +123,7 @@ export function RecallSessionStage({
 
   const onRecallFatalError = useCallback(
     (message: string) => {
-      onSettled(message)
+      onSettled(message, true)
     },
     [onSettled]
   )
@@ -157,19 +157,21 @@ export function RecallSessionStage({
               onSettled(
                 userVisibleSlashCommandError(
                   new DOMException('Aborted', 'AbortError')
-                )
+                ),
+                true
               )
               return
             }
             setCard(next)
           } catch (loadErr: unknown) {
             if (!ac.signal.aborted) {
-              onSettled(userVisibleSlashCommandError(loadErr))
+              onSettled(userVisibleSlashCommandError(loadErr), true)
             } else {
               onSettled(
                 userVisibleSlashCommandError(
                   new DOMException('Aborted', 'AbortError')
-                )
+                ),
+                true
               )
             }
           } finally {
@@ -183,7 +185,7 @@ export function RecallSessionStage({
         setLoadMoreFetching(false)
         setUiMode('loadMore')
       } catch (loadErr: unknown) {
-        onSettled(userVisibleSlashCommandError(loadErr))
+        onSettled(userVisibleSlashCommandError(loadErr), true)
       }
     },
     [appendScrollbackItem, onSettled]
@@ -210,7 +212,8 @@ export function RecallSessionStage({
           onSettled(
             userVisibleSlashCommandError(
               new DOMException('Aborted', 'AbortError')
-            )
+            ),
+            true
           )
           return
         }
@@ -227,7 +230,8 @@ export function RecallSessionStage({
           onSettled(
             userVisibleSlashCommandError(
               new DOMException('Aborted', 'AbortError')
-            )
+            ),
+            true
           )
           return
         }
@@ -241,7 +245,7 @@ export function RecallSessionStage({
         if (activeOperationAbortRef.current === ac) {
           activeOperationAbortRef.current = null
         }
-        onSettled(userVisibleSlashCommandError(loadErr))
+        onSettled(userVisibleSlashCommandError(loadErr), true)
       } finally {
         submittingRef.current = false
         setLoadMoreFetching(false)

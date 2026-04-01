@@ -17,6 +17,7 @@ import { userVisibleSlashCommandError } from './userVisibleSlashCommandError.js'
 import type { StageKeyHandler } from './commonUIComponents/stageKeyForwardContext.js'
 import { SetStageKeyHandlerContext } from './commonUIComponents/stageKeyForwardContext.js'
 import {
+  transcriptAssistantError,
   transcriptAssistantText,
   transcriptUserLine,
 } from './sessionScrollback/interactiveCliTranscript.js'
@@ -95,25 +96,35 @@ export function InteractiveCliApp() {
     []
   )
 
-  const handleAsyncSlashSettled = useCallback((assistantText: string) => {
-    if (assistantText !== '') {
-      setScrollbackItems((prev) => [
-        ...prev,
-        withLeadingGapAfterUserIfNeeded(
-          prev,
-          transcriptAssistantText(assistantText)
-        ),
-      ])
-    }
-    setActiveStageComponent(null)
-    setActiveStageIndicator(undefined)
-    stageArgumentRef.current = undefined
-  }, [])
+  const handleAsyncSlashSettled = useCallback(
+    (assistantText: string, isError = false) => {
+      if (assistantText !== '') {
+        setScrollbackItems((prev) => [
+          ...prev,
+          withLeadingGapAfterUserIfNeeded(
+            prev,
+            isError
+              ? transcriptAssistantError(assistantText)
+              : transcriptAssistantText(assistantText)
+          ),
+        ])
+      }
+      setActiveStageComponent(null)
+      setActiveStageIndicator(undefined)
+      stageArgumentRef.current = undefined
+    },
+    []
+  )
 
   const onCommittedLine = useCallback((line: string) => {
-    const commitUserLineWithAssistant = (assistantText: string) => {
+    const commitUserLineWithAssistant = (
+      assistantText: string,
+      isError = false
+    ) => {
       const user = transcriptUserLine(line)
-      const assistant = transcriptAssistantText(assistantText)
+      const assistant = isError
+        ? transcriptAssistantError(assistantText)
+        : transcriptAssistantText(assistantText)
       setScrollbackItems((prev) => {
         const withUser = [...prev, withLeadingGapAfterUserIfNeeded(prev, user)]
         return [
@@ -130,13 +141,13 @@ export function InteractiveCliApp() {
         : undefined
 
     if (!lineOfCommand) {
-      commitUserLineWithAssistant('Not supported')
+      commitUserLineWithAssistant('Not supported', true)
       return
     }
 
     const resolved = resolveInteractiveSlashCommand(lineOfCommand)
     if (!resolved) {
-      commitUserLineWithAssistant('unsupported command')
+      commitUserLineWithAssistant('unsupported command', true)
       return
     }
 
@@ -150,7 +161,7 @@ export function InteractiveCliApp() {
       const argumentMissing = argument === undefined || argument === ''
       const argSpec = command.argument
       if (argSpec !== undefined && argumentMissing && !argSpec.optional) {
-        const assistant = transcriptAssistantText(
+        const assistant = transcriptAssistantError(
           `Missing ${argSpec.name}. Usage: ${command.doc.usage}`
         )
         setScrollbackItems((prev) => [
@@ -172,7 +183,7 @@ export function InteractiveCliApp() {
     const argumentMissing = argument === undefined || argument === ''
     const argSpec = command.argument
     if (argSpec !== undefined && argumentMissing && !argSpec.optional) {
-      const assistant = transcriptAssistantText(
+      const assistant = transcriptAssistantError(
         `Missing ${argSpec.name}. Usage: ${command.doc.usage}`
       )
       setScrollbackItems((prev) => [
@@ -191,7 +202,7 @@ export function InteractiveCliApp() {
         if (command.literal === '/exit') setExitAfterCommit(true)
       })
       .catch((err: unknown) => {
-        const assistant = transcriptAssistantText(
+        const assistant = transcriptAssistantError(
           userVisibleSlashCommandError(err)
         )
         setScrollbackItems((prev) => [

@@ -41,7 +41,8 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     stdin.write('x\r')
     await waitForFrames(
       () => frames.join('\n'),
-      (c) => c.includes('Not supported') && c.includes('x')
+      (c) =>
+        c.includes('Not supported') && c.includes('x') && c.includes('\x1b[41m')
     )
   })
 
@@ -83,7 +84,8 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
       (c) =>
         c.includes('recall') &&
         c.includes('Not supported') &&
-        c.includes('\x1b[100m')
+        c.includes('\x1b[100m') &&
+        c.includes('\x1b[41m')
     )
 
     const combined = frames.join('\n')
@@ -103,7 +105,8 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
       (c) =>
         c.includes('hello') &&
         c.includes('Not supported') &&
-        c.includes('\x1b[100m')
+        c.includes('\x1b[100m') &&
+        c.includes('\x1b[41m')
     )
 
     const combined = frames.join('\n')
@@ -123,7 +126,8 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
       (c) =>
         c.includes('/no-such-command') &&
         c.includes('unsupported command') &&
-        c.includes('\x1b[100m')
+        c.includes('\x1b[100m') &&
+        c.includes('\x1b[41m')
     )
 
     const combined = frames.join('\n')
