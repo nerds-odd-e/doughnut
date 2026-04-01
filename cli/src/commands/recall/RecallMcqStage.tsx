@@ -309,7 +309,6 @@ export function RecallMcqStage({
         {
           kind: 'slash-and-number-or-highlight',
           choiceCount: choices.length,
-          invalidDraftFallback: 'reject',
         },
         'signal-escape',
         {

@@ -15,8 +15,6 @@ type SelectListDraftPolicy =
   | {
       kind: 'slash-and-number-or-highlight'
       choiceCount: number
-      /** Default `highlight`: invalid non-empty draft submits highlighted row. `reject`: pass draft through so callers can ignore (e.g. MCQ). */
-      invalidDraftFallback?: 'highlight' | 'reject'
     }
   | { kind: 'highlight-only' }
 
@@ -58,16 +56,14 @@ type InkLikeKey = {
 export function selectListSubmitLineForSlashAndNumber(
   trimmedDraft: string,
   choiceCount: number,
-  selectedIndex: number,
-  invalidDraftFallback: 'highlight' | 'reject' = 'highlight'
+  selectedIndex: number
 ): string {
   if (trimmedDraft === '/stop') return '/stop'
   if (trimmedDraft === '/contest') return '/contest'
   if (trimmedDraft === '') return String(selectedIndex + 1)
   const n = Number.parseInt(trimmedDraft, 10)
   if (n >= 1 && n <= choiceCount) return String(n)
-  if (invalidDraftFallback === 'reject') return trimmedDraft
-  return String(selectedIndex + 1)
+  return trimmedDraft
 }
 
 /** 0-based choice index from a submit line produced by the slash-and-number policy, or null if not a numeric choice (/stop, /contest, invalid). */
@@ -177,15 +173,12 @@ function dispatchSelectListKey(
   if (e.submitPressed && !e.shift) {
     if (draftEnabled) {
       const trimmed = e.lineDraft.trim()
-      const invalidDraftFallback =
-        draftPolicy.invalidDraftFallback ?? 'highlight'
       return {
         result: 'submit-with-line',
         lineForProcessInput: selectListSubmitLineForSlashAndNumber(
           trimmed,
           draftPolicy.choiceCount,
-          selectedIndex,
-          invalidDraftFallback
+          selectedIndex
         ),
       }
     }

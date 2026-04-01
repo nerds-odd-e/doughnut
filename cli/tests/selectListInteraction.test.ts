@@ -26,28 +26,20 @@ describe('selectListSubmitLineForSlashAndNumber', () => {
     expect(selectListSubmitLineForSlashAndNumber('1', 3, 2)).toBe('1')
     expect(selectListSubmitLineForSlashAndNumber('3', 3, 0)).toBe('3')
   })
-  it('uses highlighted choice as 1-based when draft is not a listed number', () => {
+  it('empty draft confirms highlight; non-empty invalid passes through', () => {
     expect(selectListSubmitLineForSlashAndNumber('', 3, 0)).toBe('1')
-    expect(selectListSubmitLineForSlashAndNumber('99', 3, 1)).toBe('2')
-    expect(selectListSubmitLineForSlashAndNumber('abc', 3, 2)).toBe('3')
-  })
-  it('treats 0 as out of range, not a valid choice index', () => {
-    expect(selectListSubmitLineForSlashAndNumber('0', 3, 1)).toBe('2')
-  })
-  it('reject: empty still confirms highlight; non-empty invalid passes through', () => {
-    expect(selectListSubmitLineForSlashAndNumber('', 3, 1, 'reject')).toBe('2')
-    expect(selectListSubmitLineForSlashAndNumber('99', 3, 1, 'reject')).toBe(
-      '99'
-    )
-    expect(selectListSubmitLineForSlashAndNumber('abc', 3, 2, 'reject')).toBe(
-      'abc'
-    )
+    expect(selectListSubmitLineForSlashAndNumber('', 3, 1)).toBe('2')
+    expect(selectListSubmitLineForSlashAndNumber('99', 3, 1)).toBe('99')
+    expect(selectListSubmitLineForSlashAndNumber('abc', 3, 2)).toBe('abc')
     expect(
       choiceIndexFromSelectListSubmitLine(
-        selectListSubmitLineForSlashAndNumber('99', 3, 1, 'reject'),
+        selectListSubmitLineForSlashAndNumber('99', 3, 1),
         3
       )
     ).toBeNull()
+  })
+  it('treats 0 as out of range, passes draft through', () => {
+    expect(selectListSubmitLineForSlashAndNumber('0', 3, 1)).toBe('0')
   })
 })
 
@@ -271,7 +263,7 @@ describe('handleSelectListInkKey', () => {
     expect(onSubmitWithLine).toHaveBeenCalledWith('/stop')
   })
 
-  it('slash-and-number reject: invalid draft is passed through, not coerced to highlight', () => {
+  it('slash-and-number: invalid draft is passed through, not coerced to highlight', () => {
     const onSubmitWithLine = vi.fn()
     const handlers = {
       onSetHighlightIndex: vi.fn(),
@@ -281,7 +273,6 @@ describe('handleSelectListInkKey', () => {
     const policy = {
       kind: 'slash-and-number-or-highlight' as const,
       choiceCount: 3,
-      invalidDraftFallback: 'reject' as const,
     }
     handleSelectListInkKey(
       '\r',
