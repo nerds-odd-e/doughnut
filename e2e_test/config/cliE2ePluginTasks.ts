@@ -18,6 +18,7 @@ import {
   CLI_INTERACTIVE_PTY_COLS,
   CLI_INTERACTIVE_PTY_ROWS,
 } from './tty-assert-staging/geometry'
+import { TERMINAL_ERROR_PREVIEW_LEN } from './tty-assert-staging/errorSnapshotFormatting'
 import { stripAnsiCliPty } from './tty-assert-staging/stripAnsi'
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
@@ -44,8 +45,6 @@ type CliInteractiveWriteRawTask = {
 const INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING = 'doughnut 0.1.0'
 const INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS = 20_000
 const INSTALLED_CLI_INTERACTIVE_WRITE_SETTLE_MS = 500
-
-const PREVIEW_LEN = 500
 
 type CliInteractivePtySession = {
   buf: { text: string }
@@ -93,8 +92,8 @@ export function createCliE2ePluginTasks(repoRoot: string) {
         }
         if (Date.now() - started >= timeoutMs) {
           const preview =
-            stripped.length > PREVIEW_LEN
-              ? `${stripped.slice(0, PREVIEW_LEN)}...`
+            stripped.length > TERMINAL_ERROR_PREVIEW_LEN
+              ? `${stripped.slice(0, TERMINAL_ERROR_PREVIEW_LEN)}...`
               : stripped
           reject(
             new Error(

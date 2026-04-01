@@ -11,6 +11,12 @@
  * - **Interactive PTY**: live buffer from plugin task `cliInteractivePtyGetBuffer` (`interactiveCliPtySession`).
  */
 import { extractCurrentGuidanceFromReplayedPlaintext } from '../../../config/cliPtyCurrentGuidanceFromReplay'
+import {
+  formatRawTerminalSnapshotForError,
+  headPreview,
+  tailPreview,
+  TERMINAL_ERROR_PREVIEW_LEN,
+} from '../../../config/tty-assert-staging/errorSnapshotFormatting'
 import { ptyTranscriptToVisiblePlaintext } from '../../../config/tty-assert-staging/ptyTranscriptToVisiblePlaintext'
 import { stripAnsiCliPty } from '../../../config/tty-assert-staging/stripAnsi'
 
@@ -20,55 +26,16 @@ const SECTION = {
   nonInteractive: 'non-interactive output',
 } as const
 
-const CONTENT_PREVIEW_LEN = 500
-const MAX_SNAPSHOT_CHARS = 12_000
 const CLI_OUTPUT_ASSERT_RETRY_MS = 50
 const CLI_OUTPUT_ASSERT_TIMEOUT_MS = 3000
 
 const WRONG_NON_INTERACTIVE_STEP =
   'Expected non-interactive CLI output (e.g. `version` / `update` spawn), but this capture looks like an interactive PTY session.'
 
-function sanitizeVisibleText(s: string): string {
-  let out = s.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
-  out = out.split(String.fromCharCode(0x1b)).join('<ESC>')
-  return [...out]
-    .map((ch) => {
-      const n = ch.charCodeAt(0)
-      if (n === 0x09 || n === 0x0a) return ch
-      if (n < 0x20 || n === 0x7f) {
-        return `<0x${n.toString(16).padStart(2, '0')}>`
-      }
-      return ch
-    })
-    .join('')
-}
-
-function formatCliTerminalSnapshotForError(raw: string): string {
-  const stripped = stripAnsiCliPty(raw)
-  const visible = sanitizeVisibleText(stripped)
-  const truncated =
-    visible.length > MAX_SNAPSHOT_CHARS
-      ? `${visible.slice(0, MAX_SNAPSHOT_CHARS)}\n\n… truncated (${visible.length} visible chars, showing first ${MAX_SNAPSHOT_CHARS})`
-      : visible
-  return `raw bytes: ${raw.length} | ANSI-stripped: ${stripped.length} chars\n\n${truncated}`
-}
-
 function failCliAssertion(message: string, raw: string): never {
   throw new Error(
-    `${message}\n\n--- CLI terminal snapshot (ANSI-stripped, safe text) ---\n${formatCliTerminalSnapshotForError(raw)}`
+    `${message}\n\n--- CLI terminal snapshot (ANSI-stripped, safe text) ---\n${formatRawTerminalSnapshotForError(raw)}`
   )
-}
-
-function headPreview(text: string): string {
-  return text.length > CONTENT_PREVIEW_LEN
-    ? `${text.slice(0, CONTENT_PREVIEW_LEN)}...`
-    : text
-}
-
-function tailPreview(text: string): string {
-  return text.length > CONTENT_PREVIEW_LEN
-    ? text.slice(-CONTENT_PREVIEW_LEN)
-    : text
 }
 
 function stdoutLooksLikeInteractiveCliPtyCapture(stdout: string): boolean {
@@ -300,8 +267,8 @@ function formatGuidanceRegion(
   replayedPlain: string
 ): string {
   const guidanceSection =
-    guidancePlain.length > CONTENT_PREVIEW_LEN
-      ? `${guidancePlain.slice(-CONTENT_PREVIEW_LEN)}\n… (${guidancePlain.length} chars)`
+    guidancePlain.length > TERMINAL_ERROR_PREVIEW_LEN
+      ? `${guidancePlain.slice(-TERMINAL_ERROR_PREVIEW_LEN)}\n… (${guidancePlain.length} chars)`
       : guidancePlain || '(empty)'
   return (
     `  Guidance region (replayed plain):\n${guidanceSection}\n` +
