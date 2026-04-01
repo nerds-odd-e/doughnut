@@ -7,13 +7,10 @@ import {
   type MutableRefObject,
   type ReactNode,
 } from 'react'
-import type { DOMElement, Key } from 'ink'
-import { Box, Text, useCursor, useInput } from 'ink'
-import stringWidth from 'string-width'
-import { getAbsoluteContentPosition } from '../inkAbsoluteContentPosition.js'
+import type { Key } from 'ink'
+import { Box, Text, useInput, useStdout } from 'ink'
+import { BorderedSingleLinePromptInputInk } from './borderedSingleLinePromptInputInk.js'
 import { SetStageKeyHandlerContext } from './stageKeyForwardContext.js'
-
-const YES_NO_LINE_PREFIX = '> '
 
 function normalizeCommittedLine(s: string): string {
   return s.replace(/\r\n/g, ' ').replace(/\n/g, ' ').trim()
@@ -56,12 +53,8 @@ export function YesNoStagePrompt({
   const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
   const [buffer, setBuffer] = useState('')
   const bufferRef = useRef('')
-  const lineOriginRef = useRef<DOMElement | null>(null)
-  const [lineOrigin, setLineOrigin] = useState<{
-    x: number
-    y: number
-  } | null>(null)
-  const { setCursorPosition } = useCursor()
+  const { stdout } = useStdout()
+  const terminalColumns = stdout.columns > 0 ? stdout.columns : 80
 
   const onAnswerRef = useRef(onAnswer)
   onAnswerRef.current = onAnswer
@@ -138,34 +131,19 @@ export function YesNoStagePrompt({
     }
   }, [setStageKeyHandler, handleInput])
 
-  useLayoutEffect(() => {
-    const el = lineOriginRef.current
-    if (!el) return
-    setLineOrigin(getAbsoluteContentPosition(el) ?? null)
-  }, [buffer, header, belowBuffer, prompt, defaultAnswer])
-
   useInput(handleInput, {
     isActive: setStageKeyHandler === undefined,
   })
 
-  if (lineOrigin) {
-    setCursorPosition({
-      x: lineOrigin.x + stringWidth(YES_NO_LINE_PREFIX + buffer),
-      y: lineOrigin.y,
-    })
-  } else {
-    setCursorPosition(undefined)
-  }
-
   return (
     <Box flexDirection="column">
       {header}
-      <Box ref={lineOriginRef}>
-        <Text>
-          {YES_NO_LINE_PREFIX}
-          {buffer}
-        </Text>
-      </Box>
+      <BorderedSingleLinePromptInputInk
+        terminalColumns={terminalColumns}
+        buffer={buffer}
+        caretOffset={buffer.length}
+        placeholder=""
+      />
       {belowBuffer}
       <Text>
         {prompt} {yesNoHint(defaultAnswer)}

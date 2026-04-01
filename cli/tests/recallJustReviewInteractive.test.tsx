@@ -93,7 +93,7 @@ describe('recall just-review (interactive)', () => {
     stdin.write('\x7f')
     await untilLastFrame(
       frames,
-      (f) => f.includes('>') && !f.includes(rejectedInBuffer)
+      (f) => f.includes('→') && !f.includes(rejectedInBuffer)
     )
   }
 
@@ -120,7 +120,7 @@ describe('recall just-review (interactive)', () => {
       ['Yes, I remember?', noteTitle],
       [summaryNotYet]
     )
-    await backspaceClearsTyped(stdin, frames, '> q')
+    await backspaceClearsTyped(stdin, frames, '→ q')
   }
 
   function alphaNoteRealm() {

@@ -256,7 +256,7 @@ describe('YesNoStagePrompt', () => {
     stdin.write('\x7f')
     await waitForLastFrame(lastFrame, (f) => {
       const p = stripAnsi(f)
-      return p.includes('>') && !p.includes('> x') && !p.includes('>x')
+      return p.includes('→') && !p.includes('→ x') && !p.includes('→x')
     })
 
     stdin.write('y\r')
