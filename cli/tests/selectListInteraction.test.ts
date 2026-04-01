@@ -34,6 +34,21 @@ describe('selectListSubmitLineForSlashAndNumber', () => {
   it('treats 0 as out of range, not a valid choice index', () => {
     expect(selectListSubmitLineForSlashAndNumber('0', 3, 1)).toBe('2')
   })
+  it('reject: empty still confirms highlight; non-empty invalid passes through', () => {
+    expect(selectListSubmitLineForSlashAndNumber('', 3, 1, 'reject')).toBe('2')
+    expect(selectListSubmitLineForSlashAndNumber('99', 3, 1, 'reject')).toBe(
+      '99'
+    )
+    expect(selectListSubmitLineForSlashAndNumber('abc', 3, 2, 'reject')).toBe(
+      'abc'
+    )
+    expect(
+      choiceIndexFromSelectListSubmitLine(
+        selectListSubmitLineForSlashAndNumber('99', 3, 1, 'reject'),
+        3
+      )
+    ).toBeNull()
+  })
 })
 
 describe('choiceIndexFromSelectListSubmitLine', () => {
@@ -254,6 +269,31 @@ describe('handleSelectListInkKey', () => {
       handlers
     )
     expect(onSubmitWithLine).toHaveBeenCalledWith('/stop')
+  })
+
+  it('slash-and-number reject: invalid draft is passed through, not coerced to highlight', () => {
+    const onSubmitWithLine = vi.fn()
+    const handlers = {
+      onSetHighlightIndex: vi.fn(),
+      onSubmitHighlightIndex: vi.fn(),
+      onSubmitWithLine,
+    }
+    const policy = {
+      kind: 'slash-and-number-or-highlight' as const,
+      choiceCount: 3,
+      invalidDraftFallback: 'reject' as const,
+    }
+    handleSelectListInkKey(
+      '\r',
+      { return: true },
+      '99',
+      1,
+      3,
+      policy,
+      'signal-escape',
+      handlers
+    )
+    expect(onSubmitWithLine).toHaveBeenCalledWith('99')
   })
 
   it('slash-and-number: backspace edits; highlight-only backspace aborts', () => {

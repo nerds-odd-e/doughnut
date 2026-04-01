@@ -237,6 +237,66 @@ describe('recall MCQ (interactive)', () => {
     )
   })
 
+  test('out-of-range MCQ number does not call answerQuiz; valid answer still works', async () => {
+    let recallingAfterWrong = 0
+    recallingSpy.mockImplementation(() => {
+      recallingAfterWrong += 1
+      const empty = makeMe.aDueMemoryTrackersList
+        .totalAssimilatedCount(0)
+        .toRepeat([])
+        .please()
+      const data =
+        recallingAfterWrong === 1
+          ? makeMe.aDueMemoryTrackersList
+              .totalAssimilatedCount(0)
+              .toRepeat([{ memoryTrackerId: 1, spelling: false }])
+              .please()
+          : empty
+      return Promise.resolve({
+        data,
+      } as Awaited<ReturnType<typeof RecallsController.recalling>>)
+    })
+
+    const pending = pendingMcqPrompt()
+    answerQuizSpy.mockResolvedValue({
+      data: {
+        ...pending,
+        answer: { id: 100, correct: false, choiceIndex: 1 },
+      },
+    } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
+
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForMcqVisible(frames)
+
+    stdin.write('9\r')
+    await waitForFrames(
+      () => stripAnsi(frames.at(-1) ?? ''),
+      (p) => p.includes('→ 9')
+    )
+
+    expect(answerQuizSpy).not.toHaveBeenCalled()
+    expect(stripAnsi(frames.join('\n'))).not.toContain('Incorrect.')
+
+    stdin.write('\x7f')
+    await waitForFrames(
+      () => stripAnsi(frames.at(-1) ?? ''),
+      (p) => p.includes('→') && !p.includes('→ 9')
+    )
+    stdin.write('2\r')
+
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes('Load more from next 3 days?')
+    )
+
+    expect(answerQuizSpy).toHaveBeenCalledTimes(1)
+    expect(stripAnsi(frames.join('\n'))).toContain('Incorrect.')
+  })
+
   test('wrong MCQ then next due tracker shows second question without ending recall', async () => {
     const SECOND_PROMPT_ID = 99
     const secondStem = 'SECOND_MCQ_STEM_UNIQUE'
