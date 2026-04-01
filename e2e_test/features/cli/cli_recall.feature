@@ -117,7 +117,7 @@ Feature: CLI recall status and recall session
       Given the note "sedition" was assimilated on day 1
       And It's day 2
       When I enter the slash command "/recall" in the interactive CLI
-      Then I should see "Spell:" in the Current guidance
+      Then I should see "means incite" in the Current guidance
       When I enter "sedition" in the interactive CLI
       Then I should see "Correct!" in answered questions
       And I should see "Your answer: sedition" in answered questions

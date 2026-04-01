@@ -320,7 +320,6 @@ export function SpellingRecallStage({
       {stemLines.map((line, i) => (
         <Text key={`s-${i}`}>{line.length > 0 ? line : ' '}</Text>
       ))}
-      <Text>Spell:</Text>
     </Box>
   )
 }

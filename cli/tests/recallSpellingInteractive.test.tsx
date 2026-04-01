@@ -37,7 +37,7 @@ async function waitForSpellingPromptVisible(
   await waitForLastFrame(
     lastFrame,
     (p) =>
-      p.includes('Spell:') &&
+      p.includes('Spell the title') &&
       p.includes('Recalling') &&
       !p.includes('Loading spelling question')
   )
@@ -412,7 +412,6 @@ describe('recall spelling (interactive)', () => {
     await waitForLastFrame(
       lastFrame,
       (p) =>
-        p.includes('Spell:') &&
         p.includes('Spell the title') &&
         p.includes('→ par') &&
         !p.includes(LEAVE_RECALL_PROMPT)
@@ -449,7 +448,7 @@ describe('recall spelling (interactive)', () => {
     await waitForLastFrame(
       lastFrame,
       (p) =>
-        p.includes('Spell:') &&
+        p.includes('Spell the title') &&
         p.includes('→ par') &&
         !p.includes(LEAVE_RECALL_PROMPT)
     )
