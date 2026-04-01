@@ -74,7 +74,10 @@ describe('recall spelling (interactive)', () => {
     pending: RecallPrompt,
     answer: { correct: boolean; spellingAnswer: string }
   ): RecallPrompt {
-    return { ...pending, note: spellingFixtureNoteRealm.note, answer }
+    return makeMe.recallPromptFrom(pending, {
+      note: spellingFixtureNoteRealm.note,
+      answer,
+    })
   }
 
   beforeEach(() => {

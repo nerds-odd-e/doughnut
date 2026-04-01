@@ -109,16 +109,16 @@ describe("MemoryTrackerPage", () => {
     const note = makeMe.aNote.please()
     const recallPrompt1 = makeMe.aRecallPrompt
       .withQuestionStem("Question 1")
+      .withNote(note)
       .please()
     const recallPrompt2 = makeMe.aRecallPrompt
       .withQuestionStem("Question 2")
+      .withNote(note)
       .please()
     const recallPrompt3 = makeMe.aRecallPrompt
       .withQuestionStem("Question 3")
+      .withNote(note)
       .please()
-    recallPrompt1.note = note
-    recallPrompt2.note = note
-    recallPrompt3.note = note
     const recallPrompts = [recallPrompt3, recallPrompt2, recallPrompt1]
     const memoryTracker = makeMe.aMemoryTracker.please()
 
@@ -138,10 +138,8 @@ describe("MemoryTrackerPage", () => {
 
   it("shows note under question only once", async () => {
     const note = makeMe.aNote.please()
-    const recallPrompt1 = makeMe.aRecallPrompt.please()
-    const recallPrompt2 = makeMe.aRecallPrompt.please()
-    recallPrompt1.note = note
-    recallPrompt2.note = note
+    const recallPrompt1 = makeMe.aRecallPrompt.withNote(note).please()
+    const recallPrompt2 = makeMe.aRecallPrompt.withNote(note).please()
     const recallPrompts = [recallPrompt1, recallPrompt2]
     const memoryTracker = makeMe.aMemoryTracker.please()
 
@@ -163,9 +161,10 @@ describe("MemoryTrackerPage", () => {
   it("shows question generated time", async () => {
     const note = makeMe.aNote.please()
     const questionGeneratedTime = new Date("2024-01-01T10:00:00Z").toISOString()
-    const recallPrompt = makeMe.aRecallPrompt.please()
-    recallPrompt.note = note
-    recallPrompt.questionGeneratedTime = questionGeneratedTime
+    const recallPrompt = makeMe.aRecallPrompt
+      .withNote(note)
+      .withQuestionGeneratedTime(questionGeneratedTime)
+      .please()
     const memoryTracker = makeMe.aMemoryTracker.please()
 
     mockSdkService("getRecallPrompts", [recallPrompt])
@@ -185,9 +184,10 @@ describe("MemoryTrackerPage", () => {
 
   it("shows contested status for contested questions", async () => {
     const note = makeMe.aNote.please()
-    const recallPrompt = makeMe.aRecallPrompt.please()
-    recallPrompt.note = note
-    recallPrompt.isContested = true
+    const recallPrompt = makeMe.aRecallPrompt
+      .withNote(note)
+      .withIsContested(true)
+      .please()
     const memoryTracker = makeMe.aMemoryTracker.please()
 
     mockSdkService("getRecallPrompts", [recallPrompt])
@@ -206,16 +206,17 @@ describe("MemoryTrackerPage", () => {
     const note = makeMe.aNote.please()
     const answerTime = new Date("2024-01-01T12:00:00Z").toISOString()
     const questionGeneratedTime = new Date("2024-01-01T10:00:00Z").toISOString()
-    const recallPrompt = makeMe.aRecallPrompt.please()
-    recallPrompt.note = note
-    recallPrompt.questionGeneratedTime = questionGeneratedTime
-    recallPrompt.answerTime = answerTime
-    recallPrompt.answer = {
-      id: 1,
-      correct: true,
-      choiceIndex: 0,
-    }
-    recallPrompt.predefinedQuestion = makeMe.aPredefinedQuestion.please()
+    const recallPrompt = makeMe.aRecallPrompt
+      .withNote(note)
+      .withQuestionGeneratedTime(questionGeneratedTime)
+      .withAnswerTime(answerTime)
+      .withAnswer({
+        id: 1,
+        correct: true,
+        choiceIndex: 0,
+      })
+      .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
+      .please()
     const memoryTracker = makeMe.aMemoryTracker.please()
 
     mockSdkService("getRecallPrompts", [recallPrompt])
@@ -237,8 +238,7 @@ describe("MemoryTrackerPage", () => {
 
   it("shows unanswered status for unanswered questions", async () => {
     const note = makeMe.aNote.please()
-    const recallPrompt = makeMe.aRecallPrompt.please()
-    recallPrompt.note = note
+    const recallPrompt = makeMe.aRecallPrompt.withNote(note).please()
     const memoryTracker = makeMe.aMemoryTracker.please()
 
     mockSdkService("getRecallPrompts", [recallPrompt])

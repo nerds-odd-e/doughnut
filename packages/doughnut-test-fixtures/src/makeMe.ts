@@ -1,3 +1,4 @@
+import type { RecallPrompt } from '@generated/doughnut-backend-api'
 import ApiErrorBuilder from './ApiErrorBuilder'
 import AnsweredQuestionBuilder from './AnsweredQuestionBuilder'
 import AssessmentAttemptBuilder from './AssessmentAttemptBuilder'
@@ -59,6 +60,13 @@ class MakeMe {
 
   static get aRecallPrompt(): RecallPromptBuilder {
     return new RecallPromptBuilder()
+  }
+
+  static recallPromptFrom(
+    base: RecallPrompt,
+    overrides: Partial<RecallPrompt>
+  ): RecallPrompt {
+    return { ...base, ...overrides }
   }
 
   static get anAssessmentQuestionInstance(): AssessmentQuestionInstanceBuilder {

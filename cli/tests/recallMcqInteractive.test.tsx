@@ -73,7 +73,10 @@ describe('recall MCQ (interactive)', () => {
     pending: RecallPrompt,
     answer: { id: number; correct: boolean; choiceIndex: number }
   ): RecallPrompt {
-    return { ...pending, note: mcqFixtureNoteRealm.note, answer }
+    return makeMe.recallPromptFrom(pending, {
+      note: mcqFixtureNoteRealm.note,
+      answer,
+    })
   }
 
   beforeEach(() => {

@@ -1,8 +1,5 @@
 import AssessmentPage from "@/pages/AssessmentPage.vue"
-import type {
-  AssessmentQuestionInstance,
-  RecallPrompt,
-} from "@generated/doughnut-backend-api"
+import type { AssessmentQuestionInstance } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
@@ -36,11 +33,9 @@ describe("assessment page", () => {
     const notebook = makeMe.aNotebook.please()
     const assessmentQuestionInstance =
       makeMe.anAssessmentQuestionInstance.please()
-    const recallPrompt: RecallPrompt = {
-      ...assessmentQuestionInstance,
-      questionType: "MCQ",
-      notebook,
-    }
+    const recallPrompt = makeMe.aRecallPrompt
+      .forAssessmentQuestion(assessmentQuestionInstance, notebook)
+      .please()
     const assessmentAttempt = makeMe.anAssessmentAttempt
       .forNotebook(notebook)
       .withQuestions([recallPrompt])
@@ -107,16 +102,12 @@ describe("assessment page", () => {
       multipleChoicesQuestion: quizQuestion_2.multipleChoicesQuestion,
       answer: { id: 1, correct: true, choiceIndex: 0 },
     }
-    const recallPrompt1: RecallPrompt = {
-      ...quizQuestion_1,
-      questionType: "MCQ",
-      notebook,
-    }
-    const recallPrompt2: RecallPrompt = {
-      ...quizQuestion_2,
-      questionType: "MCQ",
-      notebook,
-    }
+    const recallPrompt1 = makeMe.aRecallPrompt
+      .forAssessmentQuestion(quizQuestion_1, notebook)
+      .please()
+    const recallPrompt2 = makeMe.aRecallPrompt
+      .forAssessmentQuestion(quizQuestion_2, notebook)
+      .please()
     const assessmentAttempt = makeMe.anAssessmentAttempt
       .forNotebook(notebook)
       .withQuestions([recallPrompt1, recallPrompt2])

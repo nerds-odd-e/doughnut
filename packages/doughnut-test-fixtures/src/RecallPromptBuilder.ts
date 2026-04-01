@@ -1,4 +1,6 @@
 import type {
+  AssessmentQuestionInstance,
+  Notebook,
   RecallPrompt,
   Note,
   PredefinedQuestion,
@@ -12,6 +14,7 @@ import NotebookBuilder from './NotebookBuilder'
 class RecallPromptBuilder extends Builder<RecallPrompt> {
   predefinedQuestionBuilder = new PredefinedQuestionBuilder()
   private idToUse?: number
+  private notebookToUse?: Notebook
   private noteToUse?: Note
   private predefinedQuestionToUse?: PredefinedQuestion
   private answerToUse?: Answer
@@ -21,6 +24,7 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
   private questionTypeToUse?: string
   private memoryTrackerIdToUse?: number
   private spellingStemToUse?: string
+  private assessmentInstanceToUse?: AssessmentQuestionInstance
 
   withId(id: number) {
     this.idToUse = id
@@ -37,8 +41,24 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
     return this
   }
 
+  withNotebook(notebook: Notebook) {
+    this.notebookToUse = notebook
+    return this
+  }
+
   withNote(note: Note) {
     this.noteToUse = note
+    return this
+  }
+
+  forAssessmentQuestion(
+    instance: AssessmentQuestionInstance,
+    notebook?: Notebook
+  ) {
+    this.assessmentInstanceToUse = instance
+    if (notebook !== undefined) {
+      this.notebookToUse = notebook
+    }
     return this
   }
 
@@ -84,15 +104,31 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
   }
 
   do(): RecallPrompt {
+    const notebook = this.notebookToUse ?? new NotebookBuilder().do()
     if (this.spellingStemToUse !== undefined) {
       return {
         id: this.idToUse ?? generateId(),
         memoryTrackerId: this.memoryTrackerIdToUse,
         questionType: 'SPELLING',
-        notebook: new NotebookBuilder().do(),
+        notebook,
         note: this.noteToUse,
         spellingQuestion: { stem: this.spellingStemToUse },
         answer: this.answerToUse,
+        answerTime: this.answerTimeToUse,
+        questionGeneratedTime: this.questionGeneratedTimeToUse,
+        isContested: this.isContestedToUse,
+      }
+    }
+    if (this.assessmentInstanceToUse !== undefined) {
+      const inst = this.assessmentInstanceToUse
+      return {
+        id: this.idToUse ?? inst.id,
+        memoryTrackerId: this.memoryTrackerIdToUse,
+        questionType: 'MCQ',
+        multipleChoicesQuestion: inst.multipleChoicesQuestion,
+        notebook,
+        note: this.noteToUse,
+        answer: this.answerToUse ?? inst.answer,
         answerTime: this.answerTimeToUse,
         questionGeneratedTime: this.questionGeneratedTimeToUse,
         isContested: this.isContestedToUse,
@@ -105,7 +141,7 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
       memoryTrackerId: this.memoryTrackerIdToUse,
       questionType: (this.questionTypeToUse ?? 'MCQ') as 'MCQ' | 'SPELLING',
       multipleChoicesQuestion: predefinedQuestion.multipleChoicesQuestion,
-      notebook: new NotebookBuilder().do(),
+      notebook,
       note: this.noteToUse,
       predefinedQuestion: predefinedQuestion,
       answer: this.answerToUse,
