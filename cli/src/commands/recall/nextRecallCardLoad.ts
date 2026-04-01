@@ -3,6 +3,7 @@ import {
   RecallsController,
   type DueMemoryTrackers,
   type MemoryTracker,
+  type MemoryTrackerLite,
   type RecallPrompt,
 } from 'doughnut-api'
 import {
@@ -10,6 +11,7 @@ import {
   runDefaultBackendJson,
 } from '../../backendApi/doughnutBackendClient.js'
 import { dueRecallQuery } from './dueRecallQuery.js'
+import { noteBreadcrumbTrailTitles } from './recallNoteContext.js'
 
 function shuffleMemoryTrackerIds(ids: readonly number[]): number[] {
   const a = [...ids]
@@ -33,7 +35,7 @@ export async function fetchDueMemoryTrackerIds(
     })
   )
   const trackers = due.toRepeat ?? []
-  return trackers.map((t) => t.memoryTrackerId)
+  return trackers.map((t: MemoryTrackerLite) => t.memoryTrackerId)
 }
 
 export async function fetchShuffledDueMemoryTrackerIds(
@@ -43,53 +45,6 @@ export async function fetchShuffledDueMemoryTrackerIds(
   return shuffleMemoryTrackerIds(
     await fetchDueMemoryTrackerIds(dueInDays, signal)
   )
-}
-
-type NoteTopologyWalk = {
-  readonly title?: string | null
-  readonly notebookTitle?: string | null
-  readonly parentOrSubjectNoteTopology?: NoteTopologyWalk | null
-}
-
-/** Root → current note, same order as web `Breadcrumb` with `includingSelf: true`. */
-function breadcrumbTitlesFromNoteTopology(
-  topology: NoteTopologyWalk | undefined
-): readonly string[] {
-  if (topology === undefined) {
-    return ['Note']
-  }
-  const chain: NoteTopologyWalk[] = []
-  let current: NoteTopologyWalk | undefined = topology
-  while (current !== undefined) {
-    chain.push(current)
-    current = current.parentOrSubjectNoteTopology ?? undefined
-  }
-  chain.reverse()
-  return chain.map((n) => {
-    const t = n.title?.trim()
-    return t !== undefined && t.length > 0 ? t : 'Note'
-  })
-}
-
-/** Breadcrumb for answered recall UI from the prompt returned after submit. */
-export function breadcrumbTitlesFromRecallPrompt(
-  prompt: RecallPrompt
-): readonly string[] {
-  const topo = prompt.note?.noteTopology as NoteTopologyWalk | undefined
-  return breadcrumbTitlesFromNoteTopology(topo)
-}
-
-/** Full note details for answered spelling scrollback; falls back if the API omits `note`. */
-export function noteDetailsMarkdownFromAnsweredRecallPrompt(
-  prompt: RecallPrompt,
-  fallbackDetailsMarkdown: string
-): string {
-  const d = prompt.note?.details
-  if (d !== undefined) {
-    const t = d.trim()
-    if (t.length > 0) return t
-  }
-  return fallbackDetailsMarkdown.trim()
 }
 
 /** Just-review recall card (fallback when MCQ is not available). */
@@ -105,7 +60,7 @@ function recallJustReviewPayloadFromMemoryTracker(
   mt: MemoryTracker
 ): RecallJustReviewPayload {
   const note = mt.note
-  const topo = note?.noteTopology as NoteTopologyWalk | undefined
+  const topo = note?.noteTopology
   const noteTitle = topo?.title?.trim() || 'Note'
   const detailsMarkdown = (note?.details ?? '').trim()
   const notebookTitle = topo?.notebookTitle?.trim()
@@ -114,7 +69,7 @@ function recallJustReviewPayloadFromMemoryTracker(
     noteTitle,
     detailsMarkdown,
     notebookTitle,
-    breadcrumbTitles: breadcrumbTitlesFromNoteTopology(topo),
+    breadcrumbTitles: noteBreadcrumbTrailTitles(note),
   }
 }
 
@@ -124,7 +79,6 @@ export type RecallMcqCardPayload = {
   readonly stem: string
   readonly choices: readonly string[]
   readonly notebookTitle?: string
-  readonly breadcrumbTitles: readonly string[]
 }
 
 function firstPendingMcq(prompts: RecallPrompt[]): RecallPrompt | undefined {
@@ -134,8 +88,7 @@ function firstPendingMcq(prompts: RecallPrompt[]): RecallPrompt | undefined {
 export function recallMcqPayloadFromRecallPrompt(
   memoryTrackerId: number,
   notebookTitle: string | undefined,
-  prompt: RecallPrompt,
-  breadcrumbTitles: readonly string[]
+  prompt: RecallPrompt
 ): RecallMcqCardPayload | null {
   if (prompt.questionType !== 'MCQ' || prompt.answer != null) return null
   const mq = prompt.multipleChoicesQuestion
@@ -147,7 +100,6 @@ export function recallMcqPayloadFromRecallPrompt(
     stem: mq?.f0__stem?.trim() ?? '',
     choices,
     notebookTitle,
-    breadcrumbTitles,
   }
 }
 
@@ -159,7 +111,6 @@ async function tryLoadMcqPayload(
   memoryTrackerId: number,
   notebookTitle: string | undefined,
   existingPrompts: RecallPrompt[],
-  breadcrumbTitles: readonly string[],
   signal?: AbortSignal
 ): Promise<RecallMcqCardPayload | null> {
   let mcqPrompt = firstPendingMcq(existingPrompts)
@@ -182,17 +133,15 @@ async function tryLoadMcqPayload(
   return recallMcqPayloadFromRecallPrompt(
     memoryTrackerId,
     notebookTitle,
-    mcqPrompt,
-    breadcrumbTitles
+    mcqPrompt
   )
 }
 
 /** Spelling memory tracker: server spelling question first (same order as web recall). */
 export type SpellingRecallSessionPayload = {
   readonly memoryTrackerId: number
-  readonly noteTitle: string
   readonly notebookTitle?: string
-  readonly breadcrumbTitles: readonly string[]
+  /** Cached from tracker load; answered scrollback prefers `note` on the submit response. */
   readonly detailsMarkdown: string
 }
 
@@ -227,9 +176,7 @@ export async function loadRecallCardForMemoryTrackerId(
       variant: 'spelling-session',
       payload: {
         memoryTrackerId: reviewPayload.memoryTrackerId,
-        noteTitle: reviewPayload.noteTitle,
         notebookTitle: reviewPayload.notebookTitle,
-        breadcrumbTitles: reviewPayload.breadcrumbTitles,
         detailsMarkdown: reviewPayload.detailsMarkdown,
       },
     }
@@ -246,7 +193,6 @@ export async function loadRecallCardForMemoryTrackerId(
     memoryTrackerId,
     notebookTitle,
     prompts,
-    reviewPayload.breadcrumbTitles,
     signal
   )
   if (mcqPayload !== null) {

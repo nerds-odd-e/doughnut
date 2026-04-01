@@ -32,11 +32,11 @@ import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import { RECALL_BUSY_SUBMIT_ANSWER_LABEL } from './recallBusyInputCopy.js'
 import { normalizeSpellingLineForSubmit } from './spellingAnswerLine.js'
+import type { SpellingRecallSessionPayload } from './nextRecallCardLoad.js'
 import {
-  breadcrumbTitlesFromRecallPrompt,
-  noteDetailsMarkdownFromAnsweredRecallPrompt,
-  type SpellingRecallSessionPayload,
-} from './nextRecallCardLoad.js'
+  noteBreadcrumbTrailTitles,
+  noteDetailsMarkdownOrFallback,
+} from './recallNoteContext.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 import {
   RecallAnsweredBlockShell,
@@ -83,18 +83,24 @@ async function submitSpellingAnswer(
 }
 
 function recallAnsweredSpellingInk(args: {
-  readonly breadcrumbTitles: readonly string[]
-  readonly detailsMarkdown: string
+  readonly answeredPrompt: RecallPrompt
+  readonly detailsMarkdownFallback: string
   readonly spellingAnswerDisplay: string
-  readonly correct: boolean
 }): ReactElement {
   const width = resolvedTerminalWidth()
-  const crumb = recallAnsweredBreadcrumbText(args.breadcrumbTitles)
+  const crumb = recallAnsweredBreadcrumbText(
+    noteBreadcrumbTrailTitles(args.answeredPrompt.note)
+  )
+  const detailsMarkdown = noteDetailsMarkdownOrFallback(
+    args.answeredPrompt.note,
+    args.detailsMarkdownFallback
+  )
   const detailLines = recallAnsweredMarkdownToDisplayLines(
-    args.detailsMarkdown,
+    detailsMarkdown,
     width
   )
   const ans = args.spellingAnswerDisplay
+  const correct = args.answeredPrompt.answer?.correct === true
   return (
     <RecallAnsweredBlockShell>
       <Text>{crumb}</Text>
@@ -102,7 +108,7 @@ function recallAnsweredSpellingInk(args: {
         <Text key={i}>{line.length > 0 ? line : ' '}</Text>
       ))}
       <Text>{`Your answer: ${ans}`}</Text>
-      {recallAnsweredQuizOutcomeInk(args.correct)}
+      {recallAnsweredQuizOutcomeInk(correct)}
     </RecallAnsweredBlockShell>
   )
 }
@@ -192,13 +198,9 @@ export function SpellingRecallStage({
       const spellingAnswerDisplay =
         updated.answer?.spellingAnswer?.trim() || line
       const answeredBlock = recallAnsweredSpellingInk({
-        breadcrumbTitles: breadcrumbTitlesFromRecallPrompt(updated),
-        detailsMarkdown: noteDetailsMarkdownFromAnsweredRecallPrompt(
-          updated,
-          payload.detailsMarkdown
-        ),
+        answeredPrompt: updated,
+        detailsMarkdownFallback: payload.detailsMarkdown,
         spellingAnswerDisplay,
-        correct,
       })
       if (!correct) {
         bufferRef.current = ''

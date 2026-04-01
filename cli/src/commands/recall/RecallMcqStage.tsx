@@ -42,11 +42,11 @@ import {
 } from './recallBusyInputCopy.js'
 import { numberedMcqMarkdownLinesForTerminal } from './numberedMcqMarkdownLines.js'
 import {
-  breadcrumbTitlesFromRecallPrompt,
   recallMcqPayloadFromRecallPrompt,
   type RecallCard,
   type RecallMcqCardPayload,
 } from './nextRecallCardLoad.js'
+import { noteBreadcrumbTrailTitles } from './recallNoteContext.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 import {
   RecallAnsweredBlockShell,
@@ -64,22 +64,23 @@ const CONTEST_REJECTED_FALLBACK =
   'Contest was not accepted. Please answer the question.'
 
 function recallAnsweredMcqInk(args: {
-  readonly breadcrumbTitles: readonly string[]
+  readonly answeredPrompt: RecallPrompt
   readonly stem: string
   readonly choices: readonly string[]
   readonly selectedChoiceIndex: number
-  readonly updatedPrompt: RecallPrompt
 }): ReactElement {
   const width = resolvedTerminalWidth()
-  const crumb = recallAnsweredBreadcrumbText(args.breadcrumbTitles)
-  const correct = args.updatedPrompt.answer?.correct === true
+  const crumb = recallAnsweredBreadcrumbText(
+    noteBreadcrumbTrailTitles(args.answeredPrompt.note)
+  )
+  const correct = args.answeredPrompt.answer?.correct === true
   const fromPredefined =
-    args.updatedPrompt.predefinedQuestion?.correctAnswerIndex
+    args.answeredPrompt.predefinedQuestion?.correctAnswerIndex
   const correctChoiceIndex =
     fromPredefined !== undefined && fromPredefined !== null
       ? fromPredefined
-      : correct && args.updatedPrompt.answer?.choiceIndex !== undefined
-        ? args.updatedPrompt.answer.choiceIndex
+      : correct && args.answeredPrompt.answer?.choiceIndex !== undefined
+        ? args.answeredPrompt.answer.choiceIndex
         : undefined
 
   const stemLines = recallAnsweredMarkdownToDisplayLines(args.stem, width)
@@ -121,7 +122,6 @@ export async function contestAndRegenerateMcq(
   memoryTrackerId: number,
   notebookTitle: string | undefined,
   currentRecallPromptId: number,
-  breadcrumbTitles: readonly string[],
   signal?: AbortSignal
 ): Promise<ContestMcqOutcome> {
   const contestResult = await runDefaultBackendJson<QuestionContestResult>(() =>
@@ -144,8 +144,7 @@ export async function contestAndRegenerateMcq(
   const mapped = recallMcqPayloadFromRecallPrompt(
     memoryTrackerId,
     notebookTitle,
-    regenerated,
-    breadcrumbTitles
+    regenerated
   )
   if (mapped === null) {
     throw new Error('Regenerated recall prompt is not a pending MCQ.')
@@ -233,11 +232,10 @@ export function RecallMcqStage({
             successful: false,
             answeredRows: [
               recallAnsweredMcqInk({
-                breadcrumbTitles: breadcrumbTitlesFromRecallPrompt(updated),
+                answeredPrompt: updated,
                 stem: payload.stem,
                 choices: payload.choices,
                 selectedChoiceIndex: choiceIdx,
-                updatedPrompt: updated,
               }),
             ],
           })
@@ -247,11 +245,10 @@ export function RecallMcqStage({
           successful: true,
           answeredRows: [
             recallAnsweredMcqInk({
-              breadcrumbTitles: breadcrumbTitlesFromRecallPrompt(updated),
+              answeredPrompt: updated,
               stem: payload.stem,
               choices: payload.choices,
               selectedChoiceIndex: choiceIdx,
-              updatedPrompt: updated,
             }),
           ],
         })
@@ -280,8 +277,7 @@ export function RecallMcqStage({
       const result = await contestAndRegenerateMcq(
         payload.memoryTrackerId,
         payload.notebookTitle,
-        payload.recallPromptId,
-        payload.breadcrumbTitles
+        payload.recallPromptId
       )
       if (result.outcome === 'replaced') {
         setHighlightIndex(0)
@@ -305,7 +301,6 @@ export function RecallMcqStage({
     inputBlockedRef,
     onRecallFatalError,
     onReplaceCurrentRecallCard,
-    payload.breadcrumbTitles,
     payload.memoryTrackerId,
     payload.notebookTitle,
     payload.recallPromptId,
