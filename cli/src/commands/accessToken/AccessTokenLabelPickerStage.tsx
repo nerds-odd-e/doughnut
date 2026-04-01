@@ -24,13 +24,11 @@ const PICKER_ABORTED_MESSAGE = 'Cancelled.'
 export function AccessTokenLabelPickerStage({
   onSettled,
   labels,
-  stageIndicator,
   currentPrompt,
   initialHighlightIndex,
   onPick,
 }: InteractiveSlashCommandStageProps & {
   readonly labels: readonly string[]
-  readonly stageIndicator: string
   readonly currentPrompt: string
   readonly initialHighlightIndex: (labels: readonly string[]) => number
   readonly onPick: (label: string) => void
@@ -106,7 +104,6 @@ export function AccessTokenLabelPickerStage({
 
   return (
     <Box flexDirection="column">
-      <Text>{stageIndicator}</Text>
       <Text>{currentPrompt}</Text>
       <Box flexDirection="column">
         <GuidanceListInk

@@ -14,4 +14,5 @@ export const recallSlashCommand: InteractiveSlashCommand = {
   literal: '/recall',
   doc: recallDoc,
   stageComponent: RecallSessionStage,
+  stageIndicator: 'Recalling',
 }

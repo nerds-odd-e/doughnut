@@ -7,7 +7,6 @@ import {
 } from './accessToken.js'
 import { AccessTokenLabelPickerStage } from './AccessTokenLabelPickerStage.js'
 
-const STAGE_INDICATOR = 'Remove access token'
 const CURRENT_PROMPT =
   'Select and enter to remove the token from local config only'
 
@@ -37,7 +36,6 @@ export function RemoveAccessTokenPickerStage({
     <AccessTokenLabelPickerStage
       onSettled={onSettled}
       labels={labels}
-      stageIndicator={STAGE_INDICATOR}
       currentPrompt={CURRENT_PROMPT}
       initialHighlightIndex={initialHighlightIndexPreferDefault}
       onPick={(label) => {

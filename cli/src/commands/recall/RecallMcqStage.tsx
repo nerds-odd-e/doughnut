@@ -1,5 +1,4 @@
 import {
-  Fragment,
   useCallback,
   useContext,
   useLayoutEffect,
@@ -158,8 +157,6 @@ export async function submitMcqAnswer(
     })
   )
 }
-
-const STAGE_LABEL = 'Recalling'
 
 const MCQ_HINT =
   '↑↓ Enter or number to select; Esc asks to leave recall (y/n confirm)'
@@ -397,13 +394,10 @@ export function RecallMcqStage({
         onDismiss={() => setShowLeaveConfirm(false)}
         inputBlockedRef={inputBlockedRef}
         header={
-          <Fragment>
-            <Text>{STAGE_LABEL}</Text>
-            {payload.notebookTitle !== undefined &&
-            payload.notebookTitle !== '' ? (
-              <Text>{payload.notebookTitle}</Text>
-            ) : null}
-          </Fragment>
+          payload.notebookTitle !== undefined &&
+          payload.notebookTitle !== '' ? (
+            <Text>{payload.notebookTitle}</Text>
+          ) : undefined
         }
       />
     )
@@ -411,7 +405,6 @@ export function RecallMcqStage({
 
   return (
     <Box flexDirection="column">
-      <Text>{STAGE_LABEL}</Text>
       {payload.notebookTitle !== undefined && payload.notebookTitle !== '' ? (
         <Text>{payload.notebookTitle}</Text>
       ) : null}

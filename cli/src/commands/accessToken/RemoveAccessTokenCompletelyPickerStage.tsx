@@ -8,7 +8,6 @@ import {
 } from './accessToken.js'
 import { AccessTokenLabelPickerStage } from './AccessTokenLabelPickerStage.js'
 
-const STAGE_INDICATOR = 'Remove access token completely'
 const CURRENT_PROMPT =
   'Select and enter to revoke on the server and remove locally'
 
@@ -45,7 +44,6 @@ export function RemoveAccessTokenCompletelyPickerStage({
     <AccessTokenLabelPickerStage
       onSettled={onSettled}
       labels={labels}
-      stageIndicator={STAGE_INDICATOR}
       currentPrompt={CURRENT_PROMPT}
       initialHighlightIndex={initialHighlightIndexPreferDefault}
       onPick={(label) => {

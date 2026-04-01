@@ -7,7 +7,6 @@ import {
 } from '../accessToken.js'
 import { AccessTokenLabelPickerStage } from '../AccessTokenLabelPickerStage.js'
 
-const STAGE_INDICATOR = 'Access tokens'
 const CURRENT_PROMPT = 'Select and enter to change the default access token'
 
 function initialHighlightIndexPreferDefault(labels: readonly string[]): number {
@@ -26,7 +25,6 @@ export function ListAccessTokenStage({
     <AccessTokenLabelPickerStage
       onSettled={onSettled}
       labels={labels}
-      stageIndicator={STAGE_INDICATOR}
       currentPrompt={CURRENT_PROMPT}
       initialHighlightIndex={initialHighlightIndexPreferDefault}
       onPick={(label) => {

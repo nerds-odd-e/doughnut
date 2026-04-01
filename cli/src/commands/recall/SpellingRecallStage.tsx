@@ -1,5 +1,4 @@
 import {
-  Fragment,
   useCallback,
   useContext,
   useEffect,
@@ -102,8 +101,6 @@ function recallAnsweredSpellingInk(args: {
     </RecallAnsweredBlockShell>
   )
 }
-
-const STAGE_LABEL = 'Recalling'
 
 const SPELL_INPUT_PLACEHOLDER = 'Type answer, Enter to submit'
 
@@ -290,7 +287,6 @@ export function SpellingRecallStage({
   if (loadState.status === 'loading') {
     return (
       <Box flexDirection="column">
-        <Text>{STAGE_LABEL}</Text>
         {payload.notebookTitle !== undefined && payload.notebookTitle !== '' ? (
           <Text>{payload.notebookTitle}</Text>
         ) : null}
@@ -308,13 +304,10 @@ export function SpellingRecallStage({
         onDismiss={() => setShowLeaveConfirm(false)}
         inputBlockedRef={inputBlockedRef}
         header={
-          <Fragment>
-            <Text>{STAGE_LABEL}</Text>
-            {payload.notebookTitle !== undefined &&
-            payload.notebookTitle !== '' ? (
-              <Text>{payload.notebookTitle}</Text>
-            ) : null}
-          </Fragment>
+          payload.notebookTitle !== undefined &&
+          payload.notebookTitle !== '' ? (
+            <Text>{payload.notebookTitle}</Text>
+          ) : undefined
         }
       />
     )
@@ -322,7 +315,6 @@ export function SpellingRecallStage({
 
   return (
     <Box flexDirection="column">
-      <Text>{STAGE_LABEL}</Text>
       {payload.notebookTitle !== undefined && payload.notebookTitle !== '' ? (
         <Text>{payload.notebookTitle}</Text>
       ) : null}

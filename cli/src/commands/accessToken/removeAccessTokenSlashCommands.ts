@@ -22,6 +22,7 @@ export const removeAccessTokenSlashCommand: InteractiveSlashCommand = {
   literal: '/remove-access-token',
   doc: removeAccessTokenDoc,
   stageComponent: RemoveAccessTokenPickerStage,
+  stageIndicator: 'Remove access token',
 }
 
 export const removeAccessTokenCompletelySlashCommand: InteractiveSlashCommand =
@@ -29,4 +30,5 @@ export const removeAccessTokenCompletelySlashCommand: InteractiveSlashCommand =
     literal: '/remove-access-token-completely',
     doc: removeAccessTokenCompletelyDoc,
     stageComponent: RemoveAccessTokenCompletelyPickerStage,
+    stageIndicator: 'Remove access token completely',
   }

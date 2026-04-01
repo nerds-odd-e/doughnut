@@ -1,6 +1,5 @@
 import { MemoryTrackerController } from 'doughnut-api'
 import {
-  Fragment,
   useCallback,
   useState,
   type MutableRefObject,
@@ -23,8 +22,6 @@ import {
   recallAnsweredBreadcrumbText,
   recallAnsweredMarkdownToDisplayLines,
 } from './recallAnsweredInkShared.js'
-
-const STAGE_LABEL = 'Recalling'
 
 function justReviewOutcomeLine(
   outcome: 'remembered' | 'reduced',
@@ -147,14 +144,10 @@ export function JustReviewRecallStage({
   const detailLines =
     detailsRendered.length > 0 ? detailsRendered.split('\n') : []
 
-  const headerEl = (
-    <Fragment>
-      <Text>{STAGE_LABEL}</Text>
-      {payload.notebookTitle !== undefined && payload.notebookTitle !== '' ? (
-        <Text>{payload.notebookTitle}</Text>
-      ) : null}
-    </Fragment>
-  )
+  const headerEl =
+    payload.notebookTitle !== undefined && payload.notebookTitle !== '' ? (
+      <Text>{payload.notebookTitle}</Text>
+    ) : undefined
 
   const handleQuestionEsc = useCallback(() => {
     if (inputBlockedRef.current) {

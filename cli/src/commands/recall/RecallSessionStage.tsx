@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { Key } from 'ink'
-import { Box, Text, useInput } from 'ink'
+import { Box, useInput } from 'ink'
 import { Spinner } from '@inkjs/ui'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
 import { SetStageKeyHandlerContext } from '../../commonUIComponents/stageKeyForwardContext.js'
@@ -27,8 +27,6 @@ import { recallSessionSummaryLine } from './recallSessionSummary.js'
 import { recallAnsweredScrollbackItem } from './recallAnsweredScrollback.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 import { useSessionScrollbackAppend } from '../../sessionScrollback/sessionScrollbackAppendContext.js'
-
-const STAGE_LABEL = 'Recalling'
 
 function RecallSessionChrome({ children }: { readonly children: ReactNode }) {
   return <Box flexDirection="column">{children}</Box>
@@ -194,7 +192,6 @@ export function RecallSessionStage({
           defaultAnswer={true}
           onCancel={escapeLoadMorePrompt}
           inputBlockedRef={submittingRef}
-          header={<Text>{STAGE_LABEL}</Text>}
         />
       </RecallSessionChrome>
     )

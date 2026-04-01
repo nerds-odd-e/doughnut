@@ -39,6 +39,11 @@ type InteractiveSlashCommandBase = {
 type InteractiveStageSlashCommand = InteractiveSlashCommandBase & {
   /** Renders as the active stage; must honor `InteractiveSlashCommandStageProps` isolation. */
   readonly stageComponent: ComponentType<InteractiveSlashCommandStageProps>
+  /**
+   * When set, `InteractiveCliApp` renders this as the first line above the stage; stages must not
+   * duplicate the same title.
+   */
+  readonly stageIndicator?: string
 }
 
 type InteractiveRunSlashCommand = InteractiveSlashCommandBase & {
