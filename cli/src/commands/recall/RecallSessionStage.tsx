@@ -59,6 +59,7 @@ export function RecallSessionStage({
   const { appendScrollbackItem } = useSessionScrollbackAppend()
   const [card, setCard] = useState<RecallCard | null>(null)
   const [uiMode, setUiMode] = useState<'card' | 'loadMore'>('card')
+  const [loadMoreFetching, setLoadMoreFetching] = useState(false)
   const [initialResolved, setInitialResolved] = useState(false)
   const submittingRef = useRef(false)
   const sessionAnsweredCardsRef = useRef(0)
@@ -89,6 +90,7 @@ export function RecallSessionStage({
         } else {
           startedWithEmptyTodayRef.current = true
           setCard(null)
+          setLoadMoreFetching(false)
           setUiMode('loadMore')
         }
         setInitialResolved(true)
@@ -140,6 +142,7 @@ export function RecallSessionStage({
           setCard(next)
           return
         }
+        setLoadMoreFetching(false)
         setUiMode('loadMore')
       } catch (loadErr: unknown) {
         onSettled(userVisibleSlashCommandError(loadErr))
@@ -157,6 +160,7 @@ export function RecallSessionStage({
         settleSessionSummary()
         return
       }
+      setLoadMoreFetching(true)
       const ac = new AbortController()
       activeOperationAbortRef.current = ac
       try {
@@ -165,7 +169,6 @@ export function RecallSessionStage({
           activeOperationAbortRef.current = null
         }
         if (ac.signal.aborted) {
-          submittingRef.current = false
           onSettled(
             userVisibleSlashCommandError(
               new DOMException('Aborted', 'AbortError')
@@ -178,7 +181,6 @@ export function RecallSessionStage({
           ids.length > 0
             ? await loadRecallCardForMemoryTrackerId(ids[0]!, ac.signal)
             : null
-        submittingRef.current = false
         if (ac.signal.aborted) {
           onSettled(
             userVisibleSlashCommandError(
@@ -194,11 +196,13 @@ export function RecallSessionStage({
           setCard(next)
         }
       } catch (loadErr: unknown) {
-        submittingRef.current = false
         if (activeOperationAbortRef.current === ac) {
           activeOperationAbortRef.current = null
         }
         onSettled(userVisibleSlashCommandError(loadErr))
+      } finally {
+        submittingRef.current = false
+        setLoadMoreFetching(false)
       }
     },
     [onSettled, settleSessionSummary]
@@ -227,6 +231,18 @@ export function RecallSessionStage({
   }
 
   if (uiMode === 'loadMore') {
+    if (loadMoreFetching) {
+      return (
+        <RecallSessionChrome>
+          <Box flexDirection="column">
+            <RecallSessionEscSpinner abortRef={activeOperationAbortRef} />
+            <Box>
+              <Spinner label="Loading more…" />
+            </Box>
+          </Box>
+        </RecallSessionChrome>
+      )
+    }
     return (
       <RecallSessionChrome>
         <YesNoStagePrompt

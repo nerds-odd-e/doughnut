@@ -353,6 +353,69 @@ describe('recall just-review (interactive)', () => {
     expect(markAsRecalledCount.n).toBe(1)
   })
 
+  test('load more y shows Loading more… while extended recalling is in flight', async () => {
+    const markAsRecalledCount = mockMarkAsRecalledCounting()
+    mockShowMemoryTrackerCardForRealm(alphaNoteRealm())
+
+    type RecallingResult = Awaited<
+      ReturnType<typeof RecallsController.recalling>
+    >
+    let resolveExtended: ((value: RecallingResult) => void) | undefined
+    const extendedRecallingPromise = new Promise<RecallingResult>((resolve) => {
+      resolveExtended = resolve
+    })
+
+    let recallingN = 0
+    recallingSpy.mockImplementation(
+      async (opts: Parameters<typeof RecallsController.recalling>[0]) => {
+        recallingN += 1
+        const due = opts.query.dueindays ?? 0
+        if (recallingN === 1 && due === 0) {
+          return {
+            data: makeMe.aDueMemoryTrackersList
+              .totalAssimilatedCount(0)
+              .toRepeat([{ memoryTrackerId: 1, spelling: false }])
+              .please(),
+          } as RecallingResult
+        }
+        if (due === 3) {
+          return extendedRecallingPromise
+        }
+        return {
+          data: makeMe.aDueMemoryTrackersList
+            .totalAssimilatedCount(0)
+            .toRepeat([])
+            .please(),
+        } as RecallingResult
+      }
+    )
+
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    startRecall(stdin)
+    await waitRememberAlpha(frames)
+    stdin.write('y\r')
+    await waitLoadMore(frames)
+    stdin.write('y\r')
+
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) => stripAnsi(c).includes('Loading more…')
+    )
+
+    resolveExtended?.({
+      data: makeMe.aDueMemoryTrackersList
+        .totalAssimilatedCount(0)
+        .toRepeat([])
+        .please(),
+    })
+
+    await untilPlain(frames, (p) => p.includes('Recalled 1 note'))
+    expect(markAsRecalledCount.n).toBe(1)
+  })
+
   test('Esc from remember card shows leave recall confirm without markAsRecalled', async () => {
     mockMarkAsRecalledCounting()
     mockShowMemoryTrackerCardForRealm(alphaNoteRealm())
