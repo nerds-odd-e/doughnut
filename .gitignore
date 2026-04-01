@@ -60,6 +60,9 @@ backend/out
 .idea/
 .run/
 
+# Python (local venvs; e.g. MinerU spike — not in flake)
+.venv-mineru/
+
 # nodejs
 node_modules/
 # minimal npm install prefix (GitHub Deploy job URL map scripts)
