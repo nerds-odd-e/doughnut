@@ -79,6 +79,10 @@ Pick one behavior in **sub-phase 1.4** and keep it **test-only / diagnostic** so
 
 ## Sub-phase 1.3 — PTY session core in staging (Node only)
 
+**Status:** Done.
+
+**As implemented:** [`e2e_test/config/tty-assert-staging/ptySession.ts`](../e2e_test/config/tty-assert-staging/ptySession.ts) exports `BufferedPtySession`, `startBufferedPtySession`, `disposeBufferedPtySession`, `waitForVisiblePlaintextSubstring`. [`cliE2ePluginTasks.ts`](../e2e_test/config/cliE2ePluginTasks.ts) keeps the singleton, `cliEnv` merge, startup substring/timeouts, and task names; [`cliE2eGoogleOAuthSimulation.ts`](../e2e_test/config/cliE2eGoogleOAuthSimulation.ts) takes `BufferedPtySession`.
+
 **User-visible outcome:** None.
 
 **Work:**
@@ -94,9 +98,9 @@ Pick one behavior in **sub-phase 1.4** and keep it **test-only / diagnostic** so
 
 | Target method | Staging / internal (Phase 1) |
 |---------------|------------------------------|
-| `startProgram` | `createPtySession(options)` or `TtyPtySession.start(...)` |
-| `write` / `submit` | `writeRaw`, `writeLine` (maps to `\r` behavior you already use) |
-| `kill` | `dispose()` / `kill()` |
+| `startProgram` | `startBufferedPtySession(options)` |
+| `write` / `submit` | Still Cypress tasks `cliInteractiveWriteRaw` / `cliInteractiveWriteLine` (plugin); maps to `\r` for line submit |
+| `kill` | `disposeBufferedPtySession(session)` |
 
 **Gate:** CLI E2E green (interactive install scenario still finds startup banner and accepts lines).
 
@@ -142,7 +146,7 @@ Pick one behavior in **sub-phase 1.4** and keep it **test-only / diagnostic** so
 ## Checklist before closing parent Phase 1
 
 - [x] `tty-assert-staging/` contains **no** imports from `cypress`, `e2e_test/start`, or Doughnut product packages. *(1.1)*
-- [ ] `createCliE2ePluginTasks` is **obviously** glue: tasks + Doughnut env + OAuth + install paths.
+- [x] `createCliE2ePluginTasks` is **obviously** glue: tasks + Doughnut env + OAuth + install paths. *(1.3)*
 - [ ] `outputAssertions` domain heuristics remain **local** and documented if still mixed with generic formatting.
 - [ ] Target API table (above) updated if names changed during implementation.
 - [ ] Update [`cli-terminal-test-library-extraction.md`](./cli-terminal-test-library-extraction.md) Phase 1 bullet to point at this file and mark Phase 1 done when appropriate.

@@ -2,7 +2,6 @@
  * Cypress `task` handlers for CLI E2E. Depends only on `repoRoot` (repo checkout path).
  */
 
-import type { IPty } from '@lydell/node-pty'
 import { existsSync, mkdtempSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
@@ -15,11 +14,11 @@ import {
 } from './cliE2eRepo'
 import { cliEnv } from './cliEnv'
 import {
-  CLI_INTERACTIVE_PTY_COLS,
-  CLI_INTERACTIVE_PTY_ROWS,
-} from './tty-assert-staging/geometry'
-import { TERMINAL_ERROR_PREVIEW_LEN } from './tty-assert-staging/errorSnapshotFormatting'
-import { stripAnsiCliPty } from './tty-assert-staging/stripAnsi'
+  disposeBufferedPtySession,
+  startBufferedPtySession,
+  waitForVisiblePlaintextSubstring,
+  type BufferedPtySession,
+} from './tty-assert-staging/ptySession'
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
 
@@ -46,11 +45,6 @@ const INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING = 'doughnut 0.1.0'
 const INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS = 20_000
 const INSTALLED_CLI_INTERACTIVE_WRITE_SETTLE_MS = 500
 
-type CliInteractivePtySession = {
-  buf: { text: string }
-  pty: IPty
-}
-
 async function bundleCliE2eInstallOrThrow(
   repoRoot: string,
   env?: NodeJS.ProcessEnv
@@ -65,47 +59,11 @@ async function bundleCliE2eInstallOrThrow(
 }
 
 export function createCliE2ePluginTasks(repoRoot: string) {
-  let interactiveCliPtySession: CliInteractivePtySession | null = null
+  let interactiveCliPtySession: BufferedPtySession | null = null
 
   function disposeInteractiveCliPtySession(): void {
-    if (!interactiveCliPtySession) return
-    try {
-      interactiveCliPtySession.pty.kill()
-    } catch {
-      /* already exited */
-    }
+    disposeBufferedPtySession(interactiveCliPtySession)
     interactiveCliPtySession = null
-  }
-
-  function installedCliInteractiveWaitForSubstring(
-    getRawOutput: () => string,
-    needle: string,
-    timeoutMs: number
-  ): Promise<void> {
-    const started = Date.now()
-    return new Promise((resolve, reject) => {
-      const tick = () => {
-        const stripped = stripAnsiCliPty(getRawOutput())
-        if (stripped.includes(needle)) {
-          resolve()
-          return
-        }
-        if (Date.now() - started >= timeoutMs) {
-          const preview =
-            stripped.length > TERMINAL_ERROR_PREVIEW_LEN
-              ? `${stripped.slice(0, TERMINAL_ERROR_PREVIEW_LEN)}...`
-              : stripped
-          reject(
-            new Error(
-              `Timeout after ${timeoutMs}ms waiting for substring ${JSON.stringify(needle)} in interactive CLI PTY output. Preview (ANSI-stripped):\n${preview}`
-            )
-          )
-          return
-        }
-        setTimeout(tick, 50)
-      }
-      tick()
-    })
   }
 
   async function startInteractiveCliPtySession(opts: {
@@ -115,22 +73,15 @@ export function createCliE2ePluginTasks(repoRoot: string) {
     env?: NodeJS.ProcessEnv
   }): Promise<void> {
     disposeInteractiveCliPtySession()
-    const { spawn } = await import('@lydell/node-pty')
-    const p = spawn(opts.command, opts.args, {
-      name: 'xterm-256color',
-      cols: CLI_INTERACTIVE_PTY_COLS,
-      rows: CLI_INTERACTIVE_PTY_ROWS,
+    const session = await startBufferedPtySession({
+      command: opts.command,
+      args: opts.args,
       cwd: opts.cwd,
       env: { ...process.env, ...cliEnv(opts.env) },
     })
-    const buf = { text: '' }
-    const session: CliInteractivePtySession = { pty: p, buf }
-    p.onData((data: string) => {
-      buf.text += data
-    })
     interactiveCliPtySession = session
-    await installedCliInteractiveWaitForSubstring(
-      () => buf.text,
+    await waitForVisiblePlaintextSubstring(
+      () => session.buf.text,
       INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING,
       INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS
     )

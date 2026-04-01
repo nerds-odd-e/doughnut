@@ -3,7 +3,7 @@
  * fetches redirect_uri with a mock authorization code.
  */
 
-import type { IPty } from '@lydell/node-pty'
+import type { BufferedPtySession } from './tty-assert-staging/ptySession'
 
 const GOOGLE_ACCOUNTS_URL_PATTERN = /https:\/\/accounts\.google\.com\/[^\s]+/
 const E2E_MOCK_OAUTH_CODE = 'e2e_mock_auth_code'
@@ -25,20 +25,13 @@ function notifyOAuthSimulationIfNeeded(
   })
 }
 
-export type CliInteractivePtySessionForOAuth = {
-  pty: IPty
-  buf: { text: string }
-}
-
 /**
  * Registers a second `onData` handler that completes Google OAuth by `fetch`ing the redirect with a mock code.
  *
  * **Call at most once per PTY / per scenario** (after the interactive session starts, before steps that print the OAuth URL).
  * Calling again on the same live session stacks listeners and can fire duplicate callbacks; there is no unsubscribe.
  */
-export function attachGoogleOAuthSimulation(
-  session: CliInteractivePtySessionForOAuth
-): void {
+export function attachGoogleOAuthSimulation(session: BufferedPtySession): void {
   const oauthState: OAuthSimulationState = { done: false }
   session.pty.onData(() => {
     notifyOAuthSimulationIfNeeded(session.buf.text, oauthState)
