@@ -10,7 +10,7 @@ export type InteractiveSlashCommandStageProps = {
   readonly onSettled: (assistantText: string) => void
 }
 
-export type InteractiveSlashCommandResult = {
+type InteractiveSlashCommandResult = {
   assistantMessage: string
 }
 
@@ -20,7 +20,7 @@ export interface CommandDoc {
   readonly description: string
 }
 
-export type InteractiveSlashCommandArgument = {
+type InteractiveSlashCommandArgument = {
   readonly name: string
   /** When true, an empty argument is allowed (e.g. open the stage or call `run` without a value). */
   readonly optional: boolean
