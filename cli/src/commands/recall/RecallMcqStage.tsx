@@ -120,7 +120,7 @@ type ContestMcqOutcome =
 /** Contest then regenerate, or rejected outcome with a user-visible message. */
 export async function contestAndRegenerateMcq(
   memoryTrackerId: number,
-  notebookTitle: string | undefined,
+  notebookTitle: string,
   currentRecallPromptId: number,
   signal?: AbortSignal
 ): Promise<ContestMcqOutcome> {
@@ -141,11 +141,7 @@ export async function contestAndRegenerateMcq(
       ...doughnutSdkOptions(signal),
     })
   )
-  const mapped = recallMcqPayloadFromRecallPrompt(
-    memoryTrackerId,
-    regenerated,
-    notebookTitle
-  )
+  const mapped = recallMcqPayloadFromRecallPrompt(memoryTrackerId, regenerated)
   if (mapped === null) {
     throw new Error('Regenerated recall prompt is not a pending MCQ.')
   }
@@ -276,7 +272,6 @@ export function RecallMcqStage({
     try {
       const result = await contestAndRegenerateMcq(
         payload.memoryTrackerId,
-        payload.notebookTitle,
         payload.recallPromptId
       )
       if (result.outcome === 'replaced') {
@@ -302,7 +297,6 @@ export function RecallMcqStage({
     onRecallFatalError,
     onReplaceCurrentRecallCard,
     payload.memoryTrackerId,
-    payload.notebookTitle,
     payload.recallPromptId,
   ])
 

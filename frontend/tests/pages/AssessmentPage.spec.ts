@@ -39,6 +39,7 @@ describe("assessment page", () => {
     const recallPrompt: RecallPrompt = {
       ...assessmentQuestionInstance,
       questionType: "MCQ",
+      notebook,
     }
     const assessmentAttempt = makeMe.anAssessmentAttempt
       .forNotebook(notebook)
@@ -109,10 +110,12 @@ describe("assessment page", () => {
     const recallPrompt1: RecallPrompt = {
       ...quizQuestion_1,
       questionType: "MCQ",
+      notebook,
     }
     const recallPrompt2: RecallPrompt = {
       ...quizQuestion_2,
       questionType: "MCQ",
+      notebook,
     }
     const assessmentAttempt = makeMe.anAssessmentAttempt
       .forNotebook(notebook)

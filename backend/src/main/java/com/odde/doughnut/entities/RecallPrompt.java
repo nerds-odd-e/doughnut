@@ -9,6 +9,7 @@ import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.SpellingQuestion;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -69,11 +70,10 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
+  @JsonProperty
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   public Notebook getNotebook() {
-    if (getPredefinedQuestion() == null) {
-      return null;
-    }
-    return getPredefinedQuestion().getNote().getNotebook();
+    return getMemoryTracker().getNote().getNotebook();
   }
 
   @JsonIgnore
@@ -151,7 +151,6 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
     }
     Note note = memoryTracker.getNote();
     String stem = note.createMaskedDetailsForRecall().maskedDetailsAsMarkdown();
-    Notebook notebook = note.getNotebook();
-    return new SpellingQuestion(stem, notebook);
+    return new SpellingQuestion(stem, getNotebook());
   }
 }

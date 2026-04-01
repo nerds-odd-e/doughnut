@@ -21,7 +21,7 @@
           />
         </div>
         <template v-else>
-         <div v-if="currentRecallPrompt.notebook" class="notebook-source daisy-mb-4">
+         <div class="notebook-source daisy-mb-4">
             <NotebookLink :notebook="currentRecallPrompt.notebook" />
           </div>
           <ContestableQuestion

@@ -3343,6 +3343,7 @@ components:
           $ref: "#/components/schemas/SpellingQuestion"
       required:
       - id
+      - notebook
       - questionType
     SpellingQuestion:
       type: object

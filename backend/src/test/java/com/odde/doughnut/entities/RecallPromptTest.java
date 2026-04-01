@@ -29,6 +29,18 @@ class RecallPromptTest {
   }
 
   @Nested
+  class GetNotebook {
+    @Test
+    void shouldReturnNotebookFromMemoryTrackerWhenSpellingAndNoPredefinedQuestion() {
+      RecallPrompt recallPrompt = new RecallPrompt();
+      recallPrompt.setQuestionType(QuestionType.SPELLING);
+      recallPrompt.setMemoryTracker(memoryTracker);
+
+      assertThat(recallPrompt.getNotebook(), equalTo(note.getNotebook()));
+    }
+  }
+
+  @Nested
   class GetSpellingQuestion {
     @Test
     void shouldReturnSpellingQuestionWhenQuestionTypeIsSpelling() {

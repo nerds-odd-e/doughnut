@@ -201,7 +201,7 @@ export type RecallPrompt = {
     memoryTrackerId?: number;
     questionType: 'MCQ' | 'SPELLING';
     multipleChoicesQuestion?: MultipleChoicesQuestion;
-    notebook?: Notebook;
+    notebook: Notebook;
     note?: Note;
     questionGeneratedTime?: string;
     isContested?: boolean;
@@ -672,7 +672,7 @@ export type RecallPromptWritable = {
     memoryTrackerId?: number;
     questionType: 'MCQ' | 'SPELLING';
     multipleChoicesQuestion?: MultipleChoicesQuestion;
-    notebook?: Notebook;
+    notebook: Notebook;
     note?: NoteWritable;
     questionGeneratedTime?: string;
     isContested?: boolean;

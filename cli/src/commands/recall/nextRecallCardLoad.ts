@@ -79,29 +79,16 @@ export type RecallMcqCardPayload = {
   readonly recallPromptId: number
   readonly stem: string
   readonly choices: readonly string[]
-  readonly notebookTitle?: string
+  readonly notebookTitle: string
 }
 
 function firstPendingMcq(prompts: RecallPrompt[]): RecallPrompt | undefined {
   return prompts.find((p) => p.questionType === 'MCQ' && p.answer == null)
 }
 
-function notebookTitleForMcqPrompt(
-  prompt: RecallPrompt,
-  fallback?: string | undefined
-): string | undefined {
-  const fromPrompt = prompt.notebook?.title?.trim()
-  if (fromPrompt !== undefined && fromPrompt.length > 0) {
-    return fromPrompt
-  }
-  const f = fallback?.trim()
-  return f !== undefined && f.length > 0 ? f : undefined
-}
-
 export function recallMcqPayloadFromRecallPrompt(
   memoryTrackerId: number,
-  prompt: RecallPrompt,
-  notebookTitleFallback?: string | undefined
+  prompt: RecallPrompt
 ): RecallMcqCardPayload | null {
   if (prompt.questionType !== 'MCQ' || prompt.answer != null) return null
   const mq = prompt.multipleChoicesQuestion
@@ -112,7 +99,7 @@ export function recallMcqPayloadFromRecallPrompt(
     recallPromptId: prompt.id,
     stem: mq?.f0__stem?.trim() ?? '',
     choices,
-    notebookTitle: notebookTitleForMcqPrompt(prompt, notebookTitleFallback),
+    notebookTitle: prompt.notebook.title.trim(),
   }
 }
 
