@@ -98,9 +98,10 @@ Pick one behavior in **sub-phase 1.4** and keep it **test-only / diagnostic** so
 
 | Target method | Staging / internal (Phase 1) |
 |---------------|------------------------------|
-| `startProgram` | `startBufferedPtySession(options)` |
-| `write` / `submit` | Still Cypress tasks `cliInteractiveWriteRaw` / `cliInteractiveWriteLine` (plugin); maps to `\r` for line submit |
-| `kill` | `disposeBufferedPtySession(session)` |
+| `startProgram` | `startProgram` / `attachTerminalHandle` in [`facade.ts`](../e2e_test/config/tty-assert-staging/facade.ts) (wraps `startBufferedPtySession`); Cypress plugin keeps `cliEnv` merge and uses `attachTerminalHandle` after spawn |
+| `write` / `submit` | Handle `write` / `submit`; same task names: `cliInteractiveWriteRaw` / `cliInteractiveWriteLine` |
+| `kill` | `handle.kill()` → `disposeBufferedPtySession(session)` |
+| `expect` / `dumpFrames` | `handle.expect(loc).toBeVisible`, `handle.dumpFrames()` (diagnostic object; not real frames) |
 
 **Gate:** CLI E2E green (interactive install scenario still finds startup banner and accepts lines).
 
@@ -108,7 +109,11 @@ Pick one behavior in **sub-phase 1.4** and keep it **test-only / diagnostic** so
 
 ## Sub-phase 1.4 — Facade module and locator / expect sketch
 
+**Status:** Done.
+
 **User-visible outcome:** None for Gherkin; **optional** richer **Node** API for plugin code.
+
+**As implemented:** [`e2e_test/config/tty-assert-staging/facade.ts`](../e2e_test/config/tty-assert-staging/facade.ts) exports `startProgram`, `attachTerminalHandle`, `TtyAssertTerminalHandle` (`write`, `submit`, `kill`, `getRawBuffer`, `getVisiblePlaintext` = stripped cumulative transcript, `getReplayedScreenPlaintext`, `getByText`, `expect(loc).toBeVisible`, `dumpFrames`). [`cliE2ePluginTasks.ts`](../e2e_test/config/cliE2ePluginTasks.ts) stores that handle, waits for startup via `expect(getByText(…)).toBeVisible`, delegates writes/buffer/OAuth `session`. `waitForVisiblePlaintextSubstring` in [`ptySession.ts`](../e2e_test/config/tty-assert-staging/ptySession.ts) takes optional `retryMs` (default 50).
 
 **Work:**
 
@@ -148,7 +153,7 @@ Pick one behavior in **sub-phase 1.4** and keep it **test-only / diagnostic** so
 - [x] `tty-assert-staging/` contains **no** imports from `cypress`, `e2e_test/start`, or Doughnut product packages. *(1.1)*
 - [x] `createCliE2ePluginTasks` is **obviously** glue: tasks + Doughnut env + OAuth + install paths. *(1.3)*
 - [ ] `outputAssertions` domain heuristics remain **local** and documented if still mixed with generic formatting.
-- [ ] Target API table (above) updated if names changed during implementation.
+- [x] Target API table (above) updated if names changed during implementation. *(1.4)*
 - [ ] Update [`cli-terminal-test-library-extraction.md`](./cli-terminal-test-library-extraction.md) Phase 1 bullet to point at this file and mark Phase 1 done when appropriate.
 
 ---

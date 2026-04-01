@@ -49,7 +49,8 @@ export function disposeBufferedPtySession(
 export function waitForVisiblePlaintextSubstring(
   getRawOutput: () => string,
   needle: string,
-  timeoutMs: number
+  timeoutMs: number,
+  retryMs = 50
 ): Promise<void> {
   const started = Date.now()
   return new Promise((resolve, reject) => {
@@ -68,7 +69,7 @@ export function waitForVisiblePlaintextSubstring(
         )
         return
       }
-      setTimeout(tick, 50)
+      setTimeout(tick, retryMs)
     }
     tick()
   })

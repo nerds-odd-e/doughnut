@@ -14,11 +14,10 @@ import {
 } from './cliE2eRepo'
 import { cliEnv } from './cliEnv'
 import {
-  disposeBufferedPtySession,
-  startBufferedPtySession,
-  waitForVisiblePlaintextSubstring,
-  type BufferedPtySession,
-} from './tty-assert-staging/ptySession'
+  attachTerminalHandle,
+  type TtyAssertTerminalHandle,
+} from './tty-assert-staging/facade'
+import { startBufferedPtySession } from './tty-assert-staging/ptySession'
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
 
@@ -59,11 +58,11 @@ async function bundleCliE2eInstallOrThrow(
 }
 
 export function createCliE2ePluginTasks(repoRoot: string) {
-  let interactiveCliPtySession: BufferedPtySession | null = null
+  let interactiveCliPtyHandle: TtyAssertTerminalHandle | null = null
 
   function disposeInteractiveCliPtySession(): void {
-    disposeBufferedPtySession(interactiveCliPtySession)
-    interactiveCliPtySession = null
+    interactiveCliPtyHandle?.kill()
+    interactiveCliPtyHandle = null
   }
 
   async function startInteractiveCliPtySession(opts: {
@@ -79,12 +78,11 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       cwd: opts.cwd,
       env: { ...process.env, ...cliEnv(opts.env) },
     })
-    interactiveCliPtySession = session
-    await waitForVisiblePlaintextSubstring(
-      () => session.buf.text,
-      INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING,
-      INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS
-    )
+    const handle = attachTerminalHandle(session)
+    interactiveCliPtyHandle = handle
+    await handle
+      .expect(handle.getByText(INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING))
+      .toBeVisible({ timeoutMs: INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS })
   }
 
   return {
@@ -206,13 +204,13 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       return null
     },
     cliInteractivePtyEnableGoogleOAuthSimulation() {
-      const session = interactiveCliPtySession
-      if (!session) {
+      const handle = interactiveCliPtyHandle
+      if (!handle) {
         throw new Error(
           'cliInteractivePtyEnableGoogleOAuthSimulation: no active interactive CLI PTY. Start the session first (e.g. runRepoCliInteractive).'
         )
       }
-      attachGoogleOAuthSimulation(session)
+      attachGoogleOAuthSimulation(handle.session)
       return null
     },
     cliInteractivePtyDispose() {
@@ -220,23 +218,22 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       return null
     },
     cliInteractivePtyGetBuffer(): string {
-      if (!interactiveCliPtySession) {
+      if (!interactiveCliPtyHandle) {
         throw new Error(
           'cliInteractivePtyGetBuffer: no active interactive CLI PTY session. Ensure @interactiveCLI started the session or run the installed CLI in interactive mode first.'
         )
       }
-      return interactiveCliPtySession.buf.text
+      return interactiveCliPtyHandle.getRawBuffer()
     },
     async cliInteractiveWriteLine({
       line,
     }: CliInteractiveWriteLineTask): Promise<null> {
-      if (!interactiveCliPtySession) {
+      if (!interactiveCliPtyHandle) {
         throw new Error(
           'cliInteractiveWriteLine: no active interactive CLI PTY session. Ensure @interactiveCLI started the session or run the installed CLI in interactive mode first.'
         )
       }
-      const { pty } = interactiveCliPtySession
-      pty.write(`${line}\r`)
+      interactiveCliPtyHandle.submit(line)
       await new Promise<void>((resolve) =>
         setTimeout(resolve, INSTALLED_CLI_INTERACTIVE_WRITE_SETTLE_MS)
       )
@@ -245,13 +242,12 @@ export function createCliE2ePluginTasks(repoRoot: string) {
     async cliInteractiveWriteRaw({
       data,
     }: CliInteractiveWriteRawTask): Promise<null> {
-      if (!interactiveCliPtySession) {
+      if (!interactiveCliPtyHandle) {
         throw new Error(
           'cliInteractiveWriteRaw: no active interactive CLI PTY session. Ensure @interactiveCLI started the session or run the installed CLI in interactive mode first.'
         )
       }
-      const { pty } = interactiveCliPtySession
-      pty.write(data)
+      interactiveCliPtyHandle.write(data)
       await new Promise<void>((resolve) =>
         setTimeout(resolve, INSTALLED_CLI_INTERACTIVE_WRITE_SETTLE_MS)
       )
