@@ -187,7 +187,7 @@ jobs:
           node_version: ${{ vars.NODE_VERSION }}
           pnpm_version: ${{ vars.PNPM_VERSION }}
           force_install: "true"
-      - uses: cypress-io/github-action@v7.1.8
+      - uses: cypress-io/github-action@v7.1.9
         with:
           browser: chrome
           config-file: e2e_test/config/ci.ts
