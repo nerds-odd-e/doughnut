@@ -24,7 +24,7 @@
 | PTY spawn, buffer, write tasks | `e2e_test/config/cliE2ePluginTasks.ts` | `tty-assert` **runtime** API + optional **Cypress task adapter** (thin, ideally in `e2e_test` only) |
 | ANSI strip | `e2e_test/config/cliPtyAnsi.ts` | `tty-assert` core |
 | Fixed cols/rows | `e2e_test/config/cliInteractivePtyGeometry.ts` | `tty-assert` default geometry (configurable) |
-| Transcript → visible plaintext / replay | `e2e_test/config/cliPtyTerminalReplay.ts` | `tty-assert` core (generic terminal model) |
+| Transcript → visible plaintext / replay | `e2e_test/config/cliPtyTerminalReplay.ts` | `tty-assert` core; **Phase 4** moves authoritative interpretation to **xterm.js** where parity is proven |
 | Google OAuth PTY simulation | `e2e_test/config/cliE2eGoogleOAuthSimulation.ts` | Stays **Doughnut** (or behind `tty-assert` **hook/extension** interface) |
 | Retry, snapshot formatting, `expectContains` | `e2e_test/start/pageObjects/cli/outputAssertions.ts` | Split: **generic** retry + snapshot → `tty-assert`; **domain** sections → Doughnut |
 | Cypress fluents | `e2e_test/start/pageObjects/cli/interactiveCli.ts` | Doughnut; calls `tty-assert`-backed tasks or helpers |
@@ -73,46 +73,88 @@
 
 ---
 
-## Phase 4 — Clearer failure messages for TTY debugging
+## Phase 4 — Introduce xterm.js for better assertion
+
+**Outcome:** Terminal-visible state used for assertions is driven by **xterm.js** (headless / Node-friendly wiring), so behavior matches a real terminal emulator more closely than a hand-rolled replay.
+
+**Work:**
+
+- Feed the PTY byte stream into an xterm instance sized to the same **cols × rows** as the PTY session.
+- Migrate or replace bespoke replay (`ptyTranscriptToVisiblePlaintext` and related) **behind** this model where parity is verified; keep regression tests on fixed transcript fixtures until confidence is high.
+- Expose a small internal or package-level API to read **current screen / buffer** for assertions and later diagnostics (PNG, structured debug output).
+
+**Gate:** Doughnut CLI E2E unchanged; `tty-assert` unit tests cover xterm-backed visible state for representative transcripts.
+
+---
+
+## Phase 5 — Tidy assertion APIs of `tty-assert`
+
+**Outcome:** One coherent, documented **assertion surface** (names, parameters, options objects, retries), instead of accreted helpers.
+
+**Work:**
+
+- Consolidate entry points for substring/region checks, timeouts, and error message shape; avoid duplicate “strip then search” paths.
+- Separate **generic** matchers from hooks where Doughnut passes domain-specific region logic (e.g. “current guidance”) without widening the core API unnecessarily.
+- Update Doughnut page objects to the tidied API with **no** behavior change.
+
+**Gate:** E2E green; `tty-assert` README or `docs/` snippet shows the intended public assertion API.
+
+---
+
+## Phase 6 — Tidy start and terminating APIs of `tty-assert`
+
+**Outcome:** Obvious lifecycle: **start session** (spawn, env, geometry), **write**, **read state**, **stop/dispose** — with clear semantics for errors and teardown.
+
+**Work:**
+
+- Unify spawn options, default env, kill vs graceful exit, and **idempotent** dispose (safe double-call, scenario end hooks).
+- Define behavior for edge cases: child already dead, timeout waiting for startup marker, leak prevention (listeners, timers).
+- Align Cypress plugin tasks with this surface so `e2e_test` stays a thin adapter.
+
+**Gate:** E2E green; unit tests for lifecycle edge cases where practical without a real long-running PTY.
+
+---
+
+## Phase 7 — Clearer failure messages for TTY debugging
 
 **Outcome:** When an assertion fails, developers see **structure** (rows, regions, or frame boundaries) not only a flat wall of text.
 
 **Work:**
 
-- Define a **stable, documented** “debug view” of the last replayed screen (e.g. row numbers, optional ruler, highlighted region when the **caller** passes region bounds — generic API: “annotate this substring range”).
+- Define a **stable, documented** “debug view” of the last replayed screen (e.g. row numbers, optional ruler, highlighted region when the **caller** passes region bounds — generic API: “annotate this substring range”). Prefer reading layout from **xterm** state where possible.
 - Unify duplicate preview logic (plugin `PREVIEW_LEN` vs `outputAssertions` truncation) through `tty-assert` helpers.
 
 **Gate:** Intentionally failing test in `tty-assert` or a temporary Doughnut step shows improved message; real suite green.
 
 ---
 
-## Phase 5 — “Final visible screenshot” in plain text (single state)
+## Phase 8 — “Final visible screenshot” in plain text (single state)
 
 **Outcome:** Failure artifacts include **one** plain-text rendering of the **final** visible terminal state, not the entire scrollback or every intermediate frame.
 
 **Work:**
 
-- API: `lastVisiblePlaintext(transcript, geometry)` (may already exist as part of replay); error formatter opts into **final screen only** vs **full stripped transcript** for support bundle.
+- API: `lastVisiblePlaintext` (or equivalent) sourced from **xterm** / shared screen model; error formatter opts into **final screen only** vs **full stripped transcript** for support bundle.
 - Cypress: on failure path, attach text artifact via existing screenshot/video / CI artifact patterns where possible.
 
 **Gate:** Failure output is shorter and readable; E2E still pass.
 
 ---
 
-## Phase 6 — PNG screenshot of terminal state
+## Phase 9 — PNG screenshot of terminal state
 
 **Outcome:** Raster image of the **final** (or selected) visible screen for failed runs.
 
 **Work:**
 
-- Choose renderer (canvas in Node, headless terminal image lib, or HTML → png); keep **optional** heavy dependency (peer or optional install) so lightweight consumers can skip PNG.
+- Choose renderer (canvas in Node, headless terminal image lib, or HTML → png); **xterm** + canvas is a natural fit if already on the path; keep **optional** heavy dependency (peer or optional install) so lightweight consumers can skip PNG.
 - Integrate with Cypress failure hooks: write PNG to `downloadsFolder` / task return path for CI artifacts.
 
 **Gate:** On forced failure, PNG appears in CI artifacts; default CI still passes.
 
 ---
 
-## Phase 7 — Animated capture (screen changes over time)
+## Phase 10 — Animated capture (screen changes over time)
 
 **Outcome:** Optional artifact showing evolution from session start to failure (or full scenario).
 
@@ -125,7 +167,7 @@
 
 ---
 
-## Phase 8 — Move out of Doughnut (OSS npm package)
+## Phase 11 — Move out of Doughnut (OSS npm package)
 
 **Outcome:** Standalone repository, semver, changelog, README for **Playwright / Vitest / raw Node** consumers; Doughnut pins a version.
 
@@ -142,8 +184,10 @@
 
 - **1 → 2:** Clean seams make the package extraction mechanical.
 - **3** can start once **2**’s skeleton exists (tests can live next to the package).
-- **4–7** are mostly sequential in **diagnostic value** but **6–7** may share rendering infrastructure (5 → 6 especially).
-- **8** last.
+- **3 → 4:** Unit tests and CI exist before swapping the emulation core to xterm.js.
+- **4 → 5 → 6:** Visible state model (xterm) stabilizes first; then assertion API; then lifecycle API — each phase ends with E2E green.
+- **7–10** are mostly sequential in **diagnostic value**; **9–10** may share rendering infrastructure (**8 → 9** especially).
+- **11** last.
 
 ---
 
