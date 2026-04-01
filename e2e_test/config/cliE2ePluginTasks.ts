@@ -17,8 +17,8 @@ import { cliEnv } from './cliEnv'
 import {
   CLI_INTERACTIVE_PTY_COLS,
   CLI_INTERACTIVE_PTY_ROWS,
-} from './cliInteractivePtyGeometry'
-import { stripAnsiCliPty } from './cliPtyAnsi'
+} from './tty-assert-staging/geometry'
+import { stripAnsiCliPty } from './tty-assert-staging/stripAnsi'
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
 

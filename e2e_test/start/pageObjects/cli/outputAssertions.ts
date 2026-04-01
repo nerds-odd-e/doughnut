@@ -1,7 +1,7 @@
 /**
  * Hub for Cypress assertions on **terminal-visible** CLI output.
  *
- * Add new checks here (or in `cliPtyTerminalReplay` / `cliPtyAnsi` helpers) so
+ * Add new checks here (or in `tty-assert-staging` / `cliPtyCurrentGuidanceFromReplay`) so
  * failures stay consistent: bounded retries, then an error that includes an
  * ANSI-stripped snapshot of the buffer, and a Cypress screenshot on the final
  * failure path where this module throws.
@@ -10,11 +10,9 @@
  * - **Non-interactive**: one-shot stdout from installed `version` / `update` (alias `@doughnutOutput`).
  * - **Interactive PTY**: live buffer from plugin task `cliInteractivePtyGetBuffer` (`interactiveCliPtySession`).
  */
-import {
-  extractCurrentGuidanceFromReplayedPlaintext,
-  ptyTranscriptToVisiblePlaintext,
-} from '../../../config/cliPtyTerminalReplay'
-import { stripAnsiCliPty } from '../../../config/cliPtyAnsi'
+import { extractCurrentGuidanceFromReplayedPlaintext } from '../../../config/cliPtyCurrentGuidanceFromReplay'
+import { ptyTranscriptToVisiblePlaintext } from '../../../config/tty-assert-staging/ptyTranscriptToVisiblePlaintext'
+import { stripAnsiCliPty } from '../../../config/tty-assert-staging/stripAnsi'
 
 export const OUTPUT_ALIAS = '@doughnutOutput'
 
