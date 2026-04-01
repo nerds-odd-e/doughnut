@@ -63,11 +63,11 @@ export function InteractiveCliApp() {
   const [scrollbackItems, setScrollbackItems] = useState<
     SessionScrollbackItem[]
   >(() => [transcriptAssistantText(formatVersionOutput())])
-  const [activeStageComponent, setActiveStageComponent] =
-    useState<ComponentType<InteractiveSlashCommandStageProps> | null>(null)
-  const [activeStageIndicator, setActiveStageIndicator] = useState<
-    string | undefined
-  >(undefined)
+  const [activeSlashStage, setActiveSlashStage] = useState<{
+    component: ComponentType<InteractiveSlashCommandStageProps>
+    stageIndicator?: string
+  } | null>(null)
+  const activeStageIndicator = activeSlashStage?.stageIndicator
   const [exitAfterCommit, setExitAfterCommit] = useState(false)
 
   useEffect(() => {
@@ -97,8 +97,7 @@ export function InteractiveCliApp() {
   )
 
   const clearSlashStage = useCallback(() => {
-    setActiveStageComponent(null)
-    setActiveStageIndicator(undefined)
+    setActiveSlashStage(null)
     stageArgumentRef.current = undefined
   }, [])
 
@@ -191,11 +190,12 @@ export function InteractiveCliApp() {
       stageArgumentRef.current = argument
       const Stage = command.stageComponent
       const indicator = command.stageIndicator
-      setActiveStageIndicator(
-        indicator !== undefined && indicator !== '' ? indicator : undefined
-      )
       // setState(fn) treats fn as updater; bare `Stage` would be called with prior state as props.
-      setActiveStageComponent(() => Stage)
+      setActiveSlashStage(() => ({
+        component: Stage,
+        stageIndicator:
+          indicator !== undefined && indicator !== '' ? indicator : undefined,
+      }))
       return
     }
     const argumentMissing = argument === undefined || argument === ''
@@ -243,7 +243,7 @@ export function InteractiveCliApp() {
       <SessionScrollbackAppendProvider value={scrollbackAppendApi}>
         <Box flexDirection="column">
           <SessionScrollback items={scrollbackItems} />
-          {activeStageComponent && (
+          {activeSlashStage && (
             <Box flexDirection="column">
               {activeStageIndicator !== undefined ? (
                 <StageLiveHeaderInk
@@ -251,7 +251,7 @@ export function InteractiveCliApp() {
                   cols={liveRegionCols}
                 />
               ) : null}
-              {createElement(activeStageComponent, {
+              {createElement(activeSlashStage.component, {
                 argument: stageArgumentRef.current,
                 onSettled: handleAsyncSlashSettled,
                 onAbortWithError: handleAsyncSlashAbortWithError,
@@ -261,7 +261,7 @@ export function InteractiveCliApp() {
           {!exitAfterCommit && (
             <MainInteractivePrompt
               onCommittedLine={onCommittedLine}
-              isActive={!activeStageComponent}
+              isActive={!activeSlashStage}
             />
           )}
         </Box>
