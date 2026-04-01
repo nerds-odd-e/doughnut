@@ -2,7 +2,7 @@
 
 **Parent plan:** [`cli-terminal-test-library-extraction.md`](./cli-terminal-test-library-extraction.md) (Phase 1: in-place refactor, **no user-visible or Gherkin behavior change**).
 
-**This document:** Break Phase 1 into **small sub-phases**, each with one **observable gate**, ordered by **stability and seam clarity first** (see `.cursor/rules/planning.mdc`). **Sub-phase 1.1 is done** (see below); **1.2+** describe remaining Phase 1 work.
+**This document:** Records Phase 1 sub-phases (see `.cursor/rules/planning.mdc`). **Phase 1 is complete** in-repo — all sub-phases 1.1–1.5 below are **Done**. Next work is parent **Phase 2** (`packages/tty-assert`).
 
 ---
 
@@ -36,8 +36,8 @@ Pick one behavior in **sub-phase 1.4** and keep it **test-only / diagnostic** so
 | Stays in Doughnut-specific layers | In `e2e_test/config/tty-assert-staging/` (after 1.1) / still to move |
 |-----------------------------------|-----------------------------------------------------|
 | `cliE2eGoogleOAuthSimulation`, install/bundle paths, `cliEnv`, repo spawn helpers; **`cliPtyCurrentGuidanceFromReplay.ts`** (`extractCurrentGuidanceFromReplayedPlaintext` — Ink prompt / guidance heuristics) | **`stripAnsi.ts`** (`stripAnsiCliPty`), **`geometry.ts`** (`CLI_INTERACTIVE_PTY_COLS` / `ROWS`), **`ptyTranscriptToVisiblePlaintext.ts`** (`ptyTranscriptToVisiblePlaintext` + CSI replay helpers) |
-| Cypress `cy.task` registration, `repoRoot`, startup substring / timeouts **values** | **Pure** snapshot / safe-text formatting used for assertion errors (generic parts only) — **1.2** |
-| Domain strings in `outputAssertions` (recall hints, “wrong step” heuristics for non-interactive vs PTY) | **PTY session object**: buffer, spawn, kill, append from `onData`, optional wait-for-substring — **1.3** |
+| Cypress `cy.task` registration, `repoRoot`, startup substring / timeouts **values** | **`errorSnapshotFormatting.ts`** (1.2): safe visible text and truncation for assertion errors |
+| Domain strings in `outputAssertions` (recall hints, “wrong step” heuristics for non-interactive vs PTY); module header documents generic vs Doughnut-specific | **PTY session** + facade (1.3–1.4): buffer, spawn, kill, `onData`, wait-for-substring |
 
 **Rule:** After each sub-phase, **active CLI E2E** (`e2e_test/features/cli/cli_install_and_run.feature`, non-`@ignore` scenarios) stays green; no change to scenario text or expected user-visible CLI output.
 
@@ -64,16 +64,16 @@ Pick one behavior in **sub-phase 1.4** and keep it **test-only / diagnostic** so
 
 ## Sub-phase 1.2 — Generic error snapshot helpers
 
-**User-visible outcome:** None. **Failure output** should remain **substantively the same** (ANSI-stripped preview, truncation limits); wording may shift only if unavoidable — prefer identical messages.
+**Status:** Done.
 
-**Work:**
+**User-visible outcome:** None. **Failure output** remains substantively the same (ANSI-stripped preview, truncation limits).
 
-- Extract **generic** pieces from `outputAssertions.ts` such as:
-  - safe visible text / control-char rendering for errors,
-  - truncation policy constants (or shared `PREVIEW_LEN` / max chars) **where they are not Doughnut-specific**.
-- Keep in `outputAssertions.ts` (or adjacent Doughnut file): section labels, `stdoutLooksLikeInteractiveCliPtyCapture` heuristics, Cypress screenshot side effects, `cy.task` orchestration.
+**As implemented:**
 
-**Gate:** CLI E2E green; a **deliberate local failure** (temporary) should show the same fields as before (raw length, stripped preview, truncation behavior) — optional manual check, not committed.
+- [`e2e_test/config/tty-assert-staging/errorSnapshotFormatting.ts`](../e2e_test/config/tty-assert-staging/errorSnapshotFormatting.ts): `TERMINAL_ERROR_PREVIEW_LEN`, `TERMINAL_ERROR_MAX_VISIBLE_SNAPSHOT_CHARS`, `sanitizeVisibleTextForError`, `formatRawTerminalSnapshotForError`, `headPreview`, `tailPreview`.
+- [`outputAssertions.ts`](../e2e_test/start/pageObjects/cli/outputAssertions.ts) imports those helpers for `failCliAssertion` and substring failure lines; keeps section labels, `stdoutLooksLikeInteractiveCliPtyCapture`, Cypress retries/screenshots, and `cy.task` orchestration (see file header).
+
+**Gate:** CLI E2E green.
 
 ---
 
@@ -92,7 +92,7 @@ Pick one behavior in **sub-phase 1.4** and keep it **test-only / diagnostic** so
   - `onData` → growing buffer,
   - `kill` / idempotent dispose,
   - **optional:** `waitForVisibleSubstring` using existing `stripAnsi` + buffer (same semantics as `installedCliInteractiveWaitForSubstring` today).
-- `createCliE2ePluginTasks` becomes: **singleton session**, `cy.task` names, Doughnut **startup marker string**, **timeouts**, `PREVIEW_LEN` for plugin errors, OAuth attach, install bundle — **no** duplicate buffer logic.
+- `createCliE2ePluginTasks` becomes: **singleton session**, `cy.task` names, Doughnut **startup marker string**, **timeouts**, OAuth attach, install bundle — **no** duplicate buffer logic (error snapshots use staging via page-object path, not plugin `PREVIEW_LEN`).
 
 **Suggested naming (maps to target API):**
 
@@ -160,9 +160,9 @@ Pick one behavior in **sub-phase 1.4** and keep it **test-only / diagnostic** so
 
 - [x] `tty-assert-staging/` contains **no** imports from `cypress`, `e2e_test/start`, or Doughnut product packages. *(1.1)*
 - [x] `createCliE2ePluginTasks` is **obviously** glue: tasks + Doughnut env + OAuth + install paths. *(1.3)*
-- [ ] `outputAssertions` domain heuristics remain **local** and documented if still mixed with generic formatting.
+- [x] `outputAssertions` domain heuristics remain **local** and documented (module header: generic vs Doughnut-specific). *(1.2)*
 - [x] Target API table (above) updated if names changed during implementation. *(1.4)*
-- [ ] Update [`cli-terminal-test-library-extraction.md`](./cli-terminal-test-library-extraction.md) Phase 1 bullet to point at this file and mark Phase 1 done when appropriate.
+- [x] [`cli-terminal-test-library-extraction.md`](./cli-terminal-test-library-extraction.md) Phase 1 updated to point at this file and mark Phase 1 complete.
 
 ---
 

@@ -6,6 +6,14 @@
  * ANSI-stripped snapshot of the buffer, and a Cypress screenshot on the final
  * failure path where this module throws.
  *
+ * **Generic (imported):** `tty-assert-staging/errorSnapshotFormatting` (truncation, safe visible text
+ * for errors), `stripAnsi`, `ptyTranscriptToVisiblePlaintext`; plus `extractCurrentGuidanceFromReplayedPlaintext`
+ * from `cliPtyCurrentGuidanceFromReplay` (Ink-shaped guidance region — Doughnut-specific heuristic, not Cypress).
+ *
+ * **Doughnut-specific (this file):** non-interactive vs PTY sniffing (`stdoutLooksLikeInteractiveCliPtyCapture`,
+ * recall-hint substrings), past user gray-background SGR checks, guidance assertion copy, `cy.task` reads,
+ * retry timing, and screenshot names.
+ *
  * Surfaces:
  * - **Non-interactive**: one-shot stdout from installed `version` / `update` (alias `@doughnutOutput`).
  * - **Interactive PTY**: live buffer from plugin task `cliInteractivePtyGetBuffer` (`interactiveCliPtySession`).
