@@ -377,7 +377,7 @@ Because the CLI is message-based and stage-based, define a clear distinction bet
 - current stage-specific state
 - transient async operation state
 
-**Current direction (interactive):** session history is **one** append-only Ink `<Static>` region above the live prompt column. Shell transcript items and recall-specific scrollback rows share that list; stages append through a small shared context rather than mounting a second `<Static>`. Boundaries (generic scrollback vs domain row components): `ongoing/cli-session-scrollback.md`.
+**Current direction (interactive):** session history is **one** append-only Ink `<Static>` region above the live prompt column. Shell transcript items and recall-specific scrollback rows share that list; stages append through a small shared context rather than mounting a second `<Static>`. Boundaries: `.cursor/rules/cli.mdc` (session scrollback bullet) and `cli/src/sessionScrollback/`.
 
 The separation above should stay visible as the CLI grows.
 

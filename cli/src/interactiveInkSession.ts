@@ -5,7 +5,13 @@ import { exitCliError } from './cliExit.js'
 import { InteractiveCliApp } from './InteractiveCliApp.js'
 import { formatInteractiveWelcomeBanner } from './welcomeBanner.js'
 
-/** Wires Node stdin/stdout to Ink; domain flows live in stages / InteractiveCliApp. */
+/**
+ * Interactive TTY entry: real terminal I/O stops here and hands off to Ink.
+ *
+ * Injectable `stdin` / `stdout` keep this module the narrow infrastructure edge
+ * (tests pass mock streams; no Doughnut domain logic). Behavior and stages live
+ * in `InteractiveCliApp` and `commands/`.
+ */
 export async function runInteractive(
   stdin: Readable & { isTTY?: boolean } = process.stdin,
   stdout: NodeJS.WriteStream = process.stdout

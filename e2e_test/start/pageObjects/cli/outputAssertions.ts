@@ -1,8 +1,14 @@
 /**
- * Cucumber assertions on CLI output.
+ * Hub for Cypress assertions on **terminal-visible** CLI output.
  *
- * - **Non-interactive**: one-shot CLI output (installed `version` / `update` spawns) via `@doughnutOutput`.
- * - **Interactive PTY**: transcript from plugin task `cliInteractivePtyGetBuffer` (session in `interactiveCliPtySession`).
+ * Add new checks here (or in `cliPtyTerminalReplay` / `cliPtyAnsi` helpers) so
+ * failures stay consistent: bounded retries, then an error that includes an
+ * ANSI-stripped snapshot of the buffer, and a Cypress screenshot on the final
+ * failure path where this module throws.
+ *
+ * Surfaces:
+ * - **Non-interactive**: one-shot stdout from installed `version` / `update` (alias `@doughnutOutput`).
+ * - **Interactive PTY**: live buffer from plugin task `cliInteractivePtyGetBuffer` (`interactiveCliPtySession`).
  */
 import {
   extractCurrentGuidanceFromReplayedPlaintext,

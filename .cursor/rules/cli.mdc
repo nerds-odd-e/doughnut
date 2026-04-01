@@ -11,7 +11,7 @@ TypeScript CLI for Doughnut. Lives in `cli/`.
 
 ```
 cli/
-  src/                 # Production code: `main`/`run`, `nonInteractiveCli`, `interactiveInkSession` + Ink app, `commands/`
+  src/                 # Production code: `main`/`run`, `nonInteractiveCli`, `interactiveInkSession` (TTY → Ink edge), Ink app, `commands/`
   src/commonUIComponents/  # Context-neutral Ink UI reused across stages and the main prompt (borders, guidance lists, y/n, past user block, stage key context)
   src/sessionScrollback/  # One Ink `<Static>` session history above the live column; transcript factories + recall answered rows; append context for stages
   src/commands/        # Slash-command and subcommand implementations + aggregated help
@@ -42,7 +42,13 @@ The architecture roadmap is at `ongoing/cli-architecture-roadmap.md`.
 
 It is a guideline for growing the architecture, not a direct implementation checklist. Apply it when a feature needs it; challenge the fit first. Update it as decisions land and refine the forward-looking parts as understanding changes.
 
-**Session scrollback (interactive)** — Past session lines use **one** Ink `<Static>` (append-only) above the live column (stage + `MainInteractivePrompt`). Generic `SessionScrollback` stays domain-agnostic; shell transcript shapes live in `interactiveCliTranscript.tsx`; recall “answered” outcomes use `recallAnsweredScrollback.tsx`; stages append via `sessionScrollbackAppendContext`. Boundaries and optional follow-ups: `ongoing/cli-session-scrollback.md`.
+**Session scrollback (interactive)** — Past session lines use **one** Ink `<Static>` (append-only) above the live column (stage + `MainInteractivePrompt`). Generic `SessionScrollback` stays domain-agnostic; shell transcript shapes live in `interactiveCliTranscript.tsx`; recall “answered” outcomes use `recallAnsweredScrollback.tsx`; stages append via `sessionScrollbackAppendContext`.
+
+**Interactive TTY boundary** — `interactiveInkSession.ts` only checks TTY, prints the welcome banner, and calls Ink `render` with injectable `stdin`/`stdout`. Domain behavior stays in `InteractiveCliApp` and `commands/`.
+
+**User-visible slash-command errors** — Map failures to assistant text with `userVisibleSlashCommandError` (see `cli/tests/userVisibleSlashCommandError.test.ts`). Red past-assistant blocks use `pastAssistantErrorBlock.tsx` for committed transcript lines.
+
+**Stage keyboard routing** — `SetStageKeyHandlerContext` (`stageKeyForwardContext.tsx`): the shell registers one handler so Esc and other stage keys are handled without competing Ink `useInput` instances; stages that need it install via context (e.g. `AsyncAssistantFetchStage`).
 
 ## Terminal column width (TTY layout)
 
@@ -83,7 +89,7 @@ Vocabulary for Cucumber steps and page objects (`e2e_test/start/pageObjects/cli/
 
 ## CLI E2E
 
-Features: **`e2e_test/features/cli/`**. Steps and page objects: **`e2e_test/step_definitions/cli.ts`**, **`e2e_test/start/pageObjects/cli/`**.
+Features: **`e2e_test/features/cli/`**. Steps: **`e2e_test/step_definitions/cli.ts`** (thin glue only). Page objects and terminal assertions: **`e2e_test/start/pageObjects/cli/`**, especially **`outputAssertions.ts`** — put new “what appears in the terminal?” checks there (retries, ANSI-stripped snapshot text on failure, screenshot on the final throw path).
 
 - **Run:** Cypress Node tasks spawn `cli/dist/doughnut-cli.bundle.mjs` via `node` (same locally and in GitHub Actions). Before spawn, `ensureCliBundleFresh` rebuilds the bundle when `cli/src`, `cli/package.json`, `cli/tsconfig.json`, or `packages/doughnut-api/src` are newer than the bundle. Set **`DOUGHNUT_CLI_E2E_USE_TSX=1`** to force `pnpm -C cli exec tsx src/index.ts` for debugging. Installation scenarios use the E2E install bundle path (see `@bundleCliE2eInstall`).
 - **`@bundleCliE2eInstall`:** Builds `cli/dist/e2e-install-doughnut-cli.bundle.mjs` before each scenario and removes it after; the local LB (`scripts/local-lb.mjs`) serves `/doughnut-cli-latest/doughnut` from that file when present so install tests do not overwrite `cli/dist/doughnut-cli.bundle.mjs`.
