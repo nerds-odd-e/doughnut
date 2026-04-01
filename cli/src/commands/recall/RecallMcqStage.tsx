@@ -1,7 +1,6 @@
 import {
   useCallback,
   useContext,
-  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -31,6 +30,10 @@ import {
   runDefaultBackendJson,
 } from '../../backendApi/doughnutBackendClient.js'
 import { SetStageKeyHandlerContext } from '../../commonUIComponents/stageKeyForwardContext.js'
+import {
+  TimedToastInk,
+  useTimedToastInk,
+} from '../../commonUIComponents/timedToastInk.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import { numberedMcqMarkdownLinesForTerminal } from './numberedMcqMarkdownLines.js'
@@ -162,8 +165,6 @@ export async function submitMcqAnswer(
 const MCQ_HINT =
   '↑↓ Enter or number to select; Esc asks to leave recall (y/n confirm)'
 
-const INVALID_SELECT_LIST_HINT_MS = 5000
-
 function mcqInvalidChoiceHintMessage(choiceCount: number): string {
   return `Not a valid choice. Enter 1–${choiceCount}, use ↑↓, or /contest.`
 }
@@ -195,28 +196,7 @@ export function RecallMcqStage({
   const bufferRef = useRef('')
   const [highlightIndex, setHighlightIndex] = useState(0)
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
-  const [invalidChoiceHint, setInvalidChoiceHint] = useState<string | null>(
-    null
-  )
-  const invalidHintTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null
-  )
-
-  const clearInvalidHint = useCallback(() => {
-    if (invalidHintTimeoutRef.current !== null) {
-      clearTimeout(invalidHintTimeoutRef.current)
-      invalidHintTimeoutRef.current = null
-    }
-    setInvalidChoiceHint(null)
-  }, [])
-
-  useEffect(() => {
-    return () => {
-      if (invalidHintTimeoutRef.current !== null) {
-        clearTimeout(invalidHintTimeoutRef.current)
-      }
-    }
-  }, [])
+  const { message: toastMessage, showToast, clearToast } = useTimedToastInk()
 
   const width = resolvedTerminalWidth()
   const stemLines = useMemo(
@@ -325,7 +305,7 @@ export function RecallMcqStage({
       if (inputBlockedRef.current) return
 
       const clearDraft = () => {
-        clearInvalidHint()
+        clearToast()
         bufferRef.current = ''
         setBuffer('')
       }
@@ -343,7 +323,7 @@ export function RecallMcqStage({
         'signal-escape',
         {
           onSetHighlightIndex: (index) => {
-            clearInvalidHint()
+            clearToast()
             setHighlightIndex(index)
           },
           onSubmitHighlightIndex: (index) => {
@@ -365,20 +345,13 @@ export function RecallMcqStage({
             runSubmit(idx).catch(() => undefined)
           },
           onInvalidSelectListSubmitLine: () => {
-            if (invalidHintTimeoutRef.current !== null) {
-              clearTimeout(invalidHintTimeoutRef.current)
-            }
-            setInvalidChoiceHint(mcqInvalidChoiceHintMessage(choices.length))
-            invalidHintTimeoutRef.current = setTimeout(() => {
-              invalidHintTimeoutRef.current = null
-              setInvalidChoiceHint(null)
-            }, INVALID_SELECT_LIST_HINT_MS)
+            showToast(mcqInvalidChoiceHintMessage(choices.length))
           },
           onEscapeSignaled: () => {
             setShowLeaveConfirm(true)
           },
           onEditBackspace: () => {
-            clearInvalidHint()
+            clearToast()
             const cur = bufferRef.current
             if (cur.length === 0) return
             const next = cur.slice(0, -1)
@@ -386,7 +359,7 @@ export function RecallMcqStage({
             setBuffer(next)
           },
           onEditChar: (char) => {
-            clearInvalidHint()
+            clearToast()
             const next = bufferRef.current + char
             bufferRef.current = next
             setBuffer(next)
@@ -396,11 +369,12 @@ export function RecallMcqStage({
     },
     [
       choices.length,
-      clearInvalidHint,
+      clearToast,
       highlightIndex,
       inputBlockedRef,
       runContest,
       runSubmit,
+      showToast,
     ]
   )
 
@@ -476,9 +450,7 @@ export function RecallMcqStage({
           highlightItemIndex={highlightIndex}
           rowBudget={choicesGuidanceRowBudget}
         />
-        {invalidChoiceHint !== null ? (
-          <Text color="yellow">{invalidChoiceHint}</Text>
-        ) : null}
+        <TimedToastInk message={toastMessage} />
       </Box>
     </Box>
   )
