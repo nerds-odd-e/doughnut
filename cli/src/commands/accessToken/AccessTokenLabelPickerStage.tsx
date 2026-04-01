@@ -10,13 +10,13 @@ import {
 import type { Key } from 'ink'
 import { Box, Text, useInput, useStdout } from 'ink'
 import { handleSelectListInkKey } from '../../interactions/selectListInteraction.js'
-import { GuidanceListInk } from '../../guidanceListWindowInk.js'
+import { GuidanceListInk } from '../../commonUIComponents/guidanceListWindowInk.js'
 import {
   inkTerminalColumns,
   numberedTerminalListLines,
 } from '../../terminalColumns.js'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
-import { SetStageKeyHandlerContext } from './stageKeyForwardContext.js'
+import { SetStageKeyHandlerContext } from '../../commonUIComponents/stageKeyForwardContext.js'
 
 /** Same short copy as list picker / user abort patterns. */
 const PICKER_ABORTED_MESSAGE = 'Cancelled.'

@@ -10,7 +10,7 @@ import { Box, useInput } from 'ink'
 import { Spinner } from '@inkjs/ui'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
-import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext.js'
+import { SetStageKeyHandlerContext } from '../../commonUIComponents/stageKeyForwardContext.js'
 
 type AsyncAssistantFetchStageProps = Pick<
   InteractiveSlashCommandStageProps,

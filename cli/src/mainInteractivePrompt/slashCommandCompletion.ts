@@ -1,6 +1,6 @@
 /**
  * Pure slash-command completion: filtering, guidance display, tab completion,
- * and arrow highlight cycling. List window UI lives in guidanceListWindowInk.tsx.
+ * and arrow highlight cycling. List window UI lives in commonUIComponents/guidanceListWindowInk.tsx.
  * Used by MainInteractivePrompt in this folder.
  */
 

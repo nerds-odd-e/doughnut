@@ -10,12 +10,12 @@ import {
   SLASH_GUIDANCE_USAGE_COL_CAP,
   padSlashListUsageColumn,
   slashGuidanceUsageColumnWidth,
-} from './mainInteractivePrompt/slashCommandCompletion.js'
+} from '../mainInteractivePrompt/slashCommandCompletion.js'
 import {
   inkTerminalColumns,
   truncateToTerminalColumns,
   type NumberedTerminalListLine,
-} from './terminalColumns.js'
+} from '../terminalColumns.js'
 
 const GUIDANCE_MORE_ABOVE_LABEL = '↑ more above'
 const GUIDANCE_MORE_BELOW_LABEL = '↓ more below'

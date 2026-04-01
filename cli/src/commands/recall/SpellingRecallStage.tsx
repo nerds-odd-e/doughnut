@@ -18,7 +18,7 @@ import {
   RecallPromptController,
   type RecallPrompt,
 } from 'doughnut-api'
-import { BorderedSingleLinePromptInputInk } from '../../borderedSingleLinePromptInputInk.js'
+import { BorderedSingleLinePromptInputInk } from '../../commonUIComponents/borderedSingleLinePromptInputInk.js'
 import { renderMarkdownToTerminal } from '../../markdown.js'
 import {
   inkTerminalColumns,
@@ -28,7 +28,7 @@ import {
   doughnutSdkOptions,
   runDefaultBackendJson,
 } from '../../backendApi/doughnutBackendClient.js'
-import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext.js'
+import { SetStageKeyHandlerContext } from '../../commonUIComponents/stageKeyForwardContext.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import { normalizeSpellingLineForSubmit } from './spellingAnswerLine.js'

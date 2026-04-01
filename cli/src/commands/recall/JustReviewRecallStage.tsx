@@ -13,7 +13,7 @@ import {
 } from '../../backendApi/doughnutBackendClient.js'
 import { renderMarkdownToTerminal } from '../../markdown.js'
 import { resolvedTerminalWidth } from '../../terminalColumns.js'
-import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
+import { YesNoStagePrompt } from '../../commonUIComponents/YesNoStagePrompt.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import type { RecallJustReviewPayload } from './nextRecallCardLoad.js'

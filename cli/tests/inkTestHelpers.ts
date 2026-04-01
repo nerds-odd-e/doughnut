@@ -8,8 +8,8 @@ import {
 } from 'react'
 import type { Key } from 'ink'
 import { Box, useInput } from 'ink'
-import type { StageKeyHandler } from '../src/commands/accessToken/stageKeyForwardContext.js'
-import { SetStageKeyHandlerContext } from '../src/commands/accessToken/stageKeyForwardContext.js'
+import type { StageKeyHandler } from '../src/commonUIComponents/stageKeyForwardContext.js'
+import { SetStageKeyHandlerContext } from '../src/commonUIComponents/stageKeyForwardContext.js'
 
 export function stripAnsi(s: string): string {
   const esc = String.fromCharCode(0x1b)

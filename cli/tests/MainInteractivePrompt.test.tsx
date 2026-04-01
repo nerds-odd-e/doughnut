@@ -7,7 +7,7 @@ import { MainInteractivePrompt } from '../src/mainInteractivePrompt/index.js'
 import { USER_INPUT_HISTORY_FILENAME } from '../src/mainInteractivePrompt/userInputHistoryFile.js'
 import { stripAnsi, waitForFrames } from './inkTestHelpers.js'
 
-/** Expected scroll UI copy (private in guidanceListWindowInk). */
+/** Expected scroll UI copy (private in commonUIComponents/guidanceListWindowInk). */
 const EXPECT_GUIDANCE_MORE_BELOW = '↓ more below'
 const EXPECT_GUIDANCE_ROW_BUDGET = 5
 

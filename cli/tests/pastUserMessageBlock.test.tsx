@@ -1,6 +1,6 @@
 import { render } from 'ink-testing-library'
 import { describe, expect, test } from 'vitest'
-import { PastUserMessageBlock } from '../src/pastUserMessageBlock.js'
+import { PastUserMessageBlock } from '../src/commonUIComponents/pastUserMessageBlock.js'
 import { stripAnsi } from './inkTestHelpers.js'
 
 describe('PastUserMessageBlock', () => {

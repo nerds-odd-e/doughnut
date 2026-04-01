@@ -15,8 +15,8 @@ import {
   saveUserInputHistory,
 } from './userInputHistoryFile.js'
 import { cycleListSelectionIndex } from '../interactions/selectListInteraction.js'
-import { BorderedSingleLinePromptInputInk } from '../borderedSingleLinePromptInputInk.js'
-import { GuidanceListInk } from '../guidanceListWindowInk.js'
+import { BorderedSingleLinePromptInputInk } from '../commonUIComponents/borderedSingleLinePromptInputInk.js'
+import { GuidanceListInk } from '../commonUIComponents/guidanceListWindowInk.js'
 import {
   DEFAULT_INTERACTIVE_GUIDANCE,
   effectiveSlashGuidance,

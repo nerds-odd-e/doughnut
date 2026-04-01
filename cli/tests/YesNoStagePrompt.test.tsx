@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { render } from 'ink-testing-library'
 import { describe, expect, test, vi } from 'vitest'
-import { YesNoStagePrompt } from '../src/YesNoStagePrompt.js'
+import { YesNoStagePrompt } from '../src/commonUIComponents/YesNoStagePrompt.js'
 import {
   renderInkWhenCommandLineReady,
   StageKeyRoot,

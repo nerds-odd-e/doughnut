@@ -14,8 +14,8 @@ import { resolveInteractiveSlashCommand } from './commands/interactiveSlashComma
 import type { InteractiveSlashCommandStageProps } from './commands/interactiveSlashCommand.js'
 import { formatVersionOutput } from './commands/version.js'
 import { userVisibleSlashCommandError } from './userVisibleSlashCommandError.js'
-import type { StageKeyHandler } from './commands/accessToken/stageKeyForwardContext.js'
-import { SetStageKeyHandlerContext } from './commands/accessToken/stageKeyForwardContext.js'
+import type { StageKeyHandler } from './commonUIComponents/stageKeyForwardContext.js'
+import { SetStageKeyHandlerContext } from './commonUIComponents/stageKeyForwardContext.js'
 import {
   transcriptAssistantText,
   transcriptUserLine,

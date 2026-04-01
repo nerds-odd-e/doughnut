@@ -12,8 +12,8 @@ import type { Key } from 'ink'
 import { Box, Text, useInput } from 'ink'
 import { Spinner } from '@inkjs/ui'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
-import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext.js'
-import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
+import { SetStageKeyHandlerContext } from '../../commonUIComponents/stageKeyForwardContext.js'
+import { YesNoStagePrompt } from '../../commonUIComponents/YesNoStagePrompt.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import {
   loadNextRecallCardIfAny,

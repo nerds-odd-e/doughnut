@@ -20,8 +20,8 @@ import {
   choiceIndexFromSelectListSubmitLine,
   handleSelectListInkKey,
 } from '../../interactions/selectListInteraction.js'
-import { BorderedSingleLinePromptInputInk } from '../../borderedSingleLinePromptInputInk.js'
-import { GuidanceListInk } from '../../guidanceListWindowInk.js'
+import { BorderedSingleLinePromptInputInk } from '../../commonUIComponents/borderedSingleLinePromptInputInk.js'
+import { GuidanceListInk } from '../../commonUIComponents/guidanceListWindowInk.js'
 import {
   inkTerminalColumns,
   resolvedTerminalWidth,
@@ -30,7 +30,7 @@ import {
   doughnutSdkOptions,
   runDefaultBackendJson,
 } from '../../backendApi/doughnutBackendClient.js'
-import { SetStageKeyHandlerContext } from '../accessToken/stageKeyForwardContext.js'
+import { SetStageKeyHandlerContext } from '../../commonUIComponents/stageKeyForwardContext.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import { numberedMcqMarkdownLinesForTerminal } from './numberedMcqMarkdownLines.js'

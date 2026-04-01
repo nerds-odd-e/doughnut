@@ -1,6 +1,6 @@
 import stringWidth from 'string-width'
 import { Box, Text } from 'ink'
-import { truncateToTerminalColumns } from './terminalColumns.js'
+import { truncateToTerminalColumns } from '../terminalColumns.js'
 
 const BORDER_HORIZONTAL_COLS = 2
 const CARET_DISPLAY_COLS = 1

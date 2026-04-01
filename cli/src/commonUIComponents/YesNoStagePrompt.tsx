@@ -9,7 +9,7 @@ import {
 } from 'react'
 import type { Key } from 'ink'
 import { Box, Text, useInput } from 'ink'
-import { SetStageKeyHandlerContext } from './commands/accessToken/stageKeyForwardContext.js'
+import { SetStageKeyHandlerContext } from './stageKeyForwardContext.js'
 
 function normalizeCommittedLine(s: string): string {
   return s.replace(/\r\n/g, ' ').replace(/\n/g, ' ').trim()

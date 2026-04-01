@@ -1,5 +1,5 @@
 import type { MutableRefObject, ReactNode } from 'react'
-import { YesNoStagePrompt } from '../../YesNoStagePrompt.js'
+import { YesNoStagePrompt } from '../../commonUIComponents/YesNoStagePrompt.js'
 import { LEAVE_RECALL_PROMPT } from './leaveRecallSessionCopy.js'
 
 export function LeaveRecallConfirmPrompt({

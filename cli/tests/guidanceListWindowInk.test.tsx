@@ -4,7 +4,7 @@ import { describe, expect, test } from 'vitest'
 import {
   GuidanceListInk,
   type GuidanceListInkProps,
-} from '../src/guidanceListWindowInk.js'
+} from '../src/commonUIComponents/guidanceListWindowInk.js'
 import { stripAnsi } from './inkTestHelpers.js'
 
 const MORE_ABOVE = '↑ more above'

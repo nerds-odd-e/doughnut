@@ -1,5 +1,5 @@
 import { Box, Text } from 'ink'
-import { PastUserMessageBlock } from '../pastUserMessageBlock.js'
+import { PastUserMessageBlock } from '../commonUIComponents/pastUserMessageBlock.js'
 import type { SessionScrollbackItem } from './SessionScrollback.js'
 
 export function transcriptUserLine(text: string): SessionScrollbackItem {

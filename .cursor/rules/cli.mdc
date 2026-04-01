@@ -12,6 +12,7 @@ TypeScript CLI for Doughnut. Lives in `cli/`.
 ```
 cli/
   src/                 # Production code: `main`/`run`, `nonInteractiveCli`, `interactiveInkSession` + Ink app, `commands/`
+  src/commonUIComponents/  # Context-neutral Ink UI reused across stages and the main prompt (borders, guidance lists, y/n, past user block, stage key context)
   src/sessionScrollback/  # One Ink `<Static>` session history above the live column; transcript factories + recall answered rows; append context for stages
   src/commands/        # Slash-command and subcommand implementations + aggregated help
   src/shims/           # Modules referenced only from the esbuild `bundle` script (aliases)

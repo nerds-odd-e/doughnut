@@ -1,6 +1,6 @@
 import { render } from 'ink-testing-library'
 import { describe, expect, test } from 'vitest'
-import { BorderedSingleLinePromptInputInk } from '../src/borderedSingleLinePromptInputInk.js'
+import { BorderedSingleLinePromptInputInk } from '../src/commonUIComponents/borderedSingleLinePromptInputInk.js'
 import { stripAnsi } from './inkTestHelpers.js'
 
 const MCQ_HINT =
