@@ -327,7 +327,7 @@ describe('MainInteractivePrompt caret and slash arrows (phase 3)', () => {
           rawLineIncludesBoldMarker(
             r,
             'Show how many notes are due for recall today'
-          ) && lineWithMainPrompt(r).includes('/r\x1b[7m')
+          ) && mainPromptDraftAfterArrow(stripAnsi(r)) === '/re'
       )
     } catch (err) {
       throw new Error(
@@ -345,8 +345,8 @@ describe('MainInteractivePrompt caret and slash arrows (phase 3)', () => {
       'When the slash completion list is open, Up must cycle the highlighted command immediately (wrap from first row to last), not leave the default first-row highlight.'
     ).toBe(true)
     expect(
-      lineWithMainPrompt(raw).includes('/r\x1b[7m'),
-      'When the slash completion list is open, Up must not act like history “home” (caret to column 0); the caret should stay between /r and e.'
+      mainPromptDraftAfterArrow(stripAnsi(raw)) === '/re',
+      'When the slash completion list is open, Up must not act like history “home” (caret to column 0); the draft should stay /re with the caret before e.'
     ).toBe(true)
   })
 })

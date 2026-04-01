@@ -93,7 +93,7 @@ describe('recall just-review (interactive)', () => {
     stdin.write('\x7f')
     await untilLastFrame(
       frames,
-      (f) => f.includes('> ') && !f.includes(rejectedInBuffer)
+      (f) => f.includes('>') && !f.includes(rejectedInBuffer)
     )
   }
 

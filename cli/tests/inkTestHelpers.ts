@@ -102,8 +102,8 @@ export async function renderInkWhenCommandLineReady(element: ReactElement) {
   await waitForLastFrame(
     result.lastFrame,
     (f) =>
-      (f.includes('→ ') && !f.includes('→ |')) ||
-      (f.includes('> ') && !f.includes('> |'))
+      (f.includes('→') && !f.includes('→ |')) ||
+      (f.includes('>') && !f.includes('> |'))
   )
   return result
 }

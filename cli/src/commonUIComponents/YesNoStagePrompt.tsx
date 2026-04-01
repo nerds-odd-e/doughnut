@@ -7,9 +7,13 @@ import {
   type MutableRefObject,
   type ReactNode,
 } from 'react'
-import type { Key } from 'ink'
-import { Box, Text, useInput } from 'ink'
+import type { DOMElement, Key } from 'ink'
+import { Box, Text, useCursor, useInput } from 'ink'
+import stringWidth from 'string-width'
+import { getAbsoluteContentPosition } from '../inkAbsoluteContentPosition.js'
 import { SetStageKeyHandlerContext } from './stageKeyForwardContext.js'
+
+const YES_NO_LINE_PREFIX = '> '
 
 function normalizeCommittedLine(s: string): string {
   return s.replace(/\r\n/g, ' ').replace(/\n/g, ' ').trim()
@@ -52,6 +56,12 @@ export function YesNoStagePrompt({
   const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
   const [buffer, setBuffer] = useState('')
   const bufferRef = useRef('')
+  const lineOriginRef = useRef<DOMElement | null>(null)
+  const [lineOrigin, setLineOrigin] = useState<{
+    x: number
+    y: number
+  } | null>(null)
+  const { setCursorPosition } = useCursor()
 
   const onAnswerRef = useRef(onAnswer)
   onAnswerRef.current = onAnswer
@@ -128,18 +138,34 @@ export function YesNoStagePrompt({
     }
   }, [setStageKeyHandler, handleInput])
 
+  useLayoutEffect(() => {
+    const el = lineOriginRef.current
+    if (!el) return
+    setLineOrigin(getAbsoluteContentPosition(el) ?? null)
+  }, [buffer, header, belowBuffer, prompt, defaultAnswer])
+
   useInput(handleInput, {
     isActive: setStageKeyHandler === undefined,
   })
 
+  if (lineOrigin) {
+    setCursorPosition({
+      x: lineOrigin.x + stringWidth(YES_NO_LINE_PREFIX + buffer),
+      y: lineOrigin.y,
+    })
+  } else {
+    setCursorPosition(undefined)
+  }
+
   return (
     <Box flexDirection="column">
       {header}
-      <Text>
-        {'> '}
-        {buffer}
-        <Text inverse> </Text>
-      </Text>
+      <Box ref={lineOriginRef}>
+        <Text>
+          {YES_NO_LINE_PREFIX}
+          {buffer}
+        </Text>
+      </Box>
       {belowBuffer}
       <Text>
         {prompt} {yesNoHint(defaultAnswer)}

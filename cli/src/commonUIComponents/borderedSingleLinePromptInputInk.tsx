@@ -1,5 +1,8 @@
 import stringWidth from 'string-width'
-import { Box, Text } from 'ink'
+import type { DOMElement } from 'ink'
+import { Box, Text, useCursor } from 'ink'
+import { useLayoutEffect, useRef, useState } from 'react'
+import { getAbsoluteContentPosition } from '../inkAbsoluteContentPosition.js'
 import { truncateToTerminalColumns } from '../terminalColumns.js'
 
 const BORDER_HORIZONTAL_COLS = 2
@@ -32,24 +35,47 @@ export function BorderedSingleLinePromptInputInk({
   readonly placeholder: string
   readonly leadingPrefix?: string
 }) {
-  const beforeCaret = buffer.slice(0, caretOffset)
-  const afterCaret = buffer.slice(caretOffset)
+  const contentOriginRef = useRef<DOMElement | null>(null)
+  const [contentOrigin, setContentOrigin] = useState<{
+    x: number
+    y: number
+  } | null>(null)
+  const { setCursorPosition } = useCursor()
+
   const placeholderText =
     buffer === ''
       ? displayedPlaceholder(placeholder, terminalColumns, leadingPrefix)
       : ''
 
+  useLayoutEffect(() => {
+    const el = contentOriginRef.current
+    if (!el) return
+    const p = getAbsoluteContentPosition(el)
+    setContentOrigin(p ?? null)
+  }, [terminalColumns, buffer, placeholder, leadingPrefix])
+
+  if (contentOrigin) {
+    setCursorPosition({
+      x:
+        contentOrigin.x +
+        stringWidth(leadingPrefix + buffer.slice(0, caretOffset)),
+      y: contentOrigin.y,
+    })
+  } else {
+    setCursorPosition(undefined)
+  }
+
   return (
     <Box width={terminalColumns} borderStyle="single" borderColor="white">
-      <Text>
-        {leadingPrefix}
-        {beforeCaret}
-        <Text inverse> </Text>
-        {afterCaret}
-        {placeholderText !== '' ? (
-          <Text color="gray">{placeholderText}</Text>
-        ) : null}
-      </Text>
+      <Box ref={contentOriginRef}>
+        <Text>
+          {leadingPrefix}
+          {buffer}
+          {placeholderText !== '' ? (
+            <Text color="gray">{placeholderText}</Text>
+          ) : null}
+        </Text>
+      </Box>
     </Box>
   )
 }

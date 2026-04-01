@@ -254,10 +254,10 @@ describe('YesNoStagePrompt', () => {
     expect(onAnswer).not.toHaveBeenCalled()
 
     stdin.write('\x7f')
-    await waitForLastFrame(
-      lastFrame,
-      (f) => stripAnsi(f).includes('> ') && !stripAnsi(f).includes('> x')
-    )
+    await waitForLastFrame(lastFrame, (f) => {
+      const p = stripAnsi(f)
+      return p.includes('>') && !p.includes('> x') && !p.includes('>x')
+    })
 
     stdin.write('y\r')
     await waitForFrames(
