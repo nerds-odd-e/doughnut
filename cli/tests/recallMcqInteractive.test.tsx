@@ -164,24 +164,12 @@ describe('recall MCQ (interactive)', () => {
   })
 
   test('wrong MCQ choice shows Incorrect and sends 0-based choiceIndex to API', async () => {
-    let recallingAfterWrong = 0
-    recallingSpy.mockImplementation(() => {
-      recallingAfterWrong += 1
-      const empty = makeMe.aDueMemoryTrackersList
+    recallingSpy.mockResolvedValue({
+      data: makeMe.aDueMemoryTrackersList
         .totalAssimilatedCount(0)
-        .toRepeat([])
-        .please()
-      const data =
-        recallingAfterWrong === 1
-          ? makeMe.aDueMemoryTrackersList
-              .totalAssimilatedCount(0)
-              .toRepeat([{ memoryTrackerId: 1, spelling: false }])
-              .please()
-          : empty
-      return Promise.resolve({
-        data,
-      } as Awaited<ReturnType<typeof RecallsController.recalling>>)
-    })
+        .toRepeat([{ memoryTrackerId: 1, spelling: false }])
+        .please(),
+    } as Awaited<ReturnType<typeof RecallsController.recalling>>)
 
     const pending = pendingMcqPrompt()
     answerQuizSpy.mockResolvedValue({
@@ -238,24 +226,12 @@ describe('recall MCQ (interactive)', () => {
   })
 
   test('out-of-range MCQ number does not call answerQuiz; valid answer still works', async () => {
-    let recallingAfterWrong = 0
-    recallingSpy.mockImplementation(() => {
-      recallingAfterWrong += 1
-      const empty = makeMe.aDueMemoryTrackersList
+    recallingSpy.mockResolvedValue({
+      data: makeMe.aDueMemoryTrackersList
         .totalAssimilatedCount(0)
-        .toRepeat([])
-        .please()
-      const data =
-        recallingAfterWrong === 1
-          ? makeMe.aDueMemoryTrackersList
-              .totalAssimilatedCount(0)
-              .toRepeat([{ memoryTrackerId: 1, spelling: false }])
-              .please()
-          : empty
-      return Promise.resolve({
-        data,
-      } as Awaited<ReturnType<typeof RecallsController.recalling>>)
-    })
+        .toRepeat([{ memoryTrackerId: 1, spelling: false }])
+        .please(),
+    } as Awaited<ReturnType<typeof RecallsController.recalling>>)
 
     const pending = pendingMcqPrompt()
     answerQuizSpy.mockResolvedValue({
@@ -323,31 +299,15 @@ describe('recall MCQ (interactive)', () => {
       .updatedAt(baseNoteTimes.updatedAt)
       .please()
 
-    let recallingN = 0
-    recallingSpy.mockImplementation(() => {
-      recallingN += 1
-      const empty = makeMe.aDueMemoryTrackersList
+    recallingSpy.mockResolvedValue({
+      data: makeMe.aDueMemoryTrackersList
         .totalAssimilatedCount(0)
-        .toRepeat([])
-        .please()
-      const row1 = { memoryTrackerId: 1, spelling: false as const }
-      const row2 = { memoryTrackerId: 2, spelling: false as const }
-      const data =
-        recallingN === 1
-          ? makeMe.aDueMemoryTrackersList
-              .totalAssimilatedCount(0)
-              .toRepeat([row1])
-              .please()
-          : recallingN === 2
-            ? makeMe.aDueMemoryTrackersList
-                .totalAssimilatedCount(0)
-                .toRepeat([row2])
-                .please()
-            : empty
-      return Promise.resolve({
-        data,
-      } as Awaited<ReturnType<typeof RecallsController.recalling>>)
-    })
+        .toRepeat([
+          { memoryTrackerId: 1, spelling: false as const },
+          { memoryTrackerId: 2, spelling: false as const },
+        ])
+        .please(),
+    } as Awaited<ReturnType<typeof RecallsController.recalling>>)
 
     showMemoryTrackerSpy.mockImplementation((opts) => {
       const id = opts.path.memoryTracker
@@ -455,6 +415,7 @@ describe('recall MCQ (interactive)', () => {
     ).toBe(true)
 
     expect(answerQuizSpy).toHaveBeenCalledTimes(2)
+    expect(recallingSpy).toHaveBeenCalledTimes(1)
   })
 
   test('Esc from MCQ shows leave recall confirmation without calling answerQuiz', async () => {

@@ -174,19 +174,14 @@ describe('recall just-review (interactive)', () => {
   }
 
   function setupTwoDueJustReviewItemsMocks() {
-    let recallN = 0
     recallingSpy.mockImplementation(async () => {
-      recallN += 1
-      const trackers =
-        recallN === 1
-          ? [{ memoryTrackerId: 1, spelling: false }]
-          : recallN === 2
-            ? [{ memoryTrackerId: 2, spelling: false }]
-            : []
       return {
         data: makeMe.aDueMemoryTrackersList
           .totalAssimilatedCount(0)
-          .toRepeat(trackers)
+          .toRepeat([
+            { memoryTrackerId: 1, spelling: false },
+            { memoryTrackerId: 2, spelling: false },
+          ])
           .please(),
       } as Awaited<ReturnType<typeof RecallsController.recalling>>
     })
@@ -487,7 +482,47 @@ describe('recall just-review (interactive)', () => {
   })
 
   test('load more y with empty extended window after two recalls → Recalled 2 notes', async () => {
-    setupTwoDueJustReviewItemsMocks()
+    let recallingN = 0
+    recallingSpy.mockImplementation(
+      async (opts: Parameters<typeof RecallsController.recalling>[0]) => {
+        recallingN += 1
+        const due = opts.query.dueindays ?? 0
+        const trackers =
+          recallingN === 1 && due === 0
+            ? [
+                { memoryTrackerId: 1, spelling: false },
+                { memoryTrackerId: 2, spelling: false },
+              ]
+            : []
+        return {
+          data: makeMe.aDueMemoryTrackersList
+            .totalAssimilatedCount(0)
+            .toRepeat(trackers)
+            .please(),
+        } as Awaited<ReturnType<typeof RecallsController.recalling>>
+      }
+    )
+    showMemoryTrackerSpy.mockImplementation(
+      async (opts: { path: { memoryTracker: number } }) => {
+        const id = opts.path.memoryTracker
+        const title = id === 1 ? 'Alpha' : 'Beta'
+        const noteRealm = makeMe.aNoteRealm
+          .title(title)
+          .notebookTitle('NB')
+          .details('body')
+          .createdAt(baseNoteTimes.createdAt)
+          .updatedAt(baseNoteTimes.updatedAt)
+          .please()
+        return {
+          data: makeMe.aMemoryTracker
+            .nextRecallAt('2026-06-01T00:00:00Z')
+            .ofNote(noteRealm)
+            .please(),
+        } as Awaited<
+          ReturnType<typeof MemoryTrackerController.showMemoryTracker>
+        >
+      }
+    )
     const markAsRecalledCount = mockMarkAsRecalledCounting()
 
     const { stdin, frames } = await renderInkWhenCommandLineReady(
@@ -503,6 +538,7 @@ describe('recall just-review (interactive)', () => {
     stdin.write('y\r')
     await untilPlain(frames, (p) => p.includes('Recalled 2 notes'))
     expect(markAsRecalledCount.n).toBe(2)
+    expect(recallingSpy).toHaveBeenCalledTimes(2)
   })
 
   test('load more n does not call recalling with dueindays 3', async () => {
@@ -535,7 +571,7 @@ describe('recall just-review (interactive)', () => {
     stdin.write('n\r')
     await untilPlain(frames, (p) => p.includes('Recalled 1 note'))
 
-    expect(dueindaysSeen).toEqual([0, 0])
+    expect(dueindaysSeen).toEqual([0])
   })
 
   test('missing note title falls back to Note; empty details; no notebook line', async () => {
@@ -594,6 +630,82 @@ describe('recall just-review (interactive)', () => {
     stdin.write('n\r')
     await untilPlain(frames, (p) => p.includes('Recalled 2 notes'))
     expect(markAsRecalledCount.n).toBe(2)
+    expect(recallingSpy).toHaveBeenCalledTimes(1)
+  })
+
+  test('load more y shows first card in shuffled order for extended window', async () => {
+    const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
+    let recallingCall = 0
+    recallingSpy.mockImplementation(
+      async (opts: Parameters<typeof RecallsController.recalling>[0]) => {
+        recallingCall += 1
+        const due = opts.query.dueindays ?? 0
+        if (recallingCall === 1) {
+          expect(due).toBe(0)
+          return {
+            data: makeMe.aDueMemoryTrackersList
+              .totalAssimilatedCount(0)
+              .toRepeat([{ memoryTrackerId: 1, spelling: false }])
+              .please(),
+          } as Awaited<ReturnType<typeof RecallsController.recalling>>
+        }
+        expect(due).toBe(3)
+        return {
+          data: makeMe.aDueMemoryTrackersList
+            .totalAssimilatedCount(0)
+            .toRepeat([
+              { memoryTrackerId: 10, spelling: false },
+              { memoryTrackerId: 11, spelling: false },
+              { memoryTrackerId: 12, spelling: false },
+            ])
+            .please(),
+        } as Awaited<ReturnType<typeof RecallsController.recalling>>
+      }
+    )
+
+    mockMarkAsRecalledCounting()
+    showMemoryTrackerSpy.mockImplementation(
+      async (opts: { path: { memoryTracker: number } }) => {
+        const id = opts.path.memoryTracker
+        const title =
+          id === 1
+            ? 'Alpha'
+            : id === 11
+              ? 'FIRST_AFTER_SHUFFLE'
+              : `unexpected-${String(id)}`
+        const noteRealm = makeMe.aNoteRealm
+          .title(title)
+          .notebookTitle('NB')
+          .details('body')
+          .createdAt(baseNoteTimes.createdAt)
+          .updatedAt(baseNoteTimes.updatedAt)
+          .please()
+        return {
+          data: makeMe.aMemoryTracker
+            .nextRecallAt('2026-06-01T00:00:00Z')
+            .ofNote(noteRealm)
+            .please(),
+        } as Awaited<
+          ReturnType<typeof MemoryTrackerController.showMemoryTracker>
+        >
+      }
+    )
+
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    try {
+      startRecall(stdin)
+      await waitRememberAlpha(frames)
+      stdin.write('y\r')
+      await waitLoadMore(frames)
+      stdin.write('y\r')
+      await untilPlainHas(frames, ['Yes, I remember?', 'FIRST_AFTER_SHUFFLE'])
+      expect(recallingSpy).toHaveBeenCalledTimes(2)
+    } finally {
+      randomSpy.mockRestore()
+    }
   })
 
   test('Escape during initial load shows Cancelled when recalling honors signal', async () => {

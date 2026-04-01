@@ -11,6 +11,33 @@ import {
 } from '../../backendApi/doughnutBackendClient.js'
 import { dueRecallQuery } from './dueRecallQuery.js'
 
+function shuffleMemoryTrackerIds(ids: readonly number[]): number[] {
+  const a = [...ids]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    const t = a[i]!
+    a[i] = a[j]!
+    a[j] = t
+  }
+  return a
+}
+
+export async function fetchDueMemoryTrackerIds(
+  dueInDays: number,
+  randomizeOrder: boolean,
+  signal?: AbortSignal
+): Promise<number[]> {
+  const due = await runDefaultBackendJson<DueMemoryTrackers>(() =>
+    RecallsController.recalling({
+      query: dueRecallQuery(dueInDays),
+      ...doughnutSdkOptions(signal),
+    })
+  )
+  const trackers = due.toRepeat ?? []
+  const ids = trackers.map((t) => t.memoryTrackerId)
+  return randomizeOrder ? shuffleMemoryTrackerIds(ids) : ids
+}
+
 type NoteTopologyWalk = {
   readonly title?: string | null
   readonly notebookTitle?: string | null
@@ -152,26 +179,14 @@ export type RecallCard =
       readonly payload: SpellingRecallSessionPayload
     }
 
-/** Next due recall card (MCQ, just-review fallback, or spelling session), or `null` when nothing is due. */
-export async function loadNextRecallCardIfAny(
-  dueInDays = 0,
+/** Build one recall card for a known due memory tracker id (no `recalling` list fetch). */
+export async function loadRecallCardForMemoryTrackerId(
+  memoryTrackerId: number,
   signal?: AbortSignal
-): Promise<RecallCard | null> {
-  const due = await runDefaultBackendJson<DueMemoryTrackers>(() =>
-    RecallsController.recalling({
-      query: dueRecallQuery(dueInDays),
-      ...doughnutSdkOptions(signal),
-    })
-  )
-  const trackers = due.toRepeat ?? []
-  if (trackers.length === 0) return null
-  const first = trackers[0]!
-  const id = first.memoryTrackerId
-  if (id === undefined) return null
-
+): Promise<RecallCard> {
   const mt = await runDefaultBackendJson<MemoryTracker>(() =>
     MemoryTrackerController.showMemoryTracker({
-      path: { memoryTracker: id },
+      path: { memoryTracker: memoryTrackerId },
       ...doughnutSdkOptions(signal),
     })
   )
@@ -194,13 +209,13 @@ export async function loadNextRecallCardIfAny(
 
   const prompts = await runDefaultBackendJson<RecallPrompt[]>(() =>
     MemoryTrackerController.getRecallPrompts({
-      path: { memoryTracker: id },
+      path: { memoryTracker: memoryTrackerId },
       ...doughnutSdkOptions(signal),
     })
   )
 
   const mcqPayload = await tryLoadMcqPayload(
-    id,
+    memoryTrackerId,
     notebookTitle,
     prompts,
     reviewPayload.breadcrumbTitles,

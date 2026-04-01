@@ -16,7 +16,8 @@ import { SetStageKeyHandlerContext } from '../../commonUIComponents/stageKeyForw
 import { YesNoStagePrompt } from '../../commonUIComponents/YesNoStagePrompt.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import {
-  loadNextRecallCardIfAny,
+  fetchDueMemoryTrackerIds,
+  loadRecallCardForMemoryTrackerId,
   type RecallCard,
 } from './nextRecallCardLoad.js'
 import { JustReviewRecallStage } from './JustReviewRecallStage.js'
@@ -44,6 +45,7 @@ export function RecallSessionStage({
   const startedWithEmptyTodayRef = useRef(false)
   const activeOperationAbortRef = useRef<AbortController | null>(null)
   const currentRecallCardRef = useRef<RecallCard | null>(null)
+  const trackerQueueRef = useRef<number[]>([])
   currentRecallCardRef.current = card
 
   useEffect(() => {
@@ -52,10 +54,16 @@ export function RecallSessionStage({
     activeOperationAbortRef.current = ac
     ;(async () => {
       try {
-        const next = await loadNextRecallCardIfAny(0, ac.signal)
+        const ids = await fetchDueMemoryTrackerIds(0, false, ac.signal)
         if (unmounted || ac.signal.aborted) return
-        if (next !== null) {
+        trackerQueueRef.current = ids
+        if (ids.length > 0) {
           startedWithEmptyTodayRef.current = false
+          const next = await loadRecallCardForMemoryTrackerId(
+            ids[0]!,
+            ac.signal
+          )
+          if (unmounted || ac.signal.aborted) return
           setCard(next)
           setUiMode('card')
         } else {
@@ -105,8 +113,10 @@ export function RecallSessionStage({
         appendScrollbackItem(recallAnsweredScrollbackItem(row))
       }
       try {
-        const next = await loadNextRecallCardIfAny(0)
-        if (next !== null) {
+        trackerQueueRef.current.shift()
+        const head = trackerQueueRef.current[0]
+        if (head !== undefined) {
+          const next = await loadRecallCardForMemoryTrackerId(head)
           setCard(next)
           return
         }
@@ -130,11 +140,25 @@ export function RecallSessionStage({
       const ac = new AbortController()
       activeOperationAbortRef.current = ac
       try {
-        const next = await loadNextRecallCardIfAny(3, ac.signal)
-        submittingRef.current = false
+        const ids = await fetchDueMemoryTrackerIds(3, true, ac.signal)
         if (activeOperationAbortRef.current === ac) {
           activeOperationAbortRef.current = null
         }
+        if (ac.signal.aborted) {
+          submittingRef.current = false
+          onSettled(
+            userVisibleSlashCommandError(
+              new DOMException('Aborted', 'AbortError')
+            )
+          )
+          return
+        }
+        trackerQueueRef.current = ids
+        const next =
+          ids.length > 0
+            ? await loadRecallCardForMemoryTrackerId(ids[0]!, ac.signal)
+            : null
+        submittingRef.current = false
         if (ac.signal.aborted) {
           onSettled(
             userVisibleSlashCommandError(
