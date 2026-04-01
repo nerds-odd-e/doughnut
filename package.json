@@ -18,6 +18,8 @@
     "mcp-server:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server format",
     "test-fixtures:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C packages/doughnut-test-fixtures format",
     "test-fixtures:lint": "pnpm --frozen-lockfile --silent recursive install && pnpm -C packages/doughnut-test-fixtures lint",
+    "tty-assert:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C packages/tty-assert format",
+    "tty-assert:lint": "pnpm --frozen-lockfile --silent recursive install && pnpm -C packages/tty-assert lint",
     "cli": "pnpm --frozen-lockfile --silent recursive install && DOUGHNUT_API_BASE_URL=http://localhost:9081 DOUGHNUT_CONFIG_DIR=$HOME/.config/doughnut-dev pnpm -C cli exec tsx src/index.ts",
     "cli:bundle": "pnpm --frozen-lockfile --silent recursive install && pnpm -C cli bundle",
     "cli:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C cli format",
@@ -62,8 +64,8 @@
     "test:sut-healthcheck": "node --test scripts/sut-healthcheck.test.mjs",
     "test:sut-restart": "node --test scripts/sut-restart.test.mjs",
     "verify": "pnpm format:all && pnpm test",
-    "lint:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:lint && pnpm frontend:lint && pnpm cli:lint && pnpm test-fixtures:lint && pnpm cy:lint && pnpm test:path-routing && pnpm test:sut-healthcheck && pnpm test:sut-restart && pnpm validate:path-routing && pnpm openapi:lint",
-    "format:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:format && pnpm frontend:format && pnpm mcp-server:format && pnpm test-fixtures:format && pnpm cli:format && pnpm cy:format && pnpm openapi:lint",
+    "lint:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:lint && pnpm frontend:lint && pnpm cli:lint && pnpm test-fixtures:lint && pnpm tty-assert:lint && pnpm cy:lint && pnpm test:path-routing && pnpm test:sut-healthcheck && pnpm test:sut-restart && pnpm validate:path-routing && pnpm openapi:lint",
+    "format:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:format && pnpm frontend:format && pnpm mcp-server:format && pnpm test-fixtures:format && pnpm tty-assert:format && pnpm cli:format && pnpm cy:format && pnpm openapi:lint",
     "format:changed": "scripts/format_changed.sh",
     "bundle:all": "pnpm mcp-server:bundle && pnpm cli:bundle && pnpm frontend:build",
     "sound": "github_action_sound https://github.com/nerds-odd-e/doughnut/actions"
@@ -81,7 +83,6 @@
     "@biomejs/biome": "2.4.10",
     "@cucumber/cucumber": "^12.7.0",
     "@hey-api/openapi-ts": "0.94.5",
-    "@lydell/node-pty": "1.1.0",
     "@mbtest/mountebank": "2.9.3",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@redocly/cli": "^2.25.3",
@@ -102,7 +103,8 @@
     "typescript": "6.0.2",
     "util": "^0.12.5",
     "wait-on": "^9.0.4",
-    "yaml": "^2.8.3"
+    "yaml": "^2.8.3",
+    "tty-assert": "workspace:*"
   },
   "dependencies": {
     "vue-toastification": "2.0.0-rc.5"

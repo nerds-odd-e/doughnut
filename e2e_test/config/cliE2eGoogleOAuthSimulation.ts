@@ -3,7 +3,7 @@
  * fetches redirect_uri with a mock authorization code.
  */
 
-import type { BufferedPtySession } from './tty-assert-staging/ptySession'
+import type { BufferedPtySession } from 'tty-assert/ptySession'
 
 const GOOGLE_ACCOUNTS_URL_PATTERN = /https:\/\/accounts\.google\.com\/[^\s]+/
 const E2E_MOCK_OAUTH_CODE = 'e2e_mock_auth_code'

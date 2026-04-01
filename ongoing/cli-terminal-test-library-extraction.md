@@ -1,6 +1,6 @@
 # `tty-assert` — PTY terminal test library extraction
 
-**Status:** Phase 1 (in-place staging) is **complete** in-repo; Phases 2–11 are roadmap only until started. Sub-phases: [`ongoing/cli-phase1-tty-assert-subphases.md`](./ongoing/cli-phase1-tty-assert-subphases.md).
+**Status:** Phases 1–2 are **complete** in-repo; Phases 3–11 are roadmap only until started. Sub-phases: [`ongoing/cli-phase1-tty-assert-subphases.md`](./ongoing/cli-phase1-tty-assert-subphases.md).
 
 **Intent:** Extract PTY-based terminal testing into a **Cypress-neutral, Doughnut-neutral** library named **`tty-assert`**, publishable on npm and eventually movable out of this repo. Goal: reliable assertions on terminal-visible state, with failures that show **expected vs actual** without manually decoding escape sequences, and CI-friendly artifacts where useful.
 
@@ -21,11 +21,11 @@
 
 | Area | Location today | Likely home |
 |------|----------------|-------------|
-| PTY spawn, buffer, write tasks | `e2e_test/config/cliE2ePluginTasks.ts` (glue) + `tty-assert-staging/ptySession.ts`, `facade.ts` | `tty-assert` **runtime** API + optional **Cypress task adapter** (thin, ideally in `e2e_test` only) |
-| ANSI strip | `e2e_test/config/tty-assert-staging/stripAnsi.ts` | `tty-assert` core |
-| Fixed cols/rows | `e2e_test/config/tty-assert-staging/geometry.ts` | `tty-assert` default geometry (configurable) |
-| Transcript → visible plaintext / replay | `e2e_test/config/tty-assert-staging/ptyTranscriptToVisiblePlaintext.ts` | `tty-assert` core; **Phase 4** moves authoritative interpretation to **xterm.js** where parity is proven |
-| Error snapshot formatting (truncation, safe text) | `e2e_test/config/tty-assert-staging/errorSnapshotFormatting.ts` | `tty-assert` core |
+| PTY spawn, buffer, write tasks | `e2e_test/config/cliE2ePluginTasks.ts` (glue) + `packages/tty-assert` (`ptySession`, `facade`) | `tty-assert` **runtime** API + optional **Cypress task adapter** (thin, ideally in `e2e_test` only) |
+| ANSI strip | `packages/tty-assert/src/stripAnsi.ts` | `tty-assert` core |
+| Fixed cols/rows | `packages/tty-assert/src/geometry.ts` | `tty-assert` default geometry (configurable) |
+| Transcript → visible plaintext / replay | `packages/tty-assert/src/ptyTranscriptToVisiblePlaintext.ts` | `tty-assert` core; **Phase 4** moves authoritative interpretation to **xterm.js** where parity is proven |
+| Error snapshot formatting (truncation, safe text) | `packages/tty-assert/src/errorSnapshotFormatting.ts` | `tty-assert` core |
 | Google OAuth PTY simulation | `e2e_test/config/cliE2eGoogleOAuthSimulation.ts` | Stays **Doughnut** (or behind `tty-assert` **hook/extension** interface) |
 | Retry, `expectContains`, domain heuristics | `e2e_test/start/pageObjects/cli/outputAssertions.ts` | **Generic** snapshots → `tty-assert` (today: `errorSnapshotFormatting`); **domain** sections + Cypress orchestration stay Doughnut |
 | Cypress fluents | `e2e_test/start/pageObjects/cli/interactiveCli.ts` | Doughnut; calls `tty-assert`-backed tasks or helpers |
@@ -36,19 +36,21 @@
 
 **Status:** **Complete** (in-repo). Record of sub-phases 1.1–1.5: [`ongoing/cli-phase1-tty-assert-subphases.md`](./ongoing/cli-phase1-tty-assert-subphases.md).
 
-**Outcome:** Same Gherkin + Cypress behavior; **generic terminal** logic lives under `e2e_test/config/tty-assert-staging/` and is importable without Cypress or Doughnut product types.
+**Outcome:** Same Gherkin + Cypress behavior; **generic terminal** logic lived under `e2e_test/config/tty-assert-staging/` (removed in Phase 2) and is importable without Cypress or Doughnut product types.
 
 **Delivered:**
 
-- `tty-assert-staging/`: `stripAnsi`, `geometry`, `ptyTranscriptToVisiblePlaintext`, `errorSnapshotFormatting`, `ptySession`, `facade`; Ink guidance extraction in `cliPtyCurrentGuidanceFromReplay.ts`.
+- ~~`tty-assert-staging/`~~ → **`packages/tty-assert`** (Phase 2): `stripAnsi`, `geometry`, `ptyTranscriptToVisiblePlaintext`, `errorSnapshotFormatting`, `ptySession`, `facade`; Ink guidance extraction stays in `cliPtyCurrentGuidanceFromReplay.ts`.
 - **Doughnut-only:** OAuth simulation, install/bundle paths, env wiring, Doughnut CLI vocabulary in `outputAssertions` (see that file’s header for generic vs domain).
-- **Plugin:** `createCliE2ePluginTasks` is thin glue (tasks, `cliEnv`, startup waits, OAuth, install paths) over the staging session/facade.
+- **Plugin:** `createCliE2ePluginTasks` is thin glue (tasks, `cliEnv`, startup waits, OAuth, install paths) over `tty-assert` (`ptySession` / `facade`).
 
 **Gate:** CLI E2E that ran before still passes; no new user-visible behavior.
 
 ---
 
 ## Phase 2 — Sub-project inside Doughnut monorepo
+
+**Status:** **Complete.** Workspace package `packages/tty-assert`; root `devDependencies` includes `tty-assert` (`workspace:*`) for Cypress / plugin resolution.
 
 **Outcome:** `pnpm-workspace.yaml` includes **`packages/tty-assert`**; `e2e_test` depends on it; **no** Cypress code inside the package.
 

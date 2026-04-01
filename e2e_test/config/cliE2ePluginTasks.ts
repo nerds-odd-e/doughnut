@@ -16,8 +16,8 @@ import { cliEnv } from './cliEnv'
 import {
   attachTerminalHandle,
   type TtyAssertTerminalHandle,
-} from './tty-assert-staging/facade'
-import { startBufferedPtySession } from './tty-assert-staging/ptySession'
+} from 'tty-assert/facade'
+import { startBufferedPtySession } from 'tty-assert/ptySession'
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
 

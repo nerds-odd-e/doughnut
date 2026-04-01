@@ -1,12 +1,12 @@
 /**
  * Hub for Cypress assertions on **terminal-visible** CLI output.
  *
- * Add new checks here (or in `tty-assert-staging` / `cliPtyCurrentGuidanceFromReplay`) so
+ * Add new checks here (or in `tty-assert` / `cliPtyCurrentGuidanceFromReplay`) so
  * failures stay consistent: bounded retries, then an error that includes an
  * ANSI-stripped snapshot of the buffer, and a Cypress screenshot on the final
  * failure path where this module throws.
  *
- * **Generic (imported):** `tty-assert-staging/errorSnapshotFormatting` (truncation, safe visible text
+ * **Generic (imported):** `tty-assert/errorSnapshotFormatting` (truncation, safe visible text
  * for errors), `stripAnsi`, `ptyTranscriptToVisiblePlaintext`; plus `extractCurrentGuidanceFromReplayedPlaintext`
  * from `cliPtyCurrentGuidanceFromReplay` (Ink-shaped guidance region — Doughnut-specific heuristic, not Cypress).
  *
@@ -24,9 +24,9 @@ import {
   headPreview,
   tailPreview,
   TERMINAL_ERROR_PREVIEW_LEN,
-} from '../../../config/tty-assert-staging/errorSnapshotFormatting'
-import { ptyTranscriptToVisiblePlaintext } from '../../../config/tty-assert-staging/ptyTranscriptToVisiblePlaintext'
-import { stripAnsiCliPty } from '../../../config/tty-assert-staging/stripAnsi'
+} from 'tty-assert/errorSnapshotFormatting'
+import { ptyTranscriptToVisiblePlaintext } from 'tty-assert/ptyTranscriptToVisiblePlaintext'
+import { stripAnsiCliPty } from 'tty-assert/stripAnsi'
 
 export const OUTPUT_ALIAS = '@doughnutOutput'
 

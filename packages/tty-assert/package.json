@@ -1,0 +1,24 @@
+{
+  "name": "tty-assert",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "format": "biome check --write .",
+    "lint": "biome check ."
+  },
+  "dependencies": {
+    "@lydell/node-pty": "1.1.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.10"
+  },
+  "exports": {
+    "./stripAnsi": "./src/stripAnsi.ts",
+    "./geometry": "./src/geometry.ts",
+    "./ptyTranscriptToVisiblePlaintext": "./src/ptyTranscriptToVisiblePlaintext.ts",
+    "./errorSnapshotFormatting": "./src/errorSnapshotFormatting.ts",
+    "./ptySession": "./src/ptySession.ts",
+    "./facade": "./src/facade.ts"
+  }
+}

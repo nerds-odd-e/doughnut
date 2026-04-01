@@ -4,6 +4,7 @@ packages:
   - cli
   - packages/doughnut-api
   - packages/doughnut-test-fixtures
+  - packages/tty-assert
   - packages/generated/doughnut-backend-api
 
 strictDepBuilds: true

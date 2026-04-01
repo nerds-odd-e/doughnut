@@ -1,6 +1,6 @@
 /**
  * Thin Cypress wrappers for interactive CLI PTY `cy.task` handlers (Phase 1.5).
- * Centralizes task names; vocabulary aligns with `e2e_test/config/tty-assert-staging/facade`.
+ * Centralizes task names; vocabulary aligns with `tty-assert/facade`.
  *
  * Assertions delegate to `outputAssertions` — same retries, screenshots, and messages as
  * `interactiveCli()` (do not use Node facade `expect` from Cypress; error text differs).
