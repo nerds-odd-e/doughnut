@@ -520,7 +520,7 @@ describe('recall MCQ (interactive)', () => {
     stdin.write('/recall\r')
     await waitForMcqVisible(frames)
     stdin.write('z')
-    await waitForLastFrame(lastFrame, (p) => p.includes('> z'))
+    await waitForLastFrame(lastFrame, (p) => p.includes('→ z'))
 
     pressEscape(stdin)
     await waitForFrames(
@@ -533,7 +533,7 @@ describe('recall MCQ (interactive)', () => {
     await waitForLastFrame(
       lastFrame,
       (p) =>
-        p.includes('> z') &&
+        p.includes('→ z') &&
         p.includes('Choose') &&
         !p.includes(LEAVE_RECALL_PROMPT)
     )

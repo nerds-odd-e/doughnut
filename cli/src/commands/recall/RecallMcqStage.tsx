@@ -10,7 +10,7 @@ import {
   type ReactElement,
 } from 'react'
 import type { Key } from 'ink'
-import { Box, Text, useInput } from 'ink'
+import { Box, Text, useInput, useStdout } from 'ink'
 import {
   RecallPromptController,
   type QuestionContestResult,
@@ -20,8 +20,12 @@ import {
   choiceIndexFromSelectListSubmitLine,
   handleSelectListInkKey,
 } from '../../interactions/selectListInteraction.js'
+import { BorderedSingleLinePromptInputInk } from '../../borderedSingleLinePromptInputInk.js'
 import { GuidanceListInk } from '../../guidanceListWindowInk.js'
-import { resolvedTerminalWidth } from '../../terminalColumns.js'
+import {
+  inkTerminalColumns,
+  resolvedTerminalWidth,
+} from '../../terminalColumns.js'
 import {
   doughnutSdkOptions,
   runDefaultBackendJson,
@@ -181,6 +185,8 @@ export function RecallMcqStage({
 }) {
   const { appendScrollbackItem } = useSessionScrollbackAppend()
   const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
+  const { stdout } = useStdout()
+  const promptCols = inkTerminalColumns(stdout.columns)
   const [buffer, setBuffer] = useState('')
   const bufferRef = useRef('')
   const [highlightIndex, setHighlightIndex] = useState(0)
@@ -409,12 +415,12 @@ export function RecallMcqStage({
       {payload.notebookTitle !== undefined && payload.notebookTitle !== '' ? (
         <Text>{payload.notebookTitle}</Text>
       ) : null}
-      <Text>
-        {'> '}
-        {buffer}
-        <Text inverse> </Text>
-        {buffer === '' ? <Text color="gray">{MCQ_HINT}</Text> : null}
-      </Text>
+      <BorderedSingleLinePromptInputInk
+        terminalColumns={promptCols}
+        buffer={buffer}
+        caretOffset={buffer.length}
+        placeholder={MCQ_HINT}
+      />
       {stemLines.map((line, i) => (
         <Text key={`s-${i}`}>{line.length > 0 ? line : ' '}</Text>
       ))}

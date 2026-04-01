@@ -11,15 +11,19 @@ import {
   type ReactElement,
 } from 'react'
 import type { Key } from 'ink'
-import { Box, Text, useInput } from 'ink'
+import { Box, Text, useInput, useStdout } from 'ink'
 import { Spinner } from '@inkjs/ui'
 import {
   MemoryTrackerController,
   RecallPromptController,
   type RecallPrompt,
 } from 'doughnut-api'
+import { BorderedSingleLinePromptInputInk } from '../../borderedSingleLinePromptInputInk.js'
 import { renderMarkdownToTerminal } from '../../markdown.js'
-import { resolvedTerminalWidth } from '../../terminalColumns.js'
+import {
+  inkTerminalColumns,
+  resolvedTerminalWidth,
+} from '../../terminalColumns.js'
 import {
   doughnutSdkOptions,
   runDefaultBackendJson,
@@ -101,6 +105,8 @@ function recallAnsweredSpellingInk(args: {
 
 const STAGE_LABEL = 'Recalling'
 
+const SPELL_INPUT_PLACEHOLDER = 'Type answer, Enter to submit'
+
 type LoadState =
   | { readonly status: 'loading' }
   | {
@@ -126,6 +132,8 @@ export function SpellingRecallStage({
 }) {
   const [loadState, setLoadState] = useState<LoadState>({ status: 'loading' })
   const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
+  const { stdout } = useStdout()
+  const promptCols = inkTerminalColumns(stdout.columns)
   const [buffer, setBuffer] = useState('')
   const bufferRef = useRef('')
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
@@ -318,11 +326,12 @@ export function SpellingRecallStage({
       {payload.notebookTitle !== undefined && payload.notebookTitle !== '' ? (
         <Text>{payload.notebookTitle}</Text>
       ) : null}
-      <Text>
-        {'> '}
-        {buffer}
-        <Text inverse> </Text>
-      </Text>
+      <BorderedSingleLinePromptInputInk
+        terminalColumns={promptCols}
+        buffer={buffer}
+        caretOffset={buffer.length}
+        placeholder={SPELL_INPUT_PLACEHOLDER}
+      />
       {stemLines.map((line, i) => (
         <Text key={`s-${i}`}>{line.length > 0 ? line : ' '}</Text>
       ))}

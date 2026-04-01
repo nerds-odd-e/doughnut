@@ -15,6 +15,7 @@ import {
   saveUserInputHistory,
 } from './userInputHistoryFile.js'
 import { cycleListSelectionIndex } from '../interactions/selectListInteraction.js'
+import { BorderedSingleLinePromptInputInk } from '../borderedSingleLinePromptInputInk.js'
 import { GuidanceListInk } from '../guidanceListWindowInk.js'
 import {
   DEFAULT_INTERACTIVE_GUIDANCE,
@@ -336,26 +337,18 @@ export function MainInteractivePrompt({
   const { stdout } = useStdout()
   const cols = stdout.columns > 0 ? stdout.columns : 80
 
-  const beforeCaret = buffer.slice(0, caretOffset)
-  const afterCaret = buffer.slice(caretOffset)
-
   if (!isActive) {
     return null
   }
 
   return (
     <Box flexDirection="column" marginTop={1}>
-      <Box width={cols} borderStyle="single" borderColor="white">
-        <Text>
-          {'→ '}
-          {beforeCaret}
-          <Text inverse> </Text>
-          {afterCaret}
-          {buffer === '' ? (
-            <Text color="gray">{MAIN_PROMPT_PLACEHOLDER}</Text>
-          ) : null}
-        </Text>
-      </Box>
+      <BorderedSingleLinePromptInputInk
+        terminalColumns={cols}
+        buffer={buffer}
+        caretOffset={caretOffset}
+        placeholder={MAIN_PROMPT_PLACEHOLDER}
+      />
       {guidance.show === 'hint' ? (
         <Text>{DEFAULT_INTERACTIVE_GUIDANCE}</Text>
       ) : guidance.show === 'list' ? (

@@ -343,7 +343,7 @@ describe('recall spelling (interactive)', () => {
     await waitForSpellingPromptVisible(lastFrame)
 
     stdin.write('par')
-    await waitForLastFrame(lastFrame, (p) => p.includes('> par'))
+    await waitForLastFrame(lastFrame, (p) => p.includes('→ par'))
 
     pressEscape(stdin)
     await waitForFrames(
@@ -358,7 +358,7 @@ describe('recall spelling (interactive)', () => {
       (p) =>
         p.includes('Spell:') &&
         p.includes('Spell the title') &&
-        p.includes('> par') &&
+        p.includes('→ par') &&
         !p.includes(LEAVE_RECALL_PROMPT)
     )
 
@@ -373,7 +373,7 @@ describe('recall spelling (interactive)', () => {
     stdin.write('/recall\r')
     await waitForSpellingPromptVisible(lastFrame)
     stdin.write('par')
-    await waitForLastFrame(lastFrame, (p) => p.includes('> par'))
+    await waitForLastFrame(lastFrame, (p) => p.includes('→ par'))
 
     pressEscape(stdin)
     await waitForFrames(
@@ -394,7 +394,7 @@ describe('recall spelling (interactive)', () => {
       lastFrame,
       (p) =>
         p.includes('Spell:') &&
-        p.includes('> par') &&
+        p.includes('→ par') &&
         !p.includes(LEAVE_RECALL_PROMPT)
     )
 
