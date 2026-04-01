@@ -1,5 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import { renderMarkdownToTerminal } from '../src/markdown.js'
+import { stripAnsi } from './inkTestHelpers.js'
 
 describe('renderMarkdownToTerminal', () => {
   test('renders empty string as empty', () => {
@@ -57,5 +58,27 @@ describe('renderMarkdownToTerminal', () => {
     expect(result).not.toContain('<p>')
     expect(result).not.toContain('</p>')
     expect(result).toContain('text')
+  })
+
+  test('markdown **bold** with inline <mark> is not sent through Turndown as HTML', () => {
+    const result = renderMarkdownToTerminal('**bold** and <mark>m</mark>')
+    expect(result).toContain('\x1b[')
+    expect(result).not.toContain('<mark>')
+    expect(result).not.toContain('</mark>')
+    expect(result).not.toContain('\\*')
+    const plain = stripAnsi(result)
+    expect(plain).toContain('bold')
+    expect(plain).toContain('m')
+    expect(plain).not.toContain('**')
+  })
+
+  test('markdown heading with inline <mark> keeps heading, no escaped #', () => {
+    const result = renderMarkdownToTerminal('# Heading with <mark>x</mark>')
+    expect(result).toContain('\x1b[')
+    expect(result).not.toContain('<mark>')
+    expect(result).not.toContain('\\#')
+    const plain = stripAnsi(result)
+    expect(plain).toContain('Heading with')
+    expect(plain).toContain('x')
   })
 })
