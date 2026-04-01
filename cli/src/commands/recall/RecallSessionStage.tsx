@@ -25,6 +25,7 @@ import { JustReviewRecallStage } from './JustReviewRecallStage.js'
 import { RecallMcqStage } from './RecallMcqStage.js'
 import { SpellingRecallStage } from './SpellingRecallStage.js'
 import { RECALL_SESSION_STOPPED_LINE } from './leaveRecallSessionCopy.js'
+import { RECALL_LOADING_NEXT_QUESTION_LABEL } from './recallBusyInputCopy.js'
 import { recallSessionSummaryLine } from './recallSessionSummary.js'
 import { recallAnsweredScrollbackItem } from './recallAnsweredScrollback.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
@@ -60,6 +61,7 @@ export function RecallSessionStage({
   const [card, setCard] = useState<RecallCard | null>(null)
   const [uiMode, setUiMode] = useState<'card' | 'loadMore'>('card')
   const [loadMoreFetching, setLoadMoreFetching] = useState(false)
+  const [loadingNextQuestion, setLoadingNextQuestion] = useState(false)
   const [initialResolved, setInitialResolved] = useState(false)
   const submittingRef = useRef(false)
   const sessionAnsweredCardsRef = useRef(0)
@@ -138,8 +140,37 @@ export function RecallSessionStage({
         trackerQueueRef.current.shift()
         const head = trackerQueueRef.current[0]
         if (head !== undefined) {
-          const next = await loadRecallCardForMemoryTrackerId(head)
-          setCard(next)
+          setLoadingNextQuestion(true)
+          setCard(null)
+          const ac = new AbortController()
+          activeOperationAbortRef.current = ac
+          try {
+            const next = await loadRecallCardForMemoryTrackerId(head, ac.signal)
+            if (ac.signal.aborted) {
+              onSettled(
+                userVisibleSlashCommandError(
+                  new DOMException('Aborted', 'AbortError')
+                )
+              )
+              return
+            }
+            setCard(next)
+          } catch (loadErr: unknown) {
+            if (!ac.signal.aborted) {
+              onSettled(userVisibleSlashCommandError(loadErr))
+            } else {
+              onSettled(
+                userVisibleSlashCommandError(
+                  new DOMException('Aborted', 'AbortError')
+                )
+              )
+            }
+          } finally {
+            setLoadingNextQuestion(false)
+            if (activeOperationAbortRef.current === ac) {
+              activeOperationAbortRef.current = null
+            }
+          }
           return
         }
         setLoadMoreFetching(false)
@@ -253,6 +284,19 @@ export function RecallSessionStage({
           onCancel={escapeLoadMorePrompt}
           inputBlockedRef={submittingRef}
         />
+      </RecallSessionChrome>
+    )
+  }
+
+  if (loadingNextQuestion) {
+    return (
+      <RecallSessionChrome>
+        <Box flexDirection="column">
+          <RecallSessionEscSpinner abortRef={activeOperationAbortRef} />
+          <Box>
+            <Spinner label={RECALL_LOADING_NEXT_QUESTION_LABEL} />
+          </Box>
+        </Box>
       </RecallSessionChrome>
     )
   }

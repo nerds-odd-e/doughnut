@@ -11,7 +11,10 @@ import {
   LEAVE_RECALL_PROMPT,
   RECALL_SESSION_STOPPED_LINE,
 } from '../src/commands/recall/leaveRecallSessionCopy.js'
-import { RECALL_BUSY_SUBMIT_ANSWER_LABEL } from '../src/commands/recall/recallBusyInputCopy.js'
+import {
+  RECALL_BUSY_SUBMIT_ANSWER_LABEL,
+  RECALL_LOADING_NEXT_QUESTION_LABEL,
+} from '../src/commands/recall/recallBusyInputCopy.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
   pressEscape,
@@ -279,6 +282,126 @@ describe('recall MCQ (interactive)', () => {
     await waitForFrames(
       () => stripAnsi(frames.join('\n')),
       (p) => p.includes('Load more from next 3 days?')
+    )
+  })
+
+  test('after first MCQ answer, shows loading next label until second tracker loads', async () => {
+    const SECOND_PROMPT_ID = 99
+    const secondStem = 'SECOND_MCQ_LOADING_NEXT_UNIQUE'
+    const pending = pendingMcqPrompt()
+    const secondPrompt = makeMe.aRecallPrompt
+      .withId(SECOND_PROMPT_ID)
+      .withQuestionStem(secondStem)
+      .withChoices(['X', 'Y', 'Z'])
+      .withMemoryTrackerId(2)
+      .please()
+
+    const note1 = makeMe.aNoteRealm
+      .title('Alpha')
+      .notebookTitle('NB')
+      .details('body')
+      .createdAt(baseNoteTimes.createdAt)
+      .updatedAt(baseNoteTimes.updatedAt)
+      .please()
+    const note2 = makeMe.aNoteRealm
+      .title('Beta')
+      .notebookTitle('NB')
+      .details('body2')
+      .createdAt(baseNoteTimes.createdAt)
+      .updatedAt(baseNoteTimes.updatedAt)
+      .please()
+
+    recallingSpy.mockResolvedValue({
+      data: makeMe.aDueMemoryTrackersList
+        .totalAssimilatedCount(0)
+        .toRepeat([
+          { memoryTrackerId: 1, spelling: false as const },
+          { memoryTrackerId: 2, spelling: false as const },
+        ])
+        .please(),
+    } as Awaited<ReturnType<typeof RecallsController.recalling>>)
+
+    let resolveMt2!: (
+      value: Awaited<
+        ReturnType<typeof MemoryTrackerController.showMemoryTracker>
+      >
+    ) => void
+    const mt2Promise = new Promise<
+      Awaited<ReturnType<typeof MemoryTrackerController.showMemoryTracker>>
+    >((resolve) => {
+      resolveMt2 = resolve
+    })
+
+    showMemoryTrackerSpy.mockImplementation((opts) => {
+      const id = opts.path.memoryTracker
+      if (id === 1) {
+        return Promise.resolve({
+          data: makeMe.aMemoryTracker
+            .nextRecallAt('2026-06-01T00:00:00Z')
+            .ofNote(note1)
+            .please(),
+        } as Awaited<
+          ReturnType<typeof MemoryTrackerController.showMemoryTracker>
+        >)
+      }
+      if (id === 2) {
+        return mt2Promise
+      }
+      throw new Error(`unexpected memoryTracker ${String(id)}`)
+    })
+
+    getRecallPromptsSpy.mockImplementation((opts) => {
+      const id = opts.path.memoryTracker
+      if (id === 1) {
+        return Promise.resolve({
+          data: [pending],
+        } as Awaited<
+          ReturnType<typeof MemoryTrackerController.getRecallPrompts>
+        >)
+      }
+      if (id === 2) {
+        return Promise.resolve({
+          data: [secondPrompt],
+        } as Awaited<
+          ReturnType<typeof MemoryTrackerController.getRecallPrompts>
+        >)
+      }
+      throw new Error(`unexpected memoryTracker ${String(id)}`)
+    })
+
+    answerQuizSpy.mockResolvedValue({
+      data: {
+        ...pending,
+        note: note1.note,
+        answer: { id: 100, correct: false, choiceIndex: 1 },
+      },
+    } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
+
+    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForMcqVisible(frames)
+    stdin.write('2\r')
+
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (p) =>
+        p.includes(RECALL_LOADING_NEXT_QUESTION_LABEL) &&
+        !p.includes(MCQ_HINT_SUBSTR)
+    )
+
+    resolveMt2({
+      data: makeMe.aMemoryTracker
+        .nextRecallAt('2026-06-01T00:00:00Z')
+        .ofNote(note2)
+        .please(),
+    } as Awaited<ReturnType<typeof MemoryTrackerController.showMemoryTracker>>)
+
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (p) => p.includes(secondStem)
     )
   })
 

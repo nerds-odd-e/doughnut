@@ -6,7 +6,10 @@ import {
   LEAVE_RECALL_PROMPT,
   RECALL_SESSION_STOPPED_LINE,
 } from '../src/commands/recall/leaveRecallSessionCopy.js'
-import { RECALL_BUSY_RECORD_REVIEW_LABEL } from '../src/commands/recall/recallBusyInputCopy.js'
+import {
+  RECALL_BUSY_RECORD_REVIEW_LABEL,
+  RECALL_LOADING_NEXT_QUESTION_LABEL,
+} from '../src/commands/recall/recallBusyInputCopy.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { formatVersionOutput } from '../src/commands/version.js'
 import {
@@ -299,6 +302,81 @@ describe('recall just-review (interactive)', () => {
     await waitLoadMore(frames)
     stdin.write('n\r')
     await untilPlain(frames, (p) => p.includes('Recalled 1 note'))
+  })
+
+  test('after y on first just-review, shows loading next until second tracker loads', async () => {
+    mockMarkAsRecalledCounting()
+
+    recallingSpy.mockResolvedValue({
+      data: makeMe.aDueMemoryTrackersList
+        .totalAssimilatedCount(0)
+        .toRepeat([
+          { memoryTrackerId: 1, spelling: false },
+          { memoryTrackerId: 2, spelling: false },
+        ])
+        .please(),
+    } as Awaited<ReturnType<typeof RecallsController.recalling>>)
+
+    const noteRealmAlpha = alphaNoteRealm()
+    const noteRealmBeta = makeMe.aNoteRealm
+      .title('Beta')
+      .notebookTitle('NB')
+      .details('body-beta')
+      .createdAt(baseNoteTimes.createdAt)
+      .updatedAt(baseNoteTimes.updatedAt)
+      .please()
+
+    let resolveMt2!: (
+      value: Awaited<
+        ReturnType<typeof MemoryTrackerController.showMemoryTracker>
+      >
+    ) => void
+    const mt2Promise = new Promise<
+      Awaited<ReturnType<typeof MemoryTrackerController.showMemoryTracker>>
+    >((resolve) => {
+      resolveMt2 = resolve
+    })
+
+    showMemoryTrackerSpy.mockImplementation(async (opts) => {
+      const id = opts.path.memoryTracker
+      if (id === 1) {
+        return {
+          data: makeMe.aMemoryTracker
+            .nextRecallAt('2026-06-01T00:00:00Z')
+            .ofNote(noteRealmAlpha)
+            .please(),
+        } as Awaited<
+          ReturnType<typeof MemoryTrackerController.showMemoryTracker>
+        >
+      }
+      if (id === 2) {
+        return mt2Promise
+      }
+      throw new Error(`unexpected memoryTracker ${String(id)}`)
+    })
+
+    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    startRecall(stdin)
+    await waitRememberAlpha(frames, { ynHint: true })
+    stdin.write('y\r')
+
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (p) =>
+        p.includes(RECALL_LOADING_NEXT_QUESTION_LABEL) && !p.includes('(y/n)')
+    )
+
+    resolveMt2({
+      data: makeMe.aMemoryTracker
+        .nextRecallAt('2026-06-01T00:00:00Z')
+        .ofNote(noteRealmBeta)
+        .please(),
+    } as Awaited<ReturnType<typeof MemoryTrackerController.showMemoryTracker>>)
+
+    await waitRememberBeta(frames)
   })
 
   test('empty Enter and non-y/n committed line do not recall; y then completes once', async () => {
