@@ -2,7 +2,7 @@
 
 **Parent plan:** [`cli-terminal-test-library-extraction.md`](./cli-terminal-test-library-extraction.md) (Phase 4: xterm-backed replay for **`getGuidanceContext`** only; Phase 5 finishes migration + API tidy).
 
-**This document:** Splits Phase 4 per `.cursor/rules/planning.mdc` — **one deliverable per sub-phase**, each with an explicit **gate**. **Sub-phase 4.1 is complete** (xterm deps + `ptyTranscriptToVisiblePlaintextViaXterm` + smoke tests). **4.2–4.3** remain.
+**This document:** Splits Phase 4 per `.cursor/rules/planning.mdc` — **one deliverable per sub-phase**, each with an explicit **gate**. **Sub-phases 4.1–4.2 are complete**. **4.3** remains (`outputAssertions` wiring).
 
 **Reference:** [microsoft/tui-test](https://github.com/microsoft/tui-test) — xterm.js for terminal rendering; borrow **feed bytes → read buffer text**, not their test runner.
 
@@ -48,6 +48,8 @@
 - For each fixture: compare legacy vs xterm output; **either** assert equality **or** assert a deliberate documented difference (comment + minimal case) if a mismatch is unavoidable and acceptable for guidance extraction.
 
 **Gate:** `tty-assert:test` green; still **no** Doughnut `outputAssertions` switch.
+
+**Done:** `tests/ptyTranscriptReplayParity.test.ts` — CRLF two-line parity with legacy; SGR + CRLF (Ink-shaped) parity; strict parity for CR/LF, ED clear, wrap; **documented deltas:** bare LF (legacy resets column, xterm VT LF-only) and one synthetic multi-line scroll fixture (legacy vs xterm column/scroll detail).
 
 ---
 
