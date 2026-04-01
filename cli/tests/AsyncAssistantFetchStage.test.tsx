@@ -22,6 +22,7 @@ function pendingUntilAbort(signal: AbortSignal): Promise<string> {
 describe('AsyncAssistantFetchStage', () => {
   test('Escape settles with Cancelled when work listens to signal', async () => {
     let settled: string | null = null
+    let aborted: string | null = null
     const { stdin, frames } = render(
       <StageKeyRoot>
         <AsyncAssistantFetchStage
@@ -29,6 +30,9 @@ describe('AsyncAssistantFetchStage', () => {
           runAssistantMessage={(signal) => pendingUntilAbort(signal)}
           onSettled={(t) => {
             settled = t
+          }}
+          onAbortWithError={(t) => {
+            aborted = t
           }}
         />
       </StageKeyRoot>
@@ -42,23 +46,28 @@ describe('AsyncAssistantFetchStage', () => {
     await pressEscapeAndWait(
       stdin,
       () => frames.join('\n'),
-      () => settled !== null
+      () => aborted !== null
     )
 
-    expect(settled).toBe('Cancelled.')
+    expect(aborted).toBe('Cancelled.')
+    expect(settled).toBeNull()
   })
 
   test('unmount while pending settles once with Cancelled', async () => {
-    let settleCount = 0
-    let lastSettled: string | null = null
+    let successCount = 0
+    let abortCount = 0
+    let lastAbort: string | null = null
     const { frames, unmount } = render(
       <StageKeyRoot>
         <AsyncAssistantFetchStage
           spinnerLabel="Hold…"
           runAssistantMessage={(signal) => pendingUntilAbort(signal)}
-          onSettled={(t) => {
-            settleCount += 1
-            lastSettled = t
+          onSettled={() => {
+            successCount += 1
+          }}
+          onAbortWithError={(t) => {
+            abortCount += 1
+            lastAbort = t
           }}
         />
       </StageKeyRoot>
@@ -71,11 +80,12 @@ describe('AsyncAssistantFetchStage', () => {
 
     unmount()
     await waitForFrames(
-      () => `${settleCount}:${lastSettled ?? ''}`,
-      () => settleCount >= 1
+      () => `${abortCount}:${lastAbort ?? ''}`,
+      () => abortCount >= 1
     )
 
-    expect(settleCount).toBe(1)
-    expect(lastSettled).toBe('Cancelled.')
+    expect(successCount).toBe(0)
+    expect(abortCount).toBe(1)
+    expect(lastAbort).toBe('Cancelled.')
   })
 })

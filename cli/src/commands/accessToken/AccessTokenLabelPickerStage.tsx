@@ -23,6 +23,7 @@ const PICKER_ABORTED_MESSAGE = 'Cancelled.'
 
 export function AccessTokenLabelPickerStage({
   onSettled,
+  onAbortWithError: _onAbortWithError,
   labels,
   currentPrompt,
   initialHighlightIndex,

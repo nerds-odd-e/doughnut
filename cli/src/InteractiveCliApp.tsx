@@ -96,24 +96,42 @@ export function InteractiveCliApp() {
     []
   )
 
+  const clearSlashStage = useCallback(() => {
+    setActiveStageComponent(null)
+    setActiveStageIndicator(undefined)
+    stageArgumentRef.current = undefined
+  }, [])
+
   const handleAsyncSlashSettled = useCallback(
-    (assistantText: string, isError = false) => {
+    (assistantText: string) => {
       if (assistantText !== '') {
         setScrollbackItems((prev) => [
           ...prev,
           withLeadingGapAfterUserIfNeeded(
             prev,
-            isError
-              ? transcriptAssistantError(assistantText)
-              : transcriptAssistantText(assistantText)
+            transcriptAssistantText(assistantText)
           ),
         ])
       }
-      setActiveStageComponent(null)
-      setActiveStageIndicator(undefined)
-      stageArgumentRef.current = undefined
+      clearSlashStage()
     },
-    []
+    [clearSlashStage]
+  )
+
+  const handleAsyncSlashAbortWithError = useCallback(
+    (message: string) => {
+      if (message !== '') {
+        setScrollbackItems((prev) => [
+          ...prev,
+          withLeadingGapAfterUserIfNeeded(
+            prev,
+            transcriptAssistantError(message)
+          ),
+        ])
+      }
+      clearSlashStage()
+    },
+    [clearSlashStage]
   )
 
   const onCommittedLine = useCallback((line: string) => {
@@ -236,6 +254,7 @@ export function InteractiveCliApp() {
               {createElement(activeStageComponent, {
                 argument: stageArgumentRef.current,
                 onSettled: handleAsyncSlashSettled,
+                onAbortWithError: handleAsyncSlashAbortWithError,
               })}
             </Box>
           )}

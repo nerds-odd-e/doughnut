@@ -14,7 +14,7 @@ import { SetStageKeyHandlerContext } from '../../commonUIComponents/stageKeyForw
 
 type AsyncAssistantFetchStageProps = Pick<
   InteractiveSlashCommandStageProps,
-  'onSettled'
+  'onSettled' | 'onAbortWithError'
 > & {
   readonly spinnerLabel: string
   readonly runAssistantMessage: (signal: AbortSignal) => Promise<string>
@@ -24,6 +24,7 @@ export function AsyncAssistantFetchStage({
   spinnerLabel,
   runAssistantMessage,
   onSettled,
+  onAbortWithError,
 }: AsyncAssistantFetchStageProps) {
   const runRef = useRef(runAssistantMessage)
   runRef.current = runAssistantMessage
@@ -54,19 +55,24 @@ export function AsyncAssistantFetchStage({
     const ac = new AbortController()
     abortControllerRef.current = ac
     let settled = false
-    const settleOnce = (text: string, isError = false) => {
+    const settleSuccess = (text: string) => {
       if (settled) return
       settled = true
-      onSettled(text, isError)
+      onSettled(text)
+    }
+    const settleError = (text: string) => {
+      if (settled) return
+      settled = true
+      onAbortWithError(text)
     }
     const run = async () => {
       try {
         const text = await runRef.current(ac.signal)
         if (!ac.signal.aborted) {
-          settleOnce(text)
+          settleSuccess(text)
         }
       } catch (err: unknown) {
-        settleOnce(userVisibleSlashCommandError(err), true)
+        settleError(userVisibleSlashCommandError(err))
       }
     }
     run().catch(() => undefined)
@@ -74,7 +80,7 @@ export function AsyncAssistantFetchStage({
       ac.abort()
       abortControllerRef.current = null
     }
-  }, [onSettled])
+  }, [onSettled, onAbortWithError])
 
   return (
     <Box>

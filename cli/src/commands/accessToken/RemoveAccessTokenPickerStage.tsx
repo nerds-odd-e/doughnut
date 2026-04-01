@@ -20,6 +20,7 @@ function initialHighlightIndexPreferDefault(labels: readonly string[]): number {
 export function RemoveAccessTokenPickerStage({
   argument,
   onSettled,
+  onAbortWithError,
 }: InteractiveSlashCommandStageProps) {
   const labels = useMemo(() => getStoredAccessTokenLabels(), [])
 
@@ -35,6 +36,7 @@ export function RemoveAccessTokenPickerStage({
   return (
     <AccessTokenLabelPickerStage
       onSettled={onSettled}
+      onAbortWithError={onAbortWithError}
       labels={labels}
       currentPrompt={CURRENT_PROMPT}
       initialHighlightIndex={initialHighlightIndexPreferDefault}

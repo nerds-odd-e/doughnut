@@ -25,12 +25,16 @@ export async function recallStatus(signal?: AbortSignal): Promise<string> {
   return `${count} notes to recall today`
 }
 
-function RecallStatusStage({ onSettled }: InteractiveSlashCommandStageProps) {
+function RecallStatusStage({
+  onSettled,
+  onAbortWithError,
+}: InteractiveSlashCommandStageProps) {
   return (
     <AsyncAssistantFetchStage
       spinnerLabel="Loading recall status…"
       runAssistantMessage={(signal) => recallStatus(signal)}
       onSettled={onSettled}
+      onAbortWithError={onAbortWithError}
     />
   )
 }

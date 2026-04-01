@@ -1,13 +1,14 @@
 import type { ComponentType } from 'react'
 
 /**
- * Contract for slash-command stages: communicate results only through these props (e.g.
- * `onSettled`). Stages must not import or depend on the parent shell (`InteractiveCliApp`); the
- * shell decides what happens after completion.
+ * Contract for slash-command stages: communicate results through `onSettled` (normal completion)
+ * or `onAbortWithError` (user-visible failure). Stages must not import or depend on the parent
+ * shell (`InteractiveCliApp`); the shell decides what happens after completion.
  */
 export type InteractiveSlashCommandStageProps = {
   readonly argument?: string
-  readonly onSettled: (assistantText: string, isError?: boolean) => void
+  readonly onSettled: (assistantText: string) => void
+  readonly onAbortWithError: (message: string) => void
 }
 
 type InteractiveSlashCommandResult = {

@@ -57,6 +57,7 @@ function RecallSessionChrome({
 
 export function RecallSessionStage({
   onSettled,
+  onAbortWithError,
 }: InteractiveSlashCommandStageProps) {
   const { appendScrollbackItem } = useSessionScrollbackAppend()
   const [card, setCard] = useState<RecallCard | null>(null)
@@ -101,7 +102,7 @@ export function RecallSessionStage({
         setInitialResolved(true)
       } catch (err: unknown) {
         if (unmounted) return
-        onSettled(userVisibleSlashCommandError(err), true)
+        onAbortWithError(userVisibleSlashCommandError(err))
       } finally {
         if (activeOperationAbortRef.current === ac) {
           activeOperationAbortRef.current = null
@@ -115,7 +116,7 @@ export function RecallSessionStage({
         activeOperationAbortRef.current = null
       }
     }
-  }, [onSettled])
+  }, [onAbortWithError])
 
   const settleSessionSummary = useCallback(() => {
     onSettled(recallSessionSummaryLine(sessionAnsweredCardsRef.current))
@@ -123,9 +124,9 @@ export function RecallSessionStage({
 
   const onRecallFatalError = useCallback(
     (message: string) => {
-      onSettled(message, true)
+      onAbortWithError(message)
     },
-    [onSettled]
+    [onAbortWithError]
   )
 
   const onConfirmLeaveRecall = useCallback(() => {
@@ -154,24 +155,22 @@ export function RecallSessionStage({
               ac.signal
             )
             if (ac.signal.aborted) {
-              onSettled(
+              onAbortWithError(
                 userVisibleSlashCommandError(
                   new DOMException('Aborted', 'AbortError')
-                ),
-                true
+                )
               )
               return
             }
             setCard(next)
           } catch (loadErr: unknown) {
             if (!ac.signal.aborted) {
-              onSettled(userVisibleSlashCommandError(loadErr), true)
+              onAbortWithError(userVisibleSlashCommandError(loadErr))
             } else {
-              onSettled(
+              onAbortWithError(
                 userVisibleSlashCommandError(
                   new DOMException('Aborted', 'AbortError')
-                ),
-                true
+                )
               )
             }
           } finally {
@@ -185,10 +184,10 @@ export function RecallSessionStage({
         setLoadMoreFetching(false)
         setUiMode('loadMore')
       } catch (loadErr: unknown) {
-        onSettled(userVisibleSlashCommandError(loadErr), true)
+        onAbortWithError(userVisibleSlashCommandError(loadErr))
       }
     },
-    [appendScrollbackItem, onSettled]
+    [appendScrollbackItem, onAbortWithError]
   )
 
   const submitLoadMore = useCallback(
@@ -209,11 +208,10 @@ export function RecallSessionStage({
           activeOperationAbortRef.current = null
         }
         if (ac.signal.aborted) {
-          onSettled(
+          onAbortWithError(
             userVisibleSlashCommandError(
               new DOMException('Aborted', 'AbortError')
-            ),
-            true
+            )
           )
           return
         }
@@ -227,11 +225,10 @@ export function RecallSessionStage({
               )
             : null
         if (ac.signal.aborted) {
-          onSettled(
+          onAbortWithError(
             userVisibleSlashCommandError(
               new DOMException('Aborted', 'AbortError')
-            ),
-            true
+            )
           )
           return
         }
@@ -245,13 +242,13 @@ export function RecallSessionStage({
         if (activeOperationAbortRef.current === ac) {
           activeOperationAbortRef.current = null
         }
-        onSettled(userVisibleSlashCommandError(loadErr), true)
+        onAbortWithError(userVisibleSlashCommandError(loadErr))
       } finally {
         submittingRef.current = false
         setLoadMoreFetching(false)
       }
     },
-    [onSettled, settleSessionSummary]
+    [onSettled, onAbortWithError, settleSessionSummary]
   )
 
   /** Load-more prompt: Esc = decline load more (same as n → session summary), or abort in-flight fetch — not LeaveRecallConfirmPrompt. */

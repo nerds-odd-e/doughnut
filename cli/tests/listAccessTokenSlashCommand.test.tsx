@@ -40,6 +40,7 @@ describe('ListAccessTokenStage', () => {
         onSettled={(t) => {
           settled = t
         }}
+        onAbortWithError={() => undefined}
       />
     )
 
@@ -64,6 +65,7 @@ describe('ListAccessTokenStage', () => {
         onSettled={(t) => {
           settled = t
         }}
+        onAbortWithError={() => undefined}
       />
     )
 

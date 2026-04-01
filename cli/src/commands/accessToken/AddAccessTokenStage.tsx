@@ -5,6 +5,7 @@ import { addAccessToken } from './accessToken.js'
 export function AddAccessTokenStage({
   argument,
   onSettled,
+  onAbortWithError,
 }: InteractiveSlashCommandStageProps) {
   const token = argument!
   return (
@@ -15,6 +16,7 @@ export function AddAccessTokenStage({
         return 'Token added successfully'
       }}
       onSettled={onSettled}
+      onAbortWithError={onAbortWithError}
     />
   )
 }
