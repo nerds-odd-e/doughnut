@@ -71,6 +71,27 @@ function breadcrumbTitlesFromNoteTopology(
   })
 }
 
+/** Breadcrumb for answered recall UI from the prompt returned after submit. */
+export function breadcrumbTitlesFromRecallPrompt(
+  prompt: RecallPrompt
+): readonly string[] {
+  const topo = prompt.note?.noteTopology as NoteTopologyWalk | undefined
+  return breadcrumbTitlesFromNoteTopology(topo)
+}
+
+/** Full note details for answered spelling scrollback; falls back if the API omits `note`. */
+export function noteDetailsMarkdownFromAnsweredRecallPrompt(
+  prompt: RecallPrompt,
+  fallbackDetailsMarkdown: string
+): string {
+  const d = prompt.note?.details
+  if (d !== undefined) {
+    const t = d.trim()
+    if (t.length > 0) return t
+  }
+  return fallbackDetailsMarkdown.trim()
+}
+
 /** Just-review recall card (fallback when MCQ is not available). */
 export type RecallJustReviewPayload = {
   readonly memoryTrackerId: number

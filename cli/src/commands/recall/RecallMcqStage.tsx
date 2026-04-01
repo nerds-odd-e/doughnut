@@ -42,6 +42,7 @@ import {
 } from './recallBusyInputCopy.js'
 import { numberedMcqMarkdownLinesForTerminal } from './numberedMcqMarkdownLines.js'
 import {
+  breadcrumbTitlesFromRecallPrompt,
   recallMcqPayloadFromRecallPrompt,
   type RecallCard,
   type RecallMcqCardPayload,
@@ -232,7 +233,7 @@ export function RecallMcqStage({
             successful: false,
             answeredRows: [
               recallAnsweredMcqInk({
-                breadcrumbTitles: payload.breadcrumbTitles,
+                breadcrumbTitles: breadcrumbTitlesFromRecallPrompt(updated),
                 stem: payload.stem,
                 choices: payload.choices,
                 selectedChoiceIndex: choiceIdx,
@@ -246,7 +247,7 @@ export function RecallMcqStage({
           successful: true,
           answeredRows: [
             recallAnsweredMcqInk({
-              breadcrumbTitles: payload.breadcrumbTitles,
+              breadcrumbTitles: breadcrumbTitlesFromRecallPrompt(updated),
               stem: payload.stem,
               choices: payload.choices,
               selectedChoiceIndex: choiceIdx,
@@ -265,7 +266,6 @@ export function RecallMcqStage({
       inputBlockedRef,
       onRecallFatalError,
       onRecallQuestionAnswered,
-      payload.breadcrumbTitles,
       payload.choices,
       payload.recallPromptId,
       payload.stem,

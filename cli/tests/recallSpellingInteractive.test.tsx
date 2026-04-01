@@ -4,7 +4,7 @@ import {
   RecallPromptController,
   RecallsController,
 } from 'doughnut-api'
-import type { RecallPrompt } from 'doughnut-api'
+import type { NoteRealm, RecallPrompt } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import {
@@ -51,6 +51,7 @@ describe('recall spelling (interactive)', () => {
   let getRecallPromptsSpy: ReturnType<typeof vi.spyOn>
   let askAQuestionSpy: ReturnType<typeof vi.spyOn>
   let answerSpellingSpy: ReturnType<typeof vi.spyOn>
+  let spellingFixtureNoteRealm: NoteRealm
 
   function pendingSpellingPrompt(): RecallPrompt {
     return makeMe.aRecallPrompt
@@ -67,12 +68,19 @@ describe('recall spelling (interactive)', () => {
       .please()
   }
 
+  function spellingAnsweredPrompt(
+    pending: RecallPrompt,
+    answer: { correct: boolean; spellingAnswer: string }
+  ): RecallPrompt {
+    return { ...pending, note: spellingFixtureNoteRealm.note, answer }
+  }
+
   beforeEach(() => {
     configDir = tempConfigWithToken()
     savedConfigDir = process.env.DOUGHNUT_CONFIG_DIR
     process.env.DOUGHNUT_CONFIG_DIR = configDir
 
-    const noteRealm = makeMe.aNoteRealm
+    spellingFixtureNoteRealm = makeMe.aNoteRealm
       .title('sedition')
       .notebookTitle('NB')
       .details('body')
@@ -87,7 +95,7 @@ describe('recall spelling (interactive)', () => {
     const tracker = {
       ...makeMe.aMemoryTracker
         .nextRecallAt('2026-06-01T00:00:00Z')
-        .ofNote(noteRealm)
+        .ofNote(spellingFixtureNoteRealm)
         .please(),
       id: MEMORY_TRACKER_ID,
       spelling: true as const,
@@ -144,10 +152,10 @@ describe('recall spelling (interactive)', () => {
 
     const pending = pendingSpellingPrompt()
     answerSpellingSpy.mockResolvedValue({
-      data: {
-        ...pending,
-        answer: { correct: false, spellingAnswer: 'typo' },
-      },
+      data: spellingAnsweredPrompt(pending, {
+        correct: false,
+        spellingAnswer: 'typo',
+      }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerSpelling>>)
 
     const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
@@ -229,10 +237,10 @@ describe('recall spelling (interactive)', () => {
     )
 
     resolveAnswer({
-      data: {
-        ...pending,
-        answer: { correct: false, spellingAnswer: 'typo' },
-      },
+      data: spellingAnsweredPrompt(pending, {
+        correct: false,
+        spellingAnswer: 'typo',
+      }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerSpelling>>)
 
     await waitForFrames(
@@ -264,10 +272,10 @@ describe('recall spelling (interactive)', () => {
     answerSpellingSpy.mockImplementation((opts) => {
       expect(opts.body.spellingAnswer).toBe('SeDiTiOn')
       return Promise.resolve({
-        data: {
-          ...pending,
-          answer: { correct: true, spellingAnswer: 'SeDiTiOn' },
-        },
+        data: spellingAnsweredPrompt(pending, {
+          correct: true,
+          spellingAnswer: 'SeDiTiOn',
+        }),
       } as Awaited<ReturnType<typeof RecallPromptController.answerSpelling>>)
     })
 
@@ -318,10 +326,10 @@ describe('recall spelling (interactive)', () => {
 
     const pending = pendingSpellingPrompt()
     answerSpellingSpy.mockResolvedValue({
-      data: {
-        ...pending,
-        answer: { correct: true, spellingAnswer: 'SeDiTiOn' },
-      },
+      data: spellingAnsweredPrompt(pending, {
+        correct: true,
+        spellingAnswer: 'SeDiTiOn',
+      }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerSpelling>>)
 
     const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(

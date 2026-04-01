@@ -32,7 +32,11 @@ import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import { RECALL_BUSY_SUBMIT_ANSWER_LABEL } from './recallBusyInputCopy.js'
 import { normalizeSpellingLineForSubmit } from './spellingAnswerLine.js'
-import type { SpellingRecallSessionPayload } from './nextRecallCardLoad.js'
+import {
+  breadcrumbTitlesFromRecallPrompt,
+  noteDetailsMarkdownFromAnsweredRecallPrompt,
+  type SpellingRecallSessionPayload,
+} from './nextRecallCardLoad.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 import {
   RecallAnsweredBlockShell,
@@ -188,8 +192,11 @@ export function SpellingRecallStage({
       const spellingAnswerDisplay =
         updated.answer?.spellingAnswer?.trim() || line
       const answeredBlock = recallAnsweredSpellingInk({
-        breadcrumbTitles: payload.breadcrumbTitles,
-        detailsMarkdown: payload.detailsMarkdown,
+        breadcrumbTitles: breadcrumbTitlesFromRecallPrompt(updated),
+        detailsMarkdown: noteDetailsMarkdownFromAnsweredRecallPrompt(
+          updated,
+          payload.detailsMarkdown
+        ),
         spellingAnswerDisplay,
         correct,
       })

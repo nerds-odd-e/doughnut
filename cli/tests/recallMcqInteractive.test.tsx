@@ -4,7 +4,7 @@ import {
   RecallPromptController,
   RecallsController,
 } from 'doughnut-api'
-import type { RecallPrompt } from 'doughnut-api'
+import type { NoteRealm, RecallPrompt } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import {
@@ -55,6 +55,7 @@ describe('recall MCQ (interactive)', () => {
   let answerQuizSpy: ReturnType<typeof vi.spyOn>
   let contestSpy: ReturnType<typeof vi.spyOn> | undefined
   let regenerateSpy: ReturnType<typeof vi.spyOn> | undefined
+  let mcqFixtureNoteRealm: NoteRealm
 
   function pendingMcqPrompt(): RecallPrompt {
     return makeMe.aRecallPrompt
@@ -65,12 +66,19 @@ describe('recall MCQ (interactive)', () => {
       .please()
   }
 
+  function mcqAnsweredPrompt(
+    pending: RecallPrompt,
+    answer: { id: number; correct: boolean; choiceIndex: number }
+  ): RecallPrompt {
+    return { ...pending, note: mcqFixtureNoteRealm.note, answer }
+  }
+
   beforeEach(() => {
     configDir = tempConfigWithToken()
     savedConfigDir = process.env.DOUGHNUT_CONFIG_DIR
     process.env.DOUGHNUT_CONFIG_DIR = configDir
 
-    const noteRealm = makeMe.aNoteRealm
+    mcqFixtureNoteRealm = makeMe.aNoteRealm
       .title('Alpha')
       .notebookTitle('NB')
       .details('body')
@@ -90,7 +98,7 @@ describe('recall MCQ (interactive)', () => {
       .mockResolvedValue({
         data: makeMe.aMemoryTracker
           .nextRecallAt('2026-06-01T00:00:00Z')
-          .ofNote(noteRealm)
+          .ofNote(mcqFixtureNoteRealm)
           .please(),
       } as Awaited<
         ReturnType<typeof MemoryTrackerController.showMemoryTracker>
@@ -174,10 +182,11 @@ describe('recall MCQ (interactive)', () => {
 
     const pending = pendingMcqPrompt()
     answerQuizSpy.mockResolvedValue({
-      data: {
-        ...pending,
-        answer: { id: 100, correct: false, choiceIndex: 1 },
-      },
+      data: mcqAnsweredPrompt(pending, {
+        id: 100,
+        correct: false,
+        choiceIndex: 1,
+      }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
 
     const { stdin, frames } = await renderInkWhenCommandLineReady(
@@ -260,10 +269,11 @@ describe('recall MCQ (interactive)', () => {
     )
 
     resolveAnswer({
-      data: {
-        ...pending,
-        answer: { id: 100, correct: false, choiceIndex: 1 },
-      },
+      data: mcqAnsweredPrompt(pending, {
+        id: 100,
+        correct: false,
+        choiceIndex: 1,
+      }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
 
     await waitForFrames(
@@ -282,10 +292,11 @@ describe('recall MCQ (interactive)', () => {
 
     const pending = pendingMcqPrompt()
     answerQuizSpy.mockResolvedValue({
-      data: {
-        ...pending,
-        answer: { id: 100, correct: false, choiceIndex: 1 },
-      },
+      data: mcqAnsweredPrompt(pending, {
+        id: 100,
+        correct: false,
+        choiceIndex: 1,
+      }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
 
     const { stdin, frames } = await renderInkWhenCommandLineReady(
@@ -407,6 +418,7 @@ describe('recall MCQ (interactive)', () => {
         return Promise.resolve({
           data: {
             ...pending,
+            note: note1.note,
             answer: { id: 100, correct: false, choiceIndex: 1 },
           },
         } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
@@ -414,6 +426,7 @@ describe('recall MCQ (interactive)', () => {
       return Promise.resolve({
         data: {
           ...secondPrompt,
+          note: note2.note,
           answer: { id: 101, correct: true, choiceIndex: 0 },
         },
       } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
@@ -537,10 +550,11 @@ describe('recall MCQ (interactive)', () => {
   test('after Esc then n, MCQ list highlight preserved (Enter submits second choice)', async () => {
     const pending = pendingMcqPrompt()
     answerQuizSpy.mockResolvedValue({
-      data: {
-        ...pending,
-        answer: { id: 100, correct: false, choiceIndex: 1 },
-      },
+      data: mcqAnsweredPrompt(pending, {
+        id: 100,
+        correct: false,
+        choiceIndex: 1,
+      }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
 
     const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
