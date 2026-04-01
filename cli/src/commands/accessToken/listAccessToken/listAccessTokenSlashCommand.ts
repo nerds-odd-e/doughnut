@@ -11,7 +11,7 @@ const listAccessTokenDoc: CommandDoc = {
 }
 
 export const listAccessTokenSlashCommand: InteractiveSlashCommand = {
-  line: '/list-access-token',
+  literal: '/list-access-token',
   doc: listAccessTokenDoc,
   stageComponent: ListAccessTokenStage,
 }

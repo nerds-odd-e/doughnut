@@ -13,7 +13,7 @@ const addAccessTokenDoc: CommandDoc = {
 const PREFIX = '/add-access-token'
 
 export const addAccessTokenSlashCommand: InteractiveSlashCommand = {
-  line: PREFIX,
+  literal: PREFIX,
   doc: addAccessTokenDoc,
   argument: { name: 'access token', optional: false },
   stageComponent: AddAccessTokenStage,

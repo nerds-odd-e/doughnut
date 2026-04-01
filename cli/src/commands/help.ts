@@ -40,7 +40,7 @@ export function createHelpSlashCommand(
   getInteractiveCommandDocs: () => readonly CommandDoc[]
 ): InteractiveSlashCommand {
   return {
-    line: '/help',
+    literal: '/help',
     doc: helpDoc,
     run() {
       return {

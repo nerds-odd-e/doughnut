@@ -11,7 +11,7 @@ const lastEmailDoc: CommandDoc = {
 }
 
 export const lastEmailSlashCommand: InteractiveSlashCommand = {
-  line: '/last email',
+  literal: '/last email',
   doc: lastEmailDoc,
   stageComponent: LastEmailStage,
 }

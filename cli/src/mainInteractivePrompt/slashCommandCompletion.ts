@@ -72,11 +72,11 @@ export function getSlashTabCompletion(buffer: string): {
   )
   if (matches.length === 0) return { completed: buffer, count: 0 }
   if (matches.length === 1)
-    return { completed: `${matches[0]!.line} `, count: 1 }
-  const lines = matches.map((m) => m.line)
-  let prefix = lines[0]!
-  for (let i = 1; i < lines.length; i++) {
-    while (!lines[i]!.startsWith(prefix) && prefix.length > 0) {
+    return { completed: `${matches[0]!.literal} `, count: 1 }
+  const literals = matches.map((m) => m.literal)
+  let prefix = literals[0]!
+  for (let i = 1; i < literals.length; i++) {
+    while (!literals[i]!.startsWith(prefix) && prefix.length > 0) {
       prefix = prefix.slice(0, -1)
     }
   }
@@ -124,7 +124,7 @@ export function slashGuidanceForInk(draft: string): SlashGuidanceForInk {
   const rows = matches.map((c) => ({
     usage: c.doc.usage,
     description: c.doc.description,
-    completionLine: c.line,
+    completionLine: c.literal,
   }))
   return { show: 'list', rows }
 }

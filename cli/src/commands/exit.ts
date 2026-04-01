@@ -10,7 +10,7 @@ const exitDoc: CommandDoc = {
 }
 
 export const exitSlashCommand: InteractiveSlashCommand = {
-  line: '/exit',
+  literal: '/exit',
   doc: exitDoc,
   run() {
     return { assistantMessage: 'Bye.' }

@@ -42,7 +42,7 @@ const recallStatusDoc: CommandDoc = {
 }
 
 export const recallStatusSlashCommand: InteractiveSlashCommand = {
-  line: '/recall-status',
+  literal: '/recall-status',
   doc: recallStatusDoc,
   stageComponent: RecallStatusStage,
 }

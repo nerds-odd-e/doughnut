@@ -19,14 +19,14 @@ const removeAccessTokenCompletelyDoc: CommandDoc = {
 }
 
 export const removeAccessTokenSlashCommand: InteractiveSlashCommand = {
-  line: '/remove-access-token',
+  literal: '/remove-access-token',
   doc: removeAccessTokenDoc,
   stageComponent: RemoveAccessTokenPickerStage,
 }
 
 export const removeAccessTokenCompletelySlashCommand: InteractiveSlashCommand =
   {
-    line: '/remove-access-token-completely',
+    literal: '/remove-access-token-completely',
     doc: removeAccessTokenCompletelyDoc,
     stageComponent: RemoveAccessTokenCompletelyPickerStage,
   }

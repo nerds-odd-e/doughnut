@@ -11,7 +11,7 @@ const recallDoc: CommandDoc = {
 }
 
 export const recallSlashCommand: InteractiveSlashCommand = {
-  line: '/recall',
+  literal: '/recall',
   doc: recallDoc,
   stageComponent: RecallSessionStage,
 }

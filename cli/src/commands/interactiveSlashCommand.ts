@@ -27,7 +27,7 @@ export type InteractiveSlashCommandArgument = {
 }
 
 export interface InteractiveSlashCommand {
-  readonly line: string
+  readonly literal: string
   readonly doc: CommandDoc
   /**
    * When set, a non-empty argument is required unless `optional` is true; the shell shows usage if

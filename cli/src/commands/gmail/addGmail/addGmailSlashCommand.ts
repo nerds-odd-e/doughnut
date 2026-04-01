@@ -11,7 +11,7 @@ const addGmailDoc: CommandDoc = {
 }
 
 export const addGmailSlashCommand: InteractiveSlashCommand = {
-  line: '/add gmail',
+  literal: '/add gmail',
   doc: addGmailDoc,
   stageComponent: AddGmailStage,
 }

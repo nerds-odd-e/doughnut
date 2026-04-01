@@ -25,9 +25,10 @@ export const interactiveSlashCommands: readonly InteractiveSlashCommand[] = [
   exitSlashCommand,
 ]
 
-const interactiveSlashCommandByLine = new Map<string, InteractiveSlashCommand>(
-  interactiveSlashCommands.map((c) => [c.line.slice(1), c] as const)
-)
+const interactiveSlashCommandByLiteral = new Map<
+  string,
+  InteractiveSlashCommand
+>(interactiveSlashCommands.map((c) => [c.literal.slice(1), c] as const))
 
 type ResolvedInteractiveSlashCommand = {
   command: InteractiveSlashCommand
@@ -41,15 +42,15 @@ type ResolvedInteractiveSlashCommand = {
 export function resolveInteractiveSlashCommand(
   body: string
 ): ResolvedInteractiveSlashCommand | undefined {
-  const exact = interactiveSlashCommandByLine.get(body)
+  const exact = interactiveSlashCommandByLiteral.get(body)
   if (exact) return { command: exact, argument: undefined }
 
   const prefix = [...interactiveSlashCommands]
-    .sort((a, b) => b.line.length - a.line.length)
-    .find((c) => body.startsWith(`${c.line.slice(1)} `))
+    .sort((a, b) => b.literal.length - a.literal.length)
+    .find((c) => body.startsWith(`${c.literal.slice(1)} `))
   if (!prefix) return undefined
 
-  const cmdBody = prefix.line.slice(1)
+  const cmdBody = prefix.literal.slice(1)
   const rest = body.slice(cmdBody.length + 1).trim()
   return {
     command: prefix,

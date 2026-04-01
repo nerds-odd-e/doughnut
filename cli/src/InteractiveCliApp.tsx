@@ -189,7 +189,7 @@ export function InteractiveCliApp() {
           ...prev,
           withLeadingGapAfterUserIfNeeded(prev, assistant),
         ])
-        if (command.line === '/exit') setExitAfterCommit(true)
+        if (command.literal === '/exit') setExitAfterCommit(true)
       })
       .catch((err: unknown) => {
         const assistant = transcriptAssistantText(
