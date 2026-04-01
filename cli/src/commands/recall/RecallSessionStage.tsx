@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { Key } from 'ink'
-import { Box, useInput } from 'ink'
+import { Box, Text, useInput } from 'ink'
 import { Spinner } from '@inkjs/ui'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
 import { SetStageKeyHandlerContext } from '../../commonUIComponents/stageKeyForwardContext.js'
@@ -29,8 +29,27 @@ import { recallAnsweredScrollbackItem } from './recallAnsweredScrollback.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 import { useSessionScrollbackAppend } from '../../sessionScrollback/sessionScrollbackAppendContext.js'
 
-function RecallSessionChrome({ children }: { readonly children: ReactNode }) {
-  return <Box flexDirection="column">{children}</Box>
+const RECALL_NOTEBOOK_LINE_EMOJI = '📓'
+
+function RecallSessionChrome({
+  notebookTitle,
+  children,
+}: {
+  readonly notebookTitle?: string
+  readonly children: ReactNode
+}) {
+  const trimmed = notebookTitle?.trim()
+  const showNotebook = trimmed !== undefined && trimmed.length > 0
+  return (
+    <Box flexDirection="column">
+      {showNotebook ? (
+        <Text>
+          {RECALL_NOTEBOOK_LINE_EMOJI} {trimmed}
+        </Text>
+      ) : null}
+      {children}
+    </Box>
+  )
 }
 
 export function RecallSessionStage({
@@ -236,7 +255,7 @@ export function RecallSessionStage({
 
   if (card.variant === 'mcq') {
     return (
-      <RecallSessionChrome>
+      <RecallSessionChrome notebookTitle={card.payload.notebookTitle}>
         <RecallMcqStage
           key={card.payload.recallPromptId}
           payload={card.payload}
@@ -253,7 +272,7 @@ export function RecallSessionStage({
 
   if (card.variant === 'spelling-session') {
     return (
-      <RecallSessionChrome>
+      <RecallSessionChrome notebookTitle={card.payload.notebookTitle}>
         <SpellingRecallStage
           key={card.payload.memoryTrackerId}
           payload={card.payload}
@@ -267,7 +286,7 @@ export function RecallSessionStage({
   }
 
   return (
-    <RecallSessionChrome>
+    <RecallSessionChrome notebookTitle={card.payload.notebookTitle}>
       <JustReviewRecallStage
         payload={card.payload}
         inputBlockedRef={submittingRef}

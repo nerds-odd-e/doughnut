@@ -144,11 +144,6 @@ export function JustReviewRecallStage({
   const detailLines =
     detailsRendered.length > 0 ? detailsRendered.split('\n') : []
 
-  const headerEl =
-    payload.notebookTitle !== undefined && payload.notebookTitle !== '' ? (
-      <Text>{payload.notebookTitle}</Text>
-    ) : undefined
-
   const handleQuestionEsc = useCallback(() => {
     if (inputBlockedRef.current) {
       abortJustReviewInFlight()
@@ -163,7 +158,6 @@ export function JustReviewRecallStage({
         onConfirmLeave={onConfirmLeaveRecall}
         onDismiss={() => setShowLeaveConfirm(false)}
         inputBlockedRef={inputBlockedRef}
-        header={headerEl}
       />
     )
   }
@@ -175,7 +169,6 @@ export function JustReviewRecallStage({
       onAnswer={submitJustReview}
       onCancel={handleQuestionEsc}
       inputBlockedRef={inputBlockedRef}
-      header={headerEl}
       belowBuffer={
         <>
           <Text>{payload.noteTitle}</Text>

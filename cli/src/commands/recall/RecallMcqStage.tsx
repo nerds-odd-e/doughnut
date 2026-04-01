@@ -419,21 +419,12 @@ export function RecallMcqStage({
         onConfirmLeave={onConfirmLeaveRecall}
         onDismiss={() => setShowLeaveConfirm(false)}
         inputBlockedRef={inputBlockedRef}
-        header={
-          payload.notebookTitle !== undefined &&
-          payload.notebookTitle !== '' ? (
-            <Text>{payload.notebookTitle}</Text>
-          ) : undefined
-        }
       />
     )
   }
 
   return (
     <Box flexDirection="column">
-      {payload.notebookTitle !== undefined && payload.notebookTitle !== '' ? (
-        <Text>{payload.notebookTitle}</Text>
-      ) : null}
       <BorderedSingleLinePromptInputInk
         terminalColumns={promptCols}
         buffer={buffer}
