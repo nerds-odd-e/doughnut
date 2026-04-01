@@ -1,6 +1,6 @@
 # `tty-assert` — PTY terminal test library extraction
 
-**Status:** Phases 1–3 are **complete** in-repo; Phases 4–11 are roadmap only until started. Sub-phases: [`ongoing/cli-phase1-tty-assert-subphases.md`](./ongoing/cli-phase1-tty-assert-subphases.md).
+**Status:** Phases 1–3 are **complete** in-repo; **Phase 4.1** (xterm primitive + smoke tests) is **complete**; Phases 4.2–4.3 and 5–11 follow the roadmap. Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md).
 
 **Intent:** Extract PTY-based terminal testing into a **Cypress-neutral, Doughnut-neutral** library named **`tty-assert`**, publishable on npm and eventually movable out of this repo. Goal: reliable assertions on terminal-visible state, with failures that show **expected vs actual** without manually decoding escape sequences, and CI-friendly artifacts where useful.
 
@@ -24,7 +24,7 @@
 | PTY spawn, buffer, write tasks | `e2e_test/config/cliE2ePluginTasks.ts` (glue) + `packages/tty-assert` (`ptySession`, `facade`) | `tty-assert` **runtime** API + optional **Cypress task adapter** (thin, ideally in `e2e_test` only) |
 | ANSI strip | `packages/tty-assert/src/stripAnsi.ts` | `tty-assert` core |
 | Fixed cols/rows | `packages/tty-assert/src/geometry.ts` | `tty-assert` default geometry (configurable) |
-| Transcript → visible plaintext / replay | `packages/tty-assert/src/ptyTranscriptToVisiblePlaintext.ts` | `tty-assert` core; **Phase 4** moves authoritative interpretation to **xterm.js** where parity is proven |
+| Transcript → visible plaintext / replay | `packages/tty-assert/src/ptyTranscriptToVisiblePlaintext.ts` (+ Phase 4 xterm module) | **Phase 4:** xterm replay for **`getGuidanceContext` / Current guidance** only; **Phase 5:** remaining call sites + API tidy |
 | Error snapshot formatting (truncation, safe text) | `packages/tty-assert/src/errorSnapshotFormatting.ts` | `tty-assert` core |
 | Google OAuth PTY simulation | `e2e_test/config/cliE2eGoogleOAuthSimulation.ts` | Stays **Doughnut** (or behind `tty-assert` **hook/extension** interface) |
 | Retry, `expectContains`, domain heuristics | `e2e_test/start/pageObjects/cli/outputAssertions.ts` | **Generic** snapshots → `tty-assert` (today: `errorSnapshotFormatting`); **domain** sections + Cypress orchestration stay Doughnut |
@@ -81,29 +81,41 @@
 
 ## Phase 4 — Introduce xterm.js for better assertion
 
-**Outcome:** Terminal-visible state used for assertions is driven by **xterm.js** (headless / Node-friendly wiring), so behavior matches a real terminal emulator more closely than a hand-rolled replay.
+**Status:** **4.1 complete** (library-only; no `outputAssertions` switch yet). **Sub-phases (detail, gates, TDD notes):** [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md).
 
-**Work:**
+**Outcome:** Terminal **replay** used for **Current guidance** assertions is driven by **xterm.js** (Node/headless wiring), so simulated screen text aligns with a real terminal emulator. Hand-rolled `ptyTranscriptToVisiblePlaintext` remains the default everywhere else until Phase 5.
 
-- Feed the PTY byte stream into an xterm instance sized to the same **cols × rows** as the PTY session.
-- Migrate or replace bespoke replay (`ptyTranscriptToVisiblePlaintext` and related) **behind** this model where parity is verified; keep regression tests on fixed transcript fixtures until confidence is high.
-- Expose a small internal or package-level API to read **current screen / buffer** for assertions and later diagnostics (PNG, structured debug output).
+**Sub-phase summary (planning.mdc: one slice per sub-phase, ordered by dependency):**
 
-**Gate:** Doughnut CLI E2E unchanged; `tty-assert` unit tests cover xterm-backed visible state for representative transcripts.
+| Sub-phase | Deliverable | Gate |
+|-----------|-------------|------|
+| **4.1** | `tty-assert`: xterm deps + replay primitive + smoke unit tests (transcript → plain string contract) | **Met:** `tty-assert` test + lint green; no Doughnut replay wiring |
+| **4.2** | Parity (or documented deltas) vs legacy replay on extended fixtures | `tty-assert` tests green; still no Doughnut switch |
+| **4.3** | `outputAssertions.getGuidanceContext` uses xterm for `replayedPlain` only | CLI-relevant Cypress green; run targeted `--spec` for access-token, recall, install features |
+
+**Reference: [microsoft/tui-test](https://github.com/microsoft/tui-test)** — xterm.js for PTY rendering; map **feed bytes → read buffer text** only, not their runner. Implementation notes (Node `Terminal`, addons, headless CI) live in the sub-phase doc.
+
+**Named acceptance example:** `cli_access_token.feature` — `"E2E CLI Token"` in Current guidance; recall guidance steps stay green on the same choke point.
+
+**Phase gate (after 4.3):** Hand-rolled `ptyTranscriptToVisiblePlaintext` still exported and used outside `getGuidanceContext`.
+
+**Explicitly deferred to Phase 5:** Facade replay migration; past assistant / answered / scrollback semantics; removing legacy replay from production paths; assertion API consolidation.
 
 ---
 
-## Phase 5 — Tidy assertion APIs of `tty-assert`
+## Phase 5 — Tidy assertion APIs of `tty-assert` and finish xterm migration
 
-**Outcome:** One coherent, documented **assertion surface** (names, parameters, options objects, retries), instead of accreted helpers.
+**Outcome:** One coherent, documented **assertion surface** (names, parameters, options objects, retries), instead of accreted helpers — and **all** replay-based visible text goes through xterm (or a single chosen implementation) with legacy replay removed or quarantined to regression fixtures only.
 
 **Work:**
 
-- Consolidate entry points for substring/region checks, timeouts, and error message shape; avoid duplicate “strip then search” paths.
-- Separate **generic** matchers from hooks where Doughnut passes domain-specific region logic (e.g. “current guidance”) without widening the core API unnecessarily.
-- Update Doughnut page objects to the tidied API with **no** behavior change.
+- **Finish xterm migration:** Route **`facade`** and any remaining imports of `ptyTranscriptToVisiblePlaintext` through the xterm-backed replay (or a thin `replayToPlaintext` facade that selects implementation). After parity is broad enough, **deprecate** direct use of hand-rolled replay in production paths; keep legacy in tests for golden comparisons if still valuable.
+- **Past assistant / answered questions (optional product decision):** Today these use **ANSI-stripped cumulative PTY bytes** (`assertStrippedPtyTranscriptContains`), not screen replay. Decide whether to keep that semantics (full session log) or move to **xterm buffer + scrollback** for closer-to-terminal behavior; if changed, do it here with fixture/E2E coverage and clear failure messages.
+- **Consolidate entry points** for substring/region checks, timeouts, and error message shape; avoid duplicate “strip then search” vs “replay then search” paths — one obvious path per assertion kind.
+- **Separate generic matchers** from hooks where Doughnut passes domain-specific region logic (e.g. “current guidance”) without widening the core API unnecessarily.
+- **Update Doughnut page objects** to the tidied API with **no** behavior change.
 
-**Gate:** E2E green; `tty-assert` README or `docs/` snippet shows the intended public assertion API.
+**Gate:** E2E green; `tty-assert` README or `docs/` snippet shows the intended public assertion API; no stray dual replay paths in Doughnut `outputAssertions` except documented test doubles.
 
 ---
 
@@ -191,7 +203,7 @@
 - **1 → 2:** Clean seams make the package extraction mechanical.
 - **3** can start once **2**’s skeleton exists (tests can live next to the package).
 - **3 → 4:** Unit tests and CI exist before swapping the emulation core to xterm.js.
-- **4 → 5 → 6:** Visible state model (xterm) stabilizes first; then assertion API; then lifecycle API — each phase ends with E2E green.
+- **4 → 5 → 6:** Phase 4 (sub-phases 4.1–4.3) lands xterm replay for **`getGuidanceContext` only**; Phase 5 completes xterm migration (facade, any remaining replay), tidies assertion APIs, and optionally revisits past-assistant/answered semantics; Phase 6 is lifecycle API — **4.3** and Phase 5+ end with E2E green; **4.1–4.2** gate on `tty-assert` only.
 - **7–10** are mostly sequential in **diagnostic value**; **9–10** may share rendering infrastructure (**8 → 9** especially).
 - **11** last.
 
