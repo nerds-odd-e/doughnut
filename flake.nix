@@ -29,17 +29,13 @@
 
         inherit (pkgs) stdenv lib;
         apple_sdk = pkgs.darwin.apple_sdk.frameworks;
-        cursorDevEnv = builtins.getEnv "CURSOR_DEV";
-        pythonDevEnv = builtins.getEnv "PYTHON_DEV";
-        pythonDev = pythonDevEnv == "true";
-        poetryPath = "${pkgs.poetry}/bin";
-        pythonPackages = if pythonDev then [
-          pkgs.python314
-          pkgs.poetry
-          pkgs.python314Packages.pip
-          pkgs.python314Packages.setuptools
-          pkgs.python314Packages.wheel
-        ] else [];
+
+        # Python 3.12: stable on nixos-25.11; pydantic-core in the lockfile does not build on 3.13 yet.
+        python312 = pkgs.python312;
+        pythonWithTools = python312.withPackages (ps: with ps; [ pip setuptools wheel ]);
+        poetryPkg = pkgs.poetry.override { python3 = python312; };
+        poetryPath = "${poetryPkg}/bin";
+        pythonPackages = [ pythonWithTools poetryPkg ];
 
         basePackages = with pkgs; [
           zulu25
@@ -104,13 +100,14 @@
         devShells.default = pkgs.mkShell {
           name = "doughnut";
           nativeBuildInputs = with pkgs; [ autoPatchelfHook ];
-          buildInputs = basePackages ++ darwinPackages ++ linuxPackages;
+          buildInputs = basePackages ++ darwinPackages ++ linuxPackages ++ pythonPackages;
 
           # Force binary substitutes for the shell
           preferLocalBuild = false;
           allowSubstitutes = true;
 
           shellHook = ''
+            export PATH="${pythonWithTools}/bin:${poetryPath}:$PATH"
             source ./scripts/nix_shell_hook.sh "${pkgs.fzf}" "${pkgs.mysql84}" "${pkgs.redis}" "${poetryPath}"
           '';
         };
