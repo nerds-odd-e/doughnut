@@ -8,7 +8,7 @@ import {
 } from 'react'
 import type { ComponentType } from 'react'
 import type { Key } from 'ink'
-import { Box, Text, useApp, useInput } from 'ink'
+import { Box, useApp, useInput, useStdout } from 'ink'
 import { MainInteractivePrompt } from './mainInteractivePrompt/index.js'
 import { resolveInteractiveSlashCommand } from './commands/interactiveSlashCommands.js'
 import type { InteractiveSlashCommandStageProps } from './commands/interactiveSlashCommand.js'
@@ -25,6 +25,8 @@ import {
   type SessionScrollbackItem,
 } from './sessionScrollback/SessionScrollback.js'
 import { SessionScrollbackAppendProvider } from './sessionScrollback/sessionScrollbackAppendContext.js'
+import { StageLiveHeaderInk } from './commonUIComponents/stageLiveHeaderInk.js'
+import { inkTerminalColumns } from './terminalColumns.js'
 
 function withLeadingGapAfterUserIfNeeded(
   prev: readonly SessionScrollbackItem[],
@@ -204,6 +206,9 @@ export function InteractiveCliApp() {
     [appendScrollbackItem, appendScrollbackItems]
   )
 
+  const { stdout } = useStdout()
+  const liveRegionCols = inkTerminalColumns(stdout.columns)
+
   return (
     <SetStageKeyHandlerContext.Provider value={setStageKeyHandler}>
       <SessionScrollbackAppendProvider value={scrollbackAppendApi}>
@@ -212,7 +217,10 @@ export function InteractiveCliApp() {
           {activeStageComponent && (
             <Box flexDirection="column">
               {activeStageIndicator !== undefined ? (
-                <Text>{activeStageIndicator}</Text>
+                <StageLiveHeaderInk
+                  title={activeStageIndicator}
+                  cols={liveRegionCols}
+                />
               ) : null}
               {createElement(activeStageComponent, {
                 argument: stageArgumentRef.current,
