@@ -98,14 +98,7 @@ describe('recall MCQ (interactive)', () => {
 
     showMemoryTrackerSpy = vi
       .spyOn(MemoryTrackerController, 'showMemoryTracker')
-      .mockResolvedValue({
-        data: makeMe.aMemoryTracker
-          .nextRecallAt('2026-06-01T00:00:00Z')
-          .ofNote(mcqFixtureNoteRealm)
-          .please(),
-      } as Awaited<
-        ReturnType<typeof MemoryTrackerController.showMemoryTracker>
-      >)
+      .mockRejectedValue(new Error('unexpected showMemoryTracker in MCQ path'))
 
     getRecallPromptsSpy = vi
       .spyOn(MemoryTrackerController, 'getRecallPrompts')
@@ -303,13 +296,6 @@ describe('recall MCQ (interactive)', () => {
       .createdAt(baseNoteTimes.createdAt)
       .updatedAt(baseNoteTimes.updatedAt)
       .please()
-    const note2 = makeMe.aNoteRealm
-      .title('Beta')
-      .notebookTitle('NB')
-      .details('body2')
-      .createdAt(baseNoteTimes.createdAt)
-      .updatedAt(baseNoteTimes.updatedAt)
-      .please()
 
     recallingSpy.mockResolvedValue({
       data: makeMe.aDueMemoryTrackersList
@@ -321,33 +307,15 @@ describe('recall MCQ (interactive)', () => {
         .please(),
     } as Awaited<ReturnType<typeof RecallsController.recalling>>)
 
-    let resolveMt2!: (
+    let resolvePrompts2!: (
       value: Awaited<
-        ReturnType<typeof MemoryTrackerController.showMemoryTracker>
+        ReturnType<typeof MemoryTrackerController.getRecallPrompts>
       >
     ) => void
-    const mt2Promise = new Promise<
-      Awaited<ReturnType<typeof MemoryTrackerController.showMemoryTracker>>
+    const prompts2Promise = new Promise<
+      Awaited<ReturnType<typeof MemoryTrackerController.getRecallPrompts>>
     >((resolve) => {
-      resolveMt2 = resolve
-    })
-
-    showMemoryTrackerSpy.mockImplementation((opts) => {
-      const id = opts.path.memoryTracker
-      if (id === 1) {
-        return Promise.resolve({
-          data: makeMe.aMemoryTracker
-            .nextRecallAt('2026-06-01T00:00:00Z')
-            .ofNote(note1)
-            .please(),
-        } as Awaited<
-          ReturnType<typeof MemoryTrackerController.showMemoryTracker>
-        >)
-      }
-      if (id === 2) {
-        return mt2Promise
-      }
-      throw new Error(`unexpected memoryTracker ${String(id)}`)
+      resolvePrompts2 = resolve
     })
 
     getRecallPromptsSpy.mockImplementation((opts) => {
@@ -360,11 +328,7 @@ describe('recall MCQ (interactive)', () => {
         >)
       }
       if (id === 2) {
-        return Promise.resolve({
-          data: [secondPrompt],
-        } as Awaited<
-          ReturnType<typeof MemoryTrackerController.getRecallPrompts>
-        >)
+        return prompts2Promise
       }
       throw new Error(`unexpected memoryTracker ${String(id)}`)
     })
@@ -392,12 +356,9 @@ describe('recall MCQ (interactive)', () => {
         !p.includes(MCQ_HINT_SUBSTR)
     )
 
-    resolveMt2({
-      data: makeMe.aMemoryTracker
-        .nextRecallAt('2026-06-01T00:00:00Z')
-        .ofNote(note2)
-        .please(),
-    } as Awaited<ReturnType<typeof MemoryTrackerController.showMemoryTracker>>)
+    resolvePrompts2({
+      data: [secondPrompt],
+    } as Awaited<ReturnType<typeof MemoryTrackerController.getRecallPrompts>>)
 
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
@@ -489,31 +450,6 @@ describe('recall MCQ (interactive)', () => {
         ])
         .please(),
     } as Awaited<ReturnType<typeof RecallsController.recalling>>)
-
-    showMemoryTrackerSpy.mockImplementation((opts) => {
-      const id = opts.path.memoryTracker
-      if (id === 1) {
-        return Promise.resolve({
-          data: makeMe.aMemoryTracker
-            .nextRecallAt('2026-06-01T00:00:00Z')
-            .ofNote(note1)
-            .please(),
-        } as Awaited<
-          ReturnType<typeof MemoryTrackerController.showMemoryTracker>
-        >)
-      }
-      if (id === 2) {
-        return Promise.resolve({
-          data: makeMe.aMemoryTracker
-            .nextRecallAt('2026-06-01T00:00:00Z')
-            .ofNote(note2)
-            .please(),
-        } as Awaited<
-          ReturnType<typeof MemoryTrackerController.showMemoryTracker>
-        >)
-      }
-      throw new Error(`unexpected memoryTracker ${String(id)}`)
-    })
 
     getRecallPromptsSpy.mockImplementation((opts) => {
       const id = opts.path.memoryTracker

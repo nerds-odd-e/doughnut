@@ -11,6 +11,7 @@ import {
 import type { Key } from 'ink'
 import { Box, Text, useInput } from 'ink'
 import { Spinner } from '@inkjs/ui'
+import type { MemoryTrackerLite } from 'doughnut-api'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
 import { SetStageKeyHandlerContext } from '../../commonUIComponents/stageKeyForwardContext.js'
 import { YesNoStagePrompt } from '../../commonUIComponents/YesNoStagePrompt.js'
@@ -68,7 +69,7 @@ export function RecallSessionStage({
   const startedWithEmptyTodayRef = useRef(false)
   const activeOperationAbortRef = useRef<AbortController | null>(null)
   const currentRecallCardRef = useRef<RecallCard | null>(null)
-  const trackerQueueRef = useRef<number[]>([])
+  const trackerQueueRef = useRef<MemoryTrackerLite[]>([])
   currentRecallCardRef.current = card
 
   useEffect(() => {
@@ -77,13 +78,15 @@ export function RecallSessionStage({
     activeOperationAbortRef.current = ac
     ;(async () => {
       try {
-        const ids = await fetchDueMemoryTrackerIds(0, ac.signal)
+        const lites = await fetchDueMemoryTrackerIds(0, ac.signal)
         if (unmounted || ac.signal.aborted) return
-        trackerQueueRef.current = ids
-        if (ids.length > 0) {
+        trackerQueueRef.current = lites
+        if (lites.length > 0) {
           startedWithEmptyTodayRef.current = false
+          const head = lites[0]!
           const next = await loadRecallCardForMemoryTrackerId(
-            ids[0]!,
+            head.memoryTrackerId,
+            head.spelling,
             ac.signal
           )
           if (unmounted || ac.signal.aborted) return
@@ -145,7 +148,11 @@ export function RecallSessionStage({
           const ac = new AbortController()
           activeOperationAbortRef.current = ac
           try {
-            const next = await loadRecallCardForMemoryTrackerId(head, ac.signal)
+            const next = await loadRecallCardForMemoryTrackerId(
+              head.memoryTrackerId,
+              head.spelling,
+              ac.signal
+            )
             if (ac.signal.aborted) {
               onSettled(
                 userVisibleSlashCommandError(
@@ -195,7 +202,7 @@ export function RecallSessionStage({
       const ac = new AbortController()
       activeOperationAbortRef.current = ac
       try {
-        const ids = await fetchShuffledDueMemoryTrackerIds(3, ac.signal)
+        const lites = await fetchShuffledDueMemoryTrackerIds(3, ac.signal)
         if (activeOperationAbortRef.current === ac) {
           activeOperationAbortRef.current = null
         }
@@ -207,10 +214,14 @@ export function RecallSessionStage({
           )
           return
         }
-        trackerQueueRef.current = ids
+        trackerQueueRef.current = lites
         const next =
-          ids.length > 0
-            ? await loadRecallCardForMemoryTrackerId(ids[0]!, ac.signal)
+          lites.length > 0
+            ? await loadRecallCardForMemoryTrackerId(
+                lites[0]!.memoryTrackerId,
+                lites[0]!.spelling,
+                ac.signal
+              )
             : null
         if (ac.signal.aborted) {
           onSettled(

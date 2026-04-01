@@ -143,8 +143,8 @@ export async function contestAndRegenerateMcq(
   )
   const mapped = recallMcqPayloadFromRecallPrompt(
     memoryTrackerId,
-    notebookTitle,
-    regenerated
+    regenerated,
+    notebookTitle
   )
   if (mapped === null) {
     throw new Error('Regenerated recall prompt is not a pending MCQ.')

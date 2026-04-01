@@ -11,10 +11,7 @@ import {
   LEAVE_RECALL_PROMPT,
   RECALL_SESSION_STOPPED_LINE,
 } from '../src/commands/recall/leaveRecallSessionCopy.js'
-import {
-  RECALL_BUSY_SUBMIT_ANSWER_LABEL,
-  RECALL_LOADING_NEXT_QUESTION_LABEL,
-} from '../src/commands/recall/recallBusyInputCopy.js'
+import { RECALL_BUSY_SUBMIT_ANSWER_LABEL } from '../src/commands/recall/recallBusyInputCopy.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
   pressEscape,
@@ -97,21 +94,11 @@ describe('recall spelling (interactive)', () => {
       data: spellingDueList(),
     } as Awaited<ReturnType<typeof RecallsController.recalling>>)
 
-    const tracker = {
-      ...makeMe.aMemoryTracker
-        .nextRecallAt('2026-06-01T00:00:00Z')
-        .ofNote(spellingFixtureNoteRealm)
-        .please(),
-      id: MEMORY_TRACKER_ID,
-      spelling: true as const,
-    }
     showMemoryTrackerSpy = vi
       .spyOn(MemoryTrackerController, 'showMemoryTracker')
-      .mockResolvedValue({
-        data: tracker,
-      } as Awaited<
-        ReturnType<typeof MemoryTrackerController.showMemoryTracker>
-      >)
+      .mockRejectedValue(
+        new Error('unexpected showMemoryTracker in spelling path')
+      )
 
     getRecallPromptsSpy = vi
       .spyOn(MemoryTrackerController, 'getRecallPrompts')
@@ -257,16 +244,8 @@ describe('recall spelling (interactive)', () => {
     )
   })
 
-  test('after first spelling answer, shows loading next until second tracker loads', async () => {
+  test('after first spelling answer, shows loading spelling until second question loads', async () => {
     const secondStem = 'Second spell stem loading next unique'
-    const note2Realm = makeMe.aNoteRealm
-      .title('othernote')
-      .notebookTitle('NB')
-      .details('d2')
-      .createdAt(baseNoteTimes.createdAt)
-      .updatedAt(baseNoteTimes.updatedAt)
-      .please()
-
     const pending1 = pendingSpellingPrompt()
     const pending2 = makeMe.aRecallPrompt
       .withId(SPELL_PROMPT_ID_2)
@@ -284,47 +263,13 @@ describe('recall spelling (interactive)', () => {
         .please(),
     } as Awaited<ReturnType<typeof RecallsController.recalling>>)
 
-    const tracker1 = {
-      ...makeMe.aMemoryTracker
-        .nextRecallAt('2026-06-01T00:00:00Z')
-        .ofNote(spellingFixtureNoteRealm)
-        .please(),
-      id: MEMORY_TRACKER_ID,
-      spelling: true as const,
-    }
-    const tracker2 = {
-      ...makeMe.aMemoryTracker
-        .nextRecallAt('2026-06-01T00:00:00Z')
-        .ofNote(note2Realm)
-        .please(),
-      id: 2,
-      spelling: true as const,
-    }
-
-    let resolveMt2!: (
-      value: Awaited<
-        ReturnType<typeof MemoryTrackerController.showMemoryTracker>
-      >
+    let resolveAsk2!: (
+      value: Awaited<ReturnType<typeof MemoryTrackerController.askAQuestion>>
     ) => void
-    const mt2Promise = new Promise<
-      Awaited<ReturnType<typeof MemoryTrackerController.showMemoryTracker>>
+    const ask2Promise = new Promise<
+      Awaited<ReturnType<typeof MemoryTrackerController.askAQuestion>>
     >((resolve) => {
-      resolveMt2 = resolve
-    })
-
-    showMemoryTrackerSpy.mockImplementation((opts) => {
-      const id = opts.path.memoryTracker
-      if (id === 1) {
-        return Promise.resolve({
-          data: tracker1,
-        } as Awaited<
-          ReturnType<typeof MemoryTrackerController.showMemoryTracker>
-        >)
-      }
-      if (id === 2) {
-        return mt2Promise
-      }
-      throw new Error(`unexpected memoryTracker ${String(id)}`)
+      resolveAsk2 = resolve
     })
 
     let askN = 0
@@ -335,9 +280,10 @@ describe('recall spelling (interactive)', () => {
           data: pending1,
         } as Awaited<ReturnType<typeof MemoryTrackerController.askAQuestion>>)
       }
-      return Promise.resolve({
-        data: pending2,
-      } as Awaited<ReturnType<typeof MemoryTrackerController.askAQuestion>>)
+      if (askN === 2) {
+        return ask2Promise
+      }
+      throw new Error(`unexpected askAQuestion call ${String(askN)}`)
     })
 
     answerSpellingSpy.mockResolvedValue({
@@ -359,13 +305,13 @@ describe('recall spelling (interactive)', () => {
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
       (p) =>
-        p.includes(RECALL_LOADING_NEXT_QUESTION_LABEL) &&
+        p.includes('Loading spelling question') &&
         !p.includes(SPELL_PLACEHOLDER_SUBSTR)
     )
 
-    resolveMt2({
-      data: tracker2,
-    } as Awaited<ReturnType<typeof MemoryTrackerController.showMemoryTracker>>)
+    resolveAsk2({
+      data: pending2,
+    } as Awaited<ReturnType<typeof MemoryTrackerController.askAQuestion>>)
 
     await waitForLastFrame(
       lastFrame,

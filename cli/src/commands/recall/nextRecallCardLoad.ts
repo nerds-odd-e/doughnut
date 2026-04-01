@@ -13,8 +13,10 @@ import {
 import { dueRecallQuery } from './dueRecallQuery.js'
 import { noteBreadcrumbTrailTitles } from './recallNoteContext.js'
 
-function shuffleMemoryTrackerIds(ids: readonly number[]): number[] {
-  const a = [...ids]
+function shuffleMemoryTrackerLites(
+  lites: readonly MemoryTrackerLite[]
+): MemoryTrackerLite[] {
+  const a = [...lites]
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
     const t = a[i]!
@@ -27,22 +29,21 @@ function shuffleMemoryTrackerIds(ids: readonly number[]): number[] {
 export async function fetchDueMemoryTrackerIds(
   dueInDays: number,
   signal?: AbortSignal
-): Promise<number[]> {
+): Promise<MemoryTrackerLite[]> {
   const due = await runDefaultBackendJson<DueMemoryTrackers>(() =>
     RecallsController.recalling({
       query: dueRecallQuery(dueInDays),
       ...doughnutSdkOptions(signal),
     })
   )
-  const trackers = due.toRepeat ?? []
-  return trackers.map((t: MemoryTrackerLite) => t.memoryTrackerId)
+  return due.toRepeat ?? []
 }
 
 export async function fetchShuffledDueMemoryTrackerIds(
   dueInDays: number,
   signal?: AbortSignal
-): Promise<number[]> {
-  return shuffleMemoryTrackerIds(
+): Promise<MemoryTrackerLite[]> {
+  return shuffleMemoryTrackerLites(
     await fetchDueMemoryTrackerIds(dueInDays, signal)
   )
 }
@@ -85,10 +86,22 @@ function firstPendingMcq(prompts: RecallPrompt[]): RecallPrompt | undefined {
   return prompts.find((p) => p.questionType === 'MCQ' && p.answer == null)
 }
 
+function notebookTitleForMcqPrompt(
+  prompt: RecallPrompt,
+  fallback?: string | undefined
+): string | undefined {
+  const fromPrompt = prompt.notebook?.title?.trim()
+  if (fromPrompt !== undefined && fromPrompt.length > 0) {
+    return fromPrompt
+  }
+  const f = fallback?.trim()
+  return f !== undefined && f.length > 0 ? f : undefined
+}
+
 export function recallMcqPayloadFromRecallPrompt(
   memoryTrackerId: number,
-  notebookTitle: string | undefined,
-  prompt: RecallPrompt
+  prompt: RecallPrompt,
+  notebookTitleFallback?: string | undefined
 ): RecallMcqCardPayload | null {
   if (prompt.questionType !== 'MCQ' || prompt.answer != null) return null
   const mq = prompt.multipleChoicesQuestion
@@ -99,7 +112,7 @@ export function recallMcqPayloadFromRecallPrompt(
     recallPromptId: prompt.id,
     stem: mq?.f0__stem?.trim() ?? '',
     choices,
-    notebookTitle,
+    notebookTitle: notebookTitleForMcqPrompt(prompt, notebookTitleFallback),
   }
 }
 
@@ -109,7 +122,6 @@ export function recallMcqPayloadFromRecallPrompt(
  */
 async function tryLoadMcqPayload(
   memoryTrackerId: number,
-  notebookTitle: string | undefined,
   existingPrompts: RecallPrompt[],
   signal?: AbortSignal
 ): Promise<RecallMcqCardPayload | null> {
@@ -130,18 +142,14 @@ async function tryLoadMcqPayload(
     }
   }
   if (mcqPrompt === undefined) return null
-  return recallMcqPayloadFromRecallPrompt(
-    memoryTrackerId,
-    notebookTitle,
-    mcqPrompt
-  )
+  return recallMcqPayloadFromRecallPrompt(memoryTrackerId, mcqPrompt)
 }
 
 /** Spelling memory tracker: server spelling question first (same order as web recall). */
 export type SpellingRecallSessionPayload = {
   readonly memoryTrackerId: number
   readonly notebookTitle?: string
-  /** Cached from tracker load; answered scrollback prefers `note` on the submit response. */
+  /** Cached from tracker load when available; answered scrollback prefers `note` on the submit response. */
   readonly detailsMarkdown: string
 }
 
@@ -156,28 +164,19 @@ export type RecallCard =
       readonly payload: SpellingRecallSessionPayload
     }
 
-/** Build one recall card for a known due memory tracker id (no `recalling` list fetch). */
+/** Build one recall card for a known due memory tracker (no `recalling` list fetch). */
 export async function loadRecallCardForMemoryTrackerId(
   memoryTrackerId: number,
+  spelling: boolean,
   signal?: AbortSignal
 ): Promise<RecallCard> {
-  const mt = await runDefaultBackendJson<MemoryTracker>(() =>
-    MemoryTrackerController.showMemoryTracker({
-      path: { memoryTracker: memoryTrackerId },
-      ...doughnutSdkOptions(signal),
-    })
-  )
-  const note = mt.note
-  const notebookTitle = note?.noteTopology?.notebookTitle?.trim()
-  const reviewPayload = recallJustReviewPayloadFromMemoryTracker(mt)
-
-  if (mt.spelling) {
+  if (spelling) {
     return {
       variant: 'spelling-session',
       payload: {
-        memoryTrackerId: reviewPayload.memoryTrackerId,
-        notebookTitle: reviewPayload.notebookTitle,
-        detailsMarkdown: reviewPayload.detailsMarkdown,
+        memoryTrackerId,
+        notebookTitle: undefined,
+        detailsMarkdown: '',
       },
     }
   }
@@ -189,18 +188,19 @@ export async function loadRecallCardForMemoryTrackerId(
     })
   )
 
-  const mcqPayload = await tryLoadMcqPayload(
-    memoryTrackerId,
-    notebookTitle,
-    prompts,
-    signal
-  )
+  const mcqPayload = await tryLoadMcqPayload(memoryTrackerId, prompts, signal)
   if (mcqPayload !== null) {
     return { variant: 'mcq', payload: mcqPayload }
   }
 
+  const mt = await runDefaultBackendJson<MemoryTracker>(() =>
+    MemoryTrackerController.showMemoryTracker({
+      path: { memoryTracker: memoryTrackerId },
+      ...doughnutSdkOptions(signal),
+    })
+  )
   return {
     variant: 'just-review',
-    payload: reviewPayload,
+    payload: recallJustReviewPayloadFromMemoryTracker(mt),
   }
 }
