@@ -7,7 +7,7 @@
  * failure path where this module throws.
  *
  * **Generic (imported):** `tty-assert/errorSnapshotFormatting` (truncation, safe visible text
- * for errors), `stripAnsi`, `ptyTranscriptToVisiblePlaintext`; plus `extractCurrentGuidanceFromReplayedPlaintext`
+ * for errors), `stripAnsi`, `ptyTranscriptToVisiblePlaintextViaXterm` (Current guidance replay only); plus `extractCurrentGuidanceFromReplayedPlaintext`
  * from `cliPtyCurrentGuidanceFromReplay` (Ink-shaped guidance region — Doughnut-specific heuristic, not Cypress).
  *
  * **Doughnut-specific (this file):** non-interactive vs PTY sniffing (`stdoutLooksLikeInteractiveCliPtyCapture`,
@@ -25,7 +25,7 @@ import {
   tailPreview,
   TERMINAL_ERROR_PREVIEW_LEN,
 } from 'tty-assert/errorSnapshotFormatting'
-import { ptyTranscriptToVisiblePlaintext } from 'tty-assert/ptyTranscriptToVisiblePlaintext'
+import { ptyTranscriptToVisiblePlaintextViaXterm } from 'tty-assert/ptyTranscriptToVisiblePlaintextViaXterm'
 import { stripAnsiCliPty } from 'tty-assert/stripAnsi'
 
 export const OUTPUT_ALIAS = '@doughnutOutput'
@@ -81,34 +81,32 @@ function assertSectionContainsSubstring(
 /** Re-read value each attempt; retry until assert passes or timeout, then screenshot and throw. */
 function retryCliOutputAssertion(
   readRaw: () => Cypress.Chainable<string>,
-  assert: (raw: string) => void,
+  assert: (raw: string) => void | Promise<void>,
   screenshotName: string
 ): void {
   const tryOnce = (deadline: number) => {
-    readRaw().then((raw) => {
-      let lastError: Error | undefined
-      try {
-        assert(raw)
-        return
-      } catch (err) {
-        lastError = err instanceof Error ? err : new Error(String(err))
-      }
-      if (Date.now() >= deadline) {
-        cy.screenshot(screenshotName).then(() => {
-          throw lastError
-        })
-        return
-      }
-      cy.wait(CLI_OUTPUT_ASSERT_RETRY_MS).then(() => tryOnce(deadline))
-    })
+    return readRaw().then((raw) => {
+      return Cypress.Promise.resolve(assert(raw)).then(
+        () => undefined,
+        (err: unknown) => {
+          const lastError = err instanceof Error ? err : new Error(String(err))
+          if (Date.now() >= deadline) {
+            return cy.screenshot(screenshotName).then(() => {
+              throw lastError
+            })
+          }
+          return cy
+            .wait(CLI_OUTPUT_ASSERT_RETRY_MS)
+            .then(() => tryOnce(deadline))
+        }
+      )
+    }) as Cypress.Chainable<void>
   }
-  cy.wrap(null).then(() => {
-    tryOnce(Date.now() + CLI_OUTPUT_ASSERT_TIMEOUT_MS)
-  })
+  cy.wrap(null).then(() => tryOnce(Date.now() + CLI_OUTPUT_ASSERT_TIMEOUT_MS))
 }
 
 function retryInteractiveAssertion(
-  assert: (raw: string) => void,
+  assert: (raw: string) => void | Promise<void>,
   screenshotName: string
 ): void {
   retryCliOutputAssertion(
@@ -260,11 +258,11 @@ function boldStyledTextPattern(text: string): RegExp {
   return new RegExp(`\\x1b\\[1m(?:\\x1b\\[[0-9;]*m)*${escapeRegex(text)}`)
 }
 
-function getGuidanceContext(raw: string): {
+async function getGuidanceContext(raw: string): Promise<{
   replayedPlain: string
   guidancePlain: string
-} {
-  const replayedPlain = ptyTranscriptToVisiblePlaintext(raw)
+}> {
+  const replayedPlain = await ptyTranscriptToVisiblePlaintextViaXterm(raw)
   const guidancePlain =
     extractCurrentGuidanceFromReplayedPlaintext(replayedPlain)
   return { replayedPlain, guidancePlain }
@@ -284,8 +282,11 @@ function formatGuidanceRegion(
   )
 }
 
-function assertCurrentGuidanceContains(raw: string, expected: string): void {
-  const { replayedPlain, guidancePlain } = getGuidanceContext(raw)
+async function assertCurrentGuidanceContains(
+  raw: string,
+  expected: string
+): Promise<void> {
+  const { replayedPlain, guidancePlain } = await getGuidanceContext(raw)
   if (guidancePlain.includes(expected)) return
   failCliAssertion(
     `Expected substring in ${CURRENT_GUIDANCE_SECTION} (not raw PTY bytes).\n` +
@@ -306,27 +307,32 @@ export function whenCurrentGuidanceContainsThen(
   screenshotName: string
 ): Cypress.Chainable<null> {
   const deadline = Date.now() + CLI_OUTPUT_ASSERT_TIMEOUT_MS
-  const tryOnce = (): Cypress.Chainable<null> => {
+  const tryOnce = () => {
     return cy.task<string>('cliInteractivePtyGetBuffer').then((raw) => {
-      try {
+      return Cypress.Promise.resolve(
         assertCurrentGuidanceContains(raw, prompt)
-        return onReady()
-      } catch (err) {
-        const lastError = err instanceof Error ? err : new Error(String(err))
-        if (Date.now() >= deadline) {
-          return cy.screenshot(screenshotName).then(() => {
-            throw lastError
-          })
+      ).then(
+        () => onReady(),
+        (err: unknown) => {
+          const lastError = err instanceof Error ? err : new Error(String(err))
+          if (Date.now() >= deadline) {
+            return cy.screenshot(screenshotName).then(() => {
+              throw lastError
+            })
+          }
+          return cy.wait(CLI_OUTPUT_ASSERT_RETRY_MS).then(() => tryOnce())
         }
-        return cy.wait(CLI_OUTPUT_ASSERT_RETRY_MS).then(() => tryOnce())
-      }
-    })
+      )
+    }) as Cypress.Chainable<null>
   }
   return cy.wrap(null).then(() => tryOnce())
 }
 
-function assertCurrentGuidanceContainsBold(raw: string, text: string): void {
-  const { replayedPlain, guidancePlain } = getGuidanceContext(raw)
+async function assertCurrentGuidanceContainsBold(
+  raw: string,
+  text: string
+): Promise<void> {
+  const { replayedPlain, guidancePlain } = await getGuidanceContext(raw)
   if (!guidancePlain.includes(text)) {
     failCliAssertion(
       `Expected ${JSON.stringify(text)} in ${CURRENT_GUIDANCE_SECTION}.\n` +

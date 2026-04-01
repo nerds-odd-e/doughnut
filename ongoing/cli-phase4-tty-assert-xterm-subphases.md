@@ -2,7 +2,7 @@
 
 **Parent plan:** [`cli-terminal-test-library-extraction.md`](./cli-terminal-test-library-extraction.md) (Phase 4: xterm-backed replay for **`getGuidanceContext`** only; Phase 5 finishes migration + API tidy).
 
-**This document:** Splits Phase 4 per `.cursor/rules/planning.mdc` — **one deliverable per sub-phase**, each with an explicit **gate**. **Sub-phases 4.1–4.2 are complete**. **4.3** remains (`outputAssertions` wiring).
+**This document:** Splits Phase 4 per `.cursor/rules/planning.mdc` — **one deliverable per sub-phase**, each with an explicit **gate**. **Sub-phases 4.1–4.3 are complete** (Phase 4 done; Phase 5+ in parent plan).
 
 **Reference:** [microsoft/tui-test](https://github.com/microsoft/tui-test) — xterm.js for terminal rendering; borrow **feed bytes → read buffer text**, not their test runner.
 
@@ -63,6 +63,8 @@
 - Leave **`ptyTranscriptToVisiblePlaintext`** exported and used elsewhere (`facade`, any other imports) until Phase 5.
 
 **Gate:** Full **CLI-relevant** Cypress green (same bar as parent Phase 4). For routine runs, prefer **targeted specs** over the whole suite: at minimum `e2e_test/features/cli/cli_access_token.feature`, `cli_recall.feature`, and `cli_install_and_run.feature` (install does not use Current guidance but catches accidental breakage in shared helpers). Use: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec '<paths>'` per `.cursor/rules/e2e_test.mdc`.
+
+**Done:** `getGuidanceContext` awaits `ptyTranscriptToVisiblePlaintextViaXterm`; `retryCliOutputAssertion` supports async asserts; `whenCurrentGuidanceContainsThen` awaits guidance checks. Targeted CLI Cypress specs above green.
 
 **Phase-complete checklist (parent plan):** Update [`cli-terminal-test-library-extraction.md`](./cli-terminal-test-library-extraction.md) Phase 4 status when 4.3 merges; trim or archive this sub-phase doc when Phase 4 is fully done if nothing left to track.
 

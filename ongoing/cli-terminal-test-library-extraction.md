@@ -1,6 +1,6 @@
 # `tty-assert` — PTY terminal test library extraction
 
-**Status:** Phases 1–3 are **complete** in-repo; **Phase 4.1–4.2** are **complete** (4.2: legacy vs xterm parity fixtures in `packages/tty-assert/tests/ptyTranscriptReplayParity.test.ts`); **4.3** and Phases 5–11 follow the roadmap. Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md).
+**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses `ptyTranscriptToVisiblePlaintextViaXterm`). Phases 5–11 follow the roadmap. Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md).
 
 **Intent:** Extract PTY-based terminal testing into a **Cypress-neutral, Doughnut-neutral** library named **`tty-assert`**, publishable on npm and eventually movable out of this repo. Goal: reliable assertions on terminal-visible state, with failures that show **expected vs actual** without manually decoding escape sequences, and CI-friendly artifacts where useful.
 
@@ -81,7 +81,7 @@
 
 ## Phase 4 — Introduce xterm.js for better assertion
 
-**Status:** **4.1–4.2 complete** (library-only; no `outputAssertions` switch yet). **Sub-phases (detail, gates, TDD notes):** [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md).
+**Status:** **Complete** (4.1–4.3). **Sub-phases (detail, gates, TDD notes):** [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md).
 
 **Outcome:** Terminal **replay** used for **Current guidance** assertions is driven by **xterm.js** (Node/headless wiring), so simulated screen text aligns with a real terminal emulator. Hand-rolled `ptyTranscriptToVisiblePlaintext` remains the default everywhere else until Phase 5.
 
@@ -91,7 +91,7 @@
 |-----------|-------------|------|
 | **4.1** | `tty-assert`: xterm deps + replay primitive + smoke unit tests (transcript → plain string contract) | **Met:** `tty-assert` test + lint green; no Doughnut replay wiring |
 | **4.2** | Parity (or documented deltas) vs legacy replay on extended fixtures | **Met:** `ptyTranscriptReplayParity.test.ts`; `tty-assert` tests green; still no Doughnut switch |
-| **4.3** | `outputAssertions.getGuidanceContext` uses xterm for `replayedPlain` only | CLI-relevant Cypress green; run targeted `--spec` for access-token, recall, install features |
+| **4.3** | `outputAssertions.getGuidanceContext` uses xterm for `replayedPlain` only | **Met:** targeted `cli_access_token`, `cli_recall`, `cli_install_and_run` Cypress specs green |
 
 **Reference: [microsoft/tui-test](https://github.com/microsoft/tui-test)** — xterm.js for PTY rendering; map **feed bytes → read buffer text** only, not their runner. Implementation notes (Node `Terminal`, addons, headless CI) live in the sub-phase doc.
 
