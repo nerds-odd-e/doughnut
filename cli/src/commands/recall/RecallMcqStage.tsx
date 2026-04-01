@@ -120,7 +120,6 @@ type ContestMcqOutcome =
 /** Contest then regenerate, or rejected outcome with a user-visible message. */
 export async function contestAndRegenerateMcq(
   memoryTrackerId: number,
-  notebookTitle: string,
   currentRecallPromptId: number,
   signal?: AbortSignal
 ): Promise<ContestMcqOutcome> {
