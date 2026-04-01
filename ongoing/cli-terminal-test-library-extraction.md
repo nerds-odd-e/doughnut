@@ -1,0 +1,159 @@
+# `tty-assert` — PTY terminal test library extraction
+
+**Status:** plan only — not started here.
+
+**Intent:** Extract PTY-based terminal testing into a **Cypress-neutral, Doughnut-neutral** library named **`tty-assert`**, publishable on npm and eventually movable out of this repo. Goal: reliable assertions on terminal-visible state, with failures that show **expected vs actual** without manually decoding escape sequences, and CI-friendly artifacts where useful.
+
+**Package name:** `tty-assert` (check npm for availability and scope, e.g. `@your-scope/tty-assert`, before publish).
+
+---
+
+## Principles (from `.cursor/rules/planning.mdc`)
+
+- **One slice per phase** with a clear **observable gate**: full existing CLI-relevant E2E still green after each phase that touches production test paths, unless a phase is library-only (then its gate is `tty-assert` tests + no Doughnut E2E regression when integrated).
+- **Order by value:** stability and clear boundaries first; nicer diagnostics next; pixels/animation last; extraction to standalone repo last.
+- **Tests:** Prefer driving **observable surfaces** — for `tty-assert`, **unit tests on transcript → visible text, ANSI handling, replay geometry**; Doughnut keeps **Cypress** coverage for real install + interactive flows.
+- **No duplicate “framework for framework”:** `tty-assert` owns **generic** PTY buffer, escape handling, screen replay, and **pluggable** assertion helpers; Doughnut keeps **Ink- and product-specific** matchers (e.g. “current guidance” heuristics, OAuth simulation glue) as thin adapters.
+
+---
+
+## Current anchors (what moves vs stays)
+
+| Area | Location today | Likely home |
+|------|----------------|-------------|
+| PTY spawn, buffer, write tasks | `e2e_test/config/cliE2ePluginTasks.ts` | `tty-assert` **runtime** API + optional **Cypress task adapter** (thin, ideally in `e2e_test` only) |
+| ANSI strip | `e2e_test/config/cliPtyAnsi.ts` | `tty-assert` core |
+| Fixed cols/rows | `e2e_test/config/cliInteractivePtyGeometry.ts` | `tty-assert` default geometry (configurable) |
+| Transcript → visible plaintext / replay | `e2e_test/config/cliPtyTerminalReplay.ts` | `tty-assert` core (generic terminal model) |
+| Google OAuth PTY simulation | `e2e_test/config/cliE2eGoogleOAuthSimulation.ts` | Stays **Doughnut** (or behind `tty-assert` **hook/extension** interface) |
+| Retry, snapshot formatting, `expectContains` | `e2e_test/start/pageObjects/cli/outputAssertions.ts` | Split: **generic** retry + snapshot → `tty-assert`; **domain** sections → Doughnut |
+| Cypress fluents | `e2e_test/start/pageObjects/cli/interactiveCli.ts` | Doughnut; calls `tty-assert`-backed tasks or helpers |
+
+---
+
+## Phase 1 — In-place refactor: boundaries, no behavior change
+
+**Outcome:** Same Gherkin + Cypress behavior; code grouped so **generic terminal** logic is importable without pulling Cypress or Doughnut product types.
+
+**Work:**
+
+- Introduce clear modules (still under `e2e_test/` initially — e.g. `e2e_test/config/tty-assert-staging/` — **without** a new workspace package yet).
+- **Extract:** `stripAnsi`, replay (`ptyTranscriptToVisiblePlaintext` and dependencies), geometry constants, and **pure** helpers for formatting error snapshots.
+- **Leave in Doughnut:** OAuth simulation, install/bundle paths, env wiring, strings that encode **Doughnut CLI** vocabulary (recall hints, prompt shapes).
+- **Plugin tasks:** `createCliE2ePluginTasks` becomes a thin layer: delegates PTY lifecycle to extracted modules; keeps repo-root–specific spawn commands.
+
+**Gate:** All CLI E2E scenarios that run today still pass; no new user-visible behavior.
+
+---
+
+## Phase 2 — Sub-project inside Doughnut monorepo
+
+**Outcome:** `pnpm-workspace.yaml` includes **`packages/tty-assert`**; `e2e_test` depends on it; **no** Cypress code inside the package.
+
+**Work:**
+
+- Package exports: **Node-only** surface (PTY session manager, buffer, replay, ANSI utilities, types). Prefer keeping any `cy.task` mapping in **`e2e_test`** so `tty-assert` stays test-runner agnostic (no Cypress peer dependency).
+- Wire TypeScript project references / build if needed; ensure CI Cypress job resolves the package.
+
+**Gate:** Same as phase 1 for E2E; plus `pnpm install` / CI clean build succeeds.
+
+---
+
+## Phase 3 — Library quality: unit tests, lint, format, CI
+
+**Outcome:** `tty-assert` is trustworthy on its own.
+
+**Work:**
+
+- **Vitest** (or project-standard test runner) with examples: ANSI strip edge cases, replay of a small scripted transcript → expected final plain screen, truncation boundaries.
+- **Lint + format:** Align with monorepo (Biome) or document divergence if the future OSS repo will differ.
+- **GitHub Actions:** Job (or matrix row) that runs **only** `tty-assert` `test` + `lint` on PRs touching that package.
+
+**Gate:** `tty-assert` tests green; Doughnut E2E unchanged.
+
+---
+
+## Phase 4 — Clearer failure messages for TTY debugging
+
+**Outcome:** When an assertion fails, developers see **structure** (rows, regions, or frame boundaries) not only a flat wall of text.
+
+**Work:**
+
+- Define a **stable, documented** “debug view” of the last replayed screen (e.g. row numbers, optional ruler, highlighted region when the **caller** passes region bounds — generic API: “annotate this substring range”).
+- Unify duplicate preview logic (plugin `PREVIEW_LEN` vs `outputAssertions` truncation) through `tty-assert` helpers.
+
+**Gate:** Intentionally failing test in `tty-assert` or a temporary Doughnut step shows improved message; real suite green.
+
+---
+
+## Phase 5 — “Final visible screenshot” in plain text (single state)
+
+**Outcome:** Failure artifacts include **one** plain-text rendering of the **final** visible terminal state, not the entire scrollback or every intermediate frame.
+
+**Work:**
+
+- API: `lastVisiblePlaintext(transcript, geometry)` (may already exist as part of replay); error formatter opts into **final screen only** vs **full stripped transcript** for support bundle.
+- Cypress: on failure path, attach text artifact via existing screenshot/video / CI artifact patterns where possible.
+
+**Gate:** Failure output is shorter and readable; E2E still pass.
+
+---
+
+## Phase 6 — PNG screenshot of terminal state
+
+**Outcome:** Raster image of the **final** (or selected) visible screen for failed runs.
+
+**Work:**
+
+- Choose renderer (canvas in Node, headless terminal image lib, or HTML → png); keep **optional** heavy dependency (peer or optional install) so lightweight consumers can skip PNG.
+- Integrate with Cypress failure hooks: write PNG to `downloadsFolder` / task return path for CI artifacts.
+
+**Gate:** On forced failure, PNG appears in CI artifacts; default CI still passes.
+
+---
+
+## Phase 7 — Animated capture (screen changes over time)
+
+**Outcome:** Optional artifact showing evolution from session start to failure (or full scenario).
+
+**Work:**
+
+- Define **frame sampling** policy (on PTY data events vs debounced time — avoid flakiness; prefer **event-sampled** with max frame cap for CI size).
+- Output: GIF or MP4 or frame sequence; document cost and when to enable (e.g. `DEBUG_TTY_ANIM=1`).
+
+**Gate:** Behind flag or opt-in; not required for default CI pass.
+
+---
+
+## Phase 8 — Move out of Doughnut (OSS npm package)
+
+**Outcome:** Standalone repository, semver, changelog, README for **Playwright / Vitest / raw Node** consumers; Doughnut pins a version.
+
+**Work:**
+
+- Extract git history if desired; publish **`tty-assert`** (scoped if needed).
+- Doughnut: delete in-repo package, add npm dependency, shrink adapter code.
+
+**Gate:** Doughnut CI green on released version.
+
+---
+
+## Dependencies between phases
+
+- **1 → 2:** Clean seams make the package extraction mechanical.
+- **3** can start once **2**’s skeleton exists (tests can live next to the package).
+- **4–7** are mostly sequential in **diagnostic value** but **6–7** may share rendering infrastructure (5 → 6 especially).
+- **8** last.
+
+---
+
+## Out of scope for this plan
+
+- Replacing Cypress PTY E2E with Vitest `runInteractive` for scenarios already covered in `cli/tests/`; this plan does **not** require migrating those tests.
+- Changing **what** Doughnut CLI renders — only **how tests observe and report** failures.
+
+---
+
+## When this plan changes
+
+Update this file as phases complete or scope shifts; remove stale notes.
