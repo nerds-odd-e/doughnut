@@ -127,18 +127,18 @@ Before({ tags: '@withCliGmailMockAccountConfig', order: 1 }, () => {
 })
 
 Before({ tags: '@interactiveCLI', order: 2 }, () => {
-  cy.task('cliInteractivePtyDispose')
+  cli.ttyAssertTerminal().kill()
   cy.get<string>('@cliConfigDir').then((configDir) =>
-    cy.task('runRepoCliInteractive', {
+    cli.ttyAssertTerminal().startRepoInteractive({
       env: { DOUGHNUT_CONFIG_DIR: configDir },
     })
   )
 })
 
 Before({ tags: '@interactiveCLIGmail', order: 2 }, () => {
-  cy.task('cliInteractivePtyDispose')
+  cli.ttyAssertTerminal().kill()
   cy.get<string>('@cliConfigDir').then((configDir) =>
-    cy.task('runRepoCliInteractive', {
+    cli.ttyAssertTerminal().startRepoInteractive({
       env: {
         DOUGHNUT_CONFIG_DIR: configDir,
         GOOGLE_BASE_URL: GMAIL_E2E_GOOGLE_MOCK_BASE_URL,
@@ -149,9 +149,9 @@ Before({ tags: '@interactiveCLIGmail', order: 2 }, () => {
 })
 
 After({ tags: '@interactiveCLI' }, () => {
-  cy.task('cliInteractivePtyDispose')
+  cli.ttyAssertTerminal().kill()
 })
 
 After({ tags: '@interactiveCLIGmail' }, () => {
-  cy.task('cliInteractivePtyDispose')
+  cli.ttyAssertTerminal().kill()
 })

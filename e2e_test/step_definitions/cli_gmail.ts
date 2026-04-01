@@ -1,10 +1,11 @@
 import { Given } from '@badeball/cypress-cucumber-preprocessor'
 import { mock_services } from '../start'
+import { cli } from '../start/pageObjects/cli'
 
 Given(
   'the interactive CLI has Google OAuth callback simulation enabled',
   () => {
-    cy.task('cliInteractivePtyEnableGoogleOAuthSimulation')
+    cli.ttyAssertTerminal().enableGoogleOAuthSimulation()
   }
 )
 

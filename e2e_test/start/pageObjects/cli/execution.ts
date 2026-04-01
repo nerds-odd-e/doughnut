@@ -3,6 +3,7 @@
  * Domain: installation.
  */
 import { e2eAppBaseUrl } from '../../../support/e2eAppUrl'
+import { ttyAssertTerminal } from './ttyAssertTerminal'
 
 function installation() {
   return {
@@ -31,7 +32,7 @@ function installation() {
     },
     runInteractiveMode() {
       cy.get<string>('@doughnutPath').then((doughnutPath) => {
-        cy.task('runInstalledCliInteractive', { doughnutPath })
+        ttyAssertTerminal().startInstalledInteractive({ doughnutPath })
       })
     },
   }

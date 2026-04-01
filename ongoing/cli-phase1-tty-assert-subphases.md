@@ -134,6 +134,8 @@ Pick one behavior in **sub-phase 1.4** and keep it **test-only / diagnostic** so
 
 ## Sub-phase 1.5 — Thin Cypress-facing wrapper (optional, still Phase 1)
 
+**Status:** Done.
+
 **User-visible outcome:** None; steps may call **new** helpers only if they are **aliases** of existing page-object methods (prefer **no** Gherkin edits).
 
 **Work:**
@@ -144,7 +146,13 @@ Pick one behavior in **sub-phase 1.4** and keep it **test-only / diagnostic** so
 
 **Default:** Skip 1.5 if 1.3–1.4 already achieve the parent Phase 1 “thin plugin layer” goal; do 1.5 when you want **one** import style for new tests before the standalone package exists.
 
-**Gate:** CLI E2E green.
+**As implemented:**
+
+- [`e2e_test/start/pageObjects/cli/ttyAssertTerminal.ts`](../e2e_test/start/pageObjects/cli/ttyAssertTerminal.ts): `startRepoInteractive`, `startInstalledInteractive`, `write`, `submit`, `kill`, `getRawBuffer`, `enableGoogleOAuthSimulation`; re-exports `outputAssertions` helpers; `getByText(…).expectVisibleInPastAssistantMessages()` delegates to `pastCliAssistantMessages().expectContains`.
+- [`cli` page object](../e2e_test/start/pageObjects/cli/index.ts) exposes `ttyAssertTerminal`; [`interactiveCli.ts`](../e2e_test/start/pageObjects/cli/interactiveCli.ts) uses `pty.submit` / `pty.write` for line and raw writes.
+- [`hook.ts`](../e2e_test/step_definitions/hook.ts) `@interactiveCLI` / `@interactiveCLIGmail` and [`execution.ts`](../e2e_test/start/pageObjects/cli/execution.ts) `runInteractiveMode` call the wrapper for start/kill / installed start; [`cli_gmail.ts`](../e2e_test/step_definitions/cli_gmail.ts) OAuth simulation step uses `enableGoogleOAuthSimulation`.
+
+**Gate:** CLI E2E green (`pnpm cypress run --spec e2e_test/features/cli/cli_install_and_run.feature` with SUT on `http://localhost:5173`).
 
 ---
 

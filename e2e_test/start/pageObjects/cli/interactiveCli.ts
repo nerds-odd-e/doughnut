@@ -1,7 +1,7 @@
 /**
  * Interactive CLI PTY session: `@interactiveCLI` starts the repo bundle (`runRepoCliInteractive`);
  * install scenarios use `installation().runInteractiveMode()` (`runInstalledCliInteractive`).
- * Transcript assertions use `cliInteractivePtyGetBuffer` in the Cypress plugin.
+ * PTY I/O task names live in `ttyAssertTerminal`; transcript assertions use `cliInteractivePtyGetBuffer` in the plugin.
  */
 import {
   answeredQuestions,
@@ -10,13 +10,16 @@ import {
   pastUserMessages,
   whenCurrentGuidanceContainsThen,
 } from './outputAssertions'
+import { ttyAssertTerminal } from './ttyAssertTerminal'
+
+const pty = ttyAssertTerminal()
 
 function writeInteractiveLineToPty(line: string): Cypress.Chainable<null> {
-  return cy.task('cliInteractiveWriteLine', { line })
+  return pty.submit(line)
 }
 
 function writeInteractiveRawToPty(data: string): Cypress.Chainable<null> {
-  return cy.task('cliInteractiveWriteRaw', { data })
+  return pty.write(data)
 }
 
 function interactiveCli() {
