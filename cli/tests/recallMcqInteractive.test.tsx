@@ -11,6 +11,7 @@ import {
   LEAVE_RECALL_PROMPT,
   RECALL_SESSION_STOPPED_LINE,
 } from '../src/commands/recall/leaveRecallSessionCopy.js'
+import { RECALL_BUSY_SUBMIT_ANSWER_LABEL } from '../src/commands/recall/recallBusyInputCopy.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
   pressEscape,
@@ -222,6 +223,52 @@ describe('recall MCQ (interactive)', () => {
         path: { recallPrompt: RECALL_PROMPT_ID },
         body: { choiceIndex: 1 },
       })
+    )
+  })
+
+  test('shows busy label in bordered input while answerQuiz is pending', async () => {
+    recallingSpy.mockResolvedValue({
+      data: makeMe.aDueMemoryTrackersList
+        .totalAssimilatedCount(0)
+        .toRepeat([{ memoryTrackerId: 1, spelling: false }])
+        .please(),
+    } as Awaited<ReturnType<typeof RecallsController.recalling>>)
+
+    const pending = pendingMcqPrompt()
+    let resolveAnswer!: (
+      value: Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>
+    ) => void
+    const answerPromise = new Promise<
+      Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>
+    >((resolve) => {
+      resolveAnswer = resolve
+    })
+    answerQuizSpy.mockImplementation(() => answerPromise)
+
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForMcqVisible(frames)
+
+    stdin.write('2\r')
+
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(RECALL_BUSY_SUBMIT_ANSWER_LABEL)
+    )
+
+    resolveAnswer({
+      data: {
+        ...pending,
+        answer: { id: 100, correct: false, choiceIndex: 1 },
+      },
+    } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
+
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes('Load more from next 3 days?')
     )
   })
 

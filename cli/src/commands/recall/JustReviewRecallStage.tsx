@@ -15,6 +15,7 @@ import { resolvedTerminalWidth } from '../../terminalColumns.js'
 import { YesNoStagePrompt } from '../../commonUIComponents/YesNoStagePrompt.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
+import { RECALL_BUSY_RECORD_REVIEW_LABEL } from './recallBusyInputCopy.js'
 import type { RecallJustReviewPayload } from './nextRecallCardLoad.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 import {
@@ -75,6 +76,9 @@ export function JustReviewRecallStage({
   readonly onConfirmLeaveRecall: () => void
 }) {
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
+  const [justReviewBusyLabel, setJustReviewBusyLabel] = useState<
+    string | undefined
+  >(undefined)
 
   const submitJustReview = useCallback(
     async (yesIRemember: boolean) => {
@@ -82,6 +86,7 @@ export function JustReviewRecallStage({
       const ac = new AbortController()
       activeOperationAbortRef.current = ac
       inputBlockedRef.current = true
+      setJustReviewBusyLabel(RECALL_BUSY_RECORD_REVIEW_LABEL)
       const p = payload
       try {
         try {
@@ -117,6 +122,7 @@ export function JustReviewRecallStage({
         })
       } finally {
         inputBlockedRef.current = false
+        setJustReviewBusyLabel(undefined)
         if (activeOperationAbortRef.current === ac) {
           activeOperationAbortRef.current = null
         }
@@ -169,6 +175,7 @@ export function JustReviewRecallStage({
       onAnswer={submitJustReview}
       onCancel={handleQuestionEsc}
       inputBlockedRef={inputBlockedRef}
+      busyLabel={justReviewBusyLabel}
       belowBuffer={
         <>
           <Text>{payload.noteTitle}</Text>

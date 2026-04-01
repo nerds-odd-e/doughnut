@@ -37,6 +37,8 @@ export type YesNoStagePromptProps = {
   /** Invoked on Esc before the input-blocked guard, so it can abort in-flight work when combined with {@link inputBlockedRef}. */
   onCancel?: () => void | Promise<void>
   inputBlockedRef?: MutableRefObject<boolean>
+  /** When set, bordered line shows spinner + label (no caret); keys still gated by {@link inputBlockedRef}. */
+  busyLabel?: string
   header?: ReactNode
   belowBuffer?: ReactNode
 }
@@ -47,6 +49,7 @@ export function YesNoStagePrompt({
   defaultAnswer,
   onCancel,
   inputBlockedRef,
+  busyLabel,
   header,
   belowBuffer,
 }: YesNoStagePromptProps) {
@@ -143,6 +146,7 @@ export function YesNoStagePrompt({
         buffer={buffer}
         caretOffset={buffer.length}
         placeholder=""
+        busyLabel={busyLabel}
       />
       {belowBuffer}
       <Text>

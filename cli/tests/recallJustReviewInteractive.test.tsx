@@ -6,6 +6,7 @@ import {
   LEAVE_RECALL_PROMPT,
   RECALL_SESSION_STOPPED_LINE,
 } from '../src/commands/recall/leaveRecallSessionCopy.js'
+import { RECALL_BUSY_RECORD_REVIEW_LABEL } from '../src/commands/recall/recallBusyInputCopy.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { formatVersionOutput } from '../src/commands/version.js'
 import {
@@ -264,6 +265,40 @@ describe('recall just-review (interactive)', () => {
       process.env.DOUGHNUT_CONFIG_DIR = savedConfigDir
     }
     fs.rmSync(configDir, { recursive: true, force: true })
+  })
+
+  test('shows busy label in bordered input while markAsRecalled is pending', async () => {
+    mockShowMemoryTrackerCardForRealm(alphaNoteRealm())
+    let resolveMark!: (
+      value: Awaited<ReturnType<typeof MemoryTrackerController.markAsRecalled>>
+    ) => void
+    const markPromise = new Promise<
+      Awaited<ReturnType<typeof MemoryTrackerController.markAsRecalled>>
+    >((resolve) => {
+      resolveMark = resolve
+    })
+    markAsRecalledSpy.mockImplementation(() => markPromise)
+
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    startRecall(stdin)
+    await waitRememberAlpha(frames, { ynHint: true })
+    stdin.write('y\r')
+
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(RECALL_BUSY_RECORD_REVIEW_LABEL)
+    )
+
+    resolveMark({
+      data: makeMe.aMemoryTracker.please(),
+    } as Awaited<ReturnType<typeof MemoryTrackerController.markAsRecalled>>)
+
+    await waitLoadMore(frames)
+    stdin.write('n\r')
+    await untilPlain(frames, (p) => p.includes('Recalled 1 note'))
   })
 
   test('empty Enter and non-y/n committed line do not recall; y then completes once', async () => {

@@ -11,6 +11,7 @@ import {
   LEAVE_RECALL_PROMPT,
   RECALL_SESSION_STOPPED_LINE,
 } from '../src/commands/recall/leaveRecallSessionCopy.js'
+import { RECALL_BUSY_SUBMIT_ANSWER_LABEL } from '../src/commands/recall/recallBusyInputCopy.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
   pressEscape,
@@ -185,6 +186,61 @@ describe('recall spelling (interactive)', () => {
         path: { recallPrompt: SPELL_PROMPT_ID },
         body: { spellingAnswer: 'typo' },
       })
+    )
+  })
+
+  test('shows busy label in bordered input while answerSpelling is pending', async () => {
+    let recallingAfterWrong = 0
+    recallingSpy.mockImplementation(() => {
+      recallingAfterWrong += 1
+      const empty = makeMe.aDueMemoryTrackersList
+        .totalAssimilatedCount(0)
+        .toRepeat([])
+        .please()
+      const data = recallingAfterWrong === 1 ? spellingDueList() : empty
+      return Promise.resolve({
+        data,
+      } as Awaited<ReturnType<typeof RecallsController.recalling>>)
+    })
+
+    const pending = pendingSpellingPrompt()
+    let resolveAnswer!: (
+      value: Awaited<ReturnType<typeof RecallPromptController.answerSpelling>>
+    ) => void
+    const answerPromise = new Promise<
+      Awaited<ReturnType<typeof RecallPromptController.answerSpelling>>
+    >((resolve) => {
+      resolveAnswer = resolve
+    })
+    answerSpellingSpy.mockImplementation(() => answerPromise)
+
+    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('/recall\r')
+    await waitForSpellingPromptVisible(lastFrame)
+
+    stdin.write('typo\r')
+
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) => p.includes(RECALL_BUSY_SUBMIT_ANSWER_LABEL)
+    )
+
+    resolveAnswer({
+      data: {
+        ...pending,
+        answer: { correct: false, spellingAnswer: 'typo' },
+      },
+    } as Awaited<ReturnType<typeof RecallPromptController.answerSpelling>>)
+
+    await waitForFrames(
+      () => stripAnsi(frames.join('\n')),
+      (p) =>
+        p.includes('Incorrect.') &&
+        p.includes('Your answer: typo') &&
+        p.includes('body')
     )
   })
 

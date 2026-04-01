@@ -36,6 +36,10 @@ import {
 } from '../../commonUIComponents/timedToastInk.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
+import {
+  RECALL_BUSY_REGENERATE_QUESTION_LABEL,
+  RECALL_BUSY_SUBMIT_ANSWER_LABEL,
+} from './recallBusyInputCopy.js'
 import { numberedMcqMarkdownLinesForTerminal } from './numberedMcqMarkdownLines.js'
 import {
   recallMcqPayloadFromRecallPrompt,
@@ -196,6 +200,9 @@ export function RecallMcqStage({
   const bufferRef = useRef('')
   const [highlightIndex, setHighlightIndex] = useState(0)
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
+  const [commandLineBusyLabel, setCommandLineBusyLabel] = useState<
+    string | undefined
+  >(undefined)
   const { message: toastMessage, showToast, clearToast } = useTimedToastInk()
 
   const width = resolvedTerminalWidth()
@@ -213,6 +220,7 @@ export function RecallMcqStage({
     async (choiceIdx: number) => {
       if (inputBlockedRef.current) return
       inputBlockedRef.current = true
+      setCommandLineBusyLabel(RECALL_BUSY_SUBMIT_ANSWER_LABEL)
       try {
         const updated = await submitMcqAnswer(payload.recallPromptId, choiceIdx)
         const correct = updated.answer?.correct === true
@@ -250,6 +258,7 @@ export function RecallMcqStage({
         onRecallFatalError(userVisibleSlashCommandError(err))
       } finally {
         inputBlockedRef.current = false
+        setCommandLineBusyLabel(undefined)
       }
     },
     [
@@ -266,6 +275,7 @@ export function RecallMcqStage({
   const runContest = useCallback(async () => {
     if (inputBlockedRef.current) return
     inputBlockedRef.current = true
+    setCommandLineBusyLabel(RECALL_BUSY_REGENERATE_QUESTION_LABEL)
     try {
       const result = await contestAndRegenerateMcq(
         payload.memoryTrackerId,
@@ -288,6 +298,7 @@ export function RecallMcqStage({
       onRecallFatalError(userVisibleSlashCommandError(err))
     } finally {
       inputBlockedRef.current = false
+      setCommandLineBusyLabel(undefined)
     }
   }, [
     appendScrollbackItem,
@@ -430,6 +441,7 @@ export function RecallMcqStage({
         buffer={buffer}
         caretOffset={buffer.length}
         placeholder={MCQ_HINT}
+        busyLabel={commandLineBusyLabel}
       />
       {stemLines.map((line, i) => (
         <Text key={`s-${i}`}>{line.length > 0 ? line : ' '}</Text>

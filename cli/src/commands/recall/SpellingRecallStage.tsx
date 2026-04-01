@@ -30,6 +30,7 @@ import {
 import { SetStageKeyHandlerContext } from '../../commonUIComponents/stageKeyForwardContext.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
+import { RECALL_BUSY_SUBMIT_ANSWER_LABEL } from './recallBusyInputCopy.js'
 import { normalizeSpellingLineForSubmit } from './spellingAnswerLine.js'
 import type { SpellingRecallSessionPayload } from './nextRecallCardLoad.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
@@ -134,6 +135,9 @@ export function SpellingRecallStage({
   const [buffer, setBuffer] = useState('')
   const bufferRef = useRef('')
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
+  const [spellBusyLabel, setSpellBusyLabel] = useState<string | undefined>(
+    undefined
+  )
 
   const width = resolvedTerminalWidth()
 
@@ -177,6 +181,7 @@ export function SpellingRecallStage({
     const line = normalizeSpellingLineForSubmit(bufferRef.current)
     if (line === '') return
     inputBlockedRef.current = true
+    setSpellBusyLabel(RECALL_BUSY_SUBMIT_ANSWER_LABEL)
     try {
       const updated = await submitSpellingAnswer(loadState.recallPromptId, line)
       const correct = updated.answer?.correct === true
@@ -205,6 +210,7 @@ export function SpellingRecallStage({
       onRecallFatalError(userVisibleSlashCommandError(err))
     } finally {
       inputBlockedRef.current = false
+      setSpellBusyLabel(undefined)
     }
   }, [
     inputBlockedRef,
@@ -309,6 +315,7 @@ export function SpellingRecallStage({
         buffer={buffer}
         caretOffset={buffer.length}
         placeholder={SPELL_INPUT_PLACEHOLDER}
+        busyLabel={spellBusyLabel}
       />
       {stemLines.map((line, i) => (
         <Text key={`s-${i}`}>{line.length > 0 ? line : ' '}</Text>

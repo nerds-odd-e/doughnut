@@ -48,4 +48,37 @@ describe('BorderedSingleLinePromptInputInk', () => {
     expect(plain).toContain('x')
     expect(plain).not.toContain('Enter or number')
   })
+
+  test('busyLabel shows label and hides buffer and placeholder', () => {
+    const busy = 'Submitting answer…'
+    const { lastFrame } = render(
+      <BorderedSingleLinePromptInputInk
+        terminalColumns={80}
+        buffer="should-hide"
+        caretOffset={5}
+        placeholder={MCQ_HINT}
+        busyLabel={busy}
+      />
+    )
+    const plain = stripAnsi(lastFrame() ?? '')
+    expect(plain).toContain(busy)
+    expect(plain).not.toContain('should-hide')
+    expect(plain).not.toContain('Enter or number')
+  })
+
+  test('narrow terminal truncates busy label with ellipsis', () => {
+    const longBusy =
+      'Submitting a very long answer label that must be truncated here'
+    const { lastFrame } = render(
+      <BorderedSingleLinePromptInputInk
+        terminalColumns={28}
+        buffer=""
+        caretOffset={0}
+        placeholder=""
+        busyLabel={longBusy}
+      />
+    )
+    const plain = stripAnsi(lastFrame() ?? '')
+    expect(plain).toContain('…')
+  })
 })
