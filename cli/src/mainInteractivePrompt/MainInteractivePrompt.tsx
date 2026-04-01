@@ -350,7 +350,7 @@ export function MainInteractivePrompt({
         placeholder={MAIN_PROMPT_PLACEHOLDER}
       />
       {guidance.show === 'hint' ? (
-        <Text>{DEFAULT_INTERACTIVE_GUIDANCE}</Text>
+        <Text color="gray">{DEFAULT_INTERACTIVE_GUIDANCE}</Text>
       ) : guidance.show === 'list' ? (
         <GuidanceListInk
           mode="slash"
