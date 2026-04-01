@@ -140,8 +140,7 @@ export function InteractiveCliApp() {
       ...prev,
       withLeadingGapAfterUserIfNeeded(prev, user),
     ])
-    const Stage = command.stageComponent
-    if (Stage) {
+    if ('stageComponent' in command) {
       const argumentMissing = argument === undefined || argument === ''
       const argSpec = command.argument
       if (argSpec !== undefined && argumentMissing && !argSpec.optional) {
@@ -155,6 +154,7 @@ export function InteractiveCliApp() {
         return
       }
       stageArgumentRef.current = argument
+      const Stage = command.stageComponent
       // setState(fn) treats fn as updater; bare `Stage` would be called with prior state as props.
       setActiveStageComponent(() => Stage)
       return
@@ -171,18 +171,7 @@ export function InteractiveCliApp() {
       ])
       return
     }
-    const run = command.run
-    if (!run) {
-      const assistant = transcriptAssistantText(
-        'Internal error: command has no run handler.'
-      )
-      setScrollbackItems((prev) => [
-        ...prev,
-        withLeadingGapAfterUserIfNeeded(prev, assistant),
-      ])
-      return
-    }
-    Promise.resolve(run(argument))
+    Promise.resolve(command.run(argument))
       .then((r) => {
         const assistant = transcriptAssistantText(r.assistantMessage)
         setScrollbackItems((prev) => [

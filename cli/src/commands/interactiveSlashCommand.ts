@@ -22,11 +22,11 @@ export interface CommandDoc {
 
 export type InteractiveSlashCommandArgument = {
   readonly name: string
-  /** When true, an empty argument is allowed (e.g. open `stageComponent` or call `run` without a value). */
+  /** When true, an empty argument is allowed (e.g. open the stage or call `run` without a value). */
   readonly optional: boolean
 }
 
-export interface InteractiveSlashCommand {
+type InteractiveSlashCommandBase = {
   readonly literal: string
   readonly doc: CommandDoc
   /**
@@ -34,9 +34,20 @@ export interface InteractiveSlashCommand {
    * missing and not optional.
    */
   readonly argument?: InteractiveSlashCommandArgument
+}
+
+type InteractiveStageSlashCommand = InteractiveSlashCommandBase & {
   /** Renders as the active stage; must honor `InteractiveSlashCommandStageProps` isolation. */
-  readonly stageComponent?: ComponentType<InteractiveSlashCommandStageProps>
-  readonly run?: (
+  readonly stageComponent: ComponentType<InteractiveSlashCommandStageProps>
+}
+
+type InteractiveRunSlashCommand = InteractiveSlashCommandBase & {
+  readonly run: (
     argument?: string
   ) => InteractiveSlashCommandResult | Promise<InteractiveSlashCommandResult>
 }
+
+/** Either an Ink `stageComponent` or a one-shot `run` handler — never both. */
+export type InteractiveSlashCommand =
+  | InteractiveStageSlashCommand
+  | InteractiveRunSlashCommand
