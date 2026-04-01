@@ -5,6 +5,7 @@ import {
   handleSelectListInkKey,
   selectListKeyEventFromInk,
   selectListSubmitLineForSlashAndNumber,
+  selectListSubmitLineIsInvalidChoice,
 } from '../src/interactions/selectListInteraction.js'
 
 describe('cycleListSelectionIndex', () => {
@@ -56,6 +57,21 @@ describe('choiceIndexFromSelectListSubmitLine', () => {
     expect(choiceIndexFromSelectListSubmitLine('0', 3)).toBeNull()
     expect(choiceIndexFromSelectListSubmitLine('4', 3)).toBeNull()
     expect(choiceIndexFromSelectListSubmitLine('x', 3)).toBeNull()
+  })
+})
+
+describe('selectListSubmitLineIsInvalidChoice', () => {
+  it('false for reserved slashes and valid indices', () => {
+    expect(selectListSubmitLineIsInvalidChoice('/stop', 3)).toBe(false)
+    expect(selectListSubmitLineIsInvalidChoice('/contest', 3)).toBe(false)
+    expect(selectListSubmitLineIsInvalidChoice('1', 3)).toBe(false)
+    expect(selectListSubmitLineIsInvalidChoice('  3  ', 3)).toBe(false)
+  })
+  it('true for out-of-range, non-numeric, empty', () => {
+    expect(selectListSubmitLineIsInvalidChoice('0', 3)).toBe(true)
+    expect(selectListSubmitLineIsInvalidChoice('4', 3)).toBe(true)
+    expect(selectListSubmitLineIsInvalidChoice('abc', 3)).toBe(true)
+    expect(selectListSubmitLineIsInvalidChoice('', 3)).toBe(true)
   })
 })
 
@@ -285,6 +301,58 @@ describe('handleSelectListInkKey', () => {
       handlers
     )
     expect(onSubmitWithLine).toHaveBeenCalledWith('99')
+  })
+
+  it('slash-and-number: invalid draft invokes onInvalidSelectListSubmitLine when provided', () => {
+    const onSubmitWithLine = vi.fn()
+    const onInvalidSelectListSubmitLine = vi.fn()
+    const policy = {
+      kind: 'slash-and-number-or-highlight' as const,
+      choiceCount: 3,
+    }
+    handleSelectListInkKey(
+      '\r',
+      { return: true },
+      '99',
+      1,
+      3,
+      policy,
+      'signal-escape',
+      {
+        onSetHighlightIndex: vi.fn(),
+        onSubmitHighlightIndex: vi.fn(),
+        onSubmitWithLine,
+        onInvalidSelectListSubmitLine,
+      }
+    )
+    expect(onInvalidSelectListSubmitLine).toHaveBeenCalledOnce()
+    expect(onSubmitWithLine).not.toHaveBeenCalled()
+  })
+
+  it('slash-and-number: /stop still reaches onSubmitWithLine when onInvalid provided', () => {
+    const onSubmitWithLine = vi.fn()
+    const onInvalidSelectListSubmitLine = vi.fn()
+    const policy = {
+      kind: 'slash-and-number-or-highlight' as const,
+      choiceCount: 3,
+    }
+    handleSelectListInkKey(
+      '\r',
+      { return: true },
+      '  /stop  ',
+      0,
+      3,
+      policy,
+      'signal-escape',
+      {
+        onSetHighlightIndex: vi.fn(),
+        onSubmitHighlightIndex: vi.fn(),
+        onSubmitWithLine,
+        onInvalidSelectListSubmitLine,
+      }
+    )
+    expect(onInvalidSelectListSubmitLine).not.toHaveBeenCalled()
+    expect(onSubmitWithLine).toHaveBeenCalledWith('/stop')
   })
 
   it('slash-and-number: backspace edits; highlight-only backspace aborts', () => {

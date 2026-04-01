@@ -78,10 +78,21 @@ export function choiceIndexFromSelectListSubmitLine(
   return n - 1
 }
 
+/** True when Enter submitted a line that is not /stop, /contest, or a valid 1-based choice index. */
+export function selectListSubmitLineIsInvalidChoice(
+  line: string,
+  choiceCount: number
+): boolean {
+  const t = line.trim()
+  if (t === '/stop' || t === '/contest') return false
+  return choiceIndexFromSelectListSubmitLine(t, choiceCount) === null
+}
+
 export type SelectListInkHandlers = {
   readonly onSetHighlightIndex: (index: number) => void
   readonly onSubmitHighlightIndex: (index: number) => void
   readonly onSubmitWithLine?: (trimmedLine: string) => void
+  readonly onInvalidSelectListSubmitLine?: () => void
   readonly onEscapeSignaled?: () => void
   readonly onAbortHighlightOnlyList?: () => void
   readonly onEditBackspace?: () => void
@@ -114,6 +125,15 @@ export function handleSelectListInkKey(
       return
     case 'submit-with-line': {
       const line = d.lineForProcessInput.trim()
+      if (draftPolicy.kind === 'slash-and-number-or-highlight') {
+        if (
+          handlers.onInvalidSelectListSubmitLine !== undefined &&
+          selectListSubmitLineIsInvalidChoice(line, draftPolicy.choiceCount)
+        ) {
+          handlers.onInvalidSelectListSubmitLine()
+          return
+        }
+      }
       if (handlers.onSubmitWithLine !== undefined) {
         handlers.onSubmitWithLine(line)
         return

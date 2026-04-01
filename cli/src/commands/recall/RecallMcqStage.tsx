@@ -1,6 +1,7 @@
 import {
   useCallback,
   useContext,
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -161,6 +162,12 @@ export async function submitMcqAnswer(
 const MCQ_HINT =
   '↑↓ Enter or number to select; Esc asks to leave recall (y/n confirm)'
 
+const INVALID_SELECT_LIST_HINT_MS = 5000
+
+function mcqInvalidChoiceHintMessage(choiceCount: number): string {
+  return `Not a valid choice. Enter 1–${choiceCount}, use ↑↓, or /contest.`
+}
+
 export function RecallMcqStage({
   payload,
   choicesGuidanceRowBudget,
@@ -188,6 +195,28 @@ export function RecallMcqStage({
   const bufferRef = useRef('')
   const [highlightIndex, setHighlightIndex] = useState(0)
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
+  const [invalidChoiceHint, setInvalidChoiceHint] = useState<string | null>(
+    null
+  )
+  const invalidHintTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  )
+
+  const clearInvalidHint = useCallback(() => {
+    if (invalidHintTimeoutRef.current !== null) {
+      clearTimeout(invalidHintTimeoutRef.current)
+      invalidHintTimeoutRef.current = null
+    }
+    setInvalidChoiceHint(null)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (invalidHintTimeoutRef.current !== null) {
+        clearTimeout(invalidHintTimeoutRef.current)
+      }
+    }
+  }, [])
 
   const width = resolvedTerminalWidth()
   const stemLines = useMemo(
@@ -296,6 +325,7 @@ export function RecallMcqStage({
       if (inputBlockedRef.current) return
 
       const clearDraft = () => {
+        clearInvalidHint()
         bufferRef.current = ''
         setBuffer('')
       }
@@ -312,7 +342,10 @@ export function RecallMcqStage({
         },
         'signal-escape',
         {
-          onSetHighlightIndex: setHighlightIndex,
+          onSetHighlightIndex: (index) => {
+            clearInvalidHint()
+            setHighlightIndex(index)
+          },
           onSubmitHighlightIndex: (index) => {
             clearDraft()
             runSubmit(index).catch(() => undefined)
@@ -331,10 +364,21 @@ export function RecallMcqStage({
             clearDraft()
             runSubmit(idx).catch(() => undefined)
           },
+          onInvalidSelectListSubmitLine: () => {
+            if (invalidHintTimeoutRef.current !== null) {
+              clearTimeout(invalidHintTimeoutRef.current)
+            }
+            setInvalidChoiceHint(mcqInvalidChoiceHintMessage(choices.length))
+            invalidHintTimeoutRef.current = setTimeout(() => {
+              invalidHintTimeoutRef.current = null
+              setInvalidChoiceHint(null)
+            }, INVALID_SELECT_LIST_HINT_MS)
+          },
           onEscapeSignaled: () => {
             setShowLeaveConfirm(true)
           },
           onEditBackspace: () => {
+            clearInvalidHint()
             const cur = bufferRef.current
             if (cur.length === 0) return
             const next = cur.slice(0, -1)
@@ -342,6 +386,7 @@ export function RecallMcqStage({
             setBuffer(next)
           },
           onEditChar: (char) => {
+            clearInvalidHint()
             const next = bufferRef.current + char
             bufferRef.current = next
             setBuffer(next)
@@ -349,7 +394,14 @@ export function RecallMcqStage({
         }
       )
     },
-    [choices.length, highlightIndex, inputBlockedRef, runContest, runSubmit]
+    [
+      choices.length,
+      clearInvalidHint,
+      highlightIndex,
+      inputBlockedRef,
+      runContest,
+      runSubmit,
+    ]
   )
 
   const handleInput = useCallback(
@@ -424,6 +476,9 @@ export function RecallMcqStage({
           highlightItemIndex={highlightIndex}
           rowBudget={choicesGuidanceRowBudget}
         />
+        {invalidChoiceHint !== null ? (
+          <Text color="yellow">{invalidChoiceHint}</Text>
+        ) : null}
       </Box>
     </Box>
   )
