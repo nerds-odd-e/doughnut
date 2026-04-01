@@ -303,6 +303,52 @@ describe('MainInteractivePrompt caret and slash arrows (phase 3)', () => {
         )
     )
   })
+
+  test('with list visible and caret in the middle, up arrow cycles highlight without moving caret home first', async () => {
+    const { stdin, lastFrame } = await renderMainInteractivePrompt()
+
+    stdin.write('/re')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('/remove-access-token')
+    )
+
+    stdin.write('\x1b[D')
+    await waitForFrames(
+      () => stripAnsi(lastFrame() ?? ''),
+      (f) => f.includes('→ /re')
+    )
+
+    stdin.write('\x1b[A')
+    try {
+      await waitForFrames(
+        () => lastFrame() ?? '',
+        (r) =>
+          rawLineIncludesBoldMarker(
+            r,
+            'Show how many notes are due for recall today'
+          ) && lineWithMainPrompt(r).includes('/r\x1b[7m')
+      )
+    } catch (err) {
+      throw new Error(
+        'With slash list open and caret between /r and e, the first Up should wrap the completion highlight to the last row and keep the caret after /r, not move the caret to the start of the line (history-style home). ' +
+          (err instanceof Error ? err.message : String(err))
+      )
+    }
+
+    const raw = lastFrame() ?? ''
+    expect(
+      rawLineIncludesBoldMarker(
+        raw,
+        'Show how many notes are due for recall today'
+      ),
+      'When the slash completion list is open, Up must cycle the highlighted command immediately (wrap from first row to last), not leave the default first-row highlight.'
+    ).toBe(true)
+    expect(
+      lineWithMainPrompt(raw).includes('/r\x1b[7m'),
+      'When the slash completion list is open, Up must not act like history “home” (caret to column 0); the caret should stay between /r and e.'
+    ).toBe(true)
+  })
 })
 
 describe('MainInteractivePrompt Enter picks completion (phase 4)', () => {

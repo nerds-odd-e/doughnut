@@ -145,7 +145,7 @@ export function isSlashListArrowKey(
   slashCompletionListVisible: boolean
 ): boolean {
   if (!slashCompletionListVisible) return false
-  if (key === 'up') return caretOffset === 0
+  if (key === 'up') return true
   return caretOffset === lineDraft.length
 }
 
