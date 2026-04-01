@@ -17,6 +17,7 @@ import { YesNoStagePrompt } from '../../commonUIComponents/YesNoStagePrompt.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import {
   fetchDueMemoryTrackerIds,
+  fetchShuffledDueMemoryTrackerIds,
   loadRecallCardForMemoryTrackerId,
   type RecallCard,
 } from './nextRecallCardLoad.js'
@@ -73,7 +74,7 @@ export function RecallSessionStage({
     activeOperationAbortRef.current = ac
     ;(async () => {
       try {
-        const ids = await fetchDueMemoryTrackerIds(0, false, ac.signal)
+        const ids = await fetchDueMemoryTrackerIds(0, ac.signal)
         if (unmounted || ac.signal.aborted) return
         trackerQueueRef.current = ids
         if (ids.length > 0) {
@@ -159,7 +160,7 @@ export function RecallSessionStage({
       const ac = new AbortController()
       activeOperationAbortRef.current = ac
       try {
-        const ids = await fetchDueMemoryTrackerIds(3, true, ac.signal)
+        const ids = await fetchShuffledDueMemoryTrackerIds(3, ac.signal)
         if (activeOperationAbortRef.current === ac) {
           activeOperationAbortRef.current = null
         }

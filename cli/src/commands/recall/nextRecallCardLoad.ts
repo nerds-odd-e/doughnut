@@ -24,7 +24,6 @@ function shuffleMemoryTrackerIds(ids: readonly number[]): number[] {
 
 export async function fetchDueMemoryTrackerIds(
   dueInDays: number,
-  randomizeOrder: boolean,
   signal?: AbortSignal
 ): Promise<number[]> {
   const due = await runDefaultBackendJson<DueMemoryTrackers>(() =>
@@ -34,8 +33,16 @@ export async function fetchDueMemoryTrackerIds(
     })
   )
   const trackers = due.toRepeat ?? []
-  const ids = trackers.map((t) => t.memoryTrackerId)
-  return randomizeOrder ? shuffleMemoryTrackerIds(ids) : ids
+  return trackers.map((t) => t.memoryTrackerId)
+}
+
+export async function fetchShuffledDueMemoryTrackerIds(
+  dueInDays: number,
+  signal?: AbortSignal
+): Promise<number[]> {
+  return shuffleMemoryTrackerIds(
+    await fetchDueMemoryTrackerIds(dueInDays, signal)
+  )
 }
 
 type NoteTopologyWalk = {
