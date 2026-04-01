@@ -20,6 +20,7 @@
     "test-fixtures:lint": "pnpm --frozen-lockfile --silent recursive install && pnpm -C packages/doughnut-test-fixtures lint",
     "tty-assert:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C packages/tty-assert format",
     "tty-assert:lint": "pnpm --frozen-lockfile --silent recursive install && pnpm -C packages/tty-assert lint",
+    "tty-assert:test": "pnpm --frozen-lockfile --silent recursive install && pnpm -C packages/tty-assert test",
     "cli": "pnpm --frozen-lockfile --silent recursive install && DOUGHNUT_API_BASE_URL=http://localhost:9081 DOUGHNUT_CONFIG_DIR=$HOME/.config/doughnut-dev pnpm -C cli exec tsx src/index.ts",
     "cli:bundle": "pnpm --frozen-lockfile --silent recursive install && pnpm -C cli bundle",
     "cli:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C cli format",

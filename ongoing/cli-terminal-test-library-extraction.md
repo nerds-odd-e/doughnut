@@ -1,6 +1,6 @@
 # `tty-assert` — PTY terminal test library extraction
 
-**Status:** Phases 1–2 are **complete** in-repo; Phases 3–11 are roadmap only until started. Sub-phases: [`ongoing/cli-phase1-tty-assert-subphases.md`](./ongoing/cli-phase1-tty-assert-subphases.md).
+**Status:** Phases 1–3 are **complete** in-repo; Phases 4–11 are roadmap only until started. Sub-phases: [`ongoing/cli-phase1-tty-assert-subphases.md`](./ongoing/cli-phase1-tty-assert-subphases.md).
 
 **Intent:** Extract PTY-based terminal testing into a **Cypress-neutral, Doughnut-neutral** library named **`tty-assert`**, publishable on npm and eventually movable out of this repo. Goal: reliable assertions on terminal-visible state, with failures that show **expected vs actual** without manually decoding escape sequences, and CI-friendly artifacts where useful.
 
@@ -65,13 +65,15 @@
 
 ## Phase 3 — Library quality: unit tests, lint, format, CI
 
+**Status:** **Complete.**
+
 **Outcome:** `tty-assert` is trustworthy on its own.
 
-**Work:**
+**Delivered:**
 
-- **Vitest** (or project-standard test runner) with examples: ANSI strip edge cases, replay of a small scripted transcript → expected final plain screen, truncation boundaries.
-- **Lint + format:** Align with monorepo (Biome) or document divergence if the future OSS repo will differ.
-- **GitHub Actions:** Job (or matrix row) that runs **only** `tty-assert` `test` + `lint` on PRs touching that package.
+- **Vitest** under `packages/tty-assert/tests/`: ANSI strip, replay → visible plaintext, error snapshot truncation / sanitization.
+- **Biome** `lint` / `format` unchanged (monorepo-aligned).
+- **CI:** `Other-unit-tests` runs `pnpm tty-assert:test`; **`.github/workflows/tty-assert-pr.yml`** runs `tty-assert:lint` + `tty-assert:test` on PRs that touch `packages/tty-assert/**`.
 
 **Gate:** `tty-assert` tests green; Doughnut E2E unchanged.
 

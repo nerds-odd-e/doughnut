@@ -5,13 +5,18 @@
   "type": "module",
   "scripts": {
     "format": "biome check --write .",
-    "lint": "biome check ."
+    "lint": "biome check .",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@lydell/node-pty": "1.1.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.10"
+    "@biomejs/biome": "2.4.10",
+    "@types/node": "25.5.0",
+    "typescript": "6.0.2",
+    "vitest": "4.1.2"
   },
   "exports": {
     "./stripAnsi": "./src/stripAnsi.ts",

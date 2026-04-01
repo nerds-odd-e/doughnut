@@ -1,0 +1,20 @@
+name: tty-assert (PR)
+
+on:
+  pull_request:
+    paths:
+      - 'packages/tty-assert/**'
+      - '.github/workflows/tty-assert-pr.yml'
+
+jobs:
+  tty-assert:
+    name: tty-assert lint & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/setup_nodejs_with_cache
+        with:
+          node_version: ${{ vars.NODE_VERSION }}
+          pnpm_version: ${{ vars.PNPM_VERSION }}
+      - run: pnpm tty-assert:lint
+      - run: pnpm tty-assert:test

@@ -101,6 +101,7 @@ jobs:
       - run: pnpm frontend:test
       - run: pnpm mcp-server:test
       - run: pnpm cli:test
+      - run: pnpm tty-assert:test
       - name: Run script unit tests
         run: bash scripts/test/run_all_script_tests.sh
 
