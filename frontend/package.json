@@ -24,7 +24,7 @@
   "dependencies": {
     "file-saver": "^2.0.5",
     "mini-debounce": "^1.0.8",
-    "quill": "npm:@dotwee/quill@2.0.7",
+    "quill": "npm:@dotwee/quill@2.0.9",
     "turndown": "^7.2.2",
     "turndown-plugin-gfm": "^1.0.2",
     "vue-content-loader": "2.0.1",
@@ -32,7 +32,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.10",
-    "@dotwee/quill": "2.0.9",
     "@storybook/addon-docs": "10.3.3",
     "@storybook/vue3": "10.3.3",
     "@storybook/vue3-vite": "10.3.3",
@@ -78,6 +77,6 @@
     "vue-tsc": "3.2.6"
   },
   "overrides": {
-    "quill": "npm:@dotwee/quill@2.0.7"
+    "quill": "npm:@dotwee/quill@2.0.9"
   }
 }
