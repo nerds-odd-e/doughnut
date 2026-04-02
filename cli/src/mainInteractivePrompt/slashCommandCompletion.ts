@@ -62,14 +62,15 @@ function normalizedDraft(draft: string): string {
   return draft.replace(/\n/g, ' ')
 }
 
-export function getSlashTabCompletion(buffer: string): {
+export function getSlashTabCompletion(
+  buffer: string,
+  commands: readonly InteractiveSlashCommand[] = interactiveSlashCommands
+): {
   completed: string
   count: number
 } {
   if (!buffer.startsWith('/')) return { completed: buffer, count: 0 }
-  const matches = interactiveSlashCommands.filter((c) =>
-    c.doc.usage.startsWith(buffer)
-  )
+  const matches = commands.filter((c) => c.doc.usage.startsWith(buffer))
   if (matches.length === 0) return { completed: buffer, count: 0 }
   if (matches.length === 1)
     return { completed: `${matches[0]!.literal} `, count: 1 }
@@ -116,10 +117,13 @@ export type SlashGuidanceForInk =
       readonly rows: readonly SlashCompletionListRow[]
     }
 
-export function slashGuidanceForInk(draft: string): SlashGuidanceForInk {
+export function slashGuidanceForInk(
+  draft: string,
+  commands: readonly InteractiveSlashCommand[] = interactiveSlashCommands
+): SlashGuidanceForInk {
   const p = normalizedDraft(draft)
   if (!p.startsWith('/') || p.endsWith(' ')) return { show: 'hint' }
-  const matches = filterSlashCommandsByPrefix(interactiveSlashCommands, p)
+  const matches = filterSlashCommandsByPrefix(commands, p)
   if (matches.length === 0) return { show: 'empty' }
   const rows = matches.map((c) => ({
     usage: c.doc.usage,
@@ -131,9 +135,10 @@ export function slashGuidanceForInk(draft: string): SlashGuidanceForInk {
 
 export function effectiveSlashGuidance(
   draft: string,
-  suggestionsDismissed: boolean
+  suggestionsDismissed: boolean,
+  commands: readonly InteractiveSlashCommand[] = interactiveSlashCommands
 ): SlashGuidanceForInk {
-  const g = slashGuidanceForInk(draft)
+  const g = slashGuidanceForInk(draft, commands)
   if (suggestionsDismissed && g.show === 'list') return { show: 'hint' }
   return g
 }

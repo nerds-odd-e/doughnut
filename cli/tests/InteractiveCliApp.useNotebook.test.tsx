@@ -24,6 +24,17 @@ describe('InteractiveCliApp /use notebook stage', () => {
     fs.rmSync(configDir, { recursive: true, force: true })
   })
 
+  test('in notebook stage, / shows slash sub-command guidance', async () => {
+    const { stdin, waitForFramesToInclude, waitForLastFrameToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+
+    stdin.write('/use Top Maths\r')
+    await waitForFramesToInclude('Active notebook: Top Maths')
+    stdin.write('/')
+    await waitForLastFrameToInclude('/exit, exit')
+    await waitForLastFrameToInclude('Leave notebook context')
+  })
+
   test('enters notebook stage then /exit clears stage indicator', async () => {
     const {
       stdin,
