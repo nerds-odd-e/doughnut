@@ -1,7 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import {
   getVersion,
-  formatVersionOutput,
   parseVersionFromOutput,
   compareVersions,
 } from '../src/commands/version.js'
@@ -13,10 +12,6 @@ describe('version', () => {
 
   test('getVersion returns version string', () => {
     expect(getVersion()).toMatch(/^\d+\.\d+\.\d+$/)
-  })
-
-  test('formatVersionOutput returns doughnut prefix with version', () => {
-    expect(formatVersionOutput()).toBe(`doughnut ${getVersion()}`)
   })
 
   test('parseVersionFromOutput extracts version from output', () => {

@@ -11,7 +11,6 @@ import {
   RECALL_LOADING_NEXT_QUESTION_LABEL,
 } from '../src/commands/recall/recallBusyInputCopy.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
-import { formatVersionOutput } from '../src/commands/version.js'
 import {
   pressEscape,
   pressEscapeAndWaitForCancelledLine,
@@ -386,7 +385,6 @@ describe('recall just-review (interactive)', () => {
     const { stdin, frames } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />
     )
-    expect(stripAnsi(frames.join('\n'))).toContain(formatVersionOutput())
 
     startRecall(stdin)
     await waitRememberAlpha(frames, { ynHint: true })

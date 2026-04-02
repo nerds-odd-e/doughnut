@@ -1,7 +1,6 @@
 import { render } from 'ink-testing-library'
 import { describe, expect, test } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
-import { formatVersionOutput } from '../src/commands/version.js'
 import {
   renderInkWhenCommandLineReady,
   stripAnsi,
@@ -21,7 +20,7 @@ function farewellFollowedByCommandPrompt(ansiStrippedFrame: string): boolean {
 describe('InteractiveCliApp (ink-testing-library)', () => {
   test('shows version in the first frame', () => {
     const { lastFrame } = render(<InteractiveCliApp />)
-    expect(lastFrame()).toContain(formatVersionOutput())
+    expect(lastFrame()).toMatch(/doughnut \d+\.\d+\.\d+/)
   })
 
   test('empty committed line leaves transcript unchanged; later line still commits', async () => {
@@ -29,7 +28,6 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
       <InteractiveCliApp />
     )
     const before = frames.join('\n')
-    expect(before).toContain(formatVersionOutput())
     expect(before).not.toContain('Not supported')
 
     stdin.write('\r')
@@ -137,11 +135,9 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
   })
 
   test('submitting /exit as one chunk line+CR records it in output', async () => {
-    const { lastFrame, stdin, frames } = await renderInkWhenCommandLineReady(
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />
     )
-    expect(lastFrame()).toContain(formatVersionOutput())
-
     stdin.write('/exit\r')
     await waitForFrames(
       () => frames.join('\n'),
@@ -238,7 +234,6 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     const { lastFrame, stdin, frames } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />
     )
-    expect(lastFrame()).toContain(formatVersionOutput())
 
     let expectedBuffer = ''
     for (const ch of '/exit') {

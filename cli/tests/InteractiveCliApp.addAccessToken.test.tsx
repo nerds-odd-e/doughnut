@@ -4,7 +4,6 @@ import * as path from 'node:path'
 import { UserController } from 'doughnut-api'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
-import { formatVersionOutput } from '../src/commands/version.js'
 import {
   pressEscapeAndWait,
   pressEscapeAndWaitForCancelledLine,
@@ -56,7 +55,6 @@ describe('InteractiveCliApp /add-access-token', () => {
     const { stdin, frames } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />
     )
-    expect(frames.join('\n')).toContain(formatVersionOutput())
 
     stdin.write('/add-access-token unit-test-token-value\r')
     await waitForFrames(

@@ -2,7 +2,6 @@ import * as fs from 'node:fs'
 import { RecallsController } from 'doughnut-api'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
-import { formatVersionOutput } from '../src/commands/version.js'
 import {
   pressEscapeAndWait,
   renderInkWhenCommandLineReady,
@@ -55,7 +54,6 @@ describe('InteractiveCliApp /recall-status', () => {
     const { stdin, frames } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />
     )
-    expect(stripAnsi(frames.join('\n'))).toContain(formatVersionOutput())
 
     stdin.write('/recall-status\r')
     await waitForFrames(

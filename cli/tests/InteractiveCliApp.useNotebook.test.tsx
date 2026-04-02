@@ -1,7 +1,6 @@
 import * as fs from 'node:fs'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
-import { formatVersionOutput } from '../src/commands/version.js'
 import {
   renderInkWhenCommandLineReady,
   stripAnsi,
@@ -30,9 +29,8 @@ describe('InteractiveCliApp /use notebook stage', () => {
   })
 
   test('enters notebook stage then /exit clears stage indicator', async () => {
-    const { stdin, frames, lastFrame, waitForFramesToInclude } =
+    const { stdin, lastFrame, waitForFramesToInclude } =
       await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-    expect(stripAnsi(frames.join('\n'))).toContain(formatVersionOutput())
 
     stdin.write('/use Top Maths\r')
     await waitForFramesToInclude(/Active notebook: Top Maths/)

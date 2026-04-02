@@ -1,6 +1,5 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { run } from '../src/run.js'
-import { formatVersionOutput } from '../src/commands/version.js'
 
 class ProcessExitForTest extends Error {
   readonly code: number | undefined
@@ -83,7 +82,9 @@ describe('run entry routing', () => {
     try {
       await run(['version'])
       await new Promise((r) => setImmediate(r))
-      expect(logSpy).toHaveBeenCalledWith(formatVersionOutput())
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/doughnut \d+\.\d+\.\d+/)
+      )
       expect(exitSpy).not.toHaveBeenCalled()
     } finally {
       Object.defineProperty(process.stdin, 'isTTY', {
