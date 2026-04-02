@@ -6,7 +6,6 @@ import {
   pressEscapeAndWait,
   renderInkWhenCommandLineReady,
   stripAnsi,
-  waitForFrames,
 } from './inkTestHelpers.js'
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
@@ -51,15 +50,11 @@ describe('InteractiveCliApp /recall-status', () => {
       }
     )
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall-status\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => stripAnsi(c).includes('Loading recall status')
-    )
+    await waitForFramesToInclude('Loading recall status')
 
     await pressEscapeAndWait(
       stdin,
@@ -85,17 +80,13 @@ describe('InteractiveCliApp /recall-status', () => {
       },
     } as Awaited<ReturnType<typeof RecallsController.recalling>>)
 
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, lastStrippedFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall-status\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => stripAnsi(c).includes('2 notes to recall today')
-    )
+    await waitForFramesToInclude('2 notes to recall today')
 
-    const final = stripAnsi(lastFrame() ?? '')
+    const final = lastStrippedFrame()
     expect(final.split('2 notes to recall today').length - 1).toBe(1)
     expect(final).not.toContain('Cancelled.')
   })

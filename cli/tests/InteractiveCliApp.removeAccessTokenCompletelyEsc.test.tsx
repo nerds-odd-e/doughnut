@@ -6,7 +6,6 @@ import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
   pressEscapeAndWaitForCancelledLine,
   renderInkWhenCommandLineReady,
-  waitForFrames,
 } from './inkTestHelpers.js'
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
@@ -53,15 +52,11 @@ describe('InteractiveCliApp /remove-access-token-completely inline + Esc (hung H
     process.env.DOUGHNUT_API_BASE_URL = `http://127.0.0.1:${addr.port}`
 
     try {
-      const { stdin, frames } = await renderInkWhenCommandLineReady(
-        <InteractiveCliApp />
-      )
+      const { stdin, frames, waitForFramesToInclude } =
+        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
       stdin.write('/remove-access-token-completely t\r')
-      await waitForFrames(
-        () => frames.join('\n'),
-        (c) => c.includes('Revoking token')
-      )
+      await waitForFramesToInclude('Revoking token')
 
       await pressEscapeAndWaitForCancelledLine(stdin, () => frames.join('\n'))
     } finally {

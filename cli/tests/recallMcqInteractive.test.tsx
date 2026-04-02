@@ -14,7 +14,6 @@ import {
   pressEscape,
   renderInkWhenCommandLineReady,
   stripAnsi,
-  waitForFrames,
   waitForLastFrame,
 } from './inkTestHelpers.js'
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
@@ -148,7 +147,7 @@ describe('recall MCQ (interactive)', () => {
       ],
     } as Awaited<ReturnType<typeof MemoryTrackerController.getRecallPrompts>>)
 
-    const { stdin, lastFrame, waitForFramesToInclude } =
+    const { stdin, lastStrippedFrame, waitForFramesToInclude } =
       await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
@@ -157,7 +156,7 @@ describe('recall MCQ (interactive)', () => {
       /(?=.*Pick one)(?=.*↓ more below)(?=.*1\. c0)/s
     )
 
-    const plain = stripAnsi(lastFrame() ?? '')
+    const plain = lastStrippedFrame()
     expect(plain).toContain(EXPECT_GUIDANCE_MORE_BELOW)
     expect(plain).toMatch(/1\.\s*c0/)
     expect(plain).not.toMatch(
@@ -327,15 +326,19 @@ describe('recall MCQ (interactive)', () => {
       },
     } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
 
-    const { stdin, lastFrame, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+    const {
+      stdin,
+      lastFrame,
+      waitForFramesToInclude,
+      waitForLastFrameToInclude,
+    } = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
     await waitForMcqVisible(waitForFramesToInclude)
     stdin.write('2\r')
 
-    await waitForFrames(
-      () => stripAnsi(lastFrame() ?? ''),
+    await waitForLastFrame(
+      lastFrame,
       (p) =>
         p.includes(RECALL_LOADING_NEXT_QUESTION_LABEL) &&
         !p.includes(MCQ_HINT_SUBSTR)
@@ -345,10 +348,7 @@ describe('recall MCQ (interactive)', () => {
       data: [secondPrompt],
     } as Awaited<ReturnType<typeof MemoryTrackerController.getRecallPrompts>>)
 
-    await waitForFrames(
-      () => stripAnsi(lastFrame() ?? ''),
-      (p) => p.includes(secondStem)
-    )
+    await waitForLastFrameToInclude(secondStem)
   })
 
   test('out-of-range MCQ number does not call answerQuiz; valid answer still works', async () => {
@@ -368,24 +368,21 @@ describe('recall MCQ (interactive)', () => {
       }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
 
-    const { stdin, frames, waitForFramesToInclude } =
+    const { stdin, frames, lastFrame, waitForFramesToInclude } =
       await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
     await waitForMcqVisible(waitForFramesToInclude)
 
     stdin.write('9\r')
-    await waitForFrames(
-      () => stripAnsi(frames.at(-1) ?? ''),
-      (p) => p.includes('→ 9')
-    )
+    await waitForLastFrame(lastFrame, (p) => p.includes('→ 9'))
 
     expect(answerQuizSpy).not.toHaveBeenCalled()
     expect(stripAnsi(frames.join('\n'))).not.toContain('Incorrect.')
 
     stdin.write('\x7f')
-    await waitForFrames(
-      () => stripAnsi(frames.at(-1) ?? ''),
+    await waitForLastFrame(
+      lastFrame,
       (p) => p.includes('→') && !p.includes('→ 9')
     )
     stdin.write('2\r')
@@ -583,7 +580,7 @@ describe('recall MCQ (interactive)', () => {
     stdin.write('/recall\r')
     await waitForMcqVisible(waitForFramesToInclude)
     stdin.write('\u001b[B')
-    await waitForLastFrame(lastFrame, (p) => stripAnsi(p).includes('2.'))
+    await waitForLastFrame(lastFrame, (p) => p.includes('2.'))
 
     pressEscape(stdin)
     await waitForFramesToInclude(/Leave recall\?/)

@@ -8,7 +8,6 @@ import {
   pressEscapeAndWait,
   pressEscapeAndWaitForCancelledLine,
   renderInkWhenCommandLineReady,
-  stripAnsi,
   waitForFrames,
 } from './inkTestHelpers.js'
 
@@ -52,17 +51,12 @@ describe('InteractiveCliApp /add-access-token', () => {
   })
 
   test('valid token line shows success and persists access-tokens.json', async () => {
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/add-access-token unit-test-token-value\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        c.includes('Token added successfully') &&
-        c.includes('/add-access-token unit-test-token-value')
-    )
+    await waitForFramesToInclude('Token added successfully')
+    await waitForFramesToInclude('/add-access-token unit-test-token-value')
 
     const stored = JSON.parse(
       fs.readFileSync(path.join(configDir, 'access-tokens.json'), 'utf-8')
@@ -73,31 +67,22 @@ describe('InteractiveCliApp /add-access-token', () => {
   })
 
   test('bare /add-access-token shows usage hint', async () => {
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/add-access-token\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        c.includes('Missing access token') &&
-        c.includes('/add-access-token <token>')
-    )
+    await waitForFramesToInclude('Missing access token')
+    await waitForFramesToInclude('/add-access-token <token>')
     expect(getTokenInfoSpy).not.toHaveBeenCalled()
   })
 
   test('invalid token shows assistant error and does not write access-tokens.json', async () => {
     getTokenInfoSpy.mockRejectedValue({ status: 401 })
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/add-access-token bad-token\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => c.includes('Access token is invalid or expired')
-    )
+    await waitForFramesToInclude('Access token is invalid or expired')
 
     expect(fs.existsSync(path.join(configDir, 'access-tokens.json'))).toBe(
       false
@@ -120,15 +105,11 @@ describe('InteractiveCliApp /add-access-token', () => {
       })
     })
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/add-access-token unit-test-token-value\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => c.includes('Verifying token')
-    )
+    await waitForFramesToInclude('Verifying token')
 
     await pressEscapeAndWaitForCancelledLine(stdin, () => frames.join('\n'))
 
@@ -138,20 +119,15 @@ describe('InteractiveCliApp /add-access-token', () => {
   })
 
   test('/list-access-token Esc closes picker with abort line (no list dump)', async () => {
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/add-access-token unit-test-token-value\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => c.includes('Token added successfully')
-    )
+    await waitForFramesToInclude('Token added successfully')
 
     stdin.write('/list-access-token\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => c.includes('Access tokens') && c.includes('1. Vitest token label')
+    await waitForFramesToInclude(
+      /(?=.*Access tokens)(?=.*1\. Vitest token label)/s
     )
 
     await pressEscapeAndWait(
@@ -180,7 +156,7 @@ describe('InteractiveCliApp /add-access-token', () => {
       'utf-8'
     )
 
-    const { stdin, lastFrame, waitForFramesToInclude } =
+    const { stdin, lastStrippedFrame, waitForFramesToInclude } =
       await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/list-access-token\r')
@@ -188,7 +164,7 @@ describe('InteractiveCliApp /add-access-token', () => {
       /(?=.*Access tokens)(?=.*↓ more below)(?=.*1\. L0)/s
     )
 
-    const plain = stripAnsi(lastFrame() ?? '')
+    const plain = lastStrippedFrame()
     const rows = plain
       .split('\n')
       .filter(
@@ -210,15 +186,11 @@ describe('InteractiveCliApp /add-access-token', () => {
       'utf-8'
     )
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/list-access-token\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => c.includes('Access tokens') && c.includes('2. Beta')
-    )
+    await waitForFramesToInclude(/(?=.*Access tokens)(?=.*2\. Beta)/s)
 
     stdin.write('\u001b[B')
     await waitForFrames(
@@ -227,10 +199,7 @@ describe('InteractiveCliApp /add-access-token', () => {
     )
 
     stdin.write('\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => c.includes('Default token set to: Beta')
-    )
+    await waitForFramesToInclude('Default token set to: Beta')
 
     const stored = JSON.parse(
       fs.readFileSync(path.join(configDir, 'access-tokens.json'), 'utf-8')
@@ -239,19 +208,14 @@ describe('InteractiveCliApp /add-access-token', () => {
   })
 
   test('/list-access-token with no tokens commits assistant line without Escape', async () => {
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/list-access-token\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        c.includes('No access tokens stored.') &&
-        c.includes('/list-access-token') &&
-        c.includes('→ ') &&
-        c.includes('/ commands')
-    )
+    await waitForFramesToInclude('No access tokens stored.')
+    await waitForFramesToInclude('/list-access-token')
+    await waitForFramesToInclude('→ ')
+    await waitForFramesToInclude('/ commands')
   })
 
   test('bare /remove-access-token opens picker; Down+Enter removes selected token from file', async () => {
@@ -267,17 +231,12 @@ describe('InteractiveCliApp /add-access-token', () => {
       'utf-8'
     )
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/remove-access-token\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        c.includes('Remove access token') &&
-        c.includes('1. Alpha') &&
-        c.includes('2. Beta')
+    await waitForFramesToInclude(
+      /(?=.*Remove access token)(?=.*1\. Alpha)(?=.*2\. Beta)/s
     )
 
     stdin.write('\u001b[B')
@@ -287,10 +246,7 @@ describe('InteractiveCliApp /add-access-token', () => {
     )
 
     stdin.write('\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => c.includes('Token "Beta" removed.')
-    )
+    await waitForFramesToInclude('Token "Beta" removed.')
 
     const stored = JSON.parse(
       fs.readFileSync(path.join(configDir, 'access-tokens.json'), 'utf-8')
@@ -313,15 +269,12 @@ describe('InteractiveCliApp /add-access-token', () => {
       'utf-8'
     )
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/remove-access-token-completely\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        c.includes('Remove access token completely') && c.includes('2. Beta')
+    await waitForFramesToInclude(
+      /(?=.*Remove access token completely)(?=.*2\. Beta)/s
     )
 
     stdin.write('\u001b[B')
@@ -346,27 +299,17 @@ describe('InteractiveCliApp /add-access-token', () => {
   })
 
   test('/remove-access-token removes stored label and list is empty in transcript', async () => {
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/add-access-token unit-test-token-value\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => c.includes('Token added successfully')
-    )
+    await waitForFramesToInclude('Token added successfully')
 
     stdin.write('/remove-access-token Vitest token label\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => c.includes('Token "Vitest token label" removed.')
-    )
+    await waitForFramesToInclude('Token "Vitest token label" removed.')
 
     stdin.write('/list-access-token\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => c.includes('No access tokens stored.')
-    )
+    await waitForFramesToInclude('No access tokens stored.')
 
     const afterList = JSON.parse(
       fs.readFileSync(path.join(configDir, 'access-tokens.json'), 'utf-8')
@@ -376,15 +319,11 @@ describe('InteractiveCliApp /add-access-token', () => {
   })
 
   test('/remove-access-token-completely revokes then clears config', async () => {
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/add-access-token unit-test-token-value\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => c.includes('Token added successfully')
-    )
+    await waitForFramesToInclude('Token added successfully')
 
     stdin.write('/remove-access-token-completely Vitest token label\r')
     await waitForFrames(
@@ -396,10 +335,7 @@ describe('InteractiveCliApp /add-access-token', () => {
     )
 
     stdin.write('/list-access-token\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => c.includes('No access tokens stored.')
-    )
+    await waitForFramesToInclude('No access tokens stored.')
 
     const afterList = JSON.parse(
       fs.readFileSync(path.join(configDir, 'access-tokens.json'), 'utf-8')

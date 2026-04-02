@@ -199,15 +199,12 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
   })
 
   test('after /exit, TTY must not repaint the empty command line below Bye.', async () => {
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/exit\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => c.includes('Bye.') && c.includes('/exit')
-    )
+    await waitForFramesToInclude('Bye.')
+    await waitForFramesToInclude('/exit')
 
     for (let t = 0; t < 300; t++) {
       await new Promise<void>((resolve) => {
@@ -231,9 +228,8 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
   })
 
   test('submitting /exit character by character records it in output', async () => {
-    const { lastFrame, stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { lastStrippedFrame, stdin, frames, waitForLastFrameToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     let expectedBuffer = ''
     for (const ch of '/exit') {
@@ -241,15 +237,12 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
       stdin.write(ch)
       const expected = expectedBuffer
       await waitForFrames(
-        () => stripAnsi(lastFrame() ?? ''),
+        () => lastStrippedFrame(),
         (f) => f.includes(`→ ${expected}`)
       )
     }
     stdin.write('\r')
-    await waitForFrames(
-      () => stripAnsi(lastFrame() ?? ''),
-      (f) => f.includes('→ /exit ')
-    )
+    await waitForLastFrameToInclude('→ /exit ')
     stdin.write('\r')
     await waitForFrames(
       () => frames.join('\n'),

@@ -13,7 +13,6 @@ import {
   pressEscape,
   renderInkWhenCommandLineReady,
   stripAnsi,
-  waitForFrames,
   waitForLastFrame,
 } from './inkTestHelpers.js'
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
@@ -290,8 +289,8 @@ describe('recall spelling (interactive)', () => {
 
     stdin.write('typo\r')
 
-    await waitForFrames(
-      () => stripAnsi(lastFrame() ?? ''),
+    await waitForLastFrame(
+      lastFrame,
       (p) =>
         p.includes('Loading spelling question') &&
         !p.includes(SPELL_PLACEHOLDER_SUBSTR)
@@ -304,9 +303,9 @@ describe('recall spelling (interactive)', () => {
     await waitForLastFrame(
       lastFrame,
       (p) =>
-        stripAnsi(p).includes(secondStem) &&
-        stripAnsi(p).includes('Recalling') &&
-        !stripAnsi(p).includes('Loading spelling question')
+        p.includes(secondStem) &&
+        p.includes('Recalling') &&
+        !p.includes('Loading spelling question')
     )
   })
 

@@ -357,8 +357,8 @@ describe('recall just-review (interactive)', () => {
     await waitRememberAlpha(frames, { ynHint: true })
     stdin.write('y\r')
 
-    await waitForFrames(
-      () => stripAnsi(lastFrame() ?? ''),
+    await waitForLastFrame(
+      lastFrame,
       (p) =>
         p.includes(RECALL_LOADING_NEXT_QUESTION_LABEL) && !p.includes('(y/n)')
     )
@@ -566,8 +566,7 @@ describe('recall just-review (interactive)', () => {
     await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('n\r')
-    await waitForLastFrame(lastFrame, (f) => {
-      const plain = stripAnsi(f)
+    await waitForLastFrame(lastFrame, (plain) => {
       return (
         plain.includes('Yes, I remember?') &&
         plain.includes('Alpha') &&
@@ -597,8 +596,7 @@ describe('recall just-review (interactive)', () => {
     expect(markAsRecalledSpy).not.toHaveBeenCalled()
 
     stdin.write('n\r')
-    await waitForLastFrame(lastFrame, (f) => {
-      const plain = stripAnsi(f)
+    await waitForLastFrame(lastFrame, (plain) => {
       return (
         plain.includes('Yes, I remember?') &&
         plain.includes('Alpha') &&
@@ -763,8 +761,7 @@ describe('recall just-review (interactive)', () => {
     await waitRememberAlpha(frames)
     stdin.write('y\r')
     await waitRememberBeta(frames)
-    await waitForLastFrame(lastFrame, (f) => {
-      const plain = stripAnsi(f)
+    await waitForLastFrame(lastFrame, (plain) => {
       return (
         plain.includes('Reviewed: Alpha') &&
         plain.includes('body') &&
@@ -873,20 +870,16 @@ describe('recall just-review (interactive)', () => {
       }
     )
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     startRecall(stdin)
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) => stripAnsi(c).includes('Loading recall')
-    )
+    await waitForFramesToInclude('Loading recall')
 
     await pressEscapeAndWaitForCancelledLine(stdin, () => frames.join('\n'), {
       normalize: stripAnsi,
     })
-    expect(stripAnsi(frames.join('\n'))).toContain('/recall')
+    await waitForFramesToInclude('/recall')
   })
 
   test('Escape during mark as recalled shows Cancelled when mark honors signal', async () => {
