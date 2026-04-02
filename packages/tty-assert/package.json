@@ -28,6 +28,7 @@
     "./ptyTranscriptToVisiblePlaintextViaXterm": "./src/ptyTranscriptToVisiblePlaintextViaXterm.ts",
     "./errorSnapshotFormatting": "./src/errorSnapshotFormatting.ts",
     "./ptySession": "./src/ptySession.ts",
-    "./facade": "./src/facade.ts"
+    "./facade": "./src/facade.ts",
+    "./waitForTextInSurface": "./src/waitForTextInSurface.ts"
   }
 }
