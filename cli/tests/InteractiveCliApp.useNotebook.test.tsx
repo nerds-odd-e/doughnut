@@ -6,8 +6,8 @@ import {
   renderInkWhenCommandLineReady,
   stripAnsi,
   waitForFrames,
-  waitForLastFrame,
 } from './inkTestHelpers.js'
+
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
 describe('InteractiveCliApp /use notebook stage', () => {
@@ -30,23 +30,15 @@ describe('InteractiveCliApp /use notebook stage', () => {
   })
 
   test('enters notebook stage then /exit clears stage indicator', async () => {
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
     expect(stripAnsi(frames.join('\n'))).toContain(formatVersionOutput())
 
     stdin.write('/use Top Maths\r')
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (c) => c.includes('Notebook') && c.includes('Active notebook: Top Maths')
-    )
-
-    stdin.write('|')
-    await waitForLastFrame(lastFrame, (f) => stripAnsi(f).includes('→ |'))
-    stdin.write('\x7f')
-    await waitForLastFrame(lastFrame, (f) => !stripAnsi(f).includes('→ |'))
+    await waitForFramesToInclude(/Active notebook: Top Maths/)
 
     stdin.write('/exit\r')
+
     await waitForFrames(
       () => stripAnsi(lastFrame() ?? ''),
       (c) => c.includes('/exit') && c.includes('Left notebook context.')

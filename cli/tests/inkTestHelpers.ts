@@ -93,6 +93,7 @@ export function waitForLastFrame(
  */
 export async function renderInkWhenCommandLineReady(element: ReactElement) {
   const result = render(element)
+  const { frames, lastFrame } = result
   result.stdin.write('|')
   await waitForLastFrame(
     result.lastFrame,
@@ -105,7 +106,19 @@ export async function renderInkWhenCommandLineReady(element: ReactElement) {
       (f.includes('→') && !f.includes('→ |')) ||
       (f.includes('>') && !f.includes('> |'))
   )
-  return result
+  return {
+    ...result,
+    waitForLastFrameToInclude(re: RegExp, maxTicks = 5000): Promise<void> {
+      return waitForLastFrame(lastFrame, (f) => re.test(f), maxTicks)
+    },
+    waitForFramesToInclude(re: RegExp, maxTicks = 5000): Promise<void> {
+      return waitForFrames(
+        () => stripAnsi(frames.join('\n')),
+        (c) => re.test(c),
+        maxTicks
+      )
+    },
+  }
 }
 
 /** Mirrors InteractiveCliApp stage key forwarding for tests. */
