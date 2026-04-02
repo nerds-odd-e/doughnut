@@ -54,7 +54,7 @@
     "gsap": "^3.14.2",
     "marked": "^17.0.5",
     "optionator": "^0.9.4",
-    "playwright": "^1.59.0",
+    "playwright": "^1.59.1",
     "postcss": "8.5.8",
     "postcss-load-config": "6.0.1",
     "sass": "1.98.0",
