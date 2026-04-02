@@ -7,14 +7,8 @@ import {
 import type { NoteRealm, RecallPrompt } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
-import {
-  LEAVE_RECALL_PROMPT,
-  RECALL_SESSION_STOPPED_LINE,
-} from '../src/commands/recall/leaveRecallSessionCopy.js'
-import {
-  RECALL_BUSY_SUBMIT_ANSWER_LABEL,
-  RECALL_LOADING_NEXT_QUESTION_LABEL,
-} from '../src/commands/recall/recallBusyInputCopy.js'
+import { LEAVE_RECALL_PROMPT } from '../src/commands/recall/leaveRecallSessionCopy.js'
+import { RECALL_LOADING_NEXT_QUESTION_LABEL } from '../src/commands/recall/recallBusyInputCopy.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
   pressEscape,
@@ -36,15 +30,17 @@ const MCQ_HINT_SUBSTR = '↑↓ Enter or number to select'
 
 const EXPECT_GUIDANCE_MORE_BELOW = '↓ more below'
 
-async function waitForMcqVisible(frames: string[]): Promise<void> {
-  await waitForFrames(
-    () => stripAnsi(frames.join('\n')),
-    (p) =>
-      p.includes('Choose') &&
-      p.includes('Alpha') &&
-      !p.includes('**') &&
-      p.includes('Beta') &&
-      p.includes(MCQ_HINT_SUBSTR)
+function reLiteral(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+const leaveRecallWithYnRe = /(?=.*Leave recall\?)(?=.*\(y\/n\))/s
+
+async function waitForMcqVisible(
+  waitForFramesToInclude: (re: RegExp, maxTicks?: number) => Promise<void>
+): Promise<void> {
+  await waitForFramesToInclude(
+    /(?=.*Choose)(?=.*Alpha)(?=.*Beta)(?!.*\*\*)(?=.*↑↓ Enter or number to select)/s
   )
 }
 
@@ -149,18 +145,13 @@ describe('recall MCQ (interactive)', () => {
       ],
     } as Awaited<ReturnType<typeof MemoryTrackerController.getRecallPrompts>>)
 
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) =>
-        p.includes('Pick one') &&
-        p.includes(EXPECT_GUIDANCE_MORE_BELOW) &&
-        p.includes('1. c0')
+    await waitForFramesToInclude(
+      /(?=.*Pick one)(?=.*↓ more below)(?=.*1\. c0)/s
     )
 
     const plain = stripAnsi(lastFrame() ?? '')
@@ -188,22 +179,18 @@ describe('recall MCQ (interactive)', () => {
       }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
 
-    await waitForMcqVisible(frames)
+    await waitForMcqVisible(waitForFramesToInclude)
 
     expect(frames.join('\n')).toContain('\u001b[')
 
     stdin.write('2\r')
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Load more from next 3 days?')
-    )
+    await waitForFramesToInclude(/Load more from next 3 days\?/)
 
     const plainWrong = stripAnsi(frames.join('\n'))
     expect(plainWrong).toContain('Alpha')
@@ -253,19 +240,15 @@ describe('recall MCQ (interactive)', () => {
     })
     answerQuizSpy.mockImplementation(() => answerPromise)
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
-    await waitForMcqVisible(frames)
+    await waitForMcqVisible(waitForFramesToInclude)
 
     stdin.write('2\r')
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(RECALL_BUSY_SUBMIT_ANSWER_LABEL)
-    )
+    await waitForFramesToInclude(/Submitting answer…/)
 
     resolveAnswer({
       data: mcqAnsweredPrompt(pending, {
@@ -275,10 +258,7 @@ describe('recall MCQ (interactive)', () => {
       }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Load more from next 3 days?')
-    )
+    await waitForFramesToInclude(/Load more from next 3 days\?/)
   })
 
   test('after first MCQ answer, shows loading next label until second tracker loads', async () => {
@@ -344,12 +324,11 @@ describe('recall MCQ (interactive)', () => {
       },
     } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
 
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
-    await waitForMcqVisible(frames)
+    await waitForMcqVisible(waitForFramesToInclude)
     stdin.write('2\r')
 
     await waitForFrames(
@@ -386,12 +365,11 @@ describe('recall MCQ (interactive)', () => {
       }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
-    await waitForMcqVisible(frames)
+    await waitForMcqVisible(waitForFramesToInclude)
 
     stdin.write('9\r')
     await waitForFrames(
@@ -409,10 +387,7 @@ describe('recall MCQ (interactive)', () => {
     )
     stdin.write('2\r')
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Load more from next 3 days?')
-    )
+    await waitForFramesToInclude(/Load more from next 3 days\?/)
 
     expect(answerQuizSpy).toHaveBeenCalledTimes(1)
     expect(stripAnsi(frames.join('\n'))).toContain('Incorrect.')
@@ -494,17 +469,15 @@ describe('recall MCQ (interactive)', () => {
       } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
     })
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
-    await waitForMcqVisible(frames)
+    await waitForMcqVisible(waitForFramesToInclude)
     stdin.write('2\r')
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Incorrect') && p.includes(secondStem)
+    await waitForFramesToInclude(
+      new RegExp(`(?=.*Incorrect)(?=.*${reLiteral(secondStem)})`, 's')
     )
 
     const plainFirstWrong = stripAnsi(frames.join('\n'))
@@ -516,10 +489,7 @@ describe('recall MCQ (interactive)', () => {
     expect(answerQuizSpy).toHaveBeenCalledTimes(1)
 
     stdin.write('1\r')
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Correct!')
-    )
+    await waitForFramesToInclude(/Correct!/)
 
     const plainCorrect = stripAnsi(frames.join('\n'))
     expect(plainCorrect).toContain('Beta')
@@ -541,59 +511,44 @@ describe('recall MCQ (interactive)', () => {
   })
 
   test('Esc from MCQ shows leave recall confirmation without calling answerQuiz', async () => {
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
-    await waitForMcqVisible(frames)
+    await waitForMcqVisible(waitForFramesToInclude)
 
     expect(answerQuizSpy).not.toHaveBeenCalled()
 
     pressEscape(stdin)
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_PROMPT) && p.includes('(y/n)')
-    )
+    await waitForFramesToInclude(leaveRecallWithYnRe)
 
     expect(answerQuizSpy).not.toHaveBeenCalled()
   })
 
   test('after Esc, y settles with Recall session stopped and never calls answerQuiz', async () => {
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
-    await waitForMcqVisible(frames)
+    await waitForMcqVisible(waitForFramesToInclude)
     pressEscape(stdin)
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_PROMPT)
-    )
+    await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('y\r')
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(RECALL_SESSION_STOPPED_LINE)
-    )
+    await waitForFramesToInclude(/Recall session stopped\./)
 
     expect(answerQuizSpy).not.toHaveBeenCalled()
   })
 
   test('after Esc, n returns to MCQ without answerQuiz', async () => {
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
-    await waitForMcqVisible(frames)
+    await waitForMcqVisible(waitForFramesToInclude)
     pressEscape(stdin)
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_PROMPT)
-    )
+    await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('n\r')
 
@@ -619,20 +574,16 @@ describe('recall MCQ (interactive)', () => {
       }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
 
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
-    await waitForMcqVisible(frames)
+    await waitForMcqVisible(waitForFramesToInclude)
     stdin.write('\u001b[B')
     await waitForLastFrame(lastFrame, (p) => stripAnsi(p).includes('2.'))
 
     pressEscape(stdin)
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_PROMPT)
-    )
+    await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('n\r')
     await waitForLastFrame(
@@ -642,10 +593,7 @@ describe('recall MCQ (interactive)', () => {
 
     stdin.write('\r')
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Incorrect')
-    )
+    await waitForFramesToInclude(/Incorrect/)
 
     expect(answerQuizSpy).toHaveBeenCalledTimes(1)
     expect(answerQuizSpy).toHaveBeenCalledWith(
@@ -657,20 +605,16 @@ describe('recall MCQ (interactive)', () => {
   })
 
   test('after Esc then n, MCQ command buffer preserved', async () => {
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
-    await waitForMcqVisible(frames)
+    await waitForMcqVisible(waitForFramesToInclude)
     stdin.write('z')
     await waitForLastFrame(lastFrame, (p) => p.includes('→ z'))
 
     pressEscape(stdin)
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_PROMPT)
-    )
+    await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('n\r')
 
@@ -686,23 +630,16 @@ describe('recall MCQ (interactive)', () => {
   })
 
   test('empty Enter on leave recall confirm stays on confirm; n returns to MCQ', async () => {
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
-    await waitForMcqVisible(frames)
+    await waitForMcqVisible(waitForFramesToInclude)
     pressEscape(stdin)
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_PROMPT)
-    )
+    await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('\r')
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_PROMPT)
-    )
+    await waitForFramesToInclude(/Leave recall\?/)
 
     expect(answerQuizSpy).not.toHaveBeenCalled()
 
@@ -729,19 +666,15 @@ describe('recall MCQ (interactive)', () => {
         data: pendingMcqPrompt(),
       } as Awaited<ReturnType<typeof RecallPromptController.regenerate>>)
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
-    await waitForMcqVisible(frames)
+    await waitForMcqVisible(waitForFramesToInclude)
 
     stdin.write('/contest\r')
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(rejectAdvice)
-    )
+    await waitForFramesToInclude(new RegExp(reLiteral(rejectAdvice)))
 
     const plain = stripAnsi(frames.join('\n'))
     expect(plain).toContain(rejectAdvice)
@@ -756,19 +689,15 @@ describe('recall MCQ (interactive)', () => {
       .spyOn(RecallPromptController, 'contest')
       .mockRejectedValue(new Error('contest failed hard'))
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
-    await waitForMcqVisible(frames)
+    await waitForMcqVisible(waitForFramesToInclude)
 
     stdin.write('/contest\r')
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Doughnut service is not available')
-    )
+    await waitForFramesToInclude(/Doughnut service is not available/)
 
     expect(answerQuizSpy).not.toHaveBeenCalled()
   })

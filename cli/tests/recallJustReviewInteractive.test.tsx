@@ -6,10 +6,7 @@ import {
   LEAVE_RECALL_PROMPT,
   RECALL_SESSION_STOPPED_LINE,
 } from '../src/commands/recall/leaveRecallSessionCopy.js'
-import {
-  RECALL_BUSY_RECORD_REVIEW_LABEL,
-  RECALL_LOADING_NEXT_QUESTION_LABEL,
-} from '../src/commands/recall/recallBusyInputCopy.js'
+import { RECALL_LOADING_NEXT_QUESTION_LABEL } from '../src/commands/recall/recallBusyInputCopy.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
   pressEscape,
@@ -25,6 +22,8 @@ const baseNoteTimes = {
   createdAt: '2026-01-01T00:00:00Z',
   updatedAt: '2026-01-01T00:00:00Z',
 }
+
+const leaveRecallWithYnRe = /(?=.*Leave recall\?)(?=.*\(y\/n\))/s
 
 describe('recall just-review (interactive)', () => {
   let configDir: string
@@ -281,18 +280,14 @@ describe('recall just-review (interactive)', () => {
     })
     markAsRecalledSpy.mockImplementation(() => markPromise)
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     startRecall(stdin)
     await waitRememberAlpha(frames, { ynHint: true })
     stdin.write('y\r')
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(RECALL_BUSY_RECORD_REVIEW_LABEL)
-    )
+    await waitForFramesToInclude(/Recording review…/)
 
     resolveMark({
       data: makeMe.aMemoryTracker.please(),
@@ -410,15 +405,11 @@ describe('recall just-review (interactive)', () => {
     mockMarkAsRecalledCounting()
     mockShowMemoryTrackerCardForRealm(childNoteUnderEnglish())
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     startRecall(stdin)
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes('Yes, I remember?') && p.includes('Sedition')
-    )
+    await waitForFramesToInclude(/(?=.*Yes, I remember\?)(?=.*Sedition)/s)
     stdin.write('y\r')
     await untilPlain(frames, (p) => {
       const plain = stripAnsi(p)
@@ -531,19 +522,15 @@ describe('recall just-review (interactive)', () => {
     mockMarkAsRecalledCounting()
     mockShowMemoryTrackerCardForRealm(alphaNoteRealm())
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     startRecall(stdin)
     await waitRememberAlpha(frames)
     expect(markAsRecalledSpy).not.toHaveBeenCalled()
 
     pressEscape(stdin)
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_PROMPT) && p.includes('(y/n)')
-    )
+    await waitForFramesToInclude(leaveRecallWithYnRe)
 
     expect(markAsRecalledSpy).not.toHaveBeenCalled()
   })
@@ -552,17 +539,13 @@ describe('recall just-review (interactive)', () => {
     mockMarkAsRecalledCounting()
     mockShowMemoryTrackerCardForRealm(alphaNoteRealm())
 
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     startRecall(stdin)
     await waitRememberAlpha(frames)
     pressEscape(stdin)
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_PROMPT)
-    )
+    await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('y\r')
     await untilPlain(frames, (p) => p.includes(RECALL_SESSION_STOPPED_LINE))
@@ -574,17 +557,13 @@ describe('recall just-review (interactive)', () => {
     mockMarkAsRecalledCounting()
     mockShowMemoryTrackerCardForRealm(alphaNoteRealm())
 
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     startRecall(stdin)
     await waitRememberAlpha(frames)
     pressEscape(stdin)
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_PROMPT)
-    )
+    await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('n\r')
     await waitForLastFrame(lastFrame, (f) => {
@@ -604,23 +583,16 @@ describe('recall just-review (interactive)', () => {
     mockMarkAsRecalledCounting()
     mockShowMemoryTrackerCardForRealm(alphaNoteRealm())
 
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     startRecall(stdin)
     await waitRememberAlpha(frames)
     pressEscape(stdin)
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_PROMPT)
-    )
+    await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('\r')
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_PROMPT)
-    )
+    await waitForFramesToInclude(/Leave recall\?/)
 
     expect(markAsRecalledSpy).not.toHaveBeenCalled()
 

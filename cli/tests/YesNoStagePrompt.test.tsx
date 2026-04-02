@@ -10,23 +10,23 @@ import {
   waitForLastFrame,
 } from './inkTestHelpers.js'
 
+const okAndDefaultYesHintRe = /(?=.*OK\?)(?=.*\(Y\/n\))/s
+
 describe('YesNoStagePrompt', () => {
   test('empty Enter with defaultAnswer true calls onAnswer(true) and shows (Y/n)', async () => {
     const onAnswer = vi.fn()
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <StageKeyRoot>
-        <YesNoStagePrompt
-          prompt="OK?"
-          onAnswer={onAnswer}
-          defaultAnswer={true}
-        />
-      </StageKeyRoot>
-    )
+    const { stdin, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(
+        <StageKeyRoot>
+          <YesNoStagePrompt
+            prompt="OK?"
+            onAnswer={onAnswer}
+            defaultAnswer={true}
+          />
+        </StageKeyRoot>
+      )
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (c) => c.includes('OK?') && c.includes('(Y/n)')
-    )
+    await waitForFramesToInclude(okAndDefaultYesHintRe)
 
     stdin.write('\r')
     await waitForFrames(
@@ -38,20 +38,18 @@ describe('YesNoStagePrompt', () => {
 
   test('empty Enter with defaultAnswer false calls onAnswer(false) and shows (y/N)', async () => {
     const onAnswer = vi.fn()
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <StageKeyRoot>
-        <YesNoStagePrompt
-          prompt="OK?"
-          onAnswer={onAnswer}
-          defaultAnswer={false}
-        />
-      </StageKeyRoot>
-    )
+    const { stdin, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(
+        <StageKeyRoot>
+          <YesNoStagePrompt
+            prompt="OK?"
+            onAnswer={onAnswer}
+            defaultAnswer={false}
+          />
+        </StageKeyRoot>
+      )
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (c) => c.includes('(y/N)')
-    )
+    await waitForFramesToInclude(/\(y\/N\)/)
 
     stdin.write('\r')
     await waitForFrames(
@@ -63,20 +61,18 @@ describe('YesNoStagePrompt', () => {
 
   test('whitespace-only buffer + Enter with default commits default', async () => {
     const onAnswer = vi.fn()
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <StageKeyRoot>
-        <YesNoStagePrompt
-          prompt="OK?"
-          onAnswer={onAnswer}
-          defaultAnswer={true}
-        />
-      </StageKeyRoot>
-    )
+    const { stdin, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(
+        <StageKeyRoot>
+          <YesNoStagePrompt
+            prompt="OK?"
+            onAnswer={onAnswer}
+            defaultAnswer={true}
+          />
+        </StageKeyRoot>
+      )
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (c) => c.includes('OK?')
-    )
+    await waitForFramesToInclude(/OK\?/)
 
     stdin.write('  \t  \r')
     await waitForFrames(
@@ -88,16 +84,14 @@ describe('YesNoStagePrompt', () => {
 
   test('empty Enter without default does not call onAnswer; y then commits yes', async () => {
     const onAnswer = vi.fn()
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <StageKeyRoot>
-        <YesNoStagePrompt prompt="OK?" onAnswer={onAnswer} />
-      </StageKeyRoot>
-    )
+    const { stdin, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(
+        <StageKeyRoot>
+          <YesNoStagePrompt prompt="OK?" onAnswer={onAnswer} />
+        </StageKeyRoot>
+      )
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (c) => c.includes('(y/n)')
-    )
+    await waitForFramesToInclude(/\(y\/n\)/)
 
     stdin.write('\r')
     stdin.write('y\r')
@@ -154,20 +148,18 @@ describe('YesNoStagePrompt', () => {
   test('Escape calls onCancel when set', async () => {
     const onAnswer = vi.fn()
     const onCancel = vi.fn()
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <StageKeyRoot>
-        <YesNoStagePrompt
-          prompt="OK?"
-          onAnswer={onAnswer}
-          onCancel={onCancel}
-        />
-      </StageKeyRoot>
-    )
+    const { stdin, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(
+        <StageKeyRoot>
+          <YesNoStagePrompt
+            prompt="OK?"
+            onAnswer={onAnswer}
+            onCancel={onCancel}
+          />
+        </StageKeyRoot>
+      )
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (c) => c.includes('OK?')
-    )
+    await waitForFramesToInclude(/OK\?/)
 
     stdin.write('\u001b')
     await waitForFrames(
@@ -180,16 +172,14 @@ describe('YesNoStagePrompt', () => {
 
   test('Escape without onCancel does not call onAnswer; y still commits after a turn drain', async () => {
     const onAnswer = vi.fn()
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <StageKeyRoot>
-        <YesNoStagePrompt prompt="OK?" onAnswer={onAnswer} />
-      </StageKeyRoot>
-    )
+    const { stdin, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(
+        <StageKeyRoot>
+          <YesNoStagePrompt prompt="OK?" onAnswer={onAnswer} />
+        </StageKeyRoot>
+      )
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (c) => c.includes('OK?')
-    )
+    await waitForFramesToInclude(/OK\?/)
 
     stdin.write('\u001b')
     let drain = 0
@@ -210,20 +200,18 @@ describe('YesNoStagePrompt', () => {
 
   test('typed n commits no even with defaultAnswer true', async () => {
     const onAnswer = vi.fn()
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <StageKeyRoot>
-        <YesNoStagePrompt
-          prompt="OK?"
-          onAnswer={onAnswer}
-          defaultAnswer={true}
-        />
-      </StageKeyRoot>
-    )
+    const { stdin, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(
+        <StageKeyRoot>
+          <YesNoStagePrompt
+            prompt="OK?"
+            onAnswer={onAnswer}
+            defaultAnswer={true}
+          />
+        </StageKeyRoot>
+      )
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (c) => c.includes('OK?')
-    )
+    await waitForFramesToInclude(/OK\?/)
 
     stdin.write('n\r')
     await waitForFrames(
@@ -235,20 +223,18 @@ describe('YesNoStagePrompt', () => {
 
   test('non-y/n committed line does not call onAnswer', async () => {
     const onAnswer = vi.fn()
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <StageKeyRoot>
-        <YesNoStagePrompt
-          prompt="OK?"
-          onAnswer={onAnswer}
-          defaultAnswer={true}
-        />
-      </StageKeyRoot>
-    )
+    const { stdin, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(
+        <StageKeyRoot>
+          <YesNoStagePrompt
+            prompt="OK?"
+            onAnswer={onAnswer}
+            defaultAnswer={true}
+          />
+        </StageKeyRoot>
+      )
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (c) => c.includes('OK?')
-    )
+    await waitForFramesToInclude(/OK\?/)
 
     stdin.write('x\r')
     expect(onAnswer).not.toHaveBeenCalled()

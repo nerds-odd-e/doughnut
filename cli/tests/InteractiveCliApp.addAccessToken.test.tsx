@@ -180,17 +180,12 @@ describe('InteractiveCliApp /add-access-token', () => {
       'utf-8'
     )
 
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/list-access-token\r')
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (c) =>
-        c.includes('Access tokens') &&
-        c.includes(EXPECT_GUIDANCE_MORE_BELOW) &&
-        c.includes('1. L0')
+    await waitForFramesToInclude(
+      /(?=.*Access tokens)(?=.*↓ more below)(?=.*1\. L0)/s
     )
 
     const plain = stripAnsi(lastFrame() ?? '')

@@ -7,11 +7,7 @@ import {
 import type { NoteRealm, RecallPrompt } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
-import {
-  LEAVE_RECALL_PROMPT,
-  RECALL_SESSION_STOPPED_LINE,
-} from '../src/commands/recall/leaveRecallSessionCopy.js'
-import { RECALL_BUSY_SUBMIT_ANSWER_LABEL } from '../src/commands/recall/recallBusyInputCopy.js'
+import { LEAVE_RECALL_PROMPT } from '../src/commands/recall/leaveRecallSessionCopy.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
   pressEscape,
@@ -31,6 +27,8 @@ const MEMORY_TRACKER_ID = 1
 const SPELL_PROMPT_ID = 42
 const SPELL_PROMPT_ID_2 = 43
 const SPELL_PLACEHOLDER_SUBSTR = 'Type answer, Enter to submit'
+
+const leaveRecallWithYnRe = /(?=.*Leave recall\?)(?=.*\(y\/n\))/s
 
 /** Wrong spelling still POSTs an answer; SRS rescheduling is server-side (RecallPromptControllerTests.WrongAnswer). */
 async function waitForSpellingPromptVisible(
@@ -153,21 +151,16 @@ describe('recall spelling (interactive)', () => {
       }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerSpelling>>)
 
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
     await waitForSpellingPromptVisible(lastFrame)
 
     stdin.write('typo\r')
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) =>
-        p.includes('Incorrect.') &&
-        p.includes('Your answer: typo') &&
-        p.includes('body')
+    await waitForFramesToInclude(
+      /(?=.*Incorrect\.)(?=.*Your answer: typo)(?=.*body)/s
     )
 
     const raw = frames.join('\n')
@@ -217,19 +210,15 @@ describe('recall spelling (interactive)', () => {
     })
     answerSpellingSpy.mockImplementation(() => answerPromise)
 
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
     await waitForSpellingPromptVisible(lastFrame)
 
     stdin.write('typo\r')
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(RECALL_BUSY_SUBMIT_ANSWER_LABEL)
-    )
+    await waitForFramesToInclude(/Submitting answer…/)
 
     resolveAnswer({
       data: spellingAnsweredPrompt(pending, {
@@ -238,12 +227,8 @@ describe('recall spelling (interactive)', () => {
       }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerSpelling>>)
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) =>
-        p.includes('Incorrect.') &&
-        p.includes('Your answer: typo') &&
-        p.includes('body')
+    await waitForFramesToInclude(
+      /(?=.*Incorrect\.)(?=.*Your answer: typo)(?=.*body)/s
     )
   })
 
@@ -352,21 +337,16 @@ describe('recall spelling (interactive)', () => {
       } as Awaited<ReturnType<typeof RecallPromptController.answerSpelling>>)
     })
 
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, frames, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
     await waitForSpellingPromptVisible(lastFrame)
 
     stdin.write('SeDiTiOn\r')
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) =>
-        p.includes('Correct!') &&
-        p.includes('Your answer: SeDiTiOn') &&
-        p.includes('body')
+    await waitForFramesToInclude(
+      /(?=.*Correct!)(?=.*Your answer: SeDiTiOn)(?=.*body)/s
     )
 
     const rawOk = frames.join('\n')
@@ -405,21 +385,16 @@ describe('recall spelling (interactive)', () => {
       }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerSpelling>>)
 
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
     await waitForSpellingPromptVisible(lastFrame)
 
     stdin.write('\u00A0SeDiTiOn\u00A0\r')
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) =>
-        p.includes('Correct!') &&
-        p.includes('Your answer: SeDiTiOn') &&
-        p.includes('body')
+    await waitForFramesToInclude(
+      /(?=.*Correct!)(?=.*Your answer: SeDiTiOn)(?=.*body)/s
     )
 
     expect(answerSpellingSpy).toHaveBeenCalledWith(
@@ -430,9 +405,8 @@ describe('recall spelling (interactive)', () => {
   })
 
   test('Esc from spelling shows leave recall confirmation without calling answerSpelling', async () => {
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
     await waitForSpellingPromptVisible(lastFrame)
@@ -440,41 +414,30 @@ describe('recall spelling (interactive)', () => {
     expect(answerSpellingSpy).not.toHaveBeenCalled()
 
     pressEscape(stdin)
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_PROMPT) && p.includes('(y/n)')
-    )
+    await waitForFramesToInclude(leaveRecallWithYnRe)
 
     expect(answerSpellingSpy).not.toHaveBeenCalled()
   })
 
   test('after Esc from spelling, y settles with Recall session stopped and never calls answerSpelling', async () => {
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
     await waitForSpellingPromptVisible(lastFrame)
     pressEscape(stdin)
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_PROMPT)
-    )
+    await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('y\r')
 
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(RECALL_SESSION_STOPPED_LINE)
-    )
+    await waitForFramesToInclude(/Recall session stopped\./)
 
     expect(answerSpellingSpy).not.toHaveBeenCalled()
   })
 
   test('after Esc from spelling, n returns to spelling card without answerSpelling; buffer preserved', async () => {
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
     await waitForSpellingPromptVisible(lastFrame)
@@ -483,10 +446,7 @@ describe('recall spelling (interactive)', () => {
     await waitForLastFrame(lastFrame, (p) => p.includes('→ par'))
 
     pressEscape(stdin)
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_PROMPT)
-    )
+    await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('n\r')
 
@@ -502,9 +462,8 @@ describe('recall spelling (interactive)', () => {
   })
 
   test('empty Enter on spelling leave confirm stays on confirm; n returns with buffer', async () => {
-    const { stdin, frames, lastFrame } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, lastFrame, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/recall\r')
     await waitForSpellingPromptVisible(lastFrame)
@@ -512,16 +471,10 @@ describe('recall spelling (interactive)', () => {
     await waitForLastFrame(lastFrame, (p) => p.includes('→ par'))
 
     pressEscape(stdin)
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_PROMPT)
-    )
+    await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('\r')
-    await waitForFrames(
-      () => stripAnsi(frames.join('\n')),
-      (p) => p.includes(LEAVE_RECALL_PROMPT)
-    )
+    await waitForFramesToInclude(/Leave recall\?/)
 
     expect(answerSpellingSpy).not.toHaveBeenCalled()
 
