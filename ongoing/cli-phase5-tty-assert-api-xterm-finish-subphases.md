@@ -11,7 +11,8 @@
 | **5.1** | **Met** | [`facade.ts`](../packages/tty-assert/src/facade.ts) replay uses `ptyTranscriptToViewportPlaintext` (xterm). |
 | **5.2** | **Met** | Canonical export `tty-assert/ptyTranscriptToViewportPlaintext`; legacy [`ptyTranscriptToVisiblePlaintext`](../packages/tty-assert/src/ptyTranscriptToVisiblePlaintext.ts) is `@deprecated` + [`check-legacy-replay-imports.sh`](../packages/tty-assert/scripts/check-legacy-replay-imports.sh). |
 | **5.3** | **Met** | [`waitForTextInSurface.ts`](../packages/tty-assert/src/waitForTextInSurface.ts), export `tty-assert/waitForTextInSurface`, tests in [`waitForTextInSurface.test.ts`](../packages/tty-assert/tests/waitForTextInSurface.test.ts). |
-| **5.4**–**5.8** | Pending | — |
+| **5.4** | **Met** | [`README.md`](../packages/tty-assert/README.md): strip vs replay vs locators, flattening contract, tui-test prior art, `tt/` note. |
+| **5.5**–**5.8** | Pending | — |
 | **5.9** | Pending | Systematic removal of code obsoleted after the locator + xterm switch (see below). |
 
 ---
@@ -149,6 +150,8 @@ The workspace may include a copy under [`tt/`](../tt/) for close reading while d
 ---
 
 ## Sub-phase 5.4 — Document public API (`tty-assert` README)
+
+**Status: Met** (in-repo).
 
 **User-visible outcome:** None. **Contributor outcome:** README explains **strip vs replay vs viewable/full buffer locators** and the **flattening contract** from 5.3; links [microsoft/tui-test](https://github.com/microsoft/tui-test) as **prior art**. Optionally note that a temporary local **`tt/`** tree was used for design research and **is not part of the product** (remove `tt/` from the repo once the team no longer needs it).
 
