@@ -12,6 +12,8 @@ This means “layout extraction” for Doughnut must be treated as a spectrum: f
 From user feedback, the highest-impact and most frequently requested capabilities tend to be: **(a) reliable export and deep links back to source, (b) strong search/metadata, (c) performance and stability, (d) guided workflows to reduce overwhelm/learning curve, and (e) data portability/vendor risk mitigation**. citeturn6search4turn6search3turn6search24turn5search2turn5search1turn16search26  
 Doughnut can differentiate by making **structure-first reading** the primary UX: treat each book as a navigable knowledge tree/graph, allow BFS/DFS traversal, store multi-level summaries per node, and keep every extracted note “anchored” to a stable structural address (not just a page number). citeturn10search13turn9search0turn22search0turn12search4
 
+For how those ideas are expressed in Doughnut’s own data shape—**where** in a book something is, **which region** is in play, **which user note** cites evidence, and **how progress** is tracked—see the companion document **`ongoing/doughnut-book-reading-architecture-roadmap.md`** (architecture directions, not a delivery plan).
+
 ## Overlapping products and tools
 
 The landscape clusters into three overlapping “schools” that map cleanly to your concept: (1) **spatial/active reading**, (2) **reading inbox + export**, and (3) **incremental reading + learning systems**. The table below inventories representative tools and where they overlap.
@@ -55,18 +57,32 @@ The flowchart below captures a minimally sufficient product loop that supports b
 
 ```mermaid
 flowchart TD
-  A[Notebook contains attached book file] --> B[Ingest & parse]
-  B --> C[Build structure graph: book → chapters → sections → blocks]
+  A[Notebook contains Book + source file] --> B[Ingest & parse]
+  B --> C[Build BookRange tree: structuralAddress + anchors]
   C --> D{User chooses navigation mode}
-  D -->|Breadth-first| E[Next sibling at current depth]
-  D -->|Depth-first| F[Descend into child node]
-  E --> G[Read node with context + outline]
+  D -->|Breadth-first| E[Next sibling BookRange at current depth]
+  D -->|Depth-first| F[Descend into child BookRange]
+  E --> G[Read range with context + outline]
   F --> G
   G --> H[Annotate: highlight / note / question]
-  H --> I[Extract into PKM nodes with anchors]
-  I --> J[Update progress model + queue]
+  H --> I[Note with optional SourceSpan → BookAnchor pair]
+  I --> J[ReadingRecord points at BookRange + queue]
   J --> K[Next suggestion based on mode, priority, and time]
 ```
+
+### Mapping research themes to Doughnut’s book-reading model
+
+The landscape research above talks about “TOC,” “structure,” “highlights,” and “jump back to source.” In Doughnut those concerns are separated on purpose:
+
+| Research theme | Domain role |
+|----------------|-------------|
+| Book file, format, import | **`Book`** in a **`Notebook`** (`format`, `sourceFileRef`) |
+| Outline / chapter / section / navigable chunk | **`BookRange`**: `startAnchor` / `endAnchor`, optional `structuralAddress` text, optional child ranges for hierarchy |
+| Exact point or span in the file (PDF coords, EPUB CFI, etc.) | **`BookAnchor`**: `anchorFormat` + opaque `value` until format-specific design hardens |
+| “This highlight is from here” / evidence for a PKM note | **`SourceSpan`**: anchor pair, optionally scoped **`within`** a `BookRange`; a **`Note`** has at most one `SourceSpan` for now |
+| “Where I left off” / completed a section | **`ReadingRecord`**: per **`User`**, refers to a **`BookRange`** (meaningful chunk), not a tiny citation span |
+
+This split matches the implementation pressure from the market: **navigation and progress** want coarse, stable regions (`BookRange`); **citations and extraction** want precise endpoints (`BookAnchor` / `SourceSpan`); **PKM notes** stay simple (`Note` + optional evidence).
 
 ### Functional areas and feature candidates
 
@@ -96,13 +112,14 @@ For Doughnut, the differentiator is not “having AI,” but **tying AI output t
 * “Highlight → exported markdown with templates” (BookFusion, Readwise) citeturn10search14turn6search7  
 * “Highlight → flashcard” (RemNote, Increader) citeturn10search1turn7search0  
 
-For Doughnut, the strongest UX is to keep extraction *atomic and anchored*: each extracted note stores (a) book ID, (b) structural address, (c) source span, and (d) rendering context (e.g., screenshot for scanned). This matches the direction of “jump back to source” practices across tools. citeturn9search0turn10search13turn20search1
+For Doughnut, the strongest UX is to keep extraction *atomic and anchored*: each extracted **`Note`** ties to a **`Book`** (via notebook containment and optional **`SourceSpan`**), with evidence carried by **`BookAnchor`** pairs; the navigable hierarchy stays on **`BookRange`** (`structuralAddress` plus anchor-bounded regions). Rendering fallbacks (e.g., screenshot for scanned PDFs) can attach to span kind or media later without collapsing “section” and “citation” into one type. This matches the direction of “jump back to source” practices across tools. citeturn9search0turn10search13turn20search1
 
 **Linking into the PKM graph.** Exports and integrations are consistently treated as a key selling point: BookFusion ships an Obsidian plugin and a Notion integration; Readwise maintains official plugins and export templates; Zotero users regularly request stable markdown exports that preserve deep links. citeturn10search17turn6search35turn6search28turn9search6  
 For Doughnut, linking should be native: every extracted “concept node” becomes a first-class PKM entity tied to its source anchor.
 
 **Progress tracking and re-entry.** Incremental reading systems emphasize “resume later without losing place,” including over long gaps; Polar’s “pagemarks” is explicitly inspired by incremental reading and is framed as suspend/resume over weeks/months. citeturn21search0turn21search1turn12search5  
-KOReader also ships reading statistics (progress/time/calendar views), reinforcing that quantitative re-entry tools matter. citeturn22search0
+KOReader also ships reading statistics (progress/time/calendar views), reinforcing that quantitative re-entry tools matter. citeturn22search0  
+Architecturally, attaching progress to **`ReadingRecord` → `BookRange`** (not to `SourceSpan`) keeps “where I am in the book” aligned with navigable chunks rather than with every highlight-sized fragment.
 
 **Spaced repetition and learning workflows.**  
 If you want Doughnut to “guide users to read and remember,” you are implicitly entering SRS territory:
@@ -152,10 +169,10 @@ A complementary pattern is **document chat** while reading (Readwise Reader’s 
 
 Typical implementation approach:
 
-* Build a hierarchical node graph (book → chapter → section → block).
-* Store embeddings per node/span for retrieval using vector search. Candidate tooling includes entity["organization","FAISS","vector similarity library"], entity["organization","pgvector","postgres vector extension"] on entity["organization","PostgreSQL","relational database"], or entity["organization","Milvus","vector database"] as a dedicated service. citeturn4search0turn4search3turn4search2turn4search1  
-* Produce summaries per node and cache them; allow regeneration on demand.
-* Make every AI output cite back to a source span (like RemNote pins citations for AI flashcards). citeturn10search13
+* Build a hierarchy of **`BookRange`** nodes (and optional child ranges) per **`Book`**; attach summaries or retrieval keys per range as product needs dictate.
+* Store embeddings per range or span for retrieval using vector search. Candidate tooling includes entity["organization","FAISS","vector similarity library"], entity["organization","pgvector","postgres vector extension"] on entity["organization","PostgreSQL","relational database"], or entity["organization","Milvus","vector database"] as a dedicated service. citeturn4search0turn4search3turn4search2turn4search1  
+* Produce summaries per range and cache them; allow regeneration on demand.
+* Ground AI output in **`SourceSpan`** / **`BookAnchor`** (like RemNote pins citations for AI flashcards) when the user materializes or pins content into **`Note`** objects. citeturn10search13
 
 Engineering complexity: medium-to-high. The “hard” parts are grounding (citations), incremental updates when the user modifies structure, and cost/latency control.
 
@@ -211,7 +228,9 @@ Doughnut can win by standardizing a robust “anchor format” (structural addre
 
 **Queue-first reading for knowledge work.** Incremental reading’s primary insight is operational: people need to keep many documents “in flight” without losing them. That maps to BFS “reading across nodes” and to priority scheduling. citeturn12search4turn12search5turn21search0
 
-### Recommended roadmap
+### Recommended roadmap (product research; not a Doughnut delivery plan)
+
+Sequencing of work in the repo is intentionally out of scope here; use **`ongoing/doughnut-book-reading-architecture-roadmap.md`** for stable architecture direction when a formal plan exists.
 
 **Short term (foundation):**
 Build the reliable reader + extraction spine first: PDF/EPUB import; TOC when present; fast page/section navigation; highlights/notes; deep links back to source; and robust markdown export into entity["company","Obsidian","markdown pkm app"] (with template control inspired by BookFusion/Readwise). citeturn10search14turn6search7turn9search0turn7search1turn11search14  
