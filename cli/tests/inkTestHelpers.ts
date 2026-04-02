@@ -87,6 +87,15 @@ export function waitForLastFrame(
   return waitForFrames(() => stripAnsi(lastFrame() ?? ''), predicate, maxTicks)
 }
 
+function strippedOutputMatches(
+  haystack: string,
+  pattern: string | RegExp
+): boolean {
+  return typeof pattern === 'string'
+    ? haystack.includes(pattern)
+    : pattern.test(haystack)
+}
+
 /**
  * `useInput` attaches after `useEffect`; writing to stdin immediately after `render()` can race.
  * Probe with a character, wait until it appears on the command line, then delete it.
@@ -108,13 +117,26 @@ export async function renderInkWhenCommandLineReady(element: ReactElement) {
   )
   return {
     ...result,
-    waitForLastFrameToInclude(re: RegExp, maxTicks = 5000): Promise<void> {
-      return waitForLastFrame(lastFrame, (f) => re.test(f), maxTicks)
+    lastStrippedFrame(): string {
+      return stripAnsi(lastFrame() ?? '')
     },
-    waitForFramesToInclude(re: RegExp, maxTicks = 5000): Promise<void> {
+    waitForLastFrameToInclude(
+      pattern: string | RegExp,
+      maxTicks = 5000
+    ): Promise<void> {
+      return waitForLastFrame(
+        () => stripAnsi(lastFrame() ?? ''),
+        (f) => strippedOutputMatches(f, pattern),
+        maxTicks
+      )
+    },
+    waitForFramesToInclude(
+      pattern: string | RegExp,
+      maxTicks = 5000
+    ): Promise<void> {
       return waitForFrames(
         () => stripAnsi(frames.join('\n')),
-        (c) => re.test(c),
+        (c) => strippedOutputMatches(c, pattern),
         maxTicks
       )
     },

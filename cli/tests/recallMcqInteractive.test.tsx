@@ -37,7 +37,10 @@ function reLiteral(s: string): string {
 const leaveRecallWithYnRe = /(?=.*Leave recall\?)(?=.*\(y\/n\))/s
 
 async function waitForMcqVisible(
-  waitForFramesToInclude: (re: RegExp, maxTicks?: number) => Promise<void>
+  waitForFramesToInclude: (
+    pattern: string | RegExp,
+    maxTicks?: number
+  ) => Promise<void>
 ): Promise<void> {
   await waitForFramesToInclude(
     /(?=.*Choose)(?=.*Alpha)(?=.*Beta)(?!.*\*\*)(?=.*↑↓ Enter or number to select)/s

@@ -1,11 +1,7 @@
 import * as fs from 'node:fs'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
-import {
-  renderInkWhenCommandLineReady,
-  stripAnsi,
-  waitForFrames,
-} from './inkTestHelpers.js'
+import { renderInkWhenCommandLineReady } from './inkTestHelpers.js'
 
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
@@ -29,21 +25,19 @@ describe('InteractiveCliApp /use notebook stage', () => {
   })
 
   test('enters notebook stage then /exit clears stage indicator', async () => {
-    const { stdin, lastFrame, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+    const {
+      stdin,
+      lastStrippedFrame,
+      waitForLastFrameToInclude,
+      waitForFramesToInclude,
+    } = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     stdin.write('/use Top Maths\r')
-    await waitForFramesToInclude(/Active notebook: Top Maths/)
-
+    await waitForFramesToInclude('Active notebook: Top Maths')
     stdin.write('/exit\r')
+    await waitForLastFrameToInclude('Left notebook context.')
+    await waitForLastFrameToInclude('`exit` to quit.')
 
-    await waitForFrames(
-      () => stripAnsi(lastFrame() ?? ''),
-      (c) => c.includes('/exit') && c.includes('Left notebook context.')
-    )
-
-    const end = stripAnsi(lastFrame() ?? '')
-    expect(end).toContain('`exit` to quit.')
-    expect(end).not.toContain('Active notebook: Top Maths')
+    expect(lastStrippedFrame()).not.toContain('Active notebook: Top Maths')
   })
 })
