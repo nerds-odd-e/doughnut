@@ -69,6 +69,17 @@ describe('waitForTextInSurface', () => {
     ).rejects.toThrow(/surface "viewableBuffer"[\s\S]*---\n/)
   })
 
+  it('with timeoutMs 0, failure does not say "Timeout after 0ms" (single-shot callers)', async () => {
+    const err = await waitForTextInSurface({
+      raw: 'x',
+      needle: 'nope',
+      surface: 'strippedTranscript',
+      timeoutMs: 0,
+    }).catch((e: unknown) => e)
+    expect(err).toBeInstanceOf(Error)
+    expect((err as Error).message).not.toContain('Timeout after 0ms')
+  })
+
   it('fullBuffer retains scrolled-off lines that viewableBuffer may omit', async () => {
     const rows = 3
     const cols = 50

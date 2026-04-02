@@ -7,7 +7,8 @@
  * failure path where this module throws.
  *
  * **Generic (imported):** `tty-assert/errorSnapshotFormatting` (truncation, safe visible text
- * for errors), `stripAnsi`, `ptyTranscriptToViewportPlaintext` (Current guidance replay only); plus `extractCurrentGuidanceFromReplayedPlaintext`
+ * for errors), `stripAnsi`, `ptyTranscriptToViewportPlaintext` (Current guidance replay only),
+ * `waitForTextInSurface` / `TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS` (stripped-transcript locators); plus `extractCurrentGuidanceFromReplayedPlaintext`
  * from `cliPtyCurrentGuidanceFromReplay` (Ink-shaped guidance region — Doughnut-specific heuristic, not Cypress).
  *
  * **Doughnut-specific (this file):** non-interactive vs PTY sniffing (`stdoutLooksLikeInteractiveCliPtyCapture`,
@@ -27,6 +28,10 @@ import {
 } from 'tty-assert/errorSnapshotFormatting'
 import { ptyTranscriptToViewportPlaintext } from 'tty-assert/ptyTranscriptToViewportPlaintext'
 import { stripAnsiCliPty } from 'tty-assert/stripAnsi'
+import {
+  TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS,
+  waitForTextInSurface,
+} from 'tty-assert/waitForTextInSurface'
 
 export const OUTPUT_ALIAS = '@doughnutOutput'
 
@@ -34,7 +39,8 @@ const SECTION = {
   nonInteractive: 'non-interactive output',
 } as const
 
-const CLI_OUTPUT_ASSERT_RETRY_MS = 50
+/** Matches `waitForTextInSurface` poll cadence when the library polls internally; Cypress re-reads the PTY buffer on each attempt at this interval. */
+const CLI_OUTPUT_ASSERT_RETRY_MS = TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS
 const CLI_OUTPUT_ASSERT_TIMEOUT_MS = 3000
 
 const WRONG_NON_INTERACTIVE_STEP =
@@ -141,11 +147,11 @@ const PAST_CLI_ASSISTANT_SECTION =
 const ANSWERED_QUESTIONS_SECTION =
   'answered questions (recall session answered lines; ANSI-stripped transcript)'
 
-function assertStrippedPtyTranscriptContains(
+async function assertStrippedPtyTranscriptContains(
   raw: string,
   expected: string,
   sectionLabel: string
-): void {
+): Promise<void> {
   const stripped = stripAnsiCliPty(raw)
   if (stripped.length === 0) {
     failCliAssertion(
@@ -153,26 +159,50 @@ function assertStrippedPtyTranscriptContains(
       raw
     )
   }
-  if (stripped.includes(expected)) return
-  failCliAssertion(
-    `Expected substring in ${sectionLabel}.\n` +
-      `  Expected: ${JSON.stringify(expected)}\n` +
-      `  Transcript length: ${stripped.length}\n` +
-      `  Head preview:\n${headPreview(stripped)}\n` +
-      `  Tail preview:\n${tailPreview(stripped)}`,
-    raw
+  if (expected === '') return
+  try {
+    await waitForTextInSurface({
+      raw,
+      needle: expected,
+      surface: 'strippedTranscript',
+      timeoutMs: 0,
+      retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
+      strict: false,
+    })
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err)
+    failCliAssertion(
+      `Expected substring in ${sectionLabel}.\n` +
+        `  Expected: ${JSON.stringify(expected)}\n` +
+        `  Transcript length: ${stripped.length}\n` +
+        `  ${detail}\n` +
+        `  Head preview:\n${headPreview(stripped)}\n` +
+        `  Tail preview:\n${tailPreview(stripped)}`,
+      raw
+    )
+  }
+}
+
+async function assertPastCliAssistantMessagesContains(
+  raw: string,
+  expected: string
+): Promise<void> {
+  await assertStrippedPtyTranscriptContains(
+    raw,
+    expected,
+    PAST_CLI_ASSISTANT_SECTION
   )
 }
 
-function assertPastCliAssistantMessagesContains(
+async function assertAnsweredQuestionsContains(
   raw: string,
   expected: string
-): void {
-  assertStrippedPtyTranscriptContains(raw, expected, PAST_CLI_ASSISTANT_SECTION)
-}
-
-function assertAnsweredQuestionsContains(raw: string, expected: string): void {
-  assertStrippedPtyTranscriptContains(raw, expected, ANSWERED_QUESTIONS_SECTION)
+): Promise<void> {
+  await assertStrippedPtyTranscriptContains(
+    raw,
+    expected,
+    ANSWERED_QUESTIONS_SECTION
+  )
 }
 
 /** Gray background from chalk `bgGray` / bright black (past user message block). */
@@ -180,20 +210,33 @@ const PAST_USER_MSG_GRAY_BG_SGR = '\x1b[100m'
 /** Gray foreground from chalk `grey` — not sufficient for a past user message block. */
 const GRAY_FG_ONLY_SGR = '\x1b[90m'
 
-function assertPastUserMessageBlock(
+async function assertPastUserMessageBlock(
   raw: string,
   stripped: string,
   expected: string
-): void {
+): Promise<void> {
   const preview = headPreview(stripped)
 
-  if (!stripped.includes(expected)) {
-    failCliAssertion(
-      `Past user messages: expected text ${JSON.stringify(expected)} in the transcript (ANSI-stripped).\n` +
-        `  Transcript length: ${stripped.length}\n` +
-        `  Preview:\n${preview}`,
-      raw
-    )
+  if (expected !== '') {
+    try {
+      await waitForTextInSurface({
+        raw,
+        needle: expected,
+        surface: 'strippedTranscript',
+        timeoutMs: 0,
+        retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
+        strict: false,
+      })
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : String(err)
+      failCliAssertion(
+        `Past user messages: expected text ${JSON.stringify(expected)} in the transcript (ANSI-stripped).\n` +
+          `  Transcript length: ${stripped.length}\n` +
+          `  ${detail}\n` +
+          `  Preview:\n${preview}`,
+        raw
+      )
+    }
   }
 
   const lastIdx = raw.lastIndexOf(expected)
@@ -350,7 +393,10 @@ async function assertCurrentGuidanceContainsBold(
   )
 }
 
-function assertPastUserMessagesContains(raw: string, expected: string): void {
+async function assertPastUserMessagesContains(
+  raw: string,
+  expected: string
+): Promise<void> {
   const stripped = stripAnsiCliPty(raw)
   if (stripped.length === 0) {
     failCliAssertion(
@@ -358,7 +404,7 @@ function assertPastUserMessagesContains(raw: string, expected: string): void {
       raw
     )
   }
-  assertPastUserMessageBlock(raw, stripped, expected)
+  await assertPastUserMessageBlock(raw, stripped, expected)
 }
 
 function pastCliAssistantMessages() {

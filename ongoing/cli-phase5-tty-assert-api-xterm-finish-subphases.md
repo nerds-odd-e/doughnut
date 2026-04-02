@@ -12,7 +12,8 @@
 | **5.2** | **Met** | Canonical export `tty-assert/ptyTranscriptToViewportPlaintext`; legacy [`ptyTranscriptToVisiblePlaintext`](../packages/tty-assert/src/ptyTranscriptToVisiblePlaintext.ts) is `@deprecated` + [`check-legacy-replay-imports.sh`](../packages/tty-assert/scripts/check-legacy-replay-imports.sh). |
 | **5.3** | **Met** | [`waitForTextInSurface.ts`](../packages/tty-assert/src/waitForTextInSurface.ts), export `tty-assert/waitForTextInSurface`, tests in [`waitForTextInSurface.test.ts`](../packages/tty-assert/tests/waitForTextInSurface.test.ts). |
 | **5.4** | **Met** | [`README.md`](../packages/tty-assert/README.md): strip vs replay vs locators, flattening contract, tui-test prior art, `tt/` note. |
-| **5.5**–**5.8** | Pending | — |
+| **5.5** | **Met** | [`outputAssertions.ts`](../e2e_test/start/pageObjects/cli/outputAssertions.ts) uses `waitForTextInSurface` for stripped-transcript fluents; `CLI_OUTPUT_ASSERT_RETRY_MS` = `TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS`. |
+| **5.6**–**5.8** | Pending | — |
 | **5.9** | Pending | Systematic removal of code obsoleted after the locator + xterm switch (see below). |
 
 ---
@@ -161,6 +162,8 @@ The workspace may include a copy under [`tt/`](../tt/) for close reading while d
 
 ## Sub-phase 5.5 — Doughnut: Cypress adapter uses locator / surface helpers
 
+**Status: Met** (in-repo). **Gate:** run targeted CLI Cypress locally when the Cypress binary is available (`cli_access_token`, `cli_recall`, `cli_install_and_run`).
+
 **User-visible outcome:** None **if** all migrated steps preserve the same user-visible expectations; some steps may **tighten** in 5.6+.
 
 **Work:**
@@ -168,7 +171,7 @@ The workspace may include a copy under [`tt/`](../tt/) for close reading while d
 - Refactor [`outputAssertions.ts`](../e2e_test/start/pageObjects/cli/outputAssertions.ts) internals to call **`tty-assert` locator helpers** from 5.3 where appropriate, keeping **fluent** exports (`pastCliAssistantMessages`, `currentGuidance`, …) stable **unless** a later sub-phase deliberately renames or splits them.
 - Align **retry** timing with locator `timeoutMs` / `retryMs` so there is **one** obvious polling story (Cypress chain still drives re-read of `cliInteractivePtyGetBuffer`).
 
-**Gate:** Targeted CLI Cypress: `cli_access_token.feature`, `cli_recall.feature`, `cli_install_and_run.feature` — **green with no intentional assertion tightening yet** (adapter-only refactor).
+**Delivered:** Stripped-transcript assertions (`pastCliAssistantMessages`, `answeredQuestions`, past-user text presence) use **`waitForTextInSurface`** with **`surface: 'strippedTranscript'`**, **`strict: false`**, **`timeoutMs: 0`** per buffer read (Cypress outer retry unchanged). **`CLI_OUTPUT_ASSERT_RETRY_MS`** equals **`TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS`** from [`waitForTextInSurface.ts`](../packages/tty-assert/src/waitForTextInSurface.ts). Current guidance and non-interactive paths unchanged (Ink heuristics / raw stdout).
 
 ---
 

@@ -41,7 +41,8 @@ export type WaitForTextInSurfaceOptions = {
   rows?: number
 }
 
-const DEFAULT_RETRY_MS = 50
+/** Default delay between poll attempts when `timeoutMs` is positive; Cypress adapter should use the same value for `cy.wait` between buffer re-reads. */
+export const TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS = 50
 
 export class TtyAssertStrictModeViolationError extends Error {
   readonly name = 'TtyAssertStrictModeViolationError'
@@ -239,7 +240,7 @@ export async function waitForTextInSurface(
   opts: WaitForTextInSurfaceOptions
 ): Promise<void> {
   const timeoutMs = opts.timeoutMs ?? 0
-  const retryMs = opts.retryMs ?? DEFAULT_RETRY_MS
+  const retryMs = opts.retryMs ?? TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS
   const strict = opts.strict ?? true
   const cols = opts.cols ?? CLI_INTERACTIVE_PTY_COLS
   const rows = opts.rows ?? CLI_INTERACTIVE_PTY_ROWS
@@ -267,12 +268,12 @@ export async function waitForTextInSurface(
 
     lastFail = { snapshot: result.snapshot, detail: result.detail }
     if (Date.now() - started >= timeoutMs) {
+      const detail =
+        timeoutMs === 0
+          ? lastFail.detail
+          : `Timeout after ${timeoutMs}ms. ${lastFail.detail}`
       throw new Error(
-        formatFailureMessage(
-          opts.surface,
-          `Timeout after ${timeoutMs}ms. ${lastFail.detail}`,
-          lastFail.snapshot
-        )
+        formatFailureMessage(opts.surface, detail, lastFail.snapshot)
       )
     }
     await sleep(retryMs)
