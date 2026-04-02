@@ -1,6 +1,6 @@
 # `tty-assert` — PTY terminal test library extraction
 
-**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses `ptyTranscriptToVisiblePlaintextViaXterm`). Phases 5–11 follow the roadmap. Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md); Phase 5 — [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md).
+**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses `ptyTranscriptToVisiblePlaintextViaXterm`). **Phase 5** is **in progress**: sub-phases **5.1–5.3 met**, **5.4–5.9 pending** (execution table in [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md)). Phases 6–11 follow the roadmap. Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md); Phase 5 — [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md).
 
 **Intent:** Extract PTY-based terminal testing into a **Cypress-neutral, Doughnut-neutral** library named **`tty-assert`**, publishable on npm and eventually movable out of this repo. Goal: reliable assertions on terminal-visible state, with failures that show **expected vs actual** without manually decoding escape sequences, and CI-friendly artifacts where useful.
 
@@ -24,7 +24,7 @@
 | PTY spawn, buffer, write tasks | `e2e_test/config/cliE2ePluginTasks.ts` (glue) + `packages/tty-assert` (`ptySession`, `facade`) | `tty-assert` **runtime** API + optional **Cypress task adapter** (thin, ideally in `e2e_test` only) |
 | ANSI strip | `packages/tty-assert/src/stripAnsi.ts` | `tty-assert` core |
 | Fixed cols/rows | `packages/tty-assert/src/geometry.ts` | `tty-assert` default geometry (configurable) |
-| Transcript → visible plaintext / replay | `packages/tty-assert/src/ptyTranscriptToVisiblePlaintext.ts` (+ Phase 4 xterm module) | **Phase 4:** xterm replay for **`getGuidanceContext` / Current guidance** only; **Phase 5:** facade + locators (explicit search surfaces, [tui-test](https://github.com/microsoft/tui-test)-style) + E2E migration off “whole history” defaults |
+| Transcript → visible plaintext / replay | `packages/tty-assert/src/ptyTranscriptToVisiblePlaintext.ts` (+ xterm module + [`waitForTextInSurface`](./packages/tty-assert/src/waitForTextInSurface.ts)) | **Phase 4:** xterm replay for **`getGuidanceContext` / Current guidance**; **Phase 5:** facade + **`waitForTextInSurface`** surfaces (`fullBuffer` / `viewableBuffer` / `strippedTranscript`) + E2E migration (**5.5+**); **5.9** removes legacy hand-rolled replay when parity is retired |
 | Error snapshot formatting (truncation, safe text) | `packages/tty-assert/src/errorSnapshotFormatting.ts` | `tty-assert` core |
 | Google OAuth PTY simulation | `e2e_test/config/cliE2eGoogleOAuthSimulation.ts` | Stays **Doughnut** (or behind `tty-assert` **hook/extension** interface) |
 | Retry, `expectContains`, domain heuristics | `e2e_test/start/pageObjects/cli/outputAssertions.ts` | **Generic** snapshots + **locator/poll** helpers → `tty-assert`; **domain** surfaces (guidance extraction, past-user SGR rules) + Cypress orchestration stay Doughnut |
@@ -109,16 +109,17 @@
 
 **Outcome:** One coherent, documented **assertion surface** in `tty-assert` — explicit **search surfaces** (viewport vs full xterm buffer vs stripped cumulative transcript where still appropriate), **poll + timeout** helpers in the library (patterns from [microsoft/tui-test](https://github.com/microsoft/tui-test) [`locator.ts`](https://github.com/microsoft/tui-test/blob/main/src/terminal/locator.ts) / [`toBeVisible.ts`](https://github.com/microsoft/tui-test/blob/main/src/test/matchers/toBeVisible.ts), not their runner), and **all** replay-based product paths on xterm with legacy replay quarantined to regression tests. **Doughnut E2E** updates **some** checks that today search the **entire** PTY history so they use **better locators** aligned with where users actually see text (may **tighten** tests where the old behavior was overly permissive).
 
-**Legacy hand-rolled replay:** **Not removed in Phase 5** — it stays for `tty-assert` unit tests and xterm **parity** until a post–Phase-5 cleanup (see sub-phase doc § *Legacy replay removal (after Phase 5)*; typical timing **Phase 6 hygiene** or **pre–Phase 11**).
+**Legacy hand-rolled replay:** Kept **until sub-phase 5.9** (grep-gated, parity tests). **5.9** deletes it once locators + xterm own the contract; only if 5.9 slips should the same deletion move to **Phase 6** or **pre–Phase 11** (see sub-phase doc).
 
 **Work:**
 
-- **Finish xterm migration:** Route **`facade`** (and any remaining wiring) through xterm-backed replay; **deprecate** hand-rolled replay outside tests; optional **full-buffer** plain export from xterm for scrollback-aware locators (today viewport replay is **`ptyTranscriptToViewportPlaintext`** — see sub-phase doc).
-- **Locator primitives in `tty-assert`:** Runner-agnostic async helpers with explicit surface, timeout/retry, optional strict multi-match errors; failure messages that name the surface and include a bounded snapshot (tui-test-style).
+- **Finish xterm migration:** Route **`facade`** (and any remaining wiring) through xterm-backed replay; **deprecate** hand-rolled replay outside tests (**5.1–5.2 met**). Scrollback-aware search uses **`waitForTextInSurface`** with **`fullBuffer`** / **`viewableBuffer`** (**5.3 met**); viewport **`\n`‑joined** replay remains **`ptyTranscriptToViewportPlaintext`** for guidance heuristics.
+- **Locator primitives in `tty-assert`:** **`waitForTextInSurface`** (**5.3**); Cypress adapter wiring in **5.5+**.
 - **Doughnut:** Refactor `outputAssertions` / Cypress adapter to use those helpers; **inventory** CLI steps and migrate scenarios so assertions target the **right** surface; document per-fluent contract (past assistant vs guidance vs …).
 - **Consolidate** duplicate strip/replay/poll paths; keep Ink-specific heuristics in Doughnut adapters.
+- **Sub-phase 5.9:** Systematic removal of code obsoleted by the switch (legacy replay module, redundant E2E helpers, temporary `tt/`). Prefer deleting dead code **in the same PR** as each earlier sub-phase when safe; **5.9** is the explicit final sweep.
 
-**Gate:** E2E green for touched CLI features; `tty-assert` README describes strip vs replay vs locators; `outputAssertions` has no undocumented dual replay/locator paths.
+**Gate:** E2E green for touched CLI features; `tty-assert` README describes strip vs replay vs locators; `outputAssertions` has no undocumented dual replay/locator paths; **5.9** completes the deletion pass (or documents deferral).
 
 ---
 
@@ -206,7 +207,7 @@
 - **1 → 2:** Clean seams make the package extraction mechanical.
 - **3** can start once **2**’s skeleton exists (tests can live next to the package).
 - **3 → 4:** Unit tests and CI exist before swapping the emulation core to xterm.js.
-- **4 → 5 → 6:** Phase 4 (sub-phases 4.1–4.3) lands xterm replay for **`getGuidanceContext` only**; Phase 5 completes xterm migration (facade), adds **locator-style** APIs and migrates **some** Doughnut CLI E2E off whole-transcript defaults; Phase 6 is lifecycle API — **4.3** and Phase 5+ end with E2E green; **4.1–4.2** gate on `tty-assert` only.
+- **4 → 5 → 6:** Phase 4 (sub-phases 4.1–4.3) lands xterm replay for **`getGuidanceContext` only**; Phase 5 completes xterm migration (facade **5.1–5.2**), **locators** (**5.3**), E2E adapter + inventory (**5.5–5.8**), then **5.9** removes obsoleted code; Phase 6 is lifecycle API — **4.3** and Phase 5+ end with E2E green; **4.1–4.2** gate on `tty-assert` only.
 - **7–10** are mostly sequential in **diagnostic value**; **9–10** may share rendering infrastructure (**8 → 9** especially).
 - **11** last.
 

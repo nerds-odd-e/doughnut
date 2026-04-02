@@ -112,16 +112,16 @@ function withReplayedXtermTerminal<T>(
   })
 }
 
-function indicesOfNonOverlapping(haystack: string, needle: string): number[] {
-  const indices: number[] = []
+function countNonOverlapping(haystack: string, needle: string): number {
+  let count = 0
   let from = 0
   for (;;) {
     const index = haystack.indexOf(needle, from)
     if (index < 0) break
-    indices.push(index)
+    count++
     from = index + needle.length
   }
-  return indices
+  return count
 }
 
 function regexForMatchAll(needle: RegExp): RegExp {
@@ -132,7 +132,7 @@ function regexForMatchAll(needle: RegExp): RegExp {
 
 function matchCount(haystack: string, needle: string | RegExp): number {
   if (typeof needle === 'string') {
-    return indicesOfNonOverlapping(haystack, needle).length
+    return countNonOverlapping(haystack, needle)
   }
   return Array.from(haystack.matchAll(regexForMatchAll(needle))).length
 }

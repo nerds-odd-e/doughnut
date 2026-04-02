@@ -4,6 +4,16 @@
 
 **This document:** Splits Phase 5 per [`.cursor/rules/planning.mdc`](../../.cursor/rules/planning.mdc) — **one deliverable per sub-phase**, each with an explicit **gate**, ordered by **dependency and value**. **Do not execute** until prior work is merged; treat this as the execution checklist for Phase 5 only.
 
+### Execution status (in-repo)
+
+| Sub-phase | Status | Notes |
+|-----------|--------|--------|
+| **5.1** | **Met** | [`facade.ts`](../packages/tty-assert/src/facade.ts) replay uses `ptyTranscriptToViewportPlaintext` (xterm). |
+| **5.2** | **Met** | Canonical export `tty-assert/ptyTranscriptToViewportPlaintext`; legacy [`ptyTranscriptToVisiblePlaintext`](../packages/tty-assert/src/ptyTranscriptToVisiblePlaintext.ts) is `@deprecated` + [`check-legacy-replay-imports.sh`](../packages/tty-assert/scripts/check-legacy-replay-imports.sh). |
+| **5.3** | **Met** | [`waitForTextInSurface.ts`](../packages/tty-assert/src/waitForTextInSurface.ts), export `tty-assert/waitForTextInSurface`, tests in [`waitForTextInSurface.test.ts`](../packages/tty-assert/tests/waitForTextInSurface.test.ts). |
+| **5.4**–**5.8** | Pending | — |
+| **5.9** | Pending | Systematic removal of code obsoleted after the locator + xterm switch (see below). |
+
 ---
 
 ## Research — [microsoft/tui-test](https://github.com/microsoft/tui-test)
@@ -50,7 +60,7 @@ The workspace may include a copy under [`tt/`](../tt/) for close reading while d
 
 ### Gap vs current `tty-assert` xterm helper
 
-[`ptyTranscriptToVisiblePlaintextViaXterm`](../packages/tty-assert/src/ptyTranscriptToVisiblePlaintextViaXterm.ts) returns **viewport-only** plaintext (`viewportY` … `viewportY + rows`). There is **no** exported API yet for “flattened **full** xterm buffer (scrollback + viewport) as searchable plain text”, which is what tui-test’s `full: true` path approximates for *session-wide* visibility checks. Phase 5 **may** add that (or an options flag on replay) so some assertions can move off raw cumulative bytes **without** losing scrollback-aware semantics.
+[`ptyTranscriptToViewportPlaintext`](../packages/tty-assert/src/ptyTranscriptToVisiblePlaintextViaXterm.ts) returns **viewport-only** plaintext (`viewportY` … `viewportY + rows`, `\n`‑joined rows). **Full scrollback + viewport** as a searchable flat string (row-major, no newlines between rows) is available via **`waitForTextInSurface`** with **`surface: 'fullBuffer'`** (and **`viewableBuffer`** for the tui-test viewable slice); see [`waitForTextInSurface.ts`](../packages/tty-assert/src/waitForTextInSurface.ts).
 
 ---
 
@@ -72,7 +82,7 @@ The workspace may include a copy under [`tt/`](../tt/) for close reading while d
 | In scope | Out of scope (later phases) |
 |----------|------------------------------|
 | **`tty-assert`:** xterm replay in facade; canonical replay export; **locator-style helpers** (explicit search surface, poll+timeout, optional strict/regex); **viewable vs full** buffer line ranges as in [`tt/src/terminal/term.ts`](../tt/src/terminal/term.ts) | **Playwright-style** `expect` integration, multi-shell runners, vendoring **`tt/`** — borrow **patterns** only; delete temporary `tt/` when done |
-| **Legacy hand-rolled replay** (`ptyTranscriptToVisiblePlaintext`): kept for **unit + parity tests** only (grep-gated). | **Removing** that implementation — **not** in Phase 5; see **Legacy replay removal (after Phase 5)** under 5.2. |
+| **Legacy hand-rolled replay** (`ptyTranscriptToVisiblePlaintext`): kept for **unit + parity tests** only (grep-gated) until **5.9**. | **Removing** that implementation is **sub-phase 5.9** once xterm + locators own the contract and parity is retired or replaced (see **5.9**). |
 | **Doughnut E2E:** **Change** some assertions from “whole history + section name as documentation” to **better locators** (viewport, guidance region, full xterm buffer, or retained stripped transcript where that remains the right product contract) | PNG / animation artifacts — **Phases 9–10** |
 | **Docs:** `tty-assert` README describes strip vs replay **vs locator surfaces** | Unified **lifecycle** API — **Phase 6**; row rulers / annotated regions — **Phase 7** |
 
@@ -81,6 +91,8 @@ The workspace may include a copy under [`tt/`](../tt/) for close reading while d
 ---
 
 ## Sub-phase 5.1 — Facade replay uses xterm (library-only)
+
+**Status: Met** (in-repo).
 
 **User-visible outcome:** None. **Developer outcome:** `TtyAssertTerminalHandle` replay-shaped methods use the same xterm pipeline as Current guidance.
 
@@ -96,6 +108,8 @@ The workspace may include a copy under [`tt/`](../tt/) for close reading while d
 
 ## Sub-phase 5.2 — Canonical replay export + quarantine legacy
 
+**Status: Met** (in-repo).
+
 **User-visible outcome:** None. **Developer outcome:** One obvious import for “transcript → **viewport** replay plain string (xterm)”; legacy hand-rolled replay reserved for **parity / regression** tests.
 
 **Work:**
@@ -105,15 +119,17 @@ The workspace may include a copy under [`tt/`](../tt/) for close reading while d
 
 **Gate:** `pnpm tty-assert:test` + `pnpm tty-assert:lint` green; grep gate satisfied.
 
-### Legacy replay removal (after Phase 5)
+### Legacy replay removal (scheduled as sub-phase 5.9)
 
-**Within Phase 5:** Do **not** delete `ptyTranscriptToVisiblePlaintext` or its export. It remains the reference for **`ptyTranscriptReplayParity.test.ts`** and **`ptyTranscriptToVisiblePlaintext.test.ts`**, and the grep gate keeps it out of product code.
+**Until 5.9:** Do **not** delete `ptyTranscriptToVisiblePlaintext` or its export. It remains the reference for **`ptyTranscriptReplayParity.test.ts`** and **`ptyTranscriptToVisiblePlaintext.test.ts`**, and the grep gate keeps it out of product code.
 
-**When to remove (post–Phase 5):** Schedule a **small follow-up** once **xterm replay + locator surfaces** are stable and the team accepts dropping the dual implementation — e.g. replace parity with **xterm-only** golden expectations (or a short “documented deltas” doc + minimal fixtures), then delete the hand-rolled module, tests that only targeted it, the **`tty-assert/ptyTranscriptToVisiblePlaintext`** export path, and **`check-legacy-replay-imports.sh`**. Natural homes: **Phase 6** (library hygiene alongside lifecycle API) or **before Phase 11** (npm package) if a smaller public surface matters; not blocked on Phase 5.7/5.8 unless parity is folded into locator work earlier.
+**Sub-phase 5.9** owns the **mechanical deletion** once **5.5–5.8** have switched callers to locators/xterm and parity is no longer needed: replace or drop parity fixtures (xterm-only goldens or a short “documented deltas” note), then remove the hand-rolled module, tests that only targeted it, the **`tty-assert/ptyTranscriptToVisiblePlaintext`** export path, and **`check-legacy-replay-imports.sh`**. If 5.9 slips, the same work can still land in **Phase 6** hygiene or **pre–Phase 11** — but **5.9 is the named Phase 5 slice** for “delete what the new solution replaced.”
 
 ---
 
 ## Sub-phase 5.3 — Locator primitives in `tty-assert` (tui-test–inspired, runner-agnostic)
+
+**Status: Met** (in-repo). **API:** [`waitForTextInSurface`](../packages/tty-assert/src/waitForTextInSurface.ts) — `tty-assert/waitForTextInSurface`.
 
 **User-visible outcome:** None. **Developer outcome:** Callers can assert visibility with an **explicit search surface** and shared **poll + timeout** behavior (same spirit as [`tt/src/terminal/locator.ts`](../tt/src/terminal/locator.ts) + [`tt/src/utils/poll.ts`](../tt/src/utils/poll.ts); **do not** vendor or depend on `tt/`).
 
@@ -196,6 +212,25 @@ The workspace may include a copy under [`tt/`](../tt/) for close reading while d
 
 ---
 
+## Sub-phase 5.9 — Remove code obsoleted by the locator + xterm switch
+
+**User-visible outcome:** None. **Developer / maintainer outcome:** No dead dual implementations left behind after each earlier sub-phase; the repo reflects **one** primary path for replay, stripping, and surface-scoped search.
+
+**When:** After **5.5–5.8** (and any quick follow-ups) so call sites and contracts are stable. **5.9 may be split into small PRs** (library first, then E2E glue) if the diff is large.
+
+**Work (systematic pass):**
+
+- **`tty-assert`:** Remove **legacy hand-rolled replay** (`ptyTranscriptToVisiblePlaintext` module, dedicated unit tests, parity test **or** replace with xterm-only expectations), **`ptyTranscriptToVisiblePlaintext`** export, and **`check-legacy-replay-imports.sh`** once nothing legitimate imports it. Drop any **deprecated** wrappers re-exported only for migration.
+- **Doughnut `e2e_test`:** Delete **superseded** helpers in [`outputAssertions.ts`](../e2e_test/start/pageObjects/cli/outputAssertions.ts) / plugin glue after they only duplicate `waitForTextInSurface` or canonical replay exports; remove unused imports and dead branches left from adapter refactors (**5.5–5.7**).
+- **Research tree:** Delete temporary [`tt/`](../tt/) if still present (same rule as Phase-complete checklist).
+- **Verification:** `rg` / CI for forbidden patterns (e.g. old import paths); `pnpm tty-assert:test` + `pnpm tty-assert:lint`; targeted CLI Cypress specs touched in Phase 5.
+
+**Gate:** Same as verification row; no allowlisted legacy replay import unless the team explicitly defers a subset (document that deferral in this file).
+
+**Discipline:** As **5.4–5.8** land, **delete or narrow obsolete code in the same PR** when the replacement is already merged; **5.9** is the **explicit backlog sweep** for anything that had to stay until contracts settled.
+
+---
+
 ## Dependency chain
 
 - **5.1 → 5.2 → 5.3:** Replay plumbing before locators that depend on xterm state.
@@ -203,6 +238,7 @@ The workspace may include a copy under [`tt/`](../tt/) for close reading while d
 - **5.3 → 5.5:** Cypress adapter imports locator helpers.
 - **5.5 → 5.6 → 5.7:** Adapter first, then scenario migrations, then explicit section contracts.
 - **5.7 → 5.8:** Fluents reflect final contracts.
+- **5.8 → 5.9:** Remove obsolete implementations once fluents and surfaces match the new model.
 
 ---
 
@@ -212,7 +248,8 @@ The workspace may include a copy under [`tt/`](../tt/) for close reading while d
 2. **No stray** undocumented dual paths: each assertion kind maps to **one** primary search surface.
 3. README + `outputAssertions` header **table** stay in sync.
 4. **Remove** temporary [`tt/`](../tt/) research tree from the repo when no longer needed (ideas live in `tty-assert` + this plan, not as a sibling package).
-5. Trim or archive this doc when Phase 5 is done.
+5. **Sub-phase 5.9** complete (or explicitly deferred with reason): legacy replay and other obsoleted code removed per sweep above.
+6. Trim or archive this doc when Phase 5 is done.
 
 ---
 
