@@ -7,8 +7,8 @@
  * failure path where this module throws.
  *
  * **Generic (imported):** `tty-assert/errorSnapshotFormatting` (truncation, safe visible text
- * for errors), `stripAnsi`, `ptyTranscriptToViewportPlaintext` (Current guidance replay only),
- * `waitForTextInSurface` / `TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS` (stripped-transcript locators); plus `extractCurrentGuidanceFromReplayedPlaintext`
+ * for errors), `ptyTranscriptToViewportPlaintext` (Current guidance replay only),
+ * `waitForTextInSurface` / `stripAnsiCliPty` / `TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS` (locators + stripped transcript); plus `extractCurrentGuidanceFromReplayedPlaintext`
  * from `cliPtyCurrentGuidanceFromReplay` (Ink-shaped guidance region — Doughnut-specific heuristic, not Cypress).
  *
  * **Doughnut-specific (this file):** non-interactive vs PTY sniffing (`stdoutLooksLikeInteractiveCliPtyCapture`,
@@ -40,8 +40,8 @@ import {
   TERMINAL_ERROR_PREVIEW_LEN,
 } from 'tty-assert/errorSnapshotFormatting'
 import { ptyTranscriptToViewportPlaintext } from 'tty-assert/ptyTranscriptToViewportPlaintext'
-import { stripAnsiCliPty } from 'tty-assert/stripAnsi'
 import {
+  stripAnsiCliPty,
   TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS,
   waitForTextInSurface,
 } from 'tty-assert/waitForTextInSurface'
