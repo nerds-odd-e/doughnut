@@ -44,6 +44,7 @@ overrides:
   yaml: ^2.8.3
   handlebars: '>=4.7.9'
   path-to-regexp: '>=8.4.0'
+  '@xmldom/xmldom': '>=0.9.9'
 
 patchedDependencies:
   find-cypress-specs@1.54.9:
@@ -2218,8 +2219,8 @@ packages:
   '@webcontainer/env@1.1.1':
     resolution: {integrity: sha512-6aN99yL695Hi9SuIk1oC88l9o0gmxL1nGWWQ/kNy81HigJ0FoaoTXpytCj6ItzgyCEwA9kF1wixsTuv5cjsgng==}
 
-  '@xmldom/xmldom@0.9.8':
-    resolution: {integrity: sha512-p96FSY54r+WJ50FIOsCOjyj/wavs8921hG5+kVMmZgKcvIKxMXHTrjNJvRgWa/zuX3B6t2lijLNFaOyuxUH+2A==}
+  '@xmldom/xmldom@0.9.9':
+    resolution: {integrity: sha512-qycIHAucxy/LXAYIjmLmtQ8q9GPnMbnjG1KXhWm9o5sCr6pOYDATkMPiTNa6/v8eELyqOQ2FsEqeoFYmgv/gJg==}
     engines: {node: '>=14.6'}
 
   '@xterm/headless@6.0.0':
@@ -7877,7 +7878,7 @@ snapshots:
 
   '@mbtest/mountebank@2.9.3':
     dependencies:
-      '@xmldom/xmldom': 0.9.8
+      '@xmldom/xmldom': 0.9.9
       cors: 2.8.5
       csv-parse: 5.6.0
       ejs: 4.0.1
@@ -9009,7 +9010,7 @@ snapshots:
 
   '@webcontainer/env@1.1.1': {}
 
-  '@xmldom/xmldom@0.9.8': {}
+  '@xmldom/xmldom@0.9.9': {}
 
   '@xterm/headless@6.0.0': {}
 
