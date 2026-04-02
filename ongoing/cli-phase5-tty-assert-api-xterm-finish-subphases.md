@@ -13,7 +13,9 @@
 | **5.3** | **Met** | [`waitForTextInSurface.ts`](../packages/tty-assert/src/waitForTextInSurface.ts), export `tty-assert/waitForTextInSurface`, tests in [`waitForTextInSurface.test.ts`](../packages/tty-assert/tests/waitForTextInSurface.test.ts). |
 | **5.4** | **Met** | [`README.md`](../packages/tty-assert/README.md): strip vs replay vs locators, flattening contract, tui-test prior art, `tt/` note. |
 | **5.5** | **Met** | [`outputAssertions.ts`](../e2e_test/start/pageObjects/cli/outputAssertions.ts) uses `waitForTextInSurface` for stripped-transcript fluents; `CLI_OUTPUT_ASSERT_RETRY_MS` = `TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS`. |
-| **5.6**–**5.8** | Pending | — |
+| **5.6** | **Met** | Inventory in §5.6 below + header table in `outputAssertions.ts`; Gherkin **in past CLI assistant messages** kept (domain term); `pastCliAssistantMessages` error copy documents scrollback assistant semantics. |
+| **5.7** | **Met** | Section contracts: header table + primary `TtySearchSurface` per fluent; streamlined errors (domain heading + `waitForTextInSurface` message). |
+| **5.8** | Pending | — |
 | **5.9** | Pending | Systematic removal of code obsoleted after the locator + xterm switch (see below). |
 
 ---
@@ -177,6 +179,8 @@ The workspace may include a copy under [`tt/`](../tt/) for close reading while d
 
 ## Sub-phase 5.6 — E2E assertion inventory + migrate “wrong surface” checks (scenario-first)
 
+**Status: Met** (in-repo).
+
 **User-visible outcome:** Tests match **where** users see text (viewport / guidance / scrollback), reducing false positives from “anywhere in history”.
 
 **Work:**
@@ -189,17 +193,36 @@ The workspace may include a copy under [`tt/`](../tt/) for close reading while d
 
 **Planning discipline:** Prefer **one scenario group per PR slice** if the diff gets large (e.g. recall vs access token), each with its own sub-phase **5.6a / 5.6b** in execution notes — keep **at most one** intentionally failing test while driving each slice.
 
+### 5.6 — Interactive assertion inventory (April 2026)
+
+| Location | Assertion | Intended surface | Notes |
+|----------|-----------|------------------|--------|
+| `step_definitions/cli.ts` | `nonInteractiveOutput().expectContains` | Non-interactive stdout | Rejects PTY-shaped captures. |
+| `step_definitions/cli.ts` | `pastCliAssistantMessages().expectContains` | **Past CLI assistant messages** (domain): committed assistant scrollback — welcome, slash `assistantMessage`, errors, summaries; not live `/` hints, not gray user blocks. | Mechanism: `strippedTranscript` (how those blocks appear in cumulative PTY bytes). |
+| `step_definitions/cli.ts` | `answeredQuestions().expectContains` | Same transcript surface | Recall answered lines. |
+| `step_definitions/cli.ts` | `pastUserMessages().expectContains` | Transcript + gray-block rules | |
+| `step_definitions/cli.ts` | `currentGuidance().expectContains` / `expectContainsBold` | Current guidance (viewport replay + Ink heuristic) | |
+| `step_definitions/cli.ts` | add-access-token step → `Token added successfully` | Past assistant | Slash command assistant line in scrollback. |
+| `removeToken.ts` | `expectRemoveSuccess` | Past assistant | Delegates `pastCliAssistantMessages`. |
+| `ttyAssertTerminal.ts` | `getByText(…).expectVisibleInPastAssistantMessages` | Past assistant | Facade-shaped alias. |
+
+**Gherkin unchanged:** Install welcome version and all other scenarios keep **in past CLI assistant messages** where that is the domain term (scrollback assistant content), not a separate viewport step. **Audited:** `/help` and similar (assistant `run()` → scrollback); recall / access-token / gmail; Current guidance steps already use the guidance fluent where Gherkin names that region.
+
 ---
 
 ## Sub-phase 5.7 — Section contracts: past assistant, answered, past user
 
-**User-visible outcome:** Documented, stable **search surfaces** per domain term (see [`.cursor/rules/cli.mdc`](../../.cursor/rules/cli.mdc) terminology).
+**Status: Met** (in-repo).
+
+**User-visible outcome:** Documented, stable **search surfaces** per domain term (see `.cursor/rules/cli.mdc` terminology).
 
 **Work:**
 
 - For **past CLI assistant messages**, **answered questions**, **past user messages**: explicitly choose **fullBuffer** (xterm), **strippedTranscript** (cumulative), or **viewport** — per region. Implement with **5.3** locators; remove redundant “section label only in error string” patterns where the **surface** now carries the meaning.
 - **Past user** gray-block / padding rules may stay **Doughnut-specific** (Ink layout); only the **primary search** should move to a locator where it improves precision.
-- Update step wording where necessary so **dumb automation** stays explicit ([`.cursor/rules/e2e_test.mdc`](../../.cursor/rules/e2e_test.mdc) §9).
+- Update step wording where necessary so **dumb automation** stays explicit (`.cursor/rules/e2e_test.mdc` §9).
+
+**Delivered:** **`strippedTranscript`** for past assistant, answered, and past-user **substring** checks; current guidance unchanged (viewport replay + Ink heuristic, not `waitForTextInSurface`). Header table in `outputAssertions.ts` lists **Primary `TtySearchSurface`** per fluent; assertion failures use a short **domain** line plus the library message (surface + snapshot). Gherkin steps already name the region; no step wording change required.
 
 **Gate:** Targeted CLI Cypress green; `outputAssertions` header comment lists **surface per fluent** (short table).
 

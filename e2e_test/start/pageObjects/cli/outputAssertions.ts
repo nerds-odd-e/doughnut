@@ -18,6 +18,19 @@
  * Surfaces:
  * - **Non-interactive**: one-shot stdout from installed `version` / `update` (alias `@doughnutOutput`).
  * - **Interactive PTY**: live buffer from plugin task `cliInteractivePtyGetBuffer` (`interactiveCliPtySession`).
+ *
+ * **Section contracts (interactive, Phase 5.7):** each fluent maps to one **primary**
+ * `waitForTextInSurface` surface where text search runs; failures surface that name via
+ * `tty-assert`. Domain labels below stay aligned with `.cursor/rules/cli.mdc` terminology.
+ * Keep in sync with `ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md` §5.6–5.7.
+ *
+ * | Fluent | Gherkin / caller | User-visible intent | Primary `TtySearchSurface` | Notes |
+ * |--------|------------------|---------------------|----------------------------|-------|
+ * | `currentGuidance` | in the Current guidance | Below command line | *(none — not `waitForTextInSurface`)* | xterm **viewport** replay (`ptyTranscriptToViewportPlaintext`) + `extractCurrentGuidanceFromReplayedPlaintext` |
+ * | `pastCliAssistantMessages` | in past CLI assistant messages | Committed assistant scrollback (welcome, slash `assistantMessage`, errors, summaries; not live `/` hints, not gray user blocks) | **`strippedTranscript`** | Cumulative ANSI-stripped bytes — how those blocks appear in the PTY stream |
+ * | `answeredQuestions` | in answered questions | Recall answered lines (`Correct!`, `Reviewed:`, …) | **`strippedTranscript`** | Same transcript surface as past assistant; different Gherkin step only |
+ * | `pastUserMessages` | in past user messages | Gray user blocks + Ink padding | **`strippedTranscript`** | Substring via locator; gray `\x1b[100m` + blank-line padding checked on **raw** / **stripped** (Doughnut-specific, not a library surface) |
+ * | `removeToken` page object | (caller wording) | Slash remove-token success | **`strippedTranscript`** | Delegates `pastCliAssistantMessages` |
  */
 import { extractCurrentGuidanceFromReplayedPlaintext } from '../../../config/cliPtyCurrentGuidanceFromReplay'
 import {
@@ -141,21 +154,15 @@ function nonInteractiveOutput() {
   }
 }
 
-const PAST_CLI_ASSISTANT_SECTION =
-  'past CLI assistant messages (ANSI-stripped transcript; assistant lines, not gray user blocks)'
-
-const ANSWERED_QUESTIONS_SECTION =
-  'answered questions (recall session answered lines; ANSI-stripped transcript)'
-
 async function assertStrippedPtyTranscriptContains(
   raw: string,
   expected: string,
-  sectionLabel: string
+  domainHeading: string
 ): Promise<void> {
   const stripped = stripAnsiCliPty(raw)
   if (stripped.length === 0) {
     failCliAssertion(
-      `Expected ${JSON.stringify(expected)} in ${sectionLabel}, but the PTY transcript is empty after stripping ANSI escape codes.`,
+      `${domainHeading}: expected ${JSON.stringify(expected)}, but the PTY transcript is empty after stripping ANSI.`,
       raw
     )
   }
@@ -171,15 +178,7 @@ async function assertStrippedPtyTranscriptContains(
     })
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err)
-    failCliAssertion(
-      `Expected substring in ${sectionLabel}.\n` +
-        `  Expected: ${JSON.stringify(expected)}\n` +
-        `  Transcript length: ${stripped.length}\n` +
-        `  ${detail}\n` +
-        `  Head preview:\n${headPreview(stripped)}\n` +
-        `  Tail preview:\n${tailPreview(stripped)}`,
-      raw
-    )
+    failCliAssertion(`${domainHeading}.\n${detail}`, raw)
   }
 }
 
@@ -190,7 +189,7 @@ async function assertPastCliAssistantMessagesContains(
   await assertStrippedPtyTranscriptContains(
     raw,
     expected,
-    PAST_CLI_ASSISTANT_SECTION
+    'Past CLI assistant messages (in past CLI assistant messages)'
   )
 }
 
@@ -201,7 +200,7 @@ async function assertAnsweredQuestionsContains(
   await assertStrippedPtyTranscriptContains(
     raw,
     expected,
-    ANSWERED_QUESTIONS_SECTION
+    'Answered questions (in answered questions)'
   )
 }
 
@@ -230,10 +229,7 @@ async function assertPastUserMessageBlock(
     } catch (err) {
       const detail = err instanceof Error ? err.message : String(err)
       failCliAssertion(
-        `Past user messages: expected text ${JSON.stringify(expected)} in the transcript (ANSI-stripped).\n` +
-          `  Transcript length: ${stripped.length}\n` +
-          `  ${detail}\n` +
-          `  Preview:\n${preview}`,
+        `Past user messages (in past user messages).\n${detail}`,
         raw
       )
     }
