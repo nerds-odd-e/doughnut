@@ -3,12 +3,12 @@
  *
  * **Stripped transcript vs replayed screen:** `getByText` + `expect(…).toBeVisible()` search the
  * **ANSI-stripped cumulative PTY transcript** (same model as plugin startup wait and most
- * `outputAssertions` checks). That is not the same as the emulated viewport from CSI replay; use
- * `getReplayedScreenPlaintext()` when you need replayed “screen” plain text (e.g. current guidance).
+ * `outputAssertions` checks). That is not the same as the xterm-emulated viewport; use
+ * `await getReplayedScreenPlaintext()` when you need replayed “screen” plain text (e.g. current guidance).
  *
  * **`dumpFrames()`:** PTY tests do not have Ink-style discrete frames; this returns structured
- * diagnostics (lengths, previews). A real frame array would require something like xterm (parent
- * plan Phase 4).
+ * diagnostics (lengths, previews). Replay-derived fields use the same **xterm.js** pipeline as
+ * `getReplayedScreenPlaintext()`.
  */
 
 import {
@@ -16,7 +16,7 @@ import {
   sanitizeVisibleTextForError,
   tailPreview,
 } from './errorSnapshotFormatting'
-import { ptyTranscriptToVisiblePlaintext } from './ptyTranscriptToVisiblePlaintext'
+import { ptyTranscriptToVisiblePlaintextViaXterm } from './ptyTranscriptToVisiblePlaintextViaXterm'
 import {
   disposeBufferedPtySession,
   startBufferedPtySession,
@@ -56,14 +56,14 @@ export type TtyAssertTerminalHandle = {
   getRawBuffer(): string
   /** Cumulative ANSI-stripped transcript (not emulator viewport). */
   getVisiblePlaintext(): string
-  /** Last replayed screen as plain text (CSI replay; same geometry as the PTY). */
-  getReplayedScreenPlaintext(): string
+  /** Last replayed screen as plain text (xterm replay; same geometry as the PTY). */
+  getReplayedScreenPlaintext(): Promise<string>
   getByText(value: string): TtySubstringLocator
   expect(loc: TtySubstringLocator): {
     toBeVisible(opts?: TtyAssertToBeVisibleOpts): Promise<void>
   }
   /** Diagnostic-only; not a real frame list. */
-  dumpFrames(): TtyAssertDumpFrames
+  dumpFrames(): Promise<TtyAssertDumpFrames>
 }
 
 function createHandle(session: BufferedPtySession): TtyAssertTerminalHandle {
@@ -85,7 +85,7 @@ function createHandle(session: BufferedPtySession): TtyAssertTerminalHandle {
       return stripAnsiCliPty(session.buf.text)
     },
     getReplayedScreenPlaintext() {
-      return ptyTranscriptToVisiblePlaintext(session.buf.text)
+      return ptyTranscriptToVisiblePlaintextViaXterm(session.buf.text)
     },
     getByText(value: string): TtySubstringLocator {
       return { kind: 'substring', value }
@@ -101,10 +101,10 @@ function createHandle(session: BufferedPtySession): TtyAssertTerminalHandle {
           ),
       }
     },
-    dumpFrames(): TtyAssertDumpFrames {
+    async dumpFrames(): Promise<TtyAssertDumpFrames> {
       const raw = session.buf.text
       const stripped = stripAnsiCliPty(raw)
-      const replayed = ptyTranscriptToVisiblePlaintext(raw)
+      const replayed = await ptyTranscriptToVisiblePlaintextViaXterm(raw)
       return {
         rawByteLength: raw.length,
         ansiStrippedLength: stripped.length,
