@@ -1,6 +1,6 @@
 # `tty-assert` — PTY terminal test library extraction
 
-**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses `ptyTranscriptToVisiblePlaintextViaXterm`). **Phase 5** is **in progress**: sub-phases **5.1–5.8 met**, **5.9 pending** (execution table in [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md)). Phases 6–11 follow the roadmap. Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md); Phase 5 — [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md).
+**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses xterm viewport replay). **Phase 5** is **complete** (sub-phases **5.1–5.9 met**, including legacy replay removal — execution table in [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md)). Phases 6–11 follow the roadmap. Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md); Phase 5 — [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md).
 
 **Intent:** Extract PTY-based terminal testing into a **Cypress-neutral, Doughnut-neutral** library named **`tty-assert`**, publishable on npm and eventually movable out of this repo. Goal: reliable assertions on terminal-visible state, with failures that show **expected vs actual** without manually decoding escape sequences, and CI-friendly artifacts where useful.
 
@@ -24,7 +24,7 @@
 | PTY spawn, buffer, write tasks | `e2e_test/config/cliE2ePluginTasks.ts` (glue) + `packages/tty-assert` (`ptySession`, `facade`) | `tty-assert` **runtime** API + optional **Cypress task adapter** (thin, ideally in `e2e_test` only) |
 | ANSI strip | `packages/tty-assert/src/stripAnsi.ts` | `tty-assert` core |
 | Fixed cols/rows | `packages/tty-assert/src/geometry.ts` | `tty-assert` default geometry (configurable) |
-| Transcript → visible plaintext / replay | `packages/tty-assert/src/ptyTranscriptToVisiblePlaintext.ts` (+ xterm module + [`waitForTextInSurface`](./packages/tty-assert/src/waitForTextInSurface.ts)) | **Phase 4:** xterm replay for **`getGuidanceContext` / Current guidance**; **Phase 5:** facade + **`waitForTextInSurface`** surfaces (`fullBuffer` / `viewableBuffer` / `strippedTranscript`) + E2E migration (**5.5+**); **5.9** removes legacy hand-rolled replay when parity is retired |
+| Transcript → visible plaintext / replay | [`ptyTranscriptToVisiblePlaintextViaXterm.ts`](./packages/tty-assert/src/ptyTranscriptToVisiblePlaintextViaXterm.ts) + [`waitForTextInSurface`](./packages/tty-assert/src/waitForTextInSurface.ts) | **Phase 4:** xterm viewport replay for **`getGuidanceContext` / Current guidance**; **Phase 5:** facade + locator surfaces + E2E migration; **5.9:** removed hand-rolled replay |
 | Error snapshot formatting (truncation, safe text) | `packages/tty-assert/src/errorSnapshotFormatting.ts` | `tty-assert` core |
 | Google OAuth PTY simulation | `e2e_test/config/cliE2eGoogleOAuthSimulation.ts` | Stays **Doughnut** (or behind `tty-assert` **hook/extension** interface) |
 | Retry, `expectContains`, domain heuristics | `e2e_test/start/pageObjects/cli/outputAssertions.ts` | **Generic** snapshots + **locator/poll** helpers → `tty-assert`; **domain** surfaces (guidance extraction, past-user SGR rules) + Cypress orchestration stay Doughnut |
@@ -40,7 +40,7 @@
 
 **Delivered:**
 
-- ~~`tty-assert-staging/`~~ → **`packages/tty-assert`** (Phase 2): `stripAnsi`, `geometry`, `ptyTranscriptToVisiblePlaintext`, `errorSnapshotFormatting`, `ptySession`, `facade`; Ink guidance extraction stays in `cliPtyCurrentGuidanceFromReplay.ts`.
+- ~~`tty-assert-staging/`~~ → **`packages/tty-assert`** (Phase 2): `stripAnsi`, `geometry`, xterm viewport replay, `errorSnapshotFormatting`, `ptySession`, `facade`; Ink guidance extraction stays in `cliPtyCurrentGuidanceFromReplay.ts`.
 - **Doughnut-only:** OAuth simulation, install/bundle paths, env wiring, Doughnut CLI vocabulary in `outputAssertions` (see that file’s header for generic vs domain).
 - **Plugin:** `createCliE2ePluginTasks` is thin glue (tasks, `cliEnv`, startup waits, OAuth, install paths) over `tty-assert` (`ptySession` / `facade`).
 
@@ -83,21 +83,21 @@
 
 **Status:** **Complete** (4.1–4.3). **Sub-phases (detail, gates, TDD notes):** [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md).
 
-**Outcome:** Terminal **replay** used for **Current guidance** assertions is driven by **xterm.js** (Node/headless wiring), so simulated screen text aligns with a real terminal emulator. Hand-rolled `ptyTranscriptToVisiblePlaintext` remains the default everywhere else until Phase 5.
+**Outcome:** Terminal **replay** used for **Current guidance** assertions is driven by **xterm.js** (Node/headless wiring), so simulated screen text aligns with a real terminal emulator. Legacy hand-rolled replay existed for parity until Phase **5.9**, then was removed.
 
 **Sub-phase summary (planning.mdc: one slice per sub-phase, ordered by dependency):**
 
 | Sub-phase | Deliverable | Gate |
 |-----------|-------------|------|
 | **4.1** | `tty-assert`: xterm deps + replay primitive + smoke unit tests (transcript → plain string contract) | **Met:** `tty-assert` test + lint green; no Doughnut replay wiring |
-| **4.2** | Parity (or documented deltas) vs legacy replay on extended fixtures | **Met:** `ptyTranscriptReplayParity.test.ts`; `tty-assert` tests green; still no Doughnut switch |
+| **4.2** | Parity (or documented deltas) vs legacy replay on extended fixtures | **Met** (historical); parity tests removed with legacy replay in **5.9** |
 | **4.3** | `outputAssertions.getGuidanceContext` uses xterm for `replayedPlain` only | **Met:** targeted `cli_access_token`, `cli_recall`, `cli_install_and_run` Cypress specs green |
 
 **Reference: [microsoft/tui-test](https://github.com/microsoft/tui-test)** — xterm.js for PTY rendering; map **feed bytes → read buffer text** only, not their runner. Implementation notes (Node `Terminal`, addons, headless CI) live in the sub-phase doc.
 
 **Named acceptance example:** `cli_access_token.feature` — `"E2E CLI Token"` in Current guidance; recall guidance steps stay green on the same choke point.
 
-**Phase gate (after 4.3):** Hand-rolled `ptyTranscriptToVisiblePlaintext` still exported and used outside `getGuidanceContext`.
+**Phase gate (after 4.3, historical):** Subsequent Phase **5** work moved all replay to xterm and **5.9** deleted the hand-rolled implementation.
 
 **Explicitly deferred to Phase 5:** Facade replay migration; past assistant / answered / scrollback **locators** (viewport vs full buffer vs stripped transcript); removing legacy replay from production paths; assertion API consolidation; Doughnut E2E steps that should stop searching **entire** PTY history when a narrower surface matches user-visible intent.
 
@@ -107,19 +107,19 @@
 
 **Sub-phases (detail, gates, tui-test-inspired locator notes):** [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md).
 
-**Outcome:** One coherent, documented **assertion surface** in `tty-assert` — explicit **search surfaces** (viewport vs full xterm buffer vs stripped cumulative transcript where still appropriate), **poll + timeout** helpers in the library (patterns from [microsoft/tui-test](https://github.com/microsoft/tui-test) [`locator.ts`](https://github.com/microsoft/tui-test/blob/main/src/terminal/locator.ts) / [`toBeVisible.ts`](https://github.com/microsoft/tui-test/blob/main/src/test/matchers/toBeVisible.ts), not their runner), and **all** replay-based product paths on xterm with legacy replay quarantined to regression tests. **Doughnut E2E** updates **some** checks that today search the **entire** PTY history so they use **better locators** aligned with where users actually see text (may **tighten** tests where the old behavior was overly permissive).
+**Outcome:** One coherent, documented **assertion surface** in `tty-assert` — explicit **search surfaces** (viewport vs full xterm buffer vs stripped cumulative transcript where still appropriate), **poll + timeout** helpers in the library (patterns from [microsoft/tui-test](https://github.com/microsoft/tui-test) [`locator.ts`](https://github.com/microsoft/tui-test/blob/main/src/terminal/locator.ts) / [`toBeVisible.ts`](https://github.com/microsoft/tui-test/blob/main/src/test/matchers/toBeVisible.ts), not their runner), and **all** replay-based product paths on xterm. **Doughnut E2E** updates **some** checks that searched the **entire** PTY history so they use **better locators** aligned with where users actually see text.
 
-**Legacy hand-rolled replay:** Kept **until sub-phase 5.9** (grep-gated, parity tests). **5.9** deletes it once locators + xterm own the contract; only if 5.9 slips should the same deletion move to **Phase 6** or **pre–Phase 11** (see sub-phase doc).
+**Legacy hand-rolled replay:** Removed in sub-phase **5.9** (module, parity/unit tests that only targeted it, export path, `check-legacy-replay-imports.sh`).
 
 **Work:**
 
-- **Finish xterm migration:** Route **`facade`** (and any remaining wiring) through xterm-backed replay; **deprecate** hand-rolled replay outside tests (**5.1–5.2 met**). Scrollback-aware search uses **`waitForTextInSurface`** with **`fullBuffer`** / **`viewableBuffer`** (**5.3 met**); viewport **`\n`‑joined** replay remains **`ptyTranscriptToViewportPlaintext`** for guidance heuristics.
+- **Finish xterm migration:** Route **`facade`** (and any remaining wiring) through xterm-backed replay (**5.1–5.2 met**); hand-rolled replay **deleted** in **5.9**. Scrollback-aware search uses **`waitForTextInSurface`** with **`fullBuffer`** / **`viewableBuffer`** (**5.3 met**); viewport **`\n`‑joined** replay remains **`ptyTranscriptToViewportPlaintext`** for guidance heuristics.
 - **Locator primitives in `tty-assert`:** **`waitForTextInSurface`** (**5.3**); Cypress adapter wiring in **5.5+**.
 - **Doughnut:** Refactor `outputAssertions` / Cypress adapter to use those helpers; **inventory** CLI steps and migrate scenarios so assertions target the **right** surface; document per-fluent contract (past assistant vs guidance vs …).
 - **Consolidate** duplicate strip/replay/poll paths; keep Ink-specific heuristics in Doughnut adapters.
-- **Sub-phase 5.9:** Systematic removal of code obsoleted by the switch (legacy replay module, redundant E2E helpers, temporary `tt/`). Prefer deleting dead code **in the same PR** as each earlier sub-phase when safe; **5.9** is the explicit final sweep.
+- **Sub-phase 5.9:** **Met** — legacy replay module, dedicated tests, `tty-assert/ptyTranscriptToVisiblePlaintext` export, and grep script removed; `tt/` not present.
 
-**Gate:** E2E green for touched CLI features; `tty-assert` README describes strip vs replay vs locators; `outputAssertions` has no undocumented dual replay/locator paths; **5.9** completes the deletion pass (or documents deferral).
+**Gate:** E2E green for touched CLI features; `tty-assert` README describes strip vs replay vs locators; `outputAssertions` has no undocumented dual replay/locator paths; **5.9** deletion pass complete.
 
 ---
 

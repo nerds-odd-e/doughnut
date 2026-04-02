@@ -42,8 +42,7 @@ For **`strippedTranscript`**, the haystack and snapshot are the **same**: the fu
 | `tty-assert/stripAnsi` | `stripAnsiCliPty` |
 | `tty-assert/geometry` | Default CLI PTY cols/rows |
 | `tty-assert/ptyTranscriptToViewportPlaintext` | **Canonical** xterm viewport plaintext (async) |
-| `tty-assert/ptyTranscriptToVisiblePlaintextViaXterm` | Same function; prefer the viewport export name for new code |
-| `tty-assert/ptyTranscriptToVisiblePlaintext` | Legacy hand-rolled replay (**deprecated**; tests / parity only until Phase 5.9) |
+| `tty-assert/ptyTranscriptToVisiblePlaintextViaXterm` | Same function as `ptyTranscriptToViewportPlaintext` |
 | `tty-assert/errorSnapshotFormatting` | Truncated / safe previews for errors |
 | `tty-assert/ptySession` | Buffered PTY session helpers |
 | `tty-assert/facade` | `startProgram` / `TtyAssertTerminalHandle` — `getReplayedScreenPlaintext` uses xterm; `expect(…).toBeVisible` searches **stripped** cumulative text |

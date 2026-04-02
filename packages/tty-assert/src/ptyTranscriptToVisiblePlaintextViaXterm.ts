@@ -16,8 +16,7 @@ function viewportPlaintext(term: Terminal): string {
 /**
  * Replays a PTY transcript through xterm.js (headless) and returns visible plaintext
  * for the **viewport**: one row per screen line, trailing spaces stripped per row,
- * rows joined with `\n`, no trailing blank lines — same shape as the legacy hand-rolled
- * `ptyTranscriptToVisiblePlaintext` for downstream heuristics (e.g. Current guidance).
+ * rows joined with `\n`, no trailing blank lines — for downstream heuristics (e.g. Current guidance).
  *
  * `write` is asynchronous; the promise resolves after the parser has applied the transcript.
  *
