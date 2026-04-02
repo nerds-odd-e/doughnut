@@ -128,6 +128,12 @@ CURSOR_DEV=true nix develop -c .venv-mineru/bin/python minerui-spike/spike_miner
 
 **Optional:** Cap pages in spike (`end_page_id`) so a 500-page PDF does not block the session; document in command help.
 
+#### Phase C demo (done)
+
+- **TS:** `cli/src/commands/read/readSlashCommand.ts` — registered in `interactiveSlashCommands`; `run` calls `runMineruOutlineSubprocess`, throws on failure (red assistant error via shell), success message truncated at **12_000** chars + `…`.
+- **PDF page cap:** set **`DOUGHNUT_READ_PDF_END_PAGE`** (inclusive last page index) to pass **`--end-page`** through Phase B; described in `/read` help text.
+- **Tests:** `cli/tests/readSlashCommand.test.ts` (mocked subprocess).
+
 ### Phase D — Spike retrospective (required)
 
 **Outcome:** Update this section with bullets:
