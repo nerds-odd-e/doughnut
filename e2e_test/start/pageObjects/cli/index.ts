@@ -7,9 +7,9 @@ import { ttyAssertTerminal } from './ttyAssertTerminal'
 
 /**
  * CLI page objects. Domain ordering:
- * - Output assertions (`outputAssertions`: non-interactive install runs)
- * - `ttyAssertTerminal()`: PTY `cy.task` wrappers + transcript assertions (Phase 1.5)
- * - `interactiveCli()`: domain helpers on top of the same PTY session
+ * - Output assertions (`outputAssertions`: non-interactive install runs; locator surfaces table)
+ * - `ttyAssertTerminal()`: PTY `cy.task` I/O + same transcript fluents as `interactiveCli()`
+ * - `interactiveCli()`: typing / slash / recall helpers on the PTY session
  * - Execution (installation)
  * - Backend (bundle, install script)
  */

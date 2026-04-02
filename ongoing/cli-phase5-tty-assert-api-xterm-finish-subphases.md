@@ -15,7 +15,7 @@
 | **5.5** | **Met** | [`outputAssertions.ts`](../e2e_test/start/pageObjects/cli/outputAssertions.ts) uses `waitForTextInSurface` for stripped-transcript fluents; `CLI_OUTPUT_ASSERT_RETRY_MS` = `TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS`. |
 | **5.6** | **Met** | Inventory in §5.6 below + header table in `outputAssertions.ts`; Gherkin **in past CLI assistant messages** kept (domain term); `pastCliAssistantMessages` error copy documents scrollback assistant semantics. |
 | **5.7** | **Met** | Section contracts: header table + primary `TtySearchSurface` per fluent; streamlined errors (domain heading + `waitForTextInSurface` message). |
-| **5.8** | Pending | — |
+| **5.8** | **Met** | `ttyAssertTerminal` / `interactiveCli` comments + removed unused `getByText().expectVisibleInPastAssistantMessages`. |
 | **5.9** | Pending | Systematic removal of code obsoleted after the locator + xterm switch (see below). |
 
 ---
@@ -204,7 +204,7 @@ The workspace may include a copy under [`tt/`](../tt/) for close reading while d
 | `step_definitions/cli.ts` | `currentGuidance().expectContains` / `expectContainsBold` | Current guidance (viewport replay + Ink heuristic) | |
 | `step_definitions/cli.ts` | add-access-token step → `Token added successfully` | Past assistant | Slash command assistant line in scrollback. |
 | `removeToken.ts` | `expectRemoveSuccess` | Past assistant | Delegates `pastCliAssistantMessages`. |
-| `ttyAssertTerminal.ts` | `getByText(…).expectVisibleInPastAssistantMessages` | Past assistant | Facade-shaped alias. |
+| `ttyAssertTerminal.ts` | Re-exports `pastCliAssistantMessages` et al. | Same as `outputAssertions` per fluent | PTY tasks only; no separate substring API. |
 
 **Gherkin unchanged:** Install welcome version and all other scenarios keep **in past CLI assistant messages** where that is the domain term (scrollback assistant content), not a separate viewport step. **Audited:** `/help` and similar (assistant `run()` → scrollback); recall / access-token / gmail; Current guidance steps already use the guidance fluent where Gherkin names that region.
 
@@ -230,12 +230,16 @@ The workspace may include a copy under [`tt/`](../tt/) for close reading while d
 
 ## Sub-phase 5.8 — `interactiveCli` / `ttyAssertTerminal` fluents match the tidied model
 
+**Status: Met** (in-repo).
+
 **User-visible outcome:** None beyond 5.6–5.7.
 
 **Work:**
 
 - Update [`ttyAssertTerminal.ts`](../e2e_test/start/pageObjects/cli/ttyAssertTerminal.ts) and [`interactiveCli.ts`](../e2e_test/start/pageObjects/cli/interactiveCli.ts) comments and any **re-exports** so they describe **locators / surfaces**, not “opaque substring = past assistant only”.
 - Remove or replace **`getByText(…).expectVisibleInPastAssistantMessages`** if it encodes the old **one-surface** assumption.
+
+**Delivered:** Comments point at `outputAssertions` section contracts; removed unused facade-shaped **`getByText`** (no call sites).
 
 **Gate:** Lint + targeted CLI Cypress green.
 

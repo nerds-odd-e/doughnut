@@ -1,9 +1,11 @@
 /**
- * Thin Cypress wrappers for interactive CLI PTY `cy.task` handlers (Phase 1.5).
- * Centralizes task names; vocabulary aligns with `tty-assert/facade`.
+ * PTY lifecycle and I/O: `cy.task` names for interactive CLI (`runRepoCliInteractive`,
+ * `cliInteractiveWriteLine`, `cliInteractivePtyGetBuffer`, …).
  *
- * Assertions delegate to `outputAssertions` — same retries, screenshots, and messages as
- * `interactiveCli()` (do not use Node facade `expect` from Cypress; error text differs).
+ * Transcript assertions are re-exported from `outputAssertions` — same **locator surfaces**
+ * (`strippedTranscript` vs viewport replay for Current guidance), retries, screenshots, and
+ * failure shape as `interactiveCli()`. See that file’s **Section contracts** table; do not use
+ * the Node `tty-assert/facade` `expect` API from Cypress (messages differ).
  */
 
 import {
@@ -52,18 +54,6 @@ function ttyAssertTerminal() {
     pastUserMessages,
     currentGuidance,
     whenCurrentGuidanceContainsThen,
-    /**
-     * Opaque substring locator (facade-shaped). `expectVisibleInPastAssistantMessages` uses the
-     * same check as `pastCliAssistantMessages().expectContains` — ANSI-stripped cumulative
-     * transcript, not CSI-replayed viewport geometry.
-     */
-    getByText(value: string) {
-      return {
-        expectVisibleInPastAssistantMessages() {
-          pastCliAssistantMessages().expectContains(value)
-        },
-      }
-    },
   }
 }
 

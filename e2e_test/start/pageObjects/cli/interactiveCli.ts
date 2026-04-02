@@ -1,7 +1,10 @@
 /**
- * Interactive CLI PTY session: `@interactiveCLI` starts the repo bundle (`runRepoCliInteractive`);
- * install scenarios use `installation().runInteractiveMode()` (`runInstalledCliInteractive`).
- * PTY I/O task names live in `ttyAssertTerminal`; transcript assertions use `cliInteractivePtyGetBuffer` in the plugin.
+ * Domain helpers on the interactive CLI PTY session (`ttyAssertTerminal` for `cy.task` I/O).
+ *
+ * **Assertions:** `pastCliAssistantMessages`, `answeredQuestions`, and `pastUserMessages` search
+ * the **`strippedTranscript`** surface (`waitForTextInSurface` via `outputAssertions`). **`currentGuidance`**
+ * uses xterm **viewport** replay plus Ink heuristics — not the same surface. See `outputAssertions`
+ * header (section contracts) and `.cursor/rules/cli.mdc` terminology.
  */
 import {
   answeredQuestions,
