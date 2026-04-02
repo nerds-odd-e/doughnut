@@ -136,11 +136,25 @@ CURSOR_DEV=true nix develop -c .venv-mineru/bin/python minerui-spike/spike_miner
 
 ### Phase D — Spike retrospective (required)
 
-**Outcome:** Update this section with bullets:
+**Outcome:** Spike answered “yes, locally” for representative PDF + EPUB: outline is usable in interactive CLI scrollback; failures surface as user-visible errors; CI stays light via mocked subprocess tests.
 
-- **Keep:** e.g. subprocess approach, `text_level` mapping.
-- **Discard:** e.g. middle.json path, specific backend.
-- **Follow-up product phase:** only if Phase C feels worth shipping behind a flag or with clearer deps (Nix, Docker, remote service).
+- **Keep**
+  - **Subprocess boundary** — Node spawns user Python (`DOUGHNUT_MINERU_PYTHON`); no MinerU in the CLI bundle. Optional `DOUGHNUT_MINERU_OUTLINE_SCRIPT`; default resolves `minerui-spike/spike_mineru_phase_a_outline.py` from cwd ancestors.
+  - **JSON stdout contract** — `--json-result` on the Python side; TS parses `{ ok, outline, source, note? }` (or error) for stable integration and tests.
+  - **PDF “three layers”** — Prefer `content_list` entries with `type: text` and `text_level` 1–3 in reading order (validated on a real multi-page PDF in Phase A).
+  - **EPUB** — Spine-ordered `h1`–`h3` scrape without MinerU; matches “MinerU does not ingest EPUB.”
+  - **Ops knobs** — 30m default timeout; temp output dir for PDF + cleanup; `DOUGHNUT_READ_PDF_END_PAGE` for long PDFs; assistant message truncation at 12_000 chars for TTY safety.
+  - **Testing** — Black-box Vitest on `runMineruOutlineSubprocess` and `/read` with mocked `spawn`; full MinerU remains manual / developer env.
+
+- **Discard (for spike scope; not “delete code” unless product says so)**
+  - **Treating MinerU as a repo/Nix dependency** — Keep user-installed `pip install 'mineru[pipeline]'` until a product decision; do not add MinerU to the flake for this spike.
+  - **middle.json as the primary story** — Sample PDF did not need it; keep code fallback if present, but do not invest in middle-first workflows until more corpora prove `text_level` gaps.
+  - **CI E2E for `/read`** — Still deferred; MinerU + weights in CI is heavy. Revisit only if `/read` ships as a supported feature.
+
+- **Follow-up product phase** (only if shipping `/read` or a successor)
+  - **Deps and discoverability** — One place (docs + help text) for pipeline install, first-run model download, and optional page cap; consider feature flag or “experimental” labeling in UX.
+  - **Quality gates** — Manual matrix: textbook TOC, scan-heavy PDF, two-column paper; record where `text_level` / EPUB headings fail and whether Markdown or middle fallback helps.
+  - **Optional hardening** — Path validation policy aligned with attachments; remote MinerU or containerized worker if “local GPU/CPU + pip” is not acceptable for target users.
 
 ## Testing strategy (spike)
 

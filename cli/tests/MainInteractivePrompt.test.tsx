@@ -324,24 +324,19 @@ describe('MainInteractivePrompt caret and slash arrows (phase 3)', () => {
       await waitForFrames(
         () => lastFrame() ?? '',
         (r) =>
-          rawLineIncludesBoldMarker(
-            r,
-            'Show how many notes are due for recall today'
-          ) && mainPromptDraftAfterArrow(stripAnsi(r)) === '/re'
+          rawLineIncludesBoldMarker(r, 'top-three-layer outline') &&
+          mainPromptDraftAfterArrow(stripAnsi(r)) === '/re'
       )
     } catch (err) {
       throw new Error(
-        'With slash list open and caret between /r and e, the first Up should wrap the completion highlight to the last row and keep the caret after /r, not move the caret to the start of the line (history-style home). ' +
+        'With slash list open and caret between /r and e, the first Up should wrap the completion highlight to the last matching row (/read for draft /re) and keep the caret after /r, not move the caret to the start of the line (history-style home). ' +
           (err instanceof Error ? err.message : String(err))
       )
     }
 
     const raw = lastFrame() ?? ''
     expect(
-      rawLineIncludesBoldMarker(
-        raw,
-        'Show how many notes are due for recall today'
-      ),
+      rawLineIncludesBoldMarker(raw, 'top-three-layer outline'),
       'When the slash completion list is open, Up must cycle the highlighted command immediately (wrap from first row to last), not leave the default first-row highlight.'
     ).toBe(true)
     expect(
