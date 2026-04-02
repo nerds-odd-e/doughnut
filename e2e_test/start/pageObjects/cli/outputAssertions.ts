@@ -7,7 +7,7 @@
  * failure path where this module throws.
  *
  * **Generic (imported):** `tty-assert/errorSnapshotFormatting` (truncation, safe visible text
- * for errors), `stripAnsi`, `ptyTranscriptToVisiblePlaintextViaXterm` (Current guidance replay only); plus `extractCurrentGuidanceFromReplayedPlaintext`
+ * for errors), `stripAnsi`, `ptyTranscriptToViewportPlaintext` (Current guidance replay only); plus `extractCurrentGuidanceFromReplayedPlaintext`
  * from `cliPtyCurrentGuidanceFromReplay` (Ink-shaped guidance region — Doughnut-specific heuristic, not Cypress).
  *
  * **Doughnut-specific (this file):** non-interactive vs PTY sniffing (`stdoutLooksLikeInteractiveCliPtyCapture`,
@@ -25,7 +25,7 @@ import {
   tailPreview,
   TERMINAL_ERROR_PREVIEW_LEN,
 } from 'tty-assert/errorSnapshotFormatting'
-import { ptyTranscriptToVisiblePlaintextViaXterm } from 'tty-assert/ptyTranscriptToVisiblePlaintextViaXterm'
+import { ptyTranscriptToViewportPlaintext } from 'tty-assert/ptyTranscriptToViewportPlaintext'
 import { stripAnsiCliPty } from 'tty-assert/stripAnsi'
 
 export const OUTPUT_ALIAS = '@doughnutOutput'
@@ -262,7 +262,7 @@ async function getGuidanceContext(raw: string): Promise<{
   replayedPlain: string
   guidancePlain: string
 }> {
-  const replayedPlain = await ptyTranscriptToVisiblePlaintextViaXterm(raw)
+  const replayedPlain = await ptyTranscriptToViewportPlaintext(raw)
   const guidancePlain =
     extractCurrentGuidanceFromReplayedPlaintext(replayedPlain)
   return { replayedPlain, guidancePlain }

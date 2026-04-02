@@ -1,6 +1,8 @@
 import { Terminal } from '@xterm/headless'
 import { CLI_INTERACTIVE_PTY_COLS, CLI_INTERACTIVE_PTY_ROWS } from './geometry'
 
+/** xterm headless replay → viewport plaintext. Canonical export: `ptyTranscriptToViewportPlaintext`. */
+
 function viewportPlaintext(term: Terminal): string {
   const buffer = term.buffer.active
   const lines: string[] = []
@@ -13,11 +15,13 @@ function viewportPlaintext(term: Terminal): string {
 
 /**
  * Replays a PTY transcript through xterm.js (headless) and returns visible plaintext
- * for the viewport: one row per screen line, trailing spaces stripped per row,
- * rows joined with `\n`, no trailing blank lines — same shape as `ptyTranscriptToVisiblePlaintext`
- * for downstream heuristics (e.g. Current guidance).
+ * for the **viewport**: one row per screen line, trailing spaces stripped per row,
+ * rows joined with `\n`, no trailing blank lines — same shape as the legacy hand-rolled
+ * `ptyTranscriptToVisiblePlaintext` for downstream heuristics (e.g. Current guidance).
  *
  * `write` is asynchronous; the promise resolves after the parser has applied the transcript.
+ *
+ * **Canonical import:** `ptyTranscriptToViewportPlaintext` from `tty-assert/ptyTranscriptToViewportPlaintext`.
  */
 export function ptyTranscriptToVisiblePlaintextViaXterm(
   raw: string,
@@ -44,3 +48,7 @@ export function ptyTranscriptToVisiblePlaintextViaXterm(
     }
   })
 }
+
+/** @see {@link ptyTranscriptToVisiblePlaintextViaXterm} — canonical name for new imports. */
+export const ptyTranscriptToViewportPlaintext =
+  ptyTranscriptToVisiblePlaintextViaXterm

@@ -59,7 +59,7 @@ The workspace may include a copy under [`tt/`](../tt/) for close reading while d
 | Location | Behavior today |
 |----------|----------------|
 | [`outputAssertions.ts`](../e2e_test/start/pageObjects/cli/outputAssertions.ts) | **Replay (viewport):** `getGuidanceContext` → xterm → `extractCurrentGuidanceFromReplayedPlaintext`. **Past assistant / answered:** `assertStrippedPtyTranscriptContains` on **full** stripped transcript. **Past user:** stripped transcript + gray SGR + line-padding heuristics. |
-| [`facade.ts`](../packages/tty-assert/src/facade.ts) | **`ptyTranscriptToVisiblePlaintext`** (legacy) for replay-shaped diagnostics — should move to xterm in 5.1. |
+| [`facade.ts`](../packages/tty-assert/src/facade.ts) | Replay-shaped diagnostics use **xterm** (`ptyTranscriptToViewportPlaintext`); see 5.1–5.2. |
 | [`cliE2ePluginTasks.ts`](../e2e_test/config/cliE2ePluginTasks.ts) | Startup wait: **`waitForVisiblePlaintextSubstring`** (stripped cumulative). No use of `getReplayedScreenPlaintext` / `dumpFrames` yet. |
 | [`step_definitions/cli.ts`](../e2e_test/step_definitions/cli.ts) | Steps delegate to `interactiveCli()` fluents (`pastCliAssistantMessages`, `answeredQuestions`, `currentGuidance`, …). |
 
@@ -72,6 +72,7 @@ The workspace may include a copy under [`tt/`](../tt/) for close reading while d
 | In scope | Out of scope (later phases) |
 |----------|------------------------------|
 | **`tty-assert`:** xterm replay in facade; canonical replay export; **locator-style helpers** (explicit search surface, poll+timeout, optional strict/regex); **viewable vs full** buffer line ranges as in [`tt/src/terminal/term.ts`](../tt/src/terminal/term.ts) | **Playwright-style** `expect` integration, multi-shell runners, vendoring **`tt/`** — borrow **patterns** only; delete temporary `tt/` when done |
+| **Legacy hand-rolled replay** (`ptyTranscriptToVisiblePlaintext`): kept for **unit + parity tests** only (grep-gated). | **Removing** that implementation — **not** in Phase 5; see **Legacy replay removal (after Phase 5)** under 5.2. |
 | **Doughnut E2E:** **Change** some assertions from “whole history + section name as documentation” to **better locators** (viewport, guidance region, full xterm buffer, or retained stripped transcript where that remains the right product contract) | PNG / animation artifacts — **Phases 9–10** |
 | **Docs:** `tty-assert` README describes strip vs replay **vs locator surfaces** | Unified **lifecycle** API — **Phase 6**; row rulers / annotated regions — **Phase 7** |
 
@@ -103,6 +104,12 @@ The workspace may include a copy under [`tt/`](../tt/) for close reading while d
 - **`@deprecated`** on **`ptyTranscriptToVisiblePlaintext`** for non-test use; grep gate: no production imports outside allowlist.
 
 **Gate:** `pnpm tty-assert:test` + `pnpm tty-assert:lint` green; grep gate satisfied.
+
+### Legacy replay removal (after Phase 5)
+
+**Within Phase 5:** Do **not** delete `ptyTranscriptToVisiblePlaintext` or its export. It remains the reference for **`ptyTranscriptReplayParity.test.ts`** and **`ptyTranscriptToVisiblePlaintext.test.ts`**, and the grep gate keeps it out of product code.
+
+**When to remove (post–Phase 5):** Schedule a **small follow-up** once **xterm replay + locator surfaces** are stable and the team accepts dropping the dual implementation — e.g. replace parity with **xterm-only** golden expectations (or a short “documented deltas” doc + minimal fixtures), then delete the hand-rolled module, tests that only targeted it, the **`tty-assert/ptyTranscriptToVisiblePlaintext`** export path, and **`check-legacy-replay-imports.sh`**. Natural homes: **Phase 6** (library hygiene alongside lifecycle API) or **before Phase 11** (npm package) if a smaller public surface matters; not blocked on Phase 5.7/5.8 unless parity is folded into locator work earlier.
 
 ---
 

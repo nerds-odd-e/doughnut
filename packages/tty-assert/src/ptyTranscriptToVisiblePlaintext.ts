@@ -91,8 +91,10 @@ function eraseDisplay(
 }
 
 /**
- * Replays a PTY transcript into a fixed-size screen and returns visible plaintext
- * (trailing spaces stripped per row, rows joined with `\n`).
+ * Hand-rolled PTY replay (no xterm). **For parity / regression tests only** — product code should use
+ * `ptyTranscriptToViewportPlaintext` from `tty-assert/ptyTranscriptToViewportPlaintext`.
+ *
+ * @deprecated Import only from `tty-assert` unit tests (parity vs xterm). Not for application or E2E code.
  */
 export function ptyTranscriptToVisiblePlaintext(
   raw: string,

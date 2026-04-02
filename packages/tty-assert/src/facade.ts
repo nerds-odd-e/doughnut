@@ -16,7 +16,7 @@ import {
   sanitizeVisibleTextForError,
   tailPreview,
 } from './errorSnapshotFormatting'
-import { ptyTranscriptToVisiblePlaintextViaXterm } from './ptyTranscriptToVisiblePlaintextViaXterm'
+import { ptyTranscriptToViewportPlaintext } from './ptyTranscriptToVisiblePlaintextViaXterm'
 import {
   disposeBufferedPtySession,
   startBufferedPtySession,
@@ -85,7 +85,7 @@ function createHandle(session: BufferedPtySession): TtyAssertTerminalHandle {
       return stripAnsiCliPty(session.buf.text)
     },
     getReplayedScreenPlaintext() {
-      return ptyTranscriptToVisiblePlaintextViaXterm(session.buf.text)
+      return ptyTranscriptToViewportPlaintext(session.buf.text)
     },
     getByText(value: string): TtySubstringLocator {
       return { kind: 'substring', value }
@@ -104,7 +104,7 @@ function createHandle(session: BufferedPtySession): TtyAssertTerminalHandle {
     async dumpFrames(): Promise<TtyAssertDumpFrames> {
       const raw = session.buf.text
       const stripped = stripAnsiCliPty(raw)
-      const replayed = await ptyTranscriptToVisiblePlaintextViaXterm(raw)
+      const replayed = await ptyTranscriptToViewportPlaintext(raw)
       return {
         rawByteLength: raw.length,
         ansiStrippedLength: stripped.length,

@@ -6,7 +6,7 @@
   "scripts": {
     "format": "biome check --write .",
     "lint": "biome check .",
-    "test": "vitest run",
+    "test": "vitest run && bash scripts/check-legacy-replay-imports.sh",
     "test:watch": "vitest"
   },
   "dependencies": {
@@ -23,6 +23,7 @@
   "exports": {
     "./stripAnsi": "./src/stripAnsi.ts",
     "./geometry": "./src/geometry.ts",
+    "./ptyTranscriptToViewportPlaintext": "./src/ptyTranscriptToVisiblePlaintextViaXterm.ts",
     "./ptyTranscriptToVisiblePlaintext": "./src/ptyTranscriptToVisiblePlaintext.ts",
     "./ptyTranscriptToVisiblePlaintextViaXterm": "./src/ptyTranscriptToVisiblePlaintextViaXterm.ts",
     "./errorSnapshotFormatting": "./src/errorSnapshotFormatting.ts",

@@ -109,9 +109,11 @@
 
 **Outcome:** One coherent, documented **assertion surface** in `tty-assert` — explicit **search surfaces** (viewport vs full xterm buffer vs stripped cumulative transcript where still appropriate), **poll + timeout** helpers in the library (patterns from [microsoft/tui-test](https://github.com/microsoft/tui-test) [`locator.ts`](https://github.com/microsoft/tui-test/blob/main/src/terminal/locator.ts) / [`toBeVisible.ts`](https://github.com/microsoft/tui-test/blob/main/src/test/matchers/toBeVisible.ts), not their runner), and **all** replay-based product paths on xterm with legacy replay quarantined to regression tests. **Doughnut E2E** updates **some** checks that today search the **entire** PTY history so they use **better locators** aligned with where users actually see text (may **tighten** tests where the old behavior was overly permissive).
 
+**Legacy hand-rolled replay:** **Not removed in Phase 5** — it stays for `tty-assert` unit tests and xterm **parity** until a post–Phase-5 cleanup (see sub-phase doc § *Legacy replay removal (after Phase 5)*; typical timing **Phase 6 hygiene** or **pre–Phase 11**).
+
 **Work:**
 
-- **Finish xterm migration:** Route **`facade`** (and any remaining wiring) through xterm-backed replay; **deprecate** hand-rolled replay outside tests; optional **full-buffer** plain export from xterm for scrollback-aware locators (today ViaXterm is **viewport-only** — see sub-phase doc).
+- **Finish xterm migration:** Route **`facade`** (and any remaining wiring) through xterm-backed replay; **deprecate** hand-rolled replay outside tests; optional **full-buffer** plain export from xterm for scrollback-aware locators (today viewport replay is **`ptyTranscriptToViewportPlaintext`** — see sub-phase doc).
 - **Locator primitives in `tty-assert`:** Runner-agnostic async helpers with explicit surface, timeout/retry, optional strict multi-match errors; failure messages that name the surface and include a bounded snapshot (tui-test-style).
 - **Doughnut:** Refactor `outputAssertions` / Cypress adapter to use those helpers; **inventory** CLI steps and migrate scenarios so assertions target the **right** surface; document per-fluent contract (past assistant vs guidance vs …).
 - **Consolidate** duplicate strip/replay/poll paths; keep Ink-specific heuristics in Doughnut adapters.
