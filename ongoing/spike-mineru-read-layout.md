@@ -82,10 +82,11 @@ CURSOR_DEV=true nix develop -c .venv-mineru/bin/python minerui-spike/spike_miner
 - **Deps:** Plain `pip install mineru` is not enough for `backend="pipeline"`; this machine needed **`.venv-mineru/bin/pip install 'mineru[pipeline]'`** (torch, transformers, onnxruntime, etc.). First run downloaded layout/OCR/table weights, then processed five pages in about 1–2 minutes on CPU.
 - **Output file name (MinerU 3.0.5):** `{pdf_stem}_content_list.json` under `{output_dir}/{stem}/auto/`, not `document_content_list.json`.
 - **Sample outline (PDF):** `content_list` worked; headings appeared as `type: text` with `text_level` 1–2 (no `middle.json` fallback needed). Example: L1 “The future of software engineering”; L2 sections such as “Executive summary”, “1. Where does the rigor go?” on early pages.
-- **EPUB:** e.g. same wrapper, path to `.epub`; `--start-page` / `--end-page` are PDF-only (ignored for EPUB). No MinerU run, no model download.
+- **EPUB:** same wrapper, path to `.epub`; `--start-page` / `--end-page` are PDF-only (ignored for EPUB). No MinerU run, no model download. Example book: **`~/Documents/books/10xorg-odd-e.epub`**.
 
 ```bash
-CURSOR_DEV=true nix develop -c .venv-mineru/bin/python minerui-spike/spike_mineru_phase_a_outline.py /path/to/book.epub
+CURSOR_DEV=true nix develop -c .venv-mineru/bin/python minerui-spike/spike_mineru_phase_a_outline.py \
+  "$HOME/Documents/books/10xorg-odd-e.epub"
 ```
 
 ### Phase B — Subprocess contract from Node
@@ -97,6 +98,25 @@ CURSOR_DEV=true nix develop -c .venv-mineru/bin/python minerui-spike/spike_miner
 3. Returns **trimmed string** (outline) or structured JSON string for the CLI to wrap.
 
 **Tests (spike-appropriate):** Prefer **black-box** test only if you can avoid flakiness: e.g. mock subprocess to return fixture JSON and assert outline formatting; full MinerU test remains **manual** or opt-in env flag.
+
+#### Phase B demo (done)
+
+- **TS:** `cli/src/commands/read/mineruOutlineSubprocess.ts` — `runMineruOutlineSubprocess({ bookPath, cwd?, … })` → `{ ok, outline, source, note? }` or `{ ok: false, error, exitCode? }`. Default timeout **30 minutes** (`MINERU_OUTLINE_DEFAULT_TIMEOUT_MS`). PDF: `mkdtemp` under OS tmp, passes `--output-dir` to the script, deletes dir after the run.
+- **Python:** Phase A script accepts **`--json-result`** (single JSON object on stdout; stderr unchanged).
+- **Env:** `DOUGHNUT_MINERU_PYTHON` (default `python3`), `DOUGHNUT_MINERU_OUTLINE_SCRIPT` (optional; else walk cwd ancestors for `minerui-spike/spike_mineru_phase_a_outline.py`).
+- **Tests:** `cli/tests/mineruOutlineSubprocess.test.ts` (mocked `spawn`; no MinerU in CI).
+
+```bash
+CURSOR_DEV=true nix develop -c .venv-mineru/bin/python minerui-spike/spike_mineru_phase_a_outline.py \
+  /path/to/book.pdf --end-page 2 --json-result
+```
+
+EPUB with `--json-result` (no temp output dir; same example file as Phase A):
+
+```bash
+CURSOR_DEV=true nix develop -c .venv-mineru/bin/python minerui-spike/spike_mineru_phase_a_outline.py \
+  "$HOME/Documents/books/10xorg-odd-e.epub" --json-result
+```
 
 ### Phase C — `/read <book path>` in interactive CLI
 
@@ -120,7 +140,7 @@ CURSOR_DEV=true nix develop -c .venv-mineru/bin/python minerui-spike/spike_miner
 
 | Layer | Role |
 |--------|------|
-| **Manual** | 2–3 real PDFs (textbook with TOC, novel scan, two-column paper) + record time and output quality; optionally 1–2 EPUBs to see spine/`h1`–`h3` behavior. |
+| **Manual** | 2–3 real PDFs (textbook with TOC, novel scan, two-column paper) + record time and output quality; for EPUB spine/`h1`–`h3` behavior e.g. **`~/Documents/books/10xorg-odd-e.epub`**. |
 | **Unit** | Outline formatting from **fixture JSON** (no MinerU in CI). |
 | **E2E** | Defer unless `/read` becomes a committed feature; MinerU in CI is heavy. |
 

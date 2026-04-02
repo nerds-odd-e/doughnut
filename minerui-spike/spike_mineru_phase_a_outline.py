@@ -15,6 +15,8 @@ Example:
     "/path/to/file.pdf" --end-page 4
   CURSOR_DEV=true nix develop -c .venv-mineru/bin/python minerui-spike/spike_mineru_phase_a_outline.py \\
     "/path/to/book.epub"
+
+Phase B (Node subprocess): add --json-result to emit a single JSON object on stdout (stderr unchanged for logs).
 """
 
 from __future__ import annotations
@@ -32,6 +34,18 @@ from bs4 import BeautifulSoup
 from mineru.cli.common import do_parse, read_fn
 
 SUPPORTED_BOOK_SUFFIXES = frozenset({".pdf", ".epub"})
+
+
+def _print_json_result(payload: dict) -> None:
+    print(json.dumps(payload, ensure_ascii=False), flush=True)
+
+
+def _emit_error(json_mode: bool, message: str) -> int:
+    if json_mode:
+        _print_json_result({"ok": False, "error": message})
+    else:
+        print(f"error: {message}", file=sys.stderr)
+    return 1
 
 
 def _xml_local(tag: str) -> str:
@@ -183,6 +197,7 @@ def run_pdf(
     args: argparse.Namespace,
     out_dir: Path,
     cleanup_out: bool,
+    json_mode: bool,
 ) -> int:
     pdf_bytes = read_fn(book_path)
     print(f"MinerU output directory: {out_dir}", file=sys.stderr)
@@ -206,13 +221,11 @@ def run_pdf(
             end_page_id=args.end_page,
         )
     except Exception as e:
-        print(f"error: do_parse failed: {e}", file=sys.stderr)
-        return 1
+        return _emit_error(json_mode, f"do_parse failed: {e}")
 
     cl_path = find_content_list_json(out_dir, stem)
     if not cl_path:
-        print("error: could not find *_content_list.json under output dir", file=sys.stderr)
-        return 1
+        return _emit_error(json_mode, "could not find *_content_list.json under output dir")
 
     outline, source = outline_from_content_list(cl_path)
     if not outline:
@@ -221,18 +234,29 @@ def run_pdf(
         if mid_path:
             outline, source = outline_from_middle_json(mid_path)
         else:
-            print("error: no middle.json for fallback", file=sys.stderr)
-            return 1
+            return _emit_error(json_mode, "no middle.json for fallback")
 
     if not outline:
         print("no heading layers detected (layers 1–3 empty).", file=sys.stderr)
         if cleanup_out:
             print(f"(output kept for inspection: {out_dir})", file=sys.stderr)
+        if json_mode:
+            _print_json_result(
+                {
+                    "ok": True,
+                    "outline": "",
+                    "source": "",
+                    "note": "no heading layers detected (layers 1–3 empty)",
+                }
+            )
         return 0
 
-    print(f"--- outline ({source}) ---")
-    for line in outline:
-        print(line)
+    if json_mode:
+        _print_json_result({"ok": True, "outline": "\n".join(outline), "source": source})
+    else:
+        print(f"--- outline ({source}) ---")
+        for line in outline:
+            print(line)
 
     if cleanup_out:
         print(f"\n(output dir: {out_dir})", file=sys.stderr)
@@ -254,17 +278,21 @@ def main() -> int:
     )
     p.add_argument("--lang", default="en", help="MinerU language code (PDF only; default en)")
     p.add_argument("--backend", default="pipeline", help="MinerU backend (PDF only; default pipeline)")
+    p.add_argument(
+        "--json-result",
+        action="store_true",
+        help="Print one JSON object on stdout (Phase B subprocess contract); logs stay on stderr",
+    )
     args = p.parse_args()
+    json_mode = args.json_result
 
     book_path = args.book.expanduser().resolve()
     if not book_path.is_file():
-        print(f"error: file not found: {book_path}", file=sys.stderr)
-        return 1
+        return _emit_error(json_mode, f"file not found: {book_path}")
 
     suffix = book_path.suffix.lower()
     if suffix not in SUPPORTED_BOOK_SUFFIXES:
-        print(f"error: expected .pdf or .epub, got {suffix!r}", file=sys.stderr)
-        return 1
+        return _emit_error(json_mode, f"expected .pdf or .epub, got {suffix!r}")
 
     stem = book_path.stem
 
@@ -273,11 +301,24 @@ def main() -> int:
             print("note: --start-page / --end-page apply to PDF only; ignored for EPUB", file=sys.stderr)
         outline, source = outline_from_epub(book_path)
         if not outline:
-            print(f"{source}.", file=sys.stderr)
+            if json_mode:
+                _print_json_result(
+                    {
+                        "ok": True,
+                        "outline": "",
+                        "source": "epub",
+                        "note": source,
+                    }
+                )
+            else:
+                print(f"{source}.", file=sys.stderr)
             return 0
-        print(f"--- outline ({source}) ---")
-        for line in outline:
-            print(line)
+        if json_mode:
+            _print_json_result({"ok": True, "outline": "\n".join(outline), "source": source})
+        else:
+            print(f"--- outline ({source}) ---")
+            for line in outline:
+                print(line)
         return 0
 
     out_dir = args.output_dir
@@ -289,7 +330,7 @@ def main() -> int:
         out_dir = out_dir.expanduser().resolve()
         out_dir.mkdir(parents=True, exist_ok=True)
 
-    return run_pdf(book_path, stem, args, out_dir, cleanup_out)
+    return run_pdf(book_path, stem, args, out_dir, cleanup_out, json_mode)
 
 
 if __name__ == "__main__":
