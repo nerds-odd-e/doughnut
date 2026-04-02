@@ -7,6 +7,7 @@ import { lastEmailSlashCommand } from './gmail/lastEmail/lastEmailSlashCommand.j
 import { listAccessTokenSlashCommand } from './accessToken/listAccessToken/listAccessTokenSlashCommand.js'
 import { readSlashCommand } from './read/readSlashCommand.js'
 import { recallSlashCommand } from './recall/recall.js'
+import { useNotebookSlashCommand } from './notebook/useNotebookSlashCommand.js'
 import { recallStatusSlashCommand } from './recallStatus.js'
 import {
   removeAccessTokenCompletelySlashCommand,
@@ -24,6 +25,7 @@ export const interactiveSlashCommands: readonly InteractiveSlashCommand[] = [
   recallSlashCommand,
   recallStatusSlashCommand,
   readSlashCommand,
+  useNotebookSlashCommand,
   exitSlashCommand,
 ]
 
