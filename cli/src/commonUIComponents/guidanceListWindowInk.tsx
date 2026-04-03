@@ -222,7 +222,10 @@ function SlashGuidanceListInk({
       (m, r) => Math.max(m, stringWidth(r.usage)),
       0
     )
-    const alignW = slashGuidanceUsageColumnWidth(optionRows)
+    const alignW = slashGuidanceUsageColumnWidth(
+      optionRows,
+      SLASH_GUIDANCE_USAGE_COL_CAP
+    )
     let usageCol = Math.min(maxUsageW, Math.max(0, rowInner - minDescCols))
     if (alignW > 0) {
       usageCol = Math.max(usageCol, alignW)

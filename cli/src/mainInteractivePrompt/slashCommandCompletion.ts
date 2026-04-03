@@ -5,7 +5,6 @@
  */
 
 import stringWidth from 'string-width'
-import { interactiveSlashCommands } from '../commands/interactiveSlashCommands.js'
 import type { InteractiveSlashCommand } from '../commands/interactiveSlashCommand.js'
 
 export const DEFAULT_INTERACTIVE_GUIDANCE = '/ commands'
@@ -13,7 +12,7 @@ export const DEFAULT_INTERACTIVE_GUIDANCE = '/ commands'
 /** Wider usages are not padded; descriptions start after the full usage. */
 export const SLASH_GUIDANCE_USAGE_COL_CAP = 26
 
-export type SlashCompletionListRow = {
+type SlashCompletionListRow = {
   readonly usage: string
   readonly description: string
   /** Buffer text after Tab/Enter pick (no `<argument>` placeholder). */
@@ -32,7 +31,7 @@ export function padSlashListUsageColumn(
 /** Target width for padded rows: at most `cap`, at least the widest usage that fits under `cap`. */
 export function slashGuidanceUsageColumnWidth(
   rows: readonly { readonly usage: string }[],
-  cap: number = SLASH_GUIDANCE_USAGE_COL_CAP
+  cap: number
 ): number {
   let m = 0
   for (const r of rows) {
@@ -42,29 +41,13 @@ export function slashGuidanceUsageColumnWidth(
   return m === 0 ? 0 : Math.min(cap, m)
 }
 
-export function slashGuidanceUsageWiderThanCap(
-  usage: string,
-  cap: number = SLASH_GUIDANCE_USAGE_COL_CAP
-): boolean {
-  return stringWidth(usage) > cap
-}
-
-export function formatSlashGuidanceUsageCell(
-  usage: string,
-  colWidth: number,
-  cap: number = SLASH_GUIDANCE_USAGE_COL_CAP
-): string {
-  if (stringWidth(usage) > cap) return usage
-  return padSlashListUsageColumn(usage, colWidth)
-}
-
 function normalizedDraft(draft: string): string {
   return draft.replace(/\n/g, ' ')
 }
 
 export function getSlashTabCompletion(
   buffer: string,
-  commands: readonly InteractiveSlashCommand[] = interactiveSlashCommands
+  commands: readonly InteractiveSlashCommand[]
 ): {
   completed: string
   count: number
@@ -109,7 +92,7 @@ function filterSlashCommandsByPrefix(
     })
 }
 
-export type SlashGuidanceForInk =
+type SlashGuidanceForInk =
   | { show: 'hint' }
   | { show: 'empty' }
   | {
@@ -119,7 +102,7 @@ export type SlashGuidanceForInk =
 
 export function slashGuidanceForInk(
   draft: string,
-  commands: readonly InteractiveSlashCommand[] = interactiveSlashCommands
+  commands: readonly InteractiveSlashCommand[]
 ): SlashGuidanceForInk {
   const p = normalizedDraft(draft)
   if (!p.startsWith('/') || p.endsWith(' ')) return { show: 'hint' }
