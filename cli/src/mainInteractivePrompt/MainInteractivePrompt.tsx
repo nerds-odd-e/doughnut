@@ -32,13 +32,13 @@ export function MainInteractivePrompt({
   onCommittedLine,
   isActive = true,
   slashCommands,
-  placeholder = '`exit` to quit.',
+  placeholder,
 }: {
   readonly onCommittedLine: (line: string) => void
   readonly isActive?: boolean
-  /** When set, Tab / `/` list / picks use this registry instead of top-level interactive commands. */
-  readonly slashCommands?: readonly InteractiveSlashCommand[]
-  readonly placeholder?: string
+  /** Tab / `/` list / picks use this registry. */
+  readonly slashCommands: readonly InteractiveSlashCommand[]
+  readonly placeholder: string
 }) {
   const [buffer, setBuffer] = useState('')
   const [caretOffset, setCaretOffset] = useState(0)
@@ -66,10 +66,7 @@ export function MainInteractivePrompt({
   }, [])
 
   const guidance = useMemo(
-    () =>
-      slashCommands === undefined
-        ? effectiveSlashGuidance(buffer, suggestionsDismissed)
-        : effectiveSlashGuidance(buffer, suggestionsDismissed, slashCommands),
+    () => effectiveSlashGuidance(buffer, suggestionsDismissed, slashCommands),
     [buffer, suggestionsDismissed, slashCommands]
   )
 
@@ -161,10 +158,7 @@ export function MainInteractivePrompt({
         endWalkBeforeDraftEdit()
         const draft = normalizeInputForSlash(readBuf())
         if (draft.startsWith('/') && !draft.endsWith(' ')) {
-          const { completed } =
-            slashCommands === undefined
-              ? getSlashTabCompletion(draft)
-              : getSlashTabCompletion(draft, slashCommands)
+          const { completed } = getSlashTabCompletion(draft, slashCommands)
           if (completed !== draft) {
             setAll(completed, completed.length, 0)
           }
@@ -181,10 +175,7 @@ export function MainInteractivePrompt({
           setAll('', 0, 0)
           return
         }
-        const g =
-          slashCommands === undefined
-            ? slashGuidanceForInk(raw)
-            : slashGuidanceForInk(raw, slashCommands)
+        const g = slashGuidanceForInk(raw, slashCommands)
         if (g.show === 'list') {
           suggestionsDismissedRef.current = true
           setSuggestionsDismissed(true)
@@ -220,14 +211,11 @@ export function MainInteractivePrompt({
         const buf = readBuf()
         const caret = readCaret()
 
-        const g =
-          slashCommands === undefined
-            ? effectiveSlashGuidance(buf, suggestionsDismissedRef.current)
-            : effectiveSlashGuidance(
-                buf,
-                suggestionsDismissedRef.current,
-                slashCommands
-              )
+        const g = effectiveSlashGuidance(
+          buf,
+          suggestionsDismissedRef.current,
+          slashCommands
+        )
         const slashRows = g.show === 'list' ? g.rows : []
         const listVisible = slashRows.length > 0
         const walkingHistory = historyWalkIndexRef.current !== null
@@ -278,17 +266,11 @@ export function MainInteractivePrompt({
       // --- Enter: slash completion pick or commit ---
       if (key.return) {
         const bufForPick = readBuf()
-        const gPick =
-          slashCommands === undefined
-            ? effectiveSlashGuidance(
-                bufForPick,
-                suggestionsDismissedRef.current
-              )
-            : effectiveSlashGuidance(
-                bufForPick,
-                suggestionsDismissedRef.current,
-                slashCommands
-              )
+        const gPick = effectiveSlashGuidance(
+          bufForPick,
+          suggestionsDismissedRef.current,
+          slashCommands
+        )
         const pickRows = gPick.show === 'list' ? gPick.rows : []
         if (pickRows.length > 0) {
           endWalkBeforeDraftEdit()

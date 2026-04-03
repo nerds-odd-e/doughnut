@@ -136,7 +136,7 @@ export function slashGuidanceForInk(
 export function effectiveSlashGuidance(
   draft: string,
   suggestionsDismissed: boolean,
-  commands: readonly InteractiveSlashCommand[] = interactiveSlashCommands
+  commands: readonly InteractiveSlashCommand[]
 ): SlashGuidanceForInk {
   const g = slashGuidanceForInk(draft, commands)
   if (suggestionsDismissed && g.show === 'list') return { show: 'hint' }

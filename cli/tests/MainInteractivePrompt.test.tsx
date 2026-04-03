@@ -3,6 +3,7 @@ import * as os from 'node:os'
 import * as path from 'node:path'
 import { render } from 'ink-testing-library'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import { interactiveSlashCommands } from '../src/commands/interactiveSlashCommands.js'
 import { MainInteractivePrompt } from '../src/mainInteractivePrompt/index.js'
 import { USER_INPUT_HISTORY_FILENAME } from '../src/mainInteractivePrompt/userInputHistoryFile.js'
 import { stripAnsi, waitForFrames } from './inkTestHelpers.js'
@@ -53,11 +54,17 @@ afterEach(() => {
   }
 })
 
+const MAIN_PROMPT_PLACEHOLDER = '`exit` to quit.'
+
 async function renderMainInteractivePrompt(
   onCommittedLine: (line: string) => void = () => undefined
 ) {
   const result = render(
-    <MainInteractivePrompt onCommittedLine={onCommittedLine} />
+    <MainInteractivePrompt
+      onCommittedLine={onCommittedLine}
+      slashCommands={interactiveSlashCommands}
+      placeholder={MAIN_PROMPT_PLACEHOLDER}
+    />
   )
   await waitForFrames(
     () => stripAnsi(result.lastFrame() ?? ''),

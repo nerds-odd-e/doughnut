@@ -10,7 +10,10 @@ import type { ComponentType } from 'react'
 import type { Key } from 'ink'
 import { Box, useApp, useInput, useStdout } from 'ink'
 import { MainInteractivePrompt } from './mainInteractivePrompt/index.js'
-import { resolveInteractiveSlashCommand } from './commands/interactiveSlashCommands.js'
+import {
+  interactiveSlashCommands,
+  resolveInteractiveSlashCommand,
+} from './commands/interactiveSlashCommands.js'
 import type { InteractiveSlashCommandStageProps } from './commands/interactiveSlashCommand.js'
 import { formatVersionOutput } from './commands/version.js'
 import { userVisibleSlashCommandError } from './userVisibleSlashCommandError.js'
@@ -262,6 +265,8 @@ export function InteractiveCliApp() {
             <MainInteractivePrompt
               onCommittedLine={onCommittedLine}
               isActive={!activeSlashStage}
+              slashCommands={interactiveSlashCommands}
+              placeholder="`exit` to quit."
             />
           )}
         </Box>
