@@ -6,7 +6,12 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { interactiveSlashCommands } from '../src/commands/interactiveSlashCommands.js'
 import { MainInteractivePrompt } from '../src/mainInteractivePrompt/index.js'
 import { USER_INPUT_HISTORY_FILENAME } from '../src/mainInteractivePrompt/userInputHistoryFile.js'
-import { stripAnsi, waitForFrames, waitForLastFrame } from './inkTestHelpers.js'
+import {
+  extendInkRenderForInteractiveTests,
+  inkCommandLineProbeUndelete,
+  stripAnsi,
+  waitUntilInkLastFrameStripped,
+} from './inkTestHelpers.js'
 
 /** Expected scroll UI copy (private in commonUIComponents/guidanceListWindowInk). */
 const EXPECT_GUIDANCE_MORE_BELOW = '↓ more below'
@@ -67,57 +72,16 @@ async function renderMainInteractivePrompt(
       placeholder={MAIN_PROMPT_PLACEHOLDER}
     />
   )
-  const { lastFrame, stdin } = result
-
-  await waitForFrames(
-    () => stripAnsi(lastFrame() ?? ''),
+  await waitUntilInkLastFrameStripped(
+    result.lastFrame,
     (f) => f.includes('→') && f.includes('/ commands')
   )
-  const probe = '@'
-  stdin.write(probe)
-  await waitForFrames(
-    () => stripAnsi(lastFrame() ?? ''),
-    (f) => lineWithMainPrompt(f).includes(probe)
-  )
-  stdin.write('\x7f')
-  await waitForFrames(
-    () => stripAnsi(lastFrame() ?? ''),
-    (f) => !lineWithMainPrompt(f).includes(probe)
-  )
-
-  return {
-    ...result,
-    lastStrippedFrame(): string {
-      return stripAnsi(lastFrame() ?? '')
-    },
-    waitForLastFrameToInclude(
-      pattern: string | RegExp,
-      maxTicks = 5000
-    ): Promise<void> {
-      return waitForLastFrame(
-        () => stripAnsi(lastFrame() ?? ''),
-        (f) =>
-          typeof pattern === 'string' ? f.includes(pattern) : pattern.test(f),
-        maxTicks
-      )
-    },
-    waitUntilLastFrame(
-      predicate: (stripped: string) => boolean,
-      maxTicks = 5000
-    ): Promise<void> {
-      return waitForFrames(
-        () => stripAnsi(lastFrame() ?? ''),
-        predicate,
-        maxTicks
-      )
-    },
-    waitForLastFrameRaw(
-      predicate: (raw: string) => boolean,
-      maxTicks = 5000
-    ): Promise<void> {
-      return waitForFrames(() => lastFrame() ?? '', predicate, maxTicks)
-    },
-  }
+  await inkCommandLineProbeUndelete(result, {
+    probeChar: '@',
+    probeVisible: (f) => lineWithMainPrompt(f).includes('@'),
+    probeHidden: (f) => !lineWithMainPrompt(f).includes('@'),
+  })
+  return { ...result, ...extendInkRenderForInteractiveTests(result) }
 }
 
 describe('MainInteractivePrompt slash guidance (phase 1)', () => {

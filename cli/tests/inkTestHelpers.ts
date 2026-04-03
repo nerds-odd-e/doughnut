@@ -96,27 +96,43 @@ function strippedOutputMatches(
     : pattern.test(haystack)
 }
 
+export type InkTestRenderResult = ReturnType<typeof render>
+
+export async function waitUntilInkLastFrameStripped(
+  lastFrame: () => string | undefined,
+  predicate: (stripped: string) => boolean,
+  maxTicks = 5000
+): Promise<void> {
+  return waitForFrames(() => stripAnsi(lastFrame() ?? ''), predicate, maxTicks)
+}
+
 /**
  * `useInput` attaches after `useEffect`; writing to stdin immediately after `render()` can race.
- * Probe with a character, wait until it appears on the command line, then delete it.
+ * Write a probe character, wait until the stripped last frame matches `probeVisible`, backspace, then wait for `probeHidden`.
  */
-export async function renderInkWhenCommandLineReady(element: ReactElement) {
-  const result = render(element)
+export async function inkCommandLineProbeUndelete(
+  result: InkTestRenderResult,
+  options: {
+    readonly probeChar: string
+    readonly probeVisible: (strippedLastFrame: string) => boolean
+    readonly probeHidden: (strippedLastFrame: string) => boolean
+  },
+  maxTicks = 5000
+): Promise<void> {
+  const { lastFrame, stdin } = result
+  const { probeChar, probeVisible, probeHidden } = options
+  stdin.write(probeChar)
+  await waitUntilInkLastFrameStripped(lastFrame, probeVisible, maxTicks)
+  stdin.write('\x7f')
+  await waitUntilInkLastFrameStripped(lastFrame, probeHidden, maxTicks)
+}
+
+/** Shared wait helpers for Ink interactive tests (last frame / full scrollback). */
+export function extendInkRenderForInteractiveTests(
+  result: InkTestRenderResult
+) {
   const { frames, lastFrame } = result
-  result.stdin.write('|')
-  await waitForLastFrame(
-    result.lastFrame,
-    (f) => f.includes('→ |') || f.includes('> |')
-  )
-  result.stdin.write('\x7f')
-  await waitForLastFrame(
-    result.lastFrame,
-    (f) =>
-      (f.includes('→') && !f.includes('→ |')) ||
-      (f.includes('>') && !f.includes('> |'))
-  )
   return {
-    ...result,
     lastStrippedFrame(): string {
       return stripAnsi(lastFrame() ?? '')
     },
@@ -124,8 +140,8 @@ export async function renderInkWhenCommandLineReady(element: ReactElement) {
       pattern: string | RegExp,
       maxTicks = 5000
     ): Promise<void> {
-      return waitForLastFrame(
-        () => stripAnsi(lastFrame() ?? ''),
+      return waitUntilInkLastFrameStripped(
+        lastFrame,
         (f) => strippedOutputMatches(f, pattern),
         maxTicks
       )
@@ -140,7 +156,35 @@ export async function renderInkWhenCommandLineReady(element: ReactElement) {
         maxTicks
       )
     },
+    waitUntilLastFrame(
+      predicate: (stripped: string) => boolean,
+      maxTicks = 5000
+    ): Promise<void> {
+      return waitUntilInkLastFrameStripped(lastFrame, predicate, maxTicks)
+    },
+    waitForLastFrameRaw(
+      predicate: (raw: string) => boolean,
+      maxTicks = 5000
+    ): Promise<void> {
+      return waitForFrames(() => lastFrame() ?? '', predicate, maxTicks)
+    },
   }
+}
+
+/**
+ * `useInput` attaches after `useEffect`; writing to stdin immediately after `render()` can race.
+ * Probe with `|`, wait until it appears on the command line, then delete it.
+ */
+export async function renderInkWhenCommandLineReady(element: ReactElement) {
+  const result = render(element)
+  await inkCommandLineProbeUndelete(result, {
+    probeChar: '|',
+    probeVisible: (f) => f.includes('→ |') || f.includes('> |'),
+    probeHidden: (f) =>
+      (f.includes('→') && !f.includes('→ |')) ||
+      (f.includes('>') && !f.includes('> |')),
+  })
+  return { ...result, ...extendInkRenderForInteractiveTests(result) }
 }
 
 /** Mirrors InteractiveCliApp stage key forwarding for tests. */
