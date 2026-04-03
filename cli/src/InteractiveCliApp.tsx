@@ -98,7 +98,7 @@ function InteractiveCliAppBody() {
   const onCommittedCommand = useCallback(
     (resolved: ResolvedInteractiveSlashCommand) => {
       const { command, argument, line } = resolved
-      const user = transcriptUserLine(line)
+      appendScrollbackItem(transcriptUserLine(line))
       if ('stageComponent' in command) {
         const argumentMissing = argument === undefined || argument === ''
         const argSpec = command.argument
@@ -106,10 +106,9 @@ function InteractiveCliAppBody() {
           const assistant = transcriptAssistantError(
             `Missing ${argSpec.name}. Usage: ${command.doc.usage}`
           )
-          appendScrollbackItems([user, assistant])
+          appendScrollbackItem(assistant)
           return
         }
-        appendScrollbackItem(user)
         stageArgumentRef.current = argument
         const Stage = command.stageComponent
         const indicator = command.stageIndicator
@@ -127,10 +126,9 @@ function InteractiveCliAppBody() {
         const assistant = transcriptAssistantError(
           `Missing ${argSpec.name}. Usage: ${command.doc.usage}`
         )
-        appendScrollbackItems([user, assistant])
+        appendScrollbackItem(assistant)
         return
       }
-      appendScrollbackItem(user)
       Promise.resolve(command.run(argument))
         .then((r) => {
           const assistant = transcriptAssistantText(r.assistantMessage)
@@ -152,10 +150,8 @@ function InteractiveCliAppBody() {
       const assistantText = line.startsWith('/')
         ? 'unsupported command'
         : 'Not supported'
-      appendScrollbackItems([
-        transcriptUserLine(line),
-        transcriptAssistantError(assistantText),
-      ])
+      appendScrollbackItem(transcriptUserLine(line))
+      appendScrollbackItem(transcriptAssistantError(assistantText))
     },
     [appendScrollbackItems]
   )

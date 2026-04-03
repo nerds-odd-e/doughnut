@@ -33,14 +33,12 @@ function invokeNotebookStageRunCommand(cmd: InteractiveSlashCommand): string {
 function dispatchNotebookUncommittedLine(
   line: string,
   {
-    appendScrollbackItems,
-  }: Pick<SessionScrollbackAppendApi, 'appendScrollbackItems'>
+    appendScrollbackItem,
+  }: Pick<SessionScrollbackAppendApi, 'appendScrollbackItem'>
 ) {
   if (line === '') return
-  appendScrollbackItems([
-    transcriptUserLine(line),
-    transcriptAssistantError('Not supported'),
-  ])
+  appendScrollbackItem(transcriptUserLine(line))
+  appendScrollbackItem(transcriptAssistantError('Not supported'))
 }
 
 function UseNotebookStage({
@@ -48,8 +46,7 @@ function UseNotebookStage({
   onSettled,
 }: InteractiveSlashCommandStageProps) {
   const title = (argument ?? '').trim()
-  const { appendScrollbackItem, appendScrollbackItems } =
-    useSessionScrollbackAppend()
+  const { appendScrollbackItem } = useSessionScrollbackAppend()
 
   const onCommittedCommand = useCallback(
     (resolved: ResolvedInteractiveSlashCommand) => {
@@ -62,9 +59,9 @@ function UseNotebookStage({
 
   const onCommittedLine = useCallback(
     (line: string) => {
-      dispatchNotebookUncommittedLine(line.trim(), { appendScrollbackItems })
+      dispatchNotebookUncommittedLine(line.trim(), { appendScrollbackItem })
     },
-    [appendScrollbackItems]
+    [appendScrollbackItem]
   )
 
   return (
