@@ -107,7 +107,6 @@ function UseNotebookStage({
         onStageSettled={handleStageSettled}
         onStageAbortWithError={handleStageAbortWithError}
         showMainPrompt
-        mainPromptIsActive={!activeStage}
         slashCommands={notebookStageSlashCommands}
         placeholder={STAGE_PLACEHOLDER}
         onCommittedCommand={onCommittedCommand}

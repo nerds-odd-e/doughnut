@@ -12,7 +12,6 @@ export function SlashCommandShellLiveColumn({
   onStageSettled,
   onStageAbortWithError,
   showMainPrompt,
-  mainPromptIsActive,
   slashCommands,
   placeholder,
   onCommittedCommand,
@@ -24,7 +23,6 @@ export function SlashCommandShellLiveColumn({
   readonly onStageSettled: (assistantText: string) => void
   readonly onStageAbortWithError: (message: string) => void
   readonly showMainPrompt: boolean
-  readonly mainPromptIsActive: boolean
   readonly slashCommands: readonly InteractiveSlashCommand[]
   readonly placeholder: string
   readonly onCommittedCommand: (
@@ -50,7 +48,7 @@ export function SlashCommandShellLiveColumn({
         <MainInteractivePrompt
           onCommittedCommand={onCommittedCommand}
           onCommittedLine={onCommittedLine}
-          isActive={mainPromptIsActive}
+          isActive={activeStage === null}
           slashCommands={slashCommands}
           placeholder={placeholder}
         />

@@ -104,7 +104,6 @@ function InteractiveCliAppBody() {
         onStageSettled={handleStageSettled}
         onStageAbortWithError={handleStageAbortWithError}
         showMainPrompt={!exitAfterCommit}
-        mainPromptIsActive={!activeStage}
         slashCommands={interactiveSlashCommands}
         placeholder="`exit` to quit."
         onCommittedCommand={onCommittedCommand}
