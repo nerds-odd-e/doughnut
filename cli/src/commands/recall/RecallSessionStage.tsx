@@ -1,21 +1,9 @@
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type MutableRefObject,
-  type ReactNode,
-} from 'react'
-import type { Key } from 'ink'
-import { Box, Text, useInput } from 'ink'
-import { Spinner } from '@inkjs/ui'
+import { useCallback, useRef, useState, type ReactNode } from 'react'
+import { Box, Text } from 'ink'
 import type { MemoryTrackerLite } from 'doughnut-api'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
-import { SetStageKeyHandlerContext } from '../../commonUIComponents/stageKeyForwardContext.js'
 import { YesNoStagePrompt } from '../../commonUIComponents/YesNoStagePrompt.js'
-import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
+import { AsyncAssistantFetchStage } from '../gmail/AsyncAssistantFetchStage.js'
 import {
   fetchDueMemoryTrackerIds,
   fetchShuffledDueMemoryTrackerIds,
@@ -64,6 +52,7 @@ export function RecallSessionStage({
   const [uiMode, setUiMode] = useState<'card' | 'loadMore'>('card')
   const [loadMoreFetching, setLoadMoreFetching] = useState(false)
   const [loadingNextQuestion, setLoadingNextQuestion] = useState(false)
+  const [nextQuestionLoadKey, setNextQuestionLoadKey] = useState(0)
   const [initialResolved, setInitialResolved] = useState(false)
   const submittingRef = useRef(false)
   const sessionAnsweredCardsRef = useRef(0)
@@ -73,54 +62,111 @@ export function RecallSessionStage({
   const trackerQueueRef = useRef<MemoryTrackerLite[]>([])
   currentRecallCardRef.current = card
 
-  useEffect(() => {
-    let unmounted = false
-    const ac = new AbortController()
-    activeOperationAbortRef.current = ac
-    ;(async () => {
-      try {
-        const lites = await fetchDueMemoryTrackerIds(0, ac.signal)
-        if (unmounted || ac.signal.aborted) return
-        trackerQueueRef.current = lites
-        if (lites.length > 0) {
-          startedWithEmptyTodayRef.current = false
-          const head = lites[0]!
-          const next = await loadRecallCardForMemoryTrackerId(
-            head.memoryTrackerId,
-            head.spelling,
-            ac.signal
-          )
-          if (unmounted || ac.signal.aborted) return
-          setCard(next)
-          setUiMode('card')
-        } else {
-          startedWithEmptyTodayRef.current = true
-          setCard(null)
-          setLoadMoreFetching(false)
-          setUiMode('loadMore')
-        }
-        setInitialResolved(true)
-      } catch (err: unknown) {
-        if (unmounted) return
-        onAbortWithError(userVisibleSlashCommandError(err))
-      } finally {
-        if (activeOperationAbortRef.current === ac) {
-          activeOperationAbortRef.current = null
-        }
-      }
-    })().catch(() => undefined)
-    return () => {
-      unmounted = true
-      ac.abort()
-      if (activeOperationAbortRef.current === ac) {
-        activeOperationAbortRef.current = null
-      }
-    }
-  }, [onAbortWithError])
-
   const settleSessionSummary = useCallback(() => {
     onSettled(recallSessionSummaryLine(sessionAnsweredCardsRef.current))
   }, [onSettled])
+
+  const runInitialRecallLoad = useCallback(async (signal: AbortSignal) => {
+    const lites = await fetchDueMemoryTrackerIds(0, signal)
+    if (signal.aborted) {
+      throw new DOMException('Aborted', 'AbortError')
+    }
+    trackerQueueRef.current = lites
+    if (lites.length > 0) {
+      startedWithEmptyTodayRef.current = false
+      const head = lites[0]!
+      const next = await loadRecallCardForMemoryTrackerId(
+        head.memoryTrackerId,
+        head.spelling,
+        signal
+      )
+      if (signal.aborted) {
+        throw new DOMException('Aborted', 'AbortError')
+      }
+      setCard(next)
+      setUiMode('card')
+    } else {
+      startedWithEmptyTodayRef.current = true
+      setCard(null)
+      setLoadMoreFetching(false)
+      setUiMode('loadMore')
+    }
+    return ''
+  }, [])
+
+  const onInitialFetchSuccess = useCallback(() => {
+    setInitialResolved(true)
+  }, [])
+
+  const runLoadMoreRecall = useCallback(async (signal: AbortSignal) => {
+    const lites = await fetchShuffledDueMemoryTrackerIds(3, signal)
+    if (signal.aborted) {
+      throw new DOMException('Aborted', 'AbortError')
+    }
+    trackerQueueRef.current = lites
+    if (lites.length === 0) {
+      return ''
+    }
+    const next = await loadRecallCardForMemoryTrackerId(
+      lites[0]!.memoryTrackerId,
+      lites[0]!.spelling,
+      signal
+    )
+    if (signal.aborted) {
+      throw new DOMException('Aborted', 'AbortError')
+    }
+    setUiMode('card')
+    setCard(next)
+    return ''
+  }, [])
+
+  const onLoadMoreFetchSuccess = useCallback(() => {
+    setLoadMoreFetching(false)
+    submittingRef.current = false
+    if (trackerQueueRef.current.length === 0) {
+      settleSessionSummary()
+    }
+  }, [settleSessionSummary])
+
+  const handleLoadMoreAbort = useCallback(
+    (message: string) => {
+      setLoadMoreFetching(false)
+      submittingRef.current = false
+      onAbortWithError(message)
+    },
+    [onAbortWithError]
+  )
+
+  const runLoadNextRecallCard = useCallback(async (signal: AbortSignal) => {
+    const head = trackerQueueRef.current[0]
+    if (head === undefined) {
+      throw new Error(
+        'Recall queue unexpectedly empty while loading next card.'
+      )
+    }
+    const next = await loadRecallCardForMemoryTrackerId(
+      head.memoryTrackerId,
+      head.spelling,
+      signal
+    )
+    if (signal.aborted) {
+      throw new DOMException('Aborted', 'AbortError')
+    }
+    setCard(next)
+    return ''
+  }, [])
+
+  const onNextQuestionFetchSuccess = useCallback(() => {
+    setLoadingNextQuestion(false)
+  }, [])
+
+  const handleNextQuestionAbort = useCallback(
+    (message: string) => {
+      setLoadingNextQuestion(false)
+      onAbortWithError(message)
+    },
+    [onAbortWithError]
+  )
 
   const onRecallFatalError = useCallback(
     (message: string) => {
@@ -134,60 +180,24 @@ export function RecallSessionStage({
   }, [onSettled])
 
   const onRecallQuestionAnswered = useCallback(
-    async (outcome: RecallQuestionAnswerOutcome) => {
+    (outcome: RecallQuestionAnswerOutcome) => {
       sessionAnsweredCardsRef.current += 1
 
       for (const row of outcome.answeredRows) {
         appendScrollbackItem(recallAnsweredScrollbackItem(row))
       }
-      try {
-        trackerQueueRef.current.shift()
-        const head = trackerQueueRef.current[0]
-        if (head !== undefined) {
-          setLoadingNextQuestion(true)
-          setCard(null)
-          const ac = new AbortController()
-          activeOperationAbortRef.current = ac
-          try {
-            const next = await loadRecallCardForMemoryTrackerId(
-              head.memoryTrackerId,
-              head.spelling,
-              ac.signal
-            )
-            if (ac.signal.aborted) {
-              onAbortWithError(
-                userVisibleSlashCommandError(
-                  new DOMException('Aborted', 'AbortError')
-                )
-              )
-              return
-            }
-            setCard(next)
-          } catch (loadErr: unknown) {
-            if (!ac.signal.aborted) {
-              onAbortWithError(userVisibleSlashCommandError(loadErr))
-            } else {
-              onAbortWithError(
-                userVisibleSlashCommandError(
-                  new DOMException('Aborted', 'AbortError')
-                )
-              )
-            }
-          } finally {
-            setLoadingNextQuestion(false)
-            if (activeOperationAbortRef.current === ac) {
-              activeOperationAbortRef.current = null
-            }
-          }
-          return
-        }
-        setLoadMoreFetching(false)
-        setUiMode('loadMore')
-      } catch (loadErr: unknown) {
-        onAbortWithError(userVisibleSlashCommandError(loadErr))
+      trackerQueueRef.current.shift()
+      const head = trackerQueueRef.current[0]
+      if (head !== undefined) {
+        setLoadingNextQuestion(true)
+        setCard(null)
+        setNextQuestionLoadKey((k) => k + 1)
+        return
       }
+      setLoadMoreFetching(false)
+      setUiMode('loadMore')
     },
-    [appendScrollbackItem, onAbortWithError]
+    [appendScrollbackItem]
   )
 
   const submitLoadMore = useCallback(
@@ -200,75 +210,25 @@ export function RecallSessionStage({
         return
       }
       setLoadMoreFetching(true)
-      const ac = new AbortController()
-      activeOperationAbortRef.current = ac
-      try {
-        const lites = await fetchShuffledDueMemoryTrackerIds(3, ac.signal)
-        if (activeOperationAbortRef.current === ac) {
-          activeOperationAbortRef.current = null
-        }
-        if (ac.signal.aborted) {
-          onAbortWithError(
-            userVisibleSlashCommandError(
-              new DOMException('Aborted', 'AbortError')
-            )
-          )
-          return
-        }
-        trackerQueueRef.current = lites
-        const next =
-          lites.length > 0
-            ? await loadRecallCardForMemoryTrackerId(
-                lites[0]!.memoryTrackerId,
-                lites[0]!.spelling,
-                ac.signal
-              )
-            : null
-        if (ac.signal.aborted) {
-          onAbortWithError(
-            userVisibleSlashCommandError(
-              new DOMException('Aborted', 'AbortError')
-            )
-          )
-          return
-        }
-        if (next === null) {
-          settleSessionSummary()
-        } else {
-          setUiMode('card')
-          setCard(next)
-        }
-      } catch (loadErr: unknown) {
-        if (activeOperationAbortRef.current === ac) {
-          activeOperationAbortRef.current = null
-        }
-        onAbortWithError(userVisibleSlashCommandError(loadErr))
-      } finally {
-        submittingRef.current = false
-        setLoadMoreFetching(false)
-      }
     },
-    [onSettled, onAbortWithError, settleSessionSummary]
+    [settleSessionSummary]
   )
 
-  /** Load-more prompt: Esc = decline load more (same as n → session summary), or abort in-flight fetch — not LeaveRecallConfirmPrompt. */
+  /** Load-more prompt: Esc = decline load more (same as n → session summary). In-flight load-more fetch uses Esc via `AsyncAssistantFetchStage`. */
   const escapeLoadMorePrompt = useCallback(() => {
-    if (submittingRef.current) {
-      activeOperationAbortRef.current?.abort()
-    } else {
-      submitLoadMore(false).catch(() => undefined)
-    }
+    submitLoadMore(false).catch(() => undefined)
   }, [submitLoadMore])
 
   if (!initialResolved) {
     return (
       <RecallSessionChrome>
-        <Box flexDirection="column">
-          <RecallSessionEscSpinner abortRef={activeOperationAbortRef} />
-          <Box>
-            <Spinner label="Loading recall…" />
-          </Box>
-        </Box>
+        <AsyncAssistantFetchStage
+          spinnerLabel="Loading recall…"
+          runAssistantMessage={runInitialRecallLoad}
+          onFetchSuccess={onInitialFetchSuccess}
+          onSettled={onSettled}
+          onAbortWithError={onAbortWithError}
+        />
       </RecallSessionChrome>
     )
   }
@@ -277,12 +237,13 @@ export function RecallSessionStage({
     if (loadMoreFetching) {
       return (
         <RecallSessionChrome>
-          <Box flexDirection="column">
-            <RecallSessionEscSpinner abortRef={activeOperationAbortRef} />
-            <Box>
-              <Spinner label="Loading more…" />
-            </Box>
-          </Box>
+          <AsyncAssistantFetchStage
+            spinnerLabel="Loading more…"
+            runAssistantMessage={runLoadMoreRecall}
+            onFetchSuccess={onLoadMoreFetchSuccess}
+            onSettled={onSettled}
+            onAbortWithError={handleLoadMoreAbort}
+          />
         </RecallSessionChrome>
       )
     }
@@ -303,27 +264,20 @@ export function RecallSessionStage({
   if (loadingNextQuestion) {
     return (
       <RecallSessionChrome>
-        <Box flexDirection="column">
-          <RecallSessionEscSpinner abortRef={activeOperationAbortRef} />
-          <Box>
-            <Spinner label={RECALL_LOADING_NEXT_QUESTION_LABEL} />
-          </Box>
-        </Box>
+        <AsyncAssistantFetchStage
+          key={nextQuestionLoadKey}
+          spinnerLabel={RECALL_LOADING_NEXT_QUESTION_LABEL}
+          runAssistantMessage={runLoadNextRecallCard}
+          onFetchSuccess={onNextQuestionFetchSuccess}
+          onSettled={onSettled}
+          onAbortWithError={handleNextQuestionAbort}
+        />
       </RecallSessionChrome>
     )
   }
 
   if (card === null) {
-    return (
-      <RecallSessionChrome>
-        <Box flexDirection="column">
-          <RecallSessionEscSpinner abortRef={activeOperationAbortRef} />
-          <Box>
-            <Spinner label="Loading recall…" />
-          </Box>
-        </Box>
-      </RecallSessionChrome>
-    )
+    return null
   }
 
   if (card.variant === 'mcq') {
@@ -370,34 +324,4 @@ export function RecallSessionStage({
       />
     </RecallSessionChrome>
   )
-}
-
-function RecallSessionEscSpinner({
-  abortRef,
-}: {
-  readonly abortRef: MutableRefObject<AbortController | null>
-}) {
-  const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
-  const handleStageInput = useCallback(
-    (input: string, key: Key) => {
-      const isEscape = key.escape === true || input === '\u001b'
-      if (!isEscape) return
-      abortRef.current?.abort()
-    },
-    [abortRef]
-  )
-
-  useLayoutEffect(() => {
-    if (setStageKeyHandler === undefined) return
-    setStageKeyHandler(handleStageInput)
-    return () => {
-      setStageKeyHandler(null)
-    }
-  }, [setStageKeyHandler, handleStageInput])
-
-  useInput(handleStageInput, {
-    isActive: setStageKeyHandler === undefined,
-  })
-
-  return null
 }
