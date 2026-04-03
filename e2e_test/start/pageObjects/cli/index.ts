@@ -1,4 +1,5 @@
 import { nonInteractiveOutput } from './outputAssertions'
+import { bookReadingCli } from './bookReadingCli'
 import { installation } from './execution'
 import { backend } from './backend'
 import { interactiveCli } from './interactiveCli'
@@ -17,6 +18,7 @@ export const cli = {
   nonInteractiveOutput,
   ttyAssertTerminal,
   interactiveCli,
+  bookReading: bookReadingCli,
   removeToken,
   installation,
   backend,

@@ -89,6 +89,16 @@ export function createCliE2ePluginTasks(repoRoot: string) {
     getMineruOutlineE2eStubScriptPath(): string {
       return join(repoRoot, 'e2e_test', 'scripts', 'mineru_outline_e2e_stub.py')
     },
+    getE2eFixtureAbsolutePath(relativePath: string): string {
+      const normalized = relativePath.replace(/^\/+/, '')
+      const p = join(repoRoot, 'e2e_test', 'fixtures', normalized)
+      if (!existsSync(p)) {
+        throw new Error(
+          `E2E fixture not found: ${p} (relative to e2e_test/fixtures: ${normalized})`
+        )
+      }
+      return p
+    },
     createCliConfigDir() {
       return mkdtempSync(join(tmpdir(), 'cypress-cli-config-'))
     },
