@@ -19,7 +19,7 @@ overrides:
   express: '>=5.2.0'
   systeminformation: '>=5.31.0'
   qs: '>=6.14.2'
-  hono: ^4.12.9
+  hono: ^4.12.10
   '@hono/node-server': '>=1.19.10'
   undici: '>=7.24.0'
   diff: '>=8.0.3'
@@ -75,8 +75,8 @@ importers:
         specifier: ^12.7.0
         version: 12.7.0
       '@hey-api/openapi-ts':
-        specifier: 0.94.5
-        version: 0.94.5(typescript@6.0.2)
+        specifier: 0.95.0
+        version: 0.95.0(typescript@6.0.2)
       '@mbtest/mountebank':
         specifier: 2.9.3
         version: 2.9.3
@@ -84,8 +84,8 @@ importers:
         specifier: ^1.29.0
         version: 1.29.0(zod@4.3.6)
       '@redocly/cli':
-        specifier: ^2.25.3
-        version: 2.25.3(@opentelemetry/api@1.9.0)(core-js@3.46.0)
+        specifier: ^2.25.4
+        version: 2.25.4(@opentelemetry/api@1.9.0)(core-js@3.46.0)
       '@testing-library/cypress':
         specifier: 10.1.0
         version: 10.1.0(cypress@15.13.0)
@@ -114,8 +114,8 @@ importers:
         specifier: ^15.0.0
         version: 15.0.0
       hono:
-        specifier: ^4.12.9
-        version: 4.12.9
+        specifier: ^4.12.10
+        version: 4.12.10
       npm-run-all2:
         specifier: ^8.0.4
         version: 8.0.4
@@ -1141,15 +1141,15 @@ packages:
     resolution: {integrity: sha512-7atnpUkT8TyUPHYPLk91j/GyaqMuwTEHanLOe50Dlx0EEvNuQqFD52Yjg8x4KU0UFL1mWlyhE+sUE/wAtQ1N2A==}
     engines: {node: '>=20.19.0'}
 
-  '@hey-api/openapi-ts@0.94.5':
-    resolution: {integrity: sha512-fCR/kIexbDarnt/WGKvjJb4K30JaFzO2F/528kHpyWT7vopPS0JeqtRQMjJg+Gk09N/05nbv1OaFOQXcy0BiVQ==}
+  '@hey-api/openapi-ts@0.95.0':
+    resolution: {integrity: sha512-lk5C+WKl5yqEmliQihEyhX/jNcWlAykTSEqkDeKa9xSq5YDAzOFvx7oos8YTqiIzdc4TemtlEaB8Rns7+8A0qg==}
     engines: {node: '>=20.19.0'}
     hasBin: true
     peerDependencies:
       typescript: '>=5.5.3 || >=6.0.0 || 6.0.1-rc'
 
-  '@hey-api/shared@0.2.6':
-    resolution: {integrity: sha512-ZZrsWbazJcJO688tJVEBeei03B4miPI7OauW+qLMYP/9KL6NadmA5MjqsIIwgfvb0HKMAR7lt4AINKzv0Zwdgw==}
+  '@hey-api/shared@0.3.0':
+    resolution: {integrity: sha512-G+4GPojdLEh9bUwRG88teMPM1HdqMm/IsJ38cbnNxhyDu1FkFGwilkA1EqnULCzfTam/ZoZkaLdmAd8xEh4Xsw==}
     engines: {node: '>=20.19.0'}
 
   '@hey-api/spec-types@0.1.0':
@@ -1162,7 +1162,7 @@ packages:
     resolution: {integrity: sha512-dr8/3zEaB+p0D2n/IUrlPF1HZm586qgJNXK1a9fhg/PzdtkK7Ksd5l312tJX2yBuALqDYBlG20QEbayqPyxn+g==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
-      hono: ^4.12.9
+      hono: ^4.12.10
 
   '@humanwhocodes/momoa@2.0.4':
     resolution: {integrity: sha512-RE815I4arJFtt+FVeU1Tgp9/Xvecacji8w/V6XtXsWWH/wz/eNkNbhb+ny/+PlVZjV0rxQpRSQKNKE3lcktHEA==}
@@ -1636,27 +1636,27 @@ packages:
   '@redocly/cli-otel@0.1.2':
     resolution: {integrity: sha512-Bg7BoO5t1x3lVK+KhA5aGPmeXpQmdf6WtTYHhelKJCsQ+tRMiJoFAQoKHoBHAoNxXrhlS3K9lKFLHGmtxsFQfA==}
 
-  '@redocly/cli@2.25.3':
-    resolution: {integrity: sha512-02wjApwJwGD+kGWRoiFVY0Hq960ydMAMHrK3AJH2LMiYNYcrzAr1FSbA3OSylvg2gx3w/r1r710B+iMz3KJKbw==}
+  '@redocly/cli@2.25.4':
+    resolution: {integrity: sha512-ypBv8ZhckTzcOfsFH2VILsLqk00bJ1tI0POtlaEf8z0rDsnmD8auUETkMzw8wlUB+aQM7+VSzpSsmcmqeSgzWQ==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
     hasBin: true
 
   '@redocly/config@0.22.0':
     resolution: {integrity: sha512-gAy93Ddo01Z3bHuVdPWfCwzgfaYgMdaZPcfL7JZ7hWJoK9V0lXDbigTWkhiPFAaLWzbOJ+kbUQG1+XwIm0KRGQ==}
 
-  '@redocly/config@0.45.0':
-    resolution: {integrity: sha512-V+wNusPQUaYV1c5s9iptfKQ2Ggno4bMeiyXdNILxqZS87gttwPfqlqHKHKFyz006voS3JsR295cbpx3GlsIxKg==}
+  '@redocly/config@0.46.0':
+    resolution: {integrity: sha512-FZEprNEkmLITKKdv5blIai1qiCcc4dn5+96AjWnmFQmH/oz/OyBiXBSi752/M+Wmype7aH2uRywSCuYlu4CgVA==}
 
   '@redocly/openapi-core@1.34.8':
     resolution: {integrity: sha512-/oy8sXi5xK4+HvcFR7xS1A74zJ5aS6rtacNEr91SczLqvtxz79opxp7yYpdYtfGQAp6igx9eU9alwSC/R/X3Cg==}
     engines: {node: '>=18.17.0', npm: '>=9.5.0'}
 
-  '@redocly/openapi-core@2.25.3':
-    resolution: {integrity: sha512-GIu3Mdym5IDIPCvXTzMZ6TQw/+7sKd52PdysxNVe7zBk22ExSGnVE9UAk9BaLOzXT77PJWDUwaimBdJoPpxHMA==}
+  '@redocly/openapi-core@2.25.4':
+    resolution: {integrity: sha512-zYdKQEsowPNtkTixrfbn5DySWBLQpTsISthVBBEPAa3OZC75UI76CbHXEamJ8Kmlead9IkD5RbgeJvxqJ5/H6Q==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
-  '@redocly/respect-core@2.25.3':
-    resolution: {integrity: sha512-07m80JYdp7J7kH4D1Vqdpa2ZBFCv3QAwCoh2w9H3OjuT/rXQkBSkJQm1n70fzO/HuUf4azzULdp2XnsIpxP2qw==}
+  '@redocly/respect-core@2.25.4':
+    resolution: {integrity: sha512-0xMbcSft+9Q2sO1wSJMxo510Aqc/kGF/AmUK3OaLQvGvKUgOqq2Op/0aorNQJk6s8WBEH4UN4eFt7fUzUeXs8g==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
   '@rolldown/binding-android-arm64@1.0.0-rc.12':
@@ -3742,8 +3742,8 @@ packages:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
 
-  hono@4.12.9:
-    resolution: {integrity: sha512-wy3T8Zm2bsEvxKZM5w21VdHDDcwVS1yUFFY6i8UobSsKfFceT7TOwhbhfKsDyx7tYQlmRM5FLpIuYvNFyjctiA==}
+  hono@4.12.10:
+    resolution: {integrity: sha512-mx/p18PLy5og9ufies2GOSUqep98Td9q4i/EF6X7yJgAiIopxqdfIO3jbqsi3jRgTgw88jMDEzVKi+V2EF+27w==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -7640,11 +7640,11 @@ snapshots:
       '@types/json-schema': 7.0.15
       js-yaml: 4.1.1
 
-  '@hey-api/openapi-ts@0.94.5(typescript@6.0.2)':
+  '@hey-api/openapi-ts@0.95.0(typescript@6.0.2)':
     dependencies:
       '@hey-api/codegen-core': 0.7.4
       '@hey-api/json-schema-ref-parser': 1.3.1
-      '@hey-api/shared': 0.2.6
+      '@hey-api/shared': 0.3.0
       '@hey-api/spec-types': 0.1.0
       '@hey-api/types': 0.1.4
       ansi-colors: 4.1.3
@@ -7655,7 +7655,7 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
-  '@hey-api/shared@0.2.6':
+  '@hey-api/shared@0.3.0':
     dependencies:
       '@hey-api/codegen-core': 0.7.4
       '@hey-api/json-schema-ref-parser': 1.3.1
@@ -7674,9 +7674,9 @@ snapshots:
 
   '@hey-api/types@0.1.4': {}
 
-  '@hono/node-server@1.19.11(hono@4.12.9)':
+  '@hono/node-server@1.19.11(hono@4.12.10)':
     dependencies:
-      hono: 4.12.9
+      hono: 4.12.10
 
   '@humanwhocodes/momoa@2.0.4': {}
 
@@ -7914,7 +7914,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.29.0(zod@4.3.6)':
     dependencies:
-      '@hono/node-server': 1.19.11(hono@4.12.9)
+      '@hono/node-server': 1.19.11(hono@4.12.10)
       ajv: 8.18.0
       ajv-formats: 3.0.1(ajv@8.18.0)
       content-type: 1.0.5
@@ -7924,7 +7924,7 @@ snapshots:
       eventsource-parser: 3.0.6
       express: 5.2.1
       express-rate-limit: 8.3.0(express@5.2.1)
-      hono: 4.12.9
+      hono: 4.12.10
       jose: 6.1.3
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -8143,15 +8143,15 @@ snapshots:
     dependencies:
       ulid: 2.4.0
 
-  '@redocly/cli@2.25.3(@opentelemetry/api@1.9.0)(core-js@3.46.0)':
+  '@redocly/cli@2.25.4(@opentelemetry/api@1.9.0)(core-js@3.46.0)':
     dependencies:
       '@opentelemetry/exporter-trace-otlp-http': 0.202.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/resources': 2.0.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-node': 2.0.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.34.0
       '@redocly/cli-otel': 0.1.2
-      '@redocly/openapi-core': 2.25.3
-      '@redocly/respect-core': 2.25.3
+      '@redocly/openapi-core': 2.25.4
+      '@redocly/respect-core': 2.25.4
       abort-controller: 3.0.0
       ajv: 8.18.0
       ajv-formats: 3.0.1(ajv@8.18.0)
@@ -8185,7 +8185,7 @@ snapshots:
 
   '@redocly/config@0.22.0': {}
 
-  '@redocly/config@0.45.0':
+  '@redocly/config@0.46.0':
     dependencies:
       json-schema-to-ts: 2.7.2
 
@@ -8203,10 +8203,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@redocly/openapi-core@2.25.3':
+  '@redocly/openapi-core@2.25.4':
     dependencies:
       '@redocly/ajv': 8.18.0
-      '@redocly/config': 0.45.0
+      '@redocly/config': 0.46.0
       ajv: 8.18.0
       ajv-formats: 3.0.1(ajv@8.18.0)
       colorette: 1.4.0
@@ -8216,12 +8216,12 @@ snapshots:
       pluralize: 8.0.0
       yaml-ast-parser: 0.0.43
 
-  '@redocly/respect-core@2.25.3':
+  '@redocly/respect-core@2.25.4':
     dependencies:
       '@faker-js/faker': 7.6.0
       '@noble/hashes': 1.8.0
       '@redocly/ajv': 8.18.0
-      '@redocly/openapi-core': 2.25.3
+      '@redocly/openapi-core': 2.25.4
       ajv: 8.18.0
       better-ajv-errors: 1.2.0(ajv@8.18.0)
       colorette: 2.0.20
@@ -10620,7 +10620,7 @@ snapshots:
 
   he@1.2.0: {}
 
-  hono@4.12.9: {}
+  hono@4.12.10: {}
 
   hookable@5.5.3: {}
 
