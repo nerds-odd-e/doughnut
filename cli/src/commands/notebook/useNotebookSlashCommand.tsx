@@ -14,6 +14,7 @@ import type {
   InteractiveSlashCommand,
   InteractiveSlashCommandStageProps,
 } from '../interactiveSlashCommand.js'
+import type { ResolvedInteractiveSlashCommand } from '../interactiveSlashCommands.js'
 import { notebookStageSlashCommands } from './notebookStageSlashCommands.js'
 
 const STAGE_PLACEHOLDER = '`/exit` to leave notebook context.'
@@ -29,36 +30,17 @@ function invokeNotebookStageRunCommand(cmd: InteractiveSlashCommand): string {
   return out.assistantMessage
 }
 
-function dispatchNotebookCommittedLine(
+function dispatchNotebookUncommittedLine(
   line: string,
   {
-    appendScrollbackItem,
     appendScrollbackItems,
-  }: Pick<
-    SessionScrollbackAppendApi,
-    'appendScrollbackItem' | 'appendScrollbackItems'
-  >,
-  onSettled: (text: string) => void
+  }: Pick<SessionScrollbackAppendApi, 'appendScrollbackItems'>
 ) {
   if (line === '') return
-  const userItem = transcriptUserLine(line)
-  if (line === 'exit') {
-    const leaveCmd = notebookStageSlashCommands.find(
-      (c) => c.literal === '/exit'
-    )
-    if (leaveCmd === undefined) return
-    appendScrollbackItem(userItem)
-    onSettled(invokeNotebookStageRunCommand(leaveCmd))
-    return
-  }
-  for (const cmd of notebookStageSlashCommands) {
-    if ('run' in cmd && line === cmd.literal) {
-      appendScrollbackItem(userItem)
-      onSettled(invokeNotebookStageRunCommand(cmd))
-      return
-    }
-  }
-  appendScrollbackItems([userItem, transcriptAssistantError('Not supported')])
+  appendScrollbackItems([
+    transcriptUserLine(line),
+    transcriptAssistantError('Not supported'),
+  ])
 }
 
 function UseNotebookStage({
@@ -69,21 +51,27 @@ function UseNotebookStage({
   const { appendScrollbackItem, appendScrollbackItems } =
     useSessionScrollbackAppend()
 
+  const onCommittedCommand = useCallback(
+    (resolved: ResolvedInteractiveSlashCommand) => {
+      const userItem = transcriptUserLine(resolved.line)
+      appendScrollbackItem(userItem)
+      onSettled(invokeNotebookStageRunCommand(resolved.command))
+    },
+    [appendScrollbackItem, onSettled]
+  )
+
   const onCommittedLine = useCallback(
     (line: string) => {
-      dispatchNotebookCommittedLine(
-        line.trim(),
-        { appendScrollbackItem, appendScrollbackItems },
-        onSettled
-      )
+      dispatchNotebookUncommittedLine(line.trim(), { appendScrollbackItems })
     },
-    [appendScrollbackItem, appendScrollbackItems, onSettled]
+    [appendScrollbackItems]
   )
 
   return (
     <Box flexDirection="column">
       <Text>Active notebook: {title}</Text>
       <MainInteractivePrompt
+        onCommittedCommand={onCommittedCommand}
         onCommittedLine={onCommittedLine}
         isActive
         slashCommands={notebookStageSlashCommands}

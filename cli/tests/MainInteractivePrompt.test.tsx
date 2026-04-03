@@ -61,6 +61,7 @@ async function renderMainInteractivePrompt(
 ) {
   const result = render(
     <MainInteractivePrompt
+      onCommittedCommand={() => undefined}
       onCommittedLine={onCommittedLine}
       slashCommands={interactiveSlashCommands}
       placeholder={MAIN_PROMPT_PLACEHOLDER}

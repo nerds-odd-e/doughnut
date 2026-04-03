@@ -12,7 +12,6 @@ import { Box, useApp, useInput, useStdout } from 'ink'
 import { MainInteractivePrompt } from './mainInteractivePrompt/index.js'
 import {
   interactiveSlashCommands,
-  resolveInteractiveSlashCommand,
   type ResolvedInteractiveSlashCommand,
 } from './commands/interactiveSlashCommands.js'
 import type { InteractiveSlashCommandStageProps } from './commands/interactiveSlashCommand.js'
@@ -218,22 +217,13 @@ export function InteractiveCliApp() {
     })
   }
 
-  const onCommittedLine = useCallback(
-    (line: string) => {
-      const resolved = resolveInteractiveSlashCommand(line)
-      if (!resolved) {
-        if (line.startsWith('/')) {
-          commitUserLineWithAssistant(line, 'unsupported command', true)
-          return
-        }
-        commitUserLineWithAssistant(line, 'Not supported', true)
-        return
-      }
-
-      onCommittedCommand(resolved)
-    },
-    [onCommittedCommand]
-  )
+  const onCommittedLine = useCallback((line: string) => {
+    if (line.startsWith('/')) {
+      commitUserLineWithAssistant(line, 'unsupported command', true)
+      return
+    }
+    commitUserLineWithAssistant(line, 'Not supported', true)
+  }, [])
 
   const scrollbackAppendApi = useMemo(
     () => ({ appendScrollbackItem, appendScrollbackItems }),
@@ -265,6 +255,7 @@ export function InteractiveCliApp() {
           )}
           {!exitAfterCommit && (
             <MainInteractivePrompt
+              onCommittedCommand={onCommittedCommand}
               onCommittedLine={onCommittedLine}
               isActive={!activeSlashStage}
               slashCommands={interactiveSlashCommands}

@@ -27,13 +27,21 @@ import {
   slashGuidanceForInk,
 } from './slashCommandCompletion.js'
 import type { InteractiveSlashCommand } from '../commands/interactiveSlashCommand.js'
+import {
+  resolveInteractiveSlashCommand,
+  type ResolvedInteractiveSlashCommand,
+} from '../commands/interactiveSlashCommands.js'
 
 export function MainInteractivePrompt({
+  onCommittedCommand,
   onCommittedLine,
   isActive = true,
   slashCommands,
   placeholder,
 }: {
+  readonly onCommittedCommand: (
+    resolved: ResolvedInteractiveSlashCommand
+  ) => void
   readonly onCommittedLine: (line: string) => void
   readonly isActive?: boolean
   /** Tab / `/` list / picks use this registry. */
@@ -52,10 +60,15 @@ export function MainInteractivePrompt({
   const caretRef = useRef(0)
   const slashHighlightRef = useRef(0)
   const suggestionsDismissedRef = useRef(false)
+  const onCommittedCommandRef = useRef(onCommittedCommand)
   const onCommittedLineRef = useRef(onCommittedLine)
   const historyLinesRef = useRef<string[]>([])
   const historyWalkIndexRef = useRef<number | null>(null)
   const draftBeforeWalkRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    onCommittedCommandRef.current = onCommittedCommand
+  }, [onCommittedCommand])
 
   useEffect(() => {
     onCommittedLineRef.current = onCommittedLine
@@ -138,6 +151,16 @@ export function MainInteractivePrompt({
         }
       }
 
+      const dispatchCommitted = (line: string) => {
+        if (line === '') return
+        const resolved = resolveInteractiveSlashCommand(line, slashCommands)
+        if (resolved !== undefined) {
+          onCommittedCommandRef.current(resolved)
+        } else {
+          onCommittedLineRef.current(line)
+        }
+      }
+
       const commitLine = () => {
         const line = readBuf()
         historyLinesRef.current = appendUserInputHistoryLine(
@@ -148,9 +171,7 @@ export function MainInteractivePrompt({
         historyWalkIndexRef.current = null
         draftBeforeWalkRef.current = null
         setAll('', 0, 0)
-        if (line !== '') {
-          onCommittedLineRef.current(line)
-        }
+        dispatchCommitted(line)
       }
 
       // --- Slash completion: Tab ---
@@ -313,7 +334,7 @@ export function MainInteractivePrompt({
             historyWalkIndexRef.current = null
             draftBeforeWalkRef.current = null
             setAll('', 0, 0)
-            if (line !== '') onCommittedLineRef.current(line)
+            if (line !== '') dispatchCommitted(line)
             curBuf = ''
             c = 0
             if (input[i + 1] === '\n') i++
@@ -329,7 +350,7 @@ export function MainInteractivePrompt({
             historyWalkIndexRef.current = null
             draftBeforeWalkRef.current = null
             setAll('', 0, 0)
-            if (line !== '') onCommittedLineRef.current(line)
+            if (line !== '') dispatchCommitted(line)
             curBuf = ''
             c = 0
             continue
