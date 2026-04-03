@@ -7,7 +7,6 @@ import { useMemo } from 'react'
 import stringWidth from 'string-width'
 import { Box, Text, useStdout } from 'ink'
 import {
-  SLASH_GUIDANCE_USAGE_COL_CAP,
   padSlashListUsageColumn,
   slashGuidanceUsageColumnWidth,
 } from '../mainInteractivePrompt/slashCommandCompletion.js'
@@ -217,6 +216,7 @@ function SlashGuidanceListInk({
     const optionRows = display.filter((r) => r.kind === 'option')
     const fixed = 4
     const rowInner = Math.max(0, termCols - fixed)
+    const slashGuidanceUsageColCap = 26
     const minDescCols = 8
     const maxUsageW = optionRows.reduce(
       (m, r) => Math.max(m, stringWidth(r.usage)),
@@ -224,14 +224,14 @@ function SlashGuidanceListInk({
     )
     const alignW = slashGuidanceUsageColumnWidth(
       optionRows,
-      SLASH_GUIDANCE_USAGE_COL_CAP
+      slashGuidanceUsageColCap
     )
     let usageCol = Math.min(maxUsageW, Math.max(0, rowInner - minDescCols))
     if (alignW > 0) {
       usageCol = Math.max(usageCol, alignW)
     }
     if (usageCol === 0 && rowInner > minDescCols) {
-      usageCol = Math.min(SLASH_GUIDANCE_USAGE_COL_CAP, rowInner - minDescCols)
+      usageCol = Math.min(slashGuidanceUsageColCap, rowInner - minDescCols)
     }
     usageCol = Math.min(usageCol, rowInner)
     let desc = rowInner - usageCol

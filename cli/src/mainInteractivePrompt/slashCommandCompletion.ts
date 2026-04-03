@@ -9,9 +9,6 @@ import type { InteractiveSlashCommand } from '../commands/interactiveSlashComman
 
 export const DEFAULT_INTERACTIVE_GUIDANCE = '/ commands'
 
-/** Wider usages are not padded; descriptions start after the full usage. */
-export const SLASH_GUIDANCE_USAGE_COL_CAP = 26
-
 type SlashCompletionListRow = {
   readonly usage: string
   readonly description: string
