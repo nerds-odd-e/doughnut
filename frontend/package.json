@@ -50,7 +50,7 @@
     "daisyui": "4.12.24",
     "doughnut-test-fixtures": "workspace:*",
     "es-toolkit": "^1.45.1",
-    "esbuild": "0.27.5",
+    "esbuild": "0.28.0",
     "gsap": "^3.14.2",
     "marked": "^17.0.5",
     "optionator": "^0.9.4",
