@@ -34,20 +34,31 @@ const interactiveSlashCommandByLiteral = new Map<
   InteractiveSlashCommand
 >(interactiveSlashCommands.map((c) => [c.literal.slice(1), c] as const))
 
-type ResolvedInteractiveSlashCommand = {
+export type ResolvedInteractiveSlashCommand = {
   command: InteractiveSlashCommand
   argument: string | undefined
+  /** Full committed input line (e.g. `/help`, `exit`) for transcript display. */
+  line: string
 }
 
 /**
  * @param body - Same string the resolver uses for lookup: after `/` when the user committed a
  *   slash command, or the full committed line when they did not (e.g. `exit`).
+ * @param line - Full committed input line; echoed on {@link ResolvedInteractiveSlashCommand.line}.
  */
 export function resolveInteractiveSlashCommand(
-  body: string
+  line: string
 ): ResolvedInteractiveSlashCommand | undefined {
+  const body = line.startsWith('/')
+    ? line.slice(1)
+    : line.trim() === 'exit'
+      ? 'exit'
+      : undefined
+
+  if (body === undefined) return undefined
+
   const exact = interactiveSlashCommandByLiteral.get(body)
-  if (exact) return { command: exact, argument: undefined }
+  if (exact) return { command: exact, argument: undefined, line }
 
   const prefix = [...interactiveSlashCommands]
     .sort((a, b) => b.literal.length - a.literal.length)
@@ -59,5 +70,6 @@ export function resolveInteractiveSlashCommand(
   return {
     command: prefix,
     argument: rest === '' ? undefined : rest,
+    line,
   }
 }

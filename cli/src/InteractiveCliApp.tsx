@@ -13,6 +13,7 @@ import { MainInteractivePrompt } from './mainInteractivePrompt/index.js'
 import {
   interactiveSlashCommands,
   resolveInteractiveSlashCommand,
+  type ResolvedInteractiveSlashCommand,
 } from './commands/interactiveSlashCommands.js'
 import type { InteractiveSlashCommandStageProps } from './commands/interactiveSlashCommand.js'
 import { formatVersionOutput } from './commands/version.js'
@@ -137,11 +138,8 @@ export function InteractiveCliApp() {
   )
 
   const onCommittedCommand = useCallback(
-    (
-      line: string,
-      resolved: NonNullable<ReturnType<typeof resolveInteractiveSlashCommand>>
-    ) => {
-      const { command, argument } = resolved
+    (resolved: ResolvedInteractiveSlashCommand) => {
+      const { command, argument, line } = resolved
       const user = transcriptUserLine(line)
       setScrollbackItems((prev) => [
         ...prev,
@@ -205,46 +203,34 @@ export function InteractiveCliApp() {
     []
   )
 
+  const commitUserLineWithAssistant = (
+    userLine: string,
+    assistantText: string,
+    isError = false
+  ) => {
+    const user = transcriptUserLine(userLine)
+    const assistant = isError
+      ? transcriptAssistantError(assistantText)
+      : transcriptAssistantText(assistantText)
+    setScrollbackItems((prev) => {
+      const withUser = [...prev, withLeadingGapAfterUserIfNeeded(prev, user)]
+      return [...withUser, withLeadingGapAfterUserIfNeeded(withUser, assistant)]
+    })
+  }
+
   const onCommittedLine = useCallback(
     (line: string) => {
-      const commitUserLineWithAssistant = (
-        assistantText: string,
-        isError = false
-      ) => {
-        const user = transcriptUserLine(line)
-        const assistant = isError
-          ? transcriptAssistantError(assistantText)
-          : transcriptAssistantText(assistantText)
-        setScrollbackItems((prev) => {
-          const withUser = [
-            ...prev,
-            withLeadingGapAfterUserIfNeeded(prev, user),
-          ]
-          return [
-            ...withUser,
-            withLeadingGapAfterUserIfNeeded(withUser, assistant),
-          ]
-        })
-      }
-
-      const lineOfCommand = line.startsWith('/')
-        ? line.slice(1)
-        : line.trim() === 'exit'
-          ? 'exit'
-          : undefined
-
-      if (!lineOfCommand) {
-        commitUserLineWithAssistant('Not supported', true)
-        return
-      }
-
-      const resolved = resolveInteractiveSlashCommand(lineOfCommand)
+      const resolved = resolveInteractiveSlashCommand(line)
       if (!resolved) {
-        commitUserLineWithAssistant('unsupported command', true)
+        if (line.startsWith('/')) {
+          commitUserLineWithAssistant(line, 'unsupported command', true)
+          return
+        }
+        commitUserLineWithAssistant(line, 'Not supported', true)
         return
       }
 
-      onCommittedCommand(line, resolved)
+      onCommittedCommand(resolved)
     },
     [onCommittedCommand]
   )
