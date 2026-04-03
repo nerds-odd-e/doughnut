@@ -12,17 +12,15 @@
 
 ---
 
-## Phase 1 — `/use <notebook>`: active notebook in the CLI
+## Phase 1 — `/use <notebook>`: active notebook in the CLI — **done**
 
-**User outcome:** In interactive CLI, the user can run `/use Top Maths` (or similar) and get a clear assistant confirmation that **this notebook is now the target** for subsequent book commands. Errors when the notebook does not exist or the user lacks access are user-visible and consistent with existing CLI error patterns.
+**User outcome:** In interactive CLI, the user can run `/use Top Maths` (or similar) and get a clear assistant confirmation that **this notebook is now the target** for subsequent book commands run **from the notebook stage**. Errors when the notebook does not exist or the user lacks access are user-visible and consistent with existing CLI error patterns.
 
-**Shipped CLI details (interactive):** `/use` accepts an **optional** title; **without** a title it opens a **notebook picker** (↑/↓, Enter, Esc). The picker supports **type-to-filter** on titles (**case-insensitive substring**). With a title, resolution is **exact case-sensitive** match against `myNotebooks`. Sub-phase checklist: [book-reading-phase-1-subphases.md](book-reading-phase-1-subphases.md).
+**Shipped CLI details (interactive):** `/use` accepts an **optional** title; **without** a title it opens a **notebook picker** (↑/↓, Enter, Esc). The picker supports **type-to-filter** on titles (**case-insensitive substring**). With a title, resolution is **exact case-sensitive** match against `myNotebooks`. The resolved notebook is **only in memory for the notebook stage**—there is **no** file-backed or cross-session persistence; leaving the stage (`/exit`) clears that context. **`/attach`** (Phase 3) is a **notebook-stage sub-command**, not a top-level slash command.
 
-**Implementation notes (non-prescriptive):** Persist the selection for the CLI session and/or the same persistence mechanism other CLI context uses (e.g. file-backed state), so `/attach` does not require repeating the notebook name every time. Resolve notebook by **title or stable id**—pick one rule and document it in command help.
+**Tests:** CLI coverage via **`runInteractive`** / Vitest: happy path, picker, filter, not-found / unauthorized, and related paths. No Cypress for this phase (web app untouched).
 
-**Tests:** Extend CLI coverage through **`runInteractive`** (or equivalent entry point): happy path + not-found / unauthorized. No need for Cypress in this phase if the web app is untouched.
-
-**Phase complete when:** `/use` works end-to-end in the CLI with tests green; no dead code.
+**Phase complete:** Delivered; `pnpm cli:test` green.
 
 ---
 
@@ -45,7 +43,7 @@
 
 ## Phase 3 — `/attach <pdf>`: parse locally, upload to Doughnut
 
-**User outcome:** After `/use` has set the active notebook, `/attach path/to/book.pdf` runs the **existing local PDF outline pipeline** (same family as `/read` / `runMineruOutlineSubprocess`), then **uploads** the file + structured outline to the backend so the book is **stored on that notebook**. Assistant message confirms success (and surfaces actionable failures: missing file, MinerU/Python errors, network/auth errors).
+**User outcome:** From the **notebook stage** (after `/use` has chosen the notebook), `/attach path/to/book.pdf` runs the **existing local PDF outline pipeline** (same family as `/read` / `runMineruOutlineSubprocess`), then **uploads** the file + structured outline to the backend so the book is **stored on that notebook**. Assistant message confirms success (and surfaces actionable failures: missing file, MinerU/Python errors, network/auth errors).
 
 **Implementation notes:** Factor shared “outline extraction” so `/read` and `/attach` do not fork incompatible logic. Respect env knobs already used for PDF caps (e.g. `DOUGHNUT_READ_PDF_END_PAGE`) or introduce attach-specific documented limits if product needs them.
 
