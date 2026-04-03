@@ -3,7 +3,7 @@ import { Fragment, type ReactNode } from 'react'
 
 /**
  * Scrollback entries are pre-rendered Ink trees. Optional `endsWithUserLine` is only for
- * `InteractiveCliApp` append spacing (user block → following row); `<Static>` ignores it.
+ * session scrollback append spacing (user block → following row); `<Static>` ignores it.
  */
 export type SessionScrollbackItem = {
   readonly id: string
