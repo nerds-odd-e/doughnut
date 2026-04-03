@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Box, Text } from 'ink'
 import {
   NotebookController,
@@ -23,10 +23,13 @@ import {
   leaveNotebookStageSlashCommand,
   notebookStageSlashCommands,
 } from './notebookStageSlashCommands.js'
+import { UseNotebookPickerStage } from './useNotebookPickerStage.js'
 
 const STAGE_PLACEHOLDER = '`/exit` to leave notebook context.'
 
 const NOTEBOOK_NOT_FOUND = 'No notebook found with that title.'
+
+const NO_NOTEBOOKS_MESSAGE = 'No notebooks found.'
 
 function UseNotebookActiveShell({
   notebook,
@@ -75,13 +78,11 @@ function UseNotebookStage({
   const [resolvedNotebook, setResolvedNotebook] = useState<Notebook | null>(
     null
   )
+  const [pickerNotebooks, setPickerNotebooks] = useState<Notebook[] | null>(
+    null
+  )
   const resolvedNotebookRef = useRef<Notebook | null>(null)
-
-  useEffect(() => {
-    if (title === '') {
-      onAbortWithError('No notebook title given.')
-    }
-  }, [title, onAbortWithError])
+  const pickerListRef = useRef<Notebook[]>([])
 
   const runResolveNotebook = useCallback(
     async (signal: AbortSignal) => {
@@ -106,11 +107,28 @@ function UseNotebookStage({
     [title]
   )
 
-  const handleFetchSuccess = useCallback(() => {
+  const handleFetchSuccessTitled = useCallback(() => {
     const next = resolvedNotebookRef.current
     if (next !== null) {
       setResolvedNotebook(next)
     }
+  }, [])
+
+  const runLoadPickerList = useCallback(async (signal: AbortSignal) => {
+    const view = await runDefaultBackendJson<NotebooksViewedByUser>(() =>
+      NotebookController.myNotebooks({
+        ...doughnutSdkOptions(signal),
+      })
+    )
+    if (view.notebooks.length === 0) {
+      throw new Error(NO_NOTEBOOKS_MESSAGE)
+    }
+    pickerListRef.current = view.notebooks
+    return ''
+  }, [])
+
+  const handlePickerListSuccess = useCallback(() => {
+    setPickerNotebooks(pickerListRef.current)
   }, [])
 
   if (resolvedNotebook !== null) {
@@ -123,14 +141,31 @@ function UseNotebookStage({
   }
 
   if (title === '') {
-    return null
+    if (pickerNotebooks === null) {
+      return (
+        <AsyncAssistantFetchStage
+          spinnerLabel="Loading notebooks…"
+          runAssistantMessage={runLoadPickerList}
+          onFetchSuccess={handlePickerListSuccess}
+          onSettled={onSettled}
+          onAbortWithError={onAbortWithError}
+        />
+      )
+    }
+    return (
+      <UseNotebookPickerStage
+        notebooks={pickerNotebooks}
+        onPick={setResolvedNotebook}
+        onSettled={onSettled}
+      />
+    )
   }
 
   return (
     <AsyncAssistantFetchStage
       spinnerLabel="Loading notebooks…"
       runAssistantMessage={runResolveNotebook}
-      onFetchSuccess={handleFetchSuccess}
+      onFetchSuccess={handleFetchSuccessTitled}
       onSettled={onSettled}
       onAbortWithError={onAbortWithError}
     />
@@ -139,15 +174,15 @@ function UseNotebookStage({
 
 const useNotebookDoc: CommandDoc = {
   name: '/use',
-  usage: '/use <notebook title>',
+  usage: '/use [<notebook title>]',
   description:
-    'Set the active notebook for book commands. Title must match one of your notebooks exactly (case-sensitive). Not found, auth, and network errors are shown as assistant errors.',
+    'Set the active notebook for book commands. Run without a title to pick from a list. With a title, it must match one of your notebooks exactly (case-sensitive). Not found, auth, and network errors are shown as assistant errors.',
 }
 
 export const useNotebookSlashCommand: InteractiveSlashCommand = {
   literal: '/use',
   doc: useNotebookDoc,
-  argument: { name: 'notebook title', optional: false },
+  argument: { name: 'notebook title', optional: true },
   stageComponent: UseNotebookStage,
   stageIndicator: 'Notebook',
 }

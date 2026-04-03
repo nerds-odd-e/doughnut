@@ -27,7 +27,7 @@ function notebookWithTitle(title: string) {
   return makeMe.aNotebook.headNote(makeMe.aNote.title(title).please()).do()
 }
 
-function UseNotebookStageTestShell(props: { readonly argument: string }) {
+function UseNotebookStageTestShell(props: { readonly argument?: string }) {
   const { argument } = props
   const [stageOpen, setStageOpen] = useState(true)
   const { stdout } = useStdout()
@@ -73,7 +73,7 @@ function UseNotebookStageTestShell(props: { readonly argument: string }) {
   )
 }
 
-function notebookStageTestAppElement(argument: string) {
+function notebookStageTestAppElement(argument?: string) {
   return (
     <SessionScrollbackSessionProvider initialItems={[]}>
       <StageKeyRoot>
@@ -99,6 +99,16 @@ async function renderNotebookStageWhenPromptReady(notebookArgument: string) {
       (f.includes('>') && !f.includes('> |')),
   })
   return { ...result, ...extendInkRenderForInteractiveTests(result) }
+}
+
+async function renderNotebookStageWhenPickerVisible() {
+  const result = render(notebookStageTestAppElement(undefined))
+  const extended = extendInkRenderForInteractiveTests(result)
+  await waitForFrames(
+    () => stripAnsi(result.frames.join('\n')),
+    (c) => c.includes('Pick a notebook')
+  )
+  return { ...result, ...extended }
 }
 
 describe('useNotebookSlashCommand stage', () => {
@@ -222,5 +232,72 @@ describe('useNotebookSlashCommand stage', () => {
 
     await waitForFramesToInclude('Multiple notebooks match')
     await waitForFramesToInclude('Same')
+  })
+
+  test('bare /use shows picker; Enter selects first notebook', async () => {
+    myNotebooksSpy.mockResolvedValue({
+      data: {
+        notebooks: [notebookWithTitle('Alpha'), notebookWithTitle('Beta')],
+      },
+    } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
+
+    const { stdin, waitForFramesToInclude } =
+      await renderNotebookStageWhenPickerVisible()
+
+    stdin.write('\r')
+    await waitForFramesToInclude('Active notebook: Alpha')
+  })
+
+  test('bare /use picker: Down + Enter selects second notebook', async () => {
+    myNotebooksSpy.mockResolvedValue({
+      data: {
+        notebooks: [notebookWithTitle('Alpha'), notebookWithTitle('Beta')],
+      },
+    } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
+
+    const { stdin, waitForFramesToInclude } =
+      await renderNotebookStageWhenPickerVisible()
+
+    stdin.write('\u001b[B')
+    for (let i = 0; i < 10; i += 1) {
+      await new Promise<void>((resolve) => {
+        setImmediate(resolve)
+      })
+    }
+    stdin.write('\r')
+    await waitForFramesToInclude('Active notebook: Beta')
+  })
+
+  test('bare /use with empty notebook list shows error', async () => {
+    myNotebooksSpy.mockResolvedValue({
+      data: { notebooks: [] },
+    } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
+
+    const result = render(notebookStageTestAppElement(undefined))
+    const { waitForFramesToInclude } = {
+      ...result,
+      ...extendInkRenderForInteractiveTests(result),
+    }
+
+    await waitForFramesToInclude('No notebooks found.')
+  })
+
+  test('bare /use Esc on picker settles Cancelled', async () => {
+    myNotebooksSpy.mockResolvedValue({
+      data: {
+        notebooks: [notebookWithTitle('Alpha'), notebookWithTitle('Beta')],
+      },
+    } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
+
+    const { stdin, frames, waitForFramesToInclude } =
+      await renderNotebookStageWhenPickerVisible()
+
+    await pressEscapeAndWait(
+      stdin,
+      () => frames.join('\n'),
+      (c) => stripAnsi(c).includes('Cancelled.')
+    )
+
+    await waitForFramesToInclude('Cancelled.')
   })
 })
