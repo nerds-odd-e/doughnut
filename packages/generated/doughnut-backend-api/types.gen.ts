@@ -608,16 +608,6 @@ export type NotebooksViewedByUser = {
     subscriptions?: Array<Subscription>;
 };
 
-export type BookSummary = {
-    id: number;
-    bookName: string;
-    format: string;
-    sourceFileRef?: string;
-    createdAt?: string;
-    updatedAt?: string;
-    notebookId?: string;
-};
-
 export type NotebookCertificateApprovalDto = {
     approval?: NotebookCertificateApproval;
 };
@@ -2965,32 +2955,13 @@ export type MyNotebooksResponses = {
 
 export type MyNotebooksResponse = MyNotebooksResponses[keyof MyNotebooksResponses];
 
-export type ListBooksData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/books';
-};
-
-export type ListBooksResponses = {
-    /**
-     * OK
-     */
-    200: Array<BookSummary>;
-};
-
-export type ListBooksResponse = ListBooksResponses[keyof ListBooksResponses];
-
 export type GetBookData = {
     body?: never;
     path: {
         notebook: number;
-        book: number;
     };
     query?: never;
-    url: '/api/notebooks/{notebook}/books/{book}';
+    url: '/api/notebooks/{notebook}/book';
 };
 
 export type GetBookResponses = {

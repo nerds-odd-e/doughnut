@@ -2447,38 +2447,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebooksViewedByUser"
-  /api/notebooks/{notebook}/books:
-    get:
-      tags:
-      - notebook-books-controller
-      operationId: listBooks
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Book_Summary"
-  /api/notebooks/{notebook}/books/{book}:
+  /api/notebooks/{notebook}/book:
     get:
       tags:
       - notebook-books-controller
       operationId: getBook
       parameters:
       - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: book
         in: path
         required: true
         schema:
@@ -4294,30 +4269,6 @@ components:
             $ref: "#/components/schemas/Subscription"
       required:
       - notebooks
-    Book_Summary:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        bookName:
-          type: string
-        format:
-          type: string
-        sourceFileRef:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-        notebookId:
-          type: string
-      required:
-      - bookName
-      - format
-      - id
     NotebookCertificateApprovalDTO:
       type: object
       properties:

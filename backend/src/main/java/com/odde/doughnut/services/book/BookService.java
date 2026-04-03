@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookAnchor;
 import com.odde.doughnut.entities.BookRange;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.repositories.BookRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
@@ -22,10 +23,15 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class BookService {
 
+  private final BookRepository bookRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
 
-  public BookService(EntityPersister entityPersister, TestabilitySettings testabilitySettings) {
+  public BookService(
+      BookRepository bookRepository,
+      EntityPersister entityPersister,
+      TestabilitySettings testabilitySettings) {
+    this.bookRepository = bookRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
   }
@@ -33,6 +39,10 @@ public class BookService {
   @Transactional
   public Book attachBook(Notebook notebook, AttachBookRequest request) {
     validateAttachRequest(request);
+    if (bookRepository.findByNotebook_Id(notebook.getId()).isPresent()) {
+      throw new ResponseStatusException(
+          HttpStatus.CONFLICT, "This notebook already has a book attached");
+    }
 
     var book = new Book();
     book.setNotebook(notebook);
@@ -54,11 +64,10 @@ public class BookService {
   }
 
   @Transactional(readOnly = true)
-  public Book requireBookInNotebook(Notebook notebook, Book book) {
-    if (!book.getNotebook().getId().equals(notebook.getId())) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
-    }
-    return book;
+  public Book getBookForNotebook(Notebook notebook) {
+    return bookRepository
+        .findByNotebook_Id(notebook.getId())
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
   }
 
   private void validateAttachRequest(AttachBookRequest request) {

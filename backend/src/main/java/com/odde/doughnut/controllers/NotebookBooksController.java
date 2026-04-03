@@ -54,13 +54,11 @@ class NotebookBooksController {
     return ResponseEntity.status(HttpStatus.CREATED).body(body);
   }
 
-  @GetMapping("/{notebook}/books/{book}")
+  @GetMapping("/{notebook}/book")
   @JsonView(BookViews.Full.class)
-  public Book getBook(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
-      @PathVariable("book") @Schema(type = "integer") Book book)
+  public Book getBook(@PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
-    return bookService.requireBookInNotebook(notebook, book);
+    return bookService.getBookForNotebook(notebook);
   }
 }

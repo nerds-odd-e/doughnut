@@ -102,11 +102,20 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(children.getFirst().getStructuralTitle(), equalTo("Section 1.1"));
       assertThat(children.get(1).getStructuralTitle(), equalTo("Section 1.2"));
 
-      Book detail = controller.getBook(nb, loadBook(created.getId()));
+      Book detail = controller.getBook(nb);
       assertThat(detail.getRanges(), hasSize(3));
       BookRange detailRoot = rootRangesSorted(detail).getFirst();
       assertThat(detailRoot.getId(), equalTo(outRoot.getId()));
       assertThat(childrenOf(detail, detailRoot), hasSize(2));
+    }
+
+    @Test
+    void rejectsSecondAttachForSameNotebook() throws UnexpectedNoAccessRightException {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      controller.attachBook(nb, attachRequest(node("First")));
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.attachBook(nb, attachRequest(node("Second"))));
     }
 
     @Test
@@ -159,16 +168,17 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   @Nested
   class GetBook {
     @Test
-    void rejectsWhenBookNotInNotebook() throws UnexpectedNoAccessRightException {
+    void returns404WhenNotebookHasNoBook() throws UnexpectedNoAccessRightException {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      assertThrows(ResponseStatusException.class, () -> controller.getBook(nb));
+    }
+
+    @Test
+    void doesNotReturnAnotherNotebooksBook() throws UnexpectedNoAccessRightException {
       Notebook nb1 = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       Notebook nb2 = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      ResponseEntity<Book> res = controller.attachBook(nb1, attachRequest(node("X")));
-      Book book = loadBook(res.getBody().getId());
-      assertThrows(ResponseStatusException.class, () -> controller.getBook(nb2, book));
+      controller.attachBook(nb1, attachRequest(node("X")));
+      assertThrows(ResponseStatusException.class, () -> controller.getBook(nb2));
     }
-  }
-
-  private Book loadBook(int id) {
-    return makeMe.entityPersister.find(Book.class, id);
   }
 }

@@ -38,7 +38,7 @@
 | AuthZ | Same as other notebook mutations: caller must be allowed to modify the target notebook (reuse `Notebook` path variable + `authorizationService.assertAuthorization(notebook)` pattern). |
 | Content type | **`application/json`** — request body is the DTO below (**no** `multipart`, **no** file part). |
 | Body | Single JSON object: `bookName`, `format`, `layout` (nested tree—see below). |
-| Response | **`201 Created`** with the persisted **`Book`** JSON (same shape as **`GET .../books/{book}`**): metadata plus **`ranges`** (flat list with `parentRangeId`, `siblingOrder`, `title`, anchors). Errors: **`400`** validation (invalid layout, wrong content type), **`403`** / **`404`** consistent with notebook APIs. |
+| Response | **`201 Created`** with the persisted **`Book`** JSON (same shape as **`GET .../book`**): metadata plus **`ranges`** (flat list with `parentRangeId`, `siblingOrder`, `title`, anchors). At most **one book per notebook**; a second **`attach-book`** for the same notebook should fail (**`409 Conflict`** or equivalent). Errors: **`400`** validation (invalid layout, wrong content type), **`403`** / **`404`** consistent with notebook APIs. |
 
 **Rationale:** Outline-only attach keeps a clear boundary: **structure** is declared in one JSON payload; **bytes** follow a separate API or flow so this handler stays simple and testable.
 
@@ -82,7 +82,7 @@ This is the **interchange structure** the CLI (Phase 3) builds from MinerU / out
 
 ### Read path for Phase 2
 
-**`GET /api/notebooks/{notebook}/books/{book}`** returns the **`Book`** JSON (metadata + flat **`ranges`** with server-assigned ids, `title`, anchors, `parentRangeId`, `siblingOrder`). There is **no** `GET .../books` list endpoint; clients use the **`id` from `attach-book`** (or another future discovery path) before calling GET. **Create via `attach-book`**, **read via GET** by id. OpenAPI documents the `Book` schema.
+**`GET /api/notebooks/{notebook}/book`** returns the **only** **`Book`** for that notebook (metadata + flat **`ranges`** with server-assigned ids, `title`, anchors, `parentRangeId`, `siblingOrder`). **No `{book}` path segment**—one notebook has at most one book. **`404`** when the notebook has no book yet. There is **no** list-books endpoint. **Create via `attach-book`**, **read via `GET .../book`**. OpenAPI documents the `Book` schema.
 
 **Data shape (directional, persistence):**
 
@@ -91,7 +91,7 @@ This is the **interchange structure** the CLI (Phase 3) builds from MinerU / out
 
 **Tests:** Prefer **controller-level** tests with real DB (`@Transactional`) and **`makeMe`** factories. Assert HTTP response bodies and persistence (e.g. reload from repository), not internal service private methods. Use **`application/json`** request bodies (nested `layout.roots` / `children`).
 
-**Phase complete when:** Migrations applied; **`POST .../attach-book`** persists book + outline under auth (**no** file on this route); **`GET .../books/{book}`** returns **`Book`** JSON with range ids; OpenAPI updated for any surface consumed by the frontend / `doughnut-api` generation.
+**Phase complete when:** Migrations applied (including **one book per notebook** in storage); **`POST .../attach-book`** persists book + outline under auth (**no** file on this route); **`GET .../book`** returns **`Book`** JSON with range ids; OpenAPI updated for any surface consumed by the frontend / `doughnut-api` generation.
 
 ---
 
@@ -117,7 +117,7 @@ This is the **interchange structure** the CLI (Phase 3) builds from MinerU / out
 
 **Follow-up:** Run **`pnpm generateTypeScript`** after OpenAPI changes.
 
-**Phase complete when:** E2E passes for the story-shaped scenario; the browser shows correct hierarchical structure for multiple levels when the outline has children (using **`book` id** from attach or **`GET .../books/{book}`**—no list-books API).
+**Phase complete when:** E2E passes for the story-shaped scenario; the browser shows correct hierarchical structure for multiple levels when the outline has children (using **`GET .../book`** or the **`attach-book`** response—no list-books API).
 
 ---
 
