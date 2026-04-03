@@ -1,19 +1,13 @@
 import { useCallback } from 'react'
-import { Box, Text, useStdout } from 'ink'
-import {
-  type SessionScrollbackAppendApi,
-  useSessionScrollbackAppend,
-} from '../../sessionScrollback/sessionScrollbackAppendContext.js'
-import { inkTerminalColumns } from '../../terminalColumns.js'
+import { Box, Text } from 'ink'
 import type {
   CommandDoc,
   InteractiveSlashCommand,
   InteractiveSlashCommandStageProps,
 } from '../interactiveSlashCommand.js'
-import type { ResolvedInteractiveSlashCommand } from '../interactiveSlashCommands.js'
-import { applyResolvedInteractiveSlashCommand } from '../interactiveSlashCommandDispatch.js'
+import { commitNotebookStagePlainLine } from '../slashCommandShellPlainLineCommit.js'
 import { SlashCommandShellLiveColumn } from '../slashCommandShellLiveColumn.js'
-import { useSlashCommandShellState } from '../useSlashCommandShellState.js'
+import { useSlashCommandShellLiveColumnHandlers } from '../useSlashCommandShellLiveColumnHandlers.js'
 import {
   leaveNotebookStageSlashCommand,
   notebookStageSlashCommands,
@@ -21,75 +15,36 @@ import {
 
 const STAGE_PLACEHOLDER = '`/exit` to leave notebook context.'
 
-function dispatchNotebookUncommittedLine(
-  line: string,
-  {
-    appendScrollbackError,
-    appendScrollbackUserMessage,
-  }: Pick<
-    SessionScrollbackAppendApi,
-    'appendScrollbackError' | 'appendScrollbackUserMessage'
-  >
-) {
-  if (line === '') return
-  appendScrollbackUserMessage(line)
-  appendScrollbackError('Not supported')
-}
-
 function UseNotebookStage({
   argument,
   onSettled,
 }: InteractiveSlashCommandStageProps) {
   const title = (argument ?? '').trim()
   const {
-    appendScrollbackAssistantTextMessage,
-    appendScrollbackError,
-    appendScrollbackUserMessage,
-  } = useSessionScrollbackAppend()
-  const { stdout } = useStdout()
-  const liveRegionCols = inkTerminalColumns(stdout.columns)
-
-  const {
+    liveRegionCols,
     activeStage,
     stageArgumentRef,
     handleStageSettled,
     handleStageAbortWithError,
-    openStage,
-    setStageArgumentRef,
-  } = useSlashCommandShellState(
-    appendScrollbackAssistantTextMessage,
-    appendScrollbackError
-  )
-
-  const onCommittedCommand = useCallback(
-    (resolved: ResolvedInteractiveSlashCommand) => {
-      appendScrollbackUserMessage(resolved.line)
-      applyResolvedInteractiveSlashCommand(resolved, {
-        appendScrollbackError,
-        setStageArgumentRef,
-        openStage,
-        onRunSuccess: (command, assistantMessage) => {
-          if (command === leaveNotebookStageSlashCommand) {
-            onSettled(assistantMessage)
-          } else {
-            appendScrollbackAssistantTextMessage(assistantMessage)
-          }
-        },
-      })
-    },
-    [
-      appendScrollbackAssistantTextMessage,
-      appendScrollbackError,
-      appendScrollbackUserMessage,
-      onSettled,
-      openStage,
-      setStageArgumentRef,
-    ]
-  )
+    onCommittedCommand,
+    appendScrollbackError,
+    appendScrollbackUserMessage,
+  } = useSlashCommandShellLiveColumnHandlers({
+    onRunSuccess: useCallback(
+      (command, assistantMessage, { appendScrollbackAssistantTextMessage }) => {
+        if (command === leaveNotebookStageSlashCommand) {
+          onSettled(assistantMessage)
+        } else {
+          appendScrollbackAssistantTextMessage(assistantMessage)
+        }
+      },
+      [onSettled]
+    ),
+  })
 
   const onCommittedLine = useCallback(
     (line: string) => {
-      dispatchNotebookUncommittedLine(line.trim(), {
+      commitNotebookStagePlainLine(line, {
         appendScrollbackError,
         appendScrollbackUserMessage,
       })
