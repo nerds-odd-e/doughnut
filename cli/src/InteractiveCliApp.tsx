@@ -136,48 +136,41 @@ export function InteractiveCliApp() {
     [clearSlashStage]
   )
 
-  const onCommittedLine = useCallback((line: string) => {
-    const commitUserLineWithAssistant = (
-      assistantText: string,
-      isError = false
+  const onCommittedCommand = useCallback(
+    (
+      line: string,
+      resolved: NonNullable<ReturnType<typeof resolveInteractiveSlashCommand>>
     ) => {
+      const { command, argument } = resolved
       const user = transcriptUserLine(line)
-      const assistant = isError
-        ? transcriptAssistantError(assistantText)
-        : transcriptAssistantText(assistantText)
-      setScrollbackItems((prev) => {
-        const withUser = [...prev, withLeadingGapAfterUserIfNeeded(prev, user)]
-        return [
-          ...withUser,
-          withLeadingGapAfterUserIfNeeded(withUser, assistant),
-        ]
-      })
-    }
-
-    const lineOfCommand = line.startsWith('/')
-      ? line.slice(1)
-      : line.trim() === 'exit'
-        ? 'exit'
-        : undefined
-
-    if (!lineOfCommand) {
-      commitUserLineWithAssistant('Not supported', true)
-      return
-    }
-
-    const resolved = resolveInteractiveSlashCommand(lineOfCommand)
-    if (!resolved) {
-      commitUserLineWithAssistant('unsupported command', true)
-      return
-    }
-
-    const { command, argument } = resolved
-    const user = transcriptUserLine(line)
-    setScrollbackItems((prev) => [
-      ...prev,
-      withLeadingGapAfterUserIfNeeded(prev, user),
-    ])
-    if ('stageComponent' in command) {
+      setScrollbackItems((prev) => [
+        ...prev,
+        withLeadingGapAfterUserIfNeeded(prev, user),
+      ])
+      if ('stageComponent' in command) {
+        const argumentMissing = argument === undefined || argument === ''
+        const argSpec = command.argument
+        if (argSpec !== undefined && argumentMissing && !argSpec.optional) {
+          const assistant = transcriptAssistantError(
+            `Missing ${argSpec.name}. Usage: ${command.doc.usage}`
+          )
+          setScrollbackItems((prev) => [
+            ...prev,
+            withLeadingGapAfterUserIfNeeded(prev, assistant),
+          ])
+          return
+        }
+        stageArgumentRef.current = argument
+        const Stage = command.stageComponent
+        const indicator = command.stageIndicator
+        // setState(fn) treats fn as updater; bare `Stage` would be called with prior state as props.
+        setActiveSlashStage(() => ({
+          component: Stage,
+          stageIndicator:
+            indicator !== undefined && indicator !== '' ? indicator : undefined,
+        }))
+        return
+      }
       const argumentMissing = argument === undefined || argument === ''
       const argSpec = command.argument
       if (argSpec !== undefined && argumentMissing && !argSpec.optional) {
@@ -190,48 +183,71 @@ export function InteractiveCliApp() {
         ])
         return
       }
-      stageArgumentRef.current = argument
-      const Stage = command.stageComponent
-      const indicator = command.stageIndicator
-      // setState(fn) treats fn as updater; bare `Stage` would be called with prior state as props.
-      setActiveSlashStage(() => ({
-        component: Stage,
-        stageIndicator:
-          indicator !== undefined && indicator !== '' ? indicator : undefined,
-      }))
-      return
-    }
-    const argumentMissing = argument === undefined || argument === ''
-    const argSpec = command.argument
-    if (argSpec !== undefined && argumentMissing && !argSpec.optional) {
-      const assistant = transcriptAssistantError(
-        `Missing ${argSpec.name}. Usage: ${command.doc.usage}`
-      )
-      setScrollbackItems((prev) => [
-        ...prev,
-        withLeadingGapAfterUserIfNeeded(prev, assistant),
-      ])
-      return
-    }
-    Promise.resolve(command.run(argument))
-      .then((r) => {
-        const assistant = transcriptAssistantText(r.assistantMessage)
-        setScrollbackItems((prev) => [
-          ...prev,
-          withLeadingGapAfterUserIfNeeded(prev, assistant),
-        ])
-        if (command.literal === '/exit') setExitAfterCommit(true)
-      })
-      .catch((err: unknown) => {
-        const assistant = transcriptAssistantError(
-          userVisibleSlashCommandError(err)
-        )
-        setScrollbackItems((prev) => [
-          ...prev,
-          withLeadingGapAfterUserIfNeeded(prev, assistant),
-        ])
-      })
-  }, [])
+      Promise.resolve(command.run(argument))
+        .then((r) => {
+          const assistant = transcriptAssistantText(r.assistantMessage)
+          setScrollbackItems((prev) => [
+            ...prev,
+            withLeadingGapAfterUserIfNeeded(prev, assistant),
+          ])
+          if (command.literal === '/exit') setExitAfterCommit(true)
+        })
+        .catch((err: unknown) => {
+          const assistant = transcriptAssistantError(
+            userVisibleSlashCommandError(err)
+          )
+          setScrollbackItems((prev) => [
+            ...prev,
+            withLeadingGapAfterUserIfNeeded(prev, assistant),
+          ])
+        })
+    },
+    []
+  )
+
+  const onCommittedLine = useCallback(
+    (line: string) => {
+      const commitUserLineWithAssistant = (
+        assistantText: string,
+        isError = false
+      ) => {
+        const user = transcriptUserLine(line)
+        const assistant = isError
+          ? transcriptAssistantError(assistantText)
+          : transcriptAssistantText(assistantText)
+        setScrollbackItems((prev) => {
+          const withUser = [
+            ...prev,
+            withLeadingGapAfterUserIfNeeded(prev, user),
+          ]
+          return [
+            ...withUser,
+            withLeadingGapAfterUserIfNeeded(withUser, assistant),
+          ]
+        })
+      }
+
+      const lineOfCommand = line.startsWith('/')
+        ? line.slice(1)
+        : line.trim() === 'exit'
+          ? 'exit'
+          : undefined
+
+      if (!lineOfCommand) {
+        commitUserLineWithAssistant('Not supported', true)
+        return
+      }
+
+      const resolved = resolveInteractiveSlashCommand(lineOfCommand)
+      if (!resolved) {
+        commitUserLineWithAssistant('unsupported command', true)
+        return
+      }
+
+      onCommittedCommand(line, resolved)
+    },
+    [onCommittedCommand]
+  )
 
   const scrollbackAppendApi = useMemo(
     () => ({ appendScrollbackItem, appendScrollbackItems }),
