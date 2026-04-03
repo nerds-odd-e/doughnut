@@ -2,6 +2,7 @@ import type { Readable } from 'node:stream'
 import React from 'react'
 import { render } from 'ink'
 import { exitCliError } from './cliExit.js'
+import { formatVersionOutput } from './commands/version.js'
 import { InteractiveCliApp } from './InteractiveCliApp.js'
 import { formatInteractiveWelcomeBanner } from './welcomeBanner.js'
 
@@ -20,6 +21,7 @@ export async function runInteractive(
     exitCliError('not a terminal (use version or update)')
   }
   stdout.write(formatInteractiveWelcomeBanner())
+  stdout.write(`${formatVersionOutput()}\n`)
   const { waitUntilExit } = render(React.createElement(InteractiveCliApp), {
     stdin: stdin as NodeJS.ReadStream,
     stdout,

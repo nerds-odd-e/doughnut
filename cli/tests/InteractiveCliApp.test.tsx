@@ -1,4 +1,3 @@
-import { render } from 'ink-testing-library'
 import { describe, expect, test } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
@@ -18,11 +17,6 @@ function farewellFollowedByCommandPrompt(ansiStrippedFrame: string): boolean {
 }
 
 describe('InteractiveCliApp (ink-testing-library)', () => {
-  test('shows version in the first frame', () => {
-    const { lastFrame } = render(<InteractiveCliApp />)
-    expect(lastFrame()).toMatch(/doughnut \d+\.\d+\.\d+/)
-  })
-
   test('empty committed line leaves transcript unchanged; later line still commits', async () => {
     const { stdin, frames } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />

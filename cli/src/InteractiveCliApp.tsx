@@ -1,11 +1,4 @@
-import {
-  createElement,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { createElement, useCallback, useEffect, useRef, useState } from 'react'
 import type { ComponentType } from 'react'
 import type { Key } from 'ink'
 import { Box, useApp, useInput, useStdout } from 'ink'
@@ -15,11 +8,9 @@ import {
   type ResolvedInteractiveSlashCommand,
 } from './commands/interactiveSlashCommands.js'
 import type { InteractiveSlashCommandStageProps } from './commands/interactiveSlashCommand.js'
-import { formatVersionOutput } from './commands/version.js'
 import { userVisibleSlashCommandError } from './userVisibleSlashCommandError.js'
 import type { StageKeyHandler } from './commonUIComponents/stageKeyForwardContext.js'
 import { SetStageKeyHandlerContext } from './commonUIComponents/stageKeyForwardContext.js'
-import { scrollbackAssistantTextMessageItem } from './sessionScrollback/interactiveCliTranscript.js'
 import {
   SessionScrollbackSessionProvider,
   useSessionScrollbackAppend,
@@ -28,12 +19,8 @@ import { StageLiveHeaderInk } from './commonUIComponents/stageLiveHeaderInk.js'
 import { inkTerminalColumns } from './terminalColumns.js'
 
 export function InteractiveCliApp() {
-  const initialScrollbackItems = useMemo(
-    () => [scrollbackAssistantTextMessageItem(formatVersionOutput())],
-    []
-  )
   return (
-    <SessionScrollbackSessionProvider initialItems={initialScrollbackItems}>
+    <SessionScrollbackSessionProvider initialItems={[]}>
       <InteractiveCliAppBody />
     </SessionScrollbackSessionProvider>
   )
