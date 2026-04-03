@@ -1,13 +1,16 @@
 import type { SessionScrollbackAppendApi } from '../sessionScrollback/sessionScrollbackAppendContext.js'
 
-type PlainLineScrollback = Pick<
+export type PlainLineCommitScrollback = Pick<
   SessionScrollbackAppendApi,
   'appendScrollbackError' | 'appendScrollbackUserMessage'
 >
 
 export function commitMainInteractivePlainLine(
   line: string,
-  { appendScrollbackError, appendScrollbackUserMessage }: PlainLineScrollback
+  {
+    appendScrollbackError,
+    appendScrollbackUserMessage,
+  }: PlainLineCommitScrollback
 ): void {
   const assistantText = line.startsWith('/')
     ? 'unsupported command'
@@ -18,7 +21,10 @@ export function commitMainInteractivePlainLine(
 
 export function commitNotebookStagePlainLine(
   line: string,
-  { appendScrollbackError, appendScrollbackUserMessage }: PlainLineScrollback
+  {
+    appendScrollbackError,
+    appendScrollbackUserMessage,
+  }: PlainLineCommitScrollback
 ): void {
   const trimmed = line.trim()
   if (trimmed === '') return

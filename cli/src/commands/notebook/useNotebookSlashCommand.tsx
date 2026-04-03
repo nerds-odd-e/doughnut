@@ -5,9 +5,10 @@ import type {
   InteractiveSlashCommand,
   InteractiveSlashCommandStageProps,
 } from '../interactiveSlashCommand.js'
+import type { InteractiveRunSlashCommand } from '../interactiveSlashCommandDispatch.js'
 import { commitNotebookStagePlainLine } from '../slashCommandShellPlainLineCommit.js'
-import { SlashCommandShellLiveColumn } from '../slashCommandShellLiveColumn.js'
-import { useSlashCommandShellLiveColumnHandlers } from '../useSlashCommandShellLiveColumnHandlers.js'
+import { SlashCommandShellHost } from '../slashCommandShellHost.js'
+import type { SlashCommandShellRunSuccessContext } from '../useSlashCommandShellLiveColumnHandlers.js'
 import {
   leaveNotebookStageSlashCommand,
   notebookStageSlashCommands,
@@ -20,52 +21,32 @@ function UseNotebookStage({
   onSettled,
 }: InteractiveSlashCommandStageProps) {
   const title = (argument ?? '').trim()
-  const {
-    liveRegionCols,
-    activeStage,
-    stageArgumentRef,
-    handleStageSettled,
-    handleStageAbortWithError,
-    onCommittedCommand,
-    appendScrollbackError,
-    appendScrollbackUserMessage,
-  } = useSlashCommandShellLiveColumnHandlers({
-    onRunSuccess: useCallback(
-      (command, assistantMessage, { appendScrollbackAssistantTextMessage }) => {
-        if (command === leaveNotebookStageSlashCommand) {
-          onSettled(assistantMessage)
-        } else {
-          appendScrollbackAssistantTextMessage(assistantMessage)
-        }
-      },
-      [onSettled]
-    ),
-  })
-
-  const onCommittedLine = useCallback(
-    (line: string) => {
-      commitNotebookStagePlainLine(line, {
-        appendScrollbackError,
-        appendScrollbackUserMessage,
-      })
+  const onRunSuccess = useCallback(
+    (
+      command: InteractiveRunSlashCommand,
+      assistantMessage: string,
+      {
+        appendScrollbackAssistantTextMessage,
+      }: SlashCommandShellRunSuccessContext
+    ) => {
+      if (command === leaveNotebookStageSlashCommand) {
+        onSettled(assistantMessage)
+      } else {
+        appendScrollbackAssistantTextMessage(assistantMessage)
+      }
     },
-    [appendScrollbackError, appendScrollbackUserMessage]
+    [onSettled]
   )
 
   return (
     <Box flexDirection="column">
       <Text>Active notebook: {title}</Text>
-      <SlashCommandShellLiveColumn
-        cols={liveRegionCols}
-        activeStage={activeStage}
-        stageArgumentRef={stageArgumentRef}
-        onStageSettled={handleStageSettled}
-        onStageAbortWithError={handleStageAbortWithError}
-        showMainPrompt
+      <SlashCommandShellHost
+        onRunSuccess={onRunSuccess}
         slashCommands={notebookStageSlashCommands}
         placeholder={STAGE_PLACEHOLDER}
-        onCommittedCommand={onCommittedCommand}
-        onCommittedLine={onCommittedLine}
+        showMainPrompt
+        commitPlainLine={commitNotebookStagePlainLine}
       />
     </Box>
   )

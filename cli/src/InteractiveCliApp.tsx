@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Key } from 'ink'
 import { useApp, useInput } from 'ink'
+import type { InteractiveRunSlashCommand } from './commands/interactiveSlashCommandDispatch.js'
 import { interactiveSlashCommands } from './commands/interactiveSlashCommands.js'
 import { commitMainInteractivePlainLine } from './commands/slashCommandShellPlainLineCommit.js'
-import { SlashCommandShellLiveColumn } from './commands/slashCommandShellLiveColumn.js'
-import { useSlashCommandShellLiveColumnHandlers } from './commands/useSlashCommandShellLiveColumnHandlers.js'
+import { SlashCommandShellHost } from './commands/slashCommandShellHost.js'
+import type { SlashCommandShellRunSuccessContext } from './commands/useSlashCommandShellLiveColumnHandlers.js'
 import type { StageKeyHandler } from './commonUIComponents/stageKeyForwardContext.js'
 import { SetStageKeyHandlerContext } from './commonUIComponents/stageKeyForwardContext.js'
 import { SessionScrollbackSessionProvider } from './sessionScrollback/sessionScrollbackAppendContext.js'
@@ -31,53 +32,33 @@ function InteractiveCliAppBody() {
   )
   const [exitAfterCommit, setExitAfterCommit] = useState(false)
 
-  const {
-    liveRegionCols,
-    activeStage,
-    stageArgumentRef,
-    handleStageSettled,
-    handleStageAbortWithError,
-    onCommittedCommand,
-    appendScrollbackError,
-    appendScrollbackUserMessage,
-  } = useSlashCommandShellLiveColumnHandlers({
-    onRunSuccess: useCallback(
-      (command, assistantMessage, { appendScrollbackAssistantTextMessage }) => {
-        appendScrollbackAssistantTextMessage(assistantMessage)
-        if (command.literal === '/exit') setExitAfterCommit(true)
-      },
-      []
-    ),
-  })
-
   useEffect(() => {
     if (!exitAfterCommit) return
     exit()
   }, [exit, exitAfterCommit])
 
-  const onCommittedLine = useCallback(
-    (line: string) => {
-      commitMainInteractivePlainLine(line, {
-        appendScrollbackError,
-        appendScrollbackUserMessage,
-      })
+  const onRunSuccess = useCallback(
+    (
+      command: InteractiveRunSlashCommand,
+      assistantMessage: string,
+      {
+        appendScrollbackAssistantTextMessage,
+      }: SlashCommandShellRunSuccessContext
+    ) => {
+      appendScrollbackAssistantTextMessage(assistantMessage)
+      if (command.literal === '/exit') setExitAfterCommit(true)
     },
-    [appendScrollbackError, appendScrollbackUserMessage]
+    []
   )
 
   return (
     <SetStageKeyHandlerContext.Provider value={setStageKeyHandler}>
-      <SlashCommandShellLiveColumn
-        cols={liveRegionCols}
-        activeStage={activeStage}
-        stageArgumentRef={stageArgumentRef}
-        onStageSettled={handleStageSettled}
-        onStageAbortWithError={handleStageAbortWithError}
-        showMainPrompt={!exitAfterCommit}
+      <SlashCommandShellHost
+        onRunSuccess={onRunSuccess}
         slashCommands={interactiveSlashCommands}
         placeholder="`exit` to quit."
-        onCommittedCommand={onCommittedCommand}
-        onCommittedLine={onCommittedLine}
+        showMainPrompt={!exitAfterCommit}
+        commitPlainLine={commitMainInteractivePlainLine}
       />
     </SetStageKeyHandlerContext.Provider>
   )

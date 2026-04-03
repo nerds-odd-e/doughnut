@@ -10,7 +10,7 @@
 
 ## Scope and testing
 
-- **In scope:** Interactive CLI only — `/use`, notebook **stage** (1.1 done for titled `/use`), **notebook-stage** `/` sub-command discovery (**1.3**), missing notebook errors, bare `/use` picker, typing filter on that list.
+- **In scope:** Interactive CLI only — `/use`, notebook **stage** (1.1 done for titled `/use`), **notebook-stage** `/` sub-command discovery (**1.3** done), missing notebook errors, bare `/use` picker, typing filter on that list.
 - **Out of scope for these sub-phases:** Backend book APIs, `/attach`, browser; those stay in later parent phases.
 - **E2E:** Do **not** add or extend Cypress/Cucumber for 1.1–1.6. Rely on **Vitest** driving **`runInteractive`** (and existing Ink helpers in `cli/tests/inkTestHelpers.ts`) per [.cursor/rules/cli.mdc](../.cursor/rules/cli.mdc). Mock HTTP with **`vi.spyOn`** on **`doughnut-api`** controllers and **`makeMe`** from **`doughnut-test-fixtures/makeMe`** for response shapes.
 - **Deploy gate:** After each sub-phase, follow the parent plan checklist (commit/push/CD) when the team treats a sub-phase as shippable; keep **`pnpm cli:test`** green.
@@ -25,7 +25,7 @@ Sub-phases are numbered in **delivery order**. Later items assume earlier shell/
 |----|------------|--------|
 | 1.1 | — | Done |
 | 1.2 | — | **Scrapped** — recall stage `/exit` removed from this track (recall unchanged; leave via existing Esc / y-n flows). |
-| 1.3 | 1.1 — stage slash hints for **notebook stage only** (see section) | — |
+| 1.3 | 1.1 — stage slash hints for **notebook stage only** (see section) | Done |
 | 1.4 | 1.1 — error path for titled `/use` | — |
 | 1.5 | 1.1, ideally 1.3 — optional argument + stage or list UI | — |
 | 1.6 | 1.5 — filter is a refinement of the picker | — |
@@ -54,13 +54,13 @@ Recall stage **`/exit`** is **not** part of this sub-phase track. Recall behavio
 
 ## 1.3 — Notebook stage: `/` lists choosable sub-commands
 
+**Status:** Done.
+
 **User outcome:** When the **notebook** stage (from **`/use`**) has focus, typing **`/`** shows **notebook-stage** sub-commands the user can complete or pick (mirror **Current guidance** behavior for top-level slash hints in `MainInteractivePrompt` — reuse patterns from `slashCommandCompletion` / `effectiveSlashGuidance` where practical). **Recall and other stages are explicitly out of scope for 1.3**; extending the same mechanism to them is a later follow-up if still wanted.
 
-**Implementation notes:** Introduce a small mechanism scoped to the notebook stage first (e.g. stage contributes slash rows + completions only while `UseNotebookStage` is active). Design it so recall or future stages *could* plug in later without a second ad hoc list — but **do not** implement recall guidance in this sub-phase. Keep **high cohesion** for the notebook stage: one representation of “what can I type here?” for that stage.
+**Implemented:** `notebookStageSlashCommands` in `cli/src/commands/notebook/notebookStageSlashCommands.ts` (currently **`/exit`**). `UseNotebookStage` passes it to `SlashCommandShellLiveColumn` as `slashCommands` so Tab/`/` guidance matches the stage registry only. Recall unchanged.
 
-**Tests:** `runInteractive` (or Ink render consistent with other `InteractiveCliApp.*` tests) — in **notebook** stage only, `/` shows expected hints (at minimum **`/exit`**, aligned with **1.1**).
-
-**Done when:** Notebook stage shows correct guidance; no requirement to change recall; tests cover notebook only.
+**Tests:** `cli/tests/InteractiveCliApp.useNotebook.test.tsx` — `in notebook stage, / shows slash sub-command guidance` asserts `/exit` usage and description in the live column.
 
 ---
 
