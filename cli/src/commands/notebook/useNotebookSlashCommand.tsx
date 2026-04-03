@@ -1,30 +1,26 @@
-import { useCallback } from 'react'
-import { Box, Text } from 'ink'
+import { useCallback, useRef, useState } from 'react'
+import type { ComponentType } from 'react'
+import { Box, Text, useStdout } from 'ink'
 import { MainInteractivePrompt } from '../../mainInteractivePrompt/index.js'
 import {
   type SessionScrollbackAppendApi,
   useSessionScrollbackAppend,
 } from '../../sessionScrollback/sessionScrollbackAppendContext.js'
+import { inkTerminalColumns } from '../../terminalColumns.js'
 import type {
   CommandDoc,
   InteractiveSlashCommand,
   InteractiveSlashCommandStageProps,
 } from '../interactiveSlashCommand.js'
 import type { ResolvedInteractiveSlashCommand } from '../interactiveSlashCommands.js'
-import { notebookStageSlashCommands } from './notebookStageSlashCommands.js'
+import { applyResolvedInteractiveSlashCommand } from '../interactiveSlashCommandDispatch.js'
+import { SlashCommandStageMount } from '../slashCommandStageMount.js'
+import {
+  leaveNotebookStageSlashCommand,
+  notebookStageSlashCommands,
+} from './notebookStageSlashCommands.js'
 
 const STAGE_PLACEHOLDER = '`/exit` to leave notebook context.'
-
-function invokeNotebookStageRunCommand(cmd: InteractiveSlashCommand): string {
-  if (!('run' in cmd)) {
-    throw new Error('expected a run slash command')
-  }
-  const out = cmd.run()
-  if (out instanceof Promise) {
-    throw new Error('notebook stage slash commands must be synchronous')
-  }
-  return out.assistantMessage
-}
 
 function dispatchNotebookUncommittedLine(
   line: string,
@@ -46,15 +42,75 @@ function UseNotebookStage({
   onSettled,
 }: InteractiveSlashCommandStageProps) {
   const title = (argument ?? '').trim()
-  const { appendScrollbackError, appendScrollbackUserMessage } =
-    useSessionScrollbackAppend()
+  const {
+    appendScrollbackAssistantTextMessage,
+    appendScrollbackError,
+    appendScrollbackUserMessage,
+  } = useSessionScrollbackAppend()
+  const { stdout } = useStdout()
+  const liveRegionCols = inkTerminalColumns(stdout.columns)
+
+  const [activeNestedStage, setActiveNestedStage] = useState<{
+    component: ComponentType<InteractiveSlashCommandStageProps>
+    stageIndicator?: string
+  } | null>(null)
+  const nestedStageArgumentRef = useRef<string | undefined>(undefined)
+  const activeNestedIndicator = activeNestedStage?.stageIndicator
+
+  const clearNestedStage = useCallback(() => {
+    setActiveNestedStage(null)
+    nestedStageArgumentRef.current = undefined
+  }, [])
+
+  const handleNestedSettled = useCallback(
+    (assistantText: string) => {
+      if (assistantText !== '') {
+        appendScrollbackAssistantTextMessage(assistantText)
+      }
+      clearNestedStage()
+    },
+    [appendScrollbackAssistantTextMessage, clearNestedStage]
+  )
+
+  const handleNestedAbortWithError = useCallback(
+    (message: string) => {
+      if (message !== '') {
+        appendScrollbackError(message)
+      }
+      clearNestedStage()
+    },
+    [appendScrollbackError, clearNestedStage]
+  )
 
   const onCommittedCommand = useCallback(
     (resolved: ResolvedInteractiveSlashCommand) => {
       appendScrollbackUserMessage(resolved.line)
-      onSettled(invokeNotebookStageRunCommand(resolved.command))
+      applyResolvedInteractiveSlashCommand(resolved, {
+        appendScrollbackError,
+        setStageArgumentRef: (arg) => {
+          nestedStageArgumentRef.current = arg
+        },
+        openStage: ({ component, stageIndicator }) => {
+          setActiveNestedStage(() => ({
+            component,
+            stageIndicator,
+          }))
+        },
+        onRunSuccess: (command, assistantMessage) => {
+          if (command === leaveNotebookStageSlashCommand) {
+            onSettled(assistantMessage)
+          } else {
+            appendScrollbackAssistantTextMessage(assistantMessage)
+          }
+        },
+      })
     },
-    [appendScrollbackUserMessage, onSettled]
+    [
+      appendScrollbackAssistantTextMessage,
+      appendScrollbackError,
+      appendScrollbackUserMessage,
+      onSettled,
+    ]
   )
 
   const onCommittedLine = useCallback(
@@ -70,10 +126,22 @@ function UseNotebookStage({
   return (
     <Box flexDirection="column">
       <Text>Active notebook: {title}</Text>
+      {activeNestedStage ? (
+        <SlashCommandStageMount
+          cols={liveRegionCols}
+          stageIndicator={activeNestedIndicator}
+          Stage={activeNestedStage.component}
+          stageProps={{
+            argument: nestedStageArgumentRef.current,
+            onSettled: handleNestedSettled,
+            onAbortWithError: handleNestedAbortWithError,
+          }}
+        />
+      ) : null}
       <MainInteractivePrompt
         onCommittedCommand={onCommittedCommand}
         onCommittedLine={onCommittedLine}
-        isActive
+        isActive={!activeNestedStage}
         slashCommands={notebookStageSlashCommands}
         placeholder={STAGE_PLACEHOLDER}
       />
