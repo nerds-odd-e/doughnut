@@ -300,4 +300,72 @@ describe('useNotebookSlashCommand stage', () => {
 
     await waitForFramesToInclude('Cancelled.')
   })
+
+  test('bare /use picker: typing filters list; Enter selects highlighted match', async () => {
+    myNotebooksSpy.mockResolvedValue({
+      data: {
+        notebooks: [
+          notebookWithTitle('Alpha'),
+          notebookWithTitle('Beta'),
+          notebookWithTitle('Alpaca'),
+        ],
+      },
+    } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
+
+    const {
+      stdin,
+      waitForLastFrameToInclude,
+      waitForFramesToInclude,
+      waitUntilLastFrame,
+    } = await renderNotebookStageWhenPickerVisible()
+
+    stdin.write('b')
+    await waitForLastFrameToInclude('Filter: b')
+    stdin.write('e')
+    await waitForLastFrameToInclude('Filter: be')
+    stdin.write('t')
+    await waitForLastFrameToInclude('Filter: bet')
+    await waitUntilLastFrame(
+      (f) => f.includes('Beta') && !f.includes('Alpha') && !f.includes('Alpaca')
+    )
+
+    stdin.write('\r')
+    await waitForFramesToInclude('Active notebook: Beta')
+  })
+
+  test('bare /use picker: filter with no matches; backspace restores list', async () => {
+    myNotebooksSpy.mockResolvedValue({
+      data: {
+        notebooks: [
+          notebookWithTitle('Alpha'),
+          notebookWithTitle('Beta'),
+          notebookWithTitle('Alpaca'),
+        ],
+      },
+    } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
+
+    const { stdin, waitForLastFrameToInclude, waitUntilLastFrame } =
+      await renderNotebookStageWhenPickerVisible()
+
+    stdin.write('xyz')
+    await waitForLastFrameToInclude('Filter: xyz')
+    await waitForLastFrameToInclude('No matching notebooks.')
+
+    stdin.write('\x7f')
+    await waitUntilLastFrame(
+      (f) => f.includes('Filter: xy') && f.includes('No matching notebooks.')
+    )
+    stdin.write('\x7f')
+    await waitUntilLastFrame(
+      (f) => f.includes('Filter: x') && f.includes('No matching notebooks.')
+    )
+    stdin.write('\x7f')
+    await waitUntilLastFrame(
+      (f) =>
+        f.includes('Alpha') &&
+        f.includes('Beta') &&
+        f.includes('Alpaca') &&
+        !f.includes('No matching notebooks.')
+    )
+  })
 })

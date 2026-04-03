@@ -479,6 +479,102 @@ describe('handleSelectListInkKey', () => {
     )
     expect(onAbortHighlightOnlyList).toHaveBeenCalledOnce()
   })
+
+  it('filter-buffer: typed char and backspace call edit handlers; Enter submits highlight', () => {
+    const onEditChar = vi.fn()
+    const onEditBackspace = vi.fn()
+    const onSubmitHighlightIndex = vi.fn()
+    const policy = { kind: 'filter-buffer' as const }
+    const handlers = {
+      onSetHighlightIndex: vi.fn(),
+      onSubmitHighlightIndex,
+      onEditChar,
+      onEditBackspace,
+    }
+    handleSelectListInkKey('x', {}, '', 1, 3, policy, 'abort-list', handlers)
+    expect(onEditChar).toHaveBeenCalledWith('x')
+
+    handleSelectListInkKey(
+      '',
+      { backspace: true },
+      '',
+      1,
+      3,
+      policy,
+      'abort-list',
+      handlers
+    )
+    expect(onEditBackspace).toHaveBeenCalledOnce()
+
+    handleSelectListInkKey(
+      '\r',
+      { return: true },
+      '',
+      2,
+      3,
+      policy,
+      'abort-list',
+      handlers
+    )
+    expect(onSubmitHighlightIndex).toHaveBeenCalledWith(2)
+  })
+
+  it('filter-buffer: escape aborts; unhandled key redraws; up/down no-op when list empty', () => {
+    const onAbortHighlightOnlyList = vi.fn()
+    const onRedraw = vi.fn()
+    const policy = { kind: 'filter-buffer' as const }
+    const base = {
+      onSetHighlightIndex: vi.fn(),
+      onSubmitHighlightIndex: vi.fn(),
+      onEditChar: vi.fn(),
+      onEditBackspace: vi.fn(),
+    }
+    handleSelectListInkKey('\u001b', {}, '', 0, 2, policy, 'abort-list', {
+      ...base,
+      onAbortHighlightOnlyList,
+    })
+    expect(onAbortHighlightOnlyList).toHaveBeenCalledOnce()
+
+    handleSelectListInkKey('', { name: 'f1' }, '', 0, 2, policy, 'abort-list', {
+      ...base,
+      onRedraw,
+    })
+    expect(onRedraw).toHaveBeenCalledOnce()
+
+    const onSetHighlightIndex = vi.fn()
+    handleSelectListInkKey(
+      '',
+      { downArrow: true },
+      '',
+      0,
+      0,
+      policy,
+      'abort-list',
+      {
+        ...base,
+        onSetHighlightIndex,
+        onRedraw,
+      }
+    )
+    expect(onSetHighlightIndex).not.toHaveBeenCalled()
+
+    const onSubmitHighlightIndex = vi.fn()
+    handleSelectListInkKey(
+      '\r',
+      { return: true },
+      '',
+      0,
+      0,
+      policy,
+      'abort-list',
+      {
+        ...base,
+        onSetHighlightIndex: vi.fn(),
+        onSubmitHighlightIndex,
+      }
+    )
+    expect(onSubmitHighlightIndex).not.toHaveBeenCalled()
+  })
 })
 
 describe('selectListKeyEventFromInk', () => {

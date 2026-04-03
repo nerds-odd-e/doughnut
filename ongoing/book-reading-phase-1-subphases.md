@@ -27,8 +27,8 @@ Sub-phases are numbered in **delivery order**. Later items assume earlier shell/
 | 1.2 | — | **Scrapped** — recall stage `/exit` removed from this track (recall unchanged; leave via existing Esc / y-n flows). |
 | 1.3 | 1.1 — stage slash hints for **notebook stage only** (see section) | Done |
 | 1.4 | 1.1 — error path for titled `/use` | Done |
-| 1.5 | 1.1, ideally 1.3 — optional argument + stage or list UI | — |
-| 1.6 | 1.5 — filter is a refinement of the picker | — |
+| 1.5 | 1.1, ideally 1.3 — optional argument + stage or list UI | Done |
+| 1.6 | 1.5 — filter is a refinement of the picker | Done |
 
 Unknown-notebook handling and its test are **1.4** (can ship in the commit right after **1.1** if small).
 
@@ -82,11 +82,15 @@ Recall stage **`/exit`** is **not** part of this sub-phase track. Recall behavio
 
 ## 1.5 — `/use` with no notebook argument opens a chooser
 
+**Status:** Done.
+
 **User outcome:** `/use` alone (argument optional on the command) opens an interactive **notebook list** stage: user picks a notebook (e.g. ↑↓ + Enter or number keys — match an existing list pattern in the CLI if one exists, e.g. recall MCQ / token flows).
 
 **Implementation notes:** Set **`argument.optional: true`** on `/use` and branch in the stage: empty argument → fetch list → selection UI; non-empty → resolve by title as in **1.1**. Reuse **1.3** mechanism for stage sub-commands (`/exit`, etc.).
 
-**Tests:** `runInteractive` — mock list of at least two notebooks; open `/use`, select one; assert active notebook confirmation matches choice.
+**Implemented:** `argument.optional: true` on `useNotebookSlashCommand`; `UseNotebookStage` loads notebooks via `NotebookController.myNotebooks` and renders `UseNotebookPickerStage` when the argument is empty (numbered list, ↑/↓, Enter, Esc). Type-to-filter on that list is **1.6**.
+
+**Tests:** `cli/tests/useNotebookSlashCommand.test.tsx` — bare `/use`, Enter / Down+Enter, Esc, empty list; mounted stage + `vi.spyOn(NotebookController, 'myNotebooks')`.
 
 **Done when:** Optional arg behavior documented in help; tests green.
 
@@ -94,11 +98,15 @@ Recall stage **`/exit`** is **not** part of this sub-phase track. Recall behavio
 
 ## 1.6 — Notebook chooser filters while typing
 
+**Status:** Done.
+
 **User outcome:** In the **1.5** list, as the user types (or narrows with a dedicated filter buffer — pick one UX consistent with the CLI), the visible choices **filter** to matching notebook titles (substring or prefix; document the rule in code/help).
 
 **Implementation notes:** If the chooser reuses a generic “select list” component, extend filtering there so recall or other lists can reuse later only if it stays simple.
 
-**Tests:** `runInteractive` — type filter characters; assert only matching rows remain selectable and Enter confirms the highlighted match.
+**Implemented:** New `filter-buffer` policy in `cli/src/interactions/selectListInteraction.ts` (typing edits a filter; Enter confirms highlight; empty filtered list no-ops submit and arrows; `listLength` passed into dispatch for safe empty-list behavior). `UseNotebookPickerStage` keeps `filterQuery`, filters by **case-insensitive substring** (trimmed query; documented next to matcher), shows `Filter:` line and `No matching notebooks.` when the filter matches nothing. Command help text updated on `/use`.
+
+**Tests:** `cli/tests/useNotebookSlashCommand.test.tsx` — type to narrow to one notebook then Enter; filter with no matches then backspace until list restores. `cli/tests/selectListInteraction.test.ts` — `filter-buffer` key policy.
 
 **Done when:** Filtering observable in tests; no fixed-time sleeps (see cli.mdc).
 

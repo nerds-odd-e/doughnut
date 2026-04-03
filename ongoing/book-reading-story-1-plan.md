@@ -16,6 +16,8 @@
 
 **User outcome:** In interactive CLI, the user can run `/use Top Maths` (or similar) and get a clear assistant confirmation that **this notebook is now the target** for subsequent book commands. Errors when the notebook does not exist or the user lacks access are user-visible and consistent with existing CLI error patterns.
 
+**Shipped CLI details (interactive):** `/use` accepts an **optional** title; **without** a title it opens a **notebook picker** (↑/↓, Enter, Esc). The picker supports **type-to-filter** on titles (**case-insensitive substring**). With a title, resolution is **exact case-sensitive** match against `myNotebooks`. Sub-phase checklist: [book-reading-phase-1-subphases.md](book-reading-phase-1-subphases.md).
+
 **Implementation notes (non-prescriptive):** Persist the selection for the CLI session and/or the same persistence mechanism other CLI context uses (e.g. file-backed state), so `/attach` does not require repeating the notebook name every time. Resolve notebook by **title or stable id**—pick one rule and document it in command help.
 
 **Tests:** Extend CLI coverage through **`runInteractive`** (or equivalent entry point): happy path + not-found / unauthorized. No need for Cypress in this phase if the web app is untouched.

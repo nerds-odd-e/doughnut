@@ -176,7 +176,7 @@ const useNotebookDoc: CommandDoc = {
   name: '/use',
   usage: '/use [<notebook title>]',
   description:
-    'Set the active notebook for book commands. Run without a title to pick from a list. With a title, it must match one of your notebooks exactly (case-sensitive). Not found, auth, and network errors are shown as assistant errors.',
+    'Set the active notebook for book commands. Run without a title to pick from a list (type to narrow by title, case-insensitive substring). With a title, it must match one of your notebooks exactly (case-sensitive). Not found, auth, and network errors are shown as assistant errors.',
 }
 
 export const useNotebookSlashCommand: InteractiveSlashCommand = {

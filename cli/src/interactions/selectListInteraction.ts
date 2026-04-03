@@ -17,6 +17,8 @@ type SelectListDraftPolicy =
       choiceCount: number
     }
   | { kind: 'highlight-only' }
+  /** Typing edits a filter buffer; Enter confirms the highlighted row (not numeric choice submission). */
+  | { kind: 'filter-buffer' }
 
 type SelectListEscapePolicy = 'abort-list' | 'signal-escape'
 
@@ -112,7 +114,13 @@ export function handleSelectListInkKey(
   handlers: SelectListInkHandlers
 ): void {
   const ev = selectListKeyEventFromInk(input, key, lineDraft)
-  const d = dispatchSelectListKey(ev, highlightIndex, draftPolicy, escapePolicy)
+  const d = dispatchSelectListKey(
+    ev,
+    highlightIndex,
+    listLength,
+    draftPolicy,
+    escapePolicy
+  )
 
   switch (d.result) {
     case 'move-highlight':
@@ -174,10 +182,12 @@ export function handleSelectListInkKey(
 function dispatchSelectListKey(
   e: SelectListKeyEvent,
   selectedIndex: number,
+  listLength: number,
   draftPolicy: SelectListDraftPolicy,
   escapePolicy: SelectListEscapePolicy
 ): SelectListKeyDispatchResult {
   const draftEnabled = draftPolicy.kind === 'slash-and-number-or-highlight'
+  const filterBuffer = draftPolicy.kind === 'filter-buffer'
 
   if (e.keyName === 'escape') {
     return escapePolicy === 'abort-list'
@@ -186,6 +196,9 @@ function dispatchSelectListKey(
   }
 
   if (e.keyName === 'up' || e.keyName === 'down') {
+    if (listLength <= 0) {
+      return { result: 'redraw' }
+    }
     const delta = e.keyName === 'up' ? (-1 as const) : (1 as const)
     return { result: 'move-highlight', delta }
   }
@@ -202,24 +215,30 @@ function dispatchSelectListKey(
         ),
       }
     }
+    if (filterBuffer && listLength <= 0) {
+      return { result: 'redraw' }
+    }
     return { result: 'submit-highlight-index', index: selectedIndex }
   }
 
   if (e.keyName === 'backspace') {
-    return draftEnabled
-      ? { result: 'edit-backspace' }
-      : { result: 'abort-highlight-only-list' }
+    if (draftEnabled || filterBuffer) {
+      return { result: 'edit-backspace' }
+    }
+    return { result: 'abort-highlight-only-list' }
   }
 
   if (e.str && !e.ctrl && !e.meta) {
-    return draftEnabled
-      ? { result: 'edit-char', char: e.str }
-      : { result: 'abort-highlight-only-list' }
+    if (draftEnabled || filterBuffer) {
+      return { result: 'edit-char', char: e.str }
+    }
+    return { result: 'abort-highlight-only-list' }
   }
 
-  return draftEnabled
-    ? { result: 'redraw' }
-    : { result: 'abort-highlight-only-list' }
+  if (draftEnabled || filterBuffer) {
+    return { result: 'redraw' }
+  }
+  return { result: 'abort-highlight-only-list' }
 }
 
 export function selectListKeyEventFromInk(
