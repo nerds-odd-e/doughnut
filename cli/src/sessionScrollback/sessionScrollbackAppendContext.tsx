@@ -6,17 +6,35 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { Box } from 'ink'
-import {
-  scrollbackAssistantTextMessageItem,
-  scrollbackErrorItem,
-  scrollbackUserMessageItem,
-} from './interactiveCliTranscript.js'
+import { Box, Text } from 'ink'
 import {
   SessionScrollback,
   type SessionScrollbackItem,
 } from './SessionScrollback.js'
+import { PastUserMessageBlock } from '../commonUIComponents/pastUserMessageBlock.js'
+import { PastAssistantErrorBlock } from '../commonUIComponents/pastAssistantErrorBlock.js'
 
+const scrollbackUserMessageItem = (text: string): SessionScrollbackItem => ({
+  id: crypto.randomUUID(),
+  element: <PastUserMessageBlock text={text} />,
+  endsWithUserLine: true,
+})
+
+const scrollbackAssistantTextMessageItem = (
+  text: string
+): SessionScrollbackItem => ({
+  id: crypto.randomUUID(),
+  element: (
+    <Box>
+      <Text>{text}</Text>
+    </Box>
+  ),
+})
+
+const scrollbackErrorItem = (text: string): SessionScrollbackItem => ({
+  id: crypto.randomUUID(),
+  element: <PastAssistantErrorBlock text={text} />,
+})
 function withLeadingGapAfterUserIfNeeded(
   prev: readonly SessionScrollbackItem[],
   item: SessionScrollbackItem
