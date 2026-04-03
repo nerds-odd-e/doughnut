@@ -1,15 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { ComponentType } from 'react'
 import type { Key } from 'ink'
 import { useApp, useInput, useStdout } from 'ink'
-import { MainInteractivePrompt } from './mainInteractivePrompt/index.js'
 import {
   interactiveSlashCommands,
   type ResolvedInteractiveSlashCommand,
 } from './commands/interactiveSlashCommands.js'
-import type { InteractiveSlashCommandStageProps } from './commands/interactiveSlashCommand.js'
 import { applyResolvedInteractiveSlashCommand } from './commands/interactiveSlashCommandDispatch.js'
-import { SlashCommandStageMount } from './commands/slashCommandStageMount.js'
+import { SlashCommandShellLiveColumn } from './commands/slashCommandShellLiveColumn.js'
+import { useSlashCommandShellState } from './commands/useSlashCommandShellState.js'
 import type { StageKeyHandler } from './commonUIComponents/stageKeyForwardContext.js'
 import { SetStageKeyHandlerContext } from './commonUIComponents/stageKeyForwardContext.js'
 import {
@@ -34,7 +32,6 @@ function InteractiveCliAppBody() {
   } = useSessionScrollbackAppend()
   const { exit } = useApp()
   const stageKeyHandlerRef = useRef<StageKeyHandler | null>(null)
-  const stageArgumentRef = useRef<string | undefined>(undefined)
   const setStageKeyHandler = useCallback((handler: StageKeyHandler | null) => {
     stageKeyHandlerRef.current = handler
   }, [])
@@ -44,11 +41,17 @@ function InteractiveCliAppBody() {
       stageKeyHandlerRef.current?.(input, key)
     }, [])
   )
-  const [activeSlashStage, setActiveSlashStage] = useState<{
-    component: ComponentType<InteractiveSlashCommandStageProps>
-    stageIndicator?: string
-  } | null>(null)
-  const activeStageIndicator = activeSlashStage?.stageIndicator
+  const {
+    activeStage,
+    stageArgumentRef,
+    handleStageSettled,
+    handleStageAbortWithError,
+    openStage,
+    setStageArgumentRef,
+  } = useSlashCommandShellState(
+    appendScrollbackAssistantTextMessage,
+    appendScrollbackError
+  )
   const [exitAfterCommit, setExitAfterCommit] = useState(false)
 
   useEffect(() => {
@@ -56,45 +59,13 @@ function InteractiveCliAppBody() {
     exit()
   }, [exit, exitAfterCommit])
 
-  const clearSlashStage = useCallback(() => {
-    setActiveSlashStage(null)
-    stageArgumentRef.current = undefined
-  }, [])
-
-  const handleAsyncSlashSettled = useCallback(
-    (assistantText: string) => {
-      if (assistantText !== '') {
-        appendScrollbackAssistantTextMessage(assistantText)
-      }
-      clearSlashStage()
-    },
-    [appendScrollbackAssistantTextMessage, clearSlashStage]
-  )
-
-  const handleAsyncSlashAbortWithError = useCallback(
-    (message: string) => {
-      if (message !== '') {
-        appendScrollbackError(message)
-      }
-      clearSlashStage()
-    },
-    [appendScrollbackError, clearSlashStage]
-  )
-
   const onCommittedCommand = useCallback(
     (resolved: ResolvedInteractiveSlashCommand) => {
       appendScrollbackUserMessage(resolved.line)
       applyResolvedInteractiveSlashCommand(resolved, {
         appendScrollbackError,
-        setStageArgumentRef: (arg) => {
-          stageArgumentRef.current = arg
-        },
-        openStage: ({ component, stageIndicator }) => {
-          setActiveSlashStage(() => ({
-            component,
-            stageIndicator,
-          }))
-        },
+        setStageArgumentRef,
+        openStage,
         onRunSuccess: (command, assistantMessage) => {
           appendScrollbackAssistantTextMessage(assistantMessage)
           if (command.literal === '/exit') setExitAfterCommit(true)
@@ -105,6 +76,8 @@ function InteractiveCliAppBody() {
       appendScrollbackAssistantTextMessage,
       appendScrollbackError,
       appendScrollbackUserMessage,
+      openStage,
+      setStageArgumentRef,
     ]
   )
 
@@ -124,27 +97,19 @@ function InteractiveCliAppBody() {
 
   return (
     <SetStageKeyHandlerContext.Provider value={setStageKeyHandler}>
-      {activeSlashStage ? (
-        <SlashCommandStageMount
-          cols={liveRegionCols}
-          stageIndicator={activeStageIndicator}
-          Stage={activeSlashStage.component}
-          stageProps={{
-            argument: stageArgumentRef.current,
-            onSettled: handleAsyncSlashSettled,
-            onAbortWithError: handleAsyncSlashAbortWithError,
-          }}
-        />
-      ) : null}
-      {!exitAfterCommit && (
-        <MainInteractivePrompt
-          onCommittedCommand={onCommittedCommand}
-          onCommittedLine={onCommittedLine}
-          isActive={!activeSlashStage}
-          slashCommands={interactiveSlashCommands}
-          placeholder="`exit` to quit."
-        />
-      )}
+      <SlashCommandShellLiveColumn
+        cols={liveRegionCols}
+        activeStage={activeStage}
+        stageArgumentRef={stageArgumentRef}
+        onStageSettled={handleStageSettled}
+        onStageAbortWithError={handleStageAbortWithError}
+        showMainPrompt={!exitAfterCommit}
+        mainPromptIsActive={!activeStage}
+        slashCommands={interactiveSlashCommands}
+        placeholder="`exit` to quit."
+        onCommittedCommand={onCommittedCommand}
+        onCommittedLine={onCommittedLine}
+      />
     </SetStageKeyHandlerContext.Provider>
   )
 }
