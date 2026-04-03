@@ -10,7 +10,7 @@ The key engineering constraint is that **PDF is not reliably “structured text.
 This means “layout extraction” for Doughnut must be treated as a spectrum: from “use embedded structure when present” → “heuristics using fonts/geometry” → “OCR + layout models” when the document is scanned or poorly formed. citeturn7search1turn7search2turn15search0turn14search1turn3search0
 
 From user feedback, the highest-impact and most frequently requested capabilities tend to be: **(a) reliable export and deep links back to source, (b) strong search/metadata, (c) performance and stability, (d) guided workflows to reduce overwhelm/learning curve, and (e) data portability/vendor risk mitigation**. citeturn6search4turn6search3turn6search24turn5search2turn5search1turn16search26  
-Doughnut can differentiate by making **structure-first reading** the primary UX: treat each book as a navigable knowledge tree/graph, allow BFS/DFS traversal, store multi-level summaries per node, and keep every extracted note “anchored” to a stable structural address (not just a page number). citeturn10search13turn9search0turn22search0turn12search4
+Doughnut can differentiate by making **structure-first reading** the primary UX: treat each book as a navigable knowledge tree/graph, allow BFS/DFS traversal, store multi-level summaries per node, and keep every extracted note “anchored” with stable **`BookAnchor`** pairs and a clear place in the **`BookRange`** tree (not just a page number). citeturn10search13turn9search0turn22search0turn12search4
 
 For how those ideas are expressed in Doughnut’s own data shape—**where** in a book something is, **which region** is in play, **which user note** cites evidence, and **how progress** is tracked—see the companion document **`ongoing/doughnut-book-reading-architecture-roadmap.md`** (architecture directions, not a delivery plan).
 
@@ -58,7 +58,7 @@ The flowchart below captures a minimally sufficient product loop that supports b
 ```mermaid
 flowchart TD
   A[Notebook contains Book + source file] --> B[Ingest & parse]
-  B --> C[Build BookRange tree: structuralAddress + anchors]
+  B --> C[Build BookRange tree: structuralTitle + anchors]
   C --> D{User chooses navigation mode}
   D -->|Breadth-first| E[Next sibling BookRange at current depth]
   D -->|Depth-first| F[Descend into child BookRange]
@@ -77,7 +77,7 @@ The landscape research above talks about “TOC,” “structure,” “highligh
 | Research theme | Domain role |
 |----------------|-------------|
 | Book file, format, import | **`Book`** in a **`Notebook`** (`format`, `sourceFileRef`) |
-| Outline / chapter / section / navigable chunk | **`BookRange`**: `startAnchor` / `endAnchor`, optional `structuralAddress` text, optional child ranges for hierarchy |
+| Outline / chapter / section / navigable chunk | **`BookRange`**: `startAnchor` / `endAnchor`, optional `structuralTitle` text, optional child ranges for hierarchy |
 | Exact point or span in the file (PDF coords, EPUB CFI, etc.) | **`BookAnchor`**: `anchorFormat` + opaque `value` until format-specific design hardens |
 | “This highlight is from here” / evidence for a PKM note | **`SourceSpan`**: anchor pair, optionally scoped **`within`** a `BookRange`; a **`Note`** has at most one `SourceSpan` for now |
 | “Where I left off” / completed a section | **`ReadingRecord`**: per **`User`**, refers to a **`BookRange`** (meaningful chunk), not a tiny citation span |
@@ -112,7 +112,7 @@ For Doughnut, the differentiator is not “having AI,” but **tying AI output t
 * “Highlight → exported markdown with templates” (BookFusion, Readwise) citeturn10search14turn6search7  
 * “Highlight → flashcard” (RemNote, Increader) citeturn10search1turn7search0  
 
-For Doughnut, the strongest UX is to keep extraction *atomic and anchored*: each extracted **`Note`** ties to a **`Book`** (via notebook containment and optional **`SourceSpan`**), with evidence carried by **`BookAnchor`** pairs; the navigable hierarchy stays on **`BookRange`** (`structuralAddress` plus anchor-bounded regions). Rendering fallbacks (e.g., screenshot for scanned PDFs) can attach to span kind or media later without collapsing “section” and “citation” into one type. This matches the direction of “jump back to source” practices across tools. citeturn9search0turn10search13turn20search1
+For Doughnut, the strongest UX is to keep extraction *atomic and anchored*: each extracted **`Note`** ties to a **`Book`** (via notebook containment and optional **`SourceSpan`**), with evidence carried by **`BookAnchor`** pairs; the navigable hierarchy stays on **`BookRange`** (`structuralTitle` plus anchor-bounded regions). Rendering fallbacks (e.g., screenshot for scanned PDFs) can attach to span kind or media later without collapsing “section” and “citation” into one type. This matches the direction of “jump back to source” practices across tools. citeturn9search0turn10search13turn20search1
 
 **Linking into the PKM graph.** Exports and integrations are consistently treated as a key selling point: BookFusion ships an Obsidian plugin and a Notion integration; Readwise maintains official plugins and export templates; Zotero users regularly request stable markdown exports that preserve deep links. citeturn10search17turn6search35turn6search28turn9search6  
 For Doughnut, linking should be native: every extracted “concept node” becomes a first-class PKM entity tied to its source anchor.
@@ -224,7 +224,7 @@ Doughnut’s clearest “white space” is to merge **structure-aware reading** 
 **Structure as the product, not a side panel.** Many tools show TOC/outlines; few treat the book as a *first-class knowledge graph* whose nodes can be traversed BFS/DFS, summarized at multiple LoD, and linked into PKM entities with stable anchors. RemNote’s expandable summaries and “headers only” concept are strong evidence that multi-resolution reading is valuable. citeturn10search13turn10search0
 
 **Anchors that survive export.** Zotero demonstrates the power of notes that include links back to the exact PDF page/spot; users repeatedly complain when those links break during export. citeturn9search0turn9search27  
-Doughnut can win by standardizing a robust “anchor format” (structural address + coordinates + fallback screenshot) that never breaks.
+Doughnut can win by standardizing a robust “anchor format” (range tree position via `structuralTitle` / parent chain + precise coordinates in `BookAnchor` + fallback screenshot) that never breaks.
 
 **Queue-first reading for knowledge work.** Incremental reading’s primary insight is operational: people need to keep many documents “in flight” without losing them. That maps to BFS “reading across nodes” and to priority scheduling. citeturn12search4turn12search5turn21search0
 

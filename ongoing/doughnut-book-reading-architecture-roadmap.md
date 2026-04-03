@@ -40,7 +40,7 @@ classDiagram
     }
 
     class BookRange {
-      +structuralAddress : text
+      +structuralTitle : text
     }
 
     class BookAnchor {
@@ -88,7 +88,7 @@ Keep the abstraction **open** early: `anchorFormat` + `value` (opaque until form
 
 ### BookRange
 
-A region: `startAnchor` + `endAnchor`. Primary unit for **navigation**, **hierarchical decomposition**, and **progress**. Optional `structuralAddress` text (e.g. `Chapter 3`, `2.4.1`) stays on the range rather than a separate type for now.
+A region: `startAnchor` + `endAnchor`. Primary unit for **navigation**, **hierarchical decomposition**, and **progress**. Optional **`structuralTitle`** is the human-readable label for that node in the outline (e.g. `Chapter 3`, `2.4.1`). A breadcrumb-style path can be **derived** by walking parent ranges; we do not use a separate persisted “structural address” field.
 
 ### SourceSpan
 
@@ -119,7 +119,7 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 ## Current directional choices
 
 - **One span per note (initially):** Keeps PKM extraction simple; multi-span and cross-book evidence are explicit future extensions.
-- **`structuralAddress` on `BookRange`:** Human-readable structure without a separate “address object” until needed.
+- **`structuralTitle` on `BookRange`:** Human-readable title for the range in the book’s structure tree; parent chain + title is enough to reconstruct display paths when needed.
 - **No `StructuralBookRange` subtype yet:** Structural vs user-carved ranges may be distinguished later if the product requires it (e.g. import vs override).
 
 ---
