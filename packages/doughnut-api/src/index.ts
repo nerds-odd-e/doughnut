@@ -1,6 +1,7 @@
 import { client } from '@generated/doughnut-backend-api/client.gen'
 import {
   MemoryTrackerController,
+  NotebookController,
   RecallsController,
   RecallPromptController,
   UserController,
@@ -16,6 +17,7 @@ import type {
   MultipleChoicesQuestion,
   Note,
   Notebook,
+  NotebooksViewedByUser,
   QuestionContestResult,
   RecallPrompt,
   SpellingQuestion,
@@ -65,6 +67,7 @@ export function configureClient(baseUrl: string, authToken?: string): void {
 
 export {
   MemoryTrackerController,
+  NotebookController,
   RecallsController,
   RecallPromptController,
   UserController,
@@ -80,6 +83,7 @@ export type {
   MultipleChoicesQuestion,
   Note,
   Notebook,
+  NotebooksViewedByUser,
   QuestionContestResult,
   RecallPrompt,
   SpellingQuestion,

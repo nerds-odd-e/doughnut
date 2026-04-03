@@ -26,7 +26,7 @@ Sub-phases are numbered in **delivery order**. Later items assume earlier shell/
 | 1.1 | — | Done |
 | 1.2 | — | **Scrapped** — recall stage `/exit` removed from this track (recall unchanged; leave via existing Esc / y-n flows). |
 | 1.3 | 1.1 — stage slash hints for **notebook stage only** (see section) | Done |
-| 1.4 | 1.1 — error path for titled `/use` | — |
+| 1.4 | 1.1 — error path for titled `/use` | Done |
 | 1.5 | 1.1, ideally 1.3 — optional argument + stage or list UI | — |
 | 1.6 | 1.5 — filter is a refinement of the picker | — |
 
@@ -66,11 +66,15 @@ Recall stage **`/exit`** is **not** part of this sub-phase track. Recall behavio
 
 ## 1.4 — `/use <non-existing-notebook>` shows a user-visible error
 
+**Status:** Done.
+
 **User outcome:** If the title does not match an accessible notebook, the user sees a **clear error** in the same family as existing CLI failures (`userVisibleSlashCommandError`, red assistant block / transcript pattern).
 
 **Implementation notes:** After API returns empty or 404, call **`onAbortWithError`** from the stage or map to assistant error before entering a “success” stage — do not enter notebook stage with an invalid id.
 
-**Tests:** `runInteractive` + spy returning no match; assert error text in scrollback/stdout.
+**Implemented:** `NotebookController.myNotebooks` via `runDefaultBackendJson`; exact case-sensitive title match; duplicate titles → error; loading spinner + Esc abort (`Cancelled.`). `NotebookController` and `NotebooksViewedByUser` exported from `doughnut-api`.
+
+**Tests:** `cli/tests/InteractiveCliApp.useNotebook.test.tsx` — `vi.spyOn(NotebookController, 'myNotebooks')`, not found, 401, Esc during load, duplicate titles.
 
 **Done when:** Error path tested; happy path from **1.1** unchanged.
 
