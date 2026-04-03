@@ -18,6 +18,11 @@ type AsyncAssistantFetchStageProps = Pick<
 > & {
   readonly spinnerLabel: string
   readonly runAssistantMessage: (signal: AbortSignal) => Promise<string>
+  /**
+   * When set, invoked on successful fetch instead of `onSettled` (e.g. stages
+   * that transition to another UI rather than posting an assistant line).
+   */
+  readonly onFetchSuccess?: () => void
 }
 
 export function AsyncAssistantFetchStage({
@@ -25,6 +30,7 @@ export function AsyncAssistantFetchStage({
   runAssistantMessage,
   onSettled,
   onAbortWithError,
+  onFetchSuccess,
 }: AsyncAssistantFetchStageProps) {
   const runRef = useRef(runAssistantMessage)
   runRef.current = runAssistantMessage
@@ -58,7 +64,11 @@ export function AsyncAssistantFetchStage({
     const settleSuccess = (text: string) => {
       if (settled) return
       settled = true
-      onSettled(text)
+      if (onFetchSuccess !== undefined) {
+        onFetchSuccess()
+      } else {
+        onSettled(text)
+      }
     }
     const settleError = (text: string) => {
       if (settled) return
@@ -80,7 +90,7 @@ export function AsyncAssistantFetchStage({
       ac.abort()
       abortControllerRef.current = null
     }
-  }, [onSettled, onAbortWithError])
+  }, [onSettled, onAbortWithError, onFetchSuccess])
 
   return (
     <Box>

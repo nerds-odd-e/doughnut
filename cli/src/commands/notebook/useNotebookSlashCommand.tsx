@@ -1,25 +1,15 @@
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react'
-import type { Key } from 'ink'
-import { Box, Text, useInput } from 'ink'
-import { Spinner } from '@inkjs/ui'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Box, Text } from 'ink'
 import {
   NotebookController,
   type Notebook,
   type NotebooksViewedByUser,
 } from 'doughnut-api'
-import { SetStageKeyHandlerContext } from '../../commonUIComponents/stageKeyForwardContext.js'
-import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import {
   doughnutSdkOptions,
   runDefaultBackendJson,
 } from '../../backendApi/doughnutBackendClient.js'
+import { AsyncAssistantFetchStage } from '../gmail/AsyncAssistantFetchStage.js'
 import type {
   CommandDoc,
   InteractiveSlashCommand,
@@ -85,83 +75,43 @@ function UseNotebookStage({
   const [resolvedNotebook, setResolvedNotebook] = useState<Notebook | null>(
     null
   )
-  const abortControllerRef = useRef<AbortController | null>(null)
-  const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
-
-  const handleStageInput = useCallback((input: string, key: Key) => {
-    const isEscape = key.escape === true || input === '\u001b'
-    if (!isEscape) return
-    abortControllerRef.current?.abort()
-  }, [])
-
-  useLayoutEffect(() => {
-    if (setStageKeyHandler === undefined || resolvedNotebook !== null) return
-    setStageKeyHandler(handleStageInput)
-    return () => {
-      setStageKeyHandler(null)
-    }
-  }, [setStageKeyHandler, handleStageInput, resolvedNotebook])
-
-  useInput(handleStageInput, {
-    isActive: setStageKeyHandler === undefined && resolvedNotebook === null,
-  })
+  const resolvedNotebookRef = useRef<Notebook | null>(null)
 
   useEffect(() => {
     if (title === '') {
       onAbortWithError('No notebook title given.')
-      return
-    }
-
-    const ac = new AbortController()
-    abortControllerRef.current = ac
-    let cancelled = false
-    let finished = false
-
-    const finishError = (message: string) => {
-      if (cancelled || finished) return
-      finished = true
-      onAbortWithError(message)
-    }
-
-    const run = async () => {
-      try {
-        const view = await runDefaultBackendJson<NotebooksViewedByUser>(() =>
-          NotebookController.myNotebooks({
-            ...doughnutSdkOptions(ac.signal),
-          })
-        )
-        if (cancelled || ac.signal.aborted) return
-
-        const matches = view.notebooks.filter(
-          (n: Notebook) => n.title === title
-        )
-        if (matches.length === 0) {
-          finishError(NOTEBOOK_NOT_FOUND)
-          return
-        }
-        if (matches.length > 1) {
-          finishError(
-            `Multiple notebooks match "${title}". Rename one in the web app so the title is unique.`
-          )
-          return
-        }
-        if (cancelled || ac.signal.aborted || finished) return
-        finished = true
-        setResolvedNotebook(matches[0])
-      } catch (err: unknown) {
-        if (cancelled) return
-        finishError(userVisibleSlashCommandError(err))
-      }
-    }
-
-    run().catch(() => undefined)
-
-    return () => {
-      cancelled = true
-      ac.abort()
-      abortControllerRef.current = null
     }
   }, [title, onAbortWithError])
+
+  const runResolveNotebook = useCallback(
+    async (signal: AbortSignal) => {
+      const view = await runDefaultBackendJson<NotebooksViewedByUser>(() =>
+        NotebookController.myNotebooks({
+          ...doughnutSdkOptions(signal),
+        })
+      )
+
+      const matches = view.notebooks.filter((n: Notebook) => n.title === title)
+      if (matches.length === 0) {
+        throw new Error(NOTEBOOK_NOT_FOUND)
+      }
+      if (matches.length > 1) {
+        throw new Error(
+          `Multiple notebooks match "${title}". Rename one in the web app so the title is unique.`
+        )
+      }
+      resolvedNotebookRef.current = matches[0]
+      return ''
+    },
+    [title]
+  )
+
+  const handleFetchSuccess = useCallback(() => {
+    const next = resolvedNotebookRef.current
+    if (next !== null) {
+      setResolvedNotebook(next)
+    }
+  }, [])
 
   if (resolvedNotebook !== null) {
     return (
@@ -172,10 +122,18 @@ function UseNotebookStage({
     )
   }
 
+  if (title === '') {
+    return null
+  }
+
   return (
-    <Box>
-      <Spinner label="Loading notebooks…" />
-    </Box>
+    <AsyncAssistantFetchStage
+      spinnerLabel="Loading notebooks…"
+      runAssistantMessage={runResolveNotebook}
+      onFetchSuccess={handleFetchSuccess}
+      onSettled={onSettled}
+      onAbortWithError={onAbortWithError}
+    />
   )
 }
 
