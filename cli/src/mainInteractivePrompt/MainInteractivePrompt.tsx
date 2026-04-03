@@ -26,15 +26,19 @@ import {
   normalizeInputForSlash,
   slashGuidanceForInk,
 } from './slashCommandCompletion.js'
-
-const MAIN_PROMPT_PLACEHOLDER = '`exit` to quit.'
+import type { InteractiveSlashCommand } from '../commands/interactiveSlashCommand.js'
 
 export function MainInteractivePrompt({
   onCommittedLine,
   isActive = true,
+  slashCommands,
+  placeholder = '`exit` to quit.',
 }: {
   readonly onCommittedLine: (line: string) => void
   readonly isActive?: boolean
+  /** When set, Tab / `/` list / picks use this registry instead of top-level interactive commands. */
+  readonly slashCommands?: readonly InteractiveSlashCommand[]
+  readonly placeholder?: string
 }) {
   const [buffer, setBuffer] = useState('')
   const [caretOffset, setCaretOffset] = useState(0)
@@ -62,275 +66,301 @@ export function MainInteractivePrompt({
   }, [])
 
   const guidance = useMemo(
-    () => effectiveSlashGuidance(buffer, suggestionsDismissed),
-    [buffer, suggestionsDismissed]
+    () =>
+      slashCommands === undefined
+        ? effectiveSlashGuidance(buffer, suggestionsDismissed)
+        : effectiveSlashGuidance(buffer, suggestionsDismissed, slashCommands),
+    [buffer, suggestionsDismissed, slashCommands]
   )
 
-  const handleInput = useCallback((input: string, key: Key) => {
-    if (!isActiveRef.current) return
-    const readBuf = () => bufferRef.current
-    const readCaret = () => caretRef.current
-    const readHighlight = () => slashHighlightRef.current
+  const handleInput = useCallback(
+    (input: string, key: Key) => {
+      if (!isActiveRef.current) return
+      const readBuf = () => bufferRef.current
+      const readCaret = () => caretRef.current
+      const readHighlight = () => slashHighlightRef.current
 
-    const historyState = (): PromptHistoryState => ({
-      lineDraft: readBuf(),
-      caretOffset: readCaret(),
-      userInputHistoryLines: historyLinesRef.current,
-      userInputHistoryWalkIndex: historyWalkIndexRef.current,
-      lineDraftBeforeUserInputHistoryWalk: draftBeforeWalkRef.current,
-    })
+      const historyState = (): PromptHistoryState => ({
+        lineDraft: readBuf(),
+        caretOffset: readCaret(),
+        userInputHistoryLines: historyLinesRef.current,
+        userInputHistoryWalkIndex: historyWalkIndexRef.current,
+        lineDraftBeforeUserInputHistoryWalk: draftBeforeWalkRef.current,
+      })
 
-    const syncWalkFrom = (s: PromptHistoryState) => {
-      historyWalkIndexRef.current = s.userInputHistoryWalkIndex
-      draftBeforeWalkRef.current = s.lineDraftBeforeUserInputHistoryWalk
-    }
-
-    const endWalkBeforeDraftEdit = () => {
-      const next = exitHistoryWalkOnDraftEdit(historyState())
-      syncWalkFrom(next)
-    }
-
-    const setAll = (nextBuf: string, nextCaret: number, nextHi?: number) => {
-      suggestionsDismissedRef.current = false
-      setSuggestionsDismissed(false)
-      const hi = nextHi ?? 0
-      bufferRef.current = nextBuf
-      caretRef.current = nextCaret
-      slashHighlightRef.current = hi
-      setBuffer(nextBuf)
-      setCaretOffset(nextCaret)
-      setSlashHighlightIndex(hi)
-    }
-
-    const setCaretOnly = (nextCaret: number) => {
-      caretRef.current = nextCaret
-      setCaretOffset(nextCaret)
-    }
-
-    const setHighlightOnly = (nextHi: number) => {
-      slashHighlightRef.current = nextHi
-      setSlashHighlightIndex(nextHi)
-    }
-
-    const applyHistoryArrow = (dir: 'up' | 'down') => {
-      const prev = historyState()
-      const next = dir === 'up' ? onArrowUp(prev) : onArrowDown(prev)
-      if (
-        prev.lineDraft === next.lineDraft &&
-        prev.caretOffset === next.caretOffset &&
-        prev.userInputHistoryWalkIndex === next.userInputHistoryWalkIndex &&
-        prev.lineDraftBeforeUserInputHistoryWalk ===
-          next.lineDraftBeforeUserInputHistoryWalk
-      ) {
-        return
+      const syncWalkFrom = (s: PromptHistoryState) => {
+        historyWalkIndexRef.current = s.userInputHistoryWalkIndex
+        draftBeforeWalkRef.current = s.lineDraftBeforeUserInputHistoryWalk
       }
-      syncWalkFrom(next)
-      const draftChanged = prev.lineDraft !== next.lineDraft
-      if (draftChanged) {
-        setAll(next.lineDraft, next.caretOffset, 0)
-      } else {
-        setCaretOnly(next.caretOffset)
-      }
-    }
 
-    const commitLine = () => {
-      const line = readBuf()
-      historyLinesRef.current = appendUserInputHistoryLine(
-        historyLinesRef.current,
-        maskInteractiveInputLineForStorage(line)
-      )
-      saveUserInputHistory(getConfigDir(), historyLinesRef.current)
-      historyWalkIndexRef.current = null
-      draftBeforeWalkRef.current = null
-      setAll('', 0, 0)
-      if (line !== '') {
-        onCommittedLineRef.current(line)
+      const endWalkBeforeDraftEdit = () => {
+        const next = exitHistoryWalkOnDraftEdit(historyState())
+        syncWalkFrom(next)
       }
-    }
 
-    // --- Slash completion: Tab ---
-    if (key.tab) {
-      endWalkBeforeDraftEdit()
-      const draft = normalizeInputForSlash(readBuf())
-      if (draft.startsWith('/') && !draft.endsWith(' ')) {
-        const { completed } = getSlashTabCompletion(draft)
-        if (completed !== draft) {
-          setAll(completed, completed.length, 0)
+      const setAll = (nextBuf: string, nextCaret: number, nextHi?: number) => {
+        suggestionsDismissedRef.current = false
+        setSuggestionsDismissed(false)
+        const hi = nextHi ?? 0
+        bufferRef.current = nextBuf
+        caretRef.current = nextCaret
+        slashHighlightRef.current = hi
+        setBuffer(nextBuf)
+        setCaretOffset(nextCaret)
+        setSlashHighlightIndex(hi)
+      }
+
+      const setCaretOnly = (nextCaret: number) => {
+        caretRef.current = nextCaret
+        setCaretOffset(nextCaret)
+      }
+
+      const setHighlightOnly = (nextHi: number) => {
+        slashHighlightRef.current = nextHi
+        setSlashHighlightIndex(nextHi)
+      }
+
+      const applyHistoryArrow = (dir: 'up' | 'down') => {
+        const prev = historyState()
+        const next = dir === 'up' ? onArrowUp(prev) : onArrowDown(prev)
+        if (
+          prev.lineDraft === next.lineDraft &&
+          prev.caretOffset === next.caretOffset &&
+          prev.userInputHistoryWalkIndex === next.userInputHistoryWalkIndex &&
+          prev.lineDraftBeforeUserInputHistoryWalk ===
+            next.lineDraftBeforeUserInputHistoryWalk
+        ) {
+          return
+        }
+        syncWalkFrom(next)
+        const draftChanged = prev.lineDraft !== next.lineDraft
+        if (draftChanged) {
+          setAll(next.lineDraft, next.caretOffset, 0)
+        } else {
+          setCaretOnly(next.caretOffset)
         }
       }
-      return
-    }
 
-    // --- Slash completion: Esc ---
-    if (key.escape) {
-      const raw = readBuf()
-      if (isBareDraftSlash(raw)) {
+      const commitLine = () => {
+        const line = readBuf()
+        historyLinesRef.current = appendUserInputHistoryLine(
+          historyLinesRef.current,
+          maskInteractiveInputLineForStorage(line)
+        )
+        saveUserInputHistory(getConfigDir(), historyLinesRef.current)
         historyWalkIndexRef.current = null
         draftBeforeWalkRef.current = null
         setAll('', 0, 0)
+        if (line !== '') {
+          onCommittedLineRef.current(line)
+        }
+      }
+
+      // --- Slash completion: Tab ---
+      if (key.tab) {
+        endWalkBeforeDraftEdit()
+        const draft = normalizeInputForSlash(readBuf())
+        if (draft.startsWith('/') && !draft.endsWith(' ')) {
+          const { completed } =
+            slashCommands === undefined
+              ? getSlashTabCompletion(draft)
+              : getSlashTabCompletion(draft, slashCommands)
+          if (completed !== draft) {
+            setAll(completed, completed.length, 0)
+          }
+        }
         return
       }
-      const g = slashGuidanceForInk(raw)
-      if (g.show === 'list') {
-        suggestionsDismissedRef.current = true
-        setSuggestionsDismissed(true)
-        setHighlightOnly(0)
+
+      // --- Slash completion: Esc ---
+      if (key.escape) {
+        const raw = readBuf()
+        if (isBareDraftSlash(raw)) {
+          historyWalkIndexRef.current = null
+          draftBeforeWalkRef.current = null
+          setAll('', 0, 0)
+          return
+        }
+        const g =
+          slashCommands === undefined
+            ? slashGuidanceForInk(raw)
+            : slashGuidanceForInk(raw, slashCommands)
+        if (g.show === 'list') {
+          suggestionsDismissedRef.current = true
+          setSuggestionsDismissed(true)
+          setHighlightOnly(0)
+        }
+        return
       }
-      return
-    }
 
-    // --- Caret movement: left, right, home, end ---
-    if (key.leftArrow) {
-      const c = readCaret()
-      if (c > 0) setCaretOnly(c - 1)
-      return
-    }
-    if (key.rightArrow) {
-      const buf = readBuf()
-      const c = readCaret()
-      if (c < buf.length) setCaretOnly(c + 1)
-      return
-    }
-    if (key.home) {
-      setCaretOnly(0)
-      return
-    }
-    if (key.end) {
-      setCaretOnly(readBuf().length)
-      return
-    }
+      // --- Caret movement: left, right, home, end ---
+      if (key.leftArrow) {
+        const c = readCaret()
+        if (c > 0) setCaretOnly(c - 1)
+        return
+      }
+      if (key.rightArrow) {
+        const buf = readBuf()
+        const c = readCaret()
+        if (c < buf.length) setCaretOnly(c + 1)
+        return
+      }
+      if (key.home) {
+        setCaretOnly(0)
+        return
+      }
+      if (key.end) {
+        setCaretOnly(readBuf().length)
+        return
+      }
 
-    // --- ↑↓: slash list cycling vs history walk ---
-    if (key.upArrow || key.downArrow) {
-      const dir = key.upArrow ? 'up' : 'down'
-      const buf = readBuf()
-      const caret = readCaret()
+      // --- ↑↓: slash list cycling vs history walk ---
+      if (key.upArrow || key.downArrow) {
+        const dir = key.upArrow ? 'up' : 'down'
+        const buf = readBuf()
+        const caret = readCaret()
 
-      const g = effectiveSlashGuidance(buf, suggestionsDismissedRef.current)
-      const slashRows = g.show === 'list' ? g.rows : []
-      const listVisible = slashRows.length > 0
-      const walkingHistory = historyWalkIndexRef.current !== null
+        const g =
+          slashCommands === undefined
+            ? effectiveSlashGuidance(buf, suggestionsDismissedRef.current)
+            : effectiveSlashGuidance(
+                buf,
+                suggestionsDismissedRef.current,
+                slashCommands
+              )
+        const slashRows = g.show === 'list' ? g.rows : []
+        const listVisible = slashRows.length > 0
+        const walkingHistory = historyWalkIndexRef.current !== null
 
-      if (
-        !walkingHistory &&
-        isSlashListArrowKey(dir, caret, buf, listVisible)
-      ) {
-        setHighlightOnly(
-          cycleListSelectionIndex(
-            readHighlight(),
-            dir === 'down' ? 1 : -1,
-            slashRows.length
+        if (
+          !walkingHistory &&
+          isSlashListArrowKey(dir, caret, buf, listVisible)
+        ) {
+          setHighlightOnly(
+            cycleListSelectionIndex(
+              readHighlight(),
+              dir === 'down' ? 1 : -1,
+              slashRows.length
+            )
           )
-        )
+          return
+        }
+        applyHistoryArrow(dir)
         return
       }
-      applyHistoryArrow(dir)
-      return
-    }
 
-    // --- Editing: backspace, delete ---
-    if (key.backspace) {
-      endWalkBeforeDraftEdit()
-      const buf = readBuf()
-      const c = readCaret()
-      if (c === 0) return
-      const nextBuf = buf.slice(0, c - 1) + buf.slice(c)
-      setAll(nextBuf, c - 1, 0)
-      return
-    }
-
-    if (key.delete) {
-      endWalkBeforeDraftEdit()
-      const buf = readBuf()
-      const c = readCaret()
-      if (c === buf.length && c > 0) {
+      // --- Editing: backspace, delete ---
+      if (key.backspace) {
+        endWalkBeforeDraftEdit()
+        const buf = readBuf()
+        const c = readCaret()
+        if (c === 0) return
         const nextBuf = buf.slice(0, c - 1) + buf.slice(c)
         setAll(nextBuf, c - 1, 0)
         return
       }
-      if (c >= buf.length) return
-      const nextBuf = buf.slice(0, c) + buf.slice(c + 1)
-      setAll(nextBuf, c, 0)
-      return
-    }
 
-    // --- Enter: slash completion pick or commit ---
-    if (key.return) {
-      const bufForPick = readBuf()
-      const gPick = effectiveSlashGuidance(
-        bufForPick,
-        suggestionsDismissedRef.current
-      )
-      const pickRows = gPick.show === 'list' ? gPick.rows : []
-      if (pickRows.length > 0) {
-        endWalkBeforeDraftEdit()
-        const hi = readHighlight()
-        const row = pickRows[hi] ?? pickRows[0]!
-        const completed = `${row.completionLine} `
-        setAll(completed, completed.length, 0)
-        return
-      }
-      commitLine()
-      return
-    }
-
-    // --- Character input (including multi-char paste) ---
-    if (input.length > 0) {
-      if (!(input.includes('\r') || input.includes('\n'))) {
+      if (key.delete) {
         endWalkBeforeDraftEdit()
         const buf = readBuf()
         const c = readCaret()
-        const inserted = normalizeInputForSlash(input)
-        setAll(
-          buf.slice(0, c) + inserted + buf.slice(c),
-          c + inserted.length,
-          0
-        )
+        if (c === buf.length && c > 0) {
+          const nextBuf = buf.slice(0, c - 1) + buf.slice(c)
+          setAll(nextBuf, c - 1, 0)
+          return
+        }
+        if (c >= buf.length) return
+        const nextBuf = buf.slice(0, c) + buf.slice(c + 1)
+        setAll(nextBuf, c, 0)
         return
       }
-      endWalkBeforeDraftEdit()
-      let curBuf = readBuf()
-      let c = readCaret()
-      for (let i = 0; i < input.length; i++) {
-        const ch = input[i]!
-        if (ch === '\r') {
-          const line = curBuf
-          historyLinesRef.current = appendUserInputHistoryLine(
-            historyLinesRef.current,
-            maskInteractiveInputLineForStorage(line)
-          )
-          saveUserInputHistory(getConfigDir(), historyLinesRef.current)
-          historyWalkIndexRef.current = null
-          draftBeforeWalkRef.current = null
-          setAll('', 0, 0)
-          if (line !== '') onCommittedLineRef.current(line)
-          curBuf = ''
-          c = 0
-          if (input[i + 1] === '\n') i++
-          continue
+
+      // --- Enter: slash completion pick or commit ---
+      if (key.return) {
+        const bufForPick = readBuf()
+        const gPick =
+          slashCommands === undefined
+            ? effectiveSlashGuidance(
+                bufForPick,
+                suggestionsDismissedRef.current
+              )
+            : effectiveSlashGuidance(
+                bufForPick,
+                suggestionsDismissedRef.current,
+                slashCommands
+              )
+        const pickRows = gPick.show === 'list' ? gPick.rows : []
+        if (pickRows.length > 0) {
+          endWalkBeforeDraftEdit()
+          const hi = readHighlight()
+          const row = pickRows[hi] ?? pickRows[0]!
+          const completed = `${row.completionLine} `
+          setAll(completed, completed.length, 0)
+          return
         }
-        if (ch === '\n') {
-          const line = curBuf
-          historyLinesRef.current = appendUserInputHistoryLine(
-            historyLinesRef.current,
-            maskInteractiveInputLineForStorage(line)
-          )
-          saveUserInputHistory(getConfigDir(), historyLinesRef.current)
-          historyWalkIndexRef.current = null
-          draftBeforeWalkRef.current = null
-          setAll('', 0, 0)
-          if (line !== '') onCommittedLineRef.current(line)
-          curBuf = ''
-          c = 0
-          continue
-        }
-        curBuf = curBuf.slice(0, c) + ch + curBuf.slice(c)
-        c += 1
+        commitLine()
+        return
       }
-      setAll(curBuf, c, 0)
-      return
-    }
-  }, [])
+
+      // --- Character input (including multi-char paste) ---
+      if (input.length > 0) {
+        if (!(input.includes('\r') || input.includes('\n'))) {
+          endWalkBeforeDraftEdit()
+          const buf = readBuf()
+          const c = readCaret()
+          const inserted = normalizeInputForSlash(input)
+          setAll(
+            buf.slice(0, c) + inserted + buf.slice(c),
+            c + inserted.length,
+            0
+          )
+          return
+        }
+        endWalkBeforeDraftEdit()
+        let curBuf = readBuf()
+        let c = readCaret()
+        for (let i = 0; i < input.length; i++) {
+          const ch = input[i]!
+          if (ch === '\r') {
+            const line = curBuf
+            historyLinesRef.current = appendUserInputHistoryLine(
+              historyLinesRef.current,
+              maskInteractiveInputLineForStorage(line)
+            )
+            saveUserInputHistory(getConfigDir(), historyLinesRef.current)
+            historyWalkIndexRef.current = null
+            draftBeforeWalkRef.current = null
+            setAll('', 0, 0)
+            if (line !== '') onCommittedLineRef.current(line)
+            curBuf = ''
+            c = 0
+            if (input[i + 1] === '\n') i++
+            continue
+          }
+          if (ch === '\n') {
+            const line = curBuf
+            historyLinesRef.current = appendUserInputHistoryLine(
+              historyLinesRef.current,
+              maskInteractiveInputLineForStorage(line)
+            )
+            saveUserInputHistory(getConfigDir(), historyLinesRef.current)
+            historyWalkIndexRef.current = null
+            draftBeforeWalkRef.current = null
+            setAll('', 0, 0)
+            if (line !== '') onCommittedLineRef.current(line)
+            curBuf = ''
+            c = 0
+            continue
+          }
+          curBuf = curBuf.slice(0, c) + ch + curBuf.slice(c)
+          c += 1
+        }
+        setAll(curBuf, c, 0)
+        return
+      }
+    },
+    [slashCommands]
+  )
 
   useInput(handleInput)
 
@@ -347,7 +377,7 @@ export function MainInteractivePrompt({
         terminalColumns={cols}
         buffer={buffer}
         caretOffset={caretOffset}
-        placeholder={MAIN_PROMPT_PLACEHOLDER}
+        placeholder={placeholder}
       />
       {guidance.show === 'hint' ? (
         <Text color="gray">{DEFAULT_INTERACTIVE_GUIDANCE}</Text>
