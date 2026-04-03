@@ -44,7 +44,23 @@ describe('InteractiveCliApp /use notebook integration', () => {
     stdin.write('/use Top Maths\r')
     await waitForFramesToInclude('Active notebook: Top Maths')
     stdin.write('/')
+    await waitForLastFrameToInclude('/attach <path to pdf>')
+    await waitForLastFrameToInclude('Attach a PDF to the active notebook')
     await waitForLastFrameToInclude('/exit, exit')
     await waitForLastFrameToInclude('Leave notebook context')
+  })
+
+  test('notebook stage: /attach <path> shows placeholder until implemented', async () => {
+    myNotebooksSpy.mockResolvedValue({
+      data: { notebooks: [notebookWithTitle('Top Maths')] },
+    } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
+
+    const { stdin, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+
+    stdin.write('/use Top Maths\r')
+    await waitForFramesToInclude('Active notebook: Top Maths')
+    stdin.write('/attach /tmp/nonexistent-e2e-stub.pdf\r')
+    await waitForFramesToInclude('Attach is not implemented yet.')
   })
 })
