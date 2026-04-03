@@ -37,8 +37,8 @@
 | Method / route | `POST /api/notebooks/{notebook}/attach-book` |
 | AuthZ | Same as other notebook mutations: caller must be allowed to modify the target notebook (reuse `Notebook` path variable + `authorizationService.assertAuthorization(notebook)` pattern). |
 | Content type | **`application/json`** — request body is the DTO below (**no** `multipart`, **no** file part). |
-| Body | Single JSON object: `schemaVersion`, `bookName`, `format`, `layout` (nested tree—see below). |
-| Response | **`201 Created`** with body including at least **`bookId`**. **Range ids** (`BookRange` primary keys) **do not exist until the server persists** the tree; the response may include an **outline DTO with server-assigned range ids** (typically still **nested**, mirroring the read endpoint) so clients can verify persistence without relying on a second GET. Errors: **`400`** validation (invalid layout, wrong content type), **`403`** / **`404`** consistent with notebook APIs. |
+| Body | Single JSON object: `bookName`, `format`, `layout` (nested tree—see below). |
+| Response | **`201 Created`** with the persisted **`Book`** JSON (same shape as **`GET .../books/{book}`**): metadata plus **`ranges`** (flat list with `parentRangeId`, `siblingOrder`, `title`, anchors). Errors: **`400`** validation (invalid layout, wrong content type), **`403`** / **`404`** consistent with notebook APIs. |
 
 **Rationale:** Outline-only attach keeps a clear boundary: **structure** is declared in one JSON payload; **bytes** follow a separate API or flow so this handler stays simple and testable.
 
@@ -48,7 +48,6 @@ This is the **interchange structure** the CLI (Phase 3) builds from MinerU / out
 
 | Field | Type | Required | Notes |
 |-------|------|----------|--------|
-| `schemaVersion` | integer | yes | Start at **`1`**. Bump when breaking wire changes; server rejects unknown expectations explicitly. |
 | `bookName` | string | yes | Display title for the `Book` (trimmed; max length TBD in implementation, e.g. 512). |
 | `format` | string | yes | For this story: **`"pdf"`** only. Leaves room for later `"epub"` without a new route. |
 | `layout` | object | yes | Root container for the outline **tree** (see below). |
@@ -79,11 +78,11 @@ This is the **interchange structure** the CLI (Phase 3) builds from MinerU / out
 
 - One `Book` per successful `attach-book`: `format` and `bookName` from payload; **`sourceFileRef` unset or null** until a later upload/bind step.
 - Recursive descent of `layout.roots` / `children` → one **`BookRange`** per node, parent/child from **nesting**, `structuralTitle` from `title`, `startAnchor` / `endAnchor` → **`BookAnchor`** rows.
-- Reject: unknown `schemaVersion`, invalid anchors, or structural violations (e.g. excessively deep tree—limit TBD if needed).
+- Reject: invalid anchors, or structural violations (e.g. excessively deep tree—limit TBD if needed).
 
 ### Read path for Phase 2
 
-Keep a **GET** suitable for the browser and tests, e.g. **`GET /api/notebooks/{notebook}/books`** (list metadata) and **`GET /api/notebooks/{notebook}/books/{book}`** returning the outline as a **nested** DTO with **server-assigned** range ids on each node (shape aligned with request `LayoutNode` + `id` field, or equivalent—document in OpenAPI). Exact paths can follow existing REST style; **create via `attach-book`**, **read via GET**.
+**`GET /api/notebooks/{notebook}/books/{book}`** returns the **`Book`** JSON (metadata + flat **`ranges`** with server-assigned ids, `title`, anchors, `parentRangeId`, `siblingOrder`). There is **no** `GET .../books` list endpoint; clients use the **`id` from `attach-book`** (or another future discovery path) before calling GET. **Create via `attach-book`**, **read via GET** by id. OpenAPI documents the `Book` schema.
 
 **Data shape (directional, persistence):**
 
@@ -92,7 +91,7 @@ Keep a **GET** suitable for the browser and tests, e.g. **`GET /api/notebooks/{n
 
 **Tests:** Prefer **controller-level** tests with real DB (`@Transactional`) and **`makeMe`** factories. Assert HTTP response bodies and persistence (e.g. reload from repository), not internal service private methods. Use **`application/json`** request bodies (nested `layout.roots` / `children`).
 
-**Phase complete when:** Migrations applied; **`POST .../attach-book`** persists book + nested outline under auth (**no** file on this route); **GET** returns nested outline JSON with range ids; OpenAPI updated for any surface consumed by the frontend / `doughnut-api` generation.
+**Phase complete when:** Migrations applied; **`POST .../attach-book`** persists book + outline under auth (**no** file on this route); **`GET .../books/{book}`** returns **`Book`** JSON with range ids; OpenAPI updated for any surface consumed by the frontend / `doughnut-api` generation.
 
 ---
 
@@ -118,7 +117,7 @@ Keep a **GET** suitable for the browser and tests, e.g. **`GET /api/notebooks/{n
 
 **Follow-up:** Run **`pnpm generateTypeScript`** after OpenAPI changes.
 
-**Phase complete when:** E2E passes for the story-shaped scenario; frontend lists show correct data for multiple levels when the outline has children.
+**Phase complete when:** E2E passes for the story-shaped scenario; the browser shows correct hierarchical structure for multiple levels when the outline has children (using **`book` id** from attach or **`GET .../books/{book}`**—no list-books API).
 
 ---
 

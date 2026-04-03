@@ -285,6 +285,54 @@ export type RedirectToNoteResponse = {
     noteId?: number;
 };
 
+export type AttachBookAnchorRequestFull = {
+    anchorFormat: string;
+    value: string;
+};
+
+export type AttachBookLayoutNodeRequestFull = {
+    title: string;
+    startAnchor: AttachBookAnchorRequestFull;
+    endAnchor: AttachBookAnchorRequestFull;
+    children?: Array<AttachBookLayoutNodeRequestFull>;
+};
+
+export type AttachBookLayoutRequestFull = {
+    roots: Array<AttachBookLayoutNodeRequestFull>;
+};
+
+export type AttachBookRequestFull = {
+    bookName: string;
+    format: string;
+    layout: AttachBookLayoutRequestFull;
+};
+
+export type BookAnchorFull = {
+    id: number;
+    anchorFormat: string;
+    value: string;
+};
+
+export type BookRangeFull = {
+    id: number;
+    startAnchor?: BookAnchorFull;
+    endAnchor?: BookAnchorFull;
+    siblingOrder?: number;
+    title: string;
+    parentRangeId?: string;
+};
+
+export type BookFull = {
+    id: number;
+    bookName: string;
+    format: string;
+    sourceFileRef?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    ranges?: Array<BookRangeFull>;
+    notebookId?: string;
+};
+
 export type NotebookCertificateApproval = {
     id: number;
     notebook: Notebook;
@@ -558,6 +606,16 @@ export type UriAndTitle = {
 export type NotebooksViewedByUser = {
     notebooks: Array<Notebook>;
     subscriptions?: Array<Subscription>;
+};
+
+export type BookSummary = {
+    id: number;
+    bookName: string;
+    format: string;
+    sourceFileRef?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    notebookId?: string;
 };
 
 export type NotebookCertificateApprovalDto = {
@@ -1712,6 +1770,24 @@ export type ImportObsidianResponses = {
      */
     200: unknown;
 };
+
+export type AttachBookData = {
+    body: AttachBookRequestFull;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/attach-book';
+};
+
+export type AttachBookResponses = {
+    /**
+     * Created
+     */
+    201: BookFull;
+};
+
+export type AttachBookResponse = AttachBookResponses[keyof AttachBookResponses];
 
 export type CreateNotebookData = {
     body: NoteCreationDto;
@@ -2888,6 +2964,43 @@ export type MyNotebooksResponses = {
 };
 
 export type MyNotebooksResponse = MyNotebooksResponses[keyof MyNotebooksResponses];
+
+export type ListBooksData = {
+    body?: never;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/books';
+};
+
+export type ListBooksResponses = {
+    /**
+     * OK
+     */
+    200: Array<BookSummary>;
+};
+
+export type ListBooksResponse = ListBooksResponses[keyof ListBooksResponses];
+
+export type GetBookData = {
+    body?: never;
+    path: {
+        notebook: number;
+        book: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/books/{book}';
+};
+
+export type GetBookResponses = {
+    /**
+     * OK
+     */
+    200: BookFull;
+};
+
+export type GetBookResponse = GetBookResponses[keyof GetBookResponses];
 
 export type GetAllPendingRequestData = {
     body?: never;

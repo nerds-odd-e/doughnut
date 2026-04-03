@@ -1152,6 +1152,30 @@ paths:
       responses:
         "200":
           description: OK
+  /api/notebooks/{notebook}/attach-book:
+    post:
+      tags:
+      - notebook-books-controller
+      operationId: attachBook
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AttachBookRequest_Full"
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book_Full"
   /api/notebooks/create:
     post:
       tags:
@@ -2423,6 +2447,49 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebooksViewedByUser"
+  /api/notebooks/{notebook}/books:
+    get:
+      tags:
+      - notebook-books-controller
+      operationId: listBooks
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Book_Summary"
+  /api/notebooks/{notebook}/books/{book}:
+    get:
+      tags:
+      - notebook-books-controller
+      operationId: getBook
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: book
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Book_Full"
   /api/notebook_certificate_approvals/get-all-pending-request:
     get:
       tags:
@@ -3476,6 +3543,121 @@ components:
         noteId:
           type: integer
           format: int32
+    AttachBookAnchorRequest_Full:
+      type: object
+      properties:
+        anchorFormat:
+          type: string
+        value:
+          type: string
+      required:
+      - anchorFormat
+      - value
+    AttachBookLayoutNodeRequest_Full:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 512
+          minLength: 0
+        startAnchor:
+          $ref: "#/components/schemas/AttachBookAnchorRequest_Full"
+        endAnchor:
+          $ref: "#/components/schemas/AttachBookAnchorRequest_Full"
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/AttachBookLayoutNodeRequest_Full"
+      required:
+      - endAnchor
+      - startAnchor
+      - title
+    AttachBookLayoutRequest_Full:
+      type: object
+      properties:
+        roots:
+          type: array
+          items:
+            $ref: "#/components/schemas/AttachBookLayoutNodeRequest_Full"
+      required:
+      - roots
+    AttachBookRequest_Full:
+      type: object
+      properties:
+        bookName:
+          type: string
+          maxLength: 512
+          minLength: 0
+        format:
+          type: string
+        layout:
+          $ref: "#/components/schemas/AttachBookLayoutRequest_Full"
+      required:
+      - bookName
+      - format
+      - layout
+    BookAnchor_Full:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        anchorFormat:
+          type: string
+        value:
+          type: string
+      required:
+      - anchorFormat
+      - id
+      - value
+    BookRange_Full:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        startAnchor:
+          $ref: "#/components/schemas/BookAnchor_Full"
+        endAnchor:
+          $ref: "#/components/schemas/BookAnchor_Full"
+        siblingOrder:
+          type: integer
+          format: int64
+        title:
+          type: string
+        parentRangeId:
+          type: string
+      required:
+      - id
+      - title
+    Book_Full:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        bookName:
+          type: string
+        format:
+          type: string
+        sourceFileRef:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        ranges:
+          type: array
+          items:
+            $ref: "#/components/schemas/BookRange_Full"
+        notebookId:
+          type: string
+      required:
+      - bookName
+      - format
+      - id
     NotebookCertificateApproval:
       type: object
       properties:
@@ -4112,6 +4294,30 @@ components:
             $ref: "#/components/schemas/Subscription"
       required:
       - notebooks
+    Book_Summary:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        bookName:
+          type: string
+        format:
+          type: string
+        sourceFileRef:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        notebookId:
+          type: string
+      required:
+      - bookName
+      - format
+      - id
     NotebookCertificateApprovalDTO:
       type: object
       properties:

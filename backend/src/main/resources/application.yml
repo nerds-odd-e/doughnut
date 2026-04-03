@@ -57,6 +57,7 @@ server:
   port: 8081
 springdoc:
   override-with-generic-response: false
+  writer-with-json-view: true
   api-docs:
     enabled: true
     path: /api-docs
@@ -127,6 +128,7 @@ server:
   port: 9081
 springdoc:
   override-with-generic-response: false
+  writer-with-json-view: true
   api-docs:
     enabled: true
     path: /api-docs
@@ -264,6 +266,7 @@ server:
   port: 8081
 springdoc:
   override-with-generic-response: false
+  writer-with-json-view: true
   api-docs:
     enabled: true
     path: /api-docs
