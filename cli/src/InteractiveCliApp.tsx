@@ -147,26 +147,17 @@ function InteractiveCliAppBody() {
     [appendScrollbackItem, appendScrollbackItems]
   )
 
-  const commitUserLineWithAssistant = useCallback(
-    (userLine: string, assistantText: string, isError = false) => {
-      const user = transcriptUserLine(userLine)
-      const assistant = isError
-        ? transcriptAssistantError(assistantText)
-        : transcriptAssistantText(assistantText)
-      appendScrollbackItems([user, assistant])
-    },
-    [appendScrollbackItems]
-  )
-
   const onCommittedLine = useCallback(
     (line: string) => {
-      if (line.startsWith('/')) {
-        commitUserLineWithAssistant(line, 'unsupported command', true)
-        return
-      }
-      commitUserLineWithAssistant(line, 'Not supported', true)
+      const assistantText = line.startsWith('/')
+        ? 'unsupported command'
+        : 'Not supported'
+      appendScrollbackItems([
+        transcriptUserLine(line),
+        transcriptAssistantError(assistantText),
+      ])
     },
-    [commitUserLineWithAssistant]
+    [appendScrollbackItems]
   )
 
   const { stdout } = useStdout()
