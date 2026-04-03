@@ -8,6 +8,11 @@ import {
 } from 'react'
 import { Box } from 'ink'
 import {
+  scrollbackAssistantTextMessageItem,
+  scrollbackErrorItem,
+  scrollbackUserMessageItem,
+} from './interactiveCliTranscript.js'
+import {
   SessionScrollback,
   type SessionScrollbackItem,
 } from './SessionScrollback.js'
@@ -31,6 +36,9 @@ function withLeadingGapAfterUserIfNeeded(
 }
 
 export type SessionScrollbackAppendApi = {
+  readonly appendScrollbackUserMessage: (text: string) => void
+  readonly appendScrollbackAssistantTextMessage: (text: string) => void
+  readonly appendScrollbackError: (text: string) => void
   readonly appendScrollbackItem: (item: SessionScrollbackItem) => void
 }
 
@@ -51,7 +59,41 @@ export function SessionScrollbackSessionProvider(props: {
     setItems((prev) => [...prev, withLeadingGapAfterUserIfNeeded(prev, item)])
   }, [])
 
-  const api = useMemo(() => ({ appendScrollbackItem }), [appendScrollbackItem])
+  const appendScrollbackUserMessage = useCallback(
+    (text: string) => {
+      appendScrollbackItem(scrollbackUserMessageItem(text))
+    },
+    [appendScrollbackItem]
+  )
+
+  const appendScrollbackAssistantTextMessage = useCallback(
+    (text: string) => {
+      appendScrollbackItem(scrollbackAssistantTextMessageItem(text))
+    },
+    [appendScrollbackItem]
+  )
+
+  const appendScrollbackError = useCallback(
+    (text: string) => {
+      appendScrollbackItem(scrollbackErrorItem(text))
+    },
+    [appendScrollbackItem]
+  )
+
+  const api = useMemo(
+    () => ({
+      appendScrollbackUserMessage,
+      appendScrollbackAssistantTextMessage,
+      appendScrollbackError,
+      appendScrollbackItem,
+    }),
+    [
+      appendScrollbackUserMessage,
+      appendScrollbackAssistantTextMessage,
+      appendScrollbackError,
+      appendScrollbackItem,
+    ]
+  )
 
   return (
     <SessionScrollbackAppendContext.Provider value={api}>

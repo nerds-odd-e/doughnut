@@ -3,28 +3,26 @@ import { PastAssistantErrorBlock } from '../commonUIComponents/pastAssistantErro
 import { PastUserMessageBlock } from '../commonUIComponents/pastUserMessageBlock.js'
 import type { SessionScrollbackItem } from './SessionScrollback.js'
 
-export function transcriptUserLine(text: string): SessionScrollbackItem {
-  return {
-    id: crypto.randomUUID(),
-    element: <PastUserMessageBlock text={text} />,
-    endsWithUserLine: true,
-  }
-}
+export const scrollbackUserMessageItem = (
+  text: string
+): SessionScrollbackItem => ({
+  id: crypto.randomUUID(),
+  element: <PastUserMessageBlock text={text} />,
+  endsWithUserLine: true,
+})
 
-export function transcriptAssistantText(text: string): SessionScrollbackItem {
-  return {
-    id: crypto.randomUUID(),
-    element: (
-      <Box>
-        <Text>{text}</Text>
-      </Box>
-    ),
-  }
-}
+export const scrollbackAssistantTextMessageItem = (
+  text: string
+): SessionScrollbackItem => ({
+  id: crypto.randomUUID(),
+  element: (
+    <Box>
+      <Text>{text}</Text>
+    </Box>
+  ),
+})
 
-export function transcriptAssistantError(text: string): SessionScrollbackItem {
-  return {
-    id: crypto.randomUUID(),
-    element: <PastAssistantErrorBlock text={text} />,
-  }
-}
+export const scrollbackErrorItem = (text: string): SessionScrollbackItem => ({
+  id: crypto.randomUUID(),
+  element: <PastAssistantErrorBlock text={text} />,
+})

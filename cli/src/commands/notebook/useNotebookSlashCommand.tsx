@@ -2,10 +2,6 @@ import { useCallback } from 'react'
 import { Box, Text } from 'ink'
 import { MainInteractivePrompt } from '../../mainInteractivePrompt/index.js'
 import {
-  transcriptAssistantError,
-  transcriptUserLine,
-} from '../../sessionScrollback/interactiveCliTranscript.js'
-import {
   type SessionScrollbackAppendApi,
   useSessionScrollbackAppend,
 } from '../../sessionScrollback/sessionScrollbackAppendContext.js'
@@ -33,12 +29,16 @@ function invokeNotebookStageRunCommand(cmd: InteractiveSlashCommand): string {
 function dispatchNotebookUncommittedLine(
   line: string,
   {
-    appendScrollbackItem,
-  }: Pick<SessionScrollbackAppendApi, 'appendScrollbackItem'>
+    appendScrollbackError,
+    appendScrollbackUserMessage,
+  }: Pick<
+    SessionScrollbackAppendApi,
+    'appendScrollbackError' | 'appendScrollbackUserMessage'
+  >
 ) {
   if (line === '') return
-  appendScrollbackItem(transcriptUserLine(line))
-  appendScrollbackItem(transcriptAssistantError('Not supported'))
+  appendScrollbackUserMessage(line)
+  appendScrollbackError('Not supported')
 }
 
 function UseNotebookStage({
@@ -46,22 +46,25 @@ function UseNotebookStage({
   onSettled,
 }: InteractiveSlashCommandStageProps) {
   const title = (argument ?? '').trim()
-  const { appendScrollbackItem } = useSessionScrollbackAppend()
+  const { appendScrollbackError, appendScrollbackUserMessage } =
+    useSessionScrollbackAppend()
 
   const onCommittedCommand = useCallback(
     (resolved: ResolvedInteractiveSlashCommand) => {
-      const userItem = transcriptUserLine(resolved.line)
-      appendScrollbackItem(userItem)
+      appendScrollbackUserMessage(resolved.line)
       onSettled(invokeNotebookStageRunCommand(resolved.command))
     },
-    [appendScrollbackItem, onSettled]
+    [appendScrollbackUserMessage, onSettled]
   )
 
   const onCommittedLine = useCallback(
     (line: string) => {
-      dispatchNotebookUncommittedLine(line.trim(), { appendScrollbackItem })
+      dispatchNotebookUncommittedLine(line.trim(), {
+        appendScrollbackError,
+        appendScrollbackUserMessage,
+      })
     },
-    [appendScrollbackItem]
+    [appendScrollbackError, appendScrollbackUserMessage]
   )
 
   return (
