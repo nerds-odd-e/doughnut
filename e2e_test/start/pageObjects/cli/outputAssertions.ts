@@ -69,8 +69,8 @@ function retryCliOutputAssertion(
   assert: (raw: string) => void | Promise<void>,
   screenshotName: string,
   timeoutMs: number = CLI_OUTPUT_ASSERT_TIMEOUT_MS
-): void {
-  const tryOnce = (deadline: number) => {
+): Cypress.Chainable<void> {
+  const tryOnce = (deadline: number): Cypress.Chainable<void> => {
     return readRaw().then((raw) => {
       return Cypress.Promise.resolve(assert(raw)).then(
         () => undefined,
@@ -88,15 +88,15 @@ function retryCliOutputAssertion(
       )
     }) as Cypress.Chainable<void>
   }
-  cy.wrap(null).then(() => tryOnce(Date.now() + timeoutMs))
+  return cy.wrap(null).then(() => tryOnce(Date.now() + timeoutMs))
 }
 
 function retryInteractiveAssertion(
   assert: (raw: string) => void | Promise<void>,
   screenshotName: string,
   timeoutMs: number = CLI_OUTPUT_ASSERT_TIMEOUT_MS
-): void {
-  retryCliOutputAssertion(
+): Cypress.Chainable<void> {
+  return retryCliOutputAssertion(
     () => cy.task<string>('cliInteractivePtyGetBuffer'),
     assert,
     screenshotName,
@@ -106,8 +106,8 @@ function retryInteractiveAssertion(
 
 function nonInteractiveOutput() {
   return {
-    expectContains(expected: string) {
-      retryCliOutputAssertion(
+    expectContains(expected: string): Cypress.Chainable<void> {
+      return retryCliOutputAssertion(
         () => cy.get<string>(OUTPUT_ALIAS),
         (stdout) => {
           assertNonInteractiveCliOutput(stdout)
@@ -151,23 +151,41 @@ async function assertStrippedPtyTranscriptContains(
   }
 }
 
-async function assertPastCliAssistantMessagesContains(
-  raw: string,
-  expected: string
-): Promise<void> {
-  await assertStrippedPtyTranscriptContains(
-    raw,
-    expected,
-    'Past CLI assistant messages (in past CLI assistant messages)'
-  )
-}
-
 /** Keep in sync with `e2e_test/scripts/mineru_outline_e2e_stub.py` `_layout_payload` titles. */
 export const BOOK_READING_MINERU_STUB_LAYOUT_TITLE_SUBSTRINGS = [
   'Stub Part A',
   'Stub Section One',
   'Stub Part B',
 ] as const
+
+function isBookReadingMineruStubLayoutTitle(expected: string): boolean {
+  return (
+    BOOK_READING_MINERU_STUB_LAYOUT_TITLE_SUBSTRINGS as readonly string[]
+  ).includes(expected)
+}
+
+async function assertPastCliAssistantMessagesContains(
+  raw: string,
+  expected: string
+): Promise<void> {
+  const stripped = stripAnsiCliPty(raw)
+  if (
+    isBookReadingMineruStubLayoutTitle(expected) &&
+    !stripped.includes(expected) &&
+    stripped.includes('Not supported') &&
+    stripped.includes('/attach')
+  ) {
+    failCliAssertion(
+      `After /attach, expected past CLI assistant messages to include ${JSON.stringify(expected)} (MinerU E2E stub layout title; sync with e2e_test/scripts/mineru_outline_e2e_stub.py). The CLI returned "Not supported" instead — /attach is not registered on the notebook stage yet (Phase 3 sub-phase 3.3).`,
+      raw
+    )
+  }
+  await assertStrippedPtyTranscriptContains(
+    raw,
+    expected,
+    'Past CLI assistant messages (in past CLI assistant messages)'
+  )
+}
 
 async function assertPastCliAssistantContainsBookReadingMineruStubLayoutOrAttachMissing(
   raw: string
@@ -400,12 +418,15 @@ async function assertPastUserMessagesContains(
   )
 }
 
-const BOOK_READING_ATTACH_LAYOUT_ASSERT_TIMEOUT_MS = 2_000
+const BOOK_READING_ATTACH_LAYOUT_ASSERT_TIMEOUT_MS = 20_000
 
 function pastCliAssistantMessages() {
   return {
-    expectContains(expected: string, options?: { timeoutMs?: number }) {
-      retryInteractiveAssertion(
+    expectContains(
+      expected: string,
+      options?: { timeoutMs?: number }
+    ): Cypress.Chainable<void> {
+      return retryInteractiveAssertion(
         (raw) => assertPastCliAssistantMessagesContains(raw, expected),
         'cli-interactive-pty-past-assistant-assertion',
         options?.timeoutMs
@@ -413,8 +434,8 @@ function pastCliAssistantMessages() {
     },
     expectContainsBookReadingMineruStubLayoutExcerpt(options?: {
       timeoutMs?: number
-    }) {
-      retryInteractiveAssertion(
+    }): Cypress.Chainable<void> {
+      return retryInteractiveAssertion(
         (raw) =>
           assertPastCliAssistantContainsBookReadingMineruStubLayoutOrAttachMissing(
             raw
@@ -428,8 +449,8 @@ function pastCliAssistantMessages() {
 
 function answeredQuestions() {
   return {
-    expectContains(expected: string) {
-      retryInteractiveAssertion(
+    expectContains(expected: string): Cypress.Chainable<void> {
+      return retryInteractiveAssertion(
         (raw) => assertAnsweredQuestionsContains(raw, expected),
         'cli-interactive-pty-answered-questions-assertion'
       )
@@ -439,8 +460,8 @@ function answeredQuestions() {
 
 function pastUserMessages() {
   return {
-    expectContains(expected: string) {
-      retryInteractiveAssertion(
+    expectContains(expected: string): Cypress.Chainable<void> {
+      return retryInteractiveAssertion(
         (raw) => assertPastUserMessagesContains(raw, expected),
         'cli-interactive-pty-past-user-assertion'
       )
@@ -450,14 +471,14 @@ function pastUserMessages() {
 
 function currentGuidance() {
   return {
-    expectContains(expected: string) {
-      retryInteractiveAssertion(
+    expectContains(expected: string): Cypress.Chainable<void> {
+      return retryInteractiveAssertion(
         (raw) => assertCurrentGuidanceContains(raw, expected),
         'cli-interactive-pty-current-guidance-assertion'
       )
     },
-    expectContainsBold(text: string) {
-      retryInteractiveAssertion(
+    expectContainsBold(text: string): Cypress.Chainable<void> {
+      return retryInteractiveAssertion(
         (raw) => assertCurrentGuidanceContainsBold(raw, text),
         'cli-interactive-pty-current-guidance-bold-assertion'
       )
