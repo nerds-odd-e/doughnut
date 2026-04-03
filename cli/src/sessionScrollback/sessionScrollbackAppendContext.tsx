@@ -32,9 +32,6 @@ function withLeadingGapAfterUserIfNeeded(
 
 export type SessionScrollbackAppendApi = {
   readonly appendScrollbackItem: (item: SessionScrollbackItem) => void
-  readonly appendScrollbackItems: (
-    items: readonly SessionScrollbackItem[]
-  ) => void
 }
 
 const SessionScrollbackAppendContext = createContext<
@@ -54,24 +51,7 @@ export function SessionScrollbackSessionProvider(props: {
     setItems((prev) => [...prev, withLeadingGapAfterUserIfNeeded(prev, item)])
   }, [])
 
-  const appendScrollbackItems = useCallback(
-    (toAppend: readonly SessionScrollbackItem[]) => {
-      if (toAppend.length === 0) return
-      setItems((prev) => {
-        const acc = [...prev]
-        for (const item of toAppend) {
-          acc.push(withLeadingGapAfterUserIfNeeded(acc, item))
-        }
-        return acc
-      })
-    },
-    []
-  )
-
-  const api = useMemo(
-    () => ({ appendScrollbackItem, appendScrollbackItems }),
-    [appendScrollbackItem, appendScrollbackItems]
-  )
+  const api = useMemo(() => ({ appendScrollbackItem }), [appendScrollbackItem])
 
   return (
     <SessionScrollbackAppendContext.Provider value={api}>

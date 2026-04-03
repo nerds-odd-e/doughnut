@@ -44,8 +44,7 @@ export function InteractiveCliApp() {
 }
 
 function InteractiveCliAppBody() {
-  const { appendScrollbackItem, appendScrollbackItems } =
-    useSessionScrollbackAppend()
+  const { appendScrollbackItem } = useSessionScrollbackAppend()
   const { exit } = useApp()
   const stageKeyHandlerRef = useRef<StageKeyHandler | null>(null)
   const stageArgumentRef = useRef<string | undefined>(undefined)
@@ -142,7 +141,7 @@ function InteractiveCliAppBody() {
           appendScrollbackItem(assistant)
         })
     },
-    [appendScrollbackItem, appendScrollbackItems]
+    [appendScrollbackItem]
   )
 
   const onCommittedLine = useCallback(
@@ -153,7 +152,7 @@ function InteractiveCliAppBody() {
       appendScrollbackItem(transcriptUserLine(line))
       appendScrollbackItem(transcriptAssistantError(assistantText))
     },
-    [appendScrollbackItems]
+    [appendScrollbackItem]
   )
 
   const { stdout } = useStdout()
