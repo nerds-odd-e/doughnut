@@ -151,70 +151,6 @@ async function assertStrippedPtyTranscriptContains(
   }
 }
 
-/** Keep in sync with `e2e_test/scripts/mineru_outline_e2e_stub.py` `_layout_payload` titles. */
-export const BOOK_READING_MINERU_STUB_LAYOUT_TITLE_SUBSTRINGS = [
-  'Stub Part A',
-  'Stub Section One',
-  'Stub Part B',
-] as const
-
-function isBookReadingMineruStubLayoutTitle(expected: string): boolean {
-  return (
-    BOOK_READING_MINERU_STUB_LAYOUT_TITLE_SUBSTRINGS as readonly string[]
-  ).includes(expected)
-}
-
-async function assertPastCliAssistantMessagesContains(
-  raw: string,
-  expected: string
-): Promise<void> {
-  const stripped = stripAnsiCliPty(raw)
-  if (
-    isBookReadingMineruStubLayoutTitle(expected) &&
-    !stripped.includes(expected) &&
-    stripped.includes('Not supported') &&
-    stripped.includes('/attach')
-  ) {
-    failCliAssertion(
-      `After /attach, expected past CLI assistant messages to include ${JSON.stringify(expected)} (MinerU E2E stub layout title; sync with e2e_test/scripts/mineru_outline_e2e_stub.py). The CLI returned "Not supported" instead — /attach is not registered on the notebook stage yet (Phase 3 sub-phase 3.3).`,
-      raw
-    )
-  }
-  await assertStrippedPtyTranscriptContains(
-    raw,
-    expected,
-    'Past CLI assistant messages (in past CLI assistant messages)'
-  )
-}
-
-async function assertPastCliAssistantContainsBookReadingMineruStubLayoutOrAttachMissing(
-  raw: string
-): Promise<void> {
-  const stripped = stripAnsiCliPty(raw)
-  const missing = BOOK_READING_MINERU_STUB_LAYOUT_TITLE_SUBSTRINGS.filter(
-    (s) => !stripped.includes(s)
-  )
-  if (missing.length === 0) return
-
-  const looksLikeAttachRejected =
-    stripped.includes('Not supported') && stripped.includes('/attach')
-
-  if (
-    looksLikeAttachRejected &&
-    missing.length === BOOK_READING_MINERU_STUB_LAYOUT_TITLE_SUBSTRINGS.length
-  ) {
-    failCliAssertion(
-      `After /attach, expected past CLI assistant messages to include MinerU E2E stub layout titles (${BOOK_READING_MINERU_STUB_LAYOUT_TITLE_SUBSTRINGS.join(', ')}; keep in sync with e2e_test/scripts/mineru_outline_e2e_stub.py). The CLI returned "Not supported" instead — /attach is not registered on the notebook stage yet (Phase 3 sub-phase 3.3).`,
-      raw
-    )
-  }
-
-  failCliAssertion(
-    `Expected past CLI assistant messages to include ${JSON.stringify(missing[0])} (MinerU E2E stub layout excerpt; ${missing.length} of ${BOOK_READING_MINERU_STUB_LAYOUT_TITLE_SUBSTRINGS.length} titles missing).`,
-    raw
-  )
-}
-
 async function assertAnsweredQuestionsContains(
   raw: string,
   expected: string
@@ -418,8 +354,6 @@ async function assertPastUserMessagesContains(
   )
 }
 
-const BOOK_READING_ATTACH_LAYOUT_ASSERT_TIMEOUT_MS = 20_000
-
 function pastCliAssistantMessages() {
   return {
     expectContains(
@@ -427,21 +361,14 @@ function pastCliAssistantMessages() {
       options?: { timeoutMs?: number }
     ): Cypress.Chainable<void> {
       return retryInteractiveAssertion(
-        (raw) => assertPastCliAssistantMessagesContains(raw, expected),
+        (raw) =>
+          assertStrippedPtyTranscriptContains(
+            raw,
+            expected,
+            'Past CLI assistant messages (in past CLI assistant messages)'
+          ),
         'cli-interactive-pty-past-assistant-assertion',
         options?.timeoutMs
-      )
-    },
-    expectContainsBookReadingMineruStubLayoutExcerpt(options?: {
-      timeoutMs?: number
-    }): Cypress.Chainable<void> {
-      return retryInteractiveAssertion(
-        (raw) =>
-          assertPastCliAssistantContainsBookReadingMineruStubLayoutOrAttachMissing(
-            raw
-          ),
-        'cli-book-reading-mineru-stub-layout-excerpt',
-        options?.timeoutMs ?? BOOK_READING_ATTACH_LAYOUT_ASSERT_TIMEOUT_MS
       )
     },
   }

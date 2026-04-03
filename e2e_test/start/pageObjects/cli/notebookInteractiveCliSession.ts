@@ -1,29 +1,8 @@
 import { interactiveCli } from './interactiveCli'
 
-const NOTEBOOK_ACTIVE_TIMEOUT_MS = 20_000
+const NOTEBOOK_ACTIVE_TIMEOUT_MS = 2_000
 
-/**
- * Fluent notebook-stage session after `/use`: attach PDFs under
- * `e2e_test/fixtures/book_reading/` and assert on past assistant text.
- */
-export type NotebookInteractiveCliCtx = {
-  attachPdfBook(
-    fixtureFilename: string
-  ): Cypress.Chainable<NotebookInteractiveCliCtx>
-  pastCliAssistantMessages(): NotebookInteractiveCliPastAssistant
-}
-
-export type NotebookInteractiveCliPastAssistant = {
-  expectContains(
-    expected: string,
-    options?: { timeoutMs?: number }
-  ): Cypress.Chainable<NotebookInteractiveCliCtx>
-  expectContainsBookReadingMineruStubLayoutExcerpt(options?: {
-    timeoutMs?: number
-  }): Cypress.Chainable<NotebookInteractiveCliCtx>
-}
-
-function notebookInteractiveCtx(): NotebookInteractiveCliCtx {
+function notebookInteractiveCtx() {
   return {
     attachPdfBook(fixtureFilename: string) {
       return cy
@@ -36,30 +15,14 @@ function notebookInteractiveCtx(): NotebookInteractiveCliCtx {
             `/attach ${absPath}`
           )
         )
-        .then(() => cy.wrap(notebookInteractiveCtx()))
-    },
-    pastCliAssistantMessages(): NotebookInteractiveCliPastAssistant {
-      return {
-        expectContains(expected, options) {
-          return interactiveCli()
-            .pastCliAssistantMessages()
-            .expectContains(expected, options)
-            .then(() => cy.wrap(notebookInteractiveCtx()))
-        },
-        expectContainsBookReadingMineruStubLayoutExcerpt(options) {
-          return interactiveCli()
-            .pastCliAssistantMessages()
-            .expectContainsBookReadingMineruStubLayoutExcerpt(options)
-            .then(() => cy.wrap(notebookInteractiveCtx()))
-        },
-      }
+        .then(() => cy.wrap(interactiveCli()))
     },
   }
 }
 
 export function useNotebook(
   notebookTitle: string
-): Cypress.Chainable<NotebookInteractiveCliCtx> {
+): Cypress.Chainable<ReturnType<typeof notebookInteractiveCtx>> {
   const ic = interactiveCli()
   return ic
     .enterSlashCommandInInteractiveCli(`/use ${notebookTitle}`)

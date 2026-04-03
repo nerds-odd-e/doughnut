@@ -10,11 +10,9 @@ When(
     cli
       .useNotebook(notebookTitle)
       .then((ctx) => ctx.attachPdfBook(fixtureFilename))
-      .then((ctx) =>
+      .then((ctx) => {
         ctx.pastCliAssistantMessages().expectContains('Book part A')
-      )
-      .then((ctx) =>
         ctx.pastCliAssistantMessages().expectContains('Book part A.1')
-      )
+      })
   }
 )
