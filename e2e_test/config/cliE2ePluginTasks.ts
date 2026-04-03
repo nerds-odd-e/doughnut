@@ -86,6 +86,9 @@ export function createCliE2ePluginTasks(repoRoot: string) {
   }
 
   return {
+    getMineruOutlineE2eStubScriptPath(): string {
+      return join(repoRoot, 'e2e_test', 'scripts', 'mineru_outline_e2e_stub.py')
+    },
     createCliConfigDir() {
       return mkdtempSync(join(tmpdir(), 'cypress-cli-config-'))
     },

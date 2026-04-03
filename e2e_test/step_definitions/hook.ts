@@ -110,6 +110,16 @@ After({ tags: '@bundleCliE2eInstall' }, () =>
   cli.backend().removeE2eInstallCliBundle()
 )
 
+Before({ tags: '@stubMineruOutline', order: 0 }, () => {
+  cy.task<string>('getMineruOutlineE2eStubScriptPath').then((p) => {
+    Cypress.env('DOUGHNUT_MINERU_OUTLINE_SCRIPT_E2E', p)
+  })
+})
+
+After({ tags: '@stubMineruOutline' }, () => {
+  Cypress.env('DOUGHNUT_MINERU_OUTLINE_SCRIPT_E2E', undefined)
+})
+
 Before({ tags: '@withCliConfig', order: 1 }, () => {
   cy.task('createCliConfigDir').as('cliConfigDir')
 })
@@ -128,24 +138,34 @@ Before({ tags: '@withCliGmailMockAccountConfig', order: 1 }, () => {
 
 Before({ tags: '@interactiveCLI', order: 2 }, () => {
   cli.ttyAssertTerminal().kill()
-  cy.get<string>('@cliConfigDir').then((configDir) =>
-    cli.ttyAssertTerminal().startRepoInteractive({
-      env: { DOUGHNUT_CONFIG_DIR: configDir },
-    })
-  )
+  cy.get<string>('@cliConfigDir').then((configDir) => {
+    const env: NodeJS.ProcessEnv = { DOUGHNUT_CONFIG_DIR: configDir }
+    const stub = Cypress.env('DOUGHNUT_MINERU_OUTLINE_SCRIPT_E2E') as
+      | string
+      | undefined
+    if (typeof stub === 'string' && stub.length > 0) {
+      env.DOUGHNUT_MINERU_OUTLINE_SCRIPT = stub
+    }
+    return cli.ttyAssertTerminal().startRepoInteractive({ env })
+  })
 })
 
 Before({ tags: '@interactiveCLIGmail', order: 2 }, () => {
   cli.ttyAssertTerminal().kill()
-  cy.get<string>('@cliConfigDir').then((configDir) =>
-    cli.ttyAssertTerminal().startRepoInteractive({
-      env: {
-        DOUGHNUT_CONFIG_DIR: configDir,
-        GOOGLE_BASE_URL: GMAIL_E2E_GOOGLE_MOCK_BASE_URL,
-        DOUGHNUT_NO_BROWSER: '1',
-      },
-    })
-  )
+  cy.get<string>('@cliConfigDir').then((configDir) => {
+    const env: NodeJS.ProcessEnv = {
+      DOUGHNUT_CONFIG_DIR: configDir,
+      GOOGLE_BASE_URL: GMAIL_E2E_GOOGLE_MOCK_BASE_URL,
+      DOUGHNUT_NO_BROWSER: '1',
+    }
+    const stub = Cypress.env('DOUGHNUT_MINERU_OUTLINE_SCRIPT_E2E') as
+      | string
+      | undefined
+    if (typeof stub === 'string' && stub.length > 0) {
+      env.DOUGHNUT_MINERU_OUTLINE_SCRIPT = stub
+    }
+    return cli.ttyAssertTerminal().startRepoInteractive({ env })
+  })
 })
 
 After({ tags: '@interactiveCLI' }, () => {
