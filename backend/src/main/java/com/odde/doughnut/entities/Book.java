@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -13,6 +14,16 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "book")
+@JsonPropertyOrder({
+  "id",
+  "bookName",
+  "format",
+  "createdAt",
+  "updatedAt",
+  "ranges",
+  "notebookId",
+  "hasSourceFile"
+})
 public class Book extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -41,9 +52,19 @@ public class Book extends EntityIdentifiedByIdOnly {
   private String format;
 
   @Column(name = "source_file_ref", length = 1024)
-  @Getter
   @Setter
   private String sourceFileRef;
+
+  @JsonIgnore
+  public String getSourceFileRef() {
+    return sourceFileRef;
+  }
+
+  @JsonProperty("hasSourceFile")
+  @JsonView(BookViews.Full.class)
+  public boolean getHasSourceFile() {
+    return sourceFileRef != null && !sourceFileRef.isBlank();
+  }
 
   @Column(name = "created_at", nullable = false)
   @Getter

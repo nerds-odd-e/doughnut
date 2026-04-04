@@ -3645,8 +3645,6 @@ components:
           type: string
         format:
           type: string
-        sourceFileRef:
-          type: string
         createdAt:
           type: string
           format: date-time
@@ -3659,6 +3657,8 @@ components:
             $ref: "#/components/schemas/BookRange_Full"
         notebookId:
           type: string
+        hasSourceFile:
+          type: boolean
       required:
       - bookName
       - format

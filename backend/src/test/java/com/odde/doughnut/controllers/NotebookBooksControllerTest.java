@@ -211,6 +211,25 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void hasSourceFileTrueWhenPdfStored() throws Exception {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      controller.attachBook(nb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
+      Book book = controller.getBook(nb);
+      assertThat(book.getHasSourceFile(), equalTo(true));
+    }
+
+    @Test
+    void hasSourceFileFalseWhenSourceFileRefCleared() throws Exception {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      controller.attachBook(nb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
+      Book book = bookRepository.findByNotebook_Id(nb.getId()).orElseThrow();
+      book.setSourceFileRef(null);
+      makeMe.entityPersister.save(book);
+      makeMe.entityPersister.flush();
+      assertThat(controller.getBook(nb).getHasSourceFile(), equalTo(false));
+    }
+
+    @Test
     void doesNotReturnAnotherNotebooksBook() throws Exception {
       Notebook nb1 = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       Notebook nb2 = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();

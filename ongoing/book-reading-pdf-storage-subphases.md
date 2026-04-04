@@ -56,6 +56,8 @@ Each row is a **merge gate**: backend verify, relevant frontend/CLI tests, and *
 
 ### SP-B1 — API exposes “has file” + book reading download control
 
+**Done.** [`Book`](backend/src/main/java/com/odde/doughnut/entities/Book.java) exposes **`hasSourceFile`** on `BookViews.Full`; **`sourceFileRef`** is not serialized (`@JsonIgnore` on getter). [BookReadingPage.vue](frontend/src/pages/BookReadingPage.vue) download link `data-testid="book-download-pdf"` → `/api/notebooks/{id}/book/file`. Vitest: [BookReadingPage.spec.ts](frontend/tests/pages/BookReadingPage.spec.ts). Controller tests for `getHasSourceFile()` in [NotebookBooksControllerTest](backend/src/test/java/com/odde/doughnut/controllers/NotebookBooksControllerTest.java).
+
 - **Outcome (user-visible in browser):** `Book` JSON (appropriate `JsonView`) includes something like **`hasSourceFile`** derived from **`source_file_ref`**. [BookReadingPage.vue](frontend/src/pages/BookReadingPage.vue) shows a **Download** control (stable **`data-testid`**) when true; link targets the same-origin GET download URL with session cookie.
 - **Tests:** Frontend unit test if there is an established pattern for this page; otherwise minimal component assertion — **do not** skip E2E in SP-B2 solely because of this test.
 - **Deliverable cleanliness:** No feature flags dead in code; unused generated SDK types cleaned up if any.

@@ -1,15 +1,25 @@
 <template>
   <div data-testid="book-reading-page">
-    <div v-if="book" data-testid="book-reading-outline">
-      <div
-        v-for="node in flatOutline"
-        :key="node.id"
-        data-testid="book-outline-node"
-        :data-outline-depth="node.depth"
+    <template v-if="book">
+      <a
+        v-if="book.hasSourceFile"
+        class="daisy-btn daisy-btn-outline daisy-btn-sm daisy-mb-2"
+        :href="`/api/notebooks/${props.notebookId}/book/file`"
+        data-testid="book-download-pdf"
       >
-        {{ node.title }}
+        Download
+      </a>
+      <div data-testid="book-reading-outline">
+        <div
+          v-for="node in flatOutline"
+          :key="node.id"
+          data-testid="book-outline-node"
+          :data-outline-depth="node.depth"
+        >
+          {{ node.title }}
+        </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 

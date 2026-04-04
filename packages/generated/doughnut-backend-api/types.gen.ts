@@ -329,11 +329,11 @@ export type BookFull = {
     id: number;
     bookName: string;
     format: string;
-    sourceFileRef?: string;
     createdAt?: string;
     updatedAt?: string;
     ranges?: Array<BookRangeFull>;
     notebookId?: string;
+    hasSourceFile?: boolean;
 };
 
 export type NotebookCertificateApproval = {
