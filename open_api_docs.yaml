@@ -1156,6 +1156,7 @@ paths:
     post:
       tags:
       - notebook-books-controller
+      summary: Attach book
       operationId: attachBook
       parameters:
       - name: notebook
@@ -1165,6 +1166,19 @@ paths:
           type: integer
       requestBody:
         content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                metadata:
+                  $ref: "#/components/schemas/AttachBookRequest_Full"
+                file:
+                  type: string
+                  format: binary
+                  description: PDF file
+              required:
+              - file
+              - metadata
           application/json:
             schema:
               $ref: "#/components/schemas/AttachBookRequest_Full"
@@ -3577,6 +3591,7 @@ components:
       - roots
     AttachBookRequest_Full:
       type: object
+      description: Attach book metadata as JSON
       properties:
         bookName:
           type: string

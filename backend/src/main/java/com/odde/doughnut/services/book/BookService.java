@@ -42,16 +42,31 @@ public class BookService {
   @Transactional
   public Book attachBook(Notebook notebook, AttachBookRequest request) {
     validateAttachRequest(request);
+    assertNotebookHasNoBook(notebook);
+    return persistNewBook(notebook, request, null);
+  }
+
+  @Transactional
+  public Book attachBookWithPdf(Notebook notebook, AttachBookRequest request, byte[] pdfBytes) {
+    validateAttachRequest(request);
+    assertNotebookHasNoBook(notebook);
+    String ref = bookPdfStorage.put(pdfBytes);
+    return persistNewBook(notebook, request, ref);
+  }
+
+  private void assertNotebookHasNoBook(Notebook notebook) {
     if (bookRepository.findByNotebook_Id(notebook.getId()).isPresent()) {
       throw new ResponseStatusException(
           HttpStatus.CONFLICT, "This notebook already has a book attached");
     }
+  }
 
+  private Book persistNewBook(Notebook notebook, AttachBookRequest request, String sourceFileRef) {
     var book = new Book();
     book.setNotebook(notebook);
     book.setBookName(trimmedMax(request.getBookName(), 512));
     book.setFormat(BOOK_FORMAT_PDF);
-    book.setSourceFileRef(null);
+    book.setSourceFileRef(sourceFileRef);
     var now = testabilitySettings.getCurrentUTCTimestamp();
     book.setCreatedAt(now);
     book.setUpdatedAt(now);

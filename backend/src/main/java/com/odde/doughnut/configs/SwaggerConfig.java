@@ -1,5 +1,7 @@
 package com.odde.doughnut.configs;
 
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.servers.Server;
 import java.util.LinkedHashMap;
@@ -19,6 +21,22 @@ public class SwaggerConfig {
       Server server = new Server();
       server.setUrl("");
       openApi.setServers(List.of(server));
+    };
+  }
+
+  @Bean
+  public OpenApiCustomizer attachBookOperationIdCustomizer() {
+    return openApi -> {
+      PathItem pathItem = openApi.getPaths().get("/api/notebooks/{notebook}/attach-book");
+      if (pathItem == null) {
+        return;
+      }
+      Operation post = pathItem.getPost();
+      if (post == null) {
+        return;
+      }
+      post.setOperationId("attachBook");
+      post.setSummary("Attach book");
     };
   }
 

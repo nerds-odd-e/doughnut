@@ -663,6 +663,9 @@ export class NotebookController {
 }
 
 export class NotebookBooksController {
+    /**
+     * Attach book
+     */
     public static attachBook<ThrowOnError extends boolean = false>(options: Options<AttachBookData, ThrowOnError>) {
         return (options.client ?? client).post<AttachBookResponses, unknown, ThrowOnError>({
             url: '/api/notebooks/{notebook}/attach-book',

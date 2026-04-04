@@ -301,6 +301,9 @@ export type AttachBookLayoutRequestFull = {
     roots: Array<AttachBookLayoutNodeRequestFull>;
 };
 
+/**
+ * Attach book metadata as JSON
+ */
 export type AttachBookRequestFull = {
     bookName: string;
     format: string;

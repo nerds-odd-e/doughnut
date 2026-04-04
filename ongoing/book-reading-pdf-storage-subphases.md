@@ -34,9 +34,11 @@ Each row is a **merge gate**: backend verify, relevant frontend/CLI tests, and *
 
 ### SP-A3 — Multipart attach **alongside** existing JSON attach
 
+**Done.** Second handler on `POST .../attach-book` with `consumes = MULTIPART_FORM_DATA` (`@RequestPart` **`metadata`** + **`file`**); **`BookService.attachBookWithPdf`** + shared **`persistNewBook`**; empty/missing **`file`** → **400**. OpenAPI has **one** `post` (spec limit for same path/method) with **`application/json`** and **`multipart/form-data`** in **`requestBody.content`**; **[`SwaggerConfig`](backend/src/main/java/com/odde/doughnut/configs/SwaggerConfig.java)** **`attachBookOperationIdCustomizer`** sets **`operationId: attachBook`** so **`pnpm generateTypeScript`** still emits **`NotebookBooksController.attachBook`** for JSON (CLI unchanged until SP-A4). Multipart callers use **`multipart/form-data`** on the same URL.
+
 - **Outcome (integrator-visible):** Second `POST .../attach-book` handler (or equivalent) with `consumes = MULTIPART_FORM_DATA`: parts **`metadata`** (`AttachBookRequest` JSON) + **`file`** (PDF). On success, **`BookPdfStorage.put`**, set **`source_file_ref`**, same outline persistence as today. **Existing JSON-only attach** remains **unchanged** so current CLI and tests keep working.
-- **Tests:** New multipart cases in controller tests; **all** existing attach tests still green.
-- **OpenAPI / codegen:** Springdoc documents multipart; run `pnpm generateTypeScript`; fix any compile breaks in packages that consume the spec (even if CLI does not call multipart yet).
+- **Tests:** **`AttachBookMultipart`** nested class in [NotebookBooksControllerTest](backend/src/test/java/com/odde/doughnut/controllers/NotebookBooksControllerTest.java); **all** existing attach tests still green.
+- **OpenAPI / codegen:** Regenerate with **`pnpm generateTypeScript`**; do not hand-edit **`open_api_docs.yaml`**.
 - **Deliverable cleanliness:** Two consumes on the same resource is **interim**; tracked for removal in SP-A5.
 
 ### SP-A4 — CLI uses multipart attach

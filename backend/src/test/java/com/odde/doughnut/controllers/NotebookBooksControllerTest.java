@@ -25,6 +25,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 class NotebookBooksControllerTest extends ControllerTestBase {
@@ -168,6 +170,52 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       AttachBookLayoutNodeRequest root = deep;
       assertThrows(
           ResponseStatusException.class, () -> controller.attachBook(nb, attachRequest(root)));
+    }
+  }
+
+  @Nested
+  class AttachBookMultipart {
+    private static MultipartFile pdfFile(byte[] content) {
+      return new MockMultipartFile("file", "book.pdf", "application/pdf", content);
+    }
+
+    @Test
+    void storesPdfAndReturnsBookWithSourceRefAndDownloadableFile() throws Exception {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      AttachBookRequest req = attachRequest(node("Chapter 1"));
+      byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e};
+
+      ResponseEntity<Book> res = controller.attachBookMultipart(nb, req, pdfFile(pdfBytes));
+
+      assertThat(res.getStatusCode(), equalTo(HttpStatus.CREATED));
+      Book created = res.getBody();
+      assertThat(created, notNullValue());
+      assertThat(created.getSourceFileRef(), notNullValue());
+      assertThat(created.getSourceFileRef().isBlank(), equalTo(false));
+
+      ResponseEntity<byte[]> fileRes = controller.getBookFile(nb);
+      assertThat(fileRes.getStatusCode(), equalTo(HttpStatus.OK));
+      assertThat(fileRes.getBody(), equalTo(pdfBytes));
+    }
+
+    @Test
+    void rejectsEmptyLayoutRootsLikeJsonAttach() throws Exception {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      AttachBookRequest req = attachRequest();
+      req.getLayout().setRoots(new ArrayList<>());
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.attachBookMultipart(nb, req, pdfFile(new byte[] {1})));
+    }
+
+    @Test
+    void rejectsEmptyFile() throws Exception {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      MultipartFile empty =
+          new MockMultipartFile("file", "book.pdf", "application/pdf", new byte[0]);
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.attachBookMultipart(nb, attachRequest(node("A")), empty));
     }
   }
 
