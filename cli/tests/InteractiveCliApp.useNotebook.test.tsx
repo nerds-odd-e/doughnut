@@ -11,8 +11,9 @@ vi.mock('../src/commands/mineruOutline/mineruOutlineSubprocess.js', () => ({
 import * as fs from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { NotebookBooksController, NotebookController } from 'doughnut-api'
+import { NotebookController } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
+import * as doughnutBackendClient from '../src/backendApi/doughnutBackendClient.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { renderInkWhenCommandLineReady } from './inkTestHelpers.js'
 
@@ -82,7 +83,7 @@ describe('InteractiveCliApp /use notebook integration', () => {
   })
 
   describe('notebook stage /attach', () => {
-    let attachBookSpy: ReturnType<typeof vi.spyOn> | undefined
+    let attachBookSpy: ReturnType<typeof vi.spyOn>
     let attachWorkDir: string
     let attachPdfPath: string
 
@@ -93,7 +94,10 @@ describe('InteractiveCliApp /use notebook integration', () => {
       myNotebooksSpy.mockResolvedValue({
         data: { notebooks: [notebookWithTitle('Top Maths')] },
       } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
-      attachBookSpy = vi.spyOn(NotebookBooksController, 'attachBook')
+      attachBookSpy = vi.spyOn(
+        doughnutBackendClient,
+        'attachNotebookBookWithPdf'
+      )
       runMineruOutlineSubprocess.mockResolvedValue({
         ok: true,
         outline: 'o',
@@ -163,21 +167,21 @@ describe('InteractiveCliApp /use notebook integration', () => {
 
     test('attaches PDF and shows structure excerpt from API book', async () => {
       attachBookSpy.mockResolvedValue({
-        data: {
-          id: 99,
-          bookName: 'top-maths',
-          format: 'pdf',
-          ranges: [
-            { id: 1, title: 'Part One', siblingOrder: 0 },
-            {
-              id: 2,
-              title: 'Part One Child',
-              siblingOrder: 0,
-              parentRangeId: '1',
-            },
-          ],
-        },
-      } as Awaited<ReturnType<typeof NotebookBooksController.attachBook>>)
+        id: 99,
+        bookName: 'top-maths',
+        format: 'pdf',
+        ranges: [
+          { id: 1, title: 'Part One', siblingOrder: 0 },
+          {
+            id: 2,
+            title: 'Part One Child',
+            siblingOrder: 0,
+            parentRangeId: '1',
+          },
+        ],
+      } as Awaited<
+        ReturnType<typeof doughnutBackendClient.attachNotebookBookWithPdf>
+      >)
 
       const { stdin, waitForFramesToInclude } =
         await renderInkWhenCommandLineReady(<InteractiveCliApp />)
@@ -191,7 +195,11 @@ describe('InteractiveCliApp /use notebook integration', () => {
     })
 
     test('shows user-visible error when attach-book fails', async () => {
-      attachBookSpy.mockRejectedValue({ status: 403 })
+      attachBookSpy.mockImplementation(() =>
+        doughnutBackendClient.withBackendClient('t', async () => {
+          throw { status: 403 }
+        })
+      )
 
       const { stdin, waitForFramesToInclude } =
         await renderInkWhenCommandLineReady(<InteractiveCliApp />)
@@ -205,10 +213,11 @@ describe('InteractiveCliApp /use notebook integration', () => {
     })
 
     test('shows API validation message for HTTP 400 when present', async () => {
-      attachBookSpy.mockRejectedValue({
-        status: 400,
-        message: 'Invalid layout roots',
-      })
+      attachBookSpy.mockImplementation(() =>
+        doughnutBackendClient.withBackendClient('t', async () => {
+          throw { status: 400, message: 'Invalid layout roots' }
+        })
+      )
 
       const { stdin, waitForFramesToInclude } =
         await renderInkWhenCommandLineReady(<InteractiveCliApp />)
@@ -220,7 +229,11 @@ describe('InteractiveCliApp /use notebook integration', () => {
     })
 
     test('shows generic guidance for HTTP 400 without body message', async () => {
-      attachBookSpy.mockRejectedValue({ status: 400 })
+      attachBookSpy.mockImplementation(() =>
+        doughnutBackendClient.withBackendClient('t', async () => {
+          throw { status: 400 }
+        })
+      )
 
       const { stdin, waitForFramesToInclude } =
         await renderInkWhenCommandLineReady(<InteractiveCliApp />)
@@ -234,7 +247,11 @@ describe('InteractiveCliApp /use notebook integration', () => {
     })
 
     test('shows not-found guidance for HTTP 404', async () => {
-      attachBookSpy.mockRejectedValue({ status: 404 })
+      attachBookSpy.mockImplementation(() =>
+        doughnutBackendClient.withBackendClient('t', async () => {
+          throw { status: 404 }
+        })
+      )
 
       const { stdin, waitForFramesToInclude } =
         await renderInkWhenCommandLineReady(<InteractiveCliApp />)
@@ -248,10 +265,14 @@ describe('InteractiveCliApp /use notebook integration', () => {
     })
 
     test('shows server conflict message for HTTP 409', async () => {
-      attachBookSpy.mockRejectedValue({
-        status: 409,
-        message: 'This notebook already has a book attached',
-      })
+      attachBookSpy.mockImplementation(() =>
+        doughnutBackendClient.withBackendClient('t', async () => {
+          throw {
+            status: 409,
+            message: 'This notebook already has a book attached',
+          }
+        })
+      )
 
       const { stdin, waitForFramesToInclude } =
         await renderInkWhenCommandLineReady(<InteractiveCliApp />)

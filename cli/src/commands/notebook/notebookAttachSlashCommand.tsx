@@ -4,16 +4,8 @@ import { basename, extname, resolve } from 'node:path'
 import { useEffect, useRef } from 'react'
 import { Box } from 'ink'
 import { Spinner } from '@inkjs/ui'
-import {
-  NotebookBooksController,
-  type BookFull,
-  type BookRangeFull,
-  type Notebook,
-} from 'doughnut-api'
-import {
-  doughnutSdkOptions,
-  runDefaultBackendJson,
-} from '../../backendApi/doughnutBackendClient.js'
+import type { BookRangeFull, Notebook } from 'doughnut-api'
+import { attachNotebookBookWithPdf } from '../../backendApi/doughnutBackendClient.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import type {
   CommandDoc,
@@ -112,16 +104,14 @@ async function runNotebookAttachPdf(
   const bookName =
     ext.toLowerCase() === '.pdf' ? basename(path, ext) : basename(path)
 
-  const book = await runDefaultBackendJson<BookFull>(() =>
-    NotebookBooksController.attachBook({
-      ...doughnutSdkOptions(),
-      path: { notebook: notebook.id },
-      body: {
-        bookName,
-        format: 'pdf',
-        layout: minerResult.layout,
-      },
-    })
+  const book = await attachNotebookBookWithPdf(
+    notebook.id,
+    {
+      bookName,
+      format: 'pdf',
+      layout: minerResult.layout,
+    },
+    absPdf
   )
 
   const tree = bookRangesTreeLines(book.ranges)
