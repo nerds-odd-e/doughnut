@@ -2973,6 +2973,24 @@ export type GetBookResponses = {
 
 export type GetBookResponse = GetBookResponses[keyof GetBookResponses];
 
+export type GetBookFileData = {
+    body?: never;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/book/file';
+};
+
+export type GetBookFileResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type GetBookFileResponse = GetBookFileResponses[keyof GetBookFileResponses];
+
 export type GetAllPendingRequestData = {
     body?: never;
     path?: never;

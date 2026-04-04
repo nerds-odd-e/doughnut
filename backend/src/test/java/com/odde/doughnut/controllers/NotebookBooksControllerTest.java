@@ -181,4 +181,27 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThrows(ResponseStatusException.class, () -> controller.getBook(nb2));
     }
   }
+
+  @Nested
+  class GetBookFile {
+    @Test
+    void returns404WhenNotebookHasNoBook() throws UnexpectedNoAccessRightException {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(nb));
+    }
+
+    @Test
+    void returns404WhenBookHasNoSourceFile() throws UnexpectedNoAccessRightException {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      controller.attachBook(nb, attachRequest(node("X")));
+      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(nb));
+    }
+
+    @Test
+    void rejectsNotebookWithoutReadAccess() {
+      User other = makeMe.aUser().please();
+      Notebook otherNb = makeMe.aNotebook().creatorAndOwner(other).please();
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.getBookFile(otherNb));
+    }
+  }
 }

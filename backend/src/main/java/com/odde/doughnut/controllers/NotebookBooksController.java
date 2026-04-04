@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @SessionScope
@@ -60,5 +61,18 @@ class NotebookBooksController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
     return bookService.getBookForNotebook(notebook);
+  }
+
+  @GetMapping(value = "/{notebook}/book/file", produces = MediaType.APPLICATION_PDF_VALUE)
+  public ResponseEntity<byte[]> getBookFile(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertReadAuthorization(notebook);
+    Book book = bookService.getBookForNotebook(notebook);
+    String ref = book.getSourceFileRef();
+    if (ref == null || ref.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
+    }
+    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
   }
 }
