@@ -1,11 +1,11 @@
 import { pageIsNotLoading } from '../pageBase'
 import { findNotebookCardButton, notebookList } from './NotebookList'
-import notebookSettingsPage from './notebookSettingsPage'
+import notebookPage from './notebookPage'
 
 export const notebookCard = (notebook: string) => ({
   ...notebookList(),
   shareNotebookToBazaar() {
-    return this.editNotebookSettings().shareNotebookToBazaar()
+    return this.openNotebookPage().shareNotebookToBazaar()
   },
   updateSubscription() {
     findNotebookCardButton(notebook, 'Edit subscription').click()
@@ -15,14 +15,14 @@ export const notebookCard = (notebook: string) => ({
     cy.findByRole('button', { name: 'OK' }).click()
     pageIsNotLoading()
   },
-  editNotebookSettings() {
+  openNotebookPage() {
     findNotebookCardButton(notebook, 'Edit notebook settings').click()
-    return notebookSettingsPage()
+    return notebookPage()
   },
   exportForObsidian() {
-    return this.editNotebookSettings().exportForObsidian()
+    return this.openNotebookPage().exportForObsidian()
   },
   importObsidianData(filename: string) {
-    return this.editNotebookSettings().importObsidianData(filename)
+    return this.openNotebookPage().importObsidianData(filename)
   },
 })

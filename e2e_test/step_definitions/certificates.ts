@@ -13,7 +13,7 @@ Then(
     start
       .navigateToNotebooksPage()
       .notebookCard(noteTopology)
-      .editNotebookSettings()
+      .openNotebookPage()
       .assertNoteHasSettingWithValue('Certificate Expiry', '1y')
   }
 )
@@ -24,12 +24,12 @@ Given(
     start
       .navigateToNotebooksPage()
       .notebookCard(notebook)
-      .editNotebookSettings()
+      .openNotebookPage()
       .updateAssessmentSettings({ certificateExpiry: period })
     start
       .navigateToNotebooksPage()
       .notebookCard(notebook)
-      .editNotebookSettings()
+      .openNotebookPage()
       .assertNoteHasSettingWithValue('Certificate Expiry', period)
   }
 )

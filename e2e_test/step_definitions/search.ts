@@ -6,6 +6,6 @@ Given('I reindex the notebook {string}', (notebookTitle: string) => {
   start
     .navigateToNotebooksPage()
     .notebookCard(notebookTitle)
-    .editNotebookSettings()
+    .openNotebookPage()
     .reindexNotebook()
 })

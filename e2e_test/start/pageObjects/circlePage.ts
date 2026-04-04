@@ -2,7 +2,7 @@ import noteCreationForm from './noteForms/noteCreationForm'
 import { bazaarOrCircle } from './BazaarOrCircle'
 import { findNotebookCardButton } from './NotebookList'
 import { navigateToMyCircles } from './myCirclesPage'
-import notebookSettingsPage from './notebookSettingsPage'
+import notebookPage from './notebookPage'
 
 export const assumeCirclePage = () => ({
   creatingNotebook(notebookTopic: string) {
@@ -14,7 +14,7 @@ export const assumeCirclePage = () => ({
   },
   moveNotebook(notebookTitle: string) {
     findNotebookCardButton(notebookTitle, 'Edit notebook settings').click()
-    notebookSettingsPage().moveNotebookToCircle()
+    notebookPage().moveNotebookToCircle()
     return {
       toCircle(circleName: string) {
         cy.findByText(circleName).click()

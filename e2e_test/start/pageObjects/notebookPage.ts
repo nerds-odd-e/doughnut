@@ -1,7 +1,7 @@
 import { pageIsNotLoading } from '../pageBase'
 import { form } from '../forms'
 
-const notebookSettingsPage = () => {
+const notebookPage = () => {
   const clickButton = (name: string) =>
     cy.findByRole('button', { name }).click()
   const assertButtonExists = (name: string) =>
@@ -100,4 +100,4 @@ const notebookSettingsPage = () => {
   }
 }
 
-export default notebookSettingsPage
+export default notebookPage

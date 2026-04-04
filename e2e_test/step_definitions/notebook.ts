@@ -47,7 +47,7 @@ When('I change notebook {string} to skip recall', (noteTopology: string) => {
   start
     .navigateToNotebooksPage()
     .notebookCard(noteTopology)
-    .editNotebookSettings()
+    .openNotebookPage()
     .skipMemoryTracking()
 })
 
@@ -55,7 +55,7 @@ When('I request for an approval for notebook {string}', (notebook: string) => {
   start
     .navigateToNotebooksPage()
     .notebookCard(notebook)
-    .editNotebookSettings()
+    .openNotebookPage()
     .requestForNotebookApproval()
 })
 
@@ -65,7 +65,7 @@ When(
     start
       .navigateToNotebooksPage()
       .notebookCard(noteTopology)
-      .editNotebookSettings()
+      .openNotebookPage()
       .expectNotebookApprovalStatus(status)
   }
 )
@@ -76,7 +76,7 @@ Then(
     start
       .navigateToNotebooksPage()
       .notebookCard(noteTopology)
-      .editNotebookSettings()
+      .openNotebookPage()
       .expectNotebookApprovalStatus(status)
   }
 )
@@ -91,7 +91,7 @@ Given(
     start
       .navigateToNotebooksPage()
       .notebookCard(notebook)
-      .editNotebookSettings()
+      .openNotebookPage()
       .updateAssessmentSettings({ numberOfQuestion })
   }
 )
@@ -102,7 +102,7 @@ Given(
     start
       .navigateToNotebooksPage()
       .notebookCard(notebook)
-      .editNotebookSettings()
+      .openNotebookPage()
       .updateAssessmentSettings({ numberOfQuestion })
   }
 )
@@ -128,7 +128,7 @@ Given('following notebooks have pending approval:', (notebooks: DataTable) => {
     start
       .navigateToNotebooksPage()
       .notebookCard(notebookName)
-      .editNotebookSettings()
+      .openNotebookPage()
       .requestForNotebookApproval()
   })
 })
