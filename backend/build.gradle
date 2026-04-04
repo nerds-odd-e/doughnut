@@ -60,6 +60,8 @@ ext['flyway.version'] = '11.20.3'
 def jdkUnsafeMemoryAccessJvmArgs = ['--sun-misc-unsafe-memory-access=allow']
 
 dependencies {
+  implementation platform('com.google.cloud:libraries-bom:26.54.0')
+  implementation 'com.google.cloud:google-cloud-storage'
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-websocket'

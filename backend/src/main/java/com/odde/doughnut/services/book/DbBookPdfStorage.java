@@ -3,10 +3,8 @@ package com.odde.doughnut.services.book;
 import com.odde.doughnut.entities.AttachmentBlob;
 import com.odde.doughnut.entities.repositories.AttachmentBlobRepository;
 import java.util.Optional;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
 public class DbBookPdfStorage implements BookPdfStorage {
 
   private final AttachmentBlobRepository attachmentBlobRepository;

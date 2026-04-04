@@ -70,6 +70,8 @@ Each row is a **merge gate**: backend verify, relevant frontend/CLI tests, and *
 
 ### SP-C1 — GCS `BookPdfStorage` implementation (not default in dev)
 
+**Done.** [`GcsBookPdfStorage`](backend/src/main/java/com/odde/doughnut/services/book/GcsBookPdfStorage.java), [`BookPdfStorageConfiguration`](backend/src/main/java/com/odde/doughnut/configs/BookPdfStorageConfiguration.java) (`@ConditionalOnProperty` on `doughnut.book-pdf.gcs.bucket`); [`DbBookPdfStorage`](backend/src/main/java/com/odde/doughnut/services/book/DbBookPdfStorage.java) registered via `@ConditionalOnMissingBean`; commented property example in [`application.yml`](backend/src/main/resources/application.yml); [`GcsBookPdfStorageTest`](backend/src/test/java/com/odde/doughnut/services/book/GcsBookPdfStorageTest.java).
+
 - **Outcome (integrator-visible in configured env):** Second implementation of **`BookPdfStorage`** using GCP **Storage** client: **put** uploads object, **get** reads bytes (or streams). Activated only when **explicit** config/profile says so (e.g. bucket name + credentials). **Default** local/test profile remains DB implementation from SP-A2.
 - **Tests:** **Black-box** tests against the GCS adapter with **mocked** `Storage` (or fakes) — assert correct bucket/blob id derivation from `source_file_ref` **without** coupling tests to private helpers; **no** real network in unit tests.
 - **Deliverable cleanliness:** If the bean is `@ConditionalOnProperty`, document required properties; **no** unreachable GCS code paths.
