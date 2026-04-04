@@ -18,6 +18,8 @@ Example:
     "/path/to/book.epub"
 
 Phase B (Node subprocess): add --json-result to emit a single JSON object on stdout (stderr unchanged for logs).
+  Include optional top-level ``layout`` with ``roots`` / ``children`` for POST …/attach-book (same shape as
+  ``e2e_test/scripts/mineru_outline_e2e_stub.py``).
 """
 
 from __future__ import annotations
@@ -28,11 +30,13 @@ import sys
 import tempfile
 import zipfile
 from pathlib import Path
+from typing import Any
 from xml.etree import ElementTree as ET
 
 from mineru.cli.common import do_parse, read_fn
 
 SUPPORTED_BOOK_SUFFIXES = frozenset({".pdf", ".epub"})
+ANCHOR_FORMAT = "pdf.mineru_outline_v1"
 
 
 def _print_json_result(payload: dict) -> None:
@@ -84,10 +88,10 @@ def _href_from_opf(opf_zip_path: str, href: str) -> str:
     return (Path(base) / href).as_posix()
 
 
-def outline_from_epub(epub_path: Path) -> tuple[list[str], str]:
+def heading_records_from_epub(epub_path: Path) -> tuple[list[dict[str, Any]], str]:
     from bs4 import BeautifulSoup
 
-    lines: list[str] = []
+    records: list[dict[str, Any]] = []
     with zipfile.ZipFile(epub_path) as z:
         opf_path = _container_opf_path(z)
         manifest, spine = _parse_opf_manifest_spine(z.read(opf_path))
@@ -113,10 +117,26 @@ def outline_from_epub(epub_path: Path) -> tuple[list[str], str]:
                 if not text:
                     continue
                 level = int(tag.name[1])
-                lines.append(f"[L{level} s{spine_idx}] {text}")
-    if lines:
-        return lines, "epub (h1–h3 along OPF spine; MinerU does not parse EPUB)"
+                records.append(
+                    {
+                        "level": level,
+                        "title": text,
+                        "source": "epub",
+                        "spine_index": spine_idx,
+                        "href": inner_path,
+                    }
+                )
+    if records:
+        return records, "epub (h1–h3 along OPF spine; MinerU does not parse EPUB)"
     return [], "no h1–h3 found in linear spine documents"
+
+
+def outline_from_epub(epub_path: Path) -> tuple[list[str], str]:
+    records, source = heading_records_from_epub(epub_path)
+    if not records:
+        return [], source
+    lines = [f"[L{r['level']} s{r['spine_index']}] {r['title']}" for r in records]
+    return lines, source
 
 
 def find_content_list_json(output_dir: Path, stem: str) -> Path | None:
@@ -138,12 +158,44 @@ def find_middle_json(output_dir: Path, stem: str) -> Path | None:
     return matches[0] if matches else None
 
 
-def outline_from_content_list(path: Path) -> tuple[list[str], str]:
-    data = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(data, list):
-        return [], "content list is not a JSON array"
-    lines: list[str] = []
+def _anchor_pair(payload: dict[str, Any]) -> tuple[dict[str, str], dict[str, str]]:
+    s = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    a = {"anchorFormat": ANCHOR_FORMAT, "value": s}
+    return a, a
+
+
+def layout_roots_from_heading_records(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Build nested layout nodes (attach-book ``layout.roots``) from headings in reading order."""
+    roots: list[dict[str, Any]] = []
+    stack: list[tuple[int, dict[str, Any]]] = []
+    for rec in records:
+        level = int(rec["level"])
+        title = str(rec["title"]).strip()
+        if not title:
+            continue
+        payload = {k: rec[k] for k in ("page_idx", "bbox", "source", "spine_index", "href") if k in rec and rec[k] is not None}
+        start_a, end_a = _anchor_pair(payload if payload else {"kind": "heading"})
+        node: dict[str, Any] = {
+            "title": title,
+            "startAnchor": start_a,
+            "endAnchor": end_a,
+        }
+        while stack and stack[-1][0] >= level:
+            stack.pop()
+        if not stack:
+            roots.append(node)
+        else:
+            parent = stack[-1][1]
+            parent.setdefault("children", []).append(node)
+        stack.append((level, node))
+    return roots
+
+
+def heading_records_from_content_list(data: list[Any]) -> tuple[list[dict[str, Any]], str | None]:
+    records: list[dict[str, Any]] = []
     for item in data:
+        if not isinstance(item, dict):
+            continue
         if item.get("type") != "text":
             continue
         level = item.get("text_level")
@@ -152,11 +204,14 @@ def outline_from_content_list(path: Path) -> tuple[list[str], str]:
         text = (item.get("text") or "").strip()
         if not text:
             continue
-        page = item.get("page_idx")
-        page_s = f"p{page}" if page is not None else "p?"
-        lines.append(f"[L{level} {page_s}] {text}")
-    if lines:
-        return lines, "content_list"
+        rec: dict[str, Any] = {"level": int(level), "title": text}
+        if item.get("page_idx") is not None:
+            rec["page_idx"] = item.get("page_idx")
+        if item.get("bbox") is not None:
+            rec["bbox"] = item.get("bbox")
+        records.append(rec)
+    if records:
+        return records, None
     return [], "no text blocks with text_level in {1,2,3}"
 
 
@@ -170,13 +225,18 @@ def _text_from_para_block(block: dict) -> str:
     return "".join(parts).strip()
 
 
-def outline_from_middle_json(path: Path) -> tuple[list[str], str]:
-    data = json.loads(path.read_text(encoding="utf-8"))
+def heading_records_from_middle_data(data: dict[str, Any]) -> tuple[list[dict[str, Any]], str | None]:
+    records: list[dict[str, Any]] = []
     pdf_info = data.get("pdf_info") or []
-    lines: list[str] = []
+    if not isinstance(pdf_info, list):
+        return [], "pdf_info is not a list"
     for page in pdf_info:
+        if not isinstance(page, dict):
+            continue
         page_idx = page.get("page_idx")
         for block in page.get("para_blocks") or []:
+            if not isinstance(block, dict):
+                continue
             if block.get("type") != "title":
                 continue
             level = block.get("level", 1)
@@ -185,11 +245,43 @@ def outline_from_middle_json(path: Path) -> tuple[list[str], str]:
             text = _text_from_para_block(block)
             if not text:
                 continue
-            page_s = f"p{page_idx}" if page_idx is not None else "p?"
-            lines.append(f"[L{level} {page_s}] {text}")
-    if lines:
-        return lines, "middle.json (title blocks)"
+            rec: dict[str, Any] = {"level": int(level), "title": text}
+            if page_idx is not None:
+                rec["page_idx"] = page_idx
+            if block.get("bbox") is not None:
+                rec["bbox"] = block.get("bbox")
+            records.append(rec)
+    if records:
+        return records, None
     return [], "no title para_blocks with level in {1,2,3}"
+
+
+def outline_from_content_list(path: Path) -> tuple[list[str], str]:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, list):
+        return [], "content list is not a JSON array"
+    records, err = heading_records_from_content_list(data)
+    if err is not None:
+        return [], err
+    lines = [
+        f"[L{rec['level']} {'p' + str(rec['page_idx']) if rec.get('page_idx') is not None else 'p?'}] {rec['title']}"
+        for rec in records
+    ]
+    return lines, "content_list"
+
+
+def outline_from_middle_json(path: Path) -> tuple[list[str], str]:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        return [], "middle.json root is not an object"
+    records, err = heading_records_from_middle_data(data)
+    if err is not None:
+        return [], err
+    lines = [
+        f"[L{rec['level']} {'p' + str(rec['page_idx']) if rec.get('page_idx') is not None else 'p?'}] {rec['title']}"
+        for rec in records
+    ]
+    return lines, "middle.json (title blocks)"
 
 
 def run_pdf(
@@ -228,16 +320,40 @@ def run_pdf(
     if not cl_path:
         return _emit_error(json_mode, "could not find *_content_list.json under output dir")
 
-    outline, source = outline_from_content_list(cl_path)
-    if not outline:
-        print(f"note: {source}; trying middle.json fallback", file=sys.stderr)
-        mid_path = find_middle_json(out_dir, stem)
-        if mid_path:
-            outline, source = outline_from_middle_json(mid_path)
-        else:
-            return _emit_error(json_mode, "no middle.json for fallback")
+    records: list[dict[str, Any]] = []
+    source = ""
+    cl_note = ""
+    try:
+        raw_cl = json.loads(cl_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        return _emit_error(json_mode, f"invalid content list JSON: {e}")
 
-    if not outline:
+    if isinstance(raw_cl, list):
+        recs, err = heading_records_from_content_list(raw_cl)
+        if err is None:
+            records = recs
+            source = "content_list"
+        else:
+            cl_note = err
+    else:
+        cl_note = "content list is not a JSON array"
+
+    if not records:
+        print(f"note: {cl_note or 'no headings from content_list'}; trying middle.json fallback", file=sys.stderr)
+        mid_path = find_middle_json(out_dir, stem)
+        if not mid_path:
+            return _emit_error(json_mode, "no middle.json for fallback")
+        try:
+            raw_mid = json.loads(mid_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as e:
+            return _emit_error(json_mode, f"invalid middle.json: {e}")
+        if isinstance(raw_mid, dict):
+            recs, err = heading_records_from_middle_data(raw_mid)
+            if err is None:
+                records = recs
+                source = "middle.json (title blocks)"
+
+    if not records:
         print("no heading layers detected (layers 1–3 empty).", file=sys.stderr)
         if cleanup_out:
             print(f"(output kept for inspection: {out_dir})", file=sys.stderr)
@@ -252,8 +368,21 @@ def run_pdf(
             )
         return 0
 
+    outline = [
+        f"[L{r['level']} {'p' + str(r['page_idx']) if r.get('page_idx') is not None else 'p?'}] {r['title']}"
+        for r in records
+    ]
+    layout_payload = {"roots": layout_roots_from_heading_records(records)}
+
     if json_mode:
-        _print_json_result({"ok": True, "outline": "\n".join(outline), "source": source})
+        _print_json_result(
+            {
+                "ok": True,
+                "outline": "\n".join(outline),
+                "source": source,
+                "layout": layout_payload,
+            }
+        )
     else:
         print(f"--- outline ({source}) ---")
         for line in outline:
@@ -300,24 +429,33 @@ def main() -> int:
     if suffix == ".epub":
         if args.start_page != 0 or args.end_page is not None:
             print("note: --start-page / --end-page apply to PDF only; ignored for EPUB", file=sys.stderr)
-        outline, source = outline_from_epub(book_path)
-        if not outline:
+        epub_records, epub_note = heading_records_from_epub(book_path)
+        if not epub_records:
             if json_mode:
                 _print_json_result(
                     {
                         "ok": True,
                         "outline": "",
                         "source": "epub",
-                        "note": source,
+                        "note": epub_note,
                     }
                 )
             else:
-                print(f"{source}.", file=sys.stderr)
+                print(f"{epub_note}.", file=sys.stderr)
             return 0
+        outline = [f"[L{r['level']} s{r['spine_index']}] {r['title']}" for r in epub_records]
+        layout_payload = {"roots": layout_roots_from_heading_records(epub_records)}
         if json_mode:
-            _print_json_result({"ok": True, "outline": "\n".join(outline), "source": source})
+            _print_json_result(
+                {
+                    "ok": True,
+                    "outline": "\n".join(outline),
+                    "source": epub_note,
+                    "layout": layout_payload,
+                }
+            )
         else:
-            print(f"--- outline ({source}) ---")
+            print(f"--- outline ({epub_note}) ---")
             for line in outline:
                 print(line)
         return 0
