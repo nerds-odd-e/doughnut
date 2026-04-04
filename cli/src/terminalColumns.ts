@@ -62,6 +62,28 @@ function breakLongGraphemeRun(text: string, maxWidth: number): string[] {
   return lines.length > 0 ? lines : ['']
 }
 
+/** Newline-separated rows; lines wider than `maxDisplayCols` split by grapheme (paths, JSON). */
+export function splitTextToTerminalRows(
+  text: string,
+  maxDisplayCols: number
+): string[] {
+  if (maxDisplayCols < 1) return ['']
+  const normalized = text.replace(/\r\n/g, '\n')
+  const out: string[] = []
+  for (const line of normalized.split('\n')) {
+    if (line === '') {
+      out.push('')
+      continue
+    }
+    if (stringWidth(line) <= maxDisplayCols) {
+      out.push(line)
+      continue
+    }
+    out.push(...breakLongGraphemeRun(line, maxDisplayCols))
+  }
+  return out
+}
+
 function wrapParagraphToWidths(
   text: string,
   firstLineWidth: number,

@@ -8,6 +8,9 @@ import { materializeEmbeddedMineruOutlineScript } from './embeddedMineruOutlineS
 
 export const MINERU_OUTLINE_DEFAULT_TIMEOUT_MS = 30 * 60 * 1000
 
+/** Cap stderr bytes included in user-visible errors (tracebacks are usually < this). */
+const MINERU_STDERR_EXCERPT_CHARS = 12_000
+
 export type MineruOutlineOk = {
   ok: true
   outline: string
@@ -284,21 +287,28 @@ function mapSpawnOutcome(spawned: SpawnOutcome): MineruOutlineResult {
   let parsed: unknown
   try {
     if (!trimmedOut) {
+      const err = spawned.stderr.trim()
+      const excerpt =
+        err.length <= MINERU_STDERR_EXCERPT_CHARS
+          ? err
+          : `${err.slice(0, MINERU_STDERR_EXCERPT_CHARS / 2)}\n…\n${err.slice(-MINERU_STDERR_EXCERPT_CHARS / 2)}`
       return {
         ok: false,
-        error:
-          spawned.stderr.trim().slice(-500) ||
-          `empty stdout (exit ${spawned.code ?? 'unknown'})`,
+        error: excerpt || `empty stdout (exit ${spawned.code ?? 'unknown'})`,
         exitCode: spawned.code,
       }
     }
     parsed = JSON.parse(trimmedOut) as unknown
   } catch {
-    const tail = spawned.stderr.trim().slice(-500)
+    const err = spawned.stderr.trim()
+    const excerpt =
+      err.length <= MINERU_STDERR_EXCERPT_CHARS
+        ? err
+        : `${err.slice(0, MINERU_STDERR_EXCERPT_CHARS / 2)}\n…\n${err.slice(-MINERU_STDERR_EXCERPT_CHARS / 2)}`
     return {
       ok: false,
-      error: tail
-        ? `invalid JSON on stdout; stderr (tail): ${tail}`
+      error: excerpt
+        ? `invalid JSON on stdout; stderr:\n${excerpt}`
         : 'invalid JSON on stdout',
       exitCode: spawned.code,
     }

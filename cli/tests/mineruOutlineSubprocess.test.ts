@@ -282,7 +282,8 @@ describe('runMineruOutlineSubprocess', () => {
     expect(result.ok).toBe(false)
     if (!result.ok) {
       expect(result.error).toContain('invalid JSON')
-      expect(result.error).toContain('stderr (tail)')
+      expect(result.error).toContain('stderr:')
+      expect(result.error).toContain('something on stderr')
     }
   })
 

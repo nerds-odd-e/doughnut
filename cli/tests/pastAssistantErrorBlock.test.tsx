@@ -21,4 +21,14 @@ describe('PastAssistantErrorBlock', () => {
     expect(lines[i - 1]?.length).toBe(lines[i]?.length)
     expect(lines[i + 1]?.length).toBe(lines[i]?.length)
   })
+
+  test('renders every newline as a separate red content row', () => {
+    const { lastFrame } = render(
+      <PastAssistantErrorBlock text={'Traceback:\n  File "x.py", line 1'} />
+    )
+    const raw = stripAnsi(lastFrame() ?? '')
+    expect(raw).toContain('Traceback:')
+    expect(raw).toContain('File "x.py", line 1')
+    expect(raw.indexOf('Traceback:')).toBeLessThan(raw.indexOf('File "x.py"'))
+  })
 })

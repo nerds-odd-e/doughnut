@@ -6,7 +6,8 @@ PDF: MinerU `do_parse` (pipeline). Venv `.venv-mineru/bin/python`; install e.g.:
   .venv-mineru/bin/pip install 'mineru[pipeline]'
 
 EPUB: MinerU does not accept EPUB (only PDF / images / Office). For `.epub` we walk
-the OPF spine and collect <h1>–<h3> text in order (BeautifulSoup; pulled in with MinerU).
+the OPF spine and collect <h1>–<h3> text in order (BeautifulSoup — `pip install beautifulsoup4`;
+only loaded when you process an `.epub`).
 
 MinerU writes `{stem}_content_list.json` (not `document_content_list.json`).
 
@@ -28,8 +29,6 @@ import tempfile
 import zipfile
 from pathlib import Path
 from xml.etree import ElementTree as ET
-
-from bs4 import BeautifulSoup
 
 from mineru.cli.common import do_parse, read_fn
 
@@ -86,6 +85,8 @@ def _href_from_opf(opf_zip_path: str, href: str) -> str:
 
 
 def outline_from_epub(epub_path: Path) -> tuple[list[str], str]:
+    from bs4 import BeautifulSoup
+
     lines: list[str] = []
     with zipfile.ZipFile(epub_path) as z:
         opf_path = _container_opf_path(z)
