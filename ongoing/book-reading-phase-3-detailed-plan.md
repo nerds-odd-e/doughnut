@@ -42,6 +42,8 @@ passes by:
 
 **GitHub Actions:** Confirm once in the E2E job that **`python3`** is on `PATH` (document finding; add a trivial `python3 -c 'print(1)'` step only if a runner image regression is a concern). No MinerU pip install in CI.
 
+**Production CLI bundle:** Default script resolution and embedding so **`python3`** runs the same logical script from the **esbuild bundle** as from source — sub-phase **3.5**.
+
 ---
 
 ## PDF fixture
@@ -86,16 +88,35 @@ Each sub-phase should end with **tests green** except the deliberate red step ca
 - Map **API response** (`Book` + **ranges**) to a **bounded, TTY-safe** assistant message (excerpt of structure — mirror rules like **`READ_OUTLINE_ASSISTANT_MAX_CHARS`** if needed).
 - **Vitest:** prefer **`runInteractive`** + **`vi.spyOn`** on the API controller per [.cursor/rules/cli.mdc](../.cursor/rules/cli.mdc) for at least one success and one failure class; avoid duplicating E2E.
 
-**Exit:** E2E scenario **green** with stub + real backend in **`pnpm run-p …`** stack.
+**Exit:** E2E scenario **green** with stub + real backend in **`pnpm run-p …`** stack. **Bundled** CLI can still use checkout-relative script paths until **3.5** proves the same Python invocation from **`cli/dist/doughnut-cli.bundle.mjs`** (or E2E install path).
 
-### 3.5 — Exceptional cases for `/attach`
+### 3.5 — Python outline script in the bundle; one spawn path for bundle and source
+
+- The script the CLI passes to **`python3`** (real MinerU wrapper, shared with **`/read`**-factored code, or the checked-in stub when **`DOUGHNUT_MINERU_OUTLINE_SCRIPT`** points at it) must be **reachable when the user runs the shipped artifact** (`cli/dist/doughnut-cli.bundle.mjs`), not only via **`pnpm -C cli exec tsx src/index.ts`** or dev layouts.
+- Use **one** resolution and spawn approach for **bundled** and **from-source** runs: e.g. embed the script in the bundle (esbuild `loader` / `import` of file contents + write to a temp file at runtime, or equivalent) and pass that path to **`python3`**, or another single mechanism documented in this plan once chosen — avoid a large behavioral fork (`if (bundled) … else …`) except where the runtime truly differs (e.g. only the script bytes source changes).
+- **Vitest:** observable check that the bundled entry (or the same helper **`runMineruOutlineSubprocess`** uses) resolves an executable script path and that **`python3`** can run it in the stub/E2E shape where practical; do not rely on “works in dev folder layout” alone.
+- **CI / E2E:** stub path via **`DOUGHNUT_MINERU_OUTLINE_SCRIPT`** remains valid; confirm the **default** production resolution still works when the CLI is **`node cli/dist/doughnut-cli.bundle.mjs`** (or the E2E-installed bundle path) without requiring a checkout-relative path that the bundle cannot see.
+
+**Exit:** Same subprocess argv pattern and env knobs as today; bundle and source runs do not diverge in how the Python script is obtained or invoked.
+
+### 3.6 — Exceptional cases for `/attach` (file, subprocess contract, API)
 
 - **File:** missing path, non-`.pdf`, unreadable file — clear assistant or thrown **`userVisibleSlashCommandError`** mapping.
-- **Subprocess:** stub returns **`ok: false`** or invalid JSON — message surfaces cleanly.
+- **Subprocess:** process exits successfully but returns **`ok: false`** or invalid JSON — message surfaces cleanly (contract failure after a **running** interpreter).
 - **API:** **409** second attach, **403/404** notebook, validation **400** — user-visible text actionable for support.
 - Keep **unit-level** tests for message shape where cheap; **one** E2E optional if a case is regressions-prone and not covered elsewhere.
 
-### 3.6 — Remove `/read` and dead spike code
+### 3.7 — Exceptional cases on the Python side (environment and MinerU)
+
+- **`python3` missing or not on `PATH`:** user-visible message (install Python / fix PATH), mapped via **`userVisibleSlashCommandError`** or assistant text consistent with [.cursor/rules/cli.mdc](../.cursor/rules/cli.mdc).
+- **MinerU (or required deps) not installed / import fails:** clear, actionable copy (how to install or which env var points at a custom script).
+- **MinerU cannot run:** non-zero exit, stderr with useful excerpt (bounded for TTY), timeouts for huge PDFs — honest, support-friendly messages without leaking stack dumps.
+- **Optional:** wrong Python version if the team documents a minimum; surface as a single class of error if detectable.
+- Prefer **unit** tests with controlled subprocess mocks or fixture stderr where the behavior is message mapping; **E2E** only if a regression slipped through and needs a tag-scoped scenario.
+
+**Exit:** Attach failures from the **host Python/MinerU stack** are categorized and user-visible separately from file/API issues in **3.6**.
+
+### 3.8 — Remove `/read` and dead spike code
 
 - Remove **`readSlashCommand`** from the main registry, **help** text, and any **guidance** references.
 - Delete or archive **unused** modules under **`cli/src/commands/read/`** only after **attach** uses the **factored** outline/layout pipeline (no duplicate MinerU wiring).
