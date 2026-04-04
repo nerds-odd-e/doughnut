@@ -12,11 +12,14 @@ import json
 from pathlib import Path
 from typing import Any
 
-# Same heading sequence as the former mineru_outline_e2e_stub layout (book_reading E2E).
+# Book-reading E2E: matches Gherkin table in book_reading.feature (two main topics, two subtopics each).
 _E2E_CONTENT_LIST: list[dict[str, Any]] = [
-    {"type": "text", "text_level": 1, "text": "Stub Part A", "page_idx": 0},
-    {"type": "text", "text_level": 2, "text": "Stub Section One", "page_idx": 0},
-    {"type": "text", "text_level": 1, "text": "Stub Part B", "page_idx": 0},
+    {"type": "text", "text_level": 1, "text": "Main Topic 1", "page_idx": 0},
+    {"type": "text", "text_level": 2, "text": "Subtopic 1.1", "page_idx": 0},
+    {"type": "text", "text_level": 2, "text": "Subtopic 1.2", "page_idx": 0},
+    {"type": "text", "text_level": 1, "text": "Main Topic 2", "page_idx": 0},
+    {"type": "text", "text_level": 2, "text": "Subtopic 2.1", "page_idx": 0},
+    {"type": "text", "text_level": 2, "text": "Subtopic 2.2", "page_idx": 0},
 ]
 
 

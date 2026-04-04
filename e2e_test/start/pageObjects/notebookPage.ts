@@ -104,6 +104,14 @@ const notebookPage = () => {
         cy.findByRole('button', { name: /^Read$/i })
       })
     },
+    clickReadOnAttachedBook() {
+      pageIsNotLoading()
+      cy.get('[data-testid="notebook-attached-book"]').within(() => {
+        cy.findByRole('button', { name: /^Read$/i }).click()
+      })
+      pageIsNotLoading()
+      return this
+    },
   }
 }
 

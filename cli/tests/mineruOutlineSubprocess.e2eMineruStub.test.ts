@@ -46,11 +46,12 @@ describe('mineru_book_outline.py with E2E shadow mineru (PYTHONPATH)', () => {
     })
     expect(result.ok).toBe(true)
     if (!result.ok) return
-    expect(result.outline).toContain('Stub Part A')
-    expect(result.layout?.roots?.[0]?.title).toBe('Stub Part A')
-    expect(result.layout?.roots?.[0]?.children?.[0]?.title).toBe(
-      'Stub Section One'
-    )
-    expect(result.layout?.roots?.[1]?.title).toBe('Stub Part B')
+    expect(result.outline).toContain('Main Topic 1')
+    expect(result.layout?.roots?.[0]?.title).toBe('Main Topic 1')
+    expect(result.layout?.roots?.[0]?.children?.[0]?.title).toBe('Subtopic 1.1')
+    expect(result.layout?.roots?.[0]?.children?.[1]?.title).toBe('Subtopic 1.2')
+    expect(result.layout?.roots?.[1]?.title).toBe('Main Topic 2')
+    expect(result.layout?.roots?.[1]?.children?.[0]?.title).toBe('Subtopic 2.1')
+    expect(result.layout?.roots?.[1]?.children?.[1]?.title).toBe('Subtopic 2.2')
   })
 })
