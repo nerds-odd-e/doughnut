@@ -91,14 +91,11 @@ Each row is a **merge gate**: backend verify, relevant frontend/CLI tests, and *
 
 ### SP-C2 — Wire profile selection + integration proof
 
-- **Outcome (operator-visible):** `application-*.yml` (or deployment env) documents **`prod` = GCS** (bucket required) and **non-`prod` = DB**. One **integration-style** test: Spring context with **`prod`** profile **or** test-only `@TestConfiguration` that loads the GCS beans with **mock** `Storage` — **smallest** approach that proves `BookService` receives `BookStorage` and prod wiring does not pull in `DbBookStorage`.
+**Done.** Comments in [`application.yml`](../backend/src/main/resources/application.yml) (default + `prod` blocks) describe **`prod` → GCS** (bucket required) and **non-`prod` → DB**; integration proof: [`BookStorageProdWiringTest`](../backend/src/test/java/com/odde/doughnut/integration/BookStorageProdWiringTest.java) — `AnnotationConfigApplicationContext` with **`prod`** profile, **`BookStorageConfiguration`** + mock `Storage` (bean override), asserts a single **`GcsBookStorage`** bean and **`BookService`** wiring.
+
+- **Outcome (operator-visible):** `application.yml` (or deployment env) documents **`prod` = GCS** (bucket required) and **non-`prod` = DB**. One **integration-style** test that proves **`BookStorageConfiguration`** with **`prod`** yields **`GcsBookStorage`** for **`BookService`** (no `DbBookStorage` bean in that context).
 - **Tests:** That integration test + full **backend:verify** green.
 - **Deliverable cleanliness:** No duplicate storage selection logic in multiple packages.
-
-### SP-C3 — Not planned (E2E vs GCS)
-
-- **Superseded by testing split (top of this doc):** Book-reading **E2E** stays **DB-only**. **GCS** remains **unit-tested** only. **No** second Cypress job, emulator job, or `@gcsBookStorage` tag for book PDF storage unless the team explicitly reopens this later.
-- **CI notes:** See **CI notes** below — **contract + unit tests for GCS; E2E for attach/download on DB**.
 
 ### SP-D1 — Hardening and parent-doc alignment
 
