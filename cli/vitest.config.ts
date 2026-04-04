@@ -1,7 +1,9 @@
 import { defineConfig } from 'vitest/config'
 import { resolve } from 'node:path'
+import { pythonAsTextVitePlugin } from './pythonAsTextVitePlugin.js'
 
 export default defineConfig({
+  plugins: [pythonAsTextVitePlugin()],
   resolve: {
     alias: {
       '@generated/doughnut-backend-api': resolve(

@@ -4,6 +4,7 @@ import { access, mkdtemp, rm } from 'node:fs/promises'
 import type { AttachBookLayoutRequestFull } from 'doughnut-api'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
+import { materializeEmbeddedMineruOutlineScript } from './embeddedMineruOutlineScript.js'
 
 export const MINERU_OUTLINE_DEFAULT_TIMEOUT_MS = 30 * 60 * 1000
 
@@ -226,14 +227,8 @@ export async function runMineruOutlineSubprocess(
   const scriptPath =
     options.scriptPath ??
     process.env.DOUGHNUT_MINERU_OUTLINE_SCRIPT ??
-    resolveDefaultScriptPath(cwd)
-  if (!scriptPath) {
-    return {
-      ok: false,
-      error:
-        'miner outline script not found (expected minerui-spike/spike_mineru_phase_a_outline.py from cwd ancestors); set DOUGHNUT_MINERU_OUTLINE_SCRIPT',
-    }
-  }
+    resolveDefaultScriptPath(cwd) ??
+    materializeEmbeddedMineruOutlineScript()
 
   const python =
     options.pythonExecutable ?? process.env.DOUGHNUT_MINERU_PYTHON ?? 'python3'

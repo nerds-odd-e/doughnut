@@ -1,7 +1,13 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { EventEmitter } from 'node:events'
 import { PassThrough } from 'node:stream'
-import { writeFileSync, mkdtempSync, rmSync } from 'node:fs'
+import {
+  existsSync,
+  readFileSync,
+  writeFileSync,
+  mkdtempSync,
+  rmSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { ChildProcess } from 'node:child_process'
@@ -48,6 +54,36 @@ describe('runMineruOutlineSubprocess', () => {
   afterEach(() => {
     rmSync(workDir, { recursive: true, force: true })
     vi.mocked(childProcess.spawn).mockReset()
+  })
+
+  test('uses embedded default script path when env unset and cwd has no minerui-spike', async () => {
+    delete process.env.DOUGHNUT_MINERU_OUTLINE_SCRIPT
+    const isolatedCwd = mkdtempSync(join(tmpdir(), 'mineru-no-repo-'))
+    const isolatedEpub = join(isolatedCwd, 'book.epub')
+    writeFileSync(isolatedEpub, '')
+    try {
+      fakeChild((child) => {
+        setImmediate(() => {
+          child.stdout!.end(
+            JSON.stringify({ ok: true, outline: 'x', source: 'epub' })
+          )
+          child.stderr!.end('')
+          child.emit('close', 0, null)
+        })
+      })
+
+      await runMineruOutlineSubprocess({
+        bookPath: isolatedEpub,
+        cwd: isolatedCwd,
+      })
+
+      const args = vi.mocked(childProcess.spawn).mock.calls[0]![1] as string[]
+      const scriptArg = args[0]!
+      expect(existsSync(scriptArg)).toBe(true)
+      expect(readFileSync(scriptArg, 'utf8')).toContain('Phase A spike')
+    } finally {
+      rmSync(isolatedCwd, { recursive: true, force: true })
+    }
   })
 
   test('returns trimmed outline when subprocess prints ok JSON', async () => {
