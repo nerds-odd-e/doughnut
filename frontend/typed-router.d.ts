@@ -83,6 +83,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/BookReadingPage': RouteRecordInfo<
+      '/BookReadingPage',
+      '/BookReadingPage',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/CircleJoinPage': RouteRecordInfo<
       '/CircleJoinPage',
       '/CircleJoinPage',
@@ -274,6 +281,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/BazaarPage.vue': {
       routes:
         | '/BazaarPage'
+      views:
+        | never
+    }
+    'src/pages/BookReadingPage.vue': {
+      routes:
+        | '/BookReadingPage'
       views:
         | never
     }

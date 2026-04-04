@@ -10,7 +10,11 @@
         Open the book reader to browse this notebook's attached PDF structure.
       </p>
     </div>
-    <button type="button" class="daisy-btn daisy-btn-primary daisy-btn-sm">
+    <button
+      type="button"
+      class="daisy-btn daisy-btn-primary daisy-btn-sm"
+      @click="router.push({ name: 'bookReading', params: { notebookId: props.notebookId } })"
+    >
       Read
     </button>
   </section>
@@ -31,6 +35,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue"
+import { useRouter } from "vue-router"
 import type { BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -38,6 +43,8 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 const props = defineProps({
   notebookId: { type: Number, required: true },
 })
+
+const router = useRouter()
 
 const book = ref<BookFull | null>(null)
 const bookLoadFinished = ref(false)

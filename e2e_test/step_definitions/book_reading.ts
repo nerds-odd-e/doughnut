@@ -9,11 +9,9 @@ import start from '../start'
 
 function parseBookOutlineTable(data: DataTable): BookOutlineRow[] {
   return data.raw().map((row) => {
-    const cell = row[0] ?? ''
-    const leadingSpaces = /^(\s*)/.exec(cell)
-    const leading = leadingSpaces?.[1]?.length ?? 0
-    const depth = Math.floor(leading / 2)
-    return { depth, title: cell.trim() }
+    const depth = parseInt(row[0] ?? '0', 10)
+    const title = (row[1] ?? '').trim()
+    return { depth, title }
   })
 }
 

@@ -19,6 +19,7 @@ import CirclesPage from "@/pages/CirclesPage.vue"
 import ManageAccessTokensPage from "@/pages/ManageAccessTokensPage.vue"
 import MemoryTrackerPage from "@/pages/MemoryTrackerPage.vue"
 import NotebookPage from "@/pages/NotebookPage.vue"
+import BookReadingPage from "@/pages/BookReadingPage.vue"
 import { routeMetadata } from "./routeMetadata"
 
 // Please start most of the path with "/d/"
@@ -47,6 +48,7 @@ const componentMap: Record<string, unknown> = {
   manageAccessTokens: ManageAccessTokensPage,
   memoryTrackerShow: MemoryTrackerPage,
   notebookEdit: NotebookPage,
+  bookReading: BookReadingPage,
 }
 
 // Combine route metadata with components
