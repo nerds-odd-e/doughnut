@@ -4,7 +4,7 @@ This document is **not** a delivery plan. It does not define phased user-visible
 
 **Companion:** market and product research stays in `ongoing/book-reading-research-report.md`. That report is now cross-walked to the vocabulary below.
 
-**Living document:** When a book-reading plan is written and executed, **update this roadmap** so it stays the single place for “what we believe the shape of the system should be.” Do not duplicate long architecture prose inside the plan; link here instead.
+**Living document:** When a book-reading plan is written and executed, **update this roadmap** so it stays the single place for “what we believe the shape of the system should be.” Do not duplicate long architecture prose inside the plan; link here instead. **Delivery plan for “Read a range of a book”:** [`ongoing/book-reading-read-a-range-plan.md`](book-reading-read-a-range-plan.md).
 
 ---
 
@@ -126,7 +126,25 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 
 ## Story 1 (shipped)
 
-**Book** metadata plus **BookRange** tree on a **Notebook** only: **`POST /api/notebooks/{notebook}/attach-book`** (JSON outline) and **`GET /api/notebooks/{notebook}/book`**, at most one book per notebook. **`sourceFileRef` is not used**—there is **no server-side PDF storage** in Story 1; the file stays on the client until a later upload/bind story. Outline anchors use **`pdf.mineru_outline_v1`** on the wire (backend `BookReadingWireConstants`).
+**Book** metadata plus **BookRange** tree on a **Notebook**: **`POST /api/notebooks/{notebook}/attach-book`** (JSON outline only) and **`GET /api/notebooks/{notebook}/book`**, at most one book per notebook. As shipped, **`sourceFileRef` is not used** and there is **no server-side PDF storage**; the PDF stayed on the client. Outline anchors use **`pdf.mineru_outline_v1`** on the wire (backend `BookReadingWireConstants`).
+
+---
+
+## Story 2 — Read a range (direction)
+
+**Goal:** After CLI (or future UI) attach, the **same book the user reads in the browser** is the **file stored server-side**, with a reading UI that ties **outline navigation** to **PDF position**.
+
+| Decision | Direction |
+|----------|-----------|
+| **CLI + server** | **`/attach` in the CLI** uploads the PDF to the backend **via the same `attach-book` surface** as the rest of the product (extend the route to accept outline + file in one logical operation—e.g. multipart—or an equivalent single-user-visible “attach” that does not fork a second attach API). |
+| **Blob storage** | **Production:** PDF bytes live in a **GCP bucket** (object key or URL recorded so `sourceFileRef` or equivalent can resolve the object). **Dev / automated tests:** a **local or test-local object store** (filesystem, emulator, or test-only bucket) so the **same E2E scenarios** run without requiring real GCP. |
+| **Frontend PDF** | Render the book with **pdf.js** in the **main content** area of the book reading page. |
+| **Chrome layout** | **Book layout** (outline / ranges tree) lives in a **drawer sidebar** on the book reading page; the **PDF viewer occupies the main pane**. |
+| **Sync** | **Two-way:** (1) **Selecting / activating a range** in the layout drives **pdf.js** to the corresponding anchors (page / region). (2) **Scrolling (and relevant zoom / page changes) in the PDF** updates which range is **highlighted** as current in the layout. |
+
+**Deletion:** Removing a book from the notebook (frontend flow) must **delete the persisted book record** and **remove the object** from the configured storage backend (GCS in prod, local/test store in dev).
+
+**Plan:** Phased delivery is spelled out in [`ongoing/book-reading-read-a-range-plan.md`](book-reading-read-a-range-plan.md).
 
 ---
 

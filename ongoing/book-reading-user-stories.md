@@ -20,11 +20,15 @@ Then I should see the book structure of the notebook "Top Maths" in the browser
 
 ## Story: Read a range of a book
 
-### Sub-stories
+### Scenarios / sub-stories
 
-- User reads a top-level range that has child ranges.
-- User reads a leaf range.
-- User splits a range further.
+- attach in cli and download book from frontend (with a solution that works for dev and test env) (e2e test needed)
+- attach in cli and download book from frontend (store in gcp in production) (use the same e2e test as previous)
+- delete a book of a notebook using frontend. It will delete the book record and also remove the file from gcp
+- showing the pdf book in book reading page (e2e test needed)
+- clicking book layout range to jump to pdf position (e2e test needed)
+- scroll pdf to update book layout highlight
+- show/hide the drawer
 
 ---
 
@@ -55,3 +59,5 @@ _(Sub-stories to be added.)_
 ## Story: EPUB book
 
 _(Sub-stories to be added.)_
+
+## User splits a range further.
