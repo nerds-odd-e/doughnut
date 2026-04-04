@@ -4,9 +4,6 @@ import notebookPage from './notebookPage'
 
 export const notebookCard = (notebook: string) => ({
   ...notebookList(),
-  shareNotebookToBazaar() {
-    return this.openNotebookPage().shareNotebookToBazaar()
-  },
   updateSubscription() {
     findNotebookCardButton(notebook, 'Edit subscription').click()
   },
@@ -18,11 +15,5 @@ export const notebookCard = (notebook: string) => ({
   openNotebookPage() {
     findNotebookCardButton(notebook, 'Edit notebook settings').click()
     return notebookPage()
-  },
-  exportForObsidian() {
-    return this.openNotebookPage().exportForObsidian()
-  },
-  importObsidianData(filename: string) {
-    return this.openNotebookPage().importObsidianData(filename)
   },
 })

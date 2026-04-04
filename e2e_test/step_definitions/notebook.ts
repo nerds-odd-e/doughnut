@@ -12,10 +12,7 @@ import {
 import start from '../start'
 
 Given('I choose to share my notebook {string}', (noteTopology: string) => {
-  start
-    .navigateToNotebooksPage()
-    .notebookCard(noteTopology)
-    .shareNotebookToBazaar()
+  start.navigateToNotebookPage(noteTopology).shareNotebookToBazaar()
 })
 
 Then(
@@ -134,10 +131,7 @@ Then('I should get immediate feedback by showing the wrong answer', () => {
 When(
   'I Import Obsidian data {string} to note {string}',
   (filename: string, noteTitle: string) => {
-    start
-      .navigateToNotebooksPage()
-      .notebookCard(noteTitle)
-      .importObsidianData(filename)
+    start.navigateToNotebookPage(noteTitle).importObsidianData(filename)
   }
 )
 
