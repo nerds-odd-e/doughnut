@@ -1,5 +1,6 @@
 import { pageIsNotLoading } from '../pageBase'
 import { form } from '../forms'
+import bookReadingPage from './bookReadingPage'
 
 const notebookPage = () => {
   const clickButton = (name: string) =>
@@ -97,20 +98,13 @@ const notebookPage = () => {
       cy.findByRole('button', { name: 'Move to ...' }).click()
       return this
     },
-    expectAttachedBookSectionWithRead(bookTitle: string) {
-      pageIsNotLoading()
-      return cy.get('[data-testid="notebook-attached-book"]').within(() => {
-        cy.contains(bookTitle)
-        cy.findByRole('button', { name: /^Read$/i })
-      })
-    },
-    clickReadOnAttachedBook() {
+    readBook(bookTitle: string) {
       pageIsNotLoading()
       cy.get('[data-testid="notebook-attached-book"]').within(() => {
+        cy.contains(bookTitle)
         cy.findByRole('button', { name: /^Read$/i }).click()
       })
-      pageIsNotLoading()
-      return this
+      return bookReadingPage()
     },
   }
 }

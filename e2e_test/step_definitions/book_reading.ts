@@ -3,10 +3,8 @@
  */
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
-import bookReadingPage from '../start/pageObjects/bookReadingPage'
 import type { BookOutlineRow } from '../start/pageObjects/bookReadingPage'
 import { cli } from '../start/pageObjects/cli'
-import notebookPage from '../start/pageObjects/notebookPage'
 import start from '../start'
 
 function parseBookOutlineTable(data: DataTable): BookOutlineRow[] {
@@ -40,8 +38,7 @@ Then(
     const expected = parseBookOutlineTable(data)
     start
       .navigateToNotebookPage(notebookTitle)
-      .expectAttachedBookSectionWithRead('top-maths')
-    notebookPage().clickReadOnAttachedBook()
-    bookReadingPage().expectBookStructureRows(expected)
+      .readBook('top-maths')
+      .expectBookStructureRows(expected)
   }
 )
