@@ -7,15 +7,15 @@
 **Architecture constants (all sub-phases):**
 
 - **Single attach surface:** `POST /api/notebooks/{notebook}/attach-book` — PDF + outline **together** (multipart); no separate product “upload-only” API.
-- **Opaque `Book.source_file_ref`:** Only persisted locator the domain uses; **`BookPdfStorage`** (name indicative) **puts** bytes → ref, **gets** ref → bytes (or streams). **Non-`prod`** Spring profiles use DB (`AttachmentBlob`); **`prod`** uses GCS object key only — **same** interface, **no** DB fallback in production.
+- **Opaque `Book.source_file_ref`:** Only persisted locator the domain uses; **`BookStorage`** **puts** bytes → ref, **gets** ref → bytes (or streams). The type is **format-agnostic**; today’s implementations and routes are **PDF**. **Non-`prod`** Spring profiles use DB (`AttachmentBlob`); **`prod`** uses GCS object key only — **same** interface, **no** DB fallback in production.
 - **Download contract:** Authenticated **`GET`** on a **documented** path (e.g. `/api/notebooks/{notebook}/book/file`) that streams PDF with correct headers; browser and CLI both rely on **same** contract. Phase 2 may stream **from GCS server-side** first (keeps cookie/session model identical to Phase 1); redirects/signed URLs stay an optional later optimization **without** changing the path if desired.
 
 **Explicitly not in this meta-plan:** pdf.js, drawer, range sync (Phase 3+ of the parent doc).
 
-**Book PDF storage — testing split:**
+**Book file storage (PDF today) — testing split:**
 
-- **E2E** (book reading / attach / download scenarios, including SP-B2) runs **only** against **DB** `BookPdfStorage`. CI and local SUT use **non-`prod`** Spring profiles, so Cypress never asserts behavior against real GCS.
-- **GCS** `BookPdfStorage` is covered by **unit tests** only (e.g. mocked `com.google.cloud.storage.Storage` in [`GcsBookPdfStorageTest`](backend/src/test/java/com/odde/doughnut/services/book/GcsBookPdfStorageTest.java)); **no** Gherkin / Cypress variant for GCS.
+- **E2E** (book reading / attach / download scenarios, including SP-B2) runs **only** against **DB** `BookStorage`. CI and local SUT use **non-`prod`** Spring profiles, so Cypress never asserts behavior against real GCS.
+- **GCS** `BookStorage` is covered by **unit tests** only (e.g. mocked `com.google.cloud.storage.Storage` in [`GcsBookStorageTest`](backend/src/test/java/com/odde/doughnut/services/book/GcsBookStorageTest.java)); **no** Gherkin / Cypress variant for GCS.
 
 ---
 
@@ -29,11 +29,11 @@ Each row is a **merge gate**: backend verify, relevant frontend/CLI tests, and *
 - **Tests:** Extend [NotebookBooksControllerTest](backend/src/test/java/com/odde/doughnut/controllers/NotebookBooksControllerTest.java) (or equivalent) for 404 + auth; no storage bean required yet beyond what already exists.
 - **Deliverable cleanliness:** No unused beans; if a placeholder method exists on a future storage type, **do not** add it until SP-A2.
 
-### SP-A2 — `BookPdfStorage` (DB) + happy-path download
+### SP-A2 — `BookStorage` (DB) + happy-path download
 
-**Done.** `BookPdfStorage` / `DbBookPdfStorage`, `AttachmentBlobRepository`, `GET .../book/file` streams PDF with `Content-Disposition`; tests in `NotebookBooksControllerTest`.
+**Done.** `BookStorage` / `DbBookStorage`, `AttachmentBlobRepository`, `GET .../book/file` streams PDF with `Content-Disposition`; tests in `NotebookBooksControllerTest`.
 
-- **Outcome (integrator-visible):** First **production** use of storage: **`BookPdfStorage`** + DB-backed implementation (persist/load via `AttachmentBlob` pattern). Download handler resolves `source_file_ref` through **`get`** and returns **200** `application/pdf` with **Content-Disposition** (filename sanitization consistent with existing export endpoints).
+- **Outcome (integrator-visible):** First **production** use of storage: **`BookStorage`** + DB-backed implementation (persist/load via `AttachmentBlob` pattern). Download handler resolves `source_file_ref` through **`get`** and returns **200** `application/pdf` with **Content-Disposition** (filename sanitization consistent with existing export endpoints).
 - **Tests:** Controller-level test with **real** persistence (`makeMe` / test setup) so the **full** GET path is exercised; include **404** when ref is corrupt/unknown if the implementation can detect it cheaply.
 - **Deliverable cleanliness:** Interface + **one** default `@Bean` implementation wired; **no** orphan implementations.
 
@@ -41,7 +41,7 @@ Each row is a **merge gate**: backend verify, relevant frontend/CLI tests, and *
 
 **Done.** Second handler on `POST .../attach-book` with `consumes = MULTIPART_FORM_DATA` (`@RequestPart` **`metadata`** + **`file`**); **`BookService.attachBookWithPdf`** + shared **`persistNewBook`**; empty/missing **`file`** → **400**. OpenAPI has **one** `post` (spec limit for same path/method) with **`application/json`** and **`multipart/form-data`** in **`requestBody.content`**; **[`SwaggerConfig`](backend/src/main/java/com/odde/doughnut/configs/SwaggerConfig.java)** **`attachBookOperationIdCustomizer`** sets **`operationId: attachBook`** so **`pnpm generateTypeScript`** still emits **`NotebookBooksController.attachBook`** for JSON (CLI unchanged until SP-A4). Multipart callers use **`multipart/form-data`** on the same URL.
 
-- **Outcome (integrator-visible):** Second `POST .../attach-book` handler (or equivalent) with `consumes = MULTIPART_FORM_DATA`: parts **`metadata`** (`AttachBookRequest` JSON) + **`file`** (PDF). On success, **`BookPdfStorage.put`**, set **`source_file_ref`**, same outline persistence as today. **Existing JSON-only attach** remains **unchanged** so current CLI and tests keep working.
+- **Outcome (integrator-visible):** Second `POST .../attach-book` handler (or equivalent) with `consumes = MULTIPART_FORM_DATA`: parts **`metadata`** (`AttachBookRequest` JSON) + **`file`** (PDF). On success, **`BookStorage.put`**, set **`source_file_ref`**, same outline persistence as today. **Existing JSON-only attach** remains **unchanged** so current CLI and tests keep working.
 - **Tests:** **`AttachBookMultipart`** nested class in [NotebookBooksControllerTest](backend/src/test/java/com/odde/doughnut/controllers/NotebookBooksControllerTest.java); **all** existing attach tests still green.
 - **OpenAPI / codegen:** Regenerate with **`pnpm generateTypeScript`**; do not hand-edit **`open_api_docs.yaml`**.
 
@@ -69,15 +69,15 @@ Each row is a **merge gate**: backend verify, relevant frontend/CLI tests, and *
 
 ### SP-B2 — E2E: CLI attach + browser download
 
-- **Outcome (user-visible E2E):** New Cucumber scenario: attach fixture PDF via CLI → open notebook → Read → **Download** → assert PDF (magic bytes or fixture comparison) via **intercept**, **`cy.request`** with session, or reliable downloads-folder pattern — pick one style and **reuse** patterns from [e2e_test](e2e_test) (e.g. obsidian/audio lessons). **Storage:** scenario assumes **DB** `BookPdfStorage` (non-`prod` profile); **do not** run this E2E against GCS.
+- **Outcome (user-visible E2E):** New Cucumber scenario: attach fixture PDF via CLI → open notebook → Read → **Download** → assert PDF (magic bytes or fixture comparison) via **intercept**, **`cy.request`** with session, or reliable downloads-folder pattern — pick one style and **reuse** patterns from [e2e_test](e2e_test) (e.g. obsidian/audio lessons). **Storage:** scenario assumes **DB** `BookStorage` (non-`prod` profile); **do not** run this E2E against GCS.
 - **Tests:** Single focused feature file/spec run in CI for this change set.
 - **Deliverable cleanliness:** Page object methods colocated; step definitions stay thin.
 
-### SP-C1 — GCS `BookPdfStorage` implementation (prod only)
+### SP-C1 — GCS `BookStorage` implementation (prod only)
 
-**Done.** [`GcsBookPdfStorage`](backend/src/main/java/com/odde/doughnut/services/book/GcsBookPdfStorage.java), [`BookPdfStorageConfiguration`](backend/src/main/java/com/odde/doughnut/configs/BookPdfStorageConfiguration.java) — **`@Profile("prod")`** for GCS `Storage` + `BookPdfStorage`; **`@Profile("!prod")`** for [`DbBookPdfStorage`](backend/src/main/java/com/odde/doughnut/services/book/DbBookPdfStorage.java) (no property-based fallback). Prod requires **`doughnut.book-pdf.gcs.bucket`**. Note in [`application.yml`](backend/src/main/resources/application.yml); [`GcsBookPdfStorageTest`](backend/src/test/java/com/odde/doughnut/services/book/GcsBookPdfStorageTest.java).
+**Done.** [`GcsBookStorage`](backend/src/main/java/com/odde/doughnut/services/book/GcsBookStorage.java), [`BookStorageConfiguration`](backend/src/main/java/com/odde/doughnut/configs/BookStorageConfiguration.java) — **`@Profile("prod")`** for GCS `Storage` + `BookStorage`; **`@Profile("!prod")`** for [`DbBookStorage`](backend/src/main/java/com/odde/doughnut/services/book/DbBookStorage.java) (no property-based fallback). Prod requires **`doughnut.book-pdf.gcs.bucket`**. Note in [`application.yml`](backend/src/main/resources/application.yml); [`GcsBookStorageTest`](backend/src/test/java/com/odde/doughnut/services/book/GcsBookStorageTest.java).
 
-- **Outcome (integrator-visible):** Second implementation of **`BookPdfStorage`** using GCP **Storage** client: **put** uploads object, **get** reads bytes. **`prod`** profile **only** — uses GCS; **all other profiles** use DB from SP-A2. **No** DB storage bean in production.
+- **Outcome (integrator-visible):** Second implementation of **`BookStorage`** using GCP **Storage** client: **put** uploads object, **get** reads bytes. **`prod`** profile **only** — uses GCS; **all other profiles** use DB from SP-A2. **No** DB storage bean in production.
 - **Tests:** **Black-box** unit tests with **mocked** `Storage` — **no** real network; **no** E2E against GCS (see testing split above).
 - **Deliverable cleanliness:** Required prod properties documented; **no** unreachable GCS code paths.
 
@@ -89,7 +89,7 @@ Each row is a **merge gate**: backend verify, relevant frontend/CLI tests, and *
 
 ### SP-C2 — Wire profile selection + integration proof
 
-- **Outcome (operator-visible):** `application-*.yml` (or deployment env) documents **`prod` = GCS** (bucket required) and **non-`prod` = DB**. One **integration-style** test: Spring context with **`prod`** profile **or** test-only `@TestConfiguration` that loads the GCS beans with **mock** `Storage` — **smallest** approach that proves `BookService` receives `BookPdfStorage` and prod wiring does not pull in `DbBookPdfStorage`.
+- **Outcome (operator-visible):** `application-*.yml` (or deployment env) documents **`prod` = GCS** (bucket required) and **non-`prod` = DB**. One **integration-style** test: Spring context with **`prod`** profile **or** test-only `@TestConfiguration` that loads the GCS beans with **mock** `Storage` — **smallest** approach that proves `BookService` receives `BookStorage` and prod wiring does not pull in `DbBookStorage`.
 - **Tests:** That integration test + full **backend:verify** green.
 - **Deliverable cleanliness:** No duplicate storage selection logic in multiple packages.
 

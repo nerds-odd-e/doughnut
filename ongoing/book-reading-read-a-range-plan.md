@@ -16,7 +16,7 @@
 
 - **Same attach surface:** Extend **`POST /api/notebooks/{notebook}/attach-book`** (or keep one logical “attach book” operation) so the **CLI sends the PDF and outline together**; avoid a parallel “upload-only” product API unless a hard technical constraint appears.
 - **Observable tests:** Prefer Cypress + CLI/subprocess or HTTP assertions over tests that pin internal PDF or storage helpers, except for pure mapping (anchor ↔ scroll) if extracted as a small black-box unit.
-- **Storage rollout:** **Phase 1** uses **dev/test-local** object storage for attach/download E2E; **Phase 2** wires **GCP** (bucket) for production with the **same** attach/download contract (reuse the same E2E scenarios where feasible—emulator, fake GCS, or test bucket in CI).
+- **Storage rollout:** **Phase 1** uses **dev/test-local** object storage for attach/download E2E; **Phase 2** wires **GCP** (bucket) for production with the **same** attach/download contract (reuse the same E2E scenarios where feasible—emulator, fake GCS, or test bucket in CI). Backend abstraction: **`BookStorage`** with **`DbBookStorage`** (non-`prod`) and **`GcsBookStorage`** (`prod`); PDF is the first file format—execution detail in [book-reading-pdf-storage-subphases.md](book-reading-pdf-storage-subphases.md).
 - **At most one intentionally failing test** while driving a given phase (see planning rule).
 
 ---

@@ -26,24 +26,24 @@ public class BookService {
   private final BookRepository bookRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
-  private final BookPdfStorage bookPdfStorage;
+  private final BookStorage bookStorage;
 
   public BookService(
       BookRepository bookRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
-      BookPdfStorage bookPdfStorage) {
+      BookStorage bookStorage) {
     this.bookRepository = bookRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
-    this.bookPdfStorage = bookPdfStorage;
+    this.bookStorage = bookStorage;
   }
 
   @Transactional
   public Book attachBookWithPdf(Notebook notebook, AttachBookRequest request, byte[] pdfBytes) {
     validateAttachRequest(request);
     assertNotebookHasNoBook(notebook);
-    String ref = bookPdfStorage.put(pdfBytes);
+    String ref = bookStorage.put(pdfBytes);
     return persistNewBook(notebook, request, ref);
   }
 
@@ -89,7 +89,7 @@ public class BookService {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
     }
     byte[] bytes =
-        bookPdfStorage
+        bookStorage
             .get(ref)
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));

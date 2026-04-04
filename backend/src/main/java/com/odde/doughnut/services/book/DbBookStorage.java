@@ -5,11 +5,11 @@ import com.odde.doughnut.entities.repositories.AttachmentBlobRepository;
 import java.util.Optional;
 import org.springframework.transaction.annotation.Transactional;
 
-public class DbBookPdfStorage implements BookPdfStorage {
+public class DbBookStorage implements BookStorage {
 
   private final AttachmentBlobRepository attachmentBlobRepository;
 
-  public DbBookPdfStorage(AttachmentBlobRepository attachmentBlobRepository) {
+  public DbBookStorage(AttachmentBlobRepository attachmentBlobRepository) {
     this.attachmentBlobRepository = attachmentBlobRepository;
   }
 

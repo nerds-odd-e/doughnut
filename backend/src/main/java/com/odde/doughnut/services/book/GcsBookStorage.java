@@ -7,13 +7,13 @@ import com.google.cloud.storage.Storage;
 import java.util.Optional;
 import java.util.UUID;
 
-public class GcsBookPdfStorage implements BookPdfStorage {
+public class GcsBookStorage implements BookStorage {
 
   private final Storage storage;
   private final String bucket;
   private final String objectPrefix;
 
-  public GcsBookPdfStorage(Storage storage, String bucket, String objectPrefix) {
+  public GcsBookStorage(Storage storage, String bucket, String objectPrefix) {
     this.storage = storage;
     this.bucket = bucket;
     this.objectPrefix = normalizePrefix(objectPrefix);

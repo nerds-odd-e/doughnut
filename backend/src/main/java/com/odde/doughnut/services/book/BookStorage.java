@@ -2,7 +2,7 @@ package com.odde.doughnut.services.book;
 
 import java.util.Optional;
 
-public interface BookPdfStorage {
+public interface BookStorage {
 
   String put(byte[] data);
 

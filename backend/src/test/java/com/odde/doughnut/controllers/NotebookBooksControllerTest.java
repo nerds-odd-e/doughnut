@@ -11,8 +11,8 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.BookRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.book.BookPdfStorage;
 import com.odde.doughnut.services.book.BookReadingWireConstants;
+import com.odde.doughnut.services.book.BookStorage;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -35,7 +35,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
 
   @Autowired NotebookBooksController controller;
   @Autowired BookRepository bookRepository;
-  @Autowired BookPdfStorage bookPdfStorage;
+  @Autowired BookStorage bookStorage;
 
   @BeforeEach
   void setup() {
@@ -270,7 +270,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       controller.attachBook(nb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
       byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
-      String ref = bookPdfStorage.put(pdfBytes);
+      String ref = bookStorage.put(pdfBytes);
       Book book = bookRepository.findByNotebook_Id(nb.getId()).orElseThrow();
       book.setSourceFileRef(ref);
       makeMe.entityPersister.save(book);

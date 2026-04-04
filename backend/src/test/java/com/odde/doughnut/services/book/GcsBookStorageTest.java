@@ -17,12 +17,12 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-class GcsBookPdfStorageTest {
+class GcsBookStorageTest {
 
   @Test
   void put_uploadsWithBucketPrefixAndPdfContentType() {
     Storage storage = mock(Storage.class);
-    GcsBookPdfStorage cut = new GcsBookPdfStorage(storage, "my-bucket", "pre");
+    GcsBookStorage cut = new GcsBookStorage(storage, "my-bucket", "pre");
 
     byte[] data = "pdf".getBytes(StandardCharsets.UTF_8);
     String ref = cut.put(data);
@@ -46,14 +46,14 @@ class GcsBookPdfStorageTest {
     when(blob.getContent()).thenReturn(content);
     when(storage.get(BlobId.of("b", "pre/x.pdf"))).thenReturn(blob);
 
-    GcsBookPdfStorage cut = new GcsBookPdfStorage(storage, "b", "pre/");
+    GcsBookStorage cut = new GcsBookStorage(storage, "b", "pre/");
     assertEquals(Optional.of(content), cut.get("pre/x.pdf"));
   }
 
   @Test
   void get_emptyWhenInvalidRef() {
     Storage storage = mock(Storage.class);
-    GcsBookPdfStorage cut = new GcsBookPdfStorage(storage, "b", "safe/");
+    GcsBookStorage cut = new GcsBookStorage(storage, "b", "safe/");
     assertTrue(cut.get("safe/../evil").isEmpty());
     assertTrue(cut.get("/safe/x").isEmpty());
     assertTrue(cut.get("safe\\x").isEmpty());
@@ -63,7 +63,7 @@ class GcsBookPdfStorageTest {
   @Test
   void get_emptyWhenWrongPrefix() {
     Storage storage = mock(Storage.class);
-    GcsBookPdfStorage cut = new GcsBookPdfStorage(storage, "b", "expected/");
+    GcsBookStorage cut = new GcsBookStorage(storage, "b", "expected/");
     assertTrue(cut.get("other/key.pdf").isEmpty());
     verifyNoInteractions(storage);
   }
@@ -72,7 +72,7 @@ class GcsBookPdfStorageTest {
   void get_emptyWhenNoBlob() {
     Storage storage = mock(Storage.class);
     when(storage.get(BlobId.of("b", "a.pdf"))).thenReturn(null);
-    GcsBookPdfStorage cut = new GcsBookPdfStorage(storage, "b", "");
+    GcsBookStorage cut = new GcsBookStorage(storage, "b", "");
     assertTrue(cut.get("a.pdf").isEmpty());
   }
 }
