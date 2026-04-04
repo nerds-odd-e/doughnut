@@ -11,4 +11,10 @@ Feature: Book reading
 
   Scenario: Attach PDF and see structure in the browser
     When I attach book "top-maths.pdf" to the notebook "Top Maths" via the CLI
-    # Then I should see the book structure of the notebook "Top Maths" in the browser
+    # Then I should see the book structure of the notebook "Top Maths" in the browser:
+    #  | Main Topic 1   |
+    #  |   Subtopic 1.1 |
+    #  |   Subtopic 1.2 |
+    #  | Main Topic 2   |
+    #  |   Subtopic 2.1 |
+    #  |   Subtopic 2.2 |
