@@ -31,7 +31,7 @@ describe("BookReadingPage", () => {
       .mount()
     await flushPromises()
 
-    const link = wrapper.find('[data-testid="book-download-pdf"]')
+    const link = wrapper.find('[data-testid="book-reading-download"]')
     expect(link.exists()).toBe(true)
     expect(link.attributes("href")).toBe(
       `/api/notebooks/${notebookId}/book/file`
@@ -58,7 +58,7 @@ describe("BookReadingPage", () => {
       .mount()
     await flushPromises()
 
-    expect(wrapper.find('[data-testid="book-download-pdf"]').exists()).toBe(
+    expect(wrapper.find('[data-testid="book-reading-download"]').exists()).toBe(
       false
     )
   })

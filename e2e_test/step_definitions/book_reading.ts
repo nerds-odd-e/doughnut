@@ -3,7 +3,9 @@
  */
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
-import type { BookOutlineRow } from '../start/pageObjects/bookReadingPage'
+import bookReadingPage, {
+  type BookOutlineRow,
+} from '../start/pageObjects/bookReadingPage'
 import { cli } from '../start/pageObjects/cli'
 import start from '../start'
 
@@ -38,5 +40,15 @@ Then(
       .navigateToNotebookPage(notebookTitle)
       .readBook('top-maths')
       .expectBookStructureRows(expected)
+  }
+)
+
+Then(
+  'I should be able to download the attached book PDF matching fixture {string}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (fixtureFilename: string) => {
+    return bookReadingPage().expectDownloadedBookPdfMatchesFixture(
+      fixtureFilename
+    )
   }
 )

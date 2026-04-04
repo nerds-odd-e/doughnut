@@ -18,6 +18,29 @@ const bookReadingPage = () => ({
       })
     return this
   },
+  expectDownloadedBookPdfMatchesFixture(fixtureFilename: string) {
+    pageIsNotLoading()
+    cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
+    cy.get('[data-testid="book-reading-page"]').should('exist')
+    cy.get('[data-testid="book-reading-download"]').should('exist').click()
+    const downloadsFolder = Cypress.config('downloadsFolder') as string
+    const downloadedPath = `${downloadsFolder}/${fixtureFilename}`
+    return cy
+      .task('fileShouldExistSoon', downloadedPath)
+      .should('equal', true)
+      .then(() =>
+        cy.fixture(`book_reading/${fixtureFilename}`, null).then((expected) =>
+          cy.readFile(downloadedPath, null).then((actual) => {
+            expect(
+              Cypress.Buffer.from(actual as ArrayBuffer).equals(
+                Cypress.Buffer.from(expected as ArrayBuffer)
+              ),
+              'downloaded PDF bytes match fixture'
+            ).to.be.true
+          })
+        )
+      )
+  },
 })
 
 export default bookReadingPage

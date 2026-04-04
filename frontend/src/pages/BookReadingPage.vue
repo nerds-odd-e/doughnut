@@ -5,7 +5,7 @@
         v-if="book.hasSourceFile"
         class="daisy-btn daisy-btn-outline daisy-btn-sm daisy-mb-2"
         :href="`/api/notebooks/${props.notebookId}/book/file`"
-        data-testid="book-download-pdf"
+        data-testid="book-reading-download"
       >
         Download
       </a>
