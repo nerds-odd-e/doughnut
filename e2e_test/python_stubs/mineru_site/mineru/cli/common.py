@@ -1,6 +1,6 @@
 """
 E2E-only fake MinerU: implements `read_fn` and `do_parse` used by
-minerui-spike/spike_mineru_phase_a_outline.py. No models or GPU.
+cli/python/mineru_book_outline.py. No models or GPU.
 
 When e2e_test/python_stubs/mineru_site is prepended to PYTHONPATH, this module
 replaces the real `mineru.cli.common` for the spike script subprocess.

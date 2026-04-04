@@ -12,7 +12,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { ChildProcess } from 'node:child_process'
 import * as childProcess from 'node:child_process'
-import { runMineruOutlineSubprocess } from '../src/commands/read/mineruOutlineSubprocess.js'
+import { runMineruOutlineSubprocess } from '../src/commands/mineruOutline/mineruOutlineSubprocess.js'
 
 vi.mock('node:child_process', async (importOriginal) => {
   const actual = await importOriginal<typeof import('node:child_process')>()
@@ -42,7 +42,7 @@ describe('runMineruOutlineSubprocess', () => {
 
   beforeEach(() => {
     process.env.DOUGHNUT_MINERU_OUTLINE_SCRIPT =
-      '/fake/minerui-spike/spike_mineru_phase_a_outline.py'
+      '/fake/cli/python/mineru_book_outline.py'
     delete process.env.DOUGHNUT_MINERU_PYTHON
     workDir = mkdtempSync(join(tmpdir(), 'mineru-outline-test-'))
     epubPath = join(workDir, 'book.epub')
@@ -56,7 +56,7 @@ describe('runMineruOutlineSubprocess', () => {
     vi.mocked(childProcess.spawn).mockReset()
   })
 
-  test('uses embedded default script path when env unset and cwd has no minerui-spike', async () => {
+  test('uses embedded default script path when env unset and cwd has no checkout cli/python', async () => {
     delete process.env.DOUGHNUT_MINERU_OUTLINE_SCRIPT
     const isolatedCwd = mkdtempSync(join(tmpdir(), 'mineru-no-repo-'))
     const isolatedEpub = join(isolatedCwd, 'book.epub')
@@ -80,7 +80,7 @@ describe('runMineruOutlineSubprocess', () => {
       const args = vi.mocked(childProcess.spawn).mock.calls[0]![1] as string[]
       const scriptArg = args[0]!
       expect(existsSync(scriptArg)).toBe(true)
-      expect(readFileSync(scriptArg, 'utf8')).toContain('Phase A spike')
+      expect(readFileSync(scriptArg, 'utf8')).toContain('Doughnut CLI')
     } finally {
       rmSync(isolatedCwd, { recursive: true, force: true })
     }
@@ -114,7 +114,7 @@ describe('runMineruOutlineSubprocess', () => {
     expect(vi.mocked(childProcess.spawn)).toHaveBeenCalledWith(
       'python3',
       expect.arrayContaining([
-        '/fake/minerui-spike/spike_mineru_phase_a_outline.py',
+        '/fake/cli/python/mineru_book_outline.py',
         epubPath,
         '--json-result',
       ]),
@@ -315,11 +315,11 @@ describe('runMineruOutlineSubprocess', () => {
     expect(result.ok).toBe(false)
     if (!result.ok) {
       expect(result.error).toContain('timed out')
-      expect(result.error).not.toContain('DOUGHNUT_READ_PDF_END_PAGE')
+      expect(result.error).not.toContain('DOUGHNUT_MINERU_PDF_END_PAGE')
     }
   })
 
-  test('PDF timeout message mentions DOUGHNUT_READ_PDF_END_PAGE', async () => {
+  test('PDF timeout message mentions DOUGHNUT_MINERU_PDF_END_PAGE', async () => {
     fakeChild((child) => {
       child.kill = vi.fn(() => {
         setImmediate(() => child.emit('close', null, 'SIGTERM'))
@@ -335,7 +335,7 @@ describe('runMineruOutlineSubprocess', () => {
     expect(result.ok).toBe(false)
     if (!result.ok) {
       expect(result.error).toContain('timed out')
-      expect(result.error).toContain('DOUGHNUT_READ_PDF_END_PAGE')
+      expect(result.error).toContain('DOUGHNUT_MINERU_PDF_END_PAGE')
     }
   })
 

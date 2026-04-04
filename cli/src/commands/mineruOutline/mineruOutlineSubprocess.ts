@@ -22,7 +22,7 @@ export type MineruOutlineOk = {
   outline: string
   source: string
   note?: string
-  /** Present when stdout JSON includes a valid attach-book `layout` (optional for `/read`). */
+  /** Present when stdout JSON includes a valid attach-book `layout`. */
   layout?: AttachBookLayoutRequestFull
 }
 
@@ -47,11 +47,7 @@ export type RunMineruOutlineOptions = {
 function resolveDefaultScriptPath(startDir: string): string | null {
   let dir = resolve(startDir)
   for (;;) {
-    const candidate = join(
-      dir,
-      'minerui-spike',
-      'spike_mineru_phase_a_outline.py'
-    )
+    const candidate = join(dir, 'cli', 'python', 'mineru_book_outline.py')
     if (existsSync(candidate)) {
       return candidate
     }
@@ -207,7 +203,7 @@ function timeoutErrorMessage(timeoutMs: number, isPdf: boolean): string {
   if (!isPdf) {
     return base
   }
-  return `${base} For large PDFs, set DOUGHNUT_READ_PDF_END_PAGE to cap the page range.`
+  return `${base} For large PDFs, set DOUGHNUT_MINERU_PDF_END_PAGE to cap the page range.`
 }
 
 function isRecord(v: unknown): v is Record<string, unknown> {

@@ -10,7 +10,7 @@ export function materializeEmbeddedMineruOutlineScript(): string {
     return materializedPath
   }
   const dir = mkdtempSync(join(tmpdir(), 'doughnut-mineru-outline-'))
-  const path = join(dir, 'spike_mineru_phase_a_outline.py')
+  const path = join(dir, 'mineru_book_outline.py')
   writeFileSync(path, getEmbeddedMineruOutlineSource(), 'utf8')
   materializedPath = path
   return path

@@ -6,8 +6,8 @@
   "type": "module",
   "imports": {
     "#mineru-embedded": {
-      "mineru-bundle": "./src/commands/read/mineruEmbeddedSource.bundle.ts",
-      "default": "./src/commands/read/mineruEmbeddedSource.ts"
+      "mineru-bundle": "./src/commands/mineruOutline/mineruEmbeddedSource.bundle.ts",
+      "default": "./src/commands/mineruOutline/mineruEmbeddedSource.ts"
     }
   },
   "engines": {

@@ -4,7 +4,7 @@
 
 **Architecture direction:** Align persisted shapes with [doughnut-book-reading-architecture-roadmap.md](doughnut-book-reading-architecture-roadmap.md) (`Book`, `BookRange`, `BookAnchor`). Do not duplicate that document here; update the roadmap when concrete storage/API choices land.
 
-**Parsing boundary:** Reuse the same operational approach as the `/read` spike ([spike-mineru-read-layout.md](spike-mineru-read-layout.md), `cli/src/commands/read/`): **CLI runs MinerU (or equivalent) in a subprocess**, then sends **extracted outline** to the server. **PDF bytes are not sent on `attach-book`** (separate upload/bind flow—see Phase 3 notes). The server stores the range tree from the nested layout payload; it does **not** need to run Python/MinerU in v1.
+**Parsing boundary:** **CLI runs MinerU (or equivalent) in a subprocess** via [`cli/python/mineru_book_outline.py`](../cli/python/mineru_book_outline.py) and **`runMineruOutlineSubprocess`**, then sends **extracted outline** to the server. Historical spike notes: [spike-mineru-read-layout.md](spike-mineru-read-layout.md). **PDF bytes are not sent on `attach-book`** (separate upload/bind flow—see Phase 3 notes). The server stores the range tree from the nested layout payload; it does **not** need to run Python/MinerU in v1.
 
 **Test discipline:** Follow [.cursor/rules/planning.mdc](../.cursor/rules/planning.mdc): one main user-visible outcome per phase, observable assertions (CLI stdout/transcript, HTTP, Cypress DOM), avoid layer-only phases without a visible slice.
 
@@ -95,15 +95,15 @@ This is the **interchange structure** the CLI (Phase 3) builds from MinerU / out
 
 ---
 
-## Phase 3 — `/attach <pdf>`: parse locally, upload to Doughnut
+## Phase 3 — `/attach <pdf>`: parse locally, upload to Doughnut — **done**
 
-**User outcome:** From the **notebook stage** (after `/use` has chosen the notebook), `/attach path/to/book.pdf` runs the **existing local PDF outline pipeline** (same family as `/read` / `runMineruOutlineSubprocess`), builds a **nested** layout matching Phase 2’s `layout.roots` / `children` shape, then calls **`POST /api/notebooks/{notebook}/attach-book`** with **`application/json`** (book name + layout). **PDF bytes are not sent on that endpoint**—Phase 3 also introduces or uses a **separate** upload/bind API (or storage flow) so the file is stored and linked to the created `Book`; exact route and ordering (create book first vs upload first) **TBD at implementation** and should be documented here once chosen. Assistant message confirms success (and surfaces actionable failures: missing file, invalid outline JSON from a running subprocess, network/auth errors, and **Python/MinerU environment** failures such as missing interpreter, missing MinerU, or MinerU runtime errors—see detailed Phase 3 sub-phases).
+**User outcome:** From the **notebook stage** (after `/use` has chosen the notebook), `/attach path/to/book.pdf` runs the **local PDF outline pipeline** (`runMineruOutlineSubprocess` + [`cli/python/mineru_book_outline.py`](../cli/python/mineru_book_outline.py)), builds a **nested** layout matching Phase 2’s `layout.roots` / `children` shape, then calls **`POST /api/notebooks/{notebook}/attach-book`** with **`application/json`** (book name + layout). **PDF bytes are not sent on that endpoint**—Phase 3 also introduces or uses a **separate** upload/bind API (or storage flow) so the file is stored and linked to the created `Book`; exact route and ordering (create book first vs upload first) **TBD at implementation** and should be documented here once chosen. Assistant message confirms success (and surfaces actionable failures: missing file, invalid outline JSON from a running subprocess, network/auth errors, and **Python/MinerU environment** failures such as missing interpreter, missing MinerU, or MinerU runtime errors—see [book-reading-phase-3-detailed-plan.md](book-reading-phase-3-detailed-plan.md)).
 
-**Implementation notes:** Factor shared “outline extraction” so `/read` and `/attach` do not fork incompatible logic: both should be able to produce the same nested `LayoutNode` tree the backend expects. The Python script invoked by the CLI must be **available and runnable from the shipped CLI bundle** using the **same** resolution/spawn approach as from source (see [book-reading-phase-3-detailed-plan.md](book-reading-phase-3-detailed-plan.md) sub-phase **3.5**). Respect env knobs already used for PDF caps (e.g. `DOUGHNUT_READ_PDF_END_PAGE`) or introduce attach-specific documented limits if product needs them.
+**Implementation notes:** Outline extraction lives in **`cli/src/commands/mineruOutline/`**; the Python script is embedded in the CLI bundle and also resolved from checkout at **`cli/python/mineru_book_outline.py`**. PDF page cap: **`DOUGHNUT_MINERU_PDF_END_PAGE`**. The interactive **`/read`** spike command was removed in Phase 3.8.
 
 **Tests:** CLI tests through **`runInteractive`** with **HTTP mocked** via the established `doughnut-api` spy pattern (see `.cursor/rules/cli.mdc`) **or** a thin test server **only** if the scenario is transport-level—prefer the project’s default mock approach for happy path + one failure class.
 
-**Phase complete when:** Attach works against a running backend in dev: **nested** `attach-book` + file story complete end-to-end; tests cover observable CLI + client/API contracts; no dead code paths for the chosen upload/bind flow.
+**Phase complete:** Attach path, E2E gate with **`@mockMineruLib`**, bundle embed, exceptional cases, **`pnpm cli:test`** green; no **`/read`** entry point.
 
 ---
 

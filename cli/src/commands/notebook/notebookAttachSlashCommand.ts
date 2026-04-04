@@ -15,27 +15,22 @@ import type {
   CommandDoc,
   InteractiveSlashCommand,
 } from '../interactiveSlashCommand.js'
-import { runMineruOutlineSubprocess } from '../read/mineruOutlineSubprocess.js'
-import { READ_OUTLINE_ASSISTANT_MAX_CHARS } from '../read/readSlashCommand.js'
+import { runMineruOutlineSubprocess } from '../mineruOutline/mineruOutlineSubprocess.js'
+import { truncateForBookOutlineAssistant } from '../mineruOutline/outlineAssistantLimits.js'
 
 const attachNotebookDoc: CommandDoc = {
   name: '/attach',
   usage: '/attach <path to pdf>',
   description:
-    'Attach a PDF to the active notebook (outline extraction and POST attach-book).',
+    'Attach a PDF to the active notebook (outline extraction and POST attach-book). Set DOUGHNUT_MINERU_PDF_END_PAGE to an inclusive last page index to cap large PDFs. Python: DOUGHNUT_MINERU_PYTHON; script: DOUGHNUT_MINERU_OUTLINE_SCRIPT.',
 }
 
-function pdfEndPageFromReadEnv(): number | undefined {
-  const raw = process.env.DOUGHNUT_READ_PDF_END_PAGE?.trim()
+function pdfEndPageFromMineruEnv(): number | undefined {
+  const raw = process.env.DOUGHNUT_MINERU_PDF_END_PAGE?.trim()
   if (raw === undefined || raw === '') return undefined
   const n = Number.parseInt(raw, 10)
   if (!Number.isFinite(n) || n < 0) return undefined
   return n
-}
-
-function truncateForAssistant(text: string): string {
-  if (text.length <= READ_OUTLINE_ASSISTANT_MAX_CHARS) return text
-  return `${text.slice(0, READ_OUTLINE_ASSISTANT_MAX_CHARS)}…`
 }
 
 function normParentId(v: string | number | undefined | null): string | null {
@@ -100,7 +95,7 @@ export function attachNotebookSlashCommandFor(
 
       const minerResult = await runMineruOutlineSubprocess({
         bookPath: path,
-        pdfEndPage: pdfEndPageFromReadEnv(),
+        pdfEndPage: pdfEndPageFromMineruEnv(),
       })
       if (!minerResult.ok) {
         throw new Error(minerResult.error)
@@ -131,7 +126,9 @@ export function attachNotebookSlashCommandFor(
       )
 
       const tree = bookRangesTreeLines(book.ranges)
-      const excerpt = truncateForAssistant(tree === '' ? book.bookName : tree)
+      const excerpt = truncateForBookOutlineAssistant(
+        tree === '' ? book.bookName : tree
+      )
       const assistantMessage = `Attached "${book.bookName}" to this notebook.\n\n${excerpt}`
       return { assistantMessage }
     },

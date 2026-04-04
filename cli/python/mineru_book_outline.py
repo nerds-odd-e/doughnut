@@ -1,26 +1,23 @@
 #!/usr/bin/env python3
 """
-Phase A spike: heading outline (layers 1–3) from PDF or EPUB.
+Doughnut CLI: heading outline (layers 1–3) from PDF or EPUB for attach-book layout extraction.
 
-PDF: MinerU `do_parse` (pipeline). Venv `.venv-mineru/bin/python`; install e.g.:
-  .venv-mineru/bin/pip install 'mineru[pipeline]'
+PDF: MinerU `do_parse` (pipeline). Example venv: `.venv-mineru/bin/pip install 'mineru[pipeline]'`.
 
-EPUB: MinerU does not accept EPUB (only PDF / images / Office). For `.epub` we walk
-the OPF spine and collect <h1>–<h3> text in order (BeautifulSoup — `pip install beautifulsoup4`;
-only loaded when you process an `.epub`).
+EPUB: MinerU does not accept EPUB. For `.epub` we walk the OPF spine and collect <h1>–<h3> text
+(BeautifulSoup — `pip install beautifulsoup4`; only loaded for `.epub`).
 
 MinerU writes `{stem}_content_list.json` (not `document_content_list.json`).
 
-Example:
-  CURSOR_DEV=true nix develop -c .venv-mineru/bin/python minerui-spike/spike_mineru_phase_a_outline.py \\
-    "/path/to/file.pdf" --end-page 4
-  CURSOR_DEV=true nix develop -c .venv-mineru/bin/python minerui-spike/spike_mineru_phase_a_outline.py \\
-    "/path/to/book.epub"
+With `--json-result`, stdout is one JSON object with `outline`, optional `note`, and `layout` with
+nested `roots` / `children` for `POST …/attach-book`. Logs stay on stderr.
 
-Phase B (Node subprocess): add --json-result to emit a single JSON object on stdout (stderr unchanged for logs).
-  Include optional top-level ``layout`` with ``roots`` / ``children`` for POST …/attach-book.
-  E2E prepends ``e2e_test/python_stubs/mineru_site`` to ``PYTHONPATH`` to shadow ``mineru`` with a fake
-  ``do_parse`` (no real MinerU in CI).
+Example:
+  python3 cli/python/mineru_book_outline.py "/path/to/file.pdf" --json-result --end-page 4
+  python3 cli/python/mineru_book_outline.py "/path/to/book.epub" --json-result
+
+E2E prepends `e2e_test/python_stubs/mineru_site` to `PYTHONPATH` to shadow `mineru` with a fake
+`do_parse` (no real MinerU in CI).
 """
 
 from __future__ import annotations
@@ -396,7 +393,7 @@ def run_pdf(
 
 def main() -> int:
     p = argparse.ArgumentParser(
-        description="Phase A: heading outline (layers 1–3) from PDF (MinerU) or EPUB (spine h1–h3)."
+        description="Heading outline (layers 1–3) from PDF (MinerU) or EPUB (spine h1–h3)."
     )
     p.add_argument("book", type=Path, help="Path to .pdf or .epub")
     p.add_argument("--output-dir", type=Path, default=None, help="MinerU output (PDF only; default: temp dir)")
@@ -412,7 +409,7 @@ def main() -> int:
     p.add_argument(
         "--json-result",
         action="store_true",
-        help="Print one JSON object on stdout (Phase B subprocess contract); logs stay on stderr",
+        help="Print one JSON object on stdout (CLI subprocess contract); logs stay on stderr",
     )
     args = p.parse_args()
     json_mode = args.json_result
@@ -464,7 +461,7 @@ def main() -> int:
     out_dir = args.output_dir
     cleanup_out = False
     if out_dir is None:
-        out_dir = Path(tempfile.mkdtemp(prefix="mineru-phase-a-"))
+        out_dir = Path(tempfile.mkdtemp(prefix="doughnut-mineru-outline-"))
         cleanup_out = True
     else:
         out_dir = out_dir.expanduser().resolve()

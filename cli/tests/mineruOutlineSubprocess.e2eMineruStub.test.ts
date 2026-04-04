@@ -3,24 +3,25 @@ import { writeFileSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { delimiter, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { runMineruOutlineSubprocess } from '../src/commands/read/mineruOutlineSubprocess.js'
+import { runMineruOutlineSubprocess } from '../src/commands/mineruOutline/mineruOutlineSubprocess.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const repoRoot = join(__dirname, '..', '..')
 const mockSite = join(repoRoot, 'e2e_test', 'python_stubs', 'mineru_site')
-const spikeScriptPath = join(
+const outlineScriptPath = join(
   repoRoot,
-  'minerui-spike',
-  'spike_mineru_phase_a_outline.py'
+  'cli',
+  'python',
+  'mineru_book_outline.py'
 )
 
-describe('spike_mineru_phase_a_outline.py with E2E shadow mineru (PYTHONPATH)', () => {
+describe('mineru_book_outline.py with E2E shadow mineru (PYTHONPATH)', () => {
   let workDir: string
   let pdfPath: string
   let prevPythonPath: string | undefined
 
   beforeEach(() => {
-    workDir = mkdtempSync(join(tmpdir(), 'mineru-spike-mock-'))
+    workDir = mkdtempSync(join(tmpdir(), 'mineru-e2e-stub-'))
     pdfPath = join(workDir, 'book.pdf')
     writeFileSync(pdfPath, '%PDF-1.4\n%%EOF\n')
     prevPythonPath = process.env.PYTHONPATH
@@ -41,7 +42,7 @@ describe('spike_mineru_phase_a_outline.py with E2E shadow mineru (PYTHONPATH)', 
     const result = await runMineruOutlineSubprocess({
       bookPath: pdfPath,
       cwd: repoRoot,
-      scriptPath: spikeScriptPath,
+      scriptPath: outlineScriptPath,
     })
     expect(result.ok).toBe(true)
     if (!result.ok) return

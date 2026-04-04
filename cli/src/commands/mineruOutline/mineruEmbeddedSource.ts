@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 export function getEmbeddedMineruOutlineSource(): string {
   const here = dirname(fileURLToPath(import.meta.url))
   return readFileSync(
-    join(here, '../../../../minerui-spike/spike_mineru_phase_a_outline.py'),
+    join(here, '../../../python/mineru_book_outline.py'),
     'utf8'
   )
 }

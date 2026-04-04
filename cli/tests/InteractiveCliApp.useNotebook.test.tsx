@@ -4,7 +4,7 @@ const { runMineruOutlineSubprocess } = vi.hoisted(() => ({
   runMineruOutlineSubprocess: vi.fn(),
 }))
 
-vi.mock('../src/commands/read/mineruOutlineSubprocess.js', () => ({
+vi.mock('../src/commands/mineruOutline/mineruOutlineSubprocess.js', () => ({
   runMineruOutlineSubprocess,
 }))
 
