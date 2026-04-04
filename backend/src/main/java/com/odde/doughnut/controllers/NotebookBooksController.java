@@ -40,27 +40,6 @@ class NotebookBooksController {
   }
 
   @Operation(operationId = "attachBook", summary = "Attach book")
-  @PostMapping(value = "/{notebook}/attach-book", consumes = MediaType.APPLICATION_JSON_VALUE)
-  @Transactional
-  @JsonView(BookViews.Full.class)
-  @ApiResponses({
-    @ApiResponse(
-        responseCode = "201",
-        description = "Created",
-        content =
-            @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = Book.class)))
-  })
-  public ResponseEntity<Book> attachBook(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
-      @Valid @RequestBody AttachBookRequest request)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(notebook);
-    Book body = bookService.attachBook(notebook, request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(body);
-  }
-
   @PostMapping(value = "/{notebook}/attach-book", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @Transactional
   @JsonView(BookViews.Full.class)
@@ -73,7 +52,7 @@ class NotebookBooksController {
                 mediaType = MediaType.APPLICATION_JSON_VALUE,
                 schema = @Schema(implementation = Book.class)))
   })
-  public ResponseEntity<Book> attachBookMultipart(
+  public ResponseEntity<Book> attachBook(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @Parameter(description = "Attach book metadata as JSON") @RequestPart("metadata") @Valid
           AttachBookRequest metadata,

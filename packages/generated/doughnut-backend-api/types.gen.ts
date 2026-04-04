@@ -1765,7 +1765,13 @@ export type ImportObsidianResponses = {
 };
 
 export type AttachBookData = {
-    body: AttachBookRequestFull;
+    body?: {
+        metadata: AttachBookRequestFull;
+        /**
+         * PDF file
+         */
+        file: Blob | File;
+    };
     path: {
         notebook: number;
     };

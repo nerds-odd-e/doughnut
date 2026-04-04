@@ -31,6 +31,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 class NotebookBooksControllerTest extends ControllerTestBase {
 
+  private static final byte[] STUB_PDF_BYTES = new byte[] {1};
+
   @Autowired NotebookBooksController controller;
   @Autowired BookRepository bookRepository;
   @Autowired BookPdfStorage bookPdfStorage;
@@ -38,6 +40,10 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
+  }
+
+  private static MultipartFile pdfFile(byte[] content) {
+    return new MockMultipartFile("file", "book.pdf", "application/pdf", content);
   }
 
   private static List<BookRange> rootRangesSorted(Book book) {
@@ -86,20 +92,23 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   @Nested
   class AttachBook {
     @Test
-    void persistsNestedOutlineAndReturnsBookWithRanges() throws UnexpectedNoAccessRightException {
+    void persistsNestedOutlineAndReturnsBookWithRanges() throws Exception {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       AttachBookLayoutNodeRequest ch1 = node("Section 1.1");
       AttachBookLayoutNodeRequest ch2 = node("Section 1.2");
       AttachBookLayoutNodeRequest root = node("Chapter 1", ch1, ch2);
       AttachBookRequest req = attachRequest(root);
+      byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e};
 
-      ResponseEntity<Book> res = controller.attachBook(nb, req);
+      ResponseEntity<Book> res = controller.attachBook(nb, req, pdfFile(pdfBytes));
 
       assertThat(res.getStatusCode(), equalTo(HttpStatus.CREATED));
       assertThat(res.getBody(), notNullValue());
       Book created = res.getBody();
       assertThat(created.getId(), notNullValue());
       assertThat(created.getBookName(), equalTo("Linear Algebra"));
+      assertThat(created.getSourceFileRef(), notNullValue());
+      assertThat(created.getSourceFileRef().isBlank(), equalTo(false));
       assertThat(created.getRanges(), hasSize(3));
 
       BookRange outRoot = rootRangesSorted(created).getFirst();
@@ -115,15 +124,19 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       BookRange detailRoot = rootRangesSorted(detail).getFirst();
       assertThat(detailRoot.getId(), equalTo(outRoot.getId()));
       assertThat(childrenOf(detail, detailRoot), hasSize(2));
+
+      ResponseEntity<byte[]> fileRes = controller.getBookFile(nb);
+      assertThat(fileRes.getStatusCode(), equalTo(HttpStatus.OK));
+      assertThat(fileRes.getBody(), equalTo(pdfBytes));
     }
 
     @Test
-    void rejectsSecondAttachForSameNotebook() throws UnexpectedNoAccessRightException {
+    void rejectsSecondAttachForSameNotebook() throws Exception {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      controller.attachBook(nb, attachRequest(node("First")));
+      controller.attachBook(nb, attachRequest(node("First")), pdfFile(STUB_PDF_BYTES));
       assertThrows(
           ResponseStatusException.class,
-          () -> controller.attachBook(nb, attachRequest(node("Second"))));
+          () -> controller.attachBook(nb, attachRequest(node("Second")), pdfFile(STUB_PDF_BYTES)));
     }
 
     @Test
@@ -132,36 +145,41 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       Notebook otherNb = makeMe.aNotebook().creatorAndOwner(other).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.attachBook(otherNb, attachRequest(node("A"))));
+          () -> controller.attachBook(otherNb, attachRequest(node("A")), pdfFile(STUB_PDF_BYTES)));
     }
 
     @Test
-    void rejectsNonPdfFormat() throws UnexpectedNoAccessRightException {
+    void rejectsNonPdfFormat() {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       AttachBookRequest req = attachRequest(node("A"));
       req.setFormat("epub");
-      assertThrows(ResponseStatusException.class, () -> controller.attachBook(nb, req));
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
     }
 
     @Test
-    void rejectsEmptyRoots() throws UnexpectedNoAccessRightException {
+    void rejectsEmptyRoots() {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       AttachBookRequest req = attachRequest();
       req.getLayout().setRoots(new ArrayList<>());
-      assertThrows(ResponseStatusException.class, () -> controller.attachBook(nb, req));
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
     }
 
     @Test
-    void rejectsBadAnchorFormat() throws UnexpectedNoAccessRightException {
+    void rejectsBadAnchorFormat() {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       AttachBookLayoutNodeRequest n = node("A");
       n.getStartAnchor().setAnchorFormat("unknown");
       assertThrows(
-          ResponseStatusException.class, () -> controller.attachBook(nb, attachRequest(n)));
+          ResponseStatusException.class,
+          () -> controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES)));
     }
 
     @Test
-    void rejectsExcessiveDepth() throws UnexpectedNoAccessRightException {
+    void rejectsExcessiveDepth() {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       AttachBookLayoutNodeRequest deep = node("leaf");
       for (int i = 0; i < BookReadingWireConstants.MAX_LAYOUT_DEPTH; i++) {
@@ -169,43 +187,8 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       }
       AttachBookLayoutNodeRequest root = deep;
       assertThrows(
-          ResponseStatusException.class, () -> controller.attachBook(nb, attachRequest(root)));
-    }
-  }
-
-  @Nested
-  class AttachBookMultipart {
-    private static MultipartFile pdfFile(byte[] content) {
-      return new MockMultipartFile("file", "book.pdf", "application/pdf", content);
-    }
-
-    @Test
-    void storesPdfAndReturnsBookWithSourceRefAndDownloadableFile() throws Exception {
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      AttachBookRequest req = attachRequest(node("Chapter 1"));
-      byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e};
-
-      ResponseEntity<Book> res = controller.attachBookMultipart(nb, req, pdfFile(pdfBytes));
-
-      assertThat(res.getStatusCode(), equalTo(HttpStatus.CREATED));
-      Book created = res.getBody();
-      assertThat(created, notNullValue());
-      assertThat(created.getSourceFileRef(), notNullValue());
-      assertThat(created.getSourceFileRef().isBlank(), equalTo(false));
-
-      ResponseEntity<byte[]> fileRes = controller.getBookFile(nb);
-      assertThat(fileRes.getStatusCode(), equalTo(HttpStatus.OK));
-      assertThat(fileRes.getBody(), equalTo(pdfBytes));
-    }
-
-    @Test
-    void rejectsEmptyLayoutRootsLikeJsonAttach() throws Exception {
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      AttachBookRequest req = attachRequest();
-      req.getLayout().setRoots(new ArrayList<>());
-      assertThrows(
           ResponseStatusException.class,
-          () -> controller.attachBookMultipart(nb, req, pdfFile(new byte[] {1})));
+          () -> controller.attachBook(nb, attachRequest(root), pdfFile(STUB_PDF_BYTES)));
     }
 
     @Test
@@ -215,7 +198,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
           new MockMultipartFile("file", "book.pdf", "application/pdf", new byte[0]);
       assertThrows(
           ResponseStatusException.class,
-          () -> controller.attachBookMultipart(nb, attachRequest(node("A")), empty));
+          () -> controller.attachBook(nb, attachRequest(node("A")), empty));
     }
   }
 
@@ -228,10 +211,10 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void doesNotReturnAnotherNotebooksBook() throws UnexpectedNoAccessRightException {
+    void doesNotReturnAnotherNotebooksBook() throws Exception {
       Notebook nb1 = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       Notebook nb2 = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      controller.attachBook(nb1, attachRequest(node("X")));
+      controller.attachBook(nb1, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
       assertThrows(ResponseStatusException.class, () -> controller.getBook(nb2));
     }
   }
@@ -245,9 +228,14 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void returns404WhenBookHasNoSourceFile() throws UnexpectedNoAccessRightException {
+    void returns404WhenBookHasNoSourceFile() throws Exception {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      controller.attachBook(nb, attachRequest(node("X")));
+      controller.attachBook(nb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
+      Book book = bookRepository.findByNotebook_Id(nb.getId()).orElseThrow();
+      book.setSourceFileRef(null);
+      makeMe.entityPersister.save(book);
+      makeMe.entityPersister.flush();
+
       assertThrows(ResponseStatusException.class, () -> controller.getBookFile(nb));
     }
 
@@ -259,9 +247,9 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void returnsPdfWhenSourceFileRefPointsAtBlob() throws UnexpectedNoAccessRightException {
+    void returnsPdfWhenSourceFileRefPointsAtBlob() throws Exception {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      controller.attachBook(nb, attachRequest(node("X")));
+      controller.attachBook(nb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
       byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
       String ref = bookPdfStorage.put(pdfBytes);
       Book book = bookRepository.findByNotebook_Id(nb.getId()).orElseThrow();
@@ -280,9 +268,9 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void returns404WhenSourceFileRefIsNotNumeric() throws UnexpectedNoAccessRightException {
+    void returns404WhenSourceFileRefIsNotNumeric() throws Exception {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      controller.attachBook(nb, attachRequest(node("X")));
+      controller.attachBook(nb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
       Book book = bookRepository.findByNotebook_Id(nb.getId()).orElseThrow();
       book.setSourceFileRef("not-an-id");
       makeMe.entityPersister.save(book);
@@ -292,9 +280,9 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void returns404WhenSourceFileRefBlobMissing() throws UnexpectedNoAccessRightException {
+    void returns404WhenSourceFileRefBlobMissing() throws Exception {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      controller.attachBook(nb, attachRequest(node("X")));
+      controller.attachBook(nb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
       Book book = bookRepository.findByNotebook_Id(nb.getId()).orElseThrow();
       book.setSourceFileRef(String.valueOf(Integer.MAX_VALUE));
       makeMe.entityPersister.save(book);

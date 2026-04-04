@@ -39,7 +39,6 @@ Each row is a **merge gate**: backend verify, relevant frontend/CLI tests, and *
 - **Outcome (integrator-visible):** Second `POST .../attach-book` handler (or equivalent) with `consumes = MULTIPART_FORM_DATA`: parts **`metadata`** (`AttachBookRequest` JSON) + **`file`** (PDF). On success, **`BookPdfStorage.put`**, set **`source_file_ref`**, same outline persistence as today. **Existing JSON-only attach** remains **unchanged** so current CLI and tests keep working.
 - **Tests:** **`AttachBookMultipart`** nested class in [NotebookBooksControllerTest](backend/src/test/java/com/odde/doughnut/controllers/NotebookBooksControllerTest.java); **all** existing attach tests still green.
 - **OpenAPI / codegen:** Regenerate with **`pnpm generateTypeScript`**; do not hand-edit **`open_api_docs.yaml`**.
-- **Deliverable cleanliness:** Two consumes on the same resource is **interim**; tracked for removal in SP-A5.
 
 ### SP-A4 — CLI uses multipart attach
 
@@ -48,6 +47,8 @@ Each row is a **merge gate**: backend verify, relevant frontend/CLI tests, and *
 - **Deliverable cleanliness:** No client code path still sending **only** JSON for new attaches unless documented as deprecated internal test helper (prefer not — tests should use multipart too).
 
 ### SP-A5 — Remove JSON-only attach; single consumes
+
+**Done.** JSON `attachBook` handler removed; single multipart `attachBook` on [`NotebookBooksController`](backend/src/main/java/com/odde/doughnut/controllers/NotebookBooksController.java); **`BookService.attachBook`** removed; OpenAPI + SDK are multipart-only; [`NotebookBooksControllerTest`](backend/src/test/java/com/odde/doughnut/controllers/NotebookBooksControllerTest.java) uses multipart throughout.
 
 - **Outcome (integrator-visible):** **One** attach contract: **multipart only**. All controller tests and fixtures use multipart.
 - **Tests:** Full backend + CLI + book_reading E2E green.

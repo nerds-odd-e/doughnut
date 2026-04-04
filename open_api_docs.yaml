@@ -1179,10 +1179,6 @@ paths:
               required:
               - file
               - metadata
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AttachBookRequest_Full"
-        required: true
       responses:
         "201":
           description: Created

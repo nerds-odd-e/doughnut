@@ -40,13 +40,6 @@ public class BookService {
   }
 
   @Transactional
-  public Book attachBook(Notebook notebook, AttachBookRequest request) {
-    validateAttachRequest(request);
-    assertNotebookHasNoBook(notebook);
-    return persistNewBook(notebook, request, null);
-  }
-
-  @Transactional
   public Book attachBookWithPdf(Notebook notebook, AttachBookRequest request, byte[] pdfBytes) {
     validateAttachRequest(request);
     assertNotebookHasNoBook(notebook);
