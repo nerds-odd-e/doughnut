@@ -134,6 +134,33 @@ describe('InteractiveCliApp /use notebook integration', () => {
       fs.rmSync(attachWorkDir, { recursive: true, force: true })
     })
 
+    test('shows spinner while attach is pending', async () => {
+      attachBookSpy.mockImplementation(() => new Promise(() => undefined))
+
+      const { stdin, waitForFramesToInclude } =
+        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+
+      stdin.write('/use Top Maths\r')
+      await waitForFramesToInclude('Active notebook: Top Maths')
+      stdin.write(`/attach ${attachPdfPath}\r`)
+      await waitForFramesToInclude('Attaching PDF')
+    })
+
+    test('blocks input while attach spinner is visible', async () => {
+      attachBookSpy.mockImplementation(() => new Promise(() => undefined))
+
+      const { stdin, waitForFramesToInclude, waitForLastFrameToInclude } =
+        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+
+      stdin.write('/use Top Maths\r')
+      await waitForFramesToInclude('Active notebook: Top Maths')
+      stdin.write(`/attach ${attachPdfPath}\r`)
+      await waitForFramesToInclude('Attaching PDF')
+
+      stdin.write('should-not-appear\r')
+      await waitForLastFrameToInclude('Attaching PDF')
+    })
+
     test('attaches PDF and shows structure excerpt from API book', async () => {
       attachBookSpy.mockResolvedValue({
         data: {

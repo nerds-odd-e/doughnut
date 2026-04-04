@@ -124,6 +124,12 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 
 ---
 
+## Story 1 (shipped)
+
+**Book** metadata plus **BookRange** tree on a **Notebook** only: **`POST /api/notebooks/{notebook}/attach-book`** (JSON outline) and **`GET /api/notebooks/{notebook}/book`**, at most one book per notebook. **`sourceFileRef` is not used**—there is **no server-side PDF storage** in Story 1; the file stays on the client until a later upload/bind story. Outline anchors use **`pdf.mineru_outline_v1`** on the wire (backend `BookReadingWireConstants`).
+
+---
+
 ## Open architecture questions
 
 Revisit when implementation or product constraints clarify:
