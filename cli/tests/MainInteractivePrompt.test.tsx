@@ -4,8 +4,11 @@ import * as path from 'node:path'
 import { render } from 'ink-testing-library'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { interactiveSlashCommands } from '../src/commands/interactiveSlashCommands.js'
+import {
+  InputHistoryProvider,
+  USER_INPUT_HISTORY_FILENAME,
+} from '../src/inputHistory/index.js'
 import { MainInteractivePrompt } from '../src/mainInteractivePrompt/index.js'
-import { USER_INPUT_HISTORY_FILENAME } from '../src/mainInteractivePrompt/userInputHistoryFile.js'
 import {
   extendInkRenderForInteractiveTests,
   inkCommandLineProbeUndelete,
@@ -65,12 +68,14 @@ async function renderMainInteractivePrompt(
   onCommittedLine: (line: string) => void = () => undefined
 ) {
   const result = render(
-    <MainInteractivePrompt
-      onCommittedCommand={() => undefined}
-      onCommittedLine={onCommittedLine}
-      slashCommands={interactiveSlashCommands}
-      placeholder={MAIN_PROMPT_PLACEHOLDER}
-    />
+    <InputHistoryProvider>
+      <MainInteractivePrompt
+        onCommittedCommand={() => undefined}
+        onCommittedLine={onCommittedLine}
+        slashCommands={interactiveSlashCommands}
+        placeholder={MAIN_PROMPT_PLACEHOLDER}
+      />
+    </InputHistoryProvider>
   )
   await waitUntilInkLastFrameStripped(
     result.lastFrame,

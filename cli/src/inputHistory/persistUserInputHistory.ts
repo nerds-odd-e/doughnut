@@ -1,14 +1,14 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { MAX_USER_INPUT_HISTORY_LINES } from './history.js'
+import { MAX_USER_INPUT_HISTORY_LINES } from '../mainInteractivePrompt/history.js'
 
 export const USER_INPUT_HISTORY_FILENAME = 'user-input-history.json'
 
-export function userInputHistoryPath(configDir: string): string {
+function userInputHistoryPath(configDir: string): string {
   return path.join(configDir, USER_INPUT_HISTORY_FILENAME)
 }
 
-export function shouldSkipUserInputHistoryPersistence(): boolean {
+function shouldSkipUserInputHistoryPersistence(): boolean {
   return process.env.DOUGHNUT_CLI_DISABLE_INPUT_HISTORY === '1'
 }
 

@@ -8,12 +8,15 @@ import { SlashCommandShellHost } from './commands/slashCommandShellHost.js'
 import type { SlashCommandShellRunSuccessContext } from './commands/useSlashCommandShellLiveColumnHandlers.js'
 import type { StageKeyHandler } from './commonUIComponents/stageKeyForwardContext.js'
 import { SetStageKeyHandlerContext } from './commonUIComponents/stageKeyForwardContext.js'
+import { InputHistoryProvider } from './inputHistory/index.js'
 import { SessionScrollbackSessionProvider } from './sessionScrollback/sessionScrollbackAppendContext.js'
 
 export function InteractiveCliApp() {
   return (
     <SessionScrollbackSessionProvider initialItems={[]}>
-      <InteractiveCliAppBody />
+      <InputHistoryProvider>
+        <InteractiveCliAppBody />
+      </InputHistoryProvider>
     </SessionScrollbackSessionProvider>
   )
 }

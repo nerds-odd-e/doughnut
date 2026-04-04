@@ -60,6 +60,25 @@ describe('InteractiveCliApp /use notebook integration', () => {
     await waitForLastFrameToInclude('Leave notebook context')
   })
 
+  test('after nested plain line and /exit, root up-arrow recalls /exit not stale root prefix', async () => {
+    myNotebooksSpy.mockResolvedValue({
+      data: { notebooks: [notebookWithTitle('Top Maths')] },
+    } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
+
+    const { stdin, waitForFramesToInclude, waitForLastFrameToInclude } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+
+    stdin.write('/use Top Maths\r')
+    await waitForFramesToInclude('Active notebook: Top Maths')
+    stdin.write('nested-history-marker\r')
+    await waitForFramesToInclude('Not supported')
+    stdin.write('/exit\r')
+    await waitForLastFrameToInclude('`exit` to quit.')
+
+    stdin.write('\x1b[A')
+    await waitForLastFrameToInclude('/exit')
+  })
+
   describe('notebook stage /attach', () => {
     let attachBookSpy: ReturnType<typeof vi.spyOn> | undefined
 

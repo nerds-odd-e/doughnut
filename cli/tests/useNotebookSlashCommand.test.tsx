@@ -7,6 +7,7 @@ import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { useNotebookSlashCommand } from '../src/commands/notebook/useNotebookSlashCommand.js'
 import { SlashCommandStageMount } from '../src/commands/slashCommandStageMount.js'
+import { InputHistoryProvider } from '../src/inputHistory/index.js'
 import { inkTerminalColumns } from '../src/terminalColumns.js'
 import {
   SessionScrollbackSessionProvider,
@@ -76,9 +77,11 @@ function UseNotebookStageTestShell(props: { readonly argument?: string }) {
 function notebookStageTestAppElement(argument?: string) {
   return (
     <SessionScrollbackSessionProvider initialItems={[]}>
-      <StageKeyRoot>
-        <UseNotebookStageTestShell argument={argument} />
-      </StageKeyRoot>
+      <InputHistoryProvider>
+        <StageKeyRoot>
+          <UseNotebookStageTestShell argument={argument} />
+        </StageKeyRoot>
+      </InputHistoryProvider>
     </SessionScrollbackSessionProvider>
   )
 }

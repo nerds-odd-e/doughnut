@@ -1,19 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Key } from 'ink'
 import { Box, Text, useInput, useStdout } from 'ink'
-import { getConfigDir } from '../configDir.js'
+import { useInputHistory } from '../inputHistory/index.js'
 import {
-  appendUserInputHistoryLine,
   exitHistoryWalkOnDraftEdit,
   maskInteractiveInputLineForStorage,
   onArrowDown,
   onArrowUp,
   type PromptHistoryState,
 } from './history.js'
-import {
-  loadUserInputHistory,
-  saveUserInputHistory,
-} from './userInputHistoryFile.js'
 import { cycleListSelectionIndex } from '../interactions/selectListInteraction.js'
 import { BorderedSingleLinePromptInputInk } from '../commonUIComponents/borderedSingleLinePromptInputInk.js'
 import { GuidanceListInk } from '../commonUIComponents/guidanceListWindowInk.js'
@@ -48,6 +43,8 @@ export function MainInteractivePrompt({
   readonly slashCommands: readonly InteractiveSlashCommand[]
   readonly placeholder: string
 }) {
+  const { linesRef: historyLinesRef, appendCommittedLine } = useInputHistory()
+
   const [buffer, setBuffer] = useState('')
   const [caretOffset, setCaretOffset] = useState(0)
   const [slashHighlightIndex, setSlashHighlightIndex] = useState(0)
@@ -62,7 +59,6 @@ export function MainInteractivePrompt({
   const suggestionsDismissedRef = useRef(false)
   const onCommittedCommandRef = useRef(onCommittedCommand)
   const onCommittedLineRef = useRef(onCommittedLine)
-  const historyLinesRef = useRef<string[]>([])
   const historyWalkIndexRef = useRef<number | null>(null)
   const draftBeforeWalkRef = useRef<string | null>(null)
 
@@ -73,10 +69,6 @@ export function MainInteractivePrompt({
   useEffect(() => {
     onCommittedLineRef.current = onCommittedLine
   }, [onCommittedLine])
-
-  useEffect(() => {
-    historyLinesRef.current = loadUserInputHistory(getConfigDir())
-  }, [])
 
   const guidance = useMemo(
     () => effectiveSlashGuidance(buffer, suggestionsDismissed, slashCommands),
@@ -163,11 +155,7 @@ export function MainInteractivePrompt({
 
       const commitLine = () => {
         const line = readBuf()
-        historyLinesRef.current = appendUserInputHistoryLine(
-          historyLinesRef.current,
-          maskInteractiveInputLineForStorage(line)
-        )
-        saveUserInputHistory(getConfigDir(), historyLinesRef.current)
+        appendCommittedLine(maskInteractiveInputLineForStorage(line))
         historyWalkIndexRef.current = null
         draftBeforeWalkRef.current = null
         setAll('', 0, 0)
@@ -326,11 +314,7 @@ export function MainInteractivePrompt({
           const ch = input[i]!
           if (ch === '\r') {
             const line = curBuf
-            historyLinesRef.current = appendUserInputHistoryLine(
-              historyLinesRef.current,
-              maskInteractiveInputLineForStorage(line)
-            )
-            saveUserInputHistory(getConfigDir(), historyLinesRef.current)
+            appendCommittedLine(maskInteractiveInputLineForStorage(line))
             historyWalkIndexRef.current = null
             draftBeforeWalkRef.current = null
             setAll('', 0, 0)
@@ -342,11 +326,7 @@ export function MainInteractivePrompt({
           }
           if (ch === '\n') {
             const line = curBuf
-            historyLinesRef.current = appendUserInputHistoryLine(
-              historyLinesRef.current,
-              maskInteractiveInputLineForStorage(line)
-            )
-            saveUserInputHistory(getConfigDir(), historyLinesRef.current)
+            appendCommittedLine(maskInteractiveInputLineForStorage(line))
             historyWalkIndexRef.current = null
             draftBeforeWalkRef.current = null
             setAll('', 0, 0)
@@ -362,7 +342,7 @@ export function MainInteractivePrompt({
         return
       }
     },
-    [slashCommands]
+    [appendCommittedLine, historyLinesRef, slashCommands]
   )
 
   useInput(handleInput)
