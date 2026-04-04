@@ -17,15 +17,21 @@ function parseBookOutlineTable(data: DataTable): BookOutlineRow[] {
   })
 }
 
+function pdfFixtureStem(fixtureFilename: string): string {
+  return fixtureFilename.replace(/\.pdf$/i, '')
+}
+
 When(
   'I attach book {string} to the notebook {string} via the CLI',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (fixtureFilename: string, notebookTitle: string) => {
+    const stem = pdfFixtureStem(fixtureFilename)
+    cy.wrap(stem).as('attachedBookPdfStem')
     return cli
       .useNotebook(notebookTitle)
       .then((ctx) => ctx.attachPdfBook(fixtureFilename))
       .then((ctx) => {
-        ctx.pastCliAssistantMessages().expectContains('Attached "top-maths"')
+        ctx.pastCliAssistantMessages().expectContains(`Attached "${stem}"`)
         ctx.pastCliAssistantMessages().expectContains('Main Topic 1')
         ctx.pastCliAssistantMessages().expectContains('Subtopic 1.1')
       })
@@ -34,12 +40,15 @@ When(
 
 Then(
   'I should see the book structure of the notebook {string} in the browser:',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (notebookTitle: string, data: DataTable) => {
     const expected = parseBookOutlineTable(data)
-    start
-      .navigateToNotebookPage(notebookTitle)
-      .readBook('top-maths')
-      .expectBookStructureRows(expected)
+    return cy.get<string>('@attachedBookPdfStem').then((stem) => {
+      start
+        .navigateToNotebookPage(notebookTitle)
+        .readBook(stem)
+        .expectBookStructureRows(expected)
+    })
   }
 )
 

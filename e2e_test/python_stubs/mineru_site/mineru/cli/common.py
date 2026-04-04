@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 # Book-reading E2E: matches Gherkin table in book_reading.feature (two main topics, two subtopics each).
+# PDF fixture page-1 text for pdf.js / SP-3.6: DOUGHNUT_E2E_BOOK_PAGE1 (page 2: DOUGHNUT_E2E_BOOK_PAGE2).
 _E2E_CONTENT_LIST: list[dict[str, Any]] = [
     {"type": "text", "text_level": 1, "text": "Main Topic 1", "page_idx": 0},
     {"type": "text", "text_level": 2, "text": "Subtopic 1.1", "page_idx": 0},
