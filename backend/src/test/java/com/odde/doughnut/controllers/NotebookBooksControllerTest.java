@@ -9,7 +9,9 @@ import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookRange;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.BookRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.book.BookPdfStorage;
 import com.odde.doughnut.services.book.BookReadingWireConstants;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -19,13 +21,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 
 class NotebookBooksControllerTest extends ControllerTestBase {
 
   @Autowired NotebookBooksController controller;
+  @Autowired BookRepository bookRepository;
+  @Autowired BookPdfStorage bookPdfStorage;
 
   @BeforeEach
   void setup() {
@@ -202,6 +208,51 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       User other = makeMe.aUser().please();
       Notebook otherNb = makeMe.aNotebook().creatorAndOwner(other).please();
       assertThrows(UnexpectedNoAccessRightException.class, () -> controller.getBookFile(otherNb));
+    }
+
+    @Test
+    void returnsPdfWhenSourceFileRefPointsAtBlob() throws UnexpectedNoAccessRightException {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      controller.attachBook(nb, attachRequest(node("X")));
+      byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
+      String ref = bookPdfStorage.put(pdfBytes);
+      Book book = bookRepository.findByNotebook_Id(nb.getId()).orElseThrow();
+      book.setSourceFileRef(ref);
+      makeMe.entityPersister.save(book);
+      makeMe.entityPersister.flush();
+
+      ResponseEntity<byte[]> res = controller.getBookFile(nb);
+
+      assertThat(res.getStatusCode(), equalTo(HttpStatus.OK));
+      assertThat(res.getBody(), equalTo(pdfBytes));
+      assertThat(res.getHeaders().getContentType(), equalTo(MediaType.APPLICATION_PDF));
+      assertThat(
+          res.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION),
+          equalTo("attachment; filename=\"Linear Algebra.pdf\""));
+    }
+
+    @Test
+    void returns404WhenSourceFileRefIsNotNumeric() throws UnexpectedNoAccessRightException {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      controller.attachBook(nb, attachRequest(node("X")));
+      Book book = bookRepository.findByNotebook_Id(nb.getId()).orElseThrow();
+      book.setSourceFileRef("not-an-id");
+      makeMe.entityPersister.save(book);
+      makeMe.entityPersister.flush();
+
+      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(nb));
+    }
+
+    @Test
+    void returns404WhenSourceFileRefBlobMissing() throws UnexpectedNoAccessRightException {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      controller.attachBook(nb, attachRequest(node("X")));
+      Book book = bookRepository.findByNotebook_Id(nb.getId()).orElseThrow();
+      book.setSourceFileRef(String.valueOf(Integer.MAX_VALUE));
+      makeMe.entityPersister.save(book);
+      makeMe.entityPersister.flush();
+
+      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(nb));
     }
   }
 }

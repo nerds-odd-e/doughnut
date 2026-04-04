@@ -26,6 +26,8 @@ Each row is a **merge gate**: backend verify, relevant frontend/CLI tests, and *
 
 ### SP-A2 — `BookPdfStorage` (DB) + happy-path download
 
+**Done.** `BookPdfStorage` / `DbBookPdfStorage`, `AttachmentBlobRepository`, `GET .../book/file` streams PDF with `Content-Disposition`; tests in `NotebookBooksControllerTest`.
+
 - **Outcome (integrator-visible):** First **production** use of storage: **`BookPdfStorage`** + DB-backed implementation (persist/load via `AttachmentBlob` pattern). Download handler resolves `source_file_ref` through **`get`** and returns **200** `application/pdf` with **Content-Disposition** (filename sanitization consistent with existing export endpoints).
 - **Tests:** Controller-level test with **real** persistence (`makeMe` / test setup) so the **full** GET path is exercised; include **404** when ref is corrupt/unknown if the implementation can detect it cheaply.
 - **Deliverable cleanliness:** Interface + **one** default `@Bean` implementation wired; **no** orphan implementations.

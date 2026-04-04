@@ -7,12 +7,14 @@ import com.odde.doughnut.entities.BookViews;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
+import com.odde.doughnut.services.book.BookPdfStorage;
 import com.odde.doughnut.services.book.BookService;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,10 +30,15 @@ class NotebookBooksController {
 
   private final AuthorizationService authorizationService;
   private final BookService bookService;
+  private final BookPdfStorage bookPdfStorage;
 
-  NotebookBooksController(AuthorizationService authorizationService, BookService bookService) {
+  NotebookBooksController(
+      AuthorizationService authorizationService,
+      BookService bookService,
+      BookPdfStorage bookPdfStorage) {
     this.authorizationService = authorizationService;
     this.bookService = bookService;
+    this.bookPdfStorage = bookPdfStorage;
   }
 
   @PostMapping(value = "/{notebook}/attach-book", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -73,6 +80,19 @@ class NotebookBooksController {
     if (ref == null || ref.isBlank()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
     }
-    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
+    byte[] body =
+        bookPdfStorage
+            .get(ref)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
+    String filename = sanitizeFileName(book.getBookName()) + ".pdf";
+    return ResponseEntity.ok()
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+        .contentType(MediaType.APPLICATION_PDF)
+        .body(body);
+  }
+
+  private static String sanitizeFileName(String fileName) {
+    return fileName.replaceAll("[\\/:*?\"<>|]", "_");
   }
 }
