@@ -24,32 +24,22 @@ passes by:
 
 **Do not run real MinerU** in E2E or in CI.
 
-**Recommended single approach:** Keep using **`runMineruOutlineSubprocess`** (or a thin wrapper shared with attach) but point **`DOUGHNUT_MINERU_OUTLINE_SCRIPT`** at a **checked-in stub script** that:
+**Approach:** Keep **`runMineruOutlineSubprocess`** unchanged, but in tagged E2E runs **prepend** [`e2e_test/python_stubs/mineru_site`](../e2e_test/python_stubs/mineru_site) to **`PYTHONPATH`** so a shadow package provides **`mineru.cli.common.read_fn`** and **`do_parse`** (writes deterministic **`{stem}_content_list.json`**). The subprocess still runs the **real** [`minerui-spike/spike_mineru_phase_a_outline.py`](../minerui-spike/spike_mineru_phase_a_outline.py) (same argv as [mineruOutlineSubprocess.ts](../cli/src/commands/read/mineruOutlineSubprocess.ts)), so outline → **`layout.roots`** logic in the spike is exercised.
 
-- Is invoked like the real spike (`python3`, same argv pattern including `--json-result`, PDF tmp dir args as today in [cli/src/commands/read/mineruOutlineSubprocess.ts](../cli/src/commands/read/mineruOutlineSubprocess.ts)).
-- Validates the book path exists / is readable (mirrors real precondition failures).
-- Prints **one JSON object on stdout** compatible with existing parsing, **extended** as needed for attach (see below).
+**JSON contract for attach:** Stdout JSON includes **`outline`** (and optional **`note`**) plus **`layout`** with nested **`roots` / `children`** for **`attach-book`**.
 
-**Why Python for the stub:** The production path already spawns **`python3`** with a script path. A **stdlib-only** stub avoids new native dependencies and works the same locally and on **`ubuntu-latest`** runners (Python 3 is present; no `actions/setup-python` required unless the team wants a pinned version — then add one step to the E2E job).
+**Wiring in E2E:** Tag **`@mockMineruLib`**: **`Before` (order 0)** stores the mock site path via **`getMineruE2eMockSitePath`** in **`Cypress.env('DOUGHNUT_E2E_MINERU_MOCK_SITE')`**; **`@interactiveCLI`** / **`@interactiveCLIGmail` (order 2)** call **`prependMineruMockToPythonPath`** and set **`PYTHONPATH`** on the PTY env for **`startRepoInteractive`**. **`After`** clears the Cypress env key. Do **not** set **`DOUGHNUT_MINERU_OUTLINE_SCRIPT`** for this flow.
 
-**Alternatives (avoid unless the stub approach blocks):** A separate env that **skips spawn** and reads a fixture from disk introduces a second behavioral path to maintain; prefer one subprocess-shaped stub unless subprocess timing/flakiness forces a bypass.
+**GitHub Actions:** **`python3`** on `PATH`; no MinerU pip install.
 
-**JSON contract extension for attach:** Today the subprocess yields text **`outline`** (and optional **`note`**) for `/read`. **`/attach`** must build the Phase 2 **nested `layout.roots` / `children`** payload.
-
-**Implemented (sub-phase 3.1):** Successful stdout JSON may include an optional top-level **`layout`** object with the same shape as **`attach-book`** request body **`layout`**: **`roots`** array of nodes with **`title`**, **`startAnchor`**, **`endAnchor`**, optional **`children`**. Anchors use **`anchorFormat`** **`pdf.mineru_outline_v1`** and opaque **`value`** (JSON string) in the E2E stub. The checked-in stub is [e2e_test/scripts/mineru_outline_e2e_stub.py](../e2e_test/scripts/mineru_outline_e2e_stub.py); production MinerU wiring should emit **`layout`** when ready, or a dedicated attach entrypoint can reuse the same spawn helper.
-
-**Wiring stub in E2E:** Tag **`@stubMineruOutline`**: a **`Before` (order 0)** stores the absolute stub path from Cypress task **`getMineruOutlineE2eStubScriptPath`** in **`Cypress.env('DOUGHNUT_MINERU_OUTLINE_SCRIPT_E2E')`**; **`@interactiveCLI` (order 2)** merges **`DOUGHNUT_MINERU_OUTLINE_SCRIPT`** into the env passed to **`startRepoInteractive`** when that env value is set. An **`After`** on the same tag clears the Cypress env key. Apply **`@stubMineruOutline`** only to book-reading (or other features that need the stub) so other interactive CLI tests keep default MinerU script resolution.
-
-**GitHub Actions:** Confirm once in the E2E job that **`python3`** is on `PATH` (document finding; add a trivial `python3 -c 'print(1)'` step only if a runner image regression is a concern). No MinerU pip install in CI.
-
-**Production CLI bundle:** Default script resolution and embedding so **`python3`** runs the same logical script from the **esbuild bundle** as from source — sub-phase **3.5**.
+**Production CLI bundle:** Default script resolution and embedding — sub-phase **3.5**.
 
 ---
 
 ## PDF fixture
 
 - Add **`e2e_test/fixtures/book_reading/top-maths.pdf`** (or equivalent path referenced by the step).
-- **Content irrelevant** for parsing if the stub ignores bytes; file must be a **valid `.pdf` path** the CLI accepts (extension + readable file).
+- **Content irrelevant** for parsing if the mock **`do_parse`** ignores bytes; file must be a **valid `.pdf` path** the CLI accepts (extension + readable file).
 - The step resolves a path on disk where the interactive CLI process can read it (same patterns as other features that pass filesystem paths to subprocesses).
 
 ---
@@ -58,19 +48,19 @@ passes by:
 
 Each sub-phase should end with **tests green** except the deliberate red step called out below.
 
-### 3.1 — Stub script + E2E env wiring (no user-visible attach yet) — **done**
+### 3.1 — E2E shadow `mineru` + env wiring (no user-visible attach yet) — **done**
 
-- **Stub:** [e2e_test/scripts/mineru_outline_e2e_stub.py](../e2e_test/scripts/mineru_outline_e2e_stub.py) (stdlib **`python3`**).
+- **Mock:** [e2e_test/python_stubs/mineru_site](../e2e_test/python_stubs/mineru_site) (shadow **`mineru.cli.common`**; stdlib **`python3`** only).
 - **Fixture:** [e2e_test/fixtures/book_reading/top-maths.pdf](../e2e_test/fixtures/book_reading/top-maths.pdf) (minimal valid PDF).
-- **E2E:** Feature tag **`@stubMineruOutline`** + hooks in [e2e_test/step_definitions/hook.ts](../e2e_test/step_definitions/hook.ts); task **`getMineruOutlineE2eStubScriptPath`** in [e2e_test/config/cliE2ePluginTasks.ts](../e2e_test/config/cliE2ePluginTasks.ts).
-- **CLI:** [cli/tests/mineruOutlineE2eStub.test.ts](../cli/tests/mineruOutlineE2eStub.test.ts) runs the stub via **`python3`** on a temp **`.pdf`** and asserts **`ok: true`** and **`layout.roots`**.
+- **E2E:** Tag **`@mockMineruLib`** + hooks in [e2e_test/step_definitions/hook.ts](../e2e_test/step_definitions/hook.ts); tasks **`getMineruE2eMockSitePath`** / **`prependMineruMockToPythonPath`** in [e2e_test/config/cliE2ePluginTasks.ts](../e2e_test/config/cliE2ePluginTasks.ts).
+- **CLI:** [cli/tests/mineruOutlineSpikeMineruMock.test.ts](../cli/tests/mineruOutlineSpikeMineruMock.test.ts) runs the **spike** with **`PYTHONPATH`** set and asserts **`ok: true`** and **`layout.roots`**.
 
-**Exit:** Local and GHA can run the Python stub the same way; **`@ignore`** unchanged on book-reading until 3.2.
+**Exit:** Local and GHA exercise the real spike script with a fake MinerU; **`@ignore`** unchanged on book-reading until 3.2.
 
 ### 3.2 — Cucumber step + page object + stable expected excerpt
 
 - Implement **`When I attach book {string} to the notebook {string} via the CLI`** in thin [e2e_test/step_definitions/](../e2e_test/step_definitions/) glue; put behavior in **`e2e_test/start/pageObjects/cli/`** (and [outputAssertions.ts](../e2e_test/start/pageObjects/cli/outputAssertions.ts) if new assertion shape is needed).
-- Flow: ensure interactive CLI session (**`@interactiveCLI`** + **`@withCliConfig`** already on feature), **`/use <exact notebook title>`**, wait for notebook stage, **`/attach <absolute path to fixture>`**, then assert **`pastCliAssistantMessages`** contain **known substrings** from the stub’s layout (titles agreed with stub output).
+- Flow: ensure interactive CLI session (**`@interactiveCLI`** + **`@withCliConfig`** already on feature), **`/use <exact notebook title>`**, wait for notebook stage, **`/attach <absolute path to fixture>`**, then assert **`pastCliAssistantMessages`** contain **known substrings** from the E2E mock’s deterministic headings (e.g. **Stub Part A**).
 - **Remove `@ignore`** once the step exists.
 
 **Expected first failure:** **`/attach`** is not a registered notebook-stage command → user-visible error or “unknown command” consistent with existing shell behavior. Assertion message should say that **attach** is missing or unrecognized (meaningful, not a timeout-only failure).
@@ -84,18 +74,18 @@ Each sub-phase should end with **tests green** except the deliberate red step ca
 ### 3.4 — Implement `/attach` (happy path)
 
 - Resolve **active notebook** from stage context (same notebook object **`/use`** selected).
-- Run **outline/layout extraction** (shared module factored from **`/read`** spike — see parent plan): subprocess stub → **nested layout** → **`NotebookBooksController` / generated client** `POST /api/notebooks/{id}/attach-book` with **`bookName`** derived from filename (or documented rule) and **`format: "pdf"`**.
+- Run **outline/layout extraction** (shared module factored from **`/read`** spike — see parent plan): subprocess (**real spike**; E2E uses shadow **`mineru`**) → **nested layout** → **`NotebookBooksController` / generated client** `POST /api/notebooks/{id}/attach-book` with **`bookName`** derived from filename (or documented rule) and **`format: "pdf"`**.
 - Map **API response** (`Book` + **ranges**) to a **bounded, TTY-safe** assistant message (excerpt of structure — mirror rules like **`READ_OUTLINE_ASSISTANT_MAX_CHARS`** if needed).
 - **Vitest:** prefer **`runInteractive`** + **`vi.spyOn`** on the API controller per [.cursor/rules/cli.mdc](../.cursor/rules/cli.mdc) for at least one success and one failure class; avoid duplicating E2E.
 
-**Exit:** E2E scenario **green** with stub + real backend in **`pnpm run-p …`** stack. **Bundled** CLI can still use checkout-relative script paths until **3.5** proves the same Python invocation from **`cli/dist/doughnut-cli.bundle.mjs`** (or E2E install path).
+**Exit:** E2E scenario **green** with **`@mockMineruLib`** + real backend in **`pnpm run-p …`** stack. **Bundled** CLI can still use checkout-relative script paths until **3.5** proves the same Python invocation from **`cli/dist/doughnut-cli.bundle.mjs`** (or E2E install path).
 
 ### 3.5 — Python outline script in the bundle; one spawn path for bundle and source
 
-- The script the CLI passes to **`python3`** (real MinerU wrapper, shared with **`/read`**-factored code, or the checked-in stub when **`DOUGHNUT_MINERU_OUTLINE_SCRIPT`** points at it) must be **reachable when the user runs the shipped artifact** (`cli/dist/doughnut-cli.bundle.mjs`), not only via **`pnpm -C cli exec tsx src/index.ts`** or dev layouts.
+- The script the CLI passes to **`python3`** (embedded / default **`spike_mineru_phase_a_outline.py`**, or override via **`DOUGHNUT_MINERU_OUTLINE_SCRIPT`**) must be **reachable when the user runs the shipped artifact** (`cli/dist/doughnut-cli.bundle.mjs`), not only via **`pnpm -C cli exec tsx src/index.ts`** or dev layouts.
 - Use **one** resolution and spawn approach for **bundled** and **from-source** runs: e.g. embed the script in the bundle (esbuild `loader` / `import` of file contents + write to a temp file at runtime, or equivalent) and pass that path to **`python3`**, or another single mechanism documented in this plan once chosen — avoid a large behavioral fork (`if (bundled) … else …`) except where the runtime truly differs (e.g. only the script bytes source changes).
-- **Vitest:** observable check that the bundled entry (or the same helper **`runMineruOutlineSubprocess`** uses) resolves an executable script path and that **`python3`** can run it in the stub/E2E shape where practical; do not rely on “works in dev folder layout” alone.
-- **CI / E2E:** stub path via **`DOUGHNUT_MINERU_OUTLINE_SCRIPT`** remains valid; confirm the **default** production resolution still works when the CLI is **`node cli/dist/doughnut-cli.bundle.mjs`** (or the E2E-installed bundle path) without requiring a checkout-relative path that the bundle cannot see.
+- **Vitest:** observable check that the bundled entry (or the same helper **`runMineruOutlineSubprocess`** uses) resolves an executable script path and that **`python3`** can run it with **`PYTHONPATH`** shadowing **`mineru`** where practical; do not rely on “works in dev folder layout” alone.
+- **CI / E2E:** **`@mockMineruLib`** + **`PYTHONPATH`** remains valid for book-reading; confirm the **default** production resolution still works when the CLI is **`node cli/dist/doughnut-cli.bundle.mjs`** (or the E2E-installed bundle path) without requiring a checkout-relative path that the bundle cannot see.
 
 **Exit:** Same subprocess argv pattern and env knobs as today; bundle and source runs do not diverge in how the Python script is obtained or invoked.
 

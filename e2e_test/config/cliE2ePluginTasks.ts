@@ -4,7 +4,7 @@
 
 import { existsSync, mkdtempSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { dirname, join } from 'node:path'
+import { delimiter, dirname, join } from 'node:path'
 import { attachGoogleOAuthSimulation } from './cliE2eGoogleOAuthSimulation'
 import {
   bundleCliE2eInstall,
@@ -86,8 +86,12 @@ export function createCliE2ePluginTasks(repoRoot: string) {
   }
 
   return {
-    getMineruOutlineE2eStubScriptPath(): string {
-      return join(repoRoot, 'e2e_test', 'scripts', 'mineru_outline_e2e_stub.py')
+    getMineruE2eMockSitePath(): string {
+      return join(repoRoot, 'e2e_test', 'python_stubs', 'mineru_site')
+    },
+    prependMineruMockToPythonPath(mockSite: string): string {
+      const tail = process.env.PYTHONPATH?.trim()
+      return tail ? `${mockSite}${delimiter}${tail}` : mockSite
     },
     getE2eFixtureAbsolutePath(relativePath: string): string {
       const normalized = relativePath.replace(/^\/+/, '')

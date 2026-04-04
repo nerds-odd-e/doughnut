@@ -110,14 +110,14 @@ After({ tags: '@bundleCliE2eInstall' }, () =>
   cli.backend().removeE2eInstallCliBundle()
 )
 
-Before({ tags: '@stubMineruOutline', order: 0 }, () => {
-  cy.task<string>('getMineruOutlineE2eStubScriptPath').then((p) => {
-    Cypress.env('DOUGHNUT_MINERU_OUTLINE_SCRIPT_E2E', p)
+Before({ tags: '@mockMineruLib', order: 0 }, () => {
+  cy.task<string>('getMineruE2eMockSitePath').then((p) => {
+    Cypress.env('DOUGHNUT_E2E_MINERU_MOCK_SITE', p)
   })
 })
 
-After({ tags: '@stubMineruOutline' }, () => {
-  Cypress.env('DOUGHNUT_MINERU_OUTLINE_SCRIPT_E2E', undefined)
+After({ tags: '@mockMineruLib' }, () => {
+  Cypress.env('DOUGHNUT_E2E_MINERU_MOCK_SITE', undefined)
 })
 
 Before({ tags: '@withCliConfig', order: 1 }, () => {
@@ -139,32 +139,48 @@ Before({ tags: '@withCliGmailMockAccountConfig', order: 1 }, () => {
 Before({ tags: '@interactiveCLI', order: 2 }, () => {
   cli.ttyAssertTerminal().kill()
   cy.get<string>('@cliConfigDir').then((configDir) => {
-    const env: NodeJS.ProcessEnv = { DOUGHNUT_CONFIG_DIR: configDir }
-    const stub = Cypress.env('DOUGHNUT_MINERU_OUTLINE_SCRIPT_E2E') as
+    const mockSite = Cypress.env('DOUGHNUT_E2E_MINERU_MOCK_SITE') as
       | string
       | undefined
-    if (typeof stub === 'string' && stub.length > 0) {
-      env.DOUGHNUT_MINERU_OUTLINE_SCRIPT = stub
+    if (typeof mockSite === 'string' && mockSite.length > 0) {
+      return cy
+        .task<string>('prependMineruMockToPythonPath', mockSite)
+        .then((pythonPath) =>
+          cli.ttyAssertTerminal().startRepoInteractive({
+            env: {
+              DOUGHNUT_CONFIG_DIR: configDir,
+              PYTHONPATH: pythonPath,
+            },
+          })
+        )
     }
-    return cli.ttyAssertTerminal().startRepoInteractive({ env })
+    return cli.ttyAssertTerminal().startRepoInteractive({
+      env: { DOUGHNUT_CONFIG_DIR: configDir },
+    })
   })
 })
 
 Before({ tags: '@interactiveCLIGmail', order: 2 }, () => {
   cli.ttyAssertTerminal().kill()
   cy.get<string>('@cliConfigDir').then((configDir) => {
-    const env: NodeJS.ProcessEnv = {
+    const mockSite = Cypress.env('DOUGHNUT_E2E_MINERU_MOCK_SITE') as
+      | string
+      | undefined
+    const base: NodeJS.ProcessEnv = {
       DOUGHNUT_CONFIG_DIR: configDir,
       GOOGLE_BASE_URL: GMAIL_E2E_GOOGLE_MOCK_BASE_URL,
       DOUGHNUT_NO_BROWSER: '1',
     }
-    const stub = Cypress.env('DOUGHNUT_MINERU_OUTLINE_SCRIPT_E2E') as
-      | string
-      | undefined
-    if (typeof stub === 'string' && stub.length > 0) {
-      env.DOUGHNUT_MINERU_OUTLINE_SCRIPT = stub
+    if (typeof mockSite === 'string' && mockSite.length > 0) {
+      return cy
+        .task<string>('prependMineruMockToPythonPath', mockSite)
+        .then((pythonPath) =>
+          cli.ttyAssertTerminal().startRepoInteractive({
+            env: { ...base, PYTHONPATH: pythonPath },
+          })
+        )
     }
-    return cli.ttyAssertTerminal().startRepoInteractive({ env })
+    return cli.ttyAssertTerminal().startRepoInteractive({ env: base })
   })
 })
 

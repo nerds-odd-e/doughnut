@@ -1,6 +1,6 @@
 @withCliConfig
 @interactiveCLI
-@stubMineruOutline
+@mockMineruLib
 Feature: Book reading
 
   Background:

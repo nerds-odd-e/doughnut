@@ -18,8 +18,9 @@ Example:
     "/path/to/book.epub"
 
 Phase B (Node subprocess): add --json-result to emit a single JSON object on stdout (stderr unchanged for logs).
-  Include optional top-level ``layout`` with ``roots`` / ``children`` for POST …/attach-book (same shape as
-  ``e2e_test/scripts/mineru_outline_e2e_stub.py``).
+  Include optional top-level ``layout`` with ``roots`` / ``children`` for POST …/attach-book.
+  E2E prepends ``e2e_test/python_stubs/mineru_site`` to ``PYTHONPATH`` to shadow ``mineru`` with a fake
+  ``do_parse`` (no real MinerU in CI).
 """
 
 from __future__ import annotations
