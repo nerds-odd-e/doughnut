@@ -108,6 +108,31 @@ The CLI install binary goes to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/d
 
 **Verify the stack:** **`pnpm sut:healthcheck`**. If unhealthy or stray processes: **`pnpm sut:restart`** or start **`pnpm sut`**. With Nix (typical local agent): **`CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`** / **`… sut:restart`** — see **`CLAUDE.md`**.
 
+## 7. Book PDF storage (GCS, prod)
+
+Attached notebook PDFs are stored in GCS when the backend runs with Spring profile **`prod`** (`GcsBookStorage` + VM **Application Default Credentials**). Production uses bucket **`doughnut-book-pdf-carbon-syntax-298809`** (the short name **`books`** is not available globally on GCS). Prod sets **`doughnut.book-pdf.gcs.bucket`** in [`backend/src/main/resources/application.yml`](../../backend/src/main/resources/application.yml) (prod profile). Optional **`doughnut.book-pdf.gcs.object-prefix`** is unset by default.
+
+**Global names:** GCS bucket names are globally unique. If you recreate this environment in another project, pick a unique bucket name and keep **`application.yml`** and this section in sync.
+
+**Create the bucket** (project **`carbon-syntax-298809`**, region aligned with the MIG in **`us-east1`**):
+
+```bash
+gcloud config set project carbon-syntax-298809
+gcloud storage buckets create gs://doughnut-book-pdf-carbon-syntax-298809 \
+  --project=carbon-syntax-298809 \
+  --location=us-east1 \
+  --uniform-bucket-level-access
+```
+
+**IAM:** The app VM uses the instance default **Compute Engine service account** `220715781008-compute@developer.gserviceaccount.com` (pattern: `PROJECT_NUMBER-compute@developer.gserviceaccount.com` for project **`carbon-syntax-298809`**). Grant **`roles/storage.objectAdmin`** on the bucket so attach and download can **`put`** and **`get`** objects:
+
+```bash
+gcloud storage buckets add-iam-policy-binding gs://doughnut-book-pdf-carbon-syntax-298809 \
+  --project=carbon-syntax-298809 \
+  --member="serviceAccount:220715781008-compute@developer.gserviceaccount.com" \
+  --role="roles/storage.objectAdmin"
+```
+
 Operational note: creating a Cloud SQL VECTOR index may fail with
 "Vector index: not enough data to train" if the table has too few embeddings.
 Run index creation after sufficient data exists.

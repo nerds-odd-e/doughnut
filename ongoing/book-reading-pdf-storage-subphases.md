@@ -81,11 +81,13 @@ Each row is a **merge gate**: backend verify, relevant frontend/CLI tests, and *
 - **Tests:** **Black-box** unit tests with **mocked** `Storage` — **no** real network; **no** E2E against GCS (see testing split above).
 - **Deliverable cleanliness:** Required prod properties documented; **no** unreachable GCS code paths.
 
-### SP-C1b — GCP bucket `books` + prod config (operator)
+### SP-C1b — GCP bucket + prod config (operator)
 
-- **Outcome (operator-visible):** Use **`gcloud`** to create a GCS bucket named **`books`** in the target GCP project (document the exact command, including region / uniform bucket-level access if required by org policy). Update **production** configuration so **`doughnut.book-pdf.gcs.bucket`** is **`books`** (and **`object-prefix`** only if the team standardizes on one).
+**Done.** Bucket **`doughnut-book-pdf-carbon-syntax-298809`** (global name **`books`** unavailable). Runbook: [docs/gcp/prod_env.md](../docs/gcp/prod_env.md) §7; prod bucket name: [`application.yml`](../backend/src/main/resources/application.yml) prod `doughnut.book-pdf.gcs.bucket`. IAM: **`roles/storage.objectAdmin`** for **`220715781008-compute@developer.gserviceaccount.com`**.
+
+- **Outcome (operator-visible):** Use **`gcloud`** to create a GCS bucket in the target GCP project (document the exact command, including region / uniform bucket-level access if required by org policy). Update **production** configuration so **`doughnut.book-pdf.gcs.bucket`** matches that bucket (and **`object-prefix`** only if the team standardizes on one).
 - **Tests:** None required for this sub-phase (infra / manual); backend tests and E2E remain on **non-`prod`** profiles (DB storage).
-- **Deliverable cleanliness:** Bucket name **`books`** matches deployed config; single source of truth for the name in ops docs / this file.
+- **Deliverable cleanliness:** Bucket name matches deployed config; single source of truth in ops docs / this file.
 
 ### SP-C2 — Wire profile selection + integration proof
 
@@ -109,7 +111,7 @@ Each row is a **merge gate**: backend verify, relevant frontend/CLI tests, and *
 ## CI notes
 
 - **Chosen strategy:** **GCS:** mocked-`Storage` unit tests only. **Book attach/download E2E:** **DB** storage (non-`prod` profile). **No** CI job runs book-reading Gherkin against real GCS.
-- **Prod / GCP:** Bucket **`books`** and `doughnut.book-pdf.gcs.bucket` alignment — see **SP-C1b**; ADC or workload identity as required by deploy environment.
+- **Prod / GCP:** Bucket **`doughnut-book-pdf-carbon-syntax-298809`** and `doughnut.book-pdf.gcs.bucket` alignment — see **SP-C1b**; ADC on the MIG VM.
 
 ---
 
@@ -126,4 +128,4 @@ After **each** SP-A* / SP-B* / SP-C* / SP-D*:
 
 ## If you must pause mid-stream
 
-Prefer finishing through **SP-A5** before any deploy so attach contract is **singular**. Prefer finishing **SP-B2** before hardening GCS so the **E2E** baseline exists on **DB** storage. Complete **SP-C1b** (bucket **`books`** + prod config) before relying on attach/download in **prod**.
+Prefer finishing through **SP-A5** before any deploy so attach contract is **singular**. Prefer finishing **SP-B2** before hardening GCS so the **E2E** baseline exists on **DB** storage. Complete **SP-C1b** (GCS bucket + prod config) before relying on attach/download in **prod**.

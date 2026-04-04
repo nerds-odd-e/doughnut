@@ -205,6 +205,9 @@ question:
     times: 0
 doughnut:
   spa-public-base-url: ${DOUGHNUT_SPA_PUBLIC_BASE_URL:https://doughnut.odd-e.com}
+  book-pdf:
+    gcs:
+      bucket: doughnut-book-pdf-carbon-syntax-298809
 server:
   error:
     include-stacktrace: never
