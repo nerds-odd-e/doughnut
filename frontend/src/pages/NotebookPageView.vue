@@ -28,21 +28,7 @@
       </router-link>
     </div>
 
-    <section
-      v-if="book"
-      class="settings-section daisy-mb-6"
-      data-testid="notebook-attached-book"
-    >
-      <div class="section-header">
-        <h4 class="section-title">{{ book.bookName }}</h4>
-        <p class="section-description">
-          Open the book reader to browse this notebook's attached PDF structure.
-        </p>
-      </div>
-      <button type="button" class="daisy-btn daisy-btn-primary daisy-btn-sm">
-        Read
-      </button>
-    </section>
+    <NotebookAttachedBookSection :notebook-id="notebook.id" />
 
     <!-- Notebook Management Section -->
     <section class="settings-section daisy-mb-6">
@@ -214,13 +200,10 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { ref, watch } from "vue"
+import { ref } from "vue"
 import { useRouter } from "vue-router"
-import type { BookFull, Notebook, User } from "@generated/doughnut-backend-api"
-import {
-  NotebookBooksController,
-  NotebookController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+import type { Notebook, User } from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useToast } from "@/composables/useToast"
@@ -232,6 +215,7 @@ import SvgMoveToCircle from "@/components/svgs/SvgMoveToCircle.vue"
 import NotebookMoveDialog from "@/components/notebook/NotebookMoveDialog.vue"
 import CheckInput from "@/components/form/CheckInput.vue"
 import TextInput from "@/components/form/TextInput.vue"
+import NotebookAttachedBookSection from "@/components/notebook/NotebookAttachedBookSection.vue"
 import NotebookCertificateRequest from "@/components/notebook/NotebookCertificateRequest.vue"
 import NotebookAssistantManagementDialog from "@/components/notebook/NotebookAssistantManagementDialog.vue"
 
@@ -256,25 +240,6 @@ const emit = defineEmits<{
 const { showSuccessToast } = useToast()
 const router = useRouter()
 const { popups } = usePopups()
-
-const book = ref<BookFull | null>(null)
-
-const loadBook = async () => {
-  const { data, error } = await apiCallWithLoading(() =>
-    NotebookBooksController.getBook({
-      path: { notebook: props.notebook.id },
-    })
-  )
-  book.value = !error && data ? data : null
-}
-
-watch(
-  () => props.notebook.id,
-  async () => {
-    await loadBook()
-  },
-  { immediate: true }
-)
 
 const goToNotebooks = () => {
   router.push({ name: "notebooks" })

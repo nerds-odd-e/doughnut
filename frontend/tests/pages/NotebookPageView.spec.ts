@@ -3,6 +3,7 @@ import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen
 import NotebookPageView from "@/pages/NotebookPageView.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkError } from "@tests/helpers"
+import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, expect, vi } from "vitest"
 
 describe("NotebookPageView.spec", () => {
@@ -46,5 +47,25 @@ describe("NotebookPageView.spec", () => {
       (wrapper.find("[name='certificateExpiry']").element as HTMLInputElement)
         .value
     ).toBe("2y 3m 4w 5d")
+  })
+
+  it("shows no-book copy without Read when getBook has no book", async () => {
+    const wrapper = helper
+      .component(NotebookPageView)
+      .withRouter()
+      .withProps({ notebook })
+      .mount()
+    await flushPromises()
+
+    const empty = wrapper.find('[data-testid="notebook-no-book"]')
+    expect(empty.exists()).toBe(true)
+    expect(empty.text()).toContain("No book attached to this notebook.")
+    expect(
+      wrapper.find('[data-testid="notebook-attached-book"]').exists()
+    ).toBe(false)
+    const readButtons = wrapper
+      .findAll("button")
+      .filter((b) => b.text() === "Read")
+    expect(readButtons.length).toBe(0)
   })
 })
