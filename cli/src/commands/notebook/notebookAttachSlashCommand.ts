@@ -1,4 +1,6 @@
-import { basename, extname } from 'node:path'
+import type { Stats } from 'node:fs'
+import { stat } from 'node:fs/promises'
+import { basename, extname, resolve } from 'node:path'
 import {
   NotebookBooksController,
   type BookFull,
@@ -83,6 +85,17 @@ export function attachNotebookSlashCommandFor(
       }
       if (!path.toLowerCase().endsWith('.pdf')) {
         throw new Error('Attach only supports .pdf files.')
+      }
+
+      const absPdf = resolve(process.cwd(), path)
+      let st: Stats
+      try {
+        st = await stat(absPdf)
+      } catch {
+        throw new Error(`file not found or not readable: ${absPdf}`)
+      }
+      if (!st.isFile()) {
+        throw new Error('Attach expects a PDF file path, not a directory.')
       }
 
       const minerResult = await runMineruOutlineSubprocess({

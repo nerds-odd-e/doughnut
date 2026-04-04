@@ -40,7 +40,30 @@ const authenticatedBackendCallFailureAdvice = {
   http5xxServer: 'The server returned an error. Try again later.',
   http400BadRequest:
     'The server rejected this request. Check your input or try again in the web app.',
+  http404NotFound:
+    'The resource was not found. It may have been removed, or the link is wrong.',
+  http409Conflict:
+    'This action conflicts with the current state on the server. Contact support if you need help.',
 } as const
+
+type SdkThrowable = unknown
+
+const MAX_CLIENT_ERROR_DETAIL_CHARS = 500
+
+function readableClientErrorDetail(cause: SdkThrowable): string | undefined {
+  if (typeof cause !== 'object' || cause === null) return undefined
+  const o = cause as Record<string, unknown>
+  for (const key of ['message', 'detail'] as const) {
+    const raw = o[key]
+    if (typeof raw !== 'string') continue
+    const t = raw.trim()
+    if (t === '') continue
+    return t.length > MAX_CLIENT_ERROR_DETAIL_CHARS
+      ? `${t.slice(0, MAX_CLIENT_ERROR_DETAIL_CHARS)}…`
+      : t
+  }
+  return undefined
+}
 
 const backendApiErrorTypes = new Set([
   'OPENAI_UNAUTHORIZED',
@@ -52,8 +75,6 @@ const backendApiErrorTypes = new Set([
   'ASSESSMENT_SERVICE_ERROR',
   'QUESTION_ANSWER_ERROR',
 ])
-
-type SdkThrowable = unknown
 
 function httpStatusFromSdkThrowable(cause: SdkThrowable): number | undefined {
   if (typeof cause !== 'object' || cause === null) return undefined
@@ -141,6 +162,24 @@ function userVisibleMessageForSdkThrowable(cause: SdkThrowable): string {
   }
   if (status === 403) {
     return authenticatedBackendCallFailureAdvice.http403StoredTokenForbidden
+  }
+  if (status === 400) {
+    return (
+      readableClientErrorDetail(cause) ??
+      authenticatedBackendCallFailureAdvice.http400BadRequest
+    )
+  }
+  if (status === 404) {
+    return (
+      readableClientErrorDetail(cause) ??
+      authenticatedBackendCallFailureAdvice.http404NotFound
+    )
+  }
+  if (status === 409) {
+    return (
+      readableClientErrorDetail(cause) ??
+      authenticatedBackendCallFailureAdvice.http409Conflict
+    )
   }
   if (status !== undefined && status >= 500) {
     return messageForHttpServerError(status)

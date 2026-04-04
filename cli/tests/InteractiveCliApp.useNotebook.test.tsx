@@ -9,6 +9,8 @@ vi.mock('../src/commands/read/mineruOutlineSubprocess.js', () => ({
 }))
 
 import * as fs from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { NotebookBooksController, NotebookController } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
@@ -81,8 +83,13 @@ describe('InteractiveCliApp /use notebook integration', () => {
 
   describe('notebook stage /attach', () => {
     let attachBookSpy: ReturnType<typeof vi.spyOn> | undefined
+    let attachWorkDir: string
+    let attachPdfPath: string
 
     beforeEach(() => {
+      attachWorkDir = fs.mkdtempSync(join(tmpdir(), 'cli-attach-test-'))
+      attachPdfPath = join(attachWorkDir, 'stub.pdf')
+      fs.writeFileSync(attachPdfPath, '')
       myNotebooksSpy.mockResolvedValue({
         data: { notebooks: [notebookWithTitle('Top Maths')] },
       } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
@@ -124,6 +131,7 @@ describe('InteractiveCliApp /use notebook integration', () => {
 
     afterEach(() => {
       attachBookSpy?.mockRestore()
+      fs.rmSync(attachWorkDir, { recursive: true, force: true })
     })
 
     test('attaches PDF and shows structure excerpt from API book', async () => {
@@ -149,7 +157,7 @@ describe('InteractiveCliApp /use notebook integration', () => {
 
       stdin.write('/use Top Maths\r')
       await waitForFramesToInclude('Active notebook: Top Maths')
-      stdin.write('/attach /tmp/foo.pdf\r')
+      stdin.write(`/attach ${attachPdfPath}\r`)
       await waitForFramesToInclude('Attached "top-maths" to this notebook.')
       await waitForFramesToInclude('Part One')
       await waitForFramesToInclude('Part One Child')
@@ -163,10 +171,110 @@ describe('InteractiveCliApp /use notebook integration', () => {
 
       stdin.write('/use Top Maths\r')
       await waitForFramesToInclude('Active notebook: Top Maths')
-      stdin.write('/attach /tmp/foo.pdf\r')
+      stdin.write(`/attach ${attachPdfPath}\r`)
       await waitForFramesToInclude(
         'Access token does not have permission for this operation.'
       )
+    })
+
+    test('shows API validation message for HTTP 400 when present', async () => {
+      attachBookSpy.mockRejectedValue({
+        status: 400,
+        message: 'Invalid layout roots',
+      })
+
+      const { stdin, waitForFramesToInclude } =
+        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+
+      stdin.write('/use Top Maths\r')
+      await waitForFramesToInclude('Active notebook: Top Maths')
+      stdin.write(`/attach ${attachPdfPath}\r`)
+      await waitForFramesToInclude('Invalid layout roots')
+    })
+
+    test('shows generic guidance for HTTP 400 without body message', async () => {
+      attachBookSpy.mockRejectedValue({ status: 400 })
+
+      const { stdin, waitForFramesToInclude } =
+        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+
+      stdin.write('/use Top Maths\r')
+      await waitForFramesToInclude('Active notebook: Top Maths')
+      stdin.write(`/attach ${attachPdfPath}\r`)
+      await waitForFramesToInclude(
+        'The server rejected this request. Check your input or try again in the web app.'
+      )
+    })
+
+    test('shows not-found guidance for HTTP 404', async () => {
+      attachBookSpy.mockRejectedValue({ status: 404 })
+
+      const { stdin, waitForFramesToInclude } =
+        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+
+      stdin.write('/use Top Maths\r')
+      await waitForFramesToInclude('Active notebook: Top Maths')
+      stdin.write(`/attach ${attachPdfPath}\r`)
+      await waitForFramesToInclude(
+        'The resource was not found. It may have been removed, or the link is wrong.'
+      )
+    })
+
+    test('shows server conflict message for HTTP 409', async () => {
+      attachBookSpy.mockRejectedValue({
+        status: 409,
+        message: 'This notebook already has a book attached',
+      })
+
+      const { stdin, waitForFramesToInclude } =
+        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+
+      stdin.write('/use Top Maths\r')
+      await waitForFramesToInclude('Active notebook: Top Maths')
+      stdin.write(`/attach ${attachPdfPath}\r`)
+      await waitForFramesToInclude('This notebook already has a book attached')
+    })
+
+    test('shows outline subprocess error when MinerU script returns ok: false', async () => {
+      runMineruOutlineSubprocess.mockResolvedValue({
+        ok: false,
+        error: 'outline script reported a parse failure',
+      })
+
+      const { stdin, waitForFramesToInclude } =
+        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+
+      stdin.write('/use Top Maths\r')
+      await waitForFramesToInclude('Active notebook: Top Maths')
+      stdin.write(`/attach ${attachPdfPath}\r`)
+      await waitForFramesToInclude('outline script reported a parse failure')
+    })
+
+    test('rejects attach when path is not a file', async () => {
+      const dirNamedPdf = join(attachWorkDir, 'folder.pdf')
+      fs.mkdirSync(dirNamedPdf)
+
+      const { stdin, waitForFramesToInclude } =
+        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+
+      stdin.write('/use Top Maths\r')
+      await waitForFramesToInclude('Active notebook: Top Maths')
+      stdin.write(`/attach ${dirNamedPdf}\r`)
+      await waitForFramesToInclude(
+        'Attach expects a PDF file path, not a directory.'
+      )
+    })
+
+    test('rejects attach when PDF path is missing', async () => {
+      const missing = join(attachWorkDir, 'missing.pdf')
+
+      const { stdin, waitForFramesToInclude } =
+        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+
+      stdin.write('/use Top Maths\r')
+      await waitForFramesToInclude('Active notebook: Top Maths')
+      stdin.write(`/attach ${missing}\r`)
+      await waitForFramesToInclude('file not found or not readable:')
     })
   })
 })
