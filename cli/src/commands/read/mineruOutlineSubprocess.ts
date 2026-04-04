@@ -11,6 +11,12 @@ export const MINERU_OUTLINE_DEFAULT_TIMEOUT_MS = 30 * 60 * 1000
 /** Cap stderr bytes included in user-visible errors (tracebacks are usually < this). */
 const MINERU_STDERR_EXCERPT_CHARS = 12_000
 
+/** After MinerU import hint, keep only a short stderr tail (avoid huge tracebacks). */
+const MINERU_IMPORT_DETAIL_MAX_CHARS = 800
+
+const MINERU_IMPORT_HINT =
+  "MinerU is missing or could not be imported. Install MinerU for PDF outlines (e.g. pip install 'mineru[pipeline]' in the Python environment used by the CLI), or set DOUGHNUT_MINERU_OUTLINE_SCRIPT to a different outline script."
+
 export type MineruOutlineOk = {
   ok: true
   outline: string
@@ -115,6 +121,93 @@ function spawnWithTimeout(
       finish()
     })
   })
+}
+
+function errnoCode(err: unknown): string | undefined {
+  if (err !== null && typeof err === 'object' && 'code' in err) {
+    const c = (err as { code: unknown }).code
+    return typeof c === 'string' ? c : undefined
+  }
+  return undefined
+}
+
+function messageForPythonSpawnFailure(
+  err: unknown,
+  pythonExecutable: string
+): string {
+  const code = errnoCode(err)
+  const msg = err instanceof Error ? err.message : String(err)
+  if (code === 'ENOENT') {
+    return `Could not run "${pythonExecutable}" (not found on PATH or missing interpreter). Install Python 3 and ensure it is on PATH, or set DOUGHNUT_MINERU_PYTHON to the full path of your python3 binary.`
+  }
+  if (code === 'EACCES') {
+    return `Permission denied when starting "${pythonExecutable}". Check that the file is executable, or choose another interpreter via DOUGHNUT_MINERU_PYTHON.`
+  }
+  return `Failed to start outline extraction (${pythonExecutable}): ${msg}`
+}
+
+type SpawnOk = { tag: 'spawned'; outcome: SpawnOutcome }
+
+async function runMineruSpawn(
+  python: string,
+  args: string[],
+  timeoutMs: number,
+  cwd: string
+): Promise<SpawnOk | MineruOutlineErr> {
+  try {
+    const outcome = await spawnWithTimeout(python, args, timeoutMs, cwd)
+    return { tag: 'spawned', outcome }
+  } catch (err) {
+    return {
+      ok: false,
+      error: messageForPythonSpawnFailure(err, python),
+    }
+  }
+}
+
+function isSpawnOk(r: SpawnOk | MineruOutlineErr): r is SpawnOk {
+  return 'tag' in r && r.tag === 'spawned'
+}
+
+function boundedStderrExcerpt(stderr: string): string {
+  const err = stderr.trim()
+  if (err.length <= MINERU_STDERR_EXCERPT_CHARS) {
+    return err
+  }
+  const half = MINERU_STDERR_EXCERPT_CHARS / 2
+  return `${err.slice(0, half)}\n…\n${err.slice(-half)}`
+}
+
+function looksLikeMineruImportFailure(stderr: string): boolean {
+  return (
+    /ModuleNotFoundError/.test(stderr) ||
+    /No module named ['"]?mineru/.test(stderr) ||
+    (/ImportError/.test(stderr) && /mineru/.test(stderr))
+  )
+}
+
+/** User-visible stderr body; applies MinerU import hint when stderr matches. */
+function stderrBodyForUserMessage(stderr: string): string {
+  const trimmed = stderr.trim()
+  if (trimmed === '') {
+    return ''
+  }
+  if (looksLikeMineruImportFailure(trimmed)) {
+    const detail = boundedStderrExcerpt(trimmed).slice(
+      0,
+      MINERU_IMPORT_DETAIL_MAX_CHARS
+    )
+    return `${MINERU_IMPORT_HINT}\n\nDetails:\n${detail}`
+  }
+  return boundedStderrExcerpt(trimmed)
+}
+
+function timeoutErrorMessage(timeoutMs: number, isPdf: boolean): string {
+  const base = `MinerU outline subprocess timed out after ${timeoutMs}ms`
+  if (!isPdf) {
+    return base
+  }
+  return `${base} For large PDFs, set DOUGHNUT_READ_PDF_END_PAGE to cap the page range.`
 }
 
 function isRecord(v: unknown): v is Record<string, unknown> {
@@ -257,11 +350,15 @@ export async function runMineruOutlineSubprocess(
       args.push('--end-page', String(options.pdfEndPage))
     }
     try {
-      const spawned = await spawnWithTimeout(python, args, timeoutMs, cwd)
+      const r = await runMineruSpawn(python, args, timeoutMs, cwd)
+      if (!isSpawnOk(r)) {
+        return r
+      }
+      const spawned = r.outcome
       if (spawned.timedOut) {
         return {
           ok: false,
-          error: `MinerU outline subprocess timed out after ${timeoutMs}ms`,
+          error: timeoutErrorMessage(timeoutMs, true),
           exitCode: spawned.code,
         }
       }
@@ -271,11 +368,15 @@ export async function runMineruOutlineSubprocess(
     }
   }
 
-  const spawned = await spawnWithTimeout(python, args, timeoutMs, cwd)
+  const r = await runMineruSpawn(python, args, timeoutMs, cwd)
+  if (!isSpawnOk(r)) {
+    return r
+  }
+  const spawned = r.outcome
   if (spawned.timedOut) {
     return {
       ok: false,
-      error: `MinerU outline subprocess timed out after ${timeoutMs}ms`,
+      error: timeoutErrorMessage(timeoutMs, false),
       exitCode: spawned.code,
     }
   }
@@ -287,28 +388,20 @@ function mapSpawnOutcome(spawned: SpawnOutcome): MineruOutlineResult {
   let parsed: unknown
   try {
     if (!trimmedOut) {
-      const err = spawned.stderr.trim()
-      const excerpt =
-        err.length <= MINERU_STDERR_EXCERPT_CHARS
-          ? err
-          : `${err.slice(0, MINERU_STDERR_EXCERPT_CHARS / 2)}\n…\n${err.slice(-MINERU_STDERR_EXCERPT_CHARS / 2)}`
+      const body = stderrBodyForUserMessage(spawned.stderr)
       return {
         ok: false,
-        error: excerpt || `empty stdout (exit ${spawned.code ?? 'unknown'})`,
+        error: body || `empty stdout (exit ${spawned.code ?? 'unknown'})`,
         exitCode: spawned.code,
       }
     }
     parsed = JSON.parse(trimmedOut) as unknown
   } catch {
-    const err = spawned.stderr.trim()
-    const excerpt =
-      err.length <= MINERU_STDERR_EXCERPT_CHARS
-        ? err
-        : `${err.slice(0, MINERU_STDERR_EXCERPT_CHARS / 2)}\n…\n${err.slice(-MINERU_STDERR_EXCERPT_CHARS / 2)}`
+    const body = stderrBodyForUserMessage(spawned.stderr)
     return {
       ok: false,
-      error: excerpt
-        ? `invalid JSON on stdout; stderr:\n${excerpt}`
+      error: body
+        ? `invalid JSON on stdout; stderr:\n${body}`
         : 'invalid JSON on stdout',
       exitCode: spawned.code,
     }
