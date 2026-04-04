@@ -7,7 +7,6 @@ import com.odde.doughnut.entities.BookViews;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
-import com.odde.doughnut.services.book.BookPdfStorage;
 import com.odde.doughnut.services.book.BookService;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @SessionScope
@@ -30,15 +28,10 @@ class NotebookBooksController {
 
   private final AuthorizationService authorizationService;
   private final BookService bookService;
-  private final BookPdfStorage bookPdfStorage;
 
-  NotebookBooksController(
-      AuthorizationService authorizationService,
-      BookService bookService,
-      BookPdfStorage bookPdfStorage) {
+  NotebookBooksController(AuthorizationService authorizationService, BookService bookService) {
     this.authorizationService = authorizationService;
     this.bookService = bookService;
-    this.bookPdfStorage = bookPdfStorage;
   }
 
   @PostMapping(value = "/{notebook}/attach-book", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -75,24 +68,12 @@ class NotebookBooksController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
-    Book book = bookService.getBookForNotebook(notebook);
-    String ref = book.getSourceFileRef();
-    if (ref == null || ref.isBlank()) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
-    }
-    byte[] body =
-        bookPdfStorage
-            .get(ref)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
-    String filename = sanitizeFileName(book.getBookName()) + ".pdf";
+    var pdf = bookService.getBookPdfFile(notebook);
     return ResponseEntity.ok()
-        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+        .header(
+            HttpHeaders.CONTENT_DISPOSITION,
+            "attachment; filename=\"" + pdf.attachmentFileName() + "\"")
         .contentType(MediaType.APPLICATION_PDF)
-        .body(body);
-  }
-
-  private static String sanitizeFileName(String fileName) {
-    return fileName.replaceAll("[\\/:*?\"<>|]", "_");
+        .body(pdf.bytes());
   }
 }

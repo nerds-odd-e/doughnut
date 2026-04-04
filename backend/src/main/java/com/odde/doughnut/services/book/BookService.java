@@ -26,14 +26,17 @@ public class BookService {
   private final BookRepository bookRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
+  private final BookPdfStorage bookPdfStorage;
 
   public BookService(
       BookRepository bookRepository,
       EntityPersister entityPersister,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      BookPdfStorage bookPdfStorage) {
     this.bookRepository = bookRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
+    this.bookPdfStorage = bookPdfStorage;
   }
 
   @Transactional
@@ -68,6 +71,26 @@ public class BookService {
     return bookRepository
         .findByNotebook_Id(notebook.getId())
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
+  }
+
+  @Transactional(readOnly = true)
+  public BookPdfFile getBookPdfFile(Notebook notebook) {
+    Book book = getBookForNotebook(notebook);
+    String ref = book.getSourceFileRef();
+    if (ref == null || ref.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
+    }
+    byte[] bytes =
+        bookPdfStorage
+            .get(ref)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
+    String attachmentFileName = sanitizeFileName(book.getBookName()) + ".pdf";
+    return new BookPdfFile(bytes, attachmentFileName);
+  }
+
+  private static String sanitizeFileName(String fileName) {
+    return fileName.replaceAll("[\\/:*?\"<>|]", "_");
   }
 
   private void validateAttachRequest(AttachBookRequest request) {
