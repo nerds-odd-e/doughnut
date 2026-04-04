@@ -7,22 +7,21 @@ import com.odde.doughnut.services.book.BookPdfStorage;
 import com.odde.doughnut.services.book.DbBookPdfStorage;
 import com.odde.doughnut.services.book.GcsBookPdfStorage;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class BookPdfStorageConfiguration {
 
   @Bean
-  @ConditionalOnProperty(prefix = "doughnut.book-pdf.gcs", name = "bucket")
+  @Profile("prod")
   Storage bookPdfGcsClient() {
     return StorageOptions.getDefaultInstance().getService();
   }
 
   @Bean
-  @ConditionalOnProperty(prefix = "doughnut.book-pdf.gcs", name = "bucket")
+  @Profile("prod")
   BookPdfStorage gcsBookPdfStorage(
       Storage bookPdfGcsClient,
       @Value("${doughnut.book-pdf.gcs.bucket}") String bucket,
@@ -31,7 +30,7 @@ public class BookPdfStorageConfiguration {
   }
 
   @Bean
-  @ConditionalOnMissingBean(BookPdfStorage.class)
+  @Profile("!prod")
   BookPdfStorage dbBookPdfStorage(AttachmentBlobRepository attachmentBlobRepository) {
     return new DbBookPdfStorage(attachmentBlobRepository);
   }

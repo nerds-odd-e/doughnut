@@ -7,10 +7,15 @@
 **Architecture constants (all sub-phases):**
 
 - **Single attach surface:** `POST /api/notebooks/{notebook}/attach-book` — PDF + outline **together** (multipart); no separate product “upload-only” API.
-- **Opaque `Book.source_file_ref`:** Only persisted locator the domain uses; **`BookPdfStorage`** (name indicative) **puts** bytes → ref, **gets** ref → bytes (or streams). Phase 1 default implementation = DB (`AttachmentBlob`); Phase 2 = GCS object key (or equivalent) behind the **same** interface.
+- **Opaque `Book.source_file_ref`:** Only persisted locator the domain uses; **`BookPdfStorage`** (name indicative) **puts** bytes → ref, **gets** ref → bytes (or streams). **Non-`prod`** Spring profiles use DB (`AttachmentBlob`); **`prod`** uses GCS object key only — **same** interface, **no** DB fallback in production.
 - **Download contract:** Authenticated **`GET`** on a **documented** path (e.g. `/api/notebooks/{notebook}/book/file`) that streams PDF with correct headers; browser and CLI both rely on **same** contract. Phase 2 may stream **from GCS server-side** first (keeps cookie/session model identical to Phase 1); redirects/signed URLs stay an optional later optimization **without** changing the path if desired.
 
 **Explicitly not in this meta-plan:** pdf.js, drawer, range sync (Phase 3+ of the parent doc).
+
+**Book PDF storage — testing split:**
+
+- **E2E** (book reading / attach / download scenarios, including SP-B2) runs **only** against **DB** `BookPdfStorage`. CI and local SUT use **non-`prod`** Spring profiles, so Cypress never asserts behavior against real GCS.
+- **GCS** `BookPdfStorage` is covered by **unit tests** only (e.g. mocked `com.google.cloud.storage.Storage` in [`GcsBookPdfStorageTest`](backend/src/test/java/com/odde/doughnut/services/book/GcsBookPdfStorageTest.java)); **no** Gherkin / Cypress variant for GCS.
 
 ---
 
@@ -64,29 +69,34 @@ Each row is a **merge gate**: backend verify, relevant frontend/CLI tests, and *
 
 ### SP-B2 — E2E: CLI attach + browser download
 
-- **Outcome (user-visible E2E):** New Cucumber scenario: attach fixture PDF via CLI → open notebook → Read → **Download** → assert PDF (magic bytes or fixture comparison) via **intercept**, **`cy.request`** with session, or reliable downloads-folder pattern — pick one style and **reuse** patterns from [e2e_test](e2e_test) (e.g. obsidian/audio lessons).
+- **Outcome (user-visible E2E):** New Cucumber scenario: attach fixture PDF via CLI → open notebook → Read → **Download** → assert PDF (magic bytes or fixture comparison) via **intercept**, **`cy.request`** with session, or reliable downloads-folder pattern — pick one style and **reuse** patterns from [e2e_test](e2e_test) (e.g. obsidian/audio lessons). **Storage:** scenario assumes **DB** `BookPdfStorage` (non-`prod` profile); **do not** run this E2E against GCS.
 - **Tests:** Single focused feature file/spec run in CI for this change set.
 - **Deliverable cleanliness:** Page object methods colocated; step definitions stay thin.
 
-### SP-C1 — GCS `BookPdfStorage` implementation (not default in dev)
+### SP-C1 — GCS `BookPdfStorage` implementation (prod only)
 
-**Done.** [`GcsBookPdfStorage`](backend/src/main/java/com/odde/doughnut/services/book/GcsBookPdfStorage.java), [`BookPdfStorageConfiguration`](backend/src/main/java/com/odde/doughnut/configs/BookPdfStorageConfiguration.java) (`@ConditionalOnProperty` on `doughnut.book-pdf.gcs.bucket`); [`DbBookPdfStorage`](backend/src/main/java/com/odde/doughnut/services/book/DbBookPdfStorage.java) registered via `@ConditionalOnMissingBean`; commented property example in [`application.yml`](backend/src/main/resources/application.yml); [`GcsBookPdfStorageTest`](backend/src/test/java/com/odde/doughnut/services/book/GcsBookPdfStorageTest.java).
+**Done.** [`GcsBookPdfStorage`](backend/src/main/java/com/odde/doughnut/services/book/GcsBookPdfStorage.java), [`BookPdfStorageConfiguration`](backend/src/main/java/com/odde/doughnut/configs/BookPdfStorageConfiguration.java) — **`@Profile("prod")`** for GCS `Storage` + `BookPdfStorage`; **`@Profile("!prod")`** for [`DbBookPdfStorage`](backend/src/main/java/com/odde/doughnut/services/book/DbBookPdfStorage.java) (no property-based fallback). Prod requires **`doughnut.book-pdf.gcs.bucket`**. Note in [`application.yml`](backend/src/main/resources/application.yml); [`GcsBookPdfStorageTest`](backend/src/test/java/com/odde/doughnut/services/book/GcsBookPdfStorageTest.java).
 
-- **Outcome (integrator-visible in configured env):** Second implementation of **`BookPdfStorage`** using GCP **Storage** client: **put** uploads object, **get** reads bytes (or streams). Activated only when **explicit** config/profile says so (e.g. bucket name + credentials). **Default** local/test profile remains DB implementation from SP-A2.
-- **Tests:** **Black-box** tests against the GCS adapter with **mocked** `Storage` (or fakes) — assert correct bucket/blob id derivation from `source_file_ref` **without** coupling tests to private helpers; **no** real network in unit tests.
-- **Deliverable cleanliness:** If the bean is `@ConditionalOnProperty`, document required properties; **no** unreachable GCS code paths.
+- **Outcome (integrator-visible):** Second implementation of **`BookPdfStorage`** using GCP **Storage** client: **put** uploads object, **get** reads bytes. **`prod`** profile **only** — uses GCS; **all other profiles** use DB from SP-A2. **No** DB storage bean in production.
+- **Tests:** **Black-box** unit tests with **mocked** `Storage` — **no** real network; **no** E2E against GCS (see testing split above).
+- **Deliverable cleanliness:** Required prod properties documented; **no** unreachable GCS code paths.
+
+### SP-C1b — GCP bucket `books` + prod config (operator)
+
+- **Outcome (operator-visible):** Use **`gcloud`** to create a GCS bucket named **`books`** in the target GCP project (document the exact command, including region / uniform bucket-level access if required by org policy). Update **production** configuration so **`doughnut.book-pdf.gcs.bucket`** is **`books`** (and **`object-prefix`** only if the team standardizes on one).
+- **Tests:** None required for this sub-phase (infra / manual); backend tests and E2E remain on **non-`prod`** profiles (DB storage).
+- **Deliverable cleanliness:** Bucket name **`books`** matches deployed config; single source of truth for the name in ops docs / this file.
 
 ### SP-C2 — Wire profile selection + integration proof
 
-- **Outcome (operator-visible):** `application-*.yml` (or equivalent) documents **local = DB**, **prod = GCS**. One **integration-style** test: Spring context with **test** properties selecting GCS bean + mock `Storage` **or** Testcontainers/fake GCS **if** the repo already standardizes on one — **choose the smallest** approach that proves wiring (constructor injection, `BookService` uses interface only).
+- **Outcome (operator-visible):** `application-*.yml` (or deployment env) documents **`prod` = GCS** (bucket required) and **non-`prod` = DB**. One **integration-style** test: Spring context with **`prod`** profile **or** test-only `@TestConfiguration` that loads the GCS beans with **mock** `Storage` — **smallest** approach that proves `BookService` receives `BookPdfStorage` and prod wiring does not pull in `DbBookPdfStorage`.
 - **Tests:** That integration test + full **backend:verify** green.
 - **Deliverable cleanliness:** No duplicate storage selection logic in multiple packages.
 
-### SP-C3 — CI / E2E against GCS (or emulator) — same Gherkin intent
+### SP-C3 — Not planned (E2E vs GCS)
 
-- **Outcome (release confidence):** Same **user journey** as SP-B2 runs in CI **with** GCS-backed storage: **dedicated test bucket**, **emulator**, or **mocked** backend boundary — **document the chosen approach** in this file’s “CI notes” subsection (update when implemented).
-- **Tests:** Either tag an E2E variant (e.g. `@gcsBookStorage`) or a **single** pipeline job with env vars; **avoid** running full suite twice on every PR unless the team agrees.
-- **Deliverable cleanliness:** Remove interim skips; document how developers run locally.
+- **Superseded by testing split (top of this doc):** Book-reading **E2E** stays **DB-only**. **GCS** remains **unit-tested** only. **No** second Cypress job, emulator job, or `@gcsBookStorage` tag for book PDF storage unless the team explicitly reopens this later.
+- **CI notes:** See **CI notes** below — **contract + unit tests for GCS; E2E for attach/download on DB**.
 
 ### SP-D1 — Hardening and parent-doc alignment
 
@@ -96,10 +106,10 @@ Each row is a **merge gate**: backend verify, relevant frontend/CLI tests, and *
 
 ---
 
-## CI notes (fill in when SP-C3 is executed)
+## CI notes
 
-- **Chosen strategy:** _TBD — test bucket vs emulator vs contract tests only._
-- **Required secrets / env:** _TBD._
+- **Chosen strategy:** **GCS:** mocked-`Storage` unit tests only. **Book attach/download E2E:** **DB** storage (non-`prod` profile). **No** CI job runs book-reading Gherkin against real GCS.
+- **Prod / GCP:** Bucket **`books`** and `doughnut.book-pdf.gcs.bucket` alignment — see **SP-C1b**; ADC or workload identity as required by deploy environment.
 
 ---
 
@@ -116,4 +126,4 @@ After **each** SP-A* / SP-B* / SP-C* / SP-D*:
 
 ## If you must pause mid-stream
 
-Prefer finishing through **SP-A5** before any deploy so attach contract is **singular**. Prefer finishing **SP-B2** before starting GCS so the **E2E** baseline exists for comparison on GCS.
+Prefer finishing through **SP-A5** before any deploy so attach contract is **singular**. Prefer finishing **SP-B2** before hardening GCS so the **E2E** baseline exists on **DB** storage. Complete **SP-C1b** (bucket **`books`** + prod config) before relying on attach/download in **prod**.
