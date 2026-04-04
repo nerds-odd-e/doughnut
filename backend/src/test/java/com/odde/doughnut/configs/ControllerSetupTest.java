@@ -14,6 +14,7 @@ import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.FailureReportRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
+import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -32,6 +33,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.server.ResponseStatusException;
 
 @SpringBootTest
@@ -65,6 +68,17 @@ public class ControllerSetupTest {
         () ->
             controllerSetup.handleSystemException(
                 request, new ResponseStatusException(HttpStatus.UNAUTHORIZED, "xx")));
+    assertThat(failureReportRepository.count(), equalTo(count));
+  }
+
+  @Test
+  void shouldNotRecordApiException() {
+    long count = failureReportRepository.count();
+    assertThrows(
+        ApiException.class,
+        () ->
+            controllerSetup.handleSystemException(
+                request, new ApiException("x", ApiError.ErrorType.BINDING_ERROR, "client error")));
     assertThat(failureReportRepository.count(), equalTo(count));
   }
 
@@ -139,6 +153,27 @@ public class ControllerSetupTest {
     assertNotNull(body);
     assertThat(body.getErrors().keySet(), contains("_originalMessage"));
     assertThat(body.getErrorType(), equalTo(ApiError.ErrorType.OPENAI_UNAUTHORIZED));
+  }
+
+  @Test
+  void returnsPayloadTooLargeForMaxUploadSizeExceeded() {
+    ResponseEntity<ApiError> res =
+        controllerSetup.handleMultipartException(new MaxUploadSizeExceededException(1L));
+    assertEquals(HttpStatus.PAYLOAD_TOO_LARGE, res.getStatusCode());
+    ApiError body = res.getBody();
+    assertNotNull(body);
+    assertThat(body.getErrorType(), equalTo(ApiError.ErrorType.MULTIPART_SIZE_EXCEEDED));
+    assertThat(body.getMessage(), containsString("10 MB"));
+  }
+
+  @Test
+  void returnsBadRequestApiErrorForOtherMultipartFailures() {
+    ResponseEntity<ApiError> res =
+        controllerSetup.handleMultipartException(new MultipartException("boundary missing"));
+    assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
+    ApiError body = res.getBody();
+    assertNotNull(body);
+    assertThat(body.getErrorType(), equalTo(ApiError.ErrorType.MULTIPART_ERROR));
   }
 
   @Test

@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 
 @ControllerAdvice
@@ -49,8 +50,18 @@ public class ControllerSetup {
   }
 
   @ExceptionHandler(MultipartException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public void handleMultipartException() {}
+  public ResponseEntity<ApiError> handleMultipartException(MultipartException ex) {
+    if (ex instanceof MaxUploadSizeExceededException) {
+      return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+          .body(
+              new ApiError(
+                  "The PDF exceeds the maximum upload size (10 MB).",
+                  ApiError.ErrorType.MULTIPART_SIZE_EXCEEDED));
+    }
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body(
+            new ApiError("Could not read multipart request.", ApiError.ErrorType.MULTIPART_ERROR));
+  }
 
   @ExceptionHandler(OpenAiUnauthorizedException.class)
   public ResponseEntity<ApiError> handleOpenAIUnauthorizedException(
@@ -69,7 +80,10 @@ public class ControllerSetup {
       case OPENAI_TIMEOUT -> HttpStatus.GATEWAY_TIMEOUT;
       case OPENAI_SERVICE_ERROR, WIKIDATA_SERVICE_ERROR, ASSESSMENT_SERVICE_ERROR ->
           HttpStatus.BAD_GATEWAY;
-      case OPENAI_UNAUTHORIZED, QUESTION_ANSWER_ERROR, BINDING_ERROR -> HttpStatus.BAD_REQUEST;
+      case OPENAI_UNAUTHORIZED, QUESTION_ANSWER_ERROR, BINDING_ERROR, MULTIPART_ERROR ->
+          HttpStatus.BAD_REQUEST;
+      case MULTIPART_SIZE_EXCEEDED -> HttpStatus.PAYLOAD_TOO_LARGE;
+      case RESOURCE_CONFLICT -> HttpStatus.CONFLICT;
       case OPENAI_NOT_AVAILABLE -> HttpStatus.SERVICE_UNAVAILABLE;
     };
   }

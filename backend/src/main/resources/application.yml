@@ -50,7 +50,7 @@ spring:
   openai:
     token: ${OPENAI_API_TOKEN:}
 # Book PDF storage: any non-`prod` profile → DbBookStorage (AttachmentBlob). Profile `prod` → GcsBookStorage only
-# (`doughnut.book-pdf.gcs.bucket` required; optional `object-prefix`). Selection: BookStorageConfiguration + @Profile. See ongoing/book-reading-pdf-storage-subphases.md.
+# (`doughnut.book-pdf.gcs.bucket` required; optional `object-prefix`). Max PDF part size: `spring.servlet.multipart.max-file-size` (10MB). Ops: docs/gcp/prod_env.md §7.
 question:
   regeneration:
     times: 0

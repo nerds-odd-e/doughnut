@@ -1,10 +1,12 @@
 package com.odde.doughnut.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookViews;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.book.BookService;
@@ -24,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @SessionScope
@@ -60,7 +61,8 @@ class NotebookBooksController {
       throws UnexpectedNoAccessRightException, IOException {
     authorizationService.assertAuthorization(notebook);
     if (file == null || file.isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is required");
+      throw new ApiException(
+          "file is required", ApiError.ErrorType.BINDING_ERROR, "file is required");
     }
     Book body = bookService.attachBookWithPdf(notebook, metadata, file.getBytes());
     return ResponseEntity.status(HttpStatus.CREATED).body(body);

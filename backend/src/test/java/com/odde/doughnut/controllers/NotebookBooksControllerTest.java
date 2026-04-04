@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.BookRange;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.BookRepository;
+import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.book.BookReadingWireConstants;
 import com.odde.doughnut.services.book.BookStorage;
@@ -134,9 +135,13 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     void rejectsSecondAttachForSameNotebook() throws Exception {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       controller.attachBook(nb, attachRequest(node("First")), pdfFile(STUB_PDF_BYTES));
-      assertThrows(
-          ResponseStatusException.class,
-          () -> controller.attachBook(nb, attachRequest(node("Second")), pdfFile(STUB_PDF_BYTES)));
+      ApiException ex =
+          assertThrows(
+              ApiException.class,
+              () ->
+                  controller.attachBook(
+                      nb, attachRequest(node("Second")), pdfFile(STUB_PDF_BYTES)));
+      assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.RESOURCE_CONFLICT));
     }
 
     @Test
@@ -154,8 +159,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       AttachBookRequest req = attachRequest(node("A"));
       req.setFormat("epub");
       assertThrows(
-          ResponseStatusException.class,
-          () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
+          ApiException.class, () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
     }
 
     @Test
@@ -164,8 +168,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       AttachBookRequest req = attachRequest();
       req.getLayout().setRoots(new ArrayList<>());
       assertThrows(
-          ResponseStatusException.class,
-          () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
+          ApiException.class, () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
     }
 
     @Test
@@ -174,7 +177,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       AttachBookLayoutNodeRequest n = node("A");
       n.getStartAnchor().setAnchorFormat("unknown");
       assertThrows(
-          ResponseStatusException.class,
+          ApiException.class,
           () -> controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES)));
     }
 
@@ -187,7 +190,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       }
       AttachBookLayoutNodeRequest root = deep;
       assertThrows(
-          ResponseStatusException.class,
+          ApiException.class,
           () -> controller.attachBook(nb, attachRequest(root), pdfFile(STUB_PDF_BYTES)));
     }
 
@@ -197,8 +200,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       MultipartFile empty =
           new MockMultipartFile("file", "book.pdf", "application/pdf", new byte[0]);
       assertThrows(
-          ResponseStatusException.class,
-          () -> controller.attachBook(nb, attachRequest(node("A")), empty));
+          ApiException.class, () -> controller.attachBook(nb, attachRequest(node("A")), empty));
     }
   }
 

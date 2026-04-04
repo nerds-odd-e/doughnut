@@ -48,6 +48,8 @@ const authenticatedBackendCallFailureAdvice = {
     'The resource was not found. It may have been removed, or the link is wrong.',
   http409Conflict:
     'This action conflicts with the current state on the server. Contact support if you need help.',
+  http413PayloadTooLarge:
+    'The PDF exceeds the maximum upload size the server accepts. Try a smaller file or split the document.',
 } as const
 
 type SdkThrowable = unknown
@@ -72,6 +74,9 @@ function readableClientErrorDetail(cause: SdkThrowable): string | undefined {
 const backendApiErrorTypes = new Set([
   'OPENAI_UNAUTHORIZED',
   'BINDING_ERROR',
+  'RESOURCE_CONFLICT',
+  'MULTIPART_SIZE_EXCEEDED',
+  'MULTIPART_ERROR',
   'OPENAI_TIMEOUT',
   'OPENAI_SERVICE_ERROR',
   'OPENAI_NOT_AVAILABLE',
@@ -127,6 +132,9 @@ function userVisibleMessageForKnownApiErrorWithoutBodyMessage(
   const st = statusHint ?? inferredStatusForBackendErrorType(errorType)
   if (st >= 500) return messageForHttpServerError(st)
   if (st === 400) return authenticatedBackendCallFailureAdvice.http400BadRequest
+  if (st === 409) return authenticatedBackendCallFailureAdvice.http409Conflict
+  if (st === 413)
+    return authenticatedBackendCallFailureAdvice.http413PayloadTooLarge
   return authenticatedBackendCallFailureAdvice.serviceUnreachableOrUnclassifiedFailure
 }
 
@@ -185,6 +193,12 @@ function userVisibleMessageForSdkThrowable(cause: SdkThrowable): string {
       authenticatedBackendCallFailureAdvice.http409Conflict
     )
   }
+  if (status === 413) {
+    return (
+      readableClientErrorDetail(cause) ??
+      authenticatedBackendCallFailureAdvice.http413PayloadTooLarge
+    )
+  }
   if (status !== undefined && status >= 500) {
     return messageForHttpServerError(status)
   }
@@ -204,7 +218,12 @@ function inferredStatusForBackendErrorType(errorType: string): number {
     case 'OPENAI_UNAUTHORIZED':
     case 'QUESTION_ANSWER_ERROR':
     case 'BINDING_ERROR':
+    case 'MULTIPART_ERROR':
       return 400
+    case 'RESOURCE_CONFLICT':
+      return 409
+    case 'MULTIPART_SIZE_EXCEEDED':
+      return 413
     default:
       return 500
   }

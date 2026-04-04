@@ -16,24 +16,24 @@
 
 - **Same attach surface:** Extend **`POST /api/notebooks/{notebook}/attach-book`** (or keep one logical “attach book” operation) so the **CLI sends the PDF and outline together**; avoid a parallel “upload-only” product API unless a hard technical constraint appears.
 - **Observable tests:** Prefer Cypress + CLI/subprocess or HTTP assertions over tests that pin internal PDF or storage helpers, except for pure mapping (anchor ↔ scroll) if extracted as a small black-box unit.
-- **Storage rollout:** **Phase 1** uses **dev/test-local** object storage for attach/download E2E; **Phase 2** wires **GCP** (bucket) for production with the **same** attach/download contract (reuse the same E2E scenarios where feasible—emulator, fake GCS, or test bucket in CI). Backend abstraction: **`BookStorage`** with **`DbBookStorage`** (non-`prod`) and **`GcsBookStorage`** (`prod`); PDF is the first file format—execution detail in [book-reading-pdf-storage-subphases.md](book-reading-pdf-storage-subphases.md).
+- **Storage rollout:** **Phase 1** and **Phase 2** are **done** (multipart **`POST …/attach-book`**, **`GET …/book/file`**, **`BookStorage`** with **`DbBookStorage`** for non-`prod` and **`GcsBookStorage`** for **`prod`**, E2E on DB storage in CI, prod bucket and ops in [`docs/gcp/prod_env.md`](../docs/gcp/prod_env.md) §7). Book PDF attach limits and error bodies: **`spring.servlet.multipart`** (10MB) and **`ApiError`**; GCS orphan cleanup when a book row is removed is **not** implemented yet (documented in that section).
 - **At most one intentionally failing test** while driving a given phase (see planning rule).
 
 ---
 
-## Phase 1 — CLI attach uploads the PDF; frontend can obtain the file (dev / test storage)
+## Phase 1 — CLI attach uploads the PDF; frontend can obtain the file (dev / test storage) — **done**
 
 **User outcome:** After **`/attach`** from the CLI, the **PDF bytes** are stored server-side (local or test bucket), linked on the **Book** (`sourceFileRef` or agreed field), and the **browser** can **download or open** the file through a **documented API** (authenticated fetch, redirect, or signed URL — choose one approach in implementation). **E2E:** scenario aligned with *“attach in cli and download book from frontend”* for **dev/test** (no real GCP required).
 
-**Completion hint:** Extend attach contract (e.g. multipart) and persistence; add read/download path; wire frontend or minimal test-only UI to prove download; one focused E2E.
+**Shipped:** Multipart attach, **`DbBookStorage`**, **`GET …/book/file`**, book reading download control, Cypress book-reading scenario (DB storage in CI).
 
 ---
 
-## Phase 2 — Production object storage on GCP
+## Phase 2 — Production object storage on GCP — **done**
 
 **User outcome:** In **production configuration**, uploaded PDFs are stored in a **GCP bucket**; **download/view** still works from the frontend **with the same user-visible flow** as Phase 1. **E2E:** **same spec** as Phase 1 where feasible (e.g. CI uses emulator, fake GCS, or a dedicated test bucket—document the chosen approach).
 
-**Completion hint:** Introduce storage abstraction in Phase 1 if not already present; Phase 2 swaps or extends the backend to GCS—no second attach API.
+**Shipped:** **`GcsBookStorage`** under **`prod`** only, bucket + IAM in **`docs/gcp/prod_env.md`**, wiring test for prod **`BookStorage`** bean; CI book E2E stays on DB profile (no real GCS in CI).
 
 ---
 

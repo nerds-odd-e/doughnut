@@ -133,6 +133,10 @@ gcloud storage buckets add-iam-policy-binding gs://doughnut-book-pdf-carbon-synt
   --role="roles/storage.objectAdmin"
 ```
 
+**Upload limit:** Book attach uses Spring **`spring.servlet.multipart.max-file-size`** (10MB in [`application.yml`](../../backend/src/main/resources/application.yml)); oversize requests get HTTP **413** with an **`ApiError`** JSON body (same shape as other API errors).
+
+**GCS orphans:** Deleting or replacing a **Book** row does **not** remove the object in GCS; orphan object cleanup is **not** implemented yet.
+
 Operational note: creating a Cloud SQL VECTOR index may fail with
 "Vector index: not enough data to train" if the table has too few embeddings.
 Run index creation after sufficient data exists.

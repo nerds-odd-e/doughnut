@@ -3,6 +3,7 @@ package com.odde.doughnut.factoryServices;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.entities.repositories.FailureReportRepository;
+import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.GithubService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ public record FailureReportFactory(
 
   public void createUnlessAllowed() {
     if (exception instanceof ResponseStatusException) return;
+    if (exception instanceof ApiException) return;
     if (exception instanceof UnexpectedNoAccessRightException) return;
 
     FailureReport failureReport = createFailureReport();

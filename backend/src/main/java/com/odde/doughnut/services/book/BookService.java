@@ -4,6 +4,7 @@ import static com.odde.doughnut.services.book.BookReadingWireConstants.ANCHOR_FO
 import static com.odde.doughnut.services.book.BookReadingWireConstants.BOOK_FORMAT_PDF;
 import static com.odde.doughnut.services.book.BookReadingWireConstants.MAX_LAYOUT_DEPTH;
 
+import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.AttachBookAnchorRequest;
 import com.odde.doughnut.controllers.dto.AttachBookLayoutNodeRequest;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
@@ -12,6 +13,7 @@ import com.odde.doughnut.entities.BookAnchor;
 import com.odde.doughnut.entities.BookRange;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.BookRepository;
+import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
@@ -49,8 +51,10 @@ public class BookService {
 
   private void assertNotebookHasNoBook(Notebook notebook) {
     if (bookRepository.findByNotebook_Id(notebook.getId()).isPresent()) {
-      throw new ResponseStatusException(
-          HttpStatus.CONFLICT, "This notebook already has a book attached");
+      throw new ApiException(
+          "This notebook already has a book attached",
+          ApiError.ErrorType.RESOURCE_CONFLICT,
+          "This notebook already has a book attached");
     }
   }
 
@@ -103,14 +107,19 @@ public class BookService {
 
   private void validateAttachRequest(AttachBookRequest request) {
     if (request.getLayout() == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "layout is required");
+      throw new ApiException(
+          "layout is required", ApiError.ErrorType.BINDING_ERROR, "layout is required");
     }
     if (!BOOK_FORMAT_PDF.equals(request.getFormat())) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "format must be \"pdf\"");
+      throw new ApiException(
+          "format must be \"pdf\"", ApiError.ErrorType.BINDING_ERROR, "format must be \"pdf\"");
     }
     List<AttachBookLayoutNodeRequest> roots = request.getLayout().getRoots();
     if (roots == null || roots.isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "layout.roots must be non-empty");
+      throw new ApiException(
+          "layout.roots must be non-empty",
+          ApiError.ErrorType.BINDING_ERROR,
+          "layout.roots must be non-empty");
     }
     for (AttachBookLayoutNodeRequest root : roots) {
       validateLayoutNode(root, 1);
@@ -119,16 +128,23 @@ public class BookService {
 
   private void validateLayoutNode(AttachBookLayoutNodeRequest node, int depth) {
     if (depth > MAX_LAYOUT_DEPTH) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "layout exceeds maximum depth of " + MAX_LAYOUT_DEPTH);
+      throw new ApiException(
+          "layout exceeds maximum depth of " + MAX_LAYOUT_DEPTH,
+          ApiError.ErrorType.BINDING_ERROR,
+          "layout exceeds maximum depth of " + MAX_LAYOUT_DEPTH);
     }
     String title = trimToNull(node.getTitle());
     if (title == null || title.isEmpty()) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "each node title must be non-empty");
+      throw new ApiException(
+          "each node title must be non-empty",
+          ApiError.ErrorType.BINDING_ERROR,
+          "each node title must be non-empty");
     }
     if (title.length() > 512) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "title exceeds maximum length");
+      throw new ApiException(
+          "title exceeds maximum length",
+          ApiError.ErrorType.BINDING_ERROR,
+          "title exceeds maximum length");
     }
     validateAnchor(node.getStartAnchor(), "startAnchor");
     validateAnchor(node.getEndAnchor(), "endAnchor");
@@ -142,29 +158,38 @@ public class BookService {
 
   private void validateAnchor(AttachBookAnchorRequest anchor, String label) {
     if (anchor == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, label + " is required");
+      throw new ApiException(
+          label + " is required", ApiError.ErrorType.BINDING_ERROR, label + " is required");
     }
     String format = trimToNull(anchor.getAnchorFormat());
     if (format == null) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, label + ".anchorFormat is required");
+      throw new ApiException(
+          label + ".anchorFormat is required",
+          ApiError.ErrorType.BINDING_ERROR,
+          label + ".anchorFormat is required");
     }
     if (!ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1.equals(format)) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST,
+      throw new ApiException(
+          label + ".anchorFormat must be \"" + ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1 + "\"",
+          ApiError.ErrorType.BINDING_ERROR,
           label + ".anchorFormat must be \"" + ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1 + "\"");
     }
     String value = trimToNull(anchor.getValue());
     if (value == null || value.isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, label + ".value must be non-empty");
+      throw new ApiException(
+          label + ".value must be non-empty",
+          ApiError.ErrorType.BINDING_ERROR,
+          label + ".value must be non-empty");
     }
   }
 
   private void persistLayoutNode(
       Book book, BookRange parent, AttachBookLayoutNodeRequest node, int siblingIndex, int depth) {
     if (depth > MAX_LAYOUT_DEPTH) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "layout exceeds maximum depth of " + MAX_LAYOUT_DEPTH);
+      throw new ApiException(
+          "layout exceeds maximum depth of " + MAX_LAYOUT_DEPTH,
+          ApiError.ErrorType.BINDING_ERROR,
+          "layout exceeds maximum depth of " + MAX_LAYOUT_DEPTH);
     }
 
     BookAnchor start = new BookAnchor();
