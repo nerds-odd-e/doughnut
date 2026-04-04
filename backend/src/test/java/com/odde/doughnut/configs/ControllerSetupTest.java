@@ -163,7 +163,7 @@ public class ControllerSetupTest {
     ApiError body = res.getBody();
     assertNotNull(body);
     assertThat(body.getErrorType(), equalTo(ApiError.ErrorType.MULTIPART_SIZE_EXCEEDED));
-    assertThat(body.getMessage(), containsString("10 MB"));
+    assertThat(body.getMessage(), containsString("100 MB"));
   }
 
   @Test

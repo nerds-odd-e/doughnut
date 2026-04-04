@@ -21,8 +21,8 @@ spring:
           max-age: 365d
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: 100MB
+      max-request-size: 100MB
   datasource:
     url: ${db.url}
     username: ${db.user}
@@ -50,7 +50,7 @@ spring:
   openai:
     token: ${OPENAI_API_TOKEN:}
 # Book PDF storage: any non-`prod` profile → DbBookStorage (AttachmentBlob). Profile `prod` → GcsBookStorage only
-# (`doughnut.book-pdf.gcs.bucket` required; optional `object-prefix`). Max PDF part size: `spring.servlet.multipart.max-file-size` (10MB). Ops: docs/gcp/prod_env.md §7.
+# (`doughnut.book-pdf.gcs.bucket` required; optional `object-prefix`). Max PDF part size: `spring.servlet.multipart.max-file-size` (100MB). Ops: docs/gcp/prod_env.md §7.
 question:
   regeneration:
     times: 0
@@ -83,8 +83,8 @@ spring:
           max-age: 365d
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: 100MB
+      max-request-size: 100MB
   datasource:
     url: ${INPUT_DB_URL:jdbc:mysql://127.0.0.1:3309/doughnut_e2e_test}
     username: ${db.user}
@@ -154,8 +154,8 @@ spring:
           max-age: 365d
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: 100MB
+      max-request-size: 100MB
   datasource:
     url: jdbc:mysql://db-server:3306/doughnut
     username: doughnut
@@ -236,8 +236,8 @@ spring:
           max-age: 365d
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: 100MB
+      max-request-size: 100MB
   datasource:
     url: ${db.url}
     username: ${db.user}

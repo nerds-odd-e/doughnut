@@ -7,11 +7,11 @@ describe('withBackendClient error messages', () => {
       withBackendClient('t', async () => {
         throw {
           status: 413,
-          message: 'The PDF exceeds the maximum upload size (10 MB).',
+          message: 'The PDF exceeds the maximum upload size (100 MB).',
           errorType: 'MULTIPART_SIZE_EXCEEDED',
         }
       })
-    ).rejects.toThrow('The PDF exceeds the maximum upload size (10 MB).')
+    ).rejects.toThrow('The PDF exceeds the maximum upload size (100 MB).')
   })
 
   test('falls back for HTTP 413 without message', async () => {

@@ -55,7 +55,7 @@ public class ControllerSetup {
       return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
           .body(
               new ApiError(
-                  "The PDF exceeds the maximum upload size (10 MB).",
+                  "The PDF exceeds the maximum upload size (100 MB).",
                   ApiError.ErrorType.MULTIPART_SIZE_EXCEEDED));
     }
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
