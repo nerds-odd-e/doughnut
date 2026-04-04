@@ -11,8 +11,9 @@ When(
       .useNotebook(notebookTitle)
       .then((ctx) => ctx.attachPdfBook(fixtureFilename))
       .then((ctx) => {
-        ctx.pastCliAssistantMessages().expectContains('Book part A')
-        ctx.pastCliAssistantMessages().expectContains('Book part A.1')
+        ctx.pastCliAssistantMessages().expectContains('Attached "top-maths"')
+        ctx.pastCliAssistantMessages().expectContains('Stub Part A')
+        ctx.pastCliAssistantMessages().expectContains('Stub Section One')
       })
   }
 )

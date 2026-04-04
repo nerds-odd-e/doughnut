@@ -21,7 +21,7 @@ import { SlashCommandShellHost } from '../slashCommandShellHost.js'
 import type { SlashCommandShellRunSuccessContext } from '../useSlashCommandShellLiveColumnHandlers.js'
 import {
   leaveNotebookStageSlashCommand,
-  notebookStageSlashCommands,
+  notebookStageSlashCommandsFor,
 } from './notebookStageSlashCommands.js'
 import { UseNotebookPickerStage } from './useNotebookPickerStage.js'
 
@@ -60,7 +60,7 @@ function UseNotebookActiveShell({
       <Text>Active notebook: {notebook.title}</Text>
       <SlashCommandShellHost
         onRunSuccess={onRunSuccess}
-        slashCommands={notebookStageSlashCommands}
+        slashCommands={notebookStageSlashCommandsFor(notebook)}
         placeholder={STAGE_PLACEHOLDER}
         showMainPrompt
         commitPlainLine={commitNotebookStagePlainLine}

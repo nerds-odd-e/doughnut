@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process'
 import { constants as fsConstants, existsSync } from 'node:fs'
 import { access, mkdtemp, rm } from 'node:fs/promises'
+import type { AttachBookLayoutRequestFull } from 'doughnut-api'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 
@@ -11,6 +12,8 @@ export type MineruOutlineOk = {
   outline: string
   source: string
   note?: string
+  /** Present when stdout JSON includes a valid attach-book `layout` (optional for `/read`). */
+  layout?: AttachBookLayoutRequestFull
 }
 
 export type MineruOutlineErr = {
@@ -114,6 +117,74 @@ function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null && !Array.isArray(v)
 }
 
+function validateAnchor(a: unknown, label: string): string | null {
+  if (!isRecord(a)) {
+    return `${label} must be an object`
+  }
+  if (typeof a.anchorFormat !== 'string' || a.anchorFormat.trim() === '') {
+    return `${label}.anchorFormat is required`
+  }
+  if (typeof a.value !== 'string') {
+    return `${label}.value is required`
+  }
+  return null
+}
+
+function validateLayoutNode(node: unknown): string | null {
+  if (!isRecord(node)) {
+    return 'each layout node must be an object'
+  }
+  if (typeof node.title !== 'string' || node.title.trim() === '') {
+    return 'each layout node needs a non-empty title'
+  }
+  const startErr = validateAnchor(node.startAnchor, 'startAnchor')
+  if (startErr !== null) {
+    return startErr
+  }
+  const endErr = validateAnchor(node.endAnchor, 'endAnchor')
+  if (endErr !== null) {
+    return endErr
+  }
+  if (node.children !== undefined) {
+    if (!Array.isArray(node.children)) {
+      return 'layout node children must be an array'
+    }
+    for (const child of node.children) {
+      const err = validateLayoutNode(child)
+      if (err !== null) {
+        return err
+      }
+    }
+  }
+  return null
+}
+
+function parseLayoutFromStdoutJson(
+  raw: Record<string, unknown>
+):
+  | { layout: AttachBookLayoutRequestFull }
+  | { error: string }
+  | { omit: true } {
+  if (!('layout' in raw)) {
+    return { omit: true }
+  }
+  const layoutRaw = raw.layout
+  if (!isRecord(layoutRaw)) {
+    return { error: 'layout must be an object' }
+  }
+  const roots = layoutRaw.roots
+  if (!Array.isArray(roots) || roots.length === 0) {
+    return { error: 'layout.roots must be a non-empty array' }
+  }
+  for (const root of roots) {
+    const err = validateLayoutNode(root)
+    if (err !== null) {
+      return { error: err }
+    }
+  }
+  return { layout: layoutRaw as AttachBookLayoutRequestFull }
+}
+
 function toMineruResult(raw: unknown): MineruOutlineResult | null {
   if (!isRecord(raw)) {
     return null
@@ -122,9 +193,16 @@ function toMineruResult(raw: unknown): MineruOutlineResult | null {
     const outline = typeof raw.outline === 'string' ? raw.outline.trim() : ''
     const source = typeof raw.source === 'string' ? raw.source : ''
     const note = typeof raw.note === 'string' ? raw.note : undefined
+    const layoutParsed = parseLayoutFromStdoutJson(raw)
+    if ('error' in layoutParsed) {
+      return { ok: false, error: layoutParsed.error }
+    }
     const out: MineruOutlineOk = { ok: true, outline, source }
     if (note !== undefined) {
       out.note = note
+    }
+    if ('layout' in layoutParsed) {
+      out.layout = layoutParsed.layout
     }
     return out
   }

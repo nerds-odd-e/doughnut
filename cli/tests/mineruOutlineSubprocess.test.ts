@@ -86,6 +86,82 @@ describe('runMineruOutlineSubprocess', () => {
     )
   })
 
+  test('returns layout when subprocess JSON includes valid layout', async () => {
+    const layout = {
+      roots: [
+        {
+          title: 'Root A',
+          startAnchor: { anchorFormat: 'pdf.mineru_outline_v1', value: '{}' },
+          endAnchor: { anchorFormat: 'pdf.mineru_outline_v1', value: '{}' },
+          children: [
+            {
+              title: 'Child 1',
+              startAnchor: {
+                anchorFormat: 'pdf.mineru_outline_v1',
+                value: '{}',
+              },
+              endAnchor: { anchorFormat: 'pdf.mineru_outline_v1', value: '{}' },
+            },
+          ],
+        },
+      ],
+    }
+    fakeChild((child) => {
+      setImmediate(() => {
+        child.stdout!.end(
+          JSON.stringify({
+            ok: true,
+            outline: 'x',
+            source: 'stub',
+            layout,
+          })
+        )
+        child.stderr!.end('')
+        child.emit('close', 0, null)
+      })
+    })
+
+    const result = await runMineruOutlineSubprocess({
+      bookPath: epubPath,
+      cwd: workDir,
+    })
+
+    expect(result).toEqual({
+      ok: true,
+      outline: 'x',
+      source: 'stub',
+      layout,
+    })
+  })
+
+  test('fails when layout.roots is empty', async () => {
+    fakeChild((child) => {
+      setImmediate(() => {
+        child.stdout!.end(
+          JSON.stringify({
+            ok: true,
+            outline: 'x',
+            source: 'y',
+            layout: { roots: [] },
+          })
+        )
+        child.stderr!.end('')
+        child.emit('close', 0, null)
+      })
+    })
+
+    const result = await runMineruOutlineSubprocess({
+      bookPath: epubPath,
+      cwd: workDir,
+    })
+
+    expect(result).toEqual({
+      ok: false,
+      error: 'layout.roots must be a non-empty array',
+      exitCode: 0,
+    })
+  })
+
   test('passes temp --output-dir for PDF', async () => {
     fakeChild((child) => {
       setImmediate(() => {
