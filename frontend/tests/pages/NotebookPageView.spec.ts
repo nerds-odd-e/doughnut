@@ -1,12 +1,18 @@
 import type { Notebook } from "@generated/doughnut-backend-api"
+import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import NotebookPageView from "@/pages/NotebookPageView.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
-import { beforeEach, describe, it, expect } from "vitest"
+import helper, { mockSdkService, wrapSdkError } from "@tests/helpers"
+import { beforeEach, describe, it, expect, vi } from "vitest"
 
 describe("NotebookPageView.spec", () => {
   beforeEach(() => {
     mockSdkService("getApprovalForNotebook", { approval: undefined })
+    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+      wrapSdkError("Not found") as Awaited<
+        ReturnType<typeof NotebookBooksController.getBook>
+      >
+    )
   })
 
   const notebook: Notebook = {
