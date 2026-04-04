@@ -32,7 +32,10 @@ import {
   navigateToMessageCenter,
 } from './pageObjects/messageCenterPage'
 import { navigateToMyCircles } from './pageObjects/myCirclesPage'
-import { navigateToNotebooksPage } from './pageObjects/myNotebooksPage'
+import {
+  navigateToNotebookPage,
+  navigateToNotebooksPage,
+} from './pageObjects/myNotebooksPage'
 import { notebookCard } from './pageObjects/notebookCard'
 import { assumeNotePage } from './pageObjects/notePage'
 import { noteSidebar } from './pageObjects/noteSidebar'
@@ -79,6 +82,7 @@ const start = {
   notebookCard,
   noteSidebar,
   recall,
+  navigateToNotebookPage,
   navigateToNotebooksPage,
 
   // === Services & Utilities ===

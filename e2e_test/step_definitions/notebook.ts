@@ -44,28 +44,18 @@ Then(
 )
 
 When('I change notebook {string} to skip recall', (noteTopology: string) => {
-  start
-    .navigateToNotebooksPage()
-    .notebookCard(noteTopology)
-    .openNotebookPage()
-    .skipMemoryTracking()
+  start.navigateToNotebookPage(noteTopology).skipMemoryTracking()
 })
 
 When('I request for an approval for notebook {string}', (notebook: string) => {
-  start
-    .navigateToNotebooksPage()
-    .notebookCard(notebook)
-    .openNotebookPage()
-    .requestForNotebookApproval()
+  start.navigateToNotebookPage(notebook).requestForNotebookApproval()
 })
 
 When(
   'the approval for the notebook {string} is {string}',
   (noteTopology: string, status: string) => {
     start
-      .navigateToNotebooksPage()
-      .notebookCard(noteTopology)
-      .openNotebookPage()
+      .navigateToNotebookPage(noteTopology)
       .expectNotebookApprovalStatus(status)
   }
 )
@@ -74,9 +64,7 @@ Then(
   'I should see the status {string} of the approval for notebook {string}',
   (status: string, noteTopology: string) => {
     start
-      .navigateToNotebooksPage()
-      .notebookCard(noteTopology)
-      .openNotebookPage()
+      .navigateToNotebookPage(noteTopology)
       .expectNotebookApprovalStatus(status)
   }
 )
@@ -89,9 +77,7 @@ Given(
   'I set the number of questions per assessment of the notebook {string} to {int}',
   (notebook: string, numberOfQuestion: number) => {
     start
-      .navigateToNotebooksPage()
-      .notebookCard(notebook)
-      .openNotebookPage()
+      .navigateToNotebookPage(notebook)
       .updateAssessmentSettings({ numberOfQuestion })
   }
 )
@@ -100,9 +86,7 @@ Given(
   'the number of questions in assessment for notebook {string} is {int}',
   (notebook: string, numberOfQuestion: number) => {
     start
-      .navigateToNotebooksPage()
-      .notebookCard(notebook)
-      .openNotebookPage()
+      .navigateToNotebookPage(notebook)
       .updateAssessmentSettings({ numberOfQuestion })
   }
 )
@@ -125,11 +109,7 @@ When(
 Given('following notebooks have pending approval:', (notebooks: DataTable) => {
   notebooks.raw().forEach((notebookRaw: string[]) => {
     const notebookName = notebookRaw[0]!
-    start
-      .navigateToNotebooksPage()
-      .notebookCard(notebookName)
-      .openNotebookPage()
-      .requestForNotebookApproval()
+    start.navigateToNotebookPage(notebookName).requestForNotebookApproval()
   })
 })
 

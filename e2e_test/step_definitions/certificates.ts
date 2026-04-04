@@ -11,9 +11,7 @@ Then(
   'I should see the default expiration of {string} note to be 1 year',
   (noteTopology: string) => {
     start
-      .navigateToNotebooksPage()
-      .notebookCard(noteTopology)
-      .openNotebookPage()
+      .navigateToNotebookPage(noteTopology)
       .assertNoteHasSettingWithValue('Certificate Expiry', '1y')
   }
 )
@@ -22,14 +20,10 @@ Given(
   'I set the certificate expiry of the notebook {string} to {string}',
   (notebook: string, period: string) => {
     start
-      .navigateToNotebooksPage()
-      .notebookCard(notebook)
-      .openNotebookPage()
+      .navigateToNotebookPage(notebook)
       .updateAssessmentSettings({ certificateExpiry: period })
     start
-      .navigateToNotebooksPage()
-      .notebookCard(notebook)
-      .openNotebookPage()
+      .navigateToNotebookPage(notebook)
       .assertNoteHasSettingWithValue('Certificate Expiry', period)
   }
 )

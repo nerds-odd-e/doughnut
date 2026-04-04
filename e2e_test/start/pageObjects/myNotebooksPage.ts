@@ -51,3 +51,6 @@ export const navigateToNotebooksPage = () => {
   router().push('/d/notebooks', 'notebooks', {})
   return myNotebooksPage()
 }
+
+export const navigateToNotebookPage = (notebookTitle: string) =>
+  navigateToNotebooksPage().notebookCard(notebookTitle).openNotebookPage()
