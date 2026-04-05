@@ -1,6 +1,6 @@
+import BookReadingPage from "@/pages/BookReadingPage.vue"
 import type { BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
-import BookReadingPage from "@/pages/BookReadingPage.vue"
 import helper, { wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import createFetchMock from "vitest-fetch-mock"
@@ -56,9 +56,7 @@ describe("BookReadingPage", () => {
     expect(err.exists()).toBe(true)
     expect(err.text()).toBe("Could not load the book file.")
     expect(wrapper.find(".daisy-loading-spinner").exists()).toBe(false)
-    expect(wrapper.find('[data-testid="pdf-first-page-canvas"]').exists()).toBe(
-      false
-    )
+    expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(false)
   })
 
   it("does not load PDF viewer when hasSourceFile is false", async () => {
@@ -80,9 +78,7 @@ describe("BookReadingPage", () => {
       .mount()
     await flushPromises()
 
-    expect(wrapper.find('[data-testid="pdf-first-page-canvas"]').exists()).toBe(
-      false
-    )
+    expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(false)
     expect(
       wrapper.find('[data-testid="book-reading-pdf-error"]').exists()
     ).toBe(false)
@@ -115,9 +111,7 @@ describe("BookReadingPage", () => {
     await flushPromises()
 
     expect(wrapper.find(".daisy-loading-spinner").exists()).toBe(true)
-    expect(wrapper.find('[data-testid="pdf-first-page-canvas"]').exists()).toBe(
-      false
-    )
+    expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(false)
 
     const copy = topMathsPdfBytes.slice(0)
     resolveFetch(
@@ -171,20 +165,13 @@ describe("BookReadingPage", () => {
       .withProps({ notebookId })
       .mount()
 
-    const deadline = Date.now() + 15_000
-    let canvas: HTMLCanvasElement | undefined
-    while (Date.now() < deadline) {
-      await flushPromises()
-      const el = wrapper.find('[data-testid="pdf-first-page-canvas"]')
-      if (el.exists()) {
-        canvas = el.element as HTMLCanvasElement
-        if (canvas.width > 0 && canvas.height > 0) break
-      }
-      await new Promise((r) => setTimeout(r, 50))
-    }
-
-    expect(canvas?.width).toBeGreaterThan(0)
-    expect(canvas?.height).toBeGreaterThan(0)
+    await vi.waitFor(
+      () =>
+        expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(
+          true
+        ),
+      { timeout: 15_000 }
+    )
   })
 
   it("shows error when PDF bytes are not valid", async () => {
@@ -223,8 +210,6 @@ describe("BookReadingPage", () => {
     expect(wrapper.find('[data-testid="book-reading-pdf-error"]').text()).toBe(
       "This file is not a valid PDF."
     )
-    expect(wrapper.find('[data-testid="pdf-first-page-canvas"]').exists()).toBe(
-      false
-    )
+    expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(false)
   })
 })

@@ -66,6 +66,7 @@ const config = defineConfig({
       "marked",
       "turndown-plugin-gfm",
       "pdfjs-dist",
+      "pdfjs-dist/web/pdf_viewer.mjs",
     ],
   },
   test: {

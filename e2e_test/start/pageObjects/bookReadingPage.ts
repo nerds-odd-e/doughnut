@@ -19,7 +19,8 @@ const bookReadingPage = () => ({
     return this
   },
   expectPdfBeginningVisible() {
-    cy.get('[data-testid="pdf-first-page-canvas"]')
+    cy.get('[data-testid="pdf-book-viewer"] .page canvas')
+      .first()
       .should(($canvas) => {
         const el = $canvas[0] as HTMLCanvasElement
         expect(el.width, 'PDF canvas should have width').to.be.greaterThan(0)

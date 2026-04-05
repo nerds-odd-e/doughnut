@@ -85,17 +85,22 @@
           </div>
         </aside>
         <main
-          class="daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-overflow-y-auto daisy-px-2 daisy-py-2 sm:daisy-px-4"
+          class="daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-relative"
         >
-          <ContentLoader v-if="pdfLoading" />
+          <div
+            v-if="pdfLoading"
+            class="daisy-px-2 daisy-py-2 sm:daisy-px-4"
+          >
+            <ContentLoader />
+          </div>
           <div
             v-else-if="pdfError"
-            class="daisy-alert daisy-alert-error daisy-mb-2"
+            class="daisy-alert daisy-alert-error daisy-mb-2 daisy-mx-2 daisy-mt-2"
             data-testid="book-reading-pdf-error"
           >
             {{ pdfError }}
           </div>
-          <PdfFirstPageCanvas
+          <PdfBookViewer
             v-else-if="bookPdfBytes"
             :pdf-bytes="bookPdfBytes"
             @load-error="onPdfLoadError"
@@ -109,7 +114,7 @@
 <script setup lang="ts">
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
-import PdfFirstPageCanvas from "@/components/book-reading/PdfFirstPageCanvas.vue"
+import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import type { BookFull, BookRangeFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, onBeforeUnmount, onMounted, ref } from "vue"
@@ -220,10 +225,6 @@ onBeforeUnmount(() => {
 }
 
 aside {
-  max-height: 100%;
-}
-
-main {
   max-height: 100%;
 }
 </style>

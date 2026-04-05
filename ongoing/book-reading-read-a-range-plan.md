@@ -41,7 +41,7 @@
 
 **User outcome:** On the book reading route, the user **sees the attached PDF rendered** in the **main content area** using **pdf.js**. **E2E:** attach via CLI → book page shows page 1; scenario asserts fixture page-1 marker text is recoverable from the rendered canvas (see sub-phases doc for the OCR-based check).
 
-**Shipped:** `PdfFirstPageCanvas` (pdf.js, page 1 → canvas), `BookReadingPage` fetch from **`GET …/book/file`** with loading and error UI, scenario step `And I should see the beginning of the PDF book "top-maths.pdf"`.
+**Shipped:** `PdfBookViewer` (pdf.js `PDFViewer`, all pages → scrollable canvas column), `BookReadingPage` fetch from **`GET …/book/file`** with loading and error UI, scenario step `And I should see the beginning of the PDF book "top-maths.pdf"`.
 
 **Completion hint:** Outline still lives in the main column next to the viewer until Phase 4 (drawer).
 
