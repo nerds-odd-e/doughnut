@@ -32,3 +32,10 @@ Feature: Book reading
     Given I attach book "top-maths.pdf" to the notebook "Top Maths" via the CLI
     When I open the book attached to notebook "Top Maths"
     Then jumping between outline rows on the same page should scroll the PDF to different positions
+
+  Scenario: Scrolling the PDF updates the viewport-current outline row
+    Given I attach book "top-maths.pdf" to the notebook "Top Maths" via the CLI
+    When I open the book attached to notebook "Top Maths"
+    And I scroll the PDF book reader to bring page 2 into primary view
+    Then I should see PDF page 2 marker "DOUGHNUT_E2E_BOOK_PAGE2" in the book reader
+    And the book outline row "Subtopic 2.2" should be viewport-current in the book reader

@@ -27,6 +27,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   loadError: [message: string]
+  viewportAnchorPage: [{ anchorPageIndexZeroBased: number }]
 }>()
 
 const containerRef = ref<HTMLDivElement | null>(null)
@@ -34,6 +35,17 @@ const viewerRef = ref<HTMLDivElement | null>(null)
 
 let pdfViewer: PDFViewer | null = null
 let currentLoadingTask: ReturnType<typeof getDocument> | null = null
+let onPageChangingForViewport: ((evt: { pageNumber: number }) => void) | null =
+  null
+let lastEmittedAnchorPageIndex: number | null = null
+
+function emitViewportAnchorIfChanged(anchorPageIndexZeroBased: number) {
+  if (lastEmittedAnchorPageIndex === anchorPageIndexZeroBased) {
+    return
+  }
+  lastEmittedAnchorPageIndex = anchorPageIndexZeroBased
+  emit("viewportAnchorPage", { anchorPageIndexZeroBased })
+}
 
 type PendingNav = {
   pageIndexZeroBased: number
@@ -103,10 +115,16 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
     currentLoadingTask = null
   }
   if (pdfViewer) {
+    if (onPageChangingForViewport) {
+      pdfViewer.eventBus.off("pagechanging", onPageChangingForViewport)
+      onPageChangingForViewport = null
+    }
     pdfViewer.setDocument(null as unknown as PDFDocumentProxy)
     pdfViewer = null
     pendingNavigation = null
   }
+
+  lastEmittedAnchorPageIndex = null
 
   const eventBus = new EventBus()
   const linkService = new PDFLinkService({ eventBus })
@@ -120,11 +138,17 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
   })
   linkService.setViewer(pdfViewer)
 
+  onPageChangingForViewport = (evt: { pageNumber: number }) => {
+    emitViewportAnchorIfChanged(evt.pageNumber - 1)
+  }
+  eventBus.on("pagechanging", onPageChangingForViewport)
+
   eventBus.on("pagesinit", () => {
     if (pdfViewer) {
       const containerWidth = container.clientWidth
       pdfViewer.currentScaleValue = containerWidth > 0 ? "page-width" : "1"
       flushPendingNavigation()
+      emitViewportAnchorIfChanged(pdfViewer.currentPageNumber - 1)
     }
   })
 
@@ -162,6 +186,10 @@ onBeforeUnmount(async () => {
     currentLoadingTask = null
   }
   if (pdfViewer) {
+    if (onPageChangingForViewport) {
+      pdfViewer.eventBus.off("pagechanging", onPageChangingForViewport)
+      onPageChangingForViewport = null
+    }
     pdfViewer.setDocument(null as unknown as PDFDocumentProxy)
     pdfViewer = null
   }

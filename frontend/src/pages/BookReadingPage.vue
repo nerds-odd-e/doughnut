@@ -79,7 +79,13 @@
               data-testid="book-outline-node"
               :data-outline-depth="node.depth"
               class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-w-full daisy-justify-start daisy-normal-case daisy-h-auto daisy-min-h-10 daisy-py-2 daisy-px-2 daisy-text-sm daisy-leading-snug daisy-font-normal"
-              :class="{ 'daisy-btn-active': node.id === selectedOutlineRangeId }"
+              :class="{
+                'daisy-btn-active': node.id === selectedOutlineRangeId,
+                'daisy-bg-base-300/50': node.id === viewportCurrentRangeId,
+              }"
+              :data-outline-current="
+                node.id === viewportCurrentRangeId ? 'true' : undefined
+              "
               :aria-current="
                 node.id === selectedOutlineRangeId ? 'location' : undefined
               "
@@ -111,6 +117,7 @@
             ref="pdfViewerRef"
             :pdf-bytes="bookPdfBytes"
             @load-error="onPdfLoadError"
+            @viewport-anchor-page="onViewportAnchorPage"
           />
         </main>
       </div>
@@ -126,6 +133,7 @@ import {
   ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1,
   parseMineruOutlineV1StartAnchor,
 } from "@/lib/book-reading/mineruOutlineV1PageIndex"
+import { viewportCurrentRangeIdFromAnchorPage } from "@/lib/book-reading/viewportCurrentRangeFromAnchorPage"
 import type {
   BookAnchorFull,
   BookFull,
@@ -206,6 +214,14 @@ function buildFlatOutline(ranges: BookRangeFull[]): OutlineNode[] {
 
 const flatOutline = ref<OutlineNode[]>([])
 const selectedOutlineRangeId = ref<number | null>(null)
+const viewportCurrentRangeId = ref<number | null>(null)
+
+function onViewportAnchorPage(payload: { anchorPageIndexZeroBased: number }) {
+  viewportCurrentRangeId.value = viewportCurrentRangeIdFromAnchorPage(
+    flatOutline.value,
+    payload.anchorPageIndexZeroBased
+  )
+}
 
 const pdfViewerRef = ref<{
   scrollToMineruOutlineV1Target: (target: {

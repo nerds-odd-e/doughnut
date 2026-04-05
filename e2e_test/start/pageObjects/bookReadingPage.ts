@@ -2,6 +2,19 @@ import { pageIsNotLoading } from '../pageBase'
 
 export type BookOutlineRow = { depth: number; title: string }
 
+function scrollableAncestorWithinBookReadingPage(viewerEl: HTMLElement) {
+  const pageRoot = viewerEl.closest('[data-testid="book-reading-page"]')
+  if (!pageRoot) throw new Error('book-reading-page not found')
+  let el: HTMLElement | null = viewerEl
+  while (el && pageRoot.contains(el)) {
+    if (el.scrollHeight > el.clientHeight + 1) {
+      return el
+    }
+    el = el.parentElement
+  }
+  return viewerEl
+}
+
 const bookReadingPage = () => {
   const outlineNodes = () =>
     cy
@@ -129,18 +142,10 @@ const bookReadingPage = () => {
       const minDeltaPx = 80
       const scrollTopOfPdfReadingScrollChain = () =>
         cy.get('[data-testid="pdf-book-viewer"]').then(($viewer) => {
-          const pageRoot = $viewer.closest(
-            '[data-testid="book-reading-page"]'
-          )[0]
-          if (!pageRoot) throw new Error('book-reading-page not found')
-          let el: HTMLElement | null = $viewer[0] as HTMLElement
-          while (el && pageRoot.contains(el)) {
-            if (el.scrollHeight > el.clientHeight + 1) {
-              return el.scrollTop
-            }
-            el = el.parentElement
-          }
-          return 0
+          const el = scrollableAncestorWithinBookReadingPage(
+            $viewer[0] as HTMLElement
+          )
+          return el.scrollTop
         })
       pageIsNotLoading()
       this.clickOutlineRowByTitle(bottomTitle)
@@ -154,6 +159,24 @@ const bookReadingPage = () => {
           ).to.be.at.least(minDeltaPx)
         })
       })
+      return this
+    },
+    scrollPdfBookReaderToBringPage2IntoPrimaryView() {
+      pageIsNotLoading()
+      cy.get(
+        '[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="2"]'
+      )
+        .first()
+        .scrollIntoView({ offset: { top: -100, left: 0 } })
+      return this
+    },
+    expectOutlineRowViewportCurrentByTitle(title: string) {
+      pageIsNotLoading()
+      const row = outlineNodes().contains(title)
+      row.should('have.attr', 'data-outline-current', 'true')
+      outlineNodes()
+        .filter('[data-outline-current="true"]')
+        .should('have.length', 1)
       return this
     },
   }

@@ -66,6 +66,14 @@ Then(
 )
 
 When(
+  'I scroll the PDF book reader to bring page 2 into primary view',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().scrollPdfBookReaderToBringPage2IntoPrimaryView()
+  }
+)
+
+When(
   'I choose the book outline row {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
@@ -86,6 +94,14 @@ Then(
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
     return bookReadingPage().expectOutlineRowSelectedByTitle(title)
+  }
+)
+
+Then(
+  'the book outline row {string} should be viewport-current in the book reader',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (title: string) => {
+    return bookReadingPage().expectOutlineRowViewportCurrentByTitle(title)
   }
 )
 
