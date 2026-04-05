@@ -252,11 +252,13 @@ const viewportCurrentAnchorDebouncer = createViewportCurrentAnchorDebouncer({
 function onViewportAnchorPage(payload: {
   anchorPageIndexZeroBased: number
   viewportTopYDown: number | null
+  pagesCount: number
 }) {
   const candidate = viewportCurrentAnchorIdFromAnchorPage(
     outlineRows.value.map((n) => n.startAnchor),
     payload.anchorPageIndexZeroBased,
-    payload.viewportTopYDown
+    payload.viewportTopYDown,
+    payload.pagesCount
   )
   viewportCurrentAnchorDebouncer.propose(candidate)
 }

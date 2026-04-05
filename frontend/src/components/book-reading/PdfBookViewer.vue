@@ -36,6 +36,7 @@ const emit = defineEmits<{
     {
       anchorPageIndexZeroBased: number
       viewportTopYDown: number | null
+      pagesCount: number
     },
   ]
 }>()
@@ -87,6 +88,7 @@ function emitViewportDescriptorIfChanged() {
   emit("viewportAnchorPage", {
     anchorPageIndexZeroBased: sample.anchorPageIndexZeroBased,
     viewportTopYDown: sample.viewportTopYDown,
+    pagesCount: pdfViewer.pagesCount,
   })
 }
 

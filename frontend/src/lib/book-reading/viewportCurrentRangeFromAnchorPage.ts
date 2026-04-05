@@ -10,7 +10,9 @@ import {
  * - `page_idx === anchorPageZeroBased` and (`viewportTopYDown === null` or `yStart ≤ viewportTopYDown`),
  * where `yStart` is the top edge of the optional mineru `bbox` (`y0`), or `0` if there is no bbox.
  *
- * Anchors without a parseable `pdf.mineru_outline_v1` value are skipped.
+ * Anchors without a parseable `pdf.mineru_outline_v1` value are skipped. When `pdfPageCount` is set,
+ * anchors whose `page_idx` is not in `[0, pdfPageCount)` are skipped, and `anchorPageZeroBased` must
+ * be in that range or the result is `null`.
  *
  * `viewportTopYDown` uses the same coordinate system as mineru bbox (origin top-left of the page, y down),
  * units as `pdfPage.getViewport({ scale: 1 })`. The PDF viewer passes a **single reference y** on the page
@@ -20,10 +22,19 @@ import {
 export function viewportCurrentAnchorIdFromAnchorPage(
   orderedPreorderStartAnchors: readonly BookAnchorFull[],
   anchorPageZeroBased: number,
-  viewportTopYDown: number | null = null
+  viewportTopYDown: number | null = null,
+  pdfPageCount: number | null = null
 ): number | null {
   if (!Number.isInteger(anchorPageZeroBased) || anchorPageZeroBased < 0) {
     return null
+  }
+  if (pdfPageCount != null) {
+    if (!Number.isInteger(pdfPageCount) || pdfPageCount <= 0) {
+      return null
+    }
+    if (anchorPageZeroBased >= pdfPageCount) {
+      return null
+    }
   }
   let best: number | null = null
   for (const anchor of orderedPreorderStartAnchors) {
@@ -33,6 +44,9 @@ export function viewportCurrentAnchorIdFromAnchorPage(
     const parsed = parseMineruOutlineV1StartAnchor(anchor.value)
     if (parsed === null) continue
     const { pageIndex: pageIdx, bbox } = parsed
+    if (pdfPageCount != null && pageIdx >= pdfPageCount) {
+      continue
+    }
     const yStart = bbox !== null ? bbox[1] : 0
     if (pageIdx < anchorPageZeroBased) {
       best = anchor.id

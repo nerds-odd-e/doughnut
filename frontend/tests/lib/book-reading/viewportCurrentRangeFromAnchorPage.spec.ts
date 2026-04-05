@@ -58,4 +58,47 @@ describe("viewportCurrentAnchorIdFromAnchorPage", () => {
     const list = makeMe.bookReadingTopMathsLikeAnchors()
     expect(viewportCurrentAnchorIdFromAnchorPage(list, 0, 0)).toBe(101)
   })
+
+  it("with pdfPageCount, skips anchors whose page_idx is beyond the document", () => {
+    const anchors = [
+      makeMe.aBookAnchor.mineruStart(0).id(1).please(),
+      makeMe.aBookAnchor.mineruStart(10).id(2).please(),
+    ]
+    expect(viewportCurrentAnchorIdFromAnchorPage(anchors, 1, null, 2)).toBe(1)
+  })
+
+  it("with pdfPageCount, returns null when every parseable anchor is beyond the document", () => {
+    const anchors = [makeMe.aBookAnchor.mineruStart(10).id(2).please()]
+    expect(viewportCurrentAnchorIdFromAnchorPage(anchors, 1, null, 2)).toBe(
+      null
+    )
+  })
+
+  it("with pdfPageCount, returns null when viewport page is out of range", () => {
+    const list = makeMe.bookReadingTopMathsLikeAnchors()
+    expect(viewportCurrentAnchorIdFromAnchorPage(list, 5, null, 3)).toBe(null)
+  })
+
+  it("with invalid pdfPageCount, returns null", () => {
+    const list = makeMe.bookReadingTopMathsLikeAnchors()
+    expect(viewportCurrentAnchorIdFromAnchorPage(list, 0, null, 0)).toBe(null)
+    expect(viewportCurrentAnchorIdFromAnchorPage(list, 0, null, 1.5)).toBe(null)
+  })
+
+  it("partial outline: only valid mineru anchors participate", () => {
+    const anchors = [
+      makeMe.aBookAnchor.anchorFormat("other").value("{}").id(1).please(),
+      makeMe.aBookAnchor.id(2).value("not-json").please(),
+      makeMe.aBookAnchor.mineruStart(0).id(77).please(),
+    ]
+    expect(viewportCurrentAnchorIdFromAnchorPage(anchors, 0)).toBe(77)
+  })
+
+  it("returns null when mineru values parse as JSON but fail mineru validation", () => {
+    const anchors = [
+      makeMe.aBookAnchor.value("{}").id(1).please(),
+      makeMe.aBookAnchor.value('{"page_idx":"1"}').id(2).please(),
+    ]
+    expect(viewportCurrentAnchorIdFromAnchorPage(anchors, 0)).toBe(null)
+  })
 })

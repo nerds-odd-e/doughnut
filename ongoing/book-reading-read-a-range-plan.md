@@ -71,7 +71,7 @@
 
 **User outcome:** As the user **scrolls or changes page** in the PDF, the **layout** shows which **BookRange** is **current** (highlight / active row). **E2E:** scroll to a region tied to a different range → highlight moves (or equivalent DOM assertion).
 
-**Completion hint:** Two-way sync completes here; keep “current range” logic cohesive (single place to compute active range from viewport).
+**Completion hint:** Two-way sync completes here; keep “current range” logic cohesive (single place to compute active range from viewport). Edge cases for invalid anchors and document bounds: [`ongoing/book-reading-phase-6-pdf-to-outline-sync-subphases.md`](book-reading-phase-6-pdf-to-outline-sync-subphases.md) sub-phase **6.8**.
 
 ---
 
