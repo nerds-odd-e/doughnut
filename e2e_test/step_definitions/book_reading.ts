@@ -27,6 +27,7 @@ When(
   (fixtureFilename: string, notebookTitle: string) => {
     const stem = pdfFixtureStem(fixtureFilename)
     cy.wrap(stem).as('attachedBookPdfStem')
+    cy.wrap(notebookTitle).as('attachedBookNotebookTitle')
     return cli
       .useNotebook(notebookTitle)
       .then((ctx) => ctx.attachPdfBook(fixtureFilename))
@@ -64,7 +65,16 @@ When(
   'I choose the book outline row {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
-    return bookReadingPage().clickOutlineRowByTitle(title)
+    return cy.get<string>('@attachedBookPdfStem').then((stem) => {
+      return cy
+        .get<string>('@attachedBookNotebookTitle')
+        .then((notebookTitle) => {
+          start
+            .navigateToNotebookPage(notebookTitle)
+            .readBook(stem)
+            .clickOutlineRowByTitle(title)
+        })
+    })
   }
 )
 
