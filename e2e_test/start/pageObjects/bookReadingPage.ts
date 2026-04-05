@@ -40,6 +40,36 @@ const bookReadingPage = () => {
     return cy.task('ocrCanvasImage', base64, { timeout: 60000 })
   }
 
+  const expectCanvasOcrContains = (
+    canvas: Cypress.Chainable<JQuery<HTMLElement>>,
+    assertCanvas: (el: HTMLCanvasElement) => void,
+    ocrMessage: string,
+    substring: string
+  ) =>
+    canvas
+      .should(($canvas) => {
+        assertCanvas($canvas[0] as HTMLCanvasElement)
+      })
+      .then(ocrCanvasFromFirstElement)
+      .then((text) => {
+        expect(text as string, ocrMessage).to.contain(substring)
+      })
+
+  const assertJumpedPageCanvas = (el: HTMLCanvasElement) => {
+    const chromeGeometryTolerancePx = 2
+    const pageRoot = el.closest('[data-testid="book-reading-page"]')
+    const nav = pageRoot?.querySelector('nav.daisy-navbar')
+    if (!nav)
+      throw new Error('book-reading GlobalBar (nav.daisy-navbar) not found')
+    const navBottom = nav.getBoundingClientRect().bottom
+    const canvasTop = el.getBoundingClientRect().top
+    expect(
+      canvasTop,
+      'PDF page top should be at or below GlobalBar bottom after outline jump'
+    ).to.be.at.least(navBottom - chromeGeometryTolerancePx)
+    assertPdfCanvasHasDarkPixels(el)
+  }
+
   return {
     expectBookStructureRows(expected: BookOutlineRow[]) {
       pageIsNotLoading()
@@ -56,17 +86,12 @@ const bookReadingPage = () => {
       return this
     },
     expectPdfBeginningVisible() {
-      cy.get('[data-testid="pdf-book-viewer"] .page canvas')
-        .first()
-        .should(($canvas) => {
-          assertPdfCanvasHasDarkPixels($canvas[0] as HTMLCanvasElement)
-        })
-        .then(ocrCanvasFromFirstElement)
-        .then((text) => {
-          expect(text as string, 'OCR text from PDF page 1 canvas').to.contain(
-            'DOUGHNUT_E2E_BOOK_PAGE1'
-          )
-        })
+      expectCanvasOcrContains(
+        cy.get('[data-testid="pdf-book-viewer"] .page canvas').first(),
+        assertPdfCanvasHasDarkPixels,
+        'OCR text from PDF page 1 canvas',
+        'DOUGHNUT_E2E_BOOK_PAGE1'
+      )
       return this
     },
     clickOutlineRowByTitle(title: string) {
@@ -76,44 +101,24 @@ const bookReadingPage = () => {
     },
     expectOutlineRowSelectedByTitle(title: string) {
       pageIsNotLoading()
-      outlineNodes()
-        .contains(title)
-        .should('have.attr', 'aria-current', 'location')
+      const row = outlineNodes().contains(title)
+      row.should('have.attr', 'aria-current', 'location')
       outlineNodes()
         .filter('[aria-current="location"]')
         .should('have.length', 1)
       return this
     },
     expectPdfPageMarkerVisible(marker: string, pageNumber: number) {
-      const chromeGeometryTolerancePx = 2
-
-      cy.get(
-        `[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="${pageNumber}"] canvas`
+      expectCanvasOcrContains(
+        cy
+          .get(
+            `[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="${pageNumber}"] canvas`
+          )
+          .first(),
+        assertJumpedPageCanvas,
+        `OCR text from PDF page ${pageNumber} canvas`,
+        marker
       )
-        .first()
-        .should(($canvas) => {
-          const el = $canvas[0] as HTMLCanvasElement
-          const pageRoot = el.closest('[data-testid="book-reading-page"]')
-          const nav = pageRoot?.querySelector('nav.daisy-navbar')
-          if (!nav)
-            throw new Error(
-              'book-reading GlobalBar (nav.daisy-navbar) not found'
-            )
-          const navBottom = nav.getBoundingClientRect().bottom
-          const canvasTop = el.getBoundingClientRect().top
-          expect(
-            canvasTop,
-            'PDF page top should be at or below GlobalBar bottom after outline jump'
-          ).to.be.at.least(navBottom - chromeGeometryTolerancePx)
-          assertPdfCanvasHasDarkPixels(el)
-        })
-        .then(ocrCanvasFromFirstElement)
-        .then((text) => {
-          expect(
-            text as string,
-            `OCR text from PDF page ${pageNumber} canvas`
-          ).to.contain(marker)
-        })
       return this
     },
   }
