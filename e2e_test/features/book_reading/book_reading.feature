@@ -28,7 +28,7 @@ Feature: Book reading
     Then I should see PDF page 2 marker "DOUGHNUT_E2E_BOOK_PAGE2" in the book reader
     And the book outline row "Main Topic 2" should be selected in the book reader
 
-  Scenario: Same-page outline entries with different bboxes scroll to different positions
+  Scenario: Outline rows on the same page scroll the PDF to different places
     Given I attach book "top-maths.pdf" to the notebook "Top Maths" via the CLI
     When I open the book attached to notebook "Top Maths"
-    Then same-page bbox outline entries should produce distinct PDF scroll positions
+    Then jumping between outline rows on the same page should scroll the PDF to different positions
