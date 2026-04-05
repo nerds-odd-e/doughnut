@@ -141,6 +141,7 @@ import {
   ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1,
   parseMineruOutlineV1StartAnchor,
 } from "@/lib/book-reading/mineruOutlineV1PageIndex"
+import { createViewportCurrentAnchorDebouncer } from "@/lib/book-reading/debounceViewportCurrentAnchorId"
 import { viewportCurrentAnchorIdFromAnchorPage } from "@/lib/book-reading/viewportCurrentRangeFromAnchorPage"
 import type {
   BookAnchorFull,
@@ -151,6 +152,7 @@ import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen
 import { computed, onBeforeUnmount, onMounted, ref } from "vue"
 
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
+const VIEWPORT_CURRENT_ANCHOR_DEBOUNCE_MS = 120
 
 const props = defineProps({
   notebookId: { type: Number, required: true },
@@ -225,15 +227,23 @@ const outlineRows = computed(() => flatOutline.value)
 const selectedOutlineRangeId = ref<number | null>(null)
 const viewportCurrentAnchorId = ref<number | null>(null)
 
+const viewportCurrentAnchorDebouncer = createViewportCurrentAnchorDebouncer({
+  delayMs: VIEWPORT_CURRENT_ANCHOR_DEBOUNCE_MS,
+  commit: (id) => {
+    viewportCurrentAnchorId.value = id
+  },
+})
+
 function onViewportAnchorPage(payload: {
   anchorPageIndexZeroBased: number
   viewportTopYDown: number | null
 }) {
-  viewportCurrentAnchorId.value = viewportCurrentAnchorIdFromAnchorPage(
+  const candidate = viewportCurrentAnchorIdFromAnchorPage(
     outlineRows.value.map((n) => n.startAnchor),
     payload.anchorPageIndexZeroBased,
     payload.viewportTopYDown
   )
+  viewportCurrentAnchorDebouncer.propose(candidate)
 }
 
 const pdfViewerRef = ref<{
@@ -294,6 +304,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", handleResize)
+  viewportCurrentAnchorDebouncer.cancel()
 })
 </script>
 
