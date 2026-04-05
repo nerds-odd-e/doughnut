@@ -89,8 +89,13 @@
                   ? 'true'
                   : undefined
               "
+              :data-outline-selected="
+                node.id === selectedOutlineRangeId ? 'true' : undefined
+              "
               :aria-current="
-                node.id === selectedOutlineRangeId ? 'location' : undefined
+                node.startAnchor.id === viewportCurrentAnchorId
+                  ? 'location'
+                  : undefined
               "
               :style="{ paddingLeft: `${node.depth * 0.75}rem` }"
               @click="onOutlineRowClick(node)"

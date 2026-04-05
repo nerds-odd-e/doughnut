@@ -115,9 +115,9 @@ const bookReadingPage = () => {
     expectOutlineRowSelectedByTitle(title: string) {
       pageIsNotLoading()
       const row = outlineNodes().contains(title)
-      row.should('have.attr', 'aria-current', 'location')
+      row.should('have.attr', 'data-outline-selected', 'true')
       outlineNodes()
-        .filter('[aria-current="location"]')
+        .filter('[data-outline-selected="true"]')
         .should('have.length', 1)
       return this
     },
@@ -188,7 +188,9 @@ const bookReadingPage = () => {
     expectOutlineRowViewportCurrentByTitle(title: string) {
       pageIsNotLoading()
       const row = outlineNodes().contains(title)
-      row.should('have.attr', 'data-outline-current', 'true')
+      row
+        .should('have.attr', 'data-outline-current', 'true')
+        .and('have.attr', 'aria-current', 'location')
       outlineNodes()
         .filter('[data-outline-current="true"]')
         .should('have.length', 1)
