@@ -10,8 +10,9 @@ Feature: Book reading
     And I add the saved access token in the interactive CLI using add-access-token
 
   Scenario: Attach PDF and see structure in the browser
-    When I attach book "top-maths.pdf" to the notebook "Top Maths" via the CLI
-    Then I should see the book structure of the notebook "Top Maths" in the browser:
+    Given I attach book "top-maths.pdf" to the notebook "Top Maths" via the CLI
+    When I open the book attached to notebook "Top Maths"
+    Then I should see the book structure in the browser:
       | 0 | Main Topic 1 |
       | 1 | Subtopic 1.1 |
       | 1 | Subtopic 1.2 |
@@ -22,7 +23,8 @@ Feature: Book reading
 
   Scenario: Outline row jumps the PDF to the anchored page
     Given I attach book "top-maths.pdf" to the notebook "Top Maths" via the CLI
-    When I choose the book outline row "Main Topic 2"
+    When I open the book attached to notebook "Top Maths"
+    And I choose the book outline row "Main Topic 2"
     Then I should see PDF page 2 marker "DOUGHNUT_E2E_BOOK_PAGE2" in the book reader
     And the book outline row "Main Topic 2" should be selected in the book reader
  
