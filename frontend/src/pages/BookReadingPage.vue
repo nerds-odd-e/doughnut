@@ -10,9 +10,17 @@
         Download
       </a>
       <ContentLoader v-if="pdfLoading" />
+      <div
+        v-else-if="pdfError"
+        class="daisy-alert daisy-alert-error daisy-mb-2"
+        data-testid="book-reading-pdf-error"
+      >
+        {{ pdfError }}
+      </div>
       <PdfFirstPageCanvas
-        v-if="bookPdfBytes"
+        v-else-if="bookPdfBytes"
         :pdf-bytes="bookPdfBytes"
+        @load-error="onPdfLoadError"
       />
       <div data-testid="book-reading-outline">
         <div
@@ -46,6 +54,11 @@ function notebookBookFilePath(notebookId: number) {
 const book = ref<BookFull | null>(null)
 const bookPdfBytes = ref<ArrayBuffer | null>(null)
 const pdfLoading = ref(false)
+const pdfError = ref<string | null>(null)
+
+function onPdfLoadError(message: string) {
+  pdfError.value = message
+}
 
 type OutlineNode = { id: number; title: string; depth: number }
 
@@ -84,13 +97,18 @@ onMounted(async () => {
     flatOutline.value = buildFlatOutline(data.ranges ?? [])
     if (data.hasSourceFile) {
       pdfLoading.value = true
+      pdfError.value = null
       try {
         const res = await fetch(notebookBookFilePath(props.notebookId), {
           credentials: "same-origin",
         })
-        if (res.ok) {
-          bookPdfBytes.value = await res.arrayBuffer()
+        if (!res.ok) {
+          pdfError.value = "Could not load the book file."
+          return
         }
+        bookPdfBytes.value = await res.arrayBuffer()
+      } catch {
+        pdfError.value = "Could not load the book file."
       } finally {
         pdfLoading.value = false
       }

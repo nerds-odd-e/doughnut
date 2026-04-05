@@ -70,7 +70,7 @@ Each row is a **merge gate**: targeted `pnpm backend:verify` / `pnpm frontend:te
 - **Tests:** Vitest asserting loading → rendered transition with mocked slow `fetch` or deferred pdf.js promise (minimal assertions, **observable** DOM).
 - **Deliverable cleanliness:** Remove any **permanent** placeholder that could be mistaken for final UI once loading exists.
 
-### SP-3.5 — Error state for missing / failed PDF load
+### SP-3.5 — Error state for missing / failed PDF load — **done**
 
 - **Outcome (user-visible):** If the file request fails (**4xx/5xx**) or the bytes are not a valid PDF, show a **short, readable error** in the PDF pane (reuse existing error styling patterns if present).
 - **Tests:** Vitest for failed fetch or reject from document load — **one** focused case is enough unless two failure modes differ in user-visible text.

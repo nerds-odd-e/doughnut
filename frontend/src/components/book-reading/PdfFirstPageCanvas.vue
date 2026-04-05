@@ -11,6 +11,10 @@ const props = defineProps<{
   pdfBytes: ArrayBuffer | Uint8Array | null
 }>()
 
+const emit = defineEmits<{
+  loadError: [message: string]
+}>()
+
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 let renderSeq = 0
 
@@ -33,12 +37,21 @@ async function renderPage() {
 
     const viewport = page.getViewport({ scale: 1 })
     const ctx = canvas.getContext("2d")
-    if (!ctx) return
+    if (!ctx) {
+      if (seq === renderSeq) {
+        emit("loadError", "This file is not a valid PDF.")
+      }
+      return
+    }
 
     canvas.width = viewport.width
     canvas.height = viewport.height
 
     await page.render({ canvasContext: ctx, viewport }).promise
+  } catch {
+    if (seq === renderSeq) {
+      emit("loadError", "This file is not a valid PDF.")
+    }
   } finally {
     await loadingTask.destroy()
   }

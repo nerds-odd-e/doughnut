@@ -30,7 +30,7 @@ describe("BookReadingPage", () => {
     vi.restoreAllMocks()
   })
 
-  it("shows download link when hasSourceFile is true", async () => {
+  it("shows download link and fetch error when book file returns an error status", async () => {
     const book: BookFull = {
       id: 1,
       bookName: "Linear Algebra",
@@ -56,6 +56,14 @@ describe("BookReadingPage", () => {
     expect(link.exists()).toBe(true)
     expect(link.attributes("href")).toBe(bookFileUrlSuffix(notebookId))
     expect(link.text()).toContain("Download")
+
+    const err = wrapper.find('[data-testid="book-reading-pdf-error"]')
+    expect(err.exists()).toBe(true)
+    expect(err.text()).toBe("Could not load the book file.")
+    expect(wrapper.find(".daisy-loading-spinner").exists()).toBe(false)
+    expect(wrapper.find('[data-testid="pdf-first-page-canvas"]').exists()).toBe(
+      false
+    )
   })
 
   it("hides download link when hasSourceFile is false", async () => {
@@ -179,5 +187,46 @@ describe("BookReadingPage", () => {
 
     expect(canvas?.width).toBeGreaterThan(0)
     expect(canvas?.height).toBeGreaterThan(0)
+  })
+
+  it("shows error when PDF bytes are not valid", async () => {
+    const book: BookFull = {
+      id: 1,
+      bookName: "Linear Algebra",
+      format: "pdf",
+      hasSourceFile: true,
+      ranges: [],
+    }
+    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+      wrapSdkResponse(book)
+    )
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(new TextEncoder().encode("not a pdf").buffer, {
+        status: 200,
+        headers: { "Content-Type": "text/plain" },
+      })
+    )
+
+    const wrapper = helper
+      .component(BookReadingPage)
+      .withRouter()
+      .withProps({ notebookId })
+      .mount()
+
+    await vi.waitFor(
+      () => {
+        expect(
+          wrapper.find('[data-testid="book-reading-pdf-error"]').exists()
+        ).toBe(true)
+      },
+      { timeout: 15_000 }
+    )
+
+    expect(wrapper.find('[data-testid="book-reading-pdf-error"]').text()).toBe(
+      "This file is not a valid PDF."
+    )
+    expect(wrapper.find('[data-testid="pdf-first-page-canvas"]').exists()).toBe(
+      false
+    )
   })
 })
