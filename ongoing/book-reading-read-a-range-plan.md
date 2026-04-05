@@ -67,11 +67,11 @@
 
 ---
 
-## Phase 6 — Scroll / navigate the PDF → active range highlight in the layout
+## Phase 6 — Scroll / navigate the PDF → active range highlight in the layout — **done**
 
 **User outcome:** As the user **scrolls or changes page** in the PDF, the **layout** shows which **BookRange** is **current** (highlight / active row). **E2E:** scroll to a region tied to a different range → highlight moves (or equivalent DOM assertion).
 
-**Completion hint:** Two-way sync completes here; keep “current range” logic cohesive (single place to compute active range from viewport). Edge cases for invalid anchors and document bounds: [`ongoing/book-reading-phase-6-pdf-to-outline-sync-subphases.md`](book-reading-phase-6-pdf-to-outline-sync-subphases.md) sub-phase **6.8**. Drawer closed: viewport-current state still updates (sub-phase **6.9**, [`BookReadingPage.spec.ts`](../frontend/tests/pages/BookReadingPage.spec.ts)).
+**Shipped:** `PdfBookViewer` emits a viewport descriptor (`viewportAnchorPage`: page index, optional within-page top, `pagesCount`). `viewportCurrentAnchorIdFromAnchorPage` in `viewportCurrentRangeFromAnchorPage.ts` picks the matching flat-outline row; debounced updates via `debounceViewportCurrentAnchorId` / `createViewportCurrentAnchorDebouncer`. Outline rows expose `data-outline-current` and separate **selected** (Phase 5) vs **viewport-current** styling and ARIA. `BookReadingPage` scrolls the aside list so the current row stays visible when the outline is open; visually hidden `aria-live="polite"` for title changes (`viewportCurrentLiveAnnouncement.ts`). Cypress scenarios *Scrolling the PDF updates the viewport-current outline row*, *Short viewport scrolls outline aside so viewport-current row stays visible*, and *Same-page scroll moves viewport-current; selected outline row stays the explicit choice* in [`e2e_test/features/book_reading/book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature). Unit coverage: `viewportCurrentRangeFromAnchorPage.spec.ts`, `viewportCurrentLiveAnnouncement.spec.ts`; drawer-closed state: [`BookReadingPage.spec.ts`](../frontend/tests/pages/BookReadingPage.spec.ts).
 
 ---
 

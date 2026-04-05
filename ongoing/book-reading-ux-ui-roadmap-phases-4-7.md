@@ -75,6 +75,8 @@ Define **one primary breakpoint** (exact pixel/Tailwind token to be chosen durin
 
 ## Phase 6 — Scroll / navigate the PDF → active range in the layout
 
+**Shipped** (see [`ongoing/book-reading-read-a-range-plan.md`](book-reading-read-a-range-plan.md) Phase 6): viewport-current row (`data-outline-current`), debounced updates, aside scroll-into-view for long outlines, **selected** vs **viewport-current** distinguished in UI and ARIA, polite live region when the current range title changes.
+
 **UX outcomes**
 
 - As the user **scrolls or flips pages**, the outline shows **which BookRange best matches** the viewport (single **current** row highlight).
