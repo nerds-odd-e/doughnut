@@ -16,22 +16,22 @@
 
 - **Same attach surface:** Extend **`POST /api/notebooks/{notebook}/attach-book`** (or keep one logical “attach book” operation) so the **CLI sends the PDF and outline together**; avoid a parallel “upload-only” product API unless a hard technical constraint appears.
 - **Observable tests:** Prefer Cypress + CLI/subprocess or HTTP assertions over tests that pin internal PDF or storage helpers, except for pure mapping (anchor ↔ scroll) if extracted as a small black-box unit.
-- **Storage rollout:** **Phase 1** and **Phase 2** are **done** (multipart **`POST …/attach-book`**, **`GET …/book/file`**, **`BookStorage`** with **`DbBookStorage`** for non-`prod` and **`GcsBookStorage`** for **`prod`**, E2E on DB storage in CI, prod bucket and ops in [`docs/gcp/prod_env.md`](../docs/gcp/prod_env.md) §7). Book PDF attach limits and error bodies: **`spring.servlet.multipart`** (100MB) and **`ApiError`**; GCS orphan cleanup when a book row is removed is **not** implemented yet (documented in that section).
+- **Storage rollout:** **Phase 1** and **Phase 2** are **done** (multipart **`POST …/attach-book`**, **`GET …/book/file`** for the in-app viewer, **`BookStorage`** with **`DbBookStorage`** for non-`prod` and **`GcsBookStorage`** for **`prod`**, E2E on DB storage in CI, prod bucket and ops in [`docs/gcp/prod_env.md`](../docs/gcp/prod_env.md) §7). Book PDF attach limits and error bodies: **`spring.servlet.multipart`** (100MB) and **`ApiError`**; GCS orphan cleanup when a book row is removed is **not** implemented yet (documented in that section).
 - **At most one intentionally failing test** while driving a given phase (see planning rule).
 
 ---
 
 ## Phase 1 — CLI attach uploads the PDF; frontend can obtain the file (dev / test storage) — **done**
 
-**User outcome:** After **`/attach`** from the CLI, the **PDF bytes** are stored server-side (local or test bucket), linked on the **Book** (`sourceFileRef` or agreed field), and the **browser** can **download or open** the file through a **documented API** (authenticated fetch, redirect, or signed URL — choose one approach in implementation). **E2E:** scenario aligned with *“attach in cli and download book from frontend”* for **dev/test** (no real GCP required).
+**User outcome:** After **`/attach`** from the CLI, the **PDF bytes** are stored server-side (local or test bucket), linked on the **Book** (`sourceFileRef` or agreed field), and the **browser** can **load** the file for the book reading page via **`GET …/book/file`**. **E2E:** book-reading scenario covers attach → outline + rendered PDF (DB storage in CI; no real GCP required).
 
-**Shipped:** Multipart attach, **`DbBookStorage`**, **`GET …/book/file`**, book reading download control, Cypress book-reading scenario (DB storage in CI).
+**Shipped:** Multipart attach, **`DbBookStorage`**, **`GET …/book/file`**, Cypress book-reading scenario (DB storage in CI).
 
 ---
 
 ## Phase 2 — Production object storage on GCP — **done**
 
-**User outcome:** In **production configuration**, uploaded PDFs are stored in a **GCP bucket**; **download/view** still works from the frontend **with the same user-visible flow** as Phase 1. **E2E:** **same spec** as Phase 1 where feasible (e.g. CI uses emulator, fake GCS, or a dedicated test bucket—document the chosen approach).
+**User outcome:** In **production configuration**, uploaded PDFs are stored in a **GCP bucket**; the **book reading page** still **loads** the PDF the same way as Phase 1. **E2E:** **same spec** as Phase 1 where feasible (e.g. CI uses emulator, fake GCS, or a dedicated test bucket—document the chosen approach).
 
 **Shipped:** **`GcsBookStorage`** under **`prod`** only, bucket + IAM in **`docs/gcp/prod_env.md`**, wiring test for prod **`BookStorage`** bean; CI book E2E stays on DB profile (no real GCS in CI).
 
@@ -41,7 +41,7 @@
 
 **User outcome:** On the book reading route, the user **sees the attached PDF rendered** in the **main content area** using **pdf.js**. **E2E:** attach via CLI → book page shows page 1; scenario asserts fixture page-1 marker text is recoverable from the rendered canvas (see sub-phases doc for the OCR-based check).
 
-**Shipped:** `PdfFirstPageCanvas` (pdf.js, page 1 → canvas), `BookReadingPage` fetch from **`GET …/book/file`** with loading and error UI, scenario step `And I should see the beginning of the PDF book "top-maths.pdf"`. Fine-grained split: [book-reading-phase3-pdfjs-subphases.md](book-reading-phase3-pdfjs-subphases.md).
+**Shipped:** `PdfFirstPageCanvas` (pdf.js, page 1 → canvas), `BookReadingPage` fetch from **`GET …/book/file`** with loading and error UI, scenario step `And I should see the beginning of the PDF book "top-maths.pdf"`.
 
 **Completion hint:** Outline still lives in the main column next to the viewer until Phase 4 (drawer).
 
@@ -81,7 +81,7 @@
 
 ## Phase 8 — Delete book from frontend (record + stored file)
 
-**User outcome:** User removes the book from the notebook in the **browser**; **book metadata** is removed and the **blob** is **deleted** from the active backend (local store or GCS). **E2E:** delete → subsequent download returns **404** (or book missing), and no orphan object in the configured store (assert via API or test hook as appropriate).
+**User outcome:** User removes the book from the notebook in the **browser**; **book metadata** is removed and the **blob** is **deleted** from the active backend (local store or GCS). **E2E:** delete → **`GET …/book/file`** returns **404** (or book missing), and no orphan object in the configured store (assert via API or test hook as appropriate).
 
 **Completion hint:** Align with existing notebook/book permissions patterns.
 

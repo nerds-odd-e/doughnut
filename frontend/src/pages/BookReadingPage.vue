@@ -1,14 +1,6 @@
 <template>
   <div data-testid="book-reading-page">
     <template v-if="book">
-      <a
-        v-if="book.hasSourceFile"
-        class="daisy-btn daisy-btn-outline daisy-btn-sm daisy-mb-2"
-        :href="notebookBookFilePath(props.notebookId)"
-        data-testid="book-reading-download"
-      >
-        Download
-      </a>
       <ContentLoader v-if="pdfLoading" />
       <div
         v-else-if="pdfError"

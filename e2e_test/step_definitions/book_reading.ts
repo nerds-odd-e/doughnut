@@ -59,13 +59,3 @@ Then(
     return bookReadingPage().expectPdfBeginningVisible()
   }
 )
-
-Then(
-  'I should be able to download the attached book PDF matching fixture {string}',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (fixtureFilename: string) => {
-    return bookReadingPage().expectDownloadedBookPdfMatchesFixture(
-      fixtureFilename
-    )
-  }
-)

@@ -30,7 +30,7 @@ describe("BookReadingPage", () => {
     vi.restoreAllMocks()
   })
 
-  it("shows download link and fetch error when book file returns an error status", async () => {
+  it("shows fetch error when book file returns an error status", async () => {
     const book: BookFull = {
       id: 1,
       bookName: "Linear Algebra",
@@ -52,11 +52,6 @@ describe("BookReadingPage", () => {
       .mount()
     await flushPromises()
 
-    const link = wrapper.find('[data-testid="book-reading-download"]')
-    expect(link.exists()).toBe(true)
-    expect(link.attributes("href")).toBe(bookFileUrlSuffix(notebookId))
-    expect(link.text()).toContain("Download")
-
     const err = wrapper.find('[data-testid="book-reading-pdf-error"]')
     expect(err.exists()).toBe(true)
     expect(err.text()).toBe("Could not load the book file.")
@@ -66,7 +61,7 @@ describe("BookReadingPage", () => {
     )
   })
 
-  it("hides download link when hasSourceFile is false", async () => {
+  it("does not load PDF viewer when hasSourceFile is false", async () => {
     const book: BookFull = {
       id: 1,
       bookName: "Linear Algebra",
@@ -85,9 +80,12 @@ describe("BookReadingPage", () => {
       .mount()
     await flushPromises()
 
-    expect(wrapper.find('[data-testid="book-reading-download"]').exists()).toBe(
+    expect(wrapper.find('[data-testid="pdf-first-page-canvas"]').exists()).toBe(
       false
     )
+    expect(
+      wrapper.find('[data-testid="book-reading-pdf-error"]').exists()
+    ).toBe(false)
   })
 
   it("shows loading indicator while PDF is loading, hides it after render", async () => {

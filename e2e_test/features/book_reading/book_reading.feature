@@ -18,6 +18,5 @@ Feature: Book reading
       | 0 | Main Topic 2 |
       | 1 | Subtopic 2.1 |
       | 1 | Subtopic 2.2 |
-    And I should be able to download the attached book PDF matching fixture "top-maths.pdf"
     And I should see the beginning of the PDF book "top-maths.pdf"
  
