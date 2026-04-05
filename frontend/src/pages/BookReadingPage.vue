@@ -183,10 +183,8 @@ type OutlineNode = {
   id: number
   title: string
   depth: number
-  startAnchor?: BookAnchorFull
+  startAnchor: BookAnchorFull
 }
-
-type OutlineNodeWithStart = OutlineNode & { startAnchor: BookAnchorFull }
 
 function buildFlatOutline(ranges: BookRangeFull[]): OutlineNode[] {
   const childrenMap = new Map<number | null, BookRangeFull[]>()
@@ -218,11 +216,7 @@ function buildFlatOutline(ranges: BookRangeFull[]): OutlineNode[] {
 }
 
 const flatOutline = ref<OutlineNode[]>([])
-const outlineRows = computed((): OutlineNodeWithStart[] =>
-  flatOutline.value.filter(
-    (n): n is OutlineNodeWithStart => n.startAnchor != null
-  )
-)
+const outlineRows = computed(() => flatOutline.value)
 const selectedOutlineRangeId = ref<number | null>(null)
 const viewportCurrentAnchorId = ref<number | null>(null)
 
@@ -242,11 +236,7 @@ const pdfViewerRef = ref<{
 
 async function onOutlineRowClick(node: OutlineNode) {
   const anchor = node.startAnchor
-  if (
-    !anchor ||
-    anchor.anchorFormat !== ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1 ||
-    anchor.value == null
-  ) {
+  if (anchor.anchorFormat !== ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1) {
     return
   }
   const parsed = parseMineruOutlineV1StartAnchor(anchor.value)

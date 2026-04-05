@@ -3633,7 +3633,9 @@ components:
         parentRangeId:
           type: string
       required:
+      - endAnchor
       - id
+      - startAnchor
       - title
     Book_Full:
       type: object

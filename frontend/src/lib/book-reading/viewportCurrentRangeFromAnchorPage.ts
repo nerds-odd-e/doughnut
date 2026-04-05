@@ -18,10 +18,7 @@ export function viewportCurrentAnchorIdFromAnchorPage(
   }
   let best: number | null = null
   for (const anchor of orderedPreorderStartAnchors) {
-    if (
-      anchor.anchorFormat !== ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1 ||
-      anchor.value == null
-    ) {
+    if (anchor.anchorFormat !== ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1) {
       continue
     }
     const pageIdx = extractPageIndexZeroBased(anchor.value)

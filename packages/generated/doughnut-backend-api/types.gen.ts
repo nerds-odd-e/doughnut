@@ -318,8 +318,8 @@ export type BookAnchorFull = {
 
 export type BookRangeFull = {
     id: number;
-    startAnchor?: BookAnchorFull;
-    endAnchor?: BookAnchorFull;
+    startAnchor: BookAnchorFull;
+    endAnchor: BookAnchorFull;
     siblingOrder?: number;
     title: string;
     parentRangeId?: string;
