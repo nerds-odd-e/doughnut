@@ -32,6 +32,35 @@ const viewerRef = ref<HTMLDivElement | null>(null)
 
 let pdfViewer: PDFViewer | null = null
 let currentLoadingTask: ReturnType<typeof getDocument> | null = null
+let pendingPageIndexZeroBased: number | null = null
+
+function flushPendingPageScroll() {
+  if (pendingPageIndexZeroBased === null || !pdfViewer?.pdfDocument) {
+    return
+  }
+  const idx = pendingPageIndexZeroBased
+  pendingPageIndexZeroBased = null
+  if (idx >= 0 && idx < pdfViewer.pagesCount) {
+    pdfViewer.scrollPageIntoView({ pageNumber: idx + 1 })
+  }
+}
+
+function scrollToPageIndexZeroBased(index: number) {
+  if (!Number.isInteger(index) || index < 0) {
+    return
+  }
+  if (!pdfViewer?.pdfDocument) {
+    pendingPageIndexZeroBased = index
+    return
+  }
+  if (index >= pdfViewer.pagesCount) {
+    return
+  }
+  pdfViewer.scrollPageIntoView({ pageNumber: index + 1 })
+  pendingPageIndexZeroBased = null
+}
+
+defineExpose({ scrollToPageIndexZeroBased })
 
 async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
   const container = containerRef.value
@@ -45,6 +74,7 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
   if (pdfViewer) {
     pdfViewer.setDocument(null as unknown as PDFDocumentProxy)
     pdfViewer = null
+    pendingPageIndexZeroBased = null
   }
 
   const eventBus = new EventBus()
@@ -63,6 +93,7 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
     if (pdfViewer) {
       const containerWidth = container.clientWidth
       pdfViewer.currentScaleValue = containerWidth > 0 ? "page-width" : "1"
+      flushPendingPageScroll()
     }
   })
 
@@ -103,6 +134,7 @@ onBeforeUnmount(async () => {
     pdfViewer.setDocument(null as unknown as PDFDocumentProxy)
     pdfViewer = null
   }
+  pendingPageIndexZeroBased = null
 })
 </script>
 

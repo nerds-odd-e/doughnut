@@ -19,4 +19,6 @@ Feature: Book reading
       | 1 | Subtopic 2.1 |
       | 1 | Subtopic 2.2 |
     And I should see the beginning of the PDF book "top-maths.pdf"
+    When I choose the book outline row "Main Topic 2"
+    Then I should see PDF page 2 marker "DOUGHNUT_E2E_BOOK_PAGE2" in the book reader
  

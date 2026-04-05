@@ -72,16 +72,18 @@
             data-testid="book-reading-outline"
             class="daisy-p-3 daisy-pb-8"
           >
-            <div
+            <button
               v-for="node in flatOutline"
               :key="node.id"
+              type="button"
               data-testid="book-outline-node"
               :data-outline-depth="node.depth"
-              class="daisy-py-1 daisy-text-sm daisy-leading-snug"
+              class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-w-full daisy-justify-start daisy-normal-case daisy-h-auto daisy-min-h-10 daisy-py-2 daisy-px-2 daisy-text-sm daisy-leading-snug daisy-font-normal"
               :style="{ paddingLeft: `${node.depth * 0.75}rem` }"
+              @click="onOutlineRowClick(node)"
             >
               {{ node.title }}
-            </div>
+            </button>
           </div>
         </aside>
         <main
@@ -102,6 +104,7 @@
           </div>
           <PdfBookViewer
             v-else-if="bookPdfBytes"
+            ref="pdfViewerRef"
             :pdf-bytes="bookPdfBytes"
             @load-error="onPdfLoadError"
           />
@@ -115,7 +118,15 @@
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
-import type { BookFull, BookRangeFull } from "@generated/doughnut-backend-api"
+import {
+  ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1,
+  extractPageIndexZeroBased,
+} from "@/lib/book-reading/mineruOutlineV1PageIndex"
+import type {
+  BookAnchorFull,
+  BookFull,
+  BookRangeFull,
+} from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, onBeforeUnmount, onMounted, ref } from "vue"
 
@@ -153,7 +164,12 @@ function onPdfLoadError(message: string) {
   pdfError.value = message
 }
 
-type OutlineNode = { id: number; title: string; depth: number }
+type OutlineNode = {
+  id: number
+  title: string
+  depth: number
+  startAnchor?: BookAnchorFull
+}
 
 function buildFlatOutline(ranges: BookRangeFull[]): OutlineNode[] {
   const childrenMap = new Map<number | null, BookRangeFull[]>()
@@ -171,7 +187,12 @@ function buildFlatOutline(ranges: BookRangeFull[]): OutlineNode[] {
   function visit(parentId: number | null, depth: number) {
     const children = (childrenMap.get(parentId) ?? []).slice().sort(sortByOrder)
     for (const child of children) {
-      result.push({ id: child.id, title: child.title, depth })
+      result.push({
+        id: child.id,
+        title: child.title,
+        depth,
+        startAnchor: child.startAnchor,
+      })
       visit(child.id, depth + 1)
     }
   }
@@ -180,6 +201,26 @@ function buildFlatOutline(ranges: BookRangeFull[]): OutlineNode[] {
 }
 
 const flatOutline = ref<OutlineNode[]>([])
+
+const pdfViewerRef = ref<{
+  scrollToPageIndexZeroBased: (index: number) => void
+} | null>(null)
+
+function onOutlineRowClick(node: OutlineNode) {
+  const anchor = node.startAnchor
+  if (
+    !anchor ||
+    anchor.anchorFormat !== ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1 ||
+    anchor.value == null
+  ) {
+    return
+  }
+  const pageIndex = extractPageIndexZeroBased(anchor.value)
+  if (pageIndex === null) {
+    return
+  }
+  pdfViewerRef.value?.scrollToPageIndexZeroBased(pageIndex)
+}
 
 onMounted(async () => {
   window.addEventListener("resize", handleResize)

@@ -59,3 +59,19 @@ Then(
     return bookReadingPage().expectPdfBeginningVisible()
   }
 )
+
+When(
+  'I choose the book outline row {string}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (title: string) => {
+    return bookReadingPage().clickOutlineRowByTitle(title)
+  }
+)
+
+Then(
+  'I should see PDF page 2 marker {string} in the book reader',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (marker: string) => {
+    return bookReadingPage().expectPdfPageMarkerVisible(marker, 2)
+  }
+)

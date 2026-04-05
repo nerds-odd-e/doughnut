@@ -18,9 +18,9 @@ _E2E_CONTENT_LIST: list[dict[str, Any]] = [
     {"type": "text", "text_level": 1, "text": "Main Topic 1", "page_idx": 0},
     {"type": "text", "text_level": 2, "text": "Subtopic 1.1", "page_idx": 0},
     {"type": "text", "text_level": 2, "text": "Subtopic 1.2", "page_idx": 0},
-    {"type": "text", "text_level": 1, "text": "Main Topic 2", "page_idx": 0},
-    {"type": "text", "text_level": 2, "text": "Subtopic 2.1", "page_idx": 0},
-    {"type": "text", "text_level": 2, "text": "Subtopic 2.2", "page_idx": 0},
+    {"type": "text", "text_level": 1, "text": "Main Topic 2", "page_idx": 1},
+    {"type": "text", "text_level": 2, "text": "Subtopic 2.1", "page_idx": 1},
+    {"type": "text", "text_level": 2, "text": "Subtopic 2.2", "page_idx": 1},
 ]
 
 
