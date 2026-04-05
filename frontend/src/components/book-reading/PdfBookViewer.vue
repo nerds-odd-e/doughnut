@@ -10,6 +10,10 @@
 
 <script setup lang="ts">
 import "@/lib/pdfjsWorker"
+import {
+  attachPdfBookViewerGeometryResampleListeners,
+  createCoalescedRequestAnimationFrameEmitter,
+} from "@/lib/book-reading/pdfBookViewerGeometryResample"
 import { pdfViewerViewportTopYDown } from "@/lib/book-reading/pdfViewerViewportTopYDown"
 import { mineruOutlineV1BboxToXyzDestArray } from "@/lib/book-reading/mineruOutlineV1PageIndex"
 import type { MineruOutlineV1Bbox } from "@/lib/book-reading/mineruOutlineV1PageIndex"
@@ -45,6 +49,17 @@ let onPageChangingForViewport: (() => void) | null = null
 let lastEmittedPage: number | null = null
 let lastEmittedYQuantized: number | null = null
 let onScrollForViewport: (() => void) | null = null
+let geometryRafEmitter: ReturnType<
+  typeof createCoalescedRequestAnimationFrameEmitter
+> | null = null
+let detachGeometryResampleListeners: (() => void) | null = null
+
+function teardownGeometryResample() {
+  geometryRafEmitter?.cancel()
+  geometryRafEmitter = null
+  detachGeometryResampleListeners?.()
+  detachGeometryResampleListeners = null
+}
 
 function detachViewportScrollListener(container: HTMLElement) {
   if (onScrollForViewport) {
@@ -154,6 +169,7 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
   }
 
   detachViewportScrollListener(container)
+  teardownGeometryResample()
   lastEmittedPage = null
   lastEmittedYQuantized = null
 
@@ -178,6 +194,16 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
     emitViewportDescriptorIfChanged()
   }
   container.addEventListener("scroll", onScrollForViewport, { passive: true })
+
+  geometryRafEmitter = createCoalescedRequestAnimationFrameEmitter({
+    emit: emitViewportDescriptorIfChanged,
+  })
+  detachGeometryResampleListeners =
+    attachPdfBookViewerGeometryResampleListeners({
+      container,
+      eventBus,
+      scheduleEmit: () => geometryRafEmitter!.schedule(),
+    })
 
   eventBus.on("pagesinit", () => {
     if (pdfViewer) {
@@ -220,6 +246,7 @@ onBeforeUnmount(async () => {
   const container = containerRef.value
   if (container) {
     detachViewportScrollListener(container)
+    teardownGeometryResample()
   }
   if (currentLoadingTask) {
     await currentLoadingTask.destroy()
