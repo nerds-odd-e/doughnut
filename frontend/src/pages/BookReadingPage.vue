@@ -9,7 +9,7 @@
         aria-live="polite"
         aria-atomic="true"
         data-testid="book-reading-viewport-current-live"
-        class="daisy-visually-hidden"
+        class="daisy-sr-only"
       >
         {{ viewportCurrentLiveText }}
       </div>
