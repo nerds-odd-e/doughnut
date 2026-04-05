@@ -57,6 +57,8 @@
       />
       <div class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-relative">
         <aside
+          ref="outlineAsideRef"
+          data-testid="book-reading-outline-aside"
           :class="[
             'daisy-bg-base-200 daisy-w-72 daisy-min-w-[16rem] daisy-max-w-[min(20rem,85vw)] daisy-transition-transform daisy-ease-in-out daisy-duration-200 daisy-overflow-y-auto daisy-overflow-x-hidden',
             isMdOrLarger
@@ -149,7 +151,7 @@ import type {
   BookRangeFull,
 } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
-import { computed, onBeforeUnmount, onMounted, ref } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
 const VIEWPORT_CURRENT_ANCHOR_DEBOUNCE_MS = 120
@@ -168,6 +170,7 @@ const pdfLoading = ref(false)
 const pdfError = ref<string | null>(null)
 
 const outlineOpened = ref(false)
+const outlineAsideRef = ref<HTMLElement | null>(null)
 const windowWidth = ref(
   typeof window !== "undefined"
     ? window.innerWidth
@@ -245,6 +248,25 @@ function onViewportAnchorPage(payload: {
   )
   viewportCurrentAnchorDebouncer.propose(candidate)
 }
+
+watch(
+  viewportCurrentAnchorId,
+  (id) => {
+    if (id === null || !outlineOpened.value) {
+      return
+    }
+    requestAnimationFrame(() => {
+      if (!outlineOpened.value) {
+        return
+      }
+      const row = outlineAsideRef.value?.querySelector(
+        '[data-outline-current="true"]'
+      )
+      row?.scrollIntoView({ block: "nearest", inline: "nearest" })
+    })
+  },
+  { flush: "post" }
+)
 
 const pdfViewerRef = ref<{
   scrollToMineruOutlineV1Target: (target: {

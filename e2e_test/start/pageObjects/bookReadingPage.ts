@@ -196,6 +196,25 @@ const bookReadingPage = () => {
         .should('have.length', 1)
       return this
     },
+    setBookReadingViewport(width: number, height: number) {
+      cy.viewport(width, height)
+      return this
+    },
+    /**
+     * After PDF scroll updates viewport-current to a lower row, the outline aside should
+     * scroll so that row is not clipped (Phase 6.5). Expects a short viewport so the list overflows.
+     */
+    expectViewportCurrentOutlineRowVisibleInAside(title: string) {
+      this.expectOutlineRowViewportCurrentByTitle(title)
+      cy.get('[data-testid="book-reading-outline-aside"]').should(($aside) => {
+        expect(
+          $aside[0]!.scrollTop,
+          'outline aside should have scrolled to reveal the current row'
+        ).to.be.greaterThan(0)
+      })
+      outlineNodes().contains(title).should('be.visible')
+      return this
+    },
   }
 }
 

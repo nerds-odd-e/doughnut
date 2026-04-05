@@ -1,7 +1,7 @@
 /**
  * Book-reading scenarios: thin glue to `e2e_test/start/pageObjects/cli`.
  */
-import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
 import bookReadingPage, {
   type BookOutlineRow,
@@ -20,6 +20,14 @@ function parseBookOutlineTable(data: DataTable): BookOutlineRow[] {
 function pdfFixtureStem(fixtureFilename: string): string {
   return fixtureFilename.replace(/\.pdf$/i, '')
 }
+
+Given(
+  'I set the book reading viewport to {int} by {int}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (width: number, height: number) => {
+    return bookReadingPage().setBookReadingViewport(width, height)
+  }
+)
 
 When(
   'I attach book {string} to the notebook {string} via the CLI',
@@ -110,6 +118,16 @@ Then(
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
     return bookReadingPage().expectOutlineRowViewportCurrentByTitle(title)
+  }
+)
+
+Then(
+  'the book outline row {string} should be viewport-current and visible in the outline aside',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (title: string) => {
+    return bookReadingPage().expectViewportCurrentOutlineRowVisibleInAside(
+      title
+    )
   }
 )
 
