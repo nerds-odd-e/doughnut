@@ -71,9 +71,9 @@ function flushPendingNavigation() {
   }
   const shot = pendingNavigation
   pendingNavigation = null
-  applyMineruOutlineV1Target(shot.pageIndexZeroBased, shot.bbox).catch(
-    () => undefined
-  )
+  applyMineruOutlineV1Target(shot.pageIndexZeroBased, shot.bbox).catch(() => {
+    /* Outline jump failures from pdf.js must not reject pagesinit / viewer setup. */
+  })
 }
 
 async function scrollToMineruOutlineV1Target(target: {

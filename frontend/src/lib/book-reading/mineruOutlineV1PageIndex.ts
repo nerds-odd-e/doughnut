@@ -8,6 +8,9 @@
  * space width/height). Rotation other than 0 is not handled for bbox.
  *
  * Invalid or malformed bbox is treated as absent (page-top navigation only).
+ *
+ * **parseMineruOutlineV1StartAnchor:** For any string input, returns a navigation target
+ * or `null`; it **never throws** (invalid JSON, wrong shape, missing `page_idx`, etc. → `null`).
  */
 export const ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1 = "pdf.mineru_outline_v1"
 
@@ -53,7 +56,10 @@ function parseOptionalBbox(raw: unknown): MineruOutlineV1Bbox | null {
   return [a, b, c, d]
 }
 
-/** Invalid JSON, missing page_idx, or invalid page_idx → null (caller no-ops). */
+/**
+ * Returns a navigation target or `null`. Never throws: malformed or non-conforming
+ * `value` yields `null` so callers can no-op (e.g. outline click without breaking the viewer).
+ */
 export function parseMineruOutlineV1StartAnchor(
   value: string
 ): MineruOutlineV1NavigationTarget | null {

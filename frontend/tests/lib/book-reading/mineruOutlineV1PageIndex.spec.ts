@@ -44,6 +44,54 @@ describe("parseMineruOutlineV1StartAnchor", () => {
     expect(parseMineruOutlineV1StartAnchor("{}")).toBe(null)
     expect(parseMineruOutlineV1StartAnchor('{"page_idx":-1}')).toBe(null)
   })
+
+  it("returns null for invalid JSON", () => {
+    expect(parseMineruOutlineV1StartAnchor("")).toBe(null)
+    expect(parseMineruOutlineV1StartAnchor("{")).toBe(null)
+    expect(parseMineruOutlineV1StartAnchor("not json")).toBe(null)
+  })
+
+  it("returns null when page_idx missing or only bbox", () => {
+    expect(parseMineruOutlineV1StartAnchor('{"bbox":[0,0,1,1]}')).toBe(null)
+    expect(parseMineruOutlineV1StartAnchor('{"kind":"heading"}')).toBe(null)
+  })
+
+  it("returns null when page_idx has wrong type", () => {
+    expect(parseMineruOutlineV1StartAnchor('{"page_idx":"0"}')).toBe(null)
+    expect(parseMineruOutlineV1StartAnchor('{"page_idx":1.5}')).toBe(null)
+    expect(parseMineruOutlineV1StartAnchor('{"page_idx":null}')).toBe(null)
+  })
+
+  it("returns null for JSON null, array, or primitive roots", () => {
+    expect(parseMineruOutlineV1StartAnchor("null")).toBe(null)
+    expect(parseMineruOutlineV1StartAnchor("[]")).toBe(null)
+    expect(parseMineruOutlineV1StartAnchor("[1,2]")).toBe(null)
+    expect(parseMineruOutlineV1StartAnchor('"x"')).toBe(null)
+    expect(parseMineruOutlineV1StartAnchor("42")).toBe(null)
+  })
+
+  it("never throws for arbitrary string input", () => {
+    const inputs = [
+      "",
+      "{",
+      "not json",
+      "{}",
+      '{"page_idx":-1}',
+      "null",
+      "[]",
+      '{"page_idx":1e100}',
+    ]
+    for (const s of inputs) {
+      expect(() => parseMineruOutlineV1StartAnchor(s)).not.toThrow()
+      const out = parseMineruOutlineV1StartAnchor(s)
+      expect(
+        out === null ||
+          (typeof out.pageIndex === "number" &&
+            Number.isInteger(out.pageIndex) &&
+            out.pageIndex >= 0)
+      ).toBe(true)
+    }
+  })
 })
 
 describe("extractPageIndexZeroBased", () => {

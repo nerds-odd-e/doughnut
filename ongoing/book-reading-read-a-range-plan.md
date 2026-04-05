@@ -61,7 +61,7 @@
 
 **User outcome:** **Selecting a node** in the layout navigates **pdf.js** to the range’s **start (or agreed) anchor** (page/region per **`pdf.mineru_outline_v1`**). **E2E:** click known range → observable scroll/page change or focus.
 
-**Completion hint:** One-way sync from **layout → PDF**; define minimal mapping rules for v1 anchors before polishing edge cases.
+**Completion hint:** One-way sync from **layout → PDF**; define minimal mapping rules for v1 anchors before polishing edge cases. **Sub-phases:** [`ongoing/book-reading-phase-5-outline-to-pdf-subphases.md`](book-reading-phase-5-outline-to-pdf-subphases.md). **Phase 5.6 (async navigation feedback)** there is **deferred**: selection-after-click (5.2) and the existing PDF **load** spinner already cover the usual feedback; bbox jumps await pdf.js `getPage` but are not showing a product-level “flash” gap in practice—**revisit 5.6** only if we observe noticeable delay or blank states on slow devices or very large PDFs (or if Phase 6 viewport sync makes latency more visible).
 
 ---
 

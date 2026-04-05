@@ -83,20 +83,22 @@
 
 ---
 
-## Phase 5.5 — **Graceful** handling of bad or minimal anchors
+## Phase 5.5 — **Graceful** handling of bad or minimal anchors — **done**
 
-**User outcome:** A row whose anchor JSON **misses** `page_idx`, is **invalid JSON**, or cannot be mapped does **not** break the viewer; behavior is **predictable** (no-op, or concise inline message — pick one product rule and keep it minimal).
+**User outcome:** A row whose anchor JSON **misses** `page_idx`, is **invalid JSON**, or cannot be mapped does **not** break the viewer; behavior is **predictable** — **no-op** (no scroll, outline selection unchanged) via early return in [`BookReadingPage.vue`](frontend/src/pages/BookReadingPage.vue) when [`parseMineruOutlineV1StartAnchor`](frontend/src/lib/book-reading/mineruOutlineV1PageIndex.ts) returns `null`.
 
 **Tests:**
 
-- **Unit:** Parser / mapping: invalid input → agreed result object (no throw in production path).
-- **E2E:** **Only if** the repo can **attach** or **seed** a book with a controlled bad node without heroic setup; otherwise justify **unit-only** for this sub-phase in the plan update and ensure the **same** code path is still invoked from the real click handler (so it is not dead). If E2E is added later, fold or reference here.
+- **Unit:** [`frontend/tests/lib/book-reading/mineruOutlineV1PageIndex.spec.ts`](frontend/tests/lib/book-reading/mineruOutlineV1PageIndex.spec.ts) — invalid JSON, missing/wrong `page_idx`, non-object JSON roots; `parseMineruOutlineV1StartAnchor` **never throws** (contract documented on the function and module header in `mineruOutlineV1PageIndex.ts`).
+- **E2E:** **Unit-only** for this sub-phase — seeding a book with a deliberately bad outline through attach would be heavy; production outline clicks still call `parseMineruOutlineV1StartAnchor`, so the parser is not dead code.
 
-**Phase-complete:** No silent catch blocks that swallow errors without user-visible or logged contract; remove duplicate validation in multiple layers unless each layer has a distinct test.
+**Phase-complete:** [`PdfBookViewer.vue`](frontend/src/components/book-reading/PdfBookViewer.vue) `flushPendingNavigation` documents why rejected outline jumps from pdf.js are ignored (`void` + commented `.catch`).
 
 ---
 
-## Phase 5.6 — **Async** navigation feedback (if needed)
+## Phase 5.6 — **Async** navigation feedback (if needed) — **deferred**
+
+**Deferral:** Not required for Phase 5 closure for now; rationale and when to reopen — [`ongoing/book-reading-read-a-range-plan.md`](book-reading-read-a-range-plan.md) Phase 5 completion hint.
 
 **User outcome:** If scrolling/page render requires **awaiting** pdf.js work, the UI avoids **jarring** blank flashes: **subtle** pending state on the row or a **minimal** main-area indicator consistent with `apiCallWithLoading`-style patterns **only where** async is genuinely user-visible.
 
