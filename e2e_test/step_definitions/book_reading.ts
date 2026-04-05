@@ -85,3 +85,11 @@ Then(
     return bookReadingPage().expectPdfPageMarkerVisible(marker, 2)
   }
 )
+
+Then(
+  'the book outline row {string} should be selected in the book reader',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (title: string) => {
+    return bookReadingPage().expectOutlineRowSelectedByTitle(title)
+  }
+)

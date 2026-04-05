@@ -67,6 +67,17 @@ const bookReadingPage = () => ({
       .click()
     return this
   },
+  expectOutlineRowSelectedByTitle(title: string) {
+    pageIsNotLoading()
+    cy.get('[data-testid="book-reading-outline"]')
+      .find('[data-testid="book-outline-node"]')
+      .contains(title)
+      .should('have.attr', 'aria-current', 'location')
+    cy.get('[data-testid="book-reading-outline"]')
+      .find('[data-testid="book-outline-node"][aria-current="location"]')
+      .should('have.length', 1)
+    return this
+  },
   expectPdfPageMarkerVisible(marker: string, pageNumber: number) {
     cy.get(
       `[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="${pageNumber}"] canvas`

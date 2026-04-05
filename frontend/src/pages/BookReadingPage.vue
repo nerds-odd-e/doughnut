@@ -79,6 +79,10 @@
               data-testid="book-outline-node"
               :data-outline-depth="node.depth"
               class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-w-full daisy-justify-start daisy-normal-case daisy-h-auto daisy-min-h-10 daisy-py-2 daisy-px-2 daisy-text-sm daisy-leading-snug daisy-font-normal"
+              :class="{ 'daisy-btn-active': node.id === selectedOutlineRangeId }"
+              :aria-current="
+                node.id === selectedOutlineRangeId ? 'location' : undefined
+              "
               :style="{ paddingLeft: `${node.depth * 0.75}rem` }"
               @click="onOutlineRowClick(node)"
             >
@@ -201,6 +205,7 @@ function buildFlatOutline(ranges: BookRangeFull[]): OutlineNode[] {
 }
 
 const flatOutline = ref<OutlineNode[]>([])
+const selectedOutlineRangeId = ref<number | null>(null)
 
 const pdfViewerRef = ref<{
   scrollToPageIndexZeroBased: (index: number) => void
@@ -219,6 +224,7 @@ function onOutlineRowClick(node: OutlineNode) {
   if (pageIndex === null) {
     return
   }
+  selectedOutlineRangeId.value = node.id
   pdfViewerRef.value?.scrollToPageIndexZeroBased(pageIndex)
 }
 

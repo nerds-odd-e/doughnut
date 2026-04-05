@@ -24,4 +24,5 @@ Feature: Book reading
     Given I attach book "top-maths.pdf" to the notebook "Top Maths" via the CLI
     When I choose the book outline row "Main Topic 2"
     Then I should see PDF page 2 marker "DOUGHNUT_E2E_BOOK_PAGE2" in the book reader
+    And the book outline row "Main Topic 2" should be selected in the book reader
  
