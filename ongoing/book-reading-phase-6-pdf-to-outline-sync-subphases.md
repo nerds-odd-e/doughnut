@@ -8,7 +8,7 @@
 
 **Planning rules:** `.cursor/rules/planning.mdc` — one **user-visible** behavior per slice where work is UI-shaped; observable tests first when adding behavior; **no dead code** (production paths exercised by that slice’s tests or clearly merged into the next slice before closing); **at most one intentionally failing test** while driving a given slice.
 
-**Status:** Delivery decomposition only — **not** an execution log.
+**Status:** **6.7** shipped — visually hidden `role="status"` / `aria-live="polite"` on [`BookReadingPage.vue`](../frontend/src/pages/BookReadingPage.vue) (`data-testid="book-reading-viewport-current-live"`), driven by debounced `viewportCurrentAnchorId` plus title deduplication in [`viewportCurrentLiveAnnouncement.ts`](../frontend/src/lib/book-reading/viewportCurrentLiveAnnouncement.ts); tests in [`viewportCurrentLiveAnnouncement.spec.ts`](../frontend/tests/lib/book-reading/viewportCurrentLiveAnnouncement.spec.ts). **6.8** and **6.9** not done. Sub-phases **6.1–6.6** match the current viewer + outline stack unless a slice is reopened.
 
 ---
 
@@ -109,13 +109,13 @@ Order is **scenario-first**: **page-level** sync before **within-page** refineme
 
 ---
 
-### 6.7 — **Accessible notification** when the **current range** meaningfully changes
+### 6.7 — **Accessible notification** when the **current range** meaningfully changes — **shipped**
 
 **User-visible:** When the debounced **viewport-current** row **changes** to a **new title**, assistive tech gets a **polite** update — **not** on every scroll tick.
 
-**Implementation hint:** Small `aria-live="polite"` region (e.g. visually hidden) fed only on **id change** after debounce; message = current range title or empty when none.
+**Implementation hint:** Small `aria-live="polite"` region (`daisy-visually-hidden`, `aria-atomic="true"`) fed after debounced `viewportCurrentAnchorId` updates; live text updates only when the resolved **structural title** changes (not on every distinct anchor id if the title repeats). Message = current range title or empty when none. No `aria-live` on outline rows (selection unchanged).
 
-**Tests:** **Unit** for “emit only on change” logic; **E2E** optional (often flaky for a11y tree) — follow project norms in `.cursor/rules/e2e_test.mdc`.
+**Tests:** **Unit** — [`viewportCurrentLiveAnnouncement.spec.ts`](../frontend/tests/lib/book-reading/viewportCurrentLiveAnnouncement.spec.ts) (`structuralTitleForStartAnchorId`, `nextLiveAnnouncementText`). **E2E** not required for this slice.
 
 **Cleanup:** Remove live region if product defers; no duplicate announcements from selection and current.
 
@@ -125,7 +125,7 @@ Order is **scenario-first**: **page-level** sync before **within-page** refineme
 
 **User-visible:** Ranges with **missing** or **unparseable** anchors are **skipped** for “current” matching; the UI **never** throws; if nothing matches, **no** row is viewport-current (or a documented fallback, e.g. last known good).
 
-**Tests:** **Unit** on the matcher with malformed / out-of-range page indices. Add **E2E** only if a **stable** fixture row can carry a bad anchor without breaking attach (may be unnecessary if unit coverage is the right layer).
+**Tests:** **Unit** on the matcher with malformed / out-of-range page indices, unparseable anchor values, and empty / partial outline inputs. **E2E** not required — unit coverage is the contract for this slice.
 
 **Cleanup:** No dead branches “for future formats” until a second anchor format exists; keep mineru-only until then.
 
@@ -137,7 +137,7 @@ Order is **scenario-first**: **page-level** sync before **within-page** refineme
 
 **Implementation hint:** Ensure listeners stay attached to the PDF container regardless of `outlineOpened`; avoid `v-if` teardown of scroll sources when the aside hides.
 
-**Tests:** E2E: close outline → scroll to change page → open outline → **Then** viewport-current matches (reuse toggle `data-testid` from `BookReadingPage`).
+**Tests:** **Unit** or **thin component/integration** coverage: assert PDF viewport listeners / debounced state stay active when the outline panel is hidden (`outlineOpened` false) and that `viewportCurrentAnchorId` (or equivalent) still updates from scroll. **E2E** not required — avoid flakiness from drawer timing and OCR; optional Cypress only if a later phase needs the full journey.
 
 **Cleanup:** No conditional hooks that only register when the drawer is open unless required for performance (default: keep simple).
 
@@ -158,6 +158,7 @@ Expect cohesion around:
 - [`frontend/src/pages/BookReadingPage.vue`](../frontend/src/pages/BookReadingPage.vue) — `flatOutline`, `selectedOutlineRangeId`, outline row chrome
 - [`frontend/src/components/book-reading/PdfBookViewer.vue`](../frontend/src/components/book-reading/PdfBookViewer.vue) — pdf.js `EventBus` / scroll container
 - [`frontend/src/lib/book-reading/mineruOutlineV1PageIndex.ts`](../frontend/src/lib/book-reading/mineruOutlineV1PageIndex.ts) — anchor parsing (reuse for viewport matching)
+- [`frontend/src/lib/book-reading/viewportCurrentLiveAnnouncement.ts`](../frontend/src/lib/book-reading/viewportCurrentLiveAnnouncement.ts) — **6.7** live region text (title resolution + dedupe)
 - [`e2e_test/features/book_reading/book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature) — extend scenarios; [`e2e_test/step_definitions/book_reading.ts`](../e2e_test/step_definitions/book_reading.ts) and page objects as needed
 
 ---

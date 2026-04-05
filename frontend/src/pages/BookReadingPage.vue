@@ -4,6 +4,15 @@
     class="book-reading-page daisy-flex daisy-flex-col daisy-h-full daisy-min-h-0"
   >
     <template v-if="book">
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        data-testid="book-reading-viewport-current-live"
+        class="daisy-visually-hidden"
+      >
+        {{ viewportCurrentLiveText }}
+      </div>
       <GlobalBar>
         <button
           type="button"
@@ -144,6 +153,7 @@ import {
   parseMineruOutlineV1StartAnchor,
 } from "@/lib/book-reading/mineruOutlineV1PageIndex"
 import { createViewportCurrentAnchorDebouncer } from "@/lib/book-reading/debounceViewportCurrentAnchorId"
+import { nextLiveAnnouncementText } from "@/lib/book-reading/viewportCurrentLiveAnnouncement"
 import { viewportCurrentAnchorIdFromAnchorPage } from "@/lib/book-reading/viewportCurrentRangeFromAnchorPage"
 import type {
   BookAnchorFull,
@@ -229,6 +239,8 @@ const flatOutline = ref<OutlineNode[]>([])
 const outlineRows = computed(() => flatOutline.value)
 const selectedOutlineRangeId = ref<number | null>(null)
 const viewportCurrentAnchorId = ref<number | null>(null)
+const viewportCurrentLiveText = ref("")
+const lastAnnouncedViewportTitle = ref<string | undefined>(undefined)
 
 const viewportCurrentAnchorDebouncer = createViewportCurrentAnchorDebouncer({
   delayMs: VIEWPORT_CURRENT_ANCHOR_DEBOUNCE_MS,
@@ -248,6 +260,19 @@ function onViewportAnchorPage(payload: {
   )
   viewportCurrentAnchorDebouncer.propose(candidate)
 }
+
+watch(viewportCurrentAnchorId, (id) => {
+  const { text, changed } = nextLiveAnnouncementText(
+    lastAnnouncedViewportTitle.value,
+    id,
+    outlineRows.value
+  )
+  if (!changed) {
+    return
+  }
+  lastAnnouncedViewportTitle.value = text
+  viewportCurrentLiveText.value = text
+})
 
 watch(
   viewportCurrentAnchorId,
