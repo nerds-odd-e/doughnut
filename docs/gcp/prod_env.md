@@ -124,12 +124,21 @@ gcloud storage buckets create gs://doughnut-book-pdf-carbon-syntax-298809 \
   --uniform-bucket-level-access
 ```
 
-**IAM:** The app VM uses the instance default **Compute Engine service account** `220715781008-compute@developer.gserviceaccount.com` (pattern: `PROJECT_NUMBER-compute@developer.gserviceaccount.com` for project **`carbon-syntax-298809`**). Grant **`roles/storage.objectAdmin`** on the bucket so attach and download can **`put`** and **`get`** objects:
+**IAM:** Grant **`roles/storage.objectAdmin`** on the bucket to whichever **service account the prod backend uses for Application Default Credentials**—usually the **VM’s attached service account**. That is often the instance default **Compute Engine** account `220715781008-compute@developer.gserviceaccount.com` (pattern: `PROJECT_NUMBER-compute@developer.gserviceaccount.com`), but if the MIG/VM is attached to a **custom** account (e.g. **`doughnut-gcp-svc-acct@carbon-syntax-298809.iam.gserviceaccount.com`**), bind that member instead; otherwise uploads fail with **`storage.objects.create` denied**.
 
 ```bash
 gcloud storage buckets add-iam-policy-binding gs://doughnut-book-pdf-carbon-syntax-298809 \
   --project=carbon-syntax-298809 \
   --member="serviceAccount:220715781008-compute@developer.gserviceaccount.com" \
+  --role="roles/storage.objectAdmin"
+```
+
+Example for a custom VM service account (adjust if yours differs):
+
+```bash
+gcloud storage buckets add-iam-policy-binding gs://doughnut-book-pdf-carbon-syntax-298809 \
+  --project=carbon-syntax-298809 \
+  --member="serviceAccount:doughnut-gcp-svc-acct@carbon-syntax-298809.iam.gserviceaccount.com" \
   --role="roles/storage.objectAdmin"
 ```
 
