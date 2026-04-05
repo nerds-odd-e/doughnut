@@ -10,6 +10,8 @@
 
 <script setup lang="ts">
 import "@/lib/pdfjsWorker"
+import { mineruOutlineV1BboxToXyzDestArray } from "@/lib/book-reading/mineruOutlineV1PageIndex"
+import type { MineruOutlineV1Bbox } from "@/lib/book-reading/mineruOutlineV1PageIndex"
 import { getDocument, type PDFDocumentProxy } from "pdfjs-dist"
 import {
   EventBus,
@@ -32,35 +34,64 @@ const viewerRef = ref<HTMLDivElement | null>(null)
 
 let pdfViewer: PDFViewer | null = null
 let currentLoadingTask: ReturnType<typeof getDocument> | null = null
-let pendingPageIndexZeroBased: number | null = null
 
-function flushPendingPageScroll() {
-  if (pendingPageIndexZeroBased === null || !pdfViewer?.pdfDocument) {
-    return
-  }
-  const idx = pendingPageIndexZeroBased
-  pendingPageIndexZeroBased = null
-  if (idx >= 0 && idx < pdfViewer.pagesCount) {
-    pdfViewer.scrollPageIntoView({ pageNumber: idx + 1 })
-  }
+type PendingNav = {
+  pageIndexZeroBased: number
+  bbox: MineruOutlineV1Bbox | null
 }
 
-function scrollToPageIndexZeroBased(index: number) {
-  if (!Number.isInteger(index) || index < 0) {
+let pendingNavigation: PendingNav | null = null
+
+async function applyMineruOutlineV1Target(
+  pageIndexZeroBased: number,
+  bbox: MineruOutlineV1Bbox | null
+) {
+  if (!pdfViewer?.pdfDocument) return
+  if (
+    !Number.isInteger(pageIndexZeroBased) ||
+    pageIndexZeroBased < 0 ||
+    pageIndexZeroBased >= pdfViewer.pagesCount
+  ) {
+    return
+  }
+  const pageNumber = pageIndexZeroBased + 1
+  if (bbox === null) {
+    pdfViewer.scrollPageIntoView({ pageNumber })
+    return
+  }
+  const page = await pdfViewer.pdfDocument.getPage(pageNumber)
+  const vp = page.getViewport({ scale: 1 })
+  const destArray = mineruOutlineV1BboxToXyzDestArray(vp.height, bbox)
+  pdfViewer.scrollPageIntoView({ pageNumber, destArray: [...destArray] })
+}
+
+function flushPendingNavigation() {
+  if (pendingNavigation === null || !pdfViewer?.pdfDocument) {
+    return
+  }
+  const shot = pendingNavigation
+  pendingNavigation = null
+  applyMineruOutlineV1Target(shot.pageIndexZeroBased, shot.bbox).catch(
+    () => undefined
+  )
+}
+
+async function scrollToMineruOutlineV1Target(target: {
+  pageIndexZeroBased: number
+  bbox: MineruOutlineV1Bbox | null
+}) {
+  const { pageIndexZeroBased, bbox } = target
+  if (!Number.isInteger(pageIndexZeroBased) || pageIndexZeroBased < 0) {
     return
   }
   if (!pdfViewer?.pdfDocument) {
-    pendingPageIndexZeroBased = index
+    pendingNavigation = { pageIndexZeroBased, bbox }
     return
   }
-  if (index >= pdfViewer.pagesCount) {
-    return
-  }
-  pdfViewer.scrollPageIntoView({ pageNumber: index + 1 })
-  pendingPageIndexZeroBased = null
+  await applyMineruOutlineV1Target(pageIndexZeroBased, bbox)
 }
 
-defineExpose({ scrollToPageIndexZeroBased })
+defineExpose({ scrollToMineruOutlineV1Target })
 
 async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
   const container = containerRef.value
@@ -74,7 +105,7 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
   if (pdfViewer) {
     pdfViewer.setDocument(null as unknown as PDFDocumentProxy)
     pdfViewer = null
-    pendingPageIndexZeroBased = null
+    pendingNavigation = null
   }
 
   const eventBus = new EventBus()
@@ -93,7 +124,7 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
     if (pdfViewer) {
       const containerWidth = container.clientWidth
       pdfViewer.currentScaleValue = containerWidth > 0 ? "page-width" : "1"
-      flushPendingPageScroll()
+      flushPendingNavigation()
     }
   })
 
@@ -134,7 +165,7 @@ onBeforeUnmount(async () => {
     pdfViewer.setDocument(null as unknown as PDFDocumentProxy)
     pdfViewer = null
   }
-  pendingPageIndexZeroBased = null
+  pendingNavigation = null
 })
 </script>
 

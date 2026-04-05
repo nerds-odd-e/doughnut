@@ -68,7 +68,7 @@
 
 ---
 
-## Phase 5.4 — **`bbox`** refinement on the same page
+## Phase 5.4 — **`bbox`** refinement on the same page — **done**
 
 **User outcome:** When the start anchor includes **`bbox`**, the PDF scrolls so the **region** is in view, not only the page top (still v1: document supported bbox coordinate space vs pdf.js).
 
@@ -78,6 +78,8 @@
 - **Unit:** Bbox → scroll destination math for fixed examples.
 
 **Phase-complete:** If bbox is optional in data, ensure **no** unused branches — page-only path still covered by 5.1 E2E.
+
+**Implemented:** [`parseMineruOutlineV1StartAnchor`](frontend/src/lib/book-reading/mineruOutlineV1PageIndex.ts), [`mineruOutlineV1BboxToXyzDestArray`](frontend/src/lib/book-reading/mineruOutlineV1PageIndex.ts) (XYZ at bbox center, null zoom — keeps page-width; avoids FitR rescaling that removed scroll delta in E2E), [`PdfBookViewer`](frontend/src/components/book-reading/PdfBookViewer.vue) `scrollToMineruOutlineV1Target`, E2E stub bboxes in [`e2e_test/python_stubs/mineru_site/mineru/cli/common.py`](e2e_test/python_stubs/mineru_site/mineru/cli/common.py), scenario *Same-page outline entries with different bboxes scroll to different positions* in [`e2e_test/features/book_reading/book_reading.feature`](e2e_test/features/book_reading/book_reading.feature).
 
 ---
 

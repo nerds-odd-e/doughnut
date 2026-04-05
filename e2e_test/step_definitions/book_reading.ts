@@ -88,3 +88,14 @@ Then(
     return bookReadingPage().expectOutlineRowSelectedByTitle(title)
   }
 )
+
+Then(
+  'same-page bbox outline entries should produce distinct PDF scroll positions',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().expectDistinctScrollForSamePageBboxOutline(
+      'Subtopic 1.1',
+      'Subtopic 1.2'
+    )
+  }
+)

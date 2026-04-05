@@ -124,7 +124,7 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import {
   ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1,
-  extractPageIndexZeroBased,
+  parseMineruOutlineV1StartAnchor,
 } from "@/lib/book-reading/mineruOutlineV1PageIndex"
 import type {
   BookAnchorFull,
@@ -208,10 +208,13 @@ const flatOutline = ref<OutlineNode[]>([])
 const selectedOutlineRangeId = ref<number | null>(null)
 
 const pdfViewerRef = ref<{
-  scrollToPageIndexZeroBased: (index: number) => void
+  scrollToMineruOutlineV1Target: (target: {
+    pageIndexZeroBased: number
+    bbox: readonly [number, number, number, number] | null
+  }) => Promise<void>
 } | null>(null)
 
-function onOutlineRowClick(node: OutlineNode) {
+async function onOutlineRowClick(node: OutlineNode) {
   const anchor = node.startAnchor
   if (
     !anchor ||
@@ -220,12 +223,15 @@ function onOutlineRowClick(node: OutlineNode) {
   ) {
     return
   }
-  const pageIndex = extractPageIndexZeroBased(anchor.value)
-  if (pageIndex === null) {
+  const parsed = parseMineruOutlineV1StartAnchor(anchor.value)
+  if (parsed === null) {
     return
   }
   selectedOutlineRangeId.value = node.id
-  pdfViewerRef.value?.scrollToPageIndexZeroBased(pageIndex)
+  await pdfViewerRef.value?.scrollToMineruOutlineV1Target({
+    pageIndexZeroBased: parsed.pageIndex,
+    bbox: parsed.bbox,
+  })
 }
 
 onMounted(async () => {

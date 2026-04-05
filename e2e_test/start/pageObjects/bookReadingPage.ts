@@ -121,6 +121,41 @@ const bookReadingPage = () => {
       )
       return this
     },
+    /** Two outline rows on the same page with different bboxes → scrollTop should change. */
+    expectDistinctScrollForSamePageBboxOutline(
+      topTitle: string,
+      bottomTitle: string
+    ) {
+      const minDeltaPx = 80
+      const scrollTopOfPdfReadingScrollChain = () =>
+        cy.get('[data-testid="pdf-book-viewer"]').then(($viewer) => {
+          const pageRoot = $viewer.closest(
+            '[data-testid="book-reading-page"]'
+          )[0]
+          if (!pageRoot) throw new Error('book-reading-page not found')
+          let el: HTMLElement | null = $viewer[0] as HTMLElement
+          while (el && pageRoot.contains(el)) {
+            if (el.scrollHeight > el.clientHeight + 1) {
+              return el.scrollTop
+            }
+            el = el.parentElement
+          }
+          return 0
+        })
+      pageIsNotLoading()
+      this.clickOutlineRowByTitle(bottomTitle)
+      scrollTopOfPdfReadingScrollChain().as('scrollAfterBottomBbox')
+      this.clickOutlineRowByTitle(topTitle)
+      cy.get<number>('@scrollAfterBottomBbox').then((bottomScroll) => {
+        scrollTopOfPdfReadingScrollChain().should((topScroll) => {
+          expect(
+            Math.abs(Number(bottomScroll) - Number(topScroll)),
+            'scrollTop should differ after bbox targets on the same page'
+          ).to.be.at.least(minDeltaPx)
+        })
+      })
+      return this
+    },
   }
 }
 
