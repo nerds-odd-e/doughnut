@@ -47,9 +47,11 @@
 
 ---
 
-## Phase 4 — Book layout in a drawer; PDF remains main focus
+## Phase 4 — Book layout in a drawer; PDF remains main focus — **done**
 
 **User outcome:** The **outline / ranges** from **`GET .../book`** appear in a **drawer sidebar**; the **PDF viewer stays in the main** region. **E2E:** layout tree visible alongside rendered PDF (drawer open by default or clearly openable—pick one consistent default and assert it).
+
+**Shipped:** `BookReadingPage` uses the same responsive sidebar pattern as `NoteShowPage` (768px): outline in a **left** panel with **internal scroll**, PDF in **`main`** with **overflow-y-auto**; **large** viewports open the outline by default, **small** hidden with **backdrop** and tap-outside to close. **GlobalBar:** compact **Notebook** link, book title, and **Outline** control (`aria-label`) so small viewports can open the panel. **E2E** unchanged (1200px viewport → outline open).
 
 **Completion hint:** Reuse existing book JSON shape; DaisyUI/drawer patterns consistent with the rest of the app.
 

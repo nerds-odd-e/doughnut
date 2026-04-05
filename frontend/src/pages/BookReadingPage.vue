@@ -1,28 +1,106 @@
 <template>
-  <div data-testid="book-reading-page">
+  <div
+    data-testid="book-reading-page"
+    class="book-reading-page daisy-flex daisy-flex-col daisy-h-full daisy-min-h-0"
+  >
     <template v-if="book">
-      <ContentLoader v-if="pdfLoading" />
-      <div
-        v-else-if="pdfError"
-        class="daisy-alert daisy-alert-error daisy-mb-2"
-        data-testid="book-reading-pdf-error"
-      >
-        {{ pdfError }}
-      </div>
-      <PdfFirstPageCanvas
-        v-else-if="bookPdfBytes"
-        :pdf-bytes="bookPdfBytes"
-        @load-error="onPdfLoadError"
-      />
-      <div data-testid="book-reading-outline">
-        <div
-          v-for="node in flatOutline"
-          :key="node.id"
-          data-testid="book-outline-node"
-          :data-outline-depth="node.depth"
+      <GlobalBar>
+        <button
+          type="button"
+          class="daisy-btn daisy-btn-sm daisy-btn-ghost daisy-shrink-0"
+          :class="{ 'sidebar-expanded': outlineOpened }"
+          data-testid="book-reading-outline-toggle"
+          aria-label="Outline"
+          title="Outline"
+          @click="outlineOpened = !outlineOpened"
         >
-          {{ node.title }}
-        </div>
+          <div class="daisy-w-4 daisy-h-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="w-4 h-4"
+            >
+              <template v-if="outlineOpened">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </template>
+              <template v-else>
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="6" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </template>
+            </svg>
+          </div>
+        </button>
+        <router-link
+          :to="{ name: 'notebookEdit', params: { notebookId: props.notebookId } }"
+          class="daisy-btn daisy-btn-sm daisy-btn-ghost daisy-shrink-0 daisy-no-underline"
+        >
+          Notebook
+        </router-link>
+        <span
+          class="daisy-truncate daisy-text-sm daisy-font-medium daisy-min-w-0 daisy-ml-1"
+          :title="book.bookName ?? undefined"
+        >
+          {{ book.bookName }}
+        </span>
+      </GlobalBar>
+      <div
+        v-if="!isMdOrLarger && outlineOpened"
+        class="daisy-fixed daisy-inset-0 daisy-bg-black/50 daisy-z-30"
+        aria-hidden="true"
+        @click="outlineOpened = false"
+      />
+      <div class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-relative">
+        <aside
+          :class="[
+            'daisy-bg-base-200 daisy-w-72 daisy-min-w-[16rem] daisy-max-w-[min(20rem,85vw)] daisy-transition-transform daisy-ease-in-out daisy-duration-200 daisy-overflow-y-auto daisy-overflow-x-hidden',
+            isMdOrLarger
+              ? outlineOpened
+                ? 'daisy-relative daisy-shrink-0 daisy-border-r daisy-border-base-300'
+                : 'daisy-hidden'
+              : outlineOpened
+                ? 'daisy-translate-x-0 daisy-fixed daisy-top-0 daisy-left-0 daisy-z-40 daisy-h-full daisy-pt-[env(safe-area-inset-top)]'
+                : '-daisy-translate-x-full daisy-fixed daisy-top-0 daisy-left-0 daisy-z-40 daisy-h-full',
+          ]"
+        >
+          <div
+            data-testid="book-reading-outline"
+            class="daisy-p-3 daisy-pb-8"
+          >
+            <div
+              v-for="node in flatOutline"
+              :key="node.id"
+              data-testid="book-outline-node"
+              :data-outline-depth="node.depth"
+              class="daisy-py-1 daisy-text-sm daisy-leading-snug"
+              :style="{ paddingLeft: `${node.depth * 0.75}rem` }"
+            >
+              {{ node.title }}
+            </div>
+          </div>
+        </aside>
+        <main
+          class="daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-overflow-y-auto daisy-px-2 daisy-py-2 sm:daisy-px-4"
+        >
+          <ContentLoader v-if="pdfLoading" />
+          <div
+            v-else-if="pdfError"
+            class="daisy-alert daisy-alert-error daisy-mb-2"
+            data-testid="book-reading-pdf-error"
+          >
+            {{ pdfError }}
+          </div>
+          <PdfFirstPageCanvas
+            v-else-if="bookPdfBytes"
+            :pdf-bytes="bookPdfBytes"
+            @load-error="onPdfLoadError"
+          />
+        </main>
       </div>
     </template>
   </div>
@@ -30,10 +108,13 @@
 
 <script setup lang="ts">
 import ContentLoader from "@/components/commons/ContentLoader.vue"
+import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfFirstPageCanvas from "@/components/book-reading/PdfFirstPageCanvas.vue"
 import type { BookFull, BookRangeFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
-import { onMounted, ref } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref } from "vue"
+
+const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
 
 const props = defineProps({
   notebookId: { type: Number, required: true },
@@ -47,6 +128,21 @@ const book = ref<BookFull | null>(null)
 const bookPdfBytes = ref<ArrayBuffer | null>(null)
 const pdfLoading = ref(false)
 const pdfError = ref<string | null>(null)
+
+const outlineOpened = ref(false)
+const windowWidth = ref(
+  typeof window !== "undefined"
+    ? window.innerWidth
+    : BOOK_READING_LAYOUT_BREAKPOINT_PX
+)
+
+function handleResize() {
+  windowWidth.value = window.innerWidth
+}
+
+const isMdOrLarger = computed(
+  () => windowWidth.value >= BOOK_READING_LAYOUT_BREAKPOINT_PX
+)
 
 function onPdfLoadError(message: string) {
   pdfError.value = message
@@ -81,6 +177,11 @@ function buildFlatOutline(ranges: BookRangeFull[]): OutlineNode[] {
 const flatOutline = ref<OutlineNode[]>([])
 
 onMounted(async () => {
+  window.addEventListener("resize", handleResize)
+  if (windowWidth.value >= BOOK_READING_LAYOUT_BREAKPOINT_PX) {
+    outlineOpened.value = true
+  }
+
   const { data, error } = await NotebookBooksController.getBook({
     path: { notebook: props.notebookId },
   })
@@ -107,4 +208,22 @@ onMounted(async () => {
     }
   }
 })
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", handleResize)
+})
 </script>
+
+<style scoped>
+.book-reading-page {
+  max-height: 100%;
+}
+
+aside {
+  max-height: 100%;
+}
+
+main {
+  max-height: 100%;
+}
+</style>

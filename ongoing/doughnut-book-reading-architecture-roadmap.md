@@ -146,7 +146,7 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 
 **Plan:** Phased delivery is spelled out in [`ongoing/book-reading-read-a-range-plan.md`](book-reading-read-a-range-plan.md).
 
-**Implemented so far (Story 2):** Phases **1–3** of that plan are shipped: multipart attach, **`GET …/book/file`**, and a **pdf.js** viewer that draws **page 1** to a **canvas** on the book reading route (loading and error states in the PDF pane). The **layout tree** from **`GET …/book`** is still shown **inline** on the same page until the **drawer** phase; **outline ↔ PDF sync** is not implemented yet. The book-reading E2E asserts that page-1 content is present by **OCR on the canvas** in Cypress test infrastructure (Tesseract.js, committed language data under `e2e_test/tesseract/`) — **not** via a product DOM text layer on top of the canvas.
+**Implemented so far (Story 2):** Phases **1–4** of that plan are shipped: multipart attach, **`GET …/book/file`**, **pdf.js** page 1 on a **canvas**, and the **outline** from **`GET …/book`** in a **left** responsive drawer/panel (PDF in **`main`**; **768px** breakpoint: open by default on large, overlay + backdrop on small; **Outline** control in **GlobalBar**). **Outline ↔ PDF sync** is not implemented yet. The book-reading E2E asserts that page-1 content is present by **OCR on the canvas** in Cypress test infrastructure (Tesseract.js, committed language data under `e2e_test/tesseract/`) — **not** via a product DOM text layer on top of the canvas.
 
 ---
 
