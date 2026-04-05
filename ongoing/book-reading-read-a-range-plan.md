@@ -57,11 +57,13 @@
 
 ---
 
-## Phase 5 — Click a layout range → PDF jumps to the right place
+## Phase 5 — Click a layout range → PDF jumps to the right place — **done**
 
 **User outcome:** **Selecting a node** in the layout navigates **pdf.js** to the range’s **start (or agreed) anchor** (page/region per **`pdf.mineru_outline_v1`**). **E2E:** click known range → observable scroll/page change or focus.
 
-**Completion hint:** One-way sync from **layout → PDF**; define minimal mapping rules for v1 anchors before polishing edge cases. **Sub-phases:** [`ongoing/book-reading-phase-5-outline-to-pdf-subphases.md`](book-reading-phase-5-outline-to-pdf-subphases.md). **Phase 5.6 (async navigation feedback)** there is **deferred**: selection-after-click (5.2) and the existing PDF **load** spinner already cover the usual feedback; bbox jumps await pdf.js `getPage` but are not showing a product-level “flash” gap in practice—**revisit 5.6** only if we observe noticeable delay or blank states on slow devices or very large PDFs (or if Phase 6 viewport sync makes latency more visible).
+**Shipped:** `mineruOutlineV1PageIndex` (`parseMineruOutlineV1StartAnchor`, bbox → scroll destination), `PdfBookViewer` `scrollToMineruOutlineV1Target`, `BookReadingPage` outline row activation and chrome/safe-area handling; Cypress scenarios *Outline row jumps the PDF to the anchored page* and *Outline rows on the same page scroll the PDF to different places* in [`e2e_test/features/book_reading/book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature).
+
+**Completion hint:** **Sub-phases:** [`ongoing/book-reading-phase-5-outline-to-pdf-subphases.md`](book-reading-phase-5-outline-to-pdf-subphases.md). **Phase 5.6 (async navigation feedback)** remains **deferred** — **revisit 5.6** only if we observe noticeable delay or blank states on slow devices or very large PDFs (or if Phase 6 viewport sync makes latency more visible). **Phases 5.7 and 5.8** (keyboard activation; nested outline expand vs navigate) are **deferred** to **Phase 9** and **Phase 10** after Phase 8—see below.
 
 ---
 
@@ -89,9 +91,30 @@
 
 ---
 
+## Phase 9 — Outline keyboard activation matches click (deferred from Phase 5.7)
+
+**User outcome:** Focus an outline control and activate with **Enter** / **Space** (platform-appropriate) → same PDF navigation and **selected** state as pointer click; touch must not regress.
+
+**E2E:** One scenario path: keyboard activation reaches the same postcondition as outline click → page/scroll and selection contract as in Phase 5.
+
+**Completion hint:** Single “activate row” code path preferred; no duplicate handlers.
+
+---
+
+## Phase 10 — Nested outline: expand/collapse vs go-to (deferred from Phase 5.8)
+
+**User outcome:** If the outline gains **hierarchical** rows with expand/collapse (e.g. chevron), **go-to** must not fire when toggling expansion (chevron vs row body or equivalent pattern). **Skip** this phase while the outline stays a **flat** list with no expand control.
+
+**E2E:** Expand vs navigate as separate actions with distinct assertions when the UI exists.
+
+**Completion hint:** Remove dead handlers on non-interactive wrappers when implementing.
+
+---
+
 ## After this story
 
 - **Reading record** and **next range** stories build on **BookRange** + **current range** from Phases 5–6.
+- **Phases 9–10** (keyboard outline activation; nested outline interaction) are optional polish after Phase 8 when the team schedules them.
 - Roadmap **open questions** (opaque anchors, finer progress) may narrow once PDF anchor mapping is exercised end-to-end.
 
 ---
