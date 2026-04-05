@@ -15,6 +15,50 @@ type PageViewLike = {
 }
 
 /**
+ * Page that contains the vertical midpoint of the scroll container (reading focus). Falls back to
+ * the page with the largest visible height inside the container when the midpoint lies in a gap.
+ *
+ * Does not use `PDFViewer.currentPageNumber`: in a short viewport pdf.js can keep that on an
+ * earlier page while it remains “fully visible”, even when the user has scrolled a later page into
+ * the reading band.
+ */
+export function pageIndexForScrollContainerCenter(
+  scrollContainer: HTMLElement,
+  pdfViewer: PDFViewer
+): number {
+  const pages = pdfViewer.pagesCount
+  if (pages <= 0) {
+    return 0
+  }
+  const containerRect = scrollContainer.getBoundingClientRect()
+  const centerY = (containerRect.top + containerRect.bottom) / 2
+
+  let bestOverlap = -Infinity
+  let bestOverlapIndex = Math.max(
+    0,
+    Math.min(pages - 1, pdfViewer.currentPageNumber - 1)
+  )
+
+  for (let i = 0; i < pages; i++) {
+    const pageView = pdfViewer.getPageView(i) as PageViewLike | undefined
+    const div = pageView?.div
+    if (!div) continue
+    const pr = div.getBoundingClientRect()
+    if (centerY >= pr.top && centerY <= pr.bottom) {
+      return i
+    }
+    const overlap =
+      Math.min(containerRect.bottom, pr.bottom) -
+      Math.max(containerRect.top, pr.top)
+    if (overlap > bestOverlap) {
+      bestOverlap = overlap
+      bestOverlapIndex = i
+    }
+  }
+  return bestOverlapIndex
+}
+
+/**
  * Vertical **center** of the scroll container’s visible band intersected with the current pdf.js
  * page, expressed as mineru-style y from the page top (down), same units as
  * `pdfPage.getViewport({ scale: 1 })`. Using the midpoint matches “where I’m reading” better than
@@ -28,8 +72,10 @@ export function pdfViewerViewportTopYDown(
   if (pages === 0 || !pdfViewer.pdfDocument) {
     return { anchorPageIndexZeroBased: 0, viewportTopYDown: null }
   }
-  const pageNumber = pdfViewer.currentPageNumber
-  const pageIndex = pageNumber - 1
+  const pageIndex = pageIndexForScrollContainerCenter(
+    scrollContainer,
+    pdfViewer
+  )
   const pageView = pdfViewer.getPageView(pageIndex) as PageViewLike | undefined
 
   if (!pageView?.pdfPage || !pageView.div) {
