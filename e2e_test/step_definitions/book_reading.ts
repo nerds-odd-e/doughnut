@@ -74,6 +74,14 @@ When(
 )
 
 When(
+  'I scroll the PDF book reader down within the same page to move viewport past the next outline bbox',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().scrollPdfBookReaderDownWithinSamePageForNextBbox()
+  }
+)
+
+When(
   'I choose the book outline row {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {

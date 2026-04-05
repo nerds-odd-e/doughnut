@@ -170,6 +170,21 @@ const bookReadingPage = () => {
         .scrollIntoView({ offset: { top: -100, left: 0 } })
       return this
     },
+    /**
+     * Scrolls the book-reading PDF container without changing pages (fixture: two bbox rows on page 1).
+     * Delta is in CSS pixels; tuned to cross mineru y gap between Subtopic 1.1 and 1.2 at page-width scale.
+     */
+    scrollPdfBookReaderDownWithinSamePageForNextBbox() {
+      const deltaPx = 420
+      pageIsNotLoading()
+      cy.get('[data-testid="pdf-book-viewer"]').then(($viewer) => {
+        const el = scrollableAncestorWithinBookReadingPage(
+          $viewer[0] as HTMLElement
+        )
+        el.scrollTop += deltaPx
+      })
+      return this
+    },
     expectOutlineRowViewportCurrentByTitle(title: string) {
       pageIsNotLoading()
       const row = outlineNodes().contains(title)

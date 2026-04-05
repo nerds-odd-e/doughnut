@@ -220,10 +220,14 @@ const outlineRows = computed(() => flatOutline.value)
 const selectedOutlineRangeId = ref<number | null>(null)
 const viewportCurrentAnchorId = ref<number | null>(null)
 
-function onViewportAnchorPage(payload: { anchorPageIndexZeroBased: number }) {
+function onViewportAnchorPage(payload: {
+  anchorPageIndexZeroBased: number
+  viewportTopYDown: number | null
+}) {
   viewportCurrentAnchorId.value = viewportCurrentAnchorIdFromAnchorPage(
     outlineRows.value.map((n) => n.startAnchor),
-    payload.anchorPageIndexZeroBased
+    payload.anchorPageIndexZeroBased,
+    payload.viewportTopYDown
   )
 }
 

@@ -39,3 +39,11 @@ Feature: Book reading
     And I scroll the PDF book reader to bring page 2 into primary view
     Then I should see PDF page 2 marker "DOUGHNUT_E2E_BOOK_PAGE2" in the book reader
     And the book outline row "Subtopic 2.2" should be viewport-current in the book reader
+
+  Scenario: Scrolling within one PDF page updates viewport-current between same-page outline rows
+    Given I attach book "top-maths.pdf" to the notebook "Top Maths" via the CLI
+    When I open the book attached to notebook "Top Maths"
+    And I choose the book outline row "Subtopic 1.1"
+    Then the book outline row "Subtopic 1.1" should be viewport-current in the book reader
+    When I scroll the PDF book reader down within the same page to move viewport past the next outline bbox
+    Then the book outline row "Subtopic 1.2" should be viewport-current in the book reader

@@ -38,4 +38,24 @@ describe("viewportCurrentAnchorIdFromAnchorPage", () => {
     expect(viewportCurrentAnchorIdFromAnchorPage(list, -1)).toBe(null)
     expect(viewportCurrentAnchorIdFromAnchorPage(list, 1.5)).toBe(null)
   })
+
+  it("on same page, viewport Y between bbox tops picks the earlier section (102)", () => {
+    const list = makeMe.bookReadingTopMathsLikeAnchors()
+    expect(viewportCurrentAnchorIdFromAnchorPage(list, 0, 400)).toBe(102)
+  })
+
+  it("on same page, viewport Y at second bbox top includes that section (103)", () => {
+    const list = makeMe.bookReadingTopMathsLikeAnchors()
+    expect(viewportCurrentAnchorIdFromAnchorPage(list, 0, 520)).toBe(103)
+  })
+
+  it("on same page, viewport Y past second bbox keeps last matching section (103)", () => {
+    const list = makeMe.bookReadingTopMathsLikeAnchors()
+    expect(viewportCurrentAnchorIdFromAnchorPage(list, 0, 800)).toBe(103)
+  })
+
+  it("on same page, viewport Y before first bbox top keeps page-top rows only (101)", () => {
+    const list = makeMe.bookReadingTopMathsLikeAnchors()
+    expect(viewportCurrentAnchorIdFromAnchorPage(list, 0, 0)).toBe(101)
+  })
 })

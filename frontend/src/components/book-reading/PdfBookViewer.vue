@@ -10,6 +10,7 @@
 
 <script setup lang="ts">
 import "@/lib/pdfjsWorker"
+import { pdfViewerViewportTopYDown } from "@/lib/book-reading/pdfViewerViewportTopYDown"
 import { mineruOutlineV1BboxToXyzDestArray } from "@/lib/book-reading/mineruOutlineV1PageIndex"
 import type { MineruOutlineV1Bbox } from "@/lib/book-reading/mineruOutlineV1PageIndex"
 import { getDocument, type PDFDocumentProxy } from "pdfjs-dist"
@@ -27,7 +28,12 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   loadError: [message: string]
-  viewportAnchorPage: [{ anchorPageIndexZeroBased: number }]
+  viewportAnchorPage: [
+    {
+      anchorPageIndexZeroBased: number
+      viewportTopYDown: number | null
+    },
+  ]
 }>()
 
 const containerRef = ref<HTMLDivElement | null>(null)
@@ -35,16 +41,38 @@ const viewerRef = ref<HTMLDivElement | null>(null)
 
 let pdfViewer: PDFViewer | null = null
 let currentLoadingTask: ReturnType<typeof getDocument> | null = null
-let onPageChangingForViewport: ((evt: { pageNumber: number }) => void) | null =
-  null
-let lastEmittedAnchorPageIndex: number | null = null
+let onPageChangingForViewport: (() => void) | null = null
+let lastEmittedPage: number | null = null
+let lastEmittedYQuantized: number | null = null
+let onScrollForViewport: (() => void) | null = null
 
-function emitViewportAnchorIfChanged(anchorPageIndexZeroBased: number) {
-  if (lastEmittedAnchorPageIndex === anchorPageIndexZeroBased) {
+function detachViewportScrollListener(container: HTMLElement) {
+  if (onScrollForViewport) {
+    container.removeEventListener("scroll", onScrollForViewport)
+    onScrollForViewport = null
+  }
+}
+
+function emitViewportDescriptorIfChanged() {
+  const container = containerRef.value
+  if (!container || !pdfViewer) return
+  const sample = pdfViewerViewportTopYDown(container, pdfViewer)
+  const yq =
+    sample.viewportTopYDown === null
+      ? null
+      : Math.round(sample.viewportTopYDown * 100) / 100
+  if (
+    lastEmittedPage === sample.anchorPageIndexZeroBased &&
+    lastEmittedYQuantized === yq
+  ) {
     return
   }
-  lastEmittedAnchorPageIndex = anchorPageIndexZeroBased
-  emit("viewportAnchorPage", { anchorPageIndexZeroBased })
+  lastEmittedPage = sample.anchorPageIndexZeroBased
+  lastEmittedYQuantized = yq
+  emit("viewportAnchorPage", {
+    anchorPageIndexZeroBased: sample.anchorPageIndexZeroBased,
+    viewportTopYDown: sample.viewportTopYDown,
+  })
 }
 
 type PendingNav = {
@@ -69,12 +97,13 @@ async function applyMineruOutlineV1Target(
   const pageNumber = pageIndexZeroBased + 1
   if (bbox === null) {
     pdfViewer.scrollPageIntoView({ pageNumber })
-    return
+  } else {
+    const page = await pdfViewer.pdfDocument.getPage(pageNumber)
+    const vp = page.getViewport({ scale: 1 })
+    const destArray = mineruOutlineV1BboxToXyzDestArray(vp.height, bbox)
+    pdfViewer.scrollPageIntoView({ pageNumber, destArray: [...destArray] })
   }
-  const page = await pdfViewer.pdfDocument.getPage(pageNumber)
-  const vp = page.getViewport({ scale: 1 })
-  const destArray = mineruOutlineV1BboxToXyzDestArray(vp.height, bbox)
-  pdfViewer.scrollPageIntoView({ pageNumber, destArray: [...destArray] })
+  queueMicrotask(() => emitViewportDescriptorIfChanged())
 }
 
 function flushPendingNavigation() {
@@ -124,7 +153,9 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
     pendingNavigation = null
   }
 
-  lastEmittedAnchorPageIndex = null
+  detachViewportScrollListener(container)
+  lastEmittedPage = null
+  lastEmittedYQuantized = null
 
   const eventBus = new EventBus()
   const linkService = new PDFLinkService({ eventBus })
@@ -138,17 +169,22 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
   })
   linkService.setViewer(pdfViewer)
 
-  onPageChangingForViewport = (evt: { pageNumber: number }) => {
-    emitViewportAnchorIfChanged(evt.pageNumber - 1)
+  onPageChangingForViewport = () => {
+    emitViewportDescriptorIfChanged()
   }
   eventBus.on("pagechanging", onPageChangingForViewport)
+
+  onScrollForViewport = () => {
+    emitViewportDescriptorIfChanged()
+  }
+  container.addEventListener("scroll", onScrollForViewport, { passive: true })
 
   eventBus.on("pagesinit", () => {
     if (pdfViewer) {
       const containerWidth = container.clientWidth
       pdfViewer.currentScaleValue = containerWidth > 0 ? "page-width" : "1"
       flushPendingNavigation()
-      emitViewportAnchorIfChanged(pdfViewer.currentPageNumber - 1)
+      emitViewportDescriptorIfChanged()
     }
   })
 
@@ -181,6 +217,10 @@ watch(
 )
 
 onBeforeUnmount(async () => {
+  const container = containerRef.value
+  if (container) {
+    detachViewportScrollListener(container)
+  }
   if (currentLoadingTask) {
     await currentLoadingTask.destroy()
     currentLoadingTask = null
