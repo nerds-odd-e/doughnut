@@ -79,13 +79,25 @@ const bookReadingPage = () => ({
     return this
   },
   expectPdfPageMarkerVisible(marker: string, pageNumber: number) {
+    // Subpixel/layout drift vs GlobalBar; keeps jump-under-chrome checks stable.
+    const chromeGeometryTolerancePx = 2
+
     cy.get(
       `[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="${pageNumber}"] canvas`
     )
       .first()
-      .scrollIntoView()
       .should(($canvas) => {
         const el = $canvas[0] as HTMLCanvasElement
+        const pageRoot = el.closest('[data-testid="book-reading-page"]')
+        const nav = pageRoot?.querySelector('nav.daisy-navbar')
+        if (!nav)
+          throw new Error('book-reading GlobalBar (nav.daisy-navbar) not found')
+        const navBottom = nav.getBoundingClientRect().bottom
+        const canvasTop = el.getBoundingClientRect().top
+        expect(
+          canvasTop,
+          'PDF page top should be at or below GlobalBar bottom after outline jump'
+        ).to.be.at.least(navBottom - chromeGeometryTolerancePx)
         expect(el.width, 'PDF canvas should have width').to.be.greaterThan(0)
         const ctx = el.getContext('2d')
         if (!ctx) throw new Error('No 2d context on PDF canvas')

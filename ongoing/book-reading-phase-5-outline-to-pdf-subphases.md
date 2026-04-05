@@ -53,7 +53,7 @@
 
 ---
 
-## Phase 5.3 — Jump lands **below chrome** (safe area / header)
+## Phase 5.3 — Jump lands **below chrome** (safe area / header) — **done**
 
 **User outcome:** After a jump, the target page is not **lost under** `GlobalBar` or notches; scrolling accounts for **fixed header height** / `safe-area-inset` in a minimal, product-consistent way.
 
@@ -61,6 +61,8 @@
 
 - **E2E:** Assert **observable** layout (e.g. first visible canvas/page block’s position relative to a known chrome element, or scroll container metrics) within tolerance — pick **one** approach and document it in the step/page object to avoid flaky pixel tests.
 - **Unit:** Optional only for pure “offset math” extracted as **input → number** without DOM.
+
+**Implemented:** [`e2e_test/start/pageObjects/bookReadingPage.ts`](e2e_test/start/pageObjects/bookReadingPage.ts) — canvas top vs `nav.daisy-navbar` bottom inside `[data-testid="book-reading-page"]`, 2px tolerance, no `scrollIntoView` before OCR. [`BookReadingPage.vue`](frontend/src/pages/BookReadingPage.vue) — `padding-top: env(safe-area-inset-top, 0px)` on `.book-reading-page`.
 
 **Phase-complete:** No duplicate scroll calls; remove interim “always scroll top” hacks from 5.1 if this replaces them.
 

@@ -269,6 +269,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .book-reading-page {
   max-height: 100%;
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 aside {
