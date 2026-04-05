@@ -73,7 +73,7 @@
             class="daisy-p-3 daisy-pb-8"
           >
             <button
-              v-for="node in flatOutline"
+              v-for="node in outlineRows"
               :key="node.id"
               type="button"
               data-testid="book-outline-node"
@@ -81,10 +81,13 @@
               class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-w-full daisy-justify-start daisy-normal-case daisy-h-auto daisy-min-h-10 daisy-py-2 daisy-px-2 daisy-text-sm daisy-leading-snug daisy-font-normal"
               :class="{
                 'daisy-btn-active': node.id === selectedOutlineRangeId,
-                'daisy-bg-base-300/50': node.id === viewportCurrentRangeId,
+                'daisy-bg-base-300/50':
+                  node.startAnchor.id === viewportCurrentAnchorId,
               }"
               :data-outline-current="
-                node.id === viewportCurrentRangeId ? 'true' : undefined
+                node.startAnchor.id === viewportCurrentAnchorId
+                  ? 'true'
+                  : undefined
               "
               :aria-current="
                 node.id === selectedOutlineRangeId ? 'location' : undefined
@@ -133,7 +136,7 @@ import {
   ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1,
   parseMineruOutlineV1StartAnchor,
 } from "@/lib/book-reading/mineruOutlineV1PageIndex"
-import { viewportCurrentRangeIdFromAnchorPage } from "@/lib/book-reading/viewportCurrentRangeFromAnchorPage"
+import { viewportCurrentAnchorIdFromAnchorPage } from "@/lib/book-reading/viewportCurrentRangeFromAnchorPage"
 import type {
   BookAnchorFull,
   BookFull,
@@ -183,6 +186,8 @@ type OutlineNode = {
   startAnchor?: BookAnchorFull
 }
 
+type OutlineNodeWithStart = OutlineNode & { startAnchor: BookAnchorFull }
+
 function buildFlatOutline(ranges: BookRangeFull[]): OutlineNode[] {
   const childrenMap = new Map<number | null, BookRangeFull[]>()
   for (const range of ranges) {
@@ -213,12 +218,17 @@ function buildFlatOutline(ranges: BookRangeFull[]): OutlineNode[] {
 }
 
 const flatOutline = ref<OutlineNode[]>([])
+const outlineRows = computed((): OutlineNodeWithStart[] =>
+  flatOutline.value.filter(
+    (n): n is OutlineNodeWithStart => n.startAnchor != null
+  )
+)
 const selectedOutlineRangeId = ref<number | null>(null)
-const viewportCurrentRangeId = ref<number | null>(null)
+const viewportCurrentAnchorId = ref<number | null>(null)
 
 function onViewportAnchorPage(payload: { anchorPageIndexZeroBased: number }) {
-  viewportCurrentRangeId.value = viewportCurrentRangeIdFromAnchorPage(
-    flatOutline.value,
+  viewportCurrentAnchorId.value = viewportCurrentAnchorIdFromAnchorPage(
+    outlineRows.value.map((n) => n.startAnchor),
     payload.anchorPageIndexZeroBased
   )
 }

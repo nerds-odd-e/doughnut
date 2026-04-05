@@ -5,28 +5,20 @@ import {
 } from "./mineruOutlineV1PageIndex"
 
 /**
- * Preorder outline row with an optional mineru start anchor (same shape as `flatOutline` nodes).
- *
- * **Rule:** last node in preorder whose mineru `page_idx` ≤ `anchorPageZeroBased`. Nodes without a
- * parseable `pdf.mineru_outline_v1` start anchor are skipped.
+ * **Rule:** last `BookAnchorFull` in preorder (caller supplies start anchors in outline order) whose
+ * mineru `page_idx` ≤ `anchorPageZeroBased`. Anchors without a parseable `pdf.mineru_outline_v1`
+ * value are skipped.
  */
-export type OutlineAnchorNode = {
-  id: number
-  startAnchor?: BookAnchorFull
-}
-
-export function viewportCurrentRangeIdFromAnchorPage(
-  orderedPreorderNodes: readonly OutlineAnchorNode[],
+export function viewportCurrentAnchorIdFromAnchorPage(
+  orderedPreorderStartAnchors: readonly BookAnchorFull[],
   anchorPageZeroBased: number
 ): number | null {
   if (!Number.isInteger(anchorPageZeroBased) || anchorPageZeroBased < 0) {
     return null
   }
   let best: number | null = null
-  for (const node of orderedPreorderNodes) {
-    const anchor = node.startAnchor
+  for (const anchor of orderedPreorderStartAnchors) {
     if (
-      !anchor ||
       anchor.anchorFormat !== ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1 ||
       anchor.value == null
     ) {
@@ -35,7 +27,7 @@ export function viewportCurrentRangeIdFromAnchorPage(
     const pageIdx = extractPageIndexZeroBased(anchor.value)
     if (pageIdx === null) continue
     if (pageIdx <= anchorPageZeroBased) {
-      best = node.id
+      best = anchor.id
     }
   }
   return best
