@@ -1,4 +1,4 @@
-# Meta-plan: Phase 3 — PDF in main content (pdf.js)
+# Meta-plan: Phase 3 — PDF in main content (pdf.js) — **done**
 
 **Parent intent:** [book-reading-read-a-range-plan.md](book-reading-read-a-range-plan.md) — **Phase 3** (*Book reading page shows the PDF with pdf.js (main content)*).
 
@@ -14,17 +14,17 @@
 
 ## E2E scope (Phase 3)
 
-- **No new scenario.** Extend the existing scenario **Attach PDF and see structure in the browser** with:
+- **No new scenario.** The scenario **Attach PDF and see structure in the browser** includes:
 
   `And I should see the beginning of the PDF book "top-maths.pdf"`
 
-- **Assertion style:** Use **stable, human-readable text** that appears on **page 1** of the fixture (e.g. `cy.contains` on the pdf.js **text layer** or equivalent DOM that reflects extracted text). Avoid asserting on canvas pixels unless necessary.
+- **Assertion style (as shipped):** The product renders page 1 to a **canvas** only (no DOM text layer). The step waits until the canvas has **dark pixels** (text ink, not only the white background), exports a **PNG**, and runs **Tesseract.js** in a Cypress **`cy.task`** ([`e2e_test/config/common.ts`](../e2e_test/config/common.ts) — `ocrCanvasImage`). The recognized string must contain the fixture marker **`DOUGHNUT_E2E_BOOK_PAGE1`**. **Committed** English trained data: [`e2e_test/tesseract/eng.traineddata`](../e2e_test/tesseract/eng.traineddata) with **`langPath`** and **`cachePath`** both set to that directory so Tesseract does not write **`eng.traineddata`** to the repo root. Root-level `eng.traineddata` / `.gz` are **gitignored** as a safety net.
 
 ---
 
 ## Fixture requirement (shared across sub-phases)
 
-Committed [e2e_test/fixtures/book_reading/top-maths.pdf](../e2e_test/fixtures/book_reading/top-maths.pdf) (SP-3.1): valid small multi-page PDF for pdf.js; **page 1** text `DOUGHNUT_E2E_BOOK_PAGE1`, **page 2** `DOUGHNUT_E2E_BOOK_PAGE2` (SP-3.6 should assert page 1).
+Committed [e2e_test/fixtures/book_reading/top-maths.pdf](../e2e_test/fixtures/book_reading/top-maths.pdf) (SP-3.1): valid small multi-page PDF for pdf.js; **page 1** text `DOUGHNUT_E2E_BOOK_PAGE1`, **page 2** `DOUGHNUT_E2E_BOOK_PAGE2` (SP-3.6 asserts page 1 marker via OCR on the canvas).
 
 **Compatibility:** Download E2E compares bytes to that fixture; **outline** in the feature file stays aligned with **mocked Mineru** (PDF bytes and outline JSON are independent).
 
@@ -52,19 +52,19 @@ Each row is a **merge gate**: targeted `pnpm backend:verify` / `pnpm frontend:te
 - **Tests:** Existing [book_reading.feature](../e2e_test/features/book_reading/book_reading.feature) **without** the new PDF step yet — structure table + download step **green**.
 - **Deliverable cleanliness:** Remove reliance on the old invalid bytes; **no** pdf.js code until SP-3.2 (avoids unused dependencies).
 
-### SP-3.2 — Viewer presentational core (buffer → page 1 canvas)
+### SP-3.2 — Viewer presentational core (buffer → page 1 canvas) — **done**
 
 - **Outcome (user-visible in app once wired):** A focused component or module that, given a **loaded** PDF **ArrayBuffer** (or `TypedArray`), uses **pdf.js** to render **page 1** to a **canvas** (or documented equivalent) in the DOM. **Vite** worker URL / bundling for `pdfjs-dist` is **resolved in this sub-phase** so CI and `pnpm sut` both work.
 - **Tests:** **Vitest** (mounted component or thin wrapper) supplying fixture bytes **read from the repo fixture** in the test — **no** Cypress yet. Covers happy parse + render path.
 - **Deliverable cleanliness:** No orphan `pdfjs-dist` config without a **used** import path from production code; **no** duplicate worker setup left for “later.”
 
-### SP-3.3 — Book reading page loads the PDF from the API into the viewer
+### SP-3.3 — Book reading page loads the PDF from the API into the viewer — **done**
 
 - **Outcome (user-visible):** On [BookReadingPage](../frontend/src/pages/BookReadingPage.vue) (or a single co-located child used only there), when **`hasSourceFile`** is true, the app **fetches** the book file with **credentials**, passes the result into the SP-3.2 viewer, and the user **sees page 1** in the **main reading area** (layout may still show the outline list on the same page until Phase 4 refines layout — pick one clear arrangement and keep it for this sub-phase only).
 - **Tests:** Extend **BookReadingPage** tests (mock SDK + **mock `fetch`** for `/book/file`) so the **wired** path is covered; manual smoke acceptable only if tests already prove the wiring.
 - **Deliverable cleanliness:** **No** second fetch path for the same bytes for “preview” vs download unless justified; prefer **one** code path or shared helper.
 
-### SP-3.4 — Loading state for PDF fetch and document open
+### SP-3.4 — Loading state for PDF fetch and document open — **done**
 
 - **Outcome (user-visible):** While bytes are loading or the document is opening, the user sees a **clear loading indicator** (spinner, skeleton, or existing app pattern) in the PDF pane; it **disappears** when page 1 is ready.
 - **Tests:** Vitest asserting loading → rendered transition with mocked slow `fetch` or deferred pdf.js promise (minimal assertions, **observable** DOM).
@@ -76,13 +76,13 @@ Each row is a **merge gate**: targeted `pnpm backend:verify` / `pnpm frontend:te
 - **Tests:** Vitest for failed fetch or reject from document load — **one** focused case is enough unless two failure modes differ in user-visible text.
 - **Deliverable cleanliness:** **No** silent empty pane on error.
 
-### SP-3.6 — E2E step: beginning of the PDF visible in the browser
+### SP-3.6 — E2E step: beginning of the PDF visible in the browser — **done**
 
 - **Outcome (user-visible E2E):** The scenario **Attach PDF and see structure in the browser** includes  
   `And I should see the beginning of the PDF book "top-maths.pdf"`  
-  implemented via **thin** step definition + **page object** method (reuse [bookReadingPage](../e2e_test/start/pageObjects/bookReadingPage.ts) patterns). Assert **known page-1 text** from the SP-3.1 fixture.
-- **Tests:** Single feature [book_reading.feature](../e2e_test/features/book_reading/book_reading.feature); run with `--spec` for that file per [e2e_test.mdc](../.cursor/rules/e2e_test.mdc).
-- **Deliverable cleanliness:** Step does not embed PDF parsing logic — **browser DOM / user-observable** assertions only.
+  via thin glue in [book_reading.ts](../e2e_test/step_definitions/book_reading.ts) and [bookReadingPage](../e2e_test/start/pageObjects/bookReadingPage.ts) (`expectPdfBeginningVisible`). The **fixture marker** `DOUGHNUT_E2E_BOOK_PAGE1` is asserted on **text recovered from the canvas** (OCR), not on a product-only text layer.
+- **Tests:** [book_reading.feature](../e2e_test/features/book_reading/book_reading.feature); run with `--spec` per [e2e_test.mdc](../.cursor/rules/e2e_test.mdc).
+- **Deliverable cleanliness:** No PDF parsing or OCR in **production** book-reading components; OCR and Tesseract config live in **E2E** (`ocrCanvasImage` task + `tesseract.js` devDependency).
 
 ---
 
@@ -111,4 +111,4 @@ After each SP-3.*:
 ## After Phase 3 execution
 
 - **Phase 4** (drawer for outline) may **relayout** the same viewer component — keep the viewer **cohesive** so Phase 4 moves containers, not PDF logic.
-- **Parent doc** completion hint: *“Depends on file access from Phases 1–2; keep viewer concerns in the main pane only.”* This meta-plan implements that scope until Phase 4.
+- **Parent plan:** Mark **Phase 3** **done** in [book-reading-read-a-range-plan.md](book-reading-read-a-range-plan.md); **Story 2** implementation notes in [doughnut-book-reading-architecture-roadmap.md](doughnut-book-reading-architecture-roadmap.md) cover what is shipped vs still planned (drawer, sync).

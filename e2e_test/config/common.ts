@@ -219,6 +219,19 @@ const commonConfig = {
         async disconnectMcpServer() {
           return await mcpClient.disconnectMcpServer()
         },
+        async ocrCanvasImage(base64Png: string) {
+          const { createWorker } = await import('tesseract.js')
+          const tessDir = join(repoRoot, 'e2e_test', 'tesseract')
+          const worker = await createWorker('eng', 1, {
+            langPath: tessDir,
+            cachePath: tessDir,
+          })
+          const {
+            data: { text },
+          } = await worker.recognize(Buffer.from(base64Png, 'base64'))
+          await worker.terminate()
+          return text
+        },
         async bundleMcpServer() {
           const mcpServerDir = join(repoRoot, 'mcp-server')
           try {

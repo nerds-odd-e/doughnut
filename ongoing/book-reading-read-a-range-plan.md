@@ -37,11 +37,13 @@
 
 ---
 
-## Phase 3 — Book reading page shows the PDF with pdf.js (main content)
+## Phase 3 — Book reading page shows the PDF with pdf.js (main content) — **done**
 
-**User outcome:** On the book reading route, the user **sees the attached PDF rendered** in the **main content area** using **pdf.js**. **E2E:** open notebook with attached book → PDF is visible (e.g. first page or canvas present).
+**User outcome:** On the book reading route, the user **sees the attached PDF rendered** in the **main content area** using **pdf.js**. **E2E:** attach via CLI → book page shows page 1; scenario asserts fixture page-1 marker text is recoverable from the rendered canvas (see sub-phases doc for the OCR-based check).
 
-**Completion hint:** Depends on file access from Phases 1–2; keep viewer concerns in the main pane only if that reduces scope—drawer can follow in Phase 4.
+**Shipped:** `PdfFirstPageCanvas` (pdf.js, page 1 → canvas), `BookReadingPage` fetch from **`GET …/book/file`** with loading and error UI, scenario step `And I should see the beginning of the PDF book "top-maths.pdf"`. Fine-grained split: [book-reading-phase3-pdfjs-subphases.md](book-reading-phase3-pdfjs-subphases.md).
+
+**Completion hint:** Outline still lives in the main column next to the viewer until Phase 4 (drawer).
 
 ---
 

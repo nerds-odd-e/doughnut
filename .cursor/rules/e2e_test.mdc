@@ -14,6 +14,7 @@ alwaysApply: false
 - Running E2E tests
 - Debugging E2E test failures
 - Mocking external services for tests
+- Asserting canvas-only UI (e.g. pdf.js) via OCR
 
 ## Development Environment Assumption
 
@@ -48,6 +49,7 @@ CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_gene
 - Cucumber plugin for BDD-style tests
 - TypeScript for type safety and better IDE support
 - Mountebank is used to mock external services.
+- **OCR:** `tesseract.js` (root devDependency) for canvas-only assertions via `cy.task` — see **OCR in E2E** below.
 
 ## Project Structure
 - `e2e_test` contains all the tests
@@ -55,6 +57,15 @@ CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_gene
 - `e2e_test/step_definitions` contains the step definitions for the tests
 - `e2e_test/start/` contains the page objects for the tests (`e2e_test/start/pageObjects/cli/` for CLI page objects with prefix `cli.xxx`)
 - `e2e_test/support/` contains the support files for the tests
+
+## OCR in E2E (Tesseract.js)
+
+Use when **text is not in the DOM** (e.g. PDF drawn only to `<canvas>`). Keep OCR in **test infrastructure**, not product code.
+
+- **Node task:** Register a task in `e2e_test/config/common.ts` that calls `tesseract.js` `createWorker` + `recognize` on image bytes (e.g. base64 PNG without the `data:image/png;base64,` prefix). Example task name: `ocrCanvasImage`.
+- **Language data:** Commit **`e2e_test/tesseract/eng.traineddata`** (uncompressed). Pass **`langPath`** and **`cachePath`** both to that directory when creating the worker so Tesseract does not write `eng.traineddata` to the repo root (root-level traineddata files are gitignored as a fallback).
+- **Page object:** Wait until the canvas has **real ink** (e.g. sample `getImageData` for dark pixels), not only non-zero alpha from an empty white fill—otherwise OCR runs on a blank bitmap. Export with `toDataURL('image/png')`, strip the prefix, `cy.task(..., { timeout: … })` for slow OCR, then assert the returned string contains the expected substring with a clear message.
+- **Reference:** `e2e_test/start/pageObjects/bookReadingPage.ts` (`expectPdfBeginningVisible`).
 
 ## Debugging
 
@@ -256,3 +267,4 @@ CURSOR_DEV=true nix develop -c pnpm format:all
 5. Don't skip error handling
 6. Don't mix different levels of abstraction in scenarios
 7. Don't ignore linting errors that appear in the terminal - fix them before completing your work
+8. Don't add OCR or DOM text layers to production just to satisfy E2E; run OCR in a Cypress Node task instead

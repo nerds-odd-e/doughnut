@@ -101,6 +101,7 @@
     "process": "^0.11.10",
     "superagent": "^10.3.0",
     "syncpack": "^14.3.0",
+    "tesseract.js": "^7.0.0",
     "tty-assert": "workspace:*",
     "typescript": "6.0.2",
     "util": "^0.12.5",
@@ -163,7 +164,8 @@
       "esbuild",
       "github_action_sound",
       "package-with-necessary-build-scripts",
-      "protobufjs"
+      "protobufjs",
+      "tesseract.js"
     ],
     "patchedDependencies": {
       "find-cypress-specs@1.54.9": "patches/find-cypress-specs@1.54.9.patch"
