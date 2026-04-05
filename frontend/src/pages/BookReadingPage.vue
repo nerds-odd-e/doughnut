@@ -4,7 +4,7 @@
       <a
         v-if="book.hasSourceFile"
         class="daisy-btn daisy-btn-outline daisy-btn-sm daisy-mb-2"
-        :href="`/api/notebooks/${props.notebookId}/book/file`"
+        :href="notebookBookFilePath(props.notebookId)"
         data-testid="book-reading-download"
       >
         Download
@@ -36,6 +36,10 @@ import { onMounted, ref } from "vue"
 const props = defineProps({
   notebookId: { type: Number, required: true },
 })
+
+function notebookBookFilePath(notebookId: number) {
+  return `/api/notebooks/${notebookId}/book/file`
+}
 
 const book = ref<BookFull | null>(null)
 const bookPdfBytes = ref<ArrayBuffer | null>(null)
@@ -75,6 +79,14 @@ onMounted(async () => {
   if (!error && data) {
     book.value = data
     flatOutline.value = buildFlatOutline(data.ranges ?? [])
+    if (data.hasSourceFile) {
+      const res = await fetch(notebookBookFilePath(props.notebookId), {
+        credentials: "same-origin",
+      })
+      if (res.ok) {
+        bookPdfBytes.value = await res.arrayBuffer()
+      }
+    }
   }
 })
 </script>
