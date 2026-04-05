@@ -21,11 +21,21 @@ pnpm exec playwright install chromium
 
 ## Running Browser Mode Tests
 
+From the `frontend/` directory:
+
 ### Run all browser tests
 
 ```bash
-pnpm test:browser
+pnpm test
 ```
+
+### Run a single spec file
+
+```bash
+pnpm test tests/path/to/TestFile.spec.ts
+```
+
+Paths are relative to `frontend/`. Do not use `pnpm test -- tests/...`: the `--` breaks Vitest’s file filter and runs every spec.
 
 ### Run browser tests in watch mode
 

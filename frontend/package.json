@@ -16,10 +16,10 @@
     "lint": "biome check . && vue-tsc --noEmit",
     "format": "biome check --write . && vue-tsc --noEmit",
     "storybook": "storybook dev -p 6006 --no-open",
-    "test:ui": "vitest run --browser",
-    "test:watch": "vitest --browser --ui",
+    "test:ui": "vitest run --browser=chromium",
+    "test:watch": "vitest --browser=chromium --ui",
     "pretest": "node scripts/generateStoryList.mjs && playwright install chromium",
-    "test": "CI=true vitest run --browser"
+    "test": "CI=true vitest run --browser=chromium"
   },
   "dependencies": {
     "file-saver": "^2.0.5",

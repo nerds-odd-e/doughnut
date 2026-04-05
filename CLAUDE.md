@@ -120,6 +120,8 @@ CURSOR_DEV=true nix develop -c <command>
 
 Unless you are already inside `nix develop`, wrap `pnpm` / Gradle invocations like the E2E row: `CURSOR_DEV=true nix develop -c <command>`. (Cloud VM: no wrapper — see above.)
 
+**Frontend single-file Vitest:** The path is relative to `frontend/`. From the repo root you can use the same path with `pnpm frontend:test tests/path/to/TestFile.spec.ts`. Do not put `--` before the file path: pnpm would forward it to Vitest and the suite filter is ignored (every spec runs).
+
 ## Architecture
 
 ### Tech Stack

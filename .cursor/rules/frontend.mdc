@@ -37,8 +37,16 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test:watch
 
 ### Running a Single Test File
 
+From the repo root (runs `pnpm install` first):
+
 ```bash
 CURSOR_DEV=true nix develop -c pnpm frontend:test tests/path/to/TestFile.spec.ts
+```
+
+Or only the frontend package:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/path/to/TestFile.spec.ts
 ```
 
 **Running a specific test case within a file:**
@@ -46,7 +54,7 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/path/to/TestFile.spec.ts
 CURSOR_DEV=true nix develop -c pnpm -C frontend test -t "test name pattern"
 ```
 
-**Note:** The test file path is relative to the `frontend/` directory.
+**Note:** The test file path is relative to the `frontend/` directory. Do not use `pnpm … test -- tests/…`: the `--` is forwarded to Vitest and file filtering is skipped (the full suite runs).
 
 **IMPORTANT: In most situations, you should run all unit tests instead of a selected file only.** Running all tests ensures you catch any regressions or side effects your changes might have introduced. Only run a single test file when you're actively debugging a specific test or iterating on a specific component.
 

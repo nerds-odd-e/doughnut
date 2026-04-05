@@ -116,6 +116,7 @@ From the **repo root**, without any nix prefix:
 | Command | Cloud VM |
 |---------|----------|
 | Frontend tests | `pnpm frontend:test` |
+| Single frontend spec (path under `frontend/`) | `pnpm -C frontend test tests/path/to/TestFile.spec.ts` or `pnpm frontend:test tests/path/to/TestFile.spec.ts` (no `--` before the path) |
 | Backend tests | `pnpm backend:verify` |
 | E2E tests | **E2E Tests** section above; topology/ports → **`docs/gcp/prod_env.md`** (Local dev / Cypress) |
 | SUT health / restart | **`pnpm sut:healthcheck`**, **`pnpm sut:restart`** — see **SUT health and restart** above |
