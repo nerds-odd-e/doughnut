@@ -1,4 +1,6 @@
+import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import BookReadingPage from "@/pages/BookReadingPage.vue"
+import type { BookRangeFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import helper, { wrapSdkResponse } from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -11,6 +13,17 @@ const fetchMock = createFetchMock(vi)
 
 function bookFileUrlSuffix(id: number) {
   return `/api/notebooks/${id}/book/file`
+}
+
+function topMathsLikeFlatRanges(): BookRangeFull[] {
+  const anchors = makeMe.bookReadingTopMathsLikeAnchors()
+  return anchors.map((startAnchor, i) => ({
+    id: i + 1,
+    title: `Section ${i + 1}`,
+    startAnchor,
+    endAnchor: startAnchor,
+    siblingOrder: i,
+  }))
 }
 
 describe("BookReadingPage", () => {
@@ -176,5 +189,70 @@ describe("BookReadingPage", () => {
       "This file is not a valid PDF."
     )
     expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(false)
+  })
+
+  it("updates viewport-current outline row while outline drawer is closed (Phase 6.9)", async () => {
+    const innerWidthDesc = Object.getOwnPropertyDescriptor(window, "innerWidth")
+    Object.defineProperty(window, "innerWidth", {
+      configurable: true,
+      writable: true,
+      value: 500,
+    })
+    try {
+      vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+        wrapSdkResponse(makeMe.aBook.ranges(topMathsLikeFlatRanges()).please())
+      )
+      const suffix = bookFileUrlSuffix(notebookId)
+      vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+        const url =
+          typeof input === "string"
+            ? input
+            : input instanceof URL
+              ? input.href
+              : input.url
+        if (!url.endsWith(suffix)) {
+          return Promise.reject(new Error(`unexpected fetch: ${url}`))
+        }
+        const copy = topMathsPdfBytes.slice(0)
+        return Promise.resolve(
+          new Response(copy, {
+            status: 200,
+            headers: { "Content-Type": "application/pdf" },
+          })
+        )
+      })
+
+      const wrapper = helper
+        .component(BookReadingPage)
+        .withRouter()
+        .withProps({ notebookId })
+        .mount()
+
+      await vi.waitFor(
+        () =>
+          expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(
+            true
+          ),
+        { timeout: 15_000 }
+      )
+
+      const pdf = wrapper.findComponent(PdfBookViewer)
+      pdf.vm.$emit("viewportAnchorPage", {
+        anchorPageIndexZeroBased: 0,
+        viewportTopYDown: null,
+        pagesCount: 10,
+      })
+
+      await new Promise((r) => setTimeout(r, 200))
+
+      const current = wrapper.find('[data-outline-current="true"]')
+      expect(current.exists()).toBe(true)
+      expect(current.attributes("aria-current")).toBe("location")
+      expect(current.text()).toBe("Section 3")
+    } finally {
+      if (innerWidthDesc) {
+        Object.defineProperty(window, "innerWidth", innerWidthDesc)
+      }
+    }
   })
 })

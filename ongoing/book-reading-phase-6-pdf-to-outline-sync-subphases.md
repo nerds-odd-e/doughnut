@@ -8,7 +8,7 @@
 
 **Planning rules:** `.cursor/rules/planning.mdc` — one **user-visible** behavior per slice where work is UI-shaped; observable tests first when adding behavior; **no dead code** (production paths exercised by that slice’s tests or clearly merged into the next slice before closing); **at most one intentionally failing test** while driving a given slice.
 
-**Status:** **6.7** shipped — visually hidden `role="status"` / `aria-live="polite"` on [`BookReadingPage.vue`](../frontend/src/pages/BookReadingPage.vue) (`data-testid="book-reading-viewport-current-live"`), driven by debounced `viewportCurrentAnchorId` plus title deduplication in [`viewportCurrentLiveAnnouncement.ts`](../frontend/src/lib/book-reading/viewportCurrentLiveAnnouncement.ts); tests in [`viewportCurrentLiveAnnouncement.spec.ts`](../frontend/tests/lib/book-reading/viewportCurrentLiveAnnouncement.spec.ts). **6.8** shipped — [`PdfBookViewer.vue`](../frontend/src/components/book-reading/PdfBookViewer.vue) includes `pagesCount` on `viewportAnchorPage`; [`viewportCurrentRangeFromAnchorPage.ts`](../frontend/src/lib/book-reading/viewportCurrentRangeFromAnchorPage.ts) skips anchors whose `page_idx` is outside the loaded PDF and returns `null` for an out-of-range viewport page or invalid page count; tests in [`viewportCurrentRangeFromAnchorPage.spec.ts`](../frontend/tests/lib/book-reading/viewportCurrentRangeFromAnchorPage.spec.ts). **6.9** not done. Sub-phases **6.1–6.6** match the current viewer + outline stack unless a slice is reopened.
+**Status:** **6.7** shipped — visually hidden `role="status"` / `aria-live="polite"` on [`BookReadingPage.vue`](../frontend/src/pages/BookReadingPage.vue) (`data-testid="book-reading-viewport-current-live"`), driven by debounced `viewportCurrentAnchorId` plus title deduplication in [`viewportCurrentLiveAnnouncement.ts`](../frontend/src/lib/book-reading/viewportCurrentLiveAnnouncement.ts); tests in [`viewportCurrentLiveAnnouncement.spec.ts`](../frontend/tests/lib/book-reading/viewportCurrentLiveAnnouncement.spec.ts). **6.8** shipped — [`PdfBookViewer.vue`](../frontend/src/components/book-reading/PdfBookViewer.vue) includes `pagesCount` on `viewportAnchorPage`; [`viewportCurrentRangeFromAnchorPage.ts`](../frontend/src/lib/book-reading/viewportCurrentRangeFromAnchorPage.ts) skips anchors whose `page_idx` is outside the loaded PDF and returns `null` for an out-of-range viewport page or invalid page count; tests in [`viewportCurrentRangeFromAnchorPage.spec.ts`](../frontend/tests/lib/book-reading/viewportCurrentRangeFromAnchorPage.spec.ts). **6.9** shipped — [`BookReadingPage.spec.ts`](../frontend/tests/pages/BookReadingPage.spec.ts) (*updates viewport-current outline row while outline drawer is closed*): with narrow viewport (`outlineOpened` false at mount), emitted `viewportAnchorPage` still updates `data-outline-current` after debounce. Sub-phases **6.1–6.6** match the current viewer + outline stack unless a slice is reopened.
 
 ---
 
@@ -131,7 +131,7 @@ Order is **scenario-first**: **page-level** sync before **within-page** refineme
 
 ---
 
-### 6.9 — **Drawer closed: no broken state** (minimal slice)
+### 6.9 — **Drawer closed: no broken state** — **shipped**
 
 **User-visible:** With the outline **hidden** (small viewport or user toggled closed), scrolling the PDF still updates **viewport-current** in state so that **reopening** the drawer shows the **correct** row without requiring another scroll (**Phase 7** will deepen toggle UX).
 
