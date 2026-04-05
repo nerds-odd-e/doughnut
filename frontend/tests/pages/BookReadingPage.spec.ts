@@ -1,7 +1,7 @@
 import BookReadingPage from "@/pages/BookReadingPage.vue"
-import type { BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import helper, { wrapSdkResponse } from "@tests/helpers"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import createFetchMock from "vitest-fetch-mock"
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest"
@@ -31,15 +31,8 @@ describe("BookReadingPage", () => {
   })
 
   it("shows fetch error when book file returns an error status", async () => {
-    const book: BookFull = {
-      id: 1,
-      bookName: "Linear Algebra",
-      format: "pdf",
-      hasSourceFile: true,
-      ranges: [],
-    }
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-      wrapSdkResponse(book)
+      wrapSdkResponse(makeMe.aBook.please())
     )
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(null, { status: 404 })
@@ -60,15 +53,8 @@ describe("BookReadingPage", () => {
   })
 
   it("does not load PDF viewer when hasSourceFile is false", async () => {
-    const book: BookFull = {
-      id: 1,
-      bookName: "Linear Algebra",
-      format: "pdf",
-      hasSourceFile: false,
-      ranges: [],
-    }
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-      wrapSdkResponse(book)
+      wrapSdkResponse(makeMe.aBook.hasSourceFile(false).please())
     )
 
     const wrapper = helper
@@ -85,15 +71,8 @@ describe("BookReadingPage", () => {
   })
 
   it("shows loading indicator while PDF is loading, hides it after render", async () => {
-    const book: BookFull = {
-      id: 1,
-      bookName: "Linear Algebra",
-      format: "pdf",
-      hasSourceFile: true,
-      ranges: [],
-    }
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-      wrapSdkResponse(book)
+      wrapSdkResponse(makeMe.aBook.please())
     )
 
     let resolveFetch!: (r: Response) => void
@@ -128,15 +107,8 @@ describe("BookReadingPage", () => {
   })
 
   it("loads PDF into viewer when hasSourceFile is true", async () => {
-    const book: BookFull = {
-      id: 1,
-      bookName: "Linear Algebra",
-      format: "pdf",
-      hasSourceFile: true,
-      ranges: [],
-    }
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-      wrapSdkResponse(book)
+      wrapSdkResponse(makeMe.aBook.please())
     )
     const suffix = bookFileUrlSuffix(notebookId)
     vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
@@ -175,15 +147,8 @@ describe("BookReadingPage", () => {
   })
 
   it("shows error when PDF bytes are not valid", async () => {
-    const book: BookFull = {
-      id: 1,
-      bookName: "Linear Algebra",
-      format: "pdf",
-      hasSourceFile: true,
-      ranges: [],
-    }
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-      wrapSdkResponse(book)
+      wrapSdkResponse(makeMe.aBook.please())
     )
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(new TextEncoder().encode("not a pdf").buffer, {
