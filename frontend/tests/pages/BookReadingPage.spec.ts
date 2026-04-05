@@ -82,6 +82,51 @@ describe("BookReadingPage", () => {
     )
   })
 
+  it("shows loading indicator while PDF is loading, hides it after render", async () => {
+    const book: BookFull = {
+      id: 1,
+      bookName: "Linear Algebra",
+      format: "pdf",
+      hasSourceFile: true,
+      ranges: [],
+    }
+    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+      wrapSdkResponse(book)
+    )
+
+    let resolveFetch!: (r: Response) => void
+    vi.spyOn(globalThis, "fetch").mockReturnValue(
+      new Promise<Response>((resolve) => {
+        resolveFetch = resolve
+      })
+    )
+
+    const wrapper = helper
+      .component(BookReadingPage)
+      .withRouter()
+      .withProps({ notebookId })
+      .mount()
+    await flushPromises()
+
+    expect(wrapper.find(".daisy-loading-spinner").exists()).toBe(true)
+    expect(wrapper.find('[data-testid="pdf-first-page-canvas"]').exists()).toBe(
+      false
+    )
+
+    const copy = topMathsPdfBytes.slice(0)
+    resolveFetch(
+      new Response(copy, {
+        status: 200,
+        headers: { "Content-Type": "application/pdf" },
+      })
+    )
+
+    await vi.waitFor(
+      () => expect(wrapper.find(".daisy-loading-spinner").exists()).toBe(false),
+      { timeout: 5000 }
+    )
+  })
+
   it("loads PDF into viewer when hasSourceFile is true", async () => {
     const book: BookFull = {
       id: 1,

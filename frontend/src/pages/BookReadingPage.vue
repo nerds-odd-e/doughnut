@@ -9,6 +9,7 @@
       >
         Download
       </a>
+      <ContentLoader v-if="pdfLoading" />
       <PdfFirstPageCanvas
         v-if="bookPdfBytes"
         :pdf-bytes="bookPdfBytes"
@@ -28,6 +29,7 @@
 </template>
 
 <script setup lang="ts">
+import ContentLoader from "@/components/commons/ContentLoader.vue"
 import PdfFirstPageCanvas from "@/components/book-reading/PdfFirstPageCanvas.vue"
 import type { BookFull, BookRangeFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
@@ -43,6 +45,7 @@ function notebookBookFilePath(notebookId: number) {
 
 const book = ref<BookFull | null>(null)
 const bookPdfBytes = ref<ArrayBuffer | null>(null)
+const pdfLoading = ref(false)
 
 type OutlineNode = { id: number; title: string; depth: number }
 
@@ -80,11 +83,16 @@ onMounted(async () => {
     book.value = data
     flatOutline.value = buildFlatOutline(data.ranges ?? [])
     if (data.hasSourceFile) {
-      const res = await fetch(notebookBookFilePath(props.notebookId), {
-        credentials: "same-origin",
-      })
-      if (res.ok) {
-        bookPdfBytes.value = await res.arrayBuffer()
+      pdfLoading.value = true
+      try {
+        const res = await fetch(notebookBookFilePath(props.notebookId), {
+          credentials: "same-origin",
+        })
+        if (res.ok) {
+          bookPdfBytes.value = await res.arrayBuffer()
+        }
+      } finally {
+        pdfLoading.value = false
       }
     }
   }
