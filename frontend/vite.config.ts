@@ -84,7 +84,16 @@ const config = defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['vue', 'vue-router', 'quill', 'gsap', 'marked', 'turndown', 'es-toolkit'],
+    include: [
+      'vue',
+      'vue-router',
+      'quill',
+      'gsap',
+      'marked',
+      'turndown',
+      'es-toolkit',
+      'pdfjs-dist',
+    ],
     exclude: ['fsevents'],
     force: true
   },

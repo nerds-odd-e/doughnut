@@ -9,6 +9,10 @@
       >
         Download
       </a>
+      <PdfFirstPageCanvas
+        v-if="bookPdfBytes"
+        :pdf-bytes="bookPdfBytes"
+      />
       <div data-testid="book-reading-outline">
         <div
           v-for="node in flatOutline"
@@ -24,15 +28,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import PdfFirstPageCanvas from "@/components/book-reading/PdfFirstPageCanvas.vue"
 import type { BookFull, BookRangeFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
+import { onMounted, ref } from "vue"
 
 const props = defineProps({
   notebookId: { type: Number, required: true },
 })
 
 const book = ref<BookFull | null>(null)
+const bookPdfBytes = ref<ArrayBuffer | null>(null)
 
 type OutlineNode = { id: number; title: string; depth: number }
 

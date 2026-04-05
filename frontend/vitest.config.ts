@@ -19,7 +19,14 @@ import checker from "vite-plugin-checker"
 // This is the official and most reliable way to detect test mode
 const isTest = process.env.VITEST !== undefined
 
+const repoRoot = fileURLToPath(new URL("..", import.meta.url))
+
 const config = defineConfig({
+  server: {
+    fs: {
+      allow: [fileURLToPath(new URL(".", import.meta.url)), repoRoot],
+    },
+  },
   resolve: {
     tsconfigPaths: true,
     alias: [
@@ -58,6 +65,7 @@ const config = defineConfig({
       "vue-toastification",
       "marked",
       "turndown-plugin-gfm",
+      "pdfjs-dist",
     ],
   },
   test: {
