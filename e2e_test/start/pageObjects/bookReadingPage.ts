@@ -18,6 +18,20 @@ const bookReadingPage = () => ({
       })
     return this
   },
+  expectPdfBeginningVisible() {
+    cy.get('[data-testid="pdf-first-page-canvas"]').should(($canvas) => {
+      const el = $canvas[0] as HTMLCanvasElement
+      expect(
+        el.width,
+        'PDF canvas should have rendered width'
+      ).to.be.greaterThan(0)
+      expect(
+        el.height,
+        'PDF canvas should have rendered height'
+      ).to.be.greaterThan(0)
+    })
+    return this
+  },
   expectDownloadedBookPdfMatchesFixture(fixtureFilename: string) {
     pageIsNotLoading()
     cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
