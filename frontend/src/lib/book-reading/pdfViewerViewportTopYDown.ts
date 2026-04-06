@@ -108,12 +108,12 @@ export function pdfViewerViewportTopYDown(
   })
   const pageHeightPdf = vp1.height
   const mineruY = pageHeightPdf - pdfY
-  if (!Number.isFinite(mineruY)) {
+  if (!Number.isFinite(mineruY) || pageHeightPdf <= 0) {
     return { anchorPageIndexZeroBased: pageIndex, viewportTopYDown: null }
   }
 
   return {
     anchorPageIndexZeroBased: pageIndex,
-    viewportTopYDown: Math.max(0, mineruY),
+    viewportTopYDown: Math.max(0, (mineruY / pageHeightPdf) * 1000),
   }
 }

@@ -98,6 +98,33 @@ type PendingNav = {
 }
 
 let pendingNavigation: PendingNav | null = null
+let debugOverlay: HTMLDivElement | null = null
+
+function clearDebugOverlay() {
+  debugOverlay?.remove()
+  debugOverlay = null
+}
+
+function showDebugBboxOverlay(pageNumber: number, bbox: MineruOutlineV1Bbox) {
+  clearDebugOverlay()
+  if (!pdfViewer) return
+  const pageView = pdfViewer.getPageView(pageNumber - 1)
+  if (!pageView?.div) return
+  const vw = pageView.viewport.width
+  const vh = pageView.viewport.height
+  const [x0, y0, x1, y1] = bbox
+  const overlay = document.createElement("div")
+  overlay.style.position = "absolute"
+  overlay.style.left = `${(x0 / 1000) * vw}px`
+  overlay.style.top = `${(y0 / 1000) * vh}px`
+  overlay.style.width = `${((x1 - x0) / 1000) * vw}px`
+  overlay.style.height = `${((y1 - y0) / 1000) * vh}px`
+  overlay.style.backgroundColor = "rgba(255, 0, 0, 0.3)"
+  overlay.style.pointerEvents = "none"
+  overlay.style.zIndex = "100"
+  pageView.div.appendChild(overlay)
+  debugOverlay = overlay
+}
 
 async function applyMineruOutlineV1Target(
   pageIndexZeroBased: number,
@@ -113,12 +140,18 @@ async function applyMineruOutlineV1Target(
   }
   const pageNumber = pageIndexZeroBased + 1
   if (bbox === null) {
+    clearDebugOverlay()
     pdfViewer.scrollPageIntoView({ pageNumber })
   } else {
     const page = await pdfViewer.pdfDocument.getPage(pageNumber)
     const vp = page.getViewport({ scale: 1 })
-    const destArray = mineruOutlineV1BboxToXyzDestArray(vp.height, bbox)
+    const destArray = mineruOutlineV1BboxToXyzDestArray(
+      vp.width,
+      vp.height,
+      bbox
+    )
     pdfViewer.scrollPageIntoView({ pageNumber, destArray: [...destArray] })
+    showDebugBboxOverlay(pageNumber, bbox)
   }
   queueMicrotask(() => emitViewportDescriptorIfChanged())
 }

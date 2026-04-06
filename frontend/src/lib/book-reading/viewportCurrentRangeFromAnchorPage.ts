@@ -7,17 +7,17 @@ import {
 /**
  * **Rule:** last `BookAnchorFull` in preorder (caller supplies start anchors in outline order) such that:
  * - `page_idx < anchorPageZeroBased`, or
- * - `page_idx === anchorPageZeroBased` and (`viewportTopYDown === null` or `yStart ≤ viewportTopYDown`),
+ * - `page_idx === anchorPageZeroBased` and (`viewportTopYDown === null` or `yStart <= viewportTopYDown`),
  * where `yStart` is the top edge of the optional mineru `bbox` (`y0`), or `0` if there is no bbox.
  *
  * Anchors without a parseable `pdf.mineru_outline_v1` value are skipped. When `pdfPageCount` is set,
  * anchors whose `page_idx` is not in `[0, pdfPageCount)` are skipped, and `anchorPageZeroBased` must
  * be in that range or the result is `null`.
  *
- * `viewportTopYDown` uses the same coordinate system as mineru bbox (origin top-left of the page, y down),
- * units as `pdfPage.getViewport({ scale: 1 })`. The PDF viewer passes a **single reference y** on the page
- * (vertical center of the visible slice). When `null`, same-page ties behave like “all starts at the top”
- * (last preorder row on that page wins), matching page-only matching.
+ * Both `viewportTopYDown` and MinerU bbox y0 use the **0-1000 normalized** coordinate system
+ * (origin top-left, y down). The PDF viewer passes a single reference y on the page (vertical
+ * center of the visible slice, normalized). When `null`, same-page ties behave like "all starts
+ * at the top" (last preorder row on that page wins), matching page-only matching.
  */
 export function viewportCurrentAnchorIdFromAnchorPage(
   orderedPreorderStartAnchors: readonly BookAnchorFull[],

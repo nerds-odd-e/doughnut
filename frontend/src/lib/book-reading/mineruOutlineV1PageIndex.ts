@@ -3,9 +3,9 @@
  *
  * **page_idx:** 0-based page index (same as pdf.js pageNumber − 1).
  *
- * **bbox (optional):** MinerU-style `[x0, y0, x1, y1]` — origin top-left, y increasing
- * downward, in the same length units as `pdfPage.getViewport({ scale: 1 })` (PDF user
- * space width/height). Rotation other than 0 is not handled for bbox.
+ * **bbox (optional):** MinerU content_list `[x0, y0, x1, y1]` — origin top-left, y increasing
+ * downward, **normalized to a 0–1000 range** (not PDF user space). To convert to PDF coordinates,
+ * scale by `pdfPageWidth / 1000` and `pdfPageHeight / 1000`. Rotation other than 0 is not handled.
  *
  * Invalid or malformed bbox is treated as absent (page-top navigation only).
  *
@@ -21,7 +21,7 @@ export type MineruOutlineV1NavigationTarget = {
   bbox: MineruOutlineV1Bbox | null
 }
 
-/** pdf.js scrollPageIntoView: above bbox top by margin (horizontal center), zoom null. */
+/** pdf.js scrollPageIntoView: near bbox top with small top padding (horizontal center of bbox), zoom null. */
 export type PdfJsXyzDestArray = readonly [
   null,
   { readonly name: "XYZ" },
@@ -86,21 +86,26 @@ export function extractPageIndexZeroBased(value: string): number | null {
   return parseMineruOutlineV1StartAnchor(value)?.pageIndex ?? null
 }
 
-/** MinerU y gap above bbox top so scroll target leaves the section title in view (pdf.js top bias). */
-const MINERU_SCROLL_TARGET_Y_MARGIN = 100
+const MINERU_BBOX_RANGE = 1000
+
+/** PDF user-space points above bbox top so headings stay in the visible band (pdf.js top-biased scroll, OCR). */
+const MINERU_SCROLL_TOP_PADDING_PDF = 40
 
 /**
- * Map v1 bbox (top-left, y down) to pdf.js scrollPageIntoView XYZ at horizontal center and a point
- * **above** the box top in PDF user space (y up), so the visible band includes the heading. Zoom
- * is null so the viewer keeps its current scale (e.g. page-width after init).
+ * Map v1 bbox (0–1000 normalized, top-left origin, y down) to pdf.js scrollPageIntoView XYZ
+ * so the viewport top sits a little above the bbox top. Zoom null keeps the current scale.
  */
 export function mineruOutlineV1BboxToXyzDestArray(
+  pageWidthPdf: number,
   pageHeightPdf: number,
   bbox: MineruOutlineV1Bbox
 ): PdfJsXyzDestArray {
   const [x0, y0, x1] = bbox
-  const x = (x0 + x1) / 2
-  const yTopMineru = Math.max(0, y0 - MINERU_SCROLL_TARGET_Y_MARGIN)
-  const y = pageHeightPdf - yTopMineru
+  const x = ((x0 + x1) / 2 / MINERU_BBOX_RANGE) * pageWidthPdf
+  const yTopPdf = Math.max(
+    0,
+    (y0 / MINERU_BBOX_RANGE) * pageHeightPdf - MINERU_SCROLL_TOP_PADDING_PDF
+  )
+  const y = pageHeightPdf - yTopPdf
   return [null, { name: "XYZ" }, x, y, null]
 }

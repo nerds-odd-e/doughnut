@@ -123,26 +123,25 @@ describe("extractPageIndexZeroBased", () => {
 })
 
 describe("mineruOutlineV1BboxToXyzDestArray", () => {
-  it("maps bbox top and horizontal center to XYZ in PDF space", () => {
+  it("converts 0-1000 bbox to PDF user space XYZ with top padding clamped at page top", () => {
+    const w = 612
     const h = 792
-    expect(mineruOutlineV1BboxToXyzDestArray(h, [0, 0, 100, 200])).toEqual([
+    expect(mineruOutlineV1BboxToXyzDestArray(w, h, [0, 0, 100, 200])).toEqual([
       null,
       { name: "XYZ" },
-      50,
+      (50 / 1000) * 612,
       792,
       null,
     ])
   })
 
-  it("maps a lower band with margin above bbox top", () => {
+  it("maps a lower band with top padding above bbox top", () => {
+    const w = 400
     const h = 600
-    expect(mineruOutlineV1BboxToXyzDestArray(h, [10, 400, 200, 550])).toEqual([
-      null,
-      { name: "XYZ" },
-      105,
-      300,
-      null,
-    ])
+    const yTopPdf = Math.max(0, (400 / 1000) * 600 - 40)
+    expect(
+      mineruOutlineV1BboxToXyzDestArray(w, h, [10, 400, 200, 550])
+    ).toEqual([null, { name: "XYZ" }, (105 / 1000) * 400, h - yTopPdf, null])
   })
 })
 
