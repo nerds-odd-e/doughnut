@@ -36,7 +36,7 @@ Feature: Book reading
 
   Scenario: Scrolling the PDF updates the viewport-current outline row
     When I scroll the PDF book reader to bring page 2 into primary view
-    Then I should see PDF page 2 marker "Strengthening the Code" in the book reader
+    Then I should see in the book reader visible PDF viewport on page 2 text including "Strengthening the Code"
     And the book outline row "2.2 Refactoring as Strengthening the Code" should be viewport-current in the book reader
 
   Scenario: Short viewport scrolls outline aside so viewport-current row stays visible

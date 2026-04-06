@@ -8,7 +8,7 @@
 
 - Feature: [`e2e_test/features/book_reading/book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature) (`@mockMineruLib`, `refactoring.pdf`, outline table).
 - Stub: [`e2e_test/python_stubs/mineru_site/mineru/cli/common.py`](../e2e_test/python_stubs/mineru_site/mineru/cli/common.py) — loads committed [`mineru_output_for_refactoring.json`](../e2e_test/fixtures/book_reading/mineru_output_for_refactoring.json) into `_E2E_CONTENT_LIST`; fake `do_parse` writes `{stem}_content_list.json` from that list.
-- Page object: [`e2e_test/start/pageObjects/bookReadingPage.ts`](../e2e_test/start/pageObjects/bookReadingPage.ts) — **`expectPdfBeginningVisible`** delegates to **`expectPdfViewerViewportScreenshotContains('Code Refactoring', 1)`** (page 1 canvas ink wait, then viewer element screenshot → OCR). **`expectPdfPageMarkerVisible`** OCRs the **full** page canvas. **`expectPdfViewerViewportScreenshotContains(marker, pageNumber)`** is also used for the outline-jump scenario (e.g. page 2).
+- Page object: [`e2e_test/start/pageObjects/bookReadingPage.ts`](../e2e_test/start/pageObjects/bookReadingPage.ts) — **`expectPdfBeginningVisible`** uses **`expectCurrentPage(1).expectVisibleOCRContains('Code Refactoring')`** (page 1 canvas ink wait, then viewer element screenshot → OCR). **`expectPdfPageMarkerVisible`** OCRs the **full** page canvas. **`expectCurrentPage(n).expectVisibleOCRContains(marker)`** backs the Gherkin step for visible-viewport OCR on page **n** (outline jump, scroll → viewport-current, etc.).
 - Steps: [`e2e_test/step_definitions/book_reading.ts`](../e2e_test/step_definitions/book_reading.ts) — CLI expectations include refactoring outline substrings (e.g. `Protecting Intention in Working Software`, `Easier to Change`).
 
 ---
@@ -104,18 +104,22 @@ Short comment in the script or adjacent README snippet: **when to re-run** (PDF 
 **Implemented:**
 
 - Feature [`book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature): scenario **Outline row jumps the PDF to the anchored page** uses `Then I should see in the book reader visible PDF viewport on page 2 text including "Strengthening the Code"`.
-- Page object: `expectPdfViewerViewportScreenshotContains` — wait for `[data-page-number]` canvas ink, then `cy.get('[data-testid="pdf-book-viewer"]').screenshot` → `readFile` base64 → `ocrCanvasImage`; step `I should see in the book reader visible PDF viewport on page {int} text including {string}`.
+- Page object: **`expectCurrentPage(pageNumber).expectVisibleOCRContains(marker)`** — wait for `[data-page-number]` canvas ink, then element screenshot of **`[data-testid="pdf-book-viewer"]`** → `ocrCanvasImage`; step `I should see in the book reader visible PDF viewport on page {int} text including {string}`.
 - **Production:** [`mineruOutlineV1BboxToXyzDestArray`](../frontend/src/lib/book-reading/mineruOutlineV1PageIndex.ts) targets a point **above** the MinerU bbox top by a fixed margin so pdf.js top-biased `scrollPageIntoView` still leaves the section title in the visible band (viewport OCR failed until this).
 
-**Tests:** That scenario path only for the new step; other scenarios still use full-canvas `expectPdfPageMarkerVisible` until Phases 5–7.
+**Tests:** That scenario path only for the new step. After Phase 5, the scroll → viewport-current scenario also uses visible-viewport OCR; short viewport (Phase 6) and same-page scroll (Phase 7) still use full-canvas `expectPdfPageMarkerVisible` until those phases ship.
 
 ---
 
-## Phase 5 — Visible-viewport OCR: scroll PDF → viewport-current (page 2 in view)
+## Phase 5 — Visible-viewport OCR: scroll PDF → viewport-current (page 2 in view) — **shipped**
 
 **Deliverables:** Same pattern: **one** assertion migration, then fix only what that assertion proves.
 
-**Tests:** The scroll-to-page-2 / viewport-current scenario that still relied on full-canvas or marker wording.
+**Implemented:**
+
+- Feature [`book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature): scenario **Scrolling the PDF updates the viewport-current outline row** uses `Then I should see in the book reader visible PDF viewport on page 2 text including "Strengthening the Code"` (same step chain as Phase 4). No production change was required; Cypress run green after the Gherkin swap.
+
+**Tests:** That scenario path only for the migrated step.
 
 ---
 
@@ -145,7 +149,8 @@ For each phase and sub-phase: failing test (when introducing new behavior) → p
 | 2 (sp-2.1, sp-2.2) | Done — regenerate script + real MinerU fixture |
 | 3 | **Done** — beginning step OCR + **`Code Refactoring`**; viewport-only crop deferred (see Phase 3 section) |
 | 4 | **Done** — outline-jump scenario: PDF viewer element screenshot OCR + MinerU scroll target margin above bbox top |
-| 5–7 | Not done — migrate remaining page-marker / scroll scenarios to visible-viewport OCR + minimal fixes per phase |
+| 5 | **Done** — scroll → viewport-current: same visible-viewport OCR on page 2 as Phase 4 |
+| 6–7 | Not done — short viewport + same-page scroll scenarios |
 
 ## Open points (decide during implementation)
 
