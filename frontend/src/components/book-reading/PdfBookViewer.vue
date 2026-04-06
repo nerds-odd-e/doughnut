@@ -15,6 +15,7 @@ import {
   createCoalescedRequestAnimationFrameEmitter,
 } from "@/lib/book-reading/pdfBookViewerGeometryResample"
 import { pdfViewerViewportTopYDown } from "@/lib/book-reading/pdfViewerViewportTopYDown"
+import { attachOutlineSelectionBboxHighlight } from "@/lib/book-reading/outlineSelectionBboxHighlight"
 import { mineruOutlineV1BboxToXyzDestArray } from "@/lib/book-reading/mineruOutlineV1PageIndex"
 import type { MineruOutlineV1Bbox } from "@/lib/book-reading/mineruOutlineV1PageIndex"
 import { getDocument, type PDFDocumentProxy } from "pdfjs-dist"
@@ -98,32 +99,27 @@ type PendingNav = {
 }
 
 let pendingNavigation: PendingNav | null = null
-let debugOverlay: HTMLDivElement | null = null
+let detachOutlineSelectionBboxHighlight: (() => void) | null = null
 
-function clearDebugOverlay() {
-  debugOverlay?.remove()
-  debugOverlay = null
+function clearOutlineSelectionBboxHighlight() {
+  detachOutlineSelectionBboxHighlight?.()
+  detachOutlineSelectionBboxHighlight = null
 }
 
-function showDebugBboxOverlay(pageNumber: number, bbox: MineruOutlineV1Bbox) {
-  clearDebugOverlay()
+function showOutlineSelectionBboxHighlight(
+  pageNumber: number,
+  bbox: MineruOutlineV1Bbox
+) {
+  clearOutlineSelectionBboxHighlight()
   if (!pdfViewer) return
   const pageView = pdfViewer.getPageView(pageNumber - 1)
   if (!pageView?.div) return
-  const vw = pageView.viewport.width
-  const vh = pageView.viewport.height
-  const [x0, y0, x1, y1] = bbox
-  const overlay = document.createElement("div")
-  overlay.style.position = "absolute"
-  overlay.style.left = `${(x0 / 1000) * vw}px`
-  overlay.style.top = `${(y0 / 1000) * vh}px`
-  overlay.style.width = `${((x1 - x0) / 1000) * vw}px`
-  overlay.style.height = `${((y1 - y0) / 1000) * vh}px`
-  overlay.style.backgroundColor = "rgba(255, 0, 0, 0.3)"
-  overlay.style.pointerEvents = "none"
-  overlay.style.zIndex = "100"
-  pageView.div.appendChild(overlay)
-  debugOverlay = overlay
+  detachOutlineSelectionBboxHighlight = attachOutlineSelectionBboxHighlight(
+    pageView.div,
+    pageView.viewport.width,
+    pageView.viewport.height,
+    bbox
+  )
 }
 
 async function applyMineruOutlineV1Target(
@@ -140,7 +136,7 @@ async function applyMineruOutlineV1Target(
   }
   const pageNumber = pageIndexZeroBased + 1
   if (bbox === null) {
-    clearDebugOverlay()
+    clearOutlineSelectionBboxHighlight()
     pdfViewer.scrollPageIntoView({ pageNumber })
   } else {
     const page = await pdfViewer.pdfDocument.getPage(pageNumber)
@@ -151,7 +147,7 @@ async function applyMineruOutlineV1Target(
       bbox
     )
     pdfViewer.scrollPageIntoView({ pageNumber, destArray: [...destArray] })
-    showDebugBboxOverlay(pageNumber, bbox)
+    showOutlineSelectionBboxHighlight(pageNumber, bbox)
   }
   queueMicrotask(() => emitViewportDescriptorIfChanged())
 }
@@ -194,6 +190,7 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
     currentLoadingTask = null
   }
   if (pdfViewer) {
+    clearOutlineSelectionBboxHighlight()
     if (onPageChangingForViewport) {
       pdfViewer.eventBus.off("pagechanging", onPageChangingForViewport)
       onPageChangingForViewport = null
@@ -295,6 +292,7 @@ onBeforeUnmount(async () => {
     pdfViewer.setDocument(null as unknown as PDFDocumentProxy)
     pdfViewer = null
   }
+  clearOutlineSelectionBboxHighlight()
   pendingNavigation = null
 })
 </script>

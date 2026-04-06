@@ -17,11 +17,26 @@
 
 These explain why “layout ↔ PDF” can look **a few lines** wrong **without** implying a specific patch until E2E reproduces it:
 
-1. **pdf.js `scrollPageIntoView` + XYZ:** The internal `scrollIntoView` sets `scrollTop` so the destination **spot** is aligned to the **top** of the scroll container, not vertically centered. We pass an XYZ point at the **center** of the MinerU bbox → content **above** that point (including part of the bbox and headings) often sits **above** the visible band.
-2. **PDF → layout:** `pdfViewerViewportTopYDown` uses the **vertical midpoint** of the visible slice; `viewportCurrentAnchorIdFromAnchorPage` compares that to each row’s **`y0` (bbox top)**. That is a different vertical convention than (1), so highlight and scroll target can drift relative to each other.
-3. **MinerU bbox vs PDF user space, rotation:** Committed JSON assumes MinerU’s bbox coordinates match pdf.js viewport space; extraction jitter and **unhandled page rotation** in bbox navigation can add variable error.
+1. **pdf.js `scrollPageIntoView` + XYZ:** The internal `scrollIntoView` aligns the destination **spot** to the **top** of the scroll container, not vertically centered. A small **PDF-space top padding** on the scroll target keeps section titles in the visible band for viewport OCR.
+2. **PDF → layout:** `pdfViewerViewportTopYDown` uses the **vertical midpoint** of the visible slice, expressed in the **same 0–1000 system as MinerU bbox** (see **Important learnings** below); `viewportCurrentAnchorIdFromAnchorPage` compares that to each row’s **`y0` (bbox top)**.
+3. **Rotation:** **Unhandled page rotation** in bbox navigation can still add error; treat as a separate follow-up if it shows up in E2E.
 
 **Plan discipline:** Record positioning fixes **only after** a phase adds/changes an assertion that **fails** on `main` (or on the branch at that point). Each fix should be the **minimum** change to satisfy **that** phase’s single assertion.
+
+---
+
+## Important learnings (MinerU `content_list` ↔ pdf.js)
+
+**Authoritative MinerU contract:** In pipeline `content_list.json`, every block’s `bbox` is **`[x0, y0, x1, y1]` mapped to a 0–1000 range** per page (see [MinerU output files — content list](https://opendatalab.github.io/MinerU/reference/output_files/)). It is **not** PDF user space (points). Values can exceed the PDF’s point width/height when misread as points (e.g. x≈905 on an A4 page ≈595 pt wide).
+
+**Frontend (`pdf.mineru_outline_v1`):**
+
+- [`mineruOutlineV1BboxToXyzDestArray`](../frontend/src/lib/book-reading/mineruOutlineV1PageIndex.ts) converts **0–1000 → `pdfPage.getViewport({ scale: 1 })` width/height**, then builds the pdf.js XYZ dest (horizontal center of bbox, top edge with **`MINERU_SCROLL_TOP_PADDING_PDF`** so headings are not flush against the viewport top).
+- [`pdfViewerViewportTopYDown`](../frontend/src/lib/book-reading/pdfViewerViewportTopYDown.ts) reports the visible band’s vertical midpoint as **normalized 0–1000** so it matches MinerU **`y0`** in [`viewportCurrentAnchorIdFromAnchorPage`](../frontend/src/lib/book-reading/viewportCurrentRangeFromAnchorPage.ts).
+
+**Debug overlay** ([`PdfBookViewer.vue`](../frontend/src/components/book-reading/PdfBookViewer.vue)): positions the semi-transparent bbox using **`(coord / 1000) * pageView.viewport.width/height`** — same mapping as above, not raw bbox numbers as PDF points.
+
+**E2E:** [`scrollPdfBookReaderDownWithinSamePageForNextBbox`](../e2e_test/start/pageObjects/bookReadingPage.ts) **`deltaPx`** is tuned against **`refactoring.pdf`** + committed JSON; **retune after** changing scroll math or padding (e.g. **340** after 0–1000 fix + top padding).
 
 ---
 
@@ -105,7 +120,7 @@ Short comment in the script or adjacent README snippet: **when to re-run** (PDF 
 
 - Feature [`book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature): scenario **Outline row jumps the PDF to the anchored page** uses `Then I should see in the book reader visible PDF viewport on page 2 text including "Strengthening the Code"`.
 - Page object: **`expectCurrentPage(pageNumber).expectVisibleOCRContains(marker)`** — wait for `[data-page-number]` canvas ink, then element screenshot of **`[data-testid="pdf-book-viewer"]`** → `ocrCanvasImage`; step `I should see in the book reader visible PDF viewport on page {int} text including {string}`.
-- **Production:** [`mineruOutlineV1BboxToXyzDestArray`](../frontend/src/lib/book-reading/mineruOutlineV1PageIndex.ts) targets a point **above** the MinerU bbox top by a fixed margin so pdf.js top-biased `scrollPageIntoView` still leaves the section title in the visible band (viewport OCR failed until this).
+- **Production:** [`mineruOutlineV1BboxToXyzDestArray`](../frontend/src/lib/book-reading/mineruOutlineV1PageIndex.ts) maps MinerU **0–1000** bbox to PDF user space and applies a small **top padding** for viewport OCR (see **Important learnings**).
 
 **Tests:** That scenario path only for the new step. After Phase 5, the scroll → viewport-current scenario also uses visible-viewport OCR. Phase 6 migrates the short-viewport scenario; Phase 7 covers same-page scroll.
 
@@ -144,8 +159,8 @@ Short comment in the script or adjacent README snippet: **when to re-run** (PDF 
 **Implemented:**
 
 - Feature [`book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature): first scenario replaces scrollTop-only same-page jump with **When/Then** outline clicks + **`expectVisibleOCRContains`** on page **1** (`"Usual Definition"` after §2, `"Protecting Intention"` after §1). Same-page scroll scenario adds viewport OCR **`"Easier to Change"`** after the in-page scroll step.
-- Page object: removed **`expectDistinctScrollForSamePageBboxOutline`**; **`scrollPdfBookReaderDownWithinSamePageForNextBbox`** `deltaPx` **480** (was 300) so viewport midpoint passes §2.1 bbox after larger outline jump margin.
-- **Production:** [`MINERU_SCROLL_TARGET_Y_MARGIN`](../frontend/src/lib/book-reading/mineruOutlineV1PageIndex.ts) **100** (was 56) so §2 heading stays in the visible band for viewport OCR; unit test expectation updated in [`mineruOutlineV1PageIndex.spec.ts`](../frontend/tests/lib/book-reading/mineruOutlineV1PageIndex.spec.ts).
+- Page object: removed **`expectDistinctScrollForSamePageBboxOutline`**; **`scrollPdfBookReaderDownWithinSamePageForNextBbox`** `deltaPx` retuned with scroll math (**340** after 0–1000 bbox + top padding; was **480** with the old margin-based approach).
+- **Production:** superseded by **0–1000 normalization** + **`MINERU_SCROLL_TOP_PADDING_PDF`** (replaced earlier `MINERU_SCROLL_TARGET_Y_MARGIN` on raw coordinates); [`mineruOutlineV1PageIndex.spec.ts`](../frontend/tests/lib/book-reading/mineruOutlineV1PageIndex.spec.ts) tracks XYZ math.
 
 ---
 
@@ -158,10 +173,10 @@ For each phase and sub-phase: failing test (when introducing new behavior) → p
 | 1 (sp-1.1, sp-1.2) | Done — `refactoring.pdf` + `mineru_output_for_refactoring.json` |
 | 2 (sp-2.1, sp-2.2) | Done — regenerate script + real MinerU fixture |
 | 3 | **Done** — beginning step OCR + **`Code Refactoring`**; viewport-only crop deferred (see Phase 3 section) |
-| 4 | **Done** — outline-jump scenario: PDF viewer element screenshot OCR + MinerU scroll target margin above bbox top |
+| 4 | **Done** — outline-jump scenario: PDF viewer element screenshot OCR + MinerU → pdf.js scroll target |
 | 5 | **Done** — scroll → viewport-current: same visible-viewport OCR on page 2 as Phase 4 |
 | 6 | **Done** — short viewport: visible-viewport OCR on page 2; removed full-page marker step |
-| 7 | **Done** — same-page jump + same-page scroll: viewport OCR; margin 100 + `deltaPx` 480 |
+| 7 | **Done** — same-page jump + same-page scroll: viewport OCR; **`deltaPx` 340** with 0–1000 bbox + top padding (retune if scroll math changes) |
 
 ## Open points (decide during implementation)
 
