@@ -8,7 +8,7 @@
 
 - Feature: [`e2e_test/features/book_reading/book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature) (`@mockMineruLib`, `refactoring.pdf`, outline table).
 - Stub: [`e2e_test/python_stubs/mineru_site/mineru/cli/common.py`](../e2e_test/python_stubs/mineru_site/mineru/cli/common.py) — loads committed [`mineru_output_for_refactoring.json`](../e2e_test/fixtures/book_reading/mineru_output_for_refactoring.json) into `_E2E_CONTENT_LIST`; fake `do_parse` writes `{stem}_content_list.json` from that list.
-- Page object: [`e2e_test/start/pageObjects/bookReadingPage.ts`](../e2e_test/start/pageObjects/bookReadingPage.ts) — `expectPdfBeginningVisible` OCRs the **first** page canvas and asserts substring **`Code Refactoring`**. **`expectPdfPageMarkerVisible`** OCRs the **full** page canvas. **`expectPdfPageMarkerVisibleInViewport`** OCRs the intersection of `[data-testid="pdf-book-viewer"]`’s on-screen rect with the page canvas (Phase 4+ outline-jump scenario). The beginning step still uses the **full** first-page canvas (no scrollport crop).
+- Page object: [`e2e_test/start/pageObjects/bookReadingPage.ts`](../e2e_test/start/pageObjects/bookReadingPage.ts) — `expectPdfBeginningVisible` OCRs the **first** page canvas and asserts substring **`Code Refactoring`**. **`expectPdfPageMarkerVisible`** OCRs the **full** page canvas. **`expectPdfViewerViewportScreenshotContains`** OCRs a Cypress **element screenshot** of `[data-testid="pdf-book-viewer"]` (Phase 4 outline-jump scenario). The beginning step still uses the **full** first-page canvas.
 - Steps: [`e2e_test/step_definitions/book_reading.ts`](../e2e_test/step_definitions/book_reading.ts) — CLI expectations include refactoring outline substrings (e.g. `Protecting Intention in Working Software`, `Easier to Change`).
 
 ---
@@ -105,8 +105,8 @@ Short comment in the script or adjacent README snippet: **when to re-run** (PDF 
 
 **Implemented:**
 
-- Feature [`book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature): scenario **Outline row jumps the PDF to the anchored page** uses `Then I should see in the book reader visible viewport on PDF page 2 text including "Strengthening the Code"`.
-- Page object: `expectPdfPageMarkerVisibleInViewport` — viewport ∩ canvas crop → `ocrCanvasImage`; step definition wires `I should see in the book reader visible viewport on PDF page {int} text including {string}`.
+- Feature [`book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature): scenario **Outline row jumps the PDF to the anchored page** uses `Then I should see in the book reader visible PDF viewport text including "Strengthening the Code"`.
+- Page object: `expectPdfViewerViewportScreenshotContains` — `cy.get('[data-testid="pdf-book-viewer"]').screenshot` → `readFile` base64 → `ocrCanvasImage`; step `I should see in the book reader visible PDF viewport text including {string}`.
 - **Production:** [`mineruOutlineV1BboxToXyzDestArray`](../frontend/src/lib/book-reading/mineruOutlineV1PageIndex.ts) targets a point **above** the MinerU bbox top by a fixed margin so pdf.js top-biased `scrollPageIntoView` still leaves the section title in the visible band (viewport OCR failed until this).
 
 **Tests:** That scenario path only for the new step; other scenarios still use full-canvas `expectPdfPageMarkerVisible` until Phases 5–7.
@@ -146,7 +146,7 @@ For each phase and sub-phase: failing test (when introducing new behavior) → p
 | 1 (sp-1.1, sp-1.2) | Done — `refactoring.pdf` + `mineru_output_for_refactoring.json` |
 | 2 (sp-2.1, sp-2.2) | Done — regenerate script + real MinerU fixture |
 | 3 | **Done** — beginning step OCR + **`Code Refactoring`**; viewport-only crop deferred (see Phase 3 section) |
-| 4 | **Done** — outline-jump scenario: viewport ∩ canvas OCR + MinerU scroll target margin above bbox top |
+| 4 | **Done** — outline-jump scenario: PDF viewer element screenshot OCR + MinerU scroll target margin above bbox top |
 | 5–7 | Not done — migrate remaining page-marker / scroll scenarios to visible-viewport OCR + minimal fixes per phase |
 
 ## Open points (decide during implementation)

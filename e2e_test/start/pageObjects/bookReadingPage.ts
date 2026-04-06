@@ -56,53 +56,6 @@ const bookReadingPage = () => {
     return ocrPngBase64(base64)
   }
 
-  /**
-   * OCR the intersection of the PDF scrollport’s on-screen rect with a page canvas (PDF CSS space).
-   * Fails if the target page is not visibly overlapped (mis-scroll / wrong page).
-   */
-  const pngBase64FromViewerViewportOnCanvas = (
-    viewerEl: HTMLElement,
-    canvasEl: HTMLCanvasElement,
-    minCssSidePx: number
-  ) => {
-    const v = viewerEl.getBoundingClientRect()
-    const c = canvasEl.getBoundingClientRect()
-    const left = Math.max(v.left, c.left)
-    const top = Math.max(v.top, c.top)
-    const right = Math.min(v.right, c.right)
-    const bottom = Math.min(v.bottom, c.bottom)
-    const cssW = right - left
-    const cssH = bottom - top
-    if (cssW < minCssSidePx || cssH < minCssSidePx) {
-      throw new Error(
-        `PDF viewport ∩ page canvas too small (${Math.round(cssW)}×${Math.round(cssH)} css px); expected visible overlap ≥ ${minCssSidePx}px`
-      )
-    }
-    const scaleX = canvasEl.width / c.width
-    const scaleY = canvasEl.height / c.height
-    let sx = (left - c.left) * scaleX
-    let sy = (top - c.top) * scaleY
-    let sw = cssW * scaleX
-    let sh = cssH * scaleY
-    sx = Math.max(0, Math.floor(sx))
-    sy = Math.max(0, Math.floor(sy))
-    sw = Math.min(canvasEl.width - sx, Math.ceil(sw))
-    sh = Math.min(canvasEl.height - sy, Math.ceil(sh))
-    if (sw < 1 || sh < 1) {
-      throw new Error('Clamped viewport crop has zero bitmap extent')
-    }
-    const upscale = 2
-    const offscreen = document.createElement('canvas')
-    offscreen.width = sw * upscale
-    offscreen.height = sh * upscale
-    const ctx = offscreen.getContext('2d')!
-    ctx.scale(upscale, upscale)
-    ctx.drawImage(canvasEl, sx, sy, sw, sh, 0, 0, sw, sh)
-    return offscreen
-      .toDataURL('image/png')
-      .replace(/^data:image\/png;base64,/, '')
-  }
-
   const expectCanvasOcrContains = (
     canvas: Cypress.Chainable<JQuery<HTMLElement>>,
     assertCanvas: (el: HTMLCanvasElement) => void,
@@ -169,35 +122,32 @@ const bookReadingPage = () => {
       )
       return this
     },
-    expectPdfPageMarkerVisibleInViewport(marker: string, pageNumber: number) {
-      const minCssOverlapPx = 48
+    expectPdfViewerViewportScreenshotContains(marker: string) {
       pageIsNotLoading()
-      cy.get('[data-testid="pdf-book-viewer"]').then(($viewer) => {
-        const viewerEl = $viewer[0] as HTMLElement
-        return cy
-          .get(
-            `[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="${pageNumber}"] canvas`
-          )
-          .first()
-          .should(($canvas) => {
-            assertPdfCanvasHasDarkPixels($canvas[0] as HTMLCanvasElement)
-          })
-          .then(($canvas) => {
-            const canvasEl = $canvas[0] as HTMLCanvasElement
-            const base64 = pngBase64FromViewerViewportOnCanvas(
-              viewerEl,
-              canvasEl,
-              minCssOverlapPx
-            )
-            return ocrPngBase64(base64)
-          })
-          .then((text) => {
-            expect(
-              text as string,
-              `OCR text from visible viewport on PDF page ${pageNumber}`
-            ).to.contain(marker)
-          })
-      })
+      cy.get('[data-testid="pdf-book-viewer"]').should('be.visible')
+      let screenshotPath = ''
+      cy.get('[data-testid="pdf-book-viewer"]')
+        .screenshot('book-reading-pdf-viewer-ocr', {
+          log: false,
+          overwrite: true,
+          onAfterScreenshot(_$el, props) {
+            screenshotPath = props.path
+          },
+        })
+        .then(() => {
+          expect(
+            screenshotPath,
+            'Cypress element screenshot path'
+          ).to.not.equal('')
+          return cy.readFile(screenshotPath, 'base64', { timeout: 30000 })
+        })
+        .then((base64) => ocrPngBase64(base64 as string))
+        .then((text) => {
+          expect(
+            text as string,
+            'OCR text from visible PDF book viewer (element screenshot)'
+          ).to.contain(marker)
+        })
       return this
     },
     /** Two outline rows on the same page with different bboxes → scrollTop should change. */
