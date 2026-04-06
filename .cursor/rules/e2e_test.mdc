@@ -65,7 +65,7 @@ Use when **text is not in the DOM** (e.g. PDF drawn only to `<canvas>`). Keep OC
 - **Node task:** Register a task in `e2e_test/config/common.ts` that calls `tesseract.js` `createWorker` + `recognize` on image bytes (e.g. base64 PNG without the `data:image/png;base64,` prefix). Example task name: `ocrCanvasImage`.
 - **Language data:** Commit **`e2e_test/tesseract/eng.traineddata`** (uncompressed). Pass **`langPath`** and **`cachePath`** both to that directory when creating the worker so Tesseract does not write `eng.traineddata` to the repo root (root-level traineddata files are gitignored as a fallback).
 - **Page object:** Wait until the canvas has **real ink** (e.g. sample `getImageData` for dark pixels), not only non-zero alpha from an empty white fill—otherwise OCR runs on a blank bitmap. Export with `toDataURL('image/png')`, strip the prefix, `cy.task(..., { timeout: … })` for slow OCR, then assert the returned string contains the expected substring with a clear message.
-- **Reference:** `e2e_test/start/pageObjects/bookReadingPage.ts` (`expectPdfBeginningVisible`).
+- **Reference:** `e2e_test/start/pageObjects/bookReadingPage.ts` (`expectPdfBeginningVisible` → `expectPdfViewerViewportScreenshotContains`).
 
 ## Debugging
 

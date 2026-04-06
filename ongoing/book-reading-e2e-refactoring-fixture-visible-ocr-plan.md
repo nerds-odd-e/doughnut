@@ -8,7 +8,7 @@
 
 - Feature: [`e2e_test/features/book_reading/book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature) (`@mockMineruLib`, `refactoring.pdf`, outline table).
 - Stub: [`e2e_test/python_stubs/mineru_site/mineru/cli/common.py`](../e2e_test/python_stubs/mineru_site/mineru/cli/common.py) — loads committed [`mineru_output_for_refactoring.json`](../e2e_test/fixtures/book_reading/mineru_output_for_refactoring.json) into `_E2E_CONTENT_LIST`; fake `do_parse` writes `{stem}_content_list.json` from that list.
-- Page object: [`e2e_test/start/pageObjects/bookReadingPage.ts`](../e2e_test/start/pageObjects/bookReadingPage.ts) — `expectPdfBeginningVisible` OCRs the **first** page canvas and asserts substring **`Code Refactoring`**. **`expectPdfPageMarkerVisible`** OCRs the **full** page canvas. **`expectPdfViewerViewportScreenshotContains(marker, pageNumber)`** waits for that page’s canvas to have ink, then OCRs a Cypress **element screenshot** of `[data-testid="pdf-book-viewer"]` (outline-jump scenario). The beginning step still uses the **full** first-page canvas.
+- Page object: [`e2e_test/start/pageObjects/bookReadingPage.ts`](../e2e_test/start/pageObjects/bookReadingPage.ts) — **`expectPdfBeginningVisible`** delegates to **`expectPdfViewerViewportScreenshotContains('Code Refactoring', 1)`** (page 1 canvas ink wait, then viewer element screenshot → OCR). **`expectPdfPageMarkerVisible`** OCRs the **full** page canvas. **`expectPdfViewerViewportScreenshotContains(marker, pageNumber)`** is also used for the outline-jump scenario (e.g. page 2).
 - Steps: [`e2e_test/step_definitions/book_reading.ts`](../e2e_test/step_definitions/book_reading.ts) — CLI expectations include refactoring outline substrings (e.g. `Protecting Intention in Working Software`, `Easier to Change`).
 
 ---
@@ -91,9 +91,7 @@ Short comment in the script or adjacent README snippet: **when to re-run** (PDF 
 
 **Implemented:**
 
-- [`expectPdfBeginningVisible`](../e2e_test/start/pageObjects/bookReadingPage.ts) OCRs the **first** page’s canvas and requires **`Code Refactoring`** (see scenario [`book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature) → `I should see the beginning of the PDF book "refactoring.pdf"`).
-
-**Original plan nuance (not done, optional follow-up):** The first version of this phase called for OCR on **only** the intersection of **`[data-testid="pdf-book-viewer"]`** with the on-screen part of the page (not the full first-page bitmap). That **viewport crop** is **not** implemented; the test still reads the **entire** first-page canvas. The **`Code Refactoring`** marker is strong enough that the scenario would fail if the viewer were scrolled so far that the title band were off-canvas, but it does not strictly assert “visible viewport band” geometry. Add a crop helper later if a failing scenario needs it.
+- [`expectPdfBeginningVisible`](../e2e_test/start/pageObjects/bookReadingPage.ts) uses the same pipeline as viewport screenshot OCR: wait for page **1** canvas ink, element screenshot of **`[data-testid="pdf-book-viewer"]`**, then assert **`Code Refactoring`** (see [`book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature) → `I should see the beginning of the PDF book "refactoring.pdf"`).
 
 **Tests:** `See book structure and beginning of PDF in the browser` (beginning step only for this phase).
 
@@ -160,3 +158,9 @@ For each phase and sub-phase: failing test (when introducing new behavior) → p
 ## Document maintenance
 
 When phases ship, trim completed checklist noise here; point [`ongoing/book-reading-read-a-range-plan.md`](book-reading-read-a-range-plan.md) at this doc for E2E fixture/OCR strategy if the main plan should stay short.
+
+---
+
+## Final checks
+
+check if there's still any place using `expectCanvasOcrContains`

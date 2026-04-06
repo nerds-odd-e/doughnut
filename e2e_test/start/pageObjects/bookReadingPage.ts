@@ -87,12 +87,7 @@ const bookReadingPage = () => {
       return this
     },
     expectPdfBeginningVisible() {
-      expectCanvasOcrContains(
-        cy.get('[data-testid="pdf-book-viewer"] .page canvas').first(),
-        assertPdfCanvasHasDarkPixels,
-        'OCR text from PDF page 1 canvas',
-        'Code Refactoring'
-      )
+      this.expectPdfViewerViewportScreenshotContains('Code Refactoring', 1)
       return this
     },
     clickOutlineRowByTitle(title: string) {
