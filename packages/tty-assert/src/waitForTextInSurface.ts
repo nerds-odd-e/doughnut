@@ -41,6 +41,14 @@ export type WaitForTextInSurfaceOptions = {
   strict?: boolean
   cols?: number
   rows?: number
+  /**
+   * Restrict xterm-backed search to rows **below** the last row matching any
+   * anchor (tried in priority order, scanning bottom-to-top per anchor).
+   * Ignored for `strippedTranscript`.
+   */
+  startAfterAnchor?: RegExp[]
+  /** When no anchor matches, search the bottom N rows (default: all rows). */
+  fallbackRowCount?: number
 }
 
 /** Default delay between poll attempts when `timeoutMs` is positive; Cypress adapter should use the same value for `cy.wait` between buffer re-reads. */
@@ -86,6 +94,31 @@ function rowMajorSearchBlock(rows: string[][]): string {
 
 function rowMajorSnapshot(rows: string[][]): string {
   return rows.map((r) => r.join('').trimEnd()).join('\n')
+}
+
+function findAnchorRowIndex(rows: string[][], anchors: RegExp[]): number {
+  for (const anchor of anchors) {
+    for (let i = rows.length - 1; i >= 0; i--) {
+      const row = rows[i]
+      if (row && anchor.test(row.join('').trimEnd())) return i
+    }
+  }
+  return -1
+}
+
+function sliceByAnchor(
+  rows: string[][],
+  anchors: RegExp[] | undefined,
+  fallbackRowCount: number | undefined
+): { rows: string[][]; rowOffset: number } {
+  if (!anchors || anchors.length === 0) return { rows, rowOffset: 0 }
+  const idx = findAnchorRowIndex(rows, anchors)
+  if (idx >= 0) return { rows: rows.slice(idx + 1), rowOffset: idx + 1 }
+  if (fallbackRowCount != null) {
+    const start = Math.max(0, rows.length - fallbackRowCount)
+    return { rows: rows.slice(start), rowOffset: start }
+  }
+  return { rows, rowOffset: 0 }
 }
 
 function withReplayedXtermTerminal<T>(
@@ -144,7 +177,9 @@ async function buildHaystackAndSnapshot(
   surface: TtySearchSurface,
   raw: string,
   cols: number,
-  rows: number
+  rows: number,
+  startAfterAnchor?: RegExp[],
+  fallbackRowCount?: number
 ): Promise<{ haystack: string; snapshot: string }> {
   if (surface === 'strippedTranscript') {
     const haystack = stripAnsiCliPty(raw)
@@ -154,10 +189,15 @@ async function buildHaystackAndSnapshot(
     const buffer = term.buffer.active
     const startY = surface === 'fullBuffer' ? 0 : buffer.baseY
     const endY = buffer.length
-    const rowData = xtermBufferRows(term, startY, endY)
+    const allRows = xtermBufferRows(term, startY, endY)
+    const { rows: searchRows } = sliceByAnchor(
+      allRows,
+      startAfterAnchor,
+      fallbackRowCount
+    )
     return {
-      haystack: rowMajorSearchBlock(rowData),
-      snapshot: rowMajorSnapshot(rowData),
+      haystack: rowMajorSearchBlock(searchRows),
+      snapshot: rowMajorSnapshot(searchRows),
     }
   })
 }
@@ -188,7 +228,9 @@ async function attemptOnce(
     opts.surface,
     opts.raw,
     opts.cols,
-    opts.rows
+    opts.rows,
+    opts.startAfterAnchor,
+    opts.fallbackRowCount
   )
 
   const count = matchCount(haystack, opts.needle)
@@ -280,4 +322,72 @@ export async function waitForTextInSurface(
     }
     await sleep(retryMs)
   }
+}
+
+/**
+ * Locator-style cell resolution: replays `raw` through xterm, finds `needle`
+ * in the viewport (optionally below an anchor row), and returns the matched
+ * xterm cells with position and styling attributes.
+ *
+ * Inspired by [tui-test `Locator.resolve`](https://github.com/microsoft/tui-test).
+ */
+export type ResolvedCell = {
+  char: string
+  x: number
+  y: number
+  bold: boolean
+}
+
+export type LocateTextResult = {
+  found: boolean
+  cells: ResolvedCell[]
+  snapshot: string
+}
+
+export async function locateTextCellsInViewport(opts: {
+  raw: string
+  needle: string
+  startAfterAnchor?: RegExp[]
+  fallbackRowCount?: number
+  cols?: number
+  rows?: number
+}): Promise<LocateTextResult> {
+  const cols = opts.cols ?? CLI_INTERACTIVE_PTY_COLS
+  const rows = opts.rows ?? CLI_INTERACTIVE_PTY_ROWS
+
+  return withReplayedXtermTerminal(opts.raw, cols, rows, (term) => {
+    const buffer = term.buffer.active
+    const baseY = buffer.baseY
+    const allRows = xtermBufferRows(term, baseY, buffer.length)
+    const { rows: searchRows, rowOffset } = sliceByAnchor(
+      allRows,
+      opts.startAfterAnchor,
+      opts.fallbackRowCount
+    )
+
+    const block = rowMajorSearchBlock(searchRows)
+    const snapshot = rowMajorSnapshot(searchRows)
+    const index = block.indexOf(opts.needle)
+    if (index < 0) {
+      return { found: false, cells: [], snapshot }
+    }
+
+    const cells: ResolvedCell[] = []
+    const rowWidth = cols
+    for (let i = 0; i < opts.needle.length; i++) {
+      const pos = index + i
+      const localY = Math.floor(pos / rowWidth)
+      const x = pos % rowWidth
+      const termLine = buffer.getLine(baseY + rowOffset + localY)
+      const cell = termLine?.getCell(x)
+      cells.push({
+        char: cell?.getChars() ?? '',
+        x,
+        y: rowOffset + localY,
+        bold: cell?.isBold() === 1,
+      })
+    }
+
+    return { found: true, cells, snapshot }
+  })
 }

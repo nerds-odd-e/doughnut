@@ -1,12 +1,9 @@
-import { extractCurrentGuidanceFromReplayedPlaintext } from '../../../config/cliPtyCurrentGuidanceFromReplay'
 import {
   formatRawTerminalSnapshotForError,
   headPreview,
-  tailPreview,
-  TERMINAL_ERROR_PREVIEW_LEN,
 } from 'tty-assert/errorSnapshotFormatting'
-import { ptyTranscriptToViewportPlaintext } from 'tty-assert/ptyTranscriptToViewportPlaintext'
 import {
+  locateTextCellsInViewport,
   stripAnsiCliPty,
   TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS,
   waitForTextInSurface,
@@ -92,54 +89,29 @@ const PAST_USER_MSG_GRAY_BG_SGR = '\x1b[100m'
 /** Gray foreground from chalk `grey` — not sufficient for a past user message block. */
 const GRAY_FG_ONLY_SGR = '\x1b[90m'
 
-const CURRENT_GUIDANCE_SECTION = 'Current guidance (simulated visible screen)'
-
-function escapeRegex(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
-/** Bold start SGR (e.g. markdansi / chalk); optional other SGR between bold-on and text. */
-function boldStyledTextPattern(text: string): RegExp {
-  return new RegExp(`\\x1b\\[1m(?:\\x1b\\[[0-9;]*m)*${escapeRegex(text)}`)
-}
-
-async function getGuidanceContext(raw: string): Promise<{
-  replayedPlain: string
-  guidancePlain: string
-}> {
-  const replayedPlain = await ptyTranscriptToViewportPlaintext(raw)
-  const guidancePlain =
-    extractCurrentGuidanceFromReplayedPlaintext(replayedPlain)
-  return { replayedPlain, guidancePlain }
-}
-
-function formatGuidanceRegion(
-  guidancePlain: string,
-  replayedPlain: string
-): string {
-  const guidanceSection =
-    guidancePlain.length > TERMINAL_ERROR_PREVIEW_LEN
-      ? `${guidancePlain.slice(-TERMINAL_ERROR_PREVIEW_LEN)}\n… (${guidancePlain.length} chars)`
-      : guidancePlain || '(empty)'
-  return (
-    `  Guidance region (replayed plain):\n${guidanceSection}\n` +
-    `  Tail preview of full replayed screen (plain):\n${tailPreview(replayedPlain)}`
-  )
-}
+/** Anchors for the guidance region, tried in priority order (most specific first). */
+const GUIDANCE_ANCHORS: RegExp[] = [/^\s*└/, /^\s*>\s*$/, /> /]
+const GUIDANCE_FALLBACK_ROWS = 8
 
 async function assertCurrentGuidanceContains(
   raw: string,
   expected: string
 ): Promise<void> {
-  const { replayedPlain, guidancePlain } = await getGuidanceContext(raw)
-  if (guidancePlain.includes(expected)) return
-  failCliAssertion(
-    `Expected substring in ${CURRENT_GUIDANCE_SECTION} (not raw PTY bytes).\n` +
-      `  Expected: ${JSON.stringify(expected)}\n` +
-      `  Guidance region (below boxed main prompt bottom ${JSON.stringify('└')} row if present, else below empty ${JSON.stringify('> ')} row or last line with that marker), replayed plain:\n` +
-      formatGuidanceRegion(guidancePlain, replayedPlain),
-    raw
-  )
+  if (expected === '') return
+  try {
+    await waitForTextInSurface({
+      raw,
+      needle: expected,
+      surface: 'viewableBuffer',
+      startAfterAnchor: GUIDANCE_ANCHORS,
+      fallbackRowCount: GUIDANCE_FALLBACK_ROWS,
+      timeoutMs: 0,
+      strict: false,
+    })
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err)
+    failCliAssertion(`Current guidance assertion failed.\n${detail}`, raw)
+  }
 }
 
 /**
@@ -177,20 +149,24 @@ async function assertCurrentGuidanceContainsBold(
   raw: string,
   text: string
 ): Promise<void> {
-  const { replayedPlain, guidancePlain } = await getGuidanceContext(raw)
-  if (!guidancePlain.includes(text)) {
+  const result = await locateTextCellsInViewport({
+    raw,
+    needle: text,
+    startAfterAnchor: GUIDANCE_ANCHORS,
+    fallbackRowCount: GUIDANCE_FALLBACK_ROWS,
+  })
+  if (!result.found) {
     failCliAssertion(
-      `Expected ${JSON.stringify(text)} in ${CURRENT_GUIDANCE_SECTION}.\n` +
-        formatGuidanceRegion(guidancePlain, replayedPlain),
+      `Expected ${JSON.stringify(text)} in current guidance.\n` +
+        `Guidance region snapshot:\n${result.snapshot}`,
       raw
     )
   }
-  if (boldStyledTextPattern(text).test(raw)) return
+  if (result.cells.every((c) => c.bold)) return
   failCliAssertion(
-    `Expected ${JSON.stringify(text)} with **bold** styling in ${CURRENT_GUIDANCE_SECTION}.\n` +
-      `  Plain guidance includes the substring, but the PTY transcript did not contain a bold SGR sequence (e.g. \\x1b[1m) immediately before that text.\n` +
-      `  (Recall layout / markdown rendering may be wrong, or text is not in the guidance region.)\n` +
-      formatGuidanceRegion(guidancePlain, replayedPlain),
+    `Expected ${JSON.stringify(text)} with **bold** styling in current guidance.\n` +
+      `  Found the text but not all cells are bold.\n` +
+      `Guidance region snapshot:\n${result.snapshot}`,
     raw
   )
 }
