@@ -36,4 +36,22 @@ public class DbBookStorage implements BookStorage {
     }
     return attachmentBlobRepository.findById(id).map(AttachmentBlob::getData);
   }
+
+  @Override
+  @Transactional
+  public void delete(String ref) {
+    if (ref == null || ref.isBlank()) {
+      return;
+    }
+    int id;
+    try {
+      id = Integer.parseInt(ref.trim());
+    } catch (NumberFormatException e) {
+      return;
+    }
+    if (id <= 0) {
+      return;
+    }
+    attachmentBlobRepository.deleteById(id);
+  }
 }

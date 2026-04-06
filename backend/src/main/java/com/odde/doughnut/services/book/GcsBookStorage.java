@@ -40,6 +40,14 @@ public class GcsBookStorage implements BookStorage {
     return Optional.of(blob.getContent());
   }
 
+  @Override
+  public void delete(String ref) {
+    if (!isAllowedRef(ref)) {
+      return;
+    }
+    storage.delete(BlobId.of(bucket, ref.trim()));
+  }
+
   private boolean isAllowedRef(String ref) {
     if (ref == null) {
       return false;

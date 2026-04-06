@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.storage.Blob;
@@ -74,5 +75,22 @@ class GcsBookStorageTest {
     when(storage.get(BlobId.of("b", "a.pdf"))).thenReturn(null);
     GcsBookStorage cut = new GcsBookStorage(storage, "b", "");
     assertTrue(cut.get("a.pdf").isEmpty());
+  }
+
+  @Test
+  void delete_callsStorageDeleteForAllowedRef() {
+    Storage storage = mock(Storage.class);
+    GcsBookStorage cut = new GcsBookStorage(storage, "b", "pre/");
+    cut.delete("pre/obj.pdf");
+    verify(storage).delete(BlobId.of("b", "pre/obj.pdf"));
+    verifyNoMoreInteractions(storage);
+  }
+
+  @Test
+  void delete_noOpWhenInvalidRef() {
+    Storage storage = mock(Storage.class);
+    GcsBookStorage cut = new GcsBookStorage(storage, "b", "safe/");
+    cut.delete("safe/../evil");
+    verifyNoInteractions(storage);
   }
 }

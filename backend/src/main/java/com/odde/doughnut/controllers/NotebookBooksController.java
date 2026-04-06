@@ -89,4 +89,14 @@ class NotebookBooksController {
         .contentType(MediaType.APPLICATION_PDF)
         .body(pdf.bytes());
   }
+
+  @Operation(operationId = "deleteBook", summary = "Delete book")
+  @DeleteMapping("/{notebook}/book")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Transactional
+  public void deleteBook(@PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(notebook);
+    bookService.deleteBookForNotebook(notebook);
+  }
 }

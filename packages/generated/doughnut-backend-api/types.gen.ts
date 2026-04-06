@@ -2964,6 +2964,24 @@ export type MyNotebooksResponses = {
 
 export type MyNotebooksResponse = MyNotebooksResponses[keyof MyNotebooksResponses];
 
+export type DeleteBookData = {
+    body?: never;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/book';
+};
+
+export type DeleteBookResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type DeleteBookResponse = DeleteBookResponses[keyof DeleteBookResponses];
+
 export type GetBookData = {
     body?: never;
     path: {

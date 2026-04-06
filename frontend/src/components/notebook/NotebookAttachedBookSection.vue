@@ -10,13 +10,23 @@
         Open the book reader to browse this notebook's attached PDF structure.
       </p>
     </div>
-    <button
-      type="button"
-      class="daisy-btn daisy-btn-primary daisy-btn-sm"
-      @click="router.push({ name: 'bookReading', params: { notebookId: props.notebookId } })"
-    >
-      Read
-    </button>
+    <div class="daisy-flex daisy-flex-wrap daisy-gap-2">
+      <button
+        type="button"
+        class="daisy-btn daisy-btn-primary daisy-btn-sm"
+        @click="router.push({ name: 'bookReading', params: { notebookId: props.notebookId } })"
+      >
+        Read
+      </button>
+      <button
+        type="button"
+        class="daisy-btn daisy-btn-outline daisy-btn-error daisy-btn-sm"
+        title="Remove attached book"
+        @click="confirmRemoveBook"
+      >
+        Remove book
+      </button>
+    </div>
   </section>
 
   <section
@@ -38,6 +48,7 @@ import { ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import type { BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
+import usePopups from "@/components/commons/Popups/usePopups"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const props = defineProps({
@@ -45,6 +56,7 @@ const props = defineProps({
 })
 
 const router = useRouter()
+const { popups } = usePopups()
 
 const book = ref<BookFull | null>(null)
 const bookLoadFinished = ref(false)
@@ -60,6 +72,25 @@ const loadBook = async () => {
     book.value = !error && data ? data : null
   } finally {
     bookLoadFinished.value = true
+  }
+}
+
+const confirmRemoveBook = async () => {
+  const name = book.value?.bookName ?? "this book"
+  if (
+    !(await popups.confirm(
+      `Remove "${name}" from this notebook? The PDF will be deleted from the server. This cannot be undone.`
+    ))
+  ) {
+    return
+  }
+  const { error } = await apiCallWithLoading(() =>
+    NotebookBooksController.deleteBook({
+      path: { notebook: props.notebookId },
+    })
+  )
+  if (!error) {
+    await loadBook()
   }
 }
 

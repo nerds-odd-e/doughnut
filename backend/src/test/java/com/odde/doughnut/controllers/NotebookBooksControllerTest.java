@@ -312,4 +312,49 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThrows(ResponseStatusException.class, () -> controller.getBookFile(nb));
     }
   }
+
+  @Nested
+  class DeleteBook {
+    @Test
+    void removesBookRowAndStoredBytes() throws Exception {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      controller.attachBook(nb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
+      Book book = bookRepository.findByNotebook_Id(nb.getId()).orElseThrow();
+      String ref = book.getSourceFileRef();
+
+      controller.deleteBook(nb);
+
+      assertThat(bookRepository.findByNotebook_Id(nb.getId()).isEmpty(), equalTo(true));
+      assertThat(bookStorage.get(ref).isEmpty(), equalTo(true));
+      assertThrows(ResponseStatusException.class, () -> controller.getBook(nb));
+      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(nb));
+    }
+
+    @Test
+    void returns404WhenNotebookHasNoBook() throws UnexpectedNoAccessRightException {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      assertThrows(ResponseStatusException.class, () -> controller.deleteBook(nb));
+    }
+
+    @Test
+    void rejectsUnauthorizedNotebook() {
+      User other = makeMe.aUser().please();
+      Notebook otherNb = makeMe.aNotebook().creatorAndOwner(other).please();
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.deleteBook(otherNb));
+    }
+
+    @Test
+    void deletesBookWhenSourceFileRefMissing() throws Exception {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      controller.attachBook(nb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
+      Book book = bookRepository.findByNotebook_Id(nb.getId()).orElseThrow();
+      book.setSourceFileRef(null);
+      makeMe.entityPersister.save(book);
+      makeMe.entityPersister.flush();
+
+      controller.deleteBook(nb);
+
+      assertThat(bookRepository.findByNotebook_Id(nb.getId()).isEmpty(), equalTo(true));
+    }
+  }
 }

@@ -85,6 +85,20 @@ public class BookService {
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
   }
 
+  @Transactional
+  public void deleteBookForNotebook(Notebook notebook) {
+    Book book =
+        bookRepository
+            .findByNotebook_Id(notebook.getId())
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
+    String ref = book.getSourceFileRef();
+    bookRepository.delete(book);
+    if (ref != null && !ref.isBlank()) {
+      bookStorage.delete(ref);
+    }
+  }
+
   @Transactional(readOnly = true)
   public BookPdfFile getBookPdfFile(Notebook notebook) {
     Book book = getBookForNotebook(notebook);

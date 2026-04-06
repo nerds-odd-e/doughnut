@@ -41,6 +41,22 @@ public class SwaggerConfig {
   }
 
   @Bean
+  public OpenApiCustomizer deleteBookOperationIdCustomizer() {
+    return openApi -> {
+      PathItem pathItem = openApi.getPaths().get("/api/notebooks/{notebook}/book");
+      if (pathItem == null) {
+        return;
+      }
+      Operation del = pathItem.getDelete();
+      if (del == null) {
+        return;
+      }
+      del.setOperationId("deleteBook");
+      del.setSummary("Delete book");
+    };
+  }
+
+  @Bean
   public OpenApiCustomizer chatMessageSchemaOrderCustomizer() {
     return openApi -> {
       // Fix the property order for ChatMessage to ensure deterministic OpenAPI generation.
