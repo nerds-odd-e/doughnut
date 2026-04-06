@@ -32,7 +32,7 @@
     "markdansi": "0.2.1",
     "react": "^19.2.4",
     "string-width": "^8.2.0",
-    "turndown": "^7.2.2",
+    "turndown": "^7.2.4",
     "yoga-layout": "~3.2.1"
   },
   "devDependencies": {

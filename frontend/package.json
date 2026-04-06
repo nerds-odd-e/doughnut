@@ -24,9 +24,9 @@
   "dependencies": {
     "file-saver": "^2.0.5",
     "mini-debounce": "^1.0.8",
-    "pdfjs-dist": "4.10.38",
+    "pdfjs-dist": "5.6.205",
     "quill": "npm:@dotwee/quill@2.0.9",
-    "turndown": "^7.2.2",
+    "turndown": "^7.2.4",
     "turndown-plugin-gfm": "^1.0.2",
     "vue-content-loader": "2.0.1",
     "vue-toastification": "2.0.0-rc.5"
@@ -53,7 +53,7 @@
     "es-toolkit": "^1.45.1",
     "esbuild": "0.28.0",
     "gsap": "^3.14.2",
-    "marked": "^17.0.5",
+    "marked": "^17.0.6",
     "optionator": "^0.9.4",
     "playwright": "^1.59.1",
     "postcss": "8.5.8",
