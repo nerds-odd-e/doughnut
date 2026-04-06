@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers.currentUser;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.UserRepository;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -52,10 +54,10 @@ class CurrentUserFetcherFromRequestTest {
   }
 
   @Test
-  void testTokenNotResolvedWhenResolverAbsent() {
+  void testTokenTreatedAsRegularTokenWhenResolverAbsent() {
     User user = makeMe.aUser().please();
     MockHttpServletRequest request = new MockHttpServletRequest();
     request.addHeader("Authorization", "Bearer access-token-of-" + user.getExternalIdentifier());
-    assertNull(fetcherWith(request, false).getUser());
+    assertThrows(ResponseStatusException.class, () -> fetcherWith(request, false));
   }
 }

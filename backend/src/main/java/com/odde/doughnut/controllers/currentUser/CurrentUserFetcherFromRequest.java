@@ -29,13 +29,10 @@ public class CurrentUserFetcherFromRequest implements CurrentUserFetcher {
     String authHeader = request.getHeader("Authorization");
     if (authHeader != null && authHeader.startsWith("Bearer ")) {
       String token = authHeader.substring(7);
-      if (testAccessTokenResolver.isPresent()) {
-        Optional<User> testUser = testAccessTokenResolver.get().resolve(token);
-        if (testUser.isPresent()) {
-          user = testUser.get();
-          externalId = user.getExternalIdentifier();
-          return;
-        }
+      if (testAccessTokenResolver.isPresent() && testAccessTokenResolver.get().handles(token)) {
+        user = testAccessTokenResolver.get().resolve(token).orElse(null);
+        if (user != null) externalId = user.getExternalIdentifier();
+        return;
       }
       user = userService.findUserByToken(token).orElse(null);
       if (user != null) {
