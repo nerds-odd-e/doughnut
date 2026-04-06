@@ -87,7 +87,7 @@ const bookReadingPage = () => {
       return this
     },
     expectPdfBeginningVisible() {
-      this.expectPdfViewerViewportScreenshotContains('Code Refactoring', 1)
+      this.expectCurrentPage(1).expectVisibleOCRContains('Code Refactoring')
       return this
     },
     clickOutlineRowByTitle(title: string) {
@@ -117,43 +117,50 @@ const bookReadingPage = () => {
       )
       return this
     },
-    expectPdfViewerViewportScreenshotContains(
-      marker: string,
-      pageNumber: number
-    ) {
+    expectCurrentPage(pageNumber: number) {
       pageIsNotLoading()
-      cy.get('[data-testid="pdf-book-viewer"]').should('be.visible')
-      cy.get(
-        `[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="${pageNumber}"] canvas`
-      )
+      const afterPageCanvasInk = cy
+        .get('[data-testid="pdf-book-viewer"]')
+        .should('be.visible')
+        .get(
+          `[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="${pageNumber}"] canvas`
+        )
         .first()
         .should(($canvas) => {
           assertPdfCanvasHasDarkPixels($canvas[0] as HTMLCanvasElement)
         })
-      let screenshotPath = ''
-      cy.get('[data-testid="pdf-book-viewer"]')
-        .screenshot('book-reading-pdf-viewer-ocr', {
-          log: false,
-          overwrite: true,
-          onAfterScreenshot(_$el, props) {
-            screenshotPath = props.path
-          },
-        })
-        .then(() => {
-          expect(
-            screenshotPath,
-            'Cypress element screenshot path'
-          ).to.not.equal('')
-          return cy.readFile(screenshotPath, 'base64', { timeout: 30000 })
-        })
-        .then((base64) => ocrPngBase64(base64 as string))
-        .then((text) => {
-          expect(
-            text as string,
-            `OCR text from visible PDF book viewer (element screenshot); expect content from page ${pageNumber} in view`
-          ).to.contain(marker)
-        })
-      return this
+      return {
+        expectVisibleOCRContains(marker: string) {
+          return afterPageCanvasInk.then(() => {
+            let screenshotPath = ''
+            return cy
+              .get('[data-testid="pdf-book-viewer"]')
+              .screenshot('book-reading-pdf-viewer-ocr', {
+                log: false,
+                overwrite: true,
+                onAfterScreenshot(_$el, props) {
+                  screenshotPath = props.path
+                },
+              })
+              .then(() => {
+                expect(
+                  screenshotPath,
+                  'Cypress element screenshot path'
+                ).to.not.equal('')
+                return cy.readFile(screenshotPath, 'base64', {
+                  timeout: 30000,
+                })
+              })
+              .then((base64) => ocrPngBase64(base64 as string))
+              .then((text) => {
+                expect(
+                  text as string,
+                  `OCR text from visible PDF book viewer (element screenshot); expect content from page ${pageNumber} in view`
+                ).to.contain(marker)
+              })
+          })
+        },
+      }
     },
     /** Two outline rows on the same page with different bboxes → scrollTop should change. */
     expectDistinctScrollForSamePageBboxOutline(

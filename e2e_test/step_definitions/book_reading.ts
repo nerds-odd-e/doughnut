@@ -111,10 +111,9 @@ Then(
   'I should see in the book reader visible PDF viewport on page {int} text including {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (pageNumber: number, marker: string) => {
-    return bookReadingPage().expectPdfViewerViewportScreenshotContains(
-      marker,
-      pageNumber
-    )
+    return bookReadingPage()
+      .expectCurrentPage(pageNumber)
+      .expectVisibleOCRContains(marker)
   }
 )
 
