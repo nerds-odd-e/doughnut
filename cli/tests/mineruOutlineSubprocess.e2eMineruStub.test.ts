@@ -46,8 +46,8 @@ describe('mineru_book_outline.py with E2E shadow mineru (PYTHONPATH)', () => {
     })
     expect(result.ok).toBe(true)
     if (!result.ok) return
-    expect(result.outline).toContain('[L2 p0] Refactoring')
-    expect(result.layout?.roots?.[0]?.title).toBe('Refactoring')
+    expect(result.outline).toContain('[L2 p0] Code Refactoring')
+    expect(result.layout?.roots?.[0]?.title).toBe('Code Refactoring')
     expect(result.layout?.roots?.[0]?.children).toBeUndefined()
     expect(result.layout?.roots?.[4]?.title).toBe(
       '2.2 Refactoring as Strengthening the Code'
