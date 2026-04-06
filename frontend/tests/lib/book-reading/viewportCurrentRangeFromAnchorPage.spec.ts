@@ -101,4 +101,13 @@ describe("viewportCurrentAnchorIdFromAnchorPage", () => {
     ]
     expect(viewportCurrentAnchorIdFromAnchorPage(anchors, 0)).toBe(null)
   })
+
+  it("on a later page with viewport at top, first anchor on that page when none pass grace", () => {
+    const anchors = [
+      makeMe.aBookAnchor.mineruStart(0).id(1).please(),
+      makeMe.aBookAnchor.mineruStart(0, [48, 72, 100, 100]).id(2).please(),
+      makeMe.aBookAnchor.mineruStart(1, [87, 68, 200, 100]).id(3).please(),
+    ]
+    expect(viewportCurrentAnchorIdFromAnchorPage(anchors, 1, 0, 2)).toBe(3)
+  })
 })

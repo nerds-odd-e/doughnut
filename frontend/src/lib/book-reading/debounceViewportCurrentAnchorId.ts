@@ -1,6 +1,7 @@
 export type ViewportCurrentAnchorDebouncer = {
   propose: (id: number | null) => void
   cancel: () => void
+  commitNow: (id: number | null) => void
 }
 
 export function createViewportCurrentAnchorDebouncer(options: {
@@ -40,6 +41,18 @@ export function createViewportCurrentAnchorDebouncer(options: {
         timeoutId = null
       }
       pending = undefined
+    },
+    commitNow(id: number | null) {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId)
+        timeoutId = null
+      }
+      pending = undefined
+      if (id === lastCommitted) {
+        return
+      }
+      lastCommitted = id
+      commit(id)
     },
   }
 }

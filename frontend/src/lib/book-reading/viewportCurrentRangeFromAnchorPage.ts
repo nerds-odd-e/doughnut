@@ -5,19 +5,26 @@ import {
 } from "./mineruOutlineV1PageIndex"
 
 /**
- * **Rule:** last `BookAnchorFull` in preorder (caller supplies start anchors in outline order) such that:
- * - `page_idx < anchorPageZeroBased`, or
- * - `page_idx === anchorPageZeroBased` and (`viewportTopYDown === null` or `yStart <= viewportTopYDown`),
- * where `yStart` is the top edge of the optional mineru `bbox` (`y0`), or `0` if there is no bbox.
+ * Small grace added to `viewportTopYDown` so a section registers as current as soon as its heading
+ * is near the top of the viewport — accounting for the scroll top padding applied during outline
+ * navigation (`MINERU_SCROLL_TOP_PADDING_PDF ≈ 40 PDF pts ≈ 50 MinerU units on a typical page`).
+ */
+const VIEWPORT_CURRENT_GRACE = 60
+
+/**
+ * **Rule:** Among anchors on `anchorPageZeroBased`, take the **last** in preorder with
+ * `yStart <= viewportTopYDown + VIEWPORT_CURRENT_GRACE` (or all rows when `viewportTopYDown === null`,
+ * then last wins). If **none** qualify (reading band is above every heading top on the page), use the
+ * **first** anchor on that page so a newly scrolled-to page still highlights its opening section.
  *
- * Anchors without a parseable `pdf.mineru_outline_v1` value are skipped. When `pdfPageCount` is set,
- * anchors whose `page_idx` is not in `[0, pdfPageCount)` are skipped, and `anchorPageZeroBased` must
- * be in that range or the result is `null`.
+ * Anchors on earlier pages contribute a fallback id only when the current PDF page has **no** outline
+ * rows (empty `onCurrentPage`).
  *
- * Both `viewportTopYDown` and MinerU bbox y0 use the **0-1000 normalized** coordinate system
- * (origin top-left, y down). The PDF viewer passes a single reference y on the page (vertical
- * center of the visible slice, normalized). When `null`, same-page ties behave like "all starts
- * at the top" (last preorder row on that page wins), matching page-only matching.
+ * `yStart` is the top edge of the optional mineru `bbox` (`y0`), or `0` if there is no bbox.
+ * Skips anchors without a parseable `pdf.mineru_outline_v1` value. With `pdfPageCount`, skips
+ * anchors whose `page_idx` is out of range; `anchorPageZeroBased` must be in range or the result is `null`.
+ *
+ * `viewportTopYDown` is the **top edge** of the visible page slice, normalized 0–1000 (origin top-left, y down).
  */
 export function viewportCurrentAnchorIdFromAnchorPage(
   orderedPreorderStartAnchors: readonly BookAnchorFull[],
@@ -36,7 +43,8 @@ export function viewportCurrentAnchorIdFromAnchorPage(
       return null
     }
   }
-  let best: number | null = null
+  let bestFromEarlierPages: number | null = null
+  const onCurrentPage: { id: number; yStart: number }[] = []
   for (const anchor of orderedPreorderStartAnchors) {
     if (anchor.anchorFormat !== ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1) {
       continue
@@ -49,12 +57,26 @@ export function viewportCurrentAnchorIdFromAnchorPage(
     }
     const yStart = bbox !== null ? bbox[1] : 0
     if (pageIdx < anchorPageZeroBased) {
-      best = anchor.id
+      bestFromEarlierPages = anchor.id
     } else if (pageIdx === anchorPageZeroBased) {
-      if (viewportTopYDown === null || yStart <= viewportTopYDown) {
-        best = anchor.id
-      }
+      onCurrentPage.push({ id: anchor.id, yStart })
     }
   }
-  return best
+  if (onCurrentPage.length === 0) {
+    return bestFromEarlierPages
+  }
+  const limit =
+    viewportTopYDown === null
+      ? Number.POSITIVE_INFINITY
+      : viewportTopYDown + VIEWPORT_CURRENT_GRACE
+  let bestOnPage: number | null = null
+  for (const row of onCurrentPage) {
+    if (row.yStart <= limit) {
+      bestOnPage = row.id
+    }
+  }
+  if (bestOnPage !== null) {
+    return bestOnPage
+  }
+  return onCurrentPage[0]!.id
 }

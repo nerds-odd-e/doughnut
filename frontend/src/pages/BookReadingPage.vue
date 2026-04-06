@@ -339,6 +339,7 @@ async function onOutlineRowClick(node: OutlineNode) {
     pageIndexZeroBased: parsed.pageIndex,
     bbox: parsed.bbox,
   })
+  viewportCurrentAnchorDebouncer.commitNow(node.startAnchor.id)
 }
 
 onMounted(async () => {

@@ -62,6 +62,19 @@ describe("createViewportCurrentAnchorDebouncer", () => {
     expect(commits).toEqual([3, null])
   })
 
+  it("commitNow applies immediately and clears a pending propose", () => {
+    const commits: (number | null)[] = []
+    const d = createViewportCurrentAnchorDebouncer({
+      delayMs: 120,
+      commit: (id) => commits.push(id),
+    })
+    d.propose(1)
+    d.commitNow(9)
+    expect(commits).toEqual([9])
+    vi.advanceTimersByTime(120)
+    expect(commits).toEqual([9])
+  })
+
   it("resets delay on each propose", () => {
     const commits: (number | null)[] = []
     const d = createViewportCurrentAnchorDebouncer({

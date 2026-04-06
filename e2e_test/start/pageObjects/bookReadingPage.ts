@@ -134,11 +134,11 @@ const bookReadingPage = () => {
     },
     /**
      * Scrolls the book-reading PDF container without changing pages (fixture: refactoring.pdf page 1).
-     * Delta is in CSS pixels; tuned with MinerU 0–1000 bbox + scroll padding so §2.1 is viewport-current
-     * while OCR still sees "Easier to Change".
+     * Delta is in CSS pixels; tuned with visible-top viewport Y + grace so §2.1 is viewport-current
+     * while OCR still sees "Easier to Change" (retune if scroll math changes).
      */
     scrollPdfBookReaderDownWithinSamePageForNextBbox() {
-      const deltaPx = 340
+      const deltaPx = 400
       pageIsNotLoading()
       cy.get('[data-testid="pdf-book-viewer"]').then(($viewer) => {
         const el = scrollableAncestorWithinBookReadingPage(
