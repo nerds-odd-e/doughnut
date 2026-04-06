@@ -245,6 +245,12 @@ describe("BookReadingPage", () => {
 
       await new Promise((r) => setTimeout(r, 200))
 
+      const indicator = wrapper.find(
+        '[data-testid="book-reading-page-indicator"]'
+      )
+      expect(indicator.exists()).toBe(true)
+      expect(indicator.text().trim()).toBe("1 / 10")
+
       const current = wrapper.find('[data-outline-current="true"]')
       expect(current.exists()).toBe(true)
       expect(current.attributes("aria-current")).toBe("location")

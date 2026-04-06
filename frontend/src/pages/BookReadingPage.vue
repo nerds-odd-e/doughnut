@@ -57,6 +57,14 @@
         >
           {{ book.bookName }}
         </span>
+        <span
+          v-if="pdfPageIndicatorVisible"
+          data-testid="book-reading-page-indicator"
+          class="daisy-shrink-0 daisy-text-sm daisy-text-base-content/70 daisy-tabular-nums daisy-ml-2"
+          :aria-label="`Page ${pdfBarCurrentPage} of ${pdfBarPagesTotal}`"
+        >
+          {{ pdfBarCurrentPage }} / {{ pdfBarPagesTotal }}
+        </span>
       </GlobalBar>
       <div
         v-if="!isMdOrLarger && outlineOpened"
@@ -179,6 +187,21 @@ const bookPdfBytes = ref<ArrayBuffer | null>(null)
 const pdfLoading = ref(false)
 const pdfError = ref<string | null>(null)
 
+const pdfBarCurrentPage = ref<number | null>(null)
+const pdfBarPagesTotal = ref<number | null>(null)
+
+const pdfPageIndicatorVisible = computed(
+  () =>
+    pdfBarCurrentPage.value != null &&
+    pdfBarPagesTotal.value != null &&
+    pdfBarPagesTotal.value > 0
+)
+
+function resetPdfPageIndicator() {
+  pdfBarCurrentPage.value = null
+  pdfBarPagesTotal.value = null
+}
+
 const outlineOpened = ref(false)
 const outlineAsideRef = ref<HTMLElement | null>(null)
 const windowWidth = ref(
@@ -197,6 +220,7 @@ const isMdOrLarger = computed(
 
 function onPdfLoadError(message: string) {
   pdfError.value = message
+  resetPdfPageIndicator()
 }
 
 type OutlineNode = {
@@ -254,6 +278,10 @@ function onViewportAnchorPage(payload: {
   viewportTopYDown: number | null
   pagesCount: number
 }) {
+  if (payload.pagesCount > 0) {
+    pdfBarCurrentPage.value = payload.anchorPageIndexZeroBased + 1
+    pdfBarPagesTotal.value = payload.pagesCount
+  }
   const candidate = viewportCurrentAnchorIdFromAnchorPage(
     outlineRows.value.map((n) => n.startAnchor),
     payload.anchorPageIndexZeroBased,
@@ -333,6 +361,7 @@ onMounted(async () => {
     if (data.hasSourceFile) {
       pdfLoading.value = true
       pdfError.value = null
+      resetPdfPageIndicator()
       try {
         const res = await fetch(notebookBookFilePath(props.notebookId), {
           credentials: "same-origin",

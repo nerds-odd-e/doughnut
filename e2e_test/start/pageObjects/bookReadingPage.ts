@@ -119,6 +119,9 @@ const bookReadingPage = () => {
     },
     expectCurrentPage(pageNumber: number) {
       pageIsNotLoading()
+      cy.get('[data-testid="book-reading-page-indicator"]')
+        .should('be.visible')
+        .and('contain', `${pageNumber} /`)
       const afterPageCanvasInk = cy
         .get('[data-testid="pdf-book-viewer"]')
         .should('be.visible')
