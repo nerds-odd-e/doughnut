@@ -12,7 +12,7 @@
 
 ---
 
-## Phase 7.1 — Large viewport: toggle hides the outline column
+## Phase 7.1 — Large viewport: toggle hides the outline column — **done**
 
 **User outcome:** On a **wide** layout, the user can **hide** the outline so the PDF uses more horizontal space.
 
