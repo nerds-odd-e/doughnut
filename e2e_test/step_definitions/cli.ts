@@ -108,18 +108,6 @@ Then('I should see {string} styled in the Current guidance', (text: string) =>
   cli.interactiveCli().currentGuidance().expectContainsBold(text)
 )
 
-Then(
-  'I should see the {word} remove success message for {string}',
-  (removalType: string, label: string) => {
-    if (removalType !== 'local' && removalType !== 'complete') {
-      throw new Error(
-        `Unknown removal_type ${JSON.stringify(removalType)} (expected local or complete)`
-      )
-    }
-    cli.removeToken().expectRemoveSuccess(removalType, label)
-  }
-)
-
 Then('I should see {string} in past user messages', (expected: string) =>
   cli.interactiveCli().pastUserMessages().expectContains(expected)
 )

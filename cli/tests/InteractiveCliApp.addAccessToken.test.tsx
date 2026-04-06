@@ -24,7 +24,6 @@ describe('InteractiveCliApp /add-access-token', () => {
   let configDir: string
   let savedConfigDir: string | undefined
   let getTokenInfoSpy: ReturnType<typeof vi.spyOn>
-  let revokeTokenSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
     configDir = fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-cli-at-'))
@@ -35,16 +34,10 @@ describe('InteractiveCliApp /add-access-token', () => {
       .mockResolvedValue({
         data: { id: 1, label: 'Vitest token label' },
       } as Awaited<ReturnType<typeof UserController.getTokenInfo>>)
-    revokeTokenSpy = vi
-      .spyOn(UserController, 'revokeToken')
-      .mockResolvedValue(
-        {} as Awaited<ReturnType<typeof UserController.revokeToken>>
-      )
   })
 
   afterEach(() => {
     getTokenInfoSpy.mockRestore()
-    revokeTokenSpy.mockRestore()
     if (savedConfigDir === undefined) delete process.env.DOUGHNUT_CONFIG_DIR
     else process.env.DOUGHNUT_CONFIG_DIR = savedConfigDir
     fs.rmSync(configDir, { recursive: true, force: true })
@@ -216,130 +209,5 @@ describe('InteractiveCliApp /add-access-token', () => {
     await waitForFramesToInclude('/list-access-token')
     await waitForFramesToInclude('→ ')
     await waitForFramesToInclude('/ commands')
-  })
-
-  test('bare /remove-access-token opens picker; Down+Enter removes selected token from file', async () => {
-    fs.writeFileSync(
-      path.join(configDir, 'access-tokens.json'),
-      JSON.stringify({
-        tokens: [
-          { label: 'Alpha', token: 't1' },
-          { label: 'Beta', token: 't2' },
-        ],
-        defaultLabel: 'Alpha',
-      }),
-      'utf-8'
-    )
-
-    const { stdin, frames, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-    stdin.write('/remove-access-token\r')
-    await waitForFramesToInclude(
-      /(?=.*Remove access token)(?=.*1\. Alpha)(?=.*2\. Beta)/s
-    )
-
-    stdin.write('\u001b[B')
-    await waitForFrames(
-      () => frames.at(-1) ?? '',
-      (f) => rawLineIncludesBoldAndText(f, '2. Beta')
-    )
-
-    stdin.write('\r')
-    await waitForFramesToInclude('Token "Beta" removed.')
-
-    const stored = JSON.parse(
-      fs.readFileSync(path.join(configDir, 'access-tokens.json'), 'utf-8')
-    ) as { tokens: { label: string; token: string }[]; defaultLabel?: string }
-    expect(stored.tokens).toEqual([{ label: 'Alpha', token: 't1' }])
-    expect(stored.defaultLabel).toBe('Alpha')
-    expect(revokeTokenSpy).not.toHaveBeenCalled()
-  })
-
-  test('bare /remove-access-token-completely opens picker; Down+Enter revokes selected token', async () => {
-    fs.writeFileSync(
-      path.join(configDir, 'access-tokens.json'),
-      JSON.stringify({
-        tokens: [
-          { label: 'Alpha', token: 't1' },
-          { label: 'Beta', token: 't2' },
-        ],
-        defaultLabel: 'Alpha',
-      }),
-      'utf-8'
-    )
-
-    const { stdin, frames, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-    stdin.write('/remove-access-token-completely\r')
-    await waitForFramesToInclude(
-      /(?=.*Remove access token completely)(?=.*2\. Beta)/s
-    )
-
-    stdin.write('\u001b[B')
-    await waitForFrames(
-      () => frames.at(-1) ?? '',
-      (f) => rawLineIncludesBoldAndText(f, '2. Beta')
-    )
-
-    stdin.write('\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        c.includes('Token "Beta" removed locally and from server.') &&
-        revokeTokenSpy.mock.calls.length >= 1
-    )
-
-    const stored = JSON.parse(
-      fs.readFileSync(path.join(configDir, 'access-tokens.json'), 'utf-8')
-    ) as { tokens: { label: string; token: string }[]; defaultLabel?: string }
-    expect(stored.tokens).toEqual([{ label: 'Alpha', token: 't1' }])
-    expect(stored.defaultLabel).toBe('Alpha')
-  })
-
-  test('/remove-access-token removes stored label and list is empty in transcript', async () => {
-    const { stdin, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-    stdin.write('/add-access-token unit-test-token-value\r')
-    await waitForFramesToInclude('Token added successfully')
-
-    stdin.write('/remove-access-token Vitest token label\r')
-    await waitForFramesToInclude('Token "Vitest token label" removed.')
-
-    stdin.write('/list-access-token\r')
-    await waitForFramesToInclude('No access tokens stored.')
-
-    const afterList = JSON.parse(
-      fs.readFileSync(path.join(configDir, 'access-tokens.json'), 'utf-8')
-    ) as { tokens: { label: string; token: string }[] }
-    expect(afterList.tokens).toEqual([])
-    expect(revokeTokenSpy).not.toHaveBeenCalled()
-  })
-
-  test('/remove-access-token-completely revokes then clears config', async () => {
-    const { stdin, frames, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-    stdin.write('/add-access-token unit-test-token-value\r')
-    await waitForFramesToInclude('Token added successfully')
-
-    stdin.write('/remove-access-token-completely Vitest token label\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        c.includes(
-          'Token "Vitest token label" removed locally and from server.'
-        ) && revokeTokenSpy.mock.calls.length >= 1
-    )
-
-    stdin.write('/list-access-token\r')
-    await waitForFramesToInclude('No access tokens stored.')
-
-    const afterList = JSON.parse(
-      fs.readFileSync(path.join(configDir, 'access-tokens.json'), 'utf-8')
-    ) as { tokens: { label: string; token: string }[] }
-    expect(afterList.tokens).toEqual([])
   })
 })

@@ -158,14 +158,14 @@ describe('MainInteractivePrompt Tab completion (phase 2)', () => {
       waitUntilLastFrame,
     } = await renderMainInteractivePrompt()
 
-    stdin.write('/remove')
-    await waitForLastFrameToInclude('→ /remove')
+    stdin.write('/rec')
+    await waitForLastFrameToInclude('→ /rec')
     stdin.write('\t')
     await waitUntilLastFrame((f) =>
-      lineWithMainPrompt(f).trimEnd().includes('→ /remove-access-token')
+      lineWithMainPrompt(f).trimEnd().includes('→ /recall')
     )
     const promptLine = lineWithMainPrompt(lastStrippedFrame()).trimEnd()
-    expect(promptLine.includes('→ /remove-access-token')).toBe(true)
+    expect(promptLine.includes('→ /recall')).toBe(true)
   })
 
   test('Tab with a unique matching usage completes to usage plus trailing space', async () => {
@@ -212,13 +212,13 @@ describe('MainInteractivePrompt caret and slash arrows (phase 3)', () => {
       await renderMainInteractivePrompt()
 
     stdin.write('/re')
-    await waitForLastFrameToInclude('/remove-access-token')
+    await waitForLastFrameToInclude('/recall')
 
     stdin.write('\x1b[B')
     await waitForLastFrameRaw((raw) =>
       rawLineIncludesBoldMarker(
         raw,
-        'Revoke a stored access token on the server'
+        'Show how many notes are due for recall today'
       )
     )
   })
@@ -228,13 +228,13 @@ describe('MainInteractivePrompt caret and slash arrows (phase 3)', () => {
       await renderMainInteractivePrompt()
 
     stdin.write('/re')
-    await waitForLastFrameToInclude('/remove-access-token')
+    await waitForLastFrameToInclude('/recall')
 
     stdin.write('\x1b[B')
     await waitForLastFrameRaw((raw) =>
       rawLineIncludesBoldMarker(
         raw,
-        'Revoke a stored access token on the server'
+        'Show how many notes are due for recall today'
       )
     )
 
@@ -252,7 +252,7 @@ describe('MainInteractivePrompt caret and slash arrows (phase 3)', () => {
       await renderMainInteractivePrompt()
 
     stdin.write('/re')
-    await waitForLastFrameToInclude('/remove-access-token')
+    await waitForLastFrameToInclude('/recall')
 
     stdin.write('\x1b[D')
     await waitForLastFrameToInclude('→ /re')
@@ -261,7 +261,7 @@ describe('MainInteractivePrompt caret and slash arrows (phase 3)', () => {
     await waitForLastFrameRaw((raw) =>
       rawLineIncludesBoldMarker(
         raw,
-        'Remove a stored access token from local config only'
+        'Recall the next due note (just review when no quiz is pe'
       )
     )
 
@@ -269,7 +269,7 @@ describe('MainInteractivePrompt caret and slash arrows (phase 3)', () => {
     await waitForLastFrameRaw((raw) =>
       rawLineIncludesBoldMarker(
         raw,
-        'Revoke a stored access token on the server'
+        'Show how many notes are due for recall today'
       )
     )
   })
@@ -279,7 +279,7 @@ describe('MainInteractivePrompt caret and slash arrows (phase 3)', () => {
       await renderMainInteractivePrompt()
 
     stdin.write('/re')
-    await waitForLastFrameToInclude('/remove-access-token')
+    await waitForLastFrameToInclude('/recall')
 
     stdin.write('\x1b[D')
     await waitForLastFrameToInclude('→ /re')
@@ -325,17 +325,17 @@ describe('MainInteractivePrompt Enter picks completion (phase 4)', () => {
       waitUntilLastFrame,
     } = await renderMainInteractivePrompt(onCommittedLine)
     stdin.write('/re')
-    await waitForLastFrameToInclude('/remove-access-token')
+    await waitForLastFrameToInclude('/recall')
     stdin.write('\x1b[B')
     await waitForLastFrameRaw((raw) =>
       rawLineIncludesBoldMarker(
         raw,
-        'Revoke a stored access token on the server'
+        'Show how many notes are due for recall today'
       )
     )
     stdin.write('\r')
     await waitUntilLastFrame((f) =>
-      lineWithMainPrompt(f).includes('/remove-access-token-completely ')
+      lineWithMainPrompt(f).includes('/recall-status ')
     )
     expect(onCommittedLine).not.toHaveBeenCalled()
   })
@@ -345,11 +345,9 @@ describe('MainInteractivePrompt Enter picks completion (phase 4)', () => {
     const { stdin, waitForLastFrameToInclude, waitUntilLastFrame } =
       await renderMainInteractivePrompt(onCommittedLine)
     stdin.write('/re')
-    await waitForLastFrameToInclude('/remove-access-token')
+    await waitForLastFrameToInclude('/recall')
     stdin.write('\r')
-    await waitUntilLastFrame((f) =>
-      lineWithMainPrompt(f).includes('/remove-access-token ')
-    )
+    await waitUntilLastFrame((f) => lineWithMainPrompt(f).includes('/recall '))
     expect(onCommittedLine).not.toHaveBeenCalled()
   })
 })
@@ -405,7 +403,7 @@ describe('MainInteractivePrompt user input history (↑↓ recall)', () => {
     await waitUntilLastFrame((f) => !lineWithMainPrompt(f).includes('z'))
 
     stdin.write('/re')
-    await waitUntilLastFrame((f) => f.includes('/remove-access-token'))
+    await waitUntilLastFrame((f) => f.includes('/recall'))
 
     stdin.write('\x1b')
     await waitUntilLastFrame(
@@ -423,7 +421,7 @@ describe('MainInteractivePrompt user input history (↑↓ recall)', () => {
       (f) =>
         lineWithMainPrompt(f).includes('/re') &&
         !lineWithMainPrompt(f).includes('z') &&
-        f.includes('/remove-access-token')
+        f.includes('/recall')
     )
   })
 })

@@ -52,9 +52,3 @@ export function appendStoredAccessToken(entry: AccessTokenEntry): void {
   config.tokens.push(entry)
   saveAccessTokenConfig(config)
 }
-
-export function getStoredAccessTokenEntryByLabel(
-  label: string
-): AccessTokenEntry | undefined {
-  return loadAccessTokenConfig().tokens.find((t) => t.label === label)
-}
