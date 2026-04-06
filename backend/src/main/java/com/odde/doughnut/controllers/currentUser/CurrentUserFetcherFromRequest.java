@@ -3,8 +3,10 @@ package com.odde.doughnut.controllers.currentUser;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.services.UserService;
+import com.odde.doughnut.testability.TestAccessTokenResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.util.Optional;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
@@ -18,12 +20,23 @@ public class CurrentUserFetcherFromRequest implements CurrentUserFetcher {
   private User user = null;
 
   public CurrentUserFetcherFromRequest(
-      HttpServletRequest request, UserRepository userRepository, UserService userService) {
+      HttpServletRequest request,
+      UserRepository userRepository,
+      UserService userService,
+      Optional<TestAccessTokenResolver> testAccessTokenResolver) {
     this.userRepository = userRepository;
     this.userService = userService;
     String authHeader = request.getHeader("Authorization");
     if (authHeader != null && authHeader.startsWith("Bearer ")) {
       String token = authHeader.substring(7);
+      if (testAccessTokenResolver.isPresent()) {
+        Optional<User> testUser = testAccessTokenResolver.get().resolve(token);
+        if (testUser.isPresent()) {
+          user = testUser.get();
+          externalId = user.getExternalIdentifier();
+          return;
+        }
+      }
       user = userService.findUserByToken(token).orElse(null);
       if (user != null) {
         externalId = user.getExternalIdentifier();

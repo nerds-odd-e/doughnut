@@ -23,6 +23,7 @@ import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -55,7 +56,8 @@ public class ControllerSetupTest {
   @BeforeEach
   void setup() {
     when(testabilitySettings.getGithubService()).thenReturn(githubService);
-    currentUserFetcher = new CurrentUserFetcherFromRequest(request, userRepository, userService);
+    currentUserFetcher =
+        new CurrentUserFetcherFromRequest(request, userRepository, userService, Optional.empty());
     controllerSetup =
         new ControllerSetup(failureReportRepository, currentUserFetcher, testabilitySettings);
   }
@@ -122,7 +124,8 @@ public class ControllerSetupTest {
   void shouldRecordUserInfo() {
     User user = makeMe.aUser().please();
     request.setUserPrincipal(() -> user.getExternalIdentifier());
-    currentUserFetcher = new CurrentUserFetcherFromRequest(request, userRepository, userService);
+    currentUserFetcher =
+        new CurrentUserFetcherFromRequest(request, userRepository, userService, Optional.empty());
     controllerSetup =
         new ControllerSetup(failureReportRepository, currentUserFetcher, testabilitySettings);
     FailureReport failureReport = catchExceptionAndGetFailureReport();
