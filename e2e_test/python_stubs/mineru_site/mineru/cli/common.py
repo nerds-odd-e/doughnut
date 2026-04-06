@@ -12,28 +12,16 @@ import json
 from pathlib import Path
 from typing import Any
 
-# Book-reading E2E: matches Gherkin table in book_reading.feature (two main topics, two subtopics each).
-# OCR markers for refactoring.pdf live in book_reading.feature + bookReadingPage.ts (not this list).
-_E2E_CONTENT_LIST: list[dict[str, Any]] = [
-    {"type": "text", "text_level": 1, "text": "Main Topic 1", "page_idx": 0},
-    {
-        "type": "text",
-        "text_level": 2,
-        "text": "Subtopic 1.1",
-        "page_idx": 0,
-        "bbox": [48, 72, 564, 200],
-    },
-    {
-        "type": "text",
-        "text_level": 2,
-        "text": "Subtopic 1.2",
-        "page_idx": 0,
-        "bbox": [48, 520, 564, 756],
-    },
-    {"type": "text", "text_level": 1, "text": "Main Topic 2", "page_idx": 1},
-    {"type": "text", "text_level": 2, "text": "Subtopic 2.1", "page_idx": 1},
-    {"type": "text", "text_level": 2, "text": "Subtopic 2.2", "page_idx": 1},
-]
+_E2E_CONTENT_LIST_FIXTURE = (
+    Path(__file__).resolve().parents[4]
+    / "fixtures"
+    / "book_reading"
+    / "mineru_output_for_refactoring.json"
+)
+
+_E2E_CONTENT_LIST: list[dict[str, Any]] = json.loads(
+    _E2E_CONTENT_LIST_FIXTURE.read_text(encoding="utf-8")
+)
 
 
 def read_fn(book_path: str | Path) -> bytes:

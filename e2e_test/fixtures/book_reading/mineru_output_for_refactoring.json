@@ -1,0 +1,20 @@
+[
+  { "type": "text", "text_level": 1, "text": "Main Topic 1", "page_idx": 0 },
+  {
+    "type": "text",
+    "text_level": 2,
+    "text": "Subtopic 1.1",
+    "page_idx": 0,
+    "bbox": [48, 72, 564, 200]
+  },
+  {
+    "type": "text",
+    "text_level": 2,
+    "text": "Subtopic 1.2",
+    "page_idx": 0,
+    "bbox": [48, 520, 564, 756]
+  },
+  { "type": "text", "text_level": 1, "text": "Main Topic 2", "page_idx": 1 },
+  { "type": "text", "text_level": 2, "text": "Subtopic 2.1", "page_idx": 1 },
+  { "type": "text", "text_level": 2, "text": "Subtopic 2.2", "page_idx": 1 }
+]
