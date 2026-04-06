@@ -133,19 +133,27 @@ const bookReadingPage = () => {
       return this
     },
     /**
-     * Scrolls the book-reading PDF container without changing pages (fixture: refactoring.pdf page 1).
-     * Delta is in CSS pixels; tuned with visible-top viewport Y + grace so §2.1 is viewport-current
-     * while OCR still sees "Easier to Change" (retune if scroll math changes).
+     * Scrolls by 30% of the rendered page-1 height so §2.1 (at ~63% of the page) lands in the
+     * upper two-thirds of the visible area. Using a fraction of page height instead of fixed CSS
+     * pixels makes the scroll viewport-size- and scale-independent.
      */
     scrollPdfBookReaderDownWithinSamePageForNextBbox() {
-      const deltaPx = 400
       pageIsNotLoading()
-      cy.get('[data-testid="pdf-book-viewer"]').then(($viewer) => {
-        const el = scrollableAncestorWithinBookReadingPage(
-          $viewer[0] as HTMLElement
-        )
-        el.scrollTop += deltaPx
-      })
+      cy.get(
+        '[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="1"]'
+      )
+        .first()
+        .then(($page) => {
+          const pageHeight = ($page[0] as HTMLElement).getBoundingClientRect()
+            .height
+          const deltaPx = Math.round(pageHeight * 0.3)
+          cy.get('[data-testid="pdf-book-viewer"]').then(($viewer) => {
+            const el = scrollableAncestorWithinBookReadingPage(
+              $viewer[0] as HTMLElement
+            )
+            el.scrollTop += deltaPx
+          })
+        })
       return this
     },
     expectOutlineRowViewportCurrentByTitle(title: string) {

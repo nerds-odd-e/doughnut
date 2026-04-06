@@ -2,16 +2,6 @@ import type { PDFViewer } from "pdfjs-dist/web/pdf_viewer.mjs"
 
 type PageViewLike = {
   div: HTMLDivElement | undefined
-  pdfPage: {
-    getViewport: (opts: { scale: number; rotation: number }) => {
-      height: number
-    }
-  } | null
-  rotation: number
-  pdfPageRotate: number
-  width: number
-  height: number
-  getPagePoint: (x: number, y: number) => number[]
 }
 
 /**
@@ -19,7 +9,7 @@ type PageViewLike = {
  * the page with the largest visible height inside the container when the midpoint lies in a gap.
  *
  * Does not use `PDFViewer.currentPageNumber`: in a short viewport pdf.js can keep that on an
- * earlier page while it remains “fully visible”, even when the user has scrolled a later page into
+ * earlier page while it remains "fully visible", even when the user has scrolled a later page into
  * the reading band.
  */
 export function pageIndexForScrollContainerCenter(
@@ -59,10 +49,14 @@ export function pageIndexForScrollContainerCenter(
 }
 
 /**
- * Uses `pageIndexForScrollContainerCenter` to pick the pdf.js page, then the vertical **center** of the
- * visible slice of that page as MinerU-style y from the page top (down), normalized 0–1000. The midpoint
- * tracks “where I’m reading” better than the top edge alone (which moves more slowly down the page when
- * scrolling). `viewportCurrentAnchorIdFromAnchorPage` applies a small top grace for outline padding.
+ * Picks the pdf.js page via `pageIndexForScrollContainerCenter`, then computes a reading-reference Y
+ * at **2/3 down the visible slice** (MinerU-style, 0–1000, top-down). The 2/3 point means a heading
+ * becomes "viewport-current" once it is in the upper two-thirds of the visible area — stable across
+ * viewport heights (midpoint or top-edge approaches are too sensitive to container size).
+ *
+ * Coordinates are derived directly from CSS layout (`getBoundingClientRect`), avoiding
+ * PDF-internal coordinate roundtrips (`getPagePoint` / `getViewport`) that can drift with
+ * CSS transforms or device pixel ratio.
  */
 export function pdfViewerViewportTopYDown(
   scrollContainer: HTMLElement,
@@ -79,7 +73,7 @@ export function pdfViewerViewportTopYDown(
   )
   const pageView = pdfViewer.getPageView(pageIndex) as PageViewLike | undefined
 
-  if (!pageView?.pdfPage || !pageView.div) {
+  if (!pageView?.div) {
     return { anchorPageIndexZeroBased: pageIndex, viewportTopYDown: null }
   }
 
@@ -91,30 +85,19 @@ export function pdfViewerViewportTopYDown(
     return { anchorPageIndexZeroBased: pageIndex, viewportTopYDown: null }
   }
 
-  const visibleMidY = (visibleTop + visibleBottom) / 2
-  let localY = visibleMidY - pageRect.top
-  localY = Math.max(0, Math.min(localY, pageView.height - 1e-6))
-
-  const localX = pageView.width / 2
-  const pdfPoint = pageView.getPagePoint(localX, localY)
-  const pdfY = pdfPoint[1]
-  if (typeof pdfY !== "number" || !Number.isFinite(pdfY)) {
+  const pageRenderedHeight = pageRect.bottom - pageRect.top
+  if (pageRenderedHeight <= 0) {
     return { anchorPageIndexZeroBased: pageIndex, viewportTopYDown: null }
   }
 
-  const totalRotation = (pageView.rotation + pageView.pdfPageRotate) % 360
-  const vp1 = pageView.pdfPage.getViewport({
-    scale: 1,
-    rotation: totalRotation,
-  })
-  const pageHeightPdf = vp1.height
-  const mineruY = pageHeightPdf - pdfY
-  if (!Number.isFinite(mineruY) || pageHeightPdf <= 0) {
-    return { anchorPageIndexZeroBased: pageIndex, viewportTopYDown: null }
-  }
+  const readingLineY = visibleTop + (2 / 3) * (visibleBottom - visibleTop)
+  const localY = Math.max(
+    0,
+    Math.min(readingLineY - pageRect.top, pageRenderedHeight)
+  )
 
   return {
     anchorPageIndexZeroBased: pageIndex,
-    viewportTopYDown: Math.max(0, (mineruY / pageHeightPdf) * 1000),
+    viewportTopYDown: (localY / pageRenderedHeight) * 1000,
   }
 }
