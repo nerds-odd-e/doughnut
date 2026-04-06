@@ -6,8 +6,7 @@ Feature: Book reading
   Background:
     Given I am logged in as an existing user
     And I have a notebook with the head note "Top Maths"
-    And I have a valid Doughnut Access Token with label "for cli"
-    And I set the saved access token in the interactive CLI using set-access-token
+    And I set the access token for "old_learner" in the interactive CLI
     When I attach book "refactoring.pdf" to the notebook "Top Maths" via the CLI
     And I open the book attached to notebook "Top Maths"
 

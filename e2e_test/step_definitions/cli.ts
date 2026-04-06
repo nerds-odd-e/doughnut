@@ -100,6 +100,23 @@ When(
   }
 )
 
+When(
+  'I set the access token for {string} in the interactive CLI',
+  (userIdentifier: string) =>
+    new Cypress.Promise<void>((resolve) => {
+      const token = `access-token-of-${userIdentifier}`
+      const interactive = cli.interactiveCli()
+      interactive
+        .enterSlashCommandInInteractiveCli(`/set-access-token ${token}`)
+        .then(() => {
+          interactive
+            .pastCliAssistantMessages()
+            .expectContains('Access token saved')
+            .then(() => resolve())
+        })
+    })
+)
+
 Then('I should see {string} in the Current guidance', (expected: string) =>
   cli.interactiveCli().currentGuidance().expectContains(expected)
 )
