@@ -15,8 +15,7 @@ const MAIN_PROMPT_BOX_BOTTOM_RE = /^\s*└/
  * Fallback when neither matches: last 8 rows of the simulated screen (see cli.mdc Current guidance).
  */
 export function extractCurrentGuidanceFromReplayedPlaintext(
-  plainScreen: string,
-  promptMarker: string = DEFAULT_PROMPT_MARKER
+  plainScreen: string
 ): string {
   const lines = plainScreen.split('\n')
   for (let i = lines.length - 1; i >= 0; i--) {
@@ -36,7 +35,7 @@ export function extractCurrentGuidanceFromReplayedPlaintext(
   if (promptLineIdx < 0) {
     for (let i = lines.length - 1; i >= 0; i--) {
       const line = lines[i]
-      if (line !== undefined && line.includes(promptMarker)) {
+      if (line !== undefined && line.includes(DEFAULT_PROMPT_MARKER)) {
         promptLineIdx = i
         break
       }
