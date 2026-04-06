@@ -26,6 +26,77 @@ function topMathsLikeFlatRanges(): BookRangeFull[] {
   }))
 }
 
+function fetchRequestUrl(input: RequestInfo | URL): string {
+  return typeof input === "string"
+    ? input
+    : input instanceof URL
+      ? input.href
+      : input.url
+}
+
+function mockNotebookBookFilePdfOk(
+  notebookId: number,
+  pdfBytes: ArrayBuffer,
+  options?: { assertSameOriginCredentials?: boolean }
+) {
+  const suffix = bookFileUrlSuffix(notebookId)
+  vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
+    const url = fetchRequestUrl(input)
+    if (!url.endsWith(suffix)) {
+      return Promise.reject(new Error(`unexpected fetch: ${url}`))
+    }
+    if (options?.assertSameOriginCredentials) {
+      expect(init?.credentials).toBe("same-origin")
+    }
+    const copy = pdfBytes.slice(0)
+    return Promise.resolve(
+      new Response(copy, {
+        status: 200,
+        headers: { "Content-Type": "application/pdf" },
+      })
+    )
+  })
+}
+
+function mountBookReadingPage(notebookId: number) {
+  return helper
+    .component(BookReadingPage)
+    .withRouter()
+    .withProps({ notebookId })
+    .mount()
+}
+
+type BookReadingPageWrapper = ReturnType<typeof mountBookReadingPage>
+
+async function waitForPdfViewer(wrapper: BookReadingPageWrapper) {
+  await vi.waitFor(
+    () =>
+      expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(
+        true
+      ),
+    { timeout: 15_000 }
+  )
+}
+
+async function withStubbedInnerWidth<T>(
+  width: number,
+  run: () => Promise<T>
+): Promise<T> {
+  const innerWidthDesc = Object.getOwnPropertyDescriptor(window, "innerWidth")
+  Object.defineProperty(window, "innerWidth", {
+    configurable: true,
+    writable: true,
+    value: width,
+  })
+  try {
+    return await run()
+  } finally {
+    if (innerWidthDesc) {
+      Object.defineProperty(window, "innerWidth", innerWidthDesc)
+    }
+  }
+}
+
 describe("BookReadingPage", () => {
   const notebookId = 7
 
@@ -51,11 +122,7 @@ describe("BookReadingPage", () => {
       new Response(null, { status: 404 })
     )
 
-    const wrapper = helper
-      .component(BookReadingPage)
-      .withRouter()
-      .withProps({ notebookId })
-      .mount()
+    const wrapper = mountBookReadingPage(notebookId)
     await flushPromises()
 
     const err = wrapper.find('[data-testid="book-reading-pdf-error"]')
@@ -70,11 +137,7 @@ describe("BookReadingPage", () => {
       wrapSdkResponse(makeMe.aBook.hasSourceFile(false).please())
     )
 
-    const wrapper = helper
-      .component(BookReadingPage)
-      .withRouter()
-      .withProps({ notebookId })
-      .mount()
+    const wrapper = mountBookReadingPage(notebookId)
     await flushPromises()
 
     expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(false)
@@ -95,11 +158,7 @@ describe("BookReadingPage", () => {
       })
     )
 
-    const wrapper = helper
-      .component(BookReadingPage)
-      .withRouter()
-      .withProps({ notebookId })
-      .mount()
+    const wrapper = mountBookReadingPage(notebookId)
     await flushPromises()
 
     expect(wrapper.find(".daisy-loading-spinner").exists()).toBe(true)
@@ -123,40 +182,12 @@ describe("BookReadingPage", () => {
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
       wrapSdkResponse(makeMe.aBook.please())
     )
-    const suffix = bookFileUrlSuffix(notebookId)
-    vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
-      const url =
-        typeof input === "string"
-          ? input
-          : input instanceof URL
-            ? input.href
-            : input.url
-      if (!url.endsWith(suffix)) {
-        return Promise.reject(new Error(`unexpected fetch: ${url}`))
-      }
-      expect(init?.credentials).toBe("same-origin")
-      const copy = topMathsPdfBytes.slice(0)
-      return Promise.resolve(
-        new Response(copy, {
-          status: 200,
-          headers: { "Content-Type": "application/pdf" },
-        })
-      )
+    mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes, {
+      assertSameOriginCredentials: true,
     })
 
-    const wrapper = helper
-      .component(BookReadingPage)
-      .withRouter()
-      .withProps({ notebookId })
-      .mount()
-
-    await vi.waitFor(
-      () =>
-        expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(
-          true
-        ),
-      { timeout: 15_000 }
-    )
+    const wrapper = mountBookReadingPage(notebookId)
+    await waitForPdfViewer(wrapper)
   })
 
   it("shows error when PDF bytes are not valid", async () => {
@@ -170,11 +201,7 @@ describe("BookReadingPage", () => {
       })
     )
 
-    const wrapper = helper
-      .component(BookReadingPage)
-      .withRouter()
-      .withProps({ notebookId })
-      .mount()
+    const wrapper = mountBookReadingPage(notebookId)
 
     await vi.waitFor(
       () => {
@@ -192,49 +219,14 @@ describe("BookReadingPage", () => {
   })
 
   it("updates viewport-current outline row while outline drawer is closed (Phase 6.9)", async () => {
-    const innerWidthDesc = Object.getOwnPropertyDescriptor(window, "innerWidth")
-    Object.defineProperty(window, "innerWidth", {
-      configurable: true,
-      writable: true,
-      value: 500,
-    })
-    try {
+    await withStubbedInnerWidth(500, async () => {
       vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
         wrapSdkResponse(makeMe.aBook.ranges(topMathsLikeFlatRanges()).please())
       )
-      const suffix = bookFileUrlSuffix(notebookId)
-      vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
-        const url =
-          typeof input === "string"
-            ? input
-            : input instanceof URL
-              ? input.href
-              : input.url
-        if (!url.endsWith(suffix)) {
-          return Promise.reject(new Error(`unexpected fetch: ${url}`))
-        }
-        const copy = topMathsPdfBytes.slice(0)
-        return Promise.resolve(
-          new Response(copy, {
-            status: 200,
-            headers: { "Content-Type": "application/pdf" },
-          })
-        )
-      })
+      mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
 
-      const wrapper = helper
-        .component(BookReadingPage)
-        .withRouter()
-        .withProps({ notebookId })
-        .mount()
-
-      await vi.waitFor(
-        () =>
-          expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(
-            true
-          ),
-        { timeout: 15_000 }
-      )
+      const wrapper = mountBookReadingPage(notebookId)
+      await waitForPdfViewer(wrapper)
 
       const pdf = wrapper.findComponent(PdfBookViewer)
       pdf.vm.$emit("viewportAnchorPage", {
@@ -255,10 +247,32 @@ describe("BookReadingPage", () => {
       expect(current.exists()).toBe(true)
       expect(current.attributes("aria-current")).toBe("location")
       expect(current.text()).toBe("Section 3")
-    } finally {
-      if (innerWidthDesc) {
-        Object.defineProperty(window, "innerWidth", innerWidthDesc)
-      }
-    }
+    })
+  })
+
+  it("outline toggle exposes aria-expanded and aria-controls (Phase 7.7)", async () => {
+    await withStubbedInnerWidth(1024, async () => {
+      vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+        wrapSdkResponse(makeMe.aBook.ranges(topMathsLikeFlatRanges()).please())
+      )
+      mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+
+      const wrapper = mountBookReadingPage(notebookId)
+      await waitForPdfViewer(wrapper)
+
+      const toggle = wrapper.find('[data-testid="book-reading-outline-toggle"]')
+      const aside = wrapper.find('[data-testid="book-reading-outline-aside"]')
+      expect(aside.attributes("id")).toBe("book-reading-outline-panel")
+      expect(toggle.attributes("aria-controls")).toBe(
+        "book-reading-outline-panel"
+      )
+      expect(toggle.attributes("aria-expanded")).toBe("true")
+
+      await toggle.trigger("click")
+      expect(toggle.attributes("aria-expanded")).toBe("false")
+
+      await toggle.trigger("click")
+      expect(toggle.attributes("aria-expanded")).toBe("true")
+    })
   })
 })

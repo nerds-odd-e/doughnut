@@ -21,6 +21,8 @@
           data-testid="book-reading-outline-toggle"
           aria-label="Outline"
           title="Outline"
+          :aria-expanded="outlineOpened"
+          aria-controls="book-reading-outline-panel"
           @click="outlineOpened = !outlineOpened"
         >
           <div class="daisy-w-4 daisy-h-4">
@@ -74,6 +76,7 @@
       />
       <div class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-relative">
         <aside
+          id="book-reading-outline-panel"
           ref="outlineAsideRef"
           data-testid="book-reading-outline-aside"
           :class="[

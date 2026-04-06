@@ -10,7 +10,7 @@
 
 **Execution order:** Implement in numeric order unless a later sub-phase discovers a bug; then fix forward and update this doc.
 
-**Codebase sync (production vs this plan):** In `BookReadingPage.vue`, **7.1–7.6**, **7.8**, **7.9** (selection is `selectedOutlineRangeId` only; toggling the outline does not clear it), **7.10–7.11** (`resize` → `windowWidth` / `isMdOrLarger`, backdrop `v-if` is small-only) are **already implemented**. **7.7** is **not**: the toggle has no `aria-expanded` (or `aria-controls` / aside `id`). [`frontend/tests/pages/BookReadingPage.spec.ts`](../frontend/tests/pages/BookReadingPage.spec.ts) has **no** Phase 7 outline-toggle tests yet — per phase discipline below, treat **Vitest** as the gate for marking a sub-phase **done**; only then shrink this sync block.
+**Codebase sync (production vs this plan):** In `BookReadingPage.vue`, **7.1–7.6**, **7.7** (`aria-expanded`, `aria-controls` → aside `id="book-reading-outline-panel"`), **7.8**, **7.9**, **7.10–7.11** are **implemented in production**. Vitest: **7.7** covered by `outline toggle exposes aria-expanded and aria-controls` in [`frontend/tests/pages/BookReadingPage.spec.ts`](../frontend/tests/pages/BookReadingPage.spec.ts); **7.1–7.6** and **7.8–7.11** still need their listed tests before marking those slices **done** per phase discipline.
 
 ---
 
@@ -84,13 +84,13 @@
 
 ---
 
-## Phase 7.7 — Toggle exposes `aria-expanded` (and optional `aria-controls`)
+## Phase 7.7 — Toggle exposes `aria-expanded` (and optional `aria-controls`) — **done**
 
 **User outcome:** Screen reader users hear whether the outline is **expanded** or **collapsed**.
 
 **Test:** `aria-expanded="true"` when open, `"false"` when closed; if `aria-controls` is added, point to a stable `id` on the aside.
 
-**Production:** **Not done** — toggle only has `aria-label` / `title` today; add `aria-expanded` bound to `outlineOpened`, and optional `aria-controls` + aside `id`.
+**Production:** Toggle uses `:aria-expanded="outlineOpened"` and `aria-controls="book-reading-outline-panel"`; aside has `id="book-reading-outline-panel"`.
 
 **Cleanup:** Remove any interim copy that duplicates `aria-label` without value.
 
