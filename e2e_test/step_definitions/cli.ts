@@ -1,6 +1,6 @@
 /**
  * CLI scenarios: keep steps as one-line glue to `e2e_test/start/pageObjects/cli`.
- * Behavior and assertions belong in page objects / `outputAssertions.ts`, not here.
+ * Behavior and assertions belong in page objects under `e2e_test/start/pageObjects/cli`, not here.
  */
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import { cli } from '../start/pageObjects/cli'

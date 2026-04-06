@@ -3,6 +3,7 @@
  * Domain: installation.
  */
 import { e2eAppBaseUrl } from '../../../support/e2eAppUrl'
+import { DOUGHNUT_OUTPUT_CY_ALIAS } from './nonInteractiveOutputAssertions'
 import { ttyAssertTerminal } from './ttyAssertTerminal'
 
 function installation() {
@@ -18,7 +19,7 @@ function installation() {
         cy.task<string>('runInstalledCli', {
           doughnutPath,
           args: ['version'],
-        }).as('doughnutOutput')
+        }).as(DOUGHNUT_OUTPUT_CY_ALIAS)
       })
     },
     runUpdate(baseUrl = e2eAppBaseUrl()) {
@@ -27,7 +28,7 @@ function installation() {
           doughnutPath,
           args: ['update'],
           env: { BASE_URL: baseUrl },
-        }).as('doughnutOutput')
+        }).as(DOUGHNUT_OUTPUT_CY_ALIAS)
       })
     },
     runInteractiveMode() {
