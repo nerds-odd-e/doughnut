@@ -27,7 +27,10 @@ Feature: Book reading
       | 1 | 5. Refactoring in Team Development |
       | 1 | 6. Why Refactoring Matters More with AI |
     And I should see the beginning of the PDF book "refactoring.pdf"
-    And jumping between outline rows on the same page should scroll the PDF to different positions
+    When I choose the book outline row "2. The Usual Defi nition Is Not Enough"
+    Then I should see in the book reader visible PDF viewport on page 1 text including "Usual Definition"
+    When I choose the book outline row "1. Refactoring: Protecting Intention in Working Software"
+    Then I should see in the book reader visible PDF viewport on page 1 text including "Protecting Intention"
 
   Scenario: Outline row jumps the PDF to the anchored page
     When I choose the book outline row "2.2 Refactoring as Strengthening the Code"
@@ -50,5 +53,6 @@ Feature: Book reading
     Then the book outline row "1. Refactoring: Protecting Intention in Working Software" should be selected in the book reader
     And the book outline row "1. Refactoring: Protecting Intention in Working Software" should be viewport-current in the book reader
     When I scroll the PDF book reader down within the same page to move viewport past the next outline bbox
-    Then the book outline row "1. Refactoring: Protecting Intention in Working Software" should be selected in the book reader
+    Then I should see in the book reader visible PDF viewport on page 1 text including "Easier to Change"
+    And the book outline row "1. Refactoring: Protecting Intention in Working Software" should be selected in the book reader
     And the book outline row "2.1 Easier to Change—and Harder to Misuse" should be viewport-current in the book reader

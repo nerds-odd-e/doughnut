@@ -140,7 +140,7 @@ describe("mineruOutlineV1BboxToXyzDestArray", () => {
       null,
       { name: "XYZ" },
       105,
-      256,
+      300,
       null,
     ])
   })

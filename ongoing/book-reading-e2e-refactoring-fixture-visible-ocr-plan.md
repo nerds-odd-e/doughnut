@@ -135,11 +135,17 @@ Short comment in the script or adjacent README snippet: **when to re-run** (PDF 
 
 ---
 
-## Phase 7 — Visible-viewport OCR: same-page bbox scroll + viewport-current vs selected
+## Phase 7 — Visible-viewport OCR: same-page bbox scroll + viewport-current vs selected — **shipped**
 
 **Deliverables:** Replace remaining PDF-side assertion(s) with visible-viewport OCR; tune `deltaPx` (and any bbox-dependent scroll) against **real** `mineru_output_for_refactoring.json` geometry. **One assertion migration per sub-step** if two failures appear; avoid bundling multiple production fixes without a failing test each time.
 
 **Tests:** Same-page scroll scenario(s).
+
+**Implemented:**
+
+- Feature [`book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature): first scenario replaces scrollTop-only same-page jump with **When/Then** outline clicks + **`expectVisibleOCRContains`** on page **1** (`"Usual Definition"` after §2, `"Protecting Intention"` after §1). Same-page scroll scenario adds viewport OCR **`"Easier to Change"`** after the in-page scroll step.
+- Page object: removed **`expectDistinctScrollForSamePageBboxOutline`**; **`scrollPdfBookReaderDownWithinSamePageForNextBbox`** `deltaPx` **480** (was 300) so viewport midpoint passes §2.1 bbox after larger outline jump margin.
+- **Production:** [`MINERU_SCROLL_TARGET_Y_MARGIN`](../frontend/src/lib/book-reading/mineruOutlineV1PageIndex.ts) **100** (was 56) so §2 heading stays in the visible band for viewport OCR; unit test expectation updated in [`mineruOutlineV1PageIndex.spec.ts`](../frontend/tests/lib/book-reading/mineruOutlineV1PageIndex.spec.ts).
 
 ---
 
@@ -155,7 +161,7 @@ For each phase and sub-phase: failing test (when introducing new behavior) → p
 | 4 | **Done** — outline-jump scenario: PDF viewer element screenshot OCR + MinerU scroll target margin above bbox top |
 | 5 | **Done** — scroll → viewport-current: same visible-viewport OCR on page 2 as Phase 4 |
 | 6 | **Done** — short viewport: visible-viewport OCR on page 2; removed full-page marker step |
-| 7 | Not done — same-page scroll scenario(s) |
+| 7 | **Done** — same-page jump + same-page scroll: viewport OCR; margin 100 + `deltaPx` 480 |
 
 ## Open points (decide during implementation)
 

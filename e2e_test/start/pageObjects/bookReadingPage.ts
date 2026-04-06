@@ -122,33 +122,6 @@ const bookReadingPage = () => {
         },
       }
     },
-    /** Two outline rows on the same page with different bboxes → scrollTop should change. */
-    expectDistinctScrollForSamePageBboxOutline(
-      topTitle: string,
-      bottomTitle: string
-    ) {
-      const minDeltaPx = 80
-      const scrollTopOfPdfReadingScrollChain = () =>
-        cy.get('[data-testid="pdf-book-viewer"]').then(($viewer) => {
-          const el = scrollableAncestorWithinBookReadingPage(
-            $viewer[0] as HTMLElement
-          )
-          return el.scrollTop
-        })
-      pageIsNotLoading()
-      this.clickOutlineRowByTitle(bottomTitle)
-      scrollTopOfPdfReadingScrollChain().as('scrollAfterBottomBbox')
-      this.clickOutlineRowByTitle(topTitle)
-      cy.get<number>('@scrollAfterBottomBbox').then((bottomScroll) => {
-        scrollTopOfPdfReadingScrollChain().should((topScroll) => {
-          expect(
-            Math.abs(Number(bottomScroll) - Number(topScroll)),
-            'scrollTop should differ after bbox targets on the same page'
-          ).to.be.at.least(minDeltaPx)
-        })
-      })
-      return this
-    },
     scrollPdfBookReaderToBringPage2IntoPrimaryView() {
       pageIsNotLoading()
       cy.get(
@@ -164,7 +137,7 @@ const bookReadingPage = () => {
      * Delta is in CSS pixels; tuned so viewport-current advances past the next heading after selecting §1.
      */
     scrollPdfBookReaderDownWithinSamePageForNextBbox() {
-      const deltaPx = 300
+      const deltaPx = 480
       pageIsNotLoading()
       cy.get('[data-testid="pdf-book-viewer"]').then(($viewer) => {
         const el = scrollableAncestorWithinBookReadingPage(

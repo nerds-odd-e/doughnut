@@ -87,7 +87,7 @@ export function extractPageIndexZeroBased(value: string): number | null {
 }
 
 /** MinerU y gap above bbox top so scroll target leaves the section title in view (pdf.js top bias). */
-const MINERU_SCROLL_TARGET_Y_MARGIN = 56
+const MINERU_SCROLL_TARGET_Y_MARGIN = 100
 
 /**
  * Map v1 bbox (top-left, y down) to pdf.js scrollPageIntoView XYZ at horizontal center and a point

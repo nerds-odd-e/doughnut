@@ -134,14 +134,3 @@ Then(
     )
   }
 )
-
-Then(
-  'jumping between outline rows on the same page should scroll the PDF to different positions',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().expectDistinctScrollForSamePageBboxOutline(
-      '1. Refactoring: Protecting Intention in Working Software',
-      '2. The Usual Defi nition Is Not Enough'
-    )
-  }
-)
