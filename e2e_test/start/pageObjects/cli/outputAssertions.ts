@@ -64,7 +64,7 @@ function assertSectionContainsSubstring(
 }
 
 /** Re-read value each attempt; retry until assert passes or timeout, then screenshot and throw. */
-function retryCliOutputAssertion(
+function retryRawAssertion(
   readRaw: () => Cypress.Chainable<string>,
   assert: (raw: string) => void | Promise<void>,
   screenshotName: string,
@@ -96,7 +96,7 @@ function retryInteractiveAssertion(
   screenshotName: string,
   timeoutMs: number = CLI_OUTPUT_ASSERT_TIMEOUT_MS
 ): Cypress.Chainable<void> {
-  return retryCliOutputAssertion(
+  return retryRawAssertion(
     () => cy.task<string>('cliInteractivePtyGetBuffer'),
     assert,
     screenshotName,
@@ -107,7 +107,7 @@ function retryInteractiveAssertion(
 function nonInteractiveOutput() {
   return {
     expectContains(expected: string): Cypress.Chainable<void> {
-      return retryCliOutputAssertion(
+      return retryRawAssertion(
         () => cy.get<string>(OUTPUT_ALIAS),
         (stdout) => {
           assertNonInteractiveCliOutput(stdout)
