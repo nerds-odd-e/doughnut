@@ -46,12 +46,21 @@ describe('mineru_book_outline.py with E2E shadow mineru (PYTHONPATH)', () => {
     })
     expect(result.ok).toBe(true)
     if (!result.ok) return
-    expect(result.outline).toContain('Main Topic 1')
-    expect(result.layout?.roots?.[0]?.title).toBe('Main Topic 1')
-    expect(result.layout?.roots?.[0]?.children?.[0]?.title).toBe('Subtopic 1.1')
-    expect(result.layout?.roots?.[0]?.children?.[1]?.title).toBe('Subtopic 1.2')
-    expect(result.layout?.roots?.[1]?.title).toBe('Main Topic 2')
-    expect(result.layout?.roots?.[1]?.children?.[0]?.title).toBe('Subtopic 2.1')
-    expect(result.layout?.roots?.[1]?.children?.[1]?.title).toBe('Subtopic 2.2')
+    expect(result.outline).toContain('[L2 p0] Refactoring')
+    expect(result.layout?.roots?.[0]?.title).toBe('Refactoring')
+    expect(result.layout?.roots?.[0]?.children).toBeUndefined()
+    expect(result.layout?.roots?.[4]?.title).toBe(
+      '2.2 Refactoring as Strengthening the Code'
+    )
+    const section3 = result.layout?.roots?.[5]
+    expect(section3?.title).toBe(
+      '3. Refactoring Is Not Only About Changing Production Code'
+    )
+    expect(section3?.children?.[0]?.title).toBe(
+      '3.1 Can You Refactor Without Tests?'
+    )
+    expect(section3?.children?.[6]?.title).toBe(
+      '6. Why Refactoring Matters More with AI'
+    )
   })
 })

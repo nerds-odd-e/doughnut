@@ -40,8 +40,10 @@ When(
       .then((ctx) => ctx.attachPdfBook(fixtureFilename))
       .then((ctx) => {
         ctx.pastCliAssistantMessages().expectContains(`Attached "${stem}"`)
-        ctx.pastCliAssistantMessages().expectContains('Main Topic 1')
-        ctx.pastCliAssistantMessages().expectContains('Subtopic 1.1')
+        ctx
+          .pastCliAssistantMessages()
+          .expectContains('Protecting Intention in Working Software')
+        ctx.pastCliAssistantMessages().expectContains('Easier to Change')
       })
   }
 )
@@ -136,8 +138,8 @@ Then(
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   () => {
     return bookReadingPage().expectDistinctScrollForSamePageBboxOutline(
-      'Subtopic 1.1',
-      'Subtopic 1.2'
+      '1. Refactoring: Protecting Intention in Working Software',
+      '2. The Usual Defi nition Is Not Enough'
     )
   }
 )

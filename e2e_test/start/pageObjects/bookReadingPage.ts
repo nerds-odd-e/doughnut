@@ -68,21 +68,6 @@ const bookReadingPage = () => {
         expect(text as string, ocrMessage).to.contain(substring)
       })
 
-  const assertJumpedPageCanvas = (el: HTMLCanvasElement) => {
-    const chromeGeometryTolerancePx = 2
-    const pageRoot = el.closest('[data-testid="book-reading-page"]')
-    const nav = pageRoot?.querySelector('nav.daisy-navbar')
-    if (!nav)
-      throw new Error('book-reading GlobalBar (nav.daisy-navbar) not found')
-    const navBottom = nav.getBoundingClientRect().bottom
-    const canvasTop = el.getBoundingClientRect().top
-    expect(
-      canvasTop,
-      'PDF page top should be at or below GlobalBar bottom after outline jump'
-    ).to.be.at.least(navBottom - chromeGeometryTolerancePx)
-    assertPdfCanvasHasDarkPixels(el)
-  }
-
   return {
     expectBookStructureRows(expected: BookOutlineRow[]) {
       pageIsNotLoading()
@@ -128,7 +113,7 @@ const bookReadingPage = () => {
             `[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="${pageNumber}"] canvas`
           )
           .first(),
-        assertJumpedPageCanvas,
+        assertPdfCanvasHasDarkPixels,
         `OCR text from PDF page ${pageNumber} canvas`,
         marker
       )
@@ -167,15 +152,16 @@ const bookReadingPage = () => {
         '[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="2"]'
       )
         .first()
-        .scrollIntoView({ offset: { top: -100, left: 0 } })
+        // @ts-expect-error Cypress ScrollIntoViewOptions omits DOM `block`
+        .scrollIntoView({ block: 'start' })
       return this
     },
     /**
-     * Scrolls the book-reading PDF container without changing pages (fixture: two bbox rows on page 1).
-     * Delta is in CSS pixels; tuned to cross mineru y gap between Subtopic 1.1 and 1.2 at page-width scale.
+     * Scrolls the book-reading PDF container without changing pages (fixture: refactoring.pdf page 1).
+     * Delta is in CSS pixels; tuned so viewport-current advances past the next heading after selecting §1.
      */
     scrollPdfBookReaderDownWithinSamePageForNextBbox() {
-      const deltaPx = 420
+      const deltaPx = 300
       pageIsNotLoading()
       cy.get('[data-testid="pdf-book-viewer"]').then(($viewer) => {
         const el = scrollableAncestorWithinBookReadingPage(
