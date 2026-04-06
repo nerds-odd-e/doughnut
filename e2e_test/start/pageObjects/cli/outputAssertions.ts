@@ -22,15 +22,13 @@ function failCliAssertion(message: string, raw: string): never {
   )
 }
 
-/** Re-read value each attempt; retry until assert passes or timeout, then screenshot and throw. */
-function retryRawAssertion(
-  readRaw: () => Cypress.Chainable<string>,
+function retryInteractiveAssertion(
   assert: (raw: string) => void | Promise<void>,
   screenshotName: string,
   timeoutMs: number = CLI_OUTPUT_ASSERT_TIMEOUT_MS
 ): Cypress.Chainable<void> {
   const tryOnce = (deadline: number): Cypress.Chainable<void> => {
-    return readRaw().then((raw) => {
+    return cy.task<string>('cliInteractivePtyGetBuffer').then((raw) => {
       return Cypress.Promise.resolve(assert(raw)).then(
         () => undefined,
         (err: unknown) => {
@@ -48,19 +46,6 @@ function retryRawAssertion(
     }) as Cypress.Chainable<void>
   }
   return cy.wrap(null).then(() => tryOnce(Date.now() + timeoutMs))
-}
-
-function retryInteractiveAssertion(
-  assert: (raw: string) => void | Promise<void>,
-  screenshotName: string,
-  timeoutMs: number = CLI_OUTPUT_ASSERT_TIMEOUT_MS
-): Cypress.Chainable<void> {
-  return retryRawAssertion(
-    () => cy.task<string>('cliInteractivePtyGetBuffer'),
-    assert,
-    screenshotName,
-    timeoutMs
-  )
 }
 
 async function assertStrippedPtyTranscriptContains(
