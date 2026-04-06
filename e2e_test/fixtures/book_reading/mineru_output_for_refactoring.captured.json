@@ -1,0 +1,231 @@
+[
+  {
+    "type": "text",
+    "text": "Refactoring",
+    "text_level": 2,
+    "bbox": [90, 72, 415, 115],
+    "page_idx": 0
+  },
+  {
+    "type": "text",
+    "text": "Refactoring is often explained in a familiar way: changing the internal structure of code without changing its external behavior. That defi nition is useful, but it is incomplete. It tells us what refactoring avoids, yet says much less about why we do it.",
+    "bbox": [87, 135, 897, 219],
+    "page_idx": 0
+  },
+  {
+    "type": "text",
+    "text": "1. Refactoring: Protecting Intention in Working Software",
+    "text_level": 2,
+    "bbox": [89, 252, 757, 313],
+    "page_idx": 0
+  },
+  {
+    "type": "text",
+    "text": "Refactoring is often defi ned as changing the internal structure of code without changing its external behavior. That defi nition is useful, but it does not fully explain the purpose of refactoring.",
+    "bbox": [87, 332, 885, 397],
+    "page_idx": 0
+  },
+  {
+    "type": "text",
+    "text": "A more practical view is this: refactoring is the work of protecting developer intention in already-working software.",
+    "bbox": [87, 413, 828, 456],
+    "page_idx": 0
+  },
+  {
+    "type": "text",
+    "text": "When code works, it already contains assumptions, domain meaning, and design choices. Over time, these can become harder to see and easier to break. Refactoring helps make them clearer and harder to violate by accident.",
+    "bbox": [87, 473, 878, 557],
+    "page_idx": 0
+  },
+  {
+    "type": "text",
+    "text": "2. The Usual Defi nition Is Not Enough",
+    "text_level": 2,
+    "bbox": [87, 577, 754, 608],
+    "page_idx": 0
+  },
+  {
+    "type": "text",
+    "text": "2.1 Easier to Change—and Harder to Misuse",
+    "text_level": 2,
+    "bbox": [87, 631, 806, 658],
+    "page_idx": 0
+  },
+  {
+    "type": "text",
+    "text": "Refactoring is often said to make code easier to change. That is true, but incomplete.",
+    "bbox": [87, 677, 873, 720],
+    "page_idx": 0
+  },
+  {
+    "type": "text",
+    "text": "Some changes should become easier. Others should become harder. If the code expresses an important business rule or domain concept, refactoring should reduce the chance of future misuse. In that sense, refactoring is not just about fl exibility. It is also about constraint.",
+    "bbox": [87, 737, 897, 822],
+    "page_idx": 0
+  },
+  {
+    "type": "text",
+    "text": "Clearer names, stronger cohesion, better boundaries, and stricter types all help the code defend its own meaning.",
+    "bbox": [87, 839, 902, 883],
+    "page_idx": 0
+  },
+  {
+    "type": "text",
+    "text": "2.2 Refactoring as Strengthening the Code",
+    "text_level": 2,
+    "bbox": [87, 68, 779, 98],
+    "page_idx": 1
+  },
+  {
+    "type": "text",
+    "text": "A lot of good refactoring does not add fl exibility. It removes unnecessary options.",
+    "bbox": [87, 115, 763, 160],
+    "page_idx": 1
+  },
+  {
+    "type": "text",
+    "text": "A function with too many valid input combinations is easy to misuse. A weak type can allow invalid states. A vague abstraction can hide the real intent of the code.",
+    "bbox": [87, 177, 894, 240],
+    "page_idx": 1
+  },
+  {
+    "type": "text",
+    "text": "Refactoring often means making the code more specifi c about what it accepts and what it means. Stronger typing is especially useful here. A good type system does not just help the compiler; it helps preserve the original design intention.",
+    "bbox": [87, 258, 897, 342],
+    "page_idx": 1
+  },
+  {
+    "type": "text",
+    "text": "3. Refactoring Is Not Only About Changing Production Code",
+    "text_level": 1,
+    "bbox": [87, 68, 843, 130],
+    "page_idx": 2
+  },
+  {
+    "type": "text",
+    "text": "3.1 Can You Refactor Without Tests?",
+    "text_level": 2,
+    "bbox": [87, 153, 680, 180],
+    "page_idx": 2
+  },
+  {
+    "type": "text",
+    "text": "Tests are the usual safety net for refactoring, but they are not the only one. Types are also a form of protection. If the type system accurately represents the author’s intent, some refactorings can be done safely even when test coverage is weak.",
+    "bbox": [87, 200, 882, 284],
+    "page_idx": 2
+  },
+  {
+    "type": "text",
+    "text": "That does not make tests optional. It simply means that safety can come from more than one source.",
+    "bbox": [87, 302, 847, 344],
+    "page_idx": 2
+  },
+  {
+    "type": "text",
+    "text": "3.2 Can You Refactor Without Changing the Code?",
+    "text_level": 2,
+    "bbox": [87, 366, 905, 393],
+    "page_idx": 2
+  },
+  {
+    "type": "text",
+    "text": "Sometimes yes.",
+    "bbox": [89, 412, 277, 435],
+    "page_idx": 2
+  },
+  {
+    "type": "text",
+    "text": "If refactoring is about protecting intention, then adding tests can itself be refactoring-like work. Even when production code stays the same, stronger tests narrow the set of acceptable future changes. They help preserve what the system is supposed to do.",
+    "bbox": [87, 453, 882, 537],
+    "page_idx": 2
+  },
+  {
+    "type": "text",
+    "text": "So refactoring is not always about editing production code. It can also mean strengthening the protection around that code.",
+    "bbox": [87, 554, 887, 596],
+    "page_idx": 2
+  },
+  {
+    "type": "text",
+    "text": "4. Two Diff erent Kinds of Refactoring",
+    "text_level": 2,
+    "bbox": [87, 68, 744, 99],
+    "page_idx": 3
+  },
+  {
+    "type": "text",
+    "text": "4.1 Refactoring to Protect Current Intent",
+    "text_level": 2,
+    "bbox": [87, 122, 744, 149],
+    "page_idx": 3
+  },
+  {
+    "type": "text",
+    "text": "One kind of refactoring strengthens what already exists. It makes current behavior, assumptions, and design choices clearer and safer. This includes better naming, higher cohesion, stronger types, and fewer misuse paths.",
+    "bbox": [87, 168, 905, 252],
+    "page_idx": 3
+  },
+  {
+    "type": "text",
+    "text": "4.2 Refactoring to Prepare for the Next Change",
+    "text_level": 2,
+    "bbox": [87, 273, 850, 300],
+    "page_idx": 3
+  },
+  {
+    "type": "text",
+    "text": "Another kind is more strategic: reshape the code so the next feature change becomes easier to make. This is the idea behind “make the change easy, then make the easy change.”",
+    "bbox": [87, 319, 863, 382],
+    "page_idx": 3
+  },
+  {
+    "type": "text",
+    "text": "These two kinds are related, but not identical. One protects the present design. The other prepares for the future.",
+    "bbox": [87, 399, 899, 444],
+    "page_idx": 3
+  },
+  {
+    "type": "text",
+    "text": "5. Refactoring in Team Development",
+    "text_level": 2,
+    "bbox": [89, 464, 737, 494],
+    "page_idx": 3
+  },
+  {
+    "type": "text",
+    "text": "In a team with collective code ownership, code cannot depend too much on one person’s memory. The code itself must carry more of the knowledge.",
+    "bbox": [87, 513, 889, 576],
+    "page_idx": 3
+  },
+  {
+    "type": "text",
+    "text": "Refactoring helps move design intent out of people’s heads and into names, types, tests, and structure. That makes the system easier to understand, review, and change safely. In this sense, refactoring is not only a technical activity. It is also a collaboration practice.",
+    "bbox": [87, 594, 889, 678],
+    "page_idx": 3
+  },
+  {
+    "type": "text",
+    "text": "6. Why Refactoring Matters More with AI",
+    "text_level": 2,
+    "bbox": [87, 699, 811, 728],
+    "page_idx": 3
+  },
+  {
+    "type": "text",
+    "text": "AI can generate and change code quickly, but it does not automatically preserve subtle design intent. If the codebase is vague, weakly typed, or overly permissive, AI can produce plausible changes that compile while quietly breaking important assumptions.",
+    "bbox": [87, 747, 897, 832],
+    "page_idx": 3
+  },
+  {
+    "type": "text",
+    "text": "That makes refactoring even more important. Clear names, cohesive modules, meaningful types, and good tests help guide both human developers and AI tools toward safer changes.",
+    "bbox": [87, 848, 867, 912],
+    "page_idx": 3
+  },
+  {
+    "type": "text",
+    "text": "Refactoring, then, is not just about cleaner code. It is about keeping software honest as it evolves.",
+    "bbox": [89, 66, 860, 108],
+    "page_idx": 4
+  }
+]
