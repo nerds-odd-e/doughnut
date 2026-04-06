@@ -152,7 +152,8 @@
       "yaml": "^2.8.3",
       "handlebars": ">=4.7.9",
       "path-to-regexp": ">=8.4.0",
-      "@xmldom/xmldom": ">=0.9.9"
+      "@xmldom/xmldom": ">=0.9.9",
+      "defu": ">=6.1.5"
     },
     "onlyBuiltDependencies": [
       "@badeball/cypress-cucumber-preprocessor",
