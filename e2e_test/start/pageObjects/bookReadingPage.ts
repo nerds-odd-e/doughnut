@@ -103,7 +103,7 @@ const bookReadingPage = () => {
         cy.get('[data-testid="pdf-book-viewer"] .page canvas').first(),
         assertPdfCanvasHasDarkPixels,
         'OCR text from PDF page 1 canvas',
-        'DOUGHNUT_E2E_BOOK_PAGE1'
+        'Easier to Change'
       )
       return this
     },

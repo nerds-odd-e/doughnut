@@ -1,6 +1,6 @@
 # Plan: Book-reading E2E — `refactoring.pdf`, committed MinerU JSON, visible-viewport OCR
 
-**Intent:** Migrate book-reading Cypress E2E from `top-maths.pdf` + inline `_E2E_CONTENT_LIST` to `e2e_test/fixtures/book_reading/refactoring.pdf` + `mineru_output_for_refactoring.json`, add a maintainer script to refresh that JSON from **real** MinerU, then replace synthetic page-marker strings with **OCR of the visible PDF viewport** in **small steps**. **Do not** design or schedule production positioning fixes until a phase’s E2E assertion fails for the right reason (reproduces the misalignment).
+**Intent:** Migrate book-reading Cypress E2E from `top-maths.pdf` + inline `_E2E_CONTENT_LIST` to `e2e_test/fixtures/book_reading/refactoring.pdf` + `mineru_output_for_refactoring.json`, add a maintainer script to refresh that JSON from **real** MinerU, then replace synthetic page-marker strings with **OCR of the visible PDF viewport** in **small steps**. **Phase 1** is split into **sp-1.1** (PDF-only swap + fix OCR failures) and **sp-1.2** (same mock content, file-backed JSON). **Phase 2** is split into **sp-2.1** (script + capture to a **different** JSON filename) and **sp-2.2** (promote to canonical fixture JSON + fix E2E). **Do not** design or schedule production positioning fixes until a phase’s E2E assertion fails for the right reason (reproduces the misalignment).
 
 **Grounding:** [`ongoing/doughnut-book-reading-architecture-roadmap.md`](doughnut-book-reading-architecture-roadmap.md) (Story 2 sync), [`ongoing/book-reading-user-stories.md`](book-reading-user-stories.md), [`ongoing/book-reading-read-a-range-plan.md`](book-reading-read-a-range-plan.md). **Planning rules:** `.cursor/rules/planning.mdc`.
 
@@ -25,37 +25,63 @@ These explain why “layout ↔ PDF” can look **a few lines** wrong **without*
 
 ---
 
-## Phase 1 — Fixture swap + outline/CLI expectations driven by JSON (still full-canvas OCR)
+## Phase 1 — `refactoring.pdf` + file-backed mock (still full-canvas OCR)
 
-**User-visible outcome:** Book-reading E2E still passes end-to-end, but uses **`refactoring.pdf`** and a **file-backed** MinerU output shape identical to what the CLI attach path expects today.
+**User-visible outcome (end of Phase 1):** Book-reading E2E passes end-to-end with **`refactoring.pdf`** and **`mineru_output_for_refactoring.json`** as the single source of truth for the MinerU **`content_list`** shape the stub emits (content still **logically** the same as today’s inline mock until Phase 2 replaces it with real MinerU output).
 
-**Deliverables:**
-
-1. Use [`e2e_test/fixtures/book_reading/refactoring.pdf`](../e2e_test/fixtures/book_reading/refactoring.pdf) in the feature Background (`attach` + any step that names the file). Drop **`top-maths.pdf`** from this feature’s contract (remove or retain the file only if another suite still needs it; today only book-reading E2E + a couple of **frontend** tests import it — update or split fixtures as needed).
-2. Add **`e2e_test/fixtures/book_reading/mineru_output_for_refactoring.json`** containing the MinerU **`content_list`** array (same JSON shape currently embedded in `_E2E_CONTENT_LIST`).
-3. Change the E2E stub’s `do_parse` to **read that JSON** from a path resolved relative to the repo (or copy embedded into the temp output layout the CLI expects — keep **one** source of truth: the committed file).
-4. Update **Gherkin** outline table, **CLI** substring expectations in `book_reading.ts`, **`readBook` stem** (`refactoring` from filename), and **scroll helpers** (`scrollPdfBookReaderToBringPage2IntoPrimaryView` offset, `scrollPdfBookReaderDownWithinSamePageForNextBbox` delta, same-page row titles) so they match the **committed** JSON and real page indices for `refactoring.pdf`.
-5. Replace **`DOUGHNUT_E2E_BOOK_PAGE1` / `PAGE2`** in the feature with **short, stable substrings** that already appear in `refactoring.pdf` and survive OCR (discover by running OCR once on rendered pages or by inspection of PDF text). **Still assert on full-page canvas** as today (`expectPdfBeginningVisible` / `expectPdfPageMarkerVisible`) so this phase does **not** depend on positioning fixes.
-
-**Tests:** Relevant Cypress spec(s) for [`book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature) only.
-
-**Collateral updates (same phase if touched):** [`ongoing/book-reading-user-stories.md`](book-reading-user-stories.md) example filename; [`ongoing/book-reading-read-a-range-plan.md`](book-reading-read-a-range-plan.md) “shipped” references if they name `top-maths.pdf`; frontend/CLI tests that import `top-maths.pdf` only for book-reading parity.
+Phase 1 stops after **sp-1.2**. Outline table, CLI expectations, scroll helpers, and **`DOUGHNUT_E2E_BOOK_PAGE*`** must match **`refactoring.pdf`** and the mock’s page indices; assertions stay **full-page canvas** (`expectPdfBeginningVisible` / `expectPdfPageMarkerVisible`) — no viewport-only OCR or positioning fixes in Phase 1.
 
 ---
 
-## Phase 2 — Maintainer script: real MinerU → refresh `mineru_output_for_refactoring.json`
+### sp-1.1 — Replace the PDF only
 
-**User-visible outcome:** None (developer workflow only).
+**Scope:** Switch the feature to [`e2e_test/fixtures/book_reading/refactoring.pdf`](../e2e_test/fixtures/book_reading/refactoring.pdf) (`attach` + any step that names the file). **No** change to `_E2E_CONTENT_LIST`, stub wiring, or JSON on disk — mocked data and **how** it is mocked stay the same.
 
-**Deliverables:**
+**Expectation:** At least one scenario in [`book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature) should **fail**, because OCR reads **`refactoring.pdf`** while expectations may still assume **`top-maths.pdf`** text.
 
-1. Script under **`e2e_test/fixtures/book_reading/`** (e.g. `regenerate_mineru_output_for_refactoring.sh` or small Python wrapper) that:
-   - Documents activation: `source .venv-mineru/bin/activate` (or equivalent) before invoking MinerU.
-   - Runs the **real** MinerU pipeline against `refactoring.pdf` into a temp output dir.
-   - Copies or normalizes the resulting **`_content_list.json`** (or equivalent) into **`mineru_output_for_refactoring.json`** in the **array** form the stub already emits.
-2. Short comment at top of the JSON or in the script: **when to re-run** (PDF changed, MinerU version bump, outline drift).
+**Fix:** Update only what is needed for green: e.g. **`DOUGHNUT_E2E_BOOK_PAGE1` / `PAGE2`**, Gherkin outline examples if they pin PDF-visible strings, CLI substring expectations in `book_reading.ts`, **`readBook` stem** (`refactoring` from filename), and page-object scroll helpers (offsets/deltas, same-page row titles) so they match **`refactoring.pdf`** and the **unchanged** mock outline. Drop **`top-maths.pdf`** from this feature’s contract (remove or keep the file if another suite still needs it — book-reading E2E + some **frontend** tests may still reference it until updated).
 
-**Tests:** Optional smoke: script exits 0 in an environment with venv + MinerU (may be manual / CI optional).
+**Tests:** Relevant Cypress spec(s) for `book_reading.feature` only.
+
+---
+
+### sp-1.2 — Move mocked data to JSON (content unchanged)
+
+**Scope:** Add **`e2e_test/fixtures/book_reading/mineru_output_for_refactoring.json`** with the MinerU **`content_list`** array — **byte-for-byte / semantically identical** to what is currently embedded in `_E2E_CONTENT_LIST` (no real MinerU capture yet). Change the E2E stub’s `do_parse` to **read that file** from a path resolved relative to the repo (single source of truth: the committed JSON).
+
+**Expectation:** E2E **still passes** after the extraction; behavior should be unchanged aside from where the mock payload lives.
+
+**Tests:** Same as sp-1.1.
+
+**Collateral updates (if touched in Phase 1):** [`ongoing/book-reading-user-stories.md`](book-reading-user-stories.md) example filename; [`ongoing/book-reading-read-a-range-plan.md`](book-reading-read-a-range-plan.md) “shipped” references if they name `top-maths.pdf`; frontend/CLI tests that import `top-maths.pdf` only for book-reading parity.
+
+---
+
+## Phase 2 — Maintainer script: real MinerU → canonical fixture JSON
+
+**User-visible outcome:** None (developer workflow + refreshed fixture content).
+
+---
+
+### sp-2.1 — Script + capture to a differently named JSON
+
+**Scope:** Add a script under **`e2e_test/fixtures/book_reading/`** (e.g. `regenerate_mineru_output_for_refactoring.sh` or a small Python wrapper) that:
+
+- Documents activation: `source .venv-mineru/bin/activate` (or equivalent) before invoking MinerU.
+- Runs the **real** MinerU pipeline against `refactoring.pdf` into a temp output dir.
+- Writes the normalized **`content_list`** array to a **new** committed JSON file whose name is **not** `mineru_output_for_refactoring.json` (e.g. `mineru_output_for_refactoring.captured.json` or `mineru_output_for_refactoring.from_mineru.json` — pick one naming convention and stick to it).
+
+Short comment in the script or adjacent README snippet: **when to re-run** (PDF changed, MinerU version bump, outline drift).
+
+**Tests:** Optional smoke: script exits 0 where venv + MinerU exist (may be manual / CI optional). E2E continues to use **`mineru_output_for_refactoring.json`** (unchanged content) until sp-2.2.
+
+---
+
+### sp-2.2 — Promote captured JSON to the fixture + fix E2E
+
+**Scope:** Replace **`mineru_output_for_refactoring.json`** with the real MinerU output (rename/copy from the sp-2.1 artifact so the canonical filename is **`mineru_output_for_refactoring.json`**). Update Gherkin, CLI expectations, scroll helpers, and page markers so E2E matches **real** outline geometry and text for `refactoring.pdf`.
+
+**Tests:** `book_reading.feature` (and any collateral tests touched by expectation changes).
 
 ---
 
@@ -107,7 +133,7 @@ These explain why “layout ↔ PDF” can look **a few lines** wrong **without*
 
 ## Phase checklist (per `.cursor/rules/planning.mdc`)
 
-For each phase: failing test (when introducing new behavior) → pass → refactor; run the **book_reading** Cypress spec(s); update this plan’s snapshot or archive when done.
+For each phase and sub-phase: failing test (when introducing new behavior) → pass → refactor; run the **book_reading** Cypress spec(s); update this plan’s snapshot or archive when done. **sp-1.1** explicitly expects at least one failure after the PDF swap, then fixes it; **sp-1.2** should stay green throughout.
 
 ## Open points (decide during implementation)
 
