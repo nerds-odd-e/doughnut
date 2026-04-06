@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
+  locateTextCellsInViewport,
   TtyAssertStrictModeViolationError,
   waitForTextInSurface,
 } from '../src/waitForTextInSurface'
@@ -104,6 +105,18 @@ describe('waitForTextInSurface', () => {
         timeoutMs: 0,
       })
     ).rejects.toThrow(/not found/)
+  })
+
+  it('locateTextCellsInViewport treats xterm bold as any non-zero isBold()', async () => {
+    const raw = `\x1b[2J\x1b[H\x1b[1mPut\x1b[22m x\n`
+    const r = await locateTextCellsInViewport({
+      raw,
+      needle: 'Put',
+      cols: 80,
+      rows: 24,
+    })
+    expect(r.found).toBe(true)
+    expect(r.cells.every((c) => c.bold)).toBe(true)
   })
 
   it('polls until a getter returns raw that contains the needle', async () => {

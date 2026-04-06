@@ -384,7 +384,7 @@ export async function locateTextCellsInViewport(opts: {
         char: cell?.getChars() ?? '',
         x,
         y: rowOffset + localY,
-        bold: cell?.isBold() === 1,
+        bold: (cell?.isBold() ?? 0) !== 0,
       })
     }
 
