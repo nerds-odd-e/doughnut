@@ -59,8 +59,10 @@ export function pageIndexForScrollContainerCenter(
 }
 
 /**
- * Uses `pageIndexForScrollContainerCenter` to pick the pdf.js page, then the **top** of the visible
- * slice of that page (not the midpoint) as MinerU-style y from the page top (down), normalized 0–1000.
+ * Uses `pageIndexForScrollContainerCenter` to pick the pdf.js page, then the vertical **center** of the
+ * visible slice of that page as MinerU-style y from the page top (down), normalized 0–1000. The midpoint
+ * tracks “where I’m reading” better than the top edge alone (which moves more slowly down the page when
+ * scrolling). `viewportCurrentAnchorIdFromAnchorPage` applies a small top grace for outline padding.
  */
 export function pdfViewerViewportTopYDown(
   scrollContainer: HTMLElement,
@@ -89,7 +91,8 @@ export function pdfViewerViewportTopYDown(
     return { anchorPageIndexZeroBased: pageIndex, viewportTopYDown: null }
   }
 
-  let localY = visibleTop - pageRect.top
+  const visibleMidY = (visibleTop + visibleBottom) / 2
+  let localY = visibleMidY - pageRect.top
   localY = Math.max(0, Math.min(localY, pageView.height - 1e-6))
 
   const localX = pageView.width / 2
