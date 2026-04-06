@@ -108,6 +108,17 @@ Then(
 )
 
 Then(
+  'I should see in the book reader visible viewport on PDF page {int} text including {string}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (pageNumber: number, marker: string) => {
+    return bookReadingPage().expectPdfPageMarkerVisibleInViewport(
+      marker,
+      pageNumber
+    )
+  }
+)
+
+Then(
   'the book outline row {string} should be selected in the book reader',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {

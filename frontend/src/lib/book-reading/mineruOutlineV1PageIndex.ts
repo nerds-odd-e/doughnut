@@ -21,7 +21,7 @@ export type MineruOutlineV1NavigationTarget = {
   bbox: MineruOutlineV1Bbox | null
 }
 
-/** pdf.js scrollPageIntoView: center of bbox, zoom null keeps current scale (e.g. page-width). */
+/** pdf.js scrollPageIntoView: above bbox top by margin (horizontal center), zoom null. */
 export type PdfJsXyzDestArray = readonly [
   null,
   { readonly name: "XYZ" },
@@ -86,18 +86,21 @@ export function extractPageIndexZeroBased(value: string): number | null {
   return parseMineruOutlineV1StartAnchor(value)?.pageIndex ?? null
 }
 
+/** MinerU y gap above bbox top so scroll target leaves the section title in view (pdf.js top bias). */
+const MINERU_SCROLL_TARGET_Y_MARGIN = 56
+
 /**
- * Map v1 bbox (top-left, y down) to pdf.js scrollPageIntoView XYZ at the box center in PDF user
- * space (y up). Zoom is null so the viewer keeps its current scale (e.g. page-width after init).
- * (FitR fits the rectangle by changing scale, which can shrink the page to the viewport and leave
- * no scroll delta for same-page jumps; XYZ targets the region without rescaling.)
+ * Map v1 bbox (top-left, y down) to pdf.js scrollPageIntoView XYZ at horizontal center and a point
+ * **above** the box top in PDF user space (y up), so the visible band includes the heading. Zoom
+ * is null so the viewer keeps its current scale (e.g. page-width after init).
  */
 export function mineruOutlineV1BboxToXyzDestArray(
   pageHeightPdf: number,
   bbox: MineruOutlineV1Bbox
 ): PdfJsXyzDestArray {
-  const [x0, y0, x1, y1] = bbox
+  const [x0, y0, x1] = bbox
   const x = (x0 + x1) / 2
-  const y = pageHeightPdf - (y0 + y1) / 2
+  const yTopMineru = Math.max(0, y0 - MINERU_SCROLL_TARGET_Y_MARGIN)
+  const y = pageHeightPdf - yTopMineru
   return [null, { name: "XYZ" }, x, y, null]
 }
