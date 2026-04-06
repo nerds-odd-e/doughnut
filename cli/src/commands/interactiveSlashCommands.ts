@@ -4,14 +4,12 @@ import { exitSlashCommand } from './exit.js'
 import { createHelpSlashCommand } from './help.js'
 import type { InteractiveSlashCommand } from './interactiveSlashCommand.js'
 import { lastEmailSlashCommand } from './gmail/lastEmail/lastEmailSlashCommand.js'
-import { listAccessTokenSlashCommand } from './accessToken/listAccessToken/listAccessTokenSlashCommand.js'
 import { recallSlashCommand } from './recall/recall.js'
 import { useNotebookSlashCommand } from './notebook/useNotebookSlashCommand.js'
 import { recallStatusSlashCommand } from './recallStatus.js'
 export const interactiveSlashCommands: readonly InteractiveSlashCommand[] = [
   createHelpSlashCommand(() => interactiveSlashCommands.map((c) => c.doc)),
   addAccessTokenSlashCommand,
-  listAccessTokenSlashCommand,
   addGmailSlashCommand,
   lastEmailSlashCommand,
   recallSlashCommand,

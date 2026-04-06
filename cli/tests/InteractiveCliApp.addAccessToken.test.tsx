@@ -5,20 +5,9 @@ import { UserController } from 'doughnut-api'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
-  pressEscapeAndWait,
   pressEscapeAndWaitForCancelledLine,
   renderInkWhenCommandLineReady,
-  waitForFrames,
 } from './inkTestHelpers.js'
-
-const EXPECT_GUIDANCE_MORE_BELOW = '↓ more below'
-const EXPECT_GUIDANCE_ROW_BUDGET = 5
-
-function rawLineIncludesBoldAndText(raw: string, text: string): boolean {
-  return raw
-    .split('\n')
-    .some((line) => line.includes(text) && line.includes('\x1b[1m'))
-}
 
 describe('InteractiveCliApp /add-access-token', () => {
   let configDir: string
@@ -109,105 +98,5 @@ describe('InteractiveCliApp /add-access-token', () => {
     expect(fs.existsSync(path.join(configDir, 'access-tokens.json'))).toBe(
       false
     )
-  })
-
-  test('/list-access-token Esc closes picker with abort line (no list dump)', async () => {
-    const { stdin, frames, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-    stdin.write('/add-access-token unit-test-token-value\r')
-    await waitForFramesToInclude('Token added successfully')
-
-    stdin.write('/list-access-token\r')
-    await waitForFramesToInclude(
-      /(?=.*Access tokens)(?=.*1\. Vitest token label)/s
-    )
-
-    await pressEscapeAndWait(
-      stdin,
-      () => frames.join('\n'),
-      (c) =>
-        c.includes('Cancelled.') &&
-        c.includes('/list-access-token') &&
-        c.includes('→ ') &&
-        c.includes('/ commands')
-    )
-
-    expect(frames.join('\n')).not.toContain('Stored access tokens:')
-  })
-
-  test('/list-access-token with many labels uses a fixed-height list with more-below', async () => {
-    fs.writeFileSync(
-      path.join(configDir, 'access-tokens.json'),
-      JSON.stringify({
-        tokens: Array.from({ length: 8 }, (_, i) => ({
-          label: `L${i}`,
-          token: `t${i}`,
-        })),
-        defaultLabel: 'L0',
-      }),
-      'utf-8'
-    )
-
-    const { stdin, lastStrippedFrame, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-    stdin.write('/list-access-token\r')
-    await waitForFramesToInclude(
-      /(?=.*Access tokens)(?=.*↓ more below)(?=.*1\. L0)/s
-    )
-
-    const plain = lastStrippedFrame()
-    const rows = plain
-      .split('\n')
-      .filter(
-        (l) => l.includes(EXPECT_GUIDANCE_MORE_BELOW) || /\d+\.\s+L\d/.test(l)
-      )
-    expect(rows.length).toBe(EXPECT_GUIDANCE_ROW_BUDGET)
-  })
-
-  test('/list-access-token Down+Enter sets default token in access-tokens.json', async () => {
-    fs.writeFileSync(
-      path.join(configDir, 'access-tokens.json'),
-      JSON.stringify({
-        tokens: [
-          { label: 'Alpha', token: 't1' },
-          { label: 'Beta', token: 't2' },
-        ],
-        defaultLabel: 'Alpha',
-      }),
-      'utf-8'
-    )
-
-    const { stdin, frames, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-    stdin.write('/list-access-token\r')
-    await waitForFramesToInclude(/(?=.*Access tokens)(?=.*2\. Beta)/s)
-
-    stdin.write('\u001b[B')
-    await waitForFrames(
-      () => frames.at(-1) ?? '',
-      (f) => rawLineIncludesBoldAndText(f, '2. Beta')
-    )
-
-    stdin.write('\r')
-    await waitForFramesToInclude('Default token set to: Beta')
-
-    const stored = JSON.parse(
-      fs.readFileSync(path.join(configDir, 'access-tokens.json'), 'utf-8')
-    ) as { tokens: { label: string; token: string }[]; defaultLabel?: string }
-    expect(stored.defaultLabel).toBe('Beta')
-  })
-
-  test('/list-access-token with no tokens commits assistant line without Escape', async () => {
-    const { stdin, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-    stdin.write('/list-access-token\r')
-    await waitForFramesToInclude('No access tokens stored.')
-    await waitForFramesToInclude('/list-access-token')
-    await waitForFramesToInclude('→ ')
-    await waitForFramesToInclude('/ commands')
   })
 })
