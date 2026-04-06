@@ -8,7 +8,7 @@
 
 - Feature: [`e2e_test/features/book_reading/book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature) (`@mockMineruLib`, `refactoring.pdf`, outline table).
 - Stub: [`e2e_test/python_stubs/mineru_site/mineru/cli/common.py`](../e2e_test/python_stubs/mineru_site/mineru/cli/common.py) — loads committed [`mineru_output_for_refactoring.json`](../e2e_test/fixtures/book_reading/mineru_output_for_refactoring.json) into `_E2E_CONTENT_LIST`; fake `do_parse` writes `{stem}_content_list.json` from that list.
-- Page object: [`e2e_test/start/pageObjects/bookReadingPage.ts`](../e2e_test/start/pageObjects/bookReadingPage.ts) — `expectPdfBeginningVisible` OCRs the **first** page canvas and asserts substring **`Code Refactoring`**. **`expectPdfPageMarkerVisible`** OCRs the **full** page canvas. **`expectPdfViewerViewportScreenshotContains`** OCRs a Cypress **element screenshot** of `[data-testid="pdf-book-viewer"]` (Phase 4 outline-jump scenario). The beginning step still uses the **full** first-page canvas.
+- Page object: [`e2e_test/start/pageObjects/bookReadingPage.ts`](../e2e_test/start/pageObjects/bookReadingPage.ts) — `expectPdfBeginningVisible` OCRs the **first** page canvas and asserts substring **`Code Refactoring`**. **`expectPdfPageMarkerVisible`** OCRs the **full** page canvas. **`expectPdfViewerViewportScreenshotContains(marker, pageNumber)`** waits for that page’s canvas to have ink, then OCRs a Cypress **element screenshot** of `[data-testid="pdf-book-viewer"]` (outline-jump scenario). The beginning step still uses the **full** first-page canvas.
 - Steps: [`e2e_test/step_definitions/book_reading.ts`](../e2e_test/step_definitions/book_reading.ts) — CLI expectations include refactoring outline substrings (e.g. `Protecting Intention in Working Software`, `Easier to Change`).
 
 ---
@@ -105,8 +105,8 @@ Short comment in the script or adjacent README snippet: **when to re-run** (PDF 
 
 **Implemented:**
 
-- Feature [`book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature): scenario **Outline row jumps the PDF to the anchored page** uses `Then I should see in the book reader visible PDF viewport text including "Strengthening the Code"`.
-- Page object: `expectPdfViewerViewportScreenshotContains` — `cy.get('[data-testid="pdf-book-viewer"]').screenshot` → `readFile` base64 → `ocrCanvasImage`; step `I should see in the book reader visible PDF viewport text including {string}`.
+- Feature [`book_reading.feature`](../e2e_test/features/book_reading/book_reading.feature): scenario **Outline row jumps the PDF to the anchored page** uses `Then I should see in the book reader visible PDF viewport on page 2 text including "Strengthening the Code"`.
+- Page object: `expectPdfViewerViewportScreenshotContains` — wait for `[data-page-number]` canvas ink, then `cy.get('[data-testid="pdf-book-viewer"]').screenshot` → `readFile` base64 → `ocrCanvasImage`; step `I should see in the book reader visible PDF viewport on page {int} text including {string}`.
 - **Production:** [`mineruOutlineV1BboxToXyzDestArray`](../frontend/src/lib/book-reading/mineruOutlineV1PageIndex.ts) targets a point **above** the MinerU bbox top by a fixed margin so pdf.js top-biased `scrollPageIntoView` still leaves the section title in the visible band (viewport OCR failed until this).
 
 **Tests:** That scenario path only for the new step; other scenarios still use full-canvas `expectPdfPageMarkerVisible` until Phases 5–7.

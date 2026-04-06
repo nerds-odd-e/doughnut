@@ -122,9 +122,19 @@ const bookReadingPage = () => {
       )
       return this
     },
-    expectPdfViewerViewportScreenshotContains(marker: string) {
+    expectPdfViewerViewportScreenshotContains(
+      marker: string,
+      pageNumber: number
+    ) {
       pageIsNotLoading()
       cy.get('[data-testid="pdf-book-viewer"]').should('be.visible')
+      cy.get(
+        `[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="${pageNumber}"] canvas`
+      )
+        .first()
+        .should(($canvas) => {
+          assertPdfCanvasHasDarkPixels($canvas[0] as HTMLCanvasElement)
+        })
       let screenshotPath = ''
       cy.get('[data-testid="pdf-book-viewer"]')
         .screenshot('book-reading-pdf-viewer-ocr', {
@@ -145,7 +155,7 @@ const bookReadingPage = () => {
         .then((text) => {
           expect(
             text as string,
-            'OCR text from visible PDF book viewer (element screenshot)'
+            `OCR text from visible PDF book viewer (element screenshot); expect content from page ${pageNumber} in view`
           ).to.contain(marker)
         })
       return this

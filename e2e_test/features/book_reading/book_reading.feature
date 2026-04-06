@@ -31,7 +31,7 @@ Feature: Book reading
 
   Scenario: Outline row jumps the PDF to the anchored page
     When I choose the book outline row "2.2 Refactoring as Strengthening the Code"
-    Then I should see in the book reader visible PDF viewport text including "Strengthening the Code"
+    Then I should see in the book reader visible PDF viewport on page 2 text including "Strengthening the Code"
     And the book outline row "2.2 Refactoring as Strengthening the Code" should be selected in the book reader
 
   Scenario: Scrolling the PDF updates the viewport-current outline row
