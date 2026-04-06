@@ -41,36 +41,6 @@ const bookReadingPage = () => {
   const ocrPngBase64 = (base64: string) =>
     cy.task('ocrCanvasImage', base64, { timeout: 60000 })
 
-  const ocrCanvasFromFirstElement = ($canvas: JQuery<HTMLElement>) => {
-    const el = $canvas[0] as HTMLCanvasElement
-    const scale = 2
-    const offscreen = document.createElement('canvas')
-    offscreen.width = el.width * scale
-    offscreen.height = el.height * scale
-    const ctx = offscreen.getContext('2d')!
-    ctx.scale(scale, scale)
-    ctx.drawImage(el, 0, 0)
-    const base64 = offscreen
-      .toDataURL('image/png')
-      .replace(/^data:image\/png;base64,/, '')
-    return ocrPngBase64(base64)
-  }
-
-  const expectCanvasOcrContains = (
-    canvas: Cypress.Chainable<JQuery<HTMLElement>>,
-    assertCanvas: (el: HTMLCanvasElement) => void,
-    ocrMessage: string,
-    substring: string
-  ) =>
-    canvas
-      .should(($canvas) => {
-        assertCanvas($canvas[0] as HTMLCanvasElement)
-      })
-      .then(ocrCanvasFromFirstElement)
-      .then((text) => {
-        expect(text as string, ocrMessage).to.contain(substring)
-      })
-
   return {
     expectBookStructureRows(expected: BookOutlineRow[]) {
       pageIsNotLoading()
@@ -102,19 +72,6 @@ const bookReadingPage = () => {
       outlineNodes()
         .filter('[data-outline-selected="true"]')
         .should('have.length', 1)
-      return this
-    },
-    expectPdfPageMarkerVisible(marker: string, pageNumber: number) {
-      expectCanvasOcrContains(
-        cy
-          .get(
-            `[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="${pageNumber}"] canvas`
-          )
-          .first(),
-        assertPdfCanvasHasDarkPixels,
-        `OCR text from PDF page ${pageNumber} canvas`,
-        marker
-      )
       return this
     },
     expectCurrentPage(pageNumber: number) {
