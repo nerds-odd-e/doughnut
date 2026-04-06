@@ -84,17 +84,17 @@ When(
 )
 
 When(
-  'I add the saved access token in the interactive CLI using add-access-token',
+  'I set the saved access token in the interactive CLI using set-access-token',
   () => {
     cy.get<string>('@savedAccessToken').then((token) => {
       expect(token, 'saved access token').to.be.a('string')
       const interactive = cli.interactiveCli()
       return interactive
-        .enterSlashCommandInInteractiveCli(`/add-access-token ${token}`)
+        .enterSlashCommandInInteractiveCli(`/set-access-token ${token}`)
         .then(() => {
           interactive
             .pastCliAssistantMessages()
-            .expectContains('Token added successfully')
+            .expectContains('Access token saved')
         })
     })
   }

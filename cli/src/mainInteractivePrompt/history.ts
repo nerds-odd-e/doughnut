@@ -3,10 +3,10 @@
  * Single-line draft only; used by MainInteractivePrompt in this folder.
  */
 
-const ADD_ACCESS_TOKEN = '/add-access-token'
+const SET_ACCESS_TOKEN = '/set-access-token'
 
-/** Match `/add-access-token` + whitespace + non-empty argument (case-insensitive on the command). */
-const ADD_ACCESS_TOKEN_WITH_SECRET = /^\/add-access-token\s+(.+)$/i
+/** Match `/set-access-token` + whitespace + non-empty argument (case-insensitive on the command). */
+const SET_ACCESS_TOKEN_WITH_SECRET = /^\/set-access-token\s+(.+)$/i
 
 /**
  * Display-safe line before it is stored in user input history (phase 4: same for disk).
@@ -18,10 +18,10 @@ export function maskInteractiveInputLineForStorage(line: string): string {
   const out = segments.map((segment) => {
     const t = segment.trim()
     if (t.length === 0) return segment
-    const m = t.match(ADD_ACCESS_TOKEN_WITH_SECRET)
+    const m = t.match(SET_ACCESS_TOKEN_WITH_SECRET)
     if (!m || m[1]!.trim().length === 0) return segment
     changed = true
-    return `${ADD_ACCESS_TOKEN} <redacted>`
+    return `${SET_ACCESS_TOKEN} <redacted>`
   })
   return changed ? out.join('\n') : line
 }

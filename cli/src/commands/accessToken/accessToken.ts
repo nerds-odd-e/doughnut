@@ -3,14 +3,14 @@ import {
   doughnutSdkOptions,
   withBackendJson,
 } from '../../backendApi/doughnutBackendClient.js'
-import { appendStoredAccessToken } from '../../backendApi/accessTokenStorage.js'
+import { saveStoredAccessToken } from '../../backendApi/accessTokenStorage.js'
 
-export async function addAccessToken(
+export async function setAccessToken(
   token: string,
   signal?: AbortSignal
 ): Promise<void> {
   const identity = await withBackendJson<UserToken>(token, () =>
     UserController.getTokenInfo(doughnutSdkOptions(signal))
   )
-  appendStoredAccessToken({ label: identity.label, token })
+  saveStoredAccessToken({ label: identity.label, token })
 }

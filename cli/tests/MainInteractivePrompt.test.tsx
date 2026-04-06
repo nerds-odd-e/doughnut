@@ -185,10 +185,10 @@ describe('MainInteractivePrompt Tab completion (phase 2)', () => {
     const { stdin, lastStrippedFrame, waitForLastFrameToInclude } =
       await renderMainInteractivePrompt()
 
-    stdin.write('/add-acc')
-    await waitForLastFrameToInclude('→ /add-acc')
+    stdin.write('/set-acc')
+    await waitForLastFrameToInclude('→ /set-acc')
     stdin.write('\t')
-    await waitForLastFrameToInclude('→ /add-access-token ')
+    await waitForLastFrameToInclude('→ /set-access-token ')
     expect(lineWithMainPrompt(lastStrippedFrame())).not.toMatch(/<token>/)
   })
 

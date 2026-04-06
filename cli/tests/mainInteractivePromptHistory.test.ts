@@ -11,21 +11,21 @@ import {
 } from '../src/mainInteractivePrompt/history.js'
 
 describe('maskInteractiveInputLineForStorage', () => {
-  test('redacts trailing secret after /add-access-token', () => {
+  test('redacts trailing secret after /set-access-token', () => {
     expect(
-      maskInteractiveInputLineForStorage('/add-access-token my-secret-token')
-    ).toBe('/add-access-token <redacted>')
+      maskInteractiveInputLineForStorage('/set-access-token my-secret-token')
+    ).toBe('/set-access-token <redacted>')
   })
 
   test('command match is case-insensitive', () => {
-    expect(maskInteractiveInputLineForStorage('/Add-Access-Token  abc  ')).toBe(
-      '/add-access-token <redacted>'
+    expect(maskInteractiveInputLineForStorage('/Set-Access-Token  abc  ')).toBe(
+      '/set-access-token <redacted>'
     )
   })
 
   test('leaves line unchanged when argument is only whitespace', () => {
-    expect(maskInteractiveInputLineForStorage('/add-access-token   ')).toBe(
-      '/add-access-token   '
+    expect(maskInteractiveInputLineForStorage('/set-access-token   ')).toBe(
+      '/set-access-token   '
     )
   })
 
@@ -36,12 +36,12 @@ describe('maskInteractiveInputLineForStorage', () => {
 
 describe('history append uses mask: recalled line is redacted', () => {
   test('append masked storage then ↑ shows redacted form, not raw secret', () => {
-    const raw = '/add-access-token super-secret-value'
+    const raw = '/set-access-token super-secret-value'
     const lines = appendUserInputHistoryLine(
       [],
       maskInteractiveInputLineForStorage(raw)
     )
-    expect(lines[0]).toBe('/add-access-token <redacted>')
+    expect(lines[0]).toBe('/set-access-token <redacted>')
     const s = {
       ...emptyPromptHistoryState(),
       lineDraft: '',
@@ -49,7 +49,7 @@ describe('history append uses mask: recalled line is redacted', () => {
       userInputHistoryLines: lines,
     }
     expect(onArrowUp(s)).toMatchObject({
-      lineDraft: '/add-access-token <redacted>',
+      lineDraft: '/set-access-token <redacted>',
       userInputHistoryWalkIndex: 0,
     })
   })

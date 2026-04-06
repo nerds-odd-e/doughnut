@@ -9,7 +9,7 @@ import {
   renderInkWhenCommandLineReady,
 } from './inkTestHelpers.js'
 
-describe('InteractiveCliApp /add-access-token', () => {
+describe('InteractiveCliApp /set-access-token', () => {
   let configDir: string
   let savedConfigDir: string | undefined
   let getTokenInfoSpy: ReturnType<typeof vi.spyOn>
@@ -36,25 +36,26 @@ describe('InteractiveCliApp /add-access-token', () => {
     const { stdin, waitForFramesToInclude } =
       await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
-    stdin.write('/add-access-token unit-test-token-value\r')
-    await waitForFramesToInclude('Token added successfully')
-    await waitForFramesToInclude('/add-access-token unit-test-token-value')
+    stdin.write('/set-access-token unit-test-token-value\r')
+    await waitForFramesToInclude('Access token saved')
+    await waitForFramesToInclude('/set-access-token unit-test-token-value')
 
     const stored = JSON.parse(
       fs.readFileSync(path.join(configDir, 'access-tokens.json'), 'utf-8')
-    ) as { tokens: { label: string; token: string }[] }
-    expect(stored.tokens).toEqual([
-      { label: 'Vitest token label', token: 'unit-test-token-value' },
-    ])
+    ) as { token: string; label: string }
+    expect(stored).toEqual({
+      label: 'Vitest token label',
+      token: 'unit-test-token-value',
+    })
   })
 
-  test('bare /add-access-token shows usage hint', async () => {
+  test('bare /set-access-token shows usage hint', async () => {
     const { stdin, waitForFramesToInclude } =
       await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
-    stdin.write('/add-access-token\r')
+    stdin.write('/set-access-token\r')
     await waitForFramesToInclude('Missing access token')
-    await waitForFramesToInclude('/add-access-token <token>')
+    await waitForFramesToInclude('/set-access-token <token>')
     expect(getTokenInfoSpy).not.toHaveBeenCalled()
   })
 
@@ -63,7 +64,7 @@ describe('InteractiveCliApp /add-access-token', () => {
     const { stdin, waitForFramesToInclude } =
       await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
-    stdin.write('/add-access-token bad-token\r')
+    stdin.write('/set-access-token bad-token\r')
     await waitForFramesToInclude('Access token is invalid or expired')
 
     expect(fs.existsSync(path.join(configDir, 'access-tokens.json'))).toBe(
@@ -90,7 +91,7 @@ describe('InteractiveCliApp /add-access-token', () => {
     const { stdin, frames, waitForFramesToInclude } =
       await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
-    stdin.write('/add-access-token unit-test-token-value\r')
+    stdin.write('/set-access-token unit-test-token-value\r')
     await waitForFramesToInclude('Verifying token')
 
     await pressEscapeAndWaitForCancelledLine(stdin, () => frames.join('\n'))

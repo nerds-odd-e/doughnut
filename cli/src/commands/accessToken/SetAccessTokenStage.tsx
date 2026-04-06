@@ -1,8 +1,8 @@
 import { AsyncAssistantFetchStage } from '../gmail/AsyncAssistantFetchStage.js'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
-import { addAccessToken } from './accessToken.js'
+import { setAccessToken } from './accessToken.js'
 
-export function AddAccessTokenStage({
+export function SetAccessTokenStage({
   argument,
   onSettled,
   onAbortWithError,
@@ -12,8 +12,8 @@ export function AddAccessTokenStage({
     <AsyncAssistantFetchStage
       spinnerLabel="Verifying token…"
       runAssistantMessage={async (signal) => {
-        await addAccessToken(token, signal)
-        return 'Token added successfully'
+        await setAccessToken(token, signal)
+        return 'Access token saved'
       }}
       onSettled={onSettled}
       onAbortWithError={onAbortWithError}

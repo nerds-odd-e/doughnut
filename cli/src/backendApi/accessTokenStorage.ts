@@ -1,54 +1,75 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import type { GeneratedTokenDto, TokenConfigDto } from 'doughnut-api'
 import { getConfigDir } from '../configDir.js'
 
-export type AccessTokenEntry = Pick<GeneratedTokenDto, 'label' | 'token'>
-type AccessTokenLabel = TokenConfigDto['label']
-
-export interface AccessTokenConfig {
-  tokens: AccessTokenEntry[]
-  defaultLabel?: AccessTokenLabel
+export interface StoredAccessToken {
+  token: string
+  label?: string
 }
 
-export function defaultAccessTokenLabel(
-  config: AccessTokenConfig
-): AccessTokenLabel | undefined {
-  if (config.tokens.length === 0) return undefined
-  if (
-    config.defaultLabel &&
-    config.tokens.some((t) => t.label === config.defaultLabel)
-  ) {
-    return config.defaultLabel
+type LegacyTokenEntry = { label?: string; token?: string }
+type LegacyFile = {
+  tokens?: LegacyTokenEntry[]
+  defaultLabel?: string
+  token?: string
+  label?: string
+}
+
+function pickLegacyToken(parsed: LegacyFile): StoredAccessToken | undefined {
+  if (typeof parsed.token === 'string' && parsed.token !== '') {
+    return {
+      token: parsed.token,
+      label: typeof parsed.label === 'string' ? parsed.label : undefined,
+    }
   }
-  return config.tokens[0]!.label
+  const tokens = parsed.tokens
+  if (!Array.isArray(tokens) || tokens.length === 0) return undefined
+  const asEntry = (e: unknown): StoredAccessToken | undefined => {
+    if (!e || typeof e !== 'object') return undefined
+    const o = e as LegacyTokenEntry
+    if (typeof o.token !== 'string' || o.token === '') return undefined
+    return {
+      token: o.token,
+      label: typeof o.label === 'string' ? o.label : undefined,
+    }
+  }
+  const dl = parsed.defaultLabel
+  if (typeof dl === 'string') {
+    for (const t of tokens) {
+      if (t && typeof t === 'object' && (t as LegacyTokenEntry).label === dl) {
+        const r = asEntry(t)
+        if (r) return r
+      }
+    }
+  }
+  for (const t of tokens) {
+    const r = asEntry(t)
+    if (r) return r
+  }
+  return undefined
 }
 
 function getConfigPath(): string {
   return path.join(getConfigDir(), 'access-tokens.json')
 }
 
-export function loadAccessTokenConfig(): AccessTokenConfig {
+/** Loads the single stored API token, migrating legacy `tokens` / `defaultLabel` files on read. */
+export function loadStoredAccessToken(): StoredAccessToken | undefined {
   try {
     const data = fs.readFileSync(getConfigPath(), 'utf-8')
-    const parsed = JSON.parse(data) as Partial<AccessTokenConfig>
-    return { tokens: parsed.tokens ?? [], defaultLabel: parsed.defaultLabel }
+    const parsed = JSON.parse(data) as LegacyFile
+    return pickLegacyToken(parsed)
   } catch {
-    return { tokens: [] }
+    return undefined
   }
 }
 
-export function saveAccessTokenConfig(config: AccessTokenConfig): void {
+export function saveStoredAccessToken(entry: StoredAccessToken): void {
   const p = getConfigPath()
   fs.mkdirSync(path.dirname(p), { recursive: true })
-  fs.writeFileSync(p, JSON.stringify(config, null, 2), 'utf-8')
-}
-
-export function appendStoredAccessToken(entry: AccessTokenEntry): void {
-  const config = loadAccessTokenConfig()
-  if (config.tokens.some((t) => t.token === entry.token)) {
-    throw new Error('Token already added.')
+  const out: Record<string, string> = { token: entry.token }
+  if (entry.label !== undefined && entry.label !== '') {
+    out.label = entry.label
   }
-  config.tokens.push(entry)
-  saveAccessTokenConfig(config)
+  fs.writeFileSync(p, JSON.stringify(out, null, 2), 'utf-8')
 }

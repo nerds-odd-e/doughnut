@@ -7,10 +7,7 @@ export function tempConfigWithToken(namePrefix = 'doughnut-cli-test-'): string {
   const configDir = fs.mkdtempSync(path.join(os.tmpdir(), namePrefix))
   fs.writeFileSync(
     path.join(configDir, 'access-tokens.json'),
-    JSON.stringify({
-      tokens: [{ label: 't', token: 'fake-bearer' }],
-      defaultLabel: 't',
-    })
+    JSON.stringify({ token: 'fake-bearer', label: 't' })
   )
   return configDir
 }

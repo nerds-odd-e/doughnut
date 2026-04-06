@@ -7,10 +7,7 @@ import {
   type BookFull,
   type RequestOptions,
 } from 'doughnut-api'
-import {
-  defaultAccessTokenLabel,
-  loadAccessTokenConfig,
-} from './accessTokenStorage.js'
+import { loadStoredAccessToken } from './accessTokenStorage.js'
 
 /**
  * For every call to the generated Doughnut HTTP client that runs inside
@@ -30,7 +27,8 @@ export function doughnutSdkOptions(
 }
 
 const authenticatedBackendCallFailureAdvice = {
-  noDefaultTokenInConfig: 'No default access token. Run doughnut login first.',
+  noAccessTokenInConfig:
+    'No access token configured. Run doughnut login first.',
   serviceUnreachableOrUnclassifiedFailure:
     'Doughnut service is not available. Check DOUGHNUT_API_BASE_URL and ensure the service is running.',
   http401StoredTokenRejected:
@@ -263,18 +261,11 @@ export async function withBackendJson<T>(
 export async function runWithDefaultBackendClient<T>(
   fn: () => Promise<T>
 ): Promise<T> {
-  const config = loadAccessTokenConfig()
-  const label = defaultAccessTokenLabel(config)
-  const entry =
-    label === undefined
-      ? undefined
-      : config.tokens.find((t) => t.label === label)
-  if (!entry) {
-    throw new Error(
-      authenticatedBackendCallFailureAdvice.noDefaultTokenInConfig
-    )
+  const stored = loadStoredAccessToken()
+  if (!stored) {
+    throw new Error(authenticatedBackendCallFailureAdvice.noAccessTokenInConfig)
   }
-  return withBackendClient(entry.token, fn)
+  return withBackendClient(stored.token, fn)
 }
 
 /**
@@ -294,16 +285,9 @@ export async function attachNotebookBookWithPdf(
   pdfAbsolutePath: string,
   signal?: AbortSignal
 ): Promise<BookFull> {
-  const config = loadAccessTokenConfig()
-  const label = defaultAccessTokenLabel(config)
-  const entry =
-    label === undefined
-      ? undefined
-      : config.tokens.find((t) => t.label === label)
-  if (!entry) {
-    throw new Error(
-      authenticatedBackendCallFailureAdvice.noDefaultTokenInConfig
-    )
+  const stored = loadStoredAccessToken()
+  if (!stored) {
+    throw new Error(authenticatedBackendCallFailureAdvice.noAccessTokenInConfig)
   }
 
   const { apiBaseUrl } = getApiConfig()
@@ -319,12 +303,12 @@ export async function attachNotebookBookWithPdf(
     basename(pdfAbsolutePath)
   )
 
-  return withBackendClient(entry.token, async () => {
+  return withBackendClient(stored.token, async () => {
     const res = await fetch(
       `${apiBaseUrl}/api/notebooks/${notebookId}/attach-book`,
       {
         method: 'POST',
-        headers: { Authorization: `Bearer ${entry.token}` },
+        headers: { Authorization: `Bearer ${stored.token}` },
         body: form,
         signal,
       }

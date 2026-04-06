@@ -1,4 +1,4 @@
-import { addAccessTokenSlashCommand } from './accessToken/addAccessTokenSlashCommand.js'
+import { setAccessTokenSlashCommand } from './accessToken/setAccessTokenSlashCommand.js'
 import { addGmailSlashCommand } from './gmail/addGmail/addGmailSlashCommand.js'
 import { exitSlashCommand } from './exit.js'
 import { createHelpSlashCommand } from './help.js'
@@ -9,7 +9,7 @@ import { useNotebookSlashCommand } from './notebook/useNotebookSlashCommand.js'
 import { recallStatusSlashCommand } from './recallStatus.js'
 export const interactiveSlashCommands: readonly InteractiveSlashCommand[] = [
   createHelpSlashCommand(() => interactiveSlashCommands.map((c) => c.doc)),
-  addAccessTokenSlashCommand,
+  setAccessTokenSlashCommand,
   addGmailSlashCommand,
   lastEmailSlashCommand,
   recallSlashCommand,
