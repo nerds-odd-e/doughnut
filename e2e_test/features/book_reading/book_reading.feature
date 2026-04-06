@@ -13,7 +13,7 @@ Feature: Book reading
 
   Scenario: See book structure and beginning of PDF in the browser
     Then I should see the book structure in the browser:
-      | 0 | Refactoring |
+      | 0 | Code Refactoring |
       | 0 | 1. Refactoring: Protecting Intention in Working Software |
       | 0 | 2. The Usual Defi nition Is Not Enough |
       | 0 | 2.1 Easier to Change—and Harder to Misuse |
