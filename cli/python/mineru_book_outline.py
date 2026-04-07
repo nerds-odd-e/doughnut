@@ -156,10 +156,9 @@ def find_middle_json(output_dir: Path, stem: str) -> Path | None:
     return matches[0] if matches else None
 
 
-def _anchor_pair(payload: dict[str, Any]) -> tuple[dict[str, str], dict[str, str]]:
+def _anchor(payload: dict[str, Any]) -> dict[str, str]:
     s = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
-    a = {"anchorFormat": ANCHOR_FORMAT, "value": s}
-    return a, a
+    return {"anchorFormat": ANCHOR_FORMAT, "value": s}
 
 
 def layout_roots_from_heading_records(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -172,11 +171,10 @@ def layout_roots_from_heading_records(records: list[dict[str, Any]]) -> list[dic
         if not title:
             continue
         payload = {k: rec[k] for k in ("page_idx", "bbox", "source", "spine_index", "href") if k in rec and rec[k] is not None}
-        start_a, end_a = _anchor_pair(payload if payload else {"kind": "heading"})
+        start_a = _anchor(payload if payload else {"kind": "heading"})
         node: dict[str, Any] = {
             "title": title,
             "startAnchor": start_a,
-            "endAnchor": end_a,
         }
         while stack and stack[-1][0] >= level:
             stack.pop()

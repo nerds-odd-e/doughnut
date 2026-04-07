@@ -161,7 +161,6 @@ public class BookService {
           "title exceeds maximum length");
     }
     validateAnchor(node.getStartAnchor(), "startAnchor");
-    validateAnchor(node.getEndAnchor(), "endAnchor");
     List<AttachBookLayoutNodeRequest> children = node.getChildren();
     if (children != null) {
       for (AttachBookLayoutNodeRequest child : children) {
@@ -210,14 +209,9 @@ public class BookService {
     start.setAnchorFormat(ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1);
     start.setValue(node.getStartAnchor().getValue().trim());
 
-    BookAnchor end = new BookAnchor();
-    end.setAnchorFormat(ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1);
-    end.setValue(node.getEndAnchor().getValue().trim());
-
     BookRange range = new BookRange();
     range.setStructuralTitle(trimmedMax(node.getTitle(), 512));
     range.setStartAnchor(start);
-    range.setEndAnchor(end);
     range.setParent(parent);
     range.setSiblingOrder(siblingIndex);
     book.addRange(range);

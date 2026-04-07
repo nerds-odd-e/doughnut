@@ -41,14 +41,6 @@ public class BookRange extends EntityIdentifiedByIdOnly {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private BookAnchor startAnchor;
 
-  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-  @JoinColumn(name = "end_anchor_id", nullable = false)
-  @Getter
-  @Setter
-  @JsonView(BookViews.Full.class)
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private BookAnchor endAnchor;
-
   @Column(name = "sibling_order", nullable = false)
   @Getter
   @Setter

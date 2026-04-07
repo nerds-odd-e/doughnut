@@ -32,11 +32,17 @@ Then I should see the book structure of the notebook "Top Maths" in the browser
 
 ## Story: Reading record
 
-- mark a book range as started
-- mark a book range as finished
-- mark a book range as skipped
-- mark a book range as skimmed
-- reset the reading status of a book range
+
+
+### mark a book range as started
+
+Given I scroll to book range "xxx" 
+Then I should see that book range "xxx" is marked as reading started
+
+### mark a book range as finished
+### mark a book range as skipped
+### mark a book range as skimmed
+### reset the reading status of a book range
 
 ---
 

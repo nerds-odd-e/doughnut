@@ -293,7 +293,6 @@ export type AttachBookAnchorRequestFull = {
 export type AttachBookLayoutNodeRequestFull = {
     title: string;
     startAnchor: AttachBookAnchorRequestFull;
-    endAnchor: AttachBookAnchorRequestFull;
     children?: Array<AttachBookLayoutNodeRequestFull>;
 };
 
@@ -319,7 +318,6 @@ export type BookAnchorFull = {
 export type BookRangeFull = {
     id: number;
     startAnchor: BookAnchorFull;
-    endAnchor: BookAnchorFull;
     siblingOrder?: number;
     title: string;
     parentRangeId?: string;

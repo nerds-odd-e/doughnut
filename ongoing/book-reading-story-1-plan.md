@@ -64,7 +64,6 @@ This is the **interchange structure** the CLI (Phase 3) builds from MinerU / out
 |-------|------|----------|--------|
 | `title` | string | yes | Maps to `BookRange.structuralTitle` / tree label (non-empty after trim). |
 | `startAnchor` | anchor object | yes | See below. |
-| `endAnchor` | anchor object | yes | See below. |
 | `children` | array | no | Same as `roots` element shape; **omit or use `[]`** for leaves. Sibling order = array order. |
 
 **Anchor object (mirrors roadmap `BookAnchor` on the wire)**
@@ -77,7 +76,7 @@ This is the **interchange structure** the CLI (Phase 3) builds from MinerU / out
 **Server mapping (directional, not implementation detail):**
 
 - One `Book` per successful `attach-book`: `format` and `bookName` from payload; **`sourceFileRef` unset or null** until a later upload/bind step.
-- Recursive descent of `layout.roots` / `children` → one **`BookRange`** per node, parent/child from **nesting**, `structuralTitle` from `title`, `startAnchor` / `endAnchor` → **`BookAnchor`** rows.
+- Recursive descent of `layout.roots` / `children` → one **`BookRange`** per node, parent/child from **nesting**, `structuralTitle` from `title`, `startAnchor` → **`BookAnchor`** row.
 - Reject: invalid anchors, or structural violations (e.g. excessively deep tree—limit TBD if needed).
 
 ### Read path for Phase 2
@@ -87,7 +86,7 @@ This is the **interchange structure** the CLI (Phase 3) builds from MinerU / out
 **Data shape (directional, persistence):**
 
 - One `Book` per logical attach on a notebook: `format` from payload; **`sourceFileRef`** populated only after the **separate** file pipeline lands.
-- Outline nodes map to **`BookRange`** with parent/child links from the stored tree, `structuralTitle` text, and **`BookAnchor`** start/end per range (`anchorFormat` + `value` per roadmap).
+- Outline nodes map to **`BookRange`** with parent/child links from the stored tree, `structuralTitle` text, and one **`BookAnchor`** per range (`anchorFormat` + `value` per roadmap).
 
 **Tests:** Prefer **controller-level** tests with real DB (`@Transactional`) and **`makeMe`** factories. Assert HTTP response bodies and persistence (e.g. reload from repository), not internal service private methods. Use **`application/json`** request bodies (nested `layout.roots` / `children`).
 

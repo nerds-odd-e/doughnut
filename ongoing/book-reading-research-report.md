@@ -77,7 +77,7 @@ The landscape research above talks about “TOC,” “structure,” “highligh
 | Research theme | Domain role |
 |----------------|-------------|
 | Book file, format, import | **`Book`** in a **`Notebook`** (`format`, `sourceFileRef`) |
-| Outline / chapter / section / navigable chunk | **`BookRange`**: `startAnchor` / `endAnchor`, optional `structuralTitle` text, optional child ranges for hierarchy |
+| Outline / chapter / section / navigable chunk | **`BookRange`**: `startAnchor`, optional `structuralTitle` text, optional child ranges for hierarchy |
 | Exact point or span in the file (PDF coords, EPUB CFI, etc.) | **`BookAnchor`**: `anchorFormat` + opaque `value` until format-specific design hardens |
 | “This highlight is from here” / evidence for a PKM note | **`SourceSpan`**: anchor pair, optionally scoped **`within`** a `BookRange`; a **`Note`** has at most one `SourceSpan` for now |
 | “Where I left off” / completed a section | **`ReadingRecord`**: per **`User`**, refers to a **`BookRange`** (meaningful chunk), not a tiny citation span |

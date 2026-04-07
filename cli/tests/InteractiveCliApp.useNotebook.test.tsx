@@ -110,18 +110,10 @@ describe('InteractiveCliApp /use notebook integration', () => {
                 anchorFormat: 'pdf.mineru_outline_v1',
                 value: '{}',
               },
-              endAnchor: {
-                anchorFormat: 'pdf.mineru_outline_v1',
-                value: '{}',
-              },
               children: [
                 {
                   title: 'Part One Child',
                   startAnchor: {
-                    anchorFormat: 'pdf.mineru_outline_v1',
-                    value: '{}',
-                  },
-                  endAnchor: {
                     anchorFormat: 'pdf.mineru_outline_v1',
                     value: '{}',
                   },

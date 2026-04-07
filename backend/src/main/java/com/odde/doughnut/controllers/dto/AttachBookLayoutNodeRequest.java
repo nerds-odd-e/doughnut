@@ -23,10 +23,5 @@ public class AttachBookLayoutNodeRequest {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private AttachBookAnchorRequest startAnchor;
 
-  @NotNull
-  @Valid
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private AttachBookAnchorRequest endAnchor;
-
   @Valid private List<AttachBookLayoutNodeRequest> children;
 }

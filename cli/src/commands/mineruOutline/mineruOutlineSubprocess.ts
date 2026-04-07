@@ -234,10 +234,6 @@ function validateLayoutNode(node: unknown): string | null {
   if (startErr !== null) {
     return startErr
   }
-  const endErr = validateAnchor(node.endAnchor, 'endAnchor')
-  if (endErr !== null) {
-    return endErr
-  }
   if (node.children !== undefined) {
     if (!Array.isArray(node.children)) {
       return 'layout node children must be an array'

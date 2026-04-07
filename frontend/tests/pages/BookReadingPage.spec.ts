@@ -21,7 +21,6 @@ function topMathsLikeFlatRanges(): BookRangeFull[] {
     id: i + 1,
     title: `Section ${i + 1}`,
     startAnchor,
-    endAnchor: startAnchor,
     siblingOrder: i,
   }))
 }

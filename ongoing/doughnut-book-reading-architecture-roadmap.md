@@ -67,7 +67,6 @@ classDiagram
 
     Book "1" --> "0..*" BookRange : has
     BookRange "1" --> "1" BookAnchor : startAnchor
-    BookRange "1" --> "1" BookAnchor : endAnchor
 
     BookRange "0..1" --> "0..*" BookRange : child ranges
 
@@ -88,7 +87,7 @@ Keep the abstraction **open** early: `anchorFormat` + `value` (opaque until form
 
 ### BookRange
 
-A region: `startAnchor` + `endAnchor`. Primary unit for **navigation**, **hierarchical decomposition**, and **progress**. Optional **`structuralTitle`** is the human-readable label for that node in the outline (e.g. `Chapter 3`, `2.4.1`). A breadcrumb-style path can be **derived** by walking parent ranges; we do not use a separate persisted “structural address” field.
+A region: **`startAnchor`** locates the section in the book file. Primary unit for **navigation**, **hierarchical decomposition**, and **progress**. Optional **`structuralTitle`** is the human-readable label for that node in the outline (e.g. `Chapter 3`, `2.4.1`). A breadcrumb-style path can be **derived** by walking parent ranges; we do not use a separate persisted “structural address” field.
 
 ### SourceSpan
 
@@ -106,7 +105,7 @@ Per `User`, refers to a `BookRange`. Progress attaches to **meaningful chunks**,
 
 ## Architectural rules (default)
 
-1. Every `BookRange` has exactly one `startAnchor` and one `endAnchor`.
+1. Every `BookRange` has exactly one `startAnchor`.
 2. Every `SourceSpan` has exactly one `startAnchor` and one `endAnchor`.
 3. `ReadingRecord` points at a `BookRange`, not a `SourceSpan`.
 4. `SourceSpan` is optional on `Note`.

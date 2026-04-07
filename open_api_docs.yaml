@@ -3580,14 +3580,11 @@ components:
           minLength: 0
         startAnchor:
           $ref: "#/components/schemas/AttachBookAnchorRequest_Full"
-        endAnchor:
-          $ref: "#/components/schemas/AttachBookAnchorRequest_Full"
         children:
           type: array
           items:
             $ref: "#/components/schemas/AttachBookLayoutNodeRequest_Full"
       required:
-      - endAnchor
       - startAnchor
       - title
     AttachBookLayoutRequest_Full:
@@ -3637,8 +3634,6 @@ components:
           format: int32
         startAnchor:
           $ref: "#/components/schemas/BookAnchor_Full"
-        endAnchor:
-          $ref: "#/components/schemas/BookAnchor_Full"
         siblingOrder:
           type: integer
           format: int64
@@ -3647,7 +3642,6 @@ components:
         parentRangeId:
           type: string
       required:
-      - endAnchor
       - id
       - startAnchor
       - title

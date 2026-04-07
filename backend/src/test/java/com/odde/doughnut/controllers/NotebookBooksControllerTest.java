@@ -73,7 +73,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     AttachBookLayoutNodeRequest n = new AttachBookLayoutNodeRequest();
     n.setTitle(title);
     n.setStartAnchor(anchor("{\"p\":1}"));
-    n.setEndAnchor(anchor("{\"p\":2}"));
     if (kids != null && kids.length > 0) {
       n.setChildren(new ArrayList<>(List.of(kids)));
     }
