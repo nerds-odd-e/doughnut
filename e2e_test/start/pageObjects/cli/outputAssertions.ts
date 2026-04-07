@@ -160,30 +160,28 @@ async function assertPastUserMessagesContains(
     )
   }
 
-  if (expected !== '') {
-    await waitForTextInSurface({
-      raw,
-      needle: expected,
-      surface: 'fullBuffer',
-      timeoutMs: 0,
-      retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
-      strict: false,
-      messagePrefix: 'Past user messages (in past user messages).',
-    })
+  await waitForTextInSurface({
+    raw,
+    needle: expected,
+    surface: 'fullBuffer',
+    timeoutMs: 0,
+    retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
+    strict: false,
+    messagePrefix: 'Past user messages (in past user messages).',
+  })
 
-    await waitForTextInSurface({
-      raw,
-      needle: new RegExp(
-        String.raw`(?:^|\n)[^\S\n]*\n[^\n]*${escapeRegExpLiteral(expected)}[^\n]*`
-      ),
-      surface: 'strippedTranscript',
-      timeoutMs: 0,
-      retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
-      strict: false,
-      messagePrefix:
-        'Past user messages must leave one blank line above the matching user message.',
-    })
-  }
+  await waitForTextInSurface({
+    raw,
+    needle: new RegExp(
+      String.raw`(?:^|\n)[^\S\n]*\n[^\n]*${escapeRegExpLiteral(expected)}[^\n]*`
+    ),
+    surface: 'strippedTranscript',
+    timeoutMs: 0,
+    retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
+    strict: false,
+    messagePrefix:
+      'Past user messages must leave one blank line above the matching user message.',
+  })
 
   const lastIdx = raw.lastIndexOf(expected)
   const windowBefore = raw.slice(Math.max(0, lastIdx - 120), lastIdx)
