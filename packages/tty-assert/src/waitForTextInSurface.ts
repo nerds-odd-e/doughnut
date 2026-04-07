@@ -14,6 +14,7 @@
  */
 
 import { Terminal } from '@xterm/headless'
+import { formatRawTerminalSnapshotForError } from './errorSnapshotFormatting'
 import { CLI_INTERACTIVE_PTY_COLS, CLI_INTERACTIVE_PTY_ROWS } from './geometry'
 import { stripAnsiCliPty } from './stripAnsi'
 
@@ -49,6 +50,8 @@ export type WaitForTextInSurfaceOptions = {
   startAfterAnchor?: RegExp[]
   /** When no anchor matches, search the bottom N rows (default: all rows). */
   fallbackRowCount?: number
+  /** Prepended to the failure body (one line is typical), before surface/snapshot sections. */
+  messagePrefix?: string
 }
 
 /** Default delay between poll attempts when `timeoutMs` is positive; Cypress adapter should use the same value for `cy.wait` between buffer re-reads. */
@@ -275,6 +278,25 @@ function formatFailureMessage(
   return `${detail}\nSearch surface: "${surface}".\n${note}\n---\n${snap}\n---`
 }
 
+const CLI_TERMINAL_RAW_SNAPSHOT_HEADING =
+  '--- CLI terminal snapshot (ANSI-stripped, safe text) ---'
+
+function withOptionalMessagePrefix(
+  prefix: string | undefined,
+  body: string
+): string {
+  if (prefix == null || prefix === '') return body
+  const p = prefix.replace(/\n+$/, '')
+  return `${p}\n${body}`
+}
+
+function appendRawTerminalSnapshotForErrorMessage(
+  body: string,
+  raw: string
+): string {
+  return `${body}\n\n${CLI_TERMINAL_RAW_SNAPSHOT_HEADING}\n${formatRawTerminalSnapshotForError(raw)}`
+}
+
 /**
  * Resolves when `needle` appears in the chosen `surface` of `raw` (replay or strip).
  * Polls until `timeoutMs` when the needle is absent (e.g. `raw` grows between attempts via a getter).
@@ -288,6 +310,7 @@ export async function waitForTextInSurface(
   const strict = opts.strict ?? true
   const cols = opts.cols ?? CLI_INTERACTIVE_PTY_COLS
   const rows = opts.rows ?? CLI_INTERACTIVE_PTY_ROWS
+  const messagePrefix = opts.messagePrefix
 
   const started = Date.now()
   let lastFail: { snapshot: string; detail: string } | undefined
@@ -305,8 +328,12 @@ export async function waitForTextInSurface(
     if (result.ok === true) return
 
     if (result.ok === 'strict') {
-      throw new TtyAssertStrictModeViolationError(
+      const body = withOptionalMessagePrefix(
+        messagePrefix,
         formatFailureMessage(opts.surface, result.message, result.snapshot)
+      )
+      throw new TtyAssertStrictModeViolationError(
+        appendRawTerminalSnapshotForErrorMessage(body, raw)
       )
     }
 
@@ -316,9 +343,11 @@ export async function waitForTextInSurface(
         timeoutMs === 0
           ? lastFail.detail
           : `Timeout after ${timeoutMs}ms. ${lastFail.detail}`
-      throw new Error(
+      const body = withOptionalMessagePrefix(
+        messagePrefix,
         formatFailureMessage(opts.surface, detail, lastFail.snapshot)
       )
+      throw new Error(appendRawTerminalSnapshotForErrorMessage(body, raw))
     }
     await sleep(retryMs)
   }

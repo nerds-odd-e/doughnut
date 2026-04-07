@@ -70,6 +70,21 @@ describe('waitForTextInSurface', () => {
     ).rejects.toThrow(/surface "viewableBuffer"[\s\S]*---\n/)
   })
 
+  it('failure message includes ANSI-stripped raw snapshot and optional messagePrefix', async () => {
+    const err = await waitForTextInSurface({
+      raw: 'pty-bytes',
+      needle: 'nope',
+      surface: 'strippedTranscript',
+      timeoutMs: 0,
+      messagePrefix: 'Custom prefix.',
+    }).catch((e: unknown) => e)
+    expect(err).toBeInstanceOf(Error)
+    const msg = (err as Error).message
+    expect(msg).toMatch(/^Custom prefix\.\n/)
+    expect(msg).toContain('raw bytes:')
+    expect(msg).toContain('ANSI-stripped:')
+  })
+
   it('with timeoutMs 0, failure does not say "Timeout after 0ms" (single-shot callers)', async () => {
     const err = await waitForTextInSurface({
       raw: 'x',

@@ -51,19 +51,15 @@ async function assertStrippedPtyTranscriptContains(
   domainHeading: string
 ): Promise<void> {
   if (expected === '') return
-  try {
-    await waitForTextInSurface({
-      raw,
-      needle: expected,
-      surface: 'strippedTranscript',
-      timeoutMs: 0,
-      retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
-      strict: false,
-    })
-  } catch (err) {
-    const detail = err instanceof Error ? err.message : String(err)
-    failCliAssertion(`${domainHeading}.\n${detail}`, raw)
-  }
+  await waitForTextInSurface({
+    raw,
+    needle: expected,
+    surface: 'strippedTranscript',
+    timeoutMs: 0,
+    retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
+    strict: false,
+    messagePrefix: `${domainHeading}.`,
+  })
 }
 
 async function assertAnsweredQuestionsContains(
@@ -91,20 +87,16 @@ async function assertCurrentGuidanceContains(
   expected: string
 ): Promise<void> {
   if (expected === '') return
-  try {
-    await waitForTextInSurface({
-      raw,
-      needle: expected,
-      surface: 'viewableBuffer',
-      startAfterAnchor: GUIDANCE_ANCHORS,
-      fallbackRowCount: GUIDANCE_FALLBACK_ROWS,
-      timeoutMs: 0,
-      strict: false,
-    })
-  } catch (err) {
-    const detail = err instanceof Error ? err.message : String(err)
-    failCliAssertion(`Current guidance assertion failed.\n${detail}`, raw)
-  }
+  await waitForTextInSurface({
+    raw,
+    needle: expected,
+    surface: 'viewableBuffer',
+    startAfterAnchor: GUIDANCE_ANCHORS,
+    fallbackRowCount: GUIDANCE_FALLBACK_ROWS,
+    timeoutMs: 0,
+    strict: false,
+    messagePrefix: 'Current guidance assertion failed.',
+  })
 }
 
 /**
@@ -179,22 +171,15 @@ async function assertPastUserMessagesContains(
   const preview = headPreview(stripped)
 
   if (expected !== '') {
-    try {
-      await waitForTextInSurface({
-        raw,
-        needle: expected,
-        surface: 'strippedTranscript',
-        timeoutMs: 0,
-        retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
-        strict: false,
-      })
-    } catch (err) {
-      const detail = err instanceof Error ? err.message : String(err)
-      failCliAssertion(
-        `Past user messages (in past user messages).\n${detail}`,
-        raw
-      )
-    }
+    await waitForTextInSurface({
+      raw,
+      needle: expected,
+      surface: 'strippedTranscript',
+      timeoutMs: 0,
+      retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
+      strict: false,
+      messagePrefix: 'Past user messages (in past user messages).',
+    })
   }
 
   const lastIdx = raw.lastIndexOf(expected)
