@@ -11,6 +11,14 @@ import topMathsUrl from "../../../e2e_test/fixtures/book_reading/top-maths.pdf?u
 
 const fetchMock = createFetchMock(vi)
 
+/** Keep in sync with `BookReadingPage.vue` */
+const VIEWPORT_CURRENT_ANCHOR_DEBOUNCE_MS = 120
+const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
+
+const notebookId = 7
+
+let topMathsPdfBytes!: ArrayBuffer
+
 function bookFileUrlSuffix(id: number) {
   return `/api/notebooks/${id}/book/file`
 }
@@ -34,11 +42,11 @@ function fetchRequestUrl(input: RequestInfo | URL): string {
 }
 
 function mockNotebookBookFilePdfOk(
-  notebookId: number,
+  id: number,
   pdfBytes: ArrayBuffer,
   options?: { assertSameOriginCredentials?: boolean }
 ) {
-  const suffix = bookFileUrlSuffix(notebookId)
+  const suffix = bookFileUrlSuffix(id)
   vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
     const url = fetchRequestUrl(input)
     if (!url.endsWith(suffix)) {
@@ -47,9 +55,8 @@ function mockNotebookBookFilePdfOk(
     if (options?.assertSameOriginCredentials) {
       expect(init?.credentials).toBe("same-origin")
     }
-    const copy = pdfBytes.slice(0)
     return Promise.resolve(
-      new Response(copy, {
+      new Response(pdfBytes.slice(0), {
         status: 200,
         headers: { "Content-Type": "application/pdf" },
       })
@@ -57,11 +64,11 @@ function mockNotebookBookFilePdfOk(
   })
 }
 
-function mountBookReadingPage(notebookId: number) {
+function mountBookReadingPage(id: number) {
   return helper
     .component(BookReadingPage)
     .withRouter()
-    .withProps({ notebookId })
+    .withProps({ notebookId: id })
     .mount()
 }
 
@@ -73,7 +80,7 @@ async function waitForPdfViewer(wrapper: BookReadingPageWrapper) {
       expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(
         true
       ),
-    { timeout: 15_000 }
+    { timeout: 8000 }
   )
 }
 
@@ -96,11 +103,80 @@ async function withStubbedInnerWidth<T>(
   }
 }
 
+async function withFakeTimers(run: () => Promise<void>) {
+  vi.useFakeTimers()
+  try {
+    await run()
+  } finally {
+    vi.useRealTimers()
+  }
+}
+
+function stubGetBookPlain() {
+  return vi
+    .spyOn(NotebookBooksController, "getBook")
+    .mockResolvedValue(wrapSdkResponse(makeMe.aBook.please()))
+}
+
+function stubGetBookWithTopMathsRanges() {
+  return vi
+    .spyOn(NotebookBooksController, "getBook")
+    .mockResolvedValue(
+      wrapSdkResponse(makeMe.aBook.ranges(topMathsLikeFlatRanges()).please())
+    )
+}
+
+async function mountLoadedBookWithRanges(
+  id: number,
+  options?: {
+    innerWidth?: number
+    assertSameOriginCredentials?: boolean
+  }
+) {
+  stubGetBookWithTopMathsRanges()
+  mockNotebookBookFilePdfOk(id, topMathsPdfBytes, {
+    assertSameOriginCredentials: options?.assertSameOriginCredentials,
+  })
+  const mount = async () => {
+    const wrapper = mountBookReadingPage(id)
+    await waitForPdfViewer(wrapper)
+    return wrapper
+  }
+  if (options?.innerWidth !== undefined) {
+    return withStubbedInnerWidth(options.innerWidth, mount)
+  }
+  return mount()
+}
+
+function pdfScrollRestoreSpy(wrapper: BookReadingPageWrapper) {
+  const pdf = wrapper.findComponent(PdfBookViewer)
+  const exposed = (
+    pdf.vm as unknown as {
+      $: {
+        exposed: {
+          scrollToStoredReadingPosition: (
+            page: number,
+            y: number
+          ) => Promise<void>
+        }
+      }
+    }
+  ).$.exposed
+  return { pdf, spy: vi.spyOn(exposed, "scrollToStoredReadingPosition") }
+}
+
+async function mountPatchDebounceScenario() {
+  stubGetBookWithTopMathsRanges()
+  mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+  const patchSpy = vi
+    .spyOn(NotebookBooksController, "patchNotebookBookReadingPosition")
+    .mockResolvedValue(wrapSdkResponse(undefined))
+  const wrapper = mountBookReadingPage(notebookId)
+  await waitForPdfViewer(wrapper)
+  return { wrapper, patchSpy }
+}
+
 describe("BookReadingPage", () => {
-  const notebookId = 7
-
-  let topMathsPdfBytes: ArrayBuffer
-
   beforeAll(async () => {
     fetchMock.disableMocks()
     const res = await fetch(topMathsUrl)
@@ -111,8 +187,6 @@ describe("BookReadingPage", () => {
 
   beforeEach(() => {
     vi.restoreAllMocks()
-    // Default to "no saved position" so existing tests that mock fetch globally
-    // are not affected by the concurrent getNotebookBookReadingPosition call.
     vi.spyOn(
       NotebookBooksController,
       "getNotebookBookReadingPosition"
@@ -126,9 +200,7 @@ describe("BookReadingPage", () => {
   })
 
   it("shows fetch error when book file returns an error status", async () => {
-    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-      wrapSdkResponse(makeMe.aBook.please())
-    )
+    stubGetBookPlain()
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(null, { status: 404 })
     )
@@ -158,10 +230,7 @@ describe("BookReadingPage", () => {
   })
 
   it("shows loading indicator while PDF is loading, hides it after render", async () => {
-    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-      wrapSdkResponse(makeMe.aBook.please())
-    )
-
+    stubGetBookPlain()
     let resolveFetch!: (r: Response) => void
     vi.spyOn(globalThis, "fetch").mockReturnValue(
       new Promise<Response>((resolve) => {
@@ -175,14 +244,14 @@ describe("BookReadingPage", () => {
     expect(wrapper.find(".daisy-loading-spinner").exists()).toBe(true)
     expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(false)
 
-    const copy = topMathsPdfBytes.slice(0)
     resolveFetch(
-      new Response(copy, {
+      new Response(topMathsPdfBytes.slice(0), {
         status: 200,
         headers: { "Content-Type": "application/pdf" },
       })
     )
 
+    await flushPromises()
     await vi.waitFor(
       () => expect(wrapper.find(".daisy-loading-spinner").exists()).toBe(false),
       { timeout: 5000 }
@@ -190,9 +259,7 @@ describe("BookReadingPage", () => {
   })
 
   it("loads PDF into viewer when hasSourceFile is true", async () => {
-    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-      wrapSdkResponse(makeMe.aBook.please())
-    )
+    stubGetBookPlain()
     mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes, {
       assertSameOriginCredentials: true,
     })
@@ -202,9 +269,7 @@ describe("BookReadingPage", () => {
   })
 
   it("shows error when PDF bytes are not valid", async () => {
-    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-      wrapSdkResponse(makeMe.aBook.please())
-    )
+    stubGetBookPlain()
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(new TextEncoder().encode("not a pdf").buffer, {
         status: 200,
@@ -220,7 +285,7 @@ describe("BookReadingPage", () => {
           wrapper.find('[data-testid="book-reading-pdf-error"]').exists()
         ).toBe(true)
       },
-      { timeout: 15_000 }
+      { timeout: 5000 }
     )
 
     expect(wrapper.find('[data-testid="book-reading-pdf-error"]').text()).toBe(
@@ -230,46 +295,35 @@ describe("BookReadingPage", () => {
   })
 
   it("updates viewport-current outline row while outline drawer is closed (Phase 6.9)", async () => {
-    await withStubbedInnerWidth(500, async () => {
-      vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-        wrapSdkResponse(makeMe.aBook.ranges(topMathsLikeFlatRanges()).please())
-      )
-      mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+    const wrapper = await mountLoadedBookWithRanges(notebookId, {
+      innerWidth: 500,
+    })
+    const pdf = wrapper.findComponent(PdfBookViewer)
 
-      const wrapper = mountBookReadingPage(notebookId)
-      await waitForPdfViewer(wrapper)
-
-      const pdf = wrapper.findComponent(PdfBookViewer)
+    await withFakeTimers(async () => {
       pdf.vm.$emit("viewportAnchorPage", {
         anchorPageIndexZeroBased: 0,
         viewport: null,
         pagesCount: 10,
       })
-
-      await new Promise((r) => setTimeout(r, 200))
-
-      const indicator = wrapper.find(
-        '[data-testid="book-reading-page-indicator"]'
-      )
-      expect(indicator.exists()).toBe(true)
-      expect(indicator.text().trim()).toBe("1 / 10")
-
-      const current = wrapper.find('[data-outline-current="true"]')
-      expect(current.exists()).toBe(true)
-      expect(current.attributes("aria-current")).toBe("location")
-      expect(current.text()).toBe("Section 3")
+      await vi.advanceTimersByTimeAsync(VIEWPORT_CURRENT_ANCHOR_DEBOUNCE_MS)
+      await flushPromises()
     })
+
+    const indicator = wrapper.find(
+      '[data-testid="book-reading-page-indicator"]'
+    )
+    expect(indicator.exists()).toBe(true)
+    expect(indicator.text().trim()).toBe("1 / 10")
+
+    const current = wrapper.find('[data-outline-current="true"]')
+    expect(current.exists()).toBe(true)
+    expect(current.attributes("aria-current")).toBe("location")
+    expect(current.text()).toBe("Section 3")
   })
 
   it("zoom buttons exist with accessible names and page indicator shows via PdfControl (Phase 12)", async () => {
-    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-      wrapSdkResponse(makeMe.aBook.ranges(topMathsLikeFlatRanges()).please())
-    )
-    mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
-
-    const wrapper = mountBookReadingPage(notebookId)
-    await waitForPdfViewer(wrapper)
-
+    const wrapper = await mountLoadedBookWithRanges(notebookId)
     expect(
       wrapper.find('[data-testid="pdf-zoom-in"]').attributes("aria-label")
     ).toBe("Zoom in")
@@ -278,12 +332,15 @@ describe("BookReadingPage", () => {
     ).toBe("Zoom out")
 
     const pdf = wrapper.findComponent(PdfBookViewer)
-    pdf.vm.$emit("viewportAnchorPage", {
-      anchorPageIndexZeroBased: 0,
-      viewport: null,
-      pagesCount: 5,
+    await withFakeTimers(async () => {
+      pdf.vm.$emit("viewportAnchorPage", {
+        anchorPageIndexZeroBased: 0,
+        viewport: null,
+        pagesCount: 5,
+      })
+      await vi.advanceTimersByTimeAsync(VIEWPORT_CURRENT_ANCHOR_DEBOUNCE_MS)
+      await flushPromises()
     })
-    await new Promise((r) => setTimeout(r, 200))
 
     const indicator = wrapper.find(
       '[data-testid="book-reading-page-indicator"]'
@@ -293,71 +350,35 @@ describe("BookReadingPage", () => {
   })
 
   it("debounces PATCH reading position on rapid viewport updates (Phase 1.3)", async () => {
-    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-      wrapSdkResponse(makeMe.aBook.ranges(topMathsLikeFlatRanges()).please())
-    )
-    mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+    const { wrapper, patchSpy } = await mountPatchDebounceScenario()
+    const pdf = wrapper.findComponent(PdfBookViewer)
+    const viewport = { top: 0, mid: 500, bottom: 1000 }
 
-    const patchSpy = vi
-      .spyOn(NotebookBooksController, "patchNotebookBookReadingPosition")
-      .mockResolvedValue(wrapSdkResponse(undefined))
-
-    const wrapper = mountBookReadingPage(notebookId)
-    await waitForPdfViewer(wrapper)
-
-    vi.useFakeTimers()
-    try {
-      const pdf = wrapper.findComponent(PdfBookViewer)
-      const viewport = { top: 0, mid: 500, bottom: 1000 }
-
-      pdf.vm.$emit("viewportAnchorPage", {
-        anchorPageIndexZeroBased: 2,
-        viewport,
-        pagesCount: 10,
-      })
-      pdf.vm.$emit("viewportAnchorPage", {
-        anchorPageIndexZeroBased: 2,
-        viewport,
-        pagesCount: 10,
-      })
-      pdf.vm.$emit("viewportAnchorPage", {
-        anchorPageIndexZeroBased: 2,
-        viewport,
-        pagesCount: 10,
-      })
-
+    await withFakeTimers(async () => {
+      for (let i = 0; i < 3; i++) {
+        pdf.vm.$emit("viewportAnchorPage", {
+          anchorPageIndexZeroBased: 2,
+          viewport,
+          pagesCount: 10,
+        })
+      }
       expect(patchSpy).not.toHaveBeenCalled()
-
-      await vi.advanceTimersByTimeAsync(400)
+      await vi.advanceTimersByTimeAsync(LAST_READ_POSITION_PATCH_DEBOUNCE_MS)
       await flushPromises()
+    })
 
-      expect(patchSpy).toHaveBeenCalledTimes(1)
-      expect(patchSpy).toHaveBeenCalledWith({
-        path: { notebook: notebookId },
-        body: { pageIndex: 2, normalizedY: 500 },
-      })
-    } finally {
-      vi.useRealTimers()
-    }
+    expect(patchSpy).toHaveBeenCalledTimes(1)
+    expect(patchSpy).toHaveBeenCalledWith({
+      path: { notebook: notebookId },
+      body: { pageIndex: 2, normalizedY: 500 },
+    })
   })
 
   it("PATCH reading position uses last viewport mid within debounce window (Phase 1.3)", async () => {
-    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-      wrapSdkResponse(makeMe.aBook.ranges(topMathsLikeFlatRanges()).please())
-    )
-    mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+    const { wrapper, patchSpy } = await mountPatchDebounceScenario()
+    const pdf = wrapper.findComponent(PdfBookViewer)
 
-    const patchSpy = vi
-      .spyOn(NotebookBooksController, "patchNotebookBookReadingPosition")
-      .mockResolvedValue(wrapSdkResponse(undefined))
-
-    const wrapper = mountBookReadingPage(notebookId)
-    await waitForPdfViewer(wrapper)
-
-    vi.useFakeTimers()
-    try {
-      const pdf = wrapper.findComponent(PdfBookViewer)
-
+    await withFakeTimers(async () => {
       pdf.vm.$emit("viewportAnchorPage", {
         anchorPageIndexZeroBased: 0,
         viewport: { top: 0, mid: 100, bottom: 200 },
@@ -368,37 +389,22 @@ describe("BookReadingPage", () => {
         viewport: { top: 0, mid: 250, bottom: 300 },
         pagesCount: 10,
       })
-
-      await vi.advanceTimersByTimeAsync(400)
+      await vi.advanceTimersByTimeAsync(LAST_READ_POSITION_PATCH_DEBOUNCE_MS)
       await flushPromises()
+    })
 
-      expect(patchSpy).toHaveBeenCalledTimes(1)
-      expect(patchSpy.mock.calls[0]?.[0]).toEqual({
-        path: { notebook: notebookId },
-        body: { pageIndex: 0, normalizedY: 250 },
-      })
-    } finally {
-      vi.useRealTimers()
-    }
+    expect(patchSpy).toHaveBeenCalledTimes(1)
+    expect(patchSpy.mock.calls[0]?.[0]).toEqual({
+      path: { notebook: notebookId },
+      body: { pageIndex: 0, normalizedY: 250 },
+    })
   })
 
   it("does not PATCH reading position when viewport is null (Phase 1.3)", async () => {
-    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-      wrapSdkResponse(makeMe.aBook.ranges(topMathsLikeFlatRanges()).please())
-    )
-    mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+    const { wrapper, patchSpy } = await mountPatchDebounceScenario()
+    const pdf = wrapper.findComponent(PdfBookViewer)
 
-    const patchSpy = vi
-      .spyOn(NotebookBooksController, "patchNotebookBookReadingPosition")
-      .mockResolvedValue(wrapSdkResponse(undefined))
-
-    const wrapper = mountBookReadingPage(notebookId)
-    await waitForPdfViewer(wrapper)
-
-    vi.useFakeTimers()
-    try {
-      const pdf = wrapper.findComponent(PdfBookViewer)
-
+    await withFakeTimers(async () => {
       pdf.vm.$emit("viewportAnchorPage", {
         anchorPageIndexZeroBased: 0,
         viewport: null,
@@ -409,20 +415,15 @@ describe("BookReadingPage", () => {
         viewport: null,
         pagesCount: 10,
       })
-
-      await vi.advanceTimersByTimeAsync(400)
+      await vi.advanceTimersByTimeAsync(LAST_READ_POSITION_PATCH_DEBOUNCE_MS)
       await flushPromises()
+    })
 
-      expect(patchSpy).not.toHaveBeenCalled()
-    } finally {
-      vi.useRealTimers()
-    }
+    expect(patchSpy).not.toHaveBeenCalled()
   })
 
   it("restores reading position from stored snapshot on open (Phase 1.4)", async () => {
-    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-      wrapSdkResponse(makeMe.aBook.please())
-    )
+    stubGetBookPlain()
     vi.spyOn(
       NotebookBooksController,
       "getNotebookBookReadingPosition"
@@ -434,21 +435,7 @@ describe("BookReadingPage", () => {
     const wrapper = mountBookReadingPage(notebookId)
     await waitForPdfViewer(wrapper)
 
-    const pdf = wrapper.findComponent(PdfBookViewer)
-    const exposed = (
-      pdf.vm as unknown as {
-        $: {
-          exposed: {
-            scrollToStoredReadingPosition: (
-              page: number,
-              y: number
-            ) => Promise<void>
-          }
-        }
-      }
-    ).$.exposed
-    const spy = vi.spyOn(exposed, "scrollToStoredReadingPosition")
-
+    const { pdf, spy } = pdfScrollRestoreSpy(wrapper)
     pdf.vm.$emit("pagesReady")
     await flushPromises()
 
@@ -456,29 +443,13 @@ describe("BookReadingPage", () => {
   })
 
   it("does not restore reading position when no snapshot exists (Phase 1.4)", async () => {
-    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-      wrapSdkResponse(makeMe.aBook.please())
-    )
+    stubGetBookPlain()
     mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
 
     const wrapper = mountBookReadingPage(notebookId)
     await waitForPdfViewer(wrapper)
 
-    const pdf = wrapper.findComponent(PdfBookViewer)
-    const exposed = (
-      pdf.vm as unknown as {
-        $: {
-          exposed: {
-            scrollToStoredReadingPosition: (
-              page: number,
-              y: number
-            ) => Promise<void>
-          }
-        }
-      }
-    ).$.exposed
-    const spy = vi.spyOn(exposed, "scrollToStoredReadingPosition")
-
+    const { pdf, spy } = pdfScrollRestoreSpy(wrapper)
     pdf.vm.$emit("pagesReady")
     await flushPromises()
 
@@ -487,13 +458,7 @@ describe("BookReadingPage", () => {
 
   it("outline toggle exposes aria-expanded and aria-controls (Phase 7.7)", async () => {
     await withStubbedInnerWidth(1024, async () => {
-      vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-        wrapSdkResponse(makeMe.aBook.ranges(topMathsLikeFlatRanges()).please())
-      )
-      mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
-
-      const wrapper = mountBookReadingPage(notebookId)
-      await waitForPdfViewer(wrapper)
+      const wrapper = await mountLoadedBookWithRanges(notebookId)
 
       const toggle = wrapper.find('[data-testid="book-reading-outline-toggle"]')
       const aside = wrapper.find('[data-testid="book-reading-outline-aside"]')
