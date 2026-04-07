@@ -122,3 +122,57 @@ export function pdfViewerViewportTopYDown(
     },
   }
 }
+
+/**
+ * Page index + MinerU Y (0–1000) for the **top edge** of the scroll container, both referring to the
+ * **same** PDF page: the page whose rendered div contains that Y in screen space.
+ *
+ * This differs from {@link pdfViewerViewportTopYDown}, which projects top/mid/bottom onto the page
+ * that contains the viewport **center**. Across a page boundary the center can sit on page N+1 while
+ * the visible top is still on page N; pairing `anchorPageIndexZeroBased` with `viewport.top` from
+ * that function then mislabels Y as if it were on N+1. Last-read save/restore must use this helper
+ * (or equivalent) so `pageIndex` and `normalizedY` always describe one physical page.
+ */
+export function pdfViewerReadingPositionTopEdge(
+  scrollContainer: HTMLElement,
+  pdfViewer: PdfJsViewerForViewport
+): { pageIndexZeroBased: number; normalizedTop: number } | null {
+  const pages = pdfViewer.pagesCount
+  if (pages <= 0 || !pdfViewer.pdfDocument) {
+    return null
+  }
+  const containerRect = scrollContainer.getBoundingClientRect()
+  const topY = containerRect.top
+
+  for (let i = 0; i < pages; i++) {
+    const pageView = pdfViewer.getPageView(i) as PageViewLike | undefined
+    const div = pageView?.div
+    if (!div) continue
+    const pr = div.getBoundingClientRect()
+    if (pr.height <= 1) continue
+    if (topY >= pr.top && topY < pr.bottom) {
+      const normalizedTop =
+        (Math.max(0, Math.min(topY - pr.top, pr.height)) / pr.height) * 1000
+      return { pageIndexZeroBased: i, normalizedTop }
+    }
+  }
+
+  const first = pdfViewer.getPageView(0) as PageViewLike | undefined
+  if (first?.div) {
+    const pr = first.div.getBoundingClientRect()
+    if (pr.height > 1 && topY < pr.top) {
+      return { pageIndexZeroBased: 0, normalizedTop: 0 }
+    }
+  }
+
+  const lastIdx = pages - 1
+  const last = pdfViewer.getPageView(lastIdx) as PageViewLike | undefined
+  if (last?.div) {
+    const pr = last.div.getBoundingClientRect()
+    if (pr.height > 1 && topY >= pr.bottom) {
+      return { pageIndexZeroBased: lastIdx, normalizedTop: 1000 }
+    }
+  }
+
+  return null
+}

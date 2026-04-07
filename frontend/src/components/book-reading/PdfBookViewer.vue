@@ -21,6 +21,7 @@ import {
   wheelDeltaYToScaleFactor,
 } from "@/lib/book-reading/pdfBookViewerZoomAroundPoint"
 import {
+  pdfViewerReadingPositionTopEdge,
   pdfViewerViewportTopYDown,
   type ViewportYRange,
 } from "@/lib/book-reading/pdfViewerViewportTopYDown"
@@ -50,6 +51,10 @@ const emit = defineEmits<{
       anchorPageIndexZeroBased: number
       viewport: ViewportYRange | null
       pagesCount: number
+      readingPosition: {
+        pageIndexZeroBased: number
+        normalizedTop: number
+      } | null
     },
   ]
   pagesReady: []
@@ -194,10 +199,12 @@ function emitViewportDescriptorIfChanged() {
   }
   lastEmittedPage = sample.anchorPageIndexZeroBased
   lastEmittedYQuantized = midQ
+  const readingPosition = pdfViewerReadingPositionTopEdge(container, pdfViewer)
   emit("viewportAnchorPage", {
     anchorPageIndexZeroBased: sample.anchorPageIndexZeroBased,
     viewport: sample.viewport,
     pagesCount: pdfViewer.pagesCount,
+    readingPosition,
   })
 }
 

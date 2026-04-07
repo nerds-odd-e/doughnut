@@ -281,6 +281,10 @@ function onViewportAnchorPage(payload: {
   anchorPageIndexZeroBased: number
   viewport: ViewportYRange | null
   pagesCount: number
+  readingPosition?: {
+    pageIndexZeroBased: number
+    normalizedTop: number
+  } | null
 }) {
   if (payload.pagesCount > 0) {
     pdfBarCurrentPage.value = payload.anchorPageIndexZeroBased + 1
@@ -293,10 +297,20 @@ function onViewportAnchorPage(payload: {
     payload.pagesCount
   )
   viewportCurrentAnchorDebouncer.propose(candidate)
-  if (payload.viewport !== null) {
+  let reading: { pageIndexZeroBased: number; normalizedTop: number } | null =
+    null
+  if (payload.readingPosition !== undefined) {
+    reading = payload.readingPosition
+  } else if (payload.viewport !== null) {
+    reading = {
+      pageIndexZeroBased: payload.anchorPageIndexZeroBased,
+      normalizedTop: payload.viewport.top,
+    }
+  }
+  if (reading !== null) {
     lastReadPositionPatchDebouncer.propose(
-      payload.anchorPageIndexZeroBased,
-      Math.round(payload.viewport.top)
+      reading.pageIndexZeroBased,
+      Math.round(reading.normalizedTop)
     )
   }
 }
