@@ -1,3 +1,5 @@
+import { debounce } from "es-toolkit"
+
 export type ViewportCurrentAnchorDebouncer = {
   propose: (id: number | null) => void
   cancel: () => void
@@ -9,45 +11,27 @@ export function createViewportCurrentAnchorDebouncer(options: {
   commit: (id: number | null) => void
 }): ViewportCurrentAnchorDebouncer {
   const { delayMs, commit } = options
-  let timeoutId: ReturnType<typeof setTimeout> | null = null
-  /** `undefined` = nothing queued; `null` is a valid queued value */
-  let pending: number | null | undefined
   let lastCommitted: number | null = null
 
-  function fire() {
-    timeoutId = null
-    if (pending === undefined) return
-    const next = pending
-    pending = undefined
-    if (next === lastCommitted) return
-    lastCommitted = next
-    commit(next)
+  const apply = (id: number | null) => {
+    if (id === lastCommitted) {
+      return
+    }
+    lastCommitted = id
+    commit(id)
   }
+
+  const debounced = debounce(apply, delayMs)
 
   return {
     propose(id: number | null) {
-      if (id === lastCommitted && pending === undefined && timeoutId === null) {
-        return
-      }
-      pending = id
-      if (timeoutId !== null) {
-        clearTimeout(timeoutId)
-      }
-      timeoutId = setTimeout(fire, delayMs)
+      debounced(id)
     },
     cancel() {
-      if (timeoutId !== null) {
-        clearTimeout(timeoutId)
-        timeoutId = null
-      }
-      pending = undefined
+      debounced.cancel()
     },
     commitNow(id: number | null) {
-      if (timeoutId !== null) {
-        clearTimeout(timeoutId)
-        timeoutId = null
-      }
-      pending = undefined
+      debounced.cancel()
       if (id === lastCommitted) {
         return
       }

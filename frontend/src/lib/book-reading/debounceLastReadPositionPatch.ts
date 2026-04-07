@@ -1,3 +1,5 @@
+import { debounce } from "es-toolkit"
+
 export type LastReadPositionPatchBody = {
   pageIndex: number
   normalizedY: number
@@ -13,19 +15,13 @@ export function createLastReadPositionPatchDebouncer(options: {
   patch: (body: LastReadPositionPatchBody) => Promise<unknown>
 }): LastReadPositionPatchDebouncer {
   const { delayMs, patch } = options
-  let timeoutId: ReturnType<typeof setTimeout> | null = null
-  let pending: LastReadPositionPatchBody | undefined
   let lastSent: LastReadPositionPatchBody | null = null
 
   function same(a: LastReadPositionPatchBody, b: LastReadPositionPatchBody) {
     return a.pageIndex === b.pageIndex && a.normalizedY === b.normalizedY
   }
 
-  function fire() {
-    timeoutId = null
-    if (pending === undefined) return
-    const next = pending
-    pending = undefined
+  const sendIfNeeded = (next: LastReadPositionPatchBody) => {
     if (lastSent !== null && same(lastSent, next)) {
       return
     }
@@ -36,29 +32,16 @@ export function createLastReadPositionPatchDebouncer(options: {
       .catch(() => undefined)
   }
 
+  const debounced = debounce((pageIndex: number, normalizedY: number) => {
+    sendIfNeeded({ pageIndex, normalizedY })
+  }, delayMs)
+
   return {
-    propose(pageIndex, normalizedY) {
-      const next = { pageIndex, normalizedY }
-      if (
-        lastSent !== null &&
-        same(lastSent, next) &&
-        pending === undefined &&
-        timeoutId === null
-      ) {
-        return
-      }
-      pending = next
-      if (timeoutId !== null) {
-        clearTimeout(timeoutId)
-      }
-      timeoutId = setTimeout(fire, delayMs)
+    propose(pageIndex: number, normalizedY: number) {
+      debounced(pageIndex, normalizedY)
     },
     cancel() {
-      if (timeoutId !== null) {
-        clearTimeout(timeoutId)
-        timeoutId = null
-      }
-      pending = undefined
+      debounced.cancel()
     },
   }
 }
