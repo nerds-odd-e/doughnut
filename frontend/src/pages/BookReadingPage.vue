@@ -161,6 +161,7 @@ import {
 import { createViewportCurrentAnchorDebouncer } from "@/lib/book-reading/debounceViewportCurrentAnchorId"
 import { nextLiveAnnouncementText } from "@/lib/book-reading/viewportCurrentLiveAnnouncement"
 import { viewportCurrentAnchorIdFromAnchorPage } from "@/lib/book-reading/viewportCurrentRangeFromAnchorPage"
+import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
 import type {
   BookAnchorFull,
   BookFull,
@@ -273,7 +274,7 @@ const viewportCurrentAnchorDebouncer = createViewportCurrentAnchorDebouncer({
 
 function onViewportAnchorPage(payload: {
   anchorPageIndexZeroBased: number
-  viewportTopYDown: number | null
+  viewport: ViewportYRange | null
   pagesCount: number
 }) {
   if (payload.pagesCount > 0) {
@@ -283,7 +284,7 @@ function onViewportAnchorPage(payload: {
   const candidate = viewportCurrentAnchorIdFromAnchorPage(
     outlineRows.value.map((n) => n.startAnchor),
     payload.anchorPageIndexZeroBased,
-    payload.viewportTopYDown,
+    payload.viewport,
     payload.pagesCount
   )
   viewportCurrentAnchorDebouncer.propose(candidate)

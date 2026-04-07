@@ -133,9 +133,9 @@ const bookReadingPage = () => {
       return this
     },
     /**
-     * Scrolls by 30% of the rendered page-1 height so §2.1 (at ~63% of the page) lands in the
-     * upper two-thirds of the visible area. Using a fraction of page height instead of fixed CSS
-     * pixels makes the scroll viewport-size- and scale-independent.
+     * Scrolls by 42% of the rendered page-1 height from §1's click position (y≈204 MinerU),
+     * giving total scroll ≈ 624 MinerU — past §2's bbox bottom (y1=608) so §2 scrolls above the
+     * viewport, making §2.1 (y0=631) the first visible anchor and therefore viewport-current.
      */
     scrollPdfBookReaderDownWithinSamePageForNextBbox() {
       pageIsNotLoading()
@@ -146,7 +146,7 @@ const bookReadingPage = () => {
         .then(($page) => {
           const pageHeight = ($page[0] as HTMLElement).getBoundingClientRect()
             .height
-          const deltaPx = Math.round(pageHeight * 0.3)
+          const deltaPx = Math.round(pageHeight * 0.42)
           cy.get('[data-testid="pdf-book-viewer"]').then(($viewer) => {
             const el = scrollableAncestorWithinBookReadingPage(
               $viewer[0] as HTMLElement

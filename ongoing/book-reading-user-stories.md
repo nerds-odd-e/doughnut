@@ -36,6 +36,12 @@ _(Sub-stories to be added.)_
 
 ---
 
+## Story: Reorganizing the book layout
+
+_(Sub-stories to be added.)_
+
+---
+
 ## Story: Decide or navigate to the next range to read
 
 _(Sub-stories to be added.)_

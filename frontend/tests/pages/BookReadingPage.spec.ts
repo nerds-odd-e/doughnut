@@ -231,7 +231,7 @@ describe("BookReadingPage", () => {
       const pdf = wrapper.findComponent(PdfBookViewer)
       pdf.vm.$emit("viewportAnchorPage", {
         anchorPageIndexZeroBased: 0,
-        viewportTopYDown: null,
+        viewport: null,
         pagesCount: 10,
       })
 

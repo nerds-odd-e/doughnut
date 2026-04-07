@@ -2,6 +2,19 @@ type PageViewLike = {
   div: HTMLDivElement | undefined
 }
 
+/**
+ * Viewport Y-range projected onto the anchor page, in MinerU-style coordinates
+ * (0–1000, origin top-left, y increasing downward).
+ */
+export type ViewportYRange = {
+  /** Y at the top edge of the visible container (page may extend above this). */
+  top: number
+  /** Y at the vertical midpoint of the scroll container. */
+  mid: number
+  /** Y at the bottom edge of the visible container (page may extend below this). */
+  bottom: number
+}
+
 /** Minimal pdf.js `PDFViewer` surface used here (avoids duplicate pdfjs-dist type trees in TS). */
 export type PdfJsViewerForViewport = {
   pagesCount: number
@@ -55,23 +68,22 @@ export function pageIndexForScrollContainerCenter(
 }
 
 /**
- * Picks the pdf.js page via `pageIndexForScrollContainerCenter`, then computes a reading-reference Y
- * at **2/3 down the visible slice** (MinerU-style, 0–1000, top-down). The 2/3 point means a heading
- * becomes "viewport-current" once it is in the upper two-thirds of the visible area — stable across
- * viewport heights (midpoint or top-edge approaches are too sensitive to container size).
+ * Picks the pdf.js page via `pageIndexForScrollContainerCenter`, then projects the scroll
+ * container's visible Y-range onto that page as a `ViewportYRange` (0–1000 MinerU, top-down):
+ * - `top`: where the container top falls on the page (0 when page starts at or above container top)
+ * - `mid`: the container midpoint projected onto the page
+ * - `bottom`: where the container bottom falls on the page (1000 when page extends below container)
  *
- * Coordinates are derived directly from CSS layout (`getBoundingClientRect`), avoiding
- * PDF-internal coordinate roundtrips (`getPagePoint` / `getViewport`) that can drift with
- * CSS transforms or device pixel ratio.
+ * Returns `null` for the viewport when the page is not meaningfully visible (height ≤ 1 px).
  */
 export function pdfViewerViewportTopYDown(
   scrollContainer: HTMLElement,
   pdfViewer: PdfJsViewerForViewport
-): { anchorPageIndexZeroBased: number; viewportTopYDown: number | null } {
+): { anchorPageIndexZeroBased: number; viewport: ViewportYRange | null } {
   const pages = pdfViewer.pagesCount
 
   if (pages === 0 || !pdfViewer.pdfDocument) {
-    return { anchorPageIndexZeroBased: 0, viewportTopYDown: null }
+    return { anchorPageIndexZeroBased: 0, viewport: null }
   }
   const pageIndex = pageIndexForScrollContainerCenter(
     scrollContainer,
@@ -80,7 +92,7 @@ export function pdfViewerViewportTopYDown(
   const pageView = pdfViewer.getPageView(pageIndex) as PageViewLike | undefined
 
   if (!pageView?.div) {
-    return { anchorPageIndexZeroBased: pageIndex, viewportTopYDown: null }
+    return { anchorPageIndexZeroBased: pageIndex, viewport: null }
   }
 
   const containerRect = scrollContainer.getBoundingClientRect()
@@ -88,22 +100,25 @@ export function pdfViewerViewportTopYDown(
   const visibleTop = Math.max(containerRect.top, pageRect.top)
   const visibleBottom = Math.min(containerRect.bottom, pageRect.bottom)
   if (visibleBottom <= visibleTop + 1) {
-    return { anchorPageIndexZeroBased: pageIndex, viewportTopYDown: null }
+    return { anchorPageIndexZeroBased: pageIndex, viewport: null }
   }
 
   const pageRenderedHeight = pageRect.bottom - pageRect.top
   if (pageRenderedHeight <= 0) {
-    return { anchorPageIndexZeroBased: pageIndex, viewportTopYDown: null }
+    return { anchorPageIndexZeroBased: pageIndex, viewport: null }
   }
 
-  const readingLineY = visibleTop + (2 / 3) * (visibleBottom - visibleTop)
-  const localY = Math.max(
-    0,
-    Math.min(readingLineY - pageRect.top, pageRenderedHeight)
-  )
+  const toMineruY = (cssY: number) =>
+    (Math.max(0, Math.min(cssY - pageRect.top, pageRenderedHeight)) /
+      pageRenderedHeight) *
+    1000
 
   return {
     anchorPageIndexZeroBased: pageIndex,
-    viewportTopYDown: (localY / pageRenderedHeight) * 1000,
+    viewport: {
+      top: toMineruY(containerRect.top),
+      mid: toMineruY((containerRect.top + containerRect.bottom) / 2),
+      bottom: toMineruY(containerRect.bottom),
+    },
   }
 }

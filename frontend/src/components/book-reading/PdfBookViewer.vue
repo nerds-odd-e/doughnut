@@ -14,7 +14,10 @@ import {
   attachPdfBookViewerGeometryResampleListeners,
   createCoalescedRequestAnimationFrameEmitter,
 } from "@/lib/book-reading/pdfBookViewerGeometryResample"
-import { pdfViewerViewportTopYDown } from "@/lib/book-reading/pdfViewerViewportTopYDown"
+import {
+  pdfViewerViewportTopYDown,
+  type ViewportYRange,
+} from "@/lib/book-reading/pdfViewerViewportTopYDown"
 import { attachOutlineSelectionBboxHighlight } from "@/lib/book-reading/outlineSelectionBboxHighlight"
 import { mineruOutlineV1BboxToXyzDestArray } from "@/lib/book-reading/mineruOutlineV1PageIndex"
 import type { MineruOutlineV1Bbox } from "@/lib/book-reading/mineruOutlineV1PageIndex"
@@ -39,7 +42,7 @@ const emit = defineEmits<{
   viewportAnchorPage: [
     {
       anchorPageIndexZeroBased: number
-      viewportTopYDown: number | null
+      viewport: ViewportYRange | null
       pagesCount: number
     },
   ]
@@ -77,21 +80,21 @@ function emitViewportDescriptorIfChanged() {
   const container = containerRef.value
   if (!container || !pdfViewer) return
   const sample = pdfViewerViewportTopYDown(container, pdfViewer)
-  const yq =
-    sample.viewportTopYDown === null
+  const midQ =
+    sample.viewport === null
       ? null
-      : Math.round(sample.viewportTopYDown * 100) / 100
+      : Math.round(sample.viewport.mid * 100) / 100
   if (
     lastEmittedPage === sample.anchorPageIndexZeroBased &&
-    lastEmittedYQuantized === yq
+    lastEmittedYQuantized === midQ
   ) {
     return
   }
   lastEmittedPage = sample.anchorPageIndexZeroBased
-  lastEmittedYQuantized = yq
+  lastEmittedYQuantized = midQ
   emit("viewportAnchorPage", {
     anchorPageIndexZeroBased: sample.anchorPageIndexZeroBased,
-    viewportTopYDown: sample.viewportTopYDown,
+    viewport: sample.viewport,
     pagesCount: pdfViewer.pagesCount,
   })
 }
