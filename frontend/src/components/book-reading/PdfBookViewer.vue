@@ -61,6 +61,9 @@ let onScrollForViewport: (() => void) | null = null
 let geometryRafEmitter: ReturnType<
   typeof createCoalescedRequestAnimationFrameEmitter
 > | null = null
+let viewportOnlyRafEmitter: ReturnType<
+  typeof createCoalescedRequestAnimationFrameEmitter
+> | null = null
 let detachGeometryResampleListeners: (() => void) | null = null
 let intrinsicFirstPageWidth = 0
 let userAdjustedScale = false
@@ -70,6 +73,8 @@ const SCALE_EPSILON = 0.001
 function teardownGeometryResample() {
   geometryRafEmitter?.cancel()
   geometryRafEmitter = null
+  viewportOnlyRafEmitter?.cancel()
+  viewportOnlyRafEmitter = null
   detachGeometryResampleListeners?.()
   detachGeometryResampleListeners = null
 }
@@ -280,11 +285,15 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
       emitViewportDescriptorIfChanged()
     },
   })
+  viewportOnlyRafEmitter = createCoalescedRequestAnimationFrameEmitter({
+    emit: () => emitViewportDescriptorIfChanged(),
+  })
   detachGeometryResampleListeners =
     attachPdfBookViewerGeometryResampleListeners({
       container,
       eventBus,
       scheduleEmit: () => geometryRafEmitter!.schedule(),
+      scheduleEmitOnScaleChange: () => viewportOnlyRafEmitter!.schedule(),
     })
 
   eventBus.on("pagesinit", () => {
