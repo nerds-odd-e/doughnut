@@ -16,6 +16,7 @@ Separate concerns so one object does not have to mean everything at once:
 |--------|---------------------|
 | **Where** | A single precise point in a book file |
 | **Which region** | A navigable or hierarchical chunk (section, “current reading unit”) |
+| **Direct content** | Material between this outline node and the next in **document reading order**, ignoring nesting depth (see below) |
 | **Evidence** | The exact span a note is about |
 | **Knowledge** | The user’s PKM note |
 | **Progress** | Where the user is in the book, at chunk granularity |
@@ -41,6 +42,14 @@ classDiagram
 
     class BookRange {
       +structuralTitle : text
+    }
+
+    class DirectContentReadingState {
+      <<conceptual>>
+      READ
+      SKIPPED
+      SKIMMED
+      NO_DIRECT_CONTENT_FOUND
     }
 
     class BookAnchor {
@@ -70,6 +79,8 @@ classDiagram
 
     BookRange "0..1" --> "0..*" BookRange : child ranges
 
+    BookRange "1" ..> "0..1" DirectContentReadingState : direct content disposition
+
     Note "0..*" --> "0..1" SourceSpan : cites
     SourceSpan "1" --> "1" BookAnchor : startAnchor
     SourceSpan "1" --> "1" BookAnchor : endAnchor
@@ -88,6 +99,29 @@ Keep the abstraction **open** early: `anchorFormat` + `value` (opaque until form
 ### BookRange
 
 A region: **`startAnchor`** locates the section in the book file. Primary unit for **navigation**, **hierarchical decomposition**, and **progress**. Optional **`structuralTitle`** is the human-readable label for that node in the outline (e.g. `Chapter 3`, `2.4.1`). A breadcrumb-style path can be **derived** by walking parent ranges; we do not use a separate persisted “structural address” field.
+
+Each `BookRange` also has a conceptual association to **direct content** (see next subsection).
+
+### Direct content (conceptual)
+
+**Direct content** is whatever lies **between** one `BookRange` and the **next** `BookRange` in reading order, or **to the end of the book** if this range is the last node in that order.
+
+- The outline may be **nested**, but direct content is **not** defined by nesting depth. It is always “from this node’s start until the next node’s start (or EOF),” following the same **linear reading order** the product uses to walk the tree (depth-first preorder is the natural default: parent, then subtree, then sibling).
+- **Parent node:** Its direct content is the material **between itself and its first child** (i.e. after this range’s start until the first child’s start). If there is no child, the next boundary is the same rule as for a leaf: the following node in the walk, or EOF.
+- **Last child in a subtree:** Its direct content runs **from its start until the next range after leaving that subtree** (the next sibling of an ancestor, or EOF)—not “until parent’s end,” unless the outline order says so.
+
+**Persistence and extraction:** For now, direct content is **only a vocabulary and UX/progress concept**. We do **not** require a stored blob, span table, or server-side extraction of that gap. When the product needs it, anchors or text extraction can be added without renaming the idea.
+
+**Disposition (per range, conceptual):** How the user (or system) treats the direct content attached to a range can be classified for product logic:
+
+| Disposition | Meaning (informal) |
+|-------------|-------------------|
+| **Direct content read** | The gap was read as intended. |
+| **Direct content skipped** | The user skipped it. |
+| **Direct content skimmed** | The user skimmed it (lighter than “read”). |
+| **No direct content found** | There is no meaningful gap (e.g. adjacent anchors, or structure implies none). |
+
+These dispositions are **not** persisted in the current architecture; they document the **intended states** when we model reading behavior. The diagram shows them as **`DirectContentReadingState`** linked conceptually to `BookRange`.
 
 ### SourceSpan
 
@@ -110,6 +144,7 @@ Per `User`, refers to a `BookRange`. Progress attaches to **meaningful chunks**,
 3. `ReadingRecord` points at a `BookRange`, not a `SourceSpan`.
 4. `SourceSpan` is optional on `Note`.
 5. Prefer `SourceSpan` to be smaller than or equal to the `BookRange` it sits within.
+6. **Direct content** is defined relative to **outline reading order** and a range’s **start** boundary; it is **orthogonal** to how deep the range sits in the tree. Until we persist it, rules about extraction or anchors for gaps are **out of scope** for this roadmap’s defaults.
 
 These are **defaults** for consistency; revisiting them is a roadmap-level change, not a silent refactor.
 
@@ -120,6 +155,7 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 - **One span per note (initially):** Keeps PKM extraction simple; multi-span and cross-book evidence are explicit future extensions.
 - **`structuralTitle` on `BookRange`:** Human-readable title for the range in the book’s structure tree; parent chain + title is enough to reconstruct display paths when needed.
 - **No `StructuralBookRange` subtype yet:** Structural vs user-carved ranges may be distinguished later if the product requires it (e.g. import vs override).
+- **Direct content is conceptual only:** Naming the gap between ranges (and the four dispositions) keeps UX and future progress modeling aligned; **no** DB column or API field is implied yet.
 
 ---
 
@@ -163,6 +199,7 @@ Revisit when implementation or product constraints clarify:
 - Whether `ReadingRecord` needs finer-grained progress inside a range (percentage, character offset, etc.).
 - Whether `BookRange` should distinguish imported outline ranges from user-created ranges.
 - Whether `SourceSpan.kind` should classify text, image, figure, table, or mixed content for rendering and export.
+- Whether **direct content** should be materialized as anchors, text, or both; where **disposition** should live (`BookRange`, `ReadingRecord`, or a future artifact) once persisted.
 
 ---
 

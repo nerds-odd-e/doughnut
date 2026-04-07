@@ -32,17 +32,27 @@ Then I should see the book structure of the notebook "Top Maths" in the browser
 
 ## Story: Reading record
 
+### Remember book last read position
+
+Given I scroll to a certain position of the book
+When I read the book again
+Then I should be starting from the same position
 
 
-### mark a book range as started
+### mark a book range as read
 
-Given I scroll to book range "xxx" 
-Then I should see that book range "xxx" is marked as reading started
+Given I scroll to title "2.3 xxx" 
+When I answer "read" to the question if the direct content of title "2.2 xxxx" is read
+Then I should see that book range "2.3 xxxx" is marked as read in the book layout
 
-### mark a book range as finished
-### mark a book range as skipped
-### mark a book range as skimmed
-### reset the reading status of a book range
+### mark a book range with no direct content as read automatically
+
+Given there's no direct content between title "xxx" and "ooo"
+When I scroll to title "xxx" 
+And I scroll to title "ooo" 
+Then I should see that book range "xxx" is marked as read in the book layout
+
+### mark a book range as skimmed/skipped
 
 ---
 
