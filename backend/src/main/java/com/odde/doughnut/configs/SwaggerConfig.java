@@ -41,6 +41,22 @@ public class SwaggerConfig {
   }
 
   @Bean
+  public OpenApiCustomizer patchBookReadingPositionOperationIdCustomizer() {
+    return openApi -> {
+      PathItem pathItem = openApi.getPaths().get("/api/notebooks/{notebook}/book/reading-position");
+      if (pathItem == null) {
+        return;
+      }
+      Operation patch = pathItem.getPatch();
+      if (patch == null) {
+        return;
+      }
+      patch.setOperationId("patchNotebookBookReadingPosition");
+      patch.setSummary("Save book reading position");
+    };
+  }
+
+  @Bean
   public OpenApiCustomizer deleteBookOperationIdCustomizer() {
     return openApi -> {
       PathItem pathItem = openApi.getPaths().get("/api/notebooks/{notebook}/book");

@@ -8,11 +8,15 @@ import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.AttachBookAnchorRequest;
 import com.odde.doughnut.controllers.dto.AttachBookLayoutNodeRequest;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
+import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookAnchor;
 import com.odde.doughnut.entities.BookRange;
+import com.odde.doughnut.entities.BookUserLastReadPosition;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.BookRepository;
+import com.odde.doughnut.entities.repositories.BookUserLastReadPositionRepository;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -26,16 +30,19 @@ import org.springframework.web.server.ResponseStatusException;
 public class BookService {
 
   private final BookRepository bookRepository;
+  private final BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final BookStorage bookStorage;
 
   public BookService(
       BookRepository bookRepository,
+      BookUserLastReadPositionRepository bookUserLastReadPositionRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       BookStorage bookStorage) {
     this.bookRepository = bookRepository;
+    this.bookUserLastReadPositionRepository = bookUserLastReadPositionRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.bookStorage = bookStorage;
@@ -86,6 +93,30 @@ public class BookService {
   }
 
   @Transactional
+  public void upsertLastReadPosition(
+      Notebook notebook, User user, BookLastReadPositionRequest request) {
+    Book book = getBookForNotebook(notebook);
+    bookUserLastReadPositionRepository
+        .findByUser_IdAndBook_Id(user.getId(), book.getId())
+        .map(
+            existing -> {
+              existing.setPageIndex(request.getPageIndex());
+              existing.setNormalizedY(request.getNormalizedY());
+              return entityPersister.save(existing);
+            })
+        .orElseGet(
+            () -> {
+              var row = new BookUserLastReadPosition();
+              row.setUser(user);
+              row.setBook(book);
+              row.setPageIndex(request.getPageIndex());
+              row.setNormalizedY(request.getNormalizedY());
+              return entityPersister.save(row);
+            });
+    entityPersister.flush();
+  }
+
+  @Transactional
   public void deleteBookForNotebook(Notebook notebook) {
     Book book =
         bookRepository
@@ -93,6 +124,7 @@ public class BookService {
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
     String ref = book.getSourceFileRef();
+    bookUserLastReadPositionRepository.deleteByBook_Id(book.getId());
     bookRepository.delete(book);
     if (ref != null && !ref.isBlank()) {
       bookStorage.delete(ref);

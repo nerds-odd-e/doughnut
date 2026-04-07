@@ -499,6 +499,17 @@ export type NoteAccessory = {
     imageWithMask?: ImageWithMask;
 };
 
+export type BookLastReadPositionRequest = {
+    /**
+     * 0-based PDF page index in the viewer
+     */
+    pageIndex: number;
+    /**
+     * Vertical position within the page in MinerU-normalized space (0-1000)
+     */
+    normalizedY: number;
+};
+
 export type UpdateAiAssistantRequest = {
     additionalInstructions?: string;
 };
@@ -2554,6 +2565,24 @@ export type MoveToCircleResponses = {
 };
 
 export type MoveToCircleResponse = MoveToCircleResponses[keyof MoveToCircleResponses];
+
+export type PatchNotebookBookReadingPositionData = {
+    body: BookLastReadPositionRequest;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/book/reading-position';
+};
+
+export type PatchNotebookBookReadingPositionResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type PatchNotebookBookReadingPositionResponse = PatchNotebookBookReadingPositionResponses[keyof PatchNotebookBookReadingPositionResponses];
 
 export type GetAiAssistantData = {
     body?: never;

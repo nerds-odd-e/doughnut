@@ -2047,6 +2047,27 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Notebook"
+  /api/notebooks/{notebook}/book/reading-position:
+    patch:
+      tags:
+      - notebook-books-controller
+      summary: Save book reading position
+      operationId: patchNotebookBookReadingPosition
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookLastReadPositionRequest"
+        required: true
+      responses:
+        "204":
+          description: No Content
   /api/notebooks/{notebook}/ai-assistant:
     get:
       tags:
@@ -4001,6 +4022,21 @@ components:
           $ref: "#/components/schemas/ImageWithMask"
       required:
       - id
+    BookLastReadPositionRequest:
+      type: object
+      properties:
+        pageIndex:
+          type: integer
+          format: int32
+          description: 0-based PDF page index in the viewer
+        normalizedY:
+          type: integer
+          format: int32
+          description: Vertical position within the page in MinerU-normalized space
+            (0-1000)
+      required:
+      - normalizedY
+      - pageIndex
     UpdateAiAssistantRequest:
       type: object
       properties:

@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
+import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookViews;
 import com.odde.doughnut.entities.Notebook;
@@ -74,6 +75,20 @@ class NotebookBooksController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
     return bookService.getBookForNotebook(notebook);
+  }
+
+  @Operation(
+      operationId = "patchNotebookBookReadingPosition",
+      summary = "Save book reading position")
+  @PatchMapping("/{notebook}/book/reading-position")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Transactional
+  public void patchReadingPosition(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @Valid @RequestBody BookLastReadPositionRequest body)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertReadAuthorization(notebook);
+    bookService.upsertLastReadPosition(notebook, authorizationService.getCurrentUser(), body);
   }
 
   @GetMapping(value = "/{notebook}/book/file", produces = MediaType.APPLICATION_PDF_VALUE)

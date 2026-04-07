@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.BookRange;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.BookRepository;
+import com.odde.doughnut.entities.repositories.BookUserLastReadPositionRepository;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.book.BookReadingWireConstants;
@@ -36,6 +37,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
 
   @Autowired NotebookBooksController controller;
   @Autowired BookRepository bookRepository;
+  @Autowired BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
   @Autowired BookStorage bookStorage;
 
   @BeforeEach
@@ -86,6 +88,13 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     r.setBookName("Linear Algebra");
     r.setFormat(BookReadingWireConstants.BOOK_FORMAT_PDF);
     r.setLayout(layout);
+    return r;
+  }
+
+  private static BookLastReadPositionRequest lastReadBody(int pageIndex, int normalizedY) {
+    BookLastReadPositionRequest r = new BookLastReadPositionRequest();
+    r.setPageIndex(pageIndex);
+    r.setNormalizedY(normalizedY);
     return r;
   }
 
@@ -354,6 +363,91 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       controller.deleteBook(nb);
 
       assertThat(bookRepository.findByNotebook_Id(nb.getId()).isEmpty(), equalTo(true));
+    }
+  }
+
+  @Nested
+  class PatchReadingPosition {
+    @Test
+    void persistsSnapshotForCurrentUserAndBook() throws Exception {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      controller.attachBook(nb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
+      Book book = bookRepository.findByNotebook_Id(nb.getId()).orElseThrow();
+
+      controller.patchReadingPosition(nb, lastReadBody(2, 750));
+
+      var stored =
+          bookUserLastReadPositionRepository
+              .findByUser_IdAndBook_Id(currentUser.getUser().getId(), book.getId())
+              .orElseThrow();
+      assertThat(stored.getPageIndex(), equalTo(2));
+      assertThat(stored.getNormalizedY(), equalTo(750));
+    }
+
+    @Test
+    void secondPatchUpdatesSameRow() throws Exception {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      controller.attachBook(nb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
+      Book book = bookRepository.findByNotebook_Id(nb.getId()).orElseThrow();
+
+      controller.patchReadingPosition(nb, lastReadBody(0, 100));
+      controller.patchReadingPosition(nb, lastReadBody(5, 0));
+
+      assertThat(bookUserLastReadPositionRepository.count(), equalTo(1L));
+      var stored =
+          bookUserLastReadPositionRepository
+              .findByUser_IdAndBook_Id(currentUser.getUser().getId(), book.getId())
+              .orElseThrow();
+      assertThat(stored.getPageIndex(), equalTo(5));
+      assertThat(stored.getNormalizedY(), equalTo(0));
+    }
+
+    @Test
+    void returns404WhenNotebookHasNoBook() throws UnexpectedNoAccessRightException {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.patchReadingPosition(nb, lastReadBody(0, 0)));
+    }
+
+    @Test
+    void rejectsNotebookWithoutReadAccess() throws Exception {
+      User other = makeMe.aUser().please();
+      Notebook otherNb = makeMe.aNotebook().creatorAndOwner(other).please();
+      User reader = currentUser.getUser();
+      currentUser.setUser(other);
+      controller.attachBook(otherNb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
+      currentUser.setUser(reader);
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.patchReadingPosition(otherNb, lastReadBody(0, 0)));
+    }
+
+    @Test
+    void requiresLoggedInUser() throws Exception {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      controller.attachBook(nb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
+      currentUser.setUser(null);
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.patchReadingPosition(nb, lastReadBody(0, 0)));
+    }
+
+    @Test
+    void removesPositionWhenBookDeleted() throws Exception {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      controller.attachBook(nb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
+      Book book = bookRepository.findByNotebook_Id(nb.getId()).orElseThrow();
+      int bookId = book.getId();
+      controller.patchReadingPosition(nb, lastReadBody(1, 500));
+
+      controller.deleteBook(nb);
+
+      assertThat(
+          bookUserLastReadPositionRepository
+              .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookId)
+              .isEmpty(),
+          equalTo(true));
     }
   }
 }
