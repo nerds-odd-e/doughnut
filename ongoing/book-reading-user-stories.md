@@ -32,13 +32,17 @@ Then I should see the book structure of the notebook "Top Maths" in the browser
 
 ## Story: Reading record
 
-_(Sub-stories to be added.)_
+- mark a book range as started
+- mark a book range as finished
+- mark a book range as skipped
+- mark a book range as skimmed
+- reset the reading status of a book range
 
 ---
 
 ## Story: Reorganizing the book layout
 
-_(Sub-stories to be added.)_
+- use AI to reorg the nesting
 
 ---
 
