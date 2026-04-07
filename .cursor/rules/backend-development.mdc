@@ -83,6 +83,10 @@ Always run all unit tests instead of just selected file or test case, unlike for
    }
    ```
 
+5. **Controller return values**
+   - Prefer returning **entities** (or other types already used as API bodies) from controllers when the JSON shape fits; narrow the serialized surface with `@JsonIgnore`, `@JsonView`, etc. as elsewhere in the codebase.
+   - Introduce a **response DTO** only when necessary (e.g. a different wire shape, aggregating multiple sources, or decoupling from persistence without overloading the entity).
+
 ## Data Builder Pattern
 
 1. **MakeMe Factory**
