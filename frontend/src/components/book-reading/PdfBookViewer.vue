@@ -323,15 +323,22 @@ async function scrollToStoredReadingPosition(
   ) {
     return
   }
-  const pageNumber = pageIndexZeroBased + 1
-  const page = await pdfViewer.pdfDocument.getPage(pageNumber)
-  const vp = page.getViewport({ scale: 1 })
+  const pageView = pdfViewer.getPageView(pageIndexZeroBased) as {
+    viewport?: {
+      width: number
+      height: number
+      convertToPdfPoint: (x: number, y: number) => number[]
+    }
+  } | null
+  if (!pageView?.viewport) return
+  const vp = pageView.viewport
   const yNorm = Math.max(0, Math.min(normalizedY, 1000))
-  const yTopPdf = (yNorm / 1000) * vp.height
-  const y = vp.height - yTopPdf
+  const vx = vp.width / 2
+  const vy = (yNorm / 1000) * vp.height
+  const [pdfX, pdfY] = vp.convertToPdfPoint(vx, vy)
   pdfViewer.scrollPageIntoView({
-    pageNumber,
-    destArray: [null, { name: "XYZ" }, vp.width / 2, y, null],
+    pageNumber: pageIndexZeroBased + 1,
+    destArray: [null, { name: "XYZ" }, pdfX, pdfY, null],
   })
   queueMicrotask(() => emitViewportDescriptorIfChanged())
 }
