@@ -7,7 +7,7 @@
         title="Edit notebook settings"
         @click="editNotebookSettings"
       >
-        <SvgNotebook />
+        <BookText class="w-5 h-5" />
       </button>
 
       <NoteNewButton
@@ -15,7 +15,7 @@
         button-title="Add Child Note"
         v-bind="{ referenceNote: note, insertMode: 'as-child' }"
       >
-        <SvgAddChild />
+        <FolderPlus class="w-5 h-5" />
       </NoteNewButton>
 
       <NoteNewButton
@@ -23,7 +23,7 @@
         button-title="Add Next Sibling Note"
         v-bind="{ referenceNote: note, insertMode: 'after' }"
       >
-        <SvgAddSibling />
+        <Folders class="w-5 h-5" />
       </NoteNewButton>
 
       <PopButton v-if="!readonly" title="search and add relationship">
@@ -49,7 +49,7 @@
         })"
         title="Star a conversation about this note"
       >
-        <SvgChat />
+        <MessageCircle class="w-5 h-5" />
       </a>
 
       <PopButton v-if="!readonly" title="associate wikidata">
@@ -65,14 +65,14 @@
       </PopButton>
 
       <button v-if="!readonly && !asMarkdown" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as markdown" @click="$emit('edit-as-markdown', true)">
-        <SvgMarkdown />
+        <FileCode class="w-5 h-5" />
       </button>
       <button v-else-if="!readonly" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as rich content" @click="$emit('edit-as-markdown', false)">
-        <SvgRichContent />
+        <LayoutTemplate class="w-5 h-5" />
       </button>
 
       <button v-if="!readonly && !audioTools" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Audio tools" @click="audioTools = true">
-        <SvgAudioInput />
+        <Mic class="w-5 h-5" />
       </button>
 
       <button
@@ -81,7 +81,7 @@
         title="more options"
         @click="moreOptions = !moreOptions"
       >
-        <SvgCog />
+        <Settings class="w-5 h-5" />
       </button>
     </div>
   </nav>
@@ -104,21 +104,23 @@ import { ref, computed, watch } from "vue"
 import type { Note, Notebook } from "@generated/doughnut-backend-api"
 import type { NoteAccessory } from "@generated/doughnut-backend-api"
 import NoteNewButton from "./NoteNewButton.vue"
-import SvgAddChild from "../../svgs/SvgAddChild.vue"
-import SvgAddSibling from "../../svgs/SvgAddSibling.vue"
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
 import AddRelationshipDialog from "../../links/AddRelationshipDialog.vue"
-import SvgCog from "../../svgs/SvgCog.vue"
-import SvgMarkdown from "@/components/svgs/SvgMarkdown.vue"
-import SvgRichContent from "@/components/svgs/SvgRichContent.vue"
-import SvgAudioInput from "../../svgs/SvgAudioInput.vue"
+import {
+  BookText,
+  FileCode,
+  FolderPlus,
+  Folders,
+  LayoutTemplate,
+  MessageCircle,
+  Mic,
+  Settings,
+} from "lucide-vue-next"
 import NoteAudioTools from "../accessory/NoteAudioTools.vue"
 import { useRouter } from "vue-router"
-import SvgChat from "@/components/svgs/SvgChat.vue"
 import SvgWikidata from "../../svgs/SvgWikidata.vue"
 import WikidataAssociationForNoteDialog from "../WikidataAssociationForNoteDialog.vue"
 import NoteMoreOptionsDialog from "../accessory/NoteMoreOptionsDialog.vue"
-import SvgNotebook from "../../svgs/SvgNotebook.vue"
 
 const { note, notebook } = defineProps<{
   note: Note

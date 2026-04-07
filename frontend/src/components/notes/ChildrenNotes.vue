@@ -8,7 +8,7 @@
         title="collapse children"
         @click="collapse()"
       >
-        <SvgCollapse />
+        <ChevronsUpDown class="w-5 h-5 rotate-180" />
       </button>
       <button
         class="daisy-btn daisy-btn-sm"
@@ -17,7 +17,7 @@
         title="expand children"
         @click="expand()"
       >
-        <SvgExpand />
+        <ChevronsUpDown class="w-5 h-5" />
       </button>
     </div>
     <div class="daisy-flex-1">
@@ -34,8 +34,7 @@ import type { PropType } from "vue"
 import { ref } from "vue"
 import type { Note } from "@generated/doughnut-backend-api"
 import Cards from "./Cards.vue"
-import SvgCollapse from "../svgs/SvgCollapse.vue"
-import SvgExpand from "../svgs/SvgExpand.vue"
+import { ChevronsUpDown } from "lucide-vue-next"
 
 const props = defineProps({
   notes: { type: Array as PropType<Note[]>, required: true },

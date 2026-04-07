@@ -1,7 +1,7 @@
 <template>
   <div v-if="currentAiReply" class="daisy-flex daisy-mb-3">
     <div class="message-avatar daisy-me-2" title="AI Assistant">
-      <SvgRobot />
+      <Bot class="w-5 h-5" />
     </div>
     <div class="daisy-card daisy-py-2 daisy-px-3 daisy-bg-light ai-chat"
     v-html="markdowntToHtml(currentAiReply)"
@@ -10,7 +10,7 @@
 
   <div v-if="currentSuggestion" class="daisy-flex daisy-mb-3">
     <div class="message-avatar daisy-me-2" title="AI Assistant">
-      <SvgRobot />
+      <Bot class="w-5 h-5" />
     </div>
     <ToolCallHandler
       v-if="currentSuggestion"
@@ -37,7 +37,7 @@
 import { ref, computed, watch } from "vue"
 import type { Conversation } from "@generated/doughnut-backend-api"
 import type { ToolCallResult } from "@/models/aiReplyState"
-import SvgRobot from "@/components/svgs/SvgRobot.vue"
+import { Bot } from "lucide-vue-next"
 import markdownizer from "../form/markdownizer"
 import {
   createAiReplyStates,

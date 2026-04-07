@@ -5,12 +5,14 @@ import helper from "@tests/helpers"
 import { beforeEach, vi, describe, it, expect } from "vitest"
 import { markRaw, reactive, nextTick } from "vue"
 import { page } from "vitest/browser"
-import SvgNote from "@/components/svgs/SvgNote.vue"
-import SvgAssimilate from "@/components/svgs/SvgAssimilate.vue"
-import SvgCalendarCheck from "@/components/svgs/SvgCalendarCheck.vue"
-import SvgPeople from "@/components/svgs/SvgPeople.vue"
-import SvgShop from "@/components/svgs/SvgShop.vue"
-import SvgChat from "@/components/svgs/SvgChat.vue"
+import {
+  BookText,
+  CalendarCheck,
+  CircleCheck,
+  MessageCircle,
+  Store,
+  Users,
+} from "lucide-vue-next"
 import type { Component } from "vue"
 
 const useRouteValue = reactive({ name: "", fullPath: "/" })
@@ -46,19 +48,19 @@ const createMockNavItems = (
     {
       name: "notebooks",
       label: "Note",
-      icon: markRaw(SvgNote),
+      icon: markRaw(BookText),
       isActive: activeItemName === "notebooks",
     },
     {
       name: "assimilate",
       label: "Assimilate",
-      icon: markRaw(SvgAssimilate),
+      icon: markRaw(CircleCheck),
       isActive: activeItemName === "assimilate",
     },
     {
       name: "recall",
       label: "Recall",
-      icon: markRaw(SvgCalendarCheck),
+      icon: markRaw(CalendarCheck),
       isActive: activeItemName === "recall",
     },
   ],
@@ -66,19 +68,19 @@ const createMockNavItems = (
     {
       name: "circles",
       label: "Circles",
-      icon: markRaw(SvgPeople),
+      icon: markRaw(Users),
       isActive: activeItemName === "circles",
     },
     {
       name: "bazaar",
       label: "Bazaar",
-      icon: markRaw(SvgShop),
+      icon: markRaw(Store),
       isActive: activeItemName === "bazaar",
     },
     {
       name: "messageCenter",
       label: "Messages",
-      icon: markRaw(SvgChat),
+      icon: markRaw(MessageCircle),
       isActive: activeItemName === "messageCenter",
     },
   ],

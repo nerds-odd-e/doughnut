@@ -25,10 +25,10 @@
           :title="conversationMessage.sender?.name || 'AI Assistant'"
         >
           <template v-if="conversationMessage.sender?.id === undefined">
-            <SvgRobot />
+            <Bot class="w-8 h-8" />
           </template>
           <template v-else>
-            <SvgMissingAvatar />
+            <UserIcon class="w-8 h-8" />
           </template>
         </div>
 
@@ -65,9 +65,8 @@ import type {
   ConversationMessage,
   Conversation,
 } from "@generated/doughnut-backend-api"
-import SvgRobot from "@/components/svgs/SvgRobot.vue"
+import { Bot, User as UserIcon } from "lucide-vue-next"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
-import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import ConversationTemplate from "./ConversationTemplate.vue"
 import markdownizer from "../form/markdownizer"
 

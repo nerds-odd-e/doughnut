@@ -30,7 +30,7 @@
                       :disabled="isLoadingUrl || !hasValidWikidataId"
                       v-show="hasValidWikidataId"
                     >
-                      <SvgPopup />
+                      <ExternalLink class="w-5 h-5" />
                     </button>
             </template>
           </TextInput>
@@ -118,7 +118,7 @@ import Modal from "../commons/Modal.vue"
 import RadioButtons from "../form/RadioButtons.vue"
 import TextInput from "../form/TextInput.vue"
 import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup"
-import SvgPopup from "../svgs/SvgPopup.vue"
+import { ExternalLink } from "lucide-vue-next"
 
 const props = defineProps<{
   searchKey: string

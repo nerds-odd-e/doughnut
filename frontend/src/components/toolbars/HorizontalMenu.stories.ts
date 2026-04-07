@@ -1,12 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import HorizontalMenu from "./HorizontalMenu.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import SvgNote from "@/components/svgs/SvgNote.vue"
-import SvgAssimilate from "@/components/svgs/SvgAssimilate.vue"
-import SvgCalendarCheck from "@/components/svgs/SvgCalendarCheck.vue"
-import SvgShop from "@/components/svgs/SvgShop.vue"
-import SvgPeople from "@/components/svgs/SvgPeople.vue"
-import SvgChat from "@/components/svgs/SvgChat.vue"
+import {
+  BookText,
+  CalendarCheck,
+  CircleCheck,
+  MessageCircle,
+  Store,
+  Users,
+} from "lucide-vue-next"
 import type { Component } from "vue"
 
 type NavigationItemType = {
@@ -29,13 +31,13 @@ const createMockNavItems = (
     {
       name: "notebooks",
       label: "Note",
-      icon: SvgNote,
+      icon: BookText,
       isActive: false,
     },
     {
       name: "assimilate",
       label: "Assimilate",
-      icon: SvgAssimilate,
+      icon: CircleCheck,
       badge: withBadges ? 5 : undefined,
       badgeClass: "due-count",
       isActive: false,
@@ -43,7 +45,7 @@ const createMockNavItems = (
     {
       name: "recall",
       label: "Recall",
-      icon: SvgCalendarCheck,
+      icon: CalendarCheck,
       badge: withBadges ? 789 : undefined,
       badgeClass: "recall-count",
       isActive: false,
@@ -53,19 +55,19 @@ const createMockNavItems = (
     {
       name: "circles",
       label: "Circles",
-      icon: SvgPeople,
+      icon: Users,
       isActive: false,
     },
     {
       name: "bazaar",
       label: "Bazaar",
-      icon: SvgShop,
+      icon: Store,
       isActive: false,
     },
     {
       name: "messageCenter",
       label: "Messages",
-      icon: SvgChat,
+      icon: MessageCircle,
       badge: withBadges ? 3 : undefined,
       badgeClass: "unread-count",
       isActive: false,
@@ -173,13 +175,13 @@ export const WithActiveItem: Story = {
       {
         name: "notebooks",
         label: "Note",
-        icon: SvgNote,
+        icon: BookText,
         isActive: false,
       },
       {
         name: "assimilate",
         label: "Assimilate",
-        icon: SvgAssimilate,
+        icon: CircleCheck,
         isActive: true,
         badge: 5,
         badgeClass: "due-count",
@@ -187,7 +189,7 @@ export const WithActiveItem: Story = {
       {
         name: "recall",
         label: "Recall",
-        icon: SvgCalendarCheck,
+        icon: CalendarCheck,
         isActive: false,
       },
     ],
@@ -205,13 +207,13 @@ export const CollapsedWithActiveItem: Story = {
       {
         name: "notebooks",
         label: "Note",
-        icon: SvgNote,
+        icon: BookText,
         isActive: false,
       },
       {
         name: "assimilate",
         label: "Assimilate",
-        icon: SvgAssimilate,
+        icon: CircleCheck,
         isActive: true,
         badge: 5,
         badgeClass: "due-count",
@@ -219,7 +221,7 @@ export const CollapsedWithActiveItem: Story = {
       {
         name: "recall",
         label: "Recall",
-        icon: SvgCalendarCheck,
+        icon: CalendarCheck,
         isActive: false,
       },
     ],

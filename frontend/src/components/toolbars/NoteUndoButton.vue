@@ -5,7 +5,7 @@
     btn-class="daisy-btn daisy-btn-sm daisy-btn-ghost"
   >
     <template #button_face>
-      <SvgUndo />
+      <Undo2 class="w-5 h-5" />
     </template>
     <template #default="{ closer }">
       <UndoConfirmationDialog
@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { computed } from "vue"
 import { useRouter } from "vue-router"
-import SvgUndo from "../svgs/SvgUndo.vue"
+import { Undo2 } from "lucide-vue-next"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import UndoConfirmationDialog from "./UndoConfirmationDialog.vue"
 import PopButton from "../commons/Popups/PopButton.vue"

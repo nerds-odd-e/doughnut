@@ -6,7 +6,7 @@
     :aria-label="ariaLabel || 'Copy to clipboard'"
     :data-testid="testId"
   >
-    <SvgClipboard v-if="!copied" />
+    <ClipboardCheck v-if="!copied" class="w-5 h-5" />
     <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
       <path stroke="currentColor" stroke-width="2" d="M5 13l4 4L19 7"/>
     </svg>
@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import SvgClipboard from "../svgs/SvgClipboard.vue"
+import { ClipboardCheck } from "lucide-vue-next"
 
 const props = withDefaults(
   defineProps<{

@@ -31,7 +31,7 @@
               @click="promotePointToChildNote(point, index)"
               title="Promote to child note"
             >
-              <SvgAddChild class="w-4 h-4" />
+              <FolderPlus class="w-4 h-4" />
               Child
             </button>
             <button
@@ -40,7 +40,7 @@
               @click="promotePointToSiblingNote(point, index)"
               title="Promote to sibling note"
             >
-              <SvgAddSibling class="w-4 h-4" />
+              <Folders class="w-4 h-4" />
               Sibling
             </button>
           </div>
@@ -77,8 +77,7 @@ import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
-import SvgAddChild from "../svgs/SvgAddChild.vue"
-import SvgAddSibling from "../svgs/SvgAddSibling.vue"
+import { FolderPlus, Folders } from "lucide-vue-next"
 import LoadingModal from "../commons/LoadingModal.vue"
 import { onMounted, ref } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"

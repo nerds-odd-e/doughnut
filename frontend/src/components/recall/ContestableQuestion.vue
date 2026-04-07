@@ -28,7 +28,7 @@
         class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         @click="contestQuestion"
       >
-        <SvgContest />
+        <Target class="w-5 h-5" />
       </a>
     </div>
   </div>
@@ -40,6 +40,7 @@ import { RecallPromptController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"
 import { ref } from "vue"
+import { Target } from "lucide-vue-next"
 import RecallPromptComponent from "./RecallPromptComponent.vue"
 import QuestionDisplay from "./QuestionDisplay.vue"
 const props = defineProps({

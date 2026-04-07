@@ -46,7 +46,7 @@
         >
           <template #button_face>
             <div class="daisy-flex daisy-items-center daisy-gap-2">
-              <SvgMoveToCircle />
+              <GitMerge class="w-5 h-5" />
               <span>Move to ...</span>
             </div>
           </template>
@@ -58,7 +58,7 @@
           title="Share notebook to bazaar"
         >
           <div class="daisy-flex daisy-items-center daisy-gap-2">
-            <SvgBazaarShare />
+            <Share2 class="w-5 h-5" />
             <span>Share notebook to bazaar</span>
           </div>
         </button>
@@ -210,8 +210,7 @@ import { useToast } from "@/composables/useToast"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
-import SvgBazaarShare from "@/components/svgs/SvgBazaarShare.vue"
-import SvgMoveToCircle from "@/components/svgs/SvgMoveToCircle.vue"
+import { GitMerge, Share2 } from "lucide-vue-next"
 import NotebookMoveDialog from "@/components/notebook/NotebookMoveDialog.vue"
 import CheckInput from "@/components/form/CheckInput.vue"
 import TextInput from "@/components/form/TextInput.vue"

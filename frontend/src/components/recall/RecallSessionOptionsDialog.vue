@@ -24,7 +24,7 @@
             aria-label="Move to end of list"
             @click="handleMoveToEnd"
           >
-            <SvgSkip />
+            <SkipForward class="w-5 h-5" />
             <span class="daisy-ml-2">Move to end of list</span>
           </button>
           <label class="daisy-label daisy-cursor-pointer daisy-flex daisy-items-center daisy-gap-2">
@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue"
-import SvgSkip from "../svgs/SvgSkip.vue"
+import { SkipForward } from "lucide-vue-next"
 import Modal from "../commons/Modal.vue"
 import { useRecallData } from "@/composables/useRecallData"
 import type { RecallPrompt } from "@generated/doughnut-backend-api"

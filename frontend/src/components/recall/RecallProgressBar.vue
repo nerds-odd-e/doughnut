@@ -20,7 +20,7 @@
                 )
               "
             >
-              <SvgBackward />
+              <SkipBack class="w-8 h-8" />
             </button>
           </template>
           <button
@@ -30,7 +30,7 @@
             :disabled="finished === 0"
             @click="$emit('viewLastAnsweredQuestion', finished - 1)"
           >
-            <SvgPause />
+            <Pause class="w-8 h-8 text-green-600" />
           </button>
         </div>
         <RecallSessionOptionsDialog
@@ -51,7 +51,7 @@
       </div>
     </template>
     <template #cogIcon>
-      <SvgCog />
+      <Settings class="w-5 h-5" />
     </template>
   </ProgressBar>
 </template>
@@ -59,9 +59,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import ProgressBar from "../commons/ProgressBar.vue"
-import SvgPause from "../svgs/SvgPause.vue"
-import SvgBackward from "../svgs/SvgBackward.vue"
-import SvgCog from "../svgs/SvgCog.vue"
+import { Pause, Settings, SkipBack } from "lucide-vue-next"
 import RecallSessionOptionsDialog from "./RecallSessionOptionsDialog.vue"
 
 import type { RecallPrompt } from "@generated/doughnut-backend-api"

@@ -21,7 +21,7 @@
         title="Generate Image with DALL-E"
       >
         <template #button_face>
-          <SvgRobot />
+          <Bot class="w-5 h-5" />
         </template>
         <template #default>
           <AIGenerateImageDialog v-bind="{ note }" />
@@ -33,7 +33,7 @@
         title="Edit Note Image"
       >
         <template #button_face>
-          <SvgImage />
+          <ImageIcon class="w-5 h-5" />
         </template>
         <template #default="{ closer }">
           <NoteEditImageDialog
@@ -48,7 +48,7 @@
         title="Edit Note URL"
       >
         <template #button_face>
-          <SvgUrlIndicator />
+          <Globe class="w-5 h-5" />
         </template>
         <template #default="{ closer }">
           <NoteEditUrlDialog
@@ -63,7 +63,7 @@
         title="Export..."
       >
         <template #button_face>
-          <SvgExport />
+          <Upload class="w-5 h-5" />
         </template>
         <template #default="{ closer }">
           <NoteExportDialog :note="note" @close-dialog="closer" />
@@ -87,7 +87,7 @@
         title="Assimilate this note"
         @click="assimilateNote"
       >
-        <SvgAssimilate />
+        <CircleCheck class="w-5 h-5" />
       </button>
 
       <button
@@ -95,7 +95,7 @@
         title="Delete note"
         @click="deleteNote"
       >
-        <SvgRemove />
+        <Trash2 class="w-5 h-5" />
       </button>
     </div>
   </div>
@@ -107,16 +107,18 @@ import type { NoteAccessory } from "@generated/doughnut-backend-api"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import AIGenerateImageDialog from "../AIGenerateImageDialog.vue"
 import Questions from "../Questions.vue"
-import SvgUrlIndicator from "../../svgs/SvgUrlIndicator.vue"
+import {
+  Bot,
+  CircleCheck,
+  Globe,
+  Image as ImageIcon,
+  Trash2,
+  Upload,
+} from "lucide-vue-next"
 import NoteEditImageDialog from "./NoteEditImageDialog.vue"
 import NoteEditUrlDialog from "./NoteEditUrlDialog.vue"
-import SvgExport from "../../svgs/SvgExport.vue"
 import NoteExportDialog from "../core/NoteExportDialog.vue"
 import SvgAssessment from "../../svgs/SvgAssessment.vue"
-import SvgAssimilate from "../../svgs/SvgAssimilate.vue"
-import SvgRemove from "../../svgs/SvgRemove.vue"
-import SvgRobot from "../../svgs/SvgRobot.vue"
-import SvgImage from "../../svgs/SvgImage.vue"
 import { useRouter } from "vue-router"
 import usePopups from "../../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"

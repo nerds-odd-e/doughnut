@@ -5,7 +5,7 @@
       title="Add to my learning"
     >
       <template #button_face>
-        <SvgAdd />
+        <Plus class="w-5 h-5" />
       </template>
       <template #default="{ closer }">
         <SubscribeDialog
@@ -33,7 +33,7 @@ import { useRouter } from "vue-router"
 import type { Notebook } from "@generated/doughnut-backend-api"
 import PopButton from "../commons/Popups/PopButton.vue"
 import usePopups from "../commons/Popups/usePopups"
-import SvgAdd from "../svgs/SvgAdd.vue"
+import { Plus } from "lucide-vue-next"
 import SvgAssessment from "../svgs/SvgAssessment.vue"
 import SubscribeDialog from "./SubscribeDialog.vue"
 import SvgCertifiedAssessment from "../svgs/SvgCertifiedAssessment.vue"

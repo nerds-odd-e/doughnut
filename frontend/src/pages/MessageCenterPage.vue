@@ -39,7 +39,7 @@
               @conversation-changed="handleConversationChanged"
             />
             <div v-else class="no-conversation-message">
-              <SvgChat class="large-svg-message" />
+              <MessageCircle class="large-svg-message" />
               <h2 class="info-heading">No conversation selected</h2>
             </div>
           </div>
@@ -56,7 +56,7 @@ import {} from "@/managedApi/clientSetup"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
-import SvgChat from "@/components/svgs/SvgChat.vue"
+import { MessageCircle } from "lucide-vue-next"
 import type { Conversation, User } from "@generated/doughnut-backend-api"
 import { messageCenterConversations } from "@/store/messageStore"
 import { useRouter } from "vue-router"

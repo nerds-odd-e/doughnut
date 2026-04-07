@@ -2,13 +2,15 @@ import { computed } from "vue"
 import { useRoute } from "vue-router"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import { useRecallData } from "@/composables/useRecallData"
-import SvgNote from "@/components/svgs/SvgNote.vue"
-import SvgAssimilate from "@/components/svgs/SvgAssimilate.vue"
-import SvgCalendarCheck from "@/components/svgs/SvgCalendarCheck.vue"
-import SvgResume from "@/components/svgs/SvgResume.vue"
-import SvgShop from "@/components/svgs/SvgShop.vue"
-import SvgPeople from "@/components/svgs/SvgPeople.vue"
-import SvgChat from "@/components/svgs/SvgChat.vue"
+import {
+  BookText,
+  CalendarCheck,
+  CircleCheck,
+  MessageCircle,
+  Play,
+  Store,
+  Users,
+} from "lucide-vue-next"
 import { messageCenterConversations } from "@/store/messageStore"
 
 export function useNavigationItems() {
@@ -27,7 +29,7 @@ export function useNavigationItems() {
       {
         name: "notebooks",
         label: "Note",
-        icon: SvgNote,
+        icon: BookText,
         isActive: ["notebooks", "noteShow", "notebookEdit"].includes(
           route.name as string
         ),
@@ -35,7 +37,7 @@ export function useNavigationItems() {
       {
         name: "assimilate",
         label: "Assimilate",
-        icon: SvgAssimilate,
+        icon: CircleCheck,
         badge: dueCount.value,
         badgeClass: "due-count",
         isActive: ["assimilate"].includes(route.name as string),
@@ -43,7 +45,7 @@ export function useNavigationItems() {
       {
         name: "recall",
         label: "Recall",
-        icon: SvgCalendarCheck,
+        icon: CalendarCheck,
         badge: toRepeatCount.value,
         badgeClass: diligentMode.value
           ? "recall-count diligent-mode"
@@ -70,7 +72,7 @@ export function useNavigationItems() {
         {
           name: "resumeRecall",
           label: "Resume",
-          icon: SvgResume,
+          icon: Play,
           badge: toRepeatCount.value,
           badgeClass: diligentMode.value
             ? "recall-count diligent-mode"
@@ -88,7 +90,7 @@ export function useNavigationItems() {
     {
       name: "circles",
       label: "Circles",
-      icon: SvgPeople,
+      icon: Users,
       isActive: ["circles", "circleShow", "circleJoin"].includes(
         route.name as string
       ),
@@ -96,13 +98,13 @@ export function useNavigationItems() {
     {
       name: "bazaar",
       label: "Bazaar",
-      icon: SvgShop,
+      icon: Store,
       isActive: ["bazaar"].includes(route.name as string),
     },
     {
       name: "messageCenter",
       label: "Messages",
-      icon: SvgChat,
+      icon: MessageCircle,
       badge: messageCenterConversations.unreadConversations.length,
       badgeClass: "unread-count",
       isActive: ["messageCenter"].includes(route.name as string),

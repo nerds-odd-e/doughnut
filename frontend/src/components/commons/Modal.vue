@@ -3,7 +3,7 @@
     <div class="modal-wrapper" @mousedown.self="$emit('close_request')">
         <div :class="sidebarStyle" class="daisy-bg-base-200">
           <button class="close-button" @click="$emit('close_request')">
-            <SvgClose />
+            <X class="w-6 h-6" />
           </button>
 
           <div class="modal-header" v-if="$slots.header">
@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import { computed, watch, onMounted, onUnmounted } from "vue"
 import Overlay from "./Overlay.vue"
-import SvgClose from "../svgs/SvgClose.vue"
+import { X } from "lucide-vue-next"
 import { useRoute } from "vue-router"
 import { registerModal } from "./modalStack"
 

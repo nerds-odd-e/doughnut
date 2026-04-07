@@ -1,25 +1,24 @@
 <template>
-  <SvgLogin
+  <KeyRound
     role="button"
     aria-label="Login via Github"
-    class="login"
+    class="login cursor-pointer"
+    :size="30"
     @click="login"
-    width="30px"
-    height="30px"
   />
 </template>
 
 <script lang="ts">
-import SvgLogin from "@/components/svgs/SvgLogin.vue"
 import loginOrRegisterAndHaltThisThread from "@/managedApi/window/loginOrRegisterAndHaltThisThread"
+import { KeyRound } from "lucide-vue-next"
 import { defineComponent } from "vue"
 
 export default defineComponent({
+  components: { KeyRound },
   methods: {
     login() {
       loginOrRegisterAndHaltThisThread()
     },
   },
-  components: { SvgLogin },
 })
 </script>

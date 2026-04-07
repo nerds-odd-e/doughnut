@@ -18,7 +18,7 @@
         aria-label="Export question generation request"
         title="Export question generation request for ChatGPT"
       >
-        <SvgExport />
+        <Upload class="w-5 h-5" />
       </button>
     </div>
     <table class="question-table daisy-mt-2" v-if="questions.length">
@@ -98,7 +98,7 @@ import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionManagement from "./QuestionManagement.vue"
 import QuestionExportDialog from "./QuestionExportDialog.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
-import SvgExport from "../svgs/SvgExport.vue"
+import { Upload } from "lucide-vue-next"
 
 const props = defineProps({
   note: {

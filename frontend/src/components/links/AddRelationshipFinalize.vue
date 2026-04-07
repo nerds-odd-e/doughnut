@@ -17,7 +17,7 @@
       /></strong>
     </div>
     <button class="daisy-btn daisy-btn-secondary go-back-button" @click="$emit('goBack')">
-      <SvgGoBack />
+      <Reply class="w-5 h-5" />
     </button>
   </div>
 </template>
@@ -30,7 +30,7 @@ import type { RelationshipCreation } from "@generated/doughnut-backend-api"
 import type { NoteTopology } from "@generated/doughnut-backend-api"
 import RelationTypeSelect from "./RelationTypeSelect.vue"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
-import SvgGoBack from "../svgs/SvgGoBack.vue"
+import { Reply } from "lucide-vue-next"
 import usePopups from "../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 

@@ -32,7 +32,7 @@
         aria-label="Export conversation"
         title="Export conversation to continue in external AI tools"
       >
-        <SvgExport />
+        <Upload class="w-5 h-5" />
       </button>
       <button
         class="maximize-button"
@@ -162,7 +162,7 @@
 import { ref, computed } from "vue"
 import type { Conversation } from "@generated/doughnut-backend-api"
 import ConversationExportDialog from "./ConversationExportDialog.vue"
-import SvgExport from "@/components/svgs/SvgExport.vue"
+import { Upload } from "lucide-vue-next"
 
 const { isMaximized, defaultMessages } = defineProps<{
   conversations?: Conversation[]

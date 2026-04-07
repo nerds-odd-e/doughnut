@@ -7,7 +7,7 @@
       <slot name="right" />
       <PopButton v-if="user" title="search note">
         <template #button_face>
-          <SvgSearch />
+          <Search class="w-5 h-5" />
         </template>
         <template #default="{ closer }">
           <AddRelationshipDialog
@@ -25,6 +25,7 @@
 import type { Ref } from "vue"
 import type { User } from "@generated/doughnut-backend-api"
 import { inject } from "vue"
+import { Search } from "lucide-vue-next"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const storageAccessor = useStorageAccessor()

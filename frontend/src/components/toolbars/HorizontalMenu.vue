@@ -41,7 +41,7 @@
               <div @click.capture.stop.prevent="handleMenuIconClick" class="active-item-wrapper">
                 <div class="nav-item daisy-text-neutral-content daisy-rounded-lg daisy-px-2 daisy-flex daisy-flex-col daisy-items-center" aria-label="Menu">
                   <div class="icon-container">
-                    <SvgMenu width="24" height="24" />
+                    <Menu :size="24" />
                   </div>
                   <span class="label">Menu</span>
                 </div>
@@ -80,7 +80,7 @@
         @click.stop="toggleExpanded"
         aria-label="Toggle menu"
       >
-        <SvgChevronRight />
+        <ChevronRight :size="24" />
       </button>
     </div>
   </div>
@@ -94,8 +94,7 @@ import { useRoute } from "vue-router"
 import LoginButton from "@/components/toolbars/LoginButton.vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
-import SvgChevronRight from "@/components/svgs/SvgChevronRight.vue"
-import SvgMenu from "@/components/svgs/SvgMenu.vue"
+import { ChevronRight, Menu } from "lucide-vue-next"
 import { useRecallData } from "@/composables/useRecallData"
 
 type NavigationItemType = {

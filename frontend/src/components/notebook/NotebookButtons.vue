@@ -6,14 +6,14 @@
       @click="editNotebookSettings"
       title="Edit notebook settings"
     >
-      <SvgNotebook />
+      <BookText class="w-5 h-5" />
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from "vue-router"
-import SvgNotebook from "@/components/svgs/SvgNotebook.vue"
+import { BookText } from "lucide-vue-next"
 import type { Notebook, User } from "@generated/doughnut-backend-api"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
 

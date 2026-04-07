@@ -1,13 +1,13 @@
 <template>
   <button title="Delete note" @click="deleteNote">
-    <SvgRemove />Delete note
+    <Trash2 class="w-5 h-5" />Delete note
   </button>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from "vue-router"
 import usePopups from "../../commons/Popups/usePopups"
-import SvgRemove from "../../svgs/SvgRemove.vue"
+import { Trash2 } from "lucide-vue-next"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const router = useRouter()

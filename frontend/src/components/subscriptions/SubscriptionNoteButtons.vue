@@ -2,7 +2,7 @@
   <div class="daisy-join">
     <PopButton title="Edit subscription">
       <template #button_face>
-        <SvgEdit />
+        <Pencil class="w-5 h-5" />
       </template>
       <SubscriptionEditDialog
         :subscription="subscription"
@@ -14,7 +14,7 @@
       title="Unsubscribe"
       @click="processForm()"
     >
-      <SvgUnsubscribe />
+      <Minus class="w-5 h-5" />
     </button>
   </div>
 </template>
@@ -26,8 +26,7 @@ import { SubscriptionController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import PopButton from "../commons/Popups/PopButton.vue"
 import usePopups from "../commons/Popups/usePopups"
-import SvgEdit from "../svgs/SvgEdit.vue"
-import SvgUnsubscribe from "../svgs/SvgUnsubscribe.vue"
+import { Minus, Pencil } from "lucide-vue-next"
 import SubscriptionEditDialog from "./SubscriptionEditDialog.vue"
 
 export default defineComponent({
@@ -41,7 +40,7 @@ export default defineComponent({
     },
   },
   emits: ["updated"],
-  components: { SvgUnsubscribe, PopButton, SvgEdit, SubscriptionEditDialog },
+  components: { Minus, Pencil, PopButton, SubscriptionEditDialog },
   methods: {
     async processForm() {
       if (

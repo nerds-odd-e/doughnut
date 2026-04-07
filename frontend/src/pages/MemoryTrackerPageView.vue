@@ -73,7 +73,7 @@
         aria-label="remove this note from recall"
         @click="removeFromRecall"
       >
-        <SvgNoRecall />
+        <EyeOff class="w-5 h-5" />
         <span>Remove from Recall</span>
       </button>
     </div>
@@ -169,7 +169,7 @@ import ConversationButton from "@/components/recall/ConversationButton.vue"
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "@/components/commons/Popups/usePopups"
-import SvgNoRecall from "@/components/svgs/SvgNoRecall.vue"
+import { EyeOff } from "lucide-vue-next"
 
 const props = defineProps({
   recallPrompts: {

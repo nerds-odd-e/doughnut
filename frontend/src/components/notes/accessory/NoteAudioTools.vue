@@ -12,7 +12,7 @@
     <div class="button-group">
       <template v-if="!isRecording">
         <button class="daisy-btn" @click="startRecording" title="Record Audio">
-          <SvgAudioInput width="24" height="24" />
+          <Mic :size="24" />
         </button>
       </template>
       <template v-else>
@@ -88,7 +88,7 @@ import {
 } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import Waveform from "./Waveform.vue"
-import SvgAudioInput from "@/components/svgs/SvgAudioInput.vue"
+import { Mic } from "lucide-vue-next"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 import FullScreen from "@/components/common/FullScreen.vue"
 

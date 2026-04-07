@@ -20,7 +20,7 @@
         :data-testid="downloadButtonTestId"
         aria-label="Download JSON"
       >
-        <SvgDownload />
+        <Download class="w-5 h-5" />
       </button>
     </div>
   </div>
@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { saveAs } from "file-saver"
 import CopyButton from "./CopyButton.vue"
-import SvgDownload from "../svgs/SvgDownload.vue"
+import { Download } from "lucide-vue-next"
 
 const props = withDefaults(
   defineProps<{

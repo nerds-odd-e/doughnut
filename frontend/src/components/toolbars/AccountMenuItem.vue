@@ -2,7 +2,7 @@
   <li class="daisy-menu-item">
     <NavigationItem
       label="Account"
-      :icon="SvgMissingAvatar"
+      :icon="UserIcon"
       :has-dropdown="true"
       :is-active="false"
     >
@@ -15,7 +15,7 @@
           </li>
           <li class="daisy-menu-item hover:daisy-bg-base-200">
             <router-link :to="{ name: 'recent' }" class="daisy-menu-title daisy-justify-start daisy-text-primary hover:daisy-text-primary-focus daisy-w-full daisy-text-left daisy-truncate" @click="slotProps.closeDropdown">
-              <SvgAssimilate class="daisy-mr-2" />Recent...
+              <CircleCheck class="daisy-mr-2 w-5 h-5 shrink-0" />Recent...
             </router-link>
           </li>
           <li class="daisy-menu-item hover:daisy-bg-base-200">
@@ -48,8 +48,7 @@
 import type { User } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
-import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
-import SvgAssimilate from "@/components/svgs/SvgAssimilate.vue"
+import { CircleCheck, User as UserIcon } from "lucide-vue-next"
 
 defineProps({
   user: { type: Object as PropType<User>, required: true },

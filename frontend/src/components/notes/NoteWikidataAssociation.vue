@@ -5,13 +5,13 @@
     title="Wiki Association"
     @click="onClickWikidata"
   >
-    <SvgAssociation />
+    <Link2 class="w-5 h-5" />
     Go to Wikidata
   </button>
 </template>
 
 <script setup lang="ts">
-import SvgAssociation from "@/components/svgs/SvgAssociation.vue"
+import { Link2 } from "lucide-vue-next"
 import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup"

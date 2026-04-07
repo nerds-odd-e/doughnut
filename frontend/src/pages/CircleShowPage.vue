@@ -27,7 +27,7 @@
           v-for="member in circle.members"
           :key="member.name"
         >
-          <span :title="member.name"> <SvgMissingAvatar /> </span>
+          <span :title="member.name"> <UserIcon class="w-6 h-6" /> </span>
         </div>
       </nav>
 
@@ -45,7 +45,7 @@
 import NotebookButtons from "@/components/notebook/NotebookButtons.vue"
 import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithButtons.vue"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
-import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
+import { User as UserIcon } from "lucide-vue-next"
 import type {
   CircleForUserView,
   Notebook,

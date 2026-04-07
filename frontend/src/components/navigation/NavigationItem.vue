@@ -14,7 +14,7 @@
       :aria-label="label"
     >
       <div class="icon-container">
-        <component :is="icon" width="24" height="24" />
+        <component :is="icon" :size="24" />
         <div v-if="badge" :class="badgeClass">
           {{ badge }}
         </div>
@@ -28,7 +28,7 @@
       class="daisy-flex daisy-flex-col daisy-items-center"
     >
       <div class="icon-container">
-        <component :is="icon" width="24" height="24" />
+        <component :is="icon" :size="24" />
         <div v-if="badge" :class="badgeClass">
           {{ badge }}
         </div>
@@ -42,7 +42,7 @@
       @click.prevent="$emit('resumeRecall')"
     >
       <div class="icon-container">
-        <component :is="icon" width="24" height="24" />
+        <component :is="icon" :size="24" />
         <div v-if="badge" :class="badgeClass">
           {{ badge }}
         </div>
@@ -58,7 +58,7 @@
         :aria-label="label"
       >
         <div class="icon-container">
-          <component :is="icon" width="24" height="24" />
+          <component :is="icon" :size="24" />
           <div v-if="badge" :class="badgeClass">
             {{ badge }}
           </div>
