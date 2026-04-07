@@ -111,14 +111,47 @@
 
 ---
 
+## Phase 11 — Responsive default PDF width (narrow = full width; wide = sensible cap; page-aware)
+
+**User outcome:** In the **main** reading area, the PDF’s **default** presentation uses **full width** of that area on **narrow** viewports. On **wider** viewports, the default does **not** stretch to arbitrary line length: it **limits** rendered width to a **comfortable reading maximum** relative to the screen, while still respecting the **document’s own page geometry** (e.g. avoid pointless upscaling of a small page; use pdf.js page dimensions / viewport so **aspect ratio** and **intrinsic page size** inform the initial scale, not only the container width).
+
+**E2E:** Assert **observable** layout at **at least two** viewport widths (e.g. below and above the book-reading breakpoint): PDF column uses full main width when narrow; when wide, content width is **capped** (DOM/CSS or stable wrapper semantics the spec can query) and remains **scrollable** as today. Prefer assertions on **user-visible** bounds over pinning internal pdf.js scale constants unless a small black-box helper is the deliberate contract.
+
+**Completion hint:** Align breakpoints with **Phase 4** / [`ongoing/book-reading-ux-ui-roadmap-phases-4-7.md`](book-reading-ux-ui-roadmap-phases-4-7.md) (single primary breakpoint). Recompute default scale on **resize** and **orientation change** so Phase 6 **viewport-current** behavior stays coherent. Architecture: zoom and scale participate in **PDF ↔ outline** sync per [`ongoing/doughnut-book-reading-architecture-roadmap.md`](doughnut-book-reading-architecture-roadmap.md) (*Scrolling (and relevant zoom / page changes)*).
+
+**Scheduling note:** PDF reading polish; may ship **after** Phase 8 or **in parallel** with later phases depending on team priority—keep **one** intentionally failing test per active phase.
+
+---
+
+## Phase 12 — PdfControl in GlobalBar: zoom buttons + grouped PDF chrome (center-weighted)
+
+**User outcome:** The **global bar** exposes **zoom in** and **zoom out** for the PDF. All **PDF-specific** controls in that bar—including the **current page** indicator (existing or added in this phase)—live in one grouped region implemented as **`PdfControl`** (single component or clearly named region for cohesion). The group is placed **center-ish** in the global bar (e.g. between notebook/context on one side and **Outline** / drawer toggles on the other) so PDF actions read as **one** toolbar cluster.
+
+**E2E:** Zoom buttons change PDF presentation in an **observable** way (consistent with Phase 3/5 OCR patterns or an equivalent stable assertion); **page indicator** updates when the user scrolls or navigates pages. **Accessibility:** controls have clear names; grouping does not break keyboard order without an intentional tab sequence.
+
+**Completion hint:** Wire zoom to the same **scale state** Phase 11 establishes for defaults (reset-to-default zoom optional follow-up unless product asks for it in the same phase). Avoid duplicating page labels inside and outside `PdfControl`.
+
+---
+
+## Phase 13 — Gesture zoom on the PDF only (no whole-page zoom)
+
+**User outcome:** **Pinch** (touch) and, where supported, **trackpad pinch** or **ctrl+wheel** (if product chooses to support it) adjust **pdf.js render scale** inside the **PDF viewer** only. Gestures **do not** change **browser zoom** of the surrounding app or hijack **page-level** scroll in a way that breaks the chrome layout; vertical **scroll through the book** remains the primary gesture except when the user is explicitly zooming (see UX roadmap *Cross-cutting: reading and scrolling*).
+
+**E2E:** If Cypress cannot reliably **pinch**, pair **minimal** automated coverage (e.g. programmatic **zoom delta** applied through the same path as buttons, or a thin black-box helper) with a short **manual / device** checklist (iOS Safari, Android Chrome) for real pinch. Do not assert implementation details of `touch-action` in E2E unless they are the user-visible contract.
+
+**Completion hint:** Scope event handling to the **viewer root** (or pdf.js container) so the **outline drawer** and **GlobalBar** are unaffected; coordinate with Phase 12 so button zoom and gesture zoom share **one** scale source of truth.
+
+---
+
 ## After this story
 
 - **Reading record** and **next range** stories build on **BookRange** + **current range** from Phases 5–6.
 - **Phases 9–10** (keyboard outline activation; nested outline interaction) are optional polish after Phase 8 when the team schedules them.
+- **Phases 11–13** (responsive default width, **PdfControl** + zoom buttons, PDF-only gesture zoom) are **reading UX polish** for Story 2; schedule relative to Phase 8 and 9–10 by product priority.
 - Roadmap **open questions** (opaque anchors, finer progress) may narrow once PDF anchor mapping is exercised end-to-end.
 
 ---
 
 ## Phase checklist (when executing)
 
-For each phase: failing test → pass → refactor; run the **relevant** Cypress spec(s); update this plan’s checkboxes or remove done phases when the story is finished; refresh the architecture roadmap if decisions diverge from the table there.
+For each phase: failing test → pass → refactor; run the **relevant** Cypress spec(s); update this plan’s checkboxes or remove done phases when the story is finished; refresh the architecture roadmap if decisions diverge from the table there. For **Phase 13**, supplement Cypress with **manual pinch** verification on real devices when automated pinch is not reliable.
