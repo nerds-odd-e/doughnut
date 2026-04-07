@@ -2,6 +2,11 @@ type PageViewLike = {
   div: HTMLDivElement | undefined
 }
 
+type PageViewWithViewport = {
+  div: HTMLDivElement | undefined
+  viewport?: { width: number; height: number }
+}
+
 /**
  * Viewport Y-range projected onto the anchor page, in MinerU-style coordinates
  * (0–1000, origin top-left, y increasing downward).
@@ -141,35 +146,56 @@ export function pdfViewerReadingPositionTopEdge(
   if (pages <= 0 || !pdfViewer.pdfDocument) {
     return null
   }
-  const containerRect = scrollContainer.getBoundingClientRect()
-  const topY = containerRect.top
+  const cRect = scrollContainer.getBoundingClientRect()
+  const topY = cRect.top + scrollContainer.clientTop
 
   for (let i = 0; i < pages; i++) {
-    const pageView = pdfViewer.getPageView(i) as PageViewLike | undefined
+    const pageView = pdfViewer.getPageView(i) as
+      | PageViewWithViewport
+      | undefined
     const div = pageView?.div
     if (!div) continue
     const pr = div.getBoundingClientRect()
-    if (pr.height <= 1) continue
-    if (topY >= pr.top && topY < pr.bottom) {
+    const innerTop = pr.top + div.clientTop
+    const innerH =
+      pageView.viewport !== undefined && pageView.viewport.height > 1
+        ? pageView.viewport.height
+        : div.clientHeight
+    if (innerH <= 1) continue
+    const innerBottom = innerTop + innerH
+    if (topY >= innerTop && topY < innerBottom) {
       const normalizedTop =
-        (Math.max(0, Math.min(topY - pr.top, pr.height)) / pr.height) * 1000
+        (Math.max(0, Math.min(topY - innerTop, innerH)) / innerH) * 1000
       return { pageIndexZeroBased: i, normalizedTop }
     }
   }
 
-  const first = pdfViewer.getPageView(0) as PageViewLike | undefined
+  const first = pdfViewer.getPageView(0) as PageViewWithViewport | undefined
   if (first?.div) {
     const pr = first.div.getBoundingClientRect()
-    if (pr.height > 1 && topY < pr.top) {
+    const innerTop = pr.top + first.div.clientTop
+    const innerH =
+      first.viewport !== undefined && first.viewport.height > 1
+        ? first.viewport.height
+        : first.div.clientHeight
+    if (innerH > 1 && topY < innerTop) {
       return { pageIndexZeroBased: 0, normalizedTop: 0 }
     }
   }
 
   const lastIdx = pages - 1
-  const last = pdfViewer.getPageView(lastIdx) as PageViewLike | undefined
+  const last = pdfViewer.getPageView(lastIdx) as
+    | PageViewWithViewport
+    | undefined
   if (last?.div) {
     const pr = last.div.getBoundingClientRect()
-    if (pr.height > 1 && topY >= pr.bottom) {
+    const innerTop = pr.top + last.div.clientTop
+    const innerH =
+      last.viewport !== undefined && last.viewport.height > 1
+        ? last.viewport.height
+        : last.div.clientHeight
+    const innerBottom = innerTop + innerH
+    if (innerH > 1 && topY >= innerBottom) {
       return { pageIndexZeroBased: lastIdx, normalizedTop: 1000 }
     }
   }

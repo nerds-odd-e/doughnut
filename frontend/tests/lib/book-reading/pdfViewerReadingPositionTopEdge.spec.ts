@@ -11,25 +11,30 @@ function mockViewer(
     pagesCount: pageRects.length,
     pdfDocument: {},
     currentPageNumber: 1,
-    getPageView: (i: number) => ({
-      div: {
-        getBoundingClientRect: () => {
-          const r = pageRects[i]!
-          const height = r.bottom - r.top
-          return {
-            top: r.top,
-            bottom: r.bottom,
-            left: 0,
-            right: 100,
-            width: 100,
-            height,
-            x: 0,
-            y: r.top,
-            toJSON: () => ({}),
-          } as DOMRect
+    getPageView: (i: number) => {
+      const r = pageRects[i]!
+      const height = r.bottom - r.top
+      return {
+        viewport: { width: 100, height },
+        div: {
+          clientTop: 0,
+          clientLeft: 0,
+          clientHeight: height,
+          getBoundingClientRect: () =>
+            ({
+              top: r.top,
+              bottom: r.bottom,
+              left: 0,
+              right: 100,
+              width: 100,
+              height,
+              x: 0,
+              y: r.top,
+              toJSON: () => ({}),
+            }) as DOMRect,
         },
-      },
-    }),
+      }
+    },
   } as unknown as PdfJsViewerForViewport
 }
 
