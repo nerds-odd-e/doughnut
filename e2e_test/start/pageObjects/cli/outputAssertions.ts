@@ -135,22 +135,6 @@ async function assertCurrentGuidanceContainsBold(
   })
 }
 
-async function assertPastUserMessageContainsInFullBuffer(
-  raw: string,
-  expected: string
-): Promise<void> {
-  if (expected === '') return
-  await waitForTextInSurface({
-    raw,
-    needle: expected,
-    surface: 'fullBuffer',
-    timeoutMs: 0,
-    retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
-    strict: false,
-    messagePrefix: 'Past user messages (in past user messages, full buffer).',
-  })
-}
-
 async function assertPastUserMessageBlankLineAboveInStrippedTranscript(
   raw: string,
   expected: string
@@ -170,7 +154,8 @@ async function assertPastUserMessageBlankLineAboveInStrippedTranscript(
   })
 }
 
-async function assertPastUserMessageNotGrayForegroundOnly(
+/** Full-buffer presence plus gray-block SGR rules in one `waitForTextInSurface` (single xterm gray pass). */
+async function assertPastUserMessageInFullBufferWithGrayBlock(
   raw: string,
   expected: string
 ): Promise<void> {
@@ -183,26 +168,15 @@ async function assertPastUserMessageNotGrayForegroundOnly(
     retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
     strict: false,
     rejectGrayForegroundOnlyWithoutGrayBackground: true,
+    requireGrayBackgroundBlock: true,
     messagePrefix:
-      'Past user messages (gray foreground only without background).',
+      'Past user messages (full buffer + gray background block, no fg-only gray).',
   })
 }
 
-async function assertPastUserMessageGrayBackgroundBlock(
-  raw: string,
-  expected: string
-): Promise<void> {
-  if (expected === '') return
-  await waitForTextInSurface({
-    raw,
-    needle: expected,
-    surface: 'fullBuffer',
-    timeoutMs: 0,
-    retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
-    strict: false,
-    requireGrayBackgroundBlock: true,
-    messagePrefix: 'Past user messages (gray background block).',
-  })
+async function assertPastUserMessagesAll(raw: string, expected: string) {
+  await assertPastUserMessageInFullBufferWithGrayBlock(raw, expected)
+  await assertPastUserMessageBlankLineAboveInStrippedTranscript(raw, expected)
 }
 
 function pastCliAssistantMessages() {
@@ -238,36 +212,14 @@ function answeredQuestions() {
 
 function pastUserMessages() {
   return {
-    expectContainsInFullBuffer(expected: string): Cypress.Chainable<void> {
+    /**
+     * One Cypress retry loop: full-buffer text + gray-block styling, then blank line above in the
+     * stripped transcript (two `waitForTextInSurface` calls per attempt).
+     */
+    expectDisplayed(expected: string): Cypress.Chainable<void> {
       return retryInteractiveAssertion(
-        (raw) => assertPastUserMessageContainsInFullBuffer(raw, expected),
-        'cli-interactive-pty-past-user-full-buffer'
-      )
-    },
-    expectBlankLineAboveInStrippedTranscript(
-      expected: string
-    ): Cypress.Chainable<void> {
-      return retryInteractiveAssertion(
-        (raw) =>
-          assertPastUserMessageBlankLineAboveInStrippedTranscript(
-            raw,
-            expected
-          ),
-        'cli-interactive-pty-past-user-blank-line'
-      )
-    },
-    expectNotGrayForegroundOnlyWithoutBackground(
-      expected: string
-    ): Cypress.Chainable<void> {
-      return retryInteractiveAssertion(
-        (raw) => assertPastUserMessageNotGrayForegroundOnly(raw, expected),
-        'cli-interactive-pty-past-user-not-fg-only'
-      )
-    },
-    expectGrayBackgroundBlock(expected: string): Cypress.Chainable<void> {
-      return retryInteractiveAssertion(
-        (raw) => assertPastUserMessageGrayBackgroundBlock(raw, expected),
-        'cli-interactive-pty-past-user-gray-bg'
+        (raw) => assertPastUserMessagesAll(raw, expected),
+        'cli-interactive-pty-past-user-displayed'
       )
     },
   }
