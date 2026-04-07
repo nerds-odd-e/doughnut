@@ -296,7 +296,7 @@ function onViewportAnchorPage(payload: {
   if (payload.viewport !== null) {
     lastReadPositionPatchDebouncer.propose(
       payload.anchorPageIndexZeroBased,
-      Math.round(payload.viewport.mid)
+      Math.round(payload.viewport.top)
     )
   }
 }

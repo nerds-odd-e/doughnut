@@ -316,19 +316,11 @@ async function scrollToStoredReadingPosition(
   ) {
     return
   }
-  const container = containerRef.value
-  if (!container) return
   const pageNumber = pageIndexZeroBased + 1
   const page = await pdfViewer.pdfDocument.getPage(pageNumber)
   const vp = page.getViewport({ scale: 1 })
   const yNorm = Math.max(0, Math.min(normalizedY, 1000))
-  const renderedPageHeight = vp.height * pdfViewer.currentScale
-  const halfViewportNorm =
-    renderedPageHeight > 0
-      ? (container.clientHeight / renderedPageHeight) * 500
-      : 0
-  const topNorm = Math.max(0, yNorm - halfViewportNorm)
-  const yTopPdf = (topNorm / 1000) * vp.height
+  const yTopPdf = (yNorm / 1000) * vp.height
   const y = vp.height - yTopPdf
   pdfViewer.scrollPageIntoView({
     pageNumber,

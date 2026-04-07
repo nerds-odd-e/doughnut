@@ -352,7 +352,7 @@ describe("BookReadingPage", () => {
   it("debounces PATCH reading position on rapid viewport updates (Phase 1.3)", async () => {
     const { wrapper, patchSpy } = await mountPatchDebounceScenario()
     const pdf = wrapper.findComponent(PdfBookViewer)
-    const viewport = { top: 0, mid: 500, bottom: 1000 }
+    const viewport = { top: 200, mid: 500, bottom: 1000 }
 
     await withFakeTimers(async () => {
       for (let i = 0; i < 3; i++) {
@@ -370,23 +370,23 @@ describe("BookReadingPage", () => {
     expect(patchSpy).toHaveBeenCalledTimes(1)
     expect(patchSpy).toHaveBeenCalledWith({
       path: { notebook: notebookId },
-      body: { pageIndex: 2, normalizedY: 500 },
+      body: { pageIndex: 2, normalizedY: 200 },
     })
   })
 
-  it("PATCH reading position uses last viewport mid within debounce window (Phase 1.3)", async () => {
+  it("PATCH reading position uses last viewport top within debounce window (Phase 1.3)", async () => {
     const { wrapper, patchSpy } = await mountPatchDebounceScenario()
     const pdf = wrapper.findComponent(PdfBookViewer)
 
     await withFakeTimers(async () => {
       pdf.vm.$emit("viewportAnchorPage", {
         anchorPageIndexZeroBased: 0,
-        viewport: { top: 0, mid: 100, bottom: 200 },
+        viewport: { top: 50, mid: 100, bottom: 200 },
         pagesCount: 10,
       })
       pdf.vm.$emit("viewportAnchorPage", {
         anchorPageIndexZeroBased: 0,
-        viewport: { top: 0, mid: 250, bottom: 300 },
+        viewport: { top: 150, mid: 250, bottom: 300 },
         pagesCount: 10,
       })
       await vi.advanceTimersByTimeAsync(LAST_READ_POSITION_PATCH_DEBOUNCE_MS)
@@ -396,7 +396,7 @@ describe("BookReadingPage", () => {
     expect(patchSpy).toHaveBeenCalledTimes(1)
     expect(patchSpy.mock.calls[0]?.[0]).toEqual({
       path: { notebook: notebookId },
-      body: { pageIndex: 0, normalizedY: 250 },
+      body: { pageIndex: 0, normalizedY: 150 },
     })
   })
 
