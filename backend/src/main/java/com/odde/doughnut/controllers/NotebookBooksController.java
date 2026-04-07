@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
 import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
 import com.odde.doughnut.entities.Book;
+import com.odde.doughnut.entities.BookUserLastReadPosition;
 import com.odde.doughnut.entities.BookViews;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.ApiException;
@@ -75,6 +76,31 @@ class NotebookBooksController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
     return bookService.getBookForNotebook(notebook);
+  }
+
+  @Operation(operationId = "getNotebookBookReadingPosition", summary = "Get book reading position")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "Saved position for the current user",
+        content =
+            @Content(
+                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = BookUserLastReadPosition.class))),
+    @ApiResponse(
+        responseCode = "204",
+        description = "No saved position yet (book exists; user has not stored a snapshot)")
+  })
+  @GetMapping("/{notebook}/book/reading-position")
+  @Transactional(readOnly = true)
+  public ResponseEntity<BookUserLastReadPosition> getReadingPosition(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertReadAuthorization(notebook);
+    return bookService
+        .getLastReadPosition(notebook, authorizationService.getCurrentUser())
+        .map(ResponseEntity::ok)
+        .orElseGet(() -> ResponseEntity.noContent().build());
   }
 
   @Operation(

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookRange;
+import com.odde.doughnut.entities.BookUserLastReadPosition;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.BookRepository;
@@ -448,6 +449,60 @@ class NotebookBooksControllerTest extends ControllerTestBase {
               .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookId)
               .isEmpty(),
           equalTo(true));
+    }
+  }
+
+  @Nested
+  class GetReadingPosition {
+    @Test
+    void returnsSavedSnapshotAfterPatch() throws Exception {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      controller.attachBook(nb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
+      controller.patchReadingPosition(nb, lastReadBody(3, 420));
+
+      ResponseEntity<BookUserLastReadPosition> res = controller.getReadingPosition(nb);
+
+      assertThat(res.getStatusCode(), equalTo(HttpStatus.OK));
+      assertThat(res.getBody(), notNullValue());
+      assertThat(res.getBody().getPageIndex(), equalTo(3));
+      assertThat(res.getBody().getNormalizedY(), equalTo(420));
+    }
+
+    @Test
+    void returns204WhenNoSnapshotStored() throws Exception {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      controller.attachBook(nb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
+
+      ResponseEntity<BookUserLastReadPosition> res = controller.getReadingPosition(nb);
+
+      assertThat(res.getStatusCode(), equalTo(HttpStatus.NO_CONTENT));
+      assertThat(res.getBody(), nullValue());
+    }
+
+    @Test
+    void returns404WhenNotebookHasNoBook() throws UnexpectedNoAccessRightException {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      assertThrows(ResponseStatusException.class, () -> controller.getReadingPosition(nb));
+    }
+
+    @Test
+    void rejectsNotebookWithoutReadAccess() throws Exception {
+      User other = makeMe.aUser().please();
+      Notebook otherNb = makeMe.aNotebook().creatorAndOwner(other).please();
+      User reader = currentUser.getUser();
+      currentUser.setUser(other);
+      controller.attachBook(otherNb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
+      currentUser.setUser(reader);
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.getReadingPosition(otherNb));
+    }
+
+    @Test
+    void requiresLoggedInUser() throws Exception {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      controller.attachBook(nb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
+      currentUser.setUser(null);
+      assertThrows(ResponseStatusException.class, () -> controller.getReadingPosition(nb));
     }
   }
 }

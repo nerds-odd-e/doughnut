@@ -620,6 +620,12 @@ export type NotebooksViewedByUser = {
     subscriptions?: Array<Subscription>;
 };
 
+export type BookUserLastReadPosition = {
+    id: number;
+    pageIndex?: number;
+    normalizedY?: number;
+};
+
 export type NotebookCertificateApprovalDto = {
     approval?: NotebookCertificateApproval;
 };
@@ -2565,6 +2571,28 @@ export type MoveToCircleResponses = {
 };
 
 export type MoveToCircleResponse = MoveToCircleResponses[keyof MoveToCircleResponses];
+
+export type GetNotebookBookReadingPositionData = {
+    body?: never;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/book/reading-position';
+};
+
+export type GetNotebookBookReadingPositionResponses = {
+    /**
+     * Saved position for the current user
+     */
+    200: BookUserLastReadPosition;
+    /**
+     * No saved position yet (book exists; user has not stored a snapshot)
+     */
+    204: void;
+};
+
+export type GetNotebookBookReadingPositionResponse = GetNotebookBookReadingPositionResponses[keyof GetNotebookBookReadingPositionResponses];
 
 export type PatchNotebookBookReadingPositionData = {
     body: BookLastReadPositionRequest;

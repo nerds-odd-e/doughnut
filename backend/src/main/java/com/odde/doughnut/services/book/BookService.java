@@ -21,6 +21,7 @@ import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,6 +91,12 @@ public class BookService {
     return bookRepository
         .findByNotebook_Id(notebook.getId())
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
+  }
+
+  @Transactional(readOnly = true)
+  public Optional<BookUserLastReadPosition> getLastReadPosition(Notebook notebook, User user) {
+    Book book = getBookForNotebook(notebook);
+    return bookUserLastReadPositionRepository.findByUser_IdAndBook_Id(user.getId(), book.getId());
   }
 
   @Transactional
