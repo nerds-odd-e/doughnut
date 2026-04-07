@@ -135,11 +135,13 @@
 
 ---
 
-## Phase 13 — Gesture zoom on the PDF only (no whole-page zoom)
+## Phase 13 — Gesture zoom on the PDF only (no whole-page zoom) — **done**
 
 **User outcome:** **Pinch** (touch) and, where supported, **trackpad pinch** or **ctrl+wheel** (if product chooses to support it) adjust **pdf.js render scale** inside the **PDF viewer** only. Gestures **do not** change **browser zoom** of the surrounding app or hijack **page-level** scroll in a way that breaks the chrome layout; vertical **scroll through the book** remains the primary gesture except when the user is explicitly zooming (see UX roadmap *Cross-cutting: reading and scrolling*).
 
 **E2E:** e2e test is not needed for this. Make sure unit test covers it.
+
+**Shipped:** `PdfBookViewer` registers **non-passive** `wheel` on the scroll container when **ctrl** or **meta** is held (`preventDefault` → no browser zoom); maps `deltaY` via `wheelDeltaYToScaleFactor`. **Two-finger pinch** uses `touchmove` with `preventDefault` only while two touches are active; incremental distance ratio updates **`pdfViewer.currentScale`** with focal-point scroll correction (`scrollAfterUniformContentScale` + clamp). Same scale and **`userAdjustedScale`** flag as **Phase 12** toolbar zoom. Pure helpers and tests: [`frontend/src/lib/book-reading/pdfBookViewerZoomAroundPoint.ts`](../frontend/src/lib/book-reading/pdfBookViewerZoomAroundPoint.ts), [`frontend/tests/lib/book-reading/pdfBookViewerZoomAroundPoint.spec.ts`](../frontend/tests/lib/book-reading/pdfBookViewerZoomAroundPoint.spec.ts).
 
 **Completion hint:** Scope event handling to the **viewer root** (or pdf.js container) so the **outline drawer** and **GlobalBar** are unaffected; coordinate with Phase 12 so button zoom and gesture zoom share **one** scale source of truth.
 

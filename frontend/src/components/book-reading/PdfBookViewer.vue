@@ -16,6 +16,11 @@ import {
 } from "@/lib/book-reading/pdfBookViewerGeometryResample"
 import { pdfScaleAfterPageWidth } from "@/lib/book-reading/pdfDefaultScale"
 import {
+  clampScrollAxis,
+  scrollAfterUniformContentScale,
+  wheelDeltaYToScaleFactor,
+} from "@/lib/book-reading/pdfBookViewerZoomAroundPoint"
+import {
   pdfViewerViewportTopYDown,
   type ViewportYRange,
 } from "@/lib/book-reading/pdfViewerViewportTopYDown"
@@ -68,6 +73,12 @@ let detachGeometryResampleListeners: (() => void) | null = null
 let intrinsicFirstPageWidth = 0
 let userAdjustedScale = false
 
+let onWheelForZoom: ((e: WheelEvent) => void) | null = null
+let onTouchStartForPinch: ((e: TouchEvent) => void) | null = null
+let onTouchMoveForPinch: ((e: TouchEvent) => void) | null = null
+let onTouchEndForPinch: ((e: TouchEvent) => void) | null = null
+let lastPinchDistance = 0
+
 const SCALE_EPSILON = 0.001
 
 function teardownGeometryResample() {
@@ -84,6 +95,86 @@ function detachViewportScrollListener(container: HTMLElement) {
     container.removeEventListener("scroll", onScrollForViewport)
     onScrollForViewport = null
   }
+}
+
+function detachGestureListeners(container: HTMLElement) {
+  lastPinchDistance = 0
+  if (onWheelForZoom) {
+    container.removeEventListener("wheel", onWheelForZoom)
+    onWheelForZoom = null
+  }
+  if (onTouchStartForPinch) {
+    container.removeEventListener("touchstart", onTouchStartForPinch)
+    onTouchStartForPinch = null
+  }
+  if (onTouchMoveForPinch) {
+    container.removeEventListener("touchmove", onTouchMoveForPinch)
+    onTouchMoveForPinch = null
+  }
+  if (onTouchEndForPinch) {
+    container.removeEventListener("touchend", onTouchEndForPinch)
+    container.removeEventListener("touchcancel", onTouchEndForPinch)
+    onTouchEndForPinch = null
+  }
+}
+
+function touchPairDistance(a: Touch, b: Touch) {
+  return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY)
+}
+
+function clampOriginInSpan(offset: number, span: number) {
+  if (span <= 0) return 0
+  return Math.min(span, Math.max(0, offset))
+}
+
+function applyGestureScaleFactor(
+  factor: number,
+  clientX: number,
+  clientY: number
+) {
+  const container = containerRef.value
+  if (!container || !pdfViewer) return
+  if (!(factor > 0) || !Number.isFinite(factor)) return
+
+  userAdjustedScale = true
+  const oldScale = pdfViewer.currentScale
+  if (oldScale <= 0) return
+
+  pdfViewer.currentScale = oldScale * factor
+  const newScale = pdfViewer.currentScale
+  const actualFactor = newScale / oldScale
+  if (Math.abs(actualFactor - 1) < 1e-9) {
+    emitViewportDescriptorIfChanged()
+    return
+  }
+
+  const rect = container.getBoundingClientRect()
+  const ox = clampOriginInSpan(clientX - rect.left, rect.width)
+  const oy = clampOriginInSpan(clientY - rect.top, rect.height)
+
+  const next = scrollAfterUniformContentScale({
+    scrollLeft: container.scrollLeft,
+    scrollTop: container.scrollTop,
+    originXInContainer: ox,
+    originYInContainer: oy,
+    scaleFactor: actualFactor,
+  })
+
+  requestAnimationFrame(() => {
+    const c = containerRef.value
+    if (!c || !pdfViewer) return
+    c.scrollLeft = clampScrollAxis(
+      next.scrollLeft,
+      c.scrollWidth,
+      c.clientWidth
+    )
+    c.scrollTop = clampScrollAxis(
+      next.scrollTop,
+      c.scrollHeight,
+      c.clientHeight
+    )
+    emitViewportDescriptorIfChanged()
+  })
 }
 
 function emitViewportDescriptorIfChanged() {
@@ -251,6 +342,7 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
   }
 
   detachViewportScrollListener(container)
+  detachGestureListeners(container)
   teardownGeometryResample()
   lastEmittedPage = null
   lastEmittedYQuantized = null
@@ -278,6 +370,61 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
     emitViewportDescriptorIfChanged()
   }
   container.addEventListener("scroll", onScrollForViewport, { passive: true })
+
+  onWheelForZoom = (e: WheelEvent) => {
+    if (!(e.ctrlKey || e.metaKey)) return
+    if (!pdfViewer) return
+    e.preventDefault()
+    const factor = wheelDeltaYToScaleFactor(e.deltaY)
+    applyGestureScaleFactor(factor, e.clientX, e.clientY)
+  }
+  container.addEventListener("wheel", onWheelForZoom, { passive: false })
+
+  onTouchStartForPinch = (e: TouchEvent) => {
+    const a = e.touches[0]
+    const b = e.touches[1]
+    if (a && b) {
+      lastPinchDistance = touchPairDistance(a, b)
+    }
+  }
+  onTouchMoveForPinch = (e: TouchEvent) => {
+    const a = e.touches[0]
+    const b = e.touches[1]
+    if (!a || !b || !pdfViewer) return
+    e.preventDefault()
+    const d = touchPairDistance(a, b)
+    if (lastPinchDistance <= 0) {
+      lastPinchDistance = d
+      return
+    }
+    if (d <= 0) return
+    const pinchFactor = d / lastPinchDistance
+    lastPinchDistance = d
+    const cx = (a.clientX + b.clientX) / 2
+    const cy = (a.clientY + b.clientY) / 2
+    applyGestureScaleFactor(pinchFactor, cx, cy)
+  }
+  onTouchEndForPinch = (e: TouchEvent) => {
+    const a = e.touches[0]
+    const b = e.touches[1]
+    if (!a || !b) {
+      lastPinchDistance = 0
+    } else {
+      lastPinchDistance = touchPairDistance(a, b)
+    }
+  }
+  container.addEventListener("touchstart", onTouchStartForPinch, {
+    passive: true,
+  })
+  container.addEventListener("touchmove", onTouchMoveForPinch, {
+    passive: false,
+  })
+  container.addEventListener("touchend", onTouchEndForPinch, {
+    passive: true,
+  })
+  container.addEventListener("touchcancel", onTouchEndForPinch, {
+    passive: true,
+  })
 
   geometryRafEmitter = createCoalescedRequestAnimationFrameEmitter({
     emit: () => {
@@ -340,6 +487,7 @@ onBeforeUnmount(async () => {
   const container = containerRef.value
   if (container) {
     detachViewportScrollListener(container)
+    detachGestureListeners(container)
     teardownGeometryResample()
   }
   if (currentLoadingTask) {
