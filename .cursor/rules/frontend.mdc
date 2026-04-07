@@ -90,6 +90,10 @@ CURSOR_DEV=true nix develop -c pnpm format:all
 - Vitest for testing (with playwright browser mode)
 - Biome for linting/formatting
 
+### Icons
+
+- Prefer **Lucide** for normal UI icons (navigation, actions, status outlines) via **`lucide-vue-next`** (`import { IconName } from 'lucide-vue-next'`). Import only the icons each file needs; size them with the component `size` prop and/or Tailwind classes; rely on **`currentColor`** so icons follow text/theme color.
+
 ## Component Rules
 
 ### Naming Conventions

@@ -35,4 +35,18 @@ public class UserToken extends EntityIdentifiedByIdOnly {
   }
 
   public UserToken() {}
+
+  /**
+   * Response-only token info for {@code GET /api/user/token-info} when the bearer value is a
+   * non-persisted test token ({@link com.odde.doughnut.testability.TestAccessTokenResolver}). Not
+   * saved; {@code id} is 0 so revoke-by-bearer does not delete a real row.
+   */
+  public static UserToken forTestabilityTokenInfo(User user) {
+    UserToken t = new UserToken();
+    t.id = 0;
+    t.setUserId(user.getId());
+    t.setLabel("Test access token (" + user.getExternalIdentifier() + ")");
+    t.setToken("");
+    return t;
+  }
 }

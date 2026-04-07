@@ -14,6 +14,7 @@ import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.services.SubscriptionService;
 import com.odde.doughnut.services.UserService;
+import com.odde.doughnut.testability.TestAccessTokenResolver;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimezoneUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -40,6 +41,7 @@ class UserController {
   private final RecallService recallService;
   private final ConversationService conversationService;
   private final TestabilitySettings testabilitySettings;
+  private final Optional<TestAccessTokenResolver> testAccessTokenResolver;
 
   @Autowired
   public UserController(
@@ -49,7 +51,8 @@ class UserController {
       SubscriptionService subscriptionService,
       RecallService recallService,
       ConversationService conversationService,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      Optional<TestAccessTokenResolver> testAccessTokenResolver) {
     this.entityPersister = entityPersister;
     this.authorizationService = authorizationService;
     this.userService = userService;
@@ -57,6 +60,7 @@ class UserController {
     this.recallService = recallService;
     this.conversationService = conversationService;
     this.testabilitySettings = testabilitySettings;
+    this.testAccessTokenResolver = testAccessTokenResolver;
   }
 
   @PostMapping("")
@@ -99,28 +103,47 @@ class UserController {
 
   @GetMapping("/token-info")
   public UserToken getTokenInfo(HttpServletRequest request) {
-    return findTokenFromBearerHeader(request);
+    String token = bearerTokenFromRequestOrThrow(request);
+    return userService
+        .findTokenByToken(token)
+        .or(() -> userTokenFromTestAccessToken(token))
+        .orElseThrow(
+            () ->
+                new ResponseStatusException(
+                    org.springframework.http.HttpStatus.UNAUTHORIZED, "Invalid token"));
   }
 
   @DeleteMapping("/token-info")
   @Transactional
   public void revokeToken(HttpServletRequest request) {
-    UserToken userToken = findTokenFromBearerHeader(request);
+    UserToken userToken = persistedUserTokenFromBearerOrThrow(request);
     userService.deleteToken(userToken.getId());
   }
 
-  private UserToken findTokenFromBearerHeader(HttpServletRequest request) {
+  private String bearerTokenFromRequestOrThrow(HttpServletRequest request) {
     String authHeader = request.getHeader("Authorization");
     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
       throw new ResponseStatusException(
           org.springframework.http.HttpStatus.UNAUTHORIZED, "Missing or invalid Authorization");
     }
+    return authHeader.substring(7);
+  }
+
+  private UserToken persistedUserTokenFromBearerOrThrow(HttpServletRequest request) {
+    String token = bearerTokenFromRequestOrThrow(request);
     return userService
-        .findTokenByToken(authHeader.substring(7))
+        .findTokenByToken(token)
         .orElseThrow(
             () ->
                 new ResponseStatusException(
                     org.springframework.http.HttpStatus.UNAUTHORIZED, "Invalid token"));
+  }
+
+  private Optional<UserToken> userTokenFromTestAccessToken(String token) {
+    if (testAccessTokenResolver.isEmpty() || !testAccessTokenResolver.get().handles(token)) {
+      return Optional.empty();
+    }
+    return testAccessTokenResolver.get().resolve(token).map(UserToken::forTestabilityTokenInfo);
   }
 
   @GetMapping("/get-tokens")

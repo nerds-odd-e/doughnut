@@ -86,6 +86,19 @@ class UserControllerTest extends ControllerTestBase {
   }
 
   @Test
+  void getTokenInfoShouldAcceptTestAccessTokenForExistingUser() {
+    User user = makeMe.aUser().please();
+    MockHttpServletRequest request = new MockHttpServletRequest();
+    request.addHeader("Authorization", "Bearer access-token-of-" + user.getExternalIdentifier());
+    UserToken tokenInfo = controller.getTokenInfo(request);
+
+    assertThat(tokenInfo.getId(), equalTo(0));
+    assertThat(tokenInfo.getUserId(), equalTo(user.getId()));
+    assertThat(
+        tokenInfo.getLabel(), equalTo("Test access token (" + user.getExternalIdentifier() + ")"));
+  }
+
+  @Test
   void getTokenInfoShouldReturn401ForInvalidToken() {
     MockHttpServletRequest request = new MockHttpServletRequest();
     request.addHeader("Authorization", "Bearer invalid-token");
