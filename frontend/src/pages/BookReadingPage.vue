@@ -158,6 +158,7 @@ import {
   ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1,
   parseMineruOutlineV1StartAnchor,
 } from "@/lib/book-reading/mineruOutlineV1PageIndex"
+import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { createViewportCurrentAnchorDebouncer } from "@/lib/book-reading/debounceViewportCurrentAnchorId"
 import { nextLiveAnnouncementText } from "@/lib/book-reading/viewportCurrentLiveAnnouncement"
 import { viewportCurrentAnchorIdFromAnchorPage } from "@/lib/book-reading/viewportCurrentRangeFromAnchorPage"
@@ -172,6 +173,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
 const VIEWPORT_CURRENT_ANCHOR_DEBOUNCE_MS = 120
+const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 
 const props = defineProps({
   notebookId: { type: Number, required: true },
@@ -265,6 +267,15 @@ const viewportCurrentAnchorDebouncer = createViewportCurrentAnchorDebouncer({
   },
 })
 
+const lastReadPositionPatchDebouncer = createLastReadPositionPatchDebouncer({
+  delayMs: LAST_READ_POSITION_PATCH_DEBOUNCE_MS,
+  patch: (body) =>
+    NotebookBooksController.patchNotebookBookReadingPosition({
+      path: { notebook: props.notebookId },
+      body,
+    }),
+})
+
 function onViewportAnchorPage(payload: {
   anchorPageIndexZeroBased: number
   viewport: ViewportYRange | null
@@ -281,6 +292,12 @@ function onViewportAnchorPage(payload: {
     payload.pagesCount
   )
   viewportCurrentAnchorDebouncer.propose(candidate)
+  if (payload.viewport !== null) {
+    lastReadPositionPatchDebouncer.propose(
+      payload.anchorPageIndexZeroBased,
+      Math.round(payload.viewport.mid)
+    )
+  }
 }
 
 watch(viewportCurrentAnchorId, (id) => {
@@ -378,6 +395,7 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   window.removeEventListener("resize", handleResize)
   viewportCurrentAnchorDebouncer.cancel()
+  lastReadPositionPatchDebouncer.cancel()
 })
 </script>
 

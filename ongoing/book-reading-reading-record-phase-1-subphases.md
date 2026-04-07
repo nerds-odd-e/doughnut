@@ -101,6 +101,13 @@ Each row is **shippable alone**: tests green, no unused endpoints/UI hooks, no t
 
 - No unused composable exports; debouncer cancelled on unmount if applicable.
 
+**Choices (shipped):**
+
+- **Debounce:** Trailing-only, **400ms** (`LAST_READ_POSITION_PATCH_DEBOUNCE_MS` on [`frontend/src/pages/BookReadingPage.vue`](../frontend/src/pages/BookReadingPage.vue)); separate from outline viewport-current debounce (120ms).
+- **Payload:** `pageIndex` = `anchorPageIndexZeroBased` from `viewportAnchorPage`; `normalizedY` = `Math.round(viewport.mid)` (MinerU 0–1000). **No PATCH** when `viewport === null` (within-page position unknown).
+- **Dedupe:** Skip scheduling when proposed pair matches last **successfully sent** pair; on fire, skip PATCH if it still matches `lastSent` (after a failed PATCH, `lastSent` is unchanged so a retry can occur).
+- **Implementation:** [`frontend/src/lib/book-reading/debounceLastReadPositionPatch.ts`](../frontend/src/lib/book-reading/debounceLastReadPositionPatch.ts) + wiring in `BookReadingPage`; tests in [`frontend/tests/pages/BookReadingPage.spec.ts`](../frontend/tests/pages/BookReadingPage.spec.ts).
+
 ---
 
 ## 1.4 — Restore on open

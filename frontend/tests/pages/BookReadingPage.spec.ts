@@ -280,6 +280,133 @@ describe("BookReadingPage", () => {
     expect(indicator.text().trim()).toBe("1 / 5")
   })
 
+  it("debounces PATCH reading position on rapid viewport updates (Phase 1.3)", async () => {
+    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+      wrapSdkResponse(makeMe.aBook.ranges(topMathsLikeFlatRanges()).please())
+    )
+    mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+
+    const patchSpy = vi
+      .spyOn(NotebookBooksController, "patchNotebookBookReadingPosition")
+      .mockResolvedValue(wrapSdkResponse(undefined))
+
+    const wrapper = mountBookReadingPage(notebookId)
+    await waitForPdfViewer(wrapper)
+
+    vi.useFakeTimers()
+    try {
+      const pdf = wrapper.findComponent(PdfBookViewer)
+      const viewport = { top: 0, mid: 500, bottom: 1000 }
+
+      pdf.vm.$emit("viewportAnchorPage", {
+        anchorPageIndexZeroBased: 2,
+        viewport,
+        pagesCount: 10,
+      })
+      pdf.vm.$emit("viewportAnchorPage", {
+        anchorPageIndexZeroBased: 2,
+        viewport,
+        pagesCount: 10,
+      })
+      pdf.vm.$emit("viewportAnchorPage", {
+        anchorPageIndexZeroBased: 2,
+        viewport,
+        pagesCount: 10,
+      })
+
+      expect(patchSpy).not.toHaveBeenCalled()
+
+      await vi.advanceTimersByTimeAsync(400)
+      await flushPromises()
+
+      expect(patchSpy).toHaveBeenCalledTimes(1)
+      expect(patchSpy).toHaveBeenCalledWith({
+        path: { notebook: notebookId },
+        body: { pageIndex: 2, normalizedY: 500 },
+      })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it("PATCH reading position uses last viewport mid within debounce window (Phase 1.3)", async () => {
+    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+      wrapSdkResponse(makeMe.aBook.ranges(topMathsLikeFlatRanges()).please())
+    )
+    mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+
+    const patchSpy = vi
+      .spyOn(NotebookBooksController, "patchNotebookBookReadingPosition")
+      .mockResolvedValue(wrapSdkResponse(undefined))
+
+    const wrapper = mountBookReadingPage(notebookId)
+    await waitForPdfViewer(wrapper)
+
+    vi.useFakeTimers()
+    try {
+      const pdf = wrapper.findComponent(PdfBookViewer)
+
+      pdf.vm.$emit("viewportAnchorPage", {
+        anchorPageIndexZeroBased: 0,
+        viewport: { top: 0, mid: 100, bottom: 200 },
+        pagesCount: 10,
+      })
+      pdf.vm.$emit("viewportAnchorPage", {
+        anchorPageIndexZeroBased: 0,
+        viewport: { top: 0, mid: 250, bottom: 300 },
+        pagesCount: 10,
+      })
+
+      await vi.advanceTimersByTimeAsync(400)
+      await flushPromises()
+
+      expect(patchSpy).toHaveBeenCalledTimes(1)
+      expect(patchSpy.mock.calls[0]?.[0]).toEqual({
+        path: { notebook: notebookId },
+        body: { pageIndex: 0, normalizedY: 250 },
+      })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it("does not PATCH reading position when viewport is null (Phase 1.3)", async () => {
+    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+      wrapSdkResponse(makeMe.aBook.ranges(topMathsLikeFlatRanges()).please())
+    )
+    mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+
+    const patchSpy = vi
+      .spyOn(NotebookBooksController, "patchNotebookBookReadingPosition")
+      .mockResolvedValue(wrapSdkResponse(undefined))
+
+    const wrapper = mountBookReadingPage(notebookId)
+    await waitForPdfViewer(wrapper)
+
+    vi.useFakeTimers()
+    try {
+      const pdf = wrapper.findComponent(PdfBookViewer)
+
+      pdf.vm.$emit("viewportAnchorPage", {
+        anchorPageIndexZeroBased: 0,
+        viewport: null,
+        pagesCount: 10,
+      })
+      pdf.vm.$emit("viewportAnchorPage", {
+        anchorPageIndexZeroBased: 1,
+        viewport: null,
+        pagesCount: 10,
+      })
+
+      await vi.advanceTimersByTimeAsync(400)
+      await flushPromises()
+
+      expect(patchSpy).not.toHaveBeenCalled()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it("outline toggle exposes aria-expanded and aria-controls (Phase 7.7)", async () => {
     await withStubbedInnerWidth(1024, async () => {
       vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
