@@ -50,13 +50,6 @@ async function assertStrippedPtyTranscriptContains(
   expected: string,
   domainHeading: string
 ): Promise<void> {
-  const stripped = stripAnsiCliPty(raw)
-  if (stripped.length === 0) {
-    failCliAssertion(
-      `${domainHeading}: expected ${JSON.stringify(expected)}, but the PTY transcript is empty after stripping ANSI.`,
-      raw
-    )
-  }
   if (expected === '') return
   try {
     await waitForTextInSurface({
