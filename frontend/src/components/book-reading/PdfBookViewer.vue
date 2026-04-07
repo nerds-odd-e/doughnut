@@ -52,6 +52,7 @@ const emit = defineEmits<{
       pagesCount: number
     },
   ]
+  pagesReady: []
 }>()
 
 const containerRef = ref<HTMLDivElement | null>(null)
@@ -303,6 +304,31 @@ async function scrollToMineruOutlineV1Target(target: {
   await applyMineruOutlineV1Target(pageIndexZeroBased, bbox)
 }
 
+async function scrollToStoredReadingPosition(
+  pageIndexZeroBased: number,
+  normalizedY: number
+) {
+  if (!pdfViewer?.pdfDocument) return
+  if (
+    !Number.isInteger(pageIndexZeroBased) ||
+    pageIndexZeroBased < 0 ||
+    pageIndexZeroBased >= pdfViewer.pagesCount
+  ) {
+    return
+  }
+  const pageNumber = pageIndexZeroBased + 1
+  const page = await pdfViewer.pdfDocument.getPage(pageNumber)
+  const vp = page.getViewport({ scale: 1 })
+  const yNorm = Math.max(0, Math.min(normalizedY, 1000))
+  const yTopPdf = Math.max(0, (yNorm / 1000) * vp.height - 40)
+  const y = vp.height - yTopPdf
+  pdfViewer.scrollPageIntoView({
+    pageNumber,
+    destArray: [null, { name: "XYZ" }, vp.width / 2, y, null],
+  })
+  queueMicrotask(() => emitViewportDescriptorIfChanged())
+}
+
 const ZOOM_STEP = 1.25
 
 function zoomIn() {
@@ -319,7 +345,12 @@ function zoomOut() {
   emitViewportDescriptorIfChanged()
 }
 
-defineExpose({ scrollToMineruOutlineV1Target, zoomIn, zoomOut })
+defineExpose({
+  scrollToMineruOutlineV1Target,
+  scrollToStoredReadingPosition,
+  zoomIn,
+  zoomOut,
+})
 
 async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
   const container = containerRef.value
@@ -448,6 +479,7 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
       applyResponsiveDefaultScale({ force: true })
       flushPendingNavigation()
       emitViewportDescriptorIfChanged()
+      emit("pagesReady")
     }
   })
 

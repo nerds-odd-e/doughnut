@@ -111,6 +111,18 @@ describe("BookReadingPage", () => {
 
   beforeEach(() => {
     vi.restoreAllMocks()
+    // Default to "no saved position" so existing tests that mock fetch globally
+    // are not affected by the concurrent getNotebookBookReadingPosition call.
+    vi.spyOn(
+      NotebookBooksController,
+      "getNotebookBookReadingPosition"
+    ).mockResolvedValue(
+      wrapSdkResponse(undefined) as Awaited<
+        ReturnType<
+          typeof NotebookBooksController.getNotebookBookReadingPosition
+        >
+      >
+    )
   })
 
   it("shows fetch error when book file returns an error status", async () => {
@@ -405,6 +417,72 @@ describe("BookReadingPage", () => {
     } finally {
       vi.useRealTimers()
     }
+  })
+
+  it("restores reading position from stored snapshot on open (Phase 1.4)", async () => {
+    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+      wrapSdkResponse(makeMe.aBook.please())
+    )
+    vi.spyOn(
+      NotebookBooksController,
+      "getNotebookBookReadingPosition"
+    ).mockResolvedValue(
+      wrapSdkResponse({ id: 1, pageIndex: 2, normalizedY: 750 })
+    )
+    mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+
+    const wrapper = mountBookReadingPage(notebookId)
+    await waitForPdfViewer(wrapper)
+
+    const pdf = wrapper.findComponent(PdfBookViewer)
+    const exposed = (
+      pdf.vm as unknown as {
+        $: {
+          exposed: {
+            scrollToStoredReadingPosition: (
+              page: number,
+              y: number
+            ) => Promise<void>
+          }
+        }
+      }
+    ).$.exposed
+    const spy = vi.spyOn(exposed, "scrollToStoredReadingPosition")
+
+    pdf.vm.$emit("pagesReady")
+    await flushPromises()
+
+    expect(spy).toHaveBeenCalledWith(2, 750)
+  })
+
+  it("does not restore reading position when no snapshot exists (Phase 1.4)", async () => {
+    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+      wrapSdkResponse(makeMe.aBook.please())
+    )
+    mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+
+    const wrapper = mountBookReadingPage(notebookId)
+    await waitForPdfViewer(wrapper)
+
+    const pdf = wrapper.findComponent(PdfBookViewer)
+    const exposed = (
+      pdf.vm as unknown as {
+        $: {
+          exposed: {
+            scrollToStoredReadingPosition: (
+              page: number,
+              y: number
+            ) => Promise<void>
+          }
+        }
+      }
+    ).$.exposed
+    const spy = vi.spyOn(exposed, "scrollToStoredReadingPosition")
+
+    pdf.vm.$emit("pagesReady")
+    await flushPromises()
+
+    expect(spy).not.toHaveBeenCalled()
   })
 
   it("outline toggle exposes aria-expanded and aria-controls (Phase 7.7)", async () => {

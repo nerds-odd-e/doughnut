@@ -142,6 +142,7 @@
             :pdf-bytes="bookPdfBytes"
             @load-error="onPdfLoadError"
             @viewport-anchor-page="onViewportAnchorPage"
+            @pages-ready="onPagesReady"
           />
         </main>
       </div>
@@ -332,14 +333,31 @@ watch(
   { flush: "post" }
 )
 
+const initialLastRead = ref<{
+  pageIndexZeroBased: number
+  normalizedY: number
+} | null>(null)
+
 const pdfViewerRef = ref<{
   scrollToMineruOutlineV1Target: (target: {
     pageIndexZeroBased: number
     bbox: readonly [number, number, number, number] | null
   }) => Promise<void>
+  scrollToStoredReadingPosition: (
+    pageIndexZeroBased: number,
+    normalizedY: number
+  ) => Promise<void>
   zoomIn: () => void
   zoomOut: () => void
 } | null>(null)
+
+function onPagesReady() {
+  const snap = initialLastRead.value
+  if (!snap) return
+  pdfViewerRef.value
+    ?.scrollToStoredReadingPosition(snap.pageIndexZeroBased, snap.normalizedY)
+    .catch(() => undefined)
+}
 
 async function onOutlineRowClick(node: OutlineNode) {
   const anchor = node.startAnchor
@@ -375,12 +393,29 @@ onMounted(async () => {
       pdfError.value = null
       resetPdfPageIndicator()
       try {
-        const res = await fetch(notebookBookFilePath(props.notebookId), {
-          credentials: "same-origin",
-        })
+        const [res, posResult] = await Promise.all([
+          fetch(notebookBookFilePath(props.notebookId), {
+            credentials: "same-origin",
+          }),
+          NotebookBooksController.getNotebookBookReadingPosition({
+            path: { notebook: props.notebookId },
+          }).catch(() => null),
+        ])
         if (!res.ok) {
           pdfError.value = "Could not load the book file."
           return
+        }
+        if (
+          posResult !== null &&
+          !posResult.error &&
+          posResult.data &&
+          typeof posResult.data.pageIndex === "number" &&
+          typeof posResult.data.normalizedY === "number"
+        ) {
+          initialLastRead.value = {
+            pageIndexZeroBased: posResult.data.pageIndex,
+            normalizedY: posResult.data.normalizedY,
+          }
         }
         bookPdfBytes.value = await res.arrayBuffer()
       } catch {
