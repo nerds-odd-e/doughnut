@@ -250,6 +250,37 @@ describe("BookReadingPage", () => {
     })
   })
 
+  it("zoom buttons exist with accessible names and page indicator shows via PdfControl (Phase 12)", async () => {
+    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+      wrapSdkResponse(makeMe.aBook.ranges(topMathsLikeFlatRanges()).please())
+    )
+    mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+
+    const wrapper = mountBookReadingPage(notebookId)
+    await waitForPdfViewer(wrapper)
+
+    expect(
+      wrapper.find('[data-testid="pdf-zoom-in"]').attributes("aria-label")
+    ).toBe("Zoom in")
+    expect(
+      wrapper.find('[data-testid="pdf-zoom-out"]').attributes("aria-label")
+    ).toBe("Zoom out")
+
+    const pdf = wrapper.findComponent(PdfBookViewer)
+    pdf.vm.$emit("viewportAnchorPage", {
+      anchorPageIndexZeroBased: 0,
+      viewport: null,
+      pagesCount: 5,
+    })
+    await new Promise((r) => setTimeout(r, 200))
+
+    const indicator = wrapper.find(
+      '[data-testid="book-reading-page-indicator"]'
+    )
+    expect(indicator.exists()).toBe(true)
+    expect(indicator.text().trim()).toBe("1 / 5")
+  })
+
   it("outline toggle exposes aria-expanded and aria-controls (Phase 7.7)", async () => {
     await withStubbedInnerWidth(1024, async () => {
       vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(

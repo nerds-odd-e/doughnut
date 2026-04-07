@@ -184,7 +184,21 @@ async function scrollToMineruOutlineV1Target(target: {
   await applyMineruOutlineV1Target(pageIndexZeroBased, bbox)
 }
 
-defineExpose({ scrollToMineruOutlineV1Target })
+const ZOOM_STEP = 1.25
+
+function zoomIn() {
+  if (!pdfViewer) return
+  pdfViewer.currentScale *= ZOOM_STEP
+  emitViewportDescriptorIfChanged()
+}
+
+function zoomOut() {
+  if (!pdfViewer) return
+  pdfViewer.currentScale /= ZOOM_STEP
+  emitViewportDescriptorIfChanged()
+}
+
+defineExpose({ scrollToMineruOutlineV1Target, zoomIn, zoomOut })
 
 async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
   const container = containerRef.value

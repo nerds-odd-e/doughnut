@@ -59,14 +59,13 @@
         >
           {{ book.bookName }}
         </span>
-        <span
-          v-if="pdfPageIndicatorVisible"
-          data-testid="book-reading-page-indicator"
-          class="daisy-shrink-0 daisy-text-sm daisy-text-base-content/70 daisy-tabular-nums daisy-ml-2"
-          :aria-label="`Page ${pdfBarCurrentPage} of ${pdfBarPagesTotal}`"
-        >
-          {{ pdfBarCurrentPage }} / {{ pdfBarPagesTotal }}
-        </span>
+        <PdfControl
+          class="daisy-ml-auto daisy-mr-2"
+          :current-page="pdfBarCurrentPage"
+          :pages-total="pdfBarPagesTotal"
+          @zoom-in="pdfViewerRef?.zoomIn()"
+          @zoom-out="pdfViewerRef?.zoomOut()"
+        />
       </GlobalBar>
       <div
         v-if="!isMdOrLarger && outlineOpened"
@@ -154,6 +153,7 @@
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
+import PdfControl from "@/components/book-reading/PdfControl.vue"
 import {
   ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1,
   parseMineruOutlineV1StartAnchor,
@@ -188,13 +188,6 @@ const pdfError = ref<string | null>(null)
 
 const pdfBarCurrentPage = ref<number | null>(null)
 const pdfBarPagesTotal = ref<number | null>(null)
-
-const pdfPageIndicatorVisible = computed(
-  () =>
-    pdfBarCurrentPage.value != null &&
-    pdfBarPagesTotal.value != null &&
-    pdfBarPagesTotal.value > 0
-)
 
 function resetPdfPageIndicator() {
   pdfBarCurrentPage.value = null
@@ -327,6 +320,8 @@ const pdfViewerRef = ref<{
     pageIndexZeroBased: number
     bbox: readonly [number, number, number, number] | null
   }) => Promise<void>
+  zoomIn: () => void
+  zoomOut: () => void
 } | null>(null)
 
 async function onOutlineRowClick(node: OutlineNode) {
