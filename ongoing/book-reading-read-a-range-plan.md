@@ -111,11 +111,13 @@
 
 ---
 
-## Phase 11 — Responsive default PDF width (narrow = full width; wide = sensible cap; page-aware)
+## Phase 11 — Responsive default PDF width (narrow = full width; wide = sensible cap; page-aware) — **done**
 
 **User outcome:** In the **main** reading area, the PDF’s **default** presentation uses **full width** of that area on **narrow** viewports. On **wider** viewports, the default does **not** stretch to arbitrary line length: it **limits** rendered width to a **comfortable reading maximum** relative to the screen, while still respecting the **document’s own page geometry** (e.g. avoid pointless upscaling of a small page; use pdf.js page dimensions / viewport so **aspect ratio** and **intrinsic page size** inform the initial scale, not only the container width).
 
 **E2E:** e2e test is not needed for this. Make sure unit test covers it.
+
+**Shipped:** `PdfBookViewer` uses pdf.js `"page-width"` for the container fit (same padding/page-chrome math as the viewer), then clamps with `pdfScaleAfterPageWidth` so wide layouts cap at `MAX_COMFORTABLE_PDF_WIDTH_PX` relative to first-page intrinsic width; responsive re-apply on geometry changes when the user has not manually zoomed; manual zoom preserved on resize/toggle. Unit coverage is in [`frontend/tests/lib/book-reading/pdfDefaultScale.spec.ts`](../frontend/tests/lib/book-reading/pdfDefaultScale.spec.ts).
 
 **Completion hint:** Align breakpoints with **Phase 4** / [`ongoing/book-reading-ux-ui-roadmap-phases-4-7.md`](book-reading-ux-ui-roadmap-phases-4-7.md) (single primary breakpoint). Recompute default scale on **resize** and **orientation change** so Phase 6 **viewport-current** behavior stays coherent. Architecture: zoom and scale participate in **PDF ↔ outline** sync per [`ongoing/doughnut-book-reading-architecture-roadmap.md`](doughnut-book-reading-architecture-roadmap.md) (*Scrolling (and relevant zoom / page changes)*).
 

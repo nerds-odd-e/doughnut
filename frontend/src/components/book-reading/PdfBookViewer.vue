@@ -14,6 +14,7 @@ import {
   attachPdfBookViewerGeometryResampleListeners,
   createCoalescedRequestAnimationFrameEmitter,
 } from "@/lib/book-reading/pdfBookViewerGeometryResample"
+import { pdfScaleAfterPageWidth } from "@/lib/book-reading/pdfDefaultScale"
 import {
   pdfViewerViewportTopYDown,
   type ViewportYRange,
@@ -61,6 +62,10 @@ let geometryRafEmitter: ReturnType<
   typeof createCoalescedRequestAnimationFrameEmitter
 > | null = null
 let detachGeometryResampleListeners: (() => void) | null = null
+let intrinsicFirstPageWidth = 0
+let userAdjustedScale = false
+
+const SCALE_EPSILON = 0.001
 
 function teardownGeometryResample() {
   geometryRafEmitter?.cancel()
@@ -97,6 +102,24 @@ function emitViewportDescriptorIfChanged() {
     viewport: sample.viewport,
     pagesCount: pdfViewer.pagesCount,
   })
+}
+
+function applyResponsiveDefaultScale(options?: { force?: boolean }) {
+  const force = options?.force === true
+  const container = containerRef.value
+  if (!container || !pdfViewer || intrinsicFirstPageWidth <= 0) return
+  if (!force && userAdjustedScale) return
+  if (container.clientWidth <= 0) return
+
+  pdfViewer.currentScaleValue = "page-width"
+  const nextScale = pdfScaleAfterPageWidth(
+    pdfViewer.currentScale,
+    intrinsicFirstPageWidth
+  )
+  if (Math.abs(pdfViewer.currentScale - nextScale) < SCALE_EPSILON) {
+    return
+  }
+  pdfViewer.currentScale = nextScale
 }
 
 type PendingNav = {
@@ -188,12 +211,14 @@ const ZOOM_STEP = 1.25
 
 function zoomIn() {
   if (!pdfViewer) return
+  userAdjustedScale = true
   pdfViewer.currentScale *= ZOOM_STEP
   emitViewportDescriptorIfChanged()
 }
 
 function zoomOut() {
   if (!pdfViewer) return
+  userAdjustedScale = true
   pdfViewer.currentScale /= ZOOM_STEP
   emitViewportDescriptorIfChanged()
 }
@@ -224,6 +249,8 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
   teardownGeometryResample()
   lastEmittedPage = null
   lastEmittedYQuantized = null
+  intrinsicFirstPageWidth = 0
+  userAdjustedScale = false
 
   const eventBus = new EventBus()
   const linkService = new PDFLinkService({ eventBus })
@@ -248,7 +275,10 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
   container.addEventListener("scroll", onScrollForViewport, { passive: true })
 
   geometryRafEmitter = createCoalescedRequestAnimationFrameEmitter({
-    emit: emitViewportDescriptorIfChanged,
+    emit: () => {
+      applyResponsiveDefaultScale()
+      emitViewportDescriptorIfChanged()
+    },
   })
   detachGeometryResampleListeners =
     attachPdfBookViewerGeometryResampleListeners({
@@ -259,8 +289,7 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
 
   eventBus.on("pagesinit", () => {
     if (pdfViewer) {
-      const containerWidth = container.clientWidth
-      pdfViewer.currentScaleValue = containerWidth > 0 ? "page-width" : "1"
+      applyResponsiveDefaultScale({ force: true })
       flushPendingNavigation()
       emitViewportDescriptorIfChanged()
     }
@@ -274,6 +303,10 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
   try {
     const pdf = await loadingTask.promise
     if (currentLoadingTask !== loadingTask) return
+    const firstPage = await pdf.getPage(1)
+    if (currentLoadingTask !== loadingTask) return
+    intrinsicFirstPageWidth = firstPage.getViewport({ scale: 1 }).width
+    userAdjustedScale = false
     pdfViewer.setDocument(pdf)
     linkService.setDocument(pdf)
   } catch {
