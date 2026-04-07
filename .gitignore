@@ -143,5 +143,6 @@ doughnut_mobile/android/app/local.properties
 .claude/
 .serena/
 frontend/vitest-test-results/
+frontend/.vitest-attachments/
 
 tt/
