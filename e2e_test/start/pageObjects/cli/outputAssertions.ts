@@ -1,7 +1,4 @@
-import {
-  formatRawTerminalSnapshotForError,
-  headPreview,
-} from 'tty-assert/errorSnapshotFormatting'
+import { formatRawTerminalSnapshotForError } from 'tty-assert/errorSnapshotFormatting'
 import {
   stripAnsiCliPty,
   TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS,
@@ -16,6 +13,10 @@ function failCliAssertion(message: string, raw: string): never {
   throw new Error(
     `${message}\n\n--- CLI terminal snapshot (ANSI-stripped, safe text) ---\n${formatRawTerminalSnapshotForError(raw)}`
   )
+}
+
+function escapeRegExpLiteral(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 function retryInteractiveAssertion(
@@ -159,17 +160,28 @@ async function assertPastUserMessagesContains(
     )
   }
 
-  const preview = headPreview(stripped)
-
   if (expected !== '') {
     await waitForTextInSurface({
       raw,
       needle: expected,
-      surface: 'strippedTranscript',
+      surface: 'fullBuffer',
       timeoutMs: 0,
       retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
       strict: false,
       messagePrefix: 'Past user messages (in past user messages).',
+    })
+
+    await waitForTextInSurface({
+      raw,
+      needle: new RegExp(
+        String.raw`(?:^|\n)[^\S\n]*\n[^\n]*${escapeRegExpLiteral(expected)}[^\n]*`
+      ),
+      surface: 'strippedTranscript',
+      timeoutMs: 0,
+      retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
+      strict: false,
+      messagePrefix:
+        'Past user messages must leave one blank line above the matching user message.',
     })
   }
 
@@ -193,35 +205,6 @@ async function assertPastUserMessagesContains(
       raw
     )
   }
-
-  const normalized = stripped.replace(/\r/g, '')
-  const lines = normalized.split('\n')
-  for (let i = lines.length - 1; i >= 0; i--) {
-    const line = lines[i]
-    if (line === undefined || !line.includes(expected)) continue
-    if (i === 0) {
-      failCliAssertion(
-        `Past user message line containing ${JSON.stringify(expected)} must have one blank line above it (top padding). ` +
-          `It is the first line of the stripped transcript (no line above). Preview:\n${preview}`,
-        raw
-      )
-    }
-    const lineAbove = lines[i - 1]
-    const prev = (lineAbove ?? '').trim()
-    if (prev !== '') {
-      failCliAssertion(
-        `Past user message line containing ${JSON.stringify(expected)} must have one blank line above it (top padding in the past message area). ` +
-          `The line above is not blank: ${JSON.stringify((lineAbove ?? '').slice(0, 200))}`,
-        raw
-      )
-    }
-    return
-  }
-
-  failCliAssertion(
-    `Internal: stripped transcript includes ${JSON.stringify(expected)} but no line contained it when splitting on newlines.`,
-    raw
-  )
 }
 
 function pastCliAssistantMessages() {
