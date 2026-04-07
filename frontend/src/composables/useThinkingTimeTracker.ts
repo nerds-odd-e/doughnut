@@ -7,6 +7,15 @@ export function useThinkingTimeTracker() {
   const isPaused = ref(false)
   const hasStopped = ref(false)
 
+  let visibilitySyncIntervalId: ReturnType<typeof setInterval> | null = null
+
+  const clearVisibilitySync = () => {
+    if (visibilitySyncIntervalId !== null) {
+      clearInterval(visibilitySyncIntervalId)
+      visibilitySyncIntervalId = null
+    }
+  }
+
   const pause = () => {
     if (!isRunning.value || runningStart.value === null) return
 
@@ -15,14 +24,27 @@ export function useThinkingTimeTracker() {
     runningStart.value = null
     isRunning.value = false
     isPaused.value = true
+    clearVisibilitySync()
   }
 
   const resume = () => {
     if (hasStopped.value || isRunning.value) return
+    if (document.hidden) return
 
     runningStart.value = performance.now()
     isRunning.value = true
     isPaused.value = false
+
+    clearVisibilitySync()
+    visibilitySyncIntervalId = setInterval(() => {
+      if (hasStopped.value) {
+        clearVisibilitySync()
+        return
+      }
+      if (isRunning.value && document.hidden) {
+        pause()
+      }
+    }, 250)
   }
 
   const start = async () => {
@@ -67,22 +89,35 @@ export function useThinkingTimeTracker() {
     }
   }
 
+  const handlePageHide = () => {
+    pause()
+  }
+
+  const handlePageShow = () => {
+    resume()
+  }
+
   const handleBlur = () => {
     pause()
   }
 
   const handleFocus = () => {
+    if (document.hidden) return
     resume()
   }
 
   const setupEventListeners = () => {
     document.addEventListener("visibilitychange", handleVisibilityChange)
+    window.addEventListener("pagehide", handlePageHide)
+    window.addEventListener("pageshow", handlePageShow)
     window.addEventListener("blur", handleBlur)
     window.addEventListener("focus", handleFocus)
   }
 
   const removeEventListeners = () => {
     document.removeEventListener("visibilitychange", handleVisibilityChange)
+    window.removeEventListener("pagehide", handlePageHide)
+    window.removeEventListener("pageshow", handlePageShow)
     window.removeEventListener("blur", handleBlur)
     window.removeEventListener("focus", handleFocus)
   }
@@ -91,6 +126,7 @@ export function useThinkingTimeTracker() {
 
   onUnmounted(() => {
     removeEventListeners()
+    clearVisibilitySync()
     pause()
   })
 
