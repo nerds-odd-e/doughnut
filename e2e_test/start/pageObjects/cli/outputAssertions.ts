@@ -1,6 +1,5 @@
 import { formatRawTerminalSnapshotForError } from 'tty-assert/errorSnapshotFormatting'
 import {
-  stripAnsiCliPty,
   TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS,
   waitForTextInSurface,
 } from 'tty-assert/waitForTextInSurface'
@@ -152,14 +151,6 @@ async function assertPastUserMessagesContains(
   raw: string,
   expected: string
 ): Promise<void> {
-  const stripped = stripAnsiCliPty(raw)
-  if (stripped.length === 0) {
-    failCliAssertion(
-      `Expected ${JSON.stringify(expected)} in past user messages, but the PTY transcript is empty after stripping ANSI escape codes.`,
-      raw
-    )
-  }
-
   await waitForTextInSurface({
     raw,
     needle: expected,

@@ -21,8 +21,6 @@ import { formatRawTerminalSnapshotForError } from './errorSnapshotFormatting'
 import { CLI_INTERACTIVE_PTY_COLS, CLI_INTERACTIVE_PTY_ROWS } from './geometry'
 import { stripAnsiCliPty } from './stripAnsi'
 
-export { stripAnsiCliPty }
-
 export type TtySearchSurface =
   | 'viewableBuffer'
   | 'fullBuffer'
