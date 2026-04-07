@@ -11,6 +11,9 @@
  *
  * **`ptyTranscriptToViewportPlaintext`:** still uses **`\n`‑joined** viewport lines for guidance
  * heuristics; locators here intentionally use the flat block for matching.
+ *
+ * **`requireBold`:** after a string needle matches, the **first** occurrence must be entirely bold
+ * (second xterm replay for the cell attribute scan).
  */
 
 import { Terminal } from '@xterm/headless'
@@ -52,6 +55,12 @@ export type WaitForTextInSurfaceOptions = {
   fallbackRowCount?: number
   /** Prepended to the failure body (one line is typical), before surface/snapshot sections. */
   messagePrefix?: string
+  /**
+   * After the needle matches, require every cell of the **first** `indexOf` occurrence in the
+   * search region to be bold (xterm `isBold()`). Only for `viewableBuffer` / `fullBuffer` with a
+   * **string** needle.
+   */
+  requireBold?: boolean
 }
 
 /** Default delay between poll attempts when `timeoutMs` is positive; Cypress adapter should use the same value for `cy.wait` between buffer re-reads. */
@@ -176,6 +185,54 @@ function matchCount(haystack: string, needle: string | RegExp): number {
   return Array.from(haystack.matchAll(regexForMatchAll(needle))).length
 }
 
+async function verifyBoldAtFirstStringMatch(opts: {
+  raw: string
+  cols: number
+  rows: number
+  surface: 'viewableBuffer' | 'fullBuffer'
+  needle: string
+  startAfterAnchor?: RegExp[]
+  fallbackRowCount?: number
+}): Promise<{ ok: true } | { ok: false; snapshot: string; detail: string }> {
+  return withReplayedXtermTerminal(opts.raw, opts.cols, opts.rows, (term) => {
+    const buffer = term.buffer.active
+    const startY = opts.surface === 'fullBuffer' ? 0 : buffer.baseY
+    const endY = buffer.length
+    const allRows = xtermBufferRows(term, startY, endY)
+    const { rows: searchRows, rowOffset } = sliceByAnchor(
+      allRows,
+      opts.startAfterAnchor,
+      opts.fallbackRowCount
+    )
+    const haystack = rowMajorSearchBlock(searchRows)
+    const snapshot = rowMajorSnapshot(searchRows)
+    const index = haystack.indexOf(opts.needle)
+    if (index < 0) {
+      return {
+        ok: false,
+        snapshot,
+        detail: `Substring ${JSON.stringify(opts.needle)} not found in surface "${opts.surface}" (bold check).`,
+      }
+    }
+    const rowWidth = opts.cols
+    for (let i = 0; i < opts.needle.length; i++) {
+      const pos = index + i
+      const localY = Math.floor(pos / rowWidth)
+      const x = pos % rowWidth
+      const termLine = buffer.getLine(startY + rowOffset + localY)
+      const cell = termLine?.getCell(x)
+      if ((cell?.isBold() ?? 0) === 0) {
+        return {
+          ok: false,
+          snapshot,
+          detail: `Matched text ${JSON.stringify(opts.needle)} is present but not all cells at the first occurrence are bold.`,
+        }
+      }
+    }
+    return { ok: true }
+  })
+}
+
 async function buildHaystackAndSnapshot(
   surface: TtySearchSurface,
   raw: string,
@@ -259,6 +316,34 @@ async function attemptOnce(
       detail: `Substring/pattern ${label} not found in surface "${opts.surface}".`,
     }
   }
+
+  if (opts.requireBold) {
+    if (
+      opts.surface === 'strippedTranscript' ||
+      typeof opts.needle !== 'string'
+    ) {
+      throw new Error(
+        'waitForTextInSurface: invalid requireBold options (caller must validate).'
+      )
+    }
+    const bold = await verifyBoldAtFirstStringMatch({
+      raw: opts.raw,
+      cols: opts.cols,
+      rows: opts.rows,
+      surface: opts.surface,
+      needle: opts.needle,
+      startAfterAnchor: opts.startAfterAnchor,
+      fallbackRowCount: opts.fallbackRowCount,
+    })
+    if (!bold.ok) {
+      return {
+        ok: false,
+        snapshot: bold.snapshot,
+        detail: bold.detail,
+      }
+    }
+  }
+
   return { ok: true }
 }
 
@@ -305,6 +390,19 @@ function appendRawTerminalSnapshotForErrorMessage(
 export async function waitForTextInSurface(
   opts: WaitForTextInSurfaceOptions
 ): Promise<void> {
+  if (opts.requireBold) {
+    if (opts.surface === 'strippedTranscript') {
+      throw new Error(
+        'waitForTextInSurface: requireBold is only supported for viewableBuffer and fullBuffer.'
+      )
+    }
+    if (typeof opts.needle !== 'string') {
+      throw new Error(
+        'waitForTextInSurface: requireBold requires a string needle.'
+      )
+    }
+  }
+
   const timeoutMs = opts.timeoutMs ?? 0
   const retryMs = opts.retryMs ?? TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS
   const strict = opts.strict ?? true
@@ -351,72 +449,4 @@ export async function waitForTextInSurface(
     }
     await sleep(retryMs)
   }
-}
-
-/**
- * Locator-style cell resolution: replays `raw` through xterm, finds `needle`
- * in the viewport (optionally below an anchor row), and returns the matched
- * xterm cells with position and styling attributes.
- *
- * Inspired by [tui-test `Locator.resolve`](https://github.com/microsoft/tui-test).
- */
-export type ResolvedCell = {
-  char: string
-  x: number
-  y: number
-  bold: boolean
-}
-
-export type LocateTextResult = {
-  found: boolean
-  cells: ResolvedCell[]
-  snapshot: string
-}
-
-export async function locateTextCellsInViewport(opts: {
-  raw: string
-  needle: string
-  startAfterAnchor?: RegExp[]
-  fallbackRowCount?: number
-  cols?: number
-  rows?: number
-}): Promise<LocateTextResult> {
-  const cols = opts.cols ?? CLI_INTERACTIVE_PTY_COLS
-  const rows = opts.rows ?? CLI_INTERACTIVE_PTY_ROWS
-
-  return withReplayedXtermTerminal(opts.raw, cols, rows, (term) => {
-    const buffer = term.buffer.active
-    const baseY = buffer.baseY
-    const allRows = xtermBufferRows(term, baseY, buffer.length)
-    const { rows: searchRows, rowOffset } = sliceByAnchor(
-      allRows,
-      opts.startAfterAnchor,
-      opts.fallbackRowCount
-    )
-
-    const block = rowMajorSearchBlock(searchRows)
-    const snapshot = rowMajorSnapshot(searchRows)
-    const index = block.indexOf(opts.needle)
-    if (index < 0) {
-      return { found: false, cells: [], snapshot }
-    }
-
-    const cells: ResolvedCell[] = []
-    const rowWidth = cols
-    for (let i = 0; i < opts.needle.length; i++) {
-      const pos = index + i
-      const localY = Math.floor(pos / rowWidth)
-      const x = pos % rowWidth
-      const termLine = buffer.getLine(baseY + rowOffset + localY)
-      const cell = termLine?.getCell(x)
-      cells.push({
-        char: cell?.getChars() ?? '',
-        x,
-        y: rowOffset + localY,
-        bold: (cell?.isBold() ?? 0) !== 0,
-      })
-    }
-
-    return { found: true, cells, snapshot }
-  })
 }

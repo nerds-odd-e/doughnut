@@ -3,7 +3,6 @@ import {
   headPreview,
 } from 'tty-assert/errorSnapshotFormatting'
 import {
-  locateTextCellsInViewport,
   stripAnsiCliPty,
   TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS,
   waitForTextInSurface,
@@ -134,26 +133,18 @@ async function assertCurrentGuidanceContainsBold(
   raw: string,
   text: string
 ): Promise<void> {
-  const result = await locateTextCellsInViewport({
+  await waitForTextInSurface({
     raw,
     needle: text,
+    surface: 'viewableBuffer',
     startAfterAnchor: GUIDANCE_ANCHORS,
     fallbackRowCount: GUIDANCE_FALLBACK_ROWS,
+    timeoutMs: 0,
+    retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
+    strict: false,
+    requireBold: true,
+    messagePrefix: 'Current guidance (expectContainsBold).',
   })
-  if (!result.found) {
-    failCliAssertion(
-      `Expected ${JSON.stringify(text)} in current guidance.\n` +
-        `Guidance region snapshot:\n${result.snapshot}`,
-      raw
-    )
-  }
-  if (result.cells.every((c) => c.bold)) return
-  failCliAssertion(
-    `Expected ${JSON.stringify(text)} with **bold** styling in current guidance.\n` +
-      `  Found the text but not all cells are bold.\n` +
-      `Guidance region snapshot:\n${result.snapshot}`,
-    raw
-  )
 }
 
 async function assertPastUserMessagesContains(

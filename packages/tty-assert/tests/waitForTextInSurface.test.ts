@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
-  locateTextCellsInViewport,
   TtyAssertStrictModeViolationError,
   waitForTextInSurface,
 } from '../src/waitForTextInSurface'
@@ -122,16 +121,44 @@ describe('waitForTextInSurface', () => {
     ).rejects.toThrow(/not found/)
   })
 
-  it('locateTextCellsInViewport treats xterm bold as any non-zero isBold()', async () => {
+  it('requireBold treats xterm bold as any non-zero isBold()', async () => {
     const raw = `\x1b[2J\x1b[H\x1b[1mPut\x1b[22m x\n`
-    const r = await locateTextCellsInViewport({
+    await waitForTextInSurface({
       raw,
       needle: 'Put',
+      surface: 'viewableBuffer',
       cols: 80,
       rows: 24,
+      timeoutMs: 0,
+      requireBold: true,
     })
-    expect(r.found).toBe(true)
-    expect(r.cells.every((c) => c.bold)).toBe(true)
+  })
+
+  it('rejects requireBold with strippedTranscript at call time', async () => {
+    await expect(
+      waitForTextInSurface({
+        raw: 'x',
+        needle: 'x',
+        surface: 'strippedTranscript',
+        timeoutMs: 0,
+        requireBold: true,
+      })
+    ).rejects.toThrow(/requireBold is only supported/)
+  })
+
+  it('requireBold fails when the first match is not all bold', async () => {
+    const raw = `\x1b[2J\x1b[HPlain\x1b[1mBold\x1b[22m\n`
+    await expect(
+      waitForTextInSurface({
+        raw,
+        needle: 'Plain',
+        surface: 'viewableBuffer',
+        cols: 80,
+        rows: 24,
+        timeoutMs: 0,
+        requireBold: true,
+      })
+    ).rejects.toThrow(/not all cells at the first occurrence are bold/)
   })
 
   it('polls until a getter returns raw that contains the needle', async () => {
