@@ -161,6 +161,63 @@ describe('waitForTextInSurface', () => {
     ).rejects.toThrow(/not all cells at the first occurrence are bold/)
   })
 
+  it('requireGrayBackgroundBlock passes for chalk-style gray background (100m)', async () => {
+    const raw = `\x1b[2J\x1b[H\x1b[100mUser paste\x1b[0m\n`
+    await waitForTextInSurface({
+      raw,
+      needle: 'User paste',
+      surface: 'viewableBuffer',
+      cols: 80,
+      rows: 24,
+      timeoutMs: 0,
+      strict: false,
+      requireGrayBackgroundBlock: true,
+    })
+  })
+
+  it('rejectGrayForegroundOnlyWithoutGrayBackground fails for gray foreground only (90m)', async () => {
+    const raw = `\x1b[2J\x1b[H\x1b[90mUser paste\x1b[0m\n`
+    await expect(
+      waitForTextInSurface({
+        raw,
+        needle: 'User paste',
+        surface: 'viewableBuffer',
+        cols: 80,
+        rows: 24,
+        timeoutMs: 0,
+        strict: false,
+        rejectGrayForegroundOnlyWithoutGrayBackground: true,
+      })
+    ).rejects.toThrow(/gray foreground only/)
+  })
+
+  it('gray block checks use the last haystack match when strict is false', async () => {
+    const raw = `\x1b[2J\x1b[H\x1b[90mUser paste\x1b[0m xx \x1b[100mUser paste\x1b[0m\n`
+    await waitForTextInSurface({
+      raw,
+      needle: 'User paste',
+      surface: 'viewableBuffer',
+      cols: 80,
+      rows: 24,
+      timeoutMs: 0,
+      strict: false,
+      rejectGrayForegroundOnlyWithoutGrayBackground: true,
+      requireGrayBackgroundBlock: true,
+    })
+  })
+
+  it('rejects gray block options with strippedTranscript at call time', async () => {
+    await expect(
+      waitForTextInSurface({
+        raw: 'x',
+        needle: 'x',
+        surface: 'strippedTranscript',
+        timeoutMs: 0,
+        requireGrayBackgroundBlock: true,
+      })
+    ).rejects.toThrow(/gray block options/)
+  })
+
   it('polls until a getter returns raw that contains the needle', async () => {
     vi.useFakeTimers()
     const state = { text: 'start' }

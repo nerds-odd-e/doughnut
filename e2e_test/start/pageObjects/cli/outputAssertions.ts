@@ -1,4 +1,3 @@
-import { formatRawTerminalSnapshotForError } from 'tty-assert/errorSnapshotFormatting'
 import {
   TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS,
   waitForTextInSurface,
@@ -7,12 +6,6 @@ import {
 /** Matches `waitForTextInSurface` poll cadence when the library polls internally; Cypress re-reads the PTY buffer on each attempt at this interval. */
 const CLI_OUTPUT_ASSERT_RETRY_MS = TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS
 const CLI_OUTPUT_ASSERT_TIMEOUT_MS = 3000
-
-function failCliAssertion(message: string, raw: string): never {
-  throw new Error(
-    `${message}\n\n--- CLI terminal snapshot (ANSI-stripped, safe text) ---\n${formatRawTerminalSnapshotForError(raw)}`
-  )
-}
 
 function escapeRegExpLiteral(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -71,11 +64,6 @@ async function assertAnsweredQuestionsContains(
     'Answered questions (in answered questions)'
   )
 }
-
-/** Gray background from chalk `bgGray` / bright black (past user message block). */
-const PAST_USER_MSG_GRAY_BG_SGR = '\x1b[100m'
-/** Gray foreground from chalk `grey` — not sufficient for a past user message block. */
-const GRAY_FG_ONLY_SGR = '\x1b[90m'
 
 /** Anchors for the guidance region, tried in priority order (most specific first). */
 const GUIDANCE_ANCHORS: RegExp[] = [/^\s*└/, /^\s*>\s*$/, /> /]
@@ -147,17 +135,6 @@ async function assertCurrentGuidanceContainsBold(
   })
 }
 
-function lastIndexOfExpectedOrFail(raw: string, expected: string): number {
-  const lastIdx = raw.lastIndexOf(expected)
-  if (lastIdx === -1) {
-    failCliAssertion(
-      `Past user message check: expected text ${JSON.stringify(expected)} not found in PTY buffer.`,
-      raw
-    )
-  }
-  return lastIdx
-}
-
 async function assertPastUserMessageContainsInFullBuffer(
   raw: string,
   expected: string
@@ -193,41 +170,39 @@ async function assertPastUserMessageBlankLineAboveInStrippedTranscript(
   })
 }
 
-function assertPastUserMessageNotGrayForegroundOnly(
+async function assertPastUserMessageNotGrayForegroundOnly(
   raw: string,
   expected: string
-): void {
+): Promise<void> {
   if (expected === '') return
-  const lastIdx = lastIndexOfExpectedOrFail(raw, expected)
-  const windowBefore = raw.slice(Math.max(0, lastIdx - 120), lastIdx)
-  const hasGrayBg = windowBefore.includes(PAST_USER_MSG_GRAY_BG_SGR)
-  const hasGrayFgOnly = windowBefore.includes(GRAY_FG_ONLY_SGR) && !hasGrayBg
-
-  if (hasGrayFgOnly) {
-    failCliAssertion(
-      `Past user message ${JSON.stringify(expected)} must appear in a gray-background block in the past message area (ANSI ${JSON.stringify(PAST_USER_MSG_GRAY_BG_SGR)} before the text in the final paint). ` +
-        `Found gray foreground only (${JSON.stringify(GRAY_FG_ONLY_SGR)}), which is not a gray-background block.`,
-      raw
-    )
-  }
+  await waitForTextInSurface({
+    raw,
+    needle: expected,
+    surface: 'fullBuffer',
+    timeoutMs: 0,
+    retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
+    strict: false,
+    rejectGrayForegroundOnlyWithoutGrayBackground: true,
+    messagePrefix:
+      'Past user messages (gray foreground only without background).',
+  })
 }
 
-function assertPastUserMessageGrayBackgroundBlock(
+async function assertPastUserMessageGrayBackgroundBlock(
   raw: string,
   expected: string
-): void {
+): Promise<void> {
   if (expected === '') return
-  const lastIdx = lastIndexOfExpectedOrFail(raw, expected)
-  const windowBefore = raw.slice(Math.max(0, lastIdx - 120), lastIdx)
-  const hasGrayBg = windowBefore.includes(PAST_USER_MSG_GRAY_BG_SGR)
-
-  if (!hasGrayBg) {
-    failCliAssertion(
-      `Past user message ${JSON.stringify(expected)} must appear in a gray-background block (expect ANSI ${JSON.stringify(PAST_USER_MSG_GRAY_BG_SGR)} immediately before the text). ` +
-        `No gray-background SGR in the bytes before the last occurrence of that text.`,
-      raw
-    )
-  }
+  await waitForTextInSurface({
+    raw,
+    needle: expected,
+    surface: 'fullBuffer',
+    timeoutMs: 0,
+    retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
+    strict: false,
+    requireGrayBackgroundBlock: true,
+    messagePrefix: 'Past user messages (gray background block).',
+  })
 }
 
 function pastCliAssistantMessages() {

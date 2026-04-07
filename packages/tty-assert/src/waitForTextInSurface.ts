@@ -14,6 +14,12 @@
  *
  * **`requireBold`:** after a string needle matches, the **first** occurrence must be entirely bold
  * (second xterm replay for the cell attribute scan).
+ *
+ * **Gray block (Ink / chalk):** `\x1b[100m` (bright black background) and `\x1b[90m` (bright black
+ * foreground) map to xterm **palette** color **8**. For past-user message blocks, use
+ * **`rejectGrayForegroundOnlyWithoutGrayBackground`** and **`requireGrayBackgroundBlock`** on a
+ * string needle: both inspect the **last** `indexOf` match in the search haystack (same as the
+ * former “last paint in raw buffer” heuristic).
  */
 
 import { Terminal } from '@xterm/headless'
@@ -59,10 +65,26 @@ export type WaitForTextInSurfaceOptions = {
    * **string** needle.
    */
   requireBold?: boolean
+  /**
+   * After the needle matches, fail if **any** cell of the **last** occurrence has bright-black /
+   * gray **foreground** (palette 8) without gray **background** (palette 8) — i.e. chalk `grey`
+   * / `90m` without a `100m` block. Only for `viewableBuffer` / `fullBuffer` with a **string**
+   * needle.
+   */
+  rejectGrayForegroundOnlyWithoutGrayBackground?: boolean
+  /**
+   * After the needle matches, require **every** cell of the **last** occurrence to use gray
+   * **background** (palette 8, chalk `bgGray` / `100m`). Only for `viewableBuffer` / `fullBuffer`
+   * with a **string** needle.
+   */
+  requireGrayBackgroundBlock?: boolean
 }
 
 /** Default delay between poll attempts when `timeoutMs` is positive; Cypress adapter should use the same value for `cy.wait` between buffer re-reads. */
 export const TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS = 50
+
+/** ANSI bright black: `\x1b[90m` (fg) / `\x1b[100m` (bg); xterm palette index 8. */
+const BRIGHT_BLACK_PALETTE_INDEX = 8
 
 export class TtyAssertStrictModeViolationError extends Error {
   readonly name = 'TtyAssertStrictModeViolationError'
@@ -231,6 +253,99 @@ async function verifyBoldAtFirstStringMatch(opts: {
   })
 }
 
+function cellHasGrayPaletteBackground(cell: {
+  isBgPalette(): boolean
+  getBgColor(): number
+}): boolean {
+  return cell.isBgPalette() && cell.getBgColor() === BRIGHT_BLACK_PALETTE_INDEX
+}
+
+function cellIsGrayForegroundOnlyWithoutGrayBackground(cell: {
+  isFgPalette(): boolean
+  getFgColor(): number
+  isBgPalette(): boolean
+  getBgColor(): number
+}): boolean {
+  const grayFg =
+    cell.isFgPalette() && cell.getFgColor() === BRIGHT_BLACK_PALETTE_INDEX
+  if (!grayFg) return false
+  return !cellHasGrayPaletteBackground(cell)
+}
+
+async function verifyGrayBlockAtLastStringMatch(opts: {
+  raw: string
+  cols: number
+  rows: number
+  surface: 'viewableBuffer' | 'fullBuffer'
+  needle: string
+  startAfterAnchor?: RegExp[]
+  fallbackRowCount?: number
+  rejectGrayForegroundOnlyWithoutGrayBackground: boolean
+  requireGrayBackgroundBlock: boolean
+}): Promise<{ ok: true } | { ok: false; snapshot: string; detail: string }> {
+  return withReplayedXtermTerminal(opts.raw, opts.cols, opts.rows, (term) => {
+    const buffer = term.buffer.active
+    const startY = opts.surface === 'fullBuffer' ? 0 : buffer.baseY
+    const endY = buffer.length
+    const allRows = xtermBufferRows(term, startY, endY)
+    const { rows: searchRows, rowOffset } = sliceByAnchor(
+      allRows,
+      opts.startAfterAnchor,
+      opts.fallbackRowCount
+    )
+    const haystack = rowMajorSearchBlock(searchRows)
+    const snapshot = rowMajorSnapshot(searchRows)
+    const index = haystack.lastIndexOf(opts.needle)
+    if (index < 0) {
+      return {
+        ok: false,
+        snapshot,
+        detail: `Substring ${JSON.stringify(opts.needle)} not found in surface "${opts.surface}" (gray block check).`,
+      }
+    }
+    const rowWidth = opts.cols
+    for (let i = 0; i < opts.needle.length; i++) {
+      const pos = index + i
+      const localY = Math.floor(pos / rowWidth)
+      const x = pos % rowWidth
+      const termLine = buffer.getLine(startY + rowOffset + localY)
+      const cell = termLine?.getCell(x)
+      if (cell == null) {
+        return {
+          ok: false,
+          snapshot,
+          detail: `Gray block check: no cell at offset ${i} for last match of ${JSON.stringify(opts.needle)}.`,
+        }
+      }
+      if (
+        opts.rejectGrayForegroundOnlyWithoutGrayBackground &&
+        cellIsGrayForegroundOnlyWithoutGrayBackground(cell)
+      ) {
+        return {
+          ok: false,
+          snapshot,
+          detail:
+            `Past user message ${JSON.stringify(opts.needle)} must appear in a gray-background block (palette background 8 / chalk \\x1b[100m). ` +
+            `Last match has gray foreground only (palette 8 / chalk \\x1b[90m) without that background.`,
+        }
+      }
+      if (
+        opts.requireGrayBackgroundBlock &&
+        !cellHasGrayPaletteBackground(cell)
+      ) {
+        return {
+          ok: false,
+          snapshot,
+          detail:
+            `Past user message ${JSON.stringify(opts.needle)} must appear in a gray-background block (palette background 8 / chalk \\x1b[100m). ` +
+            `Last match is missing gray background on at least one cell.`,
+        }
+      }
+    }
+    return { ok: true }
+  })
+}
+
 async function buildHaystackAndSnapshot(
   surface: TtySearchSurface,
   raw: string,
@@ -342,6 +457,37 @@ async function attemptOnce(
     }
   }
 
+  const rejectGray = opts.rejectGrayForegroundOnlyWithoutGrayBackground ?? false
+  const requireGrayBg = opts.requireGrayBackgroundBlock ?? false
+  if (rejectGray || requireGrayBg) {
+    if (
+      opts.surface === 'strippedTranscript' ||
+      typeof opts.needle !== 'string'
+    ) {
+      throw new Error(
+        'waitForTextInSurface: gray block options require viewableBuffer or fullBuffer and a string needle.'
+      )
+    }
+    const gray = await verifyGrayBlockAtLastStringMatch({
+      raw: opts.raw,
+      cols: opts.cols,
+      rows: opts.rows,
+      surface: opts.surface,
+      needle: opts.needle,
+      startAfterAnchor: opts.startAfterAnchor,
+      fallbackRowCount: opts.fallbackRowCount,
+      rejectGrayForegroundOnlyWithoutGrayBackground: rejectGray,
+      requireGrayBackgroundBlock: requireGrayBg,
+    })
+    if (!gray.ok) {
+      return {
+        ok: false,
+        snapshot: gray.snapshot,
+        detail: gray.detail,
+      }
+    }
+  }
+
   return { ok: true }
 }
 
@@ -397,6 +543,22 @@ export async function waitForTextInSurface(
     if (typeof opts.needle !== 'string') {
       throw new Error(
         'waitForTextInSurface: requireBold requires a string needle.'
+      )
+    }
+  }
+
+  if (
+    opts.rejectGrayForegroundOnlyWithoutGrayBackground ||
+    opts.requireGrayBackgroundBlock
+  ) {
+    if (opts.surface === 'strippedTranscript') {
+      throw new Error(
+        'waitForTextInSurface: gray block options are only supported for viewableBuffer and fullBuffer.'
+      )
+    }
+    if (typeof opts.needle !== 'string') {
+      throw new Error(
+        'waitForTextInSurface: gray block options require a string needle.'
       )
     }
   }
