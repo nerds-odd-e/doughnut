@@ -20,6 +20,7 @@ describe("useThinkingTimeTracker", () => {
   })
 
   afterEach(() => {
+    Object.defineProperty(document, "hidden", { value: false, writable: true })
     vi.useRealTimers()
     vi.restoreAllMocks()
   })
@@ -168,6 +169,93 @@ describe("useThinkingTimeTracker", () => {
 
     await page.getByTestId("stop").click()
     await expect.element(page.getByTestId("result")).toHaveTextContent("2000")
+  })
+
+  it("pauses on pagehide (e.g. iOS app switch)", async () => {
+    const TestComponent = createTestComponent(() => {
+      const { start, stop } = useThinkingTimeTracker()
+      start()
+      return { stop }
+    })
+
+    render(TestComponent)
+    await vi.advanceTimersToNextTimerAsync()
+
+    await setTime(1000)
+
+    window.dispatchEvent(new Event("pagehide"))
+    await setTime(2000)
+
+    await page.getByTestId("stop").click()
+    await expect.element(page.getByTestId("result")).toHaveTextContent("1000")
+  })
+
+  it("resumes on pageshow when visible", async () => {
+    const TestComponent = createTestComponent(() => {
+      const { start, stop } = useThinkingTimeTracker()
+      start()
+      return { stop }
+    })
+
+    render(TestComponent)
+    await vi.advanceTimersToNextTimerAsync()
+
+    await setTime(1000)
+
+    window.dispatchEvent(new Event("pagehide"))
+    await setTime(2000)
+
+    window.dispatchEvent(new Event("pageshow"))
+    await setTime(3000)
+
+    await page.getByTestId("stop").click()
+    await expect.element(page.getByTestId("result")).toHaveTextContent("2000")
+  })
+
+  it("does not resume on focus while document is hidden", async () => {
+    const TestComponent = createTestComponent(() => {
+      const { start, stop } = useThinkingTimeTracker()
+      start()
+      return { stop }
+    })
+
+    render(TestComponent)
+    await vi.advanceTimersToNextTimerAsync()
+
+    await setTime(500)
+
+    Object.defineProperty(document, "hidden", { value: true, writable: true })
+    document.dispatchEvent(new Event("visibilitychange"))
+
+    await setTime(2000)
+
+    window.dispatchEvent(new Event("focus"))
+    await setTime(3000)
+
+    await page.getByTestId("stop").click()
+    await expect.element(page.getByTestId("result")).toHaveTextContent("500")
+  })
+
+  it("pauses via visibility sync when hidden without earlier events", async () => {
+    const TestComponent = createTestComponent(() => {
+      const { start, stop } = useThinkingTimeTracker()
+      start()
+      return { stop }
+    })
+
+    render(TestComponent)
+    await vi.advanceTimersToNextTimerAsync()
+
+    await setTime(1000)
+
+    Object.defineProperty(document, "hidden", { value: true, writable: true })
+
+    await vi.advanceTimersByTimeAsync(300)
+
+    await setTime(2000)
+
+    await page.getByTestId("stop").click()
+    await expect.element(page.getByTestId("result")).toHaveTextContent("1000")
   })
 
   it("only records once per stop call", async () => {
