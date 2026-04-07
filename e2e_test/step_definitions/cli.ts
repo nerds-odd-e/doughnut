@@ -125,6 +125,11 @@ Then('I should see {string} styled in the Current guidance', (text: string) =>
   cli.interactiveCli().currentGuidance().expectContainsBold(text)
 )
 
-Then('I should see {string} in past user messages', (expected: string) =>
-  cli.interactiveCli().pastUserMessages().expectContains(expected)
-)
+Then('I should see {string} in past user messages', (expected: string) => {
+  const pm = cli.interactiveCli().pastUserMessages()
+  return pm
+    .expectContainsInFullBuffer(expected)
+    .then(() => pm.expectBlankLineAboveInStrippedTranscript(expected))
+    .then(() => pm.expectNotGrayForegroundOnlyWithoutBackground(expected))
+    .then(() => pm.expectGrayBackgroundBlock(expected))
+})

@@ -147,10 +147,22 @@ async function assertCurrentGuidanceContainsBold(
   })
 }
 
-async function assertPastUserMessagesContains(
+function lastIndexOfExpectedOrFail(raw: string, expected: string): number {
+  const lastIdx = raw.lastIndexOf(expected)
+  if (lastIdx === -1) {
+    failCliAssertion(
+      `Past user message check: expected text ${JSON.stringify(expected)} not found in PTY buffer.`,
+      raw
+    )
+  }
+  return lastIdx
+}
+
+async function assertPastUserMessageContainsInFullBuffer(
   raw: string,
   expected: string
 ): Promise<void> {
+  if (expected === '') return
   await waitForTextInSurface({
     raw,
     needle: expected,
@@ -158,9 +170,15 @@ async function assertPastUserMessagesContains(
     timeoutMs: 0,
     retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
     strict: false,
-    messagePrefix: 'Past user messages (in past user messages).',
+    messagePrefix: 'Past user messages (in past user messages, full buffer).',
   })
+}
 
+async function assertPastUserMessageBlankLineAboveInStrippedTranscript(
+  raw: string,
+  expected: string
+): Promise<void> {
+  if (expected === '') return
   await waitForTextInSurface({
     raw,
     needle: new RegExp(
@@ -173,8 +191,14 @@ async function assertPastUserMessagesContains(
     messagePrefix:
       'Past user messages must leave one blank line above the matching user message.',
   })
+}
 
-  const lastIdx = raw.lastIndexOf(expected)
+function assertPastUserMessageNotGrayForegroundOnly(
+  raw: string,
+  expected: string
+): void {
+  if (expected === '') return
+  const lastIdx = lastIndexOfExpectedOrFail(raw, expected)
   const windowBefore = raw.slice(Math.max(0, lastIdx - 120), lastIdx)
   const hasGrayBg = windowBefore.includes(PAST_USER_MSG_GRAY_BG_SGR)
   const hasGrayFgOnly = windowBefore.includes(GRAY_FG_ONLY_SGR) && !hasGrayBg
@@ -186,6 +210,16 @@ async function assertPastUserMessagesContains(
       raw
     )
   }
+}
+
+function assertPastUserMessageGrayBackgroundBlock(
+  raw: string,
+  expected: string
+): void {
+  if (expected === '') return
+  const lastIdx = lastIndexOfExpectedOrFail(raw, expected)
+  const windowBefore = raw.slice(Math.max(0, lastIdx - 120), lastIdx)
+  const hasGrayBg = windowBefore.includes(PAST_USER_MSG_GRAY_BG_SGR)
 
   if (!hasGrayBg) {
     failCliAssertion(
@@ -229,10 +263,36 @@ function answeredQuestions() {
 
 function pastUserMessages() {
   return {
-    expectContains(expected: string): Cypress.Chainable<void> {
+    expectContainsInFullBuffer(expected: string): Cypress.Chainable<void> {
       return retryInteractiveAssertion(
-        (raw) => assertPastUserMessagesContains(raw, expected),
-        'cli-interactive-pty-past-user-assertion'
+        (raw) => assertPastUserMessageContainsInFullBuffer(raw, expected),
+        'cli-interactive-pty-past-user-full-buffer'
+      )
+    },
+    expectBlankLineAboveInStrippedTranscript(
+      expected: string
+    ): Cypress.Chainable<void> {
+      return retryInteractiveAssertion(
+        (raw) =>
+          assertPastUserMessageBlankLineAboveInStrippedTranscript(
+            raw,
+            expected
+          ),
+        'cli-interactive-pty-past-user-blank-line'
+      )
+    },
+    expectNotGrayForegroundOnlyWithoutBackground(
+      expected: string
+    ): Cypress.Chainable<void> {
+      return retryInteractiveAssertion(
+        (raw) => assertPastUserMessageNotGrayForegroundOnly(raw, expected),
+        'cli-interactive-pty-past-user-not-fg-only'
+      )
+    },
+    expectGrayBackgroundBlock(expected: string): Cypress.Chainable<void> {
+      return retryInteractiveAssertion(
+        (raw) => assertPastUserMessageGrayBackgroundBlock(raw, expected),
+        'cli-interactive-pty-past-user-gray-bg'
       )
     },
   }

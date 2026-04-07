@@ -1,10 +1,10 @@
 /**
  * Domain helpers on the interactive CLI PTY session (`ttyAssertTerminal` for `cy.task` I/O).
  *
- * **Assertions:** `pastCliAssistantMessages`, `answeredQuestions`, and `pastUserMessages` search
- * the **`strippedTranscript`** surface (`waitForTextInSurface` via `outputAssertions`). **`currentGuidance`**
- * uses xterm **viewport** replay plus Ink heuristics — not the same surface. See `outputAssertions`
- * header (section contracts) and `.cursor/rules/cli.mdc` terminology.
+ * **Assertions:** `pastCliAssistantMessages` and `answeredQuestions` search the **`strippedTranscript`**
+ * surface. **`pastUserMessages`** uses **`fullBuffer`** plus transcript layout and Ink gray-block SGR
+ * checks (see `outputAssertions`). **`currentGuidance`** uses xterm **viewport** replay plus Ink
+ * heuristics — not the same surface. See `.cursor/rules/cli.mdc` terminology.
  */
 import {
   answeredQuestions,
