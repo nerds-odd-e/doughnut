@@ -18,13 +18,16 @@ import { pdfViewerViewportTopYDown } from "@/lib/book-reading/pdfViewerViewportT
 import { attachOutlineSelectionBboxHighlight } from "@/lib/book-reading/outlineSelectionBboxHighlight"
 import { mineruOutlineV1BboxToXyzDestArray } from "@/lib/book-reading/mineruOutlineV1PageIndex"
 import type { MineruOutlineV1Bbox } from "@/lib/book-reading/mineruOutlineV1PageIndex"
-import { getDocument, type PDFDocumentProxy } from "pdfjs-dist"
+import {
+  getDocument,
+  type PDFDocumentProxy,
+} from "pdfjs-dist/legacy/build/pdf.mjs"
 import {
   EventBus,
   PDFLinkService,
   PDFViewer,
-} from "pdfjs-dist/web/pdf_viewer.mjs"
-import "pdfjs-dist/web/pdf_viewer.css"
+} from "pdfjs-dist/legacy/web/pdf_viewer.mjs"
+import "pdfjs-dist/legacy/web/pdf_viewer.css"
 import { nextTick, onBeforeUnmount, ref, watch } from "vue"
 
 const props = defineProps<{

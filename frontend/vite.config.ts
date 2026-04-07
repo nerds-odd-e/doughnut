@@ -93,7 +93,8 @@ const config = defineConfig({
       'turndown',
       'es-toolkit',
       'pdfjs-dist',
-      'pdfjs-dist/web/pdf_viewer.mjs',
+      'pdfjs-dist/legacy/build/pdf.mjs',
+      'pdfjs-dist/legacy/web/pdf_viewer.mjs',
     ],
     exclude: ['fsevents'],
     force: true

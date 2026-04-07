@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vitest"
-import { pageIndexForScrollContainerCenter } from "@/lib/book-reading/pdfViewerViewportTopYDown"
-import type { PDFViewer } from "pdfjs-dist/web/pdf_viewer.mjs"
+import {
+  pageIndexForScrollContainerCenter,
+  type PdfJsViewerForViewport,
+} from "@/lib/book-reading/pdfViewerViewportTopYDown"
 
 function rect(top: number, bottom: number) {
   return {
@@ -19,10 +21,11 @@ function rect(top: number, bottom: number) {
 function mockViewer(
   pageRects: Array<{ top: number; bottom: number } | null>,
   currentPageNumber: number
-): PDFViewer {
+): PdfJsViewerForViewport {
   return {
     pagesCount: pageRects.length,
     currentPageNumber,
+    pdfDocument: {},
     getPageView: (i: number) => {
       const r = pageRects[i]
       if (r == null) {
@@ -34,7 +37,7 @@ function mockViewer(
         } as unknown as HTMLDivElement,
       }
     },
-  } as unknown as PDFViewer
+  } as unknown as PdfJsViewerForViewport
 }
 
 describe("pageIndexForScrollContainerCenter", () => {
@@ -73,8 +76,9 @@ describe("pageIndexForScrollContainerCenter", () => {
     const viewer = {
       pagesCount: 0,
       currentPageNumber: 1,
+      pdfDocument: null,
       getPageView: vi.fn(),
-    } as unknown as PDFViewer
+    } as unknown as PdfJsViewerForViewport
     expect(pageIndexForScrollContainerCenter(scrollContainer, viewer)).toBe(0)
     expect(scrollContainer.getBoundingClientRect).not.toHaveBeenCalled()
   })

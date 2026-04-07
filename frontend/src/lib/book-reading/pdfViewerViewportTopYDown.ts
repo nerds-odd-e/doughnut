@@ -1,7 +1,13 @@
-import type { PDFViewer } from "pdfjs-dist/web/pdf_viewer.mjs"
-
 type PageViewLike = {
   div: HTMLDivElement | undefined
+}
+
+/** Minimal pdf.js `PDFViewer` surface used here (avoids duplicate pdfjs-dist type trees in TS). */
+export type PdfJsViewerForViewport = {
+  pagesCount: number
+  currentPageNumber: number
+  pdfDocument: unknown
+  getPageView: (index: number) => unknown
 }
 
 /**
@@ -14,7 +20,7 @@ type PageViewLike = {
  */
 export function pageIndexForScrollContainerCenter(
   scrollContainer: HTMLElement,
-  pdfViewer: PDFViewer
+  pdfViewer: PdfJsViewerForViewport
 ): number {
   const pages = pdfViewer.pagesCount
   if (pages <= 0) {
@@ -60,7 +66,7 @@ export function pageIndexForScrollContainerCenter(
  */
 export function pdfViewerViewportTopYDown(
   scrollContainer: HTMLElement,
-  pdfViewer: PDFViewer
+  pdfViewer: PdfJsViewerForViewport
 ): { anchorPageIndexZeroBased: number; viewportTopYDown: number | null } {
   const pages = pdfViewer.pagesCount
 
