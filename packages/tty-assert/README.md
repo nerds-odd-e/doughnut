@@ -42,8 +42,8 @@ For **`strippedTranscript`**, the haystack and snapshot are the **same**: the fu
 When `waitForTextInSurface` or `ManagedTtySession.assert` fails, the message body includes:
 
 1. **Detail** and **`Search surface: "…"`** plus a short note (transcript vs row-major matching).
-2. A **`---`** block with the snapshot shown as **numbered lines**: `  1 | …`, `  2 | …` (UTF-16 lines split on `\n`; a single-line transcript is still line `1`). The block is truncated at **`TERMINAL_ERROR_LOCATOR_SNAPSHOT_MAX_CHARS`** (8000), after numbering.
-3. The existing **raw PTY appendix** (`formatRawTerminalSnapshotForError`) — still capped by **`TERMINAL_ERROR_MAX_VISIBLE_SNAPSHOT_CHARS`** (12_000 visible chars).
+2. A **`---`** block with the snapshot as **numbered lines** (`  1 | …`, split on `\n`). The block is truncated after numbering (about **8000** characters).
+3. A **raw PTY appendix** with ANSI stripped and safe-visible escaping, capped at about **12_000** visible characters.
 
 ---
 
