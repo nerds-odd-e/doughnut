@@ -455,7 +455,6 @@ onMounted(async () => {
   if (!error && data) {
     book.value = data
     flatBookRanges.value = buildFlatBookRanges(data.ranges ?? [])
-    await bookReading.syncFromServer()
     if (data.hasSourceFile) {
       pdfLoading.value = true
       pdfError.value = null
@@ -468,6 +467,7 @@ onMounted(async () => {
           NotebookBooksController.getNotebookBookReadingPosition({
             path: { notebook: props.notebookId },
           }).catch(() => null),
+          bookReading.syncFromServer(),
         ])
         if (!res.ok) {
           pdfError.value = "Could not load the book file."
@@ -491,6 +491,8 @@ onMounted(async () => {
       } finally {
         pdfLoading.value = false
       }
+    } else {
+      await bookReading.syncFromServer()
     }
   }
 })
