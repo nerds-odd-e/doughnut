@@ -1,4 +1,4 @@
-import type { CliInteractiveAssertRequest } from '../../../config/cliInteractiveAssertRequest'
+import type { ManagedTtyAssertTaskPayload } from '../../../config/cliE2ePluginTasks'
 import { TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS } from 'tty-assert/waitForTextInSurface'
 
 const guidanceStartAfterAnchors = [
@@ -8,7 +8,7 @@ const guidanceStartAfterAnchors = [
 ] as const
 
 const guidanceBase: Pick<
-  CliInteractiveAssertRequest,
+  ManagedTtyAssertTaskPayload,
   'surface' | 'retryMs' | 'strict' | 'fallbackRowCount' | 'startAfterAnchor'
 > = {
   surface: 'viewableBuffer',
@@ -19,7 +19,7 @@ const guidanceBase: Pick<
 }
 
 const transcriptPollBase: Pick<
-  CliInteractiveAssertRequest,
+  ManagedTtyAssertTaskPayload,
   'retryMs' | 'strict'
 > = {
   retryMs: TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS,
@@ -28,10 +28,10 @@ const transcriptPollBase: Pick<
 
 function currentGuidanceContainsAssertRequest(
   expected: string
-): CliInteractiveAssertRequest {
+): ManagedTtyAssertTaskPayload {
   return {
     ...guidanceBase,
-    needle: { kind: 'text', value: expected },
+    needle: expected,
     messagePrefix: 'Current guidance assertion failed.',
   }
 }
@@ -39,10 +39,10 @@ function currentGuidanceContainsAssertRequest(
 function strippedTranscriptTextAssertRequest(
   expected: string,
   messagePrefix: string
-): CliInteractiveAssertRequest {
+): ManagedTtyAssertTaskPayload {
   return {
     ...transcriptPollBase,
-    needle: { kind: 'text', value: expected },
+    needle: expected,
     surface: 'strippedTranscript',
     messagePrefix,
   }
@@ -105,7 +105,7 @@ function pastUserMessages() {
       return cy
         .task<null>('cliInteractiveAssert', {
           ...transcriptPollBase,
-          needle: { kind: 'text', value: expected },
+          needle: expected,
           surface: 'fullBuffer',
           rejectGrayForegroundOnlyWithoutGrayBackground: true,
           requireGrayBackgroundBlock: true,
@@ -115,7 +115,7 @@ function pastUserMessages() {
         .then(() =>
           cy.task<null>('cliInteractiveAssert', {
             ...transcriptPollBase,
-            needle: { kind: 'regex', source: blankLineAboveSource },
+            needle: { source: blankLineAboveSource },
             surface: 'strippedTranscript',
             messagePrefix:
               'Past user messages must leave one blank line above the matching user message.',
@@ -136,7 +136,7 @@ function currentGuidance() {
     expectContainsBold(text: string): Cypress.Chainable<null> {
       return cy.task<null>('cliInteractiveAssert', {
         ...guidanceBase,
-        needle: { kind: 'text', value: text },
+        needle: text,
         requireBold: true,
         messagePrefix: 'Current guidance (expectContainsBold).',
       })

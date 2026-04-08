@@ -12,15 +12,36 @@ import {
   cliRepoSpawnFromRoot,
   runShellCommandSync,
 } from './cliE2eRepo'
-import {
-  cliInteractiveAssertRequestToManagedOptions,
-  type CliInteractiveAssertRequest,
-} from './cliInteractiveAssertRequest'
 import { cliEnv } from './cliEnv'
 import {
   startManagedTtySession,
+  type ManagedTtyAssertOptions,
   type ManagedTtySession,
 } from 'tty-assert/managedTtySession'
+
+/** JSON-safe `cy.task` body (`RegExp` must use `{ source, flags? }`). */
+export type ManagedTtyAssertTaskPayload = Omit<
+  ManagedTtyAssertOptions,
+  'needle' | 'startAfterAnchor'
+> & {
+  needle: string | { source: string; flags?: string }
+  startAfterAnchor?: { source: string; flags?: string }[]
+}
+
+function managedTtyAssertTaskPayloadToOptions(
+  p: ManagedTtyAssertTaskPayload
+): ManagedTtyAssertOptions {
+  return {
+    ...p,
+    needle:
+      typeof p.needle === 'string'
+        ? p.needle
+        : new RegExp(p.needle.source, p.needle.flags ?? ''),
+    startAfterAnchor: p.startAfterAnchor?.map(
+      (a) => new RegExp(a.source, a.flags ?? '')
+    ),
+  }
+}
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
 
@@ -247,7 +268,7 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       return interactiveCliPtyHandle.session.buf.text
     },
     async cliInteractiveAssert(
-      body: CliInteractiveAssertRequest
+      body: ManagedTtyAssertTaskPayload
     ): Promise<null> {
       const handle = interactiveCliPtyHandle
       if (!handle) {
@@ -255,7 +276,7 @@ export function createCliE2ePluginTasks(repoRoot: string) {
           'cliInteractiveAssert: no active interactive CLI PTY session. Ensure @interactiveCLI started the session or run the installed CLI in interactive mode first.'
         )
       }
-      await handle.assert(cliInteractiveAssertRequestToManagedOptions(body))
+      await handle.assert(managedTtyAssertTaskPayloadToOptions(body))
       return null
     },
     async cliInteractiveWriteLine({
