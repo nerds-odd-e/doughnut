@@ -62,6 +62,19 @@ function snapshotWithRowNumbers(snapshot: string): string {
     .join('\n')
 }
 
+function numberedSnapshotForError(snapshot: string): string {
+  return truncateLocatorFailureSnapshot(snapshotWithRowNumbers(snapshot))
+}
+
+/** Managed session assertion failures: xterm viewport as plain rows (before raw transcript appendix). */
+export const TERMINAL_ERROR_FINAL_VIEWPORT_HEADING =
+  '--- Final visible screen (viewport) ---'
+
+export function formatFinalViewportPlaintextForError(viewportPlain: string): string {
+  const snap = numberedSnapshotForError(viewportPlain)
+  return `${TERMINAL_ERROR_FINAL_VIEWPORT_HEADING}\n${snap}\n---`
+}
+
 /**
  * Body for `waitForTextInSurface` / managed session assertion failures (before raw appendix).
  */
@@ -70,7 +83,7 @@ export function formatSearchSurfaceFailure(
   detail: string,
   snapshot: string
 ): string {
-  const snap = truncateLocatorFailureSnapshot(snapshotWithRowNumbers(snapshot))
+  const snap = numberedSnapshotForError(snapshot)
   const note =
     surface === 'strippedTranscript'
       ? 'Search uses the ANSI-stripped cumulative transcript (same text as the snapshot below).'

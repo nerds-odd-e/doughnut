@@ -1,6 +1,7 @@
 import type { IPty } from '@lydell/node-pty'
 import { Terminal } from '@xterm/headless'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { TERMINAL_ERROR_FINAL_VIEWPORT_HEADING } from '../src/errorSnapshotFormatting'
 import { attachManagedTtySession } from '../src/managedTtySession'
 import { ptyTranscriptToViewportPlaintext } from '../src/ptyTranscriptToVisiblePlaintextViaXterm'
 
@@ -144,6 +145,58 @@ describe('ManagedTtySession', () => {
     })
     const m = attachManagedTtySession({ pty, buf: { text: '' } })
     expect(() => m.dispose()).not.toThrow()
+  })
+
+  it('assert failure appends final viewport for viewableBuffer', async () => {
+    const buf = { text: '\x1b[2J\x1b[Hphase8_viewport_marker' }
+    const m = attachManagedTtySession(
+      { pty: mockPty(), buf },
+      { cols: 40, rows: 6 }
+    )
+    try {
+      await expect(
+        m.assert({
+          needle: 'NEVER_MATCHES',
+          surface: 'viewableBuffer',
+          cols: 40,
+          rows: 6,
+          timeoutMs: 0,
+        })
+      ).rejects.toSatisfy((e: unknown) => {
+        const msg = e instanceof Error ? e.message : String(e)
+        expect(msg).toContain(TERMINAL_ERROR_FINAL_VIEWPORT_HEADING)
+        expect(msg).toMatch(/phase8_viewport_marker/)
+        return true
+      })
+    } finally {
+      m.dispose()
+    }
+  })
+
+  it('assert failure appends final viewport for strippedTranscript', async () => {
+    const buf = { text: '\x1b[2J\x1b[Hphase8_stripped_viewport' }
+    const m = attachManagedTtySession(
+      { pty: mockPty(), buf },
+      { cols: 40, rows: 6 }
+    )
+    try {
+      await expect(
+        m.assert({
+          needle: 'NEVER_MATCHES',
+          surface: 'strippedTranscript',
+          cols: 40,
+          rows: 6,
+          timeoutMs: 0,
+        })
+      ).rejects.toSatisfy((e: unknown) => {
+        const msg = e instanceof Error ? e.message : String(e)
+        expect(msg).toContain(TERMINAL_ERROR_FINAL_VIEWPORT_HEADING)
+        expect(msg).toMatch(/phase8_stripped_viewport/)
+        return true
+      })
+    } finally {
+      m.dispose()
+    }
   })
 
   it('assert times out when startup-style marker never appears (strippedTranscript)', async () => {

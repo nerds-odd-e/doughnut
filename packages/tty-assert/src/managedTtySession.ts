@@ -1,6 +1,7 @@
 import { Terminal } from '@xterm/headless'
 import {
   TERMINAL_ERROR_RAW_TAIL_BYTES,
+  formatFinalViewportPlaintextForError,
   formatRawTerminalSnapshotForError,
   formatSearchSurfaceFailure,
   headPreview,
@@ -61,6 +62,16 @@ function appendRawTerminalSnapshotForErrorMessage(
   raw: string
 ): string {
   return `${body}\n\n${CLI_TERMINAL_RAW_SNAPSHOT_HEADING}\n${formatRawTerminalSnapshotForError(raw)}`
+}
+
+function appendManagedAssertFailureDiagnostics(
+  body: string,
+  raw: string,
+  term: Terminal
+): string {
+  const viewportPlain = viewportPlaintextFromHeadlessTerminal(term)
+  const withViewport = `${body}\n\n${formatFinalViewportPlaintextForError(viewportPlain)}`
+  return appendRawTerminalSnapshotForErrorMessage(withViewport, raw)
 }
 
 export type ManagedTtySession = {
@@ -133,6 +144,7 @@ export function attachManagedTtySession(
         if (disposed) {
           throw new Error('ManagedTtySession.assert after dispose')
         }
+        await syncReplay()
         const raw = session.buf.text
 
         let result:
@@ -150,7 +162,6 @@ export function attachManagedTtySession(
             rows,
           })
         } else {
-          await syncReplay()
           result = attemptOnceOnLiveTerminal(term, {
             needle: opts.needle,
             surface: opts.surface,
@@ -176,7 +187,7 @@ export function attachManagedTtySession(
             )
           )
           throw new TtyAssertStrictModeViolationError(
-            appendRawTerminalSnapshotForErrorMessage(body, raw)
+            appendManagedAssertFailureDiagnostics(body, raw, term)
           )
         }
 
@@ -190,7 +201,7 @@ export function attachManagedTtySession(
             messagePrefix,
             formatSearchSurfaceFailure(opts.surface, detail, lastFail.snapshot)
           )
-          throw new Error(appendRawTerminalSnapshotForErrorMessage(body, raw))
+          throw new Error(appendManagedAssertFailureDiagnostics(body, raw, term))
         }
         await sleep(retryMs)
       }

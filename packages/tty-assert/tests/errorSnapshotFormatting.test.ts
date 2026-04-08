@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
+  TERMINAL_ERROR_FINAL_VIEWPORT_HEADING,
+  formatFinalViewportPlaintextForError,
   formatRawTerminalSnapshotForError,
   formatSearchSurfaceFailure,
   headPreview,
@@ -71,6 +73,16 @@ describe('formatRawTerminalSnapshotForError', () => {
     expect(out).toContain('truncated')
     expect(out).toContain(`${MAX_VISIBLE_SNAPSHOT_CHARS}`)
     expect(out.length).toBeLessThan(inner.length + 500)
+  })
+})
+
+describe('formatFinalViewportPlaintextForError', () => {
+  it('includes heading, numbered rows, and closing ---', () => {
+    const out = formatFinalViewportPlaintextForError('lineA\nlineB')
+    expect(out).toContain(TERMINAL_ERROR_FINAL_VIEWPORT_HEADING)
+    expect(out).toContain('  1 | lineA')
+    expect(out).toContain('  2 | lineB')
+    expect(out.endsWith('\n---')).toBe(true)
   })
 })
 

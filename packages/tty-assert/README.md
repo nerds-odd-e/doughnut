@@ -37,13 +37,14 @@ For **`strippedTranscript`**, the haystack and snapshot are the **same**: the fu
 
 ---
 
-## Assertion failure messages (Phase 7)
+## Assertion failure messages
 
 When `waitForTextInSurface` or `ManagedTtySession.assert` fails, the message body includes:
 
 1. **Detail** and **`Search surface: "…"`** plus a short note (transcript vs row-major matching).
 2. A **`---`** block with the snapshot as **numbered lines** (`  1 | …`, split on `\n`). The block is truncated after numbering (about **8000** characters).
-3. A **raw PTY appendix** with ANSI stripped and safe-visible escaping, capped at about **12_000** visible characters.
+3. **`ManagedTtySession.assert` only:** **`--- Final visible screen (viewport) ---`** plus the same **numbered-line** form of the xterm **viewport** (current visible rows), then a closing **`---`**. This is the plain-text “screenshot” of what is on screen at failure time, before the cumulative transcript dump.
+4. A **raw PTY appendix** with ANSI stripped and safe-visible escaping, capped at about **12_000** visible characters.
 
 ---
 
