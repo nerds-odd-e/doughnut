@@ -41,16 +41,17 @@ Then I should be starting from the same position
 
 ### mark a book range as read
 
-Given I scroll to title "2.3 xxx" 
-When I answer "read" to the question if the direct content of title "2.2 xxxx" is read in the Reading Control Panel
-Then I should see that book range "2.3 xxxx" is marked as read in the book layout
+Given I choose the book range "2.1 xxx"
+And I scroll to title "2.2 xxx" 
+When I mark the book range "2.1 xxx" as read in the Reading Control Panel
+Then I should see that book range "2.1 xxxx" is marked as read in the book layout
+And I should see that book range "2.2 xxx" is selected in the book layout
 
 ### mark a book range with no direct content as read automatically
 
-Given there's no direct content between title "xxx" and "ooo"
-When I scroll to title "xxx" 
-And I scroll to title "ooo" 
-Then I should see that book range "xxx" is marked as read in the book layout
+Given I choose the book range "2. xxx"
+When I scroll to title "2.1 xxx" 
+Then I should see that book range "2.1 xxxx" is marked as read in the book layout
 
 ### mark a book range as skimmed/skipped
 

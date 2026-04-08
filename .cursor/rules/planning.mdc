@@ -35,6 +35,18 @@ Use this when planning **new** or **changed** functionality.
 
 **Still too big:** If one precondition + one E2E story is still large, split by **one small part of the outcome** per phase (one aspect of the postcondition).
 
+### E2E-led decomposition (sub-phases)
+
+**When to use:** A planned **phase** still spans several user-visible beats (e.g. multi-step Gherkin). Prefer **sub-phases** that alternate **E2E red** and **minimal implementation green**, instead of front-loading backend or UI layers.
+
+**Pattern (repeat until the full scenario is uncommented and green):**
+
+1. **Red sub-phase** — Add or extend the **real** E2E scenario (e.g. Cucumber) with the **full** story text in the feature file. **Enable only the next step** toward the final outcome: **comment out** all **later** steps (`#` in Gherkin), or use an equivalent convention (e.g. a `@ignore` copy with a single new step) — pick **one** approach and stay consistent. **Earlier** steps stay **enabled** and should already **pass**. Run E2E; confirm **exactly one** failure for the **right reason** (**behavior not implemented**), not typos, flakiness, or missing harness. If the failure is unclear, **fix the step definition, assertion text, or page object** so the next reader understands what is missing. **Do not** leave **multiple** newly added steps failing at once (same intent as **at most one intentionally failing test** above).
+2. **Green sub-phase** — Implement the **smallest** production change that makes the **currently enabled** prefix **pass**. **No dead code**; keep the change clean.
+3. **Next** — Uncomment the **next** Gherkin line (or enable the next step) and go back to **1**.
+
+Document the **ordered list of steps** and sub-phase labels in `ongoing/<short-name>.md` when helpful; this rule defines the **discipline**, not the product scenario.
+
 ---
 
 ## Plan document (design and architecture)
@@ -79,6 +91,8 @@ Before closing a phase and starting the next:
 3. **Update the plan** — Reflect what is done and what remains; drop obsolete notes.
 
 ### Test-driven workflow (when adding or changing behavior)
+
+For **multi-step** E2E scenarios split into **sub-phases**, prefer **E2E-led decomposition (sub-phases)** above instead of treating the whole scenario as one red/green swing.
 
 1. Add or change the **E2E or unit** test; **run it** and confirm it **fails**.
 2. Confirm it fails for the **right reason** (not a typo or env issue).
