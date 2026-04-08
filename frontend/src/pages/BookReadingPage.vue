@@ -156,8 +156,8 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
 import {
-  PDF_OUTLINE_V1_ANCHOR_FORMAT,
-  parsePdfOutlineV1StartAnchor,
+  parsePdfOutlineV1Anchor,
+  type PdfOutlineV1NavigationTarget,
 } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { createViewportCurrentAnchorDebouncer } from "@/lib/book-reading/debounceViewportCurrentAnchorId"
@@ -353,10 +353,9 @@ const initialLastRead = ref<{
 } | null>(null)
 
 const pdfViewerRef = ref<{
-  scrollToPdfOutlineV1Target: (target: {
-    pageIndexZeroBased: number
-    bbox: readonly [number, number, number, number] | null
-  }) => Promise<void>
+  scrollToPdfOutlineV1Target: (
+    target: PdfOutlineV1NavigationTarget
+  ) => Promise<void>
   scrollToStoredReadingPosition: (
     pageIndexZeroBased: number,
     normalizedY: number
@@ -374,19 +373,12 @@ function onPagesReady() {
 }
 
 async function onOutlineRowClick(node: OutlineNode) {
-  const anchor = node.startAnchor
-  if (anchor.anchorFormat !== PDF_OUTLINE_V1_ANCHOR_FORMAT) {
-    return
-  }
-  const parsed = parsePdfOutlineV1StartAnchor(anchor.value)
+  const parsed = parsePdfOutlineV1Anchor(node.startAnchor)
   if (parsed === null) {
     return
   }
   selectedOutlineRangeId.value = node.id
-  await pdfViewerRef.value?.scrollToPdfOutlineV1Target({
-    pageIndexZeroBased: parsed.pageIndex,
-    bbox: parsed.bbox,
-  })
+  await pdfViewerRef.value?.scrollToPdfOutlineV1Target(parsed)
   viewportCurrentAnchorDebouncer.commitNow(node.startAnchor.id)
 }
 

@@ -1,8 +1,11 @@
 import {
-  PDF_OUTLINE_V1_ANCHOR_FORMAT,
   extractPageIndexZeroBased,
+  normalizedYToViewportY,
   outlineV1BboxToPdfJsXyzDestArray,
+  outlineV1BboxToPixelRect,
+  parsePdfOutlineV1Anchor,
   parsePdfOutlineV1StartAnchor,
+  screenYToNormalizedY,
 } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { describe, expect, it } from "vitest"
 
@@ -94,6 +97,38 @@ describe("parsePdfOutlineV1StartAnchor", () => {
   })
 })
 
+describe("parsePdfOutlineV1Anchor", () => {
+  it("recognizes the pdf.mineru_outline_v1 wire format", () => {
+    const anchor = {
+      id: 1,
+      anchorFormat: "pdf.mineru_outline_v1",
+      value: '{"page_idx":0}',
+    }
+    expect(parsePdfOutlineV1Anchor(anchor)).toEqual({
+      pageIndex: 0,
+      bbox: null,
+    })
+  })
+
+  it("returns null for wrong anchor format", () => {
+    const anchor = {
+      id: 1,
+      anchorFormat: "other",
+      value: '{"page_idx":0}',
+    }
+    expect(parsePdfOutlineV1Anchor(anchor)).toBe(null)
+  })
+
+  it("returns null when value is malformed", () => {
+    const anchor = {
+      id: 1,
+      anchorFormat: "pdf.mineru_outline_v1",
+      value: "not-json",
+    }
+    expect(parsePdfOutlineV1Anchor(anchor)).toBe(null)
+  })
+})
+
 describe("extractPageIndexZeroBased", () => {
   it("returns page_idx for minimal JSON", () => {
     expect(extractPageIndexZeroBased('{"page_idx":0}')).toBe(0)
@@ -145,8 +180,50 @@ describe("outlineV1BboxToPdfJsXyzDestArray", () => {
   })
 })
 
-describe("PDF_OUTLINE_V1_ANCHOR_FORMAT", () => {
-  it("matches backend wire constant", () => {
-    expect(PDF_OUTLINE_V1_ANCHOR_FORMAT).toBe("pdf.mineru_outline_v1")
+describe("outlineV1BboxToPixelRect", () => {
+  it("converts normalized bbox to pixel coordinates", () => {
+    expect(outlineV1BboxToPixelRect([100, 200, 300, 400], 800, 600)).toEqual({
+      left: 80,
+      top: 120,
+      width: 160,
+      height: 120,
+    })
+  })
+
+  it("maps full-page bbox to full viewport", () => {
+    expect(outlineV1BboxToPixelRect([0, 0, 1000, 1000], 500, 400)).toEqual({
+      left: 0,
+      top: 0,
+      width: 500,
+      height: 400,
+    })
+  })
+})
+
+describe("normalizedYToViewportY", () => {
+  it("scales normalized Y to viewport height", () => {
+    expect(normalizedYToViewportY(500, 800)).toBe(400)
+  })
+
+  it("clamps to 0 at the low end", () => {
+    expect(normalizedYToViewportY(-50, 800)).toBe(0)
+  })
+
+  it("clamps to page height at the high end", () => {
+    expect(normalizedYToViewportY(1500, 800)).toBe(800)
+  })
+})
+
+describe("screenYToNormalizedY", () => {
+  it("maps screen position within page to normalized Y", () => {
+    expect(screenYToNormalizedY(150, { top: 100, height: 200 })).toBe(250)
+  })
+
+  it("clamps to 0 when above the page", () => {
+    expect(screenYToNormalizedY(50, { top: 100, height: 200 })).toBe(0)
+  })
+
+  it("clamps to 1000 when below the page", () => {
+    expect(screenYToNormalizedY(400, { top: 100, height: 200 })).toBe(1000)
   })
 })

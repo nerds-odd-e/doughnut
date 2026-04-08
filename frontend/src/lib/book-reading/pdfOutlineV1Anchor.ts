@@ -3,15 +3,13 @@
  * and optional `bbox`. Bbox coordinates come from the book-outline pipeline (MinerU content_list)
  * as `[x0,y0,x1,y1]` in 0–1000 normalized page space, top-left origin, y downward — not PDF user space.
  *
- * `parsePdfOutlineV1StartAnchor` never throws on bad input.
+ * Consumers should use the exported functions; constants are internal.
  */
-export const PDF_OUTLINE_V1_ANCHOR_FORMAT = "pdf.mineru_outline_v1"
+import type { BookAnchorFull } from "@generated/doughnut-backend-api"
 
-/** Max coordinate on the normalized page axis (bbox and viewport projection use the same scale). */
-export const PDF_OUTLINE_V1_NORMALIZED_MAX = 1000
-
-/** PDF user-space points subtracted above bbox top when scrolling to a heading (pdf.js XYZ). */
-export const PDF_OUTLINE_V1_SCROLL_TOP_PADDING_PDF = 40
+const ANCHOR_FORMAT = "pdf.mineru_outline_v1"
+const NORMALIZED_MAX = 1000
+const SCROLL_TOP_PADDING_PDF = 40
 
 export type PdfOutlineV1Bbox = readonly [number, number, number, number]
 
@@ -20,7 +18,7 @@ export type PdfOutlineV1NavigationTarget = {
   bbox: PdfOutlineV1Bbox | null
 }
 
-/** pdf.js scrollPageIntoView: near bbox top with small top padding (horizontal center of bbox), zoom null. */
+/** pdf.js scrollPageIntoView XYZ dest array shape. */
 export type PdfJsXyzDestArray = readonly [
   null,
   { readonly name: "XYZ" },
@@ -55,6 +53,7 @@ function parseOptionalBbox(raw: unknown): PdfOutlineV1Bbox | null {
   return [a, b, c, d]
 }
 
+/** Parse anchor value JSON. Never throws: malformed input yields `null`. */
 export function parsePdfOutlineV1StartAnchor(
   value: string
 ): PdfOutlineV1NavigationTarget | null {
@@ -77,13 +76,21 @@ export function parsePdfOutlineV1StartAnchor(
   }
 }
 
+/** Check anchor format and parse value in one step. Returns `null` for wrong format or bad value. */
+export function parsePdfOutlineV1Anchor(
+  anchor: BookAnchorFull
+): PdfOutlineV1NavigationTarget | null {
+  if (anchor.anchorFormat !== ANCHOR_FORMAT) return null
+  return parsePdfOutlineV1StartAnchor(anchor.value)
+}
+
 export function extractPageIndexZeroBased(value: string): number | null {
   return parsePdfOutlineV1StartAnchor(value)?.pageIndex ?? null
 }
 
 /**
- * Map v1 bbox (normalized page space, top-left origin, y down) to pdf.js scrollPageIntoView XYZ
- * so the viewport top sits a little above the bbox top. Zoom null keeps the current scale.
+ * Map v1 bbox to pdf.js scrollPageIntoView XYZ so the viewport top sits a little above the
+ * bbox top. Zoom null keeps the current scale.
  */
 export function outlineV1BboxToPdfJsXyzDestArray(
   pageWidthPdf: number,
@@ -91,23 +98,46 @@ export function outlineV1BboxToPdfJsXyzDestArray(
   bbox: PdfOutlineV1Bbox
 ): PdfJsXyzDestArray {
   const [x0, y0, x1] = bbox
-  const x = ((x0 + x1) / 2 / PDF_OUTLINE_V1_NORMALIZED_MAX) * pageWidthPdf
+  const x = ((x0 + x1) / 2 / NORMALIZED_MAX) * pageWidthPdf
   const yTopPdf = Math.max(
     0,
-    (y0 / PDF_OUTLINE_V1_NORMALIZED_MAX) * pageHeightPdf -
-      PDF_OUTLINE_V1_SCROLL_TOP_PADDING_PDF
+    (y0 / NORMALIZED_MAX) * pageHeightPdf - SCROLL_TOP_PADDING_PDF
   )
   const y = pageHeightPdf - yTopPdf
   return [null, { name: "XYZ" }, x, y, null]
 }
 
-/** Screen Y → normalized outline-v1 Y (0–PDF_OUTLINE_V1_NORMALIZED_MAX), clamped to the page band. */
-export function screenYToOutlineV1NormalizedY(
+/** Convert normalized bbox to pixel rectangle in the given viewport dimensions. */
+export function outlineV1BboxToPixelRect(
+  bbox: PdfOutlineV1Bbox,
+  viewportWidth: number,
+  viewportHeight: number
+): { left: number; top: number; width: number; height: number } {
+  const [x0, y0, x1, y1] = bbox
+  return {
+    left: (x0 / NORMALIZED_MAX) * viewportWidth,
+    top: (y0 / NORMALIZED_MAX) * viewportHeight,
+    width: ((x1 - x0) / NORMALIZED_MAX) * viewportWidth,
+    height: ((y1 - y0) / NORMALIZED_MAX) * viewportHeight,
+  }
+}
+
+/** Convert normalized Y (0–1000) to viewport Y, clamped to page bounds. */
+export function normalizedYToViewportY(
+  normalizedY: number,
+  pageHeight: number
+): number {
+  const clamped = Math.max(0, Math.min(normalizedY, NORMALIZED_MAX))
+  return (clamped / NORMALIZED_MAX) * pageHeight
+}
+
+/** Screen Y → normalized Y (0–1000), clamped to the page band. */
+export function screenYToNormalizedY(
   screenY: number,
   page: { top: number; height: number }
 ): number {
   return (
     (Math.max(0, Math.min(screenY - page.top, page.height)) / page.height) *
-    PDF_OUTLINE_V1_NORMALIZED_MAX
+    NORMALIZED_MAX
   )
 }

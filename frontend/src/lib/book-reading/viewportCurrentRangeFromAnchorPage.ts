@@ -1,8 +1,5 @@
 import type { BookAnchorFull } from "@generated/doughnut-backend-api"
-import {
-  PDF_OUTLINE_V1_ANCHOR_FORMAT,
-  parsePdfOutlineV1StartAnchor,
-} from "./pdfOutlineV1Anchor"
+import { parsePdfOutlineV1Anchor } from "./pdfOutlineV1Anchor"
 import type { ViewportYRange } from "./pdfViewerViewportTopYDown"
 
 /**
@@ -50,10 +47,7 @@ export function viewportCurrentAnchorIdFromAnchorPage(
   let bestFromEarlierPages: number | null = null
   const onCurrentPage: { id: number; y0: number; y1: number }[] = []
   for (const anchor of orderedPreorderStartAnchors) {
-    if (anchor.anchorFormat !== PDF_OUTLINE_V1_ANCHOR_FORMAT) {
-      continue
-    }
-    const parsed = parsePdfOutlineV1StartAnchor(anchor.value)
+    const parsed = parsePdfOutlineV1Anchor(anchor)
     if (parsed === null) continue
     const { pageIndex: pageIdx, bbox } = parsed
     if (pdfPageCount != null && pageIdx >= pdfPageCount) {

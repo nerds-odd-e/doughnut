@@ -17,9 +17,14 @@ describe("attachOutlineSelectionBboxHighlight", () => {
     vi.useRealTimers()
   })
 
-  it("maps bbox to the page layer, starts opaque, fades to zero, then removes", () => {
+  it("places overlay at the given pixel rect, fades to zero, then removes", () => {
     vi.useFakeTimers()
-    attachOutlineSelectionBboxHighlight(host, 800, 600, [100, 200, 300, 400])
+    attachOutlineSelectionBboxHighlight(host, {
+      left: 80,
+      top: 120,
+      width: 160,
+      height: 120,
+    })
     const el = host.querySelector(
       "[data-testid=outline-selection-bbox-highlight]"
     ) as HTMLElement
@@ -41,12 +46,12 @@ describe("attachOutlineSelectionBboxHighlight", () => {
 
   it("cancel() removes the highlight and pending timers", () => {
     vi.useFakeTimers()
-    const cancel = attachOutlineSelectionBboxHighlight(
-      host,
-      1000,
-      1000,
-      [0, 0, 100, 100]
-    )
+    const cancel = attachOutlineSelectionBboxHighlight(host, {
+      left: 0,
+      top: 0,
+      width: 100,
+      height: 100,
+    })
     cancel()
     expect(
       host.querySelector("[data-testid=outline-selection-bbox-highlight]")

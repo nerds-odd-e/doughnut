@@ -1,7 +1,4 @@
-import {
-  PDF_OUTLINE_V1_NORMALIZED_MAX,
-  screenYToOutlineV1NormalizedY,
-} from "./pdfOutlineV1Anchor"
+import { screenYToNormalizedY } from "./pdfOutlineV1Anchor"
 
 type PageViewLike = {
   div: HTMLDivElement | undefined
@@ -108,12 +105,12 @@ export function pdfViewerViewportTopYDown(
   return {
     anchorPageIndexZeroBased: pageIndex,
     viewport: {
-      top: screenYToOutlineV1NormalizedY(containerRect.top, area),
-      mid: screenYToOutlineV1NormalizedY(
+      top: screenYToNormalizedY(containerRect.top, area),
+      mid: screenYToNormalizedY(
         (containerRect.top + containerRect.bottom) / 2,
         area
       ),
-      bottom: screenYToOutlineV1NormalizedY(containerRect.bottom, area),
+      bottom: screenYToNormalizedY(containerRect.bottom, area),
     },
   }
 }
@@ -144,7 +141,7 @@ export function pdfViewerReadingPositionTopEdge(
     if (topY >= area.top && topY < area.top + area.height) {
       return {
         pageIndexZeroBased: i,
-        normalizedTop: screenYToOutlineV1NormalizedY(topY, area),
+        normalizedTop: screenYToNormalizedY(topY, area),
       }
     }
   }
@@ -156,6 +153,9 @@ export function pdfViewerReadingPositionTopEdge(
   }
   return {
     pageIndexZeroBased: lastArea.index,
-    normalizedTop: PDF_OUTLINE_V1_NORMALIZED_MAX,
+    normalizedTop: screenYToNormalizedY(
+      lastArea.top + lastArea.height,
+      lastArea
+    ),
   }
 }
