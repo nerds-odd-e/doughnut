@@ -1,14 +1,14 @@
 import {
-  ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1,
+  PDF_OUTLINE_V1_ANCHOR_FORMAT,
   extractPageIndexZeroBased,
-  mineruOutlineV1BboxToXyzDestArray,
-  parseMineruOutlineV1StartAnchor,
-} from "@/lib/book-reading/mineruOutlineV1PageIndex"
+  outlineV1BboxToPdfJsXyzDestArray,
+  parsePdfOutlineV1StartAnchor,
+} from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { describe, expect, it } from "vitest"
 
-describe("parseMineruOutlineV1StartAnchor", () => {
+describe("parsePdfOutlineV1StartAnchor", () => {
   it("returns page and null bbox when bbox absent", () => {
-    expect(parseMineruOutlineV1StartAnchor('{"page_idx":0}')).toEqual({
+    expect(parsePdfOutlineV1StartAnchor('{"page_idx":0}')).toEqual({
       pageIndex: 0,
       bbox: null,
     })
@@ -16,7 +16,7 @@ describe("parseMineruOutlineV1StartAnchor", () => {
 
   it("returns page and bbox when valid", () => {
     expect(
-      parseMineruOutlineV1StartAnchor('{"page_idx":0,"bbox":[10,20,100,200]}')
+      parsePdfOutlineV1StartAnchor('{"page_idx":0,"bbox":[10,20,100,200]}')
     ).toEqual({
       pageIndex: 0,
       bbox: [10, 20, 100, 200],
@@ -25,49 +25,49 @@ describe("parseMineruOutlineV1StartAnchor", () => {
 
   it("treats invalid bbox as absent", () => {
     expect(
-      parseMineruOutlineV1StartAnchor('{"page_idx":1,"bbox":[0,1,2]}')
+      parsePdfOutlineV1StartAnchor('{"page_idx":1,"bbox":[0,1,2]}')
     ).toEqual({ pageIndex: 1, bbox: null })
     expect(
-      parseMineruOutlineV1StartAnchor('{"page_idx":1,"bbox":[2,1,0,0]}')
+      parsePdfOutlineV1StartAnchor('{"page_idx":1,"bbox":[2,1,0,0]}')
     ).toEqual({ pageIndex: 1, bbox: null })
     expect(
-      parseMineruOutlineV1StartAnchor('{"page_idx":1,"bbox":"nope"}')
+      parsePdfOutlineV1StartAnchor('{"page_idx":1,"bbox":"nope"}')
     ).toEqual({ pageIndex: 1, bbox: null })
     expect(
-      parseMineruOutlineV1StartAnchor(
+      parsePdfOutlineV1StartAnchor(
         '{"page_idx":1,"bbox":[0,0,100,100],"extra":1}'
       )
     ).toEqual({ pageIndex: 1, bbox: [0, 0, 100, 100] })
   })
 
   it("returns null when page_idx invalid", () => {
-    expect(parseMineruOutlineV1StartAnchor("{}")).toBe(null)
-    expect(parseMineruOutlineV1StartAnchor('{"page_idx":-1}')).toBe(null)
+    expect(parsePdfOutlineV1StartAnchor("{}")).toBe(null)
+    expect(parsePdfOutlineV1StartAnchor('{"page_idx":-1}')).toBe(null)
   })
 
   it("returns null for invalid JSON", () => {
-    expect(parseMineruOutlineV1StartAnchor("")).toBe(null)
-    expect(parseMineruOutlineV1StartAnchor("{")).toBe(null)
-    expect(parseMineruOutlineV1StartAnchor("not json")).toBe(null)
+    expect(parsePdfOutlineV1StartAnchor("")).toBe(null)
+    expect(parsePdfOutlineV1StartAnchor("{")).toBe(null)
+    expect(parsePdfOutlineV1StartAnchor("not json")).toBe(null)
   })
 
   it("returns null when page_idx missing or only bbox", () => {
-    expect(parseMineruOutlineV1StartAnchor('{"bbox":[0,0,1,1]}')).toBe(null)
-    expect(parseMineruOutlineV1StartAnchor('{"kind":"heading"}')).toBe(null)
+    expect(parsePdfOutlineV1StartAnchor('{"bbox":[0,0,1,1]}')).toBe(null)
+    expect(parsePdfOutlineV1StartAnchor('{"kind":"heading"}')).toBe(null)
   })
 
   it("returns null when page_idx has wrong type", () => {
-    expect(parseMineruOutlineV1StartAnchor('{"page_idx":"0"}')).toBe(null)
-    expect(parseMineruOutlineV1StartAnchor('{"page_idx":1.5}')).toBe(null)
-    expect(parseMineruOutlineV1StartAnchor('{"page_idx":null}')).toBe(null)
+    expect(parsePdfOutlineV1StartAnchor('{"page_idx":"0"}')).toBe(null)
+    expect(parsePdfOutlineV1StartAnchor('{"page_idx":1.5}')).toBe(null)
+    expect(parsePdfOutlineV1StartAnchor('{"page_idx":null}')).toBe(null)
   })
 
   it("returns null for JSON null, array, or primitive roots", () => {
-    expect(parseMineruOutlineV1StartAnchor("null")).toBe(null)
-    expect(parseMineruOutlineV1StartAnchor("[]")).toBe(null)
-    expect(parseMineruOutlineV1StartAnchor("[1,2]")).toBe(null)
-    expect(parseMineruOutlineV1StartAnchor('"x"')).toBe(null)
-    expect(parseMineruOutlineV1StartAnchor("42")).toBe(null)
+    expect(parsePdfOutlineV1StartAnchor("null")).toBe(null)
+    expect(parsePdfOutlineV1StartAnchor("[]")).toBe(null)
+    expect(parsePdfOutlineV1StartAnchor("[1,2]")).toBe(null)
+    expect(parsePdfOutlineV1StartAnchor('"x"')).toBe(null)
+    expect(parsePdfOutlineV1StartAnchor("42")).toBe(null)
   })
 
   it("never throws for arbitrary string input", () => {
@@ -82,8 +82,8 @@ describe("parseMineruOutlineV1StartAnchor", () => {
       '{"page_idx":1e100}',
     ]
     for (const s of inputs) {
-      expect(() => parseMineruOutlineV1StartAnchor(s)).not.toThrow()
-      const out = parseMineruOutlineV1StartAnchor(s)
+      expect(() => parsePdfOutlineV1StartAnchor(s)).not.toThrow()
+      const out = parsePdfOutlineV1StartAnchor(s)
       expect(
         out === null ||
           (typeof out.pageIndex === "number" &&
@@ -122,11 +122,11 @@ describe("extractPageIndexZeroBased", () => {
   })
 })
 
-describe("mineruOutlineV1BboxToXyzDestArray", () => {
+describe("outlineV1BboxToPdfJsXyzDestArray", () => {
   it("converts 0-1000 bbox to PDF user space XYZ with top padding clamped at page top", () => {
     const w = 612
     const h = 792
-    expect(mineruOutlineV1BboxToXyzDestArray(w, h, [0, 0, 100, 200])).toEqual([
+    expect(outlineV1BboxToPdfJsXyzDestArray(w, h, [0, 0, 100, 200])).toEqual([
       null,
       { name: "XYZ" },
       (50 / 1000) * 612,
@@ -139,14 +139,14 @@ describe("mineruOutlineV1BboxToXyzDestArray", () => {
     const w = 400
     const h = 600
     const yTopPdf = Math.max(0, (400 / 1000) * 600 - 40)
-    expect(
-      mineruOutlineV1BboxToXyzDestArray(w, h, [10, 400, 200, 550])
-    ).toEqual([null, { name: "XYZ" }, (105 / 1000) * 400, h - yTopPdf, null])
+    expect(outlineV1BboxToPdfJsXyzDestArray(w, h, [10, 400, 200, 550])).toEqual(
+      [null, { name: "XYZ" }, (105 / 1000) * 400, h - yTopPdf, null]
+    )
   })
 })
 
-describe("ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1", () => {
+describe("PDF_OUTLINE_V1_ANCHOR_FORMAT", () => {
   it("matches backend wire constant", () => {
-    expect(ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1).toBe("pdf.mineru_outline_v1")
+    expect(PDF_OUTLINE_V1_ANCHOR_FORMAT).toBe("pdf.mineru_outline_v1")
   })
 })

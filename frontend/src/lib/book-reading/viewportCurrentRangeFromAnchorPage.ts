@@ -1,16 +1,15 @@
 import type { BookAnchorFull } from "@generated/doughnut-backend-api"
 import {
-  ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1,
-  parseMineruOutlineV1StartAnchor,
-} from "./mineruOutlineV1PageIndex"
+  PDF_OUTLINE_V1_ANCHOR_FORMAT,
+  parsePdfOutlineV1StartAnchor,
+} from "./pdfOutlineV1Anchor"
 import type { ViewportYRange } from "./pdfViewerViewportTopYDown"
 
 /**
- * Approximate MinerU-unit equivalent of `MINERU_SCROLL_TOP_PADDING_PDF` (40 PDF pts on a typical
- * page of ~800–850 pt). Used by the close-nodes transition: if the next section heading enters the
- * viewport within this distance of the top edge, it becomes current.
+ * Normalized distance for the close-nodes transition (tuned with pdfOutlineV1Anchor scroll padding
+ * and typical page height in mind).
  */
-const SCROLL_PADDING_MINERU = 50
+const SCROLL_PADDING_NORMALIZED = 50
 
 /**
  * **Rule (in priority order):**
@@ -19,7 +18,7 @@ const SCROLL_PADDING_MINERU = 50
  * 2. If that anchor's top (`y0`) has **not** passed the viewport midpoint (`y0 > viewport.mid`) →
  *    use the anchor **before** it (or `bestFromEarlierPages` if none on the page).
  * 3. If that anchor is **partially scrolled above** the viewport top (`y0 < viewport.top`) and the
- *    **next** anchor's top is within `SCROLL_PADDING_MINERU` of the viewport top → use the next
+ *    **next** anchor's top is within `SCROLL_PADDING_NORMALIZED` of the viewport top → use the next
  *    anchor (close-nodes transition).
  * 4. **Gap case** (no visible anchor on the page) → last anchor on the page with `y0 ≤ viewport.mid`
  *    (most recent section heading scrolled past); falls back to `bestFromEarlierPages`.
@@ -51,10 +50,10 @@ export function viewportCurrentAnchorIdFromAnchorPage(
   let bestFromEarlierPages: number | null = null
   const onCurrentPage: { id: number; y0: number; y1: number }[] = []
   for (const anchor of orderedPreorderStartAnchors) {
-    if (anchor.anchorFormat !== ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1) {
+    if (anchor.anchorFormat !== PDF_OUTLINE_V1_ANCHOR_FORMAT) {
       continue
     }
-    const parsed = parseMineruOutlineV1StartAnchor(anchor.value)
+    const parsed = parsePdfOutlineV1StartAnchor(anchor.value)
     if (parsed === null) continue
     const { pageIndex: pageIdx, bbox } = parsed
     if (pdfPageCount != null && pageIdx >= pdfPageCount) {
@@ -97,7 +96,7 @@ export function viewportCurrentAnchorIdFromAnchorPage(
 
   if (first.y0 < top) {
     const next = onCurrentPage[firstVisibleIdx + 1]
-    if (next && next.y0 >= top && next.y0 - top <= SCROLL_PADDING_MINERU) {
+    if (next && next.y0 >= top && next.y0 - top <= SCROLL_PADDING_NORMALIZED) {
       return next.id
     }
   }

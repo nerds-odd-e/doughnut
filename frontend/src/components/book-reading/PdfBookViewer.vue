@@ -26,8 +26,11 @@ import {
   type ViewportYRange,
 } from "@/lib/book-reading/pdfViewerViewportTopYDown"
 import { attachOutlineSelectionBboxHighlight } from "@/lib/book-reading/outlineSelectionBboxHighlight"
-import { mineruOutlineV1BboxToXyzDestArray } from "@/lib/book-reading/mineruOutlineV1PageIndex"
-import type { MineruOutlineV1Bbox } from "@/lib/book-reading/mineruOutlineV1PageIndex"
+import {
+  PDF_OUTLINE_V1_NORMALIZED_MAX,
+  outlineV1BboxToPdfJsXyzDestArray,
+  type PdfOutlineV1Bbox,
+} from "@/lib/book-reading/pdfOutlineV1Anchor"
 import {
   getDocument,
   type PDFDocumentProxy,
@@ -228,7 +231,7 @@ function applyResponsiveDefaultScale(options?: { force?: boolean }) {
 
 type PendingNav = {
   pageIndexZeroBased: number
-  bbox: MineruOutlineV1Bbox | null
+  bbox: PdfOutlineV1Bbox | null
 }
 
 let pendingNavigation: PendingNav | null = null
@@ -241,7 +244,7 @@ function clearOutlineSelectionBboxHighlight() {
 
 function showOutlineSelectionBboxHighlight(
   pageNumber: number,
-  bbox: MineruOutlineV1Bbox
+  bbox: PdfOutlineV1Bbox
 ) {
   clearOutlineSelectionBboxHighlight()
   if (!pdfViewer) return
@@ -255,9 +258,9 @@ function showOutlineSelectionBboxHighlight(
   )
 }
 
-async function applyMineruOutlineV1Target(
+async function applyPdfOutlineV1Target(
   pageIndexZeroBased: number,
-  bbox: MineruOutlineV1Bbox | null
+  bbox: PdfOutlineV1Bbox | null
 ) {
   if (!pdfViewer?.pdfDocument) return
   if (
@@ -274,7 +277,7 @@ async function applyMineruOutlineV1Target(
   } else {
     const page = await pdfViewer.pdfDocument.getPage(pageNumber)
     const vp = page.getViewport({ scale: 1 })
-    const destArray = mineruOutlineV1BboxToXyzDestArray(
+    const destArray = outlineV1BboxToPdfJsXyzDestArray(
       vp.width,
       vp.height,
       bbox
@@ -291,14 +294,14 @@ function flushPendingNavigation() {
   }
   const shot = pendingNavigation
   pendingNavigation = null
-  applyMineruOutlineV1Target(shot.pageIndexZeroBased, shot.bbox).catch(() => {
+  applyPdfOutlineV1Target(shot.pageIndexZeroBased, shot.bbox).catch(() => {
     /* Outline jump failures from pdf.js must not reject pagesinit / viewer setup. */
   })
 }
 
-async function scrollToMineruOutlineV1Target(target: {
+async function scrollToPdfOutlineV1Target(target: {
   pageIndexZeroBased: number
-  bbox: MineruOutlineV1Bbox | null
+  bbox: PdfOutlineV1Bbox | null
 }) {
   const { pageIndexZeroBased, bbox } = target
   if (!Number.isInteger(pageIndexZeroBased) || pageIndexZeroBased < 0) {
@@ -308,7 +311,7 @@ async function scrollToMineruOutlineV1Target(target: {
     pendingNavigation = { pageIndexZeroBased, bbox }
     return
   }
-  await applyMineruOutlineV1Target(pageIndexZeroBased, bbox)
+  await applyPdfOutlineV1Target(pageIndexZeroBased, bbox)
 }
 
 async function scrollToStoredReadingPosition(
@@ -332,9 +335,12 @@ async function scrollToStoredReadingPosition(
   } | null
   if (!pageView?.viewport) return
   const vp = pageView.viewport
-  const yNorm = Math.max(0, Math.min(normalizedY, 1000))
+  const yNorm = Math.max(
+    0,
+    Math.min(normalizedY, PDF_OUTLINE_V1_NORMALIZED_MAX)
+  )
   const vx = vp.width / 2
-  const vy = (yNorm / 1000) * vp.height
+  const vy = (yNorm / PDF_OUTLINE_V1_NORMALIZED_MAX) * vp.height
   const [pdfX, pdfY] = vp.convertToPdfPoint(vx, vy)
   pdfViewer.scrollPageIntoView({
     pageNumber: pageIndexZeroBased + 1,
@@ -360,7 +366,7 @@ function zoomOut() {
 }
 
 defineExpose({
-  scrollToMineruOutlineV1Target,
+  scrollToPdfOutlineV1Target,
   scrollToStoredReadingPosition,
   zoomIn,
   zoomOut,

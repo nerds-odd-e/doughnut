@@ -1,10 +1,15 @@
+import {
+  PDF_OUTLINE_V1_NORMALIZED_MAX,
+  screenYToOutlineV1NormalizedY,
+} from "./pdfOutlineV1Anchor"
+
 type PageViewLike = {
   div: HTMLDivElement | undefined
   viewport?: { width: number; height: number }
 }
 
 /**
- * Viewport Y-range projected onto the anchor page, in MinerU-style coordinates
+ * Viewport Y-range on the anchor page in PDF outline v1 normalized coordinates
  * (0–1000, origin top-left, y increasing downward).
  */
 export type ViewportYRange = {
@@ -35,17 +40,6 @@ function pageContentArea(
       : div.clientHeight
   if (height <= 1) return null
   return { top, height }
-}
-
-/** Screen Y → MinerU normalized Y (0–1000), clamped to the page. */
-function mineruY(
-  screenY: number,
-  page: { top: number; height: number }
-): number {
-  return (
-    (Math.max(0, Math.min(screenY - page.top, page.height)) / page.height) *
-    1000
-  )
 }
 
 /**
@@ -89,8 +83,8 @@ export function pageIndexForScrollContainerCenter(
 }
 
 /**
- * Projects the scroll container's visible Y-range onto the center page as a `ViewportYRange`
- * (0–1000 MinerU, top-down). Returns `null` viewport when the page has no meaningful height.
+ * Projects the scroll container's visible Y-range onto the center page as a `ViewportYRange`.
+ * Returns `null` viewport when the page has no meaningful height.
  */
 export function pdfViewerViewportTopYDown(
   scrollContainer: HTMLElement,
@@ -114,15 +108,18 @@ export function pdfViewerViewportTopYDown(
   return {
     anchorPageIndexZeroBased: pageIndex,
     viewport: {
-      top: mineruY(containerRect.top, area),
-      mid: mineruY((containerRect.top + containerRect.bottom) / 2, area),
-      bottom: mineruY(containerRect.bottom, area),
+      top: screenYToOutlineV1NormalizedY(containerRect.top, area),
+      mid: screenYToOutlineV1NormalizedY(
+        (containerRect.top + containerRect.bottom) / 2,
+        area
+      ),
+      bottom: screenYToOutlineV1NormalizedY(containerRect.bottom, area),
     },
   }
 }
 
 /**
- * Page index + MinerU Y (0–1000) for the **top edge** of the scroll container.
+ * Page index + normalized Y for the **top edge** of the scroll container (same scale as outline v1 bbox).
  * The page index and normalizedTop always refer to the same physical page.
  */
 export function pdfViewerReadingPositionTopEdge(
@@ -145,7 +142,10 @@ export function pdfViewerReadingPositionTopEdge(
     lastArea = { index: i, ...area }
 
     if (topY >= area.top && topY < area.top + area.height) {
-      return { pageIndexZeroBased: i, normalizedTop: mineruY(topY, area) }
+      return {
+        pageIndexZeroBased: i,
+        normalizedTop: screenYToOutlineV1NormalizedY(topY, area),
+      }
     }
   }
 
@@ -154,5 +154,8 @@ export function pdfViewerReadingPositionTopEdge(
   if (topY < firstArea.top) {
     return { pageIndexZeroBased: firstArea.index, normalizedTop: 0 }
   }
-  return { pageIndexZeroBased: lastArea.index, normalizedTop: 1000 }
+  return {
+    pageIndexZeroBased: lastArea.index,
+    normalizedTop: PDF_OUTLINE_V1_NORMALIZED_MAX,
+  }
 }

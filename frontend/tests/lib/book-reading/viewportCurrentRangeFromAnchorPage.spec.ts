@@ -93,14 +93,14 @@ describe("viewportCurrentAnchorIdFromAnchorPage", () => {
 
   it("with pdfPageCount, skips anchors whose page_idx is beyond the document", () => {
     const anchors = [
-      makeMe.aBookAnchor.mineruStart(0).id(1).please(),
-      makeMe.aBookAnchor.mineruStart(10).id(2).please(),
+      makeMe.aBookAnchor.pdfOutlineV1Start(0).id(1).please(),
+      makeMe.aBookAnchor.pdfOutlineV1Start(10).id(2).please(),
     ]
     expect(viewportCurrentAnchorIdFromAnchorPage(anchors, 1, null, 2)).toBe(1)
   })
 
   it("with pdfPageCount, returns null when every parseable anchor is beyond the document", () => {
-    const anchors = [makeMe.aBookAnchor.mineruStart(10).id(2).please()]
+    const anchors = [makeMe.aBookAnchor.pdfOutlineV1Start(10).id(2).please()]
     expect(viewportCurrentAnchorIdFromAnchorPage(anchors, 1, null, 2)).toBe(
       null
     )
@@ -117,16 +117,16 @@ describe("viewportCurrentAnchorIdFromAnchorPage", () => {
     expect(viewportCurrentAnchorIdFromAnchorPage(list, 0, null, 1.5)).toBe(null)
   })
 
-  it("partial outline: only valid mineru anchors participate", () => {
+  it("partial outline: only valid pdf outline v1 anchors participate", () => {
     const anchors = [
       makeMe.aBookAnchor.anchorFormat("other").value("{}").id(1).please(),
       makeMe.aBookAnchor.id(2).value("not-json").please(),
-      makeMe.aBookAnchor.mineruStart(0).id(77).please(),
+      makeMe.aBookAnchor.pdfOutlineV1Start(0).id(77).please(),
     ]
     expect(viewportCurrentAnchorIdFromAnchorPage(anchors, 0)).toBe(77)
   })
 
-  it("returns null when mineru values parse as JSON but fail mineru validation", () => {
+  it("returns null when values parse as JSON but fail outline v1 validation", () => {
     const anchors = [
       makeMe.aBookAnchor.value("{}").id(1).please(),
       makeMe.aBookAnchor.value('{"page_idx":"1"}').id(2).please(),
@@ -136,8 +136,14 @@ describe("viewportCurrentAnchorIdFromAnchorPage", () => {
 
   it("close-nodes: first visible partially above viewport, next within SCROLL_PADDING → use next", () => {
     const anchors = [
-      makeMe.aBookAnchor.mineruStart(0, [48, 400, 100, 450]).id(10).please(),
-      makeMe.aBookAnchor.mineruStart(0, [48, 478, 100, 530]).id(20).please(),
+      makeMe.aBookAnchor
+        .pdfOutlineV1Start(0, [48, 400, 100, 450])
+        .id(10)
+        .please(),
+      makeMe.aBookAnchor
+        .pdfOutlineV1Start(0, [48, 478, 100, 530])
+        .id(20)
+        .please(),
     ]
     // id=10 (y0=400,y1=450): visible (400<600,450>430); y0=400<mid=550 → not >mid; y0=400<top=430 → partially above
     // next id=20: y0=478, 478-430=48 ≤ 50 (SCROLL_PADDING) → use id=20
@@ -148,8 +154,14 @@ describe("viewportCurrentAnchorIdFromAnchorPage", () => {
 
   it("close-nodes: first visible partially above, next beyond SCROLL_PADDING → use first visible", () => {
     const anchors = [
-      makeMe.aBookAnchor.mineruStart(0, [48, 400, 100, 450]).id(10).please(),
-      makeMe.aBookAnchor.mineruStart(0, [48, 510, 100, 560]).id(20).please(),
+      makeMe.aBookAnchor
+        .pdfOutlineV1Start(0, [48, 400, 100, 450])
+        .id(10)
+        .please(),
+      makeMe.aBookAnchor
+        .pdfOutlineV1Start(0, [48, 510, 100, 560])
+        .id(20)
+        .please(),
     ]
     // id=10 partially above (y0=400<top=430); next id=20 y0=510, 510-430=80 > 50 → use id=10
     expect(
@@ -159,9 +171,15 @@ describe("viewportCurrentAnchorIdFromAnchorPage", () => {
 
   it("on a later page with viewport showing page top, first anchor on that page is current", () => {
     const anchors = [
-      makeMe.aBookAnchor.mineruStart(0).id(1).please(),
-      makeMe.aBookAnchor.mineruStart(0, [48, 72, 100, 100]).id(2).please(),
-      makeMe.aBookAnchor.mineruStart(1, [87, 68, 200, 100]).id(3).please(),
+      makeMe.aBookAnchor.pdfOutlineV1Start(0).id(1).please(),
+      makeMe.aBookAnchor
+        .pdfOutlineV1Start(0, [48, 72, 100, 100])
+        .id(2)
+        .please(),
+      makeMe.aBookAnchor
+        .pdfOutlineV1Start(1, [87, 68, 200, 100])
+        .id(3)
+        .please(),
     ]
     // page 1 at top: id=3 (y0=68,y1=100) visible (68<600,100>0); y0=68<mid=300 → current
     expect(

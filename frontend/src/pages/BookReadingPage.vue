@@ -156,9 +156,9 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
 import {
-  ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1,
-  parseMineruOutlineV1StartAnchor,
-} from "@/lib/book-reading/mineruOutlineV1PageIndex"
+  PDF_OUTLINE_V1_ANCHOR_FORMAT,
+  parsePdfOutlineV1StartAnchor,
+} from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { createViewportCurrentAnchorDebouncer } from "@/lib/book-reading/debounceViewportCurrentAnchorId"
 import { nextLiveAnnouncementText } from "@/lib/book-reading/viewportCurrentLiveAnnouncement"
@@ -353,7 +353,7 @@ const initialLastRead = ref<{
 } | null>(null)
 
 const pdfViewerRef = ref<{
-  scrollToMineruOutlineV1Target: (target: {
+  scrollToPdfOutlineV1Target: (target: {
     pageIndexZeroBased: number
     bbox: readonly [number, number, number, number] | null
   }) => Promise<void>
@@ -375,15 +375,15 @@ function onPagesReady() {
 
 async function onOutlineRowClick(node: OutlineNode) {
   const anchor = node.startAnchor
-  if (anchor.anchorFormat !== ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1) {
+  if (anchor.anchorFormat !== PDF_OUTLINE_V1_ANCHOR_FORMAT) {
     return
   }
-  const parsed = parseMineruOutlineV1StartAnchor(anchor.value)
+  const parsed = parsePdfOutlineV1StartAnchor(anchor.value)
   if (parsed === null) {
     return
   }
   selectedOutlineRangeId.value = node.id
-  await pdfViewerRef.value?.scrollToMineruOutlineV1Target({
+  await pdfViewerRef.value?.scrollToPdfOutlineV1Target({
     pageIndexZeroBased: parsed.pageIndex,
     bbox: parsed.bbox,
   })
