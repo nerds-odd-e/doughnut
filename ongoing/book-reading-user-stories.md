@@ -41,11 +41,11 @@ Then I should be starting from the same position
 
 ### mark a book range as read
 
-Given I choose the book range "2.1 xxx"
-And I scroll to title "2.2 xxx" 
-When I mark the book range "2.1 xxx" as read in the Reading Control Panel
-Then I should see that book range "2.1 xxxx" is marked as read in the book layout
-And I should see that book range "2.2 xxx" is selected in the book layout
+When I choose the book range "2.1 Easier to Change—and Harder to Misuse"
+And I scroll to title "2.2 Refactoring as Strengthening the Code"
+When I mark the book range "2.1 Easier to Change—and Harder to Misuse" as read in the Reading Control Panel
+Then I should see that book range "2.1 Easier to Change—and Harder to Misuse" is marked as read in the book layout
+And I should see that book range "2.2 Refactoring as Strengthening the Code" is selected in the book layout
 
 ### mark a book range with no direct content as read automatically
 
