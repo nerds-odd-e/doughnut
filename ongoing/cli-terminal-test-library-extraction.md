@@ -1,6 +1,6 @@
 # `tty-assert` — PTY terminal test library extraction
 
-**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses xterm viewport replay). **Phase 5** is **complete** (sub-phases **5.1–5.9 met**, including legacy replay removal — execution table in [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md)). **Phase 6** now has a detailed plan in [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md). Phases 7–11 follow the roadmap. Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md); Phase 5 — [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md); Phase 6 — [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md).
+**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses xterm viewport replay). **Phase 5** is **complete** (sub-phases **5.1–5.9 met**, including legacy replay removal — execution table in [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md)). **Phase 6** is **complete** (sub-phases **6.1–6.5 met** — managed session, `cliInteractiveAssert`, docs, removal of unused `cliInteractivePtyGetBuffer`; detail in [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md)). Phases 7–11 follow the roadmap. Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md); Phase 5 — [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md); Phase 6 — [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md).
 
 **Intent:** Extract PTY-based terminal testing into a **Cypress-neutral, Doughnut-neutral** library named **`tty-assert`**, publishable on npm and eventually movable out of this repo. Goal: reliable assertions on terminal-visible state, with failures that show **expected vs actual** without manually decoding escape sequences, and CI-friendly artifacts where useful.
 
@@ -125,19 +125,17 @@
 
 ## Phase 6 — Tidy start and terminating APIs of `tty-assert`
 
-**Sub-phases (detail, design decisions, gates):** [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md).
+**Status:** **Complete** (6.1–6.5). **Sub-phases (detail, design decisions, gates):** [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md).
 
-**Outcome:** `tty-assert` owns one managed interactive session: **start session** (spawn, env, geometry), keep the **live PTY + xterm mirror + retry/assertion state** together, **write**, **assert/read state**, then **dispose** with clear teardown semantics. Doughnut Cypress code stays a thin adapter and stops round-tripping raw PTY buffer text through browser-side retries.
+**Outcome:** `tty-assert` owns one managed interactive session: **start session** (spawn, env, geometry), keep the **live PTY + xterm mirror + retry/assertion state** together, **write**, **assert/read state**, then **dispose** with clear teardown semantics. Doughnut Cypress code stays a thin adapter and uses **`cliInteractiveAssert`** with serialized payloads (no browser-side raw-buffer polling).
 
-**Work:**
+**Delivered:**
 
-- Introduce a managed-session API in `tty-assert` that keeps the PTY process, cumulative transcript, replay sync state, and xterm-backed assertions together.
-- Move retry/polling into `tty-assert`; Doughnut E2E uses one serialized Cypress assertion task instead of `cliInteractivePtyGetBuffer` loops.
-- Unify spawn options, default env, startup wait, and **idempotent** dispose (safe double-call, scenario end hooks).
-- Define behavior for edge cases: child already dead, timeout waiting for startup marker, replay resync fallback, leak prevention (listeners, timers).
-- Keep Doughnut-only terms such as Current guidance / past user messages outside the package as request builders over generic `tty-assert` assertion primitives.
+- `tty-assert/managedTtySession`: `startManagedTtySession`, `attachManagedTtySession`, incremental xterm sync, polling `assert`, idempotent `dispose`, `dumpFrames`.
+- Plugin: `cliInteractiveAssert` → `managed.assert`; startup wait uses managed `assert`; **`cliInteractivePtyGetBuffer` removed** (unused).
+- `e2e_test/start/pageObjects/cli/outputAssertions.ts`: request builders for current guidance, transcript, full-buffer + cell expectations.
 
-**Gate:** `tty-assert` unit tests cover managed-session lifecycle + replay sync; touched CLI E2E are green; no normal Doughnut assertion path depends on `cliInteractivePtyGetBuffer`.
+**Gate:** **Met** — `pnpm tty-assert:test` green; CLI E2E paths for interactive assertions use `cliInteractiveAssert` only.
 
 ---
 

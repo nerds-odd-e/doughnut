@@ -8,6 +8,8 @@ This package is **Cypress-neutral** and **Doughnut-neutral**; the monorepo wires
 
 **Research copy:** A temporary local `tt/` tree (upstream tui-test snapshot) was used only for reading while designing locators. It is **not** a product dependency; remove it from the workspace when no longer needed.
 
+**Phase 6:** Managed session + single Cypress assertion task — design and sub-phases in [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](../../ongoing/cli-phase6-tty-assert-managed-session-subphases.md).
+
 ---
 
 ## Strip vs replay vs locators
@@ -45,7 +47,28 @@ For **`strippedTranscript`**, the haystack and snapshot are the **same**: the fu
 | `tty-assert/errorSnapshotFormatting` | Truncated / safe previews for errors |
 | `tty-assert/ptySession` | Buffered PTY session helpers |
 | `tty-assert/facade` | `startProgram` / `TtyAssertTerminalHandle` — `getReplayedScreenPlaintext` uses xterm; `expect(…).toBeVisible` searches **stripped** cumulative text |
+| `tty-assert/managedTtySession` | Long-lived PTY + incremental xterm replay + polling `assert` — see below |
 | `tty-assert/waitForTextInSurface` | `waitForTextInSurface`, `stripAnsiCliPty`, `TtySearchSurface`, `TtyAssertStrictModeViolationError` |
+
+---
+
+## Managed interactive session (`managedTtySession`)
+
+Use this when one process owns **the same** PTY buffer, xterm headless instance, and assertion loop (retry + sync). That matches interactive CLI E2E: start once, write many times, assert many times, dispose once.
+
+**Lifecycle**
+
+1. **`startManagedTtySession(opts)`** — spawns the PTY (`ptySession`), returns **`ManagedTtySession`**.
+2. **`write` / `submit`** — send bytes or a line (`\r` appended for `submit`).
+3. **`assert(opts)`** — polls until timeout: syncs new raw bytes into xterm, then runs the same surface logic as `waitForTextInSurface` (or stripped-transcript path without replay). No need to pass an updated `raw` string from outside; it always reads `session.buf.text`.
+4. **`dumpFrames()`** — async diagnostic snapshot (previews of viewport, stripped tail, etc.).
+5. **`dispose()`** — idempotent: tears down xterm, disposes the buffered PTY session. Safe if the child already exited.
+
+**`ManagedTtyAssertOptions`** (same assertion knobs as `waitForTextInSurface` except **`raw`** is omitted): `needle` (string or `RegExp`), `surface`, `timeoutMs`, `retryMs`, `strict`, `messagePrefix`, `startAfterAnchor`, `fallbackRowCount`, `cellExpectations`.
+
+**Cypress:** Doughnut maps **`cy.task('cliInteractiveAssert', payload)`** to `managed.assert(...)`. The task body must stay **JSON-serializable**: use `{ source, flags? }` instead of `RegExp` objects for needles and anchors (see `e2e_test/config/cliE2ePluginTasks.ts`).
+
+**Node tests without Cypress:** Prefer `managedTtySession` or `facade` directly; do not round-trip PTY text through a browser.
 
 ---
 

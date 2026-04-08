@@ -262,14 +262,6 @@ export function createCliE2ePluginTasks(repoRoot: string) {
       disposeInteractiveCliPtySession()
       return null
     },
-    cliInteractivePtyGetBuffer(): string {
-      if (!interactiveCliPtyHandle) {
-        throw new Error(
-          'cliInteractivePtyGetBuffer: no active interactive CLI PTY session. Ensure @interactiveCLI started the session or run the installed CLI in interactive mode first.'
-        )
-      }
-      return interactiveCliPtyHandle.session.buf.text
-    },
     async cliInteractiveAssert(
       body: ManagedTtyAssertTaskPayload
     ): Promise<null> {

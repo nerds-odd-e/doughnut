@@ -2,9 +2,9 @@
  * PTY lifecycle and I/O: `cy.task` names for interactive CLI (`runRepoCliInteractive`,
  * `cliInteractiveWriteLine`, `cliInteractiveAssert`, `cliInteractivePtyDispose`, …).
  *
- * Transcript assertions are re-exported from `outputAssertions` and use **`cliInteractiveAssert`**
- * (serialized requests; managed PTY + xterm in the plugin). Do not use the Node `tty-assert/facade`
- * `expect` API from Cypress (messages differ).
+ * Assertions use **`cliInteractiveAssert`** with JSON-serializable payloads; the plugin delegates to
+ * `tty-assert` managed session (`assert` retries in Node with one live xterm mirror). Page objects
+ * build requests in `outputAssertions.ts`.
  */
 
 import {
