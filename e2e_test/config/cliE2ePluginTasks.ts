@@ -21,7 +21,7 @@ import {
 
 /**
  * JSON-safe `cy.task` body (`RegExp` must use `{ source, flags? }`).
- * Style checks: prefer `cellExpectations` from `tty-assert` over legacy boolean flags on assert options.
+ * Optional **`cellExpectations`** carries serializable cell-span checks (see `tty-assert` / `waitForTextInSurface`).
  */
 export type ManagedTtyAssertTaskPayload = Omit<
   ManagedTtyAssertOptions,

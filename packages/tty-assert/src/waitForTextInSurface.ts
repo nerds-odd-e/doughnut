@@ -12,17 +12,19 @@
  * **`ptyTranscriptToViewportPlaintext`:** still uses **`\n`‑joined** viewport lines for guidance
  * heuristics; locators here intentionally use the flat block for matching.
  *
- * **`requireBold`:** after a string needle matches, the **first** occurrence must be entirely bold
- * (second xterm replay for the cell attribute scan).
+ * **`cellExpectations`:** composable, serializable checks on the matched cell span after the
+ * needle matches. Each block picks **`match: 'first'`** or **`'last'`** for which haystack
+ * occurrence to inspect (same row-major flat block as substring search).
+ *
+ * **Bold:** use `{ kind: 'allBold' }` on a **`first`** block so every cell of the first match is
+ * bold (xterm `isBold()`).
  *
  * **Gray block (Ink / chalk):** `\x1b[100m` (bright black background) and `\x1b[90m` (bright black
- * foreground) map to xterm **palette** color **8**. For past-user message blocks, use
- * **`rejectGrayForegroundOnlyWithoutGrayBackground`** and **`requireGrayBackgroundBlock`** on a
- * string needle: both inspect the **last** `indexOf` match in the search haystack (same as the
- * former “last paint in raw buffer” heuristic).
+ * foreground) map to xterm **palette** color **8**. Typical past-user styling uses a **`last`** block
+ * with `noFgPaletteUnlessBgPalette` / `allBgPalette` for palette 8.
  *
- * Prefer **`cellExpectations`** for new code: composable, serializable checks on the matched cell
- * span (`match: 'first' | 'last'` per block). Legacy boolean style flags map to the same behavior.
+ * Cell expectations require **`viewableBuffer` or `fullBuffer`**, a **string** needle, and a second
+ * xterm pass for cell attributes.
  */
 
 import {
@@ -68,27 +70,8 @@ export type WaitForTextInSurfaceOptions = {
   /** Prepended to the failure body (one line is typical), before surface/snapshot sections. */
   messagePrefix?: string
   /**
-   * After the needle matches, require every cell of the **first** `indexOf` occurrence in the
-   * search region to be bold (xterm `isBold()`). Only for `viewableBuffer` / `fullBuffer` with a
-   * **string** needle.
-   */
-  requireBold?: boolean
-  /**
-   * After the needle matches, fail if **any** cell of the **last** occurrence has bright-black /
-   * gray **foreground** (palette 8) without gray **background** (palette 8) — i.e. chalk `grey`
-   * / `90m` without a `100m` block. Only for `viewableBuffer` / `fullBuffer` with a **string**
-   * needle.
-   */
-  rejectGrayForegroundOnlyWithoutGrayBackground?: boolean
-  /**
-   * After the needle matches, require **every** cell of the **last** occurrence to use gray
-   * **background** (palette 8, chalk `bgGray` / `100m`). Only for `viewableBuffer` / `fullBuffer`
-   * with a **string** needle.
-   */
-  requireGrayBackgroundBlock?: boolean
-  /**
    * After the needle matches, assert on xterm cells for the chosen occurrence per block.
-   * Do not combine with `requireBold` / gray boolean flags (throws).
+   * Only for `viewableBuffer` / `fullBuffer` with a **string** needle.
    */
   cellExpectations?: CellExpectationBlock[]
 }
@@ -154,10 +137,6 @@ export async function waitForTextInSurface(
   const cellExpectations = validateAndResolveCellExpectations({
     surface: opts.surface,
     needle: opts.needle,
-    requireBold: opts.requireBold,
-    rejectGrayForegroundOnlyWithoutGrayBackground:
-      opts.rejectGrayForegroundOnlyWithoutGrayBackground,
-    requireGrayBackgroundBlock: opts.requireGrayBackgroundBlock,
     cellExpectations: opts.cellExpectations,
   })
 

@@ -132,10 +132,6 @@ export function attachManagedTtySession(
       const cellExpectations = validateAndResolveCellExpectations({
         surface: opts.surface,
         needle: opts.needle,
-        requireBold: opts.requireBold,
-        rejectGrayForegroundOnlyWithoutGrayBackground:
-          opts.rejectGrayForegroundOnlyWithoutGrayBackground,
-        requireGrayBackgroundBlock: opts.requireGrayBackgroundBlock,
         cellExpectations: opts.cellExpectations,
       })
 

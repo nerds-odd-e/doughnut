@@ -57,6 +57,15 @@ type SerializedPattern =
   | { kind: 'text'; value: string }
   | { kind: 'regex'; source: string; flags?: string }
 
+type CellExpectationBlock = {
+  match: 'first' | 'last'
+  expectations: Array<
+    | { kind: 'allBold' }
+    | { kind: 'allBgPalette'; index: number }
+    | { kind: 'noFgPaletteUnlessBgPalette'; fgPalette: number; unlessBgPalette: number }
+  >
+}
+
 type TtyAssertRequest = {
   needle: SerializedPattern
   surface: 'strippedTranscript' | 'viewableBuffer' | 'fullBuffer'
@@ -66,9 +75,7 @@ type TtyAssertRequest = {
   messagePrefix?: string
   startAfterAnchor?: Array<{ source: string; flags?: string }>
   fallbackRowCount?: number
-  requireBold?: boolean
-  rejectGrayForegroundOnlyWithoutGrayBackground?: boolean
-  requireGrayBackgroundBlock?: boolean
+  cellExpectations?: CellExpectationBlock[]
 }
 
 type ManagedTtySession = {

@@ -1,6 +1,6 @@
 # `tty-assert` — Replace ad-hoc style booleans with locator-scoped cell expectations
 
-**Status:** Planning only (not executed).
+**Status:** Phases **1–3 complete** in-repo; Phase 4 optional.
 
 **Parent roadmap:** [`cli-terminal-test-library-extraction.md`](./cli-terminal-test-library-extraction.md) (Phases 5–6 delivered the current `waitForTextInSurface` / managed-session wiring).
 
@@ -91,8 +91,10 @@ Each phase has a **single observable gate** and avoids multiple intentionally fa
 
 ### Phase 3 — Remove deprecated booleans
 
-- Delete `requireBold`, `rejectGrayForegroundOnlyWithoutGrayBackground`, `requireGrayBackgroundBlock` from public types and docs ([`waitForTextInSurface.ts`](../../packages/tty-assert/src/waitForTextInSurface.ts), README, [`cli-phase6` doc](./cli-phase6-tty-assert-managed-session-subphases.md) if it lists them).
-- **Gate:** `tty-assert` tests + same CLI E2E subset green.
+**Status:** **Complete.**
+
+- Removed the three boolean options from public types and docs; [`waitForTextInSurface.ts`](../../packages/tty-assert/src/waitForTextInSurface.ts), [`packages/tty-assert/README.md`](../../packages/tty-assert/README.md), and [`cli-phase6` doc](./cli-phase6-tty-assert-managed-session-subphases.md) updated accordingly.
+- **Gate:** `tty-assert` tests + targeted CLI E2E subset green.
 
 ### Phase 4 (optional, value-driven) — Richer expectations without new booleans
 

@@ -64,6 +64,27 @@ await waitForTextInSurface({
 })
 ```
 
+After the needle matches, optional **`cellExpectations`** assert on xterm cells (string needle, `viewableBuffer` / `fullBuffer` only). Example — bold on the **first** match and Ink-style gray block on the **last** (palette 8):
+
+```ts
+await waitForTextInSurface({
+  raw: ptyBytes,
+  needle: 'User paste',
+  surface: 'viewableBuffer',
+  strict: false,
+  cellExpectations: [
+    { match: 'first', expectations: [{ kind: 'allBold' }] },
+    {
+      match: 'last',
+      expectations: [
+        { kind: 'noFgPaletteUnlessBgPalette', fgPalette: 8, unlessBgPalette: 8 },
+        { kind: 'allBgPalette', index: 8 },
+      ],
+    },
+  ],
+})
+```
+
 - **`viewableBuffer`:** lines from xterm `baseY` through `length - 1` (tui-test “viewable” slice).
 - **`fullBuffer`:** lines `0` through `length - 1` (scrollback + active).
 - **`strippedTranscript`:** no replay; search `stripAnsiCliPty(raw)`.
