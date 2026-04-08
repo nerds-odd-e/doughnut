@@ -42,7 +42,7 @@ Then I should be starting from the same position
 ### mark a book range as read
 
 When I choose the book range "2.1 Easier to Change—and Harder to Misuse"
-And I scroll to title "2.2 Refactoring as Strengthening the Code"
+And I scroll the PDF until the book range "2.2 Refactoring as Strengthening the Code" is the current range in the book reader
 When I mark the book range "2.1 Easier to Change—and Harder to Misuse" as read in the Reading Control Panel
 Then I should see that book range "2.1 Easier to Change—and Harder to Misuse" is marked as read in the book layout
 And I should see that book range "2.2 Refactoring as Strengthening the Code" is selected in the book layout
@@ -50,7 +50,7 @@ And I should see that book range "2.2 Refactoring as Strengthening the Code" is 
 ### mark a book range with no direct content as read automatically
 
 Given I choose the book range "2. xxx"
-When I scroll to title "2.1 xxx" 
+When I scroll the PDF until the book range "2.1 xxx" is the current range in the book reader 
 Then I should see that book range "2.1 xxxx" is marked as read in the book layout
 
 ### mark a book range as skimmed/skipped

@@ -133,6 +133,23 @@ const bookReadingPage = () => {
       return this
     },
     /**
+     * Scroll the PDF until the book layout row identified by `rangeTitle` is the viewport-derived
+     * current range (same DOM contract as expectBookRangeIsCurrentRangeByTitle).
+     * For refactoring.pdf, §2.2 is anchored on page 2.
+     */
+    scrollPdfBookReaderToMakeBookRangeCurrent(rangeTitle: string) {
+      pageIsNotLoading()
+      if (!rangeTitle.includes('2.2 Refactoring as Strengthening')) {
+        throw new Error(
+          `scrollPdfBookReaderToMakeBookRangeCurrent: unsupported book range (add scroll strategy): ${rangeTitle}`
+        )
+      }
+      this.scrollPdfBookReaderToBringPage2IntoPrimaryView()
+      cy.wait(200)
+      this.expectBookRangeIsCurrentRangeByTitle(rangeTitle)
+      return this
+    },
+    /**
      * Scrolls by 42% of the rendered page-1 height from §1's click position (y≈204 MinerU),
      * giving total scroll ≈ 624 MinerU — past §2's bbox bottom (y1=608) so §2 scrolls above the
      * viewport, making §2.1 (y0=631) the first visible anchor and therefore the current range.

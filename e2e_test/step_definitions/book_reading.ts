@@ -99,6 +99,16 @@ When(
   }
 )
 
+When(
+  'I scroll the PDF until the book range {string} is the current range in the book reader',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (rangeTitle: string) => {
+    return bookReadingPage().scrollPdfBookReaderToMakeBookRangeCurrent(
+      rangeTitle
+    )
+  }
+)
+
 Then(
   'I should see in the book reader visible PDF viewport on page {int} text including {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain

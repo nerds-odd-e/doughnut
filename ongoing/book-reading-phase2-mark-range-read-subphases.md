@@ -18,7 +18,7 @@
 
 ```gherkin
 Given I choose the book range "2.1 xxx"
-And I scroll to title "2.2 xxx"
+And I scroll the PDF until the book range "2.2 xxx" is the current range in the book reader
 When I mark the book range "2.1 xxx" as read in the Reading Control Panel
 Then I should see that book range "2.1 xxx" is marked as read in the book layout
 And I should see that book range "2.2 xxx" is selected in the book layout
@@ -29,7 +29,7 @@ And I should see that book range "2.2 xxx" is selected in the book layout
 | Phrase | Meaning |
 |--------|--------|
 | **Choose** the book range | User establishes **selected range** in the book layout (distinct from **current range** driven by PDF viewport where the product already distinguishes them — see shipped Story 2 sync). |
-| **Scroll to** title "2.2 …" | PDF viewport + sync logic yield **current range** = the range whose title matches "2.2 …" (same **reading-order walk** as today’s current-range highlight). |
+| **Scroll the PDF until** the book range "2.2 …" **is the current range** | PDF viewport + sync logic yield **current range** = that **book range** (same **reading-order walk** as today’s current-range highlight). |
 | **Reading Control Panel** | Bottom-anchored control in the **PDF main pane** per UX roadmap; **does not** own document scroll. |
 | **Mark "2.1 …" as read** | Records disposition for **the selected range’s direct content** (conceptually the gap **from 2.1’s start through the next range’s start in reading order** — architecture *direct content*). The disposition attaches to **book range 2.1**, not to 2.2. **Before the persistence sub-phase (2.11):** session **in-memory** only. **From 2.11 onward:** server **`ReadingRecord`** (`ReadingRecord` → `BookRange`) via DB + API. |
 | **Marked as read in the book layout** | **Observable** styling on the **2.1** row: **right border** in a **fixed semantic color** (exact token: pick one DaisyUI / Tailwind semantic and reuse everywhere). |
@@ -88,7 +88,7 @@ Then **uncomment the next line** → **Red** again → **Green** again, until **
 | Order | Gherkin (uncomment up to here) | Red | Green (minimum outcome) |
 |-------|--------------------------------|-----|-------------------------|
 | 1 | `Given I choose the book range "2.1 xxx"` | **2.1** | **2.2** — selection + stable hook for “chosen” range |
-| 2 | `And I scroll to title "2.2 xxx"` | **2.3** | **2.4** — scroll / viewport drives **current range** to **2.2**; assert in E2E |
+| 2 | `And I scroll the PDF until the book range "2.2 xxx" is the current range in the book reader` | **2.3** | **2.4** — scroll / viewport drives **current range** to **2.2**; assert in E2E |
 | 3 | `When I mark the book range "2.1 xxx" as read in the Reading Control Panel` | **2.5** | **2.6** — panel at **successor** boundary + **Mark as read** updates **in-memory** state for **2.1** (no HTTP) |
 | 4 | `Then I should see that book range "2.1 xxx" is marked as read in the book layout` | **2.7** | **2.8** — **right border** + same **DOM hook** as Cypress; optional non-color cue (design **6**) |
 | 5 | `And I should see that book range "2.2 xxx" is selected in the book layout` | **2.9** | **2.10** — selection **still** **2.2** after mark; **full** scenario **green** |
