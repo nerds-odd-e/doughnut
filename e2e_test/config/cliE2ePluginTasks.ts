@@ -12,6 +12,10 @@ import {
   cliRepoSpawnFromRoot,
   runShellCommandSync,
 } from './cliE2eRepo'
+import {
+  cliInteractiveAssertRequestToManagedOptions,
+  type CliInteractiveAssertRequest,
+} from './cliInteractiveAssertRequest'
 import { cliEnv } from './cliEnv'
 import {
   startManagedTtySession,
@@ -241,6 +245,18 @@ export function createCliE2ePluginTasks(repoRoot: string) {
         )
       }
       return interactiveCliPtyHandle.session.buf.text
+    },
+    async cliInteractiveAssert(
+      body: CliInteractiveAssertRequest
+    ): Promise<null> {
+      const handle = interactiveCliPtyHandle
+      if (!handle) {
+        throw new Error(
+          'cliInteractiveAssert: no active interactive CLI PTY session. Ensure @interactiveCLI started the session or run the installed CLI in interactive mode first.'
+        )
+      }
+      await handle.assert(cliInteractiveAssertRequestToManagedOptions(body))
+      return null
     },
     async cliInteractiveWriteLine({
       line,

@@ -1,3 +1,9 @@
+import type { CliInteractiveAssertRequest } from '../../../config/cliInteractiveAssertRequest'
+import {
+  currentGuidanceContainsAssertRequest,
+  currentGuidanceContainsBoldAssertRequest,
+  waitForCurrentGuidancePromptAssertRequest,
+} from './currentGuidanceCliAssertRequests'
 import {
   TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS,
   waitForTextInSurface,
@@ -6,6 +12,37 @@ import {
 /** Matches `waitForTextInSurface` poll cadence when the library polls internally; Cypress re-reads the PTY buffer on each attempt at this interval. */
 const CLI_OUTPUT_ASSERT_RETRY_MS = TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS
 const CLI_OUTPUT_ASSERT_TIMEOUT_MS = 3000
+
+/** Cypress task wall clock: must exceed managed-session `timeoutMs` used by Current guidance asserts. */
+const CLI_INTERACTIVE_ASSERT_TASK_TIMEOUT_MS = 15_000
+
+function runCliInteractiveAssertWithScreenshot(
+  body: CliInteractiveAssertRequest,
+  screenshotName: string
+): Cypress.Chainable<void> {
+  return cy.wrap(null, { log: false }).then((_subject: null) => {
+    return new Cypress.Promise<void>((resolve, reject) => {
+      const taskChain = cy.task('cliInteractiveAssert', body, {
+        timeout: CLI_INTERACTIVE_ASSERT_TASK_TIMEOUT_MS,
+      }) as Cypress.Chainable<null> & {
+        then(
+          onFulfilled: (value: null) => void,
+          onRejected: (err: unknown) => void
+        ): Cypress.Chainable<unknown>
+      }
+      taskChain.then(
+        () => {
+          resolve()
+        },
+        (err: unknown) => {
+          cy.screenshot(screenshotName).then(() => {
+            reject(err)
+          })
+        }
+      )
+    })
+  })
+}
 
 function escapeRegExpLiteral(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -65,74 +102,20 @@ async function assertAnsweredQuestionsContains(
   )
 }
 
-/** Anchors for the guidance region, tried in priority order (most specific first). */
-const GUIDANCE_ANCHORS: RegExp[] = [/^\s*└/, /^\s*>\s*$/, /> /]
-const GUIDANCE_FALLBACK_ROWS = 8
-
-async function assertCurrentGuidanceContains(
-  raw: string,
-  expected: string
-): Promise<void> {
-  if (expected === '') return
-  await waitForTextInSurface({
-    raw,
-    needle: expected,
-    surface: 'viewableBuffer',
-    startAfterAnchor: GUIDANCE_ANCHORS,
-    fallbackRowCount: GUIDANCE_FALLBACK_ROWS,
-    timeoutMs: 0,
-    strict: false,
-    messagePrefix: 'Current guidance assertion failed.',
-  })
-}
-
 /**
  * Waits until Current guidance contains `prompt`, then runs `onReady` (e.g. PTY write).
- * Failures reuse assertCurrentGuidanceContains diagnostics (expected prompt vs visible guidance).
+ * Assertion and retry run in the plugin via `cliInteractiveAssert` (managed PTY session).
  */
 export function whenCurrentGuidanceContainsThen(
   prompt: string,
   onReady: () => Cypress.Chainable<null>,
   screenshotName: string
 ): Cypress.Chainable<null> {
-  const deadline = Date.now() + CLI_OUTPUT_ASSERT_TIMEOUT_MS
-  const tryOnce = () => {
-    return cy.task<string>('cliInteractivePtyGetBuffer').then((raw) => {
-      return Cypress.Promise.resolve(
-        assertCurrentGuidanceContains(raw, prompt)
-      ).then(
-        () => onReady(),
-        (err: unknown) => {
-          const lastError = err instanceof Error ? err : new Error(String(err))
-          if (Date.now() >= deadline) {
-            return cy.screenshot(screenshotName).then(() => {
-              throw lastError
-            })
-          }
-          return cy.wait(CLI_OUTPUT_ASSERT_RETRY_MS).then(() => tryOnce())
-        }
-      )
-    }) as Cypress.Chainable<null>
-  }
-  return cy.wrap(null).then(() => tryOnce())
-}
-
-async function assertCurrentGuidanceContainsBold(
-  raw: string,
-  text: string
-): Promise<void> {
-  await waitForTextInSurface({
-    raw,
-    needle: text,
-    surface: 'viewableBuffer',
-    startAfterAnchor: GUIDANCE_ANCHORS,
-    fallbackRowCount: GUIDANCE_FALLBACK_ROWS,
-    timeoutMs: 0,
-    retryMs: CLI_OUTPUT_ASSERT_RETRY_MS,
-    strict: false,
-    requireBold: true,
-    messagePrefix: 'Current guidance (expectContainsBold).',
-  })
+  if (prompt === '') return onReady()
+  return runCliInteractiveAssertWithScreenshot(
+    waitForCurrentGuidancePromptAssertRequest(prompt),
+    screenshotName
+  ).then(() => onReady()) as Cypress.Chainable<null>
 }
 
 async function assertPastUserMessageBlankLineAboveInStrippedTranscript(
@@ -228,14 +211,22 @@ function pastUserMessages() {
 function currentGuidance() {
   return {
     expectContains(expected: string): Cypress.Chainable<void> {
-      return retryInteractiveAssertion(
-        (raw) => assertCurrentGuidanceContains(raw, expected),
+      if (expected === '')
+        return cy.wrap(null, {
+          log: false,
+        }) as unknown as Cypress.Chainable<void>
+      return runCliInteractiveAssertWithScreenshot(
+        currentGuidanceContainsAssertRequest(expected),
         'cli-interactive-pty-current-guidance-assertion'
       )
     },
     expectContainsBold(text: string): Cypress.Chainable<void> {
-      return retryInteractiveAssertion(
-        (raw) => assertCurrentGuidanceContainsBold(raw, text),
+      if (text === '')
+        return cy.wrap(null, {
+          log: false,
+        }) as unknown as Cypress.Chainable<void>
+      return runCliInteractiveAssertWithScreenshot(
+        currentGuidanceContainsBoldAssertRequest(text),
         'cli-interactive-pty-current-guidance-bold-assertion'
       )
     },

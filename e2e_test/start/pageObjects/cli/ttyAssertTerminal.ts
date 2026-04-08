@@ -1,11 +1,10 @@
 /**
  * PTY lifecycle and I/O: `cy.task` names for interactive CLI (`runRepoCliInteractive`,
- * `cliInteractiveWriteLine`, `cliInteractivePtyGetBuffer`, …).
+ * `cliInteractiveWriteLine`, `cliInteractiveAssert`, `cliInteractivePtyGetBuffer`, …).
  *
- * Transcript assertions are re-exported from `outputAssertions` — same **locator surfaces**
- * (`strippedTranscript` vs viewport replay for Current guidance), retries, screenshots, and
- * failure shape as `interactiveCli()`. See that file’s **Section contracts** table; do not use
- * the Node `tty-assert/facade` `expect` API from Cypress (messages differ).
+ * Transcript assertions are re-exported from `outputAssertions`. **Current guidance** uses
+ * `cliInteractiveAssert`; **past assistant / answered / past user** still use buffer round-trips
+ * until migrated. Do not use the Node `tty-assert/facade` `expect` API from Cypress (messages differ).
  */
 
 import {
@@ -42,9 +41,6 @@ function ttyAssertTerminal() {
     },
     kill() {
       return cy.task('cliInteractivePtyDispose')
-    },
-    getRawBuffer() {
-      return cy.task<string>('cliInteractivePtyGetBuffer')
     },
     enableGoogleOAuthSimulation() {
       return cy.task('cliInteractivePtyEnableGoogleOAuthSimulation')

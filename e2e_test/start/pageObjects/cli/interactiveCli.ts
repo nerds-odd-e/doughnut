@@ -2,9 +2,11 @@
  * Domain helpers on the interactive CLI PTY session (`ttyAssertTerminal` for `cy.task` I/O).
  *
  * **Assertions:** `pastCliAssistantMessages` and `answeredQuestions` search the **`strippedTranscript`**
- * surface. **`pastUserMessages.expectDisplayed`** runs **`fullBuffer`** gray-block checks plus
- * stripped-transcript blank-line layout in one Cypress retry loop (`outputAssertions`). **`currentGuidance`** uses xterm **viewport** replay plus Ink
- * heuristics — not the same surface. See `.cursor/rules/cli.mdc` terminology.
+ * surface via `cliInteractivePtyGetBuffer` retries in `outputAssertions`. **`pastUserMessages.expectDisplayed`**
+ * uses the same pattern (full buffer + stripped transcript per attempt). **`currentGuidance`** and
+ * **`whenCurrentGuidanceContainsThen`** use **`cliInteractiveAssert`**: the plugin delegates to
+ * `tty-assert` managed-session `assert` (viewport replay + Ink anchors), not browser-side buffer polling.
+ * Surfaces differ — see `.cursor/rules/cli.mdc` terminology.
  */
 import {
   answeredQuestions,
@@ -18,11 +20,11 @@ import { ttyAssertTerminal } from './ttyAssertTerminal'
 const pty = ttyAssertTerminal()
 
 function writeInteractiveLineToPty(line: string): Cypress.Chainable<null> {
-  return pty.submit(line)
+  return pty.submit(line) as Cypress.Chainable<null>
 }
 
 function writeInteractiveRawToPty(data: string): Cypress.Chainable<null> {
-  return pty.write(data)
+  return pty.write(data) as Cypress.Chainable<null>
 }
 
 function interactiveCli() {
