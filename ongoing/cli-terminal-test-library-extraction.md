@@ -25,7 +25,6 @@
 | ANSI strip | `packages/tty-assert/src/stripAnsi.ts` | `tty-assert` core |
 | Fixed cols/rows | `packages/tty-assert/src/geometry.ts` | `tty-assert` default geometry (configurable) |
 | Transcript → visible plaintext / replay | [`ptyTranscriptToVisiblePlaintextViaXterm.ts`](./packages/tty-assert/src/ptyTranscriptToVisiblePlaintextViaXterm.ts) + [`waitForTextInSurface`](./packages/tty-assert/src/waitForTextInSurface.ts) | **Phase 4:** xterm viewport replay for **`getGuidanceContext` / Current guidance**; **Phase 5:** facade + locator surfaces + E2E migration; **5.9:** removed hand-rolled replay |
-| Error snapshot formatting (truncation, safe text) | `packages/tty-assert/src/errorSnapshotFormatting.ts` | `tty-assert` core |
 | Google OAuth PTY simulation | `e2e_test/config/cliE2eGoogleOAuthSimulation.ts` | Stays **Doughnut** (or behind `tty-assert` **hook/extension** interface) |
 | Retry, `expectContains`, domain heuristics | `e2e_test/start/pageObjects/cli/outputAssertions.ts` | **Generic** snapshots + **locator/poll** helpers → `tty-assert`; **domain** surfaces (guidance extraction, past-user SGR rules) + Cypress orchestration stay Doughnut |
 | Cypress fluents | `e2e_test/start/pageObjects/cli/interactiveCli.ts` | Doughnut; calls `tty-assert`-backed tasks or helpers |
@@ -40,7 +39,7 @@
 
 **Delivered:**
 
-- ~~`tty-assert-staging/`~~ → **`packages/tty-assert`** (Phase 2): `stripAnsi`, `geometry`, xterm viewport replay, `errorSnapshotFormatting`, `ptySession`, `facade`; Ink guidance extraction stays in `cliPtyCurrentGuidanceFromReplay.ts`.
+- ~~`tty-assert-staging/`~~ → **`packages/tty-assert`** (Phase 2): `stripAnsi`, `geometry`, xterm viewport replay, `ptySession`, `facade`; Ink guidance extraction stays in `cliPtyCurrentGuidanceFromReplay.ts`.
 - **Doughnut-only:** OAuth simulation, install/bundle paths, env wiring, Doughnut CLI vocabulary in `outputAssertions` (see that file’s header for generic vs domain).
 - **Plugin:** `createCliE2ePluginTasks` is thin glue (tasks, `cliEnv`, startup waits, OAuth, install paths) over `tty-assert` (`ptySession` / `facade`).
 

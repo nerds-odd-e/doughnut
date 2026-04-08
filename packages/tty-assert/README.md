@@ -45,15 +45,6 @@ When `waitForTextInSurface` or `ManagedTtySession.assert` fails, the message bod
 2. A **`---`** block with the snapshot shown as **numbered lines**: `  1 | …`, `  2 | …` (UTF-16 lines split on `\n`; a single-line transcript is still line `1`). The block is truncated at **`TERMINAL_ERROR_LOCATOR_SNAPSHOT_MAX_CHARS`** (8000), after numbering.
 3. The existing **raw PTY appendix** (`formatRawTerminalSnapshotForError`) — still capped by **`TERMINAL_ERROR_MAX_VISIBLE_SNAPSHOT_CHARS`** (12_000 visible chars).
 
-Helpers (from `tty-assert/errorSnapshotFormatting`):
-
-- **`formatSearchSurfaceFailure(surface, detail, snapshot)`** — builds the body above (used internally by locators).
-- **`formatSnapshotWithRowNumbers(snapshot, options?)`** — row numbers; optional **`columnRuler: true`** and **`cols`** prepend a tens column ruler row (default **off**).
-- **`truncateLocatorFailureSnapshot`** — shared truncation for the numbered block.
-- **`annotateSubstringRangeInText(text, start, end)`** — inserts `«…»` around the half-open **`[start, end)`** range (UTF-16 indices; clamped). Use **before** `formatSnapshotWithRowNumbers` so offsets match the snapshot string.
-
-**`TERMINAL_ERROR_RAW_TAIL_BYTES`** (800) is the raw-byte tail length used in `dumpFrames()` previews.
-
 ---
 
 ## Subpath exports (`package.json` `"exports"`)
@@ -63,7 +54,6 @@ Helpers (from `tty-assert/errorSnapshotFormatting`):
 | `tty-assert/geometry` | Default CLI PTY cols/rows |
 | `tty-assert/ptyTranscriptToViewportPlaintext` | **Canonical** xterm viewport plaintext (async) |
 | `tty-assert/ptyTranscriptToVisiblePlaintextViaXterm` | Same function as `ptyTranscriptToViewportPlaintext` |
-| `tty-assert/errorSnapshotFormatting` | Truncated / safe previews, locator failure layout, row-numbered debug snapshots |
 | `tty-assert/ptySession` | Buffered PTY session helpers |
 | `tty-assert/facade` | `startProgram` / `TtyAssertTerminalHandle` — `getReplayedScreenPlaintext` uses xterm; `expect(…).toBeVisible` searches **stripped** cumulative text |
 | `tty-assert/managedTtySession` | Long-lived PTY + incremental xterm replay + polling `assert` — see below |

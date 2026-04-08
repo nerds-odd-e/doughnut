@@ -24,7 +24,6 @@
     "./geometry": "./src/geometry.ts",
     "./ptyTranscriptToViewportPlaintext": "./src/ptyTranscriptToVisiblePlaintextViaXterm.ts",
     "./ptyTranscriptToVisiblePlaintextViaXterm": "./src/ptyTranscriptToVisiblePlaintextViaXterm.ts",
-    "./errorSnapshotFormatting": "./src/errorSnapshotFormatting.ts",
     "./ptySession": "./src/ptySession.ts",
     "./facade": "./src/facade.ts",
     "./waitForTextInSurface": "./src/waitForTextInSurface.ts",

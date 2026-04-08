@@ -1,8 +1,3 @@
-import {
-  formatRawTerminalSnapshotForError,
-  headPreview,
-} from 'tty-assert/errorSnapshotFormatting'
-
 /** Cypress `cy.get('@…')` handle; must match `.as(…)` on the stored stdout chain. */
 export const DOUGHNUT_OUTPUT_CY_ALIAS = 'doughnutOutput'
 export const OUTPUT_ALIAS = `@${DOUGHNUT_OUTPUT_CY_ALIAS}`
@@ -13,12 +8,6 @@ const SECTION = {
 
 const WRONG_NON_INTERACTIVE_STEP =
   'Expected non-interactive CLI output (e.g. `version` / `update` spawn), but this capture looks like an interactive PTY session.'
-
-function failCliAssertion(message: string, raw: string): never {
-  throw new Error(
-    `${message}\n\n--- CLI terminal snapshot (ANSI-stripped, safe text) ---\n${formatRawTerminalSnapshotForError(raw)}`
-  )
-}
 
 function stdoutLooksLikeInteractiveCliPtyCapture(stdout: string): boolean {
   if (stdout.includes('\x1b[2K')) return true
@@ -36,7 +25,7 @@ function stdoutLooksLikeInteractiveCliPtyCapture(stdout: string): boolean {
 
 function assertNonInteractiveCliOutput(stdout: string): void {
   if (stdoutLooksLikeInteractiveCliPtyCapture(stdout)) {
-    failCliAssertion(WRONG_NON_INTERACTIVE_STEP, stdout)
+    throw new Error(WRONG_NON_INTERACTIVE_STEP)
   }
 }
 
@@ -46,10 +35,7 @@ function assertSectionContainsSubstring(
   sectionLabel: string
 ): void {
   if (haystack.includes(needle)) return
-  failCliAssertion(
-    `Expected "${needle}" in ${sectionLabel}. Content:\n${headPreview(haystack)}`,
-    haystack
-  )
+  throw new Error(`Expected "${needle}" in ${sectionLabel}`)
 }
 
 function nonInteractiveOutput() {
