@@ -12,14 +12,17 @@ import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookAnchor;
 import com.odde.doughnut.entities.BookRange;
+import com.odde.doughnut.entities.BookRangeReadingRecord;
 import com.odde.doughnut.entities.BookUserLastReadPosition;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.BookRangeReadingRecordRepository;
 import com.odde.doughnut.entities.repositories.BookRepository;
 import com.odde.doughnut.entities.repositories.BookUserLastReadPositionRepository;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
@@ -32,6 +35,7 @@ public class BookService {
 
   private final BookRepository bookRepository;
   private final BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
+  private final BookRangeReadingRecordRepository bookRangeReadingRecordRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final BookStorage bookStorage;
@@ -39,11 +43,13 @@ public class BookService {
   public BookService(
       BookRepository bookRepository,
       BookUserLastReadPositionRepository bookUserLastReadPositionRepository,
+      BookRangeReadingRecordRepository bookRangeReadingRecordRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       BookStorage bookStorage) {
     this.bookRepository = bookRepository;
     this.bookUserLastReadPositionRepository = bookUserLastReadPositionRepository;
+    this.bookRangeReadingRecordRepository = bookRangeReadingRecordRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.bookStorage = bookStorage;
@@ -118,6 +124,33 @@ public class BookService {
               row.setBook(book);
               row.setPageIndex(request.getPageIndex());
               row.setNormalizedY(request.getNormalizedY());
+              return entityPersister.save(row);
+            });
+    entityPersister.flush();
+  }
+
+  @Transactional
+  public void markRangeRead(Notebook notebook, User user, BookRange bookRange) {
+    Book book = getBookForNotebook(notebook);
+    if (!bookRange.getBook().getId().equals(book.getId())) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
+    }
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    bookRangeReadingRecordRepository
+        .findByUser_IdAndBookRange_Id(user.getId(), bookRange.getId())
+        .map(
+            existing -> {
+              existing.setStatus(BookRangeReadingRecord.STATUS_READ);
+              existing.setCompletedAt(now);
+              return entityPersister.save(existing);
+            })
+        .orElseGet(
+            () -> {
+              var row = new BookRangeReadingRecord();
+              row.setUser(user);
+              row.setBookRange(bookRange);
+              row.setStatus(BookRangeReadingRecord.STATUS_READ);
+              row.setCompletedAt(now);
               return entityPersister.save(row);
             });
     entityPersister.flush();

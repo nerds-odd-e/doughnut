@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
 import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
 import com.odde.doughnut.entities.Book;
+import com.odde.doughnut.entities.BookRange;
 import com.odde.doughnut.entities.BookUserLastReadPosition;
 import com.odde.doughnut.entities.BookViews;
 import com.odde.doughnut.entities.Notebook;
@@ -115,6 +116,20 @@ class NotebookBooksController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
     bookService.upsertLastReadPosition(notebook, authorizationService.getCurrentUser(), body);
+  }
+
+  @Operation(
+      operationId = "putNotebookBookRangeReadingRecord",
+      summary = "Mark book range as read for the current user")
+  @PutMapping("/{notebook}/book/ranges/{bookRange}/reading-record")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Transactional
+  public void putRangeReadingRecord(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @PathVariable("bookRange") @Schema(type = "integer") BookRange bookRange)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertReadAuthorization(notebook);
+    bookService.markRangeRead(notebook, authorizationService.getCurrentUser(), bookRange);
   }
 
   @GetMapping(value = "/{notebook}/book/file", produces = MediaType.APPLICATION_PDF_VALUE)

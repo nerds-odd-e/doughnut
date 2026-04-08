@@ -799,6 +799,25 @@ export type CircleForUserViewWritable = {
     members: Array<UserForOtherUserView>;
 };
 
+export type PutNotebookBookRangeReadingRecordData = {
+    body?: never;
+    path: {
+        notebook: number;
+        bookRange: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/book/ranges/{bookRange}/reading-record';
+};
+
+export type PutNotebookBookRangeReadingRecordResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type PutNotebookBookRangeReadingRecordResponse = PutNotebookBookRangeReadingRecordResponses[keyof PutNotebookBookRangeReadingRecordResponses];
+
 export type GetUserProfileData = {
     body?: never;
     path?: never;

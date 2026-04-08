@@ -7,9 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookRange;
+import com.odde.doughnut.entities.BookRangeReadingRecord;
 import com.odde.doughnut.entities.BookUserLastReadPosition;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.BookRangeReadingRecordRepository;
 import com.odde.doughnut.entities.repositories.BookRepository;
 import com.odde.doughnut.entities.repositories.BookUserLastReadPositionRepository;
 import com.odde.doughnut.exceptions.ApiException;
@@ -39,6 +41,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   @Autowired NotebookBooksController controller;
   @Autowired BookRepository bookRepository;
   @Autowired BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
+  @Autowired BookRangeReadingRecordRepository bookRangeReadingRecordRepository;
   @Autowired BookStorage bookStorage;
 
   @BeforeEach
@@ -481,6 +484,83 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       Notebook nb = notebookWithBook();
       currentUser.setUser(null);
       assertThrows(ResponseStatusException.class, () -> controller.getReadingPosition(nb));
+    }
+  }
+
+  @Nested
+  class PutRangeReadingRecord {
+    @Test
+    void persistsReadRecordForCurrentUserAndRange() throws Exception {
+      testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
+      Notebook nb = notebookWithBook();
+      BookRange range = rootRangesSorted(bookOf(nb)).getFirst();
+
+      controller.putRangeReadingRecord(nb, range);
+
+      var stored =
+          bookRangeReadingRecordRepository
+              .findByUser_IdAndBookRange_Id(currentUser.getUser().getId(), range.getId())
+              .orElseThrow();
+      assertThat(stored.getStatus(), equalTo(BookRangeReadingRecord.STATUS_READ));
+      assertThat(stored.getCompletedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
+    }
+
+    @Test
+    void secondPutUpdatesCompletedAtAndKeepsSingleRow() throws Exception {
+      testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(0, 10).please());
+      Notebook nb = notebookWithBook();
+      BookRange range = rootRangesSorted(bookOf(nb)).getFirst();
+
+      controller.putRangeReadingRecord(nb, range);
+      testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(1, 11).please());
+      controller.putRangeReadingRecord(nb, range);
+
+      assertThat(bookRangeReadingRecordRepository.count(), equalTo(1L));
+      var stored =
+          bookRangeReadingRecordRepository
+              .findByUser_IdAndBookRange_Id(currentUser.getUser().getId(), range.getId())
+              .orElseThrow();
+      assertThat(stored.getCompletedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
+    }
+
+    @Test
+    void returns404WhenNotebookHasNoBook() throws Exception {
+      Notebook nbEmpty = myNotebook();
+      Notebook nbWith = notebookWithBook();
+      BookRange range = rootRangesSorted(bookOf(nbWith)).getFirst();
+
+      assertThrows(
+          ResponseStatusException.class, () -> controller.putRangeReadingRecord(nbEmpty, range));
+    }
+
+    @Test
+    void returns404WhenRangeBelongsToAnotherNotebooksBook() throws Exception {
+      Notebook otherNb = otherUsersNotebookWithBook();
+      BookRange otherRange = rootRangesSorted(bookOf(otherNb)).getFirst();
+      Notebook myNb = notebookWithBook();
+
+      assertThrows(
+          ResponseStatusException.class, () -> controller.putRangeReadingRecord(myNb, otherRange));
+    }
+
+    @Test
+    void rejectsNotebookWithoutReadAccess() throws Exception {
+      Notebook otherNb = otherUsersNotebookWithBook();
+      BookRange range = rootRangesSorted(bookOf(otherNb)).getFirst();
+
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.putRangeReadingRecord(otherNb, range));
+    }
+
+    @Test
+    void requiresLoggedInUser() throws Exception {
+      Notebook nb = notebookWithBook();
+      BookRange range = rootRangesSorted(bookOf(nb)).getFirst();
+      currentUser.setUser(null);
+
+      assertThrows(
+          ResponseStatusException.class, () -> controller.putRangeReadingRecord(nb, range));
     }
   }
 }

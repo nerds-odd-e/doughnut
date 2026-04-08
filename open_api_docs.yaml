@@ -5,6 +5,26 @@ info:
 servers:
 - url: ""
 paths:
+  /api/notebooks/{notebook}/book/ranges/{bookRange}/reading-record:
+    put:
+      tags:
+      - notebook-books-controller
+      summary: Mark book range as read for the current user
+      operationId: putNotebookBookRangeReadingRecord
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: bookRange
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: No Content
   /api/user:
     get:
       tags:
