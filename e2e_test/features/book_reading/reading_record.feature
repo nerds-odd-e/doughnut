@@ -10,7 +10,6 @@ Feature: Reading record
     When I attach book "refactoring.pdf" to the notebook "Top Maths" via the CLI
     And I open the book attached to notebook "Top Maths"
 
-  @ignore
   Scenario: Mark a book range as read (reading record)
     When I choose the book range "2.1 Easier to Change—and Harder to Misuse"
     And I scroll the PDF until the book range "2.2 Refactoring as Strengthening the Code" is the current range in the book reader

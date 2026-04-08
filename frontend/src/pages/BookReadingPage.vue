@@ -136,14 +136,20 @@
           >
             {{ pdfError }}
           </div>
-          <PdfBookViewer
-            v-else-if="bookPdfBytes"
-            ref="pdfViewerRef"
-            :pdf-bytes="bookPdfBytes"
-            @load-error="onPdfLoadError"
-            @viewport-anchor-page="onViewportAnchorPage"
-            @pages-ready="onPagesReady"
-          />
+          <template v-else-if="bookPdfBytes">
+            <PdfBookViewer
+              ref="pdfViewerRef"
+              :pdf-bytes="bookPdfBytes"
+              @load-error="onPdfLoadError"
+              @viewport-anchor-page="onViewportAnchorPage"
+              @pages-ready="onPagesReady"
+            />
+            <ReadingControlPanel
+              v-if="readingControlPanelVisible"
+              :selected-range-title="readingControlSelectedRangeTitle"
+              @mark-as-read="markSelectedRangeAsRead"
+            />
+          </template>
         </main>
       </div>
     </template>
@@ -155,6 +161,7 @@ import ContentLoader from "@/components/commons/ContentLoader.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
+import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import {
   parsePdfOutlineV1Anchor,
   type PdfOutlineV1NavigationTarget,
@@ -170,7 +177,14 @@ import type {
   BookRangeFull,
 } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
+import {
+  computed,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  shallowRef,
+  watch,
+} from "vue"
 
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
 const CURRENT_RANGE_ANCHOR_DEBOUNCE_MS = 120
@@ -258,6 +272,41 @@ const flatBookRanges = ref<BookRangeRow[]>([])
 const bookRangeRows = computed(() => flatBookRanges.value)
 const currentSelectionRangeId = ref<number | null>(null)
 const currentRangeAnchorId = ref<number | null>(null)
+
+const inMemoryReadRangeIds = shallowRef(new Set<number>())
+
+const readingControlSelectedRangeTitle = computed(() => {
+  const selId = currentSelectionRangeId.value
+  if (selId === null) {
+    return ""
+  }
+  return bookRangeRows.value.find((r) => r.id === selId)?.title ?? ""
+})
+
+const readingControlPanelVisible = computed(() => {
+  const selId = currentSelectionRangeId.value
+  const curAnchorId = currentRangeAnchorId.value
+  if (selId === null || curAnchorId === null) {
+    return false
+  }
+  const rows = bookRangeRows.value
+  const selIdx = rows.findIndex((r) => r.id === selId)
+  if (selIdx < 0 || selIdx >= rows.length - 1) {
+    return false
+  }
+  const successor = rows[selIdx + 1]!
+  return successor.startAnchor.id === curAnchorId
+})
+
+function markSelectedRangeAsRead() {
+  const id = currentSelectionRangeId.value
+  if (id === null) {
+    return
+  }
+  const next = new Set(inMemoryReadRangeIds.value)
+  next.add(id)
+  inMemoryReadRangeIds.value = next
+}
 const currentRangeLiveText = ref("")
 const lastAnnouncedCurrentRangeTitle = ref<string | undefined>(undefined)
 
