@@ -2,14 +2,7 @@
  * Cypress `task` handlers for CLI E2E. Depends only on `repoRoot` (repo checkout path).
  */
 
-import { randomBytes } from 'node:crypto'
-import {
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  unlinkSync,
-  writeFileSync,
-} from 'node:fs'
+import { existsSync, mkdtempSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { delimiter, dirname, join } from 'node:path'
 import { attachGoogleOAuthSimulation } from './cliE2eGoogleOAuthSimulation'
@@ -74,17 +67,9 @@ type CliInteractiveWriteRawTask = {
   data: string
 }
 
-/**
- * Absolute path to Cypress {@link https://docs.cypress.io/app/references/configuration#Screenshots screenshotsFolder},
- * e.g. `path.resolve(config.projectRoot, config.screenshotsFolder)` inside `setupNodeEvents`.
- *
- * {@link https://docs.cypress.io/api/node-events/before-spec-api `before:spec`} exposes `spec.name` (basename);
- * Cypress failure screenshots use that same segment as the subdirectory under `screenshotsFolder`.
- */
 export type CliE2ePluginTasksOptions = {
-  screenshotsFolderAbsolute: string
-  /** From `before:spec` → `spec.name`, so PTY PNGs land next to Cypress screenshots for that spec. */
-  getCurrentSpecScreenshotFolderName?: () => string | undefined
+  /** When set, PTY assert failures write a viewport PNG and the returned path is appended to the error. */
+  onPtyAssertFailureSavePng?: (png: Buffer) => string
 }
 
 const INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING = 'doughnut 0.1.0'
@@ -297,18 +282,11 @@ export function createCliE2ePluginTasks(
       try {
         await handle.assert(managedTtyAssertTaskPayloadToOptions(body))
       } catch (err) {
-        const shots = options?.screenshotsFolderAbsolute
-        if (shots) {
+        const savePng = options?.onPtyAssertFailureSavePng
+        if (savePng) {
           try {
-            const specFolder =
-              options?.getCurrentSpecScreenshotFolderName?.()?.trim() ||
-              'cli-pty'
-            const dir = join(shots, specFolder)
-            mkdirSync(dir, { recursive: true })
-            const fileName = `terminal-pty-assert-failure-${Date.now()}-${randomBytes(4).toString('hex')}.png`
-            const filePath = join(dir, fileName)
             const png = await handle.captureViewportPng()
-            writeFileSync(filePath, png)
+            const filePath = savePng(png)
             if (err instanceof Error) {
               err.message = `${err.message}\n\nTerminal viewport PNG: ${filePath}`
             }

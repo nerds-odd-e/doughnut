@@ -8,6 +8,7 @@ import { createEsbuildPlugin } from '@badeball/cypress-cucumber-preprocessor/esb
 import createBundler from '@bahmutov/cypress-esbuild-preprocessor'
 import AdmZip from 'adm-zip'
 import type { ExpectedFile } from '../start/downloadChecker'
+import { attachCypressSpecScreenshotSink } from './cypressSpecScreenshotSink'
 import { createCliE2ePluginTasks } from './cliE2ePluginTasks'
 import { runShellCommandSync } from './cliE2eRepo'
 import { E2E_APP_BASE_URL } from './constants'
@@ -66,22 +67,19 @@ const commonConfig = {
         screenshotsFolder
       )
 
-      let currentSpecScreenshotFolderName: string | undefined
-      // Aligns PTY PNG path with Cypress screenshots (`spec.name` subfolder). In `cypress open`,
-      // `before:spec` may require `experimentalInteractiveRunEvents` (Cypress docs); otherwise
-      // the plugin falls back to `cli-pty/`.
-      on('before:spec', (spec: Cypress.Spec) => {
-        currentSpecScreenshotFolderName = spec.name
-      })
-      on('after:spec', () => {
-        currentSpecScreenshotFolderName = undefined
-      })
+      const specScreenshotSink = attachCypressSpecScreenshotSink(
+        on,
+        screenshotsFolderAbsolute
+      )
 
       on('task', {
         ...createCliE2ePluginTasks(repoRoot, {
-          screenshotsFolderAbsolute,
-          getCurrentSpecScreenshotFolderName: () =>
-            currentSpecScreenshotFolderName,
+          onPtyAssertFailureSavePng: (png) =>
+            specScreenshotSink.saveBufferToCurrentSpecFolder(
+              'terminal-pty-assert-failure',
+              '.png',
+              png
+            ),
         }),
         setTestState({ key, value }: { key: string; value: unknown }) {
           testState[key] = value
