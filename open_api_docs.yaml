@@ -2550,6 +2550,26 @@ paths:
       responses:
         "204":
           description: No Content
+  /api/notebooks/{notebook}/book/reading-records:
+    get:
+      tags:
+      - notebook-books-controller
+      summary: List reading records for the notebook book (current user)
+      operationId: getNotebookBookReadingRecords
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Reading records for ranges in this book
+          content:
+            application/json:
+              schema:
+                type: array
+                $ref: "#/components/schemas/BookRangeReadingRecordListItem"
   /api/notebooks/{notebook}/book/file:
     get:
       tags:
@@ -3687,17 +3707,6 @@ components:
       - anchorFormat
       - id
       - value
-    BookRangeReadingRecordWire_Full:
-      type: object
-      properties:
-        status:
-          type: string
-        completedAt:
-          type: string
-          format: date-time
-      required:
-      - completedAt
-      - status
     BookRange_Full:
       type: object
       properties:
@@ -3713,8 +3722,6 @@ components:
           type: string
         parentRangeId:
           type: string
-        readingRecord:
-          $ref: "#/components/schemas/BookRangeReadingRecordWire_Full"
       required:
       - id
       - startAnchor
@@ -4398,6 +4405,20 @@ components:
             $ref: "#/components/schemas/Subscription"
       required:
       - notebooks
+    BookRangeReadingRecordListItem:
+      type: object
+      properties:
+        bookRangeId:
+          type: string
+        status:
+          type: string
+        completedAt:
+          type: string
+          format: date-time
+      required:
+      - bookRangeId
+      - completedAt
+      - status
     BookUserLastReadPosition:
       type: object
       properties:

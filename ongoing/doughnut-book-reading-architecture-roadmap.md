@@ -137,6 +137,8 @@ Belongs to a `Notebook`. At most **one** `SourceSpan` for the first version—en
 
 Per `User`, refers to a `BookRange`. Progress attaches to **meaningful chunks**, not citation-sized spans.
 
+**HTTP (as implemented for Phase 2 read disposition):** Rows are written with **`PUT /api/notebooks/{notebook}/book/ranges/{bookRange}/reading-record`** and listed with **`GET /api/notebooks/{notebook}/book/reading-records`** (current user only). **`GET …/book`** does **not** embed reading state on each `BookRange`; the client merges layout + reading-records list when it needs borders or panel logic from the server.
+
 ---
 
 ## Architectural rules (default)
@@ -157,7 +159,7 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 - **One span per note (initially):** Keeps PKM extraction simple; multi-span and cross-book evidence are explicit future extensions.
 - **`structuralTitle` on `BookRange`:** Human-readable title for the range in the book’s structure tree; parent chain + title is enough to reconstruct display paths when needed.
 - **No `StructuralBookRange` subtype yet:** Structural vs user-carved ranges may be distinguished later if the product requires it (e.g. import vs override).
-- **Direct content is conceptual in data until reading record ships:** Naming the gap between ranges (and the four dispositions) keeps UX and progress modeling aligned. **Persistence** of disposition follows **`ReadingRecord`** (and related API) per [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md); the **Reading Control Panel** is the intended **primary in-reader** control for those actions — [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md).
+- **Direct content** remains **conceptual** (no DB column for the gap). **Persistence** of disposition is **`ReadingRecord`** rows + **`PUT`/`GET` reading-record APIs** per [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md) and sub-phases in [`ongoing/book-reading-phase2-mark-range-read-subphases.md`](book-reading-phase2-mark-range-read-subphases.md); the **Reading Control Panel** is the intended **primary in-reader** control — [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md).
 
 ---
 

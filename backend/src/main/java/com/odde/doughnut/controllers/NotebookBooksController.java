@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
 import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
+import com.odde.doughnut.controllers.dto.BookRangeReadingRecordListItem;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookRange;
 import com.odde.doughnut.entities.BookUserLastReadPosition;
@@ -21,6 +22,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -76,7 +78,29 @@ class NotebookBooksController {
   public Book getBook(@PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
-    return bookService.getBookForNotebook(notebook, authorizationService.getCurrentUser());
+    return bookService.getBookForNotebook(notebook);
+  }
+
+  @Operation(
+      operationId = "getNotebookBookReadingRecords",
+      summary = "List reading records for the notebook book (current user)")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "Reading records for ranges in this book",
+        content =
+            @Content(
+                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema =
+                    @Schema(type = "array", implementation = BookRangeReadingRecordListItem.class)))
+  })
+  @GetMapping("/{notebook}/book/reading-records")
+  @Transactional(readOnly = true)
+  public List<BookRangeReadingRecordListItem> getBookReadingRecords(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertReadAuthorization(notebook);
+    return bookService.listReadingRecordsForBook(notebook, authorizationService.getCurrentUser());
   }
 
   @Operation(operationId = "getNotebookBookReadingPosition", summary = "Get book reading position")

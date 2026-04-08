@@ -485,56 +485,39 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   }
 
   @Nested
-  class GetBookReadingRecord {
+  class GetBookReadingRecords {
     @Test
-    void includesReadingRecordOnMarkedRange() throws Exception {
+    void returnsRecordForMarkedRange() throws Exception {
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
       Notebook nb = notebookWithBook();
       BookRange range = rootRangesSorted(bookOf(nb)).getFirst();
       controller.putRangeReadingRecord(nb, range);
 
-      Book detail = controller.getBook(nb);
-      BookRange fromGet =
-          rootRangesSorted(detail).stream()
-              .filter(r -> r.getId().equals(range.getId()))
-              .findFirst()
-              .orElseThrow();
-      assertThat(fromGet.getReadingRecord(), notNullValue());
+      var list = controller.getBookReadingRecords(nb);
+      assertThat(list, hasSize(1));
+      assertThat(list.getFirst().getBookRangeId(), equalTo(range.getId()));
+      assertThat(list.getFirst().getStatus(), equalTo(BookRangeReadingRecord.STATUS_READ));
       assertThat(
-          fromGet.getReadingRecord().getStatus(), equalTo(BookRangeReadingRecord.STATUS_READ));
-      assertThat(
-          fromGet.getReadingRecord().getCompletedAt(),
-          equalTo(testabilitySettings.getCurrentUTCTimestamp()));
+          list.getFirst().getCompletedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
     }
 
     @Test
-    void omitsReadingRecordOnUnmarkedSiblingRoots() throws Exception {
+    void returnsOnlyMarkedRangesAmongSiblings() throws Exception {
       Notebook nb = myNotebook();
       byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
       controller.attachBook(nb, attachRequest(node("2.1"), node("2.2")), pdfFile(pdfBytes));
       Book book = bookOf(nb);
       List<BookRange> roots = rootRangesSorted(book);
       BookRange first = roots.getFirst();
-      BookRange second = roots.get(1);
       controller.putRangeReadingRecord(nb, first);
 
-      Book detail = controller.getBook(nb);
-      BookRange firstOut =
-          rootRangesSorted(detail).stream()
-              .filter(r -> r.getId().equals(first.getId()))
-              .findFirst()
-              .orElseThrow();
-      BookRange secondOut =
-          rootRangesSorted(detail).stream()
-              .filter(r -> r.getId().equals(second.getId()))
-              .findFirst()
-              .orElseThrow();
-      assertThat(firstOut.getReadingRecord(), notNullValue());
-      assertThat(secondOut.getReadingRecord(), nullValue());
+      var list = controller.getBookReadingRecords(nb);
+      assertThat(list, hasSize(1));
+      assertThat(list.getFirst().getBookRangeId(), equalTo(first.getId()));
     }
 
     @Test
-    void doesNotExposeAnotherUsersReadingRecord() throws Exception {
+    void doesNotIncludeAnotherUsersRecords() throws Exception {
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
       Notebook nb = notebookWithBook();
       BookRange range = rootRangesSorted(bookOf(nb)).getFirst();
@@ -547,9 +530,13 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       makeMe.entityPersister.save(otherRow);
       makeMe.entityPersister.flush();
 
-      Book detail = controller.getBook(nb);
-      BookRange fromGet = rootRangesSorted(detail).getFirst();
-      assertThat(fromGet.getReadingRecord(), nullValue());
+      assertThat(controller.getBookReadingRecords(nb), empty());
+    }
+
+    @Test
+    void returnsEmptyWhenNoRecords() throws Exception {
+      Notebook nb = notebookWithBook();
+      assertThat(controller.getBookReadingRecords(nb), empty());
     }
   }
 

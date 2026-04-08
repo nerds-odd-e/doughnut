@@ -9,7 +9,7 @@ import com.odde.doughnut.controllers.dto.AttachBookAnchorRequest;
 import com.odde.doughnut.controllers.dto.AttachBookLayoutNodeRequest;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
 import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
-import com.odde.doughnut.controllers.dto.BookRangeReadingRecordWire;
+import com.odde.doughnut.controllers.dto.BookRangeReadingRecordListItem;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookAnchor;
 import com.odde.doughnut.entities.BookRange;
@@ -24,9 +24,7 @@ import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -97,37 +95,23 @@ public class BookService {
 
   @Transactional(readOnly = true)
   public Book getBookForNotebook(Notebook notebook) {
-    return getBookForNotebook(notebook, null);
+    return bookRepository
+        .findByNotebook_Id(notebook.getId())
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
   }
 
   @Transactional(readOnly = true)
-  public Book getBookForNotebook(Notebook notebook, User user) {
-    Book book =
-        bookRepository
-            .findByNotebook_Id(notebook.getId())
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
-    if (user != null) {
-      attachReadingRecords(book, user);
-    }
-    return book;
-  }
-
-  private void attachReadingRecords(Book book, User user) {
-    List<BookRangeReadingRecord> rows =
-        bookRangeReadingRecordRepository.findAllByUser_IdAndBookRange_Book_Id(
-            user.getId(), book.getId());
-    Map<Integer, BookRangeReadingRecord> byRangeId = new HashMap<>();
-    for (BookRangeReadingRecord row : rows) {
-      byRangeId.put(row.getBookRange().getId(), row);
-    }
-    for (BookRange range : book.getRanges()) {
-      BookRangeReadingRecord row = byRangeId.get(range.getId());
-      if (row != null) {
-        range.setReadingRecord(
-            new BookRangeReadingRecordWire(row.getStatus(), row.getCompletedAt()));
-      }
-    }
+  public List<BookRangeReadingRecordListItem> listReadingRecordsForBook(
+      Notebook notebook, User user) {
+    Book book = getBookForNotebook(notebook);
+    return bookRangeReadingRecordRepository
+        .findAllByUser_IdAndBookRange_Book_Id(user.getId(), book.getId())
+        .stream()
+        .map(
+            row ->
+                new BookRangeReadingRecordListItem(
+                    row.getBookRange().getId(), row.getStatus(), row.getCompletedAt()))
+        .toList();
   }
 
   @Transactional(readOnly = true)

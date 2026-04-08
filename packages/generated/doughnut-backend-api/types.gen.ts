@@ -315,18 +315,12 @@ export type BookAnchorFull = {
     value: string;
 };
 
-export type BookRangeReadingRecordWireFull = {
-    status: string;
-    completedAt: string;
-};
-
 export type BookRangeFull = {
     id: number;
     startAnchor: BookAnchorFull;
     siblingOrder?: number;
     title: string;
     parentRangeId?: string;
-    readingRecord?: BookRangeReadingRecordWireFull;
 };
 
 export type BookFull = {
@@ -624,6 +618,12 @@ export type UriAndTitle = {
 export type NotebooksViewedByUser = {
     notebooks: Array<Notebook>;
     subscriptions?: Array<Subscription>;
+};
+
+export type BookRangeReadingRecordListItem = {
+    bookRangeId: string;
+    status: string;
+    completedAt: string;
 };
 
 export type BookUserLastReadPosition = {
@@ -3079,6 +3079,24 @@ export type GetBookResponses = {
 };
 
 export type GetBookResponse = GetBookResponses[keyof GetBookResponses];
+
+export type GetNotebookBookReadingRecordsData = {
+    body?: never;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/book/reading-records';
+};
+
+export type GetNotebookBookReadingRecordsResponses = {
+    /**
+     * Reading records for ranges in this book
+     */
+    200: BookRangeReadingRecordListItem;
+};
+
+export type GetNotebookBookReadingRecordsResponse = GetNotebookBookReadingRecordsResponses[keyof GetNotebookBookReadingRecordsResponses];
 
 export type GetBookFileData = {
     body?: never;

@@ -57,7 +57,7 @@
 **User outcome:**
 
 - Server persists **`ReadingRecord`** (per user, per `BookRange`) with at least **status = read** and sensible **timestamps** (`startedAt` / `lastReadAt` / `completedAt` as appropriate — minimal first slice: mark **completed** when they confirm read).
-- Book JSON (or a dedicated endpoint the page already calls) exposes enough for the **book layout** to **render read state** for ranges that have a record.
+- **`GET …/book`** stays **layout-only** (tree + anchors). The client loads read state via **`GET …/book/reading-records`** (per-user list: **`bookRangeId`**, **`status`**, **`completedAt`**) and merges it in the UI for **read** styling on **book layout** rows. **Write:** **`PUT …/book/ranges/{bookRange}/reading-record`**.
 - The user can complete **confirm read** from the panel **without** breaking PDF scroll, pinch/zoom, or drawer behavior; panel can be **minimized** after use if product wants that default.
 
 **Data model:** New table/entity aligned with roadmap diagram: `User` + `BookRange` + status + timestamps; enforce **uniqueness** (user + book_range_id). Foreign keys consistent with existing `book_range` and user entities.

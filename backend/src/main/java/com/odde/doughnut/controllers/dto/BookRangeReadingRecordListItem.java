@@ -11,8 +11,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(name = "BookRangeReadingRecordWire")
-public class BookRangeReadingRecordWire {
+@Schema(name = "BookRangeReadingRecordListItem")
+public class BookRangeReadingRecordListItem {
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED, type = "integer")
+  private Integer bookRangeId;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String status;

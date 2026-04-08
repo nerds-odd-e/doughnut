@@ -1,11 +1,9 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.odde.doughnut.controllers.dto.BookRangeReadingRecordWire;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -13,7 +11,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "book_range")
-@JsonPropertyOrder({"id", "startAnchor", "siblingOrder", "title", "parentRangeId", "readingRecord"})
+@JsonPropertyOrder({"id", "startAnchor", "siblingOrder", "title", "parentRangeId"})
 public class BookRange extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -57,12 +55,4 @@ public class BookRange extends EntityIdentifiedByIdOnly {
   public Integer getParentRangeId() {
     return parent == null ? null : parent.getId();
   }
-
-  @Transient
-  @JsonView(BookViews.Full.class)
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @Getter
-  @Setter
-  @Schema
-  private BookRangeReadingRecordWire readingRecord;
 }
