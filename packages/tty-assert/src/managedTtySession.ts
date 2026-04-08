@@ -166,6 +166,9 @@ export function attachManagedTtySession(
       let lastFail: { snapshot: string; detail: string } | undefined
 
       for (;;) {
+        if (disposed) {
+          throw new Error('ManagedTtySession.assert after dispose')
+        }
         const raw = session.buf.text
 
         let result:

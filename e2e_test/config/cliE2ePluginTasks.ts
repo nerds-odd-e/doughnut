@@ -14,10 +14,9 @@ import {
 } from './cliE2eRepo'
 import { cliEnv } from './cliEnv'
 import {
-  attachTerminalHandle,
-  type TtyAssertTerminalHandle,
-} from 'tty-assert/facade'
-import { startBufferedPtySession } from 'tty-assert/ptySession'
+  startManagedTtySession,
+  type ManagedTtySession,
+} from 'tty-assert/managedTtySession'
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
 
@@ -58,10 +57,10 @@ async function bundleCliE2eInstallOrThrow(
 }
 
 export function createCliE2ePluginTasks(repoRoot: string) {
-  let interactiveCliPtyHandle: TtyAssertTerminalHandle | null = null
+  let interactiveCliPtyHandle: ManagedTtySession | null = null
 
   function disposeInteractiveCliPtySession(): void {
-    interactiveCliPtyHandle?.kill()
+    interactiveCliPtyHandle?.dispose()
     interactiveCliPtyHandle = null
   }
 
@@ -72,17 +71,18 @@ export function createCliE2ePluginTasks(repoRoot: string) {
     env?: NodeJS.ProcessEnv
   }): Promise<void> {
     disposeInteractiveCliPtySession()
-    const session = await startBufferedPtySession({
+    const managed = await startManagedTtySession({
       command: opts.command,
       args: opts.args,
       cwd: opts.cwd,
       env: { ...process.env, ...cliEnv(opts.env) },
     })
-    const handle = attachTerminalHandle(session)
-    interactiveCliPtyHandle = handle
-    await handle
-      .expect(handle.getByText(INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING))
-      .toBeVisible({ timeoutMs: INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS })
+    interactiveCliPtyHandle = managed
+    await managed.assert({
+      needle: INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING,
+      surface: 'strippedTranscript',
+      timeoutMs: INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS,
+    })
   }
 
   return {
@@ -240,7 +240,7 @@ export function createCliE2ePluginTasks(repoRoot: string) {
           'cliInteractivePtyGetBuffer: no active interactive CLI PTY session. Ensure @interactiveCLI started the session or run the installed CLI in interactive mode first.'
         )
       }
-      return interactiveCliPtyHandle.getRawBuffer()
+      return interactiveCliPtyHandle.session.buf.text
     },
     async cliInteractiveWriteLine({
       line,

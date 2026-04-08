@@ -130,4 +130,55 @@ describe('ManagedTtySession', () => {
       m.dispose()
     }
   })
+
+  it('dispose() is idempotent (double dispose does not throw)', () => {
+    const m = attachManagedTtySession({ pty: mockPty(), buf: { text: '' } })
+    m.dispose()
+    expect(() => m.dispose()).not.toThrow()
+  })
+
+  it('dispose() does not propagate when pty.kill throws (child already exited)', () => {
+    const pty = mockPty()
+    vi.spyOn(pty, 'kill').mockImplementation(() => {
+      throw new Error('already exited')
+    })
+    const m = attachManagedTtySession({ pty, buf: { text: '' } })
+    expect(() => m.dispose()).not.toThrow()
+  })
+
+  it('assert times out when startup-style marker never appears (strippedTranscript)', async () => {
+    const buf = { text: 'no marker here' }
+    const m = attachManagedTtySession({ pty: mockPty(), buf })
+    try {
+      await expect(
+        m.assert({
+          needle: 'doughnut 0.1.0',
+          surface: 'strippedTranscript',
+          timeoutMs: 120,
+          retryMs: 20,
+        })
+      ).rejects.toThrow(/Timeout after 120ms/)
+    } finally {
+      m.dispose()
+    }
+  })
+
+  it('assert aborts after dispose during retry wait', async () => {
+    const buf = { text: 'nope' }
+    const m = attachManagedTtySession(
+      { pty: mockPty(), buf },
+      { cols: 20, rows: 4 }
+    )
+    queueMicrotask(() => {
+      m.dispose()
+    })
+    await expect(
+      m.assert({
+        needle: 'missing',
+        surface: 'strippedTranscript',
+        timeoutMs: 60_000,
+        retryMs: 5,
+      })
+    ).rejects.toThrow('ManagedTtySession.assert after dispose')
+  })
 })
