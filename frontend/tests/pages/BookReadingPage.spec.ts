@@ -595,7 +595,7 @@ describe("BookReadingPage", () => {
       expect(readingControlPanel(wrapper).exists()).toBe(false)
     })
 
-    it("leaves the book layout selection unchanged after Mark as read", async () => {
+    it("moves book layout selection to the successor range after Mark as read", async () => {
       const wrapper = await mountLoadedBookWithRanges(notebookId)
       await clickBookRangeByTitle(wrapper, "Section 1")
       await vi.waitFor(() =>
@@ -610,13 +610,11 @@ describe("BookReadingPage", () => {
         pagesCount: 10,
       })
 
-      await readingControlPanel(wrapper)
-        .find('[data-testid="book-reading-mark-as-read"]')
-        .trigger("click")
+      await wrapper.findComponent(ReadingControlPanel).vm.$emit("markAsRead")
       await flushPromises()
 
       expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-        "Section 1"
+        "Section 2"
       )
       expect(wrapper.find('[data-current-range="true"]').text()).toBe(
         "Section 2"
@@ -647,11 +645,13 @@ describe("BookReadingPage", () => {
       await panel.vm.$emit("markAsRead")
       await flushPromises()
 
-      expect(
-        wrapper
-          .find('[data-current-selection="true"]')
-          .attributes("data-direct-content-read")
-      ).toBe("true")
+      const section1Row = wrapper
+        .findAll('[data-testid="book-reading-book-range"]')
+        .find((w) => /^Section 1(?:\s|$)/.test(w.text().trim()))
+      expect(section1Row?.attributes("data-direct-content-read")).toBe("true")
+      expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+        "Section 2"
+      )
       expect(readingControlPanel(wrapper).exists()).toBe(false)
     })
   })

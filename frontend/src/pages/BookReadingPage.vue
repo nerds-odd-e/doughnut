@@ -318,6 +318,11 @@ function markSelectedRangeAsRead() {
   const next = new Set(inMemoryReadRangeIds.value)
   next.add(id)
   inMemoryReadRangeIds.value = next
+  const rows = bookRangeRows.value
+  const selIdx = rows.findIndex((r) => r.id === id)
+  if (selIdx >= 0 && selIdx < rows.length - 1) {
+    currentSelectionRangeId.value = rows[selIdx + 1]!.id
+  }
 }
 const currentRangeLiveText = ref("")
 const lastAnnouncedCurrentRangeTitle = ref<string | undefined>(undefined)
