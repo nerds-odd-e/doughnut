@@ -23,8 +23,14 @@ paths:
         schema:
           type: integer
       responses:
-        "204":
-          description: No Content
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BookRangeReadingRecordListItem"
   /api/user:
     get:
       tags:
@@ -3030,6 +3036,20 @@ paths:
           description: OK
 components:
   schemas:
+    BookRangeReadingRecordListItem:
+      type: object
+      properties:
+        bookRangeId:
+          type: string
+        status:
+          type: string
+        completedAt:
+          type: string
+          format: date-time
+      required:
+      - bookRangeId
+      - completedAt
+      - status
     Circle:
       type: object
       properties:
@@ -4406,20 +4426,6 @@ components:
             $ref: "#/components/schemas/Subscription"
       required:
       - notebooks
-    BookRangeReadingRecordListItem:
-      type: object
-      properties:
-        bookRangeId:
-          type: string
-        status:
-          type: string
-        completedAt:
-          type: string
-          format: date-time
-      required:
-      - bookRangeId
-      - completedAt
-      - status
     BookUserLastReadPosition:
       type: object
       properties:

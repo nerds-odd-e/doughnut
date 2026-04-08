@@ -4,6 +4,12 @@ export type ClientOptions = {
     baseUrl: `${string}://${string}` | (string & {});
 };
 
+export type BookRangeReadingRecordListItem = {
+    bookRangeId: string;
+    status: string;
+    completedAt: string;
+};
+
 export type Circle = {
     id: number;
     name: string;
@@ -620,12 +626,6 @@ export type NotebooksViewedByUser = {
     subscriptions?: Array<Subscription>;
 };
 
-export type BookRangeReadingRecordListItem = {
-    bookRangeId: string;
-    status: string;
-    completedAt: string;
-};
-
 export type BookUserLastReadPosition = {
     id: number;
     pageIndex?: number;
@@ -817,9 +817,9 @@ export type PutNotebookBookRangeReadingRecordData = {
 
 export type PutNotebookBookRangeReadingRecordResponses = {
     /**
-     * No Content
+     * OK
      */
-    204: void;
+    200: Array<BookRangeReadingRecordListItem>;
 };
 
 export type PutNotebookBookRangeReadingRecordResponse = PutNotebookBookRangeReadingRecordResponses[keyof PutNotebookBookRangeReadingRecordResponses];

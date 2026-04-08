@@ -136,14 +136,15 @@ class NotebookBooksController {
       operationId = "putNotebookBookRangeReadingRecord",
       summary = "Mark book range as read for the current user")
   @PutMapping("/{notebook}/book/ranges/{bookRange}/reading-record")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
   @Transactional
-  public void putRangeReadingRecord(
+  public List<BookRangeReadingRecordListItem> putRangeReadingRecord(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @PathVariable("bookRange") @Schema(type = "integer") BookRange bookRange)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
-    bookService.markRangeRead(notebook, authorizationService.getCurrentUser(), bookRange);
+    var user = authorizationService.getCurrentUser();
+    bookService.markRangeRead(notebook, user, bookRange);
+    return bookService.listReadingRecordsForBook(notebook, user);
   }
 
   @GetMapping(value = "/{notebook}/book/file", produces = MediaType.APPLICATION_PDF_VALUE)

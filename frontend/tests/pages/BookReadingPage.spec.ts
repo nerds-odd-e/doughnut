@@ -620,27 +620,18 @@ describe("BookReadingPage", () => {
     })
 
     it("moves book layout selection to the successor range after Mark as read", async () => {
-      let recordFetches = 0
       vi.spyOn(
         NotebookBooksController,
-        "getNotebookBookReadingRecords"
-      ).mockImplementation(async () => {
-        recordFetches += 1
-        if (recordFetches === 1) {
-          return wrapSdkResponse([])
-        }
-        return wrapSdkResponse([
+        "putNotebookBookRangeReadingRecord"
+      ).mockResolvedValue(
+        wrapSdkResponse([
           {
             bookRangeId: "1",
             status: "READ",
             completedAt: "2020-01-01T00:00:00Z",
           },
         ])
-      })
-      vi.spyOn(
-        NotebookBooksController,
-        "putNotebookBookRangeReadingRecord"
-      ).mockResolvedValue(wrapSdkResponse(undefined))
+      )
       const wrapper = await mountLoadedBookWithRanges(notebookId)
       await clickBookRangeByTitle(wrapper, "Section 1")
       await vi.waitFor(() =>
@@ -667,27 +658,18 @@ describe("BookReadingPage", () => {
     })
 
     it("unmounts the reading control panel after Mark as read once it was shown", async () => {
-      let recordFetches = 0
       vi.spyOn(
         NotebookBooksController,
-        "getNotebookBookReadingRecords"
-      ).mockImplementation(async () => {
-        recordFetches += 1
-        if (recordFetches === 1) {
-          return wrapSdkResponse([])
-        }
-        return wrapSdkResponse([
+        "putNotebookBookRangeReadingRecord"
+      ).mockResolvedValue(
+        wrapSdkResponse([
           {
             bookRangeId: "1",
             status: "READ",
             completedAt: "2020-01-01T00:00:00Z",
           },
         ])
-      })
-      vi.spyOn(
-        NotebookBooksController,
-        "putNotebookBookRangeReadingRecord"
-      ).mockResolvedValue(wrapSdkResponse(undefined))
+      )
       const wrapper = await mountLoadedBookWithRanges(notebookId)
       await clickBookRangeByTitle(wrapper, "Section 1")
       await vi.waitFor(() =>

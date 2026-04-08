@@ -548,7 +548,13 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       Notebook nb = notebookWithBook();
       BookRange range = rootRangesSorted(bookOf(nb)).getFirst();
 
-      controller.putRangeReadingRecord(nb, range);
+      var returned = controller.putRangeReadingRecord(nb, range);
+      assertThat(returned, hasSize(1));
+      assertThat(returned.getFirst().getBookRangeId(), equalTo(range.getId()));
+      assertThat(returned.getFirst().getStatus(), equalTo(BookRangeReadingRecord.STATUS_READ));
+      assertThat(
+          returned.getFirst().getCompletedAt(),
+          equalTo(testabilitySettings.getCurrentUTCTimestamp()));
 
       var stored =
           bookRangeReadingRecordRepository
@@ -564,9 +570,14 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       Notebook nb = notebookWithBook();
       BookRange range = rootRangesSorted(bookOf(nb)).getFirst();
 
-      controller.putRangeReadingRecord(nb, range);
+      var firstResponse = controller.putRangeReadingRecord(nb, range);
+      assertThat(firstResponse, hasSize(1));
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(1, 11).please());
-      controller.putRangeReadingRecord(nb, range);
+      var secondResponse = controller.putRangeReadingRecord(nb, range);
+      assertThat(secondResponse, hasSize(1));
+      assertThat(
+          secondResponse.getFirst().getCompletedAt(),
+          equalTo(testabilitySettings.getCurrentUTCTimestamp()));
 
       assertThat(bookRangeReadingRecordRepository.count(), equalTo(1L));
       var stored =

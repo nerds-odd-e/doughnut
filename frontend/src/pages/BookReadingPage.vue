@@ -314,18 +314,11 @@ async function markSelectedRangeAsRead() {
   if (id === null) {
     return
   }
-  const result = await apiCallWithLoading(async () => {
-    const putRes =
-      await NotebookBooksController.putNotebookBookRangeReadingRecord({
-        path: { notebook: props.notebookId, bookRange: id },
-      })
-    if (putRes.error) {
-      return putRes
-    }
-    return NotebookBooksController.getNotebookBookReadingRecords({
-      path: { notebook: props.notebookId },
+  const result = await apiCallWithLoading(() =>
+    NotebookBooksController.putNotebookBookRangeReadingRecord({
+      path: { notebook: props.notebookId, bookRange: id },
     })
-  })
+  )
   if (result.error || result.data === undefined) {
     return
   }
