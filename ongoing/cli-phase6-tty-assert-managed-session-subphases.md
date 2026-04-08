@@ -62,7 +62,6 @@ type CellExpectationBlock = {
   expectations: Array<
     | { kind: 'allBold' }
     | { kind: 'allBgPalette'; index: number }
-    | { kind: 'noFgPaletteUnlessBgPalette'; fgPalette: number; unlessBgPalette: number }
   >
 }
 

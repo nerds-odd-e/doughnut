@@ -19,9 +19,9 @@
  * **Bold:** use `{ kind: 'allBold' }` on a **`first`** block so every cell of the first match is
  * bold (xterm `isBold()`).
  *
- * **Gray block (Ink / chalk):** `\x1b[100m` (bright black background) and `\x1b[90m` (bright black
- * foreground) map to xterm **palette** color **8**. Typical past-user styling uses a **`last`** block
- * with `noFgPaletteUnlessBgPalette` / `allBgPalette` for palette 8.
+ * **Gray block (Ink / chalk):** `\x1b[100m` (bright black background) maps to xterm **palette**
+ * color **8**. Typical past-user styling uses a **`last`** block with `{ kind: 'allBgPalette', index: 8 }`
+ * so every cell in the match has that background (gray foreground-only without `100m` fails this check).
  *
  * Cell expectations require **`viewableBuffer` or `fullBuffer`**, a **string** needle, and a second
  * xterm pass for cell attributes.

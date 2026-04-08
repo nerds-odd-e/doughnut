@@ -3,11 +3,6 @@
 export type CellExpectation =
   | { kind: 'allBold' }
   | { kind: 'allBgPalette'; index: number }
-  | {
-      kind: 'noFgPaletteUnlessBgPalette'
-      fgPalette: number
-      unlessBgPalette: number
-    }
 
 export type CellExpectationBlock = {
   match: 'first' | 'last'

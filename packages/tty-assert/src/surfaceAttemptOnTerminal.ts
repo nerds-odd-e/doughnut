@@ -145,25 +145,10 @@ function cellHasPaletteBackground(
   return cell.isBgPalette() && cell.getBgColor() === index
 }
 
-function cellViolatesNoFgUnlessBg(
-  cell: {
-    isFgPalette(): boolean
-    getFgColor(): number
-    isBgPalette(): boolean
-    getBgColor(): number
-  },
-  fgPalette: number,
-  unlessBgPalette: number
-): boolean {
-  const fgOn = cell.isFgPalette() && cell.getFgColor() === fgPalette
-  if (!fgOn) return false
-  return !cellHasPaletteBackground(cell, unlessBgPalette)
-}
-
 function blockNotFoundLabel(block: CellExpectationBlock): string {
   const kinds = new Set(block.expectations.map((e) => e.kind))
   if (kinds.has('allBold') && kinds.size === 1) return 'bold check'
-  if (kinds.has('noFgPaletteUnlessBgPalette') || kinds.has('allBgPalette')) {
+  if (kinds.has('allBgPalette')) {
     return 'gray block check'
   }
   return 'cell expectation check'
@@ -218,45 +203,6 @@ function runCellExpectationBlocks(
               ok: false,
               snapshot,
               detail: `Matched text ${JSON.stringify(opts.needle)} is present but not all cells at the ${which} are bold.`,
-            }
-          }
-        }
-        continue
-      }
-
-      if (exp.kind === 'noFgPaletteUnlessBgPalette') {
-        const grayProduct =
-          exp.fgPalette === BRIGHT_BLACK_PALETTE_INDEX &&
-          exp.unlessBgPalette === BRIGHT_BLACK_PALETTE_INDEX
-        for (let i = 0; i < opts.needle.length; i++) {
-          const pos = index + i
-          const localY = Math.floor(pos / rowWidth)
-          const x = pos % rowWidth
-          const termLine = buffer.getLine(startY + rowOffset + localY)
-          const cell = termLine?.getCell(x)
-          if (cell == null) {
-            return {
-              ok: false,
-              snapshot,
-              detail: `Gray block check: no cell at offset ${i} for last match of ${JSON.stringify(opts.needle)}.`,
-            }
-          }
-          if (
-            cellViolatesNoFgUnlessBg(cell, exp.fgPalette, exp.unlessBgPalette)
-          ) {
-            if (grayProduct) {
-              return {
-                ok: false,
-                snapshot,
-                detail:
-                  `Past user message ${JSON.stringify(opts.needle)} must appear in a gray-background block (palette background 8 / chalk \\x1b[100m). ` +
-                  `Last match has gray foreground only (palette 8 / chalk \\x1b[90m) without that background.`,
-              }
-            }
-            return {
-              ok: false,
-              snapshot,
-              detail: `Matched text ${JSON.stringify(opts.needle)}: foreground palette ${exp.fgPalette} requires background palette ${exp.unlessBgPalette} on every cell in the span.`,
             }
           }
         }

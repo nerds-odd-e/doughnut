@@ -74,13 +74,7 @@ await waitForTextInSurface({
   strict: false,
   cellExpectations: [
     { match: 'first', expectations: [{ kind: 'allBold' }] },
-    {
-      match: 'last',
-      expectations: [
-        { kind: 'noFgPaletteUnlessBgPalette', fgPalette: 8, unlessBgPalette: 8 },
-        { kind: 'allBgPalette', index: 8 },
-      ],
-    },
+    { match: 'last', expectations: [{ kind: 'allBgPalette', index: 8 }] },
   ],
 })
 ```

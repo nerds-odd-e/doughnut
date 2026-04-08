@@ -96,8 +96,8 @@ function answeredQuestions() {
 function pastUserMessages() {
   return {
     /**
-     * Full-buffer text + gray-block styling, then blank line above in the stripped transcript
-     * (two `cliInteractiveAssert` tasks; retry lives in the managed session per request).
+     * Full-buffer text + gray background (palette 8) on the matched span, then blank line above
+     * in the stripped transcript (two `cliInteractiveAssert` tasks; retry in managed session).
      */
     expectDisplayed(expected: string): Cypress.Chainable<null> {
       const escaped = expected.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -110,18 +110,11 @@ function pastUserMessages() {
           cellExpectations: [
             {
               match: 'last',
-              expectations: [
-                {
-                  kind: 'noFgPaletteUnlessBgPalette',
-                  fgPalette: 8,
-                  unlessBgPalette: 8,
-                },
-                { kind: 'allBgPalette', index: 8 },
-              ],
+              expectations: [{ kind: 'allBgPalette', index: 8 }],
             },
           ],
           messagePrefix:
-            'Past user messages (full buffer + gray background block, no fg-only gray).',
+            'Past user messages (full buffer + gray background block).',
         })
         .then(() =>
           cy.task<null>('cliInteractiveAssert', {

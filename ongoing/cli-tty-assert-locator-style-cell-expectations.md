@@ -43,11 +43,6 @@ cellExpectations?: Array<{
   expectations: Array<
     | { kind: 'allBold' }
     | { kind: 'allBgPalette'; index: number }
-    | {
-        kind: 'noFgPaletteUnlessBgPalette'
-        fgPalette: number
-        unlessBgPalette: number
-      }
   >
 }>
 ```
@@ -55,8 +50,7 @@ cellExpectations?: Array<{
 **Mapping from old flags:**
 
 - `requireBold: true` → one block: `{ match: 'first', expectations: [{ kind: 'allBold' }] }`.
-- `rejectGrayForegroundOnlyWithoutGrayBackground` + `requireGrayBackgroundBlock` (palette 8 / chalk `90m`/`100m`) → one block: `{ match: 'last', expectations: [{ kind: 'noFgPaletteUnlessBgPalette', fgPalette: 8, unlessBgPalette: 8 }, { kind: 'allBgPalette', index: 8 }] }`  
-  (Order within `expectations` should match current failure diagnostics where it matters; implementation can run checks in a fixed order with clear messages.)
+- `rejectGrayForegroundOnlyWithoutGrayBackground` + `requireGrayBackgroundBlock` (palette 8 / chalk `90m`/`100m`) → one block: `{ match: 'last', expectations: [{ kind: 'allBgPalette', index: 8 }] }` (gray fg without `100m` bg fails the same check).
 
 **Implementation order:** Ship the **array** type from Phase 1 even if tests only pass **one** block at first — no second “merge Option B” phase. Add a multi-block payload only when a scenario needs a single round-trip with different `match` values.
 

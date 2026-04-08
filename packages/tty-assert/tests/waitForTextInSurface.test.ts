@@ -169,7 +169,7 @@ describe('waitForTextInSurface', () => {
     })
   })
 
-  it('cellExpectations noFgPaletteUnlessBgPalette on last match fails for gray foreground only (90m)', async () => {
+  it('cellExpectations allBgPalette on last match fails for gray foreground only (90m, no 100m)', async () => {
     const raw = `\x1b[2J\x1b[H\x1b[90mUser paste\x1b[0m\n`
     await expect(
       waitForTextInSurface({
@@ -183,17 +183,11 @@ describe('waitForTextInSurface', () => {
         cellExpectations: [
           {
             match: 'last',
-            expectations: [
-              {
-                kind: 'noFgPaletteUnlessBgPalette',
-                fgPalette: 8,
-                unlessBgPalette: 8,
-              },
-            ],
+            expectations: [{ kind: 'allBgPalette', index: 8 }],
           },
         ],
       })
-    ).rejects.toThrow(/gray foreground only/)
+    ).rejects.toThrow(/missing gray background/)
   })
 
   it('cellExpectations last-match gray block uses last haystack match when strict is false', async () => {
@@ -209,14 +203,7 @@ describe('waitForTextInSurface', () => {
       cellExpectations: [
         {
           match: 'last',
-          expectations: [
-            {
-              kind: 'noFgPaletteUnlessBgPalette',
-              fgPalette: 8,
-              unlessBgPalette: 8,
-            },
-            { kind: 'allBgPalette', index: 8 },
-          ],
+          expectations: [{ kind: 'allBgPalette', index: 8 }],
         },
       ],
     })
