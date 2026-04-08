@@ -77,9 +77,14 @@ type CliInteractiveWriteRawTask = {
 /**
  * Absolute path to Cypress {@link https://docs.cypress.io/app/references/configuration#Screenshots screenshotsFolder},
  * e.g. `path.resolve(config.projectRoot, config.screenshotsFolder)` inside `setupNodeEvents`.
+ *
+ * {@link https://docs.cypress.io/api/node-events/before-spec-api `before:spec`} exposes `spec.name` (basename);
+ * Cypress failure screenshots use that same segment as the subdirectory under `screenshotsFolder`.
  */
 export type CliE2ePluginTasksOptions = {
   screenshotsFolderAbsolute: string
+  /** From `before:spec` → `spec.name`, so PTY PNGs land next to Cypress screenshots for that spec. */
+  getCurrentSpecScreenshotFolderName?: () => string | undefined
 }
 
 const INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING = 'doughnut 0.1.0'
@@ -295,9 +300,12 @@ export function createCliE2ePluginTasks(
         const shots = options?.screenshotsFolderAbsolute
         if (shots) {
           try {
-            const dir = join(shots, 'cli-pty')
+            const specFolder =
+              options?.getCurrentSpecScreenshotFolderName?.()?.trim() ||
+              'cli-pty'
+            const dir = join(shots, specFolder)
             mkdirSync(dir, { recursive: true })
-            const fileName = `assert-failure-${Date.now()}-${randomBytes(4).toString('hex')}.png`
+            const fileName = `terminal-pty-assert-failure-${Date.now()}-${randomBytes(4).toString('hex')}.png`
             const filePath = join(dir, fileName)
             const png = await handle.captureViewportPng()
             writeFileSync(filePath, png)

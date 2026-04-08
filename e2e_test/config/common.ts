@@ -66,8 +66,23 @@ const commonConfig = {
         screenshotsFolder
       )
 
+      let currentSpecScreenshotFolderName: string | undefined
+      // Aligns PTY PNG path with Cypress screenshots (`spec.name` subfolder). In `cypress open`,
+      // `before:spec` may require `experimentalInteractiveRunEvents` (Cypress docs); otherwise
+      // the plugin falls back to `cli-pty/`.
+      on('before:spec', (spec: Cypress.Spec) => {
+        currentSpecScreenshotFolderName = spec.name
+      })
+      on('after:spec', () => {
+        currentSpecScreenshotFolderName = undefined
+      })
+
       on('task', {
-        ...createCliE2ePluginTasks(repoRoot, { screenshotsFolderAbsolute }),
+        ...createCliE2ePluginTasks(repoRoot, {
+          screenshotsFolderAbsolute,
+          getCurrentSpecScreenshotFolderName: () =>
+            currentSpecScreenshotFolderName,
+        }),
         setTestState({ key, value }: { key: string; value: unknown }) {
           testState[key] = value
           return null
