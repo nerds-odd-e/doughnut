@@ -76,7 +76,7 @@ class NotebookBooksController {
   public Book getBook(@PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
-    return bookService.getBookForNotebook(notebook);
+    return bookService.getBookForNotebook(notebook, authorizationService.getCurrentUser());
   }
 
   @Operation(operationId = "getNotebookBookReadingPosition", summary = "Get book reading position")

@@ -3687,6 +3687,17 @@ components:
       - anchorFormat
       - id
       - value
+    BookRangeReadingRecordWire_Full:
+      type: object
+      properties:
+        status:
+          type: string
+        completedAt:
+          type: string
+          format: date-time
+      required:
+      - completedAt
+      - status
     BookRange_Full:
       type: object
       properties:
@@ -3702,6 +3713,8 @@ components:
           type: string
         parentRangeId:
           type: string
+        readingRecord:
+          $ref: "#/components/schemas/BookRangeReadingRecordWire_Full"
       required:
       - id
       - startAnchor

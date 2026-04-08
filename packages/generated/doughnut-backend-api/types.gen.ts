@@ -315,12 +315,18 @@ export type BookAnchorFull = {
     value: string;
 };
 
+export type BookRangeReadingRecordWireFull = {
+    status: string;
+    completedAt: string;
+};
+
 export type BookRangeFull = {
     id: number;
     startAnchor: BookAnchorFull;
     siblingOrder?: number;
     title: string;
     parentRangeId?: string;
+    readingRecord?: BookRangeReadingRecordWireFull;
 };
 
 export type BookFull = {
