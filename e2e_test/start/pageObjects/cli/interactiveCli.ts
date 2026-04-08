@@ -39,10 +39,8 @@ function interactiveCli() {
       answer: string,
       prompt: string
     ): Cypress.Chainable<null> {
-      return whenCurrentGuidanceContainsThen(
-        prompt,
-        () => writeInteractiveLineToPty(answer),
-        'cli-interactive-answer-to-prompt'
+      return whenCurrentGuidanceContainsThen(prompt, () =>
+        writeInteractiveLineToPty(answer)
       )
     },
     inputDownArrowSelectionForSlashCommand(
@@ -54,8 +52,7 @@ function interactiveCli() {
           () =>
             writeInteractiveRawToPty('\u001b[B').then(() =>
               writeInteractiveRawToPty('\r')
-            ),
-          'cli-interactive-recall-mcq-down-arrow-submit'
+            )
         )
       )
     },
