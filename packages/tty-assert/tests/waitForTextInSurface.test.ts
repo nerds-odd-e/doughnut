@@ -134,6 +134,21 @@ describe('waitForTextInSurface', () => {
     })
   })
 
+  it('cellExpectations allBold on first match treats xterm bold like requireBold', async () => {
+    const raw = `\x1b[2J\x1b[H\x1b[1mPut\x1b[22m x\n`
+    await waitForTextInSurface({
+      raw,
+      needle: 'Put',
+      surface: 'viewableBuffer',
+      cols: 80,
+      rows: 24,
+      timeoutMs: 0,
+      cellExpectations: [
+        { match: 'first', expectations: [{ kind: 'allBold' }] },
+      ],
+    })
+  })
+
   it('rejects requireBold with strippedTranscript at call time', async () => {
     await expect(
       waitForTextInSurface({
@@ -143,7 +158,9 @@ describe('waitForTextInSurface', () => {
         timeoutMs: 0,
         requireBold: true,
       })
-    ).rejects.toThrow(/requireBold is only supported/)
+    ).rejects.toThrow(
+      /cell expectations \(and legacy requireBold \/ gray block options\) are only supported for viewableBuffer and fullBuffer/
+    )
   })
 
   it('requireBold fails when the first match is not all bold', async () => {
@@ -161,6 +178,23 @@ describe('waitForTextInSurface', () => {
     ).rejects.toThrow(/not all cells at the first occurrence are bold/)
   })
 
+  it('cellExpectations allBold fails when the first match is not all bold', async () => {
+    const raw = `\x1b[2J\x1b[HPlain\x1b[1mBold\x1b[22m\n`
+    await expect(
+      waitForTextInSurface({
+        raw,
+        needle: 'Plain',
+        surface: 'viewableBuffer',
+        cols: 80,
+        rows: 24,
+        timeoutMs: 0,
+        cellExpectations: [
+          { match: 'first', expectations: [{ kind: 'allBold' }] },
+        ],
+      })
+    ).rejects.toThrow(/not all cells at the first occurrence are bold/)
+  })
+
   it('requireGrayBackgroundBlock passes for chalk-style gray background (100m)', async () => {
     const raw = `\x1b[2J\x1b[H\x1b[100mUser paste\x1b[0m\n`
     await waitForTextInSurface({
@@ -172,6 +206,22 @@ describe('waitForTextInSurface', () => {
       timeoutMs: 0,
       strict: false,
       requireGrayBackgroundBlock: true,
+    })
+  })
+
+  it('cellExpectations allBgPalette on last match passes for chalk-style gray background (100m)', async () => {
+    const raw = `\x1b[2J\x1b[H\x1b[100mUser paste\x1b[0m\n`
+    await waitForTextInSurface({
+      raw,
+      needle: 'User paste',
+      surface: 'viewableBuffer',
+      cols: 80,
+      rows: 24,
+      timeoutMs: 0,
+      strict: false,
+      cellExpectations: [
+        { match: 'last', expectations: [{ kind: 'allBgPalette', index: 8 }] },
+      ],
     })
   })
 
@@ -191,6 +241,33 @@ describe('waitForTextInSurface', () => {
     ).rejects.toThrow(/gray foreground only/)
   })
 
+  it('cellExpectations noFgPaletteUnlessBgPalette on last match fails for gray foreground only (90m)', async () => {
+    const raw = `\x1b[2J\x1b[H\x1b[90mUser paste\x1b[0m\n`
+    await expect(
+      waitForTextInSurface({
+        raw,
+        needle: 'User paste',
+        surface: 'viewableBuffer',
+        cols: 80,
+        rows: 24,
+        timeoutMs: 0,
+        strict: false,
+        cellExpectations: [
+          {
+            match: 'last',
+            expectations: [
+              {
+                kind: 'noFgPaletteUnlessBgPalette',
+                fgPalette: 8,
+                unlessBgPalette: 8,
+              },
+            ],
+          },
+        ],
+      })
+    ).rejects.toThrow(/gray foreground only/)
+  })
+
   it('gray block checks use the last haystack match when strict is false', async () => {
     const raw = `\x1b[2J\x1b[H\x1b[90mUser paste\x1b[0m xx \x1b[100mUser paste\x1b[0m\n`
     await waitForTextInSurface({
@@ -206,6 +283,32 @@ describe('waitForTextInSurface', () => {
     })
   })
 
+  it('cellExpectations last-match gray block matches legacy boolean pair', async () => {
+    const raw = `\x1b[2J\x1b[H\x1b[90mUser paste\x1b[0m xx \x1b[100mUser paste\x1b[0m\n`
+    await waitForTextInSurface({
+      raw,
+      needle: 'User paste',
+      surface: 'viewableBuffer',
+      cols: 80,
+      rows: 24,
+      timeoutMs: 0,
+      strict: false,
+      cellExpectations: [
+        {
+          match: 'last',
+          expectations: [
+            {
+              kind: 'noFgPaletteUnlessBgPalette',
+              fgPalette: 8,
+              unlessBgPalette: 8,
+            },
+            { kind: 'allBgPalette', index: 8 },
+          ],
+        },
+      ],
+    })
+  })
+
   it('rejects gray block options with strippedTranscript at call time', async () => {
     await expect(
       waitForTextInSurface({
@@ -215,7 +318,58 @@ describe('waitForTextInSurface', () => {
         timeoutMs: 0,
         requireGrayBackgroundBlock: true,
       })
-    ).rejects.toThrow(/gray block options/)
+    ).rejects.toThrow(
+      /cell expectations \(and legacy requireBold \/ gray block options\) are only supported for viewableBuffer and fullBuffer/
+    )
+  })
+
+  it('rejects cellExpectations with strippedTranscript at call time', async () => {
+    await expect(
+      waitForTextInSurface({
+        raw: 'x',
+        needle: 'x',
+        surface: 'strippedTranscript',
+        timeoutMs: 0,
+        cellExpectations: [
+          { match: 'first', expectations: [{ kind: 'allBold' }] },
+        ],
+      })
+    ).rejects.toThrow(
+      /cell expectations \(and legacy requireBold \/ gray block options\) are only supported for viewableBuffer and fullBuffer/
+    )
+  })
+
+  it('rejects combining legacy style booleans with cellExpectations', async () => {
+    await expect(
+      waitForTextInSurface({
+        raw: '\x1b[2J\x1b[H\x1b[1mPut\x1b[22m x\n',
+        needle: 'Put',
+        surface: 'viewableBuffer',
+        cols: 80,
+        rows: 24,
+        timeoutMs: 0,
+        requireBold: true,
+        cellExpectations: [
+          { match: 'first', expectations: [{ kind: 'allBold' }] },
+        ],
+      })
+    ).rejects.toThrow(/do not combine cellExpectations with requireBold/)
+  })
+
+  it('rejects cellExpectations with RegExp needle at call time', async () => {
+    await expect(
+      waitForTextInSurface({
+        raw: '\x1b[2J\x1b[H\x1b[1mx\x1b[22m\n',
+        needle: /x/,
+        surface: 'viewableBuffer',
+        cols: 80,
+        rows: 24,
+        timeoutMs: 0,
+        cellExpectations: [
+          { match: 'first', expectations: [{ kind: 'allBold' }] },
+        ],
+      })
+    ).rejects.toThrow(/cell expectations require a string needle/)
   })
 
   it('polls until a getter returns raw that contains the needle', async () => {

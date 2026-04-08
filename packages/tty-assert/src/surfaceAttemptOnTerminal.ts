@@ -4,6 +4,7 @@
  */
 
 import { Terminal } from '@xterm/headless'
+import type { CellExpectationBlock } from './cellExpectations'
 import { stripAnsiCliPty } from './stripAnsi'
 
 /** ANSI bright black: `\x1b[90m` (fg) / `\x1b[100m` (bg); xterm palette index 8. */
@@ -69,17 +70,22 @@ function sliceByAnchor(
   return { rows, rowOffset: 0 }
 }
 
-export function buildHaystackAndSnapshotFromTerminal(
+function xtermSearchContext(
   term: Terminal,
   surface: 'viewableBuffer' | 'fullBuffer',
   startAfterAnchor: RegExp[] | undefined,
   fallbackRowCount: number | undefined
-): { haystack: string; snapshot: string } {
+): {
+  haystack: string
+  snapshot: string
+  startY: number
+  rowOffset: number
+} {
   const buffer = term.buffer.active
   const startY = surface === 'fullBuffer' ? 0 : buffer.baseY
   const endY = buffer.length
   const allRows = xtermBufferRows(term, startY, endY)
-  const { rows: searchRows } = sliceByAnchor(
+  const { rows: searchRows, rowOffset } = sliceByAnchor(
     allRows,
     startAfterAnchor,
     fallbackRowCount
@@ -87,7 +93,24 @@ export function buildHaystackAndSnapshotFromTerminal(
   return {
     haystack: rowMajorSearchBlock(searchRows),
     snapshot: rowMajorSnapshot(searchRows),
+    startY,
+    rowOffset,
   }
+}
+
+export function buildHaystackAndSnapshotFromTerminal(
+  term: Terminal,
+  surface: 'viewableBuffer' | 'fullBuffer',
+  startAfterAnchor: RegExp[] | undefined,
+  fallbackRowCount: number | undefined
+): { haystack: string; snapshot: string } {
+  const ctx = xtermSearchContext(
+    term,
+    surface,
+    startAfterAnchor,
+    fallbackRowCount
+  )
+  return { haystack: ctx.haystack, snapshot: ctx.snapshot }
 }
 
 function countNonOverlapping(haystack: string, needle: string): number {
@@ -115,7 +138,38 @@ function matchCount(haystack: string, needle: string | RegExp): number {
   return Array.from(haystack.matchAll(regexForMatchAll(needle))).length
 }
 
-function verifyBoldAtFirstStringMatchOnTerminal(
+function cellHasPaletteBackground(
+  cell: { isBgPalette(): boolean; getBgColor(): number },
+  index: number
+): boolean {
+  return cell.isBgPalette() && cell.getBgColor() === index
+}
+
+function cellViolatesNoFgUnlessBg(
+  cell: {
+    isFgPalette(): boolean
+    getFgColor(): number
+    isBgPalette(): boolean
+    getBgColor(): number
+  },
+  fgPalette: number,
+  unlessBgPalette: number
+): boolean {
+  const fgOn = cell.isFgPalette() && cell.getFgColor() === fgPalette
+  if (!fgOn) return false
+  return !cellHasPaletteBackground(cell, unlessBgPalette)
+}
+
+function blockNotFoundLabel(block: CellExpectationBlock): string {
+  const kinds = new Set(block.expectations.map((e) => e.kind))
+  if (kinds.has('allBold') && kinds.size === 1) return 'bold check'
+  if (kinds.has('noFgPaletteUnlessBgPalette') || kinds.has('allBgPalette')) {
+    return 'gray block check'
+  }
+  return 'cell expectation check'
+}
+
+function runCellExpectationBlocks(
   term: Terminal,
   opts: {
     surface: 'viewableBuffer' | 'fullBuffer'
@@ -123,134 +177,128 @@ function verifyBoldAtFirstStringMatchOnTerminal(
     cols: number
     startAfterAnchor?: RegExp[]
     fallbackRowCount?: number
-  }
+  },
+  blocks: CellExpectationBlock[]
 ): { ok: true } | { ok: false; snapshot: string; detail: string } {
   const buffer = term.buffer.active
-  const startY = opts.surface === 'fullBuffer' ? 0 : buffer.baseY
-  const endY = buffer.length
-  const allRows = xtermBufferRows(term, startY, endY)
-  const { rows: searchRows, rowOffset } = sliceByAnchor(
-    allRows,
+  const { haystack, snapshot, startY, rowOffset } = xtermSearchContext(
+    term,
+    opts.surface,
     opts.startAfterAnchor,
     opts.fallbackRowCount
   )
-  const haystack = rowMajorSearchBlock(searchRows)
-  const snapshot = rowMajorSnapshot(searchRows)
-  const index = haystack.indexOf(opts.needle)
-  if (index < 0) {
-    return {
-      ok: false,
-      snapshot,
-      detail: `Substring ${JSON.stringify(opts.needle)} not found in surface "${opts.surface}" (bold check).`,
-    }
-  }
   const rowWidth = opts.cols
-  for (let i = 0; i < opts.needle.length; i++) {
-    const pos = index + i
-    const localY = Math.floor(pos / rowWidth)
-    const x = pos % rowWidth
-    const termLine = buffer.getLine(startY + rowOffset + localY)
-    const cell = termLine?.getCell(x)
-    if ((cell?.isBold() ?? 0) === 0) {
-      return {
-        ok: false,
-        snapshot,
-        detail: `Matched text ${JSON.stringify(opts.needle)} is present but not all cells at the first occurrence are bold.`,
-      }
-    }
-  }
-  return { ok: true }
-}
 
-function cellHasGrayPaletteBackground(cell: {
-  isBgPalette(): boolean
-  getBgColor(): number
-}): boolean {
-  return cell.isBgPalette() && cell.getBgColor() === BRIGHT_BLACK_PALETTE_INDEX
-}
+  for (const block of blocks) {
+    const index =
+      block.match === 'first'
+        ? haystack.indexOf(opts.needle)
+        : haystack.lastIndexOf(opts.needle)
+    if (index < 0) {
+      const label = blockNotFoundLabel(block)
+      return {
+        ok: false,
+        snapshot,
+        detail: `Substring ${JSON.stringify(opts.needle)} not found in surface "${opts.surface}" (${label}).`,
+      }
+    }
 
-function cellIsGrayForegroundOnlyWithoutGrayBackground(cell: {
-  isFgPalette(): boolean
-  getFgColor(): number
-  isBgPalette(): boolean
-  getBgColor(): number
-}): boolean {
-  const grayFg =
-    cell.isFgPalette() && cell.getFgColor() === BRIGHT_BLACK_PALETTE_INDEX
-  if (!grayFg) return false
-  return !cellHasGrayPaletteBackground(cell)
-}
+    for (const exp of block.expectations) {
+      if (exp.kind === 'allBold') {
+        const which =
+          block.match === 'first' ? 'first occurrence' : 'last occurrence'
+        for (let i = 0; i < opts.needle.length; i++) {
+          const pos = index + i
+          const localY = Math.floor(pos / rowWidth)
+          const x = pos % rowWidth
+          const termLine = buffer.getLine(startY + rowOffset + localY)
+          const cell = termLine?.getCell(x)
+          if ((cell?.isBold() ?? 0) === 0) {
+            return {
+              ok: false,
+              snapshot,
+              detail: `Matched text ${JSON.stringify(opts.needle)} is present but not all cells at the ${which} are bold.`,
+            }
+          }
+        }
+        continue
+      }
 
-function verifyGrayBlockAtLastStringMatchOnTerminal(
-  term: Terminal,
-  opts: {
-    surface: 'viewableBuffer' | 'fullBuffer'
-    needle: string
-    cols: number
-    startAfterAnchor?: RegExp[]
-    fallbackRowCount?: number
-    rejectGrayForegroundOnlyWithoutGrayBackground: boolean
-    requireGrayBackgroundBlock: boolean
-  }
-): { ok: true } | { ok: false; snapshot: string; detail: string } {
-  const buffer = term.buffer.active
-  const startY = opts.surface === 'fullBuffer' ? 0 : buffer.baseY
-  const endY = buffer.length
-  const allRows = xtermBufferRows(term, startY, endY)
-  const { rows: searchRows, rowOffset } = sliceByAnchor(
-    allRows,
-    opts.startAfterAnchor,
-    opts.fallbackRowCount
-  )
-  const haystack = rowMajorSearchBlock(searchRows)
-  const snapshot = rowMajorSnapshot(searchRows)
-  const index = haystack.lastIndexOf(opts.needle)
-  if (index < 0) {
-    return {
-      ok: false,
-      snapshot,
-      detail: `Substring ${JSON.stringify(opts.needle)} not found in surface "${opts.surface}" (gray block check).`,
-    }
-  }
-  const rowWidth = opts.cols
-  for (let i = 0; i < opts.needle.length; i++) {
-    const pos = index + i
-    const localY = Math.floor(pos / rowWidth)
-    const x = pos % rowWidth
-    const termLine = buffer.getLine(startY + rowOffset + localY)
-    const cell = termLine?.getCell(x)
-    if (cell == null) {
-      return {
-        ok: false,
-        snapshot,
-        detail: `Gray block check: no cell at offset ${i} for last match of ${JSON.stringify(opts.needle)}.`,
+      if (exp.kind === 'noFgPaletteUnlessBgPalette') {
+        const grayProduct =
+          exp.fgPalette === BRIGHT_BLACK_PALETTE_INDEX &&
+          exp.unlessBgPalette === BRIGHT_BLACK_PALETTE_INDEX
+        for (let i = 0; i < opts.needle.length; i++) {
+          const pos = index + i
+          const localY = Math.floor(pos / rowWidth)
+          const x = pos % rowWidth
+          const termLine = buffer.getLine(startY + rowOffset + localY)
+          const cell = termLine?.getCell(x)
+          if (cell == null) {
+            return {
+              ok: false,
+              snapshot,
+              detail: `Gray block check: no cell at offset ${i} for last match of ${JSON.stringify(opts.needle)}.`,
+            }
+          }
+          if (
+            cellViolatesNoFgUnlessBg(cell, exp.fgPalette, exp.unlessBgPalette)
+          ) {
+            if (grayProduct) {
+              return {
+                ok: false,
+                snapshot,
+                detail:
+                  `Past user message ${JSON.stringify(opts.needle)} must appear in a gray-background block (palette background 8 / chalk \\x1b[100m). ` +
+                  `Last match has gray foreground only (palette 8 / chalk \\x1b[90m) without that background.`,
+              }
+            }
+            return {
+              ok: false,
+              snapshot,
+              detail: `Matched text ${JSON.stringify(opts.needle)}: foreground palette ${exp.fgPalette} requires background palette ${exp.unlessBgPalette} on every cell in the span.`,
+            }
+          }
+        }
+        continue
+      }
+
+      if (exp.kind === 'allBgPalette') {
+        const grayProduct = exp.index === BRIGHT_BLACK_PALETTE_INDEX
+        for (let i = 0; i < opts.needle.length; i++) {
+          const pos = index + i
+          const localY = Math.floor(pos / rowWidth)
+          const x = pos % rowWidth
+          const termLine = buffer.getLine(startY + rowOffset + localY)
+          const cell = termLine?.getCell(x)
+          if (cell == null) {
+            return {
+              ok: false,
+              snapshot,
+              detail: `Gray block check: no cell at offset ${i} for last match of ${JSON.stringify(opts.needle)}.`,
+            }
+          }
+          if (!cellHasPaletteBackground(cell, exp.index)) {
+            if (grayProduct) {
+              return {
+                ok: false,
+                snapshot,
+                detail:
+                  `Past user message ${JSON.stringify(opts.needle)} must appear in a gray-background block (palette background 8 / chalk \\x1b[100m). ` +
+                  `Last match is missing gray background on at least one cell.`,
+              }
+            }
+            return {
+              ok: false,
+              snapshot,
+              detail: `Matched text ${JSON.stringify(opts.needle)}: expected background palette index ${exp.index} on every cell in the span.`,
+            }
+          }
+        }
       }
     }
-    if (
-      opts.rejectGrayForegroundOnlyWithoutGrayBackground &&
-      cellIsGrayForegroundOnlyWithoutGrayBackground(cell)
-    ) {
-      return {
-        ok: false,
-        snapshot,
-        detail:
-          `Past user message ${JSON.stringify(opts.needle)} must appear in a gray-background block (palette background 8 / chalk \\x1b[100m). ` +
-          `Last match has gray foreground only (palette 8 / chalk \\x1b[90m) without that background.`,
-      }
-    }
-    if (
-      opts.requireGrayBackgroundBlock &&
-      !cellHasGrayPaletteBackground(cell)
-    ) {
-      return {
-        ok: false,
-        snapshot,
-        detail:
-          `Past user message ${JSON.stringify(opts.needle)} must appear in a gray-background block (palette background 8 / chalk \\x1b[100m). ` +
-          `Last match is missing gray background on at least one cell.`,
-      }
-    }
   }
+
   return { ok: true }
 }
 
@@ -263,9 +311,8 @@ export type SurfaceAttemptOpts = {
   rows: number
   startAfterAnchor?: RegExp[]
   fallbackRowCount?: number
-  requireBold?: boolean
-  rejectGrayForegroundOnlyWithoutGrayBackground?: boolean
-  requireGrayBackgroundBlock?: boolean
+  /** Resolved style checks; empty means none. Caller must validate surface and needle. */
+  cellExpectations?: CellExpectationBlock[]
 }
 
 type TtySearchSurfaceForAttempt =
@@ -322,50 +369,29 @@ export function attemptOnceOnLiveTerminal(
     }
   }
 
-  if (opts.requireBold) {
+  const blocks = opts.cellExpectations ?? []
+  if (blocks.length > 0) {
     if (typeof opts.needle !== 'string') {
       throw new Error(
-        'waitForTextInSurface: invalid requireBold options (caller must validate).'
+        'waitForTextInSurface: cell expectations require a string needle (caller must validate).'
       )
     }
-    const bold = verifyBoldAtFirstStringMatchOnTerminal(term, {
-      surface: opts.surface,
-      needle: opts.needle,
-      cols: opts.cols,
-      startAfterAnchor: opts.startAfterAnchor,
-      fallbackRowCount: opts.fallbackRowCount,
-    })
-    if (!bold.ok) {
+    const cellResult = runCellExpectationBlocks(
+      term,
+      {
+        surface: opts.surface,
+        needle: opts.needle,
+        cols: opts.cols,
+        startAfterAnchor: opts.startAfterAnchor,
+        fallbackRowCount: opts.fallbackRowCount,
+      },
+      blocks
+    )
+    if (!cellResult.ok) {
       return {
         ok: false,
-        snapshot: bold.snapshot,
-        detail: bold.detail,
-      }
-    }
-  }
-
-  const rejectGray = opts.rejectGrayForegroundOnlyWithoutGrayBackground ?? false
-  const requireGrayBg = opts.requireGrayBackgroundBlock ?? false
-  if (rejectGray || requireGrayBg) {
-    if (typeof opts.needle !== 'string') {
-      throw new Error(
-        'waitForTextInSurface: gray block options require viewableBuffer or fullBuffer and a string needle.'
-      )
-    }
-    const gray = verifyGrayBlockAtLastStringMatchOnTerminal(term, {
-      surface: opts.surface,
-      needle: opts.needle,
-      cols: opts.cols,
-      startAfterAnchor: opts.startAfterAnchor,
-      fallbackRowCount: opts.fallbackRowCount,
-      rejectGrayForegroundOnlyWithoutGrayBackground: rejectGray,
-      requireGrayBackgroundBlock: requireGrayBg,
-    })
-    if (!gray.ok) {
-      return {
-        ok: false,
-        snapshot: gray.snapshot,
-        detail: gray.detail,
+        snapshot: cellResult.snapshot,
+        detail: cellResult.detail,
       }
     }
   }

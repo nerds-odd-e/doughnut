@@ -20,11 +20,20 @@
  * **`rejectGrayForegroundOnlyWithoutGrayBackground`** and **`requireGrayBackgroundBlock`** on a
  * string needle: both inspect the **last** `indexOf` match in the search haystack (same as the
  * former “last paint in raw buffer” heuristic).
+ *
+ * Prefer **`cellExpectations`** for new code: composable, serializable checks on the matched cell
+ * span (`match: 'first' | 'last'` per block). Legacy boolean style flags map to the same behavior.
  */
 
+import {
+  validateAndResolveCellExpectations,
+  type CellExpectationBlock,
+} from './cellExpectations'
 import { formatRawTerminalSnapshotForError } from './errorSnapshotFormatting'
 import { CLI_INTERACTIVE_PTY_COLS, CLI_INTERACTIVE_PTY_ROWS } from './geometry'
 import { attemptOnce } from './surfaceAttemptOnTerminal'
+
+export type { CellExpectation, CellExpectationBlock } from './cellExpectations'
 
 export type TtySearchSurface =
   | 'viewableBuffer'
@@ -77,6 +86,11 @@ export type WaitForTextInSurfaceOptions = {
    * with a **string** needle.
    */
   requireGrayBackgroundBlock?: boolean
+  /**
+   * After the needle matches, assert on xterm cells for the chosen occurrence per block.
+   * Do not combine with `requireBold` / gray boolean flags (throws).
+   */
+  cellExpectations?: CellExpectationBlock[]
 }
 
 /** Default delay between poll attempts when `timeoutMs` is positive; Cypress adapter should use the same value for `cy.wait` between buffer re-reads. */
@@ -137,34 +151,15 @@ function appendRawTerminalSnapshotForErrorMessage(
 export async function waitForTextInSurface(
   opts: WaitForTextInSurfaceOptions
 ): Promise<void> {
-  if (opts.requireBold) {
-    if (opts.surface === 'strippedTranscript') {
-      throw new Error(
-        'waitForTextInSurface: requireBold is only supported for viewableBuffer and fullBuffer.'
-      )
-    }
-    if (typeof opts.needle !== 'string') {
-      throw new Error(
-        'waitForTextInSurface: requireBold requires a string needle.'
-      )
-    }
-  }
-
-  if (
-    opts.rejectGrayForegroundOnlyWithoutGrayBackground ||
-    opts.requireGrayBackgroundBlock
-  ) {
-    if (opts.surface === 'strippedTranscript') {
-      throw new Error(
-        'waitForTextInSurface: gray block options are only supported for viewableBuffer and fullBuffer.'
-      )
-    }
-    if (typeof opts.needle !== 'string') {
-      throw new Error(
-        'waitForTextInSurface: gray block options require a string needle.'
-      )
-    }
-  }
+  const cellExpectations = validateAndResolveCellExpectations({
+    surface: opts.surface,
+    needle: opts.needle,
+    requireBold: opts.requireBold,
+    rejectGrayForegroundOnlyWithoutGrayBackground:
+      opts.rejectGrayForegroundOnlyWithoutGrayBackground,
+    requireGrayBackgroundBlock: opts.requireGrayBackgroundBlock,
+    cellExpectations: opts.cellExpectations,
+  })
 
   const timeoutMs = opts.timeoutMs ?? 0
   const retryMs = opts.retryMs ?? TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS
@@ -187,10 +182,7 @@ export async function waitForTextInSurface(
       rows,
       startAfterAnchor: opts.startAfterAnchor,
       fallbackRowCount: opts.fallbackRowCount,
-      requireBold: opts.requireBold,
-      rejectGrayForegroundOnlyWithoutGrayBackground:
-        opts.rejectGrayForegroundOnlyWithoutGrayBackground,
-      requireGrayBackgroundBlock: opts.requireGrayBackgroundBlock,
+      cellExpectations,
     })
 
     if (result.ok === true) return

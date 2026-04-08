@@ -12,6 +12,7 @@ import {
   type BufferedPtySession,
   type StartBufferedPtySessionOptions,
 } from './ptySession'
+import { validateAndResolveCellExpectations } from './cellExpectations'
 import { viewportPlaintextFromHeadlessTerminal } from './ptyTranscriptToVisiblePlaintextViaXterm'
 import {
   attemptOnceOnLiveTerminal,
@@ -128,34 +129,15 @@ export function attachManagedTtySession(
         throw new Error('ManagedTtySession.assert after dispose')
       }
 
-      if (opts.requireBold) {
-        if (opts.surface === 'strippedTranscript') {
-          throw new Error(
-            'waitForTextInSurface: requireBold is only supported for viewableBuffer and fullBuffer.'
-          )
-        }
-        if (typeof opts.needle !== 'string') {
-          throw new Error(
-            'waitForTextInSurface: requireBold requires a string needle.'
-          )
-        }
-      }
-
-      if (
-        opts.rejectGrayForegroundOnlyWithoutGrayBackground ||
-        opts.requireGrayBackgroundBlock
-      ) {
-        if (opts.surface === 'strippedTranscript') {
-          throw new Error(
-            'waitForTextInSurface: gray block options are only supported for viewableBuffer and fullBuffer.'
-          )
-        }
-        if (typeof opts.needle !== 'string') {
-          throw new Error(
-            'waitForTextInSurface: gray block options require a string needle.'
-          )
-        }
-      }
+      const cellExpectations = validateAndResolveCellExpectations({
+        surface: opts.surface,
+        needle: opts.needle,
+        requireBold: opts.requireBold,
+        rejectGrayForegroundOnlyWithoutGrayBackground:
+          opts.rejectGrayForegroundOnlyWithoutGrayBackground,
+        requireGrayBackgroundBlock: opts.requireGrayBackgroundBlock,
+        cellExpectations: opts.cellExpectations,
+      })
 
       const timeoutMs = opts.timeoutMs ?? 3000
       const retryMs = opts.retryMs ?? TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS
@@ -196,10 +178,7 @@ export function attachManagedTtySession(
             rows,
             startAfterAnchor: opts.startAfterAnchor,
             fallbackRowCount: opts.fallbackRowCount,
-            requireBold: opts.requireBold,
-            rejectGrayForegroundOnlyWithoutGrayBackground:
-              opts.rejectGrayForegroundOnlyWithoutGrayBackground,
-            requireGrayBackgroundBlock: opts.requireGrayBackgroundBlock,
+            cellExpectations,
           })
         }
 
