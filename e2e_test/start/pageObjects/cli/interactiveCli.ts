@@ -1,12 +1,10 @@
 /**
  * Domain helpers on the interactive CLI PTY session (`ttyAssertTerminal` for `cy.task` I/O).
  *
- * **Assertions:** `pastCliAssistantMessages` and `answeredQuestions` search the **`strippedTranscript`**
- * surface via `cliInteractivePtyGetBuffer` retries in `outputAssertions`. **`pastUserMessages.expectDisplayed`**
- * uses the same pattern (full buffer + stripped transcript per attempt). **`currentGuidance`** and
- * **`whenCurrentGuidanceContainsThen`** use **`cliInteractiveAssert`**: the plugin delegates to
- * `tty-assert` managed-session `assert` (viewport replay + Ink anchors), not browser-side buffer polling.
- * Surfaces differ — see `.cursor/rules/cli.mdc` terminology.
+ * **Assertions:** `currentGuidance`, **`whenCurrentGuidanceContainsThen`**, `pastCliAssistantMessages`,
+ * `answeredQuestions`, and **`pastUserMessages.expectDisplayed`** all use **`cliInteractiveAssert`**:
+ * the plugin delegates to `tty-assert` managed-session `assert` (retry + replay in Node). Surfaces
+ * differ — see `.cursor/rules/cli.mdc` terminology.
  */
 import {
   answeredQuestions,

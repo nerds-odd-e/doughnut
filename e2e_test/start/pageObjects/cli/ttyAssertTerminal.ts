@@ -1,10 +1,10 @@
 /**
  * PTY lifecycle and I/O: `cy.task` names for interactive CLI (`runRepoCliInteractive`,
- * `cliInteractiveWriteLine`, `cliInteractiveAssert`, `cliInteractivePtyGetBuffer`, …).
+ * `cliInteractiveWriteLine`, `cliInteractiveAssert`, `cliInteractivePtyDispose`, …).
  *
- * Transcript assertions are re-exported from `outputAssertions`. **Current guidance** uses
- * `cliInteractiveAssert`; **past assistant / answered / past user** still use buffer round-trips
- * until migrated. Do not use the Node `tty-assert/facade` `expect` API from Cypress (messages differ).
+ * Transcript assertions are re-exported from `outputAssertions` and use **`cliInteractiveAssert`**
+ * (serialized requests; managed PTY + xterm in the plugin). Do not use the Node `tty-assert/facade`
+ * `expect` API from Cypress (messages differ).
  */
 
 import {
