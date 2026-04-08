@@ -1,7 +1,5 @@
 import { interactiveCli } from './interactiveCli'
 
-const NOTEBOOK_ACTIVE_TIMEOUT_MS = 20_000
-
 /**
  * Book-reading CLI flows: `/use` + `/attach` against fixtures under
  * `e2e_test/fixtures/book_reading/`.
@@ -21,8 +19,7 @@ export function bookReadingCli() {
         ic.enterSlashCommandInInteractiveCli(`/use ${notebookTitle}`)
           .then(() => {
             ic.pastCliAssistantMessages().expectContains(
-              `Active notebook: ${notebookTitle}`,
-              { timeoutMs: NOTEBOOK_ACTIVE_TIMEOUT_MS }
+              `Active notebook: ${notebookTitle}`
             )
           })
           .then(() =>

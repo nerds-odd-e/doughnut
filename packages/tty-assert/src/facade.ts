@@ -26,7 +26,7 @@ import {
 } from './ptySession'
 import { stripAnsiCliPty } from './stripAnsi'
 
-export const DEFAULT_TTY_EXPECT_TIMEOUT_MS = 3000
+const DEFAULT_TO_BE_VISIBLE_TIMEOUT_MS = 3000
 export const DEFAULT_TTY_EXPECT_RETRY_MS = 50
 
 export type TtySubstringLocator = {
@@ -96,7 +96,7 @@ function createHandle(session: BufferedPtySession): TtyAssertTerminalHandle {
           waitForVisiblePlaintextSubstring(
             () => session.buf.text,
             loc.value,
-            opts?.timeoutMs ?? DEFAULT_TTY_EXPECT_TIMEOUT_MS,
+            opts?.timeoutMs ?? DEFAULT_TO_BE_VISIBLE_TIMEOUT_MS,
             opts?.retryMs ?? DEFAULT_TTY_EXPECT_RETRY_MS
           ),
       }

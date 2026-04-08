@@ -1,7 +1,5 @@
 import { interactiveCli } from './interactiveCli'
 
-const NOTEBOOK_ACTIVE_TIMEOUT_MS = 2_000
-
 function notebookInteractiveCtx() {
   return {
     attachPdfBook(fixtureFilename: string) {
@@ -29,9 +27,7 @@ export function useNotebook(
     .then(() =>
       ic
         .pastCliAssistantMessages()
-        .expectContains(`Active notebook: ${notebookTitle}`, {
-          timeoutMs: NOTEBOOK_ACTIVE_TIMEOUT_MS,
-        })
+        .expectContains(`Active notebook: ${notebookTitle}`)
     )
     .then(() => cy.wrap(notebookInteractiveCtx()))
 }

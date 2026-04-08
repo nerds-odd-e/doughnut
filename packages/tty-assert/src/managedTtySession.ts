@@ -157,7 +157,7 @@ export function attachManagedTtySession(
         }
       }
 
-      const timeoutMs = opts.timeoutMs ?? 0
+      const timeoutMs = opts.timeoutMs ?? 3000
       const retryMs = opts.retryMs ?? TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS
       const strict = opts.strict ?? true
       const messagePrefix = opts.messagePrefix

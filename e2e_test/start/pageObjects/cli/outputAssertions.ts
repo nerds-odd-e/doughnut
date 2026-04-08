@@ -1,9 +1,6 @@
 import type { CliInteractiveAssertRequest } from '../../../config/cliInteractiveAssertRequest'
 import { TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS } from 'tty-assert/waitForTextInSurface'
 
-const CURRENT_GUIDANCE_ASSERT_TIMEOUT_MS = 3000
-const TRANSCRIPT_ASSERT_TIMEOUT_MS = 3000
-
 const guidanceStartAfterAnchors = [
   { source: '^\\s*└' },
   { source: '^\\s*>\\s*$' },
@@ -12,15 +9,9 @@ const guidanceStartAfterAnchors = [
 
 const guidanceBase: Pick<
   CliInteractiveAssertRequest,
-  | 'surface'
-  | 'timeoutMs'
-  | 'retryMs'
-  | 'strict'
-  | 'fallbackRowCount'
-  | 'startAfterAnchor'
+  'surface' | 'retryMs' | 'strict' | 'fallbackRowCount' | 'startAfterAnchor'
 > = {
   surface: 'viewableBuffer',
-  timeoutMs: CURRENT_GUIDANCE_ASSERT_TIMEOUT_MS,
   retryMs: TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS,
   strict: false,
   fallbackRowCount: 8,
@@ -47,14 +38,12 @@ function currentGuidanceContainsAssertRequest(
 
 function strippedTranscriptTextAssertRequest(
   expected: string,
-  messagePrefix: string,
-  timeoutMs: number = TRANSCRIPT_ASSERT_TIMEOUT_MS
+  messagePrefix: string
 ): CliInteractiveAssertRequest {
   return {
     ...transcriptPollBase,
     needle: { kind: 'text', value: expected },
     surface: 'strippedTranscript',
-    timeoutMs,
     messagePrefix,
   }
 }
@@ -78,16 +67,12 @@ export function whenCurrentGuidanceContainsThen(
 
 function pastCliAssistantMessages() {
   return {
-    expectContains(
-      expected: string,
-      options?: { timeoutMs?: number }
-    ): Cypress.Chainable<null> {
+    expectContains(expected: string): Cypress.Chainable<null> {
       return cy.task<null>(
         'cliInteractiveAssert',
         strippedTranscriptTextAssertRequest(
           expected,
-          'Past CLI assistant messages (in past CLI assistant messages).',
-          options?.timeoutMs ?? TRANSCRIPT_ASSERT_TIMEOUT_MS
+          'Past CLI assistant messages (in past CLI assistant messages).'
         )
       )
     },
@@ -122,7 +107,6 @@ function pastUserMessages() {
           ...transcriptPollBase,
           needle: { kind: 'text', value: expected },
           surface: 'fullBuffer',
-          timeoutMs: TRANSCRIPT_ASSERT_TIMEOUT_MS,
           rejectGrayForegroundOnlyWithoutGrayBackground: true,
           requireGrayBackgroundBlock: true,
           messagePrefix:
@@ -133,7 +117,6 @@ function pastUserMessages() {
             ...transcriptPollBase,
             needle: { kind: 'regex', source: blankLineAboveSource },
             surface: 'strippedTranscript',
-            timeoutMs: TRANSCRIPT_ASSERT_TIMEOUT_MS,
             messagePrefix:
               'Past user messages must leave one blank line above the matching user message.',
           })
