@@ -23,6 +23,7 @@ describe("QuestionDisplay", () => {
   })
 
   afterEach(() => {
+    Object.defineProperty(document, "hidden", { value: false, writable: true })
     vi.useRealTimers()
     vi.restoreAllMocks()
   })

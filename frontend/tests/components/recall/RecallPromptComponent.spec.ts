@@ -15,6 +15,7 @@ describe("RecallPromptComponent", () => {
   })
 
   afterEach(() => {
+    Object.defineProperty(document, "hidden", { value: false, writable: true })
     vi.useRealTimers()
   })
 
@@ -63,7 +64,7 @@ describe("RecallPromptComponent", () => {
         wrapper.find(".daisy-loading.daisy-loading-spinner").exists()
       ).toBe(true)
 
-      vi.runAllTimers()
+      await vi.advanceTimersByTimeAsync(100)
       await flushPromises()
 
       // Verify loading spinner is removed after response
