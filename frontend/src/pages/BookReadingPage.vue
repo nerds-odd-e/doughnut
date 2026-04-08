@@ -109,7 +109,7 @@
                 range.id === currentSelectionRangeId ? 'true' : undefined
               "
               :data-direct-content-read="
-                readRangeIdSet.has(range.id) ? 'true' : undefined
+                bookReading.isDirectContentRead(range.id) ? 'true' : undefined
               "
               :aria-current="
                 range.startAnchor.id === currentRangeAnchorId
@@ -121,7 +121,7 @@
             >
               {{ range.title }}
               <span
-                v-if="readRangeIdSet.has(range.id)"
+                v-if="bookReading.isDirectContentRead(range.id)"
                 class="daisy-sr-only"
               >
                 Marked as read
@@ -179,14 +179,12 @@ import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounc
 import { createCurrentRangeAnchorDebouncer } from "@/lib/book-reading/debounceCurrentRangeAnchorId"
 import { nextLiveAnnouncementText } from "@/lib/book-reading/currentRangeLiveAnnouncement"
 import { currentRangeAnchorIdFromAnchorPage } from "@/lib/book-reading/currentRangeAnchorFromAnchorPage"
-import { readRangeIdsFromRecords } from "@/lib/book-reading/readRangeIdsFromRecords"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
 import type {
   BookAnchorFull,
   BookFull,
   BookRangeFull,
-  BookRangeReadingRecordListItem,
 } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
@@ -198,6 +196,8 @@ const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 const props = defineProps({
   notebookId: { type: Number, required: true },
 })
+
+const bookReading = useNotebookBookReadingRecords(() => props.notebookId)
 
 function notebookBookFilePath(notebookId: number) {
   return `/api/notebooks/${notebookId}/book/file`
@@ -278,11 +278,6 @@ const bookRangeRows = computed(() => flatBookRanges.value)
 const currentSelectionRangeId = ref<number | null>(null)
 const currentRangeAnchorId = ref<number | null>(null)
 
-const bookReadingRecords = ref<BookRangeReadingRecordListItem[]>([])
-const readRangeIdSet = computed(() =>
-  readRangeIdsFromRecords(bookReadingRecords.value)
-)
-
 const readingControlSelectedRangeTitle = computed(() => {
   const selId = currentSelectionRangeId.value
   if (selId === null) {
@@ -302,7 +297,7 @@ const readingControlPanelVisible = computed(() => {
   if (selIdx < 0 || selIdx >= rows.length - 1) {
     return false
   }
-  if (readRangeIdSet.value.has(selId)) {
+  if (bookReading.isDirectContentRead(selId)) {
     return false
   }
   const successor = rows[selIdx + 1]!
@@ -314,15 +309,10 @@ async function markSelectedRangeAsRead() {
   if (id === null) {
     return
   }
-  const result = await apiCallWithLoading(() =>
-    NotebookBooksController.putNotebookBookRangeReadingRecord({
-      path: { notebook: props.notebookId, bookRange: id },
-    })
-  )
-  if (result.error || result.data === undefined) {
+  const ok = await bookReading.submitMarkRead(id)
+  if (!ok) {
     return
   }
-  bookReadingRecords.value = result.data
   const rows = bookRangeRows.value
   const selIdx = rows.findIndex((r) => r.id === id)
   if (selIdx >= 0 && selIdx < rows.length - 1) {
@@ -465,13 +455,7 @@ onMounted(async () => {
   if (!error && data) {
     book.value = data
     flatBookRanges.value = buildFlatBookRanges(data.ranges ?? [])
-    const recordsResult =
-      await NotebookBooksController.getNotebookBookReadingRecords({
-        path: { notebook: props.notebookId },
-      })
-    if (!recordsResult.error && recordsResult.data) {
-      bookReadingRecords.value = recordsResult.data
-    }
+    await bookReading.syncFromServer()
     if (data.hasSourceFile) {
       pdfLoading.value = true
       pdfError.value = null
