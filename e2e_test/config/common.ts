@@ -54,8 +54,20 @@ const commonConfig = {
 
       const testState: Record<string, unknown> = {}
 
+      // Cypress stores screenshots under screenshotsFolder (relative to projectRoot).
+      const projectRootForScreenshots =
+        typeof config.projectRoot === 'string' ? config.projectRoot : repoRoot
+      const screenshotsFolder =
+        typeof config.screenshotsFolder === 'string'
+          ? config.screenshotsFolder
+          : 'e2e_test/screenshots'
+      const screenshotsFolderAbsolute = resolve(
+        projectRootForScreenshots,
+        screenshotsFolder
+      )
+
       on('task', {
-        ...createCliE2ePluginTasks(repoRoot),
+        ...createCliE2ePluginTasks(repoRoot, { screenshotsFolderAbsolute }),
         setTestState({ key, value }: { key: string; value: unknown }) {
           testState[key] = value
           return null

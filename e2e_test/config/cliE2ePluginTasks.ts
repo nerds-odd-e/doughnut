@@ -2,7 +2,14 @@
  * Cypress `task` handlers for CLI E2E. Depends only on `repoRoot` (repo checkout path).
  */
 
-import { existsSync, mkdtempSync, unlinkSync, writeFileSync } from 'node:fs'
+import { randomBytes } from 'node:crypto'
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  unlinkSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { delimiter, dirname, join } from 'node:path'
 import { attachGoogleOAuthSimulation } from './cliE2eGoogleOAuthSimulation'
@@ -67,6 +74,14 @@ type CliInteractiveWriteRawTask = {
   data: string
 }
 
+/**
+ * Absolute path to Cypress {@link https://docs.cypress.io/app/references/configuration#Screenshots screenshotsFolder},
+ * e.g. `path.resolve(config.projectRoot, config.screenshotsFolder)` inside `setupNodeEvents`.
+ */
+export type CliE2ePluginTasksOptions = {
+  screenshotsFolderAbsolute: string
+}
+
 const INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING = 'doughnut 0.1.0'
 const INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS = 20_000
 const INSTALLED_CLI_INTERACTIVE_WRITE_SETTLE_MS = 500
@@ -84,7 +99,10 @@ async function bundleCliE2eInstallOrThrow(
   }
 }
 
-export function createCliE2ePluginTasks(repoRoot: string) {
+export function createCliE2ePluginTasks(
+  repoRoot: string,
+  options?: CliE2ePluginTasksOptions
+) {
   let interactiveCliPtyHandle: ManagedTtySession | null = null
 
   function disposeInteractiveCliPtySession(): void {
@@ -271,7 +289,30 @@ export function createCliE2ePluginTasks(repoRoot: string) {
           'cliInteractiveAssert: no active interactive CLI PTY session. Ensure @interactiveCLI started the session or run the installed CLI in interactive mode first.'
         )
       }
-      await handle.assert(managedTtyAssertTaskPayloadToOptions(body))
+      try {
+        await handle.assert(managedTtyAssertTaskPayloadToOptions(body))
+      } catch (err) {
+        const shots = options?.screenshotsFolderAbsolute
+        if (shots) {
+          try {
+            const dir = join(shots, 'cli-pty')
+            mkdirSync(dir, { recursive: true })
+            const fileName = `assert-failure-${Date.now()}-${randomBytes(4).toString('hex')}.png`
+            const filePath = join(dir, fileName)
+            const png = await handle.captureViewportPng()
+            writeFileSync(filePath, png)
+            if (err instanceof Error) {
+              err.message = `${err.message}\n\nTerminal viewport PNG: ${filePath}`
+            }
+          } catch (captureErr) {
+            console.error(
+              'cliInteractiveAssert: failed to capture terminal viewport PNG',
+              captureErr
+            )
+          }
+        }
+        throw err
+      }
       return null
     },
     async cliInteractiveWriteLine({
