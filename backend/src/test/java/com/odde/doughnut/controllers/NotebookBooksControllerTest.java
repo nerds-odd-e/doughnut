@@ -53,10 +53,12 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     return makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
   }
 
-  private Notebook notebookWithBook() throws Exception {
-    Notebook nb = myNotebook();
-    controller.attachBook(nb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
-    return nb;
+  private Notebook notebookWithBook() {
+    return makeMe
+        .aNotebook()
+        .creatorAndOwner(currentUser.getUser())
+        .withBook("Linear Algebra")
+        .please();
   }
 
   private Book bookOf(Notebook nb) {
@@ -74,14 +76,9 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     return makeMe.aNotebook().creatorAndOwner(makeMe.aUser().please()).please();
   }
 
-  private Notebook otherUsersNotebookWithBook() throws Exception {
-    User saved = currentUser.getUser();
+  private Notebook otherUsersNotebookWithBook() {
     User other = makeMe.aUser().please();
-    Notebook nb = makeMe.aNotebook().creatorAndOwner(other).please();
-    currentUser.setUser(other);
-    controller.attachBook(nb, attachRequest(node("X")), pdfFile(STUB_PDF_BYTES));
-    currentUser.setUser(saved);
-    return nb;
+    return makeMe.aNotebook().creatorAndOwner(other).withBook("Linear Algebra").please();
   }
 
   private static MultipartFile pdfFile(byte[] content) {
@@ -258,20 +255,20 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void hasSourceFileTrueWhenPdfStored() throws Exception {
+    void hasSourceFileTrueWhenPdfStored() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
       assertThat(controller.getBook(nb).getHasSourceFile(), equalTo(true));
     }
 
     @Test
-    void hasSourceFileFalseWhenSourceFileRefCleared() throws Exception {
+    void hasSourceFileFalseWhenSourceFileRefCleared() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
       setSourceFileRef(nb, null);
       assertThat(controller.getBook(nb).getHasSourceFile(), equalTo(false));
     }
 
     @Test
-    void doesNotReturnAnotherNotebooksBook() throws Exception {
+    void doesNotReturnAnotherNotebooksBook() {
       notebookWithBook();
       Notebook nb2 = myNotebook();
       assertThrows(ResponseStatusException.class, () -> controller.getBook(nb2));
@@ -287,7 +284,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void returns404WhenBookHasNoSourceFile() throws Exception {
+    void returns404WhenBookHasNoSourceFile() {
       Notebook nb = notebookWithBook();
       setSourceFileRef(nb, null);
       assertThrows(ResponseStatusException.class, () -> controller.getBookFile(nb));
@@ -300,7 +297,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void returnsPdfWhenSourceFileRefPointsAtBlob() throws Exception {
+    void returnsPdfWhenSourceFileRefPointsAtBlob() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
       byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
       setSourceFileRef(nb, bookStorage.put(pdfBytes));
@@ -316,14 +313,14 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void returns404WhenSourceFileRefIsNotNumeric() throws Exception {
+    void returns404WhenSourceFileRefIsNotNumeric() {
       Notebook nb = notebookWithBook();
       setSourceFileRef(nb, "not-an-id");
       assertThrows(ResponseStatusException.class, () -> controller.getBookFile(nb));
     }
 
     @Test
-    void returns404WhenSourceFileRefBlobMissing() throws Exception {
+    void returns404WhenSourceFileRefBlobMissing() {
       Notebook nb = notebookWithBook();
       setSourceFileRef(nb, String.valueOf(Integer.MAX_VALUE));
       assertThrows(ResponseStatusException.class, () -> controller.getBookFile(nb));
@@ -333,7 +330,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   @Nested
   class DeleteBook {
     @Test
-    void removesBookRowAndStoredBytes() throws Exception {
+    void removesBookRowAndStoredBytes() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
       String ref = bookOf(nb).getSourceFileRef();
 
@@ -358,7 +355,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void deletesBookWhenSourceFileRefMissing() throws Exception {
+    void deletesBookWhenSourceFileRefMissing() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
       setSourceFileRef(nb, null);
 
@@ -371,7 +368,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   @Nested
   class PatchReadingPosition {
     @Test
-    void persistsSnapshotForCurrentUserAndBook() throws Exception {
+    void persistsSnapshotForCurrentUserAndBook() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
 
       controller.patchReadingPosition(nb, lastReadBody(2, 750));
@@ -385,7 +382,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void secondPatchUpdatesSameRow() throws Exception {
+    void secondPatchUpdatesSameRow() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
 
       controller.patchReadingPosition(nb, lastReadBody(0, 100));
@@ -409,7 +406,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void rejectsNotebookWithoutReadAccess() throws Exception {
+    void rejectsNotebookWithoutReadAccess() {
       Notebook otherNb = otherUsersNotebookWithBook();
       assertThrows(
           UnexpectedNoAccessRightException.class,
@@ -417,7 +414,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void requiresLoggedInUser() throws Exception {
+    void requiresLoggedInUser() {
       Notebook nb = notebookWithBook();
       currentUser.setUser(null);
       assertThrows(
@@ -426,7 +423,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void removesPositionWhenBookDeleted() throws Exception {
+    void removesPositionWhenBookDeleted() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
       int bookId = bookOf(nb).getId();
       controller.patchReadingPosition(nb, lastReadBody(1, 500));
@@ -444,7 +441,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   @Nested
   class GetReadingPosition {
     @Test
-    void returnsSavedSnapshotAfterPatch() throws Exception {
+    void returnsSavedSnapshotAfterPatch() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
       controller.patchReadingPosition(nb, lastReadBody(3, 420));
 
@@ -457,7 +454,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void returns204WhenNoSnapshotStored() throws Exception {
+    void returns204WhenNoSnapshotStored() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
 
       ResponseEntity<BookUserLastReadPosition> res = controller.getReadingPosition(nb);
@@ -473,14 +470,14 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void rejectsNotebookWithoutReadAccess() throws Exception {
+    void rejectsNotebookWithoutReadAccess() {
       Notebook otherNb = otherUsersNotebookWithBook();
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.getReadingPosition(otherNb));
     }
 
     @Test
-    void requiresLoggedInUser() throws Exception {
+    void requiresLoggedInUser() {
       Notebook nb = notebookWithBook();
       currentUser.setUser(null);
       assertThrows(ResponseStatusException.class, () -> controller.getReadingPosition(nb));
@@ -490,7 +487,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   @Nested
   class PutRangeReadingRecord {
     @Test
-    void persistsReadRecordForCurrentUserAndRange() throws Exception {
+    void persistsReadRecordForCurrentUserAndRange() throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
       Notebook nb = notebookWithBook();
       BookRange range = rootRangesSorted(bookOf(nb)).getFirst();
@@ -506,7 +503,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void secondPutUpdatesCompletedAtAndKeepsSingleRow() throws Exception {
+    void secondPutUpdatesCompletedAtAndKeepsSingleRow() throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(0, 10).please());
       Notebook nb = notebookWithBook();
       BookRange range = rootRangesSorted(bookOf(nb)).getFirst();
@@ -524,7 +521,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void returns404WhenNotebookHasNoBook() throws Exception {
+    void returns404WhenNotebookHasNoBook() {
       Notebook nbEmpty = myNotebook();
       Notebook nbWith = notebookWithBook();
       BookRange range = rootRangesSorted(bookOf(nbWith)).getFirst();
@@ -534,7 +531,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void returns404WhenRangeBelongsToAnotherNotebooksBook() throws Exception {
+    void returns404WhenRangeBelongsToAnotherNotebooksBook() {
       Notebook otherNb = otherUsersNotebookWithBook();
       BookRange otherRange = rootRangesSorted(bookOf(otherNb)).getFirst();
       Notebook myNb = notebookWithBook();
@@ -544,7 +541,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void rejectsNotebookWithoutReadAccess() throws Exception {
+    void rejectsNotebookWithoutReadAccess() {
       Notebook otherNb = otherUsersNotebookWithBook();
       BookRange range = rootRangesSorted(bookOf(otherNb)).getFirst();
 
@@ -554,7 +551,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void requiresLoggedInUser() throws Exception {
+    void requiresLoggedInUser() {
       Notebook nb = notebookWithBook();
       BookRange range = rootRangesSorted(bookOf(nb)).getFirst();
       currentUser.setUser(null);

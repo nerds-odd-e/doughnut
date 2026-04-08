@@ -3,6 +3,7 @@ package com.odde.doughnut.testability;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.NoteEmbeddingService;
+import com.odde.doughnut.services.book.BookStorage;
 import com.odde.doughnut.testability.builders.*;
 import java.sql.Timestamp;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Component;
 public class MakeMe extends MakeMeWithoutDB {
   @Autowired public EntityPersister entityPersister;
   @Autowired public NoteEmbeddingService noteEmbeddingService;
+  @Autowired public BookStorage bookStorage;
+  @Autowired public TestabilitySettings testabilitySettings;
 
   private MakeMe() {}
 
@@ -53,6 +56,10 @@ public class MakeMe extends MakeMeWithoutDB {
 
   public NotebookBuilder theNotebook(Notebook notebook) {
     return new NotebookBuilder(notebook, this);
+  }
+
+  public BookBuilder aBook() {
+    return new BookBuilder(this);
   }
 
   public NoteBuilder theNote(Note note) {
