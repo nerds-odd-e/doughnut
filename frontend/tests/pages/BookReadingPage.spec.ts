@@ -198,6 +198,10 @@ describe("BookReadingPage", () => {
         >
       >
     )
+    vi.spyOn(
+      NotebookBooksController,
+      "getNotebookBookReadingRecords"
+    ).mockResolvedValue(wrapSdkResponse([]))
   })
 
   it("shows fetch error when book file returns an error status", async () => {
@@ -514,6 +518,26 @@ describe("BookReadingPage", () => {
       })
     }
 
+    it("shows read border for ranges returned as READ from reading-records on load", async () => {
+      vi.spyOn(
+        NotebookBooksController,
+        "getNotebookBookReadingRecords"
+      ).mockResolvedValue(
+        wrapSdkResponse([
+          {
+            bookRangeId: "1",
+            status: "READ",
+            completedAt: "2020-01-01T00:00:00Z",
+          },
+        ])
+      )
+      const wrapper = await mountLoadedBookWithRanges(notebookId)
+      const section1Row = wrapper
+        .findAll('[data-testid="book-reading-book-range"]')
+        .find((w) => w.text().trim().startsWith("Section 1"))
+      expect(section1Row?.attributes("data-direct-content-read")).toBe("true")
+    })
+
     it("shows the panel when the selected range’s successor is the viewport current range", async () => {
       const wrapper = await mountLoadedBookWithRanges(notebookId)
       await clickBookRangeByTitle(wrapper, "Section 1")
@@ -596,6 +620,27 @@ describe("BookReadingPage", () => {
     })
 
     it("moves book layout selection to the successor range after Mark as read", async () => {
+      let recordFetches = 0
+      vi.spyOn(
+        NotebookBooksController,
+        "getNotebookBookReadingRecords"
+      ).mockImplementation(async () => {
+        recordFetches += 1
+        if (recordFetches === 1) {
+          return wrapSdkResponse([])
+        }
+        return wrapSdkResponse([
+          {
+            bookRangeId: "1",
+            status: "READ",
+            completedAt: "2020-01-01T00:00:00Z",
+          },
+        ])
+      })
+      vi.spyOn(
+        NotebookBooksController,
+        "putNotebookBookRangeReadingRecord"
+      ).mockResolvedValue(wrapSdkResponse(undefined))
       const wrapper = await mountLoadedBookWithRanges(notebookId)
       await clickBookRangeByTitle(wrapper, "Section 1")
       await vi.waitFor(() =>
@@ -622,6 +667,27 @@ describe("BookReadingPage", () => {
     })
 
     it("unmounts the reading control panel after Mark as read once it was shown", async () => {
+      let recordFetches = 0
+      vi.spyOn(
+        NotebookBooksController,
+        "getNotebookBookReadingRecords"
+      ).mockImplementation(async () => {
+        recordFetches += 1
+        if (recordFetches === 1) {
+          return wrapSdkResponse([])
+        }
+        return wrapSdkResponse([
+          {
+            bookRangeId: "1",
+            status: "READ",
+            completedAt: "2020-01-01T00:00:00Z",
+          },
+        ])
+      })
+      vi.spyOn(
+        NotebookBooksController,
+        "putNotebookBookRangeReadingRecord"
+      ).mockResolvedValue(wrapSdkResponse(undefined))
       const wrapper = await mountLoadedBookWithRanges(notebookId)
       await clickBookRangeByTitle(wrapper, "Section 1")
       await vi.waitFor(() =>

@@ -109,7 +109,7 @@
                 range.id === currentSelectionRangeId ? 'true' : undefined
               "
               :data-direct-content-read="
-                inMemoryReadRangeIds.has(range.id) ? 'true' : undefined
+                readRangeIdSet.has(range.id) ? 'true' : undefined
               "
               :aria-current="
                 range.startAnchor.id === currentRangeAnchorId
@@ -121,7 +121,7 @@
             >
               {{ range.title }}
               <span
-                v-if="inMemoryReadRangeIds.has(range.id)"
+                v-if="readRangeIdSet.has(range.id)"
                 class="daisy-sr-only"
               >
                 Marked as read
@@ -179,21 +179,17 @@ import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounc
 import { createCurrentRangeAnchorDebouncer } from "@/lib/book-reading/debounceCurrentRangeAnchorId"
 import { nextLiveAnnouncementText } from "@/lib/book-reading/currentRangeLiveAnnouncement"
 import { currentRangeAnchorIdFromAnchorPage } from "@/lib/book-reading/currentRangeAnchorFromAnchorPage"
+import { readRangeIdsFromRecords } from "@/lib/book-reading/readRangeIdsFromRecords"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type {
   BookAnchorFull,
   BookFull,
   BookRangeFull,
+  BookRangeReadingRecordListItem,
 } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
-import {
-  computed,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  shallowRef,
-  watch,
-} from "vue"
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
 const CURRENT_RANGE_ANCHOR_DEBOUNCE_MS = 120
@@ -282,7 +278,10 @@ const bookRangeRows = computed(() => flatBookRanges.value)
 const currentSelectionRangeId = ref<number | null>(null)
 const currentRangeAnchorId = ref<number | null>(null)
 
-const inMemoryReadRangeIds = shallowRef(new Set<number>())
+const bookReadingRecords = ref<BookRangeReadingRecordListItem[]>([])
+const readRangeIdSet = computed(() =>
+  readRangeIdsFromRecords(bookReadingRecords.value)
+)
 
 const readingControlSelectedRangeTitle = computed(() => {
   const selId = currentSelectionRangeId.value
@@ -303,21 +302,34 @@ const readingControlPanelVisible = computed(() => {
   if (selIdx < 0 || selIdx >= rows.length - 1) {
     return false
   }
-  if (inMemoryReadRangeIds.value.has(selId)) {
+  if (readRangeIdSet.value.has(selId)) {
     return false
   }
   const successor = rows[selIdx + 1]!
   return successor.startAnchor.id === curAnchorId
 })
 
-function markSelectedRangeAsRead() {
+async function markSelectedRangeAsRead() {
   const id = currentSelectionRangeId.value
   if (id === null) {
     return
   }
-  const next = new Set(inMemoryReadRangeIds.value)
-  next.add(id)
-  inMemoryReadRangeIds.value = next
+  const result = await apiCallWithLoading(async () => {
+    const putRes =
+      await NotebookBooksController.putNotebookBookRangeReadingRecord({
+        path: { notebook: props.notebookId, bookRange: id },
+      })
+    if (putRes.error) {
+      return putRes
+    }
+    return NotebookBooksController.getNotebookBookReadingRecords({
+      path: { notebook: props.notebookId },
+    })
+  })
+  if (result.error || result.data === undefined) {
+    return
+  }
+  bookReadingRecords.value = result.data
   const rows = bookRangeRows.value
   const selIdx = rows.findIndex((r) => r.id === id)
   if (selIdx >= 0 && selIdx < rows.length - 1) {
@@ -460,6 +472,13 @@ onMounted(async () => {
   if (!error && data) {
     book.value = data
     flatBookRanges.value = buildFlatBookRanges(data.ranges ?? [])
+    const recordsResult =
+      await NotebookBooksController.getNotebookBookReadingRecords({
+        path: { notebook: props.notebookId },
+      })
+    if (!recordsResult.error && recordsResult.data) {
+      bookReadingRecords.value = recordsResult.data
+    }
     if (data.hasSourceFile) {
       pdfLoading.value = true
       pdfError.value = null

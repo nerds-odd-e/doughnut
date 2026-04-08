@@ -84,16 +84,6 @@ class NotebookBooksController {
   @Operation(
       operationId = "getNotebookBookReadingRecords",
       summary = "List reading records for the notebook book (current user)")
-  @ApiResponses({
-    @ApiResponse(
-        responseCode = "200",
-        description = "Reading records for ranges in this book",
-        content =
-            @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema =
-                    @Schema(type = "array", implementation = BookRangeReadingRecordListItem.class)))
-  })
   @GetMapping("/{notebook}/book/reading-records")
   @Transactional(readOnly = true)
   public List<BookRangeReadingRecordListItem> getBookReadingRecords(

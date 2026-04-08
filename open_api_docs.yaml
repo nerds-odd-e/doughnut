@@ -2564,12 +2564,13 @@ paths:
           type: integer
       responses:
         "200":
-          description: Reading records for ranges in this book
+          description: OK
           content:
-            application/json:
+            '*/*':
               schema:
                 type: array
-                $ref: "#/components/schemas/BookRangeReadingRecordListItem"
+                items:
+                  $ref: "#/components/schemas/BookRangeReadingRecordListItem"
   /api/notebooks/{notebook}/book/file:
     get:
       tags:

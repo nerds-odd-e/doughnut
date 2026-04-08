@@ -3091,9 +3091,9 @@ export type GetNotebookBookReadingRecordsData = {
 
 export type GetNotebookBookReadingRecordsResponses = {
     /**
-     * Reading records for ranges in this book
+     * OK
      */
-    200: BookRangeReadingRecordListItem;
+    200: Array<BookRangeReadingRecordListItem>;
 };
 
 export type GetNotebookBookReadingRecordsResponse = GetNotebookBookReadingRecordsResponses[keyof GetNotebookBookReadingRecordsResponses];
