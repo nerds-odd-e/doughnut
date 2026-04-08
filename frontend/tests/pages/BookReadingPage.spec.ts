@@ -479,4 +479,147 @@ describe("BookReadingPage", () => {
       expect(toggle.attributes("aria-expanded")).toBe("true")
     })
   })
+
+  describe("Reading control panel", () => {
+    function readingControlPanel(wrapper: BookReadingPageWrapper) {
+      return wrapper.find('[data-testid="book-reading-reading-control-panel"]')
+    }
+
+    async function clickBookRangeByTitle(
+      wrapper: BookReadingPageWrapper,
+      title: string
+    ) {
+      const row = wrapper
+        .findAll('[data-testid="book-reading-book-range"]')
+        .find((w) => w.text() === title)
+      expect(row, `book range row "${title}"`).toBeDefined()
+      await row!.trigger("click")
+      await flushPromises()
+    }
+
+    async function emitViewportAndSettleCurrentRange(
+      wrapper: BookReadingPageWrapper,
+      payload: {
+        anchorPageIndexZeroBased: number
+        viewport: { top: number; mid: number; bottom: number } | null
+        pagesCount: number
+      }
+    ) {
+      const pdf = wrapper.findComponent(PdfBookViewer)
+      await withFakeTimers(async () => {
+        pdf.vm.$emit("viewportAnchorPage", payload)
+        await vi.advanceTimersByTimeAsync(CURRENT_RANGE_ANCHOR_DEBOUNCE_MS)
+        await flushPromises()
+      })
+    }
+
+    it("shows the panel when the selected range’s successor is the viewport current range", async () => {
+      const wrapper = await mountLoadedBookWithRanges(notebookId)
+      await clickBookRangeByTitle(wrapper, "Section 1")
+      await vi.waitFor(() =>
+        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+          "Section 1"
+        )
+      )
+
+      await emitViewportAndSettleCurrentRange(wrapper, {
+        anchorPageIndexZeroBased: 0,
+        viewport: { top: 0, mid: 500, bottom: 1000 },
+        pagesCount: 10,
+      })
+
+      const current = wrapper.find('[data-current-range="true"]')
+      expect(current.text()).toBe("Section 2")
+
+      const panel = readingControlPanel(wrapper)
+      expect(panel.exists()).toBe(true)
+      expect(panel.isVisible()).toBe(true)
+      expect(panel.text()).toContain("Section 1")
+      expect(
+        wrapper.find('[data-testid="book-reading-mark-as-read"]').exists()
+      ).toBe(true)
+    })
+
+    it("hides the panel when nothing is selected", async () => {
+      const wrapper = await mountLoadedBookWithRanges(notebookId)
+
+      await emitViewportAndSettleCurrentRange(wrapper, {
+        anchorPageIndexZeroBased: 0,
+        viewport: { top: 0, mid: 500, bottom: 1000 },
+        pagesCount: 10,
+      })
+
+      expect(readingControlPanel(wrapper).exists()).toBe(false)
+    })
+
+    it("hides the panel when the current range is not the immediate successor of the selection", async () => {
+      const wrapper = await mountLoadedBookWithRanges(notebookId)
+      await clickBookRangeByTitle(wrapper, "Section 1")
+      await vi.waitFor(() =>
+        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+          "Section 1"
+        )
+      )
+
+      await emitViewportAndSettleCurrentRange(wrapper, {
+        anchorPageIndexZeroBased: 0,
+        viewport: { top: 400, mid: 600, bottom: 1000 },
+        pagesCount: 10,
+      })
+
+      expect(wrapper.find('[data-current-range="true"]').text()).toBe(
+        "Section 3"
+      )
+      expect(readingControlPanel(wrapper).exists()).toBe(false)
+    })
+
+    it("hides the panel when the selected range has no successor", async () => {
+      const wrapper = await mountLoadedBookWithRanges(notebookId)
+      await clickBookRangeByTitle(wrapper, "Section 6")
+      await vi.waitFor(() =>
+        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+          "Section 6"
+        )
+      )
+
+      await emitViewportAndSettleCurrentRange(wrapper, {
+        anchorPageIndexZeroBased: 1,
+        viewport: null,
+        pagesCount: 10,
+      })
+
+      expect(wrapper.find('[data-current-range="true"]').text()).toBe(
+        "Section 6"
+      )
+      expect(readingControlPanel(wrapper).exists()).toBe(false)
+    })
+
+    it("leaves the book layout selection unchanged after Mark as read", async () => {
+      const wrapper = await mountLoadedBookWithRanges(notebookId)
+      await clickBookRangeByTitle(wrapper, "Section 1")
+      await vi.waitFor(() =>
+        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+          "Section 1"
+        )
+      )
+
+      await emitViewportAndSettleCurrentRange(wrapper, {
+        anchorPageIndexZeroBased: 0,
+        viewport: { top: 0, mid: 500, bottom: 1000 },
+        pagesCount: 10,
+      })
+
+      await readingControlPanel(wrapper)
+        .find('[data-testid="book-reading-mark-as-read"]')
+        .trigger("click")
+      await flushPromises()
+
+      expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+        "Section 1"
+      )
+      expect(wrapper.find('[data-current-range="true"]').text()).toBe(
+        "Section 2"
+      )
+    })
+  })
 })
