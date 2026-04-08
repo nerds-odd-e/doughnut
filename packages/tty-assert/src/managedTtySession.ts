@@ -201,7 +201,9 @@ export function attachManagedTtySession(
             messagePrefix,
             formatSearchSurfaceFailure(opts.surface, detail, lastFail.snapshot)
           )
-          throw new Error(appendManagedAssertFailureDiagnostics(body, raw, term))
+          throw new Error(
+            appendManagedAssertFailureDiagnostics(body, raw, term)
+          )
         }
         await sleep(retryMs)
       }

@@ -70,7 +70,9 @@ function numberedSnapshotForError(snapshot: string): string {
 export const TERMINAL_ERROR_FINAL_VIEWPORT_HEADING =
   '--- Final visible screen (viewport) ---'
 
-export function formatFinalViewportPlaintextForError(viewportPlain: string): string {
+export function formatFinalViewportPlaintextForError(
+  viewportPlain: string
+): string {
   const snap = numberedSnapshotForError(viewportPlain)
   return `${TERMINAL_ERROR_FINAL_VIEWPORT_HEADING}\n${snap}\n---`
 }
