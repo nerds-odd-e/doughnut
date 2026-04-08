@@ -56,17 +56,20 @@ describe('waitForTextInSurface', () => {
     })
   })
 
-  it('failure message names the surface and includes a snapshot block', async () => {
-    await expect(
-      waitForTextInSurface({
-        raw: 'only this',
-        needle: 'missing',
-        surface: 'viewableBuffer',
-        cols: 10,
-        rows: 2,
-        timeoutMs: 0,
-      })
-    ).rejects.toThrow(/surface "viewableBuffer"[\s\S]*---\n/)
+  it('failure message names the surface, row-numbers the snapshot, and wraps it in ---', async () => {
+    const err = await waitForTextInSurface({
+      raw: 'only this',
+      needle: 'missing',
+      surface: 'viewableBuffer',
+      cols: 10,
+      rows: 2,
+      timeoutMs: 0,
+    }).catch((e: unknown) => e)
+    expect(err).toBeInstanceOf(Error)
+    const msg = (err as Error).message
+    expect(msg).toContain('surface "viewableBuffer"')
+    expect(msg).toMatch(/\d+ \| /)
+    expect(msg).toMatch(/---\n[\s\S]*\n---/)
   })
 
   it('failure message includes ANSI-stripped raw snapshot and optional messagePrefix', async () => {

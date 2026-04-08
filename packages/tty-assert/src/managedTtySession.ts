@@ -1,6 +1,8 @@
 import { Terminal } from '@xterm/headless'
 import {
+  TERMINAL_ERROR_RAW_TAIL_BYTES,
   formatRawTerminalSnapshotForError,
+  formatSearchSurfaceFailure,
   headPreview,
   sanitizeVisibleTextForError,
   tailPreview,
@@ -40,22 +42,6 @@ export type ManagedTtyAssertOptions = Omit<WaitForTextInSurfaceOptions, 'raw'>
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-function formatFailureMessage(
-  surface: WaitForTextInSurfaceOptions['surface'],
-  detail: string,
-  snapshot: string
-): string {
-  const snap =
-    snapshot.length > 8000
-      ? `${snapshot.slice(0, 8000)}\n… (truncated)`
-      : snapshot
-  const note =
-    surface === 'strippedTranscript'
-      ? 'Search uses the ANSI-stripped cumulative transcript (same text as the snapshot below).'
-      : 'Snapshot: newline-separated trimmed rows. Matching uses a flat row-major block with no newlines between rows.'
-  return `${detail}\nSearch surface: "${surface}".\n${note}\n---\n${snap}\n---`
 }
 
 const CLI_TERMINAL_RAW_SNAPSHOT_HEADING =
@@ -183,7 +169,11 @@ export function attachManagedTtySession(
         if (result.ok === 'strict') {
           const body = withOptionalMessagePrefix(
             messagePrefix,
-            formatFailureMessage(opts.surface, result.message, result.snapshot)
+            formatSearchSurfaceFailure(
+              opts.surface,
+              result.message,
+              result.snapshot
+            )
           )
           throw new TtyAssertStrictModeViolationError(
             appendRawTerminalSnapshotForErrorMessage(body, raw)
@@ -198,7 +188,7 @@ export function attachManagedTtySession(
               : `Timeout after ${timeoutMs}ms. ${lastFail.detail}`
           const body = withOptionalMessagePrefix(
             messagePrefix,
-            formatFailureMessage(opts.surface, detail, lastFail.snapshot)
+            formatSearchSurfaceFailure(opts.surface, detail, lastFail.snapshot)
           )
           throw new Error(appendRawTerminalSnapshotForErrorMessage(body, raw))
         }
@@ -220,7 +210,7 @@ export function attachManagedTtySession(
         replayedScreenPlaintextTailPreview: tailPreview(replayed),
         strippedTranscriptTailPreview: tailPreview(stripped),
         rawTailSanitizedPreview: sanitizeVisibleTextForError(
-          tailPreview(raw.slice(-800))
+          tailPreview(raw.slice(-TERMINAL_ERROR_RAW_TAIL_BYTES))
         ),
       }
     },

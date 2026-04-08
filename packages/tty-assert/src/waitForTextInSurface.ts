@@ -31,7 +31,10 @@ import {
   validateAndResolveCellExpectations,
   type CellExpectationBlock,
 } from './cellExpectations'
-import { formatRawTerminalSnapshotForError } from './errorSnapshotFormatting'
+import {
+  formatRawTerminalSnapshotForError,
+  formatSearchSurfaceFailure,
+} from './errorSnapshotFormatting'
 import { CLI_INTERACTIVE_PTY_COLS, CLI_INTERACTIVE_PTY_ROWS } from './geometry'
 import { attemptOnce } from './surfaceAttemptOnTerminal'
 
@@ -89,22 +92,6 @@ function sleep(ms: number): Promise<void> {
 
 function resolveRaw(raw: string | (() => string)): string {
   return typeof raw === 'function' ? raw() : raw
-}
-
-function formatFailureMessage(
-  surface: TtySearchSurface,
-  detail: string,
-  snapshot: string
-): string {
-  const snap =
-    snapshot.length > 8000
-      ? `${snapshot.slice(0, 8000)}\n… (truncated)`
-      : snapshot
-  const note =
-    surface === 'strippedTranscript'
-      ? 'Search uses the ANSI-stripped cumulative transcript (same text as the snapshot below).'
-      : 'Snapshot: newline-separated trimmed rows. Matching uses a flat row-major block with no newlines between rows.'
-  return `${detail}\nSearch surface: "${surface}".\n${note}\n---\n${snap}\n---`
 }
 
 const CLI_TERMINAL_RAW_SNAPSHOT_HEADING =
@@ -169,7 +156,11 @@ export async function waitForTextInSurface(
     if (result.ok === 'strict') {
       const body = withOptionalMessagePrefix(
         messagePrefix,
-        formatFailureMessage(opts.surface, result.message, result.snapshot)
+        formatSearchSurfaceFailure(
+          opts.surface,
+          result.message,
+          result.snapshot
+        )
       )
       throw new TtyAssertStrictModeViolationError(
         appendRawTerminalSnapshotForErrorMessage(body, raw)
@@ -184,7 +175,7 @@ export async function waitForTextInSurface(
           : `Timeout after ${timeoutMs}ms. ${lastFail.detail}`
       const body = withOptionalMessagePrefix(
         messagePrefix,
-        formatFailureMessage(opts.surface, detail, lastFail.snapshot)
+        formatSearchSurfaceFailure(opts.surface, detail, lastFail.snapshot)
       )
       throw new Error(appendRawTerminalSnapshotForErrorMessage(body, raw))
     }

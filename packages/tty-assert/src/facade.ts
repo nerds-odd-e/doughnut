@@ -12,6 +12,7 @@
  */
 
 import {
+  TERMINAL_ERROR_RAW_TAIL_BYTES,
   headPreview,
   sanitizeVisibleTextForError,
   tailPreview,
@@ -112,7 +113,7 @@ function createHandle(session: BufferedPtySession): TtyAssertTerminalHandle {
         replayedScreenPlaintextTailPreview: tailPreview(replayed),
         strippedTranscriptTailPreview: tailPreview(stripped),
         rawTailSanitizedPreview: sanitizeVisibleTextForError(
-          tailPreview(raw.slice(-800))
+          tailPreview(raw.slice(-TERMINAL_ERROR_RAW_TAIL_BYTES))
         ),
       }
     },
