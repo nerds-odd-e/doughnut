@@ -163,6 +163,7 @@
       "core-js",
       "core-js-pure",
       "cypress",
+      "canvas",
       "esbuild",
       "github_action_sound",
       "package-with-necessary-build-scripts",

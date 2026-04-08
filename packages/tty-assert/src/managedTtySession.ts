@@ -17,6 +17,7 @@ import {
 } from './ptySession'
 import { validateAndResolveCellExpectations } from './cellExpectations'
 import { viewportPlaintextFromHeadlessTerminal } from './ptyTranscriptToVisiblePlaintextViaXterm'
+import { viewportPngFromHeadlessTerminal } from './viewportPngFromHeadlessTerminal'
 import {
   attemptOnceOnLiveTerminal,
   attemptOnceStrippedTranscript,
@@ -79,6 +80,7 @@ export type ManagedTtySession = {
   write(data: string): void
   submit(line: string): void
   assert(opts: ManagedTtyAssertOptions): Promise<void>
+  captureViewportPng(): Promise<Buffer>
   dumpFrames(): Promise<ManagedTtySessionDumpFrames>
   dispose(): void
 }
@@ -207,6 +209,13 @@ export function attachManagedTtySession(
         }
         await sleep(retryMs)
       }
+    },
+    async captureViewportPng(): Promise<Buffer> {
+      if (disposed) {
+        throw new Error('ManagedTtySession.captureViewportPng after dispose')
+      }
+      await syncReplay()
+      return viewportPngFromHeadlessTerminal(term)
     },
     async dumpFrames(): Promise<ManagedTtySessionDumpFrames> {
       if (disposed) {
