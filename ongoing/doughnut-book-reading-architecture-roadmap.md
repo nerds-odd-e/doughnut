@@ -2,7 +2,7 @@
 
 This document is **not** a delivery plan. It does not define phased user-visible work (for that, see `.cursor/rules/planning.mdc` and a future `ongoing/<short-name>.md` plan when one exists). It **is** the guideline for **architecture direction**: how we want concepts and boundaries to line up so implementation can stay coherent as features land.
 
-**Companion:** market and product research stays in `ongoing/book-reading-research-report.md`. That report is now cross-walked to the vocabulary below.
+**Companion:** market and product research stays in `ongoing/book-reading-research-report.md`. That report is now cross-walked to the vocabulary below. **UX/UI behavior** (drawer, PDF chrome, **Reading Control Panel**) — [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md).
 
 **Living document:** When a book-reading plan is written and executed, **update this roadmap** so it stays the single place for “what we believe the shape of the system should be.” Do not duplicate long architecture prose inside the plan; link here instead. **Delivery plan for “Read a range of a book”:** [`ongoing/book-reading-read-a-range-plan.md`](book-reading-read-a-range-plan.md).
 
@@ -121,7 +121,9 @@ Each `BookRange` also has a conceptual association to **direct content** (see ne
 | **Direct content skimmed** | The user skimmed it (lighter than “read”). |
 | **No direct content found** | There is no meaningful gap (e.g. adjacent anchors, or structure implies none). |
 
-These dispositions are **not** persisted in the current architecture; they document the **intended states** when we model reading behavior. The diagram shows them as **`DirectContentReadingState`** linked conceptually to `BookRange`.
+These dispositions are **not** persisted until the reading-record work lands; they document the **intended states** when we model reading behavior. The diagram shows them as **`DirectContentReadingState`** linked conceptually to `BookRange`.
+
+**UI surface (direction):** The user affirms direct-content disposition from a **Reading Control Panel** anchored **near the bottom of the PDF main pane**, expandable to full actions or **minimized** to one or two controls — see [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md). This keeps progress actions **book-local** and avoids competing with the outline drawer or global chrome for primary attention.
 
 ### SourceSpan
 
@@ -155,7 +157,7 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 - **One span per note (initially):** Keeps PKM extraction simple; multi-span and cross-book evidence are explicit future extensions.
 - **`structuralTitle` on `BookRange`:** Human-readable title for the range in the book’s structure tree; parent chain + title is enough to reconstruct display paths when needed.
 - **No `StructuralBookRange` subtype yet:** Structural vs user-carved ranges may be distinguished later if the product requires it (e.g. import vs override).
-- **Direct content is conceptual only:** Naming the gap between ranges (and the four dispositions) keeps UX and future progress modeling aligned; **no** DB column or API field is implied yet.
+- **Direct content is conceptual in data until reading record ships:** Naming the gap between ranges (and the four dispositions) keeps UX and progress modeling aligned. **Persistence** of disposition follows **`ReadingRecord`** (and related API) per [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md); the **Reading Control Panel** is the intended **primary in-reader** control for those actions — [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md).
 
 ---
 

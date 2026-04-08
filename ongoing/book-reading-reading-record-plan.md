@@ -4,7 +4,7 @@
 
 **Architecture (ReadingRecord, BookRange, direct content vocabulary):** [`ongoing/doughnut-book-reading-architecture-roadmap.md`](doughnut-book-reading-architecture-roadmap.md).
 
-**UX context (drawer, outline, viewport-current):** [`ongoing/book-reading-ux-ui-roadmap-phases-4-7.md`](book-reading-ux-ui-roadmap-phases-4-7.md) and shipped Story 2 work in [`ongoing/book-reading-read-a-range-plan.md`](book-reading-read-a-range-plan.md).
+**UX context (drawer, outline, viewport-current, Reading Control Panel):** [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md) and shipped Story 2 work in [`ongoing/book-reading-read-a-range-plan.md`](book-reading-read-a-range-plan.md).
 
 **Planning rules:** `.cursor/rules/planning.mdc` — one **user-visible** behavior per phase, scenario-first ordering, test-first workflow when adding behavior, at most one intentionally failing test while driving a phase.
 
@@ -50,17 +50,19 @@
 
 **User story scenario:** *mark a book range as read* — at title “2.3 …”, answer **read** to whether the **direct content** of “2.2 …” was read; outline shows “2.3 …” (or the range that encodes the confirmed disposition—interpret per final copy) as **read**.
 
+**UX (Reading Control Panel):** The user completes this flow from the **Reading Control Panel** — a **bottom-anchored** region **inside the PDF main pane** (see [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md)). **Expanded:** short context (which range’s **direct content** is in question) and **Mark as read** (and room for later skim/skip). **Minimized:** a **small bar** with **one or two** controls (e.g. expand + quick mark, or equivalent). The panel must **not** capture document scroll; PDF remains the hero. Product copy still ties the **question** to the **previous** range’s direct content in reading order unless the story is updated in `book-reading-user-stories.md` in the same PR.
+
 **Clarify in implementation (product copy):** The Gherkin ties the **question** to the **previous** range’s direct content and an **observable mark** on a range; adjust labels and which row shows the checkmark so the UI matches the story **literally** or update the story in `book-reading-user-stories.md` in the same PR as the behavior. The plan assumes: user **confirms disposition** for **direct content belonging to a specific predecessor range** in reading order, and **persistence** reflects that as a **`ReadingRecord`** (or one row per user + range).
 
 **User outcome:**
 
-- Server persists **`ReadingRecord`** (per user, per `BookRange`) with at least **status = read** and sensible **timestamps** (`startedAt` / `lastReadAt` / `completedAt` as appropriate — minimal first slice: mark **completed** when they answer read).
+- Server persists **`ReadingRecord`** (per user, per `BookRange`) with at least **status = read** and sensible **timestamps** (`startedAt` / `lastReadAt` / `completedAt` as appropriate — minimal first slice: mark **completed** when they confirm read).
 - Book JSON (or a dedicated endpoint the page already calls) exposes enough for the outline to **render read state** for ranges that have a record.
-- The user can complete the **question → answer read** flow without breaking PDF scroll or drawer behavior.
+- The user can complete **confirm read** from the panel **without** breaking PDF scroll, pinch/zoom, or drawer behavior; panel can be **minimized** after use if product wants that default.
 
 **Data model:** New table/entity aligned with roadmap diagram: `User` + `BookRange` + status + timestamps; enforce **uniqueness** (user + book_range_id). Foreign keys consistent with existing `book_range` and user entities.
 
-**E2E:** Fixture outline with **distinct titles** “2.2 …” and “2.3 …” (or equivalent) → drive scroll/selection so the **prompt** appears → answer **read** → assert **visible mark** on the correct outline row (DOM attribute or text pattern stable for Cypress).
+**E2E:** Fixture outline with **distinct titles** “2.2 …” and “2.3 …” (or equivalent) → drive scroll/selection so the panel shows the **expected context** → user activates **Mark as read** (from expanded or minimized state, per chosen default) → assert **visible mark** on the correct outline row (DOM attribute or text pattern stable for Cypress).
 
 **Unit / focused tests (optional but useful):** Status transitions, invalid range id, wrong notebook/book — via controller or service black-box tests per `.cursor/rules/backend-development.mdc`.
 
@@ -87,7 +89,7 @@ Keep **one behavior’s assertions together** (one focused test class or `descri
 
 **User story scenario:** *mark a book range as skimmed/skipped* (Gherkin to be completed in `book-reading-user-stories.md` when this phase starts).
 
-**User outcome:** The same flow family as Phase 2 supports **skimmed** and **skipped** (aligned with **Direct content disposition** names in the architecture doc: skimmed / skipped vs read). Outline distinguishes states **at least** as much as product requires (could be icon, label, or shared “touched” vs “completed” — decide in implementation; roadmap allows enum-style status).
+**User outcome:** The same flow family as Phase 2 supports **skimmed** and **skipped** from the **Reading Control Panel** (expanded actions), aligned with **Direct content disposition** names in the architecture doc. Outline distinguishes states **at least** as much as product requires (could be icon, label, or shared “touched” vs “completed” — decide in implementation; roadmap allows enum-style status).
 
 **Depends on:** Phase 2 (and reuses Phase 3 heuristic only if skim/skip also applies to “no prompt” cases—optional; do not expand scope unless a single cohesive UX falls out naturally).
 

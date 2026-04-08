@@ -42,7 +42,7 @@ Then I should be starting from the same position
 ### mark a book range as read
 
 Given I scroll to title "2.3 xxx" 
-When I answer "read" to the question if the direct content of title "2.2 xxxx" is read
+When I answer "read" to the question if the direct content of title "2.2 xxxx" is read in the Reading Control Panel
 Then I should see that book range "2.3 xxxx" is marked as read in the book layout
 
 ### mark a book range with no direct content as read automatically
