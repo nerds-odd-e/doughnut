@@ -10,7 +10,7 @@
 
 **Planning rules:** `.cursor/rules/planning.mdc` — one **user-visible** behavior per sub-phase where possible; scenario-first ordering; observable tests; **no dead production code** (each sub-phase leaves only code that current tests or user flows use); at most one intentionally failing test while driving a change.
 
-**Status:** Planning only — **do not execute** until picked up for implementation.
+**Status:** Planning only — **do not execute** later sub-phases (**2.12–2.14**) until picked up. **2.11** may commit **only** the Flyway migration ahead of application code (schema-first).
 
 ---
 
@@ -31,7 +31,7 @@ And I should see that book range "2.2 xxx" is selected in the book layout
 | **Choose** the book range | User establishes **selected range** in the book layout (distinct from **current range** driven by PDF viewport where the product already distinguishes them — see shipped Story 2 sync). |
 | **Scroll the PDF until** the book range "2.2 …" **is the current range** | PDF viewport + sync logic yield **current range** = that **book range** (same **reading-order walk** as today’s current-range highlight). |
 | **Reading Control Panel** | Bottom-anchored control in the **PDF main pane** per UX roadmap; **does not** own document scroll. |
-| **Mark "2.1 …" as read** | Records disposition for **the selected range’s direct content** (conceptually the gap **from 2.1’s start through the next range’s start in reading order** — architecture *direct content*). The disposition attaches to **book range 2.1**, not to 2.2. **Before the persistence sub-phase (2.11):** session **in-memory** only. **From 2.11 onward:** server **`ReadingRecord`** (`ReadingRecord` → `BookRange`) via DB + API. |
+| **Mark "2.1 …" as read** | Records disposition for **the selected range’s direct content** (conceptually the gap **from 2.1’s start through the next range’s start in reading order** — architecture *direct content*). The disposition attaches to **book range 2.1**, not to 2.2. **Before persistence is wired in the UI (through 2.10):** session **in-memory** only. **From sub-phase 2.14 onward:** the **Reading Control Panel** persists via server **`ReadingRecord`** (`ReadingRecord` → `BookRange`) and **refreshes** from **`GET …/book`**. (Backend **write** exists from **2.12**; **GET** carries read state from **2.13**.) |
 | **Marked as read in the book layout** | **Observable** styling on the **2.1** row: **right border** in a **fixed semantic color** (exact token: pick one DaisyUI / Tailwind semantic and reuse everywhere). |
 | **"2.2 …" is selected** | After the action, the layout still reflects **2.2** as the **active selection** row (the same notion as “chosen” / selection affordance used elsewhere on the book reading page — **not** necessarily the same CSS as *current range* if the product keeps two tracks; the scenario asserts the **selection** track matches 2.2). **Design rule:** Marking read **must not** steal selection back to 2.1 or clear selection in a way that contradicts this Then. |
 
@@ -46,21 +46,21 @@ And I should see that book range "2.2 xxx" is selected in the book layout
 
 ## Design decisions (record)
 
-1. **Frontend-first, in-memory until 2.11** — Sub-phases **2.1–2.10** drive and implement the **in-memory** story **from Cypress** (see **E2E-driven cycle** below). **No** Flyway, **no** new reading-record HTTP surface until **2.11**, and **no** requirement that the scenario **survives reload** or **hydrates from server** — the Cypress path stays in **one session** with state held in the running app.
+1. **Frontend-first, in-memory through 2.10** — Sub-phases **2.1–2.10** drive the **in-memory** story **from Cypress** (see **E2E-driven cycle** below). **No** requirement that the scenario **survives reload** or **hydrates from server** until the **frontend persistence slice (2.14)** — the Cypress path may stay in **one session** with state held in the running app through **2.10**. **Sub-phase 2.11** may add **only** the **Flyway** table for reading records (**no** application code using it yet). **No** reading-record **HTTP** surface until **2.12** (write) and **2.13** (enriched **GET …/book** + OpenAPI/TS).
 
-2. **Identity of “read” (after 2.11)** — One row per **(user, book_range_id)** with a **status** enum; ship only **`READ`** in the Phase 2 backend slice (parent Phase 4 adds skim/skip). **Uniqueness** enforced in DB and application layer.
+2. **Identity of “read” (after schema + backend)** — One row per **(user, book_range_id)** with a **status** enum; ship only **`READ`** in the Phase 2 backend slice (parent Phase 4 adds skim/skip). **Uniqueness** enforced in DB (**2.11**) and application layer (**2.12+**).
 
-3. **Timestamps (after 2.11)** — On first “mark read,” set **`completedAt`** (and **`lastReadAt`** only if the schema uses both — keep minimal: one **completion** instant is enough for Phase 2; avoid unused columns).
+3. **Timestamps (backend write slice)** — On first “mark read,” set **`completedAt`** (keep minimal: one **completion** instant for Phase 2; avoid unused columns). Implemented with **2.12** write path.
 
-4. **API surface (2.11 only)** — Prefer **few cohesive endpoints**:
-   - **Write:** e.g. `PUT` or `PATCH` under the **notebook book** resource **or** `.../book/ranges/{rangeId}/reading-record` — **choose one** and mirror existing Spring/OpenAPI style; **stable error shapes** for wrong notebook / range not in book / unauthorized.
-   - **Read:** Extend **`GET …/book`** so each **range node** carries enough for the layout border (e.g. **`readingRecord`** or **`readingStatus`**) — **avoid a second round-trip** on every paint if possible.
+4. **API surface (split across 2.12 / 2.13)** — Prefer **few cohesive endpoints**:
+   - **Write (2.12):** e.g. **`PUT`** `.../book/ranges/{rangeId}/reading-record` — mirror existing Spring/OpenAPI style; **stable error shapes** for wrong notebook / range not in book / unauthorized.
+   - **Read (2.13):** Extend **`GET …/book`** so each **range** carries enough for the layout border (e.g. **`readingRecord`**) — **bulk / single extra query**, no per-range N+1.
 
-5. **OpenAPI + TypeScript (2.11)** — Land OpenAPI changes **with** the backend in **2.11**, then **`pnpm generateTypeScript`**. The **frontend’s authoritative model** for the loaded book (including per-range reading fields) **must** use the **generated API types** — **no** long-lived parallel hand-written DTO for the same payload. Sub-phases **2.1–2.10** may use a **minimal interim** shape **only** where it reduces churn; **2.11** **refactors** so client updates operate on **the same types** the SDK returns for **`GET …/book`** (compose or narrow generated types; do not duplicate field names in a second schema).
+5. **OpenAPI + TypeScript (2.13)** — Land OpenAPI changes **with** **GET …/book** enrichment in **2.13**, then **`pnpm generateTypeScript`**. The **frontend’s authoritative model** (**2.14**) **must** use the **generated API types** for the loaded book — **no** long-lived parallel hand-written DTO for the same payload. Sub-phases **2.1–2.10** may keep a **minimal interim** client shape; **2.14** **refactors** so client state matches **`GET …/book`** (compose or narrow generated types).
 
 6. **Right border = read** — Single **semantic** color; optional **non-color cue** for a11y in the **green** sub-phase that implements the first **`Then`** (see **2.8** in the table below).
 
-7. **After “Mark as read”** — **2.1–2.10:** update **client** read state immediately; **do not** change **selection** away from **2.2** per scenario. **2.11 onward:** after successful write, **refresh book** from server (or optimistic update + reconcile) so border and **`GET …/book`** stay aligned; same selection rule.
+7. **After “Mark as read”** — **2.1–2.10:** update **client** read state immediately (**in-memory**); **do not** change **selection** away from **2.2** per scenario. **2.14 onward:** after successful **PUT**, **refresh book** from server (**GET …/book**) so border and payload stay aligned; same selection rule.
 
 8. **Out of scope for Phase 2** — Auto-mark when no direct content (parent **Phase 3**), skim/skip (parent **Phase 4**), persisting panel expand/minimize preference, fine-grained in-range scroll restore beyond existing Phase 1 work.
 
@@ -68,7 +68,7 @@ And I should see that book range "2.2 xxx" is selected in the book layout
 
 ## Sub-phases (E2E-led in-memory slice, then persistence)
 
-**In-memory work (2.1–2.10)** follows an **E2E-driven cycle** aligned with `.cursor/rules/planning.mdc` (**at most one intentionally failing test** while driving a slice). **Persistence (2.11)** is **after** the full scenario is **green** without server-backed reading state.
+**In-memory work (2.1–2.10)** follows an **E2E-driven cycle** aligned with `.cursor/rules/planning.mdc` (**at most one intentionally failing test** while driving a slice). **Persistence** is **after** the full scenario is **green** without server-backed reading state in the UI, split into **2.11–2.14** below (schema first, then backend write, then **GET** + contract, then frontend).
 
 ### E2E-driven cycle (repeat for each new Gherkin step)
 
@@ -97,29 +97,86 @@ If a **single** Gherkin step is **too large** (two user-visible outcomes), **spl
 
 ---
 
-### Phase 2.11 — Persistence + `GET …/book` enrichment + API-typed client model (**last** sub-phase)
+### Phase 2.11 — Reading-record **schema only** (Flyway)
 
-**User-visible value:** **Yes** — read state **survives** reload and matches server; **authoritative** book tree on the client uses **generated** types.
+**User-visible value:** **No** (no product behavior change until a later sub-phase uses the table).
 
-This sub-phase combines **“persist read”** + **“book layout payload includes read state”**, **after** **2.10** proves the **in-memory** UX end-to-end.
+**After** **2.10** is green (or in the same delivery stream as agreed by the team).
 
 **Deliverables**
 
-- **DB:** Flyway migration — **`ReadingRecord`** (user, book_range_id, status, timestamps); FKs; **unique (user_id, book_range_id)**.
-- **Backend:** Entity, repository, service, **write** endpoint (mark read, idempotent upsert acceptable).
-- **Backend:** Extend **`GET …/book`** so each **range** includes reading fields needed for the border (single query pattern, no N+1).
-- **OpenAPI** updated; **`pnpm generateTypeScript`**.
-- **Frontend refactor:** the **loaded book** + per-range reading info held in client state **must** be typed from **generated** SDK/OpenAPI types (the **same** shapes as **`GET …/book`** — use composition/`Pick`/narrowing on generated types; **remove** interim duplicate DTOs).
-- Wire **Mark as read** to the **write** API; after success, **refresh book** (or equivalent reconcile) so UI matches server.
-
-**Tests**
-
-- **Spring** controller (and/or `@Transactional`) tests: write + enriched **`GET …/book`**; errors for wrong notebook / range / auth.
-- **Vitest (mounted):** load a **fixture object** that is **typed as / satisfies** the **generated** book response type (or build via **`makeMe`** if extended appropriately) → mount book layout (or page with mocked SDK returning that payload) → assert **tree renders correctly** (titles/structure hooks and **read** border for ranges with reading fields set). This proves the **UI matches the API-shaped payload**, not a divergent hand-written mock.
+- **DB:** Flyway migration — table for per-user per-range reading state (e.g. **`book_range_reading_record`**): **`user_id`**, **`book_range_id`**, **`status`**, **`completed_at`**; FKs to **`user`** and **`book_range`** with **`ON DELETE CASCADE`**; **`UNIQUE (user_id, book_range_id)`**.
 
 **Explicit non-goals**
 
-- Changing the **2.1–2.10** Gherkin to **require** reload (optional **future** scenario, not **2.11**).
+- **No** JPA entity, **no** repository, **no** HTTP endpoints, **no** OpenAPI / TypeScript changes, **no** frontend changes.
+
+**Tests / verification**
+
+- Migration applies cleanly (e.g. **`migrateTestDB`** / CI pipeline used by this repo).
+
+---
+
+### Phase 2.12 — Backend: **write** path (mark read)
+
+**User-visible value:** **No** from the browser until **2.14** (API exists but UI may still be in-memory).
+
+**Deliverables**
+
+- **JPA** entity + **`ReadingRecordRepository`** mapping to the **2.11** table.
+- **`BookService`:** **`markRangeRead`** (validate range belongs to notebook’s book; idempotent upsert acceptable — document in tests).
+- **`NotebookBooksController`:** **`PUT /api/notebooks/{notebook}/book/ranges/{bookRange}/reading-record`** → **204**; **`assertReadAuthorization`** aligned with reading-position endpoints.
+- **No** change yet to **`GET …/book`** JSON shape (or add **OpenAPI** only if the controller must be documented without new response fields — prefer deferring **OpenAPI** churn to **2.13**).
+
+**Tests**
+
+- **Spring** controller (and/or **`@Transactional`**) tests: row persisted; **404** wrong notebook / no book / range not in book; **403** read access; **idempotent** second **PUT** behavior.
+
+**Explicit non-goals**
+
+- Enriched **`GET …/book`** (that is **2.13**).
+
+---
+
+### Phase 2.13 — Backend: enrich **`GET …/book`** + **OpenAPI** + **TypeScript**
+
+**User-visible value:** **No** from the browser until **2.14** (contract ready for the client).
+
+**Deliverables**
+
+- **`BookService` / `getBook` path:** after loading the book, **bulk-load** reading records for the **current user** and all **range ids**; attach a **transient** wire object on each **`BookRange`** (e.g. **`readingRecord`**: `status`, `completedAt`) for **`BookViews.Full`** only.
+- **`@EntityGraph`** (or equivalent) on **`BookRepository`** if needed to avoid **N+1** on ranges/anchors.
+- Regenerate **OpenAPI**; **`pnpm generateTypeScript`**; update **OpenAPI** approval test golden if applicable.
+
+**Tests**
+
+- **Spring:** **`getBook`** includes **`readingRecord`** on marked ranges only; stable absence for unmarked ranges.
+- **OpenAPI** snapshot test passes after intentional doc update.
+
+**Explicit non-goals**
+
+- Frontend wiring (**2.14**).
+
+---
+
+### Phase 2.14 — Frontend: **API-backed** read state (**last** persistence sub-phase)
+
+**User-visible value:** **Yes** — **Mark as read** persists; read border and panel logic can use **server** state; reload can show read state once **GET** is used on load (still **no** new Cypress requirement to **force** reload — optional future scenario).
+
+**Deliverables**
+
+- **`BookReadingPage`:** remove **in-memory** read **`Set`**; derive border / panel visibility / sr-only copy from **`range.readingRecord`** on **generated** **`BookRangeFull`**.
+- **`markSelectedRangeAsRead`:** **`PUT`** then **`getBook`**; **`apiCallWithLoading`** (or equivalent project pattern); preserve **selection → successor** behavior from **2.10** tests.
+- Extend **`makeMe` / builders** only if needed so tests stay on **`@generated`** types.
+
+**Tests**
+
+- **Vitest (mounted):** mock **PUT** + second **getBook** with **`readingRecord`** on the marked range; keep existing reading-control assertions green.
+- **Fixture test:** mount from an object **satisfying** **`BookFull`** with **`readingRecord`** set on a range → assert **read** border / hooks match payload.
+
+**Explicit non-goals**
+
+- Changing **2.1–2.10** Gherkin to **require** reload (optional **future** scenario).
 
 ---
 
@@ -129,19 +186,25 @@ This sub-phase combines **“persist read”** + **“book layout payload includ
 2.1 red ──► 2.2 green ──► 2.3 red ──► 2.4 green ──► 2.5 red ──► 2.6 green
     ──► 2.7 red ──► 2.8 green ──► 2.9 red ──► 2.10 green (full E2E)
                                                               │
-                                                              ▼
-                                                         2.11 persistence
-                                                         + GET book + API types
+                        ┌─────────────────────────────────────┼─────────────────────────────────────┐
+                        ▼                                     ▼                                     ▼
+                    2.11 Flyway                           2.12 PUT                           2.13 GET+OpenAPI
+                    (schema only)                      mark read write                    enrich book + TS
+                                                              │                                     │
+                                                              └──────────────────┬──────────────────┘
+                                                                                 ▼
+                                                                            2.14 Frontend
+                                                                            (persisted UX)
 ```
 
-**2.11** is strictly **after** **2.10**. **No parallelization** of the red/green sequence without breaking the **one failing step** rule.
+**2.11–2.14** are strictly **after** **2.10**. **Order:** **2.11** → **2.12** → **2.13** → **2.14** (each may be its own PR). **No parallelization** of the **2.1–2.10** red/green sequence without breaking the **one failing step** rule.
 
 ---
 
 ## Phase discipline (each sub-phase)
 
 1. **Tests first or alongside** — red → green for the **observable** surface of **that** sub-phase.
-2. **No dead production code** — no unused endpoints, components, or DB columns; **remove** scaffolding before merge. After **2.11**, **remove** interim client DTOs so the book tree uses **generated** types only (decision **5**).
+2. **No dead production code** — no unused endpoints, components, or DB columns; **remove** scaffolding before merge. After **2.14**, **remove** interim client-only read state so the book tree uses **generated** types from **`GET …/book`** only (decision **5**).
 3. **No stray feature flags** — behavior is **on** when merged.
 4. **Deploy gate** — parent plan: commit/push/CD between **parent** phases; for **sub-phases**, follow team habit (often **one PR per red/green beat** or **pair 2.n+2.n+1** when practical).
 5. **Update documents** — when shipped, trim this file’s speculative options; align [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md) Phase 2 bullet list with **completed** sub-phases; refresh **Current directional choices** in the architecture roadmap only if a **default** changed (e.g. reading-order walk).
@@ -156,6 +219,6 @@ This sub-phase combines **“persist read”** + **“book layout payload includ
 
 ## Open points
 
-1. **Exact HTTP paths and DTO names** — match existing notebook/book controllers; decide in **2.11**.
-2. **Idempotency** — second “mark read” is **no-op** or **updates timestamp**; document chosen behavior in API tests (**2.11**).
+1. **Exact HTTP paths and DTO names** — match existing notebook/book controllers; lock in **2.12** / **2.13** when implemented.
+2. **Idempotency** — second “mark read” is **no-op** or **updates timestamp**; document chosen behavior in API tests (**2.12**).
 3. **Selection vs current range styling** — if the scenario’s “selected” is **ambiguous** with **current range** after scroll, **product + a11y** pick one mapping; encode in **one** place (page object + live region strategy if any) — lock by **2.10** so hooks stay stable.
