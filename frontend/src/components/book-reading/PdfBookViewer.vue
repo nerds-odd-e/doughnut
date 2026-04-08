@@ -89,9 +89,6 @@ let onTouchMoveForPinch: ((e: TouchEvent) => void) | null = null
 let onTouchEndForPinch: ((e: TouchEvent) => void) | null = null
 let lastPinchDistance = 0
 
-/** Invalidates in-flight `scrollToStoredReadingPosition` after user outline navigation or new PDF load. */
-let navigationGeneration = 0
-
 const SCALE_EPSILON = 0.001
 
 function teardownGeometryResample() {
@@ -261,7 +258,6 @@ function showBookRangeSelectionBboxHighlight(
 }
 
 async function applyPdfOutlineV1Target(target: PdfOutlineV1NavigationTarget) {
-  navigationGeneration++
   if (!pdfViewer?.pdfDocument) return
   const { pageIndex, bbox } = target
   if (
@@ -317,7 +313,6 @@ async function scrollToStoredReadingPosition(
   pageIndexZeroBased: number,
   normalizedY: number
 ) {
-  const genAtStart = navigationGeneration
   if (!pdfViewer?.pdfDocument) return
   if (
     !Number.isInteger(pageIndexZeroBased) ||
@@ -338,15 +333,11 @@ async function scrollToStoredReadingPosition(
   const vx = vp.width / 2
   const vy = normalizedYToViewportY(normalizedY, vp.height)
   const [pdfX, pdfY] = vp.convertToPdfPoint(vx, vy)
-  requestAnimationFrame(() => {
-    if (genAtStart !== navigationGeneration) return
-    if (!pdfViewer?.pdfDocument) return
-    pdfViewer.scrollPageIntoView({
-      pageNumber: pageIndexZeroBased + 1,
-      destArray: [null, { name: "XYZ" }, pdfX, pdfY, null],
-    })
-    queueMicrotask(() => emitViewportDescriptorIfChanged())
+  pdfViewer.scrollPageIntoView({
+    pageNumber: pageIndexZeroBased + 1,
+    destArray: [null, { name: "XYZ" }, pdfX, pdfY, null],
   })
+  queueMicrotask(() => emitViewportDescriptorIfChanged())
 }
 
 const ZOOM_STEP = 1.25
@@ -373,7 +364,6 @@ defineExpose({
 })
 
 async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
-  navigationGeneration++
   const container = containerRef.value
   const viewer = viewerRef.value
   if (!container || !viewer) return
