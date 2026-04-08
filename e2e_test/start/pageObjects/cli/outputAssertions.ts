@@ -107,8 +107,19 @@ function pastUserMessages() {
           ...transcriptPollBase,
           needle: expected,
           surface: 'fullBuffer',
-          rejectGrayForegroundOnlyWithoutGrayBackground: true,
-          requireGrayBackgroundBlock: true,
+          cellExpectations: [
+            {
+              match: 'last',
+              expectations: [
+                {
+                  kind: 'noFgPaletteUnlessBgPalette',
+                  fgPalette: 8,
+                  unlessBgPalette: 8,
+                },
+                { kind: 'allBgPalette', index: 8 },
+              ],
+            },
+          ],
           messagePrefix:
             'Past user messages (full buffer + gray background block, no fg-only gray).',
         })
@@ -137,7 +148,9 @@ function currentGuidance() {
       return cy.task<null>('cliInteractiveAssert', {
         ...guidanceBase,
         needle: text,
-        requireBold: true,
+        cellExpectations: [
+          { match: 'first', expectations: [{ kind: 'allBold' }] },
+        ],
         messagePrefix: 'Current guidance (expectContainsBold).',
       })
     },

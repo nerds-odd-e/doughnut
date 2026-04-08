@@ -19,7 +19,10 @@ import {
   type ManagedTtySession,
 } from 'tty-assert/managedTtySession'
 
-/** JSON-safe `cy.task` body (`RegExp` must use `{ source, flags? }`). */
+/**
+ * JSON-safe `cy.task` body (`RegExp` must use `{ source, flags? }`).
+ * Style checks: prefer `cellExpectations` from `tty-assert` over legacy boolean flags on assert options.
+ */
 export type ManagedTtyAssertTaskPayload = Omit<
   ManagedTtyAssertOptions,
   'needle' | 'startAfterAnchor'
