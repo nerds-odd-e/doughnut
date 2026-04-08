@@ -20,7 +20,7 @@ overrides:
   systeminformation: '>=5.31.0'
   qs: '>=6.14.2'
   hono: ^4.12.12
-  '@hono/node-server': '>=1.19.10'
+  '@hono/node-server': '>=1.19.13'
   undici: '>=7.24.0'
   diff: '>=8.0.3'
   lodash-es: '>=4.18.0'
@@ -78,6 +78,9 @@ importers:
       '@hey-api/openapi-ts':
         specifier: 0.95.0
         version: 0.95.0(typescript@6.0.2)
+      '@hono/node-server':
+        specifier: '>=1.19.13'
+        version: 1.19.13(hono@4.12.12)
       '@mbtest/mountebank':
         specifier: 2.9.3
         version: 2.9.3
@@ -1315,8 +1318,8 @@ packages:
   '@hey-api/types@0.1.4':
     resolution: {integrity: sha512-thWfawrDIP7wSI9ioT13I5soaaqB5vAPIiZmgD8PbeEVKNrkonc0N/Sjj97ezl7oQgusZmaNphGdMKipPO6IBg==}
 
-  '@hono/node-server@1.19.11':
-    resolution: {integrity: sha512-dr8/3zEaB+p0D2n/IUrlPF1HZm586qgJNXK1a9fhg/PzdtkK7Ksd5l312tJX2yBuALqDYBlG20QEbayqPyxn+g==}
+  '@hono/node-server@1.19.13':
+    resolution: {integrity: sha512-TsQLe4i2gvoTtrHje625ngThGBySOgSK3Xo2XRYOdqGN1teR8+I7vchQC46uLJi8OF62YTYA3AhSpumtkhsaKQ==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4.12.12
@@ -8042,7 +8045,7 @@ snapshots:
 
   '@hey-api/types@0.1.4': {}
 
-  '@hono/node-server@1.19.11(hono@4.12.12)':
+  '@hono/node-server@1.19.13(hono@4.12.12)':
     dependencies:
       hono: 4.12.12
 
@@ -8282,7 +8285,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.29.0(zod@4.3.6)':
     dependencies:
-      '@hono/node-server': 1.19.11(hono@4.12.12)
+      '@hono/node-server': 1.19.13(hono@4.12.12)
       ajv: 8.18.0
       ajv-formats: 3.0.1(ajv@8.18.0)
       content-type: 1.0.5
