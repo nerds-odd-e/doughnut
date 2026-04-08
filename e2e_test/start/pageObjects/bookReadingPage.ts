@@ -1,6 +1,6 @@
 import { pageIsNotLoading } from '../pageBase'
 
-export type BookOutlineRow = { depth: number; title: string }
+export type BookLayoutRow = { depth: number; title: string }
 
 function scrollableAncestorWithinBookReadingPage(viewerEl: HTMLElement) {
   const pageRoot = viewerEl.closest('[data-testid="book-reading-page"]')
@@ -16,10 +16,10 @@ function scrollableAncestorWithinBookReadingPage(viewerEl: HTMLElement) {
 }
 
 const bookReadingPage = () => {
-  const outlineNodes = () =>
+  const bookRangeRows = () =>
     cy
-      .get('[data-testid="book-reading-outline"]')
-      .find('[data-testid="book-outline-node"]')
+      .get('[data-testid="book-reading-book-layout"]')
+      .find('[data-testid="book-reading-book-range"]')
 
   const assertPdfCanvasHasDarkPixels = (el: HTMLCanvasElement) => {
     expect(el.width, 'PDF canvas should have width').to.be.greaterThan(0)
@@ -42,16 +42,16 @@ const bookReadingPage = () => {
     cy.task('ocrCanvasImage', base64, { timeout: 60000 })
 
   return {
-    expectBookStructureRows(expected: BookOutlineRow[]) {
+    expectBookLayoutRows(expected: BookLayoutRow[]) {
       pageIsNotLoading()
       cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
       cy.get('[data-testid="book-reading-page"]').should('exist')
-      outlineNodes()
+      bookRangeRows()
         .should('have.length', expected.length)
         .each(($el, i) => {
           const row = expected[i]!
           cy.wrap($el)
-            .should('have.attr', 'data-outline-depth', String(row.depth))
+            .should('have.attr', 'data-book-range-depth', String(row.depth))
             .and('contain', row.title)
         })
       return this
@@ -60,17 +60,17 @@ const bookReadingPage = () => {
       this.expectCurrentPage(1).expectVisibleOCRContains('Code Refactoring')
       return this
     },
-    clickOutlineRowByTitle(title: string) {
+    clickBookRangeByTitle(title: string) {
       pageIsNotLoading()
-      outlineNodes().contains(title).click()
+      bookRangeRows().contains(title).click()
       return this
     },
-    expectOutlineRowSelectedByTitle(title: string) {
+    expectBookRangeIsCurrentSelectionByTitle(title: string) {
       pageIsNotLoading()
-      const row = outlineNodes().contains(title)
-      row.should('have.attr', 'data-outline-selected', 'true')
-      outlineNodes()
-        .filter('[data-outline-selected="true"]')
+      const row = bookRangeRows().contains(title)
+      row.should('have.attr', 'data-current-selection', 'true')
+      bookRangeRows()
+        .filter('[data-current-selection="true"]')
         .should('have.length', 1)
       return this
     },
@@ -135,7 +135,7 @@ const bookReadingPage = () => {
     /**
      * Scrolls by 42% of the rendered page-1 height from §1's click position (y≈204 MinerU),
      * giving total scroll ≈ 624 MinerU — past §2's bbox bottom (y1=608) so §2 scrolls above the
-     * viewport, making §2.1 (y0=631) the first visible anchor and therefore viewport-current.
+     * viewport, making §2.1 (y0=631) the first visible anchor and therefore the current range.
      */
     scrollPdfBookReaderDownWithinSamePageForNextBbox() {
       pageIsNotLoading()
@@ -156,14 +156,14 @@ const bookReadingPage = () => {
         })
       return this
     },
-    expectOutlineRowViewportCurrentByTitle(title: string) {
+    expectBookRangeIsCurrentRangeByTitle(title: string) {
       pageIsNotLoading()
-      const row = outlineNodes().contains(title)
+      const row = bookRangeRows().contains(title)
       row
-        .should('have.attr', 'data-outline-current', 'true')
+        .should('have.attr', 'data-current-range', 'true')
         .and('have.attr', 'aria-current', 'location')
-      outlineNodes()
-        .filter('[data-outline-current="true"]')
+      bookRangeRows()
+        .filter('[data-current-range="true"]')
         .should('have.length', 1)
       return this
     },
@@ -172,18 +172,20 @@ const bookReadingPage = () => {
       return this
     },
     /**
-     * After PDF scroll updates viewport-current to a lower row, the outline aside should
+     * After PDF scroll updates the current range to a lower book range, the book layout aside should
      * scroll so that row is not clipped (Phase 6.5). Expects a short viewport so the list overflows.
      */
-    expectViewportCurrentOutlineRowVisibleInAside(title: string) {
-      this.expectOutlineRowViewportCurrentByTitle(title)
-      cy.get('[data-testid="book-reading-outline-aside"]').should(($aside) => {
-        expect(
-          $aside[0]!.scrollTop,
-          'outline aside should have scrolled to reveal the current row'
-        ).to.be.greaterThan(0)
-      })
-      outlineNodes().contains(title).should('be.visible')
+    expectCurrentRangeVisibleInBookLayoutAside(title: string) {
+      this.expectBookRangeIsCurrentRangeByTitle(title)
+      cy.get('[data-testid="book-reading-book-layout-aside"]').should(
+        ($aside) => {
+          expect(
+            $aside[0]!.scrollTop,
+            'book layout aside should have scrolled to reveal the current range'
+          ).to.be.greaterThan(0)
+        }
+      )
+      bookRangeRows().contains(title).should('be.visible')
       return this
     },
   }

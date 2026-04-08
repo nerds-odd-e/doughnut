@@ -1,7 +1,7 @@
 import {
   nextLiveAnnouncementText,
   structuralTitleForStartAnchorId,
-} from "@/lib/book-reading/viewportCurrentLiveAnnouncement"
+} from "@/lib/book-reading/currentRangeLiveAnnouncement"
 import { describe, expect, it } from "vitest"
 
 const rows = [

@@ -1,11 +1,11 @@
-export const OUTLINE_SELECTION_BBOX_HIGHLIGHT_FADE_MS = 2000
+export const BOOK_RANGE_SELECTION_BBOX_HIGHLIGHT_FADE_MS = 2000
 
-export function attachOutlineSelectionBboxHighlight(
+export function attachBookRangeSelectionBboxHighlight(
   pageLayer: HTMLElement,
   rect: { left: number; top: number; width: number; height: number }
 ): () => void {
   const overlay = document.createElement("div")
-  overlay.dataset.testid = "outline-selection-bbox-highlight"
+  overlay.dataset.testid = "book-range-selection-bbox-highlight"
   overlay.style.position = "absolute"
   overlay.style.left = `${rect.left}px`
   overlay.style.top = `${rect.top}px`
@@ -15,7 +15,7 @@ export function attachOutlineSelectionBboxHighlight(
   overlay.style.pointerEvents = "none"
   overlay.style.zIndex = "100"
   overlay.style.opacity = "1"
-  overlay.style.transition = `opacity ${OUTLINE_SELECTION_BBOX_HIGHLIGHT_FADE_MS}ms ease-out`
+  overlay.style.transition = `opacity ${BOOK_RANGE_SELECTION_BBOX_HIGHLIGHT_FADE_MS}ms ease-out`
 
   let fadeStartTimer: ReturnType<typeof setTimeout> | null = null
   let removalTimer: ReturnType<typeof setTimeout> | null = null
@@ -40,7 +40,7 @@ export function attachOutlineSelectionBboxHighlight(
   removalTimer = setTimeout(() => {
     removalTimer = null
     overlay.remove()
-  }, OUTLINE_SELECTION_BBOX_HIGHLIGHT_FADE_MS)
+  }, BOOK_RANGE_SELECTION_BBOX_HIGHLIGHT_FADE_MS)
 
   return cancel
 }

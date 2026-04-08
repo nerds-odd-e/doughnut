@@ -25,7 +25,7 @@ import {
   pdfViewerViewportTopYDown,
   type ViewportYRange,
 } from "@/lib/book-reading/pdfViewerViewportTopYDown"
-import { attachOutlineSelectionBboxHighlight } from "@/lib/book-reading/outlineSelectionBboxHighlight"
+import { attachBookRangeSelectionBboxHighlight } from "@/lib/book-reading/bookRangeSelectionBboxHighlight"
 import {
   normalizedYToViewportY,
   outlineV1BboxToPdfJsXyzDestArray,
@@ -231,18 +231,18 @@ function applyResponsiveDefaultScale(options?: { force?: boolean }) {
 }
 
 let pendingNavigation: PdfOutlineV1NavigationTarget | null = null
-let detachOutlineSelectionBboxHighlight: (() => void) | null = null
+let detachBookRangeSelectionBboxHighlight: (() => void) | null = null
 
-function clearOutlineSelectionBboxHighlight() {
-  detachOutlineSelectionBboxHighlight?.()
-  detachOutlineSelectionBboxHighlight = null
+function clearBookRangeSelectionBboxHighlight() {
+  detachBookRangeSelectionBboxHighlight?.()
+  detachBookRangeSelectionBboxHighlight = null
 }
 
-function showOutlineSelectionBboxHighlight(
+function showBookRangeSelectionBboxHighlight(
   pageNumber: number,
   bbox: PdfOutlineV1NavigationTarget["bbox"] & object
 ) {
-  clearOutlineSelectionBboxHighlight()
+  clearBookRangeSelectionBboxHighlight()
   if (!pdfViewer) return
   const pageView = pdfViewer.getPageView(pageNumber - 1)
   if (!pageView?.div) return
@@ -251,7 +251,7 @@ function showOutlineSelectionBboxHighlight(
     pageView.viewport.width,
     pageView.viewport.height
   )
-  detachOutlineSelectionBboxHighlight = attachOutlineSelectionBboxHighlight(
+  detachBookRangeSelectionBboxHighlight = attachBookRangeSelectionBboxHighlight(
     pageView.div,
     rect
   )
@@ -269,7 +269,7 @@ async function applyPdfOutlineV1Target(target: PdfOutlineV1NavigationTarget) {
   }
   const pageNumber = pageIndex + 1
   if (bbox === null) {
-    clearOutlineSelectionBboxHighlight()
+    clearBookRangeSelectionBboxHighlight()
     pdfViewer.scrollPageIntoView({ pageNumber })
   } else {
     const page = await pdfViewer.pdfDocument.getPage(pageNumber)
@@ -280,7 +280,7 @@ async function applyPdfOutlineV1Target(target: PdfOutlineV1NavigationTarget) {
       bbox
     )
     pdfViewer.scrollPageIntoView({ pageNumber, destArray: [...destArray] })
-    showOutlineSelectionBboxHighlight(pageNumber, bbox)
+    showBookRangeSelectionBboxHighlight(pageNumber, bbox)
   }
   queueMicrotask(() => emitViewportDescriptorIfChanged())
 }
@@ -373,7 +373,7 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
     currentLoadingTask = null
   }
   if (pdfViewer) {
-    clearOutlineSelectionBboxHighlight()
+    clearBookRangeSelectionBboxHighlight()
     if (onPageChangingForViewport) {
       pdfViewer.eventBus.off("pagechanging", onPageChangingForViewport)
       onPageChangingForViewport = null
@@ -545,7 +545,7 @@ onBeforeUnmount(async () => {
     pdfViewer.setDocument(null as unknown as PDFDocumentProxy)
     pdfViewer = null
   }
-  clearOutlineSelectionBboxHighlight()
+  clearBookRangeSelectionBboxHighlight()
   pendingNavigation = null
 })
 </script>

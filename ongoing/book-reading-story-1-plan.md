@@ -106,9 +106,9 @@ This is the **interchange structure** the CLI (Phase 3) builds from MinerU / out
 
 ---
 
-## Phase 4 — Browser: see the book structure for the notebook
+## Phase 4 — Browser: see the book layout for the notebook
 
-**User outcome:** The user opens the **relevant notebook experience in the web app** and **sees the attached PDF’s structure** (hierarchical outline: expand/collapse or equivalent—match Doughnut’s existing navigation patterns). This satisfies the story’s **Then** clause: *see the book structure of the notebook “Top Maths” in the browser*.
+**User outcome:** The user opens the **relevant notebook experience in the web app** and **sees the attached PDF’s book layout** (hierarchical **book ranges**: expand/collapse or equivalent—match Doughnut’s existing navigation patterns). This satisfies the story’s **Then** clause: *see the book layout of the notebook “Top Maths” in the browser*.
 
 **UX placement:** Prefer the smallest change that fits existing IA (notebook detail sidebar, a “Books” tab, or a dedicated sub-route—decide during implementation; document the chosen entry point briefly here when known).
 

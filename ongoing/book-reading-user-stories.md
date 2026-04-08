@@ -7,14 +7,14 @@
 ```gherkin
 Given there is a notebook "Top Maths"
 When I attach book "top-maths.pdf" to the notebook "Top Maths" via the CLI
-Then I should see the book structure of the notebook "Top Maths" in the browser
+Then I should see the book layout of the notebook "Top Maths" in the browser
 ```
 
 ### Sub-stories
 
 - User can `/use <notebook>` to select the current active notebook in the CLI.
 - User can `/attach <pdf file>` so the book is parsed and shared with the Doughnut server.
-- User can see the book structure of a notebook.
+- User can see the book layout of a notebook.
 
 ---
 
@@ -24,7 +24,7 @@ Then I should see the book structure of the notebook "Top Maths" in the browser
 
 - delete a book of a notebook using frontend. It will delete the book record and also remove the file from gcp
 - showing the pdf book in book reading page (e2e test needed)
-- clicking book layout range to jump to pdf position (e2e test needed)
+- clicking a book range to jump to pdf position (e2e test needed)
 - scroll pdf to update book layout highlight
 - show/hide the drawer
 
@@ -62,7 +62,7 @@ Then I should see that book range "xxx" is marked as read in the book layout
 
 ---
 
-## Story: Decide or navigate to the next range to read
+## Story: Decide or navigate to the next book range to read
 
 _(Sub-stories to be added.)_
 

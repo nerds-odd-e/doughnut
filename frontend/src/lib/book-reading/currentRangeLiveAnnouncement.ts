@@ -1,11 +1,11 @@
-export type OutlineRowForLiveAnnouncement = {
+export type BookRangeRowForLiveAnnouncement = {
   title: string
   startAnchor: { id: number }
 }
 
 export function structuralTitleForStartAnchorId(
   anchorId: number | null,
-  rows: OutlineRowForLiveAnnouncement[]
+  rows: BookRangeRowForLiveAnnouncement[]
 ): string {
   if (anchorId === null) {
     return ""
@@ -17,7 +17,7 @@ export function structuralTitleForStartAnchorId(
 export function nextLiveAnnouncementText(
   previousAnnouncedTitle: string | undefined,
   anchorId: number | null,
-  rows: OutlineRowForLiveAnnouncement[]
+  rows: BookRangeRowForLiveAnnouncement[]
 ): { text: string; changed: boolean } {
   const resolved = structuralTitleForStartAnchorId(anchorId, rows)
   if (resolved === previousAnnouncedTitle) {

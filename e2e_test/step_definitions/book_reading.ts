@@ -4,12 +4,12 @@
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
 import bookReadingPage, {
-  type BookOutlineRow,
+  type BookLayoutRow,
 } from '../start/pageObjects/bookReadingPage'
 import { cli } from '../start/pageObjects/cli'
 import start from '../start'
 
-function parseBookOutlineTable(data: DataTable): BookOutlineRow[] {
+function parseBookLayoutTable(data: DataTable): BookLayoutRow[] {
   return data.raw().map((row) => {
     const depth = parseInt(row[0] ?? '0', 10)
     const title = (row[1] ?? '').trim()
@@ -59,11 +59,11 @@ When(
 )
 
 Then(
-  'I should see the book structure in the browser:',
+  'I should see the book layout in the browser:',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (data: DataTable) => {
-    const expected = parseBookOutlineTable(data)
-    return bookReadingPage().expectBookStructureRows(expected)
+    const expected = parseBookLayoutTable(data)
+    return bookReadingPage().expectBookLayoutRows(expected)
   }
 )
 
@@ -84,7 +84,7 @@ When(
 )
 
 When(
-  'I scroll the PDF book reader down within the same page to move viewport past the next outline bbox',
+  'I scroll the PDF book reader down within the same page to move viewport past the next book range bbox',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   () => {
     return bookReadingPage().scrollPdfBookReaderDownWithinSamePageForNextBbox()
@@ -92,10 +92,10 @@ When(
 )
 
 When(
-  'I choose the book outline row {string}',
+  'I choose the book range {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
-    return bookReadingPage().clickOutlineRowByTitle(title)
+    return bookReadingPage().clickBookRangeByTitle(title)
   }
 )
 
@@ -110,27 +110,25 @@ Then(
 )
 
 Then(
-  'the book outline row {string} should be selected in the book reader',
+  'the book range {string} should be the current selection in the book reader',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
-    return bookReadingPage().expectOutlineRowSelectedByTitle(title)
+    return bookReadingPage().expectBookRangeIsCurrentSelectionByTitle(title)
   }
 )
 
 Then(
-  'the book outline row {string} should be viewport-current in the book reader',
+  'the book range {string} should be the current range in the book reader',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
-    return bookReadingPage().expectOutlineRowViewportCurrentByTitle(title)
+    return bookReadingPage().expectBookRangeIsCurrentRangeByTitle(title)
   }
 )
 
 Then(
-  'the book outline row {string} should be viewport-current and visible in the outline aside',
+  'the book range {string} should be the current range and visible in the book layout aside',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
-    return bookReadingPage().expectViewportCurrentOutlineRowVisibleInAside(
-      title
-    )
+    return bookReadingPage().expectCurrentRangeVisibleInBookLayoutAside(title)
   }
 )

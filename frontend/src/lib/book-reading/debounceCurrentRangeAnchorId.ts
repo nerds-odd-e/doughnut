@@ -1,15 +1,15 @@
 import { debounce } from "es-toolkit"
 
-export type ViewportCurrentAnchorDebouncer = {
+export type CurrentRangeAnchorDebouncer = {
   propose: (id: number | null) => void
   cancel: () => void
   commitNow: (id: number | null) => void
 }
 
-export function createViewportCurrentAnchorDebouncer(options: {
+export function createCurrentRangeAnchorDebouncer(options: {
   delayMs: number
   commit: (id: number | null) => void
-}): ViewportCurrentAnchorDebouncer {
+}): CurrentRangeAnchorDebouncer {
   const { delayMs, commit } = options
   let lastCommitted: number | null = null
 

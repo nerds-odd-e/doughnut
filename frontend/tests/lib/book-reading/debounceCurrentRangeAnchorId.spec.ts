@@ -1,7 +1,7 @@
-import { createViewportCurrentAnchorDebouncer } from "@/lib/book-reading/debounceViewportCurrentAnchorId"
+import { createCurrentRangeAnchorDebouncer } from "@/lib/book-reading/debounceCurrentRangeAnchorId"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
-describe("createViewportCurrentAnchorDebouncer", () => {
+describe("createCurrentRangeAnchorDebouncer", () => {
   beforeEach(() => {
     vi.useFakeTimers()
   })
@@ -11,7 +11,7 @@ describe("createViewportCurrentAnchorDebouncer", () => {
 
   it("commits once with latest value after rapid proposes", () => {
     const commits: (number | null)[] = []
-    const d = createViewportCurrentAnchorDebouncer({
+    const d = createCurrentRangeAnchorDebouncer({
       delayMs: 120,
       commit: (id) => commits.push(id),
     })
@@ -25,7 +25,7 @@ describe("createViewportCurrentAnchorDebouncer", () => {
 
   it("does not commit when cancel runs before delay", () => {
     const commits: (number | null)[] = []
-    const d = createViewportCurrentAnchorDebouncer({
+    const d = createCurrentRangeAnchorDebouncer({
       delayMs: 120,
       commit: (id) => commits.push(id),
     })
@@ -37,7 +37,7 @@ describe("createViewportCurrentAnchorDebouncer", () => {
 
   it("skips redundant propose matching last committed", () => {
     const commits: (number | null)[] = []
-    const d = createViewportCurrentAnchorDebouncer({
+    const d = createCurrentRangeAnchorDebouncer({
       delayMs: 120,
       commit: (id) => commits.push(id),
     })
@@ -51,7 +51,7 @@ describe("createViewportCurrentAnchorDebouncer", () => {
 
   it("commits null after debounce when candidate becomes null", () => {
     const commits: (number | null)[] = []
-    const d = createViewportCurrentAnchorDebouncer({
+    const d = createCurrentRangeAnchorDebouncer({
       delayMs: 50,
       commit: (id) => commits.push(id),
     })
@@ -64,7 +64,7 @@ describe("createViewportCurrentAnchorDebouncer", () => {
 
   it("commitNow applies immediately and clears a pending propose", () => {
     const commits: (number | null)[] = []
-    const d = createViewportCurrentAnchorDebouncer({
+    const d = createCurrentRangeAnchorDebouncer({
       delayMs: 120,
       commit: (id) => commits.push(id),
     })
@@ -77,7 +77,7 @@ describe("createViewportCurrentAnchorDebouncer", () => {
 
   it("resets delay on each propose", () => {
     const commits: (number | null)[] = []
-    const d = createViewportCurrentAnchorDebouncer({
+    const d = createCurrentRangeAnchorDebouncer({
       delayMs: 100,
       commit: (id) => commits.push(id),
     })

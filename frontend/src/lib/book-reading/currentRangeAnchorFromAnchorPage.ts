@@ -22,12 +22,12 @@ const SCROLL_PADDING_NORMALIZED = 50
  * 5. `viewport === null` → last anchor on the page (scroll position unknown).
  *
  * Anchors on earlier pages contribute `bestFromEarlierPages` only when the current page has **no**
- * outline rows (`onCurrentPage` is empty).
+ * book ranges (`onCurrentPage` is empty).
  *
  * `y0` / `y1` come from `bbox[1]` / `bbox[3]`; anchors without a bbox are treated as a point at
  * `y = 0` (never visible by the bbox check, but reachable as the "previous" fallback).
  */
-export function viewportCurrentAnchorIdFromAnchorPage(
+export function currentRangeAnchorIdFromAnchorPage(
   orderedPreorderStartAnchors: readonly BookAnchorFull[],
   anchorPageZeroBased: number,
   viewport: ViewportYRange | null = null,

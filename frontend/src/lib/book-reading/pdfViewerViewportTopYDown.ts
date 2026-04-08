@@ -6,7 +6,7 @@ type PageViewLike = {
 }
 
 /**
- * Viewport Y-range on the anchor page in PDF outline v1 normalized coordinates
+ * Viewport Y-range on the anchor page in `pdf.mineru_outline_v1` normalized coordinates
  * (0–1000, origin top-left, y increasing downward).
  */
 export type ViewportYRange = {
@@ -116,7 +116,7 @@ export function pdfViewerViewportTopYDown(
 }
 
 /**
- * Page index + normalized Y for the **top edge** of the scroll container (same scale as outline v1 bbox).
+ * Page index + normalized Y for the **top edge** of the scroll container (same scale as `pdf.mineru_outline_v1` bbox).
  * The page index and normalizedTop always refer to the same physical page.
  */
 export function pdfViewerReadingPositionTopEdge(

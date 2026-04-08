@@ -1,6 +1,6 @@
 /**
  * PDF outline v1 wire format (`pdf.mineru_outline_v1`): `BookAnchor.value` is JSON with `page_idx`
- * and optional `bbox`. Bbox coordinates come from the book-outline pipeline (MinerU content_list)
+ * and optional `bbox`. Bbox coordinates come from the MinerU book-layout pipeline (`content_list`)
  * as `[x0,y0,x1,y1]` in 0–1000 normalized page space, top-left origin, y downward — not PDF user space.
  *
  * Consumers should use the exported functions; constants are internal.

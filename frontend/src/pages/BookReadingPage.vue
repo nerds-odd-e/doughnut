@@ -8,22 +8,22 @@
         role="status"
         aria-live="polite"
         aria-atomic="true"
-        data-testid="book-reading-viewport-current-live"
+        data-testid="book-reading-current-range-live"
         class="daisy-sr-only"
       >
-        {{ viewportCurrentLiveText }}
+        {{ currentRangeLiveText }}
       </div>
       <GlobalBar>
         <button
           type="button"
           class="daisy-btn daisy-btn-sm daisy-btn-ghost daisy-shrink-0"
-          :class="{ 'sidebar-expanded': outlineOpened }"
-          data-testid="book-reading-outline-toggle"
-          aria-label="Outline"
-          title="Outline"
-          :aria-expanded="outlineOpened"
-          aria-controls="book-reading-outline-panel"
-          @click="outlineOpened = !outlineOpened"
+          :class="{ 'sidebar-expanded': bookLayoutOpened }"
+          data-testid="book-reading-book-layout-toggle"
+          aria-label="Book layout"
+          title="Book layout"
+          :aria-expanded="bookLayoutOpened"
+          aria-controls="book-reading-book-layout-panel"
+          @click="bookLayoutOpened = !bookLayoutOpened"
         >
           <div class="daisy-w-4 daisy-h-4">
             <svg
@@ -36,7 +36,7 @@
               stroke-linejoin="round"
               class="w-4 h-4"
             >
-              <template v-if="outlineOpened">
+              <template v-if="bookLayoutOpened">
                 <path d="M19 12H5M12 19l-7-7 7-7" />
               </template>
               <template v-else>
@@ -68,55 +68,55 @@
         />
       </GlobalBar>
       <div
-        v-if="!isMdOrLarger && outlineOpened"
+        v-if="!isMdOrLarger && bookLayoutOpened"
         class="daisy-fixed daisy-inset-0 daisy-bg-black/50 daisy-z-30"
         aria-hidden="true"
-        @click="outlineOpened = false"
+        @click="bookLayoutOpened = false"
       />
       <div class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-relative">
         <aside
-          id="book-reading-outline-panel"
-          ref="outlineAsideRef"
-          data-testid="book-reading-outline-aside"
+          id="book-reading-book-layout-panel"
+          ref="bookLayoutAsideRef"
+          data-testid="book-reading-book-layout-aside"
           :class="[
             'daisy-bg-base-200 daisy-w-72 daisy-min-w-[16rem] daisy-max-w-[min(20rem,85vw)] daisy-transition-transform daisy-ease-in-out daisy-duration-200 daisy-overflow-y-auto daisy-overflow-x-hidden',
             isMdOrLarger
-              ? outlineOpened
+              ? bookLayoutOpened
                 ? 'daisy-relative daisy-shrink-0 daisy-border-r daisy-border-base-300'
                 : 'daisy-hidden'
-              : outlineOpened
+              : bookLayoutOpened
                 ? 'daisy-translate-x-0 daisy-fixed daisy-top-0 daisy-left-0 daisy-z-40 daisy-h-full daisy-pt-[env(safe-area-inset-top)]'
                 : '-daisy-translate-x-full daisy-fixed daisy-top-0 daisy-left-0 daisy-z-40 daisy-h-full',
           ]"
         >
           <div
-            data-testid="book-reading-outline"
+            data-testid="book-reading-book-layout"
             class="daisy-p-3 daisy-pb-8"
           >
             <button
-              v-for="node in outlineRows"
-              :key="node.id"
+              v-for="range in bookRangeRows"
+              :key="range.id"
               type="button"
-              data-testid="book-outline-node"
-              class="book-reading-outline-row"
-              :data-outline-depth="node.depth"
-              :data-outline-current="
-                node.startAnchor.id === viewportCurrentAnchorId
+              data-testid="book-reading-book-range"
+              class="book-reading-book-range"
+              :data-book-range-depth="range.depth"
+              :data-current-range="
+                range.startAnchor.id === currentRangeAnchorId
                   ? 'true'
                   : undefined
               "
-              :data-outline-selected="
-                node.id === selectedOutlineRangeId ? 'true' : undefined
+              :data-current-selection="
+                range.id === currentSelectionRangeId ? 'true' : undefined
               "
               :aria-current="
-                node.startAnchor.id === viewportCurrentAnchorId
+                range.startAnchor.id === currentRangeAnchorId
                   ? 'location'
                   : undefined
               "
-              :style="{ paddingLeft: `${node.depth * 0.75}rem` }"
-              @click="onOutlineRowClick(node)"
+              :style="{ paddingLeft: `${range.depth * 0.75}rem` }"
+              @click="onBookRangeClick(range)"
             >
-              {{ node.title }}
+              {{ range.title }}
             </button>
           </div>
         </aside>
@@ -160,9 +160,9 @@ import {
   type PdfOutlineV1NavigationTarget,
 } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
-import { createViewportCurrentAnchorDebouncer } from "@/lib/book-reading/debounceViewportCurrentAnchorId"
-import { nextLiveAnnouncementText } from "@/lib/book-reading/viewportCurrentLiveAnnouncement"
-import { viewportCurrentAnchorIdFromAnchorPage } from "@/lib/book-reading/viewportCurrentRangeFromAnchorPage"
+import { createCurrentRangeAnchorDebouncer } from "@/lib/book-reading/debounceCurrentRangeAnchorId"
+import { nextLiveAnnouncementText } from "@/lib/book-reading/currentRangeLiveAnnouncement"
+import { currentRangeAnchorIdFromAnchorPage } from "@/lib/book-reading/currentRangeAnchorFromAnchorPage"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
 import type {
   BookAnchorFull,
@@ -173,7 +173,7 @@ import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
-const VIEWPORT_CURRENT_ANCHOR_DEBOUNCE_MS = 120
+const CURRENT_RANGE_ANCHOR_DEBOUNCE_MS = 120
 const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 
 const props = defineProps({
@@ -197,8 +197,8 @@ function resetPdfPageIndicator() {
   pdfBarPagesTotal.value = null
 }
 
-const outlineOpened = ref(false)
-const outlineAsideRef = ref<HTMLElement | null>(null)
+const bookLayoutOpened = ref(false)
+const bookLayoutAsideRef = ref<HTMLElement | null>(null)
 const windowWidth = ref(
   typeof window !== "undefined"
     ? window.innerWidth
@@ -218,14 +218,14 @@ function onPdfLoadError(message: string) {
   resetPdfPageIndicator()
 }
 
-type OutlineNode = {
+type BookRangeRow = {
   id: number
   title: string
   depth: number
   startAnchor: BookAnchorFull
 }
 
-function buildFlatOutline(ranges: BookRangeFull[]): OutlineNode[] {
+function buildFlatBookRanges(ranges: BookRangeFull[]): BookRangeRow[] {
   const childrenMap = new Map<number | null, BookRangeFull[]>()
   for (const range of ranges) {
     const parentId =
@@ -237,7 +237,7 @@ function buildFlatOutline(ranges: BookRangeFull[]): OutlineNode[] {
   const sortByOrder = (a: BookRangeFull, b: BookRangeFull) =>
     (a.siblingOrder ?? 0) - (b.siblingOrder ?? 0)
 
-  const result: OutlineNode[] = []
+  const result: BookRangeRow[] = []
   function visit(parentId: number | null, depth: number) {
     const children = (childrenMap.get(parentId) ?? []).slice().sort(sortByOrder)
     for (const child of children) {
@@ -254,17 +254,17 @@ function buildFlatOutline(ranges: BookRangeFull[]): OutlineNode[] {
   return result
 }
 
-const flatOutline = ref<OutlineNode[]>([])
-const outlineRows = computed(() => flatOutline.value)
-const selectedOutlineRangeId = ref<number | null>(null)
-const viewportCurrentAnchorId = ref<number | null>(null)
-const viewportCurrentLiveText = ref("")
-const lastAnnouncedViewportTitle = ref<string | undefined>(undefined)
+const flatBookRanges = ref<BookRangeRow[]>([])
+const bookRangeRows = computed(() => flatBookRanges.value)
+const currentSelectionRangeId = ref<number | null>(null)
+const currentRangeAnchorId = ref<number | null>(null)
+const currentRangeLiveText = ref("")
+const lastAnnouncedCurrentRangeTitle = ref<string | undefined>(undefined)
 
-const viewportCurrentAnchorDebouncer = createViewportCurrentAnchorDebouncer({
-  delayMs: VIEWPORT_CURRENT_ANCHOR_DEBOUNCE_MS,
+const currentRangeAnchorDebouncer = createCurrentRangeAnchorDebouncer({
+  delayMs: CURRENT_RANGE_ANCHOR_DEBOUNCE_MS,
   commit: (id) => {
-    viewportCurrentAnchorId.value = id
+    currentRangeAnchorId.value = id
   },
 })
 
@@ -290,13 +290,13 @@ function onViewportAnchorPage(payload: {
     pdfBarCurrentPage.value = payload.anchorPageIndexZeroBased + 1
     pdfBarPagesTotal.value = payload.pagesCount
   }
-  const candidate = viewportCurrentAnchorIdFromAnchorPage(
-    outlineRows.value.map((n) => n.startAnchor),
+  const candidate = currentRangeAnchorIdFromAnchorPage(
+    bookRangeRows.value.map((r) => r.startAnchor),
     payload.anchorPageIndexZeroBased,
     payload.viewport,
     payload.pagesCount
   )
-  viewportCurrentAnchorDebouncer.propose(candidate)
+  currentRangeAnchorDebouncer.propose(candidate)
   let reading: { pageIndexZeroBased: number; normalizedTop: number } | null =
     null
   if (payload.readingPosition !== undefined) {
@@ -315,31 +315,31 @@ function onViewportAnchorPage(payload: {
   }
 }
 
-watch(viewportCurrentAnchorId, (id) => {
+watch(currentRangeAnchorId, (id) => {
   const { text, changed } = nextLiveAnnouncementText(
-    lastAnnouncedViewportTitle.value,
+    lastAnnouncedCurrentRangeTitle.value,
     id,
-    outlineRows.value
+    bookRangeRows.value
   )
   if (!changed) {
     return
   }
-  lastAnnouncedViewportTitle.value = text
-  viewportCurrentLiveText.value = text
+  lastAnnouncedCurrentRangeTitle.value = text
+  currentRangeLiveText.value = text
 })
 
 watch(
-  viewportCurrentAnchorId,
+  currentRangeAnchorId,
   (id) => {
-    if (id === null || !outlineOpened.value) {
+    if (id === null || !bookLayoutOpened.value) {
       return
     }
     requestAnimationFrame(() => {
-      if (!outlineOpened.value) {
+      if (!bookLayoutOpened.value) {
         return
       }
-      const row = outlineAsideRef.value?.querySelector(
-        '[data-outline-current="true"]'
+      const row = bookLayoutAsideRef.value?.querySelector(
+        '[data-current-range="true"]'
       )
       row?.scrollIntoView({ block: "nearest", inline: "nearest" })
     })
@@ -372,20 +372,20 @@ function onPagesReady() {
     .catch(() => undefined)
 }
 
-async function onOutlineRowClick(node: OutlineNode) {
-  const parsed = parsePdfOutlineV1Anchor(node.startAnchor)
+async function onBookRangeClick(range: BookRangeRow) {
+  const parsed = parsePdfOutlineV1Anchor(range.startAnchor)
   if (parsed === null) {
     return
   }
-  selectedOutlineRangeId.value = node.id
+  currentSelectionRangeId.value = range.id
   await pdfViewerRef.value?.scrollToPdfOutlineV1Target(parsed)
-  viewportCurrentAnchorDebouncer.commitNow(node.startAnchor.id)
+  currentRangeAnchorDebouncer.commitNow(range.startAnchor.id)
 }
 
 onMounted(async () => {
   window.addEventListener("resize", handleResize)
   if (windowWidth.value >= BOOK_READING_LAYOUT_BREAKPOINT_PX) {
-    outlineOpened.value = true
+    bookLayoutOpened.value = true
   }
 
   const { data, error } = await NotebookBooksController.getBook({
@@ -393,7 +393,7 @@ onMounted(async () => {
   })
   if (!error && data) {
     book.value = data
-    flatOutline.value = buildFlatOutline(data.ranges ?? [])
+    flatBookRanges.value = buildFlatBookRanges(data.ranges ?? [])
     if (data.hasSourceFile) {
       pdfLoading.value = true
       pdfError.value = null
@@ -435,7 +435,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", handleResize)
-  viewportCurrentAnchorDebouncer.cancel()
+  currentRangeAnchorDebouncer.cancel()
   lastReadPositionPatchDebouncer.cancel()
 })
 </script>
@@ -450,7 +450,7 @@ aside {
   max-height: 100%;
 }
 
-.book-reading-outline-row {
+.book-reading-book-range {
   @apply daisy-w-full daisy-min-h-10 daisy-text-left daisy-rounded-md;
   @apply daisy-border-0 daisy-border-solid daisy-border-l-4 daisy-border-transparent;
   @apply daisy-py-2 daisy-pr-2 daisy-pl-2 daisy-text-sm daisy-leading-snug daisy-font-normal;
@@ -460,11 +460,11 @@ aside {
   @apply focus-visible:daisy-ring-offset-2 focus-visible:daisy-ring-offset-base-200;
 }
 
-.book-reading-outline-row[data-outline-current="true"] {
+.book-reading-book-range[data-current-range="true"] {
   @apply daisy-bg-primary/35;
 }
 
-.book-reading-outline-row[data-outline-selected="true"] {
+.book-reading-book-range[data-current-selection="true"] {
   @apply daisy-border-primary daisy-font-medium;
 }
 </style>

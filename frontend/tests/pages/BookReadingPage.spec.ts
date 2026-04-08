@@ -12,7 +12,7 @@ import topMathsUrl from "../../../e2e_test/fixtures/book_reading/top-maths.pdf?u
 const fetchMock = createFetchMock(vi)
 
 /** Keep in sync with `BookReadingPage.vue` */
-const VIEWPORT_CURRENT_ANCHOR_DEBOUNCE_MS = 120
+const CURRENT_RANGE_ANCHOR_DEBOUNCE_MS = 120
 const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 
 const notebookId = 7
@@ -294,7 +294,7 @@ describe("BookReadingPage", () => {
     expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(false)
   })
 
-  it("updates viewport-current outline row while outline drawer is closed (Phase 6.9)", async () => {
+  it("updates current range while book layout drawer is closed (Phase 6.9)", async () => {
     const wrapper = await mountLoadedBookWithRanges(notebookId, {
       innerWidth: 500,
     })
@@ -306,7 +306,7 @@ describe("BookReadingPage", () => {
         viewport: null,
         pagesCount: 10,
       })
-      await vi.advanceTimersByTimeAsync(VIEWPORT_CURRENT_ANCHOR_DEBOUNCE_MS)
+      await vi.advanceTimersByTimeAsync(CURRENT_RANGE_ANCHOR_DEBOUNCE_MS)
       await flushPromises()
     })
 
@@ -316,7 +316,7 @@ describe("BookReadingPage", () => {
     expect(indicator.exists()).toBe(true)
     expect(indicator.text().trim()).toBe("1 / 10")
 
-    const current = wrapper.find('[data-outline-current="true"]')
+    const current = wrapper.find('[data-current-range="true"]')
     expect(current.exists()).toBe(true)
     expect(current.attributes("aria-current")).toBe("location")
     expect(current.text()).toBe("Section 3")
@@ -338,7 +338,7 @@ describe("BookReadingPage", () => {
         viewport: null,
         pagesCount: 5,
       })
-      await vi.advanceTimersByTimeAsync(VIEWPORT_CURRENT_ANCHOR_DEBOUNCE_MS)
+      await vi.advanceTimersByTimeAsync(CURRENT_RANGE_ANCHOR_DEBOUNCE_MS)
       await flushPromises()
     })
 
@@ -456,15 +456,19 @@ describe("BookReadingPage", () => {
     expect(spy).not.toHaveBeenCalled()
   })
 
-  it("outline toggle exposes aria-expanded and aria-controls (Phase 7.7)", async () => {
+  it("book layout toggle exposes aria-expanded and aria-controls (Phase 7.7)", async () => {
     await withStubbedInnerWidth(1024, async () => {
       const wrapper = await mountLoadedBookWithRanges(notebookId)
 
-      const toggle = wrapper.find('[data-testid="book-reading-outline-toggle"]')
-      const aside = wrapper.find('[data-testid="book-reading-outline-aside"]')
-      expect(aside.attributes("id")).toBe("book-reading-outline-panel")
+      const toggle = wrapper.find(
+        '[data-testid="book-reading-book-layout-toggle"]'
+      )
+      const aside = wrapper.find(
+        '[data-testid="book-reading-book-layout-aside"]'
+      )
+      expect(aside.attributes("id")).toBe("book-reading-book-layout-panel")
       expect(toggle.attributes("aria-controls")).toBe(
-        "book-reading-outline-panel"
+        "book-reading-book-layout-panel"
       )
       expect(toggle.attributes("aria-expanded")).toBe("true")
 
