@@ -3,7 +3,7 @@ import { CLI_INTERACTIVE_PTY_COLS, CLI_INTERACTIVE_PTY_ROWS } from './geometry'
 
 /** xterm headless replay → viewport plaintext. Canonical export: `ptyTranscriptToViewportPlaintext`. */
 
-function viewportPlaintext(term: Terminal): string {
+export function viewportPlaintextFromHeadlessTerminal(term: Terminal): string {
   const buffer = term.buffer.active
   const lines: string[] = []
   for (let i = 0; i < term.rows; i++) {
@@ -36,7 +36,7 @@ export function ptyTranscriptToVisiblePlaintextViaXterm(
     try {
       term.write(raw, () => {
         try {
-          resolve(viewportPlaintext(term))
+          resolve(viewportPlaintextFromHeadlessTerminal(term))
         } finally {
           term.dispose()
         }

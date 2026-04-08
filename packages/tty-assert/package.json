@@ -27,6 +27,7 @@
     "./errorSnapshotFormatting": "./src/errorSnapshotFormatting.ts",
     "./ptySession": "./src/ptySession.ts",
     "./facade": "./src/facade.ts",
-    "./waitForTextInSurface": "./src/waitForTextInSurface.ts"
+    "./waitForTextInSurface": "./src/waitForTextInSurface.ts",
+    "./managedTtySession": "./src/managedTtySession.ts"
   }
 }
