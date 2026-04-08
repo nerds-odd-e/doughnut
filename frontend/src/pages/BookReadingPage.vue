@@ -303,6 +303,9 @@ const readingControlPanelVisible = computed(() => {
   if (selIdx < 0 || selIdx >= rows.length - 1) {
     return false
   }
+  if (inMemoryReadRangeIds.value.has(selId)) {
+    return false
+  }
   const successor = rows[selIdx + 1]!
   return successor.startAnchor.id === curAnchorId
 })

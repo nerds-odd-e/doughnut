@@ -1,4 +1,5 @@
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
+import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import BookReadingPage from "@/pages/BookReadingPage.vue"
 import type { BookRangeFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
@@ -620,6 +621,38 @@ describe("BookReadingPage", () => {
       expect(wrapper.find('[data-current-range="true"]').text()).toBe(
         "Section 2"
       )
+    })
+
+    it("unmounts the reading control panel after Mark as read once it was shown", async () => {
+      const wrapper = await mountLoadedBookWithRanges(notebookId)
+      await clickBookRangeByTitle(wrapper, "Section 1")
+      await vi.waitFor(() =>
+        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+          "Section 1"
+        )
+      )
+
+      await emitViewportAndSettleCurrentRange(wrapper, {
+        anchorPageIndexZeroBased: 0,
+        viewport: { top: 0, mid: 500, bottom: 1000 },
+        pagesCount: 10,
+      })
+
+      const panel = wrapper.findComponent(ReadingControlPanel)
+      expect(panel.exists()).toBe(true)
+
+      const selectedRow = wrapper.find('[data-current-selection="true"]')
+      expect(selectedRow.attributes("data-direct-content-read")).toBeUndefined()
+
+      await panel.vm.$emit("markAsRead")
+      await flushPromises()
+
+      expect(
+        wrapper
+          .find('[data-current-selection="true"]')
+          .attributes("data-direct-content-read")
+      ).toBe("true")
+      expect(readingControlPanel(wrapper).exists()).toBe(false)
     })
   })
 })
