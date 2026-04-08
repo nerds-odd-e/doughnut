@@ -109,6 +109,16 @@ When(
   }
 )
 
+When(
+  'I mark the book range {string} as read in the Reading Control Panel',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (rangeTitle: string) => {
+    return bookReadingPage().markBookRangeAsReadInReadingControlPanel(
+      rangeTitle
+    )
+  }
+)
+
 Then(
   'I should see in the book reader visible PDF viewport on page {int} text including {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain

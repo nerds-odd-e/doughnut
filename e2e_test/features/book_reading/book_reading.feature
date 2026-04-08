@@ -56,9 +56,10 @@ Feature: Book reading
     And the book range "1. Refactoring: Protecting Intention in Working Software" should be the current selection in the book reader
     And the book range "2.1 Easier to Change—and Harder to Misuse" should be the current range in the book reader
 
+  @ignore
   Scenario: Mark a book range as read (reading record)
     When I choose the book range "2.1 Easier to Change—and Harder to Misuse"
     And I scroll the PDF until the book range "2.2 Refactoring as Strengthening the Code" is the current range in the book reader
-    # When I mark the book range "2.1 Easier to Change—and Harder to Misuse" as read in the Reading Control Panel
+    When I mark the book range "2.1 Easier to Change—and Harder to Misuse" as read in the Reading Control Panel
     # Then I should see that book range "2.1 Easier to Change—and Harder to Misuse" is marked as read in the book layout
     # And I should see that book range "2.2 Refactoring as Strengthening the Code" is selected in the book layout

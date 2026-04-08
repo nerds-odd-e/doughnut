@@ -205,6 +205,20 @@ const bookReadingPage = () => {
       bookRangeRows().contains(title).should('be.visible')
       return this
     },
+    /**
+     * Reading Control Panel (Phase 2 reading record): bottom of PDF main pane.
+     * Contract for production: data-testid book-reading-reading-control-panel + book-reading-mark-as-read.
+     */
+    markBookRangeAsReadInReadingControlPanel(rangeTitle: string) {
+      pageIsNotLoading()
+      cy.get('[data-testid="book-reading-reading-control-panel"]')
+        .should('be.visible')
+        .and('contain', rangeTitle)
+      cy.get('[data-testid="book-reading-mark-as-read"]')
+        .should('be.visible')
+        .click()
+      return this
+    },
   }
 }
 
