@@ -23,13 +23,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.CacheControl;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -149,14 +152,26 @@ class NotebookBooksController {
 
   @GetMapping(value = "/{notebook}/book/file", produces = MediaType.APPLICATION_PDF_VALUE)
   public ResponseEntity<byte[]> getBookFile(
+      WebRequest request,
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
     var pdf = bookService.getBookPdfFile(notebook);
+    String etag = pdf.etag();
+    CacheControl cacheControl =
+        CacheControl.maxAge(365, TimeUnit.DAYS).cachePrivate().mustRevalidate();
+    if (request.checkNotModified(etag)) {
+      return ResponseEntity.status(HttpStatus.NOT_MODIFIED)
+          .eTag(etag)
+          .cacheControl(cacheControl)
+          .build();
+    }
     return ResponseEntity.ok()
+        .eTag(etag)
+        .cacheControl(cacheControl)
         .header(
             HttpHeaders.CONTENT_DISPOSITION,
-            "attachment; filename=\"" + pdf.attachmentFileName() + "\"")
+            "inline; filename=\"" + pdf.attachmentFileName() + "\"")
         .contentType(MediaType.APPLICATION_PDF)
         .body(pdf.bytes());
   }
