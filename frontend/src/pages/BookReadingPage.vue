@@ -108,6 +108,9 @@
               :data-current-selection="
                 range.id === currentSelectionRangeId ? 'true' : undefined
               "
+              :data-direct-content-read="
+                inMemoryReadRangeIds.has(range.id) ? 'true' : undefined
+              "
               :aria-current="
                 range.startAnchor.id === currentRangeAnchorId
                   ? 'location'
@@ -117,6 +120,12 @@
               @click="onBookRangeClick(range)"
             >
               {{ range.title }}
+              <span
+                v-if="inMemoryReadRangeIds.has(range.id)"
+                class="daisy-sr-only"
+              >
+                Marked as read
+              </span>
             </button>
           </div>
         </aside>
@@ -515,5 +524,9 @@ aside {
 
 .book-reading-book-range[data-current-selection="true"] {
   @apply daisy-border-primary daisy-font-medium;
+}
+
+.book-reading-book-range[data-direct-content-read="true"] {
+  @apply daisy-border-r-4 daisy-border-r-success;
 }
 </style>

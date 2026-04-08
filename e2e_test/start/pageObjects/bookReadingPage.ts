@@ -219,6 +219,17 @@ const bookReadingPage = () => {
         .click()
       return this
     },
+    /**
+     * Book layout row marked as read: `data-direct-content-read="true"` plus success right border
+     * and screen-reader “Marked as read” on the row.
+     */
+    expectBookRangeMarkedAsReadInBookLayout(title: string) {
+      pageIsNotLoading()
+      bookRangeRows()
+        .contains(title)
+        .should('have.attr', 'data-direct-content-read', 'true')
+      return this
+    },
   }
 }
 
