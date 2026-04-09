@@ -31,7 +31,7 @@
       </NotebookNewButton>
     </template>
   </GlobalBar>
-  <div
+  <main
     class="daisy-container daisy-mx-auto daisy-px-4 daisy-py-6"
     :class="
       notebooksLayout === 'grid' ? 'daisy-max-w-7xl' : 'daisy-max-w-3xl'
@@ -98,7 +98,7 @@
         None yet — visit the Bazaar to subscribe to shared notebooks.
       </p>
     </section>
-  </div>
+  </main>
 </template>
 
 <script setup lang="ts">
