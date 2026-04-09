@@ -47,7 +47,7 @@
 - **Coexists with drawer:** Opening/closing the book layout **does not** reset panel expand/minimize preference for the session unless we later persist it (open UX question).
 - **Accessibility:** Expand/collapse and primary actions need **visible labels** or **accessible names**; avoid relying only on iconography for “mark read.”
 
-**Delivery mapping:** The reading-record plan’s first user-visible slice ships **read** + persistence + read badge on **book ranges** via this panel. Later slices add **auto-mark when no direct content**, **skim/skip**, and any **persistence of panel state** if product wants it — see [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md).
+**Delivery mapping:** The reading-record plan’s **Phase 2** slice (**read** + persistence + read styling on **book ranges** via this panel) is **shipped** — see [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md) and [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature). **Phase 3–4** add **auto-mark when no direct content**, **skim/skip**, and optional **persistence of panel state** if product wants it.
 
 ---
 

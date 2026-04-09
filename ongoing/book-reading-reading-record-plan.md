@@ -8,9 +8,11 @@
 
 **Planning rules:** `.cursor/rules/planning.mdc` — one **user-visible** behavior per phase, scenario-first ordering, test-first workflow when adding behavior, at most one intentionally failing test while driving a phase.
 
-**Testing for this story:** **Phase 2** uses **E2E** for the main book layout + prompt + mark behavior. **Phases 1, 3, and 4** do **not** add E2E; they rely on **unit-style tests** in the sense of `.cursor/rules/planning.mdc` — drive **observable** surfaces (HTTP responses from **controllers**, **mounted** Vue behavior via Vitest where the UI is the contract), use **black-box** inputs/outputs, prefer **few** focused tests over a 1:1 map to implementation files, and use **direct** tests only for deliberate small contracts (pure predicates, mapping, validation messages).
+**Testing for this story:** **Phase 2** is covered by **E2E** ([`reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature)) plus controller and mounted tests. **Phases 1, 3, and 4** do **not** add E2E in this plan; they rely on **unit-style tests** per `.cursor/rules/planning.mdc` — **observable** surfaces (HTTP from **controllers**, **mounted** Vue via Vitest), **black-box** I/O, **few** focused tests, **direct** tests only for small deliberate contracts (pure predicates, mapping, validation messages).
 
 **This document is a delivery plan only** — not executed here.
+
+**Status:** **Phase 2** (*Mark a book range as read*) is **shipped** (E2E: [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature)). **Phase 3** and **Phase 4** below are **not** started. Sub-phase detail: [`ongoing/book-reading-phase2-mark-range-read-subphases.md`](book-reading-phase2-mark-range-read-subphases.md).
 
 ---
 
@@ -19,7 +21,8 @@
 - **Progress on chunks:** [`ongoing/doughnut-book-reading-architecture-roadmap.md`](doughnut-book-reading-architecture-roadmap.md) — `ReadingRecord` refers to a **`BookRange`**, not a `SourceSpan`. Per-range **read / skim / skip** states belong on that model (or equivalent rows), not on arbitrary PDF coordinates.
 - **Fine-grained “where on the page”** (exact scroll restore) is an **open architecture question** in the same roadmap; Phase 1 may persist a **viewport-aligned** snapshot (see below) without pretending it is a substitute for long-term `ReadingRecord` semantics.
 - **Direct content** between two **book ranges** is **conceptual** today (no required DB column for the gap). Phases 3–4 rely on a **documented heuristic** (e.g. anchor proximity in **MinerU-normalized** space, same-page `y0` ordering, or “next range start immediately follows previous start”) — pick one rule per implementation and test it; revisiting the heuristic is allowed if product feedback demands it.
-- **Book layout reading order** for “previous range” and auto-marking should match the **same linear order** the UI uses for the **current range** (depth-first preorder over the `BookRange` tree unless product explicitly chooses another walk).
+- **Consecutive ranges in reading order** (for Phase 2’s “successor” check, Phase 3’s A→B gap, and **current range**) are **not** required to sit at the same tree depth. **B** is always the **immediate successor** of **A** in the linear walk. Typical shapes include: **siblings** (A then next sibling), **parent then first child** (A then its first `children[]` entry), and **last descendant then next range after leaving a subtree** (e.g. A is the last range in a subtree; B is the next sibling of an ancestor — “uncle” relative to A). Same rule as **direct content** boundaries in [`ongoing/doughnut-book-reading-architecture-roadmap.md`](doughnut-book-reading-architecture-roadmap.md).
+- **Book layout reading order** for the reading-control **successor boundary**, Phase 3 auto-marking, and **current range** must match the **same linear order** (depth-first preorder over the `BookRange` tree unless product explicitly chooses another walk).
 - **Observable tests (this plan):** **Phase 2** — Cypress for the full reading-record UX. **Phases 1, 3, 4** — Spring **controller** tests (status, body, persistence side effects via follow-up reads) and/or **mounted** frontend tests where the behavior is UI-shaped; **pure** black-box tests for predicates and formatting. Avoid tests that only pin private helpers when a controller or mounted component already proves the path.
 
 ---
@@ -46,25 +49,21 @@
 
 ---
 
-## Phase 2 — Mark a book range as read
+## Phase 2 — Mark a book range as read — **shipped**
 
-**User story scenario:** *mark a book range as read* — at title “2.3 …”, answer **read** to whether the **direct content** of “2.2 …” was read; the **book layout** shows “2.3 …” (or the range that encodes the confirmed disposition—interpret per final copy) as **read**.
+**User story scenario:** [`ongoing/book-reading-user-stories.md`](book-reading-user-stories.md) — *mark a book range as read* (same steps as [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature)): user **selects** range **2.1**, scrolls until **2.2** is **current range**, marks **2.1** read from the panel; **2.1** shows read styling and **2.2** stays **selected**.
 
-**UX (Reading Control Panel):** The user completes this flow from the **Reading Control Panel** — a **bottom-anchored** region **inside the PDF main pane** (see [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md)). **Expanded:** short context (which range’s **direct content** is in question) and **Mark as read** (and room for later skim/skip). **Minimized:** a **small bar** with **one or two** controls (e.g. expand + quick mark, or equivalent). The panel must **not** capture document scroll; PDF remains the hero. Product copy still ties the **question** to the **previous** range’s direct content in reading order unless the story is updated in `book-reading-user-stories.md` in the same PR.
+**UX (Reading Control Panel):** **Bottom-anchored** in the **PDF main pane** ([`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md)). The panel appears when **current range** (viewport) is the **immediate successor** of the **selected range** in reading order — equivalent to treating the **selected** range’s direct content as “in question” while the reader sits on the next heading. **Mark as read** persists disposition for the **selected** `BookRange` (not the current-range row). Expanded/minimized bar; panel does **not** own document scroll.
 
-**Clarify in implementation (product copy):** The Gherkin ties the **question** to the **previous** range’s direct content and an **observable mark** on a range; adjust labels and which row shows the checkmark so the UI matches the story **literally** or update the story in `book-reading-user-stories.md` in the same PR as the behavior. The plan assumes: user **confirms disposition** for **direct content belonging to a specific predecessor range** in reading order, and **persistence** reflects that as a **`ReadingRecord`** (or one row per user + range).
+**User outcome (as implemented):**
 
-**User outcome:**
+- Server: table **`book_range_reading_record`**, entity **`BookRangeReadingRecord`**, **`READ`** status, **`completed_at`** on mark; uniqueness **(user_id, book_range_id)**.
+- **`GET …/book`** remains **layout-only**. Client merges **`GET …/book/reading-records`** (`bookRangeId`, `status`, `completedAt`) with layout for read borders (`frontend/src/lib/book-reading/readRangeIdsFromRecords.ts`, `useNotebookBookReadingRecords`, `BookReadingPage.vue`).
+- **`PUT …/book/ranges/{bookRange}/reading-record`** → **200** + JSON array of **`BookRangeReadingRecordListItem`** (full list after write; same item shape as **`GET …/book/reading-records`** — avoids an extra list fetch after mark).
 
-- Server persists **`ReadingRecord`** (per user, per `BookRange`) with at least **status = read** and sensible **timestamps** (`startedAt` / `lastReadAt` / `completedAt` as appropriate — minimal first slice: mark **completed** when they confirm read).
-- **`GET …/book`** stays **layout-only** (tree + anchors). The client loads read state via **`GET …/book/reading-records`** (per-user list: **`bookRangeId`**, **`status`**, **`completedAt`**) and merges it in the UI for **read** styling on **book layout** rows. **Write:** **`PUT …/book/ranges/{bookRange}/reading-record`**.
-- The user can complete **confirm read** from the panel **without** breaking PDF scroll, pinch/zoom, or drawer behavior; panel can be **minimized** after use if product wants that default.
+**E2E:** `reading_record.feature` (CLI attach `refactoring.pdf`, OCR-backed scroll steps).
 
-**Data model:** New table/entity aligned with roadmap diagram: `User` + `BookRange` + status + timestamps; enforce **uniqueness** (user + book_range_id). Foreign keys consistent with existing `book_range` and user entities.
-
-**E2E:** Fixture **book layout** with **distinct titles** “2.2 …” and “2.3 …” (or equivalent) → drive scroll/selection so the panel shows the **expected context** → user activates **Mark as read** (from expanded or minimized state, per chosen default) → assert **visible mark** on the correct **book range** (DOM attribute or text pattern stable for Cypress).
-
-**Unit / focused tests (optional but useful):** Status transitions, invalid range id, wrong notebook/book — via controller or service black-box tests per `.cursor/rules/backend-development.mdc`.
+**Other tests:** `NotebookBooksControllerTest` (list + put + auth/idempotency paths); mounted **`BookReadingPage.spec.ts`**; **`readRangeIdsFromRecords.spec.ts`**.
 
 ---
 
@@ -72,7 +71,7 @@
 
 **User story scenario:** *mark a book range with no direct content as read automatically* — no meaningful gap between title “xxx” and “ooo”; scrolling through **xxx** then **ooo** results in **xxx** shown as read **without** an explicit answer.
 
-**User outcome:** When the system classifies **direct content between range A and the next range B in reading order** as **empty / not meaningful** (per the agreed heuristic in Principles), **entering B** (or passing the boundary—define one rule) **automatically** creates or updates **`ReadingRecord`** for **A** as read (or equivalent “no gap” disposition), and the **book layout** updates like Phase 2.
+**User outcome:** When the system classifies **direct content between range A and the immediate successor B** in **book layout reading order** as **empty / not meaningful** (per the agreed heuristic in Principles), **entering B** (or passing the boundary—define one rule) **automatically** creates or updates **`ReadingRecord`** for **A** as read (or equivalent “no gap” disposition), and the **book layout** updates like Phase 2. **A** and **B** may be siblings, parent/first-child, last-child-in-subtree/next-after-subtree, or any other **consecutive preorder** pair — not only same-level headings.
 
 **Depends on:** Phase 2 (persistence and **book layout** display of read state).
 
@@ -116,4 +115,4 @@ After each phase:
 
 ## Document maintenance
 
-When phases ship, trim duplication here; keep the architecture roadmap as the single place for long-lived conceptual rules. **Phase 2** may add or extend a Cypress feature path — link it here for onboarding. Phases 1, 3, and 4 rely on unit/controller/mounted tests only.
+When phases ship, trim duplication here; keep the architecture roadmap as the single place for long-lived conceptual rules. **Phase 2** Cypress path: [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature). Phases 1, 3, and 4 rely on unit/controller/mounted tests only (no extra E2E required by this plan except Phase 2, done).

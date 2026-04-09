@@ -110,6 +110,8 @@ Each `BookRange` also has a conceptual association to **direct content** (see ne
 - **Parent book range:** Its direct content is the material **between itself and its first child** (i.e. after this range’s start until the first child’s start). If there is no child, the next boundary is the same rule as for a leaf: the following **book range** in the walk, or EOF.
 - **Last child in a subtree:** Its direct content runs **from its start until the next range after leaving that subtree** (the next sibling of an ancestor, or EOF)—not “until parent’s end,” unless the **book layout** order says so.
 
+**Reading-record heuristics (e.g. “no meaningful gap”):** Any predicate over “the gap from **A**’s start to **B**’s start” applies to **every** consecutive pair (**A**, **B**) in that same walk—**siblings**, **parent → first child**, **last node in a subtree → next range after the subtree**, etc. It is **not** limited to same-depth ranges.
+
 **Persistence and extraction:** For now, direct content is **only a vocabulary and UX/progress concept**. We do **not** require a stored blob, span table, or server-side extraction of that gap. When the product needs it, anchors or text extraction can be added without renaming the idea.
 
 **Disposition (per range, conceptual):** How the user (or system) treats the direct content attached to a range can be classified for product logic:
@@ -137,7 +139,7 @@ Belongs to a `Notebook`. At most **one** `SourceSpan` for the first version—en
 
 Per `User`, refers to a `BookRange`. Progress attaches to **meaningful chunks**, not citation-sized spans.
 
-**HTTP (as implemented for Phase 2 read disposition):** Rows are written with **`PUT /api/notebooks/{notebook}/book/ranges/{bookRange}/reading-record`** and listed with **`GET /api/notebooks/{notebook}/book/reading-records`** (current user only). **`GET …/book`** does **not** embed reading state on each `BookRange`; the client merges layout + reading-records list when it needs borders or panel logic from the server.
+**HTTP (as implemented for Phase 2 read disposition):** Rows are written with **`PUT /api/notebooks/{notebook}/book/ranges/{bookRange}/reading-record`** (response body: full **reading-records** list for the current user and book, same JSON shape as **`GET`**) and listed with **`GET /api/notebooks/{notebook}/book/reading-records`**. **`GET …/book`** does **not** embed reading state on each `BookRange`; the client merges layout + reading-records list when it needs borders or panel logic from the server.
 
 ---
 
@@ -148,7 +150,7 @@ Per `User`, refers to a `BookRange`. Progress attaches to **meaningful chunks**,
 3. `ReadingRecord` points at a `BookRange`, not a `SourceSpan`.
 4. `SourceSpan` is optional on `Note`.
 5. Prefer `SourceSpan` to be smaller than or equal to the `BookRange` it sits within.
-6. **Direct content** is defined relative to **book layout reading order** and a range’s **start** boundary; it is **orthogonal** to how deep the range sits in the tree. Until we persist it, rules about extraction or anchors for gaps are **out of scope** for this roadmap’s defaults.
+6. **Direct content** is defined relative to **book layout reading order** and a range’s **start** boundary; it is **orthogonal** to how deep the range sits in the tree. **Disposition** is persisted via **`ReadingRecord`**; **materializing** the gap as extracted text/spans (if ever) is **out of scope** for this roadmap’s defaults until product asks for it.
 
 These are **defaults** for consistency; revisiting them is a roadmap-level change, not a silent refactor.
 
