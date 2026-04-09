@@ -497,6 +497,10 @@ export type NoteUpdateDetailsDto = {
     details?: string;
 };
 
+export type UpdateNotebookGroupRequest = {
+    notebookGroupId?: number;
+};
+
 export type NoteAccessoriesDto = {
     url?: string;
     imageUrl?: string;
@@ -517,10 +521,6 @@ export type NoteAccessory = {
     imageMask?: string;
     useParentImage?: boolean;
     imageWithMask?: ImageWithMask;
-};
-
-export type UpdateNotebookGroupRequest = {
-    notebookGroupId?: number;
 };
 
 export type BookLastReadPositionRequest = {
@@ -2546,6 +2546,24 @@ export type UpdateNoteDetailsResponses = {
 };
 
 export type UpdateNoteDetailsResponse = UpdateNoteDetailsResponses[keyof UpdateNoteDetailsResponses];
+
+export type UpdateSubscriptionGroupData = {
+    body: UpdateNotebookGroupRequest;
+    path: {
+        subscription: number;
+    };
+    query?: never;
+    url: '/api/subscriptions/{subscription}/notebook-group';
+};
+
+export type UpdateSubscriptionGroupResponses = {
+    /**
+     * OK
+     */
+    200: Subscription;
+};
+
+export type UpdateSubscriptionGroupResponse = UpdateSubscriptionGroupResponses[keyof UpdateSubscriptionGroupResponses];
 
 export type ShowNoteData = {
     body?: never;

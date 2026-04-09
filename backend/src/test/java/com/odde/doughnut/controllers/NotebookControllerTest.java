@@ -153,6 +153,40 @@ class NotebookControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void subscribedNotebookInGroupAppearsOnlyInsideGroupRow()
+        throws UnexpectedNoAccessRightException {
+      User subscriber = makeMe.aUser().please();
+      currentUser.setUser(subscriber);
+      User owner = makeMe.aUser().please();
+      Notebook bazaarNotebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+      makeMe.aBazaarNotebook(bazaarNotebook).please();
+      Subscription subscription =
+          makeMe.aSubscription().forNotebook(bazaarNotebook).forUser(subscriber).please();
+      NotebookGroup group =
+          notebookGroupService.createGroup(subscriber, subscriber.getOwnership(), "G");
+      notebookGroupService.assignSubscriptionToGroup(subscriber, subscription, group);
+      makeMe.refresh(subscriber);
+      var view = controller.myNotebooks();
+      boolean topLevelSubscribed =
+          view.catalogItems.stream()
+              .anyMatch(
+                  item ->
+                      item instanceof NotebookCatalogSubscribedNotebookItem s
+                          && s.notebook.getId().equals(bazaarNotebook.getId()));
+      assertFalse(topLevelSubscribed);
+      NotebookCatalogGroupItem groupRow =
+          view.catalogItems.stream()
+              .filter(NotebookCatalogGroupItem.class::isInstance)
+              .map(NotebookCatalogGroupItem.class::cast)
+              .filter(g -> g.id.equals(group.getId()))
+              .findFirst()
+              .orElseThrow();
+      assertThat(
+          groupRow.notebooks.stream().map(Notebook::getId).toList(),
+          equalTo(List.of(bazaarNotebook.getId())));
+    }
+
+    @Test
     void subscribedNotebookAppearsInCatalogItemsBetweenOwnedRows() {
       User subscriber = makeMe.aUser().please();
       currentUser.setUser(subscriber);

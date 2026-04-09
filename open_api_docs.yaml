@@ -1962,6 +1962,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteRealm"
+  /api/subscriptions/{subscription}/notebook-group:
+    patch:
+      tags:
+      - subscription-controller
+      operationId: updateSubscriptionGroup
+      parameters:
+      - name: subscription
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateNotebookGroupRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Subscription"
   /api/notes/{note}:
     get:
       tags:
@@ -4134,6 +4158,12 @@ components:
       properties:
         details:
           type: string
+    UpdateNotebookGroupRequest:
+      type: object
+      properties:
+        notebookGroupId:
+          type: integer
+          format: int32
     NoteAccessoriesDTO:
       type: object
       properties:
@@ -4174,12 +4204,6 @@ components:
           $ref: "#/components/schemas/ImageWithMask"
       required:
       - id
-    UpdateNotebookGroupRequest:
-      type: object
-      properties:
-        notebookGroupId:
-          type: integer
-          format: int32
     BookLastReadPositionRequest:
       type: object
       properties:

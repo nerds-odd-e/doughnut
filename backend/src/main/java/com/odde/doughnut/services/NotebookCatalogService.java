@@ -55,6 +55,9 @@ public class NotebookCatalogService {
     }
 
     for (Subscription subscription : subscriptions) {
+      if (subscription.getNotebookGroup() != null) {
+        continue;
+      }
       Notebook notebook = subscription.getNotebook();
       rows.add(
           new SortableRow(
@@ -75,10 +78,27 @@ public class NotebookCatalogService {
                   Comparator.comparing((Notebook nb) -> nb.getHeadNote().getCreatedAt())
                       .thenComparing(Notebook::getId))
               .toList();
+      List<Notebook> subscribedMembers =
+          subscriptions.stream()
+              .filter(
+                  s ->
+                      s.getNotebookGroup() != null
+                          && Objects.equals(s.getNotebookGroup().getId(), group.getId()))
+              .sorted(
+                  Comparator.comparing(
+                          (Subscription s) -> s.getNotebook().getHeadNote().getCreatedAt())
+                      .thenComparing(s -> s.getNotebook().getId()))
+              .map(Subscription::getNotebook)
+              .toList();
+      List<Notebook> allMembers = new ArrayList<>(members);
+      allMembers.addAll(subscribedMembers);
+      allMembers.sort(
+          Comparator.comparing((Notebook nb) -> nb.getHeadNote().getCreatedAt())
+              .thenComparing(Notebook::getId));
       rows.add(
           new SortableRow(
               new NotebookCatalogGroupItem(
-                  group.getId(), group.getName(), group.getCreatedAt(), members),
+                  group.getId(), group.getName(), group.getCreatedAt(), allMembers),
               group.getCreatedAt(),
               1,
               group.getId()));

@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookGroup;
 import com.odde.doughnut.entities.Ownership;
+import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
@@ -49,5 +50,26 @@ public class NotebookGroupService {
     }
     notebook.setNotebookGroup(null);
     entityPersister.save(notebook);
+  }
+
+  public void assignSubscriptionToGroup(User actor, Subscription subscription, NotebookGroup group)
+      throws UnexpectedNoAccessRightException {
+    if (!subscription.getUser().equals(actor)) {
+      throw new UnexpectedNoAccessRightException();
+    }
+    if (!group.getOwnership().ownsBy(actor)) {
+      throw new UnexpectedNoAccessRightException();
+    }
+    subscription.setNotebookGroup(group);
+    entityPersister.save(subscription);
+  }
+
+  public void clearSubscriptionGroup(User actor, Subscription subscription)
+      throws UnexpectedNoAccessRightException {
+    if (!subscription.getUser().equals(actor)) {
+      throw new UnexpectedNoAccessRightException();
+    }
+    subscription.setNotebookGroup(null);
+    entityPersister.save(subscription);
   }
 }
