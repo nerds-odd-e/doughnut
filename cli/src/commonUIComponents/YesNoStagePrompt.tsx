@@ -68,8 +68,10 @@ export function YesNoStagePrompt({
   const handleInput = useCallback(
     (input: string, key: Key) => {
       const isEscape = key.escape === true || input === '\u001b'
-      if (isEscape && onCancelRef.current !== undefined) {
-        runOnCancel(onCancelRef.current)
+      if (isEscape) {
+        if (onCancelRef.current !== undefined) {
+          runOnCancel(onCancelRef.current)
+        }
         return
       }
 

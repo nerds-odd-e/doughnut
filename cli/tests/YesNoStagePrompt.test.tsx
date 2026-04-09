@@ -171,31 +171,38 @@ describe('YesNoStagePrompt', () => {
   })
 
   test('Escape without onCancel does not call onAnswer; y still commits after a turn drain', async () => {
-    const onAnswer = vi.fn()
-    const { stdin, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(
-        <StageKeyRoot>
-          <YesNoStagePrompt prompt="OK?" onAnswer={onAnswer} />
-        </StageKeyRoot>
+    // Ink 7 defers a lone ESC ~20ms; the next stdin chunk cancels that timer and merges bytes (breaks y).
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    try {
+      const onAnswer = vi.fn()
+      const { stdin, waitForFramesToInclude } =
+        await renderInkWhenCommandLineReady(
+          <StageKeyRoot>
+            <YesNoStagePrompt prompt="OK?" onAnswer={onAnswer} />
+          </StageKeyRoot>
+        )
+
+      await waitForFramesToInclude(/OK\?/)
+
+      stdin.write('\u001b')
+      await vi.advanceTimersByTimeAsync(25)
+      let drain = 0
+      await waitForFrames(
+        () => String(++drain),
+        (s) => Number(s) >= 30
       )
+      expect(onAnswer).not.toHaveBeenCalled()
 
-    await waitForFramesToInclude(/OK\?/)
-
-    stdin.write('\u001b')
-    let drain = 0
-    await waitForFrames(
-      () => String(++drain),
-      (s) => Number(s) >= 30
-    )
-    expect(onAnswer).not.toHaveBeenCalled()
-
-    stdin.write('y\r')
-    await waitForFrames(
-      () => String(onAnswer.mock.calls.length),
-      (c) => Number(c) >= 1
-    )
-    expect(onAnswer).toHaveBeenCalledTimes(1)
-    expect(onAnswer).toHaveBeenCalledWith(true)
+      stdin.write('y\r')
+      await waitForFrames(
+        () => String(onAnswer.mock.calls.length),
+        (c) => Number(c) >= 1
+      )
+      expect(onAnswer).toHaveBeenCalledTimes(1)
+      expect(onAnswer).toHaveBeenCalledWith(true)
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   test('typed n commits no even with defaultAnswer true', async () => {
