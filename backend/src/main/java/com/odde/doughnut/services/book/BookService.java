@@ -23,12 +23,14 @@ import com.odde.doughnut.entities.repositories.BookUserLastReadPositionRepositor
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -199,7 +201,11 @@ public class BookService {
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
     String attachmentFileName = sanitizeFileName(book.getBookName()) + ".pdf";
-    return new BookPdfFile(bytes, attachmentFileName);
+    return new BookPdfFile(bytes, attachmentFileName, etagForSourceRef(ref));
+  }
+
+  private static String etagForSourceRef(String ref) {
+    return "\"" + DigestUtils.md5DigestAsHex(ref.getBytes(StandardCharsets.UTF_8)) + "\"";
   }
 
   private static String sanitizeFileName(String fileName) {

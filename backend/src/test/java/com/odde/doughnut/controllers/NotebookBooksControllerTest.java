@@ -18,6 +18,7 @@ import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.book.BookReadingWireConstants;
 import com.odde.doughnut.services.book.BookStorage;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -30,7 +31,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.util.DigestUtils;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -83,6 +87,10 @@ class NotebookBooksControllerTest extends ControllerTestBase {
 
   private static MultipartFile pdfFile(byte[] content) {
     return new MockMultipartFile("file", "book.pdf", "application/pdf", content);
+  }
+
+  private static ServletWebRequest webRequest() {
+    return new ServletWebRequest(new MockHttpServletRequest());
   }
 
   private static List<BookRange> rootRangesSorted(Book book) {
@@ -170,7 +178,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(detailRoot.getId(), equalTo(outRoot.getId()));
       assertThat(childrenOf(detail, detailRoot), hasSize(2));
 
-      ResponseEntity<byte[]> fileRes = controller.getBookFile(nb);
+      ResponseEntity<byte[]> fileRes = controller.getBookFile(webRequest(), nb);
       assertThat(fileRes.getStatusCode(), equalTo(HttpStatus.OK));
       assertThat(fileRes.getBody(), equalTo(pdfBytes));
     }
@@ -280,50 +288,75 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     @Test
     void returns404WhenNotebookHasNoBook() throws UnexpectedNoAccessRightException {
       Notebook nb = myNotebook();
-      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(nb));
+      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(webRequest(), nb));
     }
 
     @Test
     void returns404WhenBookHasNoSourceFile() {
       Notebook nb = notebookWithBook();
       setSourceFileRef(nb, null);
-      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(nb));
+      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(webRequest(), nb));
     }
 
     @Test
     void rejectsNotebookWithoutReadAccess() {
       Notebook otherNb = otherUsersNotebook();
-      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.getBookFile(otherNb));
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.getBookFile(webRequest(), otherNb));
     }
 
     @Test
     void returnsPdfWhenSourceFileRefPointsAtBlob() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
       byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
-      setSourceFileRef(nb, bookStorage.put(pdfBytes));
+      String ref = bookStorage.put(pdfBytes);
+      setSourceFileRef(nb, ref);
+      String expectedEtag =
+          "\"" + DigestUtils.md5DigestAsHex(ref.getBytes(StandardCharsets.UTF_8)) + "\"";
 
-      ResponseEntity<byte[]> res = controller.getBookFile(nb);
+      ResponseEntity<byte[]> res = controller.getBookFile(webRequest(), nb);
 
       assertThat(res.getStatusCode(), equalTo(HttpStatus.OK));
       assertThat(res.getBody(), equalTo(pdfBytes));
       assertThat(res.getHeaders().getContentType(), equalTo(MediaType.APPLICATION_PDF));
+      assertThat(res.getHeaders().getETag(), equalTo(expectedEtag));
       assertThat(
           res.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION),
-          equalTo("attachment; filename=\"Linear Algebra.pdf\""));
+          equalTo("inline; filename=\"Linear Algebra.pdf\""));
+      assertThat(res.getHeaders().getCacheControl(), containsString("private"));
+      assertThat(res.getHeaders().getCacheControl(), containsString("max-age="));
+    }
+
+    @Test
+    void returns304WhenIfNoneMatchMatchesEtag() throws UnexpectedNoAccessRightException {
+      Notebook nb = notebookWithBook();
+      byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
+      String ref = bookStorage.put(pdfBytes);
+      setSourceFileRef(nb, ref);
+      String etag = "\"" + DigestUtils.md5DigestAsHex(ref.getBytes(StandardCharsets.UTF_8)) + "\"";
+
+      MockHttpServletRequest req = new MockHttpServletRequest();
+      req.addHeader(HttpHeaders.IF_NONE_MATCH, etag);
+      ResponseEntity<byte[]> res = controller.getBookFile(new ServletWebRequest(req), nb);
+
+      assertThat(res.getStatusCode(), equalTo(HttpStatus.NOT_MODIFIED));
+      assertThat(res.getBody(), nullValue());
+      assertThat(res.getHeaders().getETag(), equalTo(etag));
     }
 
     @Test
     void returns404WhenSourceFileRefIsNotNumeric() {
       Notebook nb = notebookWithBook();
       setSourceFileRef(nb, "not-an-id");
-      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(nb));
+      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(webRequest(), nb));
     }
 
     @Test
     void returns404WhenSourceFileRefBlobMissing() {
       Notebook nb = notebookWithBook();
       setSourceFileRef(nb, String.valueOf(Integer.MAX_VALUE));
-      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(nb));
+      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(webRequest(), nb));
     }
   }
 
@@ -339,7 +372,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(bookRepository.findByNotebook_Id(nb.getId()).isEmpty(), equalTo(true));
       assertThat(bookStorage.get(ref).isEmpty(), equalTo(true));
       assertThrows(ResponseStatusException.class, () -> controller.getBook(nb));
-      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(nb));
+      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(webRequest(), nb));
     }
 
     @Test
