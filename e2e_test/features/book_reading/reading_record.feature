@@ -10,6 +10,13 @@ Feature: Reading record
     When I attach book "refactoring.pdf" to the notebook "Top Maths" via the CLI
     And I open the book attached to notebook "Top Maths"
 
+  @ignore
+  Scenario: Auto-read a heading-only book block when entering its successor (reading record)
+    When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
+    And I scroll the PDF book reader down within the same page to move viewport past the next book block bbox
+    Then the book block "2.1 Easier to Change—and Harder to Misuse" should be the current block in the book reader
+    And I should see that book block "2. The Usual Defi nition Is Not Enough" is marked as read in the book layout
+
   Scenario: Mark a book block as read (reading record)
     When I choose the book block "2.1 Easier to Change—and Harder to Misuse"
     And I scroll the PDF until the book block "2.2 Refactoring as Strengthening the Code" is the current block in the book reader

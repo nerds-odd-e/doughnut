@@ -3,14 +3,22 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.CircleForUserView;
 import com.odde.doughnut.controllers.dto.CircleJoiningByInvitation;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
+import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
+import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.entities.Circle;
+import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.NotebookGroup;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.CircleService;
+import com.odde.doughnut.services.NotebookGroupService;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,6 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 class CircleControllerTest extends ControllerTestBase {
   @Autowired CircleService circleService;
   @Autowired CircleController controller;
+  @Autowired NotebookGroupService notebookGroupService;
 
   @BeforeEach
   void setup() {
@@ -95,6 +104,47 @@ class CircleControllerTest extends ControllerTestBase {
           () -> {
             controller.showCircle(circle);
           });
+    }
+
+    @Test
+    void notebooksViewIncludesCatalogWithCircleOwnedGroups()
+        throws UnexpectedNoAccessRightException {
+      User user = currentUser.getUser();
+      Circle circle = makeMe.aCircle().please();
+      circleService.joinAndSave(circle, user);
+      Notebook inGroup = makeMe.aNotebook().creatorAndOwner(user).owner(circle).please();
+      Notebook ungrouped = makeMe.aNotebook().creatorAndOwner(user).owner(circle).please();
+      NotebookGroup group =
+          notebookGroupService.createGroup(user, circle.getOwnership(), "Circle group");
+      notebookGroupService.assignNotebookToGroup(user, inGroup, group);
+      makeMe.refresh(circle);
+
+      CircleForUserView view = controller.showCircle(circle);
+      var notebooksView = view.getNotebooks();
+
+      assertThat(notebooksView.notebooks.size(), equalTo(2));
+      assertFalse(
+          notebooksView.catalogItems.stream()
+              .filter(NotebookCatalogNotebookItem.class::isInstance)
+              .map(NotebookCatalogNotebookItem.class::cast)
+              .anyMatch(row -> row.notebook.getId().equals(inGroup.getId())));
+      NotebookCatalogGroupItem groupRow =
+          notebooksView.catalogItems.stream()
+              .filter(NotebookCatalogGroupItem.class::isInstance)
+              .map(NotebookCatalogGroupItem.class::cast)
+              .filter(gr -> gr.id.equals(group.getId()))
+              .findFirst()
+              .orElseThrow();
+      assertThat(
+          groupRow.notebooks.stream().map(Notebook::getId).toList(),
+          equalTo(List.of(inGroup.getId())));
+      assertThat(
+          notebooksView.catalogItems.stream()
+              .filter(NotebookCatalogNotebookItem.class::isInstance)
+              .map(NotebookCatalogNotebookItem.class::cast)
+              .map(row -> row.notebook.getId())
+              .toList(),
+          equalTo(List.of(ungrouped.getId())));
     }
   }
 

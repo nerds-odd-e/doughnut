@@ -15,7 +15,7 @@
 - Group rows use a **visually distinct** treatment from notebook cards.
 - At the notebooks page, the user gets a **hint** of which notebooks are inside each group (e.g. short list of titles, ellipsis, and/or count — exact copy and limits are an implementation detail).
 
-**Scope note:** Start with **personal** `NotebookController.myNotebooks` ownership (see [`NotebookController.java`](../backend/src/main/java/com/odde/doughnut/controllers/NotebookController.java), [`NotebooksPage.vue`](../frontend/src/pages/NotebooksPage.vue)). **Circle** notebooks use a parallel path ([`CircleForUserView`](../backend/src/main/java/com/odde/doughnut/controllers/dto/CircleForUserView.java)); treat **circle parity** as a **later phase** unless product requires it on day one.
+**Ownership scope:** Notebook groups are tied to an [`Ownership`](../backend/src/main/java/com/odde/doughnut/entities/Ownership.java) — the same row backs **personal** notebooks (`NotebookController.myNotebooks`, [`NotebooksPage.vue`](../frontend/src/pages/NotebooksPage.vue)) and **circle** notebooks (`CircleForUserView` via [`CircleController.showCircle`](../backend/src/main/java/com/odde/doughnut/controllers/CircleController.java)). Groups for a circle **belong to that circle’s ownership** (`notebook_group.ownership_id` = the circle’s ownership). Backend catalog merging applies to both paths; **circle-specific behavior does not need its own E2E test** — cover it with **unit / controller** tests (see Phase 2 tests). **Circle UI** on the notebooks list (when built) should mirror the personal page pattern for catalog + hints.
 
 ---
 
@@ -63,7 +63,7 @@ Document the chosen rule in code (single place) so API and UI stay consistent.
 - Extend **`myNotebooks`** response so the client does not re-implement authorization-sensitive merging. Options: discriminated **`catalogItems[]`**, or `notebookGroups[]` + `notebooks[]` plus explicit **sort keys** — prefer **one ordered list** if it keeps the UI dumb and matches “listed together.”
 - OpenAPI update → `pnpm generateTypeScript` ([`generated-backend-api`](../.cursor/rules/generated-backend-api-code-for-frontend.mdc)).
 
-**Tests:** `NotebookController` / dedicated controller tests — create group, list includes group, sort order assertions, ungrouped notebooks omitted from “top-level” duplicate if the product rule is **grouped notebooks only under their group row** (state this explicitly in implementation).
+**Tests:** `NotebookController` / dedicated controller tests — create group, list includes group, sort order assertions, ungrouped notebooks omitted from “top-level” duplicate if the product rule is **grouped notebooks only under their group row** (state this explicitly in implementation). **`CircleController.showCircle`:** assert nested `NotebooksViewedByUser.catalogItems` includes circle-owned groups and members the same way (no separate Cypress scenario for circle groups).
 
 ---
 
@@ -110,7 +110,6 @@ Document the chosen rule in code (single place) so API and UI stay consistent.
 ## Optional follow-ups (separate phases if needed)
 
 - **Rename / delete** empty or non-empty group (product rules for members on delete).
-- **Circle** notebook lists — same concept on circle ownership catalog.
 - **Bazaar / subscription** notebooks — explicitly **out of scope** unless product says otherwise (subscribed notebooks are already a separate section on the page).
 
 ---
