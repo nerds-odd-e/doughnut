@@ -3,7 +3,7 @@
     "type": "text",
     "text": "Code Refactoring",
     "text_level": 2,
-    "bbox": [90, 72, 415, 115],
+    "bbox": [90, 72, 576, 115],
     "page_idx": 0
   },
   {
@@ -21,7 +21,7 @@
   },
   {
     "type": "text",
-    "text": "Refactoring is often defi ned as changing the internal structure of code without changing its external behavior. That defi nition is useful, but it does not fully explain the purpose of refactoring.",
+    "text": "Refactoring is often defi ned as changing the internal structure of code without changing its external behavior. That defi nition is useful, but it does not fully explain the purpose of refactoring.1",
     "bbox": [87, 332, 885, 397],
     "page_idx": 0
   },
@@ -34,14 +34,14 @@
   {
     "type": "text",
     "text": "When code works, it already contains assumptions, domain meaning, and design choices. Over time, these can become harder to see and easier to break. Refactoring helps make them clearer and harder to violate by accident.",
-    "bbox": [87, 473, 878, 557],
+    "bbox": [87, 474, 878, 557],
     "page_idx": 0
   },
   {
     "type": "text",
     "text": "2. The Usual Defi nition Is Not Enough",
     "text_level": 2,
-    "bbox": [87, 577, 754, 608],
+    "bbox": [87, 577, 754, 607],
     "page_idx": 0
   },
   {
@@ -54,7 +54,7 @@
   {
     "type": "text",
     "text": "Refactoring is often said to make code easier to change. That is true, but incomplete.",
-    "bbox": [87, 677, 873, 720],
+    "bbox": [87, 677, 873, 719],
     "page_idx": 0
   },
   {
@@ -70,28 +70,55 @@
     "page_idx": 0
   },
   {
+    "type": "page_footnote",
+    "text": "1 Wake, William C. (2003). Refactoring Workbook. Addison-Wesley",
+    "bbox": [89, 916, 643, 934],
+    "page_idx": 0
+  },
+  {
+    "type": "page_number",
+    "text": "Page 1 of 5",
+    "bbox": [443, 933, 554, 951],
+    "page_idx": 0
+  },
+  {
     "type": "text",
     "text": "2.2 Refactoring as Strengthening the Code",
     "text_level": 2,
-    "bbox": [87, 68, 779, 98],
+    "bbox": [87, 89, 779, 117],
     "page_idx": 1
   },
   {
     "type": "text",
     "text": "A lot of good refactoring does not add fl exibility. It removes unnecessary options.",
-    "bbox": [87, 115, 763, 160],
+    "bbox": [87, 136, 764, 179],
     "page_idx": 1
   },
   {
     "type": "text",
     "text": "A function with too many valid input combinations is easy to misuse. A weak type can allow invalid states. A vague abstraction can hide the real intent of the code.",
-    "bbox": [87, 177, 894, 240],
+    "bbox": [87, 197, 894, 260],
     "page_idx": 1
   },
   {
     "type": "text",
     "text": "Refactoring often means making the code more specifi c about what it accepts and what it means. Stronger typing is especially useful here. A good type system does not just help the compiler; it helps preserve the original design intention.",
-    "bbox": [87, 258, 897, 342],
+    "bbox": [87, 278, 897, 360],
+    "page_idx": 1
+  },
+  {
+    "type": "table",
+    "img_path": "images/91c0668981fa16a6361d6d4d97285fd2d19bf34c0606564e1a2828b0535f7219.jpg",
+    "table_caption": [],
+    "table_footnote": [],
+    "table_body": "<table><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>Column1</td><td rowspan=1 colspan=1>Column2</td></tr><tr><td rowspan=1 colspan=1>Something</td><td rowspan=1 colspan=1>Q1</td><td rowspan=1 colspan=1>Q2</td></tr><tr><td rowspan=1 colspan=1>Something else</td><td rowspan=1 colspan=1>Q3</td><td rowspan=1 colspan=1>Q4</td></tr></table>",
+    "bbox": [92, 360, 904, 441],
+    "page_idx": 1
+  },
+  {
+    "type": "page_number",
+    "text": "Page 2 of 5",
+    "bbox": [445, 933, 554, 951],
     "page_idx": 1
   },
   {
@@ -105,7 +132,7 @@
     "type": "text",
     "text": "3.1 Can You Refactor Without Tests?",
     "text_level": 2,
-    "bbox": [87, 153, 680, 180],
+    "bbox": [87, 153, 682, 180],
     "page_idx": 2
   },
   {
@@ -146,17 +173,23 @@
     "page_idx": 2
   },
   {
+    "type": "page_number",
+    "text": "Page 3 of 5",
+    "bbox": [445, 933, 554, 952],
+    "page_idx": 2
+  },
+  {
     "type": "text",
     "text": "4. Two Diff erent Kinds of Refactoring",
     "text_level": 2,
-    "bbox": [87, 68, 744, 99],
+    "bbox": [87, 70, 744, 98],
     "page_idx": 3
   },
   {
     "type": "text",
     "text": "4.1 Refactoring to Protect Current Intent",
     "text_level": 2,
-    "bbox": [87, 122, 744, 149],
+    "bbox": [87, 122, 744, 148],
     "page_idx": 3
   },
   {
@@ -167,65 +200,92 @@
   },
   {
     "type": "text",
+    "text": "4.1.1 Refactoring Art",
+    "text_level": 2,
+    "bbox": [87, 271, 363, 293],
+    "page_idx": 3
+  },
+  {
+    "type": "image",
+    "img_path": "images/22a9f79f2dab6a64b27b95a11568e1d50285517c94287324d7bb63df2c64bcfd.jpg",
+    "image_caption": [],
+    "image_footnote": [],
+    "bbox": [208, 350, 742, 582],
+    "page_idx": 3
+  },
+  {
+    "type": "text",
     "text": "4.2 Refactoring to Prepare for the Next Change",
     "text_level": 2,
-    "bbox": [87, 273, 850, 300],
+    "bbox": [87, 671, 850, 699],
     "page_idx": 3
   },
   {
     "type": "text",
     "text": "Another kind is more strategic: reshape the code so the next feature change becomes easier to make. This is the idea behind “make the change easy, then make the easy change.”",
-    "bbox": [87, 319, 863, 382],
+    "bbox": [87, 718, 862, 782],
     "page_idx": 3
   },
   {
     "type": "text",
     "text": "These two kinds are related, but not identical. One protects the present design. The other prepares for the future.",
-    "bbox": [87, 399, 899, 444],
+    "bbox": [87, 799, 899, 841],
+    "page_idx": 3
+  },
+  {
+    "type": "page_number",
+    "text": "Page 4 of 5",
+    "bbox": [443, 933, 554, 951],
     "page_idx": 3
   },
   {
     "type": "text",
     "text": "5. Refactoring in Team Development",
     "text_level": 2,
-    "bbox": [89, 464, 737, 494],
-    "page_idx": 3
+    "bbox": [87, 96, 737, 126],
+    "page_idx": 4
   },
   {
     "type": "text",
     "text": "In a team with collective code ownership, code cannot depend too much on one person’s memory. The code itself must carry more of the knowledge.",
-    "bbox": [87, 513, 889, 576],
-    "page_idx": 3
+    "bbox": [87, 146, 889, 209],
+    "page_idx": 4
   },
   {
     "type": "text",
     "text": "Refactoring helps move design intent out of people’s heads and into names, types, tests, and structure. That makes the system easier to understand, review, and change safely. In this sense, refactoring is not only a technical activity. It is also a collaboration practice.",
-    "bbox": [87, 594, 889, 678],
-    "page_idx": 3
+    "bbox": [87, 227, 889, 311],
+    "page_idx": 4
   },
   {
     "type": "text",
     "text": "6. Why Refactoring Matters More with AI",
     "text_level": 2,
-    "bbox": [87, 699, 811, 728],
-    "page_idx": 3
+    "bbox": [89, 331, 811, 361],
+    "page_idx": 4
   },
   {
     "type": "text",
     "text": "AI can generate and change code quickly, but it does not automatically preserve subtle design intent. If the codebase is vague, weakly typed, or overly permissive, AI can produce plausible changes that compile while quietly breaking important assumptions.",
-    "bbox": [87, 747, 897, 832],
-    "page_idx": 3
+    "bbox": [87, 380, 897, 464],
+    "page_idx": 4
   },
   {
     "type": "text",
     "text": "That makes refactoring even more important. Clear names, cohesive modules, meaningful types, and good tests help guide both human developers and AI tools toward safer changes.",
-    "bbox": [87, 848, 867, 912],
-    "page_idx": 3
+    "bbox": [87, 481, 867, 545],
+    "page_idx": 4
   },
   {
     "type": "text",
     "text": "Refactoring, then, is not just about cleaner code. It is about keeping software honest as it evolves.",
-    "bbox": [89, 66, 860, 108],
+    "bbox": [87, 562, 862, 605],
+    "page_idx": 4
+  },
+  {
+    "type": "page_number",
+    "text": "Page 5 of 5",
+    "bbox": [445, 933, 554, 952],
     "page_idx": 4
   }
 ]

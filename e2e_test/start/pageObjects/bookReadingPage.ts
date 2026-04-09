@@ -25,12 +25,16 @@ const bookReadingPage = () => {
     expect(el.width, 'PDF canvas should have width').to.be.greaterThan(0)
     const ctx = el.getContext('2d')
     if (!ctx) throw new Error('No 2d context on PDF canvas')
-    const sampleW = Math.min(el.width, 200)
-    const sampleH = Math.min(el.height, 200)
-    const data = ctx.getImageData(0, 0, sampleW, sampleH).data
+    const w = el.width
+    const h = el.height
+    const data = ctx.getImageData(0, 0, w, h).data
     let darkPixels = 0
-    for (let i = 0; i < data.length; i += 4) {
-      if ((data[i] ?? 255) < 128 && (data[i + 3] ?? 0) > 128) darkPixels++
+    const stride = 6
+    for (let y = 0; y < h; y += stride) {
+      for (let x = 0; x < w; x += stride) {
+        const i = (y * w + x) * 4
+        if ((data[i] ?? 255) < 128 && (data[i + 3] ?? 0) > 128) darkPixels++
+      }
     }
     expect(
       darkPixels,

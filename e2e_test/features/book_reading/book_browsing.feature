@@ -22,6 +22,7 @@ Feature: Book browsing
       | 1 | 3.2 Can You Refactor Without Changing the Code? |
       | 1 | 4. Two Diff erent Kinds of Refactoring |
       | 1 | 4.1 Refactoring to Protect Current Intent |
+      | 1 | 4.1.1 Refactoring Art |
       | 1 | 4.2 Refactoring to Prepare for the Next Change |
       | 1 | 5. Refactoring in Team Development |
       | 1 | 6. Why Refactoring Matters More with AI |
