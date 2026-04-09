@@ -4,4 +4,4 @@ export {
   type ManagedTtyAssertInput,
   type ManagedTtyAssertOptions,
   type ManagedTtySession,
-} from './managedTtySession'
+} from './managed/managedTtySession'
