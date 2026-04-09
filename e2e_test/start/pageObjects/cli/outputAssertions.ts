@@ -1,5 +1,4 @@
 import type { ManagedTtyAssertTaskPayload } from '../../../config/cliE2ePluginTasks'
-import { TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS } from 'tty-assert/locatorRetryMs'
 import { cliAssertTask } from './cliAssertTask'
 
 const guidanceStartAfterAnchors = [
@@ -10,20 +9,15 @@ const guidanceStartAfterAnchors = [
 
 const guidanceBase: Pick<
   ManagedTtyAssertTaskPayload,
-  'surface' | 'retryMs' | 'strict' | 'fallbackRowCount' | 'startAfterAnchor'
+  'surface' | 'strict' | 'fallbackRowCount' | 'startAfterAnchor'
 > = {
   surface: 'viewableBuffer',
-  retryMs: TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS,
   strict: false,
   fallbackRowCount: 8,
   startAfterAnchor: [...guidanceStartAfterAnchors],
 }
 
-const transcriptPollBase: Pick<
-  ManagedTtyAssertTaskPayload,
-  'retryMs' | 'strict'
-> = {
-  retryMs: TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS,
+const transcriptPollBase: Pick<ManagedTtyAssertTaskPayload, 'strict'> = {
   strict: false,
 }
 
