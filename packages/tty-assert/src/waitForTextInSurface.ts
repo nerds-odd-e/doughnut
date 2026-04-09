@@ -31,6 +31,7 @@ import {
   validateAndResolveCellExpectations,
   type CellExpectationBlock,
 } from './cellExpectations'
+import { TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS } from './locatorRetryMs'
 import {
   formatRawTerminalSnapshotForError,
   formatSearchSurfaceFailure,
@@ -79,8 +80,7 @@ export type WaitForTextInSurfaceOptions = {
   cellExpectations?: CellExpectationBlock[]
 }
 
-/** Default delay between poll attempts when `timeoutMs` is positive; Cypress adapter should use the same value for `cy.wait` between buffer re-reads. */
-export const TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS = 50
+export { TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS }
 
 export class TtyAssertStrictModeViolationError extends Error {
   readonly name = 'TtyAssertStrictModeViolationError'

@@ -25,9 +25,9 @@ import {
   writeTranscriptToTerminal,
 } from './surfaceAttemptOnTerminal'
 import { stripAnsiCliPty } from './stripAnsi'
+import { TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS } from './locatorRetryMs'
 import {
   TtyAssertStrictModeViolationError,
-  TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS,
   type WaitForTextInSurfaceOptions,
 } from './waitForTextInSurface'
 

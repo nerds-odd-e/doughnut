@@ -1,6 +1,6 @@
 # `tty-assert` — PTY terminal test library extraction
 
-**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses xterm viewport replay). **Phase 5** is **complete** (sub-phases **5.1–5.9 met**, including legacy replay removal — execution table in [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md)). **Phase 6** is **complete** (sub-phases **6.1–6.5 met** — managed session, `cliAssert`, docs, removal of unused `cliInteractivePtyGetBuffer`; detail in [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md)). Phases 7–11 follow the roadmap. Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md); Phase 5 — [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md); Phase 6 — [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md).
+**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses xterm viewport replay). **Phase 5** is **complete** (sub-phases **5.1–5.9 met**, including legacy replay removal — execution table in [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md)). **Phase 6** is **complete** (sub-phases **6.1–6.5 met** — managed session, `cliAssert`, docs, removal of unused `cliInteractivePtyGetBuffer`; detail in [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md)). Phases **7–15** follow the roadmap (7–10 diagnostics and capture; **11–14** library cleanup before OSS extraction; **15** move out). Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md); Phase 5 — [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md); Phase 6 — [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md).
 
 **Intent:** Extract PTY-based terminal testing into a **Cypress-neutral, Doughnut-neutral** library named **`tty-assert`**, publishable on npm and eventually movable out of this repo. Goal: reliable assertions on terminal-visible state, with failures that show **expected vs actual** without manually decoding escape sequences, and CI-friendly artifacts where useful.
 
@@ -190,7 +190,62 @@
 
 ---
 
-## Phase 11 — Move out of Doughnut (OSS npm package)
+## Phase 11 — Package surface, README truth, and prior-art wording
+
+**Outcome:** What the README promises matches what **`package.json` `exports`** (and TypeScript resolution) actually allow; bibliographic noise and stale notes are gone so external readers are not misled.
+
+**Work:**
+
+- Add or adjust **`exports`** so documented entry points (e.g. `waitForTextInSurface`, helpers used from adapters) are real, **or** narrow README examples to **`tty-assert` root** only until subpaths ship.
+- Remove **third-party prior-art** name-drops and links from **`packages/tty-assert`** sources and README; describe row-major search and strict matching in neutral terms (same behavior, no citation trail). Optionally trim duplicate bibliographic lines in **`ongoing/*`** phase notes that only referenced that prior art.
+- Delete stale **local research tree** wording from README if it no longer applies.
+
+**Gate:** `pnpm tty-assert:lint` + `pnpm tty-assert:test` green; a quick manual read confirms README import examples work (or are explicitly “monorepo / root-only” until exports land).
+
+---
+
+## Phase 12 — Neutral failure copy and clearer symbols
+
+**Outcome:** Assertion failures and API names read **generic** at the library layer; misleading labels are fixed without changing what Doughnut E2E asserts.
+
+**Work:**
+
+- Replace **product-specific** phrasing in **`tty-assert`** error paths (e.g. Ink/chalk/past-user wording in shared cell checks) with **neutral** messages, or push product-specific copy into **Doughnut** adapters if a hint must stay.
+- Ensure internal errors attribute the right surface (e.g. not **`waitForTextInSurface:`** when the call path is **`ManagedTtySession.assert`**).
+- Rename symbols where the name lies about behavior (e.g. **`dumpFrames`**) if the rename stays localized and tests/docs follow; **`facade`** is **removed** in Phase 14 rather than renamed.
+
+**Gate:** `tty-assert` unit tests updated for any message/symbol changes; CLI-relevant E2E still green if anything in the plugin path touched.
+
+---
+
+## Phase 13 — Shared assertion loop and adapter types
+
+**Outcome:** One place owns **poll + timeout + strict** for surface asserts; duplicate **diagnostic shapes** and **Cypress JSON** bridging stop drifting.
+
+**Work:**
+
+- Factor **`waitForTextInSurface`** and **`ManagedTtySession.assert`** through a **single internal** polling/attempt driver (or clearly document why two remain if a merge is worse).
+- Unify **`ManagedTtySessionDumpFrames`** / **`TtyAssertDumpFrames`** (one type, shared builder if both APIs stay).
+- Move **JSON-serializable assert payload** + **`RegExp` ↔ `{ source, flags }`** conversion next to **`tty-assert`** (or a single shared module consumed by **`cliE2ePluginTasks`**) so option lists do not fork.
+
+**Gate:** `pnpm tty-assert:test` green; targeted CLI E2E specs green; no behavior change intended beyond safer refactors.
+
+---
+
+## Phase 14 — Remove unused `facade` API
+
+**Outcome:** No **second** interactive terminal handle API that only unit tests use; **`managedTtySession` + `waitForTextInSurface`** remain the supported shapes.
+
+**Work:**
+
+- Delete **`facade.ts`** ( **`startProgram`**, **`attachTerminalHandle`**, **`expect(…).toBeVisible`** on stripped transcript) and **`facade.test.ts`**, or fold any unique coverage into **`managedTtySession`** / **`waitForTextInSurface`** tests if something would otherwise be lost.
+- Drop README / plan table references that point integrators at **`facade`**.
+
+**Gate:** `pnpm tty-assert:test` green; CLI E2E unchanged (callers already use managed session).
+
+---
+
+## Phase 15 — Move out of Doughnut (OSS npm package)
 
 **Outcome:** Standalone repository, semver, changelog, README for **Playwright / Vitest / raw Node** consumers; Doughnut pins a version.
 
@@ -210,7 +265,8 @@
 - **3 → 4:** Unit tests and CI exist before swapping the emulation core to xterm.js.
 - **4 → 5 → 6:** Phase 4 (sub-phases 4.1–4.3) lands xterm replay for **`getGuidanceContext` only**; Phase 5 completes xterm migration (facade **5.1–5.2**), **locators** (**5.3**), E2E adapter + inventory (**5.5–5.8**), then **5.9** removes obsoleted code; Phase 6 is lifecycle API — **4.3** and Phase 5+ end with E2E green; **4.1–4.2** gate on `tty-assert` only.
 - **7–10** are mostly sequential in **diagnostic value**; **9–10** may share rendering infrastructure (**8 → 9** especially).
-- **11** last.
+- **11–14** improve **package honesty, cohesion, and internals** before publish; they can overlap **7–10** where there is no conflict, but **complete 11–14 before 15** so the published tarball matches docs and has no dead public sketch.
+- **15** last.
 
 ---
 

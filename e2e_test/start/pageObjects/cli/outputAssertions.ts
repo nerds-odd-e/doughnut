@@ -1,5 +1,5 @@
 import type { ManagedTtyAssertTaskPayload } from '../../../config/cliE2ePluginTasks'
-import { TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS } from 'tty-assert'
+import { TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS } from 'tty-assert/locatorRetryMs'
 import { cliAssertTask } from './cliAssertTask'
 
 const guidanceStartAfterAnchors = [
