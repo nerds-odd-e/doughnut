@@ -15,14 +15,19 @@ class CircleNoteBuilder extends Builder<CircleForUserView> {
   }
 
   do(): CircleForUserView {
+    const notebooks = this.notebooksBuilder
+      .do()
+      .map((bazaarNotebook) => bazaarNotebook.notebook)
     return {
       id: generateId(),
       name: '',
       invitationCode: '',
       notebooks: {
-        notebooks: this.notebooksBuilder
-          .do()
-          .map((bazaarNotebook) => bazaarNotebook.notebook),
+        notebooks,
+        catalogItems: notebooks.map((notebook) => ({
+          type: 'notebook' as const,
+          notebook,
+        })),
       },
       members: [],
     }
