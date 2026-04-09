@@ -261,17 +261,12 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     @Test
     void persistsContentBlocksForEachBlock() throws Exception {
       Notebook nb = myNotebook();
-      Map<String, Object> headingItem = new LinkedHashMap<>();
-      headingItem.put("type", "text");
-      headingItem.put("text_level", 2);
-      headingItem.put("text", "Chapter 1");
-      headingItem.put("page_idx", 0);
       Map<String, Object> bodyItem = new LinkedHashMap<>();
       bodyItem.put("type", "text");
       bodyItem.put("text", "Some body text");
       bodyItem.put("page_idx", 1);
       AttachBookLayoutNodeRequest n = node("Chapter 1");
-      n.setContentBlocks(new ArrayList<>(List.of(headingItem, bodyItem)));
+      n.setContentBlocks(new ArrayList<>(List.of(bodyItem)));
 
       ResponseEntity<Book> res =
           controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
@@ -280,14 +275,10 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       BookBlock block = rootBlocksSorted(created).getFirst();
       List<BookContentBlock> cbs =
           bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(block.getId());
-      assertThat(cbs, hasSize(2));
+      assertThat(cbs, hasSize(1));
       assertThat(cbs.get(0).getSiblingOrder(), equalTo(0));
       assertThat(cbs.get(0).getType(), equalTo("text"));
-      assertThat(cbs.get(0).getPageIdx(), equalTo(0));
-      assertThat(cbs.get(0).getRawData(), containsString("\"text_level\":2"));
-      assertThat(cbs.get(1).getSiblingOrder(), equalTo(1));
-      assertThat(cbs.get(1).getType(), equalTo("text"));
-      assertThat(cbs.get(1).getPageIdx(), equalTo(1));
+      assertThat(cbs.get(0).getPageIdx(), equalTo(1));
     }
   }
 
@@ -322,13 +313,8 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     @Test
     void hasDirectContentFalseForHeadingOnlyBlock() throws Exception {
       Notebook nb = myNotebook();
-      Map<String, Object> headingItem = new LinkedHashMap<>();
-      headingItem.put("type", "text");
-      headingItem.put("text_level", 2);
-      headingItem.put("text", "Section A");
-      headingItem.put("page_idx", 0);
       AttachBookLayoutNodeRequest n = node("Section A");
-      n.setContentBlocks(new ArrayList<>(List.of(headingItem)));
+      n.setContentBlocks(new ArrayList<>());
       controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
       makeMe.entityPersister.flushAndClear();
 
@@ -341,17 +327,12 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     @Test
     void hasDirectContentTrueWhenBlockHasBodyText() throws Exception {
       Notebook nb = myNotebook();
-      Map<String, Object> headingItem = new LinkedHashMap<>();
-      headingItem.put("type", "text");
-      headingItem.put("text_level", 2);
-      headingItem.put("text", "Section B");
-      headingItem.put("page_idx", 0);
       Map<String, Object> bodyItem = new LinkedHashMap<>();
       bodyItem.put("type", "text");
       bodyItem.put("text", "Some body text");
       bodyItem.put("page_idx", 0);
       AttachBookLayoutNodeRequest n = node("Section B");
-      n.setContentBlocks(new ArrayList<>(List.of(headingItem, bodyItem)));
+      n.setContentBlocks(new ArrayList<>(List.of(bodyItem)));
       controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
       makeMe.entityPersister.flushAndClear();
 

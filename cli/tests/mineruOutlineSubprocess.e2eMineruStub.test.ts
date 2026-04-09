@@ -69,8 +69,10 @@ describe('mineru_book_outline.py with E2E shadow mineru (PYTHONPATH)', () => {
     const firstBlock = firstRoot?.contentBlocks?.[0] as {
       type?: string
       text_level?: number
+      text?: string
     }
     expect(firstBlock?.type).toBe('text')
-    expect(firstBlock?.text_level).toBe(2)
+    expect(firstBlock?.text_level).toBeUndefined()
+    expect(firstBlock?.text).toMatch(/^Refactoring is often explained/)
   })
 })

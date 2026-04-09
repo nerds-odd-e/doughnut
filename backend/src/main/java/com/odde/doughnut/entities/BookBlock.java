@@ -72,6 +72,6 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   @JsonProperty("hasDirectContent")
   @JsonView(BookViews.Full.class)
   public boolean getHasDirectContent() {
-    return contentBlocks.size() > 1;
+    return !contentBlocks.isEmpty();
   }
 }

@@ -190,9 +190,10 @@ def layout_roots_from_heading_records(records: list[dict[str, Any]]) -> list[dic
 def layout_roots_with_content_blocks(data: list[Any]) -> list[dict[str, Any]]:
     """Build nested layout nodes with ordered contentBlocks from the full content_list.
 
-    Each layout node's contentBlocks contains all MinerU items that belong to it,
-    starting with the heading item that created the node.  Items appearing before
-    the first heading are skipped (handled in sub-phase 3H).
+    Each layout node's contentBlocks holds only non-heading MinerU items that belong
+    to that section (body stream in reading order). The heading lives on the node's
+    title and startAnchor only. Items appearing before the first heading are skipped
+    (handled in sub-phase 3H).
     """
     roots: list[dict[str, Any]] = []
     stack: list[tuple[int, dict[str, Any]]] = []
@@ -210,7 +211,7 @@ def layout_roots_with_content_blocks(data: list[Any]) -> list[dict[str, Any]]:
             node: dict[str, Any] = {
                 "title": title,
                 "startAnchor": start_a,
-                "contentBlocks": [item],
+                "contentBlocks": [],
             }
             while stack and stack[-1][0] >= text_level:
                 stack.pop()

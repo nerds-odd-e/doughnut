@@ -174,10 +174,7 @@ describe('runMineruOutlineSubprocess', () => {
         {
           title: 'Root A',
           startAnchor: { anchorFormat: 'pdf.mineru_outline_v1', value: '{}' },
-          contentBlocks: [
-            { type: 'text', text_level: 2, text: 'Root A', page_idx: 0 },
-            { type: 'page_number', text: '1', page_idx: 0 },
-          ],
+          contentBlocks: [{ type: 'page_number', text: '1', page_idx: 0 }],
         },
       ],
     }

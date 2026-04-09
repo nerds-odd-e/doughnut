@@ -158,6 +158,23 @@ Document the chosen rule in code (single place) so API and UI stay consistent.
 
 ---
 
+## Phase 9 — Frontend-only filter for the notebook list
+
+**User outcome:** On the notebooks page, the user can **narrow what they see** in the **owned** catalog (merged `catalogItems` list) using controls that run **entirely in the browser** — no new query parameters or `myNotebooks` contract changes.
+
+**Suggested shape:**
+
+- **Filter input** (search by notebook title and/or group name) and/or **simple toggles** (e.g. all / ungrouped only / groups only — pick the smallest set that matches product intent).
+- Derive a **computed list** from props/state holding the full `catalogItems` from the server; **preserve server order** within the filtered result.
+- **Groups:** when a group **matches** the filter, show the **whole** group row and either **all** members or **only members** that match — state the rule explicitly in implementation (prefer one consistent rule, e.g. show group if name matches **or** any member title matches, and then either filter members inside the row or keep all members for simplicity).
+- **Empty filter result:** clear message (e.g. “No notebooks match”) and a way to **clear** the filter.
+- **Accessibility:** associate the filter control with a **label**; avoid relying on placeholder alone.
+- **After Phase 8:** apply the **same** filter UX to the **single** merged list (owned + subscribed in `catalogItems`); if the subscribed block is still separate until Phase 8 lands, either filter **only** the owned section in Phase 9 and **extend** the same pattern when merging, or wait until Phase 8 and implement filter once on the unified list — choose one in implementation to avoid duplicate filter logic.
+
+**Tests:** **Mounted** [`NotebooksPageView`](../frontend/src/pages/NotebooksPageView.vue) (or a small child component) with **mocked** `catalogItems` — assert **visible** rows change with filter text/toggle and **restore** when cleared. **No** new backend tests; **optional** thin E2E only if the team wants one step on the happy path (not required for this phase).
+
+---
+
 ## Optional follow-ups (separate phases if needed)
 
 - **Rename / delete** empty or non-empty group (product rules for members on delete).
