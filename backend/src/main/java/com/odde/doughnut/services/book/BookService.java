@@ -165,7 +165,8 @@ public class BookService {
   public void upsertReadingRecord(
       Notebook notebook, User user, BookBlock bookBlock, String status) {
     if (!(BookBlockReadingRecord.STATUS_READ.equals(status)
-        || BookBlockReadingRecord.STATUS_SKIMMED.equals(status))) {
+        || BookBlockReadingRecord.STATUS_SKIMMED.equals(status)
+        || BookBlockReadingRecord.STATUS_SKIPPED.equals(status))) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid reading record status");
     }
     Book book = getBookForNotebook(notebook);

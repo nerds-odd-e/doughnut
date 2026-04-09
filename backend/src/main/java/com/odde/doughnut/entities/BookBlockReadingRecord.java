@@ -14,6 +14,7 @@ public class BookBlockReadingRecord extends EntityIdentifiedByIdOnly {
 
   public static final String STATUS_READ = "READ";
   public static final String STATUS_SKIMMED = "SKIMMED";
+  public static final String STATUS_SKIPPED = "SKIPPED";
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "user_id", nullable = false)

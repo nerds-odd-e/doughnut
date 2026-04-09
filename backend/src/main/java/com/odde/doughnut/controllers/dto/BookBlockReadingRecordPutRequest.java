@@ -12,7 +12,7 @@ public class BookBlockReadingRecordPutRequest {
   @NotNull
   @Schema(
       requiredMode = Schema.RequiredMode.REQUIRED,
-      allowableValues = {"READ", "SKIMMED"},
+      allowableValues = {"READ", "SKIMMED", "SKIPPED"},
       description = "Reading disposition for the book block's direct content")
   private String status;
 }
