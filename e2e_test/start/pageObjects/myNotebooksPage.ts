@@ -46,6 +46,28 @@ const myNotebooksPage = () => {
           .should('exist')
       )
     },
+    creatingNotebookGroup(name: string) {
+      cy.findByRole('button', { name: 'New notebook group' }).click()
+      cy.findByLabelText('Group name').type(name)
+      cy.findByRole('button', { name: 'Create notebook group' }).click()
+      pageIsNotLoading()
+      return this as any
+    },
+    expectNotebookGroupWithMemberHint(
+      groupName: string,
+      hintSubstring: string
+    ) {
+      cy.contains('[data-cy="notebook-group-card"]', groupName)
+        .find('p')
+        .should('contain.text', hintSubstring)
+      return this as any
+    },
+    expectNotebookAtTopLevelOfCatalog(notebookTitle: string) {
+      cy.get('.notebook-catalog-section--list > [data-cy="notebook-card"]')
+        .contains('h5', notebookTitle)
+        .should('be.visible')
+      return this as any
+    },
   }
 }
 

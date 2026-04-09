@@ -77,9 +77,9 @@ A `BookBlock` has **no direct content** when it owns no **non-structural** impor
 The following do **not** count by default:
 
 - structural heading text (on `BookBlock` only after sub-phase 3D; before 3D, the duplicate heading row persisted as a `BookContentBlock` must still be excluded from the count)
-- `page_number`
-- footnotes (`page_footnote` in the committed fixture; confirm naming in MinerU outputs during type research)
-- unknown future types
+- running chrome: `header`, `footer`
+- any MinerU block whose `type` starts with `page_` (e.g. `page_number`, `page_footnote`, and future `page_*` kinds)
+- any other type not in the counting list above (e.g. `equation`, `code`)
 
 Unknown types are still persisted. They are simply ignored by the Phase 3 predicate until product logic opts them in later.
 
@@ -191,11 +191,11 @@ Reason:
 - committed fixture [`e2e_test/fixtures/book_reading/mineru_output_for_refactoring.json`](e2e_test/fixtures/book_reading/mineru_output_for_refactoring.json) — types observed there include at least `text`, `table`, `image`, `page_number`, `page_footnote`
 - MinerU / PDF-Extract-Kit documentation and sample `content_list` outputs for **other** `type` strings (e.g. equations, code blocks, discarded regions) and whether product should opt them into "direct content" later
 
-**Default after research (unless product overrides in the same delivery):** count toward direct content only persisted blocks whose `type` is **`text`** (body text: `type == "text"` **and** not a heading — e.g. no `text_level` in 1–3, matching the walker's heading rule), **`table`**, or **`image`**. Do **not** count `page_number`, footnotes, or unknown types.
+**Default after research (unless product overrides in the same delivery):** count toward direct content only persisted blocks whose `type` is **`text`** (body text: `type == "text"` **and** not a heading — e.g. no `text_level` in 1–3, matching the walker's heading rule), **`table`**, or **`image`**. Do **not** count `header`, `footer`, any **`page_*`** type, or other unknown types.
 
 **Red step (planning.mdc):**
 
-- Add a **small pure unit-test suite** (inputs → `hasDirectContent` or equivalent boolean) covering the full matrix: body `text`, `table`, `image` → true; `page_number`, `page_footnote`, unknown `type`, empty list → false; heading-like `text` rows should not appear in persisted lists after 3D — if legacy rows exist, define one explicit test case for "ignore heading-shaped first row" or document migration-only.
+- Add a **small pure unit-test suite** (inputs → `hasDirectContent` or equivalent boolean) covering the full matrix: body `text`, `table`, `image` → true; `header`, `footer`, representative `page_*` types, unknown `type`, empty list → false; heading-like `text` rows should not appear in persisted lists after 3D — if legacy rows exist, define one explicit test case for "ignore heading-shaped first row" or document migration-only.
 - Add or extend **controller / persistence** tests if needed so the observable `GET …/book` flag stays aligned with the same predicate.
 
 **Why this phase matters:**
@@ -253,9 +253,28 @@ Reason:
 
 **Observed in [`e2e_test/fixtures/book_reading/mineru_output_for_refactoring.json`](e2e_test/fixtures/book_reading/mineru_output_for_refactoring.json):** `text`, `table`, `image`, `page_number`, `page_footnote`.
 
-**To research and list here:** any additional `type` values from MinerU/PDF-Extract-Kit docs or real `content_list` dumps (e.g. code blocks, equations, figures, headers/footers). For each, note: **default counts as direct content?** (yes / no / product decision pending) and **rationale**.
+**From MinerU reference docs (Context7: `/opendatalab/mineru`, output_files / model inference):** VLM-backed parsing recognizes many `type` values. The following extends the fixture list for product default **direct content?** (yes = counts with current §5 rule; no = persisted but ignored by default).
 
-**Default product stance until overridden:** only `text` (non-heading body), `table`, and `image` count; everything else in the research table defaults to **no** unless explicitly promoted later.
+| `type` (content_list / model) | Default direct content? | Notes |
+|------------------------------|-------------------------|--------|
+| `text` (body: no `text_level` or not in 1–3) | **yes** | Matches importer heading rule in `layout_roots_with_content_blocks` (`text_level` in 1–3 only). |
+| `text` with `text_level` 1–3 | **no** | Structural heading; after 3D not in `contentBlocks`; legacy rows still ignored by predicate. |
+| `table` | **yes** | §5 |
+| `image` | **yes** | §5 |
+| `equation` | **no** | Display math; opt-in later if product wants. |
+| `code` | **no** | VLM `content_list` may emit `code` / `code_body`; opt-in later. |
+| `list` | **no** | List container in VLM output; opt-in later. |
+| `title` | **no** | Model inference type; structural. |
+| `table_caption`, `table_footnote`, `image_caption`, `image_footnote` | **no** | Ancillary to figures/tables. |
+| `code_caption`, `ref_text`, `algorithm`, `phonetic` | **no** | Doc-listed inference types; not §5 defaults. |
+| `header`, `footer` | **no** | Running header/footer chrome (MinerU model types); safe to exclude from direct-content count. |
+| `aside_text` | **no** | Side notes. |
+| `page_*` (prefix) | **no** | **Product rule:** any `type` starting with `page_` is non-direct-content (covers `page_number`, `page_footnote`, and future MinerU `page_*` without listing each). |
+| Any other or future `type` | **no** | Unknown types stay persisted; predicate ignores until promoted. |
+
+**Default product stance until overridden:** only `text` (non-heading body), `table`, and `image` count. **`header`**, **`footer`**, and all **`page_*`** types are explicitly non-counting; other types in the research table default to **no** unless explicitly promoted later.
+
+**Executable spec (3E):** table-driven unit tests on `BookBlockDirectContentPredicate` in `backend/src/test/java/com/odde/doughnut/services/book/BookBlockDirectContentPredicateTest.java` (skips `header`, `footer`, and any `type` starting with `page_`). **`BookBlock#getHasDirectContent()`** still uses non-empty `contentBlocks` until sub-phase **3F** wires this predicate.
 
 ---
 

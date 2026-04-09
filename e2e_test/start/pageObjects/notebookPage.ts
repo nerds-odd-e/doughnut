@@ -94,6 +94,18 @@ const notebookPage = () => {
       pageIsNotLoading()
       return this
     },
+    assignNotebookToGroup(groupName: string) {
+      cy.get('#notebook-group-select').select(groupName)
+      cy.findByRole('button', { name: 'Save notebook group' }).click()
+      pageIsNotLoading()
+      return this
+    },
+    setNotebookUngrouped() {
+      cy.get('#notebook-group-select').select('Ungrouped')
+      cy.findByRole('button', { name: 'Save notebook group' }).click()
+      pageIsNotLoading()
+      return this
+    },
     moveNotebookToCircle() {
       cy.findByRole('button', { name: 'Move to ...' }).click()
       return this

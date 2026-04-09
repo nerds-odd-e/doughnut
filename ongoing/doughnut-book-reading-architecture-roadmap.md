@@ -135,7 +135,7 @@ Persisted import artifact for **MinerU `content_list` items**. A `BookContentBlo
 
 **Persistence and extraction:** For MinerU-backed PDF imports, we persist raw **`BookContentBlock`** rows grouped under each `BookBlock`. This gives Phase 3 reading-record logic a stable source of truth for “does this block have direct content?” without introducing a second derived span table. We still do **not** require a stored extracted-text blob for the gap between blocks.
 
-**No-direct-content default:** A `BookBlock` is treated as having **no direct content** when it owns **no non-structural** imported content block whose `type` is **`text`**, **`table`**, or **`image`**. The heading content block that created the `BookBlock` does **not** count toward that rule even though it is persisted. `page_number`, footnotes, and unknown types are preserved but ignored by this predicate until product logic says otherwise.
+**No-direct-content default:** A `BookBlock` is treated as having **no direct content** when it owns **no non-structural** imported content block whose `type` is **`text`**, **`table`**, or **`image`**. The heading content block that created the `BookBlock` does **not** count toward that rule even though it is persisted. **`header`**, **`footer`**, any type whose name starts with **`page_`** (page numbers, page footnotes, and future `page_*` kinds), and other unknown types are preserved but ignored by this predicate until product logic promotes them.
 
 **Disposition (per block, conceptual):** How the user (or system) treats the direct content attached to a block can be classified for product logic:
 

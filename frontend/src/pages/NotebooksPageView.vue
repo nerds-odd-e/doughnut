@@ -38,7 +38,7 @@
     "
   >
     <section class="daisy-mb-12">
-      <div class="daisy-mb-5 daisy-flex daisy-flex-col daisy-gap-1 sm:daisy-flex-row sm:daisy-items-end sm:daisy-justify-between">
+      <div class="daisy-mb-5 daisy-flex daisy-flex-col daisy-gap-3 sm:daisy-flex-row sm:daisy-items-end sm:daisy-justify-between">
         <div>
           <h1 class="daisy-text-2xl daisy-font-bold daisy-tracking-tight daisy-text-base-content">
             My notebooks
@@ -46,6 +46,24 @@
           <p class="daisy-mt-1 daisy-text-sm daisy-text-base-content/60">
             Open a notebook to work with notes, or use the toolbar to create a new one.
           </p>
+        </div>
+        <div
+          v-if="user"
+          class="daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-2 sm:daisy-justify-end"
+        >
+          <PopButton
+            title="New notebook group"
+            aria-label="New notebook group"
+            btn-class="daisy-btn daisy-btn-outline daisy-btn-sm"
+          >
+            <template #button_face>
+              <FolderPlus class="h-4 w-4 sm:daisy-mr-1" />
+              New notebook group
+            </template>
+            <template #default="{ closer }">
+              <NotebookGroupNewForm :close="closer" @created="emit('refresh')" />
+            </template>
+          </PopButton>
         </div>
       </div>
       <NotebookCatalogSection
@@ -99,13 +117,15 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { onMounted, ref, watch } from "vue"
-import { LayoutGrid, List } from "lucide-vue-next"
+import { FolderPlus, LayoutGrid, List } from "lucide-vue-next"
 import type {
   Notebook,
   Subscription,
   User,
 } from "@generated/doughnut-backend-api"
 import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
+import PopButton from "@/components/commons/Popups/PopButton.vue"
+import NotebookGroupNewForm from "@/components/notebook/NotebookGroupNewForm.vue"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import NotebookCatalogSection from "@/components/notebook/NotebookCatalogSection.vue"
 import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithButtons.vue"
