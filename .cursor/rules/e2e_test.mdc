@@ -238,7 +238,7 @@ A scenario describes **one fixed path**. Prefer **dumb** automation: the path is
 - **Distinguish variants at the caller:** use different steps and/or different page-object methods (and scenarios when needed), not one “smart” API that infers what to do from parameters.
 - **State the condition in step wording** when behavior differs—for example **slash command** (space then Enter) vs **plain line** (line then Enter) vs **Enter** alone vs **ESC**—so readers and tools see a fixed sequence without opening implementation code.
 
-**Motivating example (CLI):** the retained Cypress path is **non-interactive** install checks (`runInstalledCli` in a managed PTY, then **`cliNonInteractiveAssert`** for expected text). Prefer **explicit** step wording and small page-object methods; do not infer “interactive vs one-shot” from a single vague parameter. For TTY sequences, add or extend **Vitest** (`cli/tests/interactive/`) rather than a second Cypress PTY stack.
+**Motivating example (CLI):** the retained Cypress path is **non-interactive** install checks (`runInstalledCli` in a managed PTY, then **`cliInteractiveAssert`** for expected text). Prefer **explicit** step wording and small page-object methods; do not infer “interactive vs one-shot” from a single vague parameter. For TTY sequences, add or extend **Vitest** (`cli/tests/interactive/`) rather than a second Cypress PTY stack.
 
 ## Linting Errors and E2E Tests
 

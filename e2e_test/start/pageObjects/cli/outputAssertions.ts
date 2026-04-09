@@ -60,6 +60,17 @@ export function nonInteractiveCliOutputAssertRequest(
   }
 }
 
+function nonInteractiveOutput() {
+  return {
+    expectContains(expected: string) {
+      return cy.task<null>(
+        'cliInteractiveAssert',
+        nonInteractiveCliOutputAssertRequest(expected)
+      )
+    },
+  }
+}
+
 /**
  * Waits until Current guidance contains `prompt`, then runs `onReady` (e.g. PTY write).
  * Assertion and retry run in the plugin via `cliInteractiveAssert` (managed PTY session).
@@ -165,6 +176,7 @@ function currentGuidance() {
 export {
   answeredQuestions,
   currentGuidance,
+  nonInteractiveOutput,
   pastCliAssistantMessages,
   pastUserMessages,
 }

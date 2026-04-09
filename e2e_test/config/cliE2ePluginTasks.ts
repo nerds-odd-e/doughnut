@@ -146,14 +146,8 @@ export function createCliE2ePluginTasks(
   options: CliE2ePluginTasksOptions
 ) {
   let interactiveCliPtyHandle: ManagedTtySession | null = null
-  let nonInteractiveCliPtyHandle: ManagedTtySession | null = null
 
-  function disposeNonInteractiveCliPtySession(): void {
-    nonInteractiveCliPtyHandle?.dispose()
-    nonInteractiveCliPtyHandle = null
-  }
-
-  function disposeInteractiveCliPtySession(): void {
+  function disposeManagedCliPtySession(): void {
     interactiveCliPtyHandle?.dispose()
     interactiveCliPtyHandle = null
   }
@@ -210,8 +204,7 @@ export function createCliE2ePluginTasks(
     cwd: string
     env?: NodeJS.ProcessEnv
   }): Promise<void> {
-    disposeNonInteractiveCliPtySession()
-    disposeInteractiveCliPtySession()
+    disposeManagedCliPtySession()
     const managed = await startManagedTtySession(
       {
         command: opts.command,
@@ -273,8 +266,7 @@ export function createCliE2ePluginTasks(
       return null
     },
     async installCli(baseUrl: string) {
-      disposeNonInteractiveCliPtySession()
-      disposeInteractiveCliPtySession()
+      disposeManagedCliPtySession()
       const installDir = mkdtempSync(join(tmpdir(), 'cypress-doughnut-cli-'))
       const installScriptPath = join(installDir, 'install.sh')
       const response = await fetch(`${baseUrl}/install`)
@@ -312,8 +304,7 @@ export function createCliE2ePluginTasks(
         )
       }
       const cwd = dirname(doughnutPath)
-      disposeNonInteractiveCliPtySession()
-      disposeInteractiveCliPtySession()
+      disposeManagedCliPtySession()
       let managed: ManagedTtySession | undefined
       try {
         managed = await startManagedTtySession(
@@ -330,7 +321,7 @@ export function createCliE2ePluginTasks(
           0,
           NON_INTERACTIVE_CLI_EXIT_TIMEOUT_MS
         )
-        nonInteractiveCliPtyHandle = managed
+        interactiveCliPtyHandle = managed
       } catch (e) {
         managed?.dispose()
         throw e
@@ -382,7 +373,7 @@ export function createCliE2ePluginTasks(
       return null
     },
     cliInteractivePtyDispose() {
-      disposeInteractiveCliPtySession()
+      disposeManagedCliPtySession()
       return null
     },
     async cliInteractiveAssert(
@@ -391,29 +382,13 @@ export function createCliE2ePluginTasks(
       const handle = interactiveCliPtyHandle
       if (!handle) {
         throw new Error(
-          'cliInteractiveAssert: no active interactive CLI PTY session. Start the session first (e.g. runInstalledCliInteractive or runRepoCliInteractive).'
+          'cliInteractiveAssert: no managed CLI PTY session. Start interactive (runInstalledCliInteractive / runRepoCliInteractive) or run a one-shot command (runInstalledCli) first.'
         )
       }
       await managedAssertWithTerminalArtifacts(
         handle,
         managedTtyAssertTaskPayloadToOptions(body),
         'cliInteractiveAssert'
-      )
-      return null
-    },
-    async cliNonInteractiveAssert(
-      body: ManagedTtyAssertTaskPayload
-    ): Promise<null> {
-      const handle = nonInteractiveCliPtyHandle
-      if (!handle) {
-        throw new Error(
-          'cliNonInteractiveAssert: no completed non-interactive CLI run. Run the installed doughnut command first (e.g. version or update).'
-        )
-      }
-      await managedAssertWithTerminalArtifacts(
-        handle,
-        managedTtyAssertTaskPayloadToOptions(body),
-        'cliNonInteractiveAssert'
       )
       return null
     },
