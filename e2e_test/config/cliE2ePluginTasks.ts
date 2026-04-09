@@ -84,6 +84,50 @@ const INSTALLED_CLI_INTERACTIVE_WRITE_SETTLE_MS = 500
 const CLI_E2E_INTERACTIVE_PTY_COLS = 80
 const CLI_E2E_INTERACTIVE_PTY_ROWS = 24
 
+const CLI_E2E_MANAGED_PTY_GEOMETRY = {
+  cols: CLI_E2E_INTERACTIVE_PTY_COLS,
+  rows: CLI_E2E_INTERACTIVE_PTY_ROWS,
+} as const
+
+const NON_INTERACTIVE_CLI_EXIT_TIMEOUT_MS = 60_000
+
+type PtyWithOnExit = {
+  onExit: (listener: (e: { exitCode: number; signal?: number }) => void) => {
+    dispose: () => void
+  }
+}
+
+function waitForPtyExit(
+  pty: PtyWithOnExit,
+  expectCode: number,
+  timeoutMs: number
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined
+    const sub = pty.onExit(({ exitCode, signal }) => {
+      if (timeoutId !== undefined) clearTimeout(timeoutId)
+      sub.dispose()
+      if (exitCode === expectCode) {
+        resolve()
+        return
+      }
+      reject(
+        new Error(
+          `CLI exited with code ${exitCode}${signal != null ? ` (signal ${signal})` : ''}`
+        )
+      )
+    })
+    timeoutId = setTimeout(() => {
+      sub.dispose()
+      reject(
+        new Error(
+          `Timeout after ${timeoutMs}ms waiting for non-interactive CLI to exit`
+        )
+      )
+    }, timeoutMs)
+  })
+}
+
 async function bundleCliE2eInstallOrThrow(
   repoRoot: string,
   env?: NodeJS.ProcessEnv
@@ -102,10 +146,62 @@ export function createCliE2ePluginTasks(
   options: CliE2ePluginTasksOptions
 ) {
   let interactiveCliPtyHandle: ManagedTtySession | null = null
+  let nonInteractiveCliPtyHandle: ManagedTtySession | null = null
+
+  function disposeNonInteractiveCliPtySession(): void {
+    nonInteractiveCliPtyHandle?.dispose()
+    nonInteractiveCliPtyHandle = null
+  }
 
   function disposeInteractiveCliPtySession(): void {
     interactiveCliPtyHandle?.dispose()
     interactiveCliPtyHandle = null
+  }
+
+  async function managedAssertWithTerminalArtifacts(
+    handle: ManagedTtySession,
+    assertOpts: ReturnType<typeof managedTtyAssertTaskPayloadToOptions>,
+    logPrefix: string
+  ): Promise<void> {
+    try {
+      await handle.assert(assertOpts)
+    } catch (err) {
+      try {
+        const png = await handle.captureViewportPng()
+        const pngPath = options.saveBufferToCurrentSpecFolder(
+          'terminal-pty-assert-failure',
+          '.png',
+          png
+        )
+        let suffix = `\n\nTerminal viewport PNG: ${pngPath}`
+        try {
+          const gif = await handle.buildViewportAnimationGif()
+          const gifPath = options.saveBufferToCurrentSpecFolder(
+            'terminal-pty-anim',
+            '.gif',
+            gif
+          )
+          suffix += `\nTerminal viewport animation (GIF): ${gifPath}`
+        } catch (gifErr) {
+          const msg = gifErr instanceof Error ? gifErr.message : String(gifErr)
+          if (!msg.includes('at least 2 distinct viewport frames')) {
+            console.error(
+              `${logPrefix}: failed to build/save terminal GIF`,
+              gifErr
+            )
+          }
+        }
+        if (err instanceof Error) {
+          err.message = `${err.message}${suffix}`
+        }
+      } catch (captureErr) {
+        console.error(
+          `${logPrefix}: failed to capture/save terminal failure artifacts`,
+          captureErr
+        )
+      }
+      throw err
+    }
   }
 
   async function startInteractiveCliPtySession(opts: {
@@ -114,6 +210,7 @@ export function createCliE2ePluginTasks(
     cwd: string
     env?: NodeJS.ProcessEnv
   }): Promise<void> {
+    disposeNonInteractiveCliPtySession()
     disposeInteractiveCliPtySession()
     const managed = await startManagedTtySession(
       {
@@ -122,7 +219,7 @@ export function createCliE2ePluginTasks(
         cwd: opts.cwd,
         env: { ...process.env, ...cliEnv(opts.env) },
       },
-      { cols: CLI_E2E_INTERACTIVE_PTY_COLS, rows: CLI_E2E_INTERACTIVE_PTY_ROWS }
+      CLI_E2E_MANAGED_PTY_GEOMETRY
     )
     interactiveCliPtyHandle = managed
     await managed.assert({
@@ -176,6 +273,7 @@ export function createCliE2ePluginTasks(
       return null
     },
     async installCli(baseUrl: string) {
+      disposeNonInteractiveCliPtySession()
       disposeInteractiveCliPtySession()
       const installDir = mkdtempSync(join(tmpdir(), 'cypress-doughnut-cli-'))
       const installScriptPath = join(installDir, 'install.sh')
@@ -214,24 +312,30 @@ export function createCliE2ePluginTasks(
         )
       }
       const cwd = dirname(doughnutPath)
-      const { spawn } = await import('node:child_process')
-      return new Promise<string>((resolve, reject) => {
-        const proc = spawn(process.execPath, [doughnutPath, ...(args ?? [])], {
-          cwd,
-          env: { ...process.env, ...cliEnv(env) },
-          stdio: ['pipe', 'pipe', 'pipe'],
-        })
-        let stdout = ''
-        proc.stdout?.on('data', (chunk: Buffer) => {
-          stdout += chunk.toString()
-        })
-        proc.stdin?.end()
-        proc.on('close', (code) => {
-          if (code === 0) resolve(stdout)
-          else reject(new Error(`CLI exited with code ${code}`))
-        })
-        proc.on('error', reject)
-      })
+      disposeNonInteractiveCliPtySession()
+      disposeInteractiveCliPtySession()
+      let managed: ManagedTtySession | undefined
+      try {
+        managed = await startManagedTtySession(
+          {
+            command: process.execPath,
+            args: [doughnutPath, ...(args ?? [])],
+            cwd,
+            env: { ...process.env, ...cliEnv(env) },
+          },
+          CLI_E2E_MANAGED_PTY_GEOMETRY
+        )
+        await waitForPtyExit(
+          managed.session.pty,
+          0,
+          NON_INTERACTIVE_CLI_EXIT_TIMEOUT_MS
+        )
+        nonInteractiveCliPtyHandle = managed
+      } catch (e) {
+        managed?.dispose()
+        throw e
+      }
+      return null
     },
     async runInstalledCliInteractive({
       doughnutPath,
@@ -287,49 +391,30 @@ export function createCliE2ePluginTasks(
       const handle = interactiveCliPtyHandle
       if (!handle) {
         throw new Error(
-          'cliInteractiveAssert: no active interactive CLI PTY session. Ensure @interactiveCLI started the session or run the installed CLI in interactive mode first.'
+          'cliInteractiveAssert: no active interactive CLI PTY session. Start the session first (e.g. runInstalledCliInteractive or runRepoCliInteractive).'
         )
       }
-      try {
-        await handle.assert(managedTtyAssertTaskPayloadToOptions(body))
-      } catch (err) {
-        try {
-          const png = await handle.captureViewportPng()
-          const pngPath = options.saveBufferToCurrentSpecFolder(
-            'terminal-pty-assert-failure',
-            '.png',
-            png
-          )
-          let suffix = `\n\nTerminal viewport PNG: ${pngPath}`
-          try {
-            const gif = await handle.buildViewportAnimationGif()
-            const gifPath = options.saveBufferToCurrentSpecFolder(
-              'terminal-pty-anim',
-              '.gif',
-              gif
-            )
-            suffix += `\nTerminal viewport animation (GIF): ${gifPath}`
-          } catch (gifErr) {
-            const msg =
-              gifErr instanceof Error ? gifErr.message : String(gifErr)
-            if (!msg.includes('at least 2 distinct viewport frames')) {
-              console.error(
-                'cliInteractiveAssert: failed to build/save terminal GIF',
-                gifErr
-              )
-            }
-          }
-          if (err instanceof Error) {
-            err.message = `${err.message}${suffix}`
-          }
-        } catch (captureErr) {
-          console.error(
-            'cliInteractiveAssert: failed to capture/save terminal failure artifacts',
-            captureErr
-          )
-        }
-        throw err
+      await managedAssertWithTerminalArtifacts(
+        handle,
+        managedTtyAssertTaskPayloadToOptions(body),
+        'cliInteractiveAssert'
+      )
+      return null
+    },
+    async cliNonInteractiveAssert(
+      body: ManagedTtyAssertTaskPayload
+    ): Promise<null> {
+      const handle = nonInteractiveCliPtyHandle
+      if (!handle) {
+        throw new Error(
+          'cliNonInteractiveAssert: no completed non-interactive CLI run. Run the installed doughnut command first (e.g. version or update).'
+        )
       }
+      await managedAssertWithTerminalArtifacts(
+        handle,
+        managedTtyAssertTaskPayloadToOptions(body),
+        'cliNonInteractiveAssert'
+      )
       return null
     },
     async cliInteractiveWriteLine({

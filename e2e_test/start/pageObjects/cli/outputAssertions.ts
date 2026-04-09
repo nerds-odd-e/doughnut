@@ -48,6 +48,18 @@ function strippedTranscriptTextAssertRequest(
   }
 }
 
+export function nonInteractiveCliOutputAssertRequest(
+  expected: string
+): ManagedTtyAssertTaskPayload {
+  return {
+    ...transcriptPollBase,
+    needle: expected,
+    surface: 'strippedTranscript',
+    messagePrefix: 'Non-interactive CLI output.',
+    timeoutMs: 0,
+  }
+}
+
 /**
  * Waits until Current guidance contains `prompt`, then runs `onReady` (e.g. PTY write).
  * Assertion and retry run in the plugin via `cliInteractiveAssert` (managed PTY session).
