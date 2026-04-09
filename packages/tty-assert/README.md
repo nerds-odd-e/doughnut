@@ -48,7 +48,7 @@ When `waitForTextInSurface` or `ManagedTtySession.assert` fails, the message bod
 
 ## Package root (`tty-assert`)
 
-Exported today: **`startManagedTtySession`**, **`BufferedPtySession`**, managed-session types (`ManagedTtySession`, `ManagedTtyAssertOptions`, …), **`TtyAssertDumpDiagnostics`**, and JSON-task helpers (**`ManagedTtyAssertJsonPayload`**, **`managedTtyAssertOptionsFromJson`**, **`SerializableRegExp`**) — enough for Doughnut’s Cypress plugin. Lower-level modules (`waitForTextInSurface`, `ptySession`, `facade`, replay helpers, `stripAnsi`, …) are **not** separate entry points; they are composed internally and covered by this package’s unit tests.
+Exported today: **`startManagedTtySession`**, **`BufferedPtySession`**, managed-session types (`ManagedTtySession`, `ManagedTtyAssertOptions`, …), **`TtyAssertDumpDiagnostics`**, and JSON-task helpers (**`ManagedTtyAssertJsonPayload`**, **`managedTtyAssertOptionsFromJson`**, **`SerializableRegExp`**) — enough for Doughnut’s Cypress plugin. Lower-level modules (`waitForTextInSurface`, `ptySession`, replay helpers, `stripAnsi`, …) are **not** separate entry points; they are composed internally and covered by this package’s unit tests.
 
 ---
 

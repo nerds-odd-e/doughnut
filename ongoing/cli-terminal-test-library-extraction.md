@@ -1,6 +1,6 @@
 # `tty-assert` — PTY terminal test library extraction
 
-**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses xterm viewport replay). **Phase 5** is **complete** (sub-phases **5.1–5.9 met**, including legacy replay removal — execution table in [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md)). **Phase 6** is **complete** (sub-phases **6.1–6.5 met** — managed session, `cliAssert`, docs, removal of unused `cliInteractivePtyGetBuffer`; detail in [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md)). **Phase 11** is **complete** (single **`exports`** entry + README that matches; prior-art wording removed from `packages/tty-assert`). **Phase 12** is **complete** (neutral `tty-assert:` validation errors, palette-background failure copy, `dumpDiagnostics` rename). **Phase 13** is **complete** (shared `pollSurfaceAssertLoop`, unified `TtyAssertDumpDiagnostics` + `buildTtyAssertDumpDiagnostics`, assert JSON payload + `managedTtyAssertOptionsFromJson` on package root). Phases **7–10**, **14–15** follow the roadmap (7–10 diagnostics and capture; **14** facade removal; **15** move out). Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md); Phase 5 — [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md); Phase 6 — [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md).
+**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses xterm viewport replay). **Phase 5** is **complete** (sub-phases **5.1–5.9 met**, including legacy replay removal — execution table in [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md)). **Phase 6** is **complete** (sub-phases **6.1–6.5 met** — managed session, `cliAssert`, docs, removal of unused `cliInteractivePtyGetBuffer`; detail in [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md)). **Phase 11** is **complete** (single **`exports`** entry + README that matches; prior-art wording removed from `packages/tty-assert`). **Phase 12** is **complete** (neutral `tty-assert:` validation errors, palette-background failure copy, `dumpDiagnostics` rename). **Phase 13** is **complete** (shared `pollSurfaceAssertLoop`, unified `TtyAssertDumpDiagnostics` + `buildTtyAssertDumpDiagnostics`, assert JSON payload + `managedTtyAssertOptionsFromJson` on package root). **Phase 14** is **complete** (removed unused `facade` module; managed session + `waitForTextInSurface` remain the supported shapes). Phases **7–10**, **15** follow the roadmap (7–10 diagnostics and capture; **15** move out). Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md); Phase 5 — [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md); Phase 6 — [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md).
 
 **Intent:** Extract PTY-based terminal testing into a **Cypress-neutral, Doughnut-neutral** library named **`tty-assert`**, publishable on npm and eventually movable out of this repo. Goal: reliable assertions on terminal-visible state, with failures that show **expected vs actual** without manually decoding escape sequences, and CI-friendly artifacts where useful.
 
@@ -21,7 +21,7 @@
 
 | Area | Location today | Likely home |
 |------|----------------|-------------|
-| PTY spawn, buffer, write tasks | `e2e_test/config/cliE2ePluginTasks.ts` (glue) + `packages/tty-assert` (`ptySession`, `facade`) | `tty-assert` **runtime** API + optional **Cypress task adapter** (thin, ideally in `e2e_test` only) |
+| PTY spawn, buffer, write tasks | `e2e_test/config/cliE2ePluginTasks.ts` (glue) + `packages/tty-assert` (`ptySession`, managed session) | `tty-assert` **runtime** API + optional **Cypress task adapter** (thin, ideally in `e2e_test` only) |
 | ANSI strip | `packages/tty-assert/src/stripAnsi.ts` | `tty-assert` core |
 | Fixed cols/rows | `packages/tty-assert/src/geometry.ts` | `tty-assert` default geometry (configurable) |
 | Transcript → visible plaintext / replay | [`ptyTranscriptToVisiblePlaintextViaXterm.ts`](./packages/tty-assert/src/ptyTranscriptToVisiblePlaintextViaXterm.ts) + [`waitForTextInSurface`](./packages/tty-assert/src/waitForTextInSurface.ts) | **Phase 4:** xterm viewport replay for **`getGuidanceContext` / Current guidance**; **Phase 5:** facade + locator surfaces + E2E migration; **5.9:** removed hand-rolled replay |
@@ -39,9 +39,9 @@
 
 **Delivered:**
 
-- ~~`tty-assert-staging/`~~ → **`packages/tty-assert`** (Phase 2): `stripAnsi`, `geometry`, xterm viewport replay, `ptySession`, `facade`; Ink guidance extraction stays in `cliPtyCurrentGuidanceFromReplay.ts`.
+- ~~`tty-assert-staging/`~~ → **`packages/tty-assert`** (Phase 2): `stripAnsi`, `geometry`, xterm viewport replay, `ptySession`; Ink guidance extraction stays in `cliPtyCurrentGuidanceFromReplay.ts`.
 - **Doughnut-only:** OAuth simulation, install/bundle paths, env wiring, Doughnut CLI vocabulary in `outputAssertions` (see that file’s header for generic vs domain).
-- **Plugin:** `createCliE2ePluginTasks` is thin glue (tasks, `cliEnv`, startup waits, OAuth, install paths) over `tty-assert` (`ptySession` / `facade`).
+- **Plugin:** `createCliE2ePluginTasks` is thin glue (tasks, `cliEnv`, startup waits, OAuth, install paths) over `tty-assert` (`ptySession`, managed session).
 
 **Gate:** CLI E2E that ran before still passes; no new user-visible behavior.
 
@@ -231,7 +231,7 @@
 **Delivered:**
 
 - **`pollSurfaceAssertLoop`** — internal driver used by **`waitForTextInSurface`** and **`ManagedTtySession.assert`**.
-- **`TtyAssertDumpDiagnostics`** + **`buildTtyAssertDumpDiagnostics`** — single type and builder for **`ManagedTtySession.dumpDiagnostics`** and **`facade.dumpDiagnostics`** (removed **`ManagedTtySessionDumpDiagnostics`** alias).
+- **`TtyAssertDumpDiagnostics`** + **`buildTtyAssertDumpDiagnostics`** — single type and builder for **`ManagedTtySession.dumpDiagnostics`** (removed **`ManagedTtySessionDumpDiagnostics`** alias).
 - **`TtyAssertStrictModeViolationError`** in **`ttyAssertStrictModeError.ts`** (re-exported from **`waitForTextInSurface`**) to avoid import cycles with the poll module.
 - **`ManagedTtyAssertJsonPayload`**, **`SerializableRegExp`**, **`regExpFromSerializable`**, **`managedTtyAssertOptionsFromJson`** on package root; **`cliE2ePluginTasks`** uses them (**`ManagedTtyAssertTaskPayload`** is a type alias).
 
@@ -241,14 +241,13 @@
 
 ## Phase 14 — Remove unused `facade` API
 
-**Outcome:** No **second** interactive terminal handle API that only unit tests use; **`managedTtySession` + `waitForTextInSurface`** remain the supported shapes.
+**Status:** **Complete.**
 
-**Work:**
+**Outcome:** No second interactive terminal handle API; **`managedTtySession` + `waitForTextInSurface`** are the supported shapes.
 
-- Delete **`facade.ts`** ( **`startProgram`**, **`attachTerminalHandle`**, **`expect(…).toBeVisible`** on stripped transcript) and **`facade.test.ts`**, or fold any unique coverage into **`managedTtySession`** / **`waitForTextInSurface`** tests if something would otherwise be lost.
-- Drop README / plan table references that point integrators at **`facade`**.
+**Delivered:** Removed **`facade.ts`** and **`facade.test.ts`** (behavior already covered by **`ptyTranscriptToVisiblePlaintextViaXterm`** and **`managedTtySession`** tests). README and plan anchors no longer mention **`facade`** as an integrator-facing module.
 
-**Gate:** `pnpm tty-assert:test` green; CLI E2E unchanged (callers already use managed session).
+**Gate:** **Met** — `pnpm tty-assert:test` green; no production callers used **`facade`**.
 
 ---
 
