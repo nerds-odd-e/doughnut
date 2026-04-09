@@ -6,7 +6,6 @@ import makeMe, {
 } from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
-import type { Notebook } from "@generated/doughnut-backend-api"
 
 describe("Notebooks Page", () => {
   it("fetch API to be called ONCE", async () => {
@@ -54,13 +53,11 @@ describe("Notebooks Page", () => {
       await flushPromises()
 
       const vm = wrapper.vm as unknown as {
-        notebooks: (typeof originalNotebook)[] | undefined
         catalogItems: NotebookCatalogEntry[] | undefined
       }
 
       // Verify initial state
-      expect(vm.notebooks).toHaveLength(1)
-      expect(vm.notebooks?.[0]?.title).toBe("Original Title")
+      expect(vm.catalogItems).toHaveLength(1)
       expect(vm.catalogItems?.[0]?.type).toBe("notebook")
       if (vm.catalogItems?.[0]?.type === "notebook") {
         expect(vm.catalogItems[0].notebook.title).toBe("Original Title")
@@ -72,7 +69,6 @@ describe("Notebooks Page", () => {
       await flushPromises()
 
       // Verify the notebook was updated
-      expect(vm.notebooks?.[0]?.title).toBe("Updated Title")
       if (vm.catalogItems?.[0]?.type === "notebook") {
         expect(vm.catalogItems[0].notebook.title).toBe("Updated Title")
       }
@@ -109,14 +105,15 @@ describe("Notebooks Page", () => {
 
       await flushPromises()
 
-      // Get component instance to check internal state
       const vm = wrapper.vm as unknown as {
-        notebooks: (typeof notebook1)[] | undefined
+        catalogItems: NotebookCatalogEntry[] | undefined
       }
 
-      // Verify initial state
-      expect(vm.notebooks).toHaveLength(2)
-      expect(vm.notebooks?.[0]?.title).toBe("Notebook 1")
+      expect(vm.catalogItems).toHaveLength(2)
+      expect(vm.catalogItems?.[0]?.type).toBe("notebook")
+      if (vm.catalogItems?.[0]?.type === "notebook") {
+        expect(vm.catalogItems[0].notebook.title).toBe("Notebook 1")
+      }
 
       // Emit notebook-updated event
       const notebookButtons = wrapper.findAllComponents({
@@ -127,10 +124,13 @@ describe("Notebooks Page", () => {
       }
       await flushPromises()
 
-      // Verify the notebook was updated
-      expect(vm.notebooks).toHaveLength(2)
-      expect(vm.notebooks?.[0]?.title).toBe("Updated Notebook 1")
-      expect(vm.notebooks?.[1]?.title).toBe("Notebook 2")
+      expect(vm.catalogItems).toHaveLength(2)
+      if (vm.catalogItems?.[0]?.type === "notebook") {
+        expect(vm.catalogItems[0].notebook.title).toBe("Updated Notebook 1")
+      }
+      if (vm.catalogItems?.[1]?.type === "notebook") {
+        expect(vm.catalogItems[1].notebook.title).toBe("Notebook 2")
+      }
     })
 
     it("should handle empty notebooks array gracefully", async () => {
@@ -150,11 +150,10 @@ describe("Notebooks Page", () => {
       await flushPromises()
 
       const vm = wrapper.vm as unknown as {
-        notebooks: Notebook[] | undefined
+        catalogItems: NotebookCatalogEntry[] | undefined
       }
 
-      // Verify empty state
-      expect(vm.notebooks).toHaveLength(0)
+      expect(vm.catalogItems).toEqual([])
 
       // NotebookButtons shouldn't exist when there are no notebooks
       const notebookButtons = wrapper.findComponent({ name: "NotebookButtons" })
@@ -188,19 +187,21 @@ describe("Notebooks Page", () => {
       await flushPromises()
 
       const vm = wrapper.vm as unknown as {
-        notebooks: (typeof originalNotebook)[] | undefined
+        catalogItems: NotebookCatalogEntry[] | undefined
       }
 
-      // Verify initial state
-      expect(vm.notebooks?.[0]?.title).toBe("Before Update")
+      if (vm.catalogItems?.[0]?.type === "notebook") {
+        expect(vm.catalogItems[0].notebook.title).toBe("Before Update")
+      }
 
       // Simulate event from NotebookButtons
       const notebookButtons = wrapper.findComponent({ name: "NotebookButtons" })
       notebookButtons.vm.$emit("notebook-updated", updatedNotebook)
       await flushPromises()
 
-      // Verify the notebook was updated
-      expect(vm.notebooks?.[0]?.title).toBe("After Update")
+      if (vm.catalogItems?.[0]?.type === "notebook") {
+        expect(vm.catalogItems[0].notebook.title).toBe("After Update")
+      }
     })
 
     it("patches grouped notebook in catalogItems when notebook-updated fires", async () => {

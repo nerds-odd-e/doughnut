@@ -1,8 +1,8 @@
 <template>
-  <ContentLoader v-if="notebooks === undefined" />
+  <ContentLoader v-if="catalogItems === undefined" />
   <NotebooksPageView
     v-else-if="user !== undefined"
-    :catalog-items="catalogItems ?? []"
+    :catalog-items="catalogItems"
     :subscriptions="subscriptions ?? []"
     :user="user"
     @notebook-updated="handleNotebookUpdated"
@@ -28,25 +28,17 @@ import ContentLoader from "@/components/commons/ContentLoader.vue"
 
 const user = inject<Ref<User | undefined>>("currentUser")
 const subscriptions = ref<Subscription[] | undefined>(undefined)
-const notebooks = ref<Notebook[] | undefined>(undefined)
 const catalogItems = ref<NotebookCatalogEntry[] | undefined>(undefined)
 
 const fetchData = async () => {
   const { data: result, error } = await NotebookController.myNotebooks({})
   if (!error) {
-    notebooks.value = result!.notebooks
     catalogItems.value = result!.catalogItems
     subscriptions.value = result!.subscriptions
   }
 }
 
 const handleNotebookUpdated = (updatedNotebook: Notebook) => {
-  if (notebooks.value) {
-    const index = notebooks.value.findIndex((n) => n.id === updatedNotebook.id)
-    if (index !== -1) {
-      notebooks.value[index] = updatedNotebook
-    }
-  }
   if (catalogItems.value) {
     catalogItems.value = patchNotebookInCatalogItems(
       catalogItems.value,

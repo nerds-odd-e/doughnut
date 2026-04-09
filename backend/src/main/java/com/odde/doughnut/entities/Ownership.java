@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import jakarta.persistence.Entity;
@@ -70,12 +69,5 @@ public class Ownership {
     entityPersister.save(note.getNotebook());
     entityPersister.save(note);
     return note;
-  }
-
-  public NotebooksViewedByUser jsonNotebooksViewedByUser(List<Notebook> allNotebooks) {
-    NotebooksViewedByUser notebooksViewedByUser = new NotebooksViewedByUser();
-    notebooksViewedByUser.notebooks = allNotebooks;
-    notebooksViewedByUser.catalogItems = List.of();
-    return notebooksViewedByUser;
   }
 }
