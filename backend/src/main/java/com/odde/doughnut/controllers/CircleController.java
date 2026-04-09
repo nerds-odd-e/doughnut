@@ -66,7 +66,8 @@ class CircleController {
     List<NotebookGroup> groups = notebookGroupRepository.findByOwnership_Id(ownership.getId());
     List<Notebook> notebooks =
         notebookRepository.findByOwnership_IdAndDeletedAtIsNull(ownership.getId());
-    NotebooksViewedByUser notebooksView = notebookCatalogService.buildView(notebooks, groups);
+    NotebooksViewedByUser notebooksView =
+        notebookCatalogService.buildView(notebooks, groups, List.of());
     return circle.jsonCircleForUserView(notebooksView);
   }
 

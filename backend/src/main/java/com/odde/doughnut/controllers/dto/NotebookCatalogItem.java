@@ -9,12 +9,20 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @JsonSubTypes({
   @JsonSubTypes.Type(value = NotebookCatalogNotebookItem.class, name = "notebook"),
   @JsonSubTypes.Type(value = NotebookCatalogGroupItem.class, name = "notebookGroup"),
+  @JsonSubTypes.Type(
+      value = NotebookCatalogSubscribedNotebookItem.class,
+      name = "subscribedNotebook"),
 })
 @Schema(
     discriminatorProperty = "type",
     discriminatorMapping = {
       @DiscriminatorMapping(value = "notebook", schema = NotebookCatalogNotebookItem.class),
-      @DiscriminatorMapping(value = "notebookGroup", schema = NotebookCatalogGroupItem.class)
+      @DiscriminatorMapping(value = "notebookGroup", schema = NotebookCatalogGroupItem.class),
+      @DiscriminatorMapping(
+          value = "subscribedNotebook",
+          schema = NotebookCatalogSubscribedNotebookItem.class)
     })
 public sealed interface NotebookCatalogItem
-    permits NotebookCatalogNotebookItem, NotebookCatalogGroupItem {}
+    permits NotebookCatalogNotebookItem,
+        NotebookCatalogGroupItem,
+        NotebookCatalogSubscribedNotebookItem {}

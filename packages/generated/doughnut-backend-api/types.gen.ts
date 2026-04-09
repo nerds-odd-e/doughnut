@@ -656,9 +656,15 @@ export type NotebookCatalogNotebookItem = Omit<NotebookCatalogItem, 'type'> & {
     type: 'notebook';
 };
 
+export type NotebookCatalogSubscribedNotebookItem = Omit<NotebookCatalogItem, 'type'> & {
+    notebook: Notebook;
+    subscriptionId: number;
+    type: 'subscribedNotebook';
+};
+
 export type NotebooksViewedByUser = {
     notebooks: Array<Notebook>;
-    catalogItems: Array<NotebookCatalogGroupItem | NotebookCatalogNotebookItem>;
+    catalogItems: Array<NotebookCatalogGroupItem | NotebookCatalogNotebookItem | NotebookCatalogSubscribedNotebookItem>;
     subscriptions?: Array<Subscription>;
 };
 
@@ -830,7 +836,7 @@ export type NoteRecallInfoWritable = {
 
 export type NotebooksViewedByUserWritable = {
     notebooks: Array<Notebook>;
-    catalogItems: Array<NotebookCatalogGroupItem | NotebookCatalogNotebookItem>;
+    catalogItems: Array<NotebookCatalogGroupItem | NotebookCatalogNotebookItem | NotebookCatalogSubscribedNotebookItem>;
     subscriptions?: Array<SubscriptionWritable>;
 };
 

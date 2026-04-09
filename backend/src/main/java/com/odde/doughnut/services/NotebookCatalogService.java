@@ -3,10 +3,12 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
+import com.odde.doughnut.controllers.dto.NotebookCatalogSubscribedNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookGroup;
+import com.odde.doughnut.entities.Subscription;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -28,15 +30,16 @@ public class NotebookCatalogService {
    *
    * <p>Members inside a group row use the same head-note {@code created_at} ordering.
    */
-  public NotebooksViewedByUser buildView(List<Notebook> allNotebooks, List<NotebookGroup> groups) {
+  public NotebooksViewedByUser buildView(
+      List<Notebook> allNotebooks, List<NotebookGroup> groups, List<Subscription> subscriptions) {
     NotebooksViewedByUser dto = new NotebooksViewedByUser();
     dto.notebooks = allNotebooks;
-    dto.catalogItems = buildCatalogItems(allNotebooks, groups);
+    dto.catalogItems = buildCatalogItems(allNotebooks, groups, subscriptions);
     return dto;
   }
 
   private static List<NotebookCatalogItem> buildCatalogItems(
-      List<Notebook> allNotebooks, List<NotebookGroup> groups) {
+      List<Notebook> allNotebooks, List<NotebookGroup> groups, List<Subscription> subscriptions) {
     List<SortableRow> rows = new ArrayList<>();
 
     for (Notebook notebook : allNotebooks) {
@@ -46,6 +49,16 @@ public class NotebookCatalogService {
       rows.add(
           new SortableRow(
               new NotebookCatalogNotebookItem(notebook),
+              notebook.getHeadNote().getCreatedAt(),
+              0,
+              notebook.getId()));
+    }
+
+    for (Subscription subscription : subscriptions) {
+      Notebook notebook = subscription.getNotebook();
+      rows.add(
+          new SortableRow(
+              new NotebookCatalogSubscribedNotebookItem(notebook, subscription.getId()),
               notebook.getHeadNote().getCreatedAt(),
               0,
               notebook.getId()));

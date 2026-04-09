@@ -5,7 +5,7 @@
   >
     <template v-for="item in catalogItems" :key="catalogItemKey(item)">
       <NotebookListRow
-        v-if="item.type === 'notebook'"
+        v-if="item.type === 'notebook' || item.type === 'subscribedNotebook'"
         :notebook="item.notebook"
       >
         <NotebookButtons
@@ -48,7 +48,7 @@
   >
     <template v-for="item in catalogItems" :key="catalogItemKey(item)">
       <div
-        v-if="item.type === 'notebook'"
+        v-if="item.type === 'notebook' || item.type === 'subscribedNotebook'"
         role="card"
         class="daisy-card"
         data-cy="notebook-card"
@@ -138,7 +138,9 @@ defineEmits<{
 }>()
 
 function catalogItemKey(item: NotebookCatalogEntry): string {
-  return item.type === "notebook" ? `nb-${item.notebook.id}` : `grp-${item.id}`
+  if (item.type === "notebookGroup") return `grp-${item.id}`
+  if (item.type === "subscribedNotebook") return `sub-${item.notebook.id}`
+  return `nb-${item.notebook.id}`
 }
 
 function hintForGroup(item: NotebookCatalogGroupItem) {

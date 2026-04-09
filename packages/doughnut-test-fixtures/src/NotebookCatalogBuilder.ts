@@ -2,14 +2,17 @@ import type {
   Notebook,
   NotebookCatalogGroupItem,
   NotebookCatalogNotebookItem,
+  NotebookCatalogSubscribedNotebookItem,
 } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 import NotebookCatalogGroupItemBuilder from './NotebookCatalogGroupItemBuilder'
 import NotebookCatalogNotebookItemBuilder from './NotebookCatalogNotebookItemBuilder'
+import NotebookCatalogSubscribedNotebookItemBuilder from './NotebookCatalogSubscribedNotebookItemBuilder'
 
 export type NotebookCatalogEntry =
   | NotebookCatalogNotebookItem
   | NotebookCatalogGroupItem
+  | NotebookCatalogSubscribedNotebookItem
 
 class NotebookCatalogBuilder extends Builder<NotebookCatalogEntry[]> {
   private items: NotebookCatalogEntry[] = []
@@ -46,6 +49,15 @@ class NotebookCatalogBuilder extends Builder<NotebookCatalogEntry[]> {
     this.items.push(
       new NotebookCatalogGroupItemBuilder().name(name).members(members).do()
     )
+    return this
+  }
+
+  subscribedNotebook(notebook?: Notebook) {
+    const b = new NotebookCatalogSubscribedNotebookItemBuilder()
+    if (notebook !== undefined) {
+      b.forNotebook(notebook)
+    }
+    this.items.push(b.do())
     return this
   }
 

@@ -27,6 +27,7 @@ import NotebookBuilder from './NotebookBuilder'
 import NotebookCatalogBuilder from './NotebookCatalogBuilder'
 import NotebookCatalogGroupItemBuilder from './NotebookCatalogGroupItemBuilder'
 import NotebookCatalogNotebookItemBuilder from './NotebookCatalogNotebookItemBuilder'
+import NotebookCatalogSubscribedNotebookItemBuilder from './NotebookCatalogSubscribedNotebookItemBuilder'
 import PredefinedQuestionBuilder from './PredefinedQuestionBuilder'
 import RecallPromptBuilder from './RecallPromptBuilder'
 import SuggestedQuestionForFineTuningBuilder from './SuggestedQuestionForFineTuningBuilder'
@@ -103,6 +104,10 @@ class MakeMe {
 
   static get notebookCatalogGroup(): NotebookCatalogGroupItemBuilder {
     return new NotebookCatalogGroupItemBuilder()
+  }
+
+  static get notebookCatalogSubscribedNotebook(): NotebookCatalogSubscribedNotebookItemBuilder {
+    return new NotebookCatalogSubscribedNotebookItemBuilder()
   }
 
   static get notebookCatalog(): NotebookCatalogBuilder {

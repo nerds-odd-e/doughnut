@@ -86,9 +86,10 @@ class NotebookController {
     List<NotebookGroup> groups = notebookGroupRepository.findByOwnership_Id(ownership.getId());
     List<Notebook> notebooks =
         notebookRepository.findByOwnership_IdAndDeletedAtIsNull(ownership.getId());
+    List<Subscription> subscriptions = user.getSubscriptions();
     NotebooksViewedByUser notebooksViewedByUser =
-        notebookCatalogService.buildView(notebooks, groups);
-    notebooksViewedByUser.subscriptions = user.getSubscriptions();
+        notebookCatalogService.buildView(notebooks, groups, subscriptions);
+    notebooksViewedByUser.subscriptions = subscriptions;
     return notebooksViewedByUser;
   }
 

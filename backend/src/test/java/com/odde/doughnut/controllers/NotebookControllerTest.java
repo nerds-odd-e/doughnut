@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
+import com.odde.doughnut.controllers.dto.NotebookCatalogSubscribedNotebookItem;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.controllers.dto.UpdateNotebookGroupRequest;
 import com.odde.doughnut.entities.*;
@@ -150,6 +151,44 @@ class NotebookControllerTest extends ControllerTestBase {
               .toList(),
           equalTo(List.of(first.getId(), second.getId())));
     }
+
+    @Test
+    void subscribedNotebookAppearsInCatalogItemsBetweenOwnedRows() {
+      User subscriber = makeMe.aUser().please();
+      currentUser.setUser(subscriber);
+      User owner = makeMe.aUser().please();
+      testabilitySettings.timeTravelTo(Timestamp.valueOf("2020-01-01 00:00:00"));
+      Notebook first = makeMe.aNotebook().creatorAndOwner(subscriber).please();
+      testabilitySettings.timeTravelTo(Timestamp.valueOf("2020-06-01 00:00:00"));
+      Notebook bazaarNotebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+      makeMe.aBazaarNotebook(bazaarNotebook).please();
+      Subscription subscription =
+          makeMe.aSubscription().forNotebook(bazaarNotebook).forUser(subscriber).please();
+      testabilitySettings.timeTravelTo(Timestamp.valueOf("2020-12-01 00:00:00"));
+      Notebook second = makeMe.aNotebook().creatorAndOwner(subscriber).please();
+      makeMe.refresh(subscriber);
+      var view = controller.myNotebooks();
+      var catalogIds =
+          view.catalogItems.stream().map(NotebookControllerTest::catalogItemNotebookId).toList();
+      assertThat(
+          catalogIds, equalTo(List.of(first.getId(), bazaarNotebook.getId(), second.getId())));
+      NotebookCatalogSubscribedNotebookItem subscribedRow =
+          view.catalogItems.stream()
+              .filter(NotebookCatalogSubscribedNotebookItem.class::isInstance)
+              .map(NotebookCatalogSubscribedNotebookItem.class::cast)
+              .findFirst()
+              .orElseThrow();
+      assertThat(subscribedRow.subscriptionId, equalTo(subscription.getId()));
+    }
+  }
+
+  private static Integer catalogItemNotebookId(
+      com.odde.doughnut.controllers.dto.NotebookCatalogItem item) {
+    return switch (item) {
+      case NotebookCatalogNotebookItem n -> n.notebook.getId();
+      case NotebookCatalogSubscribedNotebookItem s -> s.notebook.getId();
+      case NotebookCatalogGroupItem g -> null;
+    };
   }
 
   @Nested

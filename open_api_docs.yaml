@@ -4518,6 +4518,7 @@ components:
         mapping:
           notebook: "#/components/schemas/NotebookCatalogNotebookItem"
           notebookGroup: "#/components/schemas/NotebookCatalogGroupItem"
+          subscribedNotebook: "#/components/schemas/NotebookCatalogSubscribedNotebookItem"
       properties:
         type:
           type: string
@@ -4532,6 +4533,19 @@ components:
             $ref: "#/components/schemas/Notebook"
       required:
       - notebook
+    NotebookCatalogSubscribedNotebookItem:
+      allOf:
+      - $ref: "#/components/schemas/NotebookCatalogItem"
+      - type: object
+        properties:
+          notebook:
+            $ref: "#/components/schemas/Notebook"
+          subscriptionId:
+            type: integer
+            format: int32
+      required:
+      - notebook
+      - subscriptionId
     NotebooksViewedByUser:
       type: object
       properties:
@@ -4545,6 +4559,7 @@ components:
             oneOf:
             - $ref: "#/components/schemas/NotebookCatalogGroupItem"
             - $ref: "#/components/schemas/NotebookCatalogNotebookItem"
+            - $ref: "#/components/schemas/NotebookCatalogSubscribedNotebookItem"
         subscriptions:
           type: array
           items:
