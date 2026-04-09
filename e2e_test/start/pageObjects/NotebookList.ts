@@ -44,15 +44,27 @@ export const findNotebookCardButton = (notebook: string, name: string) => {
   const finder = () => {
     pageIsNotLoading()
     cy.get('.notebook-card').should('be.visible')
-    // Find the card that contains the notebook title and store it as an alias
-    cy.findByText(notebook, {
-      selector: '.notebook-card h5',
-    })
-      .should('be.visible')
-      .parents('[data-cy="notebook-card"]')
-      .as('notebookCard')
-    // Now find the button within that card (breaking the chain to avoid DOM detachment)
-    return cy.get('@notebookCard').findByRole('button', { name: name })
+    return cy
+      .get('[data-cy="notebook-card"]')
+      .filter((_index, card) => {
+        const $card = Cypress.$(card)
+        return $card
+          .find('.notebook-card h5')
+          .toArray()
+          .some((heading) => heading.textContent?.trim() === notebook)
+      })
+      .then(($cards) => {
+        expect($cards.length).to.be.greaterThan(0)
+        const preferredCards = $cards.filter((_index, card) => {
+          const $card = Cypress.$(card)
+          return $card.find(`button[title="${name}"]`).length > 0
+        })
+        const targetCard =
+          preferredCards.length > 0 ? preferredCards.first() : $cards.first()
+
+        return cy.wrap(targetCard)
+      })
+      .findByRole('button', { name: name })
   }
 
   return {
