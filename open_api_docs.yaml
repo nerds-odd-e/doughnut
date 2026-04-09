@@ -2068,6 +2068,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteRealm"
+  /api/notebooks/{notebook}/notebook-group:
+    patch:
+      tags:
+      - notebook-controller
+      operationId: updateNotebookGroup
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateNotebookGroupRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Notebook"
   /api/notebooks/{notebook}/move-to-circle/{circle}:
     patch:
       tags:
@@ -4148,6 +4172,12 @@ components:
           $ref: "#/components/schemas/ImageWithMask"
       required:
       - id
+    UpdateNotebookGroupRequest:
+      type: object
+      properties:
+        notebookGroupId:
+          type: integer
+          format: int32
     BookLastReadPositionRequest:
       type: object
       properties:

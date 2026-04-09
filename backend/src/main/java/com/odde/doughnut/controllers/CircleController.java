@@ -7,9 +7,11 @@ import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookGroup;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NotebookGroupRepository;
+import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.CircleService;
@@ -35,6 +37,7 @@ class CircleController {
 
   private final AuthorizationService authorizationService;
   private final NotebookGroupRepository notebookGroupRepository;
+  private final NotebookRepository notebookRepository;
   private final NotebookCatalogService notebookCatalogService;
 
   public CircleController(
@@ -43,12 +46,14 @@ class CircleController {
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
       NotebookGroupRepository notebookGroupRepository,
+      NotebookRepository notebookRepository,
       NotebookCatalogService notebookCatalogService) {
     this.circleService = circleService;
     this.notebookService = notebookService;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.notebookGroupRepository = notebookGroupRepository;
+    this.notebookRepository = notebookRepository;
     this.notebookCatalogService = notebookCatalogService;
   }
 
@@ -59,8 +64,9 @@ class CircleController {
     authorizationService.assertAuthorization(circle);
     var ownership = circle.getOwnership();
     List<NotebookGroup> groups = notebookGroupRepository.findByOwnership_Id(ownership.getId());
-    NotebooksViewedByUser notebooksView =
-        notebookCatalogService.buildView(ownership.getNotebooks(), groups);
+    List<Notebook> notebooks =
+        notebookRepository.findByOwnership_IdAndDeletedAtIsNull(ownership.getId());
+    NotebooksViewedByUser notebooksView = notebookCatalogService.buildView(notebooks, groups);
     return circle.jsonCircleForUserView(notebooksView);
   }
 

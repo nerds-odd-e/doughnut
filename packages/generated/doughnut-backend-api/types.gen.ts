@@ -518,6 +518,10 @@ export type NoteAccessory = {
     imageWithMask?: ImageWithMask;
 };
 
+export type UpdateNotebookGroupRequest = {
+    notebookGroupId?: number;
+};
+
 export type BookLastReadPositionRequest = {
     /**
      * 0-based PDF page index in the viewer
@@ -2625,6 +2629,24 @@ export type MoveToTopLevelResponses = {
 };
 
 export type MoveToTopLevelResponse = MoveToTopLevelResponses[keyof MoveToTopLevelResponses];
+
+export type UpdateNotebookGroupData = {
+    body: UpdateNotebookGroupRequest;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/notebook-group';
+};
+
+export type UpdateNotebookGroupResponses = {
+    /**
+     * OK
+     */
+    200: Notebook;
+};
+
+export type UpdateNotebookGroupResponse = UpdateNotebookGroupResponses[keyof UpdateNotebookGroupResponses];
 
 export type MoveToCircleData = {
     body?: never;

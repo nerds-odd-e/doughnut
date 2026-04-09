@@ -25,7 +25,9 @@ public class NotebookGroupService {
     NotebookGroup group = new NotebookGroup();
     group.setOwnership(ownership);
     group.setName(name);
-    return entityPersister.save(group);
+    entityPersister.save(group);
+    entityPersister.refresh(group);
+    return group;
   }
 
   public void assignNotebookToGroup(User actor, Notebook notebook, NotebookGroup group)

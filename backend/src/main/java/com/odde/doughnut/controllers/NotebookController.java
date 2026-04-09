@@ -4,13 +4,16 @@ import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
+import com.odde.doughnut.controllers.dto.UpdateNotebookGroupRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.NotebookGroupRepository;
+import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.NotebookCatalogService;
+import com.odde.doughnut.services.NotebookGroupService;
 import com.odde.doughnut.services.NotebookIndexingService;
 import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.services.ObsidianFormatService;
@@ -29,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @SessionScope
@@ -44,6 +48,8 @@ class NotebookController {
   private final BazaarService bazaarService;
   private final AuthorizationService authorizationService;
   private final NotebookGroupRepository notebookGroupRepository;
+  private final NotebookGroupService notebookGroupService;
+  private final NotebookRepository notebookRepository;
   private final NotebookCatalogService notebookCatalogService;
 
   public NotebookController(
@@ -55,6 +61,8 @@ class NotebookController {
       NotebookService notebookService,
       ObsidianFormatService obsidianFormatService,
       NotebookGroupRepository notebookGroupRepository,
+      NotebookGroupService notebookGroupService,
+      NotebookRepository notebookRepository,
       NotebookCatalogService notebookCatalogService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
@@ -64,6 +72,8 @@ class NotebookController {
     this.notebookService = notebookService;
     this.obsidianFormatService = obsidianFormatService;
     this.notebookGroupRepository = notebookGroupRepository;
+    this.notebookGroupService = notebookGroupService;
+    this.notebookRepository = notebookRepository;
     this.notebookCatalogService = notebookCatalogService;
   }
 
@@ -74,8 +84,10 @@ class NotebookController {
     User user = authorizationService.getCurrentUser();
     var ownership = user.getOwnership();
     List<NotebookGroup> groups = notebookGroupRepository.findByOwnership_Id(ownership.getId());
+    List<Notebook> notebooks =
+        notebookRepository.findByOwnership_IdAndDeletedAtIsNull(ownership.getId());
     NotebooksViewedByUser notebooksViewedByUser =
-        notebookCatalogService.buildView(ownership.getNotebooks(), groups);
+        notebookCatalogService.buildView(notebooks, groups);
     notebooksViewedByUser.subscriptions = user.getSubscriptions();
     return notebooksViewedByUser;
   }
@@ -120,6 +132,26 @@ class NotebookController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
     bazaarService.shareNotebook(notebook);
+    return notebook;
+  }
+
+  @PatchMapping("/{notebook}/notebook-group")
+  @Transactional
+  public Notebook updateNotebookGroup(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @RequestBody UpdateNotebookGroupRequest request)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(notebook);
+    User user = authorizationService.getCurrentUser();
+    if (request.getNotebookGroupId() == null) {
+      notebookGroupService.clearNotebookGroup(user, notebook);
+    } else {
+      NotebookGroup group =
+          notebookGroupRepository
+              .findById(request.getNotebookGroupId())
+              .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+      notebookGroupService.assignNotebookToGroup(user, notebook, group);
+    }
     return notebook;
   }
 

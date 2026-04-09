@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
+import com.odde.doughnut.controllers.dto.UpdateNotebookGroupRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -191,6 +192,91 @@ class NotebookControllerTest extends ControllerTestBase {
       assertThat(
           note.getNotebook().getNotebookSettings().getCertificateExpiry(),
           equalTo(Period.parse("P2Y3M")));
+    }
+  }
+
+  @Nested
+  class UpdateNotebookGroup {
+    @Test
+    void assignsNotebookToGroup() throws UnexpectedNoAccessRightException {
+      User user = makeMe.aUser().please();
+      currentUser.setUser(user);
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      NotebookGroup group = notebookGroupService.createGroup(user, user.getOwnership(), "G");
+      UpdateNotebookGroupRequest req = new UpdateNotebookGroupRequest();
+      req.setNotebookGroupId(group.getId());
+      controller.updateNotebookGroup(notebook, req);
+      assertThat(notebook.getNotebookGroup().getId(), equalTo(group.getId()));
+    }
+
+    @Test
+    void reassignsToAnotherGroup() throws UnexpectedNoAccessRightException {
+      User user = makeMe.aUser().please();
+      currentUser.setUser(user);
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      NotebookGroup g1 = notebookGroupService.createGroup(user, user.getOwnership(), "G1");
+      NotebookGroup g2 = notebookGroupService.createGroup(user, user.getOwnership(), "G2");
+      UpdateNotebookGroupRequest req1 = new UpdateNotebookGroupRequest();
+      req1.setNotebookGroupId(g1.getId());
+      controller.updateNotebookGroup(notebook, req1);
+      UpdateNotebookGroupRequest req2 = new UpdateNotebookGroupRequest();
+      req2.setNotebookGroupId(g2.getId());
+      controller.updateNotebookGroup(notebook, req2);
+      assertThat(notebook.getNotebookGroup().getId(), equalTo(g2.getId()));
+    }
+
+    @Test
+    void clearsGroupWhenNotebookGroupIdIsNull() throws UnexpectedNoAccessRightException {
+      User user = makeMe.aUser().please();
+      currentUser.setUser(user);
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      NotebookGroup group = notebookGroupService.createGroup(user, user.getOwnership(), "G");
+      notebookGroupService.assignNotebookToGroup(user, notebook, group);
+      UpdateNotebookGroupRequest req = new UpdateNotebookGroupRequest();
+      req.setNotebookGroupId(null);
+      controller.updateNotebookGroup(notebook, req);
+      assertThat(notebook.getNotebookGroup(), equalTo(null));
+    }
+
+    @Test
+    void rejectsNotebookOwnedByAnotherUser() throws UnexpectedNoAccessRightException {
+      User owner = makeMe.aUser().please();
+      currentUser.setUser(owner);
+      NotebookGroup group = notebookGroupService.createGroup(owner, owner.getOwnership(), "G");
+      User other = makeMe.aUser().please();
+      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(other).please();
+      UpdateNotebookGroupRequest req = new UpdateNotebookGroupRequest();
+      req.setNotebookGroupId(group.getId());
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.updateNotebookGroup(otherNotebook, req));
+    }
+
+    @Test
+    void notFoundWhenGroupDoesNotExist() {
+      User user = makeMe.aUser().please();
+      currentUser.setUser(user);
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      UpdateNotebookGroupRequest req = new UpdateNotebookGroupRequest();
+      req.setNotebookGroupId(9_999_999);
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.updateNotebookGroup(notebook, req));
+      assertThat(ex.getStatusCode().value(), equalTo(HttpStatus.NOT_FOUND.value()));
+    }
+
+    @Test
+    void rejectsGroupFromAnotherOwnership() throws UnexpectedNoAccessRightException {
+      User owner = makeMe.aUser().please();
+      User other = makeMe.aUser().please();
+      currentUser.setUser(owner);
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+      NotebookGroup otherGroup = notebookGroupService.createGroup(other, other.getOwnership(), "G");
+      UpdateNotebookGroupRequest req = new UpdateNotebookGroupRequest();
+      req.setNotebookGroupId(otherGroup.getId());
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.updateNotebookGroup(notebook, req));
     }
   }
 
