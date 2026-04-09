@@ -29,6 +29,34 @@ import type { WaitForTextInSurfaceOptions } from './waitForTextInSurface'
 
 export type ManagedTtyAssertOptions = Omit<WaitForTextInSurfaceOptions, 'raw'>
 
+/** Plain object form of `RegExp` for JSON-serializable assert payloads (e.g. `cy.task`). */
+export type JsonRegexp = { source: string; flags?: string }
+
+export type ManagedTtyAssertInput = Omit<
+  ManagedTtyAssertOptions,
+  'needle' | 'startAfterAnchor'
+> & {
+  needle: string | RegExp | JsonRegexp
+  startAfterAnchor?: (RegExp | JsonRegexp)[]
+}
+
+function regExpFromJsonRegexp(r: JsonRegexp): RegExp {
+  return new RegExp(r.source, r.flags ?? '')
+}
+
+export function normalizeManagedTtyAssertInput(
+  input: ManagedTtyAssertInput
+): ManagedTtyAssertOptions {
+  const needle =
+    typeof input.needle === 'string' || input.needle instanceof RegExp
+      ? input.needle
+      : regExpFromJsonRegexp(input.needle)
+  const startAfterAnchor = input.startAfterAnchor?.map((a) =>
+    a instanceof RegExp ? a : regExpFromJsonRegexp(a)
+  )
+  return { ...input, needle, startAfterAnchor }
+}
+
 /** Wired by {@link startManagedTtySession} so PTY `onData` can schedule viewport animation samples. */
 export type ManagedTtySessionPtyDataBridge = {
   onPtyData: () => void
@@ -61,7 +89,7 @@ export type ManagedTtySession = {
   readonly session: BufferedPtySession
   write(data: string): void
   submit(line: string): void
-  assert(opts: ManagedTtyAssertOptions): Promise<void>
+  assert(opts: ManagedTtyAssertInput): Promise<void>
   captureViewportPng(): Promise<Buffer>
   /** Recorded viewport PNGs when a {@link ManagedTtySessionPtyDataBridge} was used; else empty. */
   getViewportAnimationPngs(): Buffer[]
@@ -147,24 +175,26 @@ export function attachManagedTtySession(
     submit(line: string) {
       session.pty.write(`${line}\r`)
     },
-    async assert(opts: ManagedTtyAssertOptions): Promise<void> {
+    async assert(opts: ManagedTtyAssertInput): Promise<void> {
       if (disposed) {
         throw new Error('ManagedTtySession.assert after dispose')
       }
 
+      const normalized = normalizeManagedTtyAssertInput(opts)
+
       const cellExpectations = validateAndResolveCellExpectations({
-        surface: opts.surface,
-        needle: opts.needle,
-        cellExpectations: opts.cellExpectations,
+        surface: normalized.surface,
+        needle: normalized.needle,
+        cellExpectations: normalized.cellExpectations,
       })
 
-      const timeoutMs = opts.timeoutMs ?? 3000
-      const retryMs = opts.retryMs ?? TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS
-      const strict = opts.strict ?? true
-      const messagePrefix = opts.messagePrefix
+      const timeoutMs = normalized.timeoutMs ?? 3000
+      const retryMs = normalized.retryMs ?? TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS
+      const strict = normalized.strict ?? true
+      const messagePrefix = normalized.messagePrefix
 
       await pollSurfaceAssertLoop({
-        surface: opts.surface,
+        surface: normalized.surface,
         timeoutMs,
         retryMs,
         messagePrefix,
@@ -175,9 +205,9 @@ export function attachManagedTtySession(
           await syncReplay()
           const raw = session.buf.text
           const result =
-            opts.surface === 'strippedTranscript'
+            normalized.surface === 'strippedTranscript'
               ? attemptOnceStrippedTranscript({
-                  needle: opts.needle,
+                  needle: normalized.needle,
                   surface: 'strippedTranscript',
                   raw,
                   strict,
@@ -185,14 +215,14 @@ export function attachManagedTtySession(
                   rows,
                 })
               : attemptOnceOnLiveTerminal(term, {
-                  needle: opts.needle,
-                  surface: opts.surface,
+                  needle: normalized.needle,
+                  surface: normalized.surface,
                   raw,
                   strict,
                   cols,
                   rows,
-                  startAfterAnchor: opts.startAfterAnchor,
-                  fallbackRowCount: opts.fallbackRowCount,
+                  startAfterAnchor: normalized.startAfterAnchor,
+                  fallbackRowCount: normalized.fallbackRowCount,
                   cellExpectations,
                 })
           return { raw, result }

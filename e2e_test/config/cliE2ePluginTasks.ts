@@ -14,15 +14,13 @@ import {
 } from './cliE2eRepo'
 import { cliEnv } from './cliEnv'
 import {
-  managedTtyAssertOptionsFromJson,
   startManagedTtySession,
-  type ManagedTtyAssertJsonPayload,
-  type ManagedTtyAssertOptions,
+  type ManagedTtyAssertInput,
   type ManagedTtySession,
 } from 'tty-assert'
 
-/** Cypress `cy.task` body: same as {@link ManagedTtyAssertJsonPayload} from `tty-assert`. */
-export type ManagedTtyAssertTaskPayload = ManagedTtyAssertJsonPayload
+/** Cypress `cy.task` body for `cliAssert`: JSON-safe (use `{ source, flags? }` instead of `RegExp`). */
+export type ManagedTtyAssertTaskPayload = ManagedTtyAssertInput
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
 
@@ -132,7 +130,7 @@ export function createCliE2ePluginTasks(
 
   async function managedAssertWithTerminalArtifacts(
     handle: ManagedTtySession,
-    assertOpts: ManagedTtyAssertOptions,
+    assertOpts: ManagedTtyAssertInput,
     logPrefix: string
   ): Promise<void> {
     try {
@@ -361,11 +359,7 @@ export function createCliE2ePluginTasks(
           'cliAssert: no managed CLI PTY session. Start interactive (runInstalledCliInteractive / runRepoCliInteractive) or run a one-shot command (runInstalledCli) first.'
         )
       }
-      await managedAssertWithTerminalArtifacts(
-        handle,
-        managedTtyAssertOptionsFromJson(body),
-        'cliAssert'
-      )
+      await managedAssertWithTerminalArtifacts(handle, body, 'cliAssert')
       return null
     },
     async cliInteractiveWriteLine({

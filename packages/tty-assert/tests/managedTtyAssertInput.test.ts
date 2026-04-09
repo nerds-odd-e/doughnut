@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { managedTtyAssertOptionsFromJson } from '../src/managedTtyAssertJsonPayload'
+import { normalizeManagedTtyAssertInput } from '../src/managedTtySession'
 
-describe('managedTtyAssertJsonPayload', () => {
+describe('normalizeManagedTtyAssertInput', () => {
   it('turns JSON regexp fields into RegExp', () => {
-    const opts = managedTtyAssertOptionsFromJson({
+    const opts = normalizeManagedTtyAssertInput({
       surface: 'strippedTranscript',
       needle: { source: 'a+b', flags: 'i' },
       startAfterAnchor: [{ source: '^x' }],
@@ -18,7 +18,7 @@ describe('managedTtyAssertJsonPayload', () => {
   })
 
   it('honors global flag on JSON needle regexp', () => {
-    const opts = managedTtyAssertOptionsFromJson({
+    const opts = normalizeManagedTtyAssertInput({
       surface: 'strippedTranscript',
       needle: { source: '\\d', flags: 'g' },
     })

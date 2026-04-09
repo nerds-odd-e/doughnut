@@ -48,7 +48,7 @@ When `waitForTextInSurface` or `ManagedTtySession.assert` fails, the message bod
 
 ## Package root (`tty-assert`)
 
-Exported today: **`startManagedTtySession`**, **`BufferedPtySession`**, managed-session types (`ManagedTtySession`, `ManagedTtyAssertOptions`, …), and JSON-task helpers (**`ManagedTtyAssertJsonPayload`**, **`managedTtyAssertOptionsFromJson`**) — enough for Doughnut’s Cypress plugin. The return type of **`dumpDiagnostics()`** is internal to the package. Lower-level modules (`waitForTextInSurface`, `ptySession`, replay helpers, `stripAnsi`, …) are **not** separate entry points; they are composed internally and covered by this package’s unit tests.
+Exported today: **`startManagedTtySession`**, **`BufferedPtySession`**, and managed-session types (`ManagedTtySession`, **`ManagedTtyAssertInput`**, **`ManagedTtyAssertOptions`**, …) — enough for Doughnut’s Cypress plugin. The return type of **`dumpDiagnostics()`** is internal to the package. Lower-level modules (`waitForTextInSurface`, `ptySession`, replay helpers, `stripAnsi`, …) are **not** separate entry points; they are composed internally and covered by this package’s unit tests.
 
 ---
 
@@ -65,9 +65,9 @@ Use this when one process owns **the same** PTY buffer, xterm headless instance,
 5. **`getViewportAnimationPngs()`** / **`buildViewportAnimationGif()`** — when the session was started with **`startManagedTtySession`**, each PTY `onData` schedules a debounced viewport sample (deduped by viewport plaintext, ring buffer capped at 56 PNGs). **`buildViewportAnimationGif`** flushes the pending sample, then encodes those PNGs to an animated GIF (requires at least two distinct frames). Sessions from **`attachManagedTtySession`** without the internal bridge omit recording (empty PNG list; GIF build throws).
 6. **`dispose()`** — idempotent: tears down xterm, disposes the buffered PTY session. Safe if the child already exited.
 
-**`ManagedTtyAssertOptions`** (same assertion knobs as `waitForTextInSurface` except **`raw`** is omitted): `needle` (string or `RegExp`), `surface`, `timeoutMs`, `retryMs`, `strict`, `messagePrefix`, `startAfterAnchor`, `fallbackRowCount`, `cellExpectations`.
+**`ManagedTtyAssertInput`** is what **`assert(opts)`** accepts: same assertion knobs as `waitForTextInSurface` except **`raw`** is omitted, and `needle` / `startAfterAnchor` may use **`{ source, flags? }`** instead of `RegExp` (normalized inside **`assert`**). After normalization, the shape is **`ManagedTtyAssertOptions`** (`needle`: string or `RegExp` only).
 
-**Cypress:** Doughnut maps **`cy.task('cliAssert', payload)`** to `managed.assert(...)`. On failure the plugin saves a **viewport PNG** and, when enough frames were recorded, a **GIF** from **`buildViewportAnimationGif()`**, via `saveBufferToCurrentSpecFolder` (see `e2e_test/config/cliE2ePluginTasks.ts`). The task body must stay **JSON-serializable**: use `{ source, flags? }` instead of `RegExp` objects for needles and anchors.
+**Cypress:** Doughnut maps **`cy.task('cliAssert', payload)`** to `managed.assert(payload)` — no separate conversion step. On failure the plugin saves a **viewport PNG** and, when enough frames were recorded, a **GIF** from **`buildViewportAnimationGif()`**, via `saveBufferToCurrentSpecFolder` (see `e2e_test/config/cliE2ePluginTasks.ts`). The task body must stay **JSON-serializable**: use `{ source, flags? }` instead of `RegExp` objects for needles and anchors.
 
 **Node tests without Cypress:** Prefer `startManagedTtySession` from `tty-assert`; do not round-trip PTY text through a browser.
 
