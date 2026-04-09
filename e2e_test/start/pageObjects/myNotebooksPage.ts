@@ -8,8 +8,11 @@ import { notebookList } from './NotebookList'
 import noteCreationForm from './noteForms/noteCreationForm'
 import { subscribedNotebooks } from './subscribedNotebooks'
 
+const addNewNotebookButton = () =>
+  cy.findByRole('button', { name: 'Add New Notebook' })
+
 const myNotebooksPage = () => {
-  cy.findByText('Add New Notebook')
+  addNewNotebookButton()
 
   return {
     ...notebookList(),
@@ -20,7 +23,7 @@ const myNotebooksPage = () => {
       )
     },
     creatingNotebook(notebookTopic: string) {
-      cy.findByText('Add New Notebook').click()
+      addNewNotebookButton().click()
       return noteCreationForm.createNoteWithTitle(notebookTopic)
     },
     notebookCard(notebook: string) {
