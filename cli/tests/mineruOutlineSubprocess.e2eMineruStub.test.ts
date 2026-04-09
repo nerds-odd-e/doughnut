@@ -59,7 +59,7 @@ describe('mineru_book_outline.py with E2E shadow mineru (PYTHONPATH)', () => {
     expect(section3?.children?.[0]?.title).toBe(
       '3.1 Can You Refactor Without Tests?'
     )
-    expect(section3?.children?.[6]?.title).toBe(
+    expect(section3?.children?.[7]?.title).toBe(
       '6. Why Refactoring Matters More with AI'
     )
   })
