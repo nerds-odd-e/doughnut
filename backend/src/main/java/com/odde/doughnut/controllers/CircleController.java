@@ -3,13 +3,17 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.CircleForUserView;
 import com.odde.doughnut.controllers.dto.CircleJoiningByInvitation;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
+import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NotebookGroup;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.NotebookGroupRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.CircleService;
+import com.odde.doughnut.services.NotebookCatalogService;
 import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,16 +34,22 @@ class CircleController {
   private final TestabilitySettings testabilitySettings;
 
   private final AuthorizationService authorizationService;
+  private final NotebookGroupRepository notebookGroupRepository;
+  private final NotebookCatalogService notebookCatalogService;
 
   public CircleController(
       CircleService circleService,
       NotebookService notebookService,
       TestabilitySettings testabilitySettings,
-      AuthorizationService authorizationService) {
+      AuthorizationService authorizationService,
+      NotebookGroupRepository notebookGroupRepository,
+      NotebookCatalogService notebookCatalogService) {
     this.circleService = circleService;
     this.notebookService = notebookService;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
+    this.notebookGroupRepository = notebookGroupRepository;
+    this.notebookCatalogService = notebookCatalogService;
   }
 
   @GetMapping("/{circle}")
@@ -47,7 +57,11 @@ class CircleController {
       @PathVariable("circle") @Schema(type = "integer") Circle circle)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(circle);
-    return circle.jsonCircleForUserView();
+    var ownership = circle.getOwnership();
+    List<NotebookGroup> groups = notebookGroupRepository.findByOwnership_Id(ownership.getId());
+    NotebooksViewedByUser notebooksView =
+        notebookCatalogService.buildView(ownership.getNotebooks(), groups);
+    return circle.jsonCircleForUserView(notebooksView);
   }
 
   @GetMapping("")

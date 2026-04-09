@@ -349,6 +349,16 @@ export type NotebookCertificateApproval = {
     lastApprovalTime?: string;
 };
 
+export type CreateNotebookGroupRequest = {
+    name: string;
+};
+
+export type NotebookGroup = {
+    id: number;
+    name?: string;
+    createdAt?: string;
+};
+
 export type MemoryTracker = {
     id: number;
     note: Note;
@@ -624,8 +634,26 @@ export type UriAndTitle = {
     title?: string;
 };
 
+export type NotebookCatalogGroupItem = Omit<NotebookCatalogItem, 'type'> & {
+    id: number;
+    name: string;
+    createdAt: string;
+    notebooks: Array<Notebook>;
+    type: 'notebookGroup';
+};
+
+export type NotebookCatalogItem = {
+    type: string;
+};
+
+export type NotebookCatalogNotebookItem = Omit<NotebookCatalogItem, 'type'> & {
+    notebook: Notebook;
+    type: 'notebook';
+};
+
 export type NotebooksViewedByUser = {
     notebooks: Array<Notebook>;
+    catalogItems: Array<NotebookCatalogGroupItem | NotebookCatalogNotebookItem>;
     subscriptions?: Array<Subscription>;
 };
 
@@ -797,6 +825,7 @@ export type NoteRecallInfoWritable = {
 
 export type NotebooksViewedByUserWritable = {
     notebooks: Array<Notebook>;
+    catalogItems: Array<NotebookCatalogGroupItem | NotebookCatalogNotebookItem>;
     subscriptions?: Array<SubscriptionWritable>;
 };
 
@@ -1882,6 +1911,22 @@ export type RequestApprovalForNotebookResponses = {
 };
 
 export type RequestApprovalForNotebookResponse = RequestApprovalForNotebookResponses[keyof RequestApprovalForNotebookResponses];
+
+export type CreateGroupData = {
+    body: CreateNotebookGroupRequest;
+    path?: never;
+    query?: never;
+    url: '/api/notebook-groups';
+};
+
+export type CreateGroupResponses = {
+    /**
+     * OK
+     */
+    200: NotebookGroup;
+};
+
+export type CreateGroupResponse = CreateGroupResponses[keyof CreateGroupResponses];
 
 export type SoftDeleteData = {
     body?: never;

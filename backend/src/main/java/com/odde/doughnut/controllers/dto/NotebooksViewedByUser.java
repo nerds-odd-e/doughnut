@@ -7,5 +7,6 @@ import java.util.List;
 
 public class NotebooksViewedByUser {
   @NotNull public List<Notebook> notebooks;
+  @NotNull public List<NotebookCatalogItem> catalogItems;
   public List<Subscription> subscriptions;
 }

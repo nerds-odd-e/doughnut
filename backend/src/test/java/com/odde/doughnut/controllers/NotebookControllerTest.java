@@ -3,15 +3,20 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
+import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.EmbeddingService;
+import com.odde.doughnut.services.NotebookGroupService;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.time.Period;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +36,7 @@ class NotebookControllerTest extends ControllerTestBase {
   com.odde.doughnut.entities.repositories.BazaarNotebookRepository bazaarNotebookRepository;
 
   @Autowired NotebookController controller;
+  @Autowired NotebookGroupService notebookGroupService;
   private Note topNote;
   @MockitoBean EmbeddingService embeddingService;
 
@@ -86,6 +92,62 @@ class NotebookControllerTest extends ControllerTestBase {
       currentUser.setUser(user);
       List<Notebook> notebooks = currentUser.getUser().getOwnership().getNotebooks();
       assertEquals(notebooks, controller.myNotebooks().notebooks);
+    }
+  }
+
+  @Nested
+  class MyNotebooksCatalog {
+    @Test
+    void groupedNotebookAppearsOnlyInsideGroupRow() throws UnexpectedNoAccessRightException {
+      User user = makeMe.aUser().please();
+      currentUser.setUser(user);
+      Notebook grouped = makeMe.aNotebook().creatorAndOwner(user).please();
+      Notebook ungrouped = makeMe.aNotebook().creatorAndOwner(user).please();
+      NotebookGroup group = notebookGroupService.createGroup(user, user.getOwnership(), "G");
+      notebookGroupService.assignNotebookToGroup(user, grouped, group);
+      var view = controller.myNotebooks();
+      assertThat(view.notebooks.size(), equalTo(2));
+      boolean topLevelGrouped =
+          view.catalogItems.stream()
+              .filter(NotebookCatalogNotebookItem.class::isInstance)
+              .map(NotebookCatalogNotebookItem.class::cast)
+              .anyMatch(cell -> cell.notebook.getId().equals(grouped.getId()));
+      assertFalse(topLevelGrouped);
+      NotebookCatalogGroupItem groupRow =
+          view.catalogItems.stream()
+              .filter(NotebookCatalogGroupItem.class::isInstance)
+              .map(NotebookCatalogGroupItem.class::cast)
+              .filter(g -> g.id.equals(group.getId()))
+              .findFirst()
+              .orElseThrow();
+      assertThat(
+          groupRow.notebooks.stream().map(Notebook::getId).toList(),
+          equalTo(List.of(grouped.getId())));
+      assertThat(
+          view.catalogItems.stream()
+              .filter(NotebookCatalogNotebookItem.class::isInstance)
+              .map(NotebookCatalogNotebookItem.class::cast)
+              .map(n -> n.notebook.getId())
+              .toList(),
+          equalTo(List.of(ungrouped.getId())));
+    }
+
+    @Test
+    void ungroupedNotebooksOrderedByHeadNoteCreatedAt() {
+      User user = makeMe.aUser().please();
+      currentUser.setUser(user);
+      testabilitySettings.timeTravelTo(Timestamp.valueOf("2020-01-01 00:00:00"));
+      Notebook first = makeMe.aNotebook().creatorAndOwner(user).please();
+      testabilitySettings.timeTravelTo(Timestamp.valueOf("2020-06-01 00:00:00"));
+      Notebook second = makeMe.aNotebook().creatorAndOwner(user).please();
+      var view = controller.myNotebooks();
+      assertThat(
+          view.catalogItems.stream()
+              .filter(NotebookCatalogNotebookItem.class::isInstance)
+              .map(NotebookCatalogNotebookItem.class::cast)
+              .map(n -> n.notebook.getId())
+              .toList(),
+          equalTo(List.of(first.getId(), second.getId())));
     }
   }
 

@@ -5,10 +5,12 @@ import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.NotebookGroupRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
+import com.odde.doughnut.services.NotebookCatalogService;
 import com.odde.doughnut.services.NotebookIndexingService;
 import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.services.ObsidianFormatService;
@@ -18,6 +20,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,6 +43,8 @@ class NotebookController {
   private final NotebookIndexingService notebookIndexingService;
   private final BazaarService bazaarService;
   private final AuthorizationService authorizationService;
+  private final NotebookGroupRepository notebookGroupRepository;
+  private final NotebookCatalogService notebookCatalogService;
 
   public NotebookController(
       EntityPersister entityPersister,
@@ -48,7 +53,9 @@ class NotebookController {
       BazaarService bazaarService,
       AuthorizationService authorizationService,
       NotebookService notebookService,
-      ObsidianFormatService obsidianFormatService) {
+      ObsidianFormatService obsidianFormatService,
+      NotebookGroupRepository notebookGroupRepository,
+      NotebookCatalogService notebookCatalogService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.notebookIndexingService = notebookIndexingService;
@@ -56,6 +63,8 @@ class NotebookController {
     this.authorizationService = authorizationService;
     this.notebookService = notebookService;
     this.obsidianFormatService = obsidianFormatService;
+    this.notebookGroupRepository = notebookGroupRepository;
+    this.notebookCatalogService = notebookCatalogService;
   }
 
   @GetMapping("")
@@ -63,8 +72,10 @@ class NotebookController {
     authorizationService.assertLoggedIn();
 
     User user = authorizationService.getCurrentUser();
+    var ownership = user.getOwnership();
+    List<NotebookGroup> groups = notebookGroupRepository.findByOwnership_Id(ownership.getId());
     NotebooksViewedByUser notebooksViewedByUser =
-        user.getOwnership().jsonNotebooksViewedByUser(user.getOwnership().getNotebooks());
+        notebookCatalogService.buildView(ownership.getNotebooks(), groups);
     notebooksViewedByUser.subscriptions = user.getSubscriptions();
     return notebooksViewedByUser;
   }

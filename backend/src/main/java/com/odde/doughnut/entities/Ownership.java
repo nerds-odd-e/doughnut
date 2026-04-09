@@ -75,6 +75,7 @@ public class Ownership {
   public NotebooksViewedByUser jsonNotebooksViewedByUser(List<Notebook> allNotebooks) {
     NotebooksViewedByUser notebooksViewedByUser = new NotebooksViewedByUser();
     notebooksViewedByUser.notebooks = allNotebooks;
+    notebooksViewedByUser.catalogItems = List.of();
     return notebooksViewedByUser;
   }
 }

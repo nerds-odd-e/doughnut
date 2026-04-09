@@ -1266,6 +1266,24 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebookCertificateApproval"
+  /api/notebook-groups:
+    post:
+      tags:
+      - notebook-group-controller
+      operationId: createGroup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateNotebookGroupRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NotebookGroup"
   /api/memory-trackers/{memoryTracker}/soft-delete:
     post:
       tags:
@@ -3794,6 +3812,28 @@ components:
       required:
       - id
       - notebook
+    CreateNotebookGroupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          minLength: 0
+      required:
+      - name
+    NotebookGroup:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+      - id
     MemoryTracker:
       type: object
       properties:
@@ -4418,6 +4458,48 @@ components:
           type: string
         title:
           type: string
+    NotebookCatalogGroupItem:
+      allOf:
+      - $ref: "#/components/schemas/NotebookCatalogItem"
+      - type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+          name:
+            type: string
+          createdAt:
+            type: string
+            format: date-time
+          notebooks:
+            type: array
+            items:
+              $ref: "#/components/schemas/Notebook"
+      required:
+      - createdAt
+      - id
+      - name
+      - notebooks
+    NotebookCatalogItem:
+      discriminator:
+        propertyName: type
+        mapping:
+          notebook: "#/components/schemas/NotebookCatalogNotebookItem"
+          notebookGroup: "#/components/schemas/NotebookCatalogGroupItem"
+      properties:
+        type:
+          type: string
+      required:
+      - type
+    NotebookCatalogNotebookItem:
+      allOf:
+      - $ref: "#/components/schemas/NotebookCatalogItem"
+      - type: object
+        properties:
+          notebook:
+            $ref: "#/components/schemas/Notebook"
+      required:
+      - notebook
     NotebooksViewedByUser:
       type: object
       properties:
@@ -4425,11 +4507,18 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Notebook"
+        catalogItems:
+          type: array
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/NotebookCatalogGroupItem"
+            - $ref: "#/components/schemas/NotebookCatalogNotebookItem"
         subscriptions:
           type: array
           items:
             $ref: "#/components/schemas/Subscription"
       required:
+      - catalogItems
       - notebooks
     BookUserLastReadPosition:
       type: object
