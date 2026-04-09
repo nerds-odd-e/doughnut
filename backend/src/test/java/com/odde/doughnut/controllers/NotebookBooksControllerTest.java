@@ -8,10 +8,12 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.BookBlockReadingRecord;
+import com.odde.doughnut.entities.BookContentBlock;
 import com.odde.doughnut.entities.BookUserLastReadPosition;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.BookBlockReadingRecordRepository;
+import com.odde.doughnut.entities.repositories.BookContentBlockRepository;
 import com.odde.doughnut.entities.repositories.BookRepository;
 import com.odde.doughnut.entities.repositories.BookUserLastReadPositionRepository;
 import com.odde.doughnut.exceptions.ApiException;
@@ -21,7 +23,9 @@ import com.odde.doughnut.services.book.BookStorage;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -46,6 +50,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   @Autowired BookRepository bookRepository;
   @Autowired BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
   @Autowired BookBlockReadingRecordRepository bookBlockReadingRecordRepository;
+  @Autowired BookContentBlockRepository bookContentBlockRepository;
   @Autowired BookStorage bookStorage;
 
   @BeforeEach
@@ -251,6 +256,38 @@ class NotebookBooksControllerTest extends ControllerTestBase {
           new MockMultipartFile("file", "book.pdf", "application/pdf", new byte[0]);
       assertThrows(
           ApiException.class, () -> controller.attachBook(nb, attachRequest(node("A")), empty));
+    }
+
+    @Test
+    void persistsContentBlocksForEachBlock() throws Exception {
+      Notebook nb = myNotebook();
+      Map<String, Object> headingItem = new LinkedHashMap<>();
+      headingItem.put("type", "text");
+      headingItem.put("text_level", 2);
+      headingItem.put("text", "Chapter 1");
+      headingItem.put("page_idx", 0);
+      Map<String, Object> bodyItem = new LinkedHashMap<>();
+      bodyItem.put("type", "text");
+      bodyItem.put("text", "Some body text");
+      bodyItem.put("page_idx", 1);
+      AttachBookLayoutNodeRequest n = node("Chapter 1");
+      n.setContentBlocks(new ArrayList<>(List.of(headingItem, bodyItem)));
+
+      ResponseEntity<Book> res =
+          controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
+
+      Book created = res.getBody();
+      BookBlock block = rootBlocksSorted(created).getFirst();
+      List<BookContentBlock> cbs =
+          bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(block.getId());
+      assertThat(cbs, hasSize(2));
+      assertThat(cbs.get(0).getSiblingOrder(), equalTo(0));
+      assertThat(cbs.get(0).getType(), equalTo("text"));
+      assertThat(cbs.get(0).getPageIdx(), equalTo(0));
+      assertThat(cbs.get(0).getRawData(), containsString("\"text_level\":2"));
+      assertThat(cbs.get(1).getSiblingOrder(), equalTo(1));
+      assertThat(cbs.get(1).getType(), equalTo("text"));
+      assertThat(cbs.get(1).getPageIdx(), equalTo(1));
     }
   }
 

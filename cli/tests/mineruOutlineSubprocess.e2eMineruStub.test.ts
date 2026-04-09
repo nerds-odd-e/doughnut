@@ -62,5 +62,15 @@ describe('mineru_book_outline.py with E2E shadow mineru (PYTHONPATH)', () => {
     expect(section3?.children?.[7]?.title).toBe(
       '6. Why Refactoring Matters More with AI'
     )
+
+    const firstRoot = result.layout?.roots?.[0] as { contentBlocks?: unknown[] }
+    expect(Array.isArray(firstRoot?.contentBlocks)).toBe(true)
+    expect((firstRoot?.contentBlocks?.length ?? 0) > 0).toBe(true)
+    const firstBlock = firstRoot?.contentBlocks?.[0] as {
+      type?: string
+      text_level?: number
+    }
+    expect(firstBlock?.type).toBe('text')
+    expect(firstBlock?.text_level).toBe(2)
   })
 })

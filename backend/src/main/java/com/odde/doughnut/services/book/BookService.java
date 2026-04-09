@@ -4,6 +4,8 @@ import static com.odde.doughnut.services.book.BookReadingWireConstants.ANCHOR_FO
 import static com.odde.doughnut.services.book.BookReadingWireConstants.BOOK_FORMAT_PDF;
 import static com.odde.doughnut.services.book.BookReadingWireConstants.MAX_LAYOUT_DEPTH;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.AttachBookAnchorRequest;
 import com.odde.doughnut.controllers.dto.AttachBookLayoutNodeRequest;
@@ -14,6 +16,7 @@ import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookAnchor;
 import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.BookBlockReadingRecord;
+import com.odde.doughnut.entities.BookContentBlock;
 import com.odde.doughnut.entities.BookUserLastReadPosition;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
@@ -25,7 +28,10 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -42,6 +48,7 @@ public class BookService {
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final BookStorage bookStorage;
+  private final ObjectMapper objectMapper;
 
   public BookService(
       BookRepository bookRepository,
@@ -49,13 +56,15 @@ public class BookService {
       BookBlockReadingRecordRepository bookBlockReadingRecordRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
-      BookStorage bookStorage) {
+      BookStorage bookStorage,
+      ObjectMapper objectMapper) {
     this.bookRepository = bookRepository;
     this.bookUserLastReadPositionRepository = bookUserLastReadPositionRepository;
     this.bookBlockReadingRecordRepository = bookBlockReadingRecordRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.bookStorage = bookStorage;
+    this.objectMapper = objectMapper;
   }
 
   @Transactional
@@ -86,12 +95,18 @@ public class BookService {
     book.setUpdatedAt(now);
 
     List<AttachBookLayoutNodeRequest> roots = request.getLayout().getRoots();
+    List<Map.Entry<BookBlock, List<Map<String, Object>>>> pendingContentBlocks = new ArrayList<>();
     for (int i = 0; i < roots.size(); i++) {
-      persistLayoutNode(book, null, roots.get(i), i, 1);
+      persistLayoutNode(book, null, roots.get(i), i, 1, pendingContentBlocks);
     }
 
     entityPersister.save(book);
     entityPersister.flush();
+
+    for (var entry : pendingContentBlocks) {
+      persistContentBlocks(entry.getKey(), entry.getValue());
+    }
+
     return book;
   }
 
@@ -290,7 +305,12 @@ public class BookService {
   }
 
   private void persistLayoutNode(
-      Book book, BookBlock parent, AttachBookLayoutNodeRequest node, int siblingIndex, int depth) {
+      Book book,
+      BookBlock parent,
+      AttachBookLayoutNodeRequest node,
+      int siblingIndex,
+      int depth,
+      List<Map.Entry<BookBlock, List<Map<String, Object>>>> pendingContentBlocks) {
     if (depth > MAX_LAYOUT_DEPTH) {
       throw new ApiException(
           "layout exceeds maximum depth of " + MAX_LAYOUT_DEPTH,
@@ -312,7 +332,33 @@ public class BookService {
     List<AttachBookLayoutNodeRequest> children =
         node.getChildren() == null ? List.of() : node.getChildren();
     for (int j = 0; j < children.size(); j++) {
-      persistLayoutNode(book, block, children.get(j), j, depth + 1);
+      persistLayoutNode(book, block, children.get(j), j, depth + 1, pendingContentBlocks);
+    }
+
+    List<Map<String, Object>> cbs = node.getContentBlocks();
+    if (cbs != null && !cbs.isEmpty()) {
+      pendingContentBlocks.add(new AbstractMap.SimpleEntry<>(block, cbs));
+    }
+  }
+
+  private void persistContentBlocks(BookBlock block, List<Map<String, Object>> cbs) {
+    for (int i = 0; i < cbs.size(); i++) {
+      Map<String, Object> raw = cbs.get(i);
+      BookContentBlock cb = new BookContentBlock();
+      cb.setBookBlock(block);
+      cb.setSiblingOrder(i);
+      cb.setType(String.valueOf(raw.getOrDefault("type", "")));
+      Object pi = raw.get("page_idx");
+      cb.setPageIdx(pi instanceof Number n ? n.intValue() : null);
+      try {
+        cb.setRawData(objectMapper.writeValueAsString(raw));
+      } catch (JsonProcessingException e) {
+        throw new ApiException(
+            "failed to serialize content block",
+            ApiError.ErrorType.BINDING_ERROR,
+            "failed to serialize content block");
+      }
+      entityPersister.save(cb);
     }
   }
 

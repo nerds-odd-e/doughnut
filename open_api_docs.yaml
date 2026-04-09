@@ -3686,6 +3686,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AttachBookLayoutNodeRequest_Full"
+        contentBlocks:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
       required:
       - startAnchor
       - title

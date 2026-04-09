@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,4 +25,6 @@ public class AttachBookLayoutNodeRequest {
   private AttachBookAnchorRequest startAnchor;
 
   @Valid private List<AttachBookLayoutNodeRequest> children;
+
+  private List<Map<String, Object>> contentBlocks;
 }

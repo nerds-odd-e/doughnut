@@ -187,6 +187,44 @@ def layout_roots_from_heading_records(records: list[dict[str, Any]]) -> list[dic
     return roots
 
 
+def layout_roots_with_content_blocks(data: list[Any]) -> list[dict[str, Any]]:
+    """Build nested layout nodes with ordered contentBlocks from the full content_list.
+
+    Each layout node's contentBlocks contains all MinerU items that belong to it,
+    starting with the heading item that created the node.  Items appearing before
+    the first heading are skipped (handled in sub-phase 3H).
+    """
+    roots: list[dict[str, Any]] = []
+    stack: list[tuple[int, dict[str, Any]]] = []
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        item_type = item.get("type")
+        text_level = item.get("text_level") if item_type == "text" else None
+        if item_type == "text" and text_level in (1, 2, 3):
+            title = (item.get("text") or "").strip()
+            if not title:
+                continue
+            payload = {k: item[k] for k in ("page_idx", "bbox") if k in item and item[k] is not None}
+            start_a = _anchor(payload if payload else {"kind": "heading"})
+            node: dict[str, Any] = {
+                "title": title,
+                "startAnchor": start_a,
+                "contentBlocks": [item],
+            }
+            while stack and stack[-1][0] >= text_level:
+                stack.pop()
+            if not stack:
+                roots.append(node)
+            else:
+                stack[-1][1].setdefault("children", []).append(node)
+            stack.append((text_level, node))
+        else:
+            if stack:
+                stack[-1][1]["contentBlocks"].append(item)
+    return roots
+
+
 def heading_records_from_content_list(data: list[Any]) -> tuple[list[dict[str, Any]], str | None]:
     records: list[dict[str, Any]] = []
     for item in data:
@@ -368,7 +406,10 @@ def run_pdf(
         f"[L{r['level']} {'p' + str(r['page_idx']) if r.get('page_idx') is not None else 'p?'}] {r['title']}"
         for r in records
     ]
-    layout_payload = {"roots": layout_roots_from_heading_records(records)}
+    if source == "content_list" and isinstance(raw_cl, list):
+        layout_payload = {"roots": layout_roots_with_content_blocks(raw_cl)}
+    else:
+        layout_payload = {"roots": layout_roots_from_heading_records(records)}
 
     if json_mode:
         _print_json_result(

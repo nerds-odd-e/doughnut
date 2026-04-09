@@ -168,6 +168,47 @@ describe('runMineruOutlineSubprocess', () => {
     })
   })
 
+  test('passes through contentBlocks on layout nodes', async () => {
+    const layout = {
+      roots: [
+        {
+          title: 'Root A',
+          startAnchor: { anchorFormat: 'pdf.mineru_outline_v1', value: '{}' },
+          contentBlocks: [
+            { type: 'text', text_level: 2, text: 'Root A', page_idx: 0 },
+            { type: 'page_number', text: '1', page_idx: 0 },
+          ],
+        },
+      ],
+    }
+    fakeChild((child) => {
+      setImmediate(() => {
+        child.stdout!.end(
+          JSON.stringify({
+            ok: true,
+            outline: 'x',
+            source: 'content_list',
+            layout,
+          })
+        )
+        child.stderr!.end('')
+        child.emit('close', 0, null)
+      })
+    })
+
+    const result = await runMineruOutlineSubprocess({
+      bookPath: epubPath,
+      cwd: workDir,
+    })
+
+    expect(result).toEqual({
+      ok: true,
+      outline: 'x',
+      source: 'content_list',
+      layout,
+    })
+  })
+
   test('fails when layout.roots is empty', async () => {
     fakeChild((child) => {
       setImmediate(() => {
