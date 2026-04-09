@@ -412,7 +412,7 @@ describe('recall spelling (interactive)', () => {
 
     expect(answerSpellingSpy).not.toHaveBeenCalled()
 
-    pressEscape(stdin)
+    await pressEscape(stdin)
     await waitForFramesToInclude(leaveRecallWithYnRe)
 
     expect(answerSpellingSpy).not.toHaveBeenCalled()
@@ -424,7 +424,7 @@ describe('recall spelling (interactive)', () => {
 
     stdin.write('/recall\r')
     await waitForSpellingPromptVisible(lastFrame)
-    pressEscape(stdin)
+    await pressEscape(stdin)
     await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('y\r')
@@ -444,7 +444,7 @@ describe('recall spelling (interactive)', () => {
     stdin.write('par')
     await waitForLastFrame(lastFrame, (p) => p.includes('→ par'))
 
-    pressEscape(stdin)
+    await pressEscape(stdin)
     await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('n\r')
@@ -469,7 +469,7 @@ describe('recall spelling (interactive)', () => {
     stdin.write('par')
     await waitForLastFrame(lastFrame, (p) => p.includes('→ par'))
 
-    pressEscape(stdin)
+    await pressEscape(stdin)
     await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('\r')

@@ -20,23 +20,22 @@ export function stripAnsi(s: string): string {
 /** Raw TTY ESC byte for Ink `useInput` and interactive tests. */
 export const TTY_ESCAPE = '\u001b'
 
-export function pressEscape(stdin: { write(data: string): void }): void {
-  stdin.write(TTY_ESCAPE)
-}
-
 /**
- * Ink 7 buffers a lone ESC for ~20ms before emitting it (`pendingInputFlushDelayMilliseconds`).
- * `waitForFrames` spins `setImmediate` which does not advance wall-clock time, so on fast CI
- * all turns can finish before the timer fires. We install fake timers around the ESC + wait
- * to guarantee the deferred flush runs.
+ * Write ESC to stdin and flush Ink 7's deferred lone-ESC timer (~20ms).
+ * Ink buffers a lone ESC via `setTimeout` before emitting; `setImmediate` spins
+ * in `waitForFrames` do not advance wall-clock time, so on fast CI the timer
+ * never fires. We briefly install fake timers to guarantee the flush.
  */
-async function withDeferredEscapeFlush(fn: () => Promise<void>): Promise<void> {
+export async function pressEscape(stdin: {
+  write(data: string): void
+}): Promise<void> {
   const alreadyFake = vi.isFakeTimers()
   if (!alreadyFake) {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
   }
   try {
-    await fn()
+    stdin.write(TTY_ESCAPE)
+    await vi.advanceTimersByTimeAsync(25)
   } finally {
     if (!alreadyFake) {
       vi.useRealTimers()
@@ -51,11 +50,8 @@ export async function pressEscapeAndWait(
   predicate: (combined: string) => boolean,
   maxTicks = 5000
 ): Promise<void> {
-  await withDeferredEscapeFlush(async () => {
-    pressEscape(stdin)
-    await vi.advanceTimersByTimeAsync(25)
-    await waitForFrames(getCombined, predicate, maxTicks)
-  })
+  await pressEscape(stdin)
+  await waitForFrames(getCombined, predicate, maxTicks)
 }
 
 /** Poll until normalized output contains the cancelled assistant line. */
@@ -79,11 +75,8 @@ export async function pressEscapeAndWaitForCancelledLine(
   options?: { readonly normalize?: (s: string) => string },
   maxTicks = 5000
 ): Promise<void> {
-  await withDeferredEscapeFlush(async () => {
-    pressEscape(stdin)
-    await vi.advanceTimersByTimeAsync(25)
-    await waitForCancelledLine(getCombined, options, maxTicks)
-  })
+  await pressEscape(stdin)
+  await waitForCancelledLine(getCombined, options, maxTicks)
 }
 
 /** Advance the event loop until `predicate` holds or `maxTicks` is exhausted (no fixed wall-clock sleep). */

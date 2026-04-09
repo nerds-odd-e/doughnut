@@ -529,7 +529,7 @@ describe('recall just-review (interactive)', () => {
     await waitRememberAlpha(frames)
     expect(markAsRecalledSpy).not.toHaveBeenCalled()
 
-    pressEscape(stdin)
+    await pressEscape(stdin)
     await waitForFramesToInclude(leaveRecallWithYnRe)
 
     expect(markAsRecalledSpy).not.toHaveBeenCalled()
@@ -544,7 +544,7 @@ describe('recall just-review (interactive)', () => {
 
     startRecall(stdin)
     await waitRememberAlpha(frames)
-    pressEscape(stdin)
+    await pressEscape(stdin)
     await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('y\r')
@@ -562,7 +562,7 @@ describe('recall just-review (interactive)', () => {
 
     startRecall(stdin)
     await waitRememberAlpha(frames)
-    pressEscape(stdin)
+    await pressEscape(stdin)
     await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('n\r')
@@ -587,7 +587,7 @@ describe('recall just-review (interactive)', () => {
 
     startRecall(stdin)
     await waitRememberAlpha(frames)
-    pressEscape(stdin)
+    await pressEscape(stdin)
     await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('\r')
@@ -620,7 +620,7 @@ describe('recall just-review (interactive)', () => {
     await waitRememberAlpha(frames)
     stdin.write('y\r')
     await waitLoadMore(frames)
-    stdin.write('\u001b')
+    await pressEscape(stdin)
     await untilPlain(frames, (p) => p.includes('Recalled 1 note'))
     expect(markAsRecalledCount.n).toBe(1)
   })

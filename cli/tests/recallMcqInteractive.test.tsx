@@ -519,7 +519,7 @@ describe('recall MCQ (interactive)', () => {
 
     expect(answerQuizSpy).not.toHaveBeenCalled()
 
-    pressEscape(stdin)
+    await pressEscape(stdin)
     await waitForFramesToInclude(leaveRecallWithYnRe)
 
     expect(answerQuizSpy).not.toHaveBeenCalled()
@@ -531,7 +531,7 @@ describe('recall MCQ (interactive)', () => {
 
     stdin.write('/recall\r')
     await waitForMcqVisible(waitForFramesToInclude)
-    pressEscape(stdin)
+    await pressEscape(stdin)
     await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('y\r')
@@ -547,7 +547,7 @@ describe('recall MCQ (interactive)', () => {
 
     stdin.write('/recall\r')
     await waitForMcqVisible(waitForFramesToInclude)
-    pressEscape(stdin)
+    await pressEscape(stdin)
     await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('n\r')
@@ -582,7 +582,7 @@ describe('recall MCQ (interactive)', () => {
     stdin.write('\u001b[B')
     await waitForLastFrame(lastFrame, (p) => p.includes('2.'))
 
-    pressEscape(stdin)
+    await pressEscape(stdin)
     await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('n\r')
@@ -613,7 +613,7 @@ describe('recall MCQ (interactive)', () => {
     stdin.write('z')
     await waitForLastFrame(lastFrame, (p) => p.includes('→ z'))
 
-    pressEscape(stdin)
+    await pressEscape(stdin)
     await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('n\r')
@@ -635,7 +635,7 @@ describe('recall MCQ (interactive)', () => {
 
     stdin.write('/recall\r')
     await waitForMcqVisible(waitForFramesToInclude)
-    pressEscape(stdin)
+    await pressEscape(stdin)
     await waitForFramesToInclude(/Leave recall\?/)
 
     stdin.write('\r')

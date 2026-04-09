@@ -137,8 +137,8 @@ describe('YesNoStagePrompt', () => {
       (s) => Number(s) >= 30
     )
 
-    stdin.write('\u001b')
-    await waitForFrames(
+    await pressEscapeAndWait(
+      stdin,
       () => String(onCancel.mock.calls.length),
       (c) => Number(c) >= 1
     )
