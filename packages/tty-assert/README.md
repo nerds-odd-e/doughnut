@@ -4,9 +4,7 @@ Node-only helpers for asserting on **PTY (pseudo-terminal) transcripts**: ANSI s
 
 This package is **Cypress-neutral** and **Doughnut-neutral**; the monorepo wires it from `e2e_test` and other callers.
 
-**Prior art:** [microsoft/tui-test](https://github.com/microsoft/tui-test) uses xterm.js and a Playwright-style locator API. Doughnut does **not** adopt that runner; `tty-assert` borrows **ideas** (buffer slices, row-major search, strict matching). Design notes for Phase 5 live in [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](../../ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md).
-
-**Research copy:** A temporary local `tt/` tree (upstream tui-test snapshot) was used only for reading while designing locators. It is **not** a product dependency; remove it from the workspace when no longer needed.
+**Imports:** **`package.json` exposes only the package root** (`tty-assert` → `src/index.ts`). Everything else lives under `src/` for use inside this package (relative imports in tests and implementation). A published build would point the root at compiled `dist/` instead of `.ts`.
 
 **Phase 6:** Managed session + single Cypress assertion task — design and sub-phases in [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](../../ongoing/cli-phase6-tty-assert-managed-session-subphases.md).
 
@@ -30,7 +28,7 @@ Stripped text and replayed viewport text **differ**: layout, wrapping, and scrol
 
 **`waitForTextInSurface`** for xterm-backed surfaces (`viewableBuffer`, `fullBuffer`):
 
-- **Search haystack:** each row is `cols` cells; empty cells become a **space**; rows are concatenated **with no `\n` between rows** (row-major flat block). This matches tui-test’s locator search shape.
+- **Search haystack:** each row is `cols` cells; empty cells become a **space**; rows are concatenated **with no `\n` between rows** (row-major flat block).
 - **Failure snapshots:** **newline-separated** rows, each row `trimEnd`’d — readable and **not** identical to the flat search string.
 
 For **`strippedTranscript`**, the haystack and snapshot are the **same**: the full ANSI-stripped string (no xterm geometry).
@@ -48,21 +46,13 @@ When `waitForTextInSurface` or `ManagedTtySession.assert` fails, the message bod
 
 ---
 
-## Subpath exports (`package.json` `"exports"`)
+## Package root (`tty-assert`)
 
-| Import | Role |
-|--------|------|
-| `tty-assert/geometry` | Default CLI PTY cols/rows |
-| `tty-assert/ptyTranscriptToViewportPlaintext` | **Canonical** xterm viewport plaintext (async) |
-| `tty-assert/ptyTranscriptToVisiblePlaintextViaXterm` | Same function as `ptyTranscriptToViewportPlaintext` |
-| `tty-assert/ptySession` | Buffered PTY session helpers |
-| `tty-assert/facade` | `startProgram` / `TtyAssertTerminalHandle` — `getReplayedScreenPlaintext` uses xterm; `expect(…).toBeVisible` searches **stripped** cumulative text |
-| `tty-assert/managedTtySession` | Long-lived PTY + incremental xterm replay + polling `assert` — see below |
-| `tty-assert/waitForTextInSurface` | `waitForTextInSurface`, `stripAnsiCliPty`, `TtySearchSurface`, `TtyAssertStrictModeViolationError` |
+Exported today: **`startManagedTtySession`**, **`BufferedPtySession`**, and managed-session types (`ManagedTtySession`, `ManagedTtyAssertOptions`, …) — enough for Doughnut’s Cypress plugin. Lower-level modules (`waitForTextInSurface`, `ptySession`, `facade`, replay helpers, `stripAnsi`, …) are **not** separate entry points; they are composed internally and covered by this package’s unit tests.
 
 ---
 
-## Managed interactive session (`managedTtySession`)
+## Managed interactive session
 
 Use this when one process owns **the same** PTY buffer, xterm headless instance, and assertion loop (retry + sync). That matches interactive CLI E2E: start once, write many times, assert many times, dispose once.
 
@@ -79,14 +69,17 @@ Use this when one process owns **the same** PTY buffer, xterm headless instance,
 
 **Cypress:** Doughnut maps **`cy.task('cliAssert', payload)`** to `managed.assert(...)`. On failure the plugin saves a **viewport PNG** and, when enough frames were recorded, a **GIF** from **`buildViewportAnimationGif()`**, via `saveBufferToCurrentSpecFolder` (see `e2e_test/config/cliE2ePluginTasks.ts`). The task body must stay **JSON-serializable**: use `{ source, flags? }` instead of `RegExp` objects for needles and anchors.
 
-**Node tests without Cypress:** Prefer `managedTtySession` or `facade` directly; do not round-trip PTY text through a browser.
+**Node tests without Cypress:** Prefer `startManagedTtySession` from `tty-assert`; do not round-trip PTY text through a browser.
 
 ---
 
-## `waitForTextInSurface`
+## `waitForTextInSurface` (internal module)
+
+Used by **`ManagedTtySession.assert`** and unit-tested under `packages/tty-assert/tests/`. Direct use is via **relative imports** inside this package (see those tests), not a separate publish entry.
 
 ```ts
-import { waitForTextInSurface } from 'tty-assert/waitForTextInSurface'
+// e.g. from packages/tty-assert/tests/ — see waitForTextInSurface.test.ts
+import { waitForTextInSurface } from '../src/waitForTextInSurface'
 
 await waitForTextInSurface({
   raw: ptyBytes,
@@ -113,7 +106,7 @@ await waitForTextInSurface({
 })
 ```
 
-- **`viewableBuffer`:** lines from xterm `baseY` through `length - 1` (tui-test “viewable” slice).
+- **`viewableBuffer`:** lines from xterm `baseY` through `length - 1` (the scrollable view’s active region, not the full scrollback).
 - **`fullBuffer`:** lines `0` through `length - 1` (scrollback + active).
 - **`strippedTranscript`:** no replay; search `stripAnsiCliPty(raw)`.
 - **`raw`:** string or a **getter** `() => string` so each poll can see updated buffer data.

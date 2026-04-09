@@ -1,13 +1,12 @@
 /**
- * Locator-style text search over explicit **surfaces** (tui-test–inspired, runner-agnostic).
+ * Locator-style text search over explicit **surfaces** (runner-agnostic).
  *
  * **Search haystack (substring / RegExp):** xterm-backed surfaces use a **row-major** block:
  * each row is `cols` cells as strings joined (empty cells → space), then **all rows concatenated
- * with no `\n` between rows** — same shape as
- * [microsoft/tui-test `Locator`](https://github.com/microsoft/tui-test/blob/main/src/terminal/locator.ts).
+ * with no `\n` between rows**.
  *
- * **Failure snapshots:** newline-separated rows, each row **trimEnd**’d (like tui-test’s timeout
- * snapshot), so debug output is readable and differs from the flat search block.
+ * **Failure snapshots:** newline-separated rows, each row **trimEnd**’d, so debug output is
+ * readable and differs from the flat search block.
  *
  * **`ptyTranscriptToViewportPlaintext`:** still uses **`\n`‑joined** viewport lines for guidance
  * heuristics; locators here intentionally use the flat block for matching.
@@ -57,7 +56,7 @@ export type WaitForTextInSurfaceOptions = {
   timeoutMs?: number
   retryMs?: number
   /**
-   * When more than one non-overlapping match exists, throw (tui-test default).
+   * When more than one non-overlapping match exists, throw (default strict behavior).
    * Set `false` when duplicate Ink lines are expected.
    */
   strict?: boolean

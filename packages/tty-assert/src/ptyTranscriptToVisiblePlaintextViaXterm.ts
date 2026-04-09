@@ -20,7 +20,7 @@ export function viewportPlaintextFromHeadlessTerminal(term: Terminal): string {
  *
  * `write` is asynchronous; the promise resolves after the parser has applied the transcript.
  *
- * Internal to `tty-assert` and its tests; Doughnut E2E imports only the package root.
+ * Internal to `tty-assert` and its tests; integrators use the package root (`managed` session) or in-repo relative imports.
  */
 export function ptyTranscriptToVisiblePlaintextViaXterm(
   raw: string,

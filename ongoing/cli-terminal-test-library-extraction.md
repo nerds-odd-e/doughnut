@@ -1,6 +1,6 @@
 # `tty-assert` — PTY terminal test library extraction
 
-**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses xterm viewport replay). **Phase 5** is **complete** (sub-phases **5.1–5.9 met**, including legacy replay removal — execution table in [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md)). **Phase 6** is **complete** (sub-phases **6.1–6.5 met** — managed session, `cliAssert`, docs, removal of unused `cliInteractivePtyGetBuffer`; detail in [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md)). Phases **7–15** follow the roadmap (7–10 diagnostics and capture; **11–14** library cleanup before OSS extraction; **15** move out). Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md); Phase 5 — [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md); Phase 6 — [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md).
+**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses xterm viewport replay). **Phase 5** is **complete** (sub-phases **5.1–5.9 met**, including legacy replay removal — execution table in [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md)). **Phase 6** is **complete** (sub-phases **6.1–6.5 met** — managed session, `cliAssert`, docs, removal of unused `cliInteractivePtyGetBuffer`; detail in [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md)). **Phase 11** is **complete** (single **`exports`** entry + README that matches; prior-art wording removed from `packages/tty-assert`). Phases **7–10**, **12–15** follow the roadmap (7–10 diagnostics and capture; **12–14** further library cleanup before OSS extraction; **15** move out). Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md); Phase 5 — [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md); Phase 6 — [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md).
 
 **Intent:** Extract PTY-based terminal testing into a **Cypress-neutral, Doughnut-neutral** library named **`tty-assert`**, publishable on npm and eventually movable out of this repo. Goal: reliable assertions on terminal-visible state, with failures that show **expected vs actual** without manually decoding escape sequences, and CI-friendly artifacts where useful.
 
@@ -92,7 +92,7 @@
 | **4.2** | Parity (or documented deltas) vs legacy replay on extended fixtures | **Met** (historical); parity tests removed with legacy replay in **5.9** |
 | **4.3** | `outputAssertions.getGuidanceContext` uses xterm for `replayedPlain` only | **Met:** targeted `cli_access_token`, `cli_recall`, `cli_install_and_run` Cypress specs green |
 
-**Reference: [microsoft/tui-test](https://github.com/microsoft/tui-test)** — xterm.js for PTY rendering; map **feed bytes → read buffer text** only, not their runner. Implementation notes (Node `Terminal`, addons, headless CI) live in the sub-phase doc.
+**Reference (historical):** Phase 4 used headless xterm.js to map **feed bytes → viewport plaintext**. Implementation notes (Node `Terminal`, addons, headless CI) live in the sub-phase doc.
 
 **Named acceptance example:** `cli_access_token.feature` — `"E2E CLI Token"` in Current guidance; recall guidance steps stay green on the same choke point.
 
@@ -104,9 +104,9 @@
 
 ## Phase 5 — Locators, tidy assertion APIs, finish xterm migration
 
-**Sub-phases (detail, gates, tui-test-inspired locator notes):** [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md).
+**Sub-phases (detail, gates, locator design notes):** [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md).
 
-**Outcome:** One coherent, documented **assertion surface** in `tty-assert` — explicit **search surfaces** (viewport vs full xterm buffer vs stripped cumulative transcript where still appropriate), **poll + timeout** helpers in the library (patterns from [microsoft/tui-test](https://github.com/microsoft/tui-test) [`locator.ts`](https://github.com/microsoft/tui-test/blob/main/src/terminal/locator.ts) / [`toBeVisible.ts`](https://github.com/microsoft/tui-test/blob/main/src/test/matchers/toBeVisible.ts), not their runner), and **all** replay-based product paths on xterm. **Doughnut E2E** updates **some** checks that searched the **entire** PTY history so they use **better locators** aligned with where users actually see text.
+**Outcome:** One coherent, documented **assertion surface** in `tty-assert` — explicit **search surfaces** (viewport vs full xterm buffer vs stripped cumulative transcript where still appropriate), **poll + timeout** helpers in the library (row-major matching, strict duplicate handling), and **all** replay-based product paths on xterm. **Doughnut E2E** updates **some** checks that searched the **entire** PTY history so they use **better locators** aligned with where users actually see text.
 
 **Legacy hand-rolled replay:** Removed in sub-phase **5.9** (module, parity/unit tests that only targeted it, export path, `check-legacy-replay-imports.sh`).
 
@@ -130,7 +130,7 @@
 
 **Delivered:**
 
-- `tty-assert/managedTtySession`: `startManagedTtySession`, `attachManagedTtySession`, incremental xterm sync, polling `assert`, idempotent `dispose`, `dumpFrames`.
+- `packages/tty-assert/src/managedTtySession.ts`: `startManagedTtySession`, `attachManagedTtySession`, incremental xterm sync, polling `assert`, idempotent `dispose`, `dumpFrames` (integrators import `startManagedTtySession` and types from the package root).
 - Plugin: `cliAssert` → `managed.assert`; startup wait uses managed `assert`; **`cliInteractivePtyGetBuffer` removed** (unused).
 - `e2e_test/start/pageObjects/cli/outputAssertions.ts`: request builders for current guidance, transcript, full-buffer + cell expectations.
 
@@ -192,6 +192,8 @@
 
 ## Phase 11 — Package surface, README truth, and prior-art wording
 
+**Status:** **Complete.**
+
 **Outcome:** What the README promises matches what **`package.json` `exports`** (and TypeScript resolution) actually allow; bibliographic noise and stale notes are gone so external readers are not misled.
 
 **Work:**
@@ -200,7 +202,7 @@
 - Remove **third-party prior-art** name-drops and links from **`packages/tty-assert`** sources and README; describe row-major search and strict matching in neutral terms (same behavior, no citation trail). Optionally trim duplicate bibliographic lines in **`ongoing/*`** phase notes that only referenced that prior art.
 - Delete stale **local research tree** wording from README if it no longer applies.
 
-**Gate:** `pnpm tty-assert:lint` + `pnpm tty-assert:test` green; a quick manual read confirms README import examples work (or are explicitly “monorepo / root-only” until exports land).
+**Gate:** **Met** — `pnpm tty-assert:lint` + `pnpm tty-assert:test` green; README documents **root-only** `exports`; `packages/tty-assert` sources and README contain no third-party prior-art links.
 
 ---
 
