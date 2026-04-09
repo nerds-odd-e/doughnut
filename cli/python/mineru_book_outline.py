@@ -31,8 +31,6 @@ from pathlib import Path
 from typing import Any
 from xml.etree import ElementTree as ET
 
-from mineru.cli.common import do_parse, read_fn
-
 SUPPORTED_BOOK_SUFFIXES = frozenset({".pdf", ".epub"})
 ANCHOR_FORMAT = "pdf.mineru_outline_v1"
 
@@ -161,6 +159,21 @@ def _anchor(payload: dict[str, Any]) -> dict[str, str]:
     return {"anchorFormat": ANCHOR_FORMAT, "value": s}
 
 
+def _beginning_anchor_payload(first_orphan: dict[str, Any]) -> dict[str, Any]:
+    payload: dict[str, Any] = {"kind": "beginning"}
+    if first_orphan.get("page_idx") is not None:
+        payload["page_idx"] = first_orphan["page_idx"]
+    bbox = first_orphan.get("bbox")
+    if isinstance(bbox, list) and len(bbox) == 4:
+        try:
+            x0, y0, x1, y1 = (float(b) for b in bbox)
+            h = y1 - y0
+            payload["bbox"] = [x0, max(0.0, y0 - h), x1, y0]
+        except (TypeError, ValueError):
+            pass
+    return payload
+
+
 def layout_roots_from_heading_records(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Build nested layout nodes (attach-book ``layout.roots``) from headings in reading order."""
     roots: list[dict[str, Any]] = []
@@ -192,11 +205,19 @@ def layout_roots_with_content_blocks(data: list[Any]) -> list[dict[str, Any]]:
 
     Each layout node's contentBlocks holds only non-heading MinerU items that belong
     to that section (body stream in reading order). The heading lives on the node's
-    title and startAnchor only. Items appearing before the first heading are skipped
-    (handled in sub-phase 3H).
+    title and startAnchor only. Items before the first heading attach to a synthetic
+    root block titled *beginning* (startAnchor one line height above the first orphan).
     """
     roots: list[dict[str, Any]] = []
     stack: list[tuple[int, dict[str, Any]]] = []
+    beginning_node: dict[str, Any] | None = None
+
+    def flush_beginning() -> None:
+        nonlocal beginning_node
+        if beginning_node is not None:
+            roots.append(beginning_node)
+            beginning_node = None
+
     for item in data:
         if not isinstance(item, dict):
             continue
@@ -206,6 +227,7 @@ def layout_roots_with_content_blocks(data: list[Any]) -> list[dict[str, Any]]:
             title = (item.get("text") or "").strip()
             if not title:
                 continue
+            flush_beginning()
             payload = {k: item[k] for k in ("page_idx", "bbox") if k in item and item[k] is not None}
             start_a = _anchor(payload if payload else {"kind": "heading"})
             node: dict[str, Any] = {
@@ -223,6 +245,18 @@ def layout_roots_with_content_blocks(data: list[Any]) -> list[dict[str, Any]]:
         else:
             if stack:
                 stack[-1][1]["contentBlocks"].append(item)
+            else:
+                if beginning_node is None:
+                    beginning_node = {
+                        "title": "*beginning*",
+                        "startAnchor": _anchor(_beginning_anchor_payload(item)),
+                        "contentBlocks": [],
+                    }
+                beginning_node["contentBlocks"].append(item)
+
+    if beginning_node is not None:
+        roots.append(beginning_node)
+
     return roots
 
 
@@ -327,6 +361,8 @@ def run_pdf(
     cleanup_out: bool,
     json_mode: bool,
 ) -> int:
+    from mineru.cli.common import do_parse, read_fn
+
     pdf_bytes = read_fn(book_path)
     print(f"MinerU output directory: {out_dir}", file=sys.stderr)
     print(f"Book stem: {stem!r}  pages {args.start_page}..{args.end_page}", file=sys.stderr)

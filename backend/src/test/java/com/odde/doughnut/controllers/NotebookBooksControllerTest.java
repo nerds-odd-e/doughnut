@@ -280,6 +280,37 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(cbs.get(0).getType(), equalTo("text"));
       assertThat(cbs.get(0).getPageIdx(), equalTo(1));
     }
+
+    @Test
+    void persistsContentBlocksUnderSyntheticBeginningRoot() throws Exception {
+      Notebook nb = myNotebook();
+      Map<String, Object> orphan = new LinkedHashMap<>();
+      orphan.put("type", "text");
+      orphan.put("text", "Preface paragraph");
+      orphan.put("page_idx", 0);
+
+      AttachBookLayoutNodeRequest beginning = node("*beginning*");
+      beginning.setContentBlocks(new ArrayList<>(List.of(orphan)));
+      AttachBookLayoutNodeRequest chapter = node("Chapter 1");
+
+      ResponseEntity<Book> res =
+          controller.attachBook(nb, attachRequest(beginning, chapter), pdfFile(STUB_PDF_BYTES));
+
+      Book created = res.getBody();
+      assertThat(created, notNullValue());
+      List<BookBlock> roots = rootBlocksSorted(created);
+      assertThat(roots, hasSize(2));
+      assertThat(roots.getFirst().getStructuralTitle(), equalTo("*beginning*"));
+      assertThat(roots.get(1).getStructuralTitle(), equalTo("Chapter 1"));
+
+      List<BookContentBlock> beginningCbs =
+          bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(
+              roots.getFirst().getId());
+      assertThat(beginningCbs, hasSize(1));
+      assertThat(beginningCbs.getFirst().getSiblingOrder(), equalTo(0));
+      assertThat(beginningCbs.getFirst().getType(), equalTo("text"));
+      assertThat(beginningCbs.getFirst().getPageIdx(), equalTo(0));
+    }
   }
 
   @Nested
