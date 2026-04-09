@@ -1,12 +1,7 @@
 import { Terminal } from '@xterm/headless'
 import {
-  TERMINAL_ERROR_RAW_TAIL_BYTES,
   formatFinalViewportPlaintextForError,
   formatRawTerminalSnapshotForError,
-  formatSearchSurfaceFailure,
-  headPreview,
-  sanitizeVisibleTextForError,
-  tailPreview,
 } from './errorSnapshotFormatting'
 import { CLI_INTERACTIVE_PTY_COLS, CLI_INTERACTIVE_PTY_ROWS } from './geometry'
 import {
@@ -24,22 +19,13 @@ import {
   attemptOnceStrippedTranscript,
   writeTranscriptToTerminal,
 } from './surfaceAttemptOnTerminal'
-import { stripAnsiCliPty } from './stripAnsi'
 import { TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS } from './locatorRetryMs'
 import {
-  TtyAssertStrictModeViolationError,
-  type WaitForTextInSurfaceOptions,
-} from './waitForTextInSurface'
-
-/** Same fields as `TtyAssertDumpDiagnostics` from `./facade` (shared diagnostic shape). */
-export type ManagedTtySessionDumpDiagnostics = {
-  rawByteLength: number
-  ansiStrippedLength: number
-  replayedScreenPlaintextHeadPreview: string
-  replayedScreenPlaintextTailPreview: string
-  strippedTranscriptTailPreview: string
-  rawTailSanitizedPreview: string
-}
+  buildTtyAssertDumpDiagnostics,
+  type TtyAssertDumpDiagnostics,
+} from './ttyAssertDumpDiagnostics'
+import { pollSurfaceAssertLoop } from './pollSurfaceAssertLoop'
+import type { WaitForTextInSurfaceOptions } from './waitForTextInSurface'
 
 export type ManagedTtyAssertOptions = Omit<WaitForTextInSurfaceOptions, 'raw'>
 
@@ -51,21 +37,8 @@ export type ManagedTtySessionPtyDataBridge = {
 const VIEWPORT_ANIM_DEBOUNCE_MS = 40
 const VIEWPORT_ANIM_MAX_FRAMES = 56
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 const CLI_TERMINAL_RAW_SNAPSHOT_HEADING =
   '--- CLI terminal snapshot (ANSI-stripped, safe text) ---'
-
-function withOptionalMessagePrefix(
-  prefix: string | undefined,
-  body: string
-): string {
-  if (prefix == null || prefix === '') return body
-  const p = prefix.replace(/\n+$/, '')
-  return `${p}\n${body}`
-}
 
 function appendRawTerminalSnapshotForErrorMessage(
   body: string,
@@ -94,7 +67,7 @@ export type ManagedTtySession = {
   getViewportAnimationPngs(): Buffer[]
   /** Flushes pending animation sample, then builds a GIF from recorded frames (needs ≥2 frames). */
   buildViewportAnimationGif(): Promise<Buffer>
-  dumpDiagnostics(): Promise<ManagedTtySessionDumpDiagnostics>
+  dumpDiagnostics(): Promise<TtyAssertDumpDiagnostics>
   dispose(): void
 }
 
@@ -190,76 +163,43 @@ export function attachManagedTtySession(
       const strict = opts.strict ?? true
       const messagePrefix = opts.messagePrefix
 
-      const started = Date.now()
-      let lastFail: { snapshot: string; detail: string } | undefined
-
-      for (;;) {
-        if (disposed) {
-          throw new Error('ManagedTtySession.assert after dispose')
-        }
-        await syncReplay()
-        const raw = session.buf.text
-
-        let result:
-          | { ok: true }
-          | { ok: false; snapshot: string; detail: string }
-          | { ok: 'strict'; message: string; snapshot: string }
-
-        if (opts.surface === 'strippedTranscript') {
-          result = attemptOnceStrippedTranscript({
-            needle: opts.needle,
-            surface: 'strippedTranscript',
-            raw,
-            strict,
-            cols,
-            rows,
-          })
-        } else {
-          result = attemptOnceOnLiveTerminal(term, {
-            needle: opts.needle,
-            surface: opts.surface,
-            raw,
-            strict,
-            cols,
-            rows,
-            startAfterAnchor: opts.startAfterAnchor,
-            fallbackRowCount: opts.fallbackRowCount,
-            cellExpectations,
-          })
-        }
-
-        if (result.ok === true) return
-
-        if (result.ok === 'strict') {
-          const body = withOptionalMessagePrefix(
-            messagePrefix,
-            formatSearchSurfaceFailure(
-              opts.surface,
-              result.message,
-              result.snapshot
-            )
-          )
-          throw new TtyAssertStrictModeViolationError(
-            appendManagedAssertFailureDiagnostics(body, raw, term)
-          )
-        }
-
-        lastFail = { snapshot: result.snapshot, detail: result.detail }
-        if (Date.now() - started >= timeoutMs) {
-          const detail =
-            timeoutMs === 0
-              ? lastFail.detail
-              : `Timeout after ${timeoutMs}ms. ${lastFail.detail}`
-          const body = withOptionalMessagePrefix(
-            messagePrefix,
-            formatSearchSurfaceFailure(opts.surface, detail, lastFail.snapshot)
-          )
-          throw new Error(
-            appendManagedAssertFailureDiagnostics(body, raw, term)
-          )
-        }
-        await sleep(retryMs)
-      }
+      await pollSurfaceAssertLoop({
+        surface: opts.surface,
+        timeoutMs,
+        retryMs,
+        messagePrefix,
+        runAttempt: async () => {
+          if (disposed) {
+            throw new Error('ManagedTtySession.assert after dispose')
+          }
+          await syncReplay()
+          const raw = session.buf.text
+          const result =
+            opts.surface === 'strippedTranscript'
+              ? attemptOnceStrippedTranscript({
+                  needle: opts.needle,
+                  surface: 'strippedTranscript',
+                  raw,
+                  strict,
+                  cols,
+                  rows,
+                })
+              : attemptOnceOnLiveTerminal(term, {
+                  needle: opts.needle,
+                  surface: opts.surface,
+                  raw,
+                  strict,
+                  cols,
+                  rows,
+                  startAfterAnchor: opts.startAfterAnchor,
+                  fallbackRowCount: opts.fallbackRowCount,
+                  cellExpectations,
+                })
+          return { raw, result }
+        },
+        appendFailure: (body, raw) =>
+          appendManagedAssertFailureDiagnostics(body, raw, term),
+      })
     },
     async captureViewportPng(): Promise<Buffer> {
       if (disposed) {
@@ -290,24 +230,14 @@ export function attachManagedTtySession(
       }
       return viewportPngBuffersToGif([...animFrames])
     },
-    async dumpDiagnostics(): Promise<ManagedTtySessionDumpDiagnostics> {
+    async dumpDiagnostics(): Promise<TtyAssertDumpDiagnostics> {
       if (disposed) {
         throw new Error('ManagedTtySession.dumpDiagnostics after dispose')
       }
       await syncReplay()
       const raw = session.buf.text
-      const stripped = stripAnsiCliPty(raw)
       const replayed = viewportPlaintextFromHeadlessTerminal(term)
-      return {
-        rawByteLength: raw.length,
-        ansiStrippedLength: stripped.length,
-        replayedScreenPlaintextHeadPreview: headPreview(replayed),
-        replayedScreenPlaintextTailPreview: tailPreview(replayed),
-        strippedTranscriptTailPreview: tailPreview(stripped),
-        rawTailSanitizedPreview: sanitizeVisibleTextForError(
-          tailPreview(raw.slice(-TERMINAL_ERROR_RAW_TAIL_BYTES))
-        ),
-      }
+      return buildTtyAssertDumpDiagnostics({ raw, replayedPlain: replayed })
     },
     dispose() {
       if (disposed) return

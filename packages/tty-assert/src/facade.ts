@@ -11,11 +11,9 @@
  */
 
 import {
-  TERMINAL_ERROR_RAW_TAIL_BYTES,
-  headPreview,
-  sanitizeVisibleTextForError,
-  tailPreview,
-} from './errorSnapshotFormatting'
+  buildTtyAssertDumpDiagnostics,
+  type TtyAssertDumpDiagnostics,
+} from './ttyAssertDumpDiagnostics'
 import { ptyTranscriptToViewportPlaintext } from './ptyTranscriptToVisiblePlaintextViaXterm'
 import {
   disposeBufferedPtySession,
@@ -39,14 +37,7 @@ export type TtyAssertToBeVisibleOpts = {
   retryMs?: number
 }
 
-export type TtyAssertDumpDiagnostics = {
-  rawByteLength: number
-  ansiStrippedLength: number
-  replayedScreenPlaintextHeadPreview: string
-  replayedScreenPlaintextTailPreview: string
-  strippedTranscriptTailPreview: string
-  rawTailSanitizedPreview: string
-}
+export type { TtyAssertDumpDiagnostics }
 
 export type TtyAssertTerminalHandle = {
   readonly session: BufferedPtySession
@@ -103,18 +94,8 @@ function createHandle(session: BufferedPtySession): TtyAssertTerminalHandle {
     },
     async dumpDiagnostics(): Promise<TtyAssertDumpDiagnostics> {
       const raw = session.buf.text
-      const stripped = stripAnsiCliPty(raw)
       const replayed = await ptyTranscriptToViewportPlaintext(raw)
-      return {
-        rawByteLength: raw.length,
-        ansiStrippedLength: stripped.length,
-        replayedScreenPlaintextHeadPreview: headPreview(replayed),
-        replayedScreenPlaintextTailPreview: tailPreview(replayed),
-        strippedTranscriptTailPreview: tailPreview(stripped),
-        rawTailSanitizedPreview: sanitizeVisibleTextForError(
-          tailPreview(raw.slice(-TERMINAL_ERROR_RAW_TAIL_BYTES))
-        ),
-      }
+      return buildTtyAssertDumpDiagnostics({ raw, replayedPlain: replayed })
     },
   }
 }

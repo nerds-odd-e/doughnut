@@ -31,12 +31,13 @@ import {
   type CellExpectationBlock,
 } from './cellExpectations'
 import { TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS } from './locatorRetryMs'
-import {
-  formatRawTerminalSnapshotForError,
-  formatSearchSurfaceFailure,
-} from './errorSnapshotFormatting'
+import { formatRawTerminalSnapshotForError } from './errorSnapshotFormatting'
 import { CLI_INTERACTIVE_PTY_COLS, CLI_INTERACTIVE_PTY_ROWS } from './geometry'
+import { pollSurfaceAssertLoop } from './pollSurfaceAssertLoop'
 import { attemptOnce } from './surfaceAttemptOnTerminal'
+import { TtyAssertStrictModeViolationError } from './ttyAssertStrictModeError'
+
+export { TtyAssertStrictModeViolationError }
 
 export type { CellExpectation, CellExpectationBlock } from './cellExpectations'
 
@@ -81,29 +82,12 @@ export type WaitForTextInSurfaceOptions = {
 
 export { TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS }
 
-export class TtyAssertStrictModeViolationError extends Error {
-  readonly name = 'TtyAssertStrictModeViolationError'
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 function resolveRaw(raw: string | (() => string)): string {
   return typeof raw === 'function' ? raw() : raw
 }
 
 const CLI_TERMINAL_RAW_SNAPSHOT_HEADING =
   '--- CLI terminal snapshot (ANSI-stripped, safe text) ---'
-
-function withOptionalMessagePrefix(
-  prefix: string | undefined,
-  body: string
-): string {
-  if (prefix == null || prefix === '') return body
-  const p = prefix.replace(/\n+$/, '')
-  return `${p}\n${body}`
-}
 
 function appendRawTerminalSnapshotForErrorMessage(
   body: string,
@@ -133,51 +117,27 @@ export async function waitForTextInSurface(
   const rows = opts.rows ?? CLI_INTERACTIVE_PTY_ROWS
   const messagePrefix = opts.messagePrefix
 
-  const started = Date.now()
-  let lastFail: { snapshot: string; detail: string } | undefined
-
-  for (;;) {
-    const raw = resolveRaw(opts.raw)
-    const result = await attemptOnce({
-      needle: opts.needle,
-      surface: opts.surface,
-      raw,
-      strict,
-      cols,
-      rows,
-      startAfterAnchor: opts.startAfterAnchor,
-      fallbackRowCount: opts.fallbackRowCount,
-      cellExpectations,
-    })
-
-    if (result.ok === true) return
-
-    if (result.ok === 'strict') {
-      const body = withOptionalMessagePrefix(
-        messagePrefix,
-        formatSearchSurfaceFailure(
-          opts.surface,
-          result.message,
-          result.snapshot
-        )
-      )
-      throw new TtyAssertStrictModeViolationError(
-        appendRawTerminalSnapshotForErrorMessage(body, raw)
-      )
-    }
-
-    lastFail = { snapshot: result.snapshot, detail: result.detail }
-    if (Date.now() - started >= timeoutMs) {
-      const detail =
-        timeoutMs === 0
-          ? lastFail.detail
-          : `Timeout after ${timeoutMs}ms. ${lastFail.detail}`
-      const body = withOptionalMessagePrefix(
-        messagePrefix,
-        formatSearchSurfaceFailure(opts.surface, detail, lastFail.snapshot)
-      )
-      throw new Error(appendRawTerminalSnapshotForErrorMessage(body, raw))
-    }
-    await sleep(retryMs)
-  }
+  await pollSurfaceAssertLoop({
+    surface: opts.surface,
+    timeoutMs,
+    retryMs,
+    messagePrefix,
+    runAttempt: async () => {
+      const raw = resolveRaw(opts.raw)
+      const result = await attemptOnce({
+        needle: opts.needle,
+        surface: opts.surface,
+        raw,
+        strict,
+        cols,
+        rows,
+        startAfterAnchor: opts.startAfterAnchor,
+        fallbackRowCount: opts.fallbackRowCount,
+        cellExpectations,
+      })
+      return { raw, result }
+    },
+    appendFailure: (body, raw) =>
+      appendRawTerminalSnapshotForErrorMessage(body, raw),
+  })
 }

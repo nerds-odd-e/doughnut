@@ -1,6 +1,6 @@
 # `tty-assert` — PTY terminal test library extraction
 
-**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses xterm viewport replay). **Phase 5** is **complete** (sub-phases **5.1–5.9 met**, including legacy replay removal — execution table in [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md)). **Phase 6** is **complete** (sub-phases **6.1–6.5 met** — managed session, `cliAssert`, docs, removal of unused `cliInteractivePtyGetBuffer`; detail in [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md)). **Phase 11** is **complete** (single **`exports`** entry + README that matches; prior-art wording removed from `packages/tty-assert`). **Phase 12** is **complete** (neutral `tty-assert:` validation errors, palette-background failure copy, `dumpDiagnostics` rename). Phases **7–10**, **13–15** follow the roadmap (7–10 diagnostics and capture; **13–14** further library cleanup before OSS extraction; **15** move out). Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md); Phase 5 — [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md); Phase 6 — [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md).
+**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses xterm viewport replay). **Phase 5** is **complete** (sub-phases **5.1–5.9 met**, including legacy replay removal — execution table in [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md)). **Phase 6** is **complete** (sub-phases **6.1–6.5 met** — managed session, `cliAssert`, docs, removal of unused `cliInteractivePtyGetBuffer`; detail in [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md)). **Phase 11** is **complete** (single **`exports`** entry + README that matches; prior-art wording removed from `packages/tty-assert`). **Phase 12** is **complete** (neutral `tty-assert:` validation errors, palette-background failure copy, `dumpDiagnostics` rename). **Phase 13** is **complete** (shared `pollSurfaceAssertLoop`, unified `TtyAssertDumpDiagnostics` + `buildTtyAssertDumpDiagnostics`, assert JSON payload + `managedTtyAssertOptionsFromJson` on package root). Phases **7–10**, **14–15** follow the roadmap (7–10 diagnostics and capture; **14** facade removal; **15** move out). Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md); Phase 5 — [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md); Phase 6 — [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md).
 
 **Intent:** Extract PTY-based terminal testing into a **Cypress-neutral, Doughnut-neutral** library named **`tty-assert`**, publishable on npm and eventually movable out of this repo. Goal: reliable assertions on terminal-visible state, with failures that show **expected vs actual** without manually decoding escape sequences, and CI-friendly artifacts where useful.
 
@@ -216,7 +216,7 @@
 
 - Shared validation and strict-mode preambles use **`tty-assert:`** (not **`waitForTextInSurface:`**) so **`ManagedTtySession.assert`** and **`waitForTextInSurface`** share accurate copy.
 - **Palette background** cell-check failures are neutral (no past-user / chalk product wording); palette-index-8 hint references **`\\x1b[100m`** only as an escape example.
-- **`dumpFrames` → `dumpDiagnostics`** (method + **`ManagedTtySessionDumpDiagnostics`** / **`TtyAssertDumpDiagnostics`** types); README and plan references updated.
+- **`dumpFrames` → `dumpDiagnostics`** (method + **`TtyAssertDumpDiagnostics`**); README and plan references updated.
 
 **Gate:** **Met** — `pnpm tty-assert:test` + `pnpm tty-assert:lint` green; no E2E plugin path used **`dumpFrames`** (none).
 
@@ -224,15 +224,18 @@
 
 ## Phase 13 — Shared assertion loop and adapter types
 
+**Status:** **Complete.**
+
 **Outcome:** One place owns **poll + timeout + strict** for surface asserts; duplicate **diagnostic shapes** and **Cypress JSON** bridging stop drifting.
 
-**Work:**
+**Delivered:**
 
-- Factor **`waitForTextInSurface`** and **`ManagedTtySession.assert`** through a **single internal** polling/attempt driver (or clearly document why two remain if a merge is worse).
-- Unify **`ManagedTtySessionDumpDiagnostics`** / **`TtyAssertDumpDiagnostics`** (one type, shared builder if both APIs stay).
-- Move **JSON-serializable assert payload** + **`RegExp` ↔ `{ source, flags }`** conversion next to **`tty-assert`** (or a single shared module consumed by **`cliE2ePluginTasks`**) so option lists do not fork.
+- **`pollSurfaceAssertLoop`** — internal driver used by **`waitForTextInSurface`** and **`ManagedTtySession.assert`**.
+- **`TtyAssertDumpDiagnostics`** + **`buildTtyAssertDumpDiagnostics`** — single type and builder for **`ManagedTtySession.dumpDiagnostics`** and **`facade.dumpDiagnostics`** (removed **`ManagedTtySessionDumpDiagnostics`** alias).
+- **`TtyAssertStrictModeViolationError`** in **`ttyAssertStrictModeError.ts`** (re-exported from **`waitForTextInSurface`**) to avoid import cycles with the poll module.
+- **`ManagedTtyAssertJsonPayload`**, **`SerializableRegExp`**, **`regExpFromSerializable`**, **`managedTtyAssertOptionsFromJson`** on package root; **`cliE2ePluginTasks`** uses them (**`ManagedTtyAssertTaskPayload`** is a type alias).
 
-**Gate:** `pnpm tty-assert:test` green; targeted CLI E2E specs green; no behavior change intended beyond safer refactors.
+**Gate:** **Met** — `pnpm tty-assert:test` + `pnpm tty-assert:lint` green; no behavior change intended beyond safer refactors (CLI E2E not re-run in this pass).
 
 ---
 

@@ -14,37 +14,15 @@ import {
 } from './cliE2eRepo'
 import { cliEnv } from './cliEnv'
 import {
+  managedTtyAssertOptionsFromJson,
   startManagedTtySession,
+  type ManagedTtyAssertJsonPayload,
   type ManagedTtyAssertOptions,
   type ManagedTtySession,
 } from 'tty-assert'
 
-/**
- * JSON-safe `cy.task` body (`RegExp` must use `{ source, flags? }`).
- * Optional **`cellExpectations`** carries serializable cell-span checks (see `tty-assert` / `waitForTextInSurface`).
- */
-export type ManagedTtyAssertTaskPayload = Omit<
-  ManagedTtyAssertOptions,
-  'needle' | 'startAfterAnchor'
-> & {
-  needle: string | { source: string; flags?: string }
-  startAfterAnchor?: { source: string; flags?: string }[]
-}
-
-function managedTtyAssertTaskPayloadToOptions(
-  p: ManagedTtyAssertTaskPayload
-): ManagedTtyAssertOptions {
-  return {
-    ...p,
-    needle:
-      typeof p.needle === 'string'
-        ? p.needle
-        : new RegExp(p.needle.source, p.needle.flags ?? ''),
-    startAfterAnchor: p.startAfterAnchor?.map(
-      (a) => new RegExp(a.source, a.flags ?? '')
-    ),
-  }
-}
+/** Cypress `cy.task` body: same as {@link ManagedTtyAssertJsonPayload} from `tty-assert`. */
+export type ManagedTtyAssertTaskPayload = ManagedTtyAssertJsonPayload
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
 
@@ -154,7 +132,7 @@ export function createCliE2ePluginTasks(
 
   async function managedAssertWithTerminalArtifacts(
     handle: ManagedTtySession,
-    assertOpts: ReturnType<typeof managedTtyAssertTaskPayloadToOptions>,
+    assertOpts: ManagedTtyAssertOptions,
     logPrefix: string
   ): Promise<void> {
     try {
@@ -385,7 +363,7 @@ export function createCliE2ePluginTasks(
       }
       await managedAssertWithTerminalArtifacts(
         handle,
-        managedTtyAssertTaskPayloadToOptions(body),
+        managedTtyAssertOptionsFromJson(body),
         'cliAssert'
       )
       return null
