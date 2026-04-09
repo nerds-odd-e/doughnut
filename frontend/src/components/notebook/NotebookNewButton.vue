@@ -1,5 +1,5 @@
 <template>
-  <PopButton title="New notebook">
+  <PopButton title="New notebook" :btn-class="btnClass">
     <template #button_face>
       <BookPlus class="w-5 h-5" />
       <slot />
@@ -17,7 +17,10 @@ import NotebookNewDialog from "./NotebookNewDialog.vue"
 import { BookPlus } from "lucide-vue-next"
 
 export default defineComponent({
-  props: { circle: { type: Object as PropType<Circle> } },
+  props: {
+    circle: { type: Object as PropType<Circle> },
+    btnClass: String,
+  },
   components: { BookPlus, NotebookNewDialog, PopButton },
 })
 </script>

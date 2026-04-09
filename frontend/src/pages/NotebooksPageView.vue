@@ -1,10 +1,42 @@
 <template>
   <GlobalBar>
     <template #right>
-      <NotebookNewButton v-if="user">Add New Notebook</NotebookNewButton>
+      <button
+        type="button"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-join-item"
+        :class="{ 'daisy-btn-active': notebooksLayout === 'list' }"
+        title="List view"
+        aria-label="List view"
+        :aria-pressed="notebooksLayout === 'list'"
+        @click="notebooksLayout = 'list'"
+      >
+        <List class="h-5 w-5" />
+      </button>
+      <button
+        type="button"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-join-item"
+        :class="{ 'daisy-btn-active': notebooksLayout === 'grid' }"
+        title="Grid view"
+        aria-label="Grid view"
+        :aria-pressed="notebooksLayout === 'grid'"
+        @click="notebooksLayout = 'grid'"
+      >
+        <LayoutGrid class="h-5 w-5" />
+      </button>
+      <NotebookNewButton
+        v-if="user"
+        btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-join-item"
+      >
+        Add New Notebook
+      </NotebookNewButton>
     </template>
   </GlobalBar>
-  <div class="daisy-container daisy-mx-auto daisy-max-w-3xl daisy-px-4 daisy-py-6">
+  <div
+    class="daisy-container daisy-mx-auto daisy-px-4 daisy-py-6"
+    :class="
+      notebooksLayout === 'grid' ? 'daisy-max-w-7xl' : 'daisy-max-w-3xl'
+    "
+  >
     <section class="daisy-mb-12">
       <div class="daisy-mb-5 daisy-flex daisy-flex-col daisy-gap-1 sm:daisy-flex-row sm:daisy-items-end sm:daisy-justify-between">
         <div>
@@ -18,7 +50,7 @@
       </div>
       <NotebookCardsWithButtons
         v-if="notebooks.length > 0"
-        layout="list"
+        :layout="notebooksLayout"
         :notebooks="notebooks"
       >
         <template #default="{ notebook }">
@@ -50,7 +82,7 @@
       </p>
       <NotebookCardsWithButtons
         v-if="subscriptions.length > 0"
-        layout="list"
+        :layout="notebooksLayout"
         :notebooks="subscriptions.map((s) => s.notebook!)"
         :is-subscribed="true"
       >
@@ -71,6 +103,8 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
+import { onMounted, ref, watch } from "vue"
+import { LayoutGrid, List } from "lucide-vue-next"
 import type {
   Notebook,
   Subscription,
@@ -105,5 +139,20 @@ const emit = defineEmits<{
 const handleNotebookUpdated = (updatedNotebook: Notebook) => {
   emit("notebook-updated", updatedNotebook)
 }
+
+const NOTEBOOKS_LAYOUT_STORAGE_KEY = "doughnut.notebooksPage.layout"
+
+const notebooksLayout = ref<"list" | "grid">("list")
+
+onMounted(() => {
+  const stored = localStorage.getItem(NOTEBOOKS_LAYOUT_STORAGE_KEY)
+  if (stored === "list" || stored === "grid") {
+    notebooksLayout.value = stored
+  }
+})
+
+watch(notebooksLayout, (value) => {
+  localStorage.setItem(NOTEBOOKS_LAYOUT_STORAGE_KEY, value)
+})
 </script>
 
