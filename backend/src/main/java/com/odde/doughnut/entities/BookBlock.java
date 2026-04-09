@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.odde.doughnut.services.book.BookBlockDirectContentPredicate;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import java.util.ArrayList;
@@ -66,12 +67,13 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   }
 
   @OneToMany(mappedBy = "bookBlock", fetch = FetchType.LAZY)
+  @OrderBy("siblingOrder ASC")
   @JsonIgnore
   private final List<BookContentBlock> contentBlocks = new ArrayList<>();
 
   @JsonProperty("hasDirectContent")
   @JsonView(BookViews.Full.class)
   public boolean getHasDirectContent() {
-    return !contentBlocks.isEmpty();
+    return BookBlockDirectContentPredicate.hasDirectContent(contentBlocks);
   }
 }
