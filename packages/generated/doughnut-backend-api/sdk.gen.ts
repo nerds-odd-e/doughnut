@@ -20,10 +20,17 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 
 export class NotebookBooksController {
     /**
-     * Mark book block as read for the current user
+     * Set reading disposition for a book block
      */
     public static putNotebookBookBlockReadingRecord<ThrowOnError extends boolean = false>(options: Options<PutNotebookBookBlockReadingRecordData, ThrowOnError>) {
-        return (options.client ?? client).put<PutNotebookBookBlockReadingRecordResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/book/blocks/{bookBlock}/reading-record', ...options });
+        return (options.client ?? client).put<PutNotebookBookBlockReadingRecordResponses, unknown, ThrowOnError>({
+            url: '/api/notebooks/{notebook}/book/blocks/{bookBlock}/reading-record',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
     }
     
     /**

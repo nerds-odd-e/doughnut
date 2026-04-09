@@ -4,6 +4,13 @@ export type ClientOptions = {
     baseUrl: `${string}://${string}` | (string & {});
 };
 
+export type BookBlockReadingRecordPutRequest = {
+    /**
+     * Reading disposition for the book block's direct content
+     */
+    status: 'READ';
+};
+
 export type BookBlockReadingRecordListItem = {
     bookBlockId: string;
     status: string;
@@ -849,7 +856,7 @@ export type CircleForUserViewWritable = {
 };
 
 export type PutNotebookBookBlockReadingRecordData = {
-    body?: never;
+    body?: BookBlockReadingRecordPutRequest;
     path: {
         notebook: number;
         bookBlock: number;

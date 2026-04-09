@@ -696,7 +696,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
       Notebook nb = notebookWithBook();
       BookBlock range = rootBlocksSorted(bookOf(nb)).getFirst();
-      controller.putBlockReadingRecord(nb, range);
+      controller.putBlockReadingRecord(nb, range, null);
 
       var list = controller.getBookReadingRecords(nb);
       assertThat(list, hasSize(1));
@@ -714,7 +714,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       Book book = bookOf(nb);
       List<BookBlock> roots = rootBlocksSorted(book);
       BookBlock first = roots.getFirst();
-      controller.putBlockReadingRecord(nb, first);
+      controller.putBlockReadingRecord(nb, first, null);
 
       var list = controller.getBookReadingRecords(nb);
       assertThat(list, hasSize(1));
@@ -753,7 +753,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       Notebook nb = notebookWithBook();
       BookBlock range = rootBlocksSorted(bookOf(nb)).getFirst();
 
-      var returned = controller.putBlockReadingRecord(nb, range);
+      var returned = controller.putBlockReadingRecord(nb, range, null);
       assertThat(returned, hasSize(1));
       assertThat(returned.getFirst().getBookBlockId(), equalTo(range.getId()));
       assertThat(returned.getFirst().getStatus(), equalTo(BookBlockReadingRecord.STATUS_READ));
@@ -775,10 +775,10 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       Notebook nb = notebookWithBook();
       BookBlock range = rootBlocksSorted(bookOf(nb)).getFirst();
 
-      var firstResponse = controller.putBlockReadingRecord(nb, range);
+      var firstResponse = controller.putBlockReadingRecord(nb, range, null);
       assertThat(firstResponse, hasSize(1));
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(1, 11).please());
-      var secondResponse = controller.putBlockReadingRecord(nb, range);
+      var secondResponse = controller.putBlockReadingRecord(nb, range, null);
       assertThat(secondResponse, hasSize(1));
       assertThat(
           secondResponse.getFirst().getCompletedAt(),
@@ -799,7 +799,8 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       BookBlock range = rootBlocksSorted(bookOf(nbWith)).getFirst();
 
       assertThrows(
-          ResponseStatusException.class, () -> controller.putBlockReadingRecord(nbEmpty, range));
+          ResponseStatusException.class,
+          () -> controller.putBlockReadingRecord(nbEmpty, range, null));
     }
 
     @Test
@@ -809,7 +810,8 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       Notebook myNb = notebookWithBook();
 
       assertThrows(
-          ResponseStatusException.class, () -> controller.putBlockReadingRecord(myNb, otherRange));
+          ResponseStatusException.class,
+          () -> controller.putBlockReadingRecord(myNb, otherRange, null));
     }
 
     @Test
@@ -819,7 +821,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
 
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.putBlockReadingRecord(otherNb, range));
+          () -> controller.putBlockReadingRecord(otherNb, range, null));
     }
 
     @Test
@@ -829,7 +831,31 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
 
       assertThrows(
-          ResponseStatusException.class, () -> controller.putBlockReadingRecord(nb, range));
+          ResponseStatusException.class, () -> controller.putBlockReadingRecord(nb, range, null));
+    }
+
+    @Test
+    void persistsReadRecordWhenBodyRequestsRead() throws UnexpectedNoAccessRightException {
+      testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
+      Notebook nb = notebookWithBook();
+      BookBlock range = rootBlocksSorted(bookOf(nb)).getFirst();
+      var body = new BookBlockReadingRecordPutRequest();
+      body.setStatus(BookBlockReadingRecord.STATUS_READ);
+
+      var returned = controller.putBlockReadingRecord(nb, range, body);
+      assertThat(returned, hasSize(1));
+      assertThat(returned.getFirst().getBookBlockId(), equalTo(range.getId()));
+      assertThat(returned.getFirst().getStatus(), equalTo(BookBlockReadingRecord.STATUS_READ));
+      assertThat(
+          returned.getFirst().getCompletedAt(),
+          equalTo(testabilitySettings.getCurrentUTCTimestamp()));
+
+      var stored =
+          bookBlockReadingRecordRepository
+              .findByUser_IdAndBookBlock_Id(currentUser.getUser().getId(), range.getId())
+              .orElseThrow();
+      assertThat(stored.getStatus(), equalTo(BookBlockReadingRecord.STATUS_READ));
+      assertThat(stored.getCompletedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
     }
   }
 }

@@ -9,7 +9,7 @@ paths:
     put:
       tags:
       - notebook-books-controller
-      summary: Mark book block as read for the current user
+      summary: Set reading disposition for a book block
       operationId: putNotebookBookBlockReadingRecord
       parameters:
       - name: notebook
@@ -22,6 +22,11 @@ paths:
         required: true
         schema:
           type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookBlockReadingRecordPutRequest"
       responses:
         "200":
           description: OK
@@ -3102,6 +3107,16 @@ paths:
           description: OK
 components:
   schemas:
+    BookBlockReadingRecordPutRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Reading disposition for the book block's direct content
+          enum:
+          - READ
+      required:
+      - status
     BookBlockReadingRecordListItem:
       type: object
       properties:

@@ -162,7 +162,11 @@ public class BookService {
   }
 
   @Transactional
-  public void markBlockRead(Notebook notebook, User user, BookBlock bookBlock) {
+  public void upsertReadingRecord(
+      Notebook notebook, User user, BookBlock bookBlock, String status) {
+    if (!BookBlockReadingRecord.STATUS_READ.equals(status)) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid reading record status");
+    }
     Book book = getBookForNotebook(notebook);
     if (!bookBlock.getBook().getId().equals(book.getId())) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
@@ -172,7 +176,7 @@ public class BookService {
         .findByUser_IdAndBookBlock_Id(user.getId(), bookBlock.getId())
         .map(
             existing -> {
-              existing.setStatus(BookBlockReadingRecord.STATUS_READ);
+              existing.setStatus(status);
               existing.setCompletedAt(now);
               return entityPersister.save(existing);
             })
@@ -181,7 +185,7 @@ public class BookService {
               var row = new BookBlockReadingRecord();
               row.setUser(user);
               row.setBookBlock(bookBlock);
-              row.setStatus(BookBlockReadingRecord.STATUS_READ);
+              row.setStatus(status);
               row.setCompletedAt(now);
               return entityPersister.save(row);
             });

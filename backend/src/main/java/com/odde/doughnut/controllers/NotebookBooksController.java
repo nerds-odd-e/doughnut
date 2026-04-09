@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
 import com.odde.doughnut.controllers.dto.BookBlockReadingRecordListItem;
+import com.odde.doughnut.controllers.dto.BookBlockReadingRecordPutRequest;
 import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookBlock;
+import com.odde.doughnut.entities.BookBlockReadingRecord;
 import com.odde.doughnut.entities.BookUserLastReadPosition;
 import com.odde.doughnut.entities.BookViews;
 import com.odde.doughnut.entities.Notebook;
@@ -137,16 +139,18 @@ class NotebookBooksController {
 
   @Operation(
       operationId = "putNotebookBookBlockReadingRecord",
-      summary = "Mark book block as read for the current user")
+      summary = "Set reading disposition for a book block")
   @PutMapping("/{notebook}/book/blocks/{bookBlock}/reading-record")
   @Transactional
   public List<BookBlockReadingRecordListItem> putBlockReadingRecord(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
-      @PathVariable("bookBlock") @Schema(type = "integer") BookBlock bookBlock)
+      @PathVariable("bookBlock") @Schema(type = "integer") BookBlock bookBlock,
+      @RequestBody(required = false) @Valid BookBlockReadingRecordPutRequest body)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
     var user = authorizationService.getCurrentUser();
-    bookService.markBlockRead(notebook, user, bookBlock);
+    String status = body == null ? BookBlockReadingRecord.STATUS_READ : body.getStatus();
+    bookService.upsertReadingRecord(notebook, user, bookBlock, status);
     return bookService.listReadingRecordsForBook(notebook, user);
   }
 
