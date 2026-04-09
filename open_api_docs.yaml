@@ -3115,6 +3115,7 @@ components:
           description: Reading disposition for the book block's direct content
           enum:
           - READ
+          - SKIMMED
       required:
       - status
     BookBlockReadingRecordListItem:

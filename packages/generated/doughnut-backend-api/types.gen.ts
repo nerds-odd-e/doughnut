@@ -8,7 +8,7 @@ export type BookBlockReadingRecordPutRequest = {
     /**
      * Reading disposition for the book block's direct content
      */
-    status: 'READ';
+    status: 'READ' | 'SKIMMED';
 };
 
 export type BookBlockReadingRecordListItem = {
