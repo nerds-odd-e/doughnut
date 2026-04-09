@@ -10,7 +10,6 @@ Feature: Reading record
     When I attach book "refactoring.pdf" to the notebook "Top Maths" via the CLI
     And I open the book attached to notebook "Top Maths"
 
-  @ignore
   Scenario: Auto-read a heading-only book block when entering its successor (reading record)
     When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
     And I scroll the PDF book reader down within the same page to move viewport past the next book block bbox

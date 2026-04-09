@@ -6,12 +6,21 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "book_block")
-@JsonPropertyOrder({"id", "startAnchor", "siblingOrder", "title", "parentBlockId"})
+@JsonPropertyOrder({
+  "id",
+  "startAnchor",
+  "siblingOrder",
+  "title",
+  "parentBlockId",
+  "hasDirectContent"
+})
 public class BookBlock extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -54,5 +63,15 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   @Schema(type = "integer")
   public Integer getParentBlockId() {
     return parent == null ? null : parent.getId();
+  }
+
+  @OneToMany(mappedBy = "bookBlock", fetch = FetchType.LAZY)
+  @JsonIgnore
+  private final List<BookContentBlock> contentBlocks = new ArrayList<>();
+
+  @JsonProperty("hasDirectContent")
+  @JsonView(BookViews.Full.class)
+  public boolean getHasDirectContent() {
+    return contentBlocks.size() > 1;
   }
 }

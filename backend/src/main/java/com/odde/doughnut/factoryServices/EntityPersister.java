@@ -42,6 +42,11 @@ public class EntityPersister {
     entityManager.flush();
   }
 
+  public void flushAndClear() {
+    entityManager.flush();
+    entityManager.clear();
+  }
+
   public void refresh(Object entity) {
     entityManager.refresh(entity);
   }

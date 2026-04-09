@@ -330,6 +330,7 @@ export type BookBlockFull = {
     siblingOrder?: number;
     title: string;
     parentBlockId?: string;
+    hasDirectContent?: boolean;
 };
 
 export type BookFull = {

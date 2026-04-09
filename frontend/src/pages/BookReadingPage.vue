@@ -242,6 +242,7 @@ type BookBlockRow = {
   title: string
   depth: number
   startAnchor: BookAnchorFull
+  hasDirectContent: boolean
 }
 
 function buildFlatBookBlocks(blocks: BookBlockFull[]): BookBlockRow[] {
@@ -265,6 +266,7 @@ function buildFlatBookBlocks(blocks: BookBlockFull[]): BookBlockRow[] {
         title: child.title,
         depth,
         startAnchor: child.startAnchor,
+        hasDirectContent: child.hasDirectContent ?? true,
       })
       visit(child.id, depth + 1)
     }
@@ -407,6 +409,20 @@ watch(
   },
   { flush: "post" }
 )
+
+watch(currentBlockAnchorId, async (anchorId) => {
+  if (anchorId === null) return
+  const rows = bookBlockRows.value
+  const bIdx = rows.findIndex((r) => r.startAnchor.id === anchorId)
+  if (bIdx <= 0) return
+  const predecessor = rows[bIdx - 1]!
+  if (
+    !predecessor.hasDirectContent &&
+    !bookReading.isDirectContentRead(predecessor.id)
+  ) {
+    await bookReading.submitMarkRead(predecessor.id)
+  }
+})
 
 const initialLastRead = ref<{
   pageIndexZeroBased: number

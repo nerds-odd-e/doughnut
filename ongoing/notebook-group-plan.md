@@ -14,8 +14,11 @@
 - Each group has a **name** and appears on the **notebooks page** in a **single merged list** with **ungrouped** notebooks, ordered by **creation time** (see **Sort key** below).
 - Group rows use a **visually distinct** treatment from notebook cards.
 - At the notebooks page, the user gets a **hint** of which notebooks are inside each group (e.g. short list of titles, ellipsis, and/or count — exact copy and limits are an implementation detail).
+- **Later (Phases 6–8):** **Subscribed (Bazaar) notebooks** appear in the **same** merged **`catalogItems`** list as owned notebooks and groups, and can be placed in the **subscriber’s** personal groups **without** changing the shared [`Notebook`](../backend/src/main/java/com/odde/doughnut/entities/Notebook.java) row’s `notebook_group_id` (see Phase 7).
 
 **Ownership scope:** Notebook groups are tied to an [`Ownership`](../backend/src/main/java/com/odde/doughnut/entities/Ownership.java) — the same row backs **personal** notebooks (`NotebookController.myNotebooks`, [`NotebooksPage.vue`](../frontend/src/pages/NotebooksPage.vue)) and **circle** notebooks (`CircleForUserView` via [`CircleController.showCircle`](../backend/src/main/java/com/odde/doughnut/controllers/CircleController.java)). Groups for a circle **belong to that circle’s ownership** (`notebook_group.ownership_id` = the circle’s ownership). Backend catalog merging applies to both paths; **circle-specific behavior does not need its own E2E test** — cover it with **unit / controller** tests (see Phase 2 tests). **Circle UI** on the notebooks list (when built) should mirror the personal page pattern for catalog + hints.
+
+**Catalog “category” (discriminator):** The notebooks-page catalog is a discriminated union in [`NotebookCatalogItem`](../backend/src/main/java/com/odde/doughnut/controllers/dto/NotebookCatalogItem.java): JSON/OpenAPI **`type`** distinguishes rows (today `notebook` vs `notebookGroup`). Tooling and generated clients often surface this as a **category** or variant. Phases 6–8 extend this contract so **subscribed** rows are first-class in **one** ordered list while still allowing **different actions** (e.g. unsubscribe vs edit owned notebook) where needed.
 
 ---
 
@@ -107,10 +110,58 @@ Document the chosen rule in code (single place) so API and UI stay consistent.
 
 ---
 
+## Phase 6 — Unified catalog: subscribed notebooks in `catalogItems`
+
+**User outcome:** On `myNotebooks`, **subscribed (Bazaar) notebooks** appear in the **same ordered `catalogItems` list** as **ungrouped owned** notebooks and **notebook group** rows—no separate “Subscribed notebooks” **slice** in the API contract for ordering/rendering the main list (the UI may still show a small explainer line if product wants one).
+
+**Suggested shape:**
+
+- Extend [`NotebookCatalogService`](../backend/src/main/java/com/odde/doughnut/services/NotebookCatalogService.java) / DTOs so **subscriptions** participate in **`catalogItems`**. Options (pick one and keep OpenAPI accurate):
+  - **New discriminant** value under [`NotebookCatalogItem`](../backend/src/main/java/com/odde/doughnut/controllers/dto/NotebookCatalogItem.java) (e.g. `subscribedNotebook`) carrying **notebook + subscription** identifiers and any fields the list needs; **or**
+  - Keep `type: "notebook"` and add an explicit **origin** field (`owned` vs `subscribed`) if that stays clear for clients and generators.
+- **Sort key** for subscribed top-level rows: document one rule (e.g. **head note `created_at`** like owned ungrouped rows, or **subscription** timestamp—may require a small migration if you add `subscription.created_at` / similar). **Tie-break** with stable ids so order is deterministic.
+- **`subscriptions` on [`NotebooksViewedByUser`](../backend/src/main/java/com/odde/doughnut/controllers/dto/NotebooksViewedByUser.java):** Either **derive** from `catalogItems` for subscribers or **deprecate** in favor of catalog-only once the client migrates—avoid long-lived duplicate sources of truth.
+- OpenAPI update → `pnpm generateTypeScript`.
+
+**Tests:** `NotebookController` tests—merged `catalogItems` includes a subscribed row **between** owned rows/groups per sort rule; discriminator/origin field assertions. **Circle path:** only if circle notebooks list ever exposes subscriptions the same way; otherwise **omit** and note “personal `myNotebooks` only” in code.
+
+**Note:** If Phase 7 is not done yet, treat **all** subscribed rows as **top-level** catalog entries (not nested under groups). Nesting comes in Phase 7.
+
+---
+
+## Phase 7 — Subscriber-local group: add subscribed notebook to **my** group
+
+**User outcome:** A user can assign a **subscribed** notebook to **one of their personal notebook groups**, or **none** (ungrouped in **their** catalog). **No** change to [`Notebook.notebookGroup`](../backend/src/main/java/com/odde/doughnut/entities/Notebook.java) for this—only the **subscriber’s** view/organization changes.
+
+**Suggested shape:**
+
+- Flyway: nullable **`subscription.notebook_group_id`** → `notebook_group`, with integrity rules such as: subscription’s `user_id` is the subscriber; group’s `ownership_id` is that user’s **personal** ownership (same boundary as personal groups in Phase 1); notebook is the subscription’s `notebook_id`.
+- **Catalog builder:** Subscribed notebooks with a non-null **subscriber group** appear **only** under that **group row** (as members), not as duplicate top-level rows—mirror the rule for **owned** grouped notebooks.
+- API: extend an existing subscription update DTO/endpoint or add a narrow `PATCH` (nullable body = ungrouped). Reject wrong ownership, non-subscribed notebook, or assigning to someone else’s group.
+- Owned notebooks continue to use **`notebook.notebook_group_id`**; subscribed use **`subscription.notebook_group_id`**. Document the split in one place (service or catalog builder).
+
+**Tests:** Controller tests—happy path, wrong group ownership, not subscribed, clear group; catalog lists members under the group row. Prefer **observable** responses over repository-only tests ([`planning.mdc`](../.cursor/rules/planning.mdc)).
+
+---
+
+## Phase 8 — Notebooks page: one list + subscribed grouping in the UI
+
+**User outcome:** [`NotebooksPageView`](../frontend/src/pages/NotebooksPageView.vue) renders **one** main list from **`catalogItems`** (groups, owned notebooks, subscribed rows), with **subscription** actions where needed. The old **separate** subscribed section is removed or reduced to non-duplicating chrome only.
+
+**Suggested shape:**
+
+- Consume **`catalogItems`** (discriminant / origin) instead of a parallel `subscriptions` list for layout/order.
+- Group rows: **member** rendering supports **owned** and **subscribed** members (hints, counts, actions).
+- **Mounted** tests with mocked `myNotebooks`—ordering, discriminant handling, group member row for subscribed.
+
+**Tests:** Extend the Phase 5 Gherkin **or** add a focused scenario: subscribed notebook appears in the **merged** list → user moves it **into** a group → hint/membership visible → moves **out** to ungrouped. Use E2E-led decomposition if the scenario is long: **one newly enabled step failing at a time** ([`planning.mdc`](../.cursor/rules/planning.mdc)).
+
+---
+
 ## Optional follow-ups (separate phases if needed)
 
 - **Rename / delete** empty or non-empty group (product rules for members on delete).
-- **Bazaar / subscription** notebooks — explicitly **out of scope** unless product says otherwise (subscribed notebooks are already a separate section on the page).
+- **Circle + subscriptions:** if the product later mixes circle notebooks with personal subscriptions in one UI, reconcile ownership rules for group placement before reusing Phase 6–7 patterns.
 
 ---
 
