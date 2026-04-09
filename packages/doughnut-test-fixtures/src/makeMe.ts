@@ -24,6 +24,9 @@ import NoteBuilder from './NoteBuilder'
 import NoteRecallInfoBuilder from './NoteRecallInfoBuilder'
 import NoteRealmBuilder from './NoteRealmBuilder'
 import NotebookBuilder from './NotebookBuilder'
+import NotebookCatalogBuilder from './NotebookCatalogBuilder'
+import NotebookCatalogGroupItemBuilder from './NotebookCatalogGroupItemBuilder'
+import NotebookCatalogNotebookItemBuilder from './NotebookCatalogNotebookItemBuilder'
 import PredefinedQuestionBuilder from './PredefinedQuestionBuilder'
 import RecallPromptBuilder from './RecallPromptBuilder'
 import SuggestedQuestionForFineTuningBuilder from './SuggestedQuestionForFineTuningBuilder'
@@ -92,6 +95,18 @@ class MakeMe {
 
   static get aNotebook(): NotebookBuilder {
     return new NotebookBuilder()
+  }
+
+  static get notebookCatalogNotebook(): NotebookCatalogNotebookItemBuilder {
+    return new NotebookCatalogNotebookItemBuilder()
+  }
+
+  static get notebookCatalogGroup(): NotebookCatalogGroupItemBuilder {
+    return new NotebookCatalogGroupItemBuilder()
+  }
+
+  static get notebookCatalog(): NotebookCatalogBuilder {
+    return new NotebookCatalogBuilder()
   }
 
   static get aBook(): BookFullBuilder {
@@ -164,3 +179,4 @@ class MakeMe {
 }
 
 export default MakeMe
+export type { NotebookCatalogEntry } from './NotebookCatalogBuilder'

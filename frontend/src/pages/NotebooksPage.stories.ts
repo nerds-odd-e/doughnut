@@ -1,16 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import NotebooksPageView from "./NotebooksPageView.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import type {
-  Notebook,
-  Subscription,
-  User,
-} from "@generated/doughnut-backend-api"
-import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
-
-function catalogFromNotebooks(notebooks: Notebook[]): NotebookCatalogEntry[] {
-  return notebooks.map((notebook) => ({ type: "notebook", notebook }))
-}
+import type { Subscription, User } from "@generated/doughnut-backend-api"
 
 const meta = {
   title: "Page Views/NotebooksPageView",
@@ -37,11 +28,11 @@ const mockUser: User = makeMe.aUser.please()
 // Page with notebooks and subscriptions
 export const WithNotebooksAndSubscriptions: Story = {
   args: {
-    catalogItems: catalogFromNotebooks([
-      { ...makeMe.aNotebook.please(), title: "My First Notebook" },
-      { ...makeMe.aNotebook.please(), title: "Learning TypeScript" },
-      { ...makeMe.aNotebook.please(), title: "Project Documentation" },
-    ]),
+    catalogItems: makeMe.notebookCatalog
+      .notebook("My First Notebook")
+      .notebook("Learning TypeScript")
+      .notebook("Project Documentation")
+      .please(),
     subscriptions: [
       {
         id: 1,
@@ -64,10 +55,10 @@ export const WithNotebooksAndSubscriptions: Story = {
 // Page with only notebooks, no subscriptions
 export const WithNotebooksOnly: Story = {
   args: {
-    catalogItems: catalogFromNotebooks([
-      { ...makeMe.aNotebook.please(), title: "Personal Notes" },
-      { ...makeMe.aNotebook.please(), title: "Work Projects" },
-    ]),
+    catalogItems: makeMe.notebookCatalog
+      .notebook("Personal Notes")
+      .notebook("Work Projects")
+      .please(),
     subscriptions: [],
     user: mockUser,
   },
@@ -93,27 +84,17 @@ export const NoNotebooks: Story = {
 
 export const WithNotebookGroup: Story = {
   args: {
-    catalogItems: (() => {
-      const loose = {
-        ...makeMe.aNotebook.please(),
-        title: "Loose notebook",
-      }
-      const m1 = { ...makeMe.aNotebook.please(), title: "Member Alpha" }
-      const m2 = { ...makeMe.aNotebook.please(), title: "Member Beta" }
-      const m3 = { ...makeMe.aNotebook.please(), title: "Member Gamma" }
-      const m4 = { ...makeMe.aNotebook.please(), title: "Member Delta" }
-      const group: NotebookCatalogEntry = {
-        type: "notebookGroup",
-        id: 9001,
-        name: "Reading list",
-        createdAt: "2024-06-01T12:00:00.000Z",
-        notebooks: [m1, m2, m3, m4],
-      }
-      return [
-        { type: "notebook", notebook: loose },
-        group,
-      ] as NotebookCatalogEntry[]
-    })(),
+    catalogItems: makeMe.notebookCatalog
+      .notebook("Loose notebook")
+      .entry(
+        makeMe.notebookCatalogGroup
+          .id(9001)
+          .name("Reading list")
+          .createdAt("2024-06-01T12:00:00.000Z")
+          .titles("Member Alpha", "Member Beta", "Member Gamma", "Member Delta")
+          .please()
+      )
+      .please(),
     subscriptions: [],
     user: mockUser,
   },

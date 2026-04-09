@@ -1,15 +1,12 @@
 import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NotebooksPageView from "@/pages/NotebooksPageView.vue"
 import { describe, it, expect } from "vitest"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe, {
+  type NotebookCatalogEntry,
+} from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import type { Notebook } from "@generated/doughnut-backend-api"
-import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
-
-function catalogFromNotebooks(notebooks: Notebook[]): NotebookCatalogEntry[] {
-  return notebooks.map((notebook) => ({ type: "notebook", notebook }))
-}
 
 describe("Notebooks Page", () => {
   it("fetch API to be called ONCE", async () => {
@@ -17,7 +14,7 @@ describe("Notebooks Page", () => {
 
     const myNotebooksSpy = mockSdkService("myNotebooks", {
       notebooks: [notebook],
-      catalogItems: catalogFromNotebooks([notebook]),
+      catalogItems: makeMe.notebookCatalog.notebooks(notebook).please(),
       subscriptions: [],
     })
     helper.component(NotebooksPage).withRouter().render()
@@ -41,7 +38,9 @@ describe("Notebooks Page", () => {
 
       mockSdkService("myNotebooks", {
         notebooks: [originalNotebook],
-        catalogItems: catalogFromNotebooks([originalNotebook]),
+        catalogItems: makeMe.notebookCatalog
+          .notebooks(originalNotebook)
+          .please(),
         subscriptions: [],
       })
       mockSdkService("updateNotebook", updatedNotebook)
@@ -96,7 +95,9 @@ describe("Notebooks Page", () => {
 
       mockSdkService("myNotebooks", {
         notebooks: [notebook1, notebook2],
-        catalogItems: catalogFromNotebooks([notebook1, notebook2]),
+        catalogItems: makeMe.notebookCatalog
+          .notebooks(notebook1, notebook2)
+          .please(),
         subscriptions: [],
       })
 
@@ -172,7 +173,9 @@ describe("Notebooks Page", () => {
 
       mockSdkService("myNotebooks", {
         notebooks: [originalNotebook],
-        catalogItems: catalogFromNotebooks([originalNotebook]),
+        catalogItems: makeMe.notebookCatalog
+          .notebooks(originalNotebook)
+          .please(),
         subscriptions: [],
       })
 
@@ -205,14 +208,13 @@ describe("Notebooks Page", () => {
         ...makeMe.aNotebook.please(),
         title: "Member Title",
       }
-      const catalogItems: NotebookCatalogEntry[] = [
-        {
-          type: "notebookGroup",
-          id: 1,
-          name: "G",
-          createdAt: "2020-01-01T00:00:00.000Z",
-          notebooks: [member],
-        },
+      const catalogItems = [
+        makeMe.notebookCatalogGroup
+          .id(1)
+          .name("G")
+          .createdAt("2020-01-01T00:00:00.000Z")
+          .members([member])
+          .please(),
       ]
 
       mockSdkService("myNotebooks", {
@@ -248,22 +250,11 @@ describe("Notebooks Page", () => {
 
   describe("catalog list", () => {
     it("renders catalog items in document order (list layout)", async () => {
-      const nTop = { ...makeMe.aNotebook.please(), title: "Top Loose" }
-      const m1 = { ...makeMe.aNotebook.please(), title: "Inside One" }
-      const catalogItems: NotebookCatalogEntry[] = [
-        { type: "notebook", notebook: nTop },
-        {
-          type: "notebookGroup",
-          id: 42,
-          name: "Middle Group",
-          createdAt: "2020-01-01T00:00:00.000Z",
-          notebooks: [m1],
-        },
-        {
-          type: "notebook",
-          notebook: { ...makeMe.aNotebook.please(), title: "Bottom Loose" },
-        },
-      ]
+      const catalogItems = makeMe.notebookCatalog
+        .notebook("Top Loose")
+        .group("Middle Group", "Inside One")
+        .notebook("Bottom Loose")
+        .please()
 
       const wrapper = helper
         .component(NotebooksPageView)
@@ -288,18 +279,13 @@ describe("Notebooks Page", () => {
     })
 
     it("shows member hint for groups with many notebooks", async () => {
-      const m1 = { ...makeMe.aNotebook.please(), title: "Member Alpha" }
-      const m2 = { ...makeMe.aNotebook.please(), title: "Member Beta" }
-      const m3 = { ...makeMe.aNotebook.please(), title: "Member Gamma" }
-      const m4 = { ...makeMe.aNotebook.please(), title: "Member Delta" }
-      const catalogItems: NotebookCatalogEntry[] = [
-        {
-          type: "notebookGroup",
-          id: 1,
-          name: "Big Group",
-          createdAt: "2020-01-01T00:00:00.000Z",
-          notebooks: [m1, m2, m3, m4],
-        },
+      const catalogItems = [
+        makeMe.notebookCatalogGroup
+          .name("Big Group")
+          .id(1)
+          .createdAt("2020-01-01T00:00:00.000Z")
+          .titles("Member Alpha", "Member Beta", "Member Gamma", "Member Delta")
+          .please(),
       ]
 
       const wrapper = helper
