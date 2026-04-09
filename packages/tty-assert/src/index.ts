@@ -7,7 +7,5 @@ export {
 export type { TtyAssertDumpDiagnostics } from './ttyAssertDumpDiagnostics'
 export {
   type ManagedTtyAssertJsonPayload,
-  type SerializableRegExp,
   managedTtyAssertOptionsFromJson,
-  regExpFromSerializable,
 } from './managedTtyAssertJsonPayload'

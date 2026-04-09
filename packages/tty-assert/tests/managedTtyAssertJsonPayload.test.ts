@@ -1,11 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import {
-  managedTtyAssertOptionsFromJson,
-  regExpFromSerializable,
-} from '../src/managedTtyAssertJsonPayload'
+import { managedTtyAssertOptionsFromJson } from '../src/managedTtyAssertJsonPayload'
 
 describe('managedTtyAssertJsonPayload', () => {
-  it('turns serializable regex fields into RegExp', () => {
+  it('turns JSON regexp fields into RegExp', () => {
     const opts = managedTtyAssertOptionsFromJson({
       surface: 'strippedTranscript',
       needle: { source: 'a+b', flags: 'i' },
@@ -15,11 +12,17 @@ describe('managedTtyAssertJsonPayload', () => {
     expect((opts.needle as RegExp).source).toBe('a+b')
     expect((opts.needle as RegExp).flags).toContain('i')
     expect(opts.startAfterAnchor).toHaveLength(1)
-    expect(opts.startAfterAnchor![0].test('x')).toBe(true)
+    const anchor = opts.startAfterAnchor?.[0]
+    expect(anchor).toBeDefined()
+    expect(anchor!.test('x')).toBe(true)
   })
 
-  it('regExpFromSerializable matches new RegExp(source, flags)', () => {
-    const r = regExpFromSerializable({ source: '\\d', flags: 'g' })
+  it('honors global flag on JSON needle regexp', () => {
+    const opts = managedTtyAssertOptionsFromJson({
+      surface: 'strippedTranscript',
+      needle: { source: '\\d', flags: 'g' },
+    })
+    const r = opts.needle as RegExp
     expect([...'a1b2'.matchAll(r)].map((m) => m[0])).toEqual(['1', '2'])
   })
 })

@@ -233,7 +233,7 @@
 - **`pollSurfaceAssertLoop`** — internal driver used by **`waitForTextInSurface`** and **`ManagedTtySession.assert`**.
 - **`TtyAssertDumpDiagnostics`** + **`buildTtyAssertDumpDiagnostics`** — single type and builder for **`ManagedTtySession.dumpDiagnostics`** (removed **`ManagedTtySessionDumpDiagnostics`** alias).
 - **`TtyAssertStrictModeViolationError`** in **`ttyAssertStrictModeError.ts`** (re-exported from **`waitForTextInSurface`**) to avoid import cycles with the poll module.
-- **`ManagedTtyAssertJsonPayload`**, **`SerializableRegExp`**, **`regExpFromSerializable`**, **`managedTtyAssertOptionsFromJson`** on package root; **`cliE2ePluginTasks`** uses them (**`ManagedTtyAssertTaskPayload`** is a type alias).
+- **`ManagedTtyAssertJsonPayload`** + **`managedTtyAssertOptionsFromJson`** on package root (JSON regexp shape is inlined on the payload type); **`cliE2ePluginTasks`** uses them (**`ManagedTtyAssertTaskPayload`** is a type alias).
 
 **Gate:** **Met** — `pnpm tty-assert:test` + `pnpm tty-assert:lint` green; no behavior change intended beyond safer refactors (CLI E2E not re-run in this pass).
 
