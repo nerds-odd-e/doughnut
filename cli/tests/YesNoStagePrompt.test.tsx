@@ -3,6 +3,7 @@ import { render } from 'ink-testing-library'
 import { describe, expect, test, vi } from 'vitest'
 import { YesNoStagePrompt } from '../src/commonUIComponents/YesNoStagePrompt.js'
 import {
+  pressEscapeAndWait,
   renderInkWhenCommandLineReady,
   StageKeyRoot,
   stripAnsi,
@@ -146,34 +147,28 @@ describe('YesNoStagePrompt', () => {
   })
 
   test('Escape calls onCancel when set', async () => {
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
-    try {
-      const onAnswer = vi.fn()
-      const onCancel = vi.fn()
-      const { stdin, waitForFramesToInclude } =
-        await renderInkWhenCommandLineReady(
-          <StageKeyRoot>
-            <YesNoStagePrompt
-              prompt="OK?"
-              onAnswer={onAnswer}
-              onCancel={onCancel}
-            />
-          </StageKeyRoot>
-        )
-
-      await waitForFramesToInclude(/OK\?/)
-
-      stdin.write('\u001b')
-      await vi.advanceTimersByTimeAsync(25)
-      await waitForFrames(
-        () => String(onCancel.mock.calls.length),
-        (c) => Number(c) >= 1
+    const onAnswer = vi.fn()
+    const onCancel = vi.fn()
+    const { stdin, waitForFramesToInclude } =
+      await renderInkWhenCommandLineReady(
+        <StageKeyRoot>
+          <YesNoStagePrompt
+            prompt="OK?"
+            onAnswer={onAnswer}
+            onCancel={onCancel}
+          />
+        </StageKeyRoot>
       )
-      expect(onCancel).toHaveBeenCalledTimes(1)
-      expect(onAnswer).not.toHaveBeenCalled()
-    } finally {
-      vi.useRealTimers()
-    }
+
+    await waitForFramesToInclude(/OK\?/)
+
+    await pressEscapeAndWait(
+      stdin,
+      () => String(onCancel.mock.calls.length),
+      (c) => Number(c) >= 1
+    )
+    expect(onCancel).toHaveBeenCalledTimes(1)
+    expect(onAnswer).not.toHaveBeenCalled()
   })
 
   test('Escape without onCancel does not call onAnswer; y still commits after a turn drain', async () => {

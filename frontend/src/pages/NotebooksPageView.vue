@@ -1,5 +1,10 @@
 <template>
   <GlobalBar>
+    <h1
+      class="daisy-m-0 daisy-self-center daisy-text-2xl daisy-font-bold daisy-tracking-tight daisy-text-base-content"
+    >
+      My notebooks
+    </h1>
     <template #right>
       <button
         type="button"
@@ -38,20 +43,10 @@
     "
   >
     <section class="daisy-mb-12">
-      <div class="daisy-mb-5 daisy-flex daisy-flex-col daisy-gap-3 sm:daisy-flex-row sm:daisy-items-end sm:daisy-justify-between">
-        <div>
-          <h1 class="daisy-text-2xl daisy-font-bold daisy-tracking-tight daisy-text-base-content">
-            My notebooks
-          </h1>
-          <p class="daisy-mt-1 daisy-text-sm daisy-text-base-content/60">
-            Open a notebook to work with notes, or use the toolbar to create a new one.
-            Notebooks you subscribe to in the Bazaar appear in this list together with your own.
-          </p>
-        </div>
-        <div
-          v-if="user"
-          class="daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-2 sm:daisy-justify-end"
-        >
+      <div
+        v-if="user"
+        class="daisy-mb-5 daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-2 daisy-justify-end"
+      >
           <PopButton
             title="New notebook group"
             aria-label="New notebook group"
@@ -65,7 +60,6 @@
               <NotebookGroupNewForm :close="closer" @created="emit('refresh')" />
             </template>
           </PopButton>
-        </div>
       </div>
       <div
         v-if="catalogItems.length > 0"

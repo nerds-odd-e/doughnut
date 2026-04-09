@@ -45,8 +45,8 @@ describe('AsyncAssistantFetchStage', () => {
 
     await pressEscapeAndWait(
       stdin,
-      () => frames.join('\n'),
-      () => aborted !== null
+      () => aborted ?? '',
+      (s) => s === 'Cancelled.'
     )
 
     expect(aborted).toBe('Cancelled.')
