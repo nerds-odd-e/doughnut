@@ -162,13 +162,13 @@ describe('InteractiveCliApp /use notebook integration', () => {
         id: 99,
         bookName: 'top-maths',
         format: 'pdf',
-        ranges: [
+        blocks: [
           { id: 1, title: 'Part One', siblingOrder: 0 },
           {
             id: 2,
             title: 'Part One Child',
             siblingOrder: 0,
-            parentRangeId: '1',
+            parentBlockId: '1',
           },
         ],
       } as Awaited<

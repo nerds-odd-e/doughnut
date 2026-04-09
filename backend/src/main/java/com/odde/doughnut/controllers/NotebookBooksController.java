@@ -3,10 +3,10 @@ package com.odde.doughnut.controllers;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
+import com.odde.doughnut.controllers.dto.BookBlockReadingRecordListItem;
 import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
-import com.odde.doughnut.controllers.dto.BookRangeReadingRecordListItem;
 import com.odde.doughnut.entities.Book;
-import com.odde.doughnut.entities.BookRange;
+import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.BookUserLastReadPosition;
 import com.odde.doughnut.entities.BookViews;
 import com.odde.doughnut.entities.Notebook;
@@ -89,7 +89,7 @@ class NotebookBooksController {
       summary = "List reading records for the notebook book (current user)")
   @GetMapping("/{notebook}/book/reading-records")
   @Transactional(readOnly = true)
-  public List<BookRangeReadingRecordListItem> getBookReadingRecords(
+  public List<BookBlockReadingRecordListItem> getBookReadingRecords(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
@@ -136,17 +136,17 @@ class NotebookBooksController {
   }
 
   @Operation(
-      operationId = "putNotebookBookRangeReadingRecord",
-      summary = "Mark book range as read for the current user")
-  @PutMapping("/{notebook}/book/ranges/{bookRange}/reading-record")
+      operationId = "putNotebookBookBlockReadingRecord",
+      summary = "Mark book block as read for the current user")
+  @PutMapping("/{notebook}/book/blocks/{bookBlock}/reading-record")
   @Transactional
-  public List<BookRangeReadingRecordListItem> putRangeReadingRecord(
+  public List<BookBlockReadingRecordListItem> putBlockReadingRecord(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
-      @PathVariable("bookRange") @Schema(type = "integer") BookRange bookRange)
+      @PathVariable("bookBlock") @Schema(type = "integer") BookBlock bookBlock)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
     var user = authorizationService.getCurrentUser();
-    bookService.markRangeRead(notebook, user, bookRange);
+    bookService.markBlockRead(notebook, user, bookBlock);
     return bookService.listReadingRecordsForBook(notebook, user);
   }
 

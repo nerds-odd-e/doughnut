@@ -4,7 +4,7 @@ This document is **not** a delivery plan. It does not define phased user-visible
 
 **Companion:** market and product research stays in `ongoing/book-reading-research-report.md`. That report is now cross-walked to the vocabulary below. **UX/UI behavior** (drawer, PDF chrome, **Reading Control Panel**) — [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md).
 
-**Living document:** When a book-reading plan is written and executed, **update this roadmap** so it stays the single place for “what we believe the shape of the system should be.” Do not duplicate long architecture prose inside the plan; link here instead. **Delivery plan for “Read a range of a book”:** [`ongoing/book-reading-read-a-range-plan.md`](book-reading-read-a-range-plan.md).
+**Living document:** When a book-reading plan is written and executed, **update this roadmap** so it stays the single place for “what we believe the shape of the system should be.” Do not duplicate long architecture prose inside the plan; link here instead. **Delivery plan for “Read a block of a book”:** [`ongoing/book-reading-read-a-block-plan.md`](book-reading-read-a-block-plan.md).
 
 ---
 
@@ -16,10 +16,12 @@ Separate concerns so one object does not have to mean everything at once:
 |--------|---------------------|
 | **Where** | A single precise point in a book file |
 | **Which region** | A navigable or hierarchical chunk (section, “current reading unit”) |
-| **Direct content** | Material between this **book range** and the next in **document reading order**, ignoring nesting depth (see below) |
+| **Direct content** | Material between this **book block** and the next in **document reading order**, ignoring nesting depth (see below) |
 | **Evidence** | The exact span a note is about |
 | **Knowledge** | The user’s PKM note |
 | **Progress** | Where the user is in the book, at chunk granularity |
+
+**BookSubtree:** A **book block** together with all its descendant blocks in the layout tree. This is a **derived** view for aggregates or UI when needed, not a persisted peer of **BookBlock**.
 
 ---
 
@@ -40,7 +42,7 @@ classDiagram
     class Note {
     }
 
-    class BookRange {
+    class BookBlock {
       +structuralTitle : text
     }
 
@@ -74,20 +76,20 @@ classDiagram
     Notebook "1" --> "0..*" Note : contains
     Notebook "1" --> "0..*" Book : contains
 
-    Book "1" --> "0..*" BookRange : has
-    BookRange "1" --> "1" BookAnchor : startAnchor
+    Book "1" --> "0..*" BookBlock : has
+    BookBlock "1" --> "1" BookAnchor : startAnchor
 
-    BookRange "0..1" --> "0..*" BookRange : child ranges
+    BookBlock "0..1" --> "0..*" BookBlock : child blocks
 
-    BookRange "1" ..> "0..1" DirectContentReadingState : direct content disposition
+    BookBlock "1" ..> "0..1" DirectContentReadingState : direct content disposition
 
     Note "0..*" --> "0..1" SourceSpan : cites
     SourceSpan "1" --> "1" BookAnchor : startAnchor
     SourceSpan "1" --> "1" BookAnchor : endAnchor
-    SourceSpan "0..*" --> "1" BookRange : within
+    SourceSpan "0..*" --> "1" BookBlock : within
 
     User "1" --> "0..*" ReadingRecord : has
-    ReadingRecord "0..*" --> "1" BookRange : for
+    ReadingRecord "0..*" --> "1" BookBlock : for
 ```
 
 ### BookAnchor
@@ -96,25 +98,25 @@ The most precise locator: one place in the book. Examples over time: PDF coordin
 
 Keep the abstraction **open** early: `anchorFormat` + `value` (opaque until format-specific design is justified).
 
-### BookRange
+### BookBlock
 
-A region: **`startAnchor`** locates the section in the book file. Primary unit for **navigation**, **hierarchical decomposition**, and **progress**. Optional **`structuralTitle`** is the human-readable label for that **book range** in the **book layout** (e.g. `Chapter 3`, `2.4.1`). A breadcrumb-style path can be **derived** by walking parent ranges; we do not use a separate persisted “structural address” field.
+A region: **`startAnchor`** locates the section in the book file. Primary unit for **navigation**, **hierarchical decomposition**, and **progress**. Optional **`structuralTitle`** is the human-readable label for that **book block** in the **book layout** (e.g. `Chapter 3`, `2.4.1`). A breadcrumb-style path can be **derived** by walking parent blocks; we do not use a separate persisted “structural address” field.
 
-Each `BookRange` also has a conceptual association to **direct content** (see next subsection).
+Each `BookBlock` also has a conceptual association to **direct content** (see next subsection).
 
 ### Direct content (conceptual)
 
-**Direct content** is whatever lies **between** one `BookRange` and the **next** `BookRange` in reading order, or **to the end of the book** if this range is the last **book range** in that order.
+**Direct content** is whatever lies **between** one `BookBlock` and the **next** `BookBlock` in reading order, or **to the end of the book** if this block is the last **book block** in that order.
 
-- The **book layout** may be **nested**, but direct content is **not** defined by nesting depth. It is always “from this **book range**’s start until the next **book range**’s start (or EOF),” following the same **linear reading order** the product uses to walk the tree (depth-first preorder is the natural default: parent, then subtree, then sibling).
-- **Parent book range:** Its direct content is the material **between itself and its first child** (i.e. after this range’s start until the first child’s start). If there is no child, the next boundary is the same rule as for a leaf: the following **book range** in the walk, or EOF.
-- **Last child in a subtree:** Its direct content runs **from its start until the next range after leaving that subtree** (the next sibling of an ancestor, or EOF)—not “until parent’s end,” unless the **book layout** order says so.
+- The **book layout** may be **nested**, but direct content is **not** defined by nesting depth. It is always “from this **book block**’s start until the next **book block**’s start (or EOF),” following the same **linear reading order** the product uses to walk the tree (depth-first preorder is the natural default: parent, then subtree, then sibling).
+- **Parent book block:** Its direct content is the material **between itself and its first child** (i.e. after this block’s start until the first child’s start). If there is no child, the next boundary is the same rule as for a leaf: the following **book block** in the walk, or EOF.
+- **Last child in a subtree:** Its direct content runs **from its start until the next block after leaving that subtree** (the next sibling of an ancestor, or EOF)—not “until parent’s end,” unless the **book layout** order says so.
 
-**Reading-record heuristics (e.g. “no meaningful gap”):** Any predicate over “the gap from **A**’s start to **B**’s start” applies to **every** consecutive pair (**A**, **B**) in that same walk—**siblings**, **parent → first child**, **last node in a subtree → next range after the subtree**, etc. It is **not** limited to same-depth ranges.
+**Reading-record heuristics (e.g. “no meaningful gap”):** Any predicate over “the gap from **A**’s start to **B**’s start” applies to **every** consecutive pair (**A**, **B**) in that same walk—**siblings**, **parent → first child**, **last node in a subtree → next block after the subtree**, etc. It is **not** limited to same-depth blocks.
 
 **Persistence and extraction:** For now, direct content is **only a vocabulary and UX/progress concept**. We do **not** require a stored blob, span table, or server-side extraction of that gap. When the product needs it, anchors or text extraction can be added without renaming the idea.
 
-**Disposition (per range, conceptual):** How the user (or system) treats the direct content attached to a range can be classified for product logic:
+**Disposition (per block, conceptual):** How the user (or system) treats the direct content attached to a block can be classified for product logic:
 
 | Disposition | Meaning (informal) |
 |-------------|-------------------|
@@ -123,13 +125,13 @@ Each `BookRange` also has a conceptual association to **direct content** (see ne
 | **Direct content skimmed** | The user skimmed it (lighter than “read”). |
 | **No direct content found** | There is no meaningful gap (e.g. adjacent anchors, or structure implies none). |
 
-These dispositions are **not** persisted until the reading-record work lands; they document the **intended states** when we model reading behavior. The diagram shows them as **`DirectContentReadingState`** linked conceptually to `BookRange`.
+These dispositions are **not** persisted until the reading-record work lands; they document the **intended states** when we model reading behavior. The diagram shows them as **`DirectContentReadingState`** linked conceptually to `BookBlock`.
 
 **UI surface (direction):** The user affirms direct-content disposition from a **Reading Control Panel** anchored **near the bottom of the PDF main pane**, expandable to full actions or **minimized** to one or two controls — see [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md). This keeps progress actions **book-local** and avoids competing with the **book layout** drawer or global chrome for primary attention.
 
 ### SourceSpan
 
-Optional evidence on a **Note**: also start/end anchors, but purpose is **citation**, not navigation tree. May sit **within** a `BookRange` so a small quote still relates to the larger reading chunk.
+Optional evidence on a **Note**: also start/end anchors, but purpose is **citation**, not navigation tree. May sit **within** a `BookBlock` so a small quote still relates to the larger reading chunk.
 
 ### Note
 
@@ -137,20 +139,20 @@ Belongs to a `Notebook`. At most **one** `SourceSpan` for the first version—en
 
 ### ReadingRecord
 
-Per `User`, refers to a `BookRange`. Progress attaches to **meaningful chunks**, not citation-sized spans.
+Per `User`, refers to a `BookBlock`. Progress attaches to **meaningful chunks**, not citation-sized spans.
 
-**HTTP (as implemented for Phase 2 read disposition):** Rows are written with **`PUT /api/notebooks/{notebook}/book/ranges/{bookRange}/reading-record`** (response body: full **reading-records** list for the current user and book, same JSON shape as **`GET`**) and listed with **`GET /api/notebooks/{notebook}/book/reading-records`**. **`GET …/book`** does **not** embed reading state on each `BookRange`; the client merges layout + reading-records list when it needs borders or panel logic from the server.
+**HTTP (as implemented for Phase 2 read disposition):** Rows are written with **`PUT /api/notebooks/{notebook}/book/blocks/{bookBlock}/reading-record`** (response body: full **reading-records** list for the current user and book, same JSON shape as **`GET`**) and listed with **`GET /api/notebooks/{notebook}/book/reading-records`**. **`GET …/book`** does **not** embed reading state on each `BookBlock`; the client merges layout + reading-records list when it needs borders or panel logic from the server.
 
 ---
 
 ## Architectural rules (default)
 
-1. Every `BookRange` has exactly one `startAnchor`.
+1. Every `BookBlock` has exactly one `startAnchor`.
 2. Every `SourceSpan` has exactly one `startAnchor` and one `endAnchor`.
-3. `ReadingRecord` points at a `BookRange`, not a `SourceSpan`.
+3. `ReadingRecord` points at a `BookBlock`, not a `SourceSpan`.
 4. `SourceSpan` is optional on `Note`.
-5. Prefer `SourceSpan` to be smaller than or equal to the `BookRange` it sits within.
-6. **Direct content** is defined relative to **book layout reading order** and a range’s **start** boundary; it is **orthogonal** to how deep the range sits in the tree. **Disposition** is persisted via **`ReadingRecord`**; **materializing** the gap as extracted text/spans (if ever) is **out of scope** for this roadmap’s defaults until product asks for it.
+5. Prefer `SourceSpan` to be smaller than or equal to the `BookBlock` it sits within.
+6. **Direct content** is defined relative to **book layout reading order** and a block’s **start** boundary; it is **orthogonal** to how deep the block sits in the tree. **Disposition** is persisted via **`ReadingRecord`**; **materializing** the gap as extracted text/spans (if ever) is **out of scope** for this roadmap’s defaults until product asks for it.
 
 These are **defaults** for consistency; revisiting them is a roadmap-level change, not a silent refactor.
 
@@ -159,19 +161,19 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 ## Current directional choices
 
 - **One span per note (initially):** Keeps PKM extraction simple; multi-span and cross-book evidence are explicit future extensions.
-- **`structuralTitle` on `BookRange`:** Human-readable title for the range in the book’s structure tree; parent chain + title is enough to reconstruct display paths when needed.
-- **No `StructuralBookRange` subtype yet:** Structural vs user-carved ranges may be distinguished later if the product requires it (e.g. import vs override).
-- **Direct content** remains **conceptual** (no DB column for the gap). **Persistence** of disposition is **`ReadingRecord`** rows + **`PUT`/`GET` reading-record APIs** per [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md) and sub-phases in [`ongoing/book-reading-phase2-mark-range-read-subphases.md`](book-reading-phase2-mark-range-read-subphases.md); the **Reading Control Panel** is the intended **primary in-reader** control — [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md).
+- **`structuralTitle` on `BookBlock`:** Human-readable title for the block in the book’s structure tree; parent chain + title is enough to reconstruct display paths when needed.
+- **No `StructuralBookBlock` subtype yet:** Structural vs user-carved blocks may be distinguished later if the product requires it (e.g. import vs override).
+- **Direct content** remains **conceptual** (no DB column for the gap). **Persistence** of disposition is **`ReadingRecord`** rows + **`PUT`/`GET` reading-record APIs** per [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md); the **Reading Control Panel** is the intended **primary in-reader** control — [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md).
 
 ---
 
 ## Story 1 (shipped)
 
-**Book** metadata plus **BookRange** tree on a **Notebook**: **`POST /api/notebooks/{notebook}/attach-book`** (JSON **book layout** / `BookRange` tree only) and **`GET /api/notebooks/{notebook}/book`**, at most one book per notebook. As shipped, **`sourceFileRef` is not used** and there is **no server-side PDF storage**; the PDF stayed on the client. Range **start anchors** use **`pdf.mineru_outline_v1`** on the wire (backend `BookReadingWireConstants`).
+**Book** metadata plus **BookBlock** tree on a **Notebook**: **`POST /api/notebooks/{notebook}/attach-book`** (JSON **book layout** / `BookBlock` tree only) and **`GET /api/notebooks/{notebook}/book`**, at most one book per notebook. As shipped, **`sourceFileRef` is not used** and there is **no server-side PDF storage**; the PDF stayed on the client. Range **start anchors** use **`pdf.mineru_outline_v1`** on the wire (backend `BookReadingWireConstants`).
 
 ---
 
-## Story 2 — Read a range (direction)
+## Story 2 — Read a block (direction)
 
 **Goal:** After CLI (or future UI) attach, the **same book the user reads in the browser** is the **file stored server-side**, with a reading UI that ties **book layout** navigation to **PDF position**.
 
@@ -180,20 +182,20 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 | **CLI + server** | **`/attach` in the CLI** uploads the PDF to the backend **via the same `attach-book` surface** as the rest of the product (extend the route to accept **book layout** JSON + file in one logical operation—e.g. multipart—or an equivalent single-user-visible “attach” that does not fork a second attach API). |
 | **Blob storage** | **Production:** PDF bytes live in a **GCP bucket** (object key or URL recorded so `sourceFileRef` or equivalent can resolve the object). **Dev / automated tests:** a **local or test-local object store** (filesystem, emulator, or test-only bucket) so the **same E2E scenarios** run without requiring real GCP. |
 | **Frontend PDF** | Render the book with **pdf.js** in the **main content** area of the book reading page. |
-| **Chrome layout** | **Book layout** (`BookRange` tree) lives in a **drawer sidebar** on the book reading page; the **PDF viewer occupies the main pane**. |
-| **Sync** | **Two-way:** (1) **Selecting / activating a range** in the layout drives **pdf.js** to the corresponding anchors (page / region). (2) **Scrolling (and relevant zoom / page changes) in the PDF** updates which range is **highlighted** as current in the layout. |
+| **Chrome layout** | **Book layout** (`BookBlock` tree) lives in a **drawer sidebar** on the book reading page; the **PDF viewer occupies the main pane**. |
+| **Sync** | **Two-way:** (1) **Selecting / activating a book block** in the layout drives **pdf.js** to the corresponding anchors (page / region). (2) **Scrolling (and relevant zoom / page changes) in the PDF** updates which block is **highlighted** as current in the layout. |
 
 **Deletion:** Removing a book from the notebook (frontend flow) must **delete the persisted book record** and **remove the object** from the configured storage backend (GCS in prod, local/test store in dev).
 
-**Plan:** Phased delivery is spelled out in [`ongoing/book-reading-read-a-range-plan.md`](book-reading-read-a-range-plan.md).
+**Plan:** Phased delivery is spelled out in [`ongoing/book-reading-read-a-block-plan.md`](book-reading-read-a-block-plan.md).
 
-**Implemented so far (Story 2):** Phases **1–6** and **11–13** of that plan are shipped: multipart attach, **`GET …/book/file`**, **pdf.js** full scrollable viewer (`PdfBookViewer` using the **legacy** pdf.js stack — see **PDF.js build** below), the **book layout** from **`GET …/book`** in a **left** responsive drawer/panel (PDF in **`main`**; **768px** breakpoint: open by default on large, overlay + backdrop on small; **Book layout** control in **GlobalBar**), **layout → PDF** navigation from **`pdf.mineru_outline_v1`** anchors (page index, optional bbox, chrome/safe-area offset, bad-anchor no-op), **PDF ↔ book layout** sync (viewport drives **current range** highlight on a **book range**, debounced, with accessible live region for title changes), responsive default PDF scale (full-width on narrow viewports, comfortable max-width cap on wide viewports based on first-page intrinsic geometry, with manual zoom preserved across resize), **GlobalBar** **`PdfControl`** zoom buttons + page indicator, and **PDF-only gesture zoom** (ctrl/meta + wheel and two-finger pinch on the viewer scroll container, shared **`pdfViewer.currentScale`**, `preventDefault` to avoid browser zoom). The book-reading E2E uses **OCR on rendered canvases** (Tesseract.js, committed language data under `e2e_test/tesseract/`) for page markers — **not** a product DOM text layer on top of the canvas.
+**Implemented so far (Story 2):** Phases **1–6** and **11–13** of that plan are shipped: multipart attach, **`GET …/book/file`**, **pdf.js** full scrollable viewer (`PdfBookViewer` using the **legacy** pdf.js stack — see **PDF.js build** below), the **book layout** from **`GET …/book`** in a **left** responsive drawer/panel (PDF in **`main`**; **768px** breakpoint: open by default on large, overlay + backdrop on small; **Book layout** control in **GlobalBar**), **layout → PDF** navigation from **`pdf.mineru_outline_v1`** anchors (page index, optional bbox, chrome/safe-area offset, bad-anchor no-op), **PDF ↔ book layout** sync (viewport drives **current block** highlight on a **book block**, debounced, with accessible live region for title changes), responsive default PDF scale (full-width on narrow viewports, comfortable max-width cap on wide viewports based on first-page intrinsic geometry, with manual zoom preserved across resize), **GlobalBar** **`PdfControl`** zoom buttons + page indicator, and **PDF-only gesture zoom** (ctrl/meta + wheel and two-finger pinch on the viewer scroll container, shared **`pdfViewer.currentScale`**, `preventDefault` to avoid browser zoom). The book-reading E2E uses **OCR on rendered canvases** (Tesseract.js, committed language data under `e2e_test/tesseract/`) for page markers — **not** a product DOM text layer on top of the canvas.
 
 **PDF.js build (current):** The app uses **pdf.js legacy** end-to-end (`pdfjs-dist/legacy/build/pdf.mjs`, `legacy/web/pdf_viewer.mjs` + CSS, `legacy/build/pdf.worker.mjs` wired from `frontend/src/lib/pdfjsWorker.ts`). The standard worker assumes **`Uint8Array.prototype.toHex`** (PDF fingerprints); **Cypress’s bundled Electron** is on an older Chromium without that API, which breaks PDF load (e.g. `hashOriginal.toHex is not a function`). Legacy bundles a polyfill; **main thread and worker must stay on the same build line** (mixing legacy worker + modern `getDocument` is unsupported).
 
 **PDF.js build (future):** Switch back to the **non-legacy** pdf.js entrypoints once **Cypress upgrades its embedded Electron** to a Chromium that implements `Uint8Array.prototype.toHex` (or upstream pdf.js no longer requires it for our path). CI already runs E2E in Chrome; this matters most for **default `cypress run` (Electron)** and local parity.
 
-**E2E fixture / MinerU mock migration (`refactoring.pdf`, committed JSON, real MinerU refresh):** Sub-phased delivery in [`ongoing/book-reading-e2e-refactoring-fixture-visible-ocr-plan.md`](book-reading-e2e-refactoring-fixture-visible-ocr-plan.md) — Phases **1–7** **shipped** (viewport OCR, same-page scenarios). **Coordinate contract:** MinerU pipeline **`content_list`** bboxes are **0–1000 normalized per page**, not PDF points; the reader converts with page `getViewport({ scale: 1 })` width/height, applies a small PDF-space **top padding** when scrolling to a **book range**, and compares **viewport midpoint** to anchor **`y0`** in the same 0–1000 system for the **current range**. **Temporary debug:** semi-transparent bbox overlay in `PdfBookViewer` (no border). Details, pdf.js scroll quirks, and E2E **`deltaPx`** tuning: **Important learnings** section in that plan.
+**E2E fixture / MinerU mock migration (`refactoring.pdf`, committed JSON, real MinerU refresh):** Sub-phased delivery in [`ongoing/book-reading-e2e-refactoring-fixture-visible-ocr-plan.md`](book-reading-e2e-refactoring-fixture-visible-ocr-plan.md) — Phases **1–7** **shipped** (viewport OCR, same-page scenarios). **Coordinate contract:** MinerU pipeline **`content_list`** bboxes are **0–1000 normalized per page**, not PDF points; the reader converts with page `getViewport({ scale: 1 })` width/height, applies a small PDF-space **top padding** when scrolling to a **book block**, and compares **viewport midpoint** to anchor **`y0`** in the same 0–1000 system for the **current block**. **Temporary debug:** semi-transparent bbox overlay in `PdfBookViewer` (no border). Details, pdf.js scroll quirks, and E2E **`deltaPx`** tuning: **Important learnings** section in that plan.
 
 ---
 
@@ -202,15 +204,15 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 Revisit when implementation or product constraints clarify:
 
 - Whether `BookAnchor.value` stays opaque text or becomes structured payload (e.g. JSON) per `anchorFormat`.
-- Whether `ReadingRecord` needs finer-grained progress inside a range (percentage, character offset, etc.).
-- Whether `BookRange` should distinguish ranges from the **imported book layout** from user-created ranges.
+- Whether `ReadingRecord` needs finer-grained progress inside a block (percentage, character offset, etc.).
+- Whether `BookBlock` should distinguish blocks from the **imported book layout** from user-created blocks.
 - Whether `SourceSpan.kind` should classify text, image, figure, table, or mixed content for rendering and export.
-- Whether **direct content** should be materialized as anchors, text, or both; where **disposition** should live (`BookRange`, `ReadingRecord`, or a future artifact) once persisted.
+- Whether **direct content** should be materialized as anchors, text, or both; where **disposition** should live (`BookBlock`, `ReadingRecord`, or a future artifact) once persisted.
 
 ---
 
 ## Anti-patterns (what this roadmap pushes against)
 
-- **Single “range” type** for **book range**, reading cursor, highlight, and AI chunk—leads to muddy APIs and broken exports.
-- **Progress on arbitrary citations**—makes re-entry and queue semantics harder than progress on `BookRange`.
+- **Single overloaded type** for **book block**, reading cursor, highlight, and AI chunk—leads to muddy APIs and broken exports.
+- **Progress on arbitrary citations**—makes re-entry and queue semantics harder than progress on `BookBlock`.
 - **Anchors that only mean “page number”**—insufficient for structure-first reading and EPUB; `BookAnchor` is the extension point.

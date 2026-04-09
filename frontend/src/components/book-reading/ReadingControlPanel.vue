@@ -7,7 +7,7 @@
       class="daisy-pointer-events-auto daisy-mx-auto daisy-max-w-3xl daisy-rounded-lg daisy-bg-base-200/95 daisy-border daisy-border-base-300 daisy-shadow-lg daisy-px-3 daisy-py-2 daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-2"
     >
       <p class="daisy-text-sm daisy-min-w-0 daisy-flex-1 daisy-m-0">
-        <span class="daisy-font-medium">{{ selectedRangeTitle }}</span>
+        <span class="daisy-font-medium">{{ selectedBlockTitle }}</span>
       </p>
       <button
         type="button"
@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 defineProps<{
-  selectedRangeTitle: string
+  selectedBlockTitle: string
 }>()
 
 const emit = defineEmits<{

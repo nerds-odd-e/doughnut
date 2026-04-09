@@ -2,7 +2,7 @@
 
 **Scope:** The **single** user-experience and interface direction for book reading in Doughnut: **Story 2** layout (drawer, book layout ↔ PDF sync, show/hide structure), **mobile-realistic** reading, and **reading record** surfaces (including the **Reading Control Panel**). **This file is guidance only** — apply it when implementing features; it does not replace delivery plans or tests.
 
-**Related:** Architecture and vocabulary — [`ongoing/doughnut-book-reading-architecture-roadmap.md`](doughnut-book-reading-architecture-roadmap.md) (*Story 2 — Read a range*, **direct content**, `ReadingRecord`). Shipped milestones for the range reader — [`ongoing/book-reading-read-a-range-plan.md`](book-reading-read-a-range-plan.md). Reading record delivery — [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md).
+**Related:** Architecture and vocabulary — [`ongoing/doughnut-book-reading-architecture-roadmap.md`](doughnut-book-reading-architecture-roadmap.md) (*Story 2 — Read a block*, **direct content**, `ReadingRecord`). Shipped milestones for the block reader — [`ongoing/book-reading-read-a-block-plan.md`](book-reading-read-a-block-plan.md). Reading record delivery — [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md).
 
 ---
 
@@ -21,7 +21,7 @@
 | Region | Role |
 |--------|------|
 | **Main (center/right of layout)** | PDF viewer: **maximum usable area**, vertical scroll through pages, pinch/zoom per product/pdf.js choice — **do not** trap scroll in nested panes unless necessary for pdf.js. Hosts the **Reading Control Panel** (see below) as an overlay or bottom-anchored strip **inside** this region so it moves with the book, not the app chrome. |
-| **Side panel (left)** | **`BookRange` tree** (book layout) from `GET …/book`: hierarchical list of **book ranges**, scrollable if tall. |
+| **Side panel (left)** | **`BookBlock` tree** (book layout) from `GET …/book`: hierarchical list of **book blocks**, scrollable if tall. |
 
 **Direction:** DaisyUI drawer/sidebar patterns consistent with the rest of the app; **left** anchor matches the architecture roadmap “drawer sidebar” wording.
 
@@ -29,7 +29,7 @@
 
 ## Reading Control Panel (direct content disposition)
 
-**Purpose:** Let the user **mark the direct content** of a **book range** (see **Direct content** in the architecture roadmap) as **read**, and later **skimmed** / **skipped** in a later delivery slice — without modal stacks that break reading flow.
+**Purpose:** Let the user **mark the direct content** of a **book block** (see **Direct content** in the architecture roadmap) as **read**, and later **skimmed** / **skipped** in a later delivery slice — without modal stacks that break reading flow.
 
 **Placement:** **Near the bottom** of the **PDF main pane** (above safe-area inset on notched devices). It is **not** in the global top bar: it stays visually tied to “this book / this viewport.”
 
@@ -37,17 +37,17 @@
 
 | State | Behavior |
 |--------|-----------|
-| **Expanded** | Shows **short context** (e.g. which **book range**’s direct content is in question — title or breadcrumb from the **current range** / **reading-order predecessor**, per product copy in the delivery plan) and **primary actions** (e.g. **Mark as read**; later **Skimmed** / **Skipped**). Optional secondary control to **open the book layout** or focus the relevant **book range** if the drawer is closed. |
-| **Minimized** | Collapses to a **small bar** with **one or two** controls only — e.g. **chevron to expand** + **single primary** action (quick “mark read”), or **expand** + **overflow** for less common actions. Minimized state must **not** block page text: prefer floating strip, rounded bar, or thin dock with **large enough touch targets** (same comfort as **book ranges** in the list). |
+| **Expanded** | Shows **short context** (e.g. which **book block**’s direct content is in question — title or breadcrumb from the **current block** / **reading-order predecessor**, per product copy in the delivery plan) and **primary actions** (e.g. **Mark as read**; later **Skimmed** / **Skipped**). Optional secondary control to **open the book layout** or focus the relevant **book block** if the drawer is closed. |
+| **Minimized** | Collapses to a **small bar** with **one or two** controls only — e.g. **chevron to expand** + **single primary** action (quick “mark read”), or **expand** + **overflow** for less common actions. Minimized state must **not** block page text: prefer floating strip, rounded bar, or thin dock with **large enough touch targets** (same comfort as **book blocks** in the list). |
 
 **Interaction rules**
 
 - **Does not own document scroll:** The panel sits **over** or **above** the scrollable PDF viewport; vertical swipe on the page remains **scroll-through** except on the panel’s own hit targets.
-- **Coexists with viewport sync:** The **current range** (and optional **current selection** from a **book range** tap) drives **which** range’s direct content the panel describes. Copy and timing align with [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md) (e.g. predecessor-range prompt vs current range — implement to match Gherkin and user stories).
+- **Coexists with viewport sync:** The **current block** (and optional **current selection** from a **book block** tap) drives **which** block’s direct content the panel describes. Copy and timing align with [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md) (e.g. predecessor-block prompt vs current block — implement to match Gherkin and user stories).
 - **Coexists with drawer:** Opening/closing the book layout **does not** reset panel expand/minimize preference for the session unless we later persist it (open UX question).
 - **Accessibility:** Expand/collapse and primary actions need **visible labels** or **accessible names**; avoid relying only on iconography for “mark read.”
 
-**Delivery mapping:** The reading-record plan’s **Phase 2** slice (**read** + persistence + read styling on **book ranges** via this panel) is **shipped** — see [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md) and [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature). **Phase 3–4** add **auto-mark when no direct content**, **skim/skip**, and optional **persistence of panel state** if product wants it.
+**Delivery mapping:** The reading-record plan’s **Phase 2** slice (**read** + persistence + read styling on **book blocks** via this panel) is **shipped** — see [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md) and [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature). **Phase 3–4** add **auto-mark when no direct content**, **skim/skip**, and optional **persistence of panel state** if product wants it.
 
 ---
 
@@ -66,7 +66,7 @@ Define **one primary breakpoint** (exact pixel/Tailwind token to be chosen durin
 
 ## Story 2 — Drawer, navigation, and PDF sync
 
-The following sections describe **shipped or planned** Story 2 reader behavior from [`ongoing/book-reading-read-a-range-plan.md`](book-reading-read-a-range-plan.md). They remain the baseline for **book layout + PDF** chrome; the **Reading Control Panel** is an **additional** main-pane affordance for **reading record**, not a replacement for the book layout toggle.
+The following sections describe **shipped or planned** Story 2 reader behavior from [`ongoing/book-reading-read-a-block-plan.md`](book-reading-read-a-block-plan.md). They remain the baseline for **book layout + PDF** chrome; the **Reading Control Panel** is an **additional** main-pane affordance for **reading record**, not a replacement for the book layout toggle.
 
 ### Book layout in a drawer; PDF remains main focus
 
@@ -79,40 +79,40 @@ The following sections describe **shipped or planned** Story 2 reader behavior f
 **UI elements**
 
 - **Drawer shell:** width on large screens (fixed vs min/max), backdrop on small when open (tap-outside to close is standard on mobile).
-- **Book layout presentation:** reuse existing tree semantics; ensure **long lists of book ranges** scroll inside the drawer, **not** the whole page (only the PDF main area should drive document scroll).
+- **Book layout presentation:** reuse existing tree semantics; ensure **long lists of book blocks** scroll inside the drawer, **not** the whole page (only the PDF main area should drive document scroll).
 - **Chrome:** notebook/book context (title, back) should stay **compact** so vertical space stays with the PDF on mobile.
 
 **E2E alignment:** Scenario should assert **tree + PDF** when the drawer is in the **open** state used for the test; on small breakpoints, steps may need to **open the book layout** first (see **Show / hide the book layout drawer** below).
 
-### Book range selection jumps the PDF to the right place
+### Book block selection jumps the PDF to the right place
 
 **UX outcomes**
 
-- Tapping a **book range** feels like **“go to this section”**: clear **current selection** state for the chosen range (distinct from the **current range** if both exist).
+- Tapping a **book block** feels like **“go to this section”**: clear **current selection** state for the chosen block (distinct from the **current block** if both exist).
 - After navigation, the **target page/region is visible** without the user hunting; respect **safe area** and any **fixed header** so the jump does not land under obscured UI.
-- **Loading:** if navigation async, avoid jarring blank flashes; prefer **subtle pending** state on the **book range** or a **minimal** main-area indicator consistent with existing `apiCallWithLoading` patterns where applicable.
+- **Loading:** if navigation async, avoid jarring blank flashes; prefer **subtle pending** state on the **book block** or a **minimal** main-area indicator consistent with existing `apiCallWithLoading` patterns where applicable.
 
 **Mobile**
 
-- Hit targets for **book ranges** meet **comfortable touch** size; nested rows remain **expand/collapse** without accidental “go to” (pattern: chevron vs row body, or delay — pick one consistent pattern).
+- Hit targets for **book blocks** meet **comfortable touch** size; nested rows remain **expand/collapse** without accidental “go to” (pattern: chevron vs row body, or delay — pick one consistent pattern).
 
 **E2E alignment:** Observable **page/scroll** change after click, as in the plan.
 
-### PDF scroll and navigation update the current range in the book layout
+### PDF scroll and navigation update the current block in the book layout
 
-**Shipped** (see read-a-range plan — viewport sync): **current range** (`data-current-range`), debounced updates, aside scroll-into-view for long book layouts, **current selection** vs **current range** distinguished in UI and ARIA, polite live region when the current range title changes.
+**Shipped** (see read-a-block plan — viewport sync): **current block** (`data-current-block`), debounced updates, aside scroll-into-view for long book layouts, **current selection** vs **current block** distinguished in UI and ARIA, polite live region when the current block title changes.
 
 **UX outcomes**
 
-- As the user **scrolls or flips pages**, the book layout shows **which `BookRange` best matches** the viewport (single **current range** highlight).
-- **Calm feedback:** highlight updates should not **flicker** on small scroll jitter; debounce or hysteresis is a **UX implementation detail** (cohesive **current range** logic per plan).
+- As the user **scrolls or flips pages**, the book layout shows **which `BookBlock` best matches** the viewport (single **current block** highlight).
+- **Calm feedback:** highlight updates should not **flicker** on small scroll jitter; debounce or hysteresis is a **UX implementation detail** (cohesive **current block** logic per plan).
 - If the drawer is **closed**, the user still **has a reading path**; optional **minimal** indicator (e.g. breadcrumb chip, chapter title in the toolbar) is an **open question** — not required if the book layout toggle always makes “open drawer” one tap away.
 
 **Accessibility**
 
-- When the drawer is open, the **current range** should be **visible** and, where supported, **announced** on meaningful navigation (avoid noisy live regions on every scroll tick).
+- When the drawer is open, the **current block** should be **visible** and, where supported, **announced** on meaningful navigation (avoid noisy live regions on every scroll tick).
 
-**E2E alignment:** Scroll to a known region → **highlight** (or equivalent DOM) matches expected **book range**.
+**E2E alignment:** Scroll to a known region → **highlight** (or equivalent DOM) matches expected **book block**.
 
 ### Show / hide the book layout drawer
 
@@ -137,18 +137,18 @@ The following sections describe **shipped or planned** Story 2 reader behavior f
 
 - **Primary gesture:** vertical **scroll through the book** in the main pane must remain the **default** interaction; the **book layout** is **secondary**.
 - **Zoom:** if pdf.js zoom is exposed, ensure **layout toggle**, **book layout**, and **Reading Control Panel** do not break pinch or scroll containment (test on mobile Safari/Chrome when implementing).
-- **Orientation change:** PDF reflows; **current range** logic should remain coherent after resize.
+- **Orientation change:** PDF reflows; **current block** logic should remain coherent after resize.
 
 ---
 
 ## Open UX questions (decide during implementation)
 
 1. **Persist drawer open/closed** across visits or devices, or session-only?
-2. When the drawer is **closed**, show a **compact “you are here”** label (chapter/**book range** title) in the header?
+2. When the drawer is **closed**, show a **compact “you are here”** label (chapter/**book block** title) in the header?
 3. **FAB vs top-bar** toggle on mobile — which matches Doughnut’s existing navigation patterns best?
-4. **Current selection** (tap on a **book range**) vs **current range** (viewport-derived): two visual styles or one merged state?
+4. **Current selection** (tap on a **book block**) vs **current block** (viewport-derived): two visual styles or one merged state?
 5. **Reading Control Panel:** default **expanded vs minimized** on first visit / small viewport? Remember user preference per notebook or globally?
-6. **Reading Control Panel:** when both **current selection** and **current range** differ, which drives the “direct content in question” copy — always reading-order rule from the plan, or explicit UI affordance to switch?
+6. **Reading Control Panel:** when both **current selection** and **current block** differ, which drives the “direct content in question” copy — always reading-order rule from the plan, or explicit UI affordance to switch?
 
 ---
 

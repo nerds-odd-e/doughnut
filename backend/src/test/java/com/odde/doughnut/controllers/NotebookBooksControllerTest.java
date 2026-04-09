@@ -6,12 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Book;
-import com.odde.doughnut.entities.BookRange;
-import com.odde.doughnut.entities.BookRangeReadingRecord;
+import com.odde.doughnut.entities.BookBlock;
+import com.odde.doughnut.entities.BookBlockReadingRecord;
 import com.odde.doughnut.entities.BookUserLastReadPosition;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.BookRangeReadingRecordRepository;
+import com.odde.doughnut.entities.repositories.BookBlockReadingRecordRepository;
 import com.odde.doughnut.entities.repositories.BookRepository;
 import com.odde.doughnut.entities.repositories.BookUserLastReadPositionRepository;
 import com.odde.doughnut.exceptions.ApiException;
@@ -45,7 +45,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   @Autowired NotebookBooksController controller;
   @Autowired BookRepository bookRepository;
   @Autowired BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
-  @Autowired BookRangeReadingRecordRepository bookRangeReadingRecordRepository;
+  @Autowired BookBlockReadingRecordRepository bookBlockReadingRecordRepository;
   @Autowired BookStorage bookStorage;
 
   @BeforeEach
@@ -93,17 +93,17 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     return new ServletWebRequest(new MockHttpServletRequest());
   }
 
-  private static List<BookRange> rootRangesSorted(Book book) {
-    return book.getRanges().stream()
-        .filter(r -> r.getParentRangeId() == null)
-        .sorted(Comparator.comparingLong(BookRange::getSiblingOrder))
+  private static List<BookBlock> rootBlocksSorted(Book book) {
+    return book.getBlocks().stream()
+        .filter(r -> r.getParentBlockId() == null)
+        .sorted(Comparator.comparingLong(BookBlock::getSiblingOrder))
         .toList();
   }
 
-  private static List<BookRange> childrenOf(Book book, BookRange parent) {
-    return book.getRanges().stream()
-        .filter(r -> Objects.equals(r.getParentRangeId(), parent.getId()))
-        .sorted(Comparator.comparingLong(BookRange::getSiblingOrder))
+  private static List<BookBlock> childrenOf(Book book, BookBlock parent) {
+    return book.getBlocks().stream()
+        .filter(r -> Objects.equals(r.getParentBlockId(), parent.getId()))
+        .sorted(Comparator.comparingLong(BookBlock::getSiblingOrder))
         .toList();
   }
 
@@ -145,7 +145,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   @Nested
   class AttachBook {
     @Test
-    void persistsNestedOutlineAndReturnsBookWithRanges() throws Exception {
+    void persistsNestedOutlineAndReturnsBookWithBlocks() throws Exception {
       Notebook nb = myNotebook();
       AttachBookLayoutNodeRequest ch1 = node("Section 1.1");
       AttachBookLayoutNodeRequest ch2 = node("Section 1.2");
@@ -162,19 +162,19 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(created.getBookName(), equalTo("Linear Algebra"));
       assertThat(created.getSourceFileRef(), notNullValue());
       assertThat(created.getSourceFileRef().isBlank(), equalTo(false));
-      assertThat(created.getRanges(), hasSize(3));
+      assertThat(created.getBlocks(), hasSize(3));
 
-      BookRange outRoot = rootRangesSorted(created).getFirst();
+      BookBlock outRoot = rootBlocksSorted(created).getFirst();
       assertThat(outRoot.getStructuralTitle(), equalTo("Chapter 1"));
       assertThat(outRoot.getId(), notNullValue());
-      List<BookRange> children = childrenOf(created, outRoot);
+      List<BookBlock> children = childrenOf(created, outRoot);
       assertThat(children, hasSize(2));
       assertThat(children.getFirst().getStructuralTitle(), equalTo("Section 1.1"));
       assertThat(children.get(1).getStructuralTitle(), equalTo("Section 1.2"));
 
       Book detail = controller.getBook(nb);
-      assertThat(detail.getRanges(), hasSize(3));
-      BookRange detailRoot = rootRangesSorted(detail).getFirst();
+      assertThat(detail.getBlocks(), hasSize(3));
+      BookBlock detailRoot = rootBlocksSorted(detail).getFirst();
       assertThat(detailRoot.getId(), equalTo(outRoot.getId()));
       assertThat(childrenOf(detail, detailRoot), hasSize(2));
 
@@ -523,13 +523,13 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     void returnsRecordForMarkedRange() throws Exception {
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
       Notebook nb = notebookWithBook();
-      BookRange range = rootRangesSorted(bookOf(nb)).getFirst();
-      controller.putRangeReadingRecord(nb, range);
+      BookBlock range = rootBlocksSorted(bookOf(nb)).getFirst();
+      controller.putBlockReadingRecord(nb, range);
 
       var list = controller.getBookReadingRecords(nb);
       assertThat(list, hasSize(1));
-      assertThat(list.getFirst().getBookRangeId(), equalTo(range.getId()));
-      assertThat(list.getFirst().getStatus(), equalTo(BookRangeReadingRecord.STATUS_READ));
+      assertThat(list.getFirst().getBookBlockId(), equalTo(range.getId()));
+      assertThat(list.getFirst().getStatus(), equalTo(BookBlockReadingRecord.STATUS_READ));
       assertThat(
           list.getFirst().getCompletedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
     }
@@ -540,25 +540,25 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
       controller.attachBook(nb, attachRequest(node("2.1"), node("2.2")), pdfFile(pdfBytes));
       Book book = bookOf(nb);
-      List<BookRange> roots = rootRangesSorted(book);
-      BookRange first = roots.getFirst();
-      controller.putRangeReadingRecord(nb, first);
+      List<BookBlock> roots = rootBlocksSorted(book);
+      BookBlock first = roots.getFirst();
+      controller.putBlockReadingRecord(nb, first);
 
       var list = controller.getBookReadingRecords(nb);
       assertThat(list, hasSize(1));
-      assertThat(list.getFirst().getBookRangeId(), equalTo(first.getId()));
+      assertThat(list.getFirst().getBookBlockId(), equalTo(first.getId()));
     }
 
     @Test
     void doesNotIncludeAnotherUsersRecords() throws Exception {
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
       Notebook nb = notebookWithBook();
-      BookRange range = rootRangesSorted(bookOf(nb)).getFirst();
+      BookBlock range = rootBlocksSorted(bookOf(nb)).getFirst();
       User other = makeMe.aUser().please();
-      var otherRow = new BookRangeReadingRecord();
+      var otherRow = new BookBlockReadingRecord();
       otherRow.setUser(other);
-      otherRow.setBookRange(range);
-      otherRow.setStatus(BookRangeReadingRecord.STATUS_READ);
+      otherRow.setBookBlock(range);
+      otherRow.setStatus(BookBlockReadingRecord.STATUS_READ);
       otherRow.setCompletedAt(testabilitySettings.getCurrentUTCTimestamp());
       makeMe.entityPersister.save(otherRow);
       makeMe.entityPersister.flush();
@@ -574,26 +574,26 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   }
 
   @Nested
-  class PutRangeReadingRecord {
+  class PutBlockReadingRecord {
     @Test
     void persistsReadRecordForCurrentUserAndRange() throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
       Notebook nb = notebookWithBook();
-      BookRange range = rootRangesSorted(bookOf(nb)).getFirst();
+      BookBlock range = rootBlocksSorted(bookOf(nb)).getFirst();
 
-      var returned = controller.putRangeReadingRecord(nb, range);
+      var returned = controller.putBlockReadingRecord(nb, range);
       assertThat(returned, hasSize(1));
-      assertThat(returned.getFirst().getBookRangeId(), equalTo(range.getId()));
-      assertThat(returned.getFirst().getStatus(), equalTo(BookRangeReadingRecord.STATUS_READ));
+      assertThat(returned.getFirst().getBookBlockId(), equalTo(range.getId()));
+      assertThat(returned.getFirst().getStatus(), equalTo(BookBlockReadingRecord.STATUS_READ));
       assertThat(
           returned.getFirst().getCompletedAt(),
           equalTo(testabilitySettings.getCurrentUTCTimestamp()));
 
       var stored =
-          bookRangeReadingRecordRepository
-              .findByUser_IdAndBookRange_Id(currentUser.getUser().getId(), range.getId())
+          bookBlockReadingRecordRepository
+              .findByUser_IdAndBookBlock_Id(currentUser.getUser().getId(), range.getId())
               .orElseThrow();
-      assertThat(stored.getStatus(), equalTo(BookRangeReadingRecord.STATUS_READ));
+      assertThat(stored.getStatus(), equalTo(BookBlockReadingRecord.STATUS_READ));
       assertThat(stored.getCompletedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
     }
 
@@ -601,21 +601,21 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     void secondPutUpdatesCompletedAtAndKeepsSingleRow() throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(0, 10).please());
       Notebook nb = notebookWithBook();
-      BookRange range = rootRangesSorted(bookOf(nb)).getFirst();
+      BookBlock range = rootBlocksSorted(bookOf(nb)).getFirst();
 
-      var firstResponse = controller.putRangeReadingRecord(nb, range);
+      var firstResponse = controller.putBlockReadingRecord(nb, range);
       assertThat(firstResponse, hasSize(1));
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(1, 11).please());
-      var secondResponse = controller.putRangeReadingRecord(nb, range);
+      var secondResponse = controller.putBlockReadingRecord(nb, range);
       assertThat(secondResponse, hasSize(1));
       assertThat(
           secondResponse.getFirst().getCompletedAt(),
           equalTo(testabilitySettings.getCurrentUTCTimestamp()));
 
-      assertThat(bookRangeReadingRecordRepository.count(), equalTo(1L));
+      assertThat(bookBlockReadingRecordRepository.count(), equalTo(1L));
       var stored =
-          bookRangeReadingRecordRepository
-              .findByUser_IdAndBookRange_Id(currentUser.getUser().getId(), range.getId())
+          bookBlockReadingRecordRepository
+              .findByUser_IdAndBookBlock_Id(currentUser.getUser().getId(), range.getId())
               .orElseThrow();
       assertThat(stored.getCompletedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
     }
@@ -624,40 +624,40 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     void returns404WhenNotebookHasNoBook() {
       Notebook nbEmpty = myNotebook();
       Notebook nbWith = notebookWithBook();
-      BookRange range = rootRangesSorted(bookOf(nbWith)).getFirst();
+      BookBlock range = rootBlocksSorted(bookOf(nbWith)).getFirst();
 
       assertThrows(
-          ResponseStatusException.class, () -> controller.putRangeReadingRecord(nbEmpty, range));
+          ResponseStatusException.class, () -> controller.putBlockReadingRecord(nbEmpty, range));
     }
 
     @Test
     void returns404WhenRangeBelongsToAnotherNotebooksBook() {
       Notebook otherNb = otherUsersNotebookWithBook();
-      BookRange otherRange = rootRangesSorted(bookOf(otherNb)).getFirst();
+      BookBlock otherRange = rootBlocksSorted(bookOf(otherNb)).getFirst();
       Notebook myNb = notebookWithBook();
 
       assertThrows(
-          ResponseStatusException.class, () -> controller.putRangeReadingRecord(myNb, otherRange));
+          ResponseStatusException.class, () -> controller.putBlockReadingRecord(myNb, otherRange));
     }
 
     @Test
     void rejectsNotebookWithoutReadAccess() {
       Notebook otherNb = otherUsersNotebookWithBook();
-      BookRange range = rootRangesSorted(bookOf(otherNb)).getFirst();
+      BookBlock range = rootBlocksSorted(bookOf(otherNb)).getFirst();
 
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.putRangeReadingRecord(otherNb, range));
+          () -> controller.putBlockReadingRecord(otherNb, range));
     }
 
     @Test
     void requiresLoggedInUser() {
       Notebook nb = notebookWithBook();
-      BookRange range = rootRangesSorted(bookOf(nb)).getFirst();
+      BookBlock range = rootBlocksSorted(bookOf(nb)).getFirst();
       currentUser.setUser(null);
 
       assertThrows(
-          ResponseStatusException.class, () -> controller.putRangeReadingRecord(nb, range));
+          ResponseStatusException.class, () -> controller.putBlockReadingRecord(nb, range));
     }
   }
 }

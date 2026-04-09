@@ -4,8 +4,8 @@ export type ClientOptions = {
     baseUrl: `${string}://${string}` | (string & {});
 };
 
-export type BookRangeReadingRecordListItem = {
-    bookRangeId: string;
+export type BookBlockReadingRecordListItem = {
+    bookBlockId: string;
     status: string;
     completedAt: string;
 };
@@ -321,12 +321,12 @@ export type BookAnchorFull = {
     value: string;
 };
 
-export type BookRangeFull = {
+export type BookBlockFull = {
     id: number;
     startAnchor: BookAnchorFull;
     siblingOrder?: number;
     title: string;
-    parentRangeId?: string;
+    parentBlockId?: string;
 };
 
 export type BookFull = {
@@ -335,7 +335,7 @@ export type BookFull = {
     format: string;
     createdAt?: string;
     updatedAt?: string;
-    ranges?: Array<BookRangeFull>;
+    blocks?: Array<BookBlockFull>;
     notebookId?: string;
     hasSourceFile?: boolean;
 };
@@ -805,24 +805,24 @@ export type CircleForUserViewWritable = {
     members: Array<UserForOtherUserView>;
 };
 
-export type PutNotebookBookRangeReadingRecordData = {
+export type PutNotebookBookBlockReadingRecordData = {
     body?: never;
     path: {
         notebook: number;
-        bookRange: number;
+        bookBlock: number;
     };
     query?: never;
-    url: '/api/notebooks/{notebook}/book/ranges/{bookRange}/reading-record';
+    url: '/api/notebooks/{notebook}/book/blocks/{bookBlock}/reading-record';
 };
 
-export type PutNotebookBookRangeReadingRecordResponses = {
+export type PutNotebookBookBlockReadingRecordResponses = {
     /**
      * OK
      */
-    200: Array<BookRangeReadingRecordListItem>;
+    200: Array<BookBlockReadingRecordListItem>;
 };
 
-export type PutNotebookBookRangeReadingRecordResponse = PutNotebookBookRangeReadingRecordResponses[keyof PutNotebookBookRangeReadingRecordResponses];
+export type PutNotebookBookBlockReadingRecordResponse = PutNotebookBookBlockReadingRecordResponses[keyof PutNotebookBookBlockReadingRecordResponses];
 
 export type GetUserProfileData = {
     body?: never;
@@ -3093,7 +3093,7 @@ export type GetNotebookBookReadingRecordsResponses = {
     /**
      * OK
      */
-    200: Array<BookRangeReadingRecordListItem>;
+    200: Array<BookBlockReadingRecordListItem>;
 };
 
 export type GetNotebookBookReadingRecordsResponse = GetNotebookBookReadingRecordsResponses[keyof GetNotebookBookReadingRecordsResponses];

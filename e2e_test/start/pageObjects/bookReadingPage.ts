@@ -16,10 +16,10 @@ function scrollableAncestorWithinBookReadingPage(viewerEl: HTMLElement) {
 }
 
 const bookReadingPage = () => {
-  const bookRangeRows = () =>
+  const bookBlockRows = () =>
     cy
       .get('[data-testid="book-reading-book-layout"]')
-      .find('[data-testid="book-reading-book-range"]')
+      .find('[data-testid="book-reading-book-block"]')
 
   const assertPdfCanvasHasDarkPixels = (el: HTMLCanvasElement) => {
     expect(el.width, 'PDF canvas should have width').to.be.greaterThan(0)
@@ -46,12 +46,12 @@ const bookReadingPage = () => {
       pageIsNotLoading()
       cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
       cy.get('[data-testid="book-reading-page"]').should('exist')
-      bookRangeRows()
+      bookBlockRows()
         .should('have.length', expected.length)
         .each(($el, i) => {
           const row = expected[i]!
           cy.wrap($el)
-            .should('have.attr', 'data-book-range-depth', String(row.depth))
+            .should('have.attr', 'data-book-block-depth', String(row.depth))
             .and('contain', row.title)
         })
       return this
@@ -60,16 +60,16 @@ const bookReadingPage = () => {
       this.expectCurrentPage(1).expectVisibleOCRContains('Code Refactoring')
       return this
     },
-    clickBookRangeByTitle(title: string) {
+    clickBookBlockByTitle(title: string) {
       pageIsNotLoading()
-      bookRangeRows().contains(title).click()
+      bookBlockRows().contains(title).click()
       return this
     },
-    expectBookRangeIsCurrentSelectionByTitle(title: string) {
+    expectBookBlockIsCurrentSelectionByTitle(title: string) {
       pageIsNotLoading()
-      const row = bookRangeRows().contains(title)
+      const row = bookBlockRows().contains(title)
       row.should('have.attr', 'data-current-selection', 'true')
-      bookRangeRows()
+      bookBlockRows()
         .filter('[data-current-selection="true"]')
         .should('have.length', 1)
       return this
@@ -133,26 +133,26 @@ const bookReadingPage = () => {
       return this
     },
     /**
-     * Scroll the PDF until the book layout row identified by `rangeTitle` is the viewport-derived
-     * current range (same DOM contract as expectBookRangeIsCurrentRangeByTitle).
+     * Scroll the PDF until the book layout row identified by `blockTitle` is the viewport-derived
+     * current block (same DOM contract as expectBookBlockIsCurrentBlockByTitle).
      * For refactoring.pdf, §2.2 is anchored on page 2.
      */
-    scrollPdfBookReaderToMakeBookRangeCurrent(rangeTitle: string) {
+    scrollPdfBookReaderToMakeBookBlockCurrent(blockTitle: string) {
       pageIsNotLoading()
-      if (!rangeTitle.includes('2.2 Refactoring as Strengthening')) {
+      if (!blockTitle.includes('2.2 Refactoring as Strengthening')) {
         throw new Error(
-          `scrollPdfBookReaderToMakeBookRangeCurrent: unsupported book range (add scroll strategy): ${rangeTitle}`
+          `scrollPdfBookReaderToMakeBookBlockCurrent: unsupported book block (add scroll strategy): ${blockTitle}`
         )
       }
       this.scrollPdfBookReaderToBringPage2IntoPrimaryView()
       cy.wait(200)
-      this.expectBookRangeIsCurrentRangeByTitle(rangeTitle)
+      this.expectBookBlockIsCurrentBlockByTitle(blockTitle)
       return this
     },
     /**
      * Scrolls by 42% of the rendered page-1 height from §1's click position (y≈204 MinerU),
      * giving total scroll ≈ 624 MinerU — past §2's bbox bottom (y1=608) so §2 scrolls above the
-     * viewport, making §2.1 (y0=631) the first visible anchor and therefore the current range.
+     * viewport, making §2.1 (y0=631) the first visible anchor and therefore the current block.
      */
     scrollPdfBookReaderDownWithinSamePageForNextBbox() {
       pageIsNotLoading()
@@ -173,14 +173,14 @@ const bookReadingPage = () => {
         })
       return this
     },
-    expectBookRangeIsCurrentRangeByTitle(title: string) {
+    expectBookBlockIsCurrentBlockByTitle(title: string) {
       pageIsNotLoading()
-      const row = bookRangeRows().contains(title)
+      const row = bookBlockRows().contains(title)
       row
-        .should('have.attr', 'data-current-range', 'true')
+        .should('have.attr', 'data-current-block', 'true')
         .and('have.attr', 'aria-current', 'location')
-      bookRangeRows()
-        .filter('[data-current-range="true"]')
+      bookBlockRows()
+        .filter('[data-current-block="true"]')
         .should('have.length', 1)
       return this
     },
@@ -189,31 +189,31 @@ const bookReadingPage = () => {
       return this
     },
     /**
-     * After PDF scroll updates the current range to a lower book range, the book layout aside should
+     * After PDF scroll updates the current block to a lower book block, the book layout aside should
      * scroll so that row is not clipped (Phase 6.5). Expects a short viewport so the list overflows.
      */
-    expectCurrentRangeVisibleInBookLayoutAside(title: string) {
-      this.expectBookRangeIsCurrentRangeByTitle(title)
+    expectCurrentBlockVisibleInBookLayoutAside(title: string) {
+      this.expectBookBlockIsCurrentBlockByTitle(title)
       cy.get('[data-testid="book-reading-book-layout-aside"]').should(
         ($aside) => {
           expect(
             $aside[0]!.scrollTop,
-            'book layout aside should have scrolled to reveal the current range'
+            'book layout aside should have scrolled to reveal the current block'
           ).to.be.greaterThan(0)
         }
       )
-      bookRangeRows().contains(title).should('be.visible')
+      bookBlockRows().contains(title).should('be.visible')
       return this
     },
     /**
      * Reading Control Panel (Phase 2 reading record): bottom of PDF main pane.
      * Contract for production: data-testid book-reading-reading-control-panel + book-reading-mark-as-read.
      */
-    markBookRangeAsReadInReadingControlPanel(rangeTitle: string) {
+    markBookBlockAsReadInReadingControlPanel(blockTitle: string) {
       pageIsNotLoading()
       cy.get('[data-testid="book-reading-reading-control-panel"]')
         .should('be.visible')
-        .and('contain', rangeTitle)
+        .and('contain', blockTitle)
       cy.get('[data-testid="book-reading-mark-as-read"]')
         .should('be.visible')
         .click()
@@ -223,9 +223,9 @@ const bookReadingPage = () => {
      * Book layout row marked as read: `data-direct-content-read="true"` plus success right border
      * and screen-reader “Marked as read” on the row.
      */
-    expectBookRangeMarkedAsReadInBookLayout(title: string) {
+    expectBookBlockMarkedAsReadInBookLayout(title: string) {
       pageIsNotLoading()
-      bookRangeRows()
+      bookBlockRows()
         .contains(title)
         .should('have.attr', 'data-direct-content-read', 'true')
       return this

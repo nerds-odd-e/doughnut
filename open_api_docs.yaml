@@ -5,19 +5,19 @@ info:
 servers:
 - url: ""
 paths:
-  /api/notebooks/{notebook}/book/ranges/{bookRange}/reading-record:
+  /api/notebooks/{notebook}/book/blocks/{bookBlock}/reading-record:
     put:
       tags:
       - notebook-books-controller
-      summary: Mark book range as read for the current user
-      operationId: putNotebookBookRangeReadingRecord
+      summary: Mark book block as read for the current user
+      operationId: putNotebookBookBlockReadingRecord
       parameters:
       - name: notebook
         in: path
         required: true
         schema:
           type: integer
-      - name: bookRange
+      - name: bookBlock
         in: path
         required: true
         schema:
@@ -30,7 +30,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/BookRangeReadingRecordListItem"
+                  $ref: "#/components/schemas/BookBlockReadingRecordListItem"
   /api/user:
     get:
       tags:
@@ -2576,7 +2576,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/BookRangeReadingRecordListItem"
+                  $ref: "#/components/schemas/BookBlockReadingRecordListItem"
   /api/notebooks/{notebook}/book/file:
     get:
       tags:
@@ -3036,10 +3036,10 @@ paths:
           description: OK
 components:
   schemas:
-    BookRangeReadingRecordListItem:
+    BookBlockReadingRecordListItem:
       type: object
       properties:
-        bookRangeId:
+        bookBlockId:
           type: string
         status:
           type: string
@@ -3047,7 +3047,7 @@ components:
           type: string
           format: date-time
       required:
-      - bookRangeId
+      - bookBlockId
       - completedAt
       - status
     Circle:
@@ -3728,7 +3728,7 @@ components:
       - anchorFormat
       - id
       - value
-    BookRange_Full:
+    BookBlock_Full:
       type: object
       properties:
         id:
@@ -3741,7 +3741,7 @@ components:
           format: int64
         title:
           type: string
-        parentRangeId:
+        parentBlockId:
           type: string
       required:
       - id
@@ -3763,10 +3763,10 @@ components:
         updatedAt:
           type: string
           format: date-time
-        ranges:
+        blocks:
           type: array
           items:
-            $ref: "#/components/schemas/BookRange_Full"
+            $ref: "#/components/schemas/BookBlock_Full"
         notebookId:
           type: string
         hasSourceFile:

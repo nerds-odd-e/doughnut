@@ -26,32 +26,32 @@ Feature: Book browsing
       | 1 | 5. Refactoring in Team Development |
       | 1 | 6. Why Refactoring Matters More with AI |
     And I should see the beginning of the PDF book "refactoring.pdf"
-    When I choose the book range "2. The Usual Defi nition Is Not Enough"
+    When I choose the book block "2. The Usual Defi nition Is Not Enough"
     Then I should see in the book reader visible PDF viewport on page 1 text including "Usual Definition"
-    When I choose the book range "1. Refactoring: Protecting Intention in Working Software"
+    When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
     Then I should see in the book reader visible PDF viewport on page 1 text including "Protecting Intention"
 
-  Scenario: Book range jumps the PDF to the anchored page
-    When I choose the book range "2.2 Refactoring as Strengthening the Code"
+  Scenario: Book block jumps the PDF to the anchored page
+    When I choose the book block "2.2 Refactoring as Strengthening the Code"
     Then I should see in the book reader visible PDF viewport on page 2 text including "Strengthening the Code"
-    And the book range "2.2 Refactoring as Strengthening the Code" should be the current selection in the book reader
+    And the book block "2.2 Refactoring as Strengthening the Code" should be the current selection in the book reader
 
-  Scenario: Scrolling the PDF updates the current range
+  Scenario: Scrolling the PDF updates the current block
     When I scroll the PDF book reader to bring page 2 into primary view
     Then I should see in the book reader visible PDF viewport on page 2 text including "Strengthening the Code"
-    And the book range "2.2 Refactoring as Strengthening the Code" should be the current range in the book reader
+    And the book block "2.2 Refactoring as Strengthening the Code" should be the current block in the book reader
 
-  Scenario: Short viewport scrolls book layout aside so the current range stays visible
+  Scenario: Short viewport scrolls book layout aside so the current block stays visible
     When I set the book reading viewport to 1200 by 280
     And I scroll the PDF book reader to bring page 2 into primary view
     Then I should see in the book reader visible PDF viewport on page 2 text including "Strengthening the Code"
-    And the book range "2.2 Refactoring as Strengthening the Code" should be the current range and visible in the book layout aside
+    And the book block "2.2 Refactoring as Strengthening the Code" should be the current block and visible in the book layout aside
 
-  Scenario: Same-page scroll moves the current range; the current selection stays the explicit choice
-    When I choose the book range "1. Refactoring: Protecting Intention in Working Software"
-    Then the book range "1. Refactoring: Protecting Intention in Working Software" should be the current selection in the book reader
-    And the book range "1. Refactoring: Protecting Intention in Working Software" should be the current range in the book reader
-    When I scroll the PDF book reader down within the same page to move viewport past the next book range bbox
+  Scenario: Same-page scroll moves the current block; the current selection stays the explicit choice
+    When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
+    Then the book block "1. Refactoring: Protecting Intention in Working Software" should be the current selection in the book reader
+    And the book block "1. Refactoring: Protecting Intention in Working Software" should be the current block in the book reader
+    When I scroll the PDF book reader down within the same page to move viewport past the next book block bbox
     Then I should see in the book reader visible PDF viewport on page 1 text including "Easier to Change"
-    And the book range "1. Refactoring: Protecting Intention in Working Software" should be the current selection in the book reader
-    And the book range "2.1 Easier to Change—and Harder to Misuse" should be the current range in the book reader
+    And the book block "1. Refactoring: Protecting Intention in Working Software" should be the current selection in the book reader
+    And the book block "2.1 Easier to Change—and Harder to Misuse" should be the current block in the book reader

@@ -5,7 +5,7 @@ import static com.odde.doughnut.services.book.BookReadingWireConstants.BOOK_FORM
 
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookAnchor;
-import com.odde.doughnut.entities.BookRange;
+import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
@@ -16,7 +16,7 @@ public class BookBuilder extends EntityBuilder<Book> {
   private Notebook notebook;
   private byte[] pdfBytes = new byte[] {1};
   private String bookName = "Linear Algebra";
-  private String rootRangeTitle = "X";
+  private String rootBlockTitle = "X";
 
   public BookBuilder(MakeMe makeMe) {
     super(makeMe, new Book());
@@ -37,8 +37,8 @@ public class BookBuilder extends EntityBuilder<Book> {
     return this;
   }
 
-  public BookBuilder rootRangeTitle(String title) {
-    this.rootRangeTitle = title;
+  public BookBuilder rootBlockTitle(String title) {
+    this.rootBlockTitle = title;
     return this;
   }
 
@@ -69,11 +69,11 @@ public class BookBuilder extends EntityBuilder<Book> {
     anchor.setAnchorFormat(ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1);
     anchor.setValue("{\"p\":1}");
 
-    BookRange range = new BookRange();
-    range.setStructuralTitle(rootRangeTitle);
-    range.setStartAnchor(anchor);
-    range.setParent(null);
-    range.setSiblingOrder(0);
-    entity.addRange(range);
+    BookBlock block = new BookBlock();
+    block.setStructuralTitle(rootBlockTitle);
+    block.setStartAnchor(anchor);
+    block.setParent(null);
+    block.setSiblingOrder(0);
+    entity.addBlock(block);
   }
 }

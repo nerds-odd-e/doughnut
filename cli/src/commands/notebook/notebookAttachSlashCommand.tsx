@@ -4,7 +4,7 @@ import { basename, extname, resolve } from 'node:path'
 import { useEffect, useRef } from 'react'
 import { Box } from 'ink'
 import { Spinner } from '@inkjs/ui'
-import type { BookRangeFull, Notebook } from 'doughnut-api'
+import type { BookBlockFull, Notebook } from 'doughnut-api'
 import { attachNotebookBookWithPdf } from '../../backendApi/doughnutBackendClient.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import type {
@@ -35,24 +35,24 @@ function normParentId(v: string | number | undefined | null): string | null {
   return String(v)
 }
 
-function bookRangesTreeLines(ranges: BookRangeFull[] | undefined): string {
-  if (ranges === undefined || ranges.length === 0) {
+function bookBlocksTreeLines(blocks: BookBlockFull[] | undefined): string {
+  if (blocks === undefined || blocks.length === 0) {
     return ''
   }
-  const roots = ranges
-    .filter((r) => normParentId(r.parentRangeId) === null)
+  const roots = blocks
+    .filter((r) => normParentId(r.parentBlockId) === null)
     .sort((a, b) => Number(a.siblingOrder ?? 0) - Number(b.siblingOrder ?? 0))
 
   const lines: string[] = []
-  function walk(nodes: BookRangeFull[], depth: number): void {
+  function walk(nodes: BookBlockFull[], depth: number): void {
     const sorted = [...nodes].sort(
       (a, b) => Number(a.siblingOrder ?? 0) - Number(b.siblingOrder ?? 0)
     )
     for (const r of sorted) {
       lines.push(`${'  '.repeat(depth)}${r.title}`)
       const idStr = String(r.id)
-      const children = ranges.filter(
-        (x) => normParentId(x.parentRangeId) === idStr
+      const children = blocks.filter(
+        (x) => normParentId(x.parentBlockId) === idStr
       )
       walk(children, depth + 1)
     }
@@ -114,7 +114,7 @@ async function runNotebookAttachPdf(
     absPdf
   )
 
-  const tree = bookRangesTreeLines(book.ranges)
+  const tree = bookBlocksTreeLines(book.blocks)
   const excerpt = truncateForBookOutlineAssistant(
     tree === '' ? book.bookName : tree
   )

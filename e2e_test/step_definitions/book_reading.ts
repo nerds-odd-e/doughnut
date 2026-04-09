@@ -1,5 +1,5 @@
 /**
- * Book-reading scenarios: thin glue to `e2e_test/start/pageObjects/cli`.
+ * Book-reading scenarios: thin glue to `e2e_test/start/pageObjects/bookReadingPage`.
  */
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
@@ -84,7 +84,7 @@ When(
 )
 
 When(
-  'I scroll the PDF book reader down within the same page to move viewport past the next book range bbox',
+  'I scroll the PDF book reader down within the same page to move viewport past the next book block bbox',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   () => {
     return bookReadingPage().scrollPdfBookReaderDownWithinSamePageForNextBbox()
@@ -92,46 +92,46 @@ When(
 )
 
 When(
-  'I choose the book range {string}',
+  'I choose the book block {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
-    return bookReadingPage().clickBookRangeByTitle(title)
+    return bookReadingPage().clickBookBlockByTitle(title)
   }
 )
 
 When(
-  'I scroll the PDF until the book range {string} is the current range in the book reader',
+  'I scroll the PDF until the book block {string} is the current block in the book reader',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (rangeTitle: string) => {
-    return bookReadingPage().scrollPdfBookReaderToMakeBookRangeCurrent(
-      rangeTitle
+  (blockTitle: string) => {
+    return bookReadingPage().scrollPdfBookReaderToMakeBookBlockCurrent(
+      blockTitle
     )
   }
 )
 
 When(
-  'I mark the book range {string} as read in the Reading Control Panel',
+  'I mark the book block {string} as read in the Reading Control Panel',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (rangeTitle: string) => {
-    return bookReadingPage().markBookRangeAsReadInReadingControlPanel(
-      rangeTitle
+  (blockTitle: string) => {
+    return bookReadingPage().markBookBlockAsReadInReadingControlPanel(
+      blockTitle
     )
   }
 )
 
 Then(
-  'I should see that book range {string} is marked as read in the book layout',
+  'I should see that book block {string} is marked as read in the book layout',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
-    return bookReadingPage().expectBookRangeMarkedAsReadInBookLayout(title)
+    return bookReadingPage().expectBookBlockMarkedAsReadInBookLayout(title)
   }
 )
 
 Then(
-  'I should see that book range {string} is selected in the book layout',
+  'I should see that book block {string} is selected in the book layout',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
-    return bookReadingPage().expectBookRangeIsCurrentSelectionByTitle(title)
+    return bookReadingPage().expectBookBlockIsCurrentSelectionByTitle(title)
   }
 )
 
@@ -146,25 +146,25 @@ Then(
 )
 
 Then(
-  'the book range {string} should be the current selection in the book reader',
+  'the book block {string} should be the current selection in the book reader',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
-    return bookReadingPage().expectBookRangeIsCurrentSelectionByTitle(title)
+    return bookReadingPage().expectBookBlockIsCurrentSelectionByTitle(title)
   }
 )
 
 Then(
-  'the book range {string} should be the current range in the book reader',
+  'the book block {string} should be the current block in the book reader',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
-    return bookReadingPage().expectBookRangeIsCurrentRangeByTitle(title)
+    return bookReadingPage().expectBookBlockIsCurrentBlockByTitle(title)
   }
 )
 
 Then(
-  'the book range {string} should be the current range and visible in the book layout aside',
+  'the book block {string} should be the current block and visible in the book layout aside',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
-    return bookReadingPage().expectCurrentRangeVisibleInBookLayoutAside(title)
+    return bookReadingPage().expectCurrentBlockVisibleInBookLayoutAside(title)
   }
 )

@@ -1,7 +1,7 @@
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import BookReadingPage from "@/pages/BookReadingPage.vue"
-import type { BookRangeFull } from "@generated/doughnut-backend-api"
+import type { BookBlockFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import helper, { wrapSdkResponse } from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -13,7 +13,7 @@ import topMathsUrl from "../../../e2e_test/fixtures/book_reading/top-maths.pdf?u
 const fetchMock = createFetchMock(vi)
 
 /** Keep in sync with `BookReadingPage.vue` */
-const CURRENT_RANGE_ANCHOR_DEBOUNCE_MS = 120
+const CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS = 120
 const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 
 const notebookId = 7
@@ -24,7 +24,7 @@ function bookFileUrlSuffix(id: number) {
   return `/api/notebooks/${id}/book/file`
 }
 
-function topMathsLikeFlatRanges(): BookRangeFull[] {
+function topMathsLikeFlatBlocks(): BookBlockFull[] {
   const anchors = makeMe.bookReadingTopMathsLikeAnchors()
   return anchors.map((startAnchor, i) => ({
     id: i + 1,
@@ -119,22 +119,22 @@ function stubGetBookPlain() {
     .mockResolvedValue(wrapSdkResponse(makeMe.aBook.please()))
 }
 
-function stubGetBookWithTopMathsRanges() {
+function stubGetBookWithTopMathsBlocks() {
   return vi
     .spyOn(NotebookBooksController, "getBook")
     .mockResolvedValue(
-      wrapSdkResponse(makeMe.aBook.ranges(topMathsLikeFlatRanges()).please())
+      wrapSdkResponse(makeMe.aBook.blocks(topMathsLikeFlatBlocks()).please())
     )
 }
 
-async function mountLoadedBookWithRanges(
+async function mountLoadedBookWithBlocks(
   id: number,
   options?: {
     innerWidth?: number
     assertSameOriginCredentials?: boolean
   }
 ) {
-  stubGetBookWithTopMathsRanges()
+  stubGetBookWithTopMathsBlocks()
   mockNotebookBookFilePdfOk(id, topMathsPdfBytes, {
     assertSameOriginCredentials: options?.assertSameOriginCredentials,
   })
@@ -167,7 +167,7 @@ function pdfScrollRestoreSpy(wrapper: BookReadingPageWrapper) {
 }
 
 async function mountPatchDebounceScenario() {
-  stubGetBookWithTopMathsRanges()
+  stubGetBookWithTopMathsBlocks()
   mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
   const patchSpy = vi
     .spyOn(NotebookBooksController, "patchNotebookBookReadingPosition")
@@ -299,8 +299,8 @@ describe("BookReadingPage", () => {
     expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(false)
   })
 
-  it("updates current range while book layout drawer is closed (Phase 6.9)", async () => {
-    const wrapper = await mountLoadedBookWithRanges(notebookId, {
+  it("updates current block while book layout drawer is closed (Phase 6.9)", async () => {
+    const wrapper = await mountLoadedBookWithBlocks(notebookId, {
       innerWidth: 500,
     })
     const pdf = wrapper.findComponent(PdfBookViewer)
@@ -311,7 +311,7 @@ describe("BookReadingPage", () => {
         viewport: null,
         pagesCount: 10,
       })
-      await vi.advanceTimersByTimeAsync(CURRENT_RANGE_ANCHOR_DEBOUNCE_MS)
+      await vi.advanceTimersByTimeAsync(CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS)
       await flushPromises()
     })
 
@@ -321,14 +321,14 @@ describe("BookReadingPage", () => {
     expect(indicator.exists()).toBe(true)
     expect(indicator.text().trim()).toBe("1 / 10")
 
-    const current = wrapper.find('[data-current-range="true"]')
+    const current = wrapper.find('[data-current-block="true"]')
     expect(current.exists()).toBe(true)
     expect(current.attributes("aria-current")).toBe("location")
     expect(current.text()).toBe("Section 3")
   })
 
   it("zoom buttons exist with accessible names and page indicator shows via PdfControl (Phase 12)", async () => {
-    const wrapper = await mountLoadedBookWithRanges(notebookId)
+    const wrapper = await mountLoadedBookWithBlocks(notebookId)
     expect(
       wrapper.find('[data-testid="pdf-zoom-in"]').attributes("aria-label")
     ).toBe("Zoom in")
@@ -343,7 +343,7 @@ describe("BookReadingPage", () => {
         viewport: null,
         pagesCount: 5,
       })
-      await vi.advanceTimersByTimeAsync(CURRENT_RANGE_ANCHOR_DEBOUNCE_MS)
+      await vi.advanceTimersByTimeAsync(CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS)
       await flushPromises()
     })
 
@@ -463,7 +463,7 @@ describe("BookReadingPage", () => {
 
   it("book layout toggle exposes aria-expanded and aria-controls (Phase 7.7)", async () => {
     await withStubbedInnerWidth(1024, async () => {
-      const wrapper = await mountLoadedBookWithRanges(notebookId)
+      const wrapper = await mountLoadedBookWithBlocks(notebookId)
 
       const toggle = wrapper.find(
         '[data-testid="book-reading-book-layout-toggle"]'
@@ -490,19 +490,19 @@ describe("BookReadingPage", () => {
       return wrapper.find('[data-testid="book-reading-reading-control-panel"]')
     }
 
-    async function clickBookRangeByTitle(
+    async function clickBookBlockByTitle(
       wrapper: BookReadingPageWrapper,
       title: string
     ) {
       const row = wrapper
-        .findAll('[data-testid="book-reading-book-range"]')
+        .findAll('[data-testid="book-reading-book-block"]')
         .find((w) => w.text() === title)
-      expect(row, `book range row "${title}"`).toBeDefined()
+      expect(row, `book block row "${title}"`).toBeDefined()
       await row!.trigger("click")
       await flushPromises()
     }
 
-    async function emitViewportAndSettleCurrentRange(
+    async function emitViewportAndSettleCurrentBlock(
       wrapper: BookReadingPageWrapper,
       payload: {
         anchorPageIndexZeroBased: number
@@ -513,47 +513,47 @@ describe("BookReadingPage", () => {
       const pdf = wrapper.findComponent(PdfBookViewer)
       await withFakeTimers(async () => {
         pdf.vm.$emit("viewportAnchorPage", payload)
-        await vi.advanceTimersByTimeAsync(CURRENT_RANGE_ANCHOR_DEBOUNCE_MS)
+        await vi.advanceTimersByTimeAsync(CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS)
         await flushPromises()
       })
     }
 
-    it("shows read border for ranges returned as READ from reading-records on load", async () => {
+    it("shows read border for blocks returned as READ from reading-records on load", async () => {
       vi.spyOn(
         NotebookBooksController,
         "getNotebookBookReadingRecords"
       ).mockResolvedValue(
         wrapSdkResponse([
           {
-            bookRangeId: "1",
+            bookBlockId: "1",
             status: "READ",
             completedAt: "2020-01-01T00:00:00Z",
           },
         ])
       )
-      const wrapper = await mountLoadedBookWithRanges(notebookId)
+      const wrapper = await mountLoadedBookWithBlocks(notebookId)
       const section1Row = wrapper
-        .findAll('[data-testid="book-reading-book-range"]')
+        .findAll('[data-testid="book-reading-book-block"]')
         .find((w) => w.text().trim().startsWith("Section 1"))
       expect(section1Row?.attributes("data-direct-content-read")).toBe("true")
     })
 
-    it("shows the panel when the selected range’s successor is the viewport current range", async () => {
-      const wrapper = await mountLoadedBookWithRanges(notebookId)
-      await clickBookRangeByTitle(wrapper, "Section 1")
+    it("shows the panel when the selected block’s successor is the viewport current block", async () => {
+      const wrapper = await mountLoadedBookWithBlocks(notebookId)
+      await clickBookBlockByTitle(wrapper, "Section 1")
       await vi.waitFor(() =>
         expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
           "Section 1"
         )
       )
 
-      await emitViewportAndSettleCurrentRange(wrapper, {
+      await emitViewportAndSettleCurrentBlock(wrapper, {
         anchorPageIndexZeroBased: 0,
         viewport: { top: 0, mid: 500, bottom: 1000 },
         pagesCount: 10,
       })
 
-      const current = wrapper.find('[data-current-range="true"]')
+      const current = wrapper.find('[data-current-block="true"]')
       expect(current.text()).toBe("Section 2")
 
       const panel = readingControlPanel(wrapper)
@@ -566,9 +566,9 @@ describe("BookReadingPage", () => {
     })
 
     it("hides the panel when nothing is selected", async () => {
-      const wrapper = await mountLoadedBookWithRanges(notebookId)
+      const wrapper = await mountLoadedBookWithBlocks(notebookId)
 
-      await emitViewportAndSettleCurrentRange(wrapper, {
+      await emitViewportAndSettleCurrentBlock(wrapper, {
         anchorPageIndexZeroBased: 0,
         viewport: { top: 0, mid: 500, bottom: 1000 },
         pagesCount: 10,
@@ -577,70 +577,70 @@ describe("BookReadingPage", () => {
       expect(readingControlPanel(wrapper).exists()).toBe(false)
     })
 
-    it("hides the panel when the current range is not the immediate successor of the selection", async () => {
-      const wrapper = await mountLoadedBookWithRanges(notebookId)
-      await clickBookRangeByTitle(wrapper, "Section 1")
+    it("hides the panel when the current block is not the immediate successor of the selection", async () => {
+      const wrapper = await mountLoadedBookWithBlocks(notebookId)
+      await clickBookBlockByTitle(wrapper, "Section 1")
       await vi.waitFor(() =>
         expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
           "Section 1"
         )
       )
 
-      await emitViewportAndSettleCurrentRange(wrapper, {
+      await emitViewportAndSettleCurrentBlock(wrapper, {
         anchorPageIndexZeroBased: 0,
         viewport: { top: 400, mid: 600, bottom: 1000 },
         pagesCount: 10,
       })
 
-      expect(wrapper.find('[data-current-range="true"]').text()).toBe(
+      expect(wrapper.find('[data-current-block="true"]').text()).toBe(
         "Section 3"
       )
       expect(readingControlPanel(wrapper).exists()).toBe(false)
     })
 
-    it("hides the panel when the selected range has no successor", async () => {
-      const wrapper = await mountLoadedBookWithRanges(notebookId)
-      await clickBookRangeByTitle(wrapper, "Section 6")
+    it("hides the panel when the selected block has no successor", async () => {
+      const wrapper = await mountLoadedBookWithBlocks(notebookId)
+      await clickBookBlockByTitle(wrapper, "Section 6")
       await vi.waitFor(() =>
         expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
           "Section 6"
         )
       )
 
-      await emitViewportAndSettleCurrentRange(wrapper, {
+      await emitViewportAndSettleCurrentBlock(wrapper, {
         anchorPageIndexZeroBased: 1,
         viewport: null,
         pagesCount: 10,
       })
 
-      expect(wrapper.find('[data-current-range="true"]').text()).toBe(
+      expect(wrapper.find('[data-current-block="true"]').text()).toBe(
         "Section 6"
       )
       expect(readingControlPanel(wrapper).exists()).toBe(false)
     })
 
-    it("moves book layout selection to the successor range after Mark as read", async () => {
+    it("moves book layout selection to the successor block after Mark as read", async () => {
       vi.spyOn(
         NotebookBooksController,
-        "putNotebookBookRangeReadingRecord"
+        "putNotebookBookBlockReadingRecord"
       ).mockResolvedValue(
         wrapSdkResponse([
           {
-            bookRangeId: "1",
+            bookBlockId: "1",
             status: "READ",
             completedAt: "2020-01-01T00:00:00Z",
           },
         ])
       )
-      const wrapper = await mountLoadedBookWithRanges(notebookId)
-      await clickBookRangeByTitle(wrapper, "Section 1")
+      const wrapper = await mountLoadedBookWithBlocks(notebookId)
+      await clickBookBlockByTitle(wrapper, "Section 1")
       await vi.waitFor(() =>
         expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
           "Section 1"
         )
       )
 
-      await emitViewportAndSettleCurrentRange(wrapper, {
+      await emitViewportAndSettleCurrentBlock(wrapper, {
         anchorPageIndexZeroBased: 0,
         viewport: { top: 0, mid: 500, bottom: 1000 },
         pagesCount: 10,
@@ -652,7 +652,7 @@ describe("BookReadingPage", () => {
       expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
         "Section 2"
       )
-      expect(wrapper.find('[data-current-range="true"]').text()).toBe(
+      expect(wrapper.find('[data-current-block="true"]').text()).toBe(
         "Section 2"
       )
     })
@@ -660,25 +660,25 @@ describe("BookReadingPage", () => {
     it("unmounts the reading control panel after Mark as read once it was shown", async () => {
       vi.spyOn(
         NotebookBooksController,
-        "putNotebookBookRangeReadingRecord"
+        "putNotebookBookBlockReadingRecord"
       ).mockResolvedValue(
         wrapSdkResponse([
           {
-            bookRangeId: "1",
+            bookBlockId: "1",
             status: "READ",
             completedAt: "2020-01-01T00:00:00Z",
           },
         ])
       )
-      const wrapper = await mountLoadedBookWithRanges(notebookId)
-      await clickBookRangeByTitle(wrapper, "Section 1")
+      const wrapper = await mountLoadedBookWithBlocks(notebookId)
+      await clickBookBlockByTitle(wrapper, "Section 1")
       await vi.waitFor(() =>
         expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
           "Section 1"
         )
       )
 
-      await emitViewportAndSettleCurrentRange(wrapper, {
+      await emitViewportAndSettleCurrentBlock(wrapper, {
         anchorPageIndexZeroBased: 0,
         viewport: { top: 0, mid: 500, bottom: 1000 },
         pagesCount: 10,
@@ -694,7 +694,7 @@ describe("BookReadingPage", () => {
       await flushPromises()
 
       const section1Row = wrapper
-        .findAll('[data-testid="book-reading-book-range"]')
+        .findAll('[data-testid="book-reading-book-block"]')
         .find((w) => /^Section 1(?:\s|$)/.test(w.text().trim()))
       expect(section1Row?.attributes("data-direct-content-read")).toBe("true")
       expect(wrapper.find('[data-current-selection="true"]').text()).toBe(

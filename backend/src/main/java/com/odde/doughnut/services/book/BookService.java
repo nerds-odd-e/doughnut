@@ -8,16 +8,16 @@ import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.AttachBookAnchorRequest;
 import com.odde.doughnut.controllers.dto.AttachBookLayoutNodeRequest;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
+import com.odde.doughnut.controllers.dto.BookBlockReadingRecordListItem;
 import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
-import com.odde.doughnut.controllers.dto.BookRangeReadingRecordListItem;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookAnchor;
-import com.odde.doughnut.entities.BookRange;
-import com.odde.doughnut.entities.BookRangeReadingRecord;
+import com.odde.doughnut.entities.BookBlock;
+import com.odde.doughnut.entities.BookBlockReadingRecord;
 import com.odde.doughnut.entities.BookUserLastReadPosition;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.BookRangeReadingRecordRepository;
+import com.odde.doughnut.entities.repositories.BookBlockReadingRecordRepository;
 import com.odde.doughnut.entities.repositories.BookRepository;
 import com.odde.doughnut.entities.repositories.BookUserLastReadPositionRepository;
 import com.odde.doughnut.exceptions.ApiException;
@@ -38,7 +38,7 @@ public class BookService {
 
   private final BookRepository bookRepository;
   private final BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
-  private final BookRangeReadingRecordRepository bookRangeReadingRecordRepository;
+  private final BookBlockReadingRecordRepository bookBlockReadingRecordRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final BookStorage bookStorage;
@@ -46,13 +46,13 @@ public class BookService {
   public BookService(
       BookRepository bookRepository,
       BookUserLastReadPositionRepository bookUserLastReadPositionRepository,
-      BookRangeReadingRecordRepository bookRangeReadingRecordRepository,
+      BookBlockReadingRecordRepository bookBlockReadingRecordRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       BookStorage bookStorage) {
     this.bookRepository = bookRepository;
     this.bookUserLastReadPositionRepository = bookUserLastReadPositionRepository;
-    this.bookRangeReadingRecordRepository = bookRangeReadingRecordRepository;
+    this.bookBlockReadingRecordRepository = bookBlockReadingRecordRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.bookStorage = bookStorage;
@@ -103,16 +103,16 @@ public class BookService {
   }
 
   @Transactional(readOnly = true)
-  public List<BookRangeReadingRecordListItem> listReadingRecordsForBook(
+  public List<BookBlockReadingRecordListItem> listReadingRecordsForBook(
       Notebook notebook, User user) {
     Book book = getBookForNotebook(notebook);
-    return bookRangeReadingRecordRepository
-        .findAllByUser_IdAndBookRange_Book_Id(user.getId(), book.getId())
+    return bookBlockReadingRecordRepository
+        .findAllByUser_IdAndBookBlock_Book_Id(user.getId(), book.getId())
         .stream()
         .map(
             row ->
-                new BookRangeReadingRecordListItem(
-                    row.getBookRange().getId(), row.getStatus(), row.getCompletedAt()))
+                new BookBlockReadingRecordListItem(
+                    row.getBookBlock().getId(), row.getStatus(), row.getCompletedAt()))
         .toList();
   }
 
@@ -147,26 +147,26 @@ public class BookService {
   }
 
   @Transactional
-  public void markRangeRead(Notebook notebook, User user, BookRange bookRange) {
+  public void markBlockRead(Notebook notebook, User user, BookBlock bookBlock) {
     Book book = getBookForNotebook(notebook);
-    if (!bookRange.getBook().getId().equals(book.getId())) {
+    if (!bookBlock.getBook().getId().equals(book.getId())) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
     }
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-    bookRangeReadingRecordRepository
-        .findByUser_IdAndBookRange_Id(user.getId(), bookRange.getId())
+    bookBlockReadingRecordRepository
+        .findByUser_IdAndBookBlock_Id(user.getId(), bookBlock.getId())
         .map(
             existing -> {
-              existing.setStatus(BookRangeReadingRecord.STATUS_READ);
+              existing.setStatus(BookBlockReadingRecord.STATUS_READ);
               existing.setCompletedAt(now);
               return entityPersister.save(existing);
             })
         .orElseGet(
             () -> {
-              var row = new BookRangeReadingRecord();
+              var row = new BookBlockReadingRecord();
               row.setUser(user);
-              row.setBookRange(bookRange);
-              row.setStatus(BookRangeReadingRecord.STATUS_READ);
+              row.setBookBlock(bookBlock);
+              row.setStatus(BookBlockReadingRecord.STATUS_READ);
               row.setCompletedAt(now);
               return entityPersister.save(row);
             });
@@ -290,7 +290,7 @@ public class BookService {
   }
 
   private void persistLayoutNode(
-      Book book, BookRange parent, AttachBookLayoutNodeRequest node, int siblingIndex, int depth) {
+      Book book, BookBlock parent, AttachBookLayoutNodeRequest node, int siblingIndex, int depth) {
     if (depth > MAX_LAYOUT_DEPTH) {
       throw new ApiException(
           "layout exceeds maximum depth of " + MAX_LAYOUT_DEPTH,
@@ -302,17 +302,17 @@ public class BookService {
     start.setAnchorFormat(ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1);
     start.setValue(node.getStartAnchor().getValue().trim());
 
-    BookRange range = new BookRange();
-    range.setStructuralTitle(trimmedMax(node.getTitle(), 512));
-    range.setStartAnchor(start);
-    range.setParent(parent);
-    range.setSiblingOrder(siblingIndex);
-    book.addRange(range);
+    BookBlock block = new BookBlock();
+    block.setStructuralTitle(trimmedMax(node.getTitle(), 512));
+    block.setStartAnchor(start);
+    block.setParent(parent);
+    block.setSiblingOrder(siblingIndex);
+    book.addBlock(block);
 
     List<AttachBookLayoutNodeRequest> children =
         node.getChildren() == null ? List.of() : node.getChildren();
     for (int j = 0; j < children.size(); j++) {
-      persistLayoutNode(book, range, children.get(j), j, depth + 1);
+      persistLayoutNode(book, block, children.get(j), j, depth + 1);
     }
   }
 

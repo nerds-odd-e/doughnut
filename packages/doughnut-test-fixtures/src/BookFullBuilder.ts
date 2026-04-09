@@ -1,4 +1,4 @@
-import type { BookFull, BookRangeFull } from '@generated/doughnut-backend-api'
+import type { BookFull, BookBlockFull } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 import generateId from './generateId'
 
@@ -12,7 +12,7 @@ class BookFullBuilder extends Builder<BookFull> {
       bookName: 'Test Book',
       format: 'pdf',
       hasSourceFile: true,
-      ranges: [],
+      blocks: [],
     }
   }
 
@@ -36,8 +36,8 @@ class BookFullBuilder extends Builder<BookFull> {
     return this
   }
 
-  ranges(ranges: BookRangeFull[]): BookFullBuilder {
-    this.data.ranges = ranges
+  blocks(blocks: BookBlockFull[]): BookFullBuilder {
+    this.data.blocks = blocks
     return this
   }
 

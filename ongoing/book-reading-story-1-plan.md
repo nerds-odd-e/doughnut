@@ -1,10 +1,10 @@
 # Plan: Story 1 — Add a PDF book to a notebook and browse its structure
 
-**Scope:** Only [Story: Add a PDF book to a notebook and browse its structure](book-reading-user-stories.md) (PDF, CLI attach, browser structure). Out of scope: reading ranges, reading record, navigation modes, EPUB, AI summaries, `ReadingRecord`, `SourceSpan` on notes.
+**Scope:** Only [Story: Add a PDF book to a notebook and browse its structure](book-reading-user-stories.md) (PDF, CLI attach, browser structure). Out of scope: reading blocks (reader flow), reading record, navigation modes, EPUB, AI summaries, `ReadingRecord`, `SourceSpan` on notes.
 
-**Architecture direction:** Align persisted shapes with [doughnut-book-reading-architecture-roadmap.md](doughnut-book-reading-architecture-roadmap.md) (`Book`, `BookRange`, `BookAnchor`). Do not duplicate that document here; update the roadmap when concrete storage/API choices land.
+**Architecture direction:** Align persisted shapes with [doughnut-book-reading-architecture-roadmap.md](doughnut-book-reading-architecture-roadmap.md) (`Book`, `BookBlock`, `BookAnchor`). Do not duplicate that document here; update the roadmap when concrete storage/API choices land.
 
-**Parsing boundary:** **CLI runs MinerU (or equivalent) in a subprocess** via [`cli/python/mineru_book_outline.py`](../cli/python/mineru_book_outline.py) and **`runMineruOutlineSubprocess`**, then sends **extracted outline** to the server. Historical spike notes: [spike-mineru-read-layout.md](spike-mineru-read-layout.md). **PDF bytes are not sent on `attach-book`** (separate upload/bind flow—see Phase 3 notes). The server stores the range tree from the nested layout payload; it does **not** need to run Python/MinerU in v1.
+**Parsing boundary:** **CLI runs MinerU (or equivalent) in a subprocess** via [`cli/python/mineru_book_outline.py`](../cli/python/mineru_book_outline.py) and **`runMineruOutlineSubprocess`**, then sends **extracted outline** to the server. Historical spike notes: [spike-mineru-read-layout.md](spike-mineru-read-layout.md). **PDF bytes are not sent on `attach-book`** (separate upload/bind flow—see Phase 3 notes). The server stores the block tree from the nested layout payload; it does **not** need to run Python/MinerU in v1.
 
 **Test discipline:** Follow [.cursor/rules/planning.mdc](../.cursor/rules/planning.mdc): one main user-visible outcome per phase, observable assertions (CLI stdout/transcript, HTTP, Cypress DOM), avoid layer-only phases without a visible slice.
 
@@ -24,7 +24,7 @@
 
 ---
 
-## Phase 2 — Domain + API: book on notebook, outline as `Book` / `BookRange` / `BookAnchor`
+## Phase 2 — Domain + API: book on notebook, outline as `Book` / `BookBlock` / `BookAnchor`
 
 **User outcome:** A **logged-in integrator** (tests use the same auth path as the rest of the app) can create a **`format: pdf` book record** on a **notebook** via **`attach-book`** (name + **nested** layout only) and fetch a **JSON representation of the outline** suitable for the browser. **PDF file bytes are not part of Phase 2’s endpoint.** This phase is **API-visible**; the browser may not be updated yet.
 
@@ -38,13 +38,13 @@
 | AuthZ | Same as other notebook mutations: caller must be allowed to modify the target notebook (reuse `Notebook` path variable + `authorizationService.assertAuthorization(notebook)` pattern). |
 | Content type | **`application/json`** — request body is the DTO below (**no** `multipart`, **no** file part). |
 | Body | Single JSON object: `bookName`, `format`, `layout` (nested tree—see below). |
-| Response | **`201 Created`** with the persisted **`Book`** JSON (same shape as **`GET .../book`**): metadata plus **`ranges`** (flat list with `parentRangeId`, `siblingOrder`, `title`, anchors). At most **one book per notebook**; a second **`attach-book`** for the same notebook should fail (**`409 Conflict`** or equivalent). Errors: **`400`** validation (invalid layout, wrong content type), **`403`** / **`404`** consistent with notebook APIs. |
+| Response | **`201 Created`** with the persisted **`Book`** JSON (same shape as **`GET .../book`**): metadata plus **`blocks`** (flat list with `parentBlockId`, `siblingOrder`, `title`, anchors). At most **one book per notebook**; a second **`attach-book`** for the same notebook should fail (**`409 Conflict`** or equivalent). Errors: **`400`** validation (invalid layout, wrong content type), **`403`** / **`404`** consistent with notebook APIs. |
 
 **Rationale:** Outline-only attach keeps a clear boundary: **structure** is declared in one JSON payload; **bytes** follow a separate API or flow so this handler stays simple and testable.
 
 ### Request JSON (wire DTO)
 
-This is the **interchange structure** the CLI (Phase 3) builds from MinerU / outline scripts **without** the server re-running Python. There are **no client-supplied `BookRange` ids**—the nested tree is the **canonical** on-the-wire shape; the server **validates** and **walks** the tree in **array order** (sibling order = `children[]` order) and **assigns** surrogate keys and parent links on insert. Do **not** require a flatten-and-“normalize” step keyed by temporary ids; persistence derives parent/child **only** from nesting.
+This is the **interchange structure** the CLI (Phase 3) builds from MinerU / outline scripts **without** the server re-running Python. There are **no client-supplied `BookBlock` ids**—the nested tree is the **canonical** on-the-wire shape; the server **validates** and **walks** the tree in **array order** (sibling order = `children[]` order) and **assigns** surrogate keys and parent links on insert. Do **not** require a flatten-and-“normalize” step keyed by temporary ids; persistence derives parent/child **only** from nesting.
 
 | Field | Type | Required | Notes |
 |-------|------|----------|--------|
@@ -62,7 +62,7 @@ This is the **interchange structure** the CLI (Phase 3) builds from MinerU / out
 
 | Field | Type | Required | Notes |
 |-------|------|----------|--------|
-| `title` | string | yes | Maps to `BookRange.structuralTitle` / tree label (non-empty after trim). |
+| `title` | string | yes | Maps to `BookBlock.structuralTitle` / tree label (non-empty after trim). |
 | `startAnchor` | anchor object | yes | See below. |
 | `children` | array | no | Same as `roots` element shape; **omit or use `[]`** for leaves. Sibling order = array order. |
 
@@ -76,21 +76,21 @@ This is the **interchange structure** the CLI (Phase 3) builds from MinerU / out
 **Server mapping (directional, not implementation detail):**
 
 - One `Book` per successful `attach-book`: `format` and `bookName` from payload; **`sourceFileRef` unset or null** until a later upload/bind step.
-- Recursive descent of `layout.roots` / `children` → one **`BookRange`** per node, parent/child from **nesting**, `structuralTitle` from `title`, `startAnchor` → **`BookAnchor`** row.
+- Recursive descent of `layout.roots` / `children` → one **`BookBlock`** per node, parent/child from **nesting**, `structuralTitle` from `title`, `startAnchor` → **`BookAnchor`** row.
 - Reject: invalid anchors, or structural violations (e.g. excessively deep tree—limit TBD if needed).
 
 ### Read path for Phase 2
 
-**`GET /api/notebooks/{notebook}/book`** returns the **only** **`Book`** for that notebook (metadata + flat **`ranges`** with server-assigned ids, `title`, anchors, `parentRangeId`, `siblingOrder`). **No `{book}` path segment**—one notebook has at most one book. **`404`** when the notebook has no book yet. There is **no** list-books endpoint. **Create via `attach-book`**, **read via `GET .../book`**. OpenAPI documents the `Book` schema.
+**`GET /api/notebooks/{notebook}/book`** returns the **only** **`Book`** for that notebook (metadata + flat **`blocks`** with server-assigned ids, `title`, anchors, `parentBlockId`, `siblingOrder`). **No `{book}` path segment**—one notebook has at most one book. **`404`** when the notebook has no book yet. There is **no** list-books endpoint. **Create via `attach-book`**, **read via `GET .../book`**. OpenAPI documents the `Book` schema.
 
 **Data shape (directional, persistence):**
 
 - One `Book` per logical attach on a notebook: `format` from payload; **`sourceFileRef`** populated only after the **separate** file pipeline lands.
-- Outline nodes map to **`BookRange`** with parent/child links from the stored tree, `structuralTitle` text, and one **`BookAnchor`** per range (`anchorFormat` + `value` per roadmap).
+- Outline nodes map to **`BookBlock`** with parent/child links from the stored tree, `structuralTitle` text, and one **`BookAnchor`** per block (`anchorFormat` + `value` per roadmap).
 
 **Tests:** Prefer **controller-level** tests with real DB (`@Transactional`) and **`makeMe`** factories. Assert HTTP response bodies and persistence (e.g. reload from repository), not internal service private methods. Use **`application/json`** request bodies (nested `layout.roots` / `children`).
 
-**Phase complete when:** Migrations applied (including **one book per notebook** in storage); **`POST .../attach-book`** persists book + outline under auth (**no** file on this route); **`GET .../book`** returns **`Book`** JSON with range ids; OpenAPI updated for any surface consumed by the frontend / `doughnut-api` generation.
+**Phase complete when:** Migrations applied (including **one book per notebook** in storage); **`POST .../attach-book`** persists book + outline under auth (**no** file on this route); **`GET .../book`** returns **`Book`** JSON with block ids; OpenAPI updated for any surface consumed by the frontend / `doughnut-api` generation.
 
 ---
 
@@ -108,7 +108,7 @@ This is the **interchange structure** the CLI (Phase 3) builds from MinerU / out
 
 ## Phase 4 — Browser: see the book layout for the notebook
 
-**User outcome:** The user opens the **relevant notebook experience in the web app** and **sees the attached PDF’s book layout** (hierarchical **book ranges**: expand/collapse or equivalent—match Doughnut’s existing navigation patterns). This satisfies the story’s **Then** clause: *see the book layout of the notebook “Top Maths” in the browser*.
+**User outcome:** The user opens the **relevant notebook experience in the web app** and **sees the attached PDF’s book layout** (hierarchical **book blocks**: expand/collapse or equivalent—match Doughnut’s existing navigation patterns). This satisfies the story’s **Then** clause: *see the book layout of the notebook “Top Maths” in the browser*.
 
 **UX placement:** Prefer the smallest change that fits existing IA (notebook detail sidebar, a “Books” tab, or a dedicated sub-route—decide during implementation; document the chosen entry point briefly here when known).
 
@@ -131,7 +131,7 @@ This is the **interchange structure** the CLI (Phase 3) builds from MinerU / out
 
 ## Explicit non-goals (later stories)
 
-- Reading inside the app (range reader), splitting ranges, progress, notes with `SourceSpan`, citations, EPUB.
+- Reading inside the app (block reader), splitting blocks, progress, notes with `SourceSpan`, citations, EPUB.
 
 ## Risks / product notes (from research)
 

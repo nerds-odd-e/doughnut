@@ -8,10 +8,10 @@
         role="status"
         aria-live="polite"
         aria-atomic="true"
-        data-testid="book-reading-current-range-live"
+        data-testid="book-reading-current-block-live"
         class="daisy-sr-only"
       >
-        {{ currentRangeLiveText }}
+        {{ currentBlockLiveText }}
       </div>
       <GlobalBar>
         <button
@@ -94,34 +94,34 @@
             class="daisy-p-3 daisy-pb-8"
           >
             <button
-              v-for="range in bookRangeRows"
-              :key="range.id"
+              v-for="block in bookBlockRows"
+              :key="block.id"
               type="button"
-              data-testid="book-reading-book-range"
-              class="book-reading-book-range"
-              :data-book-range-depth="range.depth"
-              :data-current-range="
-                range.startAnchor.id === currentRangeAnchorId
+              data-testid="book-reading-book-block"
+              class="book-reading-book-block"
+              :data-book-block-depth="block.depth"
+              :data-current-block="
+                block.startAnchor.id === currentBlockAnchorId
                   ? 'true'
                   : undefined
               "
               :data-current-selection="
-                range.id === currentSelectionRangeId ? 'true' : undefined
+                block.id === currentSelectionBlockId ? 'true' : undefined
               "
               :data-direct-content-read="
-                bookReading.isDirectContentRead(range.id) ? 'true' : undefined
+                bookReading.isDirectContentRead(block.id) ? 'true' : undefined
               "
               :aria-current="
-                range.startAnchor.id === currentRangeAnchorId
+                block.startAnchor.id === currentBlockAnchorId
                   ? 'location'
                   : undefined
               "
-              :style="{ paddingLeft: `${range.depth * 0.75}rem` }"
-              @click="onBookRangeClick(range)"
+              :style="{ paddingLeft: `${block.depth * 0.75}rem` }"
+              @click="onBookBlockClick(block)"
             >
-              {{ range.title }}
+              {{ block.title }}
               <span
-                v-if="bookReading.isDirectContentRead(range.id)"
+                v-if="bookReading.isDirectContentRead(block.id)"
                 class="daisy-sr-only"
               >
                 Marked as read
@@ -155,8 +155,8 @@
             />
             <ReadingControlPanel
               v-if="readingControlPanelVisible"
-              :selected-range-title="readingControlSelectedRangeTitle"
-              @mark-as-read="markSelectedRangeAsRead"
+              :selected-block-title="readingControlSelectedBlockTitle"
+              @mark-as-read="markSelectedBlockAsRead"
             />
           </template>
         </main>
@@ -176,21 +176,21 @@ import {
   type PdfOutlineV1NavigationTarget,
 } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
-import { createCurrentRangeAnchorDebouncer } from "@/lib/book-reading/debounceCurrentRangeAnchorId"
-import { nextLiveAnnouncementText } from "@/lib/book-reading/currentRangeLiveAnnouncement"
-import { currentRangeAnchorIdFromAnchorPage } from "@/lib/book-reading/currentRangeAnchorFromAnchorPage"
+import { createCurrentBlockAnchorDebouncer } from "@/lib/book-reading/debounceCurrentBlockAnchorId"
+import { nextLiveAnnouncementText } from "@/lib/book-reading/currentBlockLiveAnnouncement"
+import { currentBlockAnchorIdFromAnchorPage } from "@/lib/book-reading/currentBlockAnchorFromAnchorPage"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
 import type {
   BookAnchorFull,
+  BookBlockFull,
   BookFull,
-  BookRangeFull,
 } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
-const CURRENT_RANGE_ANCHOR_DEBOUNCE_MS = 120
+const CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS = 120
 const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 
 const props = defineProps({
@@ -237,26 +237,26 @@ function onPdfLoadError(message: string) {
   resetPdfPageIndicator()
 }
 
-type BookRangeRow = {
+type BookBlockRow = {
   id: number
   title: string
   depth: number
   startAnchor: BookAnchorFull
 }
 
-function buildFlatBookRanges(ranges: BookRangeFull[]): BookRangeRow[] {
-  const childrenMap = new Map<number | null, BookRangeFull[]>()
-  for (const range of ranges) {
+function buildFlatBookBlocks(blocks: BookBlockFull[]): BookBlockRow[] {
+  const childrenMap = new Map<number | null, BookBlockFull[]>()
+  for (const block of blocks) {
     const parentId =
-      range.parentRangeId != null ? Number(range.parentRangeId) : null
+      block.parentBlockId != null ? Number(block.parentBlockId) : null
     const siblings = childrenMap.get(parentId) ?? []
-    siblings.push(range)
+    siblings.push(block)
     childrenMap.set(parentId, siblings)
   }
-  const sortByOrder = (a: BookRangeFull, b: BookRangeFull) =>
+  const sortByOrder = (a: BookBlockFull, b: BookBlockFull) =>
     (a.siblingOrder ?? 0) - (b.siblingOrder ?? 0)
 
-  const result: BookRangeRow[] = []
+  const result: BookBlockRow[] = []
   function visit(parentId: number | null, depth: number) {
     const children = (childrenMap.get(parentId) ?? []).slice().sort(sortByOrder)
     for (const child of children) {
@@ -273,26 +273,26 @@ function buildFlatBookRanges(ranges: BookRangeFull[]): BookRangeRow[] {
   return result
 }
 
-const flatBookRanges = ref<BookRangeRow[]>([])
-const bookRangeRows = computed(() => flatBookRanges.value)
-const currentSelectionRangeId = ref<number | null>(null)
-const currentRangeAnchorId = ref<number | null>(null)
+const flatBookBlocks = ref<BookBlockRow[]>([])
+const bookBlockRows = computed(() => flatBookBlocks.value)
+const currentSelectionBlockId = ref<number | null>(null)
+const currentBlockAnchorId = ref<number | null>(null)
 
-const readingControlSelectedRangeTitle = computed(() => {
-  const selId = currentSelectionRangeId.value
+const readingControlSelectedBlockTitle = computed(() => {
+  const selId = currentSelectionBlockId.value
   if (selId === null) {
     return ""
   }
-  return bookRangeRows.value.find((r) => r.id === selId)?.title ?? ""
+  return bookBlockRows.value.find((r) => r.id === selId)?.title ?? ""
 })
 
 const readingControlPanelVisible = computed(() => {
-  const selId = currentSelectionRangeId.value
-  const curAnchorId = currentRangeAnchorId.value
+  const selId = currentSelectionBlockId.value
+  const curAnchorId = currentBlockAnchorId.value
   if (selId === null || curAnchorId === null) {
     return false
   }
-  const rows = bookRangeRows.value
+  const rows = bookBlockRows.value
   const selIdx = rows.findIndex((r) => r.id === selId)
   if (selIdx < 0 || selIdx >= rows.length - 1) {
     return false
@@ -304,8 +304,8 @@ const readingControlPanelVisible = computed(() => {
   return successor.startAnchor.id === curAnchorId
 })
 
-async function markSelectedRangeAsRead() {
-  const id = currentSelectionRangeId.value
+async function markSelectedBlockAsRead() {
+  const id = currentSelectionBlockId.value
   if (id === null) {
     return
   }
@@ -313,19 +313,19 @@ async function markSelectedRangeAsRead() {
   if (!ok) {
     return
   }
-  const rows = bookRangeRows.value
+  const rows = bookBlockRows.value
   const selIdx = rows.findIndex((r) => r.id === id)
   if (selIdx >= 0 && selIdx < rows.length - 1) {
-    currentSelectionRangeId.value = rows[selIdx + 1]!.id
+    currentSelectionBlockId.value = rows[selIdx + 1]!.id
   }
 }
-const currentRangeLiveText = ref("")
-const lastAnnouncedCurrentRangeTitle = ref<string | undefined>(undefined)
+const currentBlockLiveText = ref("")
+const lastAnnouncedCurrentBlockTitle = ref<string | undefined>(undefined)
 
-const currentRangeAnchorDebouncer = createCurrentRangeAnchorDebouncer({
-  delayMs: CURRENT_RANGE_ANCHOR_DEBOUNCE_MS,
+const currentBlockAnchorDebouncer = createCurrentBlockAnchorDebouncer({
+  delayMs: CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS,
   commit: (id) => {
-    currentRangeAnchorId.value = id
+    currentBlockAnchorId.value = id
   },
 })
 
@@ -351,13 +351,13 @@ function onViewportAnchorPage(payload: {
     pdfBarCurrentPage.value = payload.anchorPageIndexZeroBased + 1
     pdfBarPagesTotal.value = payload.pagesCount
   }
-  const candidate = currentRangeAnchorIdFromAnchorPage(
-    bookRangeRows.value.map((r) => r.startAnchor),
+  const candidate = currentBlockAnchorIdFromAnchorPage(
+    bookBlockRows.value.map((r) => r.startAnchor),
     payload.anchorPageIndexZeroBased,
     payload.viewport,
     payload.pagesCount
   )
-  currentRangeAnchorDebouncer.propose(candidate)
+  currentBlockAnchorDebouncer.propose(candidate)
   let reading: { pageIndexZeroBased: number; normalizedTop: number } | null =
     null
   if (payload.readingPosition !== undefined) {
@@ -376,21 +376,21 @@ function onViewportAnchorPage(payload: {
   }
 }
 
-watch(currentRangeAnchorId, (id) => {
+watch(currentBlockAnchorId, (id) => {
   const { text, changed } = nextLiveAnnouncementText(
-    lastAnnouncedCurrentRangeTitle.value,
+    lastAnnouncedCurrentBlockTitle.value,
     id,
-    bookRangeRows.value
+    bookBlockRows.value
   )
   if (!changed) {
     return
   }
-  lastAnnouncedCurrentRangeTitle.value = text
-  currentRangeLiveText.value = text
+  lastAnnouncedCurrentBlockTitle.value = text
+  currentBlockLiveText.value = text
 })
 
 watch(
-  currentRangeAnchorId,
+  currentBlockAnchorId,
   (id) => {
     if (id === null || !bookLayoutOpened.value) {
       return
@@ -400,7 +400,7 @@ watch(
         return
       }
       const row = bookLayoutAsideRef.value?.querySelector(
-        '[data-current-range="true"]'
+        '[data-current-block="true"]'
       )
       row?.scrollIntoView({ block: "nearest", inline: "nearest" })
     })
@@ -433,14 +433,14 @@ function onPagesReady() {
     .catch(() => undefined)
 }
 
-async function onBookRangeClick(range: BookRangeRow) {
-  const parsed = parsePdfOutlineV1Anchor(range.startAnchor)
+async function onBookBlockClick(block: BookBlockRow) {
+  const parsed = parsePdfOutlineV1Anchor(block.startAnchor)
   if (parsed === null) {
     return
   }
-  currentSelectionRangeId.value = range.id
+  currentSelectionBlockId.value = block.id
   await pdfViewerRef.value?.scrollToPdfOutlineV1Target(parsed)
-  currentRangeAnchorDebouncer.commitNow(range.startAnchor.id)
+  currentBlockAnchorDebouncer.commitNow(block.startAnchor.id)
 }
 
 onMounted(async () => {
@@ -454,7 +454,7 @@ onMounted(async () => {
   })
   if (!error && data) {
     book.value = data
-    flatBookRanges.value = buildFlatBookRanges(data.ranges ?? [])
+    flatBookBlocks.value = buildFlatBookBlocks(data.blocks ?? [])
     if (data.hasSourceFile) {
       pdfLoading.value = true
       pdfError.value = null
@@ -499,7 +499,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", handleResize)
-  currentRangeAnchorDebouncer.cancel()
+  currentBlockAnchorDebouncer.cancel()
   lastReadPositionPatchDebouncer.cancel()
 })
 </script>
@@ -514,7 +514,7 @@ aside {
   max-height: 100%;
 }
 
-.book-reading-book-range {
+.book-reading-book-block {
   @apply daisy-w-full daisy-min-h-10 daisy-text-left daisy-rounded-md;
   @apply daisy-border-0 daisy-border-solid daisy-border-l-4 daisy-border-transparent;
   @apply daisy-py-2 daisy-pr-2 daisy-pl-2 daisy-text-sm daisy-leading-snug daisy-font-normal;
@@ -524,15 +524,15 @@ aside {
   @apply focus-visible:daisy-ring-offset-2 focus-visible:daisy-ring-offset-base-200;
 }
 
-.book-reading-book-range[data-current-range="true"] {
+.book-reading-book-block[data-current-block="true"] {
   @apply daisy-bg-primary/35;
 }
 
-.book-reading-book-range[data-current-selection="true"] {
+.book-reading-book-block[data-current-selection="true"] {
   @apply daisy-border-primary daisy-font-medium;
 }
 
-.book-reading-book-range[data-direct-content-read="true"] {
+.book-reading-book-block[data-direct-content-read="true"] {
   @apply daisy-border-r-4 daisy-border-r-success;
 }
 </style>

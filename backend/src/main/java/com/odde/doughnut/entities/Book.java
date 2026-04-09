@@ -20,7 +20,7 @@ import lombok.Setter;
   "format",
   "createdAt",
   "updatedAt",
-  "ranges",
+  "blocks",
   "notebookId",
   "hasSourceFile"
 })
@@ -77,15 +77,16 @@ public class Book extends EntityIdentifiedByIdOnly {
   private Timestamp updatedAt;
 
   @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-  private final List<BookRange> ranges = new ArrayList<>();
+  private final List<BookBlock> blocks = new ArrayList<>();
 
+  @JsonProperty("blocks")
   @JsonView(BookViews.Full.class)
-  public List<BookRange> getRanges() {
-    return ranges;
+  public List<BookBlock> getBlocks() {
+    return blocks;
   }
 
-  public void addRange(BookRange range) {
-    ranges.add(range);
-    range.setBook(this);
+  public void addBlock(BookBlock block) {
+    blocks.add(block);
+    block.setBook(this);
   }
 }
