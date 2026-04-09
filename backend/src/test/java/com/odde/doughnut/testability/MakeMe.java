@@ -58,6 +58,14 @@ public class MakeMe extends MakeMeWithoutDB {
     return new NotebookBuilder(notebook, this);
   }
 
+  public NotebookGroupBuilder aNotebookGroup() {
+    return new NotebookGroupBuilder(this, null);
+  }
+
+  public NotebookGroupBuilder theNotebookGroup(NotebookGroup group) {
+    return new NotebookGroupBuilder(this, group);
+  }
+
   public BookBuilder aBook() {
     return new BookBuilder(this);
   }

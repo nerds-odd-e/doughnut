@@ -83,6 +83,13 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Getter
   private NotebookAiAssistant notebookAiAssistant;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "notebook_group_id")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private NotebookGroup notebookGroup;
+
   public boolean isCertifiable() {
     return notebookCertificateApproval != null
         && notebookCertificateApproval.getLastApprovalTime() != null;
