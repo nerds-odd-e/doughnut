@@ -17,7 +17,7 @@ import {
   startManagedTtySession,
   type ManagedTtyAssertOptions,
   type ManagedTtySession,
-} from 'tty-assert/managedTtySession'
+} from 'tty-assert'
 
 /**
  * JSON-safe `cy.task` body (`RegExp` must use `{ source, flags? }`).

@@ -1,5 +1,5 @@
 import type { ManagedTtyAssertTaskPayload } from '../../../config/cliE2ePluginTasks'
-import { TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS } from 'tty-assert/waitForTextInSurface'
+import { TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS } from 'tty-assert'
 import { cliAssertTask } from './cliAssertTask'
 
 const guidanceStartAfterAnchors = [

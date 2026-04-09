@@ -1,7 +1,7 @@
 import { Terminal } from '@xterm/headless'
 import { CLI_INTERACTIVE_PTY_COLS, CLI_INTERACTIVE_PTY_ROWS } from './geometry'
 
-/** xterm headless replay → viewport plaintext. Canonical export: `ptyTranscriptToViewportPlaintext`. */
+/** Viewport plaintext from a headless xterm after replay (not re-exported from the package root). */
 
 export function viewportPlaintextFromHeadlessTerminal(term: Terminal): string {
   const buffer = term.buffer.active
@@ -20,7 +20,7 @@ export function viewportPlaintextFromHeadlessTerminal(term: Terminal): string {
  *
  * `write` is asynchronous; the promise resolves after the parser has applied the transcript.
  *
- * **Canonical import:** `ptyTranscriptToViewportPlaintext` from `tty-assert/ptyTranscriptToViewportPlaintext`.
+ * Internal to `tty-assert` and its tests; Doughnut E2E imports only the package root.
  */
 export function ptyTranscriptToVisiblePlaintextViaXterm(
   raw: string,

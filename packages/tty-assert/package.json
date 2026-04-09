@@ -22,13 +22,6 @@
     "vitest": "4.1.3"
   },
   "exports": {
-    "./geometry": "./src/geometry.ts",
-    "./ptyTranscriptToViewportPlaintext": "./src/ptyTranscriptToVisiblePlaintextViaXterm.ts",
-    "./ptyTranscriptToVisiblePlaintextViaXterm": "./src/ptyTranscriptToVisiblePlaintextViaXterm.ts",
-    "./ptySession": "./src/ptySession.ts",
-    "./facade": "./src/facade.ts",
-    "./waitForTextInSurface": "./src/waitForTextInSurface.ts",
-    "./managedTtySession": "./src/managedTtySession.ts",
-    "./viewportPngSequenceToGif": "./src/viewportPngSequenceToGif.ts"
+    ".": "./src/index.ts"
   }
 }
