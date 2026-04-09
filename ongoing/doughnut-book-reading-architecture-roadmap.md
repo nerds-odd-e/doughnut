@@ -16,6 +16,7 @@ Separate concerns so one object does not have to mean everything at once:
 |--------|---------------------|
 | **Where** | A single precise point in a book file |
 | **Which region** | A navigable or hierarchical chunk (section, “current reading unit”) |
+| **Imported content** | Which raw MinerU block belongs to which **book block** |
 | **Direct content** | Material between this **book block** and the next in **document reading order**, ignoring nesting depth (see below) |
 | **Evidence** | The exact span a note is about |
 | **Knowledge** | The user’s PKM note |
@@ -44,6 +45,12 @@ classDiagram
 
     class BookBlock {
       +structuralTitle : text
+    }
+
+    class BookContentBlock {
+      +type : text
+      +pageIndex : int
+      +textLevel : int?
     }
 
     class DirectContentReadingState {
@@ -78,6 +85,7 @@ classDiagram
 
     Book "1" --> "0..*" BookBlock : has
     BookBlock "1" --> "1" BookAnchor : startAnchor
+    BookBlock "1" --> "0..*" BookContentBlock : owns imported content
 
     BookBlock "0..1" --> "0..*" BookBlock : child blocks
 
@@ -104,6 +112,17 @@ A region: **`startAnchor`** locates the section in the book file. Primary unit f
 
 Each `BookBlock` also has a conceptual association to **direct content** (see next subsection).
 
+When imported MinerU content appears before the first heading-like block (`text_level`), we create a synthetic root-level `BookBlock` titled **`*beginning*`**. Its start anchor uses the first orphan content block’s page and a synthetic bbox placed **one line height above** that content block (`height = y1 - y0`, `syntheticY0 = max(0, y0 - height)`, `syntheticY1 = y0`). This keeps the ownership rule below total: every imported content block belongs to exactly one `BookBlock`.
+
+### BookContentBlock
+
+Persisted import artifact for **MinerU `content_list` items**. A `BookContentBlock` is **not** a second navigation tree and **not** a progress record. Its job is to keep the raw imported reading stream attached to the structural `BookBlock` that owns it.
+
+- Every imported MinerU item belongs to exactly one `BookBlock`.
+- The heading item that introduces a `BookBlock` is also persisted as a `BookContentBlock`; it remains the structural boundary for that block and is **not** counted as direct body content by default.
+- Persist **queryable columns** needed by product logic (`type`, page index, bbox, optional `textLevel`, stable order within the owning block) plus the **raw payload** so unknown MinerU block types survive round-trip without schema churn.
+- Unknown future MinerU block types are persisted intact but do **not** become direct content automatically; product logic opts them in later.
+
 ### Direct content (conceptual)
 
 **Direct content** is whatever lies **between** one `BookBlock` and the **next** `BookBlock` in reading order, or **to the end of the book** if this block is the last **book block** in that order.
@@ -114,7 +133,9 @@ Each `BookBlock` also has a conceptual association to **direct content** (see ne
 
 **Reading-record heuristics (e.g. “no meaningful gap”):** Any predicate over “the gap from **A**’s start to **B**’s start” applies to **every** consecutive pair (**A**, **B**) in that same walk—**siblings**, **parent → first child**, **last node in a subtree → next block after the subtree**, etc. It is **not** limited to same-depth blocks.
 
-**Persistence and extraction:** For now, direct content is **only a vocabulary and UX/progress concept**. We do **not** require a stored blob, span table, or server-side extraction of that gap. When the product needs it, anchors or text extraction can be added without renaming the idea.
+**Persistence and extraction:** For MinerU-backed PDF imports, we persist raw **`BookContentBlock`** rows grouped under each `BookBlock`. This gives Phase 3 reading-record logic a stable source of truth for “does this block have direct content?” without introducing a second derived span table. We still do **not** require a stored extracted-text blob for the gap between blocks.
+
+**No-direct-content default:** A `BookBlock` is treated as having **no direct content** when it owns **no non-structural** imported content block whose `type` is **`text`**, **`table`**, or **`image`**. The heading content block that created the `BookBlock` does **not** count toward that rule even though it is persisted. `page_number`, footnotes, and unknown types are preserved but ignored by this predicate until product logic says otherwise.
 
 **Disposition (per block, conceptual):** How the user (or system) treats the direct content attached to a block can be classified for product logic:
 
@@ -163,7 +184,8 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 - **One span per note (initially):** Keeps PKM extraction simple; multi-span and cross-book evidence are explicit future extensions.
 - **`structuralTitle` on `BookBlock`:** Human-readable title for the block in the book’s structure tree; parent chain + title is enough to reconstruct display paths when needed.
 - **No `StructuralBookBlock` subtype yet:** Structural vs user-carved blocks may be distinguished later if the product requires it (e.g. import vs override).
-- **Direct content** remains **conceptual** (no DB column for the gap). **Persistence** of disposition is **`ReadingRecord`** rows + **`PUT`/`GET` reading-record APIs** per [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md); the **Reading Control Panel** is the intended **primary in-reader** control — [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md).
+- **`BookContentBlock` for MinerU imports:** Persist imported `content_list` items separately from `BookBlock`, grouped by owning block. This keeps `BookBlock` structural while giving direct-content heuristics a durable imported-content stream.
+- **Direct content** remains a **product concept**, not a materialized “gap blob.” **Disposition** persistence is still **`ReadingRecord`** rows + **`PUT`/`GET` reading-record APIs** per [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md); persisted `BookContentBlock` rows merely supply the import evidence for Phase 3 heuristics. The **Reading Control Panel** remains the intended **primary in-reader** control — [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md).
 
 ---
 
@@ -207,7 +229,8 @@ Revisit when implementation or product constraints clarify:
 - Whether `ReadingRecord` needs finer-grained progress inside a block (percentage, character offset, etc.).
 - Whether `BookBlock` should distinguish blocks from the **imported book layout** from user-created blocks.
 - Whether `SourceSpan.kind` should classify text, image, figure, table, or mixed content for rendering and export.
-- Whether **direct content** should be materialized as anchors, text, or both; where **disposition** should live (`BookBlock`, `ReadingRecord`, or a future artifact) once persisted.
+- Whether non-PDF formats (EPUB and later) should reuse the same persisted **`BookContentBlock`** shape or derive direct-content evidence another way.
+- Whether some currently ignored MinerU block types should count as direct content beyond **`text`**, **`table`**, and **`image`**.
 
 ---
 

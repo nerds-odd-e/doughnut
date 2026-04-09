@@ -8,7 +8,7 @@
 
 **Planning rules:** `.cursor/rules/planning.mdc` — one **user-visible** behavior per phase, scenario-first ordering, test-first workflow when adding behavior, at most one intentionally failing test while driving a phase.
 
-**Testing for this story:** **Phase 2** is covered by **E2E** ([`reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature)) plus controller and mounted tests. **Phases 1, 3, and 4** do **not** add E2E in this plan; they rely on **unit-style tests** per `.cursor/rules/planning.mdc` — **observable** surfaces (HTTP from **controllers**, **mounted** Vue via Vitest), **black-box** I/O, **few** focused tests, **direct** tests only for small deliberate contracts (pure predicates, mapping, validation messages).
+**Testing for this story:** **Phase 2** is covered by **E2E** ([`reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature)) plus controller and mounted tests. **Phase 3** now also needs **E2E**, because the user-visible outcome is automatic read-state change while reading in the browser. **Phases 1 and 4** still rely on **unit-style tests** per `.cursor/rules/planning.mdc` — **observable** surfaces (HTTP from **controllers**, **mounted** Vue via Vitest), **black-box** I/O, **few** focused tests, **direct** tests only for small deliberate contracts (pure predicates, mapping, validation messages). **Phase 3’s detailed design and ordered sub-phases:** [`ongoing/book-reading-phase-3-no-direct-content-plan.md`](book-reading-phase-3-no-direct-content-plan.md).
 
 **This document is a delivery plan only** — not executed here.
 
@@ -20,10 +20,10 @@
 
 - **Progress on chunks:** [`ongoing/doughnut-book-reading-architecture-roadmap.md`](doughnut-book-reading-architecture-roadmap.md) — `ReadingRecord` refers to a **`BookBlock`**, not a `SourceSpan`. Per-block **read / skim / skip** states belong on that model (or equivalent rows), not on arbitrary PDF coordinates.
 - **Fine-grained “where on the page”** (exact scroll restore) is an **open architecture question** in the same roadmap; Phase 1 may persist a **viewport-aligned** snapshot (see below) without pretending it is a substitute for long-term `ReadingRecord` semantics.
-- **Direct content** between two **book blocks** is **conceptual** today (no required DB column for the gap). Phases 3–4 rely on a **documented heuristic** (e.g. anchor proximity in **MinerU-normalized** space, same-page `y0` ordering, or “next block start immediately follows previous start”) — pick one rule per implementation and test it; revisiting the heuristic is allowed if product feedback demands it.
+- **Direct content** between two **book blocks** remains a product concept, but for MinerU-backed PDF imports Phase 3 now relies on persisted **`BookContentBlock`** ownership rather than only anchor proximity. The default rule is: a block has direct content only if it owns at least one **non-structural** imported content block of type **`text`**, **`table`**, or **`image`**. `page_number`, footnotes, and unknown types are persisted but do not count by default.
 - **Consecutive blocks in reading order** (for Phase 2’s “successor” check, Phase 3’s A→B gap, and **current block**) are **not** required to sit at the same tree depth. **B** is always the **immediate successor** of **A** in the linear walk. Typical shapes include: **siblings** (A then next sibling), **parent then first child** (A then its first `children[]` entry), and **last descendant then next block after leaving a subtree** (e.g. A is the last block in a subtree; B is the next sibling of an ancestor — “uncle” relative to A). Same rule as **direct content** boundaries in [`ongoing/doughnut-book-reading-architecture-roadmap.md`](doughnut-book-reading-architecture-roadmap.md).
 - **Book layout reading order** for the reading-control **successor boundary**, Phase 3 auto-marking, and **current block** must match the **same linear order** (depth-first preorder over the `BookBlock` tree unless product explicitly chooses another walk).
-- **Observable tests (this plan):** **Phase 2** — Cypress for the full reading-record UX. **Phases 1, 3, 4** — Spring **controller** tests (status, body, persistence side effects via follow-up reads) and/or **mounted** frontend tests where the behavior is UI-shaped; **pure** black-box tests for predicates and formatting. Avoid tests that only pin private helpers when a controller or mounted component already proves the path.
+- **Observable tests (this plan):** **Phase 2** — Cypress for the full reading-record UX. **Phase 3** — Cypress for the auto-mark behavior plus targeted import/controller/unit tests for the persisted-content predicate and synthetic `*beginning*` block. **Phases 1 and 4** — Spring **controller** tests (status, body, persistence side effects via follow-up reads) and/or **mounted** frontend tests where the behavior is UI-shaped; **pure** black-box tests for predicates and formatting. Avoid tests that only pin private helpers when a controller or mounted component already proves the path.
 
 ---
 
@@ -75,12 +75,14 @@
 
 **Depends on:** Phase 2 (persistence and **book layout** display of read state).
 
-**Tests (no E2E for this phase):**
+**Tests:** This phase now needs **E2E** for the user-visible browser behavior, plus targeted lower-level regression coverage for the import contract that powers it.
 
-- **Pure predicate** (if extracted): **no-direct-content** between two anchors / blocks — table-style **inputs → outputs**; no callers from tests that bypass the real rule.
-- **Service or controller slice:** when the “next block” transition runs, assert **`ReadingRecord`** (or API response) shows **A** marked read **without** a user answer — use **real DB** `@Transactional` tests if that is the project pattern for this feature, or controller tests that observe **HTTP + repository** outcomes, **not** private method names.
+- **Detailed sub-phases:** [`ongoing/book-reading-phase-3-no-direct-content-plan.md`](book-reading-phase-3-no-direct-content-plan.md).
+- **E2E:** extend the real reading-record scenario set with a block pair that has **no direct content** in the committed MinerU fixture (e.g. `2. The Usual Defi nition Is Not Enough` → `2.1 Easier to Change—and Harder to Misuse`) and prove the earlier block becomes read **without** pressing the panel action.
+- **Controller / persistence:** attach-book persists grouped imported content blocks; the synthetic `*beginning*` block is created when orphan content appears before the first heading block; follow-up reads observe persisted ownership.
+- **Unit-style predicate coverage:** direct-content classification counts persisted **`text`**, **`table`**, and **`image`** content blocks, but ignores the structural heading content block, `page_number`, footnotes, and currently unknown types.
 
-Keep **one behavior’s assertions together** (one focused test class or `describe`) where practical.
+Keep **one behavior’s assertions together** (one focused feature + one focused controller/unit area) where practical.
 
 ---
 
@@ -115,4 +117,4 @@ After each phase:
 
 ## Document maintenance
 
-When phases ship, trim duplication here; keep the architecture roadmap as the single place for long-lived conceptual rules. **Phase 2** Cypress path: [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature). Phases 1, 3, and 4 rely on unit/controller/mounted tests only (no extra E2E required by this plan except Phase 2, done).
+When phases ship, trim duplication here; keep the architecture roadmap as the single place for long-lived conceptual rules. **Phase 2** Cypress path: [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature). **Phase 3** now also requires Cypress; see [`ongoing/book-reading-phase-3-no-direct-content-plan.md`](book-reading-phase-3-no-direct-content-plan.md). Phases 1 and 4 rely on unit/controller/mounted tests only.
