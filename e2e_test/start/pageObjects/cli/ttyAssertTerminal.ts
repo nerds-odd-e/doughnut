@@ -1,12 +1,14 @@
 /**
  * PTY lifecycle and I/O: `cy.task` names for interactive CLI (`runRepoCliInteractive`,
- * `cliInteractiveWriteLine`, `cliInteractiveAssert`, `cliInteractivePtyDispose`, …).
+ * `cliInteractiveWriteLine`, `cliAssert`, `cliInteractivePtyDispose`, …).
  *
- * Assertions use **`cliInteractiveAssert`** with JSON-serializable payloads; the plugin delegates to
- * `tty-assert` managed session (`assert` retries in Node with one live xterm mirror). Page objects
- * build requests in `outputAssertions.ts`.
+ * Assertions use **`assert`** / shared **`cliAssertTask`** → `cliAssert` with JSON-serializable
+ * payloads; the plugin delegates to `tty-assert` managed session. Request builders live in
+ * `outputAssertions.ts`.
  */
 
+import type { ManagedTtyAssertTaskPayload } from '../../../config/cliE2ePluginTasks'
+import { cliAssertTask } from './cliAssertTask'
 import {
   answeredQuestions,
   currentGuidance,
@@ -44,6 +46,9 @@ function ttyAssertTerminal() {
     },
     enableGoogleOAuthSimulation() {
       return cy.task('cliInteractivePtyEnableGoogleOAuthSimulation')
+    },
+    assert(body: ManagedTtyAssertTaskPayload) {
+      return cliAssertTask(body)
     },
     answeredQuestions,
     pastCliAssistantMessages,

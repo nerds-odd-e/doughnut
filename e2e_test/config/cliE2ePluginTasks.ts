@@ -376,19 +376,17 @@ export function createCliE2ePluginTasks(
       disposeManagedCliPtySession()
       return null
     },
-    async cliInteractiveAssert(
-      body: ManagedTtyAssertTaskPayload
-    ): Promise<null> {
+    async cliAssert(body: ManagedTtyAssertTaskPayload): Promise<null> {
       const handle = interactiveCliPtyHandle
       if (!handle) {
         throw new Error(
-          'cliInteractiveAssert: no managed CLI PTY session. Start interactive (runInstalledCliInteractive / runRepoCliInteractive) or run a one-shot command (runInstalledCli) first.'
+          'cliAssert: no managed CLI PTY session. Start interactive (runInstalledCliInteractive / runRepoCliInteractive) or run a one-shot command (runInstalledCli) first.'
         )
       }
       await managedAssertWithTerminalArtifacts(
         handle,
         managedTtyAssertTaskPayloadToOptions(body),
-        'cliInteractiveAssert'
+        'cliAssert'
       )
       return null
     },

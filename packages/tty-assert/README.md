@@ -77,7 +77,7 @@ Use this when one process owns **the same** PTY buffer, xterm headless instance,
 
 **`ManagedTtyAssertOptions`** (same assertion knobs as `waitForTextInSurface` except **`raw`** is omitted): `needle` (string or `RegExp`), `surface`, `timeoutMs`, `retryMs`, `strict`, `messagePrefix`, `startAfterAnchor`, `fallbackRowCount`, `cellExpectations`.
 
-**Cypress:** Doughnut maps **`cy.task('cliInteractiveAssert', payload)`** to `managed.assert(...)`. On failure the plugin saves a **viewport PNG** and, when enough frames were recorded, a **GIF** from **`buildViewportAnimationGif()`**, via `saveBufferToCurrentSpecFolder` (see `e2e_test/config/cliE2ePluginTasks.ts`). The task body must stay **JSON-serializable**: use `{ source, flags? }` instead of `RegExp` objects for needles and anchors.
+**Cypress:** Doughnut maps **`cy.task('cliAssert', payload)`** to `managed.assert(...)`. On failure the plugin saves a **viewport PNG** and, when enough frames were recorded, a **GIF** from **`buildViewportAnimationGif()`**, via `saveBufferToCurrentSpecFolder` (see `e2e_test/config/cliE2ePluginTasks.ts`). The task body must stay **JSON-serializable**: use `{ source, flags? }` instead of `RegExp` objects for needles and anchors.
 
 **Node tests without Cypress:** Prefer `managedTtySession` or `facade` directly; do not round-trip PTY text through a browser.
 

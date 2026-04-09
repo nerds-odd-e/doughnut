@@ -7,7 +7,7 @@ import { ttyAssertTerminal } from './ttyAssertTerminal'
 
 /**
  * CLI page objects. Domain ordering:
- * - Non-interactive CLI: `runInstalledCli` (managed PTY, same geometry as interactive) then `cliInteractiveAssert` via `nonInteractiveOutput()`
+ * - Non-interactive CLI: `runInstalledCli` (managed PTY, same geometry as interactive) then `cliAssert` via `nonInteractiveOutput()`
  * - `ttyAssertTerminal()`: PTY `cy.task` I/O + same transcript fluents as `interactiveCli()`
  * - `interactiveCli()`: typing / slash / recall helpers on the PTY session
  * - `useNotebook(title)`: `/use` then fluent `attachPdfBook` / `pastCliAssistantMessages` (notebook stage)

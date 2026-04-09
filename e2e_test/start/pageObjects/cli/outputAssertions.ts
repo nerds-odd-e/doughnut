@@ -1,5 +1,6 @@
 import type { ManagedTtyAssertTaskPayload } from '../../../config/cliE2ePluginTasks'
 import { TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS } from 'tty-assert/waitForTextInSurface'
+import { cliAssertTask } from './cliAssertTask'
 
 const guidanceStartAfterAnchors = [
   { source: '^\\s*└' },
@@ -63,36 +64,29 @@ export function nonInteractiveCliOutputAssertRequest(
 function nonInteractiveOutput() {
   return {
     expectContains(expected: string) {
-      return cy.task<null>(
-        'cliInteractiveAssert',
-        nonInteractiveCliOutputAssertRequest(expected)
-      )
+      return cliAssertTask(nonInteractiveCliOutputAssertRequest(expected))
     },
   }
 }
 
 /**
  * Waits until Current guidance contains `prompt`, then runs `onReady` (e.g. PTY write).
- * Assertion and retry run in the plugin via `cliInteractiveAssert` (managed PTY session).
+ * Assertion and retry run in the plugin via `cliAssert` (managed PTY session).
  */
 export function whenCurrentGuidanceContainsThen(
   prompt: string,
   onReady: () => Cypress.Chainable<null>
 ): Cypress.Chainable<null> {
   if (prompt === '') return onReady()
-  return cy
-    .task<null>(
-      'cliInteractiveAssert',
-      currentGuidanceContainsAssertRequest(prompt)
-    )
-    .then(() => onReady())
+  return cliAssertTask(currentGuidanceContainsAssertRequest(prompt)).then(() =>
+    onReady()
+  )
 }
 
 function pastCliAssistantMessages() {
   return {
     expectContains(expected: string): Cypress.Chainable<null> {
-      return cy.task<null>(
-        'cliInteractiveAssert',
+      return cliAssertTask(
         strippedTranscriptTextAssertRequest(
           expected,
           'Past CLI assistant messages (in past CLI assistant messages).'
@@ -105,8 +99,7 @@ function pastCliAssistantMessages() {
 function answeredQuestions() {
   return {
     expectContains(expected: string): Cypress.Chainable<null> {
-      return cy.task<null>(
-        'cliInteractiveAssert',
+      return cliAssertTask(
         strippedTranscriptTextAssertRequest(
           expected,
           'Answered questions (in answered questions).'
@@ -120,34 +113,32 @@ function pastUserMessages() {
   return {
     /**
      * Full-buffer text + gray background (palette 8) on the matched span, then blank line above
-     * in the stripped transcript (two `cliInteractiveAssert` tasks; retry in managed session).
+     * in the stripped transcript (two `cliAssert` tasks; retry in managed session).
      */
     expectDisplayed(expected: string): Cypress.Chainable<null> {
       const escaped = expected.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       const blankLineAboveSource = String.raw`(?:^|\n)[^\S\n]*\n[^\n]*${escaped}[^\n]*`
-      return cy
-        .task<null>('cliInteractiveAssert', {
+      return cliAssertTask({
+        ...transcriptPollBase,
+        needle: expected,
+        surface: 'fullBuffer',
+        cellExpectations: [
+          {
+            match: 'last',
+            expectations: [{ kind: 'allBgPalette', index: 8 }],
+          },
+        ],
+        messagePrefix:
+          'Past user messages (full buffer + gray background block).',
+      }).then(() =>
+        cliAssertTask({
           ...transcriptPollBase,
-          needle: expected,
-          surface: 'fullBuffer',
-          cellExpectations: [
-            {
-              match: 'last',
-              expectations: [{ kind: 'allBgPalette', index: 8 }],
-            },
-          ],
+          needle: { source: blankLineAboveSource },
+          surface: 'strippedTranscript',
           messagePrefix:
-            'Past user messages (full buffer + gray background block).',
+            'Past user messages must leave one blank line above the matching user message.',
         })
-        .then(() =>
-          cy.task<null>('cliInteractiveAssert', {
-            ...transcriptPollBase,
-            needle: { source: blankLineAboveSource },
-            surface: 'strippedTranscript',
-            messagePrefix:
-              'Past user messages must leave one blank line above the matching user message.',
-          })
-        )
+      )
     },
   }
 }
@@ -155,13 +146,10 @@ function pastUserMessages() {
 function currentGuidance() {
   return {
     expectContains(expected: string): Cypress.Chainable<null> {
-      return cy.task<null>(
-        'cliInteractiveAssert',
-        currentGuidanceContainsAssertRequest(expected)
-      )
+      return cliAssertTask(currentGuidanceContainsAssertRequest(expected))
     },
     expectContainsBold(text: string): Cypress.Chainable<null> {
-      return cy.task<null>('cliInteractiveAssert', {
+      return cliAssertTask({
         ...guidanceBase,
         needle: text,
         cellExpectations: [
