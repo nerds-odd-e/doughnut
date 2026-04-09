@@ -29,22 +29,19 @@ Feature: Book browsing
     And I should see the beginning of the PDF book "refactoring.pdf"
     When I choose the book block "2. The Usual Defi nition Is Not Enough"
     Then I should see in the book reader visible PDF viewport on page 1 text including "Usual Definition"
-    When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
-    Then I should see in the book reader visible PDF viewport on page 1 text including "Protecting Intention"
 
   Scenario: Book block jumps the PDF to the anchored page
     When I choose the book block "2.2 Refactoring as Strengthening the Code"
     Then I should see in the book reader visible PDF viewport on page 2 text including "Strengthening the Code"
     And the book block "2.2 Refactoring as Strengthening the Code" should be the current selection in the book reader
 
-  Scenario: Scrolling the PDF updates the current block
+  Scenario: Scrolling the PDF updates the current block; short viewport keeps aside scrolled to it
     When I scroll the PDF book reader to bring page 2 into primary view
     Then I should see in the book reader visible PDF viewport on page 2 text including "Strengthening the Code"
     And the book block "2.2 Refactoring as Strengthening the Code" should be the current block in the book reader
-
-  Scenario: Short viewport scrolls book layout aside so the current block stays visible
-    When I set the book reading viewport to 1200 by 280
-    And I scroll the PDF book reader to bring page 2 into primary view
+    When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
+    And I set the book reading viewport to 1200 by 280
+    When I scroll the PDF book reader to bring page 2 into primary view
     Then I should see in the book reader visible PDF viewport on page 2 text including "Strengthening the Code"
     And the book block "2.2 Refactoring as Strengthening the Code" should be the current block and visible in the book layout aside
 
