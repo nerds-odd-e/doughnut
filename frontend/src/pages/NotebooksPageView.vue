@@ -4,26 +4,56 @@
       <NotebookNewButton v-if="user">Add New Notebook</NotebookNewButton>
     </template>
   </GlobalBar>
-  <div class="daisy-container daisy-mx-auto daisy-p-4">
-    <main class="daisy-mb-8">
-      <NotebookCardsWithButtons v-if="notebooks.length > 0" :notebooks="notebooks">
+  <div class="daisy-container daisy-mx-auto daisy-max-w-3xl daisy-px-4 daisy-py-6">
+    <section class="daisy-mb-12">
+      <div class="daisy-mb-5 daisy-flex daisy-flex-col daisy-gap-1 sm:daisy-flex-row sm:daisy-items-end sm:daisy-justify-between">
+        <div>
+          <h1 class="daisy-text-2xl daisy-font-bold daisy-tracking-tight daisy-text-base-content">
+            My notebooks
+          </h1>
+          <p class="daisy-mt-1 daisy-text-sm daisy-text-base-content/60">
+            Open a notebook to work with notes, or use the toolbar to create a new one.
+          </p>
+        </div>
+      </div>
+      <NotebookCardsWithButtons
+        v-if="notebooks.length > 0"
+        layout="list"
+        :notebooks="notebooks"
+      >
         <template #default="{ notebook }">
-          <NotebookButtons 
-            v-bind="{ notebook, user }" 
+          <NotebookButtons
+            v-bind="{ notebook, user }"
             @notebook-updated="handleNotebookUpdated"
           />
         </template>
       </NotebookCardsWithButtons>
-    </main>
-    
-    <section class="subscribed-section">
-      <h2 class="daisy-text-2xl daisy-font-bold daisy-mb-6 daisy-flex daisy-items-center daisy-gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="daisy-text-info" viewBox="0 0 16 16">
-          <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
-        </svg>
-        Subscribed Notebooks
+      <div
+        v-else
+        class="daisy-rounded-box daisy-border daisy-border-dashed daisy-border-base-300 daisy-bg-base-200/30 daisy-px-6 daisy-py-10 daisy-text-center"
+      >
+        <p class="daisy-m-0 daisy-text-base daisy-text-base-content/70">
+          You do not have any notebooks yet.
+        </p>
+        <p class="daisy-mt-2 daisy-mb-0 daisy-text-sm daisy-text-base-content/50">
+          Use <span class="daisy-font-medium daisy-text-base-content/80">Add New Notebook</span> above to create your first one.
+        </p>
+      </div>
+    </section>
+
+    <section class="subscribed-section daisy-border-t daisy-border-base-300 daisy-pt-10">
+      <h2 class="daisy-mb-1 daisy-text-lg daisy-font-semibold daisy-text-base-content">
+        Subscribed notebooks
       </h2>
-      <NotebookCardsWithButtons v-if="subscriptions.length > 0" :notebooks="subscriptions.map((s) => s.notebook!)" :is-subscribed="true">
+      <p class="daisy-mb-5 daisy-text-sm daisy-text-base-content/60">
+        Notebooks you follow from the Bazaar appear here.
+      </p>
+      <NotebookCardsWithButtons
+        v-if="subscriptions.length > 0"
+        layout="list"
+        :notebooks="subscriptions.map((s) => s.notebook!)"
+        :is-subscribed="true"
+      >
         <template #default="{ notebook }">
           <SubscriptionNoteButtons
             v-if="subscriptions.find((s) => s.notebook === notebook)"
@@ -32,8 +62,8 @@
           />
         </template>
       </NotebookCardsWithButtons>
-      <p v-else class="daisy-text-base-content/60 daisy-italic">
-        No subscribed notebooks yet. Visit the Bazaar to find notebooks to subscribe to.
+      <p v-else class="daisy-m-0 daisy-text-sm daisy-text-base-content/55">
+        None yet — visit the Bazaar to subscribe to shared notebooks.
       </p>
     </section>
   </div>
@@ -77,10 +107,3 @@ const handleNotebookUpdated = (updatedNotebook: Notebook) => {
 }
 </script>
 
-<style scoped>
-.subscribed-section {
-  margin-top: 3rem;
-  padding-top: 2rem;
-  border-top: 2px solid #e5e7eb;
-}
-</style>

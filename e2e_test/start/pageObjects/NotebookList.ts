@@ -49,7 +49,7 @@ export const findNotebookCardButton = (notebook: string, name: string) => {
       selector: '.notebook-card h5',
     })
       .should('be.visible')
-      .parents('.daisy-card')
+      .parents('[data-cy="notebook-card"]')
       .as('notebookCard')
     // Now find the button within that card (breaking the chain to avoid DOM detachment)
     return cy.get('@notebookCard').findByRole('button', { name: name })

@@ -1,5 +1,21 @@
 <template>
-  <div class="daisy-grid daisy-grid-cols-1 sm:daisy-grid-cols-2 md:daisy-grid-cols-2 lg:daisy-grid-cols-3 xl:daisy-grid-cols-4 daisy-gap-4">
+  <div
+    v-if="layout === 'list'"
+    class="notebook-cards-list daisy-flex daisy-flex-col daisy-gap-2"
+  >
+    <NotebookListRow
+      v-for="notebook in notebooks"
+      :key="notebook.id"
+      :notebook="notebook"
+      :is-subscribed="isSubscribed"
+    >
+      <slot :notebook="notebook" />
+    </NotebookListRow>
+  </div>
+  <div
+    v-else
+    class="daisy-grid daisy-grid-cols-1 sm:daisy-grid-cols-2 md:daisy-grid-cols-2 lg:daisy-grid-cols-3 xl:daisy-grid-cols-4 daisy-gap-4"
+  >
     <div
       v-for="notebook in notebooks"
       :key="notebook.id"
@@ -22,11 +38,16 @@
 <script setup lang="ts">
 import type { Notebook } from "@generated/doughnut-backend-api"
 import NotebookCard from "../notebooks/NotebookCard.vue"
+import NotebookListRow from "./NotebookListRow.vue"
 
-defineProps<{
-  notebooks: Notebook[]
-  isSubscribed?: boolean
-}>()
+withDefaults(
+  defineProps<{
+    notebooks: Notebook[]
+    isSubscribed?: boolean
+    layout?: "grid" | "list"
+  }>(),
+  { layout: "grid" }
+)
 </script>
 
 <style scoped>
