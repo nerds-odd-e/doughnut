@@ -1,14 +1,23 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import NotebooksPageView from "./NotebooksPageView.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import type { Subscription, User } from "@generated/doughnut-backend-api"
+import type {
+  Notebook,
+  Subscription,
+  User,
+} from "@generated/doughnut-backend-api"
+import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
+
+function catalogFromNotebooks(notebooks: Notebook[]): NotebookCatalogEntry[] {
+  return notebooks.map((notebook) => ({ type: "notebook", notebook }))
+}
 
 const meta = {
   title: "Page Views/NotebooksPageView",
   component: NotebooksPageView,
   tags: ["autodocs"],
   argTypes: {
-    notebooks: {
+    catalogItems: {
       control: "object",
     },
     subscriptions: {
@@ -28,11 +37,11 @@ const mockUser: User = makeMe.aUser.please()
 // Page with notebooks and subscriptions
 export const WithNotebooksAndSubscriptions: Story = {
   args: {
-    notebooks: [
+    catalogItems: catalogFromNotebooks([
       { ...makeMe.aNotebook.please(), title: "My First Notebook" },
       { ...makeMe.aNotebook.please(), title: "Learning TypeScript" },
       { ...makeMe.aNotebook.please(), title: "Project Documentation" },
-    ],
+    ]),
     subscriptions: [
       {
         id: 1,
@@ -55,10 +64,10 @@ export const WithNotebooksAndSubscriptions: Story = {
 // Page with only notebooks, no subscriptions
 export const WithNotebooksOnly: Story = {
   args: {
-    notebooks: [
+    catalogItems: catalogFromNotebooks([
       { ...makeMe.aNotebook.please(), title: "Personal Notes" },
       { ...makeMe.aNotebook.please(), title: "Work Projects" },
-    ],
+    ]),
     subscriptions: [],
     user: mockUser,
   },
@@ -67,7 +76,7 @@ export const WithNotebooksOnly: Story = {
 // Empty state - no notebooks or subscriptions
 export const Empty: Story = {
   args: {
-    notebooks: [],
+    catalogItems: [],
     subscriptions: [],
     user: mockUser,
   },
@@ -76,7 +85,35 @@ export const Empty: Story = {
 // Empty state with no notebooks
 export const NoNotebooks: Story = {
   args: {
-    notebooks: [],
+    catalogItems: [],
+    subscriptions: [],
+    user: mockUser,
+  },
+}
+
+export const WithNotebookGroup: Story = {
+  args: {
+    catalogItems: (() => {
+      const loose = {
+        ...makeMe.aNotebook.please(),
+        title: "Loose notebook",
+      }
+      const m1 = { ...makeMe.aNotebook.please(), title: "Member Alpha" }
+      const m2 = { ...makeMe.aNotebook.please(), title: "Member Beta" }
+      const m3 = { ...makeMe.aNotebook.please(), title: "Member Gamma" }
+      const m4 = { ...makeMe.aNotebook.please(), title: "Member Delta" }
+      const group: NotebookCatalogEntry = {
+        type: "notebookGroup",
+        id: 9001,
+        name: "Reading list",
+        createdAt: "2024-06-01T12:00:00.000Z",
+        notebooks: [m1, m2, m3, m4],
+      }
+      return [
+        { type: "notebook", notebook: loose },
+        group,
+      ] as NotebookCatalogEntry[]
+    })(),
     subscriptions: [],
     user: mockUser,
   },

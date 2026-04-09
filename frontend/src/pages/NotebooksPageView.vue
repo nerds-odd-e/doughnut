@@ -48,18 +48,13 @@
           </p>
         </div>
       </div>
-      <NotebookCardsWithButtons
-        v-if="notebooks.length > 0"
+      <NotebookCatalogSection
+        v-if="catalogItems.length > 0"
+        :catalog-items="catalogItems"
         :layout="notebooksLayout"
-        :notebooks="notebooks"
-      >
-        <template #default="{ notebook }">
-          <NotebookButtons
-            v-bind="{ notebook, user }"
-            @notebook-updated="handleNotebookUpdated"
-          />
-        </template>
-      </NotebookCardsWithButtons>
+        :user="user"
+        @notebook-updated="handleNotebookUpdated"
+      />
       <div
         v-else
         class="daisy-rounded-box daisy-border daisy-border-dashed daisy-border-base-300 daisy-bg-base-200/30 daisy-px-6 daisy-py-10 daisy-text-center"
@@ -110,15 +105,16 @@ import type {
   Subscription,
   User,
 } from "@generated/doughnut-backend-api"
+import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
+import NotebookCatalogSection from "@/components/notebook/NotebookCatalogSection.vue"
 import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithButtons.vue"
-import NotebookButtons from "@/components/notebook/NotebookButtons.vue"
 import SubscriptionNoteButtons from "@/components/subscriptions/SubscriptionNoteButtons.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 
 defineProps({
-  notebooks: {
-    type: Array as PropType<Notebook[]>,
+  catalogItems: {
+    type: Array as PropType<NotebookCatalogEntry[]>,
     required: true,
   },
   subscriptions: {
