@@ -1,7 +1,7 @@
-import type { ManagedTtyAssertTaskPayload } from '../../../config/cliE2ePluginTasks'
+import type { ManagedTtyAssertInput } from 'tty-assert'
 
 export function cliAssertTask(
-  body: ManagedTtyAssertTaskPayload
+  body: ManagedTtyAssertInput
 ): Cypress.Chainable<null> {
   return cy.task<null>('cliAssert', body)
 }

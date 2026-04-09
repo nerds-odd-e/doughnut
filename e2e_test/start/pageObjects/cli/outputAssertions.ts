@@ -1,4 +1,4 @@
-import type { ManagedTtyAssertTaskPayload } from '../../../config/cliE2ePluginTasks'
+import type { ManagedTtyAssertInput } from 'tty-assert'
 import { cliAssertTask } from './cliAssertTask'
 
 const guidanceStartAfterAnchors = [
@@ -8,7 +8,7 @@ const guidanceStartAfterAnchors = [
 ] as const
 
 const guidanceBase: Pick<
-  ManagedTtyAssertTaskPayload,
+  ManagedTtyAssertInput,
   'surface' | 'strict' | 'fallbackRowCount' | 'startAfterAnchor'
 > = {
   surface: 'viewableBuffer',
@@ -17,13 +17,13 @@ const guidanceBase: Pick<
   startAfterAnchor: [...guidanceStartAfterAnchors],
 }
 
-const transcriptPollBase: Pick<ManagedTtyAssertTaskPayload, 'strict'> = {
+const transcriptPollBase: Pick<ManagedTtyAssertInput, 'strict'> = {
   strict: false,
 }
 
 function currentGuidanceContainsAssertRequest(
   expected: string
-): ManagedTtyAssertTaskPayload {
+): ManagedTtyAssertInput {
   return {
     ...guidanceBase,
     needle: expected,
@@ -34,7 +34,7 @@ function currentGuidanceContainsAssertRequest(
 function strippedTranscriptTextAssertRequest(
   expected: string,
   messagePrefix: string
-): ManagedTtyAssertTaskPayload {
+): ManagedTtyAssertInput {
   return {
     ...transcriptPollBase,
     needle: expected,
@@ -45,7 +45,7 @@ function strippedTranscriptTextAssertRequest(
 
 export function nonInteractiveCliOutputAssertRequest(
   expected: string
-): ManagedTtyAssertTaskPayload {
+): ManagedTtyAssertInput {
   return {
     ...transcriptPollBase,
     needle: expected,

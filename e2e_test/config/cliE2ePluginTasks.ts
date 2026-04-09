@@ -19,9 +19,6 @@ import {
   type ManagedTtySession,
 } from 'tty-assert'
 
-/** Cypress `cy.task` body for `cliAssert`: JSON-safe (use `{ source, flags? }` instead of `RegExp`). */
-export type ManagedTtyAssertTaskPayload = ManagedTtyAssertInput
-
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
 
 type RunInstalledCliTask = WithOptionalCliEnv & {
@@ -352,7 +349,7 @@ export function createCliE2ePluginTasks(
       disposeManagedCliPtySession()
       return null
     },
-    async cliAssert(body: ManagedTtyAssertTaskPayload): Promise<null> {
+    async cliAssert(body: ManagedTtyAssertInput): Promise<null> {
       const handle = interactiveCliPtyHandle
       if (!handle) {
         throw new Error(

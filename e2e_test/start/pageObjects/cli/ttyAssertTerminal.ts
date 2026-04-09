@@ -7,7 +7,7 @@
  * `outputAssertions.ts`.
  */
 
-import type { ManagedTtyAssertTaskPayload } from '../../../config/cliE2ePluginTasks'
+import type { ManagedTtyAssertInput } from 'tty-assert'
 import { cliAssertTask } from './cliAssertTask'
 import {
   answeredQuestions,
@@ -47,7 +47,7 @@ function ttyAssertTerminal() {
     enableGoogleOAuthSimulation() {
       return cy.task('cliInteractivePtyEnableGoogleOAuthSimulation')
     },
-    assert(body: ManagedTtyAssertTaskPayload) {
+    assert(body: ManagedTtyAssertInput) {
       return cliAssertTask(body)
     },
     answeredQuestions,
