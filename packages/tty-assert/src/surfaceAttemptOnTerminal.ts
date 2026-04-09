@@ -149,7 +149,7 @@ function blockNotFoundLabel(block: CellExpectationBlock): string {
   const kinds = new Set(block.expectations.map((e) => e.kind))
   if (kinds.has('allBold') && kinds.size === 1) return 'bold check'
   if (kinds.has('allBgPalette')) {
-    return 'gray block check'
+    return 'palette background check'
   }
   return 'cell expectation check'
 }
@@ -210,7 +210,7 @@ function runCellExpectationBlocks(
       }
 
       if (exp.kind === 'allBgPalette') {
-        const grayProduct = exp.index === BRIGHT_BLACK_PALETTE_INDEX
+        const isBrightBlackBg = exp.index === BRIGHT_BLACK_PALETTE_INDEX
         for (let i = 0; i < opts.needle.length; i++) {
           const pos = index + i
           const localY = Math.floor(pos / rowWidth)
@@ -221,17 +221,15 @@ function runCellExpectationBlocks(
             return {
               ok: false,
               snapshot,
-              detail: `Gray block check: no cell at offset ${i} for last match of ${JSON.stringify(opts.needle)}.`,
+              detail: `Palette background check: no cell at offset ${i} for last match of ${JSON.stringify(opts.needle)}.`,
             }
           }
           if (!cellHasPaletteBackground(cell, exp.index)) {
-            if (grayProduct) {
+            if (isBrightBlackBg) {
               return {
                 ok: false,
                 snapshot,
-                detail:
-                  `Past user message ${JSON.stringify(opts.needle)} must appear in a gray-background block (palette background 8 / chalk \\x1b[100m). ` +
-                  `Last match is missing gray background on at least one cell.`,
+                detail: `Matched text ${JSON.stringify(opts.needle)} at the last occurrence: expected background palette index 8 (e.g. \\x1b[100m) on every cell; at least one cell does not have that background.`,
               }
             }
             return {
@@ -280,7 +278,7 @@ export function attemptOnceOnLiveTerminal(
       ok: 'strict',
       snapshot: '',
       message:
-        'waitForTextInSurface: empty string needle is not supported (ambiguous matches).',
+        'tty-assert: empty string needle is not supported (ambiguous matches).',
     }
   }
 
@@ -319,7 +317,7 @@ export function attemptOnceOnLiveTerminal(
   if (blocks.length > 0) {
     if (typeof opts.needle !== 'string') {
       throw new Error(
-        'waitForTextInSurface: cell expectations require a string needle (caller must validate).'
+        'tty-assert: cell expectations require a string needle (caller must validate).'
       )
     }
     const cellResult = runCellExpectationBlocks(
@@ -353,7 +351,7 @@ export function attemptOnceStrippedTranscript(
       ok: 'strict',
       snapshot: '',
       message:
-        'waitForTextInSurface: empty string needle is not supported (ambiguous matches).',
+        'tty-assert: empty string needle is not supported (ambiguous matches).',
     }
   }
 

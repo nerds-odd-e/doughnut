@@ -27,13 +27,11 @@ export function validateAndResolveCellExpectations(
 
   if (o.surface === 'strippedTranscript') {
     throw new Error(
-      'waitForTextInSurface: cell expectations are only supported for viewableBuffer and fullBuffer.'
+      'tty-assert: cell expectations are only supported for viewableBuffer and fullBuffer.'
     )
   }
   if (typeof o.needle !== 'string') {
-    throw new Error(
-      'waitForTextInSurface: cell expectations require a string needle.'
-    )
+    throw new Error('tty-assert: cell expectations require a string needle.')
   }
 
   return blocks

@@ -76,7 +76,7 @@ describe('ManagedTtySession', () => {
     }
   })
 
-  it('dumpFrames replay previews match viewport plaintext from live terminal', async () => {
+  it('dumpDiagnostics replay previews match viewport plaintext from live terminal', async () => {
     const raw = `noise\x1b[2J\x1b[HOK`
     const buf = { text: raw }
     const m = attachManagedTtySession(
@@ -91,7 +91,7 @@ describe('ManagedTtySession', () => {
         rows: 4,
         timeoutMs: 0,
       })
-      const dumped = await m.dumpFrames()
+      const dumped = await m.dumpDiagnostics()
       const replayed = await ptyTranscriptToViewportPlaintext(raw)
       expect(replayed).toMatch(/^OK/)
       expect(dumped.replayedScreenPlaintextHeadPreview).toContain('OK')

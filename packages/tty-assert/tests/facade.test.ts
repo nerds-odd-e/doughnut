@@ -25,14 +25,14 @@ describe('facade replay (xterm)', () => {
     expect(replayed).not.toContain('noise')
   })
 
-  it('dumpFrames replay previews use the same xterm replay as getReplayedScreenPlaintext', async () => {
+  it('dumpDiagnostics replay previews use the same xterm replay as getReplayedScreenPlaintext', async () => {
     const raw = `noise\x1b[2J\x1b[HOK`
     const handle = attachTerminalHandle({
       pty: mockPty(),
       buf: { text: raw },
     })
     const [dumped, replayed] = await Promise.all([
-      handle.dumpFrames(),
+      handle.dumpDiagnostics(),
       handle.getReplayedScreenPlaintext(),
     ])
     expect(replayed).toMatch(/^OK/)

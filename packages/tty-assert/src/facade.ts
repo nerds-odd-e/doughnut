@@ -6,9 +6,8 @@
  * `outputAssertions` checks). That is not the same as the xterm-emulated viewport; use
  * `await getReplayedScreenPlaintext()` when you need replayed “screen” plain text (e.g. current guidance).
  *
- * **`dumpFrames()`:** PTY tests do not have Ink-style discrete frames; this returns structured
- * diagnostics (lengths, previews). Replay-derived fields use the same **xterm.js** pipeline as
- * `getReplayedScreenPlaintext()`.
+ * **`dumpDiagnostics()`:** returns structured diagnostics (lengths, previews), not a frame timeline.
+ * Replay-derived fields use the same **xterm.js** pipeline as `getReplayedScreenPlaintext()`.
  */
 
 import {
@@ -40,7 +39,7 @@ export type TtyAssertToBeVisibleOpts = {
   retryMs?: number
 }
 
-export type TtyAssertDumpFrames = {
+export type TtyAssertDumpDiagnostics = {
   rawByteLength: number
   ansiStrippedLength: number
   replayedScreenPlaintextHeadPreview: string
@@ -63,8 +62,8 @@ export type TtyAssertTerminalHandle = {
   expect(loc: TtySubstringLocator): {
     toBeVisible(opts?: TtyAssertToBeVisibleOpts): Promise<void>
   }
-  /** Diagnostic-only; not a real frame list. */
-  dumpFrames(): Promise<TtyAssertDumpFrames>
+  /** Diagnostic snapshot (previews, lengths); not a time-ordered frame list. */
+  dumpDiagnostics(): Promise<TtyAssertDumpDiagnostics>
 }
 
 function createHandle(session: BufferedPtySession): TtyAssertTerminalHandle {
@@ -102,7 +101,7 @@ function createHandle(session: BufferedPtySession): TtyAssertTerminalHandle {
           ),
       }
     },
-    async dumpFrames(): Promise<TtyAssertDumpFrames> {
+    async dumpDiagnostics(): Promise<TtyAssertDumpDiagnostics> {
       const raw = session.buf.text
       const stripped = stripAnsiCliPty(raw)
       const replayed = await ptyTranscriptToViewportPlaintext(raw)

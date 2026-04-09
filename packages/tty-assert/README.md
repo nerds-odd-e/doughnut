@@ -15,7 +15,7 @@ This package is **Cypress-neutral** and **Doughnut-neutral**; the monorepo wires
 | Concept | What it is | Typical use |
 |--------|------------|-------------|
 | **Stripped transcript** | Cumulative PTY bytes with **ANSI/OSC escapes removed** (`stripAnsiCliPty`). One long string — **not** an emulator layout. | “Did this text ever appear in the session?” (plugin startup wait, many cumulative assertions). |
-| **Viewport replay** | Feed raw bytes through **headless xterm**, then read the **visible viewport** as plain text: one row per screen line, rows joined with **`\n`** (`ptyTranscriptToViewportPlaintext` / `ptyTranscriptToVisiblePlaintextViaXterm`). | **Current screen** heuristics (e.g. Ink “current guidance” extraction in Doughnut adapters). |
+| **Viewport replay** | Feed raw bytes through **headless xterm**, then read the **visible viewport** as plain text: one row per screen line, rows joined with **`\n`** (`ptyTranscriptToViewportPlaintext` / `ptyTranscriptToVisiblePlaintextViaXterm`). | **Current screen** plain text; product-specific parsing (e.g. “current guidance”) stays in adapters. |
 | **Locator surfaces** | After the same xterm replay, search a **named slice** of the buffer (`waitForTextInSurface`), or search the **stripped transcript** as a single haystack. | “Is this text visible in the **viewable** region?” vs “anywhere in **scrollback + viewport**?” vs “in the **stripped** log?” |
 
 Stripped text and replayed viewport text **differ**: layout, wrapping, and scrollback mean a substring can appear in one model and not the other. Pick the surface that matches **what the user sees** for that assertion.
@@ -61,7 +61,7 @@ Use this when one process owns **the same** PTY buffer, xterm headless instance,
 1. **`startManagedTtySession(opts)`** — spawns the PTY (`ptySession`), returns **`ManagedTtySession`**.
 2. **`write` / `submit`** — send bytes or a line (`\r` appended for `submit`).
 3. **`assert(opts)`** — polls until timeout: syncs new raw bytes into xterm, then runs the same surface logic as `waitForTextInSurface` (or stripped-transcript path without replay). No need to pass an updated `raw` string from outside; it always reads `session.buf.text`.
-4. **`dumpFrames()`** — async diagnostic snapshot (previews of viewport, stripped tail, etc.).
+4. **`dumpDiagnostics()`** — async diagnostic snapshot (previews of viewport, stripped tail, etc.).
 5. **`getViewportAnimationPngs()`** / **`buildViewportAnimationGif()`** — when the session was started with **`startManagedTtySession`**, each PTY `onData` schedules a debounced viewport sample (deduped by viewport plaintext, ring buffer capped at 56 PNGs). **`buildViewportAnimationGif`** flushes the pending sample, then encodes those PNGs to an animated GIF (requires at least two distinct frames). Sessions from **`attachManagedTtySession`** without the internal bridge omit recording (empty PNG list; GIF build throws).
 6. **`dispose()`** — idempotent: tears down xterm, disposes the buffered PTY session. Safe if the child already exited.
 
@@ -91,7 +91,7 @@ await waitForTextInSurface({
 })
 ```
 
-After the needle matches, optional **`cellExpectations`** assert on xterm cells (string needle, `viewableBuffer` / `fullBuffer` only). Example — bold on the **first** match and Ink-style gray block on the **last** (palette 8):
+After the needle matches, optional **`cellExpectations`** assert on xterm cells (string needle, `viewableBuffer` / `fullBuffer` only). Example — bold on the **first** match and **palette 8** background on the **last**:
 
 ```ts
 await waitForTextInSurface({

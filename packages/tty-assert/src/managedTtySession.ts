@@ -31,8 +31,8 @@ import {
   type WaitForTextInSurfaceOptions,
 } from './waitForTextInSurface'
 
-/** Same fields as `TtyAssertDumpFrames` from `./facade` (shared diagnostic shape). */
-export type ManagedTtySessionDumpFrames = {
+/** Same fields as `TtyAssertDumpDiagnostics` from `./facade` (shared diagnostic shape). */
+export type ManagedTtySessionDumpDiagnostics = {
   rawByteLength: number
   ansiStrippedLength: number
   replayedScreenPlaintextHeadPreview: string
@@ -94,7 +94,7 @@ export type ManagedTtySession = {
   getViewportAnimationPngs(): Buffer[]
   /** Flushes pending animation sample, then builds a GIF from recorded frames (needs ≥2 frames). */
   buildViewportAnimationGif(): Promise<Buffer>
-  dumpFrames(): Promise<ManagedTtySessionDumpFrames>
+  dumpDiagnostics(): Promise<ManagedTtySessionDumpDiagnostics>
   dispose(): void
 }
 
@@ -290,9 +290,9 @@ export function attachManagedTtySession(
       }
       return viewportPngBuffersToGif([...animFrames])
     },
-    async dumpFrames(): Promise<ManagedTtySessionDumpFrames> {
+    async dumpDiagnostics(): Promise<ManagedTtySessionDumpDiagnostics> {
       if (disposed) {
-        throw new Error('ManagedTtySession.dumpFrames after dispose')
+        throw new Error('ManagedTtySession.dumpDiagnostics after dispose')
       }
       await syncReplay()
       const raw = session.buf.text

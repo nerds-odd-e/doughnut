@@ -156,7 +156,7 @@ describe('waitForTextInSurface', () => {
     ).rejects.toThrow(/not all cells at the first occurrence are bold/)
   })
 
-  it('cellExpectations allBgPalette on last match passes for chalk-style gray background (100m)', async () => {
+  it('cellExpectations allBgPalette on last match passes for palette-8 background (100m)', async () => {
     const raw = `\x1b[2J\x1b[H\x1b[100mUser paste\x1b[0m\n`
     await waitForTextInSurface({
       raw,
@@ -172,7 +172,7 @@ describe('waitForTextInSurface', () => {
     })
   })
 
-  it('cellExpectations allBgPalette on last match fails for gray foreground only (90m, no 100m)', async () => {
+  it('cellExpectations allBgPalette on last match fails for bright-black foreground only (90m, no 100m)', async () => {
     const raw = `\x1b[2J\x1b[H\x1b[90mUser paste\x1b[0m\n`
     await expect(
       waitForTextInSurface({
@@ -190,10 +190,10 @@ describe('waitForTextInSurface', () => {
           },
         ],
       })
-    ).rejects.toThrow(/missing gray background/)
+    ).rejects.toThrow(/background palette index 8/)
   })
 
-  it('cellExpectations last-match gray block uses last haystack match when strict is false', async () => {
+  it('cellExpectations last-match palette background uses last haystack match when strict is false', async () => {
     const raw = `\x1b[2J\x1b[H\x1b[90mUser paste\x1b[0m xx \x1b[100mUser paste\x1b[0m\n`
     await waitForTextInSurface({
       raw,

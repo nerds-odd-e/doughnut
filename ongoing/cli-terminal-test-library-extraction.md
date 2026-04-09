@@ -1,6 +1,6 @@
 # `tty-assert` — PTY terminal test library extraction
 
-**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses xterm viewport replay). **Phase 5** is **complete** (sub-phases **5.1–5.9 met**, including legacy replay removal — execution table in [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md)). **Phase 6** is **complete** (sub-phases **6.1–6.5 met** — managed session, `cliAssert`, docs, removal of unused `cliInteractivePtyGetBuffer`; detail in [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md)). **Phase 11** is **complete** (single **`exports`** entry + README that matches; prior-art wording removed from `packages/tty-assert`). Phases **7–10**, **12–15** follow the roadmap (7–10 diagnostics and capture; **12–14** further library cleanup before OSS extraction; **15** move out). Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md); Phase 5 — [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md); Phase 6 — [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md).
+**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses xterm viewport replay). **Phase 5** is **complete** (sub-phases **5.1–5.9 met**, including legacy replay removal — execution table in [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md)). **Phase 6** is **complete** (sub-phases **6.1–6.5 met** — managed session, `cliAssert`, docs, removal of unused `cliInteractivePtyGetBuffer`; detail in [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md)). **Phase 11** is **complete** (single **`exports`** entry + README that matches; prior-art wording removed from `packages/tty-assert`). **Phase 12** is **complete** (neutral `tty-assert:` validation errors, palette-background failure copy, `dumpDiagnostics` rename). Phases **7–10**, **13–15** follow the roadmap (7–10 diagnostics and capture; **13–14** further library cleanup before OSS extraction; **15** move out). Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md); Phase 5 — [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md); Phase 6 — [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md).
 
 **Intent:** Extract PTY-based terminal testing into a **Cypress-neutral, Doughnut-neutral** library named **`tty-assert`**, publishable on npm and eventually movable out of this repo. Goal: reliable assertions on terminal-visible state, with failures that show **expected vs actual** without manually decoding escape sequences, and CI-friendly artifacts where useful.
 
@@ -130,7 +130,7 @@
 
 **Delivered:**
 
-- `packages/tty-assert/src/managedTtySession.ts`: `startManagedTtySession`, `attachManagedTtySession`, incremental xterm sync, polling `assert`, idempotent `dispose`, `dumpFrames` (integrators import `startManagedTtySession` and types from the package root).
+- `packages/tty-assert/src/managedTtySession.ts`: `startManagedTtySession`, `attachManagedTtySession`, incremental xterm sync, polling `assert`, idempotent `dispose`, `dumpDiagnostics` (integrators import `startManagedTtySession` and types from the package root).
 - Plugin: `cliAssert` → `managed.assert`; startup wait uses managed `assert`; **`cliInteractivePtyGetBuffer` removed** (unused).
 - `e2e_test/start/pageObjects/cli/outputAssertions.ts`: request builders for current guidance, transcript, full-buffer + cell expectations.
 
@@ -208,15 +208,17 @@
 
 ## Phase 12 — Neutral failure copy and clearer symbols
 
+**Status:** **Complete.**
+
 **Outcome:** Assertion failures and API names read **generic** at the library layer; misleading labels are fixed without changing what Doughnut E2E asserts.
 
-**Work:**
+**Delivered:**
 
-- Replace **product-specific** phrasing in **`tty-assert`** error paths (e.g. Ink/chalk/past-user wording in shared cell checks) with **neutral** messages, or push product-specific copy into **Doughnut** adapters if a hint must stay.
-- Ensure internal errors attribute the right surface (e.g. not **`waitForTextInSurface:`** when the call path is **`ManagedTtySession.assert`**).
-- Rename symbols where the name lies about behavior (e.g. **`dumpFrames`**) if the rename stays localized and tests/docs follow; **`facade`** is **removed** in Phase 14 rather than renamed.
+- Shared validation and strict-mode preambles use **`tty-assert:`** (not **`waitForTextInSurface:`**) so **`ManagedTtySession.assert`** and **`waitForTextInSurface`** share accurate copy.
+- **Palette background** cell-check failures are neutral (no past-user / chalk product wording); palette-index-8 hint references **`\\x1b[100m`** only as an escape example.
+- **`dumpFrames` → `dumpDiagnostics`** (method + **`ManagedTtySessionDumpDiagnostics`** / **`TtyAssertDumpDiagnostics`** types); README and plan references updated.
 
-**Gate:** `tty-assert` unit tests updated for any message/symbol changes; CLI-relevant E2E still green if anything in the plugin path touched.
+**Gate:** **Met** — `pnpm tty-assert:test` + `pnpm tty-assert:lint` green; no E2E plugin path used **`dumpFrames`** (none).
 
 ---
 
@@ -227,7 +229,7 @@
 **Work:**
 
 - Factor **`waitForTextInSurface`** and **`ManagedTtySession.assert`** through a **single internal** polling/attempt driver (or clearly document why two remain if a merge is worse).
-- Unify **`ManagedTtySessionDumpFrames`** / **`TtyAssertDumpFrames`** (one type, shared builder if both APIs stay).
+- Unify **`ManagedTtySessionDumpDiagnostics`** / **`TtyAssertDumpDiagnostics`** (one type, shared builder if both APIs stay).
 - Move **JSON-serializable assert payload** + **`RegExp` ↔ `{ source, flags }`** conversion next to **`tty-assert`** (or a single shared module consumed by **`cliE2ePluginTasks`**) so option lists do not fork.
 
 **Gate:** `pnpm tty-assert:test` green; targeted CLI E2E specs green; no behavior change intended beyond safer refactors.

@@ -18,9 +18,9 @@
  * **Bold:** use `{ kind: 'allBold' }` on a **`first`** block so every cell of the first match is
  * bold (xterm `isBold()`).
  *
- * **Gray block (Ink / chalk):** `\x1b[100m` (bright black background) maps to xterm **palette**
- * color **8**. Typical past-user styling uses a **`last`** block with `{ kind: 'allBgPalette', index: 8 }`
- * so every cell in the match has that background (gray foreground-only without `100m` fails this check).
+ * **Bright-black background (palette 8):** `\x1b[100m` maps to xterm **palette** index **8**. Use a
+ * **`last`** block with `{ kind: 'allBgPalette', index: 8 }` to require that background on every cell
+ * in the match (foreground-only gray without `100m` fails this check).
  *
  * Cell expectations require **`viewableBuffer` or `fullBuffer`**, a **string** needle, and a second
  * xterm pass for cell attributes.
@@ -57,7 +57,7 @@ export type WaitForTextInSurfaceOptions = {
   retryMs?: number
   /**
    * When more than one non-overlapping match exists, throw (default strict behavior).
-   * Set `false` when duplicate Ink lines are expected.
+   * Set `false` when duplicate visible lines are expected.
    */
   strict?: boolean
   cols?: number

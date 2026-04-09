@@ -5,7 +5,7 @@ const TERMINAL_ERROR_PREVIEW_LEN = 500
 const TERMINAL_ERROR_MAX_VISIBLE_SNAPSHOT_CHARS = 12_000
 const TERMINAL_ERROR_LOCATOR_SNAPSHOT_MAX_CHARS = 8000
 
-/** Raw PTY tail length before `tailPreview` / sanitize in `dumpFrames` diagnostics. */
+/** Raw PTY tail length before `tailPreview` / sanitize in `dumpDiagnostics` output. */
 export const TERMINAL_ERROR_RAW_TAIL_BYTES = 800
 
 export function sanitizeVisibleTextForError(s: string): string {
