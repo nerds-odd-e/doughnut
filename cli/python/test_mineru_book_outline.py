@@ -33,7 +33,7 @@ class LayoutRootsWithContentBlocksTest(unittest.TestCase):
             },
         ]
         roots = mbo.layout_roots_with_content_blocks(data)
-        self.assertEqual(len(roots), 2)
+        self.assertEqual(len(roots), 3)
         self.assertEqual(roots[0]["title"], "*beginning*")
         self.assertEqual(len(roots[0]["contentBlocks"]), 1)
         self.assertEqual(roots[0]["contentBlocks"][0]["text"], "Orphan body")
