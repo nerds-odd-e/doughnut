@@ -6,17 +6,37 @@
     <div
       class="daisy-pointer-events-auto daisy-mx-auto daisy-max-w-3xl daisy-rounded-lg daisy-bg-base-200/95 daisy-border daisy-border-base-300 daisy-shadow-lg daisy-px-3 daisy-py-2 daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-2"
     >
-      <p class="daisy-text-sm daisy-min-w-0 daisy-flex-1 daisy-m-0">
+      <p class="daisy-text-sm daisy-min-w-0 daisy-flex-1 daisy-basis-full sm:daisy-basis-auto daisy-m-0">
         <span class="daisy-font-medium">{{ selectedBlockTitle }}</span>
       </p>
-      <button
-        type="button"
-        data-testid="book-reading-mark-as-read"
-        class="daisy-btn daisy-btn-primary daisy-btn-sm daisy-shrink-0"
-        @click="emit('markAsRead')"
+      <div
+        class="daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-2 daisy-shrink-0"
       >
-        Mark as read
-      </button>
+        <button
+          type="button"
+          data-testid="book-reading-mark-as-read"
+          class="daisy-btn daisy-btn-primary daisy-btn-sm"
+          @click="emit('markAsRead')"
+        >
+          Mark as read
+        </button>
+        <button
+          type="button"
+          data-testid="book-reading-mark-as-skimmed"
+          class="daisy-btn daisy-btn-outline daisy-btn-sm"
+          @click="emit('markAsSkimmed')"
+        >
+          Mark as skimmed
+        </button>
+        <button
+          type="button"
+          data-testid="book-reading-mark-as-skipped"
+          class="daisy-btn daisy-btn-outline daisy-btn-sm"
+          @click="emit('markAsSkipped')"
+        >
+          Mark as skipped
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -28,5 +48,7 @@ defineProps<{
 
 const emit = defineEmits<{
   markAsRead: []
+  markAsSkimmed: []
+  markAsSkipped: []
 }>()
 </script>

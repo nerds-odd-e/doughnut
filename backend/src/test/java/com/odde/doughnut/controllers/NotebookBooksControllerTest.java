@@ -770,29 +770,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void secondPutUpdatesCompletedAtAndKeepsSingleRow() throws UnexpectedNoAccessRightException {
-      testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(0, 10).please());
-      Notebook nb = notebookWithBook();
-      BookBlock range = rootBlocksSorted(bookOf(nb)).getFirst();
-
-      var firstResponse = controller.putBlockReadingRecord(nb, range, null);
-      assertThat(firstResponse, hasSize(1));
-      testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(1, 11).please());
-      var secondResponse = controller.putBlockReadingRecord(nb, range, null);
-      assertThat(secondResponse, hasSize(1));
-      assertThat(
-          secondResponse.getFirst().getCompletedAt(),
-          equalTo(testabilitySettings.getCurrentUTCTimestamp()));
-
-      assertThat(bookBlockReadingRecordRepository.count(), equalTo(1L));
-      var stored =
-          bookBlockReadingRecordRepository
-              .findByUser_IdAndBookBlock_Id(currentUser.getUser().getId(), range.getId())
-              .orElseThrow();
-      assertThat(stored.getCompletedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
-    }
-
-    @Test
     void returns404WhenNotebookHasNoBook() {
       Notebook nbEmpty = myNotebook();
       Notebook nbWith = notebookWithBook();
@@ -835,21 +812,70 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void persistsReadRecordWhenBodyRequestsRead() throws UnexpectedNoAccessRightException {
+    void persistsSkimmedAndSkippedRejectsBadStatus() throws Exception {
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
+      Notebook nb = myNotebook();
+      byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
+      controller.attachBook(nb, attachRequest(node("Block A"), node("Block B")), pdfFile(pdfBytes));
+      List<BookBlock> roots = rootBlocksSorted(bookOf(nb));
+      assertThat(roots, hasSize(2));
+      BookBlock first = roots.getFirst();
+      BookBlock second = roots.get(1);
+
+      var skimBody = new BookBlockReadingRecordPutRequest();
+      skimBody.setStatus(BookBlockReadingRecord.STATUS_SKIMMED);
+      var afterSkim = controller.putBlockReadingRecord(nb, first, skimBody);
+      assertThat(afterSkim, hasSize(1));
+      assertThat(afterSkim.getFirst().getStatus(), equalTo(BookBlockReadingRecord.STATUS_SKIMMED));
+
+      var skipBody = new BookBlockReadingRecordPutRequest();
+      skipBody.setStatus(BookBlockReadingRecord.STATUS_SKIPPED);
+      var afterSkip = controller.putBlockReadingRecord(nb, second, skipBody);
+      assertThat(afterSkip, hasSize(2));
+      assertThat(
+          afterSkip.stream()
+              .filter(i -> i.getBookBlockId().equals(first.getId()))
+              .findFirst()
+              .orElseThrow()
+              .getStatus(),
+          equalTo(BookBlockReadingRecord.STATUS_SKIMMED));
+      assertThat(
+          afterSkip.stream()
+              .filter(i -> i.getBookBlockId().equals(second.getId()))
+              .findFirst()
+              .orElseThrow()
+              .getStatus(),
+          equalTo(BookBlockReadingRecord.STATUS_SKIPPED));
+
+      var bad = new BookBlockReadingRecordPutRequest();
+      bad.setStatus("NOT_A_STATUS");
+      var ex =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> controller.putBlockReadingRecord(nb, first, bad));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+      assertThat(ex.getReason(), equalTo("Invalid reading record status"));
+    }
+
+    @Test
+    void secondPutKeepsOneRowOverwritesStatusAndUpdatesCompletedAt()
+        throws UnexpectedNoAccessRightException {
+      testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(0, 10).please());
       Notebook nb = notebookWithBook();
       BookBlock range = rootBlocksSorted(bookOf(nb)).getFirst();
-      var body = new BookBlockReadingRecordPutRequest();
-      body.setStatus(BookBlockReadingRecord.STATUS_READ);
 
-      var returned = controller.putBlockReadingRecord(nb, range, body);
-      assertThat(returned, hasSize(1));
-      assertThat(returned.getFirst().getBookBlockId(), equalTo(range.getId()));
-      assertThat(returned.getFirst().getStatus(), equalTo(BookBlockReadingRecord.STATUS_READ));
+      var skim = new BookBlockReadingRecordPutRequest();
+      skim.setStatus(BookBlockReadingRecord.STATUS_SKIMMED);
+      assertThat(controller.putBlockReadingRecord(nb, range, skim), hasSize(1));
+
+      testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(1, 11).please());
+      var second = controller.putBlockReadingRecord(nb, range, null);
+
+      assertThat(bookBlockReadingRecordRepository.count(), equalTo(1L));
+      assertThat(second.getFirst().getStatus(), equalTo(BookBlockReadingRecord.STATUS_READ));
       assertThat(
-          returned.getFirst().getCompletedAt(),
+          second.getFirst().getCompletedAt(),
           equalTo(testabilitySettings.getCurrentUTCTimestamp()));
-
       var stored =
           bookBlockReadingRecordRepository
               .findByUser_IdAndBookBlock_Id(currentUser.getUser().getId(), range.getId())

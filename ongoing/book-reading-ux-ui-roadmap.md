@@ -29,7 +29,7 @@
 
 ## Reading Control Panel (direct content disposition)
 
-**Purpose:** Let the user **mark the direct content** of a **book block** (see **Direct content** in the architecture roadmap) as **read**, and later **skimmed** / **skipped** in a later delivery slice — without modal stacks that break reading flow.
+**Purpose:** Let the user **mark the direct content** of a **book block** (see **Direct content** in the architecture roadmap) as **read**, **skimmed**, or **skipped** — without modal stacks that break reading flow.
 
 **Placement:** **Near the bottom** of the **PDF main pane** (above safe-area inset on notched devices). It is **not** in the global top bar: it stays visually tied to “this book / this viewport.”
 
@@ -37,7 +37,7 @@
 
 | State | Behavior |
 |--------|-----------|
-| **Expanded** | Shows **short context** (e.g. which **book block**’s direct content is in question — title or breadcrumb from the **current block** / **reading-order predecessor**, per product copy in the delivery plan) and **primary actions** (e.g. **Mark as read**; later **Skimmed** / **Skipped**). Optional secondary control to **open the book layout** or focus the relevant **book block** if the drawer is closed. |
+| **Expanded** | Shows **short context** (e.g. which **book block**’s direct content is in question — title from the **selected block**) and **actions** (**Mark as read**, **Mark as skimmed**, **Mark as skipped**). Optional secondary control to **open the book layout** or focus the relevant **book block** if the drawer is closed. |
 | **Minimized** | Collapses to a **small bar** with **one or two** controls only — e.g. **chevron to expand** + **single primary** action (quick “mark read”), or **expand** + **overflow** for less common actions. Minimized state must **not** block page text: prefer floating strip, rounded bar, or thin dock with **large enough touch targets** (same comfort as **book blocks** in the list). |
 
 **Interaction rules**
@@ -47,7 +47,7 @@
 - **Coexists with drawer:** Opening/closing the book layout **does not** reset panel expand/minimize preference for the session unless we later persist it (open UX question).
 - **Accessibility:** Expand/collapse and primary actions need **visible labels** or **accessible names**; avoid relying only on iconography for “mark read.”
 
-**Delivery mapping:** The reading-record plan’s **Phase 2** slice (**read** + persistence + read styling on **book blocks** via this panel) and **Phase 3** (**auto-mark when no direct content**, so the panel is not needed on that path) are **shipped** — see [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md) and [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature). **Phase 4** adds **skim/skip** and optional **persistence of panel state** if product wants it.
+**Delivery mapping:** The reading-record plan’s **Phase 2** slice (**read** + persistence + read styling on **book blocks** via this panel) and **Phase 3** (**auto-mark when no direct content**, so the panel is not needed on that path) are **shipped** — see [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md) and [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature). **Phase 4** (**skim/skip** actions + layout `data-*` cues + **`PUT` disposition body**) is **shipped** — [`ongoing/book-reading-phase-4-skim-skip-plan.md`](book-reading-phase-4-skim-skip-plan.md). Optional **persistence of panel state** stays deferred unless product pulls it in.
 
 ---
 

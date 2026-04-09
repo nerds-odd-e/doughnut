@@ -24,13 +24,16 @@ function bookFileUrlSuffix(id: number) {
   return `/api/notebooks/${id}/book/file`
 }
 
-function topMathsLikeFlatBlocks(): BookBlockFull[] {
+function topMathsLikeFlatBlocks(options?: {
+  firstBlockHasNoDirectContent?: boolean
+}): BookBlockFull[] {
   const anchors = makeMe.bookReadingTopMathsLikeAnchors()
   return anchors.map((startAnchor, i) => ({
     id: i + 1,
     title: `Section ${i + 1}`,
     startAnchor,
     siblingOrder: i,
+    hasDirectContent: !(options?.firstBlockHasNoDirectContent && i === 0),
   }))
 }
 
@@ -119,11 +122,15 @@ function stubGetBookPlain() {
     .mockResolvedValue(wrapSdkResponse(makeMe.aBook.please()))
 }
 
-function stubGetBookWithTopMathsBlocks() {
+function stubGetBookWithTopMathsBlocks(firstBlockHasNoDirectContent?: boolean) {
   return vi
     .spyOn(NotebookBooksController, "getBook")
     .mockResolvedValue(
-      wrapSdkResponse(makeMe.aBook.blocks(topMathsLikeFlatBlocks()).please())
+      wrapSdkResponse(
+        makeMe.aBook
+          .blocks(topMathsLikeFlatBlocks({ firstBlockHasNoDirectContent }))
+          .please()
+      )
     )
 }
 
@@ -132,9 +139,10 @@ async function mountLoadedBookWithBlocks(
   options?: {
     innerWidth?: number
     assertSameOriginCredentials?: boolean
+    firstBlockHasNoDirectContent?: boolean
   }
 ) {
-  stubGetBookWithTopMathsBlocks()
+  stubGetBookWithTopMathsBlocks(options?.firstBlockHasNoDirectContent)
   mockNotebookBookFilePdfOk(id, topMathsPdfBytes, {
     assertSameOriginCredentials: options?.assertSameOriginCredentials,
   })
@@ -167,7 +175,7 @@ function pdfScrollRestoreSpy(wrapper: BookReadingPageWrapper) {
 }
 
 async function mountPatchDebounceScenario() {
-  stubGetBookWithTopMathsBlocks()
+  stubGetBookWithTopMathsBlocks(undefined)
   mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
   const patchSpy = vi
     .spyOn(NotebookBooksController, "patchNotebookBookReadingPosition")
@@ -563,6 +571,37 @@ describe("BookReadingPage", () => {
       expect(
         wrapper.find('[data-testid="book-reading-mark-as-read"]').exists()
       ).toBe(true)
+      expect(
+        wrapper.find('[data-testid="book-reading-mark-as-skimmed"]').exists()
+      ).toBe(true)
+      expect(
+        wrapper.find('[data-testid="book-reading-mark-as-skipped"]').exists()
+      ).toBe(true)
+    })
+
+    it("shows skimmed border for blocks returned as SKIMMED from reading-records on load", async () => {
+      vi.spyOn(
+        NotebookBooksController,
+        "getNotebookBookReadingRecords"
+      ).mockResolvedValue(
+        wrapSdkResponse([
+          {
+            bookBlockId: "1",
+            status: "SKIMMED",
+            completedAt: "2020-01-01T00:00:00Z",
+          },
+        ])
+      )
+      const wrapper = await mountLoadedBookWithBlocks(notebookId)
+      const section1Row = wrapper
+        .findAll('[data-testid="book-reading-book-block"]')
+        .find((w) => w.text().trim().startsWith("Section 1"))
+      expect(section1Row?.attributes("data-direct-content-skimmed")).toBe(
+        "true"
+      )
+      expect(
+        section1Row?.attributes("data-direct-content-read")
+      ).toBeUndefined()
     })
 
     it("hides the panel when nothing is selected", async () => {
@@ -617,6 +656,46 @@ describe("BookReadingPage", () => {
         "Section 6"
       )
       expect(readingControlPanel(wrapper).exists()).toBe(false)
+    })
+
+    it("calls PUT with SKIMMED when Mark as skimmed is used", async () => {
+      const putSpy = vi
+        .spyOn(NotebookBooksController, "putNotebookBookBlockReadingRecord")
+        .mockResolvedValue(
+          wrapSdkResponse([
+            {
+              bookBlockId: "1",
+              status: "SKIMMED",
+              completedAt: "2020-01-01T00:00:00Z",
+            },
+          ])
+        )
+      const wrapper = await mountLoadedBookWithBlocks(notebookId)
+      await clickBookBlockByTitle(wrapper, "Section 1")
+      await vi.waitFor(() =>
+        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+          "Section 1"
+        )
+      )
+
+      await emitViewportAndSettleCurrentBlock(wrapper, {
+        anchorPageIndexZeroBased: 0,
+        viewport: { top: 0, mid: 500, bottom: 1000 },
+        pagesCount: 10,
+      })
+
+      await wrapper.findComponent(ReadingControlPanel).vm.$emit("markAsSkimmed")
+      await flushPromises()
+
+      expect(putSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: expect.objectContaining({
+            notebook: notebookId,
+            bookBlock: 1,
+          }),
+          body: { status: "SKIMMED" },
+        })
+      )
     })
 
     it("moves book layout selection to the successor block after Mark as read", async () => {
@@ -701,6 +780,71 @@ describe("BookReadingPage", () => {
         "Section 2"
       )
       expect(readingControlPanel(wrapper).exists()).toBe(false)
+    })
+
+    it("auto-marks predecessor with READ body when it has no direct content and no record", async () => {
+      const putSpy = vi
+        .spyOn(NotebookBooksController, "putNotebookBookBlockReadingRecord")
+        .mockResolvedValue(
+          wrapSdkResponse([
+            {
+              bookBlockId: "1",
+              status: "READ",
+              completedAt: "2020-01-01T00:00:00Z",
+            },
+          ])
+        )
+      const wrapper = await mountLoadedBookWithBlocks(notebookId, {
+        firstBlockHasNoDirectContent: true,
+      })
+
+      await emitViewportAndSettleCurrentBlock(wrapper, {
+        anchorPageIndexZeroBased: 0,
+        viewport: { top: 0, mid: 500, bottom: 1000 },
+        pagesCount: 10,
+      })
+      await flushPromises()
+
+      expect(putSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: expect.objectContaining({
+            notebook: notebookId,
+            bookBlock: 1,
+          }),
+          body: { status: "READ" },
+        })
+      )
+    })
+
+    it("does not auto-mark when predecessor has no direct content but is already SKIMMED", async () => {
+      vi.spyOn(
+        NotebookBooksController,
+        "getNotebookBookReadingRecords"
+      ).mockResolvedValue(
+        wrapSdkResponse([
+          {
+            bookBlockId: "1",
+            status: "SKIMMED",
+            completedAt: "2020-01-01T00:00:00Z",
+          },
+        ])
+      )
+      const putSpy = vi
+        .spyOn(NotebookBooksController, "putNotebookBookBlockReadingRecord")
+        .mockResolvedValue(wrapSdkResponse([]))
+
+      const wrapper = await mountLoadedBookWithBlocks(notebookId, {
+        firstBlockHasNoDirectContent: true,
+      })
+
+      await emitViewportAndSettleCurrentBlock(wrapper, {
+        anchorPageIndexZeroBased: 0,
+        viewport: { top: 0, mid: 500, bottom: 1000 },
+        pagesCount: 10,
+      })
+      await flushPromises()
+
+      expect(putSpy).not.toHaveBeenCalled()
     })
   })
 })

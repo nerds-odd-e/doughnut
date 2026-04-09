@@ -55,6 +55,18 @@ Then I should see that book block "2.1 xxxx" is marked as read in the book layou
 
 ### mark a book block as skimmed/skipped
 
+When I choose the book block "2.1 Easier to Change—and Harder to Misuse"
+And I scroll the PDF until the book block "2.2 Refactoring as Strengthening the Code" is the current block in the book reader
+When I mark the book block "2.1 Easier to Change—and Harder to Misuse" as skimmed in the Reading Control Panel
+Then I should see that book block "2.1 Easier to Change—and Harder to Misuse" is marked as skimmed in the book layout
+And I should see that book block "2.2 Refactoring as Strengthening the Code" is selected in the book layout
+
+When I choose the book block "2.1 Easier to Change—and Harder to Misuse"
+And I scroll the PDF until the book block "2.2 Refactoring as Strengthening the Code" is the current block in the book reader
+When I mark the book block "2.1 Easier to Change—and Harder to Misuse" as skipped in the Reading Control Panel
+Then I should see that book block "2.1 Easier to Change—and Harder to Misuse" is marked as skipped in the book layout
+And I should see that book block "2.2 Refactoring as Strengthening the Code" is selected in the book layout
+
 ---
 
 ## Story: Reorganizing the book layout

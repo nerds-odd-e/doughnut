@@ -8,11 +8,11 @@
 
 **Planning rules:** `.cursor/rules/planning.mdc` — one **user-visible** behavior per phase, scenario-first ordering, test-first workflow when adding behavior, at most one intentionally failing test while driving a phase.
 
-**Testing for this story:** **Phase 2** and **Phase 3** are covered by **E2E** ([`reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature)) plus controller and mounted tests. **Phases 1 and 4** still rely on **unit-style tests** per `.cursor/rules/planning.mdc` — **observable** surfaces (HTTP from **controllers**, **mounted** Vue via Vitest), **black-box** I/O, **few** focused tests, **direct** tests only for small deliberate contracts (pure predicates, mapping, validation messages). **Phase 3** design archive (sub-phases 3A–3H): [`ongoing/book-reading-phase-3-no-direct-content-plan.md`](book-reading-phase-3-no-direct-content-plan.md).
+**Testing for this story:** **Phase 2** and **Phase 3** are covered by **E2E** ([`reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature)) plus controller and mounted tests. **Phase 4** is covered by **controller** + **mounted** + **`readBlockIdsFromRecords`** tests (no Cypress in that slice). **Phase 1** uses **unit-style tests** per `.cursor/rules/planning.mdc` — **observable** surfaces (HTTP from **controllers**, **mounted** Vue via Vitest), **black-box** I/O, **few** focused tests, **direct** tests only for small deliberate contracts (pure predicates, mapping, validation messages). **Phase 3** design archive (sub-phases 3A–3H): [`ongoing/book-reading-phase-3-no-direct-content-plan.md`](book-reading-phase-3-no-direct-content-plan.md).
 
 **This document is a delivery plan only** — not executed here.
 
-**Status:** **Phase 2** (*Mark a book block as read*) and **Phase 3** (*auto-read when no direct content*) are **shipped** (same E2E feature file as Phase 2). **Phase 4** below is **not** started.
+**Status:** **Phase 2**, **Phase 3**, and **Phase 4** (*skim/skip dispositions*) are **shipped**. **Phase 1** (*last read position*) may ship separately; see Phase 1 below.
 
 ---
 
@@ -78,28 +78,22 @@
 **As implemented:**
 
 - **`GET …/book`** includes **`hasDirectContent`** per block from persisted **`BookContentBlock`** rows via **`BookBlockDirectContentPredicate`** (`backend/src/main/java/com/odde/doughnut/services/book/BookBlockDirectContentPredicate.java`; tests in **`BookBlockDirectContentPredicateTest`** and **`NotebookBooksControllerTest`**).
-- **Auto-mark:** when the viewport-derived **current block** changes, **`BookReadingPage.vue`** marks the reading-order **predecessor** read via **`PUT …/reading-record`** if **`hasDirectContent`** is false and the predecessor is not already read.
+- **Auto-mark:** when the viewport-derived **current block** changes, **`BookReadingPage.vue`** marks the reading-order **predecessor** **`READ`** via **`PUT …/reading-record`** with body **`{"status":"READ"}`** if **`hasDirectContent`** is false and the predecessor has **no** recorded disposition (**READ** / **SKIMMED** / **SKIPPED**).
 - **Import:** CLI **`cli/python/mineru_book_outline.py`** emits per-node **`contentBlocks`** (body only; no duplicate heading row); orphan prefix → synthetic **`*beginning*`** block (Python tests in **`cli/python/test_mineru_book_outline.py`**).
 - **E2E:** [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature) (no-direct-content scenario).
 - **Design archive (sub-phases 3A–3H):** [`ongoing/book-reading-phase-3-no-direct-content-plan.md`](book-reading-phase-3-no-direct-content-plan.md).
 
 ---
 
-## Phase 4 — Mark a book block as skimmed or skipped
+## Phase 4 — Mark a book block as skimmed or skipped — **shipped**
 
-**User story scenario:** *mark a book block as skimmed/skipped* (Gherkin to be completed in `book-reading-user-stories.md` when this phase starts).
+**User story scenario:** [`ongoing/book-reading-user-stories.md`](book-reading-user-stories.md) — *mark a book block as skimmed/skipped*.
 
-**User outcome:** The same flow family as Phase 2 supports **skimmed** and **skipped** from the **Reading Control Panel** (expanded actions), aligned with **Direct content disposition** names in the architecture doc. The **book layout** distinguishes states **at least** as much as product requires (could be icon, label, or shared “touched” vs “completed” — decide in implementation; roadmap allows enum-style status).
+**User outcome:** Same successor gating as Phase 2; **Reading Control Panel** adds **Mark as skimmed** and **Mark as skipped**; **`PUT …/reading-record`** accepts optional JSON body **`{"status":"READ"|"SKIMMED"|"SKIPPED"}`** (omitted body still means **READ**). Book layout uses **`data-direct-content-read`**, **`data-direct-content-skimmed`**, **`data-direct-content-skipped`** plus screen-reader labels.
 
-**Depends on:** Phase 2 (and reuses Phase 3 heuristic only if skim/skip also applies to “no prompt” cases—optional; do not expand scope unless a single cohesive UX falls out naturally).
+**As implemented:** `BookBlockReadingRecord` constants **READ** / **SKIMMED** / **SKIPPED**; **`readingDispositionByBlockId`** + **`hasRecordedDisposition`** on the client; auto-mark **READ** only and **does not** overwrite an existing skim/skip. Tests: **`NotebookBooksControllerTest`** (skim/skip persist, invalid status **400**, overwrite); mounted **`BookReadingPage.spec.ts`** and **`readBlockIdsFromRecords.spec.ts`**.
 
-**Tests (no E2E for this phase):**
-
-- **Controller / API:** `POST`/`PATCH` (or whatever surface answers the prompt) accepts **skimmed** and **skipped**; responses and **403/404** paths; persisted status round-trips on **GET** book or records endpoint.
-- **Frontend:** **Mounted** tests — choosing **skim** vs **skip** in the prompt UI calls the SDK with the right enum/body and updates **book layout** presentation props or DOM hooks you expose for testing (prefer **user-visible** strings/roles over implementation-only `data-testid` unless the project already standardizes them).
-- **Validation / enum:** illegal status rejected with stable **error text** or code if that is part of the public contract.
-
-**API / schema:** Extend `ReadingRecord.status` (or equivalent) with **skimmed** and **skipped**; migrate forward-only per `.cursor/rules/db-migration.mdc`.
+**Detail:** [`ongoing/book-reading-phase-4-skim-skip-plan.md`](book-reading-phase-4-skim-skip-plan.md) (mark archived / done).
 
 ---
 
@@ -116,4 +110,4 @@ After each phase:
 
 ## Document maintenance
 
-When phases ship, trim duplication here; keep the architecture roadmap as the single place for long-lived conceptual rules. **Phase 2** and **Phase 3** Cypress path: [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature). Phases 1 and 4 rely on unit/controller/mounted tests only.
+When phases ship, trim duplication here; keep the architecture roadmap as the single place for long-lived conceptual rules. **Phase 2** and **Phase 3** Cypress path: [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature). **Phase 4** uses controller + mounted tests only (no new Cypress in that slice). Phase 1 uses unit/controller/mounted tests as described above.

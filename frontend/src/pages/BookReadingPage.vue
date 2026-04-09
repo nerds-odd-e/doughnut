@@ -109,7 +109,19 @@
                 block.id === currentSelectionBlockId ? 'true' : undefined
               "
               :data-direct-content-read="
-                bookReading.isDirectContentRead(block.id) ? 'true' : undefined
+                bookReading.dispositionForBlock(block.id) === 'READ'
+                  ? 'true'
+                  : undefined
+              "
+              :data-direct-content-skimmed="
+                bookReading.dispositionForBlock(block.id) === 'SKIMMED'
+                  ? 'true'
+                  : undefined
+              "
+              :data-direct-content-skipped="
+                bookReading.dispositionForBlock(block.id) === 'SKIPPED'
+                  ? 'true'
+                  : undefined
               "
               :aria-current="
                 block.startAnchor.id === currentBlockAnchorId
@@ -121,10 +133,22 @@
             >
               {{ block.title }}
               <span
-                v-if="bookReading.isDirectContentRead(block.id)"
+                v-if="bookReading.dispositionForBlock(block.id) === 'READ'"
                 class="daisy-sr-only"
               >
                 Marked as read
+              </span>
+              <span
+                v-else-if="bookReading.dispositionForBlock(block.id) === 'SKIMMED'"
+                class="daisy-sr-only"
+              >
+                Marked as skimmed
+              </span>
+              <span
+                v-else-if="bookReading.dispositionForBlock(block.id) === 'SKIPPED'"
+                class="daisy-sr-only"
+              >
+                Marked as skipped
               </span>
             </button>
           </div>
@@ -156,7 +180,9 @@
             <ReadingControlPanel
               v-if="readingControlPanelVisible"
               :selected-block-title="readingControlSelectedBlockTitle"
-              @mark-as-read="markSelectedBlockAsRead"
+              @mark-as-read="() => markSelectedDisposition('READ')"
+              @mark-as-skimmed="() => markSelectedDisposition('SKIMMED')"
+              @mark-as-skipped="() => markSelectedDisposition('SKIPPED')"
             />
           </template>
         </main>
@@ -181,6 +207,7 @@ import { nextLiveAnnouncementText } from "@/lib/book-reading/currentBlockLiveAnn
 import { currentBlockAnchorIdFromAnchorPage } from "@/lib/book-reading/currentBlockAnchorFromAnchorPage"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
+import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type {
   BookAnchorFull,
   BookBlockFull,
@@ -299,19 +326,19 @@ const readingControlPanelVisible = computed(() => {
   if (selIdx < 0 || selIdx >= rows.length - 1) {
     return false
   }
-  if (bookReading.isDirectContentRead(selId)) {
+  if (bookReading.hasRecordedDisposition(selId)) {
     return false
   }
   const successor = rows[selIdx + 1]!
   return successor.startAnchor.id === curAnchorId
 })
 
-async function markSelectedBlockAsRead() {
+async function markSelectedDisposition(status: BookBlockReadingDisposition) {
   const id = currentSelectionBlockId.value
   if (id === null) {
     return
   }
-  const ok = await bookReading.submitMarkRead(id)
+  const ok = await bookReading.submitReadingDisposition(id, status)
   if (!ok) {
     return
   }
@@ -418,7 +445,7 @@ watch(currentBlockAnchorId, async (anchorId) => {
   const predecessor = rows[bIdx - 1]!
   if (
     !predecessor.hasDirectContent &&
-    !bookReading.isDirectContentRead(predecessor.id)
+    !bookReading.hasRecordedDisposition(predecessor.id)
   ) {
     await bookReading.submitMarkRead(predecessor.id)
   }
@@ -550,5 +577,13 @@ aside {
 
 .book-reading-book-block[data-direct-content-read="true"] {
   @apply daisy-border-r-4 daisy-border-r-success;
+}
+
+.book-reading-book-block[data-direct-content-skimmed="true"] {
+  @apply daisy-border-r-4 daisy-border-r-warning;
+}
+
+.book-reading-book-block[data-direct-content-skipped="true"] {
+  @apply daisy-border-r-4 daisy-border-r-neutral;
 }
 </style>
