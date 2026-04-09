@@ -5,10 +5,26 @@
   >
     <template v-for="item in catalogItems" :key="catalogItemKey(item)">
       <NotebookListRow
-        v-if="item.type === 'notebook' || item.type === 'subscribedNotebook'"
+        v-if="item.type === 'notebook'"
         :notebook="item.notebook"
       >
         <NotebookButtons
+          v-bind="{ notebook: item.notebook, user }"
+          @notebook-updated="$emit('notebook-updated', $event)"
+        />
+      </NotebookListRow>
+      <NotebookListRow
+        v-else-if="item.type === 'subscribedNotebook'"
+        :notebook="item.notebook"
+        :is-subscribed="true"
+      >
+        <SubscriptionNoteButtons
+          v-if="subscriptionById(item.subscriptionId)"
+          :subscription="subscriptionById(item.subscriptionId)!"
+          @updated="$emit('refresh')"
+        />
+        <NotebookButtons
+          v-else
           v-bind="{ notebook: item.notebook, user }"
           @notebook-updated="$emit('notebook-updated', $event)"
         />
@@ -32,8 +48,15 @@
             v-for="nb in item.notebooks"
             :key="nb.id"
             :notebook="nb"
+            :is-subscribed="!!subscriptionForNotebook(nb.id)"
           >
+            <SubscriptionNoteButtons
+              v-if="subscriptionForNotebook(nb.id)"
+              :subscription="subscriptionForNotebook(nb.id)!"
+              @updated="$emit('refresh')"
+            />
             <NotebookButtons
+              v-else
               v-bind="{ notebook: nb, user }"
               @notebook-updated="$emit('notebook-updated', $event)"
             />
@@ -48,7 +71,7 @@
   >
     <template v-for="item in catalogItems" :key="catalogItemKey(item)">
       <div
-        v-if="item.type === 'notebook' || item.type === 'subscribedNotebook'"
+        v-if="item.type === 'notebook'"
         role="card"
         class="daisy-card"
         data-cy="notebook-card"
@@ -57,6 +80,29 @@
           <template #cardHeader>
             <span class="daisy-flex daisy-justify-end daisy-p-0">
               <NotebookButtons
+                v-bind="{ notebook: item.notebook, user }"
+                @notebook-updated="$emit('notebook-updated', $event)"
+              />
+            </span>
+          </template>
+        </NotebookCard>
+      </div>
+      <div
+        v-else-if="item.type === 'subscribedNotebook'"
+        role="card"
+        class="daisy-card subscribed-notebook"
+        data-cy="notebook-card"
+      >
+        <NotebookCard :notebook="item.notebook">
+          <template #cardHeader>
+            <span class="daisy-flex daisy-justify-end daisy-p-0">
+              <SubscriptionNoteButtons
+                v-if="subscriptionById(item.subscriptionId)"
+                :subscription="subscriptionById(item.subscriptionId)!"
+                @updated="$emit('refresh')"
+              />
+              <NotebookButtons
+                v-else
                 v-bind="{ notebook: item.notebook, user }"
                 @notebook-updated="$emit('notebook-updated', $event)"
               />
@@ -86,12 +132,19 @@
             :key="nb.id"
             role="card"
             class="daisy-card"
+            :class="{ 'subscribed-notebook': !!subscriptionForNotebook(nb.id) }"
             data-cy="notebook-card"
           >
             <NotebookCard :notebook="nb">
               <template #cardHeader>
                 <span class="daisy-flex daisy-justify-end daisy-p-0">
+                  <SubscriptionNoteButtons
+                    v-if="subscriptionForNotebook(nb.id)"
+                    :subscription="subscriptionForNotebook(nb.id)!"
+                    @updated="$emit('refresh')"
+                  />
                   <NotebookButtons
+                    v-else
                     v-bind="{ notebook: nb, user }"
                     @notebook-updated="$emit('notebook-updated', $event)"
                   />
@@ -111,16 +164,22 @@ import type { NotebookCatalogEntry } from "./patchNotebookInCatalogItems"
 import type {
   Notebook,
   NotebookCatalogGroupItem,
+  Subscription,
   User,
 } from "@generated/doughnut-backend-api"
 import NotebookButtons from "./NotebookButtons.vue"
 import NotebookCard from "../notebooks/NotebookCard.vue"
 import NotebookListRow from "./NotebookListRow.vue"
+import SubscriptionNoteButtons from "../subscriptions/SubscriptionNoteButtons.vue"
 import { groupMemberHint } from "./groupMemberHint"
 
-defineProps({
+const props = defineProps({
   catalogItems: {
     type: Array as PropType<NotebookCatalogEntry[]>,
+    required: true,
+  },
+  subscriptions: {
+    type: Array as PropType<Subscription[]>,
     required: true,
   },
   layout: {
@@ -135,7 +194,16 @@ defineProps({
 
 defineEmits<{
   (e: "notebook-updated", notebook: Notebook): void
+  (e: "refresh"): void
 }>()
+
+function subscriptionById(subscriptionId: number): Subscription | undefined {
+  return props.subscriptions.find((s) => s.id === subscriptionId)
+}
+
+function subscriptionForNotebook(notebookId: number): Subscription | undefined {
+  return props.subscriptions.find((s) => s.notebook?.id === notebookId)
+}
 
 function catalogItemKey(item: NotebookCatalogEntry): string {
   if (item.type === "notebookGroup") return `grp-${item.id}`
@@ -166,5 +234,19 @@ function hintForGroup(item: NotebookCatalogGroupItem) {
   flex: 1;
   display: flex;
   flex-direction: column;
+}
+
+.daisy-card.subscribed-notebook :deep(.notebook-card) {
+  background: linear-gradient(
+    to right,
+    oklch(var(--p) / 0.2) 0%,
+    oklch(var(--p) / 0.1) 5%
+  );
+  border: 1px solid oklch(var(--p) / 0.4);
+}
+
+.daisy-card.subscribed-notebook :deep(.notebook-binding) {
+  background: oklch(var(--p));
+  border-right: 1px solid oklch(var(--p) / 0.7);
 }
 </style>

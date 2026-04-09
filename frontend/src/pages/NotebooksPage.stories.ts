@@ -25,31 +25,42 @@ type Story = StoryObj<typeof meta>
 
 const mockUser: User = makeMe.aUser.please()
 
-// Page with notebooks and subscriptions
+// Page with notebooks and Bazaar subscriptions in the merged catalogItems list
 export const WithNotebooksAndSubscriptions: Story = {
-  args: {
-    catalogItems: makeMe.notebookCatalog
-      .notebook("My First Notebook")
-      .notebook("Learning TypeScript")
-      .notebook("Project Documentation")
-      .please(),
-    subscriptions: [
-      {
-        id: 1,
-        notebook: {
-          ...makeMe.aNotebook.please(),
-          title: "Shared Knowledge Base",
-        },
-        user: mockUser,
-      } as Subscription,
-      {
-        id: 2,
-        notebook: { ...makeMe.aNotebook.please(), title: "Community Notes" },
-        user: mockUser,
-      } as Subscription,
-    ],
-    user: mockUser,
-  },
+  args: (() => {
+    const sharedNb = {
+      ...makeMe.aNotebook.please(),
+      title: "Shared Knowledge Base",
+    }
+    const communityNb = {
+      ...makeMe.aNotebook.please(),
+      title: "Community Notes",
+    }
+    return {
+      catalogItems: makeMe.notebookCatalog
+        .notebook("My First Notebook")
+        .notebook("Learning TypeScript")
+        .notebook("Project Documentation")
+        .entry(
+          makeMe.notebookCatalogSubscribedNotebook
+            .forNotebook(sharedNb)
+            .subscriptionId(1)
+            .please()
+        )
+        .entry(
+          makeMe.notebookCatalogSubscribedNotebook
+            .forNotebook(communityNb)
+            .subscriptionId(2)
+            .please()
+        )
+        .please(),
+      subscriptions: [
+        { id: 1, notebook: sharedNb, user: mockUser } as Subscription,
+        { id: 2, notebook: communityNb, user: mockUser } as Subscription,
+      ],
+      user: mockUser,
+    }
+  })(),
 }
 
 // Page with only notebooks, no subscriptions

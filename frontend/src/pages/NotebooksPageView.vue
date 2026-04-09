@@ -45,6 +45,7 @@
           </h1>
           <p class="daisy-mt-1 daisy-text-sm daisy-text-base-content/60">
             Open a notebook to work with notes, or use the toolbar to create a new one.
+            Notebooks you subscribe to in the Bazaar appear in this list together with your own.
           </p>
         </div>
         <div
@@ -69,9 +70,11 @@
       <NotebookCatalogSection
         v-if="catalogItems.length > 0"
         :catalog-items="catalogItems"
+        :subscriptions="subscriptions"
         :layout="notebooksLayout"
         :user="user"
         @notebook-updated="handleNotebookUpdated"
+        @refresh="emit('refresh')"
       />
       <div
         v-else
@@ -84,32 +87,6 @@
           Use <span class="daisy-font-medium daisy-text-base-content/80">Add New Notebook</span> above to create your first one.
         </p>
       </div>
-    </section>
-
-    <section class="subscribed-section daisy-border-t daisy-border-base-300 daisy-pt-10">
-      <h2 class="daisy-mb-1 daisy-text-lg daisy-font-semibold daisy-text-base-content">
-        Subscribed notebooks
-      </h2>
-      <p class="daisy-mb-5 daisy-text-sm daisy-text-base-content/60">
-        Notebooks you follow from the Bazaar appear here.
-      </p>
-      <NotebookCardsWithButtons
-        v-if="subscriptions.length > 0"
-        :layout="notebooksLayout"
-        :notebooks="subscriptions.map((s) => s.notebook!)"
-        :is-subscribed="true"
-      >
-        <template #default="{ notebook }">
-          <SubscriptionNoteButtons
-            v-if="subscriptions.find((s) => s.notebook === notebook)"
-            :subscription="subscriptions.find((s) => s.notebook === notebook)!"
-            @updated="$emit('refresh')"
-          />
-        </template>
-      </NotebookCardsWithButtons>
-      <p v-else class="daisy-m-0 daisy-text-sm daisy-text-base-content/55">
-        None yet — visit the Bazaar to subscribe to shared notebooks.
-      </p>
     </section>
   </main>
 </template>
@@ -128,8 +105,6 @@ import PopButton from "@/components/commons/Popups/PopButton.vue"
 import NotebookGroupNewForm from "@/components/notebook/NotebookGroupNewForm.vue"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import NotebookCatalogSection from "@/components/notebook/NotebookCatalogSection.vue"
-import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithButtons.vue"
-import SubscriptionNoteButtons from "@/components/subscriptions/SubscriptionNoteButtons.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 
 defineProps({
@@ -171,4 +146,3 @@ watch(notebooksLayout, (value) => {
   localStorage.setItem(NOTEBOOKS_LAYOUT_STORAGE_KEY, value)
 })
 </script>
-

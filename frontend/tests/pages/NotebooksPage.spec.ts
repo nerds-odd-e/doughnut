@@ -310,4 +310,79 @@ describe("Notebooks Page", () => {
       expect(groupCard.attributes("aria-label")).toContain("Member Delta")
     })
   })
+
+  describe("subscribed notebooks in merged catalog", () => {
+    it("shows subscription actions for a top-level subscribedNotebook row", async () => {
+      const subNotebook = {
+        ...makeMe.aNotebook.please(),
+        title: "Bazaar Shared",
+      }
+      const catalogItems = [
+        makeMe.notebookCatalogNotebook.title("Owned").please(),
+        makeMe.notebookCatalogSubscribedNotebook
+          .forNotebook(subNotebook)
+          .subscriptionId(42)
+          .please(),
+      ]
+      const subscriptions = [
+        { id: 42, notebook: subNotebook, user: makeMe.aUser.please() },
+      ]
+
+      const wrapper = helper
+        .component(NotebooksPageView)
+        .withProps({
+          catalogItems,
+          subscriptions,
+          user: makeMe.aUser.please(),
+        })
+        .withCurrentUser(makeMe.aUser.please())
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      expect(wrapper.find('button[title="Unsubscribe"]').exists()).toBe(true)
+      expect(wrapper.find('button[title="Edit subscription"]').exists()).toBe(
+        true
+      )
+    })
+
+    it("shows subscription actions for a subscribed member inside a group", async () => {
+      const ownedMember = {
+        ...makeMe.aNotebook.please(),
+        title: "Owned In Group",
+      }
+      const subMember = {
+        ...makeMe.aNotebook.please(),
+        title: "Subscribed In Group",
+      }
+      const catalogItems = [
+        makeMe.notebookCatalogGroup
+          .id(1)
+          .name("Mixed Group")
+          .createdAt("2020-01-01T00:00:00.000Z")
+          .members([ownedMember, subMember])
+          .please(),
+      ]
+      const subscriptions = [
+        { id: 99, notebook: subMember, user: makeMe.aUser.please() },
+      ]
+
+      const wrapper = helper
+        .component(NotebooksPageView)
+        .withProps({
+          catalogItems,
+          subscriptions,
+          user: makeMe.aUser.please(),
+        })
+        .withCurrentUser(makeMe.aUser.please())
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      const unsubButtons = wrapper.findAll('button[title="Unsubscribe"]')
+      expect(unsubButtons.length).toBe(1)
+    })
+  })
 })
