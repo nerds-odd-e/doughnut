@@ -67,6 +67,9 @@ const bookReadingPage = () => {
     clickBookBlockByTitle(title: string) {
       pageIsNotLoading()
       bookBlockRows().contains(title).click()
+      bookBlockRows()
+        .contains(title)
+        .should('have.attr', 'data-current-block', 'true')
       return this
     },
     expectBookBlockIsCurrentSelectionByTitle(title: string) {
