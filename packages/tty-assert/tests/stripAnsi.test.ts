@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { stripAnsiCliPty } from '../src/stripAnsi'
+import { stripAnsiCliPty } from '../src/ansi/stripAnsi'
 
 describe('stripAnsiCliPty', () => {
   it('leaves plain text unchanged', () => {

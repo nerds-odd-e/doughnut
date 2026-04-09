@@ -1,5 +1,8 @@
 import { Terminal } from '@xterm/headless'
-import { CLI_INTERACTIVE_PTY_COLS, CLI_INTERACTIVE_PTY_ROWS } from './geometry'
+import {
+  CLI_INTERACTIVE_PTY_COLS,
+  CLI_INTERACTIVE_PTY_ROWS,
+} from '../defaults/geometry'
 
 /** Viewport plaintext from a headless xterm after replay (not re-exported from the package root). */
 

@@ -1,5 +1,5 @@
-import { formatSearchSurfaceFailure } from './errorSnapshotFormatting'
-import type { SurfaceAttemptResult } from './surfaceAttemptOnTerminal'
+import { formatSearchSurfaceFailure } from '../diagnostics/errorSnapshotFormatting'
+import type { SurfaceAttemptResult } from '../xterm/surfaceAttemptOnTerminal'
 import { TtyAssertStrictModeViolationError } from './ttyAssertStrictModeError'
 
 function sleep(ms: number): Promise<void> {

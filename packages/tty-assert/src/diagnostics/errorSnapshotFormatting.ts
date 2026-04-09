@@ -1,5 +1,5 @@
 /** Diagnostic-only: safe visible text and truncation for PTY assertion failures (internal to tty-assert). */
-import { stripAnsiCliPty } from './stripAnsi'
+import { stripAnsiCliPty } from '../ansi/stripAnsi'
 
 const TERMINAL_ERROR_PREVIEW_LEN = 500
 const TERMINAL_ERROR_MAX_VISIBLE_SNAPSHOT_CHARS = 12_000

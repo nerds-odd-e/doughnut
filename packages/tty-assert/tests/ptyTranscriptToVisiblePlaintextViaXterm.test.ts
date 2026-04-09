@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   ptyTranscriptToViewportPlaintext,
   ptyTranscriptToVisiblePlaintextViaXterm,
-} from '../src/ptyTranscriptToVisiblePlaintextViaXterm'
+} from '../src/xterm/ptyTranscriptToVisiblePlaintextViaXterm'
 
 describe('ptyTranscriptToVisiblePlaintextViaXterm (viewport replay)', () => {
   it('replays a minimal transcript to stable non-empty plain text', async () => {

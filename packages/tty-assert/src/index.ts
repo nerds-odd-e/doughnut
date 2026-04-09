@@ -1,4 +1,4 @@
-export type { BufferedPtySession } from './ptySession'
+export type { BufferedPtySession } from './pty/ptySession'
 export {
   startManagedTtySession,
   type ManagedTtyAssertInput,

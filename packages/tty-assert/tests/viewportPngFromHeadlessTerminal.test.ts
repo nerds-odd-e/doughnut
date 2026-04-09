@@ -1,6 +1,6 @@
 import { Terminal } from '@xterm/headless'
 import { describe, expect, it } from 'vitest'
-import { viewportPngFromHeadlessTerminal } from '../src/viewportPngFromHeadlessTerminal'
+import { viewportPngFromHeadlessTerminal } from '../src/xterm/viewportPngFromHeadlessTerminal'
 
 describe('viewportPngFromHeadlessTerminal', () => {
   it('returns PNG magic bytes after replaying output', async () => {

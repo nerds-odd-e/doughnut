@@ -4,8 +4,8 @@
  */
 
 import { Terminal } from '@xterm/headless'
-import type { CellExpectationBlock } from './cellExpectations'
-import { stripAnsiCliPty } from './stripAnsi'
+import type { CellExpectationBlock } from '../surface/cellExpectations'
+import { stripAnsiCliPty } from '../ansi/stripAnsi'
 
 /** ANSI bright black: `\x1b[90m` (fg) / `\x1b[100m` (bg); xterm palette index 8. */
 const BRIGHT_BLACK_PALETTE_INDEX = 8

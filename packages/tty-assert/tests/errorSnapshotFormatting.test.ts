@@ -7,7 +7,7 @@ import {
   headPreview,
   sanitizeVisibleTextForError,
   tailPreview,
-} from '../src/errorSnapshotFormatting'
+} from '../src/diagnostics/errorSnapshotFormatting'
 
 const PREVIEW_LEN = 500
 const MAX_VISIBLE_SNAPSHOT_CHARS = 12_000

@@ -6,6 +6,8 @@ This package is **Cypress-neutral** and **Doughnut-neutral**; the monorepo wires
 
 **Imports:** **`package.json` exposes only the package root** (`tty-assert` → `src/index.ts`). Everything else lives under `src/` for use inside this package (relative imports in tests and implementation). A published build would point the root at compiled `dist/` instead of `.ts`.
 
+**Internal layout:** `ansi/` (strip escapes), `defaults/` (geometry), `diagnostics/` (failure formatting and dump payloads), `pty/` (buffered PTY), `xterm/` (headless replay, viewport PNG/GIF, live-terminal surface attempts), `surface/` (`waitForTextInSurface`, poll loop, cell expectations, strict errors), `managed/` (managed session).
+
 **Phase 6:** Managed session + single Cypress assertion task — design and sub-phases in [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](../../ongoing/cli-phase6-tty-assert-managed-session-subphases.md).
 
 ---
@@ -24,7 +26,7 @@ Stripped text and replayed viewport text **differ**: layout, wrapping, and scrol
 
 ## Flattening contract (locators)
 
-**Viewport replay** (`ptyTranscriptToViewportPlaintext`): newline-**joined** rows (see implementation in `ptyTranscriptToVisiblePlaintextViaXterm.ts`).
+**Viewport replay** (`ptyTranscriptToViewportPlaintext`): newline-**joined** rows (see implementation in `src/xterm/ptyTranscriptToVisiblePlaintextViaXterm.ts`).
 
 **`waitForTextInSurface`** for xterm-backed surfaces (`viewableBuffer`, `fullBuffer`):
 
@@ -79,7 +81,7 @@ Used by **`ManagedTtySession.assert`** and unit-tested under `packages/tty-asser
 
 ```ts
 // e.g. from packages/tty-assert/tests/ — see waitForTextInSurface.test.ts
-import { waitForTextInSurface } from '../src/waitForTextInSurface'
+import { waitForTextInSurface } from '../src/surface/waitForTextInSurface'
 
 await waitForTextInSurface({
   raw: ptyBytes,

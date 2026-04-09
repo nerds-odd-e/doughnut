@@ -1,9 +1,9 @@
 import type { IPty } from '@lydell/node-pty'
 import { Terminal } from '@xterm/headless'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { TERMINAL_ERROR_FINAL_VIEWPORT_HEADING } from '../src/errorSnapshotFormatting'
-import { attachManagedTtySession } from '../src/managedTtySession'
-import { ptyTranscriptToViewportPlaintext } from '../src/ptyTranscriptToVisiblePlaintextViaXterm'
+import { TERMINAL_ERROR_FINAL_VIEWPORT_HEADING } from '../src/diagnostics/errorSnapshotFormatting'
+import { attachManagedTtySession } from '../src/managed/managedTtySession'
+import { ptyTranscriptToViewportPlaintext } from '../src/xterm/ptyTranscriptToVisiblePlaintextViaXterm'
 
 function mockPty(): IPty {
   const noop = () => {

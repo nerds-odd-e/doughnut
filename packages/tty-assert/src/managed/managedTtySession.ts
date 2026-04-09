@@ -2,30 +2,33 @@ import { Terminal } from '@xterm/headless'
 import {
   formatFinalViewportPlaintextForError,
   formatRawTerminalSnapshotForError,
-} from './errorSnapshotFormatting'
-import { CLI_INTERACTIVE_PTY_COLS, CLI_INTERACTIVE_PTY_ROWS } from './geometry'
+} from '../diagnostics/errorSnapshotFormatting'
+import {
+  CLI_INTERACTIVE_PTY_COLS,
+  CLI_INTERACTIVE_PTY_ROWS,
+} from '../defaults/geometry'
 import {
   disposeBufferedPtySession,
   startBufferedPtySession,
   type BufferedPtySession,
   type StartBufferedPtySessionOptions,
-} from './ptySession'
-import { validateAndResolveCellExpectations } from './cellExpectations'
-import { viewportPlaintextFromHeadlessTerminal } from './ptyTranscriptToVisiblePlaintextViaXterm'
-import { viewportPngBuffersToGif } from './viewportPngSequenceToGif'
-import { viewportPngFromHeadlessTerminal } from './viewportPngFromHeadlessTerminal'
+} from '../pty/ptySession'
+import { validateAndResolveCellExpectations } from '../surface/cellExpectations'
+import { viewportPlaintextFromHeadlessTerminal } from '../xterm/ptyTranscriptToVisiblePlaintextViaXterm'
+import { viewportPngBuffersToGif } from '../xterm/viewportPngSequenceToGif'
+import { viewportPngFromHeadlessTerminal } from '../xterm/viewportPngFromHeadlessTerminal'
 import {
   attemptOnceOnLiveTerminal,
   attemptOnceStrippedTranscript,
   writeTranscriptToTerminal,
-} from './surfaceAttemptOnTerminal'
-import { TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS } from './locatorRetryMs'
+} from '../xterm/surfaceAttemptOnTerminal'
+import { TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS } from '../surface/locatorRetryMs'
 import {
   buildTtyAssertDumpDiagnostics,
   type TtyAssertDumpDiagnostics,
-} from './ttyAssertDumpDiagnostics'
-import { pollSurfaceAssertLoop } from './pollSurfaceAssertLoop'
-import type { WaitForTextInSurfaceOptions } from './waitForTextInSurface'
+} from '../diagnostics/ttyAssertDumpDiagnostics'
+import { pollSurfaceAssertLoop } from '../surface/pollSurfaceAssertLoop'
+import type { WaitForTextInSurfaceOptions } from '../surface/waitForTextInSurface'
 
 export type ManagedTtyAssertOptions = Omit<WaitForTextInSurfaceOptions, 'raw'>
 

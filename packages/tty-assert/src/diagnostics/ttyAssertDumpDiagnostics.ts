@@ -4,7 +4,7 @@ import {
   sanitizeVisibleTextForError,
   tailPreview,
 } from './errorSnapshotFormatting'
-import { stripAnsiCliPty } from './stripAnsi'
+import { stripAnsiCliPty } from '../ansi/stripAnsi'
 
 export type TtyAssertDumpDiagnostics = {
   rawByteLength: number

@@ -1,7 +1,10 @@
 import type { IPty } from '@lydell/node-pty'
-import { headPreview } from './errorSnapshotFormatting'
-import { CLI_INTERACTIVE_PTY_COLS, CLI_INTERACTIVE_PTY_ROWS } from './geometry'
-import { stripAnsiCliPty } from './stripAnsi'
+import { headPreview } from '../diagnostics/errorSnapshotFormatting'
+import {
+  CLI_INTERACTIVE_PTY_COLS,
+  CLI_INTERACTIVE_PTY_ROWS,
+} from '../defaults/geometry'
+import { stripAnsiCliPty } from '../ansi/stripAnsi'
 
 export type BufferedPtySession = {
   pty: IPty

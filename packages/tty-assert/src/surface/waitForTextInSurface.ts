@@ -31,10 +31,13 @@ import {
   type CellExpectationBlock,
 } from './cellExpectations'
 import { TTY_ASSERT_LOCATOR_DEFAULT_RETRY_MS } from './locatorRetryMs'
-import { formatRawTerminalSnapshotForError } from './errorSnapshotFormatting'
-import { CLI_INTERACTIVE_PTY_COLS, CLI_INTERACTIVE_PTY_ROWS } from './geometry'
+import { formatRawTerminalSnapshotForError } from '../diagnostics/errorSnapshotFormatting'
+import {
+  CLI_INTERACTIVE_PTY_COLS,
+  CLI_INTERACTIVE_PTY_ROWS,
+} from '../defaults/geometry'
 import { pollSurfaceAssertLoop } from './pollSurfaceAssertLoop'
-import { attemptOnce } from './surfaceAttemptOnTerminal'
+import { attemptOnce } from '../xterm/surfaceAttemptOnTerminal'
 import { TtyAssertStrictModeViolationError } from './ttyAssertStrictModeError'
 
 export { TtyAssertStrictModeViolationError }

@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   TtyAssertStrictModeViolationError,
   waitForTextInSurface,
-} from '../src/waitForTextInSurface'
+} from '../src/surface/waitForTextInSurface'
 
 describe('waitForTextInSurface', () => {
   it('finds a string in fullBuffer using row-major flat search (no newlines between rows)', async () => {

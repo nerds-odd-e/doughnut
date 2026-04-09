@@ -1,6 +1,6 @@
 import { createCanvas } from 'canvas'
 import { describe, expect, it } from 'vitest'
-import { viewportPngBuffersToGif } from '../src/viewportPngSequenceToGif'
+import { viewportPngBuffersToGif } from '../src/xterm/viewportPngSequenceToGif'
 
 function solidPng(w: number, h: number, fill: string): Buffer {
   const c = createCanvas(w, h)

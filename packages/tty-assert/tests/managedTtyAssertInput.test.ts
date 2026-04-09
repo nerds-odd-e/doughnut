@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { normalizeManagedTtyAssertInput } from '../src/managedTtySession'
+import { normalizeManagedTtyAssertInput } from '../src/managed/managedTtySession'
 
 describe('normalizeManagedTtyAssertInput', () => {
   it('turns JSON regexp fields into RegExp', () => {
