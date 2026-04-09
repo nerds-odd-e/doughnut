@@ -118,7 +118,7 @@
       "react-dom": "19.2.5",
       "ejs": ">=3.1.10",
       "jsonpath-plus@<10.0.0": ">=10.2.0",
-      "nodemailer": ">=8.0.4",
+      "nodemailer": ">=8.0.5",
       "*>superagent": ">=10.3.0",
       "@anev/ts-mountebank>superagent": ">=10.3.0",
       "formidable": ">=3.5.3",
