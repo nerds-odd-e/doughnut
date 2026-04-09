@@ -68,8 +68,12 @@ type CliInteractiveWriteRawTask = {
 }
 
 export type CliE2ePluginTasksOptions = {
-  /** When set, PTY assert failures write a viewport PNG and the returned path is appended to the error. */
-  onPtyAssertFailureSavePng?: (png: Buffer) => string
+  /** Saves under the current Cypress spec screenshot folder (see `attachCypressSpecScreenshotSink`). */
+  saveBufferToCurrentSpecFolder: (
+    stemPrefix: string,
+    extensionWithDot: string,
+    data: Buffer
+  ) => string
 }
 
 const INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING = 'doughnut 0.1.0'
@@ -91,7 +95,7 @@ async function bundleCliE2eInstallOrThrow(
 
 export function createCliE2ePluginTasks(
   repoRoot: string,
-  options?: CliE2ePluginTasksOptions
+  options: CliE2ePluginTasksOptions
 ) {
   let interactiveCliPtyHandle: ManagedTtySession | null = null
 
@@ -282,20 +286,40 @@ export function createCliE2ePluginTasks(
       try {
         await handle.assert(managedTtyAssertTaskPayloadToOptions(body))
       } catch (err) {
-        const savePng = options?.onPtyAssertFailureSavePng
-        if (savePng) {
+        try {
+          const png = await handle.captureViewportPng()
+          const pngPath = options.saveBufferToCurrentSpecFolder(
+            'terminal-pty-assert-failure',
+            '.png',
+            png
+          )
+          let suffix = `\n\nTerminal viewport PNG: ${pngPath}`
           try {
-            const png = await handle.captureViewportPng()
-            const filePath = savePng(png)
-            if (err instanceof Error) {
-              err.message = `${err.message}\n\nTerminal viewport PNG: ${filePath}`
-            }
-          } catch (captureErr) {
-            console.error(
-              'cliInteractiveAssert: failed to capture terminal viewport PNG',
-              captureErr
+            const gif = await handle.buildViewportAnimationGif()
+            const gifPath = options.saveBufferToCurrentSpecFolder(
+              'terminal-pty-anim',
+              '.gif',
+              gif
             )
+            suffix += `\nTerminal viewport animation (GIF): ${gifPath}`
+          } catch (gifErr) {
+            const msg =
+              gifErr instanceof Error ? gifErr.message : String(gifErr)
+            if (!msg.includes('at least 2 distinct viewport frames')) {
+              console.error(
+                'cliInteractiveAssert: failed to build/save terminal GIF',
+                gifErr
+              )
+            }
           }
+          if (err instanceof Error) {
+            err.message = `${err.message}${suffix}`
+          }
+        } catch (captureErr) {
+          console.error(
+            'cliInteractiveAssert: failed to capture/save terminal failure artifacts',
+            captureErr
+          )
         }
         throw err
       }

@@ -15,6 +15,8 @@ export type StartBufferedPtySessionOptions = {
   env: NodeJS.ProcessEnv
   cols?: number
   rows?: number
+  /** Called after each PTY `onData` append to `buf.text` (managed session uses this for viewport animation samples). */
+  onAfterPtyData?: () => void
 }
 
 export async function startBufferedPtySession(
@@ -31,6 +33,7 @@ export async function startBufferedPtySession(
   const buf = { text: '' }
   p.onData((data: string) => {
     buf.text += data
+    opts.onAfterPtyData?.()
   })
   return { pty: p, buf }
 }

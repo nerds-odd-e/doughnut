@@ -12,7 +12,8 @@
   "dependencies": {
     "@lydell/node-pty": "1.1.0",
     "@xterm/headless": "6.0.0",
-    "canvas": "^3.2.3"
+    "canvas": "^3.2.3",
+    "gifencoder": "^2.0.1"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.10",
@@ -27,6 +28,7 @@
     "./ptySession": "./src/ptySession.ts",
     "./facade": "./src/facade.ts",
     "./waitForTextInSurface": "./src/waitForTextInSurface.ts",
-    "./managedTtySession": "./src/managedTtySession.ts"
+    "./managedTtySession": "./src/managedTtySession.ts",
+    "./viewportPngSequenceToGif": "./src/viewportPngSequenceToGif.ts"
   }
 }

@@ -132,6 +132,27 @@ describe('ManagedTtySession', () => {
     }
   })
 
+  it('PTY data bridge records viewport PNGs when the screen changes', async () => {
+    const buf = { text: '' }
+    const bridge = { onPtyData: () => undefined }
+    const m = attachManagedTtySession(
+      { pty: mockPty(), buf },
+      { cols: 20, rows: 4 },
+      bridge
+    )
+    try {
+      buf.text = '\x1b[2J\x1b[Haa'
+      bridge.onPtyData()
+      await new Promise((r) => setTimeout(r, 80))
+      buf.text += 'bb'
+      bridge.onPtyData()
+      await new Promise((r) => setTimeout(r, 80))
+      expect(m.getViewportAnimationPngs().length).toBeGreaterThanOrEqual(1)
+    } finally {
+      m.dispose()
+    }
+  })
+
   it('dispose() is idempotent (double dispose does not throw)', () => {
     const m = attachManagedTtySession({ pty: mockPty(), buf: { text: '' } })
     m.dispose()

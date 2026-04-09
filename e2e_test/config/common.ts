@@ -74,11 +74,9 @@ const commonConfig = {
 
       on('task', {
         ...createCliE2ePluginTasks(repoRoot, {
-          onPtyAssertFailureSavePng: (png) =>
-            specScreenshotSink.saveBufferToCurrentSpecFolder(
-              'terminal-pty-assert-failure',
-              '.png',
-              png
+          saveBufferToCurrentSpecFolder:
+            specScreenshotSink.saveBufferToCurrentSpecFolder.bind(
+              specScreenshotSink
             ),
         }),
         setTestState({ key, value }: { key: string; value: unknown }) {

@@ -72,11 +72,12 @@ Use this when one process owns **the same** PTY buffer, xterm headless instance,
 2. **`write` / `submit`** — send bytes or a line (`\r` appended for `submit`).
 3. **`assert(opts)`** — polls until timeout: syncs new raw bytes into xterm, then runs the same surface logic as `waitForTextInSurface` (or stripped-transcript path without replay). No need to pass an updated `raw` string from outside; it always reads `session.buf.text`.
 4. **`dumpFrames()`** — async diagnostic snapshot (previews of viewport, stripped tail, etc.).
-5. **`dispose()`** — idempotent: tears down xterm, disposes the buffered PTY session. Safe if the child already exited.
+5. **`getViewportAnimationPngs()`** / **`buildViewportAnimationGif()`** — when the session was started with **`startManagedTtySession`**, each PTY `onData` schedules a debounced viewport sample (deduped by viewport plaintext, ring buffer capped at 56 PNGs). **`buildViewportAnimationGif`** flushes the pending sample, then encodes those PNGs to an animated GIF (requires at least two distinct frames). Sessions from **`attachManagedTtySession`** without the internal bridge omit recording (empty PNG list; GIF build throws).
+6. **`dispose()`** — idempotent: tears down xterm, disposes the buffered PTY session. Safe if the child already exited.
 
 **`ManagedTtyAssertOptions`** (same assertion knobs as `waitForTextInSurface` except **`raw`** is omitted): `needle` (string or `RegExp`), `surface`, `timeoutMs`, `retryMs`, `strict`, `messagePrefix`, `startAfterAnchor`, `fallbackRowCount`, `cellExpectations`.
 
-**Cypress:** Doughnut maps **`cy.task('cliInteractiveAssert', payload)`** to `managed.assert(...)`. The task body must stay **JSON-serializable**: use `{ source, flags? }` instead of `RegExp` objects for needles and anchors (see `e2e_test/config/cliE2ePluginTasks.ts`).
+**Cypress:** Doughnut maps **`cy.task('cliInteractiveAssert', payload)`** to `managed.assert(...)`. On failure the plugin saves a **viewport PNG** and, when enough frames were recorded, a **GIF** from **`buildViewportAnimationGif()`**, via `saveBufferToCurrentSpecFolder` (see `e2e_test/config/cliE2ePluginTasks.ts`). The task body must stay **JSON-serializable**: use `{ source, flags? }` instead of `RegExp` objects for needles and anchors.
 
 **Node tests without Cypress:** Prefer `managedTtySession` or `facade` directly; do not round-trip PTY text through a browser.
 
