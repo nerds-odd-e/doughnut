@@ -80,6 +80,10 @@ const INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING = 'doughnut 0.1.0'
 const INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS = 20_000
 const INSTALLED_CLI_INTERACTIVE_WRITE_SETTLE_MS = 500
 
+/** Interactive CLI PTY size for Cypress (failure PNG/GIF); smaller than tty-assert defaults (120×48). */
+const CLI_E2E_INTERACTIVE_PTY_COLS = 80
+const CLI_E2E_INTERACTIVE_PTY_ROWS = 24
+
 async function bundleCliE2eInstallOrThrow(
   repoRoot: string,
   env?: NodeJS.ProcessEnv
@@ -111,12 +115,15 @@ export function createCliE2ePluginTasks(
     env?: NodeJS.ProcessEnv
   }): Promise<void> {
     disposeInteractiveCliPtySession()
-    const managed = await startManagedTtySession({
-      command: opts.command,
-      args: opts.args,
-      cwd: opts.cwd,
-      env: { ...process.env, ...cliEnv(opts.env) },
-    })
+    const managed = await startManagedTtySession(
+      {
+        command: opts.command,
+        args: opts.args,
+        cwd: opts.cwd,
+        env: { ...process.env, ...cliEnv(opts.env) },
+      },
+      { cols: CLI_E2E_INTERACTIVE_PTY_COLS, rows: CLI_E2E_INTERACTIVE_PTY_ROWS }
+    )
     interactiveCliPtyHandle = managed
     await managed.assert({
       needle: INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING,

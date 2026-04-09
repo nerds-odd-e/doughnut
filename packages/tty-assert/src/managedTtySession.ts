@@ -328,12 +328,16 @@ export async function startManagedTtySession(
   opts: StartBufferedPtySessionOptions,
   geometry?: { cols?: number; rows?: number }
 ): Promise<ManagedTtySession> {
+  const cols = opts.cols ?? geometry?.cols ?? CLI_INTERACTIVE_PTY_COLS
+  const rows = opts.rows ?? geometry?.rows ?? CLI_INTERACTIVE_PTY_ROWS
   const bridge: ManagedTtySessionPtyDataBridge = {
     onPtyData: () => undefined,
   }
   const session = await startBufferedPtySession({
     ...opts,
+    cols,
+    rows,
     onAfterPtyData: () => bridge.onPtyData(),
   })
-  return attachManagedTtySession(session, geometry, bridge)
+  return attachManagedTtySession(session, { cols, rows }, bridge)
 }
