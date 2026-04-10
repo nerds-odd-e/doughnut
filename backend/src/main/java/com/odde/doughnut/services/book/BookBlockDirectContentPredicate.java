@@ -17,26 +17,37 @@ public final class BookBlockDirectContentPredicate {
       return false;
     }
     for (BookContentBlock cb : orderedBlocks) {
-      if (cb == null) {
-        continue;
-      }
-      String t = cb.getType();
-      if (t == null || t.isEmpty()) {
-        continue;
-      }
-      if ("header".equals(t) || "footer".equals(t) || t.startsWith("page_")) {
-        continue;
-      }
-      if ("table".equals(t) || "image".equals(t)) {
+      if (contributesDirectContent(cb)) {
         return true;
       }
-      if ("text".equals(t)) {
-        Integer level = textLevelFromRaw(cb.getRawData());
-        if (level != null && level >= 1 && level <= 3) {
-          continue;
-        }
-        return true;
+    }
+    return false;
+  }
+
+  /**
+   * MinerU blocks that count as direct reading content (not header/footer/page chrome/structural
+   * headings).
+   */
+  public static boolean contributesDirectContent(BookContentBlock cb) {
+    if (cb == null) {
+      return false;
+    }
+    String t = cb.getType();
+    if (t == null || t.isEmpty()) {
+      return false;
+    }
+    if ("header".equals(t) || "footer".equals(t) || t.startsWith("page_")) {
+      return false;
+    }
+    if ("table".equals(t) || "image".equals(t)) {
+      return true;
+    }
+    if ("text".equals(t)) {
+      Integer level = textLevelFromRaw(cb.getRawData());
+      if (level != null && level >= 1 && level <= 3) {
+        return false;
       }
+      return true;
     }
     return false;
   }

@@ -27,6 +27,11 @@ class BookBlockDirectContentPredicateTest {
       blocks.add(cb);
     }
     assertThat(BookBlockDirectContentPredicate.hasDirectContent(blocks), equalTo(expected));
+    if (specs.size() == 1) {
+      assertThat(
+          BookBlockDirectContentPredicate.contributesDirectContent(blocks.getFirst()),
+          equalTo(expected));
+    }
   }
 
   static Stream<Arguments> directContentCases() {

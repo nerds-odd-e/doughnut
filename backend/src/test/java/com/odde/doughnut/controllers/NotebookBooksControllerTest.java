@@ -413,6 +413,48 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void allBboxesSkipsHeaderFooterPageChromeAndStructuralHeadings() throws Exception {
+      Notebook nb = myNotebook();
+      Map<String, Object> header = new LinkedHashMap<>();
+      header.put("type", "header");
+      header.put("text", "Running title");
+      header.put("page_idx", 2);
+      header.put("bbox", new ArrayList<>(List.of(1.0, 1.0, 50.0, 10.0)));
+      Map<String, Object> footer = new LinkedHashMap<>();
+      footer.put("type", "footer");
+      footer.put("text", "copyright");
+      footer.put("page_idx", 2);
+      footer.put("bbox", new ArrayList<>(List.of(1.0, 500.0, 50.0, 510.0)));
+      Map<String, Object> pageNum = new LinkedHashMap<>();
+      pageNum.put("type", "page_number");
+      pageNum.put("text", "7");
+      pageNum.put("page_idx", 2);
+      pageNum.put("bbox", new ArrayList<>(List.of(400.0, 500.0, 410.0, 510.0)));
+      Map<String, Object> heading = new LinkedHashMap<>();
+      heading.put("type", "text");
+      heading.put("text_level", 2);
+      heading.put("text", "2.1 Section");
+      heading.put("page_idx", 2);
+      heading.put("bbox", new ArrayList<>(List.of(15.0, 30.0, 200.0, 45.0)));
+      Map<String, Object> bodyItem = new LinkedHashMap<>();
+      bodyItem.put("type", "text");
+      bodyItem.put("text", "Body paragraph");
+      bodyItem.put("page_idx", 2);
+      bodyItem.put("bbox", new ArrayList<>(List.of(10.0, 20.0, 300.0, 400.0)));
+      AttachBookLayoutNodeRequest n = new AttachBookLayoutNodeRequest();
+      n.setTitle("Section With Noise");
+      n.setStartAnchor(anchor("{\"page_idx\":2,\"bbox\":[1.0,2.0,100.0,15.0]}"));
+      n.setContentBlocks(new ArrayList<>(List.of(header, footer, pageNum, heading, bodyItem)));
+      controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
+      makeMe.entityPersister.flushAndClear();
+
+      BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();
+      assertThat(block.getAllBboxes(), hasSize(2));
+      assertThat(block.getAllBboxes().getFirst().bbox(), equalTo(List.of(1.0, 2.0, 100.0, 15.0)));
+      assertThat(block.getAllBboxes().get(1).bbox(), equalTo(List.of(10.0, 20.0, 300.0, 400.0)));
+    }
+
+    @Test
     void hasDirectContentFalseWhenOnlyPageNumberContentBlocks() throws Exception {
       Notebook nb = myNotebook();
       Map<String, Object> pageNum = new LinkedHashMap<>();

@@ -21,7 +21,7 @@ public final class BookBlockContentBboxes {
     }
     if (orderedBlocks != null) {
       for (BookContentBlock cb : orderedBlocks) {
-        if (cb == null) {
+        if (!BookBlockDirectContentPredicate.contributesDirectContent(cb)) {
           continue;
         }
         BookBlockContentBboxItem item = fromRaw(cb.getRawData());
