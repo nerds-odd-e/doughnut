@@ -320,7 +320,8 @@ const lastPositionInsideSelectedBlock = ref<{
 } | null>(null)
 const snapBackAttempts = new Map<number, number>()
 
-const blockAwaitingConfirmation = ref<BookBlockRow | null>(null)
+const lastContentBottomVisible = ref(false)
+const geometryEverVisibleForSelection = ref(false)
 
 function selectedBlockHasSuccessorAndNoDisposition(): {
   selId: number
@@ -335,57 +336,29 @@ function selectedBlockHasSuccessorAndNoDisposition(): {
   return { selId, successor: rows[selIdx + 1]! }
 }
 
-function updateReadingControlPanelVisible() {
+// allBboxes: index 0 is the anchor; remaining entries are direct-content blocks.
+// When length > 1, the last entry is the last direct-content bbox.
+const blockAwaitingConfirmation = computed<BookBlockRow | null>(() => {
   const context = selectedBlockHasSuccessorAndNoDisposition()
-  if (context === null) {
-    blockAwaitingConfirmation.value = null
-    return
-  }
+  if (context === null) return null
   const { selId, successor } = context
   const rows = bookBlockRows.value
   const sel = rows.find((r) => r.id === selId)!
-
-  if (!sel.hasDirectContent) {
-    blockAwaitingConfirmation.value = null
-    return
-  }
-
-  // allBboxes: index 0 is the anchor; remaining entries are direct-content blocks.
-  // When length > 1, the last entry is the last direct-content bbox.
+  if (!sel.hasDirectContent) return null
   const lastBbox =
     sel.allBboxes.length > 1 ? sel.allBboxes[sel.allBboxes.length - 1]! : null
-
   if (lastBbox !== null) {
-    const target = {
-      pageIndex: lastBbox.pageIndex,
-      bbox: lastBbox.bbox as [number, number, number, number],
+    if (lastContentBottomVisible.value) return sel
+    if (geometryEverVisibleForSelection.value) {
+      return successor.startAnchor.id === currentBlockAnchorId.value
+        ? null
+        : sel
     }
-    const geometryVisible =
-      pdfViewerRef.value?.isLastContentBottomVisible(
-        target,
-        READING_PANEL_OBSTRUCTION_PX
-      ) ?? false
-
-    if (geometryVisible) {
-      blockAwaitingConfirmation.value = sel
-      return
-    }
-
-    if (blockAwaitingConfirmation.value !== null) {
-      const successorIsCurrent =
-        successor.startAnchor.id === currentBlockAnchorId.value
-      blockAwaitingConfirmation.value = successorIsCurrent ? null : sel
-      return
-    }
-
-    blockAwaitingConfirmation.value = null
-    return
+    return null
   }
-
   // Fallback: no usable bbox → use successor-anchor rule
-  blockAwaitingConfirmation.value =
-    successor.startAnchor.id === currentBlockAnchorId.value ? sel : null
-}
+  return successor.startAnchor.id === currentBlockAnchorId.value ? sel : null
+})
 
 const currentBlockLiveText = ref("")
 const lastAnnouncedCurrentBlockTitle = ref<string | undefined>(undefined)
@@ -426,7 +399,37 @@ function onViewportAnchorPage(payload: {
     payload.pagesCount
   )
   currentBlockAnchorDebouncer.propose(candidate)
-  updateReadingControlPanelVisible()
+  const selIdForGeometry = selectedBlockId.value
+  if (selIdForGeometry !== null) {
+    const selForGeometry = bookBlockRows.value.find(
+      (r) => r.id === selIdForGeometry
+    )
+    if (selForGeometry?.hasDirectContent) {
+      const lastBboxForGeometry =
+        selForGeometry.allBboxes.length > 1
+          ? selForGeometry.allBboxes[selForGeometry.allBboxes.length - 1]!
+          : null
+      if (lastBboxForGeometry !== null) {
+        const geometryVisible =
+          pdfViewerRef.value?.isLastContentBottomVisible(
+            {
+              pageIndex: lastBboxForGeometry.pageIndex,
+              bbox: lastBboxForGeometry.bbox as [
+                number,
+                number,
+                number,
+                number,
+              ],
+            },
+            READING_PANEL_OBSTRUCTION_PX
+          ) ?? false
+        lastContentBottomVisible.value = geometryVisible
+        if (geometryVisible) {
+          geometryEverVisibleForSelection.value = true
+        }
+      }
+    }
+  }
   let reading: { pageIndexZeroBased: number; normalizedTop: number } | null =
     null
   if (payload.readingPosition !== undefined) {
@@ -496,20 +499,12 @@ watch(currentBlockAnchorId, async (anchorId) => {
   ) {
     await bookReading.submitMarkRead(predecessor.id)
   }
-  updateReadingControlPanelVisible()
 })
 
 watch(selectedBlockId, () => {
-  blockAwaitingConfirmation.value = null
-  updateReadingControlPanelVisible()
+  lastContentBottomVisible.value = false
+  geometryEverVisibleForSelection.value = false
 })
-
-watch(
-  () => bookReading.hasRecordedDisposition(selectedBlockId.value ?? -1),
-  () => {
-    updateReadingControlPanelVisible()
-  }
-)
 
 watch(blockAwaitingConfirmation, (block) => {
   if (block === null) return
