@@ -11,6 +11,14 @@ import { subscribedNotebooks } from './subscribedNotebooks'
 const addNewNotebookButton = () =>
   cy.findByRole('button', { name: 'Add New Notebook' })
 
+const completeMoveNotebookToGroupDialog = (groupName: string) => {
+  cy.findByRole('dialog', { name: 'Move to group' }).within(() => {
+    cy.get('#notebook-catalog-move-to-group-target').select(groupName)
+    cy.findByRole('button', { name: 'Move' }).click()
+  })
+  pageIsNotLoading()
+}
+
 const myNotebooksPage = () => {
   addNewNotebookButton()
 
@@ -76,21 +84,20 @@ const myNotebooksPage = () => {
         .should('be.visible')
       return this as any
     },
-    moveNotebookToGroupFromCatalog(
+    moveOwnedNotebookToGroupFromCatalog(
       notebookTitle: string,
-      groupName: string,
-      isSubscribed?: boolean
+      groupName: string
     ) {
-      if (isSubscribed) {
-        subscribedNotebooks().card(notebookTitle).openMoveToGroupDialog()
-      } else {
-        notebookCard(notebookTitle).openMoveToGroupDialog()
-      }
-      cy.findByRole('dialog', { name: 'Move to group' }).within(() => {
-        cy.get('#notebook-catalog-move-to-group-target').select(groupName)
-        cy.findByRole('button', { name: 'Move' }).click()
-      })
-      pageIsNotLoading()
+      notebookCard(notebookTitle).openMoveToGroupDialog()
+      completeMoveNotebookToGroupDialog(groupName)
+      return this as any
+    },
+    moveSubscribedNotebookToGroupFromCatalog(
+      notebookTitle: string,
+      groupName: string
+    ) {
+      subscribedNotebooks().card(notebookTitle).openMoveToGroupDialog()
+      completeMoveNotebookToGroupDialog(groupName)
       return this as any
     },
   }

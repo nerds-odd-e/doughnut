@@ -24,7 +24,7 @@ When(
   (notebookTitle: string, groupName: string) => {
     start
       .navigateToNotebooksPage()
-      .moveNotebookToGroupFromCatalog(notebookTitle, groupName, false)
+      .moveOwnedNotebookToGroupFromCatalog(notebookTitle, groupName)
   }
 )
 
@@ -33,7 +33,7 @@ When(
   (notebookTitle: string, groupName: string) => {
     start
       .navigateToNotebooksPage()
-      .moveNotebookToGroupFromCatalog(notebookTitle, groupName, true)
+      .moveSubscribedNotebookToGroupFromCatalog(notebookTitle, groupName)
   }
 )
 
