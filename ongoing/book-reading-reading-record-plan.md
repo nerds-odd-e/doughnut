@@ -1,113 +1,142 @@
-# Plan: Reading record (Story: Reading record)
+# Plan: Reading record
 
-**User story:** [`ongoing/book-reading-user-stories.md`](book-reading-user-stories.md) — *Story: Reading record* (scenarios below map **one scenario → one phase**).
+**User story:** [`ongoing/book-reading-user-stories.md`](book-reading-user-stories.md) — *Story: Reading record*.
 
-**Architecture (ReadingRecord, BookBlock, direct content vocabulary):** [`ongoing/doughnut-book-reading-architecture-roadmap.md`](doughnut-book-reading-architecture-roadmap.md).
+**Architecture:** [`ongoing/doughnut-book-reading-architecture-roadmap.md`](doughnut-book-reading-architecture-roadmap.md).
 
-**UX context (drawer, book layout, current block, Reading Control Panel):** [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md) and shipped Story 2 work in [`ongoing/book-reading-read-a-block-plan.md`](book-reading-read-a-block-plan.md).
+**UX context:** [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md) and shipped Story 2 reader work in [`ongoing/book-reading-read-a-block-plan.md`](book-reading-read-a-block-plan.md).
 
-**Planning rules:** `.cursor/rules/planning.mdc` — one **user-visible** behavior per phase, scenario-first ordering, test-first workflow when adding behavior, at most one intentionally failing test while driving a phase.
+**Planning rule:** `.cursor/rules/planning.mdc` — one user-visible behavior per phase, scenario-first ordering, test-first workflow.
 
-**Testing for this story:** **Phase 2** and **Phase 3** are covered by **E2E** ([`reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature)) plus controller and mounted tests. **Phase 4** is covered by **controller** + **mounted** + **`readBlockIdsFromRecords`** tests (no Cypress in that slice). **Phase 1** uses **unit-style tests** per `.cursor/rules/planning.mdc` — **observable** surfaces (HTTP from **controllers**, **mounted** Vue via Vitest), **black-box** I/O, **few** focused tests, **direct** tests only for small deliberate contracts (pure predicates, mapping, validation messages). **Phase 3** design archive (sub-phases 3A–3H): [`ongoing/book-reading-phase-3-no-direct-content-plan.md`](book-reading-phase-3-no-direct-content-plan.md).
+**This document is a delivery plan only** — update phases here before implementation, then trim obsolete detail after each shipped slice.
 
-**This document is a delivery plan only** — not executed here.
+**Status:** Core reading-record behavior is already shipped:
 
-**Status:** **Phase 2**, **Phase 3**, and **Phase 4** (*skim/skip dispositions*) are **shipped**. **Phase 1** (*last read position*) may ship separately; see Phase 1 below.
+- **Phase 2:** explicit **Mark as read** from the Reading Control Panel.
+- **Phase 3:** auto-mark **READ** for blocks with **no direct content**.
+- **Phase 4:** explicit **skimmed / skipped** dispositions.
+
+**Next planned work:** keep the existing Cypress path in [`reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature) green, but add **no new E2E** for the next reminder behavior. Cover the new behavior with **high-level mounted/controller tests** in the style preferred by `.cursor/rules/planning.mdc`.
 
 ---
 
-## Principles for this work
+## Principles for remaining work
 
-- **Progress on chunks:** [`ongoing/doughnut-book-reading-architecture-roadmap.md`](doughnut-book-reading-architecture-roadmap.md) — `ReadingRecord` refers to a **`BookBlock`**, not a `SourceSpan`. Per-block **read / skim / skip** states belong on that model (or equivalent rows), not on arbitrary PDF coordinates.
-- **Fine-grained “where on the page”** (exact scroll restore) is an **open architecture question** in the same roadmap; Phase 1 may persist a **viewport-aligned** snapshot (see below) without pretending it is a substitute for long-term `ReadingRecord` semantics.
-- **Direct content** between two **book blocks** remains a product concept; for MinerU-backed PDF imports, Phase 3 (shipped) relies on persisted **`BookContentBlock`** ownership rather than only anchor proximity. The default rule is: a block has direct content only if it owns at least one **non-structural** imported content block of type **`text`**, **`table`**, or **`image`**. **`header`**, **`footer`**, any **`page_*`** type, and other unknown types are persisted but do not count by default.
-- **Consecutive blocks in reading order** (for Phase 2’s “successor” check, Phase 3’s A→B gap, and **current block**) are **not** required to sit at the same tree depth. **B** is always the **immediate successor** of **A** in the linear walk. Typical shapes include: **siblings** (A then next sibling), **parent then first child** (A then its first `children[]` entry), and **last descendant then next block after leaving a subtree** (e.g. A is the last block in a subtree; B is the next sibling of an ancestor — “uncle” relative to A). Same rule as **direct content** boundaries in [`ongoing/doughnut-book-reading-architecture-roadmap.md`](doughnut-book-reading-architecture-roadmap.md).
-- **Book layout reading order** for the reading-control **successor boundary**, Phase 3 auto-marking, and **current block** must match the **same linear order** (depth-first preorder over the `BookBlock` tree unless product explicitly chooses another walk).
-- **Observable tests (this plan):** **Phase 2** — Cypress for the full reading-record UX. **Phase 3** (shipped) — Cypress for auto-mark without panel action, plus import/controller tests and `BookBlockDirectContentPredicate` unit tests and Python tests for `*beginning*`. **Phases 1 and 4** — Spring **controller** tests (status, body, persistence side effects via follow-up reads) and/or **mounted** frontend tests where the behavior is UI-shaped; **pure** black-box tests for predicates and formatting. Avoid tests that only pin private helpers when a controller or mounted component already proves the path.
+- **Progress remains per block:** `ReadingRecord` is still attached to **`BookBlock`**, not arbitrary PDF coordinates.
+- **Direct-content gating stays as shipped:** explicit disposition is needed only for blocks that still have **direct content** and no recorded disposition; Phase 3 auto-read behavior remains the first path for **no-direct-content** blocks.
+- **Reading order stays linear:** predecessor/successor and reminder logic follow the same **depth-first preorder** already used for **current block** and direct-content boundaries.
+- **Snap-back is a reminder, not a lock:** each block may interrupt scrolling at most **twice**; later attempts must scroll normally even if the block remains unread.
+- **Snap-back state is local and disposable:** it belongs to the current user/session view of a specific block, clears immediately when that block is marked **READ**, and does not become a new long-lived persisted progress concept unless a later plan explicitly chooses that.
+- **Tests stay high-level:** prefer mounted `BookReadingPage` / reader-flow tests that drive the real prompt and scroll-handling contract, plus controller tests only where an observable HTTP contract changes. Avoid low-level tests that only pin private counters or watcher internals.
+
+---
+
+## Existing baseline
+
+These shipped phases are the baseline that later reminder phases build on:
+
+- **Phase 2:** when the viewport reaches the immediate successor of a selected block, the **Reading Control Panel** lets the user mark that selected block **READ**.
+- **Phase 3:** when a predecessor block has **no direct content**, entering the successor auto-marks the predecessor **READ** instead of prompting.
+- **Phase 4:** the same panel path also supports **SKIMMED** and **SKIPPED**.
+
+Keep this section short; detailed shipped implementation notes belong in code/tests and the architecture/UX roadmaps.
 
 ---
 
 ## Phase 1 — Remember book last read position
 
-**User story scenario:** *Remember book last read position* — scroll to a position, leave, return, land on the **same** place.
+**User story scenario:** leave the book, return later, land on the same reading position.
 
-**User outcome:** When the user opens the book reading page again (same user, same notebook book), the PDF **restores** to the **last reading position** they had in a prior session (or prior navigation away), within normal browser refresh constraints.
+**User outcome:** reopening the book restores the last reading position for the same user and book.
 
-**Suggested shape (implementation detail, not fixed in this plan):**
+**Test shape:** no E2E required; prove via controller tests for persistence and mounted reader/page tests for save + restore behavior through observable viewer contracts.
 
-- Persist a **viewport snapshot** keyed by **user + book** (notebook has at most one book): e.g. **page index** + **within-page vertical position** in the **same normalized space** already used for the **current block** (`0–1000` MinerU-style), or an agreed scalar stored server-side; avoid a second ad-hoc coordinate system if possible.
-- **Save triggers:** debounced updates while scrolling (reuse debounce discipline similar to **current block** updates) and/or **save on visibility unload** — choose the smallest set that **passes tests** and feels reliable on mobile.
-- **API:** e.g. read with book payload or dedicated `GET`/`PATCH` under the notebook book resource; follow existing controller and OpenAPI patterns, then `pnpm generateTypeScript`.
-
-**Tests (no E2E for this phase):** Prove behavior through **observable** layers per `.cursor/rules/planning.mdc`:
-
-- **Backend:** **`@WebMvcTest` / controller tests** (or full MVC slice if that is the project habit) — e.g. `PATCH`/`GET` returns expected JSON and **persists** position; **error** bodies for wrong notebook, unauthorized user, missing book.
-- **Frontend:** **Mounted** `BookReadingPage` / composable tests (Vitest) — debounced **save** sends the API payload that matches the **viewport descriptor** already produced for **current block** logic (mock `fetch`/generated SDK); **restore on load** applies stored page/Y into the viewer contract **without** importing pdf.js internals.
-- **Pure helpers** (if any): minimal **inputs → outputs** tests only where that API is the intentional contract.
-
-**Out of scope for this phase:** Per-block read/skim/skip, prompts, read badges on **book blocks** in the book layout.
+**Out of scope:** per-block disposition prompts, snap-back reminder state, read/skim/skip styling.
 
 ---
 
-## Phase 2 — Mark a book block as read — **shipped**
+## Phase 5 — First unread boundary reminder with snap-back
 
-**User story scenario:** [`ongoing/book-reading-user-stories.md`](book-reading-user-stories.md) — *mark a book block as read* (same steps as [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature)): user **selects** block **2.1**, scrolls until **2.2** is **current block**, marks **2.1** read from the panel; **2.1** shows read styling and **2.2** stays **selected**.
+**User story scenario:** while reading a block that still needs an explicit disposition, the user scrolls past that block’s end without marking it as read.
 
-**UX (Reading Control Panel):** **Bottom-anchored** in the **PDF main pane** ([`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md)). The panel appears when **current block** (viewport) is the **immediate successor** of the **selected block** in reading order — equivalent to treating the **selected** block’s direct content as “in question” while the reader sits on the next heading. **Mark as read** persists disposition for the **selected** `BookBlock` (not the current-block row). Expanded/minimized bar; panel does **not** own document scroll.
+**User outcome:** on the **first** attempt to scroll past the current unread block’s end boundary, the reader:
 
-**User outcome (as implemented):**
+- shows the existing prompt that asks the user to mark that block as read, and
+- restores the scroll position to the **last valid position inside that same block**.
 
-- Server: table **`book_block_reading_record`**, entity **`BookBlockReadingRecord`**, **`READ`** status, **`completed_at`** on mark; uniqueness **(user_id, book_block_id)**.
-- **`GET …/book`** remains **layout-only**. Client merges **`GET …/book/reading-records`** (`bookBlockId`, `status`, `completedAt`) with layout for read borders (`frontend/src/lib/book-reading/readBlockIdsFromRecords.ts`, `useNotebookBookReadingRecords`, `BookReadingPage.vue`).
-- **`PUT …/book/blocks/{bookBlock}/reading-record`** → **200** + JSON array of **`BookBlockReadingRecordListItem`** (full list after write; same item shape as **`GET …/book/reading-records`** — avoids an extra list fetch after mark).
+**Depends on:** shipped Phase 2/4 disposition flow and shipped Phase 3 no-direct-content auto-read path.
 
-**E2E:** `reading_record.feature` (CLI attach `refactoring.pdf`, OCR-backed scroll steps).
+**Notes for implementation shape:**
 
-**Other tests:** `NotebookBooksControllerTest` (list + put + auth/idempotency paths); mounted **`BookReadingPage.spec.ts`**; **`readBlockIdsFromRecords.spec.ts`**.
+- The snap-back trigger should only run for a block that still has **no recorded disposition** and still requires an explicit answer.
+- The restored position should be the last viewer position that was still considered **inside** the block, not a synthetic top-of-block jump.
+- Existing `reading_record.feature` behavior must still pass unchanged.
 
----
+**Tests (no new E2E):**
 
-## Phase 3 — Mark a block with no direct content as read automatically — **shipped**
-
-**User story scenario:** *mark a book block with no direct content as read automatically* — no meaningful gap between title “xxx” and “ooo”; scrolling through **xxx** then **ooo** results in **xxx** shown as read **without** an explicit answer.
-
-**User outcome:** When the system classifies **direct content between block A and the immediate successor B** in **book layout reading order** as **empty / not meaningful** (per the agreed heuristic in Principles), **entering B** **automatically** creates or updates **`ReadingRecord`** for **A** as read, and the **book layout** updates like Phase 2. **A** and **B** may be siblings, parent/first-child, last-child-in-subtree/next-after-subtree, or any other **consecutive preorder** pair — not only same-level headings.
-
-**Depends on:** Phase 2 (persistence and **book layout** display of read state).
-
-**As implemented:**
-
-- **`GET …/book`** includes **`hasDirectContent`** per block from persisted **`BookContentBlock`** rows via **`BookBlockDirectContentPredicate`** (`backend/src/main/java/com/odde/doughnut/services/book/BookBlockDirectContentPredicate.java`; tests in **`BookBlockDirectContentPredicateTest`** and **`NotebookBooksControllerTest`**).
-- **Auto-mark:** when the viewport-derived **current block** changes, **`BookReadingPage.vue`** marks the reading-order **predecessor** **`READ`** via **`PUT …/reading-record`** with body **`{"status":"READ"}`** if **`hasDirectContent`** is false and the predecessor has **no** recorded disposition (**READ** / **SKIMMED** / **SKIPPED**).
-- **Import:** CLI **`cli/python/mineru_book_outline.py`** emits per-node **`contentBlocks`** (body only; no duplicate heading row); orphan prefix → synthetic **`*beginning*`** block (Python tests in **`cli/python/test_mineru_book_outline.py`**).
-- **E2E:** [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature) (no-direct-content scenario).
-- **Design archive (sub-phases 3A–3H):** [`ongoing/book-reading-phase-3-no-direct-content-plan.md`](book-reading-phase-3-no-direct-content-plan.md).
+- **Mounted reader/page test:** drive the real end-boundary detection path for a block with direct content; assert that the prompt becomes visible and the viewer receives a restore-to-last-valid-position request on the first crossing.
+- **Mounted negative test:** assert that the same boundary crossing for a block already marked **READ/SKIMMED/SKIPPED**, or auto-read by the no-direct-content rule, does **not** snap back.
 
 ---
 
-## Phase 4 — Mark a book block as skimmed or skipped — **shipped**
+## Phase 6 — One more reminder, then release scrolling
 
-**User story scenario:** [`ongoing/book-reading-user-stories.md`](book-reading-user-stories.md) — *mark a book block as skimmed/skipped*.
+**User story scenario:** after the first snap-back, the user again tries to scroll past the same unread block without marking it as read.
 
-**User outcome:** Same successor gating as Phase 2; **Reading Control Panel** adds **Mark as skimmed** and **Mark as skipped**; **`PUT …/reading-record`** accepts optional JSON body **`{"status":"READ"|"SKIMMED"|"SKIPPED"}`** (omitted body still means **READ**). Book layout uses **`data-direct-content-read`**, **`data-direct-content-skimmed`**, **`data-direct-content-skipped`** plus screen-reader labels.
+**User outcome:** the reader applies the same snap-back behavior **one more time** on the **second** attempt, then allows **normal scrolling** on the **third and later** attempts for that same block.
 
-**As implemented:** `BookBlockReadingRecord` constants **READ** / **SKIMMED** / **SKIPPED**; **`readingDispositionByBlockId`** + **`hasRecordedDisposition`** on the client; auto-mark **READ** only and **does not** overwrite an existing skim/skip. Tests: **`NotebookBooksControllerTest`** (skim/skip persist, invalid status **400**, overwrite); mounted **`BookReadingPage.spec.ts`** and **`readBlockIdsFromRecords.spec.ts`**.
+**Depends on:** Phase 5.
 
-**Detail:** [`ongoing/book-reading-phase-4-skim-skip-plan.md`](book-reading-phase-4-skim-skip-plan.md) (mark archived / done).
+**Notes for implementation shape:**
+
+- Count attempts **per block** in the active reader state.
+- “Allow normal scrolling” means the prompt may still be present or reappear by the usual rules, but the forced scroll restoration must stop after attempt two.
+- Keep the counting rule simple: at most **two** snap-backs for one block before normal scrolling resumes.
+
+**Tests (no new E2E):**
+
+- **Mounted reader/page sequence test:** simulate first, second, and third boundary crossings for the same unread block and assert: snap-back on attempt 1, snap-back on attempt 2, no snap-back on attempt 3.
+- **Mounted continuation test:** assert that attempt 4+ behaves the same as attempt 3.
 
 ---
 
-## Phase discipline (checklist)
+## Phase 7 — Clear snap-back on read; scope reminders per block
+
+**User story scenario:** the user marks a block as read after one or two reminders, then continues reading and later reaches another unread block.
+
+**User outcome:**
+
+- marking the block **READ** clears that block’s snap-back reminder state immediately, so later scrolling for that block proceeds normally, and
+- a different unread block gets its **own** reminder budget of up to two snap-backs.
+
+**Depends on:** Phase 6.
+
+**Notes for implementation shape:**
+
+- Clearing is immediate on successful **Mark as read** completion; do not wait for navigation away and back.
+- The per-block scope should not accidentally share attempt counts across siblings, parent/child neighbors, or repeated visits to a different block.
+- This phase is only about **READ** because the requested behavior says “marked as read”; if product later wants skim/skip to clear the reminder too, that should be an explicit follow-up decision.
+
+**Tests (no new E2E):**
+
+- **Mounted reader/page test:** after one or two snap-backs, complete **Mark as read** and assert that subsequent scrolling no longer restores position for that block.
+- **Mounted per-block test:** exhaust reminders for block A, move to a different unread block B, and assert that B still gets its own first and second snap-backs.
+- **Controller coverage only if needed:** add or extend HTTP tests only if the implementation introduces a new observable API contract. Otherwise keep coverage in mounted reader-flow tests.
+
+---
+
+## Phase discipline
 
 After each phase:
 
-1. **Clean up** dead code and temporary flags.
-2. **Deploy gate** — commit/push and let CD deploy before the next phase unless the team agrees otherwise.
-3. **Update this plan** — mark the phase done, drop obsolete notes, link to merged PR or components if helpful.
-4. **Architecture doc** — if a **default** in [`ongoing/doughnut-book-reading-architecture-roadmap.md`](doughnut-book-reading-architecture-roadmap.md) changes (e.g. how fine-grained position relates to `ReadingRecord`), update *Current directional choices* or *Open architecture questions* there in the same delivery stream.
+1. Add or update the focused high-level test first, and confirm the failure is for the right reason.
+2. Implement the smallest change that makes that phase green while preserving the existing `reading_record.feature` path.
+3. Remove temporary state or dead branches that were only useful during the phase.
+4. Update this plan to reflect what shipped and trim notes that no longer matter for later phases.
+5. If the work changes a long-lived default, update the architecture or UX roadmap in the same delivery stream.
 
 ---
 
 ## Document maintenance
 
-When phases ship, trim duplication here; keep the architecture roadmap as the single place for long-lived conceptual rules. **Phase 2** and **Phase 3** Cypress path: [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature). **Phase 4** uses controller + mounted tests only (no new Cypress in that slice). Phase 1 uses unit/controller/mounted tests as described above.
+Keep this file forward-looking. Detailed shipped implementation notes should move to code, tests, or the architecture/UX roadmaps once they stop helping with upcoming phases.

@@ -23,31 +23,6 @@ When(
   }
 )
 
-When(
-  'I assign notebook {string} to notebook group {string}',
-  (notebookTitle: string, groupName: string) => {
-    start.navigateToNotebookPage(notebookTitle).assignNotebookToGroup(groupName)
-  }
-)
-
-When(
-  'I move notebook {string} to notebook group {string} from the notebook catalog',
-  (notebookTitle: string, groupName: string) => {
-    start
-      .navigateToNotebooksPage()
-      .moveOwnedNotebookToGroupFromCatalog(notebookTitle, groupName)
-  }
-)
-
-When(
-  'I move subscribed notebook {string} to notebook group {string} from the notebook catalog',
-  (notebookTitle: string, groupName: string) => {
-    start
-      .navigateToNotebooksPage()
-      .moveSubscribedNotebookToGroupFromCatalog(notebookTitle, groupName)
-  }
-)
-
 When('I go to my notebooks page', () => {
   start.navigateToNotebooksPage()
 })
