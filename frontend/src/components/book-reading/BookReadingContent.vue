@@ -62,6 +62,7 @@
         <ReadingControlPanel
           v-if="blockAwaitingConfirmation"
           :selected-block-title="blockAwaitingConfirmation.title"
+          :snap-animation-key="snapAnimationKey"
           @mark-as-read="() => markSelectedDisposition('READ')"
           @mark-as-skimmed="() => markSelectedDisposition('SKIMMED')"
           @mark-as-skipped="() => markSelectedDisposition('SKIPPED')"
@@ -180,6 +181,7 @@ const lastContentBottomVisible = ref(false)
 const geometryEverVisibleForSelection = ref(false)
 
 const snapbackAttempts = new Map<number, number>()
+const snapAnimationKey = ref(0)
 
 function shouldSnapBack(proposedAnchorId: number | null): boolean {
   if (proposedAnchorId === null) return false
@@ -191,10 +193,18 @@ function shouldSnapBack(proposedAnchorId: number | null): boolean {
   if (selIdx < 0 || selIdx >= rows.length - 1) return false
   const sel = rows[selIdx]!
   if (!sel.hasDirectContent) return false
+  const successor = rows[selIdx + 1]!
   const proposedIdx = rows.findIndex(
     (r) => r.startAnchor.id === proposedAnchorId
   )
-  if (proposedIdx <= selIdx) return false
+  if (proposedIdx < 0 || proposedIdx <= selIdx) return false
+  const immediateSuccessorAnchor = proposedAnchorId === successor.startAnchor.id
+  if (!immediateSuccessorAnchor) {
+    if (proposedIdx <= selIdx + 1) return false
+    for (let i = selIdx + 1; i < proposedIdx; i++) {
+      if (!rows[i]!.hasDirectContent) return false
+    }
+  }
   if (!geometryEverVisibleForSelection.value) return false
   if (sel.allBboxes.length <= 1) return false
   return (snapbackAttempts.get(selId) ?? 0) < 1
@@ -203,6 +213,7 @@ function shouldSnapBack(proposedAnchorId: number | null): boolean {
 function performSnapBack(): void {
   const selId = selectedBlockId.value
   if (selId === null) return
+  snapAnimationKey.value += 1
   const rows = flatBookBlocks.value
   const sel = rows.find((r) => r.id === selId)
   if (!sel || sel.allBboxes.length <= 1) return

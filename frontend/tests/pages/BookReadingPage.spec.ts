@@ -1251,6 +1251,81 @@ describe("BookReadingPage", () => {
         expect(snapToBottomSpy).toHaveBeenCalledWith(1, 150, 80, 500)
         expect(readingControlPanel(wrapper).exists()).toBe(true)
       })
+
+      it("sets data-snap-animating on panel when snap fires", async () => {
+        stubGetBookWithFirstBlockHavingBbox()
+        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        const wrapper = mountBookReadingPage(notebookId)
+        await waitForPdfViewer(wrapper)
+        mockIsLastContentBottomVisible(wrapper, true)
+        spyOnSuppressScrollInput(wrapper)
+
+        await clickBookBlockByTitle(wrapper, "Section 1")
+        await vi.waitFor(() =>
+          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+            "Section 1"
+          )
+        )
+
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 40, bottom: 600 },
+          pagesCount: 10,
+        })
+
+        mockIsLastContentBottomVisible(wrapper, false)
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 200, bottom: 600 },
+          pagesCount: 10,
+        })
+
+        expect(
+          readingControlPanel(wrapper).attributes("data-snap-animating")
+        ).toBe("true")
+      })
+
+      it("clears data-snap-animating after animationend on the inner card", async () => {
+        stubGetBookWithFirstBlockHavingBbox()
+        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        const wrapper = mountBookReadingPage(notebookId)
+        await waitForPdfViewer(wrapper)
+        mockIsLastContentBottomVisible(wrapper, true)
+        spyOnSuppressScrollInput(wrapper)
+
+        await clickBookBlockByTitle(wrapper, "Section 1")
+        await vi.waitFor(() =>
+          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+            "Section 1"
+          )
+        )
+
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 40, bottom: 600 },
+          pagesCount: 10,
+        })
+
+        mockIsLastContentBottomVisible(wrapper, false)
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 200, bottom: 600 },
+          pagesCount: 10,
+        })
+
+        expect(
+          readingControlPanel(wrapper).attributes("data-snap-animating")
+        ).toBe("true")
+
+        const panel = readingControlPanel(wrapper)
+        const card = panel.element.querySelector("div")
+        card?.dispatchEvent(new Event("animationend"))
+        await wrapper.vm.$nextTick()
+
+        expect(
+          readingControlPanel(wrapper).attributes("data-snap-animating")
+        ).toBeUndefined()
+      })
     })
 
     it("auto-marks predecessor with READ body when it has no direct content and no record", async () => {
