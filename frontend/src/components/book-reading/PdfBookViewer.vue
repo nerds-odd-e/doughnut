@@ -30,6 +30,7 @@ import {
   normalizedYToViewportY,
   outlineV1BboxToPdfJsXyzDestArray,
   outlineV1BboxToPixelRect,
+  type PdfOutlineV1Bbox,
   type PdfOutlineV1NavigationTarget,
 } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import {
@@ -230,19 +231,25 @@ function applyResponsiveDefaultScale(options?: { force?: boolean }) {
   pdfViewer.currentScale = nextScale
 }
 
-let pendingNavigation: PdfOutlineV1NavigationTarget | null = null
-let detachBookBlockSelectionBboxHighlight: (() => void) | null = null
-
-function clearBookBlockSelectionBboxHighlight() {
-  detachBookBlockSelectionBboxHighlight?.()
-  detachBookBlockSelectionBboxHighlight = null
+type PendingNavigation = {
+  target: PdfOutlineV1NavigationTarget
+  contentHighlightTargets: ReadonlyArray<PdfOutlineV1NavigationTarget>
 }
 
-function showBookBlockSelectionBboxHighlight(
+let pendingNavigation: PendingNavigation | null = null
+let bookBlockSelectionBboxHighlightCancels: (() => void)[] = []
+
+function clearBookBlockSelectionBboxHighlight() {
+  for (const c of bookBlockSelectionBboxHighlightCancels) {
+    c()
+  }
+  bookBlockSelectionBboxHighlightCancels = []
+}
+
+function appendBookBlockSelectionBboxHighlight(
   pageNumber: number,
-  bbox: PdfOutlineV1NavigationTarget["bbox"] & object
+  bbox: PdfOutlineV1Bbox
 ) {
-  clearBookBlockSelectionBboxHighlight()
   if (!pdfViewer) return
   const pageView = pdfViewer.getPageView(pageNumber - 1)
   if (!pageView?.div) return
@@ -251,13 +258,43 @@ function showBookBlockSelectionBboxHighlight(
     pageView.viewport.width,
     pageView.viewport.height
   )
-  detachBookBlockSelectionBboxHighlight = attachBookBlockSelectionBboxHighlight(
-    pageView.div,
-    rect
+  bookBlockSelectionBboxHighlightCancels.push(
+    attachBookBlockSelectionBboxHighlight(pageView.div, rect)
   )
 }
 
-async function applyPdfOutlineV1Target(target: PdfOutlineV1NavigationTarget) {
+function showSelectionBboxHighlights(
+  target: PdfOutlineV1NavigationTarget,
+  contentHighlightTargets: ReadonlyArray<PdfOutlineV1NavigationTarget>
+) {
+  clearBookBlockSelectionBboxHighlight()
+  if (!pdfViewer) return
+  const { pageIndex, bbox } = target
+  if (
+    bbox !== null &&
+    Number.isInteger(pageIndex) &&
+    pageIndex >= 0 &&
+    pageIndex < pdfViewer.pagesCount
+  ) {
+    appendBookBlockSelectionBboxHighlight(pageIndex + 1, bbox)
+  }
+  for (const e of contentHighlightTargets) {
+    if (e.bbox === null) continue
+    if (
+      !Number.isInteger(e.pageIndex) ||
+      e.pageIndex < 0 ||
+      e.pageIndex >= pdfViewer.pagesCount
+    ) {
+      continue
+    }
+    appendBookBlockSelectionBboxHighlight(e.pageIndex + 1, e.bbox)
+  }
+}
+
+async function applyPdfOutlineV1Target(
+  target: PdfOutlineV1NavigationTarget,
+  contentHighlightTargets: ReadonlyArray<PdfOutlineV1NavigationTarget> = []
+) {
   if (!pdfViewer?.pdfDocument) return
   const { pageIndex, bbox } = target
   if (
@@ -269,7 +306,6 @@ async function applyPdfOutlineV1Target(target: PdfOutlineV1NavigationTarget) {
   }
   const pageNumber = pageIndex + 1
   if (bbox === null) {
-    clearBookBlockSelectionBboxHighlight()
     pdfViewer.scrollPageIntoView({ pageNumber })
   } else {
     const page = await pdfViewer.pdfDocument.getPage(pageNumber)
@@ -280,8 +316,8 @@ async function applyPdfOutlineV1Target(target: PdfOutlineV1NavigationTarget) {
       bbox
     )
     pdfViewer.scrollPageIntoView({ pageNumber, destArray: [...destArray] })
-    showBookBlockSelectionBboxHighlight(pageNumber, bbox)
   }
+  showSelectionBboxHighlights(target, contentHighlightTargets)
   queueMicrotask(() => emitViewportDescriptorIfChanged())
 }
 
@@ -291,22 +327,25 @@ function flushPendingNavigation() {
   }
   const shot = pendingNavigation
   pendingNavigation = null
-  applyPdfOutlineV1Target(shot).catch(() => {
-    /* Outline jump failures from pdf.js must not reject pagesinit / viewer setup. */
-  })
+  applyPdfOutlineV1Target(shot.target, shot.contentHighlightTargets).catch(
+    () => {
+      /* Outline jump failures from pdf.js must not reject pagesinit / viewer setup. */
+    }
+  )
 }
 
 async function scrollToPdfOutlineV1Target(
-  target: PdfOutlineV1NavigationTarget
+  target: PdfOutlineV1NavigationTarget,
+  contentHighlightTargets: ReadonlyArray<PdfOutlineV1NavigationTarget> = []
 ) {
   if (!Number.isInteger(target.pageIndex) || target.pageIndex < 0) {
     return
   }
   if (!pdfViewer?.pdfDocument) {
-    pendingNavigation = target
+    pendingNavigation = { target, contentHighlightTargets }
     return
   }
-  await applyPdfOutlineV1Target(target)
+  await applyPdfOutlineV1Target(target, contentHighlightTargets)
 }
 
 async function scrollToStoredReadingPosition(
@@ -356,13 +395,11 @@ function zoomOut() {
   emitViewportDescriptorIfChanged()
 }
 
-function highlightBlockSelection(target: PdfOutlineV1NavigationTarget) {
-  const { pageIndex, bbox } = target
-  if (bbox === null) {
-    clearBookBlockSelectionBboxHighlight()
-    return
-  }
-  showBookBlockSelectionBboxHighlight(pageIndex + 1, bbox)
+function highlightBlockSelection(
+  target: PdfOutlineV1NavigationTarget,
+  contentHighlightTargets: ReadonlyArray<PdfOutlineV1NavigationTarget> = []
+) {
+  showSelectionBboxHighlights(target, contentHighlightTargets)
 }
 
 defineExpose({

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.odde.doughnut.services.book.BookBlockContentBboxItem;
+import com.odde.doughnut.services.book.BookBlockContentBboxes;
 import com.odde.doughnut.services.book.BookBlockDirectContentPredicate;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -20,7 +22,8 @@ import lombok.Setter;
   "siblingOrder",
   "title",
   "parentBlockId",
-  "hasDirectContent"
+  "hasDirectContent",
+  "contentBboxes"
 })
 public class BookBlock extends EntityIdentifiedByIdOnly {
 
@@ -75,5 +78,11 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   @JsonView(BookViews.Full.class)
   public boolean getHasDirectContent() {
     return BookBlockDirectContentPredicate.hasDirectContent(contentBlocks);
+  }
+
+  @JsonProperty("contentBboxes")
+  @JsonView(BookViews.Full.class)
+  public List<BookBlockContentBboxItem> getContentBboxes() {
+    return BookBlockContentBboxes.fromOrderedBlocks(contentBlocks);
   }
 }

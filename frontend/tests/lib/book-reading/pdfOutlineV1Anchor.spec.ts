@@ -1,8 +1,10 @@
 import {
+  contentBboxWireItemsToNavigationTargets,
   extractPageIndexZeroBased,
   normalizedYToViewportY,
   outlineV1BboxToPdfJsXyzDestArray,
   outlineV1BboxToPixelRect,
+  parseNormalizedBBoxArray,
   parsePdfOutlineV1Anchor,
   parsePdfOutlineV1StartAnchor,
   screenYToNormalizedY,
@@ -126,6 +128,49 @@ describe("parsePdfOutlineV1Anchor", () => {
       value: "not-json",
     }
     expect(parsePdfOutlineV1Anchor(anchor)).toBe(null)
+  })
+})
+
+describe("parseNormalizedBBoxArray", () => {
+  it("accepts valid four-number bbox", () => {
+    expect(parseNormalizedBBoxArray([10, 20, 100, 200])).toEqual([
+      10, 20, 100, 200,
+    ])
+  })
+
+  it("rejects wrong length or non-finite or inverted ranges", () => {
+    expect(parseNormalizedBBoxArray([1, 2, 3])).toBe(null)
+    expect(parseNormalizedBBoxArray([2, 1, 0, 0])).toBe(null)
+    expect(parseNormalizedBBoxArray(undefined)).toBe(null)
+  })
+})
+
+describe("contentBboxWireItemsToNavigationTargets", () => {
+  it("maps API items to navigation targets", () => {
+    expect(
+      contentBboxWireItemsToNavigationTargets([
+        { pageIndex: 0, bbox: [1, 2, 3, 4] },
+        { pageIndex: 1, bbox: [10, 20, 30, 40] },
+      ])
+    ).toEqual([
+      { pageIndex: 0, bbox: [1, 2, 3, 4] },
+      { pageIndex: 1, bbox: [10, 20, 30, 40] },
+    ])
+  })
+
+  it("drops invalid bbox or page", () => {
+    expect(
+      contentBboxWireItemsToNavigationTargets([
+        { pageIndex: 0, bbox: [1, 2, 3] },
+        { pageIndex: -1, bbox: [0, 0, 1, 1] },
+        { pageIndex: 0, bbox: [0, 0, 1, 1] },
+      ])
+    ).toEqual([{ pageIndex: 0, bbox: [0, 0, 1, 1] }])
+  })
+
+  it("returns empty for undefined or empty input", () => {
+    expect(contentBboxWireItemsToNavigationTargets(undefined)).toEqual([])
+    expect(contentBboxWireItemsToNavigationTargets([])).toEqual([])
   })
 })
 

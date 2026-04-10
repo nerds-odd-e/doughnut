@@ -44,6 +44,31 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
     ).toBeNull()
   })
 
+  it("allows multiple simultaneous overlays until each is cancelled", () => {
+    vi.useFakeTimers()
+    attachBookBlockSelectionBboxHighlight(host, {
+      left: 0,
+      top: 0,
+      width: 10,
+      height: 10,
+    })
+    attachBookBlockSelectionBboxHighlight(host, {
+      left: 20,
+      top: 0,
+      width: 10,
+      height: 10,
+    })
+    expect(
+      host.querySelectorAll("[data-testid=book-block-selection-bbox-highlight]")
+        .length
+    ).toBe(2)
+    vi.advanceTimersByTime(BOOK_BLOCK_SELECTION_BBOX_HIGHLIGHT_FADE_MS)
+    expect(
+      host.querySelectorAll("[data-testid=book-block-selection-bbox-highlight]")
+        .length
+    ).toBe(0)
+  })
+
   it("cancel() removes the highlight and pending timers", () => {
     vi.useFakeTimers()
     const cancel = attachBookBlockSelectionBboxHighlight(host, {

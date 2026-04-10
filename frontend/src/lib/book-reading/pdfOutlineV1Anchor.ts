@@ -27,6 +27,14 @@ export type PdfJsXyzDestArray = readonly [
   null,
 ]
 
+/** Same rules as anchor `bbox` JSON: four finite numbers, x0 < x1, y0 < y1. */
+export function parseNormalizedBBoxArray(
+  raw: ReadonlyArray<number> | undefined
+): PdfOutlineV1Bbox | null {
+  if (!raw || raw.length !== 4) return null
+  return parseOptionalBbox(raw as unknown[])
+}
+
 function parseOptionalBbox(raw: unknown): PdfOutlineV1Bbox | null {
   if (!Array.isArray(raw) || raw.length !== 4) return null
   const a = raw[0]
@@ -82,6 +90,28 @@ export function parsePdfOutlineV1Anchor(
 ): PdfOutlineV1NavigationTarget | null {
   if (anchor.anchorFormat !== ANCHOR_FORMAT) return null
   return parsePdfOutlineV1StartAnchor(anchor.value)
+}
+
+export function contentBboxWireItemsToNavigationTargets(
+  items:
+    | ReadonlyArray<{ pageIndex: number; bbox: ReadonlyArray<number> }>
+    | undefined
+): PdfOutlineV1NavigationTarget[] {
+  if (!items?.length) return []
+  const out: PdfOutlineV1NavigationTarget[] = []
+  for (const it of items) {
+    const bbox = parseNormalizedBBoxArray(it.bbox)
+    if (bbox === null) continue
+    if (
+      typeof it.pageIndex !== "number" ||
+      !Number.isInteger(it.pageIndex) ||
+      it.pageIndex < 0
+    ) {
+      continue
+    }
+    out.push({ pageIndex: it.pageIndex, bbox })
+  }
+  return out
 }
 
 export function extractPageIndexZeroBased(value: string): number | null {

@@ -3816,6 +3816,20 @@ components:
       - anchorFormat
       - id
       - value
+    BookBlockContentBboxItem_Full:
+      type: object
+      properties:
+        pageIndex:
+          type: integer
+          format: int32
+        bbox:
+          type: array
+          items:
+            type: number
+            format: double
+      required:
+      - bbox
+      - pageIndex
     BookBlock_Full:
       type: object
       properties:
@@ -3833,6 +3847,10 @@ components:
           type: string
         hasDirectContent:
           type: boolean
+        contentBboxes:
+          type: array
+          items:
+            $ref: "#/components/schemas/BookBlockContentBboxItem_Full"
       required:
       - id
       - startAnchor

@@ -331,6 +331,11 @@ export type BookAnchorFull = {
     value: string;
 };
 
+export type BookBlockContentBboxItemFull = {
+    pageIndex: number;
+    bbox: Array<number>;
+};
+
 export type BookBlockFull = {
     id: number;
     startAnchor: BookAnchorFull;
@@ -338,6 +343,7 @@ export type BookBlockFull = {
     title: string;
     parentBlockId?: string;
     hasDirectContent?: boolean;
+    contentBboxes?: Array<BookBlockContentBboxItemFull>;
 };
 
 export type BookFull = {

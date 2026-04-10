@@ -198,6 +198,7 @@ import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import {
+  contentBboxWireItemsToNavigationTargets,
   parsePdfOutlineV1Anchor,
   type PdfOutlineV1NavigationTarget,
 } from "@/lib/book-reading/pdfOutlineV1Anchor"
@@ -211,6 +212,7 @@ import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookRead
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type {
   BookAnchorFull,
+  BookBlockContentBboxItemFull,
   BookBlockFull,
   BookFull,
 } from "@generated/doughnut-backend-api"
@@ -271,6 +273,7 @@ type BookBlockRow = {
   depth: number
   startAnchor: BookAnchorFull
   hasDirectContent: boolean
+  contentBboxes: BookBlockContentBboxItemFull[]
 }
 
 function buildFlatBookBlocks(blocks: BookBlockFull[]): BookBlockRow[] {
@@ -295,6 +298,7 @@ function buildFlatBookBlocks(blocks: BookBlockFull[]): BookBlockRow[] {
         depth,
         startAnchor: child.startAnchor,
         hasDirectContent: child.hasDirectContent ?? true,
+        contentBboxes: child.contentBboxes ?? [],
       })
       visit(child.id, depth + 1)
     }
@@ -445,9 +449,13 @@ const initialLastRead = ref<{
 
 const pdfViewerRef = ref<{
   scrollToPdfOutlineV1Target: (
-    target: PdfOutlineV1NavigationTarget
+    target: PdfOutlineV1NavigationTarget,
+    contentHighlightTargets?: ReadonlyArray<PdfOutlineV1NavigationTarget>
   ) => Promise<void>
-  highlightBlockSelection: (target: PdfOutlineV1NavigationTarget) => void
+  highlightBlockSelection: (
+    target: PdfOutlineV1NavigationTarget,
+    contentHighlightTargets?: ReadonlyArray<PdfOutlineV1NavigationTarget>
+  ) => void
   scrollToStoredReadingPosition: (
     pageIndexZeroBased: number,
     normalizedY: number
@@ -462,7 +470,13 @@ async function applyBookBlockSelection(block: BookBlockRow) {
     return
   }
   selectedBlockId.value = block.id
-  await pdfViewerRef.value?.scrollToPdfOutlineV1Target(parsed)
+  const contentHighlightTargets = contentBboxWireItemsToNavigationTargets(
+    block.contentBboxes
+  )
+  await pdfViewerRef.value?.scrollToPdfOutlineV1Target(
+    parsed,
+    contentHighlightTargets
+  )
   currentBlockAnchorDebouncer.commitNow(block.startAnchor.id)
 }
 
@@ -473,7 +487,10 @@ useBookReadingBlockSelection({
     selectedBlockId.value = row.id
     const parsed = parsePdfOutlineV1Anchor(row.startAnchor)
     if (parsed !== null) {
-      pdfViewerRef.value?.highlightBlockSelection(parsed)
+      pdfViewerRef.value?.highlightBlockSelection(
+        parsed,
+        contentBboxWireItemsToNavigationTargets(row.contentBboxes)
+      )
     }
   },
 })
