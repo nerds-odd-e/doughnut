@@ -34,7 +34,9 @@ function topMathsLikeFlatBlocks(options?: {
     title: `Section ${i + 1}`,
     startAnchor,
     siblingOrder: i,
-    hasDirectContent: !(options?.firstBlockHasNoDirectContent && i === 0),
+    ...(options?.firstBlockHasNoDirectContent && i === 0
+      ? { allBboxes: [{ pageIndex: 0, bbox: [0, 0, 0, 0] }] }
+      : {}),
   }))
 }
 
@@ -495,6 +497,21 @@ describe("BookReadingPage", () => {
       return wrapper.find('[data-testid="book-reading-reading-control-panel"]')
     }
 
+    function mockIsLastContentBottomVisible(
+      wrapper: BookReadingPageWrapper,
+      returnValue: boolean
+    ) {
+      const pdf = wrapper.findComponent(PdfBookViewer)
+      const exposed = (
+        pdf.vm as unknown as {
+          $: { exposed: { isLastContentBottomVisible: () => boolean } }
+        }
+      ).$.exposed
+      vi.spyOn(exposed, "isLastContentBottomVisible").mockReturnValue(
+        returnValue
+      )
+    }
+
     async function clickBookBlockByTitle(
       wrapper: BookReadingPageWrapper,
       title: string
@@ -791,7 +808,6 @@ describe("BookReadingPage", () => {
           title: `Section ${i + 1}`,
           startAnchor,
           siblingOrder: i,
-          hasDirectContent: true,
           // Section 1 has anchor + one direct-content bbox; others have none
           allBboxes: i === 0 ? [anchorBbox, contentBbox] : [],
         }))
@@ -799,21 +815,6 @@ describe("BookReadingPage", () => {
           wrapSdkResponse(
             makeMe.aBook.notebookId(String(notebookId)).blocks(blocks).please()
           )
-        )
-      }
-
-      function mockIsLastContentBottomVisible(
-        wrapper: BookReadingPageWrapper,
-        returnValue: boolean
-      ) {
-        const pdf = wrapper.findComponent(PdfBookViewer)
-        const exposed = (
-          pdf.vm as unknown as {
-            $: { exposed: { isLastContentBottomVisible: () => boolean } }
-          }
-        ).$.exposed
-        vi.spyOn(exposed, "isLastContentBottomVisible").mockReturnValue(
-          returnValue
         )
       }
 
@@ -856,7 +857,6 @@ describe("BookReadingPage", () => {
           title: `Section ${i + 1}`,
           startAnchor,
           siblingOrder: i,
-          hasDirectContent: true,
           // Section 1: anchor on page 0, direct-content bbox on page 1 (cross-page)
           allBboxes: i === 0 ? [anchorBbox, crossPageContentBbox] : [],
         }))
@@ -1497,7 +1497,6 @@ describe("BookReadingPage", () => {
           title: `Section ${i + 1}`,
           startAnchor,
           siblingOrder: i,
-          hasDirectContent: true,
           allBboxes:
             i === 0
               ? [anchorBbox, contentBbox]

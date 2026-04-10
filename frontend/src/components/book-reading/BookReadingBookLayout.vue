@@ -96,7 +96,6 @@ export type BookReadingBookLayoutBlockRow = {
   title: string
   depth: number
   startAnchor: BookAnchorFull
-  hasDirectContent: boolean
   allBboxes: PageBboxFull[]
 }
 

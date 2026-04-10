@@ -162,7 +162,6 @@ function buildFlatBookBlocks(
         title: child.title,
         depth,
         startAnchor: child.startAnchor,
-        hasDirectContent: child.hasDirectContent ?? true,
         allBboxes: child.allBboxes ?? [],
       })
       visit(child.id, depth + 1)
@@ -183,6 +182,14 @@ const geometryEverVisibleForSelection = ref(false)
 const snapbackAttempts = new Map<number, number>()
 const snapAnimationKey = ref(0)
 
+function hasDirectContent(row: BookReadingBookLayoutBlockRow): boolean {
+  return row.allBboxes.length > 1
+}
+
+function lastContentBbox(row: BookReadingBookLayoutBlockRow) {
+  return hasDirectContent(row) ? row.allBboxes[row.allBboxes.length - 1]! : null
+}
+
 function shouldSnapBack(proposedAnchorId: number | null): boolean {
   if (proposedAnchorId === null) return false
   const selId = selectedBlockId.value
@@ -192,7 +199,6 @@ function shouldSnapBack(proposedAnchorId: number | null): boolean {
   const selIdx = rows.findIndex((r) => r.id === selId)
   if (selIdx < 0 || selIdx >= rows.length - 1) return false
   const sel = rows[selIdx]!
-  if (!sel.hasDirectContent) return false
   const successor = rows[selIdx + 1]!
   const proposedIdx = rows.findIndex(
     (r) => r.startAnchor.id === proposedAnchorId
@@ -202,11 +208,11 @@ function shouldSnapBack(proposedAnchorId: number | null): boolean {
   if (!immediateSuccessorAnchor) {
     if (proposedIdx <= selIdx + 1) return false
     for (let i = selIdx + 1; i < proposedIdx; i++) {
-      if (!rows[i]!.hasDirectContent) return false
+      if (!hasDirectContent(rows[i]!)) return false
     }
   }
   if (!geometryEverVisibleForSelection.value) return false
-  if (sel.allBboxes.length <= 1) return false
+  if (!hasDirectContent(sel)) return false
   return (snapbackAttempts.get(selId) ?? 0) < 2
 }
 
@@ -216,8 +222,9 @@ function performSnapBack(): void {
   snapAnimationKey.value += 1
   const rows = flatBookBlocks.value
   const sel = rows.find((r) => r.id === selId)
-  if (!sel || sel.allBboxes.length <= 1) return
-  const lastBbox = sel.allBboxes[sel.allBboxes.length - 1]!
+  if (!sel) return
+  const lastBbox = lastContentBbox(sel)
+  if (lastBbox === null) return
   snapbackAttempts.set(selId, (snapbackAttempts.get(selId) ?? 0) + 1)
   const parsedStart = parsePdfOutlineV1Anchor(sel.startAnchor)
   if (parsedStart !== null && parsedStart.pageIndex === lastBbox.pageIndex) {
@@ -260,9 +267,7 @@ const blockAwaitingConfirmation =
     const { selId, successor } = context
     const rows = flatBookBlocks.value
     const sel = rows.find((r) => r.id === selId)!
-    if (!sel.hasDirectContent) return null
-    const lastBbox =
-      sel.allBboxes.length > 1 ? sel.allBboxes[sel.allBboxes.length - 1]! : null
+    const lastBbox = lastContentBbox(sel)
     if (lastBbox !== null) {
       if (lastContentBottomVisible.value) return sel
       if (geometryEverVisibleForSelection.value) {
@@ -325,29 +330,20 @@ function onViewportAnchorPage(payload: {
     const selForGeometry = flatBookBlocks.value.find(
       (r) => r.id === selIdForGeometry
     )
-    if (selForGeometry?.hasDirectContent) {
-      const lastBboxForGeometry =
-        selForGeometry.allBboxes.length > 1
-          ? selForGeometry.allBboxes[selForGeometry.allBboxes.length - 1]!
-          : null
-      if (lastBboxForGeometry !== null) {
-        const geometryVisible =
-          pdfViewerRef.value?.isLastContentBottomVisible(
-            {
-              pageIndex: lastBboxForGeometry.pageIndex,
-              bbox: lastBboxForGeometry.bbox as [
-                number,
-                number,
-                number,
-                number,
-              ],
-            },
-            READING_PANEL_OBSTRUCTION_PX
-          ) ?? false
-        lastContentBottomVisible.value = geometryVisible
-        if (geometryVisible) {
-          geometryEverVisibleForSelection.value = true
-        }
+    const lastBboxForGeometry =
+      selForGeometry !== undefined ? lastContentBbox(selForGeometry) : null
+    if (lastBboxForGeometry !== null) {
+      const geometryVisible =
+        pdfViewerRef.value?.isLastContentBottomVisible(
+          {
+            pageIndex: lastBboxForGeometry.pageIndex,
+            bbox: lastBboxForGeometry.bbox as [number, number, number, number],
+          },
+          READING_PANEL_OBSTRUCTION_PX
+        ) ?? false
+      lastContentBottomVisible.value = geometryVisible
+      if (geometryVisible) {
+        geometryEverVisibleForSelection.value = true
       }
     }
   }
@@ -389,7 +385,8 @@ watch(currentBlockAnchorId, async (anchorId) => {
   if (bIdx <= 0) return
   const predecessor = rows[bIdx - 1]!
   if (
-    !predecessor.hasDirectContent &&
+    !hasDirectContent(predecessor) &&
+    predecessor.allBboxes.length > 0 &&
     !bookReading.hasRecordedDisposition(predecessor.id)
   ) {
     await bookReading.submitMarkRead(predecessor.id)
