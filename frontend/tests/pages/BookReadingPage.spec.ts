@@ -237,30 +237,6 @@ describe("BookReadingPage", () => {
     expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(false)
   })
 
-  it("does not load PDF viewer when hasSourceFile is false", async () => {
-    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-      wrapSdkResponse(
-        makeMe.aBook
-          .hasSourceFile(false)
-          .notebookId(String(notebookId))
-          .please()
-      )
-    )
-
-    const wrapper = mountBookReadingPage(notebookId)
-    await flushPromises()
-
-    expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(false)
-    expect(
-      wrapper.find('[data-testid="book-reading-book-file-load-error"]').exists()
-    ).toBe(false)
-    expect(
-      wrapper
-        .find('[data-testid="book-reading-pdf-viewer-load-error"]')
-        .exists()
-    ).toBe(false)
-  })
-
   it("shows loading indicator while PDF is loading, hides it after render", async () => {
     stubGetBookPlain(notebookId)
     let resolveFetch!: (r: Response) => void
@@ -290,7 +266,7 @@ describe("BookReadingPage", () => {
     )
   })
 
-  it("loads PDF into viewer when hasSourceFile is true", async () => {
+  it("loads PDF into viewer", async () => {
     stubGetBookPlain(notebookId)
     mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes, {
       assertSameOriginCredentials: true,

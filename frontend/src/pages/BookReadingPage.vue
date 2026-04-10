@@ -5,7 +5,7 @@
   >
     <template v-if="book">
       <div
-        v-if="book.hasSourceFile && pdfLoading"
+        v-if="pdfLoading"
         class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-flex-col"
       >
         <div class="daisy-px-2 daisy-py-2 sm:daisy-px-4 daisy-flex-1">
@@ -13,7 +13,7 @@
         </div>
       </div>
       <div
-        v-else-if="book.hasSourceFile && bookFileLoadError"
+        v-else-if="bookFileLoadError"
         class="daisy-px-2 daisy-py-2 sm:daisy-px-4"
       >
         <div
@@ -58,7 +58,7 @@ const initialLastRead = ref<{
 } | null>(null)
 
 const contentPdfBytes = computed(() => {
-  if (!book.value?.hasSourceFile) return undefined
+  if (!book.value) return undefined
   return bookPdfBytes.value ?? undefined
 })
 
@@ -69,40 +69,38 @@ onMounted(async () => {
   if (!error && data) {
     book.value = data
     const notebook = Number(data.notebookId)
-    if (data.hasSourceFile) {
-      pdfLoading.value = true
-      bookFileLoadError.value = null
-      try {
-        const [res, posResult] = await Promise.all([
-          fetch(notebookBookFilePath(notebook), {
-            credentials: "same-origin",
-          }),
-          NotebookBooksController.getNotebookBookReadingPosition({
-            path: { notebook },
-          }).catch(() => null),
-        ])
-        if (!res.ok) {
-          bookFileLoadError.value = "Could not load the book file."
-          return
-        }
-        if (
-          posResult !== null &&
-          !posResult.error &&
-          posResult.data &&
-          typeof posResult.data.pageIndex === "number" &&
-          typeof posResult.data.normalizedY === "number"
-        ) {
-          initialLastRead.value = {
-            pageIndexZeroBased: posResult.data.pageIndex,
-            normalizedY: posResult.data.normalizedY,
-          }
-        }
-        bookPdfBytes.value = await res.arrayBuffer()
-      } catch {
+    pdfLoading.value = true
+    bookFileLoadError.value = null
+    try {
+      const [res, posResult] = await Promise.all([
+        fetch(notebookBookFilePath(notebook), {
+          credentials: "same-origin",
+        }),
+        NotebookBooksController.getNotebookBookReadingPosition({
+          path: { notebook },
+        }).catch(() => null),
+      ])
+      if (!res.ok) {
         bookFileLoadError.value = "Could not load the book file."
-      } finally {
-        pdfLoading.value = false
+        return
       }
+      if (
+        posResult !== null &&
+        !posResult.error &&
+        posResult.data &&
+        typeof posResult.data.pageIndex === "number" &&
+        typeof posResult.data.normalizedY === "number"
+      ) {
+        initialLastRead.value = {
+          pageIndexZeroBased: posResult.data.pageIndex,
+          normalizedY: posResult.data.normalizedY,
+        }
+      }
+      bookPdfBytes.value = await res.arrayBuffer()
+    } catch {
+      bookFileLoadError.value = "Could not load the book file."
+    } finally {
+      pdfLoading.value = false
     }
   }
 })

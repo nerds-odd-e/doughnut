@@ -59,11 +59,8 @@ public class BookBuilder extends EntityBuilder<Book> {
     entity.setCreatedAt(now);
     entity.setUpdatedAt(now);
 
-    if (pdfBytes != null && pdfBytes.length > 0) {
-      entity.setSourceFileRef(makeMe.bookStorage.put(pdfBytes));
-    } else {
-      entity.setSourceFileRef(null);
-    }
+    byte[] toStore = pdfBytes == null || pdfBytes.length == 0 ? new byte[] {1} : pdfBytes;
+    entity.setSourceFileRef(makeMe.bookStorage.put(toStore));
 
     BookAnchor anchor = new BookAnchor();
     anchor.setAnchorFormat(ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1);

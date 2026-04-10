@@ -3877,8 +3877,6 @@ components:
             $ref: "#/components/schemas/BookBlock_Full"
         notebookId:
           type: string
-        hasSourceFile:
-          type: boolean
       required:
       - blocks
       - bookName

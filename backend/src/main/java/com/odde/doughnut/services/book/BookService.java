@@ -204,18 +204,13 @@ public class BookService {
     String ref = book.getSourceFileRef();
     bookUserLastReadPositionRepository.deleteByBook_Id(book.getId());
     bookRepository.delete(book);
-    if (ref != null && !ref.isBlank()) {
-      bookStorage.delete(ref);
-    }
+    bookStorage.delete(ref);
   }
 
   @Transactional(readOnly = true)
   public BookPdfFile getBookPdfFile(Notebook notebook) {
     Book book = getBookForNotebook(notebook);
     String ref = book.getSourceFileRef();
-    if (ref == null || ref.isBlank()) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
-    }
     byte[] bytes =
         bookStorage
             .get(ref)

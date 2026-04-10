@@ -12,7 +12,6 @@ class BookFullBuilder extends Builder<BookFull> {
       bookName: 'Test Book',
       format: 'pdf',
       notebookId: String(generateId()),
-      hasSourceFile: true,
       blocks: [],
     }
   }
@@ -34,11 +33,6 @@ class BookFullBuilder extends Builder<BookFull> {
 
   notebookId(notebookId: string): BookFullBuilder {
     this.data.notebookId = notebookId
-    return this
-  }
-
-  hasSourceFile(hasSourceFile: boolean): BookFullBuilder {
-    this.data.hasSourceFile = hasSourceFile
     return this
   }
 

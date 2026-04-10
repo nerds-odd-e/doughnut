@@ -14,16 +14,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "book")
-@JsonPropertyOrder({
-  "id",
-  "bookName",
-  "format",
-  "createdAt",
-  "updatedAt",
-  "blocks",
-  "notebookId",
-  "hasSourceFile"
-})
+@JsonPropertyOrder({"id", "bookName", "format", "createdAt", "updatedAt", "blocks", "notebookId"})
 public class Book extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -51,19 +42,13 @@ public class Book extends EntityIdentifiedByIdOnly {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String format;
 
-  @Column(name = "source_file_ref", length = 1024)
+  @Column(name = "source_file_ref", nullable = false, length = 1024)
   @Setter
   private String sourceFileRef;
 
   @JsonIgnore
   public String getSourceFileRef() {
     return sourceFileRef;
-  }
-
-  @JsonProperty("hasSourceFile")
-  @JsonView(BookViews.Full.class)
-  public boolean getHasSourceFile() {
-    return sourceFileRef != null && !sourceFileRef.isBlank();
   }
 
   @Column(name = "created_at", nullable = false)

@@ -322,16 +322,11 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void hasSourceFileTrueWhenPdfStored() throws UnexpectedNoAccessRightException {
+    void getBookReturnsBookWithNonBlankSourceFileRef() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
-      assertThat(controller.getBook(nb).getHasSourceFile(), equalTo(true));
-    }
-
-    @Test
-    void hasSourceFileFalseWhenSourceFileRefCleared() throws UnexpectedNoAccessRightException {
-      Notebook nb = notebookWithBook();
-      setSourceFileRef(nb, null);
-      assertThat(controller.getBook(nb).getHasSourceFile(), equalTo(false));
+      String ref = controller.getBook(nb).getSourceFileRef();
+      assertThat(ref, notNullValue());
+      assertThat(ref.isBlank(), equalTo(false));
     }
 
     @Test
@@ -545,13 +540,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void returns404WhenBookHasNoSourceFile() {
-      Notebook nb = notebookWithBook();
-      setSourceFileRef(nb, null);
-      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(webRequest(), nb));
-    }
-
-    @Test
     void rejectsNotebookWithoutReadAccess() {
       Notebook otherNb = otherUsersNotebook();
       assertThrows(
@@ -638,16 +626,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     void rejectsUnauthorizedNotebook() {
       Notebook otherNb = otherUsersNotebook();
       assertThrows(UnexpectedNoAccessRightException.class, () -> controller.deleteBook(otherNb));
-    }
-
-    @Test
-    void deletesBookWhenSourceFileRefMissing() throws UnexpectedNoAccessRightException {
-      Notebook nb = notebookWithBook();
-      setSourceFileRef(nb, null);
-
-      controller.deleteBook(nb);
-
-      assertThat(bookRepository.findByNotebook_Id(nb.getId()).isEmpty(), equalTo(true));
     }
   }
 

@@ -354,7 +354,6 @@ export type BookFull = {
     updatedAt?: string;
     blocks: Array<BookBlockFull>;
     notebookId: string;
-    hasSourceFile?: boolean;
 };
 
 export type NotebookCertificateApproval = {
