@@ -15,8 +15,7 @@
 - **Phase 2:** explicit **Mark as read** from the Reading Control Panel.
 - **Phase 3:** auto-mark **READ** for blocks with **no direct content**.
 - **Phase 4:** explicit **skimmed / skipped** dispositions.
-
-**Next planned work:** keep the existing Cypress path in [`reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature) green, but add **no new E2E** for the next reminder behavior. Cover the new behavior with **high-level mounted/controller tests** in the style preferred by `.cursor/rules/planning.mdc`.
+- **Phase 5:** first snap-back reminder when scrolling past an unread block's end boundary.
 
 ---
 
@@ -38,6 +37,7 @@ These shipped phases are the baseline that later reminder phases build on:
 - **Phase 2:** when the viewport reaches the immediate successor of a selected block, the **Reading Control Panel** lets the user mark that selected block **READ**.
 - **Phase 3:** when a predecessor block has **no direct content**, entering the successor auto-marks the predecessor **READ** instead of prompting.
 - **Phase 4:** the same panel path also supports **SKIMMED** and **SKIPPED**.
+- **Phase 5:** on the first crossing of the end boundary of an unread block with direct content, the reader snaps the viewport back so the last content bbox bottom sits above the panel, and keeps the panel visible. No E2E changes — covered by mounted tests.
 
 Keep this section short; detailed shipped implementation notes belong in code/tests and the architecture/UX roadmaps.
 
@@ -55,30 +55,6 @@ Keep this section short; detailed shipped implementation notes belong in code/te
 
 ---
 
-## Phase 5 — First unread boundary reminder with snap-back
-
-**User story scenario:** while reading a block that still needs an explicit disposition, the user scrolls past that block’s end without marking it as read.
-
-**User outcome:** on the **first** attempt to scroll past the current unread block’s end boundary, the reader:
-
-- shows the existing prompt that asks the user to mark that block as read, and
-- restores the scroll position to the **last valid position inside that same block**.
-
-**Depends on:** shipped Phase 2/4 disposition flow and shipped Phase 3 no-direct-content auto-read path.
-
-**Notes for implementation shape:**
-
-- The snap-back trigger should only run for a block that still has **no recorded disposition** and still requires an explicit answer.
-- The restored position should be the last viewer position that was still considered **inside** the block, not a synthetic top-of-block jump.
-- Existing `reading_record.feature` behavior must still pass unchanged.
-
-**Tests (no new E2E):**
-
-- **Mounted reader/page test:** drive the real end-boundary detection path for a block with direct content; assert that the prompt becomes visible and the viewer receives a restore-to-last-valid-position request on the first crossing.
-- **Mounted negative test:** assert that the same boundary crossing for a block already marked **READ/SKIMMED/SKIPPED**, or auto-read by the no-direct-content rule, does **not** snap back.
-
----
-
 ## Phase 6 — One more reminder, then release scrolling
 
 **User story scenario:** after the first snap-back, the user again tries to scroll past the same unread block without marking it as read.
@@ -90,7 +66,7 @@ Keep this section short; detailed shipped implementation notes belong in code/te
 **Notes for implementation shape:**
 
 - Count attempts **per block** in the active reader state.
-- “Allow normal scrolling” means the prompt may still be present or reappear by the usual rules, but the forced scroll restoration must stop after attempt two.
+- "Allow normal scrolling" means the prompt may still be present or reappear by the usual rules, but the forced scroll restoration must stop after attempt two.
 - Keep the counting rule simple: at most **two** snap-backs for one block before normal scrolling resumes.
 
 **Tests (no new E2E):**
@@ -106,7 +82,7 @@ Keep this section short; detailed shipped implementation notes belong in code/te
 
 **User outcome:**
 
-- marking the block **READ** clears that block’s snap-back reminder state immediately, so later scrolling for that block proceeds normally, and
+- marking the block **READ** clears that block's snap-back reminder state immediately, so later scrolling for that block proceeds normally, and
 - a different unread block gets its **own** reminder budget of up to two snap-backs.
 
 **Depends on:** Phase 6.
@@ -115,7 +91,7 @@ Keep this section short; detailed shipped implementation notes belong in code/te
 
 - Clearing is immediate on successful **Mark as read** completion; do not wait for navigation away and back.
 - The per-block scope should not accidentally share attempt counts across siblings, parent/child neighbors, or repeated visits to a different block.
-- This phase is only about **READ** because the requested behavior says “marked as read”; if product later wants skim/skip to clear the reminder too, that should be an explicit follow-up decision.
+- This phase is only about **READ** because the requested behavior says "marked as read"; if product later wants skim/skip to clear the reminder too, that should be an explicit follow-up decision.
 
 **Tests (no new E2E):**
 

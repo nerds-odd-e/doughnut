@@ -8,7 +8,7 @@ export type CurrentBlockAnchorDebouncer = {
 
 export function createCurrentBlockAnchorDebouncer(options: {
   delayMs: number
-  commit: (id: number | null) => void
+  commit: (id: number | null) => boolean
 }): CurrentBlockAnchorDebouncer {
   const { delayMs, commit } = options
   let lastCommitted: number | null = null
@@ -17,8 +17,11 @@ export function createCurrentBlockAnchorDebouncer(options: {
     if (id === lastCommitted) {
       return
     }
+    const prev = lastCommitted
     lastCommitted = id
-    commit(id)
+    if (!commit(id)) {
+      lastCommitted = prev
+    }
   }
 
   const debounced = debounce(apply, delayMs)
@@ -35,8 +38,11 @@ export function createCurrentBlockAnchorDebouncer(options: {
       if (id === lastCommitted) {
         return
       }
+      const prev = lastCommitted
       lastCommitted = id
-      commit(id)
+      if (!commit(id)) {
+        lastCommitted = prev
+      }
     },
   }
 }

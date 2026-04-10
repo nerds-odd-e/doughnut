@@ -103,6 +103,7 @@ const CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS = 120
 const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 /** Vertical space (px) reserved at the bottom of the PDF main pane by ReadingControlPanel. */
 const READING_PANEL_OBSTRUCTION_PX = 80
+const SNAP_HOLD_MS = 500
 
 const props = defineProps<{
   book: BookFull
@@ -179,6 +180,41 @@ const selectedBlockId = ref<number | null>(null)
 const lastContentBottomVisible = ref(false)
 const geometryEverVisibleForSelection = ref(false)
 
+const snapbackAttempts = new Map<number, number>()
+
+function shouldSnapBack(proposedAnchorId: number | null): boolean {
+  if (proposedAnchorId === null) return false
+  const selId = selectedBlockId.value
+  if (selId === null) return false
+  if (bookReading.hasRecordedDisposition(selId)) return false
+  const rows = bookBlockRows.value
+  const selIdx = rows.findIndex((r) => r.id === selId)
+  if (selIdx < 0 || selIdx >= rows.length - 1) return false
+  const sel = rows[selIdx]!
+  const successor = rows[selIdx + 1]!
+  if (!sel.hasDirectContent) return false
+  if (proposedAnchorId !== successor.startAnchor.id) return false
+  if (!geometryEverVisibleForSelection.value) return false
+  if (sel.allBboxes.length <= 1) return false
+  return (snapbackAttempts.get(selId) ?? 0) < 1
+}
+
+function performSnapBack(): void {
+  const selId = selectedBlockId.value
+  if (selId === null) return
+  const rows = bookBlockRows.value
+  const sel = rows.find((r) => r.id === selId)
+  if (!sel || sel.allBboxes.length <= 1) return
+  const lastBbox = sel.allBboxes[sel.allBboxes.length - 1]!
+  snapbackAttempts.set(selId, (snapbackAttempts.get(selId) ?? 0) + 1)
+  pdfViewerRef.value?.snapToContentBottomAndHold(
+    lastBbox.pageIndex,
+    (lastBbox.bbox as number[])[3]!,
+    READING_PANEL_OBSTRUCTION_PX,
+    SNAP_HOLD_MS
+  )
+}
+
 function selectedBlockHasSuccessorAndNoDisposition(): {
   selId: number
   successor: BookReadingBookLayoutBlockRow
@@ -223,7 +259,12 @@ const lastAnnouncedCurrentBlockTitle = ref<string | undefined>(undefined)
 const currentBlockAnchorDebouncer = createCurrentBlockAnchorDebouncer({
   delayMs: CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS,
   commit: (id) => {
+    if (shouldSnapBack(id)) {
+      performSnapBack()
+      return false
+    }
     currentBlockAnchorId.value = id
+    return true
   },
 })
 
@@ -335,6 +376,7 @@ watch(currentBlockAnchorId, async (anchorId) => {
 watch(selectedBlockId, () => {
   lastContentBottomVisible.value = false
   geometryEverVisibleForSelection.value = false
+  snapbackAttempts.clear()
 })
 
 const pdfViewerRef = ref<{
@@ -349,6 +391,12 @@ const pdfViewerRef = ref<{
     pageIndexZeroBased: number,
     normalizedY: number
   ) => Promise<void>
+  snapToContentBottomAndHold: (
+    pageIndex: number,
+    normalizedBboxBottom: number,
+    obstructionPx: number,
+    holdMs: number
+  ) => void
   zoomIn: () => void
   zoomOut: () => void
   isLastContentBottomVisible: (

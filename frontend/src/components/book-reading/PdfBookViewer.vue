@@ -87,6 +87,8 @@ let userAdjustedScale = false
 let onWheelForZoom: ((e: WheelEvent) => void) | null = null
 let onTouchStartForPinch: ((e: TouchEvent) => void) | null = null
 let onTouchMoveForPinch: ((e: TouchEvent) => void) | null = null
+let scrollSuppressed = false
+let scrollSuppressTimer: ReturnType<typeof setTimeout> | null = null
 let onTouchEndForPinch: ((e: TouchEvent) => void) | null = null
 let lastPinchDistance = 0
 
@@ -418,10 +420,50 @@ function isLastContentBottomVisible(
   return bboxBottomClient < panelTop && bboxBottomClient > containerRect.top
 }
 
+/**
+ * Scrolls so the bottom of the given bbox sits just above `obstructionPx` from the container
+ * bottom, then suppresses wheel/touch-move scroll input for `holdMs` milliseconds so trailing
+ * gesture events cannot immediately undo the snap.
+ */
+function snapToContentBottomAndHold(
+  pageIndex: number,
+  normalizedBboxBottom: number,
+  obstructionPx: number,
+  holdMs: number
+): void {
+  const container = containerRef.value
+  if (!container || !pdfViewer) return
+  if (
+    !Number.isInteger(pageIndex) ||
+    pageIndex < 0 ||
+    pageIndex >= pdfViewer.pagesCount
+  )
+    return
+  const pageView = pdfViewer.getPageView(pageIndex)
+  if (!(pageView as { div?: HTMLDivElement } | null)?.div) return
+  const pageDiv = (pageView as { div: HTMLDivElement }).div
+  const pageRect = pageDiv.getBoundingClientRect()
+  const containerRect = container.getBoundingClientRect()
+  const bboxBottomClient =
+    pageRect.top + (normalizedBboxBottom / 1000) * pageRect.height
+  const targetClient = containerRect.bottom - obstructionPx
+  container.scrollTop += bboxBottomClient - targetClient
+
+  if (scrollSuppressTimer !== null) {
+    clearTimeout(scrollSuppressTimer)
+  }
+  scrollSuppressed = true
+  scrollSuppressTimer = setTimeout(() => {
+    scrollSuppressed = false
+    scrollSuppressTimer = null
+  }, holdMs)
+}
+
 defineExpose({
   scrollToPdfOutlineV1Target,
   highlightBlockSelection,
   scrollToStoredReadingPosition,
+  snapToContentBottomAndHold,
   zoomIn,
   zoomOut,
   isLastContentBottomVisible,
@@ -478,6 +520,10 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
   container.addEventListener("scroll", onScrollForViewport, { passive: true })
 
   onWheelForZoom = (e: WheelEvent) => {
+    if (scrollSuppressed) {
+      e.preventDefault()
+      return
+    }
     if (!(e.ctrlKey || e.metaKey)) return
     if (!pdfViewer) return
     e.preventDefault()
@@ -494,6 +540,10 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
     }
   }
   onTouchMoveForPinch = (e: TouchEvent) => {
+    if (scrollSuppressed) {
+      e.preventDefault()
+      return
+    }
     const a = e.touches[0]
     const b = e.touches[1]
     if (!a || !b || !pdfViewer) return
@@ -591,6 +641,11 @@ watch(
 )
 
 onBeforeUnmount(async () => {
+  if (scrollSuppressTimer !== null) {
+    clearTimeout(scrollSuppressTimer)
+    scrollSuppressTimer = null
+  }
+  scrollSuppressed = false
   const container = containerRef.value
   if (container) {
     detachViewportScrollListener(container)
