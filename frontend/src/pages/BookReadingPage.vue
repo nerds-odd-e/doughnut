@@ -178,8 +178,8 @@
               @pages-ready="onPagesReady"
             />
             <ReadingControlPanel
-              v-if="readingControlPanelVisible"
-              :selected-block-title="readingControlSelectedBlockTitle"
+              v-if="blockAwaitingConfirmation"
+              :selected-block-title="blockAwaitingConfirmation.title"
               @mark-as-read="() => markSelectedDisposition('READ')"
               @mark-as-skimmed="() => markSelectedDisposition('SKIMMED')"
               @mark-as-skipped="() => markSelectedDisposition('SKIPPED')"
@@ -320,15 +320,7 @@ const lastPositionInsideSelectedBlock = ref<{
 } | null>(null)
 const snapBackAttempts = new Map<number, number>()
 
-const readingControlSelectedBlockTitle = computed(() => {
-  const selId = selectedBlockId.value
-  if (selId === null) {
-    return ""
-  }
-  return bookBlockRows.value.find((r) => r.id === selId)?.title ?? ""
-})
-
-const readingControlPanelVisible = ref(false)
+const blockAwaitingConfirmation = ref<BookBlockRow | null>(null)
 
 function selectedBlockHasSuccessorAndNoDisposition(): {
   selId: number
@@ -346,7 +338,7 @@ function selectedBlockHasSuccessorAndNoDisposition(): {
 function updateReadingControlPanelVisible() {
   const context = selectedBlockHasSuccessorAndNoDisposition()
   if (context === null) {
-    readingControlPanelVisible.value = false
+    blockAwaitingConfirmation.value = null
     return
   }
   const { selId, successor } = context
@@ -354,7 +346,7 @@ function updateReadingControlPanelVisible() {
   const sel = rows.find((r) => r.id === selId)!
 
   if (!sel.hasDirectContent) {
-    readingControlPanelVisible.value = false
+    blockAwaitingConfirmation.value = null
     return
   }
 
@@ -375,24 +367,24 @@ function updateReadingControlPanelVisible() {
       ) ?? false
 
     if (geometryVisible) {
-      readingControlPanelVisible.value = true
+      blockAwaitingConfirmation.value = sel
       return
     }
 
-    if (readingControlPanelVisible.value) {
+    if (blockAwaitingConfirmation.value !== null) {
       const successorIsCurrent =
         successor.startAnchor.id === currentBlockAnchorId.value
-      readingControlPanelVisible.value = !successorIsCurrent
+      blockAwaitingConfirmation.value = successorIsCurrent ? null : sel
       return
     }
 
-    readingControlPanelVisible.value = false
+    blockAwaitingConfirmation.value = null
     return
   }
 
   // Fallback: no usable bbox → use successor-anchor rule
-  readingControlPanelVisible.value =
-    successor.startAnchor.id === currentBlockAnchorId.value
+  blockAwaitingConfirmation.value =
+    successor.startAnchor.id === currentBlockAnchorId.value ? sel : null
 }
 
 const currentBlockLiveText = ref("")
@@ -508,7 +500,7 @@ watch(currentBlockAnchorId, async (anchorId) => {
 })
 
 watch(selectedBlockId, () => {
-  readingControlPanelVisible.value = false
+  blockAwaitingConfirmation.value = null
   updateReadingControlPanelVisible()
 })
 
@@ -519,10 +511,9 @@ watch(
   }
 )
 
-watch(readingControlPanelVisible, (visible) => {
-  if (!visible) return
-  const selId = selectedBlockId.value
-  if (selId === null) return
+watch(blockAwaitingConfirmation, (block) => {
+  if (block === null) return
+  const selId = block.id
   const attempts = snapBackAttempts.get(selId) ?? 0
   if (attempts >= 1) return
   const pos = lastPositionInsideSelectedBlock.value
