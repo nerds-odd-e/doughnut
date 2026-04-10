@@ -2,7 +2,6 @@
   <div
     class="notebook-list-row daisy-rounded-box daisy-border daisy-border-base-300/80 daisy-bg-base-100 daisy-transition-colors hover:daisy-border-primary/30 hover:daisy-bg-base-200/40"
     :class="{
-      'notebook-list-row--subscribed': isSubscribed,
       'notebook-list-row--compact': compact,
     }"
     data-cy="notebook-card"
@@ -46,7 +45,6 @@ import type { Notebook } from "@generated/doughnut-backend-api"
 
 defineProps<{
   notebook: Notebook
-  isSubscribed?: boolean
   compact?: boolean
 }>()
 </script>

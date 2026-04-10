@@ -1,10 +1,11 @@
 import { onWatcherCleanup, watch, type Ref } from "vue"
+import type { BookAnchorFull } from "@generated/doughnut-backend-api"
 
 export const AUTO_SELECT_BOOK_BLOCK_DWELL_MS = 5000
 
 export type BookBlockRowForSelection = {
   id: number
-  startAnchor: { id: number }
+  startAnchor: BookAnchorFull
 }
 
 /**

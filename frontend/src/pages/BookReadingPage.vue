@@ -447,6 +447,7 @@ const pdfViewerRef = ref<{
   scrollToPdfOutlineV1Target: (
     target: PdfOutlineV1NavigationTarget
   ) => Promise<void>
+  highlightBlockSelection: (target: PdfOutlineV1NavigationTarget) => void
   scrollToStoredReadingPosition: (
     pageIndexZeroBased: number,
     normalizedY: number
@@ -470,6 +471,10 @@ useBookReadingBlockSelection({
   currentBlockAnchorId,
   onDwellSelectBlock: (row) => {
     selectedBlockId.value = row.id
+    const parsed = parsePdfOutlineV1Anchor(row.startAnchor)
+    if (parsed !== null) {
+      pdfViewerRef.value?.highlightBlockSelection(parsed)
+    }
   },
 })
 

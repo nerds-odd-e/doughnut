@@ -356,8 +356,18 @@ function zoomOut() {
   emitViewportDescriptorIfChanged()
 }
 
+function highlightBlockSelection(target: PdfOutlineV1NavigationTarget) {
+  const { pageIndex, bbox } = target
+  if (bbox === null) {
+    clearBookBlockSelectionBboxHighlight()
+    return
+  }
+  showBookBlockSelectionBboxHighlight(pageIndex + 1, bbox)
+}
+
 defineExpose({
   scrollToPdfOutlineV1Target,
+  highlightBlockSelection,
   scrollToStoredReadingPosition,
   zoomIn,
   zoomOut,
