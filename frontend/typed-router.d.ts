@@ -167,6 +167,20 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/NotebookGroupPage': RouteRecordInfo<
+      '/NotebookGroupPage',
+      '/NotebookGroupPage',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/NotebookGroupPageView': RouteRecordInfo<
+      '/NotebookGroupPageView',
+      '/NotebookGroupPageView',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/NotebookPage': RouteRecordInfo<
       '/NotebookPage',
       '/NotebookPage',
@@ -353,6 +367,18 @@ declare module 'vue-router/auto-routes' {
     'src/pages/NonproductionOnlyLoginPage.vue': {
       routes:
         | '/NonproductionOnlyLoginPage'
+      views:
+        | never
+    }
+    'src/pages/NotebookGroupPage.vue': {
+      routes:
+        | '/NotebookGroupPage'
+      views:
+        | never
+    }
+    'src/pages/NotebookGroupPageView.vue': {
+      routes:
+        | '/NotebookGroupPageView'
       views:
         | never
     }

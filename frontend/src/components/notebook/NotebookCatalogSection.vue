@@ -29,40 +29,16 @@
           @notebook-updated="$emit('notebook-updated', $event)"
         />
       </NotebookListRow>
-      <div
+      <NotebookCatalogGroupPanel
         v-else
-        data-cy="notebook-group-card"
-        class="notebook-catalog-group daisy-rounded-box daisy-border daisy-border-primary/25 daisy-bg-primary/5 daisy-p-4"
-        :aria-label="hintForGroup(item).ariaLabel"
-      >
-        <div class="daisy-mb-3 daisy-flex daisy-flex-col daisy-gap-0.5">
-          <h3 class="daisy-m-0 daisy-text-base daisy-font-semibold daisy-text-base-content">
-            {{ item.name }}
-          </h3>
-          <p class="daisy-m-0 daisy-text-sm daisy-text-base-content/65">
-            {{ hintForGroup(item).subtitle }}
-          </p>
-        </div>
-        <div class="daisy-flex daisy-flex-col daisy-gap-2 daisy-border-l-2 daisy-border-primary/30 daisy-pl-3">
-          <NotebookListRow
-            v-for="nb in item.notebooks"
-            :key="nb.id"
-            :notebook="nb"
-            :is-subscribed="!!subscriptionForNotebook(nb.id)"
-          >
-            <SubscriptionNoteButtons
-              v-if="subscriptionForNotebook(nb.id)"
-              :subscription="subscriptionForNotebook(nb.id)!"
-              @updated="$emit('refresh')"
-            />
-            <NotebookButtons
-              v-else
-              v-bind="{ notebook: nb, user }"
-              @notebook-updated="$emit('notebook-updated', $event)"
-            />
-          </NotebookListRow>
-        </div>
-      </div>
+        :group="item"
+        :layout="layout"
+        :subscriptions="subscriptions"
+        :user="user"
+        header-navigates-to-group
+        @notebook-updated="$emit('notebook-updated', $event)"
+        @refresh="$emit('refresh')"
+      />
     </template>
   </div>
   <div
@@ -110,50 +86,16 @@
           </template>
         </NotebookCard>
       </div>
-      <div
+      <NotebookCatalogGroupPanel
         v-else
-        data-cy="notebook-group-card"
-        class="notebook-catalog-group daisy-col-span-full daisy-rounded-box daisy-border daisy-border-primary/25 daisy-bg-primary/5 daisy-p-4"
-        :aria-label="hintForGroup(item).ariaLabel"
-      >
-        <div class="daisy-mb-4 daisy-flex daisy-flex-col daisy-gap-0.5">
-          <h3 class="daisy-m-0 daisy-text-lg daisy-font-semibold daisy-text-base-content">
-            {{ item.name }}
-          </h3>
-          <p class="daisy-m-0 daisy-text-sm daisy-text-base-content/65">
-            {{ hintForGroup(item).subtitle }}
-          </p>
-        </div>
-        <div
-          class="daisy-grid daisy-grid-cols-1 sm:daisy-grid-cols-2 md:daisy-grid-cols-2 lg:daisy-grid-cols-3 xl:daisy-grid-cols-4 daisy-gap-4"
-        >
-          <div
-            v-for="nb in item.notebooks"
-            :key="nb.id"
-            role="card"
-            class="daisy-card"
-            :class="{ 'subscribed-notebook': !!subscriptionForNotebook(nb.id) }"
-            data-cy="notebook-card"
-          >
-            <NotebookCard :notebook="nb">
-              <template #cardHeader>
-                <span class="daisy-flex daisy-justify-end daisy-p-0">
-                  <SubscriptionNoteButtons
-                    v-if="subscriptionForNotebook(nb.id)"
-                    :subscription="subscriptionForNotebook(nb.id)!"
-                    @updated="$emit('refresh')"
-                  />
-                  <NotebookButtons
-                    v-else
-                    v-bind="{ notebook: nb, user }"
-                    @notebook-updated="$emit('notebook-updated', $event)"
-                  />
-                </span>
-              </template>
-            </NotebookCard>
-          </div>
-        </div>
-      </div>
+        :group="item"
+        :layout="layout"
+        :subscriptions="subscriptions"
+        :user="user"
+        header-navigates-to-group
+        @notebook-updated="$emit('notebook-updated', $event)"
+        @refresh="$emit('refresh')"
+      />
     </template>
   </div>
 </template>
@@ -163,15 +105,14 @@ import type { PropType } from "vue"
 import type { NotebookCatalogEntry } from "./patchNotebookInCatalogItems"
 import type {
   Notebook,
-  NotebookCatalogGroupItem,
   Subscription,
   User,
 } from "@generated/doughnut-backend-api"
 import NotebookButtons from "./NotebookButtons.vue"
 import NotebookCard from "../notebooks/NotebookCard.vue"
+import NotebookCatalogGroupPanel from "./NotebookCatalogGroupPanel.vue"
 import NotebookListRow from "./NotebookListRow.vue"
 import SubscriptionNoteButtons from "../subscriptions/SubscriptionNoteButtons.vue"
-import { groupMemberHint } from "./groupMemberHint"
 
 const props = defineProps({
   catalogItems: {
@@ -201,18 +142,10 @@ function subscriptionById(subscriptionId: number): Subscription | undefined {
   return props.subscriptions.find((s) => s.id === subscriptionId)
 }
 
-function subscriptionForNotebook(notebookId: number): Subscription | undefined {
-  return props.subscriptions.find((s) => s.notebook?.id === notebookId)
-}
-
 function catalogItemKey(item: NotebookCatalogEntry): string {
   if (item.type === "notebookGroup") return `grp-${item.id}`
   if (item.type === "subscribedNotebook") return `sub-${item.notebook.id}`
   return `nb-${item.notebook.id}`
-}
-
-function hintForGroup(item: NotebookCatalogGroupItem) {
-  return groupMemberHint(item.notebooks)
 }
 </script>
 

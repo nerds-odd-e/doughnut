@@ -62,6 +62,13 @@ const myNotebooksPage = () => {
         .should('contain.text', hintSubstring)
       return this as any
     },
+    openNotebookGroupFromHeader(groupName: string) {
+      cy.contains('[data-cy="notebook-group-card"]', groupName)
+        .find('[data-cy="notebook-group-header-link"]')
+        .click()
+      pageIsNotLoading()
+      return this as any
+    },
     expectNotebookAtTopLevelOfCatalog(notebookTitle: string) {
       cy.get('.notebook-catalog-section--list > [data-cy="notebook-card"]')
         .contains('h5', notebookTitle)

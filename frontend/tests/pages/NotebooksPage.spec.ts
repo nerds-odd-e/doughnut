@@ -1,6 +1,7 @@
 import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NotebooksPageView from "@/pages/NotebooksPageView.vue"
 import { beforeEach, describe, it, expect } from "vitest"
+import { RouterLink } from "vue-router"
 import makeMe, {
   type NotebookCatalogEntry,
 } from "doughnut-test-fixtures/makeMe"
@@ -402,6 +403,37 @@ describe("Notebooks Page", () => {
       expect(groupCard.classes()).toContain("notebook-catalog-group")
       expect(groupCard.attributes("aria-label")).toContain("Member Alpha")
       expect(groupCard.attributes("aria-label")).toContain("Member Delta")
+    })
+
+    it("group header links to notebook group route", async () => {
+      const catalogItems = [
+        makeMe.notebookCatalogGroup
+          .id(42)
+          .name("Nav Group")
+          .createdAt("2020-01-01T00:00:00.000Z")
+          .titles("Member One")
+          .please(),
+      ]
+
+      const wrapper = helper
+        .component(NotebooksPageView)
+        .withProps({
+          catalogItems,
+          subscriptions: [],
+          user: makeMe.aUser.please(),
+        })
+        .withCurrentUser(makeMe.aUser.please())
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      const groupCard = wrapper.get('[data-cy="notebook-group-card"]')
+      const headerRouterLink = groupCard.findAllComponents(RouterLink)[0]
+      expect(headerRouterLink.props("to")).toEqual({
+        name: "notebookGroup",
+        params: { groupId: 42 },
+      })
     })
   })
 

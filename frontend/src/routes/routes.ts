@@ -19,6 +19,7 @@ import CirclesPage from "@/pages/CirclesPage.vue"
 import ManageAccessTokensPage from "@/pages/ManageAccessTokensPage.vue"
 import MemoryTrackerPage from "@/pages/MemoryTrackerPage.vue"
 import NotebookPage from "@/pages/NotebookPage.vue"
+import NotebookGroupPage from "@/pages/NotebookGroupPage.vue"
 import BookReadingPage from "@/pages/BookReadingPage.vue"
 import { routeMetadata } from "./routeMetadata"
 
@@ -30,6 +31,7 @@ import { routeMetadata } from "./routeMetadata"
 const componentMap: Record<string, unknown> = {
   root: HomePage,
   notebooks: NotebooksPage,
+  notebookGroup: NotebookGroupPage,
   noteShow: NoteShowPage,
   circleShow: CircleShowPage,
   bazaar: BazaarPage,

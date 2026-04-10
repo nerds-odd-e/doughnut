@@ -16,6 +16,13 @@ export const routeMetadata: RouteMetadata[] = [
     name: "notebooks",
   },
   {
+    path: "/d/notebooks/groups/:groupId",
+    name: "notebookGroup",
+    props: (route: RouteLocation) => ({
+      groupId: Number(route.params.groupId),
+    }),
+  },
+  {
     path: "/d/notebooks/:notebookId/edit",
     name: "notebookEdit",
     props: (route: RouteLocation) => ({

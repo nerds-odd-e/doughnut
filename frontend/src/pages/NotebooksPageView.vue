@@ -163,6 +163,7 @@ import type {
 } from "@generated/doughnut-backend-api"
 import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
 import { sortNotebookCatalogAlphabetically } from "@/components/notebook/sortNotebookCatalogAlphabetically"
+import { useNotebooksLayout } from "@/composables/useNotebooksLayout"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import NotebookGroupNewForm from "@/components/notebook/NotebookGroupNewForm.vue"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
@@ -193,10 +194,9 @@ const handleNotebookUpdated = (updatedNotebook: Notebook) => {
   emit("notebook-updated", updatedNotebook)
 }
 
-const NOTEBOOKS_LAYOUT_STORAGE_KEY = "doughnut.notebooksPage.layout"
 const NOTEBOOKS_SORT_STORAGE_KEY = "doughnut.notebooksPage.sortOrder"
 
-const notebooksLayout = ref<"list" | "grid">("list")
+const { notebooksLayout } = useNotebooksLayout()
 const notebooksSortOrder = ref<"created" | "alphabetical">("created")
 const filterText = ref("")
 
@@ -231,18 +231,10 @@ const clearFilter = () => {
 }
 
 onMounted(() => {
-  const storedLayout = localStorage.getItem(NOTEBOOKS_LAYOUT_STORAGE_KEY)
-  if (storedLayout === "list" || storedLayout === "grid") {
-    notebooksLayout.value = storedLayout
-  }
   const storedSort = localStorage.getItem(NOTEBOOKS_SORT_STORAGE_KEY)
   if (storedSort === "created" || storedSort === "alphabetical") {
     notebooksSortOrder.value = storedSort
   }
-})
-
-watch(notebooksLayout, (value) => {
-  localStorage.setItem(NOTEBOOKS_LAYOUT_STORAGE_KEY, value)
 })
 
 watch(notebooksSortOrder, (value) => {

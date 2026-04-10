@@ -23,12 +23,30 @@ When('I go to my notebooks page', () => {
   start.navigateToNotebooksPage()
 })
 
+When(
+  'I open notebook group {string} from the catalog header',
+  (groupName: string) => {
+    start.navigateToNotebooksPage().openNotebookGroupFromHeader(groupName)
+  }
+)
+
 Then(
   'I should see notebook group {string} with a hint including {string}',
   (groupName: string, hintSubstring: string) => {
     start
       .navigateToNotebooksPage()
       .expectNotebookGroupWithMemberHint(groupName, hintSubstring)
+  }
+)
+
+Then(
+  'I should be on the notebook group page for {string} with notebook {string} listed',
+  (groupName: string, notebookTitle: string) => {
+    cy.url().should('match', /\/d\/notebooks\/groups\/\d+/)
+    cy.get('main').within(() => {
+      cy.contains('h1', groupName).should('be.visible')
+      cy.contains('h5', notebookTitle).should('be.visible')
+    })
   }
 )
 

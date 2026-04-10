@@ -30,9 +30,12 @@ export function useNavigationItems() {
         name: "notebooks",
         label: "Note",
         icon: BookText,
-        isActive: ["notebooks", "noteShow", "notebookEdit"].includes(
-          route.name as string
-        ),
+        isActive: [
+          "notebooks",
+          "notebookGroup",
+          "noteShow",
+          "notebookEdit",
+        ].includes(route.name as string),
       },
       {
         name: "assimilate",
