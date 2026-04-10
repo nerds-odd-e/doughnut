@@ -1,6 +1,5 @@
 package com.odde.doughnut.testability.builders;
 
-import static com.odde.doughnut.services.book.BookReadingWireConstants.ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1;
 import static com.odde.doughnut.services.book.BookReadingWireConstants.BOOK_FORMAT_PDF;
 
 import com.odde.doughnut.entities.Book;
@@ -63,7 +62,6 @@ public class BookBuilder extends EntityBuilder<Book> {
     entity.setSourceFileRef(makeMe.bookStorage.put(toStore));
 
     BookAnchor anchor = new BookAnchor();
-    anchor.setAnchorFormat(ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1);
     anchor.setValue("{\"p\":1}");
 
     BookBlock block = new BookBlock();

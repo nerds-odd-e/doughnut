@@ -32,7 +32,6 @@ from typing import Any
 from xml.etree import ElementTree as ET
 
 SUPPORTED_BOOK_SUFFIXES = frozenset({".pdf", ".epub"})
-ANCHOR_FORMAT = "pdf.mineru_outline_v1"
 
 
 def _print_json_result(payload: dict) -> None:
@@ -156,7 +155,7 @@ def find_middle_json(output_dir: Path, stem: str) -> Path | None:
 
 def _anchor(payload: dict[str, Any]) -> dict[str, str]:
     s = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
-    return {"anchorFormat": ANCHOR_FORMAT, "value": s}
+    return {"value": s}
 
 
 def _beginning_anchor_payload(first_orphan: dict[str, Any]) -> dict[str, Any]:

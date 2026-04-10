@@ -1,6 +1,5 @@
 package com.odde.doughnut.services.book;
 
-import static com.odde.doughnut.services.book.BookReadingWireConstants.ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1;
 import static com.odde.doughnut.services.book.BookReadingWireConstants.BOOK_FORMAT_PDF;
 import static com.odde.doughnut.services.book.BookReadingWireConstants.MAX_LAYOUT_DEPTH;
 
@@ -283,19 +282,6 @@ public class BookService {
       throw new ApiException(
           label + " is required", ApiError.ErrorType.BINDING_ERROR, label + " is required");
     }
-    String format = trimToNull(anchor.getAnchorFormat());
-    if (format == null) {
-      throw new ApiException(
-          label + ".anchorFormat is required",
-          ApiError.ErrorType.BINDING_ERROR,
-          label + ".anchorFormat is required");
-    }
-    if (!ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1.equals(format)) {
-      throw new ApiException(
-          label + ".anchorFormat must be \"" + ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1 + "\"",
-          ApiError.ErrorType.BINDING_ERROR,
-          label + ".anchorFormat must be \"" + ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1 + "\"");
-    }
     String value = trimToNull(anchor.getValue());
     if (value == null || value.isEmpty()) {
       throw new ApiException(
@@ -320,7 +306,6 @@ public class BookService {
     }
 
     BookAnchor start = new BookAnchor();
-    start.setAnchorFormat(ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1);
     start.setValue(node.getStartAnchor().getValue().trim());
 
     BookBlock block = new BookBlock();

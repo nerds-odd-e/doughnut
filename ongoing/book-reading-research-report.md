@@ -78,7 +78,7 @@ The landscape research above talks about “TOC,” “structure,” “highligh
 |----------------|-------------|
 | Book file, format, import | **`Book`** in a **`Notebook`** (`format`, `sourceFileRef`) |
 | Outline / chapter / section / navigable chunk | **`BookBlock`**: `startAnchor`, optional `structuralTitle` text, optional child blocks for hierarchy |
-| Exact point or span in the file (PDF coords, EPUB CFI, etc.) | **`BookAnchor`**: `anchorFormat` + opaque `value` until format-specific design hardens |
+| Exact point or span in the file (PDF coords, EPUB CFI, etc.) | **`BookAnchor`**: opaque `value` (shipped: PDF MinerU outline v1 JSON) |
 | “This highlight is from here” / evidence for a PKM note | **`SourceSpan`**: anchor pair, optionally scoped **`within`** a `BookBlock`; a **`Note`** has at most one `SourceSpan` for now |
 | “Where I left off” / completed a section | **`ReadingRecord`**: per **`User`**, refers to a **`BookBlock`** (meaningful chunk), not a tiny citation span |
 

@@ -11,12 +11,6 @@ import lombok.Setter;
 @Table(name = "book_anchor")
 public class BookAnchor extends EntityIdentifiedByIdOnly {
 
-  @Column(name = "anchor_format", nullable = false)
-  @Getter
-  @Setter
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private String anchorFormat;
-
   @Column(name = "value", nullable = false, columnDefinition = "TEXT")
   @Getter
   @Setter

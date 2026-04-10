@@ -11,9 +11,5 @@ public class AttachBookAnchorRequest {
 
   @NotBlank
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private String anchorFormat;
-
-  @NotBlank
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String value;
 }

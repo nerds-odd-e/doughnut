@@ -114,7 +114,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
 
   private static AttachBookAnchorRequest anchor(String value) {
     AttachBookAnchorRequest a = new AttachBookAnchorRequest();
-    a.setAnchorFormat(BookReadingWireConstants.ANCHOR_FORMAT_PDF_MINERU_OUTLINE_V1);
     a.setValue(value);
     return a;
   }
@@ -224,16 +223,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       req.getLayout().setRoots(new ArrayList<>());
       assertThrows(
           ApiException.class, () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
-    }
-
-    @Test
-    void rejectsBadAnchorFormat() {
-      Notebook nb = myNotebook();
-      AttachBookLayoutNodeRequest n = node("A");
-      n.getStartAnchor().setAnchorFormat("unknown");
-      assertThrows(
-          ApiException.class,
-          () -> controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES)));
     }
 
     @Test

@@ -3749,12 +3749,9 @@ components:
     AttachBookAnchorRequest_Full:
       type: object
       properties:
-        anchorFormat:
-          type: string
         value:
           type: string
       required:
-      - anchorFormat
       - value
     AttachBookLayoutNodeRequest_Full:
       type: object
@@ -3808,12 +3805,9 @@ components:
         id:
           type: integer
           format: int32
-        anchorFormat:
-          type: string
         value:
           type: string
       required:
-      - anchorFormat
       - id
       - value
     BookBlockContentBboxItem_Full:

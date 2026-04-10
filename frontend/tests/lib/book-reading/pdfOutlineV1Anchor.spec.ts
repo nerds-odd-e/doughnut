@@ -99,10 +99,9 @@ describe("parsePdfOutlineV1StartAnchor", () => {
 })
 
 describe("parsePdfOutlineV1Anchor", () => {
-  it("recognizes the pdf.mineru_outline_v1 wire format", () => {
+  it("parses outline v1 from BookAnchor.value", () => {
     const anchor = {
       id: 1,
-      anchorFormat: "pdf.mineru_outline_v1",
       value: '{"page_idx":0}',
     }
     expect(parsePdfOutlineV1Anchor(anchor)).toEqual({
@@ -111,19 +110,9 @@ describe("parsePdfOutlineV1Anchor", () => {
     })
   })
 
-  it("returns null for wrong anchor format", () => {
-    const anchor = {
-      id: 1,
-      anchorFormat: "other",
-      value: '{"page_idx":0}',
-    }
-    expect(parsePdfOutlineV1Anchor(anchor)).toBe(null)
-  })
-
   it("returns null when value is malformed", () => {
     const anchor = {
       id: 1,
-      anchorFormat: "pdf.mineru_outline_v1",
       value: "not-json",
     }
     expect(parsePdfOutlineV1Anchor(anchor)).toBe(null)

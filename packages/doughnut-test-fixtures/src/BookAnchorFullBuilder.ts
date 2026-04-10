@@ -1,8 +1,6 @@
 import type { BookAnchorFull } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 
-const PDF_OUTLINE_V1_ANCHOR_WIRE = 'pdf.mineru_outline_v1'
-
 class BookAnchorFullBuilder extends Builder<BookAnchorFull> {
   data: BookAnchorFull
 
@@ -10,18 +8,12 @@ class BookAnchorFullBuilder extends Builder<BookAnchorFull> {
     super()
     this.data = {
       id: 1,
-      anchorFormat: PDF_OUTLINE_V1_ANCHOR_WIRE,
       value: '{"page_idx":0}',
     }
   }
 
   id(id: number): BookAnchorFullBuilder {
     this.data.id = id
-    return this
-  }
-
-  anchorFormat(anchorFormat: string): BookAnchorFullBuilder {
-    this.data.anchorFormat = anchorFormat
     return this
   }
 
@@ -34,7 +26,6 @@ class BookAnchorFullBuilder extends Builder<BookAnchorFull> {
     pageIndex: number,
     bbox?: readonly [number, number, number, number]
   ): BookAnchorFullBuilder {
-    this.data.anchorFormat = PDF_OUTLINE_V1_ANCHOR_WIRE
     const payload: { page_idx: number; bbox?: number[] } = {
       page_idx: pageIndex,
     }

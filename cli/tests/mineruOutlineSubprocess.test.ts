@@ -127,12 +127,11 @@ describe('runMineruOutlineSubprocess', () => {
       roots: [
         {
           title: 'Root A',
-          startAnchor: { anchorFormat: 'pdf.mineru_outline_v1', value: '{}' },
+          startAnchor: { value: '{}' },
           children: [
             {
               title: 'Child 1',
               startAnchor: {
-                anchorFormat: 'pdf.mineru_outline_v1',
                 value: '{}',
               },
             },
@@ -173,7 +172,7 @@ describe('runMineruOutlineSubprocess', () => {
       roots: [
         {
           title: 'Root A',
-          startAnchor: { anchorFormat: 'pdf.mineru_outline_v1', value: '{}' },
+          startAnchor: { value: '{}' },
           contentBlocks: [{ type: 'page_number', text: '1', page_idx: 0 }],
         },
       ],

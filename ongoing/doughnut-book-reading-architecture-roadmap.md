@@ -62,7 +62,6 @@ classDiagram
     }
 
     class BookAnchor {
-      +anchorFormat
       +value
     }
 
@@ -102,9 +101,7 @@ classDiagram
 
 ### BookAnchor
 
-The most precise locator: one place in the book. Examples over time: PDF coordinates, EPUB CFI, paragraph offsets, etc.
-
-Keep the abstraction **open** early: `anchorFormat` + `value` (opaque until format-specific design is justified).
+The most precise locator: one place in the book. For the shipped PDF + MinerU path, **`value`** holds **PDF MinerU outline v1** JSON (`page_idx`, optional `bbox` in normalized page space). If we add EPUB or other book files later, we extend storage or introduce a parallel shape explicitly — not a second discriminator field on this entity.
 
 ### BookBlock
 
@@ -191,7 +188,7 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 
 ## Story 1 (shipped)
 
-**Book** metadata plus **BookBlock** tree on a **Notebook**: **`POST /api/notebooks/{notebook}/attach-book`** (JSON **book layout** / `BookBlock` tree only) and **`GET /api/notebooks/{notebook}/book`**, at most one book per notebook. As shipped, **`sourceFileRef` is not used** and there is **no server-side PDF storage**; the PDF stayed on the client. Range **start anchors** use **`pdf.mineru_outline_v1`** on the wire (backend `BookReadingWireConstants`).
+**Book** metadata plus **BookBlock** tree on a **Notebook**: **`POST /api/notebooks/{notebook}/attach-book`** (JSON **book layout** / `BookBlock` tree only) and **`GET /api/notebooks/{notebook}/book`**, at most one book per notebook. As shipped, **`sourceFileRef` is not used** and there is **no server-side PDF storage**; the PDF stayed on the client. **`BookAnchor`** carries only **`value`**: **PDF MinerU outline v1** JSON for block starts.
 
 ---
 
@@ -211,7 +208,7 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 
 **Plan:** Phased delivery is spelled out in [`ongoing/book-reading-read-a-block-plan.md`](book-reading-read-a-block-plan.md).
 
-**Implemented so far (Story 2):** Phases **1–6** and **11–13** of that plan are shipped: multipart attach, **`GET …/book/file`**, **pdf.js** full scrollable viewer (`PdfBookViewer` using the **legacy** pdf.js stack — see **PDF.js build** below), the **book layout** from **`GET …/book`** in a **left** responsive drawer/panel (PDF in **`main`**; **768px** breakpoint: open by default on large, overlay + backdrop on small; **Book layout** control in **GlobalBar**), **layout → PDF** navigation from **`pdf.mineru_outline_v1`** anchors (page index, optional bbox, chrome/safe-area offset, bad-anchor no-op), **PDF ↔ book layout** sync (viewport drives **current block** highlight on a **book block**, debounced, with accessible live region for title changes), responsive default PDF scale (full-width on narrow viewports, comfortable max-width cap on wide viewports based on first-page intrinsic geometry, with manual zoom preserved across resize), **GlobalBar** **`PdfControl`** zoom buttons + page indicator, and **PDF-only gesture zoom** (ctrl/meta + wheel and two-finger pinch on the viewer scroll container, shared **`pdfViewer.currentScale`**, `preventDefault` to avoid browser zoom). The book-reading E2E uses **OCR on rendered canvases** (Tesseract.js, committed language data under `e2e_test/tesseract/`) for page markers — **not** a product DOM text layer on top of the canvas.
+**Implemented so far (Story 2):** Phases **1–6** and **11–13** of that plan are shipped: multipart attach, **`GET …/book/file`**, **pdf.js** full scrollable viewer (`PdfBookViewer` using the **legacy** pdf.js stack — see **PDF.js build** below), the **book layout** from **`GET …/book`** in a **left** responsive drawer/panel (PDF in **`main`**; **768px** breakpoint: open by default on large, overlay + backdrop on small; **Book layout** control in **GlobalBar**), **layout → PDF** navigation from **`BookAnchor.value`** (MinerU outline v1 JSON: page index, optional bbox, chrome/safe-area offset, bad-anchor no-op), **PDF ↔ book layout** sync (viewport drives **current block** highlight on a **book block**, debounced, with accessible live region for title changes), responsive default PDF scale (full-width on narrow viewports, comfortable max-width cap on wide viewports based on first-page intrinsic geometry, with manual zoom preserved across resize), **GlobalBar** **`PdfControl`** zoom buttons + page indicator, and **PDF-only gesture zoom** (ctrl/meta + wheel and two-finger pinch on the viewer scroll container, shared **`pdfViewer.currentScale`**, `preventDefault` to avoid browser zoom). The book-reading E2E uses **OCR on rendered canvases** (Tesseract.js, committed language data under `e2e_test/tesseract/`) for page markers — **not** a product DOM text layer on top of the canvas.
 
 **PDF.js build (current):** The app uses **pdf.js legacy** end-to-end (`pdfjs-dist/legacy/build/pdf.mjs`, `legacy/web/pdf_viewer.mjs` + CSS, `legacy/build/pdf.worker.mjs` wired from `frontend/src/lib/pdfjsWorker.ts`). The standard worker assumes **`Uint8Array.prototype.toHex`** (PDF fingerprints); **Cypress’s bundled Electron** is on an older Chromium without that API, which breaks PDF load (e.g. `hashOriginal.toHex is not a function`). Legacy bundles a polyfill; **main thread and worker must stay on the same build line** (mixing legacy worker + modern `getDocument` is unsupported).
 
@@ -225,7 +222,7 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 
 Revisit when implementation or product constraints clarify:
 
-- Whether `BookAnchor.value` stays opaque text or becomes structured payload (e.g. JSON) per `anchorFormat`.
+- Whether `BookAnchor.value` should gain a typed JSON schema or stay a documented string convention as formats multiply.
 - Whether `ReadingRecord` needs finer-grained progress inside a block (percentage, character offset, etc.).
 - Whether `BookBlock` should distinguish blocks from the **imported book layout** from user-created blocks.
 - Whether `SourceSpan.kind` should classify text, image, figure, table, or mixed content for rendering and export.

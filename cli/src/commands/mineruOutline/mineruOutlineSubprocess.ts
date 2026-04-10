@@ -214,9 +214,6 @@ function validateAnchor(a: unknown, label: string): string | null {
   if (!isRecord(a)) {
     return `${label} must be an object`
   }
-  if (typeof a.anchorFormat !== 'string' || a.anchorFormat.trim() === '') {
-    return `${label}.anchorFormat is required`
-  }
   if (typeof a.value !== 'string') {
     return `${label}.value is required`
   }

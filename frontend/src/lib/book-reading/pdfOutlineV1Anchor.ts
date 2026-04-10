@@ -7,7 +7,6 @@
  */
 import type { BookAnchorFull } from "@generated/doughnut-backend-api"
 
-const ANCHOR_FORMAT = "pdf.mineru_outline_v1"
 const NORMALIZED_MAX = 1000
 const SCROLL_TOP_PADDING_PDF = 40
 
@@ -76,11 +75,10 @@ export function parsePdfOutlineV1StartAnchor(
   }
 }
 
-/** Check anchor format and parse value in one step. Returns `null` for wrong format or bad value. */
+/** Parse `BookAnchor.value` as PDF MinerU outline v1 JSON. Returns `null` for bad value. */
 export function parsePdfOutlineV1Anchor(
   anchor: BookAnchorFull
 ): PdfOutlineV1NavigationTarget | null {
-  if (anchor.anchorFormat !== ANCHOR_FORMAT) return null
   return parsePdfOutlineV1StartAnchor(anchor.value)
 }
 

@@ -30,9 +30,9 @@ describe("currentBlockAnchorIdFromAnchorPage", () => {
     expect(currentBlockAnchorIdFromAnchorPage([], 0)).toBe(null)
   })
 
-  it("returns null when every anchor is wrong format or unparseable", () => {
+  it("returns null when every anchor value is unparseable as outline v1", () => {
     const anchors = [
-      makeMe.aBookAnchor.anchorFormat("other").value("{}").id(1).please(),
+      makeMe.aBookAnchor.value("{}").id(1).please(),
       makeMe.aBookAnchor.id(2).value("not-json").please(),
     ]
     expect(currentBlockAnchorIdFromAnchorPage(anchors, 0)).toBe(null)
@@ -110,9 +110,9 @@ describe("currentBlockAnchorIdFromAnchorPage", () => {
     expect(currentBlockAnchorIdFromAnchorPage(list, 0, null, 1.5)).toBe(null)
   })
 
-  it("partial book layout: only valid pdf.mineru_outline_v1 anchors participate", () => {
+  it("partial book layout: only anchors with valid outline v1 values participate", () => {
     const anchors = [
-      makeMe.aBookAnchor.anchorFormat("other").value("{}").id(1).please(),
+      makeMe.aBookAnchor.value("{}").id(1).please(),
       makeMe.aBookAnchor.id(2).value("not-json").please(),
       makeMe.aBookAnchor.pdfOutlineV1Start(0).id(77).please(),
     ]

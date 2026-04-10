@@ -299,7 +299,6 @@ export type RedirectToNoteResponse = {
 };
 
 export type AttachBookAnchorRequestFull = {
-    anchorFormat: string;
     value: string;
 };
 
@@ -327,7 +326,6 @@ export type AttachBookRequestFull = {
 
 export type BookAnchorFull = {
     id: number;
-    anchorFormat: string;
     value: string;
 };
 
